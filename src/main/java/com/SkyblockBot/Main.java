@@ -36,7 +36,7 @@ public class Main {
 
                 );
 
-                JDABuilder.createDefault("Nzk2NzkxMTY3MzY2NTk0NTky.X_dDmQ.zOZSNLa6s1fBzyUD2jQtjOsX-a8")
+                JDABuilder.createDefault(System.getenv("BOT_TOKEN"))// "Nzk2NzkxMTY3MzY2NTk0NTky.X_dDmQ.zOZSNLa6s1fBzyUD2jQtjOsX-a8")
                                 .setStatus(OnlineStatus.DO_NOT_DISTURB).setActivity(Activity.playing("Loading..."))
                                 .addEventListeners(waiter, client.build()).build();
         }
