@@ -9,6 +9,19 @@ version '1.0'
 
 sourceCompatibility = targetCompatibility = 1.8
 
+task stage(type: Copy, dependsOn: [clean, build]) {
+    from jar.archivePath
+    into project.rootDir 
+    rename {
+        'app.jar'
+    }
+}
+stage.mustRunAfter(clean)
+
+clean << {
+    project.file('app.jar').delete()
+}
+
 repositories {
     jcenter()
     maven {
