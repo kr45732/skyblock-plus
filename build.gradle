@@ -1,0 +1,29 @@
+plugins {
+    id'application'
+    id'com.github.johnrengelman.shadow' version '5.2.0'
+}
+
+mainClassName = 'com.SkyblockBot.Main'
+
+version '1.0'
+
+sourceCompatibility = targetCompatibility = 1.8
+
+task stage(dependsOn: ['build', 'clean'])
+
+repositories {
+    jcenter()
+    maven {
+        url 'https://jitpack.io'
+    }
+}
+
+dependencies {
+    compile "net.dv8tion:JDA:4.2.0_225"
+    compile "ch.qos.logback:logback-classic:1.2.3"
+    compile 'com.github.HypixelDev.PublicAPI:Example:2.0.0'
+    compile 'com.jagrosh:jda-utilities:3.0.5'
+
+}
+
+compileJava.options.encoding = 'UTF-8'
