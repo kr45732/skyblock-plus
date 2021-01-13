@@ -1,1 +1,1 @@
-worker: java $JAVA_OPTS -jar app.jar
+worker: java -jar app.jar
