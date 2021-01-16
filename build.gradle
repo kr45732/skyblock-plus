@@ -26,17 +26,18 @@ clean {
 
 repositories {
     jcenter()
+    // mavenCentral()
     maven {
         url 'https://jitpack.io'
     }
 }
 
 dependencies {
-    compile "net.dv8tion:JDA:4.2.0_225"
-    compile "ch.qos.logback:logback-classic:1.2.3"
-    compile 'com.github.HypixelDev.PublicAPI:Example:2.0.0'
-    compile 'com.jagrosh:jda-utilities:3.0.5'
-
+    implementation "net.dv8tion:JDA:4.2.0_225"
+    implementation "ch.qos.logback:logback-classic:1.2.3"
+    implementation 'com.github.HypixelDev.PublicAPI:Example:2.0.0'
+    implementation 'com.jagrosh:jda-utilities:3.0.5'
+    // implementation 'org.asynchttpclient:async-http-client:2.12.2'
 }
 
 compileJava.options.encoding = 'UTF-8'
