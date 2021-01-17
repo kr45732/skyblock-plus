@@ -37,9 +37,8 @@ public class AboutCommand extends Command {
                         : (inv ? "Please " : ""))
                 + (inv ? (join ? ", or " : "") + "[`invite`](" + oauthLink + ") me to your server" : "") + "!";
         String descr = "Hello! I am **Skyblock Multipurpose**, an an all purpose skyblock bot.\n"
-                + "I was written in java by <@" + event.getMessage().getAuthor().getId() + ">.\n"
-                + "Type `!help` or `!commands` to see my commands!" + invline + "\n\n"
-                + "Some of my features include:\n"
+                + "I was written in java by CrypticPlasma.\n" + "Type `!help` or `!commands` to see my commands!"
+                + invline + "\n\n" + "Some of my features include:\n"
                 + "<:green_check_custom:799774962394988574> Slayers, Skills, and Dungeons\n"
                 + "<:green_check_custom:799774962394988574> Guild Information\n"
                 + "<:green_check_custom:799774962394988574> Auction House and Bazaar\n";
