@@ -106,7 +106,7 @@ public class BotUtils {
     public static EmbedBuilder defaultEmbed(String title, String titleUrl) {
         EmbedBuilder eb = new EmbedBuilder();
         eb.setColor(botColor);
-        eb.setFooter("Created by CrypticPlasma#0820", null);
+        eb.setFooter("Created by CrypticPlasma", null);
         eb.setTitle(title, titleUrl);
         eb.setTimestamp(Instant.now());
         return eb;

@@ -123,11 +123,11 @@ public class SlayerCommands extends Command {
         eb.setDescription("**Total slayer:** "
                 + ((slayerWolf != -1 && slayerZombie != -1 && slayerSpider != -1) ? formatNumber(totalSlayer) + " XP"
                         : "None"));
-        eb.addField("<:wolf_ring:799776670466441236>  Wolf",
+        eb.addField("<:sven_packmaster:800002277648891914>  Wolf",
                 (slayerWolf != -1 ? formatNumber(slayerWolf) + " XP" : "None"), true);
-        eb.addField("<:beheaded_horror:799776419706175498>  Zombie",
+        eb.addField("<:revenant_horror:800002290987302943>  Zombie",
                 (slayerZombie != -1 ? formatNumber(slayerZombie) + "XP" : "None"), true);
-        eb.addField("<:spider_talisman:799776060127707146>  Spider",
+        eb.addField("<:tarantula_broodfather:800002277262884874>  Spider",
                 (slayerSpider != -1 ? formatNumber(slayerSpider) + " XP" : "None"), true);
         eb.setThumbnail("https://cravatar.eu/helmhead/" + uuidPlayer);
         return eb;

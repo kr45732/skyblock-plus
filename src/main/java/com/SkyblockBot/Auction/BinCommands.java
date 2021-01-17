@@ -11,8 +11,6 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 
@@ -73,10 +71,10 @@ public class BinCommands extends Command {
                 "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/enchants.json"),
                 "enchants_min_level");
 
-        List<String> petNames = ((JsonObject) new JsonParser().parse(petJson.toString())).entrySet().stream()
-                .map(i -> i.getKey()).collect(Collectors.toCollection(ArrayList::new));
+        List<String> petNames = petJson.getAsJsonObject().entrySet().stream().map(i -> i.getKey())
+                .collect(Collectors.toCollection(ArrayList::new));
 
-        List<String> enchantNames = ((JsonObject) new JsonParser().parse(enchantsJson.toString())).entrySet().stream()
+        List<String> enchantNames = enchantsJson.getAsJsonObject().entrySet().stream()
                 .map(i -> i.getKey().toUpperCase()).collect(Collectors.toCollection(ArrayList::new));
         enchantNames.add("ULTIMATE_JERRY");
 
@@ -144,10 +142,8 @@ public class BinCommands extends Command {
                 }
 
                 if (!raritySpecified) {
-                    List<String> petRarities = ((JsonObject) new JsonParser()
-                            .parse(higherDepth(petJson, formattedName).toString())).entrySet().stream()
-                                    .map(j -> j.getKey().toUpperCase())
-                                    .collect(Collectors.toCollection(ArrayList::new));
+                    List<String> petRarities = higherDepth(petJson, formattedName).getAsJsonObject().entrySet().stream()
+                            .map(j -> j.getKey().toUpperCase()).collect(Collectors.toCollection(ArrayList::new));
 
                     for (String j : petRarities) {
                         if (higherDepth(lowestBinJson, formattedName + rarityMap.get(j)) != null) {
