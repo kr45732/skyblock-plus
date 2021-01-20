@@ -1,0 +1,45 @@
+{
+  "796790757947867156": {
+    "name": "CrypticPlasma's Server",
+    "automated_applications": {
+      "enable": "true",
+      "react_channel": { "name": "apply", "id": "800031085588512828" },
+      "staff_channel": { "name": "applications", "id": "800386981133156443" },
+      "new_channel_prefix": "application",
+      "apply_text": "Applying in test server...",
+      "accept_text": "accept - test",
+      "deny_text": "deny - test",
+      "new_channel_category": {
+        "name": "test category",
+        "id": "800811801478037555"
+      },
+      "staff_ping": {
+        "name": "example staff role",
+        "id": "800859020139298816"
+      }
+    }
+  },
+  "782154976243089429": {
+    "name": "Skyblock Forceful",
+    "automated_applications": {
+      "enable": "true",
+      "react_channel": {
+        "name": "✐-guild-applications",
+        "id": "800528706963374140"
+      },
+      "staff_channel": { "name": "applications", "id": "800529287148601384" },
+      "new_channel_prefix": "application",
+      "apply_text": "React to this message to apply for Skyblock Forceful!\n\t• Note: If you do not get pinged in under 30 seconds then please open a ticket and send a link to your sky.lea profile **OR** apply through the forums here: https://hypixel.net/threads/skyblock-forceful-mid-late-game-guild.3583562/",
+      "accept_text": "You have been accepted! Please leave your current guild and you will recive an invite shortly after!",
+      "deny_text": "Sorry, but your application has been denied. Feel free to apply again once you meet the requirements!",
+      "new_channel_category": {
+        "name": "bot applications",
+        "id": "800830955752259674"
+      },
+      "staff_ping": {
+        "name": "Staff ⚡️",
+        "id": "782154976666451976"
+      }
+    }
+  }
+}

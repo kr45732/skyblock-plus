@@ -1,17 +1,27 @@
 package com.SkyblockBot.Skills;
 
+import static com.SkyblockBot.Miscellaneous.BotUtils.capitalizeString;
+import static com.SkyblockBot.Miscellaneous.BotUtils.defaultEmbed;
+import static com.SkyblockBot.Miscellaneous.BotUtils.getJson;
+import static com.SkyblockBot.Miscellaneous.BotUtils.higherDepth;
+import static com.SkyblockBot.Miscellaneous.BotUtils.key;
+import static com.SkyblockBot.Miscellaneous.BotUtils.roundProgress;
+import static com.SkyblockBot.Miscellaneous.BotUtils.roundSkillAverage;
+import static com.SkyblockBot.Miscellaneous.BotUtils.simplifyNumber;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static com.SkyblockBot.Miscellaneous.BotUtils.*;
 
 public class SkillsCommands extends Command {
     public SkillsCommands() {
@@ -28,7 +38,7 @@ public class SkillsCommands extends Command {
         String content = message.getContentRaw();
 
         String[] args = content.split(" ");
-        if (args.length != 3) {
+        if (args.length <= 1 || args.length > 4) {
             eb[0].setTitle("Invalid input. Type !help for help");
             event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
             return;
@@ -40,7 +50,10 @@ public class SkillsCommands extends Command {
         System.out.println();
 
         if (args[1].equals("player")) {
-            eb[0] = getPlayerSkill(args[2]);
+            if (args.length == 4) { // Profile specified
+                eb[0] = getPlayerSkill(args[2], args[3]);
+            } else
+                eb[0] = getPlayerSkill(args[2], null);
         } else {
             eb[0].setTitle("Invalid input. Type !help for help");
             event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
@@ -51,9 +64,7 @@ public class SkillsCommands extends Command {
 
     }
 
-    public EmbedBuilder getPlayerSkill(String username) {
-        String profile = "";
-        // key = "75638239-56cc-4b96-b42a-8fe28c40f3a9";
+    public EmbedBuilder getPlayerSkill(String username, String profile) {
         JsonElement playerJson = getJson("https://api.hypixel.net/player?key=" + key + "&name=" + username);
 
         if (playerJson == null) {
@@ -109,24 +120,47 @@ public class SkillsCommands extends Command {
                 .collect(Collectors.toCollection(ArrayList::new));
         skills.remove("catacombs");
 
-        double skillAverage = 0;
+        double trueSA = 0;
+        double progressSA = 0;
         EmbedBuilder eb = defaultEmbed("Skills", null);
-        for (String skill : skills) {
-            double skillExp = higherDepth(
-                    higherDepth(higherDepth(higherDepth(skyblockJson, "profile"), "members"), uuidPlayer),
-                    "experience_skill_" + skill).getAsLong();
-            SkillsStruct skillInfo = skillInfoFromExp(skillExp, skill);
-            eb.addField(skillInfo.skillName + " (" + skillInfo.skillLevel + ")",
-                    skillInfo.expCurrent + "/" + skillInfo.expForNext + "\nTotal XP:" + skillInfo.totalSkillExp
-                            + "\nProgress: " + skillInfo.progressToNext,
-                    true);
-            if (!skill.equals("runecrafting") && !skill.equals("carpentry")) {
-                skillAverage += skillInfo.skillLevel;
-            }
+        Map<String, String> skillsEmojiMap = new HashMap<String, String>();
+        skillsEmojiMap.put("taming", "<:taming:800462115365716018>");
+        skillsEmojiMap.put("farming", "<:farming:800462115055992832>");
+        skillsEmojiMap.put("foraging", "<:foraging:800462114829500477>");
+        skillsEmojiMap.put("combat", "<:combat:800462115009855548>");
+        skillsEmojiMap.put("alchemy", "<:alchemy:800462114589376564>");
+        skillsEmojiMap.put("fishing", "<:fishing:800462114853617705>");
+        skillsEmojiMap.put("enchanting", "<:enchanting:800462115193225256>");
+        skillsEmojiMap.put("mining", "<:mining:800462115009069076>");
+        skillsEmojiMap.put("carpentry", "<:carpentery:800462115156131880>");
+        skillsEmojiMap.put("runecrafting", "<:runecrafting:800462115172909086>");
 
+        for (String skill : skills) {
+            try {
+                double skillExp = higherDepth(
+                        higherDepth(higherDepth(higherDepth(skyblockJson, "profile"), "members"), uuidPlayer),
+                        "experience_skill_" + skill).getAsLong();
+                SkillsStruct skillInfo = skillInfoFromExp(skillExp, skill);
+                eb.addField(
+                        skillsEmojiMap.get(skill) + capitalizeString(skillInfo.skillName) + " (" + skillInfo.skillLevel
+                                + ")",
+                        simplifyNumber(skillInfo.expCurrent) + " / " + simplifyNumber(skillInfo.expForNext)
+                                + "\nTotal XP: " + simplifyNumber(skillInfo.totalSkillExp) + "\nProgress: "
+                                + (skillInfo.skillLevel == skillInfo.maxSkillLevel ? "max"
+                                        : roundProgress(skillInfo.progressToNext)),
+                        true);
+                if (!skill.equals("runecrafting") && !skill.equals("carpentry")) {
+                    trueSA += skillInfo.skillLevel;
+                    progressSA += skillInfo.skillLevel + skillInfo.progressToNext;
+                }
+            } catch (NullPointerException ex) {
+                eb.addField(skillsEmojiMap.get(skill) + capitalizeString(skill) + " (?) ", "Unable to retrieve", true);
+            }
         }
-        skillAverage /= (skills.size() - 2);
-        eb.setDescription("True skill Average: " + skillAverage);
+        trueSA /= (skills.size() - 2);
+        progressSA /= (skills.size() - 2);
+        eb.setDescription("True skill average: " + roundSkillAverage(trueSA) + "\nProgress skill average: "
+                + roundSkillAverage(progressSA));
         return eb;
 
     }
@@ -167,4 +201,5 @@ public class SkillsCommands extends Command {
 
         return new SkillsStruct(skill, level, maxLevel, (long) skillExp, xpCurrent, xpForNext, progress);
     }
+
 }

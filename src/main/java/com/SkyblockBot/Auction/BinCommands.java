@@ -1,6 +1,9 @@
 package com.SkyblockBot.Auction;
 
-import static com.SkyblockBot.Miscellaneous.BotUtils.*;
+import static com.SkyblockBot.Miscellaneous.BotUtils.defaultEmbed;
+import static com.SkyblockBot.Miscellaneous.BotUtils.formatNumber;
+import static com.SkyblockBot.Miscellaneous.BotUtils.getJson;
+import static com.SkyblockBot.Miscellaneous.BotUtils.higherDepth;
 
 import java.util.ArrayList;
 import java.util.Arrays;

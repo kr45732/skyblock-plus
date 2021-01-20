@@ -1,12 +1,19 @@
 package com.SkyblockBot.Slayer;
 
+import static com.SkyblockBot.Miscellaneous.BotUtils.defaultEmbed;
+import static com.SkyblockBot.Miscellaneous.BotUtils.fixUsername;
+import static com.SkyblockBot.Miscellaneous.BotUtils.formatNumber;
+import static com.SkyblockBot.Miscellaneous.BotUtils.getJson;
+import static com.SkyblockBot.Miscellaneous.BotUtils.higherDepth;
+import static com.SkyblockBot.Miscellaneous.BotUtils.key;
+import static com.SkyblockBot.Miscellaneous.BotUtils.simplifyNumber;
+
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-
-import static com.SkyblockBot.Miscellaneous.BotUtils.*;
 
 public class SlayerCommands extends Command {
     public SlayerCommands() {
@@ -124,11 +131,11 @@ public class SlayerCommands extends Command {
                 + ((slayerWolf != -1 && slayerZombie != -1 && slayerSpider != -1) ? formatNumber(totalSlayer) + " XP"
                         : "None"));
         eb.addField("<:sven_packmaster:800002277648891914>  Wolf",
-                (slayerWolf != -1 ? formatNumber(slayerWolf) + " XP" : "None"), true);
+                (slayerWolf != -1 ? simplifyNumber(slayerWolf) + " XP" : "None"), true);
         eb.addField("<:revenant_horror:800002290987302943>  Zombie",
-                (slayerZombie != -1 ? formatNumber(slayerZombie) + "XP" : "None"), true);
+                (slayerZombie != -1 ? simplifyNumber(slayerZombie) + " XP" : "None"), true);
         eb.addField("<:tarantula_broodfather:800002277262884874>  Spider",
-                (slayerSpider != -1 ? formatNumber(slayerSpider) + " XP" : "None"), true);
+                (slayerSpider != -1 ? simplifyNumber(slayerSpider) + " XP" : "None"), true);
         eb.setThumbnail("https://cravatar.eu/helmhead/" + uuidPlayer);
         return eb;
     }

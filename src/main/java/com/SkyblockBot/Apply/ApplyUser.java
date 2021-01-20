@@ -1,5 +1,15 @@
 package com.SkyblockBot.Apply;
 
+import static com.SkyblockBot.Miscellaneous.BotUtils.defaultEmbed;
+import static com.SkyblockBot.Miscellaneous.BotUtils.formatNumber;
+import static com.SkyblockBot.Miscellaneous.BotUtils.getJson;
+import static com.SkyblockBot.Miscellaneous.BotUtils.higherDepth;
+import static com.SkyblockBot.Miscellaneous.BotUtils.key;
+import static com.SkyblockBot.Miscellaneous.BotUtils.usernameToUuid;
+import static com.SkyblockBot.Miscellaneous.ChannelDeleter.addChannel;
+import static com.SkyblockBot.Miscellaneous.ChannelDeleter.removeChannel;
+import static com.SkyblockBot.Skills.SkillsCommands.skillInfoFromExp;
+
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -12,58 +22,53 @@ import com.google.gson.JsonElement;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import static com.SkyblockBot.Miscellaneous.BotUtils.*;
-import static com.SkyblockBot.Skills.SkillsCommands.skillInfoFromExp;
 
 public class ApplyUser extends ListenerAdapter {
     Message reactMessage;
-    User user;
-    MessageReactionAddEvent event;
-    TextChannel channelTest;
-    String channelPrefix;
+    User applyingUser;
+    TextChannel applicationChannel;
     int state = 0;
-    String emoji;
     String username;
     String profile;
     String profileId;
     EmbedBuilder ebMain;
+    JsonElement currentSettings;
 
-    public ApplyUser(User user, MessageReactionAddEvent event, String channelPrefix, String emoji) {
-        this.user = user;
-        this.event = event;
-        this.channelPrefix = channelPrefix;
-        this.emoji = emoji;
+    public ApplyUser(MessageReactionAddEvent event, User applyingUser, JsonElement currentSettings) {
+        this.applyingUser = applyingUser;
+        this.currentSettings = currentSettings;
 
-        event.getGuild().createTextChannel(channelPrefix + "-" + user.getName())
-                .addPermissionOverride(event.getGuild().getMember(user), EnumSet.of(Permission.VIEW_CHANNEL), null)
+        String channelPrefix = higherDepth(currentSettings, "new_channel_prefix").getAsString();
+        Category applyCategory = event.getGuild()
+                .getCategoryById(higherDepth(higherDepth(currentSettings, "new_channel_category"), "id").getAsString());
+        applyCategory.createTextChannel(channelPrefix + "-" + applyingUser.getName())
+                .addPermissionOverride(event.getGuild().getMember(applyingUser), EnumSet.of(Permission.VIEW_CHANNEL),
+                        null)
                 .addPermissionOverride(event.getGuild().getPublicRole(), null, EnumSet.of(Permission.VIEW_CHANNEL))
                 .complete();
 
-        List<TextChannel> channelList = event.getGuild().getTextChannelsByName(channelPrefix + "-" + user.getName(),
-                true);
-        for (TextChannel channel : channelList) {
-            if (!channel.hasLatestMessage()) {
-                channelTest = channel;
-                break;
-            }
-        }
-        channelTest.sendMessage("Welcome " + user.getAsMention() + "!").queue();
+        applicationChannel = event.getGuild().getTextChannelsByName(channelPrefix + "-" + applyingUser.getName(), true)
+                .get(0);
+        addChannel(applicationChannel);
+        applicationChannel.sendMessage("Welcome " + applyingUser.getAsMention() + "!").queue();
 
-        EmbedBuilder eb = defaultEmbed("Application for " + user.getName(), null);
-        eb.setDescription(
+        EmbedBuilder welcomeEb = defaultEmbed("Application for " + applyingUser.getName(), null);
+        welcomeEb.setDescription(
                 "• Please enter your in-game-name followed by the skyblock profile you want to apply with.\n• Ex: CrypticPlasma Zucchini\n");
-        eb.addField("To submit your LAST message,", "React with ✅", true);
-        eb.addField("To cancel the application,", "React with ❌", true);
-        channelTest.sendMessage(eb.build()).queue(message -> {
-            message.addReaction(emoji).queue();
+        welcomeEb.addField("To submit your LAST message,", "React with ✅", true);
+        welcomeEb.addField("To cancel the application,", "React with ❌", true);
+        applicationChannel.sendMessage(welcomeEb.build()).queue(message -> {
+            message.addReaction("✅").queue();
             message.addReaction("❌").queue();
             this.reactMessage = message;
         });
+
     }
 
     @Override
@@ -74,16 +79,18 @@ public class ApplyUser extends ListenerAdapter {
         if (event.getUser().isBot()) {
             return;
         }
+
         if (event.getReactionEmote().getName().equals("❌")) {
             state = 4;
-        } else if (!event.getReactionEmote().getName().equals(emoji)) {
+        } else if (!event.getReactionEmote().getName().equals("✅")) {
+            reactMessage.clearReactions(event.getReaction().getReactionEmote().getAsReactionCode()).queue();
             return;
         }
+        reactMessage.clearReactions().queue();
         switch (state) {
             case 0:
-                reactMessage.clearReactions().queue();
-                channelTest.retrieveMessageById(channelTest.getLatestMessageId()).queue(messageReply -> {
-                    if (messageReply.getAuthor().equals(user)) {
+                applicationChannel.retrieveMessageById(applicationChannel.getLatestMessageId()).queue(messageReply -> {
+                    if (messageReply.getAuthor().equals(applyingUser)) {
                         try {
                             username = messageReply.getContentDisplay().split(" ")[0];
                             profile = messageReply.getContentDisplay().split(" ")[1];
@@ -95,10 +102,10 @@ public class ApplyUser extends ListenerAdapter {
                                 eb0.addField("Catacombs level", getPlayerCatacombs(username), true);
                                 Gson gson = new Gson();
                                 ebMain = gson.fromJson(gson.toJson(eb0), EmbedBuilder.class);
-                                eb0.addField("Are the above stats correct?",
-                                        "React with " + emoji + " for yes and ❌ to cancel", false);
-                                channelTest.sendMessage(eb0.build()).queue(message -> {
-                                    message.addReaction(emoji).queue();
+                                eb0.addField("Are the above stats correct?", "React with ✅ for yes and ❌ to cancel",
+                                        false);
+                                applicationChannel.sendMessage(eb0.build()).queue(message -> {
+                                    message.addReaction("✅").queue();
                                     message.addReaction("❌").queue();
                                     this.reactMessage = message;
 
@@ -106,8 +113,8 @@ public class ApplyUser extends ListenerAdapter {
                                 state = 1;
                             } else {
                                 EmbedBuilder eb = invalidInput(messageReply.getContentDisplay());
-                                channelTest.sendMessage(eb.build()).queue(message -> {
-                                    message.addReaction(emoji).queue();
+                                applicationChannel.sendMessage(eb.build()).queue(message -> {
+                                    message.addReaction("✅").queue();
                                     message.addReaction("❌").queue();
                                     this.reactMessage = message;
                                 });
@@ -115,8 +122,8 @@ public class ApplyUser extends ListenerAdapter {
                             }
                         } catch (Exception ex) {
                             EmbedBuilder eb = invalidInput(messageReply.getContentDisplay());
-                            channelTest.sendMessage(eb.build()).queue(message -> {
-                                message.addReaction(emoji).queue();
+                            applicationChannel.sendMessage(eb.build()).queue(message -> {
+                                message.addReaction("✅").queue();
                                 message.addReaction("❌").queue();
                                 this.reactMessage = message;
                             });
@@ -125,8 +132,8 @@ public class ApplyUser extends ListenerAdapter {
 
                     } else {
                         EmbedBuilder eb = invalidInput(messageReply.getContentDisplay());
-                        channelTest.sendMessage(eb.build()).queue(message -> {
-                            message.addReaction(emoji).queue();
+                        applicationChannel.sendMessage(eb.build()).queue(message -> {
+                            message.addReaction("✅").queue();
                             message.addReaction("❌").queue();
                             this.reactMessage = message;
                         });
@@ -135,24 +142,23 @@ public class ApplyUser extends ListenerAdapter {
                 });
                 break;
             case 1:
-                reactMessage.clearReactions().queue();
                 EmbedBuilder eb = defaultEmbed("Thank you for applying!", null);
                 eb.setDescription(
-                        "**Your stats have been subbmited to staff**\nYou will be notified after staff review your stats");
-                channelTest.sendMessage(eb.build()).queue();
+                        "**Your stats have been subbmited to staff**\nYou will be notified once staff review your stats");
+                applicationChannel.sendMessage(eb.build()).queue();
                 event.getJDA().removeEventListener(this);
 
-                event.getJDA().addEventListener(new ApplyStaff(this, user, channelTest, ebMain));
+                event.getJDA()
+                        .addEventListener(new ApplyStaff(applyingUser, applicationChannel, ebMain, currentSettings));
                 break;
             case 2:
-                reactMessage.clearReactions().queue();
-                EmbedBuilder eb2 = defaultEmbed("Application for " + user.getName(), null);
+                EmbedBuilder eb2 = defaultEmbed("Application for " + applyingUser.getName(), null);
                 eb2.setDescription(
                         "• Please enter your in-game-name followed by the skyblock profile you want to apply with.\n• Ex: CrypticPlasma Zucchini\n");
                 eb2.addField("To submit your LAST message,", "React with ✅", true);
                 eb2.addField("To cancel the application,", "React with ❌", true);
-                channelTest.sendMessage(eb2.build()).queue(message -> {
-                    message.addReaction(emoji).queue();
+                applicationChannel.sendMessage(eb2.build()).queue(message -> {
+                    message.addReaction("✅").queue();
                     message.addReaction("❌").queue();
                     this.reactMessage = message;
                 });
@@ -160,13 +166,13 @@ public class ApplyUser extends ListenerAdapter {
                 state = 0;
                 break;
             case 4:
-                reactMessage.clearReactions().queue();
                 EmbedBuilder eb4 = defaultEmbed("Canceling application", null);
                 eb4.setDescription("Channel closing in 5 seconds...");
-                channelTest.sendMessage(eb4.build()).queue();
+                applicationChannel.sendMessage(eb4.build()).queue();
                 event.getJDA().removeEventListener(this);
                 event.getGuild().getTextChannelById(event.getChannel().getId()).delete().reason("Application canceled")
                         .queueAfter(5, TimeUnit.SECONDS);
+                removeChannel(applicationChannel);
                 break;
         }
     }
@@ -302,6 +308,7 @@ public class ApplyUser extends ListenerAdapter {
         eb.addBlankField(true);
         eb.addField("To retry,", "React with ✅", true);
         eb.addField("To cancel the application,", "React with ❌", true);
+        eb.addBlankField(true);
         return eb;
     }
 }

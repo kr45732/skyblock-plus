@@ -5,8 +5,10 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.math.RoundingMode;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.Instant;
 import java.util.Locale;
@@ -34,7 +36,6 @@ public class BotUtils {
         } else {
             botTokenL = System.getenv("BOT_TOKEN");
         }
-        System.out.println(botTokenL);
         botToken = botTokenL;
 
         String apiKey = "";
@@ -49,7 +50,6 @@ public class BotUtils {
         } else {
             apiKey = System.getenv("API_KEY");
         }
-        System.out.println(apiKey);
         key = apiKey;
     }
 
@@ -126,5 +126,37 @@ public class BotUtils {
 
     public static String formatNumber(String number) {
         return NumberFormat.getInstance(Locale.US).format(number);
+    }
+
+    public static String roundSkillAverage(double number) {
+        DecimalFormat df = new DecimalFormat("#.##");
+        df.setRoundingMode(RoundingMode.HALF_UP);
+        return df.format(number);
+    }
+
+    public static String roundProgress(double number) {
+        DecimalFormat df = new DecimalFormat("#.##");
+        df.setRoundingMode(RoundingMode.HALF_UP);
+        return df.format(number * 100) + "%";
+    }
+
+    public static String simplifyNumber(double number) {
+        String formattedNumber = "" + number;
+        DecimalFormat df = new DecimalFormat("#.#");
+        df.setRoundingMode(RoundingMode.HALF_UP);
+        if (number >= 1000000000) {
+            formattedNumber = df.format(number / 1000000000) + "B";
+        } else if (number >= 1000000) {
+            formattedNumber = df.format(number / 1000000) + "M";
+        } else if (number >= 1000) {
+            DecimalFormat df1 = new DecimalFormat("#");
+            df1.setRoundingMode(RoundingMode.HALF_UP);
+            formattedNumber = df1.format(number / 1000) + "K";
+        }
+        return formattedNumber;
+    }
+
+    public static String capitalizeString(String str) {
+        return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
     }
 }

@@ -1,4 +1,20 @@
-package com.SkyblockBot.Guild;
+package com.SkyblockBot.Guilds;
+
+import static com.SkyblockBot.Miscellaneous.BotUtils.botColor;
+import static com.SkyblockBot.Miscellaneous.BotUtils.defaultEmbed;
+import static com.SkyblockBot.Miscellaneous.BotUtils.fixUsername;
+import static com.SkyblockBot.Miscellaneous.BotUtils.formatNumber;
+import static com.SkyblockBot.Miscellaneous.BotUtils.getJson;
+import static com.SkyblockBot.Miscellaneous.BotUtils.higherDepth;
+import static com.SkyblockBot.Miscellaneous.BotUtils.key;
+import static com.SkyblockBot.Miscellaneous.BotUtils.uuidToUsername;
+
+import java.time.Instant;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -6,15 +22,10 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.jagrosh.jdautilities.menu.Paginator;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.exceptions.PermissionException;
-
-import java.time.Instant;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-
-import static com.SkyblockBot.Miscellaneous.BotUtils.*;
 
 public class GuildCommands extends Command {
     private final EventWaiter waiter;
@@ -195,12 +206,15 @@ public class GuildCommands extends Command {
             return defaultEmbed("Error fetching guild data", null);
         }
 
-        String guildName = higherDepth(higherDepth(guildJson, "guild"), "name").getAsString();
+        try {
+            String guildName = higherDepth(higherDepth(guildJson, "guild"), "name").getAsString();
+            EmbedBuilder eb = defaultEmbed(username + " is in " + guildName, null);
+            eb.addField("Guild statistics:", getGuildInfo(guildJson), false);
+            return eb;
+        } catch (Exception e) {
+            return defaultEmbed(username + " is not in a guild", null);
+        }
 
-        EmbedBuilder eb = defaultEmbed(username + " is in " + guildName, null);
-        eb.addField("Guild statistics:", getGuildInfo(guildJson), false);
-
-        return eb;
     }
 
     public EmbedBuilder getGuildInfo(String username) {

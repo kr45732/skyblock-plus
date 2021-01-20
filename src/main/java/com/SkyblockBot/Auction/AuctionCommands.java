@@ -1,16 +1,22 @@
 package com.SkyblockBot.Auction;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
+import static com.SkyblockBot.Miscellaneous.BotUtils.defaultEmbed;
+import static com.SkyblockBot.Miscellaneous.BotUtils.getJson;
+import static com.SkyblockBot.Miscellaneous.BotUtils.higherDepth;
+import static com.SkyblockBot.Miscellaneous.BotUtils.key;
+import static com.SkyblockBot.Miscellaneous.BotUtils.simplifyNumber;
+import static com.SkyblockBot.Miscellaneous.BotUtils.usernameToUuid;
 
 import java.time.Duration;
 import java.time.Instant;
 
-import static com.SkyblockBot.Miscellaneous.BotUtils.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 
 public class AuctionCommands extends Command {
     public AuctionCommands() {
@@ -94,14 +100,14 @@ public class AuctionCommands extends Command {
                 int startingBid = higherDepth(currentAuction, "starting_bid").getAsInt();
                 if (timeUntil.length() > 0) {
                     if (bin) {
-                        auction = "BIN: " + formatNumber(startingBid) + " coins";
+                        auction = "BIN: " + simplifyNumber(startingBid) + " coins";
                     } else {
-                        auction = "Current bid: " + formatNumber(highestBid);
+                        auction = "Current bid: " + simplifyNumber(highestBid);
                     }
                     auction += " | Ending in " + timeUntil;
                 } else {
                     if (highestBid >= startingBid) { // Auction sold
-                        auction = "Auction sold for " + formatNumber(highestBid) + " coins";
+                        auction = "Auction sold for " + simplifyNumber(highestBid) + " coins";
                     } else {
                         auction = "Auction did not sell";
                     }

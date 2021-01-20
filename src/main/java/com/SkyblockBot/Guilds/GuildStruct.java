@@ -1,4 +1,4 @@
-package com.SkyblockBot.Guild;
+package com.SkyblockBot.Guilds;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 

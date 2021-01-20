@@ -1,14 +1,22 @@
 package com.SkyblockBot.Dungeons;
 
+import static com.SkyblockBot.Miscellaneous.BotUtils.capitalizeString;
+import static com.SkyblockBot.Miscellaneous.BotUtils.defaultEmbed;
+import static com.SkyblockBot.Miscellaneous.BotUtils.getJson;
+import static com.SkyblockBot.Miscellaneous.BotUtils.higherDepth;
+import static com.SkyblockBot.Miscellaneous.BotUtils.key;
+import static com.SkyblockBot.Miscellaneous.BotUtils.roundProgress;
+import static com.SkyblockBot.Miscellaneous.BotUtils.roundSkillAverage;
+import static com.SkyblockBot.Miscellaneous.BotUtils.simplifyNumber;
+import static com.SkyblockBot.Skills.SkillsCommands.skillInfoFromExp;
+
 import com.SkyblockBot.Skills.SkillsStruct;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-
-import static com.SkyblockBot.Miscellaneous.BotUtils.*;
-import static com.SkyblockBot.Skills.SkillsCommands.skillInfoFromExp;
 
 public class CatacombsCommand extends Command {
     public CatacombsCommand() {
@@ -25,7 +33,7 @@ public class CatacombsCommand extends Command {
         String content = message.getContentRaw();
 
         String[] args = content.split(" ");
-        if (args.length != 3) {
+        if (args.length <= 1 || args.length > 4) {
             eb[0].setTitle("Invalid input. Type !help for help");
             event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
             return;
@@ -37,7 +45,10 @@ public class CatacombsCommand extends Command {
         System.out.println();
 
         if (args[1].equals("player")) {
-            eb[0] = getPlayerCatacombs(args[2]);
+            if (args.length == 4) { // Profile specified
+                eb[0] = getPlayerCatacombs(args[2], args[3]);
+            } else
+                eb[0] = getPlayerCatacombs(args[2], null);
         } else {
             eb[0].setTitle("Invalid input. Type !help for help");
             event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
@@ -48,9 +59,7 @@ public class CatacombsCommand extends Command {
 
     }
 
-    public EmbedBuilder getPlayerCatacombs(String username) {
-        String profile = "";
-        key = "75638239-56cc-4b96-b42a-8fe28c40f3a9";
+    public EmbedBuilder getPlayerCatacombs(String username, String profile) {
         JsonElement playerJson = getJson("https://api.hypixel.net/player?key=" + key + "&name=" + username);
 
         if (playerJson == null) {
@@ -98,19 +107,25 @@ public class CatacombsCommand extends Command {
         }
 
         EmbedBuilder eb = defaultEmbed("Dungeons", null);
-        double skillExp = higherDepth(higherDepth(higherDepth(
-                higherDepth(higherDepth(higherDepth(higherDepth(skyblockJson, "profile"), "members"), uuidPlayer),
-                        "dungeons"),
-                "dungeon_types"), "catacombs"), "experience").getAsLong();
-        SkillsStruct skillInfo = skillInfoFromExp(skillExp, "catacombs");
+        try {
+            double skillExp = higherDepth(higherDepth(higherDepth(
+                    higherDepth(higherDepth(higherDepth(higherDepth(skyblockJson, "profile"), "members"), uuidPlayer),
+                            "dungeons"),
+                    "dungeon_types"), "catacombs"), "experience").getAsLong();
+            SkillsStruct skillInfo = skillInfoFromExp(skillExp, "catacombs");
 
-        eb.addField(skillInfo.skillName + " (" + skillInfo.skillLevel + ")",
-                skillInfo.expCurrent + "/" + skillInfo.expForNext + "\nTotal XP:" + skillInfo.totalSkillExp
-                        + "\nProgress: " + skillInfo.progressToNext,
-                false);
+            eb.addField(capitalizeString(skillInfo.skillName) + " (" + skillInfo.skillLevel + ")",
+                    simplifyNumber(skillInfo.expCurrent) + " / " + simplifyNumber(skillInfo.expForNext) + "\nTotal XP: "
+                            + simplifyNumber(skillInfo.totalSkillExp) + "\nProgress: "
+                            + roundProgress(skillInfo.progressToNext),
+                    false);
 
-        eb.setDescription("Catacombs level: " + skillInfo.skillLevel);
-        return eb;
+            eb.setDescription("True catacombs level: " + skillInfo.skillLevel + "\nProgress catacombs level: "
+                    + roundSkillAverage(skillInfo.skillLevel + skillInfo.progressToNext));
+            return eb;
+        } catch (NullPointerException e) {
+            return defaultEmbed("Error fetching player dungeon data", null);
+        }
 
     }
 }

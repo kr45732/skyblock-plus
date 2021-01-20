@@ -1,14 +1,15 @@
 package com.SkyblockBot.Miscellaneous;
 
+import static com.SkyblockBot.Miscellaneous.BotUtils.botColor;
+
+import java.util.concurrent.TimeUnit;
+
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.jagrosh.jdautilities.menu.Paginator;
+
 import net.dv8tion.jda.api.exceptions.PermissionException;
-
-import java.util.concurrent.TimeUnit;
-
-import static com.SkyblockBot.Miscellaneous.BotUtils.*;
 
 public class HelpCommand extends Command {
     private final Paginator.Builder pbuilder;
@@ -66,10 +67,12 @@ public class HelpCommand extends Command {
                 "• `!slayer player [IGN] <profile>`: Get a user's slayer and optionally choose which skyblock profile to get the slayer of" };
         pbuilder.addItems(fillArray(slayerCommands));
 
-        String[] skillsCommands = new String[] { "**__Skills__**", " ", "• WIP" };
+        String[] skillsCommands = new String[] { "**__Skills__**", " ",
+                "• `!skill player [IGN]`: Get skills of a player" };
         pbuilder.addItems(fillArray(skillsCommands));
 
-        String[] dungeonCommands = new String[] { "**__Dungeons__**", " ", "• WIP" };
+        String[] dungeonCommands = new String[] { "**__Dungeons__**", " ",
+                "• `!catacombs player [IGN}` or `!cata player [IGN]`: Get catacombs level of player" };
         pbuilder.addItems(fillArray(dungeonCommands));
 
         String[] guildCommands = new String[] { "**__Guild__**", " ",

@@ -1,6 +1,12 @@
 package com.SkyblockBot.Apply;
 
+import static com.SkyblockBot.Miscellaneous.BotUtils.defaultEmbed;
+import static com.SkyblockBot.Miscellaneous.BotUtils.higherDepth;
+import static com.SkyblockBot.Miscellaneous.ChannelDeleter.removeChannel;
+
 import java.util.concurrent.TimeUnit;
+
+import com.google.gson.JsonElement;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -10,24 +16,29 @@ import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class ApplyStaff extends ListenerAdapter {
-    ApplyUser applyUser;
     User user;
-    TextChannel channelTest;
+    TextChannel applyChannel;
     EmbedBuilder ebMain;
     Message reactMessage;
-    TextChannel applicationChannel;
+    TextChannel staffChannel;
+    JsonElement currentSettings;
+    Message deleteChannelMessage;
 
-    public ApplyStaff(ApplyUser applyUser, User user, TextChannel channelTest, EmbedBuilder ebMain) {
-        this.applyUser = applyUser;
+    public ApplyStaff(User user, TextChannel applyChannel, EmbedBuilder ebMain, JsonElement currentSettings) {
         this.user = user;
-        this.channelTest = channelTest;
+        this.applyChannel = applyChannel;
         this.ebMain = ebMain;
-        applicationChannel = channelTest.getJDA().getTextChannelsByName("applications", true).get(0);
+        this.currentSettings = currentSettings;
+        staffChannel = applyChannel.getJDA()
+                .getTextChannelById(higherDepth(higherDepth(currentSettings, "staff_channel"), "id").getAsString());
 
         ebMain.addField("To accept the application,", "React with ✅", true);
         ebMain.addBlankField(true);
         ebMain.addField("To deny the application,", "React with ❌", true);
-        applicationChannel.sendMessage(ebMain.build()).queue(message -> {
+        staffChannel
+                .sendMessage("<@&" + higherDepth(higherDepth(currentSettings, "staff_ping"), "id").getAsString() + ">")
+                .complete();
+        staffChannel.sendMessage(ebMain.build()).queue(message -> {
             message.addReaction("✅").queue();
             message.addReaction("❌").queue();
             this.reactMessage = message;
@@ -36,26 +47,55 @@ public class ApplyStaff extends ListenerAdapter {
 
     @Override
     public void onMessageReactionAdd(MessageReactionAddEvent event) {
-        if (event.getMessageIdLong() != reactMessage.getIdLong())
+        if (event.getUser().isBot()) {
             return;
-        if (event.getUser().isBot())
+        }
+        try {
+            if (event.getMessageIdLong() == deleteChannelMessage.getIdLong()) {
+                if (event.getReactionEmote().getName().equals("✅")) {
+                    deleteChannelMessage.clearReactions().queue();
+                    EmbedBuilder eb = defaultEmbed("Channel Closing", null);
+                    eb.addField("Reason", "User has read message", false);
+                    applyChannel.sendMessage(eb.build()).queue();
+                    applyChannel.delete().reason("Applicant read final message").queueAfter(15, TimeUnit.SECONDS);
+                    removeChannel(applyChannel);
+                    return;
+                } else {
+                    event.getReaction().removeReaction(user).queue();
+                }
+                return;
+            }
+        } catch (Exception ex) {
+
+        }
+        if (event.getMessageIdLong() != reactMessage.getIdLong()) {
             return;
+        }
 
         if (event.getReactionEmote().getName().equals("❌")) {
-            applicationChannel.sendMessage(user.getName() + " was denied").queue();
-            channelTest
-                    .sendMessage(user.getAsMention()
-                            + "\nSorry to inform you but you have been denied.\nChannel closing in 30 seconds...")
-                    .queue();
-            channelTest.delete().reason("Application denied").queueAfter(30, TimeUnit.SECONDS);
+            staffChannel.sendMessage(user.getAsMention() + " (" + user.getName() + ") was denied by "
+                    + event.getUser().getAsMention() + " (" + event.getUser().getName() + ")").queue();
+            reactMessage.clearReactions().queue();
+            EmbedBuilder eb = defaultEmbed("Application Not Accepted", null);
+            eb.setDescription(higherDepth(currentSettings, "deny_text").getAsString()
+                    + "\n**React with ✅ to confirm that you have read this message and to close channel**");
+            applyChannel.sendMessage(user.getAsMention()).queue();
+            applyChannel.sendMessage(eb.build()).queue(denyM -> {
+                denyM.addReaction("✅").queue();
+                this.deleteChannelMessage = denyM;
+            });
             reactMessage.delete().queueAfter(5, TimeUnit.SECONDS);
         } else if (event.getReactionEmote().getName().equals("✅")) {
-            applicationChannel.sendMessage(user.getName() + " was accepted").queue();
-            channelTest.sendMessage(user.getAsMention()
-                    + "\nYou have been accepted!\nPlease make sure to leave your current guild.\nYou will recieve an invite shortly.\nChannel closing in 30 seconds...")
-                    .queue();
-            ;
-            channelTest.delete().reason("Application accepted").queueAfter(30, TimeUnit.SECONDS);
+            staffChannel.sendMessage(user.getName() + " was accepted by " + event.getUser().getName()).queue();
+            reactMessage.clearReactions().queue();
+            EmbedBuilder eb = defaultEmbed("Application Accepted", null);
+            eb.setDescription(higherDepth(currentSettings, "accept_text").getAsString()
+                    + "\n**React with ✅ to confirm that you have read this message and to close channel**");
+            applyChannel.sendMessage(user.getAsMention()).queue();
+            applyChannel.sendMessage(eb.build()).queue(denyM -> {
+                denyM.addReaction("✅").queue();
+                this.deleteChannelMessage = denyM;
+            });
             reactMessage.delete().queueAfter(5, TimeUnit.SECONDS);
         }
     }
