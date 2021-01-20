@@ -2,7 +2,7 @@
   "796790757947867156": {
     "name": "CrypticPlasma's Server",
     "automated_applications": {
-      "enable": "true",
+      "enable": "false",
       "react_channel": { "name": "apply", "id": "800031085588512828" },
       "staff_channel": { "name": "applications", "id": "800386981133156443" },
       "new_channel_prefix": "application",
