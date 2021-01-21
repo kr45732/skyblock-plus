@@ -16,7 +16,7 @@ public class AboutCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-
+        System.out.println(botPrefix + "about");
         String descr = "Hello! I am **Skyblock Plus**, an an all purpose skyblock bot.\n"
                 + "I was written in java by CrypticPlasma.\n" + "Type `" + botPrefix + "help` or `" + botPrefix
                 + "commands` to see my commands!"

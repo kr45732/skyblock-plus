@@ -35,6 +35,7 @@ public class HelpCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
+        System.out.println(botPrefix + "help");
         // "!slayer leaderboard [u-IGN]\n"
         // "!slayer lb [u-IGN]\n"
         // "!slayer leaderboard [g-guild name]\n"

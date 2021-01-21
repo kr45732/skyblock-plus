@@ -1,5 +1,6 @@
 package com.SkyblockBot.Miscellaneous;
 
+import static com.SkyblockBot.Miscellaneous.BotUtils.botPrefix;
 import static com.SkyblockBot.Miscellaneous.BotUtils.defaultEmbed;
 import static com.SkyblockBot.Miscellaneous.BotUtils.higherDepth;
 
@@ -29,6 +30,7 @@ public class VersionCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
+        System.out.println(botPrefix + "version");
         try {
             JsonElement patchNotes = new JsonParser()
                     .parse(new FileReader("src/main/java/com/SkyblockBot/json/PatchNotes.json"));
