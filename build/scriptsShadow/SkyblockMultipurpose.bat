@@ -63,7 +63,7 @@ set CMD_LINE_ARGS=%*
 :execute
 @rem Setup the command line
 
-set CLASSPATH=%APP_HOME%\lib\SkyblockMultipurpose-1.0-all.jar
+set CLASSPATH=%APP_HOME%\lib\SkyblockMultipurpose-0.0.2-all.jar
 
 @rem Execute SkyblockMultipurpose
 "%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %SKYBLOCK_MULTIPURPOSE_OPTS%  -jar "%CLASSPATH%" %CMD_LINE_ARGS%
