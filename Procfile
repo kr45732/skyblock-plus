@@ -1,1 +1,1 @@
-worker: java $JAVA_OPTS -jar build/libs/SkyblockMultipurpose-0.0.2.jar
+worker: java $JAVA_OPTS -jar app.jar
