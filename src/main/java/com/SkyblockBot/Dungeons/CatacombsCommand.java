@@ -2,7 +2,9 @@ package com.SkyblockBot.Dungeons;
 
 import static com.SkyblockBot.Miscellaneous.BotUtils.capitalizeString;
 import static com.SkyblockBot.Miscellaneous.BotUtils.defaultEmbed;
+import static com.SkyblockBot.Miscellaneous.BotUtils.errorMessage;
 import static com.SkyblockBot.Miscellaneous.BotUtils.getJson;
+import static com.SkyblockBot.Miscellaneous.BotUtils.globalCooldown;
 import static com.SkyblockBot.Miscellaneous.BotUtils.higherDepth;
 import static com.SkyblockBot.Miscellaneous.BotUtils.key;
 import static com.SkyblockBot.Miscellaneous.BotUtils.roundProgress;
@@ -22,7 +24,8 @@ public class CatacombsCommand extends Command {
     public CatacombsCommand() {
         this.name = "catacombs";
         this.guildOnly = false;
-        this.cooldown = 5;
+        this.cooldown = globalCooldown;
+        this.aliases = new String[] { "cata" };
     }
 
     @Override
@@ -34,7 +37,7 @@ public class CatacombsCommand extends Command {
 
         String[] args = content.split(" ");
         if (args.length <= 1 || args.length > 4) {
-            eb[0].setTitle("Invalid input. Type !help for help");
+            eb[0].setTitle(errorMessage(this.name));
             event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
             return;
         }
@@ -50,7 +53,7 @@ public class CatacombsCommand extends Command {
             } else
                 eb[0] = getPlayerCatacombs(args[2], null);
         } else {
-            eb[0].setTitle("Invalid input. Type !help for help");
+            eb[0].setTitle(errorMessage(this.name));
             event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
             return;
         }

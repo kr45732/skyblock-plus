@@ -1,4 +1,4 @@
-package com.SkyblockBot.Miscellaneous;
+package com.SkyblockBot.Apply;
 
 import static com.SkyblockBot.Miscellaneous.BotUtils.defaultEmbed;
 

@@ -1,9 +1,11 @@
 package com.SkyblockBot.Slayer;
 
 import static com.SkyblockBot.Miscellaneous.BotUtils.defaultEmbed;
+import static com.SkyblockBot.Miscellaneous.BotUtils.errorMessage;
 import static com.SkyblockBot.Miscellaneous.BotUtils.fixUsername;
 import static com.SkyblockBot.Miscellaneous.BotUtils.formatNumber;
 import static com.SkyblockBot.Miscellaneous.BotUtils.getJson;
+import static com.SkyblockBot.Miscellaneous.BotUtils.globalCooldown;
 import static com.SkyblockBot.Miscellaneous.BotUtils.higherDepth;
 import static com.SkyblockBot.Miscellaneous.BotUtils.key;
 import static com.SkyblockBot.Miscellaneous.BotUtils.simplifyNumber;
@@ -19,7 +21,7 @@ public class SlayerCommands extends Command {
     public SlayerCommands() {
         this.name = "slayer";
         this.guildOnly = false;
-        this.cooldown = 2;
+        this.cooldown = globalCooldown;
     }
 
     @Override
@@ -31,7 +33,7 @@ public class SlayerCommands extends Command {
 
         String[] args = content.split(" ");
         if (args.length <= 1 || args.length > 4) {
-            eb[0].setTitle("Invalid input. Type !help for help");
+            eb[0].setTitle(errorMessage(this.name));
             event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
             return;
         }
@@ -51,7 +53,7 @@ public class SlayerCommands extends Command {
                 eb[0] = getPlayerSlayer(args[2], null);
 
         } else {
-            eb[0].setTitle("Invalid input. Type !help for help");
+            eb[0].setTitle(errorMessage(this.name));
             event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
             return;
         }

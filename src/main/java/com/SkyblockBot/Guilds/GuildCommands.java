@@ -2,9 +2,11 @@ package com.SkyblockBot.Guilds;
 
 import static com.SkyblockBot.Miscellaneous.BotUtils.botColor;
 import static com.SkyblockBot.Miscellaneous.BotUtils.defaultEmbed;
+import static com.SkyblockBot.Miscellaneous.BotUtils.errorMessage;
 import static com.SkyblockBot.Miscellaneous.BotUtils.fixUsername;
 import static com.SkyblockBot.Miscellaneous.BotUtils.formatNumber;
 import static com.SkyblockBot.Miscellaneous.BotUtils.getJson;
+import static com.SkyblockBot.Miscellaneous.BotUtils.globalCooldown;
 import static com.SkyblockBot.Miscellaneous.BotUtils.higherDepth;
 import static com.SkyblockBot.Miscellaneous.BotUtils.key;
 import static com.SkyblockBot.Miscellaneous.BotUtils.uuidToUsername;
@@ -33,7 +35,7 @@ public class GuildCommands extends Command {
     public GuildCommands(EventWaiter waiter) {
         this.name = "guild";
         this.guildOnly = false;
-        this.cooldown = 5;
+        this.cooldown = globalCooldown;
         this.waiter = waiter;
     }
 
@@ -46,7 +48,7 @@ public class GuildCommands extends Command {
 
         String[] args = content.split(" ");
         if (args.length != 3) { // No args or too many args are given
-            eb[0].setTitle("Invalid input. Type !help for help");
+            eb[0].setTitle(errorMessage(this.name));
             event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
             return;
         }
@@ -84,7 +86,7 @@ public class GuildCommands extends Command {
                 }
             } else if (args[2].toLowerCase().startsWith("g-")) {
             } else {
-                eb[0].setTitle("Invalid input. Type !help for help");
+                eb[0].setTitle(errorMessage(this.name));
                 event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
                 return;
             }
@@ -97,7 +99,7 @@ public class GuildCommands extends Command {
                 eb[0] = getGuildInfo(username);
             } else if (args[2].toLowerCase().startsWith("g-")) {
             } else {
-                eb[0].setTitle("Invalid input. Type !help for help");
+                eb[0].setTitle(errorMessage(this.name));
                 event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
                 return;
             }
@@ -126,12 +128,12 @@ public class GuildCommands extends Command {
 
             } else if (args[2].toLowerCase().startsWith("g-")) {
             } else {
-                eb[0].setTitle("Invalid input. Type !help for help");
+                eb[0].setTitle(errorMessage(this.name));
                 event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
                 return;
             }
         } else {
-            eb[0].setTitle("Invalid input. Type !help for help");
+            eb[0].setTitle(errorMessage(this.name));
             event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
             return;
         }

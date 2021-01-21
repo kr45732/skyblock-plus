@@ -2,7 +2,9 @@ package com.SkyblockBot.Skills;
 
 import static com.SkyblockBot.Miscellaneous.BotUtils.capitalizeString;
 import static com.SkyblockBot.Miscellaneous.BotUtils.defaultEmbed;
+import static com.SkyblockBot.Miscellaneous.BotUtils.errorMessage;
 import static com.SkyblockBot.Miscellaneous.BotUtils.getJson;
+import static com.SkyblockBot.Miscellaneous.BotUtils.globalCooldown;
 import static com.SkyblockBot.Miscellaneous.BotUtils.higherDepth;
 import static com.SkyblockBot.Miscellaneous.BotUtils.key;
 import static com.SkyblockBot.Miscellaneous.BotUtils.roundProgress;
@@ -27,7 +29,7 @@ public class SkillsCommands extends Command {
     public SkillsCommands() {
         this.name = "skills";
         this.guildOnly = false;
-        this.cooldown = 5;
+        this.cooldown = globalCooldown;
     }
 
     @Override
@@ -39,7 +41,7 @@ public class SkillsCommands extends Command {
 
         String[] args = content.split(" ");
         if (args.length <= 1 || args.length > 4) {
-            eb[0].setTitle("Invalid input. Type !help for help");
+            eb[0].setTitle(errorMessage(this.name));
             event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
             return;
         }
@@ -55,7 +57,7 @@ public class SkillsCommands extends Command {
             } else
                 eb[0] = getPlayerSkill(args[2], null);
         } else {
-            eb[0].setTitle("Invalid input. Type !help for help");
+            eb[0].setTitle(errorMessage(this.name));
             event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
             return;
         }

@@ -23,8 +23,10 @@ public class BotUtils {
     public static String key = "";
     public static String botToken = "";
     public static Color botColor = new Color(9, 92, 13);
+    public static String botPrefix = "";
+    public static int globalCooldown = 2;
 
-    public static void setBotSettings() {
+    public static void setBotSettings(String prefix) {
         String botTokenL = "";
         if (System.getenv("BOT_TOKEN") == null) {
             try {
@@ -51,6 +53,8 @@ public class BotUtils {
             apiKey = System.getenv("API_KEY");
         }
         key = apiKey;
+
+        botPrefix = prefix;
     }
 
     public static JsonElement higherDepth(JsonElement element, String value) {
@@ -67,6 +71,14 @@ public class BotUtils {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static String errorMessage() {
+        return "Invalid input. Type `" + botPrefix + "help` for help";
+    }
+
+    public static String errorMessage(String name) {
+        return "Invalid input. Type `" + botPrefix + "help " + name + "` for help";
     }
 
     public static String uuidToUsername(String uuid) {

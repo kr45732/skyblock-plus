@@ -1,7 +1,9 @@
 package com.SkyblockBot.Auction;
 
 import static com.SkyblockBot.Miscellaneous.BotUtils.defaultEmbed;
+import static com.SkyblockBot.Miscellaneous.BotUtils.errorMessage;
 import static com.SkyblockBot.Miscellaneous.BotUtils.getJson;
+import static com.SkyblockBot.Miscellaneous.BotUtils.globalCooldown;
 import static com.SkyblockBot.Miscellaneous.BotUtils.higherDepth;
 import static com.SkyblockBot.Miscellaneous.BotUtils.key;
 import static com.SkyblockBot.Miscellaneous.BotUtils.simplifyNumber;
@@ -22,7 +24,8 @@ public class AuctionCommands extends Command {
     public AuctionCommands() {
         this.name = "auction";
         this.guildOnly = false;
-        this.cooldown = 5;
+        this.cooldown = globalCooldown;
+        this.aliases = new String[] { "ah" };
     }
 
     @Override
@@ -33,8 +36,8 @@ public class AuctionCommands extends Command {
         String content = message.getContentRaw();
 
         String[] args = content.split(" ");
-        if (args.length != 3) { // No args or too many args are given
-            eb[0].setTitle("Invalid input. Type !help for help");
+        if (args.length != 2) { // No args or too many args are given
+            eb[0].setTitle(errorMessage(this.name));
             event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
             return;
         }
@@ -44,13 +47,7 @@ public class AuctionCommands extends Command {
         }
         System.out.println();
 
-        if (args[1].equals("player")) {
-            eb[0] = getPlayerAuction(args[2]);
-        } else {
-            eb[0].setTitle("Invalid input. Type !help for help");
-            event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
-            return;
-        }
+        eb[0] = getPlayerAuction(args[1]);
 
         event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
 
@@ -63,7 +60,6 @@ public class AuctionCommands extends Command {
             return defaultEmbed("Error fetching player data", null);
         }
         String url = "https://api.hypixel.net/skyblock/auction?key=" + key + "&player=" + uuid;
-        System.out.println(url);
         JsonElement playerAuctions = getJson(url);
         JsonArray auctionsArray = higherDepth(playerAuctions, "auctions").getAsJsonArray();
         String[][] auctions = new String[auctionsArray.size()][2];

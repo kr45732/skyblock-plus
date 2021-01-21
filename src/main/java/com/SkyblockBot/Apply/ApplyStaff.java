@@ -1,8 +1,8 @@
 package com.SkyblockBot.Apply;
 
+import static com.SkyblockBot.Apply.ChannelDeleter.removeChannel;
 import static com.SkyblockBot.Miscellaneous.BotUtils.defaultEmbed;
 import static com.SkyblockBot.Miscellaneous.BotUtils.higherDepth;
-import static com.SkyblockBot.Miscellaneous.ChannelDeleter.removeChannel;
 
 import java.util.concurrent.TimeUnit;
 

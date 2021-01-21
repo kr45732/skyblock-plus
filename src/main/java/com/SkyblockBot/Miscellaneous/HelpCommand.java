@@ -1,7 +1,10 @@
 package com.SkyblockBot.Miscellaneous;
 
 import static com.SkyblockBot.Miscellaneous.BotUtils.botColor;
+import static com.SkyblockBot.Miscellaneous.BotUtils.botPrefix;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import com.jagrosh.jdautilities.command.Command;
@@ -18,7 +21,6 @@ public class HelpCommand extends Command {
     public HelpCommand(EventWaiter waiter) {
         this.name = "help";
         this.aliases = new String[] { "commands" };
-        this.help = "display help menu";
         this.guildOnly = false;
 
         pbuilder = new Paginator.Builder().setColumns(1).setItemsPerPage(itemsPerPage).showPageNumbers(true)
@@ -52,6 +54,30 @@ public class HelpCommand extends Command {
         // "!bazaar [item]\n"
         // "!bz [item]\n";
 
+        // !player [ign]
+
+        int startingPage = 0;
+        try {
+            String pageStr = event.getMessage().getContentDisplay().toLowerCase().split(" ")[1];
+            Map<String, Integer> pageMap = new HashMap<>();
+            pageMap.put("general", 2);
+            pageMap.put("slayer", 3);
+            pageMap.put("skills", 4);
+            pageMap.put("dungeons", 5);
+            pageMap.put("catacombs", 5);
+            pageMap.put("cata", 5);
+            pageMap.put("guild", 6);
+            pageMap.put("auction", 7);
+            pageMap.put("ah", 7);
+            pageMap.put("bazaar", 7);
+            pageMap.put("bz", 7);
+            pageMap.put("bin", 7);
+            if (pageMap.get(pageStr) != null) {
+                startingPage = pageMap.get(pageStr);
+            }
+        } catch (Exception ex) {
+        }
+
         pbuilder.clearItems();
         pbuilder.setText("Help Page");
         pbuilder.addItems(fillArray(
@@ -59,35 +85,40 @@ public class HelpCommand extends Command {
                         "• **Page 2**: General", "• **Page 3**: Slayer", "• **Page 4**: Skills",
                         "• **Page 5**: Dungeons", "• **Page 6**: Guild", "• **Page 7**: Auction House and Bazaar" }));
 
-        String[] generalCommands = new String[] { "**__General__**", " ", "• `!help`: Show this help page",
-                "• `!commands`: Show this help page", "• `!about`: Get information about this bot" };
+        String[] generalCommands = new String[] { "**__General__**", " ", generateHelp("Show this help page", "help"),
+                generateHelp("Show this help page", "commands"),
+                generateHelp("Get information about this bot", "about"),
+                generateHelp("Show patch notes for this bot", "version"),
+                generateHelp("Shutdown bot; can only be used by specfic people", "shutdown") };
         pbuilder.addItems(fillArray(generalCommands));
 
         String[] slayerCommands = new String[] { "**__Slayer__**", " ",
-                "• `!slayer player [IGN] <profile>`: Get a user's slayer and optionally choose which skyblock profile to get the slayer of" };
+                generateHelp("Get a user's slayer and optionally choose which skyblock profile to get the slayer of",
+                        "slayer player [IGN] <profile>") };
         pbuilder.addItems(fillArray(slayerCommands));
 
         String[] skillsCommands = new String[] { "**__Skills__**", " ",
-                "• `!skill player [IGN]`: Get skills of a player" };
+                generateHelp("Get skills of a player", "skill player [IGN]") };
         pbuilder.addItems(fillArray(skillsCommands));
 
         String[] dungeonCommands = new String[] { "**__Dungeons__**", " ",
-                "• `!catacombs player [IGN}` or `!cata player [IGN]`: Get catacombs level of player" };
+                generateHelp("Get catacombs level of player", "catacombs player [IGN]", "cata player [IGN]") };
         pbuilder.addItems(fillArray(dungeonCommands));
 
         String[] guildCommands = new String[] { "**__Guild__**", " ",
-                "• `!guild experience [u-IGN]` or `!guild exp [u-IGN]`: Get guild experience leaderboard from IGN",
-                "• `!guild members [u-IGN]`: Get all the members in a player's guild",
-                "• `!guild player [IGN]`: Get what guild a player is in",
-                "• `!guild info [u-IGN]`: Get information about a player's guild" };
+                generateHelp("Get guild experience leaderboard from IGN", "guild experience [u-IGN]",
+                        "guild exp [u-IGN]"),
+                generateHelp("Get all the members in a player's guild", "guild members [u-IGN]"),
+                generateHelp("Get what guild a player is in", "guild player [IGN]"),
+                generateHelp("Get information about a player's guild", "guild info [u-IGN]") };
         pbuilder.addItems(fillArray(guildCommands));
 
         String[] ahAndBazCommands = new String[] { "**__Auction House and Bazaar__**", " ",
-                "• `!auction player [IGN]` or `!ah [IGN]`: Get player's active (not claimed) auctions on all profiles",
-                "• `!bin item [item]`: Get lowest bin of an item" };
+                generateHelp("Get player's active (not claimed) auctions on all profiles", "auction [IGN]", "ah [IGN]"),
+                generateHelp("Get lowest bin of an item", "bin [item]") };
         pbuilder.addItems(fillArray(ahAndBazCommands));
 
-        pbuilder.build().paginate(event.getChannel(), 0);
+        pbuilder.build().paginate(event.getChannel(), startingPage);
     }
 
     public String[] fillArray(String[] inputs) {
@@ -100,6 +131,18 @@ public class HelpCommand extends Command {
             }
         }
         return filedArray;
+    }
+
+    public String generateHelp(String desc, String... commandName) {
+        String generatedStr = "• ";
+        for (int i = 0; i < commandName.length; i++) {
+            generatedStr += "`" + botPrefix + commandName[i] + "`";
+            if (commandName.length > 1 && i < (commandName.length - 1)) {
+                generatedStr += " or ";
+            }
+        }
+        generatedStr += ": " + desc;
+        return generatedStr;
     }
 
 }

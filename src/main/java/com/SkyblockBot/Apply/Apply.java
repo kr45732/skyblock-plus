@@ -24,7 +24,7 @@ public class Apply extends ListenerAdapter {
     public void onGuildReady(GuildReadyEvent event) {
         try {
             JsonElement settings = new JsonParser()
-                    .parse(new FileReader("src/main/java/com/SkyblockBot/Miscellaneous/GuildSettings.json"));
+                    .parse(new FileReader("src/main/java/com/SkyblockBot/json/GuildSettings.json"));
             if (higherDepth(settings, event.getGuild().getId()) != null) {
                 if (higherDepth(higherDepth(higherDepth(settings, event.getGuild().getId()), "automated_applications"),
                         "enable").getAsBoolean()) {

@@ -1,12 +1,14 @@
 package com.SkyblockBot.Auction;
 
+import static com.SkyblockBot.Miscellaneous.BotUtils.botPrefix;
 import static com.SkyblockBot.Miscellaneous.BotUtils.defaultEmbed;
+import static com.SkyblockBot.Miscellaneous.BotUtils.errorMessage;
 import static com.SkyblockBot.Miscellaneous.BotUtils.formatNumber;
 import static com.SkyblockBot.Miscellaneous.BotUtils.getJson;
+import static com.SkyblockBot.Miscellaneous.BotUtils.globalCooldown;
 import static com.SkyblockBot.Miscellaneous.BotUtils.higherDepth;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +26,7 @@ public class BinCommands extends Command {
     public BinCommands() {
         this.name = "bin";
         this.guildOnly = false;
-        this.cooldown = 5;
+        this.cooldown = globalCooldown;
     }
 
     @Override
@@ -32,31 +34,17 @@ public class BinCommands extends Command {
         final EmbedBuilder[] eb = { defaultEmbed("Loading auction data...", null) };
 
         Message message = event.getMessage();
-        String content = message.getContentRaw();
+        String args = message.getContentRaw();
 
-        String[] args = content.split(" ");
-        if (args.length < 3) { // No args or too many args are given
-            eb[0].setTitle("Invalid input. Type !help for help");
+        if (args.split(" ").length < 2) { // Not enough args are given
+            eb[0].setTitle(errorMessage(this.name));
             event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
             return;
         }
 
-        for (String value : args) {
-            System.out.print(value + " ");
-        }
-        System.out.println();
+        System.out.println(args);
 
-        if (args[1].equals("item")) {
-            String argsStr = "";
-            for (String i : Arrays.copyOfRange(args, 2, args.length)) {
-                argsStr += i + " ";
-            }
-            eb[0] = getLowestBin(argsStr);
-        } else {
-            eb[0].setTitle("Invalid input. Type !help for help");
-            event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
-            return;
-        }
+        eb[0] = getLowestBin(args.replace(botPrefix + "bin ", ""));
 
         event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
 
