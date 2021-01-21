@@ -26,6 +26,23 @@ public class BotUtils {
     public static String botPrefix = "";
     public static int globalCooldown = 2;
 
+    public static String getBotPrefix() {
+        String botPrefix = "";
+        if (System.getenv("BOT_PREFIX") == null) {
+            try {
+                BufferedReader br = new BufferedReader(new FileReader("DevSettings.txt"));
+                br.readLine();
+                br.readLine();
+                botPrefix = br.readLine().split("=")[1];
+                br.close();
+            } catch (Exception e) {
+            }
+        } else {
+            botPrefix = System.getenv("BOT_PREFIX");
+        }
+        return botPrefix;
+    }
+
     public static void setBotSettings(String prefix) {
         String botTokenL = "";
         if (System.getenv("BOT_TOKEN") == null) {

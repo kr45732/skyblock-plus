@@ -37,8 +37,7 @@ public class VersionCommand extends Command {
                     .collect(Collectors.toCollection(ArrayList::new));
             int latestVersion = Collections.max(patchVersions);
             JsonElement currentDesc = higherDepth(patchNotes, "" + latestVersion);
-            EmbedBuilder eb = defaultEmbed(higherDepth(currentDesc, "title").getAsString() + " - "
-                    + higherDepth(currentDesc, "version").getAsString(), null);
+            EmbedBuilder eb = defaultEmbed("Version " + higherDepth(currentDesc, "version").getAsString(), null);
             eb.setDescription(higherDepth(currentDesc, "description").getAsString());
             eb.setFooter("Released at");
             eb.setTimestamp(Instant.parse(higherDepth(currentDesc, "date").getAsString()));

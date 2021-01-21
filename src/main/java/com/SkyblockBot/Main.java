@@ -1,6 +1,7 @@
 package com.SkyblockBot;
 
 import static com.SkyblockBot.Miscellaneous.BotUtils.botToken;
+import static com.SkyblockBot.Miscellaneous.BotUtils.getBotPrefix;
 import static com.SkyblockBot.Miscellaneous.BotUtils.setBotSettings;
 
 import java.io.IOException;
@@ -33,7 +34,8 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 public class Main {
     public static void main(String[] args)
             throws IOException, LoginException, IllegalArgumentException, RateLimitedException {
-        String botPrefix = "//";
+        String botPrefix = getBotPrefix();
+
         EventWaiter waiter = new EventWaiter();
         CommandClientBuilder client = new CommandClientBuilder();
         client.useDefaultGame();
@@ -58,10 +60,10 @@ public class Main {
         // TODO: add unimplemented commands in HelpCommand.java
         // TODO: speed up commands/reduce duplicate code
         // TODO: improve !cata/catacombs command
-        // TODO: add version command + patch notes
         // TODO: use last played on profile rather than oldest profile
         // TODO: weight command/leaderboard
         // TODO: /g kick command (factoring in lowest g exp + lowest stats)
+        // TODO: give guild member role automatically
     }
 
 }
