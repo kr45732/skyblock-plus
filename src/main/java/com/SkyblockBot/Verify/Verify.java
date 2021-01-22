@@ -54,7 +54,7 @@ public class Verify extends ListenerAdapter {
     }
 
     @Override
-    public void onMessageReactionAdd(MessageReactionAddEvent event) {
+    public void onMessageReactionAdd(MessageReactionAddEvent event) throws NullPointerException {
         if (!validGuild) {
             return;
         }

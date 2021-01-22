@@ -19,7 +19,7 @@
       }
     },
     "automated_verify": {
-      "enable": "false",
+      "enable": "true",
       "react_channel": {
         "name": "verify",
         "id": "801970206721179658"
