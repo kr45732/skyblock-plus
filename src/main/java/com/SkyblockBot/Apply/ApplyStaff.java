@@ -1,8 +1,8 @@
 package com.SkyblockBot.Apply;
 
-import static com.SkyblockBot.Apply.ChannelDeleter.removeChannel;
 import static com.SkyblockBot.Miscellaneous.BotUtils.defaultEmbed;
 import static com.SkyblockBot.Miscellaneous.BotUtils.higherDepth;
+import static com.SkyblockBot.Miscellaneous.ChannelDeleter.removeChannel;
 
 import java.util.concurrent.TimeUnit;
 
@@ -86,7 +86,8 @@ public class ApplyStaff extends ListenerAdapter {
             });
             reactMessage.delete().queueAfter(5, TimeUnit.SECONDS);
         } else if (event.getReactionEmote().getName().equals("✅")) {
-            staffChannel.sendMessage(user.getName() + " was accepted by " + event.getUser().getName()).queue();
+            staffChannel.sendMessage(user.getName() + " (" + user.getAsMention() + ") was accepted by "
+                    + event.getUser().getName() + " (" + event.getUser().getAsMention() + ")").queue();
             reactMessage.clearReactions().queue();
             EmbedBuilder eb = defaultEmbed("Application Accepted", null);
             eb.setDescription(higherDepth(currentSettings, "accept_text").getAsString()

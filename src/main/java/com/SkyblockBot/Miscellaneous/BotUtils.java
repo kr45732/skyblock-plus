@@ -3,7 +3,6 @@ package com.SkyblockBot.Miscellaneous;
 import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.RoundingMode;
 import java.net.URL;
@@ -83,8 +82,8 @@ public class BotUtils {
             URLConnection request = new URL(jsonUrl).openConnection();
             request.connect();
             return new JsonParser().parse(new InputStreamReader(request.getInputStream()));
-        } catch (IOException e) {
-            System.out.println("IOException - getJson - " + jsonUrl);
+        } catch (Exception e) {
+            System.out.println("Exception - getJson - " + jsonUrl);
             e.printStackTrace();
         }
         return null;
