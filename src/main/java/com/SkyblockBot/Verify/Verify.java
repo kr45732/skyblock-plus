@@ -55,6 +55,7 @@ public class Verify extends ListenerAdapter {
 
     @Override
     public void onMessageReactionAdd(MessageReactionAddEvent event) {
+        System.out.println("msg called");
         if (!validGuild) {
             return;
         }
@@ -79,6 +80,7 @@ public class Verify extends ListenerAdapter {
             return;
         }
 
+        System.out.println("adding user");
         event.getJDA().addEventListener(new VerifyUser(event, event.getUser(), currentSettings));
     }
 }

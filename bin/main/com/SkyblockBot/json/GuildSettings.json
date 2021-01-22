@@ -59,7 +59,7 @@
         "id": "782154976666451976"
       }
     },
-    "automated_verify": {
+    "automated_verify-1": {
       "enable": "true",
       "react_channel": {
         "name": "➭verify",
@@ -76,6 +76,23 @@
       },
       "new_channel_prefix": "verify"
     },
-    "automated_roles": {}
+    "automated_verify": {
+      "enable": "true",
+      "react_channel": {
+        "name": "verify",
+        "id": "801996557582729236"
+      },
+
+      "verify_text": "test server verify",
+      "new_channel_category": {
+        "name": "test category",
+        "id": "800830955752259674"
+      },
+      "verified_role": {
+        "name": "verified",
+        "id": "782154976625426464"
+      },
+      "new_channel_prefix": "verify"
+    }
   }
 }
