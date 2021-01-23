@@ -20,6 +20,7 @@ public class Verify extends ListenerAdapter {
     JsonElement currentSettings;
     boolean validGuild = false;
     Message reactMessage;
+    TextChannel reactChannel;
 
     @Override
     public void onGuildReady(GuildReadyEvent event) {
@@ -30,11 +31,11 @@ public class Verify extends ListenerAdapter {
                 if (higherDepth(higherDepth(higherDepth(settings, event.getGuild().getId()), "automated_verify"),
                         "enable").getAsBoolean()) {
                     currentSettings = higherDepth(higherDepth(settings, event.getGuild().getId()), "automated_verify");
-                    TextChannel reactChannel = event.getGuild().getTextChannelById(
+                    reactChannel = event.getGuild().getTextChannelById(
                             higherDepth(higherDepth(currentSettings, "react_channel"), "id").getAsString());
-                    validGuild = true;
-                    channelPrefix = higherDepth(currentSettings, "new_channel_prefix").getAsString();
 
+                    channelPrefix = higherDepth(currentSettings, "new_channel_prefix").getAsString();
+                    validGuild = true;
                     reactChannel.sendMessage("Loading...").complete();
                     reactChannel.sendMessage("Loading...").complete();
                     List<Message> deleteMessages = reactChannel.getHistory().retrievePast(10).complete();
@@ -47,6 +48,7 @@ public class Verify extends ListenerAdapter {
                                 message.addReaction("✅").queue();
                                 this.reactMessage = message;
                             });
+
                 }
             }
         } catch (Exception e) {
@@ -55,14 +57,18 @@ public class Verify extends ListenerAdapter {
 
     @Override
     public void onMessageReactionAdd(MessageReactionAddEvent event) {
-        System.out.println("msg called");
         if (!validGuild) {
             return;
         }
-        if (event.getMessageIdLong() != reactMessage.getIdLong()) {
+
+        System.out.println("VALID ||| Guild " + event.getGuild().getName() + " user: " + event.getUser().getName());
+        System.out.println(reactMessage.getContentDisplay());
+        if (event.getUser().isBot()) {
             return;
         }
-        if (event.getUser().isBot()) {
+        System.out.println(reactMessage.getId());
+
+        if (event.getMessageIdLong() != reactMessage.getIdLong()) {
             return;
         }
 
@@ -74,13 +80,19 @@ public class Verify extends ListenerAdapter {
         if (event.getGuild().getTextChannelsByName(channelPrefix + "-" + event.getUser().getName(), true).size() > 0) {
             return;
         }
+        // System.out.println(event.getGuild().getMember(event.getUser()).getRoles().get(0));
+        // System.out.println(event.getGuild()
+        // .getRoleById(higherDepth(higherDepth(currentSettings, "verified_role"),
+        // "id").getAsString()));
+        // if
+        // (event.getGuild().getMember(event.getUser()).getRoles().contains(event.getGuild()
+        // .getRoleById(higherDepth(higherDepth(currentSettings, "verified_role"),
+        // "id").getAsString()))) {
+        // return;
+        // }
 
-        if (event.getGuild().getMember(event.getUser()).getRoles().contains(event.getGuild()
-                .getRoleById(higherDepth(higherDepth(currentSettings, "verified_role"), "id").getAsString()))) {
-            return;
-        }
-
-        System.out.println("adding user");
+        System.out.println(
+                "ADDING USER |||| Guild " + event.getGuild().getName() + " user: " + event.getUser().getName());
         event.getJDA().addEventListener(new VerifyUser(event, event.getUser(), currentSettings));
     }
 }

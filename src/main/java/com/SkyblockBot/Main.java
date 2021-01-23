@@ -20,7 +20,6 @@ import com.SkyblockBot.Miscellaneous.ShutdownCommand;
 import com.SkyblockBot.Miscellaneous.VersionCommand;
 import com.SkyblockBot.Skills.SkillsCommands;
 import com.SkyblockBot.Slayer.SlayerCommands;
-import com.SkyblockBot.Verify.Verify;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
@@ -55,8 +54,7 @@ public class Main {
         JDABuilder.createDefault(botToken).setStatus(OnlineStatus.DO_NOT_DISTURB).setChunkingFilter(ChunkingFilter.ALL)
                 .setMemberCachePolicy(MemberCachePolicy.ALL).enableIntents(GatewayIntent.GUILD_MEMBERS)
                 .setActivity(Activity.playing("Loading...")).addEventListeners(waiter, client.build())
-                .addEventListeners(new Apply()).addEventListeners(new ChannelDeleter()).addEventListeners(new Verify())
-                .build();
+                .addEventListeners(new Apply()).addEventListeners(new ChannelDeleter()).build();
 
         // TODO: better bin command (parsing of string)
         // TODO: add unimplemented commands in HelpCommand.java
@@ -66,6 +64,7 @@ public class Main {
         // TODO: weight command/leaderboard
         // TODO: /g kick command (factoring in lowest g exp + lowest stats)
         // TODO: give guild member role automatically
+        // TODO: fix verfication (mee 7 bot deletes the messages)
     }
 }
 
