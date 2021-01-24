@@ -143,6 +143,9 @@ public class RoleCommands extends Command {
                         } else if (currentRoleName.equals("sven") || currentRoleName.equals("rev")
                                 || currentRoleName.equals("tara")) {
                             String slayerPlayer = getPlayerSlayer(username);
+                            if (slayerPlayer == null && !errorRoles.contains("Slayer")) {
+                                errorRoles += roleChangeString("Slayer API disabled");
+                            }
 
                             if (slayerPlayer.length() > 0) {
                                 String svenExp;
@@ -194,8 +197,8 @@ public class RoleCommands extends Command {
                         } else if (currentRoleName.equals("bank_coins")) {
                             double playerBankCoins = getBankCoins(username);
                             if (playerBankCoins == -1 || playerBankCoins == -2) {
-                                if (playerBankCoins == -2) {
-                                    errorRoles += "• Unable to give bank roles due to bank api being disabled\n";
+                                if (playerBankCoins == -2 && !errorRoles.contains("Banking")) {
+                                    errorRoles += roleChangeString("Banking API disabled");
                                 }
                             }
 
@@ -243,6 +246,9 @@ public class RoleCommands extends Command {
                             String currSkill = currentRoleName.equals("catacombs") ? getPlayerCatacombs(username)
                                     : getPlayerSkills(username, currentRoleName);
 
+                            if (currSkill == null && !errorRoles.contains("Skills")) {
+                                errorRoles += roleChangeString("Skills API is disabled");
+                            }
                             if (currSkill != null) {
                                 List<Integer> skillLevels = currentRole.getAsJsonObject().entrySet().stream()
                                         .map(i -> Integer.parseInt(i.getKey()))
@@ -323,7 +329,7 @@ public class RoleCommands extends Command {
                     eb.setDescription("**Added Roles:**\n" + (addedRoles.length() > 0 ? addedRoles : "• None\n")
                             + "\n**Removed Roles:**\n" + (removedRoles.length() > 0 ? removedRoles : "• None"));
                     if (errorRoles.length() > 0) {
-                        eb.addField("Error fetching roles:", errorRoles, false);
+                        eb.addField("Disabled API's:", errorRoles, false);
                     }
                     eb.setTimestamp(Instant.now());
                 } else {
@@ -394,11 +400,15 @@ public class RoleCommands extends Command {
         }
         String uuidPlayer = usernameToUuid(username);
 
-        double skillExp = higherDepth(
-                higherDepth(higherDepth(higherDepth(skyblockJson, "profile"), "members"), uuidPlayer),
-                "experience_skill_" + skill).getAsLong();
-        SkillsStruct skillInfo = skillInfoFromExp(skillExp, skill);
-        return "" + skillInfo.skillLevel;
+        try {
+            double skillExp = higherDepth(
+                    higherDepth(higherDepth(higherDepth(skyblockJson, "profile"), "members"), uuidPlayer),
+                    "experience_skill_" + skill).getAsLong();
+            SkillsStruct skillInfo = skillInfoFromExp(skillExp, skill);
+            return "" + skillInfo.skillLevel;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public boolean checkValid(String username, String profile) {

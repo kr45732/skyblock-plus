@@ -48,7 +48,7 @@ public class ApplyUser extends ListenerAdapter {
         String channelPrefix = higherDepth(currentSettings, "new_channel_prefix").getAsString();
         Category applyCategory = event.getGuild()
                 .getCategoryById(higherDepth(higherDepth(currentSettings, "new_channel_category"), "id").getAsString());
-        TextChannel applicationChannel = applyCategory.createTextChannel(channelPrefix + "-" + applyingUser.getName())
+        applicationChannel = applyCategory.createTextChannel(channelPrefix + "-" + applyingUser.getName())
                 .addPermissionOverride(event.getGuild().getMember(applyingUser), EnumSet.of(Permission.VIEW_CHANNEL),
                         null)
                 .addPermissionOverride(event.getGuild().getPublicRole(), null, EnumSet.of(Permission.VIEW_CHANNEL))
@@ -88,57 +88,60 @@ public class ApplyUser extends ListenerAdapter {
         reactMessage.clearReactions().queue();
         switch (state) {
             case 0:
-                applicationChannel.retrieveMessageById(applicationChannel.getLatestMessageId()).queue(messageReply -> {
-                    if (messageReply.getAuthor().equals(applyingUser)) {
-                        try {
-                            username = messageReply.getContentDisplay().split(" ")[0];
-                            profile = messageReply.getContentDisplay().split(" ")[1];
-                            if (checkValid(username, profile)) {
-                                EmbedBuilder eb0 = defaultEmbed("Stats for " + username,
-                                        "https://sky.shiiyu.moe/stats/" + username + "/" + profile);
-                                eb0.addField("Total slayer", getPlayerSlayer(username), true);
-                                eb0.addField("True average skill level", getPlayerSkills(username), true);
-                                eb0.addField("Catacombs level", getPlayerCatacombs(username), true);
-                                Gson gson = new Gson();
-                                ebMain = gson.fromJson(gson.toJson(eb0), EmbedBuilder.class);
-                                eb0.addField("Are the above stats correct?", "React with ✅ for yes and ❌ to cancel",
-                                        false);
-                                applicationChannel.sendMessage(eb0.build()).queue(message -> {
-                                    message.addReaction("✅").queue();
-                                    message.addReaction("❌").queue();
-                                    this.reactMessage = message;
+                if (applicationChannel.hasLatestMessage()) {
+                    applicationChannel.retrieveMessageById(applicationChannel.getLatestMessageId())
+                            .queue(messageReply -> {
+                                if (messageReply.getAuthor().equals(applyingUser)) {
+                                    try {
+                                        username = messageReply.getContentDisplay().split(" ")[0];
+                                        profile = messageReply.getContentDisplay().split(" ")[1];
+                                        if (checkValid(username, profile)) {
+                                            EmbedBuilder eb0 = defaultEmbed("Stats for " + username,
+                                                    "https://sky.shiiyu.moe/stats/" + username + "/" + profile);
+                                            eb0.addField("Total slayer", getPlayerSlayer(username), true);
+                                            eb0.addField("True average skill level", getPlayerSkills(username), true);
+                                            eb0.addField("Catacombs level", getPlayerCatacombs(username), true);
+                                            Gson gson = new Gson();
+                                            ebMain = gson.fromJson(gson.toJson(eb0), EmbedBuilder.class);
+                                            eb0.addField("Are the above stats correct?",
+                                                    "React with ✅ for yes and ❌ to cancel", false);
+                                            applicationChannel.sendMessage(eb0.build()).queue(message -> {
+                                                message.addReaction("✅").queue();
+                                                message.addReaction("❌").queue();
+                                                this.reactMessage = message;
 
-                                });
-                                state = 1;
-                            } else {
-                                EmbedBuilder eb = invalidInput(messageReply.getContentDisplay());
-                                applicationChannel.sendMessage(eb.build()).queue(message -> {
-                                    message.addReaction("✅").queue();
-                                    message.addReaction("❌").queue();
-                                    this.reactMessage = message;
-                                });
-                                state = 2;
-                            }
-                        } catch (Exception ex) {
-                            EmbedBuilder eb = invalidInput(messageReply.getContentDisplay());
-                            applicationChannel.sendMessage(eb.build()).queue(message -> {
-                                message.addReaction("✅").queue();
-                                message.addReaction("❌").queue();
-                                this.reactMessage = message;
+                                            });
+                                            state = 1;
+                                        } else {
+                                            EmbedBuilder eb = invalidInput(messageReply.getContentDisplay());
+                                            applicationChannel.sendMessage(eb.build()).queue(message -> {
+                                                message.addReaction("✅").queue();
+                                                message.addReaction("❌").queue();
+                                                this.reactMessage = message;
+                                            });
+                                            state = 2;
+                                        }
+                                    } catch (Exception ex) {
+                                        EmbedBuilder eb = invalidInput(messageReply.getContentDisplay());
+                                        applicationChannel.sendMessage(eb.build()).queue(message -> {
+                                            message.addReaction("✅").queue();
+                                            message.addReaction("❌").queue();
+                                            this.reactMessage = message;
+                                        });
+                                        state = 2;
+                                    }
+
+                                } else {
+                                    EmbedBuilder eb = invalidInput(messageReply.getContentDisplay());
+                                    applicationChannel.sendMessage(eb.build()).queue(message -> {
+                                        message.addReaction("✅").queue();
+                                        message.addReaction("❌").queue();
+                                        this.reactMessage = message;
+                                    });
+                                    state = 2;
+                                }
                             });
-                            state = 2;
-                        }
-
-                    } else {
-                        EmbedBuilder eb = invalidInput(messageReply.getContentDisplay());
-                        applicationChannel.sendMessage(eb.build()).queue(message -> {
-                            message.addReaction("✅").queue();
-                            message.addReaction("❌").queue();
-                            this.reactMessage = message;
-                        });
-                        state = 2;
-                    }
-                });
+                }
                 break;
             case 1:
                 EmbedBuilder eb = defaultEmbed("Thank you for applying!", null);
