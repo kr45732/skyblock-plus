@@ -9,6 +9,11 @@
     "description": "- Bug fixes\n- Updated patch notes\n- Changed bin and auction command\n\n- Added commands:\n• `version`",
     "date": "2021-01-21T13:27:57.167660Z"
   },
+  "3": {
+    "version": "0.0.3",
+    "description": "- Bug fixes\n- Added automatic role claim command for Skyblock roles\n\n- Added commands:\n• `roles`",
+    "date": "2021-01-24T03:24:04.537747Z"
+  },
   "-1": {
     "version": "0.0.3",
     "description": "- Added verification system for Discord and Hypixel\n- Other minor changes",

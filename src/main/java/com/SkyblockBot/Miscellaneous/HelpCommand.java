@@ -62,6 +62,7 @@ public class HelpCommand extends Command {
             String pageStr = event.getMessage().getContentDisplay().toLowerCase().split(" ")[1];
             Map<String, Integer> pageMap = new HashMap<>();
             pageMap.put("general", 2);
+            pageMap.put("roles", 2);
             pageMap.put("slayer", 3);
             pageMap.put("skills", 4);
             pageMap.put("dungeons", 5);
@@ -90,7 +91,8 @@ public class HelpCommand extends Command {
                 generateHelp("Show this help page", "commands"),
                 generateHelp("Get information about this bot", "about"),
                 generateHelp("Show patch notes for this bot", "version"),
-                generateHelp("Shutdown bot; can only be used by specfic people", "shutdown") };
+                generateHelp("Shutdown bot; can only be used by specfic people", "shutdown"),
+                generateHelp("Claim automatic Skyblock roles", "roles claim [IGN] [profile]"), };
         pbuilder.addItems(fillArray(generalCommands));
 
         String[] slayerCommands = new String[] { "**__Slayer__**", " ",

@@ -18,6 +18,7 @@ import com.SkyblockBot.Miscellaneous.ChannelDeleter;
 import com.SkyblockBot.Miscellaneous.HelpCommand;
 import com.SkyblockBot.Miscellaneous.ShutdownCommand;
 import com.SkyblockBot.Miscellaneous.VersionCommand;
+import com.SkyblockBot.Roles.RoleCommands;
 import com.SkyblockBot.Skills.SkillsCommands;
 import com.SkyblockBot.Slayer.SlayerCommands;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
@@ -47,7 +48,7 @@ public class Main {
 
         client.addCommands(new AboutCommand(), new SlayerCommands(), new HelpCommand(waiter), new GuildCommands(waiter),
                 new AuctionCommands(), new BinCommands(), new SkillsCommands(), new CatacombsCommand(),
-                new ShutdownCommand(), new VersionCommand()
+                new ShutdownCommand(), new VersionCommand(), new RoleCommands()
 
         );
         setBotSettings(botPrefix);
