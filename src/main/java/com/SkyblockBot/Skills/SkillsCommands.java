@@ -26,6 +26,8 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
 public class SkillsCommands extends Command {
+    Message ebMessage;
+
     public SkillsCommands() {
         this.name = "skills";
         this.guildOnly = false;
@@ -34,15 +36,16 @@ public class SkillsCommands extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        final EmbedBuilder[] eb = { defaultEmbed("Loading skill data...", null) };
+        EmbedBuilder eb = defaultEmbed("Loading skill data...", null);
+        this.ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 
         Message message = event.getMessage();
         String content = message.getContentRaw();
 
         String[] args = content.split(" ");
         if (args.length <= 1 || args.length > 4) {
-            eb[0].setTitle(errorMessage(this.name));
-            event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
+            eb.setTitle(errorMessage(this.name));
+            ebMessage.editMessage(eb.build()).queue();
             return;
         }
 
@@ -53,16 +56,16 @@ public class SkillsCommands extends Command {
 
         if (args[1].equals("player")) {
             if (args.length == 4) { // Profile specified
-                eb[0] = getPlayerSkill(args[2], args[3]);
+                eb = getPlayerSkill(args[2], args[3]);
             } else
-                eb[0] = getPlayerSkill(args[2], null);
+                eb = getPlayerSkill(args[2], null);
         } else {
-            eb[0].setTitle(errorMessage(this.name));
-            event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
+            eb.setTitle(errorMessage(this.name));
+            ebMessage.editMessage(eb.build()).queue();
             return;
         }
 
-        event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
+        ebMessage.editMessage(eb.build()).queue();
 
     }
 

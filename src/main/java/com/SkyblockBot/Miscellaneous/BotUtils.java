@@ -74,7 +74,11 @@ public class BotUtils {
     }
 
     public static JsonElement higherDepth(JsonElement element, String value) {
-        return element.getAsJsonObject().get(value);
+        try {
+            return element.getAsJsonObject().get(value);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public static JsonElement getJson(String jsonUrl) {

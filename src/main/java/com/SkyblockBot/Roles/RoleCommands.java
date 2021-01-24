@@ -3,7 +3,6 @@ package com.SkyblockBot.Roles;
 import static com.SkyblockBot.Miscellaneous.BotUtils.defaultEmbed;
 import static com.SkyblockBot.Miscellaneous.BotUtils.errorMessage;
 import static com.SkyblockBot.Miscellaneous.BotUtils.getJson;
-import static com.SkyblockBot.Miscellaneous.BotUtils.globalCooldown;
 import static com.SkyblockBot.Miscellaneous.BotUtils.higherDepth;
 import static com.SkyblockBot.Miscellaneous.BotUtils.key;
 import static com.SkyblockBot.Miscellaneous.BotUtils.usernameToUuid;
@@ -33,7 +32,6 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 
 public class RoleCommands extends Command {
-    EmbedBuilder eb;
     Message ebMessage;
     String profileId;
 
@@ -45,7 +43,7 @@ public class RoleCommands extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        eb = defaultEmbed("Loading roles data...", null);
+        EmbedBuilder eb = defaultEmbed("Loading roles data...", null);
         eb.setDescription("**NOTE: This may take some time**");
 
         String content = event.getMessage().getContentRaw();
@@ -67,8 +65,14 @@ public class RoleCommands extends Command {
         }
         System.out.println();
 
-        String[] playerInfo = getPlayerInfo(args[2]).split(" ");
-
+        if (getPlayerInfo(args[2]) == null) {
+            eb = defaultEmbed("Discord tag mismatch", null);
+            eb.setDescription("Unable to get Discord tag linked with Hypixel account");
+            ebMessage.editMessage(eb.build()).queue();
+            return;
+        }
+        String[] playerInfo = getPlayerInfo(args[2]).split("\n");
+        System.out.println(playerInfo[0] + " = " + user.getAsTag());
         if (playerInfo.length > 0) {
             if (!user.getAsTag().equals(playerInfo[0])) {
                 eb = defaultEmbed("Discord tag mismatch", null);
@@ -100,6 +104,7 @@ public class RoleCommands extends Command {
                 eb = defaultEmbed("Automatic roles for " + playerInfo[1], null);
                 String addedRoles = "";
                 String removedRoles = "";
+                String errorRoles = "";
                 JsonElement settings = new JsonParser()
                         .parse(new FileReader("src/main/java/com/SkyblockBot/json/GuildSettings.json"));
                 if (higherDepth(settings, guild.getId()) != null) {
@@ -188,6 +193,11 @@ public class RoleCommands extends Command {
                             }
                         } else if (currentRoleName.equals("bank_coins")) {
                             double playerBankCoins = getBankCoins(username);
+                            if (playerBankCoins == -1 || playerBankCoins == -2) {
+                                if (playerBankCoins == -2) {
+                                    errorRoles += "• Unable to give bank roles due to bank api being disabled\n";
+                                }
+                            }
 
                             List<Integer> bankLevels = currentRole.getAsJsonObject().entrySet().stream()
                                     .map(i -> Integer.parseInt(i.getKey()))
@@ -312,6 +322,9 @@ public class RoleCommands extends Command {
                     }
                     eb.setDescription("**Added Roles:**\n" + (addedRoles.length() > 0 ? addedRoles : "• None\n")
                             + "\n**Removed Roles:**\n" + (removedRoles.length() > 0 ? removedRoles : "• None"));
+                    if (errorRoles.length() > 0) {
+                        eb.addField("Error fetching roles:", errorRoles, false);
+                    }
                     eb.setTimestamp(Instant.now());
                 } else {
                     eb = defaultEmbed("Error fetching server's settings", null);
@@ -434,7 +447,7 @@ public class RoleCommands extends Command {
         JsonElement skyblockJson = getJson(playerUrl);
 
         if (skyblockJson == null) {
-            return " ";
+            return null;
         }
         String uuidPlayer = usernameToUuid(username);
         JsonElement profileSlayer = higherDepth(
@@ -461,29 +474,33 @@ public class RoleCommands extends Command {
             return -1;
         }
 
-        double profileCoins = higherDepth(higherDepth(higherDepth(skyblockJson, "profile"), "banking"), "balance")
-                .getAsDouble();
+        try {
+            double profileCoins = higherDepth(higherDepth(higherDepth(skyblockJson, "profile"), "banking"), "balance")
+                    .getAsDouble();
+            return profileCoins;
+        } catch (Exception e) {
+            return -2;
+        }
 
-        return profileCoins;
     }
 
     public String getPlayerInfo(String username) {
         JsonElement playerJson = getJson("https://api.hypixel.net/player?key=" + key + "&name=" + username);
 
         if (playerJson == null) {
-            return " ";
+            return null;
         }
 
         if (higherDepth(playerJson, "player").isJsonNull()) {
-            return " ";
+            return null;
         }
         try {
             String discordID = higherDepth(
                     higherDepth(higherDepth(higherDepth(playerJson, "player"), "socialMedia"), "links"), "DISCORD")
                             .getAsString();
-            return discordID + " " + higherDepth(higherDepth(playerJson, "player"), "displayname").getAsString();
+            return discordID + "\n" + higherDepth(higherDepth(playerJson, "player"), "displayname").getAsString();
         } catch (Exception e) {
-            return " ";
+            return null;
         }
     }
 }

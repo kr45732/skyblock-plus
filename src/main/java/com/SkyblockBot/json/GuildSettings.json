@@ -281,7 +281,7 @@
   "782154976243089429": {
     "name": "Skyblock Forceful",
     "automated_applications": {
-      "enable": "true",
+      "enable": "false",
       "react_channel": {
         "name": "✐-apply-for-guild",
         "id": "800528706963374140"
@@ -556,7 +556,7 @@
         }
       },
 
-      "fairy": { "name": "Fairy", "id": "782154976595935250", "souls": "202" }
+      "fairy": { "name": "Fairy", "id": "782154976595935250", "souls": "210" }
     }
   }
 }

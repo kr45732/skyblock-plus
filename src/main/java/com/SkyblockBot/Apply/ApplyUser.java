@@ -48,14 +48,12 @@ public class ApplyUser extends ListenerAdapter {
         String channelPrefix = higherDepth(currentSettings, "new_channel_prefix").getAsString();
         Category applyCategory = event.getGuild()
                 .getCategoryById(higherDepth(higherDepth(currentSettings, "new_channel_category"), "id").getAsString());
-        applyCategory.createTextChannel(channelPrefix + "-" + applyingUser.getName())
+        TextChannel applicationChannel = applyCategory.createTextChannel(channelPrefix + "-" + applyingUser.getName())
                 .addPermissionOverride(event.getGuild().getMember(applyingUser), EnumSet.of(Permission.VIEW_CHANNEL),
                         null)
                 .addPermissionOverride(event.getGuild().getPublicRole(), null, EnumSet.of(Permission.VIEW_CHANNEL))
                 .complete();
 
-        applicationChannel = event.getGuild().getTextChannelsByName(channelPrefix + "-" + applyingUser.getName(), true)
-                .get(0);
         addChannel(applicationChannel);
         applicationChannel.sendMessage("Welcome " + applyingUser.getAsMention() + "!").queue();
 

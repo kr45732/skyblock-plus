@@ -23,6 +23,8 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
 public class BinCommands extends Command {
+    Message ebMessage;
+
     public BinCommands() {
         this.name = "bin";
         this.guildOnly = false;
@@ -31,23 +33,23 @@ public class BinCommands extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        final EmbedBuilder[] eb = { defaultEmbed("Loading auction data...", null) };
+        EmbedBuilder eb = defaultEmbed("Loading lowest bin data...", null);
 
         Message message = event.getMessage();
         String args = message.getContentRaw();
+        this.ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 
         if (args.split(" ").length < 2) { // Not enough args are given
-            eb[0].setTitle(errorMessage(this.name));
-            event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
+            eb.setTitle(errorMessage(this.name));
+            ebMessage.editMessage(eb.build()).queue();
             return;
         }
 
         System.out.println(args);
 
-        eb[0] = getLowestBin(args.replace(botPrefix + "bin ", ""));
+        eb = getLowestBin(args.replace(botPrefix + "bin ", ""));
 
-        event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
-
+        ebMessage.editMessage(eb.build()).queue();
     }
 
     public EmbedBuilder getLowestBin(String item) {

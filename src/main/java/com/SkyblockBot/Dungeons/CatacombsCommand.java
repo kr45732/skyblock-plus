@@ -21,6 +21,8 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
 public class CatacombsCommand extends Command {
+    Message ebMessage;
+
     public CatacombsCommand() {
         this.name = "catacombs";
         this.guildOnly = false;
@@ -30,15 +32,16 @@ public class CatacombsCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        final EmbedBuilder[] eb = { defaultEmbed("Loading catacombs data...", null) };
+        EmbedBuilder eb = defaultEmbed("Loading catacombs data...", null);
 
         Message message = event.getMessage();
         String content = message.getContentRaw();
+        this.ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 
         String[] args = content.split(" ");
         if (args.length <= 1 || args.length > 4) {
-            eb[0].setTitle(errorMessage(this.name));
-            event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
+            eb.setTitle(errorMessage(this.name));
+            ebMessage.editMessage(eb.build()).queue();
             return;
         }
 
@@ -49,16 +52,16 @@ public class CatacombsCommand extends Command {
 
         if (args[1].equals("player")) {
             if (args.length == 4) { // Profile specified
-                eb[0] = getPlayerCatacombs(args[2], args[3]);
+                eb = getPlayerCatacombs(args[2], args[3]);
             } else
-                eb[0] = getPlayerCatacombs(args[2], null);
+                eb = getPlayerCatacombs(args[2], null);
         } else {
-            eb[0].setTitle(errorMessage(this.name));
-            event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
+            eb.setTitle(errorMessage(this.name));
+            ebMessage.editMessage(eb.build()).queue();
             return;
         }
 
-        event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
+        ebMessage.editMessage(eb.build()).queue();
 
     }
 

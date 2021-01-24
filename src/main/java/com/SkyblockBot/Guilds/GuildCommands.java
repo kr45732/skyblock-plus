@@ -31,6 +31,7 @@ import net.dv8tion.jda.api.exceptions.PermissionException;
 
 public class GuildCommands extends Command {
     private final EventWaiter waiter;
+    Message ebMessage;
 
     public GuildCommands(EventWaiter waiter) {
         this.name = "guild";
@@ -41,15 +42,16 @@ public class GuildCommands extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        final EmbedBuilder[] eb = { defaultEmbed("Loading guild data...", null) };
+        EmbedBuilder eb = defaultEmbed("Loading guild data...", null);
+        this.ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 
         Message message = event.getMessage();
         String content = message.getContentRaw();
 
         String[] args = content.split(" ");
         if (args.length != 3) { // No args or too many args are given
-            eb[0].setTitle(errorMessage(this.name));
-            event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
+            eb.setTitle(errorMessage(this.name));
+            ebMessage.editMessage(eb.build()).queue();
             return;
         }
 
@@ -63,7 +65,7 @@ public class GuildCommands extends Command {
                 String username = args[2].split("-")[1];
                 GuildStruct guildExp = getGuildExp(username);
                 if (guildExp.outputArr.length == 0) {
-                    eb[0] = guildExp.eb;
+                    eb = guildExp.eb;
                 } else {
                     Paginator.Builder pbuilder = new Paginator.Builder().setColumns(2).setItemsPerPage(20)
                             .showPageNumbers(true).waitOnSinglePage(false).useNumberedItems(false).setFinalAction(m -> {
@@ -78,7 +80,7 @@ public class GuildCommands extends Command {
                     pbuilder.setText(" ");
                     pbuilder.addItems(guildExp.outputArr);
 
-                    event.reply("", m -> m.delete().queue());
+                    ebMessage.delete().queue();
 
                     pbuilder.build().paginate(event.getChannel(), 0);
 
@@ -86,21 +88,21 @@ public class GuildCommands extends Command {
                 }
             } else if (args[2].toLowerCase().startsWith("g-")) {
             } else {
-                eb[0].setTitle(errorMessage(this.name));
-                event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
+                eb.setTitle(errorMessage(this.name));
+                ebMessage.editMessage(eb.build()).queue();
                 return;
             }
         } else if (args[1].equals("player")) { // Experience commands (experience or exp)
             String username = args[2];
-            eb[0] = getGuildPlayer(username);
+            eb = getGuildPlayer(username);
         } else if (args[1].equals("info")) {
             if (args[2].toLowerCase().startsWith("u-")) {
                 String username = args[2].split("-")[1];
-                eb[0] = getGuildInfo(username);
+                eb = getGuildInfo(username);
             } else if (args[2].toLowerCase().startsWith("g-")) {
             } else {
-                eb[0].setTitle(errorMessage(this.name));
-                event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
+                eb.setTitle(errorMessage(this.name));
+                ebMessage.editMessage(eb.build()).queue();
                 return;
             }
         } else if (args[1].equals("members")) {
@@ -108,7 +110,7 @@ public class GuildCommands extends Command {
                 String username = args[2].split("-")[1];
                 GuildStruct guildMembers = getGuildMembers(username);
                 if (guildMembers.outputArr.length == 0) {
-                    eb[0] = guildMembers.eb;
+                    eb = guildMembers.eb;
                 } else {
                     Paginator.Builder pbuilder = new Paginator.Builder().setColumns(3).setItemsPerPage(27)
                             .showPageNumbers(true).waitOnSinglePage(false).useNumberedItems(false).setFinalAction(m -> {
@@ -122,23 +124,25 @@ public class GuildCommands extends Command {
 
                     pbuilder.setText(" ");
                     pbuilder.addItems(guildMembers.outputArr);
+
+                    ebMessage.delete().queue();
                     pbuilder.build().paginate(event.getChannel(), 0);
                     return;
                 }
 
             } else if (args[2].toLowerCase().startsWith("g-")) {
             } else {
-                eb[0].setTitle(errorMessage(this.name));
-                event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
+                eb.setTitle(errorMessage(this.name));
+                ebMessage.editMessage(eb.build()).queue();
                 return;
             }
         } else {
-            eb[0].setTitle(errorMessage(this.name));
-            event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
+            eb.setTitle(errorMessage(this.name));
+            ebMessage.editMessage(eb.build()).queue();
             return;
         }
 
-        event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
+        ebMessage.editMessage(eb.build()).queue();
 
     }
 

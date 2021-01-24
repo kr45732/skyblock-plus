@@ -21,6 +21,8 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
 public class AuctionCommands extends Command {
+    Message ebMessage;
+
     public AuctionCommands() {
         this.name = "auction";
         this.guildOnly = false;
@@ -30,15 +32,16 @@ public class AuctionCommands extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        final EmbedBuilder[] eb = { defaultEmbed("Loading auction data...", null) };
+        EmbedBuilder eb = defaultEmbed("Loading auction data...", null);
+        this.ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 
         Message message = event.getMessage();
         String content = message.getContentRaw();
 
         String[] args = content.split(" ");
         if (args.length != 2) { // No args or too many args are given
-            eb[0].setTitle(errorMessage(this.name));
-            event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
+            eb.setTitle(errorMessage(this.name));
+            ebMessage.editMessage(eb.build()).queue();
             return;
         }
 
@@ -47,14 +50,13 @@ public class AuctionCommands extends Command {
         }
         System.out.println();
 
-        eb[0] = getPlayerAuction(args[1]);
+        eb = getPlayerAuction(args[1]);
 
-        event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
+        ebMessage.editMessage(eb.build()).queue();
 
     }
 
     public EmbedBuilder getPlayerAuction(String username) {
-        // String username = "pinkishh";
         String uuid = usernameToUuid(username);
         if (uuid == null) {
             return defaultEmbed("Error fetching player data", null);
@@ -87,10 +89,6 @@ public class AuctionCommands extends Command {
 
                 auctions[i][0] = isPet ? higherDepth(currentAuction, "tier").getAsString().toLowerCase() + " "
                         : "" + higherDepth(currentAuction, "item_name").getAsString();
-
-                // auction = timeUntil.length() > 0
-                // ? ((bin ? "BIN: _ coins" : "Current bid: _") + " | Ending in " + timeUntil)
-                // : "Auction ended at _ coins";
 
                 int highestBid = higherDepth(currentAuction, "highest_bid_amount").getAsInt();
                 int startingBid = higherDepth(currentAuction, "starting_bid").getAsInt();

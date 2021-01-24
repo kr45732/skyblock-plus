@@ -64,7 +64,6 @@ public class Main {
         // TODO: use last played on profile rather than oldest profile
         // TODO: weight command/leaderboard
         // TODO: /g kick command (factoring in lowest g exp + lowest stats)
-        // TODO: give guild member role automatically
         // TODO: fix verfication (mee 7 bot deletes the messages)
     }
 }

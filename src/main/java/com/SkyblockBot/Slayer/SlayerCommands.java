@@ -18,6 +18,8 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
 public class SlayerCommands extends Command {
+    Message ebMessage;
+
     public SlayerCommands() {
         this.name = "slayer";
         this.guildOnly = false;
@@ -26,15 +28,16 @@ public class SlayerCommands extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        final EmbedBuilder[] eb = { defaultEmbed("Loading slayer data...", null) };
+        EmbedBuilder eb = defaultEmbed("Loading slayer data...", null);
+        this.ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 
         Message message = event.getMessage();
         String content = message.getContentRaw();
 
         String[] args = content.split(" ");
         if (args.length <= 1 || args.length > 4) {
-            eb[0].setTitle(errorMessage(this.name));
-            event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
+            eb.setTitle(errorMessage(this.name));
+            ebMessage.editMessage(eb.build()).queue();
             return;
         }
 
@@ -44,21 +47,21 @@ public class SlayerCommands extends Command {
         System.out.println();
 
         if ((args[1].equals("leaderboard") || args[1].equals("lb")) && args.length > 2) {
-            eb[0].setTitle("Guild leaderboard");
-            eb[0].addField("WIP", "WORK IN PROGRESS", false);
+            eb.setTitle("Guild leaderboard");
+            eb.addField("WIP", "WORK IN PROGRESS", false);
         } else if (args[1].equals("player") && args.length > 2) {
             if (args.length == 4) { // Profile specified
-                eb[0] = getPlayerSlayer(args[2], args[3]);
+                eb = getPlayerSlayer(args[2], args[3]);
             } else
-                eb[0] = getPlayerSlayer(args[2], null);
+                eb = getPlayerSlayer(args[2], null);
 
         } else {
-            eb[0].setTitle(errorMessage(this.name));
-            event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
+            eb.setTitle(errorMessage(this.name));
+            ebMessage.editMessage(eb.build()).queue();
             return;
         }
 
-        event.reply(eb[0].build(), m -> m.editMessage(eb[0].build()).queue());
+        ebMessage.editMessage(eb.build()).queue();
     }
 
     public EmbedBuilder getPlayerSlayer(String username, String profile) {
