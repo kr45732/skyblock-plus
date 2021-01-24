@@ -68,7 +68,9 @@ public class Apply extends ListenerAdapter {
             return;
         }
 
-        if (event.getGuild().getTextChannelsByName(channelPrefix + "-" + event.getUser().getName(), true).size() > 0) {
+        if (event.getGuild()
+                .getTextChannelsByName(channelPrefix + "-" + event.getUser().getName().replace(" ", "-"), true)
+                .size() > 0) {
             return;
         }
 
