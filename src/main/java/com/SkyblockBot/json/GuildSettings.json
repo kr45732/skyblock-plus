@@ -281,7 +281,7 @@
   "782154976243089429": {
     "name": "Skyblock Forceful",
     "automated_applications": {
-      "enable": "false",
+      "enable": "true",
       "react_channel": {
         "name": "✐-apply-for-guild",
         "id": "800528706963374140"
