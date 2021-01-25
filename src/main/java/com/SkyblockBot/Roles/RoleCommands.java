@@ -1,11 +1,6 @@
 package com.SkyblockBot.Roles;
 
-import static com.SkyblockBot.Miscellaneous.BotUtils.defaultEmbed;
-import static com.SkyblockBot.Miscellaneous.BotUtils.errorMessage;
-import static com.SkyblockBot.Miscellaneous.BotUtils.getJson;
-import static com.SkyblockBot.Miscellaneous.BotUtils.higherDepth;
-import static com.SkyblockBot.Miscellaneous.BotUtils.key;
-import static com.SkyblockBot.Miscellaneous.BotUtils.usernameToUuid;
+import static com.SkyblockBot.Miscellaneous.BotUtils.*;
 import static com.SkyblockBot.Skills.SkillsCommands.skillInfoFromExp;
 
 import java.io.FileNotFoundException;
@@ -16,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.SkyblockBot.Miscellaneous.LatestProfileStruct;
 import com.SkyblockBot.Skills.SkillsStruct;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
@@ -33,12 +29,11 @@ import net.dv8tion.jda.api.entities.User;
 
 public class RoleCommands extends Command {
     Message ebMessage;
-    String profileId;
+    String profileId = "";
 
     public RoleCommands() {
         this.name = "roles";
-        this.guildOnly = false;
-        this.cooldown = 15;
+        this.cooldown = 30;
     }
 
     @Override
@@ -53,7 +48,8 @@ public class RoleCommands extends Command {
         this.ebMessage = channel.sendMessage(eb.build()).complete();
 
         String[] args = content.split(" ");
-        if (args.length != 4) {
+        System.out.println(args.length);
+        if (args.length < 3 || args.length > 4) {
             eb.setTitle(errorMessage(this.name));
             eb.setDescription("");
             ebMessage.editMessage(eb.build()).queue();
@@ -71,26 +67,18 @@ public class RoleCommands extends Command {
             ebMessage.editMessage(eb.build()).queue();
             return;
         }
-        String[] playerInfo = getPlayerInfo(args[2]).split("\n");
-        System.out.println(playerInfo[0] + " = " + user.getAsTag());
-        if (playerInfo.length > 0) {
-            if (!user.getAsTag().equals(playerInfo[0])) {
-                eb = defaultEmbed("Discord tag mismatch", null);
-                eb.setDescription("Account " + playerInfo[1] + " is linked with the discord tag `" + playerInfo[0]
-                        + "`\nYour current discord tag is `" + user.getAsTag() + "`");
-                ebMessage.editMessage(eb.build()).queue();
-                return;
-            }
+        DiscordStruct playerInfo = getPlayerInfo(args[2]);
 
-        } else {
-            eb = defaultEmbed("Error fetching data", null);
-            eb.setDescription("**Please check given username and profile**");
+        if (!user.getAsTag().equals(playerInfo.discordTag)) {
+            eb = defaultEmbed("Discord tag mismatch", null);
+            eb.setDescription("Account " + playerInfo.username + " is linked with the discord tag `"
+                    + playerInfo.discordTag + "`\nYour current discord tag is `" + user.getAsTag() + "`");
             ebMessage.editMessage(eb.build()).queue();
             return;
         }
 
-        String username = playerInfo[1];
-        String profile = args[3];
+        String username = playerInfo.username;
+        String profile = args.length == 4 ? args[3] : null;
 
         if (!checkValid(username, profile)) {
             eb = defaultEmbed("Error fetching data", null);
@@ -101,7 +89,7 @@ public class RoleCommands extends Command {
 
         if (args[1].equals("claim")) {
             try {
-                eb = defaultEmbed("Automatic roles for " + playerInfo[1], null);
+                eb = defaultEmbed("Automatic roles for " + username, skyblockStatsLink(username, profile));
                 String addedRoles = "";
                 String removedRoles = "";
                 String errorRoles = "";
@@ -120,23 +108,25 @@ public class RoleCommands extends Command {
                     for (String currentRoleName : rolesID) {
                         JsonElement currentRole = higherDepth(rolesJson, currentRoleName);
                         if (currentRoleName.equals("guild_member") || currentRoleName.equals("related_guild_member")) {
-                            JsonElement guildJson = getJson(
-                                    "https://api.hypixel.net/findGuild?key=75638239-56cc-4b96-b42a-8fe28c40f3a9&byUuid="
-                                            + usernameToUuid(username));
+                            JsonElement guildJson = getJson("https://api.hypixel.net/findGuild?key=" + key + "&byUuid="
+                                    + usernameToUuid(username));
                             if (guildJson != null) {
                                 Role curRole = guild.getRoleById(higherDepth(currentRole, "id").getAsString());
-                                if (higherDepth(currentRole, "guild_id").getAsString()
-                                        .equals(higherDepth(guildJson, "guild").getAsString())) {
-                                    if (!guild.getMember(user).getRoles().contains(curRole)) {
-                                        guild.addRoleToMember(guild.getMember(user), curRole).queue();
+                                if (!higherDepth(guildJson, "guild").isJsonNull()) {
+                                    if (higherDepth(currentRole, "guild_id").getAsString()
+                                            .equals(higherDepth(guildJson, "guild").getAsString())) {
+                                        if (!guild.getMember(user).getRoles().contains(curRole)) {
+                                            guild.addRoleToMember(guild.getMember(user), curRole).queue();
 
-                                        addedRoles += roleChangeString(higherDepth(currentRole, "name").getAsString());
-                                    }
-                                } else {
-                                    if (guild.getMember(user).getRoles().contains(curRole)) {
-                                        removedRoles += roleChangeString(
-                                                higherDepth(currentRole, "name").getAsString());
-                                        guild.removeRoleFromMember(guild.getMember(user), curRole).queue();
+                                            addedRoles += roleChangeString(
+                                                    higherDepth(currentRole, "name").getAsString());
+                                        }
+                                    } else {
+                                        if (guild.getMember(user).getRoles().contains(curRole)) {
+                                            removedRoles += roleChangeString(
+                                                    higherDepth(currentRole, "name").getAsString());
+                                            guild.removeRoleFromMember(guild.getMember(user), curRole).queue();
+                                        }
                                     }
                                 }
                             }
@@ -226,16 +216,6 @@ public class RoleCommands extends Command {
 
                                     }
                                     break;
-                                    // } else {
-                                    // Role curRole = guild.getRoleById(
-                                    // higherDepth(higherDepth(currentRole, "" + bankLevels.get(i)), "id")
-                                    // .getAsString());
-                                    // if (guild.getMember(user).getRoles().contains(curRole)) {
-                                    // removedRoles += roleChangeString(
-                                    // higherDepth(higherDepth(currentRole, "" + bankLevels.get(i)), "name")
-                                    // .getAsString());
-                                    // guild.removeRoleFromMember(guild.getMember(user), curRole).queue();
-                                    // }
                                 }
                             }
                         } else if (currentRoleName.equals("alchemy") || currentRoleName.equals("combat")
@@ -306,23 +286,22 @@ public class RoleCommands extends Command {
                                 }
                             }
                         } else if (currentRoleName.equals("doom_slayer")) {
-                            Role svenNine = guild.getRoleById(
-                                    higherDepth(higherDepth(higherDepth(rolesJson, "sven"), "9"), "id").getAsString());
-                            Role revNine = guild.getRoleById(
-                                    higherDepth(higherDepth(higherDepth(rolesJson, "rev"), "9"), "id").getAsString());
-                            Role taraNine = guild.getRoleById(
-                                    higherDepth(higherDepth(higherDepth(rolesJson, "tara"), "9"), "id").getAsString());
-                            List<Role> userRoles = guild.getMember(user).getRoles();
+                            String[] curSlayer = getPlayerSlayer(username).split(" ");
                             Role curRole = guild.getRoleById(higherDepth(currentRole, "id").getAsString());
-                            if (userRoles.contains(svenNine) || userRoles.contains(revNine)
-                                    || userRoles.contains(taraNine)) {
-                                guild.addRoleToMember(guild.getMember(user), curRole).queue();
-                                addedRoles += roleChangeString(higherDepth(currentRole, "name").getAsString());
-                            } else {
-                                if (guild.getMember(user).getRoles().contains(curRole)) {
-                                    removedRoles += roleChangeString(higherDepth(currentRole, "name").getAsString());
-                                    guild.removeRoleFromMember(guild.getMember(user), curRole).queue();
+                            boolean shouldHaveDoomSlayer = false;
+                            for (String curType : curSlayer) {
+                                if (Integer.parseInt(curType) >= 1000000) {
+                                    if (!guild.getMember(user).getRoles().contains(curRole)) {
+                                        guild.addRoleToMember(guild.getMember(user), curRole).queue();
+                                        addedRoles += roleChangeString(higherDepth(currentRole, "name").getAsString());
+                                        shouldHaveDoomSlayer = true;
+                                        break;
+                                    }
                                 }
+                            }
+                            if (guild.getMember(user).getRoles().contains(curRole) && !shouldHaveDoomSlayer) {
+                                removedRoles += roleChangeString(higherDepth(currentRole, "name").getAsString());
+                                guild.removeRoleFromMember(guild.getMember(user), curRole).queue();
                             }
                         }
                     }
@@ -338,15 +317,13 @@ public class RoleCommands extends Command {
             } catch (JsonIOException | JsonSyntaxException | FileNotFoundException e) {
                 eb = defaultEmbed("Error fetching data", null);
             }
-        } else
-
-        {
+        } else {
             eb = defaultEmbed(errorMessage(this.name), null);
             eb.setDescription("");
             ebMessage.editMessage(eb.build()).queue();
             return;
-        }
 
+        }
         ebMessage.editMessage(eb.build()).queue();
     }
 
@@ -412,44 +389,20 @@ public class RoleCommands extends Command {
     }
 
     public boolean checkValid(String username, String profile) {
-        JsonElement playerJson = getJson(
-                "https://api.hypixel.net/player?key=" + key + "&uuid=" + usernameToUuid(username));
-
-        if (playerJson == null) {
-            return false;
-        }
-
-        if (higherDepth(playerJson, "player").isJsonNull()) {
-            return false;
-        }
-
-        String userProfile = higherDepth(
-                higherDepth(higherDepth(higherDepth(playerJson, "player"), "stats"), "SkyBlock"), "profiles")
-                        .toString();
-        userProfile = userProfile.substring(1, userProfile.length() - 2);
-        String[] outputStr = userProfile.split("},");
-        String[] profileId = new String[outputStr.length];
-
-        for (int i = 0; i < outputStr.length; i++) {
-            outputStr[i] = outputStr[i].substring(outputStr[i].indexOf(":{") + 2);
-            profileId[i] = outputStr[i].substring(outputStr[i].indexOf("id") + 5, outputStr[i].indexOf("cute") - 3);
-        }
-
-        int profileIndex = -1;
-        for (int i = 0; i < outputStr.length; i++) {
-            String currentProfile = outputStr[i].substring(outputStr[i].indexOf("name") + 7, outputStr[i].length() - 1);
-            if (currentProfile.equalsIgnoreCase(profile)) {
-                profileIndex = i;
-                break;
+        if (profile == null) {
+            LatestProfileStruct curProfileID = getLatestProfile(username);
+            if (curProfileID == null) {
+                return false;
             }
+            this.profileId = curProfileID.profileID;
+        } else {
+            String curProfileID = profileIdFromName(username, profile);
+            if (curProfileID == null) {
+                return false;
+            }
+            this.profileId = curProfileID;
         }
-
-        if (profileIndex != -1) {
-            this.profileId = profileId[profileIndex];
-            return true;
-
-        }
-        return false;
+        return true;
     }
 
     public String getPlayerSlayer(String username) {
@@ -494,7 +447,7 @@ public class RoleCommands extends Command {
 
     }
 
-    public String getPlayerInfo(String username) {
+    public DiscordStruct getPlayerInfo(String username) {
         JsonElement playerJson = getJson("https://api.hypixel.net/player?key=" + key + "&name=" + username);
 
         if (playerJson == null) {
@@ -508,7 +461,8 @@ public class RoleCommands extends Command {
             String discordID = higherDepth(
                     higherDepth(higherDepth(higherDepth(playerJson, "player"), "socialMedia"), "links"), "DISCORD")
                             .getAsString();
-            return discordID + "\n" + higherDepth(higherDepth(playerJson, "player"), "displayname").getAsString();
+            return new DiscordStruct(discordID,
+                    higherDepth(higherDepth(playerJson, "player"), "displayname").getAsString());
         } catch (Exception e) {
             return null;
         }

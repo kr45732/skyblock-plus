@@ -87,8 +87,6 @@ public class BotUtils {
             request.connect();
             return new JsonParser().parse(new InputStreamReader(request.getInputStream()));
         } catch (Exception e) {
-            System.out.println("Exception - getJson - " + jsonUrl);
-            e.printStackTrace();
         }
         return null;
     }
@@ -190,5 +188,63 @@ public class BotUtils {
 
     public static String capitalizeString(String str) {
         return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
+    }
+
+    public static LatestProfileStruct getLatestProfile(String username) {
+        try {
+            String uuidPlayer = usernameToUuid(username);
+            JsonElement skyblockProfilesJson = getJson(
+                    "https://api.hypixel.net/skyblock/profiles?key=" + key + "&uuid=" + uuidPlayer);
+            JsonArray skyblockProfiles = higherDepth(skyblockProfilesJson, "profiles").getAsJsonArray();
+            String lastSaveProfileID = "";
+            String lastProfileSave = "";
+            String lastSaveProfileName = "";
+            for (int i = 0; i < skyblockProfiles.size(); i++) {
+                String lastSave = higherDepth(higherDepth(higherDepth(skyblockProfiles.get(i), "members"), uuidPlayer),
+                        "last_save").getAsString();
+                String profileID = higherDepth(skyblockProfiles.get(i), "profile_id").getAsString();
+                String profileName = higherDepth(skyblockProfiles.get(i), "cute_name").getAsString();
+                if (i == 0) {
+                    lastProfileSave = lastSave;
+                    lastSaveProfileID = profileID;
+                    lastSaveProfileName = profileName;
+                    continue;
+                } else if (Instant.ofEpochMilli(Long.parseLong(lastSave))
+                        .isAfter(Instant.ofEpochMilli(Long.parseLong(lastProfileSave)))) {
+                    lastProfileSave = lastSave;
+                    lastSaveProfileID = profileID;
+                    lastSaveProfileName = profileName;
+                }
+            }
+            return new LatestProfileStruct(lastSaveProfileName, lastSaveProfileID);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static String skyblockStatsLink(String username, String profileName) {
+        return ("https://sky.shiiyu.moe/stats/" + username + "/" + profileName);
+    }
+
+    public static String profileIdFromName(String username, String profileName) {
+
+        try {
+            String uuidPlayer = usernameToUuid(username);
+            JsonElement skyblockProfilesJson = getJson(
+                    "https://api.hypixel.net/skyblock/profiles?key=" + key + "&uuid=" + uuidPlayer);
+
+            JsonArray skyblockProfiles = higherDepth(skyblockProfilesJson, "profiles").getAsJsonArray();
+
+            for (int i = 0; i < skyblockProfiles.size(); i++) {
+                String currentProfileID = higherDepth(skyblockProfiles.get(i), "profile_id").getAsString();
+                String currentProfileName = higherDepth(skyblockProfiles.get(i), "cute_name").getAsString();
+                if (currentProfileName.equalsIgnoreCase(profileName)) {
+                    return currentProfileID;
+                }
+            }
+
+        } catch (Exception e) {
+        }
+        return null;
     }
 }

@@ -2,14 +2,17 @@ package com.SkyblockBot.Slayer;
 
 import static com.SkyblockBot.Miscellaneous.BotUtils.defaultEmbed;
 import static com.SkyblockBot.Miscellaneous.BotUtils.errorMessage;
-import static com.SkyblockBot.Miscellaneous.BotUtils.fixUsername;
 import static com.SkyblockBot.Miscellaneous.BotUtils.formatNumber;
 import static com.SkyblockBot.Miscellaneous.BotUtils.getJson;
+import static com.SkyblockBot.Miscellaneous.BotUtils.getLatestProfile;
 import static com.SkyblockBot.Miscellaneous.BotUtils.globalCooldown;
 import static com.SkyblockBot.Miscellaneous.BotUtils.higherDepth;
 import static com.SkyblockBot.Miscellaneous.BotUtils.key;
+import static com.SkyblockBot.Miscellaneous.BotUtils.profileIdFromName;
 import static com.SkyblockBot.Miscellaneous.BotUtils.simplifyNumber;
+import static com.SkyblockBot.Miscellaneous.BotUtils.skyblockStatsLink;
 
+import com.SkyblockBot.Miscellaneous.LatestProfileStruct;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -65,38 +68,19 @@ public class SlayerCommands extends Command {
     }
 
     public EmbedBuilder getPlayerSlayer(String username, String profile) {
-        profile = profile != null ? profile : "";
+        String profileID = "";
 
-        JsonElement playerJson = getJson("https://api.hypixel.net/player?key=" + key + "&name=" + username);
-
-        if (playerJson == null) {
-            return defaultEmbed("Error fetching player data", null);
-        }
-
-        if (higherDepth(playerJson, "player").isJsonNull()) {
-            return defaultEmbed("Player not found", null);
-        }
-
-        String userProfile = higherDepth(
-                higherDepth(higherDepth(higherDepth(playerJson, "player"), "stats"), "SkyBlock"), "profiles")
-                        .toString();
-        userProfile = userProfile.substring(1, userProfile.length() - 2);
-        String[] outputStr = userProfile.split("},");
-        String[] profileId = new String[outputStr.length];
-
-        for (int i = 0; i < outputStr.length; i++) {
-            outputStr[i] = outputStr[i].substring(outputStr[i].indexOf(":{") + 2);
-            profileId[i] = outputStr[i].substring(outputStr[i].indexOf("id") + 5, outputStr[i].indexOf("cute") - 3);
-        }
-
-        // String[] profileName = new String[outputStr.length];
-        int profileIndex = 0;
-        for (int i = 0; i < outputStr.length; i++) {
-            String currentProfile = outputStr[i].substring(outputStr[i].indexOf("name") + 7, outputStr[i].length() - 1);
-            // profileName[i] = currentProfile;
-            if (currentProfile.equalsIgnoreCase(profile)) {
-                profileIndex = i;
-                break;
+        if (profile == null) {
+            LatestProfileStruct latestProfile = getLatestProfile(username);
+            if (latestProfile == null) {
+                return defaultEmbed("Error fetching latest Skyblock profile", null);
+            }
+            profileID = latestProfile.profileID;
+            profile = latestProfile.profileName;
+        } else {
+            profileID = profileIdFromName(username, profile);
+            if (profileID == null) {
+                return defaultEmbed("Error fetching player catacombs data", null);
             }
         }
 
@@ -107,8 +91,7 @@ public class SlayerCommands extends Command {
         }
 
         String uuidPlayer = higherDepth(uuidJson, "id").getAsString();
-        String playerUrl = "https://api.hypixel.net/skyblock/profile?key=" + key + "&profile="
-                + profileId[profileIndex];
+        String playerUrl = "https://api.hypixel.net/skyblock/profile?key=" + key + "&profile=" + profileID;
         JsonElement skyblockJson = getJson(playerUrl);
 
         if (skyblockJson == null) {
@@ -130,8 +113,7 @@ public class SlayerCommands extends Command {
         int totalSlayer = ((slayerWolf != -1 ? slayerWolf : 0) + (slayerZombie != -1 ? slayerZombie : 0)
                 + (slayerSpider != -1 ? slayerSpider : 0));
 
-        EmbedBuilder eb = defaultEmbed("Slayer for " + fixUsername(username),
-                "https://sky.shiiyu.moe/stats/" + username + "/" + profile);
+        EmbedBuilder eb = defaultEmbed("Slayer for " + username, skyblockStatsLink(username, profile));
         eb.setDescription("**Total slayer:** "
                 + ((slayerWolf != -1 && slayerZombie != -1 && slayerSpider != -1) ? formatNumber(totalSlayer) + " XP"
                         : "None"));

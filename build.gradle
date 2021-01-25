@@ -5,7 +5,7 @@ plugins {
 
 mainClassName = 'com.SkyblockBot.Main'
 
-version '0.0.3'
+version '0.0.1'
 
 sourceCompatibility = targetCompatibility = 1.8
 
