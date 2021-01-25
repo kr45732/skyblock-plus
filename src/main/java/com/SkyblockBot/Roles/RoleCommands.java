@@ -308,7 +308,7 @@ public class RoleCommands extends Command {
                     eb.setDescription("**Added Roles:**\n" + (addedRoles.length() > 0 ? addedRoles : "• None\n")
                             + "\n**Removed Roles:**\n" + (removedRoles.length() > 0 ? removedRoles : "• None"));
                     if (errorRoles.length() > 0) {
-                        eb.addField("Disabled API's:", errorRoles, false);
+                        eb.addField("Disabled APIs:", errorRoles, false);
                     }
                     eb.setTimestamp(Instant.now());
                 } else {

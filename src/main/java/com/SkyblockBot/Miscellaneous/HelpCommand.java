@@ -92,7 +92,7 @@ public class HelpCommand extends Command {
                 generateHelp("Get information about this bot", "about"),
                 generateHelp("Show patch notes for this bot", "version"),
                 generateHelp("Shutdown bot; can only be used by specfic people", "shutdown"),
-                generateHelp("Claim automatic Skyblock roles", "roles claim [IGN] [profile]"), };
+                generateHelp("Claim automatic Skyblock roles", "roles claim [IGN] <profile>"), };
         pbuilder.addItems(fillArray(generalCommands));
 
         String[] slayerCommands = new String[] { "**__Slayer__**", " ",
