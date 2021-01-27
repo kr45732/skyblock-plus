@@ -20,10 +20,10 @@
     "date": "22021-01-25T01:27:29.080956Z"
   },
   "5": {
-  "version": "0.0.5",
-  "description": "- Optimized multiple commands\n- Reduced duplicated code\n- Cleaned up code",
-  "date": ""
-},
+    "version": "0.0.5",
+    "description": "- Optimized multiple commands\n- Reduced and cleaned up duplicated\n- Updated auto role command\n- Updated automatic application\n- Other minor changes",
+    "date": "2021-01-27T04:48:36.133994Z"
+  },
   "-1": {
     "version": "0.0.3",
     "description": "- Added verification system for Discord and Hypixel\n- Other minor changes",
