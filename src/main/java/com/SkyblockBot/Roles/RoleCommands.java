@@ -26,7 +26,7 @@ public class RoleCommands extends Command {
 
     public RoleCommands() {
         this.name = "roles";
-        this.cooldown = 10;
+        this.cooldown = 30;
     }
 
     @Override
