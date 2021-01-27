@@ -19,6 +19,11 @@
     "description": "- Fixes for automatic roles command fixes\n- Added automatic latest profile for slayer/skill/catacombs commands\n- Added automatic profile for automatic roles command",
     "date": "22021-01-25T01:27:29.080956Z"
   },
+  "5": {
+  "version": "0.0.5",
+  "description": "- Optimized multiple commands\n- Reduced duplicated code\n- Cleaned up code",
+  "date": ""
+},
   "-1": {
     "version": "0.0.3",
     "description": "- Added verification system for Discord and Hypixel\n- Other minor changes",

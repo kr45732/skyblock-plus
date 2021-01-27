@@ -1,6 +1,11 @@
 package com.SkyblockBot.Miscellaneous;
 
-import java.awt.Color;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import net.dv8tion.jda.api.EmbedBuilder;
+
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.InputStreamReader;
@@ -10,13 +15,11 @@ import java.net.URLConnection;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Locale;
-
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-
-import net.dv8tion.jda.api.EmbedBuilder;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class BotUtils {
     public static String key = "";
@@ -24,6 +27,8 @@ public class BotUtils {
     public static Color botColor = new Color(9, 92, 13);
     public static String botPrefix = "";
     public static int globalCooldown = 2;
+    static int remainingLimit = 120;
+    static int timeTillReset = 60;
 
     public static String getBotPrefix() {
         String botPrefix = "";
@@ -34,7 +39,7 @@ public class BotUtils {
                 br.readLine();
                 botPrefix = br.readLine().split("=")[1];
                 br.close();
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
         } else {
             botPrefix = System.getenv("BOT_PREFIX");
@@ -49,7 +54,7 @@ public class BotUtils {
                 BufferedReader br = new BufferedReader(new FileReader("DevSettings.txt"));
                 botTokenL = br.readLine().split("=")[1];
                 br.close();
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
         } else {
             botTokenL = System.getenv("BOT_TOKEN");
@@ -63,7 +68,7 @@ public class BotUtils {
                 br.readLine();
                 apiKey = br.readLine().split("=")[1];
                 br.close();
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
         } else {
             apiKey = System.getenv("API_KEY");
@@ -83,16 +88,21 @@ public class BotUtils {
 
     public static JsonElement getJson(String jsonUrl) {
         try {
+            if (remainingLimit < 5) {
+                TimeUnit.SECONDS.sleep(timeTillReset);
+                System.out.println("Sleeping for " + timeTillReset + " seconds");
+            }
             URLConnection request = new URL(jsonUrl).openConnection();
             request.connect();
+            if (jsonUrl.toLowerCase().contains("api.hypixel.net")) {
+                remainingLimit = Integer.parseInt(request.getHeaderField("RateLimit-Remaining"));
+                timeTillReset = Integer.parseInt(request.getHeaderField("RateLimit-Reset"));
+            }
             return new JsonParser().parse(new InputStreamReader(request.getInputStream()));
         } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
-    }
-
-    public static String errorMessage() {
-        return "Invalid input. Type `" + botPrefix + "help` for help";
     }
 
     public static String errorMessage(String name) {
@@ -112,14 +122,6 @@ public class BotUtils {
         }
         return null;
 
-    }
-
-    public static JsonElement getJsonFromPath(String path) {
-        try {
-            return new JsonParser().parse(new FileReader(path));
-        } catch (Exception e) {
-            return null;
-        }
     }
 
     public static String usernameToUuid(String username) {
@@ -151,10 +153,6 @@ public class BotUtils {
     }
 
     public static String formatNumber(long number) {
-        return NumberFormat.getInstance(Locale.US).format(number);
-    }
-
-    public static String formatNumber(String number) {
         return NumberFormat.getInstance(Locale.US).format(number);
     }
 
@@ -190,61 +188,13 @@ public class BotUtils {
         return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
     }
 
-    public static LatestProfileStruct getLatestProfile(String username) {
-        try {
-            String uuidPlayer = usernameToUuid(username);
-            JsonElement skyblockProfilesJson = getJson(
-                    "https://api.hypixel.net/skyblock/profiles?key=" + key + "&uuid=" + uuidPlayer);
-            JsonArray skyblockProfiles = higherDepth(skyblockProfilesJson, "profiles").getAsJsonArray();
-            String lastSaveProfileID = "";
-            String lastProfileSave = "";
-            String lastSaveProfileName = "";
-            for (int i = 0; i < skyblockProfiles.size(); i++) {
-                String lastSave = higherDepth(higherDepth(higherDepth(skyblockProfiles.get(i), "members"), uuidPlayer),
-                        "last_save").getAsString();
-                String profileID = higherDepth(skyblockProfiles.get(i), "profile_id").getAsString();
-                String profileName = higherDepth(skyblockProfiles.get(i), "cute_name").getAsString();
-                if (i == 0) {
-                    lastProfileSave = lastSave;
-                    lastSaveProfileID = profileID;
-                    lastSaveProfileName = profileName;
-                    continue;
-                } else if (Instant.ofEpochMilli(Long.parseLong(lastSave))
-                        .isAfter(Instant.ofEpochMilli(Long.parseLong(lastProfileSave)))) {
-                    lastProfileSave = lastSave;
-                    lastSaveProfileID = profileID;
-                    lastSaveProfileName = profileName;
-                }
-            }
-            return new LatestProfileStruct(lastSaveProfileName, lastSaveProfileID);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
     public static String skyblockStatsLink(String username, String profileName) {
         return ("https://sky.shiiyu.moe/stats/" + username + "/" + profileName);
     }
 
-    public static String profileIdFromName(String username, String profileName) {
-
-        try {
-            String uuidPlayer = usernameToUuid(username);
-            JsonElement skyblockProfilesJson = getJson(
-                    "https://api.hypixel.net/skyblock/profiles?key=" + key + "&uuid=" + uuidPlayer);
-
-            JsonArray skyblockProfiles = higherDepth(skyblockProfilesJson, "profiles").getAsJsonArray();
-
-            for (int i = 0; i < skyblockProfiles.size(); i++) {
-                String currentProfileID = higherDepth(skyblockProfiles.get(i), "profile_id").getAsString();
-                String currentProfileName = higherDepth(skyblockProfiles.get(i), "cute_name").getAsString();
-                if (currentProfileName.equalsIgnoreCase(profileName)) {
-                    return currentProfileID;
-                }
-            }
-
-        } catch (Exception e) {
-        }
-        return null;
+    public static ArrayList<String> getJsonKeys(JsonElement jsonElement) {
+        return jsonElement.getAsJsonObject().entrySet().stream().map(Map.Entry::getKey)
+                .collect(Collectors.toCollection(ArrayList::new));
     }
+
 }

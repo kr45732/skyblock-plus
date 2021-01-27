@@ -1,12 +1,10 @@
 package com.SkyblockBot.Auction;
 
-import static com.SkyblockBot.Miscellaneous.BotUtils.botPrefix;
-import static com.SkyblockBot.Miscellaneous.BotUtils.defaultEmbed;
-import static com.SkyblockBot.Miscellaneous.BotUtils.errorMessage;
-import static com.SkyblockBot.Miscellaneous.BotUtils.formatNumber;
-import static com.SkyblockBot.Miscellaneous.BotUtils.getJson;
-import static com.SkyblockBot.Miscellaneous.BotUtils.globalCooldown;
-import static com.SkyblockBot.Miscellaneous.BotUtils.higherDepth;
+import com.google.gson.JsonElement;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,12 +13,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import com.google.gson.JsonElement;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
+import static com.SkyblockBot.Miscellaneous.BotUtils.*;
 
 public class BinCommands extends Command {
     Message ebMessage;

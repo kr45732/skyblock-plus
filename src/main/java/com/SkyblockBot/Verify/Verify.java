@@ -1,19 +1,19 @@
 package com.SkyblockBot.Verify;
 
-import static com.SkyblockBot.Miscellaneous.BotUtils.higherDepth;
-
-import java.io.File;
-import java.io.FileReader;
-import java.util.List;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.File;
+import java.io.FileReader;
+import java.util.List;
+
+import static com.SkyblockBot.Miscellaneous.BotUtils.higherDepth;
 
 public class Verify extends ListenerAdapter {
     String channelPrefix;
@@ -23,7 +23,7 @@ public class Verify extends ListenerAdapter {
     TextChannel reactChannel;
 
     @Override
-    public void onGuildReady(GuildReadyEvent event) {
+    public void onGuildReady(@NotNull GuildReadyEvent event) {
         try {
             JsonElement settings = new JsonParser()
                     .parse(new FileReader("src/main/java/com/SkyblockBot/json/GuildSettings.json"));
@@ -51,12 +51,12 @@ public class Verify extends ListenerAdapter {
 
                 }
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
     }
 
     @Override
-    public void onMessageReactionAdd(MessageReactionAddEvent event) {
+    public void onMessageReactionAdd(@NotNull MessageReactionAddEvent event) {
         if (!validGuild) {
             return;
         }
@@ -80,16 +80,6 @@ public class Verify extends ListenerAdapter {
         if (event.getGuild().getTextChannelsByName(channelPrefix + "-" + event.getUser().getName(), true).size() > 0) {
             return;
         }
-        // System.out.println(event.getGuild().getMember(event.getUser()).getRoles().get(0));
-        // System.out.println(event.getGuild()
-        // .getRoleById(higherDepth(higherDepth(currentSettings, "verified_role"),
-        // "id").getAsString()));
-        // if
-        // (event.getGuild().getMember(event.getUser()).getRoles().contains(event.getGuild()
-        // .getRoleById(higherDepth(higherDepth(currentSettings, "verified_role"),
-        // "id").getAsString()))) {
-        // return;
-        // }
 
         System.out.println(
                 "ADDING USER |||| Guild " + event.getGuild().getName() + " user: " + event.getUser().getName());

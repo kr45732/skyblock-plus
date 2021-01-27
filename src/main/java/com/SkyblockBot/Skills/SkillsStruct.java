@@ -10,7 +10,7 @@ public class SkillsStruct {
     public double progressToNext;
 
     public SkillsStruct(String skillName, int skillLevel, int maxSkillLevel, long totalSkillExp, long expCurrent,
-            long expForNext, double progressToNext) {
+                        long expForNext, double progressToNext) {
         this.skillName = skillName;
         this.skillLevel = skillLevel;
         this.maxSkillLevel = maxSkillLevel;

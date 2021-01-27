@@ -1,15 +1,14 @@
 package com.SkyblockBot.Guilds;
 
-import static com.SkyblockBot.Miscellaneous.BotUtils.botColor;
-import static com.SkyblockBot.Miscellaneous.BotUtils.defaultEmbed;
-import static com.SkyblockBot.Miscellaneous.BotUtils.errorMessage;
-import static com.SkyblockBot.Miscellaneous.BotUtils.fixUsername;
-import static com.SkyblockBot.Miscellaneous.BotUtils.formatNumber;
-import static com.SkyblockBot.Miscellaneous.BotUtils.getJson;
-import static com.SkyblockBot.Miscellaneous.BotUtils.globalCooldown;
-import static com.SkyblockBot.Miscellaneous.BotUtils.higherDepth;
-import static com.SkyblockBot.Miscellaneous.BotUtils.key;
-import static com.SkyblockBot.Miscellaneous.BotUtils.uuidToUsername;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.jagrosh.jdautilities.menu.Paginator;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.exceptions.PermissionException;
 
 import java.time.Instant;
 import java.util.Date;
@@ -18,16 +17,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.jagrosh.jdautilities.menu.Paginator;
-
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.exceptions.PermissionException;
+import static com.SkyblockBot.Miscellaneous.BotUtils.*;
 
 public class GuildCommands extends Command {
     private final EventWaiter waiter;
@@ -67,7 +57,7 @@ public class GuildCommands extends Command {
                 if (guildExp.outputArr.length == 0) {
                     eb = guildExp.eb;
                 } else {
-                    Paginator.Builder pbuilder = new Paginator.Builder().setColumns(2).setItemsPerPage(20)
+                    Paginator.Builder paginateBuilder = new Paginator.Builder().setColumns(2).setItemsPerPage(20)
                             .showPageNumbers(true).waitOnSinglePage(false).useNumberedItems(false).setFinalAction(m -> {
                                 try {
                                     m.clearReactions().queue();
@@ -77,16 +67,15 @@ public class GuildCommands extends Command {
                             }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).wrapPageEnds(true)
                             .setColor(botColor);
 
-                    pbuilder.setText(" ");
-                    pbuilder.addItems(guildExp.outputArr);
+                    paginateBuilder.setText(" ");
+                    paginateBuilder.addItems(guildExp.outputArr);
 
                     ebMessage.delete().queue();
 
-                    pbuilder.build().paginate(event.getChannel(), 0);
+                    paginateBuilder.build().paginate(event.getChannel(), 0);
 
                     return;
                 }
-            } else if (args[2].toLowerCase().startsWith("g-")) {
             } else {
                 eb.setTitle(errorMessage(this.name));
                 ebMessage.editMessage(eb.build()).queue();
@@ -99,7 +88,6 @@ public class GuildCommands extends Command {
             if (args[2].toLowerCase().startsWith("u-")) {
                 String username = args[2].split("-")[1];
                 eb = getGuildInfo(username);
-            } else if (args[2].toLowerCase().startsWith("g-")) {
             } else {
                 eb.setTitle(errorMessage(this.name));
                 ebMessage.editMessage(eb.build()).queue();
@@ -112,7 +100,7 @@ public class GuildCommands extends Command {
                 if (guildMembers.outputArr.length == 0) {
                     eb = guildMembers.eb;
                 } else {
-                    Paginator.Builder pbuilder = new Paginator.Builder().setColumns(3).setItemsPerPage(27)
+                    Paginator.Builder paginateBuilder = new Paginator.Builder().setColumns(3).setItemsPerPage(27)
                             .showPageNumbers(true).waitOnSinglePage(false).useNumberedItems(false).setFinalAction(m -> {
                                 try {
                                     m.clearReactions().queue();
@@ -122,15 +110,14 @@ public class GuildCommands extends Command {
                             }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).wrapPageEnds(true)
                             .setColor(botColor);
 
-                    pbuilder.setText(" ");
-                    pbuilder.addItems(guildMembers.outputArr);
+                    paginateBuilder.setText(" ");
+                    paginateBuilder.addItems(guildMembers.outputArr);
 
                     ebMessage.delete().queue();
-                    pbuilder.build().paginate(event.getChannel(), 0);
+                    paginateBuilder.build().paginate(event.getChannel(), 0);
                     return;
                 }
 
-            } else if (args[2].toLowerCase().startsWith("g-")) {
             } else {
                 eb.setTitle(errorMessage(this.name));
                 ebMessage.editMessage(eb.build()).queue();
@@ -178,8 +165,7 @@ public class GuildCommands extends Command {
             if (usernameFromUuid == null) {
                 return new GuildStruct(defaultEmbed("Error fetching guild player data", null), new String[0]);
             }
-            String currentUser = usernameFromUuid;
-            guildExpMap.put(totalPlayerExp, currentUser);
+            guildExpMap.put(totalPlayerExp, usernameFromUuid);
         }
 
         Map<Integer, String> guildExpTreeMap = new TreeMap<>(guildExpMap).descendingMap();

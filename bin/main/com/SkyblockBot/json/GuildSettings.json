@@ -1,10 +1,17 @@
 {
   "796790757947867156": {
     "name": "Skyblock Plus",
+    "type": "Discord Server",
     "automated_applications": {
-      "enable": "false",
-      "react_channel": { "name": "apply", "id": "800031085588512828" },
-      "staff_channel": { "name": "applications", "id": "800386981133156443" },
+      "enable": "true",
+      "react_channel": {
+        "name": "apply",
+        "id": "800031085588512828"
+      },
+      "staff_channel": {
+        "name": "applications",
+        "id": "800386981133156443"
+      },
       "new_channel_prefix": "application",
       "apply_text": "Applying in test server...",
       "accept_text": "accept - test",
@@ -24,7 +31,6 @@
         "name": "verify",
         "id": "801970206721179658"
       },
-
       "verify_text": "test server verify",
       "new_channel_category": {
         "name": "test category",
@@ -48,23 +54,57 @@
         "id": "802637259567267901",
         "guild_id": "5fea32eb8ea8c9724b8e3f3c"
       },
-
       "sven": {
-        "7": { "name": "Sven 7", "id": "802352385329725440", "xp": "100000" },
-        "8": { "name": "Sven 8", "id": "802550908327297063", "xp": "400000" },
-        "9": { "name": "Sven 9", "id": "802550929877893130", "xp": "1000000" }
+        "7": {
+          "name": "Sven 7",
+          "id": "802352385329725440",
+          "xp": "100000"
+        },
+        "8": {
+          "name": "Sven 8",
+          "id": "802550908327297063",
+          "xp": "400000"
+        },
+        "9": {
+          "name": "Sven 9",
+          "id": "802550929877893130",
+          "xp": "1000000"
+        }
       },
       "rev": {
-        "7": { "name": "Rev 7", "id": "802623315490504735", "xp": "100000" },
-        "8": { "name": "Rev 8", "id": "802352308717223968", "xp": "400000" },
-        "9": { "name": "Rev 9", "id": "802569768224948225", "xp": "1000000" }
+        "7": {
+          "name": "Rev 7",
+          "id": "802623315490504735",
+          "xp": "100000"
+        },
+        "8": {
+          "name": "Rev 8",
+          "id": "802352308717223968",
+          "xp": "400000"
+        },
+        "9": {
+          "name": "Rev 9",
+          "id": "802569768224948225",
+          "xp": "1000000"
+        }
       },
       "tara": {
-        "7": { "name": "Tara 7", "id": "802570324242857994", "xp": "100000" },
-        "8": { "name": "Tara 8", "id": "802570345940385792", "xp": "400000" },
-        "9": { "name": "Tara 9", "id": "802570358875357224", "xp": "1000000" }
+        "7": {
+          "name": "Tara 7",
+          "id": "802570324242857994",
+          "xp": "100000"
+        },
+        "8": {
+          "name": "Tara 8",
+          "id": "802570345940385792",
+          "xp": "400000"
+        },
+        "9": {
+          "name": "Tara 9",
+          "id": "802570358875357224",
+          "xp": "1000000"
+        }
       },
-
       "bank_coins": {
         "0": {
           "name": "Millionaire",
@@ -82,7 +122,6 @@
           "coins": "100000000"
         }
       },
-
       "alchemy": {
         "30": {
           "name": "Alchemy 30",
@@ -273,24 +312,33 @@
           "level": "40"
         }
       },
-
-      "fairy": { "name": "Fairy", "id": "802629322070425668", "souls": "210" },
-
-      "doom_slayer": { "name": "Doom Slayer", "id": "802632224125354024" }
+      "fairy": {
+        "name": "Fairy",
+        "id": "802629322070425668",
+        "souls": "210"
+      },
+      "doom_slayer": {
+        "name": "Doom Slayer",
+        "id": "802632224125354024"
+      }
     }
   },
   "782154976243089429": {
     "name": "Skyblock Forceful",
+    "type": "Discord Server",
     "automated_applications": {
       "enable": "true",
       "react_channel": {
         "name": "✐-apply-for-guild",
         "id": "800528706963374140"
       },
-      "staff_channel": { "name": "applications", "id": "800529287148601384" },
+      "staff_channel": {
+        "name": "applications",
+        "id": "800529287148601384"
+      },
       "new_channel_prefix": "application",
       "apply_text": "React to this message with ✅ to apply for Skyblock Forceful!\n\t• Note: If you do not get pinged in under 30 seconds then please open a ticket and send a link to your sky.lea profile **OR** apply through the forums here: https://hypixel.net/threads/skyblock-forceful-mid-late-game-guild.3583562/",
-      "accept_text": "You have been accepted! Please leave your current guild and you will recive an invite shortly after!",
+      "accept_text": "You have been accepted! Please leave your current guild and you will receive an invite shortly after!",
       "deny_text": "Sorry, but your application has been denied. Feel free to apply again once you meet the requirements!",
       "new_channel_category": {
         "name": "automated bot channels",
@@ -330,23 +378,57 @@
         "id": "782154976625426468",
         "guild_id": "5fea32eb8ea8c9724b8e3f3c"
       },
-
       "sven": {
-        "7": { "name": "Sven 7", "id": "782154976243089437", "xp": "100000" },
-        "8": { "name": "Sven 8", "id": "782684613319458878", "xp": "400000" },
-        "9": { "name": "Sven 9", "id": "785178529062453268", "xp": "1000000" }
+        "7": {
+          "name": "Sven 7",
+          "id": "782154976243089437",
+          "xp": "100000"
+        },
+        "8": {
+          "name": "Sven 8",
+          "id": "782684613319458878",
+          "xp": "400000"
+        },
+        "9": {
+          "name": "Sven 9",
+          "id": "785178529062453268",
+          "xp": "1000000"
+        }
       },
       "rev": {
-        "7": { "name": "Rev 7", "id": "782154976243089435", "xp": "100000" },
-        "8": { "name": "Rev 8", "id": "782684120970690580", "xp": "400000" },
-        "9": { "name": "Rev 9", "id": "785178299855929366", "xp": "1000000" }
+        "7": {
+          "name": "Rev 7",
+          "id": "782154976243089435",
+          "xp": "100000"
+        },
+        "8": {
+          "name": "Rev 8",
+          "id": "782684120970690580",
+          "xp": "400000"
+        },
+        "9": {
+          "name": "Rev 9",
+          "id": "785178299855929366",
+          "xp": "1000000"
+        }
       },
       "tara": {
-        "7": { "name": "Tara 7", "id": "782154976243089436", "xp": "100000" },
-        "8": { "name": "Tara 8", "id": "782684379372978196", "xp": "400000" },
-        "9": { "name": "Tara 9", "id": "785178685292019732", "xp": "1000000" }
+        "7": {
+          "name": "Tara 7",
+          "id": "782154976243089436",
+          "xp": "100000"
+        },
+        "8": {
+          "name": "Tara 8",
+          "id": "782684379372978196",
+          "xp": "400000"
+        },
+        "9": {
+          "name": "Tara 9",
+          "id": "785178685292019732",
+          "xp": "1000000"
+        }
       },
-
       "bank_coins": {
         "0": {
           "name": "Millionaire",
@@ -364,7 +446,6 @@
           "coins": "100000000"
         }
       },
-
       "alchemy": {
         "30": {
           "name": "Alchemy 30",
@@ -555,10 +636,26 @@
           "level": "40"
         }
       },
-
-      "fairy": { "name": "Fairy", "id": "782154976595935250", "souls": "210" },
-
-      "doom_slayer": { "name": "Doom Slayer", "id": "782154976595935251" }
+      "fairy": {
+        "name": "Fairy",
+        "id": "782154976595935250",
+        "souls": "210"
+      },
+      "doom_slayer": {
+        "name": "Doom Slayer",
+        "id": "782154976595935251"
+      }
+    }
+  },
+  "5e4e6d0d8ea8c9feb3f0e44f": {
+    "name": "Skyblock Forceful",
+    "type": "Guild",
+    "guild_leaderboard": {
+      "staff_ranks": [
+        "Moderator",
+        "Senior Officer",
+        "Guild Master"
+      ]
     }
   }
 }

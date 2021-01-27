@@ -1,18 +1,17 @@
 package com.SkyblockBot.Miscellaneous;
 
-import static com.SkyblockBot.Miscellaneous.BotUtils.botColor;
-import static com.SkyblockBot.Miscellaneous.BotUtils.botPrefix;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.jagrosh.jdautilities.menu.Paginator;
+import net.dv8tion.jda.api.exceptions.PermissionException;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.jagrosh.jdautilities.menu.Paginator;
-
-import net.dv8tion.jda.api.exceptions.PermissionException;
+import static com.SkyblockBot.Miscellaneous.BotUtils.botColor;
+import static com.SkyblockBot.Miscellaneous.BotUtils.botPrefix;
 
 public class HelpCommand extends Command {
     private final Paginator.Builder pbuilder;
@@ -20,7 +19,7 @@ public class HelpCommand extends Command {
 
     public HelpCommand(EventWaiter waiter) {
         this.name = "help";
-        this.aliases = new String[] { "commands" };
+        this.aliases = new String[]{"commands"};
         this.guildOnly = false;
 
         pbuilder = new Paginator.Builder().setColumns(1).setItemsPerPage(itemsPerPage).showPageNumbers(true)
@@ -77,48 +76,48 @@ public class HelpCommand extends Command {
             if (pageMap.get(pageStr) != null) {
                 startingPage = pageMap.get(pageStr);
             }
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
         }
 
         pbuilder.clearItems();
         pbuilder.setText("Help Page");
         pbuilder.addItems(fillArray(
-                new String[] { "**__Navigation__**", " ", "Use the arrow emojis to navigate through the pages",
+                new String[]{"**__Navigation__**", " ", "Use the arrow emojis to navigate through the pages",
                         "• **Page 2**: General", "• **Page 3**: Slayer", "• **Page 4**: Skills",
-                        "• **Page 5**: Dungeons", "• **Page 6**: Guild", "• **Page 7**: Auction House and Bazaar" }));
+                        "• **Page 5**: Dungeons", "• **Page 6**: Guild", "• **Page 7**: Auction House and Bazaar"}));
 
-        String[] generalCommands = new String[] { "**__General__**", " ", generateHelp("Show this help page", "help"),
+        String[] generalCommands = new String[]{"**__General__**", " ", generateHelp("Show this help page", "help"),
                 generateHelp("Show this help page", "commands"),
                 generateHelp("Get information about this bot", "about"),
                 generateHelp("Show patch notes for this bot", "version"),
-                generateHelp("Shutdown bot; can only be used by specfic people", "shutdown"),
-                generateHelp("Claim automatic Skyblock roles", "roles claim [IGN] <profile>"), };
+                generateHelp("Shutdown bot; can only be used by specific people", "shutdown"),
+                generateHelp("Claim automatic Skyblock roles", "roles claim [IGN] <profile>"),};
         pbuilder.addItems(fillArray(generalCommands));
 
-        String[] slayerCommands = new String[] { "**__Slayer__**", " ",
+        String[] slayerCommands = new String[]{"**__Slayer__**", " ",
                 generateHelp("Get a user's slayer and optionally choose which skyblock profile to get the slayer of",
-                        "slayer player [IGN] <profile>") };
+                        "slayer player [IGN] <profile>")};
         pbuilder.addItems(fillArray(slayerCommands));
 
-        String[] skillsCommands = new String[] { "**__Skills__**", " ",
-                generateHelp("Get skills of a player", "skill player [IGN]") };
+        String[] skillsCommands = new String[]{"**__Skills__**", " ",
+                generateHelp("Get skills of a player", "skill player [IGN]")};
         pbuilder.addItems(fillArray(skillsCommands));
 
-        String[] dungeonCommands = new String[] { "**__Dungeons__**", " ",
-                generateHelp("Get catacombs level of player", "catacombs player [IGN]", "cata player [IGN]") };
+        String[] dungeonCommands = new String[]{"**__Dungeons__**", " ",
+                generateHelp("Get catacombs level of player", "catacombs player [IGN]", "cata player [IGN]")};
         pbuilder.addItems(fillArray(dungeonCommands));
 
-        String[] guildCommands = new String[] { "**__Guild__**", " ",
+        String[] guildCommands = new String[]{"**__Guild__**", " ",
                 generateHelp("Get guild experience leaderboard from IGN", "guild experience [u-IGN]",
                         "guild exp [u-IGN]"),
                 generateHelp("Get all the members in a player's guild", "guild members [u-IGN]"),
                 generateHelp("Get what guild a player is in", "guild player [IGN]"),
-                generateHelp("Get information about a player's guild", "guild info [u-IGN]") };
+                generateHelp("Get information about a player's guild", "guild info [u-IGN]")};
         pbuilder.addItems(fillArray(guildCommands));
 
-        String[] ahAndBazCommands = new String[] { "**__Auction House and Bazaar__**", " ",
+        String[] ahAndBazCommands = new String[]{"**__Auction House and Bazaar__**", " ",
                 generateHelp("Get player's active (not claimed) auctions on all profiles", "auction [IGN]", "ah [IGN]"),
-                generateHelp("Get lowest bin of an item", "bin [item]") };
+                generateHelp("Get lowest bin of an item", "bin [item]")};
         pbuilder.addItems(fillArray(ahAndBazCommands));
 
         pbuilder.build().paginate(event.getChannel(), startingPage);
@@ -137,15 +136,15 @@ public class HelpCommand extends Command {
     }
 
     public String generateHelp(String desc, String... commandName) {
-        String generatedStr = "• ";
+        StringBuilder generatedStr = new StringBuilder("• ");
         for (int i = 0; i < commandName.length; i++) {
-            generatedStr += "`" + botPrefix + commandName[i] + "`";
+            generatedStr.append("`").append(botPrefix).append(commandName[i]).append("`");
             if (commandName.length > 1 && i < (commandName.length - 1)) {
-                generatedStr += " or ";
+                generatedStr.append(" or ");
             }
         }
-        generatedStr += ": " + desc;
-        return generatedStr;
+        generatedStr.append(": ").append(desc);
+        return generatedStr.toString();
     }
 
 }

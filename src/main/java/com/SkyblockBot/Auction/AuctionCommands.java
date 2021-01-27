@@ -1,24 +1,16 @@
 package com.SkyblockBot.Auction;
 
-import static com.SkyblockBot.Miscellaneous.BotUtils.defaultEmbed;
-import static com.SkyblockBot.Miscellaneous.BotUtils.errorMessage;
-import static com.SkyblockBot.Miscellaneous.BotUtils.getJson;
-import static com.SkyblockBot.Miscellaneous.BotUtils.globalCooldown;
-import static com.SkyblockBot.Miscellaneous.BotUtils.higherDepth;
-import static com.SkyblockBot.Miscellaneous.BotUtils.key;
-import static com.SkyblockBot.Miscellaneous.BotUtils.simplifyNumber;
-import static com.SkyblockBot.Miscellaneous.BotUtils.usernameToUuid;
-
-import java.time.Duration;
-import java.time.Instant;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+
+import java.time.Duration;
+import java.time.Instant;
+
+import static com.SkyblockBot.Miscellaneous.BotUtils.*;
 
 public class AuctionCommands extends Command {
     Message ebMessage;
@@ -27,7 +19,7 @@ public class AuctionCommands extends Command {
         this.name = "auction";
         this.guildOnly = false;
         this.cooldown = globalCooldown;
-        this.aliases = new String[] { "ah" };
+        this.aliases = new String[]{"ah"};
     }
 
     @Override
@@ -70,12 +62,12 @@ public class AuctionCommands extends Command {
             JsonElement currentAuction = auctionsArray.get(i);
             if (!higherDepth(currentAuction, "claimed").getAsBoolean()) {
 
-                String auction = "";
-                Boolean isPet = higherDepth(currentAuction, "item_lore").getAsString().toLowerCase().contains("pet");
-                Boolean bin = false;
+                String auction;
+                boolean isPet = higherDepth(currentAuction, "item_lore").getAsString().toLowerCase().contains("pet");
+                boolean bin = false;
                 try {
                     bin = higherDepth(currentAuction, "bin").getAsBoolean();
-                } catch (NullPointerException ex) {
+                } catch (NullPointerException ignored) {
                 }
 
                 Instant endingAt = Instant.ofEpochMilli(higherDepth(currentAuction, "end").getAsLong());
@@ -112,12 +104,11 @@ public class AuctionCommands extends Command {
         }
 
         EmbedBuilder eb = defaultEmbed(username + "'s auctions", null);
-        for (int i = 0; i < auctions.length; i++) {
-            if (auctions[i][0] != null) {
-
-                for (int j = 0; j < auctions.length; j++) {
-                    if (auctions[j][0] != null) {
-                        eb.addField(auctions[j][0], auctions[j][1], false);
+        for (String[] auction : auctions) {
+            if (auction[0] != null) {
+                for (String[] strings : auctions) {
+                    if (strings[0] != null) {
+                        eb.addField(strings[0], strings[1], false);
                     }
                 }
                 return eb;

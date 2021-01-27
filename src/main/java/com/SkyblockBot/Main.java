@@ -1,29 +1,17 @@
 package com.SkyblockBot;
 
-import static com.SkyblockBot.Miscellaneous.BotUtils.botToken;
-import static com.SkyblockBot.Miscellaneous.BotUtils.getBotPrefix;
-import static com.SkyblockBot.Miscellaneous.BotUtils.setBotSettings;
-
-import java.io.IOException;
-
-import javax.security.auth.login.LoginException;
-
 import com.SkyblockBot.Apply.Apply;
 import com.SkyblockBot.Auction.AuctionCommands;
 import com.SkyblockBot.Auction.BinCommands;
 import com.SkyblockBot.Dungeons.CatacombsCommand;
 import com.SkyblockBot.Guilds.GuildCommands;
-import com.SkyblockBot.Miscellaneous.AboutCommand;
-import com.SkyblockBot.Miscellaneous.ChannelDeleter;
-import com.SkyblockBot.Miscellaneous.HelpCommand;
-import com.SkyblockBot.Miscellaneous.ShutdownCommand;
-import com.SkyblockBot.Miscellaneous.VersionCommand;
+import com.SkyblockBot.Guilds.GuildLeaderboardCommand;
+import com.SkyblockBot.Miscellaneous.*;
 import com.SkyblockBot.Roles.RoleCommands;
 import com.SkyblockBot.Skills.SkillsCommands;
 import com.SkyblockBot.Slayer.SlayerCommands;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
@@ -32,9 +20,13 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
+import javax.security.auth.login.LoginException;
+
+import static com.SkyblockBot.Miscellaneous.BotUtils.*;
+
 public class Main {
     public static void main(String[] args)
-            throws IOException, LoginException, IllegalArgumentException, RateLimitedException {
+            throws LoginException, IllegalArgumentException, RateLimitedException {
         String botPrefix = getBotPrefix();
 
         EventWaiter waiter = new EventWaiter();
@@ -48,7 +40,7 @@ public class Main {
 
         client.addCommands(new AboutCommand(), new SlayerCommands(), new HelpCommand(waiter), new GuildCommands(waiter),
                 new AuctionCommands(), new BinCommands(), new SkillsCommands(), new CatacombsCommand(),
-                new ShutdownCommand(), new VersionCommand(), new RoleCommands()
+                new ShutdownCommand(), new VersionCommand(), new RoleCommands(), new GuildLeaderboardCommand()
 
         );
         setBotSettings(botPrefix);
@@ -63,6 +55,6 @@ public class Main {
         // TODO: improve !cata/catacombs command
         // TODO: weight command/leaderboard
         // TODO: /g kick command (factoring in lowest g exp + lowest stats)
-        // TODO: fix verfication (mee 7 bot deletes the messages)
+        // TODO: fix verification (mee 7 bot deletes the messages)
     }
 }

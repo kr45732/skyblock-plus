@@ -1,6 +1,10 @@
 package com.SkyblockBot.Miscellaneous;
 
-import static com.SkyblockBot.Miscellaneous.BotUtils.defaultEmbed;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -9,24 +13,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.ReadyEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import static com.SkyblockBot.Miscellaneous.BotUtils.defaultEmbed;
 
 public class ChannelDeleter extends ListenerAdapter {
-    static List<TextChannel> channelsList = new ArrayList<TextChannel>();
-
-    @Override
-    public void onReady(ReadyEvent event) {
-        final Runnable channelDeleter = new Runnable() {
-            public void run() {
-                updateChannels();
-            }
-        };
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        scheduler.scheduleAtFixedRate(channelDeleter, 0, 30, TimeUnit.MINUTES);
-    }
+    static List<TextChannel> channelsList = new ArrayList<>();
 
     public static void addChannel(TextChannel channel) {
         channelsList.add(channel);
@@ -34,6 +24,13 @@ public class ChannelDeleter extends ListenerAdapter {
 
     public static void removeChannel(TextChannel channel) {
         channelsList.remove(channel);
+    }
+
+    @Override
+    public void onReady(@NotNull ReadyEvent event) {
+        final Runnable channelDeleter = this::updateChannels;
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.scheduleAtFixedRate(channelDeleter, 0, 30, TimeUnit.MINUTES);
     }
 
     public void updateChannels() {

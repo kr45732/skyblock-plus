@@ -1,17 +1,6 @@
 package com.SkyblockBot.Verify;
 
-import static com.SkyblockBot.Miscellaneous.BotUtils.defaultEmbed;
-import static com.SkyblockBot.Miscellaneous.BotUtils.getJson;
-import static com.SkyblockBot.Miscellaneous.BotUtils.higherDepth;
-import static com.SkyblockBot.Miscellaneous.BotUtils.key;
-import static com.SkyblockBot.Miscellaneous.ChannelDeleter.addChannel;
-import static com.SkyblockBot.Miscellaneous.ChannelDeleter.removeChannel;
-
-import java.util.EnumSet;
-import java.util.concurrent.TimeUnit;
-
 import com.google.gson.JsonElement;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
@@ -20,6 +9,13 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+
+import java.util.EnumSet;
+import java.util.concurrent.TimeUnit;
+
+import static com.SkyblockBot.Miscellaneous.BotUtils.*;
+import static com.SkyblockBot.Miscellaneous.ChannelDeleter.addChannel;
+import static com.SkyblockBot.Miscellaneous.ChannelDeleter.removeChannel;
 
 public class VerifyUser extends ListenerAdapter {
     Message reactMessage;
@@ -183,7 +179,7 @@ public class VerifyUser extends ListenerAdapter {
         try {
             String discordID = higherDepth(
                     higherDepth(higherDepth(higherDepth(playerJson, "player"), "socialMedia"), "links"), "DISCORD")
-                            .getAsString();
+                    .getAsString();
             return discordID + " " + higherDepth(higherDepth(playerJson, "player"), "displayname").getAsString();
         } catch (Exception e) {
             return " ";

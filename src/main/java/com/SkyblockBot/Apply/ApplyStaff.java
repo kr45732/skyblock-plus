@@ -1,19 +1,18 @@
 package com.SkyblockBot.Apply;
 
-import static com.SkyblockBot.Miscellaneous.BotUtils.defaultEmbed;
-import static com.SkyblockBot.Miscellaneous.BotUtils.higherDepth;
-import static com.SkyblockBot.Miscellaneous.ChannelDeleter.removeChannel;
-
-import java.util.concurrent.TimeUnit;
-
 import com.google.gson.JsonElement;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+
+import java.util.concurrent.TimeUnit;
+
+import static com.SkyblockBot.Miscellaneous.BotUtils.defaultEmbed;
+import static com.SkyblockBot.Miscellaneous.BotUtils.higherDepth;
+import static com.SkyblockBot.Miscellaneous.ChannelDeleter.removeChannel;
 
 public class ApplyStaff extends ListenerAdapter {
     User user;
@@ -38,11 +37,10 @@ public class ApplyStaff extends ListenerAdapter {
         staffChannel
                 .sendMessage("<@&" + higherDepth(higherDepth(currentSettings, "staff_ping"), "id").getAsString() + ">")
                 .complete();
-        staffChannel.sendMessage(ebMain.build()).queue(message -> {
-            message.addReaction("✅").queue();
-            message.addReaction("❌").queue();
-            this.reactMessage = message;
-        });
+        reactMessage = staffChannel.sendMessage(ebMain.build()).complete();
+        reactMessage.addReaction("✅").queue();
+        reactMessage.addReaction("❌").queue();
+
     }
 
     @Override
@@ -65,7 +63,7 @@ public class ApplyStaff extends ListenerAdapter {
                 }
                 return;
             }
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
 
         }
         if (event.getMessageIdLong() != reactMessage.getIdLong()) {
@@ -80,10 +78,8 @@ public class ApplyStaff extends ListenerAdapter {
             eb.setDescription(higherDepth(currentSettings, "deny_text").getAsString()
                     + "\n**React with ✅ to confirm that you have read this message and to close channel**");
             applyChannel.sendMessage(user.getAsMention()).queue();
-            applyChannel.sendMessage(eb.build()).queue(denyM -> {
-                denyM.addReaction("✅").queue();
-                this.deleteChannelMessage = denyM;
-            });
+            deleteChannelMessage = applyChannel.sendMessage(eb.build()).complete();
+            deleteChannelMessage.addReaction("✅").queue();
             reactMessage.delete().queueAfter(5, TimeUnit.SECONDS);
         } else if (event.getReactionEmote().getName().equals("✅")) {
             staffChannel.sendMessage(user.getName() + " (" + user.getAsMention() + ") was accepted by "
@@ -93,10 +89,8 @@ public class ApplyStaff extends ListenerAdapter {
             eb.setDescription(higherDepth(currentSettings, "accept_text").getAsString()
                     + "\n**React with ✅ to confirm that you have read this message and to close channel**");
             applyChannel.sendMessage(user.getAsMention()).queue();
-            applyChannel.sendMessage(eb.build()).queue(denyM -> {
-                denyM.addReaction("✅").queue();
-                this.deleteChannelMessage = denyM;
-            });
+            deleteChannelMessage = applyChannel.sendMessage(eb.build()).complete();
+            deleteChannelMessage.addReaction("✅").queue();
             reactMessage.delete().queueAfter(5, TimeUnit.SECONDS);
         }
     }
