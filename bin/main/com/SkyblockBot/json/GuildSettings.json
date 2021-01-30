@@ -363,7 +363,8 @@
         "id": "802629322070425668",
         "souls": "210"
       }
-    }
+    },
+    "staff_role": { "name": "Staff", "id": "800859020139298816" }
   },
   "782154976243089429": {
     "name": "Skyblock Forceful",
@@ -735,11 +736,10 @@
     "name": "Skyblock Forceful",
     "type": "Guild",
     "guild_leaderboard": {
-      "staff_ranks": [
-        "Moderator",
-        "Senior Officer",
-        "Guild Master"
-      ]
+      "staff_ranks": ["Moderator", "Senior Officer", "Guild Master"],
+      "top_role": { "range": "5", "names": ["elite"] },
+      "middle_role": { "range": "15", "names": ["trainee", "kings"] },
+      "default_role": { "names": ["rookie", "member"] }
     }
   }
 }

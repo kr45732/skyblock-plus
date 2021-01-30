@@ -1,6 +1,6 @@
 package com.SkyblockBot.Guilds;
 
-import com.SkyblockBot.Skills.SkillsStruct;
+import com.SkyblockBot.Miscellaneous.Player;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -10,71 +10,49 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
 import java.io.FileReader;
-import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.SkyblockBot.Miscellaneous.BotUtils.*;
 
 public class GuildLeaderboardCommand extends Command {
     Message ebMessage;
+    JsonElement settings;
 
     public GuildLeaderboardCommand() {
-        this.name = "guildlb";
-        this.guildOnly = false;
-//        this.cooldown = 30;
-//        this.aliases = new String[]{"guild lb"};
-    }
-
-    public SkillsStruct skillInfoFromExp(double skillExp, String skill, JsonElement levelTables) {
-        JsonElement skillsCap = higherDepth(levelTables, "leveling_caps");
-        JsonArray skillsTable;
-        if (skill.equals("catacombs")) {
-            skillsTable = higherDepth(levelTables, "catacombs").getAsJsonArray();
-        } else if (skill.equals("runecrafting")) {
-            skillsTable = higherDepth(levelTables, "runecrafting_xp").getAsJsonArray();
-        } else {
-            skillsTable = higherDepth(levelTables, "leveling_xp").getAsJsonArray();
-        }
-        int maxLevel = higherDepth(skillsCap, skill).getAsInt();
-
-        long xpTotal = 0L;
-        int level = 1;
-        for (int i = 0; i < maxLevel; i++) {
-            xpTotal += skillsTable.get(i).getAsLong();
-
-            if (xpTotal > skillExp) {
-                xpTotal -= skillsTable.get(i).getAsLong();
-                break;
-            } else {
-                level = (i + 1);
-            }
-        }
-
-        long xpCurrent = (long) Math.floor(skillExp - xpTotal);
-        long xpForNext = 0;
-        if (level < maxLevel)
-            xpForNext = (long) Math.ceil(skillsTable.get(level).getAsLong());
-
-        double progress = xpForNext > 0 ? Math.max(0, Math.min(((double) xpCurrent) / xpForNext, 1)) : 0;
-
-        return new SkillsStruct(skill, level, maxLevel, (long) skillExp, xpCurrent, xpForNext, progress);
+        this.name = "leaderboard";
+        this.guildOnly = true;
+        this.cooldown = 60;
+        this.aliases = new String[]{"lb"};
     }
 
     @Override
     protected void execute(CommandEvent event) {
         EmbedBuilder eb = defaultEmbed("Loading guild data...", null);
+        eb.setDescription("**NOTE:** This can take up to a minute!");
         this.ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 
         Message message = event.getMessage();
         String content = message.getContentRaw();
+        try {
+            this.settings = new JsonParser()
+                    .parse(new FileReader("src/main/java/com/SkyblockBot/json/GuildSettings.json"));
+        } catch (Exception e) {
+            eb = defaultEmbed("Error fetching settings", null);
+            ebMessage.editMessage(eb.build()).queue();
+            return;
+        }
+        if (!event.getGuild().getMember(event.getAuthor()).getRoles().contains(event.getGuild().getRoleById(higherDepth(higherDepth(higherDepth(settings, event.getGuild().getId()), "staff_role"), "id").getAsString()))) {
+            eb = defaultEmbed("You must have " + event.getGuild().getRoleById(higherDepth(higherDepth(higherDepth(settings, event.getGuild().getId()), "staff_role"), "id").getAsString()).getName() + " role to run this command", null);
+            ebMessage.editMessage(eb.build()).queue();
+            return;
+        }
 
         String[] args = content.split(" ");
-        if (args.length != 2) { // No args or too many args are given
-            eb.setTitle(errorMessage(this.name));
+        if (args.length != 3) {
+            eb = defaultEmbed(errorMessage(this.name), null);
             ebMessage.editMessage(eb.build()).queue();
             return;
         }
@@ -84,125 +62,208 @@ public class GuildLeaderboardCommand extends Command {
         }
         System.out.println();
 
-        getLeaderboard(args[1]);
+        if (args[1].equals("guild")) {
+            String[] rankString = getLeaderboard(args[2]);
+            if (rankString != null) {
+                eb = defaultEmbed("Rank changes for guild " + rankString[2], null);
+                eb.addField("Promote", rankString[0], false);
+                eb.addField("Demote", rankString[1], false);
+            } else {
+                eb = defaultEmbed(errorMessage(this.name), null);
+                ebMessage.editMessage(eb.build()).queue();
+                return;
+            }
+        } else {
+            eb = defaultEmbed(errorMessage(this.name), null);
+            ebMessage.editMessage(eb.build()).queue();
+            return;
+        }
+
+        ebMessage.editMessage(eb.build()).queue();
     }
 
-    public void getLeaderboard(String username) {
+    public String[] getLeaderboard(String username) {
         String playerUuid = usernameToUuid(username);
         JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + key + "&player=" + playerUuid);
         String guildId = higherDepth(higherDepth(guildJson, "guild"), "_id").getAsString();
+        String guildName = higherDepth(higherDepth(guildJson, "guild"), "name").getAsString();
+        if (!guildName.equals("Skyblock Forceful")) {
+            return new String[]{"Currently only supported for the Skyblock Forceful guild",
+                    "Currently only supported for the Skyblock Forceful guild", ""};
+        }
+
         List<String> staffRankNames = new ArrayList<>();
+        List<String> topRoleName = new ArrayList<>();
+        List<String> middleRoleName = new ArrayList<>();
+        List<String> defaultRoleName = new ArrayList<>();
+        JsonElement guildLeaderboardSettings;
         try {
-            JsonElement settings = new JsonParser().parse(new FileReader("src/main/java/com/SkyblockBot/json/GuildSettings.json"));
-            JsonArray staffRanksArr = higherDepth(higherDepth(higherDepth(settings, guildId), "guild_leaderboard"), "staff_ranks").getAsJsonArray();
-            for (JsonElement i : staffRanksArr) {
+            guildLeaderboardSettings = higherDepth(higherDepth(this.settings, guildId), "guild_leaderboard");
+            for (JsonElement i : higherDepth(guildLeaderboardSettings, "staff_ranks").getAsJsonArray()) {
                 staffRankNames.add(i.getAsString());
             }
-        } catch (Exception e) {
-            staffRankNames = null;
-        }
-        JsonElement levelTables = getJson(
-                "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/leveling.json");
-        JsonArray guildMembers = higherDepth(higherDepth(guildJson, "guild"), "members").getAsJsonArray();
-        HashMap<String, String> guildRank; // uuid, rank
-        HashMap<Integer, GuildMemberInfoStruct> guildSlayer = new HashMap<>(); // customStruct is (uuid, username)
-        HashMap<Double, GuildMemberInfoStruct> guildSkills = new HashMap<>(); // customStruct is (uuid, username)
-        HashMap<Integer, GuildMemberInfoStruct> guildCatacombs = new HashMap<>(); // customStruct is (uuid, username)
 
-        int counter = 0;
-        long starTime = System.currentTimeMillis();
-        for (JsonElement guildMember : guildMembers) {
-            String memberRank = higherDepth(guildMember, "rank").getAsString();
-            if (!staffRankNames.contains(memberRank)) {
-                String memberUuid = higherDepth(guildMember, "uuid").getAsString();
-                String memberUsername = uuidToUsername(memberUuid);
-                try {
-                    JsonArray skyblockProfilesArr = higherDepth(getJson(
-                            "https://api.hypixel.net/skyblock/profiles?key=" + key + "&uuid=" + memberUuid), "profiles").getAsJsonArray();
-                    if (skyblockProfilesArr != null) {
-                        JsonElement latestProfile = getLatestProfile(memberUuid, skyblockProfilesArr);
-                        int playerSlayer = getPlayerSlayer(latestProfile);
-                        double playerSkillAverage = getPlayerSkills(latestProfile, levelTables);
-                        int playerCatacombs = getPlayerCatacombs(latestProfile, levelTables);
-                        guildSlayer.put(playerSlayer, new GuildMemberInfoStruct(memberUuid, memberUsername));
-                        guildSkills.put(playerSkillAverage, new GuildMemberInfoStruct(memberUuid, memberUsername));
-                        guildCatacombs.put(playerCatacombs, new GuildMemberInfoStruct(memberUuid, memberUsername));
-//                        System.out.println(memberUsername + " " + playerSlayer + " " + playerSkillAverage + " " + playerCatacombs);
-//                    break;
-                    }
-                } catch (Exception ignored) {
-                }
+            for (JsonElement i : higherDepth(higherDepth(guildLeaderboardSettings, "top_role"), "names")
+                    .getAsJsonArray()) {
+                topRoleName.add(i.getAsString().toLowerCase());
             }
-        }
-        System.out.println((System.currentTimeMillis() - starTime) / 1000);
-    }
-
-    public int getPlayerSlayer(JsonElement profileJson) {
-        JsonElement profileSlayer = higherDepth(profileJson, "slayer_bosses");
-
-        int slayerWolf = higherDepth(higherDepth(profileSlayer, "wolf"), "xp") != null
-                ? higherDepth(higherDepth(profileSlayer, "wolf"), "xp").getAsInt()
-                : 0;
-        int slayerZombie = higherDepth(higherDepth(profileSlayer, "zombie"), "xp") != null
-                ? higherDepth(higherDepth(profileSlayer, "zombie"), "xp").getAsInt()
-                : 0;
-        int slayerSpider = higherDepth(higherDepth(profileSlayer, "spider"), "xp") != null
-                ? higherDepth(higherDepth(profileSlayer, "spider"), "xp").getAsInt()
-                : 0;
-
-        return (slayerWolf + slayerZombie + slayerSpider);
-    }
-
-    public int getPlayerCatacombs(JsonElement profileJson, JsonElement levelTables) {
-
-        double skillExp = higherDepth(higherDepth(higherDepth(higherDepth(profileJson,
-                "dungeons"), "dungeon_types"), "catacombs"), "experience").getAsLong();
-        SkillsStruct skillInfo = skillInfoFromExp(skillExp, "catacombs", levelTables);
-        return skillInfo.skillLevel;
-    }
-
-    public double getPlayerSkills(JsonElement profileJson, JsonElement levelTables) {
-        JsonElement skillsCap = higherDepth(levelTables, "leveling_caps");
-
-        List<String> skills = skillsCap.getAsJsonObject().entrySet().stream().map(Map.Entry::getKey)
-                .collect(Collectors.toCollection(ArrayList::new));
-        skills.remove("catacombs");
-        skills.remove("runecrafting");
-        skills.remove("carpentry");
-
-        double progressSA = 0;
-
-        for (String skill : skills) {
-            try {
-                double skillExp = higherDepth(profileJson, "experience_skill_" + skill).getAsLong();
-                SkillsStruct skillInfo = skillInfoFromExp(skillExp, skill, levelTables);
-                progressSA += skillInfo.skillLevel + skillInfo.progressToNext;
-            } catch (Exception ignored) {
+            for (JsonElement i : higherDepth(higherDepth(guildLeaderboardSettings, "middle_role"), "names")
+                    .getAsJsonArray()) {
+                middleRoleName.add(i.getAsString().toLowerCase());
             }
-        }
-        progressSA /= skills.size();
-        return progressSA;
-    }
-
-    public JsonElement getLatestProfile(String uuidPlayer, JsonArray profilesJson) {
-        try {
-            String lastProfileSave = "";
-            JsonElement currentProfile = null;
-            for (int i = 0; i < profilesJson.size(); i++) {
-                String lastSave = higherDepth(higherDepth(higherDepth(profilesJson.get(i), "members"), uuidPlayer), "last_save").getAsString();
-                if (i == 0) {
-                    currentProfile = higherDepth(higherDepth(profilesJson.get(i), "members"), uuidPlayer);
-                    lastProfileSave = lastSave;
-                } else if (Instant.ofEpochMilli(Long.parseLong(lastSave))
-                        .isAfter(Instant.ofEpochMilli(Long.parseLong(lastProfileSave)))) {
-                    currentProfile = higherDepth(higherDepth(profilesJson.get(i), "members"), uuidPlayer);
-                    lastProfileSave = lastSave;
-                }
+            for (JsonElement i : higherDepth(higherDepth(guildLeaderboardSettings, "default_role"), "names")
+                    .getAsJsonArray()) {
+                defaultRoleName.add(i.getAsString().toLowerCase());
             }
-            return currentProfile;
         } catch (Exception e) {
             return null;
         }
-    }
 
+        JsonElement levelTables = getJson(
+                "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/leveling.json");
+        JsonArray guildMembers = higherDepth(higherDepth(guildJson, "guild"), "members").getAsJsonArray();
+
+        ArrayList<Player> guildSlayer = new ArrayList<>();
+        ArrayList<Player> guildSkills = new ArrayList<>();
+        ArrayList<Player> guildCatacombs = new ArrayList<>();
+        ArrayList<String> uniqueGuildUuid = new ArrayList<>();
+
+        for (JsonElement guildMember : guildMembers) {
+            String memberRank = higherDepth(guildMember, "rank").getAsString();
+            if (!staffRankNames.contains(memberRank)) {
+                Player player = new Player(higherDepth(guildMember, "uuid").getAsString(), levelTables, memberRank);
+                if (player.isValidPlayer()) {
+                    uniqueGuildUuid.add(player.getPlayerUuid());
+                    guildSlayer.add(player);
+                    guildSkills.add(player);
+                    guildCatacombs.add(player);
+                }
+            }
+        }
+
+        guildSlayer.sort(Comparator.comparingInt(Player::getPlayerSlayer));
+        Collections.reverse(guildSlayer);
+
+        guildSkills.sort(Comparator.comparingDouble(Player::getPlayerSkillAverage));
+        Collections.reverse(guildSkills);
+
+        guildCatacombs.sort(Comparator.comparingDouble(Player::getPlayerCatacombsLevel));
+        Collections.reverse(guildCatacombs);
+
+        for (String s : uniqueGuildUuid) {
+            int slayerRank = -1;
+            int skillsRank = -1;
+            int catacombsRank = -1;
+
+            for (int j = 0; j < guildSlayer.size(); j++) {
+                try {
+                    if (s.equals(guildSlayer.get(j).getPlayerUuid())) {
+                        slayerRank = j;
+                        break;
+                    }
+                } catch (NullPointerException ignored) {
+                }
+            }
+
+            for (int j = 0; j < guildSkills.size(); j++) {
+                try {
+                    if (s.equals(guildSkills.get(j).getPlayerUuid())) {
+                        skillsRank = j;
+                        break;
+                    }
+                } catch (NullPointerException ignored) {
+                }
+            }
+
+            for (int j = 0; j < guildCatacombs.size(); j++) {
+                try {
+                    if (s.equals(guildCatacombs.get(j).getPlayerUuid())) {
+                        catacombsRank = j;
+                        break;
+                    }
+                } catch (NullPointerException ignored) {
+                }
+            }
+
+            if (slayerRank < skillsRank) {
+                guildSkills.set(skillsRank, null);
+                if (slayerRank < catacombsRank) {
+                    guildCatacombs.set(catacombsRank, null);
+                } else {
+                    guildSlayer.set(slayerRank, null);
+                }
+            } else {
+                guildSlayer.set(slayerRank, null);
+                if (skillsRank < catacombsRank) {
+                    guildCatacombs.set(catacombsRank, null);
+                } else {
+                    guildSkills.set(skillsRank, null);
+                }
+            }
+        }
+
+        String promoteString = "";
+        String demoteString = "";
+
+        ArrayList<ArrayList<Player>> guildLeaderboards = new ArrayList<>();
+        guildLeaderboards.add(guildSlayer);
+        guildLeaderboards.add(guildSkills);
+        guildLeaderboards.add(guildCatacombs);
+        int topRankSize = higherDepth(higherDepth(guildLeaderboardSettings, "top_role"), "range").getAsInt() - 1;
+        int middleRankSize = higherDepth(higherDepth(guildLeaderboardSettings, "middle_role"), "range").getAsInt() - 1;
+        String topRankName = topRoleName.get(0).toLowerCase();
+        String middleRankName = middleRoleName.get(0).toLowerCase();
+        String defaultRankName = defaultRoleName.get(0).toLowerCase();
+
+        for (ArrayList<Player> currentLeaderboard : guildLeaderboards) {
+            for (int i = 0; i < currentLeaderboard.size(); i++) {
+                Player currentPlayer = currentLeaderboard.get(i);
+                if (currentPlayer == null) {
+                    continue;
+                }
+
+                String playerRank = currentPlayer.getPlayerGuildRank().toLowerCase();
+                String playerUsername = currentPlayer.getPlayerUsername();
+                if (topRoleName.contains(playerRank)) {
+                    if (topRoleName.size() > 1) {
+                        if (!topRoleName.get(0).equals(playerRank)) {
+                            playerRank = topRoleName.get(0);
+                        }
+                    }
+                } else if (middleRoleName.contains(playerRank)) {
+                    if (middleRoleName.size() > 1) {
+                        if (!middleRoleName.get(0).equals(playerRank)) {
+                            playerRank = middleRoleName.get(0);
+                        }
+                    }
+                } else if (defaultRoleName.contains(playerRank)) {
+                    if (defaultRoleName.size() > 1) {
+                        if (!defaultRoleName.get(0).equals(playerRank)) {
+                            playerRank = defaultRoleName.get(0);
+                        }
+                    }
+                }
+
+                if (i <= topRankSize) {
+                    if (!playerRank.equals(topRankName)) {
+                        promoteString += "\n- /g setrank " + playerUsername + " " + topRankName;
+                    }
+                } else if (i <= middleRankSize) {
+                    if (!playerRank.equals(middleRankName)) {
+                        if (playerRank.equals(topRankName)) {
+                            demoteString += "\n- /g setrank " + playerUsername + " " + middleRankName;
+                        } else {
+                            promoteString += "\n- /g setrank " + playerUsername + " " + middleRankName;
+                        }
+                    }
+                } else {
+                    if (!playerRank.equals(defaultRankName)) {
+                        demoteString += "\n- /g setrank " + playerUsername + " " + defaultRankName;
+                    }
+                }
+            }
+        }
+
+        return new String[]{promoteString, demoteString, guildName};
+    }
 }

@@ -17,11 +17,29 @@ public class Player {
     private String playerUuid;
     private String playerUsername;
     private String profileName;
+    private String playerGuildRank;
 
     public Player(String username) {
         if (!usernameToUuid(username)) {
             return;
         }
+
+        JsonArray profileArray = higherDepth(
+                getJson("https://api.hypixel.net/skyblock/profiles?key=" + key + "&uuid=" + playerUuid), "profiles")
+                .getAsJsonArray();
+
+        if (!getLatestProfile(profileArray)) {
+            return;
+        }
+
+        this.validPlayer = true;
+    }
+
+    public Player(String playerUuid, JsonElement levelTables, String playerGuildRank) {
+        this.playerUuid = playerUuid;
+        this.playerUsername = uuidToUsername(playerUuid);
+        this.levelTables = levelTables;
+        this.playerGuildRank = playerGuildRank;
 
         JsonArray profileArray = higherDepth(
                 getJson("https://api.hypixel.net/skyblock/profiles?key=" + key + "&uuid=" + playerUuid), "profiles")
@@ -104,6 +122,14 @@ public class Player {
         return higherDepth(higherDepth(profileSlayer, "spider"), "xp") != null
                 ? higherDepth(higherDepth(profileSlayer, "spider"), "xp").getAsInt()
                 : 0;
+    }
+
+    public double getPlayerCatacombsLevel() {
+        SkillsStruct catacombsInfo = getPlayerCatacombs();
+        if (catacombsInfo != null) {
+            return catacombsInfo.skillLevel + catacombsInfo.progressToNext;
+        }
+        return 0;
     }
 
     public SkillsStruct getPlayerCatacombs() {
@@ -268,5 +294,9 @@ public class Player {
 
     public String getPlayerUuid() {
         return this.playerUuid;
+    }
+
+    public String getPlayerGuildRank() {
+        return playerGuildRank;
     }
 }

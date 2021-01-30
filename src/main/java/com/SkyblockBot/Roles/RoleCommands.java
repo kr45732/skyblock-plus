@@ -114,13 +114,12 @@ public class RoleCommands extends Command {
                                                 .equals(higherDepth(guildJson, "guild").getAsString())) {
                                             if (!guild.getMember(user).getRoles().contains(curRole)) {
                                                 guild.addRoleToMember(guild.getMember(user), curRole).queue();
-                                                addedRoles.append(roleChangeString(
-                                                        higherDepth(currentRole, "name").getAsString()));
+                                                addedRoles.append(roleChangeString(curRole.getName()));
                                             }
                                         } else {
                                             if (guild.getMember(user).getRoles().contains(curRole)) {
                                                 removedRoles.append(roleChangeString(
-                                                        higherDepth(currentRole, "name").getAsString()));
+                                                        curRole.getName()));
                                                 guild.removeRoleFromMember(guild.getMember(user), curRole).queue();
                                             }
                                         }
@@ -154,9 +153,7 @@ public class RoleCommands extends Command {
 
                                         if (!guild.getMember(user).getRoles().contains(playerSlayerLevelRole)) {
                                             guild.addRoleToMember(guild.getMember(user), playerSlayerLevelRole).queue();
-                                            addedRoles.append(roleChangeString(
-                                                    higherDepth(higherDepth(currentRole, "" + currentSlayerLevels.get(i)), "name")
-                                                            .getAsString()));
+                                            addedRoles.append(roleChangeString(playerSlayerLevelRole.getName()));
                                         }
 
                                         if (isStackable) {
@@ -167,9 +164,7 @@ public class RoleCommands extends Command {
                                                                 .getAsString());
                                                 if (guild.getMember(user).getRoles().contains(removeSlayerLevelRole)) {
                                                     guild.removeRoleFromMember(guild.getMember(user), removeSlayerLevelRole).queue();
-                                                    removedRoles.append(roleChangeString(
-                                                            higherDepth(higherDepth(currentRole, "" + removeLevels), "name")
-                                                                    .getAsString()));
+                                                    removedRoles.append(roleChangeString(removeSlayerLevelRole.getName()));
                                                 }
                                             }
                                         } else {
@@ -180,9 +175,7 @@ public class RoleCommands extends Command {
                                                                 .getAsString());
                                                 if (!guild.getMember(user).getRoles().contains(removeSlayerLevelRole)) {
                                                     guild.addRoleToMember(guild.getMember(user), removeSlayerLevelRole).queue();
-                                                    addedRoles.append(roleChangeString(
-                                                            higherDepth(higherDepth(currentRole, "" + addLowerRole), "name")
-                                                                    .getAsString()));
+                                                    addedRoles.append(roleChangeString(removeSlayerLevelRole.getName()));
                                                 }
                                             }
                                         }
@@ -215,9 +208,7 @@ public class RoleCommands extends Command {
 
                                         if (!guild.getMember(user).getRoles().contains(playerBankLevelRole)) {
                                             guild.addRoleToMember(guild.getMember(user), playerBankLevelRole).queue();
-                                            addedRoles.append(roleChangeString(
-                                                    higherDepth(higherDepth(currentRole, "" + bankLevels.get(i)), "name")
-                                                            .getAsString()));
+                                            addedRoles.append(roleChangeString(playerBankLevelRole.getName()));
                                         }
 
                                         if (isStackable) {
@@ -228,9 +219,7 @@ public class RoleCommands extends Command {
                                                                 .getAsString());
                                                 if (guild.getMember(user).getRoles().contains(removeBankLevelRole)) {
                                                     guild.removeRoleFromMember(guild.getMember(user), removeBankLevelRole).queue();
-                                                    removedRoles.append(roleChangeString(
-                                                            higherDepth(higherDepth(currentRole, "" + removeLevels), "name")
-                                                                    .getAsString()));
+                                                    removedRoles.append(roleChangeString(removeBankLevelRole.getName()));
                                                 }
                                             }
                                         } else {
@@ -241,9 +230,7 @@ public class RoleCommands extends Command {
                                                                 .getAsString());
                                                 if (!guild.getMember(user).getRoles().contains(removeBankLevelRole)) {
                                                     guild.addRoleToMember(guild.getMember(user), removeBankLevelRole).queue();
-                                                    addedRoles.append(roleChangeString(
-                                                            higherDepth(higherDepth(currentRole, "" + addLowerRole), "name")
-                                                                    .getAsString()));
+                                                    addedRoles.append(roleChangeString(removeBankLevelRole.getName()));
                                                 }
                                             }
                                         }
@@ -293,9 +280,7 @@ public class RoleCommands extends Command {
 
                                         if (!guild.getMember(user).getRoles().contains(playerSkillLevelRole)) {
                                             guild.addRoleToMember(guild.getMember(user), playerSkillLevelRole).queue();
-                                            addedRoles.append(roleChangeString(
-                                                    higherDepth(higherDepth(currentRole, "" + skillLevels.get(i)), "name")
-                                                            .getAsString()));
+                                            addedRoles.append(roleChangeString(playerSkillLevelRole.getName()));
                                         }
 
                                         if (isStackable) {
@@ -306,9 +291,7 @@ public class RoleCommands extends Command {
                                                                 .getAsString());
                                                 if (guild.getMember(user).getRoles().contains(removeSkillLevelRole)) {
                                                     guild.removeRoleFromMember(guild.getMember(user), removeSkillLevelRole).queue();
-                                                    removedRoles.append(roleChangeString(
-                                                            higherDepth(higherDepth(currentRole, "" + removeLevels), "name")
-                                                                    .getAsString()));
+                                                    removedRoles.append(roleChangeString(removeSkillLevelRole.getName()));
                                                 }
                                             }
                                         } else {
@@ -319,9 +302,7 @@ public class RoleCommands extends Command {
                                                                 .getAsString());
                                                 if (!guild.getMember(user).getRoles().contains(removeSkillLevelRole)) {
                                                     guild.addRoleToMember(guild.getMember(user), removeSkillLevelRole).queue();
-                                                    addedRoles.append(roleChangeString(
-                                                            higherDepth(higherDepth(currentRole, "" + addLowerRole), "name")
-                                                                    .getAsString()));
+                                                    addedRoles.append(roleChangeString(removeSkillLevelRole.getName()));
                                                 }
                                             }
                                         }
@@ -337,12 +318,11 @@ public class RoleCommands extends Command {
                                         if (!guild.getMember(user).getRoles().contains(curRole)) {
                                             guild.addRoleToMember(guild.getMember(user), curRole).queue();
 
-                                            addedRoles.append(roleChangeString(higherDepth(currentRole, "name").getAsString()));
+                                            addedRoles.append(roleChangeString(curRole.getName()));
                                         }
                                     } else {
                                         if (guild.getMember(user).getRoles().contains(curRole)) {
-                                            removedRoles.append(roleChangeString(
-                                                    higherDepth(currentRole, "name").getAsString()));
+                                            removedRoles.append(roleChangeString(curRole.getName()));
                                             guild.removeRoleFromMember(guild.getMember(user), curRole).queue();
                                         }
                                     }
@@ -354,16 +334,16 @@ public class RoleCommands extends Command {
                                 boolean shouldHaveDoomSlayer = false;
                                 for (int curType : curSlayer) {
                                     if (curType >= 1000000) {
+                                        shouldHaveDoomSlayer = true;
                                         if (!guild.getMember(user).getRoles().contains(curRole)) {
                                             guild.addRoleToMember(guild.getMember(user), curRole).queue();
-                                            addedRoles.append(roleChangeString(higherDepth(currentRole, "name").getAsString()));
-                                            shouldHaveDoomSlayer = true;
+                                            addedRoles.append(roleChangeString(curRole.getName()));
                                             break;
                                         }
                                     }
                                 }
                                 if (guild.getMember(user).getRoles().contains(curRole) && !shouldHaveDoomSlayer) {
-                                    removedRoles.append(roleChangeString(higherDepth(currentRole, "name").getAsString()));
+                                    removedRoles.append(roleChangeString(curRole.getName()));
                                     guild.removeRoleFromMember(guild.getMember(user), curRole).queue();
                                 }
                                 break;

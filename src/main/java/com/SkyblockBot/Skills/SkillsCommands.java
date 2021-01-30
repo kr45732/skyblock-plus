@@ -86,7 +86,7 @@ public class SkillsCommands extends Command {
             skillsEmojiMap.put("fishing", "<:fishing:800462114853617705>");
             skillsEmojiMap.put("enchanting", "<:enchanting:800462115193225256>");
             skillsEmojiMap.put("mining", "<:mining:800462115009069076>");
-            skillsEmojiMap.put("carpentry", "<:carpentery:800462115156131880>");
+            skillsEmojiMap.put("carpentry", "<:carpentry:800462115156131880>");
             skillsEmojiMap.put("runecrafting", "<:runecrafting:800462115172909086>");
 
             for (String skill : skills) {

@@ -14,6 +14,8 @@ import static com.SkyblockBot.Miscellaneous.BotUtils.*;
 
 public class AuctionCommands extends Command {
     Message ebMessage;
+    String playerUsername;
+    String playerUuid;
 
     public AuctionCommands() {
         this.name = "auction";
@@ -49,11 +51,10 @@ public class AuctionCommands extends Command {
     }
 
     public EmbedBuilder getPlayerAuction(String username) {
-        String uuid = usernameToUuid(username);
-        if (uuid == null) {
+        if (usernameToUuid(username) == false) {
             return defaultEmbed("Error fetching player data", null);
         }
-        String url = "https://api.hypixel.net/skyblock/auction?key=" + key + "&player=" + uuid;
+        String url = "https://api.hypixel.net/skyblock/auction?key=" + key + "&player=" + this.playerUuid;
         JsonElement playerAuctions = getJson(url);
         JsonArray auctionsArray = higherDepth(playerAuctions, "auctions").getAsJsonArray();
         String[][] auctions = new String[auctionsArray.size()][2];
@@ -103,7 +104,7 @@ public class AuctionCommands extends Command {
             }
         }
 
-        EmbedBuilder eb = defaultEmbed(username + "'s auctions", null);
+        EmbedBuilder eb = defaultEmbed(this.playerUsername + "'s auctions", null);
         for (String[] auction : auctions) {
             if (auction[0] != null) {
                 for (String[] strings : auctions) {
@@ -114,8 +115,21 @@ public class AuctionCommands extends Command {
                 return eb;
             }
         }
-        eb.setTitle("No auctions found for " + username, null);
+        eb.setTitle("No auctions found for " + this.playerUsername, null);
         return eb;
+    }
+
+    public boolean usernameToUuid(String username) {
+        try {
+            JsonElement usernameJson = getJson("https://api.mojang.com/users/profiles/minecraft/" + username);
+            this.playerUsername = higherDepth(usernameJson, "name").getAsString();
+            this.playerUuid = higherDepth(usernameJson, "id").getAsString();
+            return true;
+        } catch (Exception e) {
+            System.out.println("Null - uuid - " + username);
+        }
+        return false;
+
     }
 
 }

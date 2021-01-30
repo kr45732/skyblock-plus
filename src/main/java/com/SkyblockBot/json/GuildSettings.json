@@ -363,6 +363,10 @@
         "id": "802629322070425668",
         "souls": "210"
       }
+    },
+    "staff_role": {
+      "name": "Staff",
+      "id": "800859020139298816"
     }
   },
   "782154976243089429": {
@@ -611,17 +615,17 @@
           "0": {
             "name": "Carpentry 30",
             "id": "782154976562642944",
-            "level": "0"
+            "level": "30"
           },
           "1": {
             "name": "Carpentry 40",
             "id": "785178855832420354",
-            "level": "1"
+            "level": "40"
           },
           "2": {
             "name": "Carpentry 50",
             "id": "783049430806822942",
-            "level": "2"
+            "level": "50"
           }
         }
       },
@@ -729,6 +733,10 @@
         "name": "Doom Slayer",
         "id": "782154976595935251"
       }
+    },
+    "staff_role": {
+      "name": "Staff ⚡️",
+      "id": "782154976666451976"
     }
   },
   "5e4e6d0d8ea8c9feb3f0e44f": {
@@ -739,7 +747,26 @@
         "Moderator",
         "Senior Officer",
         "Guild Master"
-      ]
+      ],
+      "top_role": {
+        "range": "5",
+        "names": [
+          "elite"
+        ]
+      },
+      "middle_role": {
+        "range": "15",
+        "names": [
+          "trainee",
+          "kings"
+        ]
+      },
+      "default_role": {
+        "names": [
+          "rookie",
+          "member"
+        ]
+      }
     }
   }
 }

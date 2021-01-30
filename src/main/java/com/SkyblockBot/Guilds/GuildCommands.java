@@ -1,5 +1,6 @@
 package com.SkyblockBot.Guilds;
 
+import com.SkyblockBot.Miscellaneous.UsernameUuidStruct;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
@@ -71,7 +72,6 @@ public class GuildCommands extends Command {
                     paginateBuilder.addItems(guildExp.outputArr);
 
                     ebMessage.delete().queue();
-
                     paginateBuilder.build().paginate(event.getChannel(), 0);
 
                     return;
@@ -134,18 +134,14 @@ public class GuildCommands extends Command {
     }
 
     public GuildStruct getGuildExp(String username) {
-        if (getJson("https://api.mojang.com/users/profiles/minecraft/" + username).isJsonNull()) {
-            return new GuildStruct(defaultEmbed("Error fetching player data", null), new String[0]);
+        UsernameUuidStruct uuidUsername = usernameToUuidUsername(username);
+        if (uuidUsername == null) {
+            return new GuildStruct(defaultEmbed("Error fetching player data", null), null);
         }
 
-        JsonElement jsonProfile = getJson("https://api.mojang.com/users/profiles/minecraft/" + username);
-
-        String uuidPlayer = higherDepth(jsonProfile, "id").getAsString();
-        String guildUrl = "https://api.hypixel.net/guild?key=" + key + "&player=" + uuidPlayer;
-
-        JsonElement guildJson = getJson(guildUrl);
+        JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + key + "&player=" + uuidUsername.playerUuid);
         if (guildJson == null) {
-            return new GuildStruct(defaultEmbed("Error fetching guild data", null), new String[0]);
+            return new GuildStruct(defaultEmbed("Error fetching guild data", null), null);
         }
 
         JsonElement members = higherDepth(higherDepth(guildJson, "guild"), "members");
@@ -153,7 +149,7 @@ public class GuildCommands extends Command {
         Map<Integer, String> guildExpMap = new HashMap<>();
 
         for (int i = 0; i < membersArr.size(); i++) {
-            String expHistory = (higherDepth(membersArr.get(i), "expHistory")).toString();
+            String expHistory = higherDepth(membersArr.get(i), "expHistory").toString();
             String[] playerExpArr = expHistory.substring(1, expHistory.length() - 1).split(",");
             int totalPlayerExp = 0;
 
@@ -161,11 +157,11 @@ public class GuildCommands extends Command {
                 totalPlayerExp += Integer.parseInt(value.split(":")[1]);
             }
 
-            String usernameFromUuid = uuidToUsername(higherDepth(membersArr.get(i), "uuid").getAsString());
-            if (usernameFromUuid == null) {
-                return new GuildStruct(defaultEmbed("Error fetching guild player data", null), new String[0]);
+            String currentUsername = uuidToUsername(higherDepth(membersArr.get(i), "uuid").getAsString());
+            if (currentUsername == null) {
+                return new GuildStruct(defaultEmbed("Error fetching guild player data", null), null);
             }
-            guildExpMap.put(totalPlayerExp, usernameFromUuid);
+            guildExpMap.put(totalPlayerExp, currentUsername);
         }
 
         Map<Integer, String> guildExpTreeMap = new TreeMap<>(guildExpMap).descendingMap();
@@ -184,42 +180,34 @@ public class GuildCommands extends Command {
     }
 
     public EmbedBuilder getGuildPlayer(String username) {
-        if (getJson("https://api.mojang.com/users/profiles/minecraft/" + username).isJsonNull()) {
+        UsernameUuidStruct uuidUsername = usernameToUuidUsername(username);
+        if (uuidUsername == null) {
             return defaultEmbed("Error fetching player data", null);
         }
 
-        JsonElement jsonProfile = getJson("https://api.mojang.com/users/profiles/minecraft/" + username);
-
-        String uuidPlayer = higherDepth(jsonProfile, "id").getAsString();
-        String guildUrl = "https://api.hypixel.net/guild?key=" + key + "&player=" + uuidPlayer;
-
-        JsonElement guildJson = getJson(guildUrl);
+        JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + key + "&player=" + uuidUsername.playerUuid);
         if (guildJson == null) {
             return defaultEmbed("Error fetching guild data", null);
         }
 
         try {
             String guildName = higherDepth(higherDepth(guildJson, "guild"), "name").getAsString();
-            EmbedBuilder eb = defaultEmbed(username + " is in " + guildName, null);
+            EmbedBuilder eb = defaultEmbed(uuidUsername.playerUsername + " is in " + guildName, null);
             eb.addField("Guild statistics:", getGuildInfo(guildJson), false);
             return eb;
         } catch (Exception e) {
-            return defaultEmbed(username + " is not in a guild", null);
+            return defaultEmbed(uuidUsername.playerUsername + " is not in a guild", null);
         }
 
     }
 
     public EmbedBuilder getGuildInfo(String username) {
-        if (getJson("https://api.mojang.com/users/profiles/minecraft/" + username).isJsonNull()) {
+        UsernameUuidStruct uuidUsername = usernameToUuidUsername(username);
+        if (uuidUsername == null) {
             return defaultEmbed("Error fetching player data", null);
         }
 
-        JsonElement jsonProfile = getJson("https://api.mojang.com/users/profiles/minecraft/" + username);
-
-        String uuidPlayer = higherDepth(jsonProfile, "id").getAsString();
-        String guildUrl = "https://api.hypixel.net/guild?key=" + key + "&player=" + uuidPlayer;
-
-        JsonElement guildJson = getJson(guildUrl);
+        JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + key + "&player=" + uuidUsername.playerUuid);
         if (guildJson == null) {
             return defaultEmbed("Error fetching guild data", null);
         }
@@ -233,7 +221,6 @@ public class GuildCommands extends Command {
     }
 
     public String getGuildInfo(JsonElement guildJson) {
-
         String guildInfo = "";
         String guildName = higherDepth(higherDepth(guildJson, "guild"), "name").getAsString();
 
@@ -278,16 +265,12 @@ public class GuildCommands extends Command {
     }
 
     public GuildStruct getGuildMembers(String username) {
-        if (getJson("https://api.mojang.com/users/profiles/minecraft/" + username).isJsonNull()) {
+        UsernameUuidStruct uuidUsername = usernameToUuidUsername(username);
+        if (uuidUsername == null) {
             return new GuildStruct(defaultEmbed("Error fetching player data", null), null);
         }
 
-        JsonElement jsonProfile = getJson("https://api.mojang.com/users/profiles/minecraft/" + username);
-
-        String uuidPlayer = higherDepth(jsonProfile, "id").getAsString();
-        String guildUrl = "https://api.hypixel.net/guild?key=" + key + "&player=" + uuidPlayer;
-
-        JsonElement guildJson = getJson(guildUrl);
+        JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + key + "&player=" + uuidUsername.playerUuid);
         if (guildJson == null) {
             return new GuildStruct(defaultEmbed("Error fetching guild data", null), null);
         }

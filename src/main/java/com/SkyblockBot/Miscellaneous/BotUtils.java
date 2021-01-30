@@ -135,6 +135,17 @@ public class BotUtils {
 
     }
 
+    public static UsernameUuidStruct usernameToUuidUsername(String username) {
+        try {
+            JsonElement usernameJson = getJson("https://api.mojang.com/users/profiles/minecraft/" + username);
+            return new UsernameUuidStruct(higherDepth(usernameJson, "name").getAsString(), higherDepth(usernameJson, "id").getAsString());
+        } catch (Exception e) {
+            System.out.println("Null - uuid - " + username);
+        }
+        return null;
+    }
+
+
     public static EmbedBuilder defaultEmbed(String title, String titleUrl) {
         EmbedBuilder eb = new EmbedBuilder();
         eb.setColor(botColor);
