@@ -93,11 +93,11 @@ public class SkillsCommands extends Command {
                 SkillsStruct skillInfo = player.getPlayerSkill(skill);
                 if (skillInfo != null) {
                     eb.addField(
-                            skillsEmojiMap.get(skill) + capitalizeString(skillInfo.skillName) + " (" + skillInfo.skillLevel
+                            skillsEmojiMap.get(skill)  + " " + capitalizeString(skillInfo.skillName) + " (" + skillInfo.skillLevel
                                     + ")",
                             simplifyNumber(skillInfo.expCurrent) + " / " + simplifyNumber(skillInfo.expForNext)
                                     + "\nTotal XP: " + simplifyNumber(skillInfo.totalSkillExp) + "\nProgress: "
-                                    + (skillInfo.skillLevel == skillInfo.maxSkillLevel ? "max"
+                                    + (skillInfo.skillLevel == skillInfo.maxSkillLevel ? "MAX"
                                     : roundProgress(skillInfo.progressToNext)),
                             true);
                     if (!skill.equals("runecrafting") && !skill.equals("carpentry")) {
@@ -105,7 +105,7 @@ public class SkillsCommands extends Command {
                         progressSA += skillInfo.skillLevel + skillInfo.progressToNext;
                     }
                 } else {
-                    eb.addField(skillsEmojiMap.get(skill) + capitalizeString(skill) + " (?) ", "Unable to retrieve", true);
+                    eb.addField(skillsEmojiMap.get(skill) + " " + capitalizeString(skill) + " (?) ", "Unable to retrieve", true);
                 }
             }
             trueSA /= (skills.size() - 2);

@@ -59,7 +59,7 @@ public class SlayerCommands extends Command {
             eb.addField("<:sven_packmaster:800002277648891914> Wolf", simplifyNumber(player.getPlayerWolfXp()) + " XP", true);
             eb.addField("<:revenant_horror:800002290987302943> Zombie", simplifyNumber(player.getPlayerZombieXp()) + " XP", true);
             eb.addField("<:tarantula_broodfather:800002277262884874> Spider", simplifyNumber(player.getPlayerSpiderXp()) + " XP", true);
-            eb.setThumbnail("https://cravatar.eu/helmhead/" + player.getPlayerUuid());
+//            eb.setThumbnail("https://cravatar.eu/helmhead/" + player.getPlayerUuid());
             return eb;
         }
         return defaultEmbed("Unable to fetch player data", null);

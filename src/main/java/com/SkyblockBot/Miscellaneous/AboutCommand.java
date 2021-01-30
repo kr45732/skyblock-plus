@@ -24,7 +24,8 @@ public class AboutCommand extends Command {
                 + "<:green_check_custom:799774962394988574> Slayers, Skills, and Dungeons\n"
                 + "<:green_check_custom:799774962394988574> Guild Information\n"
                 + "<:green_check_custom:799774962394988574> Auction House and Bazaar\n"
-                + "<:green_check_custom:799774962394988574> Automatic skyblock applications for a guild\n";
+                + "<:green_check_custom:799774962394988574> Automatic Skyblock Applications For a Guild\n"
+                + "<:green_check_custom:799774962394988574> Automatic Skyblock Progress Roles\n";
 
         EmbedBuilder eb = defaultEmbed("About Skyblock Plus!", null);
         eb.setDescription(description);

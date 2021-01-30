@@ -68,6 +68,8 @@ public class HelpCommand extends Command {
             pageMap.put("catacombs", 5);
             pageMap.put("cata", 5);
             pageMap.put("guild", 6);
+            pageMap.put("guild-rank", 6);
+            pageMap.put("g-rank", 6);
             pageMap.put("auction", 7);
             pageMap.put("ah", 7);
             pageMap.put("bazaar", 7);
@@ -112,7 +114,8 @@ public class HelpCommand extends Command {
                         "guild exp [u-IGN]"),
                 generateHelp("Get all the members in a player's guild", "guild members [u-IGN]"),
                 generateHelp("Get what guild a player is in", "guild player [IGN]"),
-                generateHelp("Get information about a player's guild", "guild info [u-IGN]")};
+                generateHelp("Get information about a player's guild", "guild info [u-IGN]"),
+                generateHelp("Get promote and demote leaderboard in-game commands for a player's guild", "guild-rank [u-IGN]", "g-rank [u-IGN]")};
         pbuilder.addItems(fillArray(guildCommands));
 
         String[] ahAndBazCommands = new String[]{"**__Auction House and Bazaar__**", " ",

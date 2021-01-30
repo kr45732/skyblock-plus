@@ -26,7 +26,7 @@
   },
   "6": {
     "version": "0.0.6",
-    "description": "- Fixed doom slayer in automatic role assignment\n- Fixed carpentry in automatic role assignment\n- Optimized guild commands",
+    "description": "- Added guild promote/demote viewer command\n- Fixed doom slayer in automatic role assignment\n- Fixed carpentry in automatic role assignment\n- Optimized guild commands",
     "date": "2021-01-30T03:09:33.232688Z"
   }
 }

@@ -22,10 +22,10 @@ public class GuildLeaderboardCommand extends Command {
     JsonElement settings;
 
     public GuildLeaderboardCommand() {
-        this.name = "leaderboard";
+        this.name = "guild-rank";
         this.guildOnly = true;
         this.cooldown = 60;
-        this.aliases = new String[]{"lb"};
+        this.aliases = new String[]{"g-rank"};
     }
 
     @Override
@@ -51,7 +51,7 @@ public class GuildLeaderboardCommand extends Command {
         }
 
         String[] args = content.split(" ");
-        if (args.length != 3) {
+        if (args.length != 2) {
             eb = defaultEmbed(errorMessage(this.name), null);
             ebMessage.editMessage(eb.build()).queue();
             return;
@@ -62,8 +62,8 @@ public class GuildLeaderboardCommand extends Command {
         }
         System.out.println();
 
-        if (args[1].equals("guild")) {
-            String[] rankString = getLeaderboard(args[2]);
+        if (args[1].toLowerCase().startsWith("u-")) {
+            String[] rankString = getLeaderboard(args[1].split("-")[1]);
             if (rankString != null) {
                 eb = defaultEmbed("Rank changes for guild " + rankString[2], null);
                 eb.addField("Promote", rankString[0], false);
@@ -73,7 +73,7 @@ public class GuildLeaderboardCommand extends Command {
                 ebMessage.editMessage(eb.build()).queue();
                 return;
             }
-        } else {
+        }else{
             eb = defaultEmbed(errorMessage(this.name), null);
             ebMessage.editMessage(eb.build()).queue();
             return;
@@ -84,6 +84,10 @@ public class GuildLeaderboardCommand extends Command {
 
     public String[] getLeaderboard(String username) {
         String playerUuid = usernameToUuid(username);
+        if(playerUuid == null){
+            return null;
+        }
+
         JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + key + "&player=" + playerUuid);
         String guildId = higherDepth(higherDepth(guildJson, "guild"), "_id").getAsString();
         String guildName = higherDepth(higherDepth(guildJson, "guild"), "name").getAsString();
