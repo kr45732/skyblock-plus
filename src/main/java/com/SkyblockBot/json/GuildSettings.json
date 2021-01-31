@@ -743,29 +743,17 @@
     "name": "Skyblock Forceful",
     "type": "Guild",
     "guild_leaderboard": {
-      "staff_ranks": [
-        "Moderator",
-        "Senior Officer",
-        "Guild Master"
-      ],
+      "staff_ranks": ["Moderator", "Senior Officer", "Guild Master"],
       "top_role": {
         "range": "5",
-        "names": [
-          "elite"
-        ]
+        "names": ["elite"]
       },
       "middle_role": {
         "range": "15",
-        "names": [
-          "trainee",
-          "kings"
-        ]
+        "names": ["trainee", "kings"]
       },
       "default_role": {
-        "names": [
-          "rookie",
-          "member"
-        ]
+        "names": ["rookie", "member"]
       }
     }
   }
