@@ -1,5 +1,6 @@
 package com.SkyblockBot.Apply;
 
+import com.SkyblockBot.Miscellaneous.Player;
 import com.google.gson.JsonElement;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -22,12 +23,14 @@ public class ApplyStaff extends ListenerAdapter {
     TextChannel staffChannel;
     JsonElement currentSettings;
     Message deleteChannelMessage;
+    Player player;
 
-    public ApplyStaff(User user, TextChannel applyChannel, EmbedBuilder ebMain, JsonElement currentSettings) {
+    public ApplyStaff(User user, TextChannel applyChannel, EmbedBuilder ebMain, JsonElement currentSettings, Player player) {
         this.user = user;
         this.applyChannel = applyChannel;
         this.ebMain = ebMain;
         this.currentSettings = currentSettings;
+        this.player = player;
         staffChannel = applyChannel.getJDA()
                 .getTextChannelById(higherDepth(higherDepth(currentSettings, "staff_channel"), "id").getAsString());
 
@@ -71,8 +74,8 @@ public class ApplyStaff extends ListenerAdapter {
         }
 
         if (event.getReactionEmote().getName().equals("❌")) {
-            staffChannel.sendMessage(user.getAsMention() + " (" + user.getName() + ") was denied by "
-                    + event.getUser().getAsMention() + " (" + event.getUser().getName() + ")").queue();
+            staffChannel.sendMessage(player.getPlayerUsername() + " (" + user.getAsMention() + ") was denied by "
+                    + event.getUser().getName() + " (" + event.getUser().getAsMention() + ")").queue();
             reactMessage.clearReactions().queue();
             EmbedBuilder eb = defaultEmbed("Application Not Accepted", null);
             eb.setDescription(higherDepth(currentSettings, "deny_text").getAsString()
@@ -82,7 +85,7 @@ public class ApplyStaff extends ListenerAdapter {
             deleteChannelMessage.addReaction("✅").queue();
             reactMessage.delete().queueAfter(5, TimeUnit.SECONDS);
         } else if (event.getReactionEmote().getName().equals("✅")) {
-            staffChannel.sendMessage(user.getName() + " (" + user.getAsMention() + ") was accepted by "
+            staffChannel.sendMessage(player.getPlayerUsername() + " (" + user.getAsMention() + ") was accepted by "
                     + event.getUser().getName() + " (" + event.getUser().getAsMention() + ")").queue();
             reactMessage.clearReactions().queue();
             EmbedBuilder eb = defaultEmbed("Application Accepted", null);

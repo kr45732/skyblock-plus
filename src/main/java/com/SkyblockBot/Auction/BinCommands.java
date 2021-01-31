@@ -57,7 +57,7 @@ public class BinCommands extends Command {
                 "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/enchants.json"),
                 "enchants_min_level");
 
-        List<String> petNames = petJson.getAsJsonObject().entrySet().stream().map(i -> i.getKey())
+        List<String> petNames = petJson.getAsJsonObject().entrySet().stream().map(Entry::getKey)
                 .collect(Collectors.toCollection(ArrayList::new));
 
         List<String> enchantNames = enchantsJson.getAsJsonObject().entrySet().stream()
@@ -71,10 +71,10 @@ public class BinCommands extends Command {
         rarityMap.put("UNCOMMON", ";1");
         rarityMap.put("COMMON", ";0");
 
-        String formattedName = "";
+        String formattedName;
         for (String i : enchantNames) {
             if (preFormattedItem.contains(i)) {
-                String enchantName = "";
+                String enchantName;
                 try {
                     int enchantLevel = Integer.parseInt(preFormattedItem.replaceAll("\\D+", ""));
                     enchantName = i.toLowerCase().replace("_", " ") + " " + enchantLevel;
@@ -93,7 +93,7 @@ public class BinCommands extends Command {
                                 eb.addField(enchantName,
                                         formatNumber(higherDepth(lowestBinJson, formattedName).getAsLong()), false);
 
-                            } catch (NullPointerException ex) {
+                            } catch (NullPointerException ignored) {
 
                             }
                         }

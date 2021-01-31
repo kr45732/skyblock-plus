@@ -90,12 +90,13 @@ public class Player {
     }
 
     public int getPlayerSlayer(String slayerName) {
-        if (slayerName.equals("sven")) {
-            return getPlayerWolfXp();
-        } else if (slayerName.equals("rev")) {
-            return getPlayerZombieXp();
-        } else if (slayerName.equals("tara")) {
-            return getPlayerSpiderXp();
+        switch (slayerName) {
+            case "sven":
+                return getPlayerWolfXp();
+            case "rev":
+                return getPlayerZombieXp();
+            case "tara":
+                return getPlayerSpiderXp();
         }
         return -1;
     }
@@ -142,8 +143,7 @@ public class Player {
             double skillExp = higherDepth(
                     higherDepth(higherDepth(higherDepth(profileJson, "dungeons"), "dungeon_types"), "catacombs"),
                     "experience").getAsLong();
-            SkillsStruct skillInfo = skillInfoFromExp(skillExp, "catacombs");
-            return skillInfo;
+            return skillInfoFromExp(skillExp, "catacombs");
         } catch (Exception e) {
             return null;
         }

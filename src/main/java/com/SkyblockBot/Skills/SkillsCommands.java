@@ -93,7 +93,7 @@ public class SkillsCommands extends Command {
                 SkillsStruct skillInfo = player.getPlayerSkill(skill);
                 if (skillInfo != null) {
                     eb.addField(
-                            skillsEmojiMap.get(skill)  + " " + capitalizeString(skillInfo.skillName) + " (" + skillInfo.skillLevel
+                            skillsEmojiMap.get(skill) + " " + capitalizeString(skillInfo.skillName) + " (" + skillInfo.skillLevel
                                     + ")",
                             simplifyNumber(skillInfo.expCurrent) + " / " + simplifyNumber(skillInfo.expForNext)
                                     + "\nTotal XP: " + simplifyNumber(skillInfo.totalSkillExp) + "\nProgress: "

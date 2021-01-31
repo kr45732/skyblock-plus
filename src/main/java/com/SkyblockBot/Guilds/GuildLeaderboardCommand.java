@@ -73,7 +73,7 @@ public class GuildLeaderboardCommand extends Command {
                 ebMessage.editMessage(eb.build()).queue();
                 return;
             }
-        }else{
+        } else {
             eb = defaultEmbed(errorMessage(this.name), null);
             ebMessage.editMessage(eb.build()).queue();
             return;
@@ -84,7 +84,7 @@ public class GuildLeaderboardCommand extends Command {
 
     public String[] getLeaderboard(String username) {
         String playerUuid = usernameToUuid(username);
-        if(playerUuid == null){
+        if (playerUuid == null) {
             return null;
         }
 
@@ -206,8 +206,8 @@ public class GuildLeaderboardCommand extends Command {
             }
         }
 
-        String promoteString = "";
-        String demoteString = "";
+        StringBuilder promoteString = new StringBuilder();
+        StringBuilder demoteString = new StringBuilder();
 
         ArrayList<ArrayList<Player>> guildLeaderboards = new ArrayList<>();
         guildLeaderboards.add(guildSlayer);
@@ -250,24 +250,24 @@ public class GuildLeaderboardCommand extends Command {
 
                 if (i <= topRankSize) {
                     if (!playerRank.equals(topRankName)) {
-                        promoteString += "\n- /g setrank " + playerUsername + " " + topRankName;
+                        promoteString.append("\n- /g setrank ").append(playerUsername).append(" ").append(topRankName);
                     }
                 } else if (i <= middleRankSize) {
                     if (!playerRank.equals(middleRankName)) {
                         if (playerRank.equals(topRankName)) {
-                            demoteString += "\n- /g setrank " + playerUsername + " " + middleRankName;
+                            demoteString.append("\n- /g setrank ").append(playerUsername).append(" ").append(middleRankName);
                         } else {
-                            promoteString += "\n- /g setrank " + playerUsername + " " + middleRankName;
+                            promoteString.append("\n- /g setrank ").append(playerUsername).append(" ").append(middleRankName);
                         }
                     }
                 } else {
                     if (!playerRank.equals(defaultRankName)) {
-                        demoteString += "\n- /g setrank " + playerUsername + " " + defaultRankName;
+                        demoteString.append("\n- /g setrank ").append(playerUsername).append(" ").append(defaultRankName);
                     }
                 }
             }
         }
 
-        return new String[]{promoteString, demoteString, guildName};
+        return new String[]{promoteString.toString(), demoteString.toString(), guildName};
     }
 }

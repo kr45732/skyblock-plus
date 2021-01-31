@@ -14,7 +14,7 @@ import static com.SkyblockBot.Miscellaneous.BotUtils.botColor;
 import static com.SkyblockBot.Miscellaneous.BotUtils.botPrefix;
 
 public class HelpCommand extends Command {
-    private final Paginator.Builder pbuilder;
+    private final Paginator.Builder paginateBuilder;
     private final int itemsPerPage = 9;
 
     public HelpCommand(EventWaiter waiter) {
@@ -22,7 +22,7 @@ public class HelpCommand extends Command {
         this.aliases = new String[]{"commands"};
         this.guildOnly = false;
 
-        pbuilder = new Paginator.Builder().setColumns(1).setItemsPerPage(itemsPerPage).showPageNumbers(true)
+        paginateBuilder = new Paginator.Builder().setColumns(1).setItemsPerPage(itemsPerPage).showPageNumbers(true)
                 .waitOnSinglePage(false).useNumberedItems(false).setFinalAction(m -> {
                     try {
                         m.clearReactions().queue();
@@ -81,9 +81,9 @@ public class HelpCommand extends Command {
         } catch (Exception ignored) {
         }
 
-        pbuilder.clearItems();
-        pbuilder.setText("Help Page");
-        pbuilder.addItems(fillArray(
+        paginateBuilder.clearItems();
+        paginateBuilder.setText("Help Page");
+        paginateBuilder.addItems(fillArray(
                 new String[]{"**__Navigation__**", " ", "Use the arrow emojis to navigate through the pages",
                         "• **Page 2**: General", "• **Page 3**: Slayer", "• **Page 4**: Skills",
                         "• **Page 5**: Dungeons", "• **Page 6**: Guild", "• **Page 7**: Auction House and Bazaar"}));
@@ -94,20 +94,20 @@ public class HelpCommand extends Command {
                 generateHelp("Show patch notes for this bot", "version"),
                 generateHelp("Shutdown bot; can only be used by specific people", "shutdown"),
                 generateHelp("Claim automatic Skyblock roles", "roles claim [IGN] <profile>"),};
-        pbuilder.addItems(fillArray(generalCommands));
+        paginateBuilder.addItems(fillArray(generalCommands));
 
         String[] slayerCommands = new String[]{"**__Slayer__**", " ",
                 generateHelp("Get a user's slayer and optionally choose which skyblock profile to get the slayer of",
                         "slayer player [IGN] <profile>")};
-        pbuilder.addItems(fillArray(slayerCommands));
+        paginateBuilder.addItems(fillArray(slayerCommands));
 
         String[] skillsCommands = new String[]{"**__Skills__**", " ",
                 generateHelp("Get skills of a player", "skill player [IGN]")};
-        pbuilder.addItems(fillArray(skillsCommands));
+        paginateBuilder.addItems(fillArray(skillsCommands));
 
         String[] dungeonCommands = new String[]{"**__Dungeons__**", " ",
                 generateHelp("Get catacombs level of player", "catacombs player [IGN]", "cata player [IGN]")};
-        pbuilder.addItems(fillArray(dungeonCommands));
+        paginateBuilder.addItems(fillArray(dungeonCommands));
 
         String[] guildCommands = new String[]{"**__Guild__**", " ",
                 generateHelp("Get guild experience leaderboard from IGN", "guild experience [u-IGN]",
@@ -116,14 +116,14 @@ public class HelpCommand extends Command {
                 generateHelp("Get what guild a player is in", "guild player [IGN]"),
                 generateHelp("Get information about a player's guild", "guild info [u-IGN]"),
                 generateHelp("Get promote and demote leaderboard in-game commands for a player's guild", "guild-rank [u-IGN]", "g-rank [u-IGN]")};
-        pbuilder.addItems(fillArray(guildCommands));
+        paginateBuilder.addItems(fillArray(guildCommands));
 
         String[] ahAndBazCommands = new String[]{"**__Auction House and Bazaar__**", " ",
                 generateHelp("Get player's active (not claimed) auctions on all profiles", "auction [IGN]", "ah [IGN]"),
                 generateHelp("Get lowest bin of an item", "bin [item]")};
-        pbuilder.addItems(fillArray(ahAndBazCommands));
+        paginateBuilder.addItems(fillArray(ahAndBazCommands));
 
-        pbuilder.build().paginate(event.getChannel(), startingPage);
+        paginateBuilder.build().paginate(event.getChannel(), startingPage);
     }
 
     public String[] fillArray(String[] inputs) {

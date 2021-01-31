@@ -51,7 +51,7 @@ public class AuctionCommands extends Command {
     }
 
     public EmbedBuilder getPlayerAuction(String username) {
-        if (usernameToUuid(username) == false) {
+        if (!usernameToUuid(username)) {
             return defaultEmbed("Error fetching player data", null);
         }
         String url = "https://api.hypixel.net/skyblock/auction?key=" + key + "&player=" + this.playerUuid;

@@ -25,6 +25,7 @@ public class ApplyUser extends ListenerAdapter {
     int state = 0;
     EmbedBuilder applyPlayerStats;
     JsonElement currentSettings;
+    Player player;
 
     public ApplyUser(MessageReactionAddEvent event, User applyingUser, JsonElement currentSettings) {
         this.applyingUser = applyingUser;
@@ -63,7 +64,7 @@ public class ApplyUser extends ListenerAdapter {
         }
 
         if (!event.getUser().equals(applyingUser)) {
-            reactMessage.removeReaction(event.getReaction().getReactionEmote().getAsReactionCode(), event.getUser());
+            reactMessage.removeReaction(event.getReaction().getReactionEmote().getAsReactionCode(), event.getUser()).queue();
             return;
         }
 
@@ -86,7 +87,7 @@ public class ApplyUser extends ListenerAdapter {
 
                     String[] messageContent = messageReply.getContentDisplay().split(" ");
                     if (messageContent.length == 1 || messageContent.length == 2) {
-                        Player player = messageContent.length == 1 ? new Player(messageContent[0])
+                        player = messageContent.length == 1 ? new Player(messageContent[0])
                                 : new Player(messageContent[0], messageContent[1]);
 
                         if (player.isValidPlayer()) {
@@ -137,7 +138,7 @@ public class ApplyUser extends ListenerAdapter {
                 event.getJDA().removeEventListener(this);
 
                 event.getJDA().addEventListener(
-                        new ApplyStaff(applyingUser, applicationChannel, applyPlayerStats, currentSettings));
+                        new ApplyStaff(applyingUser, applicationChannel, applyPlayerStats, currentSettings, player));
                 break;
             case 2:
                 // Retrying because of invalid username/profile

@@ -46,7 +46,7 @@ public class ChannelDeleter extends ListenerAdapter {
                 currentChannel.sendMessage(eb.build()).queue();
                 currentChannel.delete().reason("Exceeded inactivity time").queueAfter(15, TimeUnit.SECONDS);
                 channelsList.remove(currentChannel);
-            } else if (secondsDiff / 3600 % 24 > 48) {
+            } else if ((secondsDiff / 3600 % 24) > 48) {
                 eb.addField("Reason", "Open for 48 hours", false);
                 currentChannel.sendMessage(eb.build()).queue();
                 currentChannel.delete().reason("Exceeded max time").queueAfter(15, TimeUnit.SECONDS);
