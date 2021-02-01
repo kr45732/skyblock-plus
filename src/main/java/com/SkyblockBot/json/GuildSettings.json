@@ -402,7 +402,7 @@
       }
     },
     "automated_verify": {
-      "enable": "false",
+      "enable": "true",
       "react_channel": {
         "name": "➭authorize",
         "id": "805607857381703680"
