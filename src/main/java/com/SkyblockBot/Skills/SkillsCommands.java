@@ -1,6 +1,6 @@
 package com.SkyblockBot.Skills;
 
-import com.SkyblockBot.Miscellaneous.Player;
+import com.SkyblockBot.Utils.Player;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.SkyblockBot.Miscellaneous.BotUtils.*;
+import static com.SkyblockBot.Utils.BotUtils.*;
 
 public class SkillsCommands extends Command {
     Message ebMessage;
@@ -32,7 +32,7 @@ public class SkillsCommands extends Command {
         String content = message.getContentRaw();
 
         String[] args = content.split(" ");
-        if (args.length <= 1 || args.length > 4) {
+        if (args.length <= 2 || args.length > 4) {
             eb = defaultEmbed(errorMessage(this.name), null);
             ebMessage.editMessage(eb.build()).queue();
             return;

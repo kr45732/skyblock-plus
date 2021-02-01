@@ -1,13 +1,13 @@
 package com.SkyblockBot.Dungeons;
 
-import com.SkyblockBot.Miscellaneous.Player;
+import com.SkyblockBot.Utils.Player;
 import com.SkyblockBot.Skills.SkillsStruct;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
-import static com.SkyblockBot.Miscellaneous.BotUtils.*;
+import static com.SkyblockBot.Utils.BotUtils.*;
 
 public class CatacombsCommand extends Command {
     Message ebMessage;
@@ -28,7 +28,7 @@ public class CatacombsCommand extends Command {
         this.ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 
         String[] args = content.split(" ");
-        if (args.length <= 1 || args.length > 4) {
+        if (args.length <= 2 || args.length > 4) {
             eb.setTitle(errorMessage(this.name));
             ebMessage.editMessage(eb.build()).queue();
             return;

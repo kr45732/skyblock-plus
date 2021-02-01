@@ -10,8 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static com.SkyblockBot.Miscellaneous.BotUtils.botColor;
-import static com.SkyblockBot.Miscellaneous.BotUtils.botPrefix;
+import static com.SkyblockBot.Utils.BotUtils.botColor;
+import static com.SkyblockBot.Utils.BotUtils.botPrefix;
 
 public class HelpCommand extends Command {
     private final Paginator.Builder paginateBuilder;
@@ -42,6 +42,7 @@ public class HelpCommand extends Command {
             Map<String, Integer> pageMap = new HashMap<>();
             pageMap.put("general", 2);
             pageMap.put("roles", 2);
+            pageMap.put("coins", 2);
             pageMap.put("slayer", 3);
             pageMap.put("skills", 4);
             pageMap.put("dungeons", 5);
@@ -74,7 +75,8 @@ public class HelpCommand extends Command {
                 generateHelp("Get information about this bot", "about"),
                 generateHelp("Show patch notes for this bot", "version"),
                 generateHelp("Shutdown bot; can only be used by specific people", "shutdown"),
-                generateHelp("Claim automatic Skyblock roles", "roles claim [IGN] <profile>"),};
+                generateHelp("Claim automatic Skyblock roles", "roles claim [IGN] <profile>"),
+                generateHelp("Get a player's bank and purse coins", "coins player [IGN] <profile>"),};
         paginateBuilder.addItems(fillArray(generalCommands));
 
         String[] slayerCommands = new String[]{"**__Slayer__**", " ",

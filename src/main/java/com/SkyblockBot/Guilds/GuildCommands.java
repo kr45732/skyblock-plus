@@ -1,6 +1,5 @@
 package com.SkyblockBot.Guilds;
 
-import com.SkyblockBot.Miscellaneous.UsernameUuidStruct;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
@@ -18,7 +17,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
-import static com.SkyblockBot.Miscellaneous.BotUtils.*;
+import static com.SkyblockBot.Utils.BotUtils.*;
 
 public class GuildCommands extends Command {
     private final EventWaiter waiter;

@@ -1,6 +1,6 @@
 package com.SkyblockBot.Guilds;
 
-import com.SkyblockBot.Miscellaneous.Player;
+import com.SkyblockBot.Utils.Player;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import static com.SkyblockBot.Miscellaneous.BotUtils.*;
+import static com.SkyblockBot.Utils.BotUtils.*;
 
 public class GuildLeaderboardCommand extends Command {
     Message ebMessage;

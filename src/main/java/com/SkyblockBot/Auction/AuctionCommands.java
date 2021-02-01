@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.entities.Message;
 import java.time.Duration;
 import java.time.Instant;
 
-import static com.SkyblockBot.Miscellaneous.BotUtils.*;
+import static com.SkyblockBot.Utils.BotUtils.*;
 
 public class AuctionCommands extends Command {
     Message ebMessage;

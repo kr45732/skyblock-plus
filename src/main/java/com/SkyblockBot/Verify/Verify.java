@@ -13,7 +13,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.List;
 
-import static com.SkyblockBot.Miscellaneous.BotUtils.higherDepth;
+import static com.SkyblockBot.Utils.BotUtils.higherDepth;
 
 public class Verify extends ListenerAdapter {
     String channelPrefix;

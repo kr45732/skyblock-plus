@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.entities.User;
 
 import java.util.Locale;
 
-import static com.SkyblockBot.Miscellaneous.BotUtils.*;
+import static com.SkyblockBot.Utils.BotUtils.*;
 
 public class EssenceCommand extends Command {
     Message ebMessage;

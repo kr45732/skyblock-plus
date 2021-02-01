@@ -1,6 +1,6 @@
 package com.SkyblockBot.Roles;
 
-import com.SkyblockBot.Miscellaneous.Player;
+import com.SkyblockBot.Utils.Player;
 import com.google.gson.*;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.SkyblockBot.Miscellaneous.BotUtils.*;
+import static com.SkyblockBot.Utils.BotUtils.*;
 
 public class RoleCommands extends Command {
     Message ebMessage;

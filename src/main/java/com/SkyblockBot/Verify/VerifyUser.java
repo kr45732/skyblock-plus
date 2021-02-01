@@ -13,9 +13,9 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import java.util.EnumSet;
 import java.util.concurrent.TimeUnit;
 
-import static com.SkyblockBot.Miscellaneous.BotUtils.*;
-import static com.SkyblockBot.Miscellaneous.ChannelDeleter.addChannel;
-import static com.SkyblockBot.Miscellaneous.ChannelDeleter.removeChannel;
+import static com.SkyblockBot.Utils.BotUtils.*;
+import static com.SkyblockBot.TimeoutHandler.ChannelDeleter.addChannel;
+import static com.SkyblockBot.TimeoutHandler.ChannelDeleter.removeChannel;
 
 public class VerifyUser extends ListenerAdapter {
     Message reactMessage;

@@ -1,12 +1,12 @@
 package com.SkyblockBot.Slayer;
 
-import com.SkyblockBot.Miscellaneous.Player;
+import com.SkyblockBot.Utils.Player;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
-import static com.SkyblockBot.Miscellaneous.BotUtils.*;
+import static com.SkyblockBot.Utils.BotUtils.*;
 
 public class SlayerCommands extends Command {
     Message ebMessage;
@@ -26,7 +26,7 @@ public class SlayerCommands extends Command {
         String content = message.getContentRaw();
 
         String[] args = content.split(" ");
-        if (args.length <= 1 || args.length > 4) {
+        if (args.length <= 2 || args.length > 4) {
             eb = defaultEmbed(errorMessage(this.name), null);
             ebMessage.editMessage(eb.build()).queue();
             return;

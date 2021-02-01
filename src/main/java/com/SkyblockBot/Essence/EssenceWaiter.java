@@ -13,9 +13,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.SkyblockBot.Miscellaneous.BotUtils.defaultEmbed;
-import static com.SkyblockBot.Miscellaneous.BotUtils.higherDepth;
-import static com.SkyblockBot.Miscellaneous.MessageTimeout.addMessage;
+import static com.SkyblockBot.Utils.BotUtils.defaultEmbed;
+import static com.SkyblockBot.Utils.BotUtils.higherDepth;
+import static com.SkyblockBot.TimeoutHandler.MessageTimeout.addMessage;
 
 public class EssenceWaiter extends ListenerAdapter {
     String itemName;

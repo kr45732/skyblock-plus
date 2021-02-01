@@ -11,6 +11,8 @@ import com.SkyblockBot.Miscellaneous.*;
 import com.SkyblockBot.Roles.RoleCommands;
 import com.SkyblockBot.Skills.SkillsCommands;
 import com.SkyblockBot.Slayer.SlayerCommands;
+import com.SkyblockBot.TimeoutHandler.ChannelDeleter;
+import com.SkyblockBot.TimeoutHandler.MessageTimeout;
 import com.SkyblockBot.Verify.Verify;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -24,7 +26,7 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 import javax.security.auth.login.LoginException;
 
-import static com.SkyblockBot.Miscellaneous.BotUtils.*;
+import static com.SkyblockBot.Utils.BotUtils.*;
 
 public class Main {
     public static void main(String[] args) throws LoginException, IllegalArgumentException, RateLimitedException {
@@ -41,7 +43,7 @@ public class Main {
 
         client.addCommands(new AboutCommand(), new SlayerCommands(), new HelpCommand(waiter), new GuildCommands(waiter),
                 new AuctionCommands(), new BinCommands(), new SkillsCommands(), new CatacombsCommand(),
-                new ShutdownCommand(), new VersionCommand(), new RoleCommands(), new GuildLeaderboardCommand(), new EssenceCommand()
+                new ShutdownCommand(), new VersionCommand(), new RoleCommands(), new GuildLeaderboardCommand(), new EssenceCommand(), new CoinsBalanceCommand()
 
         );
         setBotSettings(botPrefix);
