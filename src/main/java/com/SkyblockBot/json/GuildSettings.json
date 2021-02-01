@@ -416,7 +416,7 @@
         "name": "Verified",
         "id": "782154976625426464"
       },
-      "new_channel_prefix": "authorize"
+      "new_channel_prefix": "νerify"
     },
     "automated_roles": {
       "enable": "true",
