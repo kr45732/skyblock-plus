@@ -28,5 +28,10 @@
     "version": "0.0.6",
     "description": "- Added guild promote/demote viewer command\n- Fixed doom slayer in automatic role assignment\n- Fixed carpentry in automatic role assignment\n- Optimized guild commands",
     "date": "2021-01-30T03:09:33.232688Z"
+  },
+  "7": {
+    "version": "0.0.7",
+    "description": "- Added slot collector to automated roles\n- Added pet enthusiast to automated roles\n- Minor bug fixes",
+    "date": "2021-01-30T03:09:33.232688Z"
   }
 }

@@ -1,10 +1,7 @@
 package com.SkyblockBot.Roles;
 
 import com.SkyblockBot.Miscellaneous.Player;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.*;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -94,19 +91,18 @@ public class RoleCommands extends Command {
                     List<String> rolesID = rolesJson.getAsJsonObject().entrySet().stream().map(Map.Entry::getKey)
                             .collect(Collectors.toCollection(ArrayList::new));
 
-                    eb = defaultEmbed("Automatic roles for " + player.getPlayerUsername(), skyblockStatsLink(player.getPlayerUsername(), player.getProfileName()));
+                    eb = defaultEmbed("Automatic roles for " + player.getUsername(), skyblockStatsLink(player.getUsername(), player.getProfileName()));
                     StringBuilder addedRoles = new StringBuilder();
                     StringBuilder removedRoles = new StringBuilder();
                     StringBuilder errorRoles = new StringBuilder();
 
-                    label:
                     for (String currentRoleName : rolesID) {
                         JsonElement currentRole = higherDepth(rolesJson, currentRoleName);
                         switch (currentRoleName) {
                             case "guild_member":
-                            case "related_guild_member":
+                            case "related_guild_member": {
                                 JsonElement guildJson = getJson("https://api.hypixel.net/findGuild?key=" + key + "&byUuid="
-                                        + player.getPlayerUuid());
+                                        + player.getUuid());
                                 if (guildJson != null) {
                                     Role curRole = guild.getRoleById(higherDepth(currentRole, "id").getAsString());
                                     if (!higherDepth(guildJson, "guild").isJsonNull()) {
@@ -125,18 +121,18 @@ public class RoleCommands extends Command {
                                         }
                                     }
                                 }
-
                                 break;
+                            }
                             case "sven":
                             case "rev":
                             case "tara": {
                                 boolean isStackable = higherDepth(currentRole, "stackable") != null;
                                 currentRole = higherDepth(currentRole, "levels");
 
-                                int slayerPlayer = player.getPlayerSlayer(currentRoleName);
+                                int slayerPlayer = player.getSlayer(currentRoleName);
                                 if (slayerPlayer == -1 && !errorRoles.toString().contains("Slayer")) {
                                     errorRoles.append(roleChangeString("Slayer API disabled"));
-                                    break label;
+                                    break;
                                 }
 
                                 List<Integer> currentSlayerLevels = currentRole.getAsJsonObject().entrySet().stream()
@@ -188,7 +184,7 @@ public class RoleCommands extends Command {
                                 boolean isStackable = higherDepth(currentRole, "stackable") != null;
                                 currentRole = higherDepth(currentRole, "levels");
 
-                                double playerBankCoins = player.getPlayerBankBalance();
+                                double playerBankCoins = player.getBankBalance();
                                 if (playerBankCoins == -1 && !errorRoles.toString().contains("Banking")) {
                                     errorRoles.append(roleChangeString("Banking API disabled"));
                                 }
@@ -248,14 +244,14 @@ public class RoleCommands extends Command {
                             case "mining":
                             case "taming":
                             case "enchanting":
-                            case "catacombs":
+                            case "catacombs": {
                                 boolean isStackable = higherDepth(currentRole, "stackable") != null;
                                 currentRole = higherDepth(currentRole, "levels");
 
                                 int currentSkill = -1;
                                 if (currentRoleName.equals("catacombs")) {
-                                    if (player.getPlayerCatacombs() != null) {
-                                        currentSkill = player.getPlayerCatacombs().skillLevel;
+                                    if (player.getCatacombsSkill() != null) {
+                                        currentSkill = player.getCatacombsSkill().skillLevel;
                                     }
                                 } else {
                                     if (player.getPlayerSkill(currentRoleName) != null) {
@@ -310,8 +306,9 @@ public class RoleCommands extends Command {
                                     }
                                 }
                                 break;
-                            case "fairy":
-                                int fairySouls = player.getPlayerFairySouls();
+                            }
+                            case "fairy": {
+                                int fairySouls = player.getFairySouls();
                                 if (fairySouls != -1) {
                                     Role curRole = guild.getRoleById(higherDepth(currentRole, "id").getAsString());
                                     if (fairySouls >= higherDepth(currentRole, "souls").getAsInt()) {
@@ -328,8 +325,9 @@ public class RoleCommands extends Command {
                                     }
                                 }
                                 break;
-                            case "doom_slayer":
-                                int[] curSlayer = new int[]{player.getPlayerWolfXp(), player.getPlayerZombieXp(), player.getPlayerSpiderXp()};
+                            }
+                            case "doom_slayer": {
+                                int[] curSlayer = new int[]{player.getWolfXp(), player.getZombieXp(), player.getSpiderXp()};
                                 Role curRole = guild.getRoleById(higherDepth(currentRole, "id").getAsString());
                                 boolean shouldHaveDoomSlayer = false;
                                 for (int curType : curSlayer) {
@@ -347,6 +345,50 @@ public class RoleCommands extends Command {
                                     guild.removeRoleFromMember(guild.getMember(user), curRole).queue();
                                 }
                                 break;
+                            }
+                            case "pet_enthusiast": {
+                                JsonArray playerPets = player.getPets();
+                                ArrayList<String> excludedPets = new ArrayList<>();
+                                higherDepth(currentRole, "excluded_pets").getAsJsonArray().forEach(o1 -> excludedPets.add(o1.getAsString()));
+
+                                boolean isPetEnthusiast = false;
+                                Role petEnthusiastRole = guild.getRoleById(higherDepth(currentRole, "id").getAsString());
+                                for (JsonElement currentPet : playerPets) {
+                                    String currentPetRarity = higherDepth(currentPet, "tier").getAsString().toLowerCase();
+                                    if (currentPetRarity.equals("epic") || currentPetRarity.equals("legendary")) {
+                                        if (!excludedPets.contains(higherDepth(currentPet, "type").getAsString().toLowerCase())) {
+                                            long currentPetExp = higherDepth(currentPet, "exp").getAsLong();
+                                            if (player.petLevelFromXp(currentPetExp, currentPetRarity) == 100) {
+                                                isPetEnthusiast = true;
+                                                if (!guild.getMember(user).getRoles().contains(petEnthusiastRole)) {
+                                                    guild.addRoleToMember(guild.getMember(user), petEnthusiastRole).queue();
+                                                    addedRoles.append(roleChangeString(petEnthusiastRole.getName()));
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                if (guild.getMember(user).getRoles().contains(petEnthusiastRole) && !isPetEnthusiast) {
+                                    removedRoles.append(roleChangeString(petEnthusiastRole.getName()));
+                                    guild.removeRoleFromMember(guild.getMember(user), petEnthusiastRole).queue();
+                                }
+                                break;
+                            }
+                            case "slot_collector": {
+                                Role petEnthusiastRole = guild.getRoleById(higherDepth(currentRole, "id").getAsString());
+                                if (player.getNumberCraftedMinion() >= higherDepth(currentRole, "num_minions").getAsInt()) {
+                                    if (!guild.getMember(user).getRoles().contains(petEnthusiastRole)) {
+                                        guild.addRoleToMember(guild.getMember(user), petEnthusiastRole).queue();
+                                        addedRoles.append(roleChangeString(petEnthusiastRole.getName()));
+                                        break;
+                                    }
+                                } else if (guild.getMember(user).getRoles().contains(petEnthusiastRole)) {
+                                    removedRoles.append(roleChangeString(petEnthusiastRole.getName()));
+                                    guild.removeRoleFromMember(guild.getMember(user), petEnthusiastRole).queue();
+                                }
+                                break;
+                            }
                         }
                     }
                     eb.setDescription("**Added Roles:**\n" + (addedRoles.length() > 0 ? addedRoles.toString() : "• None\n")

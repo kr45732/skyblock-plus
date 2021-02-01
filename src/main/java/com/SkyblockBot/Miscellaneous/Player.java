@@ -14,6 +14,7 @@ public class Player {
     private JsonElement profileJson;
     private JsonElement levelTables;
     private JsonElement outerProfileJson;
+    private JsonElement petLevelTable;
     private String playerUuid;
     private String playerUsername;
     private String profileName;
@@ -85,23 +86,23 @@ public class Player {
         return validPlayer;
     }
 
-    public int getPlayerSlayer() {
-        return getPlayerWolfXp() + getPlayerZombieXp() + getPlayerSpiderXp();
+    public int getSlayer() {
+        return getWolfXp() + getZombieXp() + getSpiderXp();
     }
 
-    public int getPlayerSlayer(String slayerName) {
+    public int getSlayer(String slayerName) {
         switch (slayerName) {
             case "sven":
-                return getPlayerWolfXp();
+                return getWolfXp();
             case "rev":
-                return getPlayerZombieXp();
+                return getZombieXp();
             case "tara":
-                return getPlayerSpiderXp();
+                return getSpiderXp();
         }
         return -1;
     }
 
-    public int getPlayerWolfXp() {
+    public int getWolfXp() {
         JsonElement profileSlayer = higherDepth(profileJson, "slayer_bosses");
 
         return higherDepth(higherDepth(profileSlayer, "wolf"), "xp") != null
@@ -109,7 +110,7 @@ public class Player {
                 : 0;
     }
 
-    public int getPlayerZombieXp() {
+    public int getZombieXp() {
         JsonElement profileSlayer = higherDepth(profileJson, "slayer_bosses");
 
         return higherDepth(higherDepth(profileSlayer, "zombie"), "xp") != null
@@ -117,7 +118,7 @@ public class Player {
                 : 0;
     }
 
-    public int getPlayerSpiderXp() {
+    public int getSpiderXp() {
         JsonElement profileSlayer = higherDepth(profileJson, "slayer_bosses");
 
         return higherDepth(higherDepth(profileSlayer, "spider"), "xp") != null
@@ -125,15 +126,15 @@ public class Player {
                 : 0;
     }
 
-    public double getPlayerCatacombsLevel() {
-        SkillsStruct catacombsInfo = getPlayerCatacombs();
+    public double getCatacombsLevel() {
+        SkillsStruct catacombsInfo = getCatacombsSkill();
         if (catacombsInfo != null) {
             return catacombsInfo.skillLevel + catacombsInfo.progressToNext;
         }
         return 0;
     }
 
-    public SkillsStruct getPlayerCatacombs() {
+    public SkillsStruct getCatacombsSkill() {
         if (this.levelTables == null) {
             this.levelTables = getJson(
                     "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/leveling.json");
@@ -164,7 +165,7 @@ public class Player {
         return null;
     }
 
-    public double getPlayerSkillAverage() {
+    public double getSkillAverage() {
         if (this.levelTables == null) {
             this.levelTables = getJson(
                     "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/leveling.json");
@@ -225,7 +226,7 @@ public class Player {
         return new SkillsStruct(skill, level, maxLevel, (long) skillExp, xpCurrent, xpForNext, progress);
     }
 
-    public double getPlayerBankBalance() {
+    public double getBankBalance() {
         try {
             return higherDepth(higherDepth(outerProfileJson, "banking"), "balance")
                     .getAsDouble();
@@ -234,7 +235,7 @@ public class Player {
         }
     }
 
-    public int getPlayerFairySouls() {
+    public int getFairySouls() {
         try {
             return higherDepth(profileJson,
                     "fairy_souls_collected").getAsInt();
@@ -284,7 +285,7 @@ public class Player {
         return false;
     }
 
-    public String getPlayerUsername() {
+    public String getUsername() {
         return this.playerUsername;
     }
 
@@ -292,11 +293,37 @@ public class Player {
         return this.profileName;
     }
 
-    public String getPlayerUuid() {
+    public String getUuid() {
         return this.playerUuid;
     }
 
-    public String getPlayerGuildRank() {
+    public String getGuildRank() {
         return playerGuildRank;
+    }
+
+    public JsonArray getPets(){
+        return higherDepth(profileJson, "pets").getAsJsonArray();
+    }
+
+    public int petLevelFromXp(long petExp, String rarity) {
+        if (this.petLevelTable == null) {
+            this.petLevelTable = getJson(
+                    "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/pets.json");
+        }
+
+        int petRarityOffset = higherDepth(higherDepth(petLevelTable, "pet_rarity_offset"), rarity.toUpperCase()).getAsInt();
+        JsonArray petLevelsXpPer = higherDepth(petLevelTable, "pet_levels").getAsJsonArray();
+        long totalExp = 0;
+        for (int i = petRarityOffset; i < petLevelsXpPer.size(); i++) {
+            totalExp += petLevelsXpPer.get(i).getAsLong();
+            if (totalExp >= petExp) {
+                return (i - petRarityOffset + 1);
+            }
+        }
+        return 100;
+    }
+
+    public int getNumberCraftedMinion(){
+        return higherDepth(profileJson, "crafted_generators").getAsJsonArray().size();
     }
 }

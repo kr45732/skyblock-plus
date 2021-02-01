@@ -76,7 +76,7 @@ public class SkillsCommands extends Command {
 
             double trueSA = 0;
             double progressSA = 0;
-            EmbedBuilder eb = defaultEmbed("Skills for " + player.getPlayerUsername(), skyblockStatsLink(player.getPlayerUsername(), player.getProfileName()));
+            EmbedBuilder eb = defaultEmbed("Skills for " + player.getUsername(), skyblockStatsLink(player.getUsername(), player.getProfileName()));
             Map<String, String> skillsEmojiMap = new HashMap<>();
             skillsEmojiMap.put("taming", "<:taming:800462115365716018>");
             skillsEmojiMap.put("farming", "<:farming:800462115055992832>");

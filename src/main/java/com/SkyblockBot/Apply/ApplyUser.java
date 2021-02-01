@@ -91,17 +91,17 @@ public class ApplyUser extends ListenerAdapter {
                                 : new Player(messageContent[0], messageContent[1]);
 
                         if (player.isValidPlayer()) {
-                            String playerSlayer = formatNumber(player.getPlayerSlayer());
-                            String playerSkills = roundSkillAverage(player.getPlayerSkillAverage());
-                            String playerCatacombs = "" + player.getPlayerCatacombs().skillLevel;
-                            EmbedBuilder statsEmbed = defaultEmbed("Stats for " + player.getPlayerUsername(),
-                                    skyblockStatsLink(player.getPlayerUsername(), player.getProfileName()));
+                            String playerSlayer = formatNumber(player.getSlayer());
+                            String playerSkills = roundSkillAverage(player.getSkillAverage());
+                            String playerCatacombs = "" + player.getCatacombsSkill().skillLevel;
+                            EmbedBuilder statsEmbed = defaultEmbed("Stats for " + player.getUsername(),
+                                    skyblockStatsLink(player.getUsername(), player.getProfileName()));
                             statsEmbed.addField("Total slayer", playerSlayer, true);
                             statsEmbed.addField("Progress skill level", playerSkills, true);
                             statsEmbed.addField("Catacombs level", "" + playerCatacombs, true);
 
-                            this.applyPlayerStats = defaultEmbed("Stats for " + player.getPlayerUsername(),
-                                    skyblockStatsLink(player.getPlayerUsername(), player.getProfileName()));
+                            this.applyPlayerStats = defaultEmbed("Stats for " + player.getUsername(),
+                                    skyblockStatsLink(player.getUsername(), player.getProfileName()));
                             this.applyPlayerStats.addField("Total slayer", playerSlayer, true);
                             this.applyPlayerStats.addField("Progress average skill level", playerSkills, true);
                             this.applyPlayerStats.addField("Catacombs level", "" + playerCatacombs, true);

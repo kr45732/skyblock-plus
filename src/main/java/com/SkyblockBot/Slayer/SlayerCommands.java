@@ -54,11 +54,11 @@ public class SlayerCommands extends Command {
     public EmbedBuilder getPlayerSlayer(String username, String profileName) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValidPlayer()) {
-            EmbedBuilder eb = defaultEmbed("Slayer for " + player.getPlayerUsername(), skyblockStatsLink(player.getPlayerUsername(), player.getProfileName()));
-            eb.setDescription("**Total slayer:** " + formatNumber(player.getPlayerSlayer()) + " XP");
-            eb.addField("<:sven_packmaster:800002277648891914> Wolf", simplifyNumber(player.getPlayerWolfXp()) + " XP", true);
-            eb.addField("<:revenant_horror:800002290987302943> Zombie", simplifyNumber(player.getPlayerZombieXp()) + " XP", true);
-            eb.addField("<:tarantula_broodfather:800002277262884874> Spider", simplifyNumber(player.getPlayerSpiderXp()) + " XP", true);
+            EmbedBuilder eb = defaultEmbed("Slayer for " + player.getUsername(), skyblockStatsLink(player.getUsername(), player.getProfileName()));
+            eb.setDescription("**Total slayer:** " + formatNumber(player.getSlayer()) + " XP");
+            eb.addField("<:sven_packmaster:800002277648891914> Wolf", simplifyNumber(player.getWolfXp()) + " XP", true);
+            eb.addField("<:revenant_horror:800002290987302943> Zombie", simplifyNumber(player.getZombieXp()) + " XP", true);
+            eb.addField("<:tarantula_broodfather:800002277262884874> Spider", simplifyNumber(player.getSpiderXp()) + " XP", true);
 //            eb.setThumbnail("https://cravatar.eu/helmhead/" + player.getPlayerUuid());
             return eb;
         }

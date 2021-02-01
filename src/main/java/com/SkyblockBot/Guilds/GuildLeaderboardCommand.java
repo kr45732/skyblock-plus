@@ -137,7 +137,7 @@ public class GuildLeaderboardCommand extends Command {
             if (!staffRankNames.contains(memberRank)) {
                 Player player = new Player(higherDepth(guildMember, "uuid").getAsString(), levelTables, memberRank);
                 if (player.isValidPlayer()) {
-                    uniqueGuildUuid.add(player.getPlayerUuid());
+                    uniqueGuildUuid.add(player.getUuid());
                     guildSlayer.add(player);
                     guildSkills.add(player);
                     guildCatacombs.add(player);
@@ -145,13 +145,13 @@ public class GuildLeaderboardCommand extends Command {
             }
         }
 
-        guildSlayer.sort(Comparator.comparingInt(Player::getPlayerSlayer));
+        guildSlayer.sort(Comparator.comparingInt(Player::getSlayer));
         Collections.reverse(guildSlayer);
 
-        guildSkills.sort(Comparator.comparingDouble(Player::getPlayerSkillAverage));
+        guildSkills.sort(Comparator.comparingDouble(Player::getSkillAverage));
         Collections.reverse(guildSkills);
 
-        guildCatacombs.sort(Comparator.comparingDouble(Player::getPlayerCatacombsLevel));
+        guildCatacombs.sort(Comparator.comparingDouble(Player::getCatacombsLevel));
         Collections.reverse(guildCatacombs);
 
         for (String s : uniqueGuildUuid) {
@@ -161,7 +161,7 @@ public class GuildLeaderboardCommand extends Command {
 
             for (int j = 0; j < guildSlayer.size(); j++) {
                 try {
-                    if (s.equals(guildSlayer.get(j).getPlayerUuid())) {
+                    if (s.equals(guildSlayer.get(j).getUuid())) {
                         slayerRank = j;
                         break;
                     }
@@ -171,7 +171,7 @@ public class GuildLeaderboardCommand extends Command {
 
             for (int j = 0; j < guildSkills.size(); j++) {
                 try {
-                    if (s.equals(guildSkills.get(j).getPlayerUuid())) {
+                    if (s.equals(guildSkills.get(j).getUuid())) {
                         skillsRank = j;
                         break;
                     }
@@ -181,7 +181,7 @@ public class GuildLeaderboardCommand extends Command {
 
             for (int j = 0; j < guildCatacombs.size(); j++) {
                 try {
-                    if (s.equals(guildCatacombs.get(j).getPlayerUuid())) {
+                    if (s.equals(guildCatacombs.get(j).getUuid())) {
                         catacombsRank = j;
                         break;
                     }
@@ -226,8 +226,8 @@ public class GuildLeaderboardCommand extends Command {
                     continue;
                 }
 
-                String playerRank = currentPlayer.getPlayerGuildRank().toLowerCase();
-                String playerUsername = currentPlayer.getPlayerUsername();
+                String playerRank = currentPlayer.getGuildRank().toLowerCase();
+                String playerUsername = currentPlayer.getUsername();
                 if (topRoleName.contains(playerRank)) {
                     if (topRoleName.size() > 1) {
                         if (!topRoleName.get(0).equals(playerRank)) {

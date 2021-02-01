@@ -58,10 +58,10 @@ public class CatacombsCommand extends Command {
     public EmbedBuilder getPlayerCatacombs(String username, String profileName) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValidPlayer()) {
-            EmbedBuilder eb = defaultEmbed("Dungeons for " + player.getPlayerUsername(), skyblockStatsLink(player.getPlayerUsername(), player.getProfileName()));
+            EmbedBuilder eb = defaultEmbed("Dungeons for " + player.getUsername(), skyblockStatsLink(player.getUsername(), player.getProfileName()));
             try {
 
-                SkillsStruct skillInfo = player.getPlayerCatacombs();
+                SkillsStruct skillInfo = player.getCatacombsSkill();
                 eb.addField(capitalizeString(skillInfo.skillName) + " (" + skillInfo.skillLevel + ")",
                         simplifyNumber(skillInfo.expCurrent) + " / " + simplifyNumber(skillInfo.expForNext) + "\nTotal XP: "
                                 + simplifyNumber(skillInfo.totalSkillExp) + "\nProgress: "

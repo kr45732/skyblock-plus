@@ -74,7 +74,7 @@ public class ApplyStaff extends ListenerAdapter {
         }
 
         if (event.getReactionEmote().getName().equals("❌")) {
-            staffChannel.sendMessage(player.getPlayerUsername() + " (" + user.getAsMention() + ") was denied by "
+            staffChannel.sendMessage(player.getUsername() + " (" + user.getAsMention() + ") was denied by "
                     + event.getUser().getName() + " (" + event.getUser().getAsMention() + ")").queue();
             reactMessage.clearReactions().queue();
             EmbedBuilder eb = defaultEmbed("Application Not Accepted", null);
@@ -85,7 +85,7 @@ public class ApplyStaff extends ListenerAdapter {
             deleteChannelMessage.addReaction("✅").queue();
             reactMessage.delete().queueAfter(5, TimeUnit.SECONDS);
         } else if (event.getReactionEmote().getName().equals("✅")) {
-            staffChannel.sendMessage(player.getPlayerUsername() + " (" + user.getAsMention() + ") was accepted by "
+            staffChannel.sendMessage(player.getUsername() + " (" + user.getAsMention() + ") was accepted by "
                     + event.getUser().getName() + " (" + event.getUser().getAsMention() + ")").queue();
             reactMessage.clearReactions().queue();
             EmbedBuilder eb = defaultEmbed("Application Accepted", null);
