@@ -24,6 +24,7 @@
 bin/
 .settings/
 .idea/
+.gradle/
 
 
 # General

@@ -301,7 +301,7 @@ public class Player {
         return playerGuildRank;
     }
 
-    public JsonArray getPets(){
+    public JsonArray getPets() {
         return higherDepth(profileJson, "pets").getAsJsonArray();
     }
 
@@ -323,7 +323,7 @@ public class Player {
         return 100;
     }
 
-    public int getNumberCraftedMinion(){
+    public int getNumberCraftedMinion() {
         return higherDepth(profileJson, "crafted_generators").getAsJsonArray().size();
     }
 }

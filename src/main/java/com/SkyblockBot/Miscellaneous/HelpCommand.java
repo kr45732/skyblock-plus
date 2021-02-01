@@ -15,7 +15,7 @@ import static com.SkyblockBot.Miscellaneous.BotUtils.botPrefix;
 
 public class HelpCommand extends Command {
     private final Paginator.Builder paginateBuilder;
-    private final int itemsPerPage = 9;
+    private final int itemsPerPage = 10;
 
     public HelpCommand(EventWaiter waiter) {
         this.name = "help";
@@ -35,26 +35,6 @@ public class HelpCommand extends Command {
     @Override
     protected void execute(CommandEvent event) {
         System.out.println(botPrefix + "help");
-        // "!slayer leaderboard [u-IGN]\n"
-        // "!slayer lb [u-IGN]\n"
-        // "!slayer leaderboard [g-guild name]\n"
-        // "!slayer lb [g-guild name]"
-
-        // "!skill player [IGN] <profile>\n"
-        // "!skill leaderboard [u-IGN]\n"
-        // "!skill lb [u-IGN]\n"
-        // "!skill leaderboard [g-guild name]\n"
-        // "!skill lb [g-guild name]\n"
-
-        // "!guild info [g-guild name]\n"
-        // "!guild members [g-guild name]\n"
-        // "!guild experience [g-guild name]\n "
-        // "!guild exp [g-guild name]\n"
-
-        // "!bazaar [item]\n"
-        // "!bz [item]\n";
-
-        // !player [ign]
 
         int startingPage = 0;
         try {
@@ -75,6 +55,7 @@ public class HelpCommand extends Command {
             pageMap.put("bazaar", 7);
             pageMap.put("bz", 7);
             pageMap.put("bin", 7);
+            pageMap.put("essence", 8);
             if (pageMap.get(pageStr) != null) {
                 startingPage = pageMap.get(pageStr);
             }
@@ -86,7 +67,7 @@ public class HelpCommand extends Command {
         paginateBuilder.addItems(fillArray(
                 new String[]{"**__Navigation__**", " ", "Use the arrow emojis to navigate through the pages",
                         "• **Page 2**: General", "• **Page 3**: Slayer", "• **Page 4**: Skills",
-                        "• **Page 5**: Dungeons", "• **Page 6**: Guild", "• **Page 7**: Auction House and Bazaar"}));
+                        "• **Page 5**: Dungeons", "• **Page 6**: Guild", "• **Page 7**: Auction House and Bazaar", "• **Page 8**: Essence"}));
 
         String[] generalCommands = new String[]{"**__General__**", " ", generateHelp("Show this help page", "help"),
                 generateHelp("Show this help page", "commands"),
@@ -122,6 +103,11 @@ public class HelpCommand extends Command {
                 generateHelp("Get player's active (not claimed) auctions on all profiles", "auction [IGN]", "ah [IGN]"),
                 generateHelp("Get lowest bin of an item", "bin [item]")};
         paginateBuilder.addItems(fillArray(ahAndBazCommands));
+
+        String[] essenceCommands = new String[]{"**__Essence__**", " ",
+                generateHelp("Calculate essence cost to upgrade an item", "essence upgrade [item]"),
+                generateHelp("Get essence information for each upgrade level for an item", "essence information [item]", "essence info [item]")};
+        paginateBuilder.addItems(fillArray(essenceCommands));
 
         paginateBuilder.build().paginate(event.getChannel(), startingPage);
     }

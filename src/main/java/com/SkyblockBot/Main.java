@@ -4,6 +4,7 @@ import com.SkyblockBot.Apply.Apply;
 import com.SkyblockBot.Auction.AuctionCommands;
 import com.SkyblockBot.Auction.BinCommands;
 import com.SkyblockBot.Dungeons.CatacombsCommand;
+import com.SkyblockBot.Essence.EssenceCommand;
 import com.SkyblockBot.Guilds.GuildCommands;
 import com.SkyblockBot.Guilds.GuildLeaderboardCommand;
 import com.SkyblockBot.Miscellaneous.*;
@@ -40,7 +41,7 @@ public class Main {
 
         client.addCommands(new AboutCommand(), new SlayerCommands(), new HelpCommand(waiter), new GuildCommands(waiter),
                 new AuctionCommands(), new BinCommands(), new SkillsCommands(), new CatacombsCommand(),
-                new ShutdownCommand(), new VersionCommand(), new RoleCommands(), new GuildLeaderboardCommand()
+                new ShutdownCommand(), new VersionCommand(), new RoleCommands(), new GuildLeaderboardCommand(), new EssenceCommand()
 
         );
         setBotSettings(botPrefix);

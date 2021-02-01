@@ -33,5 +33,10 @@
     "version": "0.0.7",
     "description": "- Added verification system\n- Added slot collector to automated roles\n- Added pet enthusiast to automated roles\n- Minor bug fixes",
     "date": "2021-01-30T03:09:33.232688Z"
+  },
+  "8": {
+    "version": "0.0.8",
+    "description": "- Added essence upgrade command\n- Added essence information command\n- Added essence page to help command\n- Minor bug fixes",
+    "date": "2021-02-01T15:08:54.670701Z"
   }
 }

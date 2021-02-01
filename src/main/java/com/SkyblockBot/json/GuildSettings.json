@@ -363,11 +363,20 @@
         "id": "802629322070425668",
         "souls": "210"
       },
-      "pet_enthusiast": {"name": "Pet Enthusiast", "id": "805567896809898009",
-        "excluded_pets": ["guardian", "jellyfish", "parrot", "sheep"]
+      "pet_enthusiast": {
+        "name": "Pet Enthusiast",
+        "id": "805567896809898009",
+        "excluded_pets": [
+          "guardian",
+          "jellyfish",
+          "parrot",
+          "sheep"
+        ]
       },
       "slot_collector": {
-        "name": "Slot collector", "id": "805598267186085985", "num_minions": "20"
+        "name": "Slot collector",
+        "id": "805598267186085985",
+        "num_minions": "20"
       }
     },
     "staff_role": {
@@ -739,11 +748,20 @@
         "name": "Doom Slayer",
         "id": "782154976595935251"
       },
-      "pet_enthusiast": {"name": "Pet Enthusiast", "id": "782154976608387072",
-        "excluded_pets": ["guardian", "jellyfish", "parrot", "sheep"]
+      "pet_enthusiast": {
+        "name": "Pet Enthusiast",
+        "id": "782154976608387072",
+        "excluded_pets": [
+          "guardian",
+          "jellyfish",
+          "parrot",
+          "sheep"
+        ]
       },
       "slot_collector": {
-        "name": "Slot collector", "id": "782154976595935248", "num_minions": "20"
+        "name": "Slot collector",
+        "id": "782154976595935248",
+        "num_minions": "20"
       }
     },
     "staff_role": {
