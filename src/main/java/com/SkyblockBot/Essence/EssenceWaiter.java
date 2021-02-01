@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import static com.SkyblockBot.Miscellaneous.BotUtils.defaultEmbed;
 import static com.SkyblockBot.Miscellaneous.BotUtils.higherDepth;
+import static com.SkyblockBot.Miscellaneous.MessageTimeout.addMessage;
 
 public class EssenceWaiter extends ListenerAdapter {
     String itemName;
@@ -33,6 +34,8 @@ public class EssenceWaiter extends ListenerAdapter {
         this.itemJson = itemJson;
         this.reactMessage = reactMessage;
         this.user = user;
+        addMessage(this.reactMessage, this);
+
         essenceEmojiMap.put("⏫", -1);
         essenceEmojiMap.put("0⃣", 0);
         essenceEmojiMap.put("1⃣", 1);

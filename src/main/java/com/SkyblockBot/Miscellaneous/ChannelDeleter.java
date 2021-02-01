@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -34,7 +35,9 @@ public class ChannelDeleter extends ListenerAdapter {
     }
 
     public void updateChannels() {
-        for (TextChannel currentChannel : channelsList) {
+        for (Iterator<TextChannel> iteratorCur = channelsList.iterator(); iteratorCur.hasNext(); ) {
+            TextChannel currentChannel = iteratorCur.next();
+
             Instant lastMessageSentTime = currentChannel.retrieveMessageById(currentChannel.getLatestMessageId())
                     .complete().getTimeCreated().toInstant();
             long secondsSinceLast = Instant.now().getEpochSecond() - lastMessageSentTime.getEpochSecond();
@@ -45,12 +48,12 @@ public class ChannelDeleter extends ListenerAdapter {
                 eb.addField("Reason", "Inactive for an hour", false);
                 currentChannel.sendMessage(eb.build()).queue();
                 currentChannel.delete().reason("Exceeded inactivity time").queueAfter(15, TimeUnit.SECONDS);
-                channelsList.remove(currentChannel);
+                iteratorCur.remove();
             } else if ((secondsDiff / 3600 % 24) > 48) {
                 eb.addField("Reason", "Open for 48 hours", false);
                 currentChannel.sendMessage(eb.build()).queue();
                 currentChannel.delete().reason("Exceeded max time").queueAfter(15, TimeUnit.SECONDS);
-                channelsList.remove(currentChannel);
+                iteratorCur.remove();
             }
         }
     }

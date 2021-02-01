@@ -36,7 +36,7 @@
   },
   "8": {
     "version": "0.0.8",
-    "description": "- Added essence upgrade command\n- Added essence information command\n- Added essence page to help command\n- Minor bug fixes",
+    "description": "- Added essence upgrade command\n- Added essence information command\n- Added essence page to help command\n- Added generic message timeout\n- Fixed channel deleter",
     "date": "2021-02-01T15:08:54.670701Z"
   }
 }
