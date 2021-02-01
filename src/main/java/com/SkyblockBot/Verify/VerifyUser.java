@@ -26,9 +26,9 @@ public class VerifyUser extends ListenerAdapter {
     String[] playerInfo;
 
     public VerifyUser(MessageReactionAddEvent event, User verifyingUser, JsonElement currentSettings) {
+        System.out.println("Verify: " + verifyingUser.getName());
         this.verifyingUser = verifyingUser;
         this.currentSettings = currentSettings;
-        System.out.println("Verify: " + verifyingUser.getName());
 
         String channelPrefix = higherDepth(currentSettings, "new_channel_prefix").getAsString();
         Category verifyCategory = event.getGuild()
@@ -63,6 +63,11 @@ public class VerifyUser extends ListenerAdapter {
             return;
         }
         if (event.getUser().isBot()) {
+            return;
+        }
+
+        if (!event.getUser().equals(verifyingUser)) {
+            reactMessage.removeReaction(event.getReaction().getReactionEmote().getAsReactionCode(), event.getUser()).queue();
             return;
         }
 

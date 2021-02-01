@@ -38,7 +38,7 @@ public class Verify extends ListenerAdapter {
                     validGuild = true;
                     reactChannel.sendMessage("Loading...").complete();
                     reactChannel.sendMessage("Loading...").complete();
-                    List<Message> deleteMessages = reactChannel.getHistory().retrievePast(10).complete();
+                    List<Message> deleteMessages = reactChannel.getHistory().retrievePast(25).complete();
                     reactChannel.deleteMessages(deleteMessages).complete();
 
                     String verifyText = higherDepth(currentSettings, "verify_text").getAsString();
@@ -61,12 +61,9 @@ public class Verify extends ListenerAdapter {
             return;
         }
 
-        System.out.println("VALID ||| Guild " + event.getGuild().getName() + " user: " + event.getUser().getName());
-        System.out.println(reactMessage.getContentDisplay());
         if (event.getUser().isBot()) {
             return;
         }
-        System.out.println(reactMessage.getId());
 
         if (event.getMessageIdLong() != reactMessage.getIdLong()) {
             return;

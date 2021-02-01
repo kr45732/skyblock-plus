@@ -10,6 +10,7 @@ import com.SkyblockBot.Miscellaneous.*;
 import com.SkyblockBot.Roles.RoleCommands;
 import com.SkyblockBot.Skills.SkillsCommands;
 import com.SkyblockBot.Slayer.SlayerCommands;
+import com.SkyblockBot.Verify.Verify;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import net.dv8tion.jda.api.JDABuilder;
@@ -46,7 +47,7 @@ public class Main {
         JDABuilder.createDefault(botToken).setStatus(OnlineStatus.DO_NOT_DISTURB).setChunkingFilter(ChunkingFilter.ALL)
                 .setMemberCachePolicy(MemberCachePolicy.ALL).enableIntents(GatewayIntent.GUILD_MEMBERS)
                 .setActivity(Activity.playing("Loading...")).addEventListeners(waiter, client.build())
-                .addEventListeners(new Apply()).addEventListeners(new ChannelDeleter()).build();
+                .addEventListeners(new Apply()).addEventListeners(new Verify()).addEventListeners(new ChannelDeleter()).build();
 
         // TODO: better bin command (parsing of string)
         // TODO: add unimplemented commands in HelpCommand.java

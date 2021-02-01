@@ -28,9 +28,9 @@ public class ApplyUser extends ListenerAdapter {
     Player player;
 
     public ApplyUser(MessageReactionAddEvent event, User applyingUser, JsonElement currentSettings) {
+        System.out.println("Apply: " + applyingUser.getName());
         this.applyingUser = applyingUser;
         this.currentSettings = currentSettings;
-        System.out.println("Apply: " + applyingUser.getName());
 
         String channelPrefix = higherDepth(currentSettings, "new_channel_prefix").getAsString();
         Category applyCategory = event.getGuild()

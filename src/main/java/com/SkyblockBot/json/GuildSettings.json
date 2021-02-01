@@ -28,7 +28,7 @@
     "automated_verify": {
       "enable": "false",
       "react_channel": {
-        "name": "verify",
+        "name": "authorize",
         "id": "801970206721179658"
       },
       "verify_text": "test server verify",
@@ -40,7 +40,7 @@
         "name": "verified",
         "id": "801987767890346014"
       },
-      "new_channel_prefix": "verify"
+      "new_channel_prefix": "authorize"
     },
     "automated_roles": {
       "enable": "true",
@@ -404,8 +404,8 @@
     "automated_verify": {
       "enable": "false",
       "react_channel": {
-        "name": "➭verify",
-        "id": "802327816829272104"
+        "name": "➭authorize",
+        "id": "805607857381703680"
       },
       "verify_text": "Welcome to Skyblock Forceful!\nCurrently, you only have access to certain channels. In order to gain full access to our server, you must verify.\n\nTo do this:\n  1) Follow the video below, replacing CrypticPlasma's name and tag with your own\n  2) React to video below with ✅\n\nIf you are not pinged in under 30 seconds, then please open a ticket",
       "new_channel_category": {
@@ -416,7 +416,7 @@
         "name": "Verified",
         "id": "782154976625426464"
       },
-      "new_channel_prefix": "verify"
+      "new_channel_prefix": "authorize"
     },
     "automated_roles": {
       "enable": "true",

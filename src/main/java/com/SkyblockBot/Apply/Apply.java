@@ -37,7 +37,7 @@ public class Apply extends ListenerAdapter {
 
                     reactChannel.sendMessage("Loading...").complete();
                     reactChannel.sendMessage("Loading...").complete();
-                    List<Message> deleteMessages = reactChannel.getHistory().retrievePast(10).complete();
+                    List<Message> deleteMessages = reactChannel.getHistory().retrievePast(25).complete();
                     reactChannel.deleteMessages(deleteMessages).complete();
 
                     String applyText = higherDepth(currentSettings, "apply_text").getAsString();
