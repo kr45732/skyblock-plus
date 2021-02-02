@@ -71,6 +71,7 @@ public class SacksCommand extends Command {
     public EmbedBuilder getPlayerSacks(String username, String profileName) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
+            @SuppressWarnings("unchecked")
             Map<String, Integer> sacksMap = player.getPlayerSacks();
             if (sacksMap != null) {
                 ArrayList<String> pageTitles = new ArrayList<>();

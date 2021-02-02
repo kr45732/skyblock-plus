@@ -119,7 +119,6 @@ public class BotUtils {
                 return higherDepth(currentName, "name").getAsString();
             }
         } catch (Exception e) {
-            System.out.println("Null - uuid - " + uuid);
         }
         return null;
 
@@ -129,8 +128,7 @@ public class BotUtils {
         try {
             JsonElement usernameJson = getJson("https://api.mojang.com/users/profiles/minecraft/" + username);
             return higherDepth(usernameJson, "id").getAsString();
-        } catch (Exception e) {
-            System.out.println("Null - uuid - " + username);
+        } catch (Exception ignored) {
         }
         return null;
 
@@ -140,8 +138,7 @@ public class BotUtils {
         try {
             JsonElement usernameJson = getJson("https://api.mojang.com/users/profiles/minecraft/" + username);
             return new UsernameUuidStruct(higherDepth(usernameJson, "name").getAsString(), higherDepth(usernameJson, "id").getAsString());
-        } catch (Exception e) {
-            System.out.println("Null - uuid - " + username);
+        } catch (Exception ignored) {
         }
         return null;
     }

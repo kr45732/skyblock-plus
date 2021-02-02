@@ -1,5 +1,6 @@
 package com.SkyblockBot.Apply;
 
+import com.SkyblockBot.Verify.VerifyGuild;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import net.dv8tion.jda.api.entities.Message;
@@ -15,11 +16,6 @@ import java.util.List;
 import static com.SkyblockBot.Utils.BotUtils.higherDepth;
 
 public class Apply extends ListenerAdapter {
-    Message reactMessage;
-    String channelPrefix;
-    boolean validGuild = false;
-    JsonElement currentSettings;
-
     @Override
     public void onGuildReady(@NotNull GuildReadyEvent event) {
         try {
@@ -28,12 +24,11 @@ public class Apply extends ListenerAdapter {
             if (higherDepth(settings, event.getGuild().getId()) != null) {
                 if (higherDepth(higherDepth(higherDepth(settings, event.getGuild().getId()), "automated_applications"),
                         "enable").getAsBoolean()) {
-                    currentSettings = higherDepth(higherDepth(settings, event.getGuild().getId()),
+                    JsonElement currentSettings = higherDepth(higherDepth(settings, event.getGuild().getId()),
                             "automated_applications");
                     TextChannel reactChannel = event.getGuild().getTextChannelById(
                             higherDepth(higherDepth(currentSettings, "react_channel"), "id").getAsString());
-                    validGuild = true;
-                    channelPrefix = higherDepth(currentSettings, "new_channel_prefix").getAsString();
+                    String channelPrefix = higherDepth(currentSettings, "new_channel_prefix").getAsString();
 
                     reactChannel.sendMessage("Loading...").complete();
                     reactChannel.sendMessage("Loading...").complete();
@@ -41,8 +36,10 @@ public class Apply extends ListenerAdapter {
                     reactChannel.deleteMessages(deleteMessages).complete();
 
                     String applyText = higherDepth(currentSettings, "apply_text").getAsString();
-                    reactMessage = reactChannel.sendMessage(applyText).complete();
+                    Message reactMessage = reactChannel.sendMessage(applyText).complete();
                     reactMessage.addReaction("✅").queue();
+
+                    event.getJDA().addEventListener(new ApplyGuild(reactMessage, channelPrefix, currentSettings));
                 }
             }
         } catch (Exception ignored) {
@@ -50,29 +47,29 @@ public class Apply extends ListenerAdapter {
         }
     }
 
-    @Override
-    public void onMessageReactionAdd(@NotNull MessageReactionAddEvent event) {
-        if (!validGuild) {
-            return;
-        }
-        if (event.getMessageIdLong() != reactMessage.getIdLong()) {
-            return;
-        }
-        if (event.getUser().isBot()) {
-            return;
-        }
-
-        event.getReaction().removeReaction(event.getUser()).queue();
-        if (!event.getReactionEmote().getName().equals("✅")) {
-            return;
-        }
-
-        if (event.getGuild()
-                .getTextChannelsByName(channelPrefix + "-" + event.getUser().getName().replace(" ", "-"), true)
-                .size() > 0) {
-            return;
-        }
-
-        event.getJDA().addEventListener(new ApplyUser(event, event.getUser(), currentSettings));
-    }
+//    @Override
+//    public void onMessageReactionAdd(@NotNull MessageReactionAddEvent event) {
+//        if (!validGuild) {
+//            return;
+//        }
+//        if (event.getMessageIdLong() != reactMessage.getIdLong()) {
+//            return;
+//        }
+//        if (event.getUser().isBot()) {
+//            return;
+//        }
+//
+//        event.getReaction().removeReaction(event.getUser()).queue();
+//        if (!event.getReactionEmote().getName().equals("✅")) {
+//            return;
+//        }
+//
+//        if (event.getGuild()
+//                .getTextChannelsByName(channelPrefix + "-" + event.getUser().getName().replace(" ", "-"), true)
+//                .size() > 0) {
+//            return;
+//        }
+//
+//        event.getJDA().addEventListener(new ApplyUser(event, event.getUser(), currentSettings));
+//    }
 }
