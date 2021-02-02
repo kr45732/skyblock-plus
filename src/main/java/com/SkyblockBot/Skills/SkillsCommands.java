@@ -68,7 +68,7 @@ public class SkillsCommands extends Command {
     public EmbedBuilder getPlayerSkill(String username, String profileName) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 
-        if (player.isValidPlayer()) {
+        if (player.isValid()) {
             JsonElement skillsCap = higherDepth(levelTables, "leveling_caps");
 
             List<String> skills = getJsonKeys(skillsCap);
@@ -90,7 +90,7 @@ public class SkillsCommands extends Command {
             skillsEmojiMap.put("runecrafting", "<:runecrafting:800462115172909086>");
 
             for (String skill : skills) {
-                SkillsStruct skillInfo = player.getPlayerSkill(skill);
+                SkillsStruct skillInfo = player.getSkill(skill);
                 if (skillInfo != null) {
                     eb.addField(
                             skillsEmojiMap.get(skill) + " " + capitalizeString(skillInfo.skillName) + " (" + skillInfo.skillLevel

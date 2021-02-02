@@ -38,5 +38,10 @@
     "version": "0.0.8",
     "description": "- Added essence upgrade command\n- Added essence information command\n- Added essence page to help command\n- Added generic message timeout\n- Fixed channel deleter\n- Added coins command",
     "date": "2021-02-01T15:08:54.670701Z"
+  },
+  "9": {
+    "version": "0.1.0",
+    "description": "- Added custom paginator\n- Added wardrobe command\n- Minor bug fixes",
+    "date": "2021-02-01T15:08:54.670701Z"
   }
 }

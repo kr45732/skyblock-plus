@@ -136,7 +136,7 @@ public class GuildLeaderboardCommand extends Command {
             String memberRank = higherDepth(guildMember, "rank").getAsString();
             if (!staffRankNames.contains(memberRank)) {
                 Player player = new Player(higherDepth(guildMember, "uuid").getAsString(), levelTables, memberRank);
-                if (player.isValidPlayer()) {
+                if (player.isValid()) {
                     uniqueGuildUuid.add(player.getUuid());
                     guildSlayer.add(player);
                     guildSkills.add(player);

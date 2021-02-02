@@ -1,0 +1,3308 @@
+{
+  "i": [
+    {},
+    {
+      "id": "397s",
+      "Count": "1b",
+      "tag": {
+        "ench": [],
+        "HideFlags": 254,
+        "SkullOwner": {
+          "Id": "68fdf966-47cb-328e-a195-c6f154127cd9",
+          "Properties": {
+            "textures": [
+              {
+                "Value": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHBzOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlL2EwZTgxZWQwN2RmYjAyNDRkNTZmNGQ1ZjJiMzc1NTNlYzAyNmZiNDc5NmYwZmIwYzU3YThlYjI2NDk4M2UxZTAifX19"
+              }
+            ]
+          }
+        },
+        "display": {
+          "Lore": [
+            "§7Health: §a+145 HP",
+            "§7Defense: §a+125",
+            "§7Speed: §a+20",
+            "§7Intelligence: §a+150 §9(Necrotic +150)",
+            "",
+            "§9Growth V",
+            "§7Grants §a+75 §c❤ Health§7.",
+            "§9Protection V",
+            "§7Grants §a+15 §a❈ Defense§7.",
+            "",
+            "§6Full Set Bonus: Young Blood",
+            "§7Gain §a+70§7 Walk Speed while",
+            "§7you are above §a50%§7 HP.",
+            "§8+100 Walk Speed Cap",
+            "",
+            "§6§lLEGENDARY HELMET"
+          ],
+          "Name": "§6Necrotic Young Dragon Helmet"
+        },
+        "ExtraAttributes": {
+          "modifier": "necrotic",
+          "originTag": "QUICK_CRAFTING",
+          "id": "YOUNG_DRAGON_HELMET",
+          "enchantments": {
+            "protection": 5,
+            "growth": 5
+          },
+          "uuid": "0a8f8a0f-5734-4753-b5c4-18cb6c84ca3f",
+          "anvil_uses": 1,
+          "timestamp": "7/7/20 5:24 PM"
+        }
+      },
+      "Damage": "3s"
+    },
+    {
+      "id": "397s",
+      "Count": "1b",
+      "tag": {
+        "ench": [],
+        "HideFlags": 254,
+        "SkullOwner": {
+          "Id": "b3c79a6a-103a-33cf-8ae2-579722654939",
+          "Properties": {
+            "textures": [
+              {
+                "Value": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHBzOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzU3OTdjNzdjY2VlM2MwNGMzZGVlZDc3MDU5NWVhODNlYTFlODRjOWE0NjI5Yjc1M2FmNWQzNTFjMGNjMTFhNzQifX19"
+              }
+            ]
+          }
+        },
+        "display": {
+          "Lore": [
+            "§7Gear Score: §d613 §8(1942)",
+            "§7Health: §a+185 HP §e(+40 HP) §8(+586.45 HP)",
+            "§7Defense: §a+145 §e(+20) §8(+459.65)",
+            "§7Intelligence: §a+275 §9(Necrotic +150) §8(+871.75)",
+            "",
+            "§9Growth V, §9Protection V",
+            "",
+            "§6Full Set Bonus: Wise Blood",
+            "§7Abilities have §a2/3 §7of the",
+            "§7mana cost.",
+            "",
+            "§6§lLEGENDARY DUNGEON HELMET"
+          ],
+          "Name": "§6Necrotic Wise Dragon Helmet §6✪§6✪§6✪§6✪"
+        },
+        "ExtraAttributes": {
+          "hot_potato_count": 10,
+          "modifier": "necrotic",
+          "dungeon_item_level": 4,
+          "originTag": "CRAFTING_GRID_SHIFT",
+          "id": "WISE_DRAGON_HELMET",
+          "enchantments": {
+            "protection": 5,
+            "growth": 5
+          },
+          "uuid": "248334f6-b1bf-4576-a992-048ceb9715bb",
+          "anvil_uses": 11,
+          "timestamp": "5/1/20 11:01 AM"
+        }
+      },
+      "Damage": "3s"
+    },
+    {
+      "id": "397s",
+      "Count": "1b",
+      "tag": {
+        "HideFlags": 254,
+        "SkullOwner": {
+          "Id": "cafa124e-da06-3b1a-b38e-f89824dcf2ab",
+          "Properties": {
+            "textures": [
+              {
+                "Value": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTI1ZTYxMjE5NzFlOTFjNTQxNWY2MTdlMTcxMTQ5OTBhMTQ2YTc0NmRkOTUyZDQxNzZlMjU3NjQxODNlZiJ9fX0="
+              }
+            ]
+          }
+        },
+        "display": {
+          "Lore": [
+            "§7Defense: §a+70",
+            "§7Speed: §a+10",
+            "",
+            "§7Each piece of this armor grants",
+            "§7the ability to §9automatically",
+            "§9mine §a2 §7extra nearby blocks",
+            "§7while mining (very short",
+            "§7cooldown, blocks must require",
+            "§7breaking power of less than 4).",
+            "",
+            "§7§8This item can be reforged!",
+            "§5§lEPIC HELMET"
+          ],
+          "Name": "§5Mineral Helmet"
+        },
+        "ExtraAttributes": {
+          "originTag": "MINERAL_HELMET",
+          "id": "MINERAL_HELMET",
+          "uuid": "17e51b8a-5001-4a77-8de2-a994e89e0948",
+          "timestamp": "11/16/20 11:30 PM"
+        }
+      },
+      "Damage": "3s"
+    },
+    {
+      "id": "397s",
+      "Count": "1b",
+      "tag": {
+        "ench": [],
+        "HideFlags": 254,
+        "SkullOwner": {
+          "Id": "bafabf7d-16e6-32fb-9720-812419bacc73",
+          "Properties": {
+            "textures": [
+              {
+                "Value": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzkwMTE2ZGE1MTRhNzNkZGQ5Mjk1NDkxODUyYWRjNTg4MDA3ZjJhY2Q3ZGUyNjk3ODhhMjEyOGQ4ZTRhNzY0YiJ9fX0="
+              }
+            ]
+          }
+        },
+        "display": {
+          "Lore": [
+            "§7Crit Chance: §c+10% §9(Submerged +10%)",
+            "§7Sea Creature Chance: §c+3.4% §9(Submerged +0.9%)",
+            "",
+            "§7Health: §a+195 HP",
+            "§7Defense: §a+135",
+            "",
+            "§9Growth V",
+            "§7Grants §a+75 §c❤ Health§7.",
+            "§9Protection V",
+            "§7Grants §a+15 §a❈ Defense§7.",
+            "",
+            "§6Full Set Bonus: Absorb",
+            "§7§9Doubles§7 your §a❈ Defense§7",
+            "§7while in water.",
+            "",
+            "§6Full Set Bonus: Reflect",
+            "§7§7Your sharp scales reflect",
+            "§7§915% §7of damage onto the",
+            "§7attacker.",
+            "",
+            "§6§lLEGENDARY HELMET"
+          ],
+          "Name": "§6Submerged Shark Scale Helmet"
+        },
+        "ExtraAttributes": {
+          "modifier": "submerged",
+          "originTag": "SHARK_SCALE_HELMET",
+          "id": "SHARK_SCALE_HELMET",
+          "enchantments": {
+            "protection": 5,
+            "growth": 5
+          },
+          "uuid": "c2e57c14-d77b-4f5c-8239-49ab0e001347",
+          "anvil_uses": 1,
+          "timestamp": "10/4/20 7:31 PM"
+        }
+      },
+      "Damage": "3s"
+    },
+    {
+      "id": "397s",
+      "Count": "1b",
+      "tag": {
+        "ench": [],
+        "HideFlags": 254,
+        "SkullOwner": {
+          "Id": "c8e41e94-9c30-38af-80c6-05b2ed6d5c53",
+          "Properties": {
+            "textures": [
+              {
+                "Value": "ewogICJ0aW1lc3RhbXAiIDogMTYwMzY2ODk3MjkwMywKICAicHJvZmlsZUlkIiA6ICIzYTNmNzhkZmExZjQ0OTllYjE5NjlmYzlkOTEwZGYwYyIsCiAgInByb2ZpbGVOYW1lIiA6ICJUaGVyb2Ryb2dvIiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlL2NlNDYwNmM2ZDk3M2E5OTlhZWMxNjg3YzdlMDc1ZjdkMzdkYjgxODVlODhiODQ0NTA3ZjE2YjNlMmIzZWI2OTAiCiAgICB9CiAgfQp9"
+              }
+            ]
+          }
+        },
+        "display": {
+          "Lore": [
+            "§7Gear Score: §d592 §8(1818)",
+            "§7Strength: §c+25 §9(Ancient +25) §8(+79.25)",
+            "§7Crit Chance: §c+12% §9(Ancient +12%) §8(+16.8%)",
+            "§7Crit Damage: §c+28% §9(Ancient +28%) §8(+88.76%)",
+            "",
+            "§7Health: §a+122 HP §e(+40 HP) §9(Ancient +7 HP) §8(+386.74 HP)",
+            "§7Defense: §a+177 §e(+20) §9(Ancient +7) §8(+561.09)",
+            "§7Intelligence: §a+70 §9(Ancient +20) §8(+221.9)",
+            "§7Ferocity: §a+10 §8(+14)",
+            "",
+            "§9Growth V, §9Protection V",
+            "§9Rejuvenate II",
+            "",
+            "§6Full Set Bonus: Regenerative Howl",
+            "§7Upon activating §c⫽ Ferocity",
+            "§c§7heal players within §925",
+            "§9§7blocks for §910% §7of your §a❈",
+            "§aDefense §7and gain §a50❈ Defense",
+            "§a§7for 5s (stacking).",
+            "",
+            "§9Ancient Bonus",
+            "§7Grants §a+1 §9☠ Crit Damage",
+            "§9§7per §cCatacombs §7level.",
+            "",
+            "§6§lLEGENDARY DUNGEON HELMET"
+          ],
+          "Name": "§6Ancient Werewolf Helmet §6✪§6✪§6✪§6✪"
+        },
+        "ExtraAttributes": {
+          "hot_potato_count": 10,
+          "modifier": "ancient",
+          "dungeon_item_level": 4,
+          "originTag": "QUICK_CRAFTING",
+          "id": "WEREWOLF_HELMET",
+          "enchantments": {
+            "rejuvenate": 2,
+            "protection": 5,
+            "growth": 5
+          },
+          "uuid": "b57d0fbd-8505-4081-9ad0-eba15814f58e",
+          "timestamp": "12/18/20 7:04 PM"
+        }
+      },
+      "Damage": "3s"
+    },
+    {
+      "id": "397s",
+      "Count": "1b",
+      "tag": {
+        "ench": [
+          {
+            "lvl": "3s",
+            "id": "5s"
+          },
+          {
+            "lvl": "1s",
+            "id": "6s"
+          }
+        ],
+        "HideFlags": 254,
+        "SkullOwner": {
+          "Id": "16b91b55-02b7-3315-bd9a-7da8467e4a96",
+          "Properties": {
+            "textures": [
+              {
+                "Value": "ewogICJ0aW1lc3RhbXAiIDogMTYwNTYyMzI0OTc5MywKICAicHJvZmlsZUlkIiA6ICIwNjEzY2I1Y2QxYjg0M2JjYjI4OTk1NWU4N2QzMGEyYyIsCiAgInByb2ZpbGVOYW1lIiA6ICJicmVhZGxvYWZzcyIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS8yYmJiMmZhN2E2Y2EwODcyODBlYTBjYjU2NGI0MWVmMWFlNDA0YTE5ZjdhODEyOGQzZDI4YzUxOWE4NWUwNjNmIgogICAgfQogIH0KfQ"
+              }
+            ]
+          }
+        },
+        "display": {
+          "Lore": [
+            "§7Gear Score: §d797 §8(2327)",
+            "§7Strength: §c+75 §9(Ancient +35) §8(+230.25)",
+            "§7Crit Chance: §c+15% §9(Ancient +15%) §8(+19.5%)",
+            "§7Crit Damage: §c+58% §9(Ancient +28%) §8(+178.06%)",
+            "",
+            "§7Health: §a+302 HP §e(+40 HP) §9(Ancient +7 HP) §8(+927.14 HP)",
+            "§7Defense: §a+142 §e(+20) §9(Ancient +7) §8(+435.94)",
+            "§7Intelligence: §a+55 §9(Ancient +25) §8(+168.85)",
+            "",
+            "§9Aqua Affinity I, §9Growth V",
+            "§9Protection V, §9Rejuvenate V",
+            "§9Respiration III, §9Thorns III",
+            "",
+            "§6Full Set Bonus: Witherborn",
+            "§7Spawns a wither minion every",
+            "§7§e30 §7seconds up to a maximum",
+            "§7§a1 §7wither. Your withers will",
+            "§7travel to and explode on nearby",
+            "§7enemies.",
+            "",
+            "§7Reduces the damage you take",
+            "§7from withers by §c10%§7.",
+            "",
+            "§9Ancient Bonus",
+            "§7Grants §a+1 §9☠ Crit Damage",
+            "§9§7per §cCatacombs §7level.",
+            "",
+            "§d§l§ka§r §d§l§d§lMYTHIC DUNGEON HELMET §d§l§ka"
+          ],
+          "Name": "§dAncient Necron's Helmet §6✪§6✪§6✪"
+        },
+        "ExtraAttributes": {
+          "rarity_upgrades": 1,
+          "hot_potato_count": 10,
+          "modifier": "ancient",
+          "dungeon_item_level": 3,
+          "originTag": "POWER_WITHER_HELMET",
+          "id": "POWER_WITHER_HELMET",
+          "enchantments": {
+            "thorns": 3,
+            "rejuvenate": 5,
+            "protection": 5,
+            "respiration": 3,
+            "growth": 5,
+            "aqua_affinity": 1
+          },
+          "uuid": "a9adbc00-8eba-413b-aebc-356aeeff1b65",
+          "timestamp": "1/23/21 2:04 PM"
+        }
+      },
+      "Damage": "3s"
+    },
+    {},
+    {
+      "id": "298s",
+      "Count": "1b",
+      "tag": {
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Gear Score: §d597 §8(1612)",
+            "§7Strength: §c+25 §9(Ancient +25) §8(+69.25)",
+            "§7Crit Chance: §c+12% §9(Ancient +12%)",
+            "§7Crit Damage: §c+28% §9(Ancient +28%) §8(+77.56%)",
+            "",
+            "§7Health: §a+222 HP §e(+40 HP) §9(Ancient +7 HP) §8(+614.94 HP)",
+            "§7Defense: §a+122 §e(+20) §9(Ancient +7) §8(+337.94)",
+            "§7Intelligence: §a+120 §9(Ancient +20) §8(+332.4)",
+            "",
+            "§9Growth V, §9Protection V",
+            "",
+            "§6Full Set Bonus: Octodexterity",
+            "§7Every 4th strike, deal §cdouble",
+            "§cdamage §7and apply Venom",
+            "§7reducing healing by §240% §7for",
+            "§7§b4 §7seconds.",
+            "",
+            "§6Piece Bonus: Spider Bulwark",
+            "§7Kill Spiders to accumulate",
+            "§7defense against them.",
+            "§7Piece Bonus: §a+80❈",
+            "§7Next Upgrade: §a+110❈ §8(§a1,331§7/§c2,000§8)",
+            "",
+            "§6Extra Bonus: §aRadioactive",
+            "§c+1% Crit Damage §7per §c10 Strength§7.",
+            "",
+            "§9Ancient Bonus",
+            "§7Grants §a+1 §9☠ Crit Damage",
+            "§9§7per §cCatacombs §7level.",
+            "",
+            "§6§l§ka§r §6§l§6§lLEGENDARY DUNGEON HELMET §6§l§ka"
+          ],
+          "color": 0,
+          "Name": "§6Ancient Tarantula Helmet"
+        },
+        "ExtraAttributes": {
+          "rarity_upgrades": 1,
+          "hot_potato_count": 10,
+          "color": "0:0:0",
+          "modifier": "ancient",
+          "dungeon_item_level": 0,
+          "originTag": "CRAFTING_GRID_COLLECT",
+          "id": "TARANTULA_HELMET",
+          "enchantments": {
+            "growth": 5,
+            "protection": 5
+          },
+          "uuid": "e81b61fa-12cb-4d63-a432-3a1288b779b2",
+          "anvil_uses": 1,
+          "timestamp": "7/25/20 1:05 PM",
+          "spider_kills": 1331
+        }
+      },
+      "Damage": "0s"
+    },
+    {},
+    {
+      "id": "299s",
+      "Count": "1b",
+      "tag": {
+        "ench": [],
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Health: §a+205 HP §9(Loving +10 HP)",
+            "§7Defense: §a+185 §9(Loving +10)",
+            "§7Speed: §a+20",
+            "§7Intelligence: §a+100 §9(Loving +100)",
+            "",
+            "§9Growth V",
+            "§7Grants §a+75 §c❤ Health§7.",
+            "§9Protection V",
+            "§7Grants §a+15 §a❈ Defense§7.",
+            "",
+            "§6Full Set Bonus: Young Blood",
+            "§7Gain §a+70§7 Walk Speed while",
+            "§7you are above §a50%§7 HP.",
+            "§8+100 Walk Speed Cap",
+            "",
+            "§9Loving Bonus",
+            "§7Increases ability damage by",
+            "§7§a5%§7.",
+            "",
+            "§6§lLEGENDARY CHESTPLATE"
+          ],
+          "color": 14542064,
+          "Name": "§6Loving Young Dragon Chestplate"
+        },
+        "ExtraAttributes": {
+          "color": "221:228:240",
+          "bossId": "d94bb84e-9439-4e23-bee5-7976d24f7545",
+          "spawnedFor": "f28411bd-7bdc-469e-87b7-b7cd2488be8e",
+          "modifier": "loving",
+          "originTag": "BOSS_DROP",
+          "id": "YOUNG_DRAGON_CHESTPLATE",
+          "enchantments": {
+            "growth": 5,
+            "protection": 5
+          },
+          "uuid": "c3bd061c-cc61-49d2-a169-9692d941499d",
+          "anvil_uses": 1,
+          "timestamp": "7/7/20 3:40 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "299s",
+      "Count": "1b",
+      "tag": {
+        "ench": [],
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Health: §a+245 HP §e(+40 HP) §9(Loving +10 HP)",
+            "§7Defense: §a+205 §e(+20) §9(Loving +10)",
+            "§7Intelligence: §a+175 §9(Loving +100)",
+            "",
+            "§9§d§lWisdom V",
+            "§7Gain §b5 §7Intelligence for",
+            "§7every §b5 §7levels of exp you",
+            "§7have on you. Capped at §b100",
+            "§b§7Intelligence.",
+            "§9Growth V",
+            "§7Grants §a+75 §c❤ Health§7.",
+            "§9Protection V",
+            "§7Grants §a+15 §a❈ Defense§7.",
+            "",
+            "§6Full Set Bonus: Wise Blood",
+            "§7Abilities have §a2/3 §7of the",
+            "§7mana cost.",
+            "",
+            "§9Loving Bonus",
+            "§7Increases ability damage by",
+            "§7§a5%§7.",
+            "",
+            "§6§lLEGENDARY CHESTPLATE"
+          ],
+          "color": 2748649,
+          "Name": "§6Loving Wise Dragon Chestplate"
+        },
+        "ExtraAttributes": {
+          "hot_potato_count": 10,
+          "color": "41:240:233",
+          "bossId": "74e7f72e-0c8e-48ba-9e43-0ee2e1396aee",
+          "spawnedFor": "72e7c990-15c4-473e-99b2-9b453d338170",
+          "modifier": "loving",
+          "originTag": "BOSS_DROP",
+          "id": "WISE_DRAGON_CHESTPLATE",
+          "enchantments": {
+            "ultimate_wisdom": 5,
+            "protection": 5,
+            "growth": 5
+          },
+          "uuid": "49d068fe-9833-41cf-b1c7-b7f9139637c1",
+          "anvil_uses": 11,
+          "timestamp": "7/27/20 2:49 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "299s",
+      "Count": "1b",
+      "tag": {
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Defense: §a+125",
+            "§7Speed: §a+15",
+            "",
+            "§7Each piece of this armor grants",
+            "§7the ability to §9automatically",
+            "§9mine §a2 §7extra nearby blocks",
+            "§7while mining (very short",
+            "§7cooldown, blocks must require",
+            "§7breaking power of less than 4).",
+            "",
+            "§7§8This item can be reforged!",
+            "§5§lEPIC CHESTPLATE"
+          ],
+          "color": 13428223,
+          "Name": "§5Mineral Chestplate"
+        },
+        "ExtraAttributes": {
+          "color": "204:229:255",
+          "originTag": "MINERAL_CHESTPLATE",
+          "id": "MINERAL_CHESTPLATE",
+          "uuid": "19cd2460-2577-4803-9181-6e571b65f334",
+          "timestamp": "11/16/20 11:30 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "299s",
+      "Count": "1b",
+      "tag": {
+        "ench": [],
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Crit Chance: §c+10% §9(Submerged +10%)",
+            "§7Sea Creature Chance: §c+3.4% §9(Submerged +0.9%)",
+            "",
+            "§7Health: §a+250 HP",
+            "§7Defense: §a+190",
+            "",
+            "§9Growth V",
+            "§7Grants §a+75 §c❤ Health§7.",
+            "§9Protection V",
+            "§7Grants §a+15 §a❈ Defense§7.",
+            "",
+            "§6Full Set Bonus: Absorb",
+            "§7§9Doubles§7 your §a❈ Defense§7",
+            "§7while in water.",
+            "",
+            "§6Full Set Bonus: Reflect",
+            "§7§7Your sharp scales reflect",
+            "§7§915% §7of damage onto the",
+            "§7attacker.",
+            "",
+            "§6§lLEGENDARY CHESTPLATE"
+          ],
+          "color": 11430,
+          "Name": "§6Submerged Shark Scale Chestplate"
+        },
+        "ExtraAttributes": {
+          "color": "0:44:166",
+          "modifier": "submerged",
+          "originTag": "SHARK_SCALE_CHESTPLATE",
+          "id": "SHARK_SCALE_CHESTPLATE",
+          "enchantments": {
+            "protection": 5,
+            "growth": 5
+          },
+          "uuid": "701c3ecc-24bd-43b2-84b3-d207534829e2",
+          "anvil_uses": 1,
+          "timestamp": "10/4/20 8:33 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "299s",
+      "Count": "1b",
+      "tag": {
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Gear Score: §d880 §8(2684)",
+            "§7Health: §a+295 HP §e(+40 HP) §9(Giant +180 HP) §8(+905.65 HP)",
+            "§7Defense: §a+275 §e(+20) §8(+844.25)",
+            "§7Intelligence: §a+50 §8(+153.5)",
+            "§7Ferocity: §a+10 §8(+13)",
+            "",
+            "§9Growth V, §9Protection V",
+            "§9Rejuvenate II",
+            "",
+            "§6Full Set Bonus: Regenerative Howl",
+            "§7Upon activating §c⫽ Ferocity",
+            "§c§7heal players within §925",
+            "§9§7blocks for §910% §7of your §a❈",
+            "§aDefense §7and gain §a50❈ Defense",
+            "§a§7for 5s (stacking).",
+            "",
+            "§6§lLEGENDARY DUNGEON CHESTPLATE"
+          ],
+          "color": 1904901,
+          "Name": "§6Giant Werewolf Chestplate §6✪§6✪§6✪"
+        },
+        "ExtraAttributes": {
+          "hot_potato_count": 10,
+          "color": "29:17:5",
+          "modifier": "giant",
+          "dungeon_item_level": 3,
+          "originTag": "QUICK_CRAFTING",
+          "id": "WEREWOLF_CHESTPLATE",
+          "enchantments": {
+            "rejuvenate": 2,
+            "growth": 5,
+            "protection": 5
+          },
+          "uuid": "c9bc41f3-79ce-45ac-86c7-7524e26f4059",
+          "timestamp": "1/14/21 1:29 AM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "299s",
+      "Count": "1b",
+      "tag": {
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Gear Score: §d940 §8(2872)",
+            "§7Strength: §c+75 §9(Ancient +35) §8(+237.75)",
+            "§7Crit Chance: §c+15% §9(Ancient +15%) §8(+21%)",
+            "§7Crit Damage: §c+58% §9(Ancient +28%) §8(+183.86%)",
+            "",
+            "§7Health: §a+382 HP §e(+40 HP) §9(Ancient +7 HP) §8(+1,210.94 HP)",
+            "§7Defense: §a+182 §e(+20) §9(Ancient +7) §8(+576.94)",
+            "§7Intelligence: §a+35 §9(Ancient +25) §8(+110.95)",
+            "",
+            "§9Growth V, §9Protection V",
+            "§9Rejuvenate V",
+            "",
+            "§6Full Set Bonus: Witherborn",
+            "§7Spawns a wither minion every",
+            "§7§e30 §7seconds up to a maximum",
+            "§7§a1 §7wither. Your withers will",
+            "§7travel to and explode on nearby",
+            "§7enemies.",
+            "",
+            "§7Reduces the damage you take",
+            "§7from withers by §c10%§7.",
+            "",
+            "§9Ancient Bonus",
+            "§7Grants §a+1 §9☠ Crit Damage",
+            "§9§7per §cCatacombs §7level.",
+            "",
+            "§d§l§ka§r §d§l§d§lMYTHIC DUNGEON CHESTPLATE §d§l§ka"
+          ],
+          "color": 15155516,
+          "Name": "§dAncient Necron's Chestplate §6✪§6✪§6✪§6✪"
+        },
+        "ExtraAttributes": {
+          "rarity_upgrades": 1,
+          "hot_potato_count": 10,
+          "color": "231:65:60",
+          "modifier": "ancient",
+          "dungeon_item_level": 4,
+          "originTag": "POWER_WITHER_CHESTPLATE",
+          "id": "POWER_WITHER_CHESTPLATE",
+          "enchantments": {
+            "rejuvenate": 5,
+            "growth": 5,
+            "protection": 5
+          },
+          "uuid": "48b5d7e6-189b-481d-a978-f1279ce7b5b0",
+          "timestamp": "1/20/21 9:28 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "299s",
+      "Count": "1b",
+      "tag": {
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Defense: §a+40",
+            "",
+            "§6Full Set Bonus: Bonus Speed",
+            "§7Increases your §f✦ Speed",
+            "§f§7by §a+20§7 near Farming",
+            "§7Minions or farming islands.",
+            "",
+            "§6Full Set Bonus: Farmer Aura",
+            "§7Regrow an extra crop on",
+            "§7farming islands every §a3",
+            "§a§7seconds.",
+            "",
+            "§7Farming islands:",
+            "§7- §bFarm",
+            "§7- §bThe Barn",
+            "§7- §bMushroom Desert",
+            "",
+            "§7§8This item can be reforged!",
+            "§f§lCOMMON CHESTPLATE"
+          ],
+          "color": 16776960,
+          "Name": "§fFarm Suit Chestplate"
+        },
+        "ExtraAttributes": {
+          "color": "255:255:0",
+          "originTag": "QUICK_CRAFTING",
+          "id": "FARM_SUIT_CHESTPLATE",
+          "uuid": "ab99e7ad-9662-4ec9-844f-db28190dd1ad",
+          "timestamp": "12/19/20 7:44 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "299s",
+      "Count": "1b",
+      "tag": {
+        "ench": [],
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Health: §a+207 HP §9(Wise +12 HP)",
+            "§7Defense: §a+115",
+            "§7Speed: §a+2 §9(Wise +2)",
+            "§7Intelligence: §a+200 §9(Wise +100)",
+            "",
+            "§9Growth V",
+            "§7Grants §a+75 §c❤ Health§7.",
+            "§9Protection V",
+            "§7Grants §a+15 §a❈ Defense§7.",
+            "",
+            "§6Full Set Bonus: Octodexterity",
+            "§7Every 4th strike, deal §cdouble",
+            "§cdamage §7and apply Venom",
+            "§7reducing healing by §240% §7for",
+            "§7§b4 §7seconds.",
+            "",
+            "§6Piece Bonus: Spider Bulwark",
+            "§7Kill Spiders to accumulate",
+            "§7defense against them.",
+            "§7Piece Bonus: §a+80❈",
+            "§7Next Upgrade: §a+110❈ §8(§a1,109§7/§c2,000§8)",
+            "",
+            "§6Extra Bonus: §aAnti-Toxin",
+            "§7Immune to healing reduction.",
+            "",
+            "§5§lEPIC CHESTPLATE"
+          ],
+          "color": 0,
+          "Name": "§5Wise Tarantula Chestplate"
+        },
+        "ExtraAttributes": {
+          "color": "0:0:0",
+          "modifier": "wise",
+          "originTag": "CRAFTING_GRID_COLLECT",
+          "id": "TARANTULA_CHESTPLATE",
+          "enchantments": {
+            "growth": 5,
+            "protection": 5
+          },
+          "uuid": "8f29079f-da02-432c-8e82-53daebd34355",
+          "anvil_uses": 1,
+          "timestamp": "7/10/20 1:04 PM",
+          "spider_kills": 1109
+        }
+      },
+      "Damage": "0s"
+    },
+    {},
+    {
+      "id": "300s",
+      "Count": "1b",
+      "tag": {
+        "ench": [],
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Health: §a+175 HP",
+            "§7Defense: §a+155",
+            "§7Speed: §a+20",
+            "§7Intelligence: §a+150 §9(Necrotic +150)",
+            "",
+            "§9Growth V",
+            "§7Grants §a+75 §c❤ Health§7.",
+            "§9Protection V",
+            "§7Grants §a+15 §a❈ Defense§7.",
+            "",
+            "§6Full Set Bonus: Young Blood",
+            "§7Gain §a+70§7 Walk Speed while",
+            "§7you are above §a50%§7 HP.",
+            "§8+100 Walk Speed Cap",
+            "",
+            "§6§lLEGENDARY LEGGINGS"
+          ],
+          "color": 14542064,
+          "Name": "§6Necrotic Young Dragon Leggings"
+        },
+        "ExtraAttributes": {
+          "color": "221:228:240",
+          "bossId": "95477a32-b773-4725-8e14-5033f323eb5d",
+          "spawnedFor": "559b3816-586c-4db5-909f-b0ca4f2b56e8",
+          "modifier": "necrotic",
+          "originTag": "BOSS_DROP",
+          "id": "YOUNG_DRAGON_LEGGINGS",
+          "enchantments": {
+            "growth": 5,
+            "protection": 5
+          },
+          "uuid": "87dd417a-77c3-4a2e-999c-a9523b7a5af1",
+          "anvil_uses": 1,
+          "timestamp": "7/7/20 2:35 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "300s",
+      "Count": "1b",
+      "tag": {
+        "ench": [],
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Health: §a+215 HP §e(+40 HP)",
+            "§7Defense: §a+175 §e(+20)",
+            "§7Intelligence: §a+225 §9(Necrotic +150)",
+            "",
+            "§9Growth V",
+            "§7Grants §a+75 §c❤ Health§7.",
+            "§9Protection V",
+            "§7Grants §a+15 §a❈ Defense§7.",
+            "",
+            "§6Full Set Bonus: Wise Blood",
+            "§7Abilities have §a2/3 §7of the",
+            "§7mana cost.",
+            "",
+            "§6§lLEGENDARY LEGGINGS"
+          ],
+          "color": 2748649,
+          "Name": "§6Necrotic Wise Dragon Leggings"
+        },
+        "ExtraAttributes": {
+          "hot_potato_count": 10,
+          "color": "41:240:233",
+          "bossId": "557cef99-d95b-43d0-a1cb-f2d98b890f15",
+          "spawnedFor": "1ec81092-97fb-407a-85ab-2007c3d457ab",
+          "modifier": "necrotic",
+          "originTag": "BOSS_DROP",
+          "id": "WISE_DRAGON_LEGGINGS",
+          "enchantments": {
+            "protection": 5,
+            "growth": 5
+          },
+          "uuid": "418ad700-e9e6-4869-aea7-31f976351486",
+          "anvil_uses": 11,
+          "timestamp": "7/13/20 9:19 AM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "300s",
+      "Count": "1b",
+      "tag": {
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Defense: §a+125",
+            "§7Speed: §a+15",
+            "",
+            "§7Each piece of this armor grants",
+            "§7the ability to §9automatically",
+            "§9mine §a2 §7extra nearby blocks",
+            "§7while mining (very short",
+            "§7cooldown, blocks must require",
+            "§7breaking power of less than 4).",
+            "",
+            "§7§8This item can be reforged!",
+            "§5§lEPIC LEGGINGS"
+          ],
+          "color": 13428223,
+          "Name": "§5Mineral Leggings"
+        },
+        "ExtraAttributes": {
+          "color": "204:229:255",
+          "originTag": "MINERAL_LEGGINGS",
+          "id": "MINERAL_LEGGINGS",
+          "uuid": "2d57707b-e676-46b5-bdd1-7e28c4bd54b0",
+          "timestamp": "11/16/20 11:30 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "300s",
+      "Count": "1b",
+      "tag": {
+        "ench": [],
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Strength: §c+25 §9(Ancient +25)",
+            "§7Crit Chance: §c+12% §9(Ancient +12%)",
+            "§7Crit Damage: §c+28% §9(Ancient +28%)",
+            "§7Sea Creature Chance: §c+2.5%",
+            "",
+            "§7Health: §a+232 HP §9(Ancient +7 HP)",
+            "§7Defense: §a+172 §9(Ancient +7)",
+            "§7Intelligence: §a+20 §9(Ancient +20)",
+            "",
+            "§9Growth V",
+            "§7Grants §a+75 §c❤ Health§7.",
+            "§9Protection V",
+            "§7Grants §a+15 §a❈ Defense§7.",
+            "",
+            "§6Full Set Bonus: Absorb",
+            "§7§9Doubles§7 your §a❈ Defense§7",
+            "§7while in water.",
+            "",
+            "§6Full Set Bonus: Reflect",
+            "§7§7Your sharp scales reflect",
+            "§7§915% §7of damage onto the",
+            "§7attacker.",
+            "",
+            "§9Ancient Bonus",
+            "§7Grants §a+1 §9☠ Crit Damage",
+            "§9§7per §cCatacombs §7level.",
+            "",
+            "§6§lLEGENDARY LEGGINGS"
+          ],
+          "color": 11430,
+          "Name": "§6Ancient Shark Scale Leggings"
+        },
+        "ExtraAttributes": {
+          "color": "0:44:166",
+          "modifier": "ancient",
+          "originTag": "SHARK_SCALE_LEGGINGS",
+          "id": "SHARK_SCALE_LEGGINGS",
+          "enchantments": {
+            "protection": 5,
+            "growth": 5
+          },
+          "uuid": "27fcfbd9-25ea-4026-b74c-3f37e36be18f",
+          "anvil_uses": 1,
+          "timestamp": "10/4/20 7:31 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "300s",
+      "Count": "1b",
+      "tag": {
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Gear Score: §d722 §8(2302)",
+            "§7Strength: §c+25 §9(Ancient +25) §8(+81.75)",
+            "§7Crit Chance: §c+12% §9(Ancient +12%) §8(+18%)",
+            "§7Crit Damage: §c+28% §9(Ancient +28%) §8(+91.56%)",
+            "",
+            "§7Health: §a+122 HP §e(+40 HP) §9(Ancient +7 HP) §8(+398.94 HP)",
+            "§7Defense: §a+242 §e(+20) §9(Ancient +7) §8(+791.34)",
+            "§7Intelligence: §a+70 §9(Ancient +20) §8(+228.9)",
+            "§7Ferocity: §a+10 §8(+15)",
+            "",
+            "§9Growth V, §9Protection V",
+            "§9Rejuvenate V",
+            "",
+            "§6Full Set Bonus: Regenerative Howl",
+            "§7Upon activating §c⫽ Ferocity",
+            "§c§7heal players within §925",
+            "§9§7blocks for §910% §7of your §a❈",
+            "§aDefense §7and gain §a50❈ Defense",
+            "§a§7for 5s (stacking).",
+            "",
+            "§9Ancient Bonus",
+            "§7Grants §a+1 §9☠ Crit Damage",
+            "§9§7per §cCatacombs §7level.",
+            "",
+            "§6§lLEGENDARY DUNGEON LEGGINGS"
+          ],
+          "color": 1904901,
+          "Name": "§6Ancient Werewolf Leggings §6✪§6✪§6✪§6✪§6✪"
+        },
+        "ExtraAttributes": {
+          "hot_potato_count": 10,
+          "color": "29:17:5",
+          "modifier": "ancient",
+          "dungeon_item_level": 5,
+          "originTag": "QUICK_CRAFTING",
+          "id": "WEREWOLF_LEGGINGS",
+          "enchantments": {
+            "rejuvenate": 5,
+            "growth": 5,
+            "protection": 5
+          },
+          "uuid": "c0f7e84b-c3ad-47ca-8348-6c2582387dec",
+          "anvil_uses": 2,
+          "timestamp": "11/2/20 7:15 AM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "300s",
+      "Count": "1b",
+      "tag": {
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Gear Score: §d886 §8(2602)",
+            "§7Strength: §c+75 §9(Ancient +35) §8(+230.25)",
+            "§7Crit Chance: §c+15% §9(Ancient +15%) §8(+19.5%)",
+            "§7Crit Damage: §c+58% §9(Ancient +28%) §8(+178.06%)",
+            "",
+            "§7Health: §a+352 HP §e(+40 HP) §9(Ancient +7 HP) §8(+1,080.64 HP)",
+            "§7Defense: §a+167 §e(+20) §9(Ancient +7) §8(+512.69)",
+            "§7Intelligence: §a+35 §9(Ancient +25) §8(+107.45)",
+            "",
+            "§9Growth V, §9Protection V",
+            "§9Thorns III",
+            "",
+            "§6Full Set Bonus: Witherborn",
+            "§7Spawns a wither minion every",
+            "§7§e30 §7seconds up to a maximum",
+            "§7§a1 §7wither. Your withers will",
+            "§7travel to and explode on nearby",
+            "§7enemies.",
+            "",
+            "§7Reduces the damage you take",
+            "§7from withers by §c10%§7.",
+            "",
+            "§9Ancient Bonus",
+            "§7Grants §a+1 §9☠ Crit Damage",
+            "§9§7per §cCatacombs §7level.",
+            "",
+            "§d§l§ka§r §d§l§d§lMYTHIC DUNGEON LEGGINGS §d§l§ka"
+          ],
+          "color": 15162428,
+          "Name": "§dAncient Necron's Leggings §6✪§6✪§6✪"
+        },
+        "ExtraAttributes": {
+          "rarity_upgrades": 1,
+          "hot_potato_count": 10,
+          "color": "231:92:60",
+          "modifier": "ancient",
+          "dungeon_item_level": 3,
+          "originTag": "POWER_WITHER_LEGGINGS",
+          "id": "POWER_WITHER_LEGGINGS",
+          "enchantments": {
+            "thorns": 3,
+            "protection": 5,
+            "growth": 5
+          },
+          "uuid": "56535a12-200c-4b5a-97a6-d3bd60123f36",
+          "timestamp": "1/23/21 4:14 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "300s",
+      "Count": "1b",
+      "tag": {
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Defense: §a+30",
+            "",
+            "§6Full Set Bonus: Bonus Speed",
+            "§7Increases your §f✦ Speed",
+            "§f§7by §a+20§7 near Farming",
+            "§7Minions or farming islands.",
+            "",
+            "§6Full Set Bonus: Farmer Aura",
+            "§7Regrow an extra crop on",
+            "§7farming islands every §a3",
+            "§a§7seconds.",
+            "",
+            "§7Farming islands:",
+            "§7- §bFarm",
+            "§7- §bThe Barn",
+            "§7- §bMushroom Desert",
+            "",
+            "§7§8This item can be reforged!",
+            "§f§lCOMMON LEGGINGS"
+          ],
+          "color": 16776960,
+          "Name": "§fFarm Suit Leggings"
+        },
+        "ExtraAttributes": {
+          "color": "255:255:0",
+          "originTag": "QUICK_CRAFTING",
+          "id": "FARM_SUIT_LEGGINGS",
+          "uuid": "8177c49b-43b0-4c19-9a43-c3b952f06033",
+          "timestamp": "12/19/20 7:44 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "300s",
+      "Count": "1b",
+      "tag": {
+        "ench": [],
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Health: §a+147 HP §9(Wise +12 HP)",
+            "§7Defense: §a+35",
+            "§7Speed: §a+2 §9(Wise +2)",
+            "§7Intelligence: §a+100 §9(Wise +100)",
+            "",
+            "§9Growth V",
+            "§7Grants §a+75 §c❤ Health§7.",
+            "§9Protection V",
+            "§7Grants §a+15 §a❈ Defense§7.",
+            "",
+            "§6Full Set Bonus: Octodexterity",
+            "§7Every 4th strike, deal §cdouble",
+            "§cdamage §7and apply Venom",
+            "§7reducing healing by §240% §7for",
+            "§7§b4 §7seconds.",
+            "",
+            "§6Piece Bonus: Spider Bulwark",
+            "§7Kill Spiders to accumulate",
+            "§7defense against them.",
+            "§7Piece Bonus: §a+80❈",
+            "§7Next Upgrade: §a+110❈ §8(§a1,109§7/§c2,000§8)",
+            "",
+            "§5§lEPIC LEGGINGS"
+          ],
+          "color": 0,
+          "Name": "§5Wise Tarantula Leggings"
+        },
+        "ExtraAttributes": {
+          "color": "0:0:0",
+          "modifier": "wise",
+          "originTag": "CRAFTING_GRID_COLLECT",
+          "id": "TARANTULA_LEGGINGS",
+          "enchantments": {
+            "growth": 5,
+            "protection": 5
+          },
+          "uuid": "6bc542fe-f0ad-4fb7-bf92-f4f116e6c481",
+          "anvil_uses": 1,
+          "timestamp": "3/13/20 7:54 PM",
+          "spider_kills": 1109
+        }
+      },
+      "Damage": "0s"
+    },
+    {},
+    {
+      "id": "301s",
+      "Count": "1b",
+      "tag": {
+        "ench": [],
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Health: §a+60 HP",
+            "§7Defense: §a+90",
+            "§7Speed: §a+20",
+            "",
+            "§9Frost Walker II",
+            "§7Ice blocks will be created below",
+            "§7you when you walk above water in",
+            "§7a radius of §a2 §7blocks.",
+            "",
+            "§6Full Set Bonus: Young Blood",
+            "§7Gain §a+70§7 Walk Speed while",
+            "§7you are above §a50%§7 HP.",
+            "§8+100 Walk Speed Cap",
+            "",
+            "§7§8This item can be reforged!",
+            "§6§lLEGENDARY BOOTS"
+          ],
+          "color": 14542064,
+          "Name": "§6Young Dragon Boots"
+        },
+        "ExtraAttributes": {
+          "color": "221:228:240",
+          "bossId": "788b5897-e906-4014-b16c-d8441c8e5098",
+          "spawnedFor": "c136d4fc-361b-4be4-b272-3c67202ff19e",
+          "originTag": "BOSS_DROP",
+          "id": "YOUNG_DRAGON_BOOTS",
+          "enchantments": {
+            "frost_walker": 2
+          },
+          "uuid": "fbbb0244-6058-416f-9163-a6d27e1e54bd",
+          "anvil_uses": 1,
+          "timestamp": "11/4/20 3:02 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "301s",
+      "Count": "1b",
+      "tag": {
+        "ench": [],
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Health: §a+175 HP §e(+40 HP)",
+            "§7Defense: §a+125 §e(+20)",
+            "§7Intelligence: §a+225 §9(Necrotic +150)",
+            "",
+            "§9Feather Falling X",
+            "§7Increases how high you can fall",
+            "§7before taking fall damage by",
+            "§7§a10§7 and reduces fall damage",
+            "§7by §a50%§7.",
+            "§9Growth V",
+            "§7Grants §a+75 §c❤ Health§7.",
+            "§9Protection V",
+            "§7Grants §a+15 §a❈ Defense§7.",
+            "§9Thorns III",
+            "§7Grants a §a50% §7chance to",
+            "§7rebound §a9% §7of damage dealt",
+            "§7back at the attacker.",
+            "",
+            "§d◆ §cR§6a§ei§an§bb§9o§dw§9 Rune II",
+            "§8Requires level 20",
+            "",
+            "§6Full Set Bonus: Wise Blood",
+            "§7Abilities have §a2/3 §7of the",
+            "§7mana cost.",
+            "",
+            "§6§lLEGENDARY BOOTS"
+          ],
+          "color": 6497149,
+          "Name": "§6Necrotic Wise Dragon Boots"
+        },
+        "ExtraAttributes": {
+          "hot_potato_count": 10,
+          "color": "99:35:125",
+          "runes": {
+            "RAINBOW": 2
+          },
+          "bossId": "7318f98b-0c7b-4f01-9cdb-43eb76f17e3b",
+          "spawnedFor": "cdd25312-d760-482e-8119-bf60b3d536ac",
+          "modifier": "necrotic",
+          "originTag": "BOSS_DROP",
+          "id": "WISE_DRAGON_BOOTS",
+          "enchantments": {
+            "thorns": 3,
+            "feather_falling": 10,
+            "growth": 5,
+            "protection": 5
+          },
+          "uuid": "fe571fdc-a048-4eb4-8672-42e2e9dc7304",
+          "anvil_uses": 12,
+          "timestamp": "6/24/20 11:51 AM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "301s",
+      "Count": "1b",
+      "tag": {
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Defense: §a+70",
+            "§7Speed: §a+10",
+            "",
+            "§7Each piece of this armor grants",
+            "§7the ability to §9automatically",
+            "§9mine §a2 §7extra nearby blocks",
+            "§7while mining (very short",
+            "§7cooldown, blocks must require",
+            "§7breaking power of less than 4).",
+            "",
+            "§7§8This item can be reforged!",
+            "§5§lEPIC BOOTS"
+          ],
+          "color": 13428223,
+          "Name": "§5Mineral Boots"
+        },
+        "ExtraAttributes": {
+          "color": "204:229:255",
+          "originTag": "MINERAL_BOOTS",
+          "id": "MINERAL_BOOTS",
+          "uuid": "4b4fe079-67c4-42b2-9c4f-d994f1e270b6",
+          "timestamp": "11/16/20 11:30 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "301s",
+      "Count": "1b",
+      "tag": {
+        "ench": [],
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Strength: §c+25 §9(Ancient +25)",
+            "§7Crit Chance: §c+12% §9(Ancient +12%)",
+            "§7Crit Damage: §c+28% §9(Ancient +28%)",
+            "§7Sea Creature Chance: §c+2.5%",
+            "",
+            "§7Health: §a+182 HP §9(Ancient +7 HP)",
+            "§7Defense: §a+122 §9(Ancient +7)",
+            "§7Intelligence: §a+20 §9(Ancient +20)",
+            "",
+            "§9Growth V",
+            "§7Grants §a+75 §c❤ Health§7.",
+            "§9Protection V",
+            "§7Grants §a+15 §a❈ Defense§7.",
+            "",
+            "§6Full Set Bonus: Absorb",
+            "§7§9Doubles§7 your §a❈ Defense§7",
+            "§7while in water.",
+            "",
+            "§6Full Set Bonus: Reflect",
+            "§7§7Your sharp scales reflect",
+            "§7§915% §7of damage onto the",
+            "§7attacker.",
+            "",
+            "§9Ancient Bonus",
+            "§7Grants §a+1 §9☠ Crit Damage",
+            "§9§7per §cCatacombs §7level.",
+            "",
+            "§6§lLEGENDARY BOOTS"
+          ],
+          "color": 11430,
+          "Name": "§6Ancient Shark Scale Boots"
+        },
+        "ExtraAttributes": {
+          "color": "0:44:166",
+          "modifier": "ancient",
+          "originTag": "SHARK_SCALE_BOOTS",
+          "id": "SHARK_SCALE_BOOTS",
+          "enchantments": {
+            "protection": 5,
+            "growth": 5
+          },
+          "uuid": "ca61a61a-260f-4309-b015-af5b4b6422f0",
+          "anvil_uses": 1,
+          "timestamp": "10/4/20 7:20 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "301s",
+      "Count": "1b",
+      "tag": {
+        "ench": [
+          {
+            "lvl": "3s",
+            "id": "8s"
+          }
+        ],
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Gear Score: §d652 §8(2109)",
+            "§7Health: §a+295 HP §e(+40 HP) §9(Giant +180 HP) §8(+964.65 HP)",
+            "§7Defense: §a+160 §e(+20) §8(+523.2)",
+            "§7Intelligence: §a+50 §8(+163.5)",
+            "§7Ferocity: §a+10 §8(+15)",
+            "",
+            "§9Depth Strider III, §9Growth V",
+            "§9Protection V",
+            "",
+            "§6Full Set Bonus: Regenerative Howl",
+            "§7Upon activating §c⫽ Ferocity",
+            "§c§7heal players within §925",
+            "§9§7blocks for §910% §7of your §a❈",
+            "§aDefense §7and gain §a50❈ Defense",
+            "§a§7for 5s (stacking).",
+            "",
+            "§6§lLEGENDARY DUNGEON BOOTS"
+          ],
+          "color": 1904901,
+          "Name": "§6Giant Werewolf Boots §6✪§6✪§6✪§6✪§6✪"
+        },
+        "ExtraAttributes": {
+          "hot_potato_count": 10,
+          "color": "29:17:5",
+          "modifier": "giant",
+          "dungeon_item_level": 5,
+          "originTag": "CRAFTING_GRID_COLLECT",
+          "id": "WEREWOLF_BOOTS",
+          "enchantments": {
+            "depth_strider": 3,
+            "protection": 5,
+            "growth": 5
+          },
+          "uuid": "5b8e0ae8-71ee-4e24-ac7c-9a9a13f8ffb4",
+          "timestamp": "1/26/21 8:06 AM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "301s",
+      "Count": "1b",
+      "tag": {
+        "ench": [
+          {
+            "lvl": "3s",
+            "id": "8s"
+          }
+        ],
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Gear Score: §d742 §8(2117)",
+            "§7Strength: §c+75 §9(Ancient +35) §8(+230.25)",
+            "§7Crit Chance: §c+15% §9(Ancient +15%) §8(+19.5%)",
+            "§7Crit Damage: §c+58% §9(Ancient +28%) §8(+178.06%)",
+            "",
+            "§7Health: §a+267 HP §e(+40 HP) §9(Ancient +7 HP) §8(+819.69 HP)",
+            "§7Defense: §a+127 §e(+20) §9(Ancient +7) §8(+389.89)",
+            "§7Intelligence: §a+35 §9(Ancient +25) §8(+107.45)",
+            "",
+            "§9Depth Strider III, §9Feather Falling X",
+            "§9Growth V, §9Protection V",
+            "§9Rejuvenate V, §9Thorns III",
+            "",
+            "§6Full Set Bonus: Witherborn",
+            "§7Spawns a wither minion every",
+            "§7§e30 §7seconds up to a maximum",
+            "§7§a1 §7wither. Your withers will",
+            "§7travel to and explode on nearby",
+            "§7enemies.",
+            "",
+            "§7Reduces the damage you take",
+            "§7from withers by §c10%§7.",
+            "",
+            "§9Ancient Bonus",
+            "§7Grants §a+1 §9☠ Crit Damage",
+            "§9§7per §cCatacombs §7level.",
+            "",
+            "§d§l§ka§r §d§l§d§lMYTHIC DUNGEON BOOTS §d§l§ka"
+          ],
+          "color": 15167036,
+          "Name": "§dAncient Necron's Boots §6✪§6✪§6✪"
+        },
+        "ExtraAttributes": {
+          "rarity_upgrades": 1,
+          "hot_potato_count": 10,
+          "color": "231:110:60",
+          "modifier": "ancient",
+          "dungeon_item_level": 3,
+          "originTag": "POWER_WITHER_BOOTS",
+          "id": "POWER_WITHER_BOOTS",
+          "enchantments": {
+            "depth_strider": 3,
+            "thorns": 3,
+            "feather_falling": 10,
+            "rejuvenate": 5,
+            "protection": 5,
+            "growth": 5
+          },
+          "uuid": "5f2f92b9-3264-4d07-bb3b-f55718f7f33f",
+          "timestamp": "1/17/21 8:25 AM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "301s",
+      "Count": "1b",
+      "tag": {
+        "ench": [],
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Crit Chance: §c+2% §9(Light +2%)",
+            "§7Crit Damage: §c+4% §9(Light +4%)",
+            "§7Bonus Attack Speed: §c+4% §9(Light +4%)",
+            "",
+            "§7Health: §a+190 HP §9(Light +15 HP)",
+            "§7Defense: §a+165 §9(Light +4)",
+            "§7Speed: §a+206 §9(Light +4)",
+            "",
+            "§9Growth V",
+            "§7Grants §a+75 §c❤ Health§7.",
+            "§9Protection V",
+            "§7Grants §a+15 §a❈ Defense§7.",
+            "",
+            "§f◆ Sparkling Rune I",
+            "§8Requires level 11",
+            "",
+            "§7These boots gain §a+2 §a❈",
+            "§aDefense §7and §a+4 §f✦ Speed",
+            "§f§7for every Farming Skill level",
+            "§7you have.",
+            "",
+            "§6Item Ability: Farmer's Speed §e§lLEFT CLICK",
+            "§7Change your speed cap",
+            "",
+            "§6Item Ability: Farmer's Grace",
+            "§7Crops won't trample while",
+            "§7wearing",
+            "",
+            "§7Bonus Defense: §a76",
+            "§7Bonus Speed: §a152",
+            "",
+            "§7Current Speed Cap: §a360",
+            "",
+            "§5§lEPIC BOOTS"
+          ],
+          "color": 13391104,
+          "Name": "§5Light Rancher's Boots"
+        },
+        "ExtraAttributes": {
+          "color": "204:85:0",
+          "runes": {
+            "SPARKLING": 1
+          },
+          "modifier": "light",
+          "ranchers_speed": 360,
+          "originTag": "RANCHERS_BOOTS",
+          "id": "RANCHERS_BOOTS",
+          "enchantments": {
+            "growth": 5,
+            "protection": 5
+          },
+          "uuid": "e0f0160e-3aeb-4253-88ae-44c937e263e4",
+          "anvil_uses": 1,
+          "timestamp": "7/8/20 12:50 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "301s",
+      "Count": "1b",
+      "tag": {
+        "ench": [],
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Health: §a+157 HP §9(Wise +12 HP)",
+            "§7Defense: §a+115",
+            "§7Speed: §a+7 §9(Wise +2)",
+            "§7Intelligence: §a+150 §9(Wise +100)",
+            "",
+            "§9Growth V",
+            "§7Grants §a+75 §c❤ Health§7.",
+            "§9Protection V",
+            "§7Grants §a+15 §a❈ Defense§7.",
+            "",
+            "§6Full Set Bonus: Octodexterity",
+            "§7Every 4th strike, deal §cdouble",
+            "§cdamage §7and apply Venom",
+            "§7reducing healing by §240% §7for",
+            "§7§b4 §7seconds.",
+            "",
+            "§6Piece Bonus: Spider Bulwark",
+            "§7Kill Spiders to accumulate",
+            "§7defense against them.",
+            "§7Piece Bonus: §a+80❈",
+            "§7Next Upgrade: §a+110❈ §8(§a1,113§7/§c2,000§8)",
+            "",
+            "§6Item Ability: Double Jump",
+            "§7Allows you to double jump!",
+            "§8Mana Cost: §340",
+            "",
+            "§5§lEPIC BOOTS"
+          ],
+          "color": 0,
+          "Name": "§5Wise Tarantula Boots"
+        },
+        "ExtraAttributes": {
+          "color": "0:0:0",
+          "modifier": "wise",
+          "originTag": "CRAFTING_GRID_SHIFT",
+          "id": "TARANTULA_BOOTS",
+          "enchantments": {
+            "protection": 5,
+            "growth": 5
+          },
+          "uuid": "c9a4402d-7260-4afb-b7da-e52db3c05956",
+          "anvil_uses": 1,
+          "timestamp": "7/4/20 4:57 PM",
+          "spider_kills": 1113
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "397s",
+      "Count": "1b",
+      "tag": {
+        "HideFlags": 254,
+        "SkullOwner": {
+          "Id": "870c288a-d7fc-36a8-b4a6-6d563936c274",
+          "Properties": {
+            "textures": [
+              {
+                "Value": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGJmNTZjNjU0MWMxMjY2ZmZjNDYzNTEwYmRiNTVhZWY5MzE1YWY1NDg4OThjZjVkM2NiYTFiNWI0YzAxIn19fQ"
+              }
+            ]
+          }
+        },
+        "display": {
+          "Lore": [
+            "§7Health: §a+70 HP",
+            "§7Intelligence: §a+89 §9(Necrotic +90)",
+            "§7Mining Speed: §a+10",
+            "",
+            "§6Full Set Bonus: Smart Miner",
+            "§7Converts your Intelligence",
+            "§7§7into Mining Speed§7. +§61",
+            "§6Mining Speed §7for every §b15",
+            "§bIntelligence §7removed.",
+            "",
+            "§9§lRARE HELMET"
+          ],
+          "Name": "§9Necrotic Goblin Helmet"
+        },
+        "ExtraAttributes": {
+          "modifier": "necrotic",
+          "originTag": "UNKNOWN",
+          "id": "GOBLIN_HELMET",
+          "uuid": "7f709cb7-0107-40da-9ae3-7bae3ac7f27c",
+          "timestamp": "1/15/21 4:44 PM"
+        }
+      },
+      "Damage": "3s"
+    },
+    {
+      "id": "174s",
+      "Count": "1b",
+      "tag": {
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Defense: §a+70",
+            "§7Speed: §a+10",
+            "§7Mining Speed: §a+10",
+            "",
+            "§6Full Set Bonus: Expert Miner",
+            "§7Grants §6+2⸕ Mining Speed §7for",
+            "§7each of your mining levels.",
+            "",
+            "§7The Defense §7of this item is",
+            "§7doubled while on a mining island",
+            "",
+            "§7§8This item can be reforged!",
+            "§5§lEPIC HELMET"
+          ],
+          "Name": "§5Glacite Helmet"
+        },
+        "ExtraAttributes": {
+          "originTag": "UNKNOWN",
+          "id": "GLACITE_HELMET",
+          "uuid": "91d9587c-d974-4fb7-bd7f-af223250a085",
+          "timestamp": "1/22/21 7:35 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "397s",
+      "Count": "1b",
+      "tag": {
+        "ench": [],
+        "HideFlags": 254,
+        "SkullOwner": {
+          "Id": "32f2d048-af64-3e8c-b37a-3ab4213bd22b",
+          "Properties": {
+            "textures": [
+              {
+                "Value": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjIyZjY3ZTVmZTViYWRiM2EwYzIzMTg2MGQyYjY4NjgyY2VkNGFmZTkyZjhkMWFkZjgyMmNlOWNkNGIwYTc0MCJ9fX0K"
+              }
+            ]
+          }
+        },
+        "display": {
+          "Lore": [
+            "§7§8Puppy Skin",
+            "",
+            "§7Strength: §c+8 §9(Fierce +8)",
+            "§7Crit Chance: §c+5% §9(Fierce +5%)",
+            "§7Crit Damage: §c+14% §9(Fierce +14%)",
+            "",
+            "§7Health: §a+575 HP",
+            "§7Defense: §a-1,000,000",
+            "§7Intelligence: §a+125",
+            "",
+            "§9Growth V",
+            "§7Grants §a+75 §c❤ Health§7.",
+            "",
+            "§6Full Set Bonus: Absolute Unit",
+            "§c+50❤ §7per §c1% Crit Damage",
+            "§7Regain §c2% §7of §cmax ❤ §7when hit. §8(1s cd)",
+            "§7Receive §a-20% §7damage from wolves.",
+            "§7Your crit damage is §950% §7less effective.",
+            "",
+            "§5§lEPIC HELMET"
+          ],
+          "Name": "§5Fierce Mastiff Crown ✦"
+        },
+        "ExtraAttributes": {
+          "modifier": "fierce",
+          "skin": "MASTIFF_PUPPY",
+          "originTag": "CRAFTING_GRID_SHIFT",
+          "id": "MASTIFF_HELMET",
+          "enchantments": {
+            "growth": 5
+          },
+          "uuid": "30681ca7-361e-4e96-89a7-3b868ac98bfc",
+          "anvil_uses": 1,
+          "timestamp": "4/15/20 12:04 PM"
+        }
+      },
+      "Damage": "3s"
+    },
+    {
+      "id": "397s",
+      "Count": "1b",
+      "tag": {
+        "ench": [
+          {
+            "lvl": "3s",
+            "id": "5s"
+          },
+          {
+            "lvl": "1s",
+            "id": "6s"
+          }
+        ],
+        "HideFlags": 254,
+        "SkullOwner": {
+          "Id": "c671b34e-b143-30f3-b66d-5311f48fefc6",
+          "Properties": {
+            "textures": [
+              {
+                "Value": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHBzOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzc4YmM2NTUxYmViMjE0OGQ5MzliNjk5MjUxNDBkMjM3OWZlMGZhYjZlN2QzMWY2NWRmNTBiNTllOWY3N2EwZTQifX19"
+              }
+            ]
+          }
+        },
+        "display": {
+          "Lore": [
+            "§7Strength: §c+35 §9(Fierce +10)",
+            "§7Crit Chance: §c+6% §9(Fierce +6%)",
+            "§7Crit Damage: §c+18% §9(Fierce +18%)",
+            "",
+            "§7Health: §a+145 HP",
+            "§7Defense: §a+125",
+            "",
+            "§9Aqua Affinity I",
+            "§7Increases your underwater mining",
+            "§7rate.",
+            "§9Growth V",
+            "§7Grants §a+75 §c❤ Health§7.",
+            "§9Protection V",
+            "§7Grants §a+15 §a❈ Defense§7.",
+            "§9Respiration III",
+            "§7Extends your underwater",
+            "§7breathing time by §a45s§7.",
+            "",
+            "§6Full Set Bonus: Strong Blood",
+            "§7Improves §9Aspect of the End",
+            "§8⋗ §c+75 Damage",
+            "",
+            "§7Instant Transmission:",
+            "§8⋗ §a+2 §7teleport range",
+            "§8⋗ §a+3 §7seconds",
+            "§8⋗ §c+5❁ Strength §7on cast",
+            "",
+            "§6§lLEGENDARY HELMET"
+          ],
+          "Name": "§6Fierce Strong Dragon Helmet"
+        },
+        "ExtraAttributes": {
+          "bossId": "e33518a7-18f8-427d-82a0-0a268329d6ce",
+          "spawnedFor": "5ebb65c9-9b8f-4ab7-bfb7-5254911567f5",
+          "modifier": "fierce",
+          "originTag": "BOSS_DROP",
+          "id": "STRONG_DRAGON_HELMET",
+          "enchantments": {
+            "growth": 5,
+            "protection": 5,
+            "respiration": 3,
+            "aqua_affinity": 1
+          },
+          "uuid": "1d51e365-bbdb-4763-a34e-53e277cee5ce",
+          "anvil_uses": 1,
+          "timestamp": "2/17/20 3:31 AM"
+        }
+      },
+      "Damage": "3s"
+    },
+    {
+      "id": "397s",
+      "Count": "1b",
+      "tag": {
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§f§lCOMMON"
+          ],
+          "Name": "§fnull"
+        },
+        "ExtraAttributes": {
+          "id": "SKULL_ITEM:3"
+        }
+      },
+      "Damage": "3s"
+    },
+    {
+      "id": "298s",
+      "Count": "1b",
+      "tag": {
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Sea Creature Chance: §c+1.5%",
+            "",
+            "§7Health: §a+50 HP",
+            "§7Defense: §a+100",
+            "",
+            "§6Item Ability: Water Burst §e§lSNEAK",
+            "§7When wearing the full set,",
+            "§7grants the wearer with the",
+            "§7ability to §aburst forward§7",
+            "§7when sneaking in water.",
+            "§8Mana Cost: §320",
+            "",
+            "§7§8This item can be reforged!",
+            "§5§lEPIC HELMET"
+          ],
+          "color": 12663823,
+          "Name": "§5Salmon Helmet"
+        },
+        "ExtraAttributes": {
+          "color": "193:60:15",
+          "originTag": "CRAFTING_GRID_COLLECT",
+          "id": "SALMON_HELMET",
+          "uuid": "7205de18-b80c-4a88-ac05-b5c318f7b6e3",
+          "timestamp": "11/26/20 8:57 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "298s",
+      "Count": "1b",
+      "tag": {
+        "ench": [],
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Health: §a+75 HP",
+            "§7Defense: §a+35",
+            "§7Intelligence: §a+185 §9(Necrotic +120)",
+            "",
+            "§9Growth V",
+            "§7Grants §a+75 §c❤ Health§7.",
+            "§9Protection V",
+            "§7Grants §a+15 §a❈ Defense§7.",
+            "",
+            "§6Full Set Bonus: Refraction",
+            "§7The stats of this armor change",
+            "§7from §a0§7 to §a200%§7 depending",
+            "§7on the current light level.",
+            "",
+            "§7Current Light Level",
+            "§c0§8 (12.5%)",
+            "",
+            "§5§lEPIC HELMET"
+          ],
+          "color": 16577535,
+          "Name": "§5Necrotic Crystal Helmet"
+        },
+        "ExtraAttributes": {
+          "color": "252:243:255",
+          "modifier": "necrotic",
+          "originTag": "QUICK_CRAFTING",
+          "id": "CRYSTAL_HELMET",
+          "enchantments": {
+            "protection": 5,
+            "growth": 5
+          },
+          "uuid": "53c31ab0-7a1d-4e9f-a229-6bde433cdc07",
+          "anvil_uses": 2,
+          "timestamp": "5/16/20 6:49 AM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "397s",
+      "Count": "1b",
+      "tag": {
+        "ench": [],
+        "HideFlags": 254,
+        "SkullOwner": {
+          "Id": "18bb99e0-16d9-3b46-a412-b8b87d6847f5",
+          "Properties": {
+            "textures": [
+              {
+                "Value": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTgzYjNmMDRmYzE2YmMyYzJjYjM2YTEyMDQ0MjY1YjBiOTMzZjNkZmEyYjM0MmViNDU3OThmZjdkNzE1YjBkOCJ9fX0="
+              }
+            ]
+          }
+        },
+        "display": {
+          "Lore": [
+            "§7Health: §a+150 HP",
+            "§7Defense: §a+60",
+            "§7Intelligence: §a+300 §9(Necrotic +150)",
+            "",
+            "§9Growth V",
+            "§7Grants §a+75 §c❤ Health§7.",
+            "§9Protection V",
+            "§7Grants §a+15 §a❈ Defense§7.",
+            "",
+            "§7This armor piece grants §a2x",
+            "§a§7item stats during the night or",
+            "§7§a3x §7during the §6Spooky",
+            "§6Festival§7! Additionally, it",
+            "§7gives a §a+5% §7chance to get",
+            "§7Candy from mobs during the",
+            "§7event.",
+            "",
+            "§6Full Set Bonus: Bat Powers Activate!",
+            "§7Upgrades your grappling hook and",
+            "§7turns you into a true vigilante!",
+            "§7Grants a §a+5% §7chance to find",
+            "§7rare Candy.",
+            "",
+            "§7§8§oYou are the hero this world",
+            "§8§oneeds.",
+            "",
+            "§6§lLEGENDARY HELMET"
+          ],
+          "Name": "§6Necrotic Bat Person Helmet"
+        },
+        "ExtraAttributes": {
+          "modifier": "necrotic",
+          "originTag": "QUICK_CRAFTING",
+          "id": "BAT_PERSON_HELMET",
+          "enchantments": {
+            "protection": 5,
+            "growth": 5
+          },
+          "uuid": "10983702-ef71-49be-b1db-892b80ec1f1a",
+          "anvil_uses": 1,
+          "timestamp": "8/11/20 4:26 PM"
+        }
+      },
+      "Damage": "3s"
+    },
+    {
+      "id": "397s",
+      "Count": "1b",
+      "tag": {
+        "HideFlags": 254,
+        "SkullOwner": {
+          "Id": "564f289a-f6ef-31a7-83d2-bce309d814f8",
+          "Properties": {
+            "textures": [
+              {
+                "Value": "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2QxMTE5NjQzY2VjZmJlMDA0MTQxYTFlYTQwNjJmODMxNWNhNzhlNTAzOTU4YWM1MDUwNWU4NTkyYzQ0YTYwMSJ9fX0="
+              }
+            ]
+          }
+        },
+        "display": {
+          "Lore": [
+            "§7Health: §a+70 HP",
+            "§7Defense: §a+30",
+            "",
+            "§6Full Set Bonus: Cold Thumb",
+            "§7Allows the wearer to shoot",
+            "§7unlimited snowballs when using",
+            "§7§9Frosty the Snow Cannon§7.",
+            "",
+            "§7Each piece grants a §a5% §7bonus",
+            "§7gift chance for every present",
+            "§7you earn from the §cGift Attack",
+            "§c§7minigame!",
+            "",
+            "§7All stats of this armor piece",
+            "§7are doubled while on the Winter",
+            "§7Island!",
+            "",
+            "§7§8This item can be reforged!",
+            "§5§lEPIC HELMET"
+          ],
+          "Name": "§5Snow Suit Helmet"
+        },
+        "ExtraAttributes": {
+          "originTag": "UNKNOWN",
+          "id": "SNOW_SUIT_HELMET",
+          "uuid": "6a3ea372-1c84-4ac0-9813-571aa5309c9f",
+          "timestamp": "6/22/20 5:43 PM"
+        }
+      },
+      "Damage": "3s"
+    },
+    {
+      "id": "299s",
+      "Count": "1b",
+      "tag": {
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Health: §a+140 HP",
+            "§7Intelligence: §a+89 §9(Necrotic +90)",
+            "§7Mining Speed: §a+10",
+            "",
+            "§6Full Set Bonus: Smart Miner",
+            "§7Converts your Intelligence",
+            "§7§7into Mining Speed§7. +§61",
+            "§6Mining Speed §7for every §b15",
+            "§bIntelligence §7removed.",
+            "",
+            "§9§lRARE CHESTPLATE"
+          ],
+          "color": 3649602,
+          "Name": "§9Necrotic Goblin Chestplate"
+        },
+        "ExtraAttributes": {
+          "color": "55:176:66",
+          "modifier": "necrotic",
+          "originTag": "UNKNOWN",
+          "id": "GOBLIN_CHESTPLATE",
+          "uuid": "c34a6542-cb62-4d12-bdda-bbe468799f63",
+          "timestamp": "1/15/21 4:37 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "299s",
+      "Count": "1b",
+      "tag": {
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Defense: §a+150",
+            "§7Speed: §a+15",
+            "§7Mining Speed: §a+10",
+            "",
+            "§6Full Set Bonus: Expert Miner",
+            "§7Grants §6+2⸕ Mining Speed §7for",
+            "§7each of your mining levels.",
+            "",
+            "§7The Defense §7of this item is",
+            "§7doubled while on a mining island",
+            "",
+            "§7§8This item can be reforged!",
+            "§5§lEPIC CHESTPLATE"
+          ],
+          "color": 261368,
+          "Name": "§5Glacite Chestplate"
+        },
+        "ExtraAttributes": {
+          "color": "3:252:248",
+          "originTag": "UNKNOWN",
+          "id": "GLACITE_CHESTPLATE",
+          "uuid": "1350835c-ff8d-4c85-9bc7-ea6dcad50d1f",
+          "timestamp": "1/22/21 7:20 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "315s",
+      "Count": "1b",
+      "tag": {
+        "ench": [],
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Strength: §c+8 §9(Fierce +8)",
+            "§7Crit Chance: §c+5% §9(Fierce +5%)",
+            "§7Crit Damage: §c+14% §9(Fierce +14%)",
+            "",
+            "§7Health: §a+579 HP §e(+4 HP)",
+            "§7Defense: §a-999,998 §e(+2)",
+            "§7True Defense: §a+5",
+            "",
+            "§9Growth V",
+            "§7Grants §a+75 §c❤ Health§7.",
+            "§9True Protection I",
+            "§7Grants §f+5❂ True Defense§7.",
+            "",
+            "§6Full Set Bonus: Absolute Unit",
+            "§c+50❤ §7per §c1% Crit Damage",
+            "§7Regain §c2% §7of §cmax ❤ §7when hit. §8(1s cd)",
+            "§7Receive §a-20% §7damage from wolves.",
+            "§7Your crit damage is §950% §7less effective.",
+            "",
+            "§5§lEPIC CHESTPLATE"
+          ],
+          "Name": "§5Fierce Mastiff Chestplate"
+        },
+        "ExtraAttributes": {
+          "hot_potato_count": 1,
+          "modifier": "fierce",
+          "originTag": "CRAFTING_GRID_SHIFT",
+          "id": "MASTIFF_CHESTPLATE",
+          "enchantments": {
+            "true_protection": 1,
+            "growth": 5
+          },
+          "uuid": "84428e29-d02f-4ecd-a3bc-32aa33fd23f9",
+          "anvil_uses": 3,
+          "timestamp": "4/15/20 12:04 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "299s",
+      "Count": "1b",
+      "tag": {
+        "ench": [],
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Strength: §c+35 §9(Fierce +10)",
+            "§7Crit Chance: §c+6% §9(Fierce +6%)",
+            "§7Crit Damage: §c+18% §9(Fierce +18%)",
+            "",
+            "§7Health: §a+223 HP §e(+28 HP)",
+            "§7Defense: §a+189 §e(+14)",
+            "",
+            "§9Growth V",
+            "§7Grants §a+75 §c❤ Health§7.",
+            "§9Protection V",
+            "§7Grants §a+15 §a❈ Defense§7.",
+            "",
+            "§6Full Set Bonus: Strong Blood",
+            "§7Improves §9Aspect of the End",
+            "§8⋗ §c+75 Damage",
+            "",
+            "§7Instant Transmission:",
+            "§8⋗ §a+2 §7teleport range",
+            "§8⋗ §a+3 §7seconds",
+            "§8⋗ §c+5❁ Strength §7on cast",
+            "",
+            "§6§lLEGENDARY CHESTPLATE"
+          ],
+          "color": 14229057,
+          "Name": "§6Fierce Strong Dragon Chestplate"
+        },
+        "ExtraAttributes": {
+          "hot_potato_count": 7,
+          "color": "217:30:65",
+          "bossId": "eb26ab15-00c2-49ed-a266-c028dc3d046d",
+          "spawnedFor": "27985f4e-dbcd-4907-8057-b9a9e180df83",
+          "modifier": "fierce",
+          "originTag": "BOSS_DROP",
+          "id": "STRONG_DRAGON_CHESTPLATE",
+          "enchantments": {
+            "growth": 5,
+            "protection": 5
+          },
+          "uuid": "570af181-5f5b-48e4-8f1f-b607359f3fb5",
+          "anvil_uses": 8,
+          "timestamp": "7/8/20 1:45 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "299s",
+      "Count": "1b",
+      "tag": {
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Gear Score: §d525 §8(1408)",
+            "§7Crit Chance: §c+5%",
+            "§7Crit Damage: §c+53% §8(+146.81%)",
+            "",
+            "§7Health: §a+156 HP §9(Wise +15 HP) §8(+432.12 HP)",
+            "§7Defense: §a+119 §8(+329.63)",
+            "§7Speed: §a+2 §9(Wise +2) §8(+5.54)",
+            "§7Intelligence: §a+125 §9(Wise +125) §8(+346.25)",
+            "",
+            "§9Growth V, §9Protection V",
+            "§9Thorns III",
+            "",
+            "§7Increase the damage you deal",
+            "§7with arrows by §c5%§7.",
+            "§7Your bows don't consume arrows.",
+            "§6Full Set Bonus: Skeleton Master",
+            "§7Increase the damage you deal",
+            "§7with arrows by §c25%§7.",
+            "",
+            "§aPerfect 52500 / 52500",
+            "§6§lLEGENDARY DUNGEON CHESTPLATE"
+          ],
+          "color": 16739083,
+          "Name": "§6Wise Skeleton Master Chestplate"
+        },
+        "ExtraAttributes": {
+          "color": "255:107:11",
+          "baseStatBoostPercentage": 50,
+          "modifier": "wise",
+          "originTag": "UNKNOWN",
+          "id": "SKELETON_MASTER_CHESTPLATE",
+          "enchantments": {
+            "thorns": 3,
+            "protection": 5,
+            "growth": 5
+          },
+          "uuid": "9a78646c-eb3c-442e-946f-504514aa7772",
+          "item_tier": 7,
+          "timestamp": "2/1/21 9:40 AM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "299s",
+      "Count": "1b",
+      "tag": {
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Sea Creature Chance: §c+1.5%",
+            "",
+            "§7Health: §a+150 HP",
+            "§7Defense: §a+70",
+            "",
+            "§6Item Ability: Water Burst §e§lSNEAK",
+            "§7When wearing the full set,",
+            "§7grants the wearer with the",
+            "§7ability to §aburst forward§7",
+            "§7when sneaking in water.",
+            "§8Mana Cost: §320",
+            "",
+            "§7§8This item can be reforged!",
+            "§5§lEPIC CHESTPLATE"
+          ],
+          "color": 11021174,
+          "Name": "§5Salmon Chestplate"
+        },
+        "ExtraAttributes": {
+          "color": "168:43:118",
+          "originTag": "CRAFTING_GRID_COLLECT",
+          "id": "SALMON_CHESTPLATE",
+          "uuid": "2f5c6b56-5259-4d7f-8a9e-6c8f0fb6ca3d",
+          "timestamp": "11/26/20 8:58 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "299s",
+      "Count": "1b",
+      "tag": {
+        "ench": [],
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Health: §a+8 HP §9(Loving +8 HP)",
+            "§7Defense: §a+57 §9(Loving +7)",
+            "§7Intelligence: §a+200 §9(Loving +80)",
+            "",
+            "§9Protection V",
+            "§7Grants §a+15 §a❈ Defense§7.",
+            "§9Thorns III",
+            "§7Grants a §a50% §7chance to",
+            "§7rebound §a9% §7of damage dealt",
+            "§7back at the attacker.",
+            "",
+            "§6Full Set Bonus: Refraction",
+            "§7The stats of this armor change",
+            "§7from §a0§7 to §a200%§7 depending",
+            "§7on the current light level.",
+            "",
+            "§7Current Light Level",
+            "§c0§8 (12.5%)",
+            "",
+            "§9Loving Bonus",
+            "§7Increases ability damage by",
+            "§7§a5%§7.",
+            "",
+            "§5§lEPIC CHESTPLATE"
+          ],
+          "color": 16577535,
+          "Name": "§5Loving Crystal Chestplate"
+        },
+        "ExtraAttributes": {
+          "color": "252:243:255",
+          "modifier": "loving",
+          "originTag": "QUICK_CRAFTING",
+          "id": "CRYSTAL_CHESTPLATE",
+          "enchantments": {
+            "thorns": 3,
+            "protection": 5
+          },
+          "uuid": "f6b709f3-c2a8-49d9-a418-6f4ae6b5d1e0",
+          "timestamp": "6/14/20 6:07 AM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "299s",
+      "Count": "1b",
+      "tag": {
+        "ench": [],
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Health: §a+170 HP §9(Loving +10 HP)",
+            "§7Defense: §a+110 §9(Loving +10)",
+            "§7Intelligence: §a+200 §9(Loving +100)",
+            "",
+            "§9Growth V",
+            "§7Grants §a+75 §c❤ Health§7.",
+            "§9Protection V",
+            "§7Grants §a+15 §a❈ Defense§7.",
+            "",
+            "§7This armor piece grants §a2x",
+            "§a§7item stats during the night or",
+            "§7§a3x §7during the §6Spooky",
+            "§6Festival§7! Additionally, it",
+            "§7gives a §a+5% §7chance to get",
+            "§7Candy from mobs during the",
+            "§7event.",
+            "",
+            "§6Full Set Bonus: Bat Powers Activate!",
+            "§7Upgrades your grappling hook and",
+            "§7turns you into a true vigilante!",
+            "§7Grants a §a+5% §7chance to find",
+            "§7rare Candy.",
+            "",
+            "§7§8§oYou are the hero this world",
+            "§8§oneeds.",
+            "",
+            "§9Loving Bonus",
+            "§7Increases ability damage by",
+            "§7§a5%§7.",
+            "",
+            "§6§lLEGENDARY CHESTPLATE"
+          ],
+          "color": 0,
+          "Name": "§6Loving Bat Person Chestplate"
+        },
+        "ExtraAttributes": {
+          "color": "0:0:0",
+          "modifier": "loving",
+          "originTag": "CRAFTING_GRID_COLLECT",
+          "id": "BAT_PERSON_CHESTPLATE",
+          "enchantments": {
+            "growth": 5,
+            "protection": 5
+          },
+          "uuid": "c2aa9916-32d9-4ef5-a18c-aedcf10202c6",
+          "anvil_uses": 1,
+          "timestamp": "7/21/20 11:07 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "299s",
+      "Count": "1b",
+      "tag": {
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Health: §a+100 HP",
+            "§7Defense: §a+40",
+            "",
+            "§6Full Set Bonus: Cold Thumb",
+            "§7Allows the wearer to shoot",
+            "§7unlimited snowballs when using",
+            "§7§9Frosty the Snow Cannon§7.",
+            "",
+            "§7Each piece grants a §a5% §7bonus",
+            "§7gift chance for every present",
+            "§7you earn from the §cGift Attack",
+            "§c§7minigame!",
+            "",
+            "§7All stats of this armor piece",
+            "§7are doubled while on the Winter",
+            "§7Island!",
+            "",
+            "§7§8This item can be reforged!",
+            "§5§lEPIC CHESTPLATE"
+          ],
+          "color": 16777215,
+          "Name": "§5Snow Suit Chestplate"
+        },
+        "ExtraAttributes": {
+          "color": "255:255:255",
+          "originTag": "UNKNOWN",
+          "id": "SNOW_SUIT_CHESTPLATE",
+          "uuid": "196116d6-03b9-4cf1-9f63-b1f56306363c",
+          "timestamp": "7/13/20 5:55 AM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "300s",
+      "Count": "1b",
+      "tag": {
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Health: §a+125 HP",
+            "§7Intelligence: §a+89 §9(Necrotic +90)",
+            "§7Mining Speed: §a+10",
+            "",
+            "§6Full Set Bonus: Smart Miner",
+            "§7Converts your Intelligence",
+            "§7§7into Mining Speed§7. +§61",
+            "§6Mining Speed §7for every §b15",
+            "§bIntelligence §7removed.",
+            "",
+            "§9§lRARE LEGGINGS"
+          ],
+          "color": 3649602,
+          "Name": "§9Necrotic Goblin Leggings"
+        },
+        "ExtraAttributes": {
+          "color": "55:176:66",
+          "modifier": "necrotic",
+          "originTag": "UNKNOWN",
+          "id": "GOBLIN_LEGGINGS",
+          "uuid": "34717418-2165-4671-afb7-ba9b39adad50",
+          "timestamp": "1/15/21 4:31 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "300s",
+      "Count": "1b",
+      "tag": {
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Defense: §a+125",
+            "§7Speed: §a+15",
+            "§7Mining Speed: §a+10",
+            "",
+            "§6Full Set Bonus: Expert Miner",
+            "§7Grants §6+2⸕ Mining Speed §7for",
+            "§7each of your mining levels.",
+            "",
+            "§7The Defense §7of this item is",
+            "§7doubled while on a mining island",
+            "",
+            "§7§8This item can be reforged!",
+            "§5§lEPIC LEGGINGS"
+          ],
+          "color": 261368,
+          "Name": "§5Glacite Leggings"
+        },
+        "ExtraAttributes": {
+          "color": "3:252:248",
+          "originTag": "UNKNOWN",
+          "id": "GLACITE_LEGGINGS",
+          "uuid": "e2ddc278-b861-4c4e-9794-b78eb2c82e3c",
+          "timestamp": "1/16/21 12:55 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "312s",
+      "Count": "1b",
+      "tag": {
+        "ench": [],
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Strength: §c+8 §9(Fierce +8)",
+            "§7Crit Chance: §c+5% §9(Fierce +5%)",
+            "§7Crit Damage: §c+14% §9(Fierce +14%)",
+            "",
+            "§7Health: §a+575 HP",
+            "§7Defense: §a-1,000,000",
+            "",
+            "§9Growth V",
+            "§7Grants §a+75 §c❤ Health§7.",
+            "",
+            "§6Full Set Bonus: Absolute Unit",
+            "§c+50❤ §7per §c1% Crit Damage",
+            "§7Regain §c2% §7of §cmax ❤ §7when hit. §8(1s cd)",
+            "§7Receive §a-20% §7damage from wolves.",
+            "§7Your crit damage is §950% §7less effective.",
+            "",
+            "§5§lEPIC LEGGINGS"
+          ],
+          "Name": "§5Fierce Mastiff Leggings"
+        },
+        "ExtraAttributes": {
+          "modifier": "fierce",
+          "originTag": "CRAFTING_GRID_COLLECT",
+          "id": "MASTIFF_LEGGINGS",
+          "enchantments": {
+            "growth": 5
+          },
+          "uuid": "26716fd9-5627-4846-8497-c403cade3971",
+          "anvil_uses": 1,
+          "timestamp": "6/4/20 10:26 AM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "300s",
+      "Count": "1b",
+      "tag": {
+        "ench": [],
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Strength: §c+35 §9(Fierce +10)",
+            "§7Crit Chance: §c+6% §9(Fierce +6%)",
+            "§7Crit Damage: §c+18% §9(Fierce +18%)",
+            "",
+            "§7Health: §a+175 HP",
+            "§7Defense: §a+155",
+            "",
+            "§9Growth V",
+            "§7Grants §a+75 §c❤ Health§7.",
+            "§9Protection V",
+            "§7Grants §a+15 §a❈ Defense§7.",
+            "",
+            "§6Full Set Bonus: Strong Blood",
+            "§7Improves §9Aspect of the End",
+            "§8⋗ §c+75 Damage",
+            "",
+            "§7Instant Transmission:",
+            "§8⋗ §a+2 §7teleport range",
+            "§8⋗ §a+3 §7seconds",
+            "§8⋗ §c+5❁ Strength §7on cast",
+            "",
+            "§6§lLEGENDARY LEGGINGS"
+          ],
+          "color": 2031664,
+          "Name": "§6Fierce Strong Dragon Leggings"
+        },
+        "ExtraAttributes": {
+          "color": "31:0:48",
+          "bossId": "e9c8e709-40e0-488c-91cd-8fb1be7d017e",
+          "spawnedFor": "a8fc7d1a-1367-4bb5-97eb-2f707a4a61f7",
+          "modifier": "fierce",
+          "originTag": "BOSS_DROP",
+          "id": "STRONG_DRAGON_LEGGINGS",
+          "enchantments": {
+            "growth": 5,
+            "protection": 5
+          },
+          "uuid": "ed5df8f2-a97d-482f-9d89-383995a7d5b9",
+          "anvil_uses": 1,
+          "timestamp": "6/25/20 10:24 AM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "300s",
+      "Count": "1b",
+      "tag": {
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Gear Score: §d472 §8(1245)",
+            "§7Strength: §c+10 §9(Mythic +10) §8(+27.7)",
+            "§7Crit Chance: §c+10% §9(Mythic +5%)",
+            "§7Crit Damage: §c+48% §8(+132.96%)",
+            "",
+            "§7Health: §a+139 HP §9(Mythic +10 HP) §8(+385.03 HP)",
+            "§7Defense: §a+112 §9(Mythic +10) §8(+310.24)",
+            "§7Speed: §a+2 §9(Mythic +2) §8(+5.54)",
+            "§7Intelligence: §a+50 §9(Mythic +50) §8(+138.5)",
+            "",
+            "§9Growth V, §9Protection V",
+            "§9Thorns III",
+            "",
+            "§7Increase the damage you deal",
+            "§7with arrows by §c5%§7.",
+            "§6Full Set Bonus: Skeleton Master",
+            "§7Increase the damage you deal",
+            "§7with arrows by §c25%§7.",
+            "",
+            "§aPerfect 52500 / 52500",
+            "§6§lLEGENDARY DUNGEON LEGGINGS"
+          ],
+          "color": 16739083,
+          "Name": "§6Mythic Skeleton Master Leggings"
+        },
+        "ExtraAttributes": {
+          "color": "255:107:11",
+          "baseStatBoostPercentage": 50,
+          "modifier": "mythic",
+          "originTag": "UNKNOWN",
+          "id": "SKELETON_MASTER_LEGGINGS",
+          "enchantments": {
+            "thorns": 3,
+            "protection": 5,
+            "growth": 5
+          },
+          "uuid": "0edbec1d-6a41-4eab-abae-89457d9f92e5",
+          "item_tier": 6,
+          "timestamp": "1/10/21 4:56 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "300s",
+      "Count": "1b",
+      "tag": {
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Sea Creature Chance: §c+1.5%",
+            "",
+            "§7Health: §a+125 HP",
+            "§7Defense: §a+40",
+            "",
+            "§6Item Ability: Water Burst §e§lSNEAK",
+            "§7When wearing the full set,",
+            "§7grants the wearer with the",
+            "§7ability to §aburst forward§7",
+            "§7when sneaking in water.",
+            "§8Mana Cost: §320",
+            "",
+            "§7§8This item can be reforged!",
+            "§5§lEPIC LEGGINGS"
+          ],
+          "color": 11021174,
+          "Name": "§5Salmon Leggings"
+        },
+        "ExtraAttributes": {
+          "color": "168:43:118",
+          "originTag": "CRAFTING_GRID_COLLECT",
+          "id": "SALMON_LEGGINGS",
+          "uuid": "7297b0ae-db6e-4325-956c-1272540549e1",
+          "timestamp": "11/26/20 8:58 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "300s",
+      "Count": "1b",
+      "tag": {
+        "ench": [],
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Health: §a+75 HP",
+            "§7Defense: §a+45",
+            "§7Intelligence: §a+220 §9(Necrotic +120)",
+            "",
+            "§9Growth V",
+            "§7Grants §a+75 §c❤ Health§7.",
+            "§9Protection V",
+            "§7Grants §a+15 §a❈ Defense§7.",
+            "",
+            "§6Full Set Bonus: Refraction",
+            "§7The stats of this armor change",
+            "§7from §a0§7 to §a200%§7 depending",
+            "§7on the current light level.",
+            "",
+            "§7Current Light Level",
+            "§c0§8 (12.5%)",
+            "",
+            "§5§lEPIC LEGGINGS"
+          ],
+          "color": 16577535,
+          "Name": "§5Necrotic Crystal Leggings"
+        },
+        "ExtraAttributes": {
+          "color": "252:243:255",
+          "modifier": "necrotic",
+          "originTag": "QUICK_CRAFTING",
+          "id": "CRYSTAL_LEGGINGS",
+          "enchantments": {
+            "protection": 5,
+            "growth": 5
+          },
+          "uuid": "75e6f516-8c88-44f1-8854-31bab611198f",
+          "anvil_uses": 2,
+          "timestamp": "5/14/20 5:52 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "300s",
+      "Count": "1b",
+      "tag": {
+        "ench": [],
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Health: §a+150 HP",
+            "§7Defense: §a+80",
+            "§7Intelligence: §a+300 §9(Necrotic +150)",
+            "",
+            "§9Growth V",
+            "§7Grants §a+75 §c❤ Health§7.",
+            "§9Protection V",
+            "§7Grants §a+15 §a❈ Defense§7.",
+            "§9Thorns III",
+            "§7Grants a §a50% §7chance to",
+            "§7rebound §a9% §7of damage dealt",
+            "§7back at the attacker.",
+            "",
+            "§7This armor piece grants §a2x",
+            "§a§7item stats during the night or",
+            "§7§a3x §7during the §6Spooky",
+            "§6Festival§7! Additionally, it",
+            "§7gives a §a+5% §7chance to get",
+            "§7Candy from mobs during the",
+            "§7event.",
+            "",
+            "§6Full Set Bonus: Bat Powers Activate!",
+            "§7Upgrades your grappling hook and",
+            "§7turns you into a true vigilante!",
+            "§7Grants a §a+5% §7chance to find",
+            "§7rare Candy.",
+            "",
+            "§7§8§oYou are the hero this world",
+            "§8§oneeds.",
+            "",
+            "§6§lLEGENDARY LEGGINGS"
+          ],
+          "color": 0,
+          "Name": "§6Necrotic Bat Person Leggings"
+        },
+        "ExtraAttributes": {
+          "color": "0:0:0",
+          "modifier": "necrotic",
+          "originTag": "QUICK_CRAFTING",
+          "id": "BAT_PERSON_LEGGINGS",
+          "enchantments": {
+            "thorns": 3,
+            "growth": 5,
+            "protection": 5
+          },
+          "uuid": "d848edc4-2181-43a1-92db-8382fd018794",
+          "anvil_uses": 1,
+          "timestamp": "8/11/20 3:18 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "300s",
+      "Count": "1b",
+      "tag": {
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Health: §a+87 HP §9(Wise +12 HP)",
+            "§7Defense: §a+30",
+            "§7Speed: §a+2 §9(Wise +2)",
+            "§7Intelligence: §a+100 §9(Wise +100)",
+            "",
+            "§6Full Set Bonus: Cold Thumb",
+            "§7Allows the wearer to shoot",
+            "§7unlimited snowballs when using",
+            "§7§9Frosty the Snow Cannon§7.",
+            "",
+            "§7Each piece grants a §a5% §7bonus",
+            "§7gift chance for every present",
+            "§7you earn from the §cGift Attack",
+            "§c§7minigame!",
+            "",
+            "§7All stats of this armor piece",
+            "§7are doubled while on the Winter",
+            "§7Island!",
+            "",
+            "§5§lEPIC LEGGINGS"
+          ],
+          "color": 16777215,
+          "Name": "§5Wise Snow Suit Leggings"
+        },
+        "ExtraAttributes": {
+          "color": "255:255:255",
+          "modifier": "wise",
+          "originTag": "UNKNOWN",
+          "id": "SNOW_SUIT_LEGGINGS",
+          "uuid": "d40095a9-d626-416d-9701-2f4b2dbdf1e6",
+          "timestamp": "6/27/20 6:38 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "301s",
+      "Count": "1b",
+      "tag": {
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Health: §a+60 HP",
+            "§7Intelligence: §a+89 §9(Necrotic +90)",
+            "§7Mining Speed: §a+10",
+            "",
+            "§6Full Set Bonus: Smart Miner",
+            "§7Converts your Intelligence",
+            "§7§7into Mining Speed§7. +§61",
+            "§6Mining Speed §7for every §b15",
+            "§bIntelligence §7removed.",
+            "",
+            "§9§lRARE BOOTS"
+          ],
+          "color": 3649602,
+          "Name": "§9Necrotic Goblin Boots"
+        },
+        "ExtraAttributes": {
+          "color": "55:176:66",
+          "modifier": "necrotic",
+          "originTag": "UNKNOWN",
+          "id": "GOBLIN_BOOTS",
+          "uuid": "d4140474-fce5-4bc1-a259-775ab6fa1f8c",
+          "timestamp": "1/15/21 4:34 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "301s",
+      "Count": "1b",
+      "tag": {
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Defense: §a+70",
+            "§7Speed: §a+10",
+            "§7Mining Speed: §a+10",
+            "",
+            "§6Full Set Bonus: Expert Miner",
+            "§7Grants §6+2⸕ Mining Speed §7for",
+            "§7each of your mining levels.",
+            "",
+            "§7The Defense §7of this item is",
+            "§7doubled while on a mining island",
+            "",
+            "§7§8This item can be reforged!",
+            "§5§lEPIC BOOTS"
+          ],
+          "color": 261368,
+          "Name": "§5Glacite Boots"
+        },
+        "ExtraAttributes": {
+          "color": "3:252:248",
+          "originTag": "UNKNOWN",
+          "id": "GLACITE_BOOTS",
+          "uuid": "37d2415c-73b4-4541-941f-f52da713158d",
+          "timestamp": "1/22/21 4:48 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "313s",
+      "Count": "1b",
+      "tag": {
+        "ench": [
+          {
+            "lvl": "3s",
+            "id": "8s"
+          }
+        ],
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Strength: §c+8 §9(Fierce +8)",
+            "§7Crit Chance: §c+5% §9(Fierce +5%)",
+            "§7Crit Damage: §c+14% §9(Fierce +14%)",
+            "",
+            "§7Health: §a+575 HP",
+            "§7Defense: §a-1,000,000",
+            "§7Intelligence: §a+25",
+            "",
+            "§9Depth Strider III",
+            "§7Reduces how much you are slowed",
+            "§7in the water by §a100%§7.",
+            "§9Feather Falling IX",
+            "§7Increases how high you can fall",
+            "§7before taking fall damage by",
+            "§7§a9§7 and reduces fall damage by",
+            "§7§a45%§7.",
+            "§9Growth V",
+            "§7Grants §a+75 §c❤ Health§7.",
+            "",
+            "§6Full Set Bonus: Absolute Unit",
+            "§c+50❤ §7per §c1% Crit Damage",
+            "§7Regain §c2% §7of §cmax ❤ §7when hit. §8(1s cd)",
+            "§7Receive §a-20% §7damage from wolves.",
+            "§7Your crit damage is §950% §7less effective.",
+            "",
+            "§5§lEPIC BOOTS"
+          ],
+          "Name": "§5Fierce Mastiff Boots"
+        },
+        "ExtraAttributes": {
+          "modifier": "fierce",
+          "originTag": "CRAFTING_GRID_COLLECT",
+          "id": "MASTIFF_BOOTS",
+          "enchantments": {
+            "depth_strider": 3,
+            "feather_falling": 9,
+            "growth": 5
+          },
+          "uuid": "4018bda9-8231-42cf-a2f9-b06b7ed1714c",
+          "anvil_uses": 2,
+          "timestamp": "7/19/20 1:20 AM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "301s",
+      "Count": "1b",
+      "tag": {
+        "ench": [
+          {
+            "lvl": "3s",
+            "id": "8s"
+          }
+        ],
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Strength: §c+35 §9(Fierce +10)",
+            "§7Crit Chance: §c+6% §9(Fierce +6%)",
+            "§7Crit Damage: §c+18% §9(Fierce +18%)",
+            "",
+            "§7Health: §a+135 HP",
+            "§7Defense: §a+105",
+            "",
+            "§9Depth Strider III",
+            "§7Reduces how much you are slowed",
+            "§7in the water by §a100%§7.",
+            "§9Feather Falling V",
+            "§7Increases how high you can fall",
+            "§7before taking fall damage by",
+            "§7§a5§7 and reduces fall damage by",
+            "§7§a25%§7.",
+            "§9Growth V",
+            "§7Grants §a+75 §c❤ Health§7.",
+            "§9Protection V",
+            "§7Grants §a+15 §a❈ Defense§7.",
+            "",
+            "§6Full Set Bonus: Strong Blood",
+            "§7Improves §9Aspect of the End",
+            "§8⋗ §c+75 Damage",
+            "",
+            "§7Instant Transmission:",
+            "§8⋗ §a+2 §7teleport range",
+            "§8⋗ §a+3 §7seconds",
+            "§8⋗ §c+5❁ Strength §7on cast",
+            "",
+            "§6§lLEGENDARY BOOTS"
+          ],
+          "color": 2031664,
+          "Name": "§6Fierce Strong Dragon Boots"
+        },
+        "ExtraAttributes": {
+          "color": "31:0:48",
+          "bossId": "f24c9dde-41e0-4583-a513-c18912c54cd1",
+          "spawnedFor": "49751937-5aec-4167-a8e3-99211d74c230",
+          "modifier": "fierce",
+          "originTag": "BOSS_DROP",
+          "id": "STRONG_DRAGON_BOOTS",
+          "enchantments": {
+            "depth_strider": 3,
+            "feather_falling": 5,
+            "growth": 5,
+            "protection": 5
+          },
+          "uuid": "f605e3bd-c378-4ae0-a546-fca2a043b408",
+          "anvil_uses": 1,
+          "timestamp": "5/2/20 7:26 AM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "301s",
+      "Count": "1b",
+      "tag": {
+        "ench": [
+          {
+            "lvl": "3s",
+            "id": "8s"
+          }
+        ],
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Gear Score: §d385 §8(951)",
+            "§7Strength: §c+8 §9(Pure +8) §8(+22.16)",
+            "§7Crit Chance: §c+15% §9(Pure +10%)",
+            "§7Crit Damage: §c+56% §9(Pure +8%) §8(+155.12%)",
+            "§7Bonus Attack Speed: §c+4% §9(Pure +4%)",
+            "",
+            "§7Health: §a+115 HP §9(Pure +8 HP) §8(+318.55 HP)",
+            "§7Defense: §a+74 §9(Pure +8) §8(+204.98)",
+            "§7Speed: §a+1 §9(Pure +1) §8(+2.77)",
+            "§7Intelligence: §a+8 §9(Pure +8) §8(+22.16)",
+            "",
+            "§9Depth Strider III, §9Feather Falling V",
+            "§9Growth V, §9Protection V",
+            "§9Thorns III",
+            "",
+            "§7Increase the damage you deal",
+            "§7with arrows by §c5%§7.",
+            "§6Full Set Bonus: Skeleton Master",
+            "§7Increase the damage you deal",
+            "§7with arrows by §c25%§7.",
+            "",
+            "§aPerfect 52500 / 52500",
+            "§6§lLEGENDARY DUNGEON BOOTS"
+          ],
+          "color": 16739083,
+          "Name": "§6Pure Skeleton Master Boots"
+        },
+        "ExtraAttributes": {
+          "color": "255:107:11",
+          "baseStatBoostPercentage": 50,
+          "modifier": "pure",
+          "originTag": "UNKNOWN",
+          "id": "SKELETON_MASTER_BOOTS",
+          "enchantments": {
+            "depth_strider": 3,
+            "thorns": 3,
+            "feather_falling": 5,
+            "protection": 5,
+            "growth": 5
+          },
+          "uuid": "9ecb508c-4ec1-4b79-be58-4f10876605d2",
+          "item_tier": 6,
+          "timestamp": "1/12/21 8:56 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "301s",
+      "Count": "1b",
+      "tag": {
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Sea Creature Chance: §c+1.5%",
+            "",
+            "§7Health: §a+75 HP",
+            "§7Defense: §a+35",
+            "",
+            "§6Item Ability: Water Burst §e§lSNEAK",
+            "§7When wearing the full set,",
+            "§7grants the wearer with the",
+            "§7ability to §aburst forward§7",
+            "§7when sneaking in water.",
+            "§8Mana Cost: §320",
+            "",
+            "§7§8This item can be reforged!",
+            "§5§lEPIC BOOTS"
+          ],
+          "color": 12663823,
+          "Name": "§5Salmon Boots"
+        },
+        "ExtraAttributes": {
+          "color": "193:60:15",
+          "originTag": "CRAFTING_GRID_COLLECT",
+          "id": "SALMON_BOOTS",
+          "uuid": "2ec587d2-4a78-4659-a40f-7b4e14fec403",
+          "timestamp": "11/26/20 8:55 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "301s",
+      "Count": "1b",
+      "tag": {
+        "ench": [],
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Health: §a+75 HP",
+            "§7Defense: §a+30",
+            "§7Intelligence: §a+180 §9(Necrotic +120)",
+            "",
+            "§9Growth V",
+            "§7Grants §a+75 §c❤ Health§7.",
+            "§9Protection V",
+            "§7Grants §a+15 §a❈ Defense§7.",
+            "",
+            "§6Full Set Bonus: Refraction",
+            "§7The stats of this armor change",
+            "§7from §a0§7 to §a200%§7 depending",
+            "§7on the current light level.",
+            "",
+            "§7Current Light Level",
+            "§c0§8 (12.5%)",
+            "",
+            "§5§lEPIC BOOTS"
+          ],
+          "color": 16577535,
+          "Name": "§5Necrotic Crystal Boots"
+        },
+        "ExtraAttributes": {
+          "color": "252:243:255",
+          "modifier": "necrotic",
+          "originTag": "QUICK_CRAFTING",
+          "id": "CRYSTAL_BOOTS",
+          "enchantments": {
+            "protection": 5,
+            "growth": 5
+          },
+          "uuid": "df33e0b9-86e1-465b-a484-725c0b79d09d",
+          "anvil_uses": 2,
+          "timestamp": "5/15/20 10:30 AM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "301s",
+      "Count": "1b",
+      "tag": {
+        "ench": [],
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Health: §a+150 HP",
+            "§7Defense: §a+60",
+            "§7Intelligence: §a+300 §9(Necrotic +150)",
+            "",
+            "§9Growth V",
+            "§7Grants §a+75 §c❤ Health§7.",
+            "§9Protection V",
+            "§7Grants §a+15 §a❈ Defense§7.",
+            "",
+            "§7This armor piece grants §a2x",
+            "§a§7item stats during the night or",
+            "§7§a3x §7during the §6Spooky",
+            "§6Festival§7! Additionally, it",
+            "§7gives a §a+5% §7chance to get",
+            "§7Candy from mobs during the",
+            "§7event.",
+            "",
+            "§6Full Set Bonus: Bat Powers Activate!",
+            "§7Upgrades your grappling hook and",
+            "§7turns you into a true vigilante!",
+            "§7Grants a §a+5% §7chance to find",
+            "§7rare Candy.",
+            "",
+            "§7§8§oYou are the hero this world",
+            "§8§oneeds.",
+            "",
+            "§6§lLEGENDARY BOOTS"
+          ],
+          "color": 0,
+          "Name": "§6Necrotic Bat Person Boots"
+        },
+        "ExtraAttributes": {
+          "color": "0:0:0",
+          "modifier": "necrotic",
+          "originTag": "QUICK_CRAFTING",
+          "id": "BAT_PERSON_BOOTS",
+          "enchantments": {
+            "protection": 5,
+            "growth": 5
+          },
+          "uuid": "edfb174c-5d10-410f-8548-2461a8b78d97",
+          "anvil_uses": 1,
+          "timestamp": "8/11/20 3:28 PM"
+        }
+      },
+      "Damage": "0s"
+    },
+    {
+      "id": "301s",
+      "Count": "1b",
+      "tag": {
+        "Unbreakable": "1b",
+        "HideFlags": 254,
+        "display": {
+          "Lore": [
+            "§7Health: §a+65 HP",
+            "§7Defense: §a+25",
+            "",
+            "§6Full Set Bonus: Cold Thumb",
+            "§7Allows the wearer to shoot",
+            "§7unlimited snowballs when using",
+            "§7§9Frosty the Snow Cannon§7.",
+            "",
+            "§7Each piece grants a §a5% §7bonus",
+            "§7gift chance for every present",
+            "§7you earn from the §cGift Attack",
+            "§c§7minigame!",
+            "",
+            "§7All stats of this armor piece",
+            "§7are doubled while on the Winter",
+            "§7Island!",
+            "",
+            "§7§8This item can be reforged!",
+            "§5§lEPIC BOOTS"
+          ],
+          "color": 16777215,
+          "Name": "§5Snow Suit Boots"
+        },
+        "ExtraAttributes": {
+          "color": "255:255:255",
+          "originTag": "UNKNOWN",
+          "id": "SNOW_SUIT_BOOTS",
+          "uuid": "94b77d9c-3f6f-41ae-a56c-88afdbe44a0f",
+          "timestamp": "6/22/20 4:14 PM"
+        }
+      },
+      "Damage": "0s"
+    }
+  ]
+}

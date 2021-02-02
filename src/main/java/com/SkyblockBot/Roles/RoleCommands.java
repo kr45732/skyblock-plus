@@ -69,7 +69,7 @@ public class RoleCommands extends Command {
         String username = playerInfo.username;
         String profileName = args.length == 4 ? args[3] : null;
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
-        if (!player.isValidPlayer()) {
+        if (!player.isValid()) {
             eb = defaultEmbed("Error fetching data", null);
             eb.setDescription("**Please check given username and profile**");
             ebMessage.editMessage(eb.build()).queue();
@@ -254,8 +254,8 @@ public class RoleCommands extends Command {
                                         currentSkill = player.getCatacombsSkill().skillLevel;
                                     }
                                 } else {
-                                    if (player.getPlayerSkill(currentRoleName) != null) {
-                                        currentSkill = player.getPlayerSkill(currentRoleName).skillLevel;
+                                    if (player.getSkill(currentRoleName) != null) {
+                                        currentSkill = player.getSkill(currentRoleName).skillLevel;
                                     }
                                 }
                                 if (currentSkill == -1 && !errorRoles.toString().contains("Skills")) {
@@ -377,7 +377,7 @@ public class RoleCommands extends Command {
                             }
                             case "slot_collector": {
                                 Role petEnthusiastRole = guild.getRoleById(higherDepth(currentRole, "id").getAsString());
-                                if (player.getNumberCraftedMinion() >= higherDepth(currentRole, "num_minions").getAsInt()) {
+                                if (player.getNumberMinionSlots() >= higherDepth(currentRole, "num_minions").getAsInt()) {
                                     if (!guild.getMember(user).getRoles().contains(petEnthusiastRole)) {
                                         guild.addRoleToMember(guild.getMember(user), petEnthusiastRole).queue();
                                         addedRoles.append(roleChangeString(petEnthusiastRole.getName()));

@@ -4,7 +4,7 @@ import com.SkyblockBot.Apply.Apply;
 import com.SkyblockBot.Auction.AuctionCommands;
 import com.SkyblockBot.Auction.BinCommands;
 import com.SkyblockBot.Dungeons.CatacombsCommand;
-import com.SkyblockBot.Essence.EssenceCommand;
+import com.SkyblockBot.Dungeons.EssenceCommand;
 import com.SkyblockBot.Guilds.GuildCommands;
 import com.SkyblockBot.Guilds.GuildLeaderboardCommand;
 import com.SkyblockBot.Miscellaneous.*;
@@ -43,7 +43,7 @@ public class Main {
 
         client.addCommands(new AboutCommand(), new SlayerCommands(), new HelpCommand(waiter), new GuildCommands(waiter),
                 new AuctionCommands(), new BinCommands(), new SkillsCommands(), new CatacombsCommand(),
-                new ShutdownCommand(), new VersionCommand(), new RoleCommands(), new GuildLeaderboardCommand(), new EssenceCommand(), new CoinsBalanceCommand()
+                new ShutdownCommand(), new VersionCommand(), new RoleCommands(), new GuildLeaderboardCommand(), new EssenceCommand(), new CoinsBalanceCommand(), new WardrobeCommand()
 
         );
         setBotSettings(botPrefix);
@@ -56,7 +56,7 @@ public class Main {
         // TODO: add unimplemented commands in HelpCommand.java
         // TODO: weight command/leaderboard
         // TODO: /g kick command (factoring in lowest g exp + lowest stats)
-        // TODO: fix verification (mee7 bot deletes the messages)
-        // TODO: Fix guild exp (DO NOT USE A MAP because of duplicated values)
+        // TODO: fix guild exp (DO NOT USE A MAP because of duplicated values)
+        // TODO: finish stats command
     }
 }

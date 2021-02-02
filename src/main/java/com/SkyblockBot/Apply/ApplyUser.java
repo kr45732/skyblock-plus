@@ -14,9 +14,9 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import java.util.EnumSet;
 import java.util.concurrent.TimeUnit;
 
-import static com.SkyblockBot.Utils.BotUtils.*;
 import static com.SkyblockBot.TimeoutHandler.ChannelDeleter.addChannel;
 import static com.SkyblockBot.TimeoutHandler.ChannelDeleter.removeChannel;
+import static com.SkyblockBot.Utils.BotUtils.*;
 
 public class ApplyUser extends ListenerAdapter {
     Message reactMessage;
@@ -90,7 +90,7 @@ public class ApplyUser extends ListenerAdapter {
                         player = messageContent.length == 1 ? new Player(messageContent[0])
                                 : new Player(messageContent[0], messageContent[1]);
 
-                        if (player.isValidPlayer()) {
+                        if (player.isValid()) {
                             String playerSlayer = formatNumber(player.getSlayer());
                             String playerSkills = roundSkillAverage(player.getSkillAverage());
                             String playerCatacombs = "" + player.getCatacombsSkill().skillLevel;

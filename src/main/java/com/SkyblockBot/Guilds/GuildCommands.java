@@ -1,11 +1,11 @@
 package com.SkyblockBot.Guilds;
 
+import com.SkyblockBot.Utils.CustomPaginator;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.jagrosh.jdautilities.menu.Paginator;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.exceptions.PermissionException;
@@ -50,82 +50,86 @@ public class GuildCommands extends Command {
         }
         System.out.println();
 
-        if (args[1].equals("experience") || args[1].equals("exp")) { // Experience commands (experience or exp)
-            if (args[2].toLowerCase().startsWith("u-")) { // Getting guild info from IGN
-                String username = args[2].split("-")[1];
-                GuildStruct guildExp = getGuildExp(username);
-                if (guildExp.outputArr.length == 0) {
-                    eb = guildExp.eb;
+        switch (args[1]) {
+            case "experience":
+            case "exp":  // Experience commands (experience or exp)
+                if (args[2].toLowerCase().startsWith("u-")) { // Getting guild info from IGN
+                    String username = args[2].split("-")[1];
+                    GuildStruct guildExp = getGuildExp(username);
+                    if (guildExp.outputArr.length == 0) {
+                        eb = guildExp.eb;
+                    } else {
+                        CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(2).setItemsPerPage(20)
+                                .showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
+                                    try {
+                                        m.clearReactions().queue();
+                                    } catch (PermissionException ex) {
+                                        m.delete().queue();
+                                    }
+                                }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).wrapPageEnds(true)
+                                .setColor(botColor);
+
+                        paginateBuilder.addItems(guildExp.outputArr);
+
+                        ebMessage.delete().queue();
+                        paginateBuilder.build().paginate(event.getChannel(), 0);
+
+                        return;
+                    }
                 } else {
-                    Paginator.Builder paginateBuilder = new Paginator.Builder().setColumns(2).setItemsPerPage(20)
-                            .showPageNumbers(true).waitOnSinglePage(false).useNumberedItems(false).setFinalAction(m -> {
-                                try {
-                                    m.clearReactions().queue();
-                                } catch (PermissionException ex) {
-                                    m.delete().queue();
-                                }
-                            }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).wrapPageEnds(true)
-                            .setColor(botColor);
-
-                    paginateBuilder.setText(" ");
-                    paginateBuilder.addItems(guildExp.outputArr);
-
-                    ebMessage.delete().queue();
-                    paginateBuilder.build().paginate(event.getChannel(), 0);
-
+                    eb.setTitle(errorMessage(this.name));
+                    ebMessage.editMessage(eb.build()).queue();
                     return;
                 }
-            } else {
-                eb.setTitle(errorMessage(this.name));
-                ebMessage.editMessage(eb.build()).queue();
-                return;
-            }
-        } else if (args[1].equals("player")) { // Experience commands (experience or exp)
-            String username = args[2];
-            eb = getGuildPlayer(username);
-        } else if (args[1].equals("info")) {
-            if (args[2].toLowerCase().startsWith("u-")) {
-                String username = args[2].split("-")[1];
-                eb = getGuildInfo(username);
-            } else {
-                eb.setTitle(errorMessage(this.name));
-                ebMessage.editMessage(eb.build()).queue();
-                return;
-            }
-        } else if (args[1].equals("members")) {
-            if (args[2].toLowerCase().startsWith("u-")) {
-                String username = args[2].split("-")[1];
-                GuildStruct guildMembers = getGuildMembers(username);
-                if (guildMembers.outputArr.length == 0) {
-                    eb = guildMembers.eb;
+                break;
+            case "player":  // Experience commands (experience or exp)
+                String username = args[2];
+                eb = getGuildPlayer(username);
+                break;
+            case "info":
+                if (args[2].toLowerCase().startsWith("u-")) {
+                    String usernameInfo = args[2].split("-")[1];
+                    eb = getGuildInfo(usernameInfo);
                 } else {
-                    Paginator.Builder paginateBuilder = new Paginator.Builder().setColumns(3).setItemsPerPage(27)
-                            .showPageNumbers(true).waitOnSinglePage(false).useNumberedItems(false).setFinalAction(m -> {
-                                try {
-                                    m.clearReactions().queue();
-                                } catch (PermissionException ex) {
-                                    m.delete().queue();
-                                }
-                            }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).wrapPageEnds(true)
-                            .setColor(botColor);
-
-                    paginateBuilder.setText(" ");
-                    paginateBuilder.addItems(guildMembers.outputArr);
-
-                    ebMessage.delete().queue();
-                    paginateBuilder.build().paginate(event.getChannel(), 0);
+                    eb.setTitle(errorMessage(this.name));
+                    ebMessage.editMessage(eb.build()).queue();
                     return;
                 }
+                break;
+            case "members":
+                if (args[2].toLowerCase().startsWith("u-")) {
+                    String usernameMembers = args[2].split("-")[1];
+                    GuildStruct guildMembers = getGuildMembers(usernameMembers);
+                    if (guildMembers.outputArr.length == 0) {
+                        eb = guildMembers.eb;
+                    } else {
+                        CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(3).setItemsPerPage(27)
+                                .showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
+                                    try {
+                                        m.clearReactions().queue();
+                                    } catch (PermissionException ex) {
+                                        m.delete().queue();
+                                    }
+                                }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).wrapPageEnds(true)
+                                .setColor(botColor);
 
-            } else {
+                        paginateBuilder.addItems(guildMembers.outputArr);
+
+                        ebMessage.delete().queue();
+                        paginateBuilder.build().paginate(event.getChannel(), 0);
+                        return;
+                    }
+
+                } else {
+                    eb.setTitle(errorMessage(this.name));
+                    ebMessage.editMessage(eb.build()).queue();
+                    return;
+                }
+                break;
+            default:
                 eb.setTitle(errorMessage(this.name));
                 ebMessage.editMessage(eb.build()).queue();
                 return;
-            }
-        } else {
-            eb.setTitle(errorMessage(this.name));
-            ebMessage.editMessage(eb.build()).queue();
-            return;
         }
 
         ebMessage.editMessage(eb.build()).queue();

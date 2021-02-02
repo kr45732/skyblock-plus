@@ -3,9 +3,14 @@ package com.SkyblockBot.Utils;
 import com.SkyblockBot.Skills.SkillsStruct;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import me.nullicorn.nedit.NBTReader;
+import me.nullicorn.nedit.type.NBTCompound;
+import me.nullicorn.nedit.type.NBTList;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.SkyblockBot.Utils.BotUtils.*;
 
@@ -82,7 +87,7 @@ public class Player {
 
     }
 
-    public boolean isValidPlayer() {
+    public boolean isValid() {
         return validPlayer;
     }
 
@@ -151,7 +156,7 @@ public class Player {
 
     }
 
-    public SkillsStruct getPlayerSkill(String skillName) {
+    public SkillsStruct getSkill(String skillName) {
         if (this.levelTables == null) {
             this.levelTables = getJson(
                     "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/leveling.json");
@@ -323,15 +328,133 @@ public class Player {
         return 100;
     }
 
-    public int getNumberCraftedMinion() {
-        return higherDepth(profileJson, "crafted_generators").getAsJsonArray().size();
+    public int getNumberMinionSlots() {
+        int[] craftedMinionsToSlots = new int[]{0, 5, 15, 30, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 350, 400, 450, 500, 550, 600};
+
+        int prevMax = 0;
+        int craftedMinions = higherDepth(profileJson, "crafted_generators").getAsJsonArray().size();
+        for (int i = 0; i < craftedMinionsToSlots.length; i++) {
+            if (craftedMinions >= craftedMinionsToSlots[i]) {
+                prevMax = i;
+            } else {
+                break;
+            }
+        }
+
+        return (prevMax + 5);
     }
 
-    public double getPurseCoins(){
-        try{
+    public double getPurseCoins() {
+        try {
             return higherDepth(profileJson, "coin_purse").getAsLong();
-        } catch(Exception e){
+        } catch (Exception e) {
             return -1;
         }
+    }
+
+    public int getSlayerLevel(String slayerName) {
+        if (this.levelTables == null) {
+            this.levelTables = getJson(
+                    "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/leveling.json");
+        }
+
+        switch (slayerName) {
+            case "sven":
+                JsonArray wolfLevelArray = higherDepth(higherDepth(levelTables, "slayer_xp"), "wolf").getAsJsonArray();
+                int wolfXp = getWolfXp();
+                int prevWolfLevel = 0;
+                for (int i = 0; i < wolfLevelArray.size(); i++) {
+                    if (wolfXp >= wolfLevelArray.get(i).getAsInt()) {
+                        prevWolfLevel = i;
+                    } else {
+                        break;
+                    }
+                }
+                return (prevWolfLevel + 1);
+            case "rev":
+                JsonArray zombieLevelArray = higherDepth(higherDepth(levelTables, "slayer_xp"), "zombie").getAsJsonArray();
+                int zombieXp = getZombieXp();
+                int prevZombieMax = 0;
+                for (int i = 0; i < zombieLevelArray.size(); i++) {
+                    if (zombieXp >= zombieLevelArray.get(i).getAsInt()) {
+                        prevZombieMax = i;
+                    } else {
+                        break;
+                    }
+                }
+                return (prevZombieMax + 1);
+            case "tara":
+                JsonArray spiderLevelArray = higherDepth(higherDepth(levelTables, "slayer_xp"), "spider").getAsJsonArray();
+                int spiderXp = getSpiderXp();
+                int prevSpiderMax = 0;
+                for (int i = 0; i < spiderLevelArray.size(); i++) {
+                    if (spiderXp >= spiderLevelArray.get(i).getAsInt()) {
+                        prevSpiderMax = i;
+                    } else {
+                        break;
+                    }
+                }
+                return (prevSpiderMax + 1);
+        }
+        return 0;
+    }
+
+    public Map<Integer, ArmorStruct> getWardrobe() {
+        String encodedWardrobeContents = higherDepth(higherDepth(profileJson, "wardrobe_contents"), "data").getAsString();
+
+        try {
+            NBTCompound decodedWardrobeContents = NBTReader.readBase64(encodedWardrobeContents);
+
+            NBTList wardrobeFrames = decodedWardrobeContents.getList(".i");
+            Map<Integer, String> wardrobeFramesMap = new HashMap<>();
+            for (int i = 0; i < wardrobeFrames.size(); i++) {
+                NBTCompound displayName = wardrobeFrames.getCompound(i).getCompound("tag.display");
+                if (displayName != null) {
+                    wardrobeFramesMap.put(i, displayName.getString("Name", "Empty").replace("§6", "").replace("§5", "").replace("§9", "").replace("§f", "").replace("§d", ""));
+                } else {
+                    wardrobeFramesMap.put(i, "Empty");
+                }
+            }
+
+            Map<Integer, ArmorStruct> armorStructMap = new HashMap<>(18);
+            for (int i = 0; i < 9; i++) {
+                ArmorStruct pageOneStruct = new ArmorStruct();
+                for (int j = i; j < wardrobeFramesMap.size() / 2; j += 9) {
+                    String currentArmorPiece = wardrobeFramesMap.get(j);
+                    if ((j - i) / 9 == 0) {
+                        pageOneStruct.setHelmet(currentArmorPiece);
+                    } else if ((j - i) / 9 == 1) {
+                        pageOneStruct.setChestplate(currentArmorPiece);
+                    } else if ((j - i) / 9 == 2) {
+                        pageOneStruct.setLeggings(currentArmorPiece);
+                    } else if ((j - i) / 9 == 3) {
+                        pageOneStruct.setBoots(currentArmorPiece);
+                    }
+                }
+                armorStructMap.put(i, pageOneStruct);
+
+                ArmorStruct pageTwoStruct = new ArmorStruct();
+                for (int j = (wardrobeFramesMap.size() / 2) + i; j < wardrobeFramesMap.size(); j += 9) {
+                    String currentArmorPiece = wardrobeFramesMap.get(j);
+                    if ((j - i) / 9 == 4) {
+                        pageTwoStruct.setHelmet(currentArmorPiece);
+                    } else if ((j - i) / 9 == 5) {
+                        pageTwoStruct.setChestplate(currentArmorPiece);
+                    } else if ((j - i) / 9 == 6) {
+                        pageTwoStruct.setLeggings(currentArmorPiece);
+                    } else if ((j - i) / 9 == 7) {
+                        pageTwoStruct.setBoots(currentArmorPiece);
+                    }
+                }
+                armorStructMap.put(i + 9, pageTwoStruct);
+            }
+//            for(Map.Entry<Integer, ArmorStruct> i:armorStructMap.entrySet()){
+//                System.out.println(i.getKey() + " " + i.getValue().getChestplate());
+//            }
+            return armorStructMap;
+        } catch (Exception e) {
+            return null;
+        }
+
     }
 }

@@ -53,7 +53,7 @@ public class SlayerCommands extends Command {
 
     public EmbedBuilder getPlayerSlayer(String username, String profileName) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
-        if (player.isValidPlayer()) {
+        if (player.isValid()) {
             EmbedBuilder eb = defaultEmbed("Slayer for " + player.getUsername(), skyblockStatsLink(player.getUsername(), player.getProfileName()));
             eb.setDescription("**Total slayer:** " + formatNumber(player.getSlayer()) + " XP");
             eb.addField("<:sven_packmaster:800002277648891914> Wolf", simplifyNumber(player.getWolfXp()) + " XP", true);

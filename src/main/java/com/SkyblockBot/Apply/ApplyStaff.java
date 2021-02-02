@@ -11,9 +11,9 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.util.concurrent.TimeUnit;
 
+import static com.SkyblockBot.TimeoutHandler.ChannelDeleter.removeChannel;
 import static com.SkyblockBot.Utils.BotUtils.defaultEmbed;
 import static com.SkyblockBot.Utils.BotUtils.higherDepth;
-import static com.SkyblockBot.TimeoutHandler.ChannelDeleter.removeChannel;
 
 public class ApplyStaff extends ListenerAdapter {
     User user;

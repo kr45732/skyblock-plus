@@ -35,8 +35,9 @@ repositories {
 dependencies {
     implementation "net.dv8tion:JDA:4.2.0_227"
     implementation "ch.qos.logback:logback-classic:1.2.3"
-    implementation 'com.github.HypixelDev.PublicAPI:Example:2.0.0'
+    implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.jagrosh:jda-utilities:3.0.5'
+    implementation 'com.github.TheNullicorn:Nedit:1.0.0'
     // implementation 'org.asynchttpclient:async-http-client:2.12.2'
 }
 

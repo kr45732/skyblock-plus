@@ -1,7 +1,7 @@
 package com.SkyblockBot.Dungeons;
 
-import com.SkyblockBot.Utils.Player;
 import com.SkyblockBot.Skills.SkillsStruct;
+import com.SkyblockBot.Utils.Player;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -57,7 +57,7 @@ public class CatacombsCommand extends Command {
 
     public EmbedBuilder getPlayerCatacombs(String username, String profileName) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
-        if (player.isValidPlayer()) {
+        if (player.isValid()) {
             EmbedBuilder eb = defaultEmbed("Dungeons for " + player.getUsername(), skyblockStatsLink(player.getUsername(), player.getProfileName()));
             try {
 

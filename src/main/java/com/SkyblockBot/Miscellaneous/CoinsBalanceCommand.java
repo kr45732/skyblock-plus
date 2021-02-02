@@ -11,7 +11,7 @@ import static com.SkyblockBot.Utils.BotUtils.*;
 public class CoinsBalanceCommand extends Command {
     Message ebMessage;
 
-    public CoinsBalanceCommand(){
+    public CoinsBalanceCommand() {
         this.name = "coins";
         this.guildOnly = false;
         this.cooldown = globalCooldown;
@@ -53,7 +53,7 @@ public class CoinsBalanceCommand extends Command {
 
     public EmbedBuilder getPlayerBalance(String username, String profileName) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
-        if (player.isValidPlayer()) {
+        if (player.isValid()) {
             double playerBankBalance = player.getBankBalance();
             double playerPurseCoins = player.getPurseCoins();
 
