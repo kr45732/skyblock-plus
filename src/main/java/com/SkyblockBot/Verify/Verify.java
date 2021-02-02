@@ -78,8 +78,6 @@ public class Verify extends ListenerAdapter {
             return;
         }
 
-        System.out.println(
-                "ADDING USER |||| Guild " + event.getGuild().getName() + " user: " + event.getUser().getName());
         event.getJDA().addEventListener(new VerifyUser(event, event.getUser(), currentSettings));
     }
 }

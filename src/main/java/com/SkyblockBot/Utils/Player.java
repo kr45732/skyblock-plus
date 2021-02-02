@@ -20,6 +20,7 @@ public class Player {
     private JsonElement levelTables;
     private JsonElement outerProfileJson;
     private JsonElement petLevelTable;
+    private JsonElement miscJson;
     private String playerUuid;
     private String playerUsername;
     private String profileName;
@@ -29,6 +30,7 @@ public class Player {
         if (usernameToUuid(username)) {
             return;
         }
+
 
         JsonArray profileArray = higherDepth(
                 getJson("https://api.hypixel.net/skyblock/profiles?key=" + key + "&uuid=" + playerUuid), "profiles")
@@ -410,7 +412,7 @@ public class Player {
             for (int i = 0; i < wardrobeFrames.size(); i++) {
                 NBTCompound displayName = wardrobeFrames.getCompound(i).getCompound("tag.display");
                 if (displayName != null) {
-                    wardrobeFramesMap.put(i, displayName.getString("Name", "Empty").replace("§6", "").replace("§c", "").replace("§5", "").replace("§9", "").replace("§f", "").replace("§d", ""));
+                    wardrobeFramesMap.put(i, displayName.getString("Name", "Empty").replaceAll("§f|§a|§9|§5|§6|§d|§4|§c|", ""));
                 } else {
                     wardrobeFramesMap.put(i, "Empty");
                 }
@@ -448,11 +450,57 @@ public class Player {
                 }
                 armorStructMap.put(i + 9, pageTwoStruct);
             }
-            if(equippedSlot > 0){
-                armorStructMap.replace((equippedSlot-1), new ArmorStruct("Equipped", "Equipped", "Equipped", "Equipped"));
+            if (equippedSlot > 0) {
+                armorStructMap.replace((equippedSlot - 1), getInventoryArmor().makeBold());
             }
 
             return armorStructMap;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public Map<Integer, String> getTalismanBag() {
+        try {
+            String encodedTalismanContents = higherDepth(higherDepth(profileJson, "talisman_bag"), "data").getAsString();
+            NBTCompound decodedTalismanContents = NBTReader.readBase64(encodedTalismanContents);
+
+            NBTList talismanFrames = decodedTalismanContents.getList(".i");
+            Map<Integer, String> talismanFramesMap = new HashMap<>();
+            for (int i = 0; i < talismanFrames.size(); i++) {
+                NBTCompound displayName = talismanFrames.getCompound(i).getCompound("tag.display");
+                if (displayName != null) {
+                    talismanFramesMap.put(i, displayName.getString("Name", "Empty").replaceAll("§f|§a|§9|§5|§6|§d|§4|§c|", ""));
+                } else {
+                    talismanFramesMap.put(i, "Empty");
+                }
+            }
+
+            return talismanFramesMap;
+
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public ArmorStruct getInventoryArmor() {
+        try {
+            String encodedInventoryContents = higherDepth(higherDepth(profileJson, "inv_armor"), "data").getAsString();
+            NBTCompound decodedInventoryContents = NBTReader.readBase64(encodedInventoryContents);
+
+            NBTList talismanFrames = decodedInventoryContents.getList(".i");
+
+            Map<Integer, String> armorFramesMap = new HashMap<>();
+            for (int i = 0; i < talismanFrames.size(); i++) {
+                NBTCompound displayName = talismanFrames.getCompound(i).getCompound("tag.display");
+                if (displayName != null) {
+                    armorFramesMap.put(i, displayName.getString("Name", "Empty").replaceAll("§f|§a|§9|§5|§6|§d|§4|§c|", ""));
+                } else {
+                    armorFramesMap.put(i, "Empty");
+                }
+            }
+            return new ArmorStruct(armorFramesMap.get(3), armorFramesMap.get(2), armorFramesMap.get(1), armorFramesMap.get(0));
+
         } catch (Exception e) {
             return null;
         }

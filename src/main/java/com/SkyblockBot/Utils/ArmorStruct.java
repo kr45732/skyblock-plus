@@ -21,7 +21,6 @@ public class ArmorStruct {
     }
 
 
-
     public String getHelmet() {
         return helmet;
     }
@@ -52,5 +51,13 @@ public class ArmorStruct {
 
     public void setBoots(String boots) {
         this.boots = boots;
+    }
+
+    public ArmorStruct makeBold() {
+        setHelmet("**" + getHelmet() + "**");
+        setChestplate("**" + getChestplate() + "**");
+        setLeggings("**" + getLeggings() + "**");
+        setBoots("**" + getBoots() + "**");
+        return this;
     }
 }

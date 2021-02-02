@@ -131,12 +131,12 @@ public class CustomPaginator extends Menu {
 
     private void handleMessageReactionAddAction(MessageReactionAddEvent event, Message message, int pageNum) {
         int newPageNum = pageNum;
-        if(!event.getUser().equals(user)){
+        if (!event.getUser().equals(user)) {
             try {
                 event.getReaction().removeReaction(event.getUser()).queue();
             } catch (PermissionException ignored) {
             }
-        }else {
+        } else {
             switch (event.getReaction().getReactionEmote().getName()) {
                 case LEFT:
                     if (newPageNum == 1 && wrapPageEnds)
