@@ -40,12 +40,13 @@ public class CustomPaginator extends Menu {
     private final int bulkSkipNumber;
     private final boolean wrapPageEnds;
     private final String[] pageTitles;
+    private final User user;
 
     CustomPaginator(EventWaiter waiter, Set<User> users, Set<Role> roles, long timeout, TimeUnit unit,
                     BiFunction<Integer, Integer, Color> color,
                     Consumer<Message> finalAction, int columns, int itemsPerPage, boolean showPageNumbers,
                     boolean numberItems, List<String> items, int bulkSkipNumber,
-                    boolean wrapPageEnds, String[] pageTitles) {
+                    boolean wrapPageEnds, String[] pageTitles, User user) {
         super(waiter, users, roles, timeout, unit);
         this.color = color;
         this.columns = columns;
@@ -58,6 +59,7 @@ public class CustomPaginator extends Menu {
         this.bulkSkipNumber = bulkSkipNumber;
         this.wrapPageEnds = wrapPageEnds;
         this.pageTitles = pageTitles;
+        this.user = user;
     }
 
     @Override
@@ -105,11 +107,6 @@ public class CustomPaginator extends Menu {
     }
 
     private void pagination(Message message, int pageNum) {
-
-        paginationWithoutTextInput(message, pageNum);
-    }
-
-    private void paginationWithoutTextInput(Message message, int pageNum) {
         waiter.waitForEvent(MessageReactionAddEvent.class,
                 event -> checkReaction(event, message.getIdLong()), // Check Reaction
                 event -> handleMessageReactionAddAction(event, message, pageNum), // Handle Reaction
@@ -120,9 +117,6 @@ public class CustomPaginator extends Menu {
         if (event.getMessageIdLong() != messageId)
             return false;
         switch (event.getReactionEmote().getName()) {
-            // LEFT, STOP, RIGHT, BIG_LEFT, BIG_RIGHT all fall-through to
-            // return if the User is valid or not. If none trip, this defaults
-            // and returns false.
             case LEFT:
             case RIGHT:
                 return isValidUser(event.getUser(), event.isFromGuild() ? event.getGuild() : null);
@@ -130,48 +124,56 @@ public class CustomPaginator extends Menu {
             case BIG_RIGHT:
                 return bulkSkipNumber > 1 && isValidUser(event.getUser(), event.isFromGuild() ? event.getGuild() : null);
             default:
+                event.getReaction().removeReaction(event.getUser()).queue();
                 return false;
         }
     }
 
     private void handleMessageReactionAddAction(MessageReactionAddEvent event, Message message, int pageNum) {
         int newPageNum = pageNum;
-        switch (event.getReaction().getReactionEmote().getName()) {
-            case LEFT:
-                if (newPageNum == 1 && wrapPageEnds)
-                    newPageNum = pages + 1;
-                if (newPageNum > 1)
-                    newPageNum--;
-                break;
-            case RIGHT:
-                if (newPageNum == pages && wrapPageEnds)
-                    newPageNum = 0;
-                if (newPageNum < pages)
-                    newPageNum++;
-                break;
-            case BIG_LEFT:
-                if (newPageNum > 1 || wrapPageEnds) {
-                    for (int i = 1; (newPageNum > 1 || wrapPageEnds) && i < bulkSkipNumber; i++) {
-                        if (newPageNum == 1)
-                            newPageNum = pages + 1;
+        if(!event.getUser().equals(user)){
+            try {
+                event.getReaction().removeReaction(event.getUser()).queue();
+            } catch (PermissionException ignored) {
+            }
+        }else {
+            switch (event.getReaction().getReactionEmote().getName()) {
+                case LEFT:
+                    if (newPageNum == 1 && wrapPageEnds)
+                        newPageNum = pages + 1;
+                    if (newPageNum > 1)
                         newPageNum--;
-                    }
-                }
-                break;
-            case BIG_RIGHT:
-                if (newPageNum < pages || wrapPageEnds) {
-                    for (int i = 1; (newPageNum < pages || wrapPageEnds) && i < bulkSkipNumber; i++) {
-                        if (newPageNum == pages)
-                            newPageNum = 0;
+                    break;
+                case RIGHT:
+                    if (newPageNum == pages && wrapPageEnds)
+                        newPageNum = 0;
+                    if (newPageNum < pages)
                         newPageNum++;
+                    break;
+                case BIG_LEFT:
+                    if (newPageNum > 1 || wrapPageEnds) {
+                        for (int i = 1; (newPageNum > 1 || wrapPageEnds) && i < bulkSkipNumber; i++) {
+                            if (newPageNum == 1)
+                                newPageNum = pages + 1;
+                            newPageNum--;
+                        }
                     }
-                }
-                break;
-        }
+                    break;
+                case BIG_RIGHT:
+                    if (newPageNum < pages || wrapPageEnds) {
+                        for (int i = 1; (newPageNum < pages || wrapPageEnds) && i < bulkSkipNumber; i++) {
+                            if (newPageNum == pages)
+                                newPageNum = 0;
+                            newPageNum++;
+                        }
+                    }
+                    break;
+            }
+            try {
+                event.getReaction().removeReaction(event.getUser()).queue();
+            } catch (PermissionException ignored) {
+            }
 
-        try {
-            event.getReaction().removeReaction(event.getUser()).queue();
-        } catch (PermissionException ignored) {
         }
 
         int n = newPageNum;
@@ -222,15 +224,17 @@ public class CustomPaginator extends Menu {
         private String[] pageTitles = null;
         private int bulkSkipNumber = 1;
         private boolean wrapPageEnds = false;
+        private User user = null;
 
         @Override
         public CustomPaginator build() {
             Checks.check(waiter != null, "Must set an EventWaiter");
             Checks.check(!strings.isEmpty(), "Must include at least one item to paginate");
+            Checks.check(user != null, "Must set message author");
 
             return new CustomPaginator(waiter, users, roles, timeout, unit, color, finalAction,
                     columns, itemsPerPage, showPageNumbers, numberItems, strings,
-                    bulkSkipNumber, wrapPageEnds, pageTitles);
+                    bulkSkipNumber, wrapPageEnds, pageTitles, user);
         }
 
         public Builder setColor(Color color) {
@@ -246,6 +250,11 @@ public class CustomPaginator extends Menu {
 
         public Builder setFinalAction(Consumer<Message> finalAction) {
             this.finalAction = finalAction;
+            return this;
+        }
+
+        public Builder setCommandUser(User user) {
+            this.user = user;
             return this;
         }
 

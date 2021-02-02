@@ -61,7 +61,7 @@ public class WardrobeCommand extends Command {
             if(armorStructMap!= null) {
                 EmbedBuilder eb = defaultEmbed("Player wardrobe for " + player.getUsername(), skyblockStatsLink(player.getUsername(), player.getProfileName()));
                 for (Map.Entry<Integer, ArmorStruct> currentArmour : armorStructMap.entrySet()) {
-                    eb.addField("Slot " + currentArmour.getKey(), currentArmour.getValue().getHelmet() + "\n" + currentArmour.getValue().getChestplate() + "\n" + currentArmour.getValue().getLeggings() + "\n" + currentArmour.getValue().getBoots(), true);
+                    eb.addField("Slot " + (currentArmour.getKey()+1), currentArmour.getValue().getHelmet() + "\n" + currentArmour.getValue().getChestplate() + "\n" + currentArmour.getValue().getLeggings() + "\n" + currentArmour.getValue().getBoots(), true);
                 }
                 return eb;
             }
