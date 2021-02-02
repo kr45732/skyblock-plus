@@ -62,6 +62,7 @@ public class HelpCommand extends Command {
             pageMap.put("bin", 7);
             pageMap.put("roles", 8);
             pageMap.put("coins", 8);
+            pageMap.put("wardrobe", 8);
 
             if (pageMap.get(pageStr) != null) {
                 startingPage = pageMap.get(pageStr);
@@ -113,7 +114,8 @@ public class HelpCommand extends Command {
 
         String[] essenceCommands = new String[]{
                 generateHelp("Claim automatic Skyblock roles", "roles claim [IGN] <profile>"),
-                generateHelp("Get a player's bank and purse coins", "coins player [IGN] <profile>")
+                generateHelp("Get a player's bank and purse coins", "coins player [IGN] <profile>"),
+                generateHelp("Get a wardrobe armor", "wardrobe player [IGN] <profile>")
         };
         paginateBuilder.addItems(fillArray(essenceCommands));
 

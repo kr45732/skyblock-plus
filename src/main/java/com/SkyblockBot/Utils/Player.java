@@ -400,9 +400,8 @@ public class Player {
     }
 
     public Map<Integer, ArmorStruct> getWardrobe() {
-        String encodedWardrobeContents = higherDepth(higherDepth(profileJson, "wardrobe_contents"), "data").getAsString();
-
         try {
+            String encodedWardrobeContents = higherDepth(higherDepth(profileJson, "wardrobe_contents"), "data").getAsString();
             NBTCompound decodedWardrobeContents = NBTReader.readBase64(encodedWardrobeContents);
 
             NBTList wardrobeFrames = decodedWardrobeContents.getList(".i");
@@ -448,13 +447,9 @@ public class Player {
                 }
                 armorStructMap.put(i + 9, pageTwoStruct);
             }
-//            for(Map.Entry<Integer, ArmorStruct> i:armorStructMap.entrySet()){
-//                System.out.println(i.getKey() + " " + i.getValue().getChestplate());
-//            }
             return armorStructMap;
         } catch (Exception e) {
             return null;
         }
-
     }
 }

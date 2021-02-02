@@ -58,12 +58,13 @@ public class WardrobeCommand extends Command {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
             Map<Integer, ArmorStruct> armorStructMap = player.getWardrobe();
-            EmbedBuilder eb = defaultEmbed("Player wardrobe for " + player.getUsername(), skyblockStatsLink(player.getUsername(), player.getProfileName()));
-
-            for (Map.Entry<Integer, ArmorStruct> currentArmour : armorStructMap.entrySet()) {
-                eb.addField("Slot " + currentArmour.getKey(), currentArmour.getValue().getHelmet() + "\n" + currentArmour.getValue().getChestplate() + "\n" + currentArmour.getValue().getLeggings() + "\n" + currentArmour.getValue().getBoots(), true);
+            if(armorStructMap!= null) {
+                EmbedBuilder eb = defaultEmbed("Player wardrobe for " + player.getUsername(), skyblockStatsLink(player.getUsername(), player.getProfileName()));
+                for (Map.Entry<Integer, ArmorStruct> currentArmour : armorStructMap.entrySet()) {
+                    eb.addField("Slot " + currentArmour.getKey(), currentArmour.getValue().getHelmet() + "\n" + currentArmour.getValue().getChestplate() + "\n" + currentArmour.getValue().getLeggings() + "\n" + currentArmour.getValue().getBoots(), true);
+                }
+                return eb;
             }
-            return eb;
         }
         return defaultEmbed("Unable to fetch player data", null);
     }
