@@ -15,13 +15,13 @@ import java.util.concurrent.TimeUnit;
 
 import static com.SkyblockBot.Utils.BotUtils.*;
 
-public class TalismanBagCommand extends Command {
+public class SacksCommand extends Command {
     Message ebMessage;
     EventWaiter waiter;
     CommandEvent event;
 
-    public TalismanBagCommand(EventWaiter waiter) {
-        this.name = "talisman";
+    public SacksCommand(EventWaiter waiter) {
+        this.name = "sacks";
         this.guildOnly = false;
         this.cooldown = globalCooldown;
         this.waiter = waiter;
@@ -49,12 +49,11 @@ public class TalismanBagCommand extends Command {
 
         this.event = event;
         if (args[1].equals("player")) {
-
             if (args.length == 4) {
-                eb = getPlayerTalismans(args[2], args[3]);
+                eb = getPlayerSacks(args[2], args[3]);
 
             } else
-                eb = getPlayerTalismans(args[2], null);
+                eb = getPlayerSacks(args[2], null);
 
             if (eb == null) {
                 ebMessage.delete().queue();
@@ -69,11 +68,11 @@ public class TalismanBagCommand extends Command {
         ebMessage.editMessage(eb.build()).queue();
     }
 
-    public EmbedBuilder getPlayerTalismans(String username, String profileName) {
+    public EmbedBuilder getPlayerSacks(String username, String profileName) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
-            Map<Integer, String> talismanBagMap = player.getTalismanBag();
-            if (talismanBagMap != null) {
+            Map<String, Integer> sacksMap = player.getPlayerSacks();
+            if (sacksMap != null) {
                 ArrayList<String> pageTitles = new ArrayList<>();
 
                 CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(1).setItemsPerPage(20).showPageNumbers(true)
@@ -85,9 +84,9 @@ public class TalismanBagCommand extends Command {
                             }
                         }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).wrapPageEnds(true).setColor(botColor).setCommandUser(event.getAuthor());
 
-                for (Map.Entry<Integer, String> currentTalisman : talismanBagMap.entrySet()) {
-                    pageTitles.add("Player talisman bag for " + player.getUsername());
-                    paginateBuilder.addItems("**Slot " + (currentTalisman.getKey() + 1) + "**: " + currentTalisman.getValue());
+                for (Map.Entry<String, Integer> currentSack : sacksMap.entrySet()) {
+                    pageTitles.add("Player sacks content for " + player.getUsername());
+                    paginateBuilder.addItems("**" + capitalizeString(currentSack.getKey().toLowerCase().replace("_", " ")) + "**: " + currentSack.getValue());
                 }
                 paginateBuilder.setPageTitles(pageTitles.toArray(new String[0]));
                 paginateBuilder.build().paginate(event.getChannel(), 0);

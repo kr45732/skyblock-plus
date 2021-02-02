@@ -1,6 +1,7 @@
 package com.SkyblockBot.Utils;
 
 import com.SkyblockBot.Skills.SkillsStruct;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import me.nullicorn.nedit.NBTReader;
@@ -20,7 +21,6 @@ public class Player {
     private JsonElement levelTables;
     private JsonElement outerProfileJson;
     private JsonElement petLevelTable;
-    private JsonElement miscJson;
     private String playerUuid;
     private String playerUsername;
     private String profileName;
@@ -501,6 +501,19 @@ public class Player {
             }
             return new ArmorStruct(armorFramesMap.get(3), armorFramesMap.get(2), armorFramesMap.get(1), armorFramesMap.get(0));
 
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public HashMap getPlayerSacks() {
+        JsonElement sacksJson = higherDepth(profileJson, "sacks_counts");
+        return new Gson().fromJson(sacksJson, HashMap.class);
+    }
+
+    public JsonArray getBankHistory() {
+        try {
+            return higherDepth(higherDepth(outerProfileJson, "banking"), "transactions").getAsJsonArray();
         } catch (Exception e) {
             return null;
         }

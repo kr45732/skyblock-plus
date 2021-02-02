@@ -41,7 +41,7 @@
   },
   "9": {
     "version": "0.1.0",
-    "description": "- Added custom paginator\n- Added wardrobe command\n- Added inventory command (see equipped player armor)\n- Added equipped armor to wardrobe command\n- Minor bug fixes",
+    "description": "- Added custom paginator\n- Added wardrobe command\n- Added inventory command (see equipped player armor)\n- Added equipped armor to wardrobe command\n- Added bank transaction history command\n- Minor bug fixes",
     "date": "2021-02-02T02:46:56.533703Z"
   }
 }

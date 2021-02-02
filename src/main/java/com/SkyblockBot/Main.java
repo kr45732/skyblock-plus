@@ -43,14 +43,16 @@ public class Main {
 
         client.addCommands(new AboutCommand(), new SlayerCommands(), new HelpCommand(waiter), new GuildCommands(waiter),
                 new AuctionCommands(), new BinCommands(), new SkillsCommands(), new CatacombsCommand(),
-                new ShutdownCommand(), new VersionCommand(), new RoleCommands(), new GuildLeaderboardCommand(), new EssenceCommand(), new CoinsBalanceCommand(), new WardrobeCommand(waiter), new TalismanBagCommand(waiter), new InventoryCommand(waiter)
-
+                new ShutdownCommand(), new VersionCommand(), new RoleCommands(), new GuildLeaderboardCommand(),
+                new EssenceCommand(), new CoinsBalanceCommand(waiter), new WardrobeCommand(waiter),
+                new TalismanBagCommand(waiter), new InventoryCommand(waiter), new SacksCommand(waiter)
         );
         setBotSettings(botPrefix);
         JDABuilder.createDefault(botToken).setStatus(OnlineStatus.DO_NOT_DISTURB).setChunkingFilter(ChunkingFilter.ALL)
                 .setMemberCachePolicy(MemberCachePolicy.ALL).enableIntents(GatewayIntent.GUILD_MEMBERS)
                 .setActivity(Activity.playing("Loading...")).addEventListeners(waiter, client.build())
-                .addEventListeners(new Apply()).addEventListeners(new Verify()).addEventListeners(new ChannelDeleter()).addEventListeners(new MessageTimeout()).build();
+                .addEventListeners(new Apply()).addEventListeners(new Verify())
+                .addEventListeners(new ChannelDeleter()).addEventListeners(new MessageTimeout()).build();
 
         // TODO: better bin command (parsing of string)
         // TODO: add unimplemented commands in HelpCommand.java
