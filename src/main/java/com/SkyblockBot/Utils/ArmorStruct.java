@@ -6,6 +6,22 @@ public class ArmorStruct {
     private String leggings;
     private String boots;
 
+    public ArmorStruct() {
+        this.helmet = "Empty";
+        this.chestplate = "Empty";
+        this.leggings = "Empty";
+        this.boots = "Empty";
+    }
+
+    public ArmorStruct(String helmet, String chestplate, String leggings, String boots) {
+        this.helmet = helmet;
+        this.chestplate = chestplate;
+        this.leggings = leggings;
+        this.boots = boots;
+    }
+
+
+
     public String getHelmet() {
         return helmet;
     }

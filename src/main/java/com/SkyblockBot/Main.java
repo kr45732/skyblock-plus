@@ -43,7 +43,7 @@ public class Main {
 
         client.addCommands(new AboutCommand(), new SlayerCommands(), new HelpCommand(waiter), new GuildCommands(waiter),
                 new AuctionCommands(), new BinCommands(), new SkillsCommands(), new CatacombsCommand(),
-                new ShutdownCommand(), new VersionCommand(), new RoleCommands(), new GuildLeaderboardCommand(), new EssenceCommand(), new CoinsBalanceCommand(), new WardrobeCommand()
+                new ShutdownCommand(), new VersionCommand(), new RoleCommands(), new GuildLeaderboardCommand(), new EssenceCommand(), new CoinsBalanceCommand(), new WardrobeCommand(waiter)
 
         );
         setBotSettings(botPrefix);

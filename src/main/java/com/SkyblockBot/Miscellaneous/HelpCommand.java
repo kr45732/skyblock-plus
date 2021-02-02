@@ -115,7 +115,7 @@ public class HelpCommand extends Command {
         String[] essenceCommands = new String[]{
                 generateHelp("Claim automatic Skyblock roles", "roles claim [IGN] <profile>"),
                 generateHelp("Get a player's bank and purse coins", "coins player [IGN] <profile>"),
-                generateHelp("Get a wardrobe armor", "wardrobe player [IGN] <profile>")
+                generateHelp("Get a player's wardrobe armors", "wardrobe player [IGN] <profile>")
         };
         paginateBuilder.addItems(fillArray(essenceCommands));
 

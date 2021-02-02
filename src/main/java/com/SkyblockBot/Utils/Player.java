@@ -402,6 +402,7 @@ public class Player {
     public Map<Integer, ArmorStruct> getWardrobe() {
         try {
             String encodedWardrobeContents = higherDepth(higherDepth(profileJson, "wardrobe_contents"), "data").getAsString();
+            int equippedSlot = higherDepth(profileJson, "wardrobe_equipped_slot").getAsInt();
             NBTCompound decodedWardrobeContents = NBTReader.readBase64(encodedWardrobeContents);
 
             NBTList wardrobeFrames = decodedWardrobeContents.getList(".i");
@@ -409,7 +410,7 @@ public class Player {
             for (int i = 0; i < wardrobeFrames.size(); i++) {
                 NBTCompound displayName = wardrobeFrames.getCompound(i).getCompound("tag.display");
                 if (displayName != null) {
-                    wardrobeFramesMap.put(i, displayName.getString("Name", "Empty").replace("§6", "").replace("§5", "").replace("§9", "").replace("§f", "").replace("§d", ""));
+                    wardrobeFramesMap.put(i, displayName.getString("Name", "Empty").replace("§6", "").replace("§c", "").replace("§5", "").replace("§9", "").replace("§f", "").replace("§d", ""));
                 } else {
                     wardrobeFramesMap.put(i, "Empty");
                 }
@@ -447,6 +448,10 @@ public class Player {
                 }
                 armorStructMap.put(i + 9, pageTwoStruct);
             }
+            if(equippedSlot > 0){
+                armorStructMap.replace((equippedSlot-1), new ArmorStruct("Equipped", "Equipped", "Equipped", "Equipped"));
+            }
+
             return armorStructMap;
         } catch (Exception e) {
             return null;
