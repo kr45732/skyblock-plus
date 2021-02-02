@@ -33,14 +33,11 @@ public class VerifyUser extends ListenerAdapter {
         String channelPrefix = higherDepth(currentSettings, "new_channel_prefix").getAsString();
         Category verifyCategory = event.getGuild()
                 .getCategoryById(higherDepth(higherDepth(currentSettings, "new_channel_category"), "id").getAsString());
-        verifyCategory.createTextChannel(channelPrefix + "-" + verifyingUser.getName())
+        this.verifyChannel = verifyCategory.createTextChannel(channelPrefix + "-" + verifyingUser.getName())
                 .addPermissionOverride(event.getGuild().getMember(verifyingUser), EnumSet.of(Permission.VIEW_CHANNEL),
                         null)
                 .addPermissionOverride(event.getGuild().getPublicRole(), null, EnumSet.of(Permission.VIEW_CHANNEL))
                 .complete();
-
-        verifyChannel = event.getGuild().getTextChannelsByName(channelPrefix + "-" + verifyingUser.getName(), true)
-                .get(0);
 
         verifyChannel.sendMessage("Welcome " + verifyingUser.getAsMention() + "!").queue();
 
