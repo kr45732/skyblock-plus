@@ -15,10 +15,8 @@ import net.dv8tion.jda.internal.utils.Checks;
 
 import java.awt.*;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -131,7 +129,7 @@ public class CustomPaginator extends Menu {
 
     private void handleMessageReactionAddAction(MessageReactionAddEvent event, Message message, int pageNum) {
         int newPageNum = pageNum;
-        if (event.getUser().equals(user)) {
+        if (Objects.equals(event.getUser(), user)) {
             switch (event.getReaction().getReactionEmote().getName()) {
                 case LEFT:
                     if (newPageNum == 1 && wrapPageEnds)

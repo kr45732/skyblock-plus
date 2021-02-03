@@ -15,7 +15,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class MessageTimeout extends ListenerAdapter {
-    static List<MessageTimeoutStruct> messageList = new ArrayList<>();
+    static final List<MessageTimeoutStruct> messageList = new ArrayList<>();
     JDA jda;
 
     public static void addMessage(Message message, Object eventListener) {

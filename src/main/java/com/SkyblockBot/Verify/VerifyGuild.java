@@ -7,9 +7,9 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 public class VerifyGuild extends ListenerAdapter {
-    Message reactMessage;
-    String channelPrefix;
-    JsonElement currentSettings;
+    final Message reactMessage;
+    final String channelPrefix;
+    final JsonElement currentSettings;
 
     public VerifyGuild(Message reactMessage, String channelPrefix, JsonElement currentSettings) {
         this.reactMessage = reactMessage;

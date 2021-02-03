@@ -19,10 +19,10 @@ import static com.SkyblockBot.Utils.BotUtils.*;
 
 public class VerifyUser extends ListenerAdapter {
     Message reactMessage;
-    User verifyingUser;
-    TextChannel verifyChannel;
+    final User verifyingUser;
+    final TextChannel verifyChannel;
     int state = 0;
-    JsonElement currentSettings;
+    final JsonElement currentSettings;
     String[] playerInfo;
 
     public VerifyUser(MessageReactionAddEvent event, User verifyingUser, JsonElement currentSettings) {

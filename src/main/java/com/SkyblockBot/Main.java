@@ -29,7 +29,7 @@ import javax.security.auth.login.LoginException;
 import static com.SkyblockBot.Utils.BotUtils.*;
 
 public class Main {
-    public static void main(String[] args) throws LoginException, IllegalArgumentException, RateLimitedException {
+    public static void main(String[] args) throws LoginException, IllegalArgumentException {
         String botPrefix = getBotPrefix();
 
         EventWaiter waiter = new EventWaiter();

@@ -20,11 +20,11 @@ import static com.SkyblockBot.Utils.BotUtils.*;
 
 public class ApplyUser extends ListenerAdapter {
     Message reactMessage;
-    User applyingUser;
-    TextChannel applicationChannel;
+    final User applyingUser;
+    final TextChannel applicationChannel;
     int state = 0;
     EmbedBuilder applyPlayerStats;
-    JsonElement currentSettings;
+    final JsonElement currentSettings;
     Player player;
 
     public ApplyUser(MessageReactionAddEvent event, User applyingUser, JsonElement currentSettings) {

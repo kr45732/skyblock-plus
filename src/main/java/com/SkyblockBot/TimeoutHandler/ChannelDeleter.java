@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 import static com.SkyblockBot.Utils.BotUtils.defaultEmbed;
 
 public class ChannelDeleter extends ListenerAdapter {
-    static List<TextChannel> channelsList = new ArrayList<>();
+    static final List<TextChannel> channelsList = new ArrayList<>();
 
     public static void addChannel(TextChannel channel) {
         channelsList.add(channel);
@@ -48,11 +48,6 @@ public class ChannelDeleter extends ListenerAdapter {
                 eb.addField("Reason", "Inactive for an hour", false);
                 currentChannel.sendMessage(eb.build()).queue();
                 currentChannel.delete().reason("Exceeded inactivity time").queueAfter(15, TimeUnit.SECONDS);
-                iteratorCur.remove();
-            } else if ((secondsDiff / 3600 % 24) > 48) {
-                eb.addField("Reason", "Open for 48 hours", false);
-                currentChannel.sendMessage(eb.build()).queue();
-                currentChannel.delete().reason("Exceeded max time").queueAfter(15, TimeUnit.SECONDS);
                 iteratorCur.remove();
             }
         }

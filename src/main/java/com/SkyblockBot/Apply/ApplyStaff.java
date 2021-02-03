@@ -16,19 +16,17 @@ import static com.SkyblockBot.Utils.BotUtils.defaultEmbed;
 import static com.SkyblockBot.Utils.BotUtils.higherDepth;
 
 public class ApplyStaff extends ListenerAdapter {
-    User user;
-    TextChannel applyChannel;
-    EmbedBuilder ebMain;
-    Message reactMessage;
-    TextChannel staffChannel;
-    JsonElement currentSettings;
+    final User user;
+    final TextChannel applyChannel;
+    final Message reactMessage;
+    final TextChannel staffChannel;
+    final JsonElement currentSettings;
     Message deleteChannelMessage;
-    Player player;
+    final Player player;
 
     public ApplyStaff(User user, TextChannel applyChannel, EmbedBuilder ebMain, JsonElement currentSettings, Player player) {
         this.user = user;
         this.applyChannel = applyChannel;
-        this.ebMain = ebMain;
         this.currentSettings = currentSettings;
         this.player = player;
         staffChannel = applyChannel.getJDA()

@@ -23,7 +23,7 @@ import static com.SkyblockBot.Utils.BotUtils.*;
 
 public class CoinsBalanceCommand extends Command {
     Message ebMessage;
-    EventWaiter waiter;
+    final EventWaiter waiter;
     CommandEvent event;
 
     public CoinsBalanceCommand(EventWaiter waiter) {

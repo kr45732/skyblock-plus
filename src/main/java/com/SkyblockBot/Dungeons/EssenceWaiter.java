@@ -18,16 +18,16 @@ import static com.SkyblockBot.Utils.BotUtils.defaultEmbed;
 import static com.SkyblockBot.Utils.BotUtils.higherDepth;
 
 public class EssenceWaiter extends ListenerAdapter {
-    String itemName;
-    JsonElement itemJson;
-    Message reactMessage;
-    User user;
+    final String itemName;
+    final JsonElement itemJson;
+    final Message reactMessage;
+    final User user;
     int startingLevel;
     int endingLevel;
     int state = 0;
-    ArrayList<String> validReactions;
-    Map<String, Integer> essenceEmojiMap = new HashMap<>();
-    Map<Integer, String> emojiEssenceMap;
+    final ArrayList<String> validReactions;
+    final Map<String, Integer> essenceEmojiMap = new HashMap<>();
+    final Map<Integer, String> emojiEssenceMap;
 
     public EssenceWaiter(String itemName, JsonElement itemJson, Message reactMessage, User user) {
         this.itemName = itemName;

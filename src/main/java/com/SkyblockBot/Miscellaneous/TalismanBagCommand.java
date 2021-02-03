@@ -17,7 +17,7 @@ import static com.SkyblockBot.Utils.BotUtils.*;
 
 public class TalismanBagCommand extends Command {
     Message ebMessage;
-    EventWaiter waiter;
+    final EventWaiter waiter;
     CommandEvent event;
 
     public TalismanBagCommand(EventWaiter waiter) {

@@ -517,6 +517,7 @@ public class Player {
         }
     }
 
+    @SuppressWarnings("rawtypes")
     public HashMap getPlayerSacks() {
         JsonElement sacksJson = higherDepth(profileJson, "sacks_counts");
         return new Gson().fromJson(sacksJson, HashMap.class);

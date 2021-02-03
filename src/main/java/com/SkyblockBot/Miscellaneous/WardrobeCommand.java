@@ -18,7 +18,7 @@ import static com.SkyblockBot.Utils.BotUtils.*;
 
 public class WardrobeCommand extends Command {
     Message ebMessage;
-    EventWaiter waiter;
+    final EventWaiter waiter;
     CommandEvent event;
 
     public WardrobeCommand(EventWaiter waiter) {

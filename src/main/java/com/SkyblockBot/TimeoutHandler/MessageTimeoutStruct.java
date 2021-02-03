@@ -3,8 +3,8 @@ package com.SkyblockBot.TimeoutHandler;
 import net.dv8tion.jda.api.entities.Message;
 
 public class MessageTimeoutStruct {
-    public Message message;
-    public Object eventListener;
+    public final Message message;
+    public final Object eventListener;
 
     public MessageTimeoutStruct(Message message, Object eventListener) {
         this.message = message;

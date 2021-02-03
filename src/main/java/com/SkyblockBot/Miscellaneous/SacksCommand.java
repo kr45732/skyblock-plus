@@ -17,7 +17,7 @@ import static com.SkyblockBot.Utils.BotUtils.*;
 
 public class SacksCommand extends Command {
     Message ebMessage;
-    EventWaiter waiter;
+    final EventWaiter waiter;
     CommandEvent event;
 
     public SacksCommand(EventWaiter waiter) {

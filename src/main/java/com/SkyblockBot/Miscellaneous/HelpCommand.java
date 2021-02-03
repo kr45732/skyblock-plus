@@ -109,6 +109,7 @@ public class HelpCommand extends Command {
                 generateHelp("Get all the members in a player's guild", "guild members [u-IGN]"),
                 generateHelp("Get what guild a player is in", "guild player [IGN]"),
                 generateHelp("Get information about a player's guild", "guild info [u-IGN]"),
+                generateHelp("Get information about a guild", "guild info [g-IGN]"),
                 generateHelp("Get promote and demote leaderboard in-game commands for a player's guild", "guild-rank [u-IGN]", "g-rank [u-IGN]")};
         paginateBuilder.addItems(fillArray(guildCommands));
 

@@ -1,8 +1,8 @@
 package com.SkyblockBot.Roles;
 
 public class DiscordStruct {
-    String discordTag;
-    String username;
+    final String discordTag;
+    final String username;
 
     public DiscordStruct(String discordTag, String username) {
         this.discordTag = discordTag;

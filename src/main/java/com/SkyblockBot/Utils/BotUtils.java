@@ -25,9 +25,9 @@ import java.util.stream.Collectors;
 public class BotUtils {
     public static String key = "";
     public static String botToken = "";
-    public static Color botColor = new Color(9, 92, 13);
+    public static final Color botColor = new Color(9, 92, 13);
     public static String botPrefix = "";
-    public static int globalCooldown = 2;
+    public static final int globalCooldown = 2;
     private static int remainingLimit = 120;
     private static int timeTillReset = 60;
 

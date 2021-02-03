@@ -1,13 +1,13 @@
 package com.SkyblockBot.Skills;
 
 public class SkillsStruct {
-    public String skillName;
-    public int skillLevel;
-    public int maxSkillLevel;
-    public long totalSkillExp;
-    public long expCurrent;
-    public long expForNext;
-    public double progressToNext;
+    public final String skillName;
+    public final int skillLevel;
+    public final int maxSkillLevel;
+    public final long totalSkillExp;
+    public final long expCurrent;
+    public final long expForNext;
+    public final double progressToNext;
 
     public SkillsStruct(String skillName, int skillLevel, int maxSkillLevel, long totalSkillExp, long expCurrent,
                         long expForNext, double progressToNext) {

@@ -12,7 +12,7 @@ import static com.SkyblockBot.Utils.BotUtils.*;
 
 public class InventoryCommand extends Command {
     Message ebMessage;
-    EventWaiter waiter;
+    final EventWaiter waiter;
     CommandEvent event;
 
     public InventoryCommand(EventWaiter waiter) {
