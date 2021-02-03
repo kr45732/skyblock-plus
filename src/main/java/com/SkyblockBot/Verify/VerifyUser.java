@@ -46,11 +46,9 @@ public class VerifyUser extends ListenerAdapter {
         welcomeEb.setDescription("• Please enter your in-game-name.\n• Ex: CrypticPlasma\n");
         welcomeEb.addField("To submit your LAST message,", "React with ✅", true);
         welcomeEb.addField("To cancel the verification,", "React with ❌", true);
-        verifyChannel.sendMessage(welcomeEb.build()).queue(message -> {
-            message.addReaction("✅").queue();
-            message.addReaction("❌").queue();
-            this.reactMessage = message;
-        });
+        reactMessage = verifyChannel.sendMessage(welcomeEb.build()).complete();
+        reactMessage.addReaction("✅").queue();
+        reactMessage.addReaction("❌").queue();
 
     }
 
@@ -77,83 +75,81 @@ public class VerifyUser extends ListenerAdapter {
         reactMessage.clearReactions().queue();
         switch (state) {
             case 0:
-                verifyChannel.retrieveMessageById(verifyChannel.getLatestMessageId()).queue(messageReply -> {
+                if (verifyChannel.hasLatestMessage()) {
+                    Message messageReply = verifyChannel.retrieveMessageById(verifyChannel.getLatestMessageId()).complete();
                     if (messageReply.getAuthor().equals(verifyingUser)) {
-                        try {
-                            String username = messageReply.getContentDisplay();
-                            playerInfo = getPlayerInfo(username).split(" ");
+                        String username = messageReply.getContentDisplay();
+                        playerInfo = getPlayerDiscordInfo(username).split(" ");
 
-                            if (playerInfo.length != 0) {
-                                if (verifyingUser.getAsTag().equals(playerInfo[0])) {
-                                    EmbedBuilder eb = defaultEmbed("Verification successful!", null);
-                                    eb.setDescription("**You have successfully been verified as " + playerInfo[1]
-                                            + "**\nChannel closing in 30 seconds...");
-                                    verifyChannel.sendMessage(eb.build()).queue();
-                                    verifyChannel.delete().reason("Verification successful").queueAfter(30,
-                                            TimeUnit.SECONDS);
-                                    event.getGuild().addRoleToMember(event.getGuild().getMember(verifyingUser),
-                                            event.getGuild().getRoleById(
-                                                    higherDepth(higherDepth(currentSettings, "verified_role"), "id")
-                                                            .getAsString()))
-                                            .queue();
-                                    removeChannel(verifyChannel);
-                                    event.getJDA().removeEventListener(this);
-                                } else {
-                                    EmbedBuilder eb = defaultEmbed("Discord tag mismatch", null);
-                                    eb.setDescription("Account " + playerInfo[1] + " is linked with the discord tag "
-                                            + playerInfo[0] + "\nYour current discord tag is "
-                                            + verifyingUser.getAsTag());
-                                    eb.addField("To retry,", "React with ✅", true);
-                                    eb.addField("To cancel the verification,", "React with ❌", true);
-                                    verifyChannel.sendMessage(eb.build()).queue(message -> {
-                                        message.addReaction("✅").queue();
-                                        message.addReaction("❌").queue();
-                                        this.reactMessage = message;
-
-                                    });
-                                    state = 2;
-                                }
-                            } else {
-                                EmbedBuilder eb = invalidInput(messageReply.getContentDisplay());
-                                verifyChannel.sendMessage(eb.build()).queue(message -> {
-                                    message.addReaction("✅").queue();
-                                    message.addReaction("❌").queue();
-                                    this.reactMessage = message;
-                                });
-                                state = 2;
+                        if (playerInfo.length > 0) {
+                            if (verifyingUser.getAsTag().equals(playerInfo[0])) {
+                                EmbedBuilder eb = defaultEmbed("Verification successful!", null);
+                                eb.setDescription("**You have successfully been verified as " + playerInfo[1]
+                                        + "**\nChannel closing in 30 seconds...");
+                                verifyChannel.sendMessage(eb.build()).queue();
+                                verifyChannel.delete().reason("Verification successful").queueAfter(30,
+                                        TimeUnit.SECONDS);
+                                event.getGuild().addRoleToMember(event.getGuild().getMember(verifyingUser),
+                                        event.getGuild().getRoleById(
+                                                higherDepth(higherDepth(currentSettings, "verified_role"), "id")
+                                                        .getAsString()))
+                                        .queue();
+                                removeChannel(verifyChannel);
+                                event.getJDA().removeEventListener(this);
+                                break;
                             }
-
-                        } catch (Exception ex) {
-                            EmbedBuilder eb = invalidInput(messageReply.getContentDisplay());
-                            verifyChannel.sendMessage(eb.build()).queue(message -> {
-                                message.addReaction("✅").queue();
-                                message.addReaction("❌").queue();
-                                this.reactMessage = message;
-                            });
+                            EmbedBuilder eb = defaultEmbed("Discord tag mismatch", null);
+                            eb.setDescription("Account " + playerInfo[1] + " is linked with the discord tag "
+                                    + playerInfo[0] + "\nYour current discord tag is "
+                                    + verifyingUser.getAsTag());
+                            eb.addField("To retry,", "React with ✅", true);
+                            eb.addField("To cancel the verification,", "React with ❌", true);
+                            reactMessage = verifyChannel.sendMessage(eb.build()).complete();
+                            reactMessage.addReaction("✅").queue();
+                            reactMessage.addReaction("❌").queue();
                             state = 2;
+                            break;
                         }
-
-                    } else {
-                        EmbedBuilder eb = invalidInput(messageReply.getContentDisplay());
-                        verifyChannel.sendMessage(eb.build()).queue(message -> {
-                            message.addReaction("✅").queue();
-                            message.addReaction("❌").queue();
-                            this.reactMessage = message;
-                        });
-                        state = 2;
+                        EmbedBuilder eb = defaultEmbed("Invalid Arguments / Username", null);
+                        eb.setDescription("**Please check your input!**");
+                        eb.addField("Argument(s) given:", messageReply.getContentDisplay(), true);
+                        eb.addField("Valid Argument Example:", "CrypticPlasma", true);
+                        eb.addBlankField(true);
+                        eb.addField("To retry,", "React with ✅", true);
+                        eb.addField("To cancel the verification,", "React with ❌", true);
+                        eb.addBlankField(true);
                     }
-                });
+                    EmbedBuilder invalidEmbed = defaultEmbed("Invalid arguments", null);
+                    invalidEmbed.setDescription("**Please check your input!**");
+                    invalidEmbed.addField("Argument(s) given:", messageReply.getContentDisplay(), true);
+                    invalidEmbed.addField("Valid Arguments Example:", "• CrypticPlasma", true);
+                    invalidEmbed.addBlankField(true);
+                    invalidEmbed.addField("To retry,", "React with ✅", true);
+                    invalidEmbed.addField("To cancel the application,", "React with ❌", true);
+                    invalidEmbed.addBlankField(true);
+                    reactMessage = verifyChannel.sendMessage(invalidEmbed.build()).complete();
+                    reactMessage.addReaction("✅").queue();
+                    reactMessage.addReaction("❌").queue();
+                    state = 2;
+                    break;
+                }
+                EmbedBuilder invalidEb = defaultEmbed("Invalid Arguments", null);
+                invalidEb.setDescription("**Unable to get latest message**");
+                invalidEb.addField("To retry,", "React with ✅", true);
+                invalidEb.addField("To cancel the verification,", "React with ❌", true);
+                reactMessage = verifyChannel.sendMessage(invalidEb.build()).complete();
+                reactMessage.addReaction("✅").queue();
+                reactMessage.addReaction("❌").queue();
+                state = 2;
                 break;
             case 2:
                 EmbedBuilder eb2 = defaultEmbed("Verification for " + verifyingUser.getName(), null);
                 eb2.setDescription("• Please enter your in-game-name.\n• Ex: CrypticPlasma\n");
                 eb2.addField("To submit your LAST message,", "React with ✅", true);
                 eb2.addField("To cancel the verification,", "React with ❌", true);
-                verifyChannel.sendMessage(eb2.build()).queue(message -> {
-                    message.addReaction("✅").queue();
-                    message.addReaction("❌").queue();
-                    this.reactMessage = message;
-                });
+                reactMessage = verifyChannel.sendMessage(eb2.build()).complete();
+                reactMessage.addReaction("✅").queue();
+                reactMessage.addReaction("❌").queue();
                 state = 0;
                 break;
             case 4:
@@ -168,35 +164,4 @@ public class VerifyUser extends ListenerAdapter {
         }
     }
 
-    public String getPlayerInfo(String username) {
-        JsonElement playerJson = getJson("https://api.hypixel.net/player?key=" + key + "&name=" + username);
-
-        if (playerJson == null) {
-            return " ";
-        }
-
-        if (higherDepth(playerJson, "player").isJsonNull()) {
-            return " ";
-        }
-        try {
-            String discordID = higherDepth(
-                    higherDepth(higherDepth(higherDepth(playerJson, "player"), "socialMedia"), "links"), "DISCORD")
-                    .getAsString();
-            return discordID + " " + higherDepth(higherDepth(playerJson, "player"), "displayname").getAsString();
-        } catch (Exception e) {
-            return " ";
-        }
-    }
-
-    public EmbedBuilder invalidInput(String invalidUserInput) {
-        EmbedBuilder eb = defaultEmbed("Invalid Arguments / Username", null);
-        eb.setDescription("**Please check your input!**");
-        eb.addField("Argument(s) given:", invalidUserInput, true);
-        eb.addField("Valid Argument Example:", "CrypticPlasma", true);
-        eb.addBlankField(true);
-        eb.addField("To retry,", "React with ✅", true);
-        eb.addField("To cancel the verification,", "React with ❌", true);
-        eb.addBlankField(true);
-        return eb;
-    }
 }

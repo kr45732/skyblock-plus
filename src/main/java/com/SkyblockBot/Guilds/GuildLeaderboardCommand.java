@@ -37,8 +37,7 @@ public class GuildLeaderboardCommand extends Command {
         Message message = event.getMessage();
         String content = message.getContentRaw();
         try {
-            this.settings = new JsonParser()
-                    .parse(new FileReader("src/main/java/com/SkyblockBot/json/GuildSettings.json"));
+            this.settings = JsonParser.parseReader(new FileReader("src/main/java/com/SkyblockBot/json/GuildSettings.json"));
         } catch (Exception e) {
             eb = defaultEmbed("Error fetching settings", null);
             ebMessage.editMessage(eb.build()).queue();

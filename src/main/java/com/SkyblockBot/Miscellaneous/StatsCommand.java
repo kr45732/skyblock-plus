@@ -56,9 +56,6 @@ public class StatsCommand extends Command {
         if (player.isValid()) {
             double playerBankBalance = player.getBankBalance();
             double playerPurseCoins = player.getPurseCoins();
-            int svenSlayer = player.getSlayer("sven");
-            int revSlayer = player.getSlayer("rev");
-            int taraSlayer = player.getSlayer("tara");
             int fairySouls = player.getFairySouls();
             int minionSlots = player.getNumberMinionSlots();
             double skillAverage = player.getSkillAverage();

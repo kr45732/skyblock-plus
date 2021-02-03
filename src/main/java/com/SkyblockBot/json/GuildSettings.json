@@ -13,9 +13,9 @@
         "id": "800386981133156443"
       },
       "new_channel_prefix": "application",
-      "apply_text": "Applying in test server...",
-      "accept_text": "accept - test",
-      "deny_text": "deny - test",
+      "apply_text": "React to this message to apply",
+      "accept_text": "Accepted",
+      "deny_text": "Not accepted",
       "new_channel_category": {
         "name": "test category",
         "id": "800811801478037555"

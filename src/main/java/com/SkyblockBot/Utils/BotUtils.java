@@ -28,8 +28,8 @@ public class BotUtils {
     public static Color botColor = new Color(9, 92, 13);
     public static String botPrefix = "";
     public static int globalCooldown = 2;
-    static int remainingLimit = 120;
-    static int timeTillReset = 60;
+    private static int remainingLimit = 120;
+    private static int timeTillReset = 60;
 
     public static String getBotPrefix() {
         String botPrefix = "";
@@ -99,7 +99,7 @@ public class BotUtils {
                 remainingLimit = Integer.parseInt(request.getHeaderField("RateLimit-Remaining"));
                 timeTillReset = Integer.parseInt(request.getHeaderField("RateLimit-Reset"));
             }
-            return new JsonParser().parse(new InputStreamReader(request.getInputStream()));
+            return JsonParser.parseReader(new InputStreamReader(request.getInputStream()));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -118,7 +118,7 @@ public class BotUtils {
                 JsonElement currentName = usernameArr.get(usernameArr.size() - 1);
                 return higherDepth(currentName, "name").getAsString();
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         return null;
 
@@ -204,6 +204,26 @@ public class BotUtils {
     public static ArrayList<String> getJsonKeys(JsonElement jsonElement) {
         return jsonElement.getAsJsonObject().entrySet().stream().map(Map.Entry::getKey)
                 .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public static String getPlayerDiscordInfo(String username) {
+        JsonElement playerJson = getJson("https://api.hypixel.net/player?key=" + key + "&name=" + username);
+
+        if (playerJson == null) {
+            return " ";
+        }
+
+        if (higherDepth(playerJson, "player").isJsonNull()) {
+            return " ";
+        }
+        try {
+            String discordID = higherDepth(
+                    higherDepth(higherDepth(higherDepth(playerJson, "player"), "socialMedia"), "links"), "DISCORD")
+                    .getAsString();
+            return discordID + " " + higherDepth(higherDepth(playerJson, "player"), "displayname").getAsString();
+        } catch (Exception e) {
+            return " ";
+        }
     }
 
 }

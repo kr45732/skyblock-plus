@@ -1,12 +1,10 @@
 package com.SkyblockBot.Apply;
 
-import com.SkyblockBot.Verify.VerifyGuild;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,8 +17,7 @@ public class Apply extends ListenerAdapter {
     @Override
     public void onGuildReady(@NotNull GuildReadyEvent event) {
         try {
-            JsonElement settings = new JsonParser()
-                    .parse(new FileReader("src/main/java/com/SkyblockBot/json/GuildSettings.json"));
+            JsonElement settings = JsonParser.parseReader(new FileReader("src/main/java/com/SkyblockBot/json/GuildSettings.json"));
             if (higherDepth(settings, event.getGuild().getId()) != null) {
                 if (higherDepth(higherDepth(higherDepth(settings, event.getGuild().getId()), "automated_applications"),
                         "enable").getAsBoolean()) {
@@ -35,41 +32,13 @@ public class Apply extends ListenerAdapter {
                     List<Message> deleteMessages = reactChannel.getHistory().retrievePast(25).complete();
                     reactChannel.deleteMessages(deleteMessages).complete();
 
-                    String applyText = higherDepth(currentSettings, "apply_text").getAsString();
-                    Message reactMessage = reactChannel.sendMessage(applyText).complete();
+                    Message reactMessage = reactChannel.sendMessage(higherDepth(currentSettings, "apply_text").getAsString()).complete();
                     reactMessage.addReaction("✅").queue();
 
                     event.getJDA().addEventListener(new ApplyGuild(reactMessage, channelPrefix, currentSettings));
                 }
             }
         } catch (Exception ignored) {
-
         }
     }
-
-//    @Override
-//    public void onMessageReactionAdd(@NotNull MessageReactionAddEvent event) {
-//        if (!validGuild) {
-//            return;
-//        }
-//        if (event.getMessageIdLong() != reactMessage.getIdLong()) {
-//            return;
-//        }
-//        if (event.getUser().isBot()) {
-//            return;
-//        }
-//
-//        event.getReaction().removeReaction(event.getUser()).queue();
-//        if (!event.getReactionEmote().getName().equals("✅")) {
-//            return;
-//        }
-//
-//        if (event.getGuild()
-//                .getTextChannelsByName(channelPrefix + "-" + event.getUser().getName().replace(" ", "-"), true)
-//                .size() > 0) {
-//            return;
-//        }
-//
-//        event.getJDA().addEventListener(new ApplyUser(event, event.getUser(), currentSettings));
-//    }
 }

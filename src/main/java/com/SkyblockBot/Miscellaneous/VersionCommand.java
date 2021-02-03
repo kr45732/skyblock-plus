@@ -29,8 +29,7 @@ public class VersionCommand extends Command {
     protected void execute(CommandEvent event) {
         System.out.println(botPrefix + "version");
         try {
-            JsonElement patchNotes = new JsonParser()
-                    .parse(new FileReader("src/main/java/com/SkyblockBot/json/PatchNotes.json"));
+            JsonElement patchNotes = JsonParser.parseReader(new FileReader("src/main/java/com/SkyblockBot/json/PatchNotes.json"));
             List<Integer> patchVersions = patchNotes.getAsJsonObject().entrySet().stream()
                     .map(i -> Integer.parseInt(i.getKey().replace(".", "")))
                     .collect(Collectors.toCollection(ArrayList::new));

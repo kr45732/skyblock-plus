@@ -76,14 +76,19 @@ public class EssenceCommand extends Command {
         if (itemJson != null) {
             String essenceType = higherDepth(itemJson, "type").getAsString().toLowerCase(Locale.ROOT);
             for (String level : getJsonKeys(itemJson)) {
-                if (level.equals("type")) {
-                    eb.setDescription("**Essence Type**: " + capitalizeString(essenceType) + " essence");
-                } else if (level.equals("dungeonize")) {
-                    eb.addField("Dungeonize item", higherDepth(itemJson, level).getAsString() + " " + essenceType + " essence", false);
-                } else if (level.equals("1")) {
-                    eb.addField(level + " star", higherDepth(itemJson, level).getAsString() + " " + essenceType + " essence", false);
-                } else {
-                    eb.addField(level + " stars", higherDepth(itemJson, level).getAsString() + " " + essenceType + " essence", false);
+                switch (level) {
+                    case "type":
+                        eb.setDescription("**Essence Type**: " + capitalizeString(essenceType) + " essence");
+                        break;
+                    case "dungeonize":
+                        eb.addField("Dungeonize item", higherDepth(itemJson, level).getAsString() + " " + essenceType + " essence", false);
+                        break;
+                    case "1":
+                        eb.addField(level + " star", higherDepth(itemJson, level).getAsString() + " " + essenceType + " essence", false);
+                        break;
+                    default:
+                        eb.addField(level + " stars", higherDepth(itemJson, level).getAsString() + " " + essenceType + " essence", false);
+                        break;
                 }
             }
             return eb;

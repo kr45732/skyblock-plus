@@ -99,7 +99,7 @@ public class CoinsBalanceCommand extends Command {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
             JsonArray bankHistoryArray = player.getBankHistory();
-            if(bankHistoryArray != null) {
+            if (bankHistoryArray != null) {
                 DateTimeFormatter dateTimeFormatter =
                         DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
                                 .withLocale(Locale.US)
@@ -116,7 +116,7 @@ public class CoinsBalanceCommand extends Command {
                             }
                         }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).wrapPageEnds(true).setColor(botColor).setCommandUser(event.getAuthor());
 
-                paginateBuilder.addItems("**Last Transaction Time:** " + dateTimeFormatter.format(Instant.ofEpochMilli(higherDepth(bankHistoryArray.get(bankHistoryArray.size() - 1), "timestamp").getAsLong())) +"\n");
+                paginateBuilder.addItems("**Last Transaction Time:** " + dateTimeFormatter.format(Instant.ofEpochMilli(higherDepth(bankHistoryArray.get(bankHistoryArray.size() - 1), "timestamp").getAsLong())) + "\n");
                 for (int i = bankHistoryArray.size() - 1; i >= 0; i--) {
                     pageTitles.add("Bank transaction history for " + player.getUsername());
                     JsonElement currentTransaction = bankHistoryArray.get(i);
@@ -129,7 +129,7 @@ public class CoinsBalanceCommand extends Command {
                 paginateBuilder.setPageTitles(pageTitles.toArray(new String[0]));
                 paginateBuilder.build().paginate(event.getChannel(), 0);
                 return null;
-            }else{
+            } else {
                 return defaultEmbed("Player banking API disabled", null);
             }
         }

@@ -79,8 +79,7 @@ public class RoleCommands extends Command {
 
         if (args[1].equals("claim")) {
             try {
-                JsonElement settings = new JsonParser()
-                        .parse(new FileReader("src/main/java/com/SkyblockBot/json/GuildSettings.json"));
+                JsonElement settings = JsonParser.parseReader(new FileReader("src/main/java/com/SkyblockBot/json/GuildSettings.json"));
                 if (higherDepth(settings, guild.getId()) != null) {
                     JsonElement rolesJson = higherDepth(higherDepth(settings, guild.getId()), "automated_roles");
                     if (!higherDepth(rolesJson, "enable").getAsBoolean()) {

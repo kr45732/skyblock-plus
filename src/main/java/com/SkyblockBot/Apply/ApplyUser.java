@@ -80,57 +80,96 @@ public class ApplyUser extends ListenerAdapter {
 
         switch (state) {
             case 0:
-                // Checks username and profile and returns stats/error
                 if (applicationChannel.hasLatestMessage()) {
                     Message messageReply = applicationChannel
                             .retrieveMessageById(applicationChannel.getLatestMessageId()).complete();
+                    if (messageReply.getAuthor().equals(applyingUser)) {
+                        String[] messageContent = messageReply.getContentDisplay().split(" ");
+                        if (messageContent.length == 1 || messageContent.length == 2) {
+                            player = messageContent.length == 1 ? new Player(messageContent[0])
+                                    : new Player(messageContent[0], messageContent[1]);
 
-                    String[] messageContent = messageReply.getContentDisplay().split(" ");
-                    if (messageContent.length == 1 || messageContent.length == 2) {
-                        player = messageContent.length == 1 ? new Player(messageContent[0])
-                                : new Player(messageContent[0], messageContent[1]);
+                            if (player.isValid()) {
+                                String[] playerInfo = getPlayerDiscordInfo(player.getUsername()).split(" ");
 
-                        if (player.isValid()) {
-                            String playerSlayer = formatNumber(player.getSlayer());
-                            String playerSkills = roundSkillAverage(player.getSkillAverage());
-                            String playerCatacombs = "" + player.getCatacombsSkill().skillLevel;
-                            EmbedBuilder statsEmbed = defaultEmbed("Stats for " + player.getUsername(),
-                                    skyblockStatsLink(player.getUsername(), player.getProfileName()));
-                            statsEmbed.addField("Total slayer", playerSlayer, true);
-                            statsEmbed.addField("Progress skill level", playerSkills, true);
-                            statsEmbed.addField("Catacombs level", "" + playerCatacombs, true);
+                                if (playerInfo.length > 0) {
+                                    if (applyingUser.getAsTag().equals(playerInfo[0])) {
+                                        String playerSlayer = formatNumber(player.getSlayer());
+                                        String playerSkills = roundSkillAverage(player.getSkillAverage());
+                                        String playerCatacombs = "" + player.getCatacombsSkill().skillLevel;
+                                        EmbedBuilder statsEmbed = defaultEmbed("Stats for " + player.getUsername(),
+                                                skyblockStatsLink(player.getUsername(), player.getProfileName()));
+                                        statsEmbed.addField("Total slayer", playerSlayer, true);
+                                        statsEmbed.addField("Progress skill level", playerSkills, true);
+                                        statsEmbed.addField("Catacombs level", "" + playerCatacombs, true);
+                                        statsEmbed.addField("Are the above stats correct?", "React with ✅ for yes, ↩️ to retry, and ❌ to cancel",
+                                                false);
 
-                            this.applyPlayerStats = defaultEmbed("Stats for " + player.getUsername(),
-                                    skyblockStatsLink(player.getUsername(), player.getProfileName()));
-                            this.applyPlayerStats.addField("Total slayer", playerSlayer, true);
-                            this.applyPlayerStats.addField("Progress average skill level", playerSkills, true);
-                            this.applyPlayerStats.addField("Catacombs level", "" + playerCatacombs, true);
+                                        applyPlayerStats = defaultEmbed("Stats for " + player.getUsername(),
+                                                skyblockStatsLink(player.getUsername(), player.getProfileName()));
+                                        applyPlayerStats.addField("Total slayer", playerSlayer, true);
+                                        applyPlayerStats.addField("Progress average skill level", playerSkills, true);
+                                        applyPlayerStats.addField("Catacombs level", "" + playerCatacombs, true);
 
-                            statsEmbed.addField("Are the above stats correct?", "React with ✅ for yes, ↩️ to retry, and ❌ to cancel",
-                                    false);
-                            reactMessage = applicationChannel.sendMessage(statsEmbed.build()).complete();
+                                        reactMessage = applicationChannel.sendMessage(statsEmbed.build()).complete();
+                                        reactMessage.addReaction("✅").queue();
+                                        reactMessage.addReaction("↩️").queue();
+                                        reactMessage.addReaction("❌").queue();
+                                        state = 1;
+                                        break;
+                                    }
+                                    EmbedBuilder discordTagMismatchEb = defaultEmbed("Discord tag mismatch", null);
+                                    discordTagMismatchEb.setDescription("Account " + player.getUsername() + " is linked with the discord tag "
+                                            + playerInfo[0] + "\nYour current discord tag is "
+                                            + applyingUser.getAsTag());
+                                    discordTagMismatchEb.addField("To retry,", "React with ✅", true);
+                                    discordTagMismatchEb.addField("To cancel the application,", "React with ❌", true);
+                                    reactMessage = applicationChannel.sendMessage(discordTagMismatchEb.build()).complete();
+                                    reactMessage.addReaction("✅").queue();
+                                    reactMessage.addReaction("❌").queue();
+                                    state = 2;
+                                    break;
+                                }
+                            }
+                            EmbedBuilder invalidEmbed = defaultEmbed("Invalid username or profile", null);
+                            invalidEmbed.setDescription("**Please check your input!**");
+                            invalidEmbed.addField("Argument(s) given:", messageReply.getContentDisplay(), true);
+                            invalidEmbed.addField("Valid Arguments Examples:", "• CrypticPlasma\n• CrypticPlasma Zucchini", true);
+                            invalidEmbed.addBlankField(true);
+                            invalidEmbed.addField("To retry,", "React with ✅", true);
+                            invalidEmbed.addField("To cancel the application,", "React with ❌", true);
+                            invalidEmbed.addBlankField(true);
+                            reactMessage = applicationChannel.sendMessage(invalidEmbed.build()).complete();
                             reactMessage.addReaction("✅").queue();
-                            reactMessage.addReaction("↩️").queue();
                             reactMessage.addReaction("❌").queue();
-                            state = 1;
+                            state = 2;
                             break;
                         }
+                        EmbedBuilder invalidEmbed = defaultEmbed("Invalid arguments", null);
+                        invalidEmbed.setDescription("**Please check your input!**");
+                        invalidEmbed.addField("Argument(s) given:", messageReply.getContentDisplay(), true);
+                        invalidEmbed.addField("Valid Arguments Examples:", "• CrypticPlasma\n• CrypticPlasma Zucchini", true);
+                        invalidEmbed.addBlankField(true);
+                        invalidEmbed.addField("To retry,", "React with ✅", true);
+                        invalidEmbed.addField("To cancel the application,", "React with ❌", true);
+                        invalidEmbed.addBlankField(true);
+                        reactMessage = applicationChannel.sendMessage(invalidEmbed.build()).complete();
+                        reactMessage.addReaction("✅").queue();
+                        reactMessage.addReaction("❌").queue();
+                        state = 2;
+                        break;
                     }
-                    EmbedBuilder invalidEmbed = invalidInput(messageReply.getContentDisplay());
-                    reactMessage = applicationChannel.sendMessage(invalidEmbed.build()).complete();
-                    reactMessage.addReaction("✅").queue();
-                    reactMessage.addReaction("❌").queue();
-                    state = 2;
-                    break;
                 }
-                EmbedBuilder invalidEmbed = invalidInput(" ");
-                reactMessage = applicationChannel.sendMessage(invalidEmbed.build()).complete();
+                EmbedBuilder invalidEb = defaultEmbed("Invalid Arguments", null);
+                invalidEb.setDescription("**Unable to get latest message**");
+                invalidEb.addField("To retry,", "React with ✅", true);
+                invalidEb.addField("To cancel the application,", "React with ❌", true);
+                reactMessage = applicationChannel.sendMessage(invalidEb.build()).complete();
                 reactMessage.addReaction("✅").queue();
                 reactMessage.addReaction("❌").queue();
                 state = 2;
                 break;
             case 1:
-                // Valid username and confirmed apply, add staff listener
                 EmbedBuilder finishApplyEmbed = defaultEmbed("Thank you for applying!", null);
                 finishApplyEmbed.setDescription(
                         "**Your stats have been submitted to staff**\nYou will be notified once staff review your stats");
@@ -141,7 +180,6 @@ public class ApplyUser extends ListenerAdapter {
                         new ApplyStaff(applyingUser, applicationChannel, applyPlayerStats, currentSettings, player));
                 break;
             case 2:
-                // Retrying because of invalid username/profile
                 EmbedBuilder retryEmbed = defaultEmbed("Application for " + applyingUser.getName(), null);
                 retryEmbed.setDescription(
                         "• Please enter your in-game-name optionally followed by the skyblock profile you want to apply with.\n• Ex: CrypticPlasma **OR** CrypticPlasma Zucchini\n");
@@ -153,7 +191,6 @@ public class ApplyUser extends ListenerAdapter {
                 state = 0;
                 break;
             case 3:
-                // Cancel
                 EmbedBuilder cancelEmbed = defaultEmbed("Canceling application", null);
                 cancelEmbed.setDescription("Channel closing in 5 seconds...");
                 applicationChannel.sendMessage(cancelEmbed.build()).queue();
@@ -163,17 +200,5 @@ public class ApplyUser extends ListenerAdapter {
                 removeChannel(applicationChannel);
                 break;
         }
-    }
-
-    public EmbedBuilder invalidInput(String invalidUserInput) {
-        EmbedBuilder eb = defaultEmbed("Invalid Arguments", null);
-        eb.setDescription("**Please check your input!**");
-        eb.addField("Argument(s) given:", invalidUserInput, true);
-        eb.addField("Valid Arguments Example:", "• CrypticPlasma\n• CrypticPlasma Zucchini", true);
-        eb.addBlankField(true);
-        eb.addField("To retry,", "React with ✅", true);
-        eb.addField("To cancel the application,", "React with ❌", true);
-        eb.addBlankField(true);
-        return eb;
     }
 }

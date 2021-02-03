@@ -31,12 +31,15 @@ public class Player {
             return;
         }
 
+        try {
+            JsonArray profileArray = higherDepth(
+                    getJson("https://api.hypixel.net/skyblock/profiles?key=" + key + "&uuid=" + playerUuid), "profiles")
+                    .getAsJsonArray();
 
-        JsonArray profileArray = higherDepth(
-                getJson("https://api.hypixel.net/skyblock/profiles?key=" + key + "&uuid=" + playerUuid), "profiles")
-                .getAsJsonArray();
-
-        if (getLatestProfile(profileArray)) {
+            if (getLatestProfile(profileArray)) {
+                return;
+            }
+        }catch (Exception e){
             return;
         }
 
@@ -49,11 +52,15 @@ public class Player {
         this.levelTables = levelTables;
         this.playerGuildRank = playerGuildRank;
 
-        JsonArray profileArray = higherDepth(
-                getJson("https://api.hypixel.net/skyblock/profiles?key=" + key + "&uuid=" + playerUuid), "profiles")
-                .getAsJsonArray();
+        try {
+            JsonArray profileArray = higherDepth(
+                    getJson("https://api.hypixel.net/skyblock/profiles?key=" + key + "&uuid=" + playerUuid), "profiles")
+                    .getAsJsonArray();
 
-        if (getLatestProfile(profileArray)) {
+            if (getLatestProfile(profileArray)) {
+                return;
+            }
+        }catch(Exception e){
             return;
         }
 
@@ -65,11 +72,15 @@ public class Player {
             return;
         }
 
-        JsonArray profileArray = higherDepth(
-                getJson("https://api.hypixel.net/skyblock/profiles?key=" + key + "&uuid=" + playerUuid), "profiles")
-                .getAsJsonArray();
+        try {
 
-        if (!profileIdFromName(profileName, profileArray)) {
+            JsonArray profileArray = higherDepth(
+                    getJson("https://api.hypixel.net/skyblock/profiles?key=" + key + "&uuid=" + playerUuid), "profiles")
+                    .getAsJsonArray();
+            if (!profileIdFromName(profileName, profileArray)) {
+                return;
+            }
+        }catch(Exception e){
             return;
         }
 

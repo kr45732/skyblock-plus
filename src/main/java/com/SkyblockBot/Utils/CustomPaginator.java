@@ -131,12 +131,7 @@ public class CustomPaginator extends Menu {
 
     private void handleMessageReactionAddAction(MessageReactionAddEvent event, Message message, int pageNum) {
         int newPageNum = pageNum;
-        if (!event.getUser().equals(user)) {
-            try {
-                event.getReaction().removeReaction(event.getUser()).queue();
-            } catch (PermissionException ignored) {
-            }
-        } else {
+        if (event.getUser().equals(user)) {
             switch (event.getReaction().getReactionEmote().getName()) {
                 case LEFT:
                     if (newPageNum == 1 && wrapPageEnds)
@@ -169,11 +164,11 @@ public class CustomPaginator extends Menu {
                     }
                     break;
             }
-            try {
-                event.getReaction().removeReaction(event.getUser()).queue();
-            } catch (PermissionException ignored) {
-            }
 
+        }
+        try {
+            event.getReaction().removeReaction(event.getUser()).queue();
+        } catch (PermissionException ignored) {
         }
 
         int n = newPageNum;
