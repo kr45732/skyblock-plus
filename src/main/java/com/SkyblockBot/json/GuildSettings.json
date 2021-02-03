@@ -398,7 +398,7 @@
         "id": "800529287148601384"
       },
       "new_channel_prefix": "application",
-      "apply_text": "React to this message with ✅ to apply for Skyblock Forceful!\n\t• Note: If you do not get pinged in under 30 seconds then please open a ticket and send a link to your sky.lea profile **OR** apply through the forums here: https://hypixel.net/threads/skyblock-forceful-mid-late-game-guild.3583562/",
+      "apply_text": "React to this message with ✅ to apply for Skyblock Forceful!\n\nIf you do not get pinged in under 30 seconds then please open a ticket and link your sky.lea profile **OR** apply through the forums [here](https://hypixel.net/threads/skyblock-forceful-mid-late-game-guild.3583562/).",
       "accept_text": "You have been accepted! Please leave your current guild and you will receive an invite shortly after!",
       "deny_text": "Sorry, but your application has been denied. Feel free to apply again once you meet the requirements!",
       "new_channel_category": {
