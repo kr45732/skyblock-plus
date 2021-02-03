@@ -22,12 +22,12 @@ public class EssenceWaiter extends ListenerAdapter {
     final JsonElement itemJson;
     final Message reactMessage;
     final User user;
-    int startingLevel;
-    int endingLevel;
-    int state = 0;
     final ArrayList<String> validReactions;
     final Map<String, Integer> essenceEmojiMap = new HashMap<>();
     final Map<Integer, String> emojiEssenceMap;
+    int startingLevel;
+    int endingLevel;
+    int state = 0;
 
     public EssenceWaiter(String itemName, JsonElement itemJson, Message reactMessage, User user) {
         this.itemName = itemName;

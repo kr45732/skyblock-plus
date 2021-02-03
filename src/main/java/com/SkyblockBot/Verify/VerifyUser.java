@@ -18,11 +18,11 @@ import static com.SkyblockBot.TimeoutHandler.ChannelDeleter.removeChannel;
 import static com.SkyblockBot.Utils.BotUtils.*;
 
 public class VerifyUser extends ListenerAdapter {
-    Message reactMessage;
     final User verifyingUser;
     final TextChannel verifyChannel;
-    int state = 0;
     final JsonElement currentSettings;
+    Message reactMessage;
+    int state = 0;
     String[] playerInfo;
 
     public VerifyUser(MessageReactionAddEvent event, User verifyingUser, JsonElement currentSettings) {

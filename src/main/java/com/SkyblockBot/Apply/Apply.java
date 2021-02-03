@@ -34,7 +34,7 @@ public class Apply extends ListenerAdapter {
                     List<Message> deleteMessages = reactChannel.getHistory().retrievePast(25).complete();
                     reactChannel.deleteMessages(deleteMessages).complete();
 
-                    EmbedBuilder eb = defaultEmbed("Apply", null);
+                    EmbedBuilder eb = defaultEmbed("Apply For Guild", null);
                     eb.setDescription(higherDepth(currentSettings, "apply_text").getAsString());
                     Message reactMessage = reactChannel.sendMessage(eb.build()).complete();
                     reactMessage.addReaction("✅").queue();

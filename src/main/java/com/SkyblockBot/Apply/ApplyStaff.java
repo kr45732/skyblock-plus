@@ -21,8 +21,8 @@ public class ApplyStaff extends ListenerAdapter {
     final Message reactMessage;
     final TextChannel staffChannel;
     final JsonElement currentSettings;
-    Message deleteChannelMessage;
     final Player player;
+    Message deleteChannelMessage;
 
     public ApplyStaff(User user, TextChannel applyChannel, EmbedBuilder ebMain, JsonElement currentSettings, Player player) {
         this.user = user;

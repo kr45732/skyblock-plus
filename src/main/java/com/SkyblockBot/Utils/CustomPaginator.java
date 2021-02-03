@@ -15,8 +15,8 @@ import net.dv8tion.jda.internal.utils.Checks;
 
 import java.awt.*;
 import java.time.Instant;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;

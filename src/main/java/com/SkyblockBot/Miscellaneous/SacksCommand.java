@@ -16,8 +16,8 @@ import java.util.concurrent.TimeUnit;
 import static com.SkyblockBot.Utils.BotUtils.*;
 
 public class SacksCommand extends Command {
-    Message ebMessage;
     final EventWaiter waiter;
+    Message ebMessage;
     CommandEvent event;
 
     public SacksCommand(EventWaiter waiter) {

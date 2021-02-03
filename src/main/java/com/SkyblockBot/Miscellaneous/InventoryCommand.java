@@ -11,8 +11,8 @@ import net.dv8tion.jda.api.entities.Message;
 import static com.SkyblockBot.Utils.BotUtils.*;
 
 public class InventoryCommand extends Command {
-    Message ebMessage;
     final EventWaiter waiter;
+    Message ebMessage;
     CommandEvent event;
 
     public InventoryCommand(EventWaiter waiter) {

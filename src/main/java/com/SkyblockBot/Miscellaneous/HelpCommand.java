@@ -67,6 +67,7 @@ public class HelpCommand extends Command {
             pageMap.put("inventory", 8);
             pageMap.put("inv", 8);
             pageMap.put("sacks", 8);
+            pageMap.put("weight", 8);
 
             if (pageMap.get(pageStr) != null) {
                 startingPage = pageMap.get(pageStr);
@@ -125,7 +126,8 @@ public class HelpCommand extends Command {
                 generateHelp("Get a player's wardrobe armors", "wardrobe player [IGN] <profile>"),
                 generateHelp("Get a player's talisman bag", "talisman player [IGN] <profile>"),
                 generateHelp("Get a player's equipped armor", "inventory player [IGN] <profile>", "inv player [IGN] <profile>"),
-                generateHelp("Get a player's sacks content", "sacks player [IGN] <profile>")
+                generateHelp("Get a player's sacks content", "sacks player [IGN] <profile>"),
+                generateHelp("Get a player's weight", "weight player [IGN] <profile>")
 
         };
         paginateBuilder.addItems(fillArray(essenceCommands));

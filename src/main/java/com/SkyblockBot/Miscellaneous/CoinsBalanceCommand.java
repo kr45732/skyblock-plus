@@ -22,8 +22,8 @@ import java.util.concurrent.TimeUnit;
 import static com.SkyblockBot.Utils.BotUtils.*;
 
 public class CoinsBalanceCommand extends Command {
-    Message ebMessage;
     final EventWaiter waiter;
+    Message ebMessage;
     CommandEvent event;
 
     public CoinsBalanceCommand(EventWaiter waiter) {

@@ -14,12 +14,12 @@ import com.SkyblockBot.Slayer.SlayerCommands;
 import com.SkyblockBot.TimeoutHandler.ChannelDeleter;
 import com.SkyblockBot.TimeoutHandler.MessageTimeout;
 import com.SkyblockBot.Verify.Verify;
+import com.SkyblockBot.Weight.WeightCommand;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.exceptions.RateLimitedException;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
@@ -46,7 +46,7 @@ public class Main {
                 new ShutdownCommand(), new VersionCommand(), new RoleCommands(), new GuildLeaderboardCommand(),
                 new EssenceCommand(), new CoinsBalanceCommand(waiter), new WardrobeCommand(waiter),
                 new TalismanBagCommand(waiter), new InventoryCommand(waiter), new SacksCommand(waiter),
-                new InviteCommand()
+                new InviteCommand(), new WeightCommand()
         );
         setBotSettings(botPrefix);
         JDABuilder.createDefault(botToken).setStatus(OnlineStatus.DO_NOT_DISTURB).setChunkingFilter(ChunkingFilter.ALL)

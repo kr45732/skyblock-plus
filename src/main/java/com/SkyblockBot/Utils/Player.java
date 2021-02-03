@@ -161,7 +161,7 @@ public class Player {
         try {
             double skillExp = higherDepth(
                     higherDepth(higherDepth(higherDepth(profileJson, "dungeons"), "dungeon_types"), "catacombs"),
-                    "experience").getAsLong();
+                    "experience").getAsDouble();
             return skillInfoFromExp(skillExp, "catacombs");
         } catch (Exception e) {
             return null;
@@ -176,7 +176,7 @@ public class Player {
         }
 
         try {
-            double skillExp = higherDepth(profileJson, "experience_skill_" + skillName).getAsLong();
+            double skillExp = higherDepth(profileJson, "experience_skill_" + skillName).getAsDouble();
             return skillInfoFromExp(skillExp, skillName);
         } catch (Exception ignored) {
         }
@@ -199,7 +199,7 @@ public class Player {
         double progressSA = 0;
         for (String skill : skills) {
             try {
-                double skillExp = higherDepth(profileJson, "experience_skill_" + skill).getAsLong();
+                double skillExp = higherDepth(profileJson, "experience_skill_" + skill).getAsDouble();
                 SkillsStruct skillInfo = skillInfoFromExp(skillExp, skill);
                 progressSA += skillInfo.skillLevel + skillInfo.progressToNext;
             } catch (Exception ignored) {
@@ -211,6 +211,7 @@ public class Player {
 
     public SkillsStruct skillInfoFromExp(double skillExp, String skill) {
         JsonElement skillsCap = higherDepth(levelTables, "leveling_caps");
+
         JsonArray skillsTable;
         if (skill.equals("catacombs")) {
             skillsTable = higherDepth(levelTables, "catacombs").getAsJsonArray();
@@ -219,7 +220,12 @@ public class Player {
         } else {
             skillsTable = higherDepth(levelTables, "leveling_xp").getAsJsonArray();
         }
-        int maxLevel = higherDepth(skillsCap, skill).getAsInt();
+        int maxLevel;
+        try {
+            maxLevel = higherDepth(skillsCap, skill).getAsInt();
+        } catch (Exception e) {
+            maxLevel = 50;
+        }
 
         long xpTotal = 0L;
         int level = 1;
@@ -530,4 +536,34 @@ public class Player {
             return null;
         }
     }
+
+    public int getSkillMaxLevel(String skillName) {
+        if (this.levelTables == null) {
+            this.levelTables = getJson(
+                    "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/leveling.json");
+        }
+
+        return higherDepth(higherDepth(levelTables, "leveling_caps"), skillName).getAsInt();
+    }
+
+    public double getSkillXp(String skillName) {
+        try {
+            if (skillName == "catacombs") {
+                return higherDepth(higherDepth(higherDepth(higherDepth(profileJson, "dungeons" + skillName), "dungeon_types"), "catacombs"), "experience").getAsDouble();
+            }
+            return higherDepth(profileJson, "experience_skill_" + skillName).getAsDouble();
+        } catch (Exception ignored) {
+        }
+        return -1;
+    }
+
+    public double getDungeonClassLevel(String className) {
+        SkillsStruct dungeonClassLevel = skillInfoFromExp(getDungeonClassXp(className), "catacombs");
+        return dungeonClassLevel.skillLevel + dungeonClassLevel.progressToNext;
+    }
+
+    public double getDungeonClassXp(String className) {
+        return higherDepth(higherDepth(higherDepth(higherDepth(profileJson, "dungeons"), "player_classes"), className), "experience").getAsDouble();
+    }
+
 }

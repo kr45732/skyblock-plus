@@ -19,12 +19,12 @@ import static com.SkyblockBot.TimeoutHandler.ChannelDeleter.removeChannel;
 import static com.SkyblockBot.Utils.BotUtils.*;
 
 public class ApplyUser extends ListenerAdapter {
-    Message reactMessage;
     final User applyingUser;
     final TextChannel applicationChannel;
+    final JsonElement currentSettings;
+    Message reactMessage;
     int state = 0;
     EmbedBuilder applyPlayerStats;
-    final JsonElement currentSettings;
     Player player;
 
     public ApplyUser(MessageReactionAddEvent event, User applyingUser, JsonElement currentSettings) {

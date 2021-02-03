@@ -40,7 +40,7 @@ public class GuildCommands extends Command {
 
         String[] args = content.split(" ");
 
-        if (args.length < 3 || args[2].split("-").length<=1) { // No args or too many args are given
+        if (args.length < 3 || args[2].split("-").length <= 1) { // No args or too many args are given
             eb.setTitle(errorMessage(this.name));
             ebMessage.editMessage(eb.build()).queue();
             return;
@@ -92,11 +92,11 @@ public class GuildCommands extends Command {
                 if (args[2].toLowerCase().startsWith("u-")) {
                     String usernameInfo = args[2].split("-")[1];
                     eb = getGuildInfo(usernameInfo);
-                } else if(args[2].toLowerCase().startsWith("g-")){
+                } else if (args[2].toLowerCase().startsWith("g-")) {
                     String guildName = content.split("-")[1];
                     System.out.println(guildName);
                     eb = guildInfoFromGuildName(guildName);
-                }else {
+                } else {
                     eb.setTitle(errorMessage(this.name));
                     ebMessage.editMessage(eb.build()).queue();
                     return;
@@ -229,7 +229,7 @@ public class GuildCommands extends Command {
         return eb;
     }
 
-    public EmbedBuilder guildInfoFromGuildName(String guildName){
+    public EmbedBuilder guildInfoFromGuildName(String guildName) {
         try {
             String guildId = higherDepth(getJson("https://api.hypixel.net/findGuild?key=" + key + "&byName=" + guildName.replace(" ", "%20")), "guild").getAsString();
             JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + key + "&id=" + guildId);
@@ -241,7 +241,7 @@ public class GuildCommands extends Command {
             EmbedBuilder eb = defaultEmbed(guildName + " information", null);
             eb.addField("Guild statistics:", getGuildInfo(guildJson), false);
             return eb;
-        }catch ( Exception e){
+        } catch (Exception e) {
             return defaultEmbed("Error fetching guild data", null);
         }
     }
@@ -267,9 +267,9 @@ public class GuildCommands extends Command {
         int numGuildMembers = higherDepth(higherDepth(guildJson, "guild"), "members").getAsJsonArray().size();
         guildInfo += ("• " + guildName + " has " + numGuildMembers + " members") + "\n";
         JsonArray preferredGames;
-        try{
+        try {
             preferredGames = higherDepth(higherDepth(guildJson, "guild"), "preferredGames").getAsJsonArray();
-        } catch(Exception e){
+        } catch (Exception e) {
             preferredGames = new JsonArray();
         }
         if (preferredGames.size() > 1) {
