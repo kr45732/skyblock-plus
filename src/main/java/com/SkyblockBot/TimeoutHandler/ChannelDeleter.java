@@ -38,13 +38,10 @@ public class ChannelDeleter extends ListenerAdapter {
         for (Iterator<TextChannel> iteratorCur = channelsList.iterator(); iteratorCur.hasNext(); ) {
             TextChannel currentChannel = iteratorCur.next();
 
-            Instant lastMessageSentTime = currentChannel.retrieveMessageById(currentChannel.getLatestMessageId())
-                    .complete().getTimeCreated().toInstant();
-            long secondsSinceLast = Instant.now().getEpochSecond() - lastMessageSentTime.getEpochSecond();
             long secondsDiff = Instant.now().getEpochSecond()
                     - currentChannel.getTimeCreated().toInstant().getEpochSecond();
-            EmbedBuilder eb = defaultEmbed("Channel Closing", null);
-            if (secondsSinceLast / 3600 % 24 > 1) {
+            if (secondsDiff > 172800) { // More than 48 hours
+                EmbedBuilder eb = defaultEmbed("Channel Closing", null);
                 eb.addField("Reason", "Inactive for an hour", false);
                 currentChannel.sendMessage(eb.build()).queue();
                 currentChannel.delete().reason("Exceeded inactivity time").queueAfter(15, TimeUnit.SECONDS);
