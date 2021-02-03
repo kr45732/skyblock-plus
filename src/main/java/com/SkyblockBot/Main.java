@@ -45,7 +45,8 @@ public class Main {
                 new AuctionCommands(), new BinCommands(), new SkillsCommands(), new CatacombsCommand(),
                 new ShutdownCommand(), new VersionCommand(), new RoleCommands(), new GuildLeaderboardCommand(),
                 new EssenceCommand(), new CoinsBalanceCommand(waiter), new WardrobeCommand(waiter),
-                new TalismanBagCommand(waiter), new InventoryCommand(waiter), new SacksCommand(waiter)
+                new TalismanBagCommand(waiter), new InventoryCommand(waiter), new SacksCommand(waiter),
+                new InviteCommand()
         );
         setBotSettings(botPrefix);
         JDABuilder.createDefault(botToken).setStatus(OnlineStatus.DO_NOT_DISTURB).setChunkingFilter(ChunkingFilter.ALL)

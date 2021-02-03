@@ -39,7 +39,7 @@ public class Player {
             if (getLatestProfile(profileArray)) {
                 return;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             return;
         }
 
@@ -60,7 +60,7 @@ public class Player {
             if (getLatestProfile(profileArray)) {
                 return;
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             return;
         }
 
@@ -80,7 +80,7 @@ public class Player {
             if (!profileIdFromName(profileName, profileArray)) {
                 return;
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             return;
         }
 

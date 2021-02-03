@@ -83,6 +83,7 @@ public class HelpCommand extends Command {
         String[] generalCommands = new String[]{generateHelp("Show this help page", "help"),
                 generateHelp("Show this help page", "commands"),
                 generateHelp("Get information about this bot", "about"),
+                generateHelp("Invite this bot to your server", "invite"),
                 generateHelp("Show patch notes for this bot", "version"),
                 generateHelp("Shutdown bot; can only be used by specific people", "shutdown")};
         paginateBuilder.addItems(fillArray(generalCommands));
