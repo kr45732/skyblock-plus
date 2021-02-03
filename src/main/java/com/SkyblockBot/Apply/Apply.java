@@ -2,6 +2,7 @@ package com.SkyblockBot.Apply;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
@@ -11,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.FileReader;
 import java.util.List;
 
+import static com.SkyblockBot.Utils.BotUtils.defaultEmbed;
 import static com.SkyblockBot.Utils.BotUtils.higherDepth;
 
 public class Apply extends ListenerAdapter {
@@ -32,7 +34,9 @@ public class Apply extends ListenerAdapter {
                     List<Message> deleteMessages = reactChannel.getHistory().retrievePast(25).complete();
                     reactChannel.deleteMessages(deleteMessages).complete();
 
-                    Message reactMessage = reactChannel.sendMessage(higherDepth(currentSettings, "apply_text").getAsString()).complete();
+                    EmbedBuilder eb = defaultEmbed("Apply", null);
+                    eb.setDescription(higherDepth(currentSettings, "apply_text").getAsString());
+                    Message reactMessage = reactChannel.sendMessage(eb.build()).complete();
                     reactMessage.addReaction("✅").queue();
 
                     event.getJDA().addEventListener(new ApplyGuild(reactMessage, channelPrefix, currentSettings));
