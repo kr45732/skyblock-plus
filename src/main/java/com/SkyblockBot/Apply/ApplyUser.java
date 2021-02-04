@@ -90,9 +90,9 @@ public class ApplyUser extends ListenerAdapter {
                                     : new Player(messageContent[0], messageContent[1]);
 
                             if (player.isValid()) {
-                                String[] playerInfo = getPlayerDiscordInfo(player.getUsername()).split(" ");
+                                String[] playerInfo = getPlayerDiscordInfo(player.getUsername());
 
-                                if (playerInfo.length > 0) {
+                                if (playerInfo != null) {
                                     if (applyingUser.getAsTag().equals(playerInfo[0])) {
                                         String playerSlayer = formatNumber(player.getSlayer());
                                         String playerSkills = roundSkillAverage(player.getSkillAverage());

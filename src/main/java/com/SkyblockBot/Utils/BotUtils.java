@@ -206,24 +206,26 @@ public class BotUtils {
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
-    public static String getPlayerDiscordInfo(String username) {
+    public static String[] getPlayerDiscordInfo(String username) {
         JsonElement playerJson = getJson("https://api.hypixel.net/player?key=" + key + "&name=" + username);
 
         if (playerJson == null) {
-            return " ";
+            return null;
         }
 
         if (higherDepth(playerJson, "player").isJsonNull()) {
-            return " ";
+            return null;
         }
         try {
             String discordID = higherDepth(
                     higherDepth(higherDepth(higherDepth(playerJson, "player"), "socialMedia"), "links"), "DISCORD")
                     .getAsString();
-            return discordID + " " + higherDepth(higherDepth(playerJson, "player"), "displayname").getAsString();
+            return new String[]{discordID, higherDepth(higherDepth(playerJson, "player"), "displayname").getAsString()};
         } catch (Exception e) {
-            return " ";
+            return null;
         }
     }
+
+
 
 }

@@ -79,9 +79,9 @@ public class VerifyUser extends ListenerAdapter {
                     Message messageReply = verifyChannel.retrieveMessageById(verifyChannel.getLatestMessageId()).complete();
                     if (messageReply.getAuthor().equals(verifyingUser)) {
                         String username = messageReply.getContentDisplay();
-                        playerInfo = getPlayerDiscordInfo(username).split(" ");
+                        playerInfo = getPlayerDiscordInfo(username);
 
-                        if (playerInfo.length > 0) {
+                        if (playerInfo != null) {
                             if (verifyingUser.getAsTag().equals(playerInfo[0])) {
                                 EmbedBuilder eb = defaultEmbed("Verification successful!", null);
                                 eb.setDescription("**You have successfully been verified as " + playerInfo[1]

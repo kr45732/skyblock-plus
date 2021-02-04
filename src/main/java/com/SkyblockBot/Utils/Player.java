@@ -429,7 +429,7 @@ public class Player {
             for (int i = 0; i < wardrobeFrames.size(); i++) {
                 NBTCompound displayName = wardrobeFrames.getCompound(i).getCompound("tag.display");
                 if (displayName != null) {
-                    wardrobeFramesMap.put(i, displayName.getString("Name", "Empty").replaceAll("§f|§a|§9|§5|§6|§d|§4|§c|", ""));
+                    wardrobeFramesMap.put(i, displayName.getString("Name", "Empty").replaceAll("§f|§a|§9|§5|§6|§d|§4|§c|§7", ""));
                 } else {
                     wardrobeFramesMap.put(i, "Empty");
                 }

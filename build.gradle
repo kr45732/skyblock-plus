@@ -1,6 +1,9 @@
 plugins {
     id'application'
     id'com.github.johnrengelman.shadow' version '5.2.0'
+    //
+    id 'org.springframework.boot' version '2.4.2'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 }
 
 mainClassName = 'com.SkyblockBot.Main'
@@ -26,7 +29,7 @@ clean {
 
 repositories {
     jcenter()
-    // mavenCentral()
+     mavenCentral()
     maven {
         url 'https://jitpack.io'
     }
@@ -39,6 +42,11 @@ dependencies {
     implementation 'com.jagrosh:jda-utilities:3.0.5'
     implementation 'com.github.TheNullicorn:Nedit:1.0.0'
     // implementation 'org.asynchttpclient:async-http-client:2.12.2'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+test {
+    useJUnitPlatform()
 }
 
 compileJava.options.encoding = 'UTF-8'
