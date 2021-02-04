@@ -27,9 +27,6 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 import javax.security.auth.login.LoginException;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
 import static com.SkyblockBot.Utils.BotUtils.*;
 
 //@SpringBootApplication
@@ -37,7 +34,7 @@ public class Main {
     public static JDA jda;
 
     public static void main(String[] args) throws LoginException, IllegalArgumentException {
-//        SpringApplication.run(com.SkyblockBot.Main.class, args);
+//      SpringApplication.run(com.SkyblockBot.Main.class, args);
 
         String botPrefix = getBotPrefix();
 
@@ -59,19 +56,19 @@ public class Main {
         );
         setBotSettings(botPrefix);
 
-        if(botPrefix.equals("/")) {
+        if (botPrefix.equals("/")) {
             jda = JDABuilder.createDefault(botToken).setStatus(OnlineStatus.DO_NOT_DISTURB).setChunkingFilter(ChunkingFilter.ALL)
                     .setMemberCachePolicy(MemberCachePolicy.ALL).enableIntents(GatewayIntent.GUILD_MEMBERS)
                     .setActivity(Activity.playing("Loading...")).addEventListeners(waiter, client.build())
                     .addEventListeners(new Apply()).addEventListeners(new Verify())
                     .addEventListeners(new ChannelDeleter()).addEventListeners(new MessageTimeout()).build();
-        }else{
+        } else {
             jda = JDABuilder.createDefault(botToken).setStatus(OnlineStatus.DO_NOT_DISTURB).setChunkingFilter(ChunkingFilter.ALL)
                     .setMemberCachePolicy(MemberCachePolicy.ALL).enableIntents(GatewayIntent.GUILD_MEMBERS)
                     .setActivity(Activity.playing("Loading...")).addEventListeners(waiter, client.build())
                     .addEventListeners(new ChannelDeleter()).addEventListeners(new MessageTimeout()).build();
         }
-        
+
         // TODO: better bin command (parsing of string)
         // TODO: add unimplemented commands in HelpCommand.java
         // TODO: weight command/leaderboard

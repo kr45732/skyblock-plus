@@ -5,8 +5,6 @@ import com.SkyblockBot.Utils.Player;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.SkyblockBot.Utils.BotUtils.setBotSettings;
-
 public class Weight {
     private final Player player;
     private final Map<String, Double> slayerWeights;

@@ -40,10 +40,24 @@ public class GuildCommands extends Command {
 
         String[] args = content.split(" ");
 
-        if (args.length < 3 || args[2].split("-").length <= 1) { // No args or too many args are given
+        if (content.contains("g-")) {
+            if (args.length < 3) {
+                eb.setTitle(errorMessage(this.name));
+                ebMessage.editMessage(eb.build()).queue();
+                return;
+            }
+        } else if (args.length != 3) {
             eb.setTitle(errorMessage(this.name));
             ebMessage.editMessage(eb.build()).queue();
             return;
+        }
+
+        if (content.contains("u-") || content.contains("g-")) {
+            if (args[2].endsWith("-")) {
+                eb.setTitle(errorMessage(this.name));
+                ebMessage.editMessage(eb.build()).queue();
+                return;
+            }
         }
 
 
@@ -94,7 +108,6 @@ public class GuildCommands extends Command {
                     eb = getGuildInfo(usernameInfo);
                 } else if (args[2].toLowerCase().startsWith("g-")) {
                     String guildName = content.split("-")[1];
-                    System.out.println(guildName);
                     eb = guildInfoFromGuildName(guildName);
                 } else {
                     eb.setTitle(errorMessage(this.name));

@@ -48,5 +48,10 @@
     "version": "0.1.1",
     "description": "- Added weight command\n- Minor bug fixes",
     "date": "2021-02-03T20:48:02.655Z"
+  },
+  "11": {
+    "version": "0.1.2",
+    "description": "- Fixed automated application not working with spaces in discord name\n- Fixed automated verify not working with spaces in discord name\n- Fixed guild commands valid input check\n- Minor bug fixes",
+    "date": "2021-02-04T23:53:54.584111Z"
   }
 }

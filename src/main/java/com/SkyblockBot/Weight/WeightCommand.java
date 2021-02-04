@@ -11,11 +11,12 @@ import static com.SkyblockBot.Utils.BotUtils.*;
 public class WeightCommand extends Command {
     Message ebMessage;
 
-    public WeightCommand(){
+    public WeightCommand() {
         this.name = "weight";
         this.guildOnly = false;
         this.cooldown = globalCooldown;
     }
+
     @Override
     protected void execute(CommandEvent event) {
         EmbedBuilder eb = defaultEmbed("Loading player data...", null);
