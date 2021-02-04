@@ -1,8 +1,8 @@
 package com.SkyblockBot.API.Models;
 
 public class Template {
-    private String success;
-    private Object object;
+    private final String success;
+    private final Object object;
 
     public Template(String success, Object object) {
         this.success = success;

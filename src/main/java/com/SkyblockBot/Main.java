@@ -32,12 +32,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import static com.SkyblockBot.Utils.BotUtils.*;
 
-@SpringBootApplication
+//@SpringBootApplication
 public class Main {
     public static JDA jda;
 
     public static void main(String[] args) throws LoginException, IllegalArgumentException {
-        SpringApplication.run(com.SkyblockBot.Main.class, args);
+//        SpringApplication.run(com.SkyblockBot.Main.class, args);
 
         String botPrefix = getBotPrefix();
 

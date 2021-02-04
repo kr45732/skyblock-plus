@@ -1,8 +1,8 @@
 package com.SkyblockBot.API.Models;
 
 public class ErrorTemplate {
-    private String success;
-    private String cause;
+    private final String success;
+    private final String cause;
 
     public ErrorTemplate(String success, String cause) {
         this.success = success;

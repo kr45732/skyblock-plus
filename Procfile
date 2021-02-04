@@ -1,1 +1,1 @@
-web: java $JAVA_OPTS -Dserver.port=$PORT -jar build/libs/SkyblockMultipurpose-0.0.1-all.jar
+worker: java $JAVA_OPTS -jar build/libs/SkyblockMultipurpose-0.0.1-all.jar

@@ -1,11 +1,8 @@
 package com.SkyblockBot.API.Service;
 
-import com.SkyblockBot.API.Models.ErrorTemplate;
-import com.SkyblockBot.API.Models.GuildModel;
-import com.SkyblockBot.API.Models.Template;
+import com.SkyblockBot.API.Models.*;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,6 +27,26 @@ public class GuildController {
             return new Template("true", guildList);
         } catch (Exception e){
             return new ErrorTemplate("false", "invalid userId");
+        }
+    }
+
+    @GetMapping("/api/guildInfo")
+    public Object getGuildInfo(@RequestParam(value = "guildId") String guildId) {
+        try{
+            Guild guild = jda.getGuildById(guildId);
+
+            List<GuildRoleModel> guildRoles = null;
+            for (Role curRole : guild.getRoles()) {
+                guildRoles.add(new GuildRoleModel(curRole));
+            }
+
+            List<GuildChannel> guildChannels = guild.getChannels();
+            List<Category> guildCategories = guild.getCategories();
+
+            return new Template("true", guildRoles);
+//            return new GuildIdToInfoModel(guild.getName(), guild.getId(), guildRoles, guildChannels, guildCategories);
+        } catch (Exception e){
+            return new ErrorTemplate("false", "invalid guildId");
         }
     }
 }
