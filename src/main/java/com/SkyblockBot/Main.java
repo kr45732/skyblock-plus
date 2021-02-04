@@ -78,5 +78,6 @@ public class Main {
         // TODO: /g kick command (factoring in lowest g exp + lowest stats)
         // TODO: fix guild exp (DO NOT USE A MAP because of duplicated values)
         // TODO: finish stats command
+        // TODO: stop heroku from idling
     }
 }
