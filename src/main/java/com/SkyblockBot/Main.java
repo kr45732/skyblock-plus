@@ -21,7 +21,6 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
@@ -30,10 +29,6 @@ import javax.security.auth.login.LoginException;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.bind.annotation.GetMapping;
-
-
-import java.util.List;
 
 import static com.SkyblockBot.Utils.BotUtils.*;
 
@@ -83,15 +78,5 @@ public class Main {
         // TODO: /g kick command (factoring in lowest g exp + lowest stats)
         // TODO: fix guild exp (DO NOT USE A MAP because of duplicated values)
         // TODO: finish stats command
-    }
-
-    @GetMapping("/api/guilds")
-    public String getBotGuilds() {
-        StringBuilder outputStr = new StringBuilder();
-        List<Guild> guildArrayList = jda.getGuilds();
-        for(Guild guild:guildArrayList){
-            outputStr.append(guild.getName()).append(" - ").append(guild.getId()).append(" | ");
-        }
-        return outputStr.toString();
     }
 }
