@@ -34,7 +34,7 @@ public class Verify extends ListenerAdapter {
 
                     String verifyText = higherDepth(currentSettings, "verify_text").getAsString();
                     reactChannel.sendMessage(verifyText).queue();
-                    Message reactMessage = reactChannel.sendFile(new File("src/main/java/com/skyblockplus/Verify/Link Discord To Hypixel.mp4")).complete();
+                    Message reactMessage = reactChannel.sendFile(new File("src/main/java/com/skyblockplus/verify/Link Discord To Hypixel.mp4")).complete();
                     reactMessage.addReaction("✅").queue();
 
                     event.getJDA().addEventListener(new VerifyGuild(reactMessage, channelPrefix, currentSettings));
