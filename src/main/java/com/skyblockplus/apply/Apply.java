@@ -19,7 +19,7 @@ public class Apply extends ListenerAdapter {
     @Override
     public void onGuildReady(@NotNull GuildReadyEvent event) {
         try {
-            JsonElement settings = JsonParser.parseReader(new FileReader("src/main/java/com/SkyblockBot/json/GuildSettings.json"));
+            JsonElement settings = JsonParser.parseReader(new FileReader("src/main/java/com/skyblockplus/json/GuildSettings.json"));
             if (higherDepth(settings, event.getGuild().getId()) != null) {
                 if (higherDepth(higherDepth(higherDepth(settings, event.getGuild().getId()), "automated_applications"),
                         "enable").getAsBoolean()) {

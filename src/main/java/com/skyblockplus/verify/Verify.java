@@ -18,7 +18,7 @@ public class Verify extends ListenerAdapter {
     @Override
     public void onGuildReady(@NotNull GuildReadyEvent event) {
         try {
-            JsonElement settings = JsonParser.parseReader(new FileReader("src/main/java/com/SkyblockBot/json/GuildSettings.json"));
+            JsonElement settings = JsonParser.parseReader(new FileReader("src/main/java/com/skyblockplus/json/GuildSettings.json"));
             if (higherDepth(settings, event.getGuild().getId()) != null) {
                 if (higherDepth(higherDepth(higherDepth(settings, event.getGuild().getId()), "automated_verify"),
                         "enable").getAsBoolean()) {
@@ -34,7 +34,7 @@ public class Verify extends ListenerAdapter {
 
                     String verifyText = higherDepth(currentSettings, "verify_text").getAsString();
                     reactChannel.sendMessage(verifyText).queue();
-                    Message reactMessage = reactChannel.sendFile(new File("src/main/java/com/SkyblockBot/Verify/Link Discord To Hypixel.mp4")).complete();
+                    Message reactMessage = reactChannel.sendFile(new File("src/main/java/com/skyblockplus/Verify/Link Discord To Hypixel.mp4")).complete();
                     reactMessage.addReaction("✅").queue();
 
                     event.getJDA().addEventListener(new VerifyGuild(reactMessage, channelPrefix, currentSettings));
