@@ -6,7 +6,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 }
 
-mainClassName = 'com.SkyblockBot.Main'
+mainClassName = 'com.skyblockplus.Main'
 
 version '0.0.1'
 
