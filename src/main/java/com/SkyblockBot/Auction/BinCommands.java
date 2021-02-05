@@ -46,19 +46,75 @@ public class BinCommands extends Command {
     }
 
     public EmbedBuilder getLowestBin(String item) {
-        String preFormattedItem = item.trim().toUpperCase().replace(" ", "_");
-
-        JsonElement lowestBinJson = getJson("https://moulberry.codes/lowestbin.json");
+        String preFormattedItem = item.trim().toUpperCase().replace(" ", "_").replace("'S", "").replace("FRAG", "FRAGMENT").replace(".", "");
 
         JsonElement petJson = getJson(
                 "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/petnums.json");
 
+        List<String> petNames = petJson.getAsJsonObject().entrySet().stream().map(Entry::getKey)
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        if (preFormattedItem.equals("BONEMERANG")) {
+            preFormattedItem = "BONE_BOOMERANG";
+        } else if (preFormattedItem.equals("GOD_POT")) {
+            preFormattedItem = "GOD_POTION";
+        } else if (preFormattedItem.equals("AOTD")) {
+            preFormattedItem = "ASPECT_OF_THE_DRAGON";
+        } else if (preFormattedItem.equals("AOTE")) {
+            preFormattedItem = "ASPECT_OF_THE_END";
+        } else if (preFormattedItem.equals("ROD_OF_CHAMPIONS")) {
+            preFormattedItem = "CHAMP_ROD";
+        } else if (preFormattedItem.equals("ROD_OF_LEGENDS")) {
+            preFormattedItem = "LEGEND_ROD";
+        } else if (preFormattedItem.equals("CHALLENGING_ROD")) {
+            preFormattedItem = "CHALLENGE_ROD";
+        } else if (preFormattedItem.equals("LASR_EYE")) {
+            preFormattedItem = "GIANT_FRAGMENT_LASER";
+        } else if (preFormattedItem.equals("DIAMANTE_HANDLE")) {
+            preFormattedItem = "GIANT_FRAGMENT_DIAMOND";
+        } else if (preFormattedItem.equals("BIGFOOT_LASSO")) {
+            preFormattedItem = "GIANT_FRAGMENT_BIGFOOT";
+        } else if (preFormattedItem.equals("JOLLY_PINK_ROCK")) {
+            preFormattedItem = "GIANT_FRAGMENT_BOULDER";
+        } else if (preFormattedItem.equals("HYPER_CATALYST")) {
+            preFormattedItem = "HYPER_CATALYST_UPGRADE";
+        } else if (preFormattedItem.equals("ENDER_HELMET")) {
+            preFormattedItem = "END_HELMET";
+        } else if (preFormattedItem.equals("ENDER_CHESTPLATE")) {
+            preFormattedItem = "END_CHESTPLATE";
+        } else if (preFormattedItem.equals("ENDER_LEGGINGS")) {
+            preFormattedItem = "END_LEGGINGS";
+        } else if (preFormattedItem.equals("ENDER_BOOTS")) {
+            preFormattedItem = "END_BOOTS";
+        } else if (preFormattedItem.equals("EMPEROR_SKULL")) {
+            preFormattedItem = "DIVER_FRAGMENT";
+        } else if (preFormattedItem.contains("GOLDEN") && preFormattedItem.contains("HEAD")) {
+            preFormattedItem = preFormattedItem.replace("GOLDEN", "GOLD");
+        } else if (preFormattedItem.equals("COLOSSAL_EXP_BOTTLE")) {
+            preFormattedItem = "COLOSSAL_EXP_BOTTLE_UPGRADE";
+        } else if (preFormattedItem.equals("FLYCATCHER")) {
+            preFormattedItem = "FLYCATCHER_UPGRADE";
+        } else if (preFormattedItem.contains("PET_SKIN")) {
+            for (String curPet : petNames) {
+                if (preFormattedItem.contains(curPet)) {
+                    preFormattedItem = "PET_SKIN_" + curPet;
+                    break;
+                }
+            }
+        }
+
+        JsonElement lowestBinJson = getJson("https://moulberry.codes/lowestbin.json");
+        if (higherDepth(lowestBinJson, preFormattedItem) != null) {
+            EmbedBuilder eb = defaultEmbed("Lowest bin", null);
+            eb.addField(capitalizeString(item.toLowerCase()), formatNumber(higherDepth(lowestBinJson, preFormattedItem).getAsLong()),
+                    false);
+            return eb;
+        }
+
+
         JsonElement enchantsJson = higherDepth(getJson(
                 "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/enchants.json"),
                 "enchants_min_level");
-
-        List<String> petNames = petJson.getAsJsonObject().entrySet().stream().map(Entry::getKey)
-                .collect(Collectors.toCollection(ArrayList::new));
 
         List<String> enchantNames = enchantsJson.getAsJsonObject().entrySet().stream()
                 .map(i -> i.getKey().toUpperCase()).collect(Collectors.toCollection(ArrayList::new));
@@ -80,17 +136,17 @@ public class BinCommands extends Command {
                     enchantName = i.toLowerCase().replace("_", " ") + " " + enchantLevel;
                     formattedName = i + ";" + enchantLevel;
                     EmbedBuilder eb = defaultEmbed("Lowest bin", null);
-                    eb.addField(enchantName, formatNumber(higherDepth(lowestBinJson, formattedName).getAsLong()),
+                    eb.addField(capitalizeString(enchantName), formatNumber(higherDepth(lowestBinJson, formattedName).getAsLong()),
                             false);
                     return eb;
                 } catch (NumberFormatException e) {
                     try {
-                        EmbedBuilder eb = defaultEmbed("Lowest bin", null);
+                        EmbedBuilder eb = defaultEmbed("/Lowest bin", null);
                         for (int j = 10; j > 0; j--) {
                             try {
                                 formattedName = i + ";" + j;
                                 enchantName = i.toLowerCase().replace("_", " ") + " " + j;
-                                eb.addField(enchantName,
+                                eb.addField(capitalizeString(enchantName),
                                         formatNumber(higherDepth(lowestBinJson, formattedName).getAsLong()), false);
 
                             } catch (NullPointerException ignored) {
@@ -98,22 +154,19 @@ public class BinCommands extends Command {
                             }
                         }
                         if (eb.getFields().size() == 0) {
-                            return defaultEmbed("No bin found for " + item.toLowerCase(), null);
+                            return defaultEmbed("No bin found for " + capitalizeString(item.toLowerCase()), null);
                         }
                         return eb;
                     } catch (NullPointerException ex) {
-                        return defaultEmbed("No bin found for " + item.toLowerCase(), null);
+                        return defaultEmbed("No bin found for " + capitalizeString(item.toLowerCase()), null);
                     }
                 } catch (NullPointerException e) {
-                    return defaultEmbed("No bin found for " + item.toLowerCase(), null);
+                    return defaultEmbed("No bin found for " + capitalizeString(item.toLowerCase()), null);
                 }
             }
         }
 
         for (String i : petNames) {
-            if (preFormattedItem.contains("JERRY") && !preFormattedItem.contains("ULTIMATE")) {
-                break;
-            }
             if (preFormattedItem.contains(i)) {
                 String petName = "";
                 formattedName = i;
@@ -140,19 +193,12 @@ public class BinCommands extends Command {
                     }
                 }
                 EmbedBuilder eb = defaultEmbed("Lowest bin", null);
-                eb.addField(petName + " pet", formatNumber(higherDepth(lowestBinJson, formattedName).getAsLong()),
+                eb.addField(capitalizeString(petName) + " pet", formatNumber(higherDepth(lowestBinJson, formattedName).getAsLong()),
                         false);
                 return eb;
             }
         }
 
-        try {
-            EmbedBuilder eb = defaultEmbed("Lowest bin", null);
-            eb.addField(item.toLowerCase(), formatNumber(higherDepth(lowestBinJson, preFormattedItem).getAsLong()),
-                    false);
-            return eb;
-        } catch (NullPointerException e) {
-            return defaultEmbed("No bin found for " + item.toLowerCase(), null);
-        }
+        return defaultEmbed("No bin found for " + capitalizeString(item.toLowerCase()), null);
     }
 }

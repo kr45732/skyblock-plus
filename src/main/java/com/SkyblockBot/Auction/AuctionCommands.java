@@ -55,6 +55,7 @@ public class AuctionCommands extends Command {
             return defaultEmbed("Error fetching player data", null);
         }
         String url = "https://api.hypixel.net/skyblock/auction?key=" + key + "&player=" + this.playerUuid;
+
         JsonElement playerAuctions = getJson(url);
         JsonArray auctionsArray = higherDepth(playerAuctions, "auctions").getAsJsonArray();
         String[][] auctions = new String[auctionsArray.size()][2];
@@ -80,8 +81,12 @@ public class AuctionCommands extends Command {
                 timeUntil += hoursUntil > 0 ? hoursUntil + "h " : "";
                 timeUntil += minutesUntil > 0 ? minutesUntil + "m " : "";
 
-                auctions[i][0] = isPet ? higherDepth(currentAuction, "tier").getAsString().toLowerCase() + " "
-                        : "" + higherDepth(currentAuction, "item_name").getAsString();
+                if (higherDepth(currentAuction, "item_name").getAsString().equals("Enchanted Book")) {
+                    auctions[i][0] = higherDepth(currentAuction, "item_lore").getAsString().split("\n")[0].replaceAll("§9|§d|§l", "");
+                } else {
+                    auctions[i][0] = (isPet ? capitalizeString(higherDepth(currentAuction, "tier").getAsString().toLowerCase()) + " "
+                            : "") + higherDepth(currentAuction, "item_name").getAsString();
+                }
 
                 int highestBid = higherDepth(currentAuction, "highest_bid_amount").getAsInt();
                 int startingBid = higherDepth(currentAuction, "starting_bid").getAsInt();
