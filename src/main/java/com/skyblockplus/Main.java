@@ -55,7 +55,6 @@ public class Main {
                 new InviteCommand(), new WeightCommand()
         );
         setBotSettings(botPrefix);
-        System.out.println(botPrefix);
 
         if (botPrefix.equals("/")) {
             jda = JDABuilder.createDefault(botToken).setStatus(OnlineStatus.DO_NOT_DISTURB).setChunkingFilter(ChunkingFilter.ALL)
