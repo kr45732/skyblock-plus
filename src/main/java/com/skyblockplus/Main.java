@@ -24,6 +24,8 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import javax.security.auth.login.LoginException;
 
@@ -34,10 +36,9 @@ public class Main {
     public static JDA jda;
 
     public static void main(String[] args) throws LoginException, IllegalArgumentException {
-//      SpringApplication.run(com.SkyblockBot.Main.class, args);
+//        SpringApplication.run(com.skyblockplus.Main.class, args);
 
         String botPrefix = getBotPrefix();
-
         EventWaiter waiter = new EventWaiter();
         CommandClientBuilder client = new CommandClientBuilder();
         client.setActivity(Activity.watching(botPrefix + "help"));
