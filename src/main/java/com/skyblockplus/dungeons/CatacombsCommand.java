@@ -1,9 +1,9 @@
 package com.skyblockplus.dungeons;
 
-import com.skyblockplus.skills.SkillsStruct;
-import com.skyblockplus.utils.Player;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.skills.SkillsStruct;
+import com.skyblockplus.utils.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 

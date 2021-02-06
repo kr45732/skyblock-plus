@@ -27,7 +27,7 @@ public class VersionCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        System.out.println(botPrefix + "version");
+        System.out.println(BOT_PREFIX + "version");
         try {
             JsonElement patchNotes = JsonParser.parseReader(new FileReader("src/main/java/com/skyblockplus/json/PatchNotes.json"));
             List<Integer> patchVersions = patchNotes.getAsJsonObject().entrySet().stream()

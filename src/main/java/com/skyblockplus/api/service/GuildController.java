@@ -16,7 +16,7 @@ import static com.skyblockplus.Main.jda;
 @RestController
 public class GuildController {
 
-    @GetMapping("/api/mutualGuilds")
+    @GetMapping("/api/guild/mutualGuilds")
     public Object getMutualGuilds(@RequestParam(value = "userId") String userId) {
         try {
             User user = jda.getUserById(userId);
@@ -38,9 +38,9 @@ public class GuildController {
             Guild guild = jda.getGuildById(guildId);
             List<GuildChannelModel> guildChannels = new ArrayList<>();
             guild.getChannels().forEach(curChannel -> {
-               if(curChannel.getType().toString().equals("TEXT")) {
-                   guildChannels.add(new GuildChannelModel(curChannel.getName(), curChannel.getId()));
-               }
+                if (curChannel.getType().toString().equals("TEXT")) {
+                    guildChannels.add(new GuildChannelModel(curChannel.getName(), curChannel.getId()));
+                }
             });
             return new Template("true", guildChannels);
         } catch (Exception e) {
@@ -69,7 +69,7 @@ public class GuildController {
             List<GuildRoleModel> guildRoles = new ArrayList<>();
             guild.getRoles().forEach(curRole -> {
 
-                if(!(curRole.isPublicRole() || curRole.isManaged())) {
+                if (!(curRole.isPublicRole() || curRole.isManaged())) {
                     guildRoles.add(new GuildRoleModel(curRole.getName(), curRole.getId()));
                 }
             });

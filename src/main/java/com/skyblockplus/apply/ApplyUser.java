@@ -1,7 +1,7 @@
 package com.skyblockplus.apply;
 
-import com.skyblockplus.utils.Player;
 import com.google.gson.JsonElement;
+import com.skyblockplus.utils.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;

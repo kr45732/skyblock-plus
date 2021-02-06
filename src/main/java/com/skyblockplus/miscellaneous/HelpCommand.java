@@ -1,17 +1,17 @@
 package com.skyblockplus.miscellaneous;
 
-import com.skyblockplus.utils.CustomPaginator;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.skyblockplus.utils.CustomPaginator;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import static com.skyblockplus.utils.BotUtils.BOT_PREFIX;
 import static com.skyblockplus.utils.BotUtils.botColor;
-import static com.skyblockplus.utils.BotUtils.botPrefix;
 
 public class HelpCommand extends Command {
     private final EventWaiter waiter;
@@ -27,7 +27,7 @@ public class HelpCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        System.out.println(botPrefix + "help");
+        System.out.println(BOT_PREFIX + "help");
 
         String[] pageTitles = new String[]{"Navigation", "General", "Slayer", "Skills",
                 "Dungeons", "Guild", "Auction House and Bazaar", "Miscellaneous Commands"};
@@ -150,7 +150,7 @@ public class HelpCommand extends Command {
     public String generateHelp(String desc, String... commandName) {
         StringBuilder generatedStr = new StringBuilder("• ");
         for (int i = 0; i < commandName.length; i++) {
-            generatedStr.append("`").append(botPrefix).append(commandName[i]).append("`");
+            generatedStr.append("`").append(BOT_PREFIX).append(commandName[i]).append("`");
             if (commandName.length > 1 && i < (commandName.length - 1)) {
                 generatedStr.append(" or ");
             }

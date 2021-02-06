@@ -1,9 +1,9 @@
 package com.skyblockplus.roles;
 
-import com.skyblockplus.utils.Player;
 import com.google.gson.*;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 
@@ -100,7 +100,7 @@ public class RoleCommands extends Command {
                         switch (currentRoleName) {
                             case "guild_member":
                             case "related_guild_member": {
-                                JsonElement guildJson = getJson("https://api.hypixel.net/findGuild?key=" + key + "&byUuid="
+                                JsonElement guildJson = getJson("https://api.hypixel.net/findGuild?key=" + HYPIXEL_API_KEY + "&byUuid="
                                         + player.getUuid());
                                 if (guildJson != null) {
                                     Role curRole = guild.getRoleById(higherDepth(currentRole, "id").getAsString());
@@ -418,7 +418,7 @@ public class RoleCommands extends Command {
 
 
     public DiscordStruct getPlayerInfo(String username) {
-        JsonElement playerJson = getJson("https://api.hypixel.net/player?key=" + key + "&name=" + username);
+        JsonElement playerJson = getJson("https://api.hypixel.net/player?key=" + HYPIXEL_API_KEY + "&name=" + username);
 
         if (playerJson == null) {
             return null;

@@ -1,14 +1,14 @@
 package com.skyblockplus.utils;
 
-import com.skyblockplus.guilds.UsernameUuidStruct;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.skyblockplus.guilds.UsernameUuidStruct;
 import net.dv8tion.jda.api.EmbedBuilder;
 
 import java.awt.*;
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.RoundingMode;
 import java.net.URL;
@@ -19,64 +19,47 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class BotUtils {
     public static final Color botColor = new Color(9, 92, 13);
     public static final int globalCooldown = 2;
-    public static String key = "";
-    public static String botToken = "";
-    public static String botPrefix = "";
+    public static String HYPIXEL_API_KEY = "";
+    public static String BOT_TOKEN = "";
+    public static String BOT_PREFIX = "";
+    public static String CLIENT_ID = "";
+    public static String CLIENT_SECRET = "";
     private static int remainingLimit = 120;
     private static int timeTillReset = 60;
 
     public static String getBotPrefix() {
-        String botPrefix = "";
-        if (System.getenv("BOT_PREFIX") == null) {
-            try {
-                BufferedReader br = new BufferedReader(new FileReader("DevSettings.txt"));
-                br.readLine();
-                br.readLine();
-                botPrefix = br.readLine().split("=")[1];
-                br.close();
-            } catch (Exception ignored) {
-            }
-        } else {
-            botPrefix = System.getenv("BOT_PREFIX");
+        Properties appProps = new Properties();
+        try {
+            appProps.load(new FileInputStream("DevSettings.properties"));
+            BOT_PREFIX = (String) appProps.get("BOT_PREFIX");
+        } catch (IOException e) {
+            BOT_PREFIX = System.getenv("BOT_PREFIX");
         }
-        return botPrefix;
+        return BOT_PREFIX;
     }
 
-    public static void setBotSettings(String prefix) {
-        String botTokenL = "";
-        if (System.getenv("BOT_TOKEN") == null) {
-            try {
-                BufferedReader br = new BufferedReader(new FileReader("DevSettings.txt"));
-                botTokenL = br.readLine().split("=")[1];
-                br.close();
-            } catch (Exception ignored) {
-            }
-        } else {
-            botTokenL = System.getenv("BOT_TOKEN");
-        }
-        botToken = botTokenL;
 
-        String apiKey = "";
-        if (System.getenv("API_KEY") == null) {
-            try {
-                BufferedReader br = new BufferedReader(new FileReader("DevSettings.txt"));
-                br.readLine();
-                apiKey = br.readLine().split("=")[1];
-                br.close();
-            } catch (Exception ignored) {
-            }
-        } else {
-            apiKey = System.getenv("API_KEY");
+    public static void setApplicationSettings() {
+        Properties appProps = new Properties();
+        try {
+            appProps.load(new FileInputStream("DevSettings.properties"));
+            HYPIXEL_API_KEY = (String) appProps.get("HYPIXEL_API_KEY");
+            BOT_TOKEN = (String) appProps.get("BOT_TOKEN");
+            CLIENT_ID = (String) appProps.get("CLIENT_ID");
+            CLIENT_SECRET = (String) appProps.get("CLIENT_SECRET");
+        } catch (IOException e) {
+            HYPIXEL_API_KEY = System.getenv("HYPIXEL_API_KEY");
+            BOT_TOKEN = System.getenv("BOT_TOKEN");
+            CLIENT_ID = System.getenv("CLIENT_ID");
+            CLIENT_SECRET = System.getenv("CLIENT_SECRET");
         }
-        key = apiKey;
-
-        botPrefix = prefix;
     }
 
     public static JsonElement higherDepth(JsonElement element, String value) {
@@ -107,7 +90,7 @@ public class BotUtils {
     }
 
     public static String errorMessage(String name) {
-        return "Invalid input. Type `" + botPrefix + "help " + name + "` for help";
+        return "Invalid input. Type `" + BOT_PREFIX + "help " + name + "` for help";
     }
 
     public static String uuidToUsername(String uuid) {
@@ -207,7 +190,7 @@ public class BotUtils {
     }
 
     public static String[] getPlayerDiscordInfo(String username) {
-        JsonElement playerJson = getJson("https://api.hypixel.net/player?key=" + key + "&name=" + username);
+        JsonElement playerJson = getJson("https://api.hypixel.net/player?key=" + HYPIXEL_API_KEY + "&name=" + username);
 
         if (playerJson == null) {
             return null;

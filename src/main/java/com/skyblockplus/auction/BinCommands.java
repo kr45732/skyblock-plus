@@ -40,7 +40,7 @@ public class BinCommands extends Command {
 
         System.out.println(args);
 
-        eb = getLowestBin(args.replace(botPrefix + "bin ", ""));
+        eb = getLowestBin(args.replace(BOT_PREFIX + "bin ", ""));
 
         ebMessage.editMessage(eb.build()).queue();
     }

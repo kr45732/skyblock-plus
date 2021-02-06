@@ -1,9 +1,9 @@
 package com.skyblockplus.utils;
 
-import com.skyblockplus.skills.SkillsStruct;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.skyblockplus.skills.SkillsStruct;
 import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
 import me.nullicorn.nedit.type.NBTList;
@@ -33,7 +33,7 @@ public class Player {
 
         try {
             JsonArray profileArray = higherDepth(
-                    getJson("https://api.hypixel.net/skyblock/profiles?key=" + key + "&uuid=" + playerUuid), "profiles")
+                    getJson("https://api.hypixel.net/skyblock/profiles?key=" + HYPIXEL_API_KEY + "&uuid=" + playerUuid), "profiles")
                     .getAsJsonArray();
 
             if (getLatestProfile(profileArray)) {
@@ -54,7 +54,7 @@ public class Player {
 
         try {
             JsonArray profileArray = higherDepth(
-                    getJson("https://api.hypixel.net/skyblock/profiles?key=" + key + "&uuid=" + playerUuid), "profiles")
+                    getJson("https://api.hypixel.net/skyblock/profiles?key=" + HYPIXEL_API_KEY + "&uuid=" + playerUuid), "profiles")
                     .getAsJsonArray();
 
             if (getLatestProfile(profileArray)) {
@@ -75,7 +75,7 @@ public class Player {
         try {
 
             JsonArray profileArray = higherDepth(
-                    getJson("https://api.hypixel.net/skyblock/profiles?key=" + key + "&uuid=" + playerUuid), "profiles")
+                    getJson("https://api.hypixel.net/skyblock/profiles?key=" + HYPIXEL_API_KEY + "&uuid=" + playerUuid), "profiles")
                     .getAsJsonArray();
             if (!profileIdFromName(profileName, profileArray)) {
                 return;

@@ -1,11 +1,11 @@
 package com.skyblockplus.guilds;
 
-import com.skyblockplus.utils.Player;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
@@ -87,7 +87,7 @@ public class GuildLeaderboardCommand extends Command {
             return null;
         }
 
-        JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + key + "&player=" + playerUuid);
+        JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&player=" + playerUuid);
         String guildId = higherDepth(higherDepth(guildJson, "guild"), "_id").getAsString();
         String guildName = higherDepth(higherDepth(guildJson, "guild"), "name").getAsString();
         if (!guildName.equals("Skyblock Forceful")) {

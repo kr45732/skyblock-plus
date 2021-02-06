@@ -32,9 +32,9 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.jagrosh:jda-utilities:3.0.5'
     implementation 'com.github.TheNullicorn:Nedit:1.0.0'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+//    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    runtimeOnly 'org.postgresql:postgresql'
+//    runtimeOnly 'org.postgresql:postgresql'
 }
 
 compileJava.options.encoding = 'UTF-8'

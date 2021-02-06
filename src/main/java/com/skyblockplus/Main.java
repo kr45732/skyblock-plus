@@ -1,5 +1,7 @@
 package com.skyblockplus;
 
+import com.jagrosh.jdautilities.command.CommandClientBuilder;
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.apply.Apply;
 import com.skyblockplus.auction.AuctionCommands;
 import com.skyblockplus.auction.BinCommands;
@@ -15,8 +17,6 @@ import com.skyblockplus.timeout.ChannelDeleter;
 import com.skyblockplus.timeout.MessageTimeout;
 import com.skyblockplus.verify.Verify;
 import com.skyblockplus.weight.WeightCommand;
-import com.jagrosh.jdautilities.command.CommandClientBuilder;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -36,9 +36,11 @@ public class Main {
     public static JDA jda;
 
     public static void main(String[] args) throws LoginException, IllegalArgumentException {
+        String botPrefix = getBotPrefix();
+        setApplicationSettings();
+
 //        SpringApplication.run(com.skyblockplus.Main.class, args);
 
-        String botPrefix = getBotPrefix();
         EventWaiter waiter = new EventWaiter();
         CommandClientBuilder client = new CommandClientBuilder();
         client.setActivity(Activity.watching(botPrefix + "help"));
@@ -55,16 +57,16 @@ public class Main {
                 new TalismanBagCommand(waiter), new InventoryCommand(), new SacksCommand(waiter),
                 new InviteCommand(), new WeightCommand()
         );
-        setBotSettings(botPrefix);
+
 
         if (botPrefix.equals("/")) {
-            jda = JDABuilder.createDefault(botToken).setStatus(OnlineStatus.DO_NOT_DISTURB).setChunkingFilter(ChunkingFilter.ALL)
+            jda = JDABuilder.createDefault(BOT_TOKEN).setStatus(OnlineStatus.DO_NOT_DISTURB).setChunkingFilter(ChunkingFilter.ALL)
                     .setMemberCachePolicy(MemberCachePolicy.ALL).enableIntents(GatewayIntent.GUILD_MEMBERS)
                     .setActivity(Activity.playing("Loading...")).addEventListeners(waiter, client.build())
                     .addEventListeners(new Apply()).addEventListeners(new Verify())
                     .addEventListeners(new ChannelDeleter()).addEventListeners(new MessageTimeout()).build();
         } else {
-            jda = JDABuilder.createDefault(botToken).setStatus(OnlineStatus.DO_NOT_DISTURB).setChunkingFilter(ChunkingFilter.ALL)
+            jda = JDABuilder.createDefault(BOT_TOKEN).setStatus(OnlineStatus.DO_NOT_DISTURB).setChunkingFilter(ChunkingFilter.ALL)
                     .setMemberCachePolicy(MemberCachePolicy.ALL).enableIntents(GatewayIntent.GUILD_MEMBERS)
                     .setActivity(Activity.playing("Loading...")).addEventListeners(waiter, client.build())
                     .addEventListeners(new ChannelDeleter()).addEventListeners(new MessageTimeout()).build();

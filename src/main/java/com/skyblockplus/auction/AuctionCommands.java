@@ -54,7 +54,7 @@ public class AuctionCommands extends Command {
         if (!usernameToUuid(username)) {
             return defaultEmbed("Error fetching player data", null);
         }
-        String url = "https://api.hypixel.net/skyblock/auction?key=" + key + "&player=" + this.playerUuid;
+        String url = "https://api.hypixel.net/skyblock/auction?key=" + HYPIXEL_API_KEY + "&player=" + this.playerUuid;
 
         JsonElement playerAuctions = getJson(url);
         JsonArray auctionsArray = higherDepth(playerAuctions, "auctions").getAsJsonArray();

@@ -55,5 +55,5 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-/DevSettings.txt
-/src/main/java/com/SkyblockBot/json/test.json
+/DevSettings.properties
+/src/main/java/com/skyblockplus/api/
