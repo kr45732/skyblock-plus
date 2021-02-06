@@ -27,7 +27,6 @@
 /.idea/
 /.gradle/
 /build/
-/gradle/
 
 # General
 .DS_Store
