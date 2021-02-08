@@ -1,12 +1,6 @@
 package com.skyblockplus.utils;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.skyblockplus.guilds.UsernameUuidStruct;
-import net.dv8tion.jda.api.EmbedBuilder;
-
-import java.awt.*;
+import java.awt.Color;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -22,6 +16,13 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.skyblockplus.guilds.UsernameUuidStruct;
+
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class BotUtils {
     public static final Color botColor = new Color(9, 92, 13);
@@ -155,7 +156,7 @@ public class BotUtils {
     }
 
     public static String roundProgress(double number) {
-        DecimalFormat df = new DecimalFormat("#.##");
+        DecimalFormat df = new DecimalFormat("#.###");
         df.setRoundingMode(RoundingMode.HALF_UP);
         return df.format(number * 100) + "%";
     }
@@ -164,14 +165,15 @@ public class BotUtils {
         String formattedNumber = "" + number;
         DecimalFormat df = new DecimalFormat("#.#");
         df.setRoundingMode(RoundingMode.HALF_UP);
-        if (number >= 1000000000) {
+        if (1000000000000D > number && number >= 1000000000) {
+            number = number >= 999999999950D ? 999999999949D : number;
             formattedNumber = df.format(number / 1000000000) + "B";
         } else if (number >= 1000000) {
+            number = number >= 999999950D ? 999999949D : number;
             formattedNumber = df.format(number / 1000000) + "M";
         } else if (number >= 1000) {
-            DecimalFormat df1 = new DecimalFormat("#");
-            df1.setRoundingMode(RoundingMode.HALF_UP);
-            formattedNumber = df1.format(number / 1000) + "K";
+            number = number >= 999950D ? 999949D : number;
+            formattedNumber = df.format(number / 1000) + "K";
         }
         return formattedNumber;
     }

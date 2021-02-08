@@ -1,5 +1,11 @@
 package com.skyblockplus;
 
+import static com.skyblockplus.utils.BotUtils.BOT_TOKEN;
+import static com.skyblockplus.utils.BotUtils.getBotPrefix;
+import static com.skyblockplus.utils.BotUtils.setApplicationSettings;
+
+import javax.security.auth.login.LoginException;
+
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.apply.Apply;
@@ -9,7 +15,16 @@ import com.skyblockplus.dungeons.CatacombsCommand;
 import com.skyblockplus.dungeons.EssenceCommand;
 import com.skyblockplus.guilds.GuildCommands;
 import com.skyblockplus.guilds.GuildLeaderboardCommand;
-import com.skyblockplus.miscellaneous.*;
+import com.skyblockplus.miscellaneous.AboutCommand;
+import com.skyblockplus.miscellaneous.CoinsCommand;
+import com.skyblockplus.miscellaneous.HelpCommand;
+import com.skyblockplus.miscellaneous.InventoryCommand;
+import com.skyblockplus.miscellaneous.InviteCommand;
+import com.skyblockplus.miscellaneous.SacksCommand;
+import com.skyblockplus.miscellaneous.ShutdownCommand;
+import com.skyblockplus.miscellaneous.TalismanBagCommand;
+import com.skyblockplus.miscellaneous.VersionCommand;
+import com.skyblockplus.miscellaneous.WardrobeCommand;
 import com.skyblockplus.roles.RoleCommands;
 import com.skyblockplus.skills.SkillsCommands;
 import com.skyblockplus.slayer.SlayerCommands;
@@ -17,6 +32,10 @@ import com.skyblockplus.timeout.ChannelDeleter;
 import com.skyblockplus.timeout.MessageTimeout;
 import com.skyblockplus.verify.Verify;
 import com.skyblockplus.weight.WeightCommand;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -24,14 +43,8 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import javax.security.auth.login.LoginException;
-
-import static com.skyblockplus.utils.BotUtils.*;
-
-//@SpringBootApplication
+// @SpringBootApplication
 public class Main {
     public static JDA jda;
 
@@ -39,7 +52,7 @@ public class Main {
         String botPrefix = getBotPrefix();
         setApplicationSettings();
 
-//        SpringApplication.run(com.skyblockplus.Main.class, args);
+       //SpringApplication.run(com.skyblockplus.Main.class, args);
 
         EventWaiter waiter = new EventWaiter();
         CommandClientBuilder client = new CommandClientBuilder();
