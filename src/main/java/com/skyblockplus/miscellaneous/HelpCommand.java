@@ -95,7 +95,7 @@ public class HelpCommand extends Command {
         paginateBuilder.addItems(fillArray(slayerCommands));
 
         String[] skillsCommands = new String[]{
-                generateHelp("Get skills of a player and optionally choose which skyblock profile to get the skills of", "skill player [IGN] <profile>")};
+                generateHelp("Get skills of a player and optionally choose which skyblock profile to get the skills of", "skills player [IGN] <profile>")};
         paginateBuilder.addItems(fillArray(skillsCommands));
 
         String[] dungeonCommands = new String[]{

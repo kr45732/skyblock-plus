@@ -375,16 +375,15 @@ public class RoleCommands extends Command {
                                 break;
                             }
                             case "slot_collector": {
-                                Role petEnthusiastRole = guild.getRoleById(higherDepth(currentRole, "id").getAsString());
+                                Role slotCollectorRole = guild.getRoleById(higherDepth(currentRole, "id").getAsString());
                                 if (player.getNumberMinionSlots() >= higherDepth(currentRole, "num_minions").getAsInt()) {
-                                    if (!guild.getMember(user).getRoles().contains(petEnthusiastRole)) {
-                                        guild.addRoleToMember(guild.getMember(user), petEnthusiastRole).queue();
-                                        addedRoles.append(roleChangeString(petEnthusiastRole.getName()));
-                                        break;
+                                    if (!guild.getMember(user).getRoles().contains(slotCollectorRole)) {
+                                        guild.addRoleToMember(guild.getMember(user), slotCollectorRole).queue();
+                                        addedRoles.append(roleChangeString(slotCollectorRole.getName()));
                                     }
-                                } else if (guild.getMember(user).getRoles().contains(petEnthusiastRole)) {
-                                    removedRoles.append(roleChangeString(petEnthusiastRole.getName()));
-                                    guild.removeRoleFromMember(guild.getMember(user), petEnthusiastRole).queue();
+                                } else if (guild.getMember(user).getRoles().contains(slotCollectorRole)) {
+                                    removedRoles.append(roleChangeString(slotCollectorRole.getName()));
+                                    guild.removeRoleFromMember(guild.getMember(user), slotCollectorRole).queue();
                                 }
                                 break;
                             }
