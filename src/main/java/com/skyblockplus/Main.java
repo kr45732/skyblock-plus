@@ -44,7 +44,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
-// @SpringBootApplication
+@SpringBootApplication
 public class Main {
     public static JDA jda;
 
@@ -52,7 +52,7 @@ public class Main {
         String botPrefix = getBotPrefix();
         setApplicationSettings();
 
-       //SpringApplication.run(com.skyblockplus.Main.class, args);
+        SpringApplication.run(com.skyblockplus.Main.class, args);
 
         EventWaiter waiter = new EventWaiter();
         CommandClientBuilder client = new CommandClientBuilder();
