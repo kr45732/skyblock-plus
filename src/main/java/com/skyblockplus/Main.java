@@ -33,8 +33,8 @@ import com.skyblockplus.timeout.MessageTimeout;
 import com.skyblockplus.verify.Verify;
 import com.skyblockplus.weight.WeightCommand;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+// import org.springframework.boot.SpringApplication;
+// import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -44,7 +44,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
-//@SpringBootApplication
+// @SpringBootApplication
 public class Main {
     public static JDA jda;
 
@@ -52,7 +52,7 @@ public class Main {
         String botPrefix = getBotPrefix();
         setApplicationSettings();
 
-        //SpringApplication.run(com.skyblockplus.Main.class, args);
+        // SpringApplication.run(com.skyblockplus.Main.class, args);
 
         EventWaiter waiter = new EventWaiter();
         CommandClientBuilder client = new CommandClientBuilder();
@@ -67,22 +67,22 @@ public class Main {
                 new AuctionCommands(), new BinCommands(), new SkillsCommands(), new CatacombsCommand(),
                 new ShutdownCommand(), new VersionCommand(), new RoleCommands(), new GuildLeaderboardCommand(),
                 new EssenceCommand(), new CoinsCommand(waiter), new WardrobeCommand(waiter),
-                new TalismanBagCommand(waiter), new InventoryCommand(), new SacksCommand(waiter),
-                new InviteCommand(), new WeightCommand()
-        );
-
+                new TalismanBagCommand(waiter), new InventoryCommand(), new SacksCommand(waiter), new InviteCommand(),
+                new WeightCommand());
 
         if (botPrefix.equals("/")) {
-            jda = JDABuilder.createDefault(BOT_TOKEN).setStatus(OnlineStatus.DO_NOT_DISTURB).setChunkingFilter(ChunkingFilter.ALL)
-                    .setMemberCachePolicy(MemberCachePolicy.ALL).enableIntents(GatewayIntent.GUILD_MEMBERS)
-                    .setActivity(Activity.playing("Loading...")).addEventListeners(waiter, client.build())
-                    .addEventListeners(new Apply()).addEventListeners(new Verify())
-                    .addEventListeners(new ChannelDeleter()).addEventListeners(new MessageTimeout()).build();
+            jda = JDABuilder.createDefault(BOT_TOKEN).setStatus(OnlineStatus.DO_NOT_DISTURB)
+                    .setChunkingFilter(ChunkingFilter.ALL).setMemberCachePolicy(MemberCachePolicy.ALL)
+                    .enableIntents(GatewayIntent.GUILD_MEMBERS).setActivity(Activity.playing("Loading..."))
+                    .addEventListeners(waiter, client.build()).addEventListeners(new Apply())
+                    .addEventListeners(new Verify()).addEventListeners(new ChannelDeleter())
+                    .addEventListeners(new MessageTimeout()).build();
         } else {
-            jda = JDABuilder.createDefault(BOT_TOKEN).setStatus(OnlineStatus.DO_NOT_DISTURB).setChunkingFilter(ChunkingFilter.ALL)
-                    .setMemberCachePolicy(MemberCachePolicy.ALL).enableIntents(GatewayIntent.GUILD_MEMBERS)
-                    .setActivity(Activity.playing("Loading...")).addEventListeners(waiter, client.build())
-                    .addEventListeners(new ChannelDeleter()).addEventListeners(new MessageTimeout()).build();
+            jda = JDABuilder.createDefault(BOT_TOKEN).setStatus(OnlineStatus.DO_NOT_DISTURB)
+                    .setChunkingFilter(ChunkingFilter.ALL).setMemberCachePolicy(MemberCachePolicy.ALL)
+                    .enableIntents(GatewayIntent.GUILD_MEMBERS).setActivity(Activity.playing("Loading..."))
+                    .addEventListeners(waiter, client.build()).addEventListeners(new ChannelDeleter())
+                    .addEventListeners(new MessageTimeout()).build();
         }
 
         // TODO: better bin command (parsing of string)

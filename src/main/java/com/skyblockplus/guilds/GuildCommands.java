@@ -22,6 +22,7 @@ import static com.skyblockplus.utils.BotUtils.*;
 public class GuildCommands extends Command {
     private final EventWaiter waiter;
     Message ebMessage;
+    int counter = 0;
 
     public GuildCommands(EventWaiter waiter) {
         this.name = "guild";
@@ -60,7 +61,6 @@ public class GuildCommands extends Command {
             }
         }
 
-
         for (String value : args) {
             System.out.print(value + " ");
         }
@@ -68,15 +68,15 @@ public class GuildCommands extends Command {
 
         switch (args[1]) {
             case "experience":
-            case "exp":  // Experience commands (experience or exp)
+            case "exp": // Experience commands (experience or exp)
                 if (args[2].toLowerCase().startsWith("u-")) { // Getting guild info from IGN
                     String username = args[2].split("-")[1];
                     GuildStruct guildExp = getGuildExp(username);
                     if (guildExp.outputArr.length == 0) {
                         eb = guildExp.eb;
                     } else {
-                        CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(2).setItemsPerPage(20)
-                                .showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
+                        CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(2)
+                                .setItemsPerPage(20).showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
                                     try {
                                         m.clearReactions().queue();
                                     } catch (PermissionException ex) {
@@ -98,7 +98,7 @@ public class GuildCommands extends Command {
                     return;
                 }
                 break;
-            case "player":  // Experience commands (experience or exp)
+            case "player": // Experience commands (experience or exp)
                 String username = args[2];
                 eb = getGuildPlayer(username);
                 break;
@@ -122,8 +122,8 @@ public class GuildCommands extends Command {
                     if (guildMembers.outputArr.length == 0) {
                         eb = guildMembers.eb;
                     } else {
-                        CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(3).setItemsPerPage(27)
-                                .showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
+                        CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(3)
+                                .setItemsPerPage(27).showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
                                     try {
                                         m.clearReactions().queue();
                                     } catch (PermissionException ex) {
@@ -161,14 +161,15 @@ public class GuildCommands extends Command {
             return new GuildStruct(defaultEmbed("Error fetching player data", null), null);
         }
 
-        JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&player=" + uuidUsername.playerUuid);
+        JsonElement guildJson = getJson(
+                "https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&player=" + uuidUsername.playerUuid);
         if (guildJson == null) {
             return new GuildStruct(defaultEmbed("Error fetching guild data", null), null);
         }
 
         JsonElement members = higherDepth(higherDepth(guildJson, "guild"), "members");
         JsonArray membersArr = members.getAsJsonArray();
-        Map<Integer, String> guildExpMap = new HashMap<>();
+        Map<String, Integer> guildExpMap = new HashMap<>();
 
         for (int i = 0; i < membersArr.size(); i++) {
             String expHistory = higherDepth(membersArr.get(i), "expHistory").toString();
@@ -180,23 +181,27 @@ public class GuildCommands extends Command {
             }
 
             String currentUsername = uuidToUsername(higherDepth(membersArr.get(i), "uuid").getAsString());
-            if (currentUsername == null) {
-                return new GuildStruct(defaultEmbed("Error fetching guild player data", null), null);
+            if (currentUsername != null) {
+                guildExpMap.put(currentUsername, totalPlayerExp);
             }
-            guildExpMap.put(totalPlayerExp, currentUsername);
         }
 
-        Map<Integer, String> guildExpTreeMap = new TreeMap<>(guildExpMap).descendingMap();
-
-        int counter = 0;
         String[] outputStrArr = new String[guildExpMap.size()];
-        for (Map.Entry<Integer, String> entry : guildExpTreeMap.entrySet()) {
-            Integer exp = entry.getKey();
-            String user = entry.getValue();
-            outputStrArr[counter] = "**" + (counter + 1) + ")** " + fixUsername(user) + ": " + formatNumber(exp)
-                    + " EXP\n";
+
+        guildExpMap.entrySet().stream().sorted((k1, k2) -> -k1.getValue().compareTo(k2.getValue())).forEach(k -> {
+            outputStrArr[counter] = "**" + (counter + 1) + ")** " + fixUsername(k.getKey()) + ": "
+                    + formatNumber(k.getValue()) + " EXP\n";
             counter++;
-        }
+        });
+
+        // for (Map.Entry<Integer, String> entry : guildExpTreeMap.entrySet()) {
+        // Integer exp = entry.getKey();
+        // String user = entry.getValue();
+        // outputStrArr[counter] = "**" + (counter + 1) + ")** " + fixUsername(user) +
+        // ": " + formatNumber(exp)
+        // + " EXP\n";
+        // counter++;
+        // }
 
         return new GuildStruct(null, outputStrArr);
     }
@@ -207,7 +212,8 @@ public class GuildCommands extends Command {
             return defaultEmbed("Error fetching player data", null);
         }
 
-        JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&player=" + uuidUsername.playerUuid);
+        JsonElement guildJson = getJson(
+                "https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&player=" + uuidUsername.playerUuid);
         if (guildJson == null) {
             return defaultEmbed("Error fetching guild data", null);
         }
@@ -229,7 +235,8 @@ public class GuildCommands extends Command {
             return defaultEmbed("Error fetching player data", null);
         }
 
-        JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&player=" + uuidUsername.playerUuid);
+        JsonElement guildJson = getJson(
+                "https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&player=" + uuidUsername.playerUuid);
         if (guildJson == null) {
             return defaultEmbed("Error fetching guild data", null);
         }
@@ -244,7 +251,8 @@ public class GuildCommands extends Command {
 
     public EmbedBuilder guildInfoFromGuildName(String guildName) {
         try {
-            String guildId = higherDepth(getJson("https://api.hypixel.net/findGuild?key=" + HYPIXEL_API_KEY + "&byName=" + guildName.replace(" ", "%20")), "guild").getAsString();
+            String guildId = higherDepth(getJson("https://api.hypixel.net/findGuild?key=" + HYPIXEL_API_KEY + "&byName="
+                    + guildName.replace(" ", "%20")), "guild").getAsString();
             JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&id=" + guildId);
             if (guildJson == null) {
                 return defaultEmbed("Error fetching guild data", null);
@@ -313,7 +321,8 @@ public class GuildCommands extends Command {
             return new GuildStruct(defaultEmbed("Error fetching player data", null), null);
         }
 
-        JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&player=" + uuidUsername.playerUuid);
+        JsonElement guildJson = getJson(
+                "https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&player=" + uuidUsername.playerUuid);
         if (guildJson == null) {
             return new GuildStruct(defaultEmbed("Error fetching guild data", null), null);
         }
