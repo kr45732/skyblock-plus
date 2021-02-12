@@ -1,7 +1,21 @@
 package com.skyblockplus.apply;
 
+import static com.skyblockplus.reload.ReloadEventWatcher.addApplySubEventListener;
+import static com.skyblockplus.timeout.ChannelDeleter.addChannel;
+import static com.skyblockplus.timeout.ChannelDeleter.removeChannel;
+import static com.skyblockplus.utils.BotUtils.defaultEmbed;
+import static com.skyblockplus.utils.BotUtils.formatNumber;
+import static com.skyblockplus.utils.BotUtils.getPlayerDiscordInfo;
+import static com.skyblockplus.utils.BotUtils.higherDepth;
+import static com.skyblockplus.utils.BotUtils.roundSkillAverage;
+import static com.skyblockplus.utils.BotUtils.skyblockStatsLink;
+
+import java.util.EnumSet;
+import java.util.concurrent.TimeUnit;
+
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
@@ -10,13 +24,6 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-
-import java.util.EnumSet;
-import java.util.concurrent.TimeUnit;
-
-import static com.skyblockplus.timeout.ChannelDeleter.addChannel;
-import static com.skyblockplus.timeout.ChannelDeleter.removeChannel;
-import static com.skyblockplus.utils.BotUtils.*;
 
 public class ApplyUser extends ListenerAdapter {
     final User applyingUser;
@@ -52,6 +59,8 @@ public class ApplyUser extends ListenerAdapter {
         this.reactMessage = applicationChannel.sendMessage(welcomeEb.build()).complete();
         this.reactMessage.addReaction("✅").queue();
         this.reactMessage.addReaction("❌").queue();
+
+        addApplySubEventListener(this.reactMessage.getGuild().getId(), this);
     }
 
     @Override
@@ -64,7 +73,8 @@ public class ApplyUser extends ListenerAdapter {
         }
 
         if (!event.getUser().equals(applyingUser)) {
-            reactMessage.removeReaction(event.getReaction().getReactionEmote().getAsReactionCode(), event.getUser()).queue();
+            reactMessage.removeReaction(event.getReaction().getReactionEmote().getAsReactionCode(), event.getUser())
+                    .queue();
             return;
         }
 
@@ -102,8 +112,8 @@ public class ApplyUser extends ListenerAdapter {
                                         statsEmbed.addField("Total slayer", playerSlayer, true);
                                         statsEmbed.addField("Progress skill level", playerSkills, true);
                                         statsEmbed.addField("Catacombs level", "" + playerCatacombs, true);
-                                        statsEmbed.addField("Are the above stats correct?", "React with ✅ for yes, ↩️ to retry, and ❌ to cancel",
-                                                false);
+                                        statsEmbed.addField("Are the above stats correct?",
+                                                "React with ✅ for yes, ↩️ to retry, and ❌ to cancel", false);
 
                                         applyPlayerStats = defaultEmbed("Stats for " + player.getUsername(),
                                                 skyblockStatsLink(player.getUsername(), player.getProfileName()));
@@ -119,12 +129,13 @@ public class ApplyUser extends ListenerAdapter {
                                         break;
                                     }
                                     EmbedBuilder discordTagMismatchEb = defaultEmbed("Discord tag mismatch", null);
-                                    discordTagMismatchEb.setDescription("Account " + player.getUsername() + " is linked with the discord tag "
-                                            + playerInfo[0] + "\nYour current discord tag is "
-                                            + applyingUser.getAsTag());
+                                    discordTagMismatchEb.setDescription("Account " + player.getUsername()
+                                            + " is linked with the discord tag " + playerInfo[0]
+                                            + "\nYour current discord tag is " + applyingUser.getAsTag());
                                     discordTagMismatchEb.addField("To retry,", "React with ✅", true);
                                     discordTagMismatchEb.addField("To cancel the application,", "React with ❌", true);
-                                    reactMessage = applicationChannel.sendMessage(discordTagMismatchEb.build()).complete();
+                                    reactMessage = applicationChannel.sendMessage(discordTagMismatchEb.build())
+                                            .complete();
                                     reactMessage.addReaction("✅").queue();
                                     reactMessage.addReaction("❌").queue();
                                     state = 2;
@@ -134,7 +145,8 @@ public class ApplyUser extends ListenerAdapter {
                             EmbedBuilder invalidEmbed = defaultEmbed("Invalid username or profile", null);
                             invalidEmbed.setDescription("**Please check your input!**");
                             invalidEmbed.addField("Argument(s) given:", messageReply.getContentDisplay(), true);
-                            invalidEmbed.addField("Valid Arguments Examples:", "• CrypticPlasma\n• CrypticPlasma Zucchini", true);
+                            invalidEmbed.addField("Valid Arguments Examples:",
+                                    "• CrypticPlasma\n• CrypticPlasma Zucchini", true);
                             invalidEmbed.addBlankField(true);
                             invalidEmbed.addField("To retry,", "React with ✅", true);
                             invalidEmbed.addField("To cancel the application,", "React with ❌", true);
@@ -148,7 +160,8 @@ public class ApplyUser extends ListenerAdapter {
                         EmbedBuilder invalidEmbed = defaultEmbed("Invalid arguments", null);
                         invalidEmbed.setDescription("**Please check your input!**");
                         invalidEmbed.addField("Argument(s) given:", messageReply.getContentDisplay(), true);
-                        invalidEmbed.addField("Valid Arguments Examples:", "• CrypticPlasma\n• CrypticPlasma Zucchini", true);
+                        invalidEmbed.addField("Valid Arguments Examples:", "• CrypticPlasma\n• CrypticPlasma Zucchini",
+                                true);
                         invalidEmbed.addBlankField(true);
                         invalidEmbed.addField("To retry,", "React with ✅", true);
                         invalidEmbed.addField("To cancel the application,", "React with ❌", true);

@@ -25,6 +25,7 @@ import com.skyblockplus.miscellaneous.ShutdownCommand;
 import com.skyblockplus.miscellaneous.TalismanBagCommand;
 import com.skyblockplus.miscellaneous.VersionCommand;
 import com.skyblockplus.miscellaneous.WardrobeCommand;
+import com.skyblockplus.reload.ReloadEventWatcher;
 import com.skyblockplus.roles.RoleCommands;
 import com.skyblockplus.skills.SkillsCommands;
 import com.skyblockplus.slayer.SlayerCommands;
@@ -74,23 +75,19 @@ public class Main {
             jda = JDABuilder.createDefault(BOT_TOKEN).setStatus(OnlineStatus.DO_NOT_DISTURB)
                     .setChunkingFilter(ChunkingFilter.ALL).setMemberCachePolicy(MemberCachePolicy.ALL)
                     .enableIntents(GatewayIntent.GUILD_MEMBERS).setActivity(Activity.playing("Loading..."))
-                    .addEventListeners(waiter, client.build()).addEventListeners(new Apply())
-                    .addEventListeners(new Verify()).addEventListeners(new ChannelDeleter())
-                    .addEventListeners(new MessageTimeout()).build();
+                    .addEventListeners(waiter, client.build(), new Apply(), new Verify(), new ChannelDeleter(),
+                            new MessageTimeout())
+                    .build();
         } else {
             jda = JDABuilder.createDefault(BOT_TOKEN).setStatus(OnlineStatus.DO_NOT_DISTURB)
                     .setChunkingFilter(ChunkingFilter.ALL).setMemberCachePolicy(MemberCachePolicy.ALL)
                     .enableIntents(GatewayIntent.GUILD_MEMBERS).setActivity(Activity.playing("Loading..."))
-                    .addEventListeners(waiter, client.build()).addEventListeners(new ChannelDeleter())
-                    .addEventListeners(new MessageTimeout()).build();
+                    .addEventListeners(waiter, client.build(), new ChannelDeleter(), new MessageTimeout()).build();
         }
 
-        // TODO: better bin command (parsing of string)
-        // TODO: add unimplemented commands in HelpCommand.java
-        // TODO: weight command/leaderboard
         // TODO: /g kick command (factoring in lowest g exp + lowest stats)
-        // TODO: fix guild exp (DO NOT USE A MAP because of duplicated values)
         // TODO: finish stats command
         // TODO: stop heroku from idling
+        // TODO: improve weight command and make more accurate
     }
 }

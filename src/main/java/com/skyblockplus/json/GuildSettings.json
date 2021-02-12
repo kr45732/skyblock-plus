@@ -3,10 +3,10 @@
     "name": "Skyblock Plus",
     "type": "Discord Server",
     "automated_applications": {
-      "enable": "false",
+      "enable": "true",
       "react_channel": {
         "name": "apply",
-        "id": "800031085588512828"
+        "id": "809594917969985536"
       },
       "staff_channel": {
         "name": "applications",
@@ -29,7 +29,7 @@
       "enable": "true",
       "react_channel": {
         "name": "verify",
-        "id": "801970206721179658"
+        "id": "809594902476357632"
       },
       "verify_text": "**Welcome to the Skyblock Plus Server!**\nTo gain access to the rest of the server:\n\n  1) Follow the video below, replacing CrypticPlasma's name and tag with your own\n  2) React to video below with ✅",
       "new_channel_category": {
@@ -366,12 +366,7 @@
       "pet_enthusiast": {
         "name": "Pet Enthusiast",
         "id": "805567896809898009",
-        "excluded_pets": [
-          "guardian",
-          "jellyfish",
-          "parrot",
-          "sheep"
-        ]
+        "excluded_pets": ["guardian", "jellyfish", "parrot", "sheep"]
       },
       "slot_collector": {
         "name": "Slot collector",
@@ -751,12 +746,7 @@
       "pet_enthusiast": {
         "name": "Pet Enthusiast",
         "id": "782154976608387072",
-        "excluded_pets": [
-          "guardian",
-          "jellyfish",
-          "parrot",
-          "sheep"
-        ]
+        "excluded_pets": ["guardian", "jellyfish", "parrot", "sheep"]
       },
       "slot_collector": {
         "name": "Slot collector",
@@ -773,29 +763,17 @@
     "name": "Skyblock Forceful",
     "type": "Guild",
     "guild_leaderboard": {
-      "staff_ranks": [
-        "Moderator",
-        "Senior Officer",
-        "Guild Master"
-      ],
+      "staff_ranks": ["Moderator", "Senior Officer", "Guild Master"],
       "top_role": {
         "range": "5",
-        "names": [
-          "elite"
-        ]
+        "names": ["elite"]
       },
       "middle_role": {
         "range": "15",
-        "names": [
-          "trainee",
-          "kings"
-        ]
+        "names": ["trainee", "kings"]
       },
       "default_role": {
-        "names": [
-          "rookie",
-          "member"
-        ]
+        "names": ["rookie", "member"]
       }
     }
   }

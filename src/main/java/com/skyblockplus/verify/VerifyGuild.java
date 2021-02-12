@@ -1,10 +1,14 @@
 package com.skyblockplus.verify;
 
+import static com.skyblockplus.reload.ReloadEventWatcher.addVerifyGuild;
+
 import com.google.gson.JsonElement;
+
+import org.jetbrains.annotations.NotNull;
+
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.jetbrains.annotations.NotNull;
 
 public class VerifyGuild extends ListenerAdapter {
     final Message reactMessage;
@@ -15,6 +19,7 @@ public class VerifyGuild extends ListenerAdapter {
         this.reactMessage = reactMessage;
         this.channelPrefix = channelPrefix;
         this.currentSettings = currentSettings;
+        addVerifyGuild(reactMessage.getGuild().getId(), this);
     }
 
     @Override
@@ -27,7 +32,6 @@ public class VerifyGuild extends ListenerAdapter {
             return;
         }
 
-
         event.getReaction().removeReaction(event.getUser()).queue();
         if (!event.getReactionEmote().getName().equals("✅")) {
             return;
@@ -36,7 +40,6 @@ public class VerifyGuild extends ListenerAdapter {
         if (event.getGuild().getTextChannelsByName(channelPrefix + "-" + event.getUser().getName(), true).size() > 0) {
             return;
         }
-
 
         event.getJDA().addEventListener(new VerifyUser(event, event.getUser(), currentSettings));
     }

@@ -1,6 +1,17 @@
 package com.skyblockplus.verify;
 
+import static com.skyblockplus.reload.ReloadEventWatcher.addVerifySubEventListener;
+import static com.skyblockplus.timeout.ChannelDeleter.addChannel;
+import static com.skyblockplus.timeout.ChannelDeleter.removeChannel;
+import static com.skyblockplus.utils.BotUtils.defaultEmbed;
+import static com.skyblockplus.utils.BotUtils.getPlayerDiscordInfo;
+import static com.skyblockplus.utils.BotUtils.higherDepth;
+
+import java.util.EnumSet;
+import java.util.concurrent.TimeUnit;
+
 import com.google.gson.JsonElement;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
@@ -9,13 +20,6 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-
-import java.util.EnumSet;
-import java.util.concurrent.TimeUnit;
-
-import static com.skyblockplus.timeout.ChannelDeleter.addChannel;
-import static com.skyblockplus.timeout.ChannelDeleter.removeChannel;
-import static com.skyblockplus.utils.BotUtils.*;
 
 public class VerifyUser extends ListenerAdapter {
     final User verifyingUser;
@@ -50,6 +54,8 @@ public class VerifyUser extends ListenerAdapter {
         reactMessage.addReaction("✅").queue();
         reactMessage.addReaction("❌").queue();
 
+        addVerifySubEventListener(this.reactMessage.getGuild().getId(), this);
+
     }
 
     @Override
@@ -62,7 +68,8 @@ public class VerifyUser extends ListenerAdapter {
         }
 
         if (!event.getUser().equals(verifyingUser)) {
-            reactMessage.removeReaction(event.getReaction().getReactionEmote().getAsReactionCode(), event.getUser()).queue();
+            reactMessage.removeReaction(event.getReaction().getReactionEmote().getAsReactionCode(), event.getUser())
+                    .queue();
             return;
         }
 
@@ -76,7 +83,8 @@ public class VerifyUser extends ListenerAdapter {
         switch (state) {
             case 0:
                 if (verifyChannel.hasLatestMessage()) {
-                    Message messageReply = verifyChannel.retrieveMessageById(verifyChannel.getLatestMessageId()).complete();
+                    Message messageReply = verifyChannel.retrieveMessageById(verifyChannel.getLatestMessageId())
+                            .complete();
                     if (messageReply.getAuthor().equals(verifyingUser)) {
                         String username = messageReply.getContentDisplay();
                         playerInfo = getPlayerDiscordInfo(username);
@@ -89,10 +97,11 @@ public class VerifyUser extends ListenerAdapter {
                                 verifyChannel.sendMessage(eb.build()).queue();
                                 verifyChannel.delete().reason("Verification successful").queueAfter(30,
                                         TimeUnit.SECONDS);
-                                event.getGuild().addRoleToMember(event.getGuild().getMember(verifyingUser),
-                                        event.getGuild().getRoleById(
-                                                higherDepth(higherDepth(currentSettings, "verified_role"), "id")
-                                                        .getAsString()))
+                                event.getGuild()
+                                        .addRoleToMember(event.getGuild().getMember(verifyingUser),
+                                                event.getGuild().getRoleById(
+                                                        higherDepth(higherDepth(currentSettings, "verified_role"), "id")
+                                                                .getAsString()))
                                         .queue();
                                 removeChannel(verifyChannel);
                                 event.getJDA().removeEventListener(this);
@@ -100,8 +109,7 @@ public class VerifyUser extends ListenerAdapter {
                             }
                             EmbedBuilder eb = defaultEmbed("Discord tag mismatch", null);
                             eb.setDescription("Account " + playerInfo[1] + " is linked with the discord tag "
-                                    + playerInfo[0] + "\nYour current discord tag is "
-                                    + verifyingUser.getAsTag());
+                                    + playerInfo[0] + "\nYour current discord tag is " + verifyingUser.getAsTag());
                             eb.addField("To retry,", "React with ✅", true);
                             eb.addField("To cancel the verification,", "React with ❌", true);
                             reactMessage = verifyChannel.sendMessage(eb.build()).complete();

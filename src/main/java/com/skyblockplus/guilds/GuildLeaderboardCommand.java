@@ -7,6 +7,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 
 import java.io.FileReader;
@@ -25,7 +26,8 @@ public class GuildLeaderboardCommand extends Command {
         this.name = "guild-rank";
         this.guildOnly = true;
         this.cooldown = 60;
-        this.aliases = new String[]{"g-rank"};
+        this.aliases = new String[] { "g-rank" };
+        this.userPermissions = new Permission[] { Permission.MANAGE_SERVER };
     }
 
     @Override
@@ -36,18 +38,6 @@ public class GuildLeaderboardCommand extends Command {
 
         Message message = event.getMessage();
         String content = message.getContentRaw();
-        try {
-            this.settings = JsonParser.parseReader(new FileReader("src/main/java/com/skyblockplus/json/GuildSettings.json"));
-        } catch (Exception e) {
-            eb = defaultEmbed("Error fetching settings", null);
-            ebMessage.editMessage(eb.build()).queue();
-            return;
-        }
-        if (!event.getGuild().getMember(event.getAuthor()).getRoles().contains(event.getGuild().getRoleById(higherDepth(higherDepth(higherDepth(settings, event.getGuild().getId()), "staff_role"), "id").getAsString()))) {
-            eb = defaultEmbed("You must have " + event.getGuild().getRoleById(higherDepth(higherDepth(higherDepth(settings, event.getGuild().getId()), "staff_role"), "id").getAsString()).getName() + " role to run this command", null);
-            ebMessage.editMessage(eb.build()).queue();
-            return;
-        }
 
         String[] args = content.split(" ");
         if (args.length != 2) {
@@ -87,12 +77,13 @@ public class GuildLeaderboardCommand extends Command {
             return null;
         }
 
-        JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&player=" + playerUuid);
+        JsonElement guildJson = getJson(
+                "https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&player=" + playerUuid);
         String guildId = higherDepth(higherDepth(guildJson, "guild"), "_id").getAsString();
         String guildName = higherDepth(higherDepth(guildJson, "guild"), "name").getAsString();
         if (!guildName.equals("Skyblock Forceful")) {
-            return new String[]{"Currently only supported for the Skyblock Forceful guild",
-                    "Currently only supported for the Skyblock Forceful guild", ""};
+            return new String[] { "Currently only supported for the Skyblock Forceful guild",
+                    "Currently only supported for the Skyblock Forceful guild", "" };
         }
 
         List<String> staffRankNames = new ArrayList<>();
@@ -254,19 +245,22 @@ public class GuildLeaderboardCommand extends Command {
                 } else if (i <= middleRankSize) {
                     if (!playerRank.equals(middleRankName)) {
                         if (playerRank.equals(topRankName)) {
-                            demoteString.append("\n- /g setrank ").append(playerUsername).append(" ").append(middleRankName);
+                            demoteString.append("\n- /g setrank ").append(playerUsername).append(" ")
+                                    .append(middleRankName);
                         } else {
-                            promoteString.append("\n- /g setrank ").append(playerUsername).append(" ").append(middleRankName);
+                            promoteString.append("\n- /g setrank ").append(playerUsername).append(" ")
+                                    .append(middleRankName);
                         }
                     }
                 } else {
                     if (!playerRank.equals(defaultRankName)) {
-                        demoteString.append("\n- /g setrank ").append(playerUsername).append(" ").append(defaultRankName);
+                        demoteString.append("\n- /g setrank ").append(playerUsername).append(" ")
+                                .append(defaultRankName);
                     }
                 }
             }
         }
 
-        return new String[]{promoteString.toString(), demoteString.toString(), guildName};
+        return new String[] { promoteString.toString(), demoteString.toString(), guildName };
     }
 }

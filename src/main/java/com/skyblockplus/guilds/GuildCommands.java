@@ -194,15 +194,6 @@ public class GuildCommands extends Command {
             counter++;
         });
 
-        // for (Map.Entry<Integer, String> entry : guildExpTreeMap.entrySet()) {
-        // Integer exp = entry.getKey();
-        // String user = entry.getValue();
-        // outputStrArr[counter] = "**" + (counter + 1) + ")** " + fixUsername(user) +
-        // ": " + formatNumber(exp)
-        // + " EXP\n";
-        // counter++;
-        // }
-
         return new GuildStruct(null, outputStrArr);
     }
 
@@ -310,7 +301,8 @@ public class GuildCommands extends Command {
         }
 
         int guildExp = higherDepth(higherDepth(guildJson, "guild"), "exp").getAsInt();
-        guildInfo += ("• " + guildName + " has a total of " + formatNumber(guildExp) + " exp") + "\n";
+
+        guildInfo += ("• " + guildName + " is guild level " + guildExpToLevel(guildExp)) + "\n";
 
         return guildInfo;
     }
@@ -336,6 +328,23 @@ public class GuildCommands extends Command {
         }
 
         return new GuildStruct(null, members);
+    }
+
+    public int guildExpToLevel(int guildExp) {
+        int[] guildExpTable = new int[] { 100000, 150000, 250000, 500000, 750000, 1000000, 1250000, 1500000, 2000000,
+                2500000, 2500000, 2500000, 2500000, 2500000, 3000000 };
+        int guildLevel = 0;
+
+        for (int i = 0;; i++) {
+            int expNeeded = i >= guildExpTable.length ? guildExpTable[guildExpTable.length - 1] : guildExpTable[i];
+            guildExp -= expNeeded;
+            if (guildExp < 0) {
+                return guildLevel;
+            } else {
+                guildLevel++;
+            }
+        }
+
     }
 
 }

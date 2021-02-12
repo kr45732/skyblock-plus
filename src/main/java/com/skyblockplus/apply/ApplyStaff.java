@@ -1,19 +1,21 @@
 package com.skyblockplus.apply;
 
+import static com.skyblockplus.reload.ReloadEventWatcher.addApplySubEventListener;
+import static com.skyblockplus.timeout.ChannelDeleter.removeChannel;
+import static com.skyblockplus.utils.BotUtils.defaultEmbed;
+import static com.skyblockplus.utils.BotUtils.higherDepth;
+
+import java.util.concurrent.TimeUnit;
+
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-
-import java.util.concurrent.TimeUnit;
-
-import static com.skyblockplus.timeout.ChannelDeleter.removeChannel;
-import static com.skyblockplus.utils.BotUtils.defaultEmbed;
-import static com.skyblockplus.utils.BotUtils.higherDepth;
 
 public class ApplyStaff extends ListenerAdapter {
     final User user;
@@ -24,7 +26,8 @@ public class ApplyStaff extends ListenerAdapter {
     final Player player;
     Message deleteChannelMessage;
 
-    public ApplyStaff(User user, TextChannel applyChannel, EmbedBuilder ebMain, JsonElement currentSettings, Player player) {
+    public ApplyStaff(User user, TextChannel applyChannel, EmbedBuilder ebMain, JsonElement currentSettings,
+            Player player) {
         this.user = user;
         this.applyChannel = applyChannel;
         this.currentSettings = currentSettings;
@@ -42,6 +45,7 @@ public class ApplyStaff extends ListenerAdapter {
         reactMessage.addReaction("✅").queue();
         reactMessage.addReaction("❌").queue();
 
+        addApplySubEventListener(reactMessage.getGuild().getId(), this);
     }
 
     @Override
