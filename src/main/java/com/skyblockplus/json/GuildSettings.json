@@ -3,10 +3,10 @@
     "name": "Skyblock Plus",
     "type": "Discord Server",
     "automated_applications": {
-      "enable": "true",
+      "enable": "false",
       "react_channel": {
         "name": "apply",
-        "id": "809594917969985536"
+        "id": "800031085588512828"
       },
       "staff_channel": {
         "name": "applications",
@@ -29,7 +29,7 @@
       "enable": "true",
       "react_channel": {
         "name": "verify",
-        "id": "809594902476357632"
+        "id": "801970206721179658"
       },
       "verify_text": "**Welcome to the Skyblock Plus Server!**\nTo gain access to the rest of the server:\n\n  1) Follow the video below, replacing CrypticPlasma's name and tag with your own\n  2) React to video below with ✅",
       "new_channel_category": {
