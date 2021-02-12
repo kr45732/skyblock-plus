@@ -25,7 +25,7 @@ import com.skyblockplus.miscellaneous.ShutdownCommand;
 import com.skyblockplus.miscellaneous.TalismanBagCommand;
 import com.skyblockplus.miscellaneous.VersionCommand;
 import com.skyblockplus.miscellaneous.WardrobeCommand;
-import com.skyblockplus.reload.ReloadEventWatcher;
+// import com.skyblockplus.reload.ReloadEventWatcher;
 import com.skyblockplus.roles.RoleCommands;
 import com.skyblockplus.skills.SkillsCommands;
 import com.skyblockplus.slayer.SlayerCommands;
