@@ -33,13 +33,12 @@ public class ApplyStaff extends ListenerAdapter {
         this.currentSettings = currentSettings;
         this.player = player;
         staffChannel = applyChannel.getJDA()
-                .getTextChannelById(higherDepth(higherDepth(currentSettings, "staff_channel"), "id").getAsString());
+                .getTextChannelById(higherDepth(currentSettings, "messageStaffChannelId").getAsString());
 
         ebMain.addField("To accept the application,", "React with ✅", true);
         ebMain.addBlankField(true);
         ebMain.addField("To deny the application,", "React with ❌", true);
-        staffChannel
-                .sendMessage("<@&" + higherDepth(higherDepth(currentSettings, "staff_ping"), "id").getAsString() + ">")
+        staffChannel.sendMessage("<@&" + higherDepth(currentSettings, "staffPingRoleId").getAsString() + ">")
                 .complete();
         reactMessage = staffChannel.sendMessage(ebMain.build()).complete();
         reactMessage.addReaction("✅").queue();
@@ -80,7 +79,7 @@ public class ApplyStaff extends ListenerAdapter {
                     + event.getUser().getName() + " (" + event.getUser().getAsMention() + ")").queue();
             reactMessage.clearReactions().queue();
             EmbedBuilder eb = defaultEmbed("Application Not Accepted", null);
-            eb.setDescription(higherDepth(currentSettings, "deny_text").getAsString()
+            eb.setDescription(higherDepth(currentSettings, "denyMessageText").getAsString()
                     + "\n**React with ✅ to confirm that you have read this message and to close channel**");
             applyChannel.sendMessage(user.getAsMention()).queue();
             deleteChannelMessage = applyChannel.sendMessage(eb.build()).complete();
@@ -91,7 +90,7 @@ public class ApplyStaff extends ListenerAdapter {
                     + event.getUser().getName() + " (" + event.getUser().getAsMention() + ")").queue();
             reactMessage.clearReactions().queue();
             EmbedBuilder eb = defaultEmbed("Application Accepted", null);
-            eb.setDescription(higherDepth(currentSettings, "accept_text").getAsString()
+            eb.setDescription(higherDepth(currentSettings, "acceptMessageText").getAsString()
                     + "\n**React with ✅ to confirm that you have read this message and to close channel**");
             applyChannel.sendMessage(user.getAsMention()).queue();
             deleteChannelMessage = applyChannel.sendMessage(eb.build()).complete();

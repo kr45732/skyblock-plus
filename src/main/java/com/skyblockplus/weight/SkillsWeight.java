@@ -16,6 +16,7 @@ public class SkillsWeight {
 
     public void addSkillWeight(String skillName, double exponent, double divider) {
         double currentSkillXp = player.getSkillXp(skillName);
+        
         if (currentSkillXp == -1) {
         } else {
             int maxLevel = player.getSkillMaxLevel(skillName);
@@ -26,7 +27,7 @@ public class SkillsWeight {
             if (currentSkillXp <= maxLevelExp) {
                 this.totalSkillWeight += base;
             } else {
-                this.totalSkillWeight += (base + Math.pow((currentSkillXp - maxLevelExp) / divider, 0.968));
+                this.totalSkillWeight += (Math.round(base) + Math.pow((currentSkillXp - maxLevelExp) / divider, 0.968));
             }
         }
     }

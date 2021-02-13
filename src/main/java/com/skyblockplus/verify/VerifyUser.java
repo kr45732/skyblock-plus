@@ -34,9 +34,9 @@ public class VerifyUser extends ListenerAdapter {
         this.verifyingUser = verifyingUser;
         this.currentSettings = currentSettings;
 
-        String channelPrefix = higherDepth(currentSettings, "new_channel_prefix").getAsString();
+        String channelPrefix = higherDepth(currentSettings, "newChannelPrefix").getAsString();
         Category verifyCategory = event.getGuild()
-                .getCategoryById(higherDepth(higherDepth(currentSettings, "new_channel_category"), "id").getAsString());
+                .getCategoryById(higherDepth(currentSettings, "newChannelCategory").getAsString());
         this.verifyChannel = verifyCategory.createTextChannel(channelPrefix + "-" + verifyingUser.getName())
                 .addPermissionOverride(event.getGuild().getMember(verifyingUser), EnumSet.of(Permission.VIEW_CHANNEL),
                         null)
@@ -100,8 +100,7 @@ public class VerifyUser extends ListenerAdapter {
                                 event.getGuild()
                                         .addRoleToMember(event.getGuild().getMember(verifyingUser),
                                                 event.getGuild().getRoleById(
-                                                        higherDepth(higherDepth(currentSettings, "verified_role"), "id")
-                                                                .getAsString()))
+                                                        higherDepth(currentSettings, "verifiedRole").getAsString()))
                                         .queue();
                                 removeChannel(verifyChannel);
                                 event.getJDA().removeEventListener(this);

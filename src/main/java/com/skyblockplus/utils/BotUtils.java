@@ -32,34 +32,37 @@ public class BotUtils {
     public static String BOT_PREFIX = "";
     public static String CLIENT_ID = "";
     public static String CLIENT_SECRET = "";
+    public static String DATABASE_URL = "";
+    public static String DATABASE_USERNAME = "";
+    public static String DATABASE_PASSWORD = "";
     private static int remainingLimit = 120;
     private static int timeTillReset = 60;
-
-    public static String getBotPrefix() {
-        Properties appProps = new Properties();
-        try {
-            appProps.load(new FileInputStream("DevSettings.properties"));
-            BOT_PREFIX = (String) appProps.get("BOT_PREFIX");
-        } catch (IOException e) {
-            BOT_PREFIX = System.getenv("BOT_PREFIX");
-        }
-        return BOT_PREFIX;
-    }
-
 
     public static void setApplicationSettings() {
         Properties appProps = new Properties();
         try {
             appProps.load(new FileInputStream("DevSettings.properties"));
+            BOT_PREFIX = (String) appProps.get("BOT_PREFIX");
             HYPIXEL_API_KEY = (String) appProps.get("HYPIXEL_API_KEY");
             BOT_TOKEN = (String) appProps.get("BOT_TOKEN");
             CLIENT_ID = (String) appProps.get("CLIENT_ID");
             CLIENT_SECRET = (String) appProps.get("CLIENT_SECRET");
+            String[] database_url_unformated = ((String) appProps.get("DATABASE_URL")).split(":", 3);
+            DATABASE_USERNAME = database_url_unformated[1].replace("/", "");
+            DATABASE_PASSWORD = database_url_unformated[2].split("@")[0];
+            DATABASE_URL = "jdbc:postgresql://" + database_url_unformated[2].split("@")[1] + "?sslmode=require&user="
+                    + DATABASE_USERNAME + "&password=" + DATABASE_PASSWORD;
         } catch (IOException e) {
+            BOT_PREFIX = System.getenv("BOT_PREFIX");
             HYPIXEL_API_KEY = System.getenv("HYPIXEL_API_KEY");
             BOT_TOKEN = System.getenv("BOT_TOKEN");
             CLIENT_ID = System.getenv("CLIENT_ID");
             CLIENT_SECRET = System.getenv("CLIENT_SECRET");
+            String[] database_url_unformated = System.getenv("DATABASE_URL").split(":", 3);
+            DATABASE_USERNAME = database_url_unformated[1].replace("/", "");
+            DATABASE_PASSWORD = database_url_unformated[2].split("@")[0];
+            DATABASE_URL = "jdbc:postgresql://" + database_url_unformated[2].split("@")[1] + "?sslmode=require&user="
+                    + DATABASE_USERNAME + "&password=" + DATABASE_PASSWORD;
         }
     }
 
@@ -121,12 +124,12 @@ public class BotUtils {
     public static UsernameUuidStruct usernameToUuidUsername(String username) {
         try {
             JsonElement usernameJson = getJson("https://api.mojang.com/users/profiles/minecraft/" + username);
-            return new UsernameUuidStruct(higherDepth(usernameJson, "name").getAsString(), higherDepth(usernameJson, "id").getAsString());
+            return new UsernameUuidStruct(higherDepth(usernameJson, "name").getAsString(),
+                    higherDepth(usernameJson, "id").getAsString());
         } catch (Exception ignored) {
         }
         return null;
     }
-
 
     public static EmbedBuilder defaultEmbed(String title, String titleUrl) {
         EmbedBuilder eb = new EmbedBuilder();
@@ -204,12 +207,12 @@ public class BotUtils {
         try {
             String discordID = higherDepth(
                     higherDepth(higherDepth(higherDepth(playerJson, "player"), "socialMedia"), "links"), "DISCORD")
-                    .getAsString();
-            return new String[]{discordID, higherDepth(higherDepth(playerJson, "player"), "displayname").getAsString()};
+                            .getAsString();
+            return new String[] { discordID,
+                    higherDepth(higherDepth(playerJson, "player"), "displayname").getAsString() };
         } catch (Exception e) {
             return null;
         }
     }
-
 
 }

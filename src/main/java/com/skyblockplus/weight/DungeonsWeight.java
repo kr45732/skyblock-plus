@@ -19,24 +19,28 @@ public class DungeonsWeight {
     public void addDungeonClassWeight(String className, double maxPoints) {
         double currentClassLevel = player.getDungeonClassLevel(className);
         double currentClassXp = player.getDungeonClassXp(className);
-        double base = Math.pow(currentClassLevel * 10, 3) * (maxPoints / 100000) / 1250;
+        double base = Math.pow(currentClassLevel, 4.5) * maxPoints;
 
         if (currentClassXp <= level50Xp) {
             totalDungeonsWeight += base;
         } else {
-            totalDungeonsWeight += (base + Math.pow((currentClassXp - level50Xp) / (4 * level50Xp / maxPoints), 0.968));
+            double remaining = currentClassXp - level50Xp;
+            double splitter = (4 * level50Xp) / base;
+            totalDungeonsWeight += (Math.floor(base) + Math.pow(remaining / splitter, 0.968));
         }
     }
 
     public void addCatacombsWeight(double maxPoints) {
         double catacombsSkillXp = player.getSkillXp("catacombs");
         double level = player.getCatacombsLevel();
-        double base = Math.pow(level * 10, 3) * (maxPoints / 100000) / 1250;
+        double base = Math.pow(level, 4.5) * maxPoints;
 
         if (catacombsSkillXp <= level50Xp) {
             totalDungeonsWeight += base;
         } else {
-            totalDungeonsWeight += (base + Math.pow((catacombsSkillXp - level50Xp) / (4 * level50Xp / maxPoints), 0.968));
+            double remaining = catacombsSkillXp - level50Xp;
+            double splitter = (4 * level50Xp) / base;
+            totalDungeonsWeight += (Math.floor(base) + Math.pow(remaining / splitter, 0.968));
         }
     }
 }

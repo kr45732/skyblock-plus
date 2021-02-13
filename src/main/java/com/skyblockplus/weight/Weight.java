@@ -47,17 +47,17 @@ public class Weight {
 
     private Map<String, Double> defaultDungeonClassWeights() {
         Map<String, Double> tempDungeonClassWeights = new HashMap<>();
-        tempDungeonClassWeights.put("healer", 200D);
-        tempDungeonClassWeights.put("mage", 200D);
-        tempDungeonClassWeights.put("berserk", 200D);
-        tempDungeonClassWeights.put("archer", 200D);
-        tempDungeonClassWeights.put("tank", 200D);
+        tempDungeonClassWeights.put("healer", 0.0000045254834D);
+        tempDungeonClassWeights.put("mage", 0.0000045254834D);
+        tempDungeonClassWeights.put("berserk", 0.0000045254834D);
+        tempDungeonClassWeights.put("archer", 0.0000045254834D);
+        tempDungeonClassWeights.put("tank", 0.0000045254834D);
         return tempDungeonClassWeights;
     }
 
     private Map<String, Double> defaultCatacombsWeights() {
         Map<String, Double> tempCatacombsWeights = new HashMap<>();
-        tempCatacombsWeights.put("catacombs", 6500D);
+        tempCatacombsWeights.put("catacombs", 0.0002149604615D);
         return tempCatacombsWeights;
     }
 

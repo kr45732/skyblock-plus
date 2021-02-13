@@ -1,6 +1,7 @@
 package com.skyblockplus.apply;
 
 import static com.skyblockplus.reload.ReloadEventWatcher.addApplyGuild;
+import static com.skyblockplus.utils.BotUtils.higherDepth;
 
 import com.google.gson.JsonElement;
 
@@ -12,12 +13,10 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class ApplyGuild extends ListenerAdapter {
     final Message reactMessage;
-    final String channelPrefix;
     final JsonElement currentSettings;
 
-    public ApplyGuild(Message reactMessage, String channelPrefix, JsonElement currentSettings) {
+    public ApplyGuild(Message reactMessage, JsonElement currentSettings) {
         this.reactMessage = reactMessage;
-        this.channelPrefix = channelPrefix;
         this.currentSettings = currentSettings;
         addApplyGuild(reactMessage.getGuild().getId(), this);
     }
@@ -36,9 +35,8 @@ public class ApplyGuild extends ListenerAdapter {
             return;
         }
 
-        if (event.getGuild()
-                .getTextChannelsByName(channelPrefix + "-" + event.getUser().getName().replace(" ", "-"), true)
-                .size() > 0) {
+        if (event.getGuild().getTextChannelsByName(higherDepth(currentSettings, "newChannelPrefix").getAsString() + "-"
+                + event.getUser().getName().replace(" ", "-"), true).size() > 0) {
             return;
         }
 

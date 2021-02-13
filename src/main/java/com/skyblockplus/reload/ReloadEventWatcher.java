@@ -88,14 +88,13 @@ public class ReloadEventWatcher extends ListenerAdapter {
                 JsonElement settings = JsonParser
                         .parseReader(new FileReader("src/main/java/com/skyblockplus/json/GuildSettings.json"));
                 if (higherDepth(settings, guildId) != null) {
-                    if (higherDepth(higherDepth(higherDepth(settings, guildId), "automated_applications"), "enable")
+                    if (higherDepth(higherDepth(higherDepth(settings, guildId), "automatedApplication"), "enable")
                             .getAsBoolean()) {
                         JsonElement currentSettings = higherDepth(higherDepth(settings, guildId),
-                                "automated_applications");
+                                "automatedApplication");
 
-                        TextChannel reactChannel = jda.getGuildById(guildId).getTextChannelById(
-                                higherDepth(higherDepth(currentSettings, "react_channel"), "id").getAsString());
-                        String channelPrefix = higherDepth(currentSettings, "new_channel_prefix").getAsString();
+                        TextChannel reactChannel = jda.getGuildById(guildId)
+                                .getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
 
                         reactChannel.sendMessage("Loading...").complete();
                         reactChannel.sendMessage("Loading...").complete();
@@ -103,11 +102,11 @@ public class ReloadEventWatcher extends ListenerAdapter {
                         reactChannel.deleteMessages(deleteMessages).complete();
 
                         EmbedBuilder eb = defaultEmbed("Apply For Guild", null);
-                        eb.setDescription(higherDepth(currentSettings, "apply_text").getAsString());
+                        eb.setDescription(higherDepth(currentSettings, "messageText").getAsString());
                         Message reactMessage = reactChannel.sendMessage(eb.build()).complete();
                         reactMessage.addReaction("✅").queue();
 
-                        jda.addEventListener(new ApplyGuild(reactMessage, channelPrefix, currentSettings));
+                        jda.addEventListener(new ApplyGuild(reactMessage, currentSettings));
 
                         return "Apply settings successfully reloaded";
 
@@ -178,26 +177,26 @@ public class ReloadEventWatcher extends ListenerAdapter {
                 JsonElement settings = JsonParser
                         .parseReader(new FileReader("src/main/java/com/skyblockplus/json/GuildSettings.json"));
                 if (higherDepth(settings, guildId) != null) {
-                    if (higherDepth(higherDepth(higherDepth(settings, guildId), "automated_verify"), "enable")
+                    if (higherDepth(higherDepth(higherDepth(settings, guildId), "automatedVerify"), "enable")
                             .getAsBoolean()) {
-                        JsonElement currentSettings = higherDepth(higherDepth(settings, guildId), "automated_verify");
+                        JsonElement currentSettings = higherDepth(higherDepth(settings, guildId), "automatedVerify");
 
-                        TextChannel reactChannel = jda.getGuildById(guildId).getTextChannelById(
-                                higherDepth(higherDepth(currentSettings, "react_channel"), "id").getAsString());
-                        String channelPrefix = higherDepth(currentSettings, "new_channel_prefix").getAsString();
+                        TextChannel reactChannel = jda.getGuildById(guildId)
+                                .getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
+
                         reactChannel.sendMessage("Loading...").complete();
                         reactChannel.sendMessage("Loading...").complete();
                         List<Message> deleteMessages = reactChannel.getHistory().retrievePast(25).complete();
                         reactChannel.deleteMessages(deleteMessages).complete();
 
-                        String verifyText = higherDepth(currentSettings, "verify_text").getAsString();
+                        String verifyText = higherDepth(currentSettings, "messageText").getAsString();
                         reactChannel.sendMessage(verifyText).queue();
                         Message reactMessage = reactChannel
                                 .sendFile(new File("src/main/java/com/skyblockplus/verify/Link Discord To Hypixel.mp4"))
                                 .complete();
                         reactMessage.addReaction("✅").queue();
 
-                        jda.addEventListener(new VerifyGuild(reactMessage, channelPrefix, currentSettings));
+                        jda.addEventListener(new VerifyGuild(reactMessage, currentSettings));
 
                         return "Verify settings successfully reloaded";
 

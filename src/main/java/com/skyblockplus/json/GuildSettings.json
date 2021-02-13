@@ -2,45 +2,24 @@
   "796790757947867156": {
     "name": "Skyblock Plus",
     "type": "Discord Server",
-    "automated_applications": {
+    "automatedApplication": {
       "enable": "false",
-      "react_channel": {
-        "name": "apply",
-        "id": "800031085588512828"
-      },
-      "staff_channel": {
-        "name": "applications",
-        "id": "800386981133156443"
-      },
-      "new_channel_prefix": "application",
-      "apply_text": "React to this message to apply",
-      "accept_text": "Accepted",
-      "deny_text": "Not accepted",
-      "new_channel_category": {
-        "name": "test category",
-        "id": "800811801478037555"
-      },
-      "staff_ping": {
-        "name": "example staff role",
-        "id": "800859020139298816"
-      }
+      "messageTextChannelId": "800031085588512828",
+      "messageStaffChannelId": "800386981133156443",
+      "newChannelPrefix": "application",
+      "newChannelCategory": "800811801478037555",
+      "messageText": "React to this message to apply in test server",
+      "acceptMessageText": "Accepted",
+      "denyMessageText": "Denied",
+      "staffPingRoleId": "800859020139298816"
     },
-    "automated_verify": {
+    "automatedVerify": {
       "enable": "true",
-      "react_channel": {
-        "name": "verify",
-        "id": "801970206721179658"
-      },
-      "verify_text": "**Welcome to the Skyblock Plus Server!**\nTo gain access to the rest of the server:\n\n  1) Follow the video below, replacing CrypticPlasma's name and tag with your own\n  2) React to video below with ✅",
-      "new_channel_category": {
-        "name": "bot channel",
-        "id": "800811801478037555"
-      },
-      "verified_role": {
-        "name": "verified",
-        "id": "801987767890346014"
-      },
-      "new_channel_prefix": "verify"
+      "messageText": "**Welcome to the Skyblock Plus Server!**\nTo gain access to the rest of the server:\n\n  1) Follow the video below, replacing CrypticPlasma's name and tag with your own\n  2) React to video below with ✅",
+      "messageTextChannelId": "801970206721179658",
+      "verifiedRole": "801987767890346014",
+      "newChannelPrefix": "verify",
+      "newChannelCategory": "800811801478037555"
     },
     "automated_roles": {
       "enable": "true",
@@ -382,45 +361,24 @@
   "782154976243089429": {
     "name": "Skyblock Forceful",
     "type": "Discord Server",
-    "automated_applications": {
+    "automatedApplication": {
       "enable": "true",
-      "react_channel": {
-        "name": "✐-apply-for-guild",
-        "id": "800528706963374140"
-      },
-      "staff_channel": {
-        "name": "applications",
-        "id": "800529287148601384"
-      },
-      "new_channel_prefix": "application",
-      "apply_text": "React to this message with ✅ to apply for Skyblock Forceful!\n\nIf you do not get pinged in under 30 seconds then please open a ticket and link your sky.lea profile **OR** apply through the forums [here](https://hypixel.net/threads/skyblock-forceful-mid-late-game-guild.3583562/).",
-      "accept_text": "You have been accepted! Please leave your current guild and you will receive an invite shortly after!",
-      "deny_text": "Sorry, but your application has been denied. Feel free to apply again once you meet the requirements!",
-      "new_channel_category": {
-        "name": "automated bot channels",
-        "id": "800830955752259674"
-      },
-      "staff_ping": {
-        "name": "Staff ⚡️",
-        "id": "782154976666451976"
-      }
+      "messageTextChannelId": "800528706963374140",
+      "messageStaffChannelId": "800529287148601384",
+      "newChannelPrefix": "application",
+      "newChannelCategory": "800830955752259674",
+      "messageText": "React to this message with ✅ to apply for Skyblock Forceful!\n\nIf you do not get pinged in under 30 seconds then please open a ticket and link your sky.lea profile **OR** apply through the forums [here](https://hypixel.net/threads/skyblock-forceful-mid-late-game-guild.3583562/).",
+      "acceptMessageText": "You have been accepted! Please leave wyour current guild and you will receive an invite shortly after!",
+      "denyMessageText": "Sorry, but your application was not accepted. Feel free to apply again once you meet the requirements!",
+      "staffPingRoleId": "782154976666451976"
     },
-    "automated_verify": {
+    "automatedVerify": {
       "enable": "true",
-      "react_channel": {
-        "name": "➭authorize",
-        "id": "805607857381703680"
-      },
-      "verify_text": "**Welcome to Skyblock Forceful!**\nCurrently, you only have access to certain channels. In order to gain full access to our server, you must verify.\n\nTo do this:\n  1) Follow the video below, replacing CrypticPlasma's name and tag with your own\n  2) React to video below with ✅\n\nIf you are not pinged in under 30 seconds, then please open a ticket",
-      "new_channel_category": {
-        "name": "automated bot channels",
-        "id": "800830955752259674"
-      },
-      "verified_role": {
-        "name": "Verified",
-        "id": "782154976625426464"
-      },
-      "new_channel_prefix": "νerify"
+      "messageText": "**Welcome to Skyblock Forceful!**\nCurrently, you only have access to certain channels. In order to gain full access to our server, you must verify.\n\nTo do this:\n  1) Follow the video below, replacing CrypticPlasma's name and tag with your own\n  2) React to video below with ✅\n\nIf you are not pinged in under 30 seconds, then please open a ticket",
+      "messageTextChannelId": "805607857381703680",
+      "verifiedRole": "782154976625426464",
+      "newChannelPrefix": "νerify",
+      "newChannelCategory": "800830955752259674"
     },
     "automated_roles": {
       "enable": "true",

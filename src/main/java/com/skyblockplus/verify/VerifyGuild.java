@@ -1,6 +1,7 @@
 package com.skyblockplus.verify;
 
 import static com.skyblockplus.reload.ReloadEventWatcher.addVerifyGuild;
+import static com.skyblockplus.utils.BotUtils.higherDepth;
 
 import com.google.gson.JsonElement;
 
@@ -12,12 +13,10 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class VerifyGuild extends ListenerAdapter {
     final Message reactMessage;
-    final String channelPrefix;
     final JsonElement currentSettings;
 
-    public VerifyGuild(Message reactMessage, String channelPrefix, JsonElement currentSettings) {
+    public VerifyGuild(Message reactMessage, JsonElement currentSettings) {
         this.reactMessage = reactMessage;
-        this.channelPrefix = channelPrefix;
         this.currentSettings = currentSettings;
         addVerifyGuild(reactMessage.getGuild().getId(), this);
     }
@@ -37,7 +36,9 @@ public class VerifyGuild extends ListenerAdapter {
             return;
         }
 
-        if (event.getGuild().getTextChannelsByName(channelPrefix + "-" + event.getUser().getName(), true).size() > 0) {
+        if (event.getGuild().getTextChannelsByName(
+                higherDepth(currentSettings, "newChannelPrefix").getAsString() + "-" + event.getUser().getName(), true)
+                .size() > 0) {
             return;
         }
 

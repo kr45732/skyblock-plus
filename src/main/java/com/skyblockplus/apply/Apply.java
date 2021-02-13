@@ -25,14 +25,13 @@ public class Apply extends ListenerAdapter {
             JsonElement settings = JsonParser
                     .parseReader(new FileReader("src/main/java/com/skyblockplus/json/GuildSettings.json"));
             if (higherDepth(settings, event.getGuild().getId()) != null) {
-                if (higherDepth(higherDepth(higherDepth(settings, event.getGuild().getId()), "automated_applications"),
+                if (higherDepth(higherDepth(higherDepth(settings, event.getGuild().getId()), "automatedApplication"),
                         "enable").getAsBoolean()) {
                     if (isUniqueApplyGuild(event.getGuild().getId())) {
                         JsonElement currentSettings = higherDepth(higherDepth(settings, event.getGuild().getId()),
-                                "automated_applications");
-                        TextChannel reactChannel = event.getGuild().getTextChannelById(
-                                higherDepth(higherDepth(currentSettings, "react_channel"), "id").getAsString());
-                        String channelPrefix = higherDepth(currentSettings, "new_channel_prefix").getAsString();
+                                "automatedApplication");
+                        TextChannel reactChannel = event.getGuild()
+                                .getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
 
                         reactChannel.sendMessage("Loading...").complete();
                         reactChannel.sendMessage("Loading...").complete();
@@ -40,11 +39,11 @@ public class Apply extends ListenerAdapter {
                         reactChannel.deleteMessages(deleteMessages).complete();
 
                         EmbedBuilder eb = defaultEmbed("Apply For Guild", null);
-                        eb.setDescription(higherDepth(currentSettings, "apply_text").getAsString());
+                        eb.setDescription(higherDepth(currentSettings, "messageText").getAsString());
                         Message reactMessage = reactChannel.sendMessage(eb.build()).complete();
                         reactMessage.addReaction("✅").queue();
 
-                        event.getJDA().addEventListener(new ApplyGuild(reactMessage, channelPrefix, currentSettings));
+                        event.getJDA().addEventListener(new ApplyGuild(reactMessage, currentSettings));
                     }
                 }
             }

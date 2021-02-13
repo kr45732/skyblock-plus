@@ -39,9 +39,9 @@ public class ApplyUser extends ListenerAdapter {
         this.applyingUser = applyingUser;
         this.currentSettings = currentSettings;
 
-        String channelPrefix = higherDepth(currentSettings, "new_channel_prefix").getAsString();
+        String channelPrefix = higherDepth(currentSettings, "newChannelPrefix").getAsString();
         Category applyCategory = event.getGuild()
-                .getCategoryById(higherDepth(higherDepth(currentSettings, "new_channel_category"), "id").getAsString());
+                .getCategoryById(higherDepth(currentSettings, "newChannelCategory").getAsString());
         this.applicationChannel = applyCategory.createTextChannel(channelPrefix + "-" + applyingUser.getName())
                 .addPermissionOverride(event.getGuild().getMember(applyingUser), EnumSet.of(Permission.VIEW_CHANNEL),
                         null)

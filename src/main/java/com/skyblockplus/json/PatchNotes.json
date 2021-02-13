@@ -58,5 +58,10 @@
     "version": "0.1.3",
     "description": "- Improved internal settings\n- Minor bug fixes",
     "date": "2021-02-06T20:12:21.803658Z"
+  },
+  "12": {
+    "version": "0.1.4",
+    "description": "- Updated apply data structure\n- Updated verify data structure\n- Updated weight command\n- Many changes and bug fixes",
+    "date": "2021-02-13T18:32:02.183508Z"
   }
 }

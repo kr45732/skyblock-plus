@@ -348,6 +348,7 @@ public class Player {
     }
 
     public int getNumberMinionSlots() {
+try{
         int[] craftedMinionsToSlots = new int[]{0, 5, 15, 30, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 350, 400, 450, 500, 550, 600};
 
         int prevMax = 0;
@@ -361,7 +362,11 @@ public class Player {
         }
 
         return (prevMax + 5);
+} catch (Exception e){
+  return 0;
+}
     }
+
 
     public double getPurseCoins() {
         try {
@@ -563,7 +568,11 @@ public class Player {
     }
 
     public double getDungeonClassXp(String className) {
+try{
         return higherDepth(higherDepth(higherDepth(higherDepth(profileJson, "dungeons"), "player_classes"), className), "experience").getAsDouble();
+} catch (Exception e){
+ return 0;
+}
     }
 
 }
