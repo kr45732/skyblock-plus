@@ -61,7 +61,7 @@
   },
   "12": {
     "version": "0.1.4",
-    "description": "- Updated apply data structure\n- Updated verify data structure\n- Updated weight command\n- Many changes and bug fixes",
+    "description": "- Fixed weight command\n Fixed farming cap to use upgraded cap from Jacob contests\n- Updated apply data structure\n- Updated verify data structure\n- Updated weight command\n- Many changes and bug fixes",
     "date": "2021-02-13T18:32:02.183508Z"
   }
 }

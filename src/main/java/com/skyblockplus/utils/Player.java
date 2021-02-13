@@ -227,6 +227,10 @@ public class Player {
             maxLevel = 50;
         }
 
+        if(skill.equals("farming")){
+            maxLevel += getFarmingCapUpgrade();
+        }
+
         long xpTotal = 0L;
         int level = 1;
         for (int i = 0; i < maxLevel; i++) {
@@ -547,6 +551,9 @@ try{
             this.levelTables = getJson(
                     "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/leveling.json");
         }
+        if(skillName.equals("farming")){
+            return higherDepth(higherDepth(levelTables, "leveling_caps"), skillName).getAsInt() + getFarmingCapUpgrade();
+        }
 
         return higherDepth(higherDepth(levelTables, "leveling_caps"), skillName).getAsInt();
     }
@@ -573,6 +580,14 @@ try{
 } catch (Exception e){
  return 0;
 }
+    }
+
+    public int getFarmingCapUpgrade(){
+        try{
+        return higherDepth(higherDepth(higherDepth(profileJson, "jacob2"), "perks"), "farming_level_cap").getAsInt();
+        } catch (Exception e){
+            return 0;
+        }
     }
 
 }
