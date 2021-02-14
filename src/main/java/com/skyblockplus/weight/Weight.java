@@ -13,18 +13,20 @@ public class Weight {
     private final Map<String, Double> catacombsWeights;
 
     public Weight(Player player) {
-        this(player, null, null, null, null);
+        this(player, defaultSlayerWeights(), defaultSkillWeights(), defaultDungeonClassWeights(),
+                defaultCatacombsWeights());
     }
 
-    public Weight(Player player, Map<String, Double> slayerWeights, Map<String, Double[]> skillWeights, Map<String, Double> dungeonClassWeights, Map<String, Double> catacombsWeights) {
+    public Weight(Player player, Map<String, Double> slayerWeights, Map<String, Double[]> skillWeights,
+            Map<String, Double> dungeonClassWeights, Map<String, Double> catacombsWeights) {
         this.player = player;
-        this.slayerWeights = (slayerWeights == null ? defaultSlayerWeights() : slayerWeights);
-        this.skillWeights = skillWeights == null ? defaultSkillWeights() : skillWeights;
-        this.dungeonClassWeights = dungeonClassWeights == null ? defaultDungeonClassWeights() : dungeonClassWeights;
-        this.catacombsWeights = catacombsWeights == null ? defaultCatacombsWeights() : catacombsWeights;
+        this.slayerWeights = slayerWeights;
+        this.skillWeights = skillWeights;
+        this.dungeonClassWeights = dungeonClassWeights;
+        this.catacombsWeights = catacombsWeights;
     }
 
-    private Map<String, Double> defaultSlayerWeights() {
+    private static Map<String, Double> defaultSlayerWeights() {
         Map<String, Double> tempSlayerWeights = new HashMap<>();
         tempSlayerWeights.put("rev", 2208D);
         tempSlayerWeights.put("sven", 1962D);
@@ -32,20 +34,20 @@ public class Weight {
         return tempSlayerWeights;
     }
 
-    private Map<String, Double[]> defaultSkillWeights() {
+    private static Map<String, Double[]> defaultSkillWeights() {
         Map<String, Double[]> tempSkillWeights = new HashMap<>();
-        tempSkillWeights.put("mining", new Double[]{1.18207448, 259634D});
-        tempSkillWeights.put("foraging", new Double[]{1.232826, 259634D});
-        tempSkillWeights.put("enchanting", new Double[]{0.96976583, 882758D});
-        tempSkillWeights.put("farming", new Double[]{1.217848139, 220689D});
-        tempSkillWeights.put("combat", new Double[]{1.22307, 275862D});
-        tempSkillWeights.put("fishing", new Double[]{1.406418, 88274D});
-        tempSkillWeights.put("alchemy", new Double[]{1.0, 1103448D});
-        tempSkillWeights.put("taming", new Double[]{1.14744, 441379D});
+        tempSkillWeights.put("mining", new Double[] { 1.18207448, 259634D });
+        tempSkillWeights.put("foraging", new Double[] { 1.232826, 259634D });
+        tempSkillWeights.put("enchanting", new Double[] { 0.96976583, 882758D });
+        tempSkillWeights.put("farming", new Double[] { 1.217848139, 220689D });
+        tempSkillWeights.put("combat", new Double[] { 1.22307, 275862D });
+        tempSkillWeights.put("fishing", new Double[] { 1.406418, 88274D });
+        tempSkillWeights.put("alchemy", new Double[] { 1.0, 1103448D });
+        tempSkillWeights.put("taming", new Double[] { 1.14744, 441379D });
         return tempSkillWeights;
     }
 
-    private Map<String, Double> defaultDungeonClassWeights() {
+    private static Map<String, Double> defaultDungeonClassWeights() {
         Map<String, Double> tempDungeonClassWeights = new HashMap<>();
         tempDungeonClassWeights.put("healer", 0.0000045254834D);
         tempDungeonClassWeights.put("mage", 0.0000045254834D);
@@ -55,7 +57,7 @@ public class Weight {
         return tempDungeonClassWeights;
     }
 
-    private Map<String, Double> defaultCatacombsWeights() {
+    private static Map<String, Double> defaultCatacombsWeights() {
         Map<String, Double> tempCatacombsWeights = new HashMap<>();
         tempCatacombsWeights.put("catacombs", 0.0002149604615D);
         return tempCatacombsWeights;

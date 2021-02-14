@@ -3,7 +3,7 @@ package com.skyblockplus.weight;
 import com.skyblockplus.utils.Player;
 
 public class SkillsWeight {
-    private final Player player;
+    private Player player;
     private double totalSkillWeight;
 
     public SkillsWeight(Player player) {
@@ -16,7 +16,7 @@ public class SkillsWeight {
 
     public void addSkillWeight(String skillName, double exponent, double divider) {
         double currentSkillXp = player.getSkillXp(skillName);
-        
+
         if (currentSkillXp == -1) {
         } else {
             int maxLevel = player.getSkillMaxLevel(skillName);

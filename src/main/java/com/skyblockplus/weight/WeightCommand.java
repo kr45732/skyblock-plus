@@ -56,7 +56,8 @@ public class WeightCommand extends Command {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
             Weight playerWeight = new Weight(player);
-            EmbedBuilder eb = defaultEmbed("Weight for " + player.getUsername(), skyblockStatsLink(player.getUsername(), player.getProfileName()));
+            EmbedBuilder eb = defaultEmbed("Weight for " + player.getUsername(),
+                    skyblockStatsLink(player.getUsername(), player.getProfileName()));
             eb.setDescription("**Total Weight**: " + roundSkillAverage(playerWeight.getPlayerWeight()));
             eb.addField("Slayer Weight", roundSkillAverage(playerWeight.getSlayerWeight()), false);
             eb.addField("Skills Weight", roundSkillAverage(playerWeight.getSkillsWeight()), false);

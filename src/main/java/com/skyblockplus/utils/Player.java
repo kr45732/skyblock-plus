@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.skyblockplus.skills.SkillsStruct;
+import com.skyblockplus.weight.Weight;
+
 import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
 import me.nullicorn.nedit.type.NBTList;
@@ -33,8 +35,8 @@ public class Player {
 
         try {
             JsonArray profileArray = higherDepth(
-                    getJson("https://api.hypixel.net/skyblock/profiles?key=" + HYPIXEL_API_KEY + "&uuid=" + playerUuid), "profiles")
-                    .getAsJsonArray();
+                    getJson("https://api.hypixel.net/skyblock/profiles?key=" + HYPIXEL_API_KEY + "&uuid=" + playerUuid),
+                    "profiles").getAsJsonArray();
 
             if (getLatestProfile(profileArray)) {
                 return;
@@ -54,8 +56,8 @@ public class Player {
 
         try {
             JsonArray profileArray = higherDepth(
-                    getJson("https://api.hypixel.net/skyblock/profiles?key=" + HYPIXEL_API_KEY + "&uuid=" + playerUuid), "profiles")
-                    .getAsJsonArray();
+                    getJson("https://api.hypixel.net/skyblock/profiles?key=" + HYPIXEL_API_KEY + "&uuid=" + playerUuid),
+                    "profiles").getAsJsonArray();
 
             if (getLatestProfile(profileArray)) {
                 return;
@@ -75,8 +77,8 @@ public class Player {
         try {
 
             JsonArray profileArray = higherDepth(
-                    getJson("https://api.hypixel.net/skyblock/profiles?key=" + HYPIXEL_API_KEY + "&uuid=" + playerUuid), "profiles")
-                    .getAsJsonArray();
+                    getJson("https://api.hypixel.net/skyblock/profiles?key=" + HYPIXEL_API_KEY + "&uuid=" + playerUuid),
+                    "profiles").getAsJsonArray();
             if (!profileIdFromName(profileName, profileArray)) {
                 return;
             }
@@ -93,8 +95,7 @@ public class Player {
             this.playerUsername = higherDepth(usernameJson, "name").getAsString();
             this.playerUuid = higherDepth(usernameJson, "id").getAsString();
             return false;
-        } catch (Exception e) {
-            System.out.println("Null - uuid - " + username);
+        } catch (Exception ignored) {
         }
         return true;
 
@@ -227,7 +228,7 @@ public class Player {
             maxLevel = 50;
         }
 
-        if(skill.equals("farming")){
+        if (skill.equals("farming")) {
             maxLevel += getFarmingCapUpgrade();
         }
 
@@ -256,8 +257,7 @@ public class Player {
 
     public double getBankBalance() {
         try {
-            return higherDepth(higherDepth(outerProfileJson, "banking"), "balance")
-                    .getAsDouble();
+            return higherDepth(higherDepth(outerProfileJson, "banking"), "balance").getAsDouble();
         } catch (Exception e) {
             return -1;
         }
@@ -265,8 +265,7 @@ public class Player {
 
     public int getFairySouls() {
         try {
-            return higherDepth(profileJson,
-                    "fairy_souls_collected").getAsInt();
+            return higherDepth(profileJson, "fairy_souls_collected").getAsInt();
         } catch (Exception e) {
             return -1;
         }
@@ -276,7 +275,9 @@ public class Player {
         try {
             String lastProfileSave = "";
             for (int i = 0; i < profilesArray.size(); i++) {
-                String lastSaveLoop = higherDepth(higherDepth(higherDepth(profilesArray.get(i), "members"), this.playerUuid), "last_save").getAsString();
+                String lastSaveLoop = higherDepth(
+                        higherDepth(higherDepth(profilesArray.get(i), "members"), this.playerUuid), "last_save")
+                                .getAsString();
                 if (i == 0) {
                     this.profileJson = higherDepth(higherDepth(profilesArray.get(i), "members"), this.playerUuid);
                     this.outerProfileJson = profilesArray.get(i);
@@ -339,7 +340,8 @@ public class Player {
                     "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/pets.json");
         }
 
-        int petRarityOffset = higherDepth(higherDepth(petLevelTable, "pet_rarity_offset"), rarity.toUpperCase()).getAsInt();
+        int petRarityOffset = higherDepth(higherDepth(petLevelTable, "pet_rarity_offset"), rarity.toUpperCase())
+                .getAsInt();
         JsonArray petLevelsXpPer = higherDepth(petLevelTable, "pet_levels").getAsJsonArray();
         long totalExp = 0;
         for (int i = petRarityOffset; i < petLevelsXpPer.size(); i++) {
@@ -352,25 +354,25 @@ public class Player {
     }
 
     public int getNumberMinionSlots() {
-try{
-        int[] craftedMinionsToSlots = new int[]{0, 5, 15, 30, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 350, 400, 450, 500, 550, 600};
+        try {
+            int[] craftedMinionsToSlots = new int[] { 0, 5, 15, 30, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300,
+                    350, 400, 450, 500, 550, 600 };
 
-        int prevMax = 0;
-        int craftedMinions = higherDepth(profileJson, "crafted_generators").getAsJsonArray().size();
-        for (int i = 0; i < craftedMinionsToSlots.length; i++) {
-            if (craftedMinions >= craftedMinionsToSlots[i]) {
-                prevMax = i;
-            } else {
-                break;
+            int prevMax = 0;
+            int craftedMinions = higherDepth(profileJson, "crafted_generators").getAsJsonArray().size();
+            for (int i = 0; i < craftedMinionsToSlots.length; i++) {
+                if (craftedMinions >= craftedMinionsToSlots[i]) {
+                    prevMax = i;
+                } else {
+                    break;
+                }
             }
+
+            return (prevMax + 5);
+        } catch (Exception e) {
+            return 0;
         }
-
-        return (prevMax + 5);
-} catch (Exception e){
-  return 0;
-}
     }
-
 
     public double getPurseCoins() {
         try {
@@ -400,7 +402,8 @@ try{
                 }
                 return (prevWolfLevel + 1);
             case "rev":
-                JsonArray zombieLevelArray = higherDepth(higherDepth(levelTables, "slayer_xp"), "zombie").getAsJsonArray();
+                JsonArray zombieLevelArray = higherDepth(higherDepth(levelTables, "slayer_xp"), "zombie")
+                        .getAsJsonArray();
                 int zombieXp = getZombieXp();
                 int prevZombieMax = 0;
                 for (int i = 0; i < zombieLevelArray.size(); i++) {
@@ -412,7 +415,8 @@ try{
                 }
                 return (prevZombieMax + 1);
             case "tara":
-                JsonArray spiderLevelArray = higherDepth(higherDepth(levelTables, "slayer_xp"), "spider").getAsJsonArray();
+                JsonArray spiderLevelArray = higherDepth(higherDepth(levelTables, "slayer_xp"), "spider")
+                        .getAsJsonArray();
                 int spiderXp = getSpiderXp();
                 int prevSpiderMax = 0;
                 for (int i = 0; i < spiderLevelArray.size(); i++) {
@@ -429,7 +433,8 @@ try{
 
     public Map<Integer, ArmorStruct> getWardrobe() {
         try {
-            String encodedWardrobeContents = higherDepth(higherDepth(profileJson, "wardrobe_contents"), "data").getAsString();
+            String encodedWardrobeContents = higherDepth(higherDepth(profileJson, "wardrobe_contents"), "data")
+                    .getAsString();
             int equippedSlot = higherDepth(profileJson, "wardrobe_equipped_slot").getAsInt();
             NBTCompound decodedWardrobeContents = NBTReader.readBase64(encodedWardrobeContents);
 
@@ -438,7 +443,8 @@ try{
             for (int i = 0; i < wardrobeFrames.size(); i++) {
                 NBTCompound displayName = wardrobeFrames.getCompound(i).getCompound("tag.display");
                 if (displayName != null) {
-                    wardrobeFramesMap.put(i, displayName.getString("Name", "Empty").replaceAll("§f|§a|§9|§5|§6|§d|§4|§c|§7", ""));
+                    wardrobeFramesMap.put(i,
+                            displayName.getString("Name", "Empty").replaceAll("§f|§a|§9|§5|§6|§d|§4|§c|§7", ""));
                 } else {
                     wardrobeFramesMap.put(i, "Empty");
                 }
@@ -488,7 +494,8 @@ try{
 
     public Map<Integer, String> getTalismanBag() {
         try {
-            String encodedTalismanContents = higherDepth(higherDepth(profileJson, "talisman_bag"), "data").getAsString();
+            String encodedTalismanContents = higherDepth(higherDepth(profileJson, "talisman_bag"), "data")
+                    .getAsString();
             NBTCompound decodedTalismanContents = NBTReader.readBase64(encodedTalismanContents);
 
             NBTList talismanFrames = decodedTalismanContents.getList(".i");
@@ -496,7 +503,8 @@ try{
             for (int i = 0; i < talismanFrames.size(); i++) {
                 NBTCompound displayName = talismanFrames.getCompound(i).getCompound("tag.display");
                 if (displayName != null) {
-                    talismanFramesMap.put(i, displayName.getString("Name", "Empty").replaceAll("§f|§a|§9|§5|§6|§d|§4|§c|", ""));
+                    talismanFramesMap.put(i,
+                            displayName.getString("Name", "Empty").replaceAll("§f|§a|§9|§5|§6|§d|§4|§c|", ""));
                 } else {
                     talismanFramesMap.put(i, "Empty");
                 }
@@ -520,12 +528,14 @@ try{
             for (int i = 0; i < talismanFrames.size(); i++) {
                 NBTCompound displayName = talismanFrames.getCompound(i).getCompound("tag.display");
                 if (displayName != null) {
-                    armorFramesMap.put(i, displayName.getString("Name", "Empty").replaceAll("§f|§a|§9|§5|§6|§d|§4|§c|", ""));
+                    armorFramesMap.put(i,
+                            displayName.getString("Name", "Empty").replaceAll("§f|§a|§9|§5|§6|§d|§4|§c|", ""));
                 } else {
                     armorFramesMap.put(i, "Empty");
                 }
             }
-            return new ArmorStruct(armorFramesMap.get(3), armorFramesMap.get(2), armorFramesMap.get(1), armorFramesMap.get(0));
+            return new ArmorStruct(armorFramesMap.get(3), armorFramesMap.get(2), armorFramesMap.get(1),
+                    armorFramesMap.get(0));
 
         } catch (Exception e) {
             return null;
@@ -551,8 +561,9 @@ try{
             this.levelTables = getJson(
                     "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/leveling.json");
         }
-        if(skillName.equals("farming")){
-            return higherDepth(higherDepth(levelTables, "leveling_caps"), skillName).getAsInt() + getFarmingCapUpgrade();
+        if (skillName.equals("farming")) {
+            return higherDepth(higherDepth(levelTables, "leveling_caps"), skillName).getAsInt()
+                    + getFarmingCapUpgrade();
         }
 
         return higherDepth(higherDepth(levelTables, "leveling_caps"), skillName).getAsInt();
@@ -561,7 +572,10 @@ try{
     public double getSkillXp(String skillName) {
         try {
             if (skillName.equals("catacombs")) {
-                return higherDepth(higherDepth(higherDepth(higherDepth(profileJson, "dungeons" + skillName), "dungeon_types"), "catacombs"), "experience").getAsDouble();
+                return higherDepth(
+                        higherDepth(higherDepth(higherDepth(profileJson, "dungeons" + skillName), "dungeon_types"),
+                                "catacombs"),
+                        "experience").getAsDouble();
             }
             return higherDepth(profileJson, "experience_skill_" + skillName).getAsDouble();
         } catch (Exception ignored) {
@@ -575,19 +589,27 @@ try{
     }
 
     public double getDungeonClassXp(String className) {
-try{
-        return higherDepth(higherDepth(higherDepth(higherDepth(profileJson, "dungeons"), "player_classes"), className), "experience").getAsDouble();
-} catch (Exception e){
- return 0;
-}
-    }
-
-    public int getFarmingCapUpgrade(){
-        try{
-        return higherDepth(higherDepth(higherDepth(profileJson, "jacob2"), "perks"), "farming_level_cap").getAsInt();
-        } catch (Exception e){
+        try {
+            return higherDepth(
+                    higherDepth(higherDepth(higherDepth(profileJson, "dungeons"), "player_classes"), className),
+                    "experience").getAsDouble();
+        } catch (Exception e) {
             return 0;
         }
+    }
+
+    public int getFarmingCapUpgrade() {
+        try {
+            return higherDepth(higherDepth(higherDepth(profileJson, "jacob2"), "perks"), "farming_level_cap")
+                    .getAsInt();
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    public double getWeight() {
+        Weight playerWeight = new Weight(this);
+        return playerWeight.getPlayerWeight();
     }
 
 }

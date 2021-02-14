@@ -107,8 +107,10 @@ public class ApplyUser extends ListenerAdapter {
                                         String playerSlayer = formatNumber(player.getSlayer());
                                         String playerSkills = roundSkillAverage(player.getSkillAverage());
                                         String playerCatacombs = "" + player.getCatacombsSkill().skillLevel;
+                                        String playerWeight = roundSkillAverage(player.getWeight());
                                         EmbedBuilder statsEmbed = defaultEmbed("Stats for " + player.getUsername(),
                                                 skyblockStatsLink(player.getUsername(), player.getProfileName()));
+                                        statsEmbed.setDescription("**Total Skyblock weight:** " + playerWeight);
                                         statsEmbed.addField("Total slayer", playerSlayer, true);
                                         statsEmbed.addField("Progress skill level", playerSkills, true);
                                         statsEmbed.addField("Catacombs level", "" + playerCatacombs, true);
@@ -117,6 +119,7 @@ public class ApplyUser extends ListenerAdapter {
 
                                         applyPlayerStats = defaultEmbed("Stats for " + player.getUsername(),
                                                 skyblockStatsLink(player.getUsername(), player.getProfileName()));
+                                        applyPlayerStats.setDescription("**Total Skyblock weight:** " + playerWeight);
                                         applyPlayerStats.addField("Total slayer", playerSlayer, true);
                                         applyPlayerStats.addField("Progress average skill level", playerSkills, true);
                                         applyPlayerStats.addField("Catacombs level", "" + playerCatacombs, true);

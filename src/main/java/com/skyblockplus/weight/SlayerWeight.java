@@ -3,7 +3,7 @@ package com.skyblockplus.weight;
 import com.skyblockplus.utils.Player;
 
 public class SlayerWeight {
-    private final Player player;
+    private Player player;
     private double totalSlayerWeight;
 
     public SlayerWeight(Player player) {

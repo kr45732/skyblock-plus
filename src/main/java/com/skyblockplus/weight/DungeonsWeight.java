@@ -5,7 +5,7 @@ import com.skyblockplus.utils.Player;
 public class DungeonsWeight {
 
     private final double level50Xp = 569809640;
-    private final Player player;
+    private Player player;
     private double totalDungeonsWeight;
 
     public DungeonsWeight(Player player) {

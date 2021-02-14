@@ -1,22 +1,26 @@
 package com.skyblockplus.guilds;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.utils.Player;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Message;
+import static com.skyblockplus.utils.BotUtils.HYPIXEL_API_KEY;
+import static com.skyblockplus.utils.BotUtils.defaultEmbed;
+import static com.skyblockplus.utils.BotUtils.errorMessage;
+import static com.skyblockplus.utils.BotUtils.getJson;
+import static com.skyblockplus.utils.BotUtils.higherDepth;
+import static com.skyblockplus.utils.BotUtils.usernameToUuid;
 
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import static com.skyblockplus.utils.BotUtils.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.Player;
+
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Message;
 
 public class GuildLeaderboardCommand extends Command {
     Message ebMessage;
