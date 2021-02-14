@@ -34,8 +34,8 @@ import com.skyblockplus.timeout.MessageTimeout;
 import com.skyblockplus.verify.Verify;
 import com.skyblockplus.weight.WeightCommand;
 
-// import org.springframework.boot.SpringApplication;
-// import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -45,14 +45,14 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
-// @SpringBootApplication
+@SpringBootApplication
 public class Main {
     public static JDA jda;
 
     public static void main(String[] args) throws LoginException, IllegalArgumentException {
         setApplicationSettings();
 
-        // SpringApplication.run(com.skyblockplus.Main.class, args);
+        SpringApplication.run(com.skyblockplus.Main.class, args);
 
         EventWaiter waiter = new EventWaiter();
         CommandClientBuilder client = new CommandClientBuilder();
@@ -89,6 +89,5 @@ public class Main {
         // TODO: /g kick command (factoring in lowest g exp + lowest stats)
         // TODO: finish stats command
         // TODO: stop heroku from idling
-        // TODO: improve weight command and make more accurate
     }
 }
