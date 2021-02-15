@@ -16,7 +16,7 @@ public class CatacombsCommand extends Command {
         this.name = "catacombs";
         this.guildOnly = false;
         this.cooldown = globalCooldown;
-        this.aliases = new String[]{"cata"};
+        this.aliases = new String[] { "cata" };
     }
 
     @Override
@@ -55,16 +55,17 @@ public class CatacombsCommand extends Command {
 
     }
 
-    public EmbedBuilder getPlayerCatacombs(String username, String profileName) {
+    private EmbedBuilder getPlayerCatacombs(String username, String profileName) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
-            EmbedBuilder eb = defaultEmbed("Dungeons for " + player.getUsername(), skyblockStatsLink(player.getUsername(), player.getProfileName()));
+            EmbedBuilder eb = defaultEmbed("Dungeons for " + player.getUsername(),
+                    skyblockStatsLink(player.getUsername(), player.getProfileName()));
             try {
 
                 SkillsStruct skillInfo = player.getCatacombsSkill();
                 eb.addField(capitalizeString(skillInfo.skillName) + " (" + skillInfo.skillLevel + ")",
-                        simplifyNumber(skillInfo.expCurrent) + " / " + simplifyNumber(skillInfo.expForNext) + "\nTotal XP: "
-                                + simplifyNumber(skillInfo.totalSkillExp) + "\nProgress: "
+                        simplifyNumber(skillInfo.expCurrent) + " / " + simplifyNumber(skillInfo.expForNext)
+                                + "\nTotal XP: " + simplifyNumber(skillInfo.totalSkillExp) + "\nProgress: "
                                 + roundProgress(skillInfo.progressToNext),
                         false);
 

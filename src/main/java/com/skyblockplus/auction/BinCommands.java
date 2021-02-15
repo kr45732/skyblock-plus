@@ -1,10 +1,13 @@
 package com.skyblockplus.auction;
 
-import com.google.gson.JsonElement;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
+import static com.skyblockplus.utils.BotUtils.BOT_PREFIX;
+import static com.skyblockplus.utils.BotUtils.capitalizeString;
+import static com.skyblockplus.utils.BotUtils.defaultEmbed;
+import static com.skyblockplus.utils.BotUtils.errorMessage;
+import static com.skyblockplus.utils.BotUtils.formatNumber;
+import static com.skyblockplus.utils.BotUtils.getJson;
+import static com.skyblockplus.utils.BotUtils.globalCooldown;
+import static com.skyblockplus.utils.BotUtils.higherDepth;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,7 +16,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import static com.skyblockplus.utils.BotUtils.*;
+import com.google.gson.JsonElement;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 
 public class BinCommands extends Command {
     Message ebMessage;
@@ -45,8 +53,9 @@ public class BinCommands extends Command {
         ebMessage.editMessage(eb.build()).queue();
     }
 
-    public EmbedBuilder getLowestBin(String item) {
-        String preFormattedItem = item.trim().toUpperCase().replace(" ", "_").replace("'S", "").replace("FRAG", "FRAGMENT").replace(".", "");
+    private EmbedBuilder getLowestBin(String item) {
+        String preFormattedItem = item.trim().toUpperCase().replace(" ", "_").replace("'S", "")
+                .replace("FRAG", "FRAGMENT").replace(".", "");
 
         JsonElement petJson = getJson(
                 "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/petnums.json");
@@ -54,7 +63,39 @@ public class BinCommands extends Command {
         List<String> petNames = petJson.getAsJsonObject().entrySet().stream().map(Entry::getKey)
                 .collect(Collectors.toCollection(ArrayList::new));
 
-        if (preFormattedItem.equals("BONEMERANG")) {
+        if (preFormattedItem.equals("NECRON_HELMET")) {
+            preFormattedItem = "POWER_WITHER_HELMET";
+        } else if (preFormattedItem.equals("NECRON_CHESTPLATE")) {
+            preFormattedItem = "POWER_WITHER_CHESTPLATE";
+        } else if (preFormattedItem.equals("NECRON_LEGGINGS")) {
+            preFormattedItem = "POWER_WITHER_LEGGINGS";
+        } else if (preFormattedItem.equals("NECRON_BOOTS")) {
+            preFormattedItem = "POWER_WITHER_BOOTS";
+        } else if (preFormattedItem.equals("STORM_HELMET")) {
+            preFormattedItem = "WISE_WITHER_HELMET";
+        } else if (preFormattedItem.equals("STORM_CHESTPLATE")) {
+            preFormattedItem = "WISE_WITHER_CHESTPLATE";
+        } else if (preFormattedItem.equals("STORM_LEGGINGS")) {
+            preFormattedItem = "WISE_WITHER_LEGGINGS";
+        } else if (preFormattedItem.equals("STORM_BOOTS")) {
+            preFormattedItem = "WISE_WITHER_BOOTS";
+        } else if (preFormattedItem.equals("MAXOR_HELMET")) {
+            preFormattedItem = "SPEED_WITHER_HELMET";
+        } else if (preFormattedItem.equals("MAXOR_CHESTPLATE")) {
+            preFormattedItem = "SPEED_WITHER_CHESTPLATE";
+        } else if (preFormattedItem.equals("MAXOR_LEGGINGS")) {
+            preFormattedItem = "SPEED_WITHER_LEGGINGS";
+        } else if (preFormattedItem.equals("MAXOR_BOOTS")) {
+            preFormattedItem = "SPEED_WITHER_BOOTS";
+        } else if (preFormattedItem.equals("GOLDOR_HELMET")) {
+            preFormattedItem = "TANK_WITHER_HELMET";
+        } else if (preFormattedItem.equals("GOLDOR_CHESTPLATE")) {
+            preFormattedItem = "TANK_WITHER_CHESTPLATE";
+        } else if (preFormattedItem.equals("GOLDOR_LEGGINGS")) {
+            preFormattedItem = "TANK_WITHER_LEGGINGS";
+        } else if (preFormattedItem.equals("GOLDOR_BOOTS")) {
+            preFormattedItem = "TANK_WITHER_BOOTS";
+        } else if (preFormattedItem.equals("BONEMERANG")) {
             preFormattedItem = "BONE_BOOMERANG";
         } else if (preFormattedItem.equals("GOD_POT")) {
             preFormattedItem = "GOD_POTION";
@@ -106,11 +147,10 @@ public class BinCommands extends Command {
         JsonElement lowestBinJson = getJson("https://moulberry.codes/lowestbin.json");
         if (higherDepth(lowestBinJson, preFormattedItem) != null) {
             EmbedBuilder eb = defaultEmbed("Lowest bin", null);
-            eb.addField(capitalizeString(item.toLowerCase()), formatNumber(higherDepth(lowestBinJson, preFormattedItem).getAsLong()),
-                    false);
+            eb.addField(capitalizeString(item.toLowerCase()),
+                    formatNumber(higherDepth(lowestBinJson, preFormattedItem).getAsLong()), false);
             return eb;
         }
-
 
         JsonElement enchantsJson = higherDepth(getJson(
                 "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/enchants.json"),
@@ -136,12 +176,12 @@ public class BinCommands extends Command {
                     enchantName = i.toLowerCase().replace("_", " ") + " " + enchantLevel;
                     formattedName = i + ";" + enchantLevel;
                     EmbedBuilder eb = defaultEmbed("Lowest bin", null);
-                    eb.addField(capitalizeString(enchantName), formatNumber(higherDepth(lowestBinJson, formattedName).getAsLong()),
-                            false);
+                    eb.addField(capitalizeString(enchantName),
+                            formatNumber(higherDepth(lowestBinJson, formattedName).getAsLong()), false);
                     return eb;
                 } catch (NumberFormatException e) {
                     try {
-                        EmbedBuilder eb = defaultEmbed("/Lowest bin", null);
+                        EmbedBuilder eb = defaultEmbed("Lowest bin", null);
                         for (int j = 10; j > 0; j--) {
                             try {
                                 formattedName = i + ";" + j;
@@ -193,8 +233,8 @@ public class BinCommands extends Command {
                     }
                 }
                 EmbedBuilder eb = defaultEmbed("Lowest bin", null);
-                eb.addField(capitalizeString(petName) + " pet", formatNumber(higherDepth(lowestBinJson, formattedName).getAsLong()),
-                        false);
+                eb.addField(capitalizeString(petName) + " pet",
+                        formatNumber(higherDepth(lowestBinJson, formattedName).getAsLong()), false);
                 return eb;
             }
         }

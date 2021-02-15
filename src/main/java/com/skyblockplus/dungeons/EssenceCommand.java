@@ -43,13 +43,13 @@ public class EssenceCommand extends Command {
         }
         System.out.println();
 
-
         String itemName = content.split(" ", 3)[2].replace(" ", "_").toUpperCase();
         if (args[1].equals("upgrade")) {
             jda = event.getJDA();
             user = event.getAuthor();
 
-            JsonElement essenceCostsJson = getJson("https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/essencecosts.json");
+            JsonElement essenceCostsJson = getJson(
+                    "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/essencecosts.json");
             JsonElement itemJson = higherDepth(essenceCostsJson, itemName);
             if (itemJson != null) {
                 jda.addEventListener(new EssenceWaiter(itemName, itemJson, ebMessage, user));
@@ -69,8 +69,9 @@ public class EssenceCommand extends Command {
         }
     }
 
-    public EmbedBuilder getEssenceInformation(String itemName) {
-        JsonElement essenceCostsJson = getJson("https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/essencecosts.json");
+    private EmbedBuilder getEssenceInformation(String itemName) {
+        JsonElement essenceCostsJson = getJson(
+                "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/essencecosts.json");
         JsonElement itemJson = higherDepth(essenceCostsJson, itemName);
         EmbedBuilder eb = defaultEmbed("Essence information for " + itemName.toLowerCase().replace("_", " "), null);
         if (itemJson != null) {
@@ -81,13 +82,16 @@ public class EssenceCommand extends Command {
                         eb.setDescription("**Essence Type**: " + capitalizeString(essenceType) + " essence");
                         break;
                     case "dungeonize":
-                        eb.addField("Dungeonize item", higherDepth(itemJson, level).getAsString() + " " + essenceType + " essence", false);
+                        eb.addField("Dungeonize item",
+                                higherDepth(itemJson, level).getAsString() + " " + essenceType + " essence", false);
                         break;
                     case "1":
-                        eb.addField(level + " star", higherDepth(itemJson, level).getAsString() + " " + essenceType + " essence", false);
+                        eb.addField(level + " star",
+                                higherDepth(itemJson, level).getAsString() + " " + essenceType + " essence", false);
                         break;
                     default:
-                        eb.addField(level + " stars", higherDepth(itemJson, level).getAsString() + " " + essenceType + " essence", false);
+                        eb.addField(level + " stars",
+                                higherDepth(itemJson, level).getAsString() + " " + essenceType + " essence", false);
                         break;
                 }
             }

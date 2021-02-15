@@ -31,10 +31,11 @@ public class MessageTimeout extends ListenerAdapter {
     }
 
     public void updateMessages() {
-        for (Iterator<MessageTimeoutStruct> iteratorCur = messageList.iterator(); iteratorCur.hasNext(); ) {
+        for (Iterator<MessageTimeoutStruct> iteratorCur = messageList.iterator(); iteratorCur.hasNext();) {
             MessageTimeoutStruct currentMessageStruct = iteratorCur.next();
             Message currentMessage = currentMessageStruct.message;
-            long secondsSinceLast = Instant.now().getEpochSecond() - currentMessage.getTimeCreated().toInstant().getEpochSecond();
+            long secondsSinceLast = Instant.now().getEpochSecond()
+                    - currentMessage.getTimeCreated().toInstant().getEpochSecond();
             if (secondsSinceLast > 30) {
                 currentMessage.clearReactions().complete();
                 currentMessage.addReaction("\uD83C\uDDF9").queue();

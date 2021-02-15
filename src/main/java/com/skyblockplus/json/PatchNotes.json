@@ -61,7 +61,12 @@
   },
   "13": {
     "version": "0.1.4",
-    "description": "- Added total player weight to automated applications\n- Fixed weight command\n Fixed farming cap to use upgraded cap from Jacob contests\n- Updated apply data structure\n- Updated verify data structure\n- Updated weight command\n- Many changes and bug fixes",
+    "description": "- Added weight calculate command\n- Added total player weight to automated applications\n- Fixed weight command\n- Fixed farming cap to use upgraded cap from Jacob contests\n- Updated apply data structure\n- Updated verify data structure\n- Updated weight command\n- Many changes and bug fixes",
     "date": "2021-02-13T18:32:02.183508Z"
+  },
+  "14": {
+    "version": "0.1.5",
+    "description": "- Added fastest lobby parkour command\n- Renammed coins command to bank command\n- Updated bin command\n- Added hypixel player stats command\n- Minor bug fixes",
+    "date": "2021-02-15T18:02:49.671977Z"
   }
 }

@@ -10,6 +10,9 @@ public class SlayerWeight {
         this.player = player;
     }
 
+    public SlayerWeight() {
+    }
+
     public double getSlayerWeight() {
         return totalSlayerWeight;
     }
@@ -27,5 +30,9 @@ public class SlayerWeight {
             double overflow = Math.pow(remaining / (divider * 1.5), 0.942);
             totalSlayerWeight += (base + overflow);
         }
+    }
+
+    public void addSlayerWeight(double slayer, double divider) {
+        totalSlayerWeight += 3 * ((slayer / 3) / divider);
     }
 }

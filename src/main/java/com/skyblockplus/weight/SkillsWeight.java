@@ -10,6 +10,9 @@ public class SkillsWeight {
         this.player = player;
     }
 
+    public SkillsWeight() {
+    }
+
     public double getSkillsWeight() {
         return totalSkillWeight;
     }
@@ -30,5 +33,9 @@ public class SkillsWeight {
                 this.totalSkillWeight += (Math.round(base) + Math.pow((currentSkillXp - maxLevelExp) / divider, 0.968));
             }
         }
+    }
+
+    public void addSkillWeight(double skillAverage, double exponent, double divider) {
+        this.totalSkillWeight += (8 * (Math.pow(skillAverage * 10, 0.5 + exponent + (skillAverage / 100)) / 1250));
     }
 }

@@ -43,7 +43,8 @@ public class SkillsCommands extends Command {
         }
         System.out.println();
 
-        levelTables = getJson("https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/leveling.json");
+        levelTables = getJson(
+                "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/leveling.json");
         if (levelTables == null) {
             eb = defaultEmbed("Error fetching data from github", null);
             ebMessage.editMessage(eb.build()).queue();
@@ -65,7 +66,7 @@ public class SkillsCommands extends Command {
 
     }
 
-    public EmbedBuilder getPlayerSkill(String username, String profileName) {
+    private EmbedBuilder getPlayerSkill(String username, String profileName) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 
         if (player.isValid()) {
@@ -76,7 +77,8 @@ public class SkillsCommands extends Command {
 
             double trueSA = 0;
             double progressSA = 0;
-            EmbedBuilder eb = defaultEmbed("Skills for " + player.getUsername(), skyblockStatsLink(player.getUsername(), player.getProfileName()));
+            EmbedBuilder eb = defaultEmbed("Skills for " + player.getUsername(),
+                    skyblockStatsLink(player.getUsername(), player.getProfileName()));
             Map<String, String> skillsEmojiMap = new HashMap<>();
             skillsEmojiMap.put("taming", "<:taming:800462115365716018>");
             skillsEmojiMap.put("farming", "<:farming:800462115055992832>");
@@ -93,19 +95,20 @@ public class SkillsCommands extends Command {
                 SkillsStruct skillInfo = player.getSkill(skill);
                 if (skillInfo != null) {
                     eb.addField(
-                            skillsEmojiMap.get(skill) + " " + capitalizeString(skillInfo.skillName) + " (" + skillInfo.skillLevel
-                                    + ")",
+                            skillsEmojiMap.get(skill) + " " + capitalizeString(skillInfo.skillName) + " ("
+                                    + skillInfo.skillLevel + ")",
                             simplifyNumber(skillInfo.expCurrent) + " / " + simplifyNumber(skillInfo.expForNext)
                                     + "\nTotal XP: " + simplifyNumber(skillInfo.totalSkillExp) + "\nProgress: "
                                     + (skillInfo.skillLevel == skillInfo.maxSkillLevel ? "MAX"
-                                    : roundProgress(skillInfo.progressToNext)),
+                                            : roundProgress(skillInfo.progressToNext)),
                             true);
                     if (!skill.equals("runecrafting") && !skill.equals("carpentry")) {
                         trueSA += skillInfo.skillLevel;
                         progressSA += skillInfo.skillLevel + skillInfo.progressToNext;
                     }
                 } else {
-                    eb.addField(skillsEmojiMap.get(skill) + " " + capitalizeString(skill) + " (?) ", "Unable to retrieve", true);
+                    eb.addField(skillsEmojiMap.get(skill) + " " + capitalizeString(skill) + " (?) ",
+                            "Unable to retrieve", true);
                 }
             }
             trueSA /= (skills.size() - 2);

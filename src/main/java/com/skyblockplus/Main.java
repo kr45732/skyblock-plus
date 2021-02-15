@@ -16,13 +16,15 @@ import com.skyblockplus.dungeons.EssenceCommand;
 import com.skyblockplus.guilds.GuildCommands;
 import com.skyblockplus.guilds.GuildLeaderboardCommand;
 import com.skyblockplus.miscellaneous.AboutCommand;
-import com.skyblockplus.miscellaneous.CoinsCommand;
+import com.skyblockplus.miscellaneous.BankCommand;
 import com.skyblockplus.miscellaneous.HelpCommand;
+import com.skyblockplus.miscellaneous.HypixelCommand;
 import com.skyblockplus.miscellaneous.InventoryCommand;
 import com.skyblockplus.miscellaneous.InviteCommand;
 import com.skyblockplus.miscellaneous.SacksCommand;
 import com.skyblockplus.miscellaneous.ShutdownCommand;
 import com.skyblockplus.miscellaneous.TalismanBagCommand;
+import com.skyblockplus.miscellaneous.UuidCommand;
 import com.skyblockplus.miscellaneous.VersionCommand;
 import com.skyblockplus.miscellaneous.WardrobeCommand;
 import com.skyblockplus.reload.ReloadEventWatcher;
@@ -52,7 +54,7 @@ public class Main {
     public static void main(String[] args) throws LoginException, IllegalArgumentException {
         setApplicationSettings();
 
-        //SpringApplication.run(com.skyblockplus.Main.class, args);
+        // SpringApplication.run(com.skyblockplus.Main.class, args);
 
         EventWaiter waiter = new EventWaiter();
         CommandClientBuilder client = new CommandClientBuilder();
@@ -66,9 +68,9 @@ public class Main {
         client.addCommands(new AboutCommand(), new SlayerCommands(), new HelpCommand(waiter), new GuildCommands(waiter),
                 new AuctionCommands(), new BinCommands(), new SkillsCommands(), new CatacombsCommand(),
                 new ShutdownCommand(), new VersionCommand(), new RoleCommands(), new GuildLeaderboardCommand(),
-                new EssenceCommand(), new CoinsCommand(waiter), new WardrobeCommand(waiter),
+                new EssenceCommand(), new BankCommand(waiter), new WardrobeCommand(waiter),
                 new TalismanBagCommand(waiter), new InventoryCommand(), new SacksCommand(waiter), new InviteCommand(),
-                new WeightCommand());
+                new WeightCommand(), new HypixelCommand(), new UuidCommand());
 
         if (BOT_PREFIX.equals("/")) {
             jda = JDABuilder.createDefault(BOT_TOKEN).setStatus(OnlineStatus.DO_NOT_DISTURB)

@@ -434,11 +434,11 @@ public class RoleCommands extends Command {
         ebMessage.editMessage(eb.build()).queue();
     }
 
-    public String roleChangeString(String name) {
+    private String roleChangeString(String name) {
         return "• " + name + "\n";
     }
 
-    public DiscordStruct getPlayerInfo(String username) {
+    private DiscordStruct getPlayerInfo(String username) {
         JsonElement playerJson = getJson("https://api.hypixel.net/player?key=" + HYPIXEL_API_KEY + "&name=" + username);
 
         if (playerJson == null) {

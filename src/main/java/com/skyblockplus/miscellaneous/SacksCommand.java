@@ -68,7 +68,7 @@ public class SacksCommand extends Command {
         ebMessage.editMessage(eb.build()).queue();
     }
 
-    public EmbedBuilder getPlayerSacks(String username, String profileName) {
+    private EmbedBuilder getPlayerSacks(String username, String profileName) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
             @SuppressWarnings("unchecked")
@@ -76,18 +76,21 @@ public class SacksCommand extends Command {
             if (sacksMap != null) {
                 ArrayList<String> pageTitles = new ArrayList<>();
 
-                CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(1).setItemsPerPage(20).showPageNumbers(true)
-                        .useNumberedItems(false).setFinalAction(m -> {
+                CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(1)
+                        .setItemsPerPage(20).showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
                             try {
                                 m.clearReactions().queue();
                             } catch (PermissionException ex) {
                                 m.delete().queue();
                             }
-                        }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).wrapPageEnds(true).setColor(botColor).setCommandUser(event.getAuthor());
+                        }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).wrapPageEnds(true).setColor(botColor)
+                        .setCommandUser(event.getAuthor());
 
                 for (Map.Entry<String, Integer> currentSack : sacksMap.entrySet()) {
                     pageTitles.add("Player sacks content for " + player.getUsername());
-                    paginateBuilder.addItems("**" + capitalizeString(currentSack.getKey().toLowerCase().replace("_", " ")) + "**: " + currentSack.getValue());
+                    paginateBuilder
+                            .addItems("**" + capitalizeString(currentSack.getKey().toLowerCase().replace("_", " "))
+                                    + "**: " + currentSack.getValue());
                 }
                 paginateBuilder.setPageTitles(pageTitles.toArray(new String[0]));
                 paginateBuilder.build().paginate(event.getChannel(), 0);

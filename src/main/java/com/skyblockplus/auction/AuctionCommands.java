@@ -21,7 +21,7 @@ public class AuctionCommands extends Command {
         this.name = "auction";
         this.guildOnly = false;
         this.cooldown = globalCooldown;
-        this.aliases = new String[]{"ah"};
+        this.aliases = new String[] { "ah" };
     }
 
     @Override
@@ -50,7 +50,7 @@ public class AuctionCommands extends Command {
 
     }
 
-    public EmbedBuilder getPlayerAuction(String username) {
+    private EmbedBuilder getPlayerAuction(String username) {
         if (!usernameToUuid(username)) {
             return defaultEmbed("Error fetching player data", null);
         }
@@ -82,9 +82,11 @@ public class AuctionCommands extends Command {
                 timeUntil += minutesUntil > 0 ? minutesUntil + "m " : "";
 
                 if (higherDepth(currentAuction, "item_name").getAsString().equals("Enchanted Book")) {
-                    auctions[i][0] = higherDepth(currentAuction, "item_lore").getAsString().split("\n")[0].replaceAll("§9|§d|§l", "");
+                    auctions[i][0] = higherDepth(currentAuction, "item_lore").getAsString().split("\n")[0]
+                            .replaceAll("§9|§d|§l", "");
                 } else {
-                    auctions[i][0] = (isPet ? capitalizeString(higherDepth(currentAuction, "tier").getAsString().toLowerCase()) + " "
+                    auctions[i][0] = (isPet
+                            ? capitalizeString(higherDepth(currentAuction, "tier").getAsString().toLowerCase()) + " "
                             : "") + higherDepth(currentAuction, "item_name").getAsString();
                 }
 
@@ -124,7 +126,7 @@ public class AuctionCommands extends Command {
         return eb;
     }
 
-    public boolean usernameToUuid(String username) {
+    private boolean usernameToUuid(String username) {
         try {
             JsonElement usernameJson = getJson("https://api.mojang.com/users/profiles/minecraft/" + username);
             this.playerUsername = higherDepth(usernameJson, "name").getAsString();

@@ -51,7 +51,7 @@ public class StatsCommand extends Command {
         ebMessage.editMessage(eb.build()).queue();
     }
 
-    public EmbedBuilder getPlayerStats(String username, String profileName) {
+    private EmbedBuilder getPlayerStats(String username, String profileName) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
             double playerBankBalance = player.getBankBalance();
@@ -60,10 +60,12 @@ public class StatsCommand extends Command {
             int minionSlots = player.getNumberMinionSlots();
             double skillAverage = player.getSkillAverage();
 
-
-            EmbedBuilder eb = defaultEmbed("Player stats for " + player.getUsername(), skyblockStatsLink(player.getUsername(), player.getProfileName()));
-            eb.addField("Slayer", "Wolf: " + player.getSlayerLevel("sven") + "\nRev: " + player.getSlayerLevel("rev") + "\nTara: " + player.getSlayerLevel("tara"), true);
-            eb.addField("Coins", "Bank: " + simplifyNumber(playerBankBalance) + " coins\nPurse: " + simplifyNumber(playerPurseCoins) + " coins", true);
+            EmbedBuilder eb = defaultEmbed("Player stats for " + player.getUsername(),
+                    skyblockStatsLink(player.getUsername(), player.getProfileName()));
+            eb.addField("Slayer", "Wolf: " + player.getSlayerLevel("sven") + "\nRev: " + player.getSlayerLevel("rev")
+                    + "\nTara: " + player.getSlayerLevel("tara"), true);
+            eb.addField("Coins", "Bank: " + simplifyNumber(playerBankBalance) + " coins\nPurse: "
+                    + simplifyNumber(playerPurseCoins) + " coins", true);
             eb.addField("Current Minion Slots", minionSlots + " slots", true);
             eb.addField("Fairy Souls", fairySouls + " souls", true);
             eb.addField("Skill Average", roundSkillAverage(skillAverage), true);

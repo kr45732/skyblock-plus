@@ -609,7 +609,7 @@ public class Player {
 
     public double getWeight() {
         Weight playerWeight = new Weight(this);
-        return playerWeight.getPlayerWeight();
+        return playerWeight.getTotalWeight();
     }
 
 }

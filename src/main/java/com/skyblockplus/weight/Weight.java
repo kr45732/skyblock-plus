@@ -1,12 +1,16 @@
 package com.skyblockplus.weight;
 
-import com.skyblockplus.utils.Player;
-
 import java.util.HashMap;
 import java.util.Map;
 
+import com.skyblockplus.utils.Player;
+
 public class Weight {
-    private final Player player;
+    private Player player;
+    private double skillAverage;
+    private double slayer;
+    private double catacombs;
+    private double averageDungeonClass;
     private final Map<String, Double> slayerWeights;
     private final Map<String, Double[]> skillWeights;
     private final Map<String, Double> dungeonClassWeights;
@@ -17,9 +21,27 @@ public class Weight {
                 defaultCatacombsWeights());
     }
 
+    public Weight(double skillAverage, double slayer, double catacombs, double averageDungeonClass) {
+        this(skillAverage, slayer, catacombs, averageDungeonClass, defaultSlayerWeights(), defaultSkillWeights(),
+                defaultDungeonClassWeights(), defaultCatacombsWeights());
+    }
+
     public Weight(Player player, Map<String, Double> slayerWeights, Map<String, Double[]> skillWeights,
             Map<String, Double> dungeonClassWeights, Map<String, Double> catacombsWeights) {
         this.player = player;
+        this.slayerWeights = slayerWeights;
+        this.skillWeights = skillWeights;
+        this.dungeonClassWeights = dungeonClassWeights;
+        this.catacombsWeights = catacombsWeights;
+    }
+
+    public Weight(double skillAverage, double slayer, double catacombs, double averageDungeonClass,
+            Map<String, Double> slayerWeights, Map<String, Double[]> skillWeights,
+            Map<String, Double> dungeonClassWeights, Map<String, Double> catacombsWeights) {
+        this.skillAverage = skillAverage;
+        this.slayer = slayer;
+        this.catacombs = catacombs;
+        this.averageDungeonClass = averageDungeonClass;
         this.slayerWeights = slayerWeights;
         this.skillWeights = skillWeights;
         this.dungeonClassWeights = dungeonClassWeights;
@@ -63,7 +85,7 @@ public class Weight {
         return tempCatacombsWeights;
     }
 
-    public double getPlayerWeight() {
+    public double getTotalWeight() {
         double totalWeight = 0;
         totalWeight += getSlayerWeight();
         totalWeight += getSkillsWeight();
@@ -100,6 +122,43 @@ public class Weight {
         dungeonsWeight.addDungeonClassWeight("archer", dungeonClassWeights.get("archer"));
         dungeonsWeight.addDungeonClassWeight("tank", dungeonClassWeights.get("tank"));
         dungeonsWeight.addCatacombsWeight(catacombsWeights.get("catacombs"));
+        return dungeonsWeight.getDungeonsWeight();
+    }
+
+    public double calculateTotalWeight() {
+        double totalWeight = 0;
+        totalWeight += calculateSlayerWeight();
+        totalWeight += calculateSkillsWeight();
+        totalWeight += calculateDungeonsWeight();
+        return totalWeight;
+    }
+
+    public double calculateSlayerWeight() {
+        SlayerWeight slayerWeight = new SlayerWeight();
+        slayerWeight.addSlayerWeight(slayer,
+                (slayerWeights.get("rev") + slayerWeights.get("sven") + slayerWeights.get("tara")) / 3);
+        return slayerWeight.getSlayerWeight();
+    }
+
+    public double calculateSkillsWeight() {
+        SkillsWeight skillsWeight = new SkillsWeight();
+        skillsWeight.addSkillWeight(skillAverage, (skillWeights.get("mining")[0] + skillWeights.get("foraging")[0]
+                + skillWeights.get("enchanting")[0] + skillWeights.get("farming")[0] + skillWeights.get("combat")[0]
+                + skillWeights.get("fishing")[0] + skillWeights.get("alchemy")[0] + skillWeights.get("taming")[0]) / 8,
+                (skillWeights.get("mining")[1] + skillWeights.get("foraging")[1] + skillWeights.get("enchanting")[1]
+                        + skillWeights.get("farming")[1] + skillWeights.get("combat")[1]
+                        + skillWeights.get("fishing")[1] + skillWeights.get("alchemy")[1]
+                        + skillWeights.get("taming")[1]) / 8);
+        return skillsWeight.getSkillsWeight();
+    }
+
+    public double calculateDungeonsWeight() {
+        DungeonsWeight dungeonsWeight = new DungeonsWeight();
+        dungeonsWeight.addDungeonClassWeight(averageDungeonClass,
+                (dungeonClassWeights.get("healer") + dungeonClassWeights.get("mage")
+                        + dungeonClassWeights.get("berserk") + dungeonClassWeights.get("archer")
+                        + dungeonClassWeights.get("tank")) / 5);
+        dungeonsWeight.addCatacombsWeight(catacombs, catacombsWeights.get("catacombs"));
         return dungeonsWeight.getDungeonsWeight();
     }
 }

@@ -75,7 +75,7 @@ public class GuildLeaderboardCommand extends Command {
         ebMessage.editMessage(eb.build()).queue();
     }
 
-    public String[] getLeaderboard(String username) {
+    private String[] getLeaderboard(String username) {
         String playerUuid = usernameToUuid(username);
         if (playerUuid == null) {
             return null;

@@ -154,7 +154,7 @@ public class GuildCommands extends Command {
 
     }
 
-    public GuildStruct getGuildExp(String username) {
+    private GuildStruct getGuildExp(String username) {
         UsernameUuidStruct uuidUsername = usernameToUuidUsername(username);
         if (uuidUsername == null) {
             return new GuildStruct(defaultEmbed("Error fetching player data", null), null);
@@ -196,7 +196,7 @@ public class GuildCommands extends Command {
         return new GuildStruct(null, outputStrArr);
     }
 
-    public EmbedBuilder getGuildPlayer(String username) {
+    private EmbedBuilder getGuildPlayer(String username) {
         UsernameUuidStruct uuidUsername = usernameToUuidUsername(username);
         if (uuidUsername == null) {
             return defaultEmbed("Error fetching player data", null);
@@ -219,7 +219,7 @@ public class GuildCommands extends Command {
 
     }
 
-    public EmbedBuilder getGuildInfo(String username) {
+    private EmbedBuilder getGuildInfo(String username) {
         UsernameUuidStruct uuidUsername = usernameToUuidUsername(username);
         if (uuidUsername == null) {
             return defaultEmbed("Error fetching player data", null);
@@ -239,7 +239,7 @@ public class GuildCommands extends Command {
         return eb;
     }
 
-    public EmbedBuilder guildInfoFromGuildName(String guildName) {
+    private EmbedBuilder guildInfoFromGuildName(String guildName) {
         try {
             String guildId = higherDepth(getJson("https://api.hypixel.net/findGuild?key=" + HYPIXEL_API_KEY + "&byName="
                     + guildName.replace(" ", "%20")), "guild").getAsString();
@@ -257,7 +257,7 @@ public class GuildCommands extends Command {
         }
     }
 
-    public String getGuildInfo(JsonElement guildJson) {
+    private String getGuildInfo(JsonElement guildJson) {
         String guildInfo = "";
         String guildName = higherDepth(higherDepth(guildJson, "guild"), "name").getAsString();
 
@@ -306,7 +306,7 @@ public class GuildCommands extends Command {
         return guildInfo;
     }
 
-    public GuildStruct getGuildMembers(String username) {
+    private GuildStruct getGuildMembers(String username) {
         UsernameUuidStruct uuidUsername = usernameToUuidUsername(username);
         if (uuidUsername == null) {
             return new GuildStruct(defaultEmbed("Error fetching player data", null), null);
@@ -329,7 +329,7 @@ public class GuildCommands extends Command {
         return new GuildStruct(null, members);
     }
 
-    public int guildExpToLevel(int guildExp) {
+    private int guildExpToLevel(int guildExp) {
         int[] guildExpTable = new int[] { 100000, 150000, 250000, 500000, 750000, 1000000, 1250000, 1500000, 2000000,
                 2500000, 2500000, 2500000, 2500000, 2500000, 3000000 };
         int guildLevel = 0;

@@ -12,6 +12,9 @@ public class DungeonsWeight {
         this.player = player;
     }
 
+    public DungeonsWeight() {
+    }
+
     public double getDungeonsWeight() {
         return totalDungeonsWeight;
     }
@@ -42,5 +45,13 @@ public class DungeonsWeight {
             double splitter = (4 * level50Xp) / base;
             totalDungeonsWeight += (Math.floor(base) + Math.pow(remaining / splitter, 0.968));
         }
+    }
+
+    public void addDungeonClassWeight(double averageDungeonClass, double maxPoints) {
+        totalDungeonsWeight += 5 * Math.pow(averageDungeonClass, 4.5) * maxPoints;
+    }
+
+    public void addCatacombsWeight(double catacombs, double maxPoints) {
+        totalDungeonsWeight += Math.pow(catacombs, 4.5) * maxPoints;
     }
 }

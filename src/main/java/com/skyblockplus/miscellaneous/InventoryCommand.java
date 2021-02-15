@@ -16,7 +16,7 @@ public class InventoryCommand extends Command {
         this.name = "inventory";
         this.guildOnly = false;
         this.cooldown = globalCooldown;
-        this.aliases = new String[]{"inv"};
+        this.aliases = new String[] { "inv" };
     }
 
     @Override
@@ -60,13 +60,14 @@ public class InventoryCommand extends Command {
         ebMessage.editMessage(eb.build()).queue();
     }
 
-    public EmbedBuilder getPlayerEquippedArmor(String username, String profileName) {
+    private EmbedBuilder getPlayerEquippedArmor(String username, String profileName) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
             ArmorStruct inventoryArmor = player.getInventoryArmor();
             if (inventoryArmor != null) {
                 EmbedBuilder eb = defaultEmbed("Equipped armor for " + player.getUsername(), null);
-                eb.addField("Equipped", inventoryArmor.getHelmet() + "\n" + inventoryArmor.getChestplate() + "\n" + inventoryArmor.getLeggings() + "\n" + inventoryArmor.getBoots(), false);
+                eb.addField("Equipped", inventoryArmor.getHelmet() + "\n" + inventoryArmor.getChestplate() + "\n"
+                        + inventoryArmor.getLeggings() + "\n" + inventoryArmor.getBoots(), false);
                 return eb;
             }
         }
