@@ -71,6 +71,7 @@ public class HelpCommand extends Command {
             pageMap.put("sacks", 8);
             pageMap.put("weight", 8);
             pageMap.put("hypixel", 8);
+            pageMap.put("uuid", 8);
 
             if (pageMap.get(pageStr) != null) {
                 startingPage = pageMap.get(pageStr);
@@ -139,7 +140,7 @@ public class HelpCommand extends Command {
                         "weight calculate [skill avg] [slayer] [cata level] [avg dungeon class level]"),
                 generateHelp("Get Hypixel information about a player", "hypixel player [IGN]"),
                 generateHelp("Get fastest Hypixel lobby parkours for a player", "hypixel parkour [IGN]"),
-                generateHelp("Get a player's minecraft uuid", "uuid parkour [IGN]") };
+                generateHelp("Get a player's minecraft uuid", "uuid player [IGN]") };
         paginateBuilder.addItems(fillArray(miscCommands));
 
         paginateBuilder.build().paginate(event.getChannel(), startingPage);
