@@ -13,40 +13,33 @@ import java.time.Instant;
 import static com.skyblockplus.utils.BotUtils.*;
 
 public class AuctionCommands extends Command {
-    Message ebMessage;
-    String playerUsername;
-    String playerUuid;
+    private String playerUsername;
+    private String playerUuid;
 
     public AuctionCommands() {
         this.name = "auction";
         this.guildOnly = false;
         this.cooldown = globalCooldown;
-        this.aliases = new String[] { "ah" };
+        this.aliases = new String[]{"ah"};
     }
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = defaultEmbed("Loading auction data...", null);
-        this.ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+        EmbedBuilder eb = defaultEmbed("Loading...", null);
+        Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 
-        Message message = event.getMessage();
-        String content = message.getContentRaw();
+        String content = event.getMessage().getContentRaw();
 
         String[] args = content.split(" ");
-        if (args.length != 2) { // No args or too many args are given
+        if (args.length != 2) {
             eb.setTitle(errorMessage(this.name));
             ebMessage.editMessage(eb.build()).queue();
             return;
         }
 
-        for (String value : args) {
-            System.out.print(value + " ");
-        }
-        System.out.println();
+        System.out.println(content);
 
-        eb = getPlayerAuction(args[1]);
-
-        ebMessage.editMessage(eb.build()).queue();
+        ebMessage.editMessage(getPlayerAuction(args[1]).build()).queue();
 
     }
 

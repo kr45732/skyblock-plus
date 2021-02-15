@@ -1,11 +1,5 @@
 package com.skyblockplus;
 
-import static com.skyblockplus.utils.BotUtils.BOT_PREFIX;
-import static com.skyblockplus.utils.BotUtils.BOT_TOKEN;
-import static com.skyblockplus.utils.BotUtils.setApplicationSettings;
-
-import javax.security.auth.login.LoginException;
-
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.apply.Apply;
@@ -15,18 +9,7 @@ import com.skyblockplus.dungeons.CatacombsCommand;
 import com.skyblockplus.dungeons.EssenceCommand;
 import com.skyblockplus.guilds.GuildCommands;
 import com.skyblockplus.guilds.GuildLeaderboardCommand;
-import com.skyblockplus.miscellaneous.AboutCommand;
-import com.skyblockplus.miscellaneous.BankCommand;
-import com.skyblockplus.miscellaneous.HelpCommand;
-import com.skyblockplus.miscellaneous.HypixelCommand;
-import com.skyblockplus.miscellaneous.InventoryCommand;
-import com.skyblockplus.miscellaneous.InviteCommand;
-import com.skyblockplus.miscellaneous.SacksCommand;
-import com.skyblockplus.miscellaneous.ShutdownCommand;
-import com.skyblockplus.miscellaneous.TalismanBagCommand;
-import com.skyblockplus.miscellaneous.UuidCommand;
-import com.skyblockplus.miscellaneous.VersionCommand;
-import com.skyblockplus.miscellaneous.WardrobeCommand;
+import com.skyblockplus.miscellaneous.*;
 import com.skyblockplus.reload.ReloadEventWatcher;
 import com.skyblockplus.roles.RoleCommands;
 import com.skyblockplus.skills.SkillsCommands;
@@ -35,10 +18,6 @@ import com.skyblockplus.timeout.ChannelDeleter;
 import com.skyblockplus.timeout.MessageTimeout;
 import com.skyblockplus.verify.Verify;
 import com.skyblockplus.weight.WeightCommand;
-
-//import org.springframework.boot.SpringApplication;
-//import org.springframework.boot.autoconfigure.SpringBootApplication;
-
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -46,6 +25,10 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+
+import javax.security.auth.login.LoginException;
+
+import static com.skyblockplus.utils.BotUtils.*;
 
 //@SpringBootApplication
 public class Main {

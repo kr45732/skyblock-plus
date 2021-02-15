@@ -1,15 +1,7 @@
 package com.skyblockplus.apply;
 
-import static com.skyblockplus.reload.ReloadEventWatcher.addApplySubEventListener;
-import static com.skyblockplus.timeout.ChannelDeleter.removeChannel;
-import static com.skyblockplus.utils.BotUtils.defaultEmbed;
-import static com.skyblockplus.utils.BotUtils.higherDepth;
-
-import java.util.concurrent.TimeUnit;
-
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -17,17 +9,24 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
+import java.util.concurrent.TimeUnit;
+
+import static com.skyblockplus.reload.ReloadEventWatcher.addApplySubEventListener;
+import static com.skyblockplus.timeout.ChannelDeleter.removeChannel;
+import static com.skyblockplus.utils.BotUtils.defaultEmbed;
+import static com.skyblockplus.utils.BotUtils.higherDepth;
+
 public class ApplyStaff extends ListenerAdapter {
-    final User user;
-    final TextChannel applyChannel;
-    final Message reactMessage;
-    final TextChannel staffChannel;
-    final JsonElement currentSettings;
-    final Player player;
-    Message deleteChannelMessage;
+    private final User user;
+    private final TextChannel applyChannel;
+    private final Message reactMessage;
+    private final TextChannel staffChannel;
+    private final JsonElement currentSettings;
+    private final Player player;
+    private Message deleteChannelMessage;
 
     public ApplyStaff(User user, TextChannel applyChannel, EmbedBuilder ebMain, JsonElement currentSettings,
-            Player player) {
+                      Player player) {
         this.user = user;
         this.applyChannel = applyChannel;
         this.currentSettings = currentSettings;

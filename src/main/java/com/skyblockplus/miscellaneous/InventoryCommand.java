@@ -10,22 +10,20 @@ import net.dv8tion.jda.api.entities.Message;
 import static com.skyblockplus.utils.BotUtils.*;
 
 public class InventoryCommand extends Command {
-    Message ebMessage;
 
     public InventoryCommand() {
         this.name = "inventory";
         this.guildOnly = false;
         this.cooldown = globalCooldown;
-        this.aliases = new String[] { "inv" };
+        this.aliases = new String[]{"inv"};
     }
 
     @Override
     protected void execute(CommandEvent event) {
         EmbedBuilder eb = defaultEmbed("Loading player data...", null);
-        this.ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+        Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 
-        Message message = event.getMessage();
-        String content = message.getContentRaw();
+        String content = event.getMessage().getContentRaw();
 
         String[] args = content.split(" ");
         if (args.length <= 2 || args.length > 4) {
@@ -34,10 +32,7 @@ public class InventoryCommand extends Command {
             return;
         }
 
-        for (String value : args) {
-            System.out.print(value + " ");
-        }
-        System.out.println();
+        System.out.println(content);
 
         if (args[1].equals("player")) {
 
@@ -47,10 +42,6 @@ public class InventoryCommand extends Command {
             } else
                 eb = getPlayerEquippedArmor(args[2], null);
 
-            if (eb == null) {
-                ebMessage.delete().queue();
-                return;
-            }
         } else {
             eb = defaultEmbed(errorMessage(this.name), null);
             ebMessage.editMessage(eb.build()).queue();

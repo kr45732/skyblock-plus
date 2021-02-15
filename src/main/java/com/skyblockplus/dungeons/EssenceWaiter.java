@@ -18,16 +18,15 @@ import static com.skyblockplus.utils.BotUtils.defaultEmbed;
 import static com.skyblockplus.utils.BotUtils.higherDepth;
 
 public class EssenceWaiter extends ListenerAdapter {
-    final String itemName;
-    final JsonElement itemJson;
-    final Message reactMessage;
-    final User user;
-    final ArrayList<String> validReactions;
-    final Map<String, Integer> essenceEmojiMap = new HashMap<>();
-    final Map<Integer, String> emojiEssenceMap;
-    int startingLevel;
-    int endingLevel;
-    int state = 0;
+    private final String itemName;
+    private final JsonElement itemJson;
+    private final Message reactMessage;
+    private final User user;
+    private final ArrayList<String> validReactions;
+    private final Map<String, Integer> essenceEmojiMap = new HashMap<>();
+    private final Map<Integer, String> emojiEssenceMap;
+    private int startingLevel;
+    private int state = 0;
 
     public EssenceWaiter(String itemName, JsonElement itemJson, Message reactMessage, User user) {
         this.itemName = itemName;
@@ -43,8 +42,8 @@ public class EssenceWaiter extends ListenerAdapter {
         essenceEmojiMap.put("3⃣", 3);
         essenceEmojiMap.put("4⃣", 4);
         essenceEmojiMap.put("5⃣", 5);
-        emojiEssenceMap = essenceEmojiMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
-
+        emojiEssenceMap = essenceEmojiMap.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
 
         EmbedBuilder eb = defaultEmbed("Essence upgrade for " + itemName.toLowerCase().replace("_", " "), null);
         eb.setDescription("Choose the current item level");
@@ -55,7 +54,8 @@ public class EssenceWaiter extends ListenerAdapter {
             validReactions.add("⏫");
             initialMessageInfo += "⏫ - Not dungeonized\n";
         }
-        eb.addField("Levels", initialMessageInfo + "0⃣ - 0 stars\n1⃣ - 1 star\n2⃣ - 2 stars\n3⃣ - 3 stars\n4⃣ - 4 stars", false);
+        eb.addField("Levels",
+                initialMessageInfo + "0⃣ - 0 stars\n1⃣ - 1 star\n2⃣ - 2 stars\n3⃣ - 3 stars\n4⃣ - 4 stars", false);
         reactMessage.editMessage(eb.build()).queue();
 
         validReactions.add("0⃣");
@@ -79,12 +79,14 @@ public class EssenceWaiter extends ListenerAdapter {
         }
 
         if (!event.getUser().equals(user)) {
-            reactMessage.removeReaction(event.getReaction().getReactionEmote().getAsReactionCode(), event.getUser()).queue();
+            reactMessage.removeReaction(event.getReaction().getReactionEmote().getAsReactionCode(), event.getUser())
+                    .queue();
             return;
         }
 
         if (!validReactions.contains(event.getReactionEmote().getName())) {
-            reactMessage.removeReaction(event.getReaction().getReactionEmote().getAsReactionCode(), event.getUser()).queue();
+            reactMessage.removeReaction(event.getReaction().getReactionEmote().getAsReactionCode(), event.getUser())
+                    .queue();
             return;
         }
 
@@ -115,7 +117,7 @@ public class EssenceWaiter extends ListenerAdapter {
                 break;
             }
             case 1: {
-                endingLevel = essenceEmojiMap.get(event.getReactionEmote().getName());
+                int endingLevel = essenceEmojiMap.get(event.getReactionEmote().getName());
                 reactMessage.clearReactions().complete();
                 int totalEssence = 0;
                 for (int i = (startingLevel + 1); i <= endingLevel; i++) {
@@ -126,7 +128,12 @@ public class EssenceWaiter extends ListenerAdapter {
                     }
                 }
                 EmbedBuilder eb = defaultEmbed("Essence upgrade for " + itemName.toLowerCase().replace("_", " "), null);
-                eb.addField("From " + (startingLevel == -1 ? "not dungeonized" : startingLevel + (startingLevel == 1 ? " star" : " stars")) + " to " + endingLevel + (endingLevel == 1 ? " star" : " stars"), totalEssence + " " + higherDepth(itemJson, "type").getAsString().toLowerCase() + " essence", false);
+                eb.addField(
+                        "From " + (startingLevel == -1 ? "not dungeonized"
+                                : startingLevel + (startingLevel == 1 ? " star" : " stars")) + " to " + endingLevel
+                                + (endingLevel == 1 ? " star" : " stars"),
+                        totalEssence + " " + higherDepth(itemJson, "type").getAsString().toLowerCase() + " essence",
+                        false);
                 reactMessage.editMessage(eb.build()).queue();
 
                 event.getJDA().removeEventListener(this);
@@ -134,6 +141,5 @@ public class EssenceWaiter extends ListenerAdapter {
             }
         }
     }
-
 
 }

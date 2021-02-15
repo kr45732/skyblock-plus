@@ -1,47 +1,40 @@
 package com.skyblockplus.guilds;
 
-import static com.skyblockplus.utils.BotUtils.HYPIXEL_API_KEY;
-import static com.skyblockplus.utils.BotUtils.defaultEmbed;
-import static com.skyblockplus.utils.BotUtils.errorMessage;
-import static com.skyblockplus.utils.BotUtils.getJson;
-import static com.skyblockplus.utils.BotUtils.higherDepth;
-import static com.skyblockplus.utils.BotUtils.usernameToUuid;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.Player;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Message;
 
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.utils.Player;
-
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Message;
+import static com.skyblockplus.utils.BotUtils.*;
 
 public class GuildLeaderboardCommand extends Command {
-    Message ebMessage;
-    JsonElement settings;
 
     public GuildLeaderboardCommand() {
         this.name = "guild-rank";
         this.guildOnly = true;
         this.cooldown = 60;
-        this.aliases = new String[] { "g-rank" };
-        this.userPermissions = new Permission[] { Permission.MANAGE_SERVER };
+        this.aliases = new String[]{"g-rank"};
+        this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
     }
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = defaultEmbed("Loading guild data...", null);
+        EmbedBuilder eb = defaultEmbed("Loading...", null);
         eb.setDescription("**NOTE:** This can take up to a minute!");
-        this.ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+        Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 
-        Message message = event.getMessage();
-        String content = message.getContentRaw();
+        String content = event.getMessage().getContentRaw();
 
         String[] args = content.split(" ");
         if (args.length != 2) {
@@ -50,10 +43,7 @@ public class GuildLeaderboardCommand extends Command {
             return;
         }
 
-        for (String value : args) {
-            System.out.print(value + " ");
-        }
-        System.out.println();
+        System.out.println(content);
 
         if (args[1].toLowerCase().startsWith("u-")) {
             String[] rankString = getLeaderboard(args[1].split("-")[1]);
@@ -86,8 +76,8 @@ public class GuildLeaderboardCommand extends Command {
         String guildId = higherDepth(higherDepth(guildJson, "guild"), "_id").getAsString();
         String guildName = higherDepth(higherDepth(guildJson, "guild"), "name").getAsString();
         if (!guildName.equals("Skyblock Forceful")) {
-            return new String[] { "Currently only supported for the Skyblock Forceful guild",
-                    "Currently only supported for the Skyblock Forceful guild", "" };
+            return new String[]{"Currently only supported for the Skyblock Forceful guild",
+                    "Currently only supported for the Skyblock Forceful guild", ""};
         }
 
         List<String> staffRankNames = new ArrayList<>();
@@ -95,8 +85,14 @@ public class GuildLeaderboardCommand extends Command {
         List<String> middleRoleName = new ArrayList<>();
         List<String> defaultRoleName = new ArrayList<>();
         JsonElement guildLeaderboardSettings;
+
+
+
         try {
-            guildLeaderboardSettings = higherDepth(higherDepth(this.settings, guildId), "guild_leaderboard");
+            JsonElement settings = higherDepth(JsonParser
+                    .parseReader(new FileReader("src/main/java/com/skyblockplus/json/GuildSettings.json")), guildId);
+
+            guildLeaderboardSettings = higherDepth(higherDepth(settings, guildId), "guild_leaderboard");
             for (JsonElement i : higherDepth(guildLeaderboardSettings, "staff_ranks").getAsJsonArray()) {
                 staffRankNames.add(i.getAsString());
             }
@@ -265,6 +261,6 @@ public class GuildLeaderboardCommand extends Command {
             }
         }
 
-        return new String[] { promoteString.toString(), demoteString.toString(), guildName };
+        return new String[]{promoteString.toString(), demoteString.toString(), guildName};
     }
 }

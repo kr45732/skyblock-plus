@@ -1,12 +1,15 @@
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.BotUtils.botColor;
-import static com.skyblockplus.utils.BotUtils.defaultEmbed;
-import static com.skyblockplus.utils.BotUtils.errorMessage;
-import static com.skyblockplus.utils.BotUtils.globalCooldown;
-import static com.skyblockplus.utils.BotUtils.higherDepth;
-import static com.skyblockplus.utils.BotUtils.simplifyNumber;
-import static com.skyblockplus.utils.BotUtils.skyblockStatsLink;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.skyblockplus.utils.CustomPaginator;
+import com.skyblockplus.utils.Player;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.exceptions.PermissionException;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -16,22 +19,11 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.skyblockplus.utils.CustomPaginator;
-import com.skyblockplus.utils.Player;
-
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.exceptions.PermissionException;
+import static com.skyblockplus.utils.BotUtils.*;
 
 public class BankCommand extends Command {
-    final EventWaiter waiter;
-    Message ebMessage;
-    CommandEvent event;
+    private final EventWaiter waiter;
+    private CommandEvent event;
 
     public BankCommand(EventWaiter waiter) {
         this.name = "bank";
@@ -42,11 +34,10 @@ public class BankCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = defaultEmbed("Loading banking and purse data...", null);
-        this.ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+        EmbedBuilder eb = defaultEmbed("Loading...", null);
+        Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 
-        Message message = event.getMessage();
-        String content = message.getContentRaw();
+        String content = event.getMessage().getContentRaw();
 
         String[] args = content.split(" ");
         if (args.length <= 2 || args.length > 4) {
@@ -55,10 +46,7 @@ public class BankCommand extends Command {
             return;
         }
 
-        for (String value : args) {
-            System.out.print(value + " ");
-        }
-        System.out.println();
+        System.out.println(content);
 
         if (args[1].equals("player")) {
             if (args.length == 4) {
@@ -92,7 +80,7 @@ public class BankCommand extends Command {
             double playerBankBalance = player.getBankBalance();
             double playerPurseCoins = player.getPurseCoins();
 
-            EmbedBuilder eb = defaultEmbed("Bank and purse coins for " + player.getUsername(),
+            EmbedBuilder eb = defaultEmbed("Total coins for " + player.getUsername(),
                     skyblockStatsLink(player.getUsername(), player.getProfileName()));
             eb.setDescription("**Total coins:** " + simplifyNumber(playerBankBalance + playerPurseCoins));
             eb.addField("Bank balance",
@@ -134,9 +122,9 @@ public class BankCommand extends Command {
                     JsonElement currentTransaction = bankHistoryArray.get(i);
                     String valueString = simplifyNumber(higherDepth(currentTransaction, "amount").getAsLong()) + " "
                             + (higherDepth(currentTransaction, "action").getAsString().equals("DEPOSIT") ? "deposited"
-                                    : "withdrawn")
+                            : "withdrawn")
                             + " by " + higherDepth(currentTransaction, "initiator_name").getAsString()
-                                    .replaceAll("§f|§a|§9|§5|§6|§d|§4|§c|§7|§b", "");
+                            .replaceAll("§f|§a|§9|§5|§6|§d|§4|§c|§7|§b", "");
 
                     String time = dateTimeFormatter
                             .format(Instant.ofEpochMilli(higherDepth(currentTransaction, "timestamp").getAsLong()));

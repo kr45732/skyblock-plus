@@ -1,21 +1,19 @@
 package com.skyblockplus.verify;
 
-import static com.skyblockplus.reload.ReloadEventWatcher.isUniqueVerifyGuild;
-import static com.skyblockplus.utils.BotUtils.higherDepth;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileReader;
 import java.util.List;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-
-import org.jetbrains.annotations.NotNull;
-
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import static com.skyblockplus.reload.ReloadEventWatcher.isUniqueVerifyGuild;
+import static com.skyblockplus.utils.BotUtils.higherDepth;
 
 public class Verify extends ListenerAdapter {
     @Override

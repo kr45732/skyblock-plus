@@ -21,12 +21,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
-
 public class CustomPaginator extends Menu {
-    public static final String BIG_LEFT = "\u23EA";
-    public static final String LEFT = "\u25C0";
-    public static final String RIGHT = "\u25B6";
-    public static final String BIG_RIGHT = "\u23E9";
+    private static final String BIG_LEFT = "\u23EA";
+    private static final String LEFT = "\u25C0";
+    private static final String RIGHT = "\u25B6";
+    private static final String BIG_RIGHT = "\u23E9";
     private final BiFunction<Integer, Integer, Color> color;
     private final int columns;
     private final int itemsPerPage;
@@ -41,10 +40,9 @@ public class CustomPaginator extends Menu {
     private final User user;
 
     CustomPaginator(EventWaiter waiter, Set<User> users, Set<Role> roles, long timeout, TimeUnit unit,
-                    BiFunction<Integer, Integer, Color> color,
-                    Consumer<Message> finalAction, int columns, int itemsPerPage, boolean showPageNumbers,
-                    boolean numberItems, List<String> items, int bulkSkipNumber,
-                    boolean wrapPageEnds, String[] pageTitles, User user) {
+                    BiFunction<Integer, Integer, Color> color, Consumer<Message> finalAction, int columns, int itemsPerPage,
+                    boolean showPageNumbers, boolean numberItems, List<String> items, int bulkSkipNumber, boolean wrapPageEnds,
+                    String[] pageTitles, User user) {
         super(waiter, users, roles, timeout, unit);
         this.color = color;
         this.columns = columns;
@@ -96,8 +94,8 @@ public class CustomPaginator extends Menu {
                 m.addReaction(LEFT).queue();
                 if (bulkSkipNumber > 1)
                     m.addReaction(RIGHT).queue();
-                m.addReaction(bulkSkipNumber > 1 ? BIG_RIGHT : RIGHT)
-                        .queue(v -> pagination(m, pageNum), t -> pagination(m, pageNum));
+                m.addReaction(bulkSkipNumber > 1 ? BIG_RIGHT : RIGHT).queue(v -> pagination(m, pageNum),
+                        t -> pagination(m, pageNum));
             } else {
                 finalAction.accept(m);
             }
@@ -105,8 +103,8 @@ public class CustomPaginator extends Menu {
     }
 
     private void pagination(Message message, int pageNum) {
-        waiter.waitForEvent(MessageReactionAddEvent.class,
-                event -> checkReaction(event, message.getIdLong()), // Check Reaction
+        waiter.waitForEvent(MessageReactionAddEvent.class, event -> checkReaction(event, message.getIdLong()), // Check
+                // Reaction
                 event -> handleMessageReactionAddAction(event, message, pageNum), // Handle Reaction
                 timeout, unit, () -> finalAction.accept(message));
     }
@@ -120,7 +118,8 @@ public class CustomPaginator extends Menu {
                 return isValidUser(event.getUser(), event.isFromGuild() ? event.getGuild() : null);
             case BIG_LEFT:
             case BIG_RIGHT:
-                return bulkSkipNumber > 1 && isValidUser(event.getUser(), event.isFromGuild() ? event.getGuild() : null);
+                return bulkSkipNumber > 1
+                        && isValidUser(event.getUser(), event.isFromGuild() ? event.getGuild() : null);
             default:
                 event.getReaction().removeReaction(event.getUser()).queue();
                 return false;
@@ -225,16 +224,14 @@ public class CustomPaginator extends Menu {
             Checks.check(!strings.isEmpty(), "Must include at least one item to paginate");
             Checks.check(user != null, "Must set message author");
 
-            return new CustomPaginator(waiter, users, roles, timeout, unit, color, finalAction,
-                    columns, itemsPerPage, showPageNumbers, numberItems, strings,
-                    bulkSkipNumber, wrapPageEnds, pageTitles, user);
+            return new CustomPaginator(waiter, users, roles, timeout, unit, color, finalAction, columns, itemsPerPage,
+                    showPageNumbers, numberItems, strings, bulkSkipNumber, wrapPageEnds, pageTitles, user);
         }
 
         public Builder setColor(Color color) {
             this.color = (i0, i1) -> color;
             return this;
         }
-
 
         public Builder setPageTitles(String[] pageTitles) {
             this.pageTitles = pageTitles;
@@ -275,15 +272,12 @@ public class CustomPaginator extends Menu {
             return this;
         }
 
-
-        public Builder clearItems() {
+        public void clearItems() {
             strings.clear();
-            return this;
         }
 
-        public Builder addItems(String... items) {
+        public void addItems(String... items) {
             strings.addAll(Arrays.asList(items));
-            return this;
         }
 
         public Builder setItems(String... items) {
@@ -301,7 +295,6 @@ public class CustomPaginator extends Menu {
             this.wrapPageEnds = wrapPageEnds;
             return this;
         }
-
 
     }
 }

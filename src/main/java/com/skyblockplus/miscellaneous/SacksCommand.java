@@ -16,9 +16,8 @@ import java.util.concurrent.TimeUnit;
 import static com.skyblockplus.utils.BotUtils.*;
 
 public class SacksCommand extends Command {
-    final EventWaiter waiter;
-    Message ebMessage;
-    CommandEvent event;
+    private final EventWaiter waiter;
+    private CommandEvent event;
 
     public SacksCommand(EventWaiter waiter) {
         this.name = "sacks";
@@ -29,11 +28,10 @@ public class SacksCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = defaultEmbed("Loading player data...", null);
-        this.ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+        EmbedBuilder eb = defaultEmbed("Loading...", null);
+        Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 
-        Message message = event.getMessage();
-        String content = message.getContentRaw();
+        String content = event.getMessage().getContentRaw();
 
         String[] args = content.split(" ");
         if (args.length <= 2 || args.length > 4) {
@@ -42,10 +40,7 @@ public class SacksCommand extends Command {
             return;
         }
 
-        for (String value : args) {
-            System.out.print(value + " ");
-        }
-        System.out.println();
+        System.out.println(content);
 
         this.event = event;
         if (args[1].equals("player")) {

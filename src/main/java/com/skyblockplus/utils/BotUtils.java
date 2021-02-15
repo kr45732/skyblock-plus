@@ -1,6 +1,12 @@
 package com.skyblockplus.utils;
 
-import java.awt.Color;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.skyblockplus.guilds.UsernameUuidStruct;
+import net.dv8tion.jda.api.EmbedBuilder;
+
+import java.awt.*;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -16,13 +22,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.skyblockplus.guilds.UsernameUuidStruct;
-
-import net.dv8tion.jda.api.EmbedBuilder;
 
 public class BotUtils {
     public static final Color botColor = new Color(9, 92, 13);
@@ -47,10 +46,10 @@ public class BotUtils {
             BOT_TOKEN = (String) appProps.get("BOT_TOKEN");
             CLIENT_ID = (String) appProps.get("CLIENT_ID");
             CLIENT_SECRET = (String) appProps.get("CLIENT_SECRET");
-            String[] database_url_unformated = ((String) appProps.get("DATABASE_URL")).split(":", 3);
-            DATABASE_USERNAME = database_url_unformated[1].replace("/", "");
-            DATABASE_PASSWORD = database_url_unformated[2].split("@")[0];
-            DATABASE_URL = "jdbc:postgresql://" + database_url_unformated[2].split("@")[1] + "?sslmode=require&user="
+            String[] database_url_unformatted = ((String) appProps.get("DATABASE_URL")).split(":", 3);
+            DATABASE_USERNAME = database_url_unformatted[1].replace("/", "");
+            DATABASE_PASSWORD = database_url_unformatted[2].split("@")[0];
+            DATABASE_URL = "jdbc:postgresql://" + database_url_unformatted[2].split("@")[1] + "?sslmode=require&user="
                     + DATABASE_USERNAME + "&password=" + DATABASE_PASSWORD;
         } catch (IOException e) {
             BOT_PREFIX = System.getenv("BOT_PREFIX");
@@ -58,10 +57,10 @@ public class BotUtils {
             BOT_TOKEN = System.getenv("BOT_TOKEN");
             CLIENT_ID = System.getenv("CLIENT_ID");
             CLIENT_SECRET = System.getenv("CLIENT_SECRET");
-            String[] database_url_unformated = System.getenv("DATABASE_URL").split(":", 3);
-            DATABASE_USERNAME = database_url_unformated[1].replace("/", "");
-            DATABASE_PASSWORD = database_url_unformated[2].split("@")[0];
-            DATABASE_URL = "jdbc:postgresql://" + database_url_unformated[2].split("@")[1] + "?sslmode=require&user="
+            String[] database_url_unformatted = System.getenv("DATABASE_URL").split(":", 3);
+            DATABASE_USERNAME = database_url_unformatted[1].replace("/", "");
+            DATABASE_PASSWORD = database_url_unformatted[2].split("@")[0];
+            DATABASE_URL = "jdbc:postgresql://" + database_url_unformatted[2].split("@")[1] + "?sslmode=require&user="
                     + DATABASE_USERNAME + "&password=" + DATABASE_PASSWORD;
         }
     }
@@ -207,9 +206,9 @@ public class BotUtils {
         try {
             String discordID = higherDepth(
                     higherDepth(higherDepth(higherDepth(playerJson, "player"), "socialMedia"), "links"), "DISCORD")
-                            .getAsString();
-            return new String[] { discordID,
-                    higherDepth(higherDepth(playerJson, "player"), "displayname").getAsString() };
+                    .getAsString();
+            return new String[]{discordID,
+                    higherDepth(higherDepth(playerJson, "player"), "displayname").getAsString()};
         } catch (Exception e) {
             return null;
         }

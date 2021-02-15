@@ -1,13 +1,10 @@
 package com.skyblockplus.auction;
 
-import static com.skyblockplus.utils.BotUtils.BOT_PREFIX;
-import static com.skyblockplus.utils.BotUtils.capitalizeString;
-import static com.skyblockplus.utils.BotUtils.defaultEmbed;
-import static com.skyblockplus.utils.BotUtils.errorMessage;
-import static com.skyblockplus.utils.BotUtils.formatNumber;
-import static com.skyblockplus.utils.BotUtils.getJson;
-import static com.skyblockplus.utils.BotUtils.globalCooldown;
-import static com.skyblockplus.utils.BotUtils.higherDepth;
+import com.google.gson.JsonElement;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,15 +13,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import com.google.gson.JsonElement;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
+import static com.skyblockplus.utils.BotUtils.*;
 
 public class BinCommands extends Command {
-    Message ebMessage;
 
     public BinCommands() {
         this.name = "bin";
@@ -34,13 +25,12 @@ public class BinCommands extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = defaultEmbed("Loading lowest bin data...", null);
+        EmbedBuilder eb = defaultEmbed("Loading...", null);
 
-        Message message = event.getMessage();
-        String args = message.getContentRaw();
-        this.ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+        String args = event.getMessage().getContentRaw();
+        Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 
-        if (args.split(" ").length < 2) { // Not enough args are given
+        if (args.split(" ").length < 2) {
             eb.setTitle(errorMessage(this.name));
             ebMessage.editMessage(eb.build()).queue();
             return;
@@ -48,9 +38,7 @@ public class BinCommands extends Command {
 
         System.out.println(args);
 
-        eb = getLowestBin(args.replace(BOT_PREFIX + "bin ", ""));
-
-        ebMessage.editMessage(eb.build()).queue();
+        ebMessage.editMessage(getLowestBin(args.replace(BOT_PREFIX + "bin ", "")).build()).queue();
     }
 
     private EmbedBuilder getLowestBin(String item) {

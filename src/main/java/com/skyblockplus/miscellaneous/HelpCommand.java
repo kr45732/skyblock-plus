@@ -1,18 +1,16 @@
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.BotUtils.BOT_PREFIX;
-import static com.skyblockplus.utils.BotUtils.botColor;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.skyblockplus.utils.CustomPaginator;
+import net.dv8tion.jda.api.exceptions.PermissionException;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.skyblockplus.utils.CustomPaginator;
-
-import net.dv8tion.jda.api.exceptions.PermissionException;
+import static com.skyblockplus.utils.BotUtils.*;
 
 public class HelpCommand extends Command {
     private final EventWaiter waiter;
@@ -20,18 +18,19 @@ public class HelpCommand extends Command {
 
     public HelpCommand(EventWaiter waiter) {
         this.name = "help";
-        this.aliases = new String[] { "commands" };
+        this.aliases = new String[]{"commands"};
         this.guildOnly = false;
         this.waiter = waiter;
+        this.cooldown = globalCooldown;
 
     }
 
     @Override
     protected void execute(CommandEvent event) {
-        System.out.println(BOT_PREFIX + "help");
+        System.out.println(event.getMessage().getContentRaw());
 
-        String[] pageTitles = new String[] { "Navigation", "General", "Slayer", "Skills", "Dungeons", "Guild",
-                "Auction House and Bazaar", "Miscellaneous Commands" };
+        String[] pageTitles = new String[]{"Navigation", "General", "Slayer", "Skills", "Dungeons", "Guild",
+                "Auction House and Bazaar", "Miscellaneous Commands"};
 
         CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(1)
                 .setItemsPerPage(itemsPerPage).showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
@@ -81,36 +80,36 @@ public class HelpCommand extends Command {
 
         paginateBuilder.clearItems();
         paginateBuilder.addItems(
-                fillArray(new String[] { "Use the arrow emojis to navigate through the pages", "• **Page 2**: General",
+                fillArray(new String[]{"Use the arrow emojis to navigate through the pages", "• **Page 2**: General",
                         "• **Page 3**: Slayer", "• **Page 4**: Skills", "• **Page 5**: Dungeons", "• **Page 6**: Guild",
-                        "• **Page 7**: Auction House and Bazaar", "• **Page 8**: Miscellaneous Commands" }));
+                        "• **Page 7**: Auction House and Bazaar", "• **Page 8**: Miscellaneous Commands"}));
 
-        String[] generalCommands = new String[] { generateHelp("Show this help page", "help"),
+        String[] generalCommands = new String[]{generateHelp("Show this help page", "help"),
                 generateHelp("Show this help page", "commands"),
                 generateHelp("Get information about this bot", "about"),
                 generateHelp("Invite this bot to your server", "invite"),
                 generateHelp("Show patch notes for this bot", "version"),
-                generateHelp("Shutdown bot; can only be used by specific people", "shutdown") };
+                generateHelp("Shutdown bot; can only be used by specific people", "shutdown")};
         paginateBuilder.addItems(fillArray(generalCommands));
 
-        String[] slayerCommands = new String[] {
+        String[] slayerCommands = new String[]{
                 generateHelp("Get a user's slayer and optionally choose which skyblock profile to get the slayer of",
-                        "slayer player [IGN] <profile>") };
+                        "slayer player [IGN] <profile>")};
         paginateBuilder.addItems(fillArray(slayerCommands));
 
-        String[] skillsCommands = new String[] {
+        String[] skillsCommands = new String[]{
                 generateHelp("Get skills of a player and optionally choose which skyblock profile to get the skills of",
-                        "skills player [IGN] <profile>") };
+                        "skills player [IGN] <profile>")};
         paginateBuilder.addItems(fillArray(skillsCommands));
 
-        String[] dungeonCommands = new String[] {
+        String[] dungeonCommands = new String[]{
                 generateHelp("Get catacombs level of player", "catacombs player [IGN]", "cata player [IGN]"),
                 generateHelp("Calculate essence cost to upgrade an item", "essence upgrade [item]"),
                 generateHelp("Get essence information for each upgrade level for an item", "essence information [item]",
-                        "essence info [item]") };
+                        "essence info [item]")};
         paginateBuilder.addItems(fillArray(dungeonCommands));
 
-        String[] guildCommands = new String[] {
+        String[] guildCommands = new String[]{
                 generateHelp("Get guild experience leaderboard from IGN", "guild experience [u-IGN]",
                         "guild exp [u-IGN]"),
                 generateHelp("Get all the members in a player's guild", "guild members [u-IGN]"),
@@ -118,15 +117,15 @@ public class HelpCommand extends Command {
                 generateHelp("Get information about a player's guild", "guild info [u-IGN]"),
                 generateHelp("Get information about a guild", "guild info [g-IGN]"),
                 generateHelp("Get promote and demote leaderboard in-game commands for a player's guild",
-                        "guild-rank [u-IGN]", "g-rank [u-IGN]") };
+                        "guild-rank [u-IGN]", "g-rank [u-IGN]")};
         paginateBuilder.addItems(fillArray(guildCommands));
 
-        String[] ahAndBazCommands = new String[] {
+        String[] ahAndBazCommands = new String[]{
                 generateHelp("Get player's active (not claimed) auctions on all profiles", "auction [IGN]", "ah [IGN]"),
-                generateHelp("Get lowest bin of an item", "bin [item]") };
+                generateHelp("Get lowest bin of an item", "bin [item]")};
         paginateBuilder.addItems(fillArray(ahAndBazCommands));
 
-        String[] miscCommands = new String[] {
+        String[] miscCommands = new String[]{
                 generateHelp("Claim automatic Skyblock roles", "roles claim [IGN] <profile>"),
                 generateHelp("Get a player's bank and purse coins", "bank player [IGN] <profile>"),
                 generateHelp("Get a player's bank transaction history", "bank history [IGN] <profile>"),
@@ -139,8 +138,8 @@ public class HelpCommand extends Command {
                 generateHelp("Calculate predicted weight using given stats (not 100% accurate)",
                         "weight calculate [skill avg] [slayer] [cata level] [avg dungeon class level]"),
                 generateHelp("Get Hypixel information about a player", "hypixel player [IGN]"),
-                generateHelp("Get fastest Hypixel lobby parkours for a player", "hypixel parkour [IGN]"),
-                generateHelp("Get a player's minecraft uuid", "uuid player [IGN]") };
+                generateHelp("Get fastest Hypixel lobby parkour for a player", "hypixel parkour [IGN]"),
+                generateHelp("Get a player's minecraft uuid", "uuid player [IGN]")};
         paginateBuilder.addItems(fillArray(miscCommands));
 
         paginateBuilder.build().paginate(event.getChannel(), startingPage);

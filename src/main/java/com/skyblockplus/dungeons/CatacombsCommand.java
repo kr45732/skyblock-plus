@@ -10,22 +10,20 @@ import net.dv8tion.jda.api.entities.Message;
 import static com.skyblockplus.utils.BotUtils.*;
 
 public class CatacombsCommand extends Command {
-    Message ebMessage;
 
     public CatacombsCommand() {
-        this.name = "catacombs";
+        this.name = "dungeons";
         this.guildOnly = false;
         this.cooldown = globalCooldown;
-        this.aliases = new String[] { "cata" };
+        this.aliases = new String[]{"cata", "catacombs"};
     }
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = defaultEmbed("Loading catacombs data...", null);
+        EmbedBuilder eb = defaultEmbed("Loading...", null);
 
-        Message message = event.getMessage();
-        String content = message.getContentRaw();
-        this.ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+        String content = event.getMessage().getContentRaw();
+        Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 
         String[] args = content.split(" ");
         if (args.length <= 2 || args.length > 4) {
@@ -34,10 +32,7 @@ public class CatacombsCommand extends Command {
             return;
         }
 
-        for (String value : args) {
-            System.out.print(value + " ");
-        }
-        System.out.println();
+        System.out.println(content);
 
         if (args[1].equals("player")) {
             if (args.length == 4) {
@@ -45,14 +40,11 @@ public class CatacombsCommand extends Command {
             } else {
                 eb = getPlayerCatacombs(args[2], null);
             }
-        } else {
-            eb.setTitle(errorMessage(this.name));
             ebMessage.editMessage(eb.build()).queue();
             return;
         }
-
+        eb.setTitle(errorMessage(this.name));
         ebMessage.editMessage(eb.build()).queue();
-
     }
 
     private EmbedBuilder getPlayerCatacombs(String username, String profileName) {
@@ -61,19 +53,28 @@ public class CatacombsCommand extends Command {
             EmbedBuilder eb = defaultEmbed("Dungeons for " + player.getUsername(),
                     skyblockStatsLink(player.getUsername(), player.getProfileName()));
             try {
-
                 SkillsStruct skillInfo = player.getCatacombsSkill();
                 eb.addField(capitalizeString(skillInfo.skillName) + " (" + skillInfo.skillLevel + ")",
                         simplifyNumber(skillInfo.expCurrent) + " / " + simplifyNumber(skillInfo.expForNext)
                                 + "\nTotal XP: " + simplifyNumber(skillInfo.totalSkillExp) + "\nProgress: "
                                 + roundProgress(skillInfo.progressToNext),
                         false);
-
                 eb.setDescription("True catacombs level: " + skillInfo.skillLevel + "\nProgress catacombs level: "
                         + roundSkillAverage(skillInfo.skillLevel + skillInfo.progressToNext));
+
+                for (String className : new String[]{"healer", "mage", "berserk", "archer", "tank"}) {
+                    skillInfo = player.getDungeonClass(className);
+                    eb.addField(capitalizeString(className) + " (" + skillInfo.skillLevel + ")",
+                            simplifyNumber(skillInfo.expCurrent) + " / " + simplifyNumber(skillInfo.expForNext)
+                                    + "\nTotal XP: " + simplifyNumber(skillInfo.totalSkillExp) + "\nProgress: "
+                                    + roundProgress(skillInfo.progressToNext),
+                            true);
+                }
+                eb.addBlankField(true);
+
                 return eb;
             } catch (NullPointerException e) {
-                return defaultEmbed("Error fetching player catacombs data", null);
+                return defaultEmbed("Error fetching player dungeons data", null);
             }
         }
         return defaultEmbed("Unable to fetch player data", null);

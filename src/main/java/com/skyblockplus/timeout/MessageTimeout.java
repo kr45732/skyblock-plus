@@ -15,8 +15,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class MessageTimeout extends ListenerAdapter {
-    static final List<MessageTimeoutStruct> messageList = new ArrayList<>();
-    JDA jda;
+    private static final List<MessageTimeoutStruct> messageList = new ArrayList<>();
+    private JDA jda;
 
     public static void addMessage(Message message, Object eventListener) {
         messageList.add(new MessageTimeoutStruct(message, eventListener));
@@ -31,7 +31,7 @@ public class MessageTimeout extends ListenerAdapter {
     }
 
     public void updateMessages() {
-        for (Iterator<MessageTimeoutStruct> iteratorCur = messageList.iterator(); iteratorCur.hasNext();) {
+        for (Iterator<MessageTimeoutStruct> iteratorCur = messageList.iterator(); iteratorCur.hasNext(); ) {
             MessageTimeoutStruct currentMessageStruct = iteratorCur.next();
             Message currentMessage = currentMessageStruct.message;
             long secondsSinceLast = Instant.now().getEpochSecond()

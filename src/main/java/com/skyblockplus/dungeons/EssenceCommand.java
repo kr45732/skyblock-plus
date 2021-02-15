@@ -13,9 +13,6 @@ import java.util.Locale;
 import static com.skyblockplus.utils.BotUtils.*;
 
 public class EssenceCommand extends Command {
-    Message ebMessage;
-    JDA jda;
-    User user;
 
     public EssenceCommand() {
         this.name = "essence";
@@ -25,11 +22,10 @@ public class EssenceCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = defaultEmbed("Loading essence data...", null);
-        this.ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+        EmbedBuilder eb = defaultEmbed("Loading...", null);
+        Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 
-        Message message = event.getMessage();
-        String content = message.getContentRaw();
+        String content = event.getMessage().getContentRaw();
 
         String[] args = content.split(" ");
         if (args.length < 3) {
@@ -38,18 +34,17 @@ public class EssenceCommand extends Command {
             return;
         }
 
-        for (String value : args) {
-            System.out.print(value + " ");
-        }
-        System.out.println();
+        System.out.println(content);
 
         String itemName = content.split(" ", 3)[2].replace(" ", "_").toUpperCase();
-        if (args[1].equals("upgrade")) {
-            jda = event.getJDA();
-            user = event.getAuthor();
 
-            JsonElement essenceCostsJson = getJson(
-                    "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/essencecosts.json");
+        JsonElement essenceCostsJson = getJson(
+                "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/essencecosts.json");
+
+        if (args[1].equals("upgrade")) {
+            JDA jda = event.getJDA();
+            User user = event.getAuthor();
+
             JsonElement itemJson = higherDepth(essenceCostsJson, itemName);
             if (itemJson != null) {
                 jda.addEventListener(new EssenceWaiter(itemName, itemJson, ebMessage, user));
@@ -57,21 +52,21 @@ public class EssenceCommand extends Command {
                 eb = defaultEmbed("Invalid item name", null);
                 ebMessage.editMessage(eb.build()).queue();
             }
+            return;
         } else if (args[1].equals("info") || args[1].equals("information")) {
-            eb = getEssenceInformation(itemName);
+            eb = getEssenceInformation(itemName, essenceCostsJson);
             if (eb == null) {
                 eb = defaultEmbed("Invalid item name", null);
             }
             ebMessage.editMessage(eb.build()).queue();
-        } else {
-            eb = defaultEmbed(errorMessage(this.name), null);
-            ebMessage.editMessage(eb.build()).queue();
+            return;
         }
+        eb = defaultEmbed(errorMessage(this.name), null);
+        ebMessage.editMessage(eb.build()).queue();
+
     }
 
-    private EmbedBuilder getEssenceInformation(String itemName) {
-        JsonElement essenceCostsJson = getJson(
-                "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/essencecosts.json");
+    private EmbedBuilder getEssenceInformation(String itemName, JsonElement essenceCostsJson) {
         JsonElement itemJson = higherDepth(essenceCostsJson, itemName);
         EmbedBuilder eb = defaultEmbed("Essence information for " + itemName.toLowerCase().replace("_", " "), null);
         if (itemJson != null) {

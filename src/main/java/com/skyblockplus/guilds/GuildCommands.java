@@ -20,8 +20,7 @@ import static com.skyblockplus.utils.BotUtils.*;
 
 public class GuildCommands extends Command {
     private final EventWaiter waiter;
-    Message ebMessage;
-    int counter = 0;
+    private int counter = 0;
 
     public GuildCommands(EventWaiter waiter) {
         this.name = "guild";
@@ -32,11 +31,10 @@ public class GuildCommands extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = defaultEmbed("Loading guild data...", null);
-        this.ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+        EmbedBuilder eb = defaultEmbed("Loading...", null);
+        Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 
-        Message message = event.getMessage();
-        String content = message.getContentRaw();
+        String content = event.getMessage().getContentRaw();
 
         String[] args = content.split(" ");
 
@@ -60,15 +58,12 @@ public class GuildCommands extends Command {
             }
         }
 
-        for (String value : args) {
-            System.out.print(value + " ");
-        }
-        System.out.println();
+        System.out.println(content);
 
         switch (args[1]) {
             case "experience":
-            case "exp": // Experience commands (experience or exp)
-                if (args[2].toLowerCase().startsWith("u-")) { // Getting guild info from IGN
+            case "exp":
+                if (args[2].toLowerCase().startsWith("u-")) {
                     String username = args[2].split("-")[1];
                     GuildStruct guildExp = getGuildExp(username);
                     if (guildExp.outputArr.length == 0) {
@@ -97,7 +92,7 @@ public class GuildCommands extends Command {
                     return;
                 }
                 break;
-            case "player": // Experience commands (experience or exp)
+            case "player":
                 String username = args[2];
                 eb = getGuildPlayer(username);
                 break;
@@ -330,11 +325,11 @@ public class GuildCommands extends Command {
     }
 
     private int guildExpToLevel(int guildExp) {
-        int[] guildExpTable = new int[] { 100000, 150000, 250000, 500000, 750000, 1000000, 1250000, 1500000, 2000000,
-                2500000, 2500000, 2500000, 2500000, 2500000, 3000000 };
+        int[] guildExpTable = new int[]{100000, 150000, 250000, 500000, 750000, 1000000, 1250000, 1500000, 2000000,
+                2500000, 2500000, 2500000, 2500000, 2500000, 3000000};
         int guildLevel = 0;
 
-        for (int i = 0;; i++) {
+        for (int i = 0; ; i++) {
             int expNeeded = i >= guildExpTable.length ? guildExpTable[guildExpTable.length - 1] : guildExpTable[i];
             guildExp -= expNeeded;
             if (guildExp < 0) {

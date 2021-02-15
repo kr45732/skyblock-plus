@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 import static com.skyblockplus.utils.BotUtils.*;
 
 public class RoleCommands extends Command {
-    Message ebMessage;
 
     public RoleCommands() {
         this.name = "roles";
@@ -28,14 +27,14 @@ public class RoleCommands extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = defaultEmbed("Loading roles data...", null);
+        EmbedBuilder eb = defaultEmbed("Loading...", null);
         eb.setDescription("**NOTE: This may take some time**");
 
         String content = event.getMessage().getContentRaw();
         MessageChannel channel = event.getChannel();
         Guild guild = event.getGuild();
         User user = event.getAuthor();
-        this.ebMessage = channel.sendMessage(eb.build()).complete();
+        Message ebMessage = channel.sendMessage(eb.build()).complete();
 
         String[] args = content.split(" ");
         if (args.length < 3 || args.length > 4) {
@@ -45,10 +44,7 @@ public class RoleCommands extends Command {
             return;
         }
 
-        for (String value : args) {
-            System.out.print(value + " ");
-        }
-        System.out.println();
+        System.out.println(content);
 
         if (getPlayerInfo(args[2]) == null) {
             eb = defaultEmbed("Discord tag mismatch", null);
@@ -142,7 +138,7 @@ public class RoleCommands extends Command {
                                 for (int i = 0; i < currentSlayerLevels.size(); i++) {
                                     long levelSlayerXp = higherDepth(
                                             higherDepth(currentRole, "" + currentSlayerLevels.get(i)), "xp")
-                                                    .getAsLong();
+                                            .getAsLong();
                                     if (slayerPlayer >= levelSlayerXp) {
                                         Role playerSlayerLevelRole = guild.getRoleById(
                                                 higherDepth(higherDepth(currentRole, "" + currentSlayerLevels.get(i)),
@@ -340,8 +336,8 @@ public class RoleCommands extends Command {
                                 break;
                             }
                             case "doom_slayer": {
-                                int[] curSlayer = new int[] { player.getWolfXp(), player.getZombieXp(),
-                                        player.getSpiderXp() };
+                                int[] curSlayer = new int[]{player.getWolfXp(), player.getZombieXp(),
+                                        player.getSpiderXp()};
                                 Role curRole = guild.getRoleById(higherDepth(currentRole, "id").getAsString());
                                 boolean shouldHaveDoomSlayer = false;
                                 for (int curType : curSlayer) {
@@ -451,7 +447,7 @@ public class RoleCommands extends Command {
         try {
             String discordID = higherDepth(
                     higherDepth(higherDepth(higherDepth(playerJson, "player"), "socialMedia"), "links"), "DISCORD")
-                            .getAsString();
+                    .getAsString();
             return new DiscordStruct(discordID,
                     higherDepth(higherDepth(playerJson, "player"), "displayname").getAsString());
         } catch (Exception e) {

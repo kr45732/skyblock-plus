@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.entities.Message;
 import static com.skyblockplus.utils.BotUtils.*;
 
 public class SlayerCommands extends Command {
-    Message ebMessage;
 
     public SlayerCommands() {
         this.name = "slayer";
@@ -19,11 +18,10 @@ public class SlayerCommands extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = defaultEmbed("Loading slayer data...", null);
-        this.ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+        EmbedBuilder eb = defaultEmbed("Loading...", null);
+        Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 
-        Message message = event.getMessage();
-        String content = message.getContentRaw();
+        String content = event.getMessage().getContentRaw();
 
         String[] args = content.split(" ");
         if (args.length <= 2 || args.length > 4) {
@@ -32,10 +30,7 @@ public class SlayerCommands extends Command {
             return;
         }
 
-        for (String value : args) {
-            System.out.print(value + " ");
-        }
-        System.out.println();
+        System.out.println(content);
 
         if (args[1].equals("player")) {
             if (args.length == 4) {

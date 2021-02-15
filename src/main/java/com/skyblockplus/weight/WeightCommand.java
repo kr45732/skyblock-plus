@@ -1,20 +1,14 @@
 package com.skyblockplus.weight;
 
-import static com.skyblockplus.utils.BotUtils.defaultEmbed;
-import static com.skyblockplus.utils.BotUtils.errorMessage;
-import static com.skyblockplus.utils.BotUtils.globalCooldown;
-import static com.skyblockplus.utils.BotUtils.roundSkillAverage;
-import static com.skyblockplus.utils.BotUtils.skyblockStatsLink;
-
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
+import static com.skyblockplus.utils.BotUtils.*;
+
 public class WeightCommand extends Command {
-    Message ebMessage;
 
     public WeightCommand() {
         this.name = "weight";
@@ -24,11 +18,10 @@ public class WeightCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = defaultEmbed("Loading player data...", null);
-        this.ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+        EmbedBuilder eb = defaultEmbed("Loading...", null);
+        Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 
-        Message message = event.getMessage();
-        String content = message.getContentRaw();
+        String content = event.getMessage().getContentRaw();
 
         String[] args = content.split(" ");
         if (args.length == 6 && args[1].equals("calculate")) {
@@ -38,10 +31,7 @@ public class WeightCommand extends Command {
             return;
         }
 
-        for (String value : args) {
-            System.out.print(value + " ");
-        }
-        System.out.println();
+        System.out.println(content);
 
         if (args[1].equals("player")) {
             if (args.length == 4) {
@@ -57,11 +47,10 @@ public class WeightCommand extends Command {
         }
 
         ebMessage.editMessage(eb.build()).queue();
-
     }
 
     private EmbedBuilder calculateWeight(String skillAverage, String slayer, String catacombs,
-            String averageDungeonClass) {
+                                         String averageDungeonClass) {
         try {
             double skillAverageD = Double.parseDouble(skillAverage);
             double slayerD = Double.parseDouble(slayer);

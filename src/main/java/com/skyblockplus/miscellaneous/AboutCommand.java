@@ -4,13 +4,13 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 
-import static com.skyblockplus.utils.BotUtils.BOT_PREFIX;
-import static com.skyblockplus.utils.BotUtils.defaultEmbed;
+import static com.skyblockplus.utils.BotUtils.*;
 
 public class AboutCommand extends Command {
     public AboutCommand() {
         this.name = "about";
         this.guildOnly = false;
+        this.cooldown = globalCooldown;
     }
 
     @Override

@@ -1,22 +1,20 @@
 package com.skyblockplus.apply;
 
-import static com.skyblockplus.reload.ReloadEventWatcher.isUniqueApplyGuild;
-import static com.skyblockplus.utils.BotUtils.defaultEmbed;
-import static com.skyblockplus.utils.BotUtils.higherDepth;
-
-import java.io.FileReader;
-import java.util.List;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-
-import org.jetbrains.annotations.NotNull;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.FileReader;
+import java.util.List;
+
+import static com.skyblockplus.reload.ReloadEventWatcher.isUniqueApplyGuild;
+import static com.skyblockplus.utils.BotUtils.defaultEmbed;
+import static com.skyblockplus.utils.BotUtils.higherDepth;
 
 public class Apply extends ListenerAdapter {
     @Override

@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 import static com.skyblockplus.utils.BotUtils.defaultEmbed;
 
 public class ChannelDeleter extends ListenerAdapter {
-    static final List<TextChannel> channelsList = new ArrayList<>();
+    private static final List<TextChannel> channelsList = new ArrayList<>();
 
     public static void addChannel(TextChannel channel) {
         channelsList.add(channel);
@@ -40,7 +40,7 @@ public class ChannelDeleter extends ListenerAdapter {
 
             long secondsDiff = Instant.now().getEpochSecond()
                     - currentChannel.getTimeCreated().toInstant().getEpochSecond();
-            if (secondsDiff > 172800) { // More than 48 hours
+            if (secondsDiff > 172800) {
                 EmbedBuilder eb = defaultEmbed("Channel Closing", null);
                 eb.addField("Reason", "Inactive for an hour", false);
                 currentChannel.sendMessage(eb.build()).queue();

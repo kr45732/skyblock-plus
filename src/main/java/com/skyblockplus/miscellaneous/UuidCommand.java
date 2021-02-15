@@ -1,19 +1,14 @@
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.BotUtils.defaultEmbed;
-import static com.skyblockplus.utils.BotUtils.errorMessage;
-import static com.skyblockplus.utils.BotUtils.globalCooldown;
-import static com.skyblockplus.utils.BotUtils.usernameToUuidUsername;
-
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.guilds.UsernameUuidStruct;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
+import static com.skyblockplus.utils.BotUtils.*;
+
 public class UuidCommand extends Command {
-    Message ebMessage;
 
     public UuidCommand() {
         this.name = "uuid";
@@ -23,11 +18,10 @@ public class UuidCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = defaultEmbed("Loading player data...", null);
-        this.ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+        EmbedBuilder eb = defaultEmbed("Loading...", null);
+        Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 
-        Message message = event.getMessage();
-        String content = message.getContentRaw();
+        String content = event.getMessage().getContentRaw();
 
         String[] args = content.split(" ");
         if (args.length != 3) {
@@ -36,10 +30,7 @@ public class UuidCommand extends Command {
             return;
         }
 
-        for (String value : args) {
-            System.out.print(value + " ");
-        }
-        System.out.println();
+        System.out.println(content);
 
         if (args[1].equals("player")) {
             eb = getUuidPlayer(args[2]);

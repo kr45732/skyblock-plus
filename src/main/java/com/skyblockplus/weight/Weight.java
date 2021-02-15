@@ -1,20 +1,20 @@
 package com.skyblockplus.weight;
 
+import com.skyblockplus.utils.Player;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import com.skyblockplus.utils.Player;
-
 public class Weight {
+    private final Map<String, Double> slayerWeights;
+    private final Map<String, Double[]> skillWeights;
+    private final Map<String, Double> dungeonClassWeights;
+    private final Map<String, Double> catacombsWeights;
     private Player player;
     private double skillAverage;
     private double slayer;
     private double catacombs;
     private double averageDungeonClass;
-    private final Map<String, Double> slayerWeights;
-    private final Map<String, Double[]> skillWeights;
-    private final Map<String, Double> dungeonClassWeights;
-    private final Map<String, Double> catacombsWeights;
 
     public Weight(Player player) {
         this(player, defaultSlayerWeights(), defaultSkillWeights(), defaultDungeonClassWeights(),
@@ -27,7 +27,7 @@ public class Weight {
     }
 
     public Weight(Player player, Map<String, Double> slayerWeights, Map<String, Double[]> skillWeights,
-            Map<String, Double> dungeonClassWeights, Map<String, Double> catacombsWeights) {
+                  Map<String, Double> dungeonClassWeights, Map<String, Double> catacombsWeights) {
         this.player = player;
         this.slayerWeights = slayerWeights;
         this.skillWeights = skillWeights;
@@ -36,8 +36,8 @@ public class Weight {
     }
 
     public Weight(double skillAverage, double slayer, double catacombs, double averageDungeonClass,
-            Map<String, Double> slayerWeights, Map<String, Double[]> skillWeights,
-            Map<String, Double> dungeonClassWeights, Map<String, Double> catacombsWeights) {
+                  Map<String, Double> slayerWeights, Map<String, Double[]> skillWeights,
+                  Map<String, Double> dungeonClassWeights, Map<String, Double> catacombsWeights) {
         this.skillAverage = skillAverage;
         this.slayer = slayer;
         this.catacombs = catacombs;
@@ -58,14 +58,14 @@ public class Weight {
 
     private static Map<String, Double[]> defaultSkillWeights() {
         Map<String, Double[]> tempSkillWeights = new HashMap<>();
-        tempSkillWeights.put("mining", new Double[] { 1.18207448, 259634D });
-        tempSkillWeights.put("foraging", new Double[] { 1.232826, 259634D });
-        tempSkillWeights.put("enchanting", new Double[] { 0.96976583, 882758D });
-        tempSkillWeights.put("farming", new Double[] { 1.217848139, 220689D });
-        tempSkillWeights.put("combat", new Double[] { 1.22307, 275862D });
-        tempSkillWeights.put("fishing", new Double[] { 1.406418, 88274D });
-        tempSkillWeights.put("alchemy", new Double[] { 1.0, 1103448D });
-        tempSkillWeights.put("taming", new Double[] { 1.14744, 441379D });
+        tempSkillWeights.put("mining", new Double[]{1.18207448, 259634D});
+        tempSkillWeights.put("foraging", new Double[]{1.232826, 259634D});
+        tempSkillWeights.put("enchanting", new Double[]{0.96976583, 882758D});
+        tempSkillWeights.put("farming", new Double[]{1.217848139, 220689D});
+        tempSkillWeights.put("combat", new Double[]{1.22307, 275862D});
+        tempSkillWeights.put("fishing", new Double[]{1.406418, 88274D});
+        tempSkillWeights.put("alchemy", new Double[]{1.0, 1103448D});
+        tempSkillWeights.put("taming", new Double[]{1.14744, 441379D});
         return tempSkillWeights;
     }
 
@@ -143,12 +143,8 @@ public class Weight {
     public double calculateSkillsWeight() {
         SkillsWeight skillsWeight = new SkillsWeight();
         skillsWeight.addSkillWeight(skillAverage, (skillWeights.get("mining")[0] + skillWeights.get("foraging")[0]
-                + skillWeights.get("enchanting")[0] + skillWeights.get("farming")[0] + skillWeights.get("combat")[0]
-                + skillWeights.get("fishing")[0] + skillWeights.get("alchemy")[0] + skillWeights.get("taming")[0]) / 8,
-                (skillWeights.get("mining")[1] + skillWeights.get("foraging")[1] + skillWeights.get("enchanting")[1]
-                        + skillWeights.get("farming")[1] + skillWeights.get("combat")[1]
-                        + skillWeights.get("fishing")[1] + skillWeights.get("alchemy")[1]
-                        + skillWeights.get("taming")[1]) / 8);
+                        + skillWeights.get("enchanting")[0] + skillWeights.get("farming")[0] + skillWeights.get("combat")[0]
+                        + skillWeights.get("fishing")[0] + skillWeights.get("alchemy")[0] + skillWeights.get("taming")[0]) / 8);
         return skillsWeight.getSkillsWeight();
     }
 

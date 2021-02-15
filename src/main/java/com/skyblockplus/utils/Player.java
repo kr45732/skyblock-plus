@@ -5,7 +5,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.skyblockplus.skills.SkillsStruct;
 import com.skyblockplus.weight.Weight;
-
 import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
 import me.nullicorn.nedit.type.NBTList;
@@ -277,7 +276,7 @@ public class Player {
             for (int i = 0; i < profilesArray.size(); i++) {
                 String lastSaveLoop = higherDepth(
                         higherDepth(higherDepth(profilesArray.get(i), "members"), this.playerUuid), "last_save")
-                                .getAsString();
+                        .getAsString();
                 if (i == 0) {
                     this.profileJson = higherDepth(higherDepth(profilesArray.get(i), "members"), this.playerUuid);
                     this.outerProfileJson = profilesArray.get(i);
@@ -355,8 +354,8 @@ public class Player {
 
     public int getNumberMinionSlots() {
         try {
-            int[] craftedMinionsToSlots = new int[] { 0, 5, 15, 30, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300,
-                    350, 400, 450, 500, 550, 600 };
+            int[] craftedMinionsToSlots = new int[]{0, 5, 15, 30, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300,
+                    350, 400, 450, 500, 550, 600};
 
             int prevMax = 0;
             int craftedMinions = higherDepth(profileJson, "crafted_generators").getAsJsonArray().size();
@@ -586,6 +585,10 @@ public class Player {
     public double getDungeonClassLevel(String className) {
         SkillsStruct dungeonClassLevel = skillInfoFromExp(getDungeonClassXp(className), "catacombs");
         return dungeonClassLevel.skillLevel + dungeonClassLevel.progressToNext;
+    }
+
+    public SkillsStruct getDungeonClass(String className) {
+        return skillInfoFromExp(getDungeonClassXp(className), "catacombs");
     }
 
     public double getDungeonClassXp(String className) {

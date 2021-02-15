@@ -1,7 +1,15 @@
 package com.skyblockplus.reload;
 
-import static com.skyblockplus.utils.BotUtils.defaultEmbed;
-import static com.skyblockplus.utils.BotUtils.higherDepth;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.skyblockplus.apply.ApplyGuild;
+import com.skyblockplus.verify.VerifyGuild;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.io.File;
 import java.io.FileReader;
@@ -10,33 +18,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.skyblockplus.apply.ApplyGuild;
-import com.skyblockplus.verify.VerifyGuild;
-
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.ReadyEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import static com.skyblockplus.utils.BotUtils.defaultEmbed;
+import static com.skyblockplus.utils.BotUtils.higherDepth;
 
 public class ReloadEventWatcher extends ListenerAdapter {
-    public static Map<String, ReloadEventWatcherClass> applyGuildEventListeners = new HashMap<>();
-    public static Map<String, ReloadEventWatcherClass> verifyGuildEventListeners = new HashMap<>();
-    public static JDA jda;
-
-    @Override
-    public void onReady(ReadyEvent event) {
-        jda = event.getJDA();
-    }
+    private static final Map<String, ReloadEventWatcherClass> applyGuildEventListeners = new HashMap<>();
+    private static final Map<String, ReloadEventWatcherClass> verifyGuildEventListeners = new HashMap<>();
+    private static JDA jda;
 
     public static boolean isUniqueApplyGuild(String guildId) {
-        if (!applyGuildEventListeners.containsKey(guildId)) {
-            return true;
-        }
-        return false;
+        return !applyGuildEventListeners.containsKey(guildId);
     }
 
     public static void addApplyGuild(String guildId, Object applyGuildEventListener) {
@@ -50,13 +41,6 @@ public class ReloadEventWatcher extends ListenerAdapter {
         if (applyGuildEventListeners.get(guildId) != null) {
             applyGuildEventListeners.replace(guildId,
                     applyGuildEventListeners.get(guildId).addSubEventListener(applySubEventListener));
-        }
-    }
-
-    public static void removeApplySubEventListener(String guildId, Object applySubEventListener) {
-        if (applyGuildEventListeners.get(guildId) != null) {
-            applyGuildEventListeners.replace(guildId,
-                    applyGuildEventListeners.get(guildId).removeSubEventListener(applySubEventListener));
         }
     }
 
@@ -122,10 +106,7 @@ public class ReloadEventWatcher extends ListenerAdapter {
     }
 
     public static boolean isUniqueVerifyGuild(String guildId) {
-        if (!verifyGuildEventListeners.containsKey(guildId)) {
-            return true;
-        }
-        return false;
+        return !verifyGuildEventListeners.containsKey(guildId);
     }
 
     public static void addVerifyGuild(String guildId, Object verifyGuildEventListener) {
@@ -139,13 +120,6 @@ public class ReloadEventWatcher extends ListenerAdapter {
         if (verifyGuildEventListeners.get(guildId) != null) {
             verifyGuildEventListeners.replace(guildId,
                     verifyGuildEventListeners.get(guildId).addSubEventListener(verifySubEventListener));
-        }
-    }
-
-    public static void removeVerifySubEventListener(String guildId, Object verifySubEventListener) {
-        if (verifyGuildEventListeners.get(guildId) != null) {
-            verifyGuildEventListeners.replace(guildId,
-                    verifyGuildEventListeners.get(guildId).removeSubEventListener(verifySubEventListener));
         }
     }
 
@@ -209,5 +183,10 @@ public class ReloadEventWatcher extends ListenerAdapter {
         }
         return "There was a problem reloading the verify settings...";
 
+    }
+
+    @Override
+    public void onReady(ReadyEvent event) {
+        jda = event.getJDA();
     }
 }

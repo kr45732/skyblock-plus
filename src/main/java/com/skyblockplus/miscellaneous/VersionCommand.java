@@ -23,13 +23,15 @@ public class VersionCommand extends Command {
     public VersionCommand() {
         this.name = "version";
         this.guildOnly = false;
+        this.cooldown = globalCooldown;
     }
 
     @Override
     protected void execute(CommandEvent event) {
-        System.out.println(BOT_PREFIX + "version");
+        System.out.println(event.getMessage().getContentRaw());
         try {
-            JsonElement patchNotes = JsonParser.parseReader(new FileReader("src/main/java/com/skyblockplus/json/PatchNotes.json"));
+            JsonElement patchNotes = JsonParser
+                    .parseReader(new FileReader("src/main/java/com/skyblockplus/json/PatchNotes.json"));
             List<Integer> patchVersions = patchNotes.getAsJsonObject().entrySet().stream()
                     .map(i -> Integer.parseInt(i.getKey().replace(".", "")))
                     .collect(Collectors.toCollection(ArrayList::new));

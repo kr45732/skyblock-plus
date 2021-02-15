@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReloadEventWatcherClass {
-    private String guildId;
-    private Object guildEventListener;
+    private final String guildId;
+    private final Object guildEventListener;
     private List<Object> subEventListeners = new ArrayList<>();
 
     public ReloadEventWatcherClass(String guildId, Object guildEventListener) {
@@ -32,11 +32,6 @@ public class ReloadEventWatcherClass {
 
     public ReloadEventWatcherClass addSubEventListener(Object subEventListener) {
         this.subEventListeners.add(subEventListener);
-        return this;
-    }
-
-    public ReloadEventWatcherClass removeSubEventListener(Object subEventListener) {
-        this.subEventListeners.remove(subEventListeners);
         return this;
     }
 

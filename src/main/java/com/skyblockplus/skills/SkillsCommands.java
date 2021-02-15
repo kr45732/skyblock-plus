@@ -14,8 +14,7 @@ import java.util.Map;
 import static com.skyblockplus.utils.BotUtils.*;
 
 public class SkillsCommands extends Command {
-    Message ebMessage;
-    JsonElement levelTables;
+    private JsonElement levelTables;
 
     public SkillsCommands() {
         this.name = "skills";
@@ -25,11 +24,10 @@ public class SkillsCommands extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = defaultEmbed("Loading skills data...", null);
-        this.ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+        EmbedBuilder eb = defaultEmbed("Loading...", null);
+        Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 
-        Message message = event.getMessage();
-        String content = message.getContentRaw();
+        String content = event.getMessage().getContentRaw();
 
         String[] args = content.split(" ");
         if (args.length <= 2 || args.length > 4) {
@@ -38,10 +36,7 @@ public class SkillsCommands extends Command {
             return;
         }
 
-        for (String value : args) {
-            System.out.print(value + " ");
-        }
-        System.out.println();
+        System.out.println(content);
 
         levelTables = getJson(
                 "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/leveling.json");
@@ -52,7 +47,7 @@ public class SkillsCommands extends Command {
         }
 
         if (args[1].equals("player")) {
-            if (args.length == 4) { // Profile specified
+            if (args.length == 4) {
                 eb = getPlayerSkill(args[2], args[3]);
             } else
                 eb = getPlayerSkill(args[2], null);
@@ -100,7 +95,7 @@ public class SkillsCommands extends Command {
                             simplifyNumber(skillInfo.expCurrent) + " / " + simplifyNumber(skillInfo.expForNext)
                                     + "\nTotal XP: " + simplifyNumber(skillInfo.totalSkillExp) + "\nProgress: "
                                     + (skillInfo.skillLevel == skillInfo.maxSkillLevel ? "MAX"
-                                            : roundProgress(skillInfo.progressToNext)),
+                                    : roundProgress(skillInfo.progressToNext)),
                             true);
                     if (!skill.equals("runecrafting") && !skill.equals("carpentry")) {
                         trueSA += skillInfo.skillLevel;

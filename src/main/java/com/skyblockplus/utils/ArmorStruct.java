@@ -20,7 +20,6 @@ public class ArmorStruct {
         this.boots = boots;
     }
 
-
     public String getHelmet() {
         return helmet;
     }
