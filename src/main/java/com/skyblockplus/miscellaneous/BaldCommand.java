@@ -5,7 +5,9 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
 
+import java.awt.*;
 import java.util.Locale;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -26,20 +28,56 @@ public class BaldCommand extends Command {
 
         String[] args = event.getMessage().getContentRaw().split(" ");
         if(args.length != 2){
-            eb = defaultEmbed("Invalid usage. Try `/bald [ign]`", null);
+            eb = defaultEmbed("Invalid usage. Try `" + BOT_PREFIX + "bald @mention`", null);
             ebMessage.editMessage(eb.build()).queue();
             return;
         }
 
-        if(args[1].equalsIgnoreCase("crypticplasma") || args[1].equalsIgnoreCase("cryptlcplasma")) {
-            ebMessage.editMessage(defaultEmbed(args[1] + " is not bald", null).build()).queueAfter(3, TimeUnit.SECONDS);
-            return;
-        }else if(args[1].equalsIgnoreCase("owlahk") || args[1].equalsIgnoreCase("owiahk") || args[1].equalsIgnoreCase("pinkishh") || args[1].equalsIgnoreCase("crowly") || args[1].equalsIgnoreCase("crowiy")){
-            ebMessage.editMessage(defaultEmbed(args[1] + " is " + (new Random().nextDouble() >= 0.99? "not " : "") + "bald", null).build()).queueAfter(3, TimeUnit.SECONDS);
-            return;
+        try{
+            String id = args[1].replaceAll("<|@|!|>", "");
+            User user = event.getJDA().getUserById(id);
+            if(user != null){
+                eb = defaultEmbed("Baldness Checker", null);
+                if (user.getId().equals("385939031596466176")){
+                   eb.setDescription(user.getName() + " is not bald!");
+                   eb.setImage(user.getAvatarUrl());
+                   ebMessage.editMessage(eb.build()).queue();
+                   event.getMessage().addReaction(":green_check_custom:799774962394988574").queue();
+                   return;
+                } else if (user.getId().equals("273873363926253568") || user.getId().equals("726329299895975948")){
+                    if(new Random().nextDouble() >= 0.99){
+                        eb.setDescription(user.getName() + " is not bald!");
+                        eb.setImage(user.getAvatarUrl());
+                        ebMessage.editMessage(eb.build()).queue();
+                        event.getMessage().addReaction(":green_check_custom:799774962394988574").queue();
+                        return;
+                    }else{
+                        eb.setDescription("**WARNING** - " + user.getName() + " is bald!!!!");
+                        eb.setImage(user.getAvatarUrl());
+                        eb.setColor(Color.red);
+                        ebMessage.editMessage(eb.build()).queue();
+                        event.getMessage().addReaction("⚠️").queue();
+                        return;
+                    }
+                }else{
+                    if(new Random().nextDouble() >= 0.5){
+                        eb.setDescription(user.getName() + " is not bald!");
+                        eb.setImage(user.getAvatarUrl());
+                        ebMessage.editMessage(eb.build()).queue();
+                        event.getMessage().addReaction(":green_check_custom:799774962394988574").queue();
+                        return;
+                    }else{
+                        eb.setDescription("**WARNING** - " + user.getName() + " __is__ bald!!!!");
+                        eb.setImage(user.getAvatarUrl());
+                        eb.setColor(Color.red);
+                        ebMessage.editMessage(eb.build()).queue();
+                        event.getMessage().addReaction("⚠️").queue();
+                        return;
+                    }
+                }
+            }
+        } catch (Exception ignored) {
         }
-
-        ebMessage.editMessage(defaultEmbed(args[1] + " is " + (new Random().nextDouble() >= 0.25? "not " : "") + "bald", null).build()).queueAfter(3, TimeUnit.SECONDS);
-
+        ebMessage.editMessage(defaultEmbed("Invalid usage. Try `" + BOT_PREFIX + "bald @mention`", null).build()).queue();
     }
 }
