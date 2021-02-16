@@ -36,7 +36,7 @@ public class BaldCommand extends Command {
         try{
             String id = args[1].replaceAll("<|@|!|>", "");
             User user = event.getJDA().getUserById(id);
-            if(user != null){
+            if(user != null && !user.isBot()){
                 eb = defaultEmbed("Baldness Checker", null);
                 if (user.getId().equals("385939031596466176")){
                    eb.setDescription(user.getName() + " is not bald!");
