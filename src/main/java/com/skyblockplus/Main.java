@@ -53,7 +53,7 @@ public class Main {
                 new ShutdownCommand(), new VersionCommand(), new RoleCommands(), new GuildLeaderboardCommand(),
                 new EssenceCommand(), new BankCommand(waiter), new WardrobeCommand(waiter),
                 new TalismanBagCommand(waiter), new InventoryCommand(), new SacksCommand(waiter), new InviteCommand(),
-                new WeightCommand(), new HypixelCommand(), new UuidCommand());
+                new WeightCommand(), new HypixelCommand(), new UuidCommand(), new SkyblockCommand(waiter), new BaldCommand());
 
         if (BOT_PREFIX.equals("/")) {
             jda = JDABuilder.createDefault(BOT_TOKEN).setStatus(OnlineStatus.DO_NOT_DISTURB)

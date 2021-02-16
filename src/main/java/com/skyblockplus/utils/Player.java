@@ -430,6 +430,10 @@ public class Player {
         return 0;
     }
 
+    public JsonElement getProfileJson(){
+        return profileJson;
+    }
+
     public Map<Integer, ArmorStruct> getWardrobe() {
         try {
             String encodedWardrobeContents = higherDepth(higherDepth(profileJson, "wardrobe_contents"), "data")
