@@ -23,11 +23,6 @@ task stage(dependsOn: ['shadowJar']) {
     }
 }
 
-// stage.mustRunAfter(clean)
-
-// clean {
-// }
-
 repositories {
     // Use maven dependencies in gradle
     jcenter()

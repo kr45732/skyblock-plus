@@ -54,7 +54,6 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
-//web: java $JAVA_OPTS -jar build/libs/SkyblockPlus-0.0.1-all.jar
 @SpringBootApplication
 public class Main {
     public static JDA jda;
@@ -93,7 +92,7 @@ public class Main {
             jda = JDABuilder.createDefault(BOT_TOKEN).setStatus(OnlineStatus.DO_NOT_DISTURB)
                     .setChunkingFilter(ChunkingFilter.ALL).setMemberCachePolicy(MemberCachePolicy.ALL)
                     .enableIntents(GatewayIntent.GUILD_MEMBERS).setActivity(Activity.playing("Loading..."))
-                    .addEventListeners(waiter, client.build(), new Apply(), new ChannelDeleter(), new MessageTimeout(),
+                    .addEventListeners(waiter, client.build(), new ChannelDeleter(), new MessageTimeout(),
                             new ReloadEventWatcher(), new EventListenerDeleter())
                     .build();
         }

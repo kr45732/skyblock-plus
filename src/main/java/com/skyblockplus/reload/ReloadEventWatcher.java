@@ -142,9 +142,6 @@ public class ReloadEventWatcher extends ListenerAdapter {
         try {
             ReloadEventWatcherClass verifyGuildListenerObject = verifyGuildEventListeners.get(guildId);
             if (verifyGuildListenerObject.getSubEventListeners().size() == 0) {
-                jda.removeEventListener(verifyGuildListenerObject.getGuildEventListener());
-                verifyGuildEventListeners.remove(guildId);
-
                 JsonElement currentSettings = getJson(
                         API_BASE_URL + "api/discord/serverSettings/get/verify?serverId=" + guildId);
                 if (currentSettings != null) {
@@ -161,6 +158,9 @@ public class ReloadEventWatcher extends ListenerAdapter {
                         reactChannel.sendMessage(verifyText).queue();
                         Message reactMessage = reactChannel.sendMessage("https://streamable.com/sdq8tp").complete();
                         reactMessage.addReaction("✅").queue();
+
+                        jda.removeEventListener(verifyGuildListenerObject.getGuildEventListener());
+                        verifyGuildEventListeners.remove(guildId);
 
                         jda.addEventListener(new VerifyGuild(reactMessage, currentSettings));
 
