@@ -1,8 +1,7 @@
 package com.skyblockplus.api.miscellaneous;
 
+import com.skyblockplus.api.templates.ErrorTemplate;
 import org.springframework.boot.web.servlet.error.ErrorController;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -10,8 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class CustomErrorController implements ErrorController {
 
     @RequestMapping("/error")
-    public ResponseEntity<?> error() {
-        return new ResponseEntity<>("Invalid Path", HttpStatus.BAD_REQUEST);
+    public ErrorTemplate error() {
+        return new ErrorTemplate("false", "Invalid request");
     }
 
     @Override
