@@ -60,6 +60,6 @@ Temporary Items
 /.idea/
 /.gradle/
 /build/
-/src/main/java/com/skyblockplus/api/discordguild
+/src/main/java/com/skyblockplus/api/
 /src/main/java/com/skyblockplus/api/discordoauth2
 lombok.config

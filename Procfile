@@ -1,1 +1,1 @@
-web: java -Dserver.port=$PORT $JAVA_OPTS -jar build/libs/SkyblockPlus-0.0.1-all.jar
+web: java -Dserver.port=$PORT $JAVA_OPTS -jar build/libs/SkyblockPlus-0.0.1.jar
