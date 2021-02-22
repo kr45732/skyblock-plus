@@ -16,6 +16,10 @@ version = '0.0.1'
 sourceCompatibility = targetCompatibility = 1.8
 mainClassName = 'com.skyblockplus.Main'
 
+bootJar {
+    mainClassName = 'com.skyblockplus.Main'
+}
+
 task stage(dependsOn: ['shadowJar']) {
     dependsOn build
     doLast {
