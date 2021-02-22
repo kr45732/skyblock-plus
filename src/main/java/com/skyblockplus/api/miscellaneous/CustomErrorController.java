@@ -11,7 +11,7 @@ public class CustomErrorController implements ErrorController {
 
     @RequestMapping("/error")
     public ResponseEntity<?> error() {
-        return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>("Invalid Path", HttpStatus.BAD_REQUEST);
     }
 
     @Override
