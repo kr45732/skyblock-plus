@@ -16,17 +16,17 @@ version = '0.0.1'
 sourceCompatibility = targetCompatibility = 1.8
 mainClassName = 'com.skyblockplus.Main'
 
-task stage {
+task stage(dependsOn: ['clean', 'shadowJar']) {
     dependsOn build
-    // doLast {
-    //     delete fileTree(dir: "build/distributions")
-    // }
+    doLast {
+        delete fileTree(dir: "build/libs", exclude:"SkyblockPlus-0.0.1-all.jar")
+    }
 }
 
-stage.mustRunAfter(clean)
+// stage.mustRunAfter(clean)
 
-clean {
-}
+// clean {
+// }
 
 repositories {
     // Use maven dependencies in gradle

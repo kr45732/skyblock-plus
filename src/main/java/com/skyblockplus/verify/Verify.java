@@ -1,10 +1,10 @@
 package com.skyblockplus.verify;
 
 import static com.skyblockplus.reload.ReloadEventWatcher.isUniqueVerifyGuild;
+import static com.skyblockplus.utils.BotUtils.API_BASE_URL;
 import static com.skyblockplus.utils.BotUtils.getJson;
-import static com.skyblockplus.utils.BotUtils.*;
+import static com.skyblockplus.utils.BotUtils.higherDepth;
 
-import java.io.File;
 import java.util.List;
 
 import com.google.gson.JsonElement;

@@ -1,11 +1,11 @@
 package com.skyblockplus.reload;
 
 import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.utils.BotUtils.API_BASE_URL;
 import static com.skyblockplus.utils.BotUtils.defaultEmbed;
 import static com.skyblockplus.utils.BotUtils.getJson;
-import static com.skyblockplus.utils.BotUtils.*;
+import static com.skyblockplus.utils.BotUtils.higherDepth;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
