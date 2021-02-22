@@ -22,7 +22,7 @@ public class GuildLeaderboardCommand extends Command {
 
     public GuildLeaderboardCommand() {
         this.name = "guild-rank";
-        this.cooldown = 60;
+        this.cooldown = 120;
         this.aliases = new String[]{"g-rank"};
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
     }

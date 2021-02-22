@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 
 public class BotUtils {
     public static final Color botColor = new Color(9, 92, 13);
-    public static final int globalCooldown = 2;
+    public static final int globalCooldown = 3;
     public static String HYPIXEL_API_KEY = "";
     public static String BOT_TOKEN = "";
     public static String BOT_PREFIX = "";
@@ -125,8 +125,7 @@ public class BotUtils {
             }
 
             return JsonParser.parseReader(new InputStreamReader(httpresponse.getEntity().getContent()));
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
         return null;
     }
@@ -140,6 +139,7 @@ public class BotUtils {
             CloseableHttpClient client = HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
 
             HttpPost httpPost = new HttpPost(jsonUrl);
+
             StringEntity entity = new StringEntity((new Gson()).toJson(postObject));
             httpPost.setEntity(entity);
             httpPost.addHeader("content-type", "application/json; charset=UTF-8");
@@ -147,8 +147,7 @@ public class BotUtils {
             CloseableHttpResponse response = client.execute(httpPost);
             client.close();
             return response.getStatusLine().getStatusCode();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
         return -1;
     }

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = {"https://skyblock-plus.herokuapp.com/", "http://localhost:8080/"})
 @RequestMapping("/api/discord/serverSettings")
 public class ServerSettingsController {
 

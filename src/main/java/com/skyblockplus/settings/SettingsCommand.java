@@ -30,7 +30,7 @@ public class SettingsCommand extends Command {
 
     public SettingsCommand(EventWaiter waiter) {
         this.name = "settings";
-        this.cooldown = globalCooldown;
+        this.cooldown = 5;
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
         this.waiter = waiter;
     }
