@@ -19,7 +19,7 @@ mainClassName = 'com.skyblockplus.Main'
 task stage {
     dependsOn build
     doLast {
-        delete fileTree(dir: "build", exclude: "libs", "tmp")
+        delete fileTree(dir: "build", exclude: ["libs", "tmp"])
         delete fileTree(dir: "build/libs", exclude: "*.jar")
     }
 }
