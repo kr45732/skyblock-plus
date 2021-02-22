@@ -1,22 +1,21 @@
 package com.skyblockplus.reload;
 
-import static com.skyblockplus.reload.ReloadEventWatcher.onApplyReload;
-import static com.skyblockplus.reload.ReloadEventWatcher.onVerifyReload;
-import static com.skyblockplus.utils.BotUtils.defaultEmbed;
-
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
+
+import static com.skyblockplus.reload.ReloadEventWatcher.onApplyReload;
+import static com.skyblockplus.reload.ReloadEventWatcher.onVerifyReload;
+import static com.skyblockplus.utils.BotUtils.defaultEmbed;
 
 public class ReloadCommand extends Command {
 
     public ReloadCommand() {
         this.name = "reload";
         this.cooldown = 60;
-        this.userPermissions = new Permission[] { Permission.MANAGE_SERVER };
+        this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
     }
 
     @Override

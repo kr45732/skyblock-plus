@@ -1,24 +1,16 @@
 package com.skyblockplus.auction;
 
-import static com.skyblockplus.utils.BotUtils.HYPIXEL_API_KEY;
-import static com.skyblockplus.utils.BotUtils.capitalizeString;
-import static com.skyblockplus.utils.BotUtils.defaultEmbed;
-import static com.skyblockplus.utils.BotUtils.errorMessage;
-import static com.skyblockplus.utils.BotUtils.getJson;
-import static com.skyblockplus.utils.BotUtils.globalCooldown;
-import static com.skyblockplus.utils.BotUtils.higherDepth;
-import static com.skyblockplus.utils.BotUtils.simplifyNumber;
-
-import java.time.Duration;
-import java.time.Instant;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+
+import java.time.Duration;
+import java.time.Instant;
+
+import static com.skyblockplus.utils.BotUtils.*;
 
 public class AuctionCommands extends Command {
     private String playerUsername;
@@ -27,7 +19,7 @@ public class AuctionCommands extends Command {
     public AuctionCommands() {
         this.name = "auction";
         this.cooldown = globalCooldown;
-        this.aliases = new String[] { "ah" };
+        this.aliases = new String[]{"ah"};
     }
 
     @Override

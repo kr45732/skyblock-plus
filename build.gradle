@@ -55,6 +55,11 @@ dependencies {
     // Apache
     implementation 'org.apache.httpcomponents:httpclient:4.5.13'
 
+    // Emoji parser
+    implementation 'com.vdurmont:emoji-java:5.1.1'
+
     // Misc
     implementation "ch.qos.logback:logback-classic:1.2.3"
+
+
 }

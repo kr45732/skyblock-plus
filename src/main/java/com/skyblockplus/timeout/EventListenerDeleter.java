@@ -1,6 +1,9 @@
 package com.skyblockplus.timeout;
 
-import static com.skyblockplus.Main.jda;
+import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.List;
@@ -9,14 +12,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.jetbrains.annotations.NotNull;
-
-import net.dv8tion.jda.api.events.ReadyEvent;
-import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import static com.skyblockplus.Main.jda;
 
 public class EventListenerDeleter extends ListenerAdapter {
-    public static Map<String, Object> eventListeners = new HashMap<>();
+    public static final Map<String, Object> eventListeners = new HashMap<>();
+
+    public static void addEventListener(String guildId, String channelId, Object eventListener) {
+        eventListeners.put((guildId + ":" + channelId), eventListener);
+    }
 
     @Override
     public void onReady(@NotNull ReadyEvent event) {
@@ -45,9 +48,5 @@ public class EventListenerDeleter extends ListenerAdapter {
         if (eventListener != null) {
             event.getJDA().removeEventListener(eventListener);
         }
-    }
-
-    public static void addEventListener(String guildId, String channelId, Object eventListener) {
-        eventListeners.put((guildId + ":" + channelId), eventListener);
     }
 }

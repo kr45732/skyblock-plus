@@ -1,28 +1,20 @@
 package com.skyblockplus.dungeons;
 
-import static com.skyblockplus.utils.BotUtils.capitalizeString;
-import static com.skyblockplus.utils.BotUtils.defaultEmbed;
-import static com.skyblockplus.utils.BotUtils.errorMessage;
-import static com.skyblockplus.utils.BotUtils.globalCooldown;
-import static com.skyblockplus.utils.BotUtils.roundProgress;
-import static com.skyblockplus.utils.BotUtils.roundSkillAverage;
-import static com.skyblockplus.utils.BotUtils.simplifyNumber;
-import static com.skyblockplus.utils.BotUtils.skyblockStatsLink;
-
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.skills.SkillsStruct;
 import com.skyblockplus.utils.Player;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+
+import static com.skyblockplus.utils.BotUtils.*;
 
 public class CatacombsCommand extends Command {
 
     public CatacombsCommand() {
         this.name = "dungeons";
         this.cooldown = globalCooldown;
-        this.aliases = new String[] { "cata", "catacombs" };
+        this.aliases = new String[]{"cata", "catacombs"};
     }
 
     @Override
@@ -69,7 +61,7 @@ public class CatacombsCommand extends Command {
                 eb.setDescription("True catacombs level: " + skillInfo.skillLevel + "\nProgress catacombs level: "
                         + roundSkillAverage(skillInfo.skillLevel + skillInfo.progressToNext));
 
-                for (String className : new String[] { "healer", "mage", "berserk", "archer", "tank" }) {
+                for (String className : new String[]{"healer", "mage", "berserk", "archer", "tank"}) {
                     skillInfo = player.getDungeonClass(className);
                     eb.addField(capitalizeString(className) + " (" + skillInfo.skillLevel + ")",
                             simplifyNumber(skillInfo.expCurrent) + " / " + simplifyNumber(skillInfo.expForNext)

@@ -1,16 +1,14 @@
 package com.skyblockplus.guilds;
 
-import static com.skyblockplus.utils.BotUtils.HYPIXEL_API_KEY;
-import static com.skyblockplus.utils.BotUtils.botColor;
-import static com.skyblockplus.utils.BotUtils.defaultEmbed;
-import static com.skyblockplus.utils.BotUtils.errorMessage;
-import static com.skyblockplus.utils.BotUtils.fixUsername;
-import static com.skyblockplus.utils.BotUtils.formatNumber;
-import static com.skyblockplus.utils.BotUtils.getJson;
-import static com.skyblockplus.utils.BotUtils.globalCooldown;
-import static com.skyblockplus.utils.BotUtils.higherDepth;
-import static com.skyblockplus.utils.BotUtils.usernameToUuidUsername;
-import static com.skyblockplus.utils.BotUtils.uuidToUsername;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.skyblockplus.utils.CustomPaginator;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.exceptions.PermissionException;
 
 import java.time.Instant;
 import java.util.Date;
@@ -18,16 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.skyblockplus.utils.CustomPaginator;
-
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.exceptions.PermissionException;
+import static com.skyblockplus.utils.BotUtils.*;
 
 public class GuildCommands extends Command {
     private final EventWaiter waiter;
@@ -37,7 +26,7 @@ public class GuildCommands extends Command {
         this.name = "guild";
         this.cooldown = globalCooldown;
         this.waiter = waiter;
-        this.aliases = new String[] { "g" };
+        this.aliases = new String[]{"g"};
     }
 
     @Override
@@ -336,11 +325,11 @@ public class GuildCommands extends Command {
     }
 
     private int guildExpToLevel(int guildExp) {
-        int[] guildExpTable = new int[] { 100000, 150000, 250000, 500000, 750000, 1000000, 1250000, 1500000, 2000000,
-                2500000, 2500000, 2500000, 2500000, 2500000, 3000000 };
+        int[] guildExpTable = new int[]{100000, 150000, 250000, 500000, 750000, 1000000, 1250000, 1500000, 2000000,
+                2500000, 2500000, 2500000, 2500000, 2500000, 3000000};
         int guildLevel = 0;
 
-        for (int i = 0;; i++) {
+        for (int i = 0; ; i++) {
             int expNeeded = i >= guildExpTable.length ? guildExpTable[guildExpTable.length - 1] : guildExpTable[i];
             guildExp -= expNeeded;
             if (guildExp < 0) {

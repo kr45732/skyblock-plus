@@ -1,17 +1,12 @@
 package com.skyblockplus.api.discordserversettings.settingsmanagers;
 
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-
 import com.skyblockplus.api.discordserversettings.automatedapplication.AutomatedApplication;
 import com.skyblockplus.api.discordserversettings.automatedroles.AutomatedRoles;
 import com.skyblockplus.api.discordserversettings.automatedverify.AutomatedVerify;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
+
+import javax.persistence.*;
 
 @Data
 @AllArgsConstructor

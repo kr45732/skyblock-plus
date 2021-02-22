@@ -1,15 +1,13 @@
 package com.skyblockplus.apply;
 
-import static com.skyblockplus.reload.ReloadEventWatcher.addApplyGuild;
-import static com.skyblockplus.utils.BotUtils.higherDepth;
-
 import com.google.gson.JsonElement;
-
-import org.jetbrains.annotations.NotNull;
-
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
+
+import static com.skyblockplus.reload.ReloadEventWatcher.addApplyGuild;
+import static com.skyblockplus.utils.BotUtils.higherDepth;
 
 public class ApplyGuild extends ListenerAdapter {
     private final Message reactMessage;

@@ -1,15 +1,15 @@
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.BotUtils.BOT_PREFIX;
-import static com.skyblockplus.utils.BotUtils.botColor;
-import static com.skyblockplus.utils.BotUtils.defaultEmbed;
-import static com.skyblockplus.utils.BotUtils.errorMessage;
-import static com.skyblockplus.utils.BotUtils.formatNumber;
-import static com.skyblockplus.utils.BotUtils.getJsonKeys;
-import static com.skyblockplus.utils.BotUtils.globalCooldown;
-import static com.skyblockplus.utils.BotUtils.higherDepth;
-import static com.skyblockplus.utils.BotUtils.roundSkillAverage;
-import static com.skyblockplus.utils.BotUtils.simplifyNumber;
+import com.google.gson.JsonElement;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.skyblockplus.utils.ArmorStruct;
+import com.skyblockplus.utils.CustomPaginator;
+import com.skyblockplus.utils.Player;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.exceptions.PermissionException;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -18,17 +18,7 @@ import java.time.format.FormatStyle;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import com.google.gson.JsonElement;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.skyblockplus.utils.ArmorStruct;
-import com.skyblockplus.utils.CustomPaginator;
-import com.skyblockplus.utils.Player;
-
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.exceptions.PermissionException;
+import static com.skyblockplus.utils.BotUtils.*;
 
 public class SkyblockCommand extends Command {
     private final EventWaiter waiter;
@@ -113,15 +103,15 @@ public class SkyblockCommand extends Command {
                     + "\n";
             skillsPageString += "• **Current Golds:** "
                     + (higherDepth(higherDepth(jacobJson, "medals_inv"), "gold") == null ? 0
-                            : higherDepth(higherDepth(jacobJson, "medals_inv"), "gold").getAsInt())
+                    : higherDepth(higherDepth(jacobJson, "medals_inv"), "gold").getAsInt())
                     + "\n";
             skillsPageString += "• **Current Silvers:** "
                     + (higherDepth(higherDepth(jacobJson, "medals_inv"), "silver") == null ? 0
-                            : higherDepth(higherDepth(jacobJson, "medals_inv"), "silver").getAsInt())
+                    : higherDepth(higherDepth(jacobJson, "medals_inv"), "silver").getAsInt())
                     + "\n";
             skillsPageString += "• **Current Bronzes:** "
                     + (higherDepth(higherDepth(jacobJson, "medals_inv"), "bronze") == null ? 0
-                            : higherDepth(higherDepth(jacobJson, "medals_inv"), "bronze").getAsInt())
+                    : higherDepth(higherDepth(jacobJson, "medals_inv"), "bronze").getAsInt())
                     + "\n";
             skillsPageString += "\n";
 
@@ -148,7 +138,7 @@ public class SkyblockCommand extends Command {
             dungeonsPageString += "__**Catacombs**__" + "\n";
             dungeonsPageString += "• **Catacombs:** " + roundSkillAverage(player.getCatacombsLevel()) + "\n";
 
-            String[] pageTitles = { "General", "Armor", "Skills", "Dungeons" };
+            String[] pageTitles = {"General", "Armor", "Skills", "Dungeons"};
             CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(1).setItemsPerPage(1)
                     .showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
                         try {

@@ -1,25 +1,22 @@
 package com.skyblockplus.reload;
 
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.utils.BotUtils.API_BASE_URL;
-import static com.skyblockplus.utils.BotUtils.defaultEmbed;
-import static com.skyblockplus.utils.BotUtils.getJson;
-import static com.skyblockplus.utils.BotUtils.higherDepth;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.google.gson.JsonElement;
 import com.skyblockplus.apply.ApplyGuild;
 import com.skyblockplus.verify.VerifyGuild;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.utils.BotUtils.*;
 
 public class ReloadEventWatcher extends ListenerAdapter {
     private static final Map<String, ReloadEventWatcherClass> applyGuildEventListeners = new HashMap<>();
@@ -156,7 +153,9 @@ public class ReloadEventWatcher extends ListenerAdapter {
 
                         String verifyText = higherDepth(currentSettings, "messageText").getAsString();
                         reactChannel.sendMessage(verifyText).queue();
-                        Message reactMessage = reactChannel.sendMessage("https://streamable.com/sdq8tp").complete();
+                        Message reactMessage = reactChannel
+                                .sendFile(new File("src/main/java/com/skyblockplus/verify/Link_Discord_To_Hypixel.mp4"))
+                                .complete();
                         reactMessage.addReaction("✅").queue();
 
                         jda.removeEventListener(verifyGuildListenerObject.getGuildEventListener());

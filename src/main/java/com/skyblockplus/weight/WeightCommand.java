@@ -1,17 +1,12 @@
 package com.skyblockplus.weight;
 
-import static com.skyblockplus.utils.BotUtils.defaultEmbed;
-import static com.skyblockplus.utils.BotUtils.errorMessage;
-import static com.skyblockplus.utils.BotUtils.globalCooldown;
-import static com.skyblockplus.utils.BotUtils.roundSkillAverage;
-import static com.skyblockplus.utils.BotUtils.skyblockStatsLink;
-
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+
+import static com.skyblockplus.utils.BotUtils.*;
 
 public class WeightCommand extends Command {
 
@@ -60,7 +55,7 @@ public class WeightCommand extends Command {
     }
 
     private EmbedBuilder calculateWeight(String skillAverage, String slayer, String catacombs,
-            String averageDungeonClass) {
+                                         String averageDungeonClass) {
         try {
             double skillAverageD = Double.parseDouble(skillAverage);
             double slayerD = Double.parseDouble(slayer);

@@ -71,7 +71,7 @@
   },
   "15": {
     "version": "0.2.0",
-    "description": "- **MAJOR MILESTONE!**\n- Fixed guild-rank command\n- Added databse\n- Added API\n- Added custom settings for verify and apply\n- Many bug fixes and changes\n- Added categories command\n- Added settings command\n- Added event listener deleter\n- Updated bald command",
+    "description": "- **MAJOR MILESTONE!**\n- Fixed guild-rank command\n- Added database\n- Added API\n- Added custom settings for verify and apply\n- Many bug fixes and changes\n- Added categories command\n- Added settings command\n- Added event listener deleter\n- Updated bald command",
     "date": "2021-02-22T00:07:45.305380Z"
   }
 }

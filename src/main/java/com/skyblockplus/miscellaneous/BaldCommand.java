@@ -1,18 +1,15 @@
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.BotUtils.BOT_PREFIX;
-import static com.skyblockplus.utils.BotUtils.defaultEmbed;
-import static com.skyblockplus.utils.BotUtils.globalCooldown;
-
-import java.awt.Color;
-import java.util.Random;
-
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
+
+import java.awt.*;
+import java.util.Random;
+
+import static com.skyblockplus.utils.BotUtils.*;
 
 public class BaldCommand extends Command {
 

@@ -1,22 +1,7 @@
 package com.skyblockplus.apply;
 
-import static com.skyblockplus.reload.ReloadEventWatcher.addApplySubEventListener;
-import static com.skyblockplus.timeout.ChannelDeleter.addChannel;
-import static com.skyblockplus.timeout.ChannelDeleter.removeChannel;
-import static com.skyblockplus.timeout.EventListenerDeleter.addEventListener;
-import static com.skyblockplus.utils.BotUtils.defaultEmbed;
-import static com.skyblockplus.utils.BotUtils.formatNumber;
-import static com.skyblockplus.utils.BotUtils.getPlayerDiscordInfo;
-import static com.skyblockplus.utils.BotUtils.higherDepth;
-import static com.skyblockplus.utils.BotUtils.roundSkillAverage;
-import static com.skyblockplus.utils.BotUtils.skyblockStatsLink;
-
-import java.util.EnumSet;
-import java.util.concurrent.TimeUnit;
-
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
@@ -25,6 +10,15 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+
+import java.util.EnumSet;
+import java.util.concurrent.TimeUnit;
+
+import static com.skyblockplus.reload.ReloadEventWatcher.addApplySubEventListener;
+import static com.skyblockplus.timeout.ChannelDeleter.addChannel;
+import static com.skyblockplus.timeout.ChannelDeleter.removeChannel;
+import static com.skyblockplus.timeout.EventListenerDeleter.addEventListener;
+import static com.skyblockplus.utils.BotUtils.*;
 
 public class ApplyUser extends ListenerAdapter {
     private final User applyingUser;

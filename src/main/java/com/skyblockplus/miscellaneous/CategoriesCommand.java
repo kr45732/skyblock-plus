@@ -1,13 +1,12 @@
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.BotUtils.defaultEmbed;
-import static com.skyblockplus.utils.BotUtils.globalCooldown;
-
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+
+import static com.skyblockplus.utils.BotUtils.defaultEmbed;
+import static com.skyblockplus.utils.BotUtils.globalCooldown;
 
 public class CategoriesCommand extends Command {
 
@@ -21,12 +20,12 @@ public class CategoriesCommand extends Command {
         EmbedBuilder eb = defaultEmbed("Loading...");
         Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 
-        String ebString = "";
+        StringBuilder ebString = new StringBuilder();
         for (net.dv8tion.jda.api.entities.Category category : event.getGuild().getCategories()) {
-            ebString += "\n " + category.getName() + " - " + category.getId();
+            ebString.append("\n ").append(category.getName()).append(" - ").append(category.getId());
         }
 
-        eb = defaultEmbed("Guild Categories").setDescription(ebString.length() == 0 ? "None" : ebString);
+        eb = defaultEmbed("Guild Categories").setDescription(ebString.length() == 0 ? "None" : ebString.toString());
         ebMessage.editMessage(eb.build()).queue();
     }
 }

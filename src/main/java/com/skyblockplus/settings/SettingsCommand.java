@@ -10,7 +10,7 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.api.discordserversettings.automatedroles.RoleObject;
 import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSettingsModel;
 import com.skyblockplus.utils.CustomPaginator;
-
+import com.vdurmont.emoji.EmojiParser;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
@@ -26,12 +26,12 @@ import static com.skyblockplus.utils.BotUtils.*;
 public class SettingsCommand extends Command {
     private final String baseUrl = API_BASE_URL + "api/discord/serverSettings/";
     private CommandEvent event;
-    private EventWaiter waiter;
+    private final EventWaiter waiter;
 
     public SettingsCommand(EventWaiter waiter) {
         this.name = "settings";
         this.cooldown = globalCooldown;
-        this.userPermissions = new Permission[] { Permission.MANAGE_SERVER };
+        this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
         this.waiter = waiter;
     }
 
@@ -249,7 +249,7 @@ public class SettingsCommand extends Command {
 
                 currentRoleSettings = getJson(
                         baseUrl + "get/role?serverId=" + event.getGuild().getId() + "&roleName=" + roleName)
-                                .getAsJsonObject();
+                        .getAsJsonObject();
 
                 if (currentRoleSettings.get("levels").getAsJsonArray().size() == 0) {
                     setRoleEnable(roleName, "false");
@@ -315,11 +315,11 @@ public class SettingsCommand extends Command {
         if (role.isPublicRole() || role.isManaged()) {
             return defaultEmbed("Error", null).setDescription("Role cannot be managed or @everyone!");
         }
-        JsonObject newRoleSettings = null;
+        JsonObject newRoleSettings;
         try {
             newRoleSettings = getJson(
                     baseUrl + "get/role?serverId=" + event.getGuild().getId() + "&roleName=" + roleType)
-                            .getAsJsonObject();
+                    .getAsJsonObject();
         } catch (Exception e) {
             return defaultEmbed("Error", null).setDescription("Invalid role");
         }
@@ -352,24 +352,24 @@ public class SettingsCommand extends Command {
                 : "• Disabled";
         ebFieldString += "\n• React Message Text: "
                 + (higherDepth(verifySettings, "messageText").getAsString().length() != 0
-                        ? higherDepth(verifySettings, "messageText").getAsString()
-                        : "None");
+                ? higherDepth(verifySettings, "messageText").getAsString()
+                : "None");
         ebFieldString += "\n• React Message Channel: "
                 + (higherDepth(verifySettings, "messageTextChannelId").getAsString().length() != 0 ? event.getGuild()
-                        .getTextChannelById(higherDepth(verifySettings, "messageTextChannelId").getAsString())
-                        .getAsMention() : "None");
+                .getTextChannelById(higherDepth(verifySettings, "messageTextChannelId").getAsString())
+                .getAsMention() : "None");
         ebFieldString += "\n• Verified Role: "
                 + (higherDepth(verifySettings, "verifiedRole").getAsString().length() != 0 ? event.getGuild()
-                        .getRoleById(higherDepth(verifySettings, "verifiedRole").getAsString()).getAsMention()
-                        : "None");
+                .getRoleById(higherDepth(verifySettings, "verifiedRole").getAsString()).getAsMention()
+                : "None");
         ebFieldString += "\n• New Channel Prefix: "
                 + (higherDepth(verifySettings, "newChannelPrefix").getAsString().length() != 0
-                        ? higherDepth(verifySettings, "newChannelPrefix").getAsString()
-                        : "None");
+                ? decodeVerifyPrefix(higherDepth(verifySettings, "newChannelPrefix").getAsString())
+                : "None");
         ebFieldString += "\n• New Channel Category: "
                 + (higherDepth(verifySettings, "newChannelCategory").getAsString().length() != 0
-                        ? higherDepth(verifySettings, "newChannelCategory").getAsString()
-                        : "None");
+                ? higherDepth(verifySettings, "newChannelCategory").getAsString()
+                : "None");
         return ebFieldString;
     }
 
@@ -393,18 +393,17 @@ public class SettingsCommand extends Command {
         roleNames.remove("enable");
         for (String roleName : roleNames) {
             JsonElement currentRoleSettings = higherDepth(rolesSettings, roleName);
-            String ebFieldString = "";
-            ebFieldString += higherDepth(currentRoleSettings, "enable").getAsString().equals("true") ? "• Enabled"
-                    : "• Disabled";
-            ebFieldString += higherDepth(currentRoleSettings, "stackable").getAsString().equals("stackable")
+            StringBuilder ebFieldString = new StringBuilder();
+            ebFieldString.append(higherDepth(currentRoleSettings, "enable").getAsString().equals("true") ? "• Enabled"
+                    : "• Disabled");
+            ebFieldString.append(higherDepth(currentRoleSettings, "stackable").getAsString().equals("stackable")
                     ? "\n• Stackable"
-                    : "\n• Not stackable";
+                    : "\n• Not stackable");
 
             for (JsonElement roleLevel : higherDepth(currentRoleSettings, "levels").getAsJsonArray()) {
-                ebFieldString += "\n• " + higherDepth(roleLevel, "value").getAsString() + " - "
-                        + event.getGuild().getRoleById(higherDepth(roleLevel, "roleId").getAsString()).getAsMention();
+                ebFieldString.append("\n• ").append(higherDepth(roleLevel, "value").getAsString()).append(" - ").append(event.getGuild().getRoleById(higherDepth(roleLevel, "roleId").getAsString()).getAsMention());
             }
-            paginateBuilder.addItems(ebFieldString);
+            paginateBuilder.addItems(ebFieldString.toString());
             pageTitles.add(roleName);
         }
 
@@ -428,36 +427,36 @@ public class SettingsCommand extends Command {
         ebFieldString += higherDepth(applySettings, "enable").getAsString().equals("true") ? "• Enabled" : "• Disabled";
         ebFieldString += "\n• React Message Text: "
                 + (higherDepth(applySettings, "messageText").getAsString().length() != 0
-                        ? higherDepth(applySettings, "messageText").getAsString()
-                        : "None");
+                ? higherDepth(applySettings, "messageText").getAsString()
+                : "None");
         ebFieldString += "\n• React Message Channel: "
                 + (higherDepth(applySettings, "messageTextChannelId").getAsString().length() != 0 ? event.getGuild()
-                        .getTextChannelById(higherDepth(applySettings, "messageTextChannelId").getAsString())
-                        .getAsMention() : "None");
+                .getTextChannelById(higherDepth(applySettings, "messageTextChannelId").getAsString())
+                .getAsMention() : "None");
         ebFieldString += "\n• Staff Message Channel: "
                 + (higherDepth(applySettings, "messageStaffChannelId").getAsString().length() != 0 ? event.getGuild()
-                        .getTextChannelById(higherDepth(applySettings, "messageStaffChannelId").getAsString())
-                        .getAsMention() : "None");
+                .getTextChannelById(higherDepth(applySettings, "messageStaffChannelId").getAsString())
+                .getAsMention() : "None");
         ebFieldString += "\n• Staff Ping Role: "
                 + (higherDepth(applySettings, "staffPingRoleId").getAsString().length() != 0 ? event.getGuild()
-                        .getRoleById(higherDepth(applySettings, "staffPingRoleId").getAsString()).getAsMention()
-                        : "None");
+                .getRoleById(higherDepth(applySettings, "staffPingRoleId").getAsString()).getAsMention()
+                : "None");
         ebFieldString += "\n• Accepted Message: "
                 + (higherDepth(applySettings, "acceptMessageText").getAsString().length() != 0
-                        ? higherDepth(applySettings, "acceptMessageText").getAsString()
-                        : "None");
+                ? higherDepth(applySettings, "acceptMessageText").getAsString()
+                : "None");
         ebFieldString += "\n• Denied Message: "
                 + (higherDepth(applySettings, "denyMessageText").getAsString().length() != 0
-                        ? higherDepth(applySettings, "denyMessageText").getAsString()
-                        : "None");
+                ? higherDepth(applySettings, "denyMessageText").getAsString()
+                : "None");
         ebFieldString += "\n• New Channel Prefix: "
                 + (higherDepth(applySettings, "newChannelPrefix").getAsString().length() != 0
-                        ? higherDepth(applySettings, "newChannelPrefix").getAsString()
-                        : "None");
+                ? higherDepth(applySettings, "newChannelPrefix").getAsString()
+                : "None");
         ebFieldString += "\n• New Channel Category: "
                 + (higherDepth(applySettings, "newChannelCategory").getAsString().length() != 0
-                        ? higherDepth(applySettings, "newChannelCategory").getAsString()
-                        : "None");
+                ? higherDepth(applySettings, "newChannelCategory").getAsString()
+                : "None");
         return ebFieldString;
     }
 
@@ -528,7 +527,10 @@ public class SettingsCommand extends Command {
 
     private EmbedBuilder setApplyNewChannelPrefix(String channelPrefix) {
         if (channelPrefix.length() > 0) {
-            int responseCode = updateApplySettings("newChannelPrefix", channelPrefix);
+            if (EmojiParser.parseToAliases(channelPrefix).length() > 25) {
+                return defaultEmbed("Error", null).setDescription("Prefix cannot be longer than 25 letters!");
+            }
+            int responseCode = updateApplySettings("newChannelPrefix", EmojiParser.parseToAliases(channelPrefix));
             if (responseCode != 200) {
                 return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
             }
@@ -542,7 +544,10 @@ public class SettingsCommand extends Command {
 
     private EmbedBuilder setApplyMessageText(String verifyText) {
         if (verifyText.length() > 0) {
-            int responseCode = updateApplySettings("messageText", verifyText);
+            if (EmojiParser.parseToAliases(verifyText).length() > 2048) {
+                return defaultEmbed("Error", null).setDescription("Text cannot be longer than 2048 letters!");
+            }
+            int responseCode = updateApplySettings("messageText", EmojiParser.parseToAliases(verifyText));
             if (responseCode != 200) {
                 return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
             }
@@ -556,7 +561,11 @@ public class SettingsCommand extends Command {
 
     private EmbedBuilder setApplyAcceptMessageText(String verifyText) {
         if (verifyText.length() > 0) {
-            int responseCode = updateApplySettings("acceptMessageText", verifyText);
+            if (EmojiParser.parseToAliases(verifyText).length() > 2048) {
+                return defaultEmbed("Error", null).setDescription("Text cannot be longer than 2048 letters!");
+            }
+
+            int responseCode = updateApplySettings("acceptMessageText", EmojiParser.parseToAliases(verifyText));
             if (responseCode != 200) {
                 return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
             }
@@ -570,7 +579,11 @@ public class SettingsCommand extends Command {
 
     private EmbedBuilder setApplyDenyMessageText(String verifyText) {
         if (verifyText.length() > 0) {
-            int responseCode = updateApplySettings("denyMessageText", verifyText);
+            if (EmojiParser.parseToAliases(verifyText).length() > 2048) {
+                return defaultEmbed("Error", null).setDescription("Text cannot be longer than 2048 letters!");
+            }
+
+            int responseCode = updateApplySettings("denyMessageText", EmojiParser.parseToAliases(verifyText));
             if (responseCode != 200) {
                 return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
             }
@@ -633,7 +646,11 @@ public class SettingsCommand extends Command {
 
     private EmbedBuilder setVerifyMessageText(String verifyText) {
         if (verifyText.length() > 0) {
-            int responseCode = updateVerifySettings("messageText", verifyText);
+            if (EmojiParser.parseToAliases(verifyText).length() > 2048) {
+                return defaultEmbed("Error", null).setDescription("Text cannot be longer than 2048 letters!");
+            }
+
+            int responseCode = updateVerifySettings("messageText", EmojiParser.parseToAliases(verifyText));
             if (responseCode != 200) {
                 return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
             }
@@ -682,7 +699,11 @@ public class SettingsCommand extends Command {
 
     private EmbedBuilder setVerifyNewChannelPrefix(String channelPrefix) {
         if (channelPrefix.length() > 0) {
-            int responseCode = updateVerifySettings("newChannelPrefix", channelPrefix);
+            if (EmojiParser.parseToAliases(channelPrefix).length() > 25) {
+                return defaultEmbed("Error", null).setDescription("Prefix cannot be longer than 25 letters!");
+            }
+
+            int responseCode = updateVerifySettings("newChannelPrefix", EmojiParser.parseToAliases(channelPrefix.replace("ν", "Nu-greek-char")));
             if (responseCode != 200) {
                 return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
             }

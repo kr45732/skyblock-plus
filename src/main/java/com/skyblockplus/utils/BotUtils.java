@@ -1,6 +1,24 @@
 package com.skyblockplus.utils;
 
-import java.awt.Color;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.skyblockplus.guilds.UsernameUuidStruct;
+import net.dv8tion.jda.api.EmbedBuilder;
+import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+
+import java.awt.*;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -14,26 +32,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.skyblockplus.guilds.UsernameUuidStruct;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-
-import net.dv8tion.jda.api.EmbedBuilder;
 
 public class BotUtils {
     public static final Color botColor = new Color(9, 92, 13);
@@ -118,6 +116,7 @@ public class BotUtils {
             if (jsonUrl.contains("raw.githubusercontent.com")) {
                 httpget.setHeader("Authorization", "token " + GITHUB_TOKEN);
             }
+            httpget.addHeader("content-type", "application/json; charset=UTF-8");
 
             HttpResponse httpresponse = httpclient.execute(httpget);
             if (jsonUrl.toLowerCase().contains("api.hypixel.net")) {
@@ -143,7 +142,7 @@ public class BotUtils {
             HttpPost httpPost = new HttpPost(jsonUrl);
             StringEntity entity = new StringEntity((new Gson()).toJson(postObject));
             httpPost.setEntity(entity);
-            httpPost.addHeader("content-type", "application/json");
+            httpPost.addHeader("content-type", "application/json; charset=UTF-8");
 
             CloseableHttpResponse response = client.execute(httpPost);
             client.close();
@@ -272,11 +271,15 @@ public class BotUtils {
         try {
             String discordID = higherDepth(
                     higherDepth(higherDepth(higherDepth(playerJson, "player"), "socialMedia"), "links"), "DISCORD")
-                            .getAsString();
-            return new String[] { discordID,
-                    higherDepth(higherDepth(playerJson, "player"), "displayname").getAsString() };
+                    .getAsString();
+            return new String[]{discordID,
+                    higherDepth(higherDepth(playerJson, "player"), "displayname").getAsString()};
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public static String decodeVerifyPrefix(String prefix){
+        return prefix.replace("Nu-greek-char", "ν");
     }
 }

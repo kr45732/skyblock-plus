@@ -1,20 +1,17 @@
 package com.skyblockplus.verify;
 
-import static com.skyblockplus.reload.ReloadEventWatcher.isUniqueVerifyGuild;
-import static com.skyblockplus.utils.BotUtils.API_BASE_URL;
-import static com.skyblockplus.utils.BotUtils.getJson;
-import static com.skyblockplus.utils.BotUtils.higherDepth;
-
-import java.util.List;
-
 import com.google.gson.JsonElement;
-
-import org.jetbrains.annotations.NotNull;
-
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.File;
+import java.util.List;
+
+import static com.skyblockplus.reload.ReloadEventWatcher.isUniqueVerifyGuild;
+import static com.skyblockplus.utils.BotUtils.*;
 
 public class Verify extends ListenerAdapter {
     @Override
@@ -35,7 +32,9 @@ public class Verify extends ListenerAdapter {
 
                         String verifyText = higherDepth(currentSettings, "messageText").getAsString();
                         reactChannel.sendMessage(verifyText).queue();
-                        Message reactMessage = reactChannel.sendMessage("https://streamable.com/sdq8tp").complete();
+                        Message reactMessage = reactChannel
+                                .sendFile(new File("src/main/java/com/skyblockplus/verify/Link_Discord_To_Hypixel.mp4"))
+                                .complete();
                         reactMessage.addReaction("✅").queue();
 
                         event.getJDA().addEventListener(new VerifyGuild(reactMessage, currentSettings));
