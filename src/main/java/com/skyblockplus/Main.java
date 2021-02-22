@@ -54,6 +54,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
+//web: java $JAVA_OPTS -jar build/libs/SkyblockPlus-0.0.1-all.jar
 @SpringBootApplication
 public class Main {
     public static JDA jda;
