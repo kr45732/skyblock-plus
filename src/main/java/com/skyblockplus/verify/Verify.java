@@ -38,13 +38,13 @@ public class Verify extends ListenerAdapter {
                         reactMessage.addReaction("✅").queue();
 
                         event.getJDA().addEventListener(new VerifyGuild(reactMessage, currentSettings));
+                        return;
                     }
-                } else {
-                    event.getJDA().addEventListener(new VerifyGuild(event.getGuild().getId(), currentSettings));
                 }
             }
         } catch (Exception ignored) {
         }
+        event.getJDA().addEventListener(new VerifyGuild(event.getGuild().getId()));
     }
 
 }

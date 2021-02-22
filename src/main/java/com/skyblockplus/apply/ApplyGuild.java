@@ -19,9 +19,9 @@ public class ApplyGuild extends ListenerAdapter {
         addApplyGuild(reactMessage.getGuild().getId(), this);
     }
 
-    public ApplyGuild(String guildId, JsonElement currentSettings) {
+    public ApplyGuild(String guildId) {
         this.reactMessage = null;
-        this.currentSettings = currentSettings;
+        this.currentSettings = null;
         addApplyGuild(guildId, this);
     }
 

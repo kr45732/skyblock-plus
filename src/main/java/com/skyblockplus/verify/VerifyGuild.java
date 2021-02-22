@@ -19,9 +19,9 @@ public class VerifyGuild extends ListenerAdapter {
         addVerifyGuild(reactMessage.getGuild().getId(), this);
     }
 
-    public VerifyGuild(String guildId, JsonElement currentSettings) {
+    public VerifyGuild(String guildId) {
         this.reactMessage = null;
-        this.currentSettings = currentSettings;
+        this.currentSettings = null;
         addVerifyGuild(guildId, this);
     }
 

@@ -37,12 +37,12 @@ public class Apply extends ListenerAdapter {
                         reactMessage.addReaction("✅").queue();
 
                         event.getJDA().addEventListener(new ApplyGuild(reactMessage, currentSettings));
+                        return;
                     }
-                } else {
-                    event.getJDA().addEventListener(new ApplyGuild(event.getGuild().getId(), currentSettings));
                 }
             }
         } catch (Exception ignored) {
         }
+        event.getJDA().addEventListener(new ApplyGuild(event.getGuild().getId()));
     }
 }
