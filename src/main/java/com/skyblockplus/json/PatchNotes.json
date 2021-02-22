@@ -68,5 +68,10 @@
     "version": "0.1.5",
     "description": "- Added fastest lobby parkour command\n- Renamed coins command to bank command\n- Updated bin command\n- Added hypixel player stats command\n- Minor bug fixes",
     "date": "2021-02-15T18:02:49.671977Z"
+  },
+  "15": {
+    "version": "0.2.0",
+    "description": "- **MAJOR MILESTONE!**\n- Fixed guild-rank command\n- Added databse\n- Added API\n- Added custom settings for verify and apply\n- Many bug fixes and changes\n- Added categories command\n- Added settings command\n- Added event listener deleter\n- Updated bald command",
+    "date": "2021-02-22T00:07:45.305380Z"
   }
 }

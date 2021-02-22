@@ -1,10 +1,13 @@
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.BotUtils.BOT_PREFIX;
+import static com.skyblockplus.utils.BotUtils.defaultEmbed;
+import static com.skyblockplus.utils.BotUtils.globalCooldown;
+
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.api.EmbedBuilder;
 
-import static com.skyblockplus.utils.BotUtils.*;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class AboutCommand extends Command {
     public AboutCommand() {
@@ -27,7 +30,7 @@ public class AboutCommand extends Command {
                 + "<:green_check_custom:799774962394988574> Automatic Skyblock Applications For a Guild\n"
                 + "<:green_check_custom:799774962394988574> Automatic Skyblock Progress Roles\n";
 
-        EmbedBuilder eb = defaultEmbed("About Skyblock Plus!", null);
+        EmbedBuilder eb = defaultEmbed("About Skyblock Plus!");
         eb.setDescription(description);
         eb.setFooter("Last restart", null);
         eb.setTimestamp(event.getClient().getStartTime());

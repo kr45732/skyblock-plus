@@ -1,37 +1,47 @@
 package com.skyblockplus.skills;
 
-import com.google.gson.JsonElement;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.utils.Player;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
+import static com.skyblockplus.utils.BotUtils.capitalizeString;
+import static com.skyblockplus.utils.BotUtils.defaultEmbed;
+import static com.skyblockplus.utils.BotUtils.errorMessage;
+import static com.skyblockplus.utils.BotUtils.getJson;
+import static com.skyblockplus.utils.BotUtils.getJsonKeys;
+import static com.skyblockplus.utils.BotUtils.globalCooldown;
+import static com.skyblockplus.utils.BotUtils.higherDepth;
+import static com.skyblockplus.utils.BotUtils.roundProgress;
+import static com.skyblockplus.utils.BotUtils.roundSkillAverage;
+import static com.skyblockplus.utils.BotUtils.simplifyNumber;
+import static com.skyblockplus.utils.BotUtils.skyblockStatsLink;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.skyblockplus.utils.BotUtils.*;
+import com.google.gson.JsonElement;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.Player;
+
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 
 public class SkillsCommands extends Command {
     private JsonElement levelTables;
 
     public SkillsCommands() {
         this.name = "skills";
-        this.guildOnly = false;
         this.cooldown = globalCooldown;
     }
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = defaultEmbed("Loading...", null);
+        EmbedBuilder eb = defaultEmbed("Loading...");
         Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 
         String content = event.getMessage().getContentRaw();
 
         String[] args = content.split(" ");
         if (args.length <= 2 || args.length > 4) {
-            eb = defaultEmbed(errorMessage(this.name), null);
+            eb = defaultEmbed(errorMessage(this.name));
             ebMessage.editMessage(eb.build()).queue();
             return;
         }
@@ -41,7 +51,7 @@ public class SkillsCommands extends Command {
         levelTables = getJson(
                 "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/leveling.json");
         if (levelTables == null) {
-            eb = defaultEmbed("Error fetching data from github", null);
+            eb = defaultEmbed("Error fetching data from github");
             ebMessage.editMessage(eb.build()).queue();
             return;
         }
@@ -52,7 +62,7 @@ public class SkillsCommands extends Command {
             } else
                 eb = getPlayerSkill(args[2], null);
         } else {
-            eb = defaultEmbed(errorMessage(this.name), null);
+            eb = defaultEmbed(errorMessage(this.name));
             ebMessage.editMessage(eb.build()).queue();
             return;
         }
@@ -95,7 +105,7 @@ public class SkillsCommands extends Command {
                             simplifyNumber(skillInfo.expCurrent) + " / " + simplifyNumber(skillInfo.expForNext)
                                     + "\nTotal XP: " + simplifyNumber(skillInfo.totalSkillExp) + "\nProgress: "
                                     + (skillInfo.skillLevel == skillInfo.maxSkillLevel ? "MAX"
-                                    : roundProgress(skillInfo.progressToNext)),
+                                            : roundProgress(skillInfo.progressToNext)),
                             true);
                     if (!skill.equals("runecrafting") && !skill.equals("carpentry")) {
                         trueSA += skillInfo.skillLevel;
@@ -112,6 +122,6 @@ public class SkillsCommands extends Command {
                     + roundSkillAverage(progressSA));
             return eb;
         }
-        return defaultEmbed("Unable to fetch player data", null);
+        return defaultEmbed("Unable to fetch player data");
     }
 }

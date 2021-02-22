@@ -1,18 +1,22 @@
 package com.skyblockplus.weight;
 
+import static com.skyblockplus.utils.BotUtils.defaultEmbed;
+import static com.skyblockplus.utils.BotUtils.errorMessage;
+import static com.skyblockplus.utils.BotUtils.globalCooldown;
+import static com.skyblockplus.utils.BotUtils.roundSkillAverage;
+import static com.skyblockplus.utils.BotUtils.skyblockStatsLink;
+
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-
-import static com.skyblockplus.utils.BotUtils.*;
 
 public class WeightCommand extends Command {
 
     public WeightCommand() {
         this.name = "weight";
-        this.guildOnly = false;
         this.cooldown = globalCooldown;
     }
 
@@ -26,7 +30,7 @@ public class WeightCommand extends Command {
         String[] args = content.split(" ");
         if (args.length == 6 && args[1].equals("calculate")) {
         } else if (args.length <= 2 || args.length > 4) {
-            eb = defaultEmbed(errorMessage(this.name), null);
+            eb = defaultEmbed(errorMessage(this.name));
             ebMessage.editMessage(eb.build()).queue();
             return;
         }
@@ -39,9 +43,15 @@ public class WeightCommand extends Command {
             } else
                 eb = getPlayerWeight(args[2], null);
         } else if (args[1].equals("calculate")) {
-            eb = calculateWeight(args[2], args[3], args[4], args[5]);
+            try {
+                eb = calculateWeight(args[2], args[3], args[4], args[5]);
+            } catch (Exception e) {
+                eb = defaultEmbed(errorMessage(this.name));
+                ebMessage.editMessage(eb.build()).queue();
+                return;
+            }
         } else {
-            eb = defaultEmbed(errorMessage(this.name), null);
+            eb = defaultEmbed(errorMessage(this.name));
             ebMessage.editMessage(eb.build()).queue();
             return;
         }
@@ -50,21 +60,21 @@ public class WeightCommand extends Command {
     }
 
     private EmbedBuilder calculateWeight(String skillAverage, String slayer, String catacombs,
-                                         String averageDungeonClass) {
+            String averageDungeonClass) {
         try {
             double skillAverageD = Double.parseDouble(skillAverage);
             double slayerD = Double.parseDouble(slayer);
             double catacombsD = Double.parseDouble(catacombs);
             double averageDungeonClassD = Double.parseDouble(averageDungeonClass);
             Weight calculatedWeight = new Weight(skillAverageD, slayerD, catacombsD, averageDungeonClassD);
-            EmbedBuilder eb = defaultEmbed("Weight Calculator", null);
+            EmbedBuilder eb = defaultEmbed("Weight Calculator");
             eb.setDescription("**Total Weight**: " + roundSkillAverage(calculatedWeight.calculateTotalWeight()));
             eb.addField("Slayer Weight", roundSkillAverage(calculatedWeight.calculateSlayerWeight()), false);
             eb.addField("Skills Weight", roundSkillAverage(calculatedWeight.calculateSkillsWeight()), false);
             eb.addField("Dungeons Weight", roundSkillAverage(calculatedWeight.calculateDungeonsWeight()), false);
             return eb;
         } catch (NumberFormatException e) {
-            return defaultEmbed("Invalid input", null);
+            return defaultEmbed("Invalid input");
         }
     }
 
@@ -80,6 +90,6 @@ public class WeightCommand extends Command {
             eb.addField("Dungeons Weight", roundSkillAverage(playerWeight.getDungeonsWeight()), false);
             return eb;
         }
-        return defaultEmbed("Unable to fetch player data", null);
+        return defaultEmbed("Unable to fetch player data");
     }
 }

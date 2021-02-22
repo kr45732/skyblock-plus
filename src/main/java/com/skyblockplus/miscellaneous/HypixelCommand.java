@@ -1,11 +1,16 @@
 package com.skyblockplus.miscellaneous;
 
-import com.google.gson.JsonElement;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.guilds.UsernameUuidStruct;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
+import static com.skyblockplus.utils.BotUtils.HYPIXEL_API_KEY;
+import static com.skyblockplus.utils.BotUtils.capitalizeString;
+import static com.skyblockplus.utils.BotUtils.defaultEmbed;
+import static com.skyblockplus.utils.BotUtils.errorMessage;
+import static com.skyblockplus.utils.BotUtils.formatNumber;
+import static com.skyblockplus.utils.BotUtils.getJson;
+import static com.skyblockplus.utils.BotUtils.getJsonKeys;
+import static com.skyblockplus.utils.BotUtils.globalCooldown;
+import static com.skyblockplus.utils.BotUtils.higherDepth;
+import static com.skyblockplus.utils.BotUtils.roundSkillAverage;
+import static com.skyblockplus.utils.BotUtils.usernameToUuidUsername;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -13,13 +18,18 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Locale;
 
-import static com.skyblockplus.utils.BotUtils.*;
+import com.google.gson.JsonElement;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.guilds.UsernameUuidStruct;
+
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 
 public class HypixelCommand extends Command {
 
     public HypixelCommand() {
         this.name = "hypixel";
-        this.guildOnly = false;
         this.cooldown = globalCooldown;
     }
 
@@ -32,7 +42,7 @@ public class HypixelCommand extends Command {
 
         String[] args = content.split(" ");
         if (args.length != 3) {
-            eb = defaultEmbed(errorMessage(this.name), null);
+            eb = defaultEmbed(errorMessage(this.name));
             ebMessage.editMessage(eb.build()).queue();
             return;
         }
@@ -44,7 +54,7 @@ public class HypixelCommand extends Command {
         } else if (args[1].equals("parkour")) {
             eb = getParkourStats(args[2]);
         } else {
-            eb = defaultEmbed(errorMessage(this.name), null);
+            eb = defaultEmbed(errorMessage(this.name));
             ebMessage.editMessage(eb.build()).queue();
             return;
         }
@@ -61,7 +71,7 @@ public class HypixelCommand extends Command {
                 hypixelJson = higherDepth(hypixelJson, "player");
 
                 try {
-                    EmbedBuilder eb = defaultEmbed("Lobby Parkour for " + usernameUuid.playerUsername, null);
+                    EmbedBuilder eb = defaultEmbed("Lobby Parkour for " + usernameUuid.playerUsername);
                     StringBuilder parkourCompletionString = new StringBuilder();
                     for (String parkourLocation : getJsonKeys(higherDepth(hypixelJson, "parkourCompletions"))) {
                         int fastestTime = -1;
@@ -72,7 +82,8 @@ public class HypixelCommand extends Command {
                             }
                         }
                         if (fastestTime != -1) {
-                            parkourCompletionString.append("• ").append(parkourLocation).append(": ").append(fastestTime / 1000).append("s\n");
+                            parkourCompletionString.append("• ").append(parkourLocation).append(": ")
+                                    .append(fastestTime / 1000).append("s\n");
                         }
                     }
 
@@ -81,11 +92,11 @@ public class HypixelCommand extends Command {
                         return eb;
                     }
                 } catch (Exception ignored) {
-                    return defaultEmbed("Unable to get any completed parkour", null);
+                    return defaultEmbed("Unable to get any completed parkour");
                 }
             }
         }
-        return defaultEmbed("Invalid username", null);
+        return defaultEmbed("Invalid username");
     }
 
     private EmbedBuilder getHypixelStats(String username) {
@@ -96,7 +107,7 @@ public class HypixelCommand extends Command {
             if (higherDepth(hypixelJson, "player") != null) {
                 hypixelJson = higherDepth(hypixelJson, "player");
 
-                EmbedBuilder eb = defaultEmbed("Hypixel Stats for " + usernameUuid.playerUsername, null);
+                EmbedBuilder eb = defaultEmbed("Hypixel Stats for " + usernameUuid.playerUsername);
                 DateTimeFormatter dateTimeFormatter = DateTimeFormatter
                         .ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT).withLocale(Locale.US)
                         .withZone(ZoneId.systemDefault());
@@ -136,7 +147,7 @@ public class HypixelCommand extends Command {
                             higherDepth(higherDepth(hypixelJson, "socialMedia"), "links"))) {
                         String currentSocialMediaLink = higherDepth(
                                 higherDepth(higherDepth(hypixelJson, "socialMedia"), "links"), socialMedia)
-                                .getAsString();
+                                        .getAsString();
                         eb.addField(
                                 socialMedia.equals("HYPIXEL") ? "Hypixel Forums"
                                         : capitalizeString(socialMedia.toLowerCase()),
@@ -184,7 +195,7 @@ public class HypixelCommand extends Command {
                 StringBuilder namesString = new StringBuilder();
                 for (JsonElement name : getJson(
                         "https://api.mojang.com/user/profiles/" + usernameUuid.playerUuid + "/names")
-                        .getAsJsonArray()) {
+                                .getAsJsonArray()) {
                     if (!higherDepth(name, "name").getAsString().equals(usernameUuid.playerUsername)) {
                         namesString.append("• ").append(higherDepth(name, "name").getAsString()).append("\n");
                     }
@@ -197,35 +208,35 @@ public class HypixelCommand extends Command {
                 if (higherDepth(hypixelJson, "skyblock_free_cookie") != null) {
                     skyblockItems += "• Free booster cookie: "
                             + dateFormatterShort.format(
-                            Instant.ofEpochMilli(higherDepth(hypixelJson, "skyblock_free_cookie").getAsLong()))
+                                    Instant.ofEpochMilli(higherDepth(hypixelJson, "skyblock_free_cookie").getAsLong()))
                             + "\n";
                 }
 
                 if (higherDepth(hypixelJson, "scorpius_bribe_96") != null) {
                     skyblockItems += "• Scorpius Bribe (Year 96): "
                             + dateFormatterShort.format(
-                            Instant.ofEpochMilli(higherDepth(hypixelJson, "scorpius_bribe_96").getAsLong()))
+                                    Instant.ofEpochMilli(higherDepth(hypixelJson, "scorpius_bribe_96").getAsLong()))
                             + "\n";
                 }
 
                 if (higherDepth(hypixelJson, "claimed_potato_talisman") != null) {
                     skyblockItems += "• Potato Talisman: "
                             + dateFormatterShort.format(Instant
-                            .ofEpochMilli(higherDepth(hypixelJson, "claimed_potato_talisman").getAsLong()))
+                                    .ofEpochMilli(higherDepth(hypixelJson, "claimed_potato_talisman").getAsLong()))
                             + "\n";
                 }
 
                 if (higherDepth(hypixelJson, "claimed_potato_basket") != null) {
                     skyblockItems += "• Potato Basket: "
                             + dateFormatterShort.format(
-                            Instant.ofEpochMilli(higherDepth(hypixelJson, "claimed_potato_basket").getAsLong()))
+                                    Instant.ofEpochMilli(higherDepth(hypixelJson, "claimed_potato_basket").getAsLong()))
                             + "\n";
                 }
 
                 if (higherDepth(hypixelJson, "claim_potato_war_crown") != null) {
                     skyblockItems += "• Potato War Crown: "
                             + dateFormatterShort.format(Instant
-                            .ofEpochMilli(higherDepth(hypixelJson, "claim_potato_war_crown").getAsLong()))
+                                    .ofEpochMilli(higherDepth(hypixelJson, "claim_potato_war_crown").getAsLong()))
                             + "\n";
                 }
 
@@ -240,6 +251,6 @@ public class HypixelCommand extends Command {
                 return eb;
             }
         }
-        return defaultEmbed("Invalid username", null);
+        return defaultEmbed("Invalid username");
     }
 }

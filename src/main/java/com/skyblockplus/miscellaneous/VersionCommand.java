@@ -1,12 +1,8 @@
 package com.skyblockplus.miscellaneous;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.api.EmbedBuilder;
+import static com.skyblockplus.utils.BotUtils.defaultEmbed;
+import static com.skyblockplus.utils.BotUtils.globalCooldown;
+import static com.skyblockplus.utils.BotUtils.higherDepth;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -16,7 +12,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.skyblockplus.utils.BotUtils.*;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class VersionCommand extends Command {
 
@@ -37,7 +40,7 @@ public class VersionCommand extends Command {
                     .collect(Collectors.toCollection(ArrayList::new));
             int latestVersion = Collections.max(patchVersions);
             JsonElement currentDesc = higherDepth(patchNotes, "" + latestVersion);
-            EmbedBuilder eb = defaultEmbed("Version " + higherDepth(currentDesc, "version").getAsString(), null);
+            EmbedBuilder eb = defaultEmbed("Version " + higherDepth(currentDesc, "version").getAsString());
             eb.setDescription(higherDepth(currentDesc, "description").getAsString());
             eb.setFooter("Released at");
             eb.setTimestamp(Instant.parse(higherDepth(currentDesc, "date").getAsString()));

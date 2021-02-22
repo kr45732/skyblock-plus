@@ -1,21 +1,23 @@
 package com.skyblockplus.dungeons;
 
-import com.google.gson.JsonElement;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.jetbrains.annotations.NotNull;
+import static com.skyblockplus.timeout.MessageTimeout.addMessage;
+import static com.skyblockplus.utils.BotUtils.defaultEmbed;
+import static com.skyblockplus.utils.BotUtils.higherDepth;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.skyblockplus.timeout.MessageTimeout.addMessage;
-import static com.skyblockplus.utils.BotUtils.defaultEmbed;
-import static com.skyblockplus.utils.BotUtils.higherDepth;
+import com.google.gson.JsonElement;
+
+import org.jetbrains.annotations.NotNull;
+
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class EssenceWaiter extends ListenerAdapter {
     private final String itemName;
@@ -45,7 +47,7 @@ public class EssenceWaiter extends ListenerAdapter {
         emojiEssenceMap = essenceEmojiMap.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
 
-        EmbedBuilder eb = defaultEmbed("Essence upgrade for " + itemName.toLowerCase().replace("_", " "), null);
+        EmbedBuilder eb = defaultEmbed("Essence upgrade for " + itemName.toLowerCase().replace("_", " "));
         eb.setDescription("Choose the current item level");
 
         validReactions = new ArrayList<>();
@@ -95,7 +97,7 @@ public class EssenceWaiter extends ListenerAdapter {
                 validReactions.clear();
                 startingLevel = essenceEmojiMap.get(event.getReactionEmote().getName());
                 reactMessage.clearReactions().complete();
-                EmbedBuilder eb = defaultEmbed("Essence upgrade for " + itemName.toLowerCase().replace("_", " "), null);
+                EmbedBuilder eb = defaultEmbed("Essence upgrade for " + itemName.toLowerCase().replace("_", " "));
                 eb.setDescription("Choose the ending item level");
 
                 StringBuilder levelsString = new StringBuilder();
@@ -127,7 +129,7 @@ public class EssenceWaiter extends ListenerAdapter {
                         totalEssence += higherDepth(itemJson, "" + i).getAsInt();
                     }
                 }
-                EmbedBuilder eb = defaultEmbed("Essence upgrade for " + itemName.toLowerCase().replace("_", " "), null);
+                EmbedBuilder eb = defaultEmbed("Essence upgrade for " + itemName.toLowerCase().replace("_", " "));
                 eb.addField(
                         "From " + (startingLevel == -1 ? "not dungeonized"
                                 : startingLevel + (startingLevel == 1 ? " star" : " stars")) + " to " + endingLevel

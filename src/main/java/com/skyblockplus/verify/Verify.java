@@ -1,32 +1,30 @@
 package com.skyblockplus.verify;
 
+import static com.skyblockplus.reload.ReloadEventWatcher.isUniqueVerifyGuild;
+import static com.skyblockplus.utils.BotUtils.getJson;
+import static com.skyblockplus.utils.BotUtils.*;
+
+import java.io.File;
+import java.util.List;
+
 import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
+
+import org.jetbrains.annotations.NotNull;
+
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.jetbrains.annotations.NotNull;
-
-import java.io.File;
-import java.io.FileReader;
-import java.util.List;
-
-import static com.skyblockplus.reload.ReloadEventWatcher.isUniqueVerifyGuild;
-import static com.skyblockplus.utils.BotUtils.higherDepth;
 
 public class Verify extends ListenerAdapter {
     @Override
     public void onGuildReady(@NotNull GuildReadyEvent event) {
         try {
-            JsonElement settings = JsonParser
-                    .parseReader(new FileReader("src/main/java/com/skyblockplus/json/GuildSettings.json"));
-            if (higherDepth(settings, event.getGuild().getId()) != null) {
-                if (higherDepth(higherDepth(higherDepth(settings, event.getGuild().getId()), "automatedVerify"),
-                        "enable").getAsBoolean()) {
+            JsonElement currentSettings = getJson(
+                    API_BASE_URL + "api/discord/serverSettings/get/verify?serverId=" + event.getGuild().getId());
+            if (currentSettings != null) {
+                if (higherDepth(currentSettings, "enable").getAsBoolean()) {
                     if (isUniqueVerifyGuild(event.getGuild().getId())) {
-                        JsonElement currentSettings = higherDepth(higherDepth(settings, event.getGuild().getId()),
-                                "automatedVerify");
                         TextChannel reactChannel = event.getGuild()
                                 .getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
 
@@ -44,6 +42,8 @@ public class Verify extends ListenerAdapter {
 
                         event.getJDA().addEventListener(new VerifyGuild(reactMessage, currentSettings));
                     }
+                } else {
+                    event.getJDA().addEventListener(new VerifyGuild(event.getGuild().getId(), currentSettings));
                 }
             }
         } catch (Exception ignored) {

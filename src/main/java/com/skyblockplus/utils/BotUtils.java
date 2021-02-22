@@ -1,18 +1,10 @@
 package com.skyblockplus.utils;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.skyblockplus.guilds.UsernameUuidStruct;
-import net.dv8tion.jda.api.EmbedBuilder;
-
-import java.awt.*;
+import java.awt.Color;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.RoundingMode;
-import java.net.URL;
-import java.net.URLConnection;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.Instant;
@@ -22,6 +14,26 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.skyblockplus.guilds.UsernameUuidStruct;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class BotUtils {
     public static final Color botColor = new Color(9, 92, 13);
@@ -34,6 +46,10 @@ public class BotUtils {
     public static String DATABASE_URL = "";
     public static String DATABASE_USERNAME = "";
     public static String DATABASE_PASSWORD = "";
+    public static String API_USERNAME = "";
+    public static String API_PASSWORD = "";
+    public static String API_BASE_URL = "";
+    private static String GITHUB_TOKEN = "";
     private static int remainingLimit = 120;
     private static int timeTillReset = 60;
 
@@ -51,6 +67,10 @@ public class BotUtils {
             DATABASE_PASSWORD = database_url_unformatted[2].split("@")[0];
             DATABASE_URL = "jdbc:postgresql://" + database_url_unformatted[2].split("@")[1] + "?sslmode=require&user="
                     + DATABASE_USERNAME + "&password=" + DATABASE_PASSWORD;
+            GITHUB_TOKEN = (String) appProps.get("GITHUB_TOKEN");
+            API_USERNAME = (String) appProps.get("API_USERNAME");
+            API_PASSWORD = (String) appProps.get("API_PASSWORD");
+            API_BASE_URL = (String) appProps.get("API_BASE_URL");
         } catch (IOException e) {
             BOT_PREFIX = System.getenv("BOT_PREFIX");
             HYPIXEL_API_KEY = System.getenv("HYPIXEL_API_KEY");
@@ -62,6 +82,10 @@ public class BotUtils {
             DATABASE_PASSWORD = database_url_unformatted[2].split("@")[0];
             DATABASE_URL = "jdbc:postgresql://" + database_url_unformatted[2].split("@")[1] + "?sslmode=require&user="
                     + DATABASE_USERNAME + "&password=" + DATABASE_PASSWORD;
+            GITHUB_TOKEN = System.getenv("GITHUB_TOKEN");
+            API_USERNAME = System.getenv("API_USERNAME");
+            API_PASSWORD = System.getenv("API_PASSWORD");
+            API_BASE_URL = System.getenv("API_BASE_URL");
         }
     }
 
@@ -79,17 +103,55 @@ public class BotUtils {
                 TimeUnit.SECONDS.sleep(timeTillReset);
                 System.out.println("Sleeping for " + timeTillReset + " seconds");
             }
-            URLConnection request = new URL(jsonUrl).openConnection();
-            request.connect();
-            if (jsonUrl.toLowerCase().contains("api.hypixel.net")) {
-                remainingLimit = Integer.parseInt(request.getHeaderField("RateLimit-Remaining"));
-                timeTillReset = Integer.parseInt(request.getHeaderField("RateLimit-Reset"));
+
+            CloseableHttpClient httpclient;
+            if (jsonUrl.contains(API_BASE_URL)) {
+                CredentialsProvider provider = new BasicCredentialsProvider();
+                UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(API_USERNAME, API_PASSWORD);
+                provider.setCredentials(AuthScope.ANY, credentials);
+                httpclient = HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
+            } else {
+                httpclient = HttpClientBuilder.create().build();
             }
-            return JsonParser.parseReader(new InputStreamReader(request.getInputStream()));
+
+            HttpGet httpget = new HttpGet(jsonUrl);
+            if (jsonUrl.contains("raw.githubusercontent.com")) {
+                httpget.setHeader("Authorization", "token " + GITHUB_TOKEN);
+            }
+
+            HttpResponse httpresponse = httpclient.execute(httpget);
+            if (jsonUrl.toLowerCase().contains("api.hypixel.net")) {
+                remainingLimit = Integer.parseInt(httpresponse.getFirstHeader("RateLimit-Remaining").getValue());
+                timeTillReset = Integer.parseInt(httpresponse.getFirstHeader("RateLimit-Reset").getValue());
+            }
+
+            return JsonParser.parseReader(new InputStreamReader(httpresponse.getEntity().getContent()));
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static int postJson(String jsonUrl, Object postObject) {
+        try {
+            CredentialsProvider provider = new BasicCredentialsProvider();
+            UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(API_USERNAME, API_PASSWORD);
+            provider.setCredentials(AuthScope.ANY, credentials);
+
+            CloseableHttpClient client = HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
+
+            HttpPost httpPost = new HttpPost(jsonUrl);
+            StringEntity entity = new StringEntity((new Gson()).toJson(postObject));
+            httpPost.setEntity(entity);
+            httpPost.addHeader("content-type", "application/json");
+
+            CloseableHttpResponse response = client.execute(httpPost);
+            client.close();
+            return response.getStatusLine().getStatusCode();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return -1;
     }
 
     public static String errorMessage(String name) {
@@ -137,6 +199,10 @@ public class BotUtils {
         eb.setTitle(title, titleUrl);
         eb.setTimestamp(Instant.now());
         return eb;
+    }
+
+    public static EmbedBuilder defaultEmbed(String title) {
+        return defaultEmbed(title, null);
     }
 
     public static String fixUsername(String username) {
@@ -206,9 +272,9 @@ public class BotUtils {
         try {
             String discordID = higherDepth(
                     higherDepth(higherDepth(higherDepth(playerJson, "player"), "socialMedia"), "links"), "DISCORD")
-                    .getAsString();
-            return new String[]{discordID,
-                    higherDepth(higherDepth(playerJson, "player"), "displayname").getAsString()};
+                            .getAsString();
+            return new String[] { discordID,
+                    higherDepth(higherDepth(playerJson, "player"), "displayname").getAsString() };
         } catch (Exception e) {
             return null;
         }

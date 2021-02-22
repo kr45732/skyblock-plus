@@ -1,30 +1,29 @@
 package com.skyblockplus.reload;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.skyblockplus.apply.ApplyGuild;
-import com.skyblockplus.verify.VerifyGuild;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.ReadyEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.utils.BotUtils.defaultEmbed;
+import static com.skyblockplus.utils.BotUtils.getJson;
+import static com.skyblockplus.utils.BotUtils.*;
 
 import java.io.File;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.skyblockplus.utils.BotUtils.defaultEmbed;
-import static com.skyblockplus.utils.BotUtils.higherDepth;
+import com.google.gson.JsonElement;
+import com.skyblockplus.apply.ApplyGuild;
+import com.skyblockplus.verify.VerifyGuild;
+
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class ReloadEventWatcher extends ListenerAdapter {
     private static final Map<String, ReloadEventWatcherClass> applyGuildEventListeners = new HashMap<>();
     private static final Map<String, ReloadEventWatcherClass> verifyGuildEventListeners = new HashMap<>();
-    private static JDA jda;
 
     public static boolean isUniqueApplyGuild(String guildId) {
         return !applyGuildEventListeners.containsKey(guildId);
@@ -46,6 +45,7 @@ public class ReloadEventWatcher extends ListenerAdapter {
 
     public static void removeApplyDeletedEventListeners() {
         List<Object> registeredListeners = jda.getRegisteredListeners();
+        System.out.println(registeredListeners);
         for (ReloadEventWatcherClass currentGuild : applyGuildEventListeners.values()) {
             String currentGuildId = currentGuild.getGuildId();
             List<Object> currentApplySubListeners = currentGuild.getSubEventListeners();
@@ -66,17 +66,11 @@ public class ReloadEventWatcher extends ListenerAdapter {
         try {
             ReloadEventWatcherClass applyGuildListenerObject = applyGuildEventListeners.get(guildId);
             if (applyGuildListenerObject.getSubEventListeners().size() == 0) {
-                jda.removeEventListener(applyGuildListenerObject.getGuildEventListener());
-                applyGuildEventListeners.remove(guildId);
 
-                JsonElement settings = JsonParser
-                        .parseReader(new FileReader("src/main/java/com/skyblockplus/json/GuildSettings.json"));
-                if (higherDepth(settings, guildId) != null) {
-                    if (higherDepth(higherDepth(higherDepth(settings, guildId), "automatedApplication"), "enable")
-                            .getAsBoolean()) {
-                        JsonElement currentSettings = higherDepth(higherDepth(settings, guildId),
-                                "automatedApplication");
-
+                JsonElement currentSettings = getJson(
+                        API_BASE_URL + "api/discord/serverSettings/get/apply?serverId=" + guildId);
+                if (currentSettings != null) {
+                    if (higherDepth(currentSettings, "enable").getAsBoolean()) {
                         TextChannel reactChannel = jda.getGuildById(guildId)
                                 .getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
 
@@ -85,10 +79,13 @@ public class ReloadEventWatcher extends ListenerAdapter {
                         List<Message> deleteMessages = reactChannel.getHistory().retrievePast(25).complete();
                         reactChannel.deleteMessages(deleteMessages).complete();
 
-                        EmbedBuilder eb = defaultEmbed("Apply For Guild", null);
+                        EmbedBuilder eb = defaultEmbed("Apply For Guild");
                         eb.setDescription(higherDepth(currentSettings, "messageText").getAsString());
                         Message reactMessage = reactChannel.sendMessage(eb.build()).complete();
                         reactMessage.addReaction("✅").queue();
+
+                        jda.removeEventListener(applyGuildListenerObject.getGuildEventListener());
+                        applyGuildEventListeners.remove(guildId);
 
                         jda.addEventListener(new ApplyGuild(reactMessage, currentSettings));
 
@@ -148,13 +145,10 @@ public class ReloadEventWatcher extends ListenerAdapter {
                 jda.removeEventListener(verifyGuildListenerObject.getGuildEventListener());
                 verifyGuildEventListeners.remove(guildId);
 
-                JsonElement settings = JsonParser
-                        .parseReader(new FileReader("src/main/java/com/skyblockplus/json/GuildSettings.json"));
-                if (higherDepth(settings, guildId) != null) {
-                    if (higherDepth(higherDepth(higherDepth(settings, guildId), "automatedVerify"), "enable")
-                            .getAsBoolean()) {
-                        JsonElement currentSettings = higherDepth(higherDepth(settings, guildId), "automatedVerify");
-
+                JsonElement currentSettings = getJson(
+                        API_BASE_URL + "api/discord/serverSettings/get/verify?serverId=" + guildId);
+                if (currentSettings != null) {
+                    if (higherDepth(currentSettings, "enable").getAsBoolean()) {
                         TextChannel reactChannel = jda.getGuildById(guildId)
                                 .getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
 
@@ -173,7 +167,6 @@ public class ReloadEventWatcher extends ListenerAdapter {
                         jda.addEventListener(new VerifyGuild(reactMessage, currentSettings));
 
                         return "Verify settings successfully reloaded";
-
                     }
                 }
             } else {

@@ -19,8 +19,18 @@ public class VerifyGuild extends ListenerAdapter {
         addVerifyGuild(reactMessage.getGuild().getId(), this);
     }
 
+    public VerifyGuild(String guildId, JsonElement currentSettings) {
+        this.reactMessage = null;
+        this.currentSettings = currentSettings;
+        addVerifyGuild(guildId, this);
+    }
+
     @Override
     public void onMessageReactionAdd(@NotNull MessageReactionAddEvent event) {
+        if (reactMessage == null) {
+            return;
+        }
+
         if (event.getUser().isBot()) {
             return;
         }

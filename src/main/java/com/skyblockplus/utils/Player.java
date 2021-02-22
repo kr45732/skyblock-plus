@@ -430,7 +430,7 @@ public class Player {
         return 0;
     }
 
-    public JsonElement getProfileJson(){
+    public JsonElement getProfileJson() {
         return profileJson;
     }
 
@@ -587,6 +587,11 @@ public class Player {
     }
 
     public double getDungeonClassLevel(String className) {
+        if (this.levelTables == null) {
+            this.levelTables = getJson(
+                    "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/leveling.json");
+        }
+
         SkillsStruct dungeonClassLevel = skillInfoFromExp(getDungeonClassXp(className), "catacombs");
         return dungeonClassLevel.skillLevel + dungeonClassLevel.progressToNext;
     }

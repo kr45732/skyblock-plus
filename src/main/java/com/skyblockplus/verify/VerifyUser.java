@@ -1,6 +1,18 @@
 package com.skyblockplus.verify;
 
+import static com.skyblockplus.reload.ReloadEventWatcher.addVerifySubEventListener;
+import static com.skyblockplus.timeout.ChannelDeleter.addChannel;
+import static com.skyblockplus.timeout.ChannelDeleter.removeChannel;
+import static com.skyblockplus.timeout.EventListenerDeleter.addEventListener;
+import static com.skyblockplus.utils.BotUtils.defaultEmbed;
+import static com.skyblockplus.utils.BotUtils.getPlayerDiscordInfo;
+import static com.skyblockplus.utils.BotUtils.higherDepth;
+
+import java.util.EnumSet;
+import java.util.concurrent.TimeUnit;
+
 import com.google.gson.JsonElement;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
@@ -9,14 +21,6 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-
-import java.util.EnumSet;
-import java.util.concurrent.TimeUnit;
-
-import static com.skyblockplus.reload.ReloadEventWatcher.addVerifySubEventListener;
-import static com.skyblockplus.timeout.ChannelDeleter.addChannel;
-import static com.skyblockplus.timeout.ChannelDeleter.removeChannel;
-import static com.skyblockplus.utils.BotUtils.*;
 
 public class VerifyUser extends ListenerAdapter {
     final User verifyingUser;
@@ -43,7 +47,7 @@ public class VerifyUser extends ListenerAdapter {
         verifyChannel.sendMessage("Welcome " + verifyingUser.getAsMention() + "!").queue();
 
         addChannel(verifyChannel);
-        EmbedBuilder welcomeEb = defaultEmbed("Verification for " + verifyingUser.getName(), null);
+        EmbedBuilder welcomeEb = defaultEmbed("Verification for " + verifyingUser.getName());
         welcomeEb.setDescription("• Please enter your in-game-name.\n• Ex: CrypticPlasma\n");
         welcomeEb.addField("To submit your LAST message,", "React with ✅", true);
         welcomeEb.addField("To cancel the verification,", "React with ❌", true);
@@ -52,6 +56,7 @@ public class VerifyUser extends ListenerAdapter {
         reactMessage.addReaction("❌").queue();
 
         addVerifySubEventListener(this.reactMessage.getGuild().getId(), this);
+        addEventListener(this.reactMessage.getGuild().getId(), this.reactMessage.getChannel().getId(), this);
 
     }
 
@@ -88,7 +93,7 @@ public class VerifyUser extends ListenerAdapter {
 
                         if (playerInfo != null) {
                             if (verifyingUser.getAsTag().equals(playerInfo[0])) {
-                                EmbedBuilder eb = defaultEmbed("Verification successful!", null);
+                                EmbedBuilder eb = defaultEmbed("Verification successful!");
                                 eb.setDescription("**You have successfully been verified as " + playerInfo[1]
                                         + "**\nChannel closing in 30 seconds...");
                                 verifyChannel.sendMessage(eb.build()).queue();
@@ -103,7 +108,7 @@ public class VerifyUser extends ListenerAdapter {
                                 event.getJDA().removeEventListener(this);
                                 break;
                             }
-                            EmbedBuilder eb = defaultEmbed("Discord tag mismatch", null);
+                            EmbedBuilder eb = defaultEmbed("Discord tag mismatch");
                             eb.setDescription("Account " + playerInfo[1] + " is linked with the discord tag "
                                     + playerInfo[0] + "\nYour current discord tag is " + verifyingUser.getAsTag());
                             eb.addField("To retry,", "React with ✅", true);
@@ -114,7 +119,7 @@ public class VerifyUser extends ListenerAdapter {
                             state = 2;
                             break;
                         }
-                        EmbedBuilder eb = defaultEmbed("Invalid Arguments / Username", null);
+                        EmbedBuilder eb = defaultEmbed("Invalid Arguments / Username");
                         eb.setDescription("**Please check your input!**");
                         eb.addField("Argument(s) given:", messageReply.getContentDisplay(), true);
                         eb.addField("Valid Argument Example:", "CrypticPlasma", true);
@@ -123,7 +128,7 @@ public class VerifyUser extends ListenerAdapter {
                         eb.addField("To cancel the verification,", "React with ❌", true);
                         eb.addBlankField(true);
                     }
-                    EmbedBuilder invalidEmbed = defaultEmbed("Invalid arguments", null);
+                    EmbedBuilder invalidEmbed = defaultEmbed("Invalid arguments");
                     invalidEmbed.setDescription("**Please check your input!**");
                     invalidEmbed.addField("Argument(s) given:", messageReply.getContentDisplay(), true);
                     invalidEmbed.addField("Valid Arguments Example:", "• CrypticPlasma", true);
@@ -137,7 +142,7 @@ public class VerifyUser extends ListenerAdapter {
                     state = 2;
                     break;
                 }
-                EmbedBuilder invalidEb = defaultEmbed("Invalid Arguments", null);
+                EmbedBuilder invalidEb = defaultEmbed("Invalid Arguments");
                 invalidEb.setDescription("**Unable to get latest message**");
                 invalidEb.addField("To retry,", "React with ✅", true);
                 invalidEb.addField("To cancel the verification,", "React with ❌", true);
@@ -147,7 +152,7 @@ public class VerifyUser extends ListenerAdapter {
                 state = 2;
                 break;
             case 2:
-                EmbedBuilder eb2 = defaultEmbed("Verification for " + verifyingUser.getName(), null);
+                EmbedBuilder eb2 = defaultEmbed("Verification for " + verifyingUser.getName());
                 eb2.setDescription("• Please enter your in-game-name.\n• Ex: CrypticPlasma\n");
                 eb2.addField("To submit your LAST message,", "React with ✅", true);
                 eb2.addField("To cancel the verification,", "React with ❌", true);
@@ -157,7 +162,7 @@ public class VerifyUser extends ListenerAdapter {
                 state = 0;
                 break;
             case 4:
-                EmbedBuilder eb4 = defaultEmbed("Canceling verification", null);
+                EmbedBuilder eb4 = defaultEmbed("Canceling verification");
                 eb4.setDescription("Channel closing in 5 seconds...");
                 verifyChannel.sendMessage(eb4.build()).queue();
                 event.getJDA().removeEventListener(this);

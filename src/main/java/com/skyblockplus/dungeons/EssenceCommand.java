@@ -1,35 +1,41 @@
 package com.skyblockplus.dungeons;
 
+import static com.skyblockplus.utils.BotUtils.capitalizeString;
+import static com.skyblockplus.utils.BotUtils.defaultEmbed;
+import static com.skyblockplus.utils.BotUtils.errorMessage;
+import static com.skyblockplus.utils.BotUtils.getJson;
+import static com.skyblockplus.utils.BotUtils.getJsonKeys;
+import static com.skyblockplus.utils.BotUtils.globalCooldown;
+import static com.skyblockplus.utils.BotUtils.higherDepth;
+
+import java.util.Locale;
+
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 
-import java.util.Locale;
-
-import static com.skyblockplus.utils.BotUtils.*;
-
 public class EssenceCommand extends Command {
 
     public EssenceCommand() {
         this.name = "essence";
-        this.guildOnly = false;
         this.cooldown = globalCooldown;
     }
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = defaultEmbed("Loading...", null);
+        EmbedBuilder eb = defaultEmbed("Loading...");
         Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 
         String content = event.getMessage().getContentRaw();
 
         String[] args = content.split(" ");
         if (args.length < 3) {
-            eb = defaultEmbed(errorMessage(this.name), null);
+            eb = defaultEmbed(errorMessage(this.name));
             ebMessage.editMessage(eb.build()).queue();
             return;
         }
@@ -49,26 +55,26 @@ public class EssenceCommand extends Command {
             if (itemJson != null) {
                 jda.addEventListener(new EssenceWaiter(itemName, itemJson, ebMessage, user));
             } else {
-                eb = defaultEmbed("Invalid item name", null);
+                eb = defaultEmbed("Invalid item name");
                 ebMessage.editMessage(eb.build()).queue();
             }
             return;
         } else if (args[1].equals("info") || args[1].equals("information")) {
             eb = getEssenceInformation(itemName, essenceCostsJson);
             if (eb == null) {
-                eb = defaultEmbed("Invalid item name", null);
+                eb = defaultEmbed("Invalid item name");
             }
             ebMessage.editMessage(eb.build()).queue();
             return;
         }
-        eb = defaultEmbed(errorMessage(this.name), null);
+        eb = defaultEmbed(errorMessage(this.name));
         ebMessage.editMessage(eb.build()).queue();
 
     }
 
     private EmbedBuilder getEssenceInformation(String itemName, JsonElement essenceCostsJson) {
         JsonElement itemJson = higherDepth(essenceCostsJson, itemName);
-        EmbedBuilder eb = defaultEmbed("Essence information for " + itemName.toLowerCase().replace("_", " "), null);
+        EmbedBuilder eb = defaultEmbed("Essence information for " + itemName.toLowerCase().replace("_", " "));
         if (itemJson != null) {
             String essenceType = higherDepth(itemJson, "type").getAsString().toLowerCase(Locale.ROOT);
             for (String level : getJsonKeys(itemJson)) {

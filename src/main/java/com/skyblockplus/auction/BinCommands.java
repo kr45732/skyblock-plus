@@ -1,10 +1,13 @@
 package com.skyblockplus.auction;
 
-import com.google.gson.JsonElement;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
+import static com.skyblockplus.utils.BotUtils.BOT_PREFIX;
+import static com.skyblockplus.utils.BotUtils.capitalizeString;
+import static com.skyblockplus.utils.BotUtils.defaultEmbed;
+import static com.skyblockplus.utils.BotUtils.errorMessage;
+import static com.skyblockplus.utils.BotUtils.formatNumber;
+import static com.skyblockplus.utils.BotUtils.getJson;
+import static com.skyblockplus.utils.BotUtils.globalCooldown;
+import static com.skyblockplus.utils.BotUtils.higherDepth;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,19 +16,23 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import static com.skyblockplus.utils.BotUtils.*;
+import com.google.gson.JsonElement;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 
 public class BinCommands extends Command {
 
     public BinCommands() {
         this.name = "bin";
-        this.guildOnly = false;
         this.cooldown = globalCooldown;
     }
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = defaultEmbed("Loading...", null);
+        EmbedBuilder eb = defaultEmbed("Loading...");
 
         String args = event.getMessage().getContentRaw();
         Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
@@ -134,7 +141,7 @@ public class BinCommands extends Command {
 
         JsonElement lowestBinJson = getJson("https://moulberry.codes/lowestbin.json");
         if (higherDepth(lowestBinJson, preFormattedItem) != null) {
-            EmbedBuilder eb = defaultEmbed("Lowest bin", null);
+            EmbedBuilder eb = defaultEmbed("Lowest bin");
             eb.addField(capitalizeString(item.toLowerCase()),
                     formatNumber(higherDepth(lowestBinJson, preFormattedItem).getAsLong()), false);
             return eb;
@@ -163,13 +170,13 @@ public class BinCommands extends Command {
                     int enchantLevel = Integer.parseInt(preFormattedItem.replaceAll("\\D+", ""));
                     enchantName = i.toLowerCase().replace("_", " ") + " " + enchantLevel;
                     formattedName = i + ";" + enchantLevel;
-                    EmbedBuilder eb = defaultEmbed("Lowest bin", null);
+                    EmbedBuilder eb = defaultEmbed("Lowest bin");
                     eb.addField(capitalizeString(enchantName),
                             formatNumber(higherDepth(lowestBinJson, formattedName).getAsLong()), false);
                     return eb;
                 } catch (NumberFormatException e) {
                     try {
-                        EmbedBuilder eb = defaultEmbed("Lowest bin", null);
+                        EmbedBuilder eb = defaultEmbed("Lowest bin");
                         for (int j = 10; j > 0; j--) {
                             try {
                                 formattedName = i + ";" + j;
@@ -182,14 +189,14 @@ public class BinCommands extends Command {
                             }
                         }
                         if (eb.getFields().size() == 0) {
-                            return defaultEmbed("No bin found for " + capitalizeString(item.toLowerCase()), null);
+                            return defaultEmbed("No bin found for " + capitalizeString(item.toLowerCase()));
                         }
                         return eb;
                     } catch (NullPointerException ex) {
-                        return defaultEmbed("No bin found for " + capitalizeString(item.toLowerCase()), null);
+                        return defaultEmbed("No bin found for " + capitalizeString(item.toLowerCase()));
                     }
                 } catch (NullPointerException e) {
-                    return defaultEmbed("No bin found for " + capitalizeString(item.toLowerCase()), null);
+                    return defaultEmbed("No bin found for " + capitalizeString(item.toLowerCase()));
                 }
             }
         }
@@ -220,13 +227,13 @@ public class BinCommands extends Command {
                         }
                     }
                 }
-                EmbedBuilder eb = defaultEmbed("Lowest bin", null);
+                EmbedBuilder eb = defaultEmbed("Lowest bin");
                 eb.addField(capitalizeString(petName) + " pet",
                         formatNumber(higherDepth(lowestBinJson, formattedName).getAsLong()), false);
                 return eb;
             }
         }
 
-        return defaultEmbed("No bin found for " + capitalizeString(item.toLowerCase()), null);
+        return defaultEmbed("No bin found for " + capitalizeString(item.toLowerCase()));
     }
 }

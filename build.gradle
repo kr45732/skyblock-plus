@@ -51,6 +51,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     runtimeOnly 'org.postgresql:postgresql'
 
+    // Apache
+    implementation 'org.apache.httpcomponents:httpclient:4.5.13'
+
     // Misc
     implementation "ch.qos.logback:logback-classic:1.2.3"
 }

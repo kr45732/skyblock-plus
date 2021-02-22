@@ -1,31 +1,36 @@
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.BotUtils.defaultEmbed;
+import static com.skyblockplus.utils.BotUtils.errorMessage;
+import static com.skyblockplus.utils.BotUtils.globalCooldown;
+import static com.skyblockplus.utils.BotUtils.roundSkillAverage;
+import static com.skyblockplus.utils.BotUtils.simplifyNumber;
+import static com.skyblockplus.utils.BotUtils.skyblockStatsLink;
+
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-
-import static com.skyblockplus.utils.BotUtils.*;
 
 public class StatsCommand extends Command {
 
     public StatsCommand() {
         this.name = "stats";
-        this.guildOnly = false;
         this.cooldown = globalCooldown;
     }
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = defaultEmbed("Loading...", null);
+        EmbedBuilder eb = defaultEmbed("Loading...");
         Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 
         String content = event.getMessage().getContentRaw();
 
         String[] args = content.split(" ");
         if (args.length <= 2 || args.length > 4) {
-            eb = defaultEmbed(errorMessage(this.name), null);
+            eb = defaultEmbed(errorMessage(this.name));
             ebMessage.editMessage(eb.build()).queue();
             return;
         }
@@ -38,7 +43,7 @@ public class StatsCommand extends Command {
             } else
                 eb = getPlayerStats(args[2], null);
         } else {
-            eb = defaultEmbed(errorMessage(this.name), null);
+            eb = defaultEmbed(errorMessage(this.name));
             ebMessage.editMessage(eb.build()).queue();
             return;
         }
@@ -66,6 +71,6 @@ public class StatsCommand extends Command {
             eb.addField("Skill Average", roundSkillAverage(skillAverage), true);
             return eb;
         }
-        return defaultEmbed("Unable to fetch player data", null);
+        return defaultEmbed("Unable to fetch player data");
     }
 }

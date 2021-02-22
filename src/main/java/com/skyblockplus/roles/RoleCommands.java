@@ -1,11 +1,11 @@
 package com.skyblockplus.roles;
 
-import com.google.gson.*;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.utils.Player;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.*;
+import static com.skyblockplus.utils.BotUtils.HYPIXEL_API_KEY;
+import static com.skyblockplus.utils.BotUtils.defaultEmbed;
+import static com.skyblockplus.utils.BotUtils.errorMessage;
+import static com.skyblockplus.utils.BotUtils.getJson;
+import static com.skyblockplus.utils.BotUtils.higherDepth;
+import static com.skyblockplus.utils.BotUtils.skyblockStatsLink;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -16,7 +16,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.skyblockplus.utils.BotUtils.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.Player;
+
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
 
 public class RoleCommands extends Command {
 
@@ -27,7 +41,7 @@ public class RoleCommands extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = defaultEmbed("Loading...", null);
+        EmbedBuilder eb = defaultEmbed("Loading...");
         eb.setDescription("**NOTE: This may take some time**");
 
         String content = event.getMessage().getContentRaw();
@@ -47,7 +61,7 @@ public class RoleCommands extends Command {
         System.out.println(content);
 
         if (getPlayerInfo(args[2]) == null) {
-            eb = defaultEmbed("Discord tag mismatch", null);
+            eb = defaultEmbed("Discord tag mismatch");
             eb.setDescription("Unable to get Discord tag linked with Hypixel account");
             ebMessage.editMessage(eb.build()).queue();
             return;
@@ -55,7 +69,7 @@ public class RoleCommands extends Command {
         DiscordStruct playerInfo = getPlayerInfo(args[2]);
 
         if (!user.getAsTag().equals(playerInfo.discordTag)) {
-            eb = defaultEmbed("Discord tag mismatch", null);
+            eb = defaultEmbed("Discord tag mismatch");
             eb.setDescription("Account **" + playerInfo.username + "** is linked with the discord tag `"
                     + playerInfo.discordTag + "`\nYour current discord tag is `" + user.getAsTag() + "`");
             ebMessage.editMessage(eb.build()).queue();
@@ -66,7 +80,7 @@ public class RoleCommands extends Command {
         String profileName = args.length == 4 ? args[3] : null;
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (!player.isValid()) {
-            eb = defaultEmbed("Error fetching data", null);
+            eb = defaultEmbed("Error fetching data");
             eb.setDescription("**Please check given username and profile**");
             ebMessage.editMessage(eb.build()).queue();
             return;
@@ -79,7 +93,7 @@ public class RoleCommands extends Command {
                 if (higherDepth(settings, guild.getId()) != null) {
                     JsonElement rolesJson = higherDepth(higherDepth(settings, guild.getId()), "automated_roles");
                     if (!higherDepth(rolesJson, "enable").getAsBoolean()) {
-                        eb = defaultEmbed("Automatic roles not enabled for this server", null);
+                        eb = defaultEmbed("Automatic roles not enabled for this server");
                         ebMessage.editMessage(eb.build()).queue();
                         return;
                     }
@@ -138,7 +152,7 @@ public class RoleCommands extends Command {
                                 for (int i = 0; i < currentSlayerLevels.size(); i++) {
                                     long levelSlayerXp = higherDepth(
                                             higherDepth(currentRole, "" + currentSlayerLevels.get(i)), "xp")
-                                            .getAsLong();
+                                                    .getAsLong();
                                     if (slayerPlayer >= levelSlayerXp) {
                                         Role playerSlayerLevelRole = guild.getRoleById(
                                                 higherDepth(higherDepth(currentRole, "" + currentSlayerLevels.get(i)),
@@ -336,8 +350,8 @@ public class RoleCommands extends Command {
                                 break;
                             }
                             case "doom_slayer": {
-                                int[] curSlayer = new int[]{player.getWolfXp(), player.getZombieXp(),
-                                        player.getSpiderXp()};
+                                int[] curSlayer = new int[] { player.getWolfXp(), player.getZombieXp(),
+                                        player.getSpiderXp() };
                                 Role curRole = guild.getRoleById(higherDepth(currentRole, "id").getAsString());
                                 boolean shouldHaveDoomSlayer = false;
                                 for (int curType : curSlayer) {
@@ -415,13 +429,13 @@ public class RoleCommands extends Command {
                     }
                     eb.setTimestamp(Instant.now());
                 } else {
-                    eb = defaultEmbed("Error fetching server's settings", null);
+                    eb = defaultEmbed("Error fetching server's settings");
                 }
             } catch (JsonIOException | JsonSyntaxException | FileNotFoundException e) {
-                eb = defaultEmbed("Error fetching data", null);
+                eb = defaultEmbed("Error fetching data");
             }
         } else {
-            eb = defaultEmbed(errorMessage(this.name), null);
+            eb = defaultEmbed(errorMessage(this.name));
             eb.setDescription("");
             ebMessage.editMessage(eb.build()).queue();
             return;
@@ -447,7 +461,7 @@ public class RoleCommands extends Command {
         try {
             String discordID = higherDepth(
                     higherDepth(higherDepth(higherDepth(playerJson, "player"), "socialMedia"), "links"), "DISCORD")
-                    .getAsString();
+                            .getAsString();
             return new DiscordStruct(discordID,
                     higherDepth(higherDepth(playerJson, "player"), "displayname").getAsString());
         } catch (Exception e) {

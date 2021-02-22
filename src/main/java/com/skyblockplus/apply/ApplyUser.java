@@ -1,7 +1,22 @@
 package com.skyblockplus.apply;
 
+import static com.skyblockplus.reload.ReloadEventWatcher.addApplySubEventListener;
+import static com.skyblockplus.timeout.ChannelDeleter.addChannel;
+import static com.skyblockplus.timeout.ChannelDeleter.removeChannel;
+import static com.skyblockplus.timeout.EventListenerDeleter.addEventListener;
+import static com.skyblockplus.utils.BotUtils.defaultEmbed;
+import static com.skyblockplus.utils.BotUtils.formatNumber;
+import static com.skyblockplus.utils.BotUtils.getPlayerDiscordInfo;
+import static com.skyblockplus.utils.BotUtils.higherDepth;
+import static com.skyblockplus.utils.BotUtils.roundSkillAverage;
+import static com.skyblockplus.utils.BotUtils.skyblockStatsLink;
+
+import java.util.EnumSet;
+import java.util.concurrent.TimeUnit;
+
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
@@ -10,14 +25,6 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-
-import java.util.EnumSet;
-import java.util.concurrent.TimeUnit;
-
-import static com.skyblockplus.reload.ReloadEventWatcher.addApplySubEventListener;
-import static com.skyblockplus.timeout.ChannelDeleter.addChannel;
-import static com.skyblockplus.timeout.ChannelDeleter.removeChannel;
-import static com.skyblockplus.utils.BotUtils.*;
 
 public class ApplyUser extends ListenerAdapter {
     private final User applyingUser;
@@ -45,7 +52,7 @@ public class ApplyUser extends ListenerAdapter {
         addChannel(this.applicationChannel);
         this.applicationChannel.sendMessage("Welcome " + applyingUser.getAsMention() + "!").complete();
 
-        EmbedBuilder welcomeEb = defaultEmbed("Application for " + applyingUser.getName(), null);
+        EmbedBuilder welcomeEb = defaultEmbed("Application for " + applyingUser.getName());
         welcomeEb.setDescription(
                 "• Please enter your in-game-name **optionally** followed by the skyblock profile you want to apply with.\n• Ex: CrypticPlasma **OR** CrypticPlasma Zucchini\n");
         welcomeEb.addField("To submit your LAST message,", "React with ✅", true);
@@ -55,6 +62,8 @@ public class ApplyUser extends ListenerAdapter {
         this.reactMessage.addReaction("❌").queue();
 
         addApplySubEventListener(this.reactMessage.getGuild().getId(), this);
+        addEventListener(this.reactMessage.getGuild().getId(), this.reactMessage.getChannel().getId(), this);
+
     }
 
     @Override
@@ -125,7 +134,7 @@ public class ApplyUser extends ListenerAdapter {
                                         state = 1;
                                         break;
                                     }
-                                    EmbedBuilder discordTagMismatchEb = defaultEmbed("Discord tag mismatch", null);
+                                    EmbedBuilder discordTagMismatchEb = defaultEmbed("Discord tag mismatch");
                                     discordTagMismatchEb.setDescription("Account " + player.getUsername()
                                             + " is linked with the discord tag " + playerInfo[0]
                                             + "\nYour current discord tag is " + applyingUser.getAsTag());
@@ -139,7 +148,7 @@ public class ApplyUser extends ListenerAdapter {
                                     break;
                                 }
                             }
-                            EmbedBuilder invalidEmbed = defaultEmbed("Invalid username or profile", null);
+                            EmbedBuilder invalidEmbed = defaultEmbed("Invalid username or profile");
                             invalidEmbed.setDescription("**Please check your input!**");
                             invalidEmbed.addField("Argument(s) given:", messageReply.getContentDisplay(), true);
                             invalidEmbed.addField("Valid Arguments Examples:",
@@ -154,7 +163,7 @@ public class ApplyUser extends ListenerAdapter {
                             state = 2;
                             break;
                         }
-                        EmbedBuilder invalidEmbed = defaultEmbed("Invalid arguments", null);
+                        EmbedBuilder invalidEmbed = defaultEmbed("Invalid arguments");
                         invalidEmbed.setDescription("**Please check your input!**");
                         invalidEmbed.addField("Argument(s) given:", messageReply.getContentDisplay(), true);
                         invalidEmbed.addField("Valid Arguments Examples:", "• CrypticPlasma\n• CrypticPlasma Zucchini",
@@ -170,7 +179,7 @@ public class ApplyUser extends ListenerAdapter {
                         break;
                     }
                 }
-                EmbedBuilder invalidEb = defaultEmbed("Invalid Arguments", null);
+                EmbedBuilder invalidEb = defaultEmbed("Invalid Arguments");
                 invalidEb.setDescription("**Unable to get latest message**");
                 invalidEb.addField("To retry,", "React with ✅", true);
                 invalidEb.addField("To cancel the application,", "React with ❌", true);
@@ -180,7 +189,7 @@ public class ApplyUser extends ListenerAdapter {
                 state = 2;
                 break;
             case 1:
-                EmbedBuilder finishApplyEmbed = defaultEmbed("Thank you for applying!", null);
+                EmbedBuilder finishApplyEmbed = defaultEmbed("Thank you for applying!");
                 finishApplyEmbed.setDescription(
                         "**Your stats have been submitted to staff**\nYou will be notified once staff review your stats");
                 applicationChannel.sendMessage(finishApplyEmbed.build()).queue();
@@ -190,7 +199,7 @@ public class ApplyUser extends ListenerAdapter {
                         new ApplyStaff(applyingUser, applicationChannel, applyPlayerStats, currentSettings, player));
                 break;
             case 2:
-                EmbedBuilder retryEmbed = defaultEmbed("Application for " + applyingUser.getName(), null);
+                EmbedBuilder retryEmbed = defaultEmbed("Application for " + applyingUser.getName());
                 retryEmbed.setDescription(
                         "• Please enter your in-game-name optionally followed by the skyblock profile you want to apply with.\n• Ex: CrypticPlasma **OR** CrypticPlasma Zucchini\n");
                 retryEmbed.addField("To submit your LAST message,", "React with ✅", true);
@@ -201,7 +210,7 @@ public class ApplyUser extends ListenerAdapter {
                 state = 0;
                 break;
             case 3:
-                EmbedBuilder cancelEmbed = defaultEmbed("Canceling application", null);
+                EmbedBuilder cancelEmbed = defaultEmbed("Canceling application");
                 cancelEmbed.setDescription("Channel closing in 5 seconds...");
                 applicationChannel.sendMessage(cancelEmbed.build()).queue();
                 event.getJDA().removeEventListener(this);

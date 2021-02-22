@@ -143,8 +143,8 @@ public class Weight {
     public double calculateSkillsWeight() {
         SkillsWeight skillsWeight = new SkillsWeight();
         skillsWeight.addSkillWeight(skillAverage, (skillWeights.get("mining")[0] + skillWeights.get("foraging")[0]
-                        + skillWeights.get("enchanting")[0] + skillWeights.get("farming")[0] + skillWeights.get("combat")[0]
-                        + skillWeights.get("fishing")[0] + skillWeights.get("alchemy")[0] + skillWeights.get("taming")[0]) / 8);
+                + skillWeights.get("enchanting")[0] + skillWeights.get("farming")[0] + skillWeights.get("combat")[0]
+                + skillWeights.get("fishing")[0] + skillWeights.get("alchemy")[0] + skillWeights.get("taming")[0]) / 8);
         return skillsWeight.getSkillsWeight();
     }
 

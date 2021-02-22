@@ -1,19 +1,23 @@
 package com.skyblockplus.miscellaneous;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.skyblockplus.utils.CustomPaginator;
-import com.skyblockplus.utils.Player;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.exceptions.PermissionException;
+import static com.skyblockplus.utils.BotUtils.botColor;
+import static com.skyblockplus.utils.BotUtils.defaultEmbed;
+import static com.skyblockplus.utils.BotUtils.errorMessage;
+import static com.skyblockplus.utils.BotUtils.globalCooldown;
 
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static com.skyblockplus.utils.BotUtils.*;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.skyblockplus.utils.CustomPaginator;
+import com.skyblockplus.utils.Player;
+
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.exceptions.PermissionException;
 
 public class TalismanBagCommand extends Command {
     private final EventWaiter waiter;
@@ -21,21 +25,20 @@ public class TalismanBagCommand extends Command {
 
     public TalismanBagCommand(EventWaiter waiter) {
         this.name = "talisman";
-        this.guildOnly = false;
         this.cooldown = globalCooldown;
         this.waiter = waiter;
     }
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = defaultEmbed("Loading...", null);
+        EmbedBuilder eb = defaultEmbed("Loading...");
         Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 
         String content = event.getMessage().getContentRaw();
 
         String[] args = content.split(" ");
         if (args.length <= 2 || args.length > 4) {
-            eb = defaultEmbed(errorMessage(this.name), null);
+            eb = defaultEmbed(errorMessage(this.name));
             ebMessage.editMessage(eb.build()).queue();
             return;
         }
@@ -56,7 +59,7 @@ public class TalismanBagCommand extends Command {
                 return;
             }
         } else {
-            eb = defaultEmbed(errorMessage(this.name), null);
+            eb = defaultEmbed(errorMessage(this.name));
             ebMessage.editMessage(eb.build()).queue();
             return;
         }
@@ -91,6 +94,6 @@ public class TalismanBagCommand extends Command {
                 return null;
             }
         }
-        return defaultEmbed("Unable to fetch player data", null);
+        return defaultEmbed("Unable to fetch player data");
     }
 }
