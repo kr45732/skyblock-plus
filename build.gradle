@@ -18,9 +18,9 @@ mainClassName = 'com.skyblockplus.Main'
 
 task stage {
     dependsOn build
-    doLast {
-        delete fileTree(dir: "build/distributions")
-    }
+    // doLast {
+    //     delete fileTree(dir: "build/distributions")
+    // }
 }
 
 stage.mustRunAfter(clean)
