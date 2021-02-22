@@ -159,9 +159,7 @@ public class ReloadEventWatcher extends ListenerAdapter {
 
                         String verifyText = higherDepth(currentSettings, "messageText").getAsString();
                         reactChannel.sendMessage(verifyText).queue();
-                        Message reactMessage = reactChannel
-                                .sendFile(new File("src/main/java/com/skyblockplus/verify/Link Discord To Hypixel.mp4"))
-                                .complete();
+                        Message reactMessage = reactChannel.sendMessage("https://streamable.com/sdq8tp").complete();
                         reactMessage.addReaction("✅").queue();
 
                         jda.addEventListener(new VerifyGuild(reactMessage, currentSettings));
