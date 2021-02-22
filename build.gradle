@@ -19,7 +19,7 @@ mainClassName = 'com.skyblockplus.Main'
 task stage(dependsOn: ['clean', 'shadowJar']) {
     dependsOn build
     doLast {
-        delete fileTree(dir: "build/libs", exclude:"SkyblockPlus-0.0.1-all.jar")
+        delete "/build/libs/SkyblockPlus-0.0.1.jar"
     }
 }
 
