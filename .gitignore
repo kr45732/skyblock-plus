@@ -62,6 +62,7 @@ Temporary Items
 /build/
 
 /src/main/java/com/skyblockplus/api/discordoauth2
+/src/main/java/com/skyblockplus/api/discordguild
 /src/main/java/com/skyblockplus/api/security/
 /src/main/java/com/skyblockplus/api/discordserversettings/settingsmanagers/ServerSettingsController.java
 
