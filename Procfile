@@ -1,0 +1,1 @@
+worker: java $JAVA_OPTS -jar build/libs/SkyblockPlus-0.0.1.jar
