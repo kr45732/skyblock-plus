@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+import static com.skyblockplus.Main.database;
 import static com.skyblockplus.reload.ReloadEventWatcher.isUniqueApplyGuild;
 import static com.skyblockplus.utils.BotUtils.*;
 
@@ -17,8 +18,7 @@ public class Apply extends ListenerAdapter {
     @Override
     public void onGuildReady(@NotNull GuildReadyEvent event) {
         try {
-            JsonElement currentSettings = getJson(
-                    API_BASE_URL + "api/discord/serverSettings/get/apply?serverId=" + event.getGuild().getId());
+            JsonElement currentSettings = database.getApplySettings(event.getGuild().getId());
 
             if (currentSettings != null) {
                 if (higherDepth(currentSettings, "enable").getAsBoolean()) {

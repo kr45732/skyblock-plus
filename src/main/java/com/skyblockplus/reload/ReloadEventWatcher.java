@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.BotUtils.*;
 
@@ -64,8 +65,7 @@ public class ReloadEventWatcher extends ListenerAdapter {
             ReloadEventWatcherClass applyGuildListenerObject = applyGuildEventListeners.get(guildId);
             if (applyGuildListenerObject.getSubEventListeners().size() == 0) {
 
-                JsonElement currentSettings = getJson(
-                        API_BASE_URL + "api/discord/serverSettings/get/apply?serverId=" + guildId);
+                JsonElement currentSettings = database.getApplySettings(guildId);
                 if (currentSettings != null) {
                     if (higherDepth(currentSettings, "enable").getAsBoolean()) {
                         TextChannel reactChannel = jda.getGuildById(guildId)
@@ -139,8 +139,7 @@ public class ReloadEventWatcher extends ListenerAdapter {
         try {
             ReloadEventWatcherClass verifyGuildListenerObject = verifyGuildEventListeners.get(guildId);
             if (verifyGuildListenerObject.getSubEventListeners().size() == 0) {
-                JsonElement currentSettings = getJson(
-                        API_BASE_URL + "api/discord/serverSettings/get/verify?serverId=" + guildId);
+                JsonElement currentSettings = database.getVerifySettings(guildId);
                 if (currentSettings != null) {
                     if (higherDepth(currentSettings, "enable").getAsBoolean()) {
                         TextChannel reactChannel = jda.getGuildById(guildId)

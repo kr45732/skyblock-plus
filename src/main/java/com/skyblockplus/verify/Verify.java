@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.util.List;
 
+import static com.skyblockplus.Main.database;
 import static com.skyblockplus.reload.ReloadEventWatcher.isUniqueVerifyGuild;
 import static com.skyblockplus.utils.BotUtils.*;
 
@@ -17,8 +18,7 @@ public class Verify extends ListenerAdapter {
     @Override
     public void onGuildReady(@NotNull GuildReadyEvent event) {
         try {
-            JsonElement currentSettings = getJson(
-                    API_BASE_URL + "api/discord/serverSettings/get/verify?serverId=" + event.getGuild().getId());
+            JsonElement currentSettings = database.getVerifySettings( event.getGuild().getId());
             if (currentSettings != null) {
                 if (higherDepth(currentSettings, "enable").getAsBoolean()) {
                     if (isUniqueVerifyGuild(event.getGuild().getId())) {
