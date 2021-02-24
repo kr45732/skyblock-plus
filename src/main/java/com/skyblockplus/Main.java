@@ -15,6 +15,7 @@ import com.skyblockplus.reload.ReloadEventWatcher;
 import com.skyblockplus.roles.RoleCommands;
 import com.skyblockplus.settings.SettingsCommand;
 import com.skyblockplus.settings.SetupCommand;
+import com.skyblockplus.settings.SpringDatabaseComponent;
 import com.skyblockplus.skills.SkillsCommands;
 import com.skyblockplus.slayer.SlayerCommands;
 import com.skyblockplus.timeout.ChannelDeleter;
@@ -39,11 +40,12 @@ import static com.skyblockplus.utils.BotUtils.*;
 @SpringBootApplication
 public class Main {
     public static JDA jda;
+    public static SpringDatabaseComponent database;
 
     public static void main(String[] args) throws LoginException, IllegalArgumentException {
         setApplicationSettings();
 
-        SpringApplication.run(com.skyblockplus.Main.class, args);
+        Main.database = SpringApplication.run(Main.class, args).getBean(SpringDatabaseComponent.class);
 
         EventWaiter waiter = new EventWaiter();
         CommandClientBuilder client = new CommandClientBuilder();

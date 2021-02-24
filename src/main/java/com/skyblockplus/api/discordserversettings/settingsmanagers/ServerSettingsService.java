@@ -20,6 +20,7 @@ public class ServerSettingsService {
         this.settingsRepository = settingsRepository;
     }
 
+
     public List<ServerSettingsModel> getAllServerSettings() {
         return settingsRepository.findAll();
     }
@@ -213,5 +214,4 @@ public class ServerSettingsService {
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
-
 }

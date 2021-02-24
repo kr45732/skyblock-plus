@@ -1,5 +1,6 @@
 package com.skyblockplus.api.discordserversettings.settingsmanagers;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.skyblockplus.api.discordserversettings.automatedapplication.AutomatedApplication;
 import com.skyblockplus.api.discordserversettings.automatedroles.AutomatedRoles;
 import com.skyblockplus.api.discordserversettings.automatedverify.AutomatedVerify;

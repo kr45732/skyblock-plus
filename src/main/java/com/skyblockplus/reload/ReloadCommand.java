@@ -15,7 +15,7 @@ public class ReloadCommand extends Command {
     public ReloadCommand() {
         this.name = "reload";
         this.cooldown = 60;
-        this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+        this.userPermissions = new Permission[]{Permission.ADMINISTRATOR};
     }
 
     @Override
