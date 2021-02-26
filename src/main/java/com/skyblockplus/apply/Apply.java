@@ -25,7 +25,7 @@ public class Apply extends ListenerAdapter {
                     if (isUniqueApplyGuild(event.getGuild().getId())) {
                         TextChannel reactChannel = event.getGuild()
                                 .getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
-
+ 
                         reactChannel.sendMessage("Loading...").complete();
                         reactChannel.sendMessage("Loading...").complete();
                         List<Message> deleteMessages = reactChannel.getHistory().retrievePast(25).complete();

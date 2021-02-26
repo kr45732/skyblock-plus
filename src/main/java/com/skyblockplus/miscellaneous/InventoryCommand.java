@@ -32,15 +32,29 @@ public class InventoryCommand extends Command {
         }
 
         System.out.println(content);
-
         if (args[1].equals("player")) {
+            String[] playerInventory;
+            if (args.length == 4) {
+                playerInventory = getPlayerInventory(args[2], args[3]);
+            } else {
+                playerInventory = getPlayerInventory(args[2], null);
+            }
 
+            if (playerInventory != null) {
+                ebMessage.delete().queue();
+                ebMessage.getChannel().sendMessage(playerInventory[0]).queue();
+                ebMessage.getChannel().sendMessage(playerInventory[1]).queue();
+                ebMessage.getChannel().sendMessage(defaultEmbed("Missing Items").setDescription(playerInventory[2]).build()).queue();
+            } else {
+                ebMessage.editMessage(defaultEmbed("Error").setDescription("Unable to fetch data").build()).queue();
+            }
+            return;
+        } else if (args[1].equals("armor")) {
             if (args.length == 4) {
                 eb = getPlayerEquippedArmor(args[2], args[3]);
 
             } else
                 eb = getPlayerEquippedArmor(args[2], null);
-
         } else {
             eb = defaultEmbed(errorMessage(this.name));
             ebMessage.editMessage(eb.build()).queue();
@@ -62,5 +76,18 @@ public class InventoryCommand extends Command {
             }
         }
         return defaultEmbed("Unable to fetch player data");
+    }
+
+    private String[] getPlayerInventory(String username, String profileName) {
+        Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+        if (player.isValid()) {
+            String[] temp = player.getInventory();
+            if (temp != null) {
+                return new String[]{
+                        temp[0], temp[1], player.invMissing
+                };
+            }
+        }
+        return null;
     }
 }

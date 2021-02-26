@@ -17,6 +17,7 @@ import java.util.Map;
 import static com.skyblockplus.utils.BotUtils.*;
 
 public class Player {
+    public String invMissing = "";
     private boolean validPlayer = false;
     private JsonElement profileJson;
     private JsonElement levelTables;
@@ -545,8 +546,91 @@ public class Player {
         }
     }
 
-    @SuppressWarnings("rawtypes")
-    public HashMap getPlayerSacks() {
+    public String[] getInventory() {
+        try {
+            String encodedInventoryContents = higherDepth(higherDepth(profileJson, "inv_contents"), "data").getAsString();
+            NBTCompound decodedInventoryContents = NBTReader.readBase64(encodedInventoryContents);
+
+            NBTList invFrames = decodedInventoryContents.getList(".i");
+            Map<Integer, String> invFramesMap = new HashMap<>();
+            for (int i = 0; i < invFrames.size(); i++) {
+                NBTCompound displayName = invFrames.getCompound(i).getCompound("tag.ExtraAttributes");
+                if (displayName != null) {
+                    invFramesMap.put(i + 1,
+                            displayName.getString("id", "empty").replaceAll("§f|§a|§9|§5|§6|§d|§4|§c|§7", "").toLowerCase());
+                } else {
+                    invFramesMap.put(i + 1, "empty");
+                }
+            }
+
+            String outputStringPart1 = "";
+            String outputStringPart2 = "";
+            String curNine = "";
+            for (Map.Entry<Integer, String> i : invFramesMap.entrySet()) {
+                if (i.getKey() <= invFrames.size() / 2) {
+                    curNine += itemToEmoji(i.getValue());
+                    if (i.getKey() % 9 == 0) {
+                        outputStringPart1 = curNine + "\n" + outputStringPart1;
+                        curNine = "";
+                    }
+                } else {
+                    curNine += itemToEmoji(i.getValue());
+                    if (i.getKey() % 9 == 0) {
+                        outputStringPart2 = curNine + "\n" + outputStringPart2;
+                        curNine = "";
+                    }
+                }
+            }
+            return new String[]{outputStringPart2, outputStringPart1};
+
+
+        } catch (Exception ignored) {
+        }
+        return null;
+    }
+
+    public String itemToEmoji(String itemName) {
+        Map<String, String> emojiMap = new HashMap<>();
+        emojiMap.put("empty", "<:empty:814669776201711637>");
+        emojiMap.put("hyperion", "<:hyperion:814675220455096321>");
+        emojiMap.put("rogue_sword", "<:rogue_sword:814675777479114803>");
+        emojiMap.put("grappling_hook", "<:grappling_hook:814676007118176257>");
+        emojiMap.put("runaans_bow", "<:runaans_bow:814676456897511424>");
+        emojiMap.put("overflux_power_orb", "<:overflux_power_orb:814676605514678292>");
+        emojiMap.put("superboom_tnt", "<:superboom_tnt:814690915318235146>");
+        emojiMap.put("spirit_leap", "<:spirit_leap:814677057107263508>");
+        emojiMap.put("skyblock_menu", "<:skyblock_menu:814676947602374698>");
+        emojiMap.put("greater_backpack", "<:greater_backpack:814679082667081769>");
+        emojiMap.put("dungeon_stone", "<:dungeon_stone:814680424994570291>");
+        emojiMap.put("defuse_kit", "<:defuse_kit:814680645724012597>");
+        emojiMap.put("rabbit_hat", "<:rabbit_hat:814680929117011988>");
+        emojiMap.put("jerry_staff", "<:jerry_staff:814681305488818197>");
+        emojiMap.put("flower_of_truth", "<:flower_of_truth:814687420413902849>");
+        emojiMap.put("bone_boomerang", "<:bone_boomerang:814687704104435732>");
+        emojiMap.put("snow_block", "<:snow_block:814690652569993248>");
+        emojiMap.put("auger_rod", "<:auger_rod:814688099044687872>");
+        emojiMap.put("death_bow", "<:death_bow:814688302707769354>");
+        emojiMap.put("diver_fragment", "<:diver_fragment:814688560816324639>");
+        emojiMap.put("blue_ice_hunk", "<:blue_ice_hunk:814688991769133087>");
+        emojiMap.put("aspect_of_the_end", "<:aspect_of_the_end:814689179110735902>");
+        emojiMap.put("enchanted_book", "<:enchanted_book:814689302960930826>");
+        emojiMap.put("ice_hunk", "<:ice_hunk:814689461307703363>");
+        emojiMap.put("golden_apple", "<:golden_apple:814689788359082004>");
+        emojiMap.put("stonk_pickaxe", "<:stonk_pickaxe:814689918311596044>");
+        emojiMap.put("white_gift", "<:white_gift:814690119591919696>");
+//        emojiMap.put("", "");
+//        emojiMap.put("", "");
+//        emojiMap.put("", "");
+
+        if (emojiMap.containsKey(itemName)) {
+            return emojiMap.get(itemName);
+        }
+
+        invMissing += "\n• " + itemName;
+        return "❓";
+    }
+
+    public HashMap<String, Integer> getPlayerSacks() {
         JsonElement sacksJson = higherDepth(profileJson, "sacks_counts");
         return new Gson().fromJson(sacksJson, HashMap.class);
     }

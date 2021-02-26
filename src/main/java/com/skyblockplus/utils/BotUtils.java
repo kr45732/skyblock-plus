@@ -278,7 +278,7 @@ public class BotUtils {
         }
     }
 
-    public static String decodeVerifyPrefix(String prefix){
+    public static String decodeVerifyPrefix(String prefix) {
         return prefix.replace("Nu-greek-char", "ν");
     }
 }
