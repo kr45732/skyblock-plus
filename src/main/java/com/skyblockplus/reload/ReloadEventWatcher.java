@@ -17,7 +17,8 @@ import java.util.Map;
 
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.utils.BotUtils.*;
+import static com.skyblockplus.utils.BotUtils.defaultEmbed;
+import static com.skyblockplus.utils.BotUtils.higherDepth;
 
 public class ReloadEventWatcher extends ListenerAdapter {
     private static final Map<String, ReloadEventWatcherClass> applyGuildEventListeners = new HashMap<>();

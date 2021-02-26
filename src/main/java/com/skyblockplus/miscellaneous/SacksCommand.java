@@ -29,37 +29,28 @@ public class SacksCommand extends Command {
     protected void execute(CommandEvent event) {
         EmbedBuilder eb = defaultEmbed("Loading...");
         Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-
         String content = event.getMessage().getContentRaw();
-
         String[] args = content.split(" ");
-        if (args.length <= 2 || args.length > 4) {
-            eb = defaultEmbed(errorMessage(this.name));
-            ebMessage.editMessage(eb.build()).queue();
-            return;
-        }
+        this.event = event;
 
         System.out.println(content);
 
-        this.event = event;
-        if (args[1].equals("player")) {
-            if (args.length == 4) {
-                eb = getPlayerSacks(args[2], args[3]);
+        if (args.length == 2 || args.length == 3) {
+            if (args.length == 3) {
+                eb = getPlayerSacks(args[1], args[2]);
 
             } else
-                eb = getPlayerSacks(args[2], null);
+                eb = getPlayerSacks(args[1], null);
 
             if (eb == null) {
                 ebMessage.delete().queue();
                 return;
             }
-        } else {
-            eb = defaultEmbed(errorMessage(this.name));
+
             ebMessage.editMessage(eb.build()).queue();
-            return;
         }
 
-        ebMessage.editMessage(eb.build()).queue();
+        ebMessage.editMessage(errorMessage(this.name).build()).queue();
     }
 
     private EmbedBuilder getPlayerSacks(String username, String profileName) {

@@ -37,7 +37,7 @@ public class GuildLeaderboardCommand extends Command {
 
         String[] args = content.split(" ");
         if (args.length != 2) {
-            eb = defaultEmbed(errorMessage(this.name));
+            eb = errorMessage(this.name);
             ebMessage.editMessage(eb.build()).queue();
             return;
         }
@@ -51,12 +51,12 @@ public class GuildLeaderboardCommand extends Command {
                 eb.addField("Promote", rankString[0], false);
                 eb.addField("Demote", rankString[1], false);
             } else {
-                eb = defaultEmbed(errorMessage(this.name));
+                eb = errorMessage(this.name);
                 ebMessage.editMessage(eb.build()).queue();
                 return;
             }
         } else {
-            eb = defaultEmbed(errorMessage(this.name));
+            eb = errorMessage(this.name);
             ebMessage.editMessage(eb.build()).queue();
             return;
         }

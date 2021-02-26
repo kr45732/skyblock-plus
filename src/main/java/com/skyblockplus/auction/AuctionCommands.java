@@ -26,20 +26,17 @@ public class AuctionCommands extends Command {
     protected void execute(CommandEvent event) {
         EmbedBuilder eb = defaultEmbed("Loading...");
         Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-
         String content = event.getMessage().getContentRaw();
-
         String[] args = content.split(" ");
-        if (args.length != 2) {
-            eb.setTitle(errorMessage(this.name));
-            ebMessage.editMessage(eb.build()).queue();
-            return;
-        }
 
         System.out.println(content);
 
-        ebMessage.editMessage(getPlayerAuction(args[1]).build()).queue();
+        if (args.length == 2) {
+            ebMessage.editMessage(getPlayerAuction(args[1]).build()).queue();
+            return;
+        }
 
+        ebMessage.editMessage(errorMessage(this.name).build()).queue();
     }
 
     private EmbedBuilder getPlayerAuction(String username) {

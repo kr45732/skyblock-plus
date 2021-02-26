@@ -25,19 +25,17 @@ public class BinCommands extends Command {
     @Override
     protected void execute(CommandEvent event) {
         EmbedBuilder eb = defaultEmbed("Loading...");
-
-        String args = event.getMessage().getContentRaw();
         Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-
-        if (args.split(" ").length < 2) {
-            eb.setTitle(errorMessage(this.name));
-            ebMessage.editMessage(eb.build()).queue();
-            return;
-        }
+        String args = event.getMessage().getContentRaw();
 
         System.out.println(args);
 
-        ebMessage.editMessage(getLowestBin(args.replace(BOT_PREFIX + "bin ", "")).build()).queue();
+        if (args.split(" ").length >= 2) {
+            ebMessage.editMessage(getLowestBin(args.replace(BOT_PREFIX + "bin ", "")).build()).queue();
+            return;
+        }
+
+        ebMessage.editMessage(errorMessage(this.name).build()).queue();
     }
 
     private EmbedBuilder getLowestBin(String item) {

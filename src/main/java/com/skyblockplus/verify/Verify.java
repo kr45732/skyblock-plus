@@ -12,13 +12,13 @@ import java.util.List;
 
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.reload.ReloadEventWatcher.isUniqueVerifyGuild;
-import static com.skyblockplus.utils.BotUtils.*;
+import static com.skyblockplus.utils.BotUtils.higherDepth;
 
 public class Verify extends ListenerAdapter {
     @Override
     public void onGuildReady(@NotNull GuildReadyEvent event) {
         try {
-            JsonElement currentSettings = database.getVerifySettings( event.getGuild().getId());
+            JsonElement currentSettings = database.getVerifySettings(event.getGuild().getId());
             if (currentSettings != null) {
                 if (higherDepth(currentSettings, "enable").getAsBoolean()) {
                     if (isUniqueVerifyGuild(event.getGuild().getId())) {

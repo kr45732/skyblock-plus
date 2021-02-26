@@ -4,12 +4,11 @@ import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.User;
 
 import java.util.Locale;
 
+import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.BotUtils.*;
 
 public class EssenceCommand extends Command {
@@ -23,36 +22,28 @@ public class EssenceCommand extends Command {
     protected void execute(CommandEvent event) {
         EmbedBuilder eb = defaultEmbed("Loading...");
         Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-
         String content = event.getMessage().getContentRaw();
-
         String[] args = content.split(" ");
-        if (args.length < 3) {
-            eb = defaultEmbed(errorMessage(this.name));
-            ebMessage.editMessage(eb.build()).queue();
-            return;
-        }
 
         System.out.println(content);
-
-        String itemName = content.split(" ", 3)[2].replace(" ", "_").toUpperCase();
 
         JsonElement essenceCostsJson = getJson(
                 "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/essencecosts.json");
 
-        if (args[1].equals("upgrade")) {
-            JDA jda = event.getJDA();
-            User user = event.getAuthor();
+        if (args.length >= 3 && args[1].equals("upgrade")) {
+            String itemName = content.split(" ", 3)[2].replace(" ", "_").toUpperCase();
 
             JsonElement itemJson = higherDepth(essenceCostsJson, itemName);
             if (itemJson != null) {
-                jda.addEventListener(new EssenceWaiter(itemName, itemJson, ebMessage, user));
+                jda.addEventListener(new EssenceWaiter(itemName, itemJson, ebMessage, event.getAuthor()));
             } else {
                 eb = defaultEmbed("Invalid item name");
                 ebMessage.editMessage(eb.build()).queue();
             }
             return;
-        } else if (args[1].equals("info") || args[1].equals("information")) {
+        } else if (args.length >= 3 && (args[1].equals("info") || args[1].equals("information"))) {
+            String itemName = content.split(" ", 3)[2].replace(" ", "_").toUpperCase();
+
             eb = getEssenceInformation(itemName, essenceCostsJson);
             if (eb == null) {
                 eb = defaultEmbed("Invalid item name");
@@ -60,9 +51,8 @@ public class EssenceCommand extends Command {
             ebMessage.editMessage(eb.build()).queue();
             return;
         }
-        eb = defaultEmbed(errorMessage(this.name));
-        ebMessage.editMessage(eb.build()).queue();
 
+        ebMessage.editMessage(errorMessage(this.name).build()).queue();
     }
 
     private EmbedBuilder getEssenceInformation(String itemName, JsonElement essenceCostsJson) {

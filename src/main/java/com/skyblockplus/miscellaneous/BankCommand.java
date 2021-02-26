@@ -35,42 +35,30 @@ public class BankCommand extends Command {
     protected void execute(CommandEvent event) {
         EmbedBuilder eb = defaultEmbed("Loading...");
         Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-
         String content = event.getMessage().getContentRaw();
-
         String[] args = content.split(" ");
-        if (args.length <= 2 || args.length > 4) {
-            eb = defaultEmbed(errorMessage(this.name));
-            ebMessage.editMessage(eb.build()).queue();
-            return;
-        }
 
         System.out.println(content);
 
-        if (args[1].equals("player")) {
-            if (args.length == 4) {
-                eb = getPlayerBalance(args[2], args[3]);
-            } else
-                eb = getPlayerBalance(args[2], null);
-        } else if (args[1].equals("history")) {
+        if ((args.length == 3 || args.length == 4) && args[1].equals("history")) {
             this.event = event;
             if (args.length == 4) {
                 eb = getPlayerBankHistory(args[2], args[3]);
-
-            } else
+            } else {
                 eb = getPlayerBankHistory(args[2], null);
+            }
 
             if (eb == null) {
                 ebMessage.delete().queue();
                 return;
             }
-        } else {
-            eb = defaultEmbed(errorMessage(this.name), null);
-            ebMessage.editMessage(eb.build()).queue();
-            return;
+        } else if (args.length == 2) {
+            ebMessage.editMessage(getPlayerBalance(args[1], null).build()).queue();
+        } else if (args.length == 3) {
+            ebMessage.editMessage(getPlayerBalance(args[1], args[2]).build()).queue();
         }
 
-        ebMessage.editMessage(eb.build()).queue();
+        ebMessage.editMessage(errorMessage(this.name).build()).queue();
     }
 
     private EmbedBuilder getPlayerBalance(String username, String profileName) {

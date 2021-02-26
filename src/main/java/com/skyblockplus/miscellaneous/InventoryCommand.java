@@ -21,23 +21,24 @@ public class InventoryCommand extends Command {
     protected void execute(CommandEvent event) {
         EmbedBuilder eb = defaultEmbed("Loading player data...");
         Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-
         String content = event.getMessage().getContentRaw();
-
         String[] args = content.split(" ");
-        if (args.length <= 2 || args.length > 4) {
-            eb = defaultEmbed(errorMessage(this.name));
-            ebMessage.editMessage(eb.build()).queue();
-            return;
-        }
 
         System.out.println(content);
-        if (args[1].equals("player")) {
-            String[] playerInventory;
+
+        if ((args.length == 3 || args.length == 4) && args[1].equals("armor")) {
             if (args.length == 4) {
-                playerInventory = getPlayerInventory(args[2], args[3]);
+                ebMessage.editMessage(getPlayerEquippedArmor(args[2], args[3]).build()).queue();
             } else {
-                playerInventory = getPlayerInventory(args[2], null);
+                ebMessage.editMessage(getPlayerEquippedArmor(args[2], null).build()).queue();
+            }
+            return;
+        } else if (args.length == 2 || args.length == 3) {
+            String[] playerInventory;
+            if (args.length == 3) {
+                playerInventory = getPlayerInventory(args[1], args[2]);
+            } else {
+                playerInventory = getPlayerInventory(args[1], null);
             }
 
             if (playerInventory != null) {
@@ -49,19 +50,9 @@ public class InventoryCommand extends Command {
                 ebMessage.editMessage(defaultEmbed("Error").setDescription("Unable to fetch data").build()).queue();
             }
             return;
-        } else if (args[1].equals("armor")) {
-            if (args.length == 4) {
-                eb = getPlayerEquippedArmor(args[2], args[3]);
-
-            } else
-                eb = getPlayerEquippedArmor(args[2], null);
-        } else {
-            eb = defaultEmbed(errorMessage(this.name));
-            ebMessage.editMessage(eb.build()).queue();
-            return;
         }
 
-        ebMessage.editMessage(eb.build()).queue();
+        ebMessage.editMessage(errorMessage(this.name).build()).queue();
     }
 
     private EmbedBuilder getPlayerEquippedArmor(String username, String profileName) {

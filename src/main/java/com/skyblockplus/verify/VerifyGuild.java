@@ -7,7 +7,8 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import static com.skyblockplus.reload.ReloadEventWatcher.addVerifyGuild;
-import static com.skyblockplus.utils.BotUtils.*;
+import static com.skyblockplus.utils.BotUtils.decodeVerifyPrefix;
+import static com.skyblockplus.utils.BotUtils.higherDepth;
 
 public class VerifyGuild extends ListenerAdapter {
     private final Message reactMessage;

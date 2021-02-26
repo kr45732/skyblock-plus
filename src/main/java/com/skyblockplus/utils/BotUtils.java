@@ -152,8 +152,8 @@ public class BotUtils {
         return -1;
     }
 
-    public static String errorMessage(String name) {
-        return "Invalid input. Type `" + BOT_PREFIX + "help " + name + "` for help";
+    public static EmbedBuilder errorMessage(String name) {
+        return defaultEmbed("Invalid input. Type `" + BOT_PREFIX + "help " + name + "` for help");
     }
 
     public static String uuidToUsername(String uuid) {

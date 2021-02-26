@@ -22,7 +22,7 @@ public class RoleCommands extends Command {
 
     public RoleCommands() {
         this.name = "roles";
-        this.cooldown = 15;
+        this.cooldown = 10;
     }
 
     @Override
@@ -38,9 +38,7 @@ public class RoleCommands extends Command {
 
         String[] args = content.split(" ");
         if (args.length < 3 || args.length > 4) {
-            eb.setTitle(errorMessage(this.name));
-            eb.setDescription("");
-            ebMessage.editMessage(eb.build()).queue();
+            ebMessage.editMessage(errorMessage(this.name).build()).queue();
             return;
         }
 
@@ -421,9 +419,7 @@ public class RoleCommands extends Command {
                 eb = defaultEmbed("Error fetching data");
             }
         } else {
-            eb = defaultEmbed(errorMessage(this.name));
-            eb.setDescription("");
-            ebMessage.editMessage(eb.build()).queue();
+            ebMessage.editMessage(errorMessage(this.name).build()).queue();
             return;
 
         }

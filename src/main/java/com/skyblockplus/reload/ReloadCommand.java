@@ -21,6 +21,7 @@ public class ReloadCommand extends Command {
     @Override
     protected void execute(CommandEvent event) {
         System.out.println(event.getMessage().getContentRaw());
+
         EmbedBuilder eb = defaultEmbed("Attempting to reload settings...");
         Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 

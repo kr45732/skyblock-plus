@@ -26,29 +26,20 @@ public class HypixelCommand extends Command {
     protected void execute(CommandEvent event) {
         EmbedBuilder eb = defaultEmbed("Loading...", null);
         Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-
         String content = event.getMessage().getContentRaw();
-
         String[] args = content.split(" ");
-        if (args.length != 3) {
-            eb = defaultEmbed(errorMessage(this.name));
-            ebMessage.editMessage(eb.build()).queue();
-            return;
-        }
 
         System.out.println(content);
 
-        if (args[1].equals("player")) {
-            eb = getHypixelStats(args[2]);
-        } else if (args[1].equals("parkour")) {
-            eb = getParkourStats(args[2]);
-        } else {
-            eb = defaultEmbed(errorMessage(this.name));
-            ebMessage.editMessage(eb.build()).queue();
+        if (args.length == 3 && args[1].equals("parkour")) {
+            ebMessage.editMessage(getParkourStats(args[2]).build()).queue();
+            return;
+        } else if (args.length == 2) {
+            ebMessage.editMessage(getHypixelStats(args[1]).build()).queue();
             return;
         }
 
-        ebMessage.editMessage(eb.build()).queue();
+        ebMessage.editMessage(errorMessage(this.name).build()).queue();
     }
 
     private EmbedBuilder getParkourStats(String username) {

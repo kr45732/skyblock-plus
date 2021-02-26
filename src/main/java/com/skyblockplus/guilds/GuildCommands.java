@@ -38,115 +38,71 @@ public class GuildCommands extends Command {
 
         String[] args = content.split(" ");
 
-        if (content.contains("g-")) {
-            if (args.length < 3) {
-                eb.setTitle(errorMessage(this.name));
-                ebMessage.editMessage(eb.build()).queue();
+        System.out.println(content);
+
+        if (args.length == 3 && ("experience".equals(args[1]) || "exp".equals(args[1]))) {
+            if (args[2].toLowerCase().startsWith("u-")) {
+                String username = args[2].split("-")[1];
+                GuildStruct guildExp = getGuildExp(username);
+                if (guildExp.outputArr.length == 0) {
+                    ebMessage.editMessage(guildExp.eb.build()).queue();
+                } else {
+                    CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(2)
+                            .setItemsPerPage(20).showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
+                                try {
+                                    m.clearReactions().queue();
+                                } catch (PermissionException ex) {
+                                    m.delete().queue();
+                                }
+                            }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).wrapPageEnds(true)
+                            .setColor(botColor).setCommandUser(event.getAuthor());
+
+                    paginateBuilder.addItems(guildExp.outputArr);
+                    ebMessage.delete().queue();
+                    paginateBuilder.build().paginate(event.getChannel(), 0);
+                }
                 return;
             }
-        } else if (args.length != 3) {
-            eb.setTitle(errorMessage(this.name));
-            ebMessage.editMessage(eb.build()).queue();
+        } else if (args.length == 3 && "info".equals(args[1])) {
+            if (args[2].toLowerCase().startsWith("u-")) {
+                String usernameInfo = args[2].split("-")[1];
+                ebMessage.editMessage(getGuildInfo(usernameInfo).build()).queue();
+                return;
+            } else if (args[2].toLowerCase().startsWith("g-")) {
+                String guildName = content.split("-")[1];
+                ebMessage.editMessage(guildInfoFromGuildName(guildName).build()).queue();
+                return;
+            }
+        } else if (args.length == 3 && "members".equals(args[1])) {
+            if (args[2].toLowerCase().startsWith("u-")) {
+                String usernameMembers = args[2].split("-")[1];
+                GuildStruct guildMembers = getGuildMembers(usernameMembers);
+                if (guildMembers.outputArr.length == 0) {
+                    ebMessage.editMessage(guildMembers.eb.build()).queue();
+                } else {
+                    CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(3)
+                            .setItemsPerPage(27).showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
+                                try {
+                                    m.clearReactions().queue();
+                                } catch (PermissionException ex) {
+                                    m.delete().queue();
+                                }
+                            }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).wrapPageEnds(true)
+                            .setColor(botColor).setCommandUser(event.getAuthor());
+
+                    paginateBuilder.addItems(guildMembers.outputArr);
+
+                    ebMessage.delete().queue();
+                    paginateBuilder.build().paginate(event.getChannel(), 0);
+                    return;
+                }
+            }
+        } else if (args.length == 2) {
+            ebMessage.editMessage(getGuildPlayer(args[1]).build()).queue();
             return;
         }
 
-        if (content.contains("u-") || content.contains("g-")) {
-            if (args[2].endsWith("-")) {
-                eb.setTitle(errorMessage(this.name));
-                ebMessage.editMessage(eb.build()).queue();
-                return;
-            }
-        }
-
-        System.out.println(content);
-
-        switch (args[1]) {
-            case "experience":
-            case "exp":
-                if (args[2].toLowerCase().startsWith("u-")) {
-                    String username = args[2].split("-")[1];
-                    GuildStruct guildExp = getGuildExp(username);
-                    if (guildExp.outputArr.length == 0) {
-                        eb = guildExp.eb;
-                    } else {
-                        CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(2)
-                                .setItemsPerPage(20).showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
-                                    try {
-                                        m.clearReactions().queue();
-                                    } catch (PermissionException ex) {
-                                        m.delete().queue();
-                                    }
-                                }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).wrapPageEnds(true)
-                                .setColor(botColor).setCommandUser(event.getAuthor());
-
-                        paginateBuilder.addItems(guildExp.outputArr);
-
-                        ebMessage.delete().queue();
-                        paginateBuilder.build().paginate(event.getChannel(), 0);
-
-                        return;
-                    }
-                } else {
-                    eb.setTitle(errorMessage(this.name));
-                    ebMessage.editMessage(eb.build()).queue();
-                    return;
-                }
-                break;
-            case "player":
-                String username = args[2];
-                eb = getGuildPlayer(username);
-                break;
-            case "info":
-                if (args[2].toLowerCase().startsWith("u-")) {
-                    String usernameInfo = args[2].split("-")[1];
-                    eb = getGuildInfo(usernameInfo);
-                } else if (args[2].toLowerCase().startsWith("g-")) {
-                    String guildName = content.split("-")[1];
-                    eb = guildInfoFromGuildName(guildName);
-                } else {
-                    eb.setTitle(errorMessage(this.name));
-                    ebMessage.editMessage(eb.build()).queue();
-                    return;
-                }
-                break;
-            case "members":
-                if (args[2].toLowerCase().startsWith("u-")) {
-                    String usernameMembers = args[2].split("-")[1];
-                    GuildStruct guildMembers = getGuildMembers(usernameMembers);
-                    if (guildMembers.outputArr.length == 0) {
-                        eb = guildMembers.eb;
-                    } else {
-                        CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(3)
-                                .setItemsPerPage(27).showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
-                                    try {
-                                        m.clearReactions().queue();
-                                    } catch (PermissionException ex) {
-                                        m.delete().queue();
-                                    }
-                                }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).wrapPageEnds(true)
-                                .setColor(botColor).setCommandUser(event.getAuthor());
-
-                        paginateBuilder.addItems(guildMembers.outputArr);
-
-                        ebMessage.delete().queue();
-                        paginateBuilder.build().paginate(event.getChannel(), 0);
-                        return;
-                    }
-
-                } else {
-                    eb.setTitle(errorMessage(this.name));
-                    ebMessage.editMessage(eb.build()).queue();
-                    return;
-                }
-                break;
-            default:
-                eb.setTitle(errorMessage(this.name));
-                ebMessage.editMessage(eb.build()).queue();
-                return;
-        }
-
-        ebMessage.editMessage(eb.build()).queue();
-
+        ebMessage.editMessage(errorMessage(this.name).build()).queue();
     }
 
     private GuildStruct getGuildExp(String username) {

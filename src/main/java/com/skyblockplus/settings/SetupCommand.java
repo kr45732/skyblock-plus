@@ -19,7 +19,7 @@ public class SetupCommand extends Command {
     public SetupCommand(EventWaiter waiter) {
         this.name = "setup";
         this.cooldown = globalCooldown;
-        this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
+        this.userPermissions = new Permission[]{Permission.ADMINISTRATOR};
         this.waiter = waiter;
     }
 

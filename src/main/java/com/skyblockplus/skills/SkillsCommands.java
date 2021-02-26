@@ -25,15 +25,8 @@ public class SkillsCommands extends Command {
     protected void execute(CommandEvent event) {
         EmbedBuilder eb = defaultEmbed("Loading...");
         Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-
         String content = event.getMessage().getContentRaw();
-
         String[] args = content.split(" ");
-        if (args.length <= 2 || args.length > 4) {
-            eb = defaultEmbed(errorMessage(this.name));
-            ebMessage.editMessage(eb.build()).queue();
-            return;
-        }
 
         System.out.println(content);
 
@@ -45,18 +38,15 @@ public class SkillsCommands extends Command {
             return;
         }
 
-        if (args[1].equals("player")) {
-            if (args.length == 4) {
-                eb = getPlayerSkill(args[2], args[3]);
-            } else
-                eb = getPlayerSkill(args[2], null);
-        } else {
-            eb = defaultEmbed(errorMessage(this.name));
-            ebMessage.editMessage(eb.build()).queue();
+        if (args.length == 3) {
+            ebMessage.editMessage(getPlayerSkill(args[1], args[2]).build()).queue();
+            return;
+        } else if (args.length == 2) {
+            ebMessage.editMessage(getPlayerSkill(args[1], null).build()).queue();
             return;
         }
 
-        ebMessage.editMessage(eb.build()).queue();
+        ebMessage.editMessage(errorMessage(this.name).build()).queue();
 
     }
 

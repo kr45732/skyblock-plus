@@ -12,7 +12,8 @@ import java.util.List;
 
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.reload.ReloadEventWatcher.isUniqueApplyGuild;
-import static com.skyblockplus.utils.BotUtils.*;
+import static com.skyblockplus.utils.BotUtils.defaultEmbed;
+import static com.skyblockplus.utils.BotUtils.higherDepth;
 
 public class Apply extends ListenerAdapter {
     @Override
@@ -25,7 +26,7 @@ public class Apply extends ListenerAdapter {
                     if (isUniqueApplyGuild(event.getGuild().getId())) {
                         TextChannel reactChannel = event.getGuild()
                                 .getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
- 
+
                         reactChannel.sendMessage("Loading...").complete();
                         reactChannel.sendMessage("Loading...").complete();
                         List<Message> deleteMessages = reactChannel.getHistory().retrievePast(25).complete();

@@ -1,14 +1,11 @@
 package com.skyblockplus.miscellaneous;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonIOException;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -29,6 +26,7 @@ public class VersionCommand extends Command {
     @Override
     protected void execute(CommandEvent event) {
         System.out.println(event.getMessage().getContentRaw());
+
         try {
             JsonElement patchNotes = JsonParser
                     .parseReader(new FileReader("src/main/java/com/skyblockplus/json/PatchNotes.json"));
@@ -42,9 +40,8 @@ public class VersionCommand extends Command {
             eb.setFooter("Released at");
             eb.setTimestamp(Instant.parse(higherDepth(currentDesc, "date").getAsString()));
             event.reply(eb.build());
-        } catch (JsonIOException | JsonSyntaxException | FileNotFoundException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            event.reply(defaultEmbed("Error fetching patch notes").build());
         }
-
     }
 }

@@ -563,25 +563,25 @@ public class Player {
                 }
             }
 
-            String outputStringPart1 = "";
-            String outputStringPart2 = "";
-            String curNine = "";
+            StringBuilder outputStringPart1 = new StringBuilder();
+            StringBuilder outputStringPart2 = new StringBuilder();
+            StringBuilder curNine = new StringBuilder();
             for (Map.Entry<Integer, String> i : invFramesMap.entrySet()) {
                 if (i.getKey() <= invFrames.size() / 2) {
-                    curNine += itemToEmoji(i.getValue());
+                    curNine.append(itemToEmoji(i.getValue()));
                     if (i.getKey() % 9 == 0) {
-                        outputStringPart1 = curNine + "\n" + outputStringPart1;
-                        curNine = "";
+                        outputStringPart1.insert(0, curNine + "\n");
+                        curNine = new StringBuilder();
                     }
                 } else {
-                    curNine += itemToEmoji(i.getValue());
+                    curNine.append(itemToEmoji(i.getValue()));
                     if (i.getKey() % 9 == 0) {
-                        outputStringPart2 = curNine + "\n" + outputStringPart2;
-                        curNine = "";
+                        outputStringPart2.insert(0, curNine + "\n");
+                        curNine = new StringBuilder();
                     }
                 }
             }
-            return new String[]{outputStringPart2, outputStringPart1};
+            return new String[]{outputStringPart2.toString(), outputStringPart1.toString()};
 
 
         } catch (Exception ignored) {
@@ -618,9 +618,6 @@ public class Player {
         emojiMap.put("golden_apple", "<:golden_apple:814689788359082004>");
         emojiMap.put("stonk_pickaxe", "<:stonk_pickaxe:814689918311596044>");
         emojiMap.put("white_gift", "<:white_gift:814690119591919696>");
-//        emojiMap.put("", "");
-//        emojiMap.put("", "");
-//        emojiMap.put("", "");
 
         if (emojiMap.containsKey(itemName)) {
             return emojiMap.get(itemName);
@@ -630,6 +627,7 @@ public class Player {
         return "❓";
     }
 
+    @SuppressWarnings("unchecked")
     public HashMap<String, Integer> getPlayerSacks() {
         JsonElement sacksJson = higherDepth(profileJson, "sacks_counts");
         return new Gson().fromJson(sacksJson, HashMap.class);
