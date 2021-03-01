@@ -7,6 +7,7 @@ import com.skyblockplus.auction.AuctionCommands;
 import com.skyblockplus.auction.BinCommands;
 import com.skyblockplus.dungeons.CatacombsCommand;
 import com.skyblockplus.dungeons.EssenceCommand;
+import com.skyblockplus.dungeons.PartyFinderCommand;
 import com.skyblockplus.guilds.GuildCommands;
 import com.skyblockplus.guilds.GuildLeaderboardCommand;
 import com.skyblockplus.miscellaneous.*;
@@ -59,10 +60,10 @@ public class Main {
                 new AuctionCommands(), new BinCommands(), new SkillsCommands(), new CatacombsCommand(),
                 new ShutdownCommand(), new VersionCommand(), new RoleCommands(), new GuildLeaderboardCommand(),
                 new EssenceCommand(), new BankCommand(waiter), new WardrobeCommand(waiter),
-                new TalismanBagCommand(waiter), new InventoryCommand(), new SacksCommand(waiter), new InviteCommand(),
+                new TalismanBagCommand(waiter), new InventoryCommand(waiter), new SacksCommand(waiter), new InviteCommand(),
                 new WeightCommand(), new HypixelCommand(), new UuidCommand(), new SkyblockCommand(waiter),
                 new BaldCommand(), new SettingsCommand(waiter), new ReloadCommand(), new SetupCommand(waiter),
-                new CategoriesCommand());
+                new CategoriesCommand(), new PartyFinderCommand());
 
         if (BOT_PREFIX.equals("/")) {
             jda = JDABuilder.createDefault(BOT_TOKEN).setStatus(OnlineStatus.DO_NOT_DISTURB)

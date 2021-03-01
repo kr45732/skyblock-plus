@@ -92,15 +92,18 @@ public class VerifyUser extends ListenerAdapter {
                             if (verifyingUser.getAsTag().equals(playerInfo[0])) {
                                 EmbedBuilder eb = defaultEmbed("Verification successful!");
                                 eb.setDescription("**You have successfully been verified as " + playerInfo[1]
-                                        + "**\nChannel closing in 30 seconds...");
+                                        + "**\nChannel closing in 10 seconds...");
                                 verifyChannel.sendMessage(eb.build()).queue();
-                                verifyChannel.delete().reason("Verification successful").queueAfter(30,
+                                verifyChannel.delete().reason("Verification successful").queueAfter(10,
                                         TimeUnit.SECONDS);
                                 event.getGuild()
                                         .addRoleToMember(event.getGuild().getMember(verifyingUser),
                                                 event.getGuild().getRoleById(
                                                         higherDepth(currentSettings, "verifiedRole").getAsString()))
                                         .queue();
+                                if(!verifyingUser.getName().equals(playerInfo[1])) {
+                                    event.getGuild().getMember(verifyingUser).modifyNickname(verifyingUser.getName() + " (" + playerInfo[1] + ")").queue();
+                                }
                                 removeChannel(verifyChannel);
                                 event.getJDA().removeEventListener(this);
                                 break;

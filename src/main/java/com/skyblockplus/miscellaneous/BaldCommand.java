@@ -35,7 +35,7 @@ public class BaldCommand extends Command {
             User user = event.getJDA().getUserById(id);
             if (user != null && !user.isBot()) {
                 eb = defaultEmbed("Baldness Checker");
-                if (user.getId().equals("385939031596466176")) {
+                if (user.getId().equals("385939031596466176") || user.getId().equals("225045405526654977")) {
                     eb.setDescription(user.getName() + " is not bald!");
                     eb.setImage(user.getAvatarUrl());
                     ebMessage.editMessage(eb.build()).queue();
@@ -48,30 +48,28 @@ public class BaldCommand extends Command {
                         eb.setImage(user.getAvatarUrl());
                         ebMessage.editMessage(eb.build()).queue();
                         event.getMessage().addReaction(":green_check_custom:799774962394988574").queue();
-                        return;
                     } else {
                         eb.setDescription("**WARNING** - " + user.getName() + " is bald!!!");
                         eb.setImage(user.getAvatarUrl());
                         eb.setColor(Color.red);
                         ebMessage.editMessage(eb.build()).queue();
                         event.getMessage().addReaction("⚠️").queue();
-                        return;
                     }
+                    return;
                 } else {
                     if (new Random().nextDouble() >= 0.5) {
                         eb.setDescription(user.getName() + " is not bald!");
                         eb.setImage(user.getAvatarUrl());
                         ebMessage.editMessage(eb.build()).queue();
                         event.getMessage().addReaction(":green_check_custom:799774962394988574").queue();
-                        return;
                     } else {
                         eb.setDescription("**WARNING** - " + user.getName() + " is bald!!!");
                         eb.setImage(user.getAvatarUrl());
                         eb.setColor(Color.red);
                         ebMessage.editMessage(eb.build()).queue();
                         event.getMessage().addReaction("⚠️").queue();
-                        return;
                     }
+                    return;
                 }
             }
         } catch (Exception ignored) {

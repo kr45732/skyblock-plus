@@ -44,10 +44,10 @@ public class SacksCommand extends Command {
 
             if (eb == null) {
                 ebMessage.delete().queue();
-                return;
+            }else {
+                ebMessage.editMessage(eb.build()).queue();
             }
-
-            ebMessage.editMessage(eb.build()).queue();
+            return;
         }
 
         ebMessage.editMessage(errorMessage(this.name).build()).queue();

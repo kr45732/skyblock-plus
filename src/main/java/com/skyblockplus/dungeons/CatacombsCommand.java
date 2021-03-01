@@ -29,7 +29,7 @@ public class CatacombsCommand extends Command {
         if (args.length == 3) {
             ebMessage.editMessage(getPlayerCatacombs(args[1], args[2]).build()).queue();
             return;
-        } else if (args.length == 4) {
+        } else if (args.length == 2) {
             ebMessage.editMessage(getPlayerCatacombs(args[1], null).build()).queue();
             return;
         }

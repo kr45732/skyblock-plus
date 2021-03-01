@@ -57,10 +57,9 @@ public class ApplyStaff extends ListenerAdapter {
             if (event.getMessageIdLong() == deleteChannelMessage.getIdLong()) {
                 if (event.getReactionEmote().getName().equals("✅")) {
                     deleteChannelMessage.clearReactions().queue();
-                    EmbedBuilder eb = defaultEmbed("Channel Closing");
-                    eb.addField("Reason", "User has read message", false);
+                    EmbedBuilder eb = defaultEmbed("Channel closing in 10 seconds");
                     applyChannel.sendMessage(eb.build()).queue();
-                    applyChannel.delete().reason("Applicant read final message").queueAfter(15, TimeUnit.SECONDS);
+                    applyChannel.delete().reason("Applicant read final message").queueAfter(10, TimeUnit.SECONDS);
                     removeChannel(applyChannel);
                     event.getJDA().removeEventListener(this);
                     return;

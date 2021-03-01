@@ -8,6 +8,7 @@ import com.skyblockplus.weight.Weight;
 import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
 import me.nullicorn.nedit.type.NBTList;
+import org.springframework.util.StringUtils;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -23,6 +24,7 @@ public class Player {
     private JsonElement levelTables;
     private JsonElement outerProfileJson;
     private JsonElement petLevelTable;
+    private JsonElement hypixelProfileJson;
     private String playerUuid;
     private String playerUsername;
     private String profileName;
@@ -557,9 +559,9 @@ public class Player {
                 NBTCompound displayName = invFrames.getCompound(i).getCompound("tag.ExtraAttributes");
                 if (displayName != null) {
                     invFramesMap.put(i + 1,
-                            displayName.getString("id", "empty").replaceAll("§f|§a|§9|§5|§6|§d|§4|§c|§7", "").toLowerCase());
-                } else {
-                    invFramesMap.put(i + 1, "empty");
+                            displayName.getString("id", "empty").toLowerCase());
+                }else{
+                    invFramesMap.put(i+1, "empty");
                 }
             }
 
@@ -582,7 +584,6 @@ public class Player {
                 }
             }
             return new String[]{outputStringPart2.toString(), outputStringPart1.toString()};
-
 
         } catch (Exception ignored) {
         }
@@ -618,6 +619,28 @@ public class Player {
         emojiMap.put("golden_apple", "<:golden_apple:814689788359082004>");
         emojiMap.put("stonk_pickaxe", "<:stonk_pickaxe:814689918311596044>");
         emojiMap.put("white_gift", "<:white_gift:814690119591919696>");
+emojiMap.put("item_spirit_bow", "<:item_spirit_bow:815283134416551997>");
+emojiMap.put("ice_spray_wand", "<:ice_spray_wand:815283295896993813>");
+emojiMap.put("jumbo_backpack", "<:jumbo_backpack:815283480476254219>");
+emojiMap.put("kismet_feather", "<:kismet_feather:815284259517759508>");
+emojiMap.put("wither_cloak", "<:wither_cloak:815283770189021204>");
+emojiMap.put("dungeon_chest_key", "<:dungeon_chest_key:815284007767769100>");
+emojiMap.put("florid_zombie_sword", "<:florid_zombie_sword:815284420567236649>");
+emojiMap.put("medium_backpack", "<:medium_backpack:815284582353731635>");
+emojiMap.put("phantom_rod", "<:phantom_rod:815284719868182568>");
+emojiMap.put("fel_pearl", "<:fel_pearl:815286137576488980>");
+emojiMap.put("holy_fragment", "<:holy_fragment:815285660214493184>");
+emojiMap.put("unstable_fragment", "<:unstable_fragment:815285660264038400>");
+emojiMap.put("young_fragment", "<:young_fragment:815285660230352897>");
+emojiMap.put("enchanted_bone", "<:enchanted_bone:815286708764934214>");
+emojiMap.put("enchanted_rotten_flesh", "<:enchanted_rotten_flesh:815287217316560896>");
+emojiMap.put("training_weights", "<:training_weights:815287498560503820>");
+emojiMap.put("beastmaster_crest_rare", "<:beastmaster_crest_rare:815288186170245140>");
+emojiMap.put("enchanted_ice", "<:enchanted_ice:815288002649522217>");
+emojiMap.put("zombie_knight_helmet", "<:zombie_knight_helmet:815300154311049236>");
+emojiMap.put("earth_shard", "<:earth_shard:815300345345474563>");
+emojiMap.put("pumpkin_dicer", "<:pumpkin_dicer:815300807980220436>");
+emojiMap.put("infinite_superboom_tnt", "<:infinite_superboom_tnt:815305646194688000>");
 
         if (emojiMap.containsKey(itemName)) {
             return emojiMap.get(itemName);
@@ -706,4 +729,65 @@ public class Player {
         return playerWeight.getTotalWeight();
     }
 
+    public Map<Integer, String[]> getInventoryItem(String itemName){
+        try {
+            String encodedInventoryContents = higherDepth(higherDepth(profileJson, "inv_contents"), "data").getAsString();
+            NBTCompound decodedInventoryContents = NBTReader.readBase64(encodedInventoryContents);
+
+            NBTList invFrames = decodedInventoryContents.getList(".i");
+            Map<Integer, String[]> invFramesMap = new HashMap<>();
+            for (int i = 0; i < invFrames.size(); i++) {
+                NBTCompound displayName = invFrames.getCompound(i).getCompound("tag.ExtraAttributes");
+                if (displayName != null) {
+                    if(displayName.getString("id", "empty").equalsIgnoreCase(itemName)){
+                        String loreString = "";
+                        for(Object loreLine: invFrames.getCompound(i).getCompound("tag.display").getList("Lore")){
+                            loreString += "\n" + ((String) loreLine).replaceAll("§ka|§0|§1|§2|§3|§4|§5|§6|§7|§8|§9|§a|§b|§c|§d|§e|§f|§k|§l|§m|§n|§o|§r", "");
+                        }
+                        invFramesMap.put(i + 1, new String[]{
+                                invFrames.getCompound(i).getString("Count", "0").toLowerCase().replace("b", "") + "x", loreString});
+                    }
+                }
+            }
+            return invFramesMap;
+
+        } catch (Exception ignored) {
+        }
+        return null;
+    }
+
+    public int getDungeonSecrets() {
+        if(hypixelProfileJson == null){
+            this.hypixelProfileJson = getJson("https://api.hypixel.net/player?key=" + HYPIXEL_API_KEY + "&uuid=" + playerUuid);
+        }
+
+        try{
+            return higherDepth(higherDepth(higherDepth(hypixelProfileJson, "player"), "achievements"), "skyblock_treasure_hunter").getAsInt();
+        }catch (Exception e){
+            return 0;
+        }
+    }
+
+    public String getSelectedDungeonClass() {
+        try {
+            return higherDepth(higherDepth(profileJson, "dungeons"), "selected_dungeon_class").getAsString();
+        } catch (Exception e) {
+            return "none";
+        }
+    }
+
+    public String getHyperion() {
+        if(getInventory()[0].contains("hyperion") || getInventory()[1].contains("hyperion") ){
+            return "yes";
+        }
+        return "no";
+    }
+
+    public int getBonemerang() {
+        if(getInventory()[0].contains("bone_boomerang") || getInventory()[1].contains("bone_boomerang") ){
+            int count = StringUtils.countOccurrencesOf(getInventory()[0], "bone_boomerang") + StringUtils.countOccurrencesOf(getInventory()[1], "bone_boomerang");
+            return count;
+        }
+        return 0;
+    }
 }

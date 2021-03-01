@@ -117,15 +117,18 @@ public class HelpCommand extends Command {
                 "cata [IGN] " + "<profile>")
                 + generateHelp("Calculate essence cost to upgrade an item", "essence upgrade [item]")
                 + generateHelp("Get essence information for each upgrade level for an item",
-                "essence information [item]", "essence info [item]"));
+                "essence information [item]", "essence info [item]")
+        + generateHelp("A party finder helper that shows dungeon stats of a person", "partyfinder [IGN] profile", "pf [IGN] profile")
+        );
 
         paginateBuilder.addItems(generateHelp("Get guild experience leaderboard from IGN", "guild experience [u-IGN]",
                 "guild exp [u-IGN]") + generateHelp("Get all the members in a player's guild", "guild members [u-IGN]")
                 + generateHelp("Get what guild a player is in", "guild [IGN]")
                 + generateHelp("Get information about a player's guild", "guild info [u-IGN]")
                 + generateHelp("Get information about a guild", "guild info [g-IGN]")
-                + generateHelp("Get promote and demote leaderboard in-game commands for a player's guild",
-                "guild-rank [u-IGN]", "g-rank [u-IGN]"));
+//                + generateHelp("Get promote and demote leaderboard in-game commands for a player's guild",
+//                "guild-rank [u-IGN]", "g-rank [u-IGN]")
+        );
 
         paginateBuilder.addItems(
                 generateHelp("Get player's active (not claimed) auctions on all profiles", "auction [IGN]", "ah [IGN]")
@@ -136,7 +139,11 @@ public class HelpCommand extends Command {
                 + generateHelp("Get a player's bank transaction history", "bank history [IGN] <profile>")
                 + generateHelp("Get a player's wardrobe armors", "wardrobe [IGN] <profile>")
                 + generateHelp("Get a player's talisman bag", "talisman [IGN] <profile>")
-                + generateHelp("Get a player's equipped armor", "inventory [IGN] <profile>",
+                + generateHelp("Get a player's inventory", "inventory [IGN] <profile>",
+                "inv [IGN] <profile>")
+                + generateHelp("Get an item's lore from a player's inventory. Item name should be the same as the emoji name", "inventory [item] [IGN] <profile>",
+                "inv [item] [IGN] <profile>")
+                + generateHelp("Get a player's equipped armor", "inventory armor [IGN] <profile>",
                 "inv [IGN] <profile>")
                 + generateHelp("Get a player's sacks content", "sacks [IGN] <profile>")
                 + generateHelp("Get a player's weight", "weight [IGN] <profile>")
@@ -144,7 +151,8 @@ public class HelpCommand extends Command {
                 "weight calculate [skill avg] [slayer] [cata level] [avg dungeon class level]")
                 + generateHelp("Get Hypixel information about a player", "hypixel [IGN]")
                 + generateHelp("Get fastest Hypixel lobby parkour for a player", "hypixel parkour [IGN]")
-                + generateHelp("Get a player's minecraft uuid", "uuid [IGN]"));
+                + generateHelp("Get a player's minecraft uuid", "uuid [IGN]")
+        );
 
         if (event.getGuild().getMember(event.getAuthor()).hasPermission(Permission.ADMINISTRATOR)) {
             paginateBuilder.addItems(generateHelp("Get the current verify settings for the bot", "settings verify")

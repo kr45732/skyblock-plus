@@ -22,13 +22,17 @@ public class GuildLeaderboardCommand extends Command {
 
     public GuildLeaderboardCommand() {
         this.name = "guild-rank";
-        this.cooldown = 120;
+        this.cooldown = 240;
         this.aliases = new String[]{"g-rank"};
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
     }
 
     @Override
     protected void execute(CommandEvent event) {
+        if(!event.getGuild().getId().equals("782154976243089429")){
+            return;
+        }
+
         EmbedBuilder eb = defaultEmbed("Loading...");
         eb.setDescription("**NOTE:** This can take up to a minute!");
         Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();

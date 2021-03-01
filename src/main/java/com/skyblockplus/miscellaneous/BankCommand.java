@@ -50,8 +50,10 @@ public class BankCommand extends Command {
 
             if (eb == null) {
                 ebMessage.delete().queue();
-                return;
+            }else {
+                ebMessage.editMessage(eb.build()).queue();
             }
+            return;
         } else if (args.length == 2) {
             ebMessage.editMessage(getPlayerBalance(args[1], null).build()).queue();
         } else if (args.length == 3) {
