@@ -73,5 +73,10 @@
     "version": "0.2.0",
     "description": "- **MAJOR MILESTONE!**\n- Fixed guild-rank command\n- Added database\n- Added API\n- Added custom settings for verify and apply\n- Many bug fixes and changes\n- Added categories command\n- Added settings command\n- Added event listener deleter\n- Updated bald command",
     "date": "2021-02-22T00:07:45.305380Z"
+  },
+  "16": {
+    "version": "0.2.2",
+    "description": "- Switched back to worker dyno\n- Updated reload command\n- Updated the roles command and structure\n- Fixed catacomb role\n- Added inventory command\n- Removed `player` from all commands",
+    "date": "2021-03-02T13:17:45.835432Z"
   }
 }

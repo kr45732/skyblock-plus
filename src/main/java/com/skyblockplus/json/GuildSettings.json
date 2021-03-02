@@ -313,12 +313,7 @@
       "pet_enthusiast": {
         "name": "Pet Enthusiast",
         "id": "805567896809898009",
-        "excluded_pets": [
-          "guardian",
-          "jellyfish",
-          "parrot",
-          "sheep"
-        ]
+        "excluded_pets": ["guardian", "jellyfish", "parrot", "sheep"]
       },
       "slot_collector": {
         "name": "Slot collector",
@@ -618,10 +613,6 @@
         "enable": "true",
         "levels": [
           {
-            "value": "20",
-            "roleId": "782154976562642953"
-          },
-          {
             "value": "25",
             "roleId": "788410758219169815"
           },
@@ -653,12 +644,7 @@
       "pet_enthusiast": {
         "name": "Pet Enthusiast",
         "id": "782154976608387072",
-        "excluded_pets": [
-          "guardian",
-          "jellyfish",
-          "parrot",
-          "sheep"
-        ]
+        "excluded_pets": ["guardian", "jellyfish", "parrot", "sheep"]
       },
       "slot_collector": {
         "name": "Slot collector",
@@ -670,29 +656,17 @@
   "5e4e6d0d8ea8c9feb3f0e44f": {
     "name": "Skyblock Forceful",
     "guild_leaderboard": {
-      "staff_ranks": [
-        "Moderator",
-        "Senior Officer",
-        "Guild Master"
-      ],
+      "staff_ranks": ["Moderator", "Senior Officer", "Guild Master"],
       "top_role": {
         "range": "5",
-        "names": [
-          "elite"
-        ]
+        "names": ["elite"]
       },
       "middle_role": {
         "range": "15",
-        "names": [
-          "trainee",
-          "kings"
-        ]
+        "names": ["trainee", "kings"]
       },
       "default_role": {
-        "names": [
-          "rookie",
-          "member"
-        ]
+        "names": ["rookie", "member"]
       }
     }
   }

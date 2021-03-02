@@ -89,6 +89,8 @@ public class ReloadEventWatcher extends ListenerAdapter {
 
                         return "Apply settings successfully reloaded";
 
+                    } else {
+                        return "Apply settings disabled";
                     }
                 }
             } else {
@@ -164,6 +166,8 @@ public class ReloadEventWatcher extends ListenerAdapter {
                         jda.addEventListener(new VerifyGuild(reactMessage, currentSettings));
 
                         return "Verify settings successfully reloaded";
+                    }else{
+                        return "Verify settings disabled";
                     }
                 }
             } else {
