@@ -278,9 +278,15 @@ public class Player {
         try {
             String lastProfileSave = "";
             for (int i = 0; i < profilesArray.size(); i++) {
-                String lastSaveLoop = higherDepth(
-                        higherDepth(higherDepth(profilesArray.get(i), "members"), this.playerUuid), "last_save")
-                                .getAsString();
+                String lastSaveLoop;
+                try {
+                     lastSaveLoop = higherDepth(
+                            higherDepth(higherDepth(profilesArray.get(i), "members"), this.playerUuid), "last_save")
+                            .getAsString();
+                } catch (Exception e){
+                    continue;
+                }
+
                 if (i == 0) {
                     this.profileJson = higherDepth(higherDepth(profilesArray.get(i), "members"), this.playerUuid);
                     this.outerProfileJson = profilesArray.get(i);
