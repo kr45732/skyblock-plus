@@ -11,12 +11,11 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.skyblockplus.utils.BotUtils.*;
+import static com.skyblockplus.utils.Utils.*;
 
 public class RoleCommands extends Command {
 
@@ -34,6 +33,7 @@ public class RoleCommands extends Command {
         MessageChannel channel = event.getChannel();
         Guild guild = event.getGuild();
         User user = event.getAuthor();
+        Member member = guild.getMemberById(user.getId());
         Message ebMessage = channel.sendMessage(eb.build()).complete();
 
         String[] args = content.split(" ");
@@ -92,24 +92,27 @@ public class RoleCommands extends Command {
 
                     for (String currentRoleName : rolesID) {
                         JsonElement currentRole = higherDepth(rolesJson, currentRoleName);
+
                         switch (currentRoleName) {
-                            case "guild_member":
-                            case "related_guild_member": {
+                            case "guild_member": {
                                 JsonElement guildJson = getJson("https://api.hypixel.net/findGuild?key="
                                         + HYPIXEL_API_KEY + "&byUuid=" + player.getUuid());
                                 if (guildJson != null) {
-                                    Role curRole = guild.getRoleById(higherDepth(currentRole, "id").getAsString());
-                                    if (!higherDepth(guildJson, "guild").isJsonNull()) {
-                                        if (higherDepth(currentRole, "guild_id").getAsString()
-                                                .equals(higherDepth(guildJson, "guild").getAsString())) {
-                                            if (!guild.getMember(user).getRoles().contains(curRole)) {
-                                                guild.addRoleToMember(guild.getMember(user), curRole).queue();
-                                                addedRoles.append(roleChangeString(curRole.getName()));
+                                    JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
+                                    String playerGuildId = higherDepth(guildJson, "guild").getAsString();
+
+                                    for (JsonElement currentLevel : levelsArray) {
+                                        String currentLevelValue = higherDepth(currentLevel, "value").getAsString();
+                                        Role currentLevelRole = guild.getRoleById(higherDepth(currentLevel, "roleId").getAsString());
+                                        if (playerGuildId.equals(currentLevelValue)) {
+                                            if (!guild.getMember(user).getRoles().contains(currentLevelRole)) {
+                                                guild.addRoleToMember(guild.getMember(user), currentLevelRole).queue();
+                                                addedRoles.append(roleChangeString(currentLevelRole.getName()));
                                             }
                                         } else {
-                                            if (guild.getMember(user).getRoles().contains(curRole)) {
-                                                removedRoles.append(roleChangeString(curRole.getName()));
-                                                guild.removeRoleFromMember(guild.getMember(user), curRole).queue();
+                                            if (guild.getMember(user).getRoles().contains(currentLevelRole)) {
+                                                removedRoles.append(roleChangeString(currentLevelRole.getName()));
+                                                guild.removeRoleFromMember(guild.getMember(user), currentLevelRole).queue();
                                             }
                                         }
                                     }
@@ -119,121 +122,113 @@ public class RoleCommands extends Command {
                             case "sven":
                             case "rev":
                             case "tara": {
-                                boolean isStackable = higherDepth(currentRole, "stackable") != null;
-                                currentRole = higherDepth(currentRole, "levels");
+                                JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
+                                int playerSlayer = player.getSlayer(currentRoleName);
 
-                                int slayerPlayer = player.getSlayer(currentRoleName);
-                                if (slayerPlayer == -1 && !errorRoles.toString().contains("Slayer")) {
-                                    errorRoles.append(roleChangeString("Slayer API disabled"));
-                                    break;
-                                }
+                                if (higherDepth(currentRole, "stackable").getAsBoolean()) {
+                                    for (JsonElement currentLevel : levelsArray) {
+                                        int currentLevelValue = higherDepth(currentLevel, "value").getAsInt();
+                                        Role currentLevelRole = event.getGuild().getRoleById(higherDepth(currentLevel, "roleId").getAsString());
 
-                                List<Integer> currentSlayerLevels = currentRole.getAsJsonObject().entrySet().stream()
-                                        .map(i -> Integer.parseInt(i.getKey())).sorted()
-                                        .collect(Collectors.toCollection(ArrayList::new));
-                                Collections.reverse(currentSlayerLevels);
-
-                                for (int i = 0; i < currentSlayerLevels.size(); i++) {
-                                    long levelSlayerXp = higherDepth(
-                                            higherDepth(currentRole, "" + currentSlayerLevels.get(i)), "xp")
-                                            .getAsLong();
-                                    if (slayerPlayer >= levelSlayerXp) {
-                                        Role playerSlayerLevelRole = guild.getRoleById(
-                                                higherDepth(higherDepth(currentRole, "" + currentSlayerLevels.get(i)),
-                                                        "id").getAsString());
-
-                                        if (!guild.getMember(user).getRoles().contains(playerSlayerLevelRole)) {
-                                            guild.addRoleToMember(guild.getMember(user), playerSlayerLevelRole).queue();
-                                            addedRoles.append(roleChangeString(playerSlayerLevelRole.getName()));
-                                        }
-
-                                        if (isStackable) {
-                                            currentSlayerLevels.remove(i);
-                                            for (int removeLevels : currentSlayerLevels) {
-                                                Role removeSlayerLevelRole = guild.getRoleById(
-                                                        higherDepth(higherDepth(currentRole, "" + removeLevels), "id")
-                                                                .getAsString());
-                                                if (guild.getMember(user).getRoles().contains(removeSlayerLevelRole)) {
-                                                    guild.removeRoleFromMember(guild.getMember(user),
-                                                            removeSlayerLevelRole).queue();
-                                                    removedRoles
-                                                            .append(roleChangeString(removeSlayerLevelRole.getName()));
-                                                }
+                                        if (playerSlayer >= currentLevelValue) {
+                                            if (!member.getRoles().contains(currentLevelRole)) {
+                                                guild.addRoleToMember(member, currentLevelRole).queue();
+                                                addedRoles.append(roleChangeString(currentLevelRole.getName()));
                                             }
                                         } else {
-                                            List<Integer> lowerRoles = currentSlayerLevels.subList(i + 1,
-                                                    currentSlayerLevels.size());
-                                            for (int addLowerRole : lowerRoles) {
-                                                Role removeSlayerLevelRole = guild.getRoleById(
-                                                        higherDepth(higherDepth(currentRole, "" + addLowerRole), "id")
-                                                                .getAsString());
-                                                if (!guild.getMember(user).getRoles().contains(removeSlayerLevelRole)) {
-                                                    guild.addRoleToMember(guild.getMember(user), removeSlayerLevelRole)
-                                                            .queue();
-                                                    addedRoles
-                                                            .append(roleChangeString(removeSlayerLevelRole.getName()));
-                                                }
+                                            if (member.getRoles().contains(currentLevelRole)) {
+                                                guild.removeRoleFromMember(member, currentLevelRole).queue();
+                                                removedRoles.append(roleChangeString(currentLevelRole.getName()));
                                             }
                                         }
-                                        break;
+                                    }
+                                } else {
+                                    for (int i = levelsArray.size() - 1; i >= 0; i--) {
+                                        JsonElement currentLevel = levelsArray.get(i);
+
+                                        int currentLevelValue = higherDepth(currentLevel, "value").getAsInt();
+                                        Role currentLevelRole = event.getGuild().getRoleById(higherDepth(currentLevel, "roleId").getAsString());
+
+                                        if (playerSlayer < currentLevelValue) {
+                                            if (member.getRoles().contains(currentLevelRole)) {
+                                                guild.removeRoleFromMember(member, currentLevelRole).queue();
+                                                removedRoles.append(roleChangeString(currentLevelRole.getName()));
+                                            }
+                                        } else {
+                                            if (!member.getRoles().contains(currentLevelRole)) {
+                                                guild.addRoleToMember(member, currentLevelRole).queue();
+                                                addedRoles.append(roleChangeString(currentLevelRole.getName()));
+                                            }
+
+                                            for (int j = i - 2; j >= 0; j--) {
+                                                JsonElement currentLevelRemoveStackable = levelsArray.get(j);
+                                                Role currentLevelRoleRemoveStackable = event.getGuild().getRoleById(higherDepth(currentLevelRemoveStackable, "roleId").getAsString());
+
+                                                if (member.getRoles().contains(currentLevelRoleRemoveStackable)) {
+                                                    guild.removeRoleFromMember(member, currentLevelRoleRemoveStackable).queue();
+                                                    removedRoles.append(roleChangeString(currentLevelRoleRemoveStackable.getName()));
+                                                }
+                                            }
+                                            break;
+                                        }
                                     }
                                 }
                                 break;
                             }
                             case "bank_coins": {
-                                boolean isStackable = higherDepth(currentRole, "stackable") != null;
-                                currentRole = higherDepth(currentRole, "levels");
-
-                                double playerBankCoins = player.getBankBalance();
-                                if (playerBankCoins == -1 && !errorRoles.toString().contains("Banking")) {
+                                JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
+                                double bankBalance = player.getBankBalance();
+                                if (bankBalance == -1 && !errorRoles.toString().contains("Banking")) {
                                     errorRoles.append(roleChangeString("Banking API disabled"));
+                                    break;
                                 }
 
-                                List<Integer> bankLevels = currentRole.getAsJsonObject().entrySet().stream()
-                                        .map(i -> Integer.parseInt(i.getKey())).sorted()
-                                        .collect(Collectors.toCollection(ArrayList::new));
-                                Collections.reverse(bankLevels);
+                                if (higherDepth(currentRole, "stackable").getAsBoolean()) {
+                                    for (JsonElement currentLevel : levelsArray) {
+                                        int currentLevelValue = higherDepth(currentLevel, "value").getAsInt();
+                                        Role currentLevelRole = event.getGuild().getRoleById(higherDepth(currentLevel, "roleId").getAsString());
 
-                                for (int i = 0; i < bankLevels.size(); i++) {
-                                    long levelCoins = higherDepth(higherDepth(currentRole, "" + bankLevels.get(i)),
-                                            "coins").getAsLong();
-                                    if (playerBankCoins >= levelCoins) {
-                                        Role playerBankLevelRole = guild.getRoleById(
-                                                higherDepth(higherDepth(currentRole, "" + bankLevels.get(i)), "id")
-                                                        .getAsString());
-
-                                        if (!guild.getMember(user).getRoles().contains(playerBankLevelRole)) {
-                                            guild.addRoleToMember(guild.getMember(user), playerBankLevelRole).queue();
-                                            addedRoles.append(roleChangeString(playerBankLevelRole.getName()));
-                                        }
-
-                                        if (isStackable) {
-                                            bankLevels.remove(i);
-                                            for (int removeLevels : bankLevels) {
-                                                Role removeBankLevelRole = guild.getRoleById(
-                                                        higherDepth(higherDepth(currentRole, "" + removeLevels), "id")
-                                                                .getAsString());
-                                                if (guild.getMember(user).getRoles().contains(removeBankLevelRole)) {
-                                                    guild.removeRoleFromMember(guild.getMember(user),
-                                                            removeBankLevelRole).queue();
-                                                    removedRoles
-                                                            .append(roleChangeString(removeBankLevelRole.getName()));
-                                                }
+                                        if (bankBalance >= currentLevelValue) {
+                                            if (!member.getRoles().contains(currentLevelRole)) {
+                                                guild.addRoleToMember(member, currentLevelRole).queue();
+                                                addedRoles.append(roleChangeString(currentLevelRole.getName()));
                                             }
                                         } else {
-                                            List<Integer> lowerRoles = bankLevels.subList(i + 1, bankLevels.size());
-                                            for (int addLowerRole : lowerRoles) {
-                                                Role removeBankLevelRole = guild.getRoleById(
-                                                        higherDepth(higherDepth(currentRole, "" + addLowerRole), "id")
-                                                                .getAsString());
-                                                if (!guild.getMember(user).getRoles().contains(removeBankLevelRole)) {
-                                                    guild.addRoleToMember(guild.getMember(user), removeBankLevelRole)
-                                                            .queue();
-                                                    addedRoles.append(roleChangeString(removeBankLevelRole.getName()));
-                                                }
+                                            if (member.getRoles().contains(currentLevelRole)) {
+                                                guild.removeRoleFromMember(member, currentLevelRole).queue();
+                                                removedRoles.append(roleChangeString(currentLevelRole.getName()));
                                             }
                                         }
-                                        break;
+                                    }
+                                } else {
+                                    for (int i = levelsArray.size() - 1; i >= 0; i--) {
+                                        JsonElement currentLevel = levelsArray.get(i);
+
+                                        int currentLevelValue = higherDepth(currentLevel, "value").getAsInt();
+                                        Role currentLevelRole = event.getGuild().getRoleById(higherDepth(currentLevel, "roleId").getAsString());
+
+                                        if (bankBalance < currentLevelValue) {
+                                            if (member.getRoles().contains(currentLevelRole)) {
+                                                guild.removeRoleFromMember(member, currentLevelRole).queue();
+                                                removedRoles.append(roleChangeString(currentLevelRole.getName()));
+                                            }
+                                        } else {
+                                            if (!member.getRoles().contains(currentLevelRole)) {
+                                                guild.addRoleToMember(member, currentLevelRole).queue();
+                                                addedRoles.append(roleChangeString(currentLevelRole.getName()));
+                                            }
+
+                                            for (int j = i - 2; j >= 0; j--) {
+                                                JsonElement currentLevelRemoveStackable = levelsArray.get(j);
+                                                Role currentLevelRoleRemoveStackable = event.getGuild().getRoleById(higherDepth(currentLevelRemoveStackable, "roleId").getAsString());
+
+                                                if (member.getRoles().contains(currentLevelRoleRemoveStackable)) {
+                                                    guild.removeRoleFromMember(member, currentLevelRoleRemoveStackable).queue();
+                                                    removedRoles.append(roleChangeString(currentLevelRoleRemoveStackable.getName()));
+                                                }
+                                            }
+                                            break;
+                                        }
                                     }
                                 }
                                 break;
@@ -248,86 +243,118 @@ public class RoleCommands extends Command {
                             case "taming":
                             case "enchanting":
                             case "catacombs": {
-                                boolean isStackable = higherDepth(currentRole, "stackable") != null;
-                                currentRole = higherDepth(currentRole, "levels");
-
-                                int currentSkill = -1;
-                                if (currentRoleName.equals("catacombs")) {
-                                    if (player.getCatacombsSkill() != null) {
-                                        currentSkill = player.getCatacombsSkill().skillLevel;
-                                    }
-                                } else {
-                                    if (player.getSkill(currentRoleName) != null) {
-                                        currentSkill = player.getSkill(currentRoleName).skillLevel;
-                                    }
+                                int currentSkillLevel = -1;
+                                if (currentRoleName.equals("catacombs") && player.getCatacombsSkill() != null) {
+                                    currentSkillLevel = player.getCatacombsSkill().skillLevel;
+                                } else if (player.getSkill(currentRoleName) != null) {
+                                    currentSkillLevel = player.getSkill(currentRoleName).skillLevel;
                                 }
-                                if (currentSkill == -1 && !errorRoles.toString().contains("Skills")) {
-                                    errorRoles.append(roleChangeString("Skills API is disabled"));
+                                if (currentSkillLevel == -1 && !errorRoles.toString().contains("Skills")) {
+                                    errorRoles.append(roleChangeString("Skills API disabled"));
                                     break;
                                 }
 
-                                List<Integer> skillLevels = currentRole.getAsJsonObject().entrySet().stream()
-                                        .map(i -> Integer.parseInt(i.getKey())).sorted()
-                                        .collect(Collectors.toCollection(ArrayList::new));
-                                Collections.reverse(skillLevels);
-                                for (int i = 0; i < skillLevels.size(); i++) {
-                                    long levelCoins = higherDepth(higherDepth(currentRole, "" + skillLevels.get(i)),
-                                            "level").getAsLong();
-                                    if (currentSkill >= levelCoins) {
-                                        Role playerSkillLevelRole = guild.getRoleById(
-                                                higherDepth(higherDepth(currentRole, "" + skillLevels.get(i)), "id")
-                                                        .getAsString());
+                                JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
+                                if (higherDepth(currentRole, "stackable").getAsBoolean()) {
+                                    for (JsonElement currentLevel : levelsArray) {
+                                        int currentLevelValue = higherDepth(currentLevel, "value").getAsInt();
+                                        Role currentLevelRole = event.getGuild().getRoleById(higherDepth(currentLevel, "roleId").getAsString());
 
-                                        if (!guild.getMember(user).getRoles().contains(playerSkillLevelRole)) {
-                                            guild.addRoleToMember(guild.getMember(user), playerSkillLevelRole).queue();
-                                            addedRoles.append(roleChangeString(playerSkillLevelRole.getName()));
-                                        }
-
-                                        if (isStackable) {
-                                            skillLevels.remove(i);
-                                            for (int removeLevels : skillLevels) {
-                                                Role removeSkillLevelRole = guild.getRoleById(
-                                                        higherDepth(higherDepth(currentRole, "" + removeLevels), "id")
-                                                                .getAsString());
-                                                if (guild.getMember(user).getRoles().contains(removeSkillLevelRole)) {
-                                                    guild.removeRoleFromMember(guild.getMember(user),
-                                                            removeSkillLevelRole).queue();
-                                                    removedRoles
-                                                            .append(roleChangeString(removeSkillLevelRole.getName()));
-                                                }
+                                        if (currentSkillLevel >= currentLevelValue) {
+                                            if (!member.getRoles().contains(currentLevelRole)) {
+                                                guild.addRoleToMember(member, currentLevelRole).queue();
+                                                addedRoles.append(roleChangeString(currentLevelRole.getName()));
                                             }
                                         } else {
-                                            List<Integer> lowerRoles = skillLevels.subList(i + 1, skillLevels.size());
-                                            for (int addLowerRole : lowerRoles) {
-                                                Role removeSkillLevelRole = guild.getRoleById(
-                                                        higherDepth(higherDepth(currentRole, "" + addLowerRole), "id")
-                                                                .getAsString());
-                                                if (!guild.getMember(user).getRoles().contains(removeSkillLevelRole)) {
-                                                    guild.addRoleToMember(guild.getMember(user), removeSkillLevelRole)
-                                                            .queue();
-                                                    addedRoles.append(roleChangeString(removeSkillLevelRole.getName()));
-                                                }
+                                            if (member.getRoles().contains(currentLevelRole)) {
+                                                guild.removeRoleFromMember(member, currentLevelRole).queue();
+                                                removedRoles.append(roleChangeString(currentLevelRole.getName()));
                                             }
                                         }
-                                        break;
+                                    }
+                                } else {
+                                    for (int i = levelsArray.size() - 1; i >= 0; i--) {
+                                        JsonElement currentLevel = levelsArray.get(i);
+
+                                        int currentLevelValue = higherDepth(currentLevel, "value").getAsInt();
+                                        Role currentLevelRole = guild.getRoleById(higherDepth(currentLevel, "roleId").getAsString());
+
+                                        if (currentSkillLevel < currentLevelValue) {
+                                            if (member.getRoles().contains(currentLevelRole)) {
+                                                guild.removeRoleFromMember(member, currentLevelRole).queue();
+                                                removedRoles.append(roleChangeString(currentLevelRole.getName()));
+                                            }
+                                        } else {
+                                            if (!member.getRoles().contains(currentLevelRole)) {
+                                                guild.addRoleToMember(member, currentLevelRole).queue();
+                                                addedRoles.append(roleChangeString(currentLevelRole.getName()));
+                                            }
+
+                                            for (int j = i - 2; j >= 0; j--) {
+                                                JsonElement currentLevelRemoveStackable = levelsArray.get(j);
+                                                Role currentLevelRoleRemoveStackable = event.getGuild().getRoleById(higherDepth(currentLevelRemoveStackable, "roleId").getAsString());
+
+                                                if (member.getRoles().contains(currentLevelRoleRemoveStackable)) {
+                                                    guild.removeRoleFromMember(member, currentLevelRoleRemoveStackable).queue();
+                                                    removedRoles.append(roleChangeString(currentLevelRoleRemoveStackable.getName()));
+                                                }
+                                            }
+                                            break;
+                                        }
                                     }
                                 }
                                 break;
                             }
-                            case "fairy": {
+                            case "fairy_souls": {
                                 int fairySouls = player.getFairySouls();
                                 if (fairySouls != -1) {
-                                    Role curRole = guild.getRoleById(higherDepth(currentRole, "id").getAsString());
-                                    if (fairySouls >= higherDepth(currentRole, "souls").getAsInt()) {
-                                        if (!guild.getMember(user).getRoles().contains(curRole)) {
-                                            guild.addRoleToMember(guild.getMember(user), curRole).queue();
+                                    JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
+                                    if (higherDepth(currentRole, "stackable").getAsBoolean()) {
+                                        for (JsonElement currentLevel : levelsArray) {
+                                            int currentLevelValue = higherDepth(currentLevel, "value").getAsInt();
+                                            Role currentLevelRole = event.getGuild().getRoleById(higherDepth(currentLevel, "roleId").getAsString());
 
-                                            addedRoles.append(roleChangeString(curRole.getName()));
+                                            if (fairySouls >= currentLevelValue) {
+                                                if (!member.getRoles().contains(currentLevelRole)) {
+                                                    guild.addRoleToMember(member, currentLevelRole).queue();
+                                                    addedRoles.append(roleChangeString(currentLevelRole.getName()));
+                                                }
+                                            } else {
+                                                if (member.getRoles().contains(currentLevelRole)) {
+                                                    guild.removeRoleFromMember(member, currentLevelRole).queue();
+                                                    removedRoles.append(roleChangeString(currentLevelRole.getName()));
+                                                }
+                                            }
                                         }
                                     } else {
-                                        if (guild.getMember(user).getRoles().contains(curRole)) {
-                                            removedRoles.append(roleChangeString(curRole.getName()));
-                                            guild.removeRoleFromMember(guild.getMember(user), curRole).queue();
+                                        for (int i = levelsArray.size() - 1; i >= 0; i--) {
+                                            JsonElement currentLevel = levelsArray.get(i);
+
+                                            int currentLevelValue = higherDepth(currentLevel, "value").getAsInt();
+                                            Role currentLevelRole = guild.getRoleById(higherDepth(currentLevel, "roleId").getAsString());
+
+                                            if (fairySouls < currentLevelValue) {
+                                                if (member.getRoles().contains(currentLevelRole)) {
+                                                    guild.removeRoleFromMember(member, currentLevelRole).queue();
+                                                    removedRoles.append(roleChangeString(currentLevelRole.getName()));
+                                                }
+                                            } else {
+                                                if (!member.getRoles().contains(currentLevelRole)) {
+                                                    guild.addRoleToMember(member, currentLevelRole).queue();
+                                                    addedRoles.append(roleChangeString(currentLevelRole.getName()));
+                                                }
+
+                                                for (int j = i - 2; j >= 0; j--) {
+                                                    JsonElement currentLevelRemoveStackable = levelsArray.get(j);
+                                                    Role currentLevelRoleRemoveStackable = event.getGuild().getRoleById(higherDepth(currentLevelRemoveStackable, "roleId").getAsString());
+
+                                                    if (member.getRoles().contains(currentLevelRoleRemoveStackable)) {
+                                                        guild.removeRoleFromMember(member, currentLevelRoleRemoveStackable).queue();
+                                                        removedRoles.append(roleChangeString(currentLevelRoleRemoveStackable.getName()));
+                                                    }
+                                                }
+                                                break;
+                                            }
                                         }
                                     }
                                 }

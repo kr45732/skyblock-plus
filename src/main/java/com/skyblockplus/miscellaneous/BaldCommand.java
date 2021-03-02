@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.entities.User;
 import java.awt.*;
 import java.util.Random;
 
-import static com.skyblockplus.utils.BotUtils.*;
+import static com.skyblockplus.utils.Utils.*;
 
 public class BaldCommand extends Command {
 
@@ -57,7 +57,7 @@ public class BaldCommand extends Command {
                     }
                     return;
                 } else {
-                    if (new Random().nextDouble() >= 0.5) {
+                    if (new Random().nextDouble() >= 0.25) {
                         eb.setDescription(user.getName() + " is not bald!");
                         eb.setImage(user.getAvatarUrl());
                         ebMessage.editMessage(eb.build()).queue();

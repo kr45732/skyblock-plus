@@ -14,8 +14,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.skyblockplus.timeout.MessageTimeout.addMessage;
-import static com.skyblockplus.utils.BotUtils.defaultEmbed;
-import static com.skyblockplus.utils.BotUtils.higherDepth;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.higherDepth;
 
 public class EssenceWaiter extends ListenerAdapter {
     private final String itemName;

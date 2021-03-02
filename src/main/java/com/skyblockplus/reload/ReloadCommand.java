@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.entities.Message;
 
 import static com.skyblockplus.reload.ReloadEventWatcher.onApplyReload;
 import static com.skyblockplus.reload.ReloadEventWatcher.onVerifyReload;
-import static com.skyblockplus.utils.BotUtils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
 
 public class ReloadCommand extends Command {
 

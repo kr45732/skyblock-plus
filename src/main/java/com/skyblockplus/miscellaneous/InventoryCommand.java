@@ -15,11 +15,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static com.skyblockplus.utils.BotUtils.*;
+import static com.skyblockplus.utils.Utils.*;
 
 public class InventoryCommand extends Command {
-    private EventWaiter waiter;
+    private final EventWaiter waiter;
     private CommandEvent event;
+
     public InventoryCommand(EventWaiter waiter) {
         this.name = "inventory";
         this.cooldown = globalCooldown;
@@ -44,15 +45,15 @@ public class InventoryCommand extends Command {
                 ebMessage.editMessage(getPlayerEquippedArmor(args[2], null).build()).queue();
             }
             return;
-        } else if((args.length == 4 || args.length == 5) && args[1].equals("slot")){
+        } else if ((args.length == 4 || args.length == 5) && args[1].equals("slot")) {
             if (args.length == 5) {
                 eb = getInventorySlot(args[2], args[3], args[4]);
             } else {
                 eb = getInventorySlot(args[2], args[3], null);
             }
-            if(eb == null){
+            if (eb == null) {
                 ebMessage.delete().queue();
-            }else{
+            } else {
                 ebMessage.editMessage(eb.build()).queue();
             }
 
@@ -81,13 +82,13 @@ public class InventoryCommand extends Command {
 
     private EmbedBuilder getInventorySlot(String itemName, String username, String profileName) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
-        if(player.isValid()){
+        if (player.isValid()) {
             Map<Integer, String[]> itemArr = player.getInventoryItem(itemName);
 
             List<String> pages = new ArrayList<>();
             List<String> pageTitles = new ArrayList<>();
 
-            for(Map.Entry<Integer, String[]> item:itemArr.entrySet()){
+            for (Map.Entry<Integer, String[]> item : itemArr.entrySet()) {
                 pageTitles.add("[" + item.getValue()[0] + " " + itemName + "] Slot " + item.getKey());
                 pages.add(item.getValue()[1]);
             }

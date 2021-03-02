@@ -14,7 +14,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static com.skyblockplus.utils.BotUtils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
 
 public class ChannelDeleter extends ListenerAdapter {
     private static final List<TextChannel> channelsList = new ArrayList<>();

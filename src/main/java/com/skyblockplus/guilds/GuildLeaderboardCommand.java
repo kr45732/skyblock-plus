@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import static com.skyblockplus.utils.BotUtils.*;
+import static com.skyblockplus.utils.Utils.*;
 
 public class GuildLeaderboardCommand extends Command {
 
@@ -29,7 +29,7 @@ public class GuildLeaderboardCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        if(!event.getGuild().getId().equals("782154976243089429")){
+        if (!event.getGuild().getId().equals("782154976243089429")) {
             return;
         }
 

@@ -14,8 +14,8 @@ import java.util.concurrent.TimeUnit;
 import static com.skyblockplus.reload.ReloadEventWatcher.addApplySubEventListener;
 import static com.skyblockplus.timeout.ChannelDeleter.removeChannel;
 import static com.skyblockplus.timeout.EventListenerDeleter.addEventListener;
-import static com.skyblockplus.utils.BotUtils.defaultEmbed;
-import static com.skyblockplus.utils.BotUtils.higherDepth;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.higherDepth;
 
 public class ApplyStaff extends ListenerAdapter {
     private final User user;

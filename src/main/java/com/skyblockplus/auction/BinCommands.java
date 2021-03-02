@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import static com.skyblockplus.utils.BotUtils.*;
+import static com.skyblockplus.utils.Utils.*;
 
 public class BinCommands extends Command {
 

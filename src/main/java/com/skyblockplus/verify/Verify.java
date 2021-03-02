@@ -12,7 +12,7 @@ import java.util.List;
 
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.reload.ReloadEventWatcher.isUniqueVerifyGuild;
-import static com.skyblockplus.utils.BotUtils.higherDepth;
+import static com.skyblockplus.utils.Utils.higherDepth;
 
 public class Verify extends ListenerAdapter {
     @Override

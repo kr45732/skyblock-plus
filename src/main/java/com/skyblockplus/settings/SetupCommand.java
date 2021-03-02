@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.exceptions.PermissionException;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.skyblockplus.utils.BotUtils.*;
+import static com.skyblockplus.utils.Utils.*;
 
 public class SetupCommand extends Command {
     private final EventWaiter waiter;

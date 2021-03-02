@@ -18,7 +18,7 @@ import static com.skyblockplus.reload.ReloadEventWatcher.addApplySubEventListene
 import static com.skyblockplus.timeout.ChannelDeleter.addChannel;
 import static com.skyblockplus.timeout.ChannelDeleter.removeChannel;
 import static com.skyblockplus.timeout.EventListenerDeleter.addEventListener;
-import static com.skyblockplus.utils.BotUtils.*;
+import static com.skyblockplus.utils.Utils.*;
 
 public class ApplyUser extends ListenerAdapter {
     private final User applyingUser;

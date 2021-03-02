@@ -6,7 +6,7 @@ import com.skyblockplus.utils.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
-import static com.skyblockplus.utils.BotUtils.*;
+import static com.skyblockplus.utils.Utils.*;
 
 public class PartyFinderCommand extends Command {
     public PartyFinderCommand() {
@@ -36,7 +36,7 @@ public class PartyFinderCommand extends Command {
 
     private EmbedBuilder getPlayerDungeonInfo(String username, String profileName) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
-        if(player.isValid()){
+        if (player.isValid()) {
             EmbedBuilder eb = defaultEmbed("Dungeon stats for " + player.getUsername());
             eb.setDescription("**Catacombs Level:** " + roundSkillAverage(player.getCatacombsLevel()));
             eb.appendDescription("\n**Secrets:** " + formatNumber(player.getDungeonSecrets()));

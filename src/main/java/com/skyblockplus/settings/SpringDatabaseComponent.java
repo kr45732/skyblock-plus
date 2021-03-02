@@ -10,11 +10,13 @@ import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSetting
 import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSettingsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 
 @Service
+@Transactional
 public class SpringDatabaseComponent {
     private final ServerSettingsService settingsService;
     private final Gson gson = new Gson();

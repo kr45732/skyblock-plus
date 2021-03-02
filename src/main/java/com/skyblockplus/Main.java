@@ -14,6 +14,7 @@ import com.skyblockplus.miscellaneous.*;
 import com.skyblockplus.reload.ReloadCommand;
 import com.skyblockplus.reload.ReloadEventWatcher;
 import com.skyblockplus.roles.RoleCommands;
+import com.skyblockplus.settings.QuickSetupTestCommand;
 import com.skyblockplus.settings.SettingsCommand;
 import com.skyblockplus.settings.SetupCommand;
 import com.skyblockplus.settings.SpringDatabaseComponent;
@@ -36,7 +37,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import javax.security.auth.login.LoginException;
 
-import static com.skyblockplus.utils.BotUtils.*;
+import static com.skyblockplus.utils.Utils.*;
 
 @SpringBootApplication
 public class Main {
@@ -63,7 +64,7 @@ public class Main {
                 new TalismanBagCommand(waiter), new InventoryCommand(waiter), new SacksCommand(waiter), new InviteCommand(),
                 new WeightCommand(), new HypixelCommand(), new UuidCommand(), new SkyblockCommand(waiter),
                 new BaldCommand(), new SettingsCommand(waiter), new ReloadCommand(), new SetupCommand(waiter),
-                new CategoriesCommand(), new PartyFinderCommand());
+                new CategoriesCommand(), new PartyFinderCommand(), new QuickSetupTestCommand());
 
         if (BOT_PREFIX.equals("/")) {
             jda = JDABuilder.createDefault(BOT_TOKEN).setStatus(OnlineStatus.DO_NOT_DISTURB)

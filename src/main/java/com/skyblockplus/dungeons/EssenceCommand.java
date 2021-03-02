@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.entities.Message;
 import java.util.Locale;
 
 import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.utils.BotUtils.*;
+import static com.skyblockplus.utils.Utils.*;
 
 public class EssenceCommand extends Command {
 

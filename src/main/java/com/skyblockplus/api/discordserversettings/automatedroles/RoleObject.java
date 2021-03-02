@@ -9,9 +9,7 @@ import javax.persistence.Embeddable;
 @AllArgsConstructor
 @Embeddable
 public class RoleObject {
-
     private String value = "";
-
     private String roleId = "";
 
     public RoleObject() {

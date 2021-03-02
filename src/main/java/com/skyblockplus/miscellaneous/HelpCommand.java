@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static com.skyblockplus.utils.BotUtils.*;
+import static com.skyblockplus.utils.Utils.*;
 
 public class HelpCommand extends Command {
     private final EventWaiter waiter;
@@ -91,7 +91,7 @@ public class HelpCommand extends Command {
                     + " 3**: Slayer\n• **Page 4**: Skills\n• **Page 5**: Dungeons\n• **Page 6**: Guild\n• **Page 7**: "
                     + "Auction House and Bazaar\n• **Page 8**: Miscellaneous Commands\n• **Page 9**: Verify Settings\n• "
                     + "**Page 10**: Apply Settings\n• **Page 11**: Roles Settings");
-        }else{
+        } else {
             paginateBuilder.addItems("Use the arrow emojis to navigate through the pages\n• **Page 2**: General\n• **Page"
                     + " 3**: Slayer\n• **Page 4**: Skills\n• **Page 5**: Dungeons\n• **Page 6**: Guild\n• **Page 7**: "
                     + "Auction House and Bazaar\n• **Page 8**: Miscellaneous Commands");
@@ -118,14 +118,14 @@ public class HelpCommand extends Command {
                 + generateHelp("Calculate essence cost to upgrade an item", "essence upgrade [item]")
                 + generateHelp("Get essence information for each upgrade level for an item",
                 "essence information [item]", "essence info [item]")
-        + generateHelp("A party finder helper that shows dungeon stats of a person", "partyfinder [IGN] profile", "pf [IGN] profile")
+                + generateHelp("A party finder helper that shows dungeon stats of a person", "partyfinder [IGN] profile", "pf [IGN] profile")
         );
 
         paginateBuilder.addItems(generateHelp("Get guild experience leaderboard from IGN", "guild experience [u-IGN]",
                 "guild exp [u-IGN]") + generateHelp("Get all the members in a player's guild", "guild members [u-IGN]")
-                + generateHelp("Get what guild a player is in", "guild [IGN]")
-                + generateHelp("Get information about a player's guild", "guild info [u-IGN]")
-                + generateHelp("Get information about a guild", "guild info [g-IGN]")
+                        + generateHelp("Get what guild a player is in", "guild [IGN]")
+                        + generateHelp("Get information about a player's guild", "guild info [u-IGN]")
+                        + generateHelp("Get information about a guild", "guild info [g-IGN]")
 //                + generateHelp("Get promote and demote leaderboard in-game commands for a player's guild",
 //                "guild-rank [u-IGN]", "g-rank [u-IGN]")
         );

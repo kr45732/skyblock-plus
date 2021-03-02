@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import static com.skyblockplus.reload.ReloadEventWatcher.addApplyGuild;
-import static com.skyblockplus.utils.BotUtils.higherDepth;
+import static com.skyblockplus.utils.Utils.higherDepth;
 
 public class ApplyGuild extends ListenerAdapter {
     private final Message reactMessage;

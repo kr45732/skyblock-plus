@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.entities.Message;
 import java.time.Duration;
 import java.time.Instant;
 
-import static com.skyblockplus.utils.BotUtils.*;
+import static com.skyblockplus.utils.Utils.*;
 
 public class AuctionCommands extends Command {
     private String playerUsername;

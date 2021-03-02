@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
@@ -148,6 +149,7 @@ public class ServerSettingsService {
 
     }
 
+    @Transactional
     public ResponseEntity<HttpStatus> updateRoleSettings(String serverId, RoleModel newRoleSettings, String roleName) {
         if (serverByServerIdExists(serverId)) {
             ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);

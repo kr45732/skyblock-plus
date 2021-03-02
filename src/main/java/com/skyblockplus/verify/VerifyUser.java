@@ -17,7 +17,7 @@ import static com.skyblockplus.reload.ReloadEventWatcher.addVerifySubEventListen
 import static com.skyblockplus.timeout.ChannelDeleter.addChannel;
 import static com.skyblockplus.timeout.ChannelDeleter.removeChannel;
 import static com.skyblockplus.timeout.EventListenerDeleter.addEventListener;
-import static com.skyblockplus.utils.BotUtils.*;
+import static com.skyblockplus.utils.Utils.*;
 
 public class VerifyUser extends ListenerAdapter {
     final User verifyingUser;
@@ -101,7 +101,7 @@ public class VerifyUser extends ListenerAdapter {
                                                 event.getGuild().getRoleById(
                                                         higherDepth(currentSettings, "verifiedRole").getAsString()))
                                         .queue();
-                                if(!verifyingUser.getName().equals(playerInfo[1])) {
+                                if (!verifyingUser.getName().equals(playerInfo[1])) {
                                     event.getGuild().getMember(verifyingUser).modifyNickname(verifyingUser.getName() + " (" + playerInfo[1] + ")").queue();
                                 }
                                 removeChannel(verifyChannel);

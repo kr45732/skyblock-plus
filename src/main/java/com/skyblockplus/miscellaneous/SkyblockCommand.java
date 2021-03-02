@@ -18,7 +18,7 @@ import java.time.format.FormatStyle;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import static com.skyblockplus.utils.BotUtils.*;
+import static com.skyblockplus.utils.Utils.*;
 
 public class SkyblockCommand extends Command {
     private final EventWaiter waiter;
@@ -49,7 +49,7 @@ public class SkyblockCommand extends Command {
 
             if (eb == null) {
                 ebMessage.delete().queue();
-            }else {
+            } else {
                 ebMessage.editMessage(eb.build()).queue();
             }
             return;
