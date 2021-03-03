@@ -673,7 +673,7 @@ public class Player {
         emojiMap.put("soul_whip", "<:soul_whip:815307925052457010>");
         emojiMap.put("rotten_leggings", "<:rotten_leggings:815307870937284699>");
         emojiMap.put("super_heavy_chestplate", "<:super_heavy_chestplate:815307825504976916>");
-        emojiMap.put("large_backpack", "<:large_backpack:815299347822149632>\n");
+        emojiMap.put("large_backpack", "<:large_backpack:815299347822149632>");
         emojiMap.put("midas_sword", "<:midas_sword:815307715467018242>");
         emojiMap.put("bonzo_staff", "<:bonzo_staff:815307683883647076>");
         emojiMap.put("flaming_sword", "<:flaming_sword:815307168109953024>");
@@ -701,7 +701,7 @@ public class Player {
         emojiMap.put("giants_sword", "<:giants_sword:816435478609133619>");
         emojiMap.put("rod_of_the_sea", "<:rod_of_the_sea:816438156445745203>");
         emojiMap.put("theoretical_hoe_warts_3", "<:theoretical_hoe_warts_3:816438156680626176>");
-        emojiMap.put("treecapitator", "<:treecapitator:816438156873302086>");
+        emojiMap.put("treecapitator_axe", "<:treecapitator:816438156873302086>");
         emojiMap.put("theoretical_hoe_cane_3", "<:theoretical_hoe_cane_3:816438156953518150>");
         emojiMap.put("fel_sword", "<:fel_sword:816442343816822785>");
         emojiMap.put("jingle_bells", "<:jingle_bells:816442343900446731>");
