@@ -576,8 +576,7 @@ public class Player {
             StringBuilder outputStringPart2 = new StringBuilder();
             StringBuilder curNine = new StringBuilder();
             for (Map.Entry<Integer, String> i : invFramesMap.entrySet()) {
-                // System.out.println(i.getKey() + " - " + i.getValue());
-                if (i.getKey() <= invFrames.size() / 2) {
+                if (i.getKey() <= 9 || i.getKey() >= 28) {
                     curNine.append(itemToEmoji(i.getValue()));
                     if (i.getKey() % 9 == 0) {
                         outputStringPart1.insert(0, curNine + "\n");
@@ -586,7 +585,7 @@ public class Player {
                 } else {
                     curNine.append(itemToEmoji(i.getValue()));
                     if (i.getKey() % 9 == 0) {
-                        outputStringPart2.insert(0, curNine + "\n");
+                        outputStringPart2.append(curNine).append("\n");
                         curNine = new StringBuilder();
                     }
                 }
@@ -674,6 +673,7 @@ public class Player {
         emojiMap.put("soul_whip", "<:soul_whip:815307925052457010>");
         emojiMap.put("rotten_leggings", "<:rotten_leggings:815307870937284699>");
         emojiMap.put("super_heavy_chestplate", "<:super_heavy_chestplate:815307825504976916>");
+        emojiMap.put("large_backpack", "<:large_backpack:815299347822149632>\n");
         emojiMap.put("midas_sword", "<:midas_sword:815307715467018242>");
         emojiMap.put("bonzo_staff", "<:bonzo_staff:815307683883647076>");
         emojiMap.put("flaming_sword", "<:flaming_sword:815307168109953024>");
@@ -685,7 +685,70 @@ public class Player {
         emojiMap.put("volta", "<:volta:816324127307595797>");
         emojiMap.put("bag_of_cash", "<:bag_of_cash:816324127253332038>");
         emojiMap.put("ancient_claw", "<:ancient_claw:816324552405549117>");
-        // emojiMap.put("", "");
+        emojiMap.put("summoning_ring", "<:summoning_ring:816433732331241483>");
+        emojiMap.put("zombie_knight_sword", "<:zombie_knight_sword:816433732331634719>");
+        emojiMap.put("enchanted_iron", "<:enchanted_iron:816433732587225158>");
+        emojiMap.put("enchanted_ancient_claw", "<:enchanted_ancient_claw:816433732624842842>");
+        emojiMap.put("griffin_feather", "<:griffin_feather:816433732624973884>");
+        emojiMap.put("potion", "<:potion:816433732688281650>");
+        emojiMap.put("enchanted_gold", "<:enchanted_gold:816433732721573938>");
+        emojiMap.put("emerald_blade", "<:emerald_blade:816433732763910166>");
+        emojiMap.put("ancestral_spade", "<:ancestral_spade:816433732969693214>");
+        emojiMap.put("magma_bow", "<:magma_bow:816435478076850187>");
+        emojiMap.put("end_stone_sword", "<:end_stone_sword:816435478223519766>");
+        emojiMap.put("gold_axe", "<:gold_axe:816435478471114773>");
+        emojiMap.put("aatrox_batphone", "<:aatrox_batphone:816435478580428841>");
+        emojiMap.put("giants_sword", "<:giants_sword:816435478609133619>");
+        emojiMap.put("rod_of_the_sea", "<:rod_of_the_sea:816438156445745203>");
+        emojiMap.put("theoretical_hoe_warts_3", "<:theoretical_hoe_warts_3:816438156680626176>");
+        emojiMap.put("treecapitator", "<:treecapitator:816438156873302086>");
+        emojiMap.put("theoretical_hoe_cane_3", "<:theoretical_hoe_cane_3:816438156953518150>");
+        emojiMap.put("fel_sword", "<:fel_sword:816442343816822785>");
+        emojiMap.put("jingle_bells", "<:jingle_bells:816442343900446731>");
+        emojiMap.put("aspect_of_the_dragon", "<:aspect_of_the_dragon:816442343922204674>");
+        emojiMap.put("gift_compass", "<:gift_compass:816442344014348300>");
+        emojiMap.put("magical_bucket", "<:magical_bucket:816442344055242773>");
+        emojiMap.put("mana_flux_power_orb", "<:mana_flux_power_orb:816442344060092477>");
+        emojiMap.put("sea_lantern", "<:sea_lantern:816442344093646849>");
+        emojiMap.put("valkyrie", "<:valkyrie:816442344260763649>");
+        emojiMap.put("livid_dagger", "<:livid_dagger:816442344264957952>");
+        emojiMap.put("wise_wither_chestplate", "<:storm_chestplate:816442344265744395>");
+        emojiMap.put("diamond_pickaxe", "<:diamond_pickaxe:816442344269414421>");
+        emojiMap.put("rune", "<:rune:816442344320532532>");
+        emojiMap.put("wither_goggles", "<:wither_goggles:816442344382922783>");
+        emojiMap.put("skeleton_master_leggings", "<:skeleton_master_leggings:816442344387641385>");
+        emojiMap.put("wise_wither_leggings", "<:storm_leggings:816442344459075584>");
+        emojiMap.put("personal_compactor_7000", "<:personal_compactor_7000:816442344462090281>");
+        emojiMap.put("wise_wither_helmet", "<:storm_helmet:816442344525791253>");
+        emojiMap.put("wise_wither_boots", "<:storm_boots:816442344534310963>");
+        emojiMap.put("slime_hat", "<:slime_hat:816442344559083580>");
+        emojiMap.put("tarantula_boots", "<:tarantula_boots:816442344572190760>");
+        emojiMap.put("zombie_soldier_boots", "<:zombie_soldier_boots:816442344617934868>");
+        emojiMap.put("shadow_assassin_helmet", "<:shadow_assassin_helmet:816444761559793694>");
+        emojiMap.put("wither_catalyst", "<:wither_catalyst:816444761493864448>");
+        emojiMap.put("zombie_soldier_chestplate", "<:zombie_soldier_chestplate:816445031946780693>");
+        emojiMap.put("cake_soul", "<:cake_soul:816445265480777818>");
+        emojiMap.put("power_wither_helmet", "<:necron_helmet:816450192366370866>");
+        emojiMap.put("tank_wither_helmet", "<:goldor_helmet:816450192198991872>");
+        emojiMap.put("mimic_fragment", "<:mimic_fragment:816452177928519709>");
+        emojiMap.put("reaper_sword", "<:reaper_falchion:816452177882775552>");
+        emojiMap.put("speed_wither_chestplate", "<:maxor_chestplate:816450192131227679>");
+        emojiMap.put("builders_wand", "<:builders_wand:816452177487724575>");
+        emojiMap.put("zombie_soldier_cutlass", "<:zombie_soldier_cutlass:816450973651304448>");
+        emojiMap.put("tank_wither_chestplate", "<:goldor_chestplate:816450192139223080>");
+        emojiMap.put("power_wither_leggings", "<:necron_leggings:816450192084566037>");
+        emojiMap.put("speed_wither_leggings", "<:maxor_leggings:816450191904473118>");
+        emojiMap.put("personal_compactor_6000", "<:personal_compactor_6000:816452177588650025>");
+        emojiMap.put("speed_wither_helmet", "<:maxor_helmet:816450192487350279>");
+        emojiMap.put("skeleton_soldier_helmet", "<:skeleton_soldier_helmet:816452177794826291>");
+        emojiMap.put("tank_wither_leggings", "<:goldor_leggings:816450192336879669>");
+        emojiMap.put("tank_wither_boots", "<:goldor_boots:816450192203055137>");
+        emojiMap.put("remnant_of_the_eye", "<:remnant_of_the_eye:816438156840271953>");
+        emojiMap.put("speed_wither_boots", "<:maxor_boots:816450192240672828>");
+        emojiMap.put("power_wither_chestplate", "<:necron_chestplate:816450192285892608>");
+        emojiMap.put("power_wither_boots", "<:necron_boots:816450192270163989>");
+        emojiMap.put("wither_blood", "<:wither_blood:816450973681320006>");
+        emojiMap.put("ornate_zombie_sword", "<:ornatezombiesword:816452177567678475>");
 
         itemName = itemName.replace("starred_", "");
         if (emojiMap.containsKey(itemName)) {

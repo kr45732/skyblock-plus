@@ -1,4 +1,4 @@
-package com.skyblockplus.settings;
+package com.skyblockplus.dev;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;

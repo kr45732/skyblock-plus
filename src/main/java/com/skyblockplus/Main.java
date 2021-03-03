@@ -5,6 +5,7 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.apply.Apply;
 import com.skyblockplus.auction.AuctionCommands;
 import com.skyblockplus.auction.BinCommands;
+import com.skyblockplus.dev.EmojiMapServerCommand;
 import com.skyblockplus.dungeons.CatacombsCommand;
 import com.skyblockplus.dungeons.EssenceCommand;
 import com.skyblockplus.dungeons.PartyFinderCommand;
@@ -14,7 +15,7 @@ import com.skyblockplus.miscellaneous.*;
 import com.skyblockplus.reload.ReloadCommand;
 import com.skyblockplus.reload.ReloadEventWatcher;
 import com.skyblockplus.roles.RoleCommands;
-import com.skyblockplus.settings.QuickSetupTestCommand;
+import com.skyblockplus.dev.QuickSetupTestCommand;
 import com.skyblockplus.settings.SettingsCommand;
 import com.skyblockplus.settings.SetupCommand;
 import com.skyblockplus.settings.SpringDatabaseComponent;
@@ -64,7 +65,7 @@ public class Main {
                 new TalismanBagCommand(waiter), new InventoryCommand(waiter), new SacksCommand(waiter), new InviteCommand(),
                 new WeightCommand(), new HypixelCommand(), new UuidCommand(), new SkyblockCommand(waiter),
                 new BaldCommand(), new SettingsCommand(waiter), new ReloadCommand(), new SetupCommand(waiter),
-                new CategoriesCommand(), new PartyFinderCommand(), new QuickSetupTestCommand());
+                new CategoriesCommand(), new PartyFinderCommand(), new QuickSetupTestCommand(), new EmojiMapServerCommand());
 
         if (BOT_PREFIX.equals("/")) {
             jda = JDABuilder.createDefault(BOT_TOKEN).setStatus(OnlineStatus.DO_NOT_DISTURB)
