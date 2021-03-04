@@ -29,8 +29,6 @@ public class QuickSetupTestCommand extends Command {
         String content = event.getMessage().getContentRaw();
         String[] args = content.split(" ", 4);
 
-        System.out.println(content);
-
         if (args.length >= 4) {
             if (args[1].equals("roles")) {
                 ebMessage.editMessage(setRoleSettings(args[2], args[3]).build()).queue();

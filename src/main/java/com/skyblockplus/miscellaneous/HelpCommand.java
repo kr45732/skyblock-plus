@@ -91,10 +91,10 @@ public class HelpCommand extends Command {
         paginateBuilder.clearItems();
 
         if (event.getGuild().getMember(event.getAuthor()).hasPermission(Permission.ADMINISTRATOR)) {
-            paginateBuilder.addItems("Use the arrow emojis to navigate through the pages"+
+            paginateBuilder.addItems("Use the arrow emojis to navigate through the pages" +
                     generatePageMap("General", "Slayer", "Skills", "Dungeons", "Guild",
-                    "Auction House and Bazaar", "Inventory", "Miscellaneous Commands", "Verify Settings",
-                    "Apply Settings", "Roles Settings"));
+                            "Auction House and Bazaar", "Inventory", "Miscellaneous Commands", "Verify Settings",
+                            "Apply Settings", "Roles Settings"));
         } else {
             paginateBuilder.addItems("Use the arrow emojis to navigate through the pages" +
                     generatePageMap("General", "Slayer", "Skills", "Dungeons", "Guild",
@@ -139,15 +139,16 @@ public class HelpCommand extends Command {
                 generateHelp("Get player's active (not claimed) auctions on all profiles", "auction [IGN]", "ah [IGN]")
                         + generateHelp("Get lowest bin of an item", "bin [item]"));
         paginateBuilder.addItems(generateHelp("Get a player's wardrobe armors", "wardrobe [IGN] <profile>")
-                + generateHelp("Get a player's talisman bag", "talisman [IGN] <profile>")
-                + generateHelp("Get a player's inventory", "inventory [IGN] <profile>",
+                        + generateHelp("Get a player's talisman bag", "talisman [IGN] <profile>")
+                        + generateHelp("Get a list of a player's talisman bag", "talisman list [IGN] <profile>")
+                        + generateHelp("Get a player's inventory", "inventory [IGN] <profile>",
                 "inv [IGN] <profile>")
 //                + generateHelp("Get an item's lore from a player's inventory. Item name should be the same as the emoji name", "inventory [item] [IGN] <profile>",
 //                "inv [item] [IGN] <profile>")
-                + generateHelp("Get a player's ender chest", "enderchest [IGN] <profile>", "echest [IGN] <profile>")
-                + generateHelp("Get a player's equipped armor", "inventory armor [IGN] <profile>",
+                        + generateHelp("Get a player's ender chest", "enderchest [IGN] <profile>", "echest [IGN] <profile>")
+                        + generateHelp("Get a player's equipped armor", "inventory armor [IGN] <profile>",
                 "inv [IGN] <profile>")
-                + generateHelp("Get a player's sacks content", "sacks [IGN] <profile>")
+                        + generateHelp("Get a player's sacks content", "sacks [IGN] <profile>")
         );
 
         paginateBuilder.addItems(generateHelp("Claim automatic Skyblock roles", "roles claim [IGN] <profile>")
@@ -220,9 +221,9 @@ public class HelpCommand extends Command {
         return generatedStr.toString();
     }
 
-    public String generatePageMap(String... pageNames){
+    public String generatePageMap(String... pageNames) {
         StringBuilder generatedStr = new StringBuilder();
-        for(int i=0; i< pageNames.length; i++){
+        for (int i = 0; i < pageNames.length; i++) {
             generatedStr.append("\n• **Page ").append(i + 2).append(":** ").append(pageNames[i]);
         }
         return generatedStr.toString();

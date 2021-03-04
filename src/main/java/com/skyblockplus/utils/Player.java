@@ -502,7 +502,7 @@ public class Player {
         }
     }
 
-    public Map<Integer, String> getTalismanBag() {
+    public Map<Integer, String> getTalismanBagMap() {
         try {
             String encodedTalismanContents = higherDepth(higherDepth(profileJson, "talisman_bag"), "data")
                     .getAsString();
@@ -746,6 +746,7 @@ public class Player {
         emojiMap.put("power_wither_boots", "<:necron_boots:816450192270163989>");
         emojiMap.put("wither_blood", "<:wither_blood:816450973681320006>");
         emojiMap.put("ornate_zombie_sword", "<:ornatezombiesword:816452177567678475>");
+        emojiMap.put("blank", "<:blank:817050888186101761>");
 
         itemName = itemName.replace("starred_", "");
         if (emojiMap.containsKey(itemName)) {
@@ -919,6 +920,65 @@ public class Player {
                     invFramesMap.put(i + 1, displayName.getString("id", "empty").toLowerCase());
                 } else {
                     invFramesMap.put(i + 1, "empty");
+                }
+            }
+
+            StringBuilder outputStringPart1 = new StringBuilder();
+            StringBuilder outputStringPart2 = new StringBuilder();
+            List<String[]> enderChestPages = new ArrayList<>();
+            StringBuilder curNine = new StringBuilder();
+            int page = 0;
+            for (Map.Entry<Integer, String> i : invFramesMap.entrySet()) {
+                if ((i.getKey() - page) <= 27) {
+                    curNine.append(itemToEmoji(i.getValue()));
+                    if (i.getKey() % 9 == 0) {
+                        outputStringPart1.append(curNine).append("\n");
+                        curNine = new StringBuilder();
+                    }
+                } else {
+                    curNine.append(itemToEmoji(i.getValue()));
+                    if (i.getKey() % 9 == 0) {
+                        outputStringPart2.append(curNine).append("\n");
+                        curNine = new StringBuilder();
+                    }
+                }
+
+                if (i.getKey() != 0 && i.getKey() % 45 == 0) {
+                    enderChestPages.add(new String[]{outputStringPart1.toString(), outputStringPart2.toString()});
+                    outputStringPart1 = new StringBuilder();
+                    outputStringPart2 = new StringBuilder();
+                    page += 45;
+                }
+            }
+            return enderChestPages;
+        } catch (Exception ignored) {
+        }
+        return null;
+    }
+
+    public List<String[]> getTalismanBag() {
+        try {
+            String encodedInventoryContents = higherDepth(higherDepth(profileJson, "talisman_bag"), "data")
+                    .getAsString();
+            NBTCompound decodedInventoryContents = NBTReader.readBase64(encodedInventoryContents);
+
+            NBTList invFrames = decodedInventoryContents.getList(".i");
+
+            Map<Integer, String> invFramesMap = new TreeMap<>();
+            for (int i = 0; i < invFrames.size(); i++) {
+                NBTCompound displayName = invFrames.getCompound(i).getCompound("tag.ExtraAttributes");
+                if (displayName != null) {
+                    invFramesMap.put(i + 1, displayName.getString("id", "empty").toLowerCase());
+                } else {
+                    invFramesMap.put(i + 1, "empty");
+                }
+            }
+
+            if (invFramesMap.size() % 45 != 0) {
+                int toAdd = 45 - (invFramesMap.size() % 45);
+                int initialSize = invFramesMap.size();
+                for (int i = 0; i < toAdd; i++) {
+                    invFramesMap.put(initialSize + 1 + i, "blank");
                 }
             }
 

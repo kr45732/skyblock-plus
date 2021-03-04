@@ -41,7 +41,7 @@ public class EnderChestCommand extends Command {
                 ebMessage.delete().queue();
                 ebMessage.getChannel().sendMessage(defaultEmbed("Missing Items").setDescription(missingEmoji).build()).queue();
 
-                jda.addEventListener(new EnderChestPaginator(playerEnderChest, ebMessage.getChannel(), event.getAuthor()));
+                jda.addEventListener(new InventoryPaginator(playerEnderChest, ebMessage.getChannel(), event.getAuthor()));
             } else {
                 ebMessage.editMessage(defaultEmbed("Error").setDescription("Unable to fetch data").build()).queue();
             }

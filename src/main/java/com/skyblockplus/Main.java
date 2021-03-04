@@ -5,10 +5,7 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.apply.Apply;
 import com.skyblockplus.auction.AuctionCommands;
 import com.skyblockplus.auction.BinCommands;
-import com.skyblockplus.dev.EmojiMapServerCommand;
-import com.skyblockplus.dev.InstantTimeNow;
-import com.skyblockplus.dev.QuickSetupTestCommand;
-import com.skyblockplus.dev.ShutdownCommand;
+import com.skyblockplus.dev.*;
 import com.skyblockplus.dungeons.CatacombsCommand;
 import com.skyblockplus.dungeons.EssenceCommand;
 import com.skyblockplus.dungeons.PartyFinderCommand;
@@ -36,14 +33,12 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import javax.security.auth.login.LoginException;
 
 import static com.skyblockplus.utils.Utils.*;
 
-@SpringBootApplication
+//@SpringBootApplication
 public class Main {
     public static JDA jda;
     public static SpringDatabaseComponent database;
@@ -51,7 +46,7 @@ public class Main {
     public static void main(String[] args) throws LoginException, IllegalArgumentException {
         setApplicationSettings();
 
-        Main.database = SpringApplication.run(Main.class, args).getBean(SpringDatabaseComponent.class);
+//        Main.database = SpringApplication.run(Main.class, args).getBean(SpringDatabaseComponent.class);
 
         EventWaiter waiter = new EventWaiter();
         CommandClientBuilder client = new CommandClientBuilder();
@@ -69,7 +64,7 @@ public class Main {
                 new WeightCommand(), new HypixelCommand(), new UuidCommand(), new SkyblockCommand(waiter),
                 new BaldCommand(), new SettingsCommand(waiter), new ReloadCommand(), new SetupCommand(waiter),
                 new CategoriesCommand(), new PartyFinderCommand(), new QuickSetupTestCommand(), new EmojiMapServerCommand(),
-                new EnderChestCommand(), new InstantTimeNow());
+                new EnderChestCommand(), new InstantTimeNow(), new GetEventListenersCommand());
 
         if (BOT_PREFIX.equals("/")) {
             jda = JDABuilder.createDefault(BOT_TOKEN).setStatus(OnlineStatus.DO_NOT_DISTURB)

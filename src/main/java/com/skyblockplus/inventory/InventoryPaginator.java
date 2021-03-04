@@ -10,7 +10,7 @@ import java.util.List;
 
 import static com.skyblockplus.timeout.MessageTimeout.addMessage;
 
-public class EnderChestPaginator extends ListenerAdapter {
+public class InventoryPaginator extends ListenerAdapter {
     private final List<String[]> enderChestPages;
     private final Message pagePart1;
     private final Message pagePart2;
@@ -18,7 +18,7 @@ public class EnderChestPaginator extends ListenerAdapter {
     private int pageNumber = 0;
     private int maxPageNumber = 0;
 
-    public EnderChestPaginator(List<String[]> enderChestPages, MessageChannel channel, User user) {
+    public InventoryPaginator(List<String[]> enderChestPages, MessageChannel channel, User user) {
         this.enderChestPages = enderChestPages;
         this.user = user;
         this.maxPageNumber = enderChestPages.size() - 1;

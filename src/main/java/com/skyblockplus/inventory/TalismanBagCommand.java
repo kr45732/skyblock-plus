@@ -10,14 +10,17 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.*;
 
 public class TalismanBagCommand extends Command {
     private final EventWaiter waiter;
     private CommandEvent event;
+    private String missingEmoji;
 
     public TalismanBagCommand(EventWaiter waiter) {
         this.name = "talisman";
@@ -35,12 +38,12 @@ public class TalismanBagCommand extends Command {
 
         System.out.println(content);
 
-        if (args.length == 2 || args.length == 3) {
-            if (args.length == 3) {
-                eb = getPlayerTalismans(args[1], args[2]);
+        if ((args.length == 3 || args.length == 4) && args[1].equals("list")) {
+            if (args.length == 4) {
+                eb = getPlayerTalismans(args[2], args[3]);
 
             } else {
-                eb = getPlayerTalismans(args[1], null);
+                eb = getPlayerTalismans(args[2], null);
             }
 
             if (eb == null) {
@@ -49,15 +52,44 @@ public class TalismanBagCommand extends Command {
                 ebMessage.editMessage(eb.build()).queue();
             }
             return;
+        } else if (args.length == 2 || args.length == 3) {
+            List<String[]> playerEnderChest;
+            if (args.length == 3) {
+                playerEnderChest = getPLayerTalismansEmoji(args[1], args[2]);
+            } else {
+                playerEnderChest = getPLayerTalismansEmoji(args[1], null);
+            }
+
+            if (playerEnderChest != null) {
+                ebMessage.delete().queue();
+                ebMessage.getChannel().sendMessage(defaultEmbed("Missing Items").setDescription(missingEmoji).build()).queue();
+
+                jda.addEventListener(new InventoryPaginator(playerEnderChest, ebMessage.getChannel(), event.getAuthor()));
+            } else {
+                ebMessage.editMessage(defaultEmbed("Error").setDescription("Unable to fetch data").build()).queue();
+            }
+            return;
         }
 
         ebMessage.editMessage(errorMessage(this.name).build()).queue();
     }
 
+    private List<String[]> getPLayerTalismansEmoji(String username, String profileName) {
+        Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+        if (player.isValid()) {
+            List<String[]> talismanBagPages = player.getTalismanBag();
+            if (talismanBagPages != null) {
+                this.missingEmoji = player.invMissing;
+                return talismanBagPages;
+            }
+        }
+        return null;
+    }
+
     private EmbedBuilder getPlayerTalismans(String username, String profileName) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
-            Map<Integer, String> talismanBagMap = player.getTalismanBag();
+            Map<Integer, String> talismanBagMap = player.getTalismanBagMap();
             if (talismanBagMap != null) {
                 ArrayList<String> pageTitles = new ArrayList<>();
 
