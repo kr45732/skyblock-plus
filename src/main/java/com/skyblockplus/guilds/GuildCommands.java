@@ -296,5 +296,4 @@ public class GuildCommands extends Command {
         }
 
     }
-
 }
