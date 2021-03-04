@@ -95,7 +95,7 @@ public class RoleCommands extends Command {
                             case "guild_member": {
                                 JsonElement guildJson = getJson("https://api.hypixel.net/findGuild?key="
                                         + HYPIXEL_API_KEY + "&byUuid=" + player.getUuid());
-                                if (guildJson != null) {
+                                if (guildJson != null && higherDepth(guildJson, "guild")!= null) {
                                     JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
                                     String playerGuildId = higherDepth(guildJson, "guild").getAsString();
 

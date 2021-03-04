@@ -20,8 +20,6 @@
 !.vscode/extensions.json
 *.code-workspace
 
-
-
 # General
 .DS_Store
 .AppleDouble
@@ -65,6 +63,7 @@ Temporary Items
 /src/main/java/com/skyblockplus/api/discordguild/
 /src/main/java/com/skyblockplus/api/security/
 /src/main/java/com/skyblockplus/api/discordserversettings/settingsmanagers/ServerSettingsController.java
+/src/main/java/com/skyblockplus/json/test.json
 
 lombok.config
 .project
