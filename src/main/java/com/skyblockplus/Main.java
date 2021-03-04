@@ -33,12 +33,14 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import javax.security.auth.login.LoginException;
 
 import static com.skyblockplus.utils.Utils.*;
 
-//@SpringBootApplication
+@SpringBootApplication
 public class Main {
     public static JDA jda;
     public static SpringDatabaseComponent database;
@@ -46,7 +48,7 @@ public class Main {
     public static void main(String[] args) throws LoginException, IllegalArgumentException {
         setApplicationSettings();
 
-//        Main.database = SpringApplication.run(Main.class, args).getBean(SpringDatabaseComponent.class);
+        Main.database = SpringApplication.run(Main.class, args).getBean(SpringDatabaseComponent.class);
 
         EventWaiter waiter = new EventWaiter();
         CommandClientBuilder client = new CommandClientBuilder();
