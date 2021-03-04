@@ -1,4 +1,4 @@
-package com.skyblockplus.miscellaneous;
+package com.skyblockplus.inventory;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -15,19 +15,19 @@ import java.util.concurrent.TimeUnit;
 
 import static com.skyblockplus.utils.Utils.*;
 
-public class TalismanBagCommand extends Command {
+public class SacksCommand extends Command {
     private final EventWaiter waiter;
     private CommandEvent event;
 
-    public TalismanBagCommand(EventWaiter waiter) {
-        this.name = "talisman";
+    public SacksCommand(EventWaiter waiter) {
+        this.name = "sacks";
         this.cooldown = globalCooldown;
         this.waiter = waiter;
     }
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = defaultEmbed("Loading...");
+        EmbedBuilder eb = loadingEmbed();
         Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
         String content = event.getMessage().getContentRaw();
         String[] args = content.split(" ");
@@ -37,11 +37,10 @@ public class TalismanBagCommand extends Command {
 
         if (args.length == 2 || args.length == 3) {
             if (args.length == 3) {
-                eb = getPlayerTalismans(args[1], args[2]);
+                eb = getPlayerSacks(args[1], args[2]);
 
-            } else {
-                eb = getPlayerTalismans(args[1], null);
-            }
+            } else
+                eb = getPlayerSacks(args[1], null);
 
             if (eb == null) {
                 ebMessage.delete().queue();
@@ -54,11 +53,11 @@ public class TalismanBagCommand extends Command {
         ebMessage.editMessage(errorMessage(this.name).build()).queue();
     }
 
-    private EmbedBuilder getPlayerTalismans(String username, String profileName) {
+    private EmbedBuilder getPlayerSacks(String username, String profileName) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
-            Map<Integer, String> talismanBagMap = player.getTalismanBag();
-            if (talismanBagMap != null) {
+            Map<String, Integer> sacksMap = player.getPlayerSacks();
+            if (sacksMap != null) {
                 ArrayList<String> pageTitles = new ArrayList<>();
 
                 CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(1)
@@ -71,16 +70,17 @@ public class TalismanBagCommand extends Command {
                         }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).wrapPageEnds(true).setColor(botColor)
                         .setCommandUser(event.getAuthor());
 
-                for (Map.Entry<Integer, String> currentTalisman : talismanBagMap.entrySet()) {
-                    pageTitles.add("Player talisman bag for " + player.getUsername());
+                for (Map.Entry<String, Integer> currentSack : sacksMap.entrySet()) {
+                    pageTitles.add("Player sacks content for " + player.getUsername());
                     paginateBuilder
-                            .addItems("**Slot " + (currentTalisman.getKey() + 1) + "**: " + currentTalisman.getValue());
+                            .addItems("**" + capitalizeString(currentSack.getKey().toLowerCase().replace("_", " "))
+                                    + "**: " + currentSack.getValue());
                 }
                 paginateBuilder.setPageTitles(pageTitles.toArray(new String[0]));
                 paginateBuilder.build().paginate(event.getChannel(), 0);
                 return null;
             }
         }
-        return defaultEmbed("Unable to fetch player data");
+        return defaultEmbed("Unable to fetch player data", null);
     }
 }

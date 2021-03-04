@@ -310,18 +310,28 @@
         ],
         "stackable": "false"
       },
-      "pet_enthusiast": {
-        "name": "Pet Enthusiast",
-        "id": "805567896809898009",
-        "excluded_pets": ["guardian", "jellyfish", "parrot", "sheep"]
-      },
       "slot_collector": {
-        "name": "Slot collector",
-        "id": "805598267186085985",
-        "num_minions": "20"
+        "enable": "true",
+        "levels": [
+          {
+            "value": "20",
+            "roleId": "805598267186085985"
+          }
+        ],
+        "stackable": "false"
+      },
+      "pet_enthusiast": {
+        "enable": "true",
+        "id": "805567896809898009",
+        "excluded_pets": [
+          "guardian",
+          "jellyfish",
+          "parrot",
+          "sheep"
+        ]
       },
       "doom_slayer": {
-        "name": "Doom Slayer",
+        "enable": "true",
         "id": "802632224125354024"
       }
     }
@@ -637,36 +647,58 @@
         ],
         "stackable": "false"
       },
+      "slot_collector": {
+        "enable": "true",
+        "levels": [
+          {
+            "value": "20",
+            "roleId": "782154976595935248"
+          }
+        ],
+        "stackable": "false"
+      },
       "doom_slayer": {
-        "name": "Doom Slayer",
+        "enable": "true",
         "id": "782154976595935251"
       },
       "pet_enthusiast": {
-        "name": "Pet Enthusiast",
+        "enable": "true",
         "id": "782154976608387072",
-        "excluded_pets": ["guardian", "jellyfish", "parrot", "sheep"]
-      },
-      "slot_collector": {
-        "name": "Slot collector",
-        "id": "782154976595935248",
-        "num_minions": "20"
+        "excluded_pets": [
+          "guardian",
+          "jellyfish",
+          "parrot",
+          "sheep"
+        ]
       }
     }
   },
   "5e4e6d0d8ea8c9feb3f0e44f": {
     "name": "Skyblock Forceful",
     "guild_leaderboard": {
-      "staff_ranks": ["Moderator", "Senior Officer", "Guild Master"],
+      "staff_ranks": [
+        "Moderator",
+        "Senior Officer",
+        "Guild Master"
+      ],
       "top_role": {
         "range": "5",
-        "names": ["elite"]
+        "names": [
+          "elite"
+        ]
       },
       "middle_role": {
         "range": "15",
-        "names": ["trainee", "kings"]
+        "names": [
+          "trainee",
+          "kings"
+        ]
       },
       "default_role": {
-        "names": ["rookie", "member"]
+        "names": [
+          "rookie",
+          "member"
+        ]
       }
     }
   }

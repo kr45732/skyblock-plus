@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.Message;
 import static com.skyblockplus.reload.ReloadEventWatcher.onApplyReload;
 import static com.skyblockplus.reload.ReloadEventWatcher.onVerifyReload;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.loadingEmbed;
 
 public class ReloadCommand extends Command {
 
@@ -22,7 +23,7 @@ public class ReloadCommand extends Command {
     protected void execute(CommandEvent event) {
         System.out.println(event.getMessage().getContentRaw());
 
-        EmbedBuilder eb = defaultEmbed("Attempting to reload settings...");
+        EmbedBuilder eb = loadingEmbed();
         Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 
         eb = defaultEmbed("Reload Settings for " + event.getGuild().getName());

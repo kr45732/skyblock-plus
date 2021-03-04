@@ -20,7 +20,6 @@ public class Apply extends ListenerAdapter {
     public void onGuildReady(@NotNull GuildReadyEvent event) {
         try {
             JsonElement currentSettings = database.getApplySettings(event.getGuild().getId());
-
             if (currentSettings != null) {
                 if (higherDepth(currentSettings, "enable").getAsBoolean()) {
                     if (isUniqueApplyGuild(event.getGuild().getId())) {

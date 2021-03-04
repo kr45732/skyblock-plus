@@ -199,6 +199,10 @@ public class Utils {
         return defaultEmbed(title, null);
     }
 
+    public static EmbedBuilder loadingEmbed() {
+        return defaultEmbed(null).setImage("https://media.giphy.com/media/HS2ZfnmlZ1YHZhL2IX/giphy.gif");
+    }
+
     public static String fixUsername(String username) {
         return username.replace("_", "\\_");
     }

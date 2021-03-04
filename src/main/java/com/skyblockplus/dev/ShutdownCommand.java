@@ -1,4 +1,4 @@
-package com.skyblockplus.miscellaneous;
+package com.skyblockplus.dev;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;

@@ -78,5 +78,10 @@
     "version": "0.2.2",
     "description": "- Switched back to worker dyno\n- Updated reload command\n- Updated the roles command and structure\n- Fixed catacomb role\n- Added inventory command\n- Removed `player` from all commands",
     "date": "2021-03-02T13:17:45.835432Z"
+  },
+  "17": {
+    "version": "0.2.3",
+    "description": "- Fixed essence timeout\n- Added ender chest command\n- Removed inventory slot command for updating\n- Changed roles structure\n- Other fixes",
+    "date": "2021-03-02T13:17:45.835432Z"
   }
 }

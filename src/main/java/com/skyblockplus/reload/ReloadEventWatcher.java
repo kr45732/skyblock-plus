@@ -44,7 +44,6 @@ public class ReloadEventWatcher extends ListenerAdapter {
 
     public static void removeApplyDeletedEventListeners() {
         List<Object> registeredListeners = jda.getRegisteredListeners();
-        System.out.println(registeredListeners);
         for (ReloadEventWatcherClass currentGuild : applyGuildEventListeners.values()) {
             String currentGuildId = currentGuild.getGuildId();
             List<Object> currentApplySubListeners = currentGuild.getSubEventListeners();
@@ -166,7 +165,7 @@ public class ReloadEventWatcher extends ListenerAdapter {
                         jda.addEventListener(new VerifyGuild(reactMessage, currentSettings));
 
                         return "Verify settings successfully reloaded";
-                    }else{
+                    } else {
                         return "Verify settings disabled";
                     }
                 }

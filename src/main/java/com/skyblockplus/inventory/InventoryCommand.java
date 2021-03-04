@@ -1,4 +1,4 @@
-package com.skyblockplus.miscellaneous;
+package com.skyblockplus.inventory;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -30,7 +30,7 @@ public class InventoryCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = defaultEmbed("Loading player data...");
+        EmbedBuilder eb = loadingEmbed();
         Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
         String content = event.getMessage().getContentRaw();
         String[] args = content.split(" ");
@@ -45,19 +45,18 @@ public class InventoryCommand extends Command {
                 ebMessage.editMessage(getPlayerEquippedArmor(args[2], null).build()).queue();
             }
             return;
-        } else if ((args.length == 4 || args.length == 5) && args[1].equals("slot")) {
-            if (args.length == 5) {
-                eb = getInventorySlot(args[2], args[3], args[4]);
-            } else {
-                eb = getInventorySlot(args[2], args[3], null);
-            }
-            if (eb == null) {
-                ebMessage.delete().queue();
-            } else {
-                ebMessage.editMessage(eb.build()).queue();
-            }
-
-            return;
+//        } else if ((args.length == 4 || args.length == 5) && args[1].equals("slot")) {
+//            if (args.length == 5) {
+//                eb = getInventorySlot(args[2], args[3], args[4]);
+//            } else {
+//                eb = getInventorySlot(args[2], args[3], null);
+//            }
+//            if (eb == null) {
+//                ebMessage.delete().queue();
+//            } else {
+//                ebMessage.editMessage(eb.build()).queue();
+//            }
+//            return;
         } else if (args.length == 2 || args.length == 3) {
             String[] playerInventory;
             if (args.length == 3) {

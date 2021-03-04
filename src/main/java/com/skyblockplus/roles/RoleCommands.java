@@ -9,11 +9,8 @@ import net.dv8tion.jda.api.entities.*;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.skyblockplus.utils.Utils.*;
 
@@ -26,9 +23,7 @@ public class RoleCommands extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = defaultEmbed("Loading...");
-        eb.setDescription("**NOTE: This may take some time**");
-
+        EmbedBuilder eb = loadingEmbed();
         String content = event.getMessage().getContentRaw();
         MessageChannel channel = event.getChannel();
         Guild guild = event.getGuild();
@@ -81,8 +76,8 @@ public class RoleCommands extends Command {
                         ebMessage.editMessage(eb.build()).queue();
                         return;
                     }
-                    List<String> rolesID = rolesJson.getAsJsonObject().entrySet().stream().map(Map.Entry::getKey)
-                            .collect(Collectors.toCollection(ArrayList::new));
+                    List<String> rolesID = getJsonKeys(rolesJson);
+                    rolesID.remove("enable");
 
                     eb = defaultEmbed("Automatic roles for " + player.getUsername(),
                             skyblockStatsLink(player.getUsername(), player.getProfileName()));
@@ -92,6 +87,9 @@ public class RoleCommands extends Command {
 
                     for (String currentRoleName : rolesID) {
                         JsonElement currentRole = higherDepth(rolesJson, currentRoleName);
+                        if (!higherDepth(currentRole, "enable").getAsBoolean()) {
+                            continue;
+                        }
 
                         switch (currentRoleName) {
                             case "guild_member": {
@@ -121,118 +119,8 @@ public class RoleCommands extends Command {
                             }
                             case "sven":
                             case "rev":
-                            case "tara": {
-                                JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
-                                int playerSlayer = player.getSlayer(currentRoleName);
-
-                                if (higherDepth(currentRole, "stackable").getAsBoolean()) {
-                                    for (JsonElement currentLevel : levelsArray) {
-                                        int currentLevelValue = higherDepth(currentLevel, "value").getAsInt();
-                                        Role currentLevelRole = event.getGuild().getRoleById(higherDepth(currentLevel, "roleId").getAsString());
-
-                                        if (playerSlayer >= currentLevelValue) {
-                                            if (!member.getRoles().contains(currentLevelRole)) {
-                                                guild.addRoleToMember(member, currentLevelRole).queue();
-                                                addedRoles.append(roleChangeString(currentLevelRole.getName()));
-                                            }
-                                        } else {
-                                            if (member.getRoles().contains(currentLevelRole)) {
-                                                guild.removeRoleFromMember(member, currentLevelRole).queue();
-                                                removedRoles.append(roleChangeString(currentLevelRole.getName()));
-                                            }
-                                        }
-                                    }
-                                } else {
-                                    for (int i = levelsArray.size() - 1; i >= 0; i--) {
-                                        JsonElement currentLevel = levelsArray.get(i);
-
-                                        int currentLevelValue = higherDepth(currentLevel, "value").getAsInt();
-                                        Role currentLevelRole = event.getGuild().getRoleById(higherDepth(currentLevel, "roleId").getAsString());
-
-                                        if (playerSlayer < currentLevelValue) {
-                                            if (member.getRoles().contains(currentLevelRole)) {
-                                                guild.removeRoleFromMember(member, currentLevelRole).queue();
-                                                removedRoles.append(roleChangeString(currentLevelRole.getName()));
-                                            }
-                                        } else {
-                                            if (!member.getRoles().contains(currentLevelRole)) {
-                                                guild.addRoleToMember(member, currentLevelRole).queue();
-                                                addedRoles.append(roleChangeString(currentLevelRole.getName()));
-                                            }
-
-                                            for (int j = i - 2; j >= 0; j--) {
-                                                JsonElement currentLevelRemoveStackable = levelsArray.get(j);
-                                                Role currentLevelRoleRemoveStackable = event.getGuild().getRoleById(higherDepth(currentLevelRemoveStackable, "roleId").getAsString());
-
-                                                if (member.getRoles().contains(currentLevelRoleRemoveStackable)) {
-                                                    guild.removeRoleFromMember(member, currentLevelRoleRemoveStackable).queue();
-                                                    removedRoles.append(roleChangeString(currentLevelRoleRemoveStackable.getName()));
-                                                }
-                                            }
-                                            break;
-                                        }
-                                    }
-                                }
-                                break;
-                            }
-                            case "bank_coins": {
-                                JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
-                                double bankBalance = player.getBankBalance();
-                                if (bankBalance == -1 && !errorRoles.toString().contains("Banking")) {
-                                    errorRoles.append(roleChangeString("Banking API disabled"));
-                                    break;
-                                }
-
-                                if (higherDepth(currentRole, "stackable").getAsBoolean()) {
-                                    for (JsonElement currentLevel : levelsArray) {
-                                        int currentLevelValue = higherDepth(currentLevel, "value").getAsInt();
-                                        Role currentLevelRole = event.getGuild().getRoleById(higherDepth(currentLevel, "roleId").getAsString());
-
-                                        if (bankBalance >= currentLevelValue) {
-                                            if (!member.getRoles().contains(currentLevelRole)) {
-                                                guild.addRoleToMember(member, currentLevelRole).queue();
-                                                addedRoles.append(roleChangeString(currentLevelRole.getName()));
-                                            }
-                                        } else {
-                                            if (member.getRoles().contains(currentLevelRole)) {
-                                                guild.removeRoleFromMember(member, currentLevelRole).queue();
-                                                removedRoles.append(roleChangeString(currentLevelRole.getName()));
-                                            }
-                                        }
-                                    }
-                                } else {
-                                    for (int i = levelsArray.size() - 1; i >= 0; i--) {
-                                        JsonElement currentLevel = levelsArray.get(i);
-
-                                        int currentLevelValue = higherDepth(currentLevel, "value").getAsInt();
-                                        Role currentLevelRole = event.getGuild().getRoleById(higherDepth(currentLevel, "roleId").getAsString());
-
-                                        if (bankBalance < currentLevelValue) {
-                                            if (member.getRoles().contains(currentLevelRole)) {
-                                                guild.removeRoleFromMember(member, currentLevelRole).queue();
-                                                removedRoles.append(roleChangeString(currentLevelRole.getName()));
-                                            }
-                                        } else {
-                                            if (!member.getRoles().contains(currentLevelRole)) {
-                                                guild.addRoleToMember(member, currentLevelRole).queue();
-                                                addedRoles.append(roleChangeString(currentLevelRole.getName()));
-                                            }
-
-                                            for (int j = i - 2; j >= 0; j--) {
-                                                JsonElement currentLevelRemoveStackable = levelsArray.get(j);
-                                                Role currentLevelRoleRemoveStackable = event.getGuild().getRoleById(higherDepth(currentLevelRemoveStackable, "roleId").getAsString());
-
-                                                if (member.getRoles().contains(currentLevelRoleRemoveStackable)) {
-                                                    guild.removeRoleFromMember(member, currentLevelRoleRemoveStackable).queue();
-                                                    removedRoles.append(roleChangeString(currentLevelRoleRemoveStackable.getName()));
-                                                }
-                                            }
-                                            break;
-                                        }
-                                    }
-                                }
-                                break;
-                            }
+                            case "tara":
+                            case "bank_coins":
                             case "alchemy":
                             case "combat":
                             case "fishing":
@@ -242,25 +130,77 @@ public class RoleCommands extends Command {
                             case "mining":
                             case "taming":
                             case "enchanting":
-                            case "catacombs": {
-                                int currentSkillLevel = -1;
-                                if (currentRoleName.equals("catacombs") && player.getCatacombsSkill() != null) {
-                                    currentSkillLevel = player.getCatacombsSkill().skillLevel;
-                                } else if (player.getSkill(currentRoleName) != null) {
-                                    currentSkillLevel = player.getSkill(currentRoleName).skillLevel;
-                                }
-                                if (currentSkillLevel == -1 && !errorRoles.toString().contains("Skills")) {
-                                    errorRoles.append(roleChangeString("Skills API disabled"));
-                                    break;
+                            case "catacombs":
+                            case "fairy_souls":
+                            case "slot_collector": {
+                                double roleAmount = -1;
+                                switch (currentRoleName) {
+                                    case "sven":
+                                    case "rev":
+                                    case "tara": {
+                                        roleAmount = player.getSlayer(currentRoleName);
+                                        break;
+                                    }
+                                    case "bank_coins": {
+                                        roleAmount = player.getBankBalance();
+                                        if (roleAmount == -1 && !errorRoles.toString().contains("Banking")) {
+                                            errorRoles.append(roleChangeString("Banking API disabled"));
+                                            continue;
+                                        }
+                                        break;
+                                    }
+                                    case "alchemy":
+                                    case "combat":
+                                    case "fishing":
+                                    case "farming":
+                                    case "foraging":
+                                    case "carpentry":
+                                    case "mining":
+                                    case "taming":
+                                    case "enchanting": {
+                                        if (player.getSkill(currentRoleName) != null) {
+                                            roleAmount = player.getSkill(currentRoleName).skillLevel;
+                                        }
+                                        if (roleAmount == -1 && !errorRoles.toString().contains("Skills")) {
+                                            errorRoles.append(roleChangeString("Skills API disabled"));
+                                            continue;
+                                        }
+                                        break;
+                                    }
+                                    case "catacombs": {
+                                        if (player.getCatacombsSkill() != null) {
+                                            roleAmount = player.getCatacombsSkill().skillLevel;
+                                        }
+                                        if (roleAmount == -1 && !errorRoles.toString().contains("Skills")) {
+                                            errorRoles.append(roleChangeString("Skills API disabled"));
+                                            continue;
+                                        }
+                                        break;
+                                    }
+                                    case "fairy_souls": {
+                                        roleAmount = player.getFairySouls();
+                                        if (roleAmount == -1) {
+                                            continue;
+                                        }
+                                        break;
+                                    }
+                                    case "slot_collector": {
+                                        roleAmount = player.getNumberMinionSlots();
+                                        break;
+                                    }
+                                    default: {
+                                        continue;
+                                    }
                                 }
 
                                 JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
+
                                 if (higherDepth(currentRole, "stackable").getAsBoolean()) {
                                     for (JsonElement currentLevel : levelsArray) {
                                         int currentLevelValue = higherDepth(currentLevel, "value").getAsInt();
                                         Role currentLevelRole = event.getGuild().getRoleById(higherDepth(currentLevel, "roleId").getAsString());
 
-                                        if (currentSkillLevel >= currentLevelValue) {
+                                        if (roleAmount >= currentLevelValue) {
                                             if (!member.getRoles().contains(currentLevelRole)) {
                                                 guild.addRoleToMember(member, currentLevelRole).queue();
                                                 addedRoles.append(roleChangeString(currentLevelRole.getName()));
@@ -277,9 +217,9 @@ public class RoleCommands extends Command {
                                         JsonElement currentLevel = levelsArray.get(i);
 
                                         int currentLevelValue = higherDepth(currentLevel, "value").getAsInt();
-                                        Role currentLevelRole = guild.getRoleById(higherDepth(currentLevel, "roleId").getAsString());
+                                        Role currentLevelRole = event.getGuild().getRoleById(higherDepth(currentLevel, "roleId").getAsString());
 
-                                        if (currentSkillLevel < currentLevelValue) {
+                                        if (roleAmount < currentLevelValue) {
                                             if (member.getRoles().contains(currentLevelRole)) {
                                                 guild.removeRoleFromMember(member, currentLevelRole).queue();
                                                 removedRoles.append(roleChangeString(currentLevelRole.getName()));
@@ -302,63 +242,8 @@ public class RoleCommands extends Command {
                                             break;
                                         }
                                     }
+                                    break;
                                 }
-                                break;
-                            }
-                            case "fairy_souls": {
-                                int fairySouls = player.getFairySouls();
-                                if (fairySouls != -1) {
-                                    JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
-                                    if (higherDepth(currentRole, "stackable").getAsBoolean()) {
-                                        for (JsonElement currentLevel : levelsArray) {
-                                            int currentLevelValue = higherDepth(currentLevel, "value").getAsInt();
-                                            Role currentLevelRole = event.getGuild().getRoleById(higherDepth(currentLevel, "roleId").getAsString());
-
-                                            if (fairySouls >= currentLevelValue) {
-                                                if (!member.getRoles().contains(currentLevelRole)) {
-                                                    guild.addRoleToMember(member, currentLevelRole).queue();
-                                                    addedRoles.append(roleChangeString(currentLevelRole.getName()));
-                                                }
-                                            } else {
-                                                if (member.getRoles().contains(currentLevelRole)) {
-                                                    guild.removeRoleFromMember(member, currentLevelRole).queue();
-                                                    removedRoles.append(roleChangeString(currentLevelRole.getName()));
-                                                }
-                                            }
-                                        }
-                                    } else {
-                                        for (int i = levelsArray.size() - 1; i >= 0; i--) {
-                                            JsonElement currentLevel = levelsArray.get(i);
-
-                                            int currentLevelValue = higherDepth(currentLevel, "value").getAsInt();
-                                            Role currentLevelRole = guild.getRoleById(higherDepth(currentLevel, "roleId").getAsString());
-
-                                            if (fairySouls < currentLevelValue) {
-                                                if (member.getRoles().contains(currentLevelRole)) {
-                                                    guild.removeRoleFromMember(member, currentLevelRole).queue();
-                                                    removedRoles.append(roleChangeString(currentLevelRole.getName()));
-                                                }
-                                            } else {
-                                                if (!member.getRoles().contains(currentLevelRole)) {
-                                                    guild.addRoleToMember(member, currentLevelRole).queue();
-                                                    addedRoles.append(roleChangeString(currentLevelRole.getName()));
-                                                }
-
-                                                for (int j = i - 2; j >= 0; j--) {
-                                                    JsonElement currentLevelRemoveStackable = levelsArray.get(j);
-                                                    Role currentLevelRoleRemoveStackable = event.getGuild().getRoleById(higherDepth(currentLevelRemoveStackable, "roleId").getAsString());
-
-                                                    if (member.getRoles().contains(currentLevelRoleRemoveStackable)) {
-                                                        guild.removeRoleFromMember(member, currentLevelRoleRemoveStackable).queue();
-                                                        removedRoles.append(roleChangeString(currentLevelRoleRemoveStackable.getName()));
-                                                    }
-                                                }
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
-                                break;
                             }
                             case "doom_slayer": {
                                 int[] curSlayer = new int[]{player.getWolfXp(), player.getZombieXp(),
@@ -415,21 +300,6 @@ public class RoleCommands extends Command {
                                 }
                                 break;
                             }
-                            case "slot_collector": {
-                                Role slotCollectorRole = guild
-                                        .getRoleById(higherDepth(currentRole, "id").getAsString());
-                                if (player.getNumberMinionSlots() >= higherDepth(currentRole, "num_minions")
-                                        .getAsInt()) {
-                                    if (!guild.getMember(user).getRoles().contains(slotCollectorRole)) {
-                                        guild.addRoleToMember(guild.getMember(user), slotCollectorRole).queue();
-                                        addedRoles.append(roleChangeString(slotCollectorRole.getName()));
-                                    }
-                                } else if (guild.getMember(user).getRoles().contains(slotCollectorRole)) {
-                                    removedRoles.append(roleChangeString(slotCollectorRole.getName()));
-                                    guild.removeRoleFromMember(guild.getMember(user), slotCollectorRole).queue();
-                                }
-                                break;
-                            }
                         }
                     }
                     eb.setDescription("**Added Roles:**\n"
@@ -438,7 +308,6 @@ public class RoleCommands extends Command {
                     if (errorRoles.length() > 0) {
                         eb.addField("Disabled APIs:", errorRoles.toString(), false);
                     }
-                    eb.setTimestamp(Instant.now());
                 } else {
                     eb = defaultEmbed("Error fetching server's settings");
                 }
@@ -448,7 +317,6 @@ public class RoleCommands extends Command {
         } else {
             ebMessage.editMessage(errorMessage(this.name).build()).queue();
             return;
-
         }
         ebMessage.editMessage(eb.build()).queue();
     }

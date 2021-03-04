@@ -6,8 +6,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.globalCooldown;
+import static com.skyblockplus.utils.Utils.*;
 
 public class CategoriesCommand extends Command {
 
@@ -19,7 +18,7 @@ public class CategoriesCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = defaultEmbed("Loading...");
+        EmbedBuilder eb = loadingEmbed();
         Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 
         StringBuilder ebString = new StringBuilder();

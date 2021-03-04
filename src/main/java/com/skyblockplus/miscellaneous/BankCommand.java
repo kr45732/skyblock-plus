@@ -33,7 +33,7 @@ public class BankCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = defaultEmbed("Loading...");
+        EmbedBuilder eb = loadingEmbed();
         Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
         String content = event.getMessage().getContentRaw();
         String[] args = content.split(" ");

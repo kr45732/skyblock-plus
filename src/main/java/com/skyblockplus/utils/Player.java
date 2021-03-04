@@ -11,10 +11,7 @@ import me.nullicorn.nedit.type.NBTList;
 import org.springframework.util.StringUtils;
 
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 import static com.skyblockplus.utils.Utils.*;
 
@@ -280,10 +277,10 @@ public class Player {
             for (int i = 0; i < profilesArray.size(); i++) {
                 String lastSaveLoop;
                 try {
-                     lastSaveLoop = higherDepth(
+                    lastSaveLoop = higherDepth(
                             higherDepth(higherDepth(profilesArray.get(i), "members"), this.playerUuid), "last_save")
                             .getAsString();
-                } catch (Exception e){
+                } catch (Exception e) {
                     continue;
                 }
 
@@ -364,8 +361,8 @@ public class Player {
 
     public int getNumberMinionSlots() {
         try {
-            int[] craftedMinionsToSlots = new int[] { 0, 5, 15, 30, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300,
-                    350, 400, 450, 500, 550, 600 };
+            int[] craftedMinionsToSlots = new int[]{0, 5, 15, 30, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300,
+                    350, 400, 450, 500, 550, 600};
 
             int prevMax = 0;
             int craftedMinions = higherDepth(profileJson, "crafted_generators").getAsJsonArray().size();
@@ -590,7 +587,7 @@ public class Player {
                     }
                 }
             }
-            return new String[] { outputStringPart2.toString(), outputStringPart1.toString() };
+            return new String[]{outputStringPart2.toString(), outputStringPart1.toString()};
 
         } catch (Exception ignored) {
         }
@@ -755,7 +752,9 @@ public class Player {
             return emojiMap.get(itemName);
         }
 
-        invMissing += "\n• " + itemName;
+        if (!invMissing.contains(itemName)) {
+            invMissing += "\n• " + itemName;
+        }
         return "❓";
     }
 
@@ -855,9 +854,9 @@ public class Player {
                             loreString.append("\n").append(((String) loreLine).replaceAll(
                                     "§ka|§0|§1|§2|§3|§4|§5|§6|§7|§8|§9|§a|§b|§c|§d|§e|§f|§k|§l|§m|§n|§o|§r", ""));
                         }
-                        invFramesMap.put(i + 1, new String[] {
+                        invFramesMap.put(i + 1, new String[]{
                                 invFrames.getCompound(i).getString("Count", "0").toLowerCase().replace("b", "") + "x",
-                                loreString.toString() });
+                                loreString.toString()});
                     }
                 }
             }
@@ -903,5 +902,56 @@ public class Player {
                     + StringUtils.countOccurrencesOf(getInventory()[1], "bone_boomerang");
         }
         return 0;
+    }
+
+    public List<String[]> getEnderChest() {
+        try {
+            String encodedInventoryContents = higherDepth(higherDepth(profileJson, "ender_chest_contents"), "data")
+                    .getAsString();
+            NBTCompound decodedInventoryContents = NBTReader.readBase64(encodedInventoryContents);
+
+            NBTList invFrames = decodedInventoryContents.getList(".i");
+
+            Map<Integer, String> invFramesMap = new TreeMap<>();
+            for (int i = 0; i < invFrames.size(); i++) {
+                NBTCompound displayName = invFrames.getCompound(i).getCompound("tag.ExtraAttributes");
+                if (displayName != null) {
+                    invFramesMap.put(i + 1, displayName.getString("id", "empty").toLowerCase());
+                } else {
+                    invFramesMap.put(i + 1, "empty");
+                }
+            }
+
+            StringBuilder outputStringPart1 = new StringBuilder();
+            StringBuilder outputStringPart2 = new StringBuilder();
+            List<String[]> enderChestPages = new ArrayList<>();
+            StringBuilder curNine = new StringBuilder();
+            int page = 0;
+            for (Map.Entry<Integer, String> i : invFramesMap.entrySet()) {
+                if ((i.getKey() - page) <= 27) {
+                    curNine.append(itemToEmoji(i.getValue()));
+                    if (i.getKey() % 9 == 0) {
+                        outputStringPart1.append(curNine).append("\n");
+                        curNine = new StringBuilder();
+                    }
+                } else {
+                    curNine.append(itemToEmoji(i.getValue()));
+                    if (i.getKey() % 9 == 0) {
+                        outputStringPart2.append(curNine).append("\n");
+                        curNine = new StringBuilder();
+                    }
+                }
+
+                if (i.getKey() != 0 && i.getKey() % 45 == 0) {
+                    enderChestPages.add(new String[]{outputStringPart1.toString(), outputStringPart2.toString()});
+                    outputStringPart1 = new StringBuilder();
+                    outputStringPart2 = new StringBuilder();
+                    page += 45;
+                }
+            }
+            return enderChestPages;
+        } catch (Exception ignored) {
+        }
+        return null;
     }
 }

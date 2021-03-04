@@ -33,7 +33,7 @@ public class GuildLeaderboardCommand extends Command {
             return;
         }
 
-        EmbedBuilder eb = defaultEmbed("Loading...");
+        EmbedBuilder eb = loadingEmbed();
         eb.setDescription("**NOTE:** This can take up to a minute!");
         Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 

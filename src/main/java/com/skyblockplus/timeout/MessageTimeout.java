@@ -22,6 +22,16 @@ public class MessageTimeout extends ListenerAdapter {
         messageList.add(new MessageTimeoutStruct(message, eventListener));
     }
 
+    public static void removeMessage(Object eventListener) {
+        for (Iterator<MessageTimeoutStruct> iteratorCur = messageList.iterator(); iteratorCur.hasNext(); ) {
+            MessageTimeoutStruct currentMessage = iteratorCur.next();
+            if (currentMessage.eventListener.equals(eventListener)) {
+                iteratorCur.remove();
+                break;
+            }
+        }
+    }
+
     @Override
     public void onReady(@NotNull ReadyEvent event) {
         final Runnable channelDeleter = this::updateMessages;
