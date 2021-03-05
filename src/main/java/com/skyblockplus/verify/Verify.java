@@ -13,6 +13,7 @@ import java.util.List;
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.reload.ReloadEventWatcher.isUniqueVerifyGuild;
 import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.Utils.loadingEmbed;
 
 public class Verify extends ListenerAdapter {
     @Override
@@ -25,8 +26,8 @@ public class Verify extends ListenerAdapter {
                         TextChannel reactChannel = event.getGuild()
                                 .getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
 
-                        reactChannel.sendMessage("Loading...").complete();
-                        reactChannel.sendMessage("Loading...").complete();
+                        reactChannel.sendMessage(loadingEmbed().build()).complete();
+                        reactChannel.sendMessage(loadingEmbed().build()).complete();
                         List<Message> deleteMessages = reactChannel.getHistory().retrievePast(25).complete();
                         reactChannel.deleteMessages(deleteMessages).complete();
 

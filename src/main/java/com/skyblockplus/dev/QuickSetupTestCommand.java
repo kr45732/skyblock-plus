@@ -10,8 +10,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
 import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.Utils.*;
 
 public class QuickSetupTestCommand extends Command {
     private CommandEvent event;
@@ -24,7 +23,7 @@ public class QuickSetupTestCommand extends Command {
     @Override
     protected void execute(CommandEvent event) {
         this.event = event;
-        EmbedBuilder eb = defaultEmbed("Loading...", null);
+        EmbedBuilder eb = loadingEmbed();
         Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
         String content = event.getMessage().getContentRaw();
         String[] args = content.split(" ", 4);

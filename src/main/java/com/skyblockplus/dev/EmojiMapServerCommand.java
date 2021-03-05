@@ -16,8 +16,8 @@ public class EmojiMapServerCommand extends Command {
     protected void execute(CommandEvent event) {
         String ebString = "";
         for (Emote emote : event.getGuild().getEmotes()) {
-            ebString += ("emojiMap.put(\"" + emote.getName() + "\", \"" + emote.getAsMention() + "\");") + "\n";
+            ebString += ("emojiMap.put(\"" + emote.getName() + "\", \"\\" + emote.getAsMention() + "\");") + "\n";
         }
-        event.reply(defaultEmbed("Emojis").setDescription(ebString).build());
+        event.reply(ebString);
     }
 }
