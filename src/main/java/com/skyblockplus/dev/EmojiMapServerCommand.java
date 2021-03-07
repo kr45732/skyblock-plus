@@ -4,8 +4,6 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.entities.Emote;
 
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-
 public class EmojiMapServerCommand extends Command {
     public EmojiMapServerCommand() {
         this.name = "e-map";
@@ -14,10 +12,10 @@ public class EmojiMapServerCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        String ebString = "";
+        StringBuilder ebString = new StringBuilder();
         for (Emote emote : event.getGuild().getEmotes()) {
-            ebString += ("emojiMap.put(\"" + emote.getName() + "\", \"\\" + emote.getAsMention() + "\");") + "\n";
+            ebString.append("emojiMap.put(\"").append(emote.getName()).append("\", \"\\").append(emote.getAsMention()).append("\");").append("\n");
         }
-        event.reply(ebString);
+        event.reply(ebString.toString());
     }
 }

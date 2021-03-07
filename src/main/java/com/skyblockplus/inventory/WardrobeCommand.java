@@ -72,7 +72,7 @@ public class WardrobeCommand extends Command {
                         .setCommandUser(event.getAuthor());
 
                 for (Map.Entry<Integer, ArmorStruct> currentArmour : armorStructMap.entrySet()) {
-                    pageTitles.add("Player wardrobe for " + player.getUsername());
+                    pageTitles.add(player.getUsername());
                     paginateBuilder.addItems("**__Slot " + (currentArmour.getKey() + 1) + "__**\n"
                             + currentArmour.getValue().getHelmet() + "\n" + currentArmour.getValue().getChestplate()
                             + "\n" + currentArmour.getValue().getLeggings() + "\n" + currentArmour.getValue().getBoots()

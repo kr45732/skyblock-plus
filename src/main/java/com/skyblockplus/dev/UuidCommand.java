@@ -1,4 +1,4 @@
-package com.skyblockplus.miscellaneous;
+package com.skyblockplus.dev;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -12,7 +12,7 @@ public class UuidCommand extends Command {
 
     public UuidCommand() {
         this.name = "uuid";
-        this.cooldown = globalCooldown;
+        this.ownerCommand = true;
     }
 
     @Override

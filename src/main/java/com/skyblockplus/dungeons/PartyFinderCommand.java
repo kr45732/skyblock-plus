@@ -37,7 +37,7 @@ public class PartyFinderCommand extends Command {
     private EmbedBuilder getPlayerDungeonInfo(String username, String profileName) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
-            EmbedBuilder eb = defaultEmbed("Dungeon stats for " + player.getUsername());
+            EmbedBuilder eb = player.defaultPlayerEmbed();
             eb.setDescription("**Catacombs Level:** " + roundSkillAverage(player.getCatacombsLevel()));
             eb.appendDescription("\n**Secrets:** " + formatNumber(player.getDungeonSecrets()));
             eb.appendDescription("\n**Selected Class:** " + player.getSelectedDungeonClass());

@@ -89,7 +89,7 @@ public class AuctionCommands extends Command {
                     }
                     auction += " | Ending in " + timeUntil;
                 } else {
-                    if (highestBid >= startingBid) { // Auction sold
+                    if (highestBid >= startingBid) {
                         auction = "Auction sold for " + simplifyNumber(highestBid) + " coins";
                     } else {
                         auction = "Auction did not sell";
@@ -100,7 +100,7 @@ public class AuctionCommands extends Command {
             }
         }
 
-        EmbedBuilder eb = defaultEmbed(this.playerUsername + "'s auctions", null);
+        EmbedBuilder eb = defaultEmbed(this.playerUsername, "https://auctions.craftlink.xyz/players/" + this.playerUuid);
         for (String[] auction : auctions) {
             if (auction[0] != null) {
                 for (String[] strings : auctions) {
@@ -121,8 +121,7 @@ public class AuctionCommands extends Command {
             this.playerUsername = higherDepth(usernameJson, "name").getAsString();
             this.playerUuid = higherDepth(usernameJson, "id").getAsString();
             return true;
-        } catch (Exception e) {
-            System.out.println("Null - uuid - " + username);
+        } catch (Exception ignored) {
         }
         return false;
 

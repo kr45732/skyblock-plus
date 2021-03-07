@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -63,7 +64,7 @@ public class GuildCommands extends Command {
                 }
                 return;
             }
-        } else if (args.length == 3 && "info".equals(args[1])) {
+        } else if (args.length >= 3 && "info".equals(args[1])) {
             if (args[2].toLowerCase().startsWith("u-")) {
                 String usernameInfo = args[2].split("-")[1];
                 ebMessage.editMessage(getGuildInfo(usernameInfo).build()).queue();
@@ -122,25 +123,29 @@ public class GuildCommands extends Command {
         Map<String, Integer> guildExpMap = new HashMap<>();
 
         for (int i = 0; i < membersArr.size(); i++) {
-            String expHistory = higherDepth(membersArr.get(i), "expHistory").toString();
-            String[] playerExpArr = expHistory.substring(1, expHistory.length() - 1).split(",");
+            String currentUsername = uuidToUsername(higherDepth(membersArr.get(i), "uuid").getAsString());
+            if (currentUsername == null) {
+                continue;
+            }
+
+            JsonElement expHistory = higherDepth(membersArr.get(i), "expHistory");
+            ArrayList<String> keys = getJsonKeys(expHistory);
             int totalPlayerExp = 0;
 
-            for (String value : playerExpArr) {
-                totalPlayerExp += Integer.parseInt(value.split(":")[1]);
+            for (String value : keys) {
+                totalPlayerExp += higherDepth(expHistory, value).getAsInt();
             }
 
-            String currentUsername = uuidToUsername(higherDepth(membersArr.get(i), "uuid").getAsString());
-            if (currentUsername != null) {
-                guildExpMap.put(currentUsername, totalPlayerExp);
-            }
+            guildExpMap.put(currentUsername, totalPlayerExp);
         }
 
         String[] outputStrArr = new String[guildExpMap.size()];
-
         guildExpMap.entrySet().stream().sorted((k1, k2) -> -k1.getValue().compareTo(k2.getValue())).forEach(k -> {
-            outputStrArr[counter] = "**" + (counter + 1) + ")** " + fixUsername(k.getKey()) + ": "
-                    + formatNumber(k.getValue()) + " EXP\n";
+            try {
+                outputStrArr[counter] = "**" + (counter + 1) + ")** " + fixUsername(k.getKey()) + ": "
+                        + formatNumber(k.getValue()) + " EXP\n";
+            } catch (Exception ignored) {
+            }
             counter++;
         });
 
@@ -161,7 +166,7 @@ public class GuildCommands extends Command {
 
         try {
             String guildName = higherDepth(higherDepth(guildJson, "guild"), "name").getAsString();
-            EmbedBuilder eb = defaultEmbed(uuidUsername.playerUsername + " is in " + guildName);
+            EmbedBuilder eb = defaultEmbed(uuidUsername.playerUsername + " is in " + guildName, "https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(higherDepth(guildJson, "guild"), "_id").getAsString());
             eb.addField("Guild statistics:", getGuildInfo(guildJson), false);
             return eb;
         } catch (Exception e) {
@@ -184,7 +189,7 @@ public class GuildCommands extends Command {
 
         String guildName = higherDepth(higherDepth(guildJson, "guild"), "name").getAsString();
 
-        EmbedBuilder eb = defaultEmbed(guildName + " information");
+        EmbedBuilder eb = defaultEmbed(guildName, "https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(higherDepth(guildJson, "guild"), "_id").getAsString());
         eb.addField("Guild statistics:", getGuildInfo(guildJson), false);
 
         return eb;
@@ -200,7 +205,7 @@ public class GuildCommands extends Command {
             }
             guildName = higherDepth(higherDepth(guildJson, "guild"), "name").getAsString();
 
-            EmbedBuilder eb = defaultEmbed(guildName + " information", null);
+            EmbedBuilder eb = defaultEmbed(guildName, "https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(higherDepth(guildJson, "guild"), "_id").getAsString());
             eb.addField("Guild statistics:", getGuildInfo(guildJson), false);
             return eb;
         } catch (Exception e) {

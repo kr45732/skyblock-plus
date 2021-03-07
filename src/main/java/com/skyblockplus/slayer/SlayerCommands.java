@@ -38,8 +38,7 @@ public class SlayerCommands extends Command {
     private EmbedBuilder getPlayerSlayer(String username, String profileName) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
-            EmbedBuilder eb = defaultEmbed("Slayer for " + player.getUsername(),
-                    skyblockStatsLink(player.getUsername(), player.getProfileName()));
+            EmbedBuilder eb = player.defaultPlayerEmbed();
             eb.setDescription("**Total slayer:** " + formatNumber(player.getSlayer()) + " XP");
             eb.addField("<:sven_packmaster:800002277648891914> Wolf", simplifyNumber(player.getWolfXp()) + " XP", true);
             eb.addField("<:revenant_horror:800002290987302943> Zombie", simplifyNumber(player.getZombieXp()) + " XP",
