@@ -36,7 +36,7 @@ public class TalismanBagCommand extends Command {
         String[] args = content.split(" ");
         this.event = event;
 
-        System.out.println(content);
+        logCommand(event.getGuild(), event.getAuthor(), content);
 
         if ((args.length == 3 || args.length == 4) && args[1].equals("list")) {
             if (args.length == 4) {
@@ -104,7 +104,7 @@ public class TalismanBagCommand extends Command {
                         .setCommandUser(event.getAuthor());
 
                 for (Map.Entry<Integer, String> currentTalisman : talismanBagMap.entrySet()) {
-                    pageTitles.add("Player talisman bag for " + player.getUsername());
+                    pageTitles.add("Talisman bag for " + player.getUsername());
                     paginateBuilder
                             .addItems("**Slot " + (currentTalisman.getKey() + 1) + "**: " + currentTalisman.getValue());
                 }

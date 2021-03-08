@@ -68,7 +68,7 @@ public class Main {
                 new CategoriesCommand(), new PartyFinderCommand(), new QuickSetupTestCommand(), new EmojiMapServerCommand(),
                 new EnderChestCommand(), new InstantTimeNow(), new GetEventListenersCommand());
 
-        if (BOT_PREFIX.equals("/")) {
+        if (BOT_PREFIX.equals("+")) {
             jda = JDABuilder.createDefault(BOT_TOKEN).setStatus(OnlineStatus.DO_NOT_DISTURB)
                     .setChunkingFilter(ChunkingFilter.ALL).setMemberCachePolicy(MemberCachePolicy.ALL)
                     .enableIntents(GatewayIntent.GUILD_MEMBERS).setActivity(Activity.playing("Loading..."))

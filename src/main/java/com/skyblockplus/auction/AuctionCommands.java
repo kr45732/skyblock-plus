@@ -29,7 +29,7 @@ public class AuctionCommands extends Command {
         String content = event.getMessage().getContentRaw();
         String[] args = content.split(" ");
 
-        System.out.println(content);
+        logCommand(event.getGuild(), event.getAuthor(), content);
 
         if (args.length == 2) {
             ebMessage.editMessage(getPlayerAuction(args[1]).build()).queue();

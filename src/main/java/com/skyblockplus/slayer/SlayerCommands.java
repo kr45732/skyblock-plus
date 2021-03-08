@@ -22,7 +22,7 @@ public class SlayerCommands extends Command {
         String content = event.getMessage().getContentRaw();
         String[] args = content.split(" ");
 
-        System.out.println(content);
+        logCommand(event.getGuild(), event.getAuthor(), content);
 
         if (args.length == 3) {
             ebMessage.editMessage(getPlayerSlayer(args[1], args[2]).build()).queue();

@@ -25,7 +25,7 @@ public class EssenceCommand extends Command {
         String content = event.getMessage().getContentRaw();
         String[] args = content.split(" ");
 
-        System.out.println(content);
+        logCommand(event.getGuild(), event.getAuthor(), content);
 
         JsonElement essenceCostsJson = getJson(
                 "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/essencecosts.json");

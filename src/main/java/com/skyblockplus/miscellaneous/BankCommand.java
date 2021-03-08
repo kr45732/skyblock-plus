@@ -38,7 +38,7 @@ public class BankCommand extends Command {
         String content = event.getMessage().getContentRaw();
         String[] args = content.split(" ");
 
-        System.out.println(content);
+        logCommand(event.getGuild(), event.getAuthor(), content);
 
         if ((args.length == 3 || args.length == 4) && args[1].equals("history")) {
             this.event = event;
@@ -71,8 +71,7 @@ public class BankCommand extends Command {
             double playerBankBalance = player.getBankBalance();
             double playerPurseCoins = player.getPurseCoins();
 
-            EmbedBuilder eb = defaultEmbed("Total coins for " + player.getUsername(),
-                    skyblockStatsLink(player.getUsername(), player.getProfileName()));
+            EmbedBuilder eb = player.defaultPlayerEmbed();
             eb.setDescription("**Total coins:** " + simplifyNumber(playerBankBalance + playerPurseCoins));
             eb.addField("Bank balance",
                     playerBankBalance == -1 ? "Banking API disabled" : simplifyNumber(playerBankBalance) + " coins",

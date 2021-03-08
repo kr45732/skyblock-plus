@@ -24,7 +24,7 @@ public class CatacombsCommand extends Command {
         String content = event.getMessage().getContentRaw();
         String[] args = content.split(" ");
 
-        System.out.println(content);
+        logCommand(event.getGuild(), event.getAuthor(), content);
 
         if (args.length == 3) {
             ebMessage.editMessage(getPlayerCatacombs(args[1], args[2]).build()).queue();

@@ -29,7 +29,7 @@ public class HypixelCommand extends Command {
         String content = event.getMessage().getContentRaw();
         String[] args = content.split(" ");
 
-        System.out.println(content);
+        logCommand(event.getGuild(), event.getAuthor(), content);
 
         if (args.length == 3 && args[1].equals("parkour")) {
             ebMessage.editMessage(getParkourStats(args[2]).build()).queue();
@@ -51,7 +51,7 @@ public class HypixelCommand extends Command {
                 hypixelJson = higherDepth(hypixelJson, "player");
 
                 try {
-                    EmbedBuilder eb = defaultEmbed("Lobby Parkour for " + usernameUuid.playerUsername);
+                    EmbedBuilder eb = defaultEmbed(usernameUuid.playerUsername, "https://plancke.io/hypixel/player/stats/" + usernameUuid.playerUuid);
                     StringBuilder parkourCompletionString = new StringBuilder();
                     for (String parkourLocation : getJsonKeys(higherDepth(hypixelJson, "parkourCompletions"))) {
                         int fastestTime = -1;
@@ -87,7 +87,7 @@ public class HypixelCommand extends Command {
             if (higherDepth(hypixelJson, "player") != null) {
                 hypixelJson = higherDepth(hypixelJson, "player");
 
-                EmbedBuilder eb = defaultEmbed("Hypixel Stats for " + usernameUuid.playerUsername);
+                EmbedBuilder eb = defaultEmbed(usernameUuid.playerUsername, "https://plancke.io/hypixel/player/stats/" + usernameUuid.playerUuid);
                 DateTimeFormatter dateTimeFormatter = DateTimeFormatter
                         .ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT).withLocale(Locale.US)
                         .withZone(ZoneId.systemDefault());
@@ -196,6 +196,13 @@ public class HypixelCommand extends Command {
                     skyblockItems += "• Scorpius Bribe (Year 96): "
                             + dateFormatterShort.format(
                             Instant.ofEpochMilli(higherDepth(hypixelJson, "scorpius_bribe_96").getAsLong()))
+                            + "\n";
+                }
+
+                if (higherDepth(hypixelJson, "scorpius_bribe_120") != null) {
+                    skyblockItems += "• Scorpius Bribe (Year 120): "
+                            + dateFormatterShort.format(
+                            Instant.ofEpochMilli(higherDepth(hypixelJson, "scorpius_bribe_120").getAsLong()))
                             + "\n";
                 }
 

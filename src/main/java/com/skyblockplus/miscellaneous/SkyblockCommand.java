@@ -38,7 +38,7 @@ public class SkyblockCommand extends Command {
         String content = event.getMessage().getContentRaw();
         String[] args = content.split(" ");
 
-        System.out.println(content);
+        logCommand(event.getGuild(), event.getAuthor(), content);
 
         if (args.length == 2 || args.length == 3) {
             if (args.length == 3) {

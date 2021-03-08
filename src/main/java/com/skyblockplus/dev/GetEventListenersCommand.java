@@ -13,11 +13,11 @@ public class GetEventListenersCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        String ebString = "";
+        StringBuilder ebString = new StringBuilder();
         for (Object i : jda.getRegisteredListeners()) {
-            ebString += "\n• " + i;
+            ebString.append("\n• ").append(i);
         }
 
-        event.getChannel().sendMessage(ebString).queue();
+        event.getChannel().sendMessage(ebString.toString()).queue();
     }
 }

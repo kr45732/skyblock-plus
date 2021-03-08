@@ -9,13 +9,13 @@ import static com.skyblockplus.utils.Utils.*;
 public class AboutCommand extends Command {
     public AboutCommand() {
         this.name = "about";
-        this.guildOnly = false;
         this.cooldown = globalCooldown;
     }
 
     @Override
     protected void execute(CommandEvent event) {
-        System.out.println(BOT_PREFIX + "about");
+        logCommand(event.getGuild(), event.getAuthor(), "about");
+
         String description = "Hello! I am **Skyblock Plus**, an an all purpose skyblock bot.\n"
                 + "I was written in java by CrypticPlasma.\n" + "Type `" + BOT_PREFIX + "help` or `" + BOT_PREFIX
                 + "commands` to see my commands!"
@@ -27,7 +27,7 @@ public class AboutCommand extends Command {
                 + "<:green_check_custom:799774962394988574> Automatic Skyblock Applications For a Guild\n"
                 + "<:green_check_custom:799774962394988574> Automatic Skyblock Progress Roles\n";
 
-        EmbedBuilder eb = defaultEmbed("About Skyblock Plus!");
+        EmbedBuilder eb = defaultEmbed("Skyblock Plus");
         eb.setDescription(description);
         eb.setFooter("Last restart", null);
         eb.setTimestamp(event.getClient().getStartTime());

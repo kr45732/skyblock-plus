@@ -27,9 +27,8 @@ public class SetupCommand extends Command {
     protected void execute(CommandEvent event) {
         EmbedBuilder eb = loadingEmbed();
         Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-        String content = event.getMessage().getContentRaw();
 
-        System.out.println(content);
+        logCommand(event.getGuild(), event.getAuthor(), "setup");
 
         String[] pageTitles = new String[]{"Overview", "Features", "Automatic Verify", "Automatic Apply",
                 "Automatic Roles", " Guild Rank Helper", "More Help"};

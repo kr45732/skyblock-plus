@@ -46,7 +46,7 @@ public class SettingsCommand extends Command {
         String content = event.getMessage().getContentRaw();
         String[] args = content.split(" ");
 
-        System.out.println(content);
+        logCommand(event.getGuild(), event.getAuthor(), content);
 
         JsonElement currentSettings = database.getServerSettings(event.getGuild().getId());
         if (higherDepth(currentSettings, "serverId") == null) {

@@ -27,7 +27,7 @@ public class EnderChestCommand extends Command {
         String content = event.getMessage().getContentRaw();
         String[] args = content.split(" ");
 
-        System.out.println(content);
+        logCommand(event.getGuild(), event.getAuthor(), content);
 
         if (args.length == 2 || args.length == 3) {
             List<String[]> playerEnderChest;

@@ -19,13 +19,12 @@ public class VersionCommand extends Command {
 
     public VersionCommand() {
         this.name = "version";
-        this.guildOnly = false;
         this.cooldown = globalCooldown;
     }
 
     @Override
     protected void execute(CommandEvent event) {
-        System.out.println(event.getMessage().getContentRaw());
+        logCommand(event.getGuild(), event.getAuthor(), event.getMessage().getContentRaw());
 
         try {
             JsonElement patchNotes = JsonParser

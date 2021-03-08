@@ -30,7 +30,7 @@ public class ApplyUser extends ListenerAdapter {
     private Player player;
 
     public ApplyUser(MessageReactionAddEvent event, User applyingUser, JsonElement currentSettings) {
-        System.out.println("Apply: " + applyingUser.getName());
+        logCommand(event.getGuild(), applyingUser, "apply " + applyingUser.getName());
         this.applyingUser = applyingUser;
         this.currentSettings = currentSettings;
 

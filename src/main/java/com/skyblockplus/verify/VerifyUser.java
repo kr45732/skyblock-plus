@@ -28,7 +28,7 @@ public class VerifyUser extends ListenerAdapter {
     String[] playerInfo;
 
     public VerifyUser(MessageReactionAddEvent event, User verifyingUser, JsonElement currentSettings) {
-        System.out.println("Verify: " + verifyingUser.getName());
+        logCommand(event.getGuild(), verifyingUser, "verify " + verifyingUser.getName());
         this.verifyingUser = verifyingUser;
         this.currentSettings = currentSettings;
 

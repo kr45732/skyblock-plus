@@ -33,7 +33,7 @@ public class SacksCommand extends Command {
         String[] args = content.split(" ");
         this.event = event;
 
-        System.out.println(content);
+        logCommand(event.getGuild(), event.getAuthor(), content);
 
         if (args.length == 2 || args.length == 3) {
             if (args.length == 3) {

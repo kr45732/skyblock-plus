@@ -19,14 +19,13 @@ public class HelpCommand extends Command {
     public HelpCommand(EventWaiter waiter) {
         this.name = "help";
         this.aliases = new String[]{"commands"};
-        this.guildOnly = false;
         this.waiter = waiter;
         this.cooldown = globalCooldown;
     }
 
     @Override
     protected void execute(CommandEvent event) {
-        System.out.println(event.getMessage().getContentRaw());
+        logCommand(event.getGuild(), event.getAuthor(), event.getMessage().getContentRaw());
 
         String[] pageTitles = new String[]{"Navigation", "General", "Slayer", "Skills", "Dungeons", "Guild",
                 "Auction House and Bazaar", "Inventory", "Miscellaneous Commands", "Settings", "Verify Settings", "Apply Settings",
@@ -73,8 +72,8 @@ public class HelpCommand extends Command {
             pageMap.put("weight", 9);
             pageMap.put("hypixel", 9);
             pageMap.put("uuid", 10);
-	    pageMap.put("categories", 10);
-	    pageMap.put("settings", 10);
+            pageMap.put("categories", 10);
+            pageMap.put("settings", 10);
             pageMap.put("setup", 10);
 
             if (event.getGuild().getMember(event.getAuthor()).hasPermission(Permission.ADMINISTRATOR)) {
@@ -110,42 +109,40 @@ public class HelpCommand extends Command {
                         + generateHelp("Show patch notes for this bot", "version"));
 
         paginateBuilder.addItems(
-                generateHelp("Get a player's slayer data",
+                generateHelp("Get the slayer data of a player",
                         "slayer [player] <profile>"));
 
         paginateBuilder.addItems(
-                generateHelp("Get a player's skills data",
+                generateHelp("Get the skills data of a player",
                         "skills [player] <profile>"));
 
-        paginateBuilder.addItems(generateHelp("Get a player's dungeon data", "catacombs [player] <profile>",
-                "cata [player] " + "<profile>")
-                + generateHelp("Calculate essence amount to upgrade an item", "essence upgrade [item]")
-                + generateHelp("Get essence information for each upgrade level of an item",
-                "essence information [item]", "essence info [item]")
+        paginateBuilder.addItems(generateHelp("Get the dungeons data of a player", "catacombs [player] <profile>", "cata [player] " + "<profile>")
+                + generateHelp("Interactive message to find the essence amount to upgrade an item", "essence upgrade [item]")
+                + generateHelp("Get the amount of essence to upgrade an item for each level", "essence information [item]", "essence info [item]")
                 + generateHelp("A party finder helper that shows a player's dungeon stats", "partyfinder [player] <profile>", "pf [player] <profile>")
         );
 
-        paginateBuilder.addItems(generateHelp("Get a player's guild experience leaderboard", "guild experience [u-player]",
-                "guild exp [u-player]") + generateHelp("Get a list of members in a player's guild", "guild members [u-player]")
-                        + generateHelp("Find what guild a player is in", "guild [player]")
-                        + generateHelp("Get information about a player's guild", "guild info [u-player]")
-                        + generateHelp("Get information about a guild", "guild info [g-player]")
-//                + generateHelp("Get promote and demote leaderboard in-game commands for a player's guild",
-//                "guild-rank [u-player]", "g-rank [u-player]")
+        paginateBuilder.addItems(generateHelp("Find what guild a player is in", "guild [player]")
+                        + generateHelp("Get information and statistics about a player's guild", "guild info [u-player]")
+                        + generateHelp("Get information and statistics about a guild", "guild info [g-player]")
+                        + generateHelp("Get a list of all members in a player's guild", "guild members [u-player]")
+                        + generateHelp("Get the experience leaderboard for a player's guild", "guild experience [u-player]", "guild exp [u-player]")
+//                + generateHelp("Get promote and demote leaderboard in-game commands for a player's guild", guild-rank [u-player]", "g-rank [u-player]")
         );
 
         paginateBuilder.addItems(
                 generateHelp("Get player's active (not claimed) auctions on all profiles", "auction [player]", "ah [player]")
                         + generateHelp("Get the lowest bin of an item", "bin [item]"));
-        paginateBuilder.addItems(generateHelp("Get a player's wardrobe armors", "wardrobe [player] <profile>")
-                        + generateHelp("Get a player's talisman bag", "talisman [player] <profile>")
-                        + generateHelp("Get a list of a player's talisman bag", "talisman list [player] <profile>")
-                        + generateHelp("Get a player's inventory", "inventory [player] <profile>",
-                "inv [player] <profile>")
-                        + generateHelp("Get a player's ender chest", "enderchest [player] <profile>", "echest [player] <profile>")
-                        + generateHelp("Get a player's equipped armor", "inventory armor [player] <profile>",
-                "inv [player] <profile>")
-                        + generateHelp("Get a player's sacks content", "sacks [player] <profile>")
+
+        paginateBuilder.addItems(
+                generateHelp("Get a player's inventory represented in emojis", "inventory [player] <profile>",
+                        "inv [player] <profile>")
+                        + generateHelp("Get a player's equipped armor", "inventory armor [player] <profile>", "inv armor [player] <profile>")
+                        + generateHelp("Get a player's ender chest represented in emojis", "enderchest [player] <profile>", "echest [player] <profile>")
+                        + generateHelp("Get a player's talisman bag represented in emojis", "talisman [player] <profile>")
+                        + generateHelp("Get a player's talisman bag represented in a list", "talisman list [player] <profile>")
+                        + generateHelp("Get a player's sacks' content bag represented in a list", "sacks [player] <profile>")
+                        + generateHelp("Get a player's wardrobe armors represented in a list", "wardrobe [player] <profile>")
         );
 
         paginateBuilder.addItems(generateHelp("Claim automatic Skyblock roles", "roles claim [player] <profile>")
@@ -161,8 +158,8 @@ public class HelpCommand extends Command {
         if (event.getGuild().getMember(event.getAuthor()).hasPermission(Permission.ADMINISTRATOR)) {
             paginateBuilder.addItems(
                     generateHelp("Get the current settings for the bot", "settings")
-                    + generateHelp("A walk-through on how to setup the bot", "setup")
-                    + generateHelp("Get the id's of all categories in guild", "categories")
+                            + generateHelp("A walk-through on how to setup the bot", "setup")
+                            + generateHelp("Get the id's of all categories in guild", "categories")
             );
 
             paginateBuilder.addItems(generateHelp("Get the current verify settings for the bot", "settings verify")

@@ -849,27 +849,27 @@ public class Player {
         emojiMap.put("wither_relic", "<:wither_relic:817502249986293871>");
         emojiMap.put("farmer_orb", "<:farmer_orb:817502293670756362>");
 
-emojiMap.put("wedding_ring_9", "<:wedding_ring_9:817868454001901668>");
-emojiMap.put("scorpion_foil", "<:scorpion_foil:817868453834522634>");
-emojiMap.put("pooch_sword", "<:pooch_sword:817868453812895844>");
-emojiMap.put("campfire_talisman_29", "<:campfire_talisman_29:817868453805424700>");
-emojiMap.put("day_crystal", "<:day_crystal:817508883664863232>");
-emojiMap.put("explosive_bow", "<:explosive_bow:817868453733597254>");
-emojiMap.put("party_hat_crab", "<a:party_hat_crab4:817868453952094278>");
-emojiMap.put("small_backpack", "<:small_backpack:817868453804769301>");
-emojiMap.put("night_crystal", "<:night_crystal:817508883719127140>");
-emojiMap.put("scarf_thesis", "<:scarf_thesis:817508883526057995>");
-emojiMap.put("trick_or_treat_bag", "<:trick_or_treat_bag:817868453972934716>");
-emojiMap.put("super_magic_mushroom_soup", "<:super_magic_mushroom_soup:817868453599772695>");
-emojiMap.put("wand_of_mending", "<:wand_of_mending:817868453678546976>");
-emojiMap.put("pigs_foot", "<:pigs_foot:817508883726598144>");
-emojiMap.put("scarf_studies", "<:scarf_studies:817508883583991859>");
-emojiMap.put("diamond_spade", "<:diamond_spade:817868453515624510>");
-emojiMap.put("bat_person_ring", "<:bat_person_ring:817508883735511091>");
-emojiMap.put("bat_person_artifact", "<:bat_person_artifact:817508883698417684>");
-emojiMap.put("scarf_grimoir", "<:scarf_grimoir:817508883755958332>");
-emojiMap.put("bat_person_talisman", "<:bat_person_talisman:817508883391447071>");
-emojiMap.put("sharp_shark_tooth_necklace", "<:sharp_shark_tooth_necklace:817869329479368745>");
+        emojiMap.put("wedding_ring_9", "<:wedding_ring_9:817868454001901668>");
+        emojiMap.put("scorpion_foil", "<:scorpion_foil:817868453834522634>");
+        emojiMap.put("pooch_sword", "<:pooch_sword:817868453812895844>");
+        emojiMap.put("campfire_talisman_29", "<:campfire_talisman_29:817868453805424700>");
+        emojiMap.put("day_crystal", "<:day_crystal:817508883664863232>");
+        emojiMap.put("explosive_bow", "<:explosive_bow:817868453733597254>");
+        emojiMap.put("party_hat_crab", "<a:party_hat_crab4:817868453952094278>");
+        emojiMap.put("small_backpack", "<:small_backpack:817868453804769301>");
+        emojiMap.put("night_crystal", "<:night_crystal:817508883719127140>");
+        emojiMap.put("scarf_thesis", "<:scarf_thesis:817508883526057995>");
+        emojiMap.put("trick_or_treat_bag", "<:trick_or_treat_bag:817868453972934716>");
+        emojiMap.put("super_magic_mushroom_soup", "<:super_magic_mushroom_soup:817868453599772695>");
+        emojiMap.put("wand_of_mending", "<:wand_of_mending:817868453678546976>");
+        emojiMap.put("pigs_foot", "<:pigs_foot:817508883726598144>");
+        emojiMap.put("scarf_studies", "<:scarf_studies:817508883583991859>");
+        emojiMap.put("diamond_spade", "<:diamond_spade:817868453515624510>");
+        emojiMap.put("bat_person_ring", "<:bat_person_ring:817508883735511091>");
+        emojiMap.put("bat_person_artifact", "<:bat_person_artifact:817508883698417684>");
+        emojiMap.put("scarf_grimoir", "<:scarf_grimoir:817508883755958332>");
+        emojiMap.put("bat_person_talisman", "<:bat_person_talisman:817508883391447071>");
+        emojiMap.put("sharp_shark_tooth_necklace", "<:sharp_shark_tooth_necklace:817869329479368745>");
 
         itemName = itemName.replace("starred_", "");
         if (emojiMap.containsKey(itemName)) {
@@ -1079,7 +1079,7 @@ emojiMap.put("sharp_shark_tooth_necklace", "<:sharp_shark_tooth_necklace:8178693
         return null;
     }
 
-    public EmbedBuilder defaultPlayerEmbed(){
+    public EmbedBuilder defaultPlayerEmbed() {
         return defaultEmbed(getUsername(),
                 skyblockStatsLink(getUsername(), getProfileName()));
     }

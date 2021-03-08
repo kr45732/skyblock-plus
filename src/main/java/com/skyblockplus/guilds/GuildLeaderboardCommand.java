@@ -46,7 +46,7 @@ public class GuildLeaderboardCommand extends Command {
             return;
         }
 
-        System.out.println(content);
+        logCommand(event.getGuild(), event.getAuthor(), content);
 
         if (args[1].toLowerCase().startsWith("u-")) {
             String[] rankString = getLeaderboard(args[1].split("-")[1]);

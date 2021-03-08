@@ -22,6 +22,8 @@ public class PartyFinderCommand extends Command {
         String content = event.getMessage().getContentRaw();
         String[] args = content.split(" ");
 
+        logCommand(event.getGuild(), event.getAuthor(), content);
+
         if (args.length == 2 || args.length == 3) {
             if (args.length == 3) {
                 ebMessage.editMessage(getPlayerDungeonInfo(args[1], args[2]).build()).queue();

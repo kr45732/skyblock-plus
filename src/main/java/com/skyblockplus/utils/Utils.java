@@ -5,6 +5,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.skyblockplus.guilds.UsernameUuidStruct;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.User;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -29,6 +32,8 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static com.skyblockplus.Main.jda;
+
 public class Utils {
     public static final Color botColor = new Color(9, 92, 13);
     public static final int globalCooldown = 4;
@@ -46,6 +51,7 @@ public class Utils {
     private static String GITHUB_TOKEN = "";
     private static int remainingLimit = 120;
     private static int timeTillReset = 60;
+    private static MessageChannel botLogChannel;
 
     public static void setApplicationSettings() {
         Properties appProps = new Properties();
@@ -255,6 +261,27 @@ public class Utils {
     public static ArrayList<String> getJsonKeys(JsonElement jsonElement) {
         return jsonElement.getAsJsonObject().entrySet().stream().map(Map.Entry::getKey)
                 .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public static void logCommand(Guild guild, User user, String commandInput) {
+        System.out.println(commandInput);
+
+        if (botLogChannel == null) {
+            botLogChannel = jda.getGuildById("796790757947867156").getTextChannelById("818469899848515624");
+        }
+
+        EmbedBuilder eb = defaultEmbed(null);
+        try {
+            guild.getChannels().get(0).createInvite().queue(invite -> {
+                eb.setAuthor(guild.getName() + " (" + guild.getId() + ")", invite.getUrl(), guild.getIconUrl());
+                eb.addField(user.getName() + " (" + user.getId() + ")", "`" + commandInput + "`", false);
+                botLogChannel.sendMessage(eb.build()).queue();
+            });
+        } catch (Exception e) {
+            eb.setAuthor(guild.getName() + " (" + guild.getId() + ")", null, guild.getIconUrl());
+            eb.addField(user.getName() + " (" + user.getId() + ")", "`" + commandInput + "`", false);
+            botLogChannel.sendMessage(eb.build()).queue();
+        }
     }
 
     public static String[] getPlayerDiscordInfo(String username) {

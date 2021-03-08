@@ -34,12 +34,10 @@ public class GuildCommands extends Command {
     protected void execute(CommandEvent event) {
         EmbedBuilder eb = loadingEmbed();
         Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-
         String content = event.getMessage().getContentRaw();
-
         String[] args = content.split(" ");
 
-        System.out.println(content);
+        logCommand(event.getGuild(), event.getAuthor(), content);
 
         if (args.length == 3 && ("experience".equals(args[1]) || "exp".equals(args[1]))) {
             if (args[2].toLowerCase().startsWith("u-")) {
@@ -140,6 +138,7 @@ public class GuildCommands extends Command {
         }
 
         String[] outputStrArr = new String[guildExpMap.size()];
+        counter = 0;
         guildExpMap.entrySet().stream().sorted((k1, k2) -> -k1.getValue().compareTo(k2.getValue())).forEach(k -> {
             try {
                 outputStrArr[counter] = "**" + (counter + 1) + ")** " + fixUsername(k.getKey()) + ": "

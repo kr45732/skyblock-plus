@@ -36,7 +36,7 @@ public class InventoryCommand extends Command {
         String[] args = content.split(" ");
         this.event = event;
 
-        System.out.println(content);
+        logCommand(event.getGuild(), event.getAuthor(), content);
 
         if ((args.length == 3 || args.length == 4) && args[1].equals("armor")) {
             if (args.length == 4) {

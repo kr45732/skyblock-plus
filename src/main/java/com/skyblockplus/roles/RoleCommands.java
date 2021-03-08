@@ -37,7 +37,7 @@ public class RoleCommands extends Command {
             return;
         }
 
-        System.out.println(content);
+        logCommand(event.getGuild(), event.getAuthor(), content);
 
         if (getPlayerInfo(args[2]) == null) {
             eb = defaultEmbed("Discord tag mismatch");
@@ -79,8 +79,7 @@ public class RoleCommands extends Command {
                     List<String> rolesID = getJsonKeys(rolesJson);
                     rolesID.remove("enable");
 
-                    eb = defaultEmbed("Automatic roles for " + player.getUsername(),
-                            skyblockStatsLink(player.getUsername(), player.getProfileName()));
+                    eb = player.defaultPlayerEmbed();
                     StringBuilder addedRoles = new StringBuilder();
                     StringBuilder removedRoles = new StringBuilder();
                     StringBuilder errorRoles = new StringBuilder();
@@ -95,7 +94,7 @@ public class RoleCommands extends Command {
                             case "guild_member": {
                                 JsonElement guildJson = getJson("https://api.hypixel.net/findGuild?key="
                                         + HYPIXEL_API_KEY + "&byUuid=" + player.getUuid());
-                                if (guildJson != null && !higherDepth(guildJson, "guild").isJsonNull()) { 
+                                if (guildJson != null && !higherDepth(guildJson, "guild").isJsonNull()) {
                                     JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
                                     String playerGuildId = higherDepth(guildJson, "guild").getAsString();
 

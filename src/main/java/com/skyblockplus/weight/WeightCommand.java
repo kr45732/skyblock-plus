@@ -22,7 +22,7 @@ public class WeightCommand extends Command {
         String content = event.getMessage().getContentRaw();
         String[] args = content.split(" ");
 
-        System.out.println(content);
+        logCommand(event.getGuild(), event.getAuthor(), content);
 
         if (args.length == 6 && args[1].equals("calculate")) {
             try {
@@ -64,8 +64,7 @@ public class WeightCommand extends Command {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
             Weight playerWeight = new Weight(player);
-            EmbedBuilder eb = defaultEmbed("Weight for " + player.getUsername(),
-                    skyblockStatsLink(player.getUsername(), player.getProfileName()));
+            EmbedBuilder eb = player.defaultPlayerEmbed();
             eb.setDescription("**Total Weight**: " + roundSkillAverage(playerWeight.getTotalWeight()));
             eb.addField("Slayer Weight", roundSkillAverage(playerWeight.getSlayerWeight()), false);
             eb.addField("Skills Weight", roundSkillAverage(playerWeight.getSkillsWeight()), false);

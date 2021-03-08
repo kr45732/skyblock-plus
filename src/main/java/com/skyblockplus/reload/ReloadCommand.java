@@ -8,8 +8,7 @@ import net.dv8tion.jda.api.entities.Message;
 
 import static com.skyblockplus.reload.ReloadEventWatcher.onApplyReload;
 import static com.skyblockplus.reload.ReloadEventWatcher.onVerifyReload;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.loadingEmbed;
+import static com.skyblockplus.utils.Utils.*;
 
 public class ReloadCommand extends Command {
 
@@ -21,7 +20,7 @@ public class ReloadCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        System.out.println(event.getMessage().getContentRaw());
+        logCommand(event.getGuild(), event.getAuthor(), event.getMessage().getContentRaw());
 
         EmbedBuilder eb = loadingEmbed();
         Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();

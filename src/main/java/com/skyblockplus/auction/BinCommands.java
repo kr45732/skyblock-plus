@@ -28,7 +28,7 @@ public class BinCommands extends Command {
         Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
         String args = event.getMessage().getContentRaw();
 
-        System.out.println(args);
+        logCommand(event.getGuild(), event.getAuthor(), args);
 
         if (args.split(" ").length >= 2) {
             ebMessage.editMessage(getLowestBin(args.replace(BOT_PREFIX + "bin ", "")).build()).queue();
@@ -121,12 +121,7 @@ public class BinCommands extends Command {
         } else if (preFormattedItem.equals("FLYCATCHER")) {
             preFormattedItem = "FLYCATCHER_UPGRADE";
         } else if (preFormattedItem.contains("PET_SKIN")) {
-            for (String curPet : petNames) {
-                if (preFormattedItem.contains(curPet)) {
-                    preFormattedItem = "PET_SKIN_" + curPet;
-                    break;
-                }
-            }
+            preFormattedItem = "PET_SKIN_" + preFormattedItem.replace("PET_SKIN", "");
         }
 
         JsonElement lowestBinJson = getJson("https://moulberry.codes/lowestbin.json");
