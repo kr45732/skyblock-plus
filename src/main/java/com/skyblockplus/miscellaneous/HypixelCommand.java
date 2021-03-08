@@ -235,6 +235,7 @@ public class HypixelCommand extends Command {
                 for (int i = 0; i < fillGap; i++) {
                     eb.addBlankField(true);
                 }
+                eb.setThumbnail("https://cravatar.eu/helmavatar/" + usernameUuid.playerUuid + "/64.png");
                 return eb;
             }
         }

@@ -69,6 +69,7 @@ public class WeightCommand extends Command {
             eb.addField("Slayer Weight", roundSkillAverage(playerWeight.getSlayerWeight()), false);
             eb.addField("Skills Weight", roundSkillAverage(playerWeight.getSkillsWeight()), false);
             eb.addField("Dungeons Weight", roundSkillAverage(playerWeight.getDungeonsWeight()), false);
+            eb.setThumbnail(player.getThumbnailUrl());
             return eb;
         }
         return defaultEmbed("Unable to fetch player data");

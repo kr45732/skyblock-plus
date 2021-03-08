@@ -62,7 +62,9 @@ public class TalismanBagCommand extends Command {
 
             if (playerEnderChest != null) {
                 ebMessage.delete().queue();
-                ebMessage.getChannel().sendMessage(defaultEmbed("Missing Items").setDescription(missingEmoji).build()).queue();
+                if(missingEmoji.length() > 0) {
+                    ebMessage.getChannel().sendMessage(defaultEmbed("Missing Items").setDescription(missingEmoji).build()).queue();
+                }
 
                 jda.addEventListener(new InventoryPaginator(playerEnderChest, ebMessage.getChannel(), event.getAuthor()));
             } else {
@@ -100,7 +102,7 @@ public class TalismanBagCommand extends Command {
                             } catch (PermissionException ex) {
                                 m.delete().queue();
                             }
-                        }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).wrapPageEnds(true).setColor(botColor)
+                        }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor)
                         .setCommandUser(event.getAuthor());
 
                 for (Map.Entry<Integer, String> currentTalisman : talismanBagMap.entrySet()) {

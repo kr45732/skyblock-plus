@@ -98,6 +98,7 @@ public class SkillsCommands extends Command {
             progressSA /= (skills.size() - 2);
             eb.setDescription("True skill average: " + roundSkillAverage(trueSA) + "\nProgress skill average: "
                     + roundSkillAverage(progressSA));
+            eb.setThumbnail(player.getThumbnailUrl());
             return eb;
         }
         return defaultEmbed("Unable to fetch player data");

@@ -57,6 +57,7 @@ public class EssenceWaiter extends ListenerAdapter {
         }
         eb.addField("Levels",
                 initialMessageInfo + "0⃣ - 0 stars\n1⃣ - 1 star\n2⃣ - 2 stars\n3⃣ - 3 stars\n4⃣ - 4 stars", false);
+        eb.setThumbnail("https://sky.lea.moe/item.gif/" + itemName);
         reactMessage.editMessage(eb.build()).queue();
 
         validReactions.add("0⃣");
@@ -112,6 +113,7 @@ public class EssenceWaiter extends ListenerAdapter {
                     }
                 }
                 eb.addField("Levels", levelsString.toString(), false);
+                eb.setThumbnail("https://sky.lea.moe/item.gif/" + itemName);
 
                 reactMessage.editMessage(eb.build()).queue();
                 state = 1;
@@ -135,6 +137,7 @@ public class EssenceWaiter extends ListenerAdapter {
                                 + (endingLevel == 1 ? " star" : " stars"),
                         totalEssence + " " + higherDepth(itemJson, "type").getAsString().toLowerCase() + " essence",
                         false);
+                eb.setThumbnail("https://sky.lea.moe/item.gif/" + itemName);
                 reactMessage.editMessage(eb.build()).queue();
 
                 removeMessage(this);

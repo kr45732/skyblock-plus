@@ -79,6 +79,7 @@ public class EssenceCommand extends Command {
                         break;
                 }
             }
+            eb.setThumbnail("https://sky.lea.moe/item.gif/" + itemName);
             return eb;
         }
         return null;

@@ -59,6 +59,7 @@ public class CatacombsCommand extends Command {
                             true);
                 }
                 eb.addBlankField(true);
+                eb.setThumbnail(player.getThumbnailUrl());
 
                 return eb;
             } catch (NullPointerException e) {

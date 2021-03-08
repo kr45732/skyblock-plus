@@ -68,7 +68,7 @@ public class WardrobeCommand extends Command {
                             } catch (PermissionException ex) {
                                 m.delete().queue();
                             }
-                        }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).wrapPageEnds(true).setColor(botColor)
+                        }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor)
                         .setCommandUser(event.getAuthor());
 
                 for (Map.Entry<Integer, ArmorStruct> currentArmour : armorStructMap.entrySet()) {

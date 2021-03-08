@@ -389,6 +389,10 @@ public class Player {
         }
     }
 
+    public String getThumbnailUrl(){
+        return "https://cravatar.eu/helmavatar/" + playerUuid + "/64.png";
+    }
+
     public int getSlayerLevel(String slayerName) {
         if (this.levelTables == null) {
             this.levelTables = getJson(

@@ -53,6 +53,7 @@ public class StatsCommand extends Command {
             eb.addField("Current Minion Slots", minionSlots + " slots", true);
             eb.addField("Fairy Souls", fairySouls + " souls", true);
             eb.addField("Skill Average", roundSkillAverage(skillAverage), true);
+            eb.setThumbnail(player.getThumbnailUrl());
             return eb;
         }
         return defaultEmbed("Unable to fetch player data");

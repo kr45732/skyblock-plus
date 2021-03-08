@@ -92,7 +92,7 @@ public class SkyblockCommand extends Command {
             skillsPageString += "__**Farming**__" + "\n";
             skillsPageString += "• **Contests Attended:** " + getJsonKeys(higherDepth(jacobJson, "contests")).size()
                     + "\n";
-            skillsPageString += "• **Unique Golds:** " + higherDepth(jacobJson, "unique_golds2").getAsJsonArray().size()
+            skillsPageString += "• **Unique Golds:** " + (higherDepth(jacobJson, "unique_golds2") != null ? higherDepth(jacobJson, "unique_golds2").getAsJsonArray().size() : 0)
                     + "\n";
             skillsPageString += "• **Current Golds:** "
                     + (higherDepth(higherDepth(jacobJson, "medals_inv"), "gold") == null ? 0
@@ -115,8 +115,8 @@ public class SkyblockCommand extends Command {
                     + formatNumber(higherDepth(statsJson, "items_fished_treasure").getAsInt()) + "\n";
             skillsPageString += "• **Large Treasures Fished:** "
                     + formatNumber(higherDepth(statsJson, "items_fished_large_treasure").getAsInt()) + "\n";
-            skillsPageString += "• **Fished With Shredder:** "
-                    + formatNumber(higherDepth(statsJson, "shredder_fished").getAsInt()) + "\n";
+            skillsPageString += "• **Fished With Shredder:** " + (higherDepth(statsJson, "shredder_fished") != null?
+                    formatNumber(higherDepth(statsJson, "shredder_fished").getAsInt()) : 0) + "\n";
 
             // Dungeons
             String dungeonsPageString = "";
@@ -140,7 +140,7 @@ public class SkyblockCommand extends Command {
                         } catch (PermissionException ex) {
                             m.delete().queue();
                         }
-                    }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).wrapPageEnds(true).setColor(botColor)
+                    }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor)
                     .setPageTitles(pageTitles).setCommandUser(event.getAuthor());
             paginateBuilder.addItems(generalPageString, armorPageString, skillsPageString, dungeonsPageString);
             paginateBuilder.build().paginate(event.getChannel(), 0);

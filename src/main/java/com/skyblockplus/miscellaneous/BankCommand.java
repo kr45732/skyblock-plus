@@ -79,6 +79,7 @@ public class BankCommand extends Command {
             eb.addField("Purse coins",
                     playerPurseCoins == -1 ? "Banking API disabled" : simplifyNumber(playerPurseCoins) + " coins",
                     false);
+            eb.setThumbnail(player.getThumbnailUrl());
             return eb;
         }
         return defaultEmbed("Unable to fetch player data");
@@ -101,7 +102,7 @@ public class BankCommand extends Command {
                             } catch (PermissionException ex) {
                                 m.delete().queue();
                             }
-                        }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).wrapPageEnds(true).setColor(botColor)
+                        }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor)
                         .setCommandUser(event.getAuthor());
 
                 paginateBuilder.addItems("**Last Transaction Time:** " + dateTimeFormatter.format(Instant.ofEpochMilli(

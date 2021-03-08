@@ -129,6 +129,7 @@ public class BinCommands extends Command {
             EmbedBuilder eb = defaultEmbed("Lowest bin");
             eb.addField(capitalizeString(item.toLowerCase()),
                     formatNumber(higherDepth(lowestBinJson, preFormattedItem).getAsLong()), false);
+            eb.setThumbnail("https://sky.lea.moe/item.gif/" + preFormattedItem);
             return eb;
         }
 
@@ -147,6 +148,7 @@ public class BinCommands extends Command {
         rarityMap.put("UNCOMMON", ";1");
         rarityMap.put("COMMON", ";0");
 
+
         String formattedName;
         for (String i : enchantNames) {
             if (preFormattedItem.contains(i)) {
@@ -158,6 +160,7 @@ public class BinCommands extends Command {
                     EmbedBuilder eb = defaultEmbed("Lowest bin");
                     eb.addField(capitalizeString(enchantName),
                             formatNumber(higherDepth(lowestBinJson, formattedName).getAsLong()), false);
+                    eb.setThumbnail("https://sky.lea.moe/item.gif/" + preFormattedItem);
                     return eb;
                 } catch (NumberFormatException e) {
                     try {
@@ -176,6 +179,7 @@ public class BinCommands extends Command {
                         if (eb.getFields().size() == 0) {
                             return defaultEmbed("No bin found for " + capitalizeString(item.toLowerCase()));
                         }
+                        eb.setThumbnail("https://sky.lea.moe/item.gif/" + preFormattedItem);
                         return eb;
                     } catch (NullPointerException ex) {
                         return defaultEmbed("No bin found for " + capitalizeString(item.toLowerCase()));

@@ -49,6 +49,9 @@ public class AuctionCommands extends Command {
         JsonArray auctionsArray = higherDepth(playerAuctions, "auctions").getAsJsonArray();
         String[][] auctions = new String[auctionsArray.size()][2];
 
+        int totalSoldValue = 0;
+        int totalPendingValue = 0;
+
         for (int i = 0; i < auctionsArray.size(); i++) {
             JsonElement currentAuction = auctionsArray.get(i);
             if (!higherDepth(currentAuction, "claimed").getAsBoolean()) {
@@ -84,13 +87,16 @@ public class AuctionCommands extends Command {
                 if (timeUntil.length() > 0) {
                     if (bin) {
                         auction = "BIN: " + simplifyNumber(startingBid) + " coins";
+                        totalPendingValue += startingBid;
                     } else {
                         auction = "Current bid: " + simplifyNumber(highestBid);
+                        totalPendingValue += highestBid;
                     }
                     auction += " | Ending in " + timeUntil;
                 } else {
                     if (highestBid >= startingBid) {
                         auction = "Auction sold for " + simplifyNumber(highestBid) + " coins";
+                        totalSoldValue += highestBid;
                     } else {
                         auction = "Auction did not sell";
                     }
@@ -108,6 +114,8 @@ public class AuctionCommands extends Command {
                         eb.addField(strings[0], strings[1], false);
                     }
                 }
+                eb.setThumbnail("https://cravatar.eu/helmavatar/" + this.playerUuid + "/64.png");
+                eb.setDescription("**Sold Auctions Value:** " + simplifyNumber(totalSoldValue) + "\n**Unsold Auctions Value:** " + simplifyNumber(totalPendingValue));
                 return eb;
             }
         }

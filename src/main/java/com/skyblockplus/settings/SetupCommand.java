@@ -97,7 +97,7 @@ public class SetupCommand extends Command {
                     } catch (PermissionException ex) {
                         m.delete().queue();
                     }
-                }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).wrapPageEnds(true).setColor(botColor)
+                }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor)
                 .setCommandUser(event.getAuthor());
 
         paginateBuilder.addItems(overview, features, verify, apply, roles, guildRankHelper, moreHelp);

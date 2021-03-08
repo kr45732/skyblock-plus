@@ -69,7 +69,10 @@ public class InventoryCommand extends Command {
                 ebMessage.delete().queue();
                 ebMessage.getChannel().sendMessage(playerInventory[0]).queue();
                 ebMessage.getChannel().sendMessage(playerInventory[1]).queue();
-                ebMessage.getChannel().sendMessage(defaultEmbed("Missing Items").setDescription(playerInventory[2]).build()).queue();
+                if(playerInventory[2].length() > 0) {
+                    ebMessage.getChannel().sendMessage(defaultEmbed("Missing Items").setDescription(playerInventory[2]).build()).queue();
+                }
+
             } else {
                 ebMessage.editMessage(defaultEmbed("Error").setDescription("Unable to fetch data").build()).queue();
             }
@@ -99,7 +102,7 @@ public class InventoryCommand extends Command {
                         } catch (PermissionException ex) {
                             m.delete().queue();
                         }
-                    }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).wrapPageEnds(true).setColor(botColor)
+                    }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor)
                     .setPageTitles(pageTitles.toArray(new String[0])).setCommandUser(event.getAuthor());
             paginateBuilder.addItems(pages.toArray(new String[0]));
             paginateBuilder.build().paginate(event.getChannel(), 0);

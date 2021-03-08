@@ -54,15 +54,11 @@ public class InventoryPaginator extends ListenerAdapter {
         }
 
         if (event.getReaction().getReactionEmote().getAsReactionCode().equals("◀️")) {
-            if ((pageNumber - 1) < 0) {
-                pageNumber = maxPageNumber;
-            } else {
+            if ((pageNumber - 1) >= 0) {
                 pageNumber -= 1;
             }
         } else if (event.getReaction().getReactionEmote().getAsReactionCode().equals("▶️")) {
-            if ((pageNumber + 1) > maxPageNumber) {
-                pageNumber = 0;
-            } else {
+            if ((pageNumber + 1) <= maxPageNumber) {
                 pageNumber += 1;
             }
         }

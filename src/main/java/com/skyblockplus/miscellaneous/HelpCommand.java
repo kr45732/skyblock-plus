@@ -38,7 +38,7 @@ public class HelpCommand extends Command {
                     } catch (PermissionException ex) {
                         m.delete().queue();
                     }
-                }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).wrapPageEnds(true).setColor(botColor)
+                }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor)
                 .setPageTitles(pageTitles).setCommandUser(event.getAuthor());
 
         int startingPage = 0;

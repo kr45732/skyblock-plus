@@ -45,6 +45,7 @@ public class PartyFinderCommand extends Command {
             eb.appendDescription("\n**Selected Class:** " + player.getSelectedDungeonClass());
             eb.appendDescription("\n**Hyperion:** " + player.getHyperion());
             eb.appendDescription((player.getBonemerang() == 1 ? "\n**Bonemerang:** " : "\n**Bonemerangs:** ") + player.getBonemerang());
+            eb.setThumbnail(player.getThumbnailUrl());
             return eb;
         }
         return defaultEmbed("Unable to fetch player data");

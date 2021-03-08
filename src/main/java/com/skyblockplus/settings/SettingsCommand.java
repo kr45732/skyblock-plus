@@ -419,7 +419,7 @@ public class SettingsCommand extends Command {
                     } catch (PermissionException ex) {
                         m.delete().queue();
                     }
-                }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).wrapPageEnds(true).setColor(botColor)
+                }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor)
                 .setCommandUser(event.getAuthor());
         ArrayList<String> pageTitles = new ArrayList<>();
         pageTitles.add("Roles Settings");

@@ -53,7 +53,7 @@ public class GuildCommands extends Command {
                                 } catch (PermissionException ex) {
                                     m.delete().queue();
                                 }
-                            }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).wrapPageEnds(true)
+                            }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS)
                             .setColor(botColor).setCommandUser(event.getAuthor());
 
                     paginateBuilder.addItems(guildExp.outputArr);
@@ -86,7 +86,7 @@ public class GuildCommands extends Command {
                                 } catch (PermissionException ex) {
                                     m.delete().queue();
                                 }
-                            }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).wrapPageEnds(true)
+                            }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS)
                             .setColor(botColor).setCommandUser(event.getAuthor());
 
                     paginateBuilder.addItems(guildMembers.outputArr);
@@ -167,6 +167,7 @@ public class GuildCommands extends Command {
             String guildName = higherDepth(higherDepth(guildJson, "guild"), "name").getAsString();
             EmbedBuilder eb = defaultEmbed(uuidUsername.playerUsername + " is in " + guildName, "https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(higherDepth(guildJson, "guild"), "_id").getAsString());
             eb.addField("Guild statistics:", getGuildInfo(guildJson), false);
+            eb.setThumbnail("https://cravatar.eu/helmavatar/" + uuidUsername.playerUuid + "/64.png");
             return eb;
         } catch (Exception e) {
             return defaultEmbed(uuidUsername.playerUsername + " is not in a guild");
