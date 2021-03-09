@@ -10,7 +10,7 @@ import static com.skyblockplus.reload.ReloadEventWatcher.addApplyGuild;
 import static com.skyblockplus.utils.Utils.higherDepth;
 
 public class ApplyGuild extends ListenerAdapter {
-    private final Message reactMessage;
+    public final Message reactMessage;
     private final JsonElement currentSettings;
 
     public ApplyGuild(Message reactMessage, JsonElement currentSettings) {

@@ -23,8 +23,8 @@ public class Apply extends ListenerAdapter {
         try {
             JsonElement currentSettings = database.getApplySettings(event.getGuild().getId());
             if (currentSettings != null) {
-                if (higherDepth(currentSettings, "enable").getAsBoolean()) {
-                    if (isUniqueApplyGuild(event.getGuild().getId())) {
+                if (isUniqueApplyGuild(event.getGuild().getId())) {
+                    if (higherDepth(currentSettings, "enable").getAsBoolean()) {
                         TextChannel reactChannel = event.getGuild()
                                 .getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
                         try{
@@ -52,7 +52,6 @@ public class Apply extends ListenerAdapter {
                         database.updateApplySettings(event.getGuild().getId(), newSettings);
 
                         event.getJDA().addEventListener(new ApplyGuild(reactMessage, currentSettings));
-
                         return;
                     }
                 }

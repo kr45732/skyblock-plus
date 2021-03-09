@@ -14,7 +14,7 @@ public class ReloadCommand extends Command {
 
     public ReloadCommand() {
         this.name = "reload";
-        this.cooldown = 60;
+        this.cooldown = (BOT_PREFIX.equals("+") ? 60 : 0);
         this.userPermissions = new Permission[]{Permission.ADMINISTRATOR};
     }
 
