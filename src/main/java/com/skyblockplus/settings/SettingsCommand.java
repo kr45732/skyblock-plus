@@ -590,8 +590,8 @@ public class SettingsCommand extends Command {
 
     private EmbedBuilder setApplyMessageText(String verifyText) {
         if (verifyText.length() > 0) {
-            if (EmojiParser.parseToAliases(verifyText).length() > 2048) {
-                return defaultEmbed("Error", null).setDescription("Text cannot be longer than 2048 letters!");
+            if (EmojiParser.parseToAliases(verifyText).length() > 1500) {
+                return defaultEmbed("Error", null).setDescription("Text cannot be longer than 1500 letters!");
             }
             int responseCode = updateApplySettings("messageText", EmojiParser.parseToAliases(verifyText));
             if (responseCode != 200) {
@@ -607,8 +607,8 @@ public class SettingsCommand extends Command {
 
     private EmbedBuilder setApplyAcceptMessageText(String verifyText) {
         if (verifyText.length() > 0) {
-            if (EmojiParser.parseToAliases(verifyText).length() > 2048) {
-                return defaultEmbed("Error", null).setDescription("Text cannot be longer than 2048 letters!");
+            if (EmojiParser.parseToAliases(verifyText).length() > 1500) {
+                return defaultEmbed("Error", null).setDescription("Text cannot be longer than 1500 letters!");
             }
 
             int responseCode = updateApplySettings("acceptMessageText", EmojiParser.parseToAliases(verifyText));
@@ -625,8 +625,8 @@ public class SettingsCommand extends Command {
 
     private EmbedBuilder setApplyDenyMessageText(String verifyText) {
         if (verifyText.length() > 0) {
-            if (EmojiParser.parseToAliases(verifyText).length() > 2048) {
-                return defaultEmbed("Error", null).setDescription("Text cannot be longer than 2048 letters!");
+            if (EmojiParser.parseToAliases(verifyText).length() > 1500) {
+                return defaultEmbed("Error", null).setDescription("Text cannot be longer than 1500 letters!");
             }
 
             int responseCode = updateApplySettings("denyMessageText", EmojiParser.parseToAliases(verifyText));
@@ -692,8 +692,8 @@ public class SettingsCommand extends Command {
 
     private EmbedBuilder setVerifyMessageText(String verifyText) {
         if (verifyText.length() > 0) {
-            if (EmojiParser.parseToAliases(verifyText).length() > 2048) {
-                return defaultEmbed("Error", null).setDescription("Text cannot be longer than 2048 letters!");
+            if (EmojiParser.parseToAliases(verifyText).length() > 1500) {
+                return defaultEmbed("Error", null).setDescription("Text cannot be longer than 1500 letters!");
             }
 
             int responseCode = updateVerifySettings("messageText", EmojiParser.parseToAliases(verifyText));

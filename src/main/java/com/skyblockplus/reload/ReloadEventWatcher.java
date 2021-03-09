@@ -1,6 +1,7 @@
 package com.skyblockplus.reload;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.skyblockplus.apply.ApplyGuild;
 import com.skyblockplus.verify.VerifyGuild;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -17,8 +18,8 @@ import java.util.Map;
 
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.loadingEmbed;
 
 public class ReloadEventWatcher extends ListenerAdapter {
     private static final Map<String, ReloadEventWatcherClass> applyGuildEventListeners = new HashMap<>();
@@ -70,9 +71,17 @@ public class ReloadEventWatcher extends ListenerAdapter {
                     if (higherDepth(currentSettings, "enable").getAsBoolean()) {
                         TextChannel reactChannel = jda.getGuildById(guildId)
                                 .getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
+                        try{
+                            Message reactMessage = reactChannel.retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString()).complete();
+                            if(reactMessage != null){
+                                jda.addEventListener(new ApplyGuild(reactMessage, currentSettings));
+                                return "Apply settings successfully reloaded";
+                            }
+                        } catch (Exception ignored) {
+                        }
 
-                        reactChannel.sendMessage("Loading...").complete();
-                        reactChannel.sendMessage("Loading...").complete();
+                        reactChannel.sendMessage(loadingEmbed().build()).complete();
+                        reactChannel.sendMessage(loadingEmbed().build()).complete();
                         List<Message> deleteMessages = reactChannel.getHistory().retrievePast(25).complete();
                         reactChannel.deleteMessages(deleteMessages).complete();
 
@@ -81,13 +90,14 @@ public class ReloadEventWatcher extends ListenerAdapter {
                         Message reactMessage = reactChannel.sendMessage(eb.build()).complete();
                         reactMessage.addReaction("✅").queue();
 
-                        jda.removeEventListener(applyGuildListenerObject.getGuildEventListener());
-                        applyGuildEventListeners.remove(guildId);
+                        JsonObject newSettings =  currentSettings.getAsJsonObject();
+                        newSettings.remove("previousMessageId");
+                        newSettings.addProperty("previousMessageId", reactMessage.getId());
+                        database.updateApplySettings(guildId, newSettings);
 
                         jda.addEventListener(new ApplyGuild(reactMessage, currentSettings));
 
                         return "Apply settings successfully reloaded";
-
                     } else {
                         return "Apply settings disabled";
                     }
@@ -147,8 +157,17 @@ public class ReloadEventWatcher extends ListenerAdapter {
                         TextChannel reactChannel = jda.getGuildById(guildId)
                                 .getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
 
-                        reactChannel.sendMessage("Loading...").complete();
-                        reactChannel.sendMessage("Loading...").complete();
+                        try{
+                            Message reactMessage = reactChannel.retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString()).complete();
+                            if(reactMessage != null){
+                                jda.addEventListener(new VerifyGuild(reactMessage, currentSettings));
+                                return "Verify settings successfully reloaded";
+                            }
+                        } catch (Exception ignored) {
+                        }
+
+                        reactChannel.sendMessage(loadingEmbed().build()).complete();
+                        reactChannel.sendMessage(loadingEmbed().build()).complete();
                         List<Message> deleteMessages = reactChannel.getHistory().retrievePast(25).complete();
                         reactChannel.deleteMessages(deleteMessages).complete();
 
@@ -159,8 +178,10 @@ public class ReloadEventWatcher extends ListenerAdapter {
                                 .complete();
                         reactMessage.addReaction("✅").queue();
 
-                        jda.removeEventListener(verifyGuildListenerObject.getGuildEventListener());
-                        verifyGuildEventListeners.remove(guildId);
+                        JsonObject newSettings =  currentSettings.getAsJsonObject();
+                        newSettings.remove("previousMessageId");
+                        newSettings.addProperty("previousMessageId", reactMessage.getId());
+                        database.updateVerifySettings(guildId, newSettings);
 
                         jda.addEventListener(new VerifyGuild(reactMessage, currentSettings));
 

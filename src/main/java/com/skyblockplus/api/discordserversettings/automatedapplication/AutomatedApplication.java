@@ -26,6 +26,8 @@ public class AutomatedApplication {
     private String denyMessageText = ""; // Message sent to applicant if denied
     private String staffPingRoleId = ""; // Role to ping when new application is sent to staff channel
 
+    private String previousMessageId = "";
+
     public AutomatedApplication() {
     }
 }

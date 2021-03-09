@@ -20,6 +20,8 @@ public class AutomatedVerify {
     private String newChannelPrefix = ""; // Channel prefix of a new verify
     private String newChannelCategory = ""; // Where new verify channels will be made
 
+    private String previousMessageId = "";
+
     public AutomatedVerify() {
     }
 }

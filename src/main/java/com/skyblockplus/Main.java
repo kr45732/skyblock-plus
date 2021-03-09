@@ -80,7 +80,7 @@ public class Main {
                     .setChunkingFilter(ChunkingFilter.ALL).setMemberCachePolicy(MemberCachePolicy.ALL)
                     .enableIntents(GatewayIntent.GUILD_MEMBERS).setActivity(Activity.playing("Loading..."))
                     .addEventListeners(waiter, client.build(), new ChannelDeleter(), new MessageTimeout(),
-                            new ReloadEventWatcher(), new EventListenerDeleter())
+                            new ReloadEventWatcher(), new EventListenerDeleter(), new Apply())
                     .build();
         }
     }

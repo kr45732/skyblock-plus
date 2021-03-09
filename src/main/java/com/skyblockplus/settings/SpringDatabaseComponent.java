@@ -42,6 +42,10 @@ public class SpringDatabaseComponent {
         return settingsService.updateServerSettings(serverId, serverSettingsModel).getStatusCodeValue();
     }
 
+    public int removeServerSettings(String serverId) {
+        return settingsService.removeServerSettings(serverId).getStatusCodeValue();
+    }
+
     public JsonElement getVerifySettings(String serverId) {
         return gson.toJsonTree(settingsService.getVerifySettings(serverId).getBody());
     }
