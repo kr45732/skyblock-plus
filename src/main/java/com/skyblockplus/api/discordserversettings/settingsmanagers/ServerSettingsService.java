@@ -239,9 +239,9 @@ public class ServerSettingsService {
     }
 
     public ResponseEntity<HttpStatus> removeServerSettings(String serverId) {
-        if(serverByServerIdExists(serverId)){
+        if (serverByServerIdExists(serverId)) {
             settingsRepository.deleteByServerId(serverId);
-            if(!serverByServerIdExists(serverId)){
+            if (!serverByServerIdExists(serverId)) {
                 return new ResponseEntity<>(HttpStatus.OK);
             }
         }

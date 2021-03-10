@@ -19,7 +19,6 @@ import java.util.Map;
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.loadingEmbed;
 
 public class ReloadEventWatcher extends ListenerAdapter {
     private static final Map<String, ReloadEventWatcherClass> applyGuildEventListeners = new HashMap<>();
@@ -75,9 +74,9 @@ public class ReloadEventWatcher extends ListenerAdapter {
                     if (higherDepth(currentSettings, "enable").getAsBoolean()) {
                         TextChannel reactChannel = jda.getGuildById(guildId)
                                 .getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
-                        try{
+                        try {
                             Message reactMessage = reactChannel.retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString()).complete();
-                            if(reactMessage != null){
+                            if (reactMessage != null) {
                                 jda.addEventListener(new ApplyGuild(reactMessage, currentSettings));
                                 return "Apply settings successfully reloaded";
                             }
@@ -94,7 +93,7 @@ public class ReloadEventWatcher extends ListenerAdapter {
                         Message reactMessage = reactChannel.sendMessage(eb.build()).complete();
                         reactMessage.addReaction("✅").queue();
 
-                        JsonObject newSettings =  currentSettings.getAsJsonObject();
+                        JsonObject newSettings = currentSettings.getAsJsonObject();
                         newSettings.remove("previousMessageId");
                         newSettings.addProperty("previousMessageId", reactMessage.getId());
                         database.updateApplySettings(guildId, newSettings);
@@ -165,9 +164,9 @@ public class ReloadEventWatcher extends ListenerAdapter {
                         TextChannel reactChannel = jda.getGuildById(guildId)
                                 .getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
 
-                        try{
+                        try {
                             Message reactMessage = reactChannel.retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString()).complete();
-                            if(reactMessage != null){
+                            if (reactMessage != null) {
                                 jda.addEventListener(new VerifyGuild(reactMessage, currentSettings));
                                 return "Verify settings successfully reloaded";
                             }
@@ -186,7 +185,7 @@ public class ReloadEventWatcher extends ListenerAdapter {
                                 .complete();
                         reactMessage.addReaction("✅").queue();
 
-                        JsonObject newSettings =  currentSettings.getAsJsonObject();
+                        JsonObject newSettings = currentSettings.getAsJsonObject();
                         newSettings.remove("previousMessageId");
                         newSettings.addProperty("previousMessageId", reactMessage.getId());
                         database.updateVerifySettings(guildId, newSettings);

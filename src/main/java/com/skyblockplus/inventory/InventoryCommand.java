@@ -69,7 +69,7 @@ public class InventoryCommand extends Command {
                 ebMessage.delete().queue();
                 ebMessage.getChannel().sendMessage(playerInventory[0]).queue();
                 ebMessage.getChannel().sendMessage(playerInventory[1]).queue();
-                if(playerInventory[2].length() > 0) {
+                if (playerInventory[2].length() > 0) {
                     ebMessage.getChannel().sendMessage(defaultEmbed("Missing Items").setDescription(playerInventory[2]).build()).queue();
                 }
 

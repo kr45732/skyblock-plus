@@ -38,9 +38,6 @@ public class SpringDatabaseComponent {
         return settingsService.addNewServerSettings(serverId, serverSettingsModel).getStatusCodeValue();
     }
 
-    public int updateServerSettings(String serverId, ServerSettingsModel serverSettingsModel) {
-        return settingsService.updateServerSettings(serverId, serverSettingsModel).getStatusCodeValue();
-    }
 
     public int removeServerSettings(String serverId) {
         return settingsService.removeServerSettings(serverId).getStatusCodeValue();
@@ -70,9 +67,6 @@ public class SpringDatabaseComponent {
         return settingsService.updateRolesSettings(serverId, gson.fromJson(newRoleSettings, AutomatedRoles.class)).getStatusCodeValue();
     }
 
-    public int updateRolesEnable(String serverId, String enable) {
-        return settingsService.updateRolesEnable(serverId, enable).getStatusCodeValue();
-    }
 
     public JsonElement getRoleSettings(String serverId, String roleName) {
         return gson.toJsonTree(settingsService.getRoleSettings(serverId, roleName).getBody());

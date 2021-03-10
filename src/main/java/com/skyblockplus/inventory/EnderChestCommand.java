@@ -39,7 +39,7 @@ public class EnderChestCommand extends Command {
 
             if (playerEnderChest != null) {
                 ebMessage.delete().queue();
-                if(missingEmoji.length() > 0) {
+                if (missingEmoji.length() > 0) {
                     ebMessage.getChannel().sendMessage(defaultEmbed("Missing Items").setDescription(missingEmoji).build()).queue();
                 }
 

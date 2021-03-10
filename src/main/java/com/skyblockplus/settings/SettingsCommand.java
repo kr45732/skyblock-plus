@@ -280,15 +280,15 @@ public class SettingsCommand extends Command {
                     break;
                 }
                 case "rev": {
-                    ebFieldString.append("**A player's revenant horror xp slayer**\nExample: `" + BOT_PREFIX + "settings roles add rev 400000 @rev 8`\n");
+                    ebFieldString.append("**A player's revenant horror xp slayer**\nExample: `").append(BOT_PREFIX).append("settings roles add rev 400000 @rev 8`\n");
                     break;
                 }
                 case "tara": {
-                    ebFieldString.append("**A player's tarantula broodfather slayer xp**\nExample: `" + BOT_PREFIX + "settings roles add tara 100000 @tara 7`\n");
+                    ebFieldString.append("**A player's tarantula broodfather slayer xp**\nExample: `").append(BOT_PREFIX).append("settings roles add tara 100000 @tara 7`\n");
                     break;
                 }
                 case "bank_coins": {
-                    ebFieldString.append("**Coins in a player's bank**\nExample: `" + BOT_PREFIX + "settings roles add bank_coins 1000000 @millionaire`\n");
+                    ebFieldString.append("**Coins in a player's bank**\nExample: `").append(BOT_PREFIX).append("settings roles add bank_coins 1000000 @millionaire`\n");
                     break;
                 }
                 case "alchemy":
@@ -301,23 +301,23 @@ public class SettingsCommand extends Command {
                 case "taming":
                 case "enchanting":
                 case "catacombs": {
-                    ebFieldString.append("**A player's " + roleName + " level**\nExample: `" + BOT_PREFIX + "settings roles add " + roleName + " 30 @" + roleName + " 30`\n");
+                    ebFieldString.append("**A player's ").append(roleName).append(" level**\nExample: `").append(BOT_PREFIX).append("settings roles add ").append(roleName).append(" 30 @").append(roleName).append(" 30`\n");
                     break;
                 }
                 case "fairy_souls": {
-                    ebFieldString.append("**Amount of collected fairy souls**\nExample: `" + BOT_PREFIX + "settings roles add fairy_souls 50 @50 souls collected`\n");
+                    ebFieldString.append("**Amount of collected fairy souls**\nExample: `").append(BOT_PREFIX).append("settings roles add fairy_souls 50 @50 souls collected`\n");
                     break;
                 }
                 case "slot_collector": {
-                    ebFieldString.append("**Number of minion slots excluding upgrades (__not fully working__)**\nExample: `" + BOT_PREFIX + "settings roles add slot_collector 24 @maxed minion slots`\n");
+                    ebFieldString.append("**Number of minion slots excluding upgrades (__not fully working__)**\nExample: `").append(BOT_PREFIX).append("settings roles add slot_collector 24 @maxed minion slots`\n");
                     break;
                 }
                 case "pet_enthusiast": {
-                    ebFieldString.append("**Having a level 100 epic or legendary pet that is not an enchanting or alchemy pet**\nExample: `" + BOT_PREFIX + "settings roles set pet_enthusiast @level 100 pet`\n");
+                    ebFieldString.append("**Having a level 100 epic or legendary pet that is not an enchanting or alchemy pet**\nExample: `").append(BOT_PREFIX).append("settings roles set pet_enthusiast @level 100 pet`\n");
                     break;
                 }
                 case "doom_slayer": {
-                    ebFieldString.append("**Having at least one level nine slayer**\nExample: `" + BOT_PREFIX + "settings roles set doom_slayer @level nine slayer`\n");
+                    ebFieldString.append("**Having at least one level nine slayer**\nExample: `").append(BOT_PREFIX).append("settings roles set doom_slayer @level nine slayer`\n");
                     break;
                 }
             }
@@ -328,7 +328,7 @@ public class SettingsCommand extends Command {
                     : "• Disabled");
             if (roleName.equals("doom_slayer") || roleName.equals("pet_enthusiast")) {
                 try {
-                    ebFieldString.append("\n• default - " + event.getGuild().getRoleById(higherDepth(higherDepth(currentRoleSettings, "levels").getAsJsonArray().get(0), "roleId").getAsString()).getAsMention());
+                    ebFieldString.append("\n• default - ").append(event.getGuild().getRoleById(higherDepth(higherDepth(currentRoleSettings, "levels").getAsJsonArray().get(0), "roleId").getAsString()).getAsMention());
                 } catch (Exception ignored) {
                 }
                 pageTitles.add(roleName + " (__one level role__)");
@@ -501,9 +501,9 @@ public class SettingsCommand extends Command {
         }
 
         JsonObject currentRoleSettings;
-        try{
+        try {
             currentRoleSettings = database.getRoleSettings(event.getGuild().getId(), roleName).getAsJsonObject();
-        } catch (Exception e){
+        } catch (Exception e) {
             return defaultEmbed("Error").setDescription("Invalid role name");
         }
 

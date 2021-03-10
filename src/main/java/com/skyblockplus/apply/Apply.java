@@ -13,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.reload.ReloadEventWatcher.isUniqueApplyGuild;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -27,9 +26,9 @@ public class Apply extends ListenerAdapter {
                     if (higherDepth(currentSettings, "enable").getAsBoolean()) {
                         TextChannel reactChannel = event.getGuild()
                                 .getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
-                        try{
+                        try {
                             Message reactMessage = reactChannel.retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString()).complete();
-                            if(reactMessage != null){
+                            if (reactMessage != null) {
                                 event.getJDA().addEventListener(new ApplyGuild(reactMessage, currentSettings));
                                 return;
                             }
@@ -63,7 +62,7 @@ public class Apply extends ListenerAdapter {
 
 
     @Override
-    public void onGuildJoin(@NotNull GuildJoinEvent event){
+    public void onGuildJoin(@NotNull GuildJoinEvent event) {
         try {
             JsonElement currentSettings = database.getApplySettings(event.getGuild().getId());
             if (currentSettings != null) {
@@ -71,9 +70,9 @@ public class Apply extends ListenerAdapter {
                     if (isUniqueApplyGuild(event.getGuild().getId())) {
                         TextChannel reactChannel = event.getGuild()
                                 .getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
-                        try{
+                        try {
                             Message reactMessage = reactChannel.retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString()).complete();
-                            if(reactMessage != null){
+                            if (reactMessage != null) {
                                 event.getJDA().addEventListener(new ApplyGuild(reactMessage, currentSettings));
                                 return;
                             }
@@ -90,7 +89,7 @@ public class Apply extends ListenerAdapter {
                         Message reactMessage = reactChannel.sendMessage(eb.build()).complete();
                         reactMessage.addReaction("✅").queue();
 
-                        JsonObject newSettings =  currentSettings.getAsJsonObject();
+                        JsonObject newSettings = currentSettings.getAsJsonObject();
                         newSettings.remove("previousMessageId");
                         newSettings.addProperty("previousMessageId", reactMessage.getId());
                         database.updateApplySettings(event.getGuild().getId(), newSettings);

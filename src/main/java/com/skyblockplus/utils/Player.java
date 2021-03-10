@@ -389,7 +389,7 @@ public class Player {
         }
     }
 
-    public String getThumbnailUrl(){
+    public String getThumbnailUrl() {
         return "https://cravatar.eu/helmavatar/" + playerUuid + "/64.png";
     }
 

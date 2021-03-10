@@ -115,7 +115,7 @@ public class SkyblockCommand extends Command {
                     + formatNumber(higherDepth(statsJson, "items_fished_treasure").getAsInt()) + "\n";
             skillsPageString += "• **Large Treasures Fished:** "
                     + formatNumber(higherDepth(statsJson, "items_fished_large_treasure").getAsInt()) + "\n";
-            skillsPageString += "• **Fished With Shredder:** " + (higherDepth(statsJson, "shredder_fished") != null?
+            skillsPageString += "• **Fished With Shredder:** " + (higherDepth(statsJson, "shredder_fished") != null ?
                     formatNumber(higherDepth(statsJson, "shredder_fished").getAsInt()) : 0) + "\n";
 
             // Dungeons

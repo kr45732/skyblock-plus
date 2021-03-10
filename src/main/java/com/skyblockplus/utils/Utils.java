@@ -1,5 +1,6 @@
 package com.skyblockplus.utils;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -12,7 +13,10 @@ import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -48,10 +52,10 @@ public class Utils {
     public static String API_USERNAME = "";
     public static String API_PASSWORD = "";
     public static String API_BASE_URL = "";
+    public static MessageChannel botLogChannel;
     private static String GITHUB_TOKEN = "";
     private static int remainingLimit = 120;
     private static int timeTillReset = 60;
-    public static MessageChannel botLogChannel;
 
     public static void setApplicationSettings() {
         Properties appProps = new Properties();
@@ -132,27 +136,27 @@ public class Utils {
         return null;
     }
 
-//    public static int postJson(String jsonUrl, Object postObject) {
-//        try {
-//            CredentialsProvider provider = new BasicCredentialsProvider();
-//            UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(API_USERNAME, API_PASSWORD);
-//            provider.setCredentials(AuthScope.ANY, credentials);
-//
-//            CloseableHttpClient client = HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
-//
-//            HttpPost httpPost = new HttpPost(jsonUrl);
-//
-//            StringEntity entity = new StringEntity((new Gson()).toJson(postObject));
-//            httpPost.setEntity(entity);
-//            httpPost.addHeader("content-type", "application/json; charset=UTF-8");
-//
-//            CloseableHttpResponse response = client.execute(httpPost);
-//            client.close();
-//            return response.getStatusLine().getStatusCode();
-//        } catch (Exception ignored) {
-//        }
-//        return -1;
-//    }
+    public static int postJson(String jsonUrl, Object postObject) {
+        try {
+            CredentialsProvider provider = new BasicCredentialsProvider();
+            UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(API_USERNAME, API_PASSWORD);
+            provider.setCredentials(AuthScope.ANY, credentials);
+
+            CloseableHttpClient client = HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
+
+            HttpPost httpPost = new HttpPost(jsonUrl);
+
+            StringEntity entity = new StringEntity((new Gson()).toJson(postObject));
+            httpPost.setEntity(entity);
+            httpPost.addHeader("content-type", "application/json; charset=UTF-8");
+
+            CloseableHttpResponse response = client.execute(httpPost);
+            client.close();
+            return response.getStatusLine().getStatusCode();
+        } catch (Exception ignored) {
+        }
+        return -1;
+    }
 
     public static EmbedBuilder errorMessage(String name) {
         return defaultEmbed("Invalid input. Type `" + BOT_PREFIX + "help " + name + "` for help");

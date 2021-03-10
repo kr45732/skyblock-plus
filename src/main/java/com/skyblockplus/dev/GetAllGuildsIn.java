@@ -4,14 +4,12 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.utils.CustomPaginator;
-import jdk.internal.event.Event;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Invite;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -20,7 +18,8 @@ import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.*;
 
 public class GetAllGuildsIn extends Command {
-    EventWaiter waiter;
+    final EventWaiter waiter;
+
     public GetAllGuildsIn(EventWaiter waiter) {
         this.name = "d-servers";
         this.ownerCommand = true;
@@ -36,8 +35,8 @@ public class GetAllGuildsIn extends Command {
 
         logCommand(event.getGuild(), event.getAuthor(), content);
 
-        if(args.length == 2){
-            if(args[1].equals("list")){
+        if (args.length == 2) {
+            if (args[1].equals("list")) {
                 CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(1).setItemsPerPage(5)
                         .showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
                             try {
@@ -47,40 +46,40 @@ public class GetAllGuildsIn extends Command {
                             }
                         }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor).setCommandUser(event.getAuthor());
 
-                for (Guild guild: jda.getGuilds()) {
-                    if(guild.getName().startsWith("Skyblock Plus - Emoji Server")){
+                for (Guild guild : jda.getGuilds()) {
+                    if (guild.getName().startsWith("Skyblock Plus - Emoji Server")) {
                         continue;
                     }
 
-                    try{
+                    try {
                         List<Invite> invites = guild.retrieveInvites().complete();
 
-                        if(invites.size() > 0){
-                            paginateBuilder.addItems("**"+guild.getName() + "**\nInvite Link: " + invites.get(0).getUrl() + "\nId: " + guild.getId() + "\nOwner: " + guild.getOwner().getEffectiveName() + " (" + guild.getOwnerId() + ")\n");
-                        }else{
-                            paginateBuilder.addItems("**"+guild.getName() + "**\nInvite Link: " + guild.getChannels().get(0).createInvite().setMaxAge(0)
-                                    .complete().getUrl() + "\nId: " +guild.getId() + "\nOwner: " + guild.getOwner().getEffectiveName() + " (" + guild.getOwnerId() + ")\n");
+                        if (invites.size() > 0) {
+                            paginateBuilder.addItems("**" + guild.getName() + "**\nInvite Link: " + invites.get(0).getUrl() + "\nId: " + guild.getId() + "\nOwner: " + guild.getOwner().getEffectiveName() + " (" + guild.getOwnerId() + ")\n");
+                        } else {
+                            paginateBuilder.addItems("**" + guild.getName() + "**\nInvite Link: " + guild.getChannels().get(0).createInvite().setMaxAge(0)
+                                    .complete().getUrl() + "\nId: " + guild.getId() + "\nOwner: " + guild.getOwner().getEffectiveName() + " (" + guild.getOwnerId() + ")\n");
                         }
 
-                    } catch (Exception e){
-                        paginateBuilder.addItems("**"+guild.getName() + "**\nId: " +guild.getId() + "\nOwner: " + guild.getOwner().getEffectiveName() + " (" + guild.getOwnerId() + ")\n");
+                    } catch (Exception e) {
+                        paginateBuilder.addItems("**" + guild.getName() + "**\nId: " + guild.getId() + "\nOwner: " + guild.getOwner().getEffectiveName() + " (" + guild.getOwnerId() + ")\n");
                     }
                 }
 
-                String[] pageTitles = new String[jda.getGuilds().size()/10];
+                String[] pageTitles = new String[jda.getGuilds().size() / 10];
                 Arrays.fill(pageTitles, "Server List");
                 paginateBuilder.setPageTitles(pageTitles);
 
                 ebMessage.delete().queue();
                 paginateBuilder.build().paginate(event.getChannel(), 0);
                 return;
-            }else if(args[1].equals("count")){
+            } else if (args[1].equals("count")) {
                 eb = defaultEmbed("Server Count").addField("Total guild count", jda.getGuilds().size() + " servers", false);
 
                 int guildCount = 0;
-                for(Guild guild: jda.getGuilds()){
-                    if(!guild.getName().startsWith("Skyblock Plus - Emoji Server")){
-                        guildCount ++;
+                for (Guild guild : jda.getGuilds()) {
+                    if (!guild.getName().startsWith("Skyblock Plus - Emoji Server")) {
+                        guildCount++;
                     }
                 }
                 eb.addField("Total guild count without emoji servers", guildCount + " servers", false);

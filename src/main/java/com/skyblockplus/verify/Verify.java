@@ -28,9 +28,9 @@ public class Verify extends ListenerAdapter {
                         TextChannel reactChannel = event.getGuild()
                                 .getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
 
-                        try{
+                        try {
                             Message reactMessage = reactChannel.retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString()).complete();
-                            if(reactMessage != null){
+                            if (reactMessage != null) {
                                 event.getJDA().addEventListener(new VerifyGuild(reactMessage, currentSettings));
                                 return;
                             }
@@ -49,7 +49,7 @@ public class Verify extends ListenerAdapter {
                                 .complete();
                         reactMessage.addReaction("✅").queue();
 
-                        JsonObject newSettings =  currentSettings.getAsJsonObject();
+                        JsonObject newSettings = currentSettings.getAsJsonObject();
                         newSettings.remove("previousMessageId");
                         newSettings.addProperty("previousMessageId", reactMessage.getId());
                         database.updateVerifySettings(event.getGuild().getId(), newSettings);
@@ -73,9 +73,9 @@ public class Verify extends ListenerAdapter {
                     if (isUniqueVerifyGuild(event.getGuild().getId())) {
                         TextChannel reactChannel = event.getGuild()
                                 .getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
-                        try{
+                        try {
                             Message reactMessage = reactChannel.retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString()).complete();
-                            if(reactMessage != null){
+                            if (reactMessage != null) {
                                 event.getJDA().addEventListener(new VerifyGuild(reactMessage, currentSettings));
                                 return;
                             }
@@ -94,7 +94,7 @@ public class Verify extends ListenerAdapter {
                                 .complete();
                         reactMessage.addReaction("✅").queue();
 
-                        JsonObject newSettings =  currentSettings.getAsJsonObject();
+                        JsonObject newSettings = currentSettings.getAsJsonObject();
                         newSettings.remove("previousMessageId");
                         newSettings.addProperty("previousMessageId", reactMessage.getId());
                         database.updateVerifySettings(event.getGuild().getId(), newSettings);
