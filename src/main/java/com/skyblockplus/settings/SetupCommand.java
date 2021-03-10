@@ -92,7 +92,7 @@ public class SetupCommand extends Command {
                 "- `settings roles stackable [roleName] [true|false]` - make a role stackable or not stackable.\n" +
                 "- `settings roles enable [roleName]` - enable a role.\n" +
                 "- `settings roles set [roleName] [@role]` - set a one level role's role\n" +
-                "• Tutorial video linked [__here__]()\n\n" +
+                "• Tutorial video linked [__here__](https://streamable.com/wninsw)\n\n" +
                 "**__Enable__**\n" +
                 "- Once all these settings are set run `settings roles enable` to enable roles*.\n" +
                 "- To view all the roles, their descriptions, and examples, type `settings roles`" +
