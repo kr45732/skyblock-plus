@@ -500,7 +500,13 @@ public class SettingsCommand extends Command {
             return defaultEmbed("These roles do not support levels. Use `" + BOT_PREFIX + "settings roles set [roleName] [@role]` instead");
         }
 
-        JsonObject currentRoleSettings = database.getRoleSettings(event.getGuild().getId(), roleName).getAsJsonObject();
+        JsonObject currentRoleSettings;
+        try{
+            currentRoleSettings = database.getRoleSettings(event.getGuild().getId(), roleName).getAsJsonObject();
+        } catch (Exception e){
+            return defaultEmbed("Error").setDescription("Invalid role name");
+        }
+
         JsonArray currentLevels = currentRoleSettings.get("levels").getAsJsonArray();
         for (JsonElement level : currentLevels) {
             String currentValue = higherDepth(level, "value").getAsString();
@@ -631,7 +637,9 @@ public class SettingsCommand extends Command {
     }
 
     private boolean allowVerifyEnable() {
-        JsonElement currentSettings = database.getVerifySettings(event.getGuild().getId());
+        JsonObject currentSettings = database.getVerifySettings(event.getGuild().getId()).getAsJsonObject();
+        currentSettings.remove("previousMessageId");
+
         for (String key : getJsonKeys(currentSettings)) {
             if (higherDepth(currentSettings, key).getAsString().length() == 0) {
                 return false;
@@ -790,7 +798,9 @@ public class SettingsCommand extends Command {
     }
 
     private boolean allowApplyEnable() {
-        JsonElement currentSettings = database.getApplySettings(event.getGuild().getId());
+        JsonObject currentSettings = database.getApplySettings(event.getGuild().getId()).getAsJsonObject();
+        currentSettings.remove("previousMessageId");
+
         for (String key : getJsonKeys(currentSettings)) {
             if (higherDepth(currentSettings, key).getAsString().length() == 0) {
                 return false;

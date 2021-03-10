@@ -3,6 +3,8 @@ package com.skyblockplus.dev;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 
+import static com.skyblockplus.utils.Utils.logCommand;
+
 public class ShutdownCommand extends Command {
 
     public ShutdownCommand() {
@@ -12,6 +14,8 @@ public class ShutdownCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
+        logCommand(event.getGuild(), event.getAuthor(), "d-shutdown");
+
         event.reactWarning();
         event.getJDA().shutdown();
     }

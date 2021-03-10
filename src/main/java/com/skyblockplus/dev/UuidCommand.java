@@ -22,6 +22,8 @@ public class UuidCommand extends Command {
         String content = event.getMessage().getContentRaw();
         String[] args = content.split(" ");
 
+        logCommand(event.getGuild(), event.getAuthor(), content);
+
         if (args.length == 2) {
             ebMessage.editMessage(getUuidPlayer(args[1]).build()).queue();
             return;
