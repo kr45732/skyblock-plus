@@ -16,7 +16,7 @@ public class QuickSetupTestCommand extends Command {
     private CommandEvent event;
 
     public QuickSetupTestCommand() {
-        this.name = "q-setup";
+        this.name = "d-settings";
         this.ownerCommand = true;
     }
 
@@ -58,8 +58,7 @@ public class QuickSetupTestCommand extends Command {
 
             int responseCode = database.updateRoleSettings(event.getGuild().getId(), roleName, jsonElement);
             return defaultEmbed("API returned response code: " + responseCode);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
         return defaultEmbed("Error updating settings");
     }

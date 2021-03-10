@@ -202,7 +202,8 @@ public class HelpCommand extends Command {
                     + generateHelp("Add a new level to a role with its corresponding discord role",
                     "settings roles add [roleName] [value] [@role]")
                     + generateHelp("Remove a role level for a role", "settings roles remove [roleName] [value]")
-                    + generateHelp("Make a specific role stackable", "settings roles stackable [roleName] [true|false]"));
+                    + generateHelp("Make a specific role stackable", "settings roles stackable [roleName] [true|false]")
+                    + generateHelp("Set a one level role's role", "settings roles set [roleName] [@role]"));
         }
 
         paginateBuilder.build().paginate(event.getChannel(), startingPage);

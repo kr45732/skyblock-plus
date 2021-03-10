@@ -57,6 +57,18 @@ public class AutomatedRoles {
     @Embedded
     private RoleModel guild_member = new RoleModel();
 
+    @Embedded
+    private RoleModel fairy_souls = new RoleModel();
+
+    @Embedded
+    private RoleModel slot_collector = new RoleModel();
+
+    @Embedded
+    private RoleModel pet_enthusiast = new RoleModel();
+
+    @Embedded
+    private RoleModel doom_slayer = new RoleModel();
+
     public AutomatedRoles() {
     }
 }

@@ -133,6 +133,15 @@ public class ServerSettingsService {
                     return new ResponseEntity<>(currentRoleSettings.getCatacombs(), HttpStatus.OK);
                 case "guild_member":
                     return new ResponseEntity<>(currentRoleSettings.getGuild_member(), HttpStatus.OK);
+                case "fairy_souls":
+                    return new ResponseEntity<>(currentRoleSettings.getFairy_souls(), HttpStatus.OK);
+                case "slot_collector":
+                    return new ResponseEntity<>(currentRoleSettings.getSlot_collector(), HttpStatus.OK);
+                case "pet_enthusiast":
+                    return new ResponseEntity<>(currentRoleSettings.getPet_enthusiast(), HttpStatus.OK);
+                case "doom_slayer":
+                    return new ResponseEntity<>(currentRoleSettings.getDoom_slayer(), HttpStatus.OK);
+
             }
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -196,6 +205,18 @@ public class ServerSettingsService {
                     break;
                 case "guild_member":
                     currentRoleSettings.setGuild_member(newRoleSettings);
+                    break;
+                case "fairy_souls":
+                    currentRoleSettings.setFairy_souls(newRoleSettings);
+                    break;
+                case "slot_collector":
+                    currentRoleSettings.setSlot_collector(newRoleSettings);
+                    break;
+                case "pet_enthusiast":
+                    currentRoleSettings.setPet_enthusiast(newRoleSettings);
+                    break;
+                case "doom_slayer":
+                    currentRoleSettings.setDoom_slayer(newRoleSettings);
                     break;
             }
             currentServerSettings.setAutomatedRoles(currentRoleSettings);

@@ -11,7 +11,7 @@ import static com.skyblockplus.utils.Utils.*;
 public class UuidCommand extends Command {
 
     public UuidCommand() {
-        this.name = "uuid";
+        this.name = "d-uuid";
         this.ownerCommand = true;
     }
 

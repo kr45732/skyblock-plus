@@ -66,7 +66,7 @@ public class Main {
                 new WeightCommand(), new HypixelCommand(), new UuidCommand(), new SkyblockCommand(waiter),
                 new BaldCommand(), new SettingsCommand(waiter), new ReloadCommand(), new SetupCommand(waiter),
                 new CategoriesCommand(), new PartyFinderCommand(), new QuickSetupTestCommand(), new EmojiMapServerCommand(),
-                new EnderChestCommand(), new InstantTimeNow(), new GetEventListenersCommand());
+                new EnderChestCommand(), new InstantTimeNow(), new GetEventListenersCommand(), new GetAllGuildsIn());
 
         if (BOT_PREFIX.equals("+")) {
             jda = JDABuilder.createDefault(BOT_TOKEN).setStatus(OnlineStatus.DO_NOT_DISTURB)
@@ -80,7 +80,7 @@ public class Main {
                     .setChunkingFilter(ChunkingFilter.ALL).setMemberCachePolicy(MemberCachePolicy.ALL)
                     .enableIntents(GatewayIntent.GUILD_MEMBERS).setActivity(Activity.playing("Loading..."))
                     .addEventListeners(waiter, client.build(), new ChannelDeleter(), new MessageTimeout(),
-                            new ReloadEventWatcher(), new EventListenerDeleter(), new Apply())
+                            new ReloadEventWatcher(), new EventListenerDeleter())
                     .build();
         }
     }

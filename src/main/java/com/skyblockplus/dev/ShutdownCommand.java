@@ -6,7 +6,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 public class ShutdownCommand extends Command {
 
     public ShutdownCommand() {
-        this.name = "shutdown";
+        this.name = "d-shutdown";
         this.ownerCommand = true;
     }
 

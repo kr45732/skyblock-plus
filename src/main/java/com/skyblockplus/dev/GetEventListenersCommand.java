@@ -7,7 +7,7 @@ import static com.skyblockplus.Main.jda;
 
 public class GetEventListenersCommand extends Command {
     public GetEventListenersCommand() {
-        this.name = "event-listeners";
+        this.name = "d-listeners";
         this.ownerCommand = true;
     }
 

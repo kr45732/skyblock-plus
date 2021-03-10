@@ -51,7 +51,7 @@ public class Utils {
     private static String GITHUB_TOKEN = "";
     private static int remainingLimit = 120;
     private static int timeTillReset = 60;
-    private static MessageChannel botLogChannel;
+    public static MessageChannel botLogChannel;
 
     public static void setApplicationSettings() {
         Properties appProps = new Properties();

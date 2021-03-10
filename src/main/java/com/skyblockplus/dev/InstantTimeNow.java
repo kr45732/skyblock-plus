@@ -9,7 +9,7 @@ import static com.skyblockplus.utils.Utils.defaultEmbed;
 
 public class InstantTimeNow extends Command {
     public InstantTimeNow() {
-        this.name = "time-now";
+        this.name = "d-instant";
         this.ownerCommand = true;
     }
 

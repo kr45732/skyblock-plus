@@ -1,7 +1,9 @@
 package com.skyblockplus.timeout;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
+import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,6 +15,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.utils.Utils.botLogChannel;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
 
 public class EventListenerDeleter extends ListenerAdapter {
     public static final Map<String, Object> eventListeners = new HashMap<>();

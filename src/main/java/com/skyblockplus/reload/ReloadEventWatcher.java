@@ -69,9 +69,6 @@ public class ReloadEventWatcher extends ListenerAdapter {
 
                 JsonElement currentSettings = database.getApplySettings(guildId);
                 if (currentSettings != null) {
-                    if(((ApplyGuild) applyGuildListenerObject.getGuildEventListener()).reactMessage != null){
-                        System.out.println(((ApplyGuild) applyGuildListenerObject.getGuildEventListener()).reactMessage.getId() + " - " + ((ApplyGuild) applyGuildListenerObject.getGuildEventListener()).reactMessage.getGuild());
-                    }
                     jda.removeEventListener(applyGuildListenerObject.getGuildEventListener());
                     applyGuildEventListeners.remove(guildId);
 

@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.entities.Emote;
 
 public class EmojiMapServerCommand extends Command {
     public EmojiMapServerCommand() {
-        this.name = "e-map";
+        this.name = "d-emojis";
         this.ownerCommand = true;
     }
 

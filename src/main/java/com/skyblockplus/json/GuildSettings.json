@@ -322,17 +322,23 @@
       },
       "pet_enthusiast": {
         "enable": "true",
-        "id": "805567896809898009",
-        "excluded_pets": [
-          "guardian",
-          "jellyfish",
-          "parrot",
-          "sheep"
-        ]
+        "levels": [
+          {
+            "value": "default",
+            "roleId": "805567896809898009"
+          }
+        ],
+        "stackable": "false"
       },
       "doom_slayer": {
         "enable": "true",
-        "id": "802632224125354024"
+        "levels": [
+          {
+            "value": "default",
+            "roleId": "802632224125354024"
+          }
+        ],
+        "stackable": "false"
       }
     }
   },
@@ -657,19 +663,25 @@
         ],
         "stackable": "false"
       },
-      "doom_slayer": {
-        "enable": "true",
-        "id": "782154976595935251"
-      },
       "pet_enthusiast": {
         "enable": "true",
-        "id": "782154976608387072",
-        "excluded_pets": [
-          "guardian",
-          "jellyfish",
-          "parrot",
-          "sheep"
-        ]
+        "levels": [
+          {
+            "value": "default",
+            "roleId": "782154976608387072"
+          }
+        ],
+        "stackable": "false"
+      },
+      "doom_slayer": {
+        "enable": "true",
+        "levels": [
+          {
+            "value": "default",
+            "roleId": "782154976595935251"
+          }
+        ],
+        "stackable": "false"
       }
     }
   },
