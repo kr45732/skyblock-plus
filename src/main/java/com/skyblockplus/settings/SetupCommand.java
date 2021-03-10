@@ -99,7 +99,7 @@ public class SetupCommand extends Command {
                 "- For more help type `help settings_roles` or watch the video linked above\n";
 
         String moreHelp = "If you need any help, have suggestions, or find any bugs for this bot be sure to join the discord server [here](https://discord.gg/DpcCAwMXwp)!\n" +
-                "You can also view the forums post [here](https://hypixel.net/threads/discord-bot-skyblock-plus-skyblock-focused.3974861)\n";
+                "You can also view the forums post [here](https://hypixel.net/threads/discord-bot-skyblock-plus-skyblock-focused.3980092/)\n";
 
         CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(1).setItemsPerPage(1)
                 .showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
