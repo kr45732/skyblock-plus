@@ -295,7 +295,7 @@ public class Utils {
                     higherDepth(higherDepth(higherDepth(playerJson, "player"), "socialMedia"), "links"), "DISCORD")
                     .getAsString();
             return new String[]{discordID,
-                    higherDepth(higherDepth(playerJson, "player"), "displayname").getAsString()};
+                    higherDepth(higherDepth(playerJson, "player"), "displayname").getAsString(), higherDepth(higherDepth(playerJson, "player"), "uuid").getAsString()};
         } catch (Exception e) {
             return null;
         }

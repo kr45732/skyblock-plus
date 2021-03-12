@@ -18,7 +18,8 @@ import java.util.Map;
 
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.higherDepth;
 
 public class ReloadEventWatcher extends ListenerAdapter {
     private static final Map<String, ReloadEventWatcherClass> applyGuildEventListeners = new HashMap<>();
@@ -74,22 +75,22 @@ public class ReloadEventWatcher extends ListenerAdapter {
                     if (higherDepth(currentSettings, "enable").getAsBoolean()) {
                         TextChannel reactChannel = jda.getGuildById(guildId)
                                 .getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
+
+                        EmbedBuilder eb = defaultEmbed("Apply For Guild");
+                        eb.setDescription(higherDepth(currentSettings, "messageText").getAsString());
+
                         try {
                             Message reactMessage = reactChannel.retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString()).complete();
+
                             if (reactMessage != null) {
+                                reactMessage.editMessage(eb.build()).queue();
+
                                 jda.addEventListener(new ApplyGuild(reactMessage, currentSettings));
                                 return "Apply settings successfully reloaded";
                             }
                         } catch (Exception ignored) {
                         }
 
-                        reactChannel.sendMessage(loadingEmbed().build()).complete();
-                        reactChannel.sendMessage(loadingEmbed().build()).complete();
-                        List<Message> deleteMessages = reactChannel.getHistory().retrievePast(25).complete();
-                        reactChannel.deleteMessages(deleteMessages).complete();
-
-                        EmbedBuilder eb = defaultEmbed("Apply For Guild");
-                        eb.setDescription(higherDepth(currentSettings, "messageText").getAsString());
                         Message reactMessage = reactChannel.sendMessage(eb.build()).complete();
                         reactMessage.addReaction("✅").queue();
 
@@ -109,7 +110,8 @@ public class ReloadEventWatcher extends ListenerAdapter {
             } else {
                 return "Apply settings not reloaded. There is currently an application in progress";
             }
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return "There was a problem reloading the apply settings...";
 
@@ -167,21 +169,16 @@ public class ReloadEventWatcher extends ListenerAdapter {
                         try {
                             Message reactMessage = reactChannel.retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString()).complete();
                             if (reactMessage != null) {
+                                reactMessage.editMessage(higherDepth(currentSettings, "messageText").getAsString()).queue();
+
                                 jda.addEventListener(new VerifyGuild(reactMessage, currentSettings));
                                 return "Verify settings successfully reloaded";
                             }
                         } catch (Exception ignored) {
                         }
 
-                        reactChannel.sendMessage(loadingEmbed().build()).complete();
-                        reactChannel.sendMessage(loadingEmbed().build()).complete();
-                        List<Message> deleteMessages = reactChannel.getHistory().retrievePast(25).complete();
-                        reactChannel.deleteMessages(deleteMessages).complete();
-
-                        String verifyText = higherDepth(currentSettings, "messageText").getAsString();
-                        reactChannel.sendMessage(verifyText).queue();
-                        Message reactMessage = reactChannel
-                                .sendFile(new File("src/main/java/com/skyblockplus/verify/Link_Discord_To_Hypixel.mp4"))
+                        Message reactMessage = reactChannel.sendMessage(higherDepth(currentSettings, "messageText").getAsString())
+                                .addFile(new File("src/main/java/com/skyblockplus/verify/Link_Discord_To_Hypixel.mp4"))
                                 .complete();
                         reactMessage.addReaction("✅").queue();
 

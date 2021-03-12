@@ -11,8 +11,10 @@ import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.util.EnumSet;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import static com.skyblockplus.link.LinkAccountCommand.linkAccount;
 import static com.skyblockplus.reload.ReloadEventWatcher.addVerifySubEventListener;
 import static com.skyblockplus.timeout.ChannelDeleter.addChannel;
 import static com.skyblockplus.timeout.ChannelDeleter.removeChannel;
@@ -98,14 +100,16 @@ public class VerifyUser extends ListenerAdapter {
                                         TimeUnit.SECONDS);
                                 event.getGuild()
                                         .addRoleToMember(event.getGuild().getMember(verifyingUser),
-                                                event.getGuild().getRoleById(
-                                                        higherDepth(currentSettings, "verifiedRole").getAsString()))
+                                                Objects.requireNonNull(event.getGuild().getRoleById(
+                                                        higherDepth(currentSettings, "verifiedRole").getAsString())))
                                         .queue();
                                 if (!verifyingUser.getName().equals(playerInfo[1])) {
-                                    event.getGuild().getMember(verifyingUser).modifyNickname(verifyingUser.getName() + " (" + playerInfo[1] + ")").queue();
+                                    event.getGuild().getMember(verifyingUser).modifyNickname(playerInfo[1]).queue();
                                 }
                                 removeChannel(verifyChannel);
                                 event.getJDA().removeEventListener(this);
+                                linkAccount(playerInfo[1], event.getUser(), event.getGuild());
+
                                 break;
                             }
                             EmbedBuilder eb = defaultEmbed("Discord tag mismatch");

@@ -46,6 +46,8 @@ public class HelpCommand extends Command {
             String pageStr = event.getMessage().getContentDisplay().toLowerCase().split(" ")[1];
             Map<String, Integer> pageMap = new HashMap<>();
             pageMap.put("general", 2);
+            pageMap.put("link", 2);
+            pageMap.put("unlink", 2);
             pageMap.put("slayer", 3);
             pageMap.put("skills", 4);
             pageMap.put("dungeons", 5);
@@ -106,7 +108,11 @@ public class HelpCommand extends Command {
                         + generateHelp("Go to the help page of a specific command", "help [command name]")
                         + generateHelp("Get information about this bot", "about")
                         + generateHelp("Invite this bot to your server", "invite")
-                        + generateHelp("Show patch notes for this bot", "version"));
+                        + generateHelp("Show patch notes for this bot", "version")
+                        + generateHelp("Link your discord and Hypixel account", "link [player]")
+                        + generateHelp("Get what Hypixel account you are linked to", "link")
+                        + generateHelp("Unlink your account", "unlink")
+                );
 
         paginateBuilder.addItems(
                 generateHelp("Get the slayer data of a player",

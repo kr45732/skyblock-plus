@@ -656,7 +656,7 @@ public class SettingsCommand extends Command {
             }
 
             EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
-            eb.setDescription("**Verify:** " + (enable.equalsIgnoreCase("true") ? "enabled.\n**Note: this will clear the messages of the verify channel**" : "disabled"));
+            eb.setDescription("**Verify:** " + (enable.equalsIgnoreCase("true") ? "enabled" : "disabled"));
             return eb;
         }
         return defaultEmbed("Invalid Input", null);
@@ -817,7 +817,7 @@ public class SettingsCommand extends Command {
             }
 
             EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
-            eb.setDescription("**Apply:** " + (enable.equalsIgnoreCase("true") ? "enabled\n**Note: this will clear the messages of the apply channel**" : "disabled"));
+            eb.setDescription("**Apply:** " + (enable.equalsIgnoreCase("true") ? "enabled" : "disabled"));
             return eb;
         }
         return defaultEmbed("Invalid Input", null);

@@ -10,11 +10,10 @@ import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.reload.ReloadEventWatcher.isUniqueApplyGuild;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.higherDepth;
 
 public class Apply extends ListenerAdapter {
     @Override
@@ -26,22 +25,21 @@ public class Apply extends ListenerAdapter {
                     if (higherDepth(currentSettings, "enable").getAsBoolean()) {
                         TextChannel reactChannel = event.getGuild()
                                 .getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
+
+                        EmbedBuilder eb = defaultEmbed("Apply For Guild");
+                        eb.setDescription(higherDepth(currentSettings, "messageText").getAsString());
+
                         try {
                             Message reactMessage = reactChannel.retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString()).complete();
                             if (reactMessage != null) {
+                                reactMessage.editMessage(eb.build()).queue();
+
                                 event.getJDA().addEventListener(new ApplyGuild(reactMessage, currentSettings));
                                 return;
                             }
                         } catch (Exception ignored) {
                         }
 
-                        reactChannel.sendMessage(loadingEmbed().build()).complete();
-                        reactChannel.sendMessage(loadingEmbed().build()).complete();
-                        List<Message> deleteMessages = reactChannel.getHistory().retrievePast(25).complete();
-                        reactChannel.deleteMessages(deleteMessages).complete();
-
-                        EmbedBuilder eb = defaultEmbed("Apply For Guild");
-                        eb.setDescription(higherDepth(currentSettings, "messageText").getAsString());
                         Message reactMessage = reactChannel.sendMessage(eb.build()).complete();
                         reactMessage.addReaction("✅").queue();
 
@@ -66,23 +64,20 @@ public class Apply extends ListenerAdapter {
         try {
             JsonElement currentSettings = database.getApplySettings(event.getGuild().getId());
             if (currentSettings != null) {
-                if (higherDepth(currentSettings, "enable").getAsBoolean()) {
-                    if (isUniqueApplyGuild(event.getGuild().getId())) {
+                if (isUniqueApplyGuild(event.getGuild().getId())) {
+                    if (higherDepth(currentSettings, "enable").getAsBoolean()) {
                         TextChannel reactChannel = event.getGuild()
                                 .getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
                         try {
                             Message reactMessage = reactChannel.retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString()).complete();
                             if (reactMessage != null) {
+                                reactMessage.editMessage(defaultEmbed("Apply For Guild").setDescription(higherDepth(currentSettings, "messageText").getAsString()).build()).queue();
+
                                 event.getJDA().addEventListener(new ApplyGuild(reactMessage, currentSettings));
                                 return;
                             }
                         } catch (Exception ignored) {
                         }
-
-                        reactChannel.sendMessage(loadingEmbed().build()).complete();
-                        reactChannel.sendMessage(loadingEmbed().build()).complete();
-                        List<Message> deleteMessages = reactChannel.getHistory().retrievePast(25).complete();
-                        reactChannel.deleteMessages(deleteMessages).complete();
 
                         EmbedBuilder eb = defaultEmbed("Apply For Guild");
                         eb.setDescription(higherDepth(currentSettings, "messageText").getAsString());
@@ -95,7 +90,6 @@ public class Apply extends ListenerAdapter {
                         database.updateApplySettings(event.getGuild().getId(), newSettings);
 
                         event.getJDA().addEventListener(new ApplyGuild(reactMessage, currentSettings));
-
                         return;
                     }
                 }
@@ -104,5 +98,4 @@ public class Apply extends ListenerAdapter {
         }
         event.getJDA().addEventListener(new ApplyGuild(event.getGuild().getId()));
     }
-
 }

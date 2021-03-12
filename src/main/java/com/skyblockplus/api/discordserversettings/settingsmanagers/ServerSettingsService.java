@@ -4,15 +4,18 @@ import com.skyblockplus.api.discordserversettings.automatedapplication.Automated
 import com.skyblockplus.api.discordserversettings.automatedroles.AutomatedRoles;
 import com.skyblockplus.api.discordserversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.discordserversettings.automatedverify.AutomatedVerify;
+import com.skyblockplus.api.discordserversettings.linkedaccounts.LinkedAccount;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.net.CacheRequest;
 import java.util.List;
 
 @Service
+@Transactional
 public class ServerSettingsService {
     private final ServerSettingsRepository settingsRepository;
 
@@ -20,7 +23,6 @@ public class ServerSettingsService {
     public ServerSettingsService(ServerSettingsRepository settingsRepository) {
         this.settingsRepository = settingsRepository;
     }
-
 
     public List<ServerSettingsModel> getAllServerSettings() {
         return settingsRepository.findAll();
@@ -123,6 +125,8 @@ public class ServerSettingsService {
                     return new ResponseEntity<>(currentRoleSettings.getForaging(), HttpStatus.OK);
                 case "carpentry":
                     return new ResponseEntity<>(currentRoleSettings.getCarpentry(), HttpStatus.OK);
+                case "farming":
+                    return new ResponseEntity<>(currentRoleSettings.getFarming(), HttpStatus.OK);
                 case "mining":
                     return new ResponseEntity<>(currentRoleSettings.getMining(), HttpStatus.OK);
                 case "taming":
@@ -158,7 +162,7 @@ public class ServerSettingsService {
 
     }
 
-    @Transactional
+//    @Transactional
     public ResponseEntity<HttpStatus> updateRoleSettings(String serverId, RoleModel newRoleSettings, String roleName) {
         if (serverByServerIdExists(serverId)) {
             ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
@@ -190,6 +194,9 @@ public class ServerSettingsService {
                     break;
                 case "carpentry":
                     currentRoleSettings.setCarpentry(newRoleSettings);
+                    break;
+                case "farming":
+                    currentRoleSettings.setFarming(newRoleSettings);
                     break;
                 case "mining":
                     currentRoleSettings.setMining(newRoleSettings);
@@ -243,6 +250,50 @@ public class ServerSettingsService {
             settingsRepository.deleteByServerId(serverId);
             if (!serverByServerIdExists(serverId)) {
                 return new ResponseEntity<>(HttpStatus.OK);
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+//    @Transactional
+    public ResponseEntity<HttpStatus> addLinkedUser(String serverId, LinkedAccount newUser) {
+        if (serverByServerIdExists(serverId)) {
+            ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+            List<LinkedAccount> currentLinkedAccounts = currentServerSettings.getLinkedAccounts();
+            currentLinkedAccounts.add(newUser);
+            currentServerSettings.setLinkedAccounts(currentLinkedAccounts);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+//    @Transactional
+    public ResponseEntity<HttpStatus> removeLinkedUser(String serverId, String discordId) {
+        if (serverByServerIdExists(serverId)) {
+            ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+            List<LinkedAccount> currentLinkedAccounts = currentServerSettings.getLinkedAccounts();
+            if(currentLinkedAccounts.removeIf(p -> p.getDiscordId().equals(discordId))){
+                currentServerSettings.setLinkedAccounts(currentLinkedAccounts);
+                return new ResponseEntity<>(HttpStatus.OK);
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    public ResponseEntity<?> getLinkedAccounts(String serverId) {
+        if (serverByServerIdExists(serverId)) {
+            return new ResponseEntity<>(settingsRepository.findServerByServerId(serverId).getLinkedAccounts(), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    public ResponseEntity<?> getLinkedUser(String serverId, String discordId) {
+        if (serverByServerIdExists(serverId)) {
+            List<LinkedAccount> currentLinkedAccounts = settingsRepository.findServerByServerId(serverId).getLinkedAccounts();;
+            for(LinkedAccount linkedAccount: currentLinkedAccounts){
+                if(linkedAccount.getDiscordId().equals(discordId)){
+                    return new ResponseEntity<>(linkedAccount, HttpStatus.OK);
+                }
             }
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

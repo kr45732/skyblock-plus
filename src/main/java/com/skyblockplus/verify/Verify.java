@@ -10,12 +10,11 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.util.List;
 
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.reload.ReloadEventWatcher.isUniqueVerifyGuild;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.utils.Utils.loadingEmbed;
 
 public class Verify extends ListenerAdapter {
     @Override
@@ -27,25 +26,19 @@ public class Verify extends ListenerAdapter {
                     if (isUniqueVerifyGuild(event.getGuild().getId())) {
                         TextChannel reactChannel = event.getGuild()
                                 .getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
-
                         try {
                             Message reactMessage = reactChannel.retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString()).complete();
                             if (reactMessage != null) {
+                                reactMessage.editMessage(higherDepth(currentSettings, "messageText").getAsString()).queue();
+
                                 event.getJDA().addEventListener(new VerifyGuild(reactMessage, currentSettings));
                                 return;
                             }
                         } catch (Exception ignored) {
                         }
 
-                        reactChannel.sendMessage(loadingEmbed().build()).complete();
-                        reactChannel.sendMessage(loadingEmbed().build()).complete();
-                        List<Message> deleteMessages = reactChannel.getHistory().retrievePast(25).complete();
-                        reactChannel.deleteMessages(deleteMessages).complete();
-
-                        String verifyText = higherDepth(currentSettings, "messageText").getAsString();
-                        reactChannel.sendMessage(verifyText).queue();
-                        Message reactMessage = reactChannel
-                                .sendFile(new File("src/main/java/com/skyblockplus/verify/Link_Discord_To_Hypixel.mp4"))
+                        Message reactMessage = reactChannel.sendMessage(higherDepth(currentSettings, "messageText").getAsString())
+                                .addFile(new File("src/main/java/com/skyblockplus/verify/Link_Discord_To_Hypixel.mp4"))
                                 .complete();
                         reactMessage.addReaction("✅").queue();
 
@@ -76,21 +69,16 @@ public class Verify extends ListenerAdapter {
                         try {
                             Message reactMessage = reactChannel.retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString()).complete();
                             if (reactMessage != null) {
+                                reactMessage.editMessage(higherDepth(currentSettings, "messageText").getAsString()).queue();
+
                                 event.getJDA().addEventListener(new VerifyGuild(reactMessage, currentSettings));
                                 return;
                             }
                         } catch (Exception ignored) {
                         }
 
-                        reactChannel.sendMessage(loadingEmbed().build()).complete();
-                        reactChannel.sendMessage(loadingEmbed().build()).complete();
-                        List<Message> deleteMessages = reactChannel.getHistory().retrievePast(25).complete();
-                        reactChannel.deleteMessages(deleteMessages).complete();
-
-                        String verifyText = higherDepth(currentSettings, "messageText").getAsString();
-                        reactChannel.sendMessage(verifyText).queue();
-                        Message reactMessage = reactChannel
-                                .sendFile(new File("src/main/java/com/skyblockplus/verify/Link_Discord_To_Hypixel.mp4"))
+                        Message reactMessage = reactChannel.sendMessage(higherDepth(currentSettings, "messageText").getAsString())
+                                .addFile(new File("src/main/java/com/skyblockplus/verify/Link_Discord_To_Hypixel.mp4"))
                                 .complete();
                         reactMessage.addReaction("✅").queue();
 

@@ -16,7 +16,7 @@ public class InventoryPaginator extends ListenerAdapter {
     private final Message pagePart2;
     private final User user;
     private int pageNumber = 0;
-    private int maxPageNumber;
+    private final int maxPageNumber;
 
     public InventoryPaginator(List<String[]> enderChestPages, MessageChannel channel, User user) {
         this.enderChestPages = enderChestPages;

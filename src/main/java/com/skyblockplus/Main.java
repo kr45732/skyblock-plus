@@ -12,6 +12,8 @@ import com.skyblockplus.dungeons.PartyFinderCommand;
 import com.skyblockplus.guilds.GuildCommands;
 import com.skyblockplus.guilds.GuildLeaderboardCommand;
 import com.skyblockplus.inventory.*;
+import com.skyblockplus.link.LinkAccountCommand;
+import com.skyblockplus.link.UnlinkAccountCommand;
 import com.skyblockplus.miscellaneous.*;
 import com.skyblockplus.reload.ReloadCommand;
 import com.skyblockplus.reload.ReloadEventWatcher;
@@ -66,7 +68,8 @@ public class Main {
                 new WeightCommand(), new HypixelCommand(), new UuidCommand(), new SkyblockCommand(waiter),
                 new BaldCommand(), new SettingsCommand(waiter), new ReloadCommand(), new SetupCommand(waiter),
                 new CategoriesCommand(), new PartyFinderCommand(), new QuickSetupTestCommand(), new EmojiMapServerCommand(),
-                new EnderChestCommand(), new InstantTimeNow(), new GetEventListenersCommand(), new GetAllGuildsIn(waiter));
+                new EnderChestCommand(), new InstantTimeNow(), new GetEventListenersCommand(), new GetAllGuildsIn(waiter),
+                new LinkAccountCommand(), new GetSettingsFile(), new UnlinkAccountCommand(), new RemoveLinkedUserDev());
 
         if (BOT_PREFIX.equals("+")) {
             jda = JDABuilder.createDefault(BOT_TOKEN).setStatus(OnlineStatus.DO_NOT_DISTURB)

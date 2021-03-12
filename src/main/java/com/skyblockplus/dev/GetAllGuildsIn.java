@@ -55,18 +55,18 @@ public class GetAllGuildsIn extends Command {
                         List<Invite> invites = guild.retrieveInvites().complete();
 
                         if (invites.size() > 0) {
-                            paginateBuilder.addItems("**" + guild.getName() + "**\nInvite Link: " + invites.get(0).getUrl() + "\nId: " + guild.getId() + "\nOwner: " + guild.getOwner().getEffectiveName() + " (" + guild.getOwnerId() + ")\n");
+                            paginateBuilder.addItems("**" + guild.getName() + " (" + guild.getMemberCount() + ")**\nInvite Link: " + invites.get(0).getUrl() + "\nId: " + guild.getId() + "\nOwner: " + guild.getOwner().getEffectiveName() + " (" + guild.getOwnerId() + ")\n");
                         } else {
-                            paginateBuilder.addItems("**" + guild.getName() + "**\nInvite Link: " + guild.getChannels().get(0).createInvite().setMaxAge(0)
+                            paginateBuilder.addItems("**" + guild.getName() + " (" + guild.getMemberCount() + ")**\nInvite Link: " + guild.getChannels().get(0).createInvite().setMaxAge(0)
                                     .complete().getUrl() + "\nId: " + guild.getId() + "\nOwner: " + guild.getOwner().getEffectiveName() + " (" + guild.getOwnerId() + ")\n");
                         }
 
                     } catch (Exception e) {
-                        paginateBuilder.addItems("**" + guild.getName() + "**\nId: " + guild.getId() + "\nOwner: " + guild.getOwner().getEffectiveName() + " (" + guild.getOwnerId() + ")\n");
+                        paginateBuilder.addItems("**" + guild.getName() + " (" + guild.getMemberCount() + ")**\nId: " + guild.getId() + "\nOwner: " + guild.getOwner().getEffectiveName() + " (" + guild.getOwnerId() + ")\n");
                     }
                 }
 
-                String[] pageTitles = new String[jda.getGuilds().size() / 10];
+                String[] pageTitles = new String[jda.getGuilds().size() / 5];
                 Arrays.fill(pageTitles, "Server List");
                 paginateBuilder.setPageTitles(pageTitles);
 

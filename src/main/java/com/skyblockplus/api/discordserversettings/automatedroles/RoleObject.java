@@ -13,5 +13,6 @@ public class RoleObject {
     private String roleId = "";
 
     public RoleObject() {
+
     }
 }

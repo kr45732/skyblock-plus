@@ -6,6 +6,7 @@ import com.skyblockplus.api.discordserversettings.automatedapplication.Automated
 import com.skyblockplus.api.discordserversettings.automatedroles.AutomatedRoles;
 import com.skyblockplus.api.discordserversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.discordserversettings.automatedverify.AutomatedVerify;
+import com.skyblockplus.api.discordserversettings.linkedaccounts.LinkedAccount;
 import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSettingsModel;
 import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSettingsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,18 @@ public class SpringDatabaseComponent {
         this.settingsService = settingsService;
     }
 
+    public int addLinkedUser(String serverId, LinkedAccount newUser) {
+        return settingsService.addLinkedUser(serverId, newUser).getStatusCodeValue();
+    }
+
+    public JsonElement getLinkedUser(String serverId, String discordId) {
+        return gson.toJsonTree(settingsService.getLinkedUser(serverId, discordId).getBody());
+    }
+
+    public int removeLinkedUser(String serverId, String discordId) {
+        return settingsService.removeLinkedUser(serverId, discordId).getStatusCodeValue();
+    }
+
     public List<ServerSettingsModel> getAllServerSettings() {
         return settingsService.getAllServerSettings();
     }
@@ -37,7 +50,6 @@ public class SpringDatabaseComponent {
     public int addNewServerSettings(String serverId, ServerSettingsModel serverSettingsModel) {
         return settingsService.addNewServerSettings(serverId, serverSettingsModel).getStatusCodeValue();
     }
-
 
     public int removeServerSettings(String serverId) {
         return settingsService.removeServerSettings(serverId).getStatusCodeValue();
