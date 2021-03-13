@@ -1,6 +1,8 @@
 package com.skyblockplus.api.discordserversettings.settingsmanagers;
 
+import com.google.gson.JsonObject;
 import com.skyblockplus.api.discordserversettings.automatedapplication.AutomatedApplication;
+import com.skyblockplus.api.discordserversettings.automatedguildroles.GuildRole;
 import com.skyblockplus.api.discordserversettings.automatedroles.AutomatedRoles;
 import com.skyblockplus.api.discordserversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.discordserversettings.automatedverify.AutomatedVerify;
@@ -11,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.net.CacheRequest;
 import java.util.List;
 
 @Service
@@ -255,7 +256,6 @@ public class ServerSettingsService {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-//    @Transactional
     public ResponseEntity<HttpStatus> addLinkedUser(String serverId, LinkedAccount newUser) {
         if (serverByServerIdExists(serverId)) {
             ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
@@ -267,7 +267,6 @@ public class ServerSettingsService {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-//    @Transactional
     public ResponseEntity<HttpStatus> removeLinkedUser(String serverId, String discordId) {
         if (serverByServerIdExists(serverId)) {
             ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
@@ -297,5 +296,30 @@ public class ServerSettingsService {
             }
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    public ResponseEntity<?> getGuildRolesSettings(String serverId) {
+        if (serverByServerIdExists(serverId)) {
+            return new ResponseEntity<>(settingsRepository.findServerByServerId(serverId).getAutomaticGuildRoles(), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    public ResponseEntity<?> getGuildRanks(String serverId) {
+        if (serverByServerIdExists(serverId)) {
+            return new ResponseEntity<>(settingsRepository.findServerByServerId(serverId).getAutomaticGuildRoles().getGuildRankRoles(), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    public ResponseEntity<HttpStatus> updateGuildRoleSettings(String serverId, GuildRole newSettings) {
+        if (serverByServerIdExists(serverId)) {
+            ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+            currentServerSettings.setAutomaticGuildRoles(newSettings);
+            settingsRepository.save(currentServerSettings);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
     }
 }

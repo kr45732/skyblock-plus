@@ -2,7 +2,9 @@ package com.skyblockplus.settings;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.skyblockplus.api.discordserversettings.automatedapplication.AutomatedApplication;
+import com.skyblockplus.api.discordserversettings.automatedguildroles.GuildRole;
 import com.skyblockplus.api.discordserversettings.automatedroles.AutomatedRoles;
 import com.skyblockplus.api.discordserversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.discordserversettings.automatedverify.AutomatedVerify;
@@ -37,6 +39,10 @@ public class SpringDatabaseComponent {
 
     public int removeLinkedUser(String serverId, String discordId) {
         return settingsService.removeLinkedUser(serverId, discordId).getStatusCodeValue();
+    }
+
+    public JsonElement getLinkedUsers(String serverId) {
+        return gson.toJsonTree(settingsService.getLinkedAccounts(serverId).getBody());
     }
 
     public List<ServerSettingsModel> getAllServerSettings() {
@@ -86,5 +92,13 @@ public class SpringDatabaseComponent {
 
     public int updateRoleSettings(String serverId, String roleName, JsonElement newRoleSettings) {
         return settingsService.updateRoleSettings(serverId, gson.fromJson(newRoleSettings, RoleModel.class), roleName).getStatusCodeValue();
+    }
+
+    public JsonElement getGuildRoleSettings(String serverId){
+        return gson.toJsonTree(settingsService.getGuildRolesSettings(serverId).getBody());
+    }
+
+    public int updateGuildRoleSettings(String serverId, JsonObject currentSettings) {
+        return settingsService.updateGuildRoleSettings(serverId, gson.fromJson(currentSettings, GuildRole.class)).getStatusCodeValue();
     }
 }

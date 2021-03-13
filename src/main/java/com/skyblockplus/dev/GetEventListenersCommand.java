@@ -4,6 +4,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 
 import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.Utils.logCommand;
 
 public class GetEventListenersCommand extends Command {
@@ -21,6 +22,6 @@ public class GetEventListenersCommand extends Command {
             ebString.append("\n• ").append(i);
         }
 
-        event.getChannel().sendMessage(ebString.toString()).queue();
+        event.reply(ebString.toString());
     }
 }

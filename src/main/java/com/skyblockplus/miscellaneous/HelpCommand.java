@@ -82,6 +82,7 @@ public class HelpCommand extends Command {
                 pageMap.put("settings_verify", 11);
                 pageMap.put("settings_apply", 12);
                 pageMap.put("settings_roles", 13);
+                pageMap.put("settings_guild", 14);
             }
 
             if (pageMap.get(pageStr) != null) {
@@ -96,7 +97,7 @@ public class HelpCommand extends Command {
             paginateBuilder.addItems("Use the arrow emojis to navigate through the pages" +
                     generatePageMap("General", "Slayer", "Skills", "Dungeons", "Guild",
                             "Auction House and Bazaar", "Inventory", "Miscellaneous Commands", "Settings", "Verify Settings",
-                            "Apply Settings", "Roles Settings"));
+                            "Apply Settings", "Roles Settings", "Guild Roles Settings"));
         } else {
             paginateBuilder.addItems("Use the arrow emojis to navigate through the pages" +
                     generatePageMap("General", "Slayer", "Skills", "Dungeons", "Guild",
@@ -210,6 +211,11 @@ public class HelpCommand extends Command {
                     + generateHelp("Remove a role level for a role", "settings roles remove [roleName] [value]")
                     + generateHelp("Make a specific role stackable", "settings roles stackable [roleName] [true|false]")
                     + generateHelp("Set a one level role's role", "settings roles set [roleName] [@role]"));
+
+            paginateBuilder.addItems(generateHelp("Enable or disable automatic guild role assigning", "settings guild [enable|disable] role")
+                    + generateHelp("Set the guild name", "settings guild set [guild_name]")
+                    + generateHelp("Set the role to give guild member's", "settings guild role [@role]")
+            );
         }
 
         paginateBuilder.build().paginate(event.getChannel(), startingPage);

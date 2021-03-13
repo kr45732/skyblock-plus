@@ -9,6 +9,7 @@ import com.skyblockplus.dev.*;
 import com.skyblockplus.dungeons.CatacombsCommand;
 import com.skyblockplus.dungeons.EssenceCommand;
 import com.skyblockplus.dungeons.PartyFinderCommand;
+import com.skyblockplus.guildroles.GuildRoles;
 import com.skyblockplus.guilds.GuildCommands;
 import com.skyblockplus.guilds.GuildLeaderboardCommand;
 import com.skyblockplus.inventory.*;
@@ -76,14 +77,15 @@ public class Main {
                     .setChunkingFilter(ChunkingFilter.ALL).setMemberCachePolicy(MemberCachePolicy.ALL)
                     .enableIntents(GatewayIntent.GUILD_MEMBERS).setActivity(Activity.playing("Loading..."))
                     .addEventListeners(waiter, client.build(), new Apply(), new Verify(), new ChannelDeleter(),
-                            new MessageTimeout(), new ReloadEventWatcher(), new EventListenerDeleter())
+                            new MessageTimeout(), new ReloadEventWatcher(), new EventListenerDeleter(),
+                            new GuildRoles())
                     .build();
         } else {
             jda = JDABuilder.createDefault(BOT_TOKEN).setStatus(OnlineStatus.DO_NOT_DISTURB)
                     .setChunkingFilter(ChunkingFilter.ALL).setMemberCachePolicy(MemberCachePolicy.ALL)
                     .enableIntents(GatewayIntent.GUILD_MEMBERS).setActivity(Activity.playing("Loading..."))
                     .addEventListeners(waiter, client.build(), new ChannelDeleter(), new MessageTimeout(),
-                            new ReloadEventWatcher(), new EventListenerDeleter())
+                            new ReloadEventWatcher(), new EventListenerDeleter(), new GuildRoles())
                     .build();
         }
     }

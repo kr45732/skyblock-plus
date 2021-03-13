@@ -21,7 +21,7 @@ public class CategoriesCommand extends Command {
         EmbedBuilder eb = loadingEmbed();
         Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 
-        logCommand(event.getGuild(), event.getAuthor(), "categories");
+        logCommand(event.getGuild(), event.getAuthor(), BOT_PREFIX + "categories");
 
         StringBuilder ebString = new StringBuilder();
         for (net.dv8tion.jda.api.entities.Category category : event.getGuild().getCategories()) {
