@@ -62,7 +62,7 @@ public class Weight {
         tempSkillWeights.put("foraging", new Double[]{1.232826, 259634D});
         tempSkillWeights.put("enchanting", new Double[]{0.96976583, 882758D});
         tempSkillWeights.put("farming", new Double[]{1.217848139, 220689D});
-        tempSkillWeights.put("combat", new Double[]{1.22307, 275862D});
+        tempSkillWeights.put("combat", new Double[]{1.15797687265, 275862D});
         tempSkillWeights.put("fishing", new Double[]{1.406418, 88274D});
         tempSkillWeights.put("alchemy", new Double[]{1.0, 1103448D});
         tempSkillWeights.put("taming", new Double[]{1.14744, 441379D});

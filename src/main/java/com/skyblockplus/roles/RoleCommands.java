@@ -333,15 +333,8 @@ public class RoleCommands extends Command {
     }
 
     private DiscordStruct getPlayerInfo(String username) {
-        JsonElement playerJson = getJson("https://api.hypixel.net/player?key=" + HYPIXEL_API_KEY + "&name=" + username);
+        JsonElement playerJson = getJson("https://api.hypixel.net/player?key=" + HYPIXEL_API_KEY + "&uuid=" + usernameToUuid(username));
 
-        if (playerJson == null) {
-            return null;
-        }
-
-        if (higherDepth(playerJson, "player").isJsonNull()) {
-            return null;
-        }
         try {
             String discordID = higherDepth(
                     higherDepth(higherDepth(higherDepth(playerJson, "player"), "socialMedia"), "links"), "DISCORD")
