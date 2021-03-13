@@ -69,9 +69,6 @@ public class ReloadEventWatcher extends ListenerAdapter {
 
                 JsonElement currentSettings = database.getApplySettings(guildId);
                 if (currentSettings != null) {
-                    jda.removeEventListener(applyGuildListenerObject.getGuildEventListener());
-                    applyGuildEventListeners.remove(guildId);
-
                     if (higherDepth(currentSettings, "enable").getAsBoolean()) {
                         TextChannel reactChannel = jda.getGuildById(guildId)
                                 .getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
@@ -99,10 +96,14 @@ public class ReloadEventWatcher extends ListenerAdapter {
                         newSettings.addProperty("previousMessageId", reactMessage.getId());
                         database.updateApplySettings(guildId, newSettings);
 
+jda.removeEventListener(applyGuildListenerObject.getGuildEventListener());
+                    applyGuildEventListeners.remove(guildId);
                         jda.addEventListener(new ApplyGuild(reactMessage, currentSettings));
 
                         return "Apply settings successfully reloaded";
                     } else {
+jda.removeEventListener(applyGuildListenerObject.getGuildEventListener());
+                    applyGuildEventListeners.remove(guildId);
                         jda.addEventListener(new ApplyGuild(guildId));
                         return "Apply settings disabled";
                     }
