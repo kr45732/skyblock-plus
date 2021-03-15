@@ -64,6 +64,7 @@ Temporary Items
 /src/main/java/com/skyblockplus/api/security/
 /src/main/java/com/skyblockplus/api/discordserversettings/settingsmanagers/ServerSettingsController.java
 /src/main/java/com/skyblockplus/json/test.json
+/src/main/java/com/skyblockplus/archive/
 
 lombok.config
 .project

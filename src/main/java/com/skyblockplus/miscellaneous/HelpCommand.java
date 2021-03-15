@@ -177,11 +177,7 @@ public class HelpCommand extends Command {
                     "Role that user will receive " + "upon being verified. Cannot be @everyone or a managed role",
                     "settings verify role " + "[@role]")
                     + generateHelp("Channel where the message to react for verifying will sent",
-                    "settings verify " + "channel [#channel]")
-                    + generateHelp("Prefix that all new verify channels should start with (prefix-discordName)",
-                    "settings verify " + "prefix [prefix]")
-                    + generateHelp("Category where new verify channels will be made",
-                    "settings verify category " + "[category id]"));
+                    "settings verify " + "channel [#channel]"));
 
             paginateBuilder.addItems(generateHelp("Get the current apply settings for the bot", "settings apply")
                     + generateHelp("Enable or disable automatic apply", "settings apply [enable|disable]")

@@ -33,7 +33,7 @@ public class RoleCommands extends Command {
         Member member = guild.getMemberById(user.getId());
         Message ebMessage = channel.sendMessage(eb.build()).complete();
 
-        if(database.getLinkedUser(guild.getId(), user.getId()).isJsonNull()){
+        if (database.getLinkedUser(guild.getId(), user.getId()).isJsonNull()) {
             ebMessage.editMessage(defaultEmbed("You must be linked to run this command. Use `" + BOT_PREFIX + "link [IGN]` to link").build()).queue();
             return;
         }

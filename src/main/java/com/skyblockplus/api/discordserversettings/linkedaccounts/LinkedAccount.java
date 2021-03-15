@@ -12,6 +12,6 @@ public class LinkedAccount {
     private String discordId = "";
     private String minecraftUuid = "";
 
-    public LinkedAccount(){
+    public LinkedAccount() {
     }
 }

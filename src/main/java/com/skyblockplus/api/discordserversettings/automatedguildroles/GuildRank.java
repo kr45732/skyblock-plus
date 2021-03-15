@@ -12,7 +12,7 @@ public class GuildRank {
     private String rankName = "";
     private String roleId = "";
 
-    public GuildRank(){
+    public GuildRank() {
 
     }
 }

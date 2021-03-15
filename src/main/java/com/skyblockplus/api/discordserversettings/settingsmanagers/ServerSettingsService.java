@@ -1,6 +1,5 @@
 package com.skyblockplus.api.discordserversettings.settingsmanagers;
 
-import com.google.gson.JsonObject;
 import com.skyblockplus.api.discordserversettings.automatedapplication.AutomatedApplication;
 import com.skyblockplus.api.discordserversettings.automatedguildroles.GuildRole;
 import com.skyblockplus.api.discordserversettings.automatedroles.AutomatedRoles;
@@ -163,7 +162,7 @@ public class ServerSettingsService {
 
     }
 
-//    @Transactional
+    //    @Transactional
     public ResponseEntity<HttpStatus> updateRoleSettings(String serverId, RoleModel newRoleSettings, String roleName) {
         if (serverByServerIdExists(serverId)) {
             ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
@@ -271,7 +270,7 @@ public class ServerSettingsService {
         if (serverByServerIdExists(serverId)) {
             ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
             List<LinkedAccount> currentLinkedAccounts = currentServerSettings.getLinkedAccounts();
-            if(currentLinkedAccounts.removeIf(p -> p.getDiscordId().equals(discordId))){
+            if (currentLinkedAccounts.removeIf(p -> p.getDiscordId().equals(discordId))) {
                 currentServerSettings.setLinkedAccounts(currentLinkedAccounts);
                 return new ResponseEntity<>(HttpStatus.OK);
             }
@@ -288,9 +287,9 @@ public class ServerSettingsService {
 
     public ResponseEntity<?> getLinkedUser(String serverId, String discordId) {
         if (serverByServerIdExists(serverId)) {
-            List<LinkedAccount> currentLinkedAccounts = settingsRepository.findServerByServerId(serverId).getLinkedAccounts();;
-            for(LinkedAccount linkedAccount: currentLinkedAccounts){
-                if(linkedAccount.getDiscordId().equals(discordId)){
+            List<LinkedAccount> currentLinkedAccounts = settingsRepository.findServerByServerId(serverId).getLinkedAccounts();
+            for (LinkedAccount linkedAccount : currentLinkedAccounts) {
+                if (linkedAccount.getDiscordId().equals(discordId)) {
                     return new ResponseEntity<>(linkedAccount, HttpStatus.OK);
                 }
             }

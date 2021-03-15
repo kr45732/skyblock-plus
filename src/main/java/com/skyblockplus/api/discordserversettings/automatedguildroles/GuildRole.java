@@ -5,7 +5,6 @@ import lombok.Data;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Embeddable;
-import javax.persistence.Embedded;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,14 +12,12 @@ import java.util.List;
 @AllArgsConstructor
 @Embeddable
 public class GuildRole {
+    @ElementCollection
+    List<GuildRank> guildRankRoles = new ArrayList<>();
     private String enableGuildRole = "false";
     private String guildId = "";
     private String roleId = "";
-
     private String enableGuildRanks = "false";
-
-    @ElementCollection
-    List<GuildRank> guildRankRoles = new ArrayList<>();
 
     public GuildRole() {
     }

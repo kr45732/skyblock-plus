@@ -94,7 +94,7 @@ public class SpringDatabaseComponent {
         return settingsService.updateRoleSettings(serverId, gson.fromJson(newRoleSettings, RoleModel.class), roleName).getStatusCodeValue();
     }
 
-    public JsonElement getGuildRoleSettings(String serverId){
+    public JsonElement getGuildRoleSettings(String serverId) {
         return gson.toJsonTree(settingsService.getGuildRolesSettings(serverId).getBody());
     }
 

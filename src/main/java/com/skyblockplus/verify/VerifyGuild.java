@@ -1,56 +1,43 @@
 package com.skyblockplus.verify;
 
-import com.google.gson.JsonElement;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.jetbrains.annotations.NotNull;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
-import static com.skyblockplus.reload.ReloadEventWatcher.addVerifyGuild;
-import static com.skyblockplus.utils.Utils.decodeVerifyPrefix;
-import static com.skyblockplus.utils.Utils.higherDepth;
+import java.util.concurrent.TimeUnit;
 
-public class VerifyGuild extends ListenerAdapter {
-    private final Message reactMessage;
-    private final JsonElement currentSettings;
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.utils.Utils.BOT_PREFIX;
 
-    public VerifyGuild(Message reactMessage, JsonElement currentSettings) {
-        this.reactMessage = reactMessage;
-        this.currentSettings = currentSettings;
-        addVerifyGuild(reactMessage.getGuild().getId(), this);
+public class VerifyGuild {
+    private final TextChannel messageChannel;
+    private final Message originalMessage;
+
+    public VerifyGuild(TextChannel messageChannel, Message originalMessage) {
+        this.messageChannel = messageChannel;
+        this.originalMessage = originalMessage;
     }
 
-    public VerifyGuild(String guildId) {
-        this.reactMessage = null;
-        this.currentSettings = null;
-        addVerifyGuild(guildId, this);
-    }
-
-    @Override
-    public void onMessageReactionAdd(@NotNull MessageReactionAddEvent event) {
-        if (reactMessage == null) {
+    public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
+        if (!event.getChannel().getId().equals(messageChannel.getId())) {
             return;
         }
 
-        if (event.getUser().isBot()) {
+        if (event.getMessage().getId().equals(originalMessage.getId())) {
             return;
         }
 
-        if (event.getMessageIdLong() != reactMessage.getIdLong()) {
-            return;
+        if (!event.getAuthor().getId().equals(jda.getSelfUser().getId())) {
+            if (event.getAuthor().isBot()) {
+                return;
+            }
+
+            if (!event.getMessage().getContentRaw().startsWith(BOT_PREFIX + "link ")) {
+                event.getMessage().delete().queue();
+                return;
+            }
         }
 
-        event.getReaction().removeReaction(event.getUser()).queue();
-        if (!event.getReactionEmote().getName().equals("✅")) {
-            return;
-        }
-
-        if (event.getGuild().getTextChannelsByName(
-                decodeVerifyPrefix(higherDepth(currentSettings, "newChannelPrefix").getAsString()) + "-" + event.getUser().getName(), true)
-                .size() > 0) {
-            return;
-        }
-
-        event.getJDA().addEventListener(new VerifyUser(event, event.getUser(), currentSettings));
+        event.getMessage().delete().queueAfter(7, TimeUnit.SECONDS);
     }
 }

@@ -38,17 +38,14 @@ public class SetupCommand extends Command {
         String features = "**I have many default features including, but not limited to:**\n• Slayer\n• Skills\n• Dungeons\n• Guilds\n• Auction house\n• Much more!\n\nI also have customizable features such as automatic verify, automatic apply, and automatic roles!";
 
         String verify = "**__Overview__**\n" +
-                "1) When a user reacts to the verify message, a new channel is created.\n" +
-                "2) They are then prompted for their in game Minecraft username.\n" +
-                "3) This is then compared with their linked discord account and if matching they will receive the verified role and the channel will be deleted.\n" +
+                "1) When a user runs `link [IGN]` their username is compared with the Hypixel API\n" +
+                "2) If it's valid they will be linked and given the verified role\n" +
                 "• Example video linked [__here__](https://i.imgur.com/jJc7fGj.mp4)\n\n" +
                 "**__Setup__**\n" +
                 "In order to enable automatic verify, all the following settings must be set:\n" +
                 "- `settings verify message [message]` - the message that users will see and react to in order to verify.\n" +
                 "- `settings verify role [@role]` - the role users will get once verified. This role cannot be @everyone or a managed role.\n" +
                 "- `settings verify channel [#channel]` - the channel where the message to react too will be sent.\n" +
-                "- `settings verify prefix [prefix]` - the prefix that new verify channels will start with. For example a prefix of verify and a user named CrypticPlasma would result in a new channel called verify-crypticplasma.\n" +
-                "- `settings verify category [category id]` - the category where new verify channels will be put. In order to get the id of a category, type `categories` and find the ID of the one you want\n" +
                 "• Tutorial video linked [__here__](https://streamable.com/481eyv)\n\n" +
                 "**__Enable__**\n" +
                 "- Once all these settings are set run `settings verify enable` to enable verify*.\n" +

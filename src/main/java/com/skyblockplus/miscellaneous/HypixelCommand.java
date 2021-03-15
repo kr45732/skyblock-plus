@@ -120,19 +120,19 @@ public class HypixelCommand extends Command {
                 double networkLevel = (Math.sqrt((2 * higherDepth(hypixelJson, "networkExp").getAsLong()) + 30625) / 50)
                         - 2.5;
                 eb.addField("Hypixel Level", roundSkillAverage(networkLevel), true);
-                
-String hypixelRank = "None";
-if(higherDepth(hypixelJson, "rank") != null && !higherDepth(hypixelJson, "rank").getAsString().equals("NORMAL")){
-hypixelRank = capitalizeString(higherDepth(hypixelJson, "rank").getAsString());
-}else if(higherDepth(hypixelJson, "monthlyPackageRank") != null && higherDepth(hypixelJson, "monthlyPackageRank").getAsString().equals("SUPERSTAR")){
-hypixelRank = "MVP++";
-}else if(higherDepth(hypixelJson, "newPackageRank") != null && !higherDepth(hypixelJson, "newPackageRank").getAsString().equals("NONE")){
-hypixelRank = higherDepth(hypixelJson, "newPackageRank").getAsString().replace("PLUS", "+").replace("_", "");
-}else if(higherDepth(hypixelJson, "packageRank") != null && !higherDepth(hypixelJson, "packageRank").getAsString().equals("NONE")){
-hypixelRank = higherDepth(hypixelJson, "packageRank").getAsString().replace("PLUS", "+").replace("_", "");
-}
 
-eb.addField("Hypixel Rank", hypixelRank, true);
+                String hypixelRank = "None";
+                if (higherDepth(hypixelJson, "rank") != null && !higherDepth(hypixelJson, "rank").getAsString().equals("NORMAL")) {
+                    hypixelRank = capitalizeString(higherDepth(hypixelJson, "rank").getAsString());
+                } else if (higherDepth(hypixelJson, "monthlyPackageRank") != null && higherDepth(hypixelJson, "monthlyPackageRank").getAsString().equals("SUPERSTAR")) {
+                    hypixelRank = "MVP++";
+                } else if (higherDepth(hypixelJson, "newPackageRank") != null && !higherDepth(hypixelJson, "newPackageRank").getAsString().equals("NONE")) {
+                    hypixelRank = higherDepth(hypixelJson, "newPackageRank").getAsString().replace("PLUS", "+").replace("_", "");
+                } else if (higherDepth(hypixelJson, "packageRank") != null && !higherDepth(hypixelJson, "packageRank").getAsString().equals("NONE")) {
+                    hypixelRank = higherDepth(hypixelJson, "packageRank").getAsString().replace("PLUS", "+").replace("_", "");
+                }
+
+                eb.addField("Hypixel Rank", hypixelRank, true);
 
                 try {
                     for (String socialMedia : getJsonKeys(

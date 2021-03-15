@@ -9,18 +9,14 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.util.EnumSet;
 import java.util.concurrent.TimeUnit;
 
-import static com.skyblockplus.reload.ReloadEventWatcher.addApplySubEventListener;
-import static com.skyblockplus.timeout.ChannelDeleter.addChannel;
-import static com.skyblockplus.timeout.ChannelDeleter.removeChannel;
-import static com.skyblockplus.timeout.EventListenerDeleter.addEventListener;
+import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.*;
 
-public class ApplyUser extends ListenerAdapter {
+public class ApplyUser {
     private final User applyingUser;
     private final TextChannel applicationChannel;
     private final JsonElement currentSettings;
@@ -28,9 +24,12 @@ public class ApplyUser extends ListenerAdapter {
     private int state = 0;
     private EmbedBuilder applyPlayerStats;
     private Player player;
+    private TextChannel staffChannel;
+    private boolean shouldDeleteChannel = false;
 
     public ApplyUser(MessageReactionAddEvent event, User applyingUser, JsonElement currentSettings) {
         logCommand(event.getGuild(), applyingUser, "apply " + applyingUser.getName());
+
         this.applyingUser = applyingUser;
         this.currentSettings = currentSettings;
 
@@ -43,7 +42,6 @@ public class ApplyUser extends ListenerAdapter {
                 .addPermissionOverride(event.getGuild().getPublicRole(), null, EnumSet.of(Permission.VIEW_CHANNEL))
                 .complete();
 
-        addChannel(this.applicationChannel);
         this.applicationChannel.sendMessage("Welcome " + applyingUser.getAsMention() + "!").complete();
 
         EmbedBuilder welcomeEb = defaultEmbed("Application for " + applyingUser.getName());
@@ -54,25 +52,29 @@ public class ApplyUser extends ListenerAdapter {
         this.reactMessage = applicationChannel.sendMessage(welcomeEb.build()).complete();
         this.reactMessage.addReaction("✅").queue();
         this.reactMessage.addReaction("❌").queue();
-
-        addApplySubEventListener(this.reactMessage.getGuild().getId(), this);
-        addEventListener(this.reactMessage.getGuild().getId(), this.reactMessage.getChannel().getId(), this);
-
     }
 
-    @Override
-    public void onMessageReactionAdd(MessageReactionAddEvent event) {
+    public String getMessageReactId() {
+        return reactMessage.getId();
+    }
+
+    public boolean onMessageReactionAdd(MessageReactionAddEvent event) {
+        if (state == 4) {
+            return onMessageReactionAddStaff(event);
+        }
+
+        // User
         if (event.getMessageIdLong() != reactMessage.getIdLong()) {
-            return;
+            return false;
         }
         if (event.getUser().isBot()) {
-            return;
+            return false;
         }
 
         if (!event.getUser().equals(applyingUser)) {
             reactMessage.removeReaction(event.getReaction().getReactionEmote().getAsReactionCode(), event.getUser())
                     .queue();
-            return;
+            return false;
         }
 
         if (event.getReactionEmote().getName().equals("❌")) {
@@ -81,8 +83,9 @@ public class ApplyUser extends ListenerAdapter {
             state = 2;
         } else if (!event.getReactionEmote().getName().equals("✅")) {
             reactMessage.clearReactions(event.getReaction().getReactionEmote().getAsReactionCode()).queue();
-            return;
+            return false;
         }
+
         reactMessage.clearReactions().queue();
 
         switch (state) {
@@ -187,10 +190,9 @@ public class ApplyUser extends ListenerAdapter {
                 finishApplyEmbed.setDescription(
                         "**Your stats have been submitted to staff**\nYou will be notified once staff review your stats");
                 applicationChannel.sendMessage(finishApplyEmbed.build()).queue();
-                event.getJDA().removeEventListener(this);
 
-                event.getJDA().addEventListener(
-                        new ApplyStaff(applyingUser, applicationChannel, applyPlayerStats, currentSettings, player));
+                state = 4;
+                staffCaseConstructor();
                 break;
             case 2:
                 EmbedBuilder retryEmbed = defaultEmbed("Application for " + applyingUser.getName());
@@ -207,11 +209,77 @@ public class ApplyUser extends ListenerAdapter {
                 EmbedBuilder cancelEmbed = defaultEmbed("Canceling application");
                 cancelEmbed.setDescription("Channel closing in 5 seconds...");
                 applicationChannel.sendMessage(cancelEmbed.build()).queue();
-                event.getJDA().removeEventListener(this);
                 event.getGuild().getTextChannelById(event.getChannel().getId()).delete().reason("Application canceled")
                         .queueAfter(5, TimeUnit.SECONDS);
-                removeChannel(applicationChannel);
-                break;
+                return true;
         }
+        return false;
+    }
+
+    private boolean onMessageReactionAddStaff(MessageReactionAddEvent event) {
+        if (event.getUser().isBot()) {
+            return false;
+        }
+        try {
+            if (shouldDeleteChannel && (event.getMessageIdLong() == reactMessage.getIdLong())) {
+                if (event.getReactionEmote().getName().equals("✅")) {
+                    reactMessage.clearReactions().queue();
+                    EmbedBuilder eb = defaultEmbed("Channel closing in 10 seconds");
+                    applicationChannel.sendMessage(eb.build()).queue();
+                    applicationChannel.delete().reason("Applicant read final message").queueAfter(10, TimeUnit.SECONDS);
+                    return true;
+                } else {
+                    event.getReaction().removeReaction(event.getUser()).queue();
+                }
+                return false;
+            }
+        } catch (Exception ignored) {
+
+        }
+        if (event.getMessageIdLong() != reactMessage.getIdLong()) {
+            return false;
+        }
+
+        if (event.getReactionEmote().getName().equals("❌")) {
+            staffChannel.sendMessage(player.getUsername() + " (" + applyingUser.getAsMention() + ") was denied by "
+                    + event.getUser().getName() + " (" + event.getUser().getAsMention() + ")").queue();
+            reactMessage.clearReactions().queue();
+            EmbedBuilder eb = defaultEmbed("Application Not Accepted");
+            eb.setDescription(higherDepth(currentSettings, "denyMessageText").getAsString()
+                    + "\n**React with ✅ to confirm that you have read this message and to close channel**");
+            applicationChannel.sendMessage(applyingUser.getAsMention()).queue();
+            reactMessage.delete().queueAfter(5, TimeUnit.SECONDS);
+            reactMessage = applicationChannel.sendMessage(eb.build()).complete();
+            reactMessage.addReaction("✅").queue();
+            shouldDeleteChannel = true;
+
+        } else if (event.getReactionEmote().getName().equals("✅")) {
+            staffChannel.sendMessage(player.getUsername() + " (" + applyingUser.getAsMention() + ") was accepted by "
+                    + event.getUser().getName() + " (" + event.getUser().getAsMention() + ")").queue();
+            reactMessage.clearReactions().queue();
+            EmbedBuilder eb = defaultEmbed("Application Accepted");
+            eb.setDescription(higherDepth(currentSettings, "acceptMessageText").getAsString()
+                    + "\n**React with ✅ to confirm that you have read this message and to close channel**");
+            applicationChannel.sendMessage(applyingUser.getAsMention()).queue();
+            reactMessage.delete().queueAfter(5, TimeUnit.SECONDS);
+            reactMessage = applicationChannel.sendMessage(eb.build()).complete();
+            reactMessage.addReaction("✅").queue();
+            shouldDeleteChannel = true;
+        }
+        return false;
+    }
+
+    private void staffCaseConstructor() {
+        staffChannel = jda
+                .getTextChannelById(higherDepth(currentSettings, "messageStaffChannelId").getAsString());
+
+        applyPlayerStats.addField("To accept the application,", "React with ✅", true);
+        applyPlayerStats.addBlankField(true);
+        applyPlayerStats.addField("To deny the application,", "React with ❌", true);
+        staffChannel.sendMessage("<@&" + higherDepth(currentSettings, "staffPingRoleId").getAsString() + ">")
+                .complete();
+        reactMessage = staffChannel.sendMessage(applyPlayerStats.build()).complete();
+        reactMessage.addReaction("✅").queue();
+        reactMessage.addReaction("❌").queue();
     }
 }

@@ -219,43 +219,43 @@ public class SettingsCommand extends Command {
                     case "channel":
                         eb = setVerifyMessageTextChannelId(args[3]);
                         break;
-                    case "prefix":
-                        eb = setVerifyNewChannelPrefix(args[3]);
-                        break;
-                    case "category":
-                        eb = setVerifyNewChannelCategory(args[3]);
-                        break;
                     default:
                         eb = defaultEmbed("Error", null).setDescription("Invalid setting");
                         break;
                 }
             }
-        } else if((args.length == 4 || args.length == 5) && args[1].equals("guild")){
-            if(args.length == 4){
-                if(args[2].equals("set")){
-                    eb = setGuildRoleId(args[3]);
-                }else if(args[2].equals("role")) {
-                    eb = setGuildRoleName(args[3]);
-                }else if(args[2].equals("enable")) {
-                    if (args[3].equals("role")) {
-                        eb = setGuildRoleEnable("true");
-                    } else if (args[3].equals("rank")) {
-                        eb = setGuildRankEnable("true");
-                    } else {
+        } else if ((args.length == 4 || args.length == 5) && args[1].equals("guild")) {
+            if (args.length == 4) {
+                switch (args[2]) {
+                    case "set":
+                        eb = setGuildRoleId(args[3]);
+                        break;
+                    case "role":
+                        eb = setGuildRoleName(args[3]);
+                        break;
+                    case "enable":
+                        if (args[3].equals("role")) {
+                            eb = setGuildRoleEnable("true");
+                        } else if (args[3].equals("rank")) {
+                            eb = setGuildRankEnable("true");
+                        } else {
+                            eb = defaultEmbed("Error").setDescription("Invalid setting");
+                        }
+                        break;
+                    case "disable":
+                        if (args[3].equals("role")) {
+                            eb = setGuildRoleEnable("false");
+                        } else if (args[3].equals("rank")) {
+                            eb = setGuildRankEnable("false");
+                        } else {
+                            eb = defaultEmbed("Error").setDescription("Invalid setting");
+                        }
+                        break;
+                    default:
                         eb = defaultEmbed("Error").setDescription("Invalid setting");
-                    }
-                }else if(args[2].equals("disable")){
-                    if(args[3].equals("role")){
-                        eb = setGuildRoleEnable("false");
-                    }else if (args[3].equals("rank")){
-                        eb = setGuildRankEnable("false");
-                    }else{
-                        eb = defaultEmbed("Error").setDescription("Invalid setting");
-                    }
-                }else{
-                    eb = defaultEmbed("Error").setDescription("Invalid setting");
+                        break;
                 }
-            }else{
+            } else {
                 eb = defaultEmbed("Error").setDescription("Invalid setting");
             }
 
@@ -268,7 +268,7 @@ public class SettingsCommand extends Command {
 
     private EmbedBuilder setGuildRoleEnable(String enable) {
         JsonObject currentSettings = database.getGuildRoleSettings(event.getGuild().getId()).getAsJsonObject();
-        if((higherDepth(currentSettings, "guildId") == null) || (higherDepth(currentSettings, "roleId") == null)){
+        if ((higherDepth(currentSettings, "guildId") == null) || (higherDepth(currentSettings, "roleId") == null)) {
             return defaultEmbed("Guild name and role must be set before enabling");
         }
 
@@ -280,7 +280,7 @@ public class SettingsCommand extends Command {
         }
 
         EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName());
-        eb.setDescription("Guild role " + (enable.equals("true")? "enabled":"disabled"));
+        eb.setDescription("Guild role " + (enable.equals("true") ? "enabled" : "disabled"));
         return eb;
     }
 
@@ -294,7 +294,7 @@ public class SettingsCommand extends Command {
         }
 
         EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName());
-        eb.setDescription("Guild ranks " + (enable.equals("true")? "enabled":"disabled"));
+        eb.setDescription("Guild ranks " + (enable.equals("true") ? "enabled" : "disabled"));
         return eb;
     }
 
@@ -728,14 +728,6 @@ public class SettingsCommand extends Command {
                 + (higherDepth(verifySettings, "verifiedRole").getAsString().length() != 0 ? event.getGuild()
                 .getRoleById(higherDepth(verifySettings, "verifiedRole").getAsString()).getAsMention()
                 : "None");
-        ebFieldString += "\n• New Channel Prefix: "
-                + (higherDepth(verifySettings, "newChannelPrefix").getAsString().length() != 0
-                ? decodeVerifyPrefix(higherDepth(verifySettings, "newChannelPrefix").getAsString())
-                : "None");
-        ebFieldString += "\n• New Channel Category: "
-                + (higherDepth(verifySettings, "newChannelCategory").getAsString().length() != 0
-                ? ("<#" + event.getGuild().getCategoryById(higherDepth(verifySettings, "newChannelCategory").getAsString()).getId() + ">")
-                : "None");
         return ebFieldString;
     }
 
@@ -816,41 +808,6 @@ public class SettingsCommand extends Command {
         } catch (Exception ignored) {
         }
         return defaultEmbed("Invalid Role", null);
-    }
-
-    private EmbedBuilder setVerifyNewChannelPrefix(String channelPrefix) {
-        if (channelPrefix.length() > 0) {
-            if (EmojiParser.parseToAliases(channelPrefix).length() > 25) {
-                return defaultEmbed("Error", null).setDescription("Prefix cannot be longer than 25 letters!");
-            }
-
-            int responseCode = updateVerifySettings("newChannelPrefix", EmojiParser.parseToAliases(channelPrefix.replace("ν", "Nu-greek-char")));
-            if (responseCode != 200) {
-                return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
-            }
-
-            EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
-            eb.setDescription("**Verify new channel prefix set to:** " + channelPrefix);
-            return eb;
-        }
-        return defaultEmbed("Invalid Input", null);
-    }
-
-    private EmbedBuilder setVerifyNewChannelCategory(String messageCategory) {
-        try {
-            net.dv8tion.jda.api.entities.Category verifyCategory = event.getGuild()
-                    .getCategoryById(messageCategory.replaceAll("[<#>]", ""));
-            int responseCode = updateVerifySettings("newChannelCategory", verifyCategory.getId());
-            if (responseCode != 200) {
-                return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
-            }
-
-            EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
-            eb.setDescription("**Verify category set to:** <#" + verifyCategory.getId() + ">");
-            return eb;
-        } catch (Exception ignored) {
-        }
-        return defaultEmbed("Invalid Guild Category", null);
     }
 
     private int updateVerifySettings(String key, String newValue) {

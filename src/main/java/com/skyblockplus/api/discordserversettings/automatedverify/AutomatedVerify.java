@@ -17,8 +17,7 @@ public class AutomatedVerify {
 
     private String messageTextChannelId = ""; // Channel where react message will be sent
     private String verifiedRole = ""; // Role given to people who verify successfully
-    private String newChannelPrefix = ""; // Channel prefix of a new verify
-    private String newChannelCategory = ""; // Where new verify channels will be made
+    private String verifiedNickname = "";
 
     private String previousMessageId = "";
 

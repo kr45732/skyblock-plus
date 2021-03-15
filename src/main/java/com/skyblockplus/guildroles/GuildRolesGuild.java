@@ -18,52 +18,55 @@ import static com.skyblockplus.utils.Utils.*;
 public class GuildRolesGuild extends ListenerAdapter {
     private final Guild guild;
 
-    public GuildRolesGuild(Guild guild){
+    public GuildRolesGuild(Guild guild) {
         this.guild = guild;
         final Runnable channelDeleter = this::updateGuildRolesRunner;
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        scheduler.scheduleAtFixedRate(channelDeleter, 0, 6, TimeUnit.HOURS);
+        scheduler.scheduleAtFixedRate(channelDeleter, 0, 3, TimeUnit.HOURS);
     }
 
-    public void updateGuildRolesRunner(){
+    public void updateGuildRolesRunner() {
         JsonElement currentSettings = database.getGuildRoleSettings(guild.getId());
 
-        if(currentSettings == null){
+        if (currentSettings == null) {
             return;
         }
 
-        if(higherDepth(currentSettings, "enableGuildRole").getAsBoolean()){
+        if (higherDepth(currentSettings, "enableGuildRole").getAsBoolean()) {
             updateGuildRoles(currentSettings);
         }
     }
 
-    public void updateGuildRoles(JsonElement currentSettings){
+    public void updateGuildRoles(JsonElement currentSettings) {
         long startTime = System.currentTimeMillis();
 
         Role role = guild.getRoleById(higherDepth(currentSettings, "roleId").getAsString());
         JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&id=" + higherDepth(currentSettings, "guildId").getAsString());
 
-        if(role == null || guildJson.isJsonNull()){
+        if (role == null || guildJson.isJsonNull()) {
             return;
         }
 
         JsonArray guildMembers = higherDepth(higherDepth(guildJson, "guild"), "members").getAsJsonArray();
         List<String> guildMembersUuids = new ArrayList<>();
 
-        for(JsonElement guildMember:guildMembers ){
+        for (JsonElement guildMember : guildMembers) {
             guildMembersUuids.add(higherDepth(guildMember, "uuid").getAsString());
         }
 
         JsonArray linkedUsers = database.getLinkedUsers(guild.getId()).getAsJsonArray();
 
-        for(JsonElement linkedUser: linkedUsers){
-            if(guildMembersUuids.contains(higherDepth(linkedUser, "minecraftUuid").getAsString())){
-                guild.addRoleToMember(higherDepth(linkedUser, "discordId").getAsString(), role).queue();
-            }else{
-                guild.removeRoleFromMember(higherDepth(linkedUser, "discordId").getAsString(), role).queue();
+        for (JsonElement linkedUser : linkedUsers) {
+            try {
+                if (guildMembersUuids.contains(higherDepth(linkedUser, "minecraftUuid").getAsString())) {
+                    guild.addRoleToMember(higherDepth(linkedUser, "discordId").getAsString(), role).queue();
+                } else {
+                    guild.removeRoleFromMember(higherDepth(linkedUser, "discordId").getAsString(), role).queue();
+                }
+            } catch (Exception ignored) {
             }
         }
 
-        System.out.println("GuildRolesGuild: " + (System.currentTimeMillis() - startTime)/1000 + "s (" + guild.getName() + ")");
+        System.out.println("GuildRolesGuild of " + linkedUsers.size() + ": " + (System.currentTimeMillis() - startTime) / 1000 + "s (" + guild.getName() + ")");
     }
 }

@@ -82,7 +82,10 @@ public class GetAllGuildsIn extends Command {
                         guildCount++;
                     }
                 }
+
+
                 eb.addField("Total guild count without emoji servers", guildCount + " servers", false);
+                eb.addField("Total users", "" + jda.getUsers().size(), false);
 
                 ebMessage.editMessage(eb.build()).queue();
                 return;
