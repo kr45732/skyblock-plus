@@ -66,7 +66,11 @@ public class LinkAccountCommand extends Command {
             LinkedAccount toAdd = new LinkedAccount(user.getId(), playerInfo[2]);
 
             if (database.addLinkedUser(guild.getId(), toAdd) == 200) {
-                guild.getMember(user).modifyNickname(playerInfo[1]).queue();
+if(!guild.getId().equals("794733014248587274")){
+
+try{
+                guild.getMember(user).modifyNickname(playerInfo[1]).queue();} catch (Exception ignored){}
+}
                 return defaultEmbed("Success").setDescription("Account " + playerInfo[1] + " linked with " + user.getAsTag());
             } else {
                 return defaultEmbed("Error linking " + playerInfo[1]);

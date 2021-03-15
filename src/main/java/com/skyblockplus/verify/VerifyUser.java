@@ -104,7 +104,9 @@ public class VerifyUser extends ListenerAdapter {
                                                         higherDepth(currentSettings, "verifiedRole").getAsString())))
                                         .queue();
 
-                                event.getGuild().getMember(verifyingUser).modifyNickname(playerInfo[1]).queue();
+if(!event.getGuild().getId().equals("794733014248587274")){
+try{
+                                event.getGuild().getMember(verifyingUser).modifyNickname(playerInfo[1]).queue();}catch (Exception ignored){}}
 
                                 removeChannel(verifyChannel);
                                 event.getJDA().removeEventListener(this);

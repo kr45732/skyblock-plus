@@ -281,7 +281,7 @@ public class Utils {
     }
 
     public static String[] getPlayerDiscordInfo(String username) {
-        JsonElement playerJson = getJson("https://api.hypixel.net/player?key=" + HYPIXEL_API_KEY + "&name=" + username);
+        JsonElement playerJson = getJson("https://api.hypixel.net/player?key=" + HYPIXEL_API_KEY + "&uuid=" + usernameToUuid(username));
 
         try {
             String discordID = higherDepth(
