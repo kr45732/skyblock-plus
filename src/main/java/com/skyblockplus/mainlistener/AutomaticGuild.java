@@ -20,8 +20,8 @@ import static com.skyblockplus.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.Utils.higherDepth;
 
 public class AutomaticGuild {
-    private ApplyGuild applyGuild;
-    private VerifyGuild verifyGuild;
+    private ApplyGuild applyGuild = new ApplyGuild(false);
+    private VerifyGuild verifyGuild = new VerifyGuild(false);
 
     public AutomaticGuild(GuildReadyEvent event) {
         applyConstructor(event);
@@ -65,7 +65,7 @@ public class AutomaticGuild {
                 verifyGuild = new VerifyGuild(reactChannel, reactMessage);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Verify constructor error");
         }
     }
 
@@ -103,7 +103,7 @@ public class AutomaticGuild {
                 applyGuild = new ApplyGuild(reactMessage, currentSettings);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Apply constructor error");
         }
     }
 
@@ -151,7 +151,7 @@ public class AutomaticGuild {
                 return "Not enabled";
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Reload apply constructor error");
         }
         return "Error Reloading";
     }
@@ -199,7 +199,7 @@ public class AutomaticGuild {
                 return "Not enabled";
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Reload verify constructor error");
         }
         return "Error Reloading";
     }
