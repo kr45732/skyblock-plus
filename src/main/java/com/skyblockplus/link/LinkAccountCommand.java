@@ -34,11 +34,14 @@ public class LinkAccountCommand extends Command {
             LinkedAccount toAdd = new LinkedAccount(user.getId(), playerInfo[2]);
 
             if (database.addLinkedUser(guild.getId(), toAdd) == 200) {
-                if (!guild.getId().equals("794733014248587274")) {
-                    try {
-                        guild.getMember(user).modifyNickname(playerInfo[1]).queue();
-                    } catch (Exception ignored) {
+
+                try {
+                    if (!higherDepth(database.getVerifySettings(guild.getId()), "verifiedNickname").getAsString().equalsIgnoreCase("none")) {
+                        String nicknameTemplate = higherDepth(database.getVerifySettings(guild.getId()), "verifiedNickname").getAsString();
+                        nicknameTemplate = nicknameTemplate.replace("[IGN]", playerInfo[1]);
+                        guild.getMember(user).modifyNickname(nicknameTemplate).queue();
                     }
+                } catch (Exception ignored) {
                 }
 
                 try {

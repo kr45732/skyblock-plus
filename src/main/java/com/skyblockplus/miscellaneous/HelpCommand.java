@@ -177,7 +177,9 @@ public class HelpCommand extends Command {
                     "Role that user will receive " + "upon being verified. Cannot be @everyone or a managed role",
                     "settings verify role " + "[@role]")
                     + generateHelp("Channel where the message to react for verifying will sent",
-                    "settings verify " + "channel [#channel]"));
+                    "settings verify " + "channel [#channel]")
+                    + generateHelp("The nickname template on verifying. Can be set to none", "settings verify nickname <prefix> [IGN] <postfix>")
+            );
 
             paginateBuilder.addItems(generateHelp("Get the current apply settings for the bot", "settings apply")
                     + generateHelp("Enable or disable automatic apply", "settings apply [enable|disable]")

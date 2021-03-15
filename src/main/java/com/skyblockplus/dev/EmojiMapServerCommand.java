@@ -4,6 +4,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.entities.Emote;
 
+import static com.skyblockplus.utils.Utils.BOT_PREFIX;
 import static com.skyblockplus.utils.Utils.logCommand;
 
 public class EmojiMapServerCommand extends Command {
@@ -14,7 +15,7 @@ public class EmojiMapServerCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        logCommand(event.getGuild(), event.getAuthor(), "d-emojis");
+        logCommand(event.getGuild(), event.getAuthor(), BOT_PREFIX + "d-emojis");
 
         StringBuilder ebString = new StringBuilder();
         for (Emote emote : event.getGuild().getEmotes()) {

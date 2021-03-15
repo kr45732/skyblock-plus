@@ -5,8 +5,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.time.Instant;
 
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.logCommand;
+import static com.skyblockplus.utils.Utils.*;
 
 public class InstantTimeNow extends Command {
     public InstantTimeNow() {
@@ -16,7 +15,7 @@ public class InstantTimeNow extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        logCommand(event.getGuild(), event.getAuthor(), "d-instant");
+        logCommand(event.getGuild(), event.getAuthor(), BOT_PREFIX +"d-instant");
 
         event.reply(defaultEmbed("Instant Time Now").setDescription(Instant.now().toString()).build());
     }

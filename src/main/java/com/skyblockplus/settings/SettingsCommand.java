@@ -219,6 +219,9 @@ public class SettingsCommand extends Command {
                     case "channel":
                         eb = setVerifyMessageTextChannelId(args[3]);
                         break;
+                    case "nickname":
+                        eb = setVerifyNickname(args[3]);
+                        break;
                     default:
                         eb = defaultEmbed("Error", null).setDescription("Invalid setting");
                         break;
@@ -436,7 +439,7 @@ public class SettingsCommand extends Command {
                 }
                 pageTitles.add(roleName + " (__one level role__)");
             } else {
-                ebFieldString.append(higherDepth(currentRoleSettings, "stackable").getAsString().equals("stackable")
+                ebFieldString.append(higherDepth(currentRoleSettings, "stackable").getAsString().equals("true")
                         ? "\n• Stackable"
                         : "\n• Not stackable");
 
@@ -728,6 +731,10 @@ public class SettingsCommand extends Command {
                 + (higherDepth(verifySettings, "verifiedRole").getAsString().length() != 0 ? event.getGuild()
                 .getRoleById(higherDepth(verifySettings, "verifiedRole").getAsString()).getAsMention()
                 : "None");
+        ebFieldString += "\n• Nickname Template: "
+                + ((higherDepth(verifySettings, "verifiedNickname").getAsString().length() != 0) && (!higherDepth(verifySettings, "verifiedNickname").getAsString().equalsIgnoreCase("none"))
+                ? higherDepth(verifySettings, "verifiedNickname").getAsString()
+                : "None");
         return ebFieldString;
     }
 
@@ -808,6 +815,37 @@ public class SettingsCommand extends Command {
         } catch (Exception ignored) {
         }
         return defaultEmbed("Invalid Role", null);
+    }
+
+    private EmbedBuilder setVerifyNickname(String nickname) {
+        if(!nickname.contains("[IGN]")){
+            if(nickname.equalsIgnoreCase("none")){
+                int responseCode = updateVerifySettings("verifiedNickname", "none");
+
+                if (responseCode != 200) {
+                    return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
+                }
+
+                EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+                eb.setDescription("**Verify nickname disabled**");
+                return eb;
+            }
+            return defaultEmbed("Error").setDescription("Nickname must contain [IGN] parameter");
+        }
+
+        if(nickname.replace("[IGN]", "") .length() > 10){
+            return defaultEmbed("Error").setDescription("Nickname prefix and/or postfix must be less than or equal to 10 letters");
+        }
+
+        int responseCode = updateVerifySettings("verifiedNickname", nickname);
+
+        if (responseCode != 200) {
+            return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
+        }
+
+        EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+        eb.setDescription("**Verify nickname set to:** " + nickname);
+        return eb;
     }
 
     private int updateVerifySettings(String key, String newValue) {

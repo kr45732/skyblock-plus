@@ -39,14 +39,15 @@ public class SetupCommand extends Command {
 
         String verify = "**__Overview__**\n" +
                 "1) When a user runs `link [IGN]` their username is compared with the Hypixel API\n" +
-                "2) If it's valid they will be linked and given the verified role\n" +
-                "• Example video linked [__here__](https://i.imgur.com/jJc7fGj.mp4)\n\n" +
+                "2) If it's valid they will be linked, given the verified role, and their nickname will be updated\n" +
+                "• Example video linked [__here__](https://i.imgur.com/VzQUJrE.mp4)\n\n" +
                 "**__Setup__**\n" +
                 "In order to enable automatic verify, all the following settings must be set:\n" +
                 "- `settings verify message [message]` - the message that users will see and react to in order to verify.\n" +
                 "- `settings verify role [@role]` - the role users will get once verified. This role cannot be @everyone or a managed role.\n" +
                 "- `settings verify channel [#channel]` - the channel where the message to react too will be sent.\n" +
-                "• Tutorial video linked [__here__](https://streamable.com/481eyv)\n\n" +
+                "- `settings verify nickname <prefix> [IGN] <postfix>` - the nickname template where IGN will be the players name. Can also be set to none.\n" +
+                "• Tutorial video linked [__here__](https://streamable.com/pibmus)\n\n" +
                 "**__Enable__**\n" +
                 "- Once all these settings are set run `settings verify enable` to enable verify*.\n" +
                 "- For more help type `help settings_verify` or watch the video linked above\n" +
