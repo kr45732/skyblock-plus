@@ -147,6 +147,7 @@ public class AutomaticGuild {
                 applyGuild = new ApplyGuild(reactMessage, currentSettings);
                 return "Reloaded";
             } else {
+                applyGuild = new ApplyGuild(false);
                 return "Not enabled";
             }
         } catch (Exception e) {
@@ -194,6 +195,7 @@ public class AutomaticGuild {
                 verifyGuild = new VerifyGuild(reactChannel, reactMessage);
                 return "Reloaded";
             } else {
+                verifyGuild = new VerifyGuild(false);
                 return "Not enabled";
             }
         } catch (Exception e) {

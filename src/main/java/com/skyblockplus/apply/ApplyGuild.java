@@ -10,13 +10,18 @@ import java.util.List;
 import static com.skyblockplus.utils.Utils.higherDepth;
 
 public class ApplyGuild {
-    final Message reactMessage;
-    final JsonElement currentSettings;
-    final List<ApplyUser> applyUserList = new ArrayList<>();
+    private Message reactMessage;
+    private JsonElement currentSettings;
+    private List<ApplyUser> applyUserList = new ArrayList<>();
+    private boolean enable = true;
 
     public ApplyGuild(Message reactMessage, JsonElement currentSettings) {
         this.reactMessage = reactMessage;
         this.currentSettings = currentSettings;
+    }
+
+    public ApplyGuild(boolean enable) {
+        this.enable = enable;
     }
 
     public int applyUserListSize() {
@@ -24,6 +29,10 @@ public class ApplyGuild {
     }
 
     public void onMessageReactionAdd(MessageReactionAddEvent event) {
+        if(!enable){
+            return;
+        }
+
         if (onMessageReactionAdd_NewApplyUser(event)) {
             return;
         }
