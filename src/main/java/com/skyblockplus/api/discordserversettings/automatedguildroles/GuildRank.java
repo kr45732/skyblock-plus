@@ -13,6 +13,5 @@ public class GuildRank {
     private String roleId = "";
 
     public GuildRank() {
-
     }
 }

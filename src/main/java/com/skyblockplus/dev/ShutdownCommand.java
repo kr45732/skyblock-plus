@@ -15,7 +15,7 @@ public class ShutdownCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        logCommand(event.getGuild(), event.getAuthor(), BOT_PREFIX +"d-shutdown");
+        logCommand(event.getGuild(), event.getAuthor(), BOT_PREFIX + "d-shutdown");
 
         event.reactWarning();
         event.getJDA().shutdown();

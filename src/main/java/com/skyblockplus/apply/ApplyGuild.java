@@ -11,9 +11,9 @@ import java.util.List;
 import static com.skyblockplus.utils.Utils.higherDepth;
 
 public class ApplyGuild {
+    private final List<ApplyUser> applyUserList = new ArrayList<>();
     private Message reactMessage;
     private JsonElement currentSettings;
-    private final List<ApplyUser> applyUserList = new ArrayList<>();
     private boolean enable = true;
 
     public ApplyGuild(Message reactMessage, JsonElement currentSettings) {

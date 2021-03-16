@@ -140,7 +140,7 @@ public class HelpCommand extends Command {
         paginateBuilder.addItems(
                 generateHelp("Get player's active (not claimed) auctions on all profiles", "auction [player]", "ah [player]")
                         + generateHelp("Get the lowest bin of an item", "bin [item]")
-                + generateHelp("Get bazaar prices of an item", "bazaar [item]", "bz [item]")
+                        + generateHelp("Get bazaar prices of an item", "bazaar [item]", "bz [item]")
         );
 
         paginateBuilder.addItems(

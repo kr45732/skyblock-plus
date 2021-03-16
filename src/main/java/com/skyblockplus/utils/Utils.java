@@ -129,7 +129,7 @@ public class Utils {
                 try {
                     remainingLimit = Integer.parseInt(httpresponse.getFirstHeader("RateLimit-Remaining").getValue());
                     timeTillReset = Integer.parseInt(httpresponse.getFirstHeader("RateLimit-Reset").getValue());
-                }catch (Exception ignored){
+                } catch (Exception ignored) {
                 }
             }
 

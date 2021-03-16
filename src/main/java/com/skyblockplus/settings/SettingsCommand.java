@@ -818,8 +818,8 @@ public class SettingsCommand extends Command {
     }
 
     private EmbedBuilder setVerifyNickname(String nickname) {
-        if(!nickname.contains("[IGN]")){
-            if(nickname.equalsIgnoreCase("none")){
+        if (!nickname.contains("[IGN]")) {
+            if (nickname.equalsIgnoreCase("none")) {
                 int responseCode = updateVerifySettings("verifiedNickname", "none");
 
                 if (responseCode != 200) {
@@ -833,7 +833,7 @@ public class SettingsCommand extends Command {
             return defaultEmbed("Error").setDescription("Nickname must contain [IGN] parameter");
         }
 
-        if(nickname.replace("[IGN]", "") .length() > 15){
+        if (nickname.replace("[IGN]", "").length() > 15) {
             return defaultEmbed("Error").setDescription("Nickname prefix and/or postfix must be less than or equal to 15 letters");
         }
 

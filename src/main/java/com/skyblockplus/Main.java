@@ -23,7 +23,6 @@ import com.skyblockplus.settings.SetupCommand;
 import com.skyblockplus.settings.SpringDatabaseComponent;
 import com.skyblockplus.skills.SkillsCommands;
 import com.skyblockplus.slayer.SlayerCommands;
-import com.skyblockplus.timeout.ChannelDeleter;
 import com.skyblockplus.timeout.MessageTimeout;
 import com.skyblockplus.weight.WeightCommand;
 import net.dv8tion.jda.api.JDA;
@@ -74,15 +73,13 @@ public class Main {
             jda = JDABuilder.createDefault(BOT_TOKEN).setStatus(OnlineStatus.DO_NOT_DISTURB)
                     .setChunkingFilter(ChunkingFilter.ALL).setMemberCachePolicy(MemberCachePolicy.ALL)
                     .enableIntents(GatewayIntent.GUILD_MEMBERS).setActivity(Activity.playing("Loading..."))
-                    .addEventListeners(waiter, client.build(), new ChannelDeleter(), new MessageTimeout(),
-                            new MainListener())
+                    .addEventListeners(waiter, client.build(), new MessageTimeout(), new MainListener())
                     .build();
         } else {
             jda = JDABuilder.createDefault(BOT_TOKEN).setStatus(OnlineStatus.DO_NOT_DISTURB)
                     .setChunkingFilter(ChunkingFilter.ALL).setMemberCachePolicy(MemberCachePolicy.ALL)
                     .enableIntents(GatewayIntent.GUILD_MEMBERS).setActivity(Activity.playing("Loading..."))
-                    .addEventListeners(waiter, client.build(), new ChannelDeleter(), new MessageTimeout(),
-                            new MainListener())
+                    .addEventListeners(waiter, client.build(), new MessageTimeout(), new MainListener())
                     .build();
         }
     }

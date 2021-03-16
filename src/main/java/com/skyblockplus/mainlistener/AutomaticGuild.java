@@ -25,12 +25,11 @@ import java.util.concurrent.TimeUnit;
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.HYPIXEL_API_KEY;
 
 public class AutomaticGuild {
+    private final String guildId;
     private ApplyGuild applyGuild = new ApplyGuild(false);
     private VerifyGuild verifyGuild = new VerifyGuild(false);
-    private final String guildId;
 
     public AutomaticGuild(GuildReadyEvent event) {
         applyConstructor(event);
@@ -42,8 +41,7 @@ public class AutomaticGuild {
     private void guildRoleConstructor() {
         Runnable channelDeleter = this::updateGuildRoles;
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        int randomDelay = (int)(Math.random() * 360);
-        randomDelay = 0;
+        int randomDelay = (int) (Math.random() * 360);
         scheduler.scheduleAtFixedRate(channelDeleter, randomDelay, 180, TimeUnit.MINUTES);
     }
 
@@ -75,7 +73,7 @@ public class AutomaticGuild {
             JsonArray linkedUsers = database.getLinkedUsers(guild.getId()).getAsJsonArray();
 
             for (JsonElement linkedUser : linkedUsers) {
-                if(guild.getMemberById(higherDepth(linkedUser, "discordId").getAsString()) == null){
+                if (guild.getMemberById(higherDepth(linkedUser, "discordId").getAsString()) == null) {
                     database.removeLinkedUser(guildId, higherDepth(linkedUser, "discordId").getAsString());
                     continue;
                 }
@@ -87,7 +85,7 @@ public class AutomaticGuild {
                 }
             }
 
-            logCommand(guild, "Guild Role | Users (" + linkedUsers.size() + ") | Time ("+ ((System.currentTimeMillis() - startTime) / 1000)+"s)");
+            logCommand(guild, "Guild Role | Users (" + linkedUsers.size() + ") | Time (" + ((System.currentTimeMillis() - startTime) / 1000) + "s)");
         }
     }
 

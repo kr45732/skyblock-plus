@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import java.util.HashMap;
 import java.util.Map;
 
+
 public class MainListener extends ListenerAdapter {
     private static final Map<String, AutomaticGuild> guildMap = new HashMap<>();
 
@@ -65,7 +66,7 @@ public class MainListener extends ListenerAdapter {
     }
 
     @Override
-    public void onTextChannelDelete(TextChannelDeleteEvent event){
+    public void onTextChannelDelete(TextChannelDeleteEvent event) {
         if (guildMap.containsKey(event.getGuild().getId())) {
             guildMap.get(event.getGuild().getId()).onTextChannelDelete(event);
         }

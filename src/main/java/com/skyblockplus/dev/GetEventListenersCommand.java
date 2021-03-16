@@ -15,7 +15,7 @@ public class GetEventListenersCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        logCommand(event.getGuild(), event.getAuthor(), BOT_PREFIX +"d-listeners");
+        logCommand(event.getGuild(), event.getAuthor(), BOT_PREFIX + "d-listeners");
 
         StringBuilder ebString = new StringBuilder();
         for (Object i : jda.getRegisteredListeners()) {

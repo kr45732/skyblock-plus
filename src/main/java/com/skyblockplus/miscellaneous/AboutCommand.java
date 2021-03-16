@@ -14,7 +14,7 @@ public class AboutCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        logCommand(event.getGuild(), event.getAuthor(), BOT_PREFIX +"about");
+        logCommand(event.getGuild(), event.getAuthor(), BOT_PREFIX + "about");
 
         String description = "Hello! I am **Skyblock Plus**, an an all purpose skyblock bot.\n"
                 + "I was written in java by CrypticPlasma.\n" + "Type `" + BOT_PREFIX + "help` or `" + BOT_PREFIX

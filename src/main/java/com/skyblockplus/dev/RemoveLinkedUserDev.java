@@ -9,8 +9,6 @@ import static com.skyblockplus.Main.database;
 import static com.skyblockplus.utils.Utils.*;
 
 public class RemoveLinkedUserDev extends Command {
-    CommandEvent event;
-
     public RemoveLinkedUserDev() {
         this.name = "d-unlink";
         this.ownerCommand = true;
@@ -22,7 +20,6 @@ public class RemoveLinkedUserDev extends Command {
         Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
         String content = event.getMessage().getContentRaw();
         String[] args = content.split(" ");
-        this.event = event;
 
         logCommand(event.getGuild(), event.getAuthor(), content);
 

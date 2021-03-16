@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.errorMessage;
 
 public class BazaarCommand extends Command {
     public BazaarCommand() {
@@ -36,7 +35,7 @@ public class BazaarCommand extends Command {
     private EmbedBuilder getBazaarItem(String itemName) {
         JsonElement bazaarItems = higherDepth(getJson("https://api.hypixel.net/skyblock/bazaar?key=" + HYPIXEL_API_KEY), "products");
         String formattedItemName = itemName.replace(" ", "_").toUpperCase();
-        if(higherDepth(bazaarItems, formattedItemName) != null){
+        if (higherDepth(bazaarItems, formattedItemName) != null) {
             JsonElement itemInfo = higherDepth(higherDepth(bazaarItems, formattedItemName), "quick_status");
             EmbedBuilder eb = defaultEmbed(itemName, "https://bazaartracker.com/product/" + formattedItemName);
             eb.addField("Buy Price (Per)", simplifyNumber(higherDepth(itemInfo, "buyPrice").getAsDouble()), true);

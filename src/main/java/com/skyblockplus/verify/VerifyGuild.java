@@ -24,7 +24,7 @@ public class VerifyGuild {
     }
 
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
-        if(!enable){
+        if (!enable) {
             return;
         }
 
