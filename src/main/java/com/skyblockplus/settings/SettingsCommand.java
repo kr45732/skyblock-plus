@@ -359,8 +359,8 @@ public class SettingsCommand extends Command {
 
         ArrayList<String> roleNames = getJsonKeys(rolesSettings);
 
-        paginateBuilder.addItems(("**Automated Roles "
-                + (higherDepth(rolesSettings, "enable").getAsString().equals("true") ? "Enabled" : "Disabled") + "**"));
+        paginateBuilder.addItems("**Automated Roles "
+                + (higherDepth(rolesSettings, "enable").getAsString().equals("true") ? "Enabled" : "Disabled") + "**");
         roleNames.remove("enable");
         for (String roleName : roleNames) {
             JsonElement currentRoleSettings = higherDepth(rolesSettings, roleName);
@@ -898,6 +898,7 @@ public class SettingsCommand extends Command {
     private boolean allowApplyEnable() {
         JsonObject currentSettings = database.getApplySettings(event.getGuild().getId()).getAsJsonObject();
         currentSettings.remove("previousMessageId");
+        currentSettings.remove("applyUsersCache");
 
         for (String key : getJsonKeys(currentSettings)) {
             if (higherDepth(currentSettings, key).getAsString().length() == 0) {

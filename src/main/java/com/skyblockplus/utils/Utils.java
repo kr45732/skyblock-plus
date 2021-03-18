@@ -261,10 +261,6 @@ public class Utils {
         return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
     }
 
-    public static String skyblockStatsLink(String username, String profileName) {
-        return ("https://sky.shiiyu.moe/stats/" + username + "/" + profileName);
-    }
-
     public static ArrayList<String> getJsonKeys(JsonElement jsonElement) {
         return jsonElement.getAsJsonObject().entrySet().stream().map(Map.Entry::getKey)
                 .collect(Collectors.toCollection(ArrayList::new));

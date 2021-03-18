@@ -1,4 +1,4 @@
-package com.skyblockplus.verify;
+package com.skyblockplus.eventlisteners.verify;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;

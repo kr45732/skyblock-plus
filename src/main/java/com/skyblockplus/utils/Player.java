@@ -904,7 +904,6 @@ public class Player {
         emojiMap.put("pet_skin_sheep_neon_red", "<:pet_skin_sheep_neon_red:820521703620739084>");
         emojiMap.put("healing_tissue", "<:healing_tissue:820521703309312050>");
         emojiMap.put("diamond_chestplate", "<:diamond_chestplate:820521703246397490>");
-
         emojiMap.put("soul_string", "<:soul_string:820536394988257321>");
         emojiMap.put("dark_orb", "<:dark_orb:820536334945878036>");
         emojiMap.put("large_agronomy_sack", "<:large_agronomy_sack:820536335030157313>");
@@ -1165,8 +1164,12 @@ public class Player {
     }
 
     public EmbedBuilder defaultPlayerEmbed() {
-        return defaultEmbed(getUsername(),
+        return defaultEmbed(getUsername() + (higherDepth(outerProfileJson, "game_mode") != null ? "♻️" : ""),
                 skyblockStatsLink(getUsername(), getProfileName()));
+    }
+
+    public String skyblockStatsLink(String username, String profileName) {
+        return ("https://sky.shiiyu.moe/stats/" + username + "/" + profileName);
     }
 
     public List<String[]> getTalismanBag() {

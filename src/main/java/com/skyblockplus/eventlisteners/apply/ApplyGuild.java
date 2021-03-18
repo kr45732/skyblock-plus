@@ -1,4 +1,4 @@
-package com.skyblockplus.apply;
+package com.skyblockplus.eventlisteners.apply;
 
 import com.google.gson.JsonElement;
 import net.dv8tion.jda.api.entities.Message;
@@ -8,10 +8,11 @@ import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.skyblockplus.Main.getApplyGuildUsersCache;
 import static com.skyblockplus.utils.Utils.higherDepth;
 
 public class ApplyGuild {
-    private final List<ApplyUser> applyUserList = new ArrayList<>();
+    private List<ApplyUser> applyUserList = new ArrayList<>();
     private Message reactMessage;
     private JsonElement currentSettings;
     private boolean enable = true;
@@ -19,6 +20,7 @@ public class ApplyGuild {
     public ApplyGuild(Message reactMessage, JsonElement currentSettings) {
         this.reactMessage = reactMessage;
         this.currentSettings = currentSettings;
+        this.applyUserList = getApplyGuildUsersCache(reactMessage.getGuild().getId());
     }
 
     public ApplyGuild(boolean enable) {
@@ -27,6 +29,10 @@ public class ApplyGuild {
 
     public int applyUserListSize() {
         return applyUserList.size();
+    }
+
+    public List<ApplyUser> getApplyUserList() {
+        return applyUserList;
     }
 
     public void onMessageReactionAdd(MessageReactionAddEvent event) {
@@ -78,11 +84,11 @@ public class ApplyGuild {
 
     public void onTextChannelDelete(TextChannelDeleteEvent event) {
         applyUserList.removeIf(applyUser -> {
-            if (applyUser.getApplicationChannel().getId().equals(event.getChannel().getId())) {
+            if (applyUser.getApplicationChannelId().equals(event.getChannel().getId())) {
                 return true;
             } else {
                 try {
-                    if (applyUser.getStaffChannel().getId().equals(event.getChannel().getId())) {
+                    if (applyUser.getStaffChannelId().equals(event.getChannel().getId())) {
                         return true;
                     }
                 } catch (Exception ignored) {

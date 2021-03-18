@@ -1,4 +1,4 @@
-package com.skyblockplus.mainlistener;
+package com.skyblockplus.eventlisteners;
 
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.util.HashMap;
 import java.util.Map;
-
 
 public class MainListener extends ListenerAdapter {
     private static final Map<String, AutomaticGuild> guildMap = new HashMap<>();
@@ -35,11 +34,16 @@ public class MainListener extends ListenerAdapter {
         return reloadStatus;
     }
 
+    public static Map<String, AutomaticGuild> getGuildMap() {
+        return guildMap;
+    }
+
     @Override
     public void onGuildReady(GuildReadyEvent event) {
         if (event.getGuild().getName().startsWith("Skyblock Plus - Emoji Server")) {
             return;
         }
+
         if (isUniqueGuild(event.getGuild().getId())) {
             guildMap.put(event.getGuild().getId(), new AutomaticGuild(event));
         } else {

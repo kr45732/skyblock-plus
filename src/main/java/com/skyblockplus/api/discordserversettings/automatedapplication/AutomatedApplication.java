@@ -5,6 +5,7 @@ import lombok.Data;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.Lob;
 
 @Data
 @AllArgsConstructor
@@ -27,6 +28,9 @@ public class AutomatedApplication {
     private String staffPingRoleId = ""; // Role to ping when new application is sent to staff channel
 
     private String previousMessageId = "";
+
+    @Lob
+    private byte[] applyUsersCache = new byte[]{};
 
     public AutomatedApplication() {
     }

@@ -162,7 +162,6 @@ public class ServerSettingsService {
 
     }
 
-    //    @Transactional
     public ResponseEntity<HttpStatus> updateRoleSettings(String serverId, RoleModel newRoleSettings, String roleName) {
         if (serverByServerIdExists(serverId)) {
             ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
@@ -320,5 +319,24 @@ public class ServerSettingsService {
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
+    }
+
+    public ResponseEntity<?> getApplyUsersCache(String serverId) {
+        if (serverByServerIdExists(serverId)) {
+            return new ResponseEntity<>(settingsRepository.findServerByServerId(serverId).getAutomatedApplication().getApplyUsersCache(), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    public ResponseEntity<HttpStatus> updateApplyUsersCache(String serverId, byte[] newSettings) {
+        if (serverByServerIdExists(serverId)) {
+            ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+            AutomatedApplication automatedApplication = currentServerSettings.getAutomatedApplication();
+            automatedApplication.setApplyUsersCache(newSettings);
+            currentServerSettings.setAutomatedApplication(automatedApplication);
+            settingsRepository.save(currentServerSettings);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 }

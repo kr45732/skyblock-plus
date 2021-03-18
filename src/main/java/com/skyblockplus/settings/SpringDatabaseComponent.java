@@ -101,4 +101,12 @@ public class SpringDatabaseComponent {
     public int updateGuildRoleSettings(String serverId, JsonObject currentSettings) {
         return settingsService.updateGuildRoleSettings(serverId, gson.fromJson(currentSettings, GuildRole.class)).getStatusCodeValue();
     }
+
+    public int updateApplyCacheSettings(String serverId, byte[] currentSettings) {
+        return settingsService.updateApplyUsersCache(serverId, currentSettings).getStatusCodeValue();
+    }
+
+    public byte[] getApplyCacheSettings(String serverId) {
+        return (byte[]) settingsService.getApplyUsersCache(serverId).getBody();
+    }
 }

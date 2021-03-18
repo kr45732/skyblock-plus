@@ -42,21 +42,21 @@ public class SlayerCommands extends Command {
             EmbedBuilder eb = player.defaultPlayerEmbed();
             JsonElement slayer = higherDepth(player.getProfileJson(), "slayer_bosses");
 
-            int svenOneKills = higherDepth(higherDepth(slayer, "wolf"), "boss_kills_tier_0").getAsInt();
-            int svenTwoKills = higherDepth(higherDepth(slayer, "wolf"), "boss_kills_tier_1").getAsInt();
-            int svenThreeKills = higherDepth(higherDepth(slayer, "wolf"), "boss_kills_tier_2").getAsInt();
-            int svenFourKills = higherDepth(higherDepth(slayer, "wolf"), "boss_kills_tier_3").getAsInt();
+            int svenOneKills = higherDepth(higherDepth(slayer, "wolf"), "boss_kills_tier_0") != null ? higherDepth(higherDepth(slayer, "wolf"), "boss_kills_tier_0").getAsInt() : 0;
+            int svenTwoKills = higherDepth(higherDepth(slayer, "wolf"), "boss_kills_tier_1") != null ? higherDepth(higherDepth(slayer, "wolf"), "boss_kills_tier_1").getAsInt() : 0;
+            int svenThreeKills = higherDepth(higherDepth(slayer, "wolf"), "boss_kills_tier_2") != null ? higherDepth(higherDepth(slayer, "wolf"), "boss_kills_tier_2").getAsInt() : 0;
+            int svenFourKills = higherDepth(higherDepth(slayer, "wolf"), "boss_kills_tier_3") != null ? higherDepth(higherDepth(slayer, "wolf"), "boss_kills_tier_3").getAsInt() : 0;
 
-            int revOneKills = higherDepth(higherDepth(slayer, "zombie"), "boss_kills_tier_0").getAsInt();
-            int revTwoKills = higherDepth(higherDepth(slayer, "zombie"), "boss_kills_tier_1").getAsInt();
-            int revThreeKills = higherDepth(higherDepth(slayer, "zombie"), "boss_kills_tier_2").getAsInt();
-            int revFourKills = higherDepth(higherDepth(slayer, "zombie"), "boss_kills_tier_3").getAsInt();
-            int revFiveKills = higherDepth(higherDepth(slayer, "zombie"), "boss_kills_tier_4").getAsInt();
+            int revOneKills = higherDepth(higherDepth(slayer, "zombie"), "boss_kills_tier_0") != null ? higherDepth(higherDepth(slayer, "zombie"), "boss_kills_tier_0").getAsInt() : 0;
+            int revTwoKills = higherDepth(higherDepth(slayer, "zombie"), "boss_kills_tier_1") != null ? higherDepth(higherDepth(slayer, "zombie"), "boss_kills_tier_1").getAsInt() : 0;
+            int revThreeKills = higherDepth(higherDepth(slayer, "zombie"), "boss_kills_tier_2") != null ? higherDepth(higherDepth(slayer, "zombie"), "boss_kills_tier_2").getAsInt() : 0;
+            int revFourKills = higherDepth(higherDepth(slayer, "zombie"), "boss_kills_tier_3") != null ? higherDepth(higherDepth(slayer, "zombie"), "boss_kills_tier_3").getAsInt() : 0;
+            int revFiveKills = higherDepth(higherDepth(slayer, "zombie"), "boss_kills_tier_4") != null ? higherDepth(higherDepth(slayer, "zombie"), "boss_kills_tier_4").getAsInt() : 0;
 
-            int taraOneKills = higherDepth(higherDepth(slayer, "spider"), "boss_kills_tier_0").getAsInt();
-            int taraTwoKills = higherDepth(higherDepth(slayer, "spider"), "boss_kills_tier_1").getAsInt();
-            int taraThreeKills = higherDepth(higherDepth(slayer, "spider"), "boss_kills_tier_2").getAsInt();
-            int taraFourKills = higherDepth(higherDepth(slayer, "spider"), "boss_kills_tier_3").getAsInt();
+            int taraOneKills = higherDepth(higherDepth(slayer, "spider"), "boss_kills_tier_0") != null ? higherDepth(higherDepth(slayer, "spider"), "boss_kills_tier_0").getAsInt() : 0;
+            int taraTwoKills = higherDepth(higherDepth(slayer, "spider"), "boss_kills_tier_1") != null ? higherDepth(higherDepth(slayer, "spider"), "boss_kills_tier_1").getAsInt() : 0;
+            int taraThreeKills = higherDepth(higherDepth(slayer, "spider"), "boss_kills_tier_2") != null ? higherDepth(higherDepth(slayer, "spider"), "boss_kills_tier_2").getAsInt() : 0;
+            int taraFourKills = higherDepth(higherDepth(slayer, "spider"), "boss_kills_tier_3") != null ? higherDepth(higherDepth(slayer, "spider"), "boss_kills_tier_3").getAsInt() : 0;
 
             String svenKills =
                     "**Tier 1:** " + svenOneKills
@@ -89,7 +89,6 @@ public class SlayerCommands extends Command {
             eb.addField("Boss Kills", taraKills, true);
 
             eb.setThumbnail(player.getThumbnailUrl());
-
             return eb;
         }
         return defaultEmbed("Unable to fetch player data");

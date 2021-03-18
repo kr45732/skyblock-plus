@@ -6,8 +6,8 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 
-import static com.skyblockplus.mainlistener.MainListener.onApplyReload;
-import static com.skyblockplus.mainlistener.MainListener.onVerifyReload;
+import static com.skyblockplus.eventlisteners.MainListener.onApplyReload;
+import static com.skyblockplus.eventlisteners.MainListener.onVerifyReload;
 import static com.skyblockplus.utils.Utils.*;
 
 public class ReloadCommand extends Command {

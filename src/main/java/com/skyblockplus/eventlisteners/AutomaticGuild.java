@@ -1,10 +1,10 @@
-package com.skyblockplus.mainlistener;
+package com.skyblockplus.eventlisteners;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.skyblockplus.apply.ApplyGuild;
-import com.skyblockplus.verify.VerifyGuild;
+import com.skyblockplus.eventlisteners.apply.ApplyGuild;
+import com.skyblockplus.eventlisteners.verify.VerifyGuild;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -38,7 +38,11 @@ public class AutomaticGuild {
         guildId = event.getGuild().getId();
     }
 
-    private void guildRoleConstructor() {
+    public ApplyGuild getApplyGuild() {
+        return applyGuild;
+    }
+
+    public void guildRoleConstructor() {
         Runnable channelDeleter = this::updateGuildRoles;
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         int randomDelay = (int) (Math.random() * 360);
