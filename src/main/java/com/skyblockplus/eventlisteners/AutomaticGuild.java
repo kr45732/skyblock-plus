@@ -104,6 +104,10 @@ public class AutomaticGuild {
         }
 
         try {
+            if(higherDepth(currentSettings, "enable") == null || (higherDepth(currentSettings, "enable") != null && !higherDepth(currentSettings, "enable").getAsBoolean())){
+                return;
+            }
+
             if (higherDepth(currentSettings, "enable").getAsBoolean()) {
                 TextChannel reactChannel = event.getGuild()
                         .getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
@@ -142,6 +146,10 @@ public class AutomaticGuild {
         }
 
         try {
+            if(higherDepth(currentSettings, "enable") == null || (higherDepth(currentSettings, "enable") != null && !higherDepth(currentSettings, "enable").getAsBoolean())){
+                return;
+            }
+
             if (higherDepth(currentSettings, "enable").getAsBoolean()) {
                 TextChannel reactChannel = event.getGuild()
                         .getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
