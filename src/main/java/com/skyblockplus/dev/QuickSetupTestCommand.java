@@ -34,13 +34,25 @@ public class QuickSetupTestCommand extends Command {
             if (args[1].equals("roles")) {
                 ebMessage.editMessage(setRoleSettings(args[2], args[3]).build()).queue();
                 return;
-            } else if (args[1].equals("delete") && args[2].equals("server")) {
-                ebMessage.editMessage(deleteServer(args[3]).build()).queue();
-                return;
+            } else if (args[1].equals("delete")){
+                if(args[2].equals("server")){
+                    ebMessage.editMessage(deleteServer(args[3]).build()).queue();
+                    return;
+                }else if(args[2].equals("apply_cache")){
+                    ebMessage.editMessage(deleteServerApplyCache(args[3]).build()).queue();
+                    return;
+                }
             }
         }
 
         ebMessage.editMessage(defaultEmbed("Invalid input").build()).queue();
+    }
+
+    private EmbedBuilder deleteServerApplyCache(String serverId) {
+        if (database.getServerSettings(serverId) != null) {
+            return defaultEmbed("API returned response code " + database.deleteApplyCacheSettings(serverId));
+        }
+        return defaultEmbed("Error updating settings");
     }
 
     private EmbedBuilder deleteServer(String serverId) {

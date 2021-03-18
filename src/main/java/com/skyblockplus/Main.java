@@ -96,24 +96,31 @@ public class Main {
     }
 
     public static void cacheApplyGuildUsers() {
+        if(!BOT_PREFIX.equals("+")){
+            return;
+        }
+
         try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
             for (Map.Entry<String, AutomaticGuild> automaticGuild : getGuildMap().entrySet()) {
-                database.updateApplyCacheSettings(automaticGuild.getKey(), new byte[]{});
-                if (automaticGuild.getValue().getApplyGuild().getApplyUserList().size() != 0) {
-                    objectOutputStream.writeObject(automaticGuild.getValue().getApplyGuild().getApplyUserList());
-                    database.updateApplyCacheSettings(automaticGuild.getKey(), byteArrayOutputStream.toByteArray());
-                    logCommand(jda.getGuildById(automaticGuild.getKey()), "Cached " + automaticGuild.getValue().getApplyGuild().getApplyUserList().size() + " ApplyUser(s)");
-                    objectOutputStream.reset();
-                    byteArrayOutputStream.reset();
+                try {
+                    database.updateApplyCacheSettings(automaticGuild.getKey(), new byte[]{});
+                    if (automaticGuild.getValue().getApplyGuild().getApplyUserList().size() != 0) {
+                        objectOutputStream.writeObject(automaticGuild.getValue().getApplyGuild().getApplyUserList());
+                        database.updateApplyCacheSettings(automaticGuild.getKey(), byteArrayOutputStream.toByteArray());
+                        logCommand(jda.getGuildById(automaticGuild.getKey()), "Cached " + automaticGuild.getValue().getApplyGuild().getApplyUserList().size() + " ApplyUser(s)");
+                        objectOutputStream.reset();
+                        byteArrayOutputStream.reset();
+                    }
+                }catch (Exception ignored){
+                    logCommand(jda.getGuildById(automaticGuild.getKey()), "Cache error");
                 }
             }
             objectOutputStream.close();
         } catch (Exception e) {
             System.out.println("== Stack Trace ==");
             e.printStackTrace();
-
         }
     }
 

@@ -272,7 +272,7 @@ public class PlayerCustom implements Serializable {
     }
 
     public EmbedBuilder defaultPlayerEmbed() {
-        return defaultEmbed(getUsername() + (higherDepth(JsonParser.parseString(outerProfileJsonString), "game_mode") != null ? "♻️" : ""),
+        return defaultEmbed(getUsername() + (higherDepth(JsonParser.parseString(outerProfileJsonString), "game_mode") != null ? " ♻️" : ""),
                 skyblockStatsLink(getUsername(), getProfileName()));
     }
 

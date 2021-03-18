@@ -42,7 +42,7 @@ public class EssenceCommand extends Command {
             }
             return;
         } else if (args.length >= 3 && (args[1].equals("info") || args[1].equals("information"))) {
-            String itemName = content.split(" ", 3)[2].replace(" ", "_").toUpperCase();
+            String itemName = content.split(" ", 3)[2];
 
             eb = getEssenceInformation(itemName, essenceCostsJson);
             if (eb == null) {
@@ -56,8 +56,66 @@ public class EssenceCommand extends Command {
     }
 
     private EmbedBuilder getEssenceInformation(String itemName, JsonElement essenceCostsJson) {
-        JsonElement itemJson = higherDepth(essenceCostsJson, itemName);
-        EmbedBuilder eb = defaultEmbed("Essence information for " + itemName.toLowerCase().replace("_", " "));
+        String preFormattedItem = itemName.replace("'s", "").replace(" ", "_").toUpperCase();
+        switch (preFormattedItem) {
+            case "NECRON_HELMET":
+                preFormattedItem = "POWER_WITHER_HELMET";
+                break;
+            case "NECRON_CHESTPLATE":
+                preFormattedItem = "POWER_WITHER_CHESTPLATE";
+                break;
+            case "NECRON_LEGGINGS":
+                preFormattedItem = "POWER_WITHER_LEGGINGS";
+                break;
+            case "NECRON_BOOTS":
+                preFormattedItem = "POWER_WITHER_BOOTS";
+                break;
+            case "STORM_HELMET":
+                preFormattedItem = "WISE_WITHER_HELMET";
+                break;
+            case "STORM_CHESTPLATE":
+                preFormattedItem = "WISE_WITHER_CHESTPLATE";
+                break;
+            case "STORM_LEGGINGS":
+                preFormattedItem = "WISE_WITHER_LEGGINGS";
+                break;
+            case "STORM_BOOTS":
+                preFormattedItem = "WISE_WITHER_BOOTS";
+                break;
+            case "MAXOR_HELMET":
+                preFormattedItem = "SPEED_WITHER_HELMET";
+                break;
+            case "MAXOR_CHESTPLATE":
+                preFormattedItem = "SPEED_WITHER_CHESTPLATE";
+                break;
+            case "MAXOR_LEGGINGS":
+                preFormattedItem = "SPEED_WITHER_LEGGINGS";
+                break;
+            case "MAXOR_BOOTS":
+                preFormattedItem = "SPEED_WITHER_BOOTS";
+                break;
+            case "GOLDOR_HELMET":
+                preFormattedItem = "TANK_WITHER_HELMET";
+                break;
+            case "GOLDOR_CHESTPLATE":
+                preFormattedItem = "TANK_WITHER_CHESTPLATE";
+                break;
+            case "GOLDOR_LEGGINGS":
+                preFormattedItem = "TANK_WITHER_LEGGINGS";
+                break;
+            case "GOLDOR_BOOTS":
+                preFormattedItem = "TANK_WITHER_BOOTS";
+                break;
+            case "BONEMERANG":
+                preFormattedItem = "BONE_BOOMERANG";
+                break;
+            case "SPIRIT_SCEPTRE":
+                preFormattedItem = "BAT_WAND";
+                break;
+        }
+
+        JsonElement itemJson = higherDepth(essenceCostsJson, preFormattedItem);
+        EmbedBuilder eb = defaultEmbed("Essence information for " + itemName);
         if (itemJson != null) {
             String essenceType = higherDepth(itemJson, "type").getAsString().toLowerCase(Locale.ROOT);
             for (String level : getJsonKeys(itemJson)) {
@@ -79,7 +137,7 @@ public class EssenceCommand extends Command {
                         break;
                 }
             }
-            eb.setThumbnail("https://sky.lea.moe/item.gif/" + itemName);
+            eb.setThumbnail("https://sky.lea.moe/item.gif/" + preFormattedItem);
             return eb;
         }
         return null;

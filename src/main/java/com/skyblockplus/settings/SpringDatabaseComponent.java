@@ -109,4 +109,8 @@ public class SpringDatabaseComponent {
     public byte[] getApplyCacheSettings(String serverId) {
         return (byte[]) settingsService.getApplyUsersCache(serverId).getBody();
     }
+
+    public int deleteApplyCacheSettings(String serverId) {
+        return settingsService.updateApplyUsersCache(serverId, new byte[]{}).getStatusCodeValue();
+    }
 }
