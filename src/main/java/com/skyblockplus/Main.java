@@ -39,10 +39,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import javax.annotation.PreDestroy;
 import javax.security.auth.login.LoginException;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -96,9 +93,9 @@ public class Main {
     }
 
     public static void cacheApplyGuildUsers() {
-        if(!BOT_PREFIX.equals("+")){
-            return;
-        }
+//        if(!BOT_PREFIX.equals("+")){
+//            return;
+//        }
 
         try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -109,12 +106,12 @@ public class Main {
                     if (automaticGuild.getValue().getApplyGuild().getApplyUserList().size() != 0) {
                         objectOutputStream.writeObject(automaticGuild.getValue().getApplyGuild().getApplyUserList());
                         database.updateApplyCacheSettings(automaticGuild.getKey(), byteArrayOutputStream.toByteArray());
-                        logCommand(jda.getGuildById(automaticGuild.getKey()), "Cached " + automaticGuild.getValue().getApplyGuild().getApplyUserList().size() + " ApplyUser(s)");
+                        System.out.println("Cached " + automaticGuild.getKey() + " ApplyUser (" + automaticGuild.getValue().getApplyGuild().getApplyUserList().size() + ")");
                         objectOutputStream.reset();
                         byteArrayOutputStream.reset();
                     }
-                }catch (Exception ignored){
-                    logCommand(jda.getGuildById(automaticGuild.getKey()), "Cache error");
+                } catch (Exception e) {
+                    System.out.println("Cache error " + automaticGuild.getKey());
                 }
             }
             objectOutputStream.close();
@@ -139,9 +136,12 @@ public class Main {
                 }
             }
             objectInputStream.close();
+            System.out.println("Retrieved cached " + guildId + " ApplyUser (" + guildApplyUsers.size() + ")");
             return guildApplyUsers;
+        }catch (EOFException ignored){
+            return new ArrayList<>();
         } catch (Exception e) {
-            System.out.println("== Stack Trace ==");
+            System.out.println("== Stack Trace (" + guildId + ") ==");
             e.printStackTrace();
             return new ArrayList<>();
         }
