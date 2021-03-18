@@ -139,12 +139,11 @@ public class Main {
             System.out.println("Retrieved cached " + guildId + " ApplyUser (" + guildApplyUsers.size() + ")");
             return guildApplyUsers;
         }catch (EOFException ignored){
-            return new ArrayList<>();
         } catch (Exception e) {
             System.out.println("== Stack Trace (" + guildId + ") ==");
             e.printStackTrace();
-            return new ArrayList<>();
         }
+        return new ArrayList<>();
     }
 
     @PreDestroy

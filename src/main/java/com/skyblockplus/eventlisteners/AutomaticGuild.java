@@ -130,7 +130,8 @@ public class AutomaticGuild {
                 verifyGuild = new VerifyGuild(reactChannel, reactMessage);
             }
         } catch (Exception e) {
-            System.out.println("Verify constructor error");
+            System.out.println("== Stack Trace (Verify constructor error) ==");
+            e.printStackTrace();
         }
     }
 
@@ -168,7 +169,8 @@ public class AutomaticGuild {
                 applyGuild = new ApplyGuild(reactMessage, currentSettings);
             }
         } catch (Exception e) {
-            System.out.println("Apply constructor error");
+            System.out.println("== Stack Trace (Apply constructor error) ==");
+            e.printStackTrace();
         }
     }
 
@@ -216,7 +218,8 @@ public class AutomaticGuild {
                 return "Not enabled";
             }
         } catch (Exception e) {
-            System.out.println("Reload apply constructor error");
+            System.out.println("== Stack Trace (Reload apply constructor error) ==");
+            e.printStackTrace();
         }
         return "Error Reloading";
     }
@@ -264,7 +267,8 @@ public class AutomaticGuild {
                 return "Not enabled";
             }
         } catch (Exception e) {
-            System.out.println("Reload verify constructor error");
+            System.out.println("== Stack Trace (Reload verify constructor error) ==");
+            e.printStackTrace();
         }
         return "Error Reloading";
     }
