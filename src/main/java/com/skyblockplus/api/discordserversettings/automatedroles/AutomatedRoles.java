@@ -71,6 +71,12 @@ public class AutomatedRoles {
     @Embedded
     private RoleModel doom_slayer = new RoleModel();
 
+    @Embedded
+    private RoleModel all_slayer_nine = new RoleModel();
+
+    @Embedded
+    private RoleModel skill_average = new RoleModel();
+
     public AutomatedRoles() {
     }
 }

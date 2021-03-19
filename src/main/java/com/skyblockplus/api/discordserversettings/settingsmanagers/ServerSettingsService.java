@@ -144,7 +144,10 @@ public class ServerSettingsService {
                     return new ResponseEntity<>(currentRoleSettings.getPet_enthusiast(), HttpStatus.OK);
                 case "doom_slayer":
                     return new ResponseEntity<>(currentRoleSettings.getDoom_slayer(), HttpStatus.OK);
-
+                case "all_slayer_nine":
+                    return new ResponseEntity<>(currentRoleSettings.getAll_slayer_nine(), HttpStatus.OK);
+                case "skill_average":
+                    return new ResponseEntity<>(currentRoleSettings.getSkill_average(), HttpStatus.OK);
             }
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -222,6 +225,12 @@ public class ServerSettingsService {
                     break;
                 case "doom_slayer":
                     currentRoleSettings.setDoom_slayer(newRoleSettings);
+                    break;
+                case "all_slayer_nine":
+                    currentRoleSettings.setAll_slayer_nine(newRoleSettings);
+                    break;
+                case "skill_average":
+                    currentRoleSettings.setSkill_average(newRoleSettings);
                     break;
             }
             currentServerSettings.setAutomatedRoles(currentRoleSettings);

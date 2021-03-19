@@ -269,6 +269,7 @@ public class SettingsCommand extends Command {
         ebMessage.editMessage(eb.build()).queue();
     }
 
+    /* Guild Role Settings */
     private EmbedBuilder setGuildRoleEnable(String enable) {
         JsonObject currentSettings = database.getGuildRoleSettings(event.getGuild().getId()).getAsJsonObject();
         if ((higherDepth(currentSettings, "guildId") == null) || (higherDepth(currentSettings, "roleId") == null)) {
@@ -359,8 +360,13 @@ public class SettingsCommand extends Command {
 
         ArrayList<String> roleNames = getJsonKeys(rolesSettings);
 
+        String pageNumbers = "";
+        for(int i=1; i<roleNames.size(); i++){
+            pageNumbers += "\n**Page " + (i+1) + ":** " + roleNames.get(i);
+        }
+
         paginateBuilder.addItems("**Automated Roles "
-                + (higherDepth(rolesSettings, "enable").getAsString().equals("true") ? "Enabled" : "Disabled") + "**");
+                + (higherDepth(rolesSettings, "enable").getAsString().equals("true") ? "Enabled" : "Disabled") + "**" + pageNumbers);
         roleNames.remove("enable");
         for (String roleName : roleNames) {
             JsonElement currentRoleSettings = higherDepth(rolesSettings, roleName);
@@ -406,6 +412,7 @@ public class SettingsCommand extends Command {
                 case "mining":
                 case "taming":
                 case "enchanting":
+                case "skill_average":
                 case "catacombs": {
                     ebFieldString.append("**A player's ").append(roleName).append(" level**\nExample: `").append(BOT_PREFIX).append("settings roles add ").append(roleName).append(" 30 @").append(roleName).append(" 30`\n");
                     break;
@@ -426,13 +433,17 @@ public class SettingsCommand extends Command {
                     ebFieldString.append("**Having at least one level nine slayer**\nExample: `").append(BOT_PREFIX).append("settings roles set doom_slayer @level nine slayer`\n");
                     break;
                 }
+                case "all_slayer_nine":{
+                    ebFieldString.append("**Having all level nine slayers**\nExample: `").append(BOT_PREFIX).append("settings roles set all_slayer_nine @role`\n");
+                    break;
+                }
             }
 
             ebFieldString.append("\nCurrent Settings:\n");
 
             ebFieldString.append(higherDepth(currentRoleSettings, "enable").getAsString().equals("true") ? "• Enabled"
                     : "• Disabled");
-            if (roleName.equals("doom_slayer") || roleName.equals("pet_enthusiast")) {
+            if (isOneLevelRole(roleName)) {
                 try {
                     ebFieldString.append("\n• default - ").append(event.getGuild().getRoleById(higherDepth(higherDepth(currentRoleSettings, "levels").getAsJsonArray().get(0), "roleId").getAsString()).getAsMention());
                 } catch (Exception ignored) {
@@ -527,9 +538,9 @@ public class SettingsCommand extends Command {
         return eb;
     }
 
-    private EmbedBuilder addRoleLevel(String roleType, String roleValue, String roleMention) {
+    private EmbedBuilder addRoleLevel(String roleName, String roleValue, String roleMention) {
         String guildName = "";
-        if (roleType.equals("guild_member")) {
+        if (roleName.equals("guild_member")) {
             try {
                 JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&name=" + roleValue.replace("_", "%20"));
                 roleValue = higherDepth(higherDepth(guildJson, "guild"), "_id").getAsString();
@@ -537,7 +548,7 @@ public class SettingsCommand extends Command {
             } catch (Exception e) {
                 return defaultEmbed("Error", null).setDescription("Invalid username");
             }
-        } else if (roleType.equals("pet_enthusiast") || roleType.equals("doom_slayer")) {
+        } else if (isOneLevelRole(roleName)) {
             return defaultEmbed("These roles do not support levels. Use `" + BOT_PREFIX + "settings roles set [roleName] [@role]` instead");
         } else {
             try {
@@ -557,7 +568,7 @@ public class SettingsCommand extends Command {
         }
         JsonObject newRoleSettings;
         try {
-            newRoleSettings = database.getRoleSettings(event.getGuild().getId(), roleType)
+            newRoleSettings = database.getRoleSettings(event.getGuild().getId(), roleName)
                     .getAsJsonObject();
         } catch (Exception e) {
             return defaultEmbed("Error", null).setDescription("Invalid role");
@@ -586,23 +597,23 @@ public class SettingsCommand extends Command {
         newRoleSettings.remove("levels");
         newRoleSettings.add("levels", currentLevels);
 
-        int responseCode = database.updateRoleSettings(event.getGuild().getId(), roleType,
+        int responseCode = database.updateRoleSettings(event.getGuild().getId(), roleName,
                 newRoleSettings);
 
         if (responseCode != 200) {
             return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
         }
 
-        if (roleType.equals("guild_member")) {
+        if (roleName.equals("guild_member")) {
             roleValue = guildName;
         }
 
         return defaultEmbed("Settings for " + event.getGuild().getName(), null)
-                .setDescription(roleType + " " + roleValue + " set to " + role.getAsMention());
+                .setDescription(roleName + " " + roleValue + " set to " + role.getAsMention());
     }
 
     private EmbedBuilder removeRoleLevel(String roleName, String value) {
-        if (roleName.equals("pet_enthusiast") || roleName.equals("doom_slayer")) {
+        if (isOneLevelRole(roleName)) {
             return defaultEmbed("These roles do not support levels. Use `" + BOT_PREFIX + "settings roles set [roleName] [@role]` instead");
         }
 
@@ -650,7 +661,7 @@ public class SettingsCommand extends Command {
     }
 
     private EmbedBuilder setRoleStackable(String roleName, String stackable) {
-        if (roleName.equals("pet_enthusiast") || roleName.equals("doom_slayer")) {
+        if (isOneLevelRole(roleName)) {
             return defaultEmbed("Error").setDescription("This role does not support stacking");
         }
 
@@ -670,7 +681,7 @@ public class SettingsCommand extends Command {
     }
 
     private EmbedBuilder setOneLevelRole(String roleName, String roleMention) {
-        if (!roleName.equals("pet_enthusiast") && !roleName.equals("doom_slayer")) {
+        if (!isOneLevelRole(roleName)) {
             return defaultEmbed("Error").setDescription("This role does is not a one level role. Use `" + BOT_PREFIX + "settings roles add [roleName] [value] [@role]` instead");
         }
 
@@ -712,6 +723,10 @@ public class SettingsCommand extends Command {
 
         return defaultEmbed("Settings for " + event.getGuild().getName(), null)
                 .setDescription(roleName + " set to " + role.getAsMention());
+    }
+
+    private boolean isOneLevelRole(String roleName){
+        return (roleName.equals("pet_enthusiast") || roleName.equals("doom_slayer") || roleName.equals("all_slayer_nine"));
     }
 
     /* Verify Settings */

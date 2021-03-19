@@ -137,6 +137,7 @@ public class RoleCommands extends Command {
                             case "enchanting":
                             case "catacombs":
                             case "fairy_souls":
+                            case "skill_average":
                             case "slot_collector": {
                                 double roleAmount = -1;
                                 switch (currentRoleName) {
@@ -153,6 +154,13 @@ public class RoleCommands extends Command {
                                             continue;
                                         }
                                         break;
+                                    }
+                                    case "skill_average":{
+                                        roleAmount = player.getSkillAverage();
+                                        if (roleAmount == -1 && !errorRoles.toString().contains("Skills")) {
+                                            errorRoles.append(roleChangeString("Skills API disabled"));
+                                            continue;
+                                        }
                                     }
                                     case "alchemy":
                                     case "combat":
@@ -235,7 +243,7 @@ public class RoleCommands extends Command {
                                                 addedRoles.append(roleChangeString(currentLevelRole.getName()));
                                             }
 
-                                            for (int j = i - 2; j >= 0; j--) {
+                                            for (int j = i - 1; j >= 0; j--) {
                                                 JsonElement currentLevelRemoveStackable = levelsArray.get(j);
                                                 Role currentLevelRoleRemoveStackable = event.getGuild().getRoleById(higherDepth(currentLevelRemoveStackable, "roleId").getAsString());
 
@@ -251,23 +259,33 @@ public class RoleCommands extends Command {
                                 }
                             }
                             case "doom_slayer": {
-                                int[] curSlayer = new int[]{player.getWolfXp(), player.getZombieXp(),
-                                        player.getSpiderXp()};
                                 Role curRole = guild.getRoleById(higherDepth(higherDepth(currentRole, "levels").getAsJsonArray().get(0), "roleId").getAsString());
-                                boolean shouldHaveDoomSlayer = false;
-                                for (int curType : curSlayer) {
-                                    if (curType >= 1000000) {
-                                        shouldHaveDoomSlayer = true;
-                                        if (!guild.getMember(user).getRoles().contains(curRole)) {
-                                            guild.addRoleToMember(guild.getMember(user), curRole).queue();
-                                            addedRoles.append(roleChangeString(curRole.getName()));
-                                            break;
-                                        }
+
+                                if((player.getWolfXp() >= 1000000) || (player.getZombieXp() >= 1000000) || (player.getSpiderXp() >= 1000000)){
+                                    if (!guild.getMember(user).getRoles().contains(curRole)) {
+                                        guild.addRoleToMember(guild.getMember(user), curRole).queue();
+                                        addedRoles.append(roleChangeString(curRole.getName()));
+                                    }
+                                }else{
+                                    if (guild.getMember(user).getRoles().contains(curRole)) {
+                                        removedRoles.append(roleChangeString(curRole.getName()));
+                                        guild.removeRoleFromMember(guild.getMember(user), curRole).queue();
                                     }
                                 }
-                                if (guild.getMember(user).getRoles().contains(curRole) && !shouldHaveDoomSlayer) {
-                                    removedRoles.append(roleChangeString(curRole.getName()));
-                                    guild.removeRoleFromMember(guild.getMember(user), curRole).queue();
+                                break;
+                            } case "all_slayer_nine":{
+                                Role curRole = guild.getRoleById(higherDepth(higherDepth(currentRole, "levels").getAsJsonArray().get(0), "roleId").getAsString());
+
+                                if((player.getWolfXp() >= 1000000) && (player.getZombieXp() >= 1000000) && (player.getSpiderXp() >= 1000000)){
+                                    if (!guild.getMember(user).getRoles().contains(curRole)) {
+                                        guild.addRoleToMember(guild.getMember(user), curRole).queue();
+                                        addedRoles.append(roleChangeString(curRole.getName()));
+                                    }
+                                }else{
+                                    if (guild.getMember(user).getRoles().contains(curRole)) {
+                                        removedRoles.append(roleChangeString(curRole.getName()));
+                                        guild.removeRoleFromMember(guild.getMember(user), curRole).queue();
+                                    }
                                 }
                                 break;
                             }

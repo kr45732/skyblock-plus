@@ -204,7 +204,8 @@ public class Player {
                 double skillExp = higherDepth(profileJson, "experience_skill_" + skill).getAsDouble();
                 SkillsStruct skillInfo = skillInfoFromExp(skillExp, skill);
                 progressSA += skillInfo.skillLevel + skillInfo.progressToNext;
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                return -1;
             }
         }
         progressSA /= skills.size();
