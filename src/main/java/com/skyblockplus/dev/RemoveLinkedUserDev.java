@@ -23,8 +23,8 @@ public class RemoveLinkedUserDev extends Command {
 
         logCommand(event.getGuild(), event.getAuthor(), content);
 
-        if (args.length == 3) {
-            ebMessage.editMessage(unlinkAccount(args[1], args[2]).build()).queue();
+        if (args.length == 2) {
+            ebMessage.editMessage(unlinkAccount(args[1]).build()).queue();
             return;
         }
 
@@ -32,7 +32,7 @@ public class RemoveLinkedUserDev extends Command {
     }
 
 
-    private EmbedBuilder unlinkAccount(String guildId, String discordId) {
+    private EmbedBuilder unlinkAccount(String discordId) {
         database.deleteLinkedUserByDiscordId(discordId);
         return defaultEmbed("Done");
     }

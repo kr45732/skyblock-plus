@@ -56,22 +56,6 @@ public class SpringDatabaseComponent {
         return gson.toJsonTree(linkedAccountService.getAllLinkedAccounts());
     }
 
-//    public int addLinkedUser(String serverId, LinkedAccount newUser) {
-//        return settingsService.addLinkedUser(serverId, newUser).getStatusCodeValue();
-//    }
-//
-//    public JsonElement getLinkedUser(String serverId, String discordId) {
-//        return gson.toJsonTree(settingsService.getLinkedUser(serverId, discordId).getBody());
-//    }
-//
-//    public int removeLinkedUser(String serverId, String discordId) {
-//        return settingsService.removeLinkedUser(serverId, discordId).getStatusCodeValue();
-//    }
-//
-//    public JsonElement getLinkedUsers(String serverId) {
-//        return gson.toJsonTree(settingsService.getLinkedAccounts(serverId).getBody());
-//    }
-
     public List<ServerSettingsModel> getAllServerSettings() {
         return settingsService.getAllServerSettings();
     }

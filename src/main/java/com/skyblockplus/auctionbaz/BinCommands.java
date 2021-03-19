@@ -39,8 +39,25 @@ public class BinCommands extends Command {
     }
 
     private EmbedBuilder getLowestBin(String item) {
+        JsonElement lowestBinJson = getJson("https://moulberry.codes/lowestbin.json");
+        if (higherDepth(lowestBinJson, item) != null) {
+            EmbedBuilder eb = defaultEmbed("Lowest bin");
+            eb.addField(capitalizeString(item.toLowerCase()),
+                    formatNumber(higherDepth(lowestBinJson, item).getAsLong()), false);
+            eb.setThumbnail("https://sky.lea.moe/item.gif/" + item);
+            return eb;
+        }
+
         String preFormattedItem = item.trim().toUpperCase().replace(" ", "_").replace("'S", "")
                 .replace("FRAG", "FRAGMENT").replace(".", "");
+
+        if (higherDepth(lowestBinJson, preFormattedItem) != null) {
+            EmbedBuilder eb = defaultEmbed("Lowest bin");
+            eb.addField(capitalizeString(item.toLowerCase()),
+                    formatNumber(higherDepth(lowestBinJson, preFormattedItem).getAsLong()), false);
+            eb.setThumbnail("https://sky.lea.moe/item.gif/" + preFormattedItem);
+            return eb;
+        }
 
         JsonElement petJson = getJson(
                 "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/petnums.json");
@@ -124,7 +141,6 @@ public class BinCommands extends Command {
             preFormattedItem = "PET_SKIN_" + preFormattedItem.replace("PET_SKIN", "");
         }
 
-        JsonElement lowestBinJson = getJson("https://moulberry.codes/lowestbin.json");
         if (higherDepth(lowestBinJson, preFormattedItem) != null) {
             EmbedBuilder eb = defaultEmbed("Lowest bin");
             eb.addField(capitalizeString(item.toLowerCase()),
