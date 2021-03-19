@@ -33,6 +33,7 @@ public class RemoveLinkedUserDev extends Command {
 
 
     private EmbedBuilder unlinkAccount(String guildId, String discordId) {
-        return defaultEmbed("API returned response code " + database.removeLinkedUser(guildId, discordId));
+        database.deleteLinkedUserByDiscordId(discordId);
+        return defaultEmbed("Done");
     }
 }
