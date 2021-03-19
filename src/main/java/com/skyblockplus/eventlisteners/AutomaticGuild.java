@@ -121,7 +121,7 @@ public class AutomaticGuild {
                 }
 
                 Message reactMessage = reactChannel.sendMessage(higherDepth(currentSettings, "messageText").getAsString())
-                        .addFile(new File("src/main/java/com/skyblockplus/verify/Link_Discord_To_Hypixel.mp4"))
+                        .addFile(new File("src/main/java/com/skyblockplus/eventlisteners/verify/Link_Discord_To_Hypixel.mp4"))
                         .complete();
 
                 JsonObject newSettings = currentSettings.getAsJsonObject();
