@@ -75,10 +75,8 @@ public class AutomaticGuild {
             }
 
             JsonArray linkedUsers = database.getLinkedUsers().getAsJsonArray();
-
             for (JsonElement linkedUser : linkedUsers) {
                 if (guild.getMemberById(higherDepth(linkedUser, "discordId").getAsString()) == null) {
-                    database.deleteLinkedUserByDiscordId(higherDepth(linkedUser, "discordId").getAsString());
                     continue;
                 }
 
