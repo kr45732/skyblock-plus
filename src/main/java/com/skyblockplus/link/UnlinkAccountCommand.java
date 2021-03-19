@@ -30,10 +30,7 @@ public class UnlinkAccountCommand extends Command {
 
 
     private EmbedBuilder unlinkAccount() {
-        if (database.removeLinkedUser(event.getGuild().getId(), event.getAuthor().getId()) == 200) {
-            return defaultEmbed("Success").setDescription("You were unlinked");
-        } else {
-            return defaultEmbed("Error unlinking");
-        }
+        database.deleteLinkedUserByDiscordId(event.getAuthor().getId());
+        return defaultEmbed("Success").setDescription("You were unlinked");
     }
 }

@@ -2,6 +2,7 @@ package com.skyblockplus.api.discordserversettings.automatedroles;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
@@ -9,6 +10,7 @@ import javax.persistence.Embedded;
 @Data
 @AllArgsConstructor
 @Embeddable
+@Transactional
 public class AutomatedRoles {
     private String enable = "false";
 

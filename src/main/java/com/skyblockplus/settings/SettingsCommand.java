@@ -926,6 +926,7 @@ public class SettingsCommand extends Command {
         try {
             TextChannel applyMessageTextChannel = event.getGuild()
                     .getTextChannelById(textChannel.replaceAll("[<#>]", ""));
+
             int responseCode = updateApplySettings("messageTextChannelId", applyMessageTextChannel.getId());
             if (responseCode != 200) {
                 return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);

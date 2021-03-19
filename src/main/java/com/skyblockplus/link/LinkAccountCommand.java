@@ -3,12 +3,14 @@ package com.skyblockplus.link;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.api.discordserversettings.linkedaccounts.LinkedAccount;
+import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
+
+import java.time.Instant;
 
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.utils.Utils.*;
@@ -31,9 +33,9 @@ public class LinkAccountCommand extends Command {
                 return eb;
             }
 
-            LinkedAccount toAdd = new LinkedAccount(user.getId(), playerInfo[2]);
+            LinkedAccountModel toAdd = new LinkedAccountModel("" + Instant.now().toEpochMilli(), user.getId(), playerInfo[2], playerInfo[1]);
 
-            if (database.addLinkedUser(guild.getId(), toAdd) == 200) {
+            if (database.addLinkedUser(toAdd) == 200) {
 
                 try {
                     if (!higherDepth(database.getVerifySettings(guild.getId()), "verifiedNickname").getAsString().equalsIgnoreCase("none")) {
@@ -82,10 +84,10 @@ public class LinkAccountCommand extends Command {
     }
 
     private EmbedBuilder getLinkedAccount() {
-        JsonElement userInfo = database.getLinkedUser(event.getGuild().getId(), event.getAuthor().getId());
+        JsonElement userInfo = database.getLinkedUserByDiscordId(event.getAuthor().getId());
 
         if (!userInfo.isJsonNull()) {
-            return defaultEmbed("You are linked to " + uuidToUsername(higherDepth(userInfo, "minecraftUuid").getAsString()));
+            return defaultEmbed("You are linked to " + (higherDepth(userInfo, "minecraftUsername").getAsString()));
         } else {
             return defaultEmbed("You are not linked");
         }

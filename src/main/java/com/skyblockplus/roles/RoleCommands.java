@@ -35,7 +35,7 @@ public class RoleCommands extends Command {
 
         logCommand(event.getGuild(), event.getAuthor(), content);
 
-        if (database.getLinkedUser(guild.getId(), user.getId()).isJsonNull()) {
+        if (database.getLinkedUserByDiscordId(user.getId()).isJsonNull()) {
             ebMessage.editMessage(defaultEmbed("You must be linked to run this command. Use `" + BOT_PREFIX + "link [IGN]` to link").build()).queue();
             return;
         }
@@ -46,7 +46,7 @@ public class RoleCommands extends Command {
             return;
         }
 
-        JsonElement linkedInfo = database.getLinkedUser(guild.getId(), user.getId());
+        JsonElement linkedInfo = database.getLinkedUserByDiscordId(user.getId());
         if (getPlayerInfo(higherDepth(linkedInfo, "minecraftUuid").getAsString()) == null) {
             eb = defaultEmbed("Discord tag error");
             eb.setDescription("Unable to get Discord tag linked with Hypixel account");

@@ -8,9 +8,10 @@ import com.skyblockplus.api.discordserversettings.automatedguildroles.GuildRole;
 import com.skyblockplus.api.discordserversettings.automatedroles.AutomatedRoles;
 import com.skyblockplus.api.discordserversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.discordserversettings.automatedverify.AutomatedVerify;
-import com.skyblockplus.api.discordserversettings.linkedaccounts.LinkedAccount;
 import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSettingsModel;
 import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSettingsService;
+import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
+import com.skyblockplus.api.linkedaccounts.LinkedAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,28 +23,54 @@ import java.util.List;
 @Transactional
 public class SpringDatabaseComponent {
     private final ServerSettingsService settingsService;
+    private final LinkedAccountService linkedAccountService;
     private final Gson gson = new Gson();
 
     @Autowired
-    public SpringDatabaseComponent(ServerSettingsService settingsService) {
+    public SpringDatabaseComponent(ServerSettingsService settingsService, LinkedAccountService linkedAccountService) {
         this.settingsService = settingsService;
+        this.linkedAccountService = linkedAccountService;
     }
 
-    public int addLinkedUser(String serverId, LinkedAccount newUser) {
-        return settingsService.addLinkedUser(serverId, newUser).getStatusCodeValue();
+    public int addLinkedUser(LinkedAccountModel newUser) {
+        return linkedAccountService.addNewLinkedAccount(newUser).getStatusCodeValue();
     }
 
-    public JsonElement getLinkedUser(String serverId, String discordId) {
-        return gson.toJsonTree(settingsService.getLinkedUser(serverId, discordId).getBody());
+    public JsonElement getLinkedUserByMinecraftUsername(String minecraftUsername) {
+        return gson.toJsonTree(linkedAccountService.getByMinecraftUsername(minecraftUsername).getBody());
     }
 
-    public int removeLinkedUser(String serverId, String discordId) {
-        return settingsService.removeLinkedUser(serverId, discordId).getStatusCodeValue();
+    public JsonElement getLinkedUserByMinecraftUuid(String minecraftUuid) {
+        return gson.toJsonTree(linkedAccountService.getByMinecraftUuid(minecraftUuid).getBody());
     }
 
-    public JsonElement getLinkedUsers(String serverId) {
-        return gson.toJsonTree(settingsService.getLinkedAccounts(serverId).getBody());
+    public JsonElement getLinkedUserByDiscordId(String discordId) {
+        return gson.toJsonTree(linkedAccountService.getByDiscordId(discordId).getBody());
     }
+
+    public void deleteLinkedUserByDiscordId(String discordId) {
+        linkedAccountService.deleteByDiscordId(discordId);
+    }
+
+    public JsonElement getLinkedUsers() {
+        return gson.toJsonTree(linkedAccountService.getAllLinkedAccounts());
+    }
+
+//    public int addLinkedUser(String serverId, LinkedAccount newUser) {
+//        return settingsService.addLinkedUser(serverId, newUser).getStatusCodeValue();
+//    }
+//
+//    public JsonElement getLinkedUser(String serverId, String discordId) {
+//        return gson.toJsonTree(settingsService.getLinkedUser(serverId, discordId).getBody());
+//    }
+//
+//    public int removeLinkedUser(String serverId, String discordId) {
+//        return settingsService.removeLinkedUser(serverId, discordId).getStatusCodeValue();
+//    }
+//
+//    public JsonElement getLinkedUsers(String serverId) {
+//        return gson.toJsonTree(settingsService.getLinkedAccounts(serverId).getBody());
+//    }
 
     public List<ServerSettingsModel> getAllServerSettings() {
         return settingsService.getAllServerSettings();

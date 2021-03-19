@@ -34,11 +34,11 @@ public class QuickSetupTestCommand extends Command {
             if (args[1].equals("roles")) {
                 ebMessage.editMessage(setRoleSettings(args[2], args[3]).build()).queue();
                 return;
-            } else if (args[1].equals("delete")){
-                if(args[2].equals("server")){
+            } else if (args[1].equals("delete")) {
+                if (args[2].equals("server")) {
                     ebMessage.editMessage(deleteServer(args[3]).build()).queue();
                     return;
-                }else if(args[2].equals("apply_cache")){
+                } else if (args[2].equals("apply_cache")) {
                     ebMessage.editMessage(deleteServerApplyCache(args[3]).build()).queue();
                     return;
                 }

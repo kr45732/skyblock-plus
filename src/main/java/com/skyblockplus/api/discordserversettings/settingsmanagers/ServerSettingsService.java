@@ -5,7 +5,6 @@ import com.skyblockplus.api.discordserversettings.automatedguildroles.GuildRole;
 import com.skyblockplus.api.discordserversettings.automatedroles.AutomatedRoles;
 import com.skyblockplus.api.discordserversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.discordserversettings.automatedverify.AutomatedVerify;
-import com.skyblockplus.api.discordserversettings.linkedaccounts.LinkedAccount;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -254,48 +253,6 @@ public class ServerSettingsService {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    public ResponseEntity<HttpStatus> addLinkedUser(String serverId, LinkedAccount newUser) {
-        if (serverByServerIdExists(serverId)) {
-            ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
-            List<LinkedAccount> currentLinkedAccounts = currentServerSettings.getLinkedAccounts();
-            currentLinkedAccounts.add(newUser);
-            currentServerSettings.setLinkedAccounts(currentLinkedAccounts);
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    }
-
-    public ResponseEntity<HttpStatus> removeLinkedUser(String serverId, String discordId) {
-        if (serverByServerIdExists(serverId)) {
-            ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
-            List<LinkedAccount> currentLinkedAccounts = currentServerSettings.getLinkedAccounts();
-            if (currentLinkedAccounts.removeIf(p -> p.getDiscordId().equals(discordId))) {
-                currentServerSettings.setLinkedAccounts(currentLinkedAccounts);
-                return new ResponseEntity<>(HttpStatus.OK);
-            }
-        }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    }
-
-    public ResponseEntity<?> getLinkedAccounts(String serverId) {
-        if (serverByServerIdExists(serverId)) {
-            return new ResponseEntity<>(settingsRepository.findServerByServerId(serverId).getLinkedAccounts(), HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    }
-
-    public ResponseEntity<?> getLinkedUser(String serverId, String discordId) {
-        if (serverByServerIdExists(serverId)) {
-            List<LinkedAccount> currentLinkedAccounts = settingsRepository.findServerByServerId(serverId).getLinkedAccounts();
-            for (LinkedAccount linkedAccount : currentLinkedAccounts) {
-                if (linkedAccount.getDiscordId().equals(discordId)) {
-                    return new ResponseEntity<>(linkedAccount, HttpStatus.OK);
-                }
-            }
-        }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    }
-
     public ResponseEntity<?> getGuildRolesSettings(String serverId) {
         if (serverByServerIdExists(serverId)) {
             return new ResponseEntity<>(settingsRepository.findServerByServerId(serverId).getAutomaticGuildRoles(), HttpStatus.OK);
@@ -303,12 +260,12 @@ public class ServerSettingsService {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    public ResponseEntity<?> getGuildRanks(String serverId) {
-        if (serverByServerIdExists(serverId)) {
-            return new ResponseEntity<>(settingsRepository.findServerByServerId(serverId).getAutomaticGuildRoles().getGuildRankRoles(), HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    }
+//    public ResponseEntity<?> getGuildRanks(String serverId) {
+//        if (serverByServerIdExists(serverId)) {
+//            return new ResponseEntity<>(settingsRepository.findServerByServerId(serverId).getAutomaticGuildRoles().getGuildRankRoles(), HttpStatus.OK);
+//        }
+//        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//    }
 
     public ResponseEntity<HttpStatus> updateGuildRoleSettings(String serverId, GuildRole newSettings) {
         if (serverByServerIdExists(serverId)) {

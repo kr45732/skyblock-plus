@@ -74,11 +74,11 @@ public class AutomaticGuild {
                 guildMembersUuids.add(higherDepth(guildMember, "uuid").getAsString());
             }
 
-            JsonArray linkedUsers = database.getLinkedUsers(guild.getId()).getAsJsonArray();
+            JsonArray linkedUsers = database.getLinkedUsers().getAsJsonArray();
 
             for (JsonElement linkedUser : linkedUsers) {
                 if (guild.getMemberById(higherDepth(linkedUser, "discordId").getAsString()) == null) {
-                    database.removeLinkedUser(guildId, higherDepth(linkedUser, "discordId").getAsString());
+                    database.deleteLinkedUserByDiscordId(higherDepth(linkedUser, "discordId").getAsString());
                     continue;
                 }
 
@@ -134,7 +134,7 @@ public class AutomaticGuild {
                 verifyGuild = new VerifyGuild(reactChannel, reactMessage);
             }
         } catch (Exception e) {
-            System.out.println("== Stack Trace (Verify constructor error) ==");
+            System.out.println("== Stack Trace (Verify constructor error - " + event.getGuild().getId() + ") ==");
             e.printStackTrace();
         }
     }
@@ -177,7 +177,7 @@ public class AutomaticGuild {
                 applyGuild = new ApplyGuild(reactMessage, currentSettings);
             }
         } catch (Exception e) {
-            System.out.println("== Stack Trace (Apply constructor error) ==");
+            System.out.println("== Stack Trace (Apply constructor error - "+event.getGuild().getId()+") ==");
             e.printStackTrace();
         }
     }
@@ -226,7 +226,7 @@ public class AutomaticGuild {
                 return "Not enabled";
             }
         } catch (Exception e) {
-            System.out.println("== Stack Trace (Reload apply constructor error) ==");
+            System.out.println("== Stack Trace (Reload apply constructor error - "+guildId+") ==");
             e.printStackTrace();
         }
         return "Error Reloading";
@@ -275,7 +275,7 @@ public class AutomaticGuild {
                 return "Not enabled";
             }
         } catch (Exception e) {
-            System.out.println("== Stack Trace (Reload verify constructor error) ==");
+            System.out.println("== Stack Trace (Reload verify constructor error - "+guildId+") ==");
             e.printStackTrace();
         }
         return "Error Reloading";

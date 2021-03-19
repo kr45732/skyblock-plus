@@ -4,17 +4,16 @@ import com.skyblockplus.api.discordserversettings.automatedapplication.Automated
 import com.skyblockplus.api.discordserversettings.automatedguildroles.GuildRole;
 import com.skyblockplus.api.discordserversettings.automatedroles.AutomatedRoles;
 import com.skyblockplus.api.discordserversettings.automatedverify.AutomatedVerify;
-import com.skyblockplus.api.discordserversettings.linkedaccounts.LinkedAccount;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
 @Entity
+@Transactional
 public class ServerSettingsModel {
 
     @Id
@@ -31,9 +30,6 @@ public class ServerSettingsModel {
 
     @Embedded
     private AutomatedRoles automatedRoles = new AutomatedRoles();
-
-    @ElementCollection
-    private List<LinkedAccount> linkedAccounts = new ArrayList<>();
 
     @Embedded
     private GuildRole automaticGuildRoles = new GuildRole();
