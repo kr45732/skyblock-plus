@@ -148,6 +148,8 @@ public class ServerSettingsService {
                     return new ResponseEntity<>(currentRoleSettings.getAll_slayer_nine(), HttpStatus.OK);
                 case "skill_average":
                     return new ResponseEntity<>(currentRoleSettings.getSkill_average(), HttpStatus.OK);
+                case "pet_score":
+                    return new ResponseEntity<>(currentRoleSettings.getPet_score(), HttpStatus.OK);
             }
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -231,6 +233,9 @@ public class ServerSettingsService {
                     break;
                 case "skill_average":
                     currentRoleSettings.setSkill_average(newRoleSettings);
+                    break;
+                case "pet_score":
+                    currentRoleSettings.setPet_score(newRoleSettings);
                     break;
             }
             currentServerSettings.setAutomatedRoles(currentRoleSettings);

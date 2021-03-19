@@ -1231,4 +1231,49 @@ public class Player {
         }
         return null;
     }
+
+    public long getHighestCriticalDamage() {
+        return higherDepth(higherDepth(profileJson, "stats"), "highest_critical_damage").getAsLong();
+    }
+
+    public int getPetScore() {
+        JsonArray playerPets = getPets();
+        Map<String, Integer> petsMap = new HashMap<>();
+        for (JsonElement pet : playerPets) {
+            String petName = higherDepth(pet, "type").getAsString();
+            int rarity = 0;
+            switch (higherDepth(pet, "tier").getAsString().toLowerCase()) {
+                case "common":
+                    rarity = 1;
+                    break;
+                case "uncommon":
+                    rarity = 2;
+                    break;
+                case "rare":
+                    rarity = 3;
+                    break;
+                case "epic":
+                    rarity = 4;
+                    break;
+                case "legendary":
+                    rarity = 5;
+                    break;
+            }
+            if (petsMap.containsKey(petName)) {
+                if (petsMap.get(petName) < rarity) {
+                    petsMap.replace(petName, rarity);
+                }
+            } else {
+                petsMap.put(petName, rarity);
+            }
+
+        }
+
+        int petScore = 0;
+        for(int i:petsMap.values()){
+            petScore += i;
+        }
+
+        return petScore;
+    }
 }

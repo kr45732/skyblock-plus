@@ -20,6 +20,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 
+import javax.persistence.Embedded;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -101,7 +102,7 @@ public class SettingsCommand extends Command {
                 } else if (args[2].equals("disable")) {
                     eb = setRolesEnable("false");
                 } else {
-                    eb = defaultEmbed("Error", null).setDescription("Invalid setting");
+                    eb = getCurrentRoleSettings(args[2]);
                 }
             } else if (args.length == 4) {
                 if (args[2].equals("enable")) {
@@ -269,6 +270,119 @@ public class SettingsCommand extends Command {
         ebMessage.editMessage(eb.build()).queue();
     }
 
+    private EmbedBuilder getCurrentRoleSettings(String roleName) {
+        EmbedBuilder eb = defaultEmbed("Role Settings for " + roleName);
+
+
+            JsonElement currentRoleSettings = database.getRoleSettings(event.getGuild().getId(), roleName);
+            if(currentRoleSettings == null){
+                return defaultEmbed("Invalid role name");
+            }
+
+            StringBuilder ebFieldString = new StringBuilder();
+
+            if (higherDepth(currentRoleSettings, "enable") == null) {
+                database.updateRoleSettings(event.getGuild().getId(), roleName, new Gson().toJsonTree(new RoleModel()));
+                currentRoleSettings = database.getRoleSettings(event.getGuild().getId(), roleName);
+            }
+
+            if (higherDepth(currentRoleSettings, "stackable") == null) {
+                database.updateRoleSettings(event.getGuild().getId(), roleName, new Gson().toJsonTree(new RoleModel()));
+                currentRoleSettings = database.getRoleSettings(event.getGuild().getId(), roleName);
+            }
+
+            switch (roleName) {
+                case "guild_member": {
+                    ebFieldString.append("**Member role for Hypixel guilds**\nExample: `").append(BOT_PREFIX).append("settings roles add guild_member skyblock_forceful @sbf guild member`\n");
+                    break;
+                }
+                case "sven": {
+                    ebFieldString.append("**A player's sven packmaster slayer xp**\nExample: `").append(BOT_PREFIX).append("settings roles add sven 1000000 @sven 9`\n");
+                    break;
+                }
+                case "rev": {
+                    ebFieldString.append("**A player's revenant horror xp slayer**\nExample: `").append(BOT_PREFIX).append("settings roles add rev 400000 @rev 8`\n");
+                    break;
+                }
+                case "tara": {
+                    ebFieldString.append("**A player's tarantula broodfather slayer xp**\nExample: `").append(BOT_PREFIX).append("settings roles add tara 100000 @tara 7`\n");
+                    break;
+                }
+                case "bank_coins": {
+                    ebFieldString.append("**Coins in a player's bank**\nExample: `").append(BOT_PREFIX).append("settings roles add bank_coins 1000000 @millionaire`\n");
+                    break;
+                }
+                case "alchemy":
+                case "combat":
+                case "fishing":
+                case "farming":
+                case "foraging":
+                case "carpentry":
+                case "mining":
+                case "taming":
+                case "enchanting":
+                case "skill_average":
+                case "pet_score":
+                case "catacombs": {
+                    ebFieldString.append("**A player's ").append(roleName).append(" level**\nExample: `").append(BOT_PREFIX).append("settings roles add ").append(roleName).append(" 30 @").append(roleName).append(" 30`\n");
+                    break;
+                }
+                case "fairy_souls": {
+                    ebFieldString.append("**Amount of collected fairy souls**\nExample: `").append(BOT_PREFIX).append("settings roles add fairy_souls 50 @50 souls collected`\n");
+                    break;
+                }
+                case "slot_collector": {
+                    ebFieldString.append("**Number of minion slots excluding upgrades (__not fully working__)**\nExample: `").append(BOT_PREFIX).append("settings roles add slot_collector 24 @maxed minion slots`\n");
+                    break;
+                }
+                case "pet_enthusiast": {
+                    ebFieldString.append("**Having a level 100 epic or legendary pet that is not an enchanting or alchemy pet**\nExample: `").append(BOT_PREFIX).append("settings roles set pet_enthusiast @level 100 pet`\n");
+                    break;
+                }
+                case "doom_slayer": {
+                    ebFieldString.append("**Having at least one level nine slayer**\nExample: `").append(BOT_PREFIX).append("settings roles set doom_slayer @level nine slayer`\n");
+                    break;
+                }
+                case "all_slayer_nine":{
+                    ebFieldString.append("**Having all level nine slayers**\nExample: `").append(BOT_PREFIX).append("settings roles set all_slayer_nine @role`\n");
+                    break;
+                }
+            }
+
+            ebFieldString.append("\nCurrent Settings:\n");
+
+            ebFieldString.append(higherDepth(currentRoleSettings, "enable").getAsString().equals("true") ? "• Enabled"
+                    : "• Disabled");
+            if (isOneLevelRole(roleName)) {
+                try {
+                    ebFieldString.append("\n• default - ").append(event.getGuild().getRoleById(higherDepth(higherDepth(currentRoleSettings, "levels").getAsJsonArray().get(0), "roleId").getAsString()).getAsMention());
+                } catch (Exception ignored) {
+                }
+            } else {
+                ebFieldString.append(higherDepth(currentRoleSettings, "stackable").getAsString().equals("true")
+                        ? "\n• Stackable"
+                        : "\n• Not stackable");
+
+                if (roleName.equals("guild_member")) {
+                    for (JsonElement roleLevel : higherDepth(currentRoleSettings, "levels").getAsJsonArray()) {
+                        String guildId = higherDepth(roleLevel, "value").getAsString();
+                        JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&id=" + guildId);
+                        ebFieldString.append("\n• ").append(higherDepth(higherDepth(guildJson, "guild"), "name").getAsString()).append(" - ").append(event.getGuild().getRoleById(higherDepth(roleLevel, "roleId").getAsString()).getAsMention());
+                    }
+                } else {
+                    for (JsonElement roleLevel : higherDepth(currentRoleSettings, "levels").getAsJsonArray()) {
+                        ebFieldString.append("\n• ").append(higherDepth(roleLevel, "value").getAsString()).append(" - ").append(event.getGuild().getRoleById(higherDepth(roleLevel, "roleId").getAsString()).getAsMention());
+                    }
+                }
+
+                if (higherDepth(currentRoleSettings, "levels").getAsJsonArray().size() == 0) {
+                    ebFieldString.append("\n• No levels set");
+                }
+
+            }
+        return eb.setDescription(ebFieldString);
+    }
+
     /* Guild Role Settings */
     private EmbedBuilder setGuildRoleEnable(String enable) {
         JsonObject currentSettings = database.getGuildRoleSettings(event.getGuild().getId()).getAsJsonObject();
@@ -413,6 +527,7 @@ public class SettingsCommand extends Command {
                 case "taming":
                 case "enchanting":
                 case "skill_average":
+                case "pet_score":
                 case "catacombs": {
                     ebFieldString.append("**A player's ").append(roleName).append(" level**\nExample: `").append(BOT_PREFIX).append("settings roles add ").append(roleName).append(" 30 @").append(roleName).append(" 30`\n");
                     break;
@@ -589,9 +704,8 @@ public class SettingsCommand extends Command {
         Gson gson = new Gson();
         currentLevels.add(gson.toJsonTree(new RoleObject(roleValue, role.getId())));
 
-        RoleObject[] temp = gson.fromJson(currentLevels, new TypeToken<RoleObject[]>() {
-        }.getType());
-        Arrays.sort(temp, Comparator.comparing(RoleObject::getValue));
+        RoleObject[] temp = gson.fromJson(currentLevels, new TypeToken<RoleObject[]>() {}.getType());
+        Arrays.sort(temp, Comparator.comparingInt(o -> Integer.parseInt(o.getValue())));
         currentLevels = gson.toJsonTree(temp).getAsJsonArray();
 
         newRoleSettings.remove("levels");

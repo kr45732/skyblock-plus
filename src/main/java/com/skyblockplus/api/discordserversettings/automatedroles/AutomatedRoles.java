@@ -77,6 +77,9 @@ public class AutomatedRoles {
     @Embedded
     private RoleModel skill_average = new RoleModel();
 
+    @Embedded
+    private RoleModel pet_score = new RoleModel();
+
     public AutomatedRoles() {
     }
 }

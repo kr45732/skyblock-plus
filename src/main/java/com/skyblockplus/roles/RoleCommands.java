@@ -138,6 +138,7 @@ public class RoleCommands extends Command {
                             case "catacombs":
                             case "fairy_souls":
                             case "skill_average":
+                            case "pet_score":
                             case "slot_collector": {
                                 double roleAmount = -1;
                                 switch (currentRoleName) {
@@ -161,6 +162,11 @@ public class RoleCommands extends Command {
                                             errorRoles.append(roleChangeString("Skills API disabled"));
                                             continue;
                                         }
+                                        break;
+                                    }
+                                    case "pet_score": {
+                                        roleAmount =player.getPetScore();
+                                        break;
                                     }
                                     case "alchemy":
                                     case "combat":
