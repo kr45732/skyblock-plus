@@ -713,7 +713,6 @@ public class SettingsCommand extends Command {
 
         int responseCode = database.updateRoleSettings(event.getGuild().getId(), roleName,
                 newRoleSettings);
-
         if (responseCode != 200) {
             return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
         }
