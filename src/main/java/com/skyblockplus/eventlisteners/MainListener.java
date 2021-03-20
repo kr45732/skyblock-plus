@@ -21,7 +21,6 @@ public class MainListener extends ListenerAdapter {
                 reloadStatus = "Application in progress";
             }
         }
-
         return reloadStatus;
     }
 
@@ -30,7 +29,6 @@ public class MainListener extends ListenerAdapter {
         if (guildMap.containsKey(guildId)) {
             reloadStatus = guildMap.get(guildId).reloadVerifyConstructor(guildId);
         }
-
         return reloadStatus;
     }
 
