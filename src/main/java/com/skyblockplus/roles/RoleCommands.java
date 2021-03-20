@@ -92,7 +92,7 @@ public class RoleCommands extends Command {
 
                     for (String currentRoleName : rolesID) {
                         JsonElement currentRole = higherDepth(rolesJson, currentRoleName);
-                        if (!higherDepth(currentRole, "enable").getAsBoolean()) {
+                        if ((higherDepth(currentRole, "enable") == null) || !higherDepth(currentRole, "enable").getAsBoolean()) {
                             continue;
                         }
 
