@@ -123,26 +123,26 @@ public class Main {
 
     @SuppressWarnings("unchecked")
     public static List<ApplyUser> getApplyGuildUsersCache(String guildId) {
-        try {
-            byte[] guildApplyCache = database.getApplyCacheSettings(guildId);
-            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(guildApplyCache);
-            ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
-            List<ApplyUser> allApplyUsers = (List<ApplyUser>) objectInputStream.readObject();
-
-            List<ApplyUser> guildApplyUsers = new ArrayList<>();
-            for (ApplyUser applyUser : allApplyUsers) {
-                if (applyUser.getGuildId().equals(guildId)) {
-                    guildApplyUsers.add(applyUser);
-                }
-            }
-            objectInputStream.close();
-            System.out.println("Retrieved cached " + guildId + " ApplyUser (" + guildApplyUsers.size() + ")");
-            return guildApplyUsers;
-        } catch (EOFException ignored) {
-        } catch (Exception e) {
-            System.out.println("== Stack Trace (" + guildId + ") ==");
-            e.printStackTrace();
-        }
+//        try {
+//            byte[] guildApplyCache = database.getApplyCacheSettings(guildId);
+//            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(guildApplyCache);
+//            ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+//            List<ApplyUser> allApplyUsers = (List<ApplyUser>) objectInputStream.readObject();
+//
+//            List<ApplyUser> guildApplyUsers = new ArrayList<>();
+//            for (ApplyUser applyUser : allApplyUsers) {
+//                if (applyUser.getGuildId().equals(guildId)) {
+//                    guildApplyUsers.add(applyUser);
+//                }
+//            }
+//            objectInputStream.close();
+//            System.out.println("Retrieved cached " + guildId + " ApplyUser (" + guildApplyUsers.size() + ")");
+//            return guildApplyUsers;
+//        } catch (EOFException ignored) {
+//        } catch (Exception e) {
+//            System.out.println("== Stack Trace (" + guildId + ") ==");
+//            e.printStackTrace();
+//        }
         return new ArrayList<>();
     }
 
@@ -150,10 +150,10 @@ public class Main {
     public void onExit() {
         System.out.println("== STOPPING ==");
 
-        System.out.println("== SAVING ==");
-        long startTime = System.currentTimeMillis();
-        cacheApplyGuildUsers();
-        System.out.println("== SAVED IN " + ((System.currentTimeMillis() - startTime) / 1000) + "s ==");
+//        System.out.println("== SAVING ==");
+//        long startTime = System.currentTimeMillis();
+//        cacheApplyGuildUsers();
+//        System.out.println("== SAVED IN " + ((System.currentTimeMillis() - startTime) / 1000) + "s ==");
 
         System.out.println("== FINISHED ==");
     }
