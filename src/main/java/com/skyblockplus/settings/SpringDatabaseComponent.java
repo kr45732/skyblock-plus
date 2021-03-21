@@ -113,15 +113,15 @@ public class SpringDatabaseComponent {
         return settingsService.updateGuildRoleSettings(serverId, gson.fromJson(currentSettings, GuildRole.class)).getStatusCodeValue();
     }
 
-    public int updateApplyCacheSettings(String serverId, byte[] currentSettings) {
+    public int updateApplyCacheSettings(String serverId, String currentSettings) {
         return settingsService.updateApplyUsersCache(serverId, currentSettings).getStatusCodeValue();
     }
 
-    public byte[] getApplyCacheSettings(String serverId) {
-        return (byte[]) settingsService.getApplyUsersCache(serverId).getBody();
+    public JsonElement getApplyCacheSettings(String serverId) {
+        return gson.toJsonTree(settingsService.getApplyUsersCache(serverId).getBody());
     }
 
     public int deleteApplyCacheSettings(String serverId) {
-        return settingsService.updateApplyUsersCache(serverId, new byte[]{}).getStatusCodeValue();
+        return settingsService.updateApplyUsersCache(serverId, "").getStatusCodeValue();
     }
 }

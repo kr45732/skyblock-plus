@@ -20,7 +20,6 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 
-import javax.persistence.Embedded;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;

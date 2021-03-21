@@ -29,8 +29,8 @@ public class AutomatedApplication {
 
     private String previousMessageId = "";
 
-    @Lob
-    private byte[] applyUsersCache = new byte[]{};
+    @Column(columnDefinition="TEXT")
+    private String applyUsersCache = "";
 
     public AutomatedApplication() {
     }

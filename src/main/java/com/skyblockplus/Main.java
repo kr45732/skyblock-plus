@@ -1,5 +1,9 @@
 package com.skyblockplus;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.reflect.TypeToken;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.auctionbaz.AuctionCommands;
@@ -93,56 +97,41 @@ public class Main {
     }
 
     public static void cacheApplyGuildUsers() {
-        if (!BOT_PREFIX.equals("+")) {
-            return;
+//        if (!BOT_PREFIX.equals("+")) {
+//            return;
+//        }
+
+        for (Map.Entry<String, AutomaticGuild> automaticGuild : getGuildMap().entrySet()) {
+            try {
+                database.deleteApplyCacheSettings(automaticGuild.getKey());
+                List<ApplyUser> applyUserList = automaticGuild.getValue().getApplyGuild().getApplyUserList();
+                System.out.println(new Gson().toJsonTree(applyUserList));
+                System.out.println(new Gson().toJson(applyUserList));
+                int code = database.updateApplyCacheSettings(automaticGuild.getKey(), new Gson().toJson(applyUserList));
+                System.out.println("CODE: " + code);
+            }catch (Exception e){
+                System.out.println("STACK - " + automaticGuild.getKey());
+                e.printStackTrace();
+            }
         }
 
-        try {
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
-            for (Map.Entry<String, AutomaticGuild> automaticGuild : getGuildMap().entrySet()) {
-                try {
-                    database.updateApplyCacheSettings(automaticGuild.getKey(), new byte[]{});
-                    if (automaticGuild.getValue().getApplyGuild().getApplyUserList().size() != 0) {
-                        objectOutputStream.writeObject(automaticGuild.getValue().getApplyGuild().getApplyUserList());
-                        database.updateApplyCacheSettings(automaticGuild.getKey(), byteArrayOutputStream.toByteArray());
-                        System.out.println("Cached " + automaticGuild.getKey() + " ApplyUser (" + automaticGuild.getValue().getApplyGuild().getApplyUserList().size() + ")");
-                        objectOutputStream.reset();
-                        byteArrayOutputStream.reset();
-                    }
-                } catch (Exception e) {
-                    System.out.println("Cache error " + automaticGuild.getKey());
-                }
-            }
-            objectOutputStream.close();
-        } catch (Exception e) {
-            System.out.println("== Stack Trace ==");
-            e.printStackTrace();
-        }
     }
 
     @SuppressWarnings("unchecked")
     public static List<ApplyUser> getApplyGuildUsersCache(String guildId) {
 //        try {
-//            byte[] guildApplyCache = database.getApplyCacheSettings(guildId);
-//            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(guildApplyCache);
-//            ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
-//            List<ApplyUser> allApplyUsers = (List<ApplyUser>) objectInputStream.readObject();
+//            JsonArray temp = database.getApplyCacheSettings(guildId).getAsJsonArray();
+//            System.out.println(database.getApplyCacheSettings(guildId));
 //
-//            List<ApplyUser> guildApplyUsers = new ArrayList<>();
-//            for (ApplyUser applyUser : allApplyUsers) {
-//                if (applyUser.getGuildId().equals(guildId)) {
-//                    guildApplyUsers.add(applyUser);
-//                }
+//            for (JsonElement temp1:temp){
+//                ApplyUser test = (new Gson().fromJson(temp1, ApplyUser.class));
+//                System.out.println(test);
+//                System.out.println(test.getGuildId());
 //            }
-//            objectInputStream.close();
-//            System.out.println("Retrieved cached " + guildId + " ApplyUser (" + guildApplyUsers.size() + ")");
-//            return guildApplyUsers;
-//        } catch (EOFException ignored) {
-//        } catch (Exception e) {
-//            System.out.println("== Stack Trace (" + guildId + ") ==");
+//        }catch (Exception e){
 //            e.printStackTrace();
 //        }
+
         return new ArrayList<>();
     }
 
@@ -150,7 +139,7 @@ public class Main {
     public void onExit() {
         System.out.println("== STOPPING ==");
 
-//        System.out.println("== SAVING ==");
+        System.out.println("== SAVING ==");
 //        long startTime = System.currentTimeMillis();
 //        cacheApplyGuildUsers();
 //        System.out.println("== SAVED IN " + ((System.currentTimeMillis() - startTime) / 1000) + "s ==");

@@ -299,11 +299,11 @@ public class ServerSettingsService {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    public ResponseEntity<HttpStatus> updateApplyUsersCache(String serverId, byte[] newSettings) {
+    public ResponseEntity<HttpStatus> updateApplyUsersCache(String serverId, String newApplyCacheJsonString) {
         if (serverByServerIdExists(serverId)) {
             ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
             AutomatedApplication automatedApplication = currentServerSettings.getAutomatedApplication();
-            automatedApplication.setApplyUsersCache(newSettings);
+            automatedApplication.setApplyUsersCache(newApplyCacheJsonString);
             currentServerSettings.setAutomatedApplication(automatedApplication);
             settingsRepository.save(currentServerSettings);
             return new ResponseEntity<>(HttpStatus.OK);

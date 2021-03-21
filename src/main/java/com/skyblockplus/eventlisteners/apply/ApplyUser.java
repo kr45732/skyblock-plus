@@ -338,4 +338,8 @@ public class ApplyUser implements Serializable {
         reactMessage.addReaction("❌").queue();
         reactMessageId = reactMessage.getId();
     }
+
+    public PlayerCustom getPlayer() {
+        return player;
+    }
 }
