@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
+import javax.persistence.Transient;
 import java.io.Serializable;
 import java.util.EnumSet;
 import java.util.concurrent.TimeUnit;

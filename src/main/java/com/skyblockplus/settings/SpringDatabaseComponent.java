@@ -3,6 +3,7 @@ package com.skyblockplus.settings;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.skyblockplus.api.discordserversettings.automatedapplication.AutomatedApplication;
 import com.skyblockplus.api.discordserversettings.automatedguildroles.GuildRole;
 import com.skyblockplus.api.discordserversettings.automatedroles.AutomatedRoles;
@@ -118,10 +119,14 @@ public class SpringDatabaseComponent {
     }
 
     public JsonElement getApplyCacheSettings(String serverId) {
-        return gson.toJsonTree(settingsService.getApplyUsersCache(serverId).getBody());
+        try {
+            return JsonParser.parseString((String) settingsService.getApplyUsersCache(serverId).getBody());
+        }catch (Exception e){
+            return JsonParser.parseString("[]");
+        }
     }
 
     public int deleteApplyCacheSettings(String serverId) {
-        return settingsService.updateApplyUsersCache(serverId, "").getStatusCodeValue();
+        return settingsService.updateApplyUsersCache(serverId, "[]").getStatusCodeValue();
     }
 }
