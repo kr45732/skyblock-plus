@@ -3,12 +3,12 @@ package com.skyblockplus.eventlisteners.apply;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.skyblockplus.utils.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
-import javax.persistence.Transient;
 import java.io.Serializable;
 import java.util.EnumSet;
 import java.util.concurrent.TimeUnit;
@@ -24,13 +24,15 @@ public class ApplyUser implements Serializable {
     private final String guildId;
     private String reactMessageId;
     private int state = 0;
-    private PlayerCustom player;
     private String staffChannelId;
     private boolean shouldDeleteChannel = false;
     private String playerSlayer;
     private String playerSkills;
     private String playerCatacombs;
     private String playerWeight;
+    private String playerUsername;
+    private String ironmanSymbol;
+    private String playerProfileName;
 
     public ApplyUser(MessageReactionAddEvent event, User applyingUser, JsonElement currentSettings) {
         logCommand(event.getGuild(), applyingUser, "apply " + applyingUser.getName());
@@ -123,8 +125,8 @@ public class ApplyUser implements Serializable {
                     if (messageReply.getAuthor().equals(applyingUser)) {
                         String[] messageContent = messageReply.getContentDisplay().split(" ");
                         if (messageContent.length == 1 || messageContent.length == 2) {
-                            player = messageContent.length == 1 ? new PlayerCustom(messageContent[0])
-                                    : new PlayerCustom(messageContent[0], messageContent[1]);
+                            Player player = messageContent.length == 1 ? new Player(messageContent[0])
+                                    : new Player(messageContent[0], messageContent[1]);
 
                             if (player.isValid()) {
                                 String[] playerInfo = getPlayerDiscordInfo(player.getUsername());
@@ -135,6 +137,10 @@ public class ApplyUser implements Serializable {
                                         playerSkills = roundSkillAverage(player.getSkillAverage());
                                         playerCatacombs = "" + player.getCatacombsSkill().skillLevel;
                                         playerWeight = roundSkillAverage(player.getWeight());
+                                        playerUsername = player.getUsername();
+                                        ironmanSymbol = higherDepth(player.getOuterProfileJson(), "game_mode") != null ? " ♻️" : "";
+                                        playerProfileName = player.getProfileName();
+
                                         EmbedBuilder statsEmbed = player.defaultPlayerEmbed();
                                         statsEmbed.setDescription("**Total Skyblock weight:** " + playerWeight);
                                         statsEmbed.addField("Total slayer", playerSlayer, true);
@@ -279,7 +285,7 @@ public class ApplyUser implements Serializable {
         User applyingUser = jda.getUserById(applyingUserId);
         Message reactMessage = event.getChannel().retrieveMessageById(event.getMessageId()).complete();
         if (event.getReactionEmote().getName().equals("❌")) {
-            staffChannel.sendMessage(player.getUsername() + " (" + applyingUser.getAsMention() + ") was denied by "
+            staffChannel.sendMessage(playerUsername + " (" + applyingUser.getAsMention() + ") was denied by "
                     + event.getUser().getName() + " (" + event.getUser().getAsMention() + ")").queue();
             reactMessage.clearReactions().queue();
             EmbedBuilder eb = defaultEmbed("Application Not Accepted");
@@ -293,7 +299,7 @@ public class ApplyUser implements Serializable {
             shouldDeleteChannel = true;
 
         } else if (event.getReactionEmote().getName().equals("✅")) {
-            staffChannel.sendMessage(player.getUsername() + " (" + applyingUser.getAsMention() + ") was accepted by "
+            staffChannel.sendMessage(playerUsername + " (" + applyingUser.getAsMention() + ") was accepted by "
                     + event.getUser().getName() + " (" + event.getUser().getAsMention() + ")").queue();
             reactMessage.clearReactions().queue();
             EmbedBuilder eb = defaultEmbed("Application Accepted");
@@ -324,7 +330,7 @@ public class ApplyUser implements Serializable {
                 .getTextChannelById(higherDepth(currentSettings, "messageStaffChannelId").getAsString());
         staffChannelId = staffChannel.getId();
 
-        EmbedBuilder applyPlayerStats = player.defaultPlayerEmbed();
+        EmbedBuilder applyPlayerStats = defaultPlayerEmbed();
         applyPlayerStats.setDescription("**Total Skyblock weight:** " + playerWeight);
         applyPlayerStats.addField("Total slayer", playerSlayer, true);
         applyPlayerStats.addField("Progress average skill level", playerSkills, true);
@@ -340,7 +346,8 @@ public class ApplyUser implements Serializable {
         reactMessageId = reactMessage.getId();
     }
 
-    public PlayerCustom getPlayer() {
-        return player;
+    public EmbedBuilder defaultPlayerEmbed() {
+        return defaultEmbed(playerUsername + ironmanSymbol,
+                "https://sky.shiiyu.moe/stats/" + playerUsername + "/" + playerProfileName);
     }
 }

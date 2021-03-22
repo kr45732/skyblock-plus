@@ -43,7 +43,8 @@ public class PartyFinderCommand extends Command {
             eb.setDescription("**Catacombs Level:** " + roundSkillAverage(player.getCatacombsLevel()));
             eb.appendDescription("\n**Secrets:** " + formatNumber(player.getDungeonSecrets()));
             eb.appendDescription("\n**Selected Class:** " + player.getSelectedDungeonClass());
-            eb.appendDescription("\n**Hyperion:** " + player.getHyperion());
+            eb.appendDescription(player.getNecronBlade());
+            eb.appendDescription(player.getFastestF7Time());
             eb.appendDescription((player.getBonemerang() == 1 ? "\n**Bonemerang:** " : "\n**Bonemerangs:** ") + player.getBonemerang());
             eb.setThumbnail(player.getThumbnailUrl());
             return eb;

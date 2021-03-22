@@ -95,9 +95,9 @@ public class Main {
     }
 
     public static void cacheApplyGuildUsers() {
-//        if (!BOT_PREFIX.equals("+")) {
-//            return;
-//        }
+        if (!BOT_PREFIX.equals("+")) {
+            return;
+        }
 
         for (Map.Entry<String, AutomaticGuild> automaticGuild : getGuildMap().entrySet()) {
             try {
@@ -108,7 +108,7 @@ public class Main {
                 if(code == 200){
                     System.out.println("Successfully cached ApplyUser | " + automaticGuild.getKey() + " | " + applyUserList.size());
                 }else{
-                    System.out.println("Failed to cache ApplyUser | " + automaticGuild.getKey() + " | " + applyUserList.size());
+                    System.out.println("Failed to cache ApplyUser ("+code+")| " + automaticGuild.getKey() + " | " + applyUserList.size());
                 }
             }catch (Exception e){
                 System.out.println("== Stack Trace (Cache ApplyUser - " + automaticGuild.getKey() + ")");
@@ -119,6 +119,10 @@ public class Main {
     }
 
     public static List<ApplyUser> getApplyGuildUsersCache(String guildId) {
+        if (!BOT_PREFIX.equals("+")) {
+            return new ArrayList<>();
+        }
+
         try {
             JsonArray applyUsersCache = database.getApplyCacheSettings(guildId).getAsJsonArray();
 
@@ -127,6 +131,7 @@ public class Main {
                 ApplyUser currentApplyUserCache = new Gson().fromJson(applyUserCache, ApplyUser.class);
                 applyUsersCacheList.add(currentApplyUserCache);
             }
+            System.out.println("Retrieved cache ("+applyUsersCacheList.size()+ ") - " + guildId);
             return applyUsersCacheList;
         }catch (Exception e){
             System.out.println("== Stack Trace (Get cache ApplyUser - " + guildId + ")");

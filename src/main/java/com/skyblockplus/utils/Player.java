@@ -21,6 +21,11 @@ public class Player {
     private boolean validPlayer = false;
     private JsonElement profileJson;
     private JsonElement levelTables;
+
+    public JsonElement getOuterProfileJson() {
+        return outerProfileJson;
+    }
+
     private JsonElement outerProfileJson;
     private JsonElement petLevelTable;
     private JsonElement hypixelProfileJson;
@@ -1098,19 +1103,45 @@ public class Player {
         }
     }
 
-    public String getHyperion() {
+    public String getNecronBlade() {
         if (getInventory()[0].contains("hyperion") || getInventory()[1].contains("hyperion")) {
-            return "yes";
+            return "\n**Hyperion:** Yes";
+        }else if (getInventory()[0].contains("valkyrie") || getInventory()[1].contains("valkyrie")) {
+            return "\n**Valkyrie:** Yes";
         }
-        return "no";
+
+        List<String[]> playerEnderChest = getEnderChest();
+        for(String[] page: playerEnderChest){
+            if (page[0].contains("hyperion") || page[1].contains("hyperion")) {
+                return "\n**Hyperion:** Yes";
+            }else if (page[0].contains("valkyrie") || page[1].contains("valkyrie")) {
+                return "\n**Valkyrie:** Yes";
+            }
+        }
+
+        return "\n**No Hyperion or Valkyrie**";
+    }
+
+    public String getFastestF7Time(){
+        try {
+            int f7TimeMilliseconds = higherDepth(higherDepth(higherDepth(higherDepth(higherDepth(profileJson, "dungeons"), "dungeon_types"), "catacombs"), "fastest_time_s_plus"), "7").getAsInt();
+            int minuets = f7TimeMilliseconds/1000/60;
+            int seconds = f7TimeMilliseconds%1000%60;
+            return "\n**Fastest F7 S+:** " + minuets + ":"+(seconds>=10?seconds:"0"+seconds);
+        }catch (Exception e){
+            return "\n**No F7 S+ time found**";
+        }
     }
 
     public int getBonemerang() {
-        if (getInventory()[0].contains("bone_boomerang") || getInventory()[1].contains("bone_boomerang")) {
-            return StringUtils.countOccurrencesOf(getInventory()[0], "bone_boomerang")
-                    + StringUtils.countOccurrencesOf(getInventory()[1], "bone_boomerang");
+        int boneCount = StringUtils.countOccurrencesOf(getInventory()[0], "bone_boomerang")
+                + StringUtils.countOccurrencesOf(getInventory()[1], "bone_boomerang");
+        List<String[]> playerEnderChest = getEnderChest();
+        for(String[] page: playerEnderChest){
+            boneCount += StringUtils.countOccurrencesOf(page[0], "bone_boomerang")
+                    + StringUtils.countOccurrencesOf(page[1], "bone_boomerang");
         }
-        return 0;
+        return boneCount;
     }
 
     public List<String[]> getEnderChest() {
