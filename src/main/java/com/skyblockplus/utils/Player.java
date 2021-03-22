@@ -21,11 +21,6 @@ public class Player {
     private boolean validPlayer = false;
     private JsonElement profileJson;
     private JsonElement levelTables;
-
-    public JsonElement getOuterProfileJson() {
-        return outerProfileJson;
-    }
-
     private JsonElement outerProfileJson;
     private JsonElement petLevelTable;
     private JsonElement hypixelProfileJson;
@@ -33,7 +28,6 @@ public class Player {
     private String playerUsername;
     private String profileName;
     private String playerGuildRank;
-
     public Player(String username) {
         if (usernameToUuid(username)) {
             return;
@@ -93,6 +87,10 @@ public class Player {
         }
 
         this.validPlayer = true;
+    }
+
+    public JsonElement getOuterProfileJson() {
+        return outerProfileJson;
     }
 
     public boolean usernameToUuid(String username) {
@@ -161,8 +159,7 @@ public class Player {
 
     public SkillsStruct getCatacombsSkill() {
         if (this.levelTables == null) {
-            this.levelTables = getJson(
-                    "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/leveling.json");
+            this.levelTables = getLevelingJson();
         }
 
         try {
@@ -178,8 +175,7 @@ public class Player {
 
     public SkillsStruct getSkill(String skillName) {
         if (this.levelTables == null) {
-            this.levelTables = getJson(
-                    "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/leveling.json");
+            this.levelTables = getLevelingJson();
         }
 
         try {
@@ -192,8 +188,7 @@ public class Player {
 
     public double getSkillAverage() {
         if (this.levelTables == null) {
-            this.levelTables = getJson(
-                    "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/leveling.json");
+            this.levelTables = getLevelingJson();
         }
 
         JsonElement skillsCap = higherDepth(levelTables, "leveling_caps");
@@ -349,8 +344,7 @@ public class Player {
 
     public int petLevelFromXp(long petExp, String rarity) {
         if (this.petLevelTable == null) {
-            this.petLevelTable = getJson(
-                    "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/pets.json");
+            this.petLevelTable = getPetJson();
         }
 
         int petRarityOffset = higherDepth(higherDepth(petLevelTable, "pet_rarity_offset"), rarity.toUpperCase())
@@ -401,8 +395,7 @@ public class Player {
 
     public int getSlayerLevel(String slayerName) {
         if (this.levelTables == null) {
-            this.levelTables = getJson(
-                    "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/leveling.json");
+            this.levelTables = getLevelingJson();
         }
 
         switch (slayerName) {
@@ -988,8 +981,7 @@ public class Player {
 
     public int getSkillMaxLevel(String skillName) {
         if (this.levelTables == null) {
-            this.levelTables = getJson(
-                    "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/leveling.json");
+            this.levelTables = getLevelingJson();
         }
         if (skillName.equals("farming")) {
             return higherDepth(higherDepth(levelTables, "leveling_caps"), skillName).getAsInt()
@@ -1015,8 +1007,7 @@ public class Player {
 
     public double getDungeonClassLevel(String className) {
         if (this.levelTables == null) {
-            this.levelTables = getJson(
-                    "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/leveling.json");
+            this.levelTables = getLevelingJson();
         }
 
         SkillsStruct dungeonClassLevel = skillInfoFromExp(getDungeonClassXp(className), "catacombs");
@@ -1106,15 +1097,15 @@ public class Player {
     public String getNecronBlade() {
         if (getInventory()[0].contains("hyperion") || getInventory()[1].contains("hyperion")) {
             return "\n**Hyperion:** Yes";
-        }else if (getInventory()[0].contains("valkyrie") || getInventory()[1].contains("valkyrie")) {
+        } else if (getInventory()[0].contains("valkyrie") || getInventory()[1].contains("valkyrie")) {
             return "\n**Valkyrie:** Yes";
         }
 
         List<String[]> playerEnderChest = getEnderChest();
-        for(String[] page: playerEnderChest){
+        for (String[] page : playerEnderChest) {
             if (page[0].contains("hyperion") || page[1].contains("hyperion")) {
                 return "\n**Hyperion:** Yes";
-            }else if (page[0].contains("valkyrie") || page[1].contains("valkyrie")) {
+            } else if (page[0].contains("valkyrie") || page[1].contains("valkyrie")) {
                 return "\n**Valkyrie:** Yes";
             }
         }
@@ -1122,13 +1113,13 @@ public class Player {
         return "\n**No Hyperion or Valkyrie**";
     }
 
-    public String getFastestF7Time(){
+    public String getFastestF7Time() {
         try {
             int f7TimeMilliseconds = higherDepth(higherDepth(higherDepth(higherDepth(higherDepth(profileJson, "dungeons"), "dungeon_types"), "catacombs"), "fastest_time_s_plus"), "7").getAsInt();
-            int minuets = f7TimeMilliseconds/1000/60;
-            int seconds = f7TimeMilliseconds%1000%60;
-            return "\n**Fastest F7 S+:** " + minuets + ":"+(seconds>=10?seconds:"0"+seconds);
-        }catch (Exception e){
+            int minuets = f7TimeMilliseconds / 1000 / 60;
+            int seconds = f7TimeMilliseconds % 1000 % 60;
+            return "\n**Fastest F7 S+:** " + minuets + ":" + (seconds >= 10 ? seconds : "0" + seconds);
+        } catch (Exception e) {
             return "\n**No F7 S+ time found**";
         }
     }
@@ -1137,7 +1128,7 @@ public class Player {
         int boneCount = StringUtils.countOccurrencesOf(getInventory()[0], "bone_boomerang")
                 + StringUtils.countOccurrencesOf(getInventory()[1], "bone_boomerang");
         List<String[]> playerEnderChest = getEnderChest();
-        for(String[] page: playerEnderChest){
+        for (String[] page : playerEnderChest) {
             boneCount += StringUtils.countOccurrencesOf(page[0], "bone_boomerang")
                     + StringUtils.countOccurrencesOf(page[1], "bone_boomerang");
         }
@@ -1301,7 +1292,7 @@ public class Player {
         }
 
         int petScore = 0;
-        for(int i:petsMap.values()){
+        for (int i : petsMap.values()) {
             petScore += i;
         }
 

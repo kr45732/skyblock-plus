@@ -53,6 +53,14 @@ public class SpringDatabaseComponent {
         linkedAccountService.deleteByDiscordId(discordId);
     }
 
+    public void deleteLinkedUserByMinecraftUsername(String minecraftUsername) {
+        linkedAccountService.deleteByMinecraftUsername(minecraftUsername);
+    }
+
+    public void deleteLinkedUserByMinecraftUuid(String minecraftUuid) {
+        linkedAccountService.deleteByMinecraftUuid(minecraftUuid);
+    }
+
     public JsonElement getLinkedUsers() {
         return gson.toJsonTree(linkedAccountService.getAllLinkedAccounts());
     }

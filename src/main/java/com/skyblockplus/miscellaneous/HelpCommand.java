@@ -42,53 +42,57 @@ public class HelpCommand extends Command {
                 .setPageTitles(pageTitles).setCommandUser(event.getAuthor());
 
         int startingPage = 0;
-        try {
-            String pageStr = event.getMessage().getContentDisplay().toLowerCase().split(" ")[1];
-            Map<String, Integer> pageMap = new HashMap<>();
-            pageMap.put("general", 2);
-            pageMap.put("link", 2);
-            pageMap.put("unlink", 2);
-            pageMap.put("slayer", 3);
-            pageMap.put("skills", 4);
-            pageMap.put("dungeons", 5);
-            pageMap.put("essence", 5);
-            pageMap.put("catacombs", 5);
-            pageMap.put("cata", 5);
-            pageMap.put("guild", 6);
-            pageMap.put("guild-rank", 6);
-            pageMap.put("g-rank", 6);
-            pageMap.put("auction", 7);
-            pageMap.put("ah", 7);
-            pageMap.put("bazaar", 7);
-            pageMap.put("bz", 7);
-            pageMap.put("bin", 7);
-            pageMap.put("wardrobe", 8);
-            pageMap.put("talisman", 8);
-            pageMap.put("inv", 8);
-            pageMap.put("inventory", 8);
-            pageMap.put("echest", 8);
-            pageMap.put("enderchest", 8);
-            pageMap.put("sacks", 8);
-            pageMap.put("roles", 9);
-            pageMap.put("bank", 9);
-            pageMap.put("weight", 9);
-            pageMap.put("hypixel", 9);
-            pageMap.put("uuid", 10);
-            pageMap.put("categories", 10);
-            pageMap.put("settings", 10);
-            pageMap.put("setup", 10);
+        String pageStr = event.getMessage().getContentDisplay().toLowerCase().split(" ")[1];
+        Map<String, Integer> pageMap = new HashMap<>();
+        pageMap.put("general", 2);
+        pageMap.put("link", 2);
+        pageMap.put("unlink", 2);
+        pageMap.put("slayer", 3);
+        pageMap.put("skills", 4);
+        pageMap.put("dungeons", 5);
+        pageMap.put("essence", 5);
+        pageMap.put("catacombs", 5);
+        pageMap.put("cata", 5);
+        pageMap.put("guild", 6);
+        pageMap.put("guild-rank", 6);
+        pageMap.put("g-rank", 6);
+        pageMap.put("auction", 7);
+        pageMap.put("ah", 7);
+        pageMap.put("bazaar", 7);
+        pageMap.put("bz", 7);
+        pageMap.put("bin", 7);
+        pageMap.put("wardrobe", 8);
+        pageMap.put("talisman", 8);
+        pageMap.put("inv", 8);
+        pageMap.put("inventory", 8);
+        pageMap.put("echest", 8);
+        pageMap.put("enderchest", 8);
+        pageMap.put("sacks", 8);
+        pageMap.put("roles", 9);
+        pageMap.put("bank", 9);
+        pageMap.put("weight", 9);
+        pageMap.put("hypixel", 9);
+        pageMap.put("uuid", 10);
+        pageMap.put("categories", 10);
+        pageMap.put("settings", 10);
+        pageMap.put("setup", 10);
 
-            if (event.getGuild().getMember(event.getAuthor()).hasPermission(Permission.ADMINISTRATOR)) {
-                pageMap.put("settings_verify", 11);
-                pageMap.put("settings_apply", 12);
-                pageMap.put("settings_roles", 13);
-                pageMap.put("settings_guild", 14);
-            }
+        if (event.getGuild().getMember(event.getAuthor()).hasPermission(Permission.ADMINISTRATOR)) {
+            pageMap.put("settings_verify", 11);
+            pageMap.put("settings_apply", 12);
+            pageMap.put("settings_roles", 13);
+            pageMap.put("settings_guild", 14);
+        }
 
-            if (pageMap.get(pageStr) != null) {
-                startingPage = pageMap.get(pageStr);
+        if (pageMap.containsKey(pageStr)) {
+            startingPage = pageMap.get(pageStr);
+        } else {
+            try {
+                if (pageMap.containsValue(Integer.parseInt(pageStr))) {
+                    startingPage = Integer.parseInt(pageStr);
+                }
+            } catch (Exception ignored) {
             }
-        } catch (Exception ignored) {
         }
 
         paginateBuilder.clearItems();
@@ -141,6 +145,7 @@ public class HelpCommand extends Command {
                 generateHelp("Get player's active (not claimed) auctions on all profiles", "auction [player]", "ah [player]")
                         + generateHelp("Get the lowest bin of an item", "bin [item]")
                         + generateHelp("Get bazaar prices of an item", "bazaar [item]", "bz [item]")
+                        + generateHelp("Get the average auction price of an item", "average [item]", "avg [item]")
         );
 
         paginateBuilder.addItems(

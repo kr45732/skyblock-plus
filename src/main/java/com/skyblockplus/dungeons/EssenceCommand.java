@@ -27,8 +27,7 @@ public class EssenceCommand extends Command {
 
         logCommand(event.getGuild(), event.getAuthor(), content);
 
-        JsonElement essenceCostsJson = getJson(
-                "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/essencecosts.json");
+        JsonElement essenceCostsJson = getEssenceCostsJson();
 
         if (args.length >= 3 && args[1].equals("upgrade")) {
             String itemName = content.split(" ", 3)[2].replace(" ", "_").toUpperCase();

@@ -116,8 +116,7 @@ public class GuildLeaderboardCommand extends Command {
             return null;
         }
 
-        JsonElement levelTables = getJson(
-                "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/leveling.json");
+
         JsonArray guildMembers = higherDepth(higherDepth(guildJson, "guild"), "members").getAsJsonArray();
 
         ArrayList<Player> guildSlayer = new ArrayList<>();
@@ -128,7 +127,7 @@ public class GuildLeaderboardCommand extends Command {
         for (JsonElement guildMember : guildMembers) {
             String memberRank = higherDepth(guildMember, "rank").getAsString();
             if (!staffRankNames.contains(memberRank)) {
-                Player player = new Player(higherDepth(guildMember, "uuid").getAsString(), levelTables, memberRank);
+                Player player = new Player(higherDepth(guildMember, "uuid").getAsString(), getLevelingJson(), memberRank);
                 if (player.isValid()) {
                     uniqueGuildUuid.add(player.getUuid());
                     guildSlayer.add(player);

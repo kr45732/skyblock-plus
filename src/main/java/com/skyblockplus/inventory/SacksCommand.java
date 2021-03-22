@@ -73,7 +73,7 @@ public class SacksCommand extends Command {
                 for (Map.Entry<String, Integer> currentSack : sacksMap.entrySet()) {
                     pageTitles.add("Player sacks content for " + player.getUsername());
                     paginateBuilder
-                            .addItems("**" + capitalizeString(currentSack.getKey().toLowerCase().replace("_", " "))
+                            .addItems("**" + convertSkyblockIdName(currentSack.getKey())
                                     + "**: " + currentSack.getValue());
                 }
                 paginateBuilder.setPageTitles(pageTitles.toArray(new String[0]));

@@ -12,11 +12,11 @@ import java.time.Instant;
 
 import static com.skyblockplus.utils.Utils.*;
 
-public class AuctionCommands extends Command {
+public class AuctionCommand extends Command {
     private String playerUsername;
     private String playerUuid;
 
-    public AuctionCommands() {
+    public AuctionCommand() {
         this.name = "auction";
         this.cooldown = globalCooldown;
         this.aliases = new String[]{"ah"};

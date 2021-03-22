@@ -21,10 +21,10 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 import java.awt.*;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -41,6 +41,7 @@ import static com.skyblockplus.Main.jda;
 public class Utils {
     public static final Color botColor = new Color(9, 92, 13);
     public static final int globalCooldown = 4;
+    private static final ScriptEngine jsScriptEngine = new ScriptEngineManager().getEngineByName("js");
     public static String HYPIXEL_API_KEY = "";
     public static String BOT_TOKEN = "";
     public static String BOT_PREFIX = "";
@@ -53,9 +54,16 @@ public class Utils {
     public static String API_PASSWORD = "";
     public static String API_BASE_URL = "";
     public static MessageChannel botLogChannel;
+    public static JsonElement essenceCostsJson;
+    public static JsonElement levelingJson;
     private static String GITHUB_TOKEN = "";
     private static int remainingLimit = 120;
     private static int timeTillReset = 60;
+    private static JsonElement collectionsJson;
+    private static JsonElement petUrlJson;
+    private static JsonElement enchantsJson;
+    private static JsonElement petNumsJson;
+    private static JsonElement petsJson;
 
     public static void setApplicationSettings() {
         Properties appProps = new Properties();
@@ -100,6 +108,116 @@ public class Utils {
             return null;
         }
     }
+
+
+    public static JsonElement getPetJson() {
+        if (petsJson == null) {
+            petsJson = getJson(
+                    "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/pets.json");
+        }
+        return petsJson;
+    }
+
+    public static JsonElement getPetNumsJson() {
+        if (petNumsJson == null) {
+            petNumsJson = getJson(
+                    "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/petnums.json");
+        }
+        return petNumsJson;
+    }
+
+    public static JsonElement getEnchantsJson() {
+        if (enchantsJson == null) {
+            enchantsJson = getJson(
+                    "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/enchants.json");
+        }
+        return enchantsJson;
+    }
+
+    public static JsonElement getLevelingJson() {
+        if (levelingJson == null) {
+            levelingJson = getJson(
+                    "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/leveling.json");
+        }
+        return levelingJson;
+    }
+
+    public static JsonElement getEssenceCostsJson() {
+        if (essenceCostsJson == null) {
+            essenceCostsJson = getJson(
+                    "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/essencecosts.json");
+
+        }
+        return essenceCostsJson;
+    }
+
+    public static String getSkyCryptData(String dataUrl) {
+        if (!dataUrl.contains("raw.githubusercontent.com")) {
+            return null;
+        }
+
+        try {
+            CloseableHttpClient httpclient = HttpClientBuilder.create().build();
+            HttpGet httpget = new HttpGet(dataUrl);
+            httpget.setHeader("Authorization", "token " + GITHUB_TOKEN);
+            httpget.addHeader("content-type", "application/json; charset=UTF-8");
+
+            HttpResponse httpresponse = httpclient.execute(httpget);
+
+            InputStream inputStream = httpresponse.getEntity().getContent();
+            ByteArrayOutputStream result = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            for (int length; (length = inputStream.read(buffer)) != -1; ) {
+                result.write(buffer, 0, length);
+            }
+            return result.toString("UTF-8").split("module.exports = ")[1];
+        } catch (Exception ignored) {
+        }
+        return null;
+    }
+
+    public static JsonElement parseJsString(String jsString) {
+        try {
+            return JsonParser.parseString(jsScriptEngine.eval(String.format("JSON.stringify(%s);", jsString)).toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static String getPetUrl(String petName) {
+        if (petUrlJson == null) {
+            petUrlJson = parseJsString(
+                    getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/pets.js").split("pet_value")[0] + "}");
+        }
+        try {
+            return "https://sky.shiiyu.moe" + higherDepth(higherDepth(higherDepth(petUrlJson, "pet_data"), petName.toUpperCase()), "head").getAsString();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static String convertSkyblockIdName(String itemName) {
+        if (collectionsJson == null) {
+            collectionsJson = parseJsString(
+                    getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/collections.js").replace(";", ""));
+        }
+
+        try {
+            JsonArray collectionsArray = higherDepth(collectionsJson, "collection_data").getAsJsonArray();
+            for (JsonElement collection : collectionsArray) {
+                try {
+                    if (higherDepth(collection, "skyblockId").getAsString().equals(itemName)) {
+                        return higherDepth(collection, "name").getAsString();
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        return capitalizeString(itemName.replace("_", " ").toLowerCase());
+    }
+
 
     public static JsonElement getJson(String jsonUrl) {
         try {
@@ -187,6 +305,88 @@ public class Utils {
         }
         return null;
 
+    }
+
+    public static String convertToInternalName(String itemName) {
+        String preFormattedItem = itemName.trim().toUpperCase().replace(" ", "_").replace("'S", "")
+                .replace("FRAG", "FRAGMENT").replace(".", "");
+
+        if (preFormattedItem.equals("NECRON_HELMET")) {
+            preFormattedItem = "POWER_WITHER_HELMET";
+        } else if (preFormattedItem.equals("NECRON_CHESTPLATE")) {
+            preFormattedItem = "POWER_WITHER_CHESTPLATE";
+        } else if (preFormattedItem.equals("NECRON_LEGGINGS")) {
+            preFormattedItem = "POWER_WITHER_LEGGINGS";
+        } else if (preFormattedItem.equals("NECRON_BOOTS")) {
+            preFormattedItem = "POWER_WITHER_BOOTS";
+        } else if (preFormattedItem.equals("STORM_HELMET")) {
+            preFormattedItem = "WISE_WITHER_HELMET";
+        } else if (preFormattedItem.equals("STORM_CHESTPLATE")) {
+            preFormattedItem = "WISE_WITHER_CHESTPLATE";
+        } else if (preFormattedItem.equals("STORM_LEGGINGS")) {
+            preFormattedItem = "WISE_WITHER_LEGGINGS";
+        } else if (preFormattedItem.equals("STORM_BOOTS")) {
+            preFormattedItem = "WISE_WITHER_BOOTS";
+        } else if (preFormattedItem.equals("MAXOR_HELMET")) {
+            preFormattedItem = "SPEED_WITHER_HELMET";
+        } else if (preFormattedItem.equals("MAXOR_CHESTPLATE")) {
+            preFormattedItem = "SPEED_WITHER_CHESTPLATE";
+        } else if (preFormattedItem.equals("MAXOR_LEGGINGS")) {
+            preFormattedItem = "SPEED_WITHER_LEGGINGS";
+        } else if (preFormattedItem.equals("MAXOR_BOOTS")) {
+            preFormattedItem = "SPEED_WITHER_BOOTS";
+        } else if (preFormattedItem.equals("GOLDOR_HELMET")) {
+            preFormattedItem = "TANK_WITHER_HELMET";
+        } else if (preFormattedItem.equals("GOLDOR_CHESTPLATE")) {
+            preFormattedItem = "TANK_WITHER_CHESTPLATE";
+        } else if (preFormattedItem.equals("GOLDOR_LEGGINGS")) {
+            preFormattedItem = "TANK_WITHER_LEGGINGS";
+        } else if (preFormattedItem.equals("GOLDOR_BOOTS")) {
+            preFormattedItem = "TANK_WITHER_BOOTS";
+        } else if (preFormattedItem.equals("BONEMERANG")) {
+            preFormattedItem = "BONE_BOOMERANG";
+        } else if (preFormattedItem.equals("GOD_POT")) {
+            preFormattedItem = "GOD_POTION";
+        } else if (preFormattedItem.equals("AOTD")) {
+            preFormattedItem = "ASPECT_OF_THE_DRAGON";
+        } else if (preFormattedItem.equals("AOTE")) {
+            preFormattedItem = "ASPECT_OF_THE_END";
+        } else if (preFormattedItem.equals("ROD_OF_CHAMPIONS")) {
+            preFormattedItem = "CHAMP_ROD";
+        } else if (preFormattedItem.equals("ROD_OF_LEGENDS")) {
+            preFormattedItem = "LEGEND_ROD";
+        } else if (preFormattedItem.equals("CHALLENGING_ROD")) {
+            preFormattedItem = "CHALLENGE_ROD";
+        } else if (preFormattedItem.equals("LASR_EYE")) {
+            preFormattedItem = "GIANT_FRAGMENT_LASER";
+        } else if (preFormattedItem.equals("DIAMANTE_HANDLE")) {
+            preFormattedItem = "GIANT_FRAGMENT_DIAMOND";
+        } else if (preFormattedItem.equals("BIGFOOT_LASSO")) {
+            preFormattedItem = "GIANT_FRAGMENT_BIGFOOT";
+        } else if (preFormattedItem.equals("JOLLY_PINK_ROCK")) {
+            preFormattedItem = "GIANT_FRAGMENT_BOULDER";
+        } else if (preFormattedItem.equals("HYPER_CATALYST")) {
+            preFormattedItem = "HYPER_CATALYST_UPGRADE";
+        } else if (preFormattedItem.equals("ENDER_HELMET")) {
+            preFormattedItem = "END_HELMET";
+        } else if (preFormattedItem.equals("ENDER_CHESTPLATE")) {
+            preFormattedItem = "END_CHESTPLATE";
+        } else if (preFormattedItem.equals("ENDER_LEGGINGS")) {
+            preFormattedItem = "END_LEGGINGS";
+        } else if (preFormattedItem.equals("ENDER_BOOTS")) {
+            preFormattedItem = "END_BOOTS";
+        } else if (preFormattedItem.equals("EMPEROR_SKULL")) {
+            preFormattedItem = "DIVER_FRAGMENT";
+        } else if (preFormattedItem.contains("GOLDEN") && preFormattedItem.contains("HEAD")) {
+            preFormattedItem = preFormattedItem.replace("GOLDEN", "GOLD");
+        } else if (preFormattedItem.equals("COLOSSAL_EXP_BOTTLE")) {
+            preFormattedItem = "COLOSSAL_EXP_BOTTLE_UPGRADE";
+        } else if (preFormattedItem.equals("FLYCATCHER")) {
+            preFormattedItem = "FLYCATCHER_UPGRADE";
+        } else if (preFormattedItem.contains("PET_SKIN")) {
+            preFormattedItem = "PET_SKIN_" + preFormattedItem.replace("PET_SKIN", "");
+        }
+        return preFormattedItem;
     }
 
     public static UsernameUuidStruct usernameToUuidUsername(String username) {

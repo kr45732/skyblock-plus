@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
 
 import static com.skyblockplus.utils.Utils.*;
 
-public class BinCommands extends Command {
+public class BinCommand extends Command {
 
-    public BinCommands() {
+    public BinCommand() {
         this.name = "bin";
         this.cooldown = globalCooldown;
     }
@@ -48,8 +48,7 @@ public class BinCommands extends Command {
             return eb;
         }
 
-        String preFormattedItem = item.trim().toUpperCase().replace(" ", "_").replace("'S", "")
-                .replace("FRAG", "FRAGMENT").replace(".", "");
+        String preFormattedItem = convertToInternalName(item);
 
         if (higherDepth(lowestBinJson, preFormattedItem) != null) {
             EmbedBuilder eb = defaultEmbed("Lowest bin");
@@ -59,98 +58,7 @@ public class BinCommands extends Command {
             return eb;
         }
 
-        JsonElement petJson = getJson(
-                "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/petnums.json");
-
-        List<String> petNames = petJson.getAsJsonObject().entrySet().stream().map(Entry::getKey)
-                .collect(Collectors.toCollection(ArrayList::new));
-
-        if (preFormattedItem.equals("NECRON_HELMET")) {
-            preFormattedItem = "POWER_WITHER_HELMET";
-        } else if (preFormattedItem.equals("NECRON_CHESTPLATE")) {
-            preFormattedItem = "POWER_WITHER_CHESTPLATE";
-        } else if (preFormattedItem.equals("NECRON_LEGGINGS")) {
-            preFormattedItem = "POWER_WITHER_LEGGINGS";
-        } else if (preFormattedItem.equals("NECRON_BOOTS")) {
-            preFormattedItem = "POWER_WITHER_BOOTS";
-        } else if (preFormattedItem.equals("STORM_HELMET")) {
-            preFormattedItem = "WISE_WITHER_HELMET";
-        } else if (preFormattedItem.equals("STORM_CHESTPLATE")) {
-            preFormattedItem = "WISE_WITHER_CHESTPLATE";
-        } else if (preFormattedItem.equals("STORM_LEGGINGS")) {
-            preFormattedItem = "WISE_WITHER_LEGGINGS";
-        } else if (preFormattedItem.equals("STORM_BOOTS")) {
-            preFormattedItem = "WISE_WITHER_BOOTS";
-        } else if (preFormattedItem.equals("MAXOR_HELMET")) {
-            preFormattedItem = "SPEED_WITHER_HELMET";
-        } else if (preFormattedItem.equals("MAXOR_CHESTPLATE")) {
-            preFormattedItem = "SPEED_WITHER_CHESTPLATE";
-        } else if (preFormattedItem.equals("MAXOR_LEGGINGS")) {
-            preFormattedItem = "SPEED_WITHER_LEGGINGS";
-        } else if (preFormattedItem.equals("MAXOR_BOOTS")) {
-            preFormattedItem = "SPEED_WITHER_BOOTS";
-        } else if (preFormattedItem.equals("GOLDOR_HELMET")) {
-            preFormattedItem = "TANK_WITHER_HELMET";
-        } else if (preFormattedItem.equals("GOLDOR_CHESTPLATE")) {
-            preFormattedItem = "TANK_WITHER_CHESTPLATE";
-        } else if (preFormattedItem.equals("GOLDOR_LEGGINGS")) {
-            preFormattedItem = "TANK_WITHER_LEGGINGS";
-        } else if (preFormattedItem.equals("GOLDOR_BOOTS")) {
-            preFormattedItem = "TANK_WITHER_BOOTS";
-        } else if (preFormattedItem.equals("BONEMERANG")) {
-            preFormattedItem = "BONE_BOOMERANG";
-        } else if (preFormattedItem.equals("GOD_POT")) {
-            preFormattedItem = "GOD_POTION";
-        } else if (preFormattedItem.equals("AOTD")) {
-            preFormattedItem = "ASPECT_OF_THE_DRAGON";
-        } else if (preFormattedItem.equals("AOTE")) {
-            preFormattedItem = "ASPECT_OF_THE_END";
-        } else if (preFormattedItem.equals("ROD_OF_CHAMPIONS")) {
-            preFormattedItem = "CHAMP_ROD";
-        } else if (preFormattedItem.equals("ROD_OF_LEGENDS")) {
-            preFormattedItem = "LEGEND_ROD";
-        } else if (preFormattedItem.equals("CHALLENGING_ROD")) {
-            preFormattedItem = "CHALLENGE_ROD";
-        } else if (preFormattedItem.equals("LASR_EYE")) {
-            preFormattedItem = "GIANT_FRAGMENT_LASER";
-        } else if (preFormattedItem.equals("DIAMANTE_HANDLE")) {
-            preFormattedItem = "GIANT_FRAGMENT_DIAMOND";
-        } else if (preFormattedItem.equals("BIGFOOT_LASSO")) {
-            preFormattedItem = "GIANT_FRAGMENT_BIGFOOT";
-        } else if (preFormattedItem.equals("JOLLY_PINK_ROCK")) {
-            preFormattedItem = "GIANT_FRAGMENT_BOULDER";
-        } else if (preFormattedItem.equals("HYPER_CATALYST")) {
-            preFormattedItem = "HYPER_CATALYST_UPGRADE";
-        } else if (preFormattedItem.equals("ENDER_HELMET")) {
-            preFormattedItem = "END_HELMET";
-        } else if (preFormattedItem.equals("ENDER_CHESTPLATE")) {
-            preFormattedItem = "END_CHESTPLATE";
-        } else if (preFormattedItem.equals("ENDER_LEGGINGS")) {
-            preFormattedItem = "END_LEGGINGS";
-        } else if (preFormattedItem.equals("ENDER_BOOTS")) {
-            preFormattedItem = "END_BOOTS";
-        } else if (preFormattedItem.equals("EMPEROR_SKULL")) {
-            preFormattedItem = "DIVER_FRAGMENT";
-        } else if (preFormattedItem.contains("GOLDEN") && preFormattedItem.contains("HEAD")) {
-            preFormattedItem = preFormattedItem.replace("GOLDEN", "GOLD");
-        } else if (preFormattedItem.equals("COLOSSAL_EXP_BOTTLE")) {
-            preFormattedItem = "COLOSSAL_EXP_BOTTLE_UPGRADE";
-        } else if (preFormattedItem.equals("FLYCATCHER")) {
-            preFormattedItem = "FLYCATCHER_UPGRADE";
-        } else if (preFormattedItem.contains("PET_SKIN")) {
-            preFormattedItem = "PET_SKIN_" + preFormattedItem.replace("PET_SKIN", "");
-        }
-
-        if (higherDepth(lowestBinJson, preFormattedItem) != null) {
-            EmbedBuilder eb = defaultEmbed("Lowest bin");
-            eb.addField(capitalizeString(item.toLowerCase()),
-                    formatNumber(higherDepth(lowestBinJson, preFormattedItem).getAsLong()), false);
-            eb.setThumbnail("https://sky.lea.moe/item.gif/" + preFormattedItem);
-            return eb;
-        }
-
-        JsonElement enchantsJson = higherDepth(getJson(
-                "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/enchants.json"),
+        JsonElement enchantsJson = higherDepth(getEssenceCostsJson(),
                 "enchants_min_level");
 
         List<String> enchantNames = enchantsJson.getAsJsonObject().entrySet().stream()
@@ -195,7 +103,7 @@ public class BinCommands extends Command {
                         if (eb.getFields().size() == 0) {
                             return defaultEmbed("No bin found for " + capitalizeString(item.toLowerCase()));
                         }
-                        eb.setThumbnail("https://sky.lea.moe/item.gif/" + preFormattedItem);
+                        eb.setThumbnail("https://sky.lea.moe/item.gif/ENCHANTED_BOOK");
                         return eb;
                     } catch (NullPointerException ex) {
                         return defaultEmbed("No bin found for " + capitalizeString(item.toLowerCase()));
@@ -205,6 +113,12 @@ public class BinCommands extends Command {
                 }
             }
         }
+
+
+        JsonElement petJson = getPetNumsJson();
+
+        List<String> petNames = petJson.getAsJsonObject().entrySet().stream().map(Entry::getKey)
+                .collect(Collectors.toCollection(ArrayList::new));
 
         for (String i : petNames) {
             if (preFormattedItem.contains(i)) {
@@ -235,6 +149,7 @@ public class BinCommands extends Command {
                 EmbedBuilder eb = defaultEmbed("Lowest bin");
                 eb.addField(capitalizeString(petName) + " pet",
                         formatNumber(higherDepth(lowestBinJson, formattedName).getAsLong()), false);
+                eb.setThumbnail(getPetUrl(formattedName.split(";")[0]));
                 return eb;
             }
         }

@@ -5,7 +5,6 @@ import lombok.Data;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.persistence.Lob;
 
 @Data
 @AllArgsConstructor
@@ -25,11 +24,15 @@ public class AutomatedApplication {
 
     @Column(length = 2048)
     private String denyMessageText = ""; // Message sent to applicant if denied
+
+    @Column(length = 2048)
+    private String waitlistedMessageText = ""; // Message sent to applicant if waitlisted
+
     private String staffPingRoleId = ""; // Role to ping when new application is sent to staff channel
 
     private String previousMessageId = "";
 
-    @Column(columnDefinition="TEXT")
+    @Column(columnDefinition = "TEXT")
     private String applyUsersCache = "";
 
     public AutomatedApplication() {

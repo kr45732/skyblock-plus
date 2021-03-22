@@ -13,10 +13,10 @@ import java.util.Map;
 
 import static com.skyblockplus.utils.Utils.*;
 
-public class SkillsCommands extends Command {
+public class SkillsCommand extends Command {
     private JsonElement levelTables;
 
-    public SkillsCommands() {
+    public SkillsCommand() {
         this.name = "skills";
         this.cooldown = globalCooldown;
     }
@@ -30,9 +30,7 @@ public class SkillsCommands extends Command {
 
         logCommand(event.getGuild(), event.getAuthor(), content);
 
-        levelTables = getJson(
-                "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/leveling.json");
-        if (levelTables == null) {
+        if (getLevelingJson() == null) {
             eb = defaultEmbed("Error fetching data from github");
             ebMessage.editMessage(eb.build()).queue();
             return;

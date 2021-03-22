@@ -85,7 +85,6 @@ public class ApplyUser implements Serializable {
             return onMessageReactionAddStaff(event);
         }
 
-        // User
         if (!event.getMessageId().equals(reactMessageId)) {
             return false;
         }
@@ -106,7 +105,7 @@ public class ApplyUser implements Serializable {
             }
         }
 
-        if (event.getReactionEmote().getName().equals("❌")) {
+        if (event.getReactionEmote().getEmoji().equals("❌")) {
             state = 3;
         } else if (event.getReactionEmote().getName().equals("↩️") && state == 1) {
             state = 2;
@@ -246,7 +245,7 @@ public class ApplyUser implements Serializable {
                 break;
             case 3:
                 EmbedBuilder cancelEmbed = defaultEmbed("Canceling application");
-                cancelEmbed.setDescription("Channel closing in 5 seconds...");
+                cancelEmbed.setDescription("Channel closing");
                 applicationChannel.sendMessage(cancelEmbed.build()).queue();
                 event.getGuild().getTextChannelById(event.getChannel().getId()).delete().reason("Application canceled")
                         .queueAfter(5, TimeUnit.SECONDS);
@@ -264,7 +263,7 @@ public class ApplyUser implements Serializable {
             if (shouldDeleteChannel && (event.getMessageId().equals(reactMessageId))) {
                 if (event.getReactionEmote().getName().equals("✅")) {
                     event.getReaction().clearReactions().queue();
-                    EmbedBuilder eb = defaultEmbed("Channel closing in 10 seconds");
+                    EmbedBuilder eb = defaultEmbed("Channel closing");
                     applicationChannel.sendMessage(eb.build()).queue();
                     applicationChannel.delete().reason("Applicant read final message").queueAfter(10, TimeUnit.SECONDS);
                     return true;
@@ -284,7 +283,7 @@ public class ApplyUser implements Serializable {
         TextChannel staffChannel = jda.getTextChannelById(staffChannelId);
         User applyingUser = jda.getUserById(applyingUserId);
         Message reactMessage = event.getChannel().retrieveMessageById(event.getMessageId()).complete();
-        if (event.getReactionEmote().getName().equals("❌")) {
+        if (event.getReactionEmote().getEmoji().equals("❌")) {
             staffChannel.sendMessage(playerUsername + " (" + applyingUser.getAsMention() + ") was denied by "
                     + event.getUser().getName() + " (" + event.getUser().getAsMention() + ")").queue();
             reactMessage.clearReactions().queue();
@@ -298,7 +297,7 @@ public class ApplyUser implements Serializable {
             this.reactMessageId = reactMessage.getId();
             shouldDeleteChannel = true;
 
-        } else if (event.getReactionEmote().getName().equals("✅")) {
+        } else if (event.getReactionEmote().getEmoji().equals("✅")) {
             staffChannel.sendMessage(playerUsername + " (" + applyingUser.getAsMention() + ") was accepted by "
                     + event.getUser().getName() + " (" + event.getUser().getAsMention() + ")").queue();
             reactMessage.clearReactions().queue();
@@ -319,6 +318,30 @@ public class ApplyUser implements Serializable {
 
             this.reactMessageId = reactMessage.getId();
             shouldDeleteChannel = true;
+        }else if(event.getReactionEmote().getEmoji().equals("\uD83D\uDD50")){
+            if(higherDepth(currentSettings, "waitlistedMessageText") != null && !higherDepth(currentSettings, "waitlistedMessageText").getAsString().equals("none")) {
+                staffChannel.sendMessage(playerUsername + " (" + applyingUser.getAsMention() + ") was waitlisted by "
+                        + event.getUser().getName() + " (" + event.getUser().getAsMention() + ")").queue();
+                reactMessage.clearReactions().queue();
+                EmbedBuilder eb = defaultEmbed("Application waitlisted");
+                eb.setDescription(higherDepth(currentSettings, "waitlistedMessageText").getAsString()
+                        + "\n**React with ✅ to close the channel**");
+                applicationChannel.sendMessage(applyingUser.getAsMention()).queue();
+                reactMessage.delete().queueAfter(5, TimeUnit.SECONDS);
+                reactMessage = applicationChannel.sendMessage(eb.build()).complete();
+                reactMessage.addReaction("✅").queue();
+            }
+
+//            JsonElement guildRoleSettings = database.getGuildRoleSettings(guildId);
+//            try {
+//                Guild guild = jda.getGuildById(guildId);
+//
+//                guild.addRoleToMember(applyingUserId, guild.getRoleById(higherDepth(guildRoleSettings, "roleId").getAsString())).queue();
+//            } catch (Exception ignored) {
+//            }
+
+            this.reactMessageId = reactMessage.getId();
+            shouldDeleteChannel = true;
         }
         return false;
     }
@@ -336,12 +359,17 @@ public class ApplyUser implements Serializable {
         applyPlayerStats.addField("Progress average skill level", playerSkills, true);
         applyPlayerStats.addField("Catacombs level", "" + playerCatacombs, true);
         applyPlayerStats.addField("To accept the application,", "React with ✅", true);
-        applyPlayerStats.addBlankField(true);
+        if(higherDepth(currentSettings, "waitlistedMessageText") != null && !higherDepth(currentSettings, "waitlistedMessageText").getAsString().equals("none")) {
+            applyPlayerStats.addField("To waitlist the application,", "React with \uD83D\uDD50", true);
+        }
         applyPlayerStats.addField("To deny the application,", "React with ❌", true);
         staffChannel.sendMessage("<@&" + higherDepth(currentSettings, "staffPingRoleId").getAsString() + ">")
                 .complete();
         Message reactMessage = staffChannel.sendMessage(applyPlayerStats.build()).complete();
         reactMessage.addReaction("✅").queue();
+        if(higherDepth(currentSettings, "waitlistedMessageText") != null && !higherDepth(currentSettings, "waitlistedMessageText").getAsString().equals("none")) {
+            reactMessage.addReaction("\uD83D\uDD50").queue();
+        }
         reactMessage.addReaction("❌").queue();
         reactMessageId = reactMessage.getId();
     }

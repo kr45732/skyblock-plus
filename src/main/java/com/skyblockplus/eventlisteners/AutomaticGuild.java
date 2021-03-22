@@ -227,7 +227,7 @@ public class AutomaticGuild {
             System.out.println("== Stack Trace (Reload apply constructor error - "+guildId+") ==");
             e.printStackTrace();
             if(e.getMessage().contains("Missing permission")){
-                return "Error Reloading\nMissing permission(s): " + e.getMessage().split("Missing permission: ")[1];
+                return "Error Reloading\nMissing permission: " + e.getMessage().split("Missing permission: ")[1];
             }
         }
         return "Error Reloading";
@@ -279,7 +279,7 @@ public class AutomaticGuild {
             System.out.println("== Stack Trace (Reload verify constructor error - "+guildId+") ==");
             e.printStackTrace();
             if(e.getMessage().contains("Missing permission")){
-                return "Error Reloading\nMissing permission(s): " + e.getMessage().split("Missing permission: ")[1];
+                return "Error Reloading\nMissing permission: " + e.getMessage().split("Missing permission: ")[1];
             }
         }
         return "Error Reloading";

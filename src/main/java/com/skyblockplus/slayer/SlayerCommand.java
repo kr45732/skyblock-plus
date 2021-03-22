@@ -9,9 +9,9 @@ import net.dv8tion.jda.api.entities.Message;
 
 import static com.skyblockplus.utils.Utils.*;
 
-public class SlayerCommands extends Command {
+public class SlayerCommand extends Command {
 
-    public SlayerCommands() {
+    public SlayerCommand() {
         this.name = "slayer";
         this.cooldown = globalCooldown;
     }

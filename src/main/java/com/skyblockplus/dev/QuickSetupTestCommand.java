@@ -38,8 +38,7 @@ public class QuickSetupTestCommand extends Command {
                 if (args[2].equals("server")) {
                     ebMessage.editMessage(deleteServer(args[3]).build()).queue();
                     return;
-                }
-                else if (args[2].equals("apply_cache")) {
+                } else if (args[2].equals("apply_cache")) {
                     ebMessage.editMessage(deleteServerApplyCache(args[3]).build()).queue();
                     return;
                 }

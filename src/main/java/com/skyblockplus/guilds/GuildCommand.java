@@ -19,11 +19,11 @@ import java.util.concurrent.TimeUnit;
 
 import static com.skyblockplus.utils.Utils.*;
 
-public class GuildCommands extends Command {
+public class GuildCommand extends Command {
     private final EventWaiter waiter;
     private int counter = 0;
 
-    public GuildCommands(EventWaiter waiter) {
+    public GuildCommand(EventWaiter waiter) {
         this.name = "guild";
         this.cooldown = globalCooldown;
         this.waiter = waiter;

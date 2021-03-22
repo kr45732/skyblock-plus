@@ -9,12 +9,9 @@ import javax.persistence.Embeddable;
 @AllArgsConstructor
 @Embeddable
 public class GuildRole {
-//    @ElementCollection
-//    List<GuildRank> guildRankRoles = new ArrayList<>();
     private String enableGuildRole = "false";
     private String guildId = "";
     private String roleId = "";
-    private String enableGuildRanks = "false";
 
     public GuildRole() {
     }
