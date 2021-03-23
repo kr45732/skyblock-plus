@@ -100,7 +100,7 @@ public class SkyblockEvent {
                     for(String prizeLevel: prizeList){
                         try{
                             String[] prizeLevelArr = prizeLevel.split("-");
-                            prizeListMap.put(Integer.parseInt(prizeLevelArr[0].strip()), prizeLevelArr[1].strip());
+                            prizeListMap.put(Integer.parseInt(prizeLevelArr[0].trim()), prizeLevelArr[1].trim());
                         } catch (Exception ignored){}
                     }
 
