@@ -42,7 +42,6 @@ public class HelpCommand extends Command {
                 .setPageTitles(pageTitles).setCommandUser(event.getAuthor());
 
         int startingPage = 0;
-        String pageStr = event.getMessage().getContentDisplay().toLowerCase().split(" ")[1];
         Map<String, Integer> pageMap = new HashMap<>();
         pageMap.put("general", 2);
         pageMap.put("link", 2);
@@ -84,16 +83,20 @@ public class HelpCommand extends Command {
             pageMap.put("settings_guild", 14);
         }
 
-        if (pageMap.containsKey(pageStr)) {
-            startingPage = pageMap.get(pageStr);
-        } else {
-            try {
-                if (pageMap.containsValue(Integer.parseInt(pageStr))) {
-                    startingPage = Integer.parseInt(pageStr);
+        try {
+            String pageStr = event.getMessage().getContentDisplay().toLowerCase().split(" ")[1];
+
+            if (pageMap.containsKey(pageStr)) {
+                startingPage = pageMap.get(pageStr);
+            } else {
+                try {
+                    if (pageMap.containsValue(Integer.parseInt(pageStr))) {
+                        startingPage = Integer.parseInt(pageStr);
+                    }
+                } catch (Exception ignored) {
                 }
-            } catch (Exception ignored) {
             }
-        }
+        }catch (Exception ignored){}
 
         paginateBuilder.clearItems();
 
