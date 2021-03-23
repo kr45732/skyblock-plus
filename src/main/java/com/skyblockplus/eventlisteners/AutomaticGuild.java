@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
-import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
+import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
@@ -33,7 +33,7 @@ public class AutomaticGuild {
     private VerifyGuild verifyGuild = new VerifyGuild();
     private SkyblockEvent skyblockEvent = new SkyblockEvent();
 
-    public AutomaticGuild(GuildReadyEvent event) {
+    public AutomaticGuild(GenericGuildEvent event) {
         applyConstructor(event);
         verifyConstructor(event);
         guildRoleConstructor();
@@ -97,7 +97,7 @@ public class AutomaticGuild {
         return applyGuild.applyUserListSize() == 0;
     }
 
-    public void verifyConstructor(GuildReadyEvent event) {
+    public void verifyConstructor(GenericGuildEvent event) {
         JsonElement currentSettings = database.getVerifySettings(event.getGuild().getId());
         if (currentSettings == null) {
             return;
@@ -139,7 +139,7 @@ public class AutomaticGuild {
         }
     }
 
-    public void applyConstructor(GuildReadyEvent event) {
+    public void applyConstructor(GenericGuildEvent event) {
         JsonElement currentSettings = database.getApplySettings(event.getGuild().getId());
         if (currentSettings == null) {
             return;

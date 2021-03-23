@@ -1,6 +1,7 @@
 package com.skyblockplus.eventlisteners;
 
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
+import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
@@ -45,7 +46,20 @@ public class MainListener extends ListenerAdapter {
         if (isUniqueGuild(event.getGuild().getId())) {
             guildMap.put(event.getGuild().getId(), new AutomaticGuild(event));
         } else {
-            System.out.println(event.getGuild().getId() + " is not unique");
+            System.out.println(event.getGuild().getId() + " is not unique - ready");
+        }
+    }
+
+    @Override
+    public void onGuildJoin(GuildJoinEvent event) {
+        if (event.getGuild().getName().startsWith("Skyblock Plus - Emoji Server")) {
+            return;
+        }
+
+        if (isUniqueGuild(event.getGuild().getId())) {
+            guildMap.put(event.getGuild().getId(), new AutomaticGuild(event));
+        } else {
+            System.out.println(event.getGuild().getId() + " is not unique - join");
         }
     }
 
