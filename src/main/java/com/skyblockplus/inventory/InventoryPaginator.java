@@ -36,10 +36,6 @@ public class InventoryPaginator extends ListenerAdapter {
             return;
         }
 
-        if (!event.getGuild().getId().equals(pagePart2.getGuild().getId())) {
-            return;
-        }
-
         if (!event.getMessageId().equals(pagePart2.getId())) {
             if (event.getMessageId().equals(pagePart1.getId())) {
                 pagePart1.clearReactions().queue();

@@ -23,8 +23,8 @@ public class ApplyGuild {
         this.applyUserList = getApplyGuildUsersCache(reactMessage.getGuild().getId());
     }
 
-    public ApplyGuild(boolean enable) {
-        this.enable = enable;
+    public ApplyGuild() {
+        this.enable = false;
     }
 
     public int applyUserListSize() {

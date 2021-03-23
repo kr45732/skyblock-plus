@@ -77,7 +77,7 @@ public class RoleCommands extends Command {
             try {
                 JsonElement rolesJson = database.getRolesSettings(guild.getId());
                 if (rolesJson != null) {
-                    if (!higherDepth(rolesJson, "enable").getAsBoolean()) {
+                    if ((higherDepth(rolesJson, "enable") == null) || !higherDepth(rolesJson, "enable").getAsBoolean()) {
                         eb = defaultEmbed("Automatic roles not enabled for this server");
                         ebMessage.editMessage(eb.build()).queue();
                         return;

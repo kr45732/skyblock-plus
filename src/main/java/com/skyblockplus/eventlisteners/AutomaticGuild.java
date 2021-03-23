@@ -3,6 +3,7 @@ package com.skyblockplus.eventlisteners;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.eventlisteners.apply.ApplyGuild;
 import com.skyblockplus.eventlisteners.verify.VerifyGuild;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -28,8 +29,9 @@ import static com.skyblockplus.utils.Utils.*;
 
 public class AutomaticGuild {
     private final String guildId;
-    private ApplyGuild applyGuild = new ApplyGuild(false);
-    private VerifyGuild verifyGuild = new VerifyGuild(false);
+    private ApplyGuild applyGuild = new ApplyGuild();
+    private VerifyGuild verifyGuild = new VerifyGuild();
+    private SkyblockEvent skyblockEvent = new SkyblockEvent();
 
     public AutomaticGuild(GuildReadyEvent event) {
         applyConstructor(event);
@@ -220,7 +222,7 @@ public class AutomaticGuild {
                 applyGuild = new ApplyGuild(reactMessage, currentSettings);
                 return "Reloaded";
             } else {
-                applyGuild = new ApplyGuild(false);
+                applyGuild = new ApplyGuild();
                 return "Not enabled";
             }
         } catch (Exception e) {
@@ -272,7 +274,7 @@ public class AutomaticGuild {
                 verifyGuild = new VerifyGuild(reactChannel, reactMessage);
                 return "Reloaded";
             } else {
-                verifyGuild = new VerifyGuild(false);
+                verifyGuild = new VerifyGuild();
                 return "Not enabled";
             }
         } catch (Exception e) {
@@ -290,10 +292,25 @@ public class AutomaticGuild {
     }
 
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
-        verifyGuild.onGuildMessageReceived(event);
+        if(verifyGuild.onGuildMessageReceived(event)){
+            return;
+        }
+
+        String s = skyblockEvent.onGuildMessageReceived(event);
+        if(s.equals("delete")){
+            skyblockEvent = new SkyblockEvent();
+        }
     }
 
     public void onTextChannelDelete(TextChannelDeleteEvent event) {
         applyGuild.onTextChannelDelete(event);
+    }
+
+    public void createSkyblockEvent(CommandEvent event){
+        skyblockEvent = new SkyblockEvent(event);
+    }
+
+    public boolean skyblockEventEnabled(){
+        return skyblockEvent.isEnable();
     }
 }

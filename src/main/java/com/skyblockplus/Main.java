@@ -3,6 +3,7 @@ package com.skyblockplus;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.auctionbaz.AuctionCommand;
@@ -28,6 +29,7 @@ import com.skyblockplus.settings.SettingsCommand;
 import com.skyblockplus.settings.SetupCommand;
 import com.skyblockplus.settings.SpringDatabaseComponent;
 import com.skyblockplus.skills.SkillsCommand;
+import com.skyblockplus.skyblockevent.SkyblockEventCommand;
 import com.skyblockplus.slayer.SlayerCommand;
 import com.skyblockplus.timeout.MessageTimeout;
 import com.skyblockplus.weight.WeightCommand;
@@ -78,7 +80,8 @@ public class Main {
                 new CategoriesCommand(), new PartyFinderCommand(), new QuickSetupTestCommand(), new EmojiMapServerCommand(),
                 new EnderChestCommand(), new InstantTimeNow(), new GetEventListenersCommand(), new GetAllGuildsIn(waiter),
                 new LinkAccountCommand(), new GetSettingsFile(), new UnlinkAccountCommand(), new LinkedUserDev(),
-                new BazaarCommand(), new AverageAuctionCommand(), new PetsCommand(waiter));
+                new BazaarCommand(), new AverageAuctionCommand(), new PetsCommand(waiter), new SkyblockEventCommand(),
+                new DeleteMessagesCommand());
 
         if (BOT_PREFIX.equals("+")) {
             jda = JDABuilder.createDefault(BOT_TOKEN).setStatus(OnlineStatus.DO_NOT_DISTURB)

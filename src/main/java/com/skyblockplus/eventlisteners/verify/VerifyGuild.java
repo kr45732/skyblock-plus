@@ -19,34 +19,31 @@ public class VerifyGuild {
         this.originalMessage = originalMessage;
     }
 
-    public VerifyGuild(boolean enable) {
-        this.enable = enable;
+    public VerifyGuild() {
+        this.enable = false;
     }
 
-    public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
+    public boolean onGuildMessageReceived(GuildMessageReceivedEvent event) {
         if (!enable) {
-            return;
-        }
-
-        if (!event.getChannel().getId().equals(messageChannel.getId())) {
-            return;
+            return false;
         }
 
         if (event.getMessage().getId().equals(originalMessage.getId())) {
-            return;
+            return false;
         }
 
         if (!event.getAuthor().getId().equals(jda.getSelfUser().getId())) {
             if (event.getAuthor().isBot()) {
-                return;
+                return false;
             }
 
             if (!event.getMessage().getContentRaw().startsWith(BOT_PREFIX + "link ")) {
                 event.getMessage().delete().queue();
-                return;
+                return true;
             }
         }
 
         event.getMessage().delete().queueAfter(7, TimeUnit.SECONDS);
+        return true;
     }
 }

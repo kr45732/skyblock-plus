@@ -58,7 +58,7 @@ public class BinCommand extends Command {
             return eb;
         }
 
-        JsonElement enchantsJson = higherDepth(getEssenceCostsJson(),
+        JsonElement enchantsJson = higherDepth(getEnchantsJson(),
                 "enchants_min_level");
 
         List<String> enchantNames = enchantsJson.getAsJsonObject().entrySet().stream()
