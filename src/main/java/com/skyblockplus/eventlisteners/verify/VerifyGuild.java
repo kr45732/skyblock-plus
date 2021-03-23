@@ -28,6 +28,10 @@ public class VerifyGuild {
             return false;
         }
 
+        if (!event.getChannel().getId().equals(messageChannel.getId())) {
+            return false;
+        }
+
         if (event.getMessage().getId().equals(originalMessage.getId())) {
             return false;
         }
