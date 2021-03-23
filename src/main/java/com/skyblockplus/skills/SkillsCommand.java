@@ -14,8 +14,6 @@ import java.util.Map;
 import static com.skyblockplus.utils.Utils.*;
 
 public class SkillsCommand extends Command {
-    private JsonElement levelTables;
-
     public SkillsCommand() {
         this.name = "skills";
         this.cooldown = globalCooldown;
@@ -52,7 +50,7 @@ public class SkillsCommand extends Command {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 
         if (player.isValid()) {
-            JsonElement skillsCap = higherDepth(levelTables, "leveling_caps");
+            JsonElement skillsCap = higherDepth(getLevelingJson(), "leveling_caps");
 
             List<String> skills = getJsonKeys(skillsCap);
             skills.remove("catacombs");
