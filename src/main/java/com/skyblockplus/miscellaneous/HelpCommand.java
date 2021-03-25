@@ -28,8 +28,8 @@ public class HelpCommand extends Command {
         logCommand(event.getGuild(), event.getAuthor(), event.getMessage().getContentRaw());
 
         String[] pageTitles = new String[]{"Navigation", "General", "Slayer", "Skills", "Dungeons", "Guild",
-                "Auction House and Bazaar", "Inventory", "Miscellaneous Commands", "Settings", "Verify Settings", "Apply Settings",
-                "Roles Settings"};
+                "Auction House and Bazaar", "Inventory", "Miscellaneous Commands", "Skyblock Event", "Settings", "Verify Settings", "Apply Settings",
+                "Roles Settings", "Guild Role Settings"};
 
         CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(1).setItemsPerPage(1)
                 .showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
@@ -71,16 +71,15 @@ public class HelpCommand extends Command {
         pageMap.put("bank", 9);
         pageMap.put("weight", 9);
         pageMap.put("hypixel", 9);
-        pageMap.put("uuid", 10);
-        pageMap.put("categories", 10);
-        pageMap.put("settings", 10);
-        pageMap.put("setup", 10);
-
+        pageMap.put("event", 10);
+        pageMap.put("categories", 11);
+        pageMap.put("settings", 11);
+        pageMap.put("setup", 11);
         if (event.getGuild().getMember(event.getAuthor()).hasPermission(Permission.ADMINISTRATOR)) {
-            pageMap.put("settings_verify", 11);
-            pageMap.put("settings_apply", 12);
-            pageMap.put("settings_roles", 13);
-            pageMap.put("settings_guild", 14);
+            pageMap.put("settings_verify", 12);
+            pageMap.put("settings_apply", 13);
+            pageMap.put("settings_roles", 14);
+            pageMap.put("settings_guild", 15);
         }
 
         try {
@@ -104,12 +103,12 @@ public class HelpCommand extends Command {
         if (event.getGuild().getMember(event.getAuthor()).hasPermission(Permission.ADMINISTRATOR)) {
             paginateBuilder.addItems("Use the arrow emojis to navigate through the pages" +
                     generatePageMap("General", "Slayer", "Skills", "Dungeons", "Guild",
-                            "Auction House and Bazaar", "Inventory", "Miscellaneous Commands", "Settings", "Verify Settings",
-                            "Apply Settings", "Roles Settings", "Guild Roles Settings"));
+                            "Auction House and Bazaar", "Inventory", "Miscellaneous Commands", "Skyblock Event", "Settings", "Verify Settings",
+                            "Apply Settings", "Roles Settings", "Guild Roles Settings", "Guild Role Settings"));
         } else {
             paginateBuilder.addItems("Use the arrow emojis to navigate through the pages" +
                     generatePageMap("General", "Slayer", "Skills", "Dungeons", "Guild",
-                            "Auction House and Bazaar", "Inventory", "Miscellaneous Commands"));
+                            "Auction House and Bazaar", "Inventory", "Miscellaneous Commands", "Skyblock Event"));
         }
 
         paginateBuilder
@@ -171,6 +170,14 @@ public class HelpCommand extends Command {
                 "weight calculate [skill avg] [slayer] [cata level] [avg dungeon class level]")
                 + generateHelp("Get Hypixel information about a player", "hypixel [player]")
                 + generateHelp("Get fastest Hypixel lobby parkour for a player", "hypixel parkour [player]")
+        );
+
+        paginateBuilder.addItems(generateHelp("Interactive message to create a Skyblock event", "event create")
+                + generateHelp("Get information about the current event if any", "event current")
+                + generateHelp("Join the current event if any", "event join")
+                + generateHelp("Leave the current event if any", "event leave")
+                + generateHelp("Get the leaderboard for current event if any", "event leaderboard", "event lb")
+                + generateHelp("End the event early", "event end")
         );
 
         if (event.getGuild().getMember(event.getAuthor()).hasPermission(Permission.ADMINISTRATOR)) {

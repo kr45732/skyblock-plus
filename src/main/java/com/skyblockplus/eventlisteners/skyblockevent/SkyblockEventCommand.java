@@ -177,6 +177,7 @@ public class SkyblockEventCommand extends Command {
 
             if (ebStringPrize.length() > 0) {
                 announcementChannel.sendMessage(defaultEmbed("Prizes").setDescription(ebStringPrize.toString()).build()).complete();
+                database.updateSkyblockEventSettings(guildId, new SbEvent());
                 return;
             }
         } catch (Exception ignored) {
@@ -272,7 +273,16 @@ public class SkyblockEventCommand extends Command {
                     if (database.getSkyblockEventActive(event.getGuild().getId())) {
                         JsonElement linkedAccount = database.getLinkedUserByDiscordId(event.getAuthor().getId());
                         if (linkedAccount != null) {
-                            String uuid = higherDepth(linkedAccount, "minecraftUuid").getAsString();
+                            String uuid = "";
+                            String username = "";
+                            try{
+                                 uuid = higherDepth(linkedAccount, "minecraftUuid").getAsString();
+                                 username = higherDepth(linkedAccount, "minecraftUsername").getAsString();
+                            }catch (Exception e){
+                                ebMessage.editMessage(defaultEmbed("You must be linked to run this command. Use `" + BOT_PREFIX + "link [IGN]` to link").build()).queue();
+                                return;
+                            }
+
 
                             if (database.eventHasMemberByUuid(event.getGuild().getId(), uuid)) {
                                 ebMessage.editMessage(defaultEmbed("Error").setDescription("You are already in the event! If you want to leave or change profile run `" + BOT_PREFIX + "event leave`").build()).queue();
@@ -280,7 +290,6 @@ public class SkyblockEventCommand extends Command {
                             }
 
                             JsonElement guildIn = getJson("https://api.hypixel.net/findGuild?key=" + HYPIXEL_API_KEY + "&byUuid=" + uuid);
-                            String username = higherDepth(linkedAccount, "minecraftUsername").getAsString();
 
                             if (higherDepth(guildIn, "guild").getAsString().equals(database.getSkyblockEventGuildId(event.getGuild().getId()))) {
                                 Player player = args.length == 3 ? new Player(username, args[2]) : new Player(username);
@@ -371,7 +380,7 @@ public class SkyblockEventCommand extends Command {
                                 ebString.append(i + 1).append(") ").append(eventMember.getUsername()).append(" | +").append(eventMember.getStartingAmount()).append("\n");
                             }
                             eb = defaultEmbed("Event leaderboard");
-                            eb.setDescription("**This updates every 15 minuets**\n\n" + ebString.toString());
+                            eb.setDescription("**This updates every 15 minutes**\n\n" + ebString.toString());
                             ebMessage.editMessage(eb.build()).queue();
                             return;
                         }

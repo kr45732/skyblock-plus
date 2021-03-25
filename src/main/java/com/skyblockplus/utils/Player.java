@@ -1134,9 +1134,9 @@ public class Player {
     public String getFastestF7Time() {
         try {
             int f7TimeMilliseconds = higherDepth(higherDepth(higherDepth(higherDepth(higherDepth(profileJson, "dungeons"), "dungeon_types"), "catacombs"), "fastest_time_s_plus"), "7").getAsInt();
-            int minuets = f7TimeMilliseconds / 1000 / 60;
+            int minutes = f7TimeMilliseconds / 1000 / 60;
             int seconds = f7TimeMilliseconds % 1000 % 60;
-            return "\n**Fastest F7 S+:** " + minuets + ":" + (seconds >= 10 ? seconds : "0" + seconds);
+            return "\n**Fastest F7 S+:** " + minutes + ":" + (seconds >= 10 ? seconds : "0" + seconds);
         } catch (Exception e) {
             return "\n**No F7 S+ time found**";
         }
