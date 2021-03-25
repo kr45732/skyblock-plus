@@ -496,7 +496,7 @@ public class SkyblockEventCommand extends Command {
                             }
                         }
 
-                        eventMemberList.sort(Comparator.comparingInt(o1 -> Integer.parseInt(o1.getStartingAmount())));
+                        eventMemberList.sort(Comparator.comparingInt(o1 -> -Integer.parseInt(o1.getStartingAmount())));
 
                         StringBuilder ebString = new StringBuilder();
                         for (int i = 0; i < eventMemberList.size(); i++) {
