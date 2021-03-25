@@ -9,12 +9,16 @@ import com.skyblockplus.utils.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
+import org.asynchttpclient.AsyncHttpClient;
+import org.asynchttpclient.Dsl;
 
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static com.skyblockplus.utils.Utils.*;
 
@@ -22,19 +26,18 @@ public class GuildLeaderboardCommand extends Command {
 
     public GuildLeaderboardCommand() {
         this.name = "guild-rank";
-        this.cooldown = 240;
+        this.cooldown = (BOT_PREFIX.equals("+") ? 240 : 0);
         this.aliases = new String[]{"g-rank"};
         this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
     }
 
     @Override
     protected void execute(CommandEvent event) {
-        if (!event.getGuild().getId().equals("782154976243089429")) {
+        if ((BOT_PREFIX.equals("+")) && !event.getGuild().getId().equals("782154976243089429")) {
             return;
         }
 
         EmbedBuilder eb = loadingEmbed();
-        eb.setDescription("**NOTE:** This can take up to a minute!");
         Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 
         String content = event.getMessage().getContentRaw();
@@ -52,6 +55,9 @@ public class GuildLeaderboardCommand extends Command {
             String[] rankString = getLeaderboard(args[1].split("-")[1]);
             if (rankString != null) {
                 eb = defaultEmbed("Rank changes for guild " + rankString[2]);
+                if (rankString.length == 4 && rankString[3].equals("false")) {
+                    eb.setDescription("**There was an error fetching some stats!**");
+                }
                 eb.addField("Promote", rankString[0], false);
                 eb.addField("Demote", rankString[1], false);
             } else {
@@ -124,18 +130,95 @@ public class GuildLeaderboardCommand extends Command {
         ArrayList<Player> guildCatacombs = new ArrayList<>();
         ArrayList<String> uniqueGuildUuid = new ArrayList<>();
 
+        AsyncHttpClient asyncHttpClient = Dsl.asyncHttpClient();
+        CountDownLatch httpGetsFinishedLatch = new CountDownLatch(1);
+        int latchCount = 0;
         for (JsonElement guildMember : guildMembers) {
             String memberRank = higherDepth(guildMember, "rank").getAsString();
             if (!staffRankNames.contains(memberRank)) {
-                Player player = new Player(higherDepth(guildMember, "uuid").getAsString(), getLevelingJson(), memberRank);
-                if (player.isValid()) {
-                    uniqueGuildUuid.add(player.getUuid());
-                    guildSlayer.add(player);
-                    guildSkills.add(player);
-                    guildCatacombs.add(player);
-                }
+                latchCount++;
             }
         }
+
+        for (JsonElement guildMember : guildMembers) {
+            String memberRank = higherDepth(guildMember, "rank").getAsString();
+            if (!staffRankNames.contains(memberRank)) {
+                int finalLatchCount = latchCount;
+
+                String guildMemberUuid = higherDepth(guildMember, "uuid").getAsString();
+
+                try {
+                    if (remainingLimit < 5) {
+                        TimeUnit.SECONDS.sleep(timeTillReset);
+                        System.out.println("Sleeping for " + timeTillReset + " seconds");
+                    }
+                } catch (Exception ignored) {
+                }
+
+                asyncHttpClient
+                        .prepareGet("https://api.ashcon.app/mojang/v2/user/" + guildMemberUuid)
+                        .execute()
+                        .toCompletableFuture()
+                        .thenApply(
+                                uuidToUsernameResponse -> {
+                                    try {
+                                        return higherDepth(JsonParser.parseString(uuidToUsernameResponse.getResponseBody()), "username").getAsString();
+                                    } catch (Exception ignored) {
+                                    }
+                                    return null;
+                                }
+                        )
+                        .thenApply(
+                                guildMemberUsernameResponse -> {
+                                    asyncHttpClient
+                                            .prepareGet("https://api.hypixel.net/skyblock/profiles?key=" + HYPIXEL_API_KEY + "&uuid=" + guildMemberUuid)
+                                            .execute()
+                                            .toCompletableFuture()
+                                            .thenApply(
+                                                    guildMemberOuterProfileJsonResponse -> {
+                                                        try {
+                                                            try {
+                                                                remainingLimit = Integer.parseInt(guildMemberOuterProfileJsonResponse.getHeader("RateLimit-Remaining"));
+                                                                timeTillReset = Integer.parseInt(guildMemberOuterProfileJsonResponse.getHeader("RateLimit-Reset"));
+                                                            } catch (Exception ignored) {
+                                                            }
+
+                                                            JsonElement guildMemberOuterProfileJson = JsonParser.parseString(guildMemberOuterProfileJsonResponse.getResponseBody());
+                                                            Player guildMemberPlayer = new Player(guildMemberUuid, guildMemberUsernameResponse, guildMemberOuterProfileJson, memberRank);
+                                                            if (guildMemberPlayer.isValid()) {
+                                                                uniqueGuildUuid.add(guildMemberPlayer.getUuid());
+                                                                guildSlayer.add(guildMemberPlayer);
+                                                                guildSkills.add(guildMemberPlayer);
+                                                                guildCatacombs.add(guildMemberPlayer);
+                                                                return true;
+                                                            }
+                                                        } catch (Exception ignored) {
+                                                        }
+                                                        uniqueGuildUuid.add("null");
+                                                        return false;
+                                                    }
+                                            )
+                                            .whenComplete(
+                                                    (o, throwable) -> {
+                                                        if (uniqueGuildUuid.size() == finalLatchCount) {
+                                                            httpGetsFinishedLatch.countDown();
+                                                        }
+                                                    }
+                                            );
+                                    return null;
+                                }
+                        );
+            }
+        }
+
+        boolean success = true;
+        try {
+            success = httpGetsFinishedLatch.await(10, TimeUnit.SECONDS);
+            asyncHttpClient.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
 
         guildSlayer.sort(Comparator.comparingInt(Player::getSlayer));
         Collections.reverse(guildSlayer);
@@ -147,6 +230,10 @@ public class GuildLeaderboardCommand extends Command {
         Collections.reverse(guildCatacombs);
 
         for (String s : uniqueGuildUuid) {
+            if (s.equals("null")) {
+                continue;
+            }
+
             int slayerRank = -1;
             int skillsRank = -1;
             int catacombsRank = -1;
@@ -262,7 +349,7 @@ public class GuildLeaderboardCommand extends Command {
                 }
             }
         }
-
-        return new String[]{promoteString.toString(), demoteString.toString(), guildName};
+//
+        return new String[]{promoteString.toString(), demoteString.toString(), guildName, "" + success};
     }
 }

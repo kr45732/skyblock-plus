@@ -125,9 +125,9 @@ public class AuctionCommand extends Command {
 
     private boolean usernameToUuid(String username) {
         try {
-            JsonElement usernameJson = getJson("https://api.mojang.com/users/profiles/minecraft/" + username);
-            this.playerUsername = higherDepth(usernameJson, "name").getAsString();
-            this.playerUuid = higherDepth(usernameJson, "id").getAsString();
+            JsonElement usernameJson = getJson("https://api.ashcon.app/mojang/v2/user/" + username);
+            this.playerUsername = higherDepth(usernameJson, "username").getAsString();
+            this.playerUuid = higherDepth(usernameJson, "uuid").getAsString().replace("-", "");
             return true;
         } catch (Exception ignored) {
         }

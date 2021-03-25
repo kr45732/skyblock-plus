@@ -2,6 +2,7 @@ package com.skyblockplus.guilds;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -9,19 +10,18 @@ import com.skyblockplus.utils.CustomPaginator;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.exceptions.PermissionException;
+import org.asynchttpclient.AsyncHttpClient;
+import org.asynchttpclient.Dsl;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static com.skyblockplus.utils.Utils.*;
 
 public class GuildCommand extends Command {
     private final EventWaiter waiter;
-    private int counter = 0;
 
     public GuildCommand(EventWaiter waiter) {
         this.name = "guild";
@@ -120,34 +120,68 @@ public class GuildCommand extends Command {
         JsonArray membersArr = members.getAsJsonArray();
         Map<String, Integer> guildExpMap = new HashMap<>();
 
+        AsyncHttpClient asyncHttpClient = Dsl.asyncHttpClient();
+        CountDownLatch httpGetsFinishedLatch = new CountDownLatch(1);
         for (int i = 0; i < membersArr.size(); i++) {
-            String currentUsername = uuidToUsername(higherDepth(membersArr.get(i), "uuid").getAsString());
-            if (currentUsername == null) {
-                continue;
-            }
+            int finalI = i;
+            asyncHttpClient
+                    .prepareGet("https://api.ashcon.app/mojang/v2/user/" + higherDepth(membersArr.get(i), "uuid").getAsString())
+                    .execute()
+                    .toCompletableFuture()
+                    .thenApply(
+                            uuidToUsernameResponse -> {
+                                try {
+                                    String currentUsername = higherDepth(JsonParser.parseString(uuidToUsernameResponse.getResponseBody()), "username").getAsString();
+                                    JsonElement expHistory = higherDepth(membersArr.get(finalI), "expHistory");
+                                    ArrayList<String> keys = getJsonKeys(expHistory);
+                                    int totalPlayerExp = 0;
 
-            JsonElement expHistory = higherDepth(membersArr.get(i), "expHistory");
-            ArrayList<String> keys = getJsonKeys(expHistory);
-            int totalPlayerExp = 0;
+                                    for (String value : keys) {
+                                        totalPlayerExp += higherDepth(expHistory, value).getAsInt();
+                                    }
 
-            for (String value : keys) {
-                totalPlayerExp += higherDepth(expHistory, value).getAsInt();
-            }
+                                    guildExpMap.put(currentUsername, totalPlayerExp);
+                                } catch (Exception e) {
+                                    guildExpMap.put("@null" + finalI, 0);
+                                }
+                                return true;
+                            }
+                    )
+                    .whenComplete(
+                            (aBoolean, throwable) -> {
+                                if (guildExpMap.size() == membersArr.size()) {
+                                    httpGetsFinishedLatch.countDown();
+                                }
+                            }
+                    );
+        }
 
-            guildExpMap.put(currentUsername, totalPlayerExp);
+        try {
+            httpGetsFinishedLatch.await(10, TimeUnit.SECONDS);
+            asyncHttpClient.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         String[] outputStrArr = new String[guildExpMap.size()];
-        counter = 0;
-        guildExpMap.entrySet().stream().sorted((k1, k2) -> -k1.getValue().compareTo(k2.getValue())).forEach(k -> {
-            try {
+
+        LinkedHashMap<String, Integer> reverseSortedMap = new LinkedHashMap<>();
+
+        guildExpMap.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .forEachOrdered(x -> reverseSortedMap.put(x.getKey(), x.getValue()));
+
+
+        int counter = 0;
+        for (Map.Entry<String, Integer> k : reverseSortedMap.entrySet()) {
+            if (!k.getKey().startsWith("@null")) {
                 outputStrArr[counter] = "**" + (counter + 1) + ")** " + fixUsername(k.getKey()) + ": "
                         + formatNumber(k.getValue()) + " EXP\n";
-            } catch (Exception ignored) {
             }
-            counter++;
-        });
 
+            counter++;
+        }
         return new GuildStruct(null, outputStrArr);
     }
 

@@ -4,7 +4,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.api.discordserversettings.skyblockevent.EventMember;
 import com.skyblockplus.eventlisteners.apply.ApplyGuild;
+import com.skyblockplus.eventlisteners.skyblockevent.SkyblockEvent;
 import com.skyblockplus.eventlisteners.verify.VerifyGuild;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -17,6 +19,8 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
 import java.io.File;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -25,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.eventlisteners.skyblockevent.SkyblockEventCommand.endSkyblockEvent;
 import static com.skyblockplus.utils.Utils.*;
 
 public class AutomaticGuild {
@@ -32,6 +37,8 @@ public class AutomaticGuild {
     private ApplyGuild applyGuild = new ApplyGuild();
     private VerifyGuild verifyGuild = new VerifyGuild();
     private SkyblockEvent skyblockEvent = new SkyblockEvent();
+    private List<EventMember> eventMemberList = new ArrayList<>();
+    private Instant eventMemberListLastUpdated = null;
 
     public AutomaticGuild(GenericGuildEvent event) {
         applyConstructor(event);
@@ -40,15 +47,42 @@ public class AutomaticGuild {
         guildId = event.getGuild().getId();
     }
 
+    public List<EventMember> getEventMemberList() {
+        return eventMemberList;
+    }
+
+    public void setEventMemberList(List<EventMember> eventMemberList) {
+        this.eventMemberList = eventMemberList;
+    }
+
+    public Instant getEventMemberListLastUpdated() {
+        return eventMemberListLastUpdated;
+    }
+
+    public void setEventMemberListLastUpdated(Instant eventMemberListLastUpdated) {
+        this.eventMemberListLastUpdated = eventMemberListLastUpdated;
+    }
+
     public ApplyGuild getApplyGuild() {
         return applyGuild;
     }
 
     public void guildRoleConstructor() {
-        Runnable channelDeleter = this::updateGuildRoles;
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         int randomDelay = (int) (Math.random() * 360);
-        scheduler.scheduleAtFixedRate(channelDeleter, randomDelay, 180, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(this::updateGuildRoles, randomDelay, 180, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(this::updateSkyblockEvent, 0, 1, TimeUnit.HOURS);
+
+    }
+
+    private void updateSkyblockEvent() {
+        if (database.getSkyblockEventActive(guildId)) {
+            JsonElement currentSettings = database.getRunningEventSettings(guildId);
+            Instant endingTime = Instant.ofEpochSecond(higherDepth(currentSettings, "timeEndingSeconds").getAsLong());
+            if (Duration.between(Instant.now(), endingTime).toMinutes() <= 0) {
+                endSkyblockEvent(guildId);
+            }
+        }
     }
 
     public void updateGuildRoles() {
@@ -104,7 +138,7 @@ public class AutomaticGuild {
         }
 
         try {
-            if(higherDepth(currentSettings, "enable") == null || (higherDepth(currentSettings, "enable") != null && !higherDepth(currentSettings, "enable").getAsBoolean())){
+            if (higherDepth(currentSettings, "enable") == null || (higherDepth(currentSettings, "enable") != null && !higherDepth(currentSettings, "enable").getAsBoolean())) {
                 return;
             }
 
@@ -146,7 +180,7 @@ public class AutomaticGuild {
         }
 
         try {
-            if(higherDepth(currentSettings, "enable") == null || (higherDepth(currentSettings, "enable") != null && !higherDepth(currentSettings, "enable").getAsBoolean())){
+            if (higherDepth(currentSettings, "enable") == null || (higherDepth(currentSettings, "enable") != null && !higherDepth(currentSettings, "enable").getAsBoolean())) {
                 return;
             }
 
@@ -177,7 +211,7 @@ public class AutomaticGuild {
                 applyGuild = new ApplyGuild(reactMessage, currentSettings);
             }
         } catch (Exception e) {
-            System.out.println("== Stack Trace (Apply constructor error - "+event.getGuild().getId()+") ==");
+            System.out.println("== Stack Trace (Apply constructor error - " + event.getGuild().getId() + ") ==");
             e.printStackTrace();
         }
     }
@@ -226,9 +260,9 @@ public class AutomaticGuild {
                 return "Not enabled";
             }
         } catch (Exception e) {
-            System.out.println("== Stack Trace (Reload apply constructor error - "+guildId+") ==");
+            System.out.println("== Stack Trace (Reload apply constructor error - " + guildId + ") ==");
             e.printStackTrace();
-            if(e.getMessage().contains("Missing permission")){
+            if (e.getMessage().contains("Missing permission")) {
                 return "Error Reloading\nMissing permission: " + e.getMessage().split("Missing permission: ")[1];
             }
         }
@@ -278,9 +312,9 @@ public class AutomaticGuild {
                 return "Not enabled";
             }
         } catch (Exception e) {
-            System.out.println("== Stack Trace (Reload verify constructor error - "+guildId+") ==");
+            System.out.println("== Stack Trace (Reload verify constructor error - " + guildId + ") ==");
             e.printStackTrace();
-            if(e.getMessage().contains("Missing permission")){
+            if (e.getMessage().contains("Missing permission")) {
                 return "Error Reloading\nMissing permission: " + e.getMessage().split("Missing permission: ")[1];
             }
         }
@@ -292,12 +326,13 @@ public class AutomaticGuild {
     }
 
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
-        if(verifyGuild.onGuildMessageReceived(event)){
+        if (verifyGuild.onGuildMessageReceived(event)) {
             return;
         }
 
         String s = skyblockEvent.onGuildMessageReceived(event);
-        if(s.equals("delete")){
+        if (s.equals("delete")) {
+            skyblockEvent.getScheduler().shutdown();
             skyblockEvent = new SkyblockEvent();
         }
     }
@@ -306,11 +341,11 @@ public class AutomaticGuild {
         applyGuild.onTextChannelDelete(event);
     }
 
-    public void createSkyblockEvent(CommandEvent event){
+    public void createSkyblockEvent(CommandEvent event) {
         skyblockEvent = new SkyblockEvent(event);
     }
 
-    public boolean skyblockEventEnabled(){
+    public boolean skyblockEventEnabled() {
         return skyblockEvent.isEnable();
     }
 }

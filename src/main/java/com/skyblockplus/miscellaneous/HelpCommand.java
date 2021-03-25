@@ -96,7 +96,8 @@ public class HelpCommand extends Command {
                 } catch (Exception ignored) {
                 }
             }
-        }catch (Exception ignored){}
+        } catch (Exception ignored) {
+        }
 
         paginateBuilder.clearItems();
 

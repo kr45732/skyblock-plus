@@ -5,6 +5,9 @@ import com.skyblockplus.api.discordserversettings.automatedguildroles.GuildRole;
 import com.skyblockplus.api.discordserversettings.automatedroles.AutomatedRoles;
 import com.skyblockplus.api.discordserversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.discordserversettings.automatedverify.AutomatedVerify;
+import com.skyblockplus.api.discordserversettings.skyblockevent.EventMember;
+import com.skyblockplus.api.discordserversettings.skyblockevent.RunningEvent;
+import com.skyblockplus.api.discordserversettings.skyblockevent.SbEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -309,5 +312,124 @@ public class ServerSettingsService {
             return new ResponseEntity<>(HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    public ResponseEntity<?> getSkyblockEventSettings(String serverId) {
+        if (serverByServerIdExists(serverId)) {
+            return new ResponseEntity<>(settingsRepository.findServerByServerId(serverId).getSbEvent(), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    public ResponseEntity<?> getRunningSkyblockEventSettings(String serverId) {
+        if (serverByServerIdExists(serverId)) {
+            if (getSkyblockEventActive(serverId)) {
+                return new ResponseEntity<>(settingsRepository.findServerByServerId(serverId).getSbEvent().getRunningEvent(), HttpStatus.OK);
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    public boolean getSkyblockEventActive(String serverId) {
+        if (serverByServerIdExists(serverId)) {
+            try {
+                if (settingsRepository.findServerByServerId(serverId).getSbEvent().getEventActive().equals("true")) {
+                    return true;
+                }
+            } catch (Exception ignored) {
+            }
+        }
+        return false;
+    }
+
+    public ResponseEntity<HttpStatus> updateSkyblockEventActive(String serverId, String setActive) {
+        if (serverByServerIdExists(serverId)) {
+            setActive = setActive.equals("true") ? "true" : "false";
+
+            ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+            SbEvent currentSbEventSettings = currentServerSettings.getSbEvent();
+            currentSbEventSettings.setEventActive(setActive);
+            currentServerSettings.setSbEvent(currentSbEventSettings);
+            settingsRepository.save(currentServerSettings);
+            return new ResponseEntity<>(HttpStatus.OK);
+
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    public ResponseEntity<HttpStatus> updateSkyblockRunningEvent(String serverId, RunningEvent newSettings) {
+        if (serverByServerIdExists(serverId)) {
+            ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+            SbEvent currentSbEventSettings = currentServerSettings.getSbEvent();
+            currentSbEventSettings.setRunningEvent(newSettings);
+            currentServerSettings.setSbEvent(currentSbEventSettings);
+            settingsRepository.save(currentServerSettings);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    public ResponseEntity<HttpStatus> updateSkyblockEventSettings(String serverId, SbEvent newSettings) {
+        if (serverByServerIdExists(serverId)) {
+            ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+            currentServerSettings.setSbEvent(newSettings);
+            settingsRepository.save(currentServerSettings);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    public ResponseEntity<HttpStatus> addEventMemberToRunningEvent(String serverId, EventMember newEventMember) {
+        if (serverByServerIdExists(serverId)) {
+            if (getSkyblockEventActive(serverId)) {
+                RunningEvent runningEvent = settingsRepository.findServerByServerId(serverId).getSbEvent().getRunningEvent();
+                List<EventMember> eventMembers = runningEvent.getMembersList();
+                eventMembers.add(newEventMember);
+                runningEvent.setMembersList(eventMembers);
+
+                return new ResponseEntity<>(updateSkyblockRunningEvent(serverId, runningEvent).getStatusCode());
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    public ResponseEntity<?> getSkyblockEventGuildId(String serverId) {
+        if (serverByServerIdExists(serverId)) {
+            if (getSkyblockEventActive(serverId)) {
+                RunningEvent runningEvent = settingsRepository.findServerByServerId(serverId).getSbEvent().getRunningEvent();
+
+                return new ResponseEntity<>(runningEvent.getEventGuildId(), HttpStatus.OK);
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    public ResponseEntity<HttpStatus> removeEventMemberToRunningEvent(String serverId, String minecraftUuid) {
+        if (serverByServerIdExists(serverId)) {
+            if (getSkyblockEventActive(serverId)) {
+                RunningEvent runningEvent = settingsRepository.findServerByServerId(serverId).getSbEvent().getRunningEvent();
+                List<EventMember> eventMembers = runningEvent.getMembersList();
+                eventMembers.removeIf(eventMember -> eventMember.getUuid().equals(minecraftUuid));
+                runningEvent.setMembersList(eventMembers);
+
+                return new ResponseEntity<>(updateSkyblockRunningEvent(serverId, runningEvent).getStatusCode());
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    public boolean eventHasMemberByUuid(String serverId, String minecraftUuid) {
+        if (serverByServerIdExists(serverId)) {
+            if (getSkyblockEventActive(serverId)) {
+                RunningEvent runningEvent = settingsRepository.findServerByServerId(serverId).getSbEvent().getRunningEvent();
+                List<EventMember> eventMembers = runningEvent.getMembersList();
+                for (EventMember eventMember : eventMembers) {
+                    if (eventMember.getUuid().equals(minecraftUuid)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

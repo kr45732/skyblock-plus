@@ -1,9 +1,7 @@
 package com.skyblockplus.dev;
 
-import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
@@ -27,15 +25,15 @@ public class DeleteMessagesCommand extends Command {
 
         logCommand(event.getGuild(), event.getAuthor(), content);
 
-        if(args.length == 2){
+        if (args.length == 2) {
             try {
                 int messageCount = Math.min(Integer.parseInt(args[1]), 100);
-                List<Message> toDelete =  event.getChannel().getHistory().retrievePast(messageCount).complete();
+                List<Message> toDelete = event.getChannel().getHistory().retrievePast(messageCount).complete();
                 event.getChannel().purgeMessages(toDelete);
                 ebMessage = ebMessage.editMessage(defaultEmbed("Deleted " + messageCount + " messages").build()).complete();
                 ebMessage.delete().queueAfter(5, TimeUnit.SECONDS);
                 return;
-            }catch (Exception e){
+            } catch (Exception e) {
                 ebMessage = ebMessage.editMessage(defaultEmbed("Invalid amount").build()).complete();
                 ebMessage.delete().queueAfter(5, TimeUnit.SECONDS);
                 return;

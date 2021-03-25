@@ -3,7 +3,6 @@ package com.skyblockplus;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.auctionbaz.AuctionCommand;
@@ -17,6 +16,7 @@ import com.skyblockplus.dungeons.PartyFinderCommand;
 import com.skyblockplus.eventlisteners.AutomaticGuild;
 import com.skyblockplus.eventlisteners.MainListener;
 import com.skyblockplus.eventlisteners.apply.ApplyUser;
+import com.skyblockplus.eventlisteners.skyblockevent.SkyblockEventCommand;
 import com.skyblockplus.guilds.GuildCommand;
 import com.skyblockplus.guilds.GuildLeaderboardCommand;
 import com.skyblockplus.inventory.*;
@@ -29,7 +29,6 @@ import com.skyblockplus.settings.SettingsCommand;
 import com.skyblockplus.settings.SetupCommand;
 import com.skyblockplus.settings.SpringDatabaseComponent;
 import com.skyblockplus.skills.SkillsCommand;
-import com.skyblockplus.skyblockevent.SkyblockEventCommand;
 import com.skyblockplus.slayer.SlayerCommand;
 import com.skyblockplus.timeout.MessageTimeout;
 import com.skyblockplus.weight.WeightCommand;
@@ -107,12 +106,14 @@ public class Main {
             try {
                 database.deleteApplyCacheSettings(automaticGuild.getKey());
                 List<ApplyUser> applyUserList = automaticGuild.getValue().getApplyGuild().getApplyUserList();
-                int code = database.updateApplyCacheSettings(automaticGuild.getKey(), new Gson().toJson(applyUserList));
+                if (applyUserList.size() > 0) {
+                    int code = database.updateApplyCacheSettings(automaticGuild.getKey(), new Gson().toJson(applyUserList));
 
-                if(code == 200){
-                    System.out.println("Successfully cached ApplyUser | " + automaticGuild.getKey() + " | " + applyUserList.size());
+                    if (code == 200) {
+                        System.out.println("Successfully cached ApplyUser | " + automaticGuild.getKey() + " | " + applyUserList.size());
+                    }
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 System.out.println("== Stack Trace (Cache ApplyUser - " + automaticGuild.getKey() + ")");
                 e.printStackTrace();
             }
@@ -129,13 +130,15 @@ public class Main {
             JsonArray applyUsersCache = database.getApplyCacheSettings(guildId).getAsJsonArray();
 
             List<ApplyUser> applyUsersCacheList = new ArrayList<>();
-            for (JsonElement applyUserCache:applyUsersCache){
+            for (JsonElement applyUserCache : applyUsersCache) {
                 ApplyUser currentApplyUserCache = new Gson().fromJson(applyUserCache, ApplyUser.class);
                 applyUsersCacheList.add(currentApplyUserCache);
             }
-            System.out.println("Retrieved cache ("+applyUsersCacheList.size()+ ") - " + guildId);
-            return applyUsersCacheList;
-        }catch (Exception e){
+            if (applyUsersCacheList.size() > 0) {
+                System.out.println("Retrieved cache (" + applyUsersCacheList.size() + ") - " + guildId);
+                return applyUsersCacheList;
+            }
+        } catch (Exception e) {
             System.out.println("== Stack Trace (Get cache ApplyUser - " + guildId + ")");
             e.printStackTrace();
         }

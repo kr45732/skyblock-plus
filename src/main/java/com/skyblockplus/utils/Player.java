@@ -5,16 +5,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.skyblockplus.skills.SkillsStruct;
 import com.skyblockplus.weight.Weight;
-import javassist.bytecode.ByteArray;
 import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
 import me.nullicorn.nedit.type.NBTList;
 import net.dv8tion.jda.api.EmbedBuilder;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.util.StringUtils;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
 
@@ -22,6 +18,7 @@ import static com.skyblockplus.utils.Utils.*;
 
 public class Player {
     public String invMissing = "";
+    private long startingAmount;
     private boolean validPlayer = false;
     private JsonElement profileJson;
     private JsonElement levelTables;
@@ -32,6 +29,7 @@ public class Player {
     private String playerUsername;
     private String profileName;
     private String playerGuildRank;
+
     public Player(String username) {
         if (usernameToUuid(username)) {
             return;
@@ -52,18 +50,14 @@ public class Player {
         this.validPlayer = true;
     }
 
-    public Player(String playerUuid, JsonElement levelTables, String playerGuildRank) {
+
+    public Player(String playerUuid, String playerUsername, JsonElement outerProfileJson, String playerGuildRank) {
         this.playerUuid = playerUuid;
-        this.playerUsername = uuidToUsername(playerUuid);
-        this.levelTables = levelTables;
+        this.playerUsername = playerUsername;
         this.playerGuildRank = playerGuildRank;
 
         try {
-            JsonArray profileArray = higherDepth(
-                    getJson("https://api.hypixel.net/skyblock/profiles?key=" + HYPIXEL_API_KEY + "&uuid=" + playerUuid),
-                    "profiles").getAsJsonArray();
-
-            if (getLatestProfile(profileArray)) {
+            if (getLatestProfile(higherDepth(outerProfileJson, "profiles").getAsJsonArray())) {
                 return;
             }
         } catch (Exception e) {
@@ -83,7 +77,7 @@ public class Player {
             JsonArray profileArray = higherDepth(
                     getJson("https://api.hypixel.net/skyblock/profiles?key=" + HYPIXEL_API_KEY + "&uuid=" + playerUuid),
                     "profiles").getAsJsonArray();
-            if (!profileIdFromName(profileName, profileArray)) {
+            if (profileIdFromName(profileName, profileArray)) {
                 return;
             }
         } catch (Exception e) {
@@ -93,15 +87,35 @@ public class Player {
         this.validPlayer = true;
     }
 
+    public Player(String playerUuid, String playerUsername, String profileName, JsonElement outerProfileJson, long startingAmount) {
+        this.playerUuid = playerUuid;
+        this.playerUsername = playerUsername;
+        this.startingAmount = startingAmount;
+
+        try {
+            if (profileIdFromName(profileName, higherDepth(outerProfileJson, "profiles").getAsJsonArray())) {
+                return;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        this.validPlayer = true;
+    }
+
+    public long getStartingAmount() {
+        return startingAmount;
+    }
+
     public JsonElement getOuterProfileJson() {
         return outerProfileJson;
     }
 
     public boolean usernameToUuid(String username) {
         try {
-            JsonElement usernameJson = getJson("https://api.mojang.com/users/profiles/minecraft/" + username);
-            this.playerUsername = higherDepth(usernameJson, "name").getAsString();
-            this.playerUuid = higherDepth(usernameJson, "id").getAsString();
+            JsonElement usernameJson = getJson("https://api.ashcon.app/mojang/v2/user/" + username);
+            this.playerUsername = higherDepth(usernameJson, "username").getAsString();
+            this.playerUuid = higherDepth(usernameJson, "uuid").getAsString().replace("-", "");
             return false;
         } catch (Exception ignored) {
         }
@@ -317,13 +331,13 @@ public class Player {
                     this.profileName = currentProfileName;
                     this.outerProfileJson = profilesArray.get(i);
                     this.profileJson = higherDepth(higherDepth(profilesArray.get(i), "members"), this.playerUuid);
-                    return true;
+                    return false;
                 }
             }
 
         } catch (Exception ignored) {
         }
-        return false;
+        return true;
     }
 
     public String getUsername() {
@@ -1301,5 +1315,25 @@ public class Player {
         }
 
         return petScore;
+    }
+
+    public int getTotalSkillsXp() {
+        JsonElement skillsCap = higherDepth(getLevelingJson(), "leveling_caps");
+
+        List<String> skills = getJsonKeys(skillsCap);
+        skills.remove("catacombs");
+        skills.remove("runecrafting");
+        skills.remove("carpentry");
+
+        int totalSkillXp = 0;
+        for (String skill : skills) {
+            SkillsStruct skillInfo = getSkill(skill);
+            if (skillInfo == null) {
+                return -1;
+            } else {
+                totalSkillXp += skillInfo.totalSkillExp;
+            }
+        }
+        return totalSkillXp;
     }
 }

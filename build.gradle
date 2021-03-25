@@ -55,6 +55,9 @@ dependencies {
     // Apache
     implementation 'org.apache.httpcomponents:httpclient:4.5.13'
 
+    // Async http client
+    implementation 'org.asynchttpclient:async-http-client:2.12.2'
+
     // Emoji parser
     implementation 'com.vdurmont:emoji-java:5.1.1'
 

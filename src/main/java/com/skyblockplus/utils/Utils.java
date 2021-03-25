@@ -56,9 +56,9 @@ public class Utils {
     public static MessageChannel botLogChannel;
     public static JsonElement essenceCostsJson;
     public static JsonElement levelingJson;
+    public static int remainingLimit = 120;
+    public static int timeTillReset = 60;
     private static String GITHUB_TOKEN = "";
-    private static int remainingLimit = 120;
-    private static int timeTillReset = 60;
     private static JsonElement collectionsJson;
     private static JsonElement petUrlJson;
     private static JsonElement enchantsJson;
@@ -151,17 +151,19 @@ public class Utils {
         return essenceCostsJson;
     }
 
+
     public static String getSkyCryptData(String dataUrl) {
         if (!dataUrl.contains("raw.githubusercontent.com")) {
             return null;
         }
 
-        try {
-            CloseableHttpClient httpclient = HttpClientBuilder.create().build();
-            HttpGet httpget = new HttpGet(dataUrl);
-            httpget.setHeader("Authorization", "token " + GITHUB_TOKEN);
-            httpget.addHeader("content-type", "application/json; charset=UTF-8");
 
+        CloseableHttpClient httpclient = HttpClientBuilder.create().build();
+        HttpGet httpget = new HttpGet(dataUrl);
+        httpget.setHeader("Authorization", "token " + GITHUB_TOKEN);
+        httpget.addHeader("content-type", "application/json; charset=UTF-8");
+
+        try {
             HttpResponse httpresponse = httpclient.execute(httpget);
 
             InputStream inputStream = httpresponse.getEntity().getContent();
@@ -170,8 +172,13 @@ public class Utils {
             for (int length; (length = inputStream.read(buffer)) != -1; ) {
                 result.write(buffer, 0, length);
             }
-            return result.toString("UTF-8").split("module.exports = ")[1];
+            return result.toString().split("module.exports = ")[1];
         } catch (Exception ignored) {
+        } finally {
+            try {
+                httpclient.close();
+            } catch (IOException ignored) {
+            }
         }
         return null;
     }
@@ -225,23 +232,27 @@ public class Utils {
                 TimeUnit.SECONDS.sleep(timeTillReset);
                 System.out.println("Sleeping for " + timeTillReset + " seconds");
             }
+        } catch (Exception ignored) {
+        }
 
-            CloseableHttpClient httpclient;
-            if (jsonUrl.contains(API_BASE_URL)) {
-                CredentialsProvider provider = new BasicCredentialsProvider();
-                UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(API_USERNAME, API_PASSWORD);
-                provider.setCredentials(AuthScope.ANY, credentials);
-                httpclient = HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
-            } else {
-                httpclient = HttpClientBuilder.create().build();
-            }
+        CloseableHttpClient httpclient;
+        if (jsonUrl.contains(API_BASE_URL)) {
+            CredentialsProvider provider = new BasicCredentialsProvider();
+            UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(API_USERNAME, API_PASSWORD);
+            provider.setCredentials(AuthScope.ANY, credentials);
+            httpclient = HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
+        } else {
+            httpclient = HttpClientBuilder.create().build();
+        }
 
-            HttpGet httpget = new HttpGet(jsonUrl);
-            if (jsonUrl.contains("raw.githubusercontent.com")) {
-                httpget.setHeader("Authorization", "token " + GITHUB_TOKEN);
-            }
-            httpget.addHeader("content-type", "application/json; charset=UTF-8");
 
+        HttpGet httpget = new HttpGet(jsonUrl);
+        if (jsonUrl.contains("raw.githubusercontent.com")) {
+            httpget.setHeader("Authorization", "token " + GITHUB_TOKEN);
+        }
+        httpget.addHeader("content-type", "application/json; charset=UTF-8");
+
+        try {
             HttpResponse httpresponse = httpclient.execute(httpget);
             if (jsonUrl.toLowerCase().contains("api.hypixel.net")) {
                 try {
@@ -253,6 +264,11 @@ public class Utils {
 
             return JsonParser.parseReader(new InputStreamReader(httpresponse.getEntity().getContent()));
         } catch (Exception ignored) {
+        } finally {
+            try {
+                httpclient.close();
+            } catch (Exception ignored) {
+            }
         }
         return null;
     }
@@ -285,12 +301,8 @@ public class Utils {
 
     public static String uuidToUsername(String uuid) {
         try {
-            JsonElement usernameJson = getJson("https://api.mojang.com/user/profiles/" + uuid + "/names");
-            JsonArray usernameArr = usernameJson.getAsJsonArray();
-            if (usernameArr.size() > 0) {
-                JsonElement currentName = usernameArr.get(usernameArr.size() - 1);
-                return higherDepth(currentName, "name").getAsString();
-            }
+            JsonElement usernameJson = getJson("https://api.ashcon.app/mojang/v2/user/" + uuid);
+            return higherDepth(usernameJson, "username").getAsString();
         } catch (Exception ignored) {
         }
         return null;
@@ -299,8 +311,8 @@ public class Utils {
 
     public static String usernameToUuid(String username) {
         try {
-            JsonElement usernameJson = getJson("https://api.mojang.com/users/profiles/minecraft/" + username);
-            return higherDepth(usernameJson, "id").getAsString();
+            JsonElement usernameJson = getJson("https://api.ashcon.app/mojang/v2/user/" + username);
+            return higherDepth(usernameJson, "uuid").getAsString().replace("-", "");
         } catch (Exception ignored) {
         }
         return null;
@@ -391,9 +403,9 @@ public class Utils {
 
     public static UsernameUuidStruct usernameToUuidUsername(String username) {
         try {
-            JsonElement usernameJson = getJson("https://api.mojang.com/users/profiles/minecraft/" + username);
-            return new UsernameUuidStruct(higherDepth(usernameJson, "name").getAsString(),
-                    higherDepth(usernameJson, "id").getAsString());
+            JsonElement usernameJson = getJson("https://api.ashcon.app/mojang/v2/user/" + username);
+            return new UsernameUuidStruct(higherDepth(usernameJson, "username").getAsString(),
+                    higherDepth(usernameJson, "uuid").getAsString().replace("-", ""));
         } catch (Exception ignored) {
         }
         return null;

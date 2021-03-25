@@ -318,8 +318,8 @@ public class ApplyUser implements Serializable {
 
             this.reactMessageId = reactMessage.getId();
             shouldDeleteChannel = true;
-        }else if(event.getReactionEmote().getEmoji().equals("\uD83D\uDD50")){
-            if(higherDepth(currentSettings, "waitlistedMessageText") != null && !higherDepth(currentSettings, "waitlistedMessageText").getAsString().equals("none")) {
+        } else if (event.getReactionEmote().getEmoji().equals("\uD83D\uDD50")) {
+            if (higherDepth(currentSettings, "waitlistedMessageText") != null && !higherDepth(currentSettings, "waitlistedMessageText").getAsString().equals("none")) {
                 staffChannel.sendMessage(playerUsername + " (" + applyingUser.getAsMention() + ") was waitlisted by "
                         + event.getUser().getName() + " (" + event.getUser().getAsMention() + ")").queue();
                 reactMessage.clearReactions().queue();
@@ -331,14 +331,6 @@ public class ApplyUser implements Serializable {
                 reactMessage = applicationChannel.sendMessage(eb.build()).complete();
                 reactMessage.addReaction("✅").queue();
             }
-
-//            JsonElement guildRoleSettings = database.getGuildRoleSettings(guildId);
-//            try {
-//                Guild guild = jda.getGuildById(guildId);
-//
-//                guild.addRoleToMember(applyingUserId, guild.getRoleById(higherDepth(guildRoleSettings, "roleId").getAsString())).queue();
-//            } catch (Exception ignored) {
-//            }
 
             this.reactMessageId = reactMessage.getId();
             shouldDeleteChannel = true;
@@ -359,7 +351,7 @@ public class ApplyUser implements Serializable {
         applyPlayerStats.addField("Progress average skill level", playerSkills, true);
         applyPlayerStats.addField("Catacombs level", "" + playerCatacombs, true);
         applyPlayerStats.addField("To accept the application,", "React with ✅", true);
-        if(higherDepth(currentSettings, "waitlistedMessageText") != null && !higherDepth(currentSettings, "waitlistedMessageText").getAsString().equals("none")) {
+        if (higherDepth(currentSettings, "waitlistedMessageText") != null && !higherDepth(currentSettings, "waitlistedMessageText").getAsString().equals("none")) {
             applyPlayerStats.addField("To waitlist the application,", "React with \uD83D\uDD50", true);
         }
         applyPlayerStats.addField("To deny the application,", "React with ❌", true);
@@ -367,7 +359,7 @@ public class ApplyUser implements Serializable {
                 .complete();
         Message reactMessage = staffChannel.sendMessage(applyPlayerStats.build()).complete();
         reactMessage.addReaction("✅").queue();
-        if(higherDepth(currentSettings, "waitlistedMessageText") != null && !higherDepth(currentSettings, "waitlistedMessageText").getAsString().equals("none")) {
+        if (higherDepth(currentSettings, "waitlistedMessageText") != null && !higherDepth(currentSettings, "waitlistedMessageText").getAsString().equals("none")) {
             reactMessage.addReaction("\uD83D\uDD50").queue();
         }
         reactMessage.addReaction("❌").queue();

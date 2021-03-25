@@ -128,7 +128,8 @@ public class CustomPaginator extends Menu {
 
     private void handleMessageReactionAddAction(MessageReactionAddEvent event, Message message, int pageNum) {
         int newPageNum = pageNum;
-        if (Objects.equals(event.getUser(), user)) {
+
+        if (user == null || (Objects.equals(event.getUser(), user))) {
             switch (event.getReaction().getReactionEmote().getName()) {
                 case LEFT:
                     if (newPageNum == 1 && wrapPageEnds)
@@ -222,7 +223,7 @@ public class CustomPaginator extends Menu {
         public CustomPaginator build() {
             Checks.check(waiter != null, "Must set an EventWaiter");
             Checks.check(!strings.isEmpty(), "Must include at least one item to paginate");
-            Checks.check(user != null, "Must set message author");
+//            Checks.check(user != null, "Must set message author");
 
             return new CustomPaginator(waiter, users, roles, timeout, unit, color, finalAction, columns, itemsPerPage,
                     showPageNumbers, numberItems, strings, bulkSkipNumber, wrapPageEnds, pageTitles, user);

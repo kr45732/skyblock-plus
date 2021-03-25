@@ -4,6 +4,7 @@ import com.skyblockplus.api.discordserversettings.automatedapplication.Automated
 import com.skyblockplus.api.discordserversettings.automatedguildroles.GuildRole;
 import com.skyblockplus.api.discordserversettings.automatedroles.AutomatedRoles;
 import com.skyblockplus.api.discordserversettings.automatedverify.AutomatedVerify;
+import com.skyblockplus.api.discordserversettings.skyblockevent.SbEvent;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,9 @@ public class ServerSettingsModel {
 
     @Embedded
     private GuildRole automaticGuildRoles = new GuildRole();
+
+    @Embedded
+    private SbEvent sbEvent = new SbEvent();
 
     public ServerSettingsModel() {
     }

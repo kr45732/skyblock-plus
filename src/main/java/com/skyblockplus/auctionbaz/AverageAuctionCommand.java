@@ -6,8 +6,6 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,11 +44,11 @@ public class AverageAuctionCommand extends Command {
             JsonElement itemJson = higherDepth(averageAhJson, item);
             EmbedBuilder eb;
 
-            if(higherDepth(itemJson, "clean_price") != null){
+            if (higherDepth(itemJson, "clean_price") != null) {
                 eb = defaultEmbed("Average auction (Clean)");
                 eb.addField(capitalizeString(item.toLowerCase()),
                         formatNumber(higherDepth(itemJson, "clean_price").getAsLong()), false);
-            }else{
+            } else {
                 eb = defaultEmbed("Average auction");
                 eb.addField(capitalizeString(item.toLowerCase()),
                         formatNumber(higherDepth(itemJson, "price").getAsLong()), false);
@@ -66,11 +64,11 @@ public class AverageAuctionCommand extends Command {
             JsonElement itemJson = higherDepth(averageAhJson, internalName);
             EmbedBuilder eb;
 
-            if(higherDepth(itemJson, "clean_price") != null){
+            if (higherDepth(itemJson, "clean_price") != null) {
                 eb = defaultEmbed("Average auction (Clean)");
                 eb.addField(capitalizeString(item.toLowerCase()),
                         formatNumber(higherDepth(itemJson, "clean_price").getAsLong()), false);
-            }else{
+            } else {
                 eb = defaultEmbed("Average auction");
                 eb.addField(capitalizeString(item.toLowerCase()),
                         formatNumber(higherDepth(itemJson, "price").getAsLong()), false);
@@ -107,11 +105,11 @@ public class AverageAuctionCommand extends Command {
                     JsonElement itemJson = higherDepth(averageAhJson, formattedName);
                     EmbedBuilder eb;
 
-                    if(higherDepth(itemJson, "clean_price") != null){
+                    if (higherDepth(itemJson, "clean_price") != null) {
                         eb = defaultEmbed("Average auction (Clean)");
                         eb.addField(capitalizeString(enchantName),
                                 formatNumber(higherDepth(itemJson, "clean_price").getAsLong()), false);
-                    }else{
+                    } else {
                         eb = defaultEmbed("Average auction");
                         eb.addField(capitalizeString(enchantName),
                                 formatNumber(higherDepth(itemJson, "price").getAsLong()), false);
@@ -129,11 +127,11 @@ public class AverageAuctionCommand extends Command {
 
                                 JsonElement itemJson = higherDepth(averageAhJson, formattedName);
 
-                                if(higherDepth(itemJson, "clean_price") != null){
+                                if (higherDepth(itemJson, "clean_price") != null) {
                                     eb.setTitle("Average auction (Clean)");
                                     eb.addField(capitalizeString(enchantName),
                                             formatNumber(higherDepth(itemJson, "clean_price").getAsLong()), false);
-                                }else{
+                                } else {
                                     eb.setTitle("Average auction");
                                     eb.addField(capitalizeString(enchantName),
                                             formatNumber(higherDepth(itemJson, "price").getAsLong()), false);
@@ -190,11 +188,11 @@ public class AverageAuctionCommand extends Command {
                 JsonElement itemJson = higherDepth(averageAhJson, formattedName);
                 EmbedBuilder eb;
 
-                if(higherDepth(itemJson, "clean_price") != null){
+                if (higherDepth(itemJson, "clean_price") != null) {
                     eb = defaultEmbed("Average auction (Clean)");
                     eb.addField(capitalizeString(petName + " pet"),
                             formatNumber(higherDepth(itemJson, "clean_price").getAsLong()), false);
-                }else{
+                } else {
                     eb = defaultEmbed("Average auction");
                     eb.addField(capitalizeString(petName + " pet"),
                             formatNumber(higherDepth(itemJson, "price").getAsLong()), false);

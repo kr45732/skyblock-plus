@@ -6,6 +6,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.discordserversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSettingsModel;
+import com.skyblockplus.api.discordserversettings.skyblockevent.SbEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
@@ -35,17 +36,28 @@ public class QuickSetupTestCommand extends Command {
                 ebMessage.editMessage(setRoleSettings(args[2], args[3]).build()).queue();
                 return;
             } else if (args[1].equals("delete")) {
-                if (args[2].equals("server")) {
-                    ebMessage.editMessage(deleteServer(args[3]).build()).queue();
-                    return;
-                } else if (args[2].equals("apply_cache")) {
-                    ebMessage.editMessage(deleteServerApplyCache(args[3]).build()).queue();
-                    return;
+                switch (args[2]) {
+                    case "server":
+                        ebMessage.editMessage(deleteServer(args[3]).build()).queue();
+                        return;
+                    case "apply_cache":
+                        ebMessage.editMessage(deleteServerApplyCache(args[3]).build()).queue();
+                        return;
+                    case "skyblock_event":
+                        ebMessage.editMessage(deleteSkyblockEvent(args[3]).build()).queue();
+                        return;
                 }
             }
         }
 
         ebMessage.editMessage(defaultEmbed("Invalid input").build()).queue();
+    }
+
+    private EmbedBuilder deleteSkyblockEvent(String serverId) {
+        if (database.updateSkyblockEventSettings(serverId, new SbEvent()) == 200) {
+            return defaultEmbed("API returned response code " + database.deleteApplyCacheSettings(serverId));
+        }
+        return defaultEmbed("Error updating settings");
     }
 
     private EmbedBuilder deleteServerApplyCache(String serverId) {
