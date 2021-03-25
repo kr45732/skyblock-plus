@@ -161,7 +161,7 @@ public class SkyblockEventCommand extends Command {
 
         for (int i = 0; i < eventMemberList.size(); i++) {
             EventMember eventMember = eventMemberList.get(i);
-            ebString.append(i + 1).append(") ").append(eventMember.getUsername()).append(" | +").append(eventMember.getStartingAmount()).append("\n");
+            ebString.append(i + 1).append(") ").append(eventMember.getUsername()).append(" | +").append(formatNumber(Long.parseLong(eventMember.getStartingAmount()))).append("\n");
 
         }
 
@@ -501,8 +501,9 @@ public class SkyblockEventCommand extends Command {
                         StringBuilder ebString = new StringBuilder();
                         for (int i = 0; i < eventMemberList.size(); i++) {
                             EventMember eventMember = eventMemberList.get(i);
-                            ebString.append(i + 1).append(") ").append(eventMember.getUsername()).append(" | +").append(eventMember.getStartingAmount()).append("\n");
+                            ebString.append(i + 1).append(") ").append(eventMember.getUsername()).append(" | +").append(formatNumber(Long.parseLong(eventMember.getStartingAmount()))).append("\n");
                         }
+
                         eb = defaultEmbed("Event leaderboard");
                         eb.setDescription(ebString.toString());
                         ebMessage.editMessage(eb.build()).queue();
