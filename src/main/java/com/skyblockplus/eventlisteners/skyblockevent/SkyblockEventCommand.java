@@ -383,7 +383,7 @@ public class SkyblockEventCommand extends Command {
                                 ebString.append(i + 1).append(") ").append(eventMember.getUsername()).append(" | +").append(formatNumber(Long.parseLong(eventMember.getStartingAmount()))).append("\n");
                             }
                             eb = defaultEmbed("Event leaderboard");
-                            eb.setDescription("Last updated " + Duration.between(currentGuild.getEventMemberListLastUpdated(), Instant.now()).toMinutes() + " minutes ago" + ebString.toString() + "\n");
+                            eb.setDescription("**Last updated " + Duration.between(currentGuild.getEventMemberListLastUpdated(), Instant.now()).toMinutes() + " minutes ago**\n\n" + ebString.toString() );
                             ebMessage.editMessage(eb.build()).queue();
                             return;
                         }
