@@ -35,6 +35,8 @@ import static com.skyblockplus.eventlisteners.MainListener.getGuildMap;
 import static com.skyblockplus.utils.Utils.*;
 
 public class SkyblockEventCommand extends Command {
+    DateTimeFormatter formatter =
+            DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withZone(ZoneId.of("UTC"));
 
     public SkyblockEventCommand() {
         this.name = "event";
@@ -227,8 +229,7 @@ public class SkyblockEventCommand extends Command {
                         eb.addField("Event Type", capitalizeString(higherDepth(currentSettings, "eventType").getAsString()), false);
 
                         Instant eventInstantEnding = Instant.ofEpochSecond(higherDepth(currentSettings, "timeEndingSeconds").getAsLong());
-                        DateTimeFormatter formatter =
-                                DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withZone(ZoneId.of("UTC"));
+
                         eb.addField("End Date", formatter.format(eventInstantEnding) + " UTC", false);
 
 
@@ -372,15 +373,18 @@ public class SkyblockEventCommand extends Command {
                         }
 
                         AutomaticGuild currentGuild = getGuildMap().get(event.getGuild().getId());
-                        if (currentGuild.getEventMemberListLastUpdated() != null && (Duration.between(Instant.now(), currentGuild.getEventMemberListLastUpdated()).toMinutes() < 15)) {
+                        System.out.println(Duration.between(Instant.now(), currentGuild.getEventMemberListLastUpdated()).toMinutes());
+                        System.out.println(Duration.between(currentGuild.getEventMemberListLastUpdated(), Instant.now()).toMinutes());
+
+                        if ((currentGuild.getEventMemberListLastUpdated() != null) && (Duration.between(Instant.now(), currentGuild.getEventMemberListLastUpdated()).toMinutes() < 15)) {
                             List<EventMember> eventMemberList = currentGuild.getEventMemberList();
                             StringBuilder ebString = new StringBuilder();
                             for (int i = 0; i < eventMemberList.size(); i++) {
                                 EventMember eventMember = eventMemberList.get(i);
-                                ebString.append(i + 1).append(") ").append(eventMember.getUsername()).append(" | +").append(eventMember.getStartingAmount()).append("\n");
+                                ebString.append(i + 1).append(") ").append(eventMember.getUsername()).append(" | +").append(formatNumber(Long.parseLong(eventMember.getStartingAmount()))).append("\n");
                             }
                             eb = defaultEmbed("Event leaderboard");
-                            eb.setDescription("**This updates every 15 minutes**\n\n" + ebString.toString());
+                            eb.setDescription("Last updated " + Duration.between(Instant.now(), currentGuild.getEventMemberListLastUpdated()).toMinutes() + " minutes ago" + ebString.toString());
                             ebMessage.editMessage(eb.build()).queue();
                             return;
                         }
