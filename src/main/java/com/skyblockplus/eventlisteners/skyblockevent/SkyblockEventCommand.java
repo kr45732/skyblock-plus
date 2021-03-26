@@ -159,7 +159,7 @@ public class SkyblockEventCommand extends Command {
         eventMemberList.sort(Comparator.comparingInt(o1 -> Integer.parseInt(o1.getStartingAmount())));
 
         StringBuilder ebString = new StringBuilder();
-        EmbedBuilder eb = defaultEmbed("Event leaderboard");
+        EmbedBuilder eb = defaultEmbed("Event Leaderboard");
 
         for (int i = 0; i < eventMemberList.size(); i++) {
             EventMember eventMember = eventMemberList.get(i);
@@ -382,8 +382,19 @@ public class SkyblockEventCommand extends Command {
                                 EventMember eventMember = eventMemberList.get(i);
                                 ebString.append(i + 1).append(") ").append(eventMember.getUsername()).append(" | +").append(formatNumber(Long.parseLong(eventMember.getStartingAmount()))).append("\n");
                             }
-                            eb = defaultEmbed("Event leaderboard");
-                            eb.setDescription("**Last updated " + Duration.between(currentGuild.getEventMemberListLastUpdated(), Instant.now()).toMinutes() + " minutes ago**\n\n" + ebString.toString() );
+                            eb = defaultEmbed("Event Leaderboard");
+                            long minutesSinceUpdate = Duration.between(currentGuild.getEventMemberListLastUpdated(), Instant.now()).toMinutes();
+
+                            String minutesSinceUpdateString;
+                            if(minutesSinceUpdate == 0){
+                                minutesSinceUpdateString = " less than a minute ";
+                            }else if(minutesSinceUpdate == 1){
+                                minutesSinceUpdateString = " 1 minute ";
+                            }else{
+                                minutesSinceUpdateString = minutesSinceUpdate + " minutes ";
+                            }
+
+                            eb.setDescription("**Last updated " + minutesSinceUpdateString + " ago**\n\n" + ebString.toString() );
                             ebMessage.editMessage(eb.build()).queue();
                             return;
                         }
@@ -507,7 +518,7 @@ public class SkyblockEventCommand extends Command {
                             ebString.append(i + 1).append(") ").append(eventMember.getUsername()).append(" | +").append(formatNumber(Long.parseLong(eventMember.getStartingAmount()))).append("\n");
                         }
 
-                        eb = defaultEmbed("Event leaderboard");
+                        eb = defaultEmbed("Event Leaderboard");
                         eb.setDescription(ebString.toString());
                         ebMessage.editMessage(eb.build()).queue();
 
