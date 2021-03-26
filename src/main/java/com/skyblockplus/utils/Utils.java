@@ -323,81 +323,132 @@ public class Utils {
         String preFormattedItem = itemName.trim().toUpperCase().replace(" ", "_").replace("'S", "")
                 .replace("FRAG", "FRAGMENT").replace(".", "");
 
-        if (preFormattedItem.equals("NECRON_HELMET")) {
-            preFormattedItem = "POWER_WITHER_HELMET";
-        } else if (preFormattedItem.equals("NECRON_CHESTPLATE")) {
-            preFormattedItem = "POWER_WITHER_CHESTPLATE";
-        } else if (preFormattedItem.equals("NECRON_LEGGINGS")) {
-            preFormattedItem = "POWER_WITHER_LEGGINGS";
-        } else if (preFormattedItem.equals("NECRON_BOOTS")) {
-            preFormattedItem = "POWER_WITHER_BOOTS";
-        } else if (preFormattedItem.equals("STORM_HELMET")) {
-            preFormattedItem = "WISE_WITHER_HELMET";
-        } else if (preFormattedItem.equals("STORM_CHESTPLATE")) {
-            preFormattedItem = "WISE_WITHER_CHESTPLATE";
-        } else if (preFormattedItem.equals("STORM_LEGGINGS")) {
-            preFormattedItem = "WISE_WITHER_LEGGINGS";
-        } else if (preFormattedItem.equals("STORM_BOOTS")) {
-            preFormattedItem = "WISE_WITHER_BOOTS";
-        } else if (preFormattedItem.equals("MAXOR_HELMET")) {
-            preFormattedItem = "SPEED_WITHER_HELMET";
-        } else if (preFormattedItem.equals("MAXOR_CHESTPLATE")) {
-            preFormattedItem = "SPEED_WITHER_CHESTPLATE";
-        } else if (preFormattedItem.equals("MAXOR_LEGGINGS")) {
-            preFormattedItem = "SPEED_WITHER_LEGGINGS";
-        } else if (preFormattedItem.equals("MAXOR_BOOTS")) {
-            preFormattedItem = "SPEED_WITHER_BOOTS";
-        } else if (preFormattedItem.equals("GOLDOR_HELMET")) {
-            preFormattedItem = "TANK_WITHER_HELMET";
-        } else if (preFormattedItem.equals("GOLDOR_CHESTPLATE")) {
-            preFormattedItem = "TANK_WITHER_CHESTPLATE";
-        } else if (preFormattedItem.equals("GOLDOR_LEGGINGS")) {
-            preFormattedItem = "TANK_WITHER_LEGGINGS";
-        } else if (preFormattedItem.equals("GOLDOR_BOOTS")) {
-            preFormattedItem = "TANK_WITHER_BOOTS";
-        } else if (preFormattedItem.equals("BONEMERANG")) {
-            preFormattedItem = "BONE_BOOMERANG";
-        } else if (preFormattedItem.equals("GOD_POT")) {
-            preFormattedItem = "GOD_POTION";
-        } else if (preFormattedItem.equals("AOTD")) {
-            preFormattedItem = "ASPECT_OF_THE_DRAGON";
-        } else if (preFormattedItem.equals("AOTE")) {
-            preFormattedItem = "ASPECT_OF_THE_END";
-        } else if (preFormattedItem.equals("ROD_OF_CHAMPIONS")) {
-            preFormattedItem = "CHAMP_ROD";
-        } else if (preFormattedItem.equals("ROD_OF_LEGENDS")) {
-            preFormattedItem = "LEGEND_ROD";
-        } else if (preFormattedItem.equals("CHALLENGING_ROD")) {
-            preFormattedItem = "CHALLENGE_ROD";
-        } else if (preFormattedItem.equals("LASR_EYE")) {
-            preFormattedItem = "GIANT_FRAGMENT_LASER";
-        } else if (preFormattedItem.equals("DIAMANTE_HANDLE")) {
-            preFormattedItem = "GIANT_FRAGMENT_DIAMOND";
-        } else if (preFormattedItem.equals("BIGFOOT_LASSO")) {
-            preFormattedItem = "GIANT_FRAGMENT_BIGFOOT";
-        } else if (preFormattedItem.equals("JOLLY_PINK_ROCK")) {
-            preFormattedItem = "GIANT_FRAGMENT_BOULDER";
-        } else if (preFormattedItem.equals("HYPER_CATALYST")) {
-            preFormattedItem = "HYPER_CATALYST_UPGRADE";
-        } else if (preFormattedItem.equals("ENDER_HELMET")) {
-            preFormattedItem = "END_HELMET";
-        } else if (preFormattedItem.equals("ENDER_CHESTPLATE")) {
-            preFormattedItem = "END_CHESTPLATE";
-        } else if (preFormattedItem.equals("ENDER_LEGGINGS")) {
-            preFormattedItem = "END_LEGGINGS";
-        } else if (preFormattedItem.equals("ENDER_BOOTS")) {
-            preFormattedItem = "END_BOOTS";
-        } else if (preFormattedItem.equals("EMPEROR_SKULL")) {
-            preFormattedItem = "DIVER_FRAGMENT";
-        } else if (preFormattedItem.contains("GOLDEN") && preFormattedItem.contains("HEAD")) {
-            preFormattedItem = preFormattedItem.replace("GOLDEN", "GOLD");
-        } else if (preFormattedItem.equals("COLOSSAL_EXP_BOTTLE")) {
-            preFormattedItem = "COLOSSAL_EXP_BOTTLE_UPGRADE";
-        } else if (preFormattedItem.equals("FLYCATCHER")) {
-            preFormattedItem = "FLYCATCHER_UPGRADE";
-        } else if (preFormattedItem.contains("PET_SKIN")) {
-            preFormattedItem = "PET_SKIN_" + preFormattedItem.replace("PET_SKIN", "");
+        switch (preFormattedItem) {
+            case "adaptive_blade":
+                preFormattedItem = "STONE_BLADE";
+                break;
+            case "NECRON_HELMET":
+                preFormattedItem = "POWER_WITHER_HELMET";
+                break;
+            case "NECRON_CHESTPLATE":
+                preFormattedItem = "POWER_WITHER_CHESTPLATE";
+                break;
+            case "NECRON_LEGGINGS":
+                preFormattedItem = "POWER_WITHER_LEGGINGS";
+                break;
+            case "NECRON_BOOTS":
+                preFormattedItem = "POWER_WITHER_BOOTS";
+                break;
+            case "STORM_HELMET":
+                preFormattedItem = "WISE_WITHER_HELMET";
+                break;
+            case "STORM_CHESTPLATE":
+                preFormattedItem = "WISE_WITHER_CHESTPLATE";
+                break;
+            case "STORM_LEGGINGS":
+                preFormattedItem = "WISE_WITHER_LEGGINGS";
+                break;
+            case "STORM_BOOTS":
+                preFormattedItem = "WISE_WITHER_BOOTS";
+                break;
+            case "MAXOR_HELMET":
+                preFormattedItem = "SPEED_WITHER_HELMET";
+                break;
+            case "MAXOR_CHESTPLATE":
+                preFormattedItem = "SPEED_WITHER_CHESTPLATE";
+                break;
+            case "MAXOR_LEGGINGS":
+                preFormattedItem = "SPEED_WITHER_LEGGINGS";
+                break;
+            case "MAXOR_BOOTS":
+                preFormattedItem = "SPEED_WITHER_BOOTS";
+                break;
+            case "GOLDOR_HELMET":
+                preFormattedItem = "TANK_WITHER_HELMET";
+                break;
+            case "GOLDOR_CHESTPLATE":
+                preFormattedItem = "TANK_WITHER_CHESTPLATE";
+                break;
+            case "GOLDOR_LEGGINGS":
+                preFormattedItem = "TANK_WITHER_LEGGINGS";
+                break;
+            case "GOLDOR_BOOTS":
+                preFormattedItem = "TANK_WITHER_BOOTS";
+                break;
+            case "BONEMERANG":
+                preFormattedItem = "BONE_BOOMERANG";
+                break;
+            case "GOD_POT":
+                preFormattedItem = "GOD_POTION";
+                break;
+            case "AOTD":
+                preFormattedItem = "ASPECT_OF_THE_DRAGON";
+                break;
+            case "AOTE":
+                preFormattedItem = "ASPECT_OF_THE_END";
+                break;
+            case "ROD_OF_CHAMPIONS":
+                preFormattedItem = "CHAMP_ROD";
+                break;
+            case "ROD_OF_LEGENDS":
+                preFormattedItem = "LEGEND_ROD";
+                break;
+            case "CHALLENGING_ROD":
+                preFormattedItem = "CHALLENGE_ROD";
+                break;
+            case "LASR_EYE":
+                preFormattedItem = "GIANT_FRAGMENT_LASER";
+                break;
+            case "DIAMANTE_HANDLE":
+                preFormattedItem = "GIANT_FRAGMENT_DIAMOND";
+                break;
+            case "BIGFOOT_LASSO":
+                preFormattedItem = "GIANT_FRAGMENT_BIGFOOT";
+                break;
+            case "JOLLY_PINK_ROCK":
+                preFormattedItem = "GIANT_FRAGMENT_BOULDER";
+                break;
+            case "HYPER_CATALYST":
+                preFormattedItem = "HYPER_CATALYST_UPGRADE";
+                break;
+            case "ENDER_HELMET":
+                preFormattedItem = "END_HELMET";
+                break;
+            case "ENDER_CHESTPLATE":
+                preFormattedItem = "END_CHESTPLATE";
+                break;
+            case "ENDER_LEGGINGS":
+                preFormattedItem = "END_LEGGINGS";
+                break;
+            case "ENDER_BOOTS":
+                preFormattedItem = "END_BOOTS";
+                break;
+            case "EMPEROR_SKULL":
+                preFormattedItem = "DIVER_FRAGMENT";
+                break;
+            case "COLOSSAL_EXP_BOTTLE":
+                preFormattedItem = "COLOSSAL_EXP_BOTTLE_UPGRADE";
+                break;
+            case "FLYCATCHER":
+                preFormattedItem = "FLYCATCHER_UPGRADE";
+                break;
+            default:
+                if (preFormattedItem.contains("GOLDEN") && preFormattedItem.contains("HEAD")) {
+                    preFormattedItem = preFormattedItem.replace("GOLDEN", "GOLD");
+                } else if (preFormattedItem.contains("PET_SKIN")) {
+                    String tempItem = preFormattedItem.replace("PET_SKIN", "");
+                    if(tempItem.startsWith("_") && tempItem.length() > 1){
+                        tempItem = tempItem.substring(1);
+                    }
+
+                    if(tempItem.endsWith("_") && tempItem.length() > 1){
+                        tempItem = tempItem.substring(0, tempItem.length()-1);
+                    }
+
+                    preFormattedItem = "PET_SKIN_" +tempItem;
+                }
         }
+
         return preFormattedItem;
     }
 

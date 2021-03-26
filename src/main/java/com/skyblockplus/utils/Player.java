@@ -1114,17 +1114,17 @@ public class Player {
 
     public String getNecronBlade() {
         if (getInventory()[0].contains("hyperion") || getInventory()[1].contains("hyperion")) {
-            return "\n**Hyperion:** Yes";
+            return "\n**Hyperion:** yes";
         } else if (getInventory()[0].contains("valkyrie") || getInventory()[1].contains("valkyrie")) {
-            return "\n**Valkyrie:** Yes";
+            return "\n**Valkyrie:** yes";
         }
 
         List<String[]> playerEnderChest = getEnderChest();
         for (String[] page : playerEnderChest) {
             if (page[0].contains("hyperion") || page[1].contains("hyperion")) {
-                return "\n**Hyperion:** Yes";
+                return "\n**Hyperion:** yes";
             } else if (page[0].contains("valkyrie") || page[1].contains("valkyrie")) {
-                return "\n**Valkyrie:** Yes";
+                return "\n**Valkyrie:** yes";
             }
         }
 
