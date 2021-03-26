@@ -373,10 +373,9 @@ public class SkyblockEventCommand extends Command {
                         }
 
                         AutomaticGuild currentGuild = getGuildMap().get(event.getGuild().getId());
-                        System.out.println(Duration.between(Instant.now(), currentGuild.getEventMemberListLastUpdated()).toMinutes());
-                        System.out.println(Duration.between(currentGuild.getEventMemberListLastUpdated(), Instant.now()).toMinutes());
 
-                        if ((currentGuild.getEventMemberListLastUpdated() != null) && (Duration.between(Instant.now(), currentGuild.getEventMemberListLastUpdated()).toMinutes() < 15)) {
+
+                        if ((currentGuild.getEventMemberListLastUpdated() != null) && (Duration.between(currentGuild.getEventMemberListLastUpdated(), Instant.now()).toMinutes() < 15)) {
                             List<EventMember> eventMemberList = currentGuild.getEventMemberList();
                             StringBuilder ebString = new StringBuilder();
                             for (int i = 0; i < eventMemberList.size(); i++) {
@@ -384,7 +383,7 @@ public class SkyblockEventCommand extends Command {
                                 ebString.append(i + 1).append(") ").append(eventMember.getUsername()).append(" | +").append(formatNumber(Long.parseLong(eventMember.getStartingAmount()))).append("\n");
                             }
                             eb = defaultEmbed("Event leaderboard");
-                            eb.setDescription("Last updated " + Duration.between(Instant.now(), currentGuild.getEventMemberListLastUpdated()).toMinutes() + " minutes ago" + ebString.toString());
+                            eb.setDescription("Last updated " + Duration.between(currentGuild.getEventMemberListLastUpdated(), Instant.now()).toMinutes() + " minutes ago" + ebString.toString() + "\n");
                             ebMessage.editMessage(eb.build()).queue();
                             return;
                         }
