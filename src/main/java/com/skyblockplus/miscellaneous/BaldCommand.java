@@ -51,7 +51,7 @@ public class BaldCommand extends Command {
                     } else {
                         eb.setDescription("**WARNING** - " + user.getName() + " is bald!!!");
                         eb.setImage(user.getAvatarUrl());
-                        eb.setColor(Color.red);
+                        eb.setColor(botColor);
                         ebMessage.editMessage(eb.build()).queue();
                         event.getMessage().addReaction("⚠️").queue();
                     }
@@ -65,7 +65,7 @@ public class BaldCommand extends Command {
                     } else {
                         eb.setDescription("**WARNING** - " + user.getName() + " is bald!!!");
                         eb.setImage(user.getAvatarUrl());
-                        eb.setColor(Color.red);
+                        eb.setColor(botColor);
                         ebMessage.editMessage(eb.build()).queue();
                         event.getMessage().addReaction("⚠️").queue();
                     }

@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
 import static com.skyblockplus.Main.jda;
 
 public class Utils {
-    public static final Color botColor = new Color(9, 92, 13);
+    public static final Color botColor = new Color(223, 5, 5);
     public static final int globalCooldown = 4;
     private static final ScriptEngine jsScriptEngine = new ScriptEngineManager().getEngineByName("js");
     public static String HYPIXEL_API_KEY = "";
@@ -177,7 +177,9 @@ public class Utils {
         } finally {
             try {
                 httpclient.close();
-            } catch (IOException ignored) {
+            } catch (IOException e) {
+                System.out.println("== Stack Trace (SkyCrypt Close Http Client) ==");
+                e.printStackTrace();
             }
         }
         return null;
@@ -267,7 +269,9 @@ public class Utils {
         } finally {
             try {
                 httpclient.close();
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                System.out.println("== Stack Trace (Get Json Close Http Client) ==");
+                e.printStackTrace();
             }
         }
         return null;
@@ -476,7 +480,7 @@ public class Utils {
     }
 
     public static EmbedBuilder loadingEmbed() {
-        return defaultEmbed(null).setImage("https://media.giphy.com/media/HS2ZfnmlZ1YHZhL2IX/giphy.gif");
+        return defaultEmbed(null).setImage("https://cdn.discordapp.com/attachments/803419567958392832/825768516636508160/sb_loading.gif");
     }
 
     public static String fixUsername(String username) {

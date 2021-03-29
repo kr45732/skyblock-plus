@@ -104,7 +104,7 @@ public class HelpCommand extends Command {
             paginateBuilder.addItems("Use the arrow emojis to navigate through the pages" +
                     generatePageMap("General", "Slayer", "Skills", "Dungeons", "Guild",
                             "Auction House and Bazaar", "Inventory", "Miscellaneous Commands", "Skyblock Event", "Settings", "Verify Settings",
-                            "Apply Settings", "Roles Settings", "Guild Roles Settings", "Guild Role Settings"));
+                            "Apply Settings", "Roles Settings", "Guild Roles Settings"));
         } else {
             paginateBuilder.addItems("Use the arrow emojis to navigate through the pages" +
                     generatePageMap("General", "Slayer", "Skills", "Dungeons", "Guild",

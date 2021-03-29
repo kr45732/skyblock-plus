@@ -121,7 +121,13 @@ public class SkyblockEventCommand extends Command {
                 announcementChannel.sendMessage(defaultEmbed("Event Over").setDescription("Error fetching data").build()).queue();
                 return;
             }
+        } catch (Exception e) {
+            System.out.println("== Stack Trace (Event End Latch) ==");
+            e.printStackTrace();
+        }
 
+        try {
+            System.out.println("== Stack Trace (Event End Close Client) ==");
             asyncHttpClient.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -475,13 +481,19 @@ public class SkyblockEventCommand extends Command {
                                 ebMessage.editMessage(defaultEmbed("Error fetching data").build()).queue();
                                 return;
                             }
+                        } catch (Exception e) {
+                            System.out.println("== Stack Trace (Event Leaderboard Latch) ==");
+                            e.printStackTrace();
+                        }
 
+                        try {
+                            System.out.println("== Stack Trace (Event Leaderboard CLose Client) ==");
                             asyncHttpClient.close();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
 
-                        List<EventMember> eventMemberList = new ArrayList<>();
+                            List<EventMember> eventMemberList = new ArrayList<>();
 
                         String eventType = higherDepth(database.getRunningEventSettings(event.getGuild().getId()), "eventType").getAsString();
                         for (Player guildMember : guildMemberPlayersList) {

@@ -47,13 +47,6 @@ public class MessageTimeout extends ListenerAdapter {
                     - currentMessage.getTimeCreated().toInstant().getEpochSecond();
             if (secondsSinceLast > 30) {
                 currentMessage.clearReactions().complete();
-                currentMessage.addReaction("\uD83C\uDDF9").queue();
-                currentMessage.addReaction("\uD83C\uDDEE").queue();
-                currentMessage.addReaction("\uD83C\uDDF2").queue();
-                currentMessage.addReaction("\uD83C\uDDEA").queue();
-                currentMessage.addReaction("\uD83C\uDDF4").queue();
-                currentMessage.addReaction("\uD83C\uDDFA").queue();
-                currentMessage.addReaction(":regional_indicator_t_2:805833620924923984").queue();
 
                 iteratorCur.remove();
                 jda.removeEventListener(currentMessageStruct.eventListener);

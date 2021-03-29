@@ -158,6 +158,13 @@ public class GuildCommand extends Command {
 
         try {
             httpGetsFinishedLatch.await(10, TimeUnit.SECONDS);
+        }catch (Exception e) {
+            System.out.println("== Stack Trace (Guild Exp Latch) ==");
+            e.printStackTrace();
+        }
+
+        try{
+            System.out.println("== Stack Trace (Guild Exp Close Client) ==");
             asyncHttpClient.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -170,7 +177,12 @@ public class GuildCommand extends Command {
         guildExpMap.entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                .forEachOrdered(x -> reverseSortedMap.put(x.getKey(), x.getValue()));
+                .forEachOrdered(x -> {
+                    try {
+                        reverseSortedMap.put(x.getKey(), x.getValue());
+                    } catch (Exception ignored) {
+                    }
+                });
 
 
         int counter = 0;
