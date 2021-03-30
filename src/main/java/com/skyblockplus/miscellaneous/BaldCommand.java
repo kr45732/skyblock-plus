@@ -21,6 +21,10 @@ public class BaldCommand extends Command {
     @Override
     protected void execute(CommandEvent event) {
         new Thread(() -> {
+            if(!(event.getGuild().getId().equals("782154976243089429") || event.getGuild().getId().equals("796790757947867156"))){
+                return;
+            }
+
             EmbedBuilder eb = defaultEmbed("Checking if bald...");
             Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 
@@ -39,6 +43,7 @@ public class BaldCommand extends Command {
                     if (user.getId().equals("385939031596466176") || user.getId().equals("225045405526654977")) {
                         eb.setDescription(user.getName() + " is not bald!");
                         eb.setImage(user.getAvatarUrl());
+                        eb.setColor(Color.GREEN.darker());
                         ebMessage.editMessage(eb.build()).queue();
                         event.getMessage().addReaction(":green_check_custom:799774962394988574").queue();
                         return;
@@ -47,12 +52,12 @@ public class BaldCommand extends Command {
                         if (new Random().nextDouble() >= 0.99) {
                             eb.setDescription(user.getName() + " is not bald!");
                             eb.setImage(user.getAvatarUrl());
+                            eb.setColor(Color.GREEN.darker());
                             ebMessage.editMessage(eb.build()).queue();
                             event.getMessage().addReaction(":green_check_custom:799774962394988574").queue();
                         } else {
                             eb.setDescription("**WARNING** - " + user.getName() + " is bald!!!");
                             eb.setImage(user.getAvatarUrl());
-                            eb.setColor(botColor);
                             ebMessage.editMessage(eb.build()).queue();
                             event.getMessage().addReaction("⚠️").queue();
                         }
@@ -61,12 +66,12 @@ public class BaldCommand extends Command {
                         if (new Random().nextDouble() >= 0.25) {
                             eb.setDescription(user.getName() + " is not bald!");
                             eb.setImage(user.getAvatarUrl());
+                            eb.setColor(Color.GREEN.darker());
                             ebMessage.editMessage(eb.build()).queue();
                             event.getMessage().addReaction(":green_check_custom:799774962394988574").queue();
                         } else {
                             eb.setDescription("**WARNING** - " + user.getName() + " is bald!!!");
                             eb.setImage(user.getAvatarUrl());
-                            eb.setColor(botColor);
                             ebMessage.editMessage(eb.build()).queue();
                             event.getMessage().addReaction("⚠️").queue();
                         }

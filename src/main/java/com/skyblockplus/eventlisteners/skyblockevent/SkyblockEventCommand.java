@@ -215,7 +215,7 @@ public class SkyblockEventCommand extends Command {
 
                         Map<String, AutomaticGuild> guildMap = getGuildMap();
                         if (guildMap.containsKey(event.getGuild().getId()) && !database.getSkyblockEventActive(event.getGuild().getId())) {
-                            ebMessage.editMessage(defaultEmbed("Create a Skyblock competition").setDescription("Please enter the name of the guild you want to track").build()).queue();
+                            ebMessage.editMessage(defaultEmbed("Create a Skyblock competition").setDescription("Please enter the name of the guild you want to track\nTo cancel type `exit`").build()).queue();
 
                             guildMap.get(event.getGuild().getId()).createSkyblockEvent(event);
                         } else if (database.getSkyblockEventActive(event.getGuild().getId())) {

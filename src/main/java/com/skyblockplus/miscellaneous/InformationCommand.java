@@ -10,8 +10,8 @@ import java.lang.management.ManagementFactory;
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.*;
 
-public class AboutCommand extends Command {
-    public AboutCommand() {
+public class InformationCommand extends Command {
+    public InformationCommand() {
         this.name = "information";
         this.cooldown = globalCooldown;
         this.aliases = new String[]{"info"};
@@ -20,7 +20,7 @@ public class AboutCommand extends Command {
     @Override
     protected void execute(CommandEvent event) {
         new Thread(() -> {
-            logCommand(event.getGuild(), event.getAuthor(), BOT_PREFIX + "about");
+            logCommand(event.getGuild(), event.getAuthor(), BOT_PREFIX + "information");
 
             EmbedBuilder eb = defaultEmbed("Skyblock Plus");
             eb.setDescription("Skyblock Plus is a Skyblock focused discord bot that has many commands to help Skyblock players and guild staff! It allows for quick retrieval of Skyblock stats plus customizable features for a better Skyblock experience.");

@@ -69,7 +69,7 @@ public class Main {
         client.useHelpBuilder(false);
         client.setPrefix(BOT_PREFIX);
 
-        client.addCommands(new AboutCommand(), new SlayerCommand(), new HelpCommand(waiter), new GuildCommand(waiter),
+        client.addCommands(new InformationCommand(), new SlayerCommand(), new HelpCommand(waiter), new GuildCommand(waiter),
                 new AuctionCommand(), new BinCommand(), new SkillsCommand(), new CatacombsCommand(),
                 new ShutdownCommand(), new VersionCommand(), new RoleCommands(), new GuildLeaderboardCommand(),
                 new EssenceCommand(), new BankCommand(waiter), new WardrobeCommand(waiter),
