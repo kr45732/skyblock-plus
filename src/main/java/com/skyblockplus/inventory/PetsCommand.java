@@ -28,30 +28,32 @@ public class PetsCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = loadingEmbed();
-        Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-        String content = event.getMessage().getContentRaw();
-        String[] args = content.split(" ");
-        this.event = event;
+        new Thread(() -> {
+            EmbedBuilder eb = loadingEmbed();
+            Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+            String content = event.getMessage().getContentRaw();
+            String[] args = content.split(" ");
+            this.event = event;
 
-        logCommand(event.getGuild(), event.getAuthor(), content);
+            logCommand(event.getGuild(), event.getAuthor(), content);
 
-        if (args.length == 2 || args.length == 3) {
-            if (args.length == 3) {
-                eb = getPlayerSacks(args[1], args[2]);
+            if (args.length == 2 || args.length == 3) {
+                if (args.length == 3) {
+                    eb = getPlayerSacks(args[1], args[2]);
 
-            } else
-                eb = getPlayerSacks(args[1], null);
+                } else
+                    eb = getPlayerSacks(args[1], null);
 
-            if (eb == null) {
-                ebMessage.delete().queue();
-            } else {
-                ebMessage.editMessage(eb.build()).queue();
+                if (eb == null) {
+                    ebMessage.delete().queue();
+                } else {
+                    ebMessage.editMessage(eb.build()).queue();
+                }
+                return;
             }
-            return;
-        }
 
-        ebMessage.editMessage(errorMessage(this.name).build()).queue();
+            ebMessage.editMessage(errorMessage(this.name).build()).queue();
+        }).start();
     }
 
     private EmbedBuilder getPlayerSacks(String username, String profileName) {

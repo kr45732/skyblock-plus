@@ -20,14 +20,16 @@ public class ReloadCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        logCommand(event.getGuild(), event.getAuthor(), event.getMessage().getContentRaw());
+        new Thread(() -> {
+            logCommand(event.getGuild(), event.getAuthor(), event.getMessage().getContentRaw());
 
-        EmbedBuilder eb = loadingEmbed();
-        Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+            EmbedBuilder eb = loadingEmbed();
+            Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 
-        eb = defaultEmbed("Reload Settings for " + event.getGuild().getName());
-        eb.addField("Apply settings reload status", onApplyReload(event.getGuild().getId()), false);
-        eb.addField("Verify settings reload status", onVerifyReload(event.getGuild().getId()), false);
-        ebMessage.editMessage(eb.build()).queue();
+            eb = defaultEmbed("Reload Settings for " + event.getGuild().getName());
+            eb.addField("Apply settings reload status", onApplyReload(event.getGuild().getId()), false);
+            eb.addField("Verify settings reload status", onVerifyReload(event.getGuild().getId()), false);
+            ebMessage.editMessage(eb.build()).queue();
+        }).start();
     }
 }

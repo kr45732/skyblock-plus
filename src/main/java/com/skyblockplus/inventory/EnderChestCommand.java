@@ -22,35 +22,37 @@ public class EnderChestCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = loadingEmbed();
-        Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-        String content = event.getMessage().getContentRaw();
-        String[] args = content.split(" ");
+        new Thread(() -> {
+            EmbedBuilder eb = loadingEmbed();
+            Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+            String content = event.getMessage().getContentRaw();
+            String[] args = content.split(" ");
 
-        logCommand(event.getGuild(), event.getAuthor(), content);
+            logCommand(event.getGuild(), event.getAuthor(), content);
 
-        if (args.length == 2 || args.length == 3) {
-            List<String[]> playerEnderChest;
-            if (args.length == 3) {
-                playerEnderChest = getPlayerEnderChest(args[1], args[2]);
-            } else {
-                playerEnderChest = getPlayerEnderChest(args[1], null);
-            }
-
-            if (playerEnderChest != null) {
-                ebMessage.delete().queue();
-                if (missingEmoji.length() > 0) {
-                    ebMessage.getChannel().sendMessage(defaultEmbed("Missing Items").setDescription(missingEmoji).build()).queue();
+            if (args.length == 2 || args.length == 3) {
+                List<String[]> playerEnderChest;
+                if (args.length == 3) {
+                    playerEnderChest = getPlayerEnderChest(args[1], args[2]);
+                } else {
+                    playerEnderChest = getPlayerEnderChest(args[1], null);
                 }
 
-                jda.addEventListener(new InventoryPaginator(playerEnderChest, ebMessage.getChannel(), event.getAuthor()));
-            } else {
-                ebMessage.editMessage(defaultEmbed("Error").setDescription("Unable to fetch data").build()).queue();
-            }
-            return;
-        }
+                if (playerEnderChest != null) {
+                    ebMessage.delete().queue();
+                    if (missingEmoji.length() > 0) {
+                        ebMessage.getChannel().sendMessage(defaultEmbed("Missing Items").setDescription(missingEmoji).build()).queue();
+                    }
 
-        ebMessage.editMessage(errorMessage(this.name).build()).queue();
+                    jda.addEventListener(new InventoryPaginator(playerEnderChest, ebMessage.getChannel(), event.getAuthor()));
+                } else {
+                    ebMessage.editMessage(defaultEmbed("Error").setDescription("Unable to fetch data").build()).queue();
+                }
+                return;
+            }
+
+            ebMessage.editMessage(errorMessage(this.name).build()).queue();
+        }).start();
     }
 
     private List<String[]> getPlayerEnderChest(String username, String profileName) {

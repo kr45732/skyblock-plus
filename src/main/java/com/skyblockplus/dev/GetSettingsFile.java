@@ -27,29 +27,31 @@ public class GetSettingsFile extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        String content = event.getMessage().getContentRaw();
-        String[] args = content.split(" ");
-        this.event = event;
+        new Thread(() -> {
+            String content = event.getMessage().getContentRaw();
+            String[] args = content.split(" ");
+            this.event = event;
 
-        logCommand(event.getGuild(), event.getAuthor(), content);
+            logCommand(event.getGuild(), event.getAuthor(), content);
 
-        if (args.length == 2) {
-            if (args[1].equals("current")) {
-                if (getCurrentServerSettings(event.getGuild().getId())) {
-                    return;
-                }
-            } else if (args[1].equals("all")) {
-                if (getAllServerSettings()) {
-                    return;
-                }
-            } else {
-                if (getCurrentServerSettings(args[1])) {
-                    return;
+            if (args.length == 2) {
+                if (args[1].equals("current")) {
+                    if (getCurrentServerSettings(event.getGuild().getId())) {
+                        return;
+                    }
+                } else if (args[1].equals("all")) {
+                    if (getAllServerSettings()) {
+                        return;
+                    }
+                } else {
+                    if (getCurrentServerSettings(args[1])) {
+                        return;
+                    }
                 }
             }
-        }
 
-        event.getChannel().sendMessage(errorMessage(this.name).build()).queue();
+            event.getChannel().sendMessage(errorMessage(this.name).build()).queue();
+        }).start();
     }
 
     private boolean getAllServerSettings() {

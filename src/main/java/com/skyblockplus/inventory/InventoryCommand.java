@@ -30,21 +30,22 @@ public class InventoryCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = loadingEmbed();
-        Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-        String content = event.getMessage().getContentRaw();
-        String[] args = content.split(" ");
-        this.event = event;
+        new Thread(() -> {
+            EmbedBuilder eb = loadingEmbed();
+            Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+            String content = event.getMessage().getContentRaw();
+            String[] args = content.split(" ");
+            this.event = event;
 
-        logCommand(event.getGuild(), event.getAuthor(), content);
+            logCommand(event.getGuild(), event.getAuthor(), content);
 
-        if ((args.length == 3 || args.length == 4) && args[1].equals("armor")) {
-            if (args.length == 4) {
-                ebMessage.editMessage(getPlayerEquippedArmor(args[2], args[3]).build()).queue();
-            } else {
-                ebMessage.editMessage(getPlayerEquippedArmor(args[2], null).build()).queue();
-            }
-            return;
+            if ((args.length == 3 || args.length == 4) && args[1].equals("armor")) {
+                if (args.length == 4) {
+                    ebMessage.editMessage(getPlayerEquippedArmor(args[2], args[3]).build()).queue();
+                } else {
+                    ebMessage.editMessage(getPlayerEquippedArmor(args[2], null).build()).queue();
+                }
+                return;
 //        } else if ((args.length == 4 || args.length == 5) && args[1].equals("slot")) {
 //            if (args.length == 5) {
 //                eb = getInventorySlot(args[2], args[3], args[4]);
@@ -57,29 +58,30 @@ public class InventoryCommand extends Command {
 //                ebMessage.editMessage(eb.build()).queue();
 //            }
 //            return;
-        } else if (args.length == 2 || args.length == 3) {
-            String[] playerInventory;
-            if (args.length == 3) {
-                playerInventory = getPlayerInventory(args[1], args[2]);
-            } else {
-                playerInventory = getPlayerInventory(args[1], null);
-            }
-
-            if (playerInventory != null) {
-                ebMessage.delete().queue();
-                ebMessage.getChannel().sendMessage(playerInventory[0]).queue();
-                ebMessage.getChannel().sendMessage(playerInventory[1]).queue();
-                if (playerInventory[2].length() > 0) {
-                    ebMessage.getChannel().sendMessage(defaultEmbed("Missing Items").setDescription(playerInventory[2]).build()).queue();
+            } else if (args.length == 2 || args.length == 3) {
+                String[] playerInventory;
+                if (args.length == 3) {
+                    playerInventory = getPlayerInventory(args[1], args[2]);
+                } else {
+                    playerInventory = getPlayerInventory(args[1], null);
                 }
 
-            } else {
-                ebMessage.editMessage(defaultEmbed("Error").setDescription("Unable to fetch data").build()).queue();
-            }
-            return;
-        }
+                if (playerInventory != null) {
+                    ebMessage.delete().queue();
+                    ebMessage.getChannel().sendMessage(playerInventory[0]).queue();
+                    ebMessage.getChannel().sendMessage(playerInventory[1]).queue();
+                    if (playerInventory[2].length() > 0) {
+                        ebMessage.getChannel().sendMessage(defaultEmbed("Missing Items").setDescription(playerInventory[2]).build()).queue();
+                    }
 
-        ebMessage.editMessage(errorMessage(this.name).build()).queue();
+                } else {
+                    ebMessage.editMessage(defaultEmbed("Error").setDescription("Unable to fetch data").build()).queue();
+                }
+                return;
+            }
+
+            ebMessage.editMessage(errorMessage(this.name).build()).queue();
+        }).start();
     }
 
     private EmbedBuilder getInventorySlot(String itemName, String username, String profileName) {

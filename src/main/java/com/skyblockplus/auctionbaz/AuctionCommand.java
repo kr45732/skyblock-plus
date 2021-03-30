@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.UsernameUuidStruct;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
@@ -13,8 +14,6 @@ import java.time.Instant;
 import static com.skyblockplus.utils.Utils.*;
 
 public class AuctionCommand extends Command {
-    private String playerUsername;
-    private String playerUuid;
 
     public AuctionCommand() {
         this.name = "auction";
@@ -24,26 +23,30 @@ public class AuctionCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = loadingEmbed();
-        Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-        String content = event.getMessage().getContentRaw();
-        String[] args = content.split(" ");
+        new Thread(() -> {
+            EmbedBuilder eb = loadingEmbed();
+            Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+            String content = event.getMessage().getContentRaw();
+            String[] args = content.split(" ");
 
-        logCommand(event.getGuild(), event.getAuthor(), content);
+            logCommand(event.getGuild(), event.getAuthor(), content);
 
-        if (args.length == 2) {
-            ebMessage.editMessage(getPlayerAuction(args[1]).build()).queue();
-            return;
-        }
+            if (args.length == 2) {
+                ebMessage.editMessage(getPlayerAuction(args[1]).build()).queue();
+                return;
+            }
 
-        ebMessage.editMessage(errorMessage(this.name).build()).queue();
+            ebMessage.editMessage(errorMessage(this.name).build()).queue();
+        }).start();
     }
 
     private EmbedBuilder getPlayerAuction(String username) {
-        if (!usernameToUuid(username)) {
+        UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
+        if (usernameUuidStruct == null) {
             return defaultEmbed("Error fetching player data");
         }
-        String url = "https://api.hypixel.net/skyblock/auction?key=" + HYPIXEL_API_KEY + "&player=" + this.playerUuid;
+
+        String url = "https://api.hypixel.net/skyblock/auction?key=" + HYPIXEL_API_KEY + "&player=" + usernameUuidStruct.playerUuid;
 
         JsonElement playerAuctions = getJson(url);
         JsonArray auctionsArray = higherDepth(playerAuctions, "auctions").getAsJsonArray();
@@ -106,7 +109,7 @@ public class AuctionCommand extends Command {
             }
         }
 
-        EmbedBuilder eb = defaultEmbed(this.playerUsername, "https://auctions.craftlink.xyz/players/" + this.playerUuid);
+        EmbedBuilder eb = defaultEmbed(usernameUuidStruct.playerUsername, "https://auctions.craftlink.xyz/players/" + usernameUuidStruct.playerUuid);
         for (String[] auction : auctions) {
             if (auction[0] != null) {
                 for (String[] strings : auctions) {
@@ -114,25 +117,12 @@ public class AuctionCommand extends Command {
                         eb.addField(strings[0], strings[1], false);
                     }
                 }
-                eb.setThumbnail("https://cravatar.eu/helmavatar/" + this.playerUuid + "/64.png");
+                eb.setThumbnail("https://cravatar.eu/helmavatar/" + usernameUuidStruct.playerUuid + "/64.png");
                 eb.setDescription("**Sold Auctions Value:** " + simplifyNumber(totalSoldValue) + "\n**Unsold Auctions Value:** " + simplifyNumber(totalPendingValue));
                 return eb;
             }
         }
-        eb.setTitle("No auctions found for " + this.playerUsername, null);
+        eb.setTitle("No auctions found for " + usernameUuidStruct.playerUsername, null);
         return eb;
     }
-
-    private boolean usernameToUuid(String username) {
-        try {
-            JsonElement usernameJson = getJson("https://api.ashcon.app/mojang/v2/user/" + username);
-            this.playerUsername = higherDepth(usernameJson, "username").getAsString();
-            this.playerUuid = higherDepth(usernameJson, "uuid").getAsString().replace("-", "");
-            return true;
-        } catch (Exception ignored) {
-        }
-        return false;
-
-    }
-
 }

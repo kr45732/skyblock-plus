@@ -18,28 +18,30 @@ public class DeleteMessagesCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = loadingEmbed();
-        Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-        String content = event.getMessage().getContentRaw();
-        String[] args = content.split(" ");
+        new Thread(() -> {
+            EmbedBuilder eb = loadingEmbed();
+            Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+            String content = event.getMessage().getContentRaw();
+            String[] args = content.split(" ");
 
-        logCommand(event.getGuild(), event.getAuthor(), content);
+            logCommand(event.getGuild(), event.getAuthor(), content);
 
-        if (args.length == 2) {
-            try {
-                int messageCount = Math.min(Integer.parseInt(args[1]), 100);
-                List<Message> toDelete = event.getChannel().getHistory().retrievePast(messageCount).complete();
-                event.getChannel().purgeMessages(toDelete);
-                ebMessage = ebMessage.editMessage(defaultEmbed("Deleted " + messageCount + " messages").build()).complete();
-                ebMessage.delete().queueAfter(5, TimeUnit.SECONDS);
-                return;
-            } catch (Exception e) {
-                ebMessage = ebMessage.editMessage(defaultEmbed("Invalid amount").build()).complete();
-                ebMessage.delete().queueAfter(5, TimeUnit.SECONDS);
-                return;
+            if (args.length == 2) {
+                try {
+                    int messageCount = Math.min(Integer.parseInt(args[1]), 100);
+                    List<Message> toDelete = event.getChannel().getHistory().retrievePast(messageCount).complete();
+                    event.getChannel().purgeMessages(toDelete);
+                    ebMessage = ebMessage.editMessage(defaultEmbed("Deleted " + messageCount + " messages").build()).complete();
+                    ebMessage.delete().queueAfter(5, TimeUnit.SECONDS);
+                    return;
+                } catch (Exception e) {
+                    ebMessage = ebMessage.editMessage(defaultEmbed("Invalid amount").build()).complete();
+                    ebMessage.delete().queueAfter(5, TimeUnit.SECONDS);
+                    return;
+                }
             }
-        }
 
-        ebMessage.editMessage(errorMessage(this.name).build()).queue();
+            ebMessage.editMessage(errorMessage(this.name).build()).queue();
+        }).start();
     }
 }

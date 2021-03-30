@@ -32,30 +32,32 @@ public class SkyblockCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        this.event = event;
-        EmbedBuilder eb = loadingEmbed();
-        Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-        String content = event.getMessage().getContentRaw();
-        String[] args = content.split(" ");
+        new Thread(() -> {
+            this.event = event;
+            EmbedBuilder eb = loadingEmbed();
+            Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+            String content = event.getMessage().getContentRaw();
+            String[] args = content.split(" ");
 
-        logCommand(event.getGuild(), event.getAuthor(), content);
+            logCommand(event.getGuild(), event.getAuthor(), content);
 
-        if (args.length == 2 || args.length == 3) {
-            if (args.length == 3) {
-                eb = getSkyblockStats(args[1], args[2]);
-            } else {
-                eb = getSkyblockStats(args[1], null);
+            if (args.length == 2 || args.length == 3) {
+                if (args.length == 3) {
+                    eb = getSkyblockStats(args[1], args[2]);
+                } else {
+                    eb = getSkyblockStats(args[1], null);
+                }
+
+                if (eb == null) {
+                    ebMessage.delete().queue();
+                } else {
+                    ebMessage.editMessage(eb.build()).queue();
+                }
+                return;
             }
 
-            if (eb == null) {
-                ebMessage.delete().queue();
-            } else {
-                ebMessage.editMessage(eb.build()).queue();
-            }
-            return;
-        }
-
-        ebMessage.editMessage(errorMessage(this.name).build()).queue();
+            ebMessage.editMessage(errorMessage(this.name).build()).queue();
+        }).start();
     }
 
     private EmbedBuilder getSkyblockStats(String username, String profileName) {

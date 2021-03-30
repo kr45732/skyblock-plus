@@ -39,254 +39,256 @@ public class SettingsCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        this.event = event;
-        EmbedBuilder eb = loadingEmbed();
-        Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-        String content = event.getMessage().getContentRaw();
-        String[] args = content.split(" ");
+        new Thread(() -> {
+            this.event = event;
+            EmbedBuilder eb = loadingEmbed();
+            Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+            String content = event.getMessage().getContentRaw();
+            String[] args = content.split(" ");
 
-        logCommand(event.getGuild(), event.getAuthor(), content);
+            logCommand(event.getGuild(), event.getAuthor(), content);
 
-        JsonElement currentSettings = database.getServerSettings(event.getGuild().getId());
-        if (higherDepth(currentSettings, "serverId") == null) {
-            database.addNewServerSettings(event.getGuild().getId(),
-                    new ServerSettingsModel(event.getGuild().getName(), event.getGuild().getId()));
-            currentSettings = database.getServerSettings(event.getGuild().getId());
-        }
-
-        if (args.length == 1) {
-            eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
-
-            if (higherDepth(currentSettings, "automatedVerify") != null) {
-                eb.addField("Verify Settings",
-                        "Use `" + BOT_PREFIX + "settings verify` to see the current verify settings", false);
-            } else {
-                eb.addField("Verify Settings", "Error! Data not found", false);
+            JsonElement currentSettings = database.getServerSettings(event.getGuild().getId());
+            if (higherDepth(currentSettings, "serverId") == null) {
+                database.addNewServerSettings(event.getGuild().getId(),
+                        new ServerSettingsModel(event.getGuild().getName(), event.getGuild().getId()));
+                currentSettings = database.getServerSettings(event.getGuild().getId());
             }
 
-            if (higherDepth(currentSettings, "automatedApplication") != null) {
-                eb.addField("Apply Settings",
-                        "Use `" + BOT_PREFIX + "settings apply` to see the current apply settings", false);
-            } else {
-                eb.addField("Apply Settings", "Error! Data not found", false);
-            }
-
-            if (higherDepth(currentSettings, "automatedRoles") != null) {
-                eb.addField("Roles Settings",
-                        "Use `" + BOT_PREFIX + "settings roles` to see the current roles settings", false);
-            } else {
-                eb.addField("Roles Settings", "Error! Data not found", false);
-            }
-
-            if (higherDepth(currentSettings, "automaticGuildRoles") != null) {
-                eb.addField("Guild Role Settings",
-                        "Use `" + BOT_PREFIX + "settings guild` to see the current guild role settings", false);
-            } else {
-                eb.addField("Guild Role Settings", "Error! Data not found", false);
-            }
-
-        } else if (args.length >= 2 && args[1].equals("roles")) {
-            if (args.length == 2) {
+            if (args.length == 1) {
                 eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+
+                if (higherDepth(currentSettings, "automatedVerify") != null) {
+                    eb.addField("Verify Settings",
+                            "Use `" + BOT_PREFIX + "settings verify` to see the current verify settings", false);
+                } else {
+                    eb.addField("Verify Settings", "Error! Data not found", false);
+                }
+
+                if (higherDepth(currentSettings, "automatedApplication") != null) {
+                    eb.addField("Apply Settings",
+                            "Use `" + BOT_PREFIX + "settings apply` to see the current apply settings", false);
+                } else {
+                    eb.addField("Apply Settings", "Error! Data not found", false);
+                }
+
                 if (higherDepth(currentSettings, "automatedRoles") != null) {
-                    ebMessage.delete().queue();
-                    getCurrentRolesSettings(higherDepth(currentSettings, "automatedRoles")).build()
-                            .paginate(ebMessage.getChannel(), 0);
-                    return;
+                    eb.addField("Roles Settings",
+                            "Use `" + BOT_PREFIX + "settings roles` to see the current roles settings", false);
                 } else {
                     eb.addField("Roles Settings", "Error! Data not found", false);
                 }
-            } else if (args.length == 3) {
-                if (args[2].equals("enable")) {
-                    if (allowRolesEnable()) {
-                        eb = setRolesEnable("true");
-                    } else {
-                        eb = defaultEmbed("Error", null).setDescription("No roles set!");
-                    }
-                } else if (args[2].equals("disable")) {
-                    eb = setRolesEnable("false");
+
+                if (higherDepth(currentSettings, "automaticGuildRoles") != null) {
+                    eb.addField("Guild Role Settings",
+                            "Use `" + BOT_PREFIX + "settings guild` to see the current guild role settings", false);
                 } else {
-                    eb = getCurrentRoleSettings(args[2]);
-                    if (eb == null) {
+                    eb.addField("Guild Role Settings", "Error! Data not found", false);
+                }
+
+            } else if (args.length >= 2 && args[1].equals("roles")) {
+                if (args.length == 2) {
+                    eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+                    if (higherDepth(currentSettings, "automatedRoles") != null) {
                         ebMessage.delete().queue();
+                        getCurrentRolesSettings(higherDepth(currentSettings, "automatedRoles")).build()
+                                .paginate(ebMessage.getChannel(), 0);
                         return;
+                    } else {
+                        eb.addField("Roles Settings", "Error! Data not found", false);
+                    }
+                } else if (args.length == 3) {
+                    if (args[2].equals("enable")) {
+                        if (allowRolesEnable()) {
+                            eb = setRolesEnable("true");
+                        } else {
+                            eb = defaultEmbed("Error", null).setDescription("No roles set!");
+                        }
+                    } else if (args[2].equals("disable")) {
+                        eb = setRolesEnable("false");
+                    } else {
+                        eb = getCurrentRoleSettings(args[2]);
+                        if (eb == null) {
+                            ebMessage.delete().queue();
+                            return;
+                        }
+                    }
+                } else if (args.length == 4) {
+                    if (args[2].equals("enable")) {
+                        eb = setRoleEnable(args[3], "true");
+                    } else if (args[2].equals("disable")) {
+                        eb = setRoleEnable(args[3], "false");
+                    } else {
+                        eb = defaultEmbed("Error", null).setDescription("Invalid setting");
+                    }
+                } else if (args.length == 5) {
+                    if (args[2].equals("stackable") && args[4].equals("true")) {
+                        eb = setRoleStackable(args[3], "true");
+                    } else if (args[2].equals("stackable") && args[4].equals("false")) {
+                        eb = setRoleStackable(args[3], "false");
+                    } else if (args[2].equals("remove")) {
+                        eb = removeRoleLevel(args[3], args[4]);
+                    } else if (args[2].equals("set")) {
+                        eb = setOneLevelRole(args[3], args[4]);
+                    } else {
+                        eb = defaultEmbed("Error", null).setDescription("Invalid setting");
+                    }
+                } else if (args.length == 6 && args[2].equals("add")) {
+                    eb = addRoleLevel(args[3], args[4], args[5]);
+                } else {
+                    eb = defaultEmbed("Error", null).setDescription("Invalid setting");
+                }
+
+                ebMessage.editMessage(eb.build()).queue();
+                return;
+            } else if (content.split(" ", 4).length >= 2 && content.split(" ", 4)[1].equals("apply")) {
+                args = content.split(" ", 4);
+                if (args.length == 2) {
+                    eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+                    if (higherDepth(currentSettings, "automatedApplication") != null) {
+                        eb.addField("Apply Settings",
+                                getCurrentApplySettings(higherDepth(currentSettings, "automatedApplication")), false);
+                    } else {
+                        eb.addField("Apply Settings", "Error! Data not found", false);
+                    }
+                } else if (args.length == 3) {
+                    if (args[2].equals("enable")) {
+                        if (allowApplyEnable()) {
+                            eb = setApplyEnable("true");
+                        } else {
+                            eb = defaultEmbed("Error", null)
+                                    .setDescription("All other apply settings must be set before " + "enabling apply!");
+                        }
+                    } else if (args[2].equals("disable")) {
+                        eb = setApplyEnable("false");
+                    } else {
+                        eb = defaultEmbed("Error", null).setDescription("Invalid setting");
+                    }
+                } else if (args.length == 4) {
+                    switch (args[2]) {
+                        case "message":
+                            eb = setApplyMessageText(args[3]);
+                            break;
+                        case "staff_role":
+                            eb = setApplyStaffPingRoleId(args[3]);
+                            break;
+                        case "channel":
+                            eb = setApplyMessageTextChannelId(args[3]);
+                            break;
+                        case "prefix":
+                            eb = setApplyNewChannelPrefix(args[3]);
+                            break;
+                        case "category":
+                            eb = setApplyNewChannelCategory(args[3]);
+                            break;
+                        case "staff_channel":
+                            eb = setApplyMessageStaffChannelId(args[3]);
+                            break;
+                        case "accept_message":
+                            eb = setApplyAcceptMessageText(args[3]);
+                            break;
+                        case "waitlist_message":
+                            eb = setApplyWaitListMessageText(args[3]);
+                            break;
+                        case "deny_message":
+                            eb = setApplyDenyMessageText(args[3]);
+                            break;
+                        default:
+                            eb = defaultEmbed("Error", null).setDescription("Invalid setting");
+                            break;
                     }
                 }
-            } else if (args.length == 4) {
-                if (args[2].equals("enable")) {
-                    eb = setRoleEnable(args[3], "true");
-                } else if (args[2].equals("disable")) {
-                    eb = setRoleEnable(args[3], "false");
-                } else {
-                    eb = defaultEmbed("Error", null).setDescription("Invalid setting");
+            } else if (content.split(" ", 4).length >= 2 && content.split(" ", 4)[1].equals("verify")) {
+                args = content.split(" ", 4);
+                if (args.length == 2) {
+                    eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+                    if (higherDepth(currentSettings, "automatedVerify") != null) {
+                        eb.addField("Verify Settings",
+                                getCurrentVerifySettings(higherDepth(currentSettings, "automatedVerify")), false);
+                    } else {
+                        eb.addField("Verify Settings", "Error! Data not found", false);
+                    }
+                } else if (args.length == 3) {
+                    if (args[2].equals("enable")) {
+                        if (allowVerifyEnable()) {
+                            eb = setVerifyEnable("true");
+                        } else {
+                            eb = defaultEmbed("Error", null)
+                                    .setDescription("All other verify settings must be set before " + "enabling verify!");
+                        }
+                    } else if (args[2].equals("disable")) {
+                        eb = setVerifyEnable("false");
+                    } else {
+                        eb = defaultEmbed("Error", null).setDescription("Invalid setting");
+                    }
+                } else if (args.length == 4) {
+                    switch (args[2]) {
+                        case "message":
+                            eb = setVerifyMessageText(args[3]);
+                            break;
+                        case "role":
+                            eb = setVerifyVerifiedRole(args[3]);
+                            break;
+                        case "channel":
+                            eb = setVerifyMessageTextChannelId(args[3]);
+                            break;
+                        case "nickname":
+                            eb = setVerifyNickname(args[3]);
+                            break;
+                        default:
+                            eb = defaultEmbed("Error", null).setDescription("Invalid setting");
+                            break;
+                    }
                 }
-            } else if (args.length == 5) {
-                if (args[2].equals("stackable") && args[4].equals("true")) {
-                    eb = setRoleStackable(args[3], "true");
-                } else if (args[2].equals("stackable") && args[4].equals("false")) {
-                    eb = setRoleStackable(args[3], "false");
-                } else if (args[2].equals("remove")) {
-                    eb = removeRoleLevel(args[3], args[4]);
-                } else if (args[2].equals("set")) {
-                    eb = setOneLevelRole(args[3], args[4]);
+            } else if ((args.length == 2 || args.length == 4 || args.length == 5) && args[1].equals("guild")) {
+                if (args.length == 2) {
+                    eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+                    if (higherDepth(currentSettings, "automaticGuildRoles") != null) {
+                        eb.addField("Guild Role Settings",
+                                getCurrentGuildRoleSettings(), false);
+                    } else {
+                        eb.addField("Guild Role Settings", "Error! Data not found", false);
+                    }
+                } else if (args.length == 4) {
+                    switch (args[2]) {
+                        case "set":
+                            eb = setGuildRoleId(args[3]);
+                            break;
+                        case "role":
+                            eb = setGuildRoleName(args[3]);
+                            break;
+                        case "enable":
+                            if (args[3].equals("role")) {
+                                eb = setGuildRoleEnable("true");
+//                        } else if (args[3].equals("rank")) {
+//                            eb = setGuildRankEnable("true");
+                            } else {
+                                eb = defaultEmbed("Error").setDescription("Invalid setting");
+                            }
+                            break;
+                        case "disable":
+                            if (args[3].equals("role")) {
+                                eb = setGuildRoleEnable("false");
+//                        } else if (args[3].equals("rank")) {
+//                            eb = setGuildRankEnable("false");
+                            } else {
+                                eb = defaultEmbed("Error").setDescription("Invalid setting");
+                            }
+                            break;
+                        default:
+                            eb = defaultEmbed("Error").setDescription("Invalid setting");
+                            break;
+                    }
                 } else {
-                    eb = defaultEmbed("Error", null).setDescription("Invalid setting");
+                    eb = defaultEmbed("Error").setDescription("Invalid setting");
                 }
-            } else if (args.length == 6 && args[2].equals("add")) {
-                eb = addRoleLevel(args[3], args[4], args[5]);
+
             } else {
                 eb = defaultEmbed("Error", null).setDescription("Invalid setting");
             }
 
             ebMessage.editMessage(eb.build()).queue();
-            return;
-        } else if (content.split(" ", 4).length >= 2 && content.split(" ", 4)[1].equals("apply")) {
-            args = content.split(" ", 4);
-            if (args.length == 2) {
-                eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
-                if (higherDepth(currentSettings, "automatedApplication") != null) {
-                    eb.addField("Apply Settings",
-                            getCurrentApplySettings(higherDepth(currentSettings, "automatedApplication")), false);
-                } else {
-                    eb.addField("Apply Settings", "Error! Data not found", false);
-                }
-            } else if (args.length == 3) {
-                if (args[2].equals("enable")) {
-                    if (allowApplyEnable()) {
-                        eb = setApplyEnable("true");
-                    } else {
-                        eb = defaultEmbed("Error", null)
-                                .setDescription("All other apply settings must be set before " + "enabling apply!");
-                    }
-                } else if (args[2].equals("disable")) {
-                    eb = setApplyEnable("false");
-                } else {
-                    eb = defaultEmbed("Error", null).setDescription("Invalid setting");
-                }
-            } else if (args.length == 4) {
-                switch (args[2]) {
-                    case "message":
-                        eb = setApplyMessageText(args[3]);
-                        break;
-                    case "staff_role":
-                        eb = setApplyStaffPingRoleId(args[3]);
-                        break;
-                    case "channel":
-                        eb = setApplyMessageTextChannelId(args[3]);
-                        break;
-                    case "prefix":
-                        eb = setApplyNewChannelPrefix(args[3]);
-                        break;
-                    case "category":
-                        eb = setApplyNewChannelCategory(args[3]);
-                        break;
-                    case "staff_channel":
-                        eb = setApplyMessageStaffChannelId(args[3]);
-                        break;
-                    case "accept_message":
-                        eb = setApplyAcceptMessageText(args[3]);
-                        break;
-                    case "waitlist_message":
-                        eb = setApplyWaitListMessageText(args[3]);
-                        break;
-                    case "deny_message":
-                        eb = setApplyDenyMessageText(args[3]);
-                        break;
-                    default:
-                        eb = defaultEmbed("Error", null).setDescription("Invalid setting");
-                        break;
-                }
-            }
-        } else if (content.split(" ", 4).length >= 2 && content.split(" ", 4)[1].equals("verify")) {
-            args = content.split(" ", 4);
-            if (args.length == 2) {
-                eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
-                if (higherDepth(currentSettings, "automatedVerify") != null) {
-                    eb.addField("Verify Settings",
-                            getCurrentVerifySettings(higherDepth(currentSettings, "automatedVerify")), false);
-                } else {
-                    eb.addField("Verify Settings", "Error! Data not found", false);
-                }
-            } else if (args.length == 3) {
-                if (args[2].equals("enable")) {
-                    if (allowVerifyEnable()) {
-                        eb = setVerifyEnable("true");
-                    } else {
-                        eb = defaultEmbed("Error", null)
-                                .setDescription("All other verify settings must be set before " + "enabling verify!");
-                    }
-                } else if (args[2].equals("disable")) {
-                    eb = setVerifyEnable("false");
-                } else {
-                    eb = defaultEmbed("Error", null).setDescription("Invalid setting");
-                }
-            } else if (args.length == 4) {
-                switch (args[2]) {
-                    case "message":
-                        eb = setVerifyMessageText(args[3]);
-                        break;
-                    case "role":
-                        eb = setVerifyVerifiedRole(args[3]);
-                        break;
-                    case "channel":
-                        eb = setVerifyMessageTextChannelId(args[3]);
-                        break;
-                    case "nickname":
-                        eb = setVerifyNickname(args[3]);
-                        break;
-                    default:
-                        eb = defaultEmbed("Error", null).setDescription("Invalid setting");
-                        break;
-                }
-            }
-        } else if ((args.length == 2 || args.length == 4 || args.length == 5) && args[1].equals("guild")) {
-            if (args.length == 2) {
-                eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
-                if (higherDepth(currentSettings, "automaticGuildRoles") != null) {
-                    eb.addField("Guild Role Settings",
-                            getCurrentGuildRoleSettings(), false);
-                } else {
-                    eb.addField("Guild Role Settings", "Error! Data not found", false);
-                }
-            } else if (args.length == 4) {
-                switch (args[2]) {
-                    case "set":
-                        eb = setGuildRoleId(args[3]);
-                        break;
-                    case "role":
-                        eb = setGuildRoleName(args[3]);
-                        break;
-                    case "enable":
-                        if (args[3].equals("role")) {
-                            eb = setGuildRoleEnable("true");
-//                        } else if (args[3].equals("rank")) {
-//                            eb = setGuildRankEnable("true");
-                        } else {
-                            eb = defaultEmbed("Error").setDescription("Invalid setting");
-                        }
-                        break;
-                    case "disable":
-                        if (args[3].equals("role")) {
-                            eb = setGuildRoleEnable("false");
-//                        } else if (args[3].equals("rank")) {
-//                            eb = setGuildRankEnable("false");
-                        } else {
-                            eb = defaultEmbed("Error").setDescription("Invalid setting");
-                        }
-                        break;
-                    default:
-                        eb = defaultEmbed("Error").setDescription("Invalid setting");
-                        break;
-                }
-            } else {
-                eb = defaultEmbed("Error").setDescription("Invalid setting");
-            }
-
-        } else {
-            eb = defaultEmbed("Error", null).setDescription("Invalid setting");
-        }
-
-        ebMessage.editMessage(eb.build()).queue();
+        }).start();
     }
 
 

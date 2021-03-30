@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import com.skyblockplus.guilds.UsernameUuidStruct;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -313,16 +312,6 @@ public class Utils {
 
     }
 
-    public static String usernameToUuid(String username) {
-        try {
-            JsonElement usernameJson = getJson("https://api.ashcon.app/mojang/v2/user/" + username);
-            return higherDepth(usernameJson, "uuid").getAsString().replace("-", "");
-        } catch (Exception ignored) {
-        }
-        return null;
-
-    }
-
     public static String convertToInternalName(String itemName) {
         String preFormattedItem = itemName.trim().toUpperCase().replace(" ", "_").replace("'S", "")
                 .replace("FRAG", "FRAGMENT").replace(".", "");
@@ -456,7 +445,7 @@ public class Utils {
         return preFormattedItem;
     }
 
-    public static UsernameUuidStruct usernameToUuidUsername(String username) {
+    public static UsernameUuidStruct usernameToUuid(String username) {
         try {
             JsonElement usernameJson = getJson("https://api.ashcon.app/mojang/v2/user/" + username);
             return new UsernameUuidStruct(higherDepth(usernameJson, "username").getAsString(),
@@ -485,10 +474,6 @@ public class Utils {
 
     public static String fixUsername(String username) {
         return username.replace("_", "\\_");
-    }
-
-    public static String formatNumber(int number) {
-        return NumberFormat.getInstance(Locale.US).format(number);
     }
 
     public static String formatNumber(long number) {

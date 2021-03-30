@@ -1,4 +1,4 @@
-package com.skyblockplus.guilds;
+package com.skyblockplus.utils;
 
 public class UsernameUuidStruct {
     public final String playerUsername;
@@ -7,6 +7,5 @@ public class UsernameUuidStruct {
     public UsernameUuidStruct(String playerUsername, String playerUuid) {
         this.playerUsername = playerUsername;
         this.playerUuid = playerUuid;
-
     }
 }

@@ -17,28 +17,30 @@ public class WeightCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = loadingEmbed();
-        Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-        String content = event.getMessage().getContentRaw();
-        String[] args = content.split(" ");
+        new Thread(() -> {
+            EmbedBuilder eb = loadingEmbed();
+            Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+            String content = event.getMessage().getContentRaw();
+            String[] args = content.split(" ");
 
-        logCommand(event.getGuild(), event.getAuthor(), content);
+            logCommand(event.getGuild(), event.getAuthor(), content);
 
-        if (args.length == 6 && args[1].equals("calculate")) {
-            try {
-                ebMessage.editMessage(calculateWeight(args[2], args[3], args[4], args[5]).build()).queue();
+            if (args.length == 6 && args[1].equals("calculate")) {
+                try {
+                    ebMessage.editMessage(calculateWeight(args[2], args[3], args[4], args[5]).build()).queue();
+                    return;
+                } catch (Exception ignored) {
+                }
+            } else if (args.length == 3) {
+                ebMessage.editMessage(getPlayerWeight(args[1], args[2]).build()).queue();
                 return;
-            } catch (Exception ignored) {
+            } else if (args.length == 2) {
+                ebMessage.editMessage(getPlayerWeight(args[1], null).build()).queue();
+                return;
             }
-        } else if (args.length == 3) {
-            ebMessage.editMessage(getPlayerWeight(args[1], args[2]).build()).queue();
-            return;
-        } else if (args.length == 2) {
-            ebMessage.editMessage(getPlayerWeight(args[1], null).build()).queue();
-            return;
-        }
 
-        ebMessage.editMessage(errorMessage(this.name).build()).queue();
+            ebMessage.editMessage(errorMessage(this.name).build()).queue();
+        }).start();
     }
 
     private EmbedBuilder calculateWeight(String skillAverage, String slayer, String catacombs,

@@ -24,18 +24,20 @@ public class BinCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = loadingEmbed();
-        Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-        String args = event.getMessage().getContentRaw();
+        new Thread(() -> {
+            EmbedBuilder eb = loadingEmbed();
+            Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+            String args = event.getMessage().getContentRaw();
 
-        logCommand(event.getGuild(), event.getAuthor(), args);
+            logCommand(event.getGuild(), event.getAuthor(), args);
 
-        if (args.split(" ").length >= 2) {
-            ebMessage.editMessage(getLowestBin(args.replace(BOT_PREFIX + "bin ", "")).build()).queue();
-            return;
-        }
+            if (args.split(" ").length >= 2) {
+                ebMessage.editMessage(getLowestBin(args.replace(BOT_PREFIX + "bin ", "")).build()).queue();
+                return;
+            }
 
-        ebMessage.editMessage(errorMessage(this.name).build()).queue();
+            ebMessage.editMessage(errorMessage(this.name).build()).queue();
+        }).start();
     }
 
     private EmbedBuilder getLowestBin(String item) {

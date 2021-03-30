@@ -15,15 +15,14 @@ import java.time.Instant;
 import java.util.*;
 
 import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.getPetJson;
 
 public class Player {
     public String invMissing = "";
     private long startingAmount;
     private boolean validPlayer = false;
     private JsonElement profileJson;
-    private JsonElement levelTables;
     private JsonElement outerProfileJson;
-    private JsonElement petLevelTable;
     private JsonElement hypixelProfileJson;
     private String playerUuid;
     private String playerUsername;
@@ -176,10 +175,6 @@ public class Player {
     }
 
     public SkillsStruct getCatacombsSkill() {
-        if (this.levelTables == null) {
-            this.levelTables = getLevelingJson();
-        }
-
         try {
             double skillExp = higherDepth(
                     higherDepth(higherDepth(higherDepth(profileJson, "dungeons"), "dungeon_types"), "catacombs"),
@@ -192,10 +187,6 @@ public class Player {
     }
 
     public SkillsStruct getSkill(String skillName) {
-        if (this.levelTables == null) {
-            this.levelTables = getLevelingJson();
-        }
-
         try {
             double skillExp = higherDepth(profileJson, "experience_skill_" + skillName).getAsDouble();
             return skillInfoFromExp(skillExp, skillName);
@@ -205,11 +196,7 @@ public class Player {
     }
 
     public double getSkillAverage() {
-        if (this.levelTables == null) {
-            this.levelTables = getLevelingJson();
-        }
-
-        JsonElement skillsCap = higherDepth(levelTables, "leveling_caps");
+        JsonElement skillsCap = higherDepth(getLevelingJson(), "leveling_caps");
 
         List<String> skills = getJsonKeys(skillsCap);
         skills.remove("catacombs");
@@ -231,15 +218,15 @@ public class Player {
     }
 
     public SkillsStruct skillInfoFromExp(double skillExp, String skill) {
-        JsonElement skillsCap = higherDepth(levelTables, "leveling_caps");
+        JsonElement skillsCap = higherDepth(getLevelingJson(), "leveling_caps");
 
         JsonArray skillsTable;
         if (skill.equals("catacombs")) {
-            skillsTable = higherDepth(levelTables, "catacombs").getAsJsonArray();
+            skillsTable = higherDepth(getLevelingJson(), "catacombs").getAsJsonArray();
         } else if (skill.equals("runecrafting")) {
-            skillsTable = higherDepth(levelTables, "runecrafting_xp").getAsJsonArray();
+            skillsTable = higherDepth(getLevelingJson(), "runecrafting_xp").getAsJsonArray();
         } else {
-            skillsTable = higherDepth(levelTables, "leveling_xp").getAsJsonArray();
+            skillsTable = higherDepth(getLevelingJson(), "leveling_xp").getAsJsonArray();
         }
         int maxLevel;
         try {
@@ -361,13 +348,10 @@ public class Player {
     }
 
     public int petLevelFromXp(long petExp, String rarity) {
-        if (this.petLevelTable == null) {
-            this.petLevelTable = getPetJson();
-        }
 
-        int petRarityOffset = higherDepth(higherDepth(petLevelTable, "pet_rarity_offset"), rarity.toUpperCase())
+        int petRarityOffset = higherDepth(higherDepth(getPetJson(), "pet_rarity_offset"), rarity.toUpperCase())
                 .getAsInt();
-        JsonArray petLevelsXpPer = higherDepth(petLevelTable, "pet_levels").getAsJsonArray();
+        JsonArray petLevelsXpPer = higherDepth(getPetJson(), "pet_levels").getAsJsonArray();
         long totalExp = 0;
         for (int i = petRarityOffset; i < petLevelsXpPer.size(); i++) {
             totalExp += petLevelsXpPer.get(i).getAsLong();
@@ -412,13 +396,10 @@ public class Player {
     }
 
     public int getSlayerLevel(String slayerName) {
-        if (this.levelTables == null) {
-            this.levelTables = getLevelingJson();
-        }
 
         switch (slayerName) {
             case "sven":
-                JsonArray wolfLevelArray = higherDepth(higherDepth(levelTables, "slayer_xp"), "wolf").getAsJsonArray();
+                JsonArray wolfLevelArray = higherDepth(higherDepth(getLevelingJson(), "slayer_xp"), "wolf").getAsJsonArray();
                 int wolfXp = getWolfXp();
                 int prevWolfLevel = 0;
                 for (int i = 0; i < wolfLevelArray.size(); i++) {
@@ -430,7 +411,7 @@ public class Player {
                 }
                 return (prevWolfLevel + 1);
             case "rev":
-                JsonArray zombieLevelArray = higherDepth(higherDepth(levelTables, "slayer_xp"), "zombie")
+                JsonArray zombieLevelArray = higherDepth(higherDepth(getLevelingJson(), "slayer_xp"), "zombie")
                         .getAsJsonArray();
                 int zombieXp = getZombieXp();
                 int prevZombieMax = 0;
@@ -443,7 +424,7 @@ public class Player {
                 }
                 return (prevZombieMax + 1);
             case "tara":
-                JsonArray spiderLevelArray = higherDepth(higherDepth(levelTables, "slayer_xp"), "spider")
+                JsonArray spiderLevelArray = higherDepth(higherDepth(getLevelingJson(), "slayer_xp"), "spider")
                         .getAsJsonArray();
                 int spiderXp = getSpiderXp();
                 int prevSpiderMax = 0;
@@ -998,15 +979,12 @@ public class Player {
     }
 
     public int getSkillMaxLevel(String skillName) {
-        if (this.levelTables == null) {
-            this.levelTables = getLevelingJson();
-        }
         if (skillName.equals("farming")) {
-            return higherDepth(higherDepth(levelTables, "leveling_caps"), skillName).getAsInt()
+            return higherDepth(higherDepth(getLevelingJson(), "leveling_caps"), skillName).getAsInt()
                     + getFarmingCapUpgrade();
         }
 
-        return higherDepth(higherDepth(levelTables, "leveling_caps"), skillName).getAsInt();
+        return higherDepth(higherDepth(getLevelingJson(), "leveling_caps"), skillName).getAsInt();
     }
 
     public double getSkillXp(String skillName) {
@@ -1024,10 +1002,6 @@ public class Player {
     }
 
     public double getDungeonClassLevel(String className) {
-        if (this.levelTables == null) {
-            this.levelTables = getLevelingJson();
-        }
-
         SkillsStruct dungeonClassLevel = skillInfoFromExp(getDungeonClassXp(className), "catacombs");
         return dungeonClassLevel.skillLevel + dungeonClassLevel.progressToNext;
     }

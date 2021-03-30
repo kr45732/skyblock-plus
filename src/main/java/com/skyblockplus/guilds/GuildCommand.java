@@ -7,6 +7,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.utils.CustomPaginator;
+import com.skyblockplus.utils.UsernameUuidStruct;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.exceptions.PermissionException;
@@ -32,80 +33,82 @@ public class GuildCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = loadingEmbed();
-        Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-        String content = event.getMessage().getContentRaw();
-        String[] args = content.split(" ");
+        new Thread(() -> {
+            EmbedBuilder eb = loadingEmbed();
+            Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+            String content = event.getMessage().getContentRaw();
+            String[] args = content.split(" ");
 
-        logCommand(event.getGuild(), event.getAuthor(), content);
+            logCommand(event.getGuild(), event.getAuthor(), content);
 
-        if (args.length == 3 && ("experience".equals(args[1]) || "exp".equals(args[1]))) {
-            if (args[2].toLowerCase().startsWith("u-")) {
-                String username = args[2].split("-")[1];
-                GuildStruct guildExp = getGuildExp(username);
-                if (guildExp.outputArr.length == 0) {
-                    ebMessage.editMessage(guildExp.eb.build()).queue();
-                } else {
-                    CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(2)
-                            .setItemsPerPage(20).showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
-                                try {
-                                    m.clearReactions().queue();
-                                } catch (PermissionException ex) {
-                                    m.delete().queue();
-                                }
-                            }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS)
-                            .setColor(botColor).setCommandUser(event.getAuthor());
+            if (args.length == 3 && ("experience".equals(args[1]) || "exp".equals(args[1]))) {
+                if (args[2].toLowerCase().startsWith("u-")) {
+                    String username = args[2].split("-")[1];
+                    GuildStruct guildExp = getGuildExp(username);
+                    if (guildExp.outputArr.length == 0) {
+                        ebMessage.editMessage(guildExp.eb.build()).queue();
+                    } else {
+                        CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(2)
+                                .setItemsPerPage(20).showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
+                                    try {
+                                        m.clearReactions().queue();
+                                    } catch (PermissionException ex) {
+                                        m.delete().queue();
+                                    }
+                                }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS)
+                                .setColor(botColor).setCommandUser(event.getAuthor());
 
-                    paginateBuilder.addItems(guildExp.outputArr);
-                    ebMessage.delete().queue();
-                    paginateBuilder.build().paginate(event.getChannel(), 0);
-                }
-                return;
-            }
-        } else if (args.length >= 3 && "info".equals(args[1])) {
-            if (args[2].toLowerCase().startsWith("u-")) {
-                String usernameInfo = args[2].split("-")[1];
-                ebMessage.editMessage(getGuildInfo(usernameInfo).build()).queue();
-                return;
-            } else if (args[2].toLowerCase().startsWith("g-")) {
-                String guildName = content.split("-")[1];
-                ebMessage.editMessage(guildInfoFromGuildName(guildName).build()).queue();
-                return;
-            }
-        } else if (args.length == 3 && "members".equals(args[1])) {
-            if (args[2].toLowerCase().startsWith("u-")) {
-                String usernameMembers = args[2].split("-")[1];
-                GuildStruct guildMembers = getGuildMembers(usernameMembers);
-                if (guildMembers.outputArr.length == 0) {
-                    ebMessage.editMessage(guildMembers.eb.build()).queue();
-                } else {
-                    CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(3)
-                            .setItemsPerPage(27).showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
-                                try {
-                                    m.clearReactions().queue();
-                                } catch (PermissionException ex) {
-                                    m.delete().queue();
-                                }
-                            }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS)
-                            .setColor(botColor).setCommandUser(event.getAuthor());
-
-                    paginateBuilder.addItems(guildMembers.outputArr);
-
-                    ebMessage.delete().queue();
-                    paginateBuilder.build().paginate(event.getChannel(), 0);
+                        paginateBuilder.addItems(guildExp.outputArr);
+                        ebMessage.delete().queue();
+                        paginateBuilder.build().paginate(event.getChannel(), 0);
+                    }
                     return;
                 }
-            }
-        } else if (args.length == 2) {
-            ebMessage.editMessage(getGuildPlayer(args[1]).build()).queue();
-            return;
-        }
+            } else if (args.length >= 3 && "info".equals(args[1])) {
+                if (args[2].toLowerCase().startsWith("u-")) {
+                    String usernameInfo = args[2].split("-")[1];
+                    ebMessage.editMessage(getGuildInfo(usernameInfo).build()).queue();
+                    return;
+                } else if (args[2].toLowerCase().startsWith("g-")) {
+                    String guildName = content.split("-")[1];
+                    ebMessage.editMessage(guildInfoFromGuildName(guildName).build()).queue();
+                    return;
+                }
+            } else if (args.length == 3 && "members".equals(args[1])) {
+                if (args[2].toLowerCase().startsWith("u-")) {
+                    String usernameMembers = args[2].split("-")[1];
+                    GuildStruct guildMembers = getGuildMembers(usernameMembers);
+                    if (guildMembers.outputArr.length == 0) {
+                        ebMessage.editMessage(guildMembers.eb.build()).queue();
+                    } else {
+                        CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(3)
+                                .setItemsPerPage(27).showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
+                                    try {
+                                        m.clearReactions().queue();
+                                    } catch (PermissionException ex) {
+                                        m.delete().queue();
+                                    }
+                                }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS)
+                                .setColor(botColor).setCommandUser(event.getAuthor());
 
-        ebMessage.editMessage(errorMessage(this.name).build()).queue();
+                        paginateBuilder.addItems(guildMembers.outputArr);
+
+                        ebMessage.delete().queue();
+                        paginateBuilder.build().paginate(event.getChannel(), 0);
+                        return;
+                    }
+                }
+            } else if (args.length == 2) {
+                ebMessage.editMessage(getGuildPlayer(args[1]).build()).queue();
+                return;
+            }
+
+            ebMessage.editMessage(errorMessage(this.name).build()).queue();
+        }).start();
     }
 
     private GuildStruct getGuildExp(String username) {
-        UsernameUuidStruct uuidUsername = usernameToUuidUsername(username);
+        UsernameUuidStruct uuidUsername = usernameToUuid(username);
         if (uuidUsername == null) {
             return new GuildStruct(defaultEmbed("Error fetching player data"), null);
         }
@@ -188,7 +191,7 @@ public class GuildCommand extends Command {
         int counter = 0;
         for (Map.Entry<String, Integer> k : reverseSortedMap.entrySet()) {
             if (!k.getKey().startsWith("@null")) {
-                outputStrArr[counter] = "**" + (counter + 1) + ")** " + fixUsername(k.getKey()) + ": "
+                outputStrArr[counter] = "`" + (counter + 1) + ")` " + fixUsername(k.getKey()) + ": "
                         + formatNumber(k.getValue()) + " EXP\n";
             }
 
@@ -198,7 +201,7 @@ public class GuildCommand extends Command {
     }
 
     private EmbedBuilder getGuildPlayer(String username) {
-        UsernameUuidStruct uuidUsername = usernameToUuidUsername(username);
+        UsernameUuidStruct uuidUsername = usernameToUuid(username);
         if (uuidUsername == null) {
             return defaultEmbed("Error fetching player data");
         }
@@ -222,7 +225,7 @@ public class GuildCommand extends Command {
     }
 
     private EmbedBuilder getGuildInfo(String username) {
-        UsernameUuidStruct uuidUsername = usernameToUuidUsername(username);
+        UsernameUuidStruct uuidUsername = usernameToUuid(username);
         if (uuidUsername == null) {
             return defaultEmbed("Error fetching player data");
         }
@@ -309,7 +312,7 @@ public class GuildCommand extends Command {
     }
 
     private GuildStruct getGuildMembers(String username) {
-        UsernameUuidStruct uuidUsername = usernameToUuidUsername(username);
+        UsernameUuidStruct uuidUsername = usernameToUuid(username);
         if (uuidUsername == null) {
             return new GuildStruct(defaultEmbed("Error fetching player data"), null);
         }

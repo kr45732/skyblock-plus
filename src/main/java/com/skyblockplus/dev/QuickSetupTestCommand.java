@@ -23,34 +23,36 @@ public class QuickSetupTestCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        this.event = event;
-        EmbedBuilder eb = loadingEmbed();
-        Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-        String content = event.getMessage().getContentRaw();
-        String[] args = content.split(" ", 4);
+        new Thread(() -> {
+            this.event = event;
+            EmbedBuilder eb = loadingEmbed();
+            Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+            String content = event.getMessage().getContentRaw();
+            String[] args = content.split(" ", 4);
 
-        logCommand(event.getGuild(), event.getAuthor(), content);
+            logCommand(event.getGuild(), event.getAuthor(), content);
 
-        if (args.length >= 4) {
-            if (args[1].equals("roles")) {
-                ebMessage.editMessage(setRoleSettings(args[2], args[3]).build()).queue();
-                return;
-            } else if (args[1].equals("delete")) {
-                switch (args[2]) {
-                    case "server":
-                        ebMessage.editMessage(deleteServer(args[3]).build()).queue();
-                        return;
-                    case "apply_cache":
-                        ebMessage.editMessage(deleteServerApplyCache(args[3]).build()).queue();
-                        return;
-                    case "skyblock_event":
-                        ebMessage.editMessage(deleteSkyblockEvent(args[3]).build()).queue();
-                        return;
+            if (args.length >= 4) {
+                if (args[1].equals("roles")) {
+                    ebMessage.editMessage(setRoleSettings(args[2], args[3]).build()).queue();
+                    return;
+                } else if (args[1].equals("delete")) {
+                    switch (args[2]) {
+                        case "server":
+                            ebMessage.editMessage(deleteServer(args[3]).build()).queue();
+                            return;
+                        case "apply_cache":
+                            ebMessage.editMessage(deleteServerApplyCache(args[3]).build()).queue();
+                            return;
+                        case "skyblock_event":
+                            ebMessage.editMessage(deleteSkyblockEvent(args[3]).build()).queue();
+                            return;
+                    }
                 }
             }
-        }
 
-        ebMessage.editMessage(defaultEmbed("Invalid input").build()).queue();
+            ebMessage.editMessage(defaultEmbed("Invalid input").build()).queue();
+        }).start();
     }
 
     private EmbedBuilder deleteSkyblockEvent(String serverId) {

@@ -20,38 +20,40 @@ public class EssenceCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = loadingEmbed();
-        Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-        String content = event.getMessage().getContentRaw();
-        String[] args = content.split(" ");
+        new Thread(() -> {
+            EmbedBuilder eb = loadingEmbed();
+            Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+            String content = event.getMessage().getContentRaw();
+            String[] args = content.split(" ");
 
-        logCommand(event.getGuild(), event.getAuthor(), content);
+            logCommand(event.getGuild(), event.getAuthor(), content);
 
-        JsonElement essenceCostsJson = getEssenceCostsJson();
+            JsonElement essenceCostsJson = getEssenceCostsJson();
 
-        if (args.length >= 3 && args[1].equals("upgrade")) {
-            String itemName = content.split(" ", 3)[2].replace(" ", "_").toUpperCase();
+            if (args.length >= 3 && args[1].equals("upgrade")) {
+                String itemName = content.split(" ", 3)[2].replace(" ", "_").toUpperCase();
 
-            JsonElement itemJson = higherDepth(essenceCostsJson, itemName);
-            if (itemJson != null) {
-                jda.addEventListener(new EssenceWaiter(itemName, itemJson, ebMessage, event.getAuthor()));
-            } else {
-                eb = defaultEmbed("Invalid item name");
+                JsonElement itemJson = higherDepth(essenceCostsJson, itemName);
+                if (itemJson != null) {
+                    jda.addEventListener(new EssenceWaiter(itemName, itemJson, ebMessage, event.getAuthor()));
+                } else {
+                    eb = defaultEmbed("Invalid item name");
+                    ebMessage.editMessage(eb.build()).queue();
+                }
+                return;
+            } else if (args.length >= 3 && (args[1].equals("info") || args[1].equals("information"))) {
+                String itemName = content.split(" ", 3)[2];
+
+                eb = getEssenceInformation(itemName, essenceCostsJson);
+                if (eb == null) {
+                    eb = defaultEmbed("Invalid item name");
+                }
                 ebMessage.editMessage(eb.build()).queue();
+                return;
             }
-            return;
-        } else if (args.length >= 3 && (args[1].equals("info") || args[1].equals("information"))) {
-            String itemName = content.split(" ", 3)[2];
 
-            eb = getEssenceInformation(itemName, essenceCostsJson);
-            if (eb == null) {
-                eb = defaultEmbed("Invalid item name");
-            }
-            ebMessage.editMessage(eb.build()).queue();
-            return;
-        }
-
-        ebMessage.editMessage(errorMessage(this.name).build()).queue();
+            ebMessage.editMessage(errorMessage(this.name).build()).queue();
+        }).start();
     }
 
     private EmbedBuilder getEssenceInformation(String itemName, JsonElement essenceCostsJson) {

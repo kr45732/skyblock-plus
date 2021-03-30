@@ -63,24 +63,25 @@ public class LinkAccountCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
+        new Thread(() -> {
+            EmbedBuilder eb = loadingEmbed();
+            Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+            String content = event.getMessage().getContentRaw();
+            String[] args = content.split(" ");
+            this.event = event;
 
-        EmbedBuilder eb = loadingEmbed();
-        Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-        String content = event.getMessage().getContentRaw();
-        String[] args = content.split(" ");
-        this.event = event;
+            logCommand(event.getGuild(), event.getAuthor(), content);
 
-        logCommand(event.getGuild(), event.getAuthor(), content);
+            if (args.length == 2) {
+                ebMessage.editMessage(linkAccount(args[1], event.getAuthor(), event.getGuild()).build()).queue();
+                return;
+            } else if (args.length == 1) {
+                ebMessage.editMessage(getLinkedAccount().build()).queue();
+                return;
+            }
 
-        if (args.length == 2) {
-            ebMessage.editMessage(linkAccount(args[1], event.getAuthor(), event.getGuild()).build()).queue();
-            return;
-        } else if (args.length == 1) {
-            ebMessage.editMessage(getLinkedAccount().build()).queue();
-            return;
-        }
-
-        ebMessage.editMessage(errorMessage(this.name).build()).queue();
+            ebMessage.editMessage(errorMessage(this.name).build()).queue();
+        }).start();
     }
 
     private EmbedBuilder getLinkedAccount() {

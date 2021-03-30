@@ -19,21 +19,23 @@ public class CatacombsCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = loadingEmbed();
-        Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-        String content = event.getMessage().getContentRaw();
-        String[] args = content.split(" ");
+        new Thread(() -> {
+            EmbedBuilder eb = loadingEmbed();
+            Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+            String content = event.getMessage().getContentRaw();
+            String[] args = content.split(" ");
 
-        logCommand(event.getGuild(), event.getAuthor(), content);
+            logCommand(event.getGuild(), event.getAuthor(), content);
 
-        if (args.length == 3) {
-            ebMessage.editMessage(getPlayerCatacombs(args[1], args[2]).build()).queue();
-            return;
-        } else if (args.length == 2) {
-            ebMessage.editMessage(getPlayerCatacombs(args[1], null).build()).queue();
-            return;
-        }
-        ebMessage.editMessage(errorMessage(this.name).build()).queue();
+            if (args.length == 3) {
+                ebMessage.editMessage(getPlayerCatacombs(args[1], args[2]).build()).queue();
+                return;
+            } else if (args.length == 2) {
+                ebMessage.editMessage(getPlayerCatacombs(args[1], null).build()).queue();
+                return;
+            }
+            ebMessage.editMessage(errorMessage(this.name).build()).queue();
+        }).start();
     }
 
     private EmbedBuilder getPlayerCatacombs(String username, String profileName) {

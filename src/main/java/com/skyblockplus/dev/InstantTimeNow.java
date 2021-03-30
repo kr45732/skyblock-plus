@@ -15,8 +15,10 @@ public class InstantTimeNow extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        logCommand(event.getGuild(), event.getAuthor(), BOT_PREFIX + "d-instant");
+        new Thread(() -> {
+            logCommand(event.getGuild(), event.getAuthor(), BOT_PREFIX + "d-instant");
 
-        event.reply(defaultEmbed("Instant Time Now").setDescription(Instant.now().toString()).build());
+            event.reply(defaultEmbed("Instant Time Now").setDescription(Instant.now().toString()).build());
+        }).start();
     }
 }

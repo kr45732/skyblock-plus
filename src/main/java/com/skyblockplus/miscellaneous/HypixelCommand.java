@@ -3,7 +3,7 @@ package com.skyblockplus.miscellaneous;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.guilds.UsernameUuidStruct;
+import com.skyblockplus.utils.UsernameUuidStruct;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
@@ -24,26 +24,28 @@ public class HypixelCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        EmbedBuilder eb = loadingEmbed();
-        Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-        String content = event.getMessage().getContentRaw();
-        String[] args = content.split(" ");
+        new Thread(() -> {
+            EmbedBuilder eb = loadingEmbed();
+            Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+            String content = event.getMessage().getContentRaw();
+            String[] args = content.split(" ");
 
-        logCommand(event.getGuild(), event.getAuthor(), content);
+            logCommand(event.getGuild(), event.getAuthor(), content);
 
-        if (args.length == 3 && args[1].equals("parkour")) {
-            ebMessage.editMessage(getParkourStats(args[2]).build()).queue();
-            return;
-        } else if (args.length == 2) {
-            ebMessage.editMessage(getHypixelStats(args[1]).build()).queue();
-            return;
-        }
+            if (args.length == 3 && args[1].equals("parkour")) {
+                ebMessage.editMessage(getParkourStats(args[2]).build()).queue();
+                return;
+            } else if (args.length == 2) {
+                ebMessage.editMessage(getHypixelStats(args[1]).build()).queue();
+                return;
+            }
 
-        ebMessage.editMessage(errorMessage(this.name).build()).queue();
+            ebMessage.editMessage(errorMessage(this.name).build()).queue();
+        }).start();
     }
 
     private EmbedBuilder getParkourStats(String username) {
-        UsernameUuidStruct usernameUuid = usernameToUuidUsername(username);
+        UsernameUuidStruct usernameUuid = usernameToUuid(username);
         if (usernameUuid != null) {
             JsonElement hypixelJson = getJson(
                     "https://api.hypixel.net/player?key=" + HYPIXEL_API_KEY + "&uuid=" + usernameUuid.playerUuid);
@@ -80,7 +82,7 @@ public class HypixelCommand extends Command {
     }
 
     private EmbedBuilder getHypixelStats(String username) {
-        UsernameUuidStruct usernameUuid = usernameToUuidUsername(username);
+        UsernameUuidStruct usernameUuid = usernameToUuid(username);
         if (usernameUuid != null) {
             JsonElement hypixelJson = getJson(
                     "https://api.hypixel.net/player?key=" + HYPIXEL_API_KEY + "&uuid=" + usernameUuid.playerUuid);
@@ -185,11 +187,11 @@ public class HypixelCommand extends Command {
                 }
 
                 StringBuilder namesString = new StringBuilder();
-                for (JsonElement name : getJson(
-                        "https://api.mojang.com/user/profiles/" + usernameUuid.playerUuid + "/names")
+                for (JsonElement name : higherDepth(getJson(
+                        "https://api.ashcon.app/mojang/v2/user/" + usernameUuid.playerUuid), "username_history")
                         .getAsJsonArray()) {
-                    if (!higherDepth(name, "name").getAsString().equals(usernameUuid.playerUsername)) {
-                        namesString.append("• ").append(higherDepth(name, "name").getAsString()).append("\n");
+                    if (!higherDepth(name, "username").getAsString().equals(usernameUuid.playerUsername)) {
+                        namesString.append("• ").append(higherDepth(name, "username").getAsString()).append("\n");
                     }
                 }
                 if (namesString.length() > 0) {

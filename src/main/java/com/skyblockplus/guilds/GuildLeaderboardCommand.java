@@ -6,6 +6,7 @@ import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.UsernameUuidStruct;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
@@ -33,55 +34,57 @@ public class GuildLeaderboardCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        if ((BOT_PREFIX.equals("+")) && !event.getGuild().getId().equals("782154976243089429")) {
-            return;
-        }
+        new Thread(() -> {
+            if ((BOT_PREFIX.equals("+")) && !event.getGuild().getId().equals("782154976243089429")) {
+                return;
+            }
 
-        EmbedBuilder eb = loadingEmbed();
-        Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+            EmbedBuilder eb = loadingEmbed();
+            Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 
-        String content = event.getMessage().getContentRaw();
+            String content = event.getMessage().getContentRaw();
 
-        String[] args = content.split(" ");
-        if (args.length != 2) {
-            eb = errorMessage(this.name);
-            ebMessage.editMessage(eb.build()).queue();
-            return;
-        }
+            String[] args = content.split(" ");
+            if (args.length != 2) {
+                eb = errorMessage(this.name);
+                ebMessage.editMessage(eb.build()).queue();
+                return;
+            }
 
-        logCommand(event.getGuild(), event.getAuthor(), content);
+            logCommand(event.getGuild(), event.getAuthor(), content);
 
-        if (args[1].toLowerCase().startsWith("u-")) {
-            String[] rankString = getLeaderboard(args[1].split("-")[1]);
-            if (rankString != null) {
-                eb = defaultEmbed("Rank changes for guild " + rankString[2]);
-                if (rankString.length == 4 && rankString[3].equals("false")) {
-                    eb.setDescription("**There was an error fetching some stats!**");
+            if (args[1].toLowerCase().startsWith("u-")) {
+                String[] rankString = getLeaderboard(args[1].split("-")[1]);
+                if (rankString != null) {
+                    eb = defaultEmbed("Rank changes for guild " + rankString[2]);
+                    if (rankString.length == 4 && rankString[3].equals("false")) {
+                        eb.setDescription("**There was an error fetching some stats!**");
+                    }
+                    eb.addField("Promote", rankString[0], false);
+                    eb.addField("Demote", rankString[1], false);
+                } else {
+                    eb = errorMessage(this.name);
+                    ebMessage.editMessage(eb.build()).queue();
+                    return;
                 }
-                eb.addField("Promote", rankString[0], false);
-                eb.addField("Demote", rankString[1], false);
             } else {
                 eb = errorMessage(this.name);
                 ebMessage.editMessage(eb.build()).queue();
                 return;
             }
-        } else {
-            eb = errorMessage(this.name);
-            ebMessage.editMessage(eb.build()).queue();
-            return;
-        }
 
-        ebMessage.editMessage(eb.build()).queue();
+            ebMessage.editMessage(eb.build()).queue();
+        }).start();
     }
 
     private String[] getLeaderboard(String username) {
-        String playerUuid = usernameToUuid(username);
-        if (playerUuid == null) {
+        UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
+        if (usernameUuidStruct == null) {
             return null;
         }
 
         JsonElement guildJson = getJson(
-                "https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&player=" + playerUuid);
+                "https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&player=" + usernameUuidStruct.playerUuid);
         String guildId = higherDepth(higherDepth(guildJson, "guild"), "_id").getAsString();
         String guildName = higherDepth(higherDepth(guildJson, "guild"), "name").getAsString();
         if (!guildName.equals("Skyblock Forceful")) {

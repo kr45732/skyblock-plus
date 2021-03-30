@@ -15,12 +15,14 @@ public class EmojiMapServerCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        logCommand(event.getGuild(), event.getAuthor(), BOT_PREFIX + "d-emojis");
+        new Thread(() -> {
+            logCommand(event.getGuild(), event.getAuthor(), BOT_PREFIX + "d-emojis");
 
-        StringBuilder ebString = new StringBuilder();
-        for (Emote emote : event.getGuild().getEmotes()) {
-            ebString.append("emojiMap.put(\"").append(emote.getName()).append("\", \"\\").append(emote.getAsMention()).append("\");").append("\n");
-        }
-        event.reply(ebString.toString());
+            StringBuilder ebString = new StringBuilder();
+            for (Emote emote : event.getGuild().getEmotes()) {
+                ebString.append("emojiMap.put(\"").append(emote.getName()).append("\", \"\\").append(emote.getAsMention()).append("\");").append("\n");
+            }
+            event.reply(ebString.toString());
+        }).start();
     }
 }
