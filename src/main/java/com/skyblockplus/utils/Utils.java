@@ -544,21 +544,18 @@ public class Utils {
         botLogChannel.sendMessage(eb.build()).queue();
     }
 
-    public static String[] getPlayerDiscordInfo(String username) {
-        JsonElement playerJson = getJson("https://api.hypixel.net/player?key=" + HYPIXEL_API_KEY + "&uuid=" + usernameToUuid(username));
+    public static DiscordInfoStruct getPlayerDiscordInfo(String username) {
+        JsonElement playerJson = getJson("https://api.hypixel.net/player?key=" + HYPIXEL_API_KEY + "&uuid=" + usernameToUuid(username).playerUuid);
 
         try {
-            String discordID = higherDepth(
-                    higherDepth(higherDepth(higherDepth(playerJson, "player"), "socialMedia"), "links"), "DISCORD")
-                    .getAsString();
-            return new String[]{discordID,
-                    higherDepth(higherDepth(playerJson, "player"), "displayname").getAsString(), higherDepth(higherDepth(playerJson, "player"), "uuid").getAsString()};
+            String discordTag = higherDepth(higherDepth(higherDepth(higherDepth(playerJson, "player"), "socialMedia"), "links"), "DISCORD").getAsString();
+            String minecraftUsername = higherDepth(higherDepth(playerJson, "player"), "displayname").getAsString();
+            String minecraftUuid = higherDepth(higherDepth(playerJson, "player"), "uuid").getAsString();
+
+            return new DiscordInfoStruct(discordTag, minecraftUsername, minecraftUuid);
         } catch (Exception e) {
             return null;
         }
     }
 
-    public static String decodeVerifyPrefix(String prefix) {
-        return prefix.replace("Nu-greek-char", "ν");
-    }
 }

@@ -3,6 +3,7 @@ package com.skyblockplus.eventlisteners.apply;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.skyblockplus.utils.DiscordInfoStruct;
 import com.skyblockplus.utils.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -128,10 +129,10 @@ public class ApplyUser implements Serializable {
                                     : new Player(messageContent[0], messageContent[1]);
 
                             if (player.isValid()) {
-                                String[] playerInfo = getPlayerDiscordInfo(player.getUsername());
+                                DiscordInfoStruct playerInfo = getPlayerDiscordInfo(player.getUsername());
 
                                 if (playerInfo != null) {
-                                    if (applyingUser.getAsTag().equals(playerInfo[0])) {
+                                    if (applyingUser.getAsTag().equals(playerInfo.discordTag)) {
                                         playerSlayer = formatNumber(player.getSlayer());
                                         playerSkills = roundSkillAverage(player.getSkillAverage());
                                         playerCatacombs = "" + player.getCatacombsSkill().skillLevel;
@@ -158,7 +159,7 @@ public class ApplyUser implements Serializable {
                                     }
                                     EmbedBuilder discordTagMismatchEb = defaultEmbed("Discord tag mismatch");
                                     discordTagMismatchEb.setDescription("Account " + player.getUsername()
-                                            + " is linked with the discord tag " + playerInfo[0]
+                                            + " is linked with the discord tag " + playerInfo.discordTag
                                             + "\nYour current discord tag is " + applyingUser.getAsTag());
                                     discordTagMismatchEb.addField("To retry,", "React with ✅", true);
                                     discordTagMismatchEb.addField("To cancel the application,", "React with ❌", true);

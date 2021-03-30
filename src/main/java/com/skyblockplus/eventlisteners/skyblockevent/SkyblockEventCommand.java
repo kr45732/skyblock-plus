@@ -299,6 +299,14 @@ public class SkyblockEventCommand extends Command {
 
                                 JsonElement guildIn = getJson("https://api.hypixel.net/findGuild?key=" + HYPIXEL_API_KEY + "&byUuid=" + uuid);
 
+
+                                try{
+                                    higherDepth(guildIn, "guild").getAsString();
+                                }catch (Exception e){
+                                    ebMessage.editMessage(defaultEmbed("Error").setDescription("You must be in the guild to join the event").build()).queue();
+                                    return;
+                                }
+
                                 if (higherDepth(guildIn, "guild").getAsString().equals(database.getSkyblockEventGuildId(event.getGuild().getId()))) {
                                     Player player = args.length == 3 ? new Player(username, args[2]) : new Player(username);
 

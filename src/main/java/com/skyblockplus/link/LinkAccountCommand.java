@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
+import com.skyblockplus.utils.DiscordInfoStruct;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -24,23 +25,23 @@ public class LinkAccountCommand extends Command {
     }
 
     public static EmbedBuilder linkAccount(String username, User user, Guild guild) {
-        String[] playerInfo = getPlayerDiscordInfo(username);
-        if (playerInfo != null && playerInfo[0] != null) {
-            if (!user.getAsTag().equals(playerInfo[0])) {
+        DiscordInfoStruct playerInfo = getPlayerDiscordInfo(username);
+        if (playerInfo != null) {
+            if (!user.getAsTag().equals(playerInfo.discordTag)) {
                 EmbedBuilder eb = defaultEmbed("Discord tag mismatch");
-                eb.setDescription("Account " + playerInfo[1] + " is linked with the discord tag "
-                        + playerInfo[0] + "\nYour current discord tag is " + user.getAsTag());
+                eb.setDescription("Account " + playerInfo.minecraftUsername + " is linked with the discord tag "
+                        + playerInfo.discordTag + "\nYour current discord tag is " + user.getAsTag());
                 return eb;
             }
 
-            LinkedAccountModel toAdd = new LinkedAccountModel("" + Instant.now().toEpochMilli(), user.getId(), playerInfo[2], playerInfo[1]);
+            LinkedAccountModel toAdd = new LinkedAccountModel("" + Instant.now().toEpochMilli(), user.getId(), playerInfo.minecraftUuid, playerInfo.minecraftUsername);
 
             if (database.addLinkedUser(toAdd) == 200) {
 
                 try {
                     if (!higherDepth(database.getVerifySettings(guild.getId()), "verifiedNickname").getAsString().equalsIgnoreCase("none")) {
                         String nicknameTemplate = higherDepth(database.getVerifySettings(guild.getId()), "verifiedNickname").getAsString();
-                        nicknameTemplate = nicknameTemplate.replace("[IGN]", playerInfo[1]);
+                        nicknameTemplate = nicknameTemplate.replace("[IGN]", playerInfo.minecraftUsername);
                         guild.getMember(user).modifyNickname(nicknameTemplate).queue();
                     }
                 } catch (Exception ignored) {
@@ -52,9 +53,9 @@ public class LinkAccountCommand extends Command {
                 } catch (Exception ignored) {
                 }
 
-                return defaultEmbed("Success").setDescription("Account " + playerInfo[1] + " linked with " + user.getAsTag());
+                return defaultEmbed("Success").setDescription("Account " + playerInfo.minecraftUsername + " linked with " + user.getAsTag());
             } else {
-                return defaultEmbed("Error linking " + playerInfo[1]);
+                return defaultEmbed("Error linking " + playerInfo.minecraftUsername);
             }
         }
 
@@ -87,9 +88,9 @@ public class LinkAccountCommand extends Command {
     private EmbedBuilder getLinkedAccount() {
         JsonElement userInfo = database.getLinkedUserByDiscordId(event.getAuthor().getId());
 
-        if (!userInfo.isJsonNull()) {
+        try{
             return defaultEmbed("You are linked to " + (higherDepth(userInfo, "minecraftUsername").getAsString()));
-        } else {
+        } catch (Exception e) {
             return defaultEmbed("You are not linked");
         }
     }
