@@ -117,7 +117,7 @@ public class SkyblockEventCommand extends Command {
         }
 
         try {
-            if (!httpGetsFinishedLatch.await(10, TimeUnit.SECONDS)) {
+            if (!httpGetsFinishedLatch.await(20, TimeUnit.SECONDS)) {
                 announcementChannel.sendMessage(defaultEmbed("Event Over").setDescription("Error fetching data").build()).queue();
                 return;
             }
@@ -486,7 +486,7 @@ public class SkyblockEventCommand extends Command {
                             }
 
                             try {
-                                if (!httpGetsFinishedLatch.await(10, TimeUnit.SECONDS)) {
+                                if (!httpGetsFinishedLatch.await(20, TimeUnit.SECONDS)) {
                                     ebMessage.editMessage(defaultEmbed("Error fetching data").build()).queue();
                                     return;
                                 }
@@ -496,7 +496,7 @@ public class SkyblockEventCommand extends Command {
                             }
 
                             try {
-                                System.out.println("== Stack Trace (Event Leaderboard CLose Client) ==");
+                                System.out.println("== Stack Trace (Event Leaderboard Close Client) ==");
                                 asyncHttpClient.close();
                             } catch (Exception e) {
                                 e.printStackTrace();

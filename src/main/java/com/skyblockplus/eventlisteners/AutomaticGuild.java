@@ -99,7 +99,7 @@ public class AutomaticGuild {
             Role role = guild.getRoleById(higherDepth(currentSettings, "roleId").getAsString());
             JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&id=" + higherDepth(currentSettings, "guildId").getAsString());
 
-            if (role == null || guildJson.isJsonNull()) {
+            if (role == null || guildJson == null) {
                 return;
             }
 
@@ -111,6 +111,7 @@ public class AutomaticGuild {
             }
 
             JsonArray linkedUsers = database.getLinkedUsers().getAsJsonArray();
+            int memberCount = 0;
             for (JsonElement linkedUser : linkedUsers) {
                 if (guild.getMemberById(higherDepth(linkedUser, "discordId").getAsString()) == null) {
                     continue;
@@ -121,9 +122,11 @@ public class AutomaticGuild {
                 } else {
                     guild.removeRoleFromMember(higherDepth(linkedUser, "discordId").getAsString(), role).queue();
                 }
+
+                memberCount ++;
             }
 
-            logCommand(guild, "Guild Role | Users (" + linkedUsers.size() + ") | Time (" + ((System.currentTimeMillis() - startTime) / 1000) + "s)");
+            logCommand(guild, "Guild Role | Users (" + memberCount + ") | Time (" + ((System.currentTimeMillis() - startTime) / 1000) + "s)");
         }
     }
 

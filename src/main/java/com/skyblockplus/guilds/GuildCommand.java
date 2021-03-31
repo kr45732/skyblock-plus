@@ -160,7 +160,7 @@ public class GuildCommand extends Command {
         }
 
         try {
-            httpGetsFinishedLatch.await(10, TimeUnit.SECONDS);
+            httpGetsFinishedLatch.await(20, TimeUnit.SECONDS);
         }catch (Exception e) {
             System.out.println("== Stack Trace (Guild Exp Latch) ==");
             e.printStackTrace();
