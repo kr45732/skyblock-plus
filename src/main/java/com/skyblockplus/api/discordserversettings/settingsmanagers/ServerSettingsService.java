@@ -153,6 +153,8 @@ public class ServerSettingsService {
                     return new ResponseEntity<>(currentRoleSettings.getSkill_average(), HttpStatus.OK);
                 case "pet_score":
                     return new ResponseEntity<>(currentRoleSettings.getPet_score(), HttpStatus.OK);
+                case "dungeon_secrets":
+                    return new ResponseEntity<>(currentRoleSettings.getDungeon_secrets(), HttpStatus.OK);
             }
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -240,6 +242,9 @@ public class ServerSettingsService {
                 case "pet_score":
                     currentRoleSettings.setPet_score(newRoleSettings);
                     break;
+                case "dungeon_secrets":
+                    currentRoleSettings.setDungeon_secrets(newRoleSettings);
+                    break;
             }
             currentServerSettings.setAutomatedRoles(currentRoleSettings);
             settingsRepository.save(currentServerSettings);
@@ -276,13 +281,6 @@ public class ServerSettingsService {
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
-
-//    public ResponseEntity<?> getGuildRanks(String serverId) {
-//        if (serverByServerIdExists(serverId)) {
-//            return new ResponseEntity<>(settingsRepository.findServerByServerId(serverId).getAutomaticGuildRoles().getGuildRankRoles(), HttpStatus.OK);
-//        }
-//        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//    }
 
     public ResponseEntity<HttpStatus> updateGuildRoleSettings(String serverId, GuildRole newSettings) {
         if (serverByServerIdExists(serverId)) {
@@ -340,21 +338,6 @@ public class ServerSettingsService {
             }
         }
         return false;
-    }
-
-    public ResponseEntity<HttpStatus> updateSkyblockEventActive(String serverId, String setActive) {
-        if (serverByServerIdExists(serverId)) {
-            setActive = setActive.equals("true") ? "true" : "false";
-
-            ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
-            SbEvent currentSbEventSettings = currentServerSettings.getSbEvent();
-            currentSbEventSettings.setEventActive(setActive);
-            currentServerSettings.setSbEvent(currentSbEventSettings);
-            settingsRepository.save(currentServerSettings);
-            return new ResponseEntity<>(HttpStatus.OK);
-
-        }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     public ResponseEntity<HttpStatus> updateSkyblockRunningEvent(String serverId, RunningEvent newSettings) {

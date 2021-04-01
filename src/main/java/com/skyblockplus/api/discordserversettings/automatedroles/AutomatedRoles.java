@@ -80,6 +80,9 @@ public class AutomatedRoles {
     @Embedded
     private RoleModel pet_score = new RoleModel();
 
+    @Embedded
+    private RoleModel dungeon_secrets = new RoleModel();
+
     public AutomatedRoles() {
     }
 }

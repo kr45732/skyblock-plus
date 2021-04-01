@@ -310,15 +310,15 @@ public class SettingsCommand extends Command {
         ebFieldString += "\n**• Guild Role:** " + displaySettings(currentSettings, "roleId");
         ebFieldString += "\n\n**" + displaySettings(currentSettings, "enableGuildRanks") + "**";
 
-        String guildRanksString = "";
+        StringBuilder guildRanksString = new StringBuilder();
         try {
             for (JsonElement guildRank : higherDepth(currentSettings, "guildRanks").getAsJsonArray()) {
-                guildRanksString += "\n• " + higherDepth(guildRank, "minecraftRoleName").getAsString() + " - " + event.getGuild().getRoleById(higherDepth(guildRank, "discordRoleId").getAsString()).getAsMention();
+                guildRanksString.append("\n• ").append(higherDepth(guildRank, "minecraftRoleName").getAsString()).append(" - ").append(event.getGuild().getRoleById(higherDepth(guildRank, "discordRoleId").getAsString()).getAsMention());
             }
         }catch (Exception ignored){
         }
 
-        ebFieldString += guildRanksString.length() > 0 ? guildRanksString : "\n• No guild ranks set";
+        ebFieldString += guildRanksString.length() > 0 ? guildRanksString.toString() : "\n• No guild ranks set";
 
         return ebFieldString;
     }
@@ -510,7 +510,6 @@ public class SettingsCommand extends Command {
         rolePageMap.put("taming", 13);
         rolePageMap.put("enchanting", 14);
         rolePageMap.put("catacombs", 15);
-
         rolePageMap.put("guild_member", 16);
         rolePageMap.put("fairy_souls", 17);
         rolePageMap.put("slot_collector", 18);
@@ -519,6 +518,7 @@ public class SettingsCommand extends Command {
         rolePageMap.put("all_slayer_nine", 21);
         rolePageMap.put("skill_average", 22);
         rolePageMap.put("pet_score", 23);
+        rolePageMap.put("dungeon_secrets", 24);
 
         if (rolePageMap.containsKey(roleName)) {
             CustomPaginator.Builder currentRoleSettings = getCurrentRolesSettings(database.getRolesSettings(event.getGuild().getId()));
@@ -630,6 +630,10 @@ public class SettingsCommand extends Command {
                 }
                 case "all_slayer_nine": {
                     ebFieldString.append("**Having all level nine slayers**\nExample: `").append(BOT_PREFIX).append("settings roles set all_slayer_nine @role`\n");
+                    break;
+                }
+                case "dungeon_secrets": {
+                    ebFieldString.append("**A player's dungeon secrets count**\nExample: `").append(BOT_PREFIX).append("settings roles add dungeon_secrets 25000 @secret sweat`\n");
                     break;
                 }
             }

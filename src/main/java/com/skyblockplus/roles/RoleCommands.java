@@ -6,6 +6,7 @@ import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.DiscordInfoStruct;
 import com.skyblockplus.utils.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -48,23 +49,23 @@ public class RoleCommands extends Command {
             }
 
             JsonElement linkedInfo = database.getLinkedUserByDiscordId(user.getId());
-            if (getPlayerInfo(higherDepth(linkedInfo, "minecraftUuid").getAsString()) == null) {
+            if (getPlayerDiscordInfo(higherDepth(linkedInfo, "minecraftUuid").getAsString()) == null) {
                 eb = defaultEmbed("Discord tag error");
                 eb.setDescription("Unable to get Discord tag linked with Hypixel account");
                 ebMessage.editMessage(eb.build()).queue();
                 return;
             }
-            DiscordStruct playerInfo = getPlayerInfo(higherDepth(linkedInfo, "minecraftUuid").getAsString());
+            DiscordInfoStruct playerInfo = getPlayerDiscordInfo(higherDepth(linkedInfo, "minecraftUuid").getAsString());
 
             if (!user.getAsTag().equals(playerInfo.discordTag)) {
                 eb = defaultEmbed("Discord tag mismatch");
-                eb.setDescription("Account **" + playerInfo.username + "** is linked with the discord tag `"
+                eb.setDescription("Account **" + playerInfo.minecraftUsername + "** is linked with the discord tag `"
                         + playerInfo.discordTag + "`\nYour current discord tag is `" + user.getAsTag() + "`");
                 ebMessage.editMessage(eb.build()).queue();
                 return;
             }
 
-            String username = playerInfo.username;
+            String username = playerInfo.minecraftUsername;
             Player player = args.length == 2 ? new Player(username) : new Player(username, args[2]);
             if (!player.isValid()) {
                 eb = defaultEmbed("Error fetching data");
@@ -140,6 +141,7 @@ public class RoleCommands extends Command {
                                 case "fairy_souls":
                                 case "skill_average":
                                 case "pet_score":
+                                case "dungeon_secrets":
                                 case "slot_collector": {
                                     double roleAmount = -1;
                                     switch (currentRoleName) {
@@ -208,6 +210,9 @@ public class RoleCommands extends Command {
                                             roleAmount = player.getNumberMinionSlots();
                                             break;
                                         }
+                                        case "dungeon_secrets":
+                                            roleAmount = player.getDungeonSecrets();
+                                            break;
                                         default: {
                                             continue;
                                         }
@@ -358,19 +363,5 @@ public class RoleCommands extends Command {
 
     private String roleChangeString(String name) {
         return "• " + name + "\n";
-    }
-
-    private DiscordStruct getPlayerInfo(String uuid) {
-        JsonElement playerJson = getJson("https://api.hypixel.net/player?key=" + HYPIXEL_API_KEY + "&uuid=" + uuid);
-
-        try {
-            String discordID = higherDepth(
-                    higherDepth(higherDepth(higherDepth(playerJson, "player"), "socialMedia"), "links"), "DISCORD")
-                    .getAsString();
-            return new DiscordStruct(discordID,
-                    higherDepth(higherDepth(playerJson, "player"), "displayname").getAsString());
-        } catch (Exception e) {
-            return null;
-        }
     }
 }

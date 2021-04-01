@@ -30,11 +30,11 @@ public class DeleteMessagesCommand extends Command {
                     List<Message> toDelete = event.getChannel().getHistory().retrievePast(messageCount).complete();
                     event.getChannel().purgeMessages(toDelete);
                     Message ebMessage = event.getChannel().sendMessage(defaultEmbed("Deleted " + messageCount + " messages").build()).complete();
-                    ebMessage.delete().queueAfter(5, TimeUnit.SECONDS);
+                    ebMessage.delete().queueAfter(3, TimeUnit.SECONDS);
                     return;
                 } catch (Exception e) {
                     Message ebMessage = event.getChannel().sendMessage(defaultEmbed("Invalid Amount").build()).complete();
-                    ebMessage.delete().queueAfter(5, TimeUnit.SECONDS);
+                    ebMessage.delete().queueAfter(3, TimeUnit.SECONDS);
                     return;
                 }
             }
