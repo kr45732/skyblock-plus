@@ -8,6 +8,7 @@ import com.google.gson.reflect.TypeToken;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.skyblockplus.api.discordserversettings.automatedguildroles.GuildRank;
 import com.skyblockplus.api.discordserversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.discordserversettings.automatedroles.RoleObject;
 import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSettingsModel;
@@ -240,7 +241,7 @@ public class SettingsCommand extends Command {
                             break;
                     }
                 }
-            } else if ((args.length == 2 || args.length == 4 || args.length == 5) && args[1].equals("guild")) {
+            } else if ((args.length >= 2) && args[1].equals("guild")) {
                 if (args.length == 2) {
                     eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
                     if (higherDepth(currentSettings, "automaticGuildRoles") != null) {
@@ -260,8 +261,8 @@ public class SettingsCommand extends Command {
                         case "enable":
                             if (args[3].equals("role")) {
                                 eb = setGuildRoleEnable("true");
-//                        } else if (args[3].equals("rank")) {
-//                            eb = setGuildRankEnable("true");
+                            } else if (args[3].equals("rank")) {
+                                eb = setGuildRankEnable("true");
                             } else {
                                 eb = defaultEmbed("Error").setDescription("Invalid setting");
                             }
@@ -269,15 +270,24 @@ public class SettingsCommand extends Command {
                         case "disable":
                             if (args[3].equals("role")) {
                                 eb = setGuildRoleEnable("false");
-//                        } else if (args[3].equals("rank")) {
-//                            eb = setGuildRankEnable("false");
+                            } else if (args[3].equals("rank")) {
+                                eb = setGuildRankEnable("false");
                             } else {
                                 eb = defaultEmbed("Error").setDescription("Invalid setting");
                             }
                             break;
+                        case "remove":
+                            eb = removeGuildRank(args[3]);
+                            break;
                         default:
                             eb = defaultEmbed("Error").setDescription("Invalid setting");
                             break;
+                    }
+                } else if(args.length == 5){
+                    if(args[2].equals("add")){
+                        eb = addGuildRank(args[3], args[4]);
+                    }else{
+                        eb = defaultEmbed("Error").setDescription("Invalid setting");
                     }
                 } else {
                     eb = defaultEmbed("Error").setDescription("Invalid setting");
@@ -291,14 +301,25 @@ public class SettingsCommand extends Command {
         }).start();
     }
 
-
     /* Guild Role Settings */
     private String getCurrentGuildRoleSettings() {
         JsonElement currentSettings = database.getGuildRoleSettings(event.getGuild().getId());
         String ebFieldString = "";
-        ebFieldString += displaySettings(currentSettings, "enableGuildRole");
+        ebFieldString += "**" + displaySettings(currentSettings, "enableGuildRole") + "**";
         ebFieldString += "\n**• Guild Name:** " + displaySettings(currentSettings, "guildId");
         ebFieldString += "\n**• Guild Role:** " + displaySettings(currentSettings, "roleId");
+        ebFieldString += "\n\n**" + displaySettings(currentSettings, "enableGuildRanks") + "**";
+
+        String guildRanksString = "";
+        try {
+            for (JsonElement guildRank : higherDepth(currentSettings, "guildRanks").getAsJsonArray()) {
+                guildRanksString += "\n• " + higherDepth(guildRank, "minecraftRoleName").getAsString() + " - " + event.getGuild().getRoleById(higherDepth(guildRank, "discordRoleId").getAsString()).getAsMention();
+            }
+        }catch (Exception ignored){
+        }
+
+        ebFieldString += guildRanksString.length() > 0 ? guildRanksString : "\n• No guild ranks set";
+
         return ebFieldString;
     }
 
@@ -320,9 +341,13 @@ public class SettingsCommand extends Command {
         return eb;
     }
 
-/*
     private EmbedBuilder setGuildRankEnable(String enable) {
         JsonObject currentSettings = database.getGuildRoleSettings(event.getGuild().getId()).getAsJsonObject();
+
+        if ((higherDepth(currentSettings, "guildId") == null) || (higherDepth(currentSettings, "guildRanks").getAsJsonArray().size() == 0)) {
+            return defaultEmbed("Error").setDescription("The guild name and a guild rank must be set");
+        }
+
         currentSettings.remove("enableGuildRanks");
         currentSettings.addProperty("enableGuildRanks", enable);
         int responseCode = database.updateGuildRoleSettings(event.getGuild().getId(), currentSettings);
@@ -334,7 +359,97 @@ public class SettingsCommand extends Command {
         eb.setDescription("Guild ranks " + (enable.equals("true") ? "enabled" : "disabled"));
         return eb;
     }
-*/
+
+    private EmbedBuilder addGuildRank(String rankName, String roleMention){
+        Role guildRankRole;
+        try {
+            guildRankRole = event.getGuild().getRoleById(roleMention.replaceAll("[<@&>]", ""));
+            if ((guildRankRole.isPublicRole() || guildRankRole.isManaged())) {
+                return defaultEmbed("Error").setDescription("Role cannot be managed or @everyone");
+            }
+        } catch (Exception e) {
+            return defaultEmbed("Invalid Role", null);
+        }
+
+        JsonObject currentSettings = database.getGuildRoleSettings(event.getGuild().getId()).getAsJsonObject();
+
+        if (higherDepth(currentSettings, "guildId") == null) {
+            return defaultEmbed("Guild name must first be set");
+        }
+
+        String guildId = higherDepth(currentSettings, "guildId").getAsString();
+
+        JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&id=" + guildId);
+
+        if(higherDepth(guildJson, "guild") == null){
+            return defaultEmbed("Current guild name is invalid");
+        }
+
+        JsonArray guildRanks = higherDepth(higherDepth(guildJson, "guild"), "ranks").getAsJsonArray();
+
+        String guildRanksString = "";
+        for(JsonElement guildRank:guildRanks){
+            guildRanksString += "\n• " + higherDepth(guildRank, "name").getAsString().replace(" ", "_");
+            if (higherDepth(guildRank, "name").getAsString().equalsIgnoreCase(rankName.replace("_", " "))){
+                JsonArray currentGuildRanks =  currentSettings.get("guildRanks").getAsJsonArray();
+
+                for (JsonElement level : currentGuildRanks) {
+                    if (higherDepth(level, "minecraftRoleName").getAsString().equalsIgnoreCase(rankName)) {
+                        currentGuildRanks.remove(level);
+                        break;
+                    }
+                }
+
+                Gson gson = new Gson();
+                currentGuildRanks.add(gson.toJsonTree(new GuildRank(rankName.toLowerCase(), guildRankRole.getId())));
+
+                currentSettings.remove("guildRanks");
+                currentSettings.add("guildRanks", currentGuildRanks);
+
+                int responseCode = database.updateGuildRoleSettings(event.getGuild().getId(), currentSettings);
+                if (responseCode != 200) {
+                    return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
+                }
+
+                EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+                eb.setDescription("**Guild rank added:** " + higherDepth(guildRank, "name").getAsString() + " - " + guildRankRole.getAsMention());
+                return eb;
+            }
+        }
+
+        return defaultEmbed("Invalid guild rank").setDescription((guildRanksString.length() > 0 ? "Valid guild ranks are: " + guildRanksString : "No guild ranks found"));
+    }
+
+    private EmbedBuilder removeGuildRank(String rankName) {
+        JsonObject currentSettings = database.getGuildRoleSettings(event.getGuild().getId()).getAsJsonObject();
+        JsonArray currentGuildRanks = currentSettings.get("guildRanks").getAsJsonArray();
+
+        for(JsonElement guildRank:currentGuildRanks){
+            if (higherDepth(guildRank, "minecraftRoleName").getAsString().equalsIgnoreCase(rankName)){
+                JsonArray currentGuildRanksTemp = currentSettings.get("guildRanks").getAsJsonArray();
+                currentGuildRanksTemp.remove(guildRank);
+
+                if(currentGuildRanksTemp.size() == 0){
+                    currentSettings.remove("enableGuildRanks");
+                    currentSettings.addProperty("enableGuildRanks", "false");
+                }
+
+                currentSettings.remove("guildRanks");
+                currentSettings.add("guildRanks", currentGuildRanksTemp);
+
+                int responseCode = database.updateGuildRoleSettings(event.getGuild().getId(), currentSettings);
+                if (responseCode != 200) {
+                    return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
+                }
+
+                EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+                eb.setDescription("**Guild rank removed:** " + rankName);
+                return eb;
+            }
+        }
+
+        return defaultEmbed("Error").setDescription("Invalid rank name");
+    }
 
     private EmbedBuilder setGuildRoleId(String guildName) {
         try {
@@ -1205,6 +1320,8 @@ public class SettingsCommand extends Command {
                         }
                     case "enableGuildRole":
                         return currentSettingValue.equals("true") ? "• Guild role enabled" : "• Guild role disabled";
+                    case "enableGuildRanks":
+                        return currentSettingValue.equals("true") ? "• Guild ranks enabled" : "• Guild ranks disabled";
                 }
 
                 return currentSettingValue;

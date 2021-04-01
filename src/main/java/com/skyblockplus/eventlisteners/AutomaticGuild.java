@@ -22,7 +22,9 @@ import java.io.File;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -43,7 +45,7 @@ public class AutomaticGuild {
     public AutomaticGuild(GenericGuildEvent event) {
         applyConstructor(event);
         verifyConstructor(event);
-        guildRoleConstructor();
+        schedulerConstructor();
         guildId = event.getGuild().getId();
     }
 
@@ -67,11 +69,12 @@ public class AutomaticGuild {
         return applyGuild;
     }
 
-    public void guildRoleConstructor() {
+    public void schedulerConstructor() {
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        int randomDelay = (int) (Math.random() * 360);
-        scheduler.scheduleAtFixedRate(this::updateGuildRoles, randomDelay, 180, TimeUnit.MINUTES);
-        scheduler.scheduleAtFixedRate(this::updateSkyblockEvent, 0, 1, TimeUnit.HOURS);
+        int guildRolesDelay = (int) (Math.random() * 360);
+        int skyblockEventDelay = (int) (Math.random() * 60);
+        scheduler.scheduleAtFixedRate(this::updateGuildRoles, guildRolesDelay, 180, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(this::updateSkyblockEvent, skyblockEventDelay, 60, TimeUnit.MINUTES);
 
     }
 
@@ -93,41 +96,77 @@ public class AutomaticGuild {
             return;
         }
 
-        if (higherDepth(currentSettings, "enableGuildRole").getAsBoolean()) {
-            long startTime = System.currentTimeMillis();
-
-            Role role = guild.getRoleById(higherDepth(currentSettings, "roleId").getAsString());
-            JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&id=" + higherDepth(currentSettings, "guildId").getAsString());
-
-            if (role == null || guildJson == null) {
-                return;
-            }
-
-            JsonArray guildMembers = higherDepth(higherDepth(guildJson, "guild"), "members").getAsJsonArray();
-            List<String> guildMembersUuids = new ArrayList<>();
-
-            for (JsonElement guildMember : guildMembers) {
-                guildMembersUuids.add(higherDepth(guildMember, "uuid").getAsString());
-            }
-
-            JsonArray linkedUsers = database.getLinkedUsers().getAsJsonArray();
-            int memberCount = 0;
-            for (JsonElement linkedUser : linkedUsers) {
-                if (guild.getMemberById(higherDepth(linkedUser, "discordId").getAsString()) == null) {
-                    continue;
-                }
-
-                if (guildMembersUuids.contains(higherDepth(linkedUser, "minecraftUuid").getAsString())) {
-                    guild.addRoleToMember(higherDepth(linkedUser, "discordId").getAsString(), role).queue();
-                } else {
-                    guild.removeRoleFromMember(higherDepth(linkedUser, "discordId").getAsString(), role).queue();
-                }
-
-                memberCount ++;
-            }
-
-            logCommand(guild, "Guild Role | Users (" + memberCount + ") | Time (" + ((System.currentTimeMillis() - startTime) / 1000) + "s)");
+        boolean enableGuildRole = false;
+        boolean enableGuildRanks = false;
+        try{
+            enableGuildRole = higherDepth(currentSettings, "enableGuildRole").getAsBoolean();
+        }catch (Exception ignored){
         }
+
+        try{
+            enableGuildRanks = higherDepth(currentSettings, "enableGuildRanks").getAsBoolean();
+        }catch (Exception ignored){
+        }
+
+        if(!enableGuildRole && !enableGuildRanks){
+            return;
+        }
+
+        long startTime = System.currentTimeMillis();
+
+        JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&id=" + higherDepth(currentSettings, "guildId").getAsString());
+
+        if (guildJson == null) {
+            return;
+        }
+
+        JsonArray guildMembers = higherDepth(higherDepth(guildJson, "guild"), "members").getAsJsonArray();
+        Map<String, String> uuidToRankMap = new HashMap<>();
+
+        for (JsonElement guildMember : guildMembers) {
+            uuidToRankMap.put(higherDepth(guildMember, "uuid").getAsString(), higherDepth(guildMember, "rank").getAsString().replace(" ", "_"));
+        }
+
+        JsonArray linkedUsers = database.getLinkedUsers().getAsJsonArray();
+
+        Role guildMemberRole = enableGuildRole ? guild.getRoleById(higherDepth(currentSettings, "roleId").getAsString()) : null;
+
+        int memberCount = 0;
+        for (JsonElement linkedUser : linkedUsers) {
+            if (guild.getMemberById(higherDepth(linkedUser, "discordId").getAsString()) == null) {
+                continue;
+            }
+
+            if(enableGuildRole) {
+                if (uuidToRankMap.containsKey(higherDepth(linkedUser, "minecraftUuid").getAsString())) {
+                    guild.addRoleToMember(higherDepth(linkedUser, "discordId").getAsString(), guildMemberRole).queue();
+                } else {
+                    guild.removeRoleFromMember(higherDepth(linkedUser, "discordId").getAsString(), guildMemberRole).queue();
+                }
+            }
+
+            if(enableGuildRanks){
+                JsonArray guildRanksArr = higherDepth(currentSettings, "guildRanks").getAsJsonArray();
+                if (!uuidToRankMap.containsKey(higherDepth(linkedUser, "minecraftUuid").getAsString())) {
+                    for(JsonElement guildRank:guildRanksArr){
+                        guild.removeRoleFromMember(higherDepth(linkedUser, "discordId").getAsString(), guild.getRoleById(higherDepth(guildRank, "discordRoleId").getAsString())).queue();
+                    }
+                }else {
+                    String currentRank =uuidToRankMap.get(higherDepth(linkedUser, "minecraftUuid").getAsString());
+                    for (JsonElement guildRank : guildRanksArr) {
+                        Role currentRankRole = guild.getRoleById(higherDepth(guildRank, "discordRoleId").getAsString());
+                        if(higherDepth(guildRank, "minecraftRoleName").getAsString().equalsIgnoreCase(currentRank)){
+                            guild.addRoleToMember(higherDepth(linkedUser, "discordId").getAsString(), currentRankRole).queue();
+                        }else{
+                            guild.removeRoleFromMember(higherDepth(linkedUser, "discordId").getAsString(), currentRankRole).queue();
+                        }
+                    }
+                }
+            }
+
+            memberCount ++;
+        }
+        logCommand(guild, "Guild Role | Users (" + memberCount + ") | Time (" + ((System.currentTimeMillis() - startTime) / 1000) + "s)");
     }
 
     public boolean allowApplyReload() {
@@ -348,7 +387,4 @@ public class AutomaticGuild {
         skyblockEvent = new SkyblockEvent(event);
     }
 
-    public boolean skyblockEventEnabled() {
-        return skyblockEvent.isEnable();
-    }
 }

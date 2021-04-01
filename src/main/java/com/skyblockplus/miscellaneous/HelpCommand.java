@@ -232,6 +232,9 @@ public class HelpCommand extends Command {
                 paginateBuilder.addItems(generateHelp("Enable or disable automatic guild role assigning", "settings guild [enable|disable] role")
                         + generateHelp("Set the guild name", "settings guild set [guild_name]")
                         + generateHelp("Set the role to give guild member's", "settings guild role [@role]")
+                        + generateHelp("Enable or disable automatic guild rank assigning", "settings guild [enable|disable] rank")
+                        + generateHelp("Add an automatic guild rank", "settings guild add [rank_name] [@role]")
+                        + generateHelp("Remove an automatic guild rank", "settings guild remove [rank_name]")
                 );
             }
 

@@ -80,7 +80,7 @@ public class Main {
                 new EnderChestCommand(), new InstantTimeNow(), new GetEventListenersCommand(), new GetAllGuildsIn(waiter),
                 new LinkAccountCommand(), new GetSettingsFile(), new UnlinkAccountCommand(), new LinkedUserDev(),
                 new BazaarCommand(), new AverageAuctionCommand(), new PetsCommand(waiter), new SkyblockEventCommand(),
-                new DeleteMessagesCommand());
+                new DeleteMessagesCommand(), new InvDataParsCommand());
 
         if (BOT_PREFIX.equals("+")) {
             jda = JDABuilder.createDefault(BOT_TOKEN).setStatus(OnlineStatus.DO_NOT_DISTURB)
