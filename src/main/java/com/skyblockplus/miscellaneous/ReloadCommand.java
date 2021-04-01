@@ -1,4 +1,4 @@
-package com.skyblockplus.reload;
+package com.skyblockplus.miscellaneous;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
