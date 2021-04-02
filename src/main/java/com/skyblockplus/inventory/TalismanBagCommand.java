@@ -39,12 +39,12 @@ public class TalismanBagCommand extends Command {
 
             logCommand(event.getGuild(), event.getAuthor(), content);
 
-            if ((args.length == 3 || args.length == 4) && args[1].equals("list")) {
+            if (((args.length == 3) && args[2].startsWith("slot")) || ((args.length == 4) && args[3].startsWith("slot"))) {
                 if (args.length == 4) {
-                    eb = getPlayerTalismans(args[2], args[3]);
+                    eb = getPlayerTalismansList(args[1], args[2], args[3]);
 
                 } else {
-                    eb = getPlayerTalismans(args[2], null);
+                    eb = getPlayerTalismansList(args[1], null, args[2]);
                 }
 
                 if (eb == null) {
@@ -56,9 +56,9 @@ public class TalismanBagCommand extends Command {
             } else if (args.length == 2 || args.length == 3) {
                 List<String[]> playerEnderChest;
                 if (args.length == 3) {
-                    playerEnderChest = getPLayerTalismansEmoji(args[1], args[2]);
+                    playerEnderChest = getPlayerTalismansEmoji(args[1], args[2]);
                 } else {
-                    playerEnderChest = getPLayerTalismansEmoji(args[1], null);
+                    playerEnderChest = getPlayerTalismansEmoji(args[1], null);
                 }
 
                 if (playerEnderChest != null) {
@@ -78,10 +78,11 @@ public class TalismanBagCommand extends Command {
         }).start();
     }
 
-    private List<String[]> getPLayerTalismansEmoji(String username, String profileName) {
+    private List<String[]> getPlayerTalismansEmoji(String username, String profileName) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
             List<String[]> talismanBagPages = player.getTalismanBag();
+
             if (talismanBagPages != null) {
                 this.missingEmoji = player.invMissing;
                 return talismanBagPages;
@@ -90,30 +91,54 @@ public class TalismanBagCommand extends Command {
         return null;
     }
 
-    private EmbedBuilder getPlayerTalismans(String username, String profileName) {
+    private EmbedBuilder getPlayerTalismansList(String username, String profileName, String slotNum) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
-            Map<Integer, String> talismanBagMap = player.getTalismanBagMap();
+            Map<Integer, InvItemStruct> talismanBagMap = player.getTalismanBagMap();
             if (talismanBagMap != null) {
-                ArrayList<String> pageTitles = new ArrayList<>();
+                List<String> pageTitles = new ArrayList<>();
+                List<String> pageThumbnails = new ArrayList<>();
 
                 CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(1)
-                        .setItemsPerPage(20).showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
+                        .setItemsPerPage(1).showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
                             try {
                                 m.clearReactions().queue();
                             } catch (PermissionException ex) {
                                 m.delete().queue();
                             }
                         }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor)
-                        .setCommandUser(event.getAuthor());
+                        .setUsers(event.getAuthor());
 
-                for (Map.Entry<Integer, String> currentTalisman : talismanBagMap.entrySet()) {
-                    pageTitles.add("Talisman bag for " + player.getUsername());
-                    paginateBuilder
-                            .addItems("**Slot " + (currentTalisman.getKey() + 1) + "**: " + currentTalisman.getValue());
+                for (Map.Entry<Integer, InvItemStruct> currentTalisman : talismanBagMap.entrySet()) {
+                    InvItemStruct currentTalismanStruct = currentTalisman.getValue();
+
+                    if(currentTalismanStruct == null){
+                        pageTitles.add("Empty");
+                        pageThumbnails.add(null);
+                        paginateBuilder.addItems("**Slot:** " + (currentTalisman.getKey() + 1));
+                    }else {
+                        pageTitles.add(currentTalismanStruct.getName() + " x" + currentTalismanStruct.getCount());
+                        pageThumbnails.add("https://sky.lea.moe/item.gif/" + currentTalismanStruct.getId());
+                        String itemString = "";
+                        itemString += "**Slot:** " + (currentTalisman.getKey() + 1);
+                        itemString += "\n\n**Lore:**\n" + currentTalismanStruct.getLore().replace("§ka", "");
+                        if(currentTalismanStruct.getLore().contains("§ka")){
+                            itemString += "\n(Recombobulated)";
+                        }
+
+                        itemString += "\n\n**Item Creation:** " + currentTalismanStruct.getCreationTimestamp();
+                        paginateBuilder.addItems(itemString);
+                    }
                 }
-                paginateBuilder.setPageTitles(pageTitles.toArray(new String[0]));
-                paginateBuilder.build().paginate(event.getChannel(), 0);
+                paginateBuilder.setPageTitles(pageTitles);
+                paginateBuilder.setPageThumbnails(pageThumbnails);
+
+                int slotNumber = 1;
+                try{
+                    slotNumber = Integer.parseInt(slotNum.replace("slot-", ""));
+                }catch (Exception ignored){
+                }
+                paginateBuilder.build().paginate(event.getChannel(), slotNumber);
                 return null;
             }
         }

@@ -23,8 +23,6 @@ import com.skyblockplus.inventory.*;
 import com.skyblockplus.link.LinkAccountCommand;
 import com.skyblockplus.link.UnlinkAccountCommand;
 import com.skyblockplus.miscellaneous.*;
-import com.skyblockplus.miscellaneous.ReloadCommand;
-import com.skyblockplus.miscellaneous.RoleCommands;
 import com.skyblockplus.settings.SettingsCommand;
 import com.skyblockplus.settings.SetupCommand;
 import com.skyblockplus.settings.SpringDatabaseComponent;
@@ -80,7 +78,7 @@ public class Main {
                 new EnderChestCommand(), new InstantTimeNow(), new GetEventListenersCommand(), new GetAllGuildsIn(waiter),
                 new LinkAccountCommand(), new GetSettingsFile(), new UnlinkAccountCommand(), new LinkedUserDev(),
                 new BazaarCommand(), new AverageAuctionCommand(), new PetsCommand(waiter), new SkyblockEventCommand(),
-                new DeleteMessagesCommand(), new InvDataParsCommand());
+                new DeleteMessagesCommand(), new PlaceholderCommand());
 
         if (BOT_PREFIX.equals("+")) {
             jda = JDABuilder.createDefault(BOT_TOKEN).setStatus(OnlineStatus.DO_NOT_DISTURB)

@@ -11,14 +11,17 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.*;
 
 public class WardrobeCommand extends Command {
     private final EventWaiter waiter;
     private CommandEvent event;
+    private String missingEmoji;
 
     public WardrobeCommand(EventWaiter waiter) {
         this.name = "wardrobe";
@@ -37,11 +40,11 @@ public class WardrobeCommand extends Command {
 
             logCommand(event.getGuild(), event.getAuthor(), content);
 
-            if (args.length == 2 || args.length == 3) {
-                if (args.length == 3) {
-                    eb = getPlayerWardrobe(args[1], args[2]);
+            if ((args.length == 3 || args.length == 4 ) && args[1].equals("list")) {
+                if (args.length == 4) {
+                    eb = getPlayerWardrobeList(args[2], args[3]);
                 } else {
-                    eb = getPlayerWardrobe(args[1], null);
+                    eb = getPlayerWardrobeList(args[2], null);
                 }
 
                 if (eb == null) {
@@ -50,16 +53,48 @@ public class WardrobeCommand extends Command {
                     ebMessage.editMessage(eb.build()).queue();
                 }
                 return;
+            } else if (args.length == 2 || args.length == 3) {
+                List<String[]> playerEnderChest;
+                if (args.length == 3) {
+                    playerEnderChest = getPlayerWardrobe(args[1], args[2]);
+                } else {
+                    playerEnderChest = getPlayerWardrobe(args[1], null);
+                }
+
+                if (playerEnderChest != null) {
+                    ebMessage.delete().queue();
+                    if (missingEmoji.length() > 0) {
+                        ebMessage.getChannel().sendMessage(defaultEmbed("Missing Items").setDescription(missingEmoji).build()).queue();
+                    }
+
+                    jda.addEventListener(new InventoryPaginator(playerEnderChest, ebMessage.getChannel(), event.getAuthor()));
+                } else {
+                    ebMessage.editMessage(defaultEmbed("Error").setDescription("Unable to fetch data").build()).queue();
+                }
+                return;
             }
 
             ebMessage.editMessage(errorMessage(this.name).build()).queue();
         }).start();
     }
 
-    private EmbedBuilder getPlayerWardrobe(String username, String profileName) {
+    private List<String[]> getPlayerWardrobe(String username, String profileName) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
-            Map<Integer, ArmorStruct> armorStructMap = player.getWardrobe();
+            List<String[]> talismanBagPages = player.getWardrobe();
+
+            if (talismanBagPages != null) {
+                this.missingEmoji = player.invMissing;
+                return talismanBagPages;
+            }
+        }
+        return null;
+    }
+
+    private EmbedBuilder getPlayerWardrobeList(String username, String profileName) {
+        Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+        if (player.isValid()) {
+            Map<Integer, ArmorStruct> armorStructMap = player.getWardrobeList();
             if (armorStructMap != null) {
                 ArrayList<String> pageTitles = new ArrayList<>();
 
@@ -71,7 +106,7 @@ public class WardrobeCommand extends Command {
                                 m.delete().queue();
                             }
                         }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor)
-                        .setCommandUser(event.getAuthor());
+                        .setUsers(event.getAuthor());
 
                 for (Map.Entry<Integer, ArmorStruct> currentArmour : armorStructMap.entrySet()) {
                     pageTitles.add(player.getUsername());
@@ -80,7 +115,7 @@ public class WardrobeCommand extends Command {
                             + "\n" + currentArmour.getValue().getLeggings() + "\n" + currentArmour.getValue().getBoots()
                             + "\n");
                 }
-                paginateBuilder.setPageTitles(pageTitles.toArray(new String[0]));
+                paginateBuilder.setPageTitles(pageTitles);
                 paginateBuilder.build().paginate(event.getChannel(), 0);
                 return null;
             }

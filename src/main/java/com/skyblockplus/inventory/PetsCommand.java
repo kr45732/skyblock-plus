@@ -69,7 +69,7 @@ public class PetsCommand extends Command {
                             m.delete().queue();
                         }
                     }).setEventWaiter(waiter).setTimeout(15, TimeUnit.SECONDS).setColor(botColor)
-                    .setCommandUser(event.getAuthor());
+                    .setUsers(event.getAuthor());
 
             JsonArray playerPets = player.getPets();
             for (JsonElement pet : playerPets) {
@@ -97,7 +97,7 @@ public class PetsCommand extends Command {
                                 (petItem != null ? "\nItem: " + petItem : ""));
 
             }
-            paginateBuilder.setPageTitles(pageTitles.toArray(new String[0]));
+            paginateBuilder.setPageTitles(pageTitles);
             paginateBuilder.build().paginate(event.getChannel(), 0);
             return null;
         }

@@ -70,7 +70,7 @@ public class SacksCommand extends Command {
                                 m.delete().queue();
                             }
                         }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor)
-                        .setCommandUser(event.getAuthor());
+                        .setUsers(event.getAuthor());
 
                 for (Map.Entry<String, Integer> currentSack : sacksMap.entrySet()) {
                     pageTitles.add("Player sacks content for " + player.getUsername());
@@ -78,7 +78,7 @@ public class SacksCommand extends Command {
                             .addItems("**" + convertSkyblockIdName(currentSack.getKey())
                                     + "**: " + currentSack.getValue());
                 }
-                paginateBuilder.setPageTitles(pageTitles.toArray(new String[0]));
+                paginateBuilder.setPageTitles(pageTitles);
                 paginateBuilder.build().paginate(event.getChannel(), 0);
                 return null;
             }

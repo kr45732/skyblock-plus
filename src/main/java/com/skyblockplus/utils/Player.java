@@ -3,6 +3,7 @@ package com.skyblockplus.utils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.skyblockplus.inventory.InvItemStruct;
 import com.skyblockplus.skills.SkillsStruct;
 import com.skyblockplus.weight.Weight;
 import me.nullicorn.nedit.NBTReader;
@@ -15,7 +16,6 @@ import java.time.Instant;
 import java.util.*;
 
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.getPetJson;
 
 public class Player {
     public String invMissing = "";
@@ -48,7 +48,6 @@ public class Player {
 
         this.validPlayer = true;
     }
-
 
     public Player(String playerUuid, String playerUsername, JsonElement outerProfileJson, String playerGuildRank) {
         this.playerUuid = playerUuid;
@@ -444,7 +443,7 @@ public class Player {
         return profileJson;
     }
 
-    public Map<Integer, ArmorStruct> getWardrobe() {
+    public Map<Integer, ArmorStruct> getWardrobeList() {
         try {
             String encodedWardrobeContents = higherDepth(higherDepth(profileJson, "wardrobe_contents"), "data")
                     .getAsString();
@@ -505,29 +504,170 @@ public class Player {
         }
     }
 
-    public Map<Integer, String> getTalismanBagMap() {
+    public List<String[]> getWardrobe() {
+        try {
+            String encodedInventoryContents = higherDepth(higherDepth(profileJson, "wardrobe_contents"), "data")
+                    .getAsString();
+            NBTCompound decodedInventoryContents = NBTReader.readBase64(encodedInventoryContents);
+
+            NBTList invFrames = decodedInventoryContents.getList(".i");
+
+            Map<Integer, String> invFramesMap = new TreeMap<>();
+            for (int i = 0; i < invFrames.size(); i++) {
+                NBTCompound displayName = invFrames.getCompound(i).getCompound("tag.ExtraAttributes");
+                if (displayName != null) {
+                    invFramesMap.put(i + 1, displayName.getString("id", "empty").toLowerCase());
+                } else {
+                    invFramesMap.put(i + 1, "empty");
+                }
+            }
+
+            if (invFramesMap.size() % 36 != 0) {
+                int toAdd = 36 - (invFramesMap.size() % 36);
+                int initialSize = invFramesMap.size();
+                for (int i = 0; i < toAdd; i++) {
+                    invFramesMap.put(initialSize + 1 + i, "blank");
+                }
+            }
+
+            StringBuilder outputStringPart1 = new StringBuilder();
+            StringBuilder outputStringPart2 = new StringBuilder();
+            List<String[]> enderChestPages = new ArrayList<>();
+            StringBuilder curNine = new StringBuilder();
+            int page = 0;
+            for (Map.Entry<Integer, String> i : invFramesMap.entrySet()) {
+                if ((i.getKey() - page) <= 18) {
+                    curNine.append(itemToEmoji(i.getValue()));
+                    if (i.getKey() % 9 == 0) {
+                        outputStringPart1.append(curNine).append("\n");
+                        curNine = new StringBuilder();
+                    }
+                } else {
+                    curNine.append(itemToEmoji(i.getValue()));
+                    if (i.getKey() % 9 == 0) {
+                        outputStringPart2.append(curNine).append("\n");
+                        curNine = new StringBuilder();
+                    }
+                }
+
+                if (i.getKey() != 0 && i.getKey() % 36 == 0) {
+                    enderChestPages.add(new String[]{outputStringPart1.toString(), outputStringPart2.toString()});
+                    outputStringPart1 = new StringBuilder();
+                    outputStringPart2 = new StringBuilder();
+                    page += 36;
+                }
+            }
+            return enderChestPages;
+        } catch (Exception ignored) {
+        }
+        return null;
+    }
+
+    public Map<Integer, InvItemStruct> getTalismanBagMap() {
         try {
             String encodedTalismanContents = higherDepth(higherDepth(profileJson, "talisman_bag"), "data")
                     .getAsString();
             NBTCompound decodedTalismanContents = NBTReader.readBase64(encodedTalismanContents);
 
             NBTList talismanFrames = decodedTalismanContents.getList(".i");
-            Map<Integer, String> talismanFramesMap = new HashMap<>();
+            Map<Integer, InvItemStruct> talismanFramesMap = new HashMap<>();
             for (int i = 0; i < talismanFrames.size(); i++) {
-                NBTCompound displayName = talismanFrames.getCompound(i).getCompound("tag.display");
-                if (displayName != null) {
-                    talismanFramesMap.put(i,
-                            displayName.getString("Name", "Empty").replaceAll("§f|§a|§9|§5|§6|§d|§4|§c|", ""));
-                } else {
-                    talismanFramesMap.put(i, "Empty");
+                try {
+                    NBTCompound currentItem = talismanFrames.getCompound(i);
+                    if (!currentItem.isEmpty()) {
+                        InvItemStruct currentItemStruct = new InvItemStruct();
+                        currentItemStruct.setName(parseMinecraftCodes(currentItem.getString("tag.display.Name", "None")));
+                        currentItemStruct.setLore(parseMinecraftCodes(currentItem.getString("tag.display.Lore", "None").replace(", ", "\n").replace("[", "").replace("]", "")));
+                        currentItemStruct.setCount(Integer.parseInt(currentItem.getString("Count", "0").replace("b", " ")));
+                        currentItemStruct.setId(currentItem.getString("tag.ExtraAttributes.id", "None"));
+                        currentItemStruct.setCreationTimestamp(currentItem.getString("tag.ExtraAttributes.timestamp", "None"));
+
+                        talismanFramesMap.put(i, currentItemStruct);
+                        continue;
+                    }
+                }catch (Exception ignored){
                 }
+                talismanFramesMap.put(i, null);
             }
 
             return talismanFramesMap;
-
         } catch (Exception e) {
-            return null;
+            e.printStackTrace();
         }
+
+        return null;
+
+    }
+
+    public Map<Integer, InvItemStruct> getInventoryMap() {
+        try {
+            String encodedInvContents = higherDepth(higherDepth(profileJson, "inv_contents"), "data")
+                    .getAsString();
+            NBTCompound decodedInvContents = NBTReader.readBase64(encodedInvContents);
+
+            NBTList invFrames = decodedInvContents.getList(".i");
+            Map<Integer, InvItemStruct> invFramesMap = new HashMap<>();
+            for (int i = 0; i < invFrames.size(); i++) {
+                try {
+                    NBTCompound currentItem = invFrames.getCompound(i);
+                    if (!currentItem.isEmpty()) {
+                        InvItemStruct currentItemStruct = new InvItemStruct();
+                        currentItemStruct.setName(parseMinecraftCodes(currentItem.getString("tag.display.Name", "None")));
+                        currentItemStruct.setLore(parseMinecraftCodes(currentItem.getString("tag.display.Lore", "None").replace(", ", "\n").replace("[", "").replace("]", "")));
+                        currentItemStruct.setCount(Integer.parseInt(currentItem.getString("Count", "0").replace("b", " ")));
+                        currentItemStruct.setId(currentItem.getString("tag.ExtraAttributes.id", "None"));
+                        currentItemStruct.setCreationTimestamp(currentItem.getString("tag.ExtraAttributes.timestamp", "None"));
+
+                        invFramesMap.put(i, currentItemStruct);
+                        continue;
+                    }
+                }catch (Exception ignored){
+                }
+                invFramesMap.put(i, null);
+            }
+
+            return invFramesMap;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public Map<Integer, InvItemStruct> getInventoryArmorMap() {
+
+        try {
+            String encodedInvContents = higherDepth(higherDepth(profileJson, "inv_armor"), "data")
+                    .getAsString();
+            NBTCompound decodedInvContents = NBTReader.readBase64(encodedInvContents);
+
+            NBTList invFrames = decodedInvContents.getList(".i");
+            Map<Integer, InvItemStruct> invFramesMap = new HashMap<>();
+            for (int i = 0; i < invFrames.size(); i++) {
+                try {
+                    NBTCompound currentItem = invFrames.getCompound(i);
+                    if (!currentItem.isEmpty()) {
+                        InvItemStruct currentItemStruct = new InvItemStruct();
+                        currentItemStruct.setName(parseMinecraftCodes(currentItem.getString("tag.display.Name", "None")));
+                        currentItemStruct.setLore(parseMinecraftCodes(currentItem.getString("tag.display.Lore", "None").replace(", ", "\n").replace("[", "").replace("]", "")));
+                        currentItemStruct.setCount(Integer.parseInt(currentItem.getString("Count", "0").replace("b", " ")));
+                        currentItemStruct.setId(currentItem.getString("tag.ExtraAttributes.id", "None"));
+                        currentItemStruct.setCreationTimestamp(currentItem.getString("tag.ExtraAttributes.timestamp", "None"));
+
+                        invFramesMap.put(invFrames.size()-i, currentItemStruct);
+                        continue;
+                    }
+                } catch (Exception ignored) {
+                }
+                invFramesMap.put(i, null);
+            }
+
+            return invFramesMap;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     public ArmorStruct getInventoryArmor() {
@@ -871,7 +1011,6 @@ public class Player {
         emojiMap.put("scarf_grimoir", "<:scarf_grimoir:817508883755958332>");
         emojiMap.put("bat_person_talisman", "<:bat_person_talisman:817508883391447071>");
         emojiMap.put("sharp_shark_tooth_necklace", "<:sharp_shark_tooth_necklace:817869329479368745>");
-
         emojiMap.put("booster_cookie", "<:booster_cookie:820521703196196905>");
         emojiMap.put("french_bread", "<:french_bread:820521703217037362>");
         emojiMap.put("melody_hair", "<:melody_hair:820521703338672129>");
@@ -1032,36 +1171,6 @@ public class Player {
     public double getWeight() {
         Weight playerWeight = new Weight(this);
         return playerWeight.getTotalWeight();
-    }
-
-    public Map<Integer, String[]> getInventoryItem(String itemName) {
-        try {
-            String encodedInventoryContents = higherDepth(higherDepth(profileJson, "inv_contents"), "data")
-                    .getAsString();
-            NBTCompound decodedInventoryContents = NBTReader.readBase64(encodedInventoryContents);
-
-            NBTList invFrames = decodedInventoryContents.getList(".i");
-            Map<Integer, String[]> invFramesMap = new HashMap<>();
-            for (int i = 0; i < invFrames.size(); i++) {
-                NBTCompound displayName = invFrames.getCompound(i).getCompound("tag.ExtraAttributes");
-                if (displayName != null) {
-                    if (displayName.getString("id", "empty").equalsIgnoreCase(itemName)) {
-                        StringBuilder loreString = new StringBuilder();
-                        for (Object loreLine : invFrames.getCompound(i).getCompound("tag.display").getList("Lore")) {
-                            loreString.append("\n").append(((String) loreLine).replaceAll(
-                                    "§ka|§0|§1|§2|§3|§4|§5|§6|§7|§8|§9|§a|§b|§c|§d|§e|§f|§k|§l|§m|§n|§o|§r", ""));
-                        }
-                        invFramesMap.put(i + 1, new String[]{
-                                invFrames.getCompound(i).getString("Count", "0").toLowerCase().replace("b", "") + "x",
-                                loreString.toString()});
-                    }
-                }
-            }
-            return invFramesMap;
-
-        } catch (Exception ignored) {
-        }
-        return null;
     }
 
     public int getDungeonSecrets() {

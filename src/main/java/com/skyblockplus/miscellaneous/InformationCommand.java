@@ -26,7 +26,7 @@ public class InformationCommand extends Command {
             EmbedBuilder eb = defaultEmbed("Skyblock Plus");
 
             final long[] ping = {-1};
-            event.reply(".", m -> {
+            event.reply("Loading...", m -> {
                 ping[0] = event.getMessage().getTimeCreated().until(m.getTimeCreated(), ChronoUnit.MILLIS);
                 m.delete().queue();
                 eb.setDescription("Skyblock Plus is a Skyblock focused discord bot that has many commands to help Skyblock players and guild staff! It allows for quick retrieval of Skyblock stats plus customizable features for a better Skyblock experience.");

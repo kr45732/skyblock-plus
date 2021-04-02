@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import static com.skyblockplus.utils.Utils.*;
@@ -108,7 +109,7 @@ public class SetupCommand extends Command {
                             m.delete().queue();
                         }
                     }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor)
-                    .setCommandUser(event.getAuthor());
+                    .setUsers(event.getAuthor());
 
             paginateBuilder.addItems(overview, features, verify, apply, roles, moreHelp);
             paginateBuilder.setPageTitles(pageTitles);

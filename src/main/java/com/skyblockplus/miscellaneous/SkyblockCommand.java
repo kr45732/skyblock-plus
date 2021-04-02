@@ -143,7 +143,7 @@ public class SkyblockCommand extends Command {
                             m.delete().queue();
                         }
                     }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor)
-                    .setPageTitles(pageTitles).setCommandUser(event.getAuthor());
+                    .setPageTitles(pageTitles).setUsers(event.getAuthor());
             paginateBuilder.addItems(generalPageString, armorPageString, skillsPageString, dungeonsPageString);
             paginateBuilder.build().paginate(event.getChannel(), 0);
 

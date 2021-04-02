@@ -558,4 +558,7 @@ public class Utils {
         }
     }
 
+    public static String parseMinecraftCodes(String unformattedString){
+        return unformattedString.replaceAll("§f|§a|§9|§5|§6|§d|§4|§c|§7|§8|§l|§o|§b|§2|§e|§r|§3|§1", "");
+    }
 }

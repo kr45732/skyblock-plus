@@ -105,7 +105,7 @@ public class BankCommand extends Command {
                                 m.delete().queue();
                             }
                         }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor)
-                        .setCommandUser(event.getAuthor());
+                        .setUsers(event.getAuthor());
 
                 paginateBuilder.addItems("**Last Transaction Time:** " + dateTimeFormatter.format(Instant.ofEpochMilli(
                         higherDepth(bankHistoryArray.get(bankHistoryArray.size() - 1), "timestamp").getAsLong()))
@@ -124,7 +124,7 @@ public class BankCommand extends Command {
                     paginateBuilder.addItems("**" + time + "**: " + valueString);
                 }
 
-                paginateBuilder.setPageTitles(pageTitles.toArray(new String[0]));
+                paginateBuilder.setPageTitles(pageTitles);
                 paginateBuilder.build().paginate(event.getChannel(), 0);
                 return null;
             } else {

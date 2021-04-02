@@ -38,14 +38,14 @@ public class GetAllGuildsIn extends Command {
 
             if (args.length == 2) {
                 if (args[1].equals("list")) {
-                    CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(1).setItemsPerPage(5)
+                    CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(1).setItemsPerPage(10)
                             .showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
                                 try {
                                     m.clearReactions().queue();
                                 } catch (PermissionException ex) {
                                     m.delete().queue();
                                 }
-                            }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor).setCommandUser(event.getAuthor());
+                            }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor).setUsers(event.getAuthor());
 
                     for (Guild guild : jda.getGuilds()) {
                         if (guild.getName().startsWith("Skyblock Plus - Emoji Server")) {

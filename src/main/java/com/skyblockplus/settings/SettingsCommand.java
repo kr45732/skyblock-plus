@@ -387,9 +387,9 @@ public class SettingsCommand extends Command {
 
         JsonArray guildRanks = higherDepth(higherDepth(guildJson, "guild"), "ranks").getAsJsonArray();
 
-        String guildRanksString = "";
+        StringBuilder guildRanksString = new StringBuilder();
         for(JsonElement guildRank:guildRanks){
-            guildRanksString += "\n• " + higherDepth(guildRank, "name").getAsString().replace(" ", "_");
+            guildRanksString.append("\n• ").append(higherDepth(guildRank, "name").getAsString().replace(" ", "_"));
             if (higherDepth(guildRank, "name").getAsString().equalsIgnoreCase(rankName.replace("_", " "))){
                 JsonArray currentGuildRanks =  currentSettings.get("guildRanks").getAsJsonArray();
 
@@ -548,7 +548,7 @@ public class SettingsCommand extends Command {
                         m.delete().queue();
                     }
                 }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor)
-                .setCommandUser(event.getAuthor());
+                .setUsers(event.getAuthor());
         ArrayList<String> pageTitles = new ArrayList<>();
         pageTitles.add("Roles Settings");
 
@@ -674,7 +674,7 @@ public class SettingsCommand extends Command {
             paginateBuilder.addItems(ebFieldString.toString());
         }
 
-        return paginateBuilder.setPageTitles(pageTitles.toArray(new String[0]));
+        return paginateBuilder.setPageTitles(pageTitles);
     }
 
     private boolean allowRolesEnable() {

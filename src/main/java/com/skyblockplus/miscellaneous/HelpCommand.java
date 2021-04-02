@@ -7,6 +7,7 @@ import com.skyblockplus.utils.CustomPaginator;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -40,7 +41,7 @@ public class HelpCommand extends Command {
                             m.delete().queue();
                         }
                     }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor)
-                    .setPageTitles(pageTitles).setCommandUser(event.getAuthor());
+                    .setPageTitles(pageTitles).setUsers(event.getAuthor());
 
             int startingPage = 0;
             Map<String, Integer> pageMap = new HashMap<>();
@@ -155,12 +156,14 @@ public class HelpCommand extends Command {
             paginateBuilder.addItems(
                     generateHelp("Get a player's inventory represented in emojis", "inventory [player] <profile>",
                             "inv [player] <profile>")
-                            + generateHelp("Get a player's equipped armor", "inventory armor [player] <profile>", "inv armor [player] <profile>")
+                            + generateHelp("Get a player's inventory with lore", "inventory [player] <profile> [slot-number]","inv [player] <profile> [slot-number]")
+                            + generateHelp("Get a player's equipped armor with lore", "inventory armor [player] <profile>", "inv armor [player] <profile>")
                             + generateHelp("Get a player's ender chest represented in emojis", "enderchest [player] <profile>", "echest [player] <profile>")
                             + generateHelp("Get a player's talisman bag represented in emojis", "talisman [player] <profile>")
-                            + generateHelp("Get a player's talisman bag represented in a list", "talisman list [player] <profile>")
+                            + generateHelp("Get a player's talisman bag with lore", "talisman [player] <profile> [slot-number]")
                             + generateHelp("Get a player's sacks' content bag represented in a list", "sacks [player] <profile>")
-                            + generateHelp("Get a player's wardrobe armors represented in a list", "wardrobe [player] <profile>")
+                            + generateHelp("Get a player's wardrobe armors represented in emojis", "wardrobe [player] <profile>")
+                            + generateHelp("Get a player's wardrobe armors represented in a list", "wardrobe list [player] <profile>")
             );
 
             paginateBuilder.addItems(generateHelp("Claim automatic Skyblock roles. The player must be linked", "roles claim <profile>")

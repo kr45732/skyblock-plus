@@ -36,13 +36,13 @@ public class CustomPaginator extends Menu {
     private final Consumer<Message> finalAction;
     private final int bulkSkipNumber;
     private final boolean wrapPageEnds;
-    private final String[] pageTitles;
-    private final User user;
+    private final List<String> pageTitles;
+    private final List<String> pageThumbnails;
 
     CustomPaginator(EventWaiter waiter, Set<User> users, Set<Role> roles, long timeout, TimeUnit unit,
                     BiFunction<Integer, Integer, Color> color, Consumer<Message> finalAction, int columns, int itemsPerPage,
                     boolean showPageNumbers, boolean numberItems, List<String> items, int bulkSkipNumber, boolean wrapPageEnds,
-                    String[] pageTitles, User user) {
+                    List<String> pageTitles, List<String> pageThumbnails) {
         super(waiter, users, roles, timeout, unit);
         this.color = color;
         this.columns = columns;
@@ -55,7 +55,7 @@ public class CustomPaginator extends Menu {
         this.bulkSkipNumber = bulkSkipNumber;
         this.wrapPageEnds = wrapPageEnds;
         this.pageTitles = pageTitles;
-        this.user = user;
+        this.pageThumbnails= pageThumbnails;
     }
 
     @Override
@@ -129,41 +129,40 @@ public class CustomPaginator extends Menu {
     private void handleMessageReactionAddAction(MessageReactionAddEvent event, Message message, int pageNum) {
         int newPageNum = pageNum;
 
-        if (user == null || (Objects.equals(event.getUser(), user))) {
-            switch (event.getReaction().getReactionEmote().getName()) {
-                case LEFT:
-                    if (newPageNum == 1 && wrapPageEnds)
-                        newPageNum = pages + 1;
-                    if (newPageNum > 1)
+        switch (event.getReaction().getReactionEmote().getName()) {
+            case LEFT:
+                if (newPageNum == 1 && wrapPageEnds)
+                    newPageNum = pages + 1;
+                if (newPageNum > 1)
+                    newPageNum--;
+                break;
+            case RIGHT:
+                if (newPageNum == pages && wrapPageEnds)
+                    newPageNum = 0;
+                if (newPageNum < pages)
+                    newPageNum++;
+                break;
+            case BIG_LEFT:
+                if (newPageNum > 1 || wrapPageEnds) {
+                    for (int i = 1; (newPageNum > 1 || wrapPageEnds) && i < bulkSkipNumber; i++) {
+                        if (newPageNum == 1)
+                            newPageNum = pages + 1;
                         newPageNum--;
-                    break;
-                case RIGHT:
-                    if (newPageNum == pages && wrapPageEnds)
-                        newPageNum = 0;
-                    if (newPageNum < pages)
+                    }
+                }
+                break;
+            case BIG_RIGHT:
+                if (newPageNum < pages || wrapPageEnds) {
+                    for (int i = 1; (newPageNum < pages || wrapPageEnds) && i < bulkSkipNumber; i++) {
+                        if (newPageNum == pages)
+                            newPageNum = 0;
                         newPageNum++;
-                    break;
-                case BIG_LEFT:
-                    if (newPageNum > 1 || wrapPageEnds) {
-                        for (int i = 1; (newPageNum > 1 || wrapPageEnds) && i < bulkSkipNumber; i++) {
-                            if (newPageNum == 1)
-                                newPageNum = pages + 1;
-                            newPageNum--;
-                        }
                     }
-                    break;
-                case BIG_RIGHT:
-                    if (newPageNum < pages || wrapPageEnds) {
-                        for (int i = 1; (newPageNum < pages || wrapPageEnds) && i < bulkSkipNumber; i++) {
-                            if (newPageNum == pages)
-                                newPageNum = 0;
-                            newPageNum++;
-                        }
-                    }
-                    break;
-            }
-
+                }
+                break;
         }
+
+
         try {
             event.getReaction().removeReaction(event.getUser()).queue();
         } catch (PermissionException ignored) {
@@ -176,9 +175,15 @@ public class CustomPaginator extends Menu {
     private Message renderPage(int pageNum) {
         MessageBuilder messageBuilder = new MessageBuilder();
         EmbedBuilder embedBuilder = new EmbedBuilder();
+
         try {
-            embedBuilder.setTitle(pageTitles[pageNum - 1]);
+            embedBuilder.setTitle(pageTitles.get(pageNum - 1));
         } catch (Exception ignored) {
+        }
+
+        try{
+            embedBuilder.setThumbnail(pageThumbnails.get(pageNum - 1));
+        }catch (Exception ignored){
         }
 
         int start = (pageNum - 1) * itemsPerPage;
@@ -199,8 +204,9 @@ public class CustomPaginator extends Menu {
         }
 
         embedBuilder.setColor(color.apply(pageNum, pages));
-        if (showPageNumbers)
+        if (showPageNumbers) {
             embedBuilder.setFooter("Created By CrypticPlasma • Page " + pageNum + "/" + pages, null);
+        }
         embedBuilder.setTimestamp(Instant.now());
         messageBuilder.setEmbed(embedBuilder.build());
         return messageBuilder.build();
@@ -214,19 +220,18 @@ public class CustomPaginator extends Menu {
         private int itemsPerPage = 12;
         private boolean showPageNumbers = true;
         private boolean numberItems = false;
-        private String[] pageTitles = null;
+        private List<String> pageTitles = null;
         private int bulkSkipNumber = 1;
         private boolean wrapPageEnds = false;
-        private User user = null;
+        private List<String> pageThumbnails = null;
 
         @Override
         public CustomPaginator build() {
             Checks.check(waiter != null, "Must set an EventWaiter");
             Checks.check(!strings.isEmpty(), "Must include at least one item to paginate");
-//            Checks.check(user != null, "Must set message author");
 
             return new CustomPaginator(waiter, users, roles, timeout, unit, color, finalAction, columns, itemsPerPage,
-                    showPageNumbers, numberItems, strings, bulkSkipNumber, wrapPageEnds, pageTitles, user);
+                    showPageNumbers, numberItems, strings, bulkSkipNumber, wrapPageEnds, pageTitles, pageThumbnails);
         }
 
         public Builder setColor(Color color) {
@@ -234,18 +239,23 @@ public class CustomPaginator extends Menu {
             return this;
         }
 
-        public Builder setPageTitles(String[] pageTitles) {
+        public Builder setPageTitles(List<String> pageTitles) {
             this.pageTitles = pageTitles;
+            return this;
+        }
+
+        public Builder setPageTitles(String[] pageTitles) {
+            this.pageTitles = Arrays.asList(pageTitles);
+            return this;
+        }
+
+        public Builder setPageThumbnails(List<String> pageThumbnails){
+            this.pageThumbnails = pageThumbnails;
             return this;
         }
 
         public Builder setFinalAction(Consumer<Message> finalAction) {
             this.finalAction = finalAction;
-            return this;
-        }
-
-        public Builder setCommandUser(User user) {
-            this.user = user;
             return this;
         }
 

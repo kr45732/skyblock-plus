@@ -169,7 +169,7 @@ public class SkyblockEventCommand extends Command {
 
         for (int i = 0; i < eventMemberList.size(); i++) {
             EventMember eventMember = eventMemberList.get(i);
-            ebString.append("`" + (i + 1)).append(")` ").append(eventMember.getUsername()).append(" | +").append(formatNumber(Long.parseLong(eventMember.getStartingAmount()))).append("\n");
+            ebString.append("`").append(i + 1).append(")` ").append(eventMember.getUsername()).append(" | +").append(formatNumber(Long.parseLong(eventMember.getStartingAmount()))).append("\n");
 
         }
 
@@ -281,8 +281,8 @@ public class SkyblockEventCommand extends Command {
                         if (database.getSkyblockEventActive(event.getGuild().getId())) {
                             JsonElement linkedAccount = database.getLinkedUserByDiscordId(event.getAuthor().getId());
                             if (linkedAccount != null) {
-                                String uuid = "";
-                                String username = "";
+                                String uuid;
+                                String username;
                                 try {
                                     uuid = higherDepth(linkedAccount, "minecraftUuid").getAsString();
                                     username = higherDepth(linkedAccount, "minecraftUsername").getAsString();
@@ -395,7 +395,7 @@ public class SkyblockEventCommand extends Command {
                                 StringBuilder ebString = new StringBuilder();
                                 for (int i = 0; i < eventMemberList.size(); i++) {
                                     EventMember eventMember = eventMemberList.get(i);
-                                    ebString.append("`"+(i + 1)).append(")` ").append(eventMember.getUsername()).append(" | +").append(formatNumber(Long.parseLong(eventMember.getStartingAmount()))).append("\n");
+                                    ebString.append("`").append(i + 1).append(")` ").append(eventMember.getUsername()).append(" | +").append(formatNumber(Long.parseLong(eventMember.getStartingAmount()))).append("\n");
                                 }
                                 eb = defaultEmbed("Event Leaderboard");
                                 long minutesSinceUpdate = Duration.between(currentGuild.getEventMemberListLastUpdated(), Instant.now()).toMinutes();
@@ -536,7 +536,7 @@ public class SkyblockEventCommand extends Command {
                             StringBuilder ebString = new StringBuilder();
                             for (int i = 0; i < eventMemberList.size(); i++) {
                                 EventMember eventMember = eventMemberList.get(i);
-                                ebString.append("`" + (i + 1)).append(")` ").append(eventMember.getUsername()).append(" | +").append(formatNumber(Long.parseLong(eventMember.getStartingAmount()))).append("\n");
+                                ebString.append("`").append(i + 1).append(")` ").append(eventMember.getUsername()).append(" | +").append(formatNumber(Long.parseLong(eventMember.getStartingAmount()))).append("\n");
                             }
 
                             eb = defaultEmbed("Event Leaderboard");

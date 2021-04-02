@@ -71,10 +71,9 @@ public class AutomaticGuild {
 
     public void schedulerConstructor() {
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        int guildRolesDelay = (int) (Math.random() * 360);
-        int skyblockEventDelay = (int) (Math.random() * 60);
-        scheduler.scheduleAtFixedRate(this::updateGuildRoles, guildRolesDelay, 180, TimeUnit.MINUTES);
-        scheduler.scheduleAtFixedRate(this::updateSkyblockEvent, skyblockEventDelay, 60, TimeUnit.MINUTES);
+        int eventDelay = (int) (Math.random() * 60);
+        scheduler.scheduleAtFixedRate(this::updateGuildRoles, eventDelay, 180, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(this::updateSkyblockEvent, eventDelay, 60, TimeUnit.MINUTES);
 
     }
 

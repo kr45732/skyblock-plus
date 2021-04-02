@@ -3,7 +3,6 @@ package com.skyblockplus.inventory;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.skyblockplus.utils.ArmorStruct;
 import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -41,23 +40,31 @@ public class InventoryCommand extends Command {
 
             if ((args.length == 3 || args.length == 4) && args[1].equals("armor")) {
                 if (args.length == 4) {
-                    ebMessage.editMessage(getPlayerEquippedArmor(args[2], args[3]).build()).queue();
+                    eb = getPlayerEquippedArmor(args[2], args[3]);
                 } else {
-                    ebMessage.editMessage(getPlayerEquippedArmor(args[2], null).build()).queue();
+                    eb = getPlayerEquippedArmor(args[2], null);
+                }
+
+                if (eb == null) {
+                    ebMessage.delete().queue();
+                } else {
+                    ebMessage.editMessage(eb.build()).queue();
                 }
                 return;
-//        } else if ((args.length == 4 || args.length == 5) && args[1].equals("slot")) {
-//            if (args.length == 5) {
-//                eb = getInventorySlot(args[2], args[3], args[4]);
-//            } else {
-//                eb = getInventorySlot(args[2], args[3], null);
-//            }
-//            if (eb == null) {
-//                ebMessage.delete().queue();
-//            } else {
-//                ebMessage.editMessage(eb.build()).queue();
-//            }
-//            return;
+            } else if (((args.length == 3) && args[2].startsWith("slot")) || ((args.length == 4) && args[3].startsWith("slot"))) {
+                if (args.length == 4) {
+                    eb = getPlayerInventoryList(args[1], args[2], args[3]);
+
+                } else {
+                    eb = getPlayerInventoryList(args[1], null, args[2]);
+                }
+
+                if (eb == null) {
+                    ebMessage.delete().queue();
+                } else {
+                    ebMessage.editMessage(eb.build()).queue();
+                }
+                return;
             } else if (args.length == 2 || args.length == 3) {
                 String[] playerInventory;
                 if (args.length == 3) {
@@ -84,31 +91,56 @@ public class InventoryCommand extends Command {
         }).start();
     }
 
-    private EmbedBuilder getInventorySlot(String itemName, String username, String profileName) {
+    private EmbedBuilder getPlayerInventoryList(String username, String profileName, String slotNum) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
-            Map<Integer, String[]> itemArr = player.getInventoryItem(itemName);
+            Map<Integer, InvItemStruct> inventoryMap = player.getInventoryMap();
+            if (inventoryMap != null) {
+                List<String> pageTitles = new ArrayList<>();
+                List<String> pageThumbnails = new ArrayList<>();
 
-            List<String> pages = new ArrayList<>();
-            List<String> pageTitles = new ArrayList<>();
+                CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(1)
+                        .setItemsPerPage(1).showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
+                            try {
+                                m.clearReactions().queue();
+                            } catch (PermissionException ex) {
+                                m.delete().queue();
+                            }
+                        }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor)
+                        .setUsers(event.getAuthor());
 
-            for (Map.Entry<Integer, String[]> item : itemArr.entrySet()) {
-                pageTitles.add("[" + item.getValue()[0] + " " + itemName + "] Slot " + item.getKey());
-                pages.add(item.getValue()[1]);
-            }
+                for (Map.Entry<Integer, InvItemStruct> currentInvSlot : inventoryMap.entrySet()) {
+                    InvItemStruct currentInvStruct = currentInvSlot.getValue();
 
-            CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(1).setItemsPerPage(1)
-                    .showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
-                        try {
-                            m.clearReactions().queue();
-                        } catch (PermissionException ex) {
-                            m.delete().queue();
+                    if(currentInvStruct == null){
+                        pageTitles.add("Empty");
+                        pageThumbnails.add(null);
+                        paginateBuilder.addItems("**Slot:** " + (currentInvSlot.getKey() + 1));
+                    }else {
+                        pageTitles.add(currentInvStruct.getName() + " x" + currentInvStruct.getCount());
+                        pageThumbnails.add("https://sky.lea.moe/item.gif/" + currentInvStruct.getId());
+                        String itemString = "";
+                        itemString += "**Slot:** " + (currentInvSlot.getKey() + 1);
+                        itemString += "\n\n**Lore:**\n" + currentInvStruct.getLore().replace("§ka", "");
+                        if(currentInvStruct.getLore().contains("§ka")){
+                            itemString += "\n(Recombobulated)";
                         }
-                    }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor)
-                    .setPageTitles(pageTitles.toArray(new String[0])).setCommandUser(event.getAuthor());
-            paginateBuilder.addItems(pages.toArray(new String[0]));
-            paginateBuilder.build().paginate(event.getChannel(), 0);
-            return null;
+
+                        itemString += "\n\n**Item Creation:** " + currentInvStruct.getCreationTimestamp();
+                        paginateBuilder.addItems(itemString);
+                    }
+                }
+                paginateBuilder.setPageTitles(pageTitles);
+                paginateBuilder.setPageThumbnails(pageThumbnails);
+
+                int slotNumber = 1;
+                try{
+                    slotNumber = Integer.parseInt(slotNum.replace("slot-", ""));
+                }catch (Exception ignored){
+                }
+                paginateBuilder.build().paginate(event.getChannel(), slotNumber);
+                return null;
+            }
         }
         return defaultEmbed("Unable to fetch player data");
     }
@@ -116,12 +148,81 @@ public class InventoryCommand extends Command {
     private EmbedBuilder getPlayerEquippedArmor(String username, String profileName) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
-            ArmorStruct inventoryArmor = player.getInventoryArmor();
-            if (inventoryArmor != null) {
-                EmbedBuilder eb = defaultEmbed("Equipped armor for " + player.getUsername());
-                eb.addField("Equipped", inventoryArmor.getHelmet() + "\n" + inventoryArmor.getChestplate() + "\n"
-                        + inventoryArmor.getLeggings() + "\n" + inventoryArmor.getBoots(), false);
-                return eb;
+            Map<Integer, InvItemStruct> inventoryMap = player.getInventoryArmorMap();
+            if (inventoryMap != null) {
+                List<String> pageTitles = new ArrayList<>();
+                List<String> pageThumbnails = new ArrayList<>();
+
+                CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(1)
+                        .setItemsPerPage(1).showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
+                            try {
+                                m.clearReactions().queue();
+                            } catch (PermissionException ex) {
+                                m.delete().queue();
+                            }
+                        }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor)
+                        .setUsers(event.getAuthor());
+
+                for (Map.Entry<Integer, InvItemStruct> currentInvSlot : inventoryMap.entrySet()) {
+                    InvItemStruct currentInvStruct = currentInvSlot.getValue();
+
+                    if(currentInvStruct == null){
+                        pageTitles.add("Empty");
+                        pageThumbnails.add(null);
+
+                        String slotName = "";
+                        switch ((currentInvSlot.getKey())){
+                            case 4:
+                                slotName = "Boots";
+                                break;
+                            case 3:
+                                slotName = "Leggings";
+                                break;
+                            case 2:
+                                slotName = "Chestplate";
+                                break;
+                            case 1:
+                                slotName = "Helmet";
+                                break;
+                        }
+
+                        paginateBuilder.addItems("**Slot:** " + slotName);
+                    }else {
+                        pageTitles.add(currentInvStruct.getName() + " x" + currentInvStruct.getCount());
+                        pageThumbnails.add("https://sky.lea.moe/item.gif/" + currentInvStruct.getId());
+                        String itemString = "";
+
+                        String slotName = "";
+                        switch ((currentInvSlot.getKey())){
+                            case 4:
+                                slotName = "Boots";
+                                break;
+                            case 3:
+                                slotName = "Leggings";
+                                break;
+                            case 2:
+                                slotName = "Chestplate";
+                                break;
+                            case 1:
+                                slotName = "Helmet";
+                                break;
+                        }
+
+                        itemString += "**Slot:** " + slotName;
+                        itemString += "\n\n**Lore:**\n" + currentInvStruct.getLore().replace("§ka", "");
+                        if(currentInvStruct.getLore().contains("§ka")){
+                            itemString += "\n(Recombobulated)";
+                        }
+
+                        itemString += "\n\n**Item Creation:** " + currentInvStruct.getCreationTimestamp();
+                        paginateBuilder.addItems(itemString);
+                    }
+                }
+                paginateBuilder.setPageTitles(pageTitles);
+                paginateBuilder.setPageThumbnails(pageThumbnails);
+
+                paginateBuilder.build().paginate(event.getChannel(), 0);
+                return null;
             }
         }
         return defaultEmbed("Unable to fetch player data");

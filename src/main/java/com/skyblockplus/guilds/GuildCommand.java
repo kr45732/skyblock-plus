@@ -56,7 +56,7 @@ public class GuildCommand extends Command {
                                         m.delete().queue();
                                     }
                                 }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS)
-                                .setColor(botColor).setCommandUser(event.getAuthor());
+                                .setColor(botColor).setUsers(event.getAuthor());
 
                         paginateBuilder.addItems(guildExp.outputArr);
                         ebMessage.delete().queue();
@@ -89,7 +89,7 @@ public class GuildCommand extends Command {
                                         m.delete().queue();
                                     }
                                 }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS)
-                                .setColor(botColor).setCommandUser(event.getAuthor());
+                                .setColor(botColor).setUsers(event.getAuthor());
 
                         paginateBuilder.addItems(guildMembers.outputArr);
 
