@@ -265,7 +265,7 @@ public class ServerSettingsService {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    public ResponseEntity<HttpStatus> removeServerSettings(String serverId) {
+    public ResponseEntity<HttpStatus> deleteServerSettings(String serverId) {
         if (serverByServerIdExists(serverId)) {
             settingsRepository.deleteByServerId(serverId);
             if (!serverByServerIdExists(serverId)) {

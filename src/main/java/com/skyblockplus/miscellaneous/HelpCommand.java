@@ -33,15 +33,7 @@ public class HelpCommand extends Command {
                     "Auction House and Bazaar", "Inventory", "Miscellaneous Commands", "Skyblock Event", "Settings", "Verify Settings", "Apply Settings",
                     "Roles Settings", "Guild Role Settings"};
 
-            CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(1).setItemsPerPage(1)
-                    .showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
-                        try {
-                            m.clearReactions().queue();
-                        } catch (PermissionException ex) {
-                            m.delete().queue();
-                        }
-                    }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor)
-                    .setPageTitles(pageTitles).setUsers(event.getAuthor());
+            CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(1).setPageTitles(pageTitles);
 
             int startingPage = 0;
             Map<String, Integer> pageMap = new HashMap<>();

@@ -4,10 +4,12 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.exceptions.PermissionException;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -560,5 +562,17 @@ public class Utils {
 
     public static String parseMinecraftCodes(String unformattedString){
         return unformattedString.replaceAll("§f|§a|§9|§5|§6|§d|§4|§c|§7|§8|§l|§o|§b|§2|§e|§r|§3|§1", "");
+    }
+
+    public static CustomPaginator.Builder defaultPaginator(EventWaiter waiter, User eventAuthor){
+        return new CustomPaginator.Builder().setColumns(1).setItemsPerPage(1)
+                .showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
+                    try {
+                        m.clearReactions().queue();
+                    } catch (PermissionException ex) {
+                        m.delete().queue();
+                    }
+                }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor)
+                .setUsers(eventAuthor);
     }
 }

@@ -56,6 +56,19 @@ public class SettingsCommand extends Command {
                 currentSettings = database.getServerSettings(event.getGuild().getId());
             }
 
+            if((args.length == 3) && (args[1].equals("delete"))){
+                if(args[2].equals("--confirm")){
+                    if(database.deleteServerSettings(event.getGuild().getId()) == 200){
+                        ebMessage.editMessage(defaultEmbed("Success").setDescription("Server settings deleted").build()).queue();
+                    }else{
+                        ebMessage.editMessage(defaultEmbed("Error").setDescription("Error deleting server settings").build()).queue();
+                    }
+                }else{
+                    ebMessage.editMessage(defaultEmbed("Error").setDescription("To delete the server settings rerun this command with the `--confirm` flag (`" + BOT_PREFIX + "settings delete --confirm`)").build()).queue();
+                }
+                return;
+            }
+
             if (args.length == 1) {
                 eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
 
@@ -540,15 +553,8 @@ public class SettingsCommand extends Command {
     }
 
     private CustomPaginator.Builder getCurrentRolesSettings(JsonElement rolesSettings) {
-        CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(1).setItemsPerPage(1)
-                .showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
-                    try {
-                        m.clearReactions().queue();
-                    } catch (PermissionException ex) {
-                        m.delete().queue();
-                    }
-                }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor)
-                .setUsers(event.getAuthor());
+        CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(1);
+
         ArrayList<String> pageTitles = new ArrayList<>();
         pageTitles.add("Roles Settings");
 

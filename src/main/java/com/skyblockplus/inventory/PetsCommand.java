@@ -9,10 +9,8 @@ import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.exceptions.PermissionException;
 
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
 import static com.skyblockplus.utils.Utils.*;
 
@@ -61,15 +59,7 @@ public class PetsCommand extends Command {
         if (player.isValid()) {
             ArrayList<String> pageTitles = new ArrayList<>();
 
-            CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(2)
-                    .setItemsPerPage(20).showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
-                        try {
-                            m.clearReactions().queue();
-                        } catch (PermissionException ex) {
-                            m.delete().queue();
-                        }
-                    }).setEventWaiter(waiter).setTimeout(15, TimeUnit.SECONDS).setColor(botColor)
-                    .setUsers(event.getAuthor());
+            CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(2).setItemsPerPage(20);
 
             JsonArray playerPets = player.getPets();
             for (JsonElement pet : playerPets) {

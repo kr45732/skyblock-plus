@@ -506,17 +506,24 @@ public class Player {
 
     public List<String[]> getWardrobe() {
         try {
+            int equippedWardrobeSlot = higherDepth(profileJson, "wardrobe_equipped_slot").getAsInt();
+            Map<Integer, InvItemStruct> equippedArmor = equippedWardrobeSlot != -1 ? getInventoryArmorMap() : null;
+
             String encodedInventoryContents = higherDepth(higherDepth(profileJson, "wardrobe_contents"), "data")
                     .getAsString();
             NBTCompound decodedInventoryContents = NBTReader.readBase64(encodedInventoryContents);
 
             NBTList invFrames = decodedInventoryContents.getList(".i");
-
             Map<Integer, String> invFramesMap = new TreeMap<>();
             for (int i = 0; i < invFrames.size(); i++) {
                 NBTCompound displayName = invFrames.getCompound(i).getCompound("tag.ExtraAttributes");
+
                 if (displayName != null) {
                     invFramesMap.put(i + 1, displayName.getString("id", "empty").toLowerCase());
+                }else if((equippedArmor != null) && (equippedWardrobeSlot <= 9) && ((((i + 1) - equippedWardrobeSlot) % 9) == 0) && ((i+1) <= 36) && (equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9) + 1)) != null) {
+                    invFramesMap.put(i + 1, equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9) + 1).getId().toLowerCase());
+                }else if((equippedArmor != null) && (equippedWardrobeSlot > 9) && ((((i + 1) - equippedWardrobeSlot) % 9) == 0) && ((i+1) > 36) && (equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9) + 1 - 3)) != null) {
+                    invFramesMap.put(i + 1, equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9) + 1 - 3).getId().toLowerCase());
                 } else {
                     invFramesMap.put(i + 1, "empty");
                 }
@@ -558,7 +565,8 @@ public class Player {
                 }
             }
             return enderChestPages;
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }

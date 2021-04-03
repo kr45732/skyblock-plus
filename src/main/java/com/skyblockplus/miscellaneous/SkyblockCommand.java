@@ -9,14 +9,12 @@ import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.exceptions.PermissionException;
 
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 import static com.skyblockplus.utils.Utils.*;
 
@@ -134,16 +132,7 @@ public class SkyblockCommand extends Command {
             dungeonsPageString += "• **Catacombs:** " + roundSkillAverage(player.getCatacombsLevel()) + "\n";
 
             String[] pageTitles = {"General", "Armor", "Skills", "Dungeons"};
-            CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(1).setItemsPerPage(1)
-                    .showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
-                        try {
-                            m.clearReactions().queue();
-
-                        } catch (PermissionException ex) {
-                            m.delete().queue();
-                        }
-                    }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor)
-                    .setPageTitles(pageTitles).setUsers(event.getAuthor());
+            CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(1).setPageTitles(pageTitles);
             paginateBuilder.addItems(generalPageString, armorPageString, skillsPageString, dungeonsPageString);
             paginateBuilder.build().paginate(event.getChannel(), 0);
 

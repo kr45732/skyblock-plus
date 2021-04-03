@@ -8,12 +8,10 @@ import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.exceptions.PermissionException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.*;
@@ -69,7 +67,7 @@ public class WardrobeCommand extends Command {
 
                     jda.addEventListener(new InventoryPaginator(playerEnderChest, ebMessage.getChannel(), event.getAuthor()));
                 } else {
-                    ebMessage.editMessage(defaultEmbed("Error").setDescription("Unable to fetch data").build()).queue();
+                    ebMessage.editMessage(defaultEmbed("Error").setDescription("Unable toUnable to fetch player data").build()).queue();
                 }
                 return;
             }
@@ -98,15 +96,7 @@ public class WardrobeCommand extends Command {
             if (armorStructMap != null) {
                 ArrayList<String> pageTitles = new ArrayList<>();
 
-                CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(1).setItemsPerPage(4)
-                        .showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
-                            try {
-                                m.clearReactions().queue();
-                            } catch (PermissionException ex) {
-                                m.delete().queue();
-                            }
-                        }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor)
-                        .setUsers(event.getAuthor());
+                CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(4);
 
                 for (Map.Entry<Integer, ArmorStruct> currentArmour : armorStructMap.entrySet()) {
                     pageTitles.add(player.getUsername());

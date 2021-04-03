@@ -79,8 +79,8 @@ public class SpringDatabaseComponent {
         return settingsService.addNewServerSettings(serverId, serverSettingsModel).getStatusCodeValue();
     }
 
-    public int removeServerSettings(String serverId) {
-        return settingsService.removeServerSettings(serverId).getStatusCodeValue();
+    public int deleteServerSettings(String serverId) {
+        return settingsService.deleteServerSettings(serverId).getStatusCodeValue();
     }
 
     public JsonElement getVerifySettings(String serverId) {

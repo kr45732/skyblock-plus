@@ -10,7 +10,6 @@ import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.UsernameUuidStruct;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.exceptions.PermissionException;
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.Dsl;
 
@@ -48,15 +47,7 @@ public class GuildCommand extends Command {
                     if (guildExp.outputArr.length == 0) {
                         ebMessage.editMessage(guildExp.eb.build()).queue();
                     } else {
-                        CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(2)
-                                .setItemsPerPage(20).showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
-                                    try {
-                                        m.clearReactions().queue();
-                                    } catch (PermissionException ex) {
-                                        m.delete().queue();
-                                    }
-                                }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS)
-                                .setColor(botColor).setUsers(event.getAuthor());
+                        CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(2).setItemsPerPage(20);
 
                         paginateBuilder.addItems(guildExp.outputArr);
                         ebMessage.delete().queue();
@@ -81,15 +72,7 @@ public class GuildCommand extends Command {
                     if (guildMembers.outputArr.length == 0) {
                         ebMessage.editMessage(guildMembers.eb.build()).queue();
                     } else {
-                        CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(3)
-                                .setItemsPerPage(27).showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
-                                    try {
-                                        m.clearReactions().queue();
-                                    } catch (PermissionException ex) {
-                                        m.delete().queue();
-                                    }
-                                }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS)
-                                .setColor(botColor).setUsers(event.getAuthor());
+                        CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(3).setItemsPerPage(27);
 
                         paginateBuilder.addItems(guildMembers.outputArr);
 

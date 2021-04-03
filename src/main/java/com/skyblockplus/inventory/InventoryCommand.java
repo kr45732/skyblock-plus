@@ -82,7 +82,7 @@ public class InventoryCommand extends Command {
                     }
 
                 } else {
-                    ebMessage.editMessage(defaultEmbed("Error").setDescription("Unable to fetch data").build()).queue();
+                    ebMessage.editMessage(defaultEmbed("Error").setDescription("Unable toUnable to fetch player data").build()).queue();
                 }
                 return;
             }
@@ -99,15 +99,7 @@ public class InventoryCommand extends Command {
                 List<String> pageTitles = new ArrayList<>();
                 List<String> pageThumbnails = new ArrayList<>();
 
-                CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(1)
-                        .setItemsPerPage(1).showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
-                            try {
-                                m.clearReactions().queue();
-                            } catch (PermissionException ex) {
-                                m.delete().queue();
-                            }
-                        }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor)
-                        .setUsers(event.getAuthor());
+                CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(1);
 
                 for (Map.Entry<Integer, InvItemStruct> currentInvSlot : inventoryMap.entrySet()) {
                     InvItemStruct currentInvStruct = currentInvSlot.getValue();

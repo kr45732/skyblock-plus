@@ -99,7 +99,7 @@ public class TalismanBagCommand extends Command {
                 List<String> pageTitles = new ArrayList<>();
                 List<String> pageThumbnails = new ArrayList<>();
 
-                CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(1)
+                CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1)
                         .setItemsPerPage(1).showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
                             try {
                                 m.clearReactions().queue();

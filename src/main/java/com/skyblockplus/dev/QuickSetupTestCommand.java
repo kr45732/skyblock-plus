@@ -71,7 +71,7 @@ public class QuickSetupTestCommand extends Command {
 
     private EmbedBuilder deleteServer(String serverId) {
         if (database.getServerSettings(serverId) != null) {
-            return defaultEmbed("API returned response code " + database.removeServerSettings(serverId));
+            return defaultEmbed("API returned response code " + database.deleteServerSettings(serverId));
         }
         return defaultEmbed("Error updating settings");
     }

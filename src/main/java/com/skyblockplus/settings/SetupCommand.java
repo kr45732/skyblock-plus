@@ -7,10 +7,6 @@ import com.skyblockplus.utils.CustomPaginator;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.exceptions.PermissionException;
-
-import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
 
 import static com.skyblockplus.utils.Utils.*;
 
@@ -101,15 +97,7 @@ public class SetupCommand extends Command {
             String moreHelp = "If you need any help, have suggestions, or find any bugs for this bot be sure to join the discord server [here](https://discord.gg/DpcCAwMXwp)!\n" +
                     "You can also view the forums post [here](https://hypixel.net/threads/discord-bot-skyblock-plus-skyblock-focused.3980092/)\n";
 
-            CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(1).setItemsPerPage(1)
-                    .showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
-                        try {
-                            m.clearReactions().queue();
-                        } catch (PermissionException ex) {
-                            m.delete().queue();
-                        }
-                    }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor)
-                    .setUsers(event.getAuthor());
+            CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(1);
 
             paginateBuilder.addItems(overview, features, verify, apply, roles, moreHelp);
             paginateBuilder.setPageTitles(pageTitles);

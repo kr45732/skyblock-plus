@@ -8,11 +8,9 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Invite;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.exceptions.PermissionException;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.*;
@@ -38,14 +36,7 @@ public class GetAllGuildsIn extends Command {
 
             if (args.length == 2) {
                 if (args[1].equals("list")) {
-                    CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(1).setItemsPerPage(10)
-                            .showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
-                                try {
-                                    m.clearReactions().queue();
-                                } catch (PermissionException ex) {
-                                    m.delete().queue();
-                                }
-                            }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor).setUsers(event.getAuthor());
+                    CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(10);
 
                     for (Guild guild : jda.getGuilds()) {
                         if (guild.getName().startsWith("Skyblock Plus - Emoji Server")) {

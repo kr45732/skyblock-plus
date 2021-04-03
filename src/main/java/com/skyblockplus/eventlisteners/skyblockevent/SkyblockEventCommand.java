@@ -346,7 +346,7 @@ public class SkyblockEventCommand extends Command {
                                         } catch (Exception ignored) {
 
                                         }
-                                        ebMessage.editMessage(defaultEmbed("Error").setDescription("Unable to fetch data").build()).queue();
+                                        ebMessage.editMessage(defaultEmbed("Error").setDescription("Unable to fetch player data").build()).queue();
 
                                     } else {
                                         ebMessage.editMessage(defaultEmbed("Error").setDescription("Invalid player").build()).queue();
