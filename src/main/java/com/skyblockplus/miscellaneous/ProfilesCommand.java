@@ -9,12 +9,8 @@ import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.UsernameUuidStruct;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.exceptions.PermissionException;
-
-import java.util.concurrent.TimeUnit;
 
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.errorMessage;
 
 public class ProfilesCommand extends Command {
     private final EventWaiter waiter;
@@ -53,15 +49,7 @@ public class ProfilesCommand extends Command {
                 JsonArray profileArray = higherDepth(
                         getJson("https://api.hypixel.net/skyblock/profiles?key=" + HYPIXEL_API_KEY + "&uuid=" + usernameUuidStruct.playerUuid), "profiles").getAsJsonArray();
 
-                CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(1).setItemsPerPage(1)
-                        .showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
-                            try {
-                                m.clearReactions().queue();
-                            } catch (PermissionException ex) {
-                                m.delete().queue();
-                            }
-                        }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor)
-                        .setUsers(event.getAuthor());
+                CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(1);
 
                 for(JsonElement profile:profileArray){
 

@@ -88,7 +88,7 @@ public class LinkAccountCommand extends Command {
     private EmbedBuilder getLinkedAccount() {
         JsonElement userInfo = database.getLinkedUserByDiscordId(event.getAuthor().getId());
 
-        try{
+        try {
             return defaultEmbed("You are linked to " + (higherDepth(userInfo, "minecraftUsername").getAsString()));
         } catch (Exception e) {
             return defaultEmbed("You are not linked");

@@ -1,14 +1,17 @@
 package com.skyblockplus.eventlisteners.apply;
 
 import com.google.gson.JsonElement;
+import com.skyblockplus.utils.Player;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.skyblockplus.Main.getApplyGuildUsersCache;
+import static com.skyblockplus.Main.*;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.Utils.higherDepth;
 
 public class ApplyGuild {
@@ -77,7 +80,26 @@ public class ApplyGuild {
             return false;
         }
 
-        ApplyUser applyUser = new ApplyUser(event, event.getUser(), currentSettings);
+        JsonElement linkedAccount = database.getLinkedUserByDiscordId(event.getUserId());
+
+        if ((linkedAccount.isJsonNull()) || !higherDepth(linkedAccount, "discordId").getAsString().equals(event.getUserId())) {
+            PrivateChannel dmChannel =  event.getUser().openPrivateChannel().complete();
+            if(linkedAccount.isJsonNull()){
+                dmChannel.sendMessage(defaultEmbed("Error").setDescription("You are not linked to the bot. Please run `+link [IGN]` and try again.").build()).queue();
+            }else{
+                dmChannel.sendMessage(defaultEmbed("Error").setDescription("Account " + higherDepth(linkedAccount, "minecraftUsername").getAsString() + " is linked with the discord tag "
+                        + jda.getUserById(higherDepth(linkedAccount, "discordId").getAsString()).getAsTag() + "\nYour current discord tag is " + event.getUser().getAsTag() + ".\nPlease relink and try again").build()).queue();
+            }
+            return false;
+        }
+
+        if(!new Player(higherDepth(linkedAccount, "minecraftUsername").getAsString()).isValid()){
+            PrivateChannel dmChannel =  event.getUser().openPrivateChannel().complete();
+            dmChannel.sendMessage(defaultEmbed("Error").setDescription("Unable to fetch player data. Please make sure that all APIs are enabled and/or try relinking").build()).queue();
+            return false;
+        }
+
+        ApplyUser applyUser = new ApplyUser(event, currentSettings, higherDepth(linkedAccount, "minecraftUsername").getAsString());
         applyUserList.add(applyUser);
         return true;
     }

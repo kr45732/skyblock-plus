@@ -432,15 +432,15 @@ public class Utils {
                     preFormattedItem = preFormattedItem.replace("GOLDEN", "GOLD");
                 } else if (preFormattedItem.contains("PET_SKIN")) {
                     String tempItem = preFormattedItem.replace("PET_SKIN", "");
-                    if(tempItem.startsWith("_") && tempItem.length() > 1){
+                    if (tempItem.startsWith("_") && tempItem.length() > 1) {
                         tempItem = tempItem.substring(1);
                     }
 
-                    if(tempItem.endsWith("_") && tempItem.length() > 1){
-                        tempItem = tempItem.substring(0, tempItem.length()-1);
+                    if (tempItem.endsWith("_") && tempItem.length() > 1) {
+                        tempItem = tempItem.substring(0, tempItem.length() - 1);
                     }
 
-                    preFormattedItem = "PET_SKIN_" +tempItem;
+                    preFormattedItem = "PET_SKIN_" + tempItem;
                 }
         }
 
@@ -560,11 +560,11 @@ public class Utils {
         }
     }
 
-    public static String parseMinecraftCodes(String unformattedString){
+    public static String parseMinecraftCodes(String unformattedString) {
         return unformattedString.replaceAll("§f|§a|§9|§5|§6|§d|§4|§c|§7|§8|§l|§o|§b|§2|§e|§r|§3|§1", "");
     }
 
-    public static CustomPaginator.Builder defaultPaginator(EventWaiter waiter, User eventAuthor){
+    public static CustomPaginator.Builder defaultPaginator(EventWaiter waiter, User eventAuthor) {
         return new CustomPaginator.Builder().setColumns(1).setItemsPerPage(1)
                 .showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
                     try {
@@ -575,4 +575,103 @@ public class Utils {
                 }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor)
                 .setUsers(eventAuthor);
     }
+
+    public static String profileNameToEmoji(String profileName) {
+        switch (profileName) {
+            case "apple":
+                return "\uD83C\uDF4E";
+            case "banana":
+                return "\uD83C\uDF4C";
+            case "blueberry":
+                return "\uD83E\uDED0";
+            case "coconut":
+                return "\uD83E\uDD65";
+            case "cucumber":
+                return "\uD83E\uDD52";
+            case "grapes":
+                return "\uD83C\uDF47";
+            case "kiwi":
+                return "\uD83E\uDD5D";
+            case "lemon":
+                return "\uD83C\uDF4B";
+            case "lime":
+                return "lime:828632854174498837";
+            case "mango":
+                return "\uD83E\uDD6D";
+            case "orange":
+                return "orange:828634110360289331";
+            case "papaya":
+                return "papaya:828633125370200085";
+            case "peach":
+                return "\uD83C\uDF51";
+            case "pear":
+                return "\uD83C\uDF50";
+            case "pineapple":
+                return "\uD83C\uDF4D";
+            case "pomegranate":
+                return "pomegranate:828632397032456232";
+            case "raspberry":
+                return "raspberry:828632035127853064";
+            case "strawberry":
+                return "\uD83C\uDF53";
+            case "tomato":
+                return "\uD83C\uDF45";
+            case "watermelon":
+                return "\uD83C\uDF49";
+            case "zucchini":
+                return "zucchini:828636746358194206";
+            default:
+                return null;
+        }
+    }
+
+    public static String emojiToProfileName(String emoji) {
+        switch (emoji) {
+            case "\uD83C\uDF4E":
+                return "apple";
+            case "\uD83C\uDF4C":
+                return "banana";
+            case "\uD83E\uDED0":
+                return "blueberry";
+            case "\uD83E\uDD65":
+                return "coconut";
+            case "\uD83E\uDD52":
+                return "cucumber";
+            case "\uD83C\uDF47":
+                return "grapes";
+            case "\uD83E\uDD5D":
+                return "kiwi";
+            case "\uD83C\uDF4B":
+                return "lemon";
+            case "lime:828632854174498837":
+                return "lime";
+            case "\uD83E\uDD6D":
+                return "mango";
+            case "orange:828634110360289331":
+                return "orange";
+            case "papaya:828633125370200085":
+                return "papaya";
+            case "\uD83C\uDF51":
+                return "peach";
+            case "\uD83C\uDF50":
+                return "pear";
+            case "\uD83C\uDF4D":
+                return "pineapple";
+            case "pomegranate:828632397032456232":
+                return "pomegranate";
+            case "raspberry:828632035127853064":
+                return "raspberry";
+            case "\uD83C\uDF53":
+                return "strawberry";
+            case "\uD83C\uDF45":
+                return "tomato";
+            case "\uD83C\uDF49":
+                return "watermelon";
+            case "zucchini:828636746358194206":
+                return "zucchini";
+            default:
+                return null;
+        }
+    }
+
 }

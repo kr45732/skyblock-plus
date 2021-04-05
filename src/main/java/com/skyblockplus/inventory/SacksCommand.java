@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.defaultPaginator;
 
 public class SacksCommand extends Command {
     private final EventWaiter waiter;
@@ -62,15 +63,7 @@ public class SacksCommand extends Command {
             if (sacksMap != null) {
                 ArrayList<String> pageTitles = new ArrayList<>();
 
-                CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder().setColumns(1)
-                        .setItemsPerPage(20).showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
-                            try {
-                                m.clearReactions().queue();
-                            } catch (PermissionException ex) {
-                                m.delete().queue();
-                            }
-                        }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor)
-                        .setUsers(event.getAuthor());
+                CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(20);
 
                 for (Map.Entry<String, Integer> currentSack : sacksMap.entrySet()) {
                     pageTitles.add("Player sacks content for " + player.getUsername());

@@ -2,13 +2,8 @@ package com.skyblockplus.dev;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import me.nullicorn.nedit.NBTReader;
-import me.nullicorn.nedit.type.NBTCompound;
-import me.nullicorn.nedit.type.NBTList;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-
-import java.io.IOException;
 
 import static com.skyblockplus.utils.Utils.*;
 
@@ -20,7 +15,7 @@ public class PlaceholderCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        if(BOT_PREFIX.equals("+")){
+        if (BOT_PREFIX.equals("+")) {
             return;
         }
 

@@ -12,6 +12,7 @@ import me.nullicorn.nedit.type.NBTList;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.springframework.util.StringUtils;
 
+import java.lang.reflect.Array;
 import java.time.Instant;
 import java.util.*;
 
@@ -24,6 +25,7 @@ public class Player {
     private JsonElement profileJson;
     private JsonElement outerProfileJson;
     private JsonElement hypixelProfileJson;
+    private JsonArray profilesArray;
     private String playerUuid;
     private String playerUsername;
     private String profileName;
@@ -35,11 +37,11 @@ public class Player {
         }
 
         try {
-            JsonArray profileArray = higherDepth(
+            this.profilesArray = higherDepth(
                     getJson("https://api.hypixel.net/skyblock/profiles?key=" + HYPIXEL_API_KEY + "&uuid=" + playerUuid),
                     "profiles").getAsJsonArray();
 
-            if (getLatestProfile(profileArray)) {
+            if (getLatestProfile(profilesArray)) {
                 return;
             }
         } catch (Exception e) {
@@ -47,6 +49,24 @@ public class Player {
         }
 
         this.validPlayer = true;
+    }
+
+    public String[] getAllProfileNames() {
+        List<String> profileNameList = new ArrayList<>();
+        if (this.profilesArray == null) {
+            this.profilesArray = higherDepth(
+                    getJson("https://api.hypixel.net/skyblock/profiles?key=" + HYPIXEL_API_KEY + "&uuid=" + playerUuid),
+                    "profiles").getAsJsonArray();
+        }
+
+        for (JsonElement profile : profilesArray) {
+            try {
+                profileNameList.add(higherDepth(profile, "cute_name").getAsString().toLowerCase());
+            } catch (Exception ignored) {
+            }
+        }
+
+        return profileNameList.toArray(new String[0]);
     }
 
     public Player(String playerUuid, String playerUsername, JsonElement outerProfileJson, String playerGuildRank) {
@@ -520,9 +540,9 @@ public class Player {
 
                 if (displayName != null) {
                     invFramesMap.put(i + 1, displayName.getString("id", "empty").toLowerCase());
-                }else if((equippedArmor != null) && (equippedWardrobeSlot <= 9) && ((((i + 1) - equippedWardrobeSlot) % 9) == 0) && ((i+1) <= 36) && (equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9) + 1)) != null) {
+                } else if ((equippedArmor != null) && (equippedWardrobeSlot <= 9) && ((((i + 1) - equippedWardrobeSlot) % 9) == 0) && ((i + 1) <= 36) && (equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9) + 1)) != null) {
                     invFramesMap.put(i + 1, equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9) + 1).getId().toLowerCase());
-                }else if((equippedArmor != null) && (equippedWardrobeSlot > 9) && ((((i + 1) - equippedWardrobeSlot) % 9) == 0) && ((i+1) > 36) && (equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9) + 1 - 3)) != null) {
+                } else if ((equippedArmor != null) && (equippedWardrobeSlot > 9) && ((((i + 1) - equippedWardrobeSlot) % 9) == 0) && ((i + 1) > 36) && (equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9) + 1 - 3)) != null) {
                     invFramesMap.put(i + 1, equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9) + 1 - 3).getId().toLowerCase());
                 } else {
                     invFramesMap.put(i + 1, "empty");
@@ -593,7 +613,7 @@ public class Player {
                         talismanFramesMap.put(i, currentItemStruct);
                         continue;
                     }
-                }catch (Exception ignored){
+                } catch (Exception ignored) {
                 }
                 talismanFramesMap.put(i, null);
             }
@@ -629,7 +649,7 @@ public class Player {
                         invFramesMap.put(i, currentItemStruct);
                         continue;
                     }
-                }catch (Exception ignored){
+                } catch (Exception ignored) {
                 }
                 invFramesMap.put(i, null);
             }
@@ -662,7 +682,7 @@ public class Player {
                         currentItemStruct.setId(currentItem.getString("tag.ExtraAttributes.id", "None"));
                         currentItemStruct.setCreationTimestamp(currentItem.getString("tag.ExtraAttributes.timestamp", "None"));
 
-                        invFramesMap.put(invFrames.size()-i, currentItemStruct);
+                        invFramesMap.put(invFrames.size() - i, currentItemStruct);
                         continue;
                     }
                 } catch (Exception ignored) {

@@ -136,6 +136,8 @@ public class Main {
                 System.out.println("Retrieved cache (" + applyUsersCacheList.size() + ") - " + guildId);
                 return applyUsersCacheList;
             }
+
+            database.deleteApplyCacheSettings(guildId);
         } catch (Exception e) {
             System.out.println("== Stack Trace (Get cache ApplyUser - " + guildId + ")");
             e.printStackTrace();
