@@ -3,7 +3,6 @@ package com.skyblockplus.eventlisteners.apply;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import com.skyblockplus.utils.DiscordInfoStruct;
 import com.skyblockplus.utils.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;

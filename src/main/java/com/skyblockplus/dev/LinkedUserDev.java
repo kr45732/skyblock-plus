@@ -53,7 +53,7 @@ public class LinkedUserDev extends Command {
             } else if (args.length == 2) {
                 if (args[1].equals("all")) {
                     if (getAllLinkedUsers()) {
-                        return;
+                        ebMessage.delete().queue();
                     }
                 }
             }

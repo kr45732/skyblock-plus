@@ -10,14 +10,13 @@ import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.UsernameUuidStruct;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import org.asynchttpclient.AsyncHttpClient;
-import org.asynchttpclient.Dsl;
 
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static com.skyblockplus.Main.asyncHttpClient;
 import static com.skyblockplus.utils.Utils.*;
 
 public class GuildCommand extends Command {
@@ -106,7 +105,6 @@ public class GuildCommand extends Command {
         JsonArray membersArr = members.getAsJsonArray();
         Map<String, Integer> guildExpMap = new HashMap<>();
 
-        AsyncHttpClient asyncHttpClient = Dsl.asyncHttpClient();
         CountDownLatch httpGetsFinishedLatch = new CountDownLatch(1);
         for (int i = 0; i < membersArr.size(); i++) {
             int finalI = i;
@@ -146,13 +144,6 @@ public class GuildCommand extends Command {
             httpGetsFinishedLatch.await(20, TimeUnit.SECONDS);
         }catch (Exception e) {
             System.out.println("== Stack Trace (Guild Exp Latch) ==");
-            e.printStackTrace();
-        }
-
-        try{
-            System.out.println("== Stack Trace (Guild Exp Close Client) ==");
-            asyncHttpClient.close();
-        } catch (Exception e) {
             e.printStackTrace();
         }
 

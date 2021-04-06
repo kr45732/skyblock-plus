@@ -14,8 +14,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import org.asynchttpclient.AsyncHttpClient;
-import org.asynchttpclient.Dsl;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -29,8 +27,7 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.Main.*;
 import static com.skyblockplus.eventlisteners.MainListener.getGuildMap;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -48,7 +45,6 @@ public class SkyblockEventCommand extends Command {
         JsonArray membersArr = higherDepth(runningEventSettings, "membersList").getAsJsonArray();
         TextChannel announcementChannel = jda.getTextChannelById(higherDepth(runningEventSettings, "announcementId").getAsString());
 
-        AsyncHttpClient asyncHttpClient = Dsl.asyncHttpClient();
         CountDownLatch httpGetsFinishedLatch = new CountDownLatch(1);
         List<Player> guildMemberPlayersList = new ArrayList<>();
 
@@ -123,13 +119,6 @@ public class SkyblockEventCommand extends Command {
             }
         } catch (Exception e) {
             System.out.println("== Stack Trace (Event End Latch) ==");
-            e.printStackTrace();
-        }
-
-        try {
-            System.out.println("== Stack Trace (Event End Close Client) ==");
-            asyncHttpClient.close();
-        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -417,7 +406,6 @@ public class SkyblockEventCommand extends Command {
 
                             JsonArray membersArr = higherDepth(database.getRunningEventSettings(event.getGuild().getId()), "membersList").getAsJsonArray();
 
-                            AsyncHttpClient asyncHttpClient = Dsl.asyncHttpClient();
                             CountDownLatch httpGetsFinishedLatch = new CountDownLatch(1);
                             List<Player> guildMemberPlayersList = new ArrayList<>();
 
@@ -492,13 +480,6 @@ public class SkyblockEventCommand extends Command {
                                 }
                             } catch (Exception e) {
                                 System.out.println("== Stack Trace (Event Leaderboard Latch) ==");
-                                e.printStackTrace();
-                            }
-
-                            try {
-                                System.out.println("== Stack Trace (Event Leaderboard Close Client) ==");
-                                asyncHttpClient.close();
-                            } catch (Exception e) {
                                 e.printStackTrace();
                             }
 

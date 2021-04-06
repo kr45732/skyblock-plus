@@ -5,12 +5,9 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.utils.CustomPaginator;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.exceptions.PermissionException;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import static com.skyblockplus.utils.Utils.*;
 
@@ -65,6 +62,7 @@ public class HelpCommand extends Command {
             pageMap.put("bank", 9);
             pageMap.put("weight", 9);
             pageMap.put("hypixel", 9);
+            pageMap.put("profiles", 9);
             pageMap.put("event", 10);
             pageMap.put("categories", 11);
             pageMap.put("settings", 11);
@@ -166,6 +164,7 @@ public class HelpCommand extends Command {
                     "weight calculate [skill avg] [slayer] [cata level] [avg dungeon class level]")
                     + generateHelp("Get Hypixel information about a player", "hypixel [player]")
                     + generateHelp("Get fastest Hypixel lobby parkour for a player", "hypixel parkour [player]")
+                    + generateHelp("Get a information about all of a player's profiles", "profiles [player]")
             );
 
             paginateBuilder.addItems(generateHelp("Interactive message to create a Skyblock event", "event create")
@@ -211,6 +210,8 @@ public class HelpCommand extends Command {
                         "settings apply staff_channel " + "[#channel]")
                         + generateHelp("Message that will be sent if applicant is accepted",
                         "settings apply accept_message [message]")
+                        + generateHelp("Message that will be sent if applicant is waitlisted (optional)",
+                        "settings apply waitlist_message [message]")
                         + generateHelp("Message that will be sent if applicant is denied",
                         "settings apply deny_message [message]"));
 

@@ -37,6 +37,8 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import org.asynchttpclient.AsyncHttpClient;
+import org.asynchttpclient.Dsl;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -53,6 +55,7 @@ import static com.skyblockplus.utils.Utils.*;
 public class Main {
     public static JDA jda;
     public static SpringDatabaseComponent database;
+    public static AsyncHttpClient asyncHttpClient = Dsl.asyncHttpClient();
 
     public static void main(String[] args) throws LoginException, IllegalArgumentException {
         setApplicationSettings();
@@ -78,7 +81,7 @@ public class Main {
                 new EnderChestCommand(), new InstantTimeNow(), new GetEventListenersCommand(), new GetAllGuildsIn(waiter),
                 new LinkAccountCommand(), new GetSettingsFile(), new UnlinkAccountCommand(), new LinkedUserDev(),
                 new BazaarCommand(), new AverageAuctionCommand(), new PetsCommand(waiter), new SkyblockEventCommand(),
-                new DeleteMessagesCommand(), new PlaceholderCommand());
+                new DeleteMessagesCommand(), new PlaceholderCommand(), new ProfilesCommand(waiter));
 
         if (BOT_PREFIX.equals("+")) {
             jda = JDABuilder.createDefault(BOT_TOKEN).setStatus(OnlineStatus.DO_NOT_DISTURB)
@@ -154,6 +157,15 @@ public class Main {
         long startTime = System.currentTimeMillis();
         cacheApplyGuildUsers();
         System.out.println("== Saved In " + ((System.currentTimeMillis() - startTime) / 1000) + "s ==");
+
+        System.out.println("== Closing Async Http Client ==");
+        try {
+            asyncHttpClient.close();
+            System.out.println("== Successfully Closed Async Http Client ==");
+        } catch (Exception e) {
+            System.out.println("== Stack Trace (Close Async Http Client)");
+            e.printStackTrace();
+        }
 
         System.out.println("== Finished ==");
     }

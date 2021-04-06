@@ -10,8 +10,6 @@ import com.skyblockplus.utils.UsernameUuidStruct;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
-import org.asynchttpclient.AsyncHttpClient;
-import org.asynchttpclient.Dsl;
 
 import java.io.FileReader;
 import java.util.ArrayList;
@@ -21,6 +19,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static com.skyblockplus.Main.asyncHttpClient;
 import static com.skyblockplus.utils.Utils.*;
 
 public class GuildLeaderboardCommand extends Command {
@@ -133,7 +132,6 @@ public class GuildLeaderboardCommand extends Command {
         ArrayList<Player> guildCatacombs = new ArrayList<>();
         ArrayList<String> uniqueGuildUuid = new ArrayList<>();
 
-        AsyncHttpClient asyncHttpClient = Dsl.asyncHttpClient();
         CountDownLatch httpGetsFinishedLatch = new CountDownLatch(1);
         int latchCount = 0;
         for (JsonElement guildMember : guildMembers) {
@@ -219,13 +217,6 @@ public class GuildLeaderboardCommand extends Command {
             success = httpGetsFinishedLatch.await(20, TimeUnit.SECONDS);
         }catch (Exception e) {
             System.out.println("== Stack Trace (Guild Rank Latch) ==");
-            e.printStackTrace();
-        }
-
-        try{
-            asyncHttpClient.close();
-        } catch (Exception e) {
-            System.out.println("== Stack Trace (Guild Rank Close Client) ==");
             e.printStackTrace();
         }
 
