@@ -206,6 +206,15 @@ public class SettingsCommand extends Command {
                         case "deny_message":
                             eb = setApplyDenyMessageText(args[3]);
                             break;
+                        case "reqs":
+                        case "requirements":
+                            args = content.split(" ");
+                            if(args.length == 5){
+                                eb = setApplyRequirement(args[3], args[4]);
+                            }else {
+                                eb = defaultEmbed("Error", null).setDescription("Invalid setting");
+                            }
+                            break;
                         default:
                             eb = defaultEmbed("Error", null).setDescription("Invalid setting");
                             break;
@@ -1074,6 +1083,11 @@ public class SettingsCommand extends Command {
         ebFieldString += "\n**• Denied Message:** " + displaySettings(applySettings, "denyMessageText");
         ebFieldString += "\n**• New Channel Prefix:** " + displaySettings(applySettings, "newChannelPrefix");
         ebFieldString += "\n**• New Channel Category:** " + displaySettings(applySettings, "newChannelCategory");
+        ebFieldString += "\n**• Slayer Requirement Value:** " + displaySettings(applySettings, "slayerRequirements");
+        ebFieldString += "\n**• Skills Requirement Value:** " + displaySettings(applySettings, "skillsRequirements");
+        ebFieldString += "\n**• Catacombs Requirement Value:** " + displaySettings(applySettings, "catacombsRequirements");
+        ebFieldString += "\n**• Weight Requirement Value:** " + displaySettings(applySettings, "weightRequirements");
+
         return ebFieldString;
     }
 
@@ -1082,6 +1096,10 @@ public class SettingsCommand extends Command {
         currentSettings.remove("previousMessageId");
         currentSettings.remove("applyUsersCache");
         currentSettings.remove("waitlistedMessageText");
+        currentSettings.remove("slayerRequirements");
+        currentSettings.remove("skillsRequirements");
+        currentSettings.remove("catacombsRequirements");
+        currentSettings.remove("weightRequirements");
 
         for (String key : getJsonKeys(currentSettings)) {
             if (higherDepth(currentSettings, key).getAsString().length() == 0) {
@@ -1274,6 +1292,46 @@ public class SettingsCommand extends Command {
         }
         return defaultEmbed("Invalid Guild Category", null);
     }
+
+    private EmbedBuilder setApplyRequirement(String reqType, String reqValue) {
+        try{
+            if(reqValue.equalsIgnoreCase("none")){
+                int responseCode = updateApplySettings(reqType, "-10");
+
+                if (responseCode != 200) {
+                    return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
+                }
+
+                EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+                eb.setDescription("**Application requirement for " + reqType + " disabled**");
+                return eb;
+            }else {
+                int reqValInt = Integer.parseInt(reqValue);
+                if (reqValInt <= 0) {
+                    return defaultEmbed("Error").setDescription("Value must be greater than 0");
+                }
+
+                if (!(reqType.equals("slayer") || reqType.equals("skills") || reqType.equals("catacombs") || reqType.equals("weight"))) {
+                    return defaultEmbed("Error").setDescription("Requirement type must be one of the following: slayer, skills, catacombs, or weight");
+                }
+
+                int responseCode = updateApplySettings(reqType + "Requirements", ""+reqValInt);
+
+                if (responseCode != 200) {
+                    return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
+                }
+
+                EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+                eb.setDescription("**Application requirement set:** " + reqType + " - " + reqValInt);
+                return eb;
+            }
+
+        }catch (Exception e){
+            return defaultEmbed("Error").setDescription("Value must be an integer");
+        }
+
+    }
+
 
     private int updateApplySettings(String key, String newValue) {
         JsonObject newApplyJson = database.getApplySettings(event.getGuild().getId()).getAsJsonObject();

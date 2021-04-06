@@ -35,6 +35,11 @@ public class AutomatedApplication {
     @Column(columnDefinition = "TEXT")
     private String applyUsersCache = "";
 
+    private String slayerRequirements = "";
+    private String skillsRequirements = "";
+    private String catacombsRequirements = "";
+    private String weightRequirements = "";
+
     public AutomatedApplication() {
     }
 }

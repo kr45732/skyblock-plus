@@ -122,7 +122,7 @@ public class ApplyUser implements Serializable {
             state = 3;
         } else if (event.getReactionEmote().getAsReactionCode().equals("↩️") && state == 1) {
             state = 2;
-        } else if (!((profileNameEmojis.contains(event.getReactionEmote().getAsReactionCode()) && (state == 0)) || (event.getReactionEmote().getAsReactionCode().equals("✅") && (state == 1)))) {
+        } else if (!((profileNameEmojis.contains(event.getReactionEmote().getAsReactionCode()) && (state == 0)) || (event.getReactionEmote().getAsReactionCode().equals("✅") && (state == 1 || state == 5)))) {
             reactMessage.clearReactions(event.getReactionEmote().getAsReactionCode()).queue();
             return false;
         }
@@ -132,6 +132,50 @@ public class ApplyUser implements Serializable {
         switch (state) {
             case 0:
                 Player player = new Player(playerUsername, emojiToProfileName(event.getReactionEmote().getAsReactionCode()));
+
+                String missingReqs = "";
+                try{
+                    if(player.getSlayer() < higherDepth(currentSettings, "slayerRequirements").getAsInt()){
+                        missingReqs += "\n• Your current slayer of " + formatNumber(player.getSlayer()) + " doesn't meet the requirement of " +  formatNumber(higherDepth(currentSettings, "slayerRequirements").getAsInt());
+                    }
+                }catch (Exception ignored){
+                }
+
+                try{
+                    if(player.getSkillAverage() < higherDepth(currentSettings, "skillsRequirements").getAsInt()){
+                        missingReqs += "\n• Your current skill average of " + roundSkillAverage(player.getSkillAverage()) + " doesn't meet the requirement of " +  roundSkillAverage(higherDepth(currentSettings, "skillsRequirements").getAsInt());
+                    }
+                }catch (Exception ignored){
+                }
+
+                try{
+                    double cataCur = player.getCatacombsSkill() != null ? (player.getCatacombsSkill().skillLevel + player.getCatacombsSkill().progressToNext) : 0;
+                    if((cataCur) < higherDepth(currentSettings, "catacombsRequirements").getAsInt()){
+                        missingReqs += "\n• Your current catacombs of " + roundSkillAverage(cataCur) + " doesn't meet the requirement of " +  roundSkillAverage(higherDepth(currentSettings, "catacombsRequirements").getAsInt());
+                    }
+                }catch (Exception ignored){
+                }
+
+                try{
+                    if(player.getWeight() < higherDepth(currentSettings, "weightRequirements").getAsInt()){
+                        missingReqs += "\n• Your current weight of " + roundSkillAverage(player.getWeight()) + " doesn't meet the requirement of " +  roundSkillAverage(higherDepth(currentSettings, "weightRequirements").getAsInt());
+                    }
+                }catch (Exception ignored){
+                }
+
+
+                if(missingReqs.length() > 0){
+                    EmbedBuilder reqEmbed = defaultEmbed("Does not meet requirements");
+                    reqEmbed.setDescription(missingReqs);
+                    reqEmbed.appendDescription("\n• If you think these values are incorrect make sure all your APIs are enabled and/or try relinking");
+                    reqEmbed.appendDescription("\n• React with ✅ to close the channel");
+
+                    reactMessage = applicationChannel.sendMessage(reqEmbed.build()).complete();
+                    reactMessage.addReaction("✅").queue();
+                    this.reactMessageId = reactMessage.getId();
+                    state = 5;
+                    break;
+                }
 
                 try {
                     playerSlayer = formatNumber(player.getSlayer());
@@ -205,6 +249,12 @@ public class ApplyUser implements Serializable {
                 cancelEmbed.setDescription("Channel closing");
                 applicationChannel.sendMessage(cancelEmbed.build()).queue();
                 event.getGuild().getTextChannelById(event.getChannel().getId()).delete().reason("Application canceled")
+                        .queueAfter(5, TimeUnit.SECONDS);
+                return true;
+            case 5:
+                EmbedBuilder closeChannelEmbed = defaultEmbed("Channel closing");
+                applicationChannel.sendMessage(closeChannelEmbed.build()).queue();
+                event.getGuild().getTextChannelById(event.getChannel().getId()).delete().reason("Application closed")
                         .queueAfter(5, TimeUnit.SECONDS);
                 return true;
         }
