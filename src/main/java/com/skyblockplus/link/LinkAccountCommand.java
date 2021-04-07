@@ -53,13 +53,13 @@ public class LinkAccountCommand extends Command {
                 } catch (Exception ignored) {
                 }
 
-                return defaultEmbed("Success").setDescription("Account " + playerInfo.minecraftUsername + " linked with " + user.getAsTag());
+                return defaultEmbed("Success").setDescription("`" + user.getAsTag() + " was linked to `" + playerInfo.minecraftUsername + "`");
             } else {
-                return defaultEmbed("Error linking " + playerInfo.minecraftUsername);
+                return defaultEmbed("Error").setDescription("Error linking `" + user.getAsTag() + " to `" + playerInfo.minecraftUsername + "`");
             }
         }
 
-        return defaultEmbed("Error finding discord tag linked with account");
+        return defaultEmbed("Error").setDescription(playerInfo.minecraftUsername + " is not linked to a Discord account. For help on how to link view [__**this**__](https://streamable.com/sdq8tp) video");
     }
 
     @Override
@@ -89,9 +89,9 @@ public class LinkAccountCommand extends Command {
         JsonElement userInfo = database.getLinkedUserByDiscordId(event.getAuthor().getId());
 
         try {
-            return defaultEmbed("You are linked to " + (higherDepth(userInfo, "minecraftUsername").getAsString()));
+            return defaultEmbed("Success").setDescription("`" + event.getAuthor().getAsTag() + "` is linked to `" + (higherDepth(userInfo, "minecraftUsername").getAsString()) + "`");
         } catch (Exception e) {
-            return defaultEmbed("You are not linked");
+            return defaultEmbed("Error").setDescription("`" + event.getAuthor().getAsTag() + "` is not linked");
         }
     }
 }

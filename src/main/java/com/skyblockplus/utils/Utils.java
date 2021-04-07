@@ -482,10 +482,14 @@ public class Utils {
         return NumberFormat.getInstance(Locale.US).format(number);
     }
 
-    public static String roundSkillAverage(double number) {
+    public static String formatNumber(double number) {
+        return NumberFormat.getInstance(Locale.US).format(number);
+    }
+
+    public static String roundAndFormat(double number) {
         DecimalFormat df = new DecimalFormat("#.##");
         df.setRoundingMode(RoundingMode.HALF_UP);
-        return df.format(number);
+        return formatNumber(Double.parseDouble(df.format(number)));
     }
 
     public static String roundProgress(double number) {

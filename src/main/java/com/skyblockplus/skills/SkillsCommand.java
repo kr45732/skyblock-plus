@@ -94,8 +94,8 @@ public class SkillsCommand extends Command {
             }
             trueSA /= (skills.size() - 2);
             progressSA /= (skills.size() - 2);
-            eb.setDescription("True skill average: " + roundSkillAverage(trueSA) + "\nProgress skill average: "
-                    + roundSkillAverage(progressSA));
+            eb.setDescription("True skill average: " + roundAndFormat(trueSA) + "\nProgress skill average: "
+                    + roundAndFormat(progressSA));
             eb.setThumbnail(player.getThumbnailUrl());
             return eb;
         }

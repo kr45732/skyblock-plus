@@ -4,6 +4,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.utils.CustomPaginator;
+import com.skyblockplus.utils.PaginatorExtras;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
@@ -100,7 +101,7 @@ public class SetupCommand extends Command {
             CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(1);
 
             paginateBuilder.addItems(overview, features, verify, apply, roles, moreHelp);
-            paginateBuilder.setPageTitles(pageTitles);
+            paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles));
             ebMessage.delete().queue();
             paginateBuilder.build().paginate(event.getChannel(), 0);
         }).start();

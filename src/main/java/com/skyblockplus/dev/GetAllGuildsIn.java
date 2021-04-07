@@ -4,6 +4,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.utils.CustomPaginator;
+import com.skyblockplus.utils.PaginatorExtras;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Invite;
@@ -60,7 +61,7 @@ public class GetAllGuildsIn extends Command {
 
                     String[] pageTitles = new String[jda.getGuilds().size() / 5];
                     Arrays.fill(pageTitles, "Server List");
-                    paginateBuilder.setPageTitles(pageTitles);
+                    paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles));
 
                     ebMessage.delete().queue();
                     paginateBuilder.build().paginate(event.getChannel(), 0);

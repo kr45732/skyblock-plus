@@ -6,6 +6,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.utils.ArmorStruct;
 import com.skyblockplus.utils.CustomPaginator;
+import com.skyblockplus.utils.PaginatorExtras;
 import com.skyblockplus.utils.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -75,7 +76,7 @@ public class SkyblockCommand extends Command {
             generalPageString += "**Purse:** " + simplifyNumber(player.getPurseCoins()) + "\n";
             generalPageString += "**Bank Account:** " + (player.getBankBalance() == -1.0 ? "Banking API disabled"
                     : simplifyNumber(player.getBankBalance())) + "\n";
-            generalPageString += "**Skill Average:** " + roundSkillAverage(player.getSkillAverage()) + "\n";
+            generalPageString += "**Skill Average:** " + roundAndFormat(player.getSkillAverage()) + "\n";
             generalPageString += "**Fairy Souls:** " + player.getFairySouls() + " / 220" + "\n";
 
             // Armor
@@ -121,18 +122,18 @@ public class SkyblockCommand extends Command {
             // Dungeons
             String dungeonsPageString = "";
             dungeonsPageString += "__**Classes**__" + "\n";
-            dungeonsPageString += "• **Healer:** " + roundSkillAverage(player.getDungeonClassLevel("healer")) + "\n";
-            dungeonsPageString += "• **Mage:** " + roundSkillAverage(player.getDungeonClassLevel("mage")) + "\n";
-            dungeonsPageString += "• **Berserk:** " + roundSkillAverage(player.getDungeonClassLevel("berserk")) + "\n";
-            dungeonsPageString += "• **Archer:** " + roundSkillAverage(player.getDungeonClassLevel("archer")) + "\n";
-            dungeonsPageString += "• **Tank:** " + roundSkillAverage(player.getDungeonClassLevel("tank")) + "\n";
+            dungeonsPageString += "• **Healer:** " + roundAndFormat(player.getDungeonClassLevel("healer")) + "\n";
+            dungeonsPageString += "• **Mage:** " + roundAndFormat(player.getDungeonClassLevel("mage")) + "\n";
+            dungeonsPageString += "• **Berserk:** " + roundAndFormat(player.getDungeonClassLevel("berserk")) + "\n";
+            dungeonsPageString += "• **Archer:** " + roundAndFormat(player.getDungeonClassLevel("archer")) + "\n";
+            dungeonsPageString += "• **Tank:** " + roundAndFormat(player.getDungeonClassLevel("tank")) + "\n";
             dungeonsPageString += "\n";
 
             dungeonsPageString += "__**Catacombs**__" + "\n";
-            dungeonsPageString += "• **Catacombs:** " + roundSkillAverage(player.getCatacombsLevel()) + "\n";
+            dungeonsPageString += "• **Catacombs:** " + roundAndFormat(player.getCatacombsLevel()) + "\n";
 
             String[] pageTitles = {"General", "Armor", "Skills", "Dungeons"};
-            CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(1).setPageTitles(pageTitles);
+            CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(1).setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles));
             paginateBuilder.addItems(generalPageString, armorPageString, skillsPageString, dungeonsPageString);
             paginateBuilder.build().paginate(event.getChannel(), 0);
 

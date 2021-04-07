@@ -7,6 +7,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.utils.CustomPaginator;
+import com.skyblockplus.utils.PaginatorExtras;
 import com.skyblockplus.utils.UsernameUuidStruct;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -112,7 +113,7 @@ public class ProfilesCommand extends Command {
                 paginateBuilder.addItems(profileStr.toString());
             }
 
-            paginateBuilder.setPageTitles(pageTitles).build().paginate(event.getChannel(), 0);
+            paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles));
             return null;
         }
         return defaultEmbed("Unable to fetch player data");

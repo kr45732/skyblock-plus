@@ -13,6 +13,7 @@ import com.skyblockplus.api.discordserversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.discordserversettings.automatedroles.RoleObject;
 import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSettingsModel;
 import com.skyblockplus.utils.CustomPaginator;
+import com.skyblockplus.utils.PaginatorExtras;
 import com.vdurmont.emoji.EmojiParser;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -688,7 +689,7 @@ public class SettingsCommand extends Command {
             paginateBuilder.addItems(ebFieldString.toString());
         }
 
-        return paginateBuilder.setPageTitles(pageTitles);
+        return paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles));
     }
 
     private boolean allowRolesEnable() {

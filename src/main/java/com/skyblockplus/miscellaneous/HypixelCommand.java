@@ -121,7 +121,7 @@ public class HypixelCommand extends Command {
 
                 double networkLevel = (Math.sqrt((2 * higherDepth(hypixelJson, "networkExp").getAsLong()) + 30625) / 50)
                         - 2.5;
-                eb.addField("Hypixel Level", roundSkillAverage(networkLevel), true);
+                eb.addField("Hypixel Level", roundAndFormat(networkLevel), true);
 
                 String hypixelRank = "None";
                 if (higherDepth(hypixelJson, "rank") != null && !higherDepth(hypixelJson, "rank").getAsString().equals("NORMAL")) {

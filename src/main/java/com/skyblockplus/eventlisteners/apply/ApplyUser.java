@@ -143,7 +143,7 @@ public class ApplyUser implements Serializable {
 
                 try{
                     if(player.getSkillAverage() < higherDepth(currentSettings, "skillsRequirements").getAsInt()){
-                        missingReqs += "\n• Your current skill average of " + roundSkillAverage(player.getSkillAverage()) + " doesn't meet the requirement of " +  roundSkillAverage(higherDepth(currentSettings, "skillsRequirements").getAsInt());
+                        missingReqs += "\n• Your current skill average of " + roundAndFormat(player.getSkillAverage()) + " doesn't meet the requirement of " +  roundAndFormat(higherDepth(currentSettings, "skillsRequirements").getAsInt());
                     }
                 }catch (Exception ignored){
                 }
@@ -151,14 +151,14 @@ public class ApplyUser implements Serializable {
                 try{
                     double cataCur = player.getCatacombsSkill() != null ? (player.getCatacombsSkill().skillLevel + player.getCatacombsSkill().progressToNext) : 0;
                     if((cataCur) < higherDepth(currentSettings, "catacombsRequirements").getAsInt()){
-                        missingReqs += "\n• Your current catacombs of " + roundSkillAverage(cataCur) + " doesn't meet the requirement of " +  roundSkillAverage(higherDepth(currentSettings, "catacombsRequirements").getAsInt());
+                        missingReqs += "\n• Your current catacombs level of " + roundAndFormat(cataCur) + " doesn't meet the requirement of " +  roundAndFormat(higherDepth(currentSettings, "catacombsRequirements").getAsInt());
                     }
                 }catch (Exception ignored){
                 }
 
                 try{
                     if(player.getWeight() < higherDepth(currentSettings, "weightRequirements").getAsInt()){
-                        missingReqs += "\n• Your current weight of " + roundSkillAverage(player.getWeight()) + " doesn't meet the requirement of " +  roundSkillAverage(higherDepth(currentSettings, "weightRequirements").getAsInt());
+                        missingReqs += "\n• Your current weight of " + roundAndFormat(player.getWeight()) + " doesn't meet the requirement of " +  roundAndFormat(higherDepth(currentSettings, "weightRequirements").getAsInt());
                     }
                 }catch (Exception ignored){
                 }
@@ -184,7 +184,7 @@ public class ApplyUser implements Serializable {
                 }
 
                 try {
-                    playerSkills = roundSkillAverage(player.getSkillAverage());
+                    playerSkills = roundAndFormat(player.getSkillAverage());
                 }catch (Exception e){
                     playerSkills = "API disabled";
                 }
@@ -192,13 +192,13 @@ public class ApplyUser implements Serializable {
                 playerSkills = playerSkills.equals("-1") ? "API disabled" : playerSkills;
 
                 try {
-                    playerCatacombs = roundSkillAverage(player.getCatacombsSkill().skillLevel + player.getCatacombsSkill().progressToNext);
+                    playerCatacombs = roundAndFormat(player.getCatacombsSkill().skillLevel + player.getCatacombsSkill().progressToNext);
                 }catch (Exception e){
                     playerCatacombs = "API disabled";
                 }
 
                 try {
-                    playerWeight = roundSkillAverage(player.getWeight());
+                    playerWeight = roundAndFormat(player.getWeight());
                 }catch (Exception e){
                     playerWeight = "API disabled";
                 }
@@ -374,7 +374,7 @@ public class ApplyUser implements Serializable {
     }
 
     public EmbedBuilder defaultPlayerEmbed() {
-        return defaultEmbed(playerUsername + ironmanSymbol,
+        return defaultEmbed(fixUsername(playerUsername) + ironmanSymbol,
                 "https://sky.shiiyu.moe/stats/" + playerUsername + "/" + playerProfileName);
     }
 }
@@ -517,9 +517,9 @@ public class ApplyUser implements Serializable {
 //                                if (playerInfo != null) {
 //                                    if (applyingUser.getAsTag().equals(playerInfo.discordTag)) {
 //                                        playerSlayer = formatNumber(player.getSlayer());
-//                                        playerSkills = roundSkillAverage(player.getSkillAverage());
+//                                        playerSkills = roundAndFormat(player.getSkillAverage());
 //                                        playerCatacombs = "" + player.getCatacombsSkill().skillLevel;
-//                                        playerWeight = roundSkillAverage(player.getWeight());
+//                                        playerWeight = roundAndFormat(player.getWeight());
 //                                        playerUsername = player.getUsername();
 //                                        ironmanSymbol = higherDepth(player.getOuterProfileJson(), "game_mode") != null ? " ♻️" : "";
 //                                        playerProfileName = player.getProfileName();

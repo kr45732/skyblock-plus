@@ -52,10 +52,10 @@ public class WeightCommand extends Command {
             double averageDungeonClassD = Double.parseDouble(averageDungeonClass);
             Weight calculatedWeight = new Weight(skillAverageD, slayerD, catacombsD, averageDungeonClassD);
             EmbedBuilder eb = defaultEmbed("Weight Calculator");
-            eb.setDescription("**Total Weight**: " + roundSkillAverage(calculatedWeight.calculateTotalWeight()));
-            eb.addField("Slayer Weight", roundSkillAverage(calculatedWeight.calculateSlayerWeight()), false);
-            eb.addField("Skills Weight", roundSkillAverage(calculatedWeight.calculateSkillsWeight()), false);
-            eb.addField("Dungeons Weight", roundSkillAverage(calculatedWeight.calculateDungeonsWeight()), false);
+            eb.setDescription("**Total Weight**: " + roundAndFormat(calculatedWeight.calculateTotalWeight()));
+            eb.addField("Slayer Weight", roundAndFormat(calculatedWeight.calculateSlayerWeight()), false);
+            eb.addField("Skills Weight", roundAndFormat(calculatedWeight.calculateSkillsWeight()), false);
+            eb.addField("Dungeons Weight", roundAndFormat(calculatedWeight.calculateDungeonsWeight()), false);
             return eb;
         } catch (NumberFormatException e) {
             return defaultEmbed("Invalid input");
@@ -67,10 +67,10 @@ public class WeightCommand extends Command {
         if (player.isValid()) {
             Weight playerWeight = new Weight(player);
             EmbedBuilder eb = player.defaultPlayerEmbed();
-            eb.setDescription("**Total Weight**: " + roundSkillAverage(playerWeight.getTotalWeight()));
-            eb.addField("Slayer Weight", roundSkillAverage(playerWeight.getSlayerWeight()), false);
-            eb.addField("Skills Weight", roundSkillAverage(playerWeight.getSkillsWeight()), false);
-            eb.addField("Dungeons Weight", roundSkillAverage(playerWeight.getDungeonsWeight()), false);
+            eb.setDescription("**Total Weight**: " + roundAndFormat(playerWeight.getTotalWeight()));
+            eb.addField("Slayer Weight", roundAndFormat(playerWeight.getSlayerWeight()), false);
+            eb.addField("Skills Weight", roundAndFormat(playerWeight.getSkillsWeight()), false);
+            eb.addField("Dungeons Weight", roundAndFormat(playerWeight.getDungeonsWeight()), false);
             eb.setThumbnail(player.getThumbnailUrl());
             return eb;
         }

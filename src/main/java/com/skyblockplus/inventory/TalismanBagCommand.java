@@ -4,6 +4,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.utils.CustomPaginator;
+import com.skyblockplus.utils.PaginatorExtras;
 import com.skyblockplus.utils.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -130,8 +131,7 @@ public class TalismanBagCommand extends Command {
                         paginateBuilder.addItems(itemString);
                     }
                 }
-                paginateBuilder.setPageTitles(pageTitles);
-                paginateBuilder.setPageThumbnails(pageThumbnails);
+                paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles).setThumbnails(pageThumbnails));
 
                 int slotNumber = 1;
                 try{

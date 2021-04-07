@@ -4,6 +4,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.utils.CustomPaginator;
+import com.skyblockplus.utils.PaginatorExtras;
 import net.dv8tion.jda.api.Permission;
 
 import java.util.HashMap;
@@ -30,7 +31,7 @@ public class HelpCommand extends Command {
                     "Auction House and Bazaar", "Inventory", "Miscellaneous Commands", "Skyblock Event", "Settings", "Verify Settings", "Apply Settings",
                     "Roles Settings", "Guild Role Settings"};
 
-            CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(1).setPageTitles(pageTitles);
+            CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(1).setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles));
 
             int startingPage = 0;
             Map<String, Integer> pageMap = new HashMap<>();
@@ -210,10 +211,13 @@ public class HelpCommand extends Command {
                         "settings apply staff_channel " + "[#channel]")
                         + generateHelp("Message that will be sent if applicant is accepted",
                         "settings apply accept_message [message]")
-                        + generateHelp("Message that will be sent if applicant is waitlisted (optional)",
+                        + generateHelp("Message that will be sent if applicant is waitlisted. Can be set to none",
                         "settings apply waitlist_message [message]")
                         + generateHelp("Message that will be sent if applicant is denied",
-                        "settings apply deny_message [message]"));
+                        "settings apply deny_message [message]")
+                        + generateHelp("Requirement that applicant must meet. Type can be slayer, skills, catacombs, or average. Value can be an integer or none",
+                        "settings apply requirements [type] [value]", "settings apply reqs [type] [value]")
+                );
 
                 paginateBuilder.addItems(generateHelp("Get the current roles settings for the bot", "settings roles")
                         + generateHelp("Enable or disable automatic roles", "settings roles [enable|disable]")

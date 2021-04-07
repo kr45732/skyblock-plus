@@ -50,7 +50,7 @@ public class CatacombsCommand extends Command {
                                 + roundProgress(skillInfo.progressToNext),
                         false);
                 eb.setDescription("True catacombs level: " + skillInfo.skillLevel + "\nProgress catacombs level: "
-                        + roundSkillAverage(skillInfo.skillLevel + skillInfo.progressToNext));
+                        + roundAndFormat(skillInfo.skillLevel + skillInfo.progressToNext));
 
                 for (String className : new String[]{"healer", "mage", "berserk", "archer", "tank"}) {
                     skillInfo = player.getDungeonClass(className);

@@ -15,10 +15,8 @@ import net.dv8tion.jda.internal.utils.Checks;
 
 import java.awt.*;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -38,13 +36,14 @@ public class CustomPaginator extends Menu {
     private final Consumer<Message> finalAction;
     private final int bulkSkipNumber;
     private final boolean wrapPageEnds;
-    private final List<String> pageTitles;
-    private final List<String> pageThumbnails;
+//    private final List<String> pageTitles;
+//    private final List<String> pageThumbnails;
+    private final PaginatorExtras extras;
 
     CustomPaginator(EventWaiter waiter, Set<User> users, Set<Role> roles, long timeout, TimeUnit unit,
                     BiFunction<Integer, Integer, Color> color, Consumer<Message> finalAction, int columns, int itemsPerPage,
                     boolean showPageNumbers, boolean numberItems, List<String> items, int bulkSkipNumber, boolean wrapPageEnds,
-                    List<String> pageTitles, List<String> pageThumbnails) {
+                    PaginatorExtras extras) {
         super(waiter, users, roles, timeout, unit);
         this.color = color;
         this.columns = columns;
@@ -56,8 +55,9 @@ public class CustomPaginator extends Menu {
         this.finalAction = finalAction;
         this.bulkSkipNumber = bulkSkipNumber;
         this.wrapPageEnds = wrapPageEnds;
-        this.pageTitles = pageTitles;
-        this.pageThumbnails= pageThumbnails;
+        this.extras = extras;
+//        this.pageTitles = pageTitles;
+//        this.pageThumbnails= pageThumbnails;
     }
 
     @Override
@@ -179,12 +179,17 @@ public class CustomPaginator extends Menu {
         EmbedBuilder embedBuilder = new EmbedBuilder();
 
         try {
-            embedBuilder.setTitle(pageTitles.get(pageNum - 1));
+            embedBuilder.setTitle(extras.getTitles().get(pageNum - 1));
         } catch (Exception ignored) {
         }
 
         try{
-            embedBuilder.setThumbnail(pageThumbnails.get(pageNum - 1));
+            embedBuilder.setThumbnail(extras.getThumbnails().get(pageNum - 1));
+        }catch (Exception ignored){
+        }
+
+        try{
+            embedBuilder.setDescription(extras.getEveryPageText());
         }catch (Exception ignored){
         }
 
@@ -194,7 +199,7 @@ public class CustomPaginator extends Menu {
             StringBuilder stringBuilder = new StringBuilder();
             for (int i = start; i < end; i++)
                 stringBuilder.append("\n").append(numberItems ? "`" + (i + 1) + ".` " : "").append(strings.get(i));
-            embedBuilder.setDescription(stringBuilder.toString());
+            embedBuilder.appendDescription(stringBuilder.toString()); //setDescription()
         } else {
             int per = (int) Math.ceil((double) (end - start) / columns);
             for (int k = 0; k < columns; k++) {
@@ -222,10 +227,13 @@ public class CustomPaginator extends Menu {
         private int itemsPerPage = 12;
         private boolean showPageNumbers = true;
         private boolean numberItems = false;
-        private List<String> pageTitles = null;
         private int bulkSkipNumber = 1;
         private boolean wrapPageEnds = false;
-        private List<String> pageThumbnails = null;
+
+//        private List<String> pageTitles = null;
+//        private List<String> pageThumbnails = null;
+
+        private PaginatorExtras extras;
 
         @Override
         public CustomPaginator build() {
@@ -233,7 +241,7 @@ public class CustomPaginator extends Menu {
             Checks.check(!strings.isEmpty(), "Must include at least one item to paginate");
 
             return new CustomPaginator(waiter, users, roles, timeout, unit, color, finalAction, columns, itemsPerPage,
-                    showPageNumbers, numberItems, strings, bulkSkipNumber, wrapPageEnds, pageTitles, pageThumbnails);
+                    showPageNumbers, numberItems, strings, bulkSkipNumber, wrapPageEnds, extras);
         }
 
         public Builder setColor(Color color) {
@@ -241,20 +249,25 @@ public class CustomPaginator extends Menu {
             return this;
         }
 
-        public Builder setPageTitles(List<String> pageTitles) {
-            this.pageTitles = pageTitles;
+        public Builder setPaginatorExtras(PaginatorExtras paginatorExtras){
+            this.extras = paginatorExtras;
             return this;
         }
 
-        public Builder setPageTitles(String[] pageTitles) {
-            this.pageTitles = Arrays.asList(pageTitles);
-            return this;
-        }
-
-        public Builder setPageThumbnails(List<String> pageThumbnails){
-            this.pageThumbnails = pageThumbnails;
-            return this;
-        }
+//        public Builder setTitles(List<String> pageTitles) {
+//            this.pageTitles = pageTitles;
+//            return this;
+//        }
+//
+//        public Builder setTitles(String[] pageTitles) {
+//            this.pageTitles = Arrays.asList(pageTitles);
+//            return this;
+//        }
+//
+//        public Builder setThumbnails(List<String> pageThumbnails){
+//            this.pageThumbnails = pageThumbnails;
+//            return this;
+//        }
 
         public Builder setFinalAction(Consumer<Message> finalAction) {
             this.finalAction = finalAction;

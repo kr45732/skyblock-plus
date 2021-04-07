@@ -5,6 +5,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.utils.ArmorStruct;
 import com.skyblockplus.utils.CustomPaginator;
+import com.skyblockplus.utils.PaginatorExtras;
 import com.skyblockplus.utils.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -105,7 +106,7 @@ public class WardrobeCommand extends Command {
                             + "\n" + currentArmour.getValue().getLeggings() + "\n" + currentArmour.getValue().getBoots()
                             + "\n");
                 }
-                paginateBuilder.setPageTitles(pageTitles);
+                paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles));
                 paginateBuilder.build().paginate(event.getChannel(), 0);
                 return null;
             }

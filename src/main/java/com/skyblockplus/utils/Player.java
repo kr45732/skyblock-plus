@@ -1315,7 +1315,7 @@ public class Player {
     }
 
     public EmbedBuilder defaultPlayerEmbed() {
-        return defaultEmbed(getUsername() + (higherDepth(outerProfileJson, "game_mode") != null ? " ♻️" : ""),
+        return defaultEmbed(fixUsername(getUsername()) + (higherDepth(outerProfileJson, "game_mode") != null ? " ♻️" : ""),
                 skyblockStatsLink(getUsername(), getProfileName()));
     }
 

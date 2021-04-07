@@ -7,6 +7,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.utils.CustomPaginator;
+import com.skyblockplus.utils.PaginatorExtras;
 import com.skyblockplus.utils.UsernameUuidStruct;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -21,6 +22,7 @@ import static com.skyblockplus.utils.Utils.*;
 
 public class GuildCommand extends Command {
     private final EventWaiter waiter;
+    private CommandEvent event;
 
     public GuildCommand(EventWaiter waiter) {
         this.name = "guild";
@@ -31,6 +33,7 @@ public class GuildCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
+        this.event = event;
         new Thread(() -> {
             EmbedBuilder eb = loadingEmbed();
             Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
@@ -42,15 +45,11 @@ public class GuildCommand extends Command {
             if (args.length == 3 && ("experience".equals(args[1]) || "exp".equals(args[1]))) {
                 if (args[2].toLowerCase().startsWith("u-")) {
                     String username = args[2].split("-")[1];
-                    GuildStruct guildExp = getGuildExp(username);
-                    if (guildExp.outputArr.length == 0) {
-                        ebMessage.editMessage(guildExp.eb.build()).queue();
-                    } else {
-                        CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(2).setItemsPerPage(20);
-
-                        paginateBuilder.addItems(guildExp.outputArr);
+                    eb = getGuildExp(username);
+                    if (eb == null) {
                         ebMessage.delete().queue();
-                        paginateBuilder.build().paginate(event.getChannel(), 0);
+                    } else {
+                        ebMessage.editMessage(eb.build()).queue();
                     }
                     return;
                 }
@@ -67,18 +66,13 @@ public class GuildCommand extends Command {
             } else if (args.length == 3 && "members".equals(args[1])) {
                 if (args[2].toLowerCase().startsWith("u-")) {
                     String usernameMembers = args[2].split("-")[1];
-                    GuildStruct guildMembers = getGuildMembers(usernameMembers);
-                    if (guildMembers.outputArr.length == 0) {
-                        ebMessage.editMessage(guildMembers.eb.build()).queue();
-                    } else {
-                        CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(3).setItemsPerPage(27);
-
-                        paginateBuilder.addItems(guildMembers.outputArr);
-
+                    eb = getGuildMembers(usernameMembers);
+                    if (eb == null) {
                         ebMessage.delete().queue();
-                        paginateBuilder.build().paginate(event.getChannel(), 0);
-                        return;
+                    } else {
+                        ebMessage.editMessage(eb.build()).queue();
                     }
+                    return;
                 }
             } else if (args.length == 2) {
                 ebMessage.editMessage(getGuildPlayer(args[1]).build()).queue();
@@ -89,16 +83,16 @@ public class GuildCommand extends Command {
         }).start();
     }
 
-    private GuildStruct getGuildExp(String username) {
+    private EmbedBuilder getGuildExp(String username) {
         UsernameUuidStruct uuidUsername = usernameToUuid(username);
         if (uuidUsername == null) {
-            return new GuildStruct(defaultEmbed("Error fetching player data"), null);
+            return defaultEmbed("Error fetching player data");
         }
 
         JsonElement guildJson = getJson(
                 "https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&player=" + uuidUsername.playerUuid);
         if (guildJson == null) {
-            return new GuildStruct(defaultEmbed("Error fetching guild data"), null);
+            return defaultEmbed("Error fetching guild data");
         }
 
         JsonElement members = higherDepth(higherDepth(guildJson, "guild"), "members");
@@ -117,7 +111,7 @@ public class GuildCommand extends Command {
                                 try {
                                     String currentUsername = higherDepth(JsonParser.parseString(uuidToUsernameResponse.getResponseBody()), "username").getAsString();
                                     JsonElement expHistory = higherDepth(membersArr.get(finalI), "expHistory");
-                                    ArrayList<String> keys = getJsonKeys(expHistory);
+                                    List<String> keys = getJsonKeys(expHistory);
                                     int totalPlayerExp = 0;
 
                                     for (String value : keys) {
@@ -147,7 +141,6 @@ public class GuildCommand extends Command {
             e.printStackTrace();
         }
 
-        String[] outputStrArr = new String[guildExpMap.size()];
 
         LinkedHashMap<String, Integer> reverseSortedMap = new LinkedHashMap<>();
 
@@ -161,17 +154,26 @@ public class GuildCommand extends Command {
                     }
                 });
 
+        CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(2).setItemsPerPage(20);
+        String[] pageTitles = new String[(int) Math.ceil(reverseSortedMap.size()/20.0)];
+        String guildName = higherDepth(higherDepth(guildJson, "guild"), "name").getAsString();
+        Arrays.fill(pageTitles, guildName);
+
+        String rankStr = "**Player:** " + uuidUsername.playerUsername + "\n**Guild Rank:** #" + (new ArrayList<>(reverseSortedMap.keySet()).indexOf(uuidUsername.playerUsername) + 1) + "\n**Exp:** " + formatNumber(reverseSortedMap.get(uuidUsername.playerUsername));
+        paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles).setEveryPageText(rankStr));
 
         int counter = 0;
         for (Map.Entry<String, Integer> k : reverseSortedMap.entrySet()) {
             if (!k.getKey().startsWith("@null")) {
-                outputStrArr[counter] = "`" + (counter + 1) + ")` " + fixUsername(k.getKey()) + ": "
-                        + formatNumber(k.getValue()) + " EXP\n";
+                paginateBuilder.addItems("`" + (counter + 1) + ")` " + fixUsername(k.getKey()) + ": "
+                        + formatNumber(k.getValue()) + " EXP\n");
             }
 
             counter++;
         }
-        return new GuildStruct(null, outputStrArr);
+
+        paginateBuilder.build().paginate(event.getChannel(), 0);
+        return null;
     }
 
     private EmbedBuilder getGuildPlayer(String username) {
@@ -285,27 +287,71 @@ public class GuildCommand extends Command {
         return guildInfo;
     }
 
-    private GuildStruct getGuildMembers(String username) {
+    private EmbedBuilder getGuildMembers(String username) {
         UsernameUuidStruct uuidUsername = usernameToUuid(username);
         if (uuidUsername == null) {
-            return new GuildStruct(defaultEmbed("Error fetching player data"), null);
+            return defaultEmbed("Error fetching player data");
         }
 
         JsonElement guildJson = getJson(
                 "https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&player=" + uuidUsername.playerUuid);
         if (guildJson == null) {
-            return new GuildStruct(defaultEmbed("Error fetching guild data"), null);
+            return defaultEmbed("Error fetching guild data");
         }
 
-        JsonArray guildMembers = higherDepth(higherDepth(guildJson, "guild"), "members").getAsJsonArray();
-        String[] members = new String[guildMembers.size()];
-        for (int i = 0; i < guildMembers.size(); i++) {
-            String currentMember = uuidToUsername(
-                    higherDepth(guildMembers.get(i).getAsJsonObject(), "uuid").getAsString());
-            members[i] = "• " + fixUsername(currentMember) + "  \n";
+        JsonArray membersArr = higherDepth(higherDepth(guildJson, "guild"), "members").getAsJsonArray();
+
+        List<String> guildMembers = new ArrayList<>();
+        CountDownLatch httpGetsFinishedLatch = new CountDownLatch(1);
+        for (int i = 0; i < membersArr.size(); i++) {
+            asyncHttpClient
+                    .prepareGet("https://api.ashcon.app/mojang/v2/user/" + higherDepth(membersArr.get(i), "uuid").getAsString())
+                    .execute()
+                    .toCompletableFuture()
+                    .thenApply(
+                            uuidToUsernameResponse -> {
+                                try {
+                                    guildMembers.add(higherDepth(JsonParser.parseString(uuidToUsernameResponse.getResponseBody()), "username").getAsString());
+                                } catch (Exception e) {
+                                    guildMembers.add(null);
+                                }
+                                return true;
+                            }
+                    )
+                    .whenComplete(
+                            (aBoolean, throwable) -> {
+                                if (guildMembers.size() == membersArr.size()) {
+                                    httpGetsFinishedLatch.countDown();
+                                }
+                            }
+                    );
         }
 
-        return new GuildStruct(null, members);
+        try {
+            httpGetsFinishedLatch.await(20, TimeUnit.SECONDS);
+        }catch (Exception e) {
+            System.out.println("== Stack Trace (Guild Members Latch) ==");
+            e.printStackTrace();
+        }
+
+
+
+        CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(3).setItemsPerPage(27);
+        String[] pageTitles = new String[(int) Math.ceil(guildMembers.size()/20.0)];
+        String guildName = higherDepth(higherDepth(guildJson, "guild"), "name").getAsString();
+        Arrays.fill(pageTitles, guildName);
+
+        paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles));
+
+        for (String member : guildMembers) {
+            if (member != null) {
+                paginateBuilder.addItems("• " + fixUsername(member) + "  \n");
+            }
+
+        }
+
+        paginateBuilder.build().paginate(event.getChannel(), 0);
+        return null;
     }
 
     private int guildExpToLevel(int guildExp) {

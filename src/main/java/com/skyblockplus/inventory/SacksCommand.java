@@ -4,6 +4,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.utils.CustomPaginator;
+import com.skyblockplus.utils.PaginatorExtras;
 import com.skyblockplus.utils.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -68,7 +69,7 @@ public class SacksCommand extends Command {
                             .addItems("**" + convertSkyblockIdName(currentSack.getKey())
                                     + "**: " + currentSack.getValue());
                 }
-                paginateBuilder.setPageTitles(pageTitles);
+                paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles));
                 paginateBuilder.build().paginate(event.getChannel(), 0);
                 return null;
             }
