@@ -59,7 +59,7 @@ public class LinkAccountCommand extends Command {
             }
         }
 
-        return defaultEmbed("Error").setDescription(playerInfo.minecraftUsername + " is not linked to a Discord account. For help on how to link view [__**this**__](https://streamable.com/sdq8tp) video");
+        return defaultEmbed("Error").setDescription(username + " is not linked to a Discord account. For help on how to link view [__**this**__](https://streamable.com/sdq8tp) video");
     }
 
     @Override
