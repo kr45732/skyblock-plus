@@ -103,17 +103,17 @@ public class InventoryCommand extends Command {
                 for (Map.Entry<Integer, InvItemStruct> currentInvSlot : inventoryMap.entrySet()) {
                     InvItemStruct currentInvStruct = currentInvSlot.getValue();
 
-                    if(currentInvStruct == null){
+                    if (currentInvStruct == null) {
                         pageTitles.add("Empty");
                         pageThumbnails.add(null);
                         paginateBuilder.addItems("**Slot:** " + (currentInvSlot.getKey() + 1));
-                    }else {
+                    } else {
                         pageTitles.add(currentInvStruct.getName() + " x" + currentInvStruct.getCount());
                         pageThumbnails.add("https://sky.lea.moe/item.gif/" + currentInvStruct.getId());
                         String itemString = "";
                         itemString += "**Slot:** " + (currentInvSlot.getKey() + 1);
-                        itemString += "\n\n**Lore:**\n" + currentInvStruct.getLore().replace("§ka", "");
-                        if(currentInvStruct.getLore().contains("§ka")){
+                        itemString += "\n\n**Lore:**\n" + currentInvStruct.getLore();
+                        if (currentInvStruct.isRecombobulated()) {
                             itemString += "\n(Recombobulated)";
                         }
 
@@ -125,9 +125,9 @@ public class InventoryCommand extends Command {
 
 
                 int slotNumber = 1;
-                try{
+                try {
                     slotNumber = Integer.parseInt(slotNum.replace("slot-", ""));
-                }catch (Exception ignored){
+                } catch (Exception ignored) {
                 }
                 paginateBuilder.build().paginate(event.getChannel(), slotNumber);
                 return null;
@@ -149,12 +149,12 @@ public class InventoryCommand extends Command {
                 for (Map.Entry<Integer, InvItemStruct> currentInvSlot : inventoryMap.entrySet()) {
                     InvItemStruct currentInvStruct = currentInvSlot.getValue();
 
-                    if(currentInvStruct == null){
+                    if (currentInvStruct == null) {
                         pageTitles.add("Empty");
                         pageThumbnails.add(null);
 
                         String slotName = "";
-                        switch ((currentInvSlot.getKey())){
+                        switch ((currentInvSlot.getKey())) {
                             case 4:
                                 slotName = "Boots";
                                 break;
@@ -170,13 +170,13 @@ public class InventoryCommand extends Command {
                         }
 
                         paginateBuilder.addItems("**Slot:** " + slotName);
-                    }else {
+                    } else {
                         pageTitles.add(currentInvStruct.getName() + " x" + currentInvStruct.getCount());
                         pageThumbnails.add("https://sky.lea.moe/item.gif/" + currentInvStruct.getId());
                         String itemString = "";
 
                         String slotName = "";
-                        switch ((currentInvSlot.getKey())){
+                        switch ((currentInvSlot.getKey())) {
                             case 4:
                                 slotName = "Boots";
                                 break;
@@ -192,8 +192,8 @@ public class InventoryCommand extends Command {
                         }
 
                         itemString += "**Slot:** " + slotName;
-                        itemString += "\n\n**Lore:**\n" + currentInvStruct.getLore().replace("§ka", "");
-                        if(currentInvStruct.getLore().contains("§ka")){
+                        itemString += "\n\n**Lore:**\n" + currentInvStruct.getLore();
+                        if (currentInvStruct.isRecombobulated()) {
                             itemString += "\n(Recombobulated)";
                         }
 

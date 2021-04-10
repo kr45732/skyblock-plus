@@ -21,7 +21,7 @@ public class BaldCommand extends Command {
     @Override
     protected void execute(CommandEvent event) {
         new Thread(() -> {
-            if(!(event.getGuild().getId().equals("782154976243089429") || event.getGuild().getId().equals("796790757947867156"))){
+            if (!(event.getGuild().getId().equals("782154976243089429") || event.getGuild().getId().equals("796790757947867156"))) {
                 return;
             }
 

@@ -63,7 +63,7 @@ public class SkyblockEvent {
 
     private void checkForTimeout() {
         Duration res = Duration.between(lastMessageSentTime, Instant.now());
-        System.out.println(res.toMinutes());
+        System.out.println("Timeout Event: " + res.toMinutes());
         if (res.toMinutes() >= 1) {
             timeout = true;
             sendEmbedMessage(defaultEmbed("Timeout"));

@@ -15,8 +15,10 @@ import net.dv8tion.jda.internal.utils.Checks;
 
 import java.awt.*;
 import java.time.Instant;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -36,7 +38,7 @@ public class CustomPaginator extends Menu {
     private final Consumer<Message> finalAction;
     private final int bulkSkipNumber;
     private final boolean wrapPageEnds;
-//    private final List<String> pageTitles;
+    //    private final List<String> pageTitles;
 //    private final List<String> pageThumbnails;
     private final PaginatorExtras extras;
 
@@ -183,14 +185,14 @@ public class CustomPaginator extends Menu {
         } catch (Exception ignored) {
         }
 
-        try{
+        try {
             embedBuilder.setThumbnail(extras.getThumbnails().get(pageNum - 1));
-        }catch (Exception ignored){
+        } catch (Exception ignored) {
         }
 
-        try{
+        try {
             embedBuilder.setDescription(extras.getEveryPageText());
-        }catch (Exception ignored){
+        } catch (Exception ignored) {
         }
 
         int start = (pageNum - 1) * itemsPerPage;
@@ -249,7 +251,7 @@ public class CustomPaginator extends Menu {
             return this;
         }
 
-        public Builder setPaginatorExtras(PaginatorExtras paginatorExtras){
+        public Builder setPaginatorExtras(PaginatorExtras paginatorExtras) {
             this.extras = paginatorExtras;
             return this;
         }

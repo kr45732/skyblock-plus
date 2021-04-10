@@ -56,14 +56,14 @@ public class SettingsCommand extends Command {
                 currentSettings = database.getServerSettings(event.getGuild().getId());
             }
 
-            if((args.length == 3) && (args[1].equals("delete"))){
-                if(args[2].equals("--confirm")){
-                    if(database.deleteServerSettings(event.getGuild().getId()) == 200){
+            if ((args.length == 3) && (args[1].equals("delete"))) {
+                if (args[2].equals("--confirm")) {
+                    if (database.deleteServerSettings(event.getGuild().getId()) == 200) {
                         ebMessage.editMessage(defaultEmbed("Success").setDescription("Server settings deleted").build()).queue();
-                    }else{
+                    } else {
                         ebMessage.editMessage(defaultEmbed("Error").setDescription("Error deleting server settings").build()).queue();
                     }
-                }else{
+                } else {
                     ebMessage.editMessage(defaultEmbed("Error").setDescription("To delete the server settings rerun this command with the `--confirm` flag (`" + BOT_PREFIX + "settings delete --confirm`)").build()).queue();
                 }
                 return;
@@ -210,9 +210,9 @@ public class SettingsCommand extends Command {
                         case "reqs":
                         case "requirements":
                             args = content.split(" ");
-                            if(args.length == 5){
+                            if (args.length == 5) {
                                 eb = setApplyRequirement(args[3], args[4]);
-                            }else {
+                            } else {
                                 eb = defaultEmbed("Error", null).setDescription("Invalid setting");
                             }
                             break;
@@ -305,10 +305,10 @@ public class SettingsCommand extends Command {
                             eb = defaultEmbed("Error").setDescription("Invalid setting");
                             break;
                     }
-                } else if(args.length == 5){
-                    if(args[2].equals("add")){
+                } else if (args.length == 5) {
+                    if (args[2].equals("add")) {
                         eb = addGuildRank(args[3], args[4]);
-                    }else{
+                    } else {
                         eb = defaultEmbed("Error").setDescription("Invalid setting");
                     }
                 } else {
@@ -337,7 +337,7 @@ public class SettingsCommand extends Command {
             for (JsonElement guildRank : higherDepth(currentSettings, "guildRanks").getAsJsonArray()) {
                 guildRanksString.append("\n• ").append(higherDepth(guildRank, "minecraftRoleName").getAsString()).append(" - ").append(event.getGuild().getRoleById(higherDepth(guildRank, "discordRoleId").getAsString()).getAsMention());
             }
-        }catch (Exception ignored){
+        } catch (Exception ignored) {
         }
 
         ebFieldString += guildRanksString.length() > 0 ? guildRanksString.toString() : "\n• No guild ranks set";
@@ -382,7 +382,7 @@ public class SettingsCommand extends Command {
         return eb;
     }
 
-    private EmbedBuilder addGuildRank(String rankName, String roleMention){
+    private EmbedBuilder addGuildRank(String rankName, String roleMention) {
         Role guildRankRole;
         try {
             guildRankRole = event.getGuild().getRoleById(roleMention.replaceAll("[<@&>]", ""));
@@ -403,17 +403,17 @@ public class SettingsCommand extends Command {
 
         JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&id=" + guildId);
 
-        if(higherDepth(guildJson, "guild") == null){
+        if (higherDepth(guildJson, "guild") == null) {
             return defaultEmbed("Current guild name is invalid");
         }
 
         JsonArray guildRanks = higherDepth(higherDepth(guildJson, "guild"), "ranks").getAsJsonArray();
 
         StringBuilder guildRanksString = new StringBuilder();
-        for(JsonElement guildRank:guildRanks){
+        for (JsonElement guildRank : guildRanks) {
             guildRanksString.append("\n• ").append(higherDepth(guildRank, "name").getAsString().replace(" ", "_"));
-            if (higherDepth(guildRank, "name").getAsString().equalsIgnoreCase(rankName.replace("_", " "))){
-                JsonArray currentGuildRanks =  currentSettings.get("guildRanks").getAsJsonArray();
+            if (higherDepth(guildRank, "name").getAsString().equalsIgnoreCase(rankName.replace("_", " "))) {
+                JsonArray currentGuildRanks = currentSettings.get("guildRanks").getAsJsonArray();
 
                 for (JsonElement level : currentGuildRanks) {
                     if (higherDepth(level, "minecraftRoleName").getAsString().equalsIgnoreCase(rankName)) {
@@ -446,12 +446,12 @@ public class SettingsCommand extends Command {
         JsonObject currentSettings = database.getGuildRoleSettings(event.getGuild().getId()).getAsJsonObject();
         JsonArray currentGuildRanks = currentSettings.get("guildRanks").getAsJsonArray();
 
-        for(JsonElement guildRank:currentGuildRanks){
-            if (higherDepth(guildRank, "minecraftRoleName").getAsString().equalsIgnoreCase(rankName)){
+        for (JsonElement guildRank : currentGuildRanks) {
+            if (higherDepth(guildRank, "minecraftRoleName").getAsString().equalsIgnoreCase(rankName)) {
                 JsonArray currentGuildRanksTemp = currentSettings.get("guildRanks").getAsJsonArray();
                 currentGuildRanksTemp.remove(guildRank);
 
-                if(currentGuildRanksTemp.size() == 0){
+                if (currentGuildRanksTemp.size() == 0) {
                     currentSettings.remove("enableGuildRanks");
                     currentSettings.addProperty("enableGuildRanks", "false");
                 }
@@ -973,7 +973,7 @@ public class SettingsCommand extends Command {
             }
 
             EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
-            eb.setDescription("**Verify:** " + (enable.equalsIgnoreCase("true") ? "enabled" : "disabled"));
+            eb.setDescription("**Verify:** " + (enable.equalsIgnoreCase("true") ? "enabled" : "disabled") + "\nRun `" + BOT_PREFIX + "reload` to reload the settings");
             return eb;
         }
         return defaultEmbed("Invalid Input", null);
@@ -1118,7 +1118,7 @@ public class SettingsCommand extends Command {
             }
 
             EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
-            eb.setDescription("**Apply:** " + (enable.equalsIgnoreCase("true") ? "enabled" : "disabled"));
+            eb.setDescription("**Apply:** " + (enable.equalsIgnoreCase("true") ? "enabled" : "disabled") + "\nRun `" + BOT_PREFIX + "reload` to reload the settings");
             return eb;
         }
         return defaultEmbed("Invalid Input", null);
@@ -1295,8 +1295,8 @@ public class SettingsCommand extends Command {
     }
 
     private EmbedBuilder setApplyRequirement(String reqType, String reqValue) {
-        try{
-            if(reqValue.equalsIgnoreCase("none")){
+        try {
+            if (reqValue.equalsIgnoreCase("none")) {
                 int responseCode = updateApplySettings(reqType, "-10");
 
                 if (responseCode != 200) {
@@ -1306,7 +1306,7 @@ public class SettingsCommand extends Command {
                 EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
                 eb.setDescription("**Application requirement for " + reqType + " disabled**");
                 return eb;
-            }else {
+            } else {
                 int reqValInt = Integer.parseInt(reqValue);
                 if (reqValInt <= 0) {
                     return defaultEmbed("Error").setDescription("Value must be greater than 0");
@@ -1316,7 +1316,7 @@ public class SettingsCommand extends Command {
                     return defaultEmbed("Error").setDescription("Requirement type must be one of the following: slayer, skills, catacombs, or weight");
                 }
 
-                int responseCode = updateApplySettings(reqType + "Requirements", ""+reqValInt);
+                int responseCode = updateApplySettings(reqType + "Requirements", "" + reqValInt);
 
                 if (responseCode != 200) {
                     return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
@@ -1327,7 +1327,7 @@ public class SettingsCommand extends Command {
                 return eb;
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             return defaultEmbed("Error").setDescription("Value must be an integer");
         }
 

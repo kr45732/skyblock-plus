@@ -45,11 +45,11 @@ public class ProfilesCommand extends Command {
 
             logCommand(event.getGuild(), event.getAuthor(), content);
 
-            if (args.length == 2){
+            if (args.length == 2) {
                 eb = getPlayerProfiles(args[1]);
-                if(eb == null){
+                if (eb == null) {
                     ebMessage.delete().queue();
-                }else{
+                } else {
                     ebMessage.editMessage(eb.build()).queue();
                 }
                 return;
@@ -72,10 +72,10 @@ public class ProfilesCommand extends Command {
 
             List<CompletableFuture<String>> profileUsernameFutureList = new ArrayList<>();
 
-            for(JsonElement profile:profileArray) {
+            for (JsonElement profile : profileArray) {
                 List<String> uuids = getJsonKeys(higherDepth(profile, "members"));
 
-                for (String uuid: uuids) {
+                for (String uuid : uuids) {
                     profileUsernameFutureList.add(asyncHttpClient
                             .prepareGet("https://api.ashcon.app/mojang/v2/user/" + uuid)
                             .execute()
@@ -96,19 +96,19 @@ public class ProfilesCommand extends Command {
 
             List<String> pageTitles = new ArrayList<>();
             int count = 0;
-            for(JsonElement profile:profileArray) {
+            for (JsonElement profile : profileArray) {
                 pageTitles.add("Profiles for " + usernameUuidStruct.playerUsername);
                 StringBuilder profileStr = new StringBuilder("• **Profile Name:** " + higherDepth(profile, "cute_name").getAsString() + (higherDepth(profile, "game_mode") != null ? " ♻️" : ""));
                 List<String> uuids = getJsonKeys(higherDepth(profile, "members"));
                 profileStr.append("\n• **Member Count:** ").append(uuids.size());
                 profileStr.append("\n\n**Members:** ");
 
-                for (String ignored:uuids) {
+                for (String ignored : uuids) {
                     try {
                         profileStr.append(profileUsernameFutureList.get(count).get());
                     } catch (Exception ignored1) {
                     }
-                    count ++;
+                    count++;
                 }
                 paginateBuilder.addItems(profileStr.toString());
             }

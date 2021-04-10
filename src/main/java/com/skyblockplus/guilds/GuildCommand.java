@@ -136,7 +136,7 @@ public class GuildCommand extends Command {
 
         try {
             httpGetsFinishedLatch.await(20, TimeUnit.SECONDS);
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("== Stack Trace (Guild Exp Latch) ==");
             e.printStackTrace();
         }
@@ -155,7 +155,7 @@ public class GuildCommand extends Command {
                 });
 
         CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(2).setItemsPerPage(20);
-        String[] pageTitles = new String[(int) Math.ceil(reverseSortedMap.size()/20.0)];
+        String[] pageTitles = new String[(int) Math.ceil(reverseSortedMap.size() / 20.0)];
         String guildName = higherDepth(higherDepth(guildJson, "guild"), "name").getAsString();
         Arrays.fill(pageTitles, guildName);
 
@@ -329,15 +329,14 @@ public class GuildCommand extends Command {
 
         try {
             httpGetsFinishedLatch.await(20, TimeUnit.SECONDS);
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("== Stack Trace (Guild Members Latch) ==");
             e.printStackTrace();
         }
 
 
-
         CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(3).setItemsPerPage(27);
-        String[] pageTitles = new String[(int) Math.ceil(guildMembers.size()/20.0)];
+        String[] pageTitles = new String[(int) Math.ceil(guildMembers.size() / 20.0)];
         String guildName = higherDepth(higherDepth(guildJson, "guild"), "name").getAsString();
         Arrays.fill(pageTitles, guildName);
 

@@ -1,14 +1,21 @@
 package com.skyblockplus.eventlisteners;
 
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
+import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.utils.Utils.*;
 
 public class MainListener extends ListenerAdapter {
     private static final Map<String, AutomaticGuild> guildMap = new HashMap<>();
@@ -51,12 +58,31 @@ public class MainListener extends ListenerAdapter {
     }
 
     @Override
+    public void onGuildLeave(@NotNull GuildLeaveEvent event) {
+        guildMap.remove(event.getGuild().getId());
+    }
+
+    @Override
     public void onGuildJoin(GuildJoinEvent event) {
         if (event.getGuild().getName().startsWith("Skyblock Plus - Emoji Server")) {
             return;
         }
 
         if (isUniqueGuild(event.getGuild().getId())) {
+            try {
+                EmbedBuilder eb = defaultEmbed("Thank you!");
+                eb.setDescription("- Thank you for adding me to " + event.getGuild().getName() + "\n- My prefix is `" + BOT_PREFIX + "`\n- You can view my commands by running `" + BOT_PREFIX + "help`\n- Make sure to check out `" + BOT_PREFIX + "setup` or the forum post [**here**](https://hypixel.net/threads/discord-bot-skyblock-plus-90-servers.3980092/post-28888349) on how to setup the customizable features of this bot!");
+                TextChannel channel = event.getGuild().getTextChannels().stream().filter(textChannel -> textChannel.getName().toLowerCase().contains("general")).findFirst().orElse(null);
+                if (channel != null) {
+                    channel.sendMessage(eb.build()).queue();
+                } else {
+                    event.getGuild().getDefaultChannel().sendMessage(eb.build()).queue();
+                }
+            } catch (Exception ignored) {
+            }
+
+            logCommand(event.getGuild(), "Joined guild | #" + jda.getGuilds().size());
+
             guildMap.put(event.getGuild().getId(), new AutomaticGuild(event));
         } else {
             System.out.println(event.getGuild().getId() + " is not unique - join");

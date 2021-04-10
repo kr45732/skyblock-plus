@@ -39,7 +39,7 @@ public class WardrobeCommand extends Command {
 
             logCommand(event.getGuild(), event.getAuthor(), content);
 
-            if ((args.length == 3 || args.length == 4 ) && args[1].equals("list")) {
+            if ((args.length == 3 || args.length == 4) && args[1].equals("list")) {
                 if (args.length == 4) {
                     eb = getPlayerWardrobeList(args[2], args[3]);
                 } else {

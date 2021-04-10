@@ -77,8 +77,7 @@ public class AuctionCommand extends Command {
                 timeUntil += minutesUntil > 0 ? minutesUntil + "m " : "";
 
                 if (higherDepth(currentAuction, "item_name").getAsString().equals("Enchanted Book")) {
-                    auctions[i][0] = higherDepth(currentAuction, "item_lore").getAsString().split("\n")[0]
-                            .replaceAll("§9|§d|§l", "");
+                    auctions[i][0] = parseMcCodes(higherDepth(currentAuction, "item_lore").getAsString().split("\n")[0]);
                 } else {
                     auctions[i][0] = (isPet
                             ? capitalizeString(higherDepth(currentAuction, "tier").getAsString().toLowerCase()) + " "

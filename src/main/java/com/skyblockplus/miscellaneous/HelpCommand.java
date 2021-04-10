@@ -45,8 +45,6 @@ public class HelpCommand extends Command {
             pageMap.put("catacombs", 5);
             pageMap.put("cata", 5);
             pageMap.put("guild", 6);
-            pageMap.put("guild-rank", 6);
-            pageMap.put("g-rank", 6);
             pageMap.put("auction", 7);
             pageMap.put("ah", 7);
             pageMap.put("bazaar", 7);
@@ -60,6 +58,8 @@ public class HelpCommand extends Command {
             pageMap.put("enderchest", 8);
             pageMap.put("sacks", 8);
             pageMap.put("roles", 9);
+            pageMap.put("networth", 9);
+            pageMap.put("nw", 9);
             pageMap.put("bank", 9);
             pageMap.put("weight", 9);
             pageMap.put("hypixel", 9);
@@ -107,7 +107,7 @@ public class HelpCommand extends Command {
             paginateBuilder
                     .addItems(generateHelp("Show this help page", "help", "commands")
                             + generateHelp("Go to the help page of a specific command", "help [command name]")
-                            + generateHelp("Get information about this bot", "information","info")
+                            + generateHelp("Get information about this bot", "information", "info")
                             + generateHelp("Invite this bot to your server", "invite")
                             + generateHelp("Show patch notes for this bot", "version")
                             + generateHelp("Link your discord and Hypixel account", "link [player]")
@@ -130,11 +130,10 @@ public class HelpCommand extends Command {
             );
 
             paginateBuilder.addItems(generateHelp("Find what guild a player is in", "guild [player]")
-                            + generateHelp("Get information and statistics about a player's guild", "guild info [u-player]")
-                            + generateHelp("Get information and statistics about a guild", "guild info [g-player]")
-                            + generateHelp("Get a list of all members in a player's guild", "guild members [u-player]")
-                            + generateHelp("Get the experience leaderboard for a player's guild", "guild experience [u-player]", "guild exp [u-player]")
-//                + generateHelp("Get promote and demote leaderboard in-game commands for a player's guild", guild-rank [u-player]", "g-rank [u-player]")
+                    + generateHelp("Get information and statistics about a player's guild", "guild info [u-player]")
+                    + generateHelp("Get information and statistics about a guild", "guild info [g-player]")
+                    + generateHelp("Get a list of all members in a player's guild", "guild members [u-player]")
+                    + generateHelp("Get the experience leaderboard for a player's guild", "guild experience [u-player]", "guild exp [u-player]")
             );
 
             paginateBuilder.addItems(
@@ -147,7 +146,7 @@ public class HelpCommand extends Command {
             paginateBuilder.addItems(
                     generateHelp("Get a player's inventory represented in emojis", "inventory [player] <profile>",
                             "inv [player] <profile>")
-                            + generateHelp("Get a player's inventory with lore", "inventory [player] <profile> [slot-number]","inv [player] <profile> [slot-number]")
+                            + generateHelp("Get a player's inventory with lore", "inventory [player] <profile> [slot-number]", "inv [player] <profile> [slot-number]")
                             + generateHelp("Get a player's equipped armor with lore", "inventory armor [player] <profile>", "inv armor [player] <profile>")
                             + generateHelp("Get a player's ender chest represented in emojis", "enderchest [player] <profile>", "echest [player] <profile>")
                             + generateHelp("Get a player's talisman bag represented in emojis", "talisman [player] <profile>")
@@ -160,6 +159,7 @@ public class HelpCommand extends Command {
             paginateBuilder.addItems(generateHelp("Claim automatic Skyblock roles. The player must be linked", "roles claim <profile>")
                     + generateHelp("Get a player's bank and purse coins", "bank [player] <profile>")
                     + generateHelp("Get a player's bank transaction history", "bank history [player] <profile>")
+                    + generateHelp("Get a player's networth (in development)", "networth [player] <profile>", "nw [player] <profile>")
                     + generateHelp("Get a player's weight", "weight [player] <profile>")
                     + generateHelp("Calculate predicted weight using given stats (not 100% accurate)",
                     "weight calculate [skill avg] [slayer] [cata level] [avg dungeon class level]")

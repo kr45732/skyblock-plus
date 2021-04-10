@@ -289,9 +289,9 @@ public class SkyblockEventCommand extends Command {
                                 JsonElement guildIn = getJson("https://api.hypixel.net/findGuild?key=" + HYPIXEL_API_KEY + "&byUuid=" + uuid);
 
 
-                                try{
+                                try {
                                     higherDepth(guildIn, "guild").getAsString();
-                                }catch (Exception e){
+                                } catch (Exception e) {
                                     ebMessage.editMessage(defaultEmbed("Error").setDescription("You must be in the guild to join the event").build()).queue();
                                     return;
                                 }

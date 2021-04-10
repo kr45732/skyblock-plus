@@ -46,7 +46,7 @@ public class MessageTimeout extends ListenerAdapter {
             long secondsSinceLast = Instant.now().getEpochSecond()
                     - currentMessage.getTimeCreated().toInstant().getEpochSecond();
             if (secondsSinceLast > 30) {
-                currentMessage.clearReactions().complete();
+                currentMessage.clearReactions().queue();
 
                 iteratorCur.remove();
                 jda.removeEventListener(currentMessageStruct.eventListener);

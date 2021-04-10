@@ -215,7 +215,7 @@ public class GuildLeaderboardCommand extends Command {
         boolean success = true;
         try {
             success = httpGetsFinishedLatch.await(20, TimeUnit.SECONDS);
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("== Stack Trace (Guild Rank Latch) ==");
             e.printStackTrace();
         }

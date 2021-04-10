@@ -35,8 +35,8 @@ public class ApplyUser implements Serializable {
     private String playerUsername;
     private String ironmanSymbol;
     private String playerProfileName;
-    private String[] profileNames;
-    private List<String> profileNameEmojis = new ArrayList<>();
+    private final String[] profileNames;
+    private final List<String> profileNameEmojis = new ArrayList<>();
 
     public ApplyUser(MessageReactionAddEvent event, JsonElement currentSettings, String playerUsername) {
         User applyingUser = event.getUser();
@@ -68,7 +68,7 @@ public class ApplyUser implements Serializable {
         Message reactMessage = applicationChannel.sendMessage(welcomeEb.build()).complete();
         this.reactMessageId = reactMessage.getId();
 
-        for(String profileName: profileNames){
+        for (String profileName : profileNames) {
             this.profileNameEmojis.add(profileNameToEmoji(profileName));
             reactMessage.addReaction(profileNameToEmoji(profileName)).queue();
         }
@@ -134,37 +134,37 @@ public class ApplyUser implements Serializable {
                 Player player = new Player(playerUsername, emojiToProfileName(event.getReactionEmote().getAsReactionCode()));
 
                 String missingReqs = "";
-                try{
-                    if(player.getSlayer() < higherDepth(currentSettings, "slayerRequirements").getAsInt()){
-                        missingReqs += "\n• Your current slayer of " + formatNumber(player.getSlayer()) + " doesn't meet the requirement of " +  formatNumber(higherDepth(currentSettings, "slayerRequirements").getAsInt());
+                try {
+                    if (player.getSlayer() < higherDepth(currentSettings, "slayerRequirements").getAsInt()) {
+                        missingReqs += "\n• Your current slayer of " + formatNumber(player.getSlayer()) + " doesn't meet the requirement of " + formatNumber(higherDepth(currentSettings, "slayerRequirements").getAsInt());
                     }
-                }catch (Exception ignored){
+                } catch (Exception ignored) {
                 }
 
-                try{
-                    if(player.getSkillAverage() < higherDepth(currentSettings, "skillsRequirements").getAsInt()){
-                        missingReqs += "\n• Your current skill average of " + roundAndFormat(player.getSkillAverage()) + " doesn't meet the requirement of " +  roundAndFormat(higherDepth(currentSettings, "skillsRequirements").getAsInt());
+                try {
+                    if (player.getSkillAverage() < higherDepth(currentSettings, "skillsRequirements").getAsInt()) {
+                        missingReqs += "\n• Your current skill average of " + roundAndFormat(player.getSkillAverage()) + " doesn't meet the requirement of " + roundAndFormat(higherDepth(currentSettings, "skillsRequirements").getAsInt());
                     }
-                }catch (Exception ignored){
+                } catch (Exception ignored) {
                 }
 
-                try{
+                try {
                     double cataCur = player.getCatacombsSkill() != null ? (player.getCatacombsSkill().skillLevel + player.getCatacombsSkill().progressToNext) : 0;
-                    if((cataCur) < higherDepth(currentSettings, "catacombsRequirements").getAsInt()){
-                        missingReqs += "\n• Your current catacombs level of " + roundAndFormat(cataCur) + " doesn't meet the requirement of " +  roundAndFormat(higherDepth(currentSettings, "catacombsRequirements").getAsInt());
+                    if ((cataCur) < higherDepth(currentSettings, "catacombsRequirements").getAsInt()) {
+                        missingReqs += "\n• Your current catacombs level of " + roundAndFormat(cataCur) + " doesn't meet the requirement of " + roundAndFormat(higherDepth(currentSettings, "catacombsRequirements").getAsInt());
                     }
-                }catch (Exception ignored){
+                } catch (Exception ignored) {
                 }
 
-                try{
-                    if(player.getWeight() < higherDepth(currentSettings, "weightRequirements").getAsInt()){
-                        missingReqs += "\n• Your current weight of " + roundAndFormat(player.getWeight()) + " doesn't meet the requirement of " +  roundAndFormat(higherDepth(currentSettings, "weightRequirements").getAsInt());
+                try {
+                    if (player.getWeight() < higherDepth(currentSettings, "weightRequirements").getAsInt()) {
+                        missingReqs += "\n• Your current weight of " + roundAndFormat(player.getWeight()) + " doesn't meet the requirement of " + roundAndFormat(higherDepth(currentSettings, "weightRequirements").getAsInt());
                     }
-                }catch (Exception ignored){
+                } catch (Exception ignored) {
                 }
 
 
-                if(missingReqs.length() > 0){
+                if (missingReqs.length() > 0) {
                     EmbedBuilder reqEmbed = defaultEmbed("Does not meet requirements");
                     reqEmbed.setDescription(missingReqs);
                     reqEmbed.appendDescription("\n• If you think these values are incorrect make sure all your APIs are enabled and/or try relinking");
@@ -179,13 +179,13 @@ public class ApplyUser implements Serializable {
 
                 try {
                     playerSlayer = formatNumber(player.getSlayer());
-                }catch (Exception e){
+                } catch (Exception e) {
                     playerSlayer = "0";
                 }
 
                 try {
                     playerSkills = roundAndFormat(player.getSkillAverage());
-                }catch (Exception e){
+                } catch (Exception e) {
                     playerSkills = "API disabled";
                 }
 
@@ -193,13 +193,13 @@ public class ApplyUser implements Serializable {
 
                 try {
                     playerCatacombs = roundAndFormat(player.getCatacombsSkill().skillLevel + player.getCatacombsSkill().progressToNext);
-                }catch (Exception e){
+                } catch (Exception e) {
                     playerCatacombs = "API disabled";
                 }
 
                 try {
                     playerWeight = roundAndFormat(player.getWeight());
-                }catch (Exception e){
+                } catch (Exception e) {
                     playerWeight = "API disabled";
                 }
 
@@ -237,7 +237,7 @@ public class ApplyUser implements Serializable {
                 reactMessage = applicationChannel.sendMessage(retryEmbed.build()).complete();
                 this.reactMessageId = reactMessage.getId();
 
-                for(String profileName: profileNames){
+                for (String profileName : profileNames) {
                     this.profileNameEmojis.add(profileNameToEmoji(profileName));
                     reactMessage.addReaction(profileNameToEmoji(profileName)).queue();
                 }

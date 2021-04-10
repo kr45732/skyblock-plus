@@ -53,7 +53,7 @@ public class LinkAccountCommand extends Command {
                 } catch (Exception ignored) {
                 }
 
-                return defaultEmbed("Success").setDescription("`" + user.getAsTag() + " was linked to `" + playerInfo.minecraftUsername + "`");
+                return defaultEmbed("Success").setDescription("`" + user.getAsTag() + "` was linked to `" + playerInfo.minecraftUsername + "`");
             } else {
                 return defaultEmbed("Error").setDescription("Error linking `" + user.getAsTag() + " to `" + playerInfo.minecraftUsername + "`");
             }

@@ -113,17 +113,17 @@ public class TalismanBagCommand extends Command {
                 for (Map.Entry<Integer, InvItemStruct> currentTalisman : talismanBagMap.entrySet()) {
                     InvItemStruct currentTalismanStruct = currentTalisman.getValue();
 
-                    if(currentTalismanStruct == null){
+                    if (currentTalismanStruct == null) {
                         pageTitles.add("Empty");
                         pageThumbnails.add(null);
                         paginateBuilder.addItems("**Slot:** " + (currentTalisman.getKey() + 1));
-                    }else {
+                    } else {
                         pageTitles.add(currentTalismanStruct.getName() + " x" + currentTalismanStruct.getCount());
                         pageThumbnails.add("https://sky.lea.moe/item.gif/" + currentTalismanStruct.getId());
                         String itemString = "";
                         itemString += "**Slot:** " + (currentTalisman.getKey() + 1);
-                        itemString += "\n\n**Lore:**\n" + currentTalismanStruct.getLore().replace("§ka", "");
-                        if(currentTalismanStruct.getLore().contains("§ka")){
+                        itemString += "\n\n**Lore:**\n" + currentTalismanStruct.getLore();
+                        if (currentTalismanStruct.isRecombobulated()) {
                             itemString += "\n(Recombobulated)";
                         }
 
@@ -134,9 +134,9 @@ public class TalismanBagCommand extends Command {
                 paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles).setThumbnails(pageThumbnails));
 
                 int slotNumber = 1;
-                try{
+                try {
                     slotNumber = Integer.parseInt(slotNum.replace("slot-", ""));
-                }catch (Exception ignored){
+                } catch (Exception ignored) {
                 }
                 paginateBuilder.build().paginate(event.getChannel(), slotNumber);
                 return null;

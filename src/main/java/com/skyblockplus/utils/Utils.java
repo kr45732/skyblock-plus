@@ -65,6 +65,7 @@ public class Utils {
     private static JsonElement enchantsJson;
     private static JsonElement petNumsJson;
     private static JsonElement petsJson;
+    private static JsonElement reforgeStonesJson;
 
     public static void setApplicationSettings() {
         Properties appProps = new Properties();
@@ -110,6 +111,13 @@ public class Utils {
         }
     }
 
+    public static JsonElement getReforgeStonesJson() {
+        if (reforgeStonesJson == null) {
+            reforgeStonesJson = getJson("https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/reforgestones.json");
+        }
+
+        return reforgeStonesJson;
+    }
 
     public static JsonElement getPetJson() {
         if (petsJson == null) {
@@ -511,6 +519,8 @@ public class Utils {
         } else if (number >= 1000) {
             number = number >= 999950D ? 999949D : number;
             formattedNumber = df.format(number / 1000) + "K";
+        } else if (number < 1) {
+            formattedNumber = "0";
         }
         return formattedNumber;
     }
@@ -551,9 +561,9 @@ public class Utils {
     }
 
     public static DiscordInfoStruct getPlayerDiscordInfo(String username) {
-        JsonElement playerJson = getJson("https://api.hypixel.net/player?key=" + HYPIXEL_API_KEY + "&uuid=" + usernameToUuid(username).playerUuid);
-
         try {
+            JsonElement playerJson = getJson("https://api.hypixel.net/player?key=" + HYPIXEL_API_KEY + "&uuid=" + usernameToUuid(username).playerUuid);
+
             String discordTag = higherDepth(higherDepth(higherDepth(higherDepth(playerJson, "player"), "socialMedia"), "links"), "DISCORD").getAsString();
             String minecraftUsername = higherDepth(higherDepth(playerJson, "player"), "displayname").getAsString();
             String minecraftUuid = higherDepth(higherDepth(playerJson, "player"), "uuid").getAsString();
@@ -564,8 +574,8 @@ public class Utils {
         }
     }
 
-    public static String parseMinecraftCodes(String unformattedString) {
-        return unformattedString.replaceAll("§f|§a|§9|§5|§6|§d|§4|§c|§7|§8|§l|§o|§b|§2|§e|§r|§3|§1", "");
+    public static String parseMcCodes(String unformattedString) {
+        return unformattedString.replaceAll("§f|§a|§9|§5|§6|§d|§4|§c|§7|§8|§l|§o|§b|§2|§e|§r|§3|§1|§ka", "");
     }
 
     public static CustomPaginator.Builder defaultPaginator(EventWaiter waiter, User eventAuthor) {

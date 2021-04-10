@@ -50,24 +50,6 @@ public class Player {
         this.validPlayer = true;
     }
 
-    public String[] getAllProfileNames() {
-        List<String> profileNameList = new ArrayList<>();
-        if (this.profilesArray == null) {
-            this.profilesArray = higherDepth(
-                    getJson("https://api.hypixel.net/skyblock/profiles?key=" + HYPIXEL_API_KEY + "&uuid=" + playerUuid),
-                    "profiles").getAsJsonArray();
-        }
-
-        for (JsonElement profile : profilesArray) {
-            try {
-                profileNameList.add(higherDepth(profile, "cute_name").getAsString().toLowerCase());
-            } catch (Exception ignored) {
-            }
-        }
-
-        return profileNameList.toArray(new String[0]);
-    }
-
     public Player(String playerUuid, String playerUsername, JsonElement outerProfileJson, String playerGuildRank) {
         this.playerUuid = playerUuid;
         this.playerUsername = playerUsername;
@@ -118,6 +100,24 @@ public class Player {
         }
 
         this.validPlayer = true;
+    }
+
+    public String[] getAllProfileNames() {
+        List<String> profileNameList = new ArrayList<>();
+        if (this.profilesArray == null) {
+            this.profilesArray = higherDepth(
+                    getJson("https://api.hypixel.net/skyblock/profiles?key=" + HYPIXEL_API_KEY + "&uuid=" + playerUuid),
+                    "profiles").getAsJsonArray();
+        }
+
+        for (JsonElement profile : profilesArray) {
+            try {
+                profileNameList.add(higherDepth(profile, "cute_name").getAsString().toLowerCase());
+            } catch (Exception ignored) {
+            }
+        }
+
+        return profileNameList.toArray(new String[0]);
     }
 
     public long getStartingAmount() {
@@ -475,7 +475,7 @@ public class Player {
                 NBTCompound displayName = wardrobeFrames.getCompound(i).getCompound("tag.display");
                 if (displayName != null) {
                     wardrobeFramesMap.put(i,
-                            displayName.getString("Name", "Empty").replaceAll("§f|§a|§9|§5|§6|§d|§4|§c|§7", ""));
+                            parseMcCodes(displayName.getString("Name", "Empty")));
                 } else {
                     wardrobeFramesMap.put(i, "Empty");
                 }
@@ -587,113 +587,6 @@ public class Player {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
-    }
-
-    public Map<Integer, InvItemStruct> getTalismanBagMap() {
-        try {
-            String encodedTalismanContents = higherDepth(higherDepth(profileJson, "talisman_bag"), "data")
-                    .getAsString();
-            NBTCompound decodedTalismanContents = NBTReader.readBase64(encodedTalismanContents);
-
-            NBTList talismanFrames = decodedTalismanContents.getList(".i");
-            Map<Integer, InvItemStruct> talismanFramesMap = new HashMap<>();
-            for (int i = 0; i < talismanFrames.size(); i++) {
-                try {
-                    NBTCompound currentItem = talismanFrames.getCompound(i);
-                    if (!currentItem.isEmpty()) {
-                        InvItemStruct currentItemStruct = new InvItemStruct();
-                        currentItemStruct.setName(parseMinecraftCodes(currentItem.getString("tag.display.Name", "None")));
-                        currentItemStruct.setLore(parseMinecraftCodes(currentItem.getString("tag.display.Lore", "None").replace(", ", "\n").replace("[", "").replace("]", "")));
-                        currentItemStruct.setCount(Integer.parseInt(currentItem.getString("Count", "0").replace("b", " ")));
-                        currentItemStruct.setId(currentItem.getString("tag.ExtraAttributes.id", "None"));
-                        currentItemStruct.setCreationTimestamp(currentItem.getString("tag.ExtraAttributes.timestamp", "None"));
-
-                        talismanFramesMap.put(i, currentItemStruct);
-                        continue;
-                    }
-                } catch (Exception ignored) {
-                }
-                talismanFramesMap.put(i, null);
-            }
-
-            return talismanFramesMap;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return null;
-
-    }
-
-    public Map<Integer, InvItemStruct> getInventoryMap() {
-        try {
-            String encodedInvContents = higherDepth(higherDepth(profileJson, "inv_contents"), "data")
-                    .getAsString();
-            NBTCompound decodedInvContents = NBTReader.readBase64(encodedInvContents);
-
-            NBTList invFrames = decodedInvContents.getList(".i");
-            Map<Integer, InvItemStruct> invFramesMap = new HashMap<>();
-            for (int i = 0; i < invFrames.size(); i++) {
-                try {
-                    NBTCompound currentItem = invFrames.getCompound(i);
-                    if (!currentItem.isEmpty()) {
-                        InvItemStruct currentItemStruct = new InvItemStruct();
-                        currentItemStruct.setName(parseMinecraftCodes(currentItem.getString("tag.display.Name", "None")));
-                        currentItemStruct.setLore(parseMinecraftCodes(currentItem.getString("tag.display.Lore", "None").replace(", ", "\n").replace("[", "").replace("]", "")));
-                        currentItemStruct.setCount(Integer.parseInt(currentItem.getString("Count", "0").replace("b", " ")));
-                        currentItemStruct.setId(currentItem.getString("tag.ExtraAttributes.id", "None"));
-                        currentItemStruct.setCreationTimestamp(currentItem.getString("tag.ExtraAttributes.timestamp", "None"));
-
-                        invFramesMap.put(i, currentItemStruct);
-                        continue;
-                    }
-                } catch (Exception ignored) {
-                }
-                invFramesMap.put(i, null);
-            }
-
-            return invFramesMap;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    public Map<Integer, InvItemStruct> getInventoryArmorMap() {
-
-        try {
-            String encodedInvContents = higherDepth(higherDepth(profileJson, "inv_armor"), "data")
-                    .getAsString();
-            NBTCompound decodedInvContents = NBTReader.readBase64(encodedInvContents);
-
-            NBTList invFrames = decodedInvContents.getList(".i");
-            Map<Integer, InvItemStruct> invFramesMap = new HashMap<>();
-            for (int i = 0; i < invFrames.size(); i++) {
-                try {
-                    NBTCompound currentItem = invFrames.getCompound(i);
-                    if (!currentItem.isEmpty()) {
-                        InvItemStruct currentItemStruct = new InvItemStruct();
-                        currentItemStruct.setName(parseMinecraftCodes(currentItem.getString("tag.display.Name", "None")));
-                        currentItemStruct.setLore(parseMinecraftCodes(currentItem.getString("tag.display.Lore", "None").replace(", ", "\n").replace("[", "").replace("]", "")));
-                        currentItemStruct.setCount(Integer.parseInt(currentItem.getString("Count", "0").replace("b", " ")));
-                        currentItemStruct.setId(currentItem.getString("tag.ExtraAttributes.id", "None"));
-                        currentItemStruct.setCreationTimestamp(currentItem.getString("tag.ExtraAttributes.timestamp", "None"));
-
-                        invFramesMap.put(invFrames.size() - i, currentItemStruct);
-                        continue;
-                    }
-                } catch (Exception ignored) {
-                }
-                invFramesMap.put(i, null);
-            }
-
-            return invFramesMap;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
         return null;
     }
 
@@ -1445,5 +1338,118 @@ public class Player {
             }
         }
         return totalSkillXp;
+    }
+
+    /* Inventory */
+    public Map<Integer, InvItemStruct> getGenericInventoryMap(String encodedContents) {
+        try {
+            NBTCompound parsedContents = NBTReader.readBase64(encodedContents);
+            NBTList items = parsedContents.getList(".i");
+            Map<Integer, InvItemStruct> itemsMap = new HashMap<>();
+
+            for (int i = 0; i < items.size(); i++) {
+                try {
+                    NBTCompound item = items.getCompound(i);
+                    if (!item.isEmpty()) {
+                        InvItemStruct itemInfo = new InvItemStruct();
+                        itemInfo.setName(parseMcCodes(item.getString("tag.display.Name", "None")));
+                        itemInfo.setLore(parseMcCodes(item.getString("tag.display.Lore", "None").replace(", ", "\n").replace("[", "").replace("]", "")));
+                        itemInfo.setCount(Integer.parseInt(item.getString("Count", "0").replace("b", " ")));
+                        itemInfo.setId(item.getString("tag.ExtraAttributes.id", "None"));
+                        itemInfo.setCreationTimestamp(item.getString("tag.ExtraAttributes.timestamp", "None"));
+                        itemInfo.setHbpCount(item.getInt("tag.ExtraAttributes.hot_potato_count", 0));
+                        itemInfo.setRecombobulated(item.getInt("tag.ExtraAttributes.rarity_upgrades", 0) == 1);
+                        itemInfo.setModifier(item.getString("tag.ExtraAttributes.modifier", "None"));
+
+                        try {
+                            NBTCompound enchants = item.getCompound("tag.ExtraAttributes.enchantments");
+                            List<String> enchantsList = new ArrayList<>();
+                            for (Map.Entry<String, Object> enchant : enchants.entrySet()) {
+                                enchantsList.add(enchant.getKey() + ";" + enchant.getValue());
+                            }
+                            itemInfo.setEnchantsFormatted(enchantsList);
+                        } catch (Exception ignored) {
+                        }
+
+                        try {
+                            NBTList necronBladeScrolls = item.getList("tag.ExtraAttributes.ability_scroll");
+                            for (Object scroll : necronBladeScrolls) {
+                                try {
+                                    itemInfo.addExtraValue("" + scroll);
+                                } catch (Exception ignored) {
+                                }
+                            }
+                        } catch (Exception ignored) {
+                        }
+
+                        if (item.getInt("tag.ExtraAttributes.wood_singularity_count", 0) == 1) {
+                            itemInfo.addExtraValue("WOOD_SINGULARITY");
+                        }
+
+                        itemsMap.put(i, itemInfo);
+                        continue;
+                    }
+                } catch (Exception ignored) {
+                }
+                itemsMap.put(i, null);
+            }
+
+            return itemsMap;
+        } catch (Exception ignored) {
+        }
+
+        return null;
+    }
+
+    public Map<Integer, InvItemStruct> getInventoryMap() {
+        String contents = higherDepth(higherDepth(profileJson, "inv_contents"), "data")
+                .getAsString();
+        return getGenericInventoryMap(contents);
+    }
+
+    public Map<Integer, InvItemStruct> getTalismanBagMap() {
+        String contents = higherDepth(higherDepth(profileJson, "talisman_bag"), "data")
+                .getAsString();
+        return getGenericInventoryMap(contents);
+    }
+
+    public Map<Integer, InvItemStruct> getInventoryArmorMap() {
+        String contents = higherDepth(higherDepth(profileJson, "inv_armor"), "data")
+                .getAsString();
+        return getGenericInventoryMap(contents);
+    }
+
+    public Map<Integer, InvItemStruct> getWardrobeMap() {
+        String contents = higherDepth(higherDepth(profileJson, "wardrobe_contents"), "data")
+                .getAsString();
+        return getGenericInventoryMap(contents);
+    }
+
+    public List<String> getPetsMapFormatted() {
+        JsonArray petsArr = getPets();
+
+        List<String> petsNameFormatted = new ArrayList<>();
+
+        Map<String, String> rarityMap = new HashMap<>();
+        rarityMap.put("LEGENDARY", ";4");
+        rarityMap.put("EPIC", ";3");
+        rarityMap.put("RARE", ";2");
+        rarityMap.put("UNCOMMON", ";1");
+        rarityMap.put("COMMON", ";0");
+
+        for (JsonElement pet : petsArr) {
+            try {
+                petsNameFormatted.add(higherDepth(pet, "type").getAsString() + rarityMap.get(higherDepth(pet, "tier").getAsString()));
+            } catch (Exception ignored) {
+            }
+        }
+
+        return petsNameFormatted;
+    }
+
+    public Map<Integer, InvItemStruct> getEnderChestMap() {
+        String contents = higherDepth(higherDepth(profileJson, "ender_chest_contents"), "data")
+                .getAsString();
+        return getGenericInventoryMap(contents);
     }
 }
