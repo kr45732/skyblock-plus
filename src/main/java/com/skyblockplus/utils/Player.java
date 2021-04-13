@@ -10,7 +10,6 @@ import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
 import me.nullicorn.nedit.type.NBTList;
 import net.dv8tion.jda.api.EmbedBuilder;
-import org.springframework.util.StringUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -1118,18 +1117,43 @@ public class Player {
     }
 
     public String getNecronBlade() {
-        if (getInventory()[0].contains("hyperion") || getInventory()[1].contains("hyperion")) {
-            return "\n**Hyperion:** yes";
-        } else if (getInventory()[0].contains("valkyrie") || getInventory()[1].contains("valkyrie")) {
-            return "\n**Valkyrie:** yes";
+        Map<Integer, InvItemStruct> inventoryMap =  getInventoryMap();
+        for(InvItemStruct item: inventoryMap.values()){
+            if(!item.getBackpackItems().isEmpty()){
+                List<InvItemStruct> backpackItems = item.getBackpackItems();
+                for(InvItemStruct backpackItem: backpackItems){
+                    if(backpackItem.getId().equalsIgnoreCase("hyperion")){
+                        return "\n**Hyperion:** yes";
+                    }else if(backpackItem.getId().equalsIgnoreCase("valkyrie")){
+                        return "\n**Valkyrie:** yes";
+                    }
+                }
+            }else{
+                if(item.getId().equalsIgnoreCase("hyperion")){
+                    return "\n**Hyperion:** yes";
+                }else if(item.getId().equalsIgnoreCase("valkyrie")){
+                    return "\n**Valkyrie:** yes";
+                }
+            }
         }
 
-        List<String[]> playerEnderChest = getEnderChest();
-        for (String[] page : playerEnderChest) {
-            if (page[0].contains("hyperion") || page[1].contains("hyperion")) {
-                return "\n**Hyperion:** yes";
-            } else if (page[0].contains("valkyrie") || page[1].contains("valkyrie")) {
-                return "\n**Valkyrie:** yes";
+        Map<Integer, InvItemStruct> enderChestMap =  getEnderChestMap();
+        for(InvItemStruct item: enderChestMap.values()){
+            if(!item.getBackpackItems().isEmpty()){
+                List<InvItemStruct> backpackItems = item.getBackpackItems();
+                for(InvItemStruct backpackItem: backpackItems){
+                    if(backpackItem.getId().equalsIgnoreCase("hyperion")){
+                        return "\n**Hyperion:** yes";
+                    }else if(backpackItem.getId().equalsIgnoreCase("valkyrie")){
+                        return "\n**Valkyrie:** yes";
+                    }
+                }
+            }else{
+                if(item.getId().equalsIgnoreCase("hyperion")){
+                    return "\n**Hyperion:** yes";
+                }else if(item.getId().equalsIgnoreCase("valkyrie")){
+                    return "\n**Valkyrie:** yes";
+                }
             }
         }
 
@@ -1148,13 +1172,40 @@ public class Player {
     }
 
     public int getBonemerang() {
-        int boneCount = StringUtils.countOccurrencesOf(getInventory()[0], "bone_boomerang")
-                + StringUtils.countOccurrencesOf(getInventory()[1], "bone_boomerang");
-        List<String[]> playerEnderChest = getEnderChest();
-        for (String[] page : playerEnderChest) {
-            boneCount += StringUtils.countOccurrencesOf(page[0], "bone_boomerang")
-                    + StringUtils.countOccurrencesOf(page[1], "bone_boomerang");
+        int boneCount = 0;
+
+        Map<Integer, InvItemStruct> inventoryMap =  getInventoryMap();
+        for(InvItemStruct item: inventoryMap.values()){
+            if(!item.getBackpackItems().isEmpty()){
+                List<InvItemStruct> backpackItems = item.getBackpackItems();
+                for(InvItemStruct backpackItem: backpackItems){
+                    if(backpackItem.getId().equalsIgnoreCase("bone_boomerang")) {
+                        boneCount ++;
+                    }
+                }
+            }else{
+                if(item.getId().equalsIgnoreCase("bone_boomerang")) {
+                    boneCount ++;
+                }
+            }
         }
+
+        Map<Integer, InvItemStruct> enderChestMap =  getEnderChestMap();
+        for(InvItemStruct item: enderChestMap.values()){
+            if(!item.getBackpackItems().isEmpty()){
+                List<InvItemStruct> backpackItems = item.getBackpackItems();
+                for(InvItemStruct backpackItem: backpackItems){
+                    if(backpackItem.getId().equalsIgnoreCase("bone_boomerang")) {
+                        boneCount ++;
+                    }
+                }
+            }else{
+                if(item.getId().equalsIgnoreCase("bone_boomerang")) {
+                    boneCount ++;
+                }
+            }
+        }
+
         return boneCount;
     }
 
@@ -1275,10 +1326,6 @@ public class Player {
         } catch (Exception ignored) {
         }
         return null;
-    }
-
-    public long getHighestCriticalDamage() {
-        return higherDepth(higherDepth(profileJson, "stats"), "highest_critical_damage").getAsLong();
     }
 
     public int getPetScore() {
@@ -1410,9 +1457,9 @@ public class Player {
     }
 
     public Map<Integer, InvItemStruct> getInventoryMap() {
-        String contents = higherDepth(higherDepth(profileJson, "inv_contents"), "data")
-                .getAsString();
         try {
+            String contents = higherDepth(higherDepth(profileJson, "inv_contents"), "data")
+                    .getAsString();
             NBTCompound parsedContents = NBTReader.readBase64(contents);
             return getGenericInventoryMap(parsedContents);
         } catch (IOException ignored) {
@@ -1421,9 +1468,9 @@ public class Player {
     }
 
     public Map<Integer, InvItemStruct> getTalismanBagMap() {
-        String contents = higherDepth(higherDepth(profileJson, "talisman_bag"), "data")
-                .getAsString();
         try {
+            String contents = higherDepth(higherDepth(profileJson, "talisman_bag"), "data")
+                    .getAsString();
             NBTCompound parsedContents = NBTReader.readBase64(contents);
             return getGenericInventoryMap(parsedContents);
         } catch (IOException ignored) {
@@ -1432,9 +1479,9 @@ public class Player {
     }
 
     public Map<Integer, InvItemStruct> getInventoryArmorMap() {
-        String contents = higherDepth(higherDepth(profileJson, "inv_armor"), "data")
-                .getAsString();
         try {
+            String contents = higherDepth(higherDepth(profileJson, "inv_armor"), "data")
+                    .getAsString();
             NBTCompound parsedContents = NBTReader.readBase64(contents);
             return getGenericInventoryMap(parsedContents);
         } catch (IOException ignored) {
@@ -1443,9 +1490,9 @@ public class Player {
     }
 
     public Map<Integer, InvItemStruct> getWardrobeMap() {
-        String contents = higherDepth(higherDepth(profileJson, "wardrobe_contents"), "data")
-                .getAsString();
         try {
+            String contents = higherDepth(higherDepth(profileJson, "wardrobe_contents"), "data")
+                    .getAsString();
             NBTCompound parsedContents = NBTReader.readBase64(contents);
             return getGenericInventoryMap(parsedContents);
         } catch (IOException ignored) {
@@ -1482,9 +1529,9 @@ public class Player {
     }
 
     public Map<Integer, InvItemStruct> getEnderChestMap() {
-        String contents = higherDepth(higherDepth(profileJson, "ender_chest_contents"), "data")
-                .getAsString();
         try {
+            String contents = higherDepth(higherDepth(profileJson, "ender_chest_contents"), "data")
+                    .getAsString();
             NBTCompound parsedContents = NBTReader.readBase64(contents);
             return getGenericInventoryMap(parsedContents);
         } catch (IOException ignored) {

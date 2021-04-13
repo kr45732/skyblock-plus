@@ -1,5 +1,6 @@
 package com.skyblockplus.miscellaneous;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -17,6 +18,8 @@ public class NetworthCommand extends Command {
     private JsonElement lowestBinJson;
     private JsonElement averageAuctionJson;
     private JsonElement bazaarJson;
+    private JsonArray sbzPrices;
+    private int failedCount;
 
     public NetworthCommand() {
         this.name = "networth";
@@ -56,6 +59,8 @@ public class NetworthCommand extends Command {
             lowestBinJson = getJson("https://moulberry.codes/lowestbin.json");
             averageAuctionJson = getJson("http://moulberry.codes/auction_averages/3day.json");
             bazaarJson = higherDepth(getJson("https://api.hypixel.net/skyblock/bazaar"), "products");
+            sbzPrices = getJson("https://raw.githubusercontent.com/skyblockz/pricecheckbot/master/data.json").getAsJsonArray();
+            failedCount = 0;
 
             double bankBalance = player.getBankBalance();
             double purseCoins = player.getPurseCoins();
@@ -107,6 +112,9 @@ public class NetworthCommand extends Command {
             eb.addField("Wardrobe", simplifyNumber(wardrobeTotal), true);
             eb.addField("Pets", simplifyNumber(petsTotal), true);
             eb.addField("Ender Chest", simplifyNumber(enderChestTotal), true);
+            if(failedCount != 0){
+                eb.appendDescription("\nUnable to get " + failedCount + " items");
+            }
 
             return eb;
         }
@@ -159,7 +167,7 @@ public class NetworthCommand extends Command {
             List<String> enchants = item.getEnchantsFormatted();
             for (String enchant : enchants) {
                 try {
-                    enchantsExtras += getLowestPrice(enchant.toUpperCase());
+                    enchantsExtras += getLowestPriceEnchant(enchant.toUpperCase());
                 } catch (Exception ignored) {
                 }
             }
@@ -208,6 +216,36 @@ public class NetworthCommand extends Command {
         return 0;
     }
 
+    public double getLowestPriceEnchant(String enchantId) {
+        double lowestBin = -1;
+        double averageAuction = -1;
+        String enchantName = enchantId.split(";")[0];
+        int enchantLevel = Integer.parseInt(enchantId.split(";")[1]);
+
+        for(int i=enchantLevel; i>=1 ;i--){
+            try {
+                lowestBin = higherDepth(lowestBinJson, enchantName + ";" + i).getAsDouble();
+            } catch (Exception ignored) {
+            }
+
+            try {
+                JsonElement avgInfo = higherDepth(averageAuctionJson, enchantName + ";" + i);
+                averageAuction = higherDepth(avgInfo, "clean_price") != null ? higherDepth(avgInfo, "clean_price").getAsDouble() : higherDepth(avgInfo, "price").getAsDouble();
+            } catch (Exception ignored) {
+            }
+
+            if (lowestBin == -1 && averageAuction != -1) {
+                return Math.pow(2, enchantLevel-i) * averageAuction;
+            } else if (lowestBin != -1 && averageAuction == -1) {
+                return Math.pow(2, enchantLevel-i) * lowestBin;
+            } else if (lowestBin != -1 && averageAuction != -1) {
+                return Math.pow(2, enchantLevel-i) * Math.min(lowestBin, averageAuction);
+            }
+        }
+
+        return 0;
+    }
+
     public double getLowestPrice(String itemId) {
         double lowestBin = -1;
         double averageAuction = -1;
@@ -233,10 +271,20 @@ public class NetworthCommand extends Command {
         }
 
         try {
-            return higherDepth(bazaarJson, itemId).getAsDouble();
+            return higherDepth(higherDepth(higherDepth(bazaarJson, itemId), "quick_status"), "sellPrice").getAsDouble();
         } catch (Exception ignored) {
         }
 
+        try{
+            for(JsonElement itemPrice:sbzPrices){
+                if(higherDepth(itemPrice, "name").getAsString().equalsIgnoreCase(itemId)){
+                    return higherDepth(itemPrice, "low").getAsDouble();
+                }
+            }
+        }catch (Exception ignored){
+        }
+
+        failedCount ++;
         return 0;
     }
 }
