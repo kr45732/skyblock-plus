@@ -215,7 +215,7 @@ public class HelpCommand extends Command {
                         "settings apply waitlist_message [message]")
                         + generateHelp("Message that will be sent if applicant is denied",
                         "settings apply deny_message [message]")
-                        + generateHelp("Requirement that applicant must meet. Type can be slayer, skills, catacombs, or average. Value can be an integer or none",
+                        + generateHelp("Requirement that applicant must meet. Type can be __slayer__, __skills__, __catacombs__, or __weight__. Value can be an integer or none",
                         "settings apply requirements [type] [value]", "settings apply reqs [type] [value]")
                 );
 

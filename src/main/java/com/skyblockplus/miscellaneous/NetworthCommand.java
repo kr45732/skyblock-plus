@@ -284,6 +284,8 @@ public class NetworthCommand extends Command {
         }catch (Exception ignored){
         }
 
+        System.out.println(itemId);
+
         failedCount ++;
         return 0;
     }
