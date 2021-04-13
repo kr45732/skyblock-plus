@@ -3,8 +3,9 @@ package com.skyblockplus.utils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.skyblockplus.inventory.InvItemStruct;
-import com.skyblockplus.skills.SkillsStruct;
+import com.skyblockplus.utils.structs.ArmorStruct;
+import com.skyblockplus.utils.structs.InvItemStruct;
+import com.skyblockplus.utils.structs.SkillsStruct;
 import com.skyblockplus.weight.Weight;
 import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
@@ -1117,41 +1118,41 @@ public class Player {
     }
 
     public String getNecronBlade() {
-        Map<Integer, InvItemStruct> inventoryMap =  getInventoryMap();
-        for(InvItemStruct item: inventoryMap.values()){
-            if(!item.getBackpackItems().isEmpty()){
+        Map<Integer, InvItemStruct> inventoryMap = getInventoryMap();
+        for (InvItemStruct item : inventoryMap.values()) {
+            if (!item.getBackpackItems().isEmpty()) {
                 List<InvItemStruct> backpackItems = item.getBackpackItems();
-                for(InvItemStruct backpackItem: backpackItems){
-                    if(backpackItem.getId().equalsIgnoreCase("hyperion")){
+                for (InvItemStruct backpackItem : backpackItems) {
+                    if (backpackItem.getId().equalsIgnoreCase("hyperion")) {
                         return "\n**Hyperion:** yes";
-                    }else if(backpackItem.getId().equalsIgnoreCase("valkyrie")){
+                    } else if (backpackItem.getId().equalsIgnoreCase("valkyrie")) {
                         return "\n**Valkyrie:** yes";
                     }
                 }
-            }else{
-                if(item.getId().equalsIgnoreCase("hyperion")){
+            } else {
+                if (item.getId().equalsIgnoreCase("hyperion")) {
                     return "\n**Hyperion:** yes";
-                }else if(item.getId().equalsIgnoreCase("valkyrie")){
+                } else if (item.getId().equalsIgnoreCase("valkyrie")) {
                     return "\n**Valkyrie:** yes";
                 }
             }
         }
 
-        Map<Integer, InvItemStruct> enderChestMap =  getEnderChestMap();
-        for(InvItemStruct item: enderChestMap.values()){
-            if(!item.getBackpackItems().isEmpty()){
+        Map<Integer, InvItemStruct> enderChestMap = getEnderChestMap();
+        for (InvItemStruct item : enderChestMap.values()) {
+            if (!item.getBackpackItems().isEmpty()) {
                 List<InvItemStruct> backpackItems = item.getBackpackItems();
-                for(InvItemStruct backpackItem: backpackItems){
-                    if(backpackItem.getId().equalsIgnoreCase("hyperion")){
+                for (InvItemStruct backpackItem : backpackItems) {
+                    if (backpackItem.getId().equalsIgnoreCase("hyperion")) {
                         return "\n**Hyperion:** yes";
-                    }else if(backpackItem.getId().equalsIgnoreCase("valkyrie")){
+                    } else if (backpackItem.getId().equalsIgnoreCase("valkyrie")) {
                         return "\n**Valkyrie:** yes";
                     }
                 }
-            }else{
-                if(item.getId().equalsIgnoreCase("hyperion")){
+            } else {
+                if (item.getId().equalsIgnoreCase("hyperion")) {
                     return "\n**Hyperion:** yes";
-                }else if(item.getId().equalsIgnoreCase("valkyrie")){
+                } else if (item.getId().equalsIgnoreCase("valkyrie")) {
                     return "\n**Valkyrie:** yes";
                 }
             }
@@ -1174,34 +1175,34 @@ public class Player {
     public int getBonemerang() {
         int boneCount = 0;
 
-        Map<Integer, InvItemStruct> inventoryMap =  getInventoryMap();
-        for(InvItemStruct item: inventoryMap.values()){
-            if(!item.getBackpackItems().isEmpty()){
+        Map<Integer, InvItemStruct> inventoryMap = getInventoryMap();
+        for (InvItemStruct item : inventoryMap.values()) {
+            if (!item.getBackpackItems().isEmpty()) {
                 List<InvItemStruct> backpackItems = item.getBackpackItems();
-                for(InvItemStruct backpackItem: backpackItems){
-                    if(backpackItem.getId().equalsIgnoreCase("bone_boomerang")) {
-                        boneCount ++;
+                for (InvItemStruct backpackItem : backpackItems) {
+                    if (backpackItem.getId().equalsIgnoreCase("bone_boomerang")) {
+                        boneCount++;
                     }
                 }
-            }else{
-                if(item.getId().equalsIgnoreCase("bone_boomerang")) {
-                    boneCount ++;
+            } else {
+                if (item.getId().equalsIgnoreCase("bone_boomerang")) {
+                    boneCount++;
                 }
             }
         }
 
-        Map<Integer, InvItemStruct> enderChestMap =  getEnderChestMap();
-        for(InvItemStruct item: enderChestMap.values()){
-            if(!item.getBackpackItems().isEmpty()){
+        Map<Integer, InvItemStruct> enderChestMap = getEnderChestMap();
+        for (InvItemStruct item : enderChestMap.values()) {
+            if (!item.getBackpackItems().isEmpty()) {
                 List<InvItemStruct> backpackItems = item.getBackpackItems();
-                for(InvItemStruct backpackItem: backpackItems){
-                    if(backpackItem.getId().equalsIgnoreCase("bone_boomerang")) {
-                        boneCount ++;
+                for (InvItemStruct backpackItem : backpackItems) {
+                    if (backpackItem.getId().equalsIgnoreCase("bone_boomerang")) {
+                        boneCount++;
                     }
                 }
-            }else{
-                if(item.getId().equalsIgnoreCase("bone_boomerang")) {
-                    boneCount ++;
+            } else {
+                if (item.getId().equalsIgnoreCase("bone_boomerang")) {
+                    boneCount++;
                 }
             }
         }

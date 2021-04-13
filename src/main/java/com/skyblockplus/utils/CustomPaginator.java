@@ -2,6 +2,7 @@ package com.skyblockplus.utils;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.jagrosh.jdautilities.menu.Menu;
+import com.skyblockplus.utils.structs.PaginatorExtras;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;

@@ -1,4 +1,4 @@
-package com.skyblockplus.inventory;
+package com.skyblockplus.utils.structs;
 
 import lombok.Data;
 

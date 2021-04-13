@@ -10,7 +10,9 @@ import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.skyblockplus.Main.*;
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.utils.MainClassUtils.getApplyGuildUsersCache;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.Utils.higherDepth;
 

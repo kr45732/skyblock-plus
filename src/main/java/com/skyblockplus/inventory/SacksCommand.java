@@ -4,7 +4,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.utils.CustomPaginator;
-import com.skyblockplus.utils.PaginatorExtras;
+import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;

@@ -1,4 +1,4 @@
-package com.skyblockplus.skills;
+package com.skyblockplus.utils.structs;
 
 public class SkillsStruct {
     public final String skillName;

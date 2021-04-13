@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
-import com.skyblockplus.utils.DiscordInfoStruct;
+import com.skyblockplus.utils.structs.DiscordInfoStruct;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;

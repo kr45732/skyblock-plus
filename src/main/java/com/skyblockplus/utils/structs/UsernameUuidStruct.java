@@ -1,4 +1,4 @@
-package com.skyblockplus.utils;
+package com.skyblockplus.utils.structs;
 
 public class UsernameUuidStruct {
     public final String playerUsername;

@@ -1,5 +1,6 @@
 package com.skyblockplus.timeout;
 
+import com.skyblockplus.utils.structs.MessageTimeoutStruct;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;

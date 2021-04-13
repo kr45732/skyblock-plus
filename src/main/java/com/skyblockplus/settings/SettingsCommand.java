@@ -13,7 +13,7 @@ import com.skyblockplus.api.discordserversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.discordserversettings.automatedroles.RoleObject;
 import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSettingsModel;
 import com.skyblockplus.utils.CustomPaginator;
-import com.skyblockplus.utils.PaginatorExtras;
+import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.vdurmont.emoji.EmojiParser;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;

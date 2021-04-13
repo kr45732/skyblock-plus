@@ -1,4 +1,4 @@
-package com.skyblockplus.utils;
+package com.skyblockplus.utils.structs;
 
 import java.util.ArrayList;
 import java.util.Arrays;

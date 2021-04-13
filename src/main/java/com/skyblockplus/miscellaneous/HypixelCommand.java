@@ -3,7 +3,7 @@ package com.skyblockplus.miscellaneous;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.utils.UsernameUuidStruct;
+import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 

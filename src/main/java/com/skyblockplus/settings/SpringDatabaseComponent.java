@@ -67,6 +67,10 @@ public class SpringDatabaseComponent {
         return gson.toJsonTree(linkedAccountService.getAllLinkedAccounts());
     }
 
+    public List<LinkedAccountModel> getLinkedUsersList() {
+        return linkedAccountService.getAllLinkedAccounts();
+    }
+
     public List<ServerSettingsModel> getAllServerSettings() {
         return settingsService.getAllServerSettings();
     }

@@ -5,6 +5,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.skyblockplus.utils.structs.DiscordInfoStruct;
+import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -556,6 +558,18 @@ public class Utils {
 
         EmbedBuilder eb = defaultEmbed(null);
         eb.setAuthor(guild.getName() + " (" + guild.getId() + ")", null, guild.getIconUrl());
+        eb.setDescription(commandInput);
+        botLogChannel.sendMessage(eb.build()).queue();
+    }
+
+    public static void logCommand(String commandInput) {
+        System.out.println(commandInput);
+
+        if (botLogChannel == null) {
+            botLogChannel = jda.getGuildById("796790757947867156").getTextChannelById("818469899848515624");
+        }
+
+        EmbedBuilder eb = defaultEmbed(null);
         eb.setDescription(commandInput);
         botLogChannel.sendMessage(eb.build()).queue();
     }

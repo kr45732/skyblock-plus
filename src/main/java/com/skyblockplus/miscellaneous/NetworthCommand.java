@@ -4,7 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.inventory.InvItemStruct;
+import com.skyblockplus.utils.structs.InvItemStruct;
 import com.skyblockplus.utils.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -112,7 +112,7 @@ public class NetworthCommand extends Command {
             eb.addField("Wardrobe", simplifyNumber(wardrobeTotal), true);
             eb.addField("Pets", simplifyNumber(petsTotal), true);
             eb.addField("Ender Chest", simplifyNumber(enderChestTotal), true);
-            if(failedCount != 0){
+            if (failedCount != 0) {
                 eb.appendDescription("\nUnable to get " + failedCount + " items");
             }
 
@@ -222,7 +222,7 @@ public class NetworthCommand extends Command {
         String enchantName = enchantId.split(";")[0];
         int enchantLevel = Integer.parseInt(enchantId.split(";")[1]);
 
-        for(int i=enchantLevel; i>=1 ;i--){
+        for (int i = enchantLevel; i >= 1; i--) {
             try {
                 lowestBin = higherDepth(lowestBinJson, enchantName + ";" + i).getAsDouble();
             } catch (Exception ignored) {
@@ -235,11 +235,11 @@ public class NetworthCommand extends Command {
             }
 
             if (lowestBin == -1 && averageAuction != -1) {
-                return Math.pow(2, enchantLevel-i) * averageAuction;
+                return Math.pow(2, enchantLevel - i) * averageAuction;
             } else if (lowestBin != -1 && averageAuction == -1) {
-                return Math.pow(2, enchantLevel-i) * lowestBin;
+                return Math.pow(2, enchantLevel - i) * lowestBin;
             } else if (lowestBin != -1 && averageAuction != -1) {
-                return Math.pow(2, enchantLevel-i) * Math.min(lowestBin, averageAuction);
+                return Math.pow(2, enchantLevel - i) * Math.min(lowestBin, averageAuction);
             }
         }
 
@@ -275,18 +275,18 @@ public class NetworthCommand extends Command {
         } catch (Exception ignored) {
         }
 
-        try{
-            for(JsonElement itemPrice:sbzPrices){
-                if(higherDepth(itemPrice, "name").getAsString().equalsIgnoreCase(itemId)){
+        try {
+            for (JsonElement itemPrice : sbzPrices) {
+                if (higherDepth(itemPrice, "name").getAsString().equalsIgnoreCase(itemId)) {
                     return higherDepth(itemPrice, "low").getAsDouble();
                 }
             }
-        }catch (Exception ignored){
+        } catch (Exception ignored) {
         }
 
         System.out.println(itemId);
 
-        failedCount ++;
+        failedCount++;
         return 0;
     }
 }

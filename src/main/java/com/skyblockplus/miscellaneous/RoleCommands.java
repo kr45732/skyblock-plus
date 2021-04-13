@@ -6,7 +6,7 @@ import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.utils.DiscordInfoStruct;
+import com.skyblockplus.utils.structs.DiscordInfoStruct;
 import com.skyblockplus.utils.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;

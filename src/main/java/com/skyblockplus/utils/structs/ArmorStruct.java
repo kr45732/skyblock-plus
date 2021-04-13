@@ -1,4 +1,4 @@
-package com.skyblockplus.utils;
+package com.skyblockplus.utils.structs;
 
 public class ArmorStruct {
     private String helmet;
