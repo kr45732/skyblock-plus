@@ -24,6 +24,8 @@ public class ApplyUser implements Serializable {
     private final String applicationChannelId;
     private final String currentSettingsString;
     private final String guildId;
+    private final String[] profileNames;
+    private final List<String> profileNameEmojis = new ArrayList<>();
     private String reactMessageId;
     private int state = 0;
     private String staffChannelId;
@@ -35,8 +37,6 @@ public class ApplyUser implements Serializable {
     private String playerUsername;
     private String ironmanSymbol;
     private String playerProfileName;
-    private final String[] profileNames;
-    private final List<String> profileNameEmojis = new ArrayList<>();
 
     public ApplyUser(MessageReactionAddEvent event, JsonElement currentSettings, String playerUsername) {
         User applyingUser = event.getUser();

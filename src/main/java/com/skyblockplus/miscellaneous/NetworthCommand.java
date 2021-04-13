@@ -8,10 +8,8 @@ import com.skyblockplus.utils.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import static com.skyblockplus.utils.Utils.*;
 
@@ -19,7 +17,6 @@ public class NetworthCommand extends Command {
     private JsonElement lowestBinJson;
     private JsonElement averageAuctionJson;
     private JsonElement bazaarJson;
-    private Map<Double, String> test = new TreeMap<>();
 
     public NetworthCommand() {
         this.name = "networth";
@@ -183,11 +180,12 @@ public class NetworthCommand extends Command {
         } catch (Exception ignored) {
         }
 
-        try{
+        try {
+            List<InvItemStruct> backpackItems = item.getBackpackItems();
             for (InvItemStruct backpackItem : backpackItems) {
                 backpackExtras += calculateItemPrice(backpackItem);
             }
-        }catch (Exception ignored){
+        } catch (Exception ignored) {
         }
 
         return itemCount * (itemCost + recombobulatedExtra + hbpExtras + enchantsExtras + fumingExtras + reforgeExtras + miscExtras + backpackExtras);

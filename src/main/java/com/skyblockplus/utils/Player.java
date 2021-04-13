@@ -10,7 +10,6 @@ import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
 import me.nullicorn.nedit.type.NBTList;
 import net.dv8tion.jda.api.EmbedBuilder;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.util.StringUtils;
 
 import java.io.ByteArrayInputStream;
@@ -1388,11 +1387,11 @@ public class Player {
                             itemInfo.addExtraValue("WOOD_SINGULARITY");
                         }
 
-                        try{
+                        try {
                             byte[] backpackContents = item.getByteArray("tag.ExtraAttributes." + itemInfo.getId().toLowerCase() + "_data");
                             NBTCompound parsedContentsBackpack = NBTReader.read(new ByteArrayInputStream(backpackContents));
                             itemInfo.setBackpackItems(getGenericInventoryMap(parsedContentsBackpack).values());
-                        }catch (Exception ignored){
+                        } catch (Exception ignored) {
                         }
 
                         itemsMap.put(i, itemInfo);
@@ -1414,7 +1413,7 @@ public class Player {
         String contents = higherDepth(higherDepth(profileJson, "inv_contents"), "data")
                 .getAsString();
         try {
-            NBTCompound parsedContents =NBTReader.readBase64(contents);
+            NBTCompound parsedContents = NBTReader.readBase64(contents);
             return getGenericInventoryMap(parsedContents);
         } catch (IOException ignored) {
         }
@@ -1425,7 +1424,7 @@ public class Player {
         String contents = higherDepth(higherDepth(profileJson, "talisman_bag"), "data")
                 .getAsString();
         try {
-            NBTCompound parsedContents =NBTReader.readBase64(contents);
+            NBTCompound parsedContents = NBTReader.readBase64(contents);
             return getGenericInventoryMap(parsedContents);
         } catch (IOException ignored) {
         }
@@ -1436,7 +1435,7 @@ public class Player {
         String contents = higherDepth(higherDepth(profileJson, "inv_armor"), "data")
                 .getAsString();
         try {
-            NBTCompound parsedContents =NBTReader.readBase64(contents);
+            NBTCompound parsedContents = NBTReader.readBase64(contents);
             return getGenericInventoryMap(parsedContents);
         } catch (IOException ignored) {
         }
@@ -1447,7 +1446,7 @@ public class Player {
         String contents = higherDepth(higherDepth(profileJson, "wardrobe_contents"), "data")
                 .getAsString();
         try {
-            NBTCompound parsedContents =NBTReader.readBase64(contents);
+            NBTCompound parsedContents = NBTReader.readBase64(contents);
             return getGenericInventoryMap(parsedContents);
         } catch (IOException ignored) {
         }
@@ -1471,7 +1470,7 @@ public class Player {
                 InvItemStruct invItemStruct = new InvItemStruct();
                 invItemStruct.setName(capitalizeString(higherDepth(pet, "type").getAsString().toLowerCase()));
                 invItemStruct.setId(higherDepth(pet, "type").getAsString() + rarityMap.get(higherDepth(pet, "tier").getAsString()));
-                if(higherDepth(pet, "heldItem") != null){
+                if (higherDepth(pet, "heldItem") != null) {
                     invItemStruct.addExtraValue(higherDepth(pet, "heldItem").getAsString());
                 }
                 petsNameFormatted.add(invItemStruct);
@@ -1486,7 +1485,7 @@ public class Player {
         String contents = higherDepth(higherDepth(profileJson, "ender_chest_contents"), "data")
                 .getAsString();
         try {
-            NBTCompound parsedContents =NBTReader.readBase64(contents);
+            NBTCompound parsedContents = NBTReader.readBase64(contents);
             return getGenericInventoryMap(parsedContents);
         } catch (IOException ignored) {
         }
