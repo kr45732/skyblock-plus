@@ -99,10 +99,6 @@ public class NetworthCommand extends Command {
                 enderChestTotal += calculateItemPrice(item);
             }
 
-            for(Map.Entry<Double, String> test1:test.entrySet()){
-                System.out.println(simplifyNumber(test1.getKey()) + " - " + test1.getValue());
-            }
-
             double totalNetworth = bankBalance + purseCoins + invTotal + talismanTotal + invArmor + wardrobeTotal + petsTotal + enderChestTotal;
 
             eb.setDescription("Total Networth: " + simplifyNumber(totalNetworth));
