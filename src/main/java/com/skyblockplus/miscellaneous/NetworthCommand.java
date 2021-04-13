@@ -19,6 +19,7 @@ public class NetworthCommand extends Command {
     private JsonElement lowestBinJson;
     private JsonElement averageAuctionJson;
     private JsonElement bazaarJson;
+    private Map<Double, String> test = new TreeMap<>();
 
     public NetworthCommand() {
         this.name = "networth";
@@ -53,9 +54,11 @@ public class NetworthCommand extends Command {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
             EmbedBuilder eb = player.defaultPlayerEmbed();
+            eb.setThumbnail(player.getThumbnailUrl());
+
             lowestBinJson = getJson("https://moulberry.codes/lowestbin.json");
             averageAuctionJson = getJson("http://moulberry.codes/auction_averages/3day.json");
-            bazaarJson = higherDepth(getJson("https://api.hypixel.net/skyblock/bazaar?key=" + HYPIXEL_API_KEY), "products");
+            bazaarJson = higherDepth(getJson("https://api.hypixel.net/skyblock/bazaar"), "products");
 
             double bankBalance = player.getBankBalance();
             double purseCoins = player.getPurseCoins();
@@ -85,29 +88,32 @@ public class NetworthCommand extends Command {
             }
 
             double petsTotal = 0;
-            List<String> petsMapFormatted = player.getPetsMapFormatted();
-            for (String item : petsMapFormatted) {
-                petsTotal += getLowestPrice(item);
+            List<InvItemStruct> petsMap = player.getPetsMapFormatted();
+            for (InvItemStruct item : petsMap) {
+                petsTotal += calculateItemPrice(item);
             }
 
             double enderChestTotal = 0;
             Map<Integer, InvItemStruct> enderChest = player.getEnderChestMap();
             for (InvItemStruct item : enderChest.values()) {
                 enderChestTotal += calculateItemPrice(item);
+            }
 
+            for(Map.Entry<Double, String> test1:test.entrySet()){
+                System.out.println(simplifyNumber(test1.getKey()) + " - " + test1.getValue());
             }
 
             double totalNetworth = bankBalance + purseCoins + invTotal + talismanTotal + invArmor + wardrobeTotal + petsTotal + enderChestTotal;
 
             eb.setDescription("Total Networth: " + simplifyNumber(totalNetworth));
-            eb.addField("Bank", simplifyNumber(bankBalance), false);
-            eb.addField("Purse", simplifyNumber(purseCoins), false);
-            eb.addField("Inventory", simplifyNumber(invTotal), false);
-            eb.addField("Talisman", simplifyNumber(talismanTotal), false);
-            eb.addField("Armor", simplifyNumber(invArmor), false);
-            eb.addField("Wardrobe", simplifyNumber(wardrobeTotal), false);
-            eb.addField("Pets", simplifyNumber(petsTotal), false);
-            eb.addField("Ender Chest", simplifyNumber(enderChestTotal), false);
+            eb.addField("Bank", simplifyNumber(bankBalance), true);
+            eb.addField("Purse", simplifyNumber(purseCoins), true);
+            eb.addField("Inventory", simplifyNumber(invTotal), true);
+            eb.addField("Talisman", simplifyNumber(talismanTotal), true);
+            eb.addField("Armor", simplifyNumber(invArmor), true);
+            eb.addField("Wardrobe", simplifyNumber(wardrobeTotal), true);
+            eb.addField("Pets", simplifyNumber(petsTotal), true);
+            eb.addField("Ender Chest", simplifyNumber(enderChestTotal), true);
 
             return eb;
         }
@@ -127,6 +133,7 @@ public class NetworthCommand extends Command {
         double fumingExtras = 0;
         double reforgeExtras = 0;
         double miscExtras = 0;
+        double backpackExtras = 0;
 
         try {
             itemCost = getLowestPrice(item.getId().toUpperCase());
@@ -180,7 +187,14 @@ public class NetworthCommand extends Command {
         } catch (Exception ignored) {
         }
 
-        return itemCount * (itemCost + recombobulatedExtra + hbpExtras + enchantsExtras + fumingExtras + reforgeExtras + miscExtras);
+        try{
+            for (InvItemStruct backpackItem : backpackItems) {
+                backpackExtras += calculateItemPrice(backpackItem);
+            }
+        }catch (Exception ignored){
+        }
+
+        return itemCount * (itemCost + recombobulatedExtra + hbpExtras + enchantsExtras + fumingExtras + reforgeExtras + miscExtras + backpackExtras);
     }
 
     private double calculateReforgePrice(String reforgeName, String itemRarity) {

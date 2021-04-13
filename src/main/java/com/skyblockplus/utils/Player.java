@@ -10,8 +10,11 @@ import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
 import me.nullicorn.nedit.type.NBTList;
 import net.dv8tion.jda.api.EmbedBuilder;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.util.StringUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
 
@@ -1341,9 +1344,8 @@ public class Player {
     }
 
     /* Inventory */
-    public Map<Integer, InvItemStruct> getGenericInventoryMap(String encodedContents) {
+    public Map<Integer, InvItemStruct> getGenericInventoryMap(NBTCompound parsedContents) {
         try {
-            NBTCompound parsedContents = NBTReader.readBase64(encodedContents);
             NBTList items = parsedContents.getList(".i");
             Map<Integer, InvItemStruct> itemsMap = new HashMap<>();
 
@@ -1386,6 +1388,13 @@ public class Player {
                             itemInfo.addExtraValue("WOOD_SINGULARITY");
                         }
 
+                        try{
+                            byte[] backpackContents = item.getByteArray("tag.ExtraAttributes." + itemInfo.getId().toLowerCase() + "_data");
+                            NBTCompound parsedContentsBackpack = NBTReader.read(new ByteArrayInputStream(backpackContents));
+                            itemInfo.setBackpackItems(getGenericInventoryMap(parsedContentsBackpack).values());
+                        }catch (Exception ignored){
+                        }
+
                         itemsMap.put(i, itemInfo);
                         continue;
                     }
@@ -1404,31 +1413,51 @@ public class Player {
     public Map<Integer, InvItemStruct> getInventoryMap() {
         String contents = higherDepth(higherDepth(profileJson, "inv_contents"), "data")
                 .getAsString();
-        return getGenericInventoryMap(contents);
+        try {
+            NBTCompound parsedContents =NBTReader.readBase64(contents);
+            return getGenericInventoryMap(parsedContents);
+        } catch (IOException ignored) {
+        }
+        return null;
     }
 
     public Map<Integer, InvItemStruct> getTalismanBagMap() {
         String contents = higherDepth(higherDepth(profileJson, "talisman_bag"), "data")
                 .getAsString();
-        return getGenericInventoryMap(contents);
+        try {
+            NBTCompound parsedContents =NBTReader.readBase64(contents);
+            return getGenericInventoryMap(parsedContents);
+        } catch (IOException ignored) {
+        }
+        return null;
     }
 
     public Map<Integer, InvItemStruct> getInventoryArmorMap() {
         String contents = higherDepth(higherDepth(profileJson, "inv_armor"), "data")
                 .getAsString();
-        return getGenericInventoryMap(contents);
+        try {
+            NBTCompound parsedContents =NBTReader.readBase64(contents);
+            return getGenericInventoryMap(parsedContents);
+        } catch (IOException ignored) {
+        }
+        return null;
     }
 
     public Map<Integer, InvItemStruct> getWardrobeMap() {
         String contents = higherDepth(higherDepth(profileJson, "wardrobe_contents"), "data")
                 .getAsString();
-        return getGenericInventoryMap(contents);
+        try {
+            NBTCompound parsedContents =NBTReader.readBase64(contents);
+            return getGenericInventoryMap(parsedContents);
+        } catch (IOException ignored) {
+        }
+        return null;
     }
 
-    public List<String> getPetsMapFormatted() {
+    public List<InvItemStruct> getPetsMapFormatted() {
         JsonArray petsArr = getPets();
 
-        List<String> petsNameFormatted = new ArrayList<>();
+        List<InvItemStruct> petsNameFormatted = new ArrayList<>();
 
         Map<String, String> rarityMap = new HashMap<>();
         rarityMap.put("LEGENDARY", ";4");
@@ -1439,7 +1468,13 @@ public class Player {
 
         for (JsonElement pet : petsArr) {
             try {
-                petsNameFormatted.add(higherDepth(pet, "type").getAsString() + rarityMap.get(higherDepth(pet, "tier").getAsString()));
+                InvItemStruct invItemStruct = new InvItemStruct();
+                invItemStruct.setName(capitalizeString(higherDepth(pet, "type").getAsString().toLowerCase()));
+                invItemStruct.setId(higherDepth(pet, "type").getAsString() + rarityMap.get(higherDepth(pet, "tier").getAsString()));
+                if(higherDepth(pet, "heldItem") != null){
+                    invItemStruct.addExtraValue(higherDepth(pet, "heldItem").getAsString());
+                }
+                petsNameFormatted.add(invItemStruct);
             } catch (Exception ignored) {
             }
         }
@@ -1450,6 +1485,11 @@ public class Player {
     public Map<Integer, InvItemStruct> getEnderChestMap() {
         String contents = higherDepth(higherDepth(profileJson, "ender_chest_contents"), "data")
                 .getAsString();
-        return getGenericInventoryMap(contents);
+        try {
+            NBTCompound parsedContents =NBTReader.readBase64(contents);
+            return getGenericInventoryMap(parsedContents);
+        } catch (IOException ignored) {
+        }
+        return null;
     }
 }

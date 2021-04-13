@@ -3,6 +3,7 @@ package com.skyblockplus.inventory;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Data
@@ -19,6 +20,7 @@ public class InvItemStruct {
     private int fumingCount = 0;
     private boolean recombobulated = false;
     private List<String> extraStats = new ArrayList<>();
+    private List<InvItemStruct> backpackItems = new ArrayList<>();
 
     public void setHbpCount(int hbpCount) {
         if (hbpCount > 10) {
@@ -40,5 +42,10 @@ public class InvItemStruct {
         }
 
         return null;
+    }
+
+    public void setBackpackItems(Collection<InvItemStruct> backpackItems) {
+        this.backpackItems.clear();
+        this.backpackItems.addAll(backpackItems);
     }
 }
