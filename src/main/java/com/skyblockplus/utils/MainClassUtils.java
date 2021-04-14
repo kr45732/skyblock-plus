@@ -97,13 +97,15 @@ public class MainClassUtils {
                 User updateUser = jda.getUserById(notUpdated.getDiscordId());
                 if (discordInfo.discordTag.equals(updateUser.getAsTag())) {
                     database.addLinkedUser(new LinkedAccountModel("" + Instant.now().toEpochMilli(), updateUser.getId(), discordInfo.minecraftUuid, discordInfo.minecraftUsername));
-                    logCommand("Updated linked user: " + notUpdated.getMinecraftUsername());
+//                    logCommand("Updated linked user: " + notUpdated.getMinecraftUsername());
+                    System.out.println("Updated linked user: " + notUpdated.getMinecraftUsername());
                     return;
                 }
             } catch (Exception ignored) {
             }
             database.deleteLinkedUserByMinecraftUsername(notUpdated.getMinecraftUsername());
-            logCommand("Error updating linked user: " + notUpdated.getMinecraftUsername());
+            System.out.println("Error updating linked user: " + notUpdated.getMinecraftUsername());
+//            logCommand("Error updating linked user: " + notUpdated.getMinecraftUsername());
         });
     }
 }
