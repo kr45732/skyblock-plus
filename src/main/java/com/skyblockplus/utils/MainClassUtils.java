@@ -77,7 +77,7 @@ public class MainClassUtils {
     public static void scheduleUpdateLinkedAccounts() {
         final Runnable updateLinkedAccounts = MainClassUtils::updateLinkedAccounts;
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        scheduler.scheduleAtFixedRate(updateLinkedAccounts, 0, 5, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(updateLinkedAccounts, 0, 1, TimeUnit.MINUTES);
     }
 
     public static void closeAsyncHttpClient() {
@@ -102,8 +102,8 @@ public class MainClassUtils {
                 }
             } catch (Exception ignored) {
             }
-            logCommand("Error updating linked user: " + notUpdated.getMinecraftUsername());
             database.deleteLinkedUserByMinecraftUsername(notUpdated.getMinecraftUsername());
+            logCommand("Error updating linked user: " + notUpdated.getMinecraftUsername());
         });
     }
 }

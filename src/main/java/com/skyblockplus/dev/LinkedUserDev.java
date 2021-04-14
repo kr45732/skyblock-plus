@@ -54,6 +54,7 @@ public class LinkedUserDev extends Command {
                 if (args[1].equals("all")) {
                     if (getAllLinkedUsers()) {
                         ebMessage.delete().queue();
+                        return;
                     }
                 }
             }
