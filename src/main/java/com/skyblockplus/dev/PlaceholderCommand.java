@@ -58,7 +58,7 @@ public class PlaceholderCommand extends Command {
                                 "Sorry for any inconvenience this may have caused.\n" +
                                 "Feel free to invite me back once I'm verified!");
                 channel.sendMessage(guild.getOwner().getAsMention()).queue();
-                channel.sendMessage(eb.build()).queue();
+                channel.sendMessage(eb.build()).complete();
                 guild.leave().complete();
                 System.out.println("Left " + guild.getName() + " - " + guild.getId());
             }
