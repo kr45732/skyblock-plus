@@ -6,8 +6,8 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.utils.CustomPaginator;
-import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.structs.PaginatorExtras;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
@@ -15,7 +15,6 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-import java.util.ArrayList;
 import java.util.Locale;
 
 import static com.skyblockplus.utils.Utils.*;
@@ -94,28 +93,27 @@ public class BankCommand extends Command {
                 DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
                         .withLocale(Locale.US).withZone(ZoneId.systemDefault());
 
-                ArrayList<String> pageTitles = new ArrayList<>();
-
-                CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(20);
+                CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1)
+                        .setItemsPerPage(20);
 
                 paginateBuilder.addItems("**Last Transaction Time:** " + dateTimeFormatter.format(Instant.ofEpochMilli(
                         higherDepth(bankHistoryArray.get(bankHistoryArray.size() - 1), "timestamp").getAsLong()))
                         + "\n");
                 for (int i = bankHistoryArray.size() - 1; i >= 0; i--) {
-                    pageTitles.add("Bank transaction history for " + player.getUsername());
                     JsonElement currentTransaction = bankHistoryArray.get(i);
                     String valueString = simplifyNumber(higherDepth(currentTransaction, "amount").getAsLong()) + " "
                             + (higherDepth(currentTransaction, "action").getAsString().equals("DEPOSIT") ? "deposited"
-                            : "withdrawn")
+                                    : "withdrawn")
                             + " by " + higherDepth(currentTransaction, "initiator_name").getAsString()
-                            .replaceAll("§f|§a|§9|§5|§6|§d|§4|§c|§7|§b", "");
+                                    .replaceAll("§f|§a|§9|§5|§6|§d|§4|§c|§7|§b", "");
 
                     String time = dateTimeFormatter
                             .format(Instant.ofEpochMilli(higherDepth(currentTransaction, "timestamp").getAsLong()));
                     paginateBuilder.addItems("**" + time + "**: " + valueString);
                 }
 
-                paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles));
+                paginateBuilder.setPaginatorExtras(new PaginatorExtras().setEveryPageTitle(player.getUsername())
+                        .setEveryPageThumbnail(player.getThumbnailUrl()));
                 paginateBuilder.build().paginate(event.getChannel(), 0);
                 return null;
             } else {

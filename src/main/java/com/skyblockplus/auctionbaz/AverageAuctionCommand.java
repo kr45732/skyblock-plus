@@ -19,7 +19,7 @@ public class AverageAuctionCommand extends Command {
     public AverageAuctionCommand() {
         this.name = "average";
         this.cooldown = globalCooldown;
-        this.aliases = new String[]{"avg"};
+        this.aliases = new String[] { "avg" };
     }
 
     @Override
@@ -80,8 +80,7 @@ public class AverageAuctionCommand extends Command {
             return eb;
         }
 
-        JsonElement enchantsJson = higherDepth(getEnchantsJson(),
-                "enchants_min_level");
+        JsonElement enchantsJson = higherDepth(getEnchantsJson(), "enchants_min_level");
 
         List<String> enchantNames = enchantsJson.getAsJsonObject().entrySet().stream()
                 .map(i -> i.getKey().toUpperCase()).collect(Collectors.toCollection(ArrayList::new));
@@ -93,7 +92,6 @@ public class AverageAuctionCommand extends Command {
         rarityMap.put("RARE", ";2");
         rarityMap.put("UNCOMMON", ";1");
         rarityMap.put("COMMON", ";0");
-
 
         String formattedName;
         for (String i : enchantNames) {
@@ -117,7 +115,7 @@ public class AverageAuctionCommand extends Command {
                                 formatNumber(higherDepth(itemJson, "price").getAsLong()), false);
                     }
 
-                    eb.setThumbnail("https://sky.lea.moe/item.gif/" + item);
+                    eb.setThumbnail("https://sky.lea.moe/item.gif/ENCHANTED_BOOK");
                     return eb;
                 } catch (NumberFormatException e) {
                     try {
@@ -154,7 +152,6 @@ public class AverageAuctionCommand extends Command {
                 }
             }
         }
-
 
         JsonElement petJson = getPetNumsJson();
 

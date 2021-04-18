@@ -8,6 +8,8 @@ public class PaginatorExtras {
     private final List<String> titles = new ArrayList<>();
     private final List<String> thumbnails = new ArrayList<>();
     private String everyPageText = null;
+    private String everyPageTitle = null;
+    private String everyPageThumnail = null;
 
     public List<String> getTitles() {
         return titles;
@@ -47,6 +49,24 @@ public class PaginatorExtras {
 
     public PaginatorExtras setEveryPageText(String everyPageText) {
         this.everyPageText = everyPageText;
+        return this;
+    }
+
+    public String getEverPageTitle() {
+        return everyPageTitle;
+    }
+
+    public PaginatorExtras setEveryPageTitle(String everyPageTitle) {
+        this.everyPageTitle = everyPageTitle;
+        return this;
+    }
+
+    public String getEveryPageThumbnail() {
+        return everyPageThumnail;
+    }
+
+    public PaginatorExtras setEveryPageThumbnail(String everyPageThumnail) {
+        this.everyPageThumnail = everyPageThumnail;
         return this;
     }
 }

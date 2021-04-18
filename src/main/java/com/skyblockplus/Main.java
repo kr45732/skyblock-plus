@@ -6,6 +6,7 @@ import com.skyblockplus.auctionbaz.AuctionCommand;
 import com.skyblockplus.auctionbaz.AverageAuctionCommand;
 import com.skyblockplus.auctionbaz.BazaarCommand;
 import com.skyblockplus.auctionbaz.BinCommand;
+import com.skyblockplus.auctionbaz.QueryAuctionCommand;
 import com.skyblockplus.dev.*;
 import com.skyblockplus.dungeons.CatacombsCommand;
 import com.skyblockplus.dungeons.EssenceCommand;
@@ -24,7 +25,6 @@ import com.skyblockplus.settings.SpringDatabaseComponent;
 import com.skyblockplus.skills.SkillsCommand;
 import com.skyblockplus.slayer.SlayerCommand;
 import com.skyblockplus.timeout.MessageTimeout;
-import com.skyblockplus.utils.Utils;
 import com.skyblockplus.weight.WeightCommand;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -41,14 +41,15 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import javax.annotation.PreDestroy;
 import javax.security.auth.login.LoginException;
 
-import static com.skyblockplus.utils.MainClassUtils.*;
+import static com.skyblockplus.utils.MainClassUtils.cacheApplyGuildUsers;
+import static com.skyblockplus.utils.MainClassUtils.closeAsyncHttpClient;
 import static com.skyblockplus.utils.Utils.*;
 
 @SpringBootApplication
 public class Main {
     public static JDA jda;
     public static SpringDatabaseComponent database;
-    public static AsyncHttpClient asyncHttpClient = Dsl.asyncHttpClient();
+    public static final AsyncHttpClient asyncHttpClient = Dsl.asyncHttpClient();
 
     public static void main(String[] args) throws LoginException, IllegalArgumentException {
         setApplicationSettings();
@@ -63,51 +64,47 @@ public class Main {
         client.useHelpBuilder(false);
         client.setPrefix(BOT_PREFIX);
 
-        client.addCommands(new InformationCommand(), new SlayerCommand(), new HelpCommand(waiter), new GuildCommand(waiter),
-                new AuctionCommand(), new BinCommand(), new SkillsCommand(), new CatacombsCommand(),
-                new ShutdownCommand(), new VersionCommand(), new RoleCommands(), new GuildLeaderboardCommand(),
-                new EssenceCommand(), new BankCommand(waiter), new WardrobeCommand(waiter),
-                new TalismanBagCommand(waiter), new InventoryCommand(waiter), new SacksCommand(waiter), new InviteCommand(),
-                new WeightCommand(), new HypixelCommand(), new UuidCommand(), new SkyblockCommand(waiter),
-                new BaldCommand(), new SettingsCommand(waiter), new ReloadCommand(), new SetupCommand(waiter),
-                new CategoriesCommand(), new PartyFinderCommand(), new QuickSetupTestCommand(), new EmojiMapServerCommand(),
-                new EnderChestCommand(), new InstantTimeNow(), new GetEventListenersCommand(), new GetAllGuildsIn(waiter),
-                new LinkAccountCommand(), new GetSettingsFile(), new UnlinkAccountCommand(), new LinkedUserDev(),
-                new BazaarCommand(), new AverageAuctionCommand(), new PetsCommand(waiter), new SkyblockEventCommand(),
-                new DeleteMessagesCommand(), new PlaceholderCommand(), new ProfilesCommand(waiter), new NetworthCommand());
+        client.addCommands(new InformationCommand(), new SlayerCommand(), new HelpCommand(waiter),
+                new GuildCommand(waiter), new AuctionCommand(), new BinCommand(), new SkillsCommand(),
+                new CatacombsCommand(), new ShutdownCommand(), new VersionCommand(), new RoleCommands(),
+                new GuildLeaderboardCommand(), new EssenceCommand(), new BankCommand(waiter),
+                new WardrobeCommand(waiter), new TalismanBagCommand(waiter), new InventoryCommand(waiter),
+                new SacksCommand(waiter), new InviteCommand(), new WeightCommand(), new HypixelCommand(),
+                new UuidCommand(), new SkyblockCommand(waiter), new BaldCommand(), new SettingsCommand(waiter),
+                new ReloadCommand(), new SetupCommand(waiter), new CategoriesCommand(), new PartyFinderCommand(),
+                new QuickSetupTestCommand(), new EmojiMapServerCommand(), new EnderChestCommand(), new InstantTimeNow(),
+                new GetEventListenersCommand(), new GetAllGuildsIn(waiter), new LinkAccountCommand(),
+                new GetSettingsFile(), new UnlinkAccountCommand(), new LinkedUserDev(), new BazaarCommand(),
+                new AverageAuctionCommand(), new PetsCommand(waiter), new SkyblockEventCommand(),
+                new DeleteMessagesCommand(), new PlaceholderCommand(), new ProfilesCommand(waiter),
+                new NetworthCommand(), new QueryAuctionCommand());
 
         if (BOT_PREFIX.equals("+")) {
             jda = JDABuilder.createDefault(BOT_TOKEN).setStatus(OnlineStatus.DO_NOT_DISTURB)
                     .setChunkingFilter(ChunkingFilter.ALL).setMemberCachePolicy(MemberCachePolicy.ALL)
                     .enableIntents(GatewayIntent.GUILD_MEMBERS).setActivity(Activity.playing("Loading..."))
-                    .addEventListeners(waiter, client.build(), new MessageTimeout(), new MainListener())
-                    .build();
+                    .addEventListeners(waiter, client.build(), new MessageTimeout(), new MainListener()).build();
         } else {
             jda = JDABuilder.createDefault(BOT_TOKEN).setStatus(OnlineStatus.DO_NOT_DISTURB)
                     .setChunkingFilter(ChunkingFilter.ALL).setMemberCachePolicy(MemberCachePolicy.ALL)
                     .enableIntents(GatewayIntent.GUILD_MEMBERS).setActivity(Activity.playing("Loading..."))
-                    .addEventListeners(waiter, client.build(), new MessageTimeout(), new MainListener())
-                    .build();
+                    .addEventListeners(waiter, client.build(), new MessageTimeout(), new MainListener()).build();
         }
 
-//        scheduleUpdateLinkedAccounts();
+        // scheduleUpdateLinkedAccounts();
     }
-
 
     @PreDestroy
     public void onExit() {
         System.out.println("== Stopping ==");
 
-        System.out.println("== Saving ==");
-        long startTime = System.currentTimeMillis();
+        System.out.println("== Caching Apply Users ==");
         cacheApplyGuildUsers();
-        System.out.println("== Saved In " + ((System.currentTimeMillis() - startTime) / 1000) + "s ==");
 
         System.out.println("== Closing Async Http Client ==");
         closeAsyncHttpClient();
 
         System.out.println("== Finished ==");
     }
-
 
 }

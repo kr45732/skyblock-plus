@@ -24,6 +24,7 @@ import static com.skyblockplus.utils.Utils.*;
 
 public class MainClassUtils {
     public static void cacheApplyGuildUsers() {
+        long startTime = System.currentTimeMillis();
         if (!BOT_PREFIX.equals("+")) {
             return;
         }
@@ -44,7 +45,7 @@ public class MainClassUtils {
                 e.printStackTrace();
             }
         }
-
+        System.out.println("== Cached apply users in " + ((System.currentTimeMillis() - startTime) / 1000) + "s ==");
     }
 
     public static List<ApplyUser> getApplyGuildUsersCache(String guildId) {
@@ -97,9 +98,9 @@ public class MainClassUtils {
                 User updateUser = jda.getUserById(notUpdated.getDiscordId());
                 if (discordInfo.discordTag.equals(updateUser.getAsTag())) {
                     database.addLinkedUser(new LinkedAccountModel("" + Instant.now().toEpochMilli(), updateUser.getId(), discordInfo.minecraftUuid, discordInfo.minecraftUsername));
-                    try{
+                    try {
                         logCommand("Updated linked user: " + notUpdated.getMinecraftUsername());
-                    }catch (Exception ignored){
+                    } catch (Exception ignored) {
                     }
                     return;
                 }
@@ -108,7 +109,7 @@ public class MainClassUtils {
             database.deleteLinkedUserByMinecraftUsername(notUpdated.getMinecraftUsername());
             try {
                 logCommand("Error updating linked user: " + notUpdated.getMinecraftUsername());
-            }catch (Exception ignored){
+            } catch (Exception ignored) {
             }
         });
     }

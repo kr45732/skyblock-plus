@@ -1,10 +1,19 @@
 package com.skyblockplus.auctionbaz;
 
-import com.google.gson.JsonElement;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
+import static com.skyblockplus.utils.Utils.BOT_PREFIX;
+import static com.skyblockplus.utils.Utils.capitalizeString;
+import static com.skyblockplus.utils.Utils.convertToInternalName;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.errorMessage;
+import static com.skyblockplus.utils.Utils.formatNumber;
+import static com.skyblockplus.utils.Utils.getEnchantsJson;
+import static com.skyblockplus.utils.Utils.getJson;
+import static com.skyblockplus.utils.Utils.getPetNumsJson;
+import static com.skyblockplus.utils.Utils.getPetUrl;
+import static com.skyblockplus.utils.Utils.globalCooldown;
+import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.Utils.loadingEmbed;
+import static com.skyblockplus.utils.Utils.logCommand;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,7 +22,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import static com.skyblockplus.utils.Utils.*;
+import com.google.gson.JsonElement;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 
 public class BinCommand extends Command {
 
@@ -60,8 +74,7 @@ public class BinCommand extends Command {
             return eb;
         }
 
-        JsonElement enchantsJson = higherDepth(getEnchantsJson(),
-                "enchants_min_level");
+        JsonElement enchantsJson = higherDepth(getEnchantsJson(), "enchants_min_level");
 
         List<String> enchantNames = enchantsJson.getAsJsonObject().entrySet().stream()
                 .map(i -> i.getKey().toUpperCase()).collect(Collectors.toCollection(ArrayList::new));
@@ -74,7 +87,6 @@ public class BinCommand extends Command {
         rarityMap.put("UNCOMMON", ";1");
         rarityMap.put("COMMON", ";0");
 
-
         String formattedName;
         for (String i : enchantNames) {
             if (preFormattedItem.contains(i)) {
@@ -86,7 +98,7 @@ public class BinCommand extends Command {
                     EmbedBuilder eb = defaultEmbed("Lowest bin");
                     eb.addField(capitalizeString(enchantName),
                             formatNumber(higherDepth(lowestBinJson, formattedName).getAsLong()), false);
-                    eb.setThumbnail("https://sky.lea.moe/item.gif/" + preFormattedItem);
+                    eb.setThumbnail("https://sky.lea.moe/item.gif/ENCHANTED_BOOK");
                     return eb;
                 } catch (NumberFormatException e) {
                     try {
@@ -115,7 +127,6 @@ public class BinCommand extends Command {
                 }
             }
         }
-
 
         JsonElement petJson = getPetNumsJson();
 

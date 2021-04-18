@@ -115,7 +115,8 @@ public class Utils {
 
     public static JsonElement getReforgeStonesJson() {
         if (reforgeStonesJson == null) {
-            reforgeStonesJson = getJson("https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/reforgestones.json");
+            reforgeStonesJson = getJson(
+                    "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/reforgestones.json");
         }
 
         return reforgeStonesJson;
@@ -162,12 +163,10 @@ public class Utils {
         return essenceCostsJson;
     }
 
-
     public static String getSkyCryptData(String dataUrl) {
         if (!dataUrl.contains("raw.githubusercontent.com")) {
             return null;
         }
-
 
         CloseableHttpClient httpclient = HttpClientBuilder.create().build();
         HttpGet httpget = new HttpGet(dataUrl);
@@ -180,7 +179,7 @@ public class Utils {
             InputStream inputStream = httpresponse.getEntity().getContent();
             ByteArrayOutputStream result = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
-            for (int length; (length = inputStream.read(buffer)) != -1; ) {
+            for (int length; (length = inputStream.read(buffer)) != -1;) {
                 result.write(buffer, 0, length);
             }
             return result.toString().split("module.exports = ")[1];
@@ -198,7 +197,8 @@ public class Utils {
 
     public static JsonElement parseJsString(String jsString) {
         try {
-            return JsonParser.parseString(jsScriptEngine.eval(String.format("JSON.stringify(%s);", jsString)).toString());
+            return JsonParser
+                    .parseString(jsScriptEngine.eval(String.format("JSON.stringify(%s);", jsString)).toString());
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -207,11 +207,15 @@ public class Utils {
 
     public static String getPetUrl(String petName) {
         if (petUrlJson == null) {
-            petUrlJson = parseJsString(
-                    getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/pets.js").split("pet_value")[0] + "}");
+            petUrlJson = parseJsString(getSkyCryptData(
+                    "https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/pets.js")
+                            .split("pet_value")[0]
+                    + "}");
         }
         try {
-            return "https://sky.shiiyu.moe" + higherDepth(higherDepth(higherDepth(petUrlJson, "pet_data"), petName.toUpperCase()), "head").getAsString();
+            return "https://sky.shiiyu.moe"
+                    + higherDepth(higherDepth(higherDepth(petUrlJson, "pet_data"), petName.toUpperCase()), "head")
+                            .getAsString();
         } catch (Exception e) {
             return null;
         }
@@ -219,8 +223,9 @@ public class Utils {
 
     public static String convertSkyblockIdName(String itemName) {
         if (collectionsJson == null) {
-            collectionsJson = parseJsString(
-                    getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/collections.js").replace(";", ""));
+            collectionsJson = parseJsString(getSkyCryptData(
+                    "https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/collections.js")
+                            .replace(";", ""));
         }
 
         try {
@@ -238,8 +243,8 @@ public class Utils {
         return capitalizeString(itemName.replace("_", " ").toLowerCase());
     }
 
-
     public static JsonElement getJson(String jsonUrl) {
+        JsonElement outputJson = null;
         try {
             if (remainingLimit < 5) {
                 TimeUnit.SECONDS.sleep(timeTillReset);
@@ -258,7 +263,6 @@ public class Utils {
             httpclient = HttpClientBuilder.create().build();
         }
 
-
         HttpGet httpget = new HttpGet(jsonUrl);
         if (jsonUrl.contains("raw.githubusercontent.com")) {
             httpget.setHeader("Authorization", "token " + GITHUB_TOKEN);
@@ -275,7 +279,7 @@ public class Utils {
                 }
             }
 
-            return JsonParser.parseReader(new InputStreamReader(httpresponse.getEntity().getContent()));
+            outputJson = JsonParser.parseReader(new InputStreamReader(httpresponse.getEntity().getContent()));
         } catch (Exception ignored) {
         } finally {
             try {
@@ -285,7 +289,7 @@ public class Utils {
                 e.printStackTrace();
             }
         }
-        return null;
+        return outputJson;
     }
 
     public static int postJson(String jsonUrl, Object postObject) {
@@ -329,129 +333,129 @@ public class Utils {
                 .replace("FRAG", "FRAGMENT").replace(".", "");
 
         switch (preFormattedItem) {
-            case "adaptive_blade":
-                preFormattedItem = "STONE_BLADE";
-                break;
-            case "NECRON_HELMET":
-                preFormattedItem = "POWER_WITHER_HELMET";
-                break;
-            case "NECRON_CHESTPLATE":
-                preFormattedItem = "POWER_WITHER_CHESTPLATE";
-                break;
-            case "NECRON_LEGGINGS":
-                preFormattedItem = "POWER_WITHER_LEGGINGS";
-                break;
-            case "NECRON_BOOTS":
-                preFormattedItem = "POWER_WITHER_BOOTS";
-                break;
-            case "STORM_HELMET":
-                preFormattedItem = "WISE_WITHER_HELMET";
-                break;
-            case "STORM_CHESTPLATE":
-                preFormattedItem = "WISE_WITHER_CHESTPLATE";
-                break;
-            case "STORM_LEGGINGS":
-                preFormattedItem = "WISE_WITHER_LEGGINGS";
-                break;
-            case "STORM_BOOTS":
-                preFormattedItem = "WISE_WITHER_BOOTS";
-                break;
-            case "MAXOR_HELMET":
-                preFormattedItem = "SPEED_WITHER_HELMET";
-                break;
-            case "MAXOR_CHESTPLATE":
-                preFormattedItem = "SPEED_WITHER_CHESTPLATE";
-                break;
-            case "MAXOR_LEGGINGS":
-                preFormattedItem = "SPEED_WITHER_LEGGINGS";
-                break;
-            case "MAXOR_BOOTS":
-                preFormattedItem = "SPEED_WITHER_BOOTS";
-                break;
-            case "GOLDOR_HELMET":
-                preFormattedItem = "TANK_WITHER_HELMET";
-                break;
-            case "GOLDOR_CHESTPLATE":
-                preFormattedItem = "TANK_WITHER_CHESTPLATE";
-                break;
-            case "GOLDOR_LEGGINGS":
-                preFormattedItem = "TANK_WITHER_LEGGINGS";
-                break;
-            case "GOLDOR_BOOTS":
-                preFormattedItem = "TANK_WITHER_BOOTS";
-                break;
-            case "BONEMERANG":
-                preFormattedItem = "BONE_BOOMERANG";
-                break;
-            case "GOD_POT":
-                preFormattedItem = "GOD_POTION";
-                break;
-            case "AOTD":
-                preFormattedItem = "ASPECT_OF_THE_DRAGON";
-                break;
-            case "AOTE":
-                preFormattedItem = "ASPECT_OF_THE_END";
-                break;
-            case "ROD_OF_CHAMPIONS":
-                preFormattedItem = "CHAMP_ROD";
-                break;
-            case "ROD_OF_LEGENDS":
-                preFormattedItem = "LEGEND_ROD";
-                break;
-            case "CHALLENGING_ROD":
-                preFormattedItem = "CHALLENGE_ROD";
-                break;
-            case "LASR_EYE":
-                preFormattedItem = "GIANT_FRAGMENT_LASER";
-                break;
-            case "DIAMANTE_HANDLE":
-                preFormattedItem = "GIANT_FRAGMENT_DIAMOND";
-                break;
-            case "BIGFOOT_LASSO":
-                preFormattedItem = "GIANT_FRAGMENT_BIGFOOT";
-                break;
-            case "JOLLY_PINK_ROCK":
-                preFormattedItem = "GIANT_FRAGMENT_BOULDER";
-                break;
-            case "HYPER_CATALYST":
-                preFormattedItem = "HYPER_CATALYST_UPGRADE";
-                break;
-            case "ENDER_HELMET":
-                preFormattedItem = "END_HELMET";
-                break;
-            case "ENDER_CHESTPLATE":
-                preFormattedItem = "END_CHESTPLATE";
-                break;
-            case "ENDER_LEGGINGS":
-                preFormattedItem = "END_LEGGINGS";
-                break;
-            case "ENDER_BOOTS":
-                preFormattedItem = "END_BOOTS";
-                break;
-            case "EMPEROR_SKULL":
-                preFormattedItem = "DIVER_FRAGMENT";
-                break;
-            case "COLOSSAL_EXP_BOTTLE":
-                preFormattedItem = "COLOSSAL_EXP_BOTTLE_UPGRADE";
-                break;
-            case "FLYCATCHER":
-                preFormattedItem = "FLYCATCHER_UPGRADE";
-                break;
-            default:
-                if (preFormattedItem.contains("GOLDEN") && preFormattedItem.contains("HEAD")) {
-                    preFormattedItem = preFormattedItem.replace("GOLDEN", "GOLD");
-                } else if (preFormattedItem.contains("PET_SKIN")) {
-                    String tempItem = preFormattedItem.replace("PET_SKIN", "");
-                    if (tempItem.startsWith("_") && tempItem.length() > 1) {
-                        tempItem = tempItem.substring(1);
-                    }
-
-                    if (tempItem.endsWith("_") && tempItem.length() > 1) {
-                        tempItem = tempItem.substring(0, tempItem.length() - 1);
-                    }
-
-                    preFormattedItem = "PET_SKIN_" + tempItem;
+        case "adaptive_blade":
+            preFormattedItem = "STONE_BLADE";
+            break;
+        case "NECRON_HELMET":
+            preFormattedItem = "POWER_WITHER_HELMET";
+            break;
+        case "NECRON_CHESTPLATE":
+            preFormattedItem = "POWER_WITHER_CHESTPLATE";
+            break;
+        case "NECRON_LEGGINGS":
+            preFormattedItem = "POWER_WITHER_LEGGINGS";
+            break;
+        case "NECRON_BOOTS":
+            preFormattedItem = "POWER_WITHER_BOOTS";
+            break;
+        case "STORM_HELMET":
+            preFormattedItem = "WISE_WITHER_HELMET";
+            break;
+        case "STORM_CHESTPLATE":
+            preFormattedItem = "WISE_WITHER_CHESTPLATE";
+            break;
+        case "STORM_LEGGINGS":
+            preFormattedItem = "WISE_WITHER_LEGGINGS";
+            break;
+        case "STORM_BOOTS":
+            preFormattedItem = "WISE_WITHER_BOOTS";
+            break;
+        case "MAXOR_HELMET":
+            preFormattedItem = "SPEED_WITHER_HELMET";
+            break;
+        case "MAXOR_CHESTPLATE":
+            preFormattedItem = "SPEED_WITHER_CHESTPLATE";
+            break;
+        case "MAXOR_LEGGINGS":
+            preFormattedItem = "SPEED_WITHER_LEGGINGS";
+            break;
+        case "MAXOR_BOOTS":
+            preFormattedItem = "SPEED_WITHER_BOOTS";
+            break;
+        case "GOLDOR_HELMET":
+            preFormattedItem = "TANK_WITHER_HELMET";
+            break;
+        case "GOLDOR_CHESTPLATE":
+            preFormattedItem = "TANK_WITHER_CHESTPLATE";
+            break;
+        case "GOLDOR_LEGGINGS":
+            preFormattedItem = "TANK_WITHER_LEGGINGS";
+            break;
+        case "GOLDOR_BOOTS":
+            preFormattedItem = "TANK_WITHER_BOOTS";
+            break;
+        case "BONEMERANG":
+            preFormattedItem = "BONE_BOOMERANG";
+            break;
+        case "GOD_POT":
+            preFormattedItem = "GOD_POTION";
+            break;
+        case "AOTD":
+            preFormattedItem = "ASPECT_OF_THE_DRAGON";
+            break;
+        case "AOTE":
+            preFormattedItem = "ASPECT_OF_THE_END";
+            break;
+        case "ROD_OF_CHAMPIONS":
+            preFormattedItem = "CHAMP_ROD";
+            break;
+        case "ROD_OF_LEGENDS":
+            preFormattedItem = "LEGEND_ROD";
+            break;
+        case "CHALLENGING_ROD":
+            preFormattedItem = "CHALLENGE_ROD";
+            break;
+        case "LASR_EYE":
+            preFormattedItem = "GIANT_FRAGMENT_LASER";
+            break;
+        case "DIAMANTE_HANDLE":
+            preFormattedItem = "GIANT_FRAGMENT_DIAMOND";
+            break;
+        case "BIGFOOT_LASSO":
+            preFormattedItem = "GIANT_FRAGMENT_BIGFOOT";
+            break;
+        case "JOLLY_PINK_ROCK":
+            preFormattedItem = "GIANT_FRAGMENT_BOULDER";
+            break;
+        case "HYPER_CATALYST":
+            preFormattedItem = "HYPER_CATALYST_UPGRADE";
+            break;
+        case "ENDER_HELMET":
+            preFormattedItem = "END_HELMET";
+            break;
+        case "ENDER_CHESTPLATE":
+            preFormattedItem = "END_CHESTPLATE";
+            break;
+        case "ENDER_LEGGINGS":
+            preFormattedItem = "END_LEGGINGS";
+            break;
+        case "ENDER_BOOTS":
+            preFormattedItem = "END_BOOTS";
+            break;
+        case "EMPEROR_SKULL":
+            preFormattedItem = "DIVER_FRAGMENT";
+            break;
+        case "COLOSSAL_EXP_BOTTLE":
+            preFormattedItem = "COLOSSAL_EXP_BOTTLE_UPGRADE";
+            break;
+        case "FLYCATCHER":
+            preFormattedItem = "FLYCATCHER_UPGRADE";
+            break;
+        default:
+            if (preFormattedItem.contains("GOLDEN") && preFormattedItem.contains("HEAD")) {
+                preFormattedItem = preFormattedItem.replace("GOLDEN", "GOLD");
+            } else if (preFormattedItem.contains("PET_SKIN")) {
+                String tempItem = preFormattedItem.replace("PET_SKIN", "");
+                if (tempItem.startsWith("_") && tempItem.length() > 1) {
+                    tempItem = tempItem.substring(1);
                 }
+
+                if (tempItem.endsWith("_") && tempItem.length() > 1) {
+                    tempItem = tempItem.substring(0, tempItem.length() - 1);
+                }
+
+                preFormattedItem = "PET_SKIN_" + tempItem;
+            }
         }
 
         return preFormattedItem;
@@ -481,7 +485,8 @@ public class Utils {
     }
 
     public static EmbedBuilder loadingEmbed() {
-        return defaultEmbed(null).setImage("https://cdn.discordapp.com/attachments/803419567958392832/825768516636508160/sb_loading.gif");
+        return defaultEmbed(null).setImage(
+                "https://cdn.discordapp.com/attachments/803419567958392832/825768516636508160/sb_loading.gif");
     }
 
     public static String fixUsername(String username) {
@@ -576,9 +581,12 @@ public class Utils {
 
     public static DiscordInfoStruct getPlayerDiscordInfo(String username) {
         try {
-            JsonElement playerJson = getJson("https://api.hypixel.net/player?key=" + HYPIXEL_API_KEY + "&uuid=" + usernameToUuid(username).playerUuid);
+            JsonElement playerJson = getJson("https://api.hypixel.net/player?key=" + HYPIXEL_API_KEY + "&uuid="
+                    + usernameToUuid(username).playerUuid);
 
-            String discordTag = higherDepth(higherDepth(higherDepth(higherDepth(playerJson, "player"), "socialMedia"), "links"), "DISCORD").getAsString();
+            String discordTag = higherDepth(
+                    higherDepth(higherDepth(higherDepth(playerJson, "player"), "socialMedia"), "links"), "DISCORD")
+                            .getAsString();
             String minecraftUsername = higherDepth(higherDepth(playerJson, "player"), "displayname").getAsString();
             String minecraftUuid = higherDepth(higherDepth(playerJson, "player"), "uuid").getAsString();
 
@@ -593,112 +601,111 @@ public class Utils {
     }
 
     public static CustomPaginator.Builder defaultPaginator(EventWaiter waiter, User eventAuthor) {
-        return new CustomPaginator.Builder().setColumns(1).setItemsPerPage(1)
-                .showPageNumbers(true).useNumberedItems(false).setFinalAction(m -> {
+        return new CustomPaginator.Builder().setColumns(1).setItemsPerPage(1).showPageNumbers(true)
+                .useNumberedItems(false).setFinalAction(m -> {
                     try {
                         m.clearReactions().queue();
                     } catch (PermissionException ex) {
                         m.delete().queue();
                     }
-                }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor)
-                .setUsers(eventAuthor);
+                }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor).setUsers(eventAuthor);
     }
 
     public static String profileNameToEmoji(String profileName) {
         switch (profileName) {
-            case "apple":
-                return "\uD83C\uDF4E";
-            case "banana":
-                return "\uD83C\uDF4C";
-            case "blueberry":
-                return "\uD83E\uDED0";
-            case "coconut":
-                return "\uD83E\uDD65";
-            case "cucumber":
-                return "\uD83E\uDD52";
-            case "grapes":
-                return "\uD83C\uDF47";
-            case "kiwi":
-                return "\uD83E\uDD5D";
-            case "lemon":
-                return "\uD83C\uDF4B";
-            case "lime":
-                return "lime:828632854174498837";
-            case "mango":
-                return "\uD83E\uDD6D";
-            case "orange":
-                return "orange:828634110360289331";
-            case "papaya":
-                return "papaya:828633125370200085";
-            case "peach":
-                return "\uD83C\uDF51";
-            case "pear":
-                return "\uD83C\uDF50";
-            case "pineapple":
-                return "\uD83C\uDF4D";
-            case "pomegranate":
-                return "pomegranate:828632397032456232";
-            case "raspberry":
-                return "raspberry:828632035127853064";
-            case "strawberry":
-                return "\uD83C\uDF53";
-            case "tomato":
-                return "\uD83C\uDF45";
-            case "watermelon":
-                return "\uD83C\uDF49";
-            case "zucchini":
-                return "zucchini:828636746358194206";
-            default:
-                return null;
+        case "apple":
+            return "\uD83C\uDF4E";
+        case "banana":
+            return "\uD83C\uDF4C";
+        case "blueberry":
+            return "\uD83E\uDED0";
+        case "coconut":
+            return "\uD83E\uDD65";
+        case "cucumber":
+            return "\uD83E\uDD52";
+        case "grapes":
+            return "\uD83C\uDF47";
+        case "kiwi":
+            return "\uD83E\uDD5D";
+        case "lemon":
+            return "\uD83C\uDF4B";
+        case "lime":
+            return "lime:828632854174498837";
+        case "mango":
+            return "\uD83E\uDD6D";
+        case "orange":
+            return "orange:828634110360289331";
+        case "papaya":
+            return "papaya:828633125370200085";
+        case "peach":
+            return "\uD83C\uDF51";
+        case "pear":
+            return "\uD83C\uDF50";
+        case "pineapple":
+            return "\uD83C\uDF4D";
+        case "pomegranate":
+            return "pomegranate:828632397032456232";
+        case "raspberry":
+            return "raspberry:828632035127853064";
+        case "strawberry":
+            return "\uD83C\uDF53";
+        case "tomato":
+            return "\uD83C\uDF45";
+        case "watermelon":
+            return "\uD83C\uDF49";
+        case "zucchini":
+            return "zucchini:828636746358194206";
+        default:
+            return null;
         }
     }
 
     public static String emojiToProfileName(String emoji) {
         switch (emoji) {
-            case "\uD83C\uDF4E":
-                return "apple";
-            case "\uD83C\uDF4C":
-                return "banana";
-            case "\uD83E\uDED0":
-                return "blueberry";
-            case "\uD83E\uDD65":
-                return "coconut";
-            case "\uD83E\uDD52":
-                return "cucumber";
-            case "\uD83C\uDF47":
-                return "grapes";
-            case "\uD83E\uDD5D":
-                return "kiwi";
-            case "\uD83C\uDF4B":
-                return "lemon";
-            case "lime:828632854174498837":
-                return "lime";
-            case "\uD83E\uDD6D":
-                return "mango";
-            case "orange:828634110360289331":
-                return "orange";
-            case "papaya:828633125370200085":
-                return "papaya";
-            case "\uD83C\uDF51":
-                return "peach";
-            case "\uD83C\uDF50":
-                return "pear";
-            case "\uD83C\uDF4D":
-                return "pineapple";
-            case "pomegranate:828632397032456232":
-                return "pomegranate";
-            case "raspberry:828632035127853064":
-                return "raspberry";
-            case "\uD83C\uDF53":
-                return "strawberry";
-            case "\uD83C\uDF45":
-                return "tomato";
-            case "\uD83C\uDF49":
-                return "watermelon";
-            case "zucchini:828636746358194206":
-                return "zucchini";
-            default:
-                return null;
+        case "\uD83C\uDF4E":
+            return "apple";
+        case "\uD83C\uDF4C":
+            return "banana";
+        case "\uD83E\uDED0":
+            return "blueberry";
+        case "\uD83E\uDD65":
+            return "coconut";
+        case "\uD83E\uDD52":
+            return "cucumber";
+        case "\uD83C\uDF47":
+            return "grapes";
+        case "\uD83E\uDD5D":
+            return "kiwi";
+        case "\uD83C\uDF4B":
+            return "lemon";
+        case "lime:828632854174498837":
+            return "lime";
+        case "\uD83E\uDD6D":
+            return "mango";
+        case "orange:828634110360289331":
+            return "orange";
+        case "papaya:828633125370200085":
+            return "papaya";
+        case "\uD83C\uDF51":
+            return "peach";
+        case "\uD83C\uDF50":
+            return "pear";
+        case "\uD83C\uDF4D":
+            return "pineapple";
+        case "pomegranate:828632397032456232":
+            return "pomegranate";
+        case "raspberry:828632035127853064":
+            return "raspberry";
+        case "\uD83C\uDF53":
+            return "strawberry";
+        case "\uD83C\uDF45":
+            return "tomato";
+        case "\uD83C\uDF49":
+            return "watermelon";
+        case "zucchini:828636746358194206":
+            return "zucchini";
+        default:
+            return null;
         }
     }
 

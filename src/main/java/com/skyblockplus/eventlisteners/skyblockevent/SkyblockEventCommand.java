@@ -32,7 +32,7 @@ import static com.skyblockplus.eventlisteners.MainListener.getGuildMap;
 import static com.skyblockplus.utils.Utils.*;
 
 public class SkyblockEventCommand extends Command {
-    DateTimeFormatter formatter =
+    final DateTimeFormatter formatter =
             DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withZone(ZoneId.of("UTC"));
 
     public SkyblockEventCommand() {
@@ -398,7 +398,7 @@ public class SkyblockEventCommand extends Command {
                                     minutesSinceUpdateString = minutesSinceUpdate + " minutes ";
                                 }
 
-                                eb.setDescription("**Last updated " + minutesSinceUpdateString + " ago**\n\n" + ebString.toString());
+                                eb.setDescription("**Last updated " + minutesSinceUpdateString + " ago**\n\n" + ebString);
                                 ebMessage.editMessage(eb.build()).queue();
                                 return;
                             }

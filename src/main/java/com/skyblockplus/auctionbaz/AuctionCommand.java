@@ -1,24 +1,24 @@
 package com.skyblockplus.auctionbaz;
 
+import static com.skyblockplus.utils.Utils.*;
+
+import java.time.Duration;
+import java.time.Instant;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
-import java.time.Duration;
-import java.time.Instant;
-
-import static com.skyblockplus.utils.Utils.*;
-
 public class AuctionCommand extends Command {
-
     public AuctionCommand() {
         this.name = "auction";
         this.cooldown = globalCooldown;
-        this.aliases = new String[]{"ah"};
+        this.aliases = new String[] { "ah" };
     }
 
     @Override
@@ -46,7 +46,8 @@ public class AuctionCommand extends Command {
             return defaultEmbed("Error fetching player data");
         }
 
-        String url = "https://api.hypixel.net/skyblock/auction?key=" + HYPIXEL_API_KEY + "&player=" + usernameUuidStruct.playerUuid;
+        String url = "https://api.hypixel.net/skyblock/auction?key=" + HYPIXEL_API_KEY + "&player="
+                + usernameUuidStruct.playerUuid;
 
         JsonElement playerAuctions = getJson(url);
         JsonArray auctionsArray = higherDepth(playerAuctions, "auctions").getAsJsonArray();
@@ -77,7 +78,8 @@ public class AuctionCommand extends Command {
                 timeUntil += minutesUntil > 0 ? minutesUntil + "m " : "";
 
                 if (higherDepth(currentAuction, "item_name").getAsString().equals("Enchanted Book")) {
-                    auctions[i][0] = parseMcCodes(higherDepth(currentAuction, "item_lore").getAsString().split("\n")[0]);
+                    auctions[i][0] = parseMcCodes(
+                            higherDepth(currentAuction, "item_lore").getAsString().split("\n")[0]);
                 } else {
                     auctions[i][0] = (isPet
                             ? capitalizeString(higherDepth(currentAuction, "tier").getAsString().toLowerCase()) + " "
@@ -108,7 +110,8 @@ public class AuctionCommand extends Command {
             }
         }
 
-        EmbedBuilder eb = defaultEmbed(usernameUuidStruct.playerUsername, "https://auctions.craftlink.xyz/players/" + usernameUuidStruct.playerUuid);
+        EmbedBuilder eb = defaultEmbed(usernameUuidStruct.playerUsername,
+                "https://auctions.craftlink.xyz/players/" + usernameUuidStruct.playerUuid);
         for (String[] auction : auctions) {
             if (auction[0] != null) {
                 for (String[] strings : auctions) {
@@ -117,7 +120,8 @@ public class AuctionCommand extends Command {
                     }
                 }
                 eb.setThumbnail("https://cravatar.eu/helmavatar/" + usernameUuidStruct.playerUuid + "/64.png");
-                eb.setDescription("**Sold Auctions Value:** " + simplifyNumber(totalSoldValue) + "\n**Unsold Auctions Value:** " + simplifyNumber(totalPendingValue));
+                eb.setDescription("**Sold Auctions Value:** " + simplifyNumber(totalSoldValue)
+                        + "\n**Unsold Auctions Value:** " + simplifyNumber(totalPendingValue));
                 return eb;
             }
         }

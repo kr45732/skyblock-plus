@@ -1391,7 +1391,7 @@ public class Player {
     }
 
     /* Inventory */
-    public Map<Integer, InvItemStruct> getGenericInventoryMap(NBTCompound parsedContents) {
+    public static Map<Integer, InvItemStruct> getGenericInventoryMap(NBTCompound parsedContents) {
         try {
             NBTList items = parsedContents.getList(".i");
             Map<Integer, InvItemStruct> itemsMap = new HashMap<>();

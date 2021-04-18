@@ -4,13 +4,12 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.utils.CustomPaginator;
-import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.ArmorStruct;
+import com.skyblockplus.utils.structs.PaginatorExtras;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -63,12 +62,17 @@ public class WardrobeCommand extends Command {
                 if (playerEnderChest != null) {
                     ebMessage.delete().queue();
                     if (missingEmoji.length() > 0) {
-                        ebMessage.getChannel().sendMessage(defaultEmbed("Missing Items").setDescription(missingEmoji).build()).queue();
+                        ebMessage.getChannel()
+                                .sendMessage(defaultEmbed("Missing Items").setDescription(missingEmoji).build())
+                                .queue();
                     }
 
-                    jda.addEventListener(new InventoryPaginator(playerEnderChest, ebMessage.getChannel(), event.getAuthor()));
+                    jda.addEventListener(
+                            new InventoryPaginator(playerEnderChest, ebMessage.getChannel(), event.getAuthor()));
                 } else {
-                    ebMessage.editMessage(defaultEmbed("Error").setDescription("Unable toUnable to fetch player data").build()).queue();
+                    ebMessage.editMessage(
+                            defaultEmbed("Error").setDescription("Unable toUnable to fetch player data").build())
+                            .queue();
                 }
                 return;
             }
@@ -95,18 +99,17 @@ public class WardrobeCommand extends Command {
         if (player.isValid()) {
             Map<Integer, ArmorStruct> armorStructMap = player.getWardrobeList();
             if (armorStructMap != null) {
-                ArrayList<String> pageTitles = new ArrayList<>();
-
-                CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(4);
+                CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1)
+                        .setItemsPerPage(4);
 
                 for (Map.Entry<Integer, ArmorStruct> currentArmour : armorStructMap.entrySet()) {
-                    pageTitles.add(player.getUsername());
                     paginateBuilder.addItems("**__Slot " + (currentArmour.getKey() + 1) + "__**\n"
                             + currentArmour.getValue().getHelmet() + "\n" + currentArmour.getValue().getChestplate()
                             + "\n" + currentArmour.getValue().getLeggings() + "\n" + currentArmour.getValue().getBoots()
                             + "\n");
                 }
-                paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles));
+                paginateBuilder.setPaginatorExtras(new PaginatorExtras().setEveryPageTitle(player.getUsername())
+                        .setEveryPageThumbnail(player.getThumbnailUrl()));
                 paginateBuilder.build().paginate(event.getChannel(), 0);
                 return null;
             }

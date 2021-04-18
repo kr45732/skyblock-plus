@@ -1,19 +1,25 @@
 package com.skyblockplus.inventory;
 
+import static com.skyblockplus.utils.Utils.capitalizeString;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.defaultPaginator;
+import static com.skyblockplus.utils.Utils.errorMessage;
+import static com.skyblockplus.utils.Utils.globalCooldown;
+import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.Utils.loadingEmbed;
+import static com.skyblockplus.utils.Utils.logCommand;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.utils.CustomPaginator;
-import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.structs.PaginatorExtras;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-
-import java.util.ArrayList;
-
-import static com.skyblockplus.utils.Utils.*;
 
 public class PetsCommand extends Command {
     private final EventWaiter waiter;
@@ -58,16 +64,16 @@ public class PetsCommand extends Command {
     private EmbedBuilder getPlayerSacks(String username, String profileName) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
-            ArrayList<String> pageTitles = new ArrayList<>();
-
-            CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(2).setItemsPerPage(20);
+            CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(2)
+                    .setItemsPerPage(20);
 
             JsonArray playerPets = player.getPets();
             for (JsonElement pet : playerPets) {
-                pageTitles.add("Pets for " + player.getUsername());
+
                 String petItem = null;
                 try {
-                    petItem = higherDepth(pet, "heldItem").getAsString().replace("PET_ITEM_", "").replace("_", " ").toLowerCase();
+                    petItem = higherDepth(pet, "heldItem").getAsString().replace("PET_ITEM_", "").replace("_", " ")
+                            .toLowerCase();
                     if (petItem.endsWith(" common")) {
                         petItem = "common " + petItem.replace(" common", "");
                     } else if (petItem.endsWith(" uncommon")) {
@@ -83,12 +89,16 @@ public class PetsCommand extends Command {
                 }
 
                 paginateBuilder.addItems(
-                        "**" + capitalizeString(higherDepth(pet, "type").getAsString().toLowerCase().replace("_", " ")) + " (" + player.petLevelFromXp(higherDepth(pet, "exp").getAsLong(), higherDepth(pet, "tier").getAsString()) + ")**" +
-                                "\nTier: " + higherDepth(pet, "tier").getAsString().toLowerCase() +
-                                (petItem != null ? "\nItem: " + petItem : ""));
+                        "**" + capitalizeString(higherDepth(pet, "type").getAsString().toLowerCase().replace("_", " "))
+                                + " ("
+                                + player.petLevelFromXp(higherDepth(pet, "exp").getAsLong(),
+                                        higherDepth(pet, "tier").getAsString())
+                                + ")**" + "\nTier: " + higherDepth(pet, "tier").getAsString().toLowerCase()
+                                + (petItem != null ? "\nItem: " + petItem : ""));
 
             }
-            paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles));
+            paginateBuilder.setPaginatorExtras(new PaginatorExtras().setEveryPageTitle(player.getUsername())
+                    .setEveryPageThumbnail(player.getThumbnailUrl()));
             paginateBuilder.build().paginate(event.getChannel(), 0);
             return null;
         }

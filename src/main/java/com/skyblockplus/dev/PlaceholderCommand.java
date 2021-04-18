@@ -28,14 +28,14 @@ public class PlaceholderCommand extends Command {
 
             logCommand(event.getGuild(), event.getAuthor(), content);
 
-            if(args[1].equals("get")) {
+            if (args[1].equals("get")) {
                 Guild guild = jda.getGuildById(args[2]);
                 List<TextChannel> channels = guild.getTextChannels();
                 System.out.println(guild.getName() + " - " + guild.getId() + " - " + guild.getMemberCount());
                 for (TextChannel channel : channels) {
                     System.out.println(channel.getName() + " - " + channel.getId());
                 }
-            } else if(args[1].equals("preview")){
+            } else if (args[1].equals("preview")) {
                 Guild guild = jda.getGuildById("796790757947867156");
                 TextChannel channel = guild.getTextChannelById("799048209929863168");
                 eb = defaultEmbed("Important Information");
@@ -47,7 +47,7 @@ public class PlaceholderCommand extends Command {
                                 "Feel free to invite me back once I'm verified!");
                 channel.sendMessage(guild.getOwner().getAsMention()).queue();
                 channel.sendMessage(eb.build()).queue();
-            }else if(args[1].equals("send")){
+            } else if (args[1].equals("send")) {
                 Guild guild = jda.getGuildById(args[2]);
                 TextChannel channel = guild.getTextChannelById(args[3]);
                 eb = defaultEmbed("Important Information");

@@ -28,7 +28,7 @@ public class GuildCommand extends Command {
         this.name = "guild";
         this.cooldown = globalCooldown;
         this.waiter = waiter;
-        this.aliases = new String[]{"g"};
+        this.aliases = new String[] { "g" };
     }
 
     @Override
@@ -103,35 +103,31 @@ public class GuildCommand extends Command {
         for (int i = 0; i < membersArr.size(); i++) {
             int finalI = i;
             asyncHttpClient
-                    .prepareGet("https://api.ashcon.app/mojang/v2/user/" + higherDepth(membersArr.get(i), "uuid").getAsString())
-                    .execute()
-                    .toCompletableFuture()
-                    .thenApply(
-                            uuidToUsernameResponse -> {
-                                try {
-                                    String currentUsername = higherDepth(JsonParser.parseString(uuidToUsernameResponse.getResponseBody()), "username").getAsString();
-                                    JsonElement expHistory = higherDepth(membersArr.get(finalI), "expHistory");
-                                    List<String> keys = getJsonKeys(expHistory);
-                                    int totalPlayerExp = 0;
+                    .prepareGet("https://api.ashcon.app/mojang/v2/user/"
+                            + higherDepth(membersArr.get(i), "uuid").getAsString())
+                    .execute().toCompletableFuture().thenApply(uuidToUsernameResponse -> {
+                        try {
+                            String currentUsername = higherDepth(
+                                    JsonParser.parseString(uuidToUsernameResponse.getResponseBody()), "username")
+                                            .getAsString();
+                            JsonElement expHistory = higherDepth(membersArr.get(finalI), "expHistory");
+                            List<String> keys = getJsonKeys(expHistory);
+                            int totalPlayerExp = 0;
 
-                                    for (String value : keys) {
-                                        totalPlayerExp += higherDepth(expHistory, value).getAsInt();
-                                    }
+                            for (String value : keys) {
+                                totalPlayerExp += higherDepth(expHistory, value).getAsInt();
+                            }
 
-                                    guildExpMap.put(currentUsername, totalPlayerExp);
-                                } catch (Exception e) {
-                                    guildExpMap.put("@null" + finalI, 0);
-                                }
-                                return true;
-                            }
-                    )
-                    .whenComplete(
-                            (aBoolean, throwable) -> {
-                                if (guildExpMap.size() == membersArr.size()) {
-                                    httpGetsFinishedLatch.countDown();
-                                }
-                            }
-                    );
+                            guildExpMap.put(currentUsername, totalPlayerExp);
+                        } catch (Exception e) {
+                            guildExpMap.put("@null" + finalI, 0);
+                        }
+                        return true;
+                    }).whenComplete((aBoolean, throwable) -> {
+                        if (guildExpMap.size() == membersArr.size()) {
+                            httpGetsFinishedLatch.countDown();
+                        }
+                    });
         }
 
         try {
@@ -141,12 +137,9 @@ public class GuildCommand extends Command {
             e.printStackTrace();
         }
 
-
         LinkedHashMap<String, Integer> reverseSortedMap = new LinkedHashMap<>();
 
-        guildExpMap.entrySet()
-                .stream()
-                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+        guildExpMap.entrySet().stream().sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .forEachOrdered(x -> {
                     try {
                         reverseSortedMap.put(x.getKey(), x.getValue());
@@ -154,13 +147,18 @@ public class GuildCommand extends Command {
                     }
                 });
 
-        CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(2).setItemsPerPage(20);
-        String[] pageTitles = new String[(int) Math.ceil(reverseSortedMap.size() / 20.0)];
-        String guildName = higherDepth(higherDepth(guildJson, "guild"), "name").getAsString();
-        Arrays.fill(pageTitles, guildName);
+        CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(2)
+                .setItemsPerPage(20);
 
-        String rankStr = "**Player:** " + uuidUsername.playerUsername + "\n**Guild Rank:** #" + (new ArrayList<>(reverseSortedMap.keySet()).indexOf(uuidUsername.playerUsername) + 1) + "\n**Exp:** " + formatNumber(reverseSortedMap.get(uuidUsername.playerUsername));
-        paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles).setEveryPageText(rankStr));
+        String rankStr = "**Player:** " + uuidUsername.playerUsername + "\n**Guild Rank:** #"
+                + (new ArrayList<>(reverseSortedMap.keySet()).indexOf(uuidUsername.playerUsername) + 1) + "\n**Exp:** "
+                + formatNumber(reverseSortedMap.get(uuidUsername.playerUsername));
+        paginateBuilder
+                .setPaginatorExtras(new PaginatorExtras()
+                        .setEveryPageTitle(higherDepth(higherDepth(guildJson, "guild"), "name").getAsString())
+                        .setEveryPageThumbnail("https://hypixel-leaderboard.senither.com/guilds/"
+                                + higherDepth(higherDepth(guildJson, "guild"), "_id").getAsString())
+                        .setEveryPageText(rankStr));
 
         int counter = 0;
         for (Map.Entry<String, Integer> k : reverseSortedMap.entrySet()) {
@@ -190,7 +188,9 @@ public class GuildCommand extends Command {
 
         try {
             String guildName = higherDepth(higherDepth(guildJson, "guild"), "name").getAsString();
-            EmbedBuilder eb = defaultEmbed(uuidUsername.playerUsername + " is in " + guildName, "https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(higherDepth(guildJson, "guild"), "_id").getAsString());
+            EmbedBuilder eb = defaultEmbed(uuidUsername.playerUsername + " is in " + guildName,
+                    "https://hypixel-leaderboard.senither.com/guilds/"
+                            + higherDepth(higherDepth(guildJson, "guild"), "_id").getAsString());
             eb.addField("Guild statistics:", getGuildInfo(guildJson), false);
             eb.setThumbnail("https://cravatar.eu/helmavatar/" + uuidUsername.playerUuid + "/64.png");
             return eb;
@@ -214,7 +214,8 @@ public class GuildCommand extends Command {
 
         String guildName = higherDepth(higherDepth(guildJson, "guild"), "name").getAsString();
 
-        EmbedBuilder eb = defaultEmbed(guildName, "https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(higherDepth(guildJson, "guild"), "_id").getAsString());
+        EmbedBuilder eb = defaultEmbed(guildName, "https://hypixel-leaderboard.senither.com/guilds/"
+                + higherDepth(higherDepth(guildJson, "guild"), "_id").getAsString());
         eb.addField("Guild statistics:", getGuildInfo(guildJson), false);
 
         return eb;
@@ -230,7 +231,8 @@ public class GuildCommand extends Command {
             }
             guildName = higherDepth(higherDepth(guildJson, "guild"), "name").getAsString();
 
-            EmbedBuilder eb = defaultEmbed(guildName, "https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(higherDepth(guildJson, "guild"), "_id").getAsString());
+            EmbedBuilder eb = defaultEmbed(guildName, "https://hypixel-leaderboard.senither.com/guilds/"
+                    + higherDepth(higherDepth(guildJson, "guild"), "_id").getAsString());
             eb.addField("Guild statistics:", getGuildInfo(guildJson), false);
             return eb;
         } catch (Exception e) {
@@ -305,26 +307,22 @@ public class GuildCommand extends Command {
         CountDownLatch httpGetsFinishedLatch = new CountDownLatch(1);
         for (int i = 0; i < membersArr.size(); i++) {
             asyncHttpClient
-                    .prepareGet("https://api.ashcon.app/mojang/v2/user/" + higherDepth(membersArr.get(i), "uuid").getAsString())
-                    .execute()
-                    .toCompletableFuture()
-                    .thenApply(
-                            uuidToUsernameResponse -> {
-                                try {
-                                    guildMembers.add(higherDepth(JsonParser.parseString(uuidToUsernameResponse.getResponseBody()), "username").getAsString());
-                                } catch (Exception e) {
-                                    guildMembers.add(null);
-                                }
-                                return true;
-                            }
-                    )
-                    .whenComplete(
-                            (aBoolean, throwable) -> {
-                                if (guildMembers.size() == membersArr.size()) {
-                                    httpGetsFinishedLatch.countDown();
-                                }
-                            }
-                    );
+                    .prepareGet("https://api.ashcon.app/mojang/v2/user/"
+                            + higherDepth(membersArr.get(i), "uuid").getAsString())
+                    .execute().toCompletableFuture().thenApply(uuidToUsernameResponse -> {
+                        try {
+                            guildMembers
+                                    .add(higherDepth(JsonParser.parseString(uuidToUsernameResponse.getResponseBody()),
+                                            "username").getAsString());
+                        } catch (Exception e) {
+                            guildMembers.add(null);
+                        }
+                        return true;
+                    }).whenComplete((aBoolean, throwable) -> {
+                        if (guildMembers.size() == membersArr.size()) {
+                            httpGetsFinishedLatch.countDown();
+                        }
+                    });
         }
 
         try {
@@ -334,13 +332,13 @@ public class GuildCommand extends Command {
             e.printStackTrace();
         }
 
+        CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(3)
+                .setItemsPerPage(27);
 
-        CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(3).setItemsPerPage(27);
-        String[] pageTitles = new String[(int) Math.ceil(guildMembers.size() / 20.0)];
-        String guildName = higherDepth(higherDepth(guildJson, "guild"), "name").getAsString();
-        Arrays.fill(pageTitles, guildName);
-
-        paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles));
+        paginateBuilder.setPaginatorExtras(new PaginatorExtras()
+                .setEveryPageTitle(higherDepth(higherDepth(guildJson, "guild"), "name").getAsString())
+                .setEveryPageThumbnail("https://hypixel-leaderboard.senither.com/guilds/"
+                        + higherDepth(higherDepth(guildJson, "guild"), "_id").getAsString()));
 
         for (String member : guildMembers) {
             if (member != null) {
@@ -354,11 +352,11 @@ public class GuildCommand extends Command {
     }
 
     private int guildExpToLevel(int guildExp) {
-        int[] guildExpTable = new int[]{100000, 150000, 250000, 500000, 750000, 1000000, 1250000, 1500000, 2000000,
-                2500000, 2500000, 2500000, 2500000, 2500000, 3000000};
+        int[] guildExpTable = new int[] { 100000, 150000, 250000, 500000, 750000, 1000000, 1250000, 1500000, 2000000,
+                2500000, 2500000, 2500000, 2500000, 2500000, 3000000 };
         int guildLevel = 0;
 
-        for (int i = 0; ; i++) {
+        for (int i = 0;; i++) {
             int expNeeded = i >= guildExpTable.length ? guildExpTable[guildExpTable.length - 1] : guildExpTable[i];
             guildExp -= expNeeded;
             if (guildExp < 0) {
