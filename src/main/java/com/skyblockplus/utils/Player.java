@@ -13,7 +13,6 @@ import me.nullicorn.nedit.type.NBTList;
 import net.dv8tion.jda.api.EmbedBuilder;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
 
@@ -88,7 +87,8 @@ public class Player {
         this.validPlayer = true;
     }
 
-    public Player(String playerUuid, String playerUsername, String profileName, JsonElement outerProfileJson, long startingAmount) {
+    public Player(String playerUuid, String playerUsername, String profileName, JsonElement outerProfileJson,
+            long startingAmount) {
         this.playerUuid = playerUuid;
         this.playerUsername = playerUsername;
         this.startingAmount = startingAmount;
@@ -152,12 +152,12 @@ public class Player {
 
     public int getSlayer(String slayerName) {
         switch (slayerName) {
-            case "sven":
-                return getWolfXp();
-            case "rev":
-                return getZombieXp();
-            case "tara":
-                return getSpiderXp();
+        case "sven":
+            return getWolfXp();
+        case "rev":
+            return getZombieXp();
+        case "tara":
+            return getSpiderXp();
         }
         return -1;
     }
@@ -306,7 +306,7 @@ public class Player {
                 try {
                     lastSaveLoop = higherDepth(
                             higherDepth(higherDepth(profilesArray.get(i), "members"), this.playerUuid), "last_save")
-                            .getAsString();
+                                    .getAsString();
                 } catch (Exception e) {
                     continue;
                 }
@@ -384,8 +384,8 @@ public class Player {
 
     public int getNumberMinionSlots() {
         try {
-            int[] craftedMinionsToSlots = new int[]{0, 5, 15, 30, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300,
-                    350, 400, 450, 500, 550, 600};
+            int[] craftedMinionsToSlots = new int[] { 0, 5, 15, 30, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300,
+                    350, 400, 450, 500, 550, 600 };
 
             int prevMax = 0;
             int craftedMinions = higherDepth(profileJson, "crafted_generators").getAsJsonArray().size();
@@ -418,44 +418,45 @@ public class Player {
     public int getSlayerLevel(String slayerName) {
 
         switch (slayerName) {
-            case "sven":
-                JsonArray wolfLevelArray = higherDepth(higherDepth(getLevelingJson(), "slayer_xp"), "wolf").getAsJsonArray();
-                int wolfXp = getWolfXp();
-                int prevWolfLevel = 0;
-                for (int i = 0; i < wolfLevelArray.size(); i++) {
-                    if (wolfXp >= wolfLevelArray.get(i).getAsInt()) {
-                        prevWolfLevel = i;
-                    } else {
-                        break;
-                    }
+        case "sven":
+            JsonArray wolfLevelArray = higherDepth(higherDepth(getLevelingJson(), "slayer_xp"), "wolf")
+                    .getAsJsonArray();
+            int wolfXp = getWolfXp();
+            int prevWolfLevel = 0;
+            for (int i = 0; i < wolfLevelArray.size(); i++) {
+                if (wolfXp >= wolfLevelArray.get(i).getAsInt()) {
+                    prevWolfLevel = i;
+                } else {
+                    break;
                 }
-                return (prevWolfLevel + 1);
-            case "rev":
-                JsonArray zombieLevelArray = higherDepth(higherDepth(getLevelingJson(), "slayer_xp"), "zombie")
-                        .getAsJsonArray();
-                int zombieXp = getZombieXp();
-                int prevZombieMax = 0;
-                for (int i = 0; i < zombieLevelArray.size(); i++) {
-                    if (zombieXp >= zombieLevelArray.get(i).getAsInt()) {
-                        prevZombieMax = i;
-                    } else {
-                        break;
-                    }
+            }
+            return (prevWolfLevel + 1);
+        case "rev":
+            JsonArray zombieLevelArray = higherDepth(higherDepth(getLevelingJson(), "slayer_xp"), "zombie")
+                    .getAsJsonArray();
+            int zombieXp = getZombieXp();
+            int prevZombieMax = 0;
+            for (int i = 0; i < zombieLevelArray.size(); i++) {
+                if (zombieXp >= zombieLevelArray.get(i).getAsInt()) {
+                    prevZombieMax = i;
+                } else {
+                    break;
                 }
-                return (prevZombieMax + 1);
-            case "tara":
-                JsonArray spiderLevelArray = higherDepth(higherDepth(getLevelingJson(), "slayer_xp"), "spider")
-                        .getAsJsonArray();
-                int spiderXp = getSpiderXp();
-                int prevSpiderMax = 0;
-                for (int i = 0; i < spiderLevelArray.size(); i++) {
-                    if (spiderXp >= spiderLevelArray.get(i).getAsInt()) {
-                        prevSpiderMax = i;
-                    } else {
-                        break;
-                    }
+            }
+            return (prevZombieMax + 1);
+        case "tara":
+            JsonArray spiderLevelArray = higherDepth(higherDepth(getLevelingJson(), "slayer_xp"), "spider")
+                    .getAsJsonArray();
+            int spiderXp = getSpiderXp();
+            int prevSpiderMax = 0;
+            for (int i = 0; i < spiderLevelArray.size(); i++) {
+                if (spiderXp >= spiderLevelArray.get(i).getAsInt()) {
+                    prevSpiderMax = i;
+                } else {
+                    break;
                 }
-                return (prevSpiderMax + 1);
+            }
+            return (prevSpiderMax + 1);
         }
         return 0;
     }
@@ -476,8 +477,7 @@ public class Player {
             for (int i = 0; i < wardrobeFrames.size(); i++) {
                 NBTCompound displayName = wardrobeFrames.getCompound(i).getCompound("tag.display");
                 if (displayName != null) {
-                    wardrobeFramesMap.put(i,
-                            parseMcCodes(displayName.getString("Name", "Empty")));
+                    wardrobeFramesMap.put(i, parseMcCodes(displayName.getString("Name", "Empty")));
                 } else {
                     wardrobeFramesMap.put(i, "Empty");
                 }
@@ -541,10 +541,16 @@ public class Player {
 
                 if (displayName != null) {
                     invFramesMap.put(i + 1, displayName.getString("id", "empty").toLowerCase());
-                } else if ((equippedArmor != null) && (equippedWardrobeSlot <= 9) && ((((i + 1) - equippedWardrobeSlot) % 9) == 0) && ((i + 1) <= 36) && (equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9) + 1)) != null) {
-                    invFramesMap.put(i + 1, equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9) + 1).getId().toLowerCase());
-                } else if ((equippedArmor != null) && (equippedWardrobeSlot > 9) && ((((i + 1) - equippedWardrobeSlot) % 9) == 0) && ((i + 1) > 36) && (equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9) + 1 - 3)) != null) {
-                    invFramesMap.put(i + 1, equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9) + 1 - 3).getId().toLowerCase());
+                } else if ((equippedArmor != null) && (equippedWardrobeSlot <= 9)
+                        && ((((i + 1) - equippedWardrobeSlot) % 9) == 0) && ((i + 1) <= 36)
+                        && (equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9) + 1)) != null) {
+                    invFramesMap.put(i + 1,
+                            equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9) + 1).getId().toLowerCase());
+                } else if ((equippedArmor != null) && (equippedWardrobeSlot > 9)
+                        && ((((i + 1) - equippedWardrobeSlot) % 9) == 0) && ((i + 1) > 36)
+                        && (equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9) + 1 - 3)) != null) {
+                    invFramesMap.put(i + 1,
+                            equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9) + 1 - 3).getId().toLowerCase());
                 } else {
                     invFramesMap.put(i + 1, "empty");
                 }
@@ -579,7 +585,7 @@ public class Player {
                 }
 
                 if (i.getKey() != 0 && i.getKey() % 36 == 0) {
-                    enderChestPages.add(new String[]{outputStringPart1.toString(), outputStringPart2.toString()});
+                    enderChestPages.add(new String[] { outputStringPart1.toString(), outputStringPart2.toString() });
                     outputStringPart1 = new StringBuilder();
                     outputStringPart2 = new StringBuilder();
                     page += 36;
@@ -652,7 +658,7 @@ public class Player {
                     }
                 }
             }
-            return new String[]{outputStringPart2.toString(), outputStringPart1.toString()};
+            return new String[] { outputStringPart2.toString(), outputStringPart1.toString() };
 
         } catch (Exception ignored) {
         }
@@ -1163,7 +1169,9 @@ public class Player {
 
     public String getFastestF7Time() {
         try {
-            int f7TimeMilliseconds = higherDepth(higherDepth(higherDepth(higherDepth(higherDepth(profileJson, "dungeons"), "dungeon_types"), "catacombs"), "fastest_time_s_plus"), "7").getAsInt();
+            int f7TimeMilliseconds = higherDepth(higherDepth(
+                    higherDepth(higherDepth(higherDepth(profileJson, "dungeons"), "dungeon_types"), "catacombs"),
+                    "fastest_time_s_plus"), "7").getAsInt();
             int minutes = f7TimeMilliseconds / 1000 / 60;
             int seconds = f7TimeMilliseconds % 1000 % 60;
             return "\n**Fastest F7 S+:** " + minutes + ":" + (seconds >= 10 ? seconds : "0" + seconds);
@@ -1249,7 +1257,7 @@ public class Player {
                 }
 
                 if (i.getKey() != 0 && i.getKey() % 45 == 0) {
-                    enderChestPages.add(new String[]{outputStringPart1.toString(), outputStringPart2.toString()});
+                    enderChestPages.add(new String[] { outputStringPart1.toString(), outputStringPart2.toString() });
                     outputStringPart1 = new StringBuilder();
                     outputStringPart2 = new StringBuilder();
                     page += 45;
@@ -1262,7 +1270,8 @@ public class Player {
     }
 
     public EmbedBuilder defaultPlayerEmbed() {
-        return defaultEmbed(fixUsername(getUsername()) + (higherDepth(outerProfileJson, "game_mode") != null ? " ♻️" : ""),
+        return defaultEmbed(
+                fixUsername(getUsername()) + (higherDepth(outerProfileJson, "game_mode") != null ? " ♻️" : ""),
                 skyblockStatsLink(getUsername(), getProfileName()));
     }
 
@@ -1317,7 +1326,7 @@ public class Player {
                 }
 
                 if (i.getKey() != 0 && i.getKey() % 45 == 0) {
-                    enderChestPages.add(new String[]{outputStringPart1.toString(), outputStringPart2.toString()});
+                    enderChestPages.add(new String[] { outputStringPart1.toString(), outputStringPart2.toString() });
                     outputStringPart1 = new StringBuilder();
                     outputStringPart2 = new StringBuilder();
                     page += 45;
@@ -1336,21 +1345,21 @@ public class Player {
             String petName = higherDepth(pet, "type").getAsString();
             int rarity = 0;
             switch (higherDepth(pet, "tier").getAsString().toLowerCase()) {
-                case "common":
-                    rarity = 1;
-                    break;
-                case "uncommon":
-                    rarity = 2;
-                    break;
-                case "rare":
-                    rarity = 3;
-                    break;
-                case "epic":
-                    rarity = 4;
-                    break;
-                case "legendary":
-                    rarity = 5;
-                    break;
+            case "common":
+                rarity = 1;
+                break;
+            case "uncommon":
+                rarity = 2;
+                break;
+            case "rare":
+                rarity = 3;
+                break;
+            case "epic":
+                rarity = 4;
+                break;
+            case "legendary":
+                rarity = 5;
+                break;
             }
             if (petsMap.containsKey(petName)) {
                 if (petsMap.get(petName) < rarity) {
@@ -1402,7 +1411,8 @@ public class Player {
                     if (!item.isEmpty()) {
                         InvItemStruct itemInfo = new InvItemStruct();
                         itemInfo.setName(parseMcCodes(item.getString("tag.display.Name", "None")));
-                        itemInfo.setLore(parseMcCodes(item.getString("tag.display.Lore", "None").replace(", ", "\n").replace("[", "").replace("]", "")));
+                        itemInfo.setLore(parseMcCodes(item.getString("tag.display.Lore", "None").replace(", ", "\n")
+                                .replace("[", "").replace("]", "")));
                         itemInfo.setCount(Integer.parseInt(item.getString("Count", "0").replace("b", " ")));
                         itemInfo.setId(item.getString("tag.ExtraAttributes.id", "None"));
                         itemInfo.setCreationTimestamp(item.getString("tag.ExtraAttributes.timestamp", "None"));
@@ -1436,8 +1446,10 @@ public class Player {
                         }
 
                         try {
-                            byte[] backpackContents = item.getByteArray("tag.ExtraAttributes." + itemInfo.getId().toLowerCase() + "_data");
-                            NBTCompound parsedContentsBackpack = NBTReader.read(new ByteArrayInputStream(backpackContents));
+                            byte[] backpackContents = item
+                                    .getByteArray("tag.ExtraAttributes." + itemInfo.getId().toLowerCase() + "_data");
+                            NBTCompound parsedContentsBackpack = NBTReader
+                                    .read(new ByteArrayInputStream(backpackContents));
                             itemInfo.setBackpackItems(getGenericInventoryMap(parsedContentsBackpack).values());
                         } catch (Exception ignored) {
                         }
@@ -1459,44 +1471,40 @@ public class Player {
 
     public Map<Integer, InvItemStruct> getInventoryMap() {
         try {
-            String contents = higherDepth(higherDepth(profileJson, "inv_contents"), "data")
-                    .getAsString();
+            String contents = higherDepth(higherDepth(profileJson, "inv_contents"), "data").getAsString();
             NBTCompound parsedContents = NBTReader.readBase64(contents);
             return getGenericInventoryMap(parsedContents);
-        } catch (IOException ignored) {
+        } catch (Exception ignored) {
         }
         return null;
     }
 
     public Map<Integer, InvItemStruct> getTalismanBagMap() {
         try {
-            String contents = higherDepth(higherDepth(profileJson, "talisman_bag"), "data")
-                    .getAsString();
+            String contents = higherDepth(higherDepth(profileJson, "talisman_bag"), "data").getAsString();
             NBTCompound parsedContents = NBTReader.readBase64(contents);
             return getGenericInventoryMap(parsedContents);
-        } catch (IOException ignored) {
+        } catch (Exception ignored) {
         }
         return null;
     }
 
     public Map<Integer, InvItemStruct> getInventoryArmorMap() {
         try {
-            String contents = higherDepth(higherDepth(profileJson, "inv_armor"), "data")
-                    .getAsString();
+            String contents = higherDepth(higherDepth(profileJson, "inv_armor"), "data").getAsString();
             NBTCompound parsedContents = NBTReader.readBase64(contents);
             return getGenericInventoryMap(parsedContents);
-        } catch (IOException ignored) {
+        } catch (Exception ignored) {
         }
         return null;
     }
 
     public Map<Integer, InvItemStruct> getWardrobeMap() {
         try {
-            String contents = higherDepth(higherDepth(profileJson, "wardrobe_contents"), "data")
-                    .getAsString();
+            String contents = higherDepth(higherDepth(profileJson, "wardrobe_contents"), "data").getAsString();
             NBTCompound parsedContents = NBTReader.readBase64(contents);
             return getGenericInventoryMap(parsedContents);
-        } catch (IOException ignored) {
+        } catch (Exception ignored) {
         }
         return null;
     }
@@ -1517,7 +1525,8 @@ public class Player {
             try {
                 InvItemStruct invItemStruct = new InvItemStruct();
                 invItemStruct.setName(capitalizeString(higherDepth(pet, "type").getAsString().toLowerCase()));
-                invItemStruct.setId(higherDepth(pet, "type").getAsString() + rarityMap.get(higherDepth(pet, "tier").getAsString()));
+                invItemStruct.setId(
+                        higherDepth(pet, "type").getAsString() + rarityMap.get(higherDepth(pet, "tier").getAsString()));
                 if (higherDepth(pet, "heldItem") != null) {
                     invItemStruct.addExtraValue(higherDepth(pet, "heldItem").getAsString());
                 }
@@ -1531,11 +1540,10 @@ public class Player {
 
     public Map<Integer, InvItemStruct> getEnderChestMap() {
         try {
-            String contents = higherDepth(higherDepth(profileJson, "ender_chest_contents"), "data")
-                    .getAsString();
+            String contents = higherDepth(higherDepth(profileJson, "ender_chest_contents"), "data").getAsString();
             NBTCompound parsedContents = NBTReader.readBase64(contents);
             return getGenericInventoryMap(parsedContents);
-        } catch (IOException ignored) {
+        } catch (Exception ignored) {
         }
         return null;
     }

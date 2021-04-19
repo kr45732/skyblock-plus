@@ -61,6 +61,10 @@ public class PlaceholderCommand extends Command {
                 channel.sendMessage(eb.build()).complete();
                 guild.leave().complete();
                 System.out.println("Left " + guild.getName() + " - " + guild.getId());
+            }else if (args[1].equals("send_silent")) {
+                Guild guild = jda.getGuildById(args[2]);
+                guild.leave().complete();
+                System.out.println("Left " + guild.getName() + " - " + guild.getId());
             }
 
 

@@ -1,18 +1,30 @@
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.errorMessage;
+import static com.skyblockplus.utils.Utils.getJson;
+import static com.skyblockplus.utils.Utils.getJsonKeys;
+import static com.skyblockplus.utils.Utils.getReforgeStonesJson;
+import static com.skyblockplus.utils.Utils.globalCooldown;
+import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.Utils.loadingEmbed;
+import static com.skyblockplus.utils.Utils.logCommand;
+import static com.skyblockplus.utils.Utils.simplifyNumber;
+import static java.lang.String.join;
+import static java.util.Collections.nCopies;
+
+import java.util.List;
+import java.util.Map;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.InvItemStruct;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-
-import java.util.List;
-import java.util.Map;
-
-import static com.skyblockplus.utils.Utils.*;
 
 public class NetworthCommand extends Command {
     private JsonElement lowestBinJson;
@@ -24,7 +36,7 @@ public class NetworthCommand extends Command {
     public NetworthCommand() {
         this.name = "networth";
         this.cooldown = globalCooldown;
-        this.aliases = new String[]{"nw"};
+        this.aliases = new String[] { "nw" };
     }
 
     @Override
@@ -36,7 +48,6 @@ public class NetworthCommand extends Command {
             String[] args = content.split(" ");
 
             logCommand(event.getGuild(), event.getAuthor(), content);
-
 
             if (args.length == 2) {
                 ebMessage.editMessage(getPlayerNetworth(args[1], null).build()).queue();
@@ -59,7 +70,8 @@ public class NetworthCommand extends Command {
             lowestBinJson = getJson("https://moulberry.codes/lowestbin.json");
             averageAuctionJson = getJson("http://moulberry.codes/auction_averages/3day.json");
             bazaarJson = higherDepth(getJson("https://api.hypixel.net/skyblock/bazaar"), "products");
-            sbzPrices = getJson("https://raw.githubusercontent.com/skyblockz/pricecheckbot/master/data.json").getAsJsonArray();
+            sbzPrices = getJson("https://raw.githubusercontent.com/skyblockz/pricecheckbot/master/data.json")
+                    .getAsJsonArray();
             failedCount = 0;
 
             double bankBalance = player.getBankBalance();
@@ -101,7 +113,8 @@ public class NetworthCommand extends Command {
                 enderChestTotal += calculateItemPrice(item);
             }
 
-            double totalNetworth = bankBalance + purseCoins + invTotal + talismanTotal + invArmor + wardrobeTotal + petsTotal + enderChestTotal;
+            double totalNetworth = bankBalance + purseCoins + invTotal + talismanTotal + invArmor + wardrobeTotal
+                    + petsTotal + enderChestTotal;
 
             eb.setDescription("Total Networth: " + simplifyNumber(totalNetworth));
             eb.addField("Bank", simplifyNumber(bankBalance), true);
@@ -148,18 +161,24 @@ public class NetworthCommand extends Command {
 
         try {
             if (item.isRecombobulated()) {
-                recombobulatedExtra = higherDepth(higherDepth(higherDepth(bazaarJson, "RECOMBOBULATOR_3000"), "quick_status"), "sellPrice").getAsDouble();
+                recombobulatedExtra = higherDepth(
+                        higherDepth(higherDepth(bazaarJson, "RECOMBOBULATOR_3000"), "quick_status"), "sellPrice")
+                                .getAsDouble();
             }
         } catch (Exception ignored) {
         }
 
         try {
-            hbpExtras = item.getHbpCount() * higherDepth(higherDepth(higherDepth(bazaarJson, "HOT_POTATO_BOOK"), "quick_status"), "sellPrice").getAsDouble();
+            hbpExtras = item.getHbpCount()
+                    * higherDepth(higherDepth(higherDepth(bazaarJson, "HOT_POTATO_BOOK"), "quick_status"), "sellPrice")
+                            .getAsDouble();
         } catch (Exception ignored) {
         }
 
         try {
-            fumingExtras = item.getFumingCount() * higherDepth(higherDepth(higherDepth(bazaarJson, "FUMING_POTATO_BOOK"), "quick_status"), "sellPrice").getAsDouble();
+            fumingExtras = item.getFumingCount()
+                    * higherDepth(higherDepth(higherDepth(bazaarJson, "FUMING_POTATO_BOOK"), "quick_status"),
+                            "sellPrice").getAsDouble();
         } catch (Exception ignored) {
         }
 
@@ -196,7 +215,8 @@ public class NetworthCommand extends Command {
         } catch (Exception ignored) {
         }
 
-        return itemCount * (itemCost + recombobulatedExtra + hbpExtras + enchantsExtras + fumingExtras + reforgeExtras + miscExtras + backpackExtras);
+        return itemCount * (itemCost + recombobulatedExtra + hbpExtras + enchantsExtras + fumingExtras + reforgeExtras
+                + miscExtras + backpackExtras);
     }
 
     private double calculateReforgePrice(String reforgeName, String itemRarity) {
@@ -208,7 +228,8 @@ public class NetworthCommand extends Command {
             if (higherDepth(reforgeStoneInfo, "reforgeName").getAsString().equalsIgnoreCase(reforgeName)) {
                 String reforgeStoneName = higherDepth(reforgeStoneInfo, "internalName").getAsString();
                 double reforgeStoneCost = getLowestPrice(reforgeStoneName);
-                double reforgeApplyCost = higherDepth(higherDepth(reforgeStoneInfo, "reforgeCosts"), itemRarity.toUpperCase()).getAsDouble();
+                double reforgeApplyCost = higherDepth(higherDepth(reforgeStoneInfo, "reforgeCosts"),
+                        itemRarity.toUpperCase()).getAsDouble();
                 return reforgeStoneCost + reforgeApplyCost;
             }
         }
@@ -230,7 +251,9 @@ public class NetworthCommand extends Command {
 
             try {
                 JsonElement avgInfo = higherDepth(averageAuctionJson, enchantName + ";" + i);
-                averageAuction = higherDepth(avgInfo, "clean_price") != null ? higherDepth(avgInfo, "clean_price").getAsDouble() : higherDepth(avgInfo, "price").getAsDouble();
+                averageAuction = higherDepth(avgInfo, "clean_price") != null
+                        ? higherDepth(avgInfo, "clean_price").getAsDouble()
+                        : higherDepth(avgInfo, "price").getAsDouble();
             } catch (Exception ignored) {
             }
 
@@ -257,10 +280,11 @@ public class NetworthCommand extends Command {
 
         try {
             JsonElement avgInfo = higherDepth(averageAuctionJson, itemId);
-            averageAuction = higherDepth(avgInfo, "clean_price") != null ? higherDepth(avgInfo, "clean_price").getAsDouble() : higherDepth(avgInfo, "price").getAsDouble();
+            averageAuction = higherDepth(avgInfo, "clean_price") != null
+                    ? higherDepth(avgInfo, "clean_price").getAsDouble()
+                    : higherDepth(avgInfo, "price").getAsDouble();
         } catch (Exception ignored) {
         }
-
 
         if (lowestBin == -1 && averageAuction != -1) {
             return averageAuction;
@@ -276,6 +300,15 @@ public class NetworthCommand extends Command {
         }
 
         try {
+            itemId = itemId.toLowerCase();
+            if (itemId.contains("generator")) {
+                String minionName = itemId.split("_generator_")[0];
+                int level = Integer.parseInt(itemId.split("_generator_")[1]);
+
+                itemId = minionName + "_minion_" + join("", nCopies(level, "i")).replace("iiiii", "v")
+                        .replace("iiii", "iv").replace("vv", "x").replace("viv", "ix");
+            }
+
             for (JsonElement itemPrice : sbzPrices) {
                 if (higherDepth(itemPrice, "name").getAsString().equalsIgnoreCase(itemId)) {
                     return higherDepth(itemPrice, "low").getAsDouble();
@@ -284,7 +317,9 @@ public class NetworthCommand extends Command {
         } catch (Exception ignored) {
         }
 
-        System.out.println(itemId);
+        if (!itemId.equalsIgnoreCase("none")) {
+            System.out.println(itemId);
+        }
 
         failedCount++;
         return 0;
