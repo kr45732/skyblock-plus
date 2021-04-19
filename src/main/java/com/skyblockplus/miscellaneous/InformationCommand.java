@@ -1,13 +1,19 @@
 package com.skyblockplus.miscellaneous;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-// import com.sun.management.OperatingSystemMXBean;
-import net.dv8tion.jda.api.EmbedBuilder;
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.utils.Utils.BOT_PREFIX;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.globalCooldown;
+import static com.skyblockplus.utils.Utils.logCommand;
+import static com.skyblockplus.utils.Utils.roundAndFormat;
+
 import java.time.temporal.ChronoUnit;
 
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.utils.Utils.*;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+
+// import com.sun.management.OperatingSystemMXBean;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class InformationCommand extends Command {
     public InformationCommand() {
@@ -38,11 +44,9 @@ public class InformationCommand extends Command {
                         "**Memory:** " + roundAndFormat(
                                 100.0 * (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())
                                         / (Runtime.getRuntime().totalMemory()))
-                // + "%\n**CPU:** "
-                // + roundAndFormat(100.0
-                // * ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class))
-                // + "%"
-                , true);
+                                + "%",
+                        false);
+
                 eb.addField("Links",
                         "[**Invite Link**](https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403040368&scope=bot)\n[**Discord Link**](https://discord.gg/DpcCAwMXwp)\n[**Forum Post**](https://hypixel.net/threads/discord-bot-skyblock-plus-90-servers.3980092/)",
                         true);
