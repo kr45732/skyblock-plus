@@ -96,7 +96,7 @@ public class QueryAuctionCommand extends Command {
                         if (itemStruct.getId().equals("ENCHANTED_BOOK")) {
                             if (itemStruct.getEnchantsFormatted().contains(enchantName)) {
                                 String lowestBinStr = "";
-                                lowestBinStr += "**Name:** " + itemStruct.getName();
+                                lowestBinStr += "**Name:** " + enchantName.replaceAll("[_;]", " ");
                                 lowestBinStr += "\n**Price:** "
                                         + simplifyNumber(higherDepth(lowestBinAh, "starting_bid").getAsDouble());
                                 lowestBinStr += "\n**Seller:** "
@@ -151,6 +151,7 @@ public class QueryAuctionCommand extends Command {
                     query = query.replace("mythic", "").trim();
                 }
 
+                System.out.println(query);
                 JsonArray ahQueryArr = queryAhApi(query);
 
                 if (ahQueryArr == null) {
@@ -166,7 +167,7 @@ public class QueryAuctionCommand extends Command {
                         continue;
                     }
 
-                    if (!rarity.equals("ANY") || !higherDepth(lowestBinAh, "tier").getAsString().equals(rarity)) {
+                    if (!rarity.equals("ANY") && !higherDepth(lowestBinAh, "tier").getAsString().equals(rarity)) {
                         continue;
                     }
 
@@ -176,7 +177,8 @@ public class QueryAuctionCommand extends Command {
                         InvItemStruct itemStruct = getGenericInventoryMap(nbtData).get(0);
                         if (itemStruct.getId().equals("PET")) {
                             String lowestBinStr = "";
-                            lowestBinStr += "**Name:** " + capitalizeString(rarity.toLowerCase()) + " "
+                            lowestBinStr += "**Name:** "
+                                    + capitalizeString(higherDepth(lowestBinAh, "tier").getAsString()) + " "
                                     + higherDepth(lowestBinAh, "item_name").getAsString();
                             lowestBinStr += "\n**Price:** "
                                     + simplifyNumber(higherDepth(lowestBinAh, "starting_bid").getAsDouble());
@@ -254,8 +256,7 @@ public class QueryAuctionCommand extends Command {
         return eb;
     }
 
-    public JsonArray queryAhApi(String query) {
-        JsonArray outputJson = null;
+    private JsonArray queryAhApi(String query) {
         CloseableHttpClient httpclient = HttpClientBuilder.create().build();
         try {
             HttpGet httpget = new HttpGet("https://api.eastarctica.tk/auctions/");
@@ -272,7 +273,7 @@ public class QueryAuctionCommand extends Command {
             httpget.setURI(uri);
 
             HttpResponse httpresponse = httpclient.execute(httpget);
-            outputJson = JsonParser.parseReader(new InputStreamReader(httpresponse.getEntity().getContent()))
+            return JsonParser.parseReader(new InputStreamReader(httpresponse.getEntity().getContent()))
                     .getAsJsonArray();
         } catch (Exception ignored) {
         } finally {
@@ -283,6 +284,6 @@ public class QueryAuctionCommand extends Command {
                 e.printStackTrace();
             }
         }
-        return outputJson;
+        return null;
     }
 }

@@ -1,13 +1,33 @@
 package com.skyblockplus;
 
+import static com.skyblockplus.utils.MainClassUtils.cacheApplyGuildUsers;
+import static com.skyblockplus.utils.MainClassUtils.closeAsyncHttpClient;
+import static com.skyblockplus.utils.Utils.BOT_PREFIX;
+import static com.skyblockplus.utils.Utils.BOT_TOKEN;
+import static com.skyblockplus.utils.Utils.setApplicationSettings;
+
+import javax.annotation.PreDestroy;
+import javax.security.auth.login.LoginException;
+
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.auctionbaz.AuctionCommand;
 import com.skyblockplus.auctionbaz.AverageAuctionCommand;
 import com.skyblockplus.auctionbaz.BazaarCommand;
+import com.skyblockplus.auctionbaz.BidsCommand;
 import com.skyblockplus.auctionbaz.BinCommand;
 import com.skyblockplus.auctionbaz.QueryAuctionCommand;
-import com.skyblockplus.dev.*;
+import com.skyblockplus.dev.DeleteMessagesCommand;
+import com.skyblockplus.dev.EmojiMapServerCommand;
+import com.skyblockplus.dev.GetAllGuildsIn;
+import com.skyblockplus.dev.GetEventListenersCommand;
+import com.skyblockplus.dev.GetSettingsFile;
+import com.skyblockplus.dev.InstantTimeNow;
+import com.skyblockplus.dev.LinkedUserDev;
+import com.skyblockplus.dev.PlaceholderCommand;
+import com.skyblockplus.dev.QuickSetupTestCommand;
+import com.skyblockplus.dev.ShutdownCommand;
+import com.skyblockplus.dev.UuidCommand;
 import com.skyblockplus.dungeons.CatacombsCommand;
 import com.skyblockplus.dungeons.EssenceCommand;
 import com.skyblockplus.dungeons.PartyFinderCommand;
@@ -15,10 +35,27 @@ import com.skyblockplus.eventlisteners.MainListener;
 import com.skyblockplus.eventlisteners.skyblockevent.SkyblockEventCommand;
 import com.skyblockplus.guilds.GuildCommand;
 import com.skyblockplus.guilds.GuildLeaderboardCommand;
-import com.skyblockplus.inventory.*;
+import com.skyblockplus.inventory.EnderChestCommand;
+import com.skyblockplus.inventory.InventoryCommand;
+import com.skyblockplus.inventory.PetsCommand;
+import com.skyblockplus.inventory.SacksCommand;
+import com.skyblockplus.inventory.TalismanBagCommand;
+import com.skyblockplus.inventory.WardrobeCommand;
 import com.skyblockplus.link.LinkAccountCommand;
 import com.skyblockplus.link.UnlinkAccountCommand;
-import com.skyblockplus.miscellaneous.*;
+import com.skyblockplus.miscellaneous.BaldCommand;
+import com.skyblockplus.miscellaneous.BankCommand;
+import com.skyblockplus.miscellaneous.CategoriesCommand;
+import com.skyblockplus.miscellaneous.HelpCommand;
+import com.skyblockplus.miscellaneous.HypixelCommand;
+import com.skyblockplus.miscellaneous.InformationCommand;
+import com.skyblockplus.miscellaneous.InviteCommand;
+import com.skyblockplus.miscellaneous.NetworthCommand;
+import com.skyblockplus.miscellaneous.ProfilesCommand;
+import com.skyblockplus.miscellaneous.ReloadCommand;
+import com.skyblockplus.miscellaneous.RoleCommands;
+import com.skyblockplus.miscellaneous.SkyblockCommand;
+import com.skyblockplus.miscellaneous.VersionCommand;
 import com.skyblockplus.settings.SettingsCommand;
 import com.skyblockplus.settings.SetupCommand;
 import com.skyblockplus.settings.SpringDatabaseComponent;
@@ -26,6 +63,12 @@ import com.skyblockplus.skills.SkillsCommand;
 import com.skyblockplus.slayer.SlayerCommand;
 import com.skyblockplus.timeout.MessageTimeout;
 import com.skyblockplus.weight.WeightCommand;
+
+import org.asynchttpclient.AsyncHttpClient;
+import org.asynchttpclient.Dsl;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -33,17 +76,6 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
-import org.asynchttpclient.AsyncHttpClient;
-import org.asynchttpclient.Dsl;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import javax.annotation.PreDestroy;
-import javax.security.auth.login.LoginException;
-
-import static com.skyblockplus.utils.MainClassUtils.cacheApplyGuildUsers;
-import static com.skyblockplus.utils.MainClassUtils.closeAsyncHttpClient;
-import static com.skyblockplus.utils.Utils.*;
 
 @SpringBootApplication
 public class Main {
@@ -77,7 +109,7 @@ public class Main {
                 new GetSettingsFile(), new UnlinkAccountCommand(), new LinkedUserDev(), new BazaarCommand(),
                 new AverageAuctionCommand(), new PetsCommand(waiter), new SkyblockEventCommand(),
                 new DeleteMessagesCommand(), new PlaceholderCommand(), new ProfilesCommand(waiter),
-                new NetworthCommand(), new QueryAuctionCommand());
+                new NetworthCommand(), new QueryAuctionCommand(), new BidsCommand());
 
         if (BOT_PREFIX.equals("+")) {
             jda = JDABuilder.createDefault(BOT_TOKEN).setStatus(OnlineStatus.DO_NOT_DISTURB)

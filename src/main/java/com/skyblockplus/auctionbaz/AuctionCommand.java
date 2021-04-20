@@ -1,6 +1,17 @@
 package com.skyblockplus.auctionbaz;
 
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.HYPIXEL_API_KEY;
+import static com.skyblockplus.utils.Utils.capitalizeString;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.errorMessage;
+import static com.skyblockplus.utils.Utils.getJson;
+import static com.skyblockplus.utils.Utils.globalCooldown;
+import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.Utils.loadingEmbed;
+import static com.skyblockplus.utils.Utils.logCommand;
+import static com.skyblockplus.utils.Utils.parseMcCodes;
+import static com.skyblockplus.utils.Utils.simplifyNumber;
+import static com.skyblockplus.utils.Utils.usernameToUuid;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -18,7 +29,7 @@ public class AuctionCommand extends Command {
     public AuctionCommand() {
         this.name = "auction";
         this.cooldown = globalCooldown;
-        this.aliases = new String[] { "ah" };
+        this.aliases = new String[] { "ah", "auctions" };
     }
 
     @Override
