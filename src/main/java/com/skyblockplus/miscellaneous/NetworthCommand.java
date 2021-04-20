@@ -79,36 +79,55 @@ public class NetworthCommand extends Command {
 
             double invTotal = 0;
             Map<Integer, InvItemStruct> playerInventory = player.getInventoryMap();
+
+            if (playerInventory == null) {
+                return defaultEmbed(player.getUsername() + "'s inventory API is disabled");
+            }
             for (InvItemStruct item : playerInventory.values()) {
                 invTotal += calculateItemPrice(item);
             }
 
             double talismanTotal = 0;
             Map<Integer, InvItemStruct> playerTalismans = player.getTalismanBagMap();
+            if (playerTalismans == null) {
+                return defaultEmbed(player.getUsername() + "'s talisman API is disabled");
+            }
             for (InvItemStruct item : playerTalismans.values()) {
                 talismanTotal += calculateItemPrice(item);
             }
 
             double invArmor = 0;
             Map<Integer, InvItemStruct> invArmorMap = player.getInventoryArmorMap();
+            if (invArmorMap == null) {
+                return defaultEmbed(player.getUsername() + "'s equipped armor API is disabled");
+            }
             for (InvItemStruct item : invArmorMap.values()) {
                 invArmor += calculateItemPrice(item);
             }
 
             double wardrobeTotal = 0;
             Map<Integer, InvItemStruct> wardrobeMap = player.getWardrobeMap();
+            if (wardrobeMap == null) {
+                return defaultEmbed(player.getUsername() + "'s wardrobe API is disabled");
+            }
             for (InvItemStruct item : wardrobeMap.values()) {
                 wardrobeTotal += calculateItemPrice(item);
             }
 
             double petsTotal = 0;
             List<InvItemStruct> petsMap = player.getPetsMapFormatted();
+            if (petsMap == null) {
+                return defaultEmbed(player.getUsername() + "'s pets API is disabled");
+            }
             for (InvItemStruct item : petsMap) {
                 petsTotal += calculateItemPrice(item);
             }
 
             double enderChestTotal = 0;
             Map<Integer, InvItemStruct> enderChest = player.getEnderChestMap();
+            if (enderChest == null) {
+                return defaultEmbed(player.getUsername() + "'s enderchest API is disabled");
+            }
             for (InvItemStruct item : enderChest.values()) {
                 enderChestTotal += calculateItemPrice(item);
             }
@@ -307,6 +326,27 @@ public class NetworthCommand extends Command {
 
                 itemId = minionName + "_minion_" + join("", nCopies(level, "i")).replace("iiiii", "v")
                         .replace("iiii", "iv").replace("vv", "x").replace("viv", "ix");
+            } else if (itemId.equals("magic_mushroom_soup")) {
+                itemId = "magical_mushroom_soup";
+            } else if (itemId.startsWith("theoretical_hoe_")) {
+                String parseHoe = itemId.split("theoretical_hoe_")[1];
+                String hoeType = parseHoe.split("_")[0];
+                int hoeLevel = Integer.parseInt(parseHoe.split("_")[1]);
+
+                for (JsonElement itemPrice : sbzPrices) {
+                    String itemNamePrice = higherDepth(itemPrice, "name").getAsString();
+                    if (itemNamePrice.startsWith("tier_" + hoeLevel) && itemNamePrice.endsWith(hoeType + "_hoe")) {
+                        return higherDepth(itemPrice, "low").getAsDouble();
+                    }
+                }
+            } else if (itemId.equals("mine_talisman")) {
+                itemId = "mine_affinity_talisman";
+            } else if (itemId.equals("village_talisman")) {
+                itemId = "village_affinity_talisman";
+            } else if (itemId.equals("coin_talisman")) {
+                itemId = "talisman_of_coins";
+            } else if (itemId.equals("melody_hair")) {
+                itemId = "melodys_hair";
             }
 
             for (JsonElement itemPrice : sbzPrices) {
@@ -317,11 +357,27 @@ public class NetworthCommand extends Command {
         } catch (Exception ignored) {
         }
 
+        if (isIgnoredItem(itemId)) {
+            return 0;
+        }
+
         if (!itemId.equalsIgnoreCase("none")) {
             System.out.println(itemId);
         }
 
         failedCount++;
         return 0;
+    }
+
+    private boolean isIgnoredItem(String s) {
+        if (s.startsWith("stained_glass_pane")) {
+            return true;
+        }
+
+        if (s.equals("skyblock_menu")) {
+            return true;
+        }
+
+        return false;
     }
 }
