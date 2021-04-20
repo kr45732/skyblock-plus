@@ -45,7 +45,7 @@ public class InformationCommand extends Command {
                                 100.0 * (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())
                                         / (Runtime.getRuntime().totalMemory()))
                                 + "%",
-                        false);
+                        true);
 
                 eb.addField("Links",
                         "[**Invite Link**](https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403040368&scope=bot)\n[**Discord Link**](https://discord.gg/DpcCAwMXwp)\n[**Forum Post**](https://hypixel.net/threads/discord-bot-skyblock-plus-90-servers.3980092/)",
