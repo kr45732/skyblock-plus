@@ -1549,7 +1549,8 @@ public class Player {
                 invItemStruct.setName("[Lvl "
                         + petLevelFromXp(higherDepth(pet, "exp").getAsLong(),
                                 higherDepth(pet, "tier").getAsString().toLowerCase())
-                        + "] " + capitalizeString(higherDepth(pet, "type").getAsString().toUpperCase()));
+                        + "] "
+                        + capitalizeString(higherDepth(pet, "type").getAsString().toUpperCase().replace("_", " ")));
                 invItemStruct.setId("PET");
                 if (higherDepth(pet, "heldItem") != null) {
                     invItemStruct.addExtraValue(higherDepth(pet, "heldItem").getAsString());
