@@ -1538,6 +1538,30 @@ public class Player {
         return petsNameFormatted;
     }
 
+    public List<InvItemStruct> getPetsMapNames() {
+        JsonArray petsArr = getPets();
+
+        List<InvItemStruct> petsNameFormatted = new ArrayList<>();
+
+        for (JsonElement pet : petsArr) {
+            try {
+                InvItemStruct invItemStruct = new InvItemStruct();
+                invItemStruct.setName("[Lvl "
+                        + petLevelFromXp(higherDepth(pet, "exp").getAsLong(),
+                                higherDepth(pet, "tier").getAsString().toLowerCase())
+                        + "] " + capitalizeString(higherDepth(pet, "type").getAsString().toUpperCase()));
+                invItemStruct.setId("PET");
+                if (higherDepth(pet, "heldItem") != null) {
+                    invItemStruct.addExtraValue(higherDepth(pet, "heldItem").getAsString());
+                }
+                petsNameFormatted.add(invItemStruct);
+            } catch (Exception ignored) {
+            }
+        }
+
+        return petsNameFormatted;
+    }
+
     public Map<Integer, InvItemStruct> getEnderChestMap() {
         try {
             String contents = higherDepth(higherDepth(profileJson, "ender_chest_contents"), "data").getAsString();

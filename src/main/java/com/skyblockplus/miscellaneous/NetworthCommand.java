@@ -1,5 +1,7 @@
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.auctionbaz.QueryAuctionCommand.queryAhApi;
+import static com.skyblockplus.utils.Player.getGenericInventoryMap;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.Utils.errorMessage;
 import static com.skyblockplus.utils.Utils.getJson;
@@ -13,8 +15,13 @@ import static com.skyblockplus.utils.Utils.simplifyNumber;
 import static java.lang.String.join;
 import static java.util.Collections.nCopies;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -23,6 +30,8 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.InvItemStruct;
 
+import me.nullicorn.nedit.NBTReader;
+import me.nullicorn.nedit.type.NBTCompound;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
@@ -32,6 +41,7 @@ public class NetworthCommand extends Command {
     private JsonElement bazaarJson;
     private JsonArray sbzPrices;
     private int failedCount;
+    private Set<String> tempSet;
 
     public NetworthCommand() {
         this.name = "networth";
@@ -46,6 +56,8 @@ public class NetworthCommand extends Command {
             Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
             String content = event.getMessage().getContentRaw();
             String[] args = content.split(" ");
+            failedCount = 0;
+            tempSet = new HashSet<String>();
 
             logCommand(event.getGuild(), event.getAuthor(), content);
 
@@ -114,8 +126,16 @@ public class NetworthCommand extends Command {
                 wardrobeTotal += calculateItemPrice(item);
             }
 
+            // double petsTotal = 0;
+            // List<InvItemStruct> petsMap = player.getPetsMapFormatted();
+            // if (petsMap == null) {
+            // return defaultEmbed(player.getUsername() + "'s pets API is disabled");
+            // }
+            // for (InvItemStruct item : petsMap) {
+            // petsTotal += calculateItemPrice(item);
+            // }
             double petsTotal = 0;
-            List<InvItemStruct> petsMap = player.getPetsMapFormatted();
+            List<InvItemStruct> petsMap = player.getPetsMapNames();
             if (petsMap == null) {
                 return defaultEmbed(player.getUsername() + "'s pets API is disabled");
             }
@@ -148,6 +168,8 @@ public class NetworthCommand extends Command {
                 eb.appendDescription("\nUnable to get " + failedCount + " items");
             }
 
+            tempSet.forEach(System.out::println);
+
             return eb;
         }
         return defaultEmbed("Unable to fetch player data");
@@ -169,7 +191,11 @@ public class NetworthCommand extends Command {
         double backpackExtras = 0;
 
         try {
-            itemCost = getLowestPrice(item.getId().toUpperCase());
+            if (item.getId().equals("PET")) {
+                itemCost = calculatePetPrice(item.getName(), item.getRarity());
+            } else {
+                itemCost = getLowestPrice(item.getId().toUpperCase(), item.getName());
+            }
         } catch (Exception ignored) {
         }
 
@@ -221,7 +247,7 @@ public class NetworthCommand extends Command {
         try {
             List<String> extraStats = item.getExtraStats();
             for (String extraItem : extraStats) {
-                miscExtras += getLowestPrice(extraItem);
+                miscExtras += getLowestPrice(extraItem, " ");
             }
         } catch (Exception ignored) {
         }
@@ -238,6 +264,51 @@ public class NetworthCommand extends Command {
                 + miscExtras + backpackExtras);
     }
 
+    private double calculatePetPrice(String petName, String rarity) {
+        JsonArray petQuery = queryAhApi(petName);
+
+        if (petQuery == null || petQuery.size() <= 0) {
+            return 0;
+        }
+
+        for (JsonElement lowestBinAh : petQuery) {
+
+            Instant endingAt = Instant.ofEpochMilli(higherDepth(lowestBinAh, "end").getAsLong());
+            Duration duration = Duration.between(Instant.now(), endingAt);
+            if (duration.getSeconds() <= 0) {
+                continue;
+            }
+
+            if (!higherDepth(lowestBinAh, "tier").getAsString().equals(rarity)) {
+                continue;
+            }
+
+            if (higherDepth(lowestBinAh, "item_lore").getAsString()
+                    .contains("Right-click to add this pet to\n§eyour pet menu!")) {
+                System.out.println("SUCCESS - " + petName + " - "
+                        + simplifyNumber(higherDepth(lowestBinAh, "starting_bid").getAsDouble()));
+                return higherDepth(lowestBinAh, "starting_bid").getAsDouble();
+            }
+        }
+
+        tempSet.add(petName);
+
+        try {
+            Map<String, String> rarityMap = new HashMap<>();
+            rarityMap.put("LEGENDARY", ";4");
+            rarityMap.put("EPIC", ";3");
+            rarityMap.put("RARE", ";2");
+            rarityMap.put("UNCOMMON", ";1");
+            rarityMap.put("COMMON", ";0");
+
+            petName = petName.split("] ")[1].toLowerCase().trim() + rarityMap.get(rarity);
+            return higherDepth(lowestBinJson, petName).getAsDouble();
+        } catch (Exception ignored) {
+        }
+
+        return 0;
+    }
+
     private double calculateReforgePrice(String reforgeName, String itemRarity) {
         JsonElement reforgesStonesJson = getReforgeStonesJson();
         List<String> reforgeStones = getJsonKeys(reforgesStonesJson);
@@ -246,7 +317,7 @@ public class NetworthCommand extends Command {
             JsonElement reforgeStoneInfo = higherDepth(reforgesStonesJson, reforgeStone);
             if (higherDepth(reforgeStoneInfo, "reforgeName").getAsString().equalsIgnoreCase(reforgeName)) {
                 String reforgeStoneName = higherDepth(reforgeStoneInfo, "internalName").getAsString();
-                double reforgeStoneCost = getLowestPrice(reforgeStoneName);
+                double reforgeStoneCost = getLowestPrice(reforgeStoneName, " ");
                 double reforgeApplyCost = higherDepth(higherDepth(reforgeStoneInfo, "reforgeCosts"),
                         itemRarity.toUpperCase()).getAsDouble();
                 return reforgeStoneCost + reforgeApplyCost;
@@ -288,7 +359,7 @@ public class NetworthCommand extends Command {
         return 0;
     }
 
-    public double getLowestPrice(String itemId) {
+    public double getLowestPrice(String itemId, String tempName) {
         double lowestBin = -1;
         double averageAuction = -1;
 
@@ -347,6 +418,8 @@ public class NetworthCommand extends Command {
                 itemId = "talisman_of_coins";
             } else if (itemId.equals("melody_hair")) {
                 itemId = "melodys_hair";
+            } else if (itemId.equals("theoretical_hoe")) {
+                itemId = "mathematical_hoe_blueprint";
             }
 
             for (JsonElement itemPrice : sbzPrices) {
@@ -361,15 +434,16 @@ public class NetworthCommand extends Command {
             return 0;
         }
 
-        if (!itemId.equalsIgnoreCase("none")) {
-            System.out.println(itemId);
-        }
-
+        tempSet.add(itemId + " - " + tempName);
         failedCount++;
         return 0;
     }
 
     private boolean isIgnoredItem(String s) {
+        if (s.equalsIgnoreCase("none")) {
+            return true;
+        }
+
         if (s.startsWith("stained_glass_pane")) {
             return true;
         }
