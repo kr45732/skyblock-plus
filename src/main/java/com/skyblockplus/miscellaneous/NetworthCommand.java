@@ -1,37 +1,33 @@
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.auctionbaz.QueryAuctionCommand.queryAhApi;
-import static com.skyblockplus.utils.Player.getGenericInventoryMap;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.errorMessage;
-import static com.skyblockplus.utils.Utils.getJson;
-import static com.skyblockplus.utils.Utils.getJsonKeys;
-import static com.skyblockplus.utils.Utils.getReforgeStonesJson;
-import static com.skyblockplus.utils.Utils.globalCooldown;
-import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.utils.Utils.loadingEmbed;
-import static com.skyblockplus.utils.Utils.logCommand;
-import static com.skyblockplus.utils.Utils.simplifyNumber;
+import static com.skyblockplus.utils.Utils.*;
 import static java.lang.String.join;
 import static java.util.Collections.nCopies;
 
-import java.time.Duration;
-import java.time.Instant;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.InvItemStruct;
 
-import me.nullicorn.nedit.NBTReader;
-import me.nullicorn.nedit.type.NBTCompound;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
@@ -42,6 +38,12 @@ public class NetworthCommand extends Command {
     private JsonArray sbzPrices;
     private int failedCount;
     private Set<String> tempSet;
+    private List<InvItemStruct> invPets;
+    private List<InvItemStruct> petsPets;
+    private List<InvItemStruct> enderChestPets;
+    private double enderChestTotal;
+    private double petsTotal;
+    private double invTotal;
 
     public NetworthCommand() {
         this.name = "networth";
@@ -56,8 +58,6 @@ public class NetworthCommand extends Command {
             Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
             String content = event.getMessage().getContentRaw();
             String[] args = content.split(" ");
-            failedCount = 0;
-            tempSet = new HashSet<String>();
 
             logCommand(event.getGuild(), event.getAuthor(), content);
 
@@ -84,73 +84,55 @@ public class NetworthCommand extends Command {
             bazaarJson = higherDepth(getJson("https://api.hypixel.net/skyblock/bazaar"), "products");
             sbzPrices = getJson("https://raw.githubusercontent.com/skyblockz/pricecheckbot/master/data.json")
                     .getAsJsonArray();
-            failedCount = 0;
 
+            failedCount = 0;
+            tempSet = new HashSet<>();
+            invPets = new ArrayList<>();
+            petsPets = new ArrayList<>();
+            enderChestPets = new ArrayList<>();
             double bankBalance = player.getBankBalance();
             double purseCoins = player.getPurseCoins();
+            invTotal = 0;
+            double talismanTotal = 0;
+            double invArmor = 0;
+            double wardrobeTotal = 0;
+            petsTotal = 0;
+            enderChestTotal = 0;
 
-            double invTotal = 0;
             Map<Integer, InvItemStruct> playerInventory = player.getInventoryMap();
-
             if (playerInventory == null) {
                 return defaultEmbed(player.getUsername() + "'s inventory API is disabled");
             }
             for (InvItemStruct item : playerInventory.values()) {
-                invTotal += calculateItemPrice(item);
+                invTotal += calculateItemPrice(item, "inventory");
             }
 
-            double talismanTotal = 0;
             Map<Integer, InvItemStruct> playerTalismans = player.getTalismanBagMap();
-            if (playerTalismans == null) {
-                return defaultEmbed(player.getUsername() + "'s talisman API is disabled");
-            }
             for (InvItemStruct item : playerTalismans.values()) {
                 talismanTotal += calculateItemPrice(item);
             }
 
-            double invArmor = 0;
             Map<Integer, InvItemStruct> invArmorMap = player.getInventoryArmorMap();
-            if (invArmorMap == null) {
-                return defaultEmbed(player.getUsername() + "'s equipped armor API is disabled");
-            }
             for (InvItemStruct item : invArmorMap.values()) {
                 invArmor += calculateItemPrice(item);
             }
 
-            double wardrobeTotal = 0;
             Map<Integer, InvItemStruct> wardrobeMap = player.getWardrobeMap();
-            if (wardrobeMap == null) {
-                return defaultEmbed(player.getUsername() + "'s wardrobe API is disabled");
-            }
             for (InvItemStruct item : wardrobeMap.values()) {
                 wardrobeTotal += calculateItemPrice(item);
             }
 
-            // double petsTotal = 0;
-            // List<InvItemStruct> petsMap = player.getPetsMapFormatted();
-            // if (petsMap == null) {
-            // return defaultEmbed(player.getUsername() + "'s pets API is disabled");
-            // }
-            // for (InvItemStruct item : petsMap) {
-            // petsTotal += calculateItemPrice(item);
-            // }
-            double petsTotal = 0;
             List<InvItemStruct> petsMap = player.getPetsMapNames();
-            if (petsMap == null) {
-                return defaultEmbed(player.getUsername() + "'s pets API is disabled");
-            }
             for (InvItemStruct item : petsMap) {
-                petsTotal += calculateItemPrice(item);
+                petsTotal += calculateItemPrice(item, "pets");
             }
 
-            double enderChestTotal = 0;
             Map<Integer, InvItemStruct> enderChest = player.getEnderChestMap();
-            if (enderChest == null) {
-                return defaultEmbed(player.getUsername() + "'s enderchest API is disabled");
-            }
             for (InvItemStruct item : enderChest.values()) {
-                enderChestTotal += calculateItemPrice(item);
+                enderChestTotal += calculateItemPrice(item, "enderchest");
             }
+
+            calculateAllPetsPrice();
 
             double totalNetworth = bankBalance + purseCoins + invTotal + talismanTotal + invArmor + wardrobeTotal
                     + petsTotal + enderChestTotal;
@@ -175,7 +157,135 @@ public class NetworthCommand extends Command {
         return defaultEmbed("Unable to fetch player data");
     }
 
+    private static JsonArray queryAhApi(String query) {
+        CloseableHttpClient httpclient = HttpClientBuilder.create().build();
+        try {
+            HttpGet httpget = new HttpGet("https://api.eastarctica.tk/auctions/");
+            httpget.addHeader("content-type", "application/json; charset=UTF-8");
+
+            URI uri = new URIBuilder(httpget.getURI())
+                    .addParameter("query", "{\"item_name\":{\"$in\":[" + query + "]},\"bin\":true}")
+                    .addParameter("sort", "{\"starting_bid\":1}").build();
+            httpget.setURI(uri);
+
+            HttpResponse httpresponse = httpclient.execute(httpget);
+            return JsonParser.parseReader(new InputStreamReader(httpresponse.getEntity().getContent()))
+                    .getAsJsonArray();
+        } catch (Exception ignored) {
+        } finally {
+            try {
+                httpclient.close();
+            } catch (Exception e) {
+                System.out.println("== Stack Trace (Nw Query Close Http Client) ==");
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    private void calculateAllPetsPrice() {
+        String queryStr = "";
+        for (InvItemStruct item : invPets) {
+            String petName = capitalizeString(item.getName()).replace("lvl", "Lvl");
+            queryStr += "\"" + petName + "\",";
+        }
+        for (InvItemStruct item : petsPets) {
+            String petName = capitalizeString(item.getName()).replace("lvl", "Lvl");
+            queryStr += "\"" + petName + "\",";
+        }
+        for (InvItemStruct item : enderChestPets) {
+            String petName = capitalizeString(item.getName()).replace("lvl", "Lvl");
+            queryStr += "\"" + petName + "\",";
+        }
+
+        if (queryStr.length() == 0) {
+            return;
+        }
+
+        queryStr = queryStr.substring(0, queryStr.length() - 1);
+
+        JsonArray ahQuery = queryAhApi(queryStr);
+
+        for (JsonElement auction : ahQuery) {
+            String auctionName = higherDepth(auction, "item_name").getAsString();
+            double auctionPrice = higherDepth(auction, "starting_bid").getAsDouble();
+            String auctionRarity = higherDepth(auction, "tier").getAsString();
+
+            for (Iterator<InvItemStruct> iterator = invPets.iterator(); iterator.hasNext();) {
+                InvItemStruct item = iterator.next();
+                if (item.getName().equalsIgnoreCase(auctionName) && item.getRarity().equalsIgnoreCase(auctionRarity)) {
+                    System.out.println(auctionName + " - " + simplifyNumber(auctionPrice) + " - " + auctionRarity);
+                    invTotal += auctionPrice
+                            + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ") : 0);
+                    iterator.remove();
+                }
+            }
+
+            for (Iterator<InvItemStruct> iterator = petsPets.iterator(); iterator.hasNext();) {
+                InvItemStruct item = iterator.next();
+                if (item.getName().equalsIgnoreCase(auctionName) && item.getRarity().equalsIgnoreCase(auctionRarity)) {
+                    System.out.println(auctionName + " - " + simplifyNumber(auctionPrice) + " - " + auctionRarity);
+                    petsTotal += auctionPrice
+                            + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ") : 0);
+                    iterator.remove();
+                }
+            }
+
+            for (Iterator<InvItemStruct> iterator = enderChestPets.iterator(); iterator.hasNext();) {
+                InvItemStruct item = iterator.next();
+                if (item.getName().equalsIgnoreCase(auctionName) && item.getRarity().equalsIgnoreCase(auctionRarity)) {
+                    System.out.println(auctionName + " - " + simplifyNumber(auctionPrice) + " - " + auctionRarity);
+                    enderChestTotal += auctionPrice
+                            + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ") : 0);
+                    iterator.remove();
+                }
+            }
+        }
+
+        Map<String, String> rarityMap = new HashMap<>();
+        rarityMap.put("LEGENDARY", ";4");
+        rarityMap.put("EPIC", ";3");
+        rarityMap.put("RARE", ";2");
+        rarityMap.put("UNCOMMON", ";1");
+        rarityMap.put("COMMON", ";0");
+
+        for (InvItemStruct item : invPets) {
+            tempSet.add(item.getName());
+            try {
+                invTotal += higherDepth(lowestBinJson,
+                        item.getName().split("] ")[1].toLowerCase().trim() + rarityMap.get(item.getRarity()))
+                                .getAsDouble();
+            } catch (Exception ignored) {
+            }
+        }
+
+        for (InvItemStruct item : petsPets) {
+            tempSet.add(item.getName());
+            try {
+                petsTotal += higherDepth(lowestBinJson,
+                        item.getName().split("] ")[1].toLowerCase().trim() + rarityMap.get(item.getRarity()))
+                                .getAsDouble();
+            } catch (Exception ignored) {
+            }
+        }
+
+        for (InvItemStruct item : enderChestPets) {
+            tempSet.add(item.getName());
+            try {
+                enderChestTotal += higherDepth(lowestBinJson,
+                        item.getName().split("] ")[1].toLowerCase().trim() + rarityMap.get(item.getRarity()))
+                                .getAsDouble();
+            } catch (Exception ignored) {
+            }
+        }
+
+    }
+
     public double calculateItemPrice(InvItemStruct item) {
+        return calculateItemPrice(item, null);
+    }
+
+    public double calculateItemPrice(InvItemStruct item, String location) {
         if (item == null) {
             return 0;
         }
@@ -191,8 +301,19 @@ public class NetworthCommand extends Command {
         double backpackExtras = 0;
 
         try {
-            if (item.getId().equals("PET")) {
-                itemCost = calculatePetPrice(item.getName(), item.getRarity());
+            if (item.getId().equals("PET") && location != null) {
+                switch (location) {
+                case "inventory":
+                    invPets.add(item);
+                    break;
+                case "pets":
+                    petsPets.add(item);
+                    break;
+                case "enderchest":
+                    enderChestPets.add(item);
+                    break;
+                }
+                return 0;
             } else {
                 itemCost = getLowestPrice(item.getId().toUpperCase(), item.getName());
             }
@@ -262,51 +383,6 @@ public class NetworthCommand extends Command {
 
         return itemCount * (itemCost + recombobulatedExtra + hbpExtras + enchantsExtras + fumingExtras + reforgeExtras
                 + miscExtras + backpackExtras);
-    }
-
-    private double calculatePetPrice(String petName, String rarity) {
-        JsonArray petQuery = queryAhApi(petName);
-
-        if (petQuery == null || petQuery.size() <= 0) {
-            return 0;
-        }
-
-        for (JsonElement lowestBinAh : petQuery) {
-
-            Instant endingAt = Instant.ofEpochMilli(higherDepth(lowestBinAh, "end").getAsLong());
-            Duration duration = Duration.between(Instant.now(), endingAt);
-            if (duration.getSeconds() <= 0) {
-                continue;
-            }
-
-            if (!higherDepth(lowestBinAh, "tier").getAsString().equals(rarity)) {
-                continue;
-            }
-
-            if (higherDepth(lowestBinAh, "item_lore").getAsString()
-                    .contains("Right-click to add this pet to\n§eyour pet menu!")) {
-                System.out.println("SUCCESS - " + petName + " - "
-                        + simplifyNumber(higherDepth(lowestBinAh, "starting_bid").getAsDouble()));
-                return higherDepth(lowestBinAh, "starting_bid").getAsDouble();
-            }
-        }
-
-        tempSet.add(petName);
-
-        try {
-            Map<String, String> rarityMap = new HashMap<>();
-            rarityMap.put("LEGENDARY", ";4");
-            rarityMap.put("EPIC", ";3");
-            rarityMap.put("RARE", ";2");
-            rarityMap.put("UNCOMMON", ";1");
-            rarityMap.put("COMMON", ";0");
-
-            petName = petName.split("] ")[1].toLowerCase().trim() + rarityMap.get(rarity);
-            return higherDepth(lowestBinJson, petName).getAsDouble();
-        } catch (Exception ignored) {
-        }
-
-        return 0;
     }
 
     private double calculateReforgePrice(String reforgeName, String itemRarity) {
@@ -420,6 +496,8 @@ public class NetworthCommand extends Command {
                 itemId = "melodys_hair";
             } else if (itemId.equals("theoretical_hoe")) {
                 itemId = "mathematical_hoe_blueprint";
+            } else if (itemId.equals("dctr_space_helm")) {
+                itemId = "dctrs_space_helmet";
             }
 
             for (JsonElement itemPrice : sbzPrices) {

@@ -151,7 +151,6 @@ public class QueryAuctionCommand extends Command {
                     query = query.replace("mythic", "").trim();
                 }
 
-                System.out.println(query);
                 JsonArray ahQueryArr = queryAhApi(query);
 
                 if (ahQueryArr == null) {
@@ -256,7 +255,7 @@ public class QueryAuctionCommand extends Command {
         return eb;
     }
 
-    public static JsonArray queryAhApi(String query) {
+    private static JsonArray queryAhApi(String query) {
         CloseableHttpClient httpclient = HttpClientBuilder.create().build();
         try {
             HttpGet httpget = new HttpGet("https://api.eastarctica.tk/auctions/");

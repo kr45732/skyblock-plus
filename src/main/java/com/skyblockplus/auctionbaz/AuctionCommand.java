@@ -57,11 +57,15 @@ public class AuctionCommand extends Command {
             return defaultEmbed("Error fetching player data");
         }
 
-        String url = "https://api.hypixel.net/skyblock/auction?key=" + HYPIXEL_API_KEY + "&player="
-                + usernameUuidStruct.playerUuid;
+        JsonElement playerAuctions = getJson("https://api.hypixel.net/skyblock/auction?key=" + HYPIXEL_API_KEY
+                + "&player=" + usernameUuidStruct.playerUuid);
+        JsonArray auctionsArray;
+        try {
+            auctionsArray = higherDepth(playerAuctions, "auctions").getAsJsonArray();
+        } catch (Exception e) {
+            return defaultEmbed("Error fetching player data");
+        }
 
-        JsonElement playerAuctions = getJson(url);
-        JsonArray auctionsArray = higherDepth(playerAuctions, "auctions").getAsJsonArray();
         String[][] auctions = new String[auctionsArray.size()][2];
 
         int totalSoldValue = 0;

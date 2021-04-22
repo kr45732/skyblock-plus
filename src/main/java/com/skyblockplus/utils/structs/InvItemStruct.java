@@ -1,10 +1,12 @@
 package com.skyblockplus.utils.structs;
 
-import lombok.Data;
+import static com.skyblockplus.utils.Utils.parseMcCodes;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import lombok.Data;
 
 @Data
 public class InvItemStruct {
@@ -21,6 +23,7 @@ public class InvItemStruct {
     private boolean recombobulated = false;
     private List<String> extraStats = new ArrayList<>();
     private List<InvItemStruct> backpackItems = new ArrayList<>();
+    private String rarity;
 
     public void setHbpCount(int hbpCount) {
         if (hbpCount > 10) {
@@ -35,13 +38,12 @@ public class InvItemStruct {
         extraStats.add(itemId);
     }
 
-    public String getRarity() {
+    public void setLore(String lore) {
+        this.lore = lore;
         if (lore != null) {
-            String[] loreArr = lore.split("\n");
-            return loreArr[loreArr.length - 1].trim().split(" ")[0];
+            String[] loreArr = parseMcCodes(lore).split("\n");
+            this.rarity = loreArr[loreArr.length - 1].trim().split(" ")[0];
         }
-
-        return null;
     }
 
     public void setBackpackItems(Collection<InvItemStruct> backpackItems) {

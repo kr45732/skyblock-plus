@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.skyblockplus.Main.jda;
 
@@ -451,7 +452,7 @@ public class Utils {
                 }
 
                 if (tempItem.endsWith("_") && tempItem.length() > 1) {
-                    tempItem = tempItem.substring(0, tempItem.length() - 1);
+                    tempItem = tempItem.substring(0, tempItem.length() - 2);
                 }
 
                 preFormattedItem = "PET_SKIN_" + tempItem;
@@ -533,7 +534,10 @@ public class Utils {
     }
 
     public static String capitalizeString(String str) {
-        return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
+        return Stream.of(str.trim().split("\\s")).filter(word -> word.length() > 0)
+                .map(word -> word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase())
+                .collect(Collectors.joining(" "));
+        // return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
     }
 
     public static ArrayList<String> getJsonKeys(JsonElement jsonElement) {

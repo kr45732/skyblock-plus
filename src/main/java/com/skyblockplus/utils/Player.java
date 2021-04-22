@@ -609,8 +609,7 @@ public class Player {
             for (int i = 0; i < talismanFrames.size(); i++) {
                 NBTCompound displayName = talismanFrames.getCompound(i).getCompound("tag.display");
                 if (displayName != null) {
-                    armorFramesMap.put(i,
-                            displayName.getString("Name", "Empty").replaceAll("§f|§a|§9|§5|§6|§d|§4|§c|", ""));
+                    armorFramesMap.put(i, parseMcCodes(displayName.getString("Name", "Empty")));
                 } else {
                     armorFramesMap.put(i, "Empty");
                 }
@@ -1552,6 +1551,7 @@ public class Player {
                         + "] "
                         + capitalizeString(higherDepth(pet, "type").getAsString().toUpperCase().replace("_", " ")));
                 invItemStruct.setId("PET");
+                invItemStruct.setRarity(higherDepth(pet, "tier").getAsString());
                 if (higherDepth(pet, "heldItem") != null) {
                     invItemStruct.addExtraValue(higherDepth(pet, "heldItem").getAsString());
                 }
