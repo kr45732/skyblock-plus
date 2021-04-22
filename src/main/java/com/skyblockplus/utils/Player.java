@@ -376,7 +376,7 @@ public class Player {
         for (int i = petRarityOffset; i < petLevelsXpPer.size(); i++) {
             totalExp += petLevelsXpPer.get(i).getAsLong();
             if (totalExp >= petExp) {
-                return (i - petRarityOffset + 1);
+                return (i - petRarityOffset + 1 > 100 ? 100 : i - petRarityOffset + 1);
             }
         }
         return 100;

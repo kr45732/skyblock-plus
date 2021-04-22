@@ -214,7 +214,6 @@ public class NetworthCommand extends Command {
             for (Iterator<InvItemStruct> iterator = invPets.iterator(); iterator.hasNext();) {
                 InvItemStruct item = iterator.next();
                 if (item.getName().equalsIgnoreCase(auctionName) && item.getRarity().equalsIgnoreCase(auctionRarity)) {
-                    System.out.println(auctionName + " - " + simplifyNumber(auctionPrice) + " - " + auctionRarity);
                     invTotal += auctionPrice
                             + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ") : 0);
                     iterator.remove();
@@ -224,7 +223,6 @@ public class NetworthCommand extends Command {
             for (Iterator<InvItemStruct> iterator = petsPets.iterator(); iterator.hasNext();) {
                 InvItemStruct item = iterator.next();
                 if (item.getName().equalsIgnoreCase(auctionName) && item.getRarity().equalsIgnoreCase(auctionRarity)) {
-                    System.out.println(auctionName + " - " + simplifyNumber(auctionPrice) + " - " + auctionRarity);
                     petsTotal += auctionPrice
                             + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ") : 0);
                     iterator.remove();
@@ -234,7 +232,6 @@ public class NetworthCommand extends Command {
             for (Iterator<InvItemStruct> iterator = enderChestPets.iterator(); iterator.hasNext();) {
                 InvItemStruct item = iterator.next();
                 if (item.getName().equalsIgnoreCase(auctionName) && item.getRarity().equalsIgnoreCase(auctionRarity)) {
-                    System.out.println(auctionName + " - " + simplifyNumber(auctionPrice) + " - " + auctionRarity);
                     enderChestTotal += auctionPrice
                             + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ") : 0);
                     iterator.remove();
@@ -250,7 +247,6 @@ public class NetworthCommand extends Command {
         rarityMap.put("COMMON", ";0");
 
         for (InvItemStruct item : invPets) {
-            tempSet.add(item.getName());
             try {
                 invTotal += higherDepth(lowestBinJson,
                         item.getName().split("] ")[1].toLowerCase().trim() + rarityMap.get(item.getRarity()))
@@ -260,7 +256,6 @@ public class NetworthCommand extends Command {
         }
 
         for (InvItemStruct item : petsPets) {
-            tempSet.add(item.getName());
             try {
                 petsTotal += higherDepth(lowestBinJson,
                         item.getName().split("] ")[1].toLowerCase().trim() + rarityMap.get(item.getRarity()))
@@ -270,7 +265,6 @@ public class NetworthCommand extends Command {
         }
 
         for (InvItemStruct item : enderChestPets) {
-            tempSet.add(item.getName());
             try {
                 enderChestTotal += higherDepth(lowestBinJson,
                         item.getName().split("] ")[1].toLowerCase().trim() + rarityMap.get(item.getRarity()))
