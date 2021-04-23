@@ -26,7 +26,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.utils.structs.InvItemStruct;
+import com.skyblockplus.utils.structs.InvItem;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -92,7 +92,7 @@ public class QueryAuctionCommand extends Command {
                     try {
                         NBTCompound nbtData = NBTReader
                                 .readBase64(higherDepth(lowestBinAh, "item_bytes").getAsString());
-                        InvItemStruct itemStruct = getGenericInventoryMap(nbtData).get(0);
+                        InvItem itemStruct = getGenericInventoryMap(nbtData).get(0);
                         if (itemStruct.getId().equals("ENCHANTED_BOOK")) {
                             if (itemStruct.getEnchantsFormatted().contains(enchantName)) {
                                 String lowestBinStr = "";
@@ -173,7 +173,7 @@ public class QueryAuctionCommand extends Command {
                     try {
                         NBTCompound nbtData = NBTReader
                                 .readBase64(higherDepth(lowestBinAh, "item_bytes").getAsString());
-                        InvItemStruct itemStruct = getGenericInventoryMap(nbtData).get(0);
+                        InvItem itemStruct = getGenericInventoryMap(nbtData).get(0);
                         if (itemStruct.getId().equals("PET")) {
                             String lowestBinStr = "";
                             lowestBinStr += "**Name:** "
@@ -237,7 +237,7 @@ public class QueryAuctionCommand extends Command {
 
             try {
                 NBTCompound nbtData = NBTReader.readBase64(higherDepth(lowestBinAh, "item_bytes").getAsString());
-                InvItemStruct itemStruct = getGenericInventoryMap(nbtData).get(0);
+                InvItem itemStruct = getGenericInventoryMap(nbtData).get(0);
                 if (itemStruct.getId().equals("ENCHANTED_BOOK")) {
                     eb.setThumbnail("https://sky.lea.moe/item.gif/ENCHANTED_BOOK");
                 } else if (itemStruct.getId().equals("PET")) {

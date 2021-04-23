@@ -9,7 +9,7 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class InvItemStruct {
+public class InvItem {
     private String name;
     private String lore;
     private int count = 1;
@@ -22,7 +22,7 @@ public class InvItemStruct {
     private int fumingCount = 0;
     private boolean recombobulated = false;
     private List<String> extraStats = new ArrayList<>();
-    private List<InvItemStruct> backpackItems = new ArrayList<>();
+    private List<InvItem> backpackItems = new ArrayList<>();
     private String rarity;
 
     public void setHbpCount(int hbpCount) {
@@ -46,7 +46,7 @@ public class InvItemStruct {
         }
     }
 
-    public void setBackpackItems(Collection<InvItemStruct> backpackItems) {
+    public void setBackpackItems(Collection<InvItem> backpackItems) {
         this.backpackItems.clear();
         this.backpackItems.addAll(backpackItems);
     }

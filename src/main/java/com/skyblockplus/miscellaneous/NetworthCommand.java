@@ -1,6 +1,16 @@
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.capitalizeString;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.errorMessage;
+import static com.skyblockplus.utils.Utils.getJson;
+import static com.skyblockplus.utils.Utils.getJsonKeys;
+import static com.skyblockplus.utils.Utils.getReforgeStonesJson;
+import static com.skyblockplus.utils.Utils.globalCooldown;
+import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.Utils.loadingEmbed;
+import static com.skyblockplus.utils.Utils.logCommand;
+import static com.skyblockplus.utils.Utils.simplifyNumber;
 import static java.lang.String.join;
 import static java.util.Collections.nCopies;
 
@@ -20,7 +30,7 @@ import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.structs.InvItemStruct;
+import com.skyblockplus.utils.structs.InvItem;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -38,9 +48,9 @@ public class NetworthCommand extends Command {
     private JsonArray sbzPrices;
     private int failedCount;
     private Set<String> tempSet;
-    private List<InvItemStruct> invPets;
-    private List<InvItemStruct> petsPets;
-    private List<InvItemStruct> enderChestPets;
+    private List<InvItem> invPets;
+    private List<InvItem> petsPets;
+    private List<InvItem> enderChestPets;
     private double enderChestTotal;
     private double petsTotal;
     private double invTotal;
@@ -58,6 +68,8 @@ public class NetworthCommand extends Command {
             Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
             String content = event.getMessage().getContentRaw();
             String[] args = content.split(" ");
+
+            System.out.println(invTotal);
 
             logCommand(event.getGuild(), event.getAuthor(), content);
 
@@ -99,36 +111,36 @@ public class NetworthCommand extends Command {
             petsTotal = 0;
             enderChestTotal = 0;
 
-            Map<Integer, InvItemStruct> playerInventory = player.getInventoryMap();
+            Map<Integer, InvItem> playerInventory = player.getInventoryMap();
             if (playerInventory == null) {
                 return defaultEmbed(player.getUsername() + "'s inventory API is disabled");
             }
-            for (InvItemStruct item : playerInventory.values()) {
+            for (InvItem item : playerInventory.values()) {
                 invTotal += calculateItemPrice(item, "inventory");
             }
 
-            Map<Integer, InvItemStruct> playerTalismans = player.getTalismanBagMap();
-            for (InvItemStruct item : playerTalismans.values()) {
+            Map<Integer, InvItem> playerTalismans = player.getTalismanBagMap();
+            for (InvItem item : playerTalismans.values()) {
                 talismanTotal += calculateItemPrice(item);
             }
 
-            Map<Integer, InvItemStruct> invArmorMap = player.getInventoryArmorMap();
-            for (InvItemStruct item : invArmorMap.values()) {
+            Map<Integer, InvItem> invArmorMap = player.getInventoryArmorMap();
+            for (InvItem item : invArmorMap.values()) {
                 invArmor += calculateItemPrice(item);
             }
 
-            Map<Integer, InvItemStruct> wardrobeMap = player.getWardrobeMap();
-            for (InvItemStruct item : wardrobeMap.values()) {
+            Map<Integer, InvItem> wardrobeMap = player.getWardrobeMap();
+            for (InvItem item : wardrobeMap.values()) {
                 wardrobeTotal += calculateItemPrice(item);
             }
 
-            List<InvItemStruct> petsMap = player.getPetsMapNames();
-            for (InvItemStruct item : petsMap) {
+            List<InvItem> petsMap = player.getPetsMapNames();
+            for (InvItem item : petsMap) {
                 petsTotal += calculateItemPrice(item, "pets");
             }
 
-            Map<Integer, InvItemStruct> enderChest = player.getEnderChestMap();
-            for (InvItemStruct item : enderChest.values()) {
+            Map<Integer, InvItem> enderChest = player.getEnderChestMap();
+            for (InvItem item : enderChest.values()) {
                 enderChestTotal += calculateItemPrice(item, "enderchest");
             }
 
@@ -185,15 +197,15 @@ public class NetworthCommand extends Command {
 
     private void calculateAllPetsPrice() {
         String queryStr = "";
-        for (InvItemStruct item : invPets) {
+        for (InvItem item : invPets) {
             String petName = capitalizeString(item.getName()).replace("lvl", "Lvl");
             queryStr += "\"" + petName + "\",";
         }
-        for (InvItemStruct item : petsPets) {
+        for (InvItem item : petsPets) {
             String petName = capitalizeString(item.getName()).replace("lvl", "Lvl");
             queryStr += "\"" + petName + "\",";
         }
-        for (InvItemStruct item : enderChestPets) {
+        for (InvItem item : enderChestPets) {
             String petName = capitalizeString(item.getName()).replace("lvl", "Lvl");
             queryStr += "\"" + petName + "\",";
         }
@@ -211,8 +223,8 @@ public class NetworthCommand extends Command {
             double auctionPrice = higherDepth(auction, "starting_bid").getAsDouble();
             String auctionRarity = higherDepth(auction, "tier").getAsString();
 
-            for (Iterator<InvItemStruct> iterator = invPets.iterator(); iterator.hasNext();) {
-                InvItemStruct item = iterator.next();
+            for (Iterator<InvItem> iterator = invPets.iterator(); iterator.hasNext();) {
+                InvItem item = iterator.next();
                 if (item.getName().equalsIgnoreCase(auctionName) && item.getRarity().equalsIgnoreCase(auctionRarity)) {
                     invTotal += auctionPrice
                             + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ") : 0);
@@ -220,8 +232,8 @@ public class NetworthCommand extends Command {
                 }
             }
 
-            for (Iterator<InvItemStruct> iterator = petsPets.iterator(); iterator.hasNext();) {
-                InvItemStruct item = iterator.next();
+            for (Iterator<InvItem> iterator = petsPets.iterator(); iterator.hasNext();) {
+                InvItem item = iterator.next();
                 if (item.getName().equalsIgnoreCase(auctionName) && item.getRarity().equalsIgnoreCase(auctionRarity)) {
                     petsTotal += auctionPrice
                             + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ") : 0);
@@ -229,8 +241,8 @@ public class NetworthCommand extends Command {
                 }
             }
 
-            for (Iterator<InvItemStruct> iterator = enderChestPets.iterator(); iterator.hasNext();) {
-                InvItemStruct item = iterator.next();
+            for (Iterator<InvItem> iterator = enderChestPets.iterator(); iterator.hasNext();) {
+                InvItem item = iterator.next();
                 if (item.getName().equalsIgnoreCase(auctionName) && item.getRarity().equalsIgnoreCase(auctionRarity)) {
                     enderChestTotal += auctionPrice
                             + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ") : 0);
@@ -246,7 +258,7 @@ public class NetworthCommand extends Command {
         rarityMap.put("UNCOMMON", ";1");
         rarityMap.put("COMMON", ";0");
 
-        for (InvItemStruct item : invPets) {
+        for (InvItem item : invPets) {
             try {
                 invTotal += higherDepth(lowestBinJson,
                         item.getName().split("] ")[1].toLowerCase().trim() + rarityMap.get(item.getRarity()))
@@ -255,7 +267,7 @@ public class NetworthCommand extends Command {
             }
         }
 
-        for (InvItemStruct item : petsPets) {
+        for (InvItem item : petsPets) {
             try {
                 petsTotal += higherDepth(lowestBinJson,
                         item.getName().split("] ")[1].toLowerCase().trim() + rarityMap.get(item.getRarity()))
@@ -264,7 +276,7 @@ public class NetworthCommand extends Command {
             }
         }
 
-        for (InvItemStruct item : enderChestPets) {
+        for (InvItem item : enderChestPets) {
             try {
                 enderChestTotal += higherDepth(lowestBinJson,
                         item.getName().split("] ")[1].toLowerCase().trim() + rarityMap.get(item.getRarity()))
@@ -275,11 +287,11 @@ public class NetworthCommand extends Command {
 
     }
 
-    public double calculateItemPrice(InvItemStruct item) {
+    private double calculateItemPrice(InvItem item) {
         return calculateItemPrice(item, null);
     }
 
-    public double calculateItemPrice(InvItemStruct item, String location) {
+    private double calculateItemPrice(InvItem item, String location) {
         if (item == null) {
             return 0;
         }
@@ -368,8 +380,8 @@ public class NetworthCommand extends Command {
         }
 
         try {
-            List<InvItemStruct> backpackItems = item.getBackpackItems();
-            for (InvItemStruct backpackItem : backpackItems) {
+            List<InvItem> backpackItems = item.getBackpackItems();
+            for (InvItem backpackItem : backpackItems) {
                 backpackExtras += calculateItemPrice(backpackItem);
             }
         } catch (Exception ignored) {
@@ -397,7 +409,7 @@ public class NetworthCommand extends Command {
         return 0;
     }
 
-    public double getLowestPriceEnchant(String enchantId) {
+    private double getLowestPriceEnchant(String enchantId) {
         double lowestBin = -1;
         double averageAuction = -1;
         String enchantName = enchantId.split(";")[0];
@@ -426,10 +438,16 @@ public class NetworthCommand extends Command {
             }
         }
 
+        // if(higherDepth(sbzPrices, enchantName + "_1") != null){
+        // return Math.pow(2, enchantLevel - i) * higherDepth(sbzPrices, enchantName +
+        // "_1");
+        // }
+
+        tempSet.add(enchantId);
         return 0;
     }
 
-    public double getLowestPrice(String itemId, String tempName) {
+    private double getLowestPrice(String itemId, String tempName) {
         double lowestBin = -1;
         double averageAuction = -1;
 

@@ -1,33 +1,15 @@
 package com.skyblockplus.utils;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.skyblockplus.utils.structs.DiscordInfoStruct;
-import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.exceptions.PermissionException;
-import org.apache.http.HttpResponse;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import static com.skyblockplus.Main.jda;
+import static java.lang.String.join;
+import static java.util.Collections.nCopies;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import java.awt.*;
-import java.io.*;
+import java.awt.Color;
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -40,7 +22,34 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.skyblockplus.Main.jda;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.skyblockplus.utils.structs.DiscordInfoStruct;
+import com.skyblockplus.utils.structs.UsernameUuidStruct;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.exceptions.PermissionException;
 
 public class Utils {
     public static final Color botColor = new Color(223, 5, 5);
@@ -164,6 +173,11 @@ public class Utils {
         return essenceCostsJson;
     }
 
+    public static String toRomanNumerals(int number) {
+        return join("", nCopies(number, "i")).replace("iiiii", "v").replace("iiii", "iv").replace("vv", "x")
+                .replace("viv", "ix");
+    }
+
     public static String getSkyCryptData(String dataUrl) {
         if (!dataUrl.contains("raw.githubusercontent.com")) {
             return null;
@@ -245,7 +259,6 @@ public class Utils {
     }
 
     public static JsonElement getJson(String jsonUrl) {
-        JsonElement outputJson = null;
         try {
             if (remainingLimit < 5) {
                 TimeUnit.SECONDS.sleep(timeTillReset);
@@ -254,23 +267,23 @@ public class Utils {
         } catch (Exception ignored) {
         }
 
-        CloseableHttpClient httpclient;
-        if (jsonUrl.contains(API_BASE_URL)) {
-            CredentialsProvider provider = new BasicCredentialsProvider();
-            UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(API_USERNAME, API_PASSWORD);
-            provider.setCredentials(AuthScope.ANY, credentials);
-            httpclient = HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
-        } else {
-            httpclient = HttpClientBuilder.create().build();
-        }
-
-        HttpGet httpget = new HttpGet(jsonUrl);
-        if (jsonUrl.contains("raw.githubusercontent.com")) {
-            httpget.setHeader("Authorization", "token " + GITHUB_TOKEN);
-        }
-        httpget.addHeader("content-type", "application/json; charset=UTF-8");
-
+        CloseableHttpClient httpclient = null;
         try {
+            if (jsonUrl.contains(API_BASE_URL)) {
+                CredentialsProvider provider = new BasicCredentialsProvider();
+                UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(API_USERNAME, API_PASSWORD);
+                provider.setCredentials(AuthScope.ANY, credentials);
+                httpclient = HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
+            } else {
+                httpclient = HttpClientBuilder.create().build();
+            }
+
+            HttpGet httpget = new HttpGet(jsonUrl);
+            if (jsonUrl.contains("raw.githubusercontent.com")) {
+                httpget.setHeader("Authorization", "token " + GITHUB_TOKEN);
+            }
+            httpget.addHeader("content-type", "application/json; charset=UTF-8");
+
             HttpResponse httpresponse = httpclient.execute(httpget);
             if (jsonUrl.toLowerCase().contains("api.hypixel.net")) {
                 try {
@@ -280,7 +293,7 @@ public class Utils {
                 }
             }
 
-            outputJson = JsonParser.parseReader(new InputStreamReader(httpresponse.getEntity().getContent()));
+            return JsonParser.parseReader(new InputStreamReader(httpresponse.getEntity().getContent()));
         } catch (Exception ignored) {
         } finally {
             try {
@@ -290,7 +303,7 @@ public class Utils {
                 e.printStackTrace();
             }
         }
-        return outputJson;
+        return null;
     }
 
     public static int postJson(String jsonUrl, Object postObject) {

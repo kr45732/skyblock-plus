@@ -1,20 +1,26 @@
 package com.skyblockplus.inventory;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.skyblockplus.utils.CustomPaginator;
-import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.structs.InvItemStruct;
-import com.skyblockplus.utils.structs.PaginatorExtras;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.defaultPaginator;
+import static com.skyblockplus.utils.Utils.errorMessage;
+import static com.skyblockplus.utils.Utils.globalCooldown;
+import static com.skyblockplus.utils.Utils.loadingEmbed;
+import static com.skyblockplus.utils.Utils.logCommand;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.skyblockplus.utils.Utils.*;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.skyblockplus.utils.CustomPaginator;
+import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.structs.InvItem;
+import com.skyblockplus.utils.structs.PaginatorExtras;
+
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 
 public class InventoryCommand extends Command {
     private final EventWaiter waiter;
@@ -23,7 +29,7 @@ public class InventoryCommand extends Command {
     public InventoryCommand(EventWaiter waiter) {
         this.name = "inventory";
         this.cooldown = globalCooldown;
-        this.aliases = new String[]{"inv"};
+        this.aliases = new String[] { "inv" };
         this.waiter = waiter;
     }
 
@@ -51,7 +57,8 @@ public class InventoryCommand extends Command {
                     ebMessage.editMessage(eb.build()).queue();
                 }
                 return;
-            } else if (((args.length == 3) && args[2].startsWith("slot")) || ((args.length == 4) && args[3].startsWith("slot"))) {
+            } else if (((args.length == 3) && args[2].startsWith("slot"))
+                    || ((args.length == 4) && args[3].startsWith("slot"))) {
                 if (args.length == 4) {
                     eb = getPlayerInventoryList(args[1], args[2], args[3]);
 
@@ -78,11 +85,15 @@ public class InventoryCommand extends Command {
                     ebMessage.getChannel().sendMessage(playerInventory[0]).queue();
                     ebMessage.getChannel().sendMessage(playerInventory[1]).queue();
                     if (playerInventory[2].length() > 0) {
-                        ebMessage.getChannel().sendMessage(defaultEmbed("Missing Items").setDescription(playerInventory[2]).build()).queue();
+                        ebMessage.getChannel()
+                                .sendMessage(defaultEmbed("Missing Items").setDescription(playerInventory[2]).build())
+                                .queue();
                     }
 
                 } else {
-                    ebMessage.editMessage(defaultEmbed("Error").setDescription("Unable toUnable to fetch player data").build()).queue();
+                    ebMessage.editMessage(
+                            defaultEmbed("Error").setDescription("Unable toUnable to fetch player data").build())
+                            .queue();
                 }
                 return;
             }
@@ -94,15 +105,16 @@ public class InventoryCommand extends Command {
     private EmbedBuilder getPlayerInventoryList(String username, String profileName, String slotNum) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
-            Map<Integer, InvItemStruct> inventoryMap = player.getInventoryMap();
+            Map<Integer, InvItem> inventoryMap = player.getInventoryMap();
             if (inventoryMap != null) {
                 List<String> pageTitles = new ArrayList<>();
                 List<String> pageThumbnails = new ArrayList<>();
 
-                CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(1);
+                CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1)
+                        .setItemsPerPage(1);
 
-                for (Map.Entry<Integer, InvItemStruct> currentInvSlot : inventoryMap.entrySet()) {
-                    InvItemStruct currentInvStruct = currentInvSlot.getValue();
+                for (Map.Entry<Integer, InvItem> currentInvSlot : inventoryMap.entrySet()) {
+                    InvItem currentInvStruct = currentInvSlot.getValue();
 
                     if (currentInvStruct == null) {
                         pageTitles.add("Empty");
@@ -122,8 +134,8 @@ public class InventoryCommand extends Command {
                         paginateBuilder.addItems(itemString);
                     }
                 }
-                paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles).setThumbnails(pageThumbnails));
-
+                paginateBuilder
+                        .setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles).setThumbnails(pageThumbnails));
 
                 int slotNumber = 1;
                 try {
@@ -140,15 +152,16 @@ public class InventoryCommand extends Command {
     private EmbedBuilder getPlayerEquippedArmor(String username, String profileName) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
-            Map<Integer, InvItemStruct> inventoryMap = player.getInventoryArmorMap();
+            Map<Integer, InvItem> inventoryMap = player.getInventoryArmorMap();
             if (inventoryMap != null) {
                 List<String> pageTitles = new ArrayList<>();
                 List<String> pageThumbnails = new ArrayList<>();
 
-                CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(1);
+                CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1)
+                        .setItemsPerPage(1);
 
-                for (Map.Entry<Integer, InvItemStruct> currentInvSlot : inventoryMap.entrySet()) {
-                    InvItemStruct currentInvStruct = currentInvSlot.getValue();
+                for (Map.Entry<Integer, InvItem> currentInvSlot : inventoryMap.entrySet()) {
+                    InvItem currentInvStruct = currentInvSlot.getValue();
 
                     if (currentInvStruct == null) {
                         pageTitles.add("Empty");
@@ -156,18 +169,18 @@ public class InventoryCommand extends Command {
 
                         String slotName = "";
                         switch ((currentInvSlot.getKey())) {
-                            case 4:
-                                slotName = "Boots";
-                                break;
-                            case 3:
-                                slotName = "Leggings";
-                                break;
-                            case 2:
-                                slotName = "Chestplate";
-                                break;
-                            case 1:
-                                slotName = "Helmet";
-                                break;
+                        case 4:
+                            slotName = "Boots";
+                            break;
+                        case 3:
+                            slotName = "Leggings";
+                            break;
+                        case 2:
+                            slotName = "Chestplate";
+                            break;
+                        case 1:
+                            slotName = "Helmet";
+                            break;
                         }
 
                         paginateBuilder.addItems("**Slot:** " + slotName);
@@ -178,18 +191,18 @@ public class InventoryCommand extends Command {
 
                         String slotName = "";
                         switch ((currentInvSlot.getKey())) {
-                            case 4:
-                                slotName = "Boots";
-                                break;
-                            case 3:
-                                slotName = "Leggings";
-                                break;
-                            case 2:
-                                slotName = "Chestplate";
-                                break;
-                            case 1:
-                                slotName = "Helmet";
-                                break;
+                        case 4:
+                            slotName = "Boots";
+                            break;
+                        case 3:
+                            slotName = "Leggings";
+                            break;
+                        case 2:
+                            slotName = "Chestplate";
+                            break;
+                        case 1:
+                            slotName = "Helmet";
+                            break;
                         }
 
                         itemString += "**Slot:** " + slotName;
@@ -202,8 +215,8 @@ public class InventoryCommand extends Command {
                         paginateBuilder.addItems(itemString);
                     }
                 }
-                paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles).setThumbnails(pageThumbnails));
-
+                paginateBuilder
+                        .setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles).setThumbnails(pageThumbnails));
 
                 paginateBuilder.build().paginate(event.getChannel(), 0);
                 return null;
@@ -217,9 +230,7 @@ public class InventoryCommand extends Command {
         if (player.isValid()) {
             String[] temp = player.getInventory();
             if (temp != null) {
-                return new String[]{
-                        temp[0], temp[1], player.invMissing
-                };
+                return new String[] { temp[0], temp[1], player.invMissing };
             }
         }
         return null;

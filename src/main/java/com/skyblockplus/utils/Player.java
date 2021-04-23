@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.structs.ArmorStruct;
-import com.skyblockplus.utils.structs.InvItemStruct;
+import com.skyblockplus.utils.structs.InvItem;
 import com.skyblockplus.utils.structs.SkillsStruct;
 import com.skyblockplus.weight.Weight;
 import me.nullicorn.nedit.NBTReader;
@@ -528,7 +528,7 @@ public class Player {
     public List<String[]> getWardrobe() {
         try {
             int equippedWardrobeSlot = higherDepth(profileJson, "wardrobe_equipped_slot").getAsInt();
-            Map<Integer, InvItemStruct> equippedArmor = equippedWardrobeSlot != -1 ? getInventoryArmorMap() : null;
+            Map<Integer, InvItem> equippedArmor = equippedWardrobeSlot != -1 ? getInventoryArmorMap() : null;
 
             String encodedInventoryContents = higherDepth(higherDepth(profileJson, "wardrobe_contents"), "data")
                     .getAsString();
@@ -1123,11 +1123,11 @@ public class Player {
     }
 
     public String getNecronBlade() {
-        Map<Integer, InvItemStruct> inventoryMap = getInventoryMap();
-        for (InvItemStruct item : inventoryMap.values()) {
+        Map<Integer, InvItem> inventoryMap = getInventoryMap();
+        for (InvItem item : inventoryMap.values()) {
             if (!item.getBackpackItems().isEmpty()) {
-                List<InvItemStruct> backpackItems = item.getBackpackItems();
-                for (InvItemStruct backpackItem : backpackItems) {
+                List<InvItem> backpackItems = item.getBackpackItems();
+                for (InvItem backpackItem : backpackItems) {
                     if (backpackItem.getId().equalsIgnoreCase("hyperion")) {
                         return "\n**Hyperion:** yes";
                     } else if (backpackItem.getId().equalsIgnoreCase("valkyrie")) {
@@ -1143,11 +1143,11 @@ public class Player {
             }
         }
 
-        Map<Integer, InvItemStruct> enderChestMap = getEnderChestMap();
-        for (InvItemStruct item : enderChestMap.values()) {
+        Map<Integer, InvItem> enderChestMap = getEnderChestMap();
+        for (InvItem item : enderChestMap.values()) {
             if (!item.getBackpackItems().isEmpty()) {
-                List<InvItemStruct> backpackItems = item.getBackpackItems();
-                for (InvItemStruct backpackItem : backpackItems) {
+                List<InvItem> backpackItems = item.getBackpackItems();
+                for (InvItem backpackItem : backpackItems) {
                     if (backpackItem.getId().equalsIgnoreCase("hyperion")) {
                         return "\n**Hyperion:** yes";
                     } else if (backpackItem.getId().equalsIgnoreCase("valkyrie")) {
@@ -1182,11 +1182,11 @@ public class Player {
     public int getBonemerang() {
         int boneCount = 0;
 
-        Map<Integer, InvItemStruct> inventoryMap = getInventoryMap();
-        for (InvItemStruct item : inventoryMap.values()) {
+        Map<Integer, InvItem> inventoryMap = getInventoryMap();
+        for (InvItem item : inventoryMap.values()) {
             if (!item.getBackpackItems().isEmpty()) {
-                List<InvItemStruct> backpackItems = item.getBackpackItems();
-                for (InvItemStruct backpackItem : backpackItems) {
+                List<InvItem> backpackItems = item.getBackpackItems();
+                for (InvItem backpackItem : backpackItems) {
                     if (backpackItem.getId().equalsIgnoreCase("bone_boomerang")) {
                         boneCount++;
                     }
@@ -1198,11 +1198,11 @@ public class Player {
             }
         }
 
-        Map<Integer, InvItemStruct> enderChestMap = getEnderChestMap();
-        for (InvItemStruct item : enderChestMap.values()) {
+        Map<Integer, InvItem> enderChestMap = getEnderChestMap();
+        for (InvItem item : enderChestMap.values()) {
             if (!item.getBackpackItems().isEmpty()) {
-                List<InvItemStruct> backpackItems = item.getBackpackItems();
-                for (InvItemStruct backpackItem : backpackItems) {
+                List<InvItem> backpackItems = item.getBackpackItems();
+                for (InvItem backpackItem : backpackItems) {
                     if (backpackItem.getId().equalsIgnoreCase("bone_boomerang")) {
                         boneCount++;
                     }
@@ -1399,16 +1399,16 @@ public class Player {
     }
 
     /* Inventory */
-    public static Map<Integer, InvItemStruct> getGenericInventoryMap(NBTCompound parsedContents) {
+    public static Map<Integer, InvItem> getGenericInventoryMap(NBTCompound parsedContents) {
         try {
             NBTList items = parsedContents.getList(".i");
-            Map<Integer, InvItemStruct> itemsMap = new HashMap<>();
+            Map<Integer, InvItem> itemsMap = new HashMap<>();
 
             for (int i = 0; i < items.size(); i++) {
                 try {
                     NBTCompound item = items.getCompound(i);
                     if (!item.isEmpty()) {
-                        InvItemStruct itemInfo = new InvItemStruct();
+                        InvItem itemInfo = new InvItem();
                         itemInfo.setName(parseMcCodes(item.getString("tag.display.Name", "None")));
                         itemInfo.setLore(parseMcCodes(item.getString("tag.display.Lore", "None").replace(", ", "\n")
                                 .replace("[", "").replace("]", "")));
@@ -1468,7 +1468,7 @@ public class Player {
         return null;
     }
 
-    public Map<Integer, InvItemStruct> getInventoryMap() {
+    public Map<Integer, InvItem> getInventoryMap() {
         try {
             String contents = higherDepth(higherDepth(profileJson, "inv_contents"), "data").getAsString();
             NBTCompound parsedContents = NBTReader.readBase64(contents);
@@ -1478,7 +1478,7 @@ public class Player {
         return null;
     }
 
-    public Map<Integer, InvItemStruct> getTalismanBagMap() {
+    public Map<Integer, InvItem> getTalismanBagMap() {
         try {
             String contents = higherDepth(higherDepth(profileJson, "talisman_bag"), "data").getAsString();
             NBTCompound parsedContents = NBTReader.readBase64(contents);
@@ -1488,7 +1488,7 @@ public class Player {
         return null;
     }
 
-    public Map<Integer, InvItemStruct> getInventoryArmorMap() {
+    public Map<Integer, InvItem> getInventoryArmorMap() {
         try {
             String contents = higherDepth(higherDepth(profileJson, "inv_armor"), "data").getAsString();
             NBTCompound parsedContents = NBTReader.readBase64(contents);
@@ -1498,7 +1498,7 @@ public class Player {
         return null;
     }
 
-    public Map<Integer, InvItemStruct> getWardrobeMap() {
+    public Map<Integer, InvItem> getWardrobeMap() {
         try {
             String contents = higherDepth(higherDepth(profileJson, "wardrobe_contents"), "data").getAsString();
             NBTCompound parsedContents = NBTReader.readBase64(contents);
@@ -1508,10 +1508,10 @@ public class Player {
         return null;
     }
 
-    public List<InvItemStruct> getPetsMapFormatted() {
+    public List<InvItem> getPetsMapFormatted() {
         JsonArray petsArr = getPets();
 
-        List<InvItemStruct> petsNameFormatted = new ArrayList<>();
+        List<InvItem> petsNameFormatted = new ArrayList<>();
 
         Map<String, String> rarityMap = new HashMap<>();
         rarityMap.put("LEGENDARY", ";4");
@@ -1522,7 +1522,7 @@ public class Player {
 
         for (JsonElement pet : petsArr) {
             try {
-                InvItemStruct invItemStruct = new InvItemStruct();
+                InvItem invItemStruct = new InvItem();
                 invItemStruct.setName(capitalizeString(higherDepth(pet, "type").getAsString().toLowerCase()));
                 invItemStruct.setId(
                         higherDepth(pet, "type").getAsString() + rarityMap.get(higherDepth(pet, "tier").getAsString()));
@@ -1537,14 +1537,14 @@ public class Player {
         return petsNameFormatted;
     }
 
-    public List<InvItemStruct> getPetsMapNames() {
+    public List<InvItem> getPetsMapNames() {
         JsonArray petsArr = getPets();
 
-        List<InvItemStruct> petsNameFormatted = new ArrayList<>();
+        List<InvItem> petsNameFormatted = new ArrayList<>();
 
         for (JsonElement pet : petsArr) {
             try {
-                InvItemStruct invItemStruct = new InvItemStruct();
+                InvItem invItemStruct = new InvItem();
                 invItemStruct.setName("[Lvl "
                         + petLevelFromXp(higherDepth(pet, "exp").getAsLong(),
                                 higherDepth(pet, "tier").getAsString().toLowerCase())
@@ -1563,7 +1563,7 @@ public class Player {
         return petsNameFormatted;
     }
 
-    public Map<Integer, InvItemStruct> getEnderChestMap() {
+    public Map<Integer, InvItem> getEnderChestMap() {
         try {
             String contents = higherDepth(higherDepth(profileJson, "ender_chest_contents"), "data").getAsString();
             NBTCompound parsedContents = NBTReader.readBase64(contents);

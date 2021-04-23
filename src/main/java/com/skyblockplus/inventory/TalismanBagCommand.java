@@ -1,23 +1,30 @@
 package com.skyblockplus.inventory;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.skyblockplus.utils.CustomPaginator;
-import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.structs.InvItemStruct;
-import com.skyblockplus.utils.structs.PaginatorExtras;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.exceptions.PermissionException;
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.utils.Utils.botColor;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.defaultPaginator;
+import static com.skyblockplus.utils.Utils.errorMessage;
+import static com.skyblockplus.utils.Utils.globalCooldown;
+import static com.skyblockplus.utils.Utils.loadingEmbed;
+import static com.skyblockplus.utils.Utils.logCommand;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.utils.Utils.*;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.skyblockplus.utils.CustomPaginator;
+import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.structs.InvItem;
+import com.skyblockplus.utils.structs.PaginatorExtras;
+
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.exceptions.PermissionException;
 
 public class TalismanBagCommand extends Command {
     private final EventWaiter waiter;
@@ -41,7 +48,8 @@ public class TalismanBagCommand extends Command {
 
             logCommand(event.getGuild(), event.getAuthor(), content);
 
-            if (((args.length == 3) && args[2].startsWith("slot")) || ((args.length == 4) && args[3].startsWith("slot"))) {
+            if (((args.length == 3) && args[2].startsWith("slot"))
+                    || ((args.length == 4) && args[3].startsWith("slot"))) {
                 if (args.length == 4) {
                     eb = getPlayerTalismansList(args[1], args[2], args[3]);
 
@@ -66,10 +74,13 @@ public class TalismanBagCommand extends Command {
                 if (playerEnderChest != null) {
                     ebMessage.delete().queue();
                     if (missingEmoji.length() > 0) {
-                        ebMessage.getChannel().sendMessage(defaultEmbed("Missing Items").setDescription(missingEmoji).build()).queue();
+                        ebMessage.getChannel()
+                                .sendMessage(defaultEmbed("Missing Items").setDescription(missingEmoji).build())
+                                .queue();
                     }
 
-                    jda.addEventListener(new InventoryPaginator(playerEnderChest, ebMessage.getChannel(), event.getAuthor()));
+                    jda.addEventListener(
+                            new InventoryPaginator(playerEnderChest, ebMessage.getChannel(), event.getAuthor()));
                 } else {
                     ebMessage.editMessage(defaultEmbed("Error").setDescription("Unable to fetch data").build()).queue();
                 }
@@ -96,7 +107,7 @@ public class TalismanBagCommand extends Command {
     private EmbedBuilder getPlayerTalismansList(String username, String profileName, String slotNum) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
-            Map<Integer, InvItemStruct> talismanBagMap = player.getTalismanBagMap();
+            Map<Integer, InvItem> talismanBagMap = player.getTalismanBagMap();
             if (talismanBagMap != null) {
                 List<String> pageTitles = new ArrayList<>();
                 List<String> pageThumbnails = new ArrayList<>();
@@ -111,8 +122,8 @@ public class TalismanBagCommand extends Command {
                         }).setEventWaiter(waiter).setTimeout(30, TimeUnit.SECONDS).setColor(botColor)
                         .setUsers(event.getAuthor());
 
-                for (Map.Entry<Integer, InvItemStruct> currentTalisman : talismanBagMap.entrySet()) {
-                    InvItemStruct currentTalismanStruct = currentTalisman.getValue();
+                for (Map.Entry<Integer, InvItem> currentTalisman : talismanBagMap.entrySet()) {
+                    InvItem currentTalismanStruct = currentTalisman.getValue();
 
                     if (currentTalismanStruct == null) {
                         pageTitles.add("Empty");
@@ -132,7 +143,8 @@ public class TalismanBagCommand extends Command {
                         paginateBuilder.addItems(itemString);
                     }
                 }
-                paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles).setThumbnails(pageThumbnails));
+                paginateBuilder
+                        .setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles).setThumbnails(pageThumbnails));
 
                 int slotNumber = 1;
                 try {
