@@ -160,10 +160,15 @@ public class BinCommand extends Command {
                     }
                 }
                 EmbedBuilder eb = defaultEmbed("Lowest bin");
-                eb.addField(capitalizeString(petName) + " pet",
-                        formatNumber(higherDepth(lowestBinJson, formattedName).getAsLong()), false);
-                eb.setThumbnail(getPetUrl(formattedName.split(";")[0]));
-                return eb;
+
+                try {
+                    eb.addField(capitalizeString(petName) + " pet",
+                            formatNumber(higherDepth(lowestBinJson, formattedName).getAsLong()), false);
+                    eb.setThumbnail(getPetUrl(formattedName.split(";")[0]));
+                    return eb;
+                } catch (Exception ignored) {
+
+                }
             }
         }
 

@@ -69,8 +69,6 @@ public class NetworthCommand extends Command {
             String content = event.getMessage().getContentRaw();
             String[] args = content.split(" ");
 
-            System.out.println(invTotal);
-
             logCommand(event.getGuild(), event.getAuthor(), content);
 
             if (args.length == 2) {
@@ -92,7 +90,7 @@ public class NetworthCommand extends Command {
             eb.setThumbnail(player.getThumbnailUrl());
 
             lowestBinJson = getJson("https://moulberry.codes/lowestbin.json");
-            averageAuctionJson = getJson("http://moulberry.codes/auction_averages/3day.json");
+            averageAuctionJson = getJson("https://moulberry.codes/auction_averages/3day.json");
             bazaarJson = higherDepth(getJson("https://api.hypixel.net/skyblock/bazaar"), "products");
             sbzPrices = getJson("https://raw.githubusercontent.com/skyblockz/pricecheckbot/master/data.json")
                     .getAsJsonArray();
@@ -218,35 +216,43 @@ public class NetworthCommand extends Command {
 
         JsonArray ahQuery = queryAhApi(queryStr);
 
-        for (JsonElement auction : ahQuery) {
-            String auctionName = higherDepth(auction, "item_name").getAsString();
-            double auctionPrice = higherDepth(auction, "starting_bid").getAsDouble();
-            String auctionRarity = higherDepth(auction, "tier").getAsString();
+        if (ahQuery != null) {
+            for (JsonElement auction : ahQuery) {
+                String auctionName = higherDepth(auction, "item_name").getAsString();
+                double auctionPrice = higherDepth(auction, "starting_bid").getAsDouble();
+                String auctionRarity = higherDepth(auction, "tier").getAsString();
 
-            for (Iterator<InvItem> iterator = invPets.iterator(); iterator.hasNext();) {
-                InvItem item = iterator.next();
-                if (item.getName().equalsIgnoreCase(auctionName) && item.getRarity().equalsIgnoreCase(auctionRarity)) {
-                    invTotal += auctionPrice
-                            + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ") : 0);
-                    iterator.remove();
+                for (Iterator<InvItem> iterator = invPets.iterator(); iterator.hasNext();) {
+                    InvItem item = iterator.next();
+                    if (item.getName().equalsIgnoreCase(auctionName)
+                            && item.getRarity().equalsIgnoreCase(auctionRarity)) {
+                        invTotal += auctionPrice
+                                + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ")
+                                        : 0);
+                        iterator.remove();
+                    }
                 }
-            }
 
-            for (Iterator<InvItem> iterator = petsPets.iterator(); iterator.hasNext();) {
-                InvItem item = iterator.next();
-                if (item.getName().equalsIgnoreCase(auctionName) && item.getRarity().equalsIgnoreCase(auctionRarity)) {
-                    petsTotal += auctionPrice
-                            + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ") : 0);
-                    iterator.remove();
+                for (Iterator<InvItem> iterator = petsPets.iterator(); iterator.hasNext();) {
+                    InvItem item = iterator.next();
+                    if (item.getName().equalsIgnoreCase(auctionName)
+                            && item.getRarity().equalsIgnoreCase(auctionRarity)) {
+                        petsTotal += auctionPrice
+                                + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ")
+                                        : 0);
+                        iterator.remove();
+                    }
                 }
-            }
 
-            for (Iterator<InvItem> iterator = enderChestPets.iterator(); iterator.hasNext();) {
-                InvItem item = iterator.next();
-                if (item.getName().equalsIgnoreCase(auctionName) && item.getRarity().equalsIgnoreCase(auctionRarity)) {
-                    enderChestTotal += auctionPrice
-                            + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ") : 0);
-                    iterator.remove();
+                for (Iterator<InvItem> iterator = enderChestPets.iterator(); iterator.hasNext();) {
+                    InvItem item = iterator.next();
+                    if (item.getName().equalsIgnoreCase(auctionName)
+                            && item.getRarity().equalsIgnoreCase(auctionRarity)) {
+                        enderChestTotal += auctionPrice
+                                + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ")
+                                        : 0);
+                        iterator.remove();
+                    }
                 }
             }
         }

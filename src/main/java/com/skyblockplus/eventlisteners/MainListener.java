@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.Main.*;
 import static com.skyblockplus.utils.Utils.*;
 
 public class MainListener extends ListenerAdapter {
@@ -60,6 +60,13 @@ public class MainListener extends ListenerAdapter {
     @Override
     public void onGuildLeave(@NotNull GuildLeaveEvent event) {
         guildMap.remove(event.getGuild().getId());
+        database.deleteServerSettings(event.getGuild().getId());
+
+        try {
+            logCommand(event.getGuild(), "Left guild");
+        } catch (Exception ignored) {
+        }
+
     }
 
     @Override
@@ -71,8 +78,13 @@ public class MainListener extends ListenerAdapter {
         if (isUniqueGuild(event.getGuild().getId())) {
             try {
                 EmbedBuilder eb = defaultEmbed("Thank you!");
-                eb.setDescription("- Thank you for adding me to " + event.getGuild().getName() + "\n- My prefix is `" + BOT_PREFIX + "`\n- You can view my commands by running `" + BOT_PREFIX + "help`\n- Make sure to check out `" + BOT_PREFIX + "setup` or the forum post [**here**](https://hypixel.net/threads/discord-bot-skyblock-plus-90-servers.3980092/post-28888349) on how to setup the customizable features of this bot!");
-                TextChannel channel = event.getGuild().getTextChannels().stream().filter(textChannel -> textChannel.getName().toLowerCase().contains("general")).findFirst().orElse(null);
+                eb.setDescription("- Thank you for adding me to " + event.getGuild().getName() + "\n- My prefix is `"
+                        + BOT_PREFIX + "`\n- You can view my commands by running `" + BOT_PREFIX
+                        + "help`\n- Make sure to check out `" + BOT_PREFIX
+                        + "setup` or the forum post [**here**](https://hypixel.net/threads/discord-bot-skyblock-plus-90-servers.3980092/post-28888349) on how to setup the customizable features of this bot!");
+                TextChannel channel = event.getGuild().getTextChannels().stream()
+                        .filter(textChannel -> textChannel.getName().toLowerCase().contains("general")).findFirst()
+                        .orElse(null);
                 if (channel != null) {
                     channel.sendMessage(eb.build()).queue();
                 } else {
