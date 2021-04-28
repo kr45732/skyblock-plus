@@ -8,6 +8,7 @@ import com.google.gson.reflect.TypeToken;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.skyblockplus.api.discordserversettings.automatedapplication.ApplyRequirements;
 import com.skyblockplus.api.discordserversettings.automatedguildroles.GuildRank;
 import com.skyblockplus.api.discordserversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.discordserversettings.automatedroles.RoleObject;
@@ -77,7 +78,7 @@ public class SettingsCommand extends Command {
             }
 
             if (args.length == 1) {
-                eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+                eb = defaultEmbed("Settings for " + event.getGuild().getName());
 
                 if (higherDepth(currentSettings, "automatedVerify") != null) {
                     eb.addField("Verify Settings",
@@ -109,7 +110,7 @@ public class SettingsCommand extends Command {
 
             } else if (args.length >= 2 && args[1].equals("roles")) {
                 if (args.length == 2) {
-                    eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+                    eb = defaultEmbed("Settings for " + event.getGuild().getName());
                     if (higherDepth(currentSettings, "automatedRoles") != null) {
                         ebMessage.delete().queue();
                         getCurrentRolesSettings(higherDepth(currentSettings, "automatedRoles")).build()
@@ -123,7 +124,7 @@ public class SettingsCommand extends Command {
                         if (allowRolesEnable()) {
                             eb = setRolesEnable("true");
                         } else {
-                            eb = defaultEmbed("Error", null).setDescription("No roles set!");
+                            eb = defaultEmbed("Error").setDescription("No roles set!");
                         }
                     } else if (args[2].equals("disable")) {
                         eb = setRolesEnable("false");
@@ -140,7 +141,7 @@ public class SettingsCommand extends Command {
                     } else if (args[2].equals("disable")) {
                         eb = setRoleEnable(args[3], "false");
                     } else {
-                        eb = defaultEmbed("Error", null).setDescription("Invalid setting");
+                        eb = defaultEmbed("Error").setDescription("Invalid setting");
                     }
                 } else if (args.length == 5) {
                     if (args[2].equals("stackable") && args[4].equals("true")) {
@@ -152,7 +153,7 @@ public class SettingsCommand extends Command {
                     } else if (args[2].equals("set")) {
                         eb = setOneLevelRole(args[3], args[4]);
                     } else {
-                        eb = defaultEmbed("Error", null).setDescription("Invalid setting");
+                        eb = defaultEmbed("Error").setDescription("Invalid setting");
                     }
                 } else if (args.length == 6 && args[2].equals("add")) {
                     eb = addRoleLevel(args[3], args[4], args[5]);
@@ -215,12 +216,20 @@ public class SettingsCommand extends Command {
                         eb = setApplyDenyMessageText(args[3]);
                         break;
                     case "reqs":
+                    case "req":
                     case "requirements":
                         args = content.split(" ");
-                        if (args.length == 5) {
-                            eb = setApplyRequirement(args[3], args[4]);
+
+                        if (args.length >= 5) {
+                            if (args[3].equals("add")) {
+                                eb = addApplyRequirement(content.split(" ", 5)[4]);
+                            } else if (args[3].equals("remove")) {
+                                eb = removeApplyRequirement(args[4]);
+                            } else {
+                                eb = defaultEmbed("Error").setDescription("Invalid setting");
+                            }
                         } else {
-                            eb = defaultEmbed("Error", null).setDescription("Invalid setting");
+                            eb = defaultEmbed("Error").setDescription("Invalid setting");
                         }
                         break;
                     default:
@@ -1127,11 +1136,7 @@ public class SettingsCommand extends Command {
         ebFieldString += "\n**• Denied Message:** " + displaySettings(applySettings, "denyMessageText");
         ebFieldString += "\n**• New Channel Prefix:** " + displaySettings(applySettings, "newChannelPrefix");
         ebFieldString += "\n**• New Channel Category:** " + displaySettings(applySettings, "newChannelCategory");
-        ebFieldString += "\n**• Slayer Requirement Value:** " + displaySettings(applySettings, "slayerRequirements");
-        ebFieldString += "\n**• Skills Requirement Value:** " + displaySettings(applySettings, "skillsRequirements");
-        ebFieldString += "\n**• Catacombs Requirement Value:** "
-                + displaySettings(applySettings, "catacombsRequirements");
-        ebFieldString += "\n**• Weight Requirement Value:** " + displaySettings(applySettings, "weightRequirements");
+        ebFieldString += "\n**• Requirements:** " + displaySettings(applySettings, "applyReqs");
 
         return ebFieldString;
     }
@@ -1141,10 +1146,7 @@ public class SettingsCommand extends Command {
         currentSettings.remove("previousMessageId");
         currentSettings.remove("applyUsersCache");
         currentSettings.remove("waitlistedMessageText");
-        currentSettings.remove("slayerRequirements");
-        currentSettings.remove("skillsRequirements");
-        currentSettings.remove("catacombsRequirements");
-        currentSettings.remove("weightRequirements");
+        currentSettings.remove("applyReqs");
 
         for (String key : getJsonKeys(currentSettings)) {
             if (higherDepth(currentSettings, key).getAsString().length() == 0) {
@@ -1338,45 +1340,89 @@ public class SettingsCommand extends Command {
         return defaultEmbed("Invalid Guild Category", null);
     }
 
-    private EmbedBuilder setApplyRequirement(String reqType, String reqValue) {
+    private EmbedBuilder removeApplyRequirement(String reqNumber) {
+        JsonArray currentReqs;
         try {
-            if (reqValue.equalsIgnoreCase("none")) {
-                int responseCode = updateApplySettings(reqType, "-10");
-
-                if (responseCode != 200) {
-                    return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
-                }
-
-                EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
-                eb.setDescription("**Application requirement for " + reqType + " disabled**");
-                return eb;
-            } else {
-                int reqValInt = Integer.parseInt(reqValue);
-                if (reqValInt <= 0) {
-                    return defaultEmbed("Error").setDescription("Value must be greater than 0");
-                }
-
-                if (!(reqType.equals("slayer") || reqType.equals("skills") || reqType.equals("catacombs")
-                        || reqType.equals("weight"))) {
-                    return defaultEmbed("Error").setDescription(
-                            "Requirement type must be one of the following: slayer, skills, catacombs, or weight");
-                }
-
-                int responseCode = updateApplySettings(reqType + "Requirements", "" + reqValInt);
-
-                if (responseCode != 200) {
-                    return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
-                }
-
-                EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
-                eb.setDescription("**Application requirement set:** " + reqType + " - " + reqValInt);
-                return eb;
-            }
-
-        } catch (Exception e) {
-            return defaultEmbed("Error").setDescription("Value must be an integer");
+            currentReqs = database.getApplyReqs(event.getGuild().getId()).getAsJsonArray();
+        } catch (Exception ignored) {
+            return defaultEmbed("Error").setDescription("Unable to get current settings");
         }
 
+        try {
+            JsonElement req = currentReqs.get(Integer.parseInt(reqNumber) - 1);
+            currentReqs.remove(Integer.parseInt(reqNumber) - 1);
+
+            int responseCode = database.updateApplyReqs(event.getGuild().getId(), currentReqs);
+
+            if (responseCode != 200) {
+                return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
+            }
+
+            EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName());
+            eb.setDescription(
+                    "**Removed application requirement of:**\n• Slayer - " + higherDepth(req, "slayerReq").getAsInt()
+                            + "\n• Skills - " + higherDepth(req, "skillsReq").getAsInt() + "\n• Catacombs - "
+                            + higherDepth(req, "catacombsReq").getAsInt() + "\n• Weight - "
+                            + higherDepth(req, "weightReq").getAsInt());
+            return eb;
+        } catch (Exception ignored) {
+            return defaultEmbed("Error").setDescription("Invalid requirement number. Run `" + BOT_PREFIX
+                    + "settings apply` to see the current apply requirements");
+        }
+    }
+
+    private EmbedBuilder addApplyRequirement(String reqArgs) {
+        JsonArray currentReqs;
+        try {
+            currentReqs = database.getApplyReqs(event.getGuild().getId()).getAsJsonArray();
+        } catch (Exception ignored) {
+            return defaultEmbed("Error").setDescription("Unable to get current settings");
+        }
+
+        if (currentReqs.size() >= 3) {
+            return defaultEmbed("Error").setDescription("You can only have up to 3 requirements");
+        }
+
+        int slayerReq = 0;
+        int skillsReq = 0;
+        int cataReq = 0;
+        int weightReq = 0;
+
+        try {
+            slayerReq = Integer.parseInt(reqArgs.split("slayer-")[1].split(" ")[0]);
+        } catch (Exception ignored) {
+        }
+
+        try {
+            skillsReq = Integer.parseInt(reqArgs.split("skills-")[1].split(" ")[0]);
+        } catch (Exception ignored) {
+        }
+
+        try {
+            cataReq = Integer.parseInt(reqArgs.split("catacombs-")[1].split(" ")[0]);
+        } catch (Exception ignored) {
+        }
+
+        try {
+            weightReq = Integer.parseInt(reqArgs.split("weight-")[1].split(" ")[0]);
+        } catch (Exception ignored) {
+        }
+
+        ApplyRequirements toAddReq = new ApplyRequirements("" + slayerReq, "" + skillsReq, "" + cataReq,
+                "" + weightReq);
+
+        currentReqs.add(new Gson().toJsonTree(toAddReq));
+
+        int responseCode = database.updateApplyReqs(event.getGuild().getId(), currentReqs);
+
+        if (responseCode != 200) {
+            return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
+        }
+
+        EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName());
+        eb.setDescription("**Application requirement added:**\n• Slayer - " + slayerReq + "\n• Skills - " + skillsReq
+                + "\n• Catacombs - " + cataReq + "\n• Weight - " + weightReq);
+        return eb;
     }
 
     private int updateApplySettings(String key, String newValue) {
@@ -1389,6 +1435,28 @@ public class SettingsCommand extends Command {
     /* Misc */
     private String displaySettings(JsonElement jsonSettings, String settingName) {
         if (higherDepth(jsonSettings, settingName) != null) {
+            if (settingName.equals("applyReqs")) {
+                JsonArray reqs = higherDepth(jsonSettings, settingName).getAsJsonArray();
+
+                if (reqs.size() == 0) {
+                    return "None";
+                }
+
+                String reqsString = "\n";
+                for (int i = 0; i < reqs.size(); i++) {
+                    JsonElement req = reqs.get(i);
+                    String slayerReq = higherDepth(req, "slayerReq").getAsString();
+                    String skillsReq = higherDepth(req, "skillsReq").getAsString();
+                    String cataReq = higherDepth(req, "catacombsReq").getAsString();
+                    String weightReq = higherDepth(req, "weightReq").getAsString();
+
+                    reqsString += "`" + (i + 1) + ")` " + slayerReq + " slayer and " + skillsReq + " skill average and "
+                            + cataReq + " cata and " + weightReq + " weight";
+                }
+
+                return reqsString;
+            }
+
             String currentSettingValue = higherDepth(jsonSettings, settingName).getAsString();
             if (currentSettingValue.length() > 0) {
                 switch (settingName) {
@@ -1437,7 +1505,6 @@ public class SettingsCommand extends Command {
                 case "enableGuildRanks":
                     return currentSettingValue.equals("true") ? "• Guild ranks enabled" : "• Guild ranks disabled";
                 }
-
                 return currentSettingValue;
             }
         }

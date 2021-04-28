@@ -81,7 +81,7 @@ public class MainListener extends ListenerAdapter {
                 eb.setDescription("- Thank you for adding me to " + event.getGuild().getName() + "\n- My prefix is `"
                         + BOT_PREFIX + "`\n- You can view my commands by running `" + BOT_PREFIX
                         + "help`\n- Make sure to check out `" + BOT_PREFIX
-                        + "setup` or the forum post [**here**](https://hypixel.net/threads/discord-bot-skyblock-plus-90-servers.3980092/post-28888349) on how to setup the customizable features of this bot!");
+                        + "setup` or the forum post [**here**](https://hypixel.net/threads/3980092) on how to setup the customizable features of this bot!");
                 TextChannel channel = event.getGuild().getTextChannels().stream()
                         .filter(textChannel -> textChannel.getName().toLowerCase().contains("general")).findFirst()
                         .orElse(null);

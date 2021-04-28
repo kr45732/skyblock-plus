@@ -72,7 +72,9 @@ public class HelpCommand extends Command {
 
             paginateBuilder.clearItems();
 
-            if (event.getGuild().getMember(event.getAuthor()).hasPermission(Permission.ADMINISTRATOR)) {
+            boolean isAdmin = event.getGuild().getMember(event.getAuthor()).hasPermission(Permission.ADMINISTRATOR);
+
+            if (isAdmin) {
                 paginateBuilder
                         .addItems("Use the arrow emojis to navigate through the pages" + generatePageMap("General",
                                 "Slayer", "Skills", "Dungeons", "Guild", "Auction House and Bazaar", "Inventory",
@@ -150,14 +152,15 @@ public class HelpCommand extends Command {
                             + generateHelp("Get fastest Hypixel lobby parkour for a player", "hypixel parkour [player]")
                             + generateHelp("Get a information about all of a player's profiles", "profiles [player]"));
 
-            paginateBuilder.addItems(generateHelp("Interactive message to create a Skyblock event", "event create")
-                    + generateHelp("Get information about the current event if any", "event current")
-                    + generateHelp("Join the current event if any", "event join")
-                    + generateHelp("Leave the current event if any", "event leave")
-                    + generateHelp("Get the leaderboard for current event if any", "event leaderboard", "event lb")
-                    + generateHelp("End the event early", "event end"));
+            paginateBuilder.addItems(
+                    (isAdmin ? generateHelp("Interactive message to create a Skyblock event", "event create") : "")
+                            + generateHelp("Get information about the current event", "event current")
+                            + generateHelp("Join the current event", "event join")
+                            + generateHelp("Leave the current event", "event leave")
+                            + generateHelp("Get the leaderboard for current event", "event leaderboard", "event lb")
+                            + (isAdmin ? generateHelp("Force end the event", "event end") : ""));
 
-            if (event.getGuild().getMember(event.getAuthor()).hasPermission(Permission.ADMINISTRATOR)) {
+            if (isAdmin) {
                 paginateBuilder.addItems(generateHelp("Get the current settings for the bot", "settings")
                         + generateHelp("A walk-through on how to setup the bot", "setup")
                         + generateHelp("Get the id's of all categories in guild", "categories"));
@@ -196,8 +199,12 @@ public class HelpCommand extends Command {
                         + generateHelp("Message that will be sent if applicant is denied",
                                 "settings apply deny_message [message]")
                         + generateHelp(
-                                "Requirement that applicant must meet. Type can be __slayer__, __skills__, __catacombs__, or __weight__. Value can be an integer or none",
-                                "settings apply requirements [type] [value]", "settings apply reqs [type] [value]"));
+                                "Add a requirement that applicant must meet. At least one of the requirement types must be set",
+                                "settings apply reqs add <slayer-amount> <skills-amount> <catacombs-amount> <weight-amount>")
+                        + generateHelp(
+                                "Remove a requirement. Run `" + BOT_PREFIX
+                                        + "settings apply` to see the index for all current requirements",
+                                "settings apply reqs remove [number]"));
 
                 paginateBuilder.addItems(generateHelp("Get the current roles settings for the bot", "settings roles")
                         + generateHelp("Enable or disable automatic roles", "settings roles [enable|disable]")

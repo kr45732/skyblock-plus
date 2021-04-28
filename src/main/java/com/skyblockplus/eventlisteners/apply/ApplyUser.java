@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.skyblockplus.utils.Player;
@@ -149,51 +150,36 @@ public class ApplyUser implements Serializable {
             Player player = new Player(playerUsername,
                     emojiToProfileName(event.getReactionEmote().getAsReactionCode()));
 
-            String missingReqs = "";
-            try {
-                if (player.getSlayer() < higherDepth(currentSettings, "slayerRequirements").getAsInt()) {
-                    missingReqs += "\n• Your current slayer of " + formatNumber(player.getSlayer())
-                            + " doesn't meet the requirement of "
-                            + formatNumber(higherDepth(currentSettings, "slayerRequirements").getAsInt());
+            JsonArray currentReqs = higherDepth(currentSettings, "applyReqs").getAsJsonArray();
+
+            boolean meetReqs = false;
+            String missingReqsStr = "";
+            if (currentReqs.size() == 0) {
+                meetReqs = true;
+            } else {
+                for (JsonElement req : currentReqs) {
+                    int slayerReq = higherDepth(req, "slayerReq").getAsInt();
+                    int skillsReq = higherDepth(req, "skillsReq").getAsInt();
+                    int cataReq = higherDepth(req, "catacombsReq").getAsInt();
+                    int weightReq = higherDepth(req, "weightReq").getAsInt();
+
+                    if (player.getSlayer() >= slayerReq && player.getSkillAverage() >= skillsReq
+                            && player.getCatacombsLevel() >= cataReq && player.getWeight() >= weightReq) {
+                        meetReqs = true;
+                        break;
+                    } else {
+                        missingReqsStr += "• Slayer - " + formatNumber(slayerReq) + " | Skill Average - "
+                                + formatNumber(skillsReq) + " | Catacombs - " + formatNumber(cataReq) + " | Weight - "
+                                + formatNumber(weightReq) + "\n";
+                    }
                 }
-            } catch (Exception ignored) {
             }
 
-            try {
-                if (player.getSkillAverage() < higherDepth(currentSettings, "skillsRequirements").getAsInt()) {
-                    missingReqs += "\n• Your current skill average of " + roundAndFormat(player.getSkillAverage())
-                            + " doesn't meet the requirement of "
-                            + roundAndFormat(higherDepth(currentSettings, "skillsRequirements").getAsInt());
-                }
-            } catch (Exception ignored) {
-            }
-
-            try {
-                double cataCur = player.getCatacombsSkill() != null
-                        ? (player.getCatacombsSkill().skillLevel + player.getCatacombsSkill().progressToNext)
-                        : 0;
-                if ((cataCur) < higherDepth(currentSettings, "catacombsRequirements").getAsInt()) {
-                    missingReqs += "\n• Your current catacombs level of " + roundAndFormat(cataCur)
-                            + " doesn't meet the requirement of "
-                            + roundAndFormat(higherDepth(currentSettings, "catacombsRequirements").getAsInt());
-                }
-            } catch (Exception ignored) {
-            }
-
-            try {
-                if (player.getWeight() < higherDepth(currentSettings, "weightRequirements").getAsInt()) {
-                    missingReqs += "\n• Your current weight of " + roundAndFormat(player.getWeight())
-                            + " doesn't meet the requirement of "
-                            + roundAndFormat(higherDepth(currentSettings, "weightRequirements").getAsInt());
-                }
-            } catch (Exception ignored) {
-            }
-
-            if (missingReqs.length() > 0) {
+            if (!meetReqs) {
                 EmbedBuilder reqEmbed = defaultEmbed("Does not meet requirements");
-                reqEmbed.setDescription(missingReqs);
+                reqEmbed.setDescription("You do not meet any of the following requirements:\n" + missingReqsStr);
                 reqEmbed.appendDescription(
-                        "\n• If you think these values are incorrect make sure all your APIs are enabled and/or try relinking");
+                        "\n\n• If you think these values are incorrect make sure all your APIs are enabled and/or try relinking");
                 reqEmbed.appendDescription("\n• React with ✅ to close the channel");
 
                 reactMessage = applicationChannel.sendMessage(reqEmbed.build()).complete();

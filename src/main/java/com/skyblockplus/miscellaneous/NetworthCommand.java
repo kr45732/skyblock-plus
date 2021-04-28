@@ -11,8 +11,7 @@ import static com.skyblockplus.utils.Utils.higherDepth;
 import static com.skyblockplus.utils.Utils.loadingEmbed;
 import static com.skyblockplus.utils.Utils.logCommand;
 import static com.skyblockplus.utils.Utils.simplifyNumber;
-import static java.lang.String.join;
-import static java.util.Collections.nCopies;
+import static com.skyblockplus.utils.Utils.toRomanNumerals;
 
 import java.io.InputStreamReader;
 import java.net.URI;
@@ -444,10 +443,13 @@ public class NetworthCommand extends Command {
             }
         }
 
-        // if(higherDepth(sbzPrices, enchantName + "_1") != null){
-        // return Math.pow(2, enchantLevel - i) * higherDepth(sbzPrices, enchantName +
-        // "_1");
-        // }
+        if (higherDepth(sbzPrices, enchantName + "_1") != null) {
+            return Math.pow(2, enchantLevel - 1) * higherDepth(sbzPrices, enchantName + "_1").getAsDouble();
+        }
+
+        if (higherDepth(sbzPrices, enchantName + "_i") != null) {
+            return Math.pow(2, enchantLevel - 1) * higherDepth(sbzPrices, enchantName + "_i").getAsDouble();
+        }
 
         tempSet.add(enchantId);
         return 0;
@@ -489,8 +491,7 @@ public class NetworthCommand extends Command {
                 String minionName = itemId.split("_generator_")[0];
                 int level = Integer.parseInt(itemId.split("_generator_")[1]);
 
-                itemId = minionName + "_minion_" + join("", nCopies(level, "i")).replace("iiiii", "v")
-                        .replace("iiii", "iv").replace("vv", "x").replace("viv", "ix");
+                itemId = minionName + "_minion_" + toRomanNumerals(level);
             } else if (itemId.equals("magic_mushroom_soup")) {
                 itemId = "magical_mushroom_soup";
             } else if (itemId.startsWith("theoretical_hoe_")) {

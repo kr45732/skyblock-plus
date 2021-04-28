@@ -550,7 +550,6 @@ public class Utils {
         return Stream.of(str.trim().split("\\s")).filter(word -> word.length() > 0)
                 .map(word -> word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase())
                 .collect(Collectors.joining(" "));
-        // return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
     }
 
     public static ArrayList<String> getJsonKeys(JsonElement jsonElement) {

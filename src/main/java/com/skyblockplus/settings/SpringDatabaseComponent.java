@@ -1,9 +1,11 @@
 package com.skyblockplus.settings;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.skyblockplus.api.discordserversettings.automatedapplication.ApplyRequirements;
 import com.skyblockplus.api.discordserversettings.automatedapplication.AutomatedApplication;
 import com.skyblockplus.api.discordserversettings.automatedguildroles.GuildRole;
 import com.skyblockplus.api.discordserversettings.automatedroles.AutomatedRoles;
@@ -20,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-
 
 @Service
 @Transactional
@@ -92,7 +93,8 @@ public class SpringDatabaseComponent {
     }
 
     public int updateVerifySettings(String serverId, JsonElement newVerifySettings) {
-        return settingsService.updateVerifySettings(serverId, gson.fromJson(newVerifySettings, AutomatedVerify.class)).getStatusCodeValue();
+        return settingsService.updateVerifySettings(serverId, gson.fromJson(newVerifySettings, AutomatedVerify.class))
+                .getStatusCodeValue();
     }
 
     public JsonElement getApplySettings(String serverId) {
@@ -100,7 +102,9 @@ public class SpringDatabaseComponent {
     }
 
     public int updateApplySettings(String serverId, JsonElement newApplySettings) {
-        return settingsService.updateApplySettings(serverId, gson.fromJson(newApplySettings, AutomatedApplication.class)).getStatusCodeValue();
+        return settingsService
+                .updateApplySettings(serverId, gson.fromJson(newApplySettings, AutomatedApplication.class))
+                .getStatusCodeValue();
     }
 
     public JsonElement getRolesSettings(String serverId) {
@@ -108,7 +112,8 @@ public class SpringDatabaseComponent {
     }
 
     public int updateRolesSettings(String serverId, JsonElement newRoleSettings) {
-        return settingsService.updateRolesSettings(serverId, gson.fromJson(newRoleSettings, AutomatedRoles.class)).getStatusCodeValue();
+        return settingsService.updateRolesSettings(serverId, gson.fromJson(newRoleSettings, AutomatedRoles.class))
+                .getStatusCodeValue();
     }
 
     public boolean serverByServerIdExists(String serverId) {
@@ -120,7 +125,8 @@ public class SpringDatabaseComponent {
     }
 
     public int updateRoleSettings(String serverId, String roleName, JsonElement newRoleSettings) {
-        return settingsService.updateRoleSettings(serverId, gson.fromJson(newRoleSettings, RoleModel.class), roleName).getStatusCodeValue();
+        return settingsService.updateRoleSettings(serverId, gson.fromJson(newRoleSettings, RoleModel.class), roleName)
+                .getStatusCodeValue();
     }
 
     public JsonElement getGuildRoleSettings(String serverId) {
@@ -128,7 +134,8 @@ public class SpringDatabaseComponent {
     }
 
     public int updateGuildRoleSettings(String serverId, JsonObject currentSettings) {
-        return settingsService.updateGuildRoleSettings(serverId, gson.fromJson(currentSettings, GuildRole.class)).getStatusCodeValue();
+        return settingsService.updateGuildRoleSettings(serverId, gson.fromJson(currentSettings, GuildRole.class))
+                .getStatusCodeValue();
     }
 
     public int updateApplyCacheSettings(String serverId, String currentSettings) {
@@ -173,5 +180,14 @@ public class SpringDatabaseComponent {
 
     public boolean eventHasMemberByUuid(String serverId, String minecraftUuid) {
         return settingsService.eventHasMemberByUuid(serverId, minecraftUuid);
+    }
+
+    public JsonElement getApplyReqs(String serverId) {
+        return gson.toJsonTree(settingsService.getApplyReqs(serverId).getBody());
+    }
+
+    public int updateApplyReqs(String serverId, JsonArray newApplyReqs) {
+        return settingsService.updateApplyReqs(serverId, gson.fromJson(newApplyReqs, ApplyRequirements[].class))
+                .getStatusCodeValue();
     }
 }

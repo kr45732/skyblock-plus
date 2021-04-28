@@ -1,13 +1,12 @@
 package com.skyblockplus.utils;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
-import com.skyblockplus.eventlisteners.AutomaticGuild;
-import com.skyblockplus.eventlisteners.apply.ApplyUser;
-import com.skyblockplus.utils.structs.DiscordInfoStruct;
-import net.dv8tion.jda.api.entities.User;
+import static com.skyblockplus.Main.asyncHttpClient;
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.eventlisteners.MainListener.getGuildMap;
+import static com.skyblockplus.utils.Utils.BOT_PREFIX;
+import static com.skyblockplus.utils.Utils.getPlayerDiscordInfo;
+import static com.skyblockplus.utils.Utils.logCommand;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -18,9 +17,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static com.skyblockplus.Main.*;
-import static com.skyblockplus.eventlisteners.MainListener.getGuildMap;
-import static com.skyblockplus.utils.Utils.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
+import com.skyblockplus.eventlisteners.AutomaticGuild;
+import com.skyblockplus.eventlisteners.apply.ApplyUser;
+import com.skyblockplus.utils.structs.DiscordInfoStruct;
+
+import net.dv8tion.jda.api.entities.User;
 
 public class MainClassUtils {
     public static void cacheApplyGuildUsers() {
@@ -34,10 +39,12 @@ public class MainClassUtils {
                 database.deleteApplyCacheSettings(automaticGuild.getKey());
                 List<ApplyUser> applyUserList = automaticGuild.getValue().getApplyGuild().getApplyUserList();
                 if (applyUserList.size() > 0) {
-                    int code = database.updateApplyCacheSettings(automaticGuild.getKey(), new Gson().toJson(applyUserList));
+                    int code = database.updateApplyCacheSettings(automaticGuild.getKey(),
+                            new Gson().toJson(applyUserList));
 
                     if (code == 200) {
-                        System.out.println("Successfully cached ApplyUser | " + automaticGuild.getKey() + " | " + applyUserList.size());
+                        System.out.println("Successfully cached ApplyUser | " + automaticGuild.getKey() + " | "
+                                + applyUserList.size());
                     }
                 }
             } catch (Exception e) {
@@ -63,10 +70,9 @@ public class MainClassUtils {
             }
             if (applyUsersCacheList.size() > 0) {
                 System.out.println("Retrieved cache (" + applyUsersCacheList.size() + ") - " + guildId);
+                database.deleteApplyCacheSettings(guildId);
                 return applyUsersCacheList;
             }
-
-            database.deleteApplyCacheSettings(guildId);
         } catch (Exception e) {
             System.out.println("== Stack Trace (Get cache ApplyUser - " + guildId + ")");
             e.printStackTrace();
@@ -92,25 +98,28 @@ public class MainClassUtils {
     }
 
     public static void updateLinkedAccounts() {
-        database.getLinkedUsersList().stream().filter(linkedAccountModel -> Duration.between(Instant.ofEpochMilli(Long.parseLong(linkedAccountModel.getLastUpdated())), Instant.now()).toDays() > 1).findAny().ifPresent(notUpdated -> {
-            try {
-                DiscordInfoStruct discordInfo = getPlayerDiscordInfo(notUpdated.getMinecraftUsername());
-                User updateUser = jda.getUserById(notUpdated.getDiscordId());
-                if (discordInfo.discordTag.equals(updateUser.getAsTag())) {
-                    database.addLinkedUser(new LinkedAccountModel("" + Instant.now().toEpochMilli(), updateUser.getId(), discordInfo.minecraftUuid, discordInfo.minecraftUsername));
+        database.getLinkedUsersList().stream().filter(linkedAccountModel -> Duration
+                .between(Instant.ofEpochMilli(Long.parseLong(linkedAccountModel.getLastUpdated())), Instant.now())
+                .toDays() > 1).findAny().ifPresent(notUpdated -> {
                     try {
-                        logCommand("Updated linked user: " + notUpdated.getMinecraftUsername());
+                        DiscordInfoStruct discordInfo = getPlayerDiscordInfo(notUpdated.getMinecraftUsername());
+                        User updateUser = jda.getUserById(notUpdated.getDiscordId());
+                        if (discordInfo.discordTag.equals(updateUser.getAsTag())) {
+                            database.addLinkedUser(new LinkedAccountModel("" + Instant.now().toEpochMilli(),
+                                    updateUser.getId(), discordInfo.minecraftUuid, discordInfo.minecraftUsername));
+                            try {
+                                logCommand("Updated linked user: " + notUpdated.getMinecraftUsername());
+                            } catch (Exception ignored) {
+                            }
+                            return;
+                        }
                     } catch (Exception ignored) {
                     }
-                    return;
-                }
-            } catch (Exception ignored) {
-            }
-            database.deleteLinkedUserByMinecraftUsername(notUpdated.getMinecraftUsername());
-            try {
-                logCommand("Error updating linked user: " + notUpdated.getMinecraftUsername());
-            } catch (Exception ignored) {
-            }
-        });
+                    database.deleteLinkedUserByMinecraftUsername(notUpdated.getMinecraftUsername());
+                    try {
+                        logCommand("Error updating linked user: " + notUpdated.getMinecraftUsername());
+                    } catch (Exception ignored) {
+                    }
+                });
     }
 }

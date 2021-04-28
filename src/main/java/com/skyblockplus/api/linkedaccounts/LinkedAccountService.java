@@ -1,12 +1,13 @@
 package com.skyblockplus.api.linkedaccounts;
 
+import java.util.List;
+
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import javax.transaction.Transactional;
-import java.util.List;
 
 @Service
 @Transactional
@@ -24,8 +25,7 @@ public class LinkedAccountService {
 
     public ResponseEntity<?> getByDiscordId(String discordId) {
         if (accountByDiscordIdExists(discordId)) {
-            return new ResponseEntity<>(settingsRepository.findByDiscordId(discordId),
-                    HttpStatus.OK);
+            return new ResponseEntity<>(settingsRepository.findByDiscordId(discordId), HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
@@ -36,8 +36,7 @@ public class LinkedAccountService {
 
     public ResponseEntity<?> getByMinecraftUuid(String minecraftUuid) {
         if (accountByMinecraftUuidExists(minecraftUuid)) {
-            return new ResponseEntity<>(settingsRepository.findByMinecraftUuid(minecraftUuid),
-                    HttpStatus.OK);
+            return new ResponseEntity<>(settingsRepository.findByMinecraftUuid(minecraftUuid), HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
@@ -48,8 +47,7 @@ public class LinkedAccountService {
 
     public ResponseEntity<?> getByMinecraftUsername(String minecraftUsername) {
         if (accountByMinecraftUsernameExists(minecraftUsername)) {
-            return new ResponseEntity<>(settingsRepository.findByMinecraftUsername(minecraftUsername),
-                    HttpStatus.OK);
+            return new ResponseEntity<>(settingsRepository.findByMinecraftUsername(minecraftUsername), HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
@@ -71,7 +69,6 @@ public class LinkedAccountService {
     }
 
     public ResponseEntity<HttpStatus> addNewLinkedAccount(LinkedAccountModel linkedAccountModel) {
-//         Note: will update an old one too
         if (settingsRepository.existsByMinecraftUsername(linkedAccountModel.getMinecraftUsername())) {
             deleteByMinecraftUsername(linkedAccountModel.getMinecraftUsername());
         } else if (settingsRepository.existsByMinecraftUuid(linkedAccountModel.getMinecraftUuid())) {

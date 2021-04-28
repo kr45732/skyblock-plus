@@ -48,9 +48,9 @@ public class InformationCommand extends Command {
                         true);
 
                 eb.addField("Links",
-                        "[**Invite Link**](https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403040368&scope=bot)\n[**Discord Link**](https://discord.gg/DpcCAwMXwp)\n[**Forum Post**](https://hypixel.net/threads/discord-bot-skyblock-plus-90-servers.3980092/)",
+                        "[**Invite Link**](https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403040368&scope=bot)\n[**Discord Link**](https://discord.gg/DpcCAwMXwp)\n[**Forum Post**](https://hypixel.net/threads/3980092)",
                         true);
-                eb.setFooter("Last restart", null);
+                eb.setFooter("Last restart");
                 eb.setTimestamp(event.getClient().getStartTime());
                 event.reply(eb.build());
             });
