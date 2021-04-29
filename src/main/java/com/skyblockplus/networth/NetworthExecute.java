@@ -36,8 +36,6 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
@@ -60,7 +58,7 @@ public class NetworthExecute {
     private double talismanTotal = 0;
     private double invArmor = 0;
 
-    private List<NetworthItemStruct> enderChestItems = new ArrayList<>();
+    private List<String> enderChestItems = new ArrayList<>();
 
     public void execute(CommandEvent event) {
         new Thread(() -> {
@@ -130,18 +128,22 @@ public class NetworthExecute {
             for (InvItem item : enderChest.values()) {
                 double itemPrice = calculateItemPrice(item, "enderchest");
                 if (item != null) {
-                    enderChestItems.add(new NetworthItemStruct(item.getName(), itemPrice));
+                    enderChestItems.add(item.getName() + "@split@" + itemPrice);
                 }
                 enderChestTotal += itemPrice;
             }
 
             calculateAllPetsPrice();
 
-            enderChestItems.sort(Comparator.comparingDouble(item -> item.getItemCost()));
+            for (String i : enderChestItems) {
+                System.out.println(i.split("@split@")[0] + " ----- " + i.split("@split@")[1]);
+            }
+            enderChestItems.sort(Comparator.comparingDouble(item -> -Double.parseDouble(item.split("@split@")[1])));
             String echestStr = "";
             for (int i = 0; i < enderChestItems.size(); i++) {
-                NetworthItemStruct item = enderChestItems.get(i);
-                echestStr += "• " + item.getItemName() + " -> " + simplifyNumber(item.getItemCost()) + "\n";
+                String item = enderChestItems.get(i);
+                echestStr += "• " + item.split("@split@")[0] + " -> "
+                        + simplifyNumber(Double.parseDouble(item.split("@split@")[1])) + "\n";
                 if (i == 4) {
                     break;
                 }
@@ -258,7 +260,7 @@ public class NetworthExecute {
                         double itemPrice = auctionPrice
                                 + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ")
                                         : 0);
-                        enderChestItems.add(new NetworthItemStruct(item.getName(), itemPrice));
+                        enderChestItems.add(item.getName() + "@split@" + itemPrice);
                         enderChestTotal += itemPrice;
                         iterator.remove();
                     }
@@ -296,7 +298,7 @@ public class NetworthExecute {
                 double itemPrice = higherDepth(lowestBinJson,
                         item.getName().split("] ")[1].toLowerCase().trim() + rarityMap.get(item.getRarity()))
                                 .getAsDouble();
-                enderChestItems.add(new NetworthItemStruct(item.getName(), itemPrice));
+                enderChestItems.add(item.getName() + "@split@" + itemPrice);
                 enderChestTotal += itemPrice;
             } catch (Exception ignored) {
             }
@@ -326,15 +328,15 @@ public class NetworthExecute {
         try {
             if (item.getId().equals("PET") && location != null) {
                 switch (location) {
-                case "inventory":
-                    invPets.add(item);
-                    break;
-                case "pets":
-                    petsPets.add(item);
-                    break;
-                case "enderchest":
-                    enderChestPets.add(item);
-                    break;
+                    case "inventory":
+                        invPets.add(item);
+                        break;
+                    case "pets":
+                        petsPets.add(item);
+                        break;
+                    case "enderchest":
+                        enderChestPets.add(item);
+                        break;
                 }
                 return 0;
             } else {
@@ -563,11 +565,4 @@ public class NetworthExecute {
 
         return false;
     }
-}
-
-@AllArgsConstructor
-@Getter
-class NetworthItemStruct {
-    public String itemName;
-    public double itemCost;
 }

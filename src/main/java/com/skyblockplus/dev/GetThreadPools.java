@@ -1,8 +1,6 @@
 package com.skyblockplus.dev;
 
-import static com.skyblockplus.Main.*;
-
-import java.util.Set;
+import static com.skyblockplus.utils.Utils.logCommand;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -15,15 +13,9 @@ public class GetThreadPools extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        Set<Thread> threads = Thread.getAllStackTraces().keySet();
+        logCommand(event.getGuild(), event.getAuthor(), event.getMessage().getContentRaw());
 
-        String replyStr = "";
-        replyStr += "Total thread count: " + threads.size() + "\n";
-        for (Thread thread : threads) {
-            replyStr += "• " + thread.getName() + " | " + thread.getId() + " | " + thread.isAlive() + "\n";
-        }
-
-        event.reply(replyStr);
+        event.getChannel().sendMessage("Total thread count: " + Thread.getAllStackTraces().size()).queue();
     }
 
 }

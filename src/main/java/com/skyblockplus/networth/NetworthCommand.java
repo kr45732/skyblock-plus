@@ -8,7 +8,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 public class NetworthCommand extends Command {
     public NetworthCommand() {
         this.name = "networth";
-        this.cooldown = globalCooldown;
+        this.cooldown = globalCooldown + 1;
         this.aliases = new String[] { "nw" };
     }
 
