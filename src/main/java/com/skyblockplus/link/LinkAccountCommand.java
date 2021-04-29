@@ -17,7 +17,6 @@ import static com.skyblockplus.Main.database;
 import static com.skyblockplus.utils.Utils.*;
 
 public class LinkAccountCommand extends Command {
-    CommandEvent event;
 
     public LinkAccountCommand() {
         this.name = "link";
@@ -34,13 +33,16 @@ public class LinkAccountCommand extends Command {
                 return eb;
             }
 
-            LinkedAccountModel toAdd = new LinkedAccountModel("" + Instant.now().toEpochMilli(), user.getId(), playerInfo.minecraftUuid, playerInfo.minecraftUsername);
+            LinkedAccountModel toAdd = new LinkedAccountModel("" + Instant.now().toEpochMilli(), user.getId(),
+                    playerInfo.minecraftUuid, playerInfo.minecraftUsername);
 
             if (database.addLinkedUser(toAdd) == 200) {
 
                 try {
-                    if (!higherDepth(database.getVerifySettings(guild.getId()), "verifiedNickname").getAsString().equalsIgnoreCase("none")) {
-                        String nicknameTemplate = higherDepth(database.getVerifySettings(guild.getId()), "verifiedNickname").getAsString();
+                    if (!higherDepth(database.getVerifySettings(guild.getId()), "verifiedNickname").getAsString()
+                            .equalsIgnoreCase("none")) {
+                        String nicknameTemplate = higherDepth(database.getVerifySettings(guild.getId()),
+                                "verifiedNickname").getAsString();
                         nicknameTemplate = nicknameTemplate.replace("[IGN]", playerInfo.minecraftUsername);
                         guild.getMember(user).modifyNickname(nicknameTemplate).queue();
                     }
@@ -48,18 +50,22 @@ public class LinkAccountCommand extends Command {
                 }
 
                 try {
-                    Role role = guild.getRoleById(higherDepth(database.getVerifySettings(guild.getId()), "verifiedRole").getAsString());
+                    Role role = guild.getRoleById(
+                            higherDepth(database.getVerifySettings(guild.getId()), "verifiedRole").getAsString());
                     guild.addRoleToMember(guild.getMember(user), role).queue();
                 } catch (Exception ignored) {
                 }
 
-                return defaultEmbed("Success").setDescription("`" + user.getAsTag() + "` was linked to `" + playerInfo.minecraftUsername + "`");
+                return defaultEmbed("Success").setDescription(
+                        "`" + user.getAsTag() + "` was linked to `" + playerInfo.minecraftUsername + "`");
             } else {
-                return defaultEmbed("Error").setDescription("Error linking `" + user.getAsTag() + " to `" + playerInfo.minecraftUsername + "`");
+                return defaultEmbed("Error").setDescription(
+                        "Error linking `" + user.getAsTag() + " to `" + playerInfo.minecraftUsername + "`");
             }
         }
 
-        return defaultEmbed("Error").setDescription(username + " is not linked to a Discord account. For help on how to link view [__**this**__](https://streamable.com/sdq8tp) video");
+        return defaultEmbed("Error").setDescription(username
+                + " is not linked to a Discord account. For help on how to link view [__**this**__](https://streamable.com/sdq8tp) video");
     }
 
     @Override
@@ -69,7 +75,6 @@ public class LinkAccountCommand extends Command {
             Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
             String content = event.getMessage().getContentRaw();
             String[] args = content.split(" ");
-            this.event = event;
 
             logCommand(event.getGuild(), event.getAuthor(), content);
 
@@ -77,7 +82,7 @@ public class LinkAccountCommand extends Command {
                 ebMessage.editMessage(linkAccount(args[1], event.getAuthor(), event.getGuild()).build()).queue();
                 return;
             } else if (args.length == 1) {
-                ebMessage.editMessage(getLinkedAccount().build()).queue();
+                ebMessage.editMessage(getLinkedAccount(event).build()).queue();
                 return;
             }
 
@@ -85,11 +90,12 @@ public class LinkAccountCommand extends Command {
         }).start();
     }
 
-    private EmbedBuilder getLinkedAccount() {
+    private EmbedBuilder getLinkedAccount(CommandEvent event) {
         JsonElement userInfo = database.getLinkedUserByDiscordId(event.getAuthor().getId());
 
         try {
-            return defaultEmbed("Success").setDescription("`" + event.getAuthor().getAsTag() + "` is linked to `" + (higherDepth(userInfo, "minecraftUsername").getAsString()) + "`");
+            return defaultEmbed("Success").setDescription("`" + event.getAuthor().getAsTag() + "` is linked to `"
+                    + (higherDepth(userInfo, "minecraftUsername").getAsString()) + "`");
         } catch (Exception e) {
             return defaultEmbed("Error").setDescription("`" + event.getAuthor().getAsTag() + "` is not linked");
         }

@@ -18,7 +18,6 @@ import static com.skyblockplus.utils.Utils.errorMessage;
 import static com.skyblockplus.utils.Utils.logCommand;
 
 public class GetSettingsFile extends Command {
-    CommandEvent event;
 
     public GetSettingsFile() {
         this.name = "d-getsettings";
@@ -30,21 +29,20 @@ public class GetSettingsFile extends Command {
         new Thread(() -> {
             String content = event.getMessage().getContentRaw();
             String[] args = content.split(" ");
-            this.event = event;
 
             logCommand(event.getGuild(), event.getAuthor(), content);
 
             if (args.length == 2) {
                 if (args[1].equals("current")) {
-                    if (getCurrentServerSettings(event.getGuild().getId())) {
+                    if (getCurrentServerSettings(event.getGuild().getId(), event)) {
                         return;
                     }
                 } else if (args[1].equals("all")) {
-                    if (getAllServerSettings()) {
+                    if (getAllServerSettings(event)) {
                         return;
                     }
                 } else {
-                    if (getCurrentServerSettings(args[1])) {
+                    if (getCurrentServerSettings(args[1], event)) {
                         return;
                     }
                 }
@@ -54,7 +52,7 @@ public class GetSettingsFile extends Command {
         }).start();
     }
 
-    private boolean getAllServerSettings() {
+    private boolean getAllServerSettings(CommandEvent event) {
         List<ServerSettingsModel> allSettings = database.getAllServerSettings();
         if (allSettings == null) {
             return false;
@@ -69,9 +67,7 @@ public class GetSettingsFile extends Command {
             }
 
             Writer writer = new FileWriter(pathName);
-            new GsonBuilder()
-                    .setPrettyPrinting()
-                    .create().toJson(allSettings, writer);
+            new GsonBuilder().setPrettyPrinting().create().toJson(allSettings, writer);
             writer.close();
 
             event.getChannel().sendMessage("All settings").addFile(file).complete();
@@ -85,7 +81,7 @@ public class GetSettingsFile extends Command {
         return false;
     }
 
-    private boolean getCurrentServerSettings(String guildId) {
+    private boolean getCurrentServerSettings(String guildId, CommandEvent event) {
         Guild guild = jda.getGuildById(guildId);
         JsonElement currentSettings = database.getServerSettings(guildId);
         if (currentSettings == null || guild == null) {
@@ -101,9 +97,7 @@ public class GetSettingsFile extends Command {
             }
 
             Writer writer = new FileWriter(pathName);
-            new GsonBuilder()
-                    .setPrettyPrinting()
-                    .create().toJson(currentSettings, writer);
+            new GsonBuilder().setPrettyPrinting().create().toJson(currentSettings, writer);
             writer.close();
 
             event.getChannel().sendMessage("Settings for " + guild.getName()).addFile(file).complete();

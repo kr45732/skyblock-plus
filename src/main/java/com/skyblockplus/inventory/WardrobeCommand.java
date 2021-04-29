@@ -1,30 +1,33 @@
 package com.skyblockplus.inventory;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.skyblockplus.utils.CustomPaginator;
-import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.structs.ArmorStruct;
-import com.skyblockplus.utils.structs.PaginatorExtras;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.defaultPaginator;
+import static com.skyblockplus.utils.Utils.errorMessage;
+import static com.skyblockplus.utils.Utils.globalCooldown;
+import static com.skyblockplus.utils.Utils.loadingEmbed;
+import static com.skyblockplus.utils.Utils.logCommand;
 
 import java.util.List;
 import java.util.Map;
 
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.utils.Utils.*;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.CustomPaginator;
+import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.structs.ArmorStruct;
+import com.skyblockplus.utils.structs.PaginatorExtras;
+
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 
 public class WardrobeCommand extends Command {
-    private final EventWaiter waiter;
-    private CommandEvent event;
     private String missingEmoji;
 
-    public WardrobeCommand(EventWaiter waiter) {
+    public WardrobeCommand() {
         this.name = "wardrobe";
         this.cooldown = globalCooldown;
-        this.waiter = waiter;
     }
 
     @Override
@@ -34,15 +37,14 @@ public class WardrobeCommand extends Command {
             Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
             String content = event.getMessage().getContentRaw();
             String[] args = content.split(" ");
-            this.event = event;
 
             logCommand(event.getGuild(), event.getAuthor(), content);
 
             if ((args.length == 3 || args.length == 4) && args[1].equals("list")) {
                 if (args.length == 4) {
-                    eb = getPlayerWardrobeList(args[2], args[3]);
+                    eb = getPlayerWardrobeList(args[2], args[3], event);
                 } else {
-                    eb = getPlayerWardrobeList(args[2], null);
+                    eb = getPlayerWardrobeList(args[2], null, event);
                 }
 
                 if (eb == null) {
@@ -94,7 +96,7 @@ public class WardrobeCommand extends Command {
         return null;
     }
 
-    private EmbedBuilder getPlayerWardrobeList(String username, String profileName) {
+    private EmbedBuilder getPlayerWardrobeList(String username, String profileName, CommandEvent event) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
             Map<Integer, ArmorStruct> armorStructMap = player.getWardrobeList();

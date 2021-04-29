@@ -14,7 +14,6 @@ import static com.skyblockplus.Main.database;
 import static com.skyblockplus.utils.Utils.*;
 
 public class QuickSetupTestCommand extends Command {
-    private CommandEvent event;
 
     public QuickSetupTestCommand() {
         this.name = "d-settings";
@@ -24,7 +23,6 @@ public class QuickSetupTestCommand extends Command {
     @Override
     protected void execute(CommandEvent event) {
         new Thread(() -> {
-            this.event = event;
             EmbedBuilder eb = loadingEmbed();
             Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
             String content = event.getMessage().getContentRaw();
@@ -34,19 +32,19 @@ public class QuickSetupTestCommand extends Command {
 
             if (args.length >= 4) {
                 if (args[1].equals("roles")) {
-                    ebMessage.editMessage(setRoleSettings(args[2], args[3]).build()).queue();
+                    ebMessage.editMessage(setRoleSettings(args[2], args[3], event).build()).queue();
                     return;
                 } else if (args[1].equals("delete")) {
                     switch (args[2]) {
-                        case "server":
-                            ebMessage.editMessage(deleteServer(args[3]).build()).queue();
-                            return;
-                        case "apply_cache":
-                            ebMessage.editMessage(deleteServerApplyCache(args[3]).build()).queue();
-                            return;
-                        case "skyblock_event":
-                            ebMessage.editMessage(deleteSkyblockEvent(args[3]).build()).queue();
-                            return;
+                    case "server":
+                        ebMessage.editMessage(deleteServer(args[3]).build()).queue();
+                        return;
+                    case "apply_cache":
+                        ebMessage.editMessage(deleteServerApplyCache(args[3]).build()).queue();
+                        return;
+                    case "skyblock_event":
+                        ebMessage.editMessage(deleteSkyblockEvent(args[3]).build()).queue();
+                        return;
                     }
                 }
             }
@@ -76,7 +74,7 @@ public class QuickSetupTestCommand extends Command {
         return defaultEmbed("Error updating settings");
     }
 
-    private EmbedBuilder setRoleSettings(String roleName, String json) {
+    private EmbedBuilder setRoleSettings(String roleName, String json, CommandEvent event) {
         try {
             JsonElement jsonElement = new Gson().toJsonTree(new Gson().fromJson(json, RoleModel.class));
             if (higherDepth(database.getServerSettings(event.getGuild().getId()), "serverId") == null) {

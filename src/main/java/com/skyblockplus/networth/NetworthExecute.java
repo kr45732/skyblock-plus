@@ -1,4 +1,4 @@
-package com.skyblockplus.miscellaneous;
+package com.skyblockplus.networth;
 
 import static com.skyblockplus.utils.Utils.capitalizeString;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
@@ -6,8 +6,7 @@ import static com.skyblockplus.utils.Utils.errorMessage;
 import static com.skyblockplus.utils.Utils.getJson;
 import static com.skyblockplus.utils.Utils.getJsonKeys;
 import static com.skyblockplus.utils.Utils.getReforgeStonesJson;
-import static com.skyblockplus.utils.Utils.globalCooldown;
-import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.Utils.*;
 import static com.skyblockplus.utils.Utils.loadingEmbed;
 import static com.skyblockplus.utils.Utils.logCommand;
 import static com.skyblockplus.utils.Utils.simplifyNumber;
@@ -16,6 +15,7 @@ import static com.skyblockplus.utils.Utils.toRomanNumerals;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -26,7 +26,6 @@ import java.util.Set;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.InvItem;
@@ -37,31 +36,33 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
-public class NetworthCommand extends Command {
+public class NetworthExecute {
     private JsonElement lowestBinJson;
     private JsonElement averageAuctionJson;
     private JsonElement bazaarJson;
     private JsonArray sbzPrices;
-    private int failedCount;
-    private Set<String> tempSet;
-    private List<InvItem> invPets;
-    private List<InvItem> petsPets;
-    private List<InvItem> enderChestPets;
-    private double enderChestTotal;
-    private double petsTotal;
-    private double invTotal;
+    private int failedCount = 0;
+    private Set<String> tempSet = new HashSet<>();
+    private List<InvItem> invPets = new ArrayList<>();
+    private List<InvItem> petsPets = new ArrayList<>();
+    private List<InvItem> enderChestPets = new ArrayList<>();
+    private double enderChestTotal = 0;
+    private double petsTotal = 0;
+    private double invTotal = 0;
+    private double bankBalance = 0;
+    private double purseCoins = 0;
+    private double wardrobeTotal = 0;
+    private double talismanTotal = 0;
+    private double invArmor = 0;
 
-    public NetworthCommand() {
-        this.name = "networth";
-        this.cooldown = globalCooldown;
-        this.aliases = new String[] { "nw" };
-    }
+    private List<NetworthItemStruct> enderChestItems = new ArrayList<>();
 
-    @Override
-    protected void execute(CommandEvent event) {
+    public void execute(CommandEvent event) {
         new Thread(() -> {
             EmbedBuilder eb = loadingEmbed();
             Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
@@ -78,7 +79,7 @@ public class NetworthCommand extends Command {
                 return;
             }
 
-            ebMessage.editMessage(errorMessage(this.name).build()).queue();
+            ebMessage.editMessage(errorMessage("networth").build()).queue();
         }).start();
     }
 
@@ -94,19 +95,8 @@ public class NetworthCommand extends Command {
             sbzPrices = getJson("https://raw.githubusercontent.com/skyblockz/pricecheckbot/master/data.json")
                     .getAsJsonArray();
 
-            failedCount = 0;
-            tempSet = new HashSet<>();
-            invPets = new ArrayList<>();
-            petsPets = new ArrayList<>();
-            enderChestPets = new ArrayList<>();
-            double bankBalance = player.getBankBalance();
-            double purseCoins = player.getPurseCoins();
-            invTotal = 0;
-            double talismanTotal = 0;
-            double invArmor = 0;
-            double wardrobeTotal = 0;
-            petsTotal = 0;
-            enderChestTotal = 0;
+            bankBalance = player.getBankBalance();
+            purseCoins = player.getPurseCoins();
 
             Map<Integer, InvItem> playerInventory = player.getInventoryMap();
             if (playerInventory == null) {
@@ -138,23 +128,39 @@ public class NetworthCommand extends Command {
 
             Map<Integer, InvItem> enderChest = player.getEnderChestMap();
             for (InvItem item : enderChest.values()) {
-                enderChestTotal += calculateItemPrice(item, "enderchest");
+                double itemPrice = calculateItemPrice(item, "enderchest");
+                if (item != null) {
+                    enderChestItems.add(new NetworthItemStruct(item.getName(), itemPrice));
+                }
+                enderChestTotal += itemPrice;
             }
 
             calculateAllPetsPrice();
 
+            enderChestItems.sort(Comparator.comparingDouble(item -> item.getItemCost()));
+            String echestStr = "";
+            for (int i = 0; i < enderChestItems.size(); i++) {
+                NetworthItemStruct item = enderChestItems.get(i);
+                echestStr += "• " + item.getItemName() + " -> " + simplifyNumber(item.getItemCost()) + "\n";
+                if (i == 4) {
+                    break;
+                }
+            }
+
             double totalNetworth = bankBalance + purseCoins + invTotal + talismanTotal + invArmor + wardrobeTotal
                     + petsTotal + enderChestTotal;
 
-            eb.setDescription("Total Networth: " + simplifyNumber(totalNetworth));
-            eb.addField("Bank", simplifyNumber(bankBalance), true);
+            eb.setDescription(
+                    "Total Networth: " + simplifyNumber(totalNetworth) + " (" + formatNumber(totalNetworth) + ")");
             eb.addField("Purse", simplifyNumber(purseCoins), true);
-            eb.addField("Inventory", simplifyNumber(invTotal), true);
-            eb.addField("Talisman", simplifyNumber(talismanTotal), true);
-            eb.addField("Armor", simplifyNumber(invArmor), true);
-            eb.addField("Wardrobe", simplifyNumber(wardrobeTotal), true);
-            eb.addField("Pets", simplifyNumber(petsTotal), true);
-            eb.addField("Ender Chest", simplifyNumber(enderChestTotal), true);
+            eb.addField("Bank", (bankBalance == -1 ? "Private" : simplifyNumber(bankBalance)), true);
+            eb.addField("Ender Chest | " + simplifyNumber(enderChestTotal), echestStr, false);
+            eb.addField("Inventory", simplifyNumber(invTotal), false);
+            eb.addField("Armor", simplifyNumber(invArmor), false);
+            eb.addField("Wardrobe", simplifyNumber(wardrobeTotal), false);
+            eb.addField("Pets", simplifyNumber(petsTotal), false);
+            eb.addField("Talisman", simplifyNumber(talismanTotal), false);
+
             if (failedCount != 0) {
                 eb.appendDescription("\nUnable to get " + failedCount + " items");
             }
@@ -163,7 +169,9 @@ public class NetworthCommand extends Command {
 
             return eb;
         }
-        return defaultEmbed("Unable to fetch player data");
+        return
+
+        defaultEmbed("Unable to fetch player data");
     }
 
     private static JsonArray queryAhApi(String query) {
@@ -247,9 +255,11 @@ public class NetworthCommand extends Command {
                     InvItem item = iterator.next();
                     if (item.getName().equalsIgnoreCase(auctionName)
                             && item.getRarity().equalsIgnoreCase(auctionRarity)) {
-                        enderChestTotal += auctionPrice
+                        double itemPrice = auctionPrice
                                 + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ")
                                         : 0);
+                        enderChestItems.add(new NetworthItemStruct(item.getName(), itemPrice));
+                        enderChestTotal += itemPrice;
                         iterator.remove();
                     }
                 }
@@ -283,9 +293,11 @@ public class NetworthCommand extends Command {
 
         for (InvItem item : enderChestPets) {
             try {
-                enderChestTotal += higherDepth(lowestBinJson,
+                double itemPrice = higherDepth(lowestBinJson,
                         item.getName().split("] ")[1].toLowerCase().trim() + rarityMap.get(item.getRarity()))
                                 .getAsDouble();
+                enderChestItems.add(new NetworthItemStruct(item.getName(), itemPrice));
+                enderChestTotal += itemPrice;
             } catch (Exception ignored) {
             }
         }
@@ -551,4 +563,11 @@ public class NetworthCommand extends Command {
 
         return false;
     }
+}
+
+@AllArgsConstructor
+@Getter
+class NetworthItemStruct {
+    public String itemName;
+    public double itemCost;
 }

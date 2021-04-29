@@ -22,6 +22,7 @@ import com.skyblockplus.dev.EmojiMapServerCommand;
 import com.skyblockplus.dev.GetAllGuildsIn;
 import com.skyblockplus.dev.GetEventListenersCommand;
 import com.skyblockplus.dev.GetSettingsFile;
+import com.skyblockplus.dev.GetThreadPools;
 import com.skyblockplus.dev.InstantTimeNow;
 import com.skyblockplus.dev.LinkedUserDev;
 import com.skyblockplus.dev.PlaceholderCommand;
@@ -50,12 +51,12 @@ import com.skyblockplus.miscellaneous.HelpCommand;
 import com.skyblockplus.miscellaneous.HypixelCommand;
 import com.skyblockplus.miscellaneous.InformationCommand;
 import com.skyblockplus.miscellaneous.InviteCommand;
-import com.skyblockplus.miscellaneous.NetworthCommand;
 import com.skyblockplus.miscellaneous.ProfilesCommand;
 import com.skyblockplus.miscellaneous.ReloadCommand;
 import com.skyblockplus.miscellaneous.RoleCommands;
 import com.skyblockplus.miscellaneous.SkyblockCommand;
 import com.skyblockplus.miscellaneous.VersionCommand;
+import com.skyblockplus.networth.NetworthCommand;
 import com.skyblockplus.settings.SettingsCommand;
 import com.skyblockplus.settings.SetupCommand;
 import com.skyblockplus.settings.SpringDatabaseComponent;
@@ -81,14 +82,15 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 public class Main {
     public static JDA jda;
     public static SpringDatabaseComponent database;
-    public static final AsyncHttpClient asyncHttpClient = Dsl.asyncHttpClient();
+    public static AsyncHttpClient asyncHttpClient = Dsl.asyncHttpClient();
+    public static EventWaiter waiter;
 
     public static void main(String[] args) throws LoginException, IllegalArgumentException {
         setApplicationSettings();
 
         Main.database = SpringApplication.run(Main.class, args).getBean(SpringDatabaseComponent.class);
 
-        EventWaiter waiter = new EventWaiter();
+        Main.waiter = new EventWaiter();
         CommandClientBuilder client = new CommandClientBuilder();
         client.setActivity(Activity.watching(BOT_PREFIX + "help"));
         client.setOwnerId("385939031596466176");
@@ -96,20 +98,19 @@ public class Main {
         client.useHelpBuilder(false);
         client.setPrefix(BOT_PREFIX);
 
-        client.addCommands(new InformationCommand(), new SlayerCommand(), new HelpCommand(waiter),
-                new GuildCommand(waiter), new AuctionCommand(), new BinCommand(), new SkillsCommand(),
-                new CatacombsCommand(), new ShutdownCommand(), new VersionCommand(), new RoleCommands(),
-                new GuildLeaderboardCommand(), new EssenceCommand(), new BankCommand(waiter),
-                new WardrobeCommand(waiter), new TalismanBagCommand(waiter), new InventoryCommand(waiter),
-                new SacksCommand(waiter), new InviteCommand(), new WeightCommand(), new HypixelCommand(),
-                new UuidCommand(), new SkyblockCommand(waiter), new BaldCommand(), new SettingsCommand(waiter),
-                new ReloadCommand(), new SetupCommand(waiter), new CategoriesCommand(), new PartyFinderCommand(),
-                new QuickSetupTestCommand(), new EmojiMapServerCommand(), new EnderChestCommand(), new InstantTimeNow(),
-                new GetEventListenersCommand(), new GetAllGuildsIn(waiter), new LinkAccountCommand(),
-                new GetSettingsFile(), new UnlinkAccountCommand(), new LinkedUserDev(), new BazaarCommand(),
-                new AverageAuctionCommand(), new PetsCommand(waiter), new SkyblockEventCommand(),
-                new DeleteMessagesCommand(), new PlaceholderCommand(), new ProfilesCommand(waiter),
-                new NetworthCommand(), new QueryAuctionCommand(), new BidsCommand());
+        client.addCommands(new InformationCommand(), new SlayerCommand(), new HelpCommand(), new GuildCommand(),
+                new AuctionCommand(), new BinCommand(), new SkillsCommand(), new CatacombsCommand(),
+                new ShutdownCommand(), new VersionCommand(), new RoleCommands(), new GuildLeaderboardCommand(),
+                new EssenceCommand(), new BankCommand(), new WardrobeCommand(), new TalismanBagCommand(),
+                new InventoryCommand(), new SacksCommand(), new InviteCommand(), new WeightCommand(),
+                new HypixelCommand(), new UuidCommand(), new SkyblockCommand(), new BaldCommand(),
+                new SettingsCommand(), new ReloadCommand(), new SetupCommand(), new CategoriesCommand(),
+                new PartyFinderCommand(), new QuickSetupTestCommand(), new EmojiMapServerCommand(),
+                new EnderChestCommand(), new InstantTimeNow(), new GetEventListenersCommand(), new GetAllGuildsIn(),
+                new LinkAccountCommand(), new GetSettingsFile(), new UnlinkAccountCommand(), new LinkedUserDev(),
+                new BazaarCommand(), new AverageAuctionCommand(), new PetsCommand(), new SkyblockEventCommand(),
+                new DeleteMessagesCommand(), new PlaceholderCommand(), new ProfilesCommand(), new NetworthCommand(),
+                new QueryAuctionCommand(), new BidsCommand(), new GetThreadPools());
 
         if (BOT_PREFIX.equals("+")) {
             jda = JDABuilder.createDefault(BOT_TOKEN).setStatus(OnlineStatus.DO_NOT_DISTURB)

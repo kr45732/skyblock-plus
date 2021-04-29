@@ -17,7 +17,6 @@ public class ShutdownCommand extends Command {
     protected void execute(CommandEvent event) {
         new Thread(() -> {
             logCommand(event.getGuild(), event.getAuthor(), BOT_PREFIX + "d-shutdown");
-
             event.reactWarning();
             event.getJDA().shutdown();
         }).start();

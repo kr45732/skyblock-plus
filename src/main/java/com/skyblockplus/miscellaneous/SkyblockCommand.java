@@ -1,15 +1,18 @@
 package com.skyblockplus.miscellaneous;
 
-import com.google.gson.JsonElement;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.skyblockplus.utils.CustomPaginator;
-import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.structs.ArmorStruct;
-import com.skyblockplus.utils.structs.PaginatorExtras;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
+import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.utils.Utils.BOT_PREFIX;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.defaultPaginator;
+import static com.skyblockplus.utils.Utils.errorMessage;
+import static com.skyblockplus.utils.Utils.formatNumber;
+import static com.skyblockplus.utils.Utils.getJsonKeys;
+import static com.skyblockplus.utils.Utils.globalCooldown;
+import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.Utils.loadingEmbed;
+import static com.skyblockplus.utils.Utils.logCommand;
+import static com.skyblockplus.utils.Utils.roundAndFormat;
+import static com.skyblockplus.utils.Utils.simplifyNumber;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -17,22 +20,27 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Locale;
 
-import static com.skyblockplus.utils.Utils.*;
+import com.google.gson.JsonElement;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.CustomPaginator;
+import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.structs.ArmorStruct;
+import com.skyblockplus.utils.structs.PaginatorExtras;
+
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 
 public class SkyblockCommand extends Command {
-    private final EventWaiter waiter;
-    private CommandEvent event;
 
-    public SkyblockCommand(EventWaiter waiter) {
+    public SkyblockCommand() {
         this.name = "skyblock";
         this.cooldown = globalCooldown;
-        this.waiter = waiter;
     }
 
     @Override
     protected void execute(CommandEvent event) {
         new Thread(() -> {
-            this.event = event;
             EmbedBuilder eb = loadingEmbed();
             Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
             String content = event.getMessage().getContentRaw();
@@ -42,9 +50,9 @@ public class SkyblockCommand extends Command {
 
             if (args.length == 2 || args.length == 3) {
                 if (args.length == 3) {
-                    eb = getSkyblockStats(args[1], args[2]);
+                    eb = getSkyblockStats(args[1], args[2], event);
                 } else {
-                    eb = getSkyblockStats(args[1], null);
+                    eb = getSkyblockStats(args[1], null, event);
                 }
 
                 if (eb == null) {
@@ -59,7 +67,7 @@ public class SkyblockCommand extends Command {
         }).start();
     }
 
-    private EmbedBuilder getSkyblockStats(String username, String profileName) {
+    private EmbedBuilder getSkyblockStats(String username, String profileName, CommandEvent event) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
             JsonElement profileJson = player.getProfileJson();
@@ -93,19 +101,20 @@ public class SkyblockCommand extends Command {
             skillsPageString += "__**Farming**__" + "\n";
             skillsPageString += "• **Contests Attended:** " + getJsonKeys(higherDepth(jacobJson, "contests")).size()
                     + "\n";
-            skillsPageString += "• **Unique Golds:** " + (higherDepth(jacobJson, "unique_golds2") != null ? higherDepth(jacobJson, "unique_golds2").getAsJsonArray().size() : 0)
-                    + "\n";
+            skillsPageString += "• **Unique Golds:** " + (higherDepth(jacobJson, "unique_golds2") != null
+                    ? higherDepth(jacobJson, "unique_golds2").getAsJsonArray().size()
+                    : 0) + "\n";
             skillsPageString += "• **Current Golds:** "
                     + (higherDepth(higherDepth(jacobJson, "medals_inv"), "gold") == null ? 0
-                    : higherDepth(higherDepth(jacobJson, "medals_inv"), "gold").getAsInt())
+                            : higherDepth(higherDepth(jacobJson, "medals_inv"), "gold").getAsInt())
                     + "\n";
             skillsPageString += "• **Current Silvers:** "
                     + (higherDepth(higherDepth(jacobJson, "medals_inv"), "silver") == null ? 0
-                    : higherDepth(higherDepth(jacobJson, "medals_inv"), "silver").getAsInt())
+                            : higherDepth(higherDepth(jacobJson, "medals_inv"), "silver").getAsInt())
                     + "\n";
             skillsPageString += "• **Current Bronzes:** "
                     + (higherDepth(higherDepth(jacobJson, "medals_inv"), "bronze") == null ? 0
-                    : higherDepth(higherDepth(jacobJson, "medals_inv"), "bronze").getAsInt())
+                            : higherDepth(higherDepth(jacobJson, "medals_inv"), "bronze").getAsInt())
                     + "\n";
             skillsPageString += "\n";
 
@@ -116,8 +125,9 @@ public class SkyblockCommand extends Command {
                     + formatNumber(higherDepth(statsJson, "items_fished_treasure").getAsInt()) + "\n";
             skillsPageString += "• **Large Treasures Fished:** "
                     + formatNumber(higherDepth(statsJson, "items_fished_large_treasure").getAsInt()) + "\n";
-            skillsPageString += "• **Fished With Shredder:** " + (higherDepth(statsJson, "shredder_fished") != null ?
-                    formatNumber(higherDepth(statsJson, "shredder_fished").getAsInt()) : 0) + "\n";
+            skillsPageString += "• **Fished With Shredder:** " + (higherDepth(statsJson, "shredder_fished") != null
+                    ? formatNumber(higherDepth(statsJson, "shredder_fished").getAsInt())
+                    : 0) + "\n";
 
             // Dungeons
             String dungeonsPageString = "";
@@ -132,8 +142,9 @@ public class SkyblockCommand extends Command {
             dungeonsPageString += "__**Catacombs**__" + "\n";
             dungeonsPageString += "• **Catacombs:** " + roundAndFormat(player.getCatacombsLevel()) + "\n";
 
-            String[] pageTitles = {"General", "Armor", "Skills", "Dungeons"};
-            CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(1).setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles));
+            String[] pageTitles = { "General", "Armor", "Skills", "Dungeons" };
+            CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1)
+                    .setItemsPerPage(1).setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles));
             paginateBuilder.addItems(generalPageString, armorPageString, skillsPageString, dungeonsPageString);
             paginateBuilder.build().paginate(event.getChannel(), 0);
 

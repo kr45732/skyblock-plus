@@ -1,8 +1,10 @@
 package com.skyblockplus.auctionbaz;
 
+import static com.skyblockplus.Main.waiter;
 import static com.skyblockplus.utils.Utils.HYPIXEL_API_KEY;
 import static com.skyblockplus.utils.Utils.capitalizeString;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.defaultPaginator;
 import static com.skyblockplus.utils.Utils.errorMessage;
 import static com.skyblockplus.utils.Utils.getJson;
 import static com.skyblockplus.utils.Utils.globalCooldown;
@@ -20,10 +22,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.CustomPaginator;
+import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed.Field;
 
 public class AuctionCommand extends Command {
     public AuctionCommand() {
@@ -43,7 +48,13 @@ public class AuctionCommand extends Command {
             logCommand(event.getGuild(), event.getAuthor(), content);
 
             if (args.length == 2) {
-                ebMessage.editMessage(getPlayerAuction(args[1]).build()).queue();
+                eb = getPlayerAuction(args[1], event);
+
+                if (eb == null) {
+                    ebMessage.delete().queue();
+                } else {
+                    ebMessage.editMessage(eb.build()).queue();
+                }
                 return;
             }
 
@@ -51,7 +62,7 @@ public class AuctionCommand extends Command {
         }).start();
     }
 
-    private EmbedBuilder getPlayerAuction(String username) {
+    private EmbedBuilder getPlayerAuction(String username, CommandEvent event) {
         UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
         if (usernameUuidStruct == null) {
             return defaultEmbed("Error fetching player data");
@@ -125,21 +136,27 @@ public class AuctionCommand extends Command {
             }
         }
 
-        EmbedBuilder eb = defaultEmbed(usernameUuidStruct.playerUsername,
-                "https://auctions.craftlink.xyz/players/" + usernameUuidStruct.playerUuid);
+        CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1)
+                .setItemsPerPage(10);
+        PaginatorExtras extras = new PaginatorExtras().setEveryPageTitle(usernameUuidStruct.playerUsername)
+                .setEveryPageThumbnail("https://cravatar.eu/helmavatar/" + usernameUuidStruct.playerUuid + "/64.png")
+                .setEveryPageText("**Sold Auctions Value:** " + simplifyNumber(totalSoldValue)
+                        + "\n**Unsold Auctions Value:** " + simplifyNumber(totalPendingValue));
+
         for (String[] auction : auctions) {
             if (auction[0] != null) {
                 for (String[] strings : auctions) {
                     if (strings[0] != null) {
-                        eb.addField(strings[0], strings[1], false);
+                        extras.addEmbedField(new Field(strings[0], strings[1], false));
                     }
                 }
-                eb.setThumbnail("https://cravatar.eu/helmavatar/" + usernameUuidStruct.playerUuid + "/64.png");
-                eb.setDescription("**Sold Auctions Value:** " + simplifyNumber(totalSoldValue)
-                        + "\n**Unsold Auctions Value:** " + simplifyNumber(totalPendingValue));
-                return eb;
+                paginateBuilder.setPaginatorExtras(extras).build().paginate(event.getChannel(), 0);
+                return null;
             }
         }
+
+        EmbedBuilder eb = defaultEmbed(usernameUuidStruct.playerUsername,
+                "https://auctions.craftlink.xyz/players/" + usernameUuidStruct.playerUuid);
         eb.setTitle("No auctions found for " + usernameUuidStruct.playerUsername, null);
         return eb;
     }

@@ -1,5 +1,6 @@
 package com.skyblockplus.inventory;
 
+import static com.skyblockplus.Main.waiter;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.Utils.defaultPaginator;
 import static com.skyblockplus.utils.Utils.errorMessage;
@@ -13,7 +14,6 @@ import java.util.Map;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.InvItem;
@@ -23,14 +23,11 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
 public class InventoryCommand extends Command {
-    private final EventWaiter waiter;
-    private CommandEvent event;
 
-    public InventoryCommand(EventWaiter waiter) {
+    public InventoryCommand() {
         this.name = "inventory";
         this.cooldown = globalCooldown;
         this.aliases = new String[] { "inv" };
-        this.waiter = waiter;
     }
 
     @Override
@@ -40,15 +37,14 @@ public class InventoryCommand extends Command {
             Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
             String content = event.getMessage().getContentRaw();
             String[] args = content.split(" ");
-            this.event = event;
 
             logCommand(event.getGuild(), event.getAuthor(), content);
 
             if ((args.length == 3 || args.length == 4) && args[1].equals("armor")) {
                 if (args.length == 4) {
-                    eb = getPlayerEquippedArmor(args[2], args[3]);
+                    eb = getPlayerEquippedArmor(args[2], args[3], event);
                 } else {
-                    eb = getPlayerEquippedArmor(args[2], null);
+                    eb = getPlayerEquippedArmor(args[2], null, event);
                 }
 
                 if (eb == null) {
@@ -60,10 +56,10 @@ public class InventoryCommand extends Command {
             } else if (((args.length == 3) && args[2].startsWith("slot"))
                     || ((args.length == 4) && args[3].startsWith("slot"))) {
                 if (args.length == 4) {
-                    eb = getPlayerInventoryList(args[1], args[2], args[3]);
+                    eb = getPlayerInventoryList(args[1], args[2], args[3], event);
 
                 } else {
-                    eb = getPlayerInventoryList(args[1], null, args[2]);
+                    eb = getPlayerInventoryList(args[1], null, args[2], event);
                 }
 
                 if (eb == null) {
@@ -102,7 +98,8 @@ public class InventoryCommand extends Command {
         }).start();
     }
 
-    private EmbedBuilder getPlayerInventoryList(String username, String profileName, String slotNum) {
+    private EmbedBuilder getPlayerInventoryList(String username, String profileName, String slotNum,
+            CommandEvent event) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
             Map<Integer, InvItem> inventoryMap = player.getInventoryMap();
@@ -149,7 +146,7 @@ public class InventoryCommand extends Command {
         return defaultEmbed("Unable to fetch player data");
     }
 
-    private EmbedBuilder getPlayerEquippedArmor(String username, String profileName) {
+    private EmbedBuilder getPlayerEquippedArmor(String username, String profileName, CommandEvent event) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
             Map<Integer, InvItem> inventoryMap = player.getInventoryArmorMap();

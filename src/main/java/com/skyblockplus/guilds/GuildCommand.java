@@ -1,39 +1,54 @@
 package com.skyblockplus.guilds;
 
+import static com.skyblockplus.Main.asyncHttpClient;
+import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.utils.Utils.HYPIXEL_API_KEY;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.defaultPaginator;
+import static com.skyblockplus.utils.Utils.errorMessage;
+import static com.skyblockplus.utils.Utils.fixUsername;
+import static com.skyblockplus.utils.Utils.formatNumber;
+import static com.skyblockplus.utils.Utils.getJson;
+import static com.skyblockplus.utils.Utils.getJsonKeys;
+import static com.skyblockplus.utils.Utils.globalCooldown;
+import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.Utils.loadingEmbed;
+import static com.skyblockplus.utils.Utils.logCommand;
+import static com.skyblockplus.utils.Utils.usernameToUuid;
+import static com.skyblockplus.utils.Utils.uuidToUsername;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
-import java.time.Instant;
-import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
-import static com.skyblockplus.Main.asyncHttpClient;
-import static com.skyblockplus.utils.Utils.*;
-
 public class GuildCommand extends Command {
-    private final EventWaiter waiter;
-    private CommandEvent event;
-
-    public GuildCommand(EventWaiter waiter) {
+    public GuildCommand() {
         this.name = "guild";
         this.cooldown = globalCooldown;
-        this.waiter = waiter;
         this.aliases = new String[] { "g" };
     }
 
     @Override
     protected void execute(CommandEvent event) {
-        this.event = event;
         new Thread(() -> {
             EmbedBuilder eb = loadingEmbed();
             Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
@@ -45,7 +60,7 @@ public class GuildCommand extends Command {
             if (args.length == 3 && ("experience".equals(args[1]) || "exp".equals(args[1]))) {
                 if (args[2].toLowerCase().startsWith("u-")) {
                     String username = args[2].split("-")[1];
-                    eb = getGuildExp(username);
+                    eb = getGuildExp(username, event);
                     if (eb == null) {
                         ebMessage.delete().queue();
                     } else {
@@ -66,7 +81,7 @@ public class GuildCommand extends Command {
             } else if (args.length == 3 && "members".equals(args[1])) {
                 if (args[2].toLowerCase().startsWith("u-")) {
                     String usernameMembers = args[2].split("-")[1];
-                    eb = getGuildMembers(usernameMembers);
+                    eb = getGuildMembers(usernameMembers, event);
                     if (eb == null) {
                         ebMessage.delete().queue();
                     } else {
@@ -83,7 +98,7 @@ public class GuildCommand extends Command {
         }).start();
     }
 
-    private EmbedBuilder getGuildExp(String username) {
+    private EmbedBuilder getGuildExp(String username, CommandEvent event) {
         UsernameUuidStruct uuidUsername = usernameToUuid(username);
         if (uuidUsername == null) {
             return defaultEmbed("Error fetching player data");
@@ -289,7 +304,7 @@ public class GuildCommand extends Command {
         return guildInfo;
     }
 
-    private EmbedBuilder getGuildMembers(String username) {
+    private EmbedBuilder getGuildMembers(String username, CommandEvent event) {
         UsernameUuidStruct uuidUsername = usernameToUuid(username);
         if (uuidUsername == null) {
             return defaultEmbed("Error fetching player data");

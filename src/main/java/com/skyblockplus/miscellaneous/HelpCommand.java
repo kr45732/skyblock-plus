@@ -1,5 +1,6 @@
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.Main.waiter;
 import static com.skyblockplus.utils.Utils.BOT_PREFIX;
 import static com.skyblockplus.utils.Utils.defaultPaginator;
 import static com.skyblockplus.utils.Utils.globalCooldown;
@@ -10,19 +11,15 @@ import java.util.Map;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 
 import net.dv8tion.jda.api.Permission;
 
 public class HelpCommand extends Command {
-    private final EventWaiter waiter;
-
-    public HelpCommand(EventWaiter waiter) {
+    public HelpCommand() {
         this.name = "help";
         this.aliases = new String[] { "commands" };
-        this.waiter = waiter;
         this.cooldown = globalCooldown;
     }
 
@@ -120,7 +117,7 @@ public class HelpCommand extends Command {
                     + generateHelp("Get bazaar prices of an item", "bazaar [item]", "bz [item]")
                     + generateHelp("Get the average auction price of an item", "average [item]", "avg [item]")
                     + generateHelp("Get a player's bids", "bids [player]")
-                    + generateHelp("Query the auction house", "+query [item]"));
+                    + generateHelp("Query the auction house", "query [item]"));
 
             paginateBuilder.addItems(generateHelp("Get a player's inventory represented in emojis",
                     "inventory [player] <profile>", "inv [player] <profile>")

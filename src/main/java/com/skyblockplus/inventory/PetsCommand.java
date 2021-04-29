@@ -1,5 +1,6 @@
 package com.skyblockplus.inventory;
 
+import static com.skyblockplus.Main.waiter;
 import static com.skyblockplus.utils.Utils.capitalizeString;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.Utils.defaultPaginator;
@@ -13,7 +14,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.PaginatorExtras;
@@ -22,13 +22,10 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
 public class PetsCommand extends Command {
-    private final EventWaiter waiter;
-    private CommandEvent event;
 
-    public PetsCommand(EventWaiter waiter) {
+    public PetsCommand() {
         this.name = "pets";
         this.cooldown = globalCooldown;
-        this.waiter = waiter;
     }
 
     @Override
@@ -38,16 +35,15 @@ public class PetsCommand extends Command {
             Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
             String content = event.getMessage().getContentRaw();
             String[] args = content.split(" ");
-            this.event = event;
 
             logCommand(event.getGuild(), event.getAuthor(), content);
 
             if (args.length == 2 || args.length == 3) {
                 if (args.length == 3) {
-                    eb = getPlayerSacks(args[1], args[2]);
+                    eb = getPlayerSacks(args[1], args[2], event);
 
                 } else
-                    eb = getPlayerSacks(args[1], null);
+                    eb = getPlayerSacks(args[1], null, event);
 
                 if (eb == null) {
                     ebMessage.delete().queue();
@@ -61,7 +57,7 @@ public class PetsCommand extends Command {
         }).start();
     }
 
-    private EmbedBuilder getPlayerSacks(String username, String profileName) {
+    private EmbedBuilder getPlayerSacks(String username, String profileName, CommandEvent event) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
             CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(2)

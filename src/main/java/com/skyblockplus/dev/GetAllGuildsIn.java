@@ -1,6 +1,7 @@
 package com.skyblockplus.dev;
 
 import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.Main.waiter;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.Utils.defaultPaginator;
 import static com.skyblockplus.utils.Utils.loadingEmbed;
@@ -10,7 +11,6 @@ import java.util.List;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 
@@ -20,12 +20,10 @@ import net.dv8tion.jda.api.entities.Invite;
 import net.dv8tion.jda.api.entities.Message;
 
 public class GetAllGuildsIn extends Command {
-    final EventWaiter waiter;
 
-    public GetAllGuildsIn(EventWaiter waiter) {
+    public GetAllGuildsIn() {
         this.name = "d-servers";
         this.ownerCommand = true;
-        this.waiter = waiter;
     }
 
     @Override

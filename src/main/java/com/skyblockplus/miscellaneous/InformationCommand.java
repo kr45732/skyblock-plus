@@ -7,8 +7,6 @@ import static com.skyblockplus.utils.Utils.globalCooldown;
 import static com.skyblockplus.utils.Utils.logCommand;
 import static com.skyblockplus.utils.Utils.roundAndFormat;
 
-import java.time.temporal.ChronoUnit;
-
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 
@@ -29,31 +27,26 @@ public class InformationCommand extends Command {
 
             EmbedBuilder eb = defaultEmbed("Skyblock Plus");
 
-            final long[] ping = { -1 };
-            event.reply("Loading...", m -> {
-                ping[0] = event.getMessage().getTimeCreated().until(m.getTimeCreated(), ChronoUnit.MILLIS);
-                m.delete().queue();
-                eb.setDescription(
-                        "Skyblock Plus is a Skyblock focused discord bot that has many commands to help Skyblock players and guild staff! It allows for quick retrieval of Skyblock stats plus customizable features for a better Skyblock experience.");
-                eb.addField("Stats",
-                        "**Servers:** " + jda.getGuilds().size() + "\n**Members:** " + jda.getUsers().size()
-                                + "\n**Ping:** " + ping[0] + "ms\n**Websocket:** " + event.getJDA().getGatewayPing()
-                                + "ms",
-                        true);
-                eb.addField("Usage",
-                        "**Memory:** " + roundAndFormat(
-                                100.0 * (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())
-                                        / (Runtime.getRuntime().totalMemory()))
-                                + "%",
-                        true);
+            eb.setDescription(
+                    "Skyblock Plus is a Skyblock focused discord bot that has many commands to help Skyblock players and guild staff! It allows for quick retrieval of Skyblock stats plus customizable features for a better Skyblock experience.");
+            eb.addField("Stats",
+                    "**Servers:** " + jda.getGuilds().size() + "\n**Members:** " + jda.getUsers().size()
+                            + "\n**Ping:** " + jda.getRestPing().complete() + "ms\n**Websocket:** "
+                            + jda.getGatewayPing() + "ms",
+                    true);
+            eb.addField("Usage",
+                    "**Memory:** " + roundAndFormat(
+                            100.0 * (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())
+                                    / (Runtime.getRuntime().totalMemory()))
+                            + "%",
+                    true);
 
-                eb.addField("Links",
-                        "[**Invite Link**](https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403040368&scope=bot)\n[**Discord Link**](https://discord.gg/DpcCAwMXwp)\n[**Forum Post**](https://hypixel.net/threads/3980092)",
-                        true);
-                eb.setFooter("Last restart");
-                eb.setTimestamp(event.getClient().getStartTime());
-                event.reply(eb.build());
-            });
+            eb.addField("Links",
+                    "[**Invite Link**](https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403040368&scope=bot)\n[**Discord Link**](https://discord.gg/DpcCAwMXwp)\n[**Forum Post**](https://hypixel.net/threads/3980092)",
+                    true);
+            eb.setFooter("Last restart");
+            eb.setTimestamp(event.getClient().getStartTime());
+            event.getChannel().sendMessage(eb.build()).queue();
         }).start();
     }
 

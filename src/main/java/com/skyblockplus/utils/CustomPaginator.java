@@ -1,8 +1,19 @@
 package com.skyblockplus.utils;
 
+import java.awt.Color;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.jagrosh.jdautilities.menu.Menu;
 import com.skyblockplus.utils.structs.PaginatorExtras;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -13,16 +24,6 @@ import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.internal.utils.Checks;
-
-import java.awt.*;
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
 
 public class CustomPaginator extends Menu {
     private static final String BIG_LEFT = "\u23EA";
@@ -52,11 +53,13 @@ public class CustomPaginator extends Menu {
         this.showPageNumbers = showPageNumbers;
         this.numberItems = numberItems;
         this.strings = items;
-        this.pages = (int) Math.ceil((double) strings.size() / itemsPerPage);
+        this.extras = extras;
+        this.pages = (int) Math
+                .ceil((double) (extras.getEmbedFields().size() > 0 ? extras.getEmbedFields().size() : strings.size())
+                        / itemsPerPage);
         this.finalAction = finalAction;
         this.bulkSkipNumber = bulkSkipNumber;
         this.wrapPageEnds = wrapPageEnds;
-        this.extras = extras;
     }
 
     @Override
@@ -200,7 +203,12 @@ public class CustomPaginator extends Menu {
 
         int start = (pageNum - 1) * itemsPerPage;
         int end = Math.min(strings.size(), pageNum * itemsPerPage);
-        if (columns == 1) {
+        if (extras.getEmbedFields().size() > 0) {
+            end = Math.min(extras.getEmbedFields().size(), pageNum * itemsPerPage);
+            for (int i = start; i < end; i++) {
+                embedBuilder.addField(extras.getEmbedFields().get(i));
+            }
+        } else if (columns == 1) {
             StringBuilder stringBuilder = new StringBuilder();
             for (int i = start; i < end; i++)
                 stringBuilder.append("\n").append(numberItems ? "`" + (i + 1) + ".` " : "").append(strings.get(i));
@@ -239,7 +247,8 @@ public class CustomPaginator extends Menu {
         @Override
         public CustomPaginator build() {
             Checks.check(waiter != null, "Must set an EventWaiter");
-            Checks.check(!strings.isEmpty(), "Must include at least one item to paginate");
+            Checks.check(!strings.isEmpty() || !extras.getEmbedFields().isEmpty(),
+                    "Must include at least one item to paginate");
 
             return new CustomPaginator(waiter, users, roles, timeout, unit, color, finalAction, columns, itemsPerPage,
                     showPageNumbers, numberItems, strings, bulkSkipNumber, wrapPageEnds, extras);

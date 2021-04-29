@@ -1,5 +1,24 @@
 package com.skyblockplus.settings;
 
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.utils.Utils.BOT_PREFIX;
+import static com.skyblockplus.utils.Utils.HYPIXEL_API_KEY;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.defaultPaginator;
+import static com.skyblockplus.utils.Utils.getJson;
+import static com.skyblockplus.utils.Utils.getJsonKeys;
+import static com.skyblockplus.utils.Utils.globalCooldown;
+import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.Utils.loadingEmbed;
+import static com.skyblockplus.utils.Utils.logCommand;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -7,7 +26,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.api.discordserversettings.automatedapplication.ApplyRequirements;
 import com.skyblockplus.api.discordserversettings.automatedguildroles.GuildRank;
 import com.skyblockplus.api.discordserversettings.automatedroles.RoleModel;
@@ -16,6 +34,7 @@ import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSetting
 import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.vdurmont.emoji.EmojiParser;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
@@ -23,20 +42,13 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 
-import java.util.*;
-
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Utils.*;
-
 public class SettingsCommand extends Command {
-    private final EventWaiter waiter;
     private CommandEvent event;
 
-    public SettingsCommand(EventWaiter waiter) {
+    public SettingsCommand() {
         this.name = "settings";
         this.cooldown = globalCooldown + 1;
         this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
-        this.waiter = waiter;
     }
 
     @Override
@@ -840,6 +852,7 @@ public class SettingsCommand extends Command {
         } catch (Exception e) {
             return defaultEmbed("Error", null).setDescription("Invalid role");
         }
+
         JsonArray currentLevels = newRoleSettings.get("levels").getAsJsonArray();
 
         if (currentLevels.size() >= 5) {

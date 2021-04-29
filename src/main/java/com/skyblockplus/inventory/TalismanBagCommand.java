@@ -1,6 +1,7 @@
 package com.skyblockplus.inventory;
 
 import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.Main.waiter;
 import static com.skyblockplus.utils.Utils.botColor;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.Utils.defaultPaginator;
@@ -16,7 +17,6 @@ import java.util.concurrent.TimeUnit;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.InvItem;
@@ -27,14 +27,11 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 
 public class TalismanBagCommand extends Command {
-    private final EventWaiter waiter;
-    private CommandEvent event;
     private String missingEmoji;
 
-    public TalismanBagCommand(EventWaiter waiter) {
+    public TalismanBagCommand() {
         this.name = "talisman";
         this.cooldown = globalCooldown;
-        this.waiter = waiter;
     }
 
     @Override
@@ -44,17 +41,16 @@ public class TalismanBagCommand extends Command {
             Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
             String content = event.getMessage().getContentRaw();
             String[] args = content.split(" ");
-            this.event = event;
 
             logCommand(event.getGuild(), event.getAuthor(), content);
 
             if (((args.length == 3) && args[2].startsWith("slot"))
                     || ((args.length == 4) && args[3].startsWith("slot"))) {
                 if (args.length == 4) {
-                    eb = getPlayerTalismansList(args[1], args[2], args[3]);
+                    eb = getPlayerTalismansList(args[1], args[2], args[3], event);
 
                 } else {
-                    eb = getPlayerTalismansList(args[1], null, args[2]);
+                    eb = getPlayerTalismansList(args[1], null, args[2], event);
                 }
 
                 if (eb == null) {
@@ -104,7 +100,8 @@ public class TalismanBagCommand extends Command {
         return null;
     }
 
-    private EmbedBuilder getPlayerTalismansList(String username, String profileName, String slotNum) {
+    private EmbedBuilder getPlayerTalismansList(String username, String profileName, String slotNum,
+            CommandEvent event) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
             Map<Integer, InvItem> talismanBagMap = player.getTalismanBagMap();

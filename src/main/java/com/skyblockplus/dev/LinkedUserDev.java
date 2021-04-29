@@ -15,7 +15,6 @@ import static com.skyblockplus.Main.database;
 import static com.skyblockplus.utils.Utils.*;
 
 public class LinkedUserDev extends Command {
-    private CommandEvent event;
 
     public LinkedUserDev() {
         this.name = "d-linked";
@@ -29,30 +28,29 @@ public class LinkedUserDev extends Command {
             Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
             String content = event.getMessage().getContentRaw();
             String[] args = content.split(" ");
-            this.event = event;
 
             logCommand(event.getGuild(), event.getAuthor(), content);
 
             if (args.length == 4) {
                 if (args[1].equals("delete")) {
                     switch (args[2]) {
-                        case "discordId":
-                            database.deleteLinkedUserByDiscordId(args[3]);
-                            ebMessage.editMessage(defaultEmbed("Done").build()).queue();
-                            return;
-                        case "username":
-                            database.deleteLinkedUserByMinecraftUsername(args[3]);
-                            ebMessage.editMessage(defaultEmbed("Done").build()).queue();
-                            return;
-                        case "uuid":
-                            database.deleteLinkedUserByMinecraftUuid(args[3]);
-                            ebMessage.editMessage(defaultEmbed("Done").build()).queue();
-                            return;
+                    case "discordId":
+                        database.deleteLinkedUserByDiscordId(args[3]);
+                        ebMessage.editMessage(defaultEmbed("Done").build()).queue();
+                        return;
+                    case "username":
+                        database.deleteLinkedUserByMinecraftUsername(args[3]);
+                        ebMessage.editMessage(defaultEmbed("Done").build()).queue();
+                        return;
+                    case "uuid":
+                        database.deleteLinkedUserByMinecraftUuid(args[3]);
+                        ebMessage.editMessage(defaultEmbed("Done").build()).queue();
+                        return;
                     }
                 }
             } else if (args.length == 2) {
                 if (args[1].equals("all")) {
-                    if (getAllLinkedUsers()) {
+                    if (getAllLinkedUsers(event)) {
                         ebMessage.delete().queue();
                         return;
                     }
@@ -63,7 +61,7 @@ public class LinkedUserDev extends Command {
         }).start();
     }
 
-    private boolean getAllLinkedUsers() {
+    private boolean getAllLinkedUsers(CommandEvent event) {
         JsonElement allSettings = database.getLinkedUsers();
         if (allSettings == null) {
             return false;
@@ -78,9 +76,7 @@ public class LinkedUserDev extends Command {
             }
 
             Writer writer = new FileWriter(pathName);
-            new GsonBuilder()
-                    .setPrettyPrinting()
-                    .create().toJson(allSettings, writer);
+            new GsonBuilder().setPrettyPrinting().create().toJson(allSettings, writer);
             writer.close();
 
             event.getChannel().sendMessage("All linked users").addFile(file).complete();

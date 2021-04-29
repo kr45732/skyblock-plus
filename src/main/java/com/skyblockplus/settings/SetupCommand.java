@@ -1,5 +1,6 @@
 package com.skyblockplus.settings;
 
+import static com.skyblockplus.Main.waiter;
 import static com.skyblockplus.utils.Utils.BOT_PREFIX;
 import static com.skyblockplus.utils.Utils.defaultPaginator;
 import static com.skyblockplus.utils.Utils.globalCooldown;
@@ -8,7 +9,6 @@ import static com.skyblockplus.utils.Utils.logCommand;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 
@@ -17,13 +17,11 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 
 public class SetupCommand extends Command {
-    private final EventWaiter waiter;
 
-    public SetupCommand(EventWaiter waiter) {
+    public SetupCommand() {
         this.name = "setup";
         this.cooldown = globalCooldown;
         this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
-        this.waiter = waiter;
     }
 
     @Override

@@ -9,7 +9,6 @@ import static com.skyblockplus.Main.database;
 import static com.skyblockplus.utils.Utils.*;
 
 public class UnlinkAccountCommand extends Command {
-    CommandEvent event;
 
     public UnlinkAccountCommand() {
         this.name = "unlink";
@@ -22,16 +21,14 @@ public class UnlinkAccountCommand extends Command {
             EmbedBuilder eb = loadingEmbed();
             Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
             String content = event.getMessage().getContentRaw();
-            this.event = event;
 
             logCommand(event.getGuild(), event.getAuthor(), content);
 
-            ebMessage.editMessage(unlinkAccount().build()).queue();
+            ebMessage.editMessage(unlinkAccount(event).build()).queue();
         }).start();
     }
 
-
-    private EmbedBuilder unlinkAccount() {
+    private EmbedBuilder unlinkAccount(CommandEvent event) {
         database.deleteLinkedUserByDiscordId(event.getAuthor().getId());
         return defaultEmbed("Success").setDescription("You were unlinked");
     }

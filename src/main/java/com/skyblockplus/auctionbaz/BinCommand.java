@@ -30,7 +30,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
 public class BinCommand extends Command {
-
     public BinCommand() {
         this.name = "bin";
         this.cooldown = globalCooldown;

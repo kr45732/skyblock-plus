@@ -1,6 +1,7 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.Main.asyncHttpClient;
+import static com.skyblockplus.Main.waiter;
 import static com.skyblockplus.utils.Utils.HYPIXEL_API_KEY;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.Utils.defaultPaginator;
@@ -27,7 +28,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
@@ -36,13 +36,10 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
 public class ProfilesCommand extends Command {
-    private final EventWaiter waiter;
-    private CommandEvent event;
 
-    public ProfilesCommand(EventWaiter waiter) {
+    public ProfilesCommand() {
         this.name = "profiles";
         this.cooldown = globalCooldown;
-        this.waiter = waiter;
     }
 
     @Override
@@ -52,12 +49,11 @@ public class ProfilesCommand extends Command {
             Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
             String content = event.getMessage().getContentRaw();
             String[] args = content.split(" ");
-            this.event = event;
 
             logCommand(event.getGuild(), event.getAuthor(), content);
 
             if (args.length == 2) {
-                eb = getPlayerProfiles(args[1]);
+                eb = getPlayerProfiles(args[1], event);
                 if (eb == null) {
                     ebMessage.delete().queue();
                 } else {
@@ -70,7 +66,7 @@ public class ProfilesCommand extends Command {
         }).start();
     }
 
-    private EmbedBuilder getPlayerProfiles(String username) {
+    private EmbedBuilder getPlayerProfiles(String username, CommandEvent event) {
         UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
         if (usernameUuidStruct != null) {
 

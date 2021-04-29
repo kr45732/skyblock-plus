@@ -1,5 +1,6 @@
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.Main.waiter;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.Utils.defaultPaginator;
 import static com.skyblockplus.utils.Utils.errorMessage;
@@ -20,7 +21,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.PaginatorExtras;
@@ -29,13 +29,9 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
 public class BankCommand extends Command {
-    private final EventWaiter waiter;
-    private CommandEvent event;
-
-    public BankCommand(EventWaiter waiter) {
+    public BankCommand() {
         this.name = "bank";
         this.cooldown = globalCooldown;
-        this.waiter = waiter;
     }
 
     @Override
@@ -49,11 +45,10 @@ public class BankCommand extends Command {
             logCommand(event.getGuild(), event.getAuthor(), content);
 
             if ((args.length == 3 || args.length == 4) && args[1].equals("history")) {
-                this.event = event;
                 if (args.length == 4) {
-                    eb = getPlayerBankHistory(args[2], args[3]);
+                    eb = getPlayerBankHistory(args[2], args[3], event);
                 } else {
-                    eb = getPlayerBankHistory(args[2], null);
+                    eb = getPlayerBankHistory(args[2], null, event);
                 }
 
                 if (eb == null) {
@@ -94,7 +89,7 @@ public class BankCommand extends Command {
         return defaultEmbed("Unable to fetch player data");
     }
 
-    private EmbedBuilder getPlayerBankHistory(String username, String profileName) {
+    private EmbedBuilder getPlayerBankHistory(String username, String profileName, CommandEvent event) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
             JsonArray bankHistoryArray = player.getBankHistory();
