@@ -222,7 +222,7 @@ public class NetworthExecute {
                 talismanStr += "• " + item.split("@split@")[0] + " ➜ "
                         + simplifyNumber(Double.parseDouble(item.split("@split@")[1])) + "\n";
                 if (i == 4) {
-                    talismanStr = "• And more...";
+                    talismanStr += "• And more...";
                     break;
                 }
             }
