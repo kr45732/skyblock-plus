@@ -88,7 +88,7 @@ public class Player {
     }
 
     public Player(String playerUuid, String playerUsername, String profileName, JsonElement outerProfileJson,
-            long startingAmount) {
+                  long startingAmount) {
         this.playerUuid = playerUuid;
         this.playerUsername = playerUsername;
         this.startingAmount = startingAmount;
@@ -102,6 +102,76 @@ public class Player {
         }
 
         this.validPlayer = true;
+    }
+
+    /* Inventory */
+    public static Map<Integer, InvItem> getGenericInventoryMap(NBTCompound parsedContents) {
+        try {
+            NBTList items = parsedContents.getList(".i");
+            Map<Integer, InvItem> itemsMap = new HashMap<>();
+
+            for (int i = 0; i < items.size(); i++) {
+                try {
+                    NBTCompound item = items.getCompound(i);
+                    if (!item.isEmpty()) {
+                        InvItem itemInfo = new InvItem();
+                        itemInfo.setName(parseMcCodes(item.getString("tag.display.Name", "None")));
+                        itemInfo.setLore(parseMcCodes(item.getString("tag.display.Lore", "None").replace(", ", "\n")
+                                .replace("[", "").replace("]", "")));
+                        itemInfo.setCount(Integer.parseInt(item.getString("Count", "0").replace("b", " ")));
+                        itemInfo.setId(item.getString("tag.ExtraAttributes.id", "None"));
+                        itemInfo.setCreationTimestamp(item.getString("tag.ExtraAttributes.timestamp", "None"));
+                        itemInfo.setHbpCount(item.getInt("tag.ExtraAttributes.hot_potato_count", 0));
+                        itemInfo.setRecombobulated(item.getInt("tag.ExtraAttributes.rarity_upgrades", 0) == 1);
+                        itemInfo.setModifier(item.getString("tag.ExtraAttributes.modifier", "None"));
+
+                        try {
+                            NBTCompound enchants = item.getCompound("tag.ExtraAttributes.enchantments");
+                            List<String> enchantsList = new ArrayList<>();
+                            for (Map.Entry<String, Object> enchant : enchants.entrySet()) {
+                                enchantsList.add(enchant.getKey() + ";" + enchant.getValue());
+                            }
+                            itemInfo.setEnchantsFormatted(enchantsList);
+                        } catch (Exception ignored) {
+                        }
+
+                        try {
+                            NBTList necronBladeScrolls = item.getList("tag.ExtraAttributes.ability_scroll");
+                            for (Object scroll : necronBladeScrolls) {
+                                try {
+                                    itemInfo.addExtraValue("" + scroll);
+                                } catch (Exception ignored) {
+                                }
+                            }
+                        } catch (Exception ignored) {
+                        }
+
+                        if (item.getInt("tag.ExtraAttributes.wood_singularity_count", 0) == 1) {
+                            itemInfo.addExtraValue("WOOD_SINGULARITY");
+                        }
+
+                        try {
+                            byte[] backpackContents = item
+                                    .getByteArray("tag.ExtraAttributes." + itemInfo.getId().toLowerCase() + "_data");
+                            NBTCompound parsedContentsBackpack = NBTReader
+                                    .read(new ByteArrayInputStream(backpackContents));
+                            itemInfo.setBackpackItems(getGenericInventoryMap(parsedContentsBackpack).values());
+                        } catch (Exception ignored) {
+                        }
+
+                        itemsMap.put(i, itemInfo);
+                        continue;
+                    }
+                } catch (Exception ignored) {
+                }
+                itemsMap.put(i, null);
+            }
+
+            return itemsMap;
+        } catch (Exception ignored) {
+        }
+
+        return null;
     }
 
     public String[] getAllProfileNames() {
@@ -152,12 +222,12 @@ public class Player {
 
     public int getSlayer(String slayerName) {
         switch (slayerName) {
-        case "sven":
-            return getWolfXp();
-        case "rev":
-            return getZombieXp();
-        case "tara":
-            return getSpiderXp();
+            case "sven":
+                return getWolfXp();
+            case "rev":
+                return getZombieXp();
+            case "tara":
+                return getSpiderXp();
         }
         return -1;
     }
@@ -306,7 +376,7 @@ public class Player {
                 try {
                     lastSaveLoop = higherDepth(
                             higherDepth(higherDepth(profilesArray.get(i), "members"), this.playerUuid), "last_save")
-                                    .getAsString();
+                            .getAsString();
                 } catch (Exception e) {
                     continue;
                 }
@@ -376,7 +446,7 @@ public class Player {
         for (int i = petRarityOffset; i < petLevelsXpPer.size(); i++) {
             totalExp += petLevelsXpPer.get(i).getAsLong();
             if (totalExp >= petExp) {
-                return (i - petRarityOffset + 1 > 100 ? 100 : i - petRarityOffset + 1);
+                return (Math.min(i - petRarityOffset + 1, 100));
             }
         }
         return 100;
@@ -384,8 +454,8 @@ public class Player {
 
     public int getNumberMinionSlots() {
         try {
-            int[] craftedMinionsToSlots = new int[] { 0, 5, 15, 30, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300,
-                    350, 400, 450, 500, 550, 600 };
+            int[] craftedMinionsToSlots = new int[]{0, 5, 15, 30, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300,
+                    350, 400, 450, 500, 550, 600};
 
             int prevMax = 0;
             int craftedMinions = higherDepth(profileJson, "crafted_generators").getAsJsonArray().size();
@@ -418,45 +488,45 @@ public class Player {
     public int getSlayerLevel(String slayerName) {
 
         switch (slayerName) {
-        case "sven":
-            JsonArray wolfLevelArray = higherDepth(higherDepth(getLevelingJson(), "slayer_xp"), "wolf")
-                    .getAsJsonArray();
-            int wolfXp = getWolfXp();
-            int prevWolfLevel = 0;
-            for (int i = 0; i < wolfLevelArray.size(); i++) {
-                if (wolfXp >= wolfLevelArray.get(i).getAsInt()) {
-                    prevWolfLevel = i;
-                } else {
-                    break;
+            case "sven":
+                JsonArray wolfLevelArray = higherDepth(higherDepth(getLevelingJson(), "slayer_xp"), "wolf")
+                        .getAsJsonArray();
+                int wolfXp = getWolfXp();
+                int prevWolfLevel = 0;
+                for (int i = 0; i < wolfLevelArray.size(); i++) {
+                    if (wolfXp >= wolfLevelArray.get(i).getAsInt()) {
+                        prevWolfLevel = i;
+                    } else {
+                        break;
+                    }
                 }
-            }
-            return (prevWolfLevel + 1);
-        case "rev":
-            JsonArray zombieLevelArray = higherDepth(higherDepth(getLevelingJson(), "slayer_xp"), "zombie")
-                    .getAsJsonArray();
-            int zombieXp = getZombieXp();
-            int prevZombieMax = 0;
-            for (int i = 0; i < zombieLevelArray.size(); i++) {
-                if (zombieXp >= zombieLevelArray.get(i).getAsInt()) {
-                    prevZombieMax = i;
-                } else {
-                    break;
+                return (prevWolfLevel + 1);
+            case "rev":
+                JsonArray zombieLevelArray = higherDepth(higherDepth(getLevelingJson(), "slayer_xp"), "zombie")
+                        .getAsJsonArray();
+                int zombieXp = getZombieXp();
+                int prevZombieMax = 0;
+                for (int i = 0; i < zombieLevelArray.size(); i++) {
+                    if (zombieXp >= zombieLevelArray.get(i).getAsInt()) {
+                        prevZombieMax = i;
+                    } else {
+                        break;
+                    }
                 }
-            }
-            return (prevZombieMax + 1);
-        case "tara":
-            JsonArray spiderLevelArray = higherDepth(higherDepth(getLevelingJson(), "slayer_xp"), "spider")
-                    .getAsJsonArray();
-            int spiderXp = getSpiderXp();
-            int prevSpiderMax = 0;
-            for (int i = 0; i < spiderLevelArray.size(); i++) {
-                if (spiderXp >= spiderLevelArray.get(i).getAsInt()) {
-                    prevSpiderMax = i;
-                } else {
-                    break;
+                return (prevZombieMax + 1);
+            case "tara":
+                JsonArray spiderLevelArray = higherDepth(higherDepth(getLevelingJson(), "slayer_xp"), "spider")
+                        .getAsJsonArray();
+                int spiderXp = getSpiderXp();
+                int prevSpiderMax = 0;
+                for (int i = 0; i < spiderLevelArray.size(); i++) {
+                    if (spiderXp >= spiderLevelArray.get(i).getAsInt()) {
+                        prevSpiderMax = i;
+                    } else {
+                        break;
+                    }
                 }
-            }
-            return (prevSpiderMax + 1);
+                return (prevSpiderMax + 1);
         }
         return 0;
     }
@@ -585,7 +655,7 @@ public class Player {
                 }
 
                 if (i.getKey() != 0 && i.getKey() % 36 == 0) {
-                    enderChestPages.add(new String[] { outputStringPart1.toString(), outputStringPart2.toString() });
+                    enderChestPages.add(new String[]{outputStringPart1.toString(), outputStringPart2.toString()});
                     outputStringPart1 = new StringBuilder();
                     outputStringPart2 = new StringBuilder();
                     page += 36;
@@ -657,7 +727,7 @@ public class Player {
                     }
                 }
             }
-            return new String[] { outputStringPart2.toString(), outputStringPart1.toString() };
+            return new String[]{outputStringPart2.toString(), outputStringPart1.toString()};
 
         } catch (Exception ignored) {
         }
@@ -1256,7 +1326,7 @@ public class Player {
                 }
 
                 if (i.getKey() != 0 && i.getKey() % 45 == 0) {
-                    enderChestPages.add(new String[] { outputStringPart1.toString(), outputStringPart2.toString() });
+                    enderChestPages.add(new String[]{outputStringPart1.toString(), outputStringPart2.toString()});
                     outputStringPart1 = new StringBuilder();
                     outputStringPart2 = new StringBuilder();
                     page += 45;
@@ -1325,7 +1395,7 @@ public class Player {
                 }
 
                 if (i.getKey() != 0 && i.getKey() % 45 == 0) {
-                    enderChestPages.add(new String[] { outputStringPart1.toString(), outputStringPart2.toString() });
+                    enderChestPages.add(new String[]{outputStringPart1.toString(), outputStringPart2.toString()});
                     outputStringPart1 = new StringBuilder();
                     outputStringPart2 = new StringBuilder();
                     page += 45;
@@ -1344,21 +1414,21 @@ public class Player {
             String petName = higherDepth(pet, "type").getAsString();
             int rarity = 0;
             switch (higherDepth(pet, "tier").getAsString().toLowerCase()) {
-            case "common":
-                rarity = 1;
-                break;
-            case "uncommon":
-                rarity = 2;
-                break;
-            case "rare":
-                rarity = 3;
-                break;
-            case "epic":
-                rarity = 4;
-                break;
-            case "legendary":
-                rarity = 5;
-                break;
+                case "common":
+                    rarity = 1;
+                    break;
+                case "uncommon":
+                    rarity = 2;
+                    break;
+                case "rare":
+                    rarity = 3;
+                    break;
+                case "epic":
+                    rarity = 4;
+                    break;
+                case "legendary":
+                    rarity = 5;
+                    break;
             }
             if (petsMap.containsKey(petName)) {
                 if (petsMap.get(petName) < rarity) {
@@ -1396,76 +1466,6 @@ public class Player {
             }
         }
         return totalSkillXp;
-    }
-
-    /* Inventory */
-    public static Map<Integer, InvItem> getGenericInventoryMap(NBTCompound parsedContents) {
-        try {
-            NBTList items = parsedContents.getList(".i");
-            Map<Integer, InvItem> itemsMap = new HashMap<>();
-
-            for (int i = 0; i < items.size(); i++) {
-                try {
-                    NBTCompound item = items.getCompound(i);
-                    if (!item.isEmpty()) {
-                        InvItem itemInfo = new InvItem();
-                        itemInfo.setName(parseMcCodes(item.getString("tag.display.Name", "None")));
-                        itemInfo.setLore(parseMcCodes(item.getString("tag.display.Lore", "None").replace(", ", "\n")
-                                .replace("[", "").replace("]", "")));
-                        itemInfo.setCount(Integer.parseInt(item.getString("Count", "0").replace("b", " ")));
-                        itemInfo.setId(item.getString("tag.ExtraAttributes.id", "None"));
-                        itemInfo.setCreationTimestamp(item.getString("tag.ExtraAttributes.timestamp", "None"));
-                        itemInfo.setHbpCount(item.getInt("tag.ExtraAttributes.hot_potato_count", 0));
-                        itemInfo.setRecombobulated(item.getInt("tag.ExtraAttributes.rarity_upgrades", 0) == 1);
-                        itemInfo.setModifier(item.getString("tag.ExtraAttributes.modifier", "None"));
-
-                        try {
-                            NBTCompound enchants = item.getCompound("tag.ExtraAttributes.enchantments");
-                            List<String> enchantsList = new ArrayList<>();
-                            for (Map.Entry<String, Object> enchant : enchants.entrySet()) {
-                                enchantsList.add(enchant.getKey() + ";" + enchant.getValue());
-                            }
-                            itemInfo.setEnchantsFormatted(enchantsList);
-                        } catch (Exception ignored) {
-                        }
-
-                        try {
-                            NBTList necronBladeScrolls = item.getList("tag.ExtraAttributes.ability_scroll");
-                            for (Object scroll : necronBladeScrolls) {
-                                try {
-                                    itemInfo.addExtraValue("" + scroll);
-                                } catch (Exception ignored) {
-                                }
-                            }
-                        } catch (Exception ignored) {
-                        }
-
-                        if (item.getInt("tag.ExtraAttributes.wood_singularity_count", 0) == 1) {
-                            itemInfo.addExtraValue("WOOD_SINGULARITY");
-                        }
-
-                        try {
-                            byte[] backpackContents = item
-                                    .getByteArray("tag.ExtraAttributes." + itemInfo.getId().toLowerCase() + "_data");
-                            NBTCompound parsedContentsBackpack = NBTReader
-                                    .read(new ByteArrayInputStream(backpackContents));
-                            itemInfo.setBackpackItems(getGenericInventoryMap(parsedContentsBackpack).values());
-                        } catch (Exception ignored) {
-                        }
-
-                        itemsMap.put(i, itemInfo);
-                        continue;
-                    }
-                } catch (Exception ignored) {
-                }
-                itemsMap.put(i, null);
-            }
-
-            return itemsMap;
-        } catch (Exception ignored) {
-        }
-
-        return null;
     }
 
     public Map<Integer, InvItem> getInventoryMap() {
@@ -1547,7 +1547,7 @@ public class Player {
                 InvItem invItemStruct = new InvItem();
                 invItemStruct.setName("[Lvl "
                         + petLevelFromXp(higherDepth(pet, "exp").getAsLong(),
-                                higherDepth(pet, "tier").getAsString().toLowerCase())
+                        higherDepth(pet, "tier").getAsString().toLowerCase())
                         + "] "
                         + capitalizeString(higherDepth(pet, "type").getAsString().toUpperCase().replace("_", " ")));
                 invItemStruct.setId("PET");

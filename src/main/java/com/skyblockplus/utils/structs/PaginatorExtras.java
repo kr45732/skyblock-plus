@@ -1,18 +1,18 @@
 package com.skyblockplus.utils.structs;
 
+import net.dv8tion.jda.api.entities.MessageEmbed.Field;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import net.dv8tion.jda.api.entities.MessageEmbed.Field;
-
 public class PaginatorExtras {
-    private List<String> titles = new ArrayList<>();
-    private List<String> thumbnails = new ArrayList<>();
+    private final List<String> titles = new ArrayList<>();
+    private final List<String> thumbnails = new ArrayList<>();
     private String everyPageText = null;
     private String everyPageTitle = null;
     private String everyPageThumnail = null;
-    private List<Field> embedFields = new ArrayList<>();
+    private final List<Field> embedFields = new ArrayList<>();
 
     public List<String> getTitles() {
         return titles;

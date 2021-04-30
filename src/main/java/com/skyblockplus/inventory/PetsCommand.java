@@ -1,15 +1,5 @@
 package com.skyblockplus.inventory;
 
-import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.Utils.capitalizeString;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.defaultPaginator;
-import static com.skyblockplus.utils.Utils.errorMessage;
-import static com.skyblockplus.utils.Utils.globalCooldown;
-import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.utils.Utils.loadingEmbed;
-import static com.skyblockplus.utils.Utils.logCommand;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
@@ -17,9 +7,11 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.PaginatorExtras;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+
+import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.utils.Utils.*;
 
 public class PetsCommand extends Command {
 
@@ -88,7 +80,7 @@ public class PetsCommand extends Command {
                         "**" + capitalizeString(higherDepth(pet, "type").getAsString().toLowerCase().replace("_", " "))
                                 + " ("
                                 + player.petLevelFromXp(higherDepth(pet, "exp").getAsLong(),
-                                        higherDepth(pet, "tier").getAsString())
+                                higherDepth(pet, "tier").getAsString())
                                 + ")**" + "\nTier: " + higherDepth(pet, "tier").getAsString().toLowerCase()
                                 + (petItem != null ? "\nItem: " + petItem : ""));
 

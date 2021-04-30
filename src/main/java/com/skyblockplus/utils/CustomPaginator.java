@@ -1,19 +1,8 @@
 package com.skyblockplus.utils;
 
-import java.awt.Color;
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.jagrosh.jdautilities.menu.Menu;
 import com.skyblockplus.utils.structs.PaginatorExtras;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -24,6 +13,16 @@ import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.internal.utils.Checks;
+
+import java.awt.*;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 public class CustomPaginator extends Menu {
     private static final String BIG_LEFT = "\u23EA";
@@ -43,9 +42,9 @@ public class CustomPaginator extends Menu {
     private final PaginatorExtras extras;
 
     CustomPaginator(EventWaiter waiter, Set<User> users, Set<Role> roles, long timeout, TimeUnit unit,
-            BiFunction<Integer, Integer, Color> color, Consumer<Message> finalAction, int columns, int itemsPerPage,
-            boolean showPageNumbers, boolean numberItems, List<String> items, int bulkSkipNumber, boolean wrapPageEnds,
-            PaginatorExtras extras) {
+                    BiFunction<Integer, Integer, Color> color, Consumer<Message> finalAction, int columns, int itemsPerPage,
+                    boolean showPageNumbers, boolean numberItems, List<String> items, int bulkSkipNumber, boolean wrapPageEnds,
+                    PaginatorExtras extras) {
         super(waiter, users, roles, timeout, unit);
         this.color = color;
         this.columns = columns;
@@ -117,15 +116,15 @@ public class CustomPaginator extends Menu {
         if (event.getMessageIdLong() != messageId)
             return false;
         switch (event.getReactionEmote().getName()) {
-        case LEFT:
-        case RIGHT:
-            return isValidUser(event.getUser(), event.isFromGuild() ? event.getGuild() : null);
-        case BIG_LEFT:
-        case BIG_RIGHT:
-            return bulkSkipNumber > 1 && isValidUser(event.getUser(), event.isFromGuild() ? event.getGuild() : null);
-        default:
-            event.getReaction().removeReaction(event.getUser()).queue();
-            return false;
+            case LEFT:
+            case RIGHT:
+                return isValidUser(event.getUser(), event.isFromGuild() ? event.getGuild() : null);
+            case BIG_LEFT:
+            case BIG_RIGHT:
+                return bulkSkipNumber > 1 && isValidUser(event.getUser(), event.isFromGuild() ? event.getGuild() : null);
+            default:
+                event.getReaction().removeReaction(event.getUser()).queue();
+                return false;
         }
     }
 
@@ -133,36 +132,36 @@ public class CustomPaginator extends Menu {
         int newPageNum = pageNum;
 
         switch (event.getReaction().getReactionEmote().getName()) {
-        case LEFT:
-            if (newPageNum == 1 && wrapPageEnds)
-                newPageNum = pages + 1;
-            if (newPageNum > 1)
-                newPageNum--;
-            break;
-        case RIGHT:
-            if (newPageNum == pages && wrapPageEnds)
-                newPageNum = 0;
-            if (newPageNum < pages)
-                newPageNum++;
-            break;
-        case BIG_LEFT:
-            if (newPageNum > 1 || wrapPageEnds) {
-                for (int i = 1; (newPageNum > 1 || wrapPageEnds) && i < bulkSkipNumber; i++) {
-                    if (newPageNum == 1)
-                        newPageNum = pages + 1;
+            case LEFT:
+                if (newPageNum == 1 && wrapPageEnds)
+                    newPageNum = pages + 1;
+                if (newPageNum > 1)
                     newPageNum--;
-                }
-            }
-            break;
-        case BIG_RIGHT:
-            if (newPageNum < pages || wrapPageEnds) {
-                for (int i = 1; (newPageNum < pages || wrapPageEnds) && i < bulkSkipNumber; i++) {
-                    if (newPageNum == pages)
-                        newPageNum = 0;
+                break;
+            case RIGHT:
+                if (newPageNum == pages && wrapPageEnds)
+                    newPageNum = 0;
+                if (newPageNum < pages)
                     newPageNum++;
+                break;
+            case BIG_LEFT:
+                if (newPageNum > 1 || wrapPageEnds) {
+                    for (int i = 1; (newPageNum > 1 || wrapPageEnds) && i < bulkSkipNumber; i++) {
+                        if (newPageNum == 1)
+                            newPageNum = pages + 1;
+                        newPageNum--;
+                    }
                 }
-            }
-            break;
+                break;
+            case BIG_RIGHT:
+                if (newPageNum < pages || wrapPageEnds) {
+                    for (int i = 1; (newPageNum < pages || wrapPageEnds) && i < bulkSkipNumber; i++) {
+                        if (newPageNum == pages)
+                            newPageNum = 0;
+                        newPageNum++;
+                    }
+                }
+                break;
         }
 
         try {

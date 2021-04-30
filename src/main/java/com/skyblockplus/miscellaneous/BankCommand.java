@@ -1,22 +1,5 @@
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.defaultPaginator;
-import static com.skyblockplus.utils.Utils.errorMessage;
-import static com.skyblockplus.utils.Utils.globalCooldown;
-import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.utils.Utils.loadingEmbed;
-import static com.skyblockplus.utils.Utils.logCommand;
-import static com.skyblockplus.utils.Utils.parseMcCodes;
-import static com.skyblockplus.utils.Utils.simplifyNumber;
-
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
-import java.util.Locale;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
@@ -24,9 +7,17 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.PaginatorExtras;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.Locale;
+
+import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.utils.Utils.*;
 
 public class BankCommand extends Command {
     public BankCommand() {
@@ -107,7 +98,7 @@ public class BankCommand extends Command {
                     JsonElement currentTransaction = bankHistoryArray.get(i);
                     String valueString = simplifyNumber(higherDepth(currentTransaction, "amount").getAsLong()) + " "
                             + (higherDepth(currentTransaction, "action").getAsString().equals("DEPOSIT") ? "deposited"
-                                    : "withdrawn")
+                            : "withdrawn")
                             + " by " + parseMcCodes(higherDepth(currentTransaction, "initiator_name").getAsString());
 
                     String time = dateTimeFormatter

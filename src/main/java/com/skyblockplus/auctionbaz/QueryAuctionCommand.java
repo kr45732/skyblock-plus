@@ -1,19 +1,20 @@
 package com.skyblockplus.auctionbaz;
 
-import static com.skyblockplus.utils.Player.getGenericInventoryMap;
-import static com.skyblockplus.utils.Utils.capitalizeString;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.errorMessage;
-import static com.skyblockplus.utils.Utils.getEnchantsJson;
-import static com.skyblockplus.utils.Utils.getJsonKeys;
-import static com.skyblockplus.utils.Utils.getPetJson;
-import static com.skyblockplus.utils.Utils.getPetUrl;
-import static com.skyblockplus.utils.Utils.globalCooldown;
-import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.utils.Utils.loadingEmbed;
-import static com.skyblockplus.utils.Utils.logCommand;
-import static com.skyblockplus.utils.Utils.simplifyNumber;
-import static com.skyblockplus.utils.Utils.uuidToUsername;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.structs.InvItem;
+import me.nullicorn.nedit.NBTReader;
+import me.nullicorn.nedit.type.NBTCompound;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 
 import java.io.InputStreamReader;
 import java.net.URI;
@@ -21,28 +22,44 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.utils.structs.InvItem;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-
-import me.nullicorn.nedit.NBTReader;
-import me.nullicorn.nedit.type.NBTCompound;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
+import static com.skyblockplus.utils.Player.getGenericInventoryMap;
+import static com.skyblockplus.utils.Utils.*;
 
 public class QueryAuctionCommand extends Command {
     public QueryAuctionCommand() {
         this.name = "query";
         this.cooldown = globalCooldown;
+    }
+
+    private static JsonArray queryAhApi(String query) {
+        CloseableHttpClient httpclient = HttpClientBuilder.create().build();
+        try {
+            HttpGet httpget = new HttpGet("https://api.eastarctica.tk/auctions/");
+            httpget.addHeader("content-type", "application/json; charset=UTF-8");
+
+            query = query.replace("[", "\\\\[");
+            URI uri = new URIBuilder(httpget.getURI())
+                    // .addParameter("query", "{\"item_name\":{\"$regex\":\"" + query
+                    // +
+                    // "\",\"$options\":\"i\"},\"$or\":[{\"bin\":true},{\"bids\":{\"$lt\":{\"$size\":0}}}]}")
+                    .addParameter("query",
+                            "{\"item_name\":{\"$regex\":\"" + query + "\",\"$options\":\"i\"},\"bin\":true}")
+                    .addParameter("sort", "{\"starting_bid\":1}").build();
+            httpget.setURI(uri);
+
+            HttpResponse httpresponse = httpclient.execute(httpget);
+            return JsonParser.parseReader(new InputStreamReader(httpresponse.getEntity().getContent()))
+                    .getAsJsonArray();
+        } catch (Exception ignored) {
+        } finally {
+            try {
+                httpclient.close();
+            } catch (Exception e) {
+                System.out.println("== Stack Trace (Auction Query Close Http Client) ==");
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 
     @Override
@@ -253,36 +270,5 @@ public class QueryAuctionCommand extends Command {
         }
 
         return eb;
-    }
-
-    private static JsonArray queryAhApi(String query) {
-        CloseableHttpClient httpclient = HttpClientBuilder.create().build();
-        try {
-            HttpGet httpget = new HttpGet("https://api.eastarctica.tk/auctions/");
-            httpget.addHeader("content-type", "application/json; charset=UTF-8");
-
-            query = query.replace("[", "\\\\[");
-            URI uri = new URIBuilder(httpget.getURI())
-                    // .addParameter("query", "{\"item_name\":{\"$regex\":\"" + query
-                    // +
-                    // "\",\"$options\":\"i\"},\"$or\":[{\"bin\":true},{\"bids\":{\"$lt\":{\"$size\":0}}}]}")
-                    .addParameter("query",
-                            "{\"item_name\":{\"$regex\":\"" + query + "\",\"$options\":\"i\"},\"bin\":true}")
-                    .addParameter("sort", "{\"starting_bid\":1}").build();
-            httpget.setURI(uri);
-
-            HttpResponse httpresponse = httpclient.execute(httpget);
-            return JsonParser.parseReader(new InputStreamReader(httpresponse.getEntity().getContent()))
-                    .getAsJsonArray();
-        } catch (Exception ignored) {
-        } finally {
-            try {
-                httpclient.close();
-            } catch (Exception e) {
-                System.out.println("== Stack Trace (Auction Query Close Http Client) ==");
-                e.printStackTrace();
-            }
-        }
-        return null;
     }
 }

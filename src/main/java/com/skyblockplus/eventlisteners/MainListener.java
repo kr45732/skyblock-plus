@@ -14,7 +14,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.skyblockplus.Main.*;
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.*;
 
 public class MainListener extends ListenerAdapter {

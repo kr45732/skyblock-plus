@@ -34,18 +34,18 @@ public class LinkedUserDev extends Command {
             if (args.length == 4) {
                 if (args[1].equals("delete")) {
                     switch (args[2]) {
-                    case "discordId":
-                        database.deleteLinkedUserByDiscordId(args[3]);
-                        ebMessage.editMessage(defaultEmbed("Done").build()).queue();
-                        return;
-                    case "username":
-                        database.deleteLinkedUserByMinecraftUsername(args[3]);
-                        ebMessage.editMessage(defaultEmbed("Done").build()).queue();
-                        return;
-                    case "uuid":
-                        database.deleteLinkedUserByMinecraftUuid(args[3]);
-                        ebMessage.editMessage(defaultEmbed("Done").build()).queue();
-                        return;
+                        case "discordId":
+                            database.deleteLinkedUserByDiscordId(args[3]);
+                            ebMessage.editMessage(defaultEmbed("Done").build()).queue();
+                            return;
+                        case "username":
+                            database.deleteLinkedUserByMinecraftUsername(args[3]);
+                            ebMessage.editMessage(defaultEmbed("Done").build()).queue();
+                            return;
+                        case "uuid":
+                            database.deleteLinkedUserByMinecraftUuid(args[3]);
+                            ebMessage.editMessage(defaultEmbed("Done").build()).queue();
+                            return;
                     }
                 }
             } else if (args.length == 2) {

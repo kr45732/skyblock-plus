@@ -1,30 +1,5 @@
 package com.skyblockplus.utils;
 
-import static com.skyblockplus.Main.jda;
-import static java.lang.String.join;
-import static java.util.Collections.nCopies;
-
-import java.awt.Color;
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -32,7 +7,11 @@ import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
-
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.exceptions.PermissionException;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -45,11 +24,25 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.exceptions.PermissionException;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import java.awt.*;
+import java.io.*;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.skyblockplus.Main.jda;
+import static java.lang.String.join;
+import static java.util.Collections.nCopies;
 
 public class Utils {
     public static final Color botColor = new Color(223, 5, 5);
@@ -194,7 +187,7 @@ public class Utils {
             InputStream inputStream = httpresponse.getEntity().getContent();
             ByteArrayOutputStream result = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
-            for (int length; (length = inputStream.read(buffer)) != -1;) {
+            for (int length; (length = inputStream.read(buffer)) != -1; ) {
                 result.write(buffer, 0, length);
             }
             return result.toString().split("module.exports = ")[1];
@@ -224,13 +217,13 @@ public class Utils {
         if (petUrlJson == null) {
             petUrlJson = parseJsString(getSkyCryptData(
                     "https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/pets.js")
-                            .split("pet_value")[0]
+                    .split("pet_value")[0]
                     + "}");
         }
         try {
             return "https://sky.shiiyu.moe"
                     + higherDepth(higherDepth(higherDepth(petUrlJson, "pet_data"), petName.toUpperCase()), "head")
-                            .getAsString();
+                    .getAsString();
         } catch (Exception e) {
             return null;
         }
@@ -240,7 +233,7 @@ public class Utils {
         if (collectionsJson == null) {
             collectionsJson = parseJsString(getSkyCryptData(
                     "https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/collections.js")
-                            .replace(";", ""));
+                    .replace(";", ""));
         }
 
         try {
@@ -604,7 +597,7 @@ public class Utils {
 
             String discordTag = higherDepth(
                     higherDepth(higherDepth(higherDepth(playerJson, "player"), "socialMedia"), "links"), "DISCORD")
-                            .getAsString();
+                    .getAsString();
             String minecraftUsername = higherDepth(higherDepth(playerJson, "player"), "displayname").getAsString();
             String minecraftUuid = higherDepth(higherDepth(playerJson, "player"), "uuid").getAsString();
 

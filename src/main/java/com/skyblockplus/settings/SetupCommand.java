@@ -1,27 +1,22 @@
 package com.skyblockplus.settings;
 
-import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.Utils.BOT_PREFIX;
-import static com.skyblockplus.utils.Utils.defaultPaginator;
-import static com.skyblockplus.utils.Utils.globalCooldown;
-import static com.skyblockplus.utils.Utils.loadingEmbed;
-import static com.skyblockplus.utils.Utils.logCommand;
-
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.structs.PaginatorExtras;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
+
+import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.utils.Utils.*;
 
 public class SetupCommand extends Command {
 
     public SetupCommand() {
         this.name = "setup";
         this.cooldown = globalCooldown;
-        this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
+        this.userPermissions = new Permission[]{Permission.ADMINISTRATOR};
     }
 
     @Override
@@ -32,8 +27,8 @@ public class SetupCommand extends Command {
 
             logCommand(event.getGuild(), event.getAuthor(), BOT_PREFIX + "setup");
 
-            String[] pageTitles = new String[] { "Overview", "Features", "Automatic Verify", "Automatic Apply",
-                    "Automatic Roles", "Automatic Guild Roles", "More Help" };
+            String[] pageTitles = new String[]{"Overview", "Features", "Automatic Verify", "Automatic Apply",
+                    "Automatic Roles", "Automatic Guild Roles", "More Help"};
 
             String overview = "This will walk you through how to setup custom settings for the bot!\n\n**Pages:**\n• Page 2 - Features\n• Page 3 - Automatic Verify\n• Page 4 - Automatic Apply\n• Page 5 - Automatic Guild Roles\n• Page 6 - Automatic Roles\n• Page 7 - More Help";
 
@@ -104,8 +99,8 @@ public class SetupCommand extends Command {
                     + "- `settings guild role [@role]` - set the guild member role. The role cannot be @everyone or managed.\n"
                     + "- `settings guild add [rank_name] [@role]` - add a guild rank and its role.\n"
                     + "- `settings guild remove [rank_name]` - remove a guild rank.\n\n" +
-            // "• Tutorial video linked [__here__]()\n\n" +
-            "**__Enable__**\n"
+                    // "• Tutorial video linked [__here__]()\n\n" +
+                    "**__Enable__**\n"
                     + "- Once these settings are set run `settings guild enable role` to enable guild roles and/or `settings guild enable rank` to enable guild ranks.\n"
                     + "- To view all the current settings type `settings guild`\n"
                     + "- For more help type `help settings_guild`\n";

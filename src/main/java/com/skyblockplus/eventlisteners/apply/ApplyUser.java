@@ -1,15 +1,14 @@
 package com.skyblockplus.eventlisteners.apply;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.emojiToProfileName;
-import static com.skyblockplus.utils.Utils.fixUsername;
-import static com.skyblockplus.utils.Utils.formatNumber;
-import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.utils.Utils.logCommand;
-import static com.skyblockplus.utils.Utils.profileNameToEmoji;
-import static com.skyblockplus.utils.Utils.roundAndFormat;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.skyblockplus.utils.Player;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -17,20 +16,9 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.skyblockplus.utils.Player;
-
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Category;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.utils.Utils.*;
 
 public class ApplyUser implements Serializable {
     private final String applyingUserId;
@@ -146,131 +134,129 @@ public class ApplyUser implements Serializable {
         reactMessage.clearReactions().queue();
 
         switch (state) {
-        case 0:
-            Player player = new Player(playerUsername,
-                    emojiToProfileName(event.getReactionEmote().getAsReactionCode()));
+            case 0:
+                Player player = new Player(playerUsername,
+                        emojiToProfileName(event.getReactionEmote().getAsReactionCode()));
 
-            JsonArray currentReqs = higherDepth(currentSettings, "applyReqs").getAsJsonArray();
+                JsonArray currentReqs = higherDepth(currentSettings, "applyReqs").getAsJsonArray();
 
-            boolean meetReqs = false;
-            String missingReqsStr = "";
-            if (currentReqs.size() == 0) {
-                meetReqs = true;
-            } else {
-                for (JsonElement req : currentReqs) {
-                    int slayerReq = higherDepth(req, "slayerReq").getAsInt();
-                    int skillsReq = higherDepth(req, "skillsReq").getAsInt();
-                    int cataReq = higherDepth(req, "catacombsReq").getAsInt();
-                    int weightReq = higherDepth(req, "weightReq").getAsInt();
+                boolean meetReqs = false;
+                StringBuilder missingReqsStr = new StringBuilder();
+                if (currentReqs.size() == 0) {
+                    meetReqs = true;
+                } else {
+                    for (JsonElement req : currentReqs) {
+                        int slayerReq = higherDepth(req, "slayerReq").getAsInt();
+                        int skillsReq = higherDepth(req, "skillsReq").getAsInt();
+                        int cataReq = higherDepth(req, "catacombsReq").getAsInt();
+                        int weightReq = higherDepth(req, "weightReq").getAsInt();
 
-                    if (player.getSlayer() >= slayerReq && player.getSkillAverage() >= skillsReq
-                            && player.getCatacombsLevel() >= cataReq && player.getWeight() >= weightReq) {
-                        meetReqs = true;
-                        break;
-                    } else {
-                        missingReqsStr += "• Slayer - " + formatNumber(slayerReq) + " | Skill Average - "
-                                + formatNumber(skillsReq) + " | Catacombs - " + formatNumber(cataReq) + " | Weight - "
-                                + formatNumber(weightReq) + "\n";
+                        if (player.getSlayer() >= slayerReq && player.getSkillAverage() >= skillsReq
+                                && player.getCatacombsLevel() >= cataReq && player.getWeight() >= weightReq) {
+                            meetReqs = true;
+                            break;
+                        } else {
+                            missingReqsStr.append("• Slayer - ").append(formatNumber(slayerReq)).append(" | Skill Average - ").append(formatNumber(skillsReq)).append(" | Catacombs - ").append(formatNumber(cataReq)).append(" | Weight - ").append(formatNumber(weightReq)).append("\n");
+                        }
                     }
                 }
-            }
 
-            if (!meetReqs) {
-                EmbedBuilder reqEmbed = defaultEmbed("Does not meet requirements");
-                reqEmbed.setDescription("You do not meet any of the following requirements:\n" + missingReqsStr);
-                reqEmbed.appendDescription(
-                        "\n\n• If you think these values are incorrect make sure all your APIs are enabled and/or try relinking");
-                reqEmbed.appendDescription("\n• React with ✅ to close the channel");
+                if (!meetReqs) {
+                    EmbedBuilder reqEmbed = defaultEmbed("Does not meet requirements");
+                    reqEmbed.setDescription("You do not meet any of the following requirements:\n" + missingReqsStr);
+                    reqEmbed.appendDescription(
+                            "\n\n• If you think these values are incorrect make sure all your APIs are enabled and/or try relinking");
+                    reqEmbed.appendDescription("\n• React with ✅ to close the channel");
 
-                reactMessage = applicationChannel.sendMessage(reqEmbed.build()).complete();
+                    reactMessage = applicationChannel.sendMessage(reqEmbed.build()).complete();
+                    reactMessage.addReaction("✅").queue();
+                    this.reactMessageId = reactMessage.getId();
+                    state = 5;
+                    break;
+                }
+
+                try {
+                    playerSlayer = formatNumber(player.getSlayer());
+                } catch (Exception e) {
+                    playerSlayer = "0";
+                }
+
+                try {
+                    playerSkills = roundAndFormat(player.getSkillAverage());
+                } catch (Exception e) {
+                    playerSkills = "API disabled";
+                }
+
+                playerSkills = playerSkills.equals("-1") ? "API disabled" : playerSkills;
+
+                try {
+                    playerCatacombs = roundAndFormat(
+                            player.getCatacombsSkill().skillLevel + player.getCatacombsSkill().progressToNext);
+                } catch (Exception e) {
+                    playerCatacombs = "API disabled";
+                }
+
+                try {
+                    playerWeight = roundAndFormat(player.getWeight());
+                } catch (Exception e) {
+                    playerWeight = "API disabled";
+                }
+
+                playerUsername = player.getUsername();
+                ironmanSymbol = higherDepth(player.getOuterProfileJson(), "game_mode") != null ? " ♻️" : "";
+                playerProfileName = player.getProfileName();
+
+                EmbedBuilder statsEmbed = player.defaultPlayerEmbed();
+                statsEmbed.setDescription("**Total Skyblock weight:** " + playerWeight);
+                statsEmbed.addField("Total slayer", playerSlayer, true);
+                statsEmbed.addField("Progress skill level", playerSkills, true);
+                statsEmbed.addField("Catacombs level", "" + playerCatacombs, true);
+                statsEmbed.addField("Are the above stats correct?", "React with ✅ for yes, ↩️ to retry, and ❌ to cancel",
+                        false);
+
+                reactMessage = applicationChannel.sendMessage(statsEmbed.build()).complete();
                 reactMessage.addReaction("✅").queue();
+                reactMessage.addReaction("↩️").queue();
+                reactMessage.addReaction("❌").queue();
                 this.reactMessageId = reactMessage.getId();
-                state = 5;
+                state = 1;
                 break;
-            }
+            case 1:
+                EmbedBuilder finishApplyEmbed = defaultEmbed("Thank you for applying!");
+                finishApplyEmbed.setDescription(
+                        "**Your stats have been submitted to staff**\nYou will be notified once staff review your stats");
+                applicationChannel.sendMessage(finishApplyEmbed.build()).queue();
 
-            try {
-                playerSlayer = formatNumber(player.getSlayer());
-            } catch (Exception e) {
-                playerSlayer = "0";
-            }
+                state = 4;
+                staffCaseConstructor();
+                break;
+            case 2:
+                EmbedBuilder retryEmbed = defaultEmbed("Application for " + applyingUser.getName());
+                retryEmbed.setDescription(
+                        "Please react with the emoji that corresponds to the profile you want to apply with or react with ❌ to cancel the application");
+                reactMessage = applicationChannel.sendMessage(retryEmbed.build()).complete();
+                this.reactMessageId = reactMessage.getId();
 
-            try {
-                playerSkills = roundAndFormat(player.getSkillAverage());
-            } catch (Exception e) {
-                playerSkills = "API disabled";
-            }
-
-            playerSkills = playerSkills.equals("-1") ? "API disabled" : playerSkills;
-
-            try {
-                playerCatacombs = roundAndFormat(
-                        player.getCatacombsSkill().skillLevel + player.getCatacombsSkill().progressToNext);
-            } catch (Exception e) {
-                playerCatacombs = "API disabled";
-            }
-
-            try {
-                playerWeight = roundAndFormat(player.getWeight());
-            } catch (Exception e) {
-                playerWeight = "API disabled";
-            }
-
-            playerUsername = player.getUsername();
-            ironmanSymbol = higherDepth(player.getOuterProfileJson(), "game_mode") != null ? " ♻️" : "";
-            playerProfileName = player.getProfileName();
-
-            EmbedBuilder statsEmbed = player.defaultPlayerEmbed();
-            statsEmbed.setDescription("**Total Skyblock weight:** " + playerWeight);
-            statsEmbed.addField("Total slayer", playerSlayer, true);
-            statsEmbed.addField("Progress skill level", playerSkills, true);
-            statsEmbed.addField("Catacombs level", "" + playerCatacombs, true);
-            statsEmbed.addField("Are the above stats correct?", "React with ✅ for yes, ↩️ to retry, and ❌ to cancel",
-                    false);
-
-            reactMessage = applicationChannel.sendMessage(statsEmbed.build()).complete();
-            reactMessage.addReaction("✅").queue();
-            reactMessage.addReaction("↩️").queue();
-            reactMessage.addReaction("❌").queue();
-            this.reactMessageId = reactMessage.getId();
-            state = 1;
-            break;
-        case 1:
-            EmbedBuilder finishApplyEmbed = defaultEmbed("Thank you for applying!");
-            finishApplyEmbed.setDescription(
-                    "**Your stats have been submitted to staff**\nYou will be notified once staff review your stats");
-            applicationChannel.sendMessage(finishApplyEmbed.build()).queue();
-
-            state = 4;
-            staffCaseConstructor();
-            break;
-        case 2:
-            EmbedBuilder retryEmbed = defaultEmbed("Application for " + applyingUser.getName());
-            retryEmbed.setDescription(
-                    "Please react with the emoji that corresponds to the profile you want to apply with or react with ❌ to cancel the application");
-            reactMessage = applicationChannel.sendMessage(retryEmbed.build()).complete();
-            this.reactMessageId = reactMessage.getId();
-
-            for (String profileName : profileNames) {
-                this.profileNameEmojis.add(profileNameToEmoji(profileName));
-                reactMessage.addReaction(profileNameToEmoji(profileName)).queue();
-            }
-            reactMessage.addReaction("❌").queue();
-            state = 0;
-            break;
-        case 3:
-            EmbedBuilder cancelEmbed = defaultEmbed("Canceling application");
-            cancelEmbed.setDescription("Channel closing");
-            applicationChannel.sendMessage(cancelEmbed.build()).queue();
-            event.getGuild().getTextChannelById(event.getChannel().getId()).delete().reason("Application canceled")
-                    .queueAfter(5, TimeUnit.SECONDS);
-            return true;
-        case 5:
-            EmbedBuilder closeChannelEmbed = defaultEmbed("Channel closing");
-            applicationChannel.sendMessage(closeChannelEmbed.build()).queue();
-            event.getGuild().getTextChannelById(event.getChannel().getId()).delete().reason("Application closed")
-                    .queueAfter(5, TimeUnit.SECONDS);
-            return true;
+                for (String profileName : profileNames) {
+                    this.profileNameEmojis.add(profileNameToEmoji(profileName));
+                    reactMessage.addReaction(profileNameToEmoji(profileName)).queue();
+                }
+                reactMessage.addReaction("❌").queue();
+                state = 0;
+                break;
+            case 3:
+                EmbedBuilder cancelEmbed = defaultEmbed("Canceling application");
+                cancelEmbed.setDescription("Channel closing");
+                applicationChannel.sendMessage(cancelEmbed.build()).queue();
+                event.getGuild().getTextChannelById(event.getChannel().getId()).delete().reason("Application canceled")
+                        .queueAfter(5, TimeUnit.SECONDS);
+                return true;
+            case 5:
+                EmbedBuilder closeChannelEmbed = defaultEmbed("Channel closing");
+                applicationChannel.sendMessage(closeChannelEmbed.build()).queue();
+                event.getGuild().getTextChannelById(event.getChannel().getId()).delete().reason("Application closed")
+                        .queueAfter(5, TimeUnit.SECONDS);
+                return true;
         }
         return false;
     }

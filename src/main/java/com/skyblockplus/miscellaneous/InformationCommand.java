@@ -1,23 +1,17 @@
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.utils.Utils.BOT_PREFIX;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.globalCooldown;
-import static com.skyblockplus.utils.Utils.logCommand;
-import static com.skyblockplus.utils.Utils.roundAndFormat;
-
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-
-// import com.sun.management.OperatingSystemMXBean;
 import net.dv8tion.jda.api.EmbedBuilder;
+
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.utils.Utils.*;
 
 public class InformationCommand extends Command {
     public InformationCommand() {
         this.name = "information";
         this.cooldown = globalCooldown;
-        this.aliases = new String[] { "info" };
+        this.aliases = new String[]{"info"};
     }
 
     @Override

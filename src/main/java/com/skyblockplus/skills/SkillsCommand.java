@@ -1,36 +1,24 @@
 package com.skyblockplus.skills;
 
-import static com.skyblockplus.utils.Utils.capitalizeString;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.errorMessage;
-import static com.skyblockplus.utils.Utils.getJsonKeys;
-import static com.skyblockplus.utils.Utils.getLevelingJson;
-import static com.skyblockplus.utils.Utils.globalCooldown;
-import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.utils.Utils.loadingEmbed;
-import static com.skyblockplus.utils.Utils.logCommand;
-import static com.skyblockplus.utils.Utils.roundAndFormat;
-import static com.skyblockplus.utils.Utils.roundProgress;
-import static com.skyblockplus.utils.Utils.simplifyNumber;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.SkillsStruct;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static com.skyblockplus.utils.Utils.*;
 
 public class SkillsCommand extends Command {
     public SkillsCommand() {
         this.name = "skills";
         this.cooldown = globalCooldown;
-        this.aliases = new String[] { "skill" };
+        this.aliases = new String[]{"skill"};
     }
 
     @Override
@@ -89,7 +77,7 @@ public class SkillsCommand extends Command {
                             simplifyNumber(skillInfo.expCurrent) + " / " + simplifyNumber(skillInfo.expForNext)
                                     + "\nTotal XP: " + simplifyNumber(skillInfo.totalSkillExp) + "\nProgress: "
                                     + (skillInfo.skillLevel == skillInfo.maxSkillLevel ? "MAX"
-                                            : roundProgress(skillInfo.progressToNext)),
+                                    : roundProgress(skillInfo.progressToNext)),
                             true);
                     if (!skill.equals("runecrafting") && !skill.equals("carpentry")) {
                         trueSA += skillInfo.skillLevel;

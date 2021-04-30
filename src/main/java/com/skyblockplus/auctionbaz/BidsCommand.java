@@ -1,37 +1,25 @@
 package com.skyblockplus.auctionbaz;
 
-import static com.skyblockplus.utils.Utils.capitalizeString;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.errorMessage;
-import static com.skyblockplus.utils.Utils.globalCooldown;
-import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.utils.Utils.loadingEmbed;
-import static com.skyblockplus.utils.Utils.logCommand;
-import static com.skyblockplus.utils.Utils.parseMcCodes;
-import static com.skyblockplus.utils.Utils.simplifyNumber;
-import static com.skyblockplus.utils.Utils.usernameToUuid;
-import static com.skyblockplus.utils.Utils.uuidToUsername;
-
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.time.Duration;
-import java.time.Instant;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
-
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.time.Duration;
+import java.time.Instant;
+
+import static com.skyblockplus.utils.Utils.*;
 
 public class BidsCommand extends Command {
     public BidsCommand() {
@@ -73,8 +61,8 @@ public class BidsCommand extends Command {
         EmbedBuilder eb = defaultEmbed(usernameUuidStruct.playerUsername,
                 "https://auctions.craftlink.xyz/players/" + usernameUuidStruct.playerUuid);
         for (JsonElement bid : bids) {
-            String auctionDesc = "";
-            String itemName = "";
+            String auctionDesc;
+            String itemName;
             boolean isPet = higherDepth(bid, "item_lore").getAsString().toLowerCase().contains("pet");
 
             Instant endingAt = Instant.ofEpochMilli(higherDepth(bid, "end").getAsLong());

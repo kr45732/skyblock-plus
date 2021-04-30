@@ -1,18 +1,15 @@
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.Main.asyncHttpClient;
-import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.Utils.HYPIXEL_API_KEY;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.defaultPaginator;
-import static com.skyblockplus.utils.Utils.errorMessage;
-import static com.skyblockplus.utils.Utils.getJson;
-import static com.skyblockplus.utils.Utils.getJsonKeys;
-import static com.skyblockplus.utils.Utils.globalCooldown;
-import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.utils.Utils.loadingEmbed;
-import static com.skyblockplus.utils.Utils.logCommand;
-import static com.skyblockplus.utils.Utils.usernameToUuid;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.CustomPaginator;
+import com.skyblockplus.utils.structs.PaginatorExtras;
+import com.skyblockplus.utils.structs.UsernameUuidStruct;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -23,17 +20,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.utils.CustomPaginator;
-import com.skyblockplus.utils.structs.PaginatorExtras;
-import com.skyblockplus.utils.structs.UsernameUuidStruct;
-
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
+import static com.skyblockplus.Main.asyncHttpClient;
+import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.utils.Utils.*;
 
 public class ProfilesCommand extends Command {
 

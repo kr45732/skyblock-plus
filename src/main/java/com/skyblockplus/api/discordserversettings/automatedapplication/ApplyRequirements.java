@@ -1,9 +1,9 @@
 package com.skyblockplus.api.discordserversettings.automatedapplication;
 
-import javax.persistence.Embeddable;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
+
+import javax.persistence.Embeddable;
 
 @Data
 @AllArgsConstructor

@@ -1,20 +1,5 @@
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Utils.BOT_PREFIX;
-import static com.skyblockplus.utils.Utils.HYPIXEL_API_KEY;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.errorMessage;
-import static com.skyblockplus.utils.Utils.getJson;
-import static com.skyblockplus.utils.Utils.getJsonKeys;
-import static com.skyblockplus.utils.Utils.getPlayerDiscordInfo;
-import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.utils.Utils.loadingEmbed;
-import static com.skyblockplus.utils.Utils.logCommand;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
@@ -23,14 +8,14 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
-
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.Utils.*;
 
 public class RoleCommands extends Command {
 
@@ -120,90 +105,47 @@ public class RoleCommands extends Command {
                             }
 
                             switch (currentRoleName) {
-                            case "guild_member": {
-                                JsonElement guildJson = getJson("https://api.hypixel.net/findGuild?key="
-                                        + HYPIXEL_API_KEY + "&byUuid=" + player.getUuid());
-                                if (guildJson != null && !higherDepth(guildJson, "guild").isJsonNull()) {
-                                    JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
-                                    String playerGuildId = higherDepth(guildJson, "guild").getAsString();
+                                case "guild_member": {
+                                    JsonElement guildJson = getJson("https://api.hypixel.net/findGuild?key="
+                                            + HYPIXEL_API_KEY + "&byUuid=" + player.getUuid());
+                                    if (guildJson != null && !higherDepth(guildJson, "guild").isJsonNull()) {
+                                        JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
+                                        String playerGuildId = higherDepth(guildJson, "guild").getAsString();
 
-                                    for (JsonElement currentLevel : levelsArray) {
-                                        String currentLevelValue = higherDepth(currentLevel, "value").getAsString();
-                                        Role currentLevelRole = guild
-                                                .getRoleById(higherDepth(currentLevel, "roleId").getAsString());
-                                        if (playerGuildId.equals(currentLevelValue)) {
-                                            if (!guild.getMember(user).getRoles().contains(currentLevelRole)) {
-                                                // currentLevelRole.getPosition()
-                                                if (botRole.canInteract(currentLevelRole)) {
-                                                    guild.addRoleToMember(guild.getMember(user), currentLevelRole)
-                                                            .queue();
-                                                    addedRoles.append(roleChangeString(currentLevelRole.getName()));
-                                                } else {
-                                                    errorRoles.append(roleChangeString(currentLevelRole.getName()));
+                                        for (JsonElement currentLevel : levelsArray) {
+                                            String currentLevelValue = higherDepth(currentLevel, "value").getAsString();
+                                            Role currentLevelRole = guild
+                                                    .getRoleById(higherDepth(currentLevel, "roleId").getAsString());
+                                            if (playerGuildId.equals(currentLevelValue)) {
+                                                if (!guild.getMember(user).getRoles().contains(currentLevelRole)) {
+                                                    // currentLevelRole.getPosition()
+                                                    if (botRole.canInteract(currentLevelRole)) {
+                                                        guild.addRoleToMember(guild.getMember(user), currentLevelRole)
+                                                                .queue();
+                                                        addedRoles.append(roleChangeString(currentLevelRole.getName()));
+                                                    } else {
+                                                        errorRoles.append(roleChangeString(currentLevelRole.getName()));
+                                                    }
                                                 }
-                                            }
-                                        } else {
-                                            if (guild.getMember(user).getRoles().contains(currentLevelRole)) {
-                                                if (botRole.canInteract(currentLevelRole)) {
-                                                    removedRoles.append(roleChangeString(currentLevelRole.getName()));
-                                                    guild.removeRoleFromMember(guild.getMember(user), currentLevelRole)
-                                                            .queue();
-                                                } else {
-                                                    errorRoles.append(currentLevelRole.getName());
+                                            } else {
+                                                if (guild.getMember(user).getRoles().contains(currentLevelRole)) {
+                                                    if (botRole.canInteract(currentLevelRole)) {
+                                                        removedRoles.append(roleChangeString(currentLevelRole.getName()));
+                                                        guild.removeRoleFromMember(guild.getMember(user), currentLevelRole)
+                                                                .queue();
+                                                    } else {
+                                                        errorRoles.append(currentLevelRole.getName());
+                                                    }
                                                 }
                                             }
                                         }
                                     }
+                                    break;
                                 }
-                                break;
-                            }
-                            case "sven":
-                            case "rev":
-                            case "tara":
-                            case "bank_coins":
-                            case "alchemy":
-                            case "combat":
-                            case "fishing":
-                            case "farming":
-                            case "foraging":
-                            case "carpentry":
-                            case "mining":
-                            case "taming":
-                            case "enchanting":
-                            case "catacombs":
-                            case "fairy_souls":
-                            case "skill_average":
-                            case "pet_score":
-                            case "dungeon_secrets":
-                            case "slot_collector": {
-                                double roleAmount = -1;
-                                switch (currentRoleName) {
                                 case "sven":
                                 case "rev":
-                                case "tara": {
-                                    roleAmount = player.getSlayer(currentRoleName);
-                                    break;
-                                }
-                                case "bank_coins": {
-                                    roleAmount = player.getBankBalance();
-                                    if (roleAmount == -1 && !disabledAPI.toString().contains("Banking")) {
-                                        disabledAPI.append(roleChangeString("Banking API disabled"));
-                                        continue;
-                                    }
-                                    break;
-                                }
-                                case "skill_average": {
-                                    roleAmount = player.getSkillAverage();
-                                    if (roleAmount == -1 && !disabledAPI.toString().contains("Skills")) {
-                                        disabledAPI.append(roleChangeString("Skills API disabled"));
-                                        continue;
-                                    }
-                                    break;
-                                }
-                                case "pet_score": {
-                                    roleAmount = player.getPetScore();
-                                    break;
-                                }
+                                case "tara":
+                                case "bank_coins":
                                 case "alchemy":
                                 case "combat":
                                 case "fishing":
@@ -212,225 +154,268 @@ public class RoleCommands extends Command {
                                 case "carpentry":
                                 case "mining":
                                 case "taming":
-                                case "enchanting": {
-                                    if (player.getSkill(currentRoleName) != null) {
-                                        roleAmount = player.getSkill(currentRoleName).skillLevel;
-                                    }
-                                    if (roleAmount == -1 && !disabledAPI.toString().contains("Skills")) {
-                                        disabledAPI.append(roleChangeString("Skills API disabled"));
-                                        continue;
-                                    }
-                                    break;
-                                }
-                                case "catacombs": {
-                                    if (player.getCatacombsSkill() != null) {
-                                        roleAmount = player.getCatacombsSkill().skillLevel;
-                                    }
-                                    if (roleAmount == -1 && !disabledAPI.toString().contains("Skills")) {
-                                        disabledAPI.append(roleChangeString("Skills API disabled"));
-                                        continue;
-                                    }
-                                    break;
-                                }
-                                case "fairy_souls": {
-                                    roleAmount = player.getFairySouls();
-                                    if (roleAmount == -1) {
-                                        continue;
-                                    }
-                                    break;
-                                }
-                                case "slot_collector": {
-                                    roleAmount = player.getNumberMinionSlots();
-                                    break;
-                                }
+                                case "enchanting":
+                                case "catacombs":
+                                case "fairy_souls":
+                                case "skill_average":
+                                case "pet_score":
                                 case "dungeon_secrets":
-                                    roleAmount = player.getDungeonSecrets();
-                                    break;
-                                default: {
-                                    continue;
-                                }
-                                }
-
-                                JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
-
-                                if (higherDepth(currentRole, "stackable").getAsBoolean()) {
-                                    for (JsonElement currentLevel : levelsArray) {
-                                        int currentLevelValue = higherDepth(currentLevel, "value").getAsInt();
-                                        Role currentLevelRole = event.getGuild()
-                                                .getRoleById(higherDepth(currentLevel, "roleId").getAsString());
-
-                                        if (roleAmount >= currentLevelValue) {
-                                            if (!member.getRoles().contains(currentLevelRole)) {
-                                                if (botRole.canInteract(currentLevelRole)) {
-                                                    guild.addRoleToMember(member, currentLevelRole).queue();
-                                                    addedRoles.append(roleChangeString(currentLevelRole.getName()));
-                                                } else {
-                                                    errorRoles.append(roleChangeString(currentLevelRole.getName()));
-                                                }
-                                            }
-                                        } else {
-                                            if (member.getRoles().contains(currentLevelRole)) {
-                                                if (botRole.canInteract(currentLevelRole)) {
-                                                    guild.removeRoleFromMember(member, currentLevelRole).queue();
-                                                    removedRoles.append(roleChangeString(currentLevelRole.getName()));
-                                                } else {
-                                                    errorRoles.append(roleChangeString(currentLevelRole.getName()));
-                                                }
-                                            }
+                                case "slot_collector": {
+                                    double roleAmount = -1;
+                                    switch (currentRoleName) {
+                                        case "sven":
+                                        case "rev":
+                                        case "tara": {
+                                            roleAmount = player.getSlayer(currentRoleName);
+                                            break;
                                         }
-                                    }
-                                } else {
-                                    for (int i = levelsArray.size() - 1; i >= 0; i--) {
-                                        JsonElement currentLevel = levelsArray.get(i);
-
-                                        int currentLevelValue = higherDepth(currentLevel, "value").getAsInt();
-                                        Role currentLevelRole = event.getGuild()
-                                                .getRoleById(higherDepth(currentLevel, "roleId").getAsString());
-
-                                        if (roleAmount < currentLevelValue) {
-                                            if (member.getRoles().contains(currentLevelRole)) {
-                                                if (botRole.canInteract(currentLevelRole)) {
-                                                    guild.removeRoleFromMember(member, currentLevelRole).queue();
-                                                    removedRoles.append(roleChangeString(currentLevelRole.getName()));
-                                                } else {
-                                                    errorRoles.append(roleChangeString(currentLevelRole.getName()));
-                                                }
-                                            }
-                                        } else {
-                                            if (!member.getRoles().contains(currentLevelRole)) {
-                                                if (botRole.canInteract(currentLevelRole)) {
-                                                    guild.addRoleToMember(member, currentLevelRole).queue();
-                                                    addedRoles.append(roleChangeString(currentLevelRole.getName()));
-                                                } else {
-                                                    errorRoles.append(roleChangeString(currentLevelRole.getName()));
-                                                }
-                                            }
-
-                                            for (int j = i - 1; j >= 0; j--) {
-                                                JsonElement currentLevelRemoveStackable = levelsArray.get(j);
-                                                Role currentLevelRoleRemoveStackable = event.getGuild()
-                                                        .getRoleById(higherDepth(currentLevelRemoveStackable, "roleId")
-                                                                .getAsString());
-
-                                                if (member.getRoles().contains(currentLevelRoleRemoveStackable)) {
-                                                    if (botRole.canInteract(currentLevelRole)) {
-                                                        guild.removeRoleFromMember(member,
-                                                                currentLevelRoleRemoveStackable).queue();
-                                                        removedRoles.append(roleChangeString(
-                                                                currentLevelRoleRemoveStackable.getName()));
-                                                    } else {
-                                                        errorRoles.append(roleChangeString(
-                                                                currentLevelRoleRemoveStackable.getName()));
-                                                    }
-                                                }
+                                        case "bank_coins": {
+                                            roleAmount = player.getBankBalance();
+                                            if (roleAmount == -1 && !disabledAPI.toString().contains("Banking")) {
+                                                disabledAPI.append(roleChangeString("Banking API disabled"));
+                                                continue;
                                             }
                                             break;
                                         }
+                                        case "skill_average": {
+                                            roleAmount = player.getSkillAverage();
+                                            if (roleAmount == -1 && !disabledAPI.toString().contains("Skills")) {
+                                                disabledAPI.append(roleChangeString("Skills API disabled"));
+                                                continue;
+                                            }
+                                            break;
+                                        }
+                                        case "pet_score": {
+                                            roleAmount = player.getPetScore();
+                                            break;
+                                        }
+                                        case "alchemy":
+                                        case "combat":
+                                        case "fishing":
+                                        case "farming":
+                                        case "foraging":
+                                        case "carpentry":
+                                        case "mining":
+                                        case "taming":
+                                        case "enchanting": {
+                                            if (player.getSkill(currentRoleName) != null) {
+                                                roleAmount = player.getSkill(currentRoleName).skillLevel;
+                                            }
+                                            if (roleAmount == -1 && !disabledAPI.toString().contains("Skills")) {
+                                                disabledAPI.append(roleChangeString("Skills API disabled"));
+                                                continue;
+                                            }
+                                            break;
+                                        }
+                                        case "catacombs": {
+                                            if (player.getCatacombsSkill() != null) {
+                                                roleAmount = player.getCatacombsSkill().skillLevel;
+                                            }
+                                            if (roleAmount == -1 && !disabledAPI.toString().contains("Skills")) {
+                                                disabledAPI.append(roleChangeString("Skills API disabled"));
+                                                continue;
+                                            }
+                                            break;
+                                        }
+                                        case "fairy_souls": {
+                                            roleAmount = player.getFairySouls();
+                                            if (roleAmount == -1) {
+                                                continue;
+                                            }
+                                            break;
+                                        }
+                                        case "slot_collector": {
+                                            roleAmount = player.getNumberMinionSlots();
+                                            break;
+                                        }
+                                        case "dungeon_secrets":
+                                            roleAmount = player.getDungeonSecrets();
+                                            break;
+                                        default: {
+                                            continue;
+                                        }
+                                    }
+
+                                    JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
+
+                                    if (higherDepth(currentRole, "stackable").getAsBoolean()) {
+                                        for (JsonElement currentLevel : levelsArray) {
+                                            int currentLevelValue = higherDepth(currentLevel, "value").getAsInt();
+                                            Role currentLevelRole = event.getGuild()
+                                                    .getRoleById(higherDepth(currentLevel, "roleId").getAsString());
+
+                                            if (roleAmount >= currentLevelValue) {
+                                                if (!member.getRoles().contains(currentLevelRole)) {
+                                                    if (botRole.canInteract(currentLevelRole)) {
+                                                        guild.addRoleToMember(member, currentLevelRole).queue();
+                                                        addedRoles.append(roleChangeString(currentLevelRole.getName()));
+                                                    } else {
+                                                        errorRoles.append(roleChangeString(currentLevelRole.getName()));
+                                                    }
+                                                }
+                                            } else {
+                                                if (member.getRoles().contains(currentLevelRole)) {
+                                                    if (botRole.canInteract(currentLevelRole)) {
+                                                        guild.removeRoleFromMember(member, currentLevelRole).queue();
+                                                        removedRoles.append(roleChangeString(currentLevelRole.getName()));
+                                                    } else {
+                                                        errorRoles.append(roleChangeString(currentLevelRole.getName()));
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    } else {
+                                        for (int i = levelsArray.size() - 1; i >= 0; i--) {
+                                            JsonElement currentLevel = levelsArray.get(i);
+
+                                            int currentLevelValue = higherDepth(currentLevel, "value").getAsInt();
+                                            Role currentLevelRole = event.getGuild()
+                                                    .getRoleById(higherDepth(currentLevel, "roleId").getAsString());
+
+                                            if (roleAmount < currentLevelValue) {
+                                                if (member.getRoles().contains(currentLevelRole)) {
+                                                    if (botRole.canInteract(currentLevelRole)) {
+                                                        guild.removeRoleFromMember(member, currentLevelRole).queue();
+                                                        removedRoles.append(roleChangeString(currentLevelRole.getName()));
+                                                    } else {
+                                                        errorRoles.append(roleChangeString(currentLevelRole.getName()));
+                                                    }
+                                                }
+                                            } else {
+                                                if (!member.getRoles().contains(currentLevelRole)) {
+                                                    if (botRole.canInteract(currentLevelRole)) {
+                                                        guild.addRoleToMember(member, currentLevelRole).queue();
+                                                        addedRoles.append(roleChangeString(currentLevelRole.getName()));
+                                                    } else {
+                                                        errorRoles.append(roleChangeString(currentLevelRole.getName()));
+                                                    }
+                                                }
+
+                                                for (int j = i - 1; j >= 0; j--) {
+                                                    JsonElement currentLevelRemoveStackable = levelsArray.get(j);
+                                                    Role currentLevelRoleRemoveStackable = event.getGuild()
+                                                            .getRoleById(higherDepth(currentLevelRemoveStackable, "roleId")
+                                                                    .getAsString());
+
+                                                    if (member.getRoles().contains(currentLevelRoleRemoveStackable)) {
+                                                        if (botRole.canInteract(currentLevelRole)) {
+                                                            guild.removeRoleFromMember(member,
+                                                                    currentLevelRoleRemoveStackable).queue();
+                                                            removedRoles.append(roleChangeString(
+                                                                    currentLevelRoleRemoveStackable.getName()));
+                                                        } else {
+                                                            errorRoles.append(roleChangeString(
+                                                                    currentLevelRoleRemoveStackable.getName()));
+                                                        }
+                                                    }
+                                                }
+                                                break;
+                                            }
+                                        }
+                                        break;
+                                    }
+                                }
+                                case "doom_slayer": {
+                                    Role curRole = guild.getRoleById(
+                                            higherDepth(higherDepth(currentRole, "levels").getAsJsonArray().get(0),
+                                                    "roleId").getAsString());
+
+                                    if ((player.getWolfXp() >= 1000000) || (player.getZombieXp() >= 1000000)
+                                            || (player.getSpiderXp() >= 1000000)) {
+                                        if (!guild.getMember(user).getRoles().contains(curRole)) {
+                                            if (botRole.canInteract(curRole)) {
+                                                guild.addRoleToMember(guild.getMember(user), curRole).queue();
+                                                addedRoles.append(roleChangeString(curRole.getName()));
+                                            } else {
+                                                errorRoles.append(roleChangeString(curRole.getName()));
+                                            }
+                                        }
+                                    } else {
+                                        if (guild.getMember(user).getRoles().contains(curRole)) {
+                                            if (botRole.canInteract(curRole)) {
+                                                removedRoles.append(roleChangeString(curRole.getName()));
+                                                guild.removeRoleFromMember(guild.getMember(user), curRole).queue();
+                                            } else {
+                                                errorRoles.append(roleChangeString(curRole.getName()));
+                                            }
+                                        }
                                     }
                                     break;
                                 }
-                            }
-                            case "doom_slayer": {
-                                Role curRole = guild.getRoleById(
-                                        higherDepth(higherDepth(currentRole, "levels").getAsJsonArray().get(0),
-                                                "roleId").getAsString());
+                                case "all_slayer_nine": {
+                                    Role curRole = guild.getRoleById(
+                                            higherDepth(higherDepth(currentRole, "levels").getAsJsonArray().get(0),
+                                                    "roleId").getAsString());
 
-                                if ((player.getWolfXp() >= 1000000) || (player.getZombieXp() >= 1000000)
-                                        || (player.getSpiderXp() >= 1000000)) {
-                                    if (!guild.getMember(user).getRoles().contains(curRole)) {
-                                        if (botRole.canInteract(curRole)) {
-                                            guild.addRoleToMember(guild.getMember(user), curRole).queue();
-                                            addedRoles.append(roleChangeString(curRole.getName()));
-                                        } else {
-                                            errorRoles.append(roleChangeString(curRole.getName()));
+                                    if ((player.getWolfXp() >= 1000000) && (player.getZombieXp() >= 1000000)
+                                            && (player.getSpiderXp() >= 1000000)) {
+                                        if (!guild.getMember(user).getRoles().contains(curRole)) {
+                                            if (botRole.canInteract(curRole)) {
+                                                guild.addRoleToMember(guild.getMember(user), curRole).queue();
+                                                addedRoles.append(roleChangeString(curRole.getName()));
+                                            } else {
+                                                errorRoles.append(roleChangeString(curRole.getName()));
+                                            }
+                                        }
+                                    } else {
+                                        if (guild.getMember(user).getRoles().contains(curRole)) {
+                                            if (botRole.canInteract(curRole)) {
+                                                removedRoles.append(roleChangeString(curRole.getName()));
+                                                guild.removeRoleFromMember(guild.getMember(user), curRole).queue();
+                                            } else {
+                                                errorRoles.append(roleChangeString(curRole.getName()));
+                                            }
                                         }
                                     }
-                                } else {
-                                    if (guild.getMember(user).getRoles().contains(curRole)) {
-                                        if (botRole.canInteract(curRole)) {
-                                            removedRoles.append(roleChangeString(curRole.getName()));
-                                            guild.removeRoleFromMember(guild.getMember(user), curRole).queue();
-                                        } else {
-                                            errorRoles.append(roleChangeString(curRole.getName()));
-                                        }
-                                    }
+                                    break;
                                 }
-                                break;
-                            }
-                            case "all_slayer_nine": {
-                                Role curRole = guild.getRoleById(
-                                        higherDepth(higherDepth(currentRole, "levels").getAsJsonArray().get(0),
-                                                "roleId").getAsString());
+                                case "pet_enthusiast": {
+                                    JsonArray playerPets = player.getPets();
+                                    ArrayList<String> excludedPets = new ArrayList<>();
+                                    excludedPets.add("guardian");
+                                    excludedPets.add("jellyfish");
+                                    excludedPets.add("parrot");
+                                    excludedPets.add("sheep");
 
-                                if ((player.getWolfXp() >= 1000000) && (player.getZombieXp() >= 1000000)
-                                        && (player.getSpiderXp() >= 1000000)) {
-                                    if (!guild.getMember(user).getRoles().contains(curRole)) {
-                                        if (botRole.canInteract(curRole)) {
-                                            guild.addRoleToMember(guild.getMember(user), curRole).queue();
-                                            addedRoles.append(roleChangeString(curRole.getName()));
-                                        } else {
-                                            errorRoles.append(roleChangeString(curRole.getName()));
-                                        }
-                                    }
-                                } else {
-                                    if (guild.getMember(user).getRoles().contains(curRole)) {
-                                        if (botRole.canInteract(curRole)) {
-                                            removedRoles.append(roleChangeString(curRole.getName()));
-                                            guild.removeRoleFromMember(guild.getMember(user), curRole).queue();
-                                        } else {
-                                            errorRoles.append(roleChangeString(curRole.getName()));
-                                        }
-                                    }
-                                }
-                                break;
-                            }
-                            case "pet_enthusiast": {
-                                JsonArray playerPets = player.getPets();
-                                ArrayList<String> excludedPets = new ArrayList<>();
-                                excludedPets.add("guardian");
-                                excludedPets.add("jellyfish");
-                                excludedPets.add("parrot");
-                                excludedPets.add("sheep");
-
-                                boolean isPetEnthusiast = false;
-                                Role petEnthusiastRole = guild.getRoleById(
-                                        higherDepth(higherDepth(currentRole, "levels").getAsJsonArray().get(0),
-                                                "roleId").getAsString());
-                                for (JsonElement currentPet : playerPets) {
-                                    String currentPetRarity = higherDepth(currentPet, "tier").getAsString()
-                                            .toLowerCase();
-                                    if (currentPetRarity.equals("epic") || currentPetRarity.equals("legendary")) {
-                                        if (!excludedPets.contains(
-                                                higherDepth(currentPet, "type").getAsString().toLowerCase())) {
-                                            long currentPetExp = higherDepth(currentPet, "exp").getAsLong();
-                                            if (player.petLevelFromXp(currentPetExp, currentPetRarity) == 100) {
-                                                isPetEnthusiast = true;
-                                                if (!guild.getMember(user).getRoles().contains(petEnthusiastRole)) {
-                                                    if (botRole.canInteract(petEnthusiastRole)) {
-                                                        guild.addRoleToMember(guild.getMember(user), petEnthusiastRole)
-                                                                .queue();
-                                                        addedRoles
-                                                                .append(roleChangeString(petEnthusiastRole.getName()));
-                                                    } else {
-                                                        errorRoles
-                                                                .append(roleChangeString(petEnthusiastRole.getName()));
+                                    boolean isPetEnthusiast = false;
+                                    Role petEnthusiastRole = guild.getRoleById(
+                                            higherDepth(higherDepth(currentRole, "levels").getAsJsonArray().get(0),
+                                                    "roleId").getAsString());
+                                    for (JsonElement currentPet : playerPets) {
+                                        String currentPetRarity = higherDepth(currentPet, "tier").getAsString()
+                                                .toLowerCase();
+                                        if (currentPetRarity.equals("epic") || currentPetRarity.equals("legendary")) {
+                                            if (!excludedPets.contains(
+                                                    higherDepth(currentPet, "type").getAsString().toLowerCase())) {
+                                                long currentPetExp = higherDepth(currentPet, "exp").getAsLong();
+                                                if (player.petLevelFromXp(currentPetExp, currentPetRarity) == 100) {
+                                                    isPetEnthusiast = true;
+                                                    if (!guild.getMember(user).getRoles().contains(petEnthusiastRole)) {
+                                                        if (botRole.canInteract(petEnthusiastRole)) {
+                                                            guild.addRoleToMember(guild.getMember(user), petEnthusiastRole)
+                                                                    .queue();
+                                                            addedRoles
+                                                                    .append(roleChangeString(petEnthusiastRole.getName()));
+                                                        } else {
+                                                            errorRoles
+                                                                    .append(roleChangeString(petEnthusiastRole.getName()));
+                                                        }
+                                                        break;
                                                     }
-                                                    break;
                                                 }
                                             }
                                         }
                                     }
-                                }
-                                if (guild.getMember(user).getRoles().contains(petEnthusiastRole) && !isPetEnthusiast) {
-                                    if (botRole.canInteract(petEnthusiastRole)) {
-                                        removedRoles.append(roleChangeString(petEnthusiastRole.getName()));
-                                        guild.removeRoleFromMember(guild.getMember(user), petEnthusiastRole).queue();
-                                    } else {
-                                        errorRoles.append(roleChangeString(petEnthusiastRole.getName()));
+                                    if (guild.getMember(user).getRoles().contains(petEnthusiastRole) && !isPetEnthusiast) {
+                                        if (botRole.canInteract(petEnthusiastRole)) {
+                                            removedRoles.append(roleChangeString(petEnthusiastRole.getName()));
+                                            guild.removeRoleFromMember(guild.getMember(user), petEnthusiastRole).queue();
+                                        } else {
+                                            errorRoles.append(roleChangeString(petEnthusiastRole.getName()));
+                                        }
                                     }
+                                    break;
                                 }
-                                break;
-                            }
                             }
                         }
                         eb.setDescription(

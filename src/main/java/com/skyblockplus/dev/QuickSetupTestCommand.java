@@ -36,15 +36,15 @@ public class QuickSetupTestCommand extends Command {
                     return;
                 } else if (args[1].equals("delete")) {
                     switch (args[2]) {
-                    case "server":
-                        ebMessage.editMessage(deleteServer(args[3]).build()).queue();
-                        return;
-                    case "apply_cache":
-                        ebMessage.editMessage(deleteServerApplyCache(args[3]).build()).queue();
-                        return;
-                    case "skyblock_event":
-                        ebMessage.editMessage(deleteSkyblockEvent(args[3]).build()).queue();
-                        return;
+                        case "server":
+                            ebMessage.editMessage(deleteServer(args[3]).build()).queue();
+                            return;
+                        case "apply_cache":
+                            ebMessage.editMessage(deleteServerApplyCache(args[3]).build()).queue();
+                            return;
+                        case "skyblock_event":
+                            ebMessage.editMessage(deleteSkyblockEvent(args[3]).build()).queue();
+                            return;
                     }
                 }
             }

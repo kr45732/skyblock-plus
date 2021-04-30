@@ -1,25 +1,5 @@
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.Utils.BOT_PREFIX;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.defaultPaginator;
-import static com.skyblockplus.utils.Utils.errorMessage;
-import static com.skyblockplus.utils.Utils.formatNumber;
-import static com.skyblockplus.utils.Utils.getJsonKeys;
-import static com.skyblockplus.utils.Utils.globalCooldown;
-import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.utils.Utils.loadingEmbed;
-import static com.skyblockplus.utils.Utils.logCommand;
-import static com.skyblockplus.utils.Utils.roundAndFormat;
-import static com.skyblockplus.utils.Utils.simplifyNumber;
-
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
-import java.util.Locale;
-
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -27,9 +7,17 @@ import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.ArmorStruct;
 import com.skyblockplus.utils.structs.PaginatorExtras;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.Locale;
+
+import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.utils.Utils.*;
 
 public class SkyblockCommand extends Command {
 
@@ -106,15 +94,15 @@ public class SkyblockCommand extends Command {
                     : 0) + "\n";
             skillsPageString += "• **Current Golds:** "
                     + (higherDepth(higherDepth(jacobJson, "medals_inv"), "gold") == null ? 0
-                            : higherDepth(higherDepth(jacobJson, "medals_inv"), "gold").getAsInt())
+                    : higherDepth(higherDepth(jacobJson, "medals_inv"), "gold").getAsInt())
                     + "\n";
             skillsPageString += "• **Current Silvers:** "
                     + (higherDepth(higherDepth(jacobJson, "medals_inv"), "silver") == null ? 0
-                            : higherDepth(higherDepth(jacobJson, "medals_inv"), "silver").getAsInt())
+                    : higherDepth(higherDepth(jacobJson, "medals_inv"), "silver").getAsInt())
                     + "\n";
             skillsPageString += "• **Current Bronzes:** "
                     + (higherDepth(higherDepth(jacobJson, "medals_inv"), "bronze") == null ? 0
-                            : higherDepth(higherDepth(jacobJson, "medals_inv"), "bronze").getAsInt())
+                    : higherDepth(higherDepth(jacobJson, "medals_inv"), "bronze").getAsInt())
                     + "\n";
             skillsPageString += "\n";
 
@@ -142,7 +130,7 @@ public class SkyblockCommand extends Command {
             dungeonsPageString += "__**Catacombs**__" + "\n";
             dungeonsPageString += "• **Catacombs:** " + roundAndFormat(player.getCatacombsLevel()) + "\n";
 
-            String[] pageTitles = { "General", "Armor", "Skills", "Dungeons" };
+            String[] pageTitles = {"General", "Armor", "Skills", "Dungeons"};
             CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1)
                     .setItemsPerPage(1).setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles));
             paginateBuilder.addItems(generalPageString, armorPageString, skillsPageString, dungeonsPageString);

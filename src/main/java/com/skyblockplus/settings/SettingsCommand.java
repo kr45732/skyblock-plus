@@ -1,24 +1,5 @@
 package com.skyblockplus.settings;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.Utils.BOT_PREFIX;
-import static com.skyblockplus.utils.Utils.HYPIXEL_API_KEY;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.defaultPaginator;
-import static com.skyblockplus.utils.Utils.getJson;
-import static com.skyblockplus.utils.Utils.getJsonKeys;
-import static com.skyblockplus.utils.Utils.globalCooldown;
-import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.utils.Utils.loadingEmbed;
-import static com.skyblockplus.utils.Utils.logCommand;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -34,7 +15,6 @@ import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSetting
 import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.vdurmont.emoji.EmojiParser;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
@@ -42,13 +22,19 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 
+import java.util.*;
+
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.utils.Utils.*;
+
 public class SettingsCommand extends Command {
     private CommandEvent event;
 
     public SettingsCommand() {
         this.name = "settings";
         this.cooldown = globalCooldown + 1;
-        this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
+        this.userPermissions = new Permission[]{Permission.ADMINISTRATOR};
     }
 
     @Override
@@ -200,53 +186,53 @@ public class SettingsCommand extends Command {
                     }
                 } else if (args.length == 4) {
                     switch (args[2]) {
-                    case "message":
-                        eb = setApplyMessageText(args[3]);
-                        break;
-                    case "staff_role":
-                        eb = setApplyStaffPingRoleId(args[3]);
-                        break;
-                    case "channel":
-                        eb = setApplyMessageTextChannelId(args[3]);
-                        break;
-                    case "prefix":
-                        eb = setApplyNewChannelPrefix(args[3]);
-                        break;
-                    case "category":
-                        eb = setApplyNewChannelCategory(args[3]);
-                        break;
-                    case "staff_channel":
-                        eb = setApplyMessageStaffChannelId(args[3]);
-                        break;
-                    case "accept_message":
-                        eb = setApplyAcceptMessageText(args[3]);
-                        break;
-                    case "waitlist_message":
-                        eb = setApplyWaitListMessageText(args[3]);
-                        break;
-                    case "deny_message":
-                        eb = setApplyDenyMessageText(args[3]);
-                        break;
-                    case "reqs":
-                    case "req":
-                    case "requirements":
-                        args = content.split(" ");
+                        case "message":
+                            eb = setApplyMessageText(args[3]);
+                            break;
+                        case "staff_role":
+                            eb = setApplyStaffPingRoleId(args[3]);
+                            break;
+                        case "channel":
+                            eb = setApplyMessageTextChannelId(args[3]);
+                            break;
+                        case "prefix":
+                            eb = setApplyNewChannelPrefix(args[3]);
+                            break;
+                        case "category":
+                            eb = setApplyNewChannelCategory(args[3]);
+                            break;
+                        case "staff_channel":
+                            eb = setApplyMessageStaffChannelId(args[3]);
+                            break;
+                        case "accept_message":
+                            eb = setApplyAcceptMessageText(args[3]);
+                            break;
+                        case "waitlist_message":
+                            eb = setApplyWaitListMessageText(args[3]);
+                            break;
+                        case "deny_message":
+                            eb = setApplyDenyMessageText(args[3]);
+                            break;
+                        case "reqs":
+                        case "req":
+                        case "requirements":
+                            args = content.split(" ");
 
-                        if (args.length >= 5) {
-                            if (args[3].equals("add")) {
-                                eb = addApplyRequirement(content.split(" ", 5)[4]);
-                            } else if (args[3].equals("remove")) {
-                                eb = removeApplyRequirement(args[4]);
+                            if (args.length >= 5) {
+                                if (args[3].equals("add")) {
+                                    eb = addApplyRequirement(content.split(" ", 5)[4]);
+                                } else if (args[3].equals("remove")) {
+                                    eb = removeApplyRequirement(args[4]);
+                                } else {
+                                    eb = defaultEmbed("Error").setDescription("Invalid setting");
+                                }
                             } else {
                                 eb = defaultEmbed("Error").setDescription("Invalid setting");
                             }
-                        } else {
-                            eb = defaultEmbed("Error").setDescription("Invalid setting");
-                        }
-                        break;
-                    default:
-                        eb = defaultEmbed("Error", null).setDescription("Invalid setting");
-                        break;
+                            break;
+                        default:
+                            eb = defaultEmbed("Error", null).setDescription("Invalid setting");
+                            break;
                     }
                 }
             } else if (content.split(" ", 4).length >= 2 && content.split(" ", 4)[1].equals("verify")) {
@@ -274,21 +260,21 @@ public class SettingsCommand extends Command {
                     }
                 } else if (args.length == 4) {
                     switch (args[2]) {
-                    case "message":
-                        eb = setVerifyMessageText(args[3]);
-                        break;
-                    case "role":
-                        eb = setVerifyVerifiedRole(args[3]);
-                        break;
-                    case "channel":
-                        eb = setVerifyMessageTextChannelId(args[3]);
-                        break;
-                    case "nickname":
-                        eb = setVerifyNickname(args[3]);
-                        break;
-                    default:
-                        eb = defaultEmbed("Error", null).setDescription("Invalid setting");
-                        break;
+                        case "message":
+                            eb = setVerifyMessageText(args[3]);
+                            break;
+                        case "role":
+                            eb = setVerifyVerifiedRole(args[3]);
+                            break;
+                        case "channel":
+                            eb = setVerifyMessageTextChannelId(args[3]);
+                            break;
+                        case "nickname":
+                            eb = setVerifyNickname(args[3]);
+                            break;
+                        default:
+                            eb = defaultEmbed("Error", null).setDescription("Invalid setting");
+                            break;
                     }
                 }
             } else if ((args.length >= 2) && args[1].equals("guild")) {
@@ -301,36 +287,36 @@ public class SettingsCommand extends Command {
                     }
                 } else if (args.length == 4) {
                     switch (args[2]) {
-                    case "set":
-                        eb = setGuildRoleId(args[3]);
-                        break;
-                    case "role":
-                        eb = setGuildRoleName(args[3]);
-                        break;
-                    case "enable":
-                        if (args[3].equals("role")) {
-                            eb = setGuildRoleEnable("true");
-                        } else if (args[3].equals("rank")) {
-                            eb = setGuildRankEnable("true");
-                        } else {
+                        case "set":
+                            eb = setGuildRoleId(args[3]);
+                            break;
+                        case "role":
+                            eb = setGuildRoleName(args[3]);
+                            break;
+                        case "enable":
+                            if (args[3].equals("role")) {
+                                eb = setGuildRoleEnable("true");
+                            } else if (args[3].equals("rank")) {
+                                eb = setGuildRankEnable("true");
+                            } else {
+                                eb = defaultEmbed("Error").setDescription("Invalid setting");
+                            }
+                            break;
+                        case "disable":
+                            if (args[3].equals("role")) {
+                                eb = setGuildRoleEnable("false");
+                            } else if (args[3].equals("rank")) {
+                                eb = setGuildRankEnable("false");
+                            } else {
+                                eb = defaultEmbed("Error").setDescription("Invalid setting");
+                            }
+                            break;
+                        case "remove":
+                            eb = removeGuildRank(args[3]);
+                            break;
+                        default:
                             eb = defaultEmbed("Error").setDescription("Invalid setting");
-                        }
-                        break;
-                    case "disable":
-                        if (args[3].equals("role")) {
-                            eb = setGuildRoleEnable("false");
-                        } else if (args[3].equals("rank")) {
-                            eb = setGuildRankEnable("false");
-                        } else {
-                            eb = defaultEmbed("Error").setDescription("Invalid setting");
-                        }
-                        break;
-                    case "remove":
-                        eb = removeGuildRank(args[3]);
-                        break;
-                    default:
-                        eb = defaultEmbed("Error").setDescription("Invalid setting");
-                        break;
+                            break;
                     }
                 } else if (args.length == 5) {
                     if (args[2].equals("add")) {
@@ -364,7 +350,7 @@ public class SettingsCommand extends Command {
             for (JsonElement guildRank : higherDepth(currentSettings, "guildRanks").getAsJsonArray()) {
                 guildRanksString.append("\n• ").append(higherDepth(guildRank, "minecraftRoleName").getAsString())
                         .append(" - ").append(event.getGuild()
-                                .getRoleById(higherDepth(guildRank, "discordRoleId").getAsString()).getAsMention());
+                        .getRoleById(higherDepth(guildRank, "discordRoleId").getAsString()).getAsMention());
             }
         } catch (Exception ignored) {
         }
@@ -631,80 +617,80 @@ public class SettingsCommand extends Command {
             }
 
             switch (roleName) {
-            case "guild_member": {
-                ebFieldString.append("**Member role for Hypixel guilds**\nExample: `").append(BOT_PREFIX)
-                        .append("settings roles add guild_member skyblock_forceful @sbf guild member`\n");
-                break;
-            }
-            case "sven": {
-                ebFieldString.append("**A player's sven packmaster slayer xp**\nExample: `").append(BOT_PREFIX)
-                        .append("settings roles add sven 1000000 @sven 9`\n");
-                break;
-            }
-            case "rev": {
-                ebFieldString.append("**A player's revenant horror xp slayer**\nExample: `").append(BOT_PREFIX)
-                        .append("settings roles add rev 400000 @rev 8`\n");
-                break;
-            }
-            case "tara": {
-                ebFieldString.append("**A player's tarantula broodfather slayer xp**\nExample: `").append(BOT_PREFIX)
-                        .append("settings roles add tara 100000 @tara 7`\n");
-                break;
-            }
-            case "bank_coins": {
-                ebFieldString.append("**Coins in a player's bank**\nExample: `").append(BOT_PREFIX)
-                        .append("settings roles add bank_coins 1000000 @millionaire`\n");
-                break;
-            }
-            case "alchemy":
-            case "combat":
-            case "fishing":
-            case "farming":
-            case "foraging":
-            case "carpentry":
-            case "mining":
-            case "taming":
-            case "enchanting":
-            case "skill_average":
-            case "pet_score":
-            case "catacombs": {
-                ebFieldString.append("**A player's ").append(roleName).append(" level**\nExample: `").append(BOT_PREFIX)
-                        .append("settings roles add ").append(roleName).append(" 30 @").append(roleName)
-                        .append(" 30`\n");
-                break;
-            }
-            case "fairy_souls": {
-                ebFieldString.append("**Amount of collected fairy souls**\nExample: `").append(BOT_PREFIX)
-                        .append("settings roles add fairy_souls 50 @50 souls collected`\n");
-                break;
-            }
-            case "slot_collector": {
-                ebFieldString
-                        .append("**Number of minion slots excluding upgrades (__not fully working__)**\nExample: `")
-                        .append(BOT_PREFIX).append("settings roles add slot_collector 24 @maxed minion slots`\n");
-                break;
-            }
-            case "pet_enthusiast": {
-                ebFieldString.append(
-                        "**Having a level 100 epic or legendary pet that is not an enchanting or alchemy pet**\nExample: `")
-                        .append(BOT_PREFIX).append("settings roles set pet_enthusiast @level 100 pet`\n");
-                break;
-            }
-            case "doom_slayer": {
-                ebFieldString.append("**Having at least one level nine slayer**\nExample: `").append(BOT_PREFIX)
-                        .append("settings roles set doom_slayer @level nine slayer`\n");
-                break;
-            }
-            case "all_slayer_nine": {
-                ebFieldString.append("**Having all level nine slayers**\nExample: `").append(BOT_PREFIX)
-                        .append("settings roles set all_slayer_nine @role`\n");
-                break;
-            }
-            case "dungeon_secrets": {
-                ebFieldString.append("**A player's dungeon secrets count**\nExample: `").append(BOT_PREFIX)
-                        .append("settings roles add dungeon_secrets 25000 @secret sweat`\n");
-                break;
-            }
+                case "guild_member": {
+                    ebFieldString.append("**Member role for Hypixel guilds**\nExample: `").append(BOT_PREFIX)
+                            .append("settings roles add guild_member skyblock_forceful @sbf guild member`\n");
+                    break;
+                }
+                case "sven": {
+                    ebFieldString.append("**A player's sven packmaster slayer xp**\nExample: `").append(BOT_PREFIX)
+                            .append("settings roles add sven 1000000 @sven 9`\n");
+                    break;
+                }
+                case "rev": {
+                    ebFieldString.append("**A player's revenant horror xp slayer**\nExample: `").append(BOT_PREFIX)
+                            .append("settings roles add rev 400000 @rev 8`\n");
+                    break;
+                }
+                case "tara": {
+                    ebFieldString.append("**A player's tarantula broodfather slayer xp**\nExample: `").append(BOT_PREFIX)
+                            .append("settings roles add tara 100000 @tara 7`\n");
+                    break;
+                }
+                case "bank_coins": {
+                    ebFieldString.append("**Coins in a player's bank**\nExample: `").append(BOT_PREFIX)
+                            .append("settings roles add bank_coins 1000000 @millionaire`\n");
+                    break;
+                }
+                case "alchemy":
+                case "combat":
+                case "fishing":
+                case "farming":
+                case "foraging":
+                case "carpentry":
+                case "mining":
+                case "taming":
+                case "enchanting":
+                case "skill_average":
+                case "pet_score":
+                case "catacombs": {
+                    ebFieldString.append("**A player's ").append(roleName).append(" level**\nExample: `").append(BOT_PREFIX)
+                            .append("settings roles add ").append(roleName).append(" 30 @").append(roleName)
+                            .append(" 30`\n");
+                    break;
+                }
+                case "fairy_souls": {
+                    ebFieldString.append("**Amount of collected fairy souls**\nExample: `").append(BOT_PREFIX)
+                            .append("settings roles add fairy_souls 50 @50 souls collected`\n");
+                    break;
+                }
+                case "slot_collector": {
+                    ebFieldString
+                            .append("**Number of minion slots excluding upgrades (__not fully working__)**\nExample: `")
+                            .append(BOT_PREFIX).append("settings roles add slot_collector 24 @maxed minion slots`\n");
+                    break;
+                }
+                case "pet_enthusiast": {
+                    ebFieldString.append(
+                            "**Having a level 100 epic or legendary pet that is not an enchanting or alchemy pet**\nExample: `")
+                            .append(BOT_PREFIX).append("settings roles set pet_enthusiast @level 100 pet`\n");
+                    break;
+                }
+                case "doom_slayer": {
+                    ebFieldString.append("**Having at least one level nine slayer**\nExample: `").append(BOT_PREFIX)
+                            .append("settings roles set doom_slayer @level nine slayer`\n");
+                    break;
+                }
+                case "all_slayer_nine": {
+                    ebFieldString.append("**Having all level nine slayers**\nExample: `").append(BOT_PREFIX)
+                            .append("settings roles set all_slayer_nine @role`\n");
+                    break;
+                }
+                case "dungeon_secrets": {
+                    ebFieldString.append("**A player's dungeon secrets count**\nExample: `").append(BOT_PREFIX)
+                            .append("settings roles add dungeon_secrets 25000 @secret sweat`\n");
+                    break;
+                }
             }
 
             ebFieldString.append("\nCurrent Settings:\n");
@@ -733,7 +719,7 @@ public class SettingsCommand extends Command {
                         ebFieldString.append("\n• ")
                                 .append(higherDepth(higherDepth(guildJson, "guild"), "name").getAsString())
                                 .append(" - ").append(event.getGuild()
-                                        .getRoleById(higherDepth(roleLevel, "roleId").getAsString()).getAsMention());
+                                .getRoleById(higherDepth(roleLevel, "roleId").getAsString()).getAsMention());
                     }
                 } else {
                     for (JsonElement roleLevel : higherDepth(currentRoleSettings, "levels").getAsJsonArray()) {
@@ -1455,7 +1441,7 @@ public class SettingsCommand extends Command {
                     return "None";
                 }
 
-                String reqsString = "\n";
+                StringBuilder reqsString = new StringBuilder("\n");
                 for (int i = 0; i < reqs.size(); i++) {
                     JsonElement req = reqs.get(i);
                     String slayerReq = higherDepth(req, "slayerReq").getAsString();
@@ -1463,60 +1449,59 @@ public class SettingsCommand extends Command {
                     String cataReq = higherDepth(req, "catacombsReq").getAsString();
                     String weightReq = higherDepth(req, "weightReq").getAsString();
 
-                    reqsString += "`" + (i + 1) + ")` " + slayerReq + " slayer and " + skillsReq + " skill average and "
-                            + cataReq + " cata and " + weightReq + " weight";
+                    reqsString.append("`").append(i + 1).append(")` ").append(slayerReq).append(" slayer and ").append(skillsReq).append(" skill average and ").append(cataReq).append(" cata and ").append(weightReq).append(" weight");
                 }
 
-                return reqsString;
+                return reqsString.toString();
             }
 
             String currentSettingValue = higherDepth(jsonSettings, settingName).getAsString();
             if (currentSettingValue.length() > 0) {
                 switch (settingName) {
-                case "messageTextChannelId":
-                case "messageStaffChannelId":
-                    try {
-                        return event.getGuild().getTextChannelById(currentSettingValue).getAsMention();
-                    } catch (PermissionException e) {
-                        if (e.getMessage().contains("Missing permission")) {
-                            return "Missing permission: " + e.getMessage().split("Missing permission: ")[1];
+                    case "messageTextChannelId":
+                    case "messageStaffChannelId":
+                        try {
+                            return event.getGuild().getTextChannelById(currentSettingValue).getAsMention();
+                        } catch (PermissionException e) {
+                            if (e.getMessage().contains("Missing permission")) {
+                                return "Missing permission: " + e.getMessage().split("Missing permission: ")[1];
+                            }
                         }
-                    }
-                    break;
-                case "verifiedRole":
-                case "staffPingRoleId":
-                case "roleId":
-                    try {
-                        return event.getGuild().getRoleById(currentSettingValue).getAsMention();
-                    } catch (PermissionException e) {
-                        if (e.getMessage().contains("Missing permission")) {
-                            return "Missing permission: " + e.getMessage().split("Missing permission: ")[1];
+                        break;
+                    case "verifiedRole":
+                    case "staffPingRoleId":
+                    case "roleId":
+                        try {
+                            return event.getGuild().getRoleById(currentSettingValue).getAsMention();
+                        } catch (PermissionException e) {
+                            if (e.getMessage().contains("Missing permission")) {
+                                return "Missing permission: " + e.getMessage().split("Missing permission: ")[1];
+                            }
                         }
-                    }
-                    break;
-                case "newChannelCategory":
-                    try {
-                        return "<#" + event.getGuild().getCategoryById(currentSettingValue).getId() + ">";
-                    } catch (PermissionException e) {
-                        if (e.getMessage().contains("Missing permission")) {
-                            return "Missing permission: " + e.getMessage().split("Missing permission: ")[1];
+                        break;
+                    case "newChannelCategory":
+                        try {
+                            return "<#" + event.getGuild().getCategoryById(currentSettingValue).getId() + ">";
+                        } catch (PermissionException e) {
+                            if (e.getMessage().contains("Missing permission")) {
+                                return "Missing permission: " + e.getMessage().split("Missing permission: ")[1];
+                            }
                         }
-                    }
-                    break;
-                case "enable":
-                    return currentSettingValue.equals("true") ? "• Enabled" : "• Disabled";
-                case "guildId":
-                    try {
-                        JsonElement guildJson = getJson(
-                                "https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&id=" + currentSettingValue);
-                        return higherDepth(higherDepth(guildJson, "guild"), "name").getAsString();
-                    } catch (Exception e) {
-                        return "Error finding guild associated with " + currentSettingValue + " id";
-                    }
-                case "enableGuildRole":
-                    return currentSettingValue.equals("true") ? "• Guild role enabled" : "• Guild role disabled";
-                case "enableGuildRanks":
-                    return currentSettingValue.equals("true") ? "• Guild ranks enabled" : "• Guild ranks disabled";
+                        break;
+                    case "enable":
+                        return currentSettingValue.equals("true") ? "• Enabled" : "• Disabled";
+                    case "guildId":
+                        try {
+                            JsonElement guildJson = getJson(
+                                    "https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&id=" + currentSettingValue);
+                            return higherDepth(higherDepth(guildJson, "guild"), "name").getAsString();
+                        } catch (Exception e) {
+                            return "Error finding guild associated with " + currentSettingValue + " id";
+                        }
+                    case "enableGuildRole":
+                        return currentSettingValue.equals("true") ? "• Guild role enabled" : "• Guild role disabled";
+                    case "enableGuildRanks":
+                        return currentSettingValue.equals("true") ? "• Guild ranks enabled" : "• Guild ranks disabled";
                 }
                 return currentSettingValue;
             }
