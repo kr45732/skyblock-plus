@@ -1,15 +1,18 @@
 package com.skyblockplus.miscellaneous;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.utils.CustomPaginator;
-import com.skyblockplus.utils.structs.PaginatorExtras;
-import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
+import static com.skyblockplus.Main.asyncHttpClient;
+import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.utils.Utils.HYPIXEL_API_KEY;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.defaultPaginator;
+import static com.skyblockplus.utils.Utils.errorMessage;
+import static com.skyblockplus.utils.Utils.getJson;
+import static com.skyblockplus.utils.Utils.getJsonKeys;
+import static com.skyblockplus.utils.Utils.globalCooldown;
+import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.Utils.loadingEmbed;
+import static com.skyblockplus.utils.Utils.logCommand;
+import static com.skyblockplus.utils.Utils.usernameToUuid;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -20,9 +23,17 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
-import static com.skyblockplus.Main.asyncHttpClient;
-import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.Utils.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.CustomPaginator;
+import com.skyblockplus.utils.structs.PaginatorExtras;
+import com.skyblockplus.utils.structs.UsernameUuidStruct;
+
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 
 public class ProfilesCommand extends Command {
 
@@ -63,8 +74,13 @@ public class ProfilesCommand extends Command {
                     .ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT).withLocale(Locale.US)
                     .withZone(ZoneId.systemDefault());
 
-            JsonArray profileArray = higherDepth(getJson("https://api.hypixel.net/skyblock/profiles?key="
-                    + HYPIXEL_API_KEY + "&uuid=" + usernameUuidStruct.playerUuid), "profiles").getAsJsonArray();
+            JsonArray profileArray;
+            try {
+                profileArray = higherDepth(getJson("https://api.hypixel.net/skyblock/profiles?key=" + HYPIXEL_API_KEY
+                        + "&uuid=" + usernameUuidStruct.playerUuid), "profiles").getAsJsonArray();
+            } catch (Exception e) {
+                return defaultEmbed("Unable to fetch player data");
+            }
 
             List<CompletableFuture<String>> profileUsernameFutureList = new ArrayList<>();
 

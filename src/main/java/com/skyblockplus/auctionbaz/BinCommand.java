@@ -19,6 +19,7 @@ public class BinCommand extends Command {
     public BinCommand() {
         this.name = "bin";
         this.cooldown = globalCooldown;
+        this.aliases = new String[] { "lbin" };
     }
 
     @Override

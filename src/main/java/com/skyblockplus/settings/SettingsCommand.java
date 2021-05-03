@@ -34,7 +34,7 @@ public class SettingsCommand extends Command {
     public SettingsCommand() {
         this.name = "settings";
         this.cooldown = globalCooldown + 1;
-        this.userPermissions = new Permission[]{Permission.ADMINISTRATOR};
+        this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
     }
 
     @Override
@@ -350,7 +350,7 @@ public class SettingsCommand extends Command {
             for (JsonElement guildRank : higherDepth(currentSettings, "guildRanks").getAsJsonArray()) {
                 guildRanksString.append("\n• ").append(higherDepth(guildRank, "minecraftRoleName").getAsString())
                         .append(" - ").append(event.getGuild()
-                        .getRoleById(higherDepth(guildRank, "discordRoleId").getAsString()).getAsMention());
+                                .getRoleById(higherDepth(guildRank, "discordRoleId").getAsString()).getAsMention());
             }
         } catch (Exception ignored) {
         }
@@ -633,8 +633,8 @@ public class SettingsCommand extends Command {
                     break;
                 }
                 case "tara": {
-                    ebFieldString.append("**A player's tarantula broodfather slayer xp**\nExample: `").append(BOT_PREFIX)
-                            .append("settings roles add tara 100000 @tara 7`\n");
+                    ebFieldString.append("**A player's tarantula broodfather slayer xp**\nExample: `")
+                            .append(BOT_PREFIX).append("settings roles add tara 100000 @tara 7`\n");
                     break;
                 }
                 case "bank_coins": {
@@ -654,9 +654,9 @@ public class SettingsCommand extends Command {
                 case "skill_average":
                 case "pet_score":
                 case "catacombs": {
-                    ebFieldString.append("**A player's ").append(roleName).append(" level**\nExample: `").append(BOT_PREFIX)
-                            .append("settings roles add ").append(roleName).append(" 30 @").append(roleName)
-                            .append(" 30`\n");
+                    ebFieldString.append("**A player's ").append(roleName).append(" level**\nExample: `")
+                            .append(BOT_PREFIX).append("settings roles add ").append(roleName).append(" 30 @")
+                            .append(roleName).append(" 30`\n");
                     break;
                 }
                 case "fairy_souls": {
@@ -719,7 +719,7 @@ public class SettingsCommand extends Command {
                         ebFieldString.append("\n• ")
                                 .append(higherDepth(higherDepth(guildJson, "guild"), "name").getAsString())
                                 .append(" - ").append(event.getGuild()
-                                .getRoleById(higherDepth(roleLevel, "roleId").getAsString()).getAsMention());
+                                        .getRoleById(higherDepth(roleLevel, "roleId").getAsString()).getAsMention());
                     }
                 } else {
                     for (JsonElement roleLevel : higherDepth(currentRoleSettings, "levels").getAsJsonArray()) {
@@ -1449,7 +1449,9 @@ public class SettingsCommand extends Command {
                     String cataReq = higherDepth(req, "catacombsReq").getAsString();
                     String weightReq = higherDepth(req, "weightReq").getAsString();
 
-                    reqsString.append("`").append(i + 1).append(")` ").append(slayerReq).append(" slayer and ").append(skillsReq).append(" skill average and ").append(cataReq).append(" cata and ").append(weightReq).append(" weight");
+                    reqsString.append("`").append(i + 1).append(")` ").append(slayerReq).append(" slayer and ")
+                            .append(skillsReq).append(" skill average and ").append(cataReq).append(" cata and ")
+                            .append(weightReq).append(" weight");
                 }
 
                 return reqsString.toString();
@@ -1492,8 +1494,8 @@ public class SettingsCommand extends Command {
                         return currentSettingValue.equals("true") ? "• Enabled" : "• Disabled";
                     case "guildId":
                         try {
-                            JsonElement guildJson = getJson(
-                                    "https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&id=" + currentSettingValue);
+                            JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY
+                                    + "&id=" + currentSettingValue);
                             return higherDepth(higherDepth(guildJson, "guild"), "name").getAsString();
                         } catch (Exception e) {
                             return "Error finding guild associated with " + currentSettingValue + " id";
