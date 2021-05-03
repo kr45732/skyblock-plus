@@ -166,8 +166,10 @@ public class SettingsCommand extends Command {
                 if (args.length == 2) {
                     eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
                     if (higherDepth(currentSettings, "automatedApplication") != null) {
-                        eb.addField("Apply Settings",
-                                getCurrentApplySettings(higherDepth(currentSettings, "automatedApplication")), false);
+                        eb = getCurrentApplySettings(higherDepth(currentSettings, "automatedApplication"));
+                        // eb.addField("Apply Settings",
+                        // getCurrentApplySettings(higherDepth(currentSettings,
+                        // "automatedApplication")), false);
                     } else {
                         eb.addField("Apply Settings", "Error! Data not found", false);
                     }
@@ -1123,21 +1125,46 @@ public class SettingsCommand extends Command {
     }
 
     /* Apply Settings */
-    private String getCurrentApplySettings(JsonElement applySettings) {
-        String ebFieldString = "";
-        ebFieldString += "**" + displaySettings(applySettings, "enable") + "**";
-        ebFieldString += "\n**• React Message Text:** " + displaySettings(applySettings, "messageText");
-        ebFieldString += "\n**• React Message Channel:** " + displaySettings(applySettings, "messageTextChannelId");
-        ebFieldString += "\n**• Staff Message Channel:** " + displaySettings(applySettings, "messageStaffChannelId");
-        ebFieldString += "\n**• Staff Ping Role:** " + displaySettings(applySettings, "staffPingRoleId");
-        ebFieldString += "\n**• Accepted Message:** " + displaySettings(applySettings, "acceptMessageText");
-        ebFieldString += "\n**• Waitlisted Message:** " + displaySettings(applySettings, "waitlistedMessageText");
-        ebFieldString += "\n**• Denied Message:** " + displaySettings(applySettings, "denyMessageText");
-        ebFieldString += "\n**• New Channel Prefix:** " + displaySettings(applySettings, "newChannelPrefix");
-        ebFieldString += "\n**• New Channel Category:** " + displaySettings(applySettings, "newChannelCategory");
-        ebFieldString += "\n**• Requirements:** " + displaySettings(applySettings, "applyReqs");
+    private EmbedBuilder getCurrentApplySettings(JsonElement applySettings) {
+        EmbedBuilder eb = defaultEmbed("Apply Settings");
+        eb.setDescription("**" + displaySettings(applySettings, "enable") + "**");
+        eb.addField("React Message Channel", displaySettings(applySettings, "messageTextChannelId"), true);
+        eb.addField("Staff Message Channel", displaySettings(applySettings, "messageStaffChannelId"), true);
+        eb.addField("Staff Ping Role", displaySettings(applySettings, "staffPingRoleId"), true);
+        eb.addField("New Channel Prefix", displaySettings(applySettings, "newChannelPrefix"), true);
+        eb.addField("New Channel Category", displaySettings(applySettings, "newChannelCategory"), true);
+        eb.addField("React Message Text", displaySettings(applySettings, "messageText"), true);
+        eb.addField("Accepted Message", displaySettings(applySettings, "acceptMessageText"), true);
+        eb.addField("Waitlisted Message", displaySettings(applySettings, "acceptMessageText"), true);
+        eb.addField("Waitlisted Message", displaySettings(applySettings, "waitlistedMessageText"), true);
+        eb.addField("Denied Message", displaySettings(applySettings, "denyMessageText"), true);
+        eb.addField("Requirements", displaySettings(applySettings, "applyReqs"), true);
+        return eb;
 
-        return ebFieldString;
+        // String ebFieldString = "";
+        // ebFieldString += "**" + displaySettings(applySettings, "enable") + "**";
+        // ebFieldString += "\n**• React Message Text:** " +
+        // displaySettings(applySettings, "messageText");
+        // ebFieldString += "\n**• React Message Channel:** " +
+        // displaySettings(applySettings, "messageTextChannelId");
+        // ebFieldString += "\n**• Staff Message Channel:** " +
+        // displaySettings(applySettings, "messageStaffChannelId");
+        // ebFieldString += "\n**• Staff Ping Role:** " + displaySettings(applySettings,
+        // "staffPingRoleId");
+        // ebFieldString += "\n**• Accepted Message:** " +
+        // displaySettings(applySettings, "acceptMessageText");
+        // ebFieldString += "\n**• Waitlisted Message:** " +
+        // displaySettings(applySettings, "waitlistedMessageText");
+        // ebFieldString += "\n**• Denied Message:** " + displaySettings(applySettings,
+        // "denyMessageText");
+        // ebFieldString += "\n**• New Channel Prefix:** " +
+        // displaySettings(applySettings, "newChannelPrefix");
+        // ebFieldString += "\n**• New Channel Category:** " +
+        // displaySettings(applySettings, "newChannelCategory");
+        // ebFieldString += "\n**• Requirements:** " + displaySettings(applySettings,
+        // "applyReqs");
+
+        // return ebFieldString;
     }
 
     private boolean allowApplyEnable() {
