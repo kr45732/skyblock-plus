@@ -52,7 +52,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     runtimeOnly 'org.postgresql:postgresql'
 
-    // Apache
+    // Http Client
     implementation 'org.apache.httpcomponents:httpclient:4.5.13'
 
     // Async http client
@@ -60,6 +60,9 @@ dependencies {
 
     // Emoji parser
     implementation 'com.vdurmont:emoji-java:5.1.1'
+
+    // Apache common text
+    // compile 'org.apache.commons:commons-text:1.9'
 
     // Misc
     implementation "ch.qos.logback:logback-classic:1.2.3"
