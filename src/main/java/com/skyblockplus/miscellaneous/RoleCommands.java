@@ -22,6 +22,7 @@ public class RoleCommands extends Command {
     public RoleCommands() {
         this.name = "roles";
         this.cooldown = 10;
+        this.aliases = new String[] { "role" };
     }
 
     @Override
@@ -130,9 +131,10 @@ public class RoleCommands extends Command {
                                             } else {
                                                 if (guild.getMember(user).getRoles().contains(currentLevelRole)) {
                                                     if (botRole.canInteract(currentLevelRole)) {
-                                                        removedRoles.append(roleChangeString(currentLevelRole.getName()));
-                                                        guild.removeRoleFromMember(guild.getMember(user), currentLevelRole)
-                                                                .queue();
+                                                        removedRoles
+                                                                .append(roleChangeString(currentLevelRole.getName()));
+                                                        guild.removeRoleFromMember(guild.getMember(user),
+                                                                currentLevelRole).queue();
                                                     } else {
                                                         errorRoles.append(currentLevelRole.getName());
                                                     }
@@ -257,7 +259,8 @@ public class RoleCommands extends Command {
                                                 if (member.getRoles().contains(currentLevelRole)) {
                                                     if (botRole.canInteract(currentLevelRole)) {
                                                         guild.removeRoleFromMember(member, currentLevelRole).queue();
-                                                        removedRoles.append(roleChangeString(currentLevelRole.getName()));
+                                                        removedRoles
+                                                                .append(roleChangeString(currentLevelRole.getName()));
                                                     } else {
                                                         errorRoles.append(roleChangeString(currentLevelRole.getName()));
                                                     }
@@ -276,7 +279,8 @@ public class RoleCommands extends Command {
                                                 if (member.getRoles().contains(currentLevelRole)) {
                                                     if (botRole.canInteract(currentLevelRole)) {
                                                         guild.removeRoleFromMember(member, currentLevelRole).queue();
-                                                        removedRoles.append(roleChangeString(currentLevelRole.getName()));
+                                                        removedRoles
+                                                                .append(roleChangeString(currentLevelRole.getName()));
                                                     } else {
                                                         errorRoles.append(roleChangeString(currentLevelRole.getName()));
                                                     }
@@ -293,8 +297,8 @@ public class RoleCommands extends Command {
 
                                                 for (int j = i - 1; j >= 0; j--) {
                                                     JsonElement currentLevelRemoveStackable = levelsArray.get(j);
-                                                    Role currentLevelRoleRemoveStackable = event.getGuild()
-                                                            .getRoleById(higherDepth(currentLevelRemoveStackable, "roleId")
+                                                    Role currentLevelRoleRemoveStackable = event.getGuild().getRoleById(
+                                                            higherDepth(currentLevelRemoveStackable, "roleId")
                                                                     .getAsString());
 
                                                     if (member.getRoles().contains(currentLevelRoleRemoveStackable)) {
@@ -392,13 +396,13 @@ public class RoleCommands extends Command {
                                                     isPetEnthusiast = true;
                                                     if (!guild.getMember(user).getRoles().contains(petEnthusiastRole)) {
                                                         if (botRole.canInteract(petEnthusiastRole)) {
-                                                            guild.addRoleToMember(guild.getMember(user), petEnthusiastRole)
-                                                                    .queue();
-                                                            addedRoles
-                                                                    .append(roleChangeString(petEnthusiastRole.getName()));
+                                                            guild.addRoleToMember(guild.getMember(user),
+                                                                    petEnthusiastRole).queue();
+                                                            addedRoles.append(
+                                                                    roleChangeString(petEnthusiastRole.getName()));
                                                         } else {
-                                                            errorRoles
-                                                                    .append(roleChangeString(petEnthusiastRole.getName()));
+                                                            errorRoles.append(
+                                                                    roleChangeString(petEnthusiastRole.getName()));
                                                         }
                                                         break;
                                                     }
@@ -406,10 +410,12 @@ public class RoleCommands extends Command {
                                             }
                                         }
                                     }
-                                    if (guild.getMember(user).getRoles().contains(petEnthusiastRole) && !isPetEnthusiast) {
+                                    if (guild.getMember(user).getRoles().contains(petEnthusiastRole)
+                                            && !isPetEnthusiast) {
                                         if (botRole.canInteract(petEnthusiastRole)) {
                                             removedRoles.append(roleChangeString(petEnthusiastRole.getName()));
-                                            guild.removeRoleFromMember(guild.getMember(user), petEnthusiastRole).queue();
+                                            guild.removeRoleFromMember(guild.getMember(user), petEnthusiastRole)
+                                                    .queue();
                                         } else {
                                             errorRoles.append(roleChangeString(petEnthusiastRole.getName()));
                                         }

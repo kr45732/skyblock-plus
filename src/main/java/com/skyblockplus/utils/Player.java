@@ -454,13 +454,27 @@ public class Player {
 
     public int getNumberMinionSlots() {
         try {
+            List<String> profileMembers = getJsonKeys(higherDepth(outerProfileJson, "members"));
+            Set<String> uniqueCraftedMinions = new HashSet<>();
+
+            for (String member : profileMembers) {
+                try {
+                    JsonArray craftedMinions = higherDepth(
+                            higherDepth(higherDepth(outerProfileJson, "members"), member), "crafted_generators")
+                                    .getAsJsonArray();
+                    for (JsonElement minion : craftedMinions) {
+                        uniqueCraftedMinions.add(minion.getAsString());
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+
             int[] craftedMinionsToSlots = new int[] { 0, 5, 15, 30, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300,
                     350, 400, 450, 500, 550, 600 };
 
             int prevMax = 0;
-            int craftedMinions = higherDepth(profileJson, "crafted_generators").getAsJsonArray().size();
             for (int i = 0; i < craftedMinionsToSlots.length; i++) {
-                if (craftedMinions >= craftedMinionsToSlots[i]) {
+                if (uniqueCraftedMinions.size() >= craftedMinionsToSlots[i]) {
                     prevMax = i;
                 } else {
                     break;
