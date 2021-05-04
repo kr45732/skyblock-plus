@@ -21,7 +21,6 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.exceptions.PermissionException;
-// import org.apache.commons.text.similarity.LevenshteinDistance;
 
 import java.util.*;
 
