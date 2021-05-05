@@ -1,22 +1,13 @@
 package com.skyblockplus.eventlisteners;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.api.discordserversettings.skyblockevent.EventMember;
-import com.skyblockplus.eventlisteners.apply.ApplyGuild;
-import com.skyblockplus.eventlisteners.skyblockevent.SkyblockEvent;
-import com.skyblockplus.eventlisteners.verify.VerifyGuild;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
-import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.eventlisteners.skyblockevent.SkyblockEventCommand.endSkyblockEvent;
+import static com.skyblockplus.utils.Utils.HYPIXEL_API_KEY;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.getJson;
+import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.Utils.logCommand;
 
 import java.io.File;
 import java.time.Duration;
@@ -29,10 +20,24 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.eventlisteners.skyblockevent.SkyblockEventCommand.endSkyblockEvent;
-import static com.skyblockplus.utils.Utils.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.api.discordserversettings.skyblockevent.EventMember;
+import com.skyblockplus.eventlisteners.apply.ApplyGuild;
+import com.skyblockplus.eventlisteners.skyblockevent.SkyblockEvent;
+import com.skyblockplus.eventlisteners.verify.VerifyGuild;
+
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
+import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
 public class AutomaticGuild {
     private final String guildId;
@@ -113,7 +118,8 @@ public class AutomaticGuild {
 
         long startTime = System.currentTimeMillis();
 
-        JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&id=" + higherDepth(currentSettings, "guildId").getAsString());
+        JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&id="
+                + higherDepth(currentSettings, "guildId").getAsString());
 
         if (guildJson == null) {
             return;
@@ -123,16 +129,18 @@ public class AutomaticGuild {
         Map<String, String> uuidToRankMap = new HashMap<>();
 
         for (JsonElement guildMember : guildMembers) {
-            uuidToRankMap.put(higherDepth(guildMember, "uuid").getAsString(), higherDepth(guildMember, "rank").getAsString().replace(" ", "_"));
+            uuidToRankMap.put(higherDepth(guildMember, "uuid").getAsString(),
+                    higherDepth(guildMember, "rank").getAsString().replace(" ", "_"));
         }
 
         JsonArray linkedUsers = database.getLinkedUsers().getAsJsonArray();
 
-        Role guildMemberRole = enableGuildRole ? guild.getRoleById(higherDepth(currentSettings, "roleId").getAsString()) : null;
+        Role guildMemberRole = enableGuildRole ? guild.getRoleById(higherDepth(currentSettings, "roleId").getAsString())
+                : null;
 
         int memberCount = 0;
         for (JsonElement linkedUser : linkedUsers) {
-            if (guild.getMemberById(higherDepth(linkedUser, "discordId").getAsString()) == null) {
+            if (guild.retrieveMemberById(higherDepth(linkedUser, "discordId").getAsString()).complete() == null) {
                 continue;
             }
 
@@ -140,7 +148,8 @@ public class AutomaticGuild {
                 if (uuidToRankMap.containsKey(higherDepth(linkedUser, "minecraftUuid").getAsString())) {
                     guild.addRoleToMember(higherDepth(linkedUser, "discordId").getAsString(), guildMemberRole).queue();
                 } else {
-                    guild.removeRoleFromMember(higherDepth(linkedUser, "discordId").getAsString(), guildMemberRole).queue();
+                    guild.removeRoleFromMember(higherDepth(linkedUser, "discordId").getAsString(), guildMemberRole)
+                            .queue();
                 }
             }
 
@@ -148,16 +157,19 @@ public class AutomaticGuild {
                 JsonArray guildRanksArr = higherDepth(currentSettings, "guildRanks").getAsJsonArray();
                 if (!uuidToRankMap.containsKey(higherDepth(linkedUser, "minecraftUuid").getAsString())) {
                     for (JsonElement guildRank : guildRanksArr) {
-                        guild.removeRoleFromMember(higherDepth(linkedUser, "discordId").getAsString(), guild.getRoleById(higherDepth(guildRank, "discordRoleId").getAsString())).queue();
+                        guild.removeRoleFromMember(higherDepth(linkedUser, "discordId").getAsString(),
+                                guild.getRoleById(higherDepth(guildRank, "discordRoleId").getAsString())).queue();
                     }
                 } else {
                     String currentRank = uuidToRankMap.get(higherDepth(linkedUser, "minecraftUuid").getAsString());
                     for (JsonElement guildRank : guildRanksArr) {
                         Role currentRankRole = guild.getRoleById(higherDepth(guildRank, "discordRoleId").getAsString());
                         if (higherDepth(guildRank, "minecraftRoleName").getAsString().equalsIgnoreCase(currentRank)) {
-                            guild.addRoleToMember(higherDepth(linkedUser, "discordId").getAsString(), currentRankRole).queue();
+                            guild.addRoleToMember(higherDepth(linkedUser, "discordId").getAsString(), currentRankRole)
+                                    .queue();
                         } else {
-                            guild.removeRoleFromMember(higherDepth(linkedUser, "discordId").getAsString(), currentRankRole).queue();
+                            guild.removeRoleFromMember(higherDepth(linkedUser, "discordId").getAsString(),
+                                    currentRankRole).queue();
                         }
                     }
                 }
@@ -165,7 +177,8 @@ public class AutomaticGuild {
 
             memberCount++;
         }
-        logCommand(guild, "Guild Role | Users (" + memberCount + ") | Time (" + ((System.currentTimeMillis() - startTime) / 1000) + "s)");
+        logCommand(guild, "Guild Role | Users (" + memberCount + ") | Time ("
+                + ((System.currentTimeMillis() - startTime) / 1000) + "s)");
     }
 
     public boolean allowApplyReload() {
@@ -179,7 +192,8 @@ public class AutomaticGuild {
         }
 
         try {
-            if (higherDepth(currentSettings, "enable") == null || (higherDepth(currentSettings, "enable") != null && !higherDepth(currentSettings, "enable").getAsBoolean())) {
+            if (higherDepth(currentSettings, "enable") == null || (higherDepth(currentSettings, "enable") != null
+                    && !higherDepth(currentSettings, "enable").getAsBoolean())) {
                 return;
             }
 
@@ -187,7 +201,9 @@ public class AutomaticGuild {
                 TextChannel reactChannel = event.getGuild()
                         .getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
                 try {
-                    Message reactMessage = reactChannel.retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString()).complete();
+                    Message reactMessage = reactChannel
+                            .retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString())
+                            .complete();
                     if (reactMessage != null) {
                         reactMessage.editMessage(higherDepth(currentSettings, "messageText").getAsString()).queue();
 
@@ -197,8 +213,10 @@ public class AutomaticGuild {
                 } catch (Exception ignored) {
                 }
 
-                Message reactMessage = reactChannel.sendMessage(higherDepth(currentSettings, "messageText").getAsString())
-                        .addFile(new File("src/main/java/com/skyblockplus/eventlisteners/verify/Link_Discord_To_Hypixel.mp4"))
+                Message reactMessage = reactChannel
+                        .sendMessage(higherDepth(currentSettings, "messageText").getAsString())
+                        .addFile(new File(
+                                "src/main/java/com/skyblockplus/eventlisteners/verify/Link_Discord_To_Hypixel.mp4"))
                         .complete();
 
                 JsonObject newSettings = currentSettings.getAsJsonObject();
@@ -221,7 +239,8 @@ public class AutomaticGuild {
         }
 
         try {
-            if (higherDepth(currentSettings, "enable") == null || (higherDepth(currentSettings, "enable") != null && !higherDepth(currentSettings, "enable").getAsBoolean())) {
+            if (higherDepth(currentSettings, "enable") == null || (higherDepth(currentSettings, "enable") != null
+                    && !higherDepth(currentSettings, "enable").getAsBoolean())) {
                 return;
             }
 
@@ -233,7 +252,9 @@ public class AutomaticGuild {
                 eb.setDescription(higherDepth(currentSettings, "messageText").getAsString());
 
                 try {
-                    Message reactMessage = reactChannel.retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString()).complete();
+                    Message reactMessage = reactChannel
+                            .retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString())
+                            .complete();
                     reactMessage.editMessage(eb.build()).queue();
 
                     applyGuild = new ApplyGuild(reactMessage, currentSettings);
@@ -263,7 +284,6 @@ public class AutomaticGuild {
             return "Invalid guild";
         }
 
-
         JsonElement currentSettings = database.getApplySettings(guild.getId());
         if (currentSettings == null) {
             return "No settings found";
@@ -278,7 +298,9 @@ public class AutomaticGuild {
                 eb.setDescription(higherDepth(currentSettings, "messageText").getAsString());
 
                 try {
-                    Message reactMessage = reactChannel.retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString()).complete();
+                    Message reactMessage = reactChannel
+                            .retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString())
+                            .complete();
                     reactMessage.editMessage(eb.build()).queue();
 
                     applyGuild = new ApplyGuild(reactMessage, currentSettings);
@@ -316,7 +338,6 @@ public class AutomaticGuild {
             return "Invalid guild";
         }
 
-
         JsonElement currentSettings = database.getVerifySettings(guild.getId());
         if (currentSettings == null) {
             return "No settings found";
@@ -327,7 +348,9 @@ public class AutomaticGuild {
                 TextChannel reactChannel = guild
                         .getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
                 try {
-                    Message reactMessage = reactChannel.retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString()).complete();
+                    Message reactMessage = reactChannel
+                            .retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString())
+                            .complete();
                     if (reactMessage != null) {
                         reactMessage.editMessage(higherDepth(currentSettings, "messageText").getAsString()).queue();
 
@@ -337,8 +360,10 @@ public class AutomaticGuild {
                 } catch (Exception ignored) {
                 }
 
-                Message reactMessage = reactChannel.sendMessage(higherDepth(currentSettings, "messageText").getAsString())
-                        .addFile(new File("src/main/java/com/skyblockplus/eventlisteners/verify/Link_Discord_To_Hypixel.mp4"))
+                Message reactMessage = reactChannel
+                        .sendMessage(higherDepth(currentSettings, "messageText").getAsString())
+                        .addFile(new File(
+                                "src/main/java/com/skyblockplus/eventlisteners/verify/Link_Discord_To_Hypixel.mp4"))
                         .complete();
 
                 JsonObject newSettings = currentSettings.getAsJsonObject();

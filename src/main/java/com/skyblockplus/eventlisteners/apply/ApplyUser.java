@@ -53,8 +53,7 @@ public class ApplyUser implements Serializable {
         Category applyCategory = event.getGuild()
                 .getCategoryById(higherDepth(currentSettings, "newChannelCategory").getAsString());
         TextChannel applicationChannel = applyCategory.createTextChannel(channelPrefix + "-" + applyingUser.getName())
-                .addPermissionOverride(event.getGuild().getMember(applyingUser), EnumSet.of(Permission.VIEW_CHANNEL),
-                        null)
+                .addPermissionOverride(event.getMember(), EnumSet.of(Permission.VIEW_CHANNEL), null)
                 .addPermissionOverride(event.getGuild().getPublicRole(), null, EnumSet.of(Permission.VIEW_CHANNEL))
                 .complete();
         this.applicationChannelId = applicationChannel.getId();
@@ -113,9 +112,9 @@ public class ApplyUser implements Serializable {
         JsonElement currentSettings = JsonParser.parseString(currentSettingsString);
 
         if (!event.getUser().equals(applyingUser)) {
-            if (!(event.getGuild().getMember(event.getUser()).getRoles().contains(
+            if (!(event.getMember().getRoles().contains(
                     event.getGuild().getRoleById(higherDepth(currentSettings, "staffPingRoleId").getAsString()))
-                    || event.getGuild().getMember(event.getUser()).hasPermission(Permission.ADMINISTRATOR))) {
+                    || event.getMember().hasPermission(Permission.ADMINISTRATOR))) {
                 reactMessage.removeReaction(event.getReactionEmote().getAsReactionCode(), event.getUser()).queue();
                 return false;
             }
@@ -156,7 +155,10 @@ public class ApplyUser implements Serializable {
                             meetReqs = true;
                             break;
                         } else {
-                            missingReqsStr.append("• Slayer - ").append(formatNumber(slayerReq)).append(" | Skill Average - ").append(formatNumber(skillsReq)).append(" | Catacombs - ").append(formatNumber(cataReq)).append(" | Weight - ").append(formatNumber(weightReq)).append("\n");
+                            missingReqsStr.append("• Slayer - ").append(formatNumber(slayerReq))
+                                    .append(" | Skill Average - ").append(formatNumber(skillsReq))
+                                    .append(" | Catacombs - ").append(formatNumber(cataReq)).append(" | Weight - ")
+                                    .append(formatNumber(weightReq)).append("\n");
                         }
                     }
                 }
@@ -211,8 +213,8 @@ public class ApplyUser implements Serializable {
                 statsEmbed.addField("Total slayer", playerSlayer, true);
                 statsEmbed.addField("Progress skill level", playerSkills, true);
                 statsEmbed.addField("Catacombs level", "" + playerCatacombs, true);
-                statsEmbed.addField("Are the above stats correct?", "React with ✅ for yes, ↩️ to retry, and ❌ to cancel",
-                        false);
+                statsEmbed.addField("Are the above stats correct?",
+                        "React with ✅ for yes, ↩️ to retry, and ❌ to cancel", false);
 
                 reactMessage = applicationChannel.sendMessage(statsEmbed.build()).complete();
                 reactMessage.addReaction("✅").queue();

@@ -1,5 +1,20 @@
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.Utils.BOT_PREFIX;
+import static com.skyblockplus.utils.Utils.HYPIXEL_API_KEY;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.errorMessage;
+import static com.skyblockplus.utils.Utils.getJson;
+import static com.skyblockplus.utils.Utils.getJsonKeys;
+import static com.skyblockplus.utils.Utils.getPlayerDiscordInfo;
+import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.Utils.loadingEmbed;
+import static com.skyblockplus.utils.Utils.logCommand;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
@@ -8,14 +23,14 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
+
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.*;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
 
 public class RoleCommands extends Command {
 
@@ -33,7 +48,7 @@ public class RoleCommands extends Command {
             MessageChannel channel = event.getChannel();
             Guild guild = event.getGuild();
             User user = event.getAuthor();
-            Member member = guild.getMemberById(user.getId());
+            Member member = event.getMember();
             Message ebMessage = channel.sendMessage(eb.build()).complete();
 
             logCommand(event.getGuild(), event.getAuthor(), content);
@@ -118,23 +133,21 @@ public class RoleCommands extends Command {
                                             Role currentLevelRole = guild
                                                     .getRoleById(higherDepth(currentLevel, "roleId").getAsString());
                                             if (playerGuildId.equals(currentLevelValue)) {
-                                                if (!guild.getMember(user).getRoles().contains(currentLevelRole)) {
+                                                if (!member.getRoles().contains(currentLevelRole)) {
                                                     // currentLevelRole.getPosition()
                                                     if (botRole.canInteract(currentLevelRole)) {
-                                                        guild.addRoleToMember(guild.getMember(user), currentLevelRole)
-                                                                .queue();
+                                                        guild.addRoleToMember(member, currentLevelRole).queue();
                                                         addedRoles.append(roleChangeString(currentLevelRole.getName()));
                                                     } else {
                                                         errorRoles.append(roleChangeString(currentLevelRole.getName()));
                                                     }
                                                 }
                                             } else {
-                                                if (guild.getMember(user).getRoles().contains(currentLevelRole)) {
+                                                if (member.getRoles().contains(currentLevelRole)) {
                                                     if (botRole.canInteract(currentLevelRole)) {
                                                         removedRoles
                                                                 .append(roleChangeString(currentLevelRole.getName()));
-                                                        guild.removeRoleFromMember(guild.getMember(user),
-                                                                currentLevelRole).queue();
+                                                        guild.removeRoleFromMember(member, currentLevelRole).queue();
                                                     } else {
                                                         errorRoles.append(currentLevelRole.getName());
                                                     }
@@ -326,19 +339,19 @@ public class RoleCommands extends Command {
 
                                     if ((player.getWolfXp() >= 1000000) || (player.getZombieXp() >= 1000000)
                                             || (player.getSpiderXp() >= 1000000)) {
-                                        if (!guild.getMember(user).getRoles().contains(curRole)) {
+                                        if (!member.getRoles().contains(curRole)) {
                                             if (botRole.canInteract(curRole)) {
-                                                guild.addRoleToMember(guild.getMember(user), curRole).queue();
+                                                guild.addRoleToMember(member, curRole).queue();
                                                 addedRoles.append(roleChangeString(curRole.getName()));
                                             } else {
                                                 errorRoles.append(roleChangeString(curRole.getName()));
                                             }
                                         }
                                     } else {
-                                        if (guild.getMember(user).getRoles().contains(curRole)) {
+                                        if (member.getRoles().contains(curRole)) {
                                             if (botRole.canInteract(curRole)) {
                                                 removedRoles.append(roleChangeString(curRole.getName()));
-                                                guild.removeRoleFromMember(guild.getMember(user), curRole).queue();
+                                                guild.removeRoleFromMember(member, curRole).queue();
                                             } else {
                                                 errorRoles.append(roleChangeString(curRole.getName()));
                                             }
@@ -353,19 +366,19 @@ public class RoleCommands extends Command {
 
                                     if ((player.getWolfXp() >= 1000000) && (player.getZombieXp() >= 1000000)
                                             && (player.getSpiderXp() >= 1000000)) {
-                                        if (!guild.getMember(user).getRoles().contains(curRole)) {
+                                        if (!member.getRoles().contains(curRole)) {
                                             if (botRole.canInteract(curRole)) {
-                                                guild.addRoleToMember(guild.getMember(user), curRole).queue();
+                                                guild.addRoleToMember(member, curRole).queue();
                                                 addedRoles.append(roleChangeString(curRole.getName()));
                                             } else {
                                                 errorRoles.append(roleChangeString(curRole.getName()));
                                             }
                                         }
                                     } else {
-                                        if (guild.getMember(user).getRoles().contains(curRole)) {
+                                        if (member.getRoles().contains(curRole)) {
                                             if (botRole.canInteract(curRole)) {
                                                 removedRoles.append(roleChangeString(curRole.getName()));
-                                                guild.removeRoleFromMember(guild.getMember(user), curRole).queue();
+                                                guild.removeRoleFromMember(member, curRole).queue();
                                             } else {
                                                 errorRoles.append(roleChangeString(curRole.getName()));
                                             }
@@ -394,10 +407,9 @@ public class RoleCommands extends Command {
                                                 long currentPetExp = higherDepth(currentPet, "exp").getAsLong();
                                                 if (player.petLevelFromXp(currentPetExp, currentPetRarity) == 100) {
                                                     isPetEnthusiast = true;
-                                                    if (!guild.getMember(user).getRoles().contains(petEnthusiastRole)) {
+                                                    if (member.getRoles().contains(petEnthusiastRole)) {
                                                         if (botRole.canInteract(petEnthusiastRole)) {
-                                                            guild.addRoleToMember(guild.getMember(user),
-                                                                    petEnthusiastRole).queue();
+                                                            guild.addRoleToMember(member, petEnthusiastRole).queue();
                                                             addedRoles.append(
                                                                     roleChangeString(petEnthusiastRole.getName()));
                                                         } else {
@@ -410,12 +422,10 @@ public class RoleCommands extends Command {
                                             }
                                         }
                                     }
-                                    if (guild.getMember(user).getRoles().contains(petEnthusiastRole)
-                                            && !isPetEnthusiast) {
+                                    if (member.getRoles().contains(petEnthusiastRole) && !isPetEnthusiast) {
                                         if (botRole.canInteract(petEnthusiastRole)) {
                                             removedRoles.append(roleChangeString(petEnthusiastRole.getName()));
-                                            guild.removeRoleFromMember(guild.getMember(user), petEnthusiastRole)
-                                                    .queue();
+                                            guild.removeRoleFromMember(member, petEnthusiastRole).queue();
                                         } else {
                                             errorRoles.append(roleChangeString(petEnthusiastRole.getName()));
                                         }

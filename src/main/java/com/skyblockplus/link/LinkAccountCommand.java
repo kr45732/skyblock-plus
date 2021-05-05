@@ -1,20 +1,27 @@
 package com.skyblockplus.link;
 
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.errorMessage;
+import static com.skyblockplus.utils.Utils.getPlayerDiscordInfo;
+import static com.skyblockplus.utils.Utils.globalCooldown;
+import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.Utils.loadingEmbed;
+import static com.skyblockplus.utils.Utils.logCommand;
+
+import java.time.Instant;
+
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
-
-import java.time.Instant;
-
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Utils.*;
 
 public class LinkAccountCommand extends Command {
 
@@ -52,7 +59,7 @@ public class LinkAccountCommand extends Command {
                 try {
                     Role role = guild.getRoleById(
                             higherDepth(database.getVerifySettings(guild.getId()), "verifiedRole").getAsString());
-                    guild.addRoleToMember(guild.getMember(user), role).queue();
+                    guild.addRoleToMember(user.getId(), role).queue();
                 } catch (Exception ignored) {
                 }
 
