@@ -1,14 +1,12 @@
 package com.skyblockplus.eventlisteners.skyblockevent;
 
-import com.google.gson.JsonElement;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSettingsModel;
-import com.skyblockplus.api.discordserversettings.skyblockevent.RunningEvent;
-import com.skyblockplus.api.discordserversettings.skyblockevent.SbEvent;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.Utils.BOT_PREFIX;
+import static com.skyblockplus.utils.Utils.HYPIXEL_API_KEY;
+import static com.skyblockplus.utils.Utils.capitalizeString;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.getJson;
+import static com.skyblockplus.utils.Utils.higherDepth;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -23,12 +21,20 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Utils.*;
+import com.google.gson.JsonElement;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSettingsModel;
+import com.skyblockplus.api.discordserversettings.skyblockevent.RunningEvent;
+import com.skyblockplus.api.discordserversettings.skyblockevent.SbEvent;
+
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class SkyblockEvent {
-    private final DateTimeFormatter formatter =
-            DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withZone(ZoneId.of("UTC"));
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
+            .withZone(ZoneId.of("UTC"));
     private final boolean enable;
     private EmbedBuilder eb;
     private TextChannel announcementChannel;
@@ -52,9 +58,8 @@ public class SkyblockEvent {
         this.commandEvent = commandEvent;
         this.eb = defaultEmbed("Create a Skyblock competition");
         lastMessageSentTime = Instant.now();
-        final Runnable checkForTimeout = this::checkForTimeout;
         scheduler = Executors.newScheduledThreadPool(1);
-        scheduler.scheduleAtFixedRate(checkForTimeout, 0, 1, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(this::checkForTimeout, 0, 1, TimeUnit.MINUTES);
     }
 
     public ScheduledExecutorService getScheduler() {
@@ -62,11 +67,16 @@ public class SkyblockEvent {
     }
 
     private void checkForTimeout() {
-        Duration res = Duration.between(lastMessageSentTime, Instant.now());
-        System.out.println("Timeout Event: " + res.toMinutes());
-        if (res.toMinutes() >= 1) {
-            timeout = true;
-            sendEmbedMessage(defaultEmbed("Timeout"));
+        try {
+            Duration res = Duration.between(lastMessageSentTime, Instant.now());
+            System.out.println("Timeout Event: " + res.toMinutes());
+            if (res.toMinutes() >= 1) {
+                timeout = true;
+                sendEmbedMessage(defaultEmbed("Timeout"));
+            }
+        } catch (Exception e) {
+            System.out.println("== Stack Trace (checkForTimeout) ==");
+            e.printStackTrace();
         }
 
     }
@@ -106,8 +116,14 @@ public class SkyblockEvent {
         switch (state) {
             case 0:
                 try {
-                    guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&name=" + event.getMessage().getContentRaw().replace(" ", "%20"));
-                    eb.addField("Guild", "Name: " + higherDepth(higherDepth(guildJson, "guild"), "name").getAsString() + "\nMembers: " + higherDepth(higherDepth(guildJson, "guild"), "members").getAsJsonArray().size(), false).setDescription("Is this a __catacombs__, __slayer__, or __skills__ event?\nTo cancel type `exit`");
+                    guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&name="
+                            + event.getMessage().getContentRaw().replace(" ", "%20"));
+                    eb.addField("Guild",
+                            "Name: " + higherDepth(higherDepth(guildJson, "guild"), "name").getAsString()
+                                    + "\nMembers: "
+                                    + higherDepth(higherDepth(guildJson, "guild"), "members").getAsJsonArray().size(),
+                            false).setDescription(
+                                    "Is this a __catacombs__, __slayer__, or __skills__ event?\nTo cancel type `exit`");
                     state++;
                 } catch (Exception e) {
                     eb.setDescription("Invalid guild name: " + event.getMessage().getContentRaw());
@@ -116,7 +132,8 @@ public class SkyblockEvent {
                 break;
             case 1:
                 String replyMessage = event.getMessage().getContentRaw().toLowerCase();
-                if (replyMessage.equals("catacombs") || replyMessage.equals("slayer") || replyMessage.equals("skills")) {
+                if (replyMessage.equals("catacombs") || replyMessage.equals("slayer")
+                        || replyMessage.equals("skills")) {
                     if (replyMessage.equals("catacombs")) {
                         eb.addField("Event Type", "Catacombs", false);
                         eventType = "catacombs";
@@ -127,10 +144,12 @@ public class SkyblockEvent {
                         eb.addField("Event Type", "Skills", false);
                         eventType = "skills";
                     }
-                    eb.setDescription("Please enter the number of __hours__ the event should last\nTo cancel type `exit`");
+                    eb.setDescription(
+                            "Please enter the number of __hours__ the event should last\nTo cancel type `exit`");
                     state++;
                 } else {
-                    eb.setDescription(replyMessage + " is an invalid option\nPlease choose from catacombs, slayer, or skills\nTo cancel type `exit`");
+                    eb.setDescription(replyMessage
+                            + " is an invalid option\nPlease choose from catacombs, slayer, or skills\nTo cancel type `exit`");
                 }
                 sendEmbedMessage(eb);
                 break;
@@ -143,8 +162,10 @@ public class SkyblockEvent {
                     } else if (eventDuration > 336) {
                         eb.setDescription("Event must be at most 2 weeks (336 hours)\nTo cancel type `exit`");
                     } else {
-                        eb.addField("End Date", formatter.format(Instant.now().plus(eventDuration, ChronoUnit.HOURS)) + " UTC", false);
-                        eb.setDescription("If there are no prizes please type \"none\", else please enter the prizes in one message following the format in the example below (place number - prize):\n1 - 15 mil coins\n2 - 10 mil\n3 - 500k\nTo cancel type `exit`");
+                        eb.addField("End Date",
+                                formatter.format(Instant.now().plus(eventDuration, ChronoUnit.HOURS)) + " UTC", false);
+                        eb.setDescription(
+                                "If there are no prizes please type \"none\", else please enter the prizes in one message following the format in the example below (place number - prize):\n1 - 15 mil coins\n2 - 10 mil\n3 - 500k\nTo cancel type `exit`");
                         state++;
                     }
                 } catch (Exception e) {
@@ -170,7 +191,8 @@ public class SkyblockEvent {
 
                     StringBuilder ebString = new StringBuilder();
                     for (Map.Entry<Integer, String> prize : prizeListMap.entrySet()) {
-                        ebString.append("• ").append(prize.getKey()).append(") - ").append(prize.getValue()).append("\n");
+                        ebString.append("• ").append(prize.getKey()).append(") - ").append(prize.getValue())
+                                .append("\n");
                     }
 
                     eb.addField("Prizes", ebString.toString(), false);
@@ -184,46 +206,60 @@ public class SkyblockEvent {
                 try {
                     announcementChannel = event.getGuild().getTextChannelById(replyMessage.replaceAll("[<#>]", ""));
                     eb.addField("Announcement Channel", announcementChannel.getAsMention(), false);
-                    eb.setDescription("Please confirm the event by replying with \"yes\" or anything else to cancel\nTo cancel type `exit`");
+                    eb.setDescription(
+                            "Please confirm the event by replying with \"yes\" or anything else to cancel\nTo cancel type `exit`");
                     state++;
                 } catch (Exception e) {
-                    eb.setDescription("Invalid channel. Please make sure the bot can see the channel and it is a valid channel!\nTo cancel type `exit`");
+                    eb.setDescription(
+                            "Invalid channel. Please make sure the bot can see the channel and it is a valid channel!\nTo cancel type `exit`");
                 }
                 sendEmbedMessage(eb);
 
                 break;
             case 5:
                 if (event.getMessage().getContentRaw().equalsIgnoreCase("yes")) {
-                    Message temp = sendEmbedMessage(defaultEmbed("Create a Skyblock competition").setDescription("Event starting..."));
+                    Message temp = sendEmbedMessage(
+                            defaultEmbed("Create a Skyblock competition").setDescription("Event starting..."));
                     EmbedBuilder announcementEb = defaultEmbed(capitalizeString(eventType) + " event started!");
-                    announcementEb.setDescription("A new " + eventType + " event has been created! Please see below for more information.");
-                    announcementEb.addField("Guild Name", higherDepth(higherDepth(guildJson, "guild"), "name").getAsString(), false);
+                    announcementEb.setDescription(
+                            "A new " + eventType + " event has been created! Please see below for more information.");
+                    announcementEb.addField("Guild Name",
+                            higherDepth(higherDepth(guildJson, "guild"), "name").getAsString(), false);
 
                     epochSecondEndingTime = Instant.now().plus(eventDuration, ChronoUnit.HOURS).getEpochSecond();
-                    announcementEb.addField("End Date", formatter.format(Instant.now().plus(eventDuration, ChronoUnit.HOURS)) + " UTC", false);
+                    announcementEb.addField("End Date",
+                            formatter.format(Instant.now().plus(eventDuration, ChronoUnit.HOURS)) + " UTC", false);
 
                     StringBuilder ebString = new StringBuilder();
                     if (prizeListMap != null) {
                         for (Map.Entry<Integer, String> prize : prizeListMap.entrySet()) {
-                            ebString.append("• ").append(prize.getKey()).append(") - ").append(prize.getValue()).append("\n");
+                            ebString.append("• ").append(prize.getKey()).append(") - ").append(prize.getValue())
+                                    .append("\n");
                         }
                     } else {
                         ebString = new StringBuilder("None");
                     }
                     announcementEb.addField("Prizes", ebString.toString(), false);
-                    announcementEb.addField("How To Join", "Run `" + BOT_PREFIX + "event join` to join!\n**You must be linked and in the guild**", false);
+                    announcementEb.addField("How To Join",
+                            "Run `" + BOT_PREFIX + "event join` to join!\n**You must be linked and in the guild**",
+                            false);
 
                     if (setSkyblockEventInDatabase()) {
                         announcementChannel.sendMessage(announcementEb.build()).complete();
 
-                        temp.editMessage(defaultEmbed("Create a Skyblock competition").setDescription("Event started").build()).queueAfter(3, TimeUnit.SECONDS);
+                        temp.editMessage(
+                                defaultEmbed("Create a Skyblock competition").setDescription("Event started").build())
+                                .queueAfter(3, TimeUnit.SECONDS);
                     } else {
-                        temp.editMessage(defaultEmbed("Create a Skyblock competition").setDescription("**Error starting event**").build()).queueAfter(3, TimeUnit.SECONDS);
+                        temp.editMessage(defaultEmbed("Create a Skyblock competition")
+                                .setDescription("**Error starting event**").build()).queueAfter(3, TimeUnit.SECONDS);
 
                     }
                 } else {
-                    Message temp = sendEmbedMessage(defaultEmbed("Create a Skyblock competition").setDescription("Canceling..."));
-                    temp.editMessage(defaultEmbed("Create a Skyblock competition").setDescription("Canceled").build()).queueAfter(3, TimeUnit.SECONDS);
+                    Message temp = sendEmbedMessage(
+                            defaultEmbed("Create a Skyblock competition").setDescription("Canceling..."));
+                    temp.editMessage(defaultEmbed("Create a Skyblock competition").setDescription("Canceled").build())
+                            .queueAfter(3, TimeUnit.SECONDS);
 
                 }
                 return "delete";
@@ -233,10 +269,13 @@ public class SkyblockEvent {
 
     private boolean setSkyblockEventInDatabase() {
         if (!database.serverByServerIdExists(commandEvent.getGuild().getId())) {
-            database.addNewServerSettings(commandEvent.getGuild().getId(), new ServerSettingsModel(commandEvent.getGuild().getName(), commandEvent.getGuild().getId()));
+            database.addNewServerSettings(commandEvent.getGuild().getId(),
+                    new ServerSettingsModel(commandEvent.getGuild().getName(), commandEvent.getGuild().getId()));
         }
 
-        RunningEvent newRunningEvent = new RunningEvent(eventType, announcementChannel.getId(), "" + epochSecondEndingTime, prizeListMap, new ArrayList<>(), higherDepth(higherDepth(guildJson, "guild"), "_id").getAsString());
+        RunningEvent newRunningEvent = new RunningEvent(eventType, announcementChannel.getId(),
+                "" + epochSecondEndingTime, prizeListMap, new ArrayList<>(),
+                higherDepth(higherDepth(guildJson, "guild"), "_id").getAsString());
         SbEvent newSkyblockEventSettings = new SbEvent(newRunningEvent, "true");
 
         return database.updateSkyblockEventSettings(commandEvent.getGuild().getId(), newSkyblockEventSettings) == 200;
