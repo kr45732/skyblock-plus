@@ -48,10 +48,10 @@ public class AutomaticGuild {
     private Instant eventMemberListLastUpdated = null;
 
     public AutomaticGuild(GenericGuildEvent event) {
+        guildId = event.getGuild().getId();
         applyConstructor(event);
         verifyConstructor(event);
         schedulerConstructor();
-        guildId = event.getGuild().getId();
     }
 
     public List<EventMember> getEventMemberList() {
@@ -77,9 +77,9 @@ public class AutomaticGuild {
     public void schedulerConstructor() {
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         int eventDelay = (int) (Math.random() * 60);
-        scheduler.scheduleAtFixedRate(this::updateGuildRoles, eventDelay, 180, TimeUnit.MINUTES);
+        // scheduler.scheduleAtFixedRate(this::updateGuildRoles, eventDelay, 180,
+        // TimeUnit.MINUTES);
         scheduler.scheduleAtFixedRate(this::updateSkyblockEvent, eventDelay, 60, TimeUnit.MINUTES);
-
     }
 
     private void updateSkyblockEvent() {
@@ -100,6 +100,7 @@ public class AutomaticGuild {
 
     public void updateGuildRoles() {
         try {
+            System.out.println(guildId);
             Guild guild = jda.getGuildById(guildId);
             JsonElement currentSettings = database.getGuildRoleSettings(guild.getId());
 
