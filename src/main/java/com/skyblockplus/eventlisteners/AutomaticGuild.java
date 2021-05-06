@@ -149,7 +149,7 @@ public class AutomaticGuild {
             int memberCount = 0;
             for (JsonElement linkedUser : linkedUsers) {
                 try {
-                    guild.retrieveMemberById(higherDepth(linkedUser, "discordId").getAsString());
+                    guild.retrieveMemberById(higherDepth(linkedUser, "discordId").getAsString()).complete();
                 } catch (Exception e) {
                     continue;
                 }
