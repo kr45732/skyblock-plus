@@ -60,8 +60,8 @@ public class SpringDatabaseComponent {
         linkedAccountService.deleteByMinecraftUuid(minecraftUuid);
     }
 
-    public JsonElement getLinkedUsers() {
-        return gson.toJsonTree(linkedAccountService.getAllLinkedAccounts());
+    public List<LinkedAccountModel> getLinkedUsers() {
+        return linkedAccountService.getAllLinkedAccounts();
     }
 
     public List<LinkedAccountModel> getLinkedUsersList() {

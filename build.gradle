@@ -31,11 +31,16 @@ repositories {
     maven {
         url 'https://jitpack.io'
     }
+
+    maven {
+        name 'm2-dv8tion'
+        url 'https://m2.dv8tion.net/releases'
+    }
 }
 
 dependencies {
     // JDA (Discord API wrapper)
-    implementation "net.dv8tion:JDA:4.2.0_227"
+    implementation "net.dv8tion:JDA:4.2.1_262"
 
     // Gson (Google json)
     implementation 'com.google.code.gson:gson:2.8.6'

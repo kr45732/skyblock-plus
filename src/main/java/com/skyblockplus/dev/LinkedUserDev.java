@@ -1,5 +1,6 @@
 package com.skyblockplus.dev;
 
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
@@ -62,7 +63,7 @@ public class LinkedUserDev extends Command {
     }
 
     private boolean getAllLinkedUsers(CommandEvent event) {
-        JsonElement allSettings = database.getLinkedUsers();
+        JsonElement allSettings = new Gson().toJsonTree(database.getLinkedUsers());
         if (allSettings == null) {
             return false;
         }

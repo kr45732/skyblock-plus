@@ -27,7 +27,7 @@ public class Weight {
     }
 
     public Weight(Player player, Map<String, Double> slayerWeights, Map<String, Double[]> skillWeights,
-                  Map<String, Double> dungeonClassWeights, Map<String, Double> catacombsWeights) {
+            Map<String, Double> dungeonClassWeights, Map<String, Double> catacombsWeights) {
         this.player = player;
         this.slayerWeights = slayerWeights;
         this.skillWeights = skillWeights;
@@ -36,8 +36,8 @@ public class Weight {
     }
 
     public Weight(double skillAverage, double slayer, double catacombs, double averageDungeonClass,
-                  Map<String, Double> slayerWeights, Map<String, Double[]> skillWeights,
-                  Map<String, Double> dungeonClassWeights, Map<String, Double> catacombsWeights) {
+            Map<String, Double> slayerWeights, Map<String, Double[]> skillWeights,
+            Map<String, Double> dungeonClassWeights, Map<String, Double> catacombsWeights) {
         this.skillAverage = skillAverage;
         this.slayer = slayer;
         this.catacombs = catacombs;
@@ -58,14 +58,14 @@ public class Weight {
 
     private static Map<String, Double[]> defaultSkillWeights() {
         Map<String, Double[]> tempSkillWeights = new HashMap<>();
-        tempSkillWeights.put("mining", new Double[]{1.18207448, 259634D});
-        tempSkillWeights.put("foraging", new Double[]{1.232826, 259634D});
-        tempSkillWeights.put("enchanting", new Double[]{0.96976583, 882758D});
-        tempSkillWeights.put("farming", new Double[]{1.217848139, 220689D});
-        tempSkillWeights.put("combat", new Double[]{1.15797687265, 275862D});
-        tempSkillWeights.put("fishing", new Double[]{1.406418, 88274D});
-        tempSkillWeights.put("alchemy", new Double[]{1.0, 1103448D});
-        tempSkillWeights.put("taming", new Double[]{1.14744, 441379D});
+        tempSkillWeights.put("mining", new Double[] { 1.18207448, 259634D });
+        tempSkillWeights.put("foraging", new Double[] { 1.232826, 259634D });
+        tempSkillWeights.put("enchanting", new Double[] { 0.96976583, 882758D });
+        tempSkillWeights.put("farming", new Double[] { 1.217848139, 220689D });
+        tempSkillWeights.put("combat", new Double[] { 1.15797687265, 275862D });
+        tempSkillWeights.put("fishing", new Double[] { 1.406418, 88274D });
+        tempSkillWeights.put("alchemy", new Double[] { 1.0, 1103448D });
+        tempSkillWeights.put("taming", new Double[] { 1.14744, 441379D });
         return tempSkillWeights;
     }
 
