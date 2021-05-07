@@ -44,7 +44,6 @@ import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
-import net.dv8tion.jda.api.utils.concurrent.Task;
 
 public class AutomaticGuild {
     private final String guildId;
@@ -84,10 +83,8 @@ public class AutomaticGuild {
     public void schedulerConstructor() {
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         int eventDelay = (int) (Math.random() * 60 + 1);
-        // scheduler.scheduleAtFixedRate(this::updateGuildRoles, eventDelay, 180,
-        // TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(this::updateGuildRoles, eventDelay, 180, TimeUnit.MINUTES);
         scheduler.scheduleAtFixedRate(this::updateSkyblockEvent, eventDelay, 60, TimeUnit.MINUTES);
-        scheduler.schedule(this::updateGuildRoles, 10, TimeUnit.SECONDS);
     }
 
     private void updateSkyblockEvent() {
@@ -108,6 +105,8 @@ public class AutomaticGuild {
 
     public void updateGuildRoles() {
         try {
+            long startTime = System.currentTimeMillis();
+
             Guild guild = jda.getGuildById(guildId);
             JsonElement currentSettings = database.getGuildRoleSettings(guild.getId());
 
@@ -130,26 +129,25 @@ public class AutomaticGuild {
             if (!enableGuildRole && !enableGuildRanks) {
                 return;
             }
+            JsonArray guildMembers = null;
+            try {
+                guildMembers = higherDepth(higherDepth(getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY
+                        + "&id=" + higherDepth(currentSettings, "guildId").getAsString()), "guild"), "members")
+                                .getAsJsonArray();
+            } catch (Exception ignored) {
+            }
 
-            long startTime = System.currentTimeMillis();
-
-            JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&id="
-                    + higherDepth(currentSettings, "guildId").getAsString());
-
-            if (guildJson == null) {
+            if (guildMembers == null) {
                 return;
             }
 
-            JsonArray guildMembers = higherDepth(higherDepth(guildJson, "guild"), "members").getAsJsonArray();
             Map<String, String> uuidToRankMap = new HashMap<>();
-
             for (JsonElement guildMember : guildMembers) {
                 uuidToRankMap.put(higherDepth(guildMember, "uuid").getAsString(),
                         higherDepth(guildMember, "rank").getAsString().replace(" ", "_"));
             }
 
             List<LinkedAccountModel> linkedUsers = database.getLinkedUsers();
-
             Role guildMemberRole = enableGuildRole
                     ? guild.getRoleById(higherDepth(currentSettings, "roleId").getAsString())
                     : null;
