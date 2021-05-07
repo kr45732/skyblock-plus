@@ -1,12 +1,12 @@
 package com.skyblockplus.weight;
 
-import com.skyblockplus.utils.Player;
-
 import java.util.HashMap;
 import java.util.Map;
 
+import com.skyblockplus.utils.Player;
+
 public class Weight {
-    private final Map<String, Double> slayerWeights;
+    private final Map<String, Double[]> slayerWeights;
     private final Map<String, Double[]> skillWeights;
     private final Map<String, Double> dungeonClassWeights;
     private final Map<String, Double> catacombsWeights;
@@ -26,7 +26,7 @@ public class Weight {
                 defaultDungeonClassWeights(), defaultCatacombsWeights());
     }
 
-    public Weight(Player player, Map<String, Double> slayerWeights, Map<String, Double[]> skillWeights,
+    public Weight(Player player, Map<String, Double[]> slayerWeights, Map<String, Double[]> skillWeights,
             Map<String, Double> dungeonClassWeights, Map<String, Double> catacombsWeights) {
         this.player = player;
         this.slayerWeights = slayerWeights;
@@ -36,7 +36,7 @@ public class Weight {
     }
 
     public Weight(double skillAverage, double slayer, double catacombs, double averageDungeonClass,
-            Map<String, Double> slayerWeights, Map<String, Double[]> skillWeights,
+            Map<String, Double[]> slayerWeights, Map<String, Double[]> skillWeights,
             Map<String, Double> dungeonClassWeights, Map<String, Double> catacombsWeights) {
         this.skillAverage = skillAverage;
         this.slayer = slayer;
@@ -48,11 +48,11 @@ public class Weight {
         this.catacombsWeights = catacombsWeights;
     }
 
-    private static Map<String, Double> defaultSlayerWeights() {
-        Map<String, Double> tempSlayerWeights = new HashMap<>();
-        tempSlayerWeights.put("rev", 2208D);
-        tempSlayerWeights.put("sven", 1962D);
-        tempSlayerWeights.put("tara", 2118D);
+    private static Map<String, Double[]> defaultSlayerWeights() {
+        Map<String, Double[]> tempSlayerWeights = new HashMap<>();
+        tempSlayerWeights.put("rev", new Double[] { 2208D, 0.1D });
+        tempSlayerWeights.put("sven", new Double[] { 1962D, 0.08D });
+        tempSlayerWeights.put("tara", new Double[] { 2118D, 0.015D });
         return tempSlayerWeights;
     }
 
@@ -95,9 +95,9 @@ public class Weight {
 
     public double getSlayerWeight() {
         SlayerWeight slayerWeight = new SlayerWeight(player);
-        slayerWeight.addSlayerWeight("rev", slayerWeights.get("rev"));
-        slayerWeight.addSlayerWeight("sven", slayerWeights.get("sven"));
-        slayerWeight.addSlayerWeight("tara", slayerWeights.get("tara"));
+        slayerWeight.addSlayerWeight("rev", slayerWeights.get("rev")[0], slayerWeights.get("rev")[1]);
+        slayerWeight.addSlayerWeight("sven", slayerWeights.get("sven")[0], slayerWeights.get("sven")[1]);
+        slayerWeight.addSlayerWeight("tara", slayerWeights.get("tara")[0], slayerWeights.get("tara")[1]);
         return slayerWeight.getSlayerWeight();
     }
 
@@ -136,7 +136,8 @@ public class Weight {
     public double calculateSlayerWeight() {
         SlayerWeight slayerWeight = new SlayerWeight();
         slayerWeight.addSlayerWeight(slayer,
-                (slayerWeights.get("rev") + slayerWeights.get("sven") + slayerWeights.get("tara")) / 3);
+                (slayerWeights.get("rev")[0] + slayerWeights.get("sven")[0] + slayerWeights.get("tara")[0]) / 3,
+                (slayerWeights.get("rev")[1] + slayerWeights.get("sven")[1] + slayerWeights.get("tara")[1]) / 3);
         return slayerWeight.getSlayerWeight();
     }
 

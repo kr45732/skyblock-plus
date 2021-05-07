@@ -17,22 +17,47 @@ public class SlayerWeight {
         return totalSlayerWeight;
     }
 
-    public void addSlayerWeight(String slayerName, double divider) {
+    public void addSlayerWeight(String slayerName, double divider, double modifier) {
         int currentSlayerXp = player.getSlayer(slayerName);
 
-        if (currentSlayerXp == 0) {
-            totalSlayerWeight += 0;
-        } else if (currentSlayerXp <= 1000000) {
-            totalSlayerWeight += (currentSlayerXp / divider);
+        if (currentSlayerXp <= 1000000) {
+            totalSlayerWeight += currentSlayerXp == 0 ? 0 : currentSlayerXp / divider;
         } else {
             double base = 1000000 / divider;
             double remaining = currentSlayerXp - 1000000;
-            double overflow = Math.pow(remaining / (divider * 1.5), 0.942);
+            double overflow = 0;
+
+            while (remaining > 0) {
+                double left = Math.min(remaining, 1000000);
+
+                overflow += Math.pow(left / (divider * (1.5 + modifier)), 0.942);
+                modifier += modifier;
+                remaining -= left;
+            }
+
             totalSlayerWeight += (base + overflow);
         }
     }
 
-    public void addSlayerWeight(double slayer, double divider) {
-        totalSlayerWeight += 3 * ((slayer / 3) / divider);
+    public void addSlayerWeight(double slayer, double divider, double modifier) {
+        slayer = slayer / 3;
+
+        if (slayer <= 1000000) {
+            totalSlayerWeight += 3 * (slayer == 0 ? 0 : slayer / divider);
+        } else {
+            double base = 1000000 / divider;
+            double remaining = slayer - 1000000;
+            double overflow = 0;
+
+            while (remaining > 0) {
+                double left = Math.min(remaining, 1000000);
+
+                overflow += Math.pow(left / (divider * (1.5 + modifier)), 0.942);
+                modifier += modifier;
+                remaining -= left;
+            }
+
+            totalSlayerWeight += 3 * (base + overflow);
+        }
     }
 }

@@ -135,20 +135,11 @@ public class GuildLeaderboardCommand extends Command {
         ArrayList<Player> guildSkills = new ArrayList<>();
         ArrayList<Player> guildCatacombs = new ArrayList<>();
         ArrayList<String> uniqueGuildUuid = new ArrayList<>();
-        List<CompletableFuture> futures = new ArrayList<>();
-        // CountDownLatch httpGetsFinishedLatch = new CountDownLatch(1);
-        // int latchCount = 0;
-        for (JsonElement guildMember : guildMembers) {
-            String memberRank = higherDepth(guildMember, "rank").getAsString();
-            if (!staffRankNames.contains(memberRank)) {
-                // latchCount++;
-            }
-        }
+        List<CompletableFuture<Boolean>> futures = new ArrayList<>();
 
         for (JsonElement guildMember : guildMembers) {
             String memberRank = higherDepth(guildMember, "rank").getAsString();
             if (!staffRankNames.contains(memberRank)) {
-                // int finalLatchCount = latchCount;
 
                 String guildMemberUuid = higherDepth(guildMember, "uuid").getAsString();
 
@@ -160,8 +151,8 @@ public class GuildLeaderboardCommand extends Command {
                 } catch (Exception ignored) {
                 }
 
-                futures.add(asyncHttpClient.prepareGet("https://api.ashcon.app/mojang/v2/user/" + guildMemberUuid)
-                        .execute().toCompletableFuture().thenApply(uuidToUsernameResponse -> {
+                asyncHttpClient.prepareGet("https://api.ashcon.app/mojang/v2/user/" + guildMemberUuid).execute()
+                        .toCompletableFuture().thenApply(uuidToUsernameResponse -> {
                             try {
                                 return higherDepth(JsonParser.parseString(uuidToUsernameResponse.getResponseBody()),
                                         "username").getAsString();
@@ -169,7 +160,7 @@ public class GuildLeaderboardCommand extends Command {
                             }
                             return null;
                         }).thenApply(guildMemberUsernameResponse -> {
-                            asyncHttpClient
+                            futures.add(asyncHttpClient
                                     .prepareGet("https://api.hypixel.net/skyblock/profiles?key=" + HYPIXEL_API_KEY
                                             + "&uuid=" + guildMemberUuid)
                                     .execute().toCompletableFuture().thenApply(guildMemberOuterProfileJsonResponse -> {
@@ -198,24 +189,18 @@ public class GuildLeaderboardCommand extends Command {
                                         }
                                         uniqueGuildUuid.add("null");
                                         return false;
-                                    }).whenComplete((o, throwable) -> {
-                                        // if (uniqueGuildUuid.size() == finalLatchCount) {
-                                        // httpGetsFinishedLatch.countDown();
-                                        // }
-                                    });
+                                    }));
                             return null;
-                        }));
+                        });
             }
         }
 
         boolean success = true;
-        // CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-        // try {
-        // success = httpGetsFinishedLatch.await(20, TimeUnit.SECONDS);
-        // } catch (Exception e) {
-        // System.out.println("== Stack Trace (Guild Rank Latch) ==");
-        // e.printStackTrace();
-        // }
+        try {
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get();
+        } catch (Exception e) {
+            success = false;
+        }
 
         guildSlayer.sort(Comparator.comparingInt(Player::getSlayer));
         Collections.reverse(guildSlayer);
