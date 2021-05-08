@@ -88,7 +88,7 @@ public class Player {
     }
 
     public Player(String playerUuid, String playerUsername, String profileName, JsonElement outerProfileJson,
-            long startingAmount) {
+                  long startingAmount) {
         this.playerUuid = playerUuid;
         this.playerUsername = playerUsername;
         this.startingAmount = startingAmount;
@@ -376,7 +376,7 @@ public class Player {
                 try {
                     lastSaveLoop = higherDepth(
                             higherDepth(higherDepth(profilesArray.get(i), "members"), this.playerUuid), "last_save")
-                                    .getAsString();
+                            .getAsString();
                 } catch (Exception e) {
                     continue;
                 }
@@ -461,7 +461,7 @@ public class Player {
                 try {
                     JsonArray craftedMinions = higherDepth(
                             higherDepth(higherDepth(outerProfileJson, "members"), member), "crafted_generators")
-                                    .getAsJsonArray();
+                            .getAsJsonArray();
                     for (JsonElement minion : craftedMinions) {
                         uniqueCraftedMinions.add(minion.getAsString());
                     }
@@ -469,8 +469,8 @@ public class Player {
                 }
             }
 
-            int[] craftedMinionsToSlots = new int[] { 0, 5, 15, 30, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300,
-                    350, 400, 450, 500, 550, 600 };
+            int[] craftedMinionsToSlots = new int[]{0, 5, 15, 30, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300,
+                    350, 400, 450, 500, 550, 600};
 
             int prevMax = 0;
             for (int i = 0; i < craftedMinionsToSlots.length; i++) {
@@ -669,7 +669,7 @@ public class Player {
                 }
 
                 if (i.getKey() != 0 && i.getKey() % 36 == 0) {
-                    enderChestPages.add(new String[] { outputStringPart1.toString(), outputStringPart2.toString() });
+                    enderChestPages.add(new String[]{outputStringPart1.toString(), outputStringPart2.toString()});
                     outputStringPart1 = new StringBuilder();
                     outputStringPart2 = new StringBuilder();
                     page += 36;
@@ -741,7 +741,7 @@ public class Player {
                     }
                 }
             }
-            return new String[] { outputStringPart2.toString(), outputStringPart1.toString() };
+            return new String[]{outputStringPart2.toString(), outputStringPart1.toString()};
 
         } catch (Exception ignored) {
         }
@@ -1348,7 +1348,7 @@ public class Player {
                 }
 
                 if (i.getKey() != 0 && i.getKey() % 45 == 0) {
-                    enderChestPages.add(new String[] { outputStringPart1.toString(), outputStringPart2.toString() });
+                    enderChestPages.add(new String[]{outputStringPart1.toString(), outputStringPart2.toString()});
                     outputStringPart1 = new StringBuilder();
                     outputStringPart2 = new StringBuilder();
                     page += 45;
@@ -1417,7 +1417,7 @@ public class Player {
                 }
 
                 if (i.getKey() != 0 && i.getKey() % 45 == 0) {
-                    enderChestPages.add(new String[] { outputStringPart1.toString(), outputStringPart2.toString() });
+                    enderChestPages.add(new String[]{outputStringPart1.toString(), outputStringPart2.toString()});
                     outputStringPart1 = new StringBuilder();
                     outputStringPart2 = new StringBuilder();
                     page += 45;
@@ -1569,7 +1569,7 @@ public class Player {
                 InvItem invItemStruct = new InvItem();
                 invItemStruct.setName("[Lvl "
                         + petLevelFromXp(higherDepth(pet, "exp").getAsLong(),
-                                higherDepth(pet, "tier").getAsString().toLowerCase())
+                        higherDepth(pet, "tier").getAsString().toLowerCase())
                         + "] "
                         + capitalizeString(higherDepth(pet, "type").getAsString().toUpperCase().replace("_", " ")));
                 invItemStruct.setId("PET");

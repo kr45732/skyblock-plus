@@ -1,6 +1,9 @@
 package com.skyblockplus.timeout;
 
-import static com.skyblockplus.Main.jda;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -10,11 +13,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.jetbrains.annotations.NotNull;
-
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.ReadyEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import static com.skyblockplus.Main.jda;
 
 public class MessageTimeout extends ListenerAdapter {
     private static final List<MessageTimeoutStruct> messageList = new ArrayList<>();
@@ -24,7 +23,7 @@ public class MessageTimeout extends ListenerAdapter {
     }
 
     public static void removeMessage(Object eventListener) {
-        for (Iterator<MessageTimeoutStruct> iteratorCur = messageList.iterator(); iteratorCur.hasNext();) {
+        for (Iterator<MessageTimeoutStruct> iteratorCur = messageList.iterator(); iteratorCur.hasNext(); ) {
             MessageTimeoutStruct currentMessage = iteratorCur.next();
             if (currentMessage.eventListener.equals(eventListener)) {
                 iteratorCur.remove();
@@ -41,7 +40,7 @@ public class MessageTimeout extends ListenerAdapter {
 
     public void updateMessages() {
         try {
-            for (Iterator<MessageTimeoutStruct> iteratorCur = messageList.iterator(); iteratorCur.hasNext();) {
+            for (Iterator<MessageTimeoutStruct> iteratorCur = messageList.iterator(); iteratorCur.hasNext(); ) {
                 MessageTimeoutStruct currentMessageStruct = iteratorCur.next();
                 Message currentMessage = currentMessageStruct.message;
                 long secondsSinceLast = Instant.now().getEpochSecond()

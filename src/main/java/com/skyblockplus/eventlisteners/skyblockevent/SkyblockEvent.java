@@ -1,12 +1,14 @@
 package com.skyblockplus.eventlisteners.skyblockevent;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Utils.BOT_PREFIX;
-import static com.skyblockplus.utils.Utils.HYPIXEL_API_KEY;
-import static com.skyblockplus.utils.Utils.capitalizeString;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.getJson;
-import static com.skyblockplus.utils.Utils.higherDepth;
+import com.google.gson.JsonElement;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSettingsModel;
+import com.skyblockplus.api.discordserversettings.skyblockevent.RunningEvent;
+import com.skyblockplus.api.discordserversettings.skyblockevent.SbEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -21,16 +23,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import com.google.gson.JsonElement;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSettingsModel;
-import com.skyblockplus.api.discordserversettings.skyblockevent.RunningEvent;
-import com.skyblockplus.api.discordserversettings.skyblockevent.SbEvent;
-
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.Utils.*;
 
 public class SkyblockEvent {
     private final DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
@@ -123,7 +117,7 @@ public class SkyblockEvent {
                                     + "\nMembers: "
                                     + higherDepth(higherDepth(guildJson, "guild"), "members").getAsJsonArray().size(),
                             false).setDescription(
-                                    "Is this a __catacombs__, __slayer__, or __skills__ event?\nTo cancel type `exit`");
+                            "Is this a __catacombs__, __slayer__, or __skills__ event?\nTo cancel type `exit`");
                     state++;
                 } catch (Exception e) {
                     eb.setDescription("Invalid guild name: " + event.getMessage().getContentRaw());

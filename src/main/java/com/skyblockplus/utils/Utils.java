@@ -71,6 +71,7 @@ public class Utils {
     private static JsonElement petNumsJson;
     private static JsonElement petsJson;
     private static JsonElement reforgeStonesJson;
+    private static JsonElement bitsJson;
 
     public static void setApplicationSettings() {
         Properties appProps = new Properties();
@@ -106,6 +107,14 @@ public class Utils {
             API_PASSWORD = System.getenv("API_PASSWORD");
             API_BASE_URL = System.getenv("API_BASE_URL");
         }
+    }
+
+    public static JsonElement getBitsJson(){
+        if(bitsJson == null){
+            bitsJson  = getJson("https://raw.githubusercontent.com/plun1331/SkyKings/main/bot-data/bit-prices.json");
+        }
+
+        return bitsJson;
     }
 
     public static JsonElement higherDepth(JsonElement element, String value) {
@@ -187,7 +196,7 @@ public class Utils {
             InputStream inputStream = httpresponse.getEntity().getContent();
             ByteArrayOutputStream result = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
-            for (int length; (length = inputStream.read(buffer)) != -1;) {
+            for (int length; (length = inputStream.read(buffer)) != -1; ) {
                 result.write(buffer, 0, length);
             }
             return result.toString().split("module.exports = ")[1];
@@ -217,13 +226,13 @@ public class Utils {
         if (petUrlJson == null) {
             petUrlJson = parseJsString(getSkyCryptData(
                     "https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/pets.js")
-                            .split("pet_value")[0]
+                    .split("pet_value")[0]
                     + "}");
         }
         try {
-            return "https://sky.shiiyu.moe"
+            return "https://sky.lea.moe"
                     + higherDepth(higherDepth(higherDepth(petUrlJson, "pet_data"), petName.toUpperCase()), "head")
-                            .getAsString();
+                    .getAsString();
         } catch (Exception e) {
             return null;
         }
@@ -233,7 +242,7 @@ public class Utils {
         if (collectionsJson == null) {
             collectionsJson = parseJsString(getSkyCryptData(
                     "https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/collections.js")
-                            .replace(";", ""));
+                    .replace(";", ""));
         }
 
         try {
@@ -601,7 +610,7 @@ public class Utils {
 
             String discordTag = higherDepth(
                     higherDepth(higherDepth(higherDepth(playerJson, "player"), "socialMedia"), "links"), "DISCORD")
-                            .getAsString();
+                    .getAsString();
             String minecraftUsername = higherDepth(higherDepth(playerJson, "player"), "displayname").getAsString();
             String minecraftUuid = higherDepth(higherDepth(playerJson, "player"), "uuid").getAsString();
 

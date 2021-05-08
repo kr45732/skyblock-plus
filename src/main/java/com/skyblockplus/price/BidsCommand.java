@@ -1,4 +1,4 @@
-package com.skyblockplus.auctionbaz;
+package com.skyblockplus.price;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

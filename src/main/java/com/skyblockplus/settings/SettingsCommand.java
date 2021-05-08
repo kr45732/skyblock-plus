@@ -34,7 +34,7 @@ public class SettingsCommand extends Command {
     public SettingsCommand() {
         this.name = "settings";
         this.cooldown = globalCooldown + 1;
-        this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
+        this.userPermissions = new Permission[]{Permission.ADMINISTRATOR};
     }
 
     @Override
@@ -349,7 +349,7 @@ public class SettingsCommand extends Command {
             for (JsonElement guildRank : higherDepth(currentSettings, "guildRanks").getAsJsonArray()) {
                 guildRanksString.append("\n• ").append(higherDepth(guildRank, "minecraftRoleName").getAsString())
                         .append(" - ").append(event.getGuild()
-                                .getRoleById(higherDepth(guildRank, "discordRoleId").getAsString()).getAsMention());
+                        .getRoleById(higherDepth(guildRank, "discordRoleId").getAsString()).getAsMention());
             }
         } catch (Exception ignored) {
         }
@@ -718,7 +718,7 @@ public class SettingsCommand extends Command {
                         ebFieldString.append("\n• ")
                                 .append(higherDepth(higherDepth(guildJson, "guild"), "name").getAsString())
                                 .append(" - ").append(event.getGuild()
-                                        .getRoleById(higherDepth(roleLevel, "roleId").getAsString()).getAsMention());
+                                .getRoleById(higherDepth(roleLevel, "roleId").getAsString()).getAsMention());
                     }
                 } else {
                     for (JsonElement roleLevel : higherDepth(currentRoleSettings, "levels").getAsJsonArray()) {

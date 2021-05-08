@@ -1,19 +1,11 @@
-package com.skyblockplus.auctionbaz;
+package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.Utils.capitalizeString;
-import static com.skyblockplus.utils.Utils.convertToInternalName;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.errorMessage;
-import static com.skyblockplus.utils.Utils.formatNumber;
-import static com.skyblockplus.utils.Utils.getEnchantsJson;
-import static com.skyblockplus.utils.Utils.getJson;
-import static com.skyblockplus.utils.Utils.getJsonKeys;
-import static com.skyblockplus.utils.Utils.getPetNumsJson;
-import static com.skyblockplus.utils.Utils.getPetUrl;
-import static com.skyblockplus.utils.Utils.globalCooldown;
-import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.utils.Utils.loadingEmbed;
-import static com.skyblockplus.utils.Utils.logCommand;
+import com.google.gson.JsonElement;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import org.apache.commons.text.similarity.LevenshteinDistance;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,21 +13,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.google.gson.JsonElement;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-
-import org.apache.commons.text.similarity.LevenshteinDistance;
-
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
+import static com.skyblockplus.utils.Utils.*;
 
 public class AverageAuctionCommand extends Command {
 
     public AverageAuctionCommand() {
         this.name = "average";
         this.cooldown = globalCooldown;
-        this.aliases = new String[] { "avg" };
+        this.aliases = new String[]{"avg"};
     }
 
     @Override
@@ -230,27 +215,54 @@ public class AverageAuctionCommand extends Command {
             }
         }
 
-        if (closestMatch != null) {
-            EmbedBuilder eb = defaultEmbed("Lowest bin");
+        if (closestMatch != null && higherDepth(averageAhJson, closestMatch) != null) {
+            EmbedBuilder eb = defaultEmbed("Average Auction");
+            JsonElement itemJson = higherDepth(averageAhJson, closestMatch);
+
             if (enchantNames.contains(closestMatch.split(";")[0].trim())) {
+                String itemName = closestMatch.toLowerCase().replace("_", " ").replace(";", " ");
+                if (higherDepth(itemJson, "clean_price") != null) {
+                    eb = defaultEmbed("Average auction (clean)");
+                    eb.addField(capitalizeString(itemName),
+                            formatNumber(higherDepth(itemJson, "clean_price").getAsLong()), false);
+                } else {
+                    eb = defaultEmbed("Average auction");
+                    eb.addField(capitalizeString(itemName),
+                            formatNumber(higherDepth(itemJson, "price").getAsLong()), false);
+                }
+
                 eb.setThumbnail("https://sky.lea.moe/item.gif/ENCHANTED_BOOK");
-                eb.addField(capitalizeString(closestMatch.toLowerCase().replace("_", " ").replace(";", " ")),
-                        formatNumber(higherDepth(averageAhJson, closestMatch).getAsLong()), false);
+
             } else if (petNames.contains(closestMatch.split(";")[0].trim())) {
                 Map<String, String> rarityMapRev = new HashMap<>();
-                rarityMapRev.put(";4", "LEGENDARY");
-                rarityMapRev.put(";3", "EPIC");
-                rarityMapRev.put(";2", "RARE");
-                rarityMapRev.put(";1", "UNCOMMON");
-                rarityMapRev.put(";0", "COMMON");
+                rarityMapRev.put("4", "LEGENDARY");
+                rarityMapRev.put("3", "EPIC");
+                rarityMapRev.put("2", "RARE");
+                rarityMapRev.put("1", "UNCOMMON");
+                rarityMapRev.put("0", "COMMON");
                 eb.setThumbnail(getPetUrl(closestMatch.split(";")[0]));
                 String[] itemS = closestMatch.toLowerCase().replace("_", " ").split(";");
-                eb.addField(capitalizeString(rarityMapRev.get(itemS[1].toUpperCase()) + " " + itemS[0]),
-                        formatNumber(higherDepth(averageAhJson, closestMatch).getAsLong()), false);
+
+                if (higherDepth(itemJson, "clean_price") != null) {
+                    eb = defaultEmbed("Average auction (clean)");
+                    eb.addField(capitalizeString(rarityMapRev.get(itemS[1].toUpperCase()) + " " + itemS[0]),
+                            formatNumber(higherDepth(itemJson, "clean_price").getAsLong()), false);
+                } else {
+                    eb = defaultEmbed("Average auction");
+                    eb.addField(capitalizeString(rarityMapRev.get(itemS[1].toUpperCase()) + " " + itemS[0]),
+                            formatNumber(higherDepth(itemJson, "price").getAsLong()), false);
+                }
             } else {
+                if (higherDepth(itemJson, "clean_price") != null) {
+                    eb = defaultEmbed("Average auction (clean)");
+                    eb.addField(capitalizeString(closestMatch.toLowerCase().replace("_", " ")),
+                            formatNumber(higherDepth(itemJson, "clean_price").getAsLong()), false);
+                } else {
+                    eb = defaultEmbed("Average auction");
+                    eb.addField(capitalizeString(closestMatch.toLowerCase().replace("_", " ")),
+                            formatNumber(higherDepth(itemJson, "price").getAsLong()), false);
+                }
                 eb.setThumbnail("https://sky.lea.moe/item.gif/" + closestMatch);
-                eb.addField(capitalizeString(closestMatch.toLowerCase().replace("_", " ")),
-                        formatNumber(higherDepth(averageAhJson, closestMatch).getAsLong()), false);
             }
 
             return eb;

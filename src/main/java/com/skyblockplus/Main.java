@@ -2,7 +2,7 @@ package com.skyblockplus;
 
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.skyblockplus.auctionbaz.*;
+import com.skyblockplus.price.*;
 import com.skyblockplus.dev.*;
 import com.skyblockplus.dungeons.CatacombsCommand;
 import com.skyblockplus.dungeons.EssenceCommand;
@@ -44,9 +44,9 @@ import static com.skyblockplus.utils.Utils.*;
 
 @SpringBootApplication
 public class Main {
+    public static final AsyncHttpClient asyncHttpClient = Dsl.asyncHttpClient();
     public static JDA jda;
     public static SpringDatabaseComponent database;
-    public static final AsyncHttpClient asyncHttpClient = Dsl.asyncHttpClient();
     public static EventWaiter waiter;
 
     public static void main(String[] args) throws LoginException, IllegalArgumentException {
@@ -74,7 +74,7 @@ public class Main {
                 new LinkAccountCommand(), new GetSettingsFile(), new UnlinkAccountCommand(), new LinkedUserDev(),
                 new BazaarCommand(), new AverageAuctionCommand(), new PetsCommand(), new SkyblockEventCommand(),
                 new DeleteMessagesCommand(), new PlaceholderCommand(), new ProfilesCommand(), new NetworthCommand(),
-                new QueryAuctionCommand(), new BidsCommand(), new GetThreadPools());
+                new QueryAuctionCommand(), new BidsCommand(), new GetThreadPools(), new BitsCommand());
 
         if (BOT_PREFIX.equals("+")) {
             jda = JDABuilder.createDefault(BOT_TOKEN).setStatus(OnlineStatus.DO_NOT_DISTURB)

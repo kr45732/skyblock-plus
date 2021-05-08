@@ -1,20 +1,11 @@
-package com.skyblockplus.auctionbaz;
+package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.Utils.BOT_PREFIX;
-import static com.skyblockplus.utils.Utils.capitalizeString;
-import static com.skyblockplus.utils.Utils.convertToInternalName;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.errorMessage;
-import static com.skyblockplus.utils.Utils.formatNumber;
-import static com.skyblockplus.utils.Utils.getEnchantsJson;
-import static com.skyblockplus.utils.Utils.getJson;
-import static com.skyblockplus.utils.Utils.getJsonKeys;
-import static com.skyblockplus.utils.Utils.getPetNumsJson;
-import static com.skyblockplus.utils.Utils.getPetUrl;
-import static com.skyblockplus.utils.Utils.globalCooldown;
-import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.utils.Utils.loadingEmbed;
-import static com.skyblockplus.utils.Utils.logCommand;
+import com.google.gson.JsonElement;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import org.apache.commons.text.similarity.LevenshteinDistance;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,20 +14,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import com.google.gson.JsonElement;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-
-import org.apache.commons.text.similarity.LevenshteinDistance;
-
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
+import static com.skyblockplus.utils.Utils.*;
 
 public class BinCommand extends Command {
     public BinCommand() {
         this.name = "bin";
         this.cooldown = globalCooldown;
-        this.aliases = new String[] { "lbin" };
+        this.aliases = new String[]{"lbin"};
     }
 
     @Override
@@ -187,22 +171,23 @@ public class BinCommand extends Command {
             }
         }
 
-        if (closestMatch != null) {
+        if (closestMatch != null && higherDepth(lowestBinJson, closestMatch) != null) {
             EmbedBuilder eb = defaultEmbed("Lowest bin");
             if (enchantNames.contains(closestMatch.split(";")[0].trim())) {
                 eb.setThumbnail("https://sky.lea.moe/item.gif/ENCHANTED_BOOK");
                 eb.addField(capitalizeString(closestMatch.toLowerCase().replace("_", " ").replace(";", " ")),
                         formatNumber(higherDepth(lowestBinJson, closestMatch).getAsLong()), false);
             } else if (petNames.contains(closestMatch.split(";")[0].trim())) {
+                System.out.println(closestMatch);
                 Map<String, String> rarityMapRev = new HashMap<>();
-                rarityMapRev.put(";4", "LEGENDARY");
-                rarityMapRev.put(";3", "EPIC");
-                rarityMapRev.put(";2", "RARE");
-                rarityMapRev.put(";1", "UNCOMMON");
-                rarityMapRev.put(";0", "COMMON");
-                eb.setThumbnail(getPetUrl(closestMatch.split(";")[0]));
-                String[] itemS = closestMatch.toLowerCase().replace("_", " ").split(";");
-                eb.addField(capitalizeString(rarityMapRev.get(itemS[1].toUpperCase()) + " " + itemS[0]),
+                rarityMapRev.put("4", "LEGENDARY");
+                rarityMapRev.put("3", "EPIC");
+                rarityMapRev.put("2", "RARE");
+                rarityMapRev.put("1", "UNCOMMON");
+                rarityMapRev.put("0", "COMMON");
+                String[] itemS = closestMatch.split(";");
+                eb.setThumbnail(getPetUrl(itemS[0]));
+                eb.addField(capitalizeString(rarityMapRev.get(itemS[1].toUpperCase()) + " " + itemS[0].replace("_", " ")),
                         formatNumber(higherDepth(lowestBinJson, closestMatch).getAsLong()), false);
             } else {
                 eb.setThumbnail("https://sky.lea.moe/item.gif/" + closestMatch);

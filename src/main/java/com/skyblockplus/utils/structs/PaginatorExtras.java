@@ -9,10 +9,10 @@ import java.util.List;
 public class PaginatorExtras {
     private final List<String> titles = new ArrayList<>();
     private final List<String> thumbnails = new ArrayList<>();
+    private final List<Field> embedFields = new ArrayList<>();
     private String everyPageText = null;
     private String everyPageTitle = null;
     private String everyPageThumnail = null;
-    private final List<Field> embedFields = new ArrayList<>();
 
     public List<String> getTitles() {
         return titles;

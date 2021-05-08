@@ -1,35 +1,24 @@
-package com.skyblockplus.auctionbaz;
+package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.Utils.capitalizeString;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.errorMessage;
-import static com.skyblockplus.utils.Utils.getJson;
-import static com.skyblockplus.utils.Utils.getJsonKeys;
-import static com.skyblockplus.utils.Utils.globalCooldown;
-import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.utils.Utils.loadingEmbed;
-import static com.skyblockplus.utils.Utils.logCommand;
-import static com.skyblockplus.utils.Utils.simplifyNumber;
+import com.google.gson.JsonElement;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import org.apache.commons.text.similarity.LevenshteinDistance;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gson.JsonElement;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-
-import org.apache.commons.text.similarity.LevenshteinDistance;
-
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
+import static com.skyblockplus.utils.Utils.*;
 
 public class BazaarCommand extends Command {
     public BazaarCommand() {
         this.name = "bazaar";
         this.cooldown = globalCooldown;
-        this.aliases = new String[] { "bz" };
+        this.aliases = new String[]{"bz"};
     }
 
     @Override
@@ -93,7 +82,7 @@ public class BazaarCommand extends Command {
             }
         }
 
-        if (closestMatch != null) {
+        if (closestMatch != null && higherDepth(bazaarItems, closestMatch) != null) {
             closestMatch = itemsMap.get(closestMatch);
 
             JsonElement itemInfo = higherDepth(higherDepth(bazaarItems, closestMatch), "quick_status");

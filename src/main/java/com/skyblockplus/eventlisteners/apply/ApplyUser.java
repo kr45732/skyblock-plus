@@ -1,15 +1,14 @@
 package com.skyblockplus.eventlisteners.apply;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.emojiToProfileName;
-import static com.skyblockplus.utils.Utils.fixUsername;
-import static com.skyblockplus.utils.Utils.formatNumber;
-import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.utils.Utils.logCommand;
-import static com.skyblockplus.utils.Utils.profileNameToEmoji;
-import static com.skyblockplus.utils.Utils.roundAndFormat;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.skyblockplus.utils.Player;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -17,20 +16,9 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.skyblockplus.utils.Player;
-
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Category;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.utils.Utils.*;
 
 public class ApplyUser implements Serializable {
     private final String applyingUserId;

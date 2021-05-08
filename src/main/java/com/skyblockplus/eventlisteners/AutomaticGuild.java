@@ -1,13 +1,21 @@
 package com.skyblockplus.eventlisteners;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.eventlisteners.skyblockevent.SkyblockEventCommand.endSkyblockEvent;
-import static com.skyblockplus.utils.Utils.HYPIXEL_API_KEY;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.getJson;
-import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.utils.Utils.logCommand;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.api.discordserversettings.skyblockevent.EventMember;
+import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
+import com.skyblockplus.eventlisteners.apply.ApplyGuild;
+import com.skyblockplus.eventlisteners.skyblockevent.SkyblockEvent;
+import com.skyblockplus.eventlisteners.verify.VerifyGuild;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
+import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import org.apache.commons.collections4.ListUtils;
 
 import java.io.File;
 import java.time.Duration;
@@ -22,28 +30,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.api.discordserversettings.skyblockevent.EventMember;
-import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
-import com.skyblockplus.eventlisteners.apply.ApplyGuild;
-import com.skyblockplus.eventlisteners.skyblockevent.SkyblockEvent;
-import com.skyblockplus.eventlisteners.verify.VerifyGuild;
-
-import org.apache.commons.collections4.ListUtils;
-
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
-import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.eventlisteners.skyblockevent.SkyblockEventCommand.endSkyblockEvent;
+import static com.skyblockplus.utils.Utils.*;
 
 public class AutomaticGuild {
     private final String guildId;
@@ -133,7 +123,7 @@ public class AutomaticGuild {
             try {
                 guildMembers = higherDepth(higherDepth(getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY
                         + "&id=" + higherDepth(currentSettings, "guildId").getAsString()), "guild"), "members")
-                                .getAsJsonArray();
+                        .getAsJsonArray();
             } catch (Exception ignored) {
             }
 

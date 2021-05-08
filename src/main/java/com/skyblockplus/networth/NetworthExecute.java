@@ -21,15 +21,21 @@ import java.util.*;
 import static com.skyblockplus.utils.Utils.*;
 
 public class NetworthExecute {
+    private final Set<String> tempSet = new HashSet<>();
+    private final List<InvItem> invPets = new ArrayList<>();
+    private final List<InvItem> petsPets = new ArrayList<>();
+    private final List<InvItem> enderChestPets = new ArrayList<>();
+    private final List<String> enderChestItems = new ArrayList<>();
+    private final List<String> petsItems = new ArrayList<>();
+    private final List<String> invItems = new ArrayList<>();
+    private final List<String> wardrobeItems = new ArrayList<>();
+    private final List<String> talismanItems = new ArrayList<>();
+    private final List<String> armorItems = new ArrayList<>();
     private JsonElement lowestBinJson;
     private JsonElement averageAuctionJson;
     private JsonElement bazaarJson;
     private JsonArray sbzPrices;
     private int failedCount = 0;
-    private final Set<String> tempSet = new HashSet<>();
-    private final List<InvItem> invPets = new ArrayList<>();
-    private final List<InvItem> petsPets = new ArrayList<>();
-    private final List<InvItem> enderChestPets = new ArrayList<>();
     private double enderChestTotal = 0;
     private double petsTotal = 0;
     private double invTotal = 0;
@@ -38,13 +44,6 @@ public class NetworthExecute {
     private double wardrobeTotal = 0;
     private double talismanTotal = 0;
     private double invArmor = 0;
-
-    private final List<String> enderChestItems = new ArrayList<>();
-    private final List<String> petsItems = new ArrayList<>();
-    private final List<String> invItems = new ArrayList<>();
-    private final List<String> wardrobeItems = new ArrayList<>();
-    private final List<String> talismanItems = new ArrayList<>();
-    private final List<String> armorItems = new ArrayList<>();
 
     private static JsonArray queryAhApi(String query) {
         CloseableHttpClient httpclient = HttpClientBuilder.create().build();

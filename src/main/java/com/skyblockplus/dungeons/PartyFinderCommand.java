@@ -1,25 +1,18 @@
 package com.skyblockplus.dungeons;
 
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.errorMessage;
-import static com.skyblockplus.utils.Utils.formatNumber;
-import static com.skyblockplus.utils.Utils.globalCooldown;
-import static com.skyblockplus.utils.Utils.loadingEmbed;
-import static com.skyblockplus.utils.Utils.logCommand;
-import static com.skyblockplus.utils.Utils.roundAndFormat;
-
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+
+import static com.skyblockplus.utils.Utils.*;
 
 public class PartyFinderCommand extends Command {
     public PartyFinderCommand() {
         this.name = "partyfinder";
         this.cooldown = globalCooldown;
-        this.aliases = new String[] { "pf" };
+        this.aliases = new String[]{"pf"};
     }
 
     @Override
@@ -57,7 +50,7 @@ public class PartyFinderCommand extends Command {
             eb.appendDescription(
                     player.getBonemerang() != -1
                             ? ((player.getBonemerang() == 1 ? "\n**Bonemerang:** " : "\n**Bonemerangs:** ")
-                                    + player.getBonemerang())
+                            + player.getBonemerang())
                             : "");
             eb.setThumbnail(player.getThumbnailUrl());
             return eb;
