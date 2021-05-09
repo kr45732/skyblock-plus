@@ -21,23 +21,23 @@ import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.*;
 
 public class ApplyUser implements Serializable {
-    private final String applyingUserId;
-    private final String applicationChannelId;
-    private final String currentSettingsString;
-    private final String guildId;
-    private final String[] profileNames;
-    private final List<String> profileNameEmojis = new ArrayList<>();
-    private String reactMessageId;
-    private int state = 0;
-    private String staffChannelId;
-    private boolean shouldDeleteChannel = false;
-    private String playerSlayer;
-    private String playerSkills;
-    private String playerCatacombs;
-    private String playerWeight;
-    private String playerUsername;
-    private String ironmanSymbol;
-    private String playerProfileName;
+    public final String applyingUserId;
+    public final String applicationChannelId;
+    public final String currentSettingsString;
+    public final String guildId;
+    public final String[] profileNames;
+    public final List<String> profileNameEmojis = new ArrayList<>();
+    public String reactMessageId;
+    public int state = 0;
+    public String staffChannelId;
+    public boolean shouldDeleteChannel = false;
+    public String playerSlayer;
+    public String playerSkills;
+    public String playerCatacombs;
+    public String playerWeight;
+    public String playerUsername;
+    public String ironmanSymbol;
+    public String playerProfileName;
 
     public ApplyUser(MessageReactionAddEvent event, JsonElement currentSettings, String playerUsername) {
         User applyingUser = event.getUser();

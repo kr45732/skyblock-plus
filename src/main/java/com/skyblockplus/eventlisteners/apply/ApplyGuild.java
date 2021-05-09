@@ -17,10 +17,10 @@ import static com.skyblockplus.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.Utils.higherDepth;
 
 public class ApplyGuild {
-    private List<ApplyUser> applyUserList = new ArrayList<>();
-    private Message reactMessage;
-    private JsonElement currentSettings;
-    private boolean enable = true;
+    public List<ApplyUser> applyUserList = new ArrayList<>();
+    public Message reactMessage;
+    public JsonElement currentSettings;
+    public boolean enable = true;
 
     public ApplyGuild(Message reactMessage, JsonElement currentSettings) {
         this.reactMessage = reactMessage;

@@ -36,12 +36,12 @@ import static com.skyblockplus.eventlisteners.skyblockevent.SkyblockEventCommand
 import static com.skyblockplus.utils.Utils.*;
 
 public class AutomaticGuild {
-    private final String guildId;
-    private ApplyGuild applyGuild = new ApplyGuild();
-    private VerifyGuild verifyGuild = new VerifyGuild();
-    private SkyblockEvent skyblockEvent = new SkyblockEvent();
-    private List<EventMember> eventMemberList = new ArrayList<>();
-    private Instant eventMemberListLastUpdated = null;
+    public final String guildId;
+    public ApplyGuild applyGuild = new ApplyGuild();
+    public VerifyGuild verifyGuild = new VerifyGuild();
+    public SkyblockEvent skyblockEvent = new SkyblockEvent();
+    public List<EventMember> eventMemberList = new ArrayList<>();
+    public Instant eventMemberListLastUpdated = null;
 
     public AutomaticGuild(GenericGuildEvent event) {
         guildId = event.getGuild().getId();

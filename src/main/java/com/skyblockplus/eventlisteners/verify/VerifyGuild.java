@@ -10,9 +10,9 @@ import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.BOT_PREFIX;
 
 public class VerifyGuild {
-    private TextChannel messageChannel;
-    private Message originalMessage;
-    private boolean enable = true;
+    public TextChannel messageChannel;
+    public Message originalMessage;
+    public boolean enable = true;
 
     public VerifyGuild(TextChannel messageChannel, Message originalMessage) {
         this.messageChannel = messageChannel;

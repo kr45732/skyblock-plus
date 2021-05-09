@@ -26,12 +26,13 @@ public class SlayerWeight {
             double base = 1000000 / divider;
             double remaining = currentSlayerXp - 1000000;
             double overflow = 0;
+            double initialModifier = modifier;
 
             while (remaining > 0) {
                 double left = Math.min(remaining, 1000000);
 
                 overflow += Math.pow(left / (divider * (1.5 + modifier)), 0.942);
-                modifier += modifier;
+                modifier += initialModifier;
                 remaining -= left;
             }
 

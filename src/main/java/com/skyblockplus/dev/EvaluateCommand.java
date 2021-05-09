@@ -1,4 +1,4 @@
-package com.skyblockplus.miscellaneous;
+package com.skyblockplus.dev;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
+import static com.skyblockplus.eventlisteners.MainListener.guildMap;
 import static com.skyblockplus.utils.Utils.*;
 
 public class EvaluateCommand extends Command {
@@ -16,7 +17,7 @@ public class EvaluateCommand extends Command {
 
     public EvaluateCommand() {
         this.name = "evaluate";
-        this.cooldown = globalCooldown;
+        this.ownerCommand = true;
         this.aliases = new String[]{"eval"};
 
         engine = new ScriptEngineManager().getEngineByName("nashorn");
@@ -54,7 +55,8 @@ public class EvaluateCommand extends Command {
                 engine.put("message", jdaEvent.getMessage());
                 engine.put("channel", jdaEvent.getChannel());
                 engine.put("args", args);
-                engine.put("api", jdaEvent.getJDA());
+                engine.put("jda", jdaEvent.getJDA());
+                engine.put("guildMap", guildMap);
                 if (jdaEvent.isFromType(ChannelType.TEXT))
                 {
                     engine.put("guild", jdaEvent.getGuild());
@@ -63,11 +65,11 @@ public class EvaluateCommand extends Command {
 
                 Object out = engine.eval(
                         "(function() {" +
-                                "with (imports) {" +
+                                "with (imports) {return" +
                                 jdaEvent.getMessage().getContentDisplay().substring(args[0].length()) +
                                 "}" +
                                 "})();");
-                ebMessage.editMessage(out == null ? "Executed without error." : out.toString()).queue();
+                ebMessage.editMessage(out == null ? "Success (null output)" : out.toString()).queue();
             }
             catch (Exception e)
             {

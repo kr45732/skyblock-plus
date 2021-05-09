@@ -27,21 +27,21 @@ import static com.skyblockplus.Main.database;
 import static com.skyblockplus.utils.Utils.*;
 
 public class SkyblockEvent {
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
+    public final DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
             .withZone(ZoneId.of("UTC"));
-    private final boolean enable;
-    private EmbedBuilder eb;
-    private TextChannel announcementChannel;
-    private Map<Integer, String> prizeListMap;
-    private CommandEvent commandEvent;
-    private int state = 0;
-    private JsonElement guildJson;
-    private String eventType;
-    private int eventDuration;
-    private long epochSecondEndingTime;
-    private Instant lastMessageSentTime;
-    private boolean timeout = false;
-    private ScheduledExecutorService scheduler;
+    public final boolean enable;
+    public EmbedBuilder eb;
+    public TextChannel announcementChannel;
+    public Map<Integer, String> prizeListMap;
+    public CommandEvent commandEvent;
+    public int state = 0;
+    public JsonElement guildJson;
+    public String eventType;
+    public int eventDuration;
+    public long epochSecondEndingTime;
+    public Instant lastMessageSentTime;
+    public boolean timeout = false;
+    public ScheduledExecutorService scheduler;
 
     public SkyblockEvent() {
         this.enable = false;

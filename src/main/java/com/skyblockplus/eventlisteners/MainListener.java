@@ -19,7 +19,7 @@ import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.*;
 
 public class MainListener extends ListenerAdapter {
-    private static final Map<String, AutomaticGuild> guildMap = new HashMap<>();
+    public static final Map<String, AutomaticGuild> guildMap = new HashMap<>();
 
     public static String onApplyReload(String guildId) {
         String reloadStatus = "Error reloading";
