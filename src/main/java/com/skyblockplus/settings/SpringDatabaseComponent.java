@@ -64,10 +64,6 @@ public class SpringDatabaseComponent {
         return linkedAccountService.getAllLinkedAccounts();
     }
 
-    public List<LinkedAccountModel> getLinkedUsersList() {
-        return linkedAccountService.getAllLinkedAccounts();
-    }
-
     public List<ServerSettingsModel> getAllServerSettings() {
         return settingsService.getAllServerSettings();
     }

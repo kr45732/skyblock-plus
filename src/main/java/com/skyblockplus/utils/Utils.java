@@ -117,9 +117,14 @@ public class Utils {
         return bitsJson;
     }
 
-    public static JsonElement higherDepth(JsonElement element, String value) {
+    public static JsonElement higherDepth(JsonElement element, String path) {
+        String[] paths = path.split("\\.");
+
         try {
-            return element.getAsJsonObject().get(value);
+            for(String key: paths){
+                element = element.getAsJsonObject().get(key);
+            }
+            return element;
         } catch (Exception e) {
             return null;
         }
@@ -231,7 +236,7 @@ public class Utils {
         }
         try {
             return "https://sky.lea.moe"
-                    + higherDepth(higherDepth(higherDepth(petUrlJson, "pet_data"), petName.toUpperCase()), "head")
+                    +higherDepth(petUrlJson, "pet_data." + petName.toUpperCase() + ".head")
                     .getAsString();
         } catch (Exception e) {
             return null;
@@ -609,10 +614,10 @@ public class Utils {
                     + usernameToUuid(username).playerUuid);
 
             String discordTag = higherDepth(
-                    higherDepth(higherDepth(higherDepth(playerJson, "player"), "socialMedia"), "links"), "DISCORD")
+                    playerJson, "player.socialMedia.links.DISCORD")
                     .getAsString();
-            String minecraftUsername = higherDepth(higherDepth(playerJson, "player"), "displayname").getAsString();
-            String minecraftUuid = higherDepth(higherDepth(playerJson, "player"), "uuid").getAsString();
+            String minecraftUsername = higherDepth(playerJson, "player.displayname").getAsString();
+            String minecraftUuid = higherDepth(playerJson, "player.uuid").getAsString();
 
             return new DiscordInfoStruct(discordTag, minecraftUsername, minecraftUuid);
         } catch (Exception e) {

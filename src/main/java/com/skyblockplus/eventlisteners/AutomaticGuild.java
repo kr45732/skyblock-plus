@@ -121,8 +121,8 @@ public class AutomaticGuild {
             }
             JsonArray guildMembers = null;
             try {
-                guildMembers = higherDepth(higherDepth(getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY
-                        + "&id=" + higherDepth(currentSettings, "guildId").getAsString()), "guild"), "members")
+                guildMembers = higherDepth(getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY
+                        + "&id=" + higherDepth(currentSettings, "guild.Id").getAsString()), "guild.members")
                         .getAsJsonArray();
             } catch (Exception ignored) {
             }

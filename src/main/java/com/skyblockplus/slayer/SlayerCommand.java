@@ -41,48 +41,49 @@ public class SlayerCommand extends Command {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
             EmbedBuilder eb = player.defaultPlayerEmbed();
+
             JsonElement slayer = higherDepth(player.getProfileJson(), "slayer_bosses");
 
-            int svenOneKills = higherDepth(higherDepth(slayer, "wolf"), "boss_kills_tier_0") != null
-                    ? higherDepth(higherDepth(slayer, "wolf"), "boss_kills_tier_0").getAsInt()
+            int svenOneKills = higherDepth(slayer, "wolf.boss_kills_tier_0") != null
+                    ? higherDepth(slayer, "wolf.boss_kills_tier_0").getAsInt()
                     : 0;
-            int svenTwoKills = higherDepth(higherDepth(slayer, "wolf"), "boss_kills_tier_1") != null
-                    ? higherDepth(higherDepth(slayer, "wolf"), "boss_kills_tier_1").getAsInt()
+            int svenTwoKills = higherDepth(slayer, "wolf.boss_kills_tier_1") != null
+                    ? higherDepth(slayer, "wolf.boss_kills_tier_1").getAsInt()
                     : 0;
-            int svenThreeKills = higherDepth(higherDepth(slayer, "wolf"), "boss_kills_tier_2") != null
-                    ? higherDepth(higherDepth(slayer, "wolf"), "boss_kills_tier_2").getAsInt()
+            int svenThreeKills = higherDepth(slayer, "wolf.boss_kills_tier_2") != null
+                    ? higherDepth(slayer, "wolf.boss_kills_tier_2").getAsInt()
                     : 0;
-            int svenFourKills = higherDepth(higherDepth(slayer, "wolf"), "boss_kills_tier_3") != null
-                    ? higherDepth(higherDepth(slayer, "wolf"), "boss_kills_tier_3").getAsInt()
-                    : 0;
-
-            int revOneKills = higherDepth(higherDepth(slayer, "zombie"), "boss_kills_tier_0") != null
-                    ? higherDepth(higherDepth(slayer, "zombie"), "boss_kills_tier_0").getAsInt()
-                    : 0;
-            int revTwoKills = higherDepth(higherDepth(slayer, "zombie"), "boss_kills_tier_1") != null
-                    ? higherDepth(higherDepth(slayer, "zombie"), "boss_kills_tier_1").getAsInt()
-                    : 0;
-            int revThreeKills = higherDepth(higherDepth(slayer, "zombie"), "boss_kills_tier_2") != null
-                    ? higherDepth(higherDepth(slayer, "zombie"), "boss_kills_tier_2").getAsInt()
-                    : 0;
-            int revFourKills = higherDepth(higherDepth(slayer, "zombie"), "boss_kills_tier_3") != null
-                    ? higherDepth(higherDepth(slayer, "zombie"), "boss_kills_tier_3").getAsInt()
-                    : 0;
-            int revFiveKills = higherDepth(higherDepth(slayer, "zombie"), "boss_kills_tier_4") != null
-                    ? higherDepth(higherDepth(slayer, "zombie"), "boss_kills_tier_4").getAsInt()
+            int svenFourKills = higherDepth(slayer, "wolf.boss_kills_tier_3") != null
+                    ? higherDepth(slayer, "wolf.boss_kills_tier_3").getAsInt()
                     : 0;
 
-            int taraOneKills = higherDepth(higherDepth(slayer, "spider"), "boss_kills_tier_0") != null
-                    ? higherDepth(higherDepth(slayer, "spider"), "boss_kills_tier_0").getAsInt()
+            int revOneKills = higherDepth(slayer, "zombie.boss_kills_tier_0") != null
+                    ? higherDepth(slayer, "zombie.boss_kills_tier_0").getAsInt()
                     : 0;
-            int taraTwoKills = higherDepth(higherDepth(slayer, "spider"), "boss_kills_tier_1") != null
-                    ? higherDepth(higherDepth(slayer, "spider"), "boss_kills_tier_1").getAsInt()
+            int revTwoKills = higherDepth(slayer, "zombie.boss_kills_tier_1") != null
+                    ? higherDepth(slayer, "zombie.boss_kills_tier_1").getAsInt()
                     : 0;
-            int taraThreeKills = higherDepth(higherDepth(slayer, "spider"), "boss_kills_tier_2") != null
-                    ? higherDepth(higherDepth(slayer, "spider"), "boss_kills_tier_2").getAsInt()
+            int revThreeKills = higherDepth(slayer, "zombie.boss_kills_tier_2") != null
+                    ? higherDepth(slayer, "zombie.boss_kills_tier_2").getAsInt()
                     : 0;
-            int taraFourKills = higherDepth(higherDepth(slayer, "spider"), "boss_kills_tier_3") != null
-                    ? higherDepth(higherDepth(slayer, "spider"), "boss_kills_tier_3").getAsInt()
+            int revFourKills = higherDepth(slayer, "zombie.boss_kills_tier_3") != null
+                    ? higherDepth(slayer, "zombie.boss_kills_tier_3").getAsInt()
+                    : 0;
+            int revFiveKills = higherDepth(slayer, "zombie.boss_kills_tier_4") != null
+                    ? higherDepth(slayer, "zombie.boss_kills_tier_4").getAsInt()
+                    : 0;
+
+            int taraOneKills = higherDepth(slayer, "spider.boss_kills_tier_0") != null
+                    ? higherDepth(slayer, "spider.boss_kills_tier_0").getAsInt()
+                    : 0;
+            int taraTwoKills = higherDepth(slayer, "spider.boss_kills_tier_1") != null
+                    ? higherDepth(slayer, "spider.boss_kills_tier_1").getAsInt()
+                    : 0;
+            int taraThreeKills = higherDepth(slayer, "spider.boss_kills_tier_2") != null
+                    ? higherDepth(slayer, "spider.boss_kills_tier_2").getAsInt()
+                    : 0;
+            int taraFourKills = higherDepth(slayer, "spider.boss_kills_tier_3") != null
+                    ? higherDepth(slayer, "spider.boss_kills_tier_3").getAsInt()
                     : 0;
 
             String svenKills = "**Tier 1:** " + svenOneKills + "\n**Tier 2:** " + svenTwoKills + "\n**Tier 3:** "

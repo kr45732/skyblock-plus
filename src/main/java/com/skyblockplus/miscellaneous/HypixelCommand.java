@@ -57,7 +57,7 @@ public class HypixelCommand extends Command {
                     StringBuilder parkourCompletionString = new StringBuilder();
                     for (String parkourLocation : getJsonKeys(higherDepth(hypixelJson, "parkourCompletions"))) {
                         int fastestTime = -1;
-                        for (JsonElement parkourTime : higherDepth(higherDepth(hypixelJson, "parkourCompletions"),
+                        for (JsonElement parkourTime : higherDepth(hypixelJson, "parkourCompletions." +
                                 parkourLocation).getAsJsonArray()) {
                             if (higherDepth(parkourTime, "timeTook").getAsInt() > fastestTime) {
                                 fastestTime = higherDepth(parkourTime, "timeTook").getAsInt();
@@ -138,9 +138,9 @@ public class HypixelCommand extends Command {
 
                 try {
                     for (String socialMedia : getJsonKeys(
-                            higherDepth(higherDepth(hypixelJson, "socialMedia"), "links"))) {
+                            higherDepth(hypixelJson, "socialMedia.links"))) {
                         String currentSocialMediaLink = higherDepth(
-                                higherDepth(higherDepth(hypixelJson, "socialMedia"), "links"), socialMedia)
+                                higherDepth(hypixelJson, "socialMedia.links"), socialMedia)
                                 .getAsString();
                         eb.addField(
                                 socialMedia.equals("HYPIXEL") ? "Hypixel Forums"
@@ -162,9 +162,9 @@ public class HypixelCommand extends Command {
                     JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&player="
                             + usernameUuid.playerUuid);
 
-                    eb.addField("Guild", higherDepth(higherDepth(guildJson, "guild"), "name").getAsString(), true);
+                    eb.addField("Guild", higherDepth(guildJson, "guild.name").getAsString(), true);
 
-                    for (JsonElement member : higherDepth(higherDepth(guildJson, "guild"), "members")
+                    for (JsonElement member : higherDepth(guildJson, "guild.members")
                             .getAsJsonArray()) {
                         if (higherDepth(member, "uuid").getAsString().equals(usernameUuid.playerUuid)) {
                             eb.addField("Guild Rank",

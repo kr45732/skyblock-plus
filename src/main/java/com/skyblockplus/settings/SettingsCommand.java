@@ -421,7 +421,7 @@ public class SettingsCommand extends Command {
             return defaultEmbed("Current guild name is invalid");
         }
 
-        JsonArray guildRanks = higherDepth(higherDepth(guildJson, "guild"), "ranks").getAsJsonArray();
+        JsonArray guildRanks = higherDepth(guildJson, "guild.ranks").getAsJsonArray();
 
         StringBuilder guildRanksString = new StringBuilder();
         for (JsonElement guildRank : guildRanks) {

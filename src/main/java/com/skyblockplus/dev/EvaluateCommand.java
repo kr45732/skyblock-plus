@@ -1,5 +1,7 @@
 package com.skyblockplus.dev;
 
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.entities.ChannelType;
@@ -9,16 +11,22 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.Writer;
+
+import static com.skyblockplus.Main.database;
 import static com.skyblockplus.eventlisteners.MainListener.guildMap;
 import static com.skyblockplus.utils.Utils.*;
 
 public class EvaluateCommand extends Command {
     private final ScriptEngine engine;
+    private int count = 0;
 
     public EvaluateCommand() {
         this.name = "evaluate";
         this.ownerCommand = true;
-        this.aliases = new String[]{"eval"};
+        this.aliases = new String[]{"eval", "ev"};
 
         engine = new ScriptEngineManager().getEngineByName("nashorn");
         try
@@ -46,6 +54,7 @@ public class EvaluateCommand extends Command {
             Message ebMessage = event.getChannel().sendMessage("Loading").complete();
             String content = event.getMessage().getContentRaw();
             String[] args = content.split("\\s+");
+            count ++;
 
             logCommand(event.getGuild(), event.getAuthor(), content);
             MessageReceivedEvent jdaEvent = event.getEvent();
@@ -56,7 +65,8 @@ public class EvaluateCommand extends Command {
                 engine.put("channel", jdaEvent.getChannel());
                 engine.put("args", args);
                 engine.put("jda", jdaEvent.getJDA());
-                engine.put("guildMap", guildMap);
+                engine.put("guilds", guildMap);
+                engine.put("db", database);
                 if (jdaEvent.isFromType(ChannelType.TEXT))
                 {
                     engine.put("guild", jdaEvent.getGuild());
@@ -69,7 +79,30 @@ public class EvaluateCommand extends Command {
                                 jdaEvent.getMessage().getContentDisplay().substring(args[0].length()) +
                                 "}" +
                                 "})();");
-                ebMessage.editMessage(out == null ? "Success (null output)" : out.toString()).queue();
+                if(out == null){
+                    ebMessage.editMessage("Success (null output)").queue();
+                } else if(out.toString().length() >= 2000){
+                    String pathName = "src/main/java/com/skyblockplus/json/" + count + "_eval_cmd.json";
+                    File file = new File(pathName);
+                    if (!file.createNewFile()) {
+                        file.delete();
+                        file.createNewFile();
+                    }
+
+                    Writer writer = new FileWriter(pathName);
+                    try{
+                        new GsonBuilder().setPrettyPrinting().create().toJson(JsonParser.parseString(out.toString()), writer);
+                    }catch (Exception e){
+                        writer.write(out.toString());
+                    }
+                    writer.close();
+
+                    ebMessage.delete().queue();
+                    event.getChannel().sendFile(file).queue();
+                    file.delete();
+                }else {
+                    ebMessage.editMessage(out.toString()).queue();
+                }
             }
             catch (Exception e)
             {

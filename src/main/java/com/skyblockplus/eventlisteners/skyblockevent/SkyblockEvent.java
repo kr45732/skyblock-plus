@@ -113,9 +113,9 @@ public class SkyblockEvent {
                     guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&name="
                             + event.getMessage().getContentRaw().replace(" ", "%20"));
                     eb.addField("Guild",
-                            "Name: " + higherDepth(higherDepth(guildJson, "guild"), "name").getAsString()
+                            "Name: " + higherDepth(guildJson, "guild.name").getAsString()
                                     + "\nMembers: "
-                                    + higherDepth(higherDepth(guildJson, "guild"), "members").getAsJsonArray().size(),
+                                    + higherDepth(guildJson, "guild.members").getAsJsonArray().size(),
                             false).setDescription(
                             "Is this a __catacombs__, __slayer__, or __skills__ event?\nTo cancel type `exit`");
                     state++;
@@ -218,7 +218,7 @@ public class SkyblockEvent {
                     announcementEb.setDescription(
                             "A new " + eventType + " event has been created! Please see below for more information.");
                     announcementEb.addField("Guild Name",
-                            higherDepth(higherDepth(guildJson, "guild"), "name").getAsString(), false);
+                            higherDepth(guildJson, "guild.name").getAsString(), false);
 
                     epochSecondEndingTime = Instant.now().plus(eventDuration, ChronoUnit.HOURS).getEpochSecond();
                     announcementEb.addField("End Date",
@@ -269,7 +269,7 @@ public class SkyblockEvent {
 
         RunningEvent newRunningEvent = new RunningEvent(eventType, announcementChannel.getId(),
                 "" + epochSecondEndingTime, prizeListMap, new ArrayList<>(),
-                higherDepth(higherDepth(guildJson, "guild"), "_id").getAsString());
+                higherDepth(guildJson, "guild._id").getAsString());
         SbEvent newSkyblockEventSettings = new SbEvent(newRunningEvent, "true");
 
         return database.updateSkyblockEventSettings(commandEvent.getGuild().getId(), newSkyblockEventSettings) == 200;

@@ -79,8 +79,8 @@ public class GuildLeaderboardCommand extends Command {
 
         JsonElement guildJson = getJson(
                 "https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&player=" + usernameUuidStruct.playerUuid);
-        String guildId = higherDepth(higherDepth(guildJson, "guild"), "_id").getAsString();
-        String guildName = higherDepth(higherDepth(guildJson, "guild"), "name").getAsString();
+        String guildId = higherDepth(guildJson, "guild._id").getAsString();
+        String guildName = higherDepth(guildJson, "guild.name").getAsString();
         if (!guildName.equals("Skyblock Forceful")) {
             return new String[]{"Currently only supported for the Skyblock Forceful guild",
                     "Currently only supported for the Skyblock Forceful guild", ""};
@@ -102,15 +102,15 @@ public class GuildLeaderboardCommand extends Command {
                 staffRankNames.add(i.getAsString());
             }
 
-            for (JsonElement i : higherDepth(higherDepth(guildLeaderboardSettings, "top_role"), "names")
+            for (JsonElement i : higherDepth(guildLeaderboardSettings, "top_role.names")
                     .getAsJsonArray()) {
                 topRoleName.add(i.getAsString().toLowerCase());
             }
-            for (JsonElement i : higherDepth(higherDepth(guildLeaderboardSettings, "middle_role"), "names")
+            for (JsonElement i : higherDepth(guildLeaderboardSettings, "middle_role.names")
                     .getAsJsonArray()) {
                 middleRoleName.add(i.getAsString().toLowerCase());
             }
-            for (JsonElement i : higherDepth(higherDepth(guildLeaderboardSettings, "default_role"), "names")
+            for (JsonElement i : higherDepth(guildLeaderboardSettings, "default_role.names")
                     .getAsJsonArray()) {
                 defaultRoleName.add(i.getAsString().toLowerCase());
             }
@@ -119,7 +119,7 @@ public class GuildLeaderboardCommand extends Command {
             return null;
         }
 
-        JsonArray guildMembers = higherDepth(higherDepth(guildJson, "guild"), "members").getAsJsonArray();
+        JsonArray guildMembers = higherDepth(guildJson, "guild.members").getAsJsonArray();
 
         ArrayList<Player> guildSlayer = new ArrayList<>();
         ArrayList<Player> guildSkills = new ArrayList<>();
@@ -268,8 +268,8 @@ public class GuildLeaderboardCommand extends Command {
         guildLeaderboards.add(guildSlayer);
         guildLeaderboards.add(guildSkills);
         guildLeaderboards.add(guildCatacombs);
-        int topRankSize = higherDepth(higherDepth(guildLeaderboardSettings, "top_role"), "range").getAsInt() - 1;
-        int middleRankSize = higherDepth(higherDepth(guildLeaderboardSettings, "middle_role"), "range").getAsInt() - 1;
+        int topRankSize = higherDepth(guildLeaderboardSettings, "top_role.range").getAsInt() - 1;
+        int middleRankSize = higherDepth(guildLeaderboardSettings, "middle_role.range").getAsInt() - 1;
         String topRankName = topRoleName.get(0).toLowerCase();
         String middleRankName = middleRoleName.get(0).toLowerCase();
         String defaultRankName = defaultRoleName.get(0).toLowerCase();

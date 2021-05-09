@@ -416,8 +416,7 @@ public class NetworthExecute {
 
         try {
             if (item.isRecombobulated()) {
-                recombobulatedExtra = higherDepth(
-                        higherDepth(higherDepth(bazaarJson, "RECOMBOBULATOR_3000"), "quick_status"), "sellPrice")
+                recombobulatedExtra = higherDepth(bazaarJson, "RECOMBOBULATOR_3000.quick_status.sellPrice")
                         .getAsDouble();
             }
         } catch (Exception ignored) {
@@ -425,15 +424,14 @@ public class NetworthExecute {
 
         try {
             hbpExtras = item.getHbpCount()
-                    * higherDepth(higherDepth(higherDepth(bazaarJson, "HOT_POTATO_BOOK"), "quick_status"), "sellPrice")
+                    * higherDepth(bazaarJson, "HOT_POTATO_BOOK.quick_status.sellPrice")
                     .getAsDouble();
         } catch (Exception ignored) {
         }
 
         try {
             fumingExtras = item.getFumingCount()
-                    * higherDepth(higherDepth(higherDepth(bazaarJson, "FUMING_POTATO_BOOK"), "quick_status"),
-                    "sellPrice").getAsDouble();
+                    * higherDepth(bazaarJson, "FUMING_POTATO_BOOK.quick_status.sellPrice").getAsDouble();
         } catch (Exception ignored) {
         }
 
@@ -483,8 +481,7 @@ public class NetworthExecute {
             if (higherDepth(reforgeStoneInfo, "reforgeName").getAsString().equalsIgnoreCase(reforgeName)) {
                 String reforgeStoneName = higherDepth(reforgeStoneInfo, "internalName").getAsString();
                 double reforgeStoneCost = getLowestPrice(reforgeStoneName, " ");
-                double reforgeApplyCost = higherDepth(higherDepth(reforgeStoneInfo, "reforgeCosts"),
-                        itemRarity.toUpperCase()).getAsDouble();
+                double reforgeApplyCost = higherDepth(reforgeStoneInfo, "reforgeCosts." + itemRarity.toUpperCase()).getAsDouble();
                 return reforgeStoneCost + reforgeApplyCost;
             }
         }
@@ -559,7 +556,7 @@ public class NetworthExecute {
         }
 
         try {
-            return higherDepth(higherDepth(higherDepth(bazaarJson, itemId), "quick_status"), "sellPrice").getAsDouble();
+            return higherDepth(bazaarJson, itemId + ".quick_status.sellPrice").getAsDouble();
         } catch (Exception ignored) {
         }
 

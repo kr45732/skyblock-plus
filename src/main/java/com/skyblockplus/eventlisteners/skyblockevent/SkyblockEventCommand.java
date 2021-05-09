@@ -180,7 +180,7 @@ public class SkyblockEventCommand extends Command {
             ArrayList<String> prizeListKeys = getJsonKeys(higherDepth(runningEventSettings, "prizeMap"));
             for (int i = 0; i < prizeListKeys.size(); i++) {
                 ebStringPrize.append(i + 1).append(") ")
-                        .append(higherDepth(higherDepth(runningEventSettings, "prizeMap"), prizeListKeys.get(i))
+                        .append(higherDepth(runningEventSettings, "prizeMap." + prizeListKeys.get(i))
                                 .getAsString())
                         .append(" - ").append(eventMemberList.get(i).getUsername()).append(" (")
                         .append(eventMemberList.get(i).getUuid()).append(")").append("\n");
@@ -245,7 +245,7 @@ public class SkyblockEventCommand extends Command {
                             JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY
                                     + "&id=" + higherDepth(currentSettings, "eventGuildId").getAsString());
 
-                            eb.addField("Guild", higherDepth(higherDepth(guildJson, "guild"), "name").getAsString(),
+                            eb.addField("Guild", higherDepth(guildJson, "guild.name").getAsString(),
                                     false);
                             eb.addField("Event Type",
                                     capitalizeString(higherDepth(currentSettings, "eventType").getAsString()), false);
@@ -259,7 +259,7 @@ public class SkyblockEventCommand extends Command {
                             StringBuilder ebString = new StringBuilder();
                             for (String prizePlace : prizesKeys) {
                                 ebString.append("• ").append(prizePlace).append(") - ").append(
-                                        higherDepth(higherDepth(currentSettings, "prizeMap"), prizePlace).getAsString())
+                                        higherDepth(currentSettings, "prizeMap." + prizePlace).getAsString())
                                         .append("\n");
                             }
 

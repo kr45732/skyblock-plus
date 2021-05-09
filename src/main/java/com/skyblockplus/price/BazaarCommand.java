@@ -49,7 +49,7 @@ public class BazaarCommand extends Command {
         for (String item : itemsUnformated) {
             String itemNameFormatted;
             try {
-                itemNameFormatted = higherDepth(higherDepth(bazaarItems, item), "name").getAsString();
+                itemNameFormatted = higherDepth(bazaarItems, item + ".name").getAsString();
             } catch (Exception e) {
                 itemNameFormatted = capitalizeString(item.replace("_", " "));
             }
@@ -57,7 +57,7 @@ public class BazaarCommand extends Command {
             itemsMap.put(itemNameFormatted, item);
 
             if (itemNameFormatted.toUpperCase().replace(" ", "_").equals(formattedItemName)) {
-                JsonElement itemInfo = higherDepth(higherDepth(bazaarItems, item), "quick_status");
+                JsonElement itemInfo = higherDepth(bazaarItems, item + ".quick_status");
                 EmbedBuilder eb = defaultEmbed(itemNameFormatted, "https://bazaartracker.com/product/" + item);
                 eb.addField("Buy Price (Per)", simplifyNumber(higherDepth(itemInfo, "buyPrice").getAsDouble()), true);
                 eb.addField("Sell Price (Per)", simplifyNumber(higherDepth(itemInfo, "sellPrice").getAsDouble()), true);
@@ -85,8 +85,8 @@ public class BazaarCommand extends Command {
         if (closestMatch != null && higherDepth(bazaarItems, closestMatch) != null) {
             closestMatch = itemsMap.get(closestMatch);
 
-            JsonElement itemInfo = higherDepth(higherDepth(bazaarItems, closestMatch), "quick_status");
-            EmbedBuilder eb = defaultEmbed(higherDepth(higherDepth(bazaarItems, closestMatch), "name").getAsString(),
+            JsonElement itemInfo = higherDepth(bazaarItems, closestMatch + ".quick_status");
+            EmbedBuilder eb = defaultEmbed(higherDepth(bazaarItems, closestMatch + ".name").getAsString(),
                     "https://bazaartracker.com/product/" + closestMatch);
             eb.addField("Buy Price (Per)", simplifyNumber(higherDepth(itemInfo, "buyPrice").getAsDouble()), true);
             eb.addField("Sell Price (Per)", simplifyNumber(higherDepth(itemInfo, "sellPrice").getAsDouble()), true);

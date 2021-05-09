@@ -93,7 +93,7 @@ public class MainClassUtils {
 
     public static void updateLinkedAccounts() {
         try {
-            database.getLinkedUsersList().stream().filter(linkedAccountModel -> Duration
+            database.getLinkedUsers().stream().filter(linkedAccountModel -> Duration
                     .between(Instant.ofEpochMilli(Long.parseLong(linkedAccountModel.getLastUpdated())), Instant.now())
                     .toDays() > 1).findAny().ifPresent(notUpdated -> {
                 try {
