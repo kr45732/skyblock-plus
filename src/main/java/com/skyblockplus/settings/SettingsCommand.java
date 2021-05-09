@@ -348,8 +348,7 @@ public class SettingsCommand extends Command {
         try {
             for (JsonElement guildRank : higherDepth(currentSettings, "guildRanks").getAsJsonArray()) {
                 guildRanksString.append("\n• ").append(higherDepth(guildRank, "minecraftRoleName").getAsString())
-                        .append(" - ").append(event.getGuild()
-                        .getRoleById(higherDepth(guildRank, "discordRoleId").getAsString()).getAsMention());
+                        .append(" - ").append("<@&" + higherDepth(guildRank, "discordRoleId").getAsString() + ">");
             }
         } catch (Exception ignored) {
         }
@@ -698,10 +697,10 @@ public class SettingsCommand extends Command {
                     : "• Disabled");
             if (isOneLevelRole(roleName)) {
                 try {
-                    ebFieldString.append("\n• default - ").append(event.getGuild().getRoleById(
+                    ebFieldString.append("\n• default - ").append("<@&" +
                             higherDepth(higherDepth(currentRoleSettings, "levels").getAsJsonArray().get(0), "roleId")
-                                    .getAsString())
-                            .getAsMention());
+                                    .getAsString() + ">"
+                            );
                 } catch (Exception ignored) {
                 }
                 pageTitles.add(roleName + " (__one level role__)");
@@ -717,14 +716,12 @@ public class SettingsCommand extends Command {
                                 "https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&id=" + guildId);
                         ebFieldString.append("\n• ")
                                 .append(higherDepth(higherDepth(guildJson, "guild"), "name").getAsString())
-                                .append(" - ").append(event.getGuild()
-                                .getRoleById(higherDepth(roleLevel, "roleId").getAsString()).getAsMention());
+                                .append(" - ").append("<@&" + higherDepth(roleLevel, "roleId").getAsString() + ">");
                     }
                 } else {
                     for (JsonElement roleLevel : higherDepth(currentRoleSettings, "levels").getAsJsonArray()) {
                         ebFieldString.append("\n• ").append(higherDepth(roleLevel, "value").getAsString()).append(" - ")
-                                .append(event.getGuild().getRoleById(higherDepth(roleLevel, "roleId").getAsString())
-                                        .getAsMention());
+                                .append("<@&" + higherDepth(roleLevel, "roleId").getAsString() + ">");
                     }
                 }
 
@@ -1451,7 +1448,7 @@ public class SettingsCommand extends Command {
 
                     reqsString.append("`").append(i + 1).append(")` ").append(slayerReq).append(" slayer and ")
                             .append(skillsReq).append(" skill average and ").append(cataReq).append(" cata and ")
-                            .append(weightReq).append(" weight");
+                            .append(weightReq).append(" weight\n");
                 }
 
                 return reqsString.toString();
@@ -1463,7 +1460,7 @@ public class SettingsCommand extends Command {
                     case "messageTextChannelId":
                     case "messageStaffChannelId":
                         try {
-                            return event.getGuild().getTextChannelById(currentSettingValue).getAsMention();
+                            return "<#" + currentSettingValue + ">";
                         } catch (PermissionException e) {
                             if (e.getMessage().contains("Missing permission")) {
                                 return "Missing permission: " + e.getMessage().split("Missing permission: ")[1];
@@ -1474,7 +1471,7 @@ public class SettingsCommand extends Command {
                     case "staffPingRoleId":
                     case "roleId":
                         try {
-                            return event.getGuild().getRoleById(currentSettingValue).getAsMention();
+                            return "<@&" + currentSettingValue + ">";
                         } catch (PermissionException e) {
                             if (e.getMessage().contains("Missing permission")) {
                                 return "Missing permission: " + e.getMessage().split("Missing permission: ")[1];

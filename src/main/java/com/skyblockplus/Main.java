@@ -74,7 +74,8 @@ public class Main {
                 new LinkAccountCommand(), new GetSettingsFile(), new UnlinkAccountCommand(), new LinkedUserDev(),
                 new BazaarCommand(), new AverageAuctionCommand(), new PetsCommand(), new SkyblockEventCommand(),
                 new DeleteMessagesCommand(), new PlaceholderCommand(), new ProfilesCommand(), new NetworthCommand(),
-                new QueryAuctionCommand(), new BidsCommand(), new GetThreadPools(), new BitsCommand());
+                new QueryAuctionCommand(), new BidsCommand(), new GetThreadPools(), new BitsCommand(),
+                new EvaluateCommand());
 
         if (BOT_PREFIX.equals("+")) {
             jda = JDABuilder.createDefault(BOT_TOKEN).setStatus(OnlineStatus.DO_NOT_DISTURB)

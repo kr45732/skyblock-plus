@@ -181,9 +181,9 @@ public class AutomaticGuild {
             for (Member linkedUser : inGuildUsers) {
                 if (enableGuildRole) {
                     if (uuidToRankMap.containsKey(discordIdToUuid.get(linkedUser.getId()))) {
-                        guild.addRoleToMember(linkedUser, guildMemberRole).queue();
+                        guild.addRoleToMember(linkedUser, guildMemberRole).queue(s -> {}, f -> logCommand(guild, linkedUser.getUser(), "Failed to add guild role"));
                     } else {
-                        guild.removeRoleFromMember(linkedUser, guildMemberRole).queue();
+                        guild.removeRoleFromMember(linkedUser, guildMemberRole).queue(s -> {}, f -> logCommand(guild, linkedUser.getUser(), "Failed to remove guild role"));
                     }
                 }
 
@@ -192,7 +192,7 @@ public class AutomaticGuild {
                     if (!uuidToRankMap.containsKey(discordIdToUuid.get(linkedUser.getId()))) {
                         for (JsonElement guildRank : guildRanksArr) {
                             guild.removeRoleFromMember(linkedUser,
-                                    guild.getRoleById(higherDepth(guildRank, "discordRoleId").getAsString())).queue();
+                                    guild.getRoleById(higherDepth(guildRank, "discordRoleId").getAsString())).queue(s -> {}, f -> logCommand(guild, linkedUser.getUser(), "Failed to remove guild rank"));
                         }
                     } else {
                         String currentRank = uuidToRankMap.get(discordIdToUuid.get(linkedUser.getId()));
@@ -201,9 +201,9 @@ public class AutomaticGuild {
                                     .getRoleById(higherDepth(guildRank, "discordRoleId").getAsString());
                             if (higherDepth(guildRank, "minecraftRoleName").getAsString()
                                     .equalsIgnoreCase(currentRank)) {
-                                guild.addRoleToMember(linkedUser, currentRankRole).queue();
+                                guild.addRoleToMember(linkedUser, currentRankRole).queue(s -> {}, f -> logCommand(guild, linkedUser.getUser(), "Failed to add guild rank"));
                             } else {
-                                guild.removeRoleFromMember(linkedUser, currentRankRole).queue();
+                                guild.removeRoleFromMember(linkedUser, currentRankRole).queue(s -> {}, f -> logCommand(guild, linkedUser.getUser(), "Failed to remove guild rank"));
                             }
                         }
                     }
