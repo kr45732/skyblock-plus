@@ -56,38 +56,38 @@ public class NetworthExecute {
             EmbedBuilder eb = loadingEmbed();
             Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
             String content = event.getMessage().getContentRaw();
+            logCommand(event.getGuild(), event.getAuthor(), content);
 
-            if(content.contains("verbose-true")){
+            if (content.contains("verbose-true")) {
                 verbose = true;
                 content = content.replace("verbose-true", "").trim();
             }
 
             String[] args = content.split(" ");
 
-            logCommand(event.getGuild(), event.getAuthor(), content);
-
-
             if (args.length == 2) {
                 ebMessage.editMessage(getPlayerNetworth(args[1], null).build()).queue();
 
-                if(verbose){
+                if (verbose) {
                     try {
-                        if(calcItemsJsonStr.endsWith(",")){
-                            calcItemsJsonStr = calcItemsJsonStr.substring(0, calcItemsJsonStr.length() -1);
+                        if (calcItemsJsonStr.endsWith(",")) {
+                            calcItemsJsonStr = calcItemsJsonStr.substring(0, calcItemsJsonStr.length() - 1);
                         }
                         calcItemsJsonStr += "]";
-                        String pathName = "src/main/java/com/skyblockplus/json/" + args[1].toLowerCase() + "_networth.json";
+                        String pathName = "src/main/java/com/skyblockplus/json/" + args[1].toLowerCase()
+                                + "_networth.json";
                         File file = new File(pathName);
                         if (!file.createNewFile()) {
                             file.delete();
                             file.createNewFile();
                         }
                         Writer writer = new FileWriter(pathName);
-                        new GsonBuilder().setPrettyPrinting().create().toJson(JsonParser.parseString(calcItemsJsonStr), writer);
+                        new GsonBuilder().setPrettyPrinting().create().toJson(JsonParser.parseString(calcItemsJsonStr),
+                                writer);
                         writer.close();
                         event.getChannel().sendFile(file).queue();
                         file.delete();
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
@@ -95,24 +95,26 @@ public class NetworthExecute {
             } else if (args.length == 3) {
                 ebMessage.editMessage(getPlayerNetworth(args[1], args[2]).build()).queue();
 
-                if(verbose){
+                if (verbose) {
                     try {
-                        if(calcItemsJsonStr.endsWith(",")){
-                            calcItemsJsonStr = calcItemsJsonStr.substring(0, calcItemsJsonStr.length() -1);
+                        if (calcItemsJsonStr.endsWith(",")) {
+                            calcItemsJsonStr = calcItemsJsonStr.substring(0, calcItemsJsonStr.length() - 1);
                         }
                         calcItemsJsonStr += "]";
-                        String pathName = "src/main/java/com/skyblockplus/json/" + args[1].toLowerCase() + "_networth.json";
+                        String pathName = "src/main/java/com/skyblockplus/json/" + args[1].toLowerCase()
+                                + "_networth.json";
                         File file = new File(pathName);
                         if (!file.createNewFile()) {
                             file.delete();
                             file.createNewFile();
                         }
                         Writer writer = new FileWriter(pathName);
-                        new GsonBuilder().setPrettyPrinting().create().toJson(JsonParser.parseString(calcItemsJsonStr), writer);
+                        new GsonBuilder().setPrettyPrinting().create().toJson(JsonParser.parseString(calcItemsJsonStr),
+                                writer);
                         writer.close();
                         event.getChannel().sendFile(file).queue();
                         file.delete();
-                    }catch (Exception ignored){
+                    } catch (Exception ignored) {
                     }
                 }
                 return;
@@ -197,7 +199,8 @@ public class NetworthExecute {
             StringBuilder echestStr = new StringBuilder();
             for (int i = 0; i < enderChestItems.size(); i++) {
                 String item = enderChestItems.get(i);
-                echestStr.append("• ").append(item.split("@split@")[0]).append(" ➜ ").append(simplifyNumber(Double.parseDouble(item.split("@split@")[1]))).append("\n");
+                echestStr.append("• ").append(item.split("@split@")[0]).append(" ➜ ")
+                        .append(simplifyNumber(Double.parseDouble(item.split("@split@")[1]))).append("\n");
                 if (i == 4) {
                     echestStr.append("• And more...");
                     break;
@@ -208,7 +211,8 @@ public class NetworthExecute {
             StringBuilder invStr = new StringBuilder();
             for (int i = 0; i < invItems.size(); i++) {
                 String item = invItems.get(i);
-                invStr.append("• ").append(item.split("@split@")[0]).append(" ➜ ").append(simplifyNumber(Double.parseDouble(item.split("@split@")[1]))).append("\n");
+                invStr.append("• ").append(item.split("@split@")[0]).append(" ➜ ")
+                        .append(simplifyNumber(Double.parseDouble(item.split("@split@")[1]))).append("\n");
                 if (i == 4) {
                     invStr.append("• And more...");
                     break;
@@ -219,7 +223,8 @@ public class NetworthExecute {
             StringBuilder armorStr = new StringBuilder();
             for (int i = 0; i < armorItems.size(); i++) {
                 String item = armorItems.get(i);
-                armorStr.append("• ").append(item.split("@split@")[0]).append(" ➜ ").append(simplifyNumber(Double.parseDouble(item.split("@split@")[1]))).append("\n");
+                armorStr.append("• ").append(item.split("@split@")[0]).append(" ➜ ")
+                        .append(simplifyNumber(Double.parseDouble(item.split("@split@")[1]))).append("\n");
                 if (i == 4) {
                     break;
                 }
@@ -229,7 +234,8 @@ public class NetworthExecute {
             StringBuilder wardrobeStr = new StringBuilder();
             for (int i = 0; i < wardrobeItems.size(); i++) {
                 String item = wardrobeItems.get(i);
-                wardrobeStr.append("• ").append(item.split("@split@")[0]).append(" ➜ ").append(simplifyNumber(Double.parseDouble(item.split("@split@")[1]))).append("\n");
+                wardrobeStr.append("• ").append(item.split("@split@")[0]).append(" ➜ ")
+                        .append(simplifyNumber(Double.parseDouble(item.split("@split@")[1]))).append("\n");
                 if (i == 4) {
                     wardrobeStr.append("• And more...");
                     break;
@@ -240,7 +246,8 @@ public class NetworthExecute {
             StringBuilder petsStr = new StringBuilder();
             for (int i = 0; i < petsItems.size(); i++) {
                 String item = petsItems.get(i);
-                petsStr.append("• ").append(item.split("@split@")[0]).append(" ➜ ").append(simplifyNumber(Double.parseDouble(item.split("@split@")[1]))).append("\n");
+                petsStr.append("• ").append(item.split("@split@")[0]).append(" ➜ ")
+                        .append(simplifyNumber(Double.parseDouble(item.split("@split@")[1]))).append("\n");
                 if (i == 4) {
                     petsStr.append("• And more...");
                     break;
@@ -251,7 +258,8 @@ public class NetworthExecute {
             StringBuilder talismanStr = new StringBuilder();
             for (int i = 0; i < talismanItems.size(); i++) {
                 String item = talismanItems.get(i);
-                talismanStr.append("• ").append(item.split("@split@")[0]).append(" ➜ ").append(simplifyNumber(Double.parseDouble(item.split("@split@")[1]))).append("\n");
+                talismanStr.append("• ").append(item.split("@split@")[0]).append(" ➜ ")
+                        .append(simplifyNumber(Double.parseDouble(item.split("@split@")[1]))).append("\n");
                 if (i == 4) {
                     talismanStr.append("• And more...");
                     break;
@@ -312,39 +320,39 @@ public class NetworthExecute {
                 double auctionPrice = higherDepth(auction, "starting_bid").getAsDouble();
                 String auctionRarity = higherDepth(auction, "tier").getAsString();
 
-                for (Iterator<InvItem> iterator = invPets.iterator(); iterator.hasNext(); ) {
+                for (Iterator<InvItem> iterator = invPets.iterator(); iterator.hasNext();) {
                     InvItem item = iterator.next();
                     if (item.getName().equalsIgnoreCase(auctionName)
                             && item.getRarity().equalsIgnoreCase(auctionRarity)) {
                         double itemPrice = auctionPrice
                                 + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ")
-                                : 0);
+                                        : 0);
                         invItems.add(item.getName() + "@split@" + itemPrice);
                         invTotal += itemPrice;
                         iterator.remove();
                     }
                 }
 
-                for (Iterator<InvItem> iterator = petsPets.iterator(); iterator.hasNext(); ) {
+                for (Iterator<InvItem> iterator = petsPets.iterator(); iterator.hasNext();) {
                     InvItem item = iterator.next();
                     if (item.getName().equalsIgnoreCase(auctionName)
                             && item.getRarity().equalsIgnoreCase(auctionRarity)) {
                         double itemPrice = auctionPrice
                                 + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ")
-                                : 0);
+                                        : 0);
                         petsItems.add(item.getName() + "@split@" + itemPrice);
                         petsTotal += itemPrice;
                         iterator.remove();
                     }
                 }
 
-                for (Iterator<InvItem> iterator = enderChestPets.iterator(); iterator.hasNext(); ) {
+                for (Iterator<InvItem> iterator = enderChestPets.iterator(); iterator.hasNext();) {
                     InvItem item = iterator.next();
                     if (item.getName().equalsIgnoreCase(auctionName)
                             && item.getRarity().equalsIgnoreCase(auctionRarity)) {
                         double itemPrice = auctionPrice
                                 + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ")
-                                : 0);
+                                        : 0);
                         enderChestItems.add(item.getName() + "@split@" + itemPrice);
                         enderChestTotal += itemPrice;
                         iterator.remove();
@@ -364,7 +372,7 @@ public class NetworthExecute {
             try {
                 double itemPrice = higherDepth(lowestBinJson,
                         item.getName().split("] ")[1].toLowerCase().trim() + rarityMap.get(item.getRarity()))
-                        .getAsDouble()
+                                .getAsDouble()
                         + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ") : 0);
                 invItems.add(item.getName() + "@split@" + itemPrice);
                 invTotal += itemPrice;
@@ -376,7 +384,7 @@ public class NetworthExecute {
             try {
                 double itemPrice = higherDepth(lowestBinJson,
                         item.getName().split("] ")[1].toLowerCase().trim() + rarityMap.get(item.getRarity()))
-                        .getAsDouble()
+                                .getAsDouble()
                         + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ") : 0);
                 petsItems.add(item.getName() + "@split@" + itemPrice);
                 petsTotal += itemPrice;
@@ -388,7 +396,7 @@ public class NetworthExecute {
             try {
                 double itemPrice = higherDepth(lowestBinJson,
                         item.getName().split("] ")[1].toLowerCase().trim() + rarityMap.get(item.getRarity()))
-                        .getAsDouble()
+                                .getAsDouble()
                         + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ") : 0);
                 enderChestItems.add(item.getName() + "@split@" + itemPrice);
                 enderChestTotal += itemPrice;
@@ -444,22 +452,25 @@ public class NetworthExecute {
 
         try {
             if (item.isRecombobulated()) {
-                recombobulatedExtra = higherDepth(bazaarJson, "RECOMBOBULATOR_3000.quick_status.sellPrice")
-                        .getAsDouble();
+                recombobulatedExtra = higherDepth(
+                        higherDepth(bazaarJson, "RECOMBOBULATOR_3000.sell_summary").getAsJsonArray().get(0),
+                        "pricePerUnit").getAsDouble();
             }
         } catch (Exception ignored) {
         }
 
         try {
             hbpExtras = item.getHbpCount()
-                    * higherDepth(bazaarJson, "HOT_POTATO_BOOK.quick_status.sellPrice")
-                    .getAsDouble();
+                    * higherDepth(higherDepth(bazaarJson, "HOT_POTATO_BOOK.sell_summary").getAsJsonArray().get(0),
+                            "pricePerUnit").getAsDouble();
+            ;
         } catch (Exception ignored) {
         }
 
         try {
             fumingExtras = item.getFumingCount()
-                    * higherDepth(bazaarJson, "FUMING_POTATO_BOOK.quick_status.sellPrice").getAsDouble();
+                    * higherDepth(higherDepth(bazaarJson, "FUMING_POTATO_BOOK.sell_summary").getAsJsonArray().get(0),
+                            "pricePerUnit").getAsDouble();
         } catch (Exception ignored) {
         }
 
@@ -470,15 +481,15 @@ public class NetworthExecute {
                 try {
                     double enchantPrice = getLowestPriceEnchant(enchant.toUpperCase());
                     enchantsExtras += enchantPrice;
-                    enchStr += "{\"type\":\"" + enchant +"\",\"price\":\""+ simplifyNumber(enchantPrice) + "\"},";
+                    enchStr += "{\"type\":\"" + enchant + "\",\"price\":\"" + simplifyNumber(enchantPrice) + "\"},";
                 } catch (Exception ignored) {
                 }
             }
         } catch (Exception ignored) {
         }
 
-        if(enchStr.endsWith(",")){
-            enchStr = enchStr.substring(0, enchStr.length() -1);
+        if (enchStr.endsWith(",")) {
+            enchStr = enchStr.substring(0, enchStr.length() - 1);
         }
         enchStr += "]";
 
@@ -494,13 +505,13 @@ public class NetworthExecute {
             for (String extraItem : extraStats) {
                 double miscPrice = getLowestPrice(extraItem, " ");
                 miscExtras += miscPrice;
-                miscStr += "{\"name\":\"" + extraItem +"\",\"price\":\""+ simplifyNumber(miscPrice) + "\"},";
+                miscStr += "{\"name\":\"" + extraItem + "\",\"price\":\"" + simplifyNumber(miscPrice) + "\"},";
             }
         } catch (Exception ignored) {
         }
 
-        if(miscStr.endsWith(",")){
-            miscStr = miscStr.substring(0, miscStr.length() -1);
+        if (miscStr.endsWith(",")) {
+            miscStr = miscStr.substring(0, miscStr.length() - 1);
         }
         miscStr += "]";
 
@@ -512,12 +523,21 @@ public class NetworthExecute {
         } catch (Exception ignored) {
         }
 
-        if(verbose) {
-            calcItemsJsonStr += "{\"name\":\"" + item.getName() + "\",\"count\":" + itemCount + ",\"base_cost\":\"" +  simplifyNumber(itemCost) + "\",\"recomb\":\"" + simplifyNumber(recombobulatedExtra) + "\",\"hbp\":\"" + simplifyNumber(hbpExtras) + "\",\"enchants\":{\"total\":\"" + simplifyNumber(enchantsExtras) + "\",\"enchs\":" + enchStr + "},\"fuming\":\"" + simplifyNumber(fumingExtras) + "\",\"reforge\":{\"cost\":" + simplifyNumber(reforgeExtras) + ",\"name\":\"" + item.getModifier()  + "\"},\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "},\"bp\":\"" + simplifyNumber(backpackExtras) + "\"},";
+        double totalPrice = itemCount * (itemCost + recombobulatedExtra + hbpExtras + enchantsExtras + fumingExtras
+                + reforgeExtras + miscExtras + backpackExtras);
+
+        if (verbose) {
+            calcItemsJsonStr += "{\"total\":\"" + simplifyNumber(totalPrice) + "\",\"name\":\"" + item.getName()
+                    + "\",\"count\":" + itemCount + ",\"base_cost\":\"" + simplifyNumber(itemCost) + "\",\"recomb\":\""
+                    + simplifyNumber(recombobulatedExtra) + "\",\"hbp\":\"" + simplifyNumber(hbpExtras)
+                    + "\",\"enchants\":{\"total\":\"" + simplifyNumber(enchantsExtras) + "\",\"enchs\":" + enchStr
+                    + "},\"fuming\":\"" + simplifyNumber(fumingExtras) + "\",\"reforge\":{\"cost\":"
+                    + simplifyNumber(reforgeExtras) + ",\"name\":\"" + item.getModifier() + "\"},\"misc\":{\"total\":\""
+                    + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "},\"bp\":\""
+                    + simplifyNumber(backpackExtras) + "\"},";
         }
 
-        return itemCount * (itemCost + recombobulatedExtra + hbpExtras + enchantsExtras + fumingExtras + reforgeExtras
-                + miscExtras + backpackExtras);
+        return totalPrice;
     }
 
     private double calculateReforgePrice(String reforgeName, String itemRarity) {
@@ -529,7 +549,8 @@ public class NetworthExecute {
             if (higherDepth(reforgeStoneInfo, "reforgeName").getAsString().equalsIgnoreCase(reforgeName)) {
                 String reforgeStoneName = higherDepth(reforgeStoneInfo, "internalName").getAsString();
                 double reforgeStoneCost = getLowestPrice(reforgeStoneName, " ");
-                double reforgeApplyCost = higherDepth(reforgeStoneInfo, "reforgeCosts." + itemRarity.toUpperCase()).getAsDouble();
+                double reforgeApplyCost = higherDepth(reforgeStoneInfo, "reforgeCosts." + itemRarity.toUpperCase())
+                        .getAsDouble();
                 return reforgeStoneCost + reforgeApplyCost;
             }
         }
@@ -542,6 +563,11 @@ public class NetworthExecute {
         double averageAuction = -1;
         String enchantName = enchantId.split(";")[0];
         int enchantLevel = Integer.parseInt(enchantId.split(";")[1]);
+
+        if (enchantName.equalsIgnoreCase("compact") || enchantName.equalsIgnoreCase("expertise")
+                || enchantName.equalsIgnoreCase("cultivating")) {
+            enchantLevel = 1;
+        }
 
         for (int i = enchantLevel; i >= 1; i--) {
             try {
@@ -604,7 +630,8 @@ public class NetworthExecute {
         }
 
         try {
-            return higherDepth(bazaarJson, itemId + ".quick_status.sellPrice").getAsDouble();
+            return higherDepth(higherDepth(bazaarJson, itemId + "sell_summary").getAsJsonArray().get(0), "pricePerUnit")
+                    .getAsDouble();
         } catch (Exception ignored) {
         }
 

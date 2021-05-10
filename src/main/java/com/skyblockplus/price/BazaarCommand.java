@@ -1,24 +1,35 @@
 package com.skyblockplus.price;
 
-import com.google.gson.JsonElement;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
-import org.apache.commons.text.similarity.LevenshteinDistance;
+import static com.skyblockplus.utils.Utils.capitalizeString;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.errorMessage;
+import static com.skyblockplus.utils.Utils.getJson;
+import static com.skyblockplus.utils.Utils.getJsonKeys;
+import static com.skyblockplus.utils.Utils.globalCooldown;
+import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.Utils.loadingEmbed;
+import static com.skyblockplus.utils.Utils.logCommand;
+import static com.skyblockplus.utils.Utils.simplifyNumber;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.skyblockplus.utils.Utils.*;
+import com.google.gson.JsonElement;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+
+import org.apache.commons.text.similarity.LevenshteinDistance;
+
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 
 public class BazaarCommand extends Command {
     public BazaarCommand() {
         this.name = "bazaar";
         this.cooldown = globalCooldown;
-        this.aliases = new String[]{"bz"};
+        this.aliases = new String[] { "bz" };
     }
 
     @Override
@@ -57,10 +68,16 @@ public class BazaarCommand extends Command {
             itemsMap.put(itemNameFormatted, item);
 
             if (itemNameFormatted.toUpperCase().replace(" ", "_").equals(formattedItemName)) {
-                JsonElement itemInfo = higherDepth(bazaarItems, item + ".quick_status");
+                JsonElement itemInfo = higherDepth(bazaarItems, item);
                 EmbedBuilder eb = defaultEmbed(itemNameFormatted, "https://bazaartracker.com/product/" + item);
-                eb.addField("Buy Price (Per)", simplifyNumber(higherDepth(itemInfo, "buyPrice").getAsDouble()), true);
-                eb.addField("Sell Price (Per)", simplifyNumber(higherDepth(itemInfo, "sellPrice").getAsDouble()), true);
+                eb.addField("Buy Price (Per)", simplifyNumber(
+                        higherDepth(higherDepth(itemInfo, "buy_summary").getAsJsonArray().get(0), "pricePerUnit")
+                                .getAsDouble()),
+                        true);
+                eb.addField("Sell Price (Per)", simplifyNumber(
+                        higherDepth(higherDepth(itemInfo, "sell_summary").getAsJsonArray().get(0), "pricePerUnit")
+                                .getAsDouble()),
+                        true);
                 eb.addBlankField(true);
                 eb.addField("Buy Volume", simplifyNumber(higherDepth(itemInfo, "buyVolume").getAsDouble()), true);
                 eb.addField("Sell Volume", simplifyNumber(higherDepth(itemInfo, "sellVolume").getAsDouble()), true);
@@ -85,11 +102,19 @@ public class BazaarCommand extends Command {
         if (closestMatch != null && higherDepth(bazaarItems, closestMatch) != null) {
             closestMatch = itemsMap.get(closestMatch);
 
-            JsonElement itemInfo = higherDepth(bazaarItems, closestMatch + ".quick_status");
+            JsonElement itemInfo = higherDepth(bazaarItems, closestMatch);
             EmbedBuilder eb = defaultEmbed(higherDepth(bazaarItems, closestMatch + ".name").getAsString(),
                     "https://bazaartracker.com/product/" + closestMatch);
-            eb.addField("Buy Price (Per)", simplifyNumber(higherDepth(itemInfo, "buyPrice").getAsDouble()), true);
-            eb.addField("Sell Price (Per)", simplifyNumber(higherDepth(itemInfo, "sellPrice").getAsDouble()), true);
+            eb.addField("Buy Price (Per)",
+                    simplifyNumber(
+                            higherDepth(higherDepth(itemInfo, "buy_summary").getAsJsonArray().get(0), "pricePerUnit")
+                                    .getAsDouble()),
+                    true);
+            eb.addField("Sell Price (Per)",
+                    simplifyNumber(
+                            higherDepth(higherDepth(itemInfo, "sell_summary").getAsJsonArray().get(0), "pricePerUnit")
+                                    .getAsDouble()),
+                    true);
             eb.addBlankField(true);
             eb.addField("Buy Volume", simplifyNumber(higherDepth(itemInfo, "buyVolume").getAsDouble()), true);
             eb.addField("Sell Volume", simplifyNumber(higherDepth(itemInfo, "sellVolume").getAsDouble()), true);

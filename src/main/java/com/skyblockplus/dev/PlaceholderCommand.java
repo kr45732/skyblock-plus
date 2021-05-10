@@ -1,24 +1,27 @@
 package com.skyblockplus.dev;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.loadingEmbed;
+import static com.skyblockplus.utils.Utils.logCommand;
 
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.utils.Utils.*;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
 
 public class PlaceholderCommand extends Command {
     public PlaceholderCommand() {
         this.name = "d-placeholder";
         this.ownerCommand = true;
-        this.aliases = new String[]{"ph"};
+        this.aliases = new String[] { "ph" };
     }
 
     @Override

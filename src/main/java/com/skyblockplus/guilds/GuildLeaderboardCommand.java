@@ -188,10 +188,11 @@ public class GuildLeaderboardCommand extends Command {
         boolean success = true;
         try {
             CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get();
+            System.out.println(futures.size());
             for(CompletableFuture<?> future:futures){
                 System.out.println(future + " - " + future.isDone());
             }
-            System.out.println(futures.size());
+
         } catch (Exception e) {
             success = false;
         }
