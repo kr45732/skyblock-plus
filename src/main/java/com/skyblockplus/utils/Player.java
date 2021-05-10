@@ -1184,8 +1184,7 @@ public class Player {
         }
 
         try {
-            return higherDepth(higherDepth(higherDepth(hypixelProfileJson, "player"), "achievements"),
-                    "skyblock_treasure_hunter").getAsInt();
+            return higherDepth(hypixelProfileJson, "player.achievements.skyblock_treasure_hunter").getAsInt();
         } catch (Exception e) {
             return 0;
         }
@@ -1193,7 +1192,7 @@ public class Player {
 
     public String getSelectedDungeonClass() {
         try {
-            return higherDepth(higherDepth(profileJson, "dungeons"), "selected_dungeon_class").getAsString();
+            return higherDepth(profileJson, "dungeons.selected_dungeon_class").getAsString();
         } catch (Exception e) {
             return "none";
         }
@@ -1249,9 +1248,7 @@ public class Player {
 
     public String getFastestF7Time() {
         try {
-            int f7TimeMilliseconds = higherDepth(higherDepth(
-                    higherDepth(higherDepth(higherDepth(profileJson, "dungeons"), "dungeon_types"), "catacombs"),
-                    "fastest_time_s_plus"), "7").getAsInt();
+            int f7TimeMilliseconds = higherDepth(profileJson, "dungeons.dungeon_types.catacombs.fastest_time_s_plus.7").getAsInt();
             int minutes = f7TimeMilliseconds / 1000 / 60;
             int seconds = f7TimeMilliseconds % 1000 % 60;
             return "\n**Fastest F7 S+:** " + minutes + ":" + (seconds >= 10 ? seconds : "0" + seconds);
@@ -1304,7 +1301,7 @@ public class Player {
 
     public List<String[]> getEnderChest() {
         try {
-            String encodedInventoryContents = higherDepth(higherDepth(profileJson, "ender_chest_contents"), "data")
+            String encodedInventoryContents = higherDepth(profileJson, "ender_chest_contents.data")
                     .getAsString();
             NBTCompound decodedInventoryContents = NBTReader.readBase64(encodedInventoryContents);
 
@@ -1365,7 +1362,7 @@ public class Player {
 
     public List<String[]> getTalismanBag() {
         try {
-            String encodedInventoryContents = higherDepth(higherDepth(profileJson, "talisman_bag"), "data")
+            String encodedInventoryContents = higherDepth(profileJson, "talisman_bag.data")
                     .getAsString();
             NBTCompound decodedInventoryContents = NBTReader.readBase64(encodedInventoryContents);
 

@@ -2,6 +2,7 @@ package com.skyblockplus;
 
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.skyblockplus.guilds.GuildRequirementsCommand;
 import com.skyblockplus.price.*;
 import com.skyblockplus.dev.*;
 import com.skyblockplus.dungeons.CatacombsCommand;
@@ -75,7 +76,7 @@ public class Main {
                 new BazaarCommand(), new AverageAuctionCommand(), new PetsCommand(), new SkyblockEventCommand(),
                 new DeleteMessagesCommand(), new PlaceholderCommand(), new ProfilesCommand(), new NetworthCommand(),
                 new QueryAuctionCommand(), new BidsCommand(), new GetThreadPools(), new BitsCommand(),
-                new EvaluateCommand());
+                new EvaluateCommand(), new GuildRequirementsCommand());
 
         if (BOT_PREFIX.equals("+")) {
             jda = JDABuilder.createDefault(BOT_TOKEN).setStatus(OnlineStatus.DO_NOT_DISTURB)

@@ -93,16 +93,16 @@ public class SkyblockCommand extends Command {
                     ? higherDepth(jacobJson, "unique_golds2").getAsJsonArray().size()
                     : 0) + "\n";
             skillsPageString += "• **Current Golds:** "
-                    + (higherDepth(higherDepth(jacobJson, "medals_inv"), "gold") == null ? 0
-                    : higherDepth(higherDepth(jacobJson, "medals_inv"), "gold").getAsInt())
+                    + (higherDepth(jacobJson, "medals_inv.gold") == null ? 0
+                    : higherDepth(jacobJson, "medals_inv.gold").getAsInt())
                     + "\n";
             skillsPageString += "• **Current Silvers:** "
-                    + (higherDepth(higherDepth(jacobJson, "medals_inv"), "silver") == null ? 0
-                    : higherDepth(higherDepth(jacobJson, "medals_inv"), "silver").getAsInt())
+                    + (higherDepth(jacobJson, "medals_inv.silver") == null ? 0
+                    : higherDepth(jacobJson, "medals_inv.silver").getAsInt())
                     + "\n";
             skillsPageString += "• **Current Bronzes:** "
-                    + (higherDepth(higherDepth(jacobJson, "medals_inv"), "bronze") == null ? 0
-                    : higherDepth(higherDepth(jacobJson, "medals_inv"), "bronze").getAsInt())
+                    + (higherDepth(jacobJson, "medals_inv.bronze") == null ? 0
+                    : higherDepth(jacobJson, "medals_inv.bronze").getAsInt())
                     + "\n";
             skillsPageString += "\n";
 

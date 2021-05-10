@@ -1,5 +1,6 @@
 package com.skyblockplus.networth;
 
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -14,7 +15,10 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.InputStreamReader;
+import java.io.Writer;
 import java.net.URI;
 import java.util.*;
 
@@ -44,47 +48,74 @@ public class NetworthExecute {
     private double wardrobeTotal = 0;
     private double talismanTotal = 0;
     private double invArmor = 0;
-
-    private static JsonArray queryAhApi(String query) {
-        CloseableHttpClient httpclient = HttpClientBuilder.create().build();
-        try {
-            HttpGet httpget = new HttpGet("https://api.eastarctica.tk/auctions/");
-            httpget.addHeader("content-type", "application/json; charset=UTF-8");
-
-            URI uri = new URIBuilder(httpget.getURI())
-                    .addParameter("query", "{\"item_name\":{\"$in\":[" + query + "]},\"bin\":true}")
-                    .addParameter("sort", "{\"starting_bid\":1}").build();
-            httpget.setURI(uri);
-
-            HttpResponse httpresponse = httpclient.execute(httpget);
-            return JsonParser.parseReader(new InputStreamReader(httpresponse.getEntity().getContent()))
-                    .getAsJsonArray();
-        } catch (Exception ignored) {
-        } finally {
-            try {
-                httpclient.close();
-            } catch (Exception e) {
-                System.out.println("== Stack Trace (Nw Query Close Http Client) ==");
-                e.printStackTrace();
-            }
-        }
-        return null;
-    }
+    private String calcItemsJsonStr = "[";
+    private boolean verbose = false;
 
     public void execute(CommandEvent event) {
         new Thread(() -> {
             EmbedBuilder eb = loadingEmbed();
             Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
             String content = event.getMessage().getContentRaw();
+
+            if(content.contains("verbose-true")){
+                verbose = true;
+                content = content.replace("verbose-true", "").trim();
+            }
+
             String[] args = content.split(" ");
 
             logCommand(event.getGuild(), event.getAuthor(), content);
 
+
             if (args.length == 2) {
                 ebMessage.editMessage(getPlayerNetworth(args[1], null).build()).queue();
+
+                if(verbose){
+                    try {
+                        if(calcItemsJsonStr.endsWith(",")){
+                            calcItemsJsonStr = calcItemsJsonStr.substring(0, calcItemsJsonStr.length() -1);
+                        }
+                        calcItemsJsonStr += "]";
+                        System.out.println(calcItemsJsonStr);
+                        String pathName = "src/main/java/com/skyblockplus/json/" + args[1].toLowerCase() + "_networth.json";
+                        File file = new File(pathName);
+                        if (!file.createNewFile()) {
+                            file.delete();
+                            file.createNewFile();
+                        }
+                        Writer writer = new FileWriter(pathName);
+                        new GsonBuilder().setPrettyPrinting().create().toJson(JsonParser.parseString(calcItemsJsonStr), writer);
+                        writer.close();
+                        event.getChannel().sendFile(file).queue();
+                        file.delete();
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
                 return;
             } else if (args.length == 3) {
                 ebMessage.editMessage(getPlayerNetworth(args[1], args[2]).build()).queue();
+
+                if(verbose){
+                    try {
+                        if(calcItemsJsonStr.endsWith(",")){
+                            calcItemsJsonStr = calcItemsJsonStr.substring(0, calcItemsJsonStr.length() -1);
+                        }
+                        calcItemsJsonStr += "]";
+                        String pathName = "src/main/java/com/skyblockplus/json/" + args[1].toLowerCase() + "_networth.json";
+                        File file = new File(pathName);
+                        if (!file.createNewFile()) {
+                            file.delete();
+                            file.createNewFile();
+                        }
+                        Writer writer = new FileWriter(pathName);
+                        new GsonBuilder().setPrettyPrinting().create().toJson(JsonParser.parseString(calcItemsJsonStr), writer);
+                        writer.close();
+                        event.getChannel().sendFile(file).queue();
+                        file.delete();
+                    }catch (Exception ignored){
+                    }
+                }
                 return;
             }
 
@@ -250,9 +281,7 @@ public class NetworthExecute {
 
             return eb;
         }
-        return
-
-                defaultEmbed("Unable to fetch player data");
+        return defaultEmbed("Unable to fetch player data");
     }
 
     private void calculateAllPetsPrice() {
@@ -435,16 +464,24 @@ public class NetworthExecute {
         } catch (Exception ignored) {
         }
 
+        String enchStr = "[";
         try {
             List<String> enchants = item.getEnchantsFormatted();
             for (String enchant : enchants) {
                 try {
-                    enchantsExtras += getLowestPriceEnchant(enchant.toUpperCase());
+                    double enchantPrice = getLowestPriceEnchant(enchant.toUpperCase());
+                    enchantsExtras += enchantPrice;
+                    enchStr += "{\"type\":\"" + enchant +"\",\"price\":\""+ simplifyNumber(enchantPrice) + "\"},";
                 } catch (Exception ignored) {
                 }
             }
         } catch (Exception ignored) {
         }
+
+        if(enchStr.endsWith(",")){
+            enchStr = enchStr.substring(0, enchStr.length() -1);
+        }
+        enchStr += "]";
 
         try {
             reforgeExtras = calculateReforgePrice(item.getModifier(), item.getRarity());
@@ -452,13 +489,21 @@ public class NetworthExecute {
 
         }
 
+        String miscStr = "[";
         try {
             List<String> extraStats = item.getExtraStats();
             for (String extraItem : extraStats) {
-                miscExtras += getLowestPrice(extraItem, " ");
+                double miscPrice = getLowestPrice(extraItem, " ");
+                miscExtras += miscPrice;
+                enchStr += "{\"name\":\"" + extraItem +"\",\"price\":\""+ simplifyNumber(miscPrice) + "\"},";
             }
         } catch (Exception ignored) {
         }
+
+        if(miscStr.endsWith(",")){
+            miscStr = miscStr.substring(0, miscStr.length() -1);
+        }
+        miscStr += "]";
 
         try {
             List<InvItem> backpackItems = item.getBackpackItems();
@@ -466,6 +511,10 @@ public class NetworthExecute {
                 backpackExtras += calculateItemPrice(backpackItem);
             }
         } catch (Exception ignored) {
+        }
+
+        if(verbose) {
+            calcItemsJsonStr += "{\"name\":\"" + item.getName() + "\",\"count\":" + itemCount + ",\"base_cost\":\"" +  simplifyNumber(itemCost) + "\",\"recomb\":\"" + simplifyNumber(recombobulatedExtra) + "\",\"hbp\":\"" + simplifyNumber(hbpExtras) + "\",\"enchants\":{\"total\":\"" + simplifyNumber(enchantsExtras) + "\",\"enchs\":" + enchStr + "},\"fuming\":\"" + simplifyNumber(fumingExtras) + "\",\"reforge\":{\"cost\":" + simplifyNumber(reforgeExtras) + ",\"name\":\"" + item.getModifier()  + "\"},\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "},\"bp\":\"" + simplifyNumber(backpackExtras) + "\"},";
         }
 
         return itemCount * (itemCost + recombobulatedExtra + hbpExtras + enchantsExtras + fumingExtras + reforgeExtras
@@ -622,4 +671,31 @@ public class NetworthExecute {
 
         return s.equals("skyblock_menu");
     }
+
+    private JsonArray queryAhApi(String query) {
+        CloseableHttpClient httpclient = HttpClientBuilder.create().build();
+        try {
+            HttpGet httpget = new HttpGet("https://api.eastarctica.tk/auctions/");
+            httpget.addHeader("content-type", "application/json; charset=UTF-8");
+
+            URI uri = new URIBuilder(httpget.getURI())
+                    .addParameter("query", "{\"item_name\":{\"$in\":[" + query + "]},\"bin\":true}")
+                    .addParameter("sort", "{\"starting_bid\":1}").build();
+            httpget.setURI(uri);
+
+            HttpResponse httpresponse = httpclient.execute(httpget);
+            return JsonParser.parseReader(new InputStreamReader(httpresponse.getEntity().getContent()))
+                    .getAsJsonArray();
+        } catch (Exception ignored) {
+        } finally {
+            try {
+                httpclient.close();
+            } catch (Exception e) {
+                System.out.println("== Stack Trace (Nw Query Close Http Client) ==");
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
 }

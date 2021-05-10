@@ -494,7 +494,7 @@ public class SettingsCommand extends Command {
         try {
             JsonElement guildJson = getJson(
                     "https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&name=" + guildName.replace("_", "%20"));
-            String guildId = higherDepth(higherDepth(guildJson, "guild"), "_id").getAsString();
+            String guildId = higherDepth(guildJson, "guild._id").getAsString();
             JsonObject currentSettings = database.getGuildRoleSettings(event.getGuild().getId()).getAsJsonObject();
             currentSettings.remove("guildId");
             currentSettings.addProperty("guildId", guildId);
@@ -505,7 +505,7 @@ public class SettingsCommand extends Command {
 
             EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
             eb.setDescription(
-                    "**Guild set to:** " + higherDepth(higherDepth(guildJson, "guild"), "name").getAsString());
+                    "**Guild set to:** " + higherDepth(guildJson, "guild.name").getAsString());
             return eb;
         } catch (Exception e) {
             return defaultEmbed("Error", null).setDescription("Invalid guild name");
@@ -715,7 +715,7 @@ public class SettingsCommand extends Command {
                         JsonElement guildJson = getJson(
                                 "https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&id=" + guildId);
                         ebFieldString.append("\n• ")
-                                .append(higherDepth(higherDepth(guildJson, "guild"), "name").getAsString())
+                                .append(higherDepth(guildJson, "guild.name").getAsString())
                                 .append(" - ").append("<@&" + higherDepth(roleLevel, "roleId").getAsString() + ">");
                     }
                 } else {
@@ -741,7 +741,7 @@ public class SettingsCommand extends Command {
         JsonObject currentSettings = database.getRolesSettings(event.getGuild().getId()).getAsJsonObject();
         currentSettings.remove("enable");
         for (String role : getJsonKeys(currentSettings)) {
-            if (higherDepth(higherDepth(currentSettings, role), "enable").getAsBoolean()) {
+            if (higherDepth(currentSettings, role + ".enable").getAsBoolean()) {
                 return true;
             }
         }
@@ -804,8 +804,8 @@ public class SettingsCommand extends Command {
             try {
                 JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&name="
                         + roleValue.replace("_", "%20"));
-                roleValue = higherDepth(higherDepth(guildJson, "guild"), "_id").getAsString();
-                guildName = higherDepth(higherDepth(guildJson, "guild"), "name").getAsString();
+                roleValue = higherDepth(guildJson, "guild._id").getAsString();
+                guildName = higherDepth(guildJson, "guild.name").getAsString();
             } catch (Exception e) {
                 return defaultEmbed("Error", null).setDescription("Invalid username");
             }
@@ -891,7 +891,7 @@ public class SettingsCommand extends Command {
             if (roleName.equals("guild_member")) {
                 JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&id="
                         + higherDepth(level, "value").getAsString());
-                currentValue = higherDepth(higherDepth(guildJson, "guild"), "name").getAsString();
+                currentValue = higherDepth(guildJson, "guild.name").getAsString();
             }
 
             if (currentValue.equalsIgnoreCase(value.replace("_", " "))) {
@@ -1493,7 +1493,7 @@ public class SettingsCommand extends Command {
                         try {
                             JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY
                                     + "&id=" + currentSettingValue);
-                            return higherDepth(higherDepth(guildJson, "guild"), "name").getAsString();
+                            return higherDepth(guildJson, "guild.name").getAsString();
                         } catch (Exception e) {
                             return "Error finding guild associated with " + currentSettingValue + " id";
                         }

@@ -106,7 +106,9 @@ public class HelpCommand extends Command {
                     + generateHelp("Get information and statistics about a guild", "guild info [g-player]")
                     + generateHelp("Get a list of all members in a player's guild", "guild members [u-player]")
                     + generateHelp("Get the experience leaderboard for a player's guild", "guild experience [u-player]",
-                    "guild exp [u-player]"));
+                    "guild exp [u-player]")
+                    + generateHelp("Get the application requirements set for this server", "guild-requirements", "g-reqs")
+            );
 
             paginateBuilder.addItems(generateHelp("Get player's active (not claimed) auctions on all profiles",
                     "auction [player]", "ah [player]") + generateHelp("Get the lowest bin of an item", "bin [item]")
