@@ -29,12 +29,14 @@ public class NetworthExecute {
     private final List<InvItem> invPets = new ArrayList<>();
     private final List<InvItem> petsPets = new ArrayList<>();
     private final List<InvItem> enderChestPets = new ArrayList<>();
+    private final List<InvItem> storagePets = new ArrayList<>();
     private final List<String> enderChestItems = new ArrayList<>();
     private final List<String> petsItems = new ArrayList<>();
     private final List<String> invItems = new ArrayList<>();
     private final List<String> wardrobeItems = new ArrayList<>();
     private final List<String> talismanItems = new ArrayList<>();
     private final List<String> armorItems = new ArrayList<>();
+    private final List<String> storageItems = new ArrayList<>();
     private JsonElement lowestBinJson;
     private JsonElement averageAuctionJson;
     private JsonElement bazaarJson;
@@ -48,6 +50,7 @@ public class NetworthExecute {
     private double wardrobeTotal = 0;
     private double talismanTotal = 0;
     private double invArmor = 0;
+    private double storageTotal = 0;
     private String calcItemsJsonStr = "[";
     private boolean verbose = false;
 
@@ -193,6 +196,15 @@ public class NetworthExecute {
                 }
             }
 
+            Map<Integer, InvItem> storageMap = player.getStorageMap();
+            for (InvItem item : storageMap.values()) {
+                double itemPrice = calculateItemPrice(item, "storage");
+                storageTotal += itemPrice;
+                if (item != null) {
+                    storageItems.add(item.getName() + "@split@" + itemPrice);
+                }
+            }
+
             calculateAllPetsPrice();
 
             enderChestItems.sort(Comparator.comparingDouble(item -> -Double.parseDouble(item.split("@split@")[1])));
@@ -203,6 +215,18 @@ public class NetworthExecute {
                         .append(simplifyNumber(Double.parseDouble(item.split("@split@")[1]))).append("\n");
                 if (i == 4) {
                     echestStr.append("• And more...");
+                    break;
+                }
+            }
+
+            storageItems.sort(Comparator.comparingDouble(item -> -Double.parseDouble(item.split("@split@")[1])));
+            StringBuilder storageStr = new StringBuilder();
+            for (int i = 0; i < storageItems.size(); i++) {
+                String item = storageItems.get(i);
+                storageStr.append("• ").append(item.split("@split@")[0]).append(" ➜ ")
+                        .append(simplifyNumber(Double.parseDouble(item.split("@split@")[1]))).append("\n");
+                if (i == 4) {
+                    storageStr.append("• And more...");
                     break;
                 }
             }
@@ -274,6 +298,7 @@ public class NetworthExecute {
             eb.addField("Purse", simplifyNumber(purseCoins), true);
             eb.addField("Bank", (bankBalance == -1 ? "Private" : simplifyNumber(bankBalance)), true);
             eb.addField("Ender Chest | " + simplifyNumber(enderChestTotal), echestStr.toString(), false);
+            eb.addField("Storage | " + simplifyNumber(storageTotal), storageStr.toString(), false);
             eb.addField("Inventory | " + simplifyNumber(invTotal), invStr.toString(), false);
             eb.addField("Armor | " + simplifyNumber(invArmor), armorStr.toString(), false);
             eb.addField("Wardrobe | " + simplifyNumber(wardrobeTotal), wardrobeStr.toString(), false);
@@ -302,6 +327,11 @@ public class NetworthExecute {
             queryStr.append("\"").append(petName).append("\",");
         }
         for (InvItem item : enderChestPets) {
+            String petName = capitalizeString(item.getName()).replace("lvl", "Lvl");
+            queryStr.append("\"").append(petName).append("\",");
+        }
+
+        for (InvItem item : storagePets) {
             String petName = capitalizeString(item.getName()).replace("lvl", "Lvl");
             queryStr.append("\"").append(petName).append("\",");
         }
@@ -358,6 +388,19 @@ public class NetworthExecute {
                         iterator.remove();
                     }
                 }
+
+                for (Iterator<InvItem> iterator = storagePets.iterator(); iterator.hasNext();) {
+                    InvItem item = iterator.next();
+                    if (item.getName().equalsIgnoreCase(auctionName)
+                            && item.getRarity().equalsIgnoreCase(auctionRarity)) {
+                        double itemPrice = auctionPrice
+                                + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ")
+                                        : 0);
+                        storageItems.add(item.getName() + "@split@" + itemPrice);
+                        storageTotal += itemPrice;
+                        iterator.remove();
+                    }
+                }
             }
         }
 
@@ -404,6 +447,18 @@ public class NetworthExecute {
             }
         }
 
+        for (InvItem item : storagePets) {
+            try {
+                double itemPrice = higherDepth(lowestBinJson,
+                        item.getName().split("] ")[1].toLowerCase().trim() + rarityMap.get(item.getRarity()))
+                                .getAsDouble()
+                        + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ") : 0);
+                storageItems.add(item.getName() + "@split@" + itemPrice);
+                storageTotal += itemPrice;
+            } catch (Exception ignored) {
+            }
+        }
+
     }
 
     private double calculateItemPrice(InvItem item) {
@@ -436,6 +491,9 @@ public class NetworthExecute {
                         break;
                     case "enderchest":
                         enderChestPets.add(item);
+                        break;
+                    case "storage":
+                        storagePets.add(item);
                         break;
                 }
                 return 0;
