@@ -495,7 +495,7 @@ public class NetworthExecute {
             for (String extraItem : extraStats) {
                 double miscPrice = getLowestPrice(extraItem, " ");
                 miscExtras += miscPrice;
-                enchStr += "{\"name\":\"" + extraItem +"\",\"price\":\""+ simplifyNumber(miscPrice) + "\"},";
+                miscStr += "{\"name\":\"" + extraItem +"\",\"price\":\""+ simplifyNumber(miscPrice) + "\"},";
             }
         } catch (Exception ignored) {
         }
