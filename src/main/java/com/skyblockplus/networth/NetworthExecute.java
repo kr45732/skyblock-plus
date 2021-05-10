@@ -76,7 +76,6 @@ public class NetworthExecute {
                             calcItemsJsonStr = calcItemsJsonStr.substring(0, calcItemsJsonStr.length() -1);
                         }
                         calcItemsJsonStr += "]";
-                        System.out.println(calcItemsJsonStr);
                         String pathName = "src/main/java/com/skyblockplus/json/" + args[1].toLowerCase() + "_networth.json";
                         File file = new File(pathName);
                         if (!file.createNewFile()) {
