@@ -1,12 +1,12 @@
 package com.skyblockplus.utils.structs;
 
-import lombok.Data;
+import static com.skyblockplus.utils.Utils.parseMcCodes;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static com.skyblockplus.utils.Utils.parseMcCodes;
+import lombok.Data;
 
 @Data
 public class InvItem {
@@ -24,6 +24,7 @@ public class InvItem {
     private List<String> extraStats = new ArrayList<>();
     private List<InvItem> backpackItems = new ArrayList<>();
     private String rarity;
+    private int dungeonFloor = 0;
 
     public void setHbpCount(int hbpCount) {
         if (hbpCount > 10) {

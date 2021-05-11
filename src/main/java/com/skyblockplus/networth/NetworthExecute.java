@@ -514,7 +514,7 @@ public class NetworthExecute {
         }
 
         try {
-            if (item.isRecombobulated()) {
+            if (item.isRecombobulated() && item.getDungeonFloor() == 0) {
                 recombobulatedExtra = higherDepth(
                         higherDepth(bazaarJson, "RECOMBOBULATOR_3000.sell_summary").getAsJsonArray().get(0),
                         "pricePerUnit").getAsDouble();
@@ -539,13 +539,15 @@ public class NetworthExecute {
 
         String enchStr = "[";
         try {
-            List<String> enchants = item.getEnchantsFormatted();
-            for (String enchant : enchants) {
-                try {
-                    double enchantPrice = getLowestPriceEnchant(enchant.toUpperCase());
-                    enchantsExtras += enchantPrice;
-                    enchStr += "{\"type\":\"" + enchant + "\",\"price\":\"" + simplifyNumber(enchantPrice) + "\"},";
-                } catch (Exception ignored) {
+            if (item.getDungeonFloor() == 0) {
+                List<String> enchants = item.getEnchantsFormatted();
+                for (String enchant : enchants) {
+                    try {
+                        double enchantPrice = getLowestPriceEnchant(enchant.toUpperCase());
+                        enchantsExtras += enchantPrice;
+                        enchStr += "{\"type\":\"" + enchant + "\",\"price\":\"" + simplifyNumber(enchantPrice) + "\"},";
+                    } catch (Exception ignored) {
+                    }
                 }
             }
         } catch (Exception ignored) {
