@@ -150,7 +150,7 @@ public class NetworthExecute {
                 double itemPrice = calculateItemPrice(item, "inventory");
                 invTotal += itemPrice;
                 if (item != null) {
-                    invItems.add(item.getName() + "@split@" + itemPrice);
+                    invItems.add(addItemStr(item, itemPrice));
                 }
 
             }
@@ -160,7 +160,7 @@ public class NetworthExecute {
                 double itemPrice = calculateItemPrice(item);
                 talismanTotal += itemPrice;
                 if (item != null) {
-                    talismanItems.add(item.getName() + "@split@" + itemPrice);
+                    talismanItems.add(addItemStr(item, itemPrice));
                 }
             }
 
@@ -169,7 +169,7 @@ public class NetworthExecute {
                 double itemPrice = calculateItemPrice(item);
                 invArmor += itemPrice;
                 if (item != null) {
-                    armorItems.add(item.getName() + "@split@" + itemPrice);
+                    armorItems.add(addItemStr(item, itemPrice));
                 }
             }
 
@@ -178,7 +178,7 @@ public class NetworthExecute {
                 double itemPrice = calculateItemPrice(item);
                 wardrobeTotal += itemPrice;
                 if (item != null) {
-                    wardrobeItems.add(item.getName() + "@split@" + itemPrice);
+                    wardrobeItems.add(addItemStr(item, itemPrice));
                 }
             }
 
@@ -192,7 +192,7 @@ public class NetworthExecute {
                 double itemPrice = calculateItemPrice(item, "enderchest");
                 enderChestTotal += itemPrice;
                 if (item != null) {
-                    enderChestItems.add(item.getName() + "@split@" + itemPrice);
+                    enderChestItems.add(addItemStr(item, itemPrice));
                 }
             }
 
@@ -201,7 +201,7 @@ public class NetworthExecute {
                 double itemPrice = calculateItemPrice(item, "storage");
                 storageTotal += itemPrice;
                 if (item != null) {
-                    storageItems.add(item.getName() + "@split@" + itemPrice);
+                    storageItems.add(addItemStr(item, itemPrice));
                 }
             }
 
@@ -357,7 +357,7 @@ public class NetworthExecute {
                         double itemPrice = auctionPrice
                                 + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ")
                                         : 0);
-                        invItems.add(item.getName() + "@split@" + itemPrice);
+                        invItems.add(addItemStr(item, itemPrice));
                         invTotal += itemPrice;
                         iterator.remove();
                     }
@@ -370,7 +370,7 @@ public class NetworthExecute {
                         double itemPrice = auctionPrice
                                 + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ")
                                         : 0);
-                        petsItems.add(item.getName() + "@split@" + itemPrice);
+                        petsItems.add(addItemStr(item, itemPrice));
                         petsTotal += itemPrice;
                         iterator.remove();
                     }
@@ -383,7 +383,7 @@ public class NetworthExecute {
                         double itemPrice = auctionPrice
                                 + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ")
                                         : 0);
-                        enderChestItems.add(item.getName() + "@split@" + itemPrice);
+                        enderChestItems.add(addItemStr(item, itemPrice));
                         enderChestTotal += itemPrice;
                         iterator.remove();
                     }
@@ -396,7 +396,7 @@ public class NetworthExecute {
                         double itemPrice = auctionPrice
                                 + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ")
                                         : 0);
-                        storageItems.add(item.getName() + "@split@" + itemPrice);
+                        storageItems.add(addItemStr(item, itemPrice));
                         storageTotal += itemPrice;
                         iterator.remove();
                     }
@@ -417,7 +417,7 @@ public class NetworthExecute {
                         item.getName().split("] ")[1].toLowerCase().trim() + rarityMap.get(item.getRarity()))
                                 .getAsDouble()
                         + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ") : 0);
-                invItems.add(item.getName() + "@split@" + itemPrice);
+                invItems.add(addItemStr(item, itemPrice));
                 invTotal += itemPrice;
             } catch (Exception ignored) {
             }
@@ -429,7 +429,7 @@ public class NetworthExecute {
                         item.getName().split("] ")[1].toLowerCase().trim() + rarityMap.get(item.getRarity()))
                                 .getAsDouble()
                         + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ") : 0);
-                petsItems.add(item.getName() + "@split@" + itemPrice);
+                petsItems.add(addItemStr(item, itemPrice));
                 petsTotal += itemPrice;
             } catch (Exception ignored) {
             }
@@ -441,7 +441,7 @@ public class NetworthExecute {
                         item.getName().split("] ")[1].toLowerCase().trim() + rarityMap.get(item.getRarity()))
                                 .getAsDouble()
                         + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ") : 0);
-                enderChestItems.add(item.getName() + "@split@" + itemPrice);
+                enderChestItems.add(addItemStr(item, itemPrice));
                 enderChestTotal += itemPrice;
             } catch (Exception ignored) {
             }
@@ -453,12 +453,17 @@ public class NetworthExecute {
                         item.getName().split("] ")[1].toLowerCase().trim() + rarityMap.get(item.getRarity()))
                                 .getAsDouble()
                         + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ") : 0);
-                storageItems.add(item.getName() + "@split@" + itemPrice);
+                storageItems.add(addItemStr(item, itemPrice));
                 storageTotal += itemPrice;
             } catch (Exception ignored) {
             }
         }
 
+    }
+
+    private String addItemStr(InvItem item, double itemPrice) {
+        return (item.getCount() != 1 ? "1x " + item.getCount() + " " : "") + item.getName()
+                + (item.isRecombobulated() ? " <:recombobulator_3000:841689479621378139>" : "") + "@split@" + itemPrice;
     }
 
     private double calculateItemPrice(InvItem item) {

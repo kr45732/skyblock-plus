@@ -1,27 +1,33 @@
 package com.skyblockplus.inventory;
 
+import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.defaultPaginator;
+import static com.skyblockplus.utils.Utils.errorMessage;
+import static com.skyblockplus.utils.Utils.globalCooldown;
+import static com.skyblockplus.utils.Utils.loadingEmbed;
+import static com.skyblockplus.utils.Utils.logCommand;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.InvItem;
 import com.skyblockplus.utils.structs.PaginatorExtras;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.Utils.*;
 
 public class InventoryCommand extends Command {
 
     public InventoryCommand() {
         this.name = "inventory";
         this.cooldown = globalCooldown;
-        this.aliases = new String[]{"inv"};
+        this.aliases = new String[] { "inv" };
     }
 
     @Override
@@ -92,7 +98,7 @@ public class InventoryCommand extends Command {
     }
 
     private EmbedBuilder getPlayerInventoryList(String username, String profileName, String slotNum,
-                                                CommandEvent event) {
+            CommandEvent event) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
             Map<Integer, InvItem> inventoryMap = player.getInventoryMap();
@@ -129,7 +135,7 @@ public class InventoryCommand extends Command {
 
                 int slotNumber = 1;
                 try {
-                    slotNumber = Integer.parseInt(slotNum.replace("slot-", ""));
+                    slotNumber = Integer.parseInt(slotNum.replace("slot:", ""));
                 } catch (Exception ignored) {
                 }
                 paginateBuilder.build().paginate(event.getChannel(), slotNumber);
@@ -220,7 +226,7 @@ public class InventoryCommand extends Command {
         if (player.isValid()) {
             String[] temp = player.getInventory();
             if (temp != null) {
-                return new String[]{temp[0], temp[1], player.invMissing};
+                return new String[] { temp[0], temp[1], player.invMissing };
             }
         }
         return null;
