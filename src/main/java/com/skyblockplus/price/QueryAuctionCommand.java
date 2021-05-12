@@ -34,7 +34,7 @@ public class QueryAuctionCommand extends Command {
     private static JsonArray queryAhApi(String query) {
         CloseableHttpClient httpclient = HttpClientBuilder.create().build();
         try {
-            HttpGet httpget = new HttpGet("https://api.eastarctica.tk/auctions/");
+            HttpGet httpget = new HttpGet("https://api.eastarcti.ca/auctions/");
             httpget.addHeader("content-type", "application/json; charset=UTF-8");
 
             query = query.replace("[", "\\\\[");

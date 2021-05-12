@@ -354,11 +354,29 @@ public class NetworthExecute {
                     InvItem item = iterator.next();
                     if (item.getName().equalsIgnoreCase(auctionName)
                             && item.getRarity().equalsIgnoreCase(auctionRarity)) {
-                        double itemPrice = auctionPrice
-                                + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ")
-                                        : 0);
-                        invItems.add(addItemStr(item, itemPrice));
-                        invTotal += itemPrice;
+                        String miscStr = "[";
+                        double miscExtras = 0;
+                        try {
+                            List<String> extraStats = item.getExtraStats();
+                            for (String extraItem : extraStats) {
+                                double miscPrice = getLowestPrice(extraItem, " ");
+                                miscExtras += miscPrice;
+                                miscStr += "{\"name\":\"" + extraItem + "\",\"price\":\"" + simplifyNumber(miscPrice) + "\"},";
+                            }
+                        } catch (Exception ignored) {
+                        }
+                        if (miscStr.endsWith(",")) {
+                            miscStr = miscStr.substring(0, miscStr.length() - 1);
+                        }
+                        miscStr += "]";
+
+                        invItems.add(addItemStr(item, auctionPrice + miscExtras));
+                        invTotal += auctionPrice + miscExtras;
+                        if (verbose) {
+                            calcItemsJsonStr += "{\"total\":\"" + simplifyNumber(auctionPrice + miscExtras) + "\",\"name\":\""
+                                    + item.getName() + "\",\"base_cost\":\"" + simplifyNumber(auctionPrice) + "\",\"misc\":{\"total\":\""
+                                    + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}},";
+                        }
                         iterator.remove();
                     }
                 }
@@ -367,11 +385,29 @@ public class NetworthExecute {
                     InvItem item = iterator.next();
                     if (item.getName().equalsIgnoreCase(auctionName)
                             && item.getRarity().equalsIgnoreCase(auctionRarity)) {
-                        double itemPrice = auctionPrice
-                                + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ")
-                                        : 0);
-                        petsItems.add(addItemStr(item, itemPrice));
-                        petsTotal += itemPrice;
+                        String miscStr = "[";
+                        double miscExtras = 0;
+                        try {
+                            List<String> extraStats = item.getExtraStats();
+                            for (String extraItem : extraStats) {
+                                double miscPrice = getLowestPrice(extraItem, " ");
+                                miscExtras += miscPrice;
+                                miscStr += "{\"name\":\"" + extraItem + "\",\"price\":\"" + simplifyNumber(miscPrice) + "\"},";
+                            }
+                        } catch (Exception ignored) {
+                        }
+                        if (miscStr.endsWith(",")) {
+                            miscStr = miscStr.substring(0, miscStr.length() - 1);
+                        }
+                        miscStr += "]";
+
+                        petsItems.add(addItemStr(item, auctionPrice + miscExtras));
+                        petsTotal += auctionPrice + miscExtras;
+                        if (verbose) {
+                            calcItemsJsonStr += "{\"total\":\"" + simplifyNumber(auctionPrice + miscExtras) + "\",\"name\":\""
+                                    + item.getName() + "\",\"base_cost\":\"" + simplifyNumber(auctionPrice) + "\",\"misc\":{\"total\":\""
+                                    + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}},";
+                        }
                         iterator.remove();
                     }
                 }
@@ -380,11 +416,29 @@ public class NetworthExecute {
                     InvItem item = iterator.next();
                     if (item.getName().equalsIgnoreCase(auctionName)
                             && item.getRarity().equalsIgnoreCase(auctionRarity)) {
-                        double itemPrice = auctionPrice
-                                + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ")
-                                        : 0);
-                        enderChestItems.add(addItemStr(item, itemPrice));
-                        enderChestTotal += itemPrice;
+                        String miscStr = "[";
+                        double miscExtras = 0;
+                        try {
+                            List<String> extraStats = item.getExtraStats();
+                            for (String extraItem : extraStats) {
+                                double miscPrice = getLowestPrice(extraItem, " ");
+                                miscExtras += miscPrice;
+                                miscStr += "{\"name\":\"" + extraItem + "\",\"price\":\"" + simplifyNumber(miscPrice) + "\"},";
+                            }
+                        } catch (Exception ignored) {
+                        }
+                        if (miscStr.endsWith(",")) {
+                            miscStr = miscStr.substring(0, miscStr.length() - 1);
+                        }
+                        miscStr += "]";
+
+                        enderChestItems.add(addItemStr(item, auctionPrice + miscExtras));
+                        enderChestTotal += auctionPrice + miscExtras;
+                        if (verbose) {
+                            calcItemsJsonStr += "{\"total\":\"" + simplifyNumber(auctionPrice + miscExtras) + "\",\"name\":\""
+                                    + item.getName() + "\",\"base_cost\":\"" + simplifyNumber(auctionPrice) + "\",\"misc\":{\"total\":\""
+                                    + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}},";
+                        }
                         iterator.remove();
                     }
                 }
@@ -393,11 +447,29 @@ public class NetworthExecute {
                     InvItem item = iterator.next();
                     if (item.getName().equalsIgnoreCase(auctionName)
                             && item.getRarity().equalsIgnoreCase(auctionRarity)) {
-                        double itemPrice = auctionPrice
-                                + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ")
-                                        : 0);
-                        storageItems.add(addItemStr(item, itemPrice));
-                        storageTotal += itemPrice;
+                        String miscStr = "[";
+                        double miscExtras = 0;
+                        try {
+                            List<String> extraStats = item.getExtraStats();
+                            for (String extraItem : extraStats) {
+                                double miscPrice = getLowestPrice(extraItem, " ");
+                                miscExtras += miscPrice;
+                                miscStr += "{\"name\":\"" + extraItem + "\",\"price\":\"" + simplifyNumber(miscPrice) + "\"},";
+                            }
+                        } catch (Exception ignored) {
+                        }
+                        if (miscStr.endsWith(",")) {
+                            miscStr = miscStr.substring(0, miscStr.length() - 1);
+                        }
+                        miscStr += "]";
+
+                        storageItems.add(addItemStr(item, auctionPrice + miscExtras));
+                        storageTotal += auctionPrice + miscExtras;
+                        if (verbose) {
+                            calcItemsJsonStr += "{\"total\":\"" + simplifyNumber(auctionPrice + miscExtras) + "\",\"name\":\""
+                                    + item.getName() + "\",\"base_cost\":\"" + simplifyNumber(auctionPrice) + "\",\"misc\":{\"total\":\""
+                                    + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}},";
+                        }
                         iterator.remove();
                     }
                 }
@@ -413,48 +485,129 @@ public class NetworthExecute {
 
         for (InvItem item : invPets) {
             try {
-                double itemPrice = higherDepth(lowestBinJson,
+                double auctionPrice = higherDepth(lowestBinJson,
                         item.getName().split("] ")[1].toLowerCase().trim() + rarityMap.get(item.getRarity()))
-                                .getAsDouble()
-                        + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ") : 0);
-                invItems.add(addItemStr(item, itemPrice));
-                invTotal += itemPrice;
+                                .getAsDouble();
+
+                String miscStr = "[";
+                double miscExtras = 0;
+                try {
+                    List<String> extraStats = item.getExtraStats();
+                    for (String extraItem : extraStats) {
+                        double miscPrice = getLowestPrice(extraItem, " ");
+                        miscExtras += miscPrice;
+                        miscStr += "{\"name\":\"" + extraItem + "\",\"price\":\"" + simplifyNumber(miscPrice) + "\"},";
+                    }
+                } catch (Exception ignored) {
+                }
+                if (miscStr.endsWith(",")) {
+                    miscStr = miscStr.substring(0, miscStr.length() - 1);
+                }
+                miscStr += "]";
+
+                storageItems.add(addItemStr(item, auctionPrice + miscExtras));
+                storageTotal += auctionPrice + miscExtras;
+                if (verbose) {
+                    calcItemsJsonStr += "{\"total\":\"" + simplifyNumber(auctionPrice + miscExtras) + "\",\"name\":\""
+                            + item.getName() + "\",\"base_cost\":\"" + simplifyNumber(auctionPrice) + "\",\"misc\":{\"total\":\""
+                            + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "},\"fail_calc_lvl_cost\":true},";
+                }
             } catch (Exception ignored) {
             }
         }
 
         for (InvItem item : petsPets) {
             try {
-                double itemPrice = higherDepth(lowestBinJson,
+                double auctionPrice = higherDepth(lowestBinJson,
                         item.getName().split("] ")[1].toLowerCase().trim() + rarityMap.get(item.getRarity()))
-                                .getAsDouble()
-                        + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ") : 0);
-                petsItems.add(addItemStr(item, itemPrice));
-                petsTotal += itemPrice;
+                                .getAsDouble();
+                String miscStr = "[";
+                double miscExtras = 0;
+                try {
+                    List<String> extraStats = item.getExtraStats();
+                    for (String extraItem : extraStats) {
+                        double miscPrice = getLowestPrice(extraItem, " ");
+                        miscExtras += miscPrice;
+                        miscStr += "{\"name\":\"" + extraItem + "\",\"price\":\"" + simplifyNumber(miscPrice) + "\"},";
+                    }
+                } catch (Exception ignored) {
+                }
+                if (miscStr.endsWith(",")) {
+                    miscStr = miscStr.substring(0, miscStr.length() - 1);
+                }
+                miscStr += "]";
+
+                storageItems.add(addItemStr(item, auctionPrice + miscExtras));
+                storageTotal += auctionPrice + miscExtras;
+                if (verbose) {
+                    calcItemsJsonStr += "{\"total\":\"" + simplifyNumber(auctionPrice + miscExtras) + "\",\"name\":\""
+                            + item.getName() + "\",\"base_cost\":\"" + simplifyNumber(auctionPrice) + "\",\"misc\":{\"total\":\""
+                            + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "},\"fail_calc_lvl_cost\":true},";
+                }
             } catch (Exception ignored) {
             }
         }
 
         for (InvItem item : enderChestPets) {
             try {
-                double itemPrice = higherDepth(lowestBinJson,
+                double auctionPrice = higherDepth(lowestBinJson,
                         item.getName().split("] ")[1].toLowerCase().trim() + rarityMap.get(item.getRarity()))
-                                .getAsDouble()
-                        + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ") : 0);
-                enderChestItems.add(addItemStr(item, itemPrice));
-                enderChestTotal += itemPrice;
+                                .getAsDouble();
+                String miscStr = "[";
+                double miscExtras = 0;
+                try {
+                    List<String> extraStats = item.getExtraStats();
+                    for (String extraItem : extraStats) {
+                        double miscPrice = getLowestPrice(extraItem, " ");
+                        miscExtras += miscPrice;
+                        miscStr += "{\"name\":\"" + extraItem + "\",\"price\":\"" + simplifyNumber(miscPrice) + "\"},";
+                    }
+                } catch (Exception ignored) {
+                }
+                if (miscStr.endsWith(",")) {
+                    miscStr = miscStr.substring(0, miscStr.length() - 1);
+                }
+                miscStr += "]";
+
+                storageItems.add(addItemStr(item, auctionPrice + miscExtras));
+                storageTotal += auctionPrice + miscExtras;
+                if (verbose) {
+                    calcItemsJsonStr += "{\"total\":\"" + simplifyNumber(auctionPrice + miscExtras) + "\",\"name\":\""
+                            + item.getName() + "\",\"base_cost\":\"" + simplifyNumber(auctionPrice) + "\",\"misc\":{\"total\":\""
+                            + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "},\"fail_calc_lvl_cost\":true},";
+                }
             } catch (Exception ignored) {
             }
         }
 
         for (InvItem item : storagePets) {
             try {
-                double itemPrice = higherDepth(lowestBinJson,
+                double auctionPrice = higherDepth(lowestBinJson,
                         item.getName().split("] ")[1].toLowerCase().trim() + rarityMap.get(item.getRarity()))
-                                .getAsDouble()
-                        + (item.getExtraStats().size() == 1 ? getLowestPrice(item.getExtraStats().get(0), " ") : 0);
-                storageItems.add(addItemStr(item, itemPrice));
-                storageTotal += itemPrice;
+                                .getAsDouble();
+                String miscStr = "[";
+                double miscExtras = 0;
+                try {
+                    List<String> extraStats = item.getExtraStats();
+                    for (String extraItem : extraStats) {
+                        double miscPrice = getLowestPrice(extraItem, " ");
+                        miscExtras += miscPrice;
+                        miscStr += "{\"name\":\"" + extraItem + "\",\"price\":\"" + simplifyNumber(miscPrice) + "\"},";
+                    }
+                } catch (Exception ignored) {
+                }
+                if (miscStr.endsWith(",")) {
+                    miscStr = miscStr.substring(0, miscStr.length() - 1);
+                }
+                miscStr += "]";
+
+                storageItems.add(addItemStr(item, auctionPrice + miscExtras));
+                storageTotal += auctionPrice + miscExtras;
+                if (verbose) {
+                    calcItemsJsonStr += "{\"total\":\"" + simplifyNumber(auctionPrice + miscExtras) + "\",\"name\":\""
+                            + item.getName() + "\",\"base_cost\":\"" + simplifyNumber(auctionPrice) + "\",\"misc\":{\"total\":\""
+                            + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "},\"fail_calc_lvl_cost\":true},";
+                }
             } catch (Exception ignored) {
             }
         }
@@ -462,7 +615,7 @@ public class NetworthExecute {
     }
 
     private String addItemStr(InvItem item, double itemPrice) {
-        return (item.getCount() != 1 ? "1x " + item.getCount() + " " : "") + item.getName()
+        return (item.getCount() != 1 ? item.getCount() + "x " : "") + item.getName()
                 + (item.isRecombobulated() ? " <:recombobulator_3000:841689479621378139>" : "") + "@split@" + itemPrice;
     }
 
@@ -766,7 +919,7 @@ public class NetworthExecute {
     private JsonArray queryAhApi(String query) {
         CloseableHttpClient httpclient = HttpClientBuilder.create().build();
         try {
-            HttpGet httpget = new HttpGet("https://api.eastarctica.tk/auctions/");
+            HttpGet httpget = new HttpGet("https://api.eastarcti.ca/auctions/");
             httpget.addHeader("content-type", "application/json; charset=UTF-8");
 
             URI uri = new URIBuilder(httpget.getURI())

@@ -114,7 +114,7 @@ public class BidsCommand extends Command {
     private JsonArray queryAhApi(String uuid) {
         CloseableHttpClient httpclient = HttpClientBuilder.create().build();
         try {
-            HttpGet httpget = new HttpGet("https://api.eastarctica.tk/auctions/");
+            HttpGet httpget = new HttpGet("https://api.eastarcti.ca/auctions/");
             httpget.addHeader("content-type", "application/json; charset=UTF-8");
 
             URI uri = new URIBuilder(httpget.getURI()).addParameter("query", "{\"bids.bidder\":\"" + uuid + "\"}")

@@ -79,8 +79,10 @@ public class BazaarCommand extends Command {
                                 .getAsDouble()),
                         true);
                 eb.addBlankField(true);
-                eb.addField("Buy Volume", simplifyNumber(higherDepth(itemInfo, "buyVolume").getAsDouble()), true);
-                eb.addField("Sell Volume", simplifyNumber(higherDepth(itemInfo, "sellVolume").getAsDouble()), true);
+                eb.addField("Buy Volume", simplifyNumber(higherDepth(itemInfo, "quick_status.buyVolume").getAsDouble()),
+                        true);
+                eb.addField("Sell Volume",
+                        simplifyNumber(higherDepth(itemInfo, "quick_status.sellVolume").getAsDouble()), true);
                 eb.addBlankField(true);
                 eb.setThumbnail("https://sky.lea.moe/item.gif/" + item);
                 return eb;
@@ -116,8 +118,10 @@ public class BazaarCommand extends Command {
                                     .getAsDouble()),
                     true);
             eb.addBlankField(true);
-            eb.addField("Buy Volume", simplifyNumber(higherDepth(itemInfo, "buyVolume").getAsDouble()), true);
-            eb.addField("Sell Volume", simplifyNumber(higherDepth(itemInfo, "sellVolume").getAsDouble()), true);
+            eb.addField("Buy Volume", simplifyNumber(higherDepth(itemInfo, "quick_status.buyVolume").getAsDouble()),
+                    true);
+            eb.addField("Sell Volume", simplifyNumber(higherDepth(itemInfo, "quick_status.sellVolume").getAsDouble()),
+                    true);
             eb.addBlankField(true);
             eb.setThumbnail("https://sky.lea.moe/item.gif/" + closestMatch);
             return eb;

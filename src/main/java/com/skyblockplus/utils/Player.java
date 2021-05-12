@@ -11,6 +11,7 @@ import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
 import me.nullicorn.nedit.type.NBTList;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Invite;
 
 import java.io.ByteArrayInputStream;
 import java.time.Instant;
@@ -135,6 +136,11 @@ public class Player {
                             }
                             itemInfo.setEnchantsFormatted(enchantsList);
                         } catch (Exception ignored) {
+                        }
+
+                        String itemSkinStr =  item.getString("tag.ExtraAttributes.skin", "None");
+                        if(!itemSkinStr.equals("None")) {
+                            itemInfo.addExtraValue("PET_SKIN_"+itemSkinStr);
                         }
 
                         try {
@@ -1568,8 +1574,11 @@ public class Player {
                         + "] "
                         + capitalizeString(higherDepth(pet, "type").getAsString().toUpperCase().replace("_", " ")));
                 invItemStruct.setId("PET");
+                if (higherDepth(pet, "skin") != null && !higherDepth(pet, "skin").isJsonNull()) {
+                    invItemStruct.addExtraValue("PET_SKIN_" + higherDepth(pet, "skin").getAsString());
+                }
                 invItemStruct.setRarity(higherDepth(pet, "tier").getAsString());
-                if (higherDepth(pet, "heldItem") != null) {
+                if (higherDepth(pet, "heldItem") != null && !higherDepth(pet, "heldItem").isJsonNull()) {
                     invItemStruct.addExtraValue(higherDepth(pet, "heldItem").getAsString());
                 }
                 petsNameFormatted.add(invItemStruct);
