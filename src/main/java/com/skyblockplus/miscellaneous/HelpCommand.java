@@ -1,25 +1,21 @@
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.Utils.BOT_PREFIX;
-import static com.skyblockplus.utils.Utils.defaultPaginator;
-import static com.skyblockplus.utils.Utils.globalCooldown;
-import static com.skyblockplus.utils.Utils.logCommand;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.structs.PaginatorExtras;
-
 import net.dv8tion.jda.api.Permission;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.utils.Utils.*;
 
 public class HelpCommand extends Command {
     public HelpCommand() {
         this.name = "help";
-        this.aliases = new String[] { "commands" };
+        this.aliases = new String[]{"commands"};
         this.cooldown = globalCooldown;
     }
 
@@ -28,9 +24,9 @@ public class HelpCommand extends Command {
         new Thread(() -> {
             logCommand(event.getGuild(), event.getAuthor(), event.getMessage().getContentRaw());
 
-            String[] pageTitles = new String[] { "Navigation", "General", "Slayer", "Skills", "Dungeons", "Guild",
+            String[] pageTitles = new String[]{"Navigation", "General", "Slayer", "Skills", "Dungeons", "Guild",
                     "Price Commands", "Inventory", "Miscellaneous Commands", "Skyblock Event", "Settings",
-                    "Verify Settings", "Apply Settings", "Roles Settings", "Guild Role Settings" };
+                    "Verify Settings", "Apply Settings", "Roles Settings", "Guild Role Settings"};
 
             CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1)
                     .setItemsPerPage(1).setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles));
@@ -75,12 +71,12 @@ public class HelpCommand extends Command {
             if (isAdmin) {
                 paginateBuilder.addItems("Use the arrow emojis to navigate through the pages"
                         + generatePageMap("General", "Slayer", "Skills", "Dungeons", "Guild", "Price Commands",
-                                "Inventory", "Miscellaneous Commands", "Skyblock Event", "Settings", "Verify Settings",
-                                "Apply Settings", "Roles Settings", "Guild Roles Settings"));
+                        "Inventory", "Miscellaneous Commands", "Skyblock Event", "Settings", "Verify Settings",
+                        "Apply Settings", "Roles Settings", "Guild Roles Settings"));
             } else {
                 paginateBuilder.addItems("Use the arrow emojis to navigate through the pages"
                         + generatePageMap("General", "Slayer", "Skills", "Dungeons", "Guild", "Price Commands",
-                                "Inventory", "Miscellaneous Commands", "Skyblock Event"));
+                        "Inventory", "Miscellaneous Commands", "Skyblock Event"));
             }
 
             paginateBuilder.addItems(generateHelp("Show this help page", "help", "commands")
@@ -99,20 +95,20 @@ public class HelpCommand extends Command {
             paginateBuilder.addItems(generateHelp("Get the dungeons data of a player", "catacombs [player] <profile>",
                     "cata [player] " + "<profile>")
                     + generateHelp("Interactive message to find the essence amount to upgrade an item",
-                            "essence upgrade [item]")
+                    "essence upgrade [item]")
                     + generateHelp("Get the amount of essence to upgrade an item for each level",
-                            "essence information [item]", "essence info [item]")
+                    "essence information [item]", "essence info [item]")
                     + generateHelp("A party finder helper that shows a player's dungeon stats",
-                            "partyfinder [player] <profile>", "pf [player] <profile>"));
+                    "partyfinder [player] <profile>", "pf [player] <profile>"));
 
             paginateBuilder.addItems(generateHelp("Find what guild a player is in", "guild [player]")
                     + generateHelp("Get information and statistics about a player's guild", "guild info [u:player]")
                     + generateHelp("Get information and statistics about a guild", "guild info [g:player]")
                     + generateHelp("Get a list of all members in a player's guild", "guild members [u:player]")
                     + generateHelp("Get the experience leaderboard for a player's guild", "guild experience [u:player]",
-                            "guild exp [u:player]")
+                    "guild exp [u:player]")
                     + generateHelp("Get the application requirements set for this server", "guild-requirements",
-                            "g-reqs"));
+                    "g-reqs"));
 
             paginateBuilder.addItems(generateHelp("Get player's active (not claimed) auctions on all profiles",
                     "auction [player]", "ah [player]") + generateHelp("Get the lowest bin of an item", "bin [item]")
@@ -125,29 +121,29 @@ public class HelpCommand extends Command {
             paginateBuilder.addItems(generateHelp("Get a player's inventory represented in emojis",
                     "inventory [player] <profile>", "inv [player] <profile>")
                     + generateHelp("Get a player's inventory with lore", "inventory [player] <profile> [slot:number]",
-                            "inv [player] <profile> [slot:number]")
+                    "inv [player] <profile> [slot:number]")
                     + generateHelp("Get a player's equipped armor with lore", "inventory armor [player] <profile>",
-                            "inv armor [player] <profile>")
+                    "inv armor [player] <profile>")
                     + generateHelp("Get a player's ender chest represented in emojis", "enderchest [player] <profile>",
-                            "echest [player] <profile>")
+                    "echest [player] <profile>")
                     + generateHelp("Get a player's talisman bag represented in emojis", "talisman [player] <profile>")
                     + generateHelp("Get a player's talisman bag with lore", "talisman [player] <profile> [slot:number]")
                     + generateHelp("Get a player's sacks' content bag represented in a list",
-                            "sacks [player] <profile>")
+                    "sacks [player] <profile>")
                     + generateHelp("Get a player's wardrobe armors represented in emojis",
-                            "wardrobe [player] <profile>")
+                    "wardrobe [player] <profile>")
                     + generateHelp("Get a player's wardrobe armors represented in a list",
-                            "wardrobe list [player] <profile>"));
+                    "wardrobe list [player] <profile>"));
 
             paginateBuilder.addItems(
                     generateHelp("Claim automatic Skyblock roles. The player must be linked", "roles claim <profile>")
                             + generateHelp("Get a player's bank and purse coins", "bank [player] <profile>")
                             + generateHelp("Get a player's bank transaction history", "bank history [player] <profile>")
                             + generateHelp("Get a player's networth (in development)", "networth [player] <profile>",
-                                    "nw [player] <profile>")
+                            "nw [player] <profile>")
                             + generateHelp("Get a player's weight", "weight [player] <profile>")
                             + generateHelp("Calculate predicted weight using given stats (not 100% accurate)",
-                                    "weight calculate [skill avg] [slayer] [cata level] [avg dungeon class level]")
+                            "weight calculate [skill avg] [slayer] [cata level] [avg dungeon class level]")
                             + generateHelp("Get Hypixel information about a player", "hypixel [player]")
                             + generateHelp("Get fastest Hypixel lobby parkour for a player", "hypixel parkour [player]")
                             + generateHelp("Get a information about all of a player's profiles", "profiles [player]"));
@@ -168,53 +164,53 @@ public class HelpCommand extends Command {
                 paginateBuilder.addItems(generateHelp("Get the current verify settings for the bot", "settings verify")
                         + generateHelp("Enable or disable automatic verify", "settings verify [enable|disable]")
                         + generateHelp("Message that users will see and react to in order to verify",
-                                "settings" + " verify message [message]")
+                        "settings" + " verify message [message]")
                         + generateHelp(
-                                "Role that user will receive "
-                                        + "upon being verified. Cannot be @everyone or a managed role",
-                                "settings verify role " + "[@role]")
+                        "Role that user will receive "
+                                + "upon being verified. Cannot be @everyone or a managed role",
+                        "settings verify role " + "[@role]")
                         + generateHelp("Channel where the message to react for verifying will sent",
-                                "settings verify " + "channel [#channel]")
+                        "settings verify " + "channel [#channel]")
                         + generateHelp("The nickname template on verifying. Can be set to none",
-                                "settings verify nickname <prefix> [IGN] <postfix>"));
+                        "settings verify nickname <prefix> [IGN] <postfix>"));
 
                 paginateBuilder.addItems(generateHelp("Get the current apply settings for the bot", "settings apply")
                         + generateHelp("Enable or disable automatic apply", "settings apply [enable|disable]")
                         + generateHelp("Message that users will see and react to in order to apply",
-                                "settings" + " apply message [message]")
+                        "settings" + " apply message [message]")
                         + generateHelp("Role that will be pinged when a new application is submitted",
-                                "settings apply staff_role [@role]")
+                        "settings apply staff_role [@role]")
                         + generateHelp("Channel where the message to react for applying will sent",
-                                "settings apply " + "channel [#channel]")
+                        "settings apply " + "channel [#channel]")
                         + generateHelp("Prefix that all new apply channels should start with (prefix-discordName)",
-                                "settings apply prefix [prefix]")
+                        "settings apply prefix [prefix]")
                         + generateHelp("Category where new apply channels will be made",
-                                "settings apply category " + "[category id]")
+                        "settings apply category " + "[category id]")
                         + generateHelp("Channel where new applications will be sent to be reviewed by staff",
-                                "settings apply staff_channel " + "[#channel]")
+                        "settings apply staff_channel " + "[#channel]")
                         + generateHelp("Message that will be sent if applicant is accepted",
-                                "settings apply accept_message [message]")
+                        "settings apply accept_message [message]")
                         + generateHelp("Message that will be sent if applicant is waitlisted. Can be set to none",
-                                "settings apply waitlist_message [message]")
+                        "settings apply waitlist_message [message]")
                         + generateHelp("Message that will be sent if applicant is denied",
-                                "settings apply deny_message [message]")
+                        "settings apply deny_message [message]")
                         + generateHelp(
-                                "Add a requirement that applicant must meet. At least one of the requirement types must be set",
-                                "settings apply reqs add <slayer:amount> <skills:amount> <catacombs:amount> <weight:amount>")
+                        "Add a requirement that applicant must meet. At least one of the requirement types must be set",
+                        "settings apply reqs add <slayer:amount> <skills:amount> <catacombs:amount> <weight:amount>")
                         + generateHelp(
-                                "Remove a requirement. Run `" + BOT_PREFIX
-                                        + "settings apply` to see the index for all current requirements",
-                                "settings apply reqs remove [number]"));
+                        "Remove a requirement. Run `" + BOT_PREFIX
+                                + "settings apply` to see the index for all current requirements",
+                        "settings apply reqs remove [number]"));
 
                 paginateBuilder.addItems(generateHelp("Get the current roles settings for the bot", "settings roles")
                         + generateHelp("Enable or disable automatic roles", "settings roles [enable|disable]")
                         + generateHelp("Enable a specific automatic role (set to disable by default)",
-                                "settings roles enable [roleName]")
+                        "settings roles enable [roleName]")
                         + generateHelp("Add a new level to a role with its corresponding discord role",
-                                "settings roles add [roleName] [value] [@role]")
+                        "settings roles add [roleName] [value] [@role]")
                         + generateHelp("Remove a role level for a role", "settings roles remove [roleName] [value]")
                         + generateHelp("Make a specific role stackable",
-                                "settings roles stackable [roleName] [true|false]")
+                        "settings roles stackable [roleName] [true|false]")
                         + generateHelp("Set a one level role's role", "settings roles set [roleName] [@role]"));
 
                 paginateBuilder.addItems(generateHelp("Enable or disable automatic guild role assigning",
@@ -222,7 +218,7 @@ public class HelpCommand extends Command {
                         + generateHelp("Set the guild name", "settings guild set [guild_name]")
                         + generateHelp("Set the role to give guild member's", "settings guild role [@role]")
                         + generateHelp("Enable or disable automatic guild rank assigning",
-                                "settings guild [enable|disable] rank")
+                        "settings guild [enable|disable] rank")
                         + generateHelp("Add an automatic guild rank", "settings guild add [rank_name] [@role]")
                         + generateHelp("Remove an automatic guild rank", "settings guild remove [rank_name]"));
             }

@@ -84,7 +84,7 @@ public class ProfilesCommand extends Command {
                                                 JsonParser.parseString(uuidToUsernameResponse.getResponseBody()),
                                                 "username").getAsString();
                                         String lastLogin = dateTimeFormatter.format(Instant.ofEpochMilli(
-                                                higherDepth(profile, "members."+ uuid +".last_save").getAsLong()));
+                                                higherDepth(profile, "members." + uuid + ".last_save").getAsLong()));
 
                                         return "\n• " + playerUsername + " last logged in on " + lastLogin;
                                     }));

@@ -1,25 +1,37 @@
 package com.skyblockplus.price;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import static com.skyblockplus.utils.Utils.capitalizeString;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.errorMessage;
+import static com.skyblockplus.utils.Utils.globalCooldown;
+import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.Utils.loadingEmbed;
+import static com.skyblockplus.utils.Utils.logCommand;
+import static com.skyblockplus.utils.Utils.parseMcCodes;
+import static com.skyblockplus.utils.Utils.simplifyNumber;
+import static com.skyblockplus.utils.Utils.usernameToUuid;
+import static com.skyblockplus.utils.Utils.uuidToUsername;
 
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
 
-import static com.skyblockplus.utils.Utils.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.structs.UsernameUuidStruct;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 
 public class BidsCommand extends Command {
     public BidsCommand() {
@@ -81,7 +93,7 @@ public class BidsCommand extends Command {
                         + higherDepth(bid, "item_name").getAsString();
             }
 
-            int highestBid = higherDepth(bid, "highest_bid_amount").getAsInt();
+            long highestBid = higherDepth(bid, "highest_bid_amount").getAsInt();
             JsonArray bidsArr = higherDepth(bid, "bids").getAsJsonArray();
             if (timeUntil.length() > 0) {
                 auctionDesc = "Current bid: " + simplifyNumber(highestBid);

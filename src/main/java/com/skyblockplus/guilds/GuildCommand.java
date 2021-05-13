@@ -24,7 +24,7 @@ public class GuildCommand extends Command {
     public GuildCommand() {
         this.name = "guild";
         this.cooldown = globalCooldown;
-        this.aliases = new String[] { "g" };
+        this.aliases = new String[]{"g"};
     }
 
     @Override
@@ -101,28 +101,28 @@ public class GuildCommand extends Command {
                     .prepareGet("https://api.ashcon.app/mojang/v2/user/"
                             + higherDepth(membersArr.get(i), "uuid").getAsString())
                     .execute().toCompletableFuture().thenApply(uuidToUsernameResponse -> {
-                        try {
-                            String currentUsername = higherDepth(
-                                    JsonParser.parseString(uuidToUsernameResponse.getResponseBody()), "username")
-                                            .getAsString();
-                            JsonElement expHistory = higherDepth(membersArr.get(finalI), "expHistory");
-                            List<String> keys = getJsonKeys(expHistory);
-                            int totalPlayerExp = 0;
+                try {
+                    String currentUsername = higherDepth(
+                            JsonParser.parseString(uuidToUsernameResponse.getResponseBody()), "username")
+                            .getAsString();
+                    JsonElement expHistory = higherDepth(membersArr.get(finalI), "expHistory");
+                    List<String> keys = getJsonKeys(expHistory);
+                    int totalPlayerExp = 0;
 
-                            for (String value : keys) {
-                                totalPlayerExp += higherDepth(expHistory, value).getAsInt();
-                            }
+                    for (String value : keys) {
+                        totalPlayerExp += higherDepth(expHistory, value).getAsInt();
+                    }
 
-                            guildExpMap.put(currentUsername, totalPlayerExp);
-                        } catch (Exception e) {
-                            guildExpMap.put("@null" + finalI, 0);
-                        }
-                        return true;
-                    }).whenComplete((aBoolean, throwable) -> {
-                        if (guildExpMap.size() == membersArr.size()) {
-                            httpGetsFinishedLatch.countDown();
-                        }
-                    });
+                    guildExpMap.put(currentUsername, totalPlayerExp);
+                } catch (Exception e) {
+                    guildExpMap.put("@null" + finalI, 0);
+                }
+                return true;
+            }).whenComplete((aBoolean, throwable) -> {
+                if (guildExpMap.size() == membersArr.size()) {
+                    httpGetsFinishedLatch.countDown();
+                }
+            });
         }
 
         try {
@@ -304,19 +304,19 @@ public class GuildCommand extends Command {
                     .prepareGet("https://api.ashcon.app/mojang/v2/user/"
                             + higherDepth(membersArr.get(i), "uuid").getAsString())
                     .execute().toCompletableFuture().thenApply(uuidToUsernameResponse -> {
-                        try {
-                            guildMembers
-                                    .add(higherDepth(JsonParser.parseString(uuidToUsernameResponse.getResponseBody()),
-                                            "username").getAsString());
-                        } catch (Exception e) {
-                            guildMembers.add(null);
-                        }
-                        return true;
-                    }).whenComplete((aBoolean, throwable) -> {
-                        if (guildMembers.size() == membersArr.size()) {
-                            httpGetsFinishedLatch.countDown();
-                        }
-                    });
+                try {
+                    guildMembers
+                            .add(higherDepth(JsonParser.parseString(uuidToUsernameResponse.getResponseBody()),
+                                    "username").getAsString());
+                } catch (Exception e) {
+                    guildMembers.add(null);
+                }
+                return true;
+            }).whenComplete((aBoolean, throwable) -> {
+                if (guildMembers.size() == membersArr.size()) {
+                    httpGetsFinishedLatch.countDown();
+                }
+            });
         }
 
         try {
@@ -346,11 +346,11 @@ public class GuildCommand extends Command {
     }
 
     private int guildExpToLevel(int guildExp) {
-        int[] guildExpTable = new int[] { 100000, 150000, 250000, 500000, 750000, 1000000, 1250000, 1500000, 2000000,
-                2500000, 2500000, 2500000, 2500000, 2500000, 3000000 };
+        int[] guildExpTable = new int[]{100000, 150000, 250000, 500000, 750000, 1000000, 1250000, 1500000, 2000000,
+                2500000, 2500000, 2500000, 2500000, 2500000, 3000000};
         int guildLevel = 0;
 
-        for (int i = 0;; i++) {
+        for (int i = 0; ; i++) {
             int expNeeded = i >= guildExpTable.length ? guildExpTable[guildExpTable.length - 1] : guildExpTable[i];
             guildExp -= expNeeded;
             if (guildExp < 0) {

@@ -1,27 +1,21 @@
 package com.skyblockplus.guilds;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.formatNumber;
-import static com.skyblockplus.utils.Utils.globalCooldown;
-import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.utils.Utils.loadingEmbed;
-import static com.skyblockplus.utils.Utils.logCommand;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.Utils.*;
 
 public class GuildRequirementsCommand extends Command {
 
     public GuildRequirementsCommand() {
         this.name = "guild-requirements";
         this.cooldown = globalCooldown;
-        this.aliases = new String[] { "g-reqs", "guild-reqs" };
+        this.aliases = new String[]{"g-reqs", "guild-reqs"};
     }
 
     @Override

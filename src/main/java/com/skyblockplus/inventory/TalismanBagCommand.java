@@ -1,30 +1,23 @@
 package com.skyblockplus.inventory;
 
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.Utils.botColor;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.defaultPaginator;
-import static com.skyblockplus.utils.Utils.errorMessage;
-import static com.skyblockplus.utils.Utils.globalCooldown;
-import static com.skyblockplus.utils.Utils.loadingEmbed;
-import static com.skyblockplus.utils.Utils.logCommand;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.InvItem;
 import com.skyblockplus.utils.structs.PaginatorExtras;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.exceptions.PermissionException;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.utils.Utils.*;
 
 public class TalismanBagCommand extends Command {
     private String missingEmoji;
@@ -101,7 +94,7 @@ public class TalismanBagCommand extends Command {
     }
 
     private EmbedBuilder getPlayerTalismansList(String username, String profileName, String slotNum,
-            CommandEvent event) {
+                                                CommandEvent event) {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
             Map<Integer, InvItem> talismanBagMap = player.getTalismanBagMap();

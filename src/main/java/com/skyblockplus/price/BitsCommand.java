@@ -10,7 +10,6 @@ import org.apache.commons.text.similarity.LevenshteinDistance;
 import java.util.List;
 
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.errorMessage;
 
 public class BitsCommand extends Command {
     public BitsCommand() {
@@ -29,7 +28,7 @@ public class BitsCommand extends Command {
 
             logCommand(event.getGuild(), event.getAuthor(), content);
 
-            if(args.length == 2){
+            if (args.length == 2) {
                 ebMessage.editMessage(getBitPrices(args[1]).build()).queue();
                 return;
             }
@@ -41,7 +40,7 @@ public class BitsCommand extends Command {
     private EmbedBuilder getBitPrices(String itemName) {
         JsonElement bitsJson = getBitsJson();
 
-        if(higherDepth(bitsJson, itemName) != null){
+        if (higherDepth(bitsJson, itemName) != null) {
             return defaultEmbed("Bits Price").addField(itemName, formatNumber(higherDepth(bitsJson, itemName).getAsLong()), false);
         }
 

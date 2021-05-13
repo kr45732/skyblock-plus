@@ -700,7 +700,7 @@ public class SettingsCommand extends Command {
                     ebFieldString.append("\n• default - ").append("<@&" +
                             higherDepth(higherDepth(currentRoleSettings, "levels").getAsJsonArray().get(0), "roleId")
                                     .getAsString() + ">"
-                            );
+                    );
                 } catch (Exception ignored) {
                 }
                 pageTitles.add(roleName + " (__one level role__)");

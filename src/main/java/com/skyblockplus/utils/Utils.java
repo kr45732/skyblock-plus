@@ -109,9 +109,9 @@ public class Utils {
         }
     }
 
-    public static JsonElement getBitsJson(){
-        if(bitsJson == null){
-            bitsJson  = getJson("https://raw.githubusercontent.com/plun1331/SkyKings/main/bot-data/bit-prices.json");
+    public static JsonElement getBitsJson() {
+        if (bitsJson == null) {
+            bitsJson = getJson("https://raw.githubusercontent.com/plun1331/SkyKings/main/bot-data/bit-prices.json");
         }
 
         return bitsJson;
@@ -121,7 +121,7 @@ public class Utils {
         String[] paths = path.split("\\.");
 
         try {
-            for(String key: paths){
+            for (String key : paths) {
                 element = element.getAsJsonObject().get(key);
             }
             return element;
@@ -236,7 +236,7 @@ public class Utils {
         }
         try {
             return "https://sky.lea.moe"
-                    +higherDepth(petUrlJson, "pet_data." + petName.toUpperCase() + ".head")
+                    + higherDepth(petUrlJson, "pet_data." + petName.toUpperCase() + ".head")
                     .getAsString();
         } catch (Exception e) {
             return null;

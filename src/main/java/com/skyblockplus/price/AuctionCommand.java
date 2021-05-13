@@ -1,5 +1,23 @@
 package com.skyblockplus.price;
 
+import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.utils.Utils.HYPIXEL_API_KEY;
+import static com.skyblockplus.utils.Utils.capitalizeString;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.defaultPaginator;
+import static com.skyblockplus.utils.Utils.errorMessage;
+import static com.skyblockplus.utils.Utils.getJson;
+import static com.skyblockplus.utils.Utils.globalCooldown;
+import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.Utils.loadingEmbed;
+import static com.skyblockplus.utils.Utils.logCommand;
+import static com.skyblockplus.utils.Utils.parseMcCodes;
+import static com.skyblockplus.utils.Utils.simplifyNumber;
+import static com.skyblockplus.utils.Utils.usernameToUuid;
+
+import java.time.Duration;
+import java.time.Instant;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
@@ -7,21 +25,16 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed.Field;
-
-import java.time.Duration;
-import java.time.Instant;
-
-import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.Utils.*;
 
 public class AuctionCommand extends Command {
     public AuctionCommand() {
         this.name = "auction";
         this.cooldown = globalCooldown;
-        this.aliases = new String[]{"ah", "auctions"};
+        this.aliases = new String[] { "ah", "auctions" };
     }
 
     @Override
@@ -99,8 +112,8 @@ public class AuctionCommand extends Command {
                             : "") + higherDepth(currentAuction, "item_name").getAsString();
                 }
 
-                int highestBid = higherDepth(currentAuction, "highest_bid_amount").getAsInt();
-                int startingBid = higherDepth(currentAuction, "starting_bid").getAsInt();
+                long highestBid = higherDepth(currentAuction, "highest_bid_amount").getAsInt();
+                long startingBid = higherDepth(currentAuction, "starting_bid").getAsInt();
                 if (timeUntil.length() > 0) {
                     if (bin) {
                         auction = "BIN: " + simplifyNumber(startingBid) + " coins";
