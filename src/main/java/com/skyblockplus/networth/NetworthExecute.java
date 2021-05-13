@@ -787,10 +787,14 @@ public class NetworthExecute {
                     ? ",\"reforge\":{\"cost\":\"" + simplifyNumber(reforgeExtras) + "\",\"name\":\""
                             + item.getModifier() + "\"}"
                     : "";
-            calcItemsJsonStr += ",\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr
-                    + "},";
-            calcItemsJsonStr += "\"bp\":\"" + simplifyNumber(backpackExtras) + "\""
-                    + (isBackpackItem == true ? ",\"inBackpack\":true" : "") + "},";
+            calcItemsJsonStr += miscExtras > 0
+                    ? ",\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}"
+                    : "";
+            calcItemsJsonStr += backpackExtras > 0 ? ",\"bp\":\"" + simplifyNumber(backpackExtras) + "\"" : "";
+
+            calcItemsJsonStr += isBackpackItem == true ? ",\"inBackpack\":true" : "";
+            calcItemsJsonStr += "},";
+
         }
 
         return totalPrice;
