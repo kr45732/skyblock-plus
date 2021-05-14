@@ -7,6 +7,8 @@ import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.InvItem;
+import com.skyblockplus.utils.structs.NwItemPrice;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import org.apache.http.HttpResponse;
@@ -635,18 +637,10 @@ public class NetworthExecute {
     }
 
     private double calculateItemPrice(InvItem item) {
-        return calculateItemPrice(item, null, false);
-    }
-
-    private double calculateItemPrice(InvItem item, boolean isBackpackITem) {
-        return calculateItemPrice(item, null, true);
+        return calculateItemPrice(item, null);
     }
 
     private double calculateItemPrice(InvItem item, String location) {
-        return calculateItemPrice(item, location, false);
-    }
-
-    private double calculateItemPrice(InvItem item, String location, boolean isBackpackItem) {
         if (item == null) {
             return 0;
         }
@@ -760,13 +754,17 @@ public class NetworthExecute {
         }
         miscStr += "]";
 
+        String bpStr = "[";
         try {
             List<InvItem> backpackItems = item.getBackpackItems();
             for (InvItem backpackItem : backpackItems) {
-                backpackExtras += calculateItemPrice(backpackItem, true);
+                NwItemPrice bpItemPrice = calculateBpItemPrice(backpackItem, location);
+                backpackExtras += bpItemPrice.price;
+                bpStr += (bpItemPrice.json != null ? bpItemPrice.json : "");
             }
         } catch (Exception ignored) {
         }
+        bpStr += "]";
 
         double totalPrice = itemCount * (itemCost + recombobulatedExtra + hbpExtras + enchantsExtras + fumingExtras
                 + reforgeExtras + miscExtras + backpackExtras);
@@ -793,14 +791,161 @@ public class NetworthExecute {
             calcItemsJsonStr += miscExtras > 0
                     ? ",\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}"
                     : "";
-            calcItemsJsonStr += backpackExtras > 0 ? ",\"bp\":\"" + simplifyNumber(backpackExtras) + "\"" : "";
+            calcItemsJsonStr += backpackExtras > 0
+                    ? ",\"bp\":{\"cost\":\"" + simplifyNumber(backpackExtras) + "\",\"bp\":" + bpStr + "}"
+                    : "";
 
-            calcItemsJsonStr += isBackpackItem == true ? ",\"in_backpack\":true" : "";
             calcItemsJsonStr += ",\"nbt_tag\":\"" + item.getNbtTag().replace("\"", "\\\"") + "\"";
             calcItemsJsonStr += "},";
         }
 
         return totalPrice;
+    }
+
+    private NwItemPrice calculateBpItemPrice(InvItem item, String location) {
+        if (item == null) {
+            return new NwItemPrice(0, null);
+        }
+
+        double itemCost = 0;
+        double itemCount = 1;
+        double recombobulatedExtra = 0;
+        double hbpExtras = 0;
+        double enchantsExtras = 0;
+        double fumingExtras = 0;
+        double reforgeExtras = 0;
+        double miscExtras = 0;
+
+        try {
+            if (item.getId().equals("PET") && location != null) {
+                switch (location) {
+                    case "inventory":
+                        invPets.add(item);
+                        break;
+                    case "pets":
+                        petsPets.add(item);
+                        break;
+                    case "enderchest":
+                        enderChestPets.add(item);
+                        break;
+                    case "storage":
+                        storagePets.add(item);
+                        break;
+                }
+                return new NwItemPrice(0, null);
+            } else {
+                itemCost = getLowestPrice(item.getId().toUpperCase(), item.getName());
+            }
+        } catch (Exception ignored) {
+        }
+
+        try {
+            itemCount = item.getCount();
+        } catch (Exception ignored) {
+        }
+
+        try {
+            if (item.isRecombobulated() && (itemCost * 2 >= higherDepth(
+                    higherDepth(bazaarJson, "RECOMBOBULATOR_3000.sell_summary").getAsJsonArray().get(0), "pricePerUnit")
+                            .getAsDouble())) {
+                recombobulatedExtra = higherDepth(
+                        higherDepth(bazaarJson, "RECOMBOBULATOR_3000.sell_summary").getAsJsonArray().get(0),
+                        "pricePerUnit").getAsDouble();
+            }
+
+        } catch (Exception ignored) {
+        }
+
+        try {
+            hbpExtras = item.getHbpCount()
+                    * higherDepth(higherDepth(bazaarJson, "HOT_POTATO_BOOK.sell_summary").getAsJsonArray().get(0),
+                            "pricePerUnit").getAsDouble();
+        } catch (Exception ignored) {
+        }
+
+        try {
+            fumingExtras = item.getFumingCount()
+                    * higherDepth(higherDepth(bazaarJson, "FUMING_POTATO_BOOK.sell_summary").getAsJsonArray().get(0),
+                            "pricePerUnit").getAsDouble();
+        } catch (Exception ignored) {
+        }
+
+        String enchStr = "[";
+        try {
+            List<String> enchants = item.getEnchantsFormatted();
+            for (String enchant : enchants) {
+                try {
+                    if (item.getDungeonFloor() != 0 && enchant.equalsIgnoreCase("scavenger;5")) {
+                        continue;
+                    }
+
+                    double enchantPrice = getLowestPriceEnchant(enchant.toUpperCase());
+                    enchantsExtras += enchantPrice;
+                    enchStr += "{\"type\":\"" + enchant + "\",\"price\":\"" + simplifyNumber(enchantPrice) + "\"},";
+                } catch (Exception ignored) {
+                }
+            }
+        } catch (Exception ignored) {
+        }
+
+        if (enchStr.endsWith(",")) {
+            enchStr = enchStr.substring(0, enchStr.length() - 1);
+        }
+        enchStr += "]";
+
+        try {
+            reforgeExtras = calculateReforgePrice(item.getModifier(), item.getRarity());
+        } catch (Exception ignored) {
+
+        }
+
+        String miscStr = "[";
+        try {
+            List<String> extraStats = item.getExtraStats();
+            for (String extraItem : extraStats) {
+                double miscPrice = getLowestPrice(extraItem, " ");
+                miscExtras += miscPrice;
+                miscStr += "{\"name\":\"" + extraItem + "\",\"price\":\"" + simplifyNumber(miscPrice) + "\"},";
+            }
+        } catch (Exception ignored) {
+        }
+
+        if (miscStr.endsWith(",")) {
+            miscStr = miscStr.substring(0, miscStr.length() - 1);
+        }
+        miscStr += "]";
+
+        double totalPrice = itemCount * (itemCost + recombobulatedExtra + hbpExtras + enchantsExtras + fumingExtras
+                + reforgeExtras + miscExtras);
+
+        String jsonStr = "";
+        if (verbose) {
+            jsonStr += "{";
+            jsonStr += "\"total\":\"" + simplifyNumber(totalPrice) + "\"";
+            jsonStr += ",\"name\":\"" + item.getName() + "\"";
+            jsonStr += ",\"id\":\"" + item.getId() + "\"";
+            jsonStr += ",\"count\":" + itemCount;
+            jsonStr += ",\"base_cost\":\"" + simplifyNumber(itemCost) + "\"";
+            jsonStr += recombobulatedExtra > 0 ? ",\"recomb\":\"" + simplifyNumber(recombobulatedExtra) + "\"" : "";
+            jsonStr += (hbpExtras > 0 ? ",\"hbp\":\"" + simplifyNumber(hbpExtras) + "\"" : "");
+            jsonStr += (enchantsExtras > 0
+                    ? ",\"enchants\":{\"total\":\"" + simplifyNumber(enchantsExtras) + "\",\"enchants\":" + enchStr
+                            + "}"
+                    : "");
+            jsonStr += fumingExtras > 0 ? ",\"fuming\":\"" + simplifyNumber(fumingExtras) + "\"" : "";
+            jsonStr += reforgeExtras > 0
+                    ? ",\"reforge\":{\"cost\":\"" + simplifyNumber(reforgeExtras) + "\",\"name\":\""
+                            + item.getModifier() + "\"}"
+                    : "";
+            jsonStr += miscExtras > 0
+                    ? ",\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}"
+                    : "";
+
+            jsonStr += ",\"nbt_tag\":\"" + item.getNbtTag().replace("\"", "\\\"") + "\"";
+            jsonStr += "},";
+        }
+
+        return new NwItemPrice(totalPrice, jsonStr);
     }
 
     private double calculateReforgePrice(String reforgeName, String itemRarity) {
