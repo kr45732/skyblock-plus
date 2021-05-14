@@ -25,6 +25,7 @@ public class InvItem {
     private List<InvItem> backpackItems = new ArrayList<>();
     private String rarity;
     private int dungeonFloor = 0;
+    private String nbtTag;
 
     public void setHbpCount(int hbpCount) {
         if (hbpCount > 10) {

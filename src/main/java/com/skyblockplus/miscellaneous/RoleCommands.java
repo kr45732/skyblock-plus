@@ -22,7 +22,7 @@ public class RoleCommands extends Command {
     public RoleCommands() {
         this.name = "roles";
         this.cooldown = 10;
-        this.aliases = new String[]{"role"};
+        this.aliases = new String[] { "role" };
     }
 
     @Override

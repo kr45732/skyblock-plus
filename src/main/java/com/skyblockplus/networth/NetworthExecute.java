@@ -196,13 +196,16 @@ public class NetworthExecute {
                 }
             }
 
-            Map<Integer, InvItem> storageMap = player.getStorageMap();
-            for (InvItem item : storageMap.values()) {
-                double itemPrice = calculateItemPrice(item, "storage");
-                storageTotal += itemPrice;
-                if (item != null) {
-                    storageItems.add(addItemStr(item, itemPrice));
+            try {
+                Map<Integer, InvItem> storageMap = player.getStorageMap();
+                for (InvItem item : storageMap.values()) {
+                    double itemPrice = calculateItemPrice(item, "storage");
+                    storageTotal += itemPrice;
+                    if (item != null) {
+                        storageItems.add(addItemStr(item, itemPrice));
+                    }
                 }
+            } catch (Exception ignored) {
             }
 
             calculateAllPetsPrice();
@@ -291,7 +294,7 @@ public class NetworthExecute {
             }
 
             double totalNetworth = bankBalance + purseCoins + invTotal + talismanTotal + invArmor + wardrobeTotal
-                    + petsTotal + enderChestTotal;
+                    + petsTotal + enderChestTotal + storageTotal;
 
             eb.setDescription(
                     "Total Networth: " + simplifyNumber(totalNetworth) + " (" + formatNumber(totalNetworth) + ")");
@@ -792,9 +795,9 @@ public class NetworthExecute {
                     : "";
             calcItemsJsonStr += backpackExtras > 0 ? ",\"bp\":\"" + simplifyNumber(backpackExtras) + "\"" : "";
 
-            calcItemsJsonStr += isBackpackItem == true ? ",\"inBackpack\":true" : "";
+            calcItemsJsonStr += isBackpackItem == true ? ",\"in_backpack\":true" : "";
+            calcItemsJsonStr += ",\"nbt_tag\":\"" + item.getNbtTag().replace("\"", "\\\"") + "\"";
             calcItemsJsonStr += "},";
-
         }
 
         return totalPrice;

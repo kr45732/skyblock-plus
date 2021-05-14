@@ -173,7 +173,7 @@ public class AutomaticGuild {
             try {
                 latch.await(15, TimeUnit.SECONDS);
             } catch (Exception e) {
-                System.out.println("== Stack Trace (updateGuildRoles latch) ==");
+                System.out.println("== Stack Trace (updateGuildRoles latch - " + guildId + ") ==");
                 e.printStackTrace();
             }
 
