@@ -51,7 +51,7 @@ public class LinkAccountCommand extends Command {
                                         "guildId").getAsString();
                                 JsonElement playerGuild = higherDepth(getJson("https://api.hypixel.net/guild?key="
                                         + HYPIXEL_API_KEY + "&player=" + playerInfo.minecraftUuid), "guild");
-                                if (higherDepth(playerGuild, "._id").getAsString().equals(settingsGuildId)) {
+                                if (higherDepth(playerGuild, "_id").getAsString().equals(settingsGuildId)) {
                                     JsonArray guildMembers = higherDepth(playerGuild, "members").getAsJsonArray();
                                     for (JsonElement guildMember : guildMembers) {
                                         if (higherDepth(guildMember, "uuid").getAsString()
