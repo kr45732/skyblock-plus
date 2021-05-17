@@ -79,8 +79,8 @@ public class AuctionCommand extends Command {
 
         String[][] auctions = new String[auctionsArray.size()][2];
 
-        int totalSoldValue = 0;
-        int totalPendingValue = 0;
+        long totalSoldValue = 0;
+        long totalPendingValue = 0;
 
         for (int i = 0; i < auctionsArray.size(); i++) {
             JsonElement currentAuction = auctionsArray.get(i);

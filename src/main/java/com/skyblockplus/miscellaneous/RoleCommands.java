@@ -1,5 +1,20 @@
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.Utils.BOT_PREFIX;
+import static com.skyblockplus.utils.Utils.HYPIXEL_API_KEY;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.errorMessage;
+import static com.skyblockplus.utils.Utils.getJson;
+import static com.skyblockplus.utils.Utils.getJsonKeys;
+import static com.skyblockplus.utils.Utils.getPlayerDiscordInfo;
+import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.Utils.loadingEmbed;
+import static com.skyblockplus.utils.Utils.logCommand;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
@@ -8,14 +23,14 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
+
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.*;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
 
 public class RoleCommands extends Command {
 
@@ -46,7 +61,7 @@ public class RoleCommands extends Command {
             }
 
             String[] args = content.split(" ");
-            if (args.length < 2 || args.length > 3) { // with or without profile
+            if (args.length < 2 || args.length > 3) {
                 ebMessage.editMessage(errorMessage(this.name).build()).queue();
                 return;
             }

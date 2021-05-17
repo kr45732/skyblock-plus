@@ -1,5 +1,6 @@
 package com.skyblockplus.link;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -44,6 +45,27 @@ public class LinkAccountCommand extends Command {
                         String nicknameTemplate = higherDepth(database.getVerifySettings(guild.getId()),
                                 "verifiedNickname").getAsString();
                         nicknameTemplate = nicknameTemplate.replace("[IGN]", playerInfo.minecraftUsername);
+                        if (nicknameTemplate.contains("[GUILD_RANK]")) {
+                            try {
+                                String settingsGuildId = higherDepth(database.getGuildRoleSettings(guild.getId()),
+                                        "guildId").getAsString();
+                                JsonElement playerGuild = higherDepth(getJson("https://api.hypixel.net/guild?key="
+                                        + HYPIXEL_API_KEY + "&player=" + playerInfo.minecraftUuid), "guild");
+                                if (higherDepth(playerGuild, "._id").getAsString().equals(settingsGuildId)) {
+                                    JsonArray guildMembers = higherDepth(playerGuild, "members").getAsJsonArray();
+                                    for (JsonElement guildMember : guildMembers) {
+                                        if (higherDepth(guildMember, "uuid").getAsString()
+                                                .equals(playerInfo.minecraftUuid)) {
+                                            nicknameTemplate = nicknameTemplate.replace("[GUILD_RANK]",
+                                                    higherDepth(guildMember, "rank").getAsString());
+                                            break;
+                                        }
+                                    }
+                                }
+                            } catch (Exception ignored) {
+                            }
+                        }
+
                         guild.getMember(user).modifyNickname(nicknameTemplate).queue();
                     }
                 } catch (Exception ignored) {

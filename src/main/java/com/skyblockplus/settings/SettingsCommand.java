@@ -34,7 +34,7 @@ public class SettingsCommand extends Command {
     public SettingsCommand() {
         this.name = "settings";
         this.cooldown = globalCooldown + 1;
-        this.userPermissions = new Permission[]{Permission.ADMINISTRATOR};
+        this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
     }
 
     @Override
@@ -504,8 +504,7 @@ public class SettingsCommand extends Command {
             }
 
             EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
-            eb.setDescription(
-                    "**Guild set to:** " + higherDepth(guildJson, "guild.name").getAsString());
+            eb.setDescription("**Guild set to:** " + higherDepth(guildJson, "guild.name").getAsString());
             return eb;
         } catch (Exception e) {
             return defaultEmbed("Error", null).setDescription("Invalid guild name");
@@ -697,10 +696,10 @@ public class SettingsCommand extends Command {
                     : "• Disabled");
             if (isOneLevelRole(roleName)) {
                 try {
-                    ebFieldString.append("\n• default - ").append("<@&" +
-                            higherDepth(higherDepth(currentRoleSettings, "levels").getAsJsonArray().get(0), "roleId")
-                                    .getAsString() + ">"
-                    );
+                    ebFieldString.append("\n• default - ").append("<@&"
+                            + higherDepth(higherDepth(currentRoleSettings, "levels").getAsJsonArray().get(0), "roleId")
+                                    .getAsString()
+                            + ">");
                 } catch (Exception ignored) {
                 }
                 pageTitles.add(roleName + " (__one level role__)");
@@ -714,8 +713,7 @@ public class SettingsCommand extends Command {
                         String guildId = higherDepth(roleLevel, "value").getAsString();
                         JsonElement guildJson = getJson(
                                 "https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&id=" + guildId);
-                        ebFieldString.append("\n• ")
-                                .append(higherDepth(guildJson, "guild.name").getAsString())
+                        ebFieldString.append("\n• ").append(higherDepth(guildJson, "guild.name").getAsString())
                                 .append(" - ").append("<@&" + higherDepth(roleLevel, "roleId").getAsString() + ">");
                     }
                 } else {
@@ -1093,6 +1091,18 @@ public class SettingsCommand extends Command {
                 return eb;
             }
             return defaultEmbed("Error").setDescription("Nickname must contain [IGN] parameter");
+        }
+
+        if (nickname.contains("[GUILD_RANK]")) {
+            try {
+                String guildId = higherDepth(database.getGuildRoleSettings(event.getGuild().getId()), "guildId")
+                        .getAsString();
+                higherDepth(getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&id=" + guildId),
+                        "guild._id");
+            } catch (Exception e) {
+                return defaultEmbed("Error").setDescription(
+                        "A guild must be set in " + BOT_PREFIX + "`settings guild` to use [GUILD_RANK] prefix");
+            }
         }
 
         if (nickname.replace("[IGN]", "").length() > 15) {

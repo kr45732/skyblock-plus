@@ -1,11 +1,18 @@
 package com.skyblockplus.miscellaneous;
 
-import com.google.gson.JsonElement;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
+import static com.skyblockplus.utils.Utils.HYPIXEL_API_KEY;
+import static com.skyblockplus.utils.Utils.capitalizeString;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.errorMessage;
+import static com.skyblockplus.utils.Utils.formatNumber;
+import static com.skyblockplus.utils.Utils.getJson;
+import static com.skyblockplus.utils.Utils.getJsonKeys;
+import static com.skyblockplus.utils.Utils.globalCooldown;
+import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.Utils.loadingEmbed;
+import static com.skyblockplus.utils.Utils.logCommand;
+import static com.skyblockplus.utils.Utils.roundAndFormat;
+import static com.skyblockplus.utils.Utils.usernameToUuid;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -13,7 +20,13 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Locale;
 
-import static com.skyblockplus.utils.Utils.*;
+import com.google.gson.JsonElement;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.structs.UsernameUuidStruct;
+
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 
 public class HypixelCommand extends Command {
 
@@ -53,12 +66,13 @@ public class HypixelCommand extends Command {
                 hypixelJson = higherDepth(hypixelJson, "player");
 
                 try {
-                    EmbedBuilder eb = defaultEmbed(usernameUuid.playerUsername, "https://plancke.io/hypixel/player/stats/" + usernameUuid.playerUuid);
+                    EmbedBuilder eb = defaultEmbed(usernameUuid.playerUsername,
+                            "https://plancke.io/hypixel/player/stats/" + usernameUuid.playerUuid);
                     StringBuilder parkourCompletionString = new StringBuilder();
                     for (String parkourLocation : getJsonKeys(higherDepth(hypixelJson, "parkourCompletions"))) {
                         int fastestTime = -1;
-                        for (JsonElement parkourTime : higherDepth(hypixelJson, "parkourCompletions." +
-                                parkourLocation).getAsJsonArray()) {
+                        for (JsonElement parkourTime : higherDepth(hypixelJson, "parkourCompletions." + parkourLocation)
+                                .getAsJsonArray()) {
                             if (higherDepth(parkourTime, "timeTook").getAsInt() > fastestTime) {
                                 fastestTime = higherDepth(parkourTime, "timeTook").getAsInt();
                             }
@@ -87,9 +101,14 @@ public class HypixelCommand extends Command {
             JsonElement hypixelJson = getJson(
                     "https://api.hypixel.net/player?key=" + HYPIXEL_API_KEY + "&uuid=" + usernameUuid.playerUuid);
             if (higherDepth(hypixelJson, "player") != null) {
+                if (higherDepth(hypixelJson, "player").isJsonNull()) {
+                    return defaultEmbed(usernameUuid.playerUsername + " has not played Hypixel");
+                }
+
                 hypixelJson = higherDepth(hypixelJson, "player");
 
-                EmbedBuilder eb = defaultEmbed(usernameUuid.playerUsername, "https://plancke.io/hypixel/player/stats/" + usernameUuid.playerUuid);
+                EmbedBuilder eb = defaultEmbed(usernameUuid.playerUsername,
+                        "https://plancke.io/hypixel/player/stats/" + usernameUuid.playerUuid);
                 DateTimeFormatter dateTimeFormatter = DateTimeFormatter
                         .ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT).withLocale(Locale.US)
                         .withZone(ZoneId.systemDefault());
@@ -124,24 +143,28 @@ public class HypixelCommand extends Command {
                 eb.addField("Hypixel Level", roundAndFormat(networkLevel), true);
 
                 String hypixelRank = "None";
-                if (higherDepth(hypixelJson, "rank") != null && !higherDepth(hypixelJson, "rank").getAsString().equals("NORMAL")) {
+                if (higherDepth(hypixelJson, "rank") != null
+                        && !higherDepth(hypixelJson, "rank").getAsString().equals("NORMAL")) {
                     hypixelRank = capitalizeString(higherDepth(hypixelJson, "rank").getAsString());
-                } else if (higherDepth(hypixelJson, "monthlyPackageRank") != null && higherDepth(hypixelJson, "monthlyPackageRank").getAsString().equals("SUPERSTAR")) {
+                } else if (higherDepth(hypixelJson, "monthlyPackageRank") != null
+                        && higherDepth(hypixelJson, "monthlyPackageRank").getAsString().equals("SUPERSTAR")) {
                     hypixelRank = "MVP++";
-                } else if (higherDepth(hypixelJson, "newPackageRank") != null && !higherDepth(hypixelJson, "newPackageRank").getAsString().equals("NONE")) {
-                    hypixelRank = higherDepth(hypixelJson, "newPackageRank").getAsString().replace("PLUS", "+").replace("_", "");
-                } else if (higherDepth(hypixelJson, "packageRank") != null && !higherDepth(hypixelJson, "packageRank").getAsString().equals("NONE")) {
-                    hypixelRank = higherDepth(hypixelJson, "packageRank").getAsString().replace("PLUS", "+").replace("_", "");
+                } else if (higherDepth(hypixelJson, "newPackageRank") != null
+                        && !higherDepth(hypixelJson, "newPackageRank").getAsString().equals("NONE")) {
+                    hypixelRank = higherDepth(hypixelJson, "newPackageRank").getAsString().replace("PLUS", "+")
+                            .replace("_", "");
+                } else if (higherDepth(hypixelJson, "packageRank") != null
+                        && !higherDepth(hypixelJson, "packageRank").getAsString().equals("NONE")) {
+                    hypixelRank = higherDepth(hypixelJson, "packageRank").getAsString().replace("PLUS", "+")
+                            .replace("_", "");
                 }
 
                 eb.addField("Hypixel Rank", hypixelRank, true);
 
                 try {
-                    for (String socialMedia : getJsonKeys(
-                            higherDepth(hypixelJson, "socialMedia.links"))) {
-                        String currentSocialMediaLink = higherDepth(
-                                higherDepth(hypixelJson, "socialMedia.links"), socialMedia)
-                                .getAsString();
+                    for (String socialMedia : getJsonKeys(higherDepth(hypixelJson, "socialMedia.links"))) {
+                        String currentSocialMediaLink = higherDepth(higherDepth(hypixelJson, "socialMedia.links"),
+                                socialMedia).getAsString();
                         eb.addField(
                                 socialMedia.equals("HYPIXEL") ? "Hypixel Forums"
                                         : capitalizeString(socialMedia.toLowerCase()),
@@ -164,8 +187,7 @@ public class HypixelCommand extends Command {
 
                     eb.addField("Guild", higherDepth(guildJson, "guild.name").getAsString(), true);
 
-                    for (JsonElement member : higherDepth(guildJson, "guild.members")
-                            .getAsJsonArray()) {
+                    for (JsonElement member : higherDepth(guildJson, "guild.members").getAsJsonArray()) {
                         if (higherDepth(member, "uuid").getAsString().equals(usernameUuid.playerUuid)) {
                             eb.addField("Guild Rank",
                                     higherDepth(member, "rank").getAsString().equals("GUILDMASTER") ? "Guild Master"
@@ -187,9 +209,9 @@ public class HypixelCommand extends Command {
                 }
 
                 StringBuilder namesString = new StringBuilder();
-                for (JsonElement name : higherDepth(getJson(
-                        "https://api.ashcon.app/mojang/v2/user/" + usernameUuid.playerUuid), "username_history")
-                        .getAsJsonArray()) {
+                for (JsonElement name : higherDepth(
+                        getJson("https://api.ashcon.app/mojang/v2/user/" + usernameUuid.playerUuid), "username_history")
+                                .getAsJsonArray()) {
                     if (!higherDepth(name, "username").getAsString().equals(usernameUuid.playerUsername)) {
                         namesString.append("• ").append(higherDepth(name, "username").getAsString()).append("\n");
                     }
@@ -202,42 +224,42 @@ public class HypixelCommand extends Command {
                 if (higherDepth(hypixelJson, "skyblock_free_cookie") != null) {
                     skyblockItems += "• Free booster cookie: "
                             + dateFormatterShort.format(
-                            Instant.ofEpochMilli(higherDepth(hypixelJson, "skyblock_free_cookie").getAsLong()))
+                                    Instant.ofEpochMilli(higherDepth(hypixelJson, "skyblock_free_cookie").getAsLong()))
                             + "\n";
                 }
 
                 if (higherDepth(hypixelJson, "scorpius_bribe_96") != null) {
                     skyblockItems += "• Scorpius Bribe (Year 96): "
                             + dateFormatterShort.format(
-                            Instant.ofEpochMilli(higherDepth(hypixelJson, "scorpius_bribe_96").getAsLong()))
+                                    Instant.ofEpochMilli(higherDepth(hypixelJson, "scorpius_bribe_96").getAsLong()))
                             + "\n";
                 }
 
                 if (higherDepth(hypixelJson, "scorpius_bribe_120") != null) {
                     skyblockItems += "• Scorpius Bribe (Year 120): "
                             + dateFormatterShort.format(
-                            Instant.ofEpochMilli(higherDepth(hypixelJson, "scorpius_bribe_120").getAsLong()))
+                                    Instant.ofEpochMilli(higherDepth(hypixelJson, "scorpius_bribe_120").getAsLong()))
                             + "\n";
                 }
 
                 if (higherDepth(hypixelJson, "claimed_potato_talisman") != null) {
                     skyblockItems += "• Potato Talisman: "
                             + dateFormatterShort.format(Instant
-                            .ofEpochMilli(higherDepth(hypixelJson, "claimed_potato_talisman").getAsLong()))
+                                    .ofEpochMilli(higherDepth(hypixelJson, "claimed_potato_talisman").getAsLong()))
                             + "\n";
                 }
 
                 if (higherDepth(hypixelJson, "claimed_potato_basket") != null) {
                     skyblockItems += "• Potato Basket: "
                             + dateFormatterShort.format(
-                            Instant.ofEpochMilli(higherDepth(hypixelJson, "claimed_potato_basket").getAsLong()))
+                                    Instant.ofEpochMilli(higherDepth(hypixelJson, "claimed_potato_basket").getAsLong()))
                             + "\n";
                 }
 
                 if (higherDepth(hypixelJson, "claim_potato_war_crown") != null) {
                     skyblockItems += "• Potato War Crown: "
                             + dateFormatterShort.format(Instant
-                            .ofEpochMilli(higherDepth(hypixelJson, "claim_potato_war_crown").getAsLong()))
+                                    .ofEpochMilli(higherDepth(hypixelJson, "claim_potato_war_crown").getAsLong()))
                             + "\n";
                 }
 

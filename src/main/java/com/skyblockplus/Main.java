@@ -90,6 +90,12 @@ public class Main {
                     .addEventListeners(waiter, client.build(), new MessageTimeout(), new MainListener()).build();
         }
 
+        try {
+            jda.awaitReady();
+        } catch (Exception ignored) {
+        }
+
+        jda.getPresence().setActivity(Activity.watching(BOT_PREFIX + "help in " + jda.getGuilds().size() + " servers"));
         // scheduleUpdateLinkedAccounts();
     }
 

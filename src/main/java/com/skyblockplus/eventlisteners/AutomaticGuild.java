@@ -219,7 +219,7 @@ public class AutomaticGuild {
             logCommand(guild, "Guild Role | Users (" + memberCount + ") | Time ("
                     + ((System.currentTimeMillis() - startTime) / 1000) + "s)");
         } catch (Exception e) {
-            System.out.println("== Stack Trace (updateGuildRoles) ==");
+            System.out.println("== Stack Trace (updateGuildRoles - " + guildId + ") ==");
             e.printStackTrace();
         }
     }
