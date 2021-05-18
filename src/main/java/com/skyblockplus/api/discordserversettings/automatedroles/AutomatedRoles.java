@@ -1,11 +1,12 @@
 package com.skyblockplus.api.discordserversettings.automatedroles;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import org.springframework.transaction.annotation.Transactional;
-
 import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
+
+import org.springframework.transaction.annotation.Transactional;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 @Data
 @AllArgsConstructor
@@ -82,6 +83,9 @@ public class AutomatedRoles {
 
     @Embedded
     private RoleModel dungeon_secrets = new RoleModel();
+
+    @Embedded
+    private RoleModel guild_ranks = new RoleModel();
 
     public AutomatedRoles() {
     }

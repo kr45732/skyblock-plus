@@ -112,6 +112,7 @@ public class RoleCommands extends Command {
                         StringBuilder removedRoles = new StringBuilder();
                         StringBuilder disabledAPI = new StringBuilder();
                         StringBuilder errorRoles = new StringBuilder();
+                        JsonElement guildJson = null;
 
                         for (String currentRoleName : rolesID) {
                             JsonElement currentRole = higherDepth(rolesJson, currentRoleName);
@@ -122,11 +123,14 @@ public class RoleCommands extends Command {
 
                             switch (currentRoleName) {
                                 case "guild_member": {
-                                    JsonElement guildJson = getJson("https://api.hypixel.net/findGuild?key="
-                                            + HYPIXEL_API_KEY + "&byUuid=" + player.getUuid());
+                                    if (guildJson == null) {
+                                        guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY
+                                                + "&player=" + player.getUuid());
+                                    }
+
                                     if (guildJson != null && !higherDepth(guildJson, "guild").isJsonNull()) {
                                         JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
-                                        String playerGuildId = higherDepth(guildJson, "guild").getAsString();
+                                        String playerGuildId = higherDepth(guildJson, "guild._id").getAsString();
 
                                         for (JsonElement currentLevel : levelsArray) {
                                             String currentLevelValue = higherDepth(currentLevel, "value").getAsString();
@@ -134,7 +138,6 @@ public class RoleCommands extends Command {
                                                     .getRoleById(higherDepth(currentLevel, "roleId").getAsString());
                                             if (playerGuildId.equals(currentLevelValue)) {
                                                 if (!member.getRoles().contains(currentLevelRole)) {
-                                                    // currentLevelRole.getPosition()
                                                     if (botRole.canInteract(currentLevelRole)) {
                                                         guild.addRoleToMember(member, currentLevelRole).queue();
                                                         addedRoles.append(roleChangeString(currentLevelRole.getName()));
@@ -149,13 +152,73 @@ public class RoleCommands extends Command {
                                                                 .append(roleChangeString(currentLevelRole.getName()));
                                                         guild.removeRoleFromMember(member, currentLevelRole).queue();
                                                     } else {
-                                                        errorRoles.append(currentLevelRole.getName());
+                                                        errorRoles.append(roleChangeString(currentLevelRole.getName()));
                                                     }
                                                 }
                                             }
                                         }
                                     }
                                     break;
+                                }
+                                case "guild_ranks": {
+                                    if (guildJson == null) {
+                                        guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY
+                                                + "&player=" + player.getUuid());
+                                    }
+
+                                    if (guildJson != null && !higherDepth(guildJson, "guild").isJsonNull()) {
+                                        JsonElement guildRoleSettings = database.getGuildRoleSettings(guild.getId());
+                                        if (higherDepth(guildRoleSettings, "guildId").getAsString()
+                                                .equals(higherDepth(guildJson, "guild._id").getAsString())) {
+                                            JsonArray guildRanks = higherDepth(guildRoleSettings, "guildRanks")
+                                                    .getAsJsonArray();
+
+                                            JsonArray guildMembers = higherDepth(guildJson, "guild.members")
+                                                    .getAsJsonArray();
+
+                                            for (JsonElement guildMember : guildMembers) {
+                                                if (higherDepth(guildMember, "uuid").getAsString()
+                                                        .equals(player.getUuid())) {
+                                                    String guildMemberRank = higherDepth(guildMember, "rank")
+                                                            .getAsString().replace(" ", "_");
+
+                                                    for (JsonElement guildRank : guildRanks) {
+                                                        Role currentLevelRole = guild.getRoleById(
+                                                                higherDepth(guildRank, "discordRoleId").getAsString());
+                                                        if (higherDepth(guildRank, "minecraftRoleName").getAsString()
+                                                                .equalsIgnoreCase(guildMemberRank)) {
+                                                            if (!member.getRoles().contains(currentLevelRole)) {
+                                                                if (botRole.canInteract(currentLevelRole)) {
+                                                                    guild.addRoleToMember(member, currentLevelRole)
+                                                                            .queue();
+                                                                    addedRoles.append(roleChangeString(
+                                                                            currentLevelRole.getName()));
+                                                                } else {
+                                                                    errorRoles.append(roleChangeString(
+                                                                            currentLevelRole.getName()));
+                                                                }
+                                                            }
+
+                                                        } else {
+                                                            if (member.getRoles().contains(currentLevelRole)) {
+                                                                if (botRole.canInteract(currentLevelRole)) {
+                                                                    removedRoles.append(roleChangeString(
+                                                                            currentLevelRole.getName()));
+                                                                    guild.removeRoleFromMember(member, currentLevelRole)
+                                                                            .queue();
+                                                                } else {
+                                                                    errorRoles.append(roleChangeString(
+                                                                            currentLevelRole.getName()));
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+
                                 }
                                 case "sven":
                                 case "rev":

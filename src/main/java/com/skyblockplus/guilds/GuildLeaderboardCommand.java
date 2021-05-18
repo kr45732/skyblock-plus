@@ -1,13 +1,6 @@
 package com.skyblockplus.guilds;
 
-import static com.skyblockplus.utils.Utils.HYPIXEL_API_KEY;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.errorMessage;
-import static com.skyblockplus.utils.Utils.getJson;
-import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.utils.Utils.loadingEmbed;
-import static com.skyblockplus.utils.Utils.logCommand;
-import static com.skyblockplus.utils.Utils.usernameToUuid;
+import static com.skyblockplus.utils.Utils.*;
 
 import java.io.FileReader;
 import java.util.ArrayList;
@@ -30,9 +23,8 @@ public class GuildLeaderboardCommand extends Command {
 
     public GuildLeaderboardCommand() {
         this.name = "guild-rank";
-        // this.cooldown = (BOT_PREFIX.equals("+") ? 240 : 0);
+        this.cooldown = globalCooldown;
         this.aliases = new String[] { "g-rank" };
-        this.ownerCommand = true;
     }
 
     @Override

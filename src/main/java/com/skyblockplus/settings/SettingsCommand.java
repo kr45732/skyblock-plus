@@ -559,6 +559,7 @@ public class SettingsCommand extends Command {
         rolePageMap.put("skill_average", 22);
         rolePageMap.put("pet_score", 23);
         rolePageMap.put("dungeon_secrets", 24);
+        rolePageMap.put("guild_ranks", 25);
 
         if (rolePageMap.containsKey(roleName)) {
             CustomPaginator.Builder currentRoleSettings = getCurrentRolesSettings(
@@ -678,6 +679,12 @@ public class SettingsCommand extends Command {
                             .append("settings roles set doom_slayer @level nine slayer`\n");
                     break;
                 }
+                case "guild_ranks": {
+                    ebFieldString.append("**If a player is in the guild set in `" + BOT_PREFIX
+                            + "settings guild`, they will be given the corresponding rank role set there**\nNote: this role can only be enabled and disabled here. To modify guild ranks use `"
+                            + BOT_PREFIX + "settings guild`");
+                    break;
+                }
                 case "all_slayer_nine": {
                     ebFieldString.append("**Having all level nine slayers**\nExample: `").append(BOT_PREFIX)
                             .append("settings roles set all_slayer_nine @role`\n");
@@ -694,7 +701,10 @@ public class SettingsCommand extends Command {
 
             ebFieldString.append(higherDepth(currentRoleSettings, "enable").getAsString().equals("true") ? "• Enabled"
                     : "• Disabled");
-            if (isOneLevelRole(roleName)) {
+            if (roleName.equals("guild_ranks")) {
+                ebFieldString.append("\n• View the current guild ranks in `" + BOT_PREFIX + "settings guild`");
+                pageTitles.add(roleName + " (__no level role__)");
+            } else if (isOneLevelRole(roleName)) {
                 try {
                     ebFieldString.append("\n• default - ").append("<@&"
                             + higherDepth(higherDepth(currentRoleSettings, "levels").getAsJsonArray().get(0), "roleId")
@@ -774,7 +784,30 @@ public class SettingsCommand extends Command {
             return defaultEmbed("Error", null).setDescription("Invalid role name");
         }
 
-        if (currentRoleSettings.get("levels").getAsJsonArray().size() != 0) {
+        if (roleName.equals("guild_ranks")) {
+            JsonArray guildRanks = higherDepth(database.getGuildRoleSettings(event.getGuild().getId()), "guildRanks")
+                    .getAsJsonArray();
+            if (guildRanks.size() != 0) {
+                currentRoleSettings.remove("enable");
+                currentRoleSettings.addProperty("enable", enable);
+                int responseCode = database.updateRoleSettings(event.getGuild().getId(), roleName, currentRoleSettings);
+                if (responseCode != 200) {
+                    return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
+                }
+
+                EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+                eb.setDescription(
+                        "**" + roleName + " role:** " + (enable.equalsIgnoreCase("true") ? "enabled" : "disabled"));
+                return eb;
+            } else {
+                currentRoleSettings.remove("enable");
+                currentRoleSettings.addProperty("enable", "false");
+                database.updateRoleSettings(event.getGuild().getId(), roleName, currentRoleSettings);
+            }
+            EmbedBuilder eb = defaultEmbed("Error", null);
+            eb.setDescription("The role must have at least one rank set in `" + BOT_PREFIX + "settings guild`!");
+            return eb;
+        } else if (currentRoleSettings.get("levels").getAsJsonArray().size() != 0) {
             currentRoleSettings.remove("enable");
             currentRoleSettings.addProperty("enable", enable);
             int responseCode = database.updateRoleSettings(event.getGuild().getId(), roleName, currentRoleSettings);
@@ -807,6 +840,8 @@ public class SettingsCommand extends Command {
             } catch (Exception e) {
                 return defaultEmbed("Error", null).setDescription("Invalid username");
             }
+        } else if (roleName.equals("guild_ranks")) {
+            return defaultEmbed("This role cannot be modified here. Use `" + BOT_PREFIX + "settings guild instead`");
         } else if (isOneLevelRole(roleName)) {
             return defaultEmbed("These roles do not support levels. Use `" + BOT_PREFIX
                     + "settings roles set [roleName] [@role]` instead");
@@ -874,6 +909,8 @@ public class SettingsCommand extends Command {
         if (isOneLevelRole(roleName)) {
             return defaultEmbed("These roles do not support levels. Use `" + BOT_PREFIX
                     + "settings roles set [roleName] [@role]` instead");
+        } else if (roleName.equals("guild_ranks")) {
+            return defaultEmbed("This role cannot be modified here. Use `" + BOT_PREFIX + "settings guild instead");
         }
 
         JsonObject currentRoleSettings;
@@ -919,11 +956,16 @@ public class SettingsCommand extends Command {
     }
 
     private EmbedBuilder setRoleStackable(String roleName, String stackable) {
-        if (isOneLevelRole(roleName)) {
+        if (isOneLevelRole(roleName) || roleName.equals("guild_ranks")) {
             return defaultEmbed("Error").setDescription("This role does not support stacking");
         }
+        JsonObject currentRoleSettings;
+        try {
+            currentRoleSettings = database.getRoleSettings(event.getGuild().getId(), roleName).getAsJsonObject();
+        } catch (Exception e) {
+            return defaultEmbed("Error").setDescription("Invalid Role");
+        }
 
-        JsonObject currentRoleSettings = database.getRoleSettings(event.getGuild().getId(), roleName).getAsJsonObject();
         currentRoleSettings.remove("stackable");
         currentRoleSettings.addProperty("stackable", stackable);
         int responseCode = database.updateRoleSettings(event.getGuild().getId(), roleName, currentRoleSettings);

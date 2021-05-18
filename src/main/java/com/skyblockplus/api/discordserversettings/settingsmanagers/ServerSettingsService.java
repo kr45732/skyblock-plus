@@ -1,5 +1,11 @@
 package com.skyblockplus.api.discordserversettings.settingsmanagers;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.transaction.Transactional;
+
 import com.skyblockplus.api.discordserversettings.automatedapplication.ApplyRequirements;
 import com.skyblockplus.api.discordserversettings.automatedapplication.AutomatedApplication;
 import com.skyblockplus.api.discordserversettings.automatedguildroles.GuildRole;
@@ -9,15 +15,11 @@ import com.skyblockplus.api.discordserversettings.automatedverify.AutomatedVerif
 import com.skyblockplus.api.discordserversettings.skyblockevent.EventMember;
 import com.skyblockplus.api.discordserversettings.skyblockevent.RunningEvent;
 import com.skyblockplus.api.discordserversettings.skyblockevent.SbEvent;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 @Service
 @Transactional
@@ -158,6 +160,8 @@ public class ServerSettingsService {
                     return new ResponseEntity<>(currentRoleSettings.getPet_score(), HttpStatus.OK);
                 case "dungeon_secrets":
                     return new ResponseEntity<>(currentRoleSettings.getDungeon_secrets(), HttpStatus.OK);
+                case "guild_ranks":
+                    return new ResponseEntity<>(currentRoleSettings.getGuild_ranks(), HttpStatus.OK);
             }
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -247,6 +251,9 @@ public class ServerSettingsService {
                     break;
                 case "dungeon_secrets":
                     currentRoleSettings.setDungeon_secrets(newRoleSettings);
+                    break;
+                case "guild_ranks":
+                    currentRoleSettings.setGuild_ranks(newRoleSettings);
                     break;
             }
             currentServerSettings.setAutomatedRoles(currentRoleSettings);
