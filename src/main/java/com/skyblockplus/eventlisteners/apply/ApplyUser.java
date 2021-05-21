@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.skyblockplus.utils.Player;
 
@@ -56,7 +57,9 @@ public class ApplyUser implements Serializable {
 
         logCommand(event.getGuild(), applyingUser, "apply " + applyingUser.getName());
 
-        currentSettings = currentSettings.getAsJsonObject().remove("applyUsersCache");
+        JsonObject currentSettingsObj = currentSettings.getAsJsonObject();
+        currentSettingsObj.remove("applyUsersCache");
+        currentSettings = currentSettingsObj.getAsJsonObject();
 
         this.applyingUserId = applyingUser.getId();
         this.currentSettingsString = new Gson().toJson(currentSettings);
@@ -74,8 +77,14 @@ public class ApplyUser implements Serializable {
 
         applicationChannel.sendMessage("Welcome " + applyingUser.getAsMention() + "!").complete();
 
+        boolean isIronman = false;
+        try {
+            isIronman = higherDepth(currentSettings, "ironmanOnly").getAsBoolean();
+        } catch (Exception ignored) {
+        }
+
         Player player = new Player(playerUsername);
-        this.profileNames = player.getAllProfileNames();
+        this.profileNames = player.getAllProfileNames(isIronman);
 
         EmbedBuilder welcomeEb = defaultEmbed("Application for " + applyingUser.getName());
         welcomeEb.setDescription(

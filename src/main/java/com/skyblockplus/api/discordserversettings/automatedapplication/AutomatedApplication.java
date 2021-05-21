@@ -26,6 +26,8 @@ public class AutomatedApplication {
     private String newChannelPrefix = "";
     private String newChannelCategory = "";
 
+    private String ironmanOnly = "false";
+
     @Column(length = 2048)
     private String messageText = "";
 

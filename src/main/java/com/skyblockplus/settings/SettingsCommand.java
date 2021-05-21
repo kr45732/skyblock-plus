@@ -214,7 +214,6 @@ public class SettingsCommand extends Command {
                     if (database.getApplySettings(event.getGuild().getId(), args[2]).isJsonNull()) {
                         eb = defaultEmbed("Error", null).setDescription("Invalid name");
                     } else {
-
                         switch (args[3]) {
                             case "message":
                                 eb = setApplyMessageText(args[2], args[4]);
@@ -259,6 +258,9 @@ public class SettingsCommand extends Command {
                                 } else {
                                     eb = defaultEmbed("Error").setDescription("Invalid setting");
                                 }
+                                break;
+                            case "ironman":
+                                eb = setIsIronman(args[2], args[4]);
                                 break;
                             default:
                                 eb = defaultEmbed("Error", null).setDescription("Invalid setting");
@@ -1242,7 +1244,7 @@ public class SettingsCommand extends Command {
         eb.addField("Staff Ping Role", displaySettings(applySettings, "staffPingRoleId"), true);
         eb.addField("New Channel Prefix", displaySettings(applySettings, "newChannelPrefix"), true);
         eb.addField("New Channel Category", displaySettings(applySettings, "newChannelCategory"), true);
-        eb.addBlankField(true);
+        eb.addField("Ironman only", displaySettings(applySettings, "ironmanOnly"), true);
         eb.addField("React Message Text", displaySettings(applySettings, "messageText"), true);
         eb.addField("Accepted Message", displaySettings(applySettings, "acceptMessageText"), true);
         eb.addField("Waitlisted Message", displaySettings(applySettings, "acceptMessageText"), true);
@@ -1258,6 +1260,7 @@ public class SettingsCommand extends Command {
         currentSettings.remove("applyUsersCache");
         currentSettings.remove("waitlistedMessageText");
         currentSettings.remove("applyReqs");
+        currentSettings.remove("ironmanOnly");
 
         for (String key : getJsonKeys(currentSettings)) {
             if (higherDepth(currentSettings, key).getAsString().length() == 0) {
@@ -1279,7 +1282,21 @@ public class SettingsCommand extends Command {
                     + BOT_PREFIX + "reload` to reload the settings");
             return eb;
         }
-        return defaultEmbed("Invalid Input", null);
+        return defaultEmbed("Invalid Input");
+    }
+
+    private EmbedBuilder setIsIronman(String name, String isIronman) {
+        if (isIronman.equalsIgnoreCase("true") || isIronman.equalsIgnoreCase("false")) {
+            int responseCode = updateApplySettings(name, "ironmanOnly", isIronman.toLowerCase());
+            if (responseCode != 200) {
+                return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+            }
+
+            EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+            eb.setDescription("**Ironman only:** " + (isIronman.equalsIgnoreCase("true") ? "enabled" : "disabled"));
+            return eb;
+        }
+        return defaultEmbed("Invalid Input");
     }
 
     private EmbedBuilder setApplyMessageTextChannelId(String name, String textChannel) {

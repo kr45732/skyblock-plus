@@ -1,20 +1,21 @@
 package com.skyblockplus.eventlisteners.apply;
 
-import com.google.gson.JsonElement;
-import com.skyblockplus.utils.Player;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.PrivateChannel;
-import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.MainClassUtils.getApplyGuildUsersCache;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.Utils.higherDepth;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.google.gson.JsonElement;
+import com.skyblockplus.utils.Player;
+
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.PrivateChannel;
+import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
 public class ApplyGuild {
     public List<ApplyUser> applyUserList = new ArrayList<>();

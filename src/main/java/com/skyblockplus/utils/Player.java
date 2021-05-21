@@ -182,7 +182,7 @@ public class Player {
         return null;
     }
 
-    public String[] getAllProfileNames() {
+    public String[] getAllProfileNames(boolean isIronman) {
         List<String> profileNameList = new ArrayList<>();
         if (this.profilesArray == null) {
             this.profilesArray = higherDepth(
@@ -192,6 +192,10 @@ public class Player {
 
         for (JsonElement profile : profilesArray) {
             try {
+                if (isIronman && higherDepth(profile, "game_mode") == null) {
+                    continue;
+                }
+
                 profileNameList.add(higherDepth(profile, "cute_name").getAsString().toLowerCase());
             } catch (Exception ignored) {
             }

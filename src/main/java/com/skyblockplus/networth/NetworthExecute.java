@@ -302,13 +302,20 @@ public class NetworthExecute {
                     "Total Networth: " + simplifyNumber(totalNetworth) + " (" + formatNumber(totalNetworth) + ")");
             eb.addField("Purse", simplifyNumber(purseCoins), true);
             eb.addField("Bank", (bankBalance == -1 ? "Private" : simplifyNumber(bankBalance)), true);
-            eb.addField("Ender Chest | " + simplifyNumber(enderChestTotal), echestStr.toString(), false);
-            eb.addField("Storage | " + simplifyNumber(storageTotal), storageStr.toString(), false);
-            eb.addField("Inventory | " + simplifyNumber(invTotal), invStr.toString(), false);
-            eb.addField("Armor | " + simplifyNumber(invArmor), armorStr.toString(), false);
-            eb.addField("Wardrobe | " + simplifyNumber(wardrobeTotal), wardrobeStr.toString(), false);
-            eb.addField("Pets | " + simplifyNumber(petsTotal), petsStr.toString(), false);
-            eb.addField("Talisman | " + simplifyNumber(talismanTotal), talismanStr.toString(), false);
+            eb.addField("Ender Chest | " + simplifyNumber(enderChestTotal),
+                    echestStr.length() == 0 ? "Empty" : echestStr.toString(), false);
+            eb.addField("Storage | " + simplifyNumber(storageTotal),
+                    storageStr.length() == 0 ? "Empty" : storageStr.toString(), false);
+            eb.addField("Inventory | " + simplifyNumber(invTotal), invStr.length() == 0 ? "Empty" : invStr.toString(),
+                    false);
+            eb.addField("Armor | " + simplifyNumber(invArmor), armorStr.length() == 0 ? "Empty" : armorStr.toString(),
+                    false);
+            eb.addField("Wardrobe | " + simplifyNumber(wardrobeTotal),
+                    wardrobeStr.length() == 0 ? "Empty" : wardrobeStr.toString(), false);
+            eb.addField("Pets | " + simplifyNumber(petsTotal), petsStr.length() == 0 ? "Empty" : petsStr.toString(),
+                    false);
+            eb.addField("Talisman | " + simplifyNumber(talismanTotal),
+                    talismanStr.length() == 0 ? "Empty" : talismanStr.toString(), false);
 
             if (failedCount != 0) {
                 eb.appendDescription("\nUnable to get " + failedCount + " items");

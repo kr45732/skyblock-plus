@@ -54,7 +54,7 @@ import net.dv8tion.jda.api.exceptions.PermissionException;
 public class Utils {
     public static final Color botColor = new Color(223, 5, 5);
     public static final int globalCooldown = 4;
-    private static final ScriptEngine jsScriptEngine = new ScriptEngineManager().getEngineByName("js");
+    public static final ScriptEngine jsScriptEngine = new ScriptEngineManager().getEngineByName("js");
     public static String HYPIXEL_API_KEY = "";
     public static String BOT_TOKEN = "";
     public static String BOT_PREFIX = "";
