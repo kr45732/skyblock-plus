@@ -111,12 +111,28 @@ public class ApplyGuild {
             return false;
         }
 
-        if (!new Player(higherDepth(linkedAccount, "minecraftUsername").getAsString()).isValid()) {
+        Player player = new Player(higherDepth(linkedAccount, "minecraftUsername").getAsString());
+
+        if (!player.isValid()) {
             PrivateChannel dmChannel = event.getUser().openPrivateChannel().complete();
             dmChannel.sendMessage(defaultEmbed("Error").setDescription(
                     "Unable to fetch player data. Please make sure that all APIs are enabled and/or try relinking")
                     .build()).queue();
             return false;
+        } else {
+            boolean isIronman = false;
+            try {
+                isIronman = higherDepth(currentSettings, "ironmanOnly").getAsBoolean();
+            } catch (Exception ignored) {
+            }
+            if (isIronman && player.getAllProfileNames(isIronman).length == 0) {
+                PrivateChannel dmChannel = event.getUser().openPrivateChannel().complete();
+                dmChannel
+                        .sendMessage(
+                                defaultEmbed("Error").setDescription("You have no ironman profiles created").build())
+                        .queue();
+                return false;
+            }
         }
 
         ApplyUser applyUser = new ApplyUser(event, currentSettings,
