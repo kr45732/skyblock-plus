@@ -33,9 +33,6 @@ public class ServerSettingsModel {
     private AutomatedVerify automatedVerify = new AutomatedVerify();
 
     @Embedded
-    private AutomatedApplication automatedApplication = new AutomatedApplication();
-
-    @Embedded
     private AutomatedApplication automatedApplicationOne = null;
 
     @Embedded
