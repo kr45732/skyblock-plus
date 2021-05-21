@@ -111,8 +111,8 @@ public class HelpCommand extends Command {
                     + generateHelp("Get a list of all members in a player's guild", "guild members [u:player]")
                     + generateHelp("Get the experience leaderboard for a player's guild", "guild experience [u:player]",
                             "guild exp [u:player]")
-                    + generateHelp("Get the application requirements set for this server", "guild-requirements",
-                            "g-reqs"));
+                    + generateHelp("Get the application requirements set for this server", "guild-requirements [name]",
+                            "g-reqs [name]"));
 
             paginateBuilder.addItems(generateHelp("Get player's active (not claimed) auctions on all profiles",
                     "auction [player]", "ah [player]") + generateHelp("Get the lowest bin of an item", "bin [item]")
@@ -176,36 +176,37 @@ public class HelpCommand extends Command {
                                 "settings verify role " + "[@role]")
                         + generateHelp("Channel where the message to react for verifying will sent",
                                 "settings verify " + "channel [#channel]")
-                        + generateHelp("The nickname template on verifying. Can be set to none",
+                        + generateHelp("The nickname template on verifying. Can be set to none.",
                                 "settings verify nickname <prefix> [IGN] <postfix>"));
 
-                paginateBuilder.addItems(generateHelp("Get the current apply settings for the bot", "settings apply")
-                        + generateHelp("Enable or disable automatic apply", "settings apply [enable|disable]")
+                paginateBuilder.addItems(generateHelp("Get the current apply names for the bot", "settings apply")
+                        + generateHelp("Create a new automatic apply with name 'name'", "settings apply create [name]")
+                        + generateHelp("Enable or disable automatic apply", "settings apply [name] [enable|disable]")
                         + generateHelp("Message that users will see and react to in order to apply",
-                                "settings" + " apply message [message]")
+                                "settings" + " apply [name] message [message]")
                         + generateHelp("Role that will be pinged when a new application is submitted",
-                                "settings apply staff_role [@role]")
+                                "settings apply [name] staff_role [@role]")
                         + generateHelp("Channel where the message to react for applying will sent",
-                                "settings apply " + "channel [#channel]")
+                                "settings apply [name] " + "channel [#channel]")
                         + generateHelp("Prefix that all new apply channels should start with (prefix-discordName)",
-                                "settings apply prefix [prefix]")
+                                "settings apply [name] prefix [prefix]")
                         + generateHelp("Category where new apply channels will be made",
-                                "settings apply category " + "[category id]")
+                                "settings apply [name] category " + "[category id]")
                         + generateHelp("Channel where new applications will be sent to be reviewed by staff",
-                                "settings apply staff_channel " + "[#channel]")
+                                "settings apply [name] staff_channel " + "[#channel]")
                         + generateHelp("Message that will be sent if applicant is accepted",
-                                "settings apply accept_message [message]")
+                                "settings apply [name] accept_message [message]")
                         + generateHelp("Message that will be sent if applicant is waitlisted. Can be set to none",
-                                "settings apply waitlist_message [message]")
+                                "settings apply [name] waitlist_message [message]")
                         + generateHelp("Message that will be sent if applicant is denied",
-                                "settings apply deny_message [message]")
+                                "settings apply [name] deny_message [message]")
                         + generateHelp(
                                 "Add a requirement that applicant must meet. At least one of the requirement types must be set",
-                                "settings apply reqs add <slayer:amount> <skills:amount> <catacombs:amount> <weight:amount>")
+                                "settings apply [name] reqs add <slayer:amount> <skills:amount> <catacombs:amount> <weight:amount>")
                         + generateHelp(
                                 "Remove a requirement. Run `" + BOT_PREFIX
-                                        + "settings apply` to see the index for all current requirements",
-                                "settings apply reqs remove [number]"));
+                                        + "settings apply [name]` to see the index for all current requirements",
+                                "settings apply [name] reqs remove [number]"));
 
                 paginateBuilder.addItems(generateHelp("Get the current roles settings for the bot", "settings roles")
                         + generateHelp("Enable or disable automatic roles", "settings roles [enable|disable]")

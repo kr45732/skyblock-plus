@@ -68,7 +68,7 @@ public class GuildKickerCommand extends Command {
         for (int i = 0; i < reqsArr.length; i++) {
             String[] indvReqs = reqsArr[i].replace("[", "").replace("]", "").split(" ");
             for (String indvReq : indvReqs) {
-                String[] reqDashSplit = indvReq.split("-");
+                String[] reqDashSplit = indvReq.split(":");
                 if (reqDashSplit.length != 2) {
                     return defaultEmbed("Error").setDescription(indvReq + " is an invalid requirement");
                 }
@@ -115,18 +115,18 @@ public class GuildKickerCommand extends Command {
                         double catacombsReq = 0;
                         double weightReq = 0;
                         for (String reqIndv : reqSplit) {
-                            switch (reqIndv.split("-")[0]) {
+                            switch (reqIndv.split(":")[0]) {
                                 case "slayer":
-                                    slayerReq = Double.parseDouble(reqIndv.split("-")[1]);
+                                    slayerReq = Double.parseDouble(reqIndv.split(":")[1]);
                                     break;
                                 case "skills":
-                                    skillsReq = Double.parseDouble(reqIndv.split("-")[1]);
+                                    skillsReq = Double.parseDouble(reqIndv.split(":")[1]);
                                     break;
                                 case "catacombs":
-                                    catacombsReq = Double.parseDouble(reqIndv.split("-")[1]);
+                                    catacombsReq = Double.parseDouble(reqIndv.split(":")[1]);
                                     break;
                                 case "weight":
-                                    weightReq = Double.parseDouble(reqIndv.split("-")[1]);
+                                    weightReq = Double.parseDouble(reqIndv.split(":")[1]);
                                     break;
                             }
                         }

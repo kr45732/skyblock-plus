@@ -129,11 +129,12 @@ public class SpringDatabaseComponent {
         return settingsService.updateApplyUsersCache(serverId, name, currentSettings).getStatusCodeValue();
     }
 
-    public JsonElement getApplyCacheSettings(String serverId, String name) {
+    public JsonArray getApplyCacheSettings(String serverId, String name) {
         try {
-            return JsonParser.parseString((String) settingsService.getApplyUsersCache(serverId, name).getBody());
+            return JsonParser.parseString((String) settingsService.getApplyUsersCache(serverId, name).getBody())
+                    .getAsJsonArray();
         } catch (Exception e) {
-            return JsonParser.parseString("[]");
+            return JsonParser.parseString("[]").getAsJsonArray();
         }
     }
 

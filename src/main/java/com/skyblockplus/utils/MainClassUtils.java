@@ -66,11 +66,10 @@ public class MainClassUtils {
         if (!BOT_PREFIX.equals("+")) {
             return new ArrayList<>();
         }
-        
+
+        JsonArray applyUsersCache = database.getApplyCacheSettings(guildId, name);
 
         try {
-            JsonArray applyUsersCache = database.getApplyCacheSettings(guildId, name).getAsJsonArray();
-            
             List<ApplyUser> applyUsersCacheList = new ArrayList<>();
             for (JsonElement applyUserCache : applyUsersCache) {
                 ApplyUser currentApplyUserCache = new Gson().fromJson(applyUserCache, ApplyUser.class);

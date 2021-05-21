@@ -1,14 +1,12 @@
 package com.skyblockplus.eventlisteners.skyblockevent;
 
-import com.google.gson.JsonElement;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSettingsModel;
-import com.skyblockplus.api.discordserversettings.skyblockevent.RunningEvent;
-import com.skyblockplus.api.discordserversettings.skyblockevent.SbEvent;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.Utils.BOT_PREFIX;
+import static com.skyblockplus.utils.Utils.HYPIXEL_API_KEY;
+import static com.skyblockplus.utils.Utils.capitalizeString;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.getJson;
+import static com.skyblockplus.utils.Utils.higherDepth;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -23,8 +21,16 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Utils.*;
+import com.google.gson.JsonElement;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSettingsModel;
+import com.skyblockplus.api.discordserversettings.skyblockevent.RunningEvent;
+import com.skyblockplus.api.discordserversettings.skyblockevent.SbEvent;
+
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class SkyblockEvent {
     public final DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
@@ -50,7 +56,7 @@ public class SkyblockEvent {
     public SkyblockEvent(CommandEvent commandEvent) {
         this.enable = true;
         this.commandEvent = commandEvent;
-        this.eb = defaultEmbed("Create a Skyblock competition");
+        this.eb = defaultEmbed("Create a Skyblock competition").setFooter("Type `exit` to cancel");
         lastMessageSentTime = Instant.now();
         scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleAtFixedRate(this::checkForTimeout, 0, 1, TimeUnit.MINUTES);
@@ -103,7 +109,7 @@ public class SkyblockEvent {
         lastMessageSentTime = Instant.now();
 
         if (event.getMessage().getContentRaw().equalsIgnoreCase("exit")) {
-            sendEmbedMessage(defaultEmbed("Create a Skyblock competition").setDescription("Canceling..."));
+            sendEmbedMessage(defaultEmbed("Create a Skyblock competition").setDescription("Canceled"));
             return "delete";
         }
 
@@ -113,11 +119,9 @@ public class SkyblockEvent {
                     guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&name="
                             + event.getMessage().getContentRaw().replace(" ", "%20"));
                     eb.addField("Guild",
-                            "Name: " + higherDepth(guildJson, "guild.name").getAsString()
-                                    + "\nMembers: "
+                            "Name: " + higherDepth(guildJson, "guild.name").getAsString() + "\nMembers: "
                                     + higherDepth(guildJson, "guild.members").getAsJsonArray().size(),
-                            false).setDescription(
-                            "Is this a __catacombs__, __slayer__, or __skills__ event?\nTo cancel type `exit`");
+                            false).setDescription("Is this a __catacombs__, __slayer__, or __skills__ event?");
                     state++;
                 } catch (Exception e) {
                     eb.setDescription("Invalid guild name: " + event.getMessage().getContentRaw());
@@ -138,12 +142,11 @@ public class SkyblockEvent {
                         eb.addField("Event Type", "Skills", false);
                         eventType = "skills";
                     }
-                    eb.setDescription(
-                            "Please enter the number of __hours__ the event should last\nTo cancel type `exit`");
+                    eb.setDescription("Please enter the number of __hours__ the event should last");
                     state++;
                 } else {
-                    eb.setDescription(replyMessage
-                            + " is an invalid option\nPlease choose from catacombs, slayer, or skills\nTo cancel type `exit`");
+                    eb.setDescription(
+                            replyMessage + " is an invalid option\nPlease choose from catacombs, slayer, or skills");
                 }
                 sendEmbedMessage(eb);
                 break;
@@ -152,18 +155,18 @@ public class SkyblockEvent {
                 try {
                     eventDuration = Integer.parseInt(replyMessage);
                     if (eventDuration <= 0) {
-                        eb.setDescription("Event must be longer than 0 hours\nTo cancel type `exit`");
+                        eb.setDescription("Event must be longer than 0 hours");
                     } else if (eventDuration > 336) {
-                        eb.setDescription("Event must be at most 2 weeks (336 hours)\nTo cancel type `exit`");
+                        eb.setDescription("Event must be at most 2 weeks (336 hours)");
                     } else {
                         eb.addField("End Date",
                                 formatter.format(Instant.now().plus(eventDuration, ChronoUnit.HOURS)) + " UTC", false);
                         eb.setDescription(
-                                "If there are no prizes please type \"none\", else please enter the prizes in one message following the format in the example below (place number - prize):\n1 - 15 mil coins\n2 - 10 mil\n3 - 500k\nTo cancel type `exit`");
+                                "If there are no prizes please type \"none\", else please enter the prizes in one message following the format in the example below (place number : prize):\n1 : 15 mil coins\n2 : 10 mil\n3 : 500k");
                         state++;
                     }
                 } catch (Exception e) {
-                    eb.setDescription("Invalid hours value: " + replyMessage + "\nTo cancel type `exit`");
+                    eb.setDescription("Invalid hours value: " + replyMessage);
                 }
                 sendEmbedMessage(eb);
                 break;
@@ -177,7 +180,7 @@ public class SkyblockEvent {
                     prizeListMap = new TreeMap<>();
                     for (String prizeLevel : prizeList) {
                         try {
-                            String[] prizeLevelArr = prizeLevel.split("-");
+                            String[] prizeLevelArr = prizeLevel.split(":");
                             prizeListMap.put(Integer.parseInt(prizeLevelArr[0].trim()), prizeLevelArr[1].trim());
                         } catch (Exception ignored) {
                         }
@@ -191,7 +194,7 @@ public class SkyblockEvent {
 
                     eb.addField("Prizes", ebString.toString(), false);
                 }
-                eb.setDescription("Please enter the channel for the announcement\nTo cancel type `exit`");
+                eb.setDescription("Please enter the channel for the announcement");
                 state++;
                 sendEmbedMessage(eb);
                 break;
@@ -200,12 +203,11 @@ public class SkyblockEvent {
                 try {
                     announcementChannel = event.getGuild().getTextChannelById(replyMessage.replaceAll("[<#>]", ""));
                     eb.addField("Announcement Channel", announcementChannel.getAsMention(), false);
-                    eb.setDescription(
-                            "Please confirm the event by replying with \"yes\" or anything else to cancel\nTo cancel type `exit`");
+                    eb.setDescription("Please confirm the event by replying with \"yes\" or anything else to cancel");
                     state++;
                 } catch (Exception e) {
                     eb.setDescription(
-                            "Invalid channel. Please make sure the bot can see the channel and it is a valid channel!\nTo cancel type `exit`");
+                            "Invalid channel. Please make sure the bot can see the channel and it is a valid channel!");
                 }
                 sendEmbedMessage(eb);
 
@@ -217,8 +219,7 @@ public class SkyblockEvent {
                     EmbedBuilder announcementEb = defaultEmbed(capitalizeString(eventType) + " event started!");
                     announcementEb.setDescription(
                             "A new " + eventType + " event has been created! Please see below for more information.");
-                    announcementEb.addField("Guild Name",
-                            higherDepth(guildJson, "guild.name").getAsString(), false);
+                    announcementEb.addField("Guild Name", higherDepth(guildJson, "guild.name").getAsString(), false);
 
                     epochSecondEndingTime = Instant.now().plus(eventDuration, ChronoUnit.HOURS).getEpochSecond();
                     announcementEb.addField("End Date",
@@ -250,10 +251,7 @@ public class SkyblockEvent {
 
                     }
                 } else {
-                    Message temp = sendEmbedMessage(
-                            defaultEmbed("Create a Skyblock competition").setDescription("Canceling..."));
-                    temp.editMessage(defaultEmbed("Create a Skyblock competition").setDescription("Canceled").build())
-                            .queueAfter(3, TimeUnit.SECONDS);
+                    sendEmbedMessage(defaultEmbed("Create a Skyblock competition").setDescription("Canceled"));
 
                 }
                 return "delete";

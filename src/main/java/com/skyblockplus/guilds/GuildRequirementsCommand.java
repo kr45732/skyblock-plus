@@ -2,16 +2,20 @@ package com.skyblockplus.guilds;
 
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.errorMessage;
 import static com.skyblockplus.utils.Utils.formatNumber;
 import static com.skyblockplus.utils.Utils.globalCooldown;
 import static com.skyblockplus.utils.Utils.higherDepth;
 import static com.skyblockplus.utils.Utils.loadingEmbed;
 import static com.skyblockplus.utils.Utils.logCommand;
 
+import java.util.List;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.api.discordserversettings.automatedapplication.AutomatedApplication;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -34,19 +38,34 @@ public class GuildRequirementsCommand extends Command {
 
             logCommand(event.getGuild(), event.getAuthor(), content);
             if (args.length != 2) {
-                ebMessage.editMessage(defaultEmbed("Error").setDescription("Invalid name").build()).queue();
+                ebMessage.editMessage(errorMessage(name).build()).queue();
                 return;
             }
+
             JsonArray guildReqs = null;
             try {
                 guildReqs = database.getApplyReqs(event.getGuild().getId(), args[1]).getAsJsonArray();
             } catch (Exception ignored) {
             }
 
+            if (guildReqs == null) {
+                List<AutomatedApplication> allGuilds = database.getAllApplySettings(event.getGuild().getId());
+
+                String ebStr = null;
+                try {
+                    ebStr = allGuilds.get(0).getName() + " or " + allGuilds.get(1).getName();
+                } catch (Exception ignored) {
+                }
+
+                ebMessage.editMessage(defaultEmbed("Error")
+                        .setDescription((ebStr != null ? args[1] + " is an invalid name\nValid options are: " + ebStr
+                                : "No requirements set for " + args[1]))
+                        .build()).queue();
+            }
+
             if (guildReqs == null || guildReqs.size() == 0) {
                 ebMessage
-                        .editMessage(
-                                defaultEmbed("Error").setDescription("No requirements set for this server").build())
+                        .editMessage(defaultEmbed("Error").setDescription("No requirements set for " + args[1]).build())
                         .queue();
                 return;
             }
