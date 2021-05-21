@@ -119,7 +119,7 @@ public class GuildLeaderboardCommand extends Command {
             String lbUuid = higherDepth(lbM, "uuid").getAsString().replace("-", "");
             String curRank = ranksMap.get(lbUuid);
 
-            if (!staffRankNames.contains(curRank)) {
+            if (curRank != null && !staffRankNames.contains(curRank)) {
                 gMembers.add(new GuildLeaderboardStruct(higherDepth(lbM, "username").getAsString(),
                         higherDepth(lbM, "average_skill_progress").getAsDouble(),
                         higherDepth(lbM, "total_slayer").getAsDouble(), higherDepth(lbM, "catacomb").getAsDouble(),
@@ -208,6 +208,8 @@ public class GuildLeaderboardCommand extends Command {
                 if (currentPlayer == null) {
                     continue;
                 }
+
+                System.out.println(currentPlayer.getName());
 
                 String playerRank = currentPlayer.getGuildRank().toLowerCase();
                 String playerUsername = currentPlayer.getName();
