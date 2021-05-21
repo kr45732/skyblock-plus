@@ -25,7 +25,8 @@ public class ApplyGuild {
     public ApplyGuild(Message reactMessage, JsonElement currentSettings) {
         this.reactMessage = reactMessage;
         this.currentSettings = currentSettings;
-        this.applyUserList = getApplyGuildUsersCache(reactMessage.getGuild().getId());
+        this.applyUserList = getApplyGuildUsersCache(reactMessage.getGuild().getId(),
+                higherDepth(currentSettings, "name").getAsString());
     }
 
     public ApplyGuild() {
@@ -53,7 +54,9 @@ public class ApplyGuild {
     }
 
     public boolean onMessageReactionAdd_ExistingApplyUser(MessageReactionAddEvent event) {
-        ApplyUser findApplyUser = applyUserList.stream().filter(applyUser -> applyUser.getMessageReactId().equals(event.getMessageId())).findFirst().orElse(null);
+        ApplyUser findApplyUser = applyUserList.stream()
+                .filter(applyUser -> applyUser.getMessageReactId().equals(event.getMessageId())).findFirst()
+                .orElse(null);
         if (findApplyUser != null) {
             if (findApplyUser.onMessageReactionAdd(event)) {
                 applyUserList.remove(findApplyUser);
@@ -84,24 +87,39 @@ public class ApplyGuild {
 
         JsonElement linkedAccount = database.getLinkedUserByDiscordId(event.getUserId());
 
-        if ((linkedAccount.isJsonNull()) || !higherDepth(linkedAccount, "discordId").getAsString().equals(event.getUserId())) {
+        if ((linkedAccount.isJsonNull())
+                || !higherDepth(linkedAccount, "discordId").getAsString().equals(event.getUserId())) {
             PrivateChannel dmChannel = event.getUser().openPrivateChannel().complete();
             if (linkedAccount.isJsonNull()) {
-                dmChannel.sendMessage(defaultEmbed("Error").setDescription("You are not linked to the bot. Please run `+link [IGN]` and try again.").build()).queue();
+                dmChannel.sendMessage(defaultEmbed("Error")
+                        .setDescription("You are not linked to the bot. Please run `+link [IGN]` and try again.")
+                        .build()).queue();
             } else {
-                dmChannel.sendMessage(defaultEmbed("Error").setDescription("Account " + higherDepth(linkedAccount, "minecraftUsername").getAsString() + " is linked with the discord tag "
-                        + jda.getUserById(higherDepth(linkedAccount, "discordId").getAsString()).getAsTag() + "\nYour current discord tag is " + event.getUser().getAsTag() + ".\nPlease relink and try again").build()).queue();
+                dmChannel
+                        .sendMessage(defaultEmbed("Error")
+                                .setDescription(
+                                        "Account " + higherDepth(linkedAccount, "minecraftUsername").getAsString()
+                                                + " is linked with the discord tag "
+                                                + jda.getUserById(higherDepth(linkedAccount, "discordId").getAsString())
+                                                        .getAsTag()
+                                                + "\nYour current discord tag is " + event.getUser().getAsTag()
+                                                + ".\nPlease relink and try again")
+                                .build())
+                        .queue();
             }
             return false;
         }
 
         if (!new Player(higherDepth(linkedAccount, "minecraftUsername").getAsString()).isValid()) {
             PrivateChannel dmChannel = event.getUser().openPrivateChannel().complete();
-            dmChannel.sendMessage(defaultEmbed("Error").setDescription("Unable to fetch player data. Please make sure that all APIs are enabled and/or try relinking").build()).queue();
+            dmChannel.sendMessage(defaultEmbed("Error").setDescription(
+                    "Unable to fetch player data. Please make sure that all APIs are enabled and/or try relinking")
+                    .build()).queue();
             return false;
         }
 
-        ApplyUser applyUser = new ApplyUser(event, currentSettings, higherDepth(linkedAccount, "minecraftUsername").getAsString());
+        ApplyUser applyUser = new ApplyUser(event, currentSettings,
+                higherDepth(linkedAccount, "minecraftUsername").getAsString());
         applyUserList.add(applyUser);
         return true;
     }

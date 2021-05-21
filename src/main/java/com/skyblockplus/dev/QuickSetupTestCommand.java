@@ -40,7 +40,7 @@ public class QuickSetupTestCommand extends Command {
                             ebMessage.editMessage(deleteServer(args[3]).build()).queue();
                             return;
                         case "apply_cache":
-                            ebMessage.editMessage(deleteServerApplyCache(args[3]).build()).queue();
+                            ebMessage.editMessage(deleteServerApplyCache(args[3], args[4]).build()).queue();
                             return;
                         case "skyblock_event":
                             ebMessage.editMessage(deleteSkyblockEvent(args[3]).build()).queue();
@@ -54,15 +54,13 @@ public class QuickSetupTestCommand extends Command {
     }
 
     private EmbedBuilder deleteSkyblockEvent(String serverId) {
-        if (database.updateSkyblockEventSettings(serverId, new SbEvent()) == 200) {
-            return defaultEmbed("API returned response code " + database.deleteApplyCacheSettings(serverId));
-        }
-        return defaultEmbed("Error updating settings");
+        return defaultEmbed(
+                "API returned response code " + database.updateSkyblockEventSettings(serverId, new SbEvent()));
     }
 
-    private EmbedBuilder deleteServerApplyCache(String serverId) {
+    private EmbedBuilder deleteServerApplyCache(String serverId, String name) {
         if (database.getServerSettings(serverId) != null) {
-            return defaultEmbed("API returned response code " + database.deleteApplyCacheSettings(serverId));
+            return defaultEmbed("API returned response code " + database.deleteApplyCacheSettings(serverId, name));
         }
         return defaultEmbed("Error updating settings");
     }

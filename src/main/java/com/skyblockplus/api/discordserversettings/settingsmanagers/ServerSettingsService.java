@@ -40,7 +40,9 @@ public class ServerSettingsService {
     }
 
     public ResponseEntity<HttpStatus> addNewServerSettings(String serverId, ServerSettingsModel newServerSettings) {
-        if (!serverByServerIdExists(serverId)) {
+        ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+        if (currentServerSettings == null) {
             ServerSettingsModel tempSettingsModel = new ServerSettingsModel();
             tempSettingsModel.setServerId(newServerSettings.getServerId());
             tempSettingsModel.setServerName(newServerSettings.getServerName());
@@ -51,14 +53,18 @@ public class ServerSettingsService {
     }
 
     public ResponseEntity<?> getServerSettingsById(String serverId) {
-        if (serverByServerIdExists(serverId)) {
-            return new ResponseEntity<>(settingsRepository.findServerByServerId(serverId), HttpStatus.OK);
+        ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+        if (currentServerSettings != null) {
+            return new ResponseEntity<>(currentServerSettings, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     public ResponseEntity<HttpStatus> updateServerSettings(String serverId, ServerSettingsModel newServerSettings) {
-        if (serverByServerIdExists(serverId)) {
+        ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+        if (currentServerSettings != null) {
             settingsRepository.save(newServerSettings);
             return new ResponseEntity<>(HttpStatus.OK);
         }
@@ -66,16 +72,18 @@ public class ServerSettingsService {
     }
 
     public ResponseEntity<?> getVerifySettings(String serverId) {
-        if (serverByServerIdExists(serverId)) {
-            return new ResponseEntity<>(settingsRepository.findServerByServerId(serverId).getAutomatedVerify(),
-                    HttpStatus.OK);
+        ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+        if (currentServerSettings != null) {
+            return new ResponseEntity<>(currentServerSettings.getAutomatedVerify(), HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     public ResponseEntity<HttpStatus> updateVerifySettings(String serverId, AutomatedVerify newVerifySettings) {
-        if (serverByServerIdExists(serverId)) {
-            ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+        ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+        if (currentServerSettings != null) {
             currentServerSettings.setAutomatedVerify(newVerifySettings);
             settingsRepository.save(currentServerSettings);
             return new ResponseEntity<>(HttpStatus.OK);
@@ -83,36 +91,20 @@ public class ServerSettingsService {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    public ResponseEntity<?> getApplySettings(String serverId) {
-        if (serverByServerIdExists(serverId)) {
-            return new ResponseEntity<>(settingsRepository.findServerByServerId(serverId).getAutomatedApplication(),
-                    HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    }
-
-    public ResponseEntity<HttpStatus> updateApplySettings(String serverId, AutomatedApplication newApplySettings) {
-        if (serverByServerIdExists(serverId)) {
-            ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
-            currentServerSettings.setAutomatedApplication(newApplySettings);
-            settingsRepository.save(currentServerSettings);
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-
-    }
-
     public ResponseEntity<?> getRolesSettings(String serverId) {
-        if (serverByServerIdExists(serverId)) {
-            return new ResponseEntity<>(settingsRepository.findServerByServerId(serverId).getAutomatedRoles(),
-                    HttpStatus.OK);
+        ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+        if (currentServerSettings != null) {
+            return new ResponseEntity<>(currentServerSettings.getAutomatedRoles(), HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     public ResponseEntity<?> getRoleSettings(String serverId, String roleName) {
-        if (serverByServerIdExists(serverId)) {
-            AutomatedRoles currentRoleSettings = settingsRepository.findServerByServerId(serverId).getAutomatedRoles();
+        ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+        if (currentServerSettings != null) {
+            AutomatedRoles currentRoleSettings = currentServerSettings.getAutomatedRoles();
             switch (roleName) {
                 case "sven":
                     return new ResponseEntity<>(currentRoleSettings.getSven(), HttpStatus.OK);
@@ -168,8 +160,9 @@ public class ServerSettingsService {
     }
 
     public ResponseEntity<HttpStatus> updateRolesSettings(String serverId, AutomatedRoles newRoleSettings) {
-        if (serverByServerIdExists(serverId)) {
-            ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+        ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+        if (currentServerSettings != null) {
             currentServerSettings.setAutomatedRoles(newRoleSettings);
             settingsRepository.save(currentServerSettings);
             return new ResponseEntity<>(HttpStatus.OK);
@@ -179,8 +172,9 @@ public class ServerSettingsService {
     }
 
     public ResponseEntity<HttpStatus> updateRoleSettings(String serverId, RoleModel newRoleSettings, String roleName) {
-        if (serverByServerIdExists(serverId)) {
-            ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+        ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+        if (currentServerSettings != null) {
             AutomatedRoles currentRoleSettings = currentServerSettings.getAutomatedRoles();
             switch (roleName) {
                 case "sven":
@@ -264,8 +258,9 @@ public class ServerSettingsService {
     }
 
     public ResponseEntity<HttpStatus> updateRolesEnable(String serverId, String newEnableSetting) {
-        if (serverByServerIdExists(serverId)) {
-            ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+        ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+        if (currentServerSettings != null) {
             AutomatedRoles currentRoleSettings = currentServerSettings.getAutomatedRoles();
             currentRoleSettings.setEnable(newEnableSetting);
             currentServerSettings.setAutomatedRoles(currentRoleSettings);
@@ -276,26 +271,28 @@ public class ServerSettingsService {
     }
 
     public ResponseEntity<HttpStatus> deleteServerSettings(String serverId) {
-        if (serverByServerIdExists(serverId)) {
+        ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+        if (currentServerSettings != null) {
             settingsRepository.deleteByServerId(serverId);
-            if (!serverByServerIdExists(serverId)) {
-                return new ResponseEntity<>(HttpStatus.OK);
-            }
+            return new ResponseEntity<>(HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     public ResponseEntity<?> getGuildRolesSettings(String serverId) {
-        if (serverByServerIdExists(serverId)) {
-            return new ResponseEntity<>(settingsRepository.findServerByServerId(serverId).getAutomaticGuildRoles(),
-                    HttpStatus.OK);
+        ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+        if (currentServerSettings != null) {
+            return new ResponseEntity<>(currentServerSettings.getAutomaticGuildRoles(), HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     public ResponseEntity<HttpStatus> updateGuildRoleSettings(String serverId, GuildRole newSettings) {
-        if (serverByServerIdExists(serverId)) {
-            ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+        ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+        if (currentServerSettings != null) {
             currentServerSettings.setAutomaticGuildRoles(newSettings);
             settingsRepository.save(currentServerSettings);
             return new ResponseEntity<>(HttpStatus.OK);
@@ -304,49 +301,54 @@ public class ServerSettingsService {
 
     }
 
-    public ResponseEntity<?> getApplyUsersCache(String serverId) {
-        if (serverByServerIdExists(serverId)) {
-            return new ResponseEntity<>(
-                    settingsRepository.findServerByServerId(serverId).getAutomatedApplication().getApplyUsersCache(),
-                    HttpStatus.OK);
+    public ResponseEntity<?> getApplyUsersCache(String serverId, String name) {
+        AutomatedApplication automatedApplication = getApplySettings(serverId, name);
+
+        if (automatedApplication != null) {
+            return new ResponseEntity<>(automatedApplication.getApplyUsersCache(), HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    public ResponseEntity<HttpStatus> updateApplyUsersCache(String serverId, String newApplyCacheJsonString) {
-        if (serverByServerIdExists(serverId)) {
-            ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
-            AutomatedApplication automatedApplication = currentServerSettings.getAutomatedApplication();
+    public ResponseEntity<HttpStatus> updateApplyUsersCache(String serverId, String name,
+            String newApplyCacheJsonString) {
+        AutomatedApplication automatedApplication = getApplySettings(serverId, name);
+
+        if (automatedApplication != null) {
+
             automatedApplication.setApplyUsersCache(newApplyCacheJsonString);
-            currentServerSettings.setAutomatedApplication(automatedApplication);
-            settingsRepository.save(currentServerSettings);
-            return new ResponseEntity<>(HttpStatus.OK);
+
+            return updateApplySettings(serverId, automatedApplication);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     public ResponseEntity<?> getSkyblockEventSettings(String serverId) {
-        if (serverByServerIdExists(serverId)) {
-            return new ResponseEntity<>(settingsRepository.findServerByServerId(serverId).getSbEvent(), HttpStatus.OK);
+        ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+        if (currentServerSettings != null) {
+            return new ResponseEntity<>(currentServerSettings.getSbEvent(), HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     public ResponseEntity<?> getRunningSkyblockEventSettings(String serverId) {
-        if (serverByServerIdExists(serverId)) {
+        ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+        if (currentServerSettings != null) {
             if (getSkyblockEventActive(serverId)) {
-                return new ResponseEntity<>(
-                        settingsRepository.findServerByServerId(serverId).getSbEvent().getRunningEvent(),
-                        HttpStatus.OK);
+                return new ResponseEntity<>(currentServerSettings.getSbEvent().getRunningEvent(), HttpStatus.OK);
             }
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     public boolean getSkyblockEventActive(String serverId) {
-        if (serverByServerIdExists(serverId)) {
+        ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+        if (currentServerSettings != null) {
             try {
-                if (settingsRepository.findServerByServerId(serverId).getSbEvent().getEventActive().equals("true")) {
+                if (currentServerSettings.getSbEvent().getEventActive().equals("true")) {
                     return true;
                 }
             } catch (Exception ignored) {
@@ -356,8 +358,9 @@ public class ServerSettingsService {
     }
 
     public ResponseEntity<HttpStatus> updateSkyblockRunningEvent(String serverId, RunningEvent newSettings) {
-        if (serverByServerIdExists(serverId)) {
-            ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+        ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+        if (currentServerSettings != null) {
             SbEvent currentSbEventSettings = currentServerSettings.getSbEvent();
             currentSbEventSettings.setRunningEvent(newSettings);
             currentServerSettings.setSbEvent(currentSbEventSettings);
@@ -368,8 +371,9 @@ public class ServerSettingsService {
     }
 
     public ResponseEntity<HttpStatus> updateSkyblockEventSettings(String serverId, SbEvent newSettings) {
-        if (serverByServerIdExists(serverId)) {
-            ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+        ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+        if (currentServerSettings != null) {
             currentServerSettings.setSbEvent(newSettings);
             settingsRepository.save(currentServerSettings);
             return new ResponseEntity<>(HttpStatus.OK);
@@ -378,10 +382,11 @@ public class ServerSettingsService {
     }
 
     public ResponseEntity<HttpStatus> addEventMemberToRunningEvent(String serverId, EventMember newEventMember) {
-        if (serverByServerIdExists(serverId)) {
+        ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+        if (currentServerSettings != null) {
             if (getSkyblockEventActive(serverId)) {
-                RunningEvent runningEvent = settingsRepository.findServerByServerId(serverId).getSbEvent()
-                        .getRunningEvent();
+                RunningEvent runningEvent = currentServerSettings.getSbEvent().getRunningEvent();
                 List<EventMember> eventMembers = runningEvent.getMembersList();
                 eventMembers.add(newEventMember);
                 runningEvent.setMembersList(eventMembers);
@@ -393,10 +398,11 @@ public class ServerSettingsService {
     }
 
     public ResponseEntity<?> getSkyblockEventGuildId(String serverId) {
-        if (serverByServerIdExists(serverId)) {
+        ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+        if (currentServerSettings != null) {
             if (getSkyblockEventActive(serverId)) {
-                RunningEvent runningEvent = settingsRepository.findServerByServerId(serverId).getSbEvent()
-                        .getRunningEvent();
+                RunningEvent runningEvent = currentServerSettings.getSbEvent().getRunningEvent();
 
                 return new ResponseEntity<>(runningEvent.getEventGuildId(), HttpStatus.OK);
             }
@@ -405,10 +411,11 @@ public class ServerSettingsService {
     }
 
     public ResponseEntity<HttpStatus> removeEventMemberToRunningEvent(String serverId, String minecraftUuid) {
-        if (serverByServerIdExists(serverId)) {
+        ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+        if (currentServerSettings != null) {
             if (getSkyblockEventActive(serverId)) {
-                RunningEvent runningEvent = settingsRepository.findServerByServerId(serverId).getSbEvent()
-                        .getRunningEvent();
+                RunningEvent runningEvent = currentServerSettings.getSbEvent().getRunningEvent();
                 List<EventMember> eventMembers = runningEvent.getMembersList();
                 eventMembers.removeIf(eventMember -> eventMember.getUuid().equals(minecraftUuid));
                 runningEvent.setMembersList(eventMembers);
@@ -420,10 +427,11 @@ public class ServerSettingsService {
     }
 
     public boolean eventHasMemberByUuid(String serverId, String minecraftUuid) {
-        if (serverByServerIdExists(serverId)) {
+        ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+        if (currentServerSettings != null) {
             if (getSkyblockEventActive(serverId)) {
-                RunningEvent runningEvent = settingsRepository.findServerByServerId(serverId).getSbEvent()
-                        .getRunningEvent();
+                RunningEvent runningEvent = currentServerSettings.getSbEvent().getRunningEvent();
                 List<EventMember> eventMembers = runningEvent.getMembersList();
                 for (EventMember eventMember : eventMembers) {
                     if (eventMember.getUuid().equals(minecraftUuid)) {
@@ -435,25 +443,94 @@ public class ServerSettingsService {
         return false;
     }
 
-    public ResponseEntity<?> getApplyReqs(String serverId) {
-        if (serverByServerIdExists(serverId)) {
-            return new ResponseEntity<>(
-                    settingsRepository.findServerByServerId(serverId).getAutomatedApplication().getApplyReqs(),
-                    HttpStatus.OK);
+    public ResponseEntity<?> getApplyReqs(String serverId, String name) {
+        AutomatedApplication applySettings = getApplySettings(serverId, name);
+
+        if (applySettings != null) {
+            return new ResponseEntity<>(applySettings.getApplyReqs(), HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    public ResponseEntity<HttpStatus> updateApplyReqs(String serverId, ApplyRequirements[] newReqs) {
-        if (serverByServerIdExists(serverId)) {
-            ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
-            AutomatedApplication currentApplySettings = currentServerSettings.getAutomatedApplication();
-            currentApplySettings.setApplyReqs(new ArrayList<>(Arrays.asList(newReqs)));
-            currentServerSettings.setAutomatedApplication(currentApplySettings);
+    public ResponseEntity<HttpStatus> updateApplyReqs(String serverId, String name, ApplyRequirements[] newReqs) {
+        AutomatedApplication applySettings = getApplySettings(serverId, name);
+
+        if (applySettings != null) {
+            applySettings.setApplyReqs(new ArrayList<>(Arrays.asList(newReqs)));
+            return updateApplySettings(serverId, applySettings);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+    }
+
+    public List<AutomatedApplication> getAllApplySettings(String serverId) {
+        ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+        if (currentServerSettings != null) {
+            return new ArrayList<>(Arrays.asList(currentServerSettings.getAutomatedApplicationOne(),
+                    currentServerSettings.getAutomatedApplicationTwo()));
+        }
+        return null;
+    }
+
+    public ResponseEntity<HttpStatus> updateApplySettings(String serverId, AutomatedApplication newSettings) {
+        ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+        if (currentServerSettings != null) {
+            String applySettingsName = newSettings.getName();
+            if (applySettingsName == null || applySettingsName.length() == 0) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            if (currentServerSettings.getAutomatedApplicationOne().getName() != null && currentServerSettings
+                    .getAutomatedApplicationOne().getName().equalsIgnoreCase(applySettingsName)) {
+                currentServerSettings.setAutomatedApplicationOne(newSettings);
+            } else if (currentServerSettings.getAutomatedApplicationTwo().getName() != null && currentServerSettings
+                    .getAutomatedApplicationTwo().getName().equalsIgnoreCase(applySettingsName)) {
+                currentServerSettings.setAutomatedApplicationTwo(newSettings);
+            } else {
+                if (currentServerSettings.getAutomatedApplicationOne().getName() == null) {
+                    currentServerSettings.setAutomatedApplicationOne(newSettings);
+                } else if (currentServerSettings.getAutomatedApplicationTwo().getName() == null) {
+                    currentServerSettings.setAutomatedApplicationTwo(newSettings);
+                } else {
+                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                }
+            }
+
             settingsRepository.save(currentServerSettings);
             return new ResponseEntity<>(HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
 
+    public AutomatedApplication getApplySettings(String serverId, String name) {
+        ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+        if (currentServerSettings != null) {
+            if (currentServerSettings.getAutomatedApplicationOne().getName() != null
+                    && currentServerSettings.getAutomatedApplicationOne().getName().equalsIgnoreCase(name)) {
+                return currentServerSettings.getAutomatedApplicationOne();
+            } else if (currentServerSettings.getAutomatedApplicationTwo().getName() != null
+                    && currentServerSettings.getAutomatedApplicationTwo().getName().equalsIgnoreCase(name)) {
+                return currentServerSettings.getAutomatedApplicationTwo();
+            }
+        }
+        return null;
+    }
+
+    public ResponseEntity<?> getApplySettingsExt(String serverId, String name) {
+        ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+        if (currentServerSettings != null) {
+            if (currentServerSettings.getAutomatedApplicationOne().getName() != null
+                    && currentServerSettings.getAutomatedApplicationOne().getName().equalsIgnoreCase(name)) {
+                return new ResponseEntity<>(currentServerSettings.getAutomatedApplicationOne(), HttpStatus.OK);
+            } else if (currentServerSettings.getAutomatedApplicationTwo().getName() != null
+                    && currentServerSettings.getAutomatedApplicationTwo().getName().equalsIgnoreCase(name)) {
+                return new ResponseEntity<>(currentServerSettings.getAutomatedApplicationTwo(), HttpStatus.OK);
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 }

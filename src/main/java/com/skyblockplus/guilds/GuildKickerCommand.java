@@ -1,25 +1,23 @@
 package com.skyblockplus.guilds;
 
+import static com.skyblockplus.Main.waiter;
 import static com.skyblockplus.utils.Utils.HYPIXEL_API_KEY;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.defaultPaginator;
 import static com.skyblockplus.utils.Utils.errorMessage;
 import static com.skyblockplus.utils.Utils.formatNumber;
 import static com.skyblockplus.utils.Utils.getJson;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.globalCooldown;
 import static com.skyblockplus.utils.Utils.higherDepth;
 import static com.skyblockplus.utils.Utils.loadingEmbed;
 import static com.skyblockplus.utils.Utils.logCommand;
 import static com.skyblockplus.utils.Utils.roundAndFormat;
 import static com.skyblockplus.utils.Utils.usernameToUuid;
 
-import java.util.Arrays;
-import static com.skyblockplus.Main.waiter;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
@@ -89,8 +87,6 @@ public class GuildKickerCommand extends Command {
 
             reqsArr[i] = reqsArr[i].replace("[", "").replace("]", "");
         }
-
-        System.out.println(Arrays.toString(reqsArr));
 
         UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
         JsonElement guildJson = getJson("https://api.hypixel.net/findGuild?key=" + HYPIXEL_API_KEY + "&byUuid="

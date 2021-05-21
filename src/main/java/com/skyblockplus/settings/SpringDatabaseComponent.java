@@ -1,6 +1,12 @@
 package com.skyblockplus.settings;
 
-import com.google.gson.*;
+import java.util.List;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.skyblockplus.api.discordserversettings.automatedapplication.ApplyRequirements;
 import com.skyblockplus.api.discordserversettings.automatedapplication.AutomatedApplication;
 import com.skyblockplus.api.discordserversettings.automatedguildroles.GuildRole;
@@ -13,11 +19,10 @@ import com.skyblockplus.api.discordserversettings.skyblockevent.EventMember;
 import com.skyblockplus.api.discordserversettings.skyblockevent.SbEvent;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @Transactional
@@ -89,16 +94,6 @@ public class SpringDatabaseComponent {
                 .getStatusCodeValue();
     }
 
-    public JsonElement getApplySettings(String serverId) {
-        return gson.toJsonTree(settingsService.getApplySettings(serverId).getBody());
-    }
-
-    public int updateApplySettings(String serverId, JsonElement newApplySettings) {
-        return settingsService
-                .updateApplySettings(serverId, gson.fromJson(newApplySettings, AutomatedApplication.class))
-                .getStatusCodeValue();
-    }
-
     public JsonElement getRolesSettings(String serverId) {
         return gson.toJsonTree(settingsService.getRolesSettings(serverId).getBody());
     }
@@ -130,20 +125,20 @@ public class SpringDatabaseComponent {
                 .getStatusCodeValue();
     }
 
-    public int updateApplyCacheSettings(String serverId, String currentSettings) {
-        return settingsService.updateApplyUsersCache(serverId, currentSettings).getStatusCodeValue();
+    public int updateApplyCacheSettings(String serverId, String name, String currentSettings) {
+        return settingsService.updateApplyUsersCache(serverId, name, currentSettings).getStatusCodeValue();
     }
 
-    public JsonElement getApplyCacheSettings(String serverId) {
+    public JsonElement getApplyCacheSettings(String serverId, String name) {
         try {
-            return JsonParser.parseString((String) settingsService.getApplyUsersCache(serverId).getBody());
+            return JsonParser.parseString((String) settingsService.getApplyUsersCache(serverId, name).getBody());
         } catch (Exception e) {
             return JsonParser.parseString("[]");
         }
     }
 
-    public int deleteApplyCacheSettings(String serverId) {
-        return settingsService.updateApplyUsersCache(serverId, "[]").getStatusCodeValue();
+    public int deleteApplyCacheSettings(String serverId, String name) {
+        return settingsService.updateApplyUsersCache(serverId, name, "[]").getStatusCodeValue();
     }
 
     public int updateSkyblockEventSettings(String serverId, SbEvent currentSettings) {
@@ -174,12 +169,29 @@ public class SpringDatabaseComponent {
         return settingsService.eventHasMemberByUuid(serverId, minecraftUuid);
     }
 
-    public JsonElement getApplyReqs(String serverId) {
-        return gson.toJsonTree(settingsService.getApplyReqs(serverId).getBody());
+    public JsonElement getApplyReqs(String serverId, String name) {
+        return gson.toJsonTree(settingsService.getApplyReqs(serverId, name).getBody());
     }
 
-    public int updateApplyReqs(String serverId, JsonArray newApplyReqs) {
-        return settingsService.updateApplyReqs(serverId, gson.fromJson(newApplyReqs, ApplyRequirements[].class))
+    public int updateApplyReqs(String serverId, String name, JsonArray newApplyReqs) {
+        return settingsService.updateApplyReqs(serverId, name, gson.fromJson(newApplyReqs, ApplyRequirements[].class))
+                .getStatusCodeValue();
+    }
+
+    public List<AutomatedApplication> getAllApplySettings(String serverId) {
+        return settingsService.getAllApplySettings(serverId);
+    }
+
+    public JsonElement getApplySettings(String serverId, String name) {
+        return gson.toJsonTree(settingsService.getApplySettingsExt(serverId, name).getBody());
+    }
+
+    public int updateApplySettings(String serverId, AutomatedApplication newSettings) {
+        return settingsService.updateApplySettings(serverId, newSettings).getStatusCodeValue();
+    }
+
+    public int updateApplySettings(String serverId, JsonElement newSettings) {
+        return settingsService.updateApplySettings(serverId, gson.fromJson(newSettings, AutomatedApplication.class))
                 .getStatusCodeValue();
     }
 }

@@ -20,7 +20,7 @@ public class BinCommand extends Command {
     public BinCommand() {
         this.name = "bin";
         this.cooldown = globalCooldown;
-        this.aliases = new String[]{"lbin"};
+        this.aliases = new String[] { "lbin" };
     }
 
     @Override
@@ -178,7 +178,6 @@ public class BinCommand extends Command {
                 eb.addField(capitalizeString(closestMatch.toLowerCase().replace("_", " ").replace(";", " ")),
                         formatNumber(higherDepth(lowestBinJson, closestMatch).getAsLong()), false);
             } else if (petNames.contains(closestMatch.split(";")[0].trim())) {
-                System.out.println(closestMatch);
                 Map<String, String> rarityMapRev = new HashMap<>();
                 rarityMapRev.put("4", "LEGENDARY");
                 rarityMapRev.put("3", "EPIC");
@@ -187,7 +186,8 @@ public class BinCommand extends Command {
                 rarityMapRev.put("0", "COMMON");
                 String[] itemS = closestMatch.split(";");
                 eb.setThumbnail(getPetUrl(itemS[0]));
-                eb.addField(capitalizeString(rarityMapRev.get(itemS[1].toUpperCase()) + " " + itemS[0].replace("_", " ")),
+                eb.addField(
+                        capitalizeString(rarityMapRev.get(itemS[1].toUpperCase()) + " " + itemS[0].replace("_", " ")),
                         formatNumber(higherDepth(lowestBinJson, closestMatch).getAsLong()), false);
             } else {
                 eb.setThumbnail("https://sky.lea.moe/item.gif/" + closestMatch);

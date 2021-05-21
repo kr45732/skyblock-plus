@@ -18,6 +18,8 @@ import lombok.Data;
 @AllArgsConstructor
 @Embeddable
 public class AutomatedApplication {
+    private String name = "";
+
     private String enable = "false";
     private String messageTextChannelId = "";
     private String messageStaffChannelId = "";
@@ -48,5 +50,9 @@ public class AutomatedApplication {
     private List<ApplyRequirements> applyReqs = new ArrayList<>();
 
     public AutomatedApplication() {
+    }
+
+    public AutomatedApplication(String name) {
+        this.name = name;
     }
 }

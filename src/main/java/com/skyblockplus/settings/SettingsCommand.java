@@ -8,6 +8,7 @@ import com.google.gson.reflect.TypeToken;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.discordserversettings.automatedapplication.ApplyRequirements;
+import com.skyblockplus.api.discordserversettings.automatedapplication.AutomatedApplication;
 import com.skyblockplus.api.discordserversettings.automatedguildroles.GuildRank;
 import com.skyblockplus.api.discordserversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.discordserversettings.automatedroles.RoleObject;
@@ -161,78 +162,110 @@ public class SettingsCommand extends Command {
 
                 ebMessage.editMessage(eb.build()).queue();
                 return;
-            } else if (content.split(" ", 4).length >= 2 && content.split(" ", 4)[1].equals("apply")) {
-                args = content.split(" ", 4);
+            } else if (content.split(" ", 5).length >= 2 && content.split(" ", 5)[1].equals("apply")) {
+                args = content.split(" ", 5);
                 if (args.length == 2) {
-                    eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
-                    if (higherDepth(currentSettings, "automatedApplication") != null) {
-                        eb = getCurrentApplySettings(higherDepth(currentSettings, "automatedApplication"));
-                    } else {
-                        eb.addField("Apply Settings", "Error! Data not found", false);
-                    }
+                    eb = defaultEmbed("All Apply Settings");
+                    eb.addField("Automatic Apply One",
+                            (higherDepth(currentSettings, "automatedApplicationOne.name") != null ? "Name: "
+                                    + higherDepth(currentSettings, "automatedApplicationOne.name").getAsString()
+                                    + "\nCommand: `" + BOT_PREFIX + "settings apply "
+                                    + higherDepth(currentSettings, "automatedApplicationOne.name").getAsString() + "`"
+                                    + "" : "Not setup"),
+                            false);
+                    eb.addField("Automatic Apply Two",
+                            (higherDepth(currentSettings, "automatedApplicationTwo.name") != null ? "Name: "
+                                    + higherDepth(currentSettings, "automatedApplicationTwo.name").getAsString()
+                                    + "\nCommand: `" + BOT_PREFIX + "settings apply "
+                                    + higherDepth(currentSettings, "automatedApplicationTwo.name").getAsString() + "`"
+                                    + "" : "Not setup"),
+                            false);
                 } else if (args.length == 3) {
-                    if (args[2].equals("enable")) {
-                        if (allowApplyEnable()) {
-                            eb = setApplyEnable("true");
-                        } else {
-                            eb = defaultEmbed("Error", null)
-                                    .setDescription("All other apply settings must be set before " + "enabling apply!");
-                        }
-                    } else if (args[2].equals("disable")) {
-                        eb = setApplyEnable("false");
+                    eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+                    JsonElement applySettings = database.getApplySettings(event.getGuild().getId(), args[2]);
+                    if (!applySettings.isJsonNull()) {
+                        eb = getCurrentApplySettings(applySettings);
                     } else {
-                        eb = defaultEmbed("Error", null).setDescription("Invalid setting");
+                        eb = defaultEmbed("Error").setDescription("Invalid name");
                     }
                 } else if (args.length == 4) {
-                    switch (args[2]) {
-                        case "message":
-                            eb = setApplyMessageText(args[3]);
-                            break;
-                        case "staff_role":
-                            eb = setApplyStaffPingRoleId(args[3]);
-                            break;
-                        case "channel":
-                            eb = setApplyMessageTextChannelId(args[3]);
-                            break;
-                        case "prefix":
-                            eb = setApplyNewChannelPrefix(args[3]);
-                            break;
-                        case "category":
-                            eb = setApplyNewChannelCategory(args[3]);
-                            break;
-                        case "staff_channel":
-                            eb = setApplyMessageStaffChannelId(args[3]);
-                            break;
-                        case "accept_message":
-                            eb = setApplyAcceptMessageText(args[3]);
-                            break;
-                        case "waitlist_message":
-                            eb = setApplyWaitListMessageText(args[3]);
-                            break;
-                        case "deny_message":
-                            eb = setApplyDenyMessageText(args[3]);
-                            break;
-                        case "reqs":
-                        case "req":
-                        case "requirements":
-                            args = content.split(" ");
+                    if (args[2].equals("create")) {
+                        eb = createApplyGuild(args[3]);
+                    } else {
+                        if (!database.getApplySettings(event.getGuild().getId(), args[2]).isJsonNull()) {
+                            if (args[3].equals("enable")) {
+                                if (allowApplyEnable(args[2])) {
+                                    eb = setApplyEnable(args[2], "true");
+                                } else {
+                                    eb = defaultEmbed("Error", null).setDescription(
+                                            "All other apply settings must be set before " + "enabling apply!");
+                                }
+                            } else if (args[3].equals("disable")) {
+                                eb = setApplyEnable(args[2], "false");
+                            } else {
+                                eb = defaultEmbed("Error", null).setDescription("Invalid setting");
+                            }
+                        } else {
+                            eb = defaultEmbed("Error").setDescription("Invalid name");
+                        }
+                    }
 
-                            if (args.length >= 5) {
-                                if (args[3].equals("add")) {
-                                    eb = addApplyRequirement(content.split(" ", 5)[4]);
-                                } else if (args[3].equals("remove")) {
-                                    eb = removeApplyRequirement(args[4]);
+                } else if (args.length == 5) {
+                    if (database.getApplySettings(event.getGuild().getId(), args[2]).isJsonNull()) {
+                        eb = defaultEmbed("Error", null).setDescription("Invalid name");
+                    } else {
+
+                        switch (args[3]) {
+                            case "message":
+                                eb = setApplyMessageText(args[2], args[4]);
+                                break;
+                            case "staff_role":
+                                eb = setApplyStaffPingRoleId(args[2], args[4]);
+                                break;
+                            case "channel":
+                                eb = setApplyMessageTextChannelId(args[2], args[4]);
+                                break;
+                            case "prefix":
+                                eb = setApplyNewChannelPrefix(args[2], args[4]);
+                                break;
+                            case "category":
+                                eb = setApplyNewChannelCategory(args[2], args[4]);
+                                break;
+                            case "staff_channel":
+                                eb = setApplyMessageStaffChannelId(args[2], args[4]);
+                                break;
+                            case "accept_message":
+                                eb = setApplyAcceptMessageText(args[2], args[4]);
+                                break;
+                            case "waitlist_message":
+                                eb = setApplyWaitListMessageText(args[2], args[4]);
+                                break;
+                            case "deny_message":
+                                eb = setApplyDenyMessageText(args[2], args[4]);
+                                break;
+                            case "reqs":
+                            case "req":
+                            case "requirements":
+                                args = content.split(" ");
+
+                                if (args.length >= 6) {
+                                    if (args[4].equals("add")) {
+                                        eb = addApplyRequirement(args[2], content.split(" ", 6)[5]);
+                                    } else if (args[4].equals("remove")) {
+                                        eb = removeApplyRequirement(args[2], args[5]);
+                                    } else {
+                                        eb = defaultEmbed("Error").setDescription("Invalid setting");
+                                    }
                                 } else {
                                     eb = defaultEmbed("Error").setDescription("Invalid setting");
                                 }
-                            } else {
-                                eb = defaultEmbed("Error").setDescription("Invalid setting");
-                            }
-                            break;
-                        default:
-                            eb = defaultEmbed("Error", null).setDescription("Invalid setting");
-                            break;
+                                break;
+                            default:
+                                eb = defaultEmbed("Error", null).setDescription("Invalid setting");
+                                break;
+                        }
                     }
+
                 }
             } else if (content.split(" ", 4).length >= 2 && content.split(" ", 4)[1].equals("verify")) {
                 args = content.split(" ", 4);
@@ -333,6 +366,36 @@ public class SettingsCommand extends Command {
 
             ebMessage.editMessage(eb.build()).queue();
         }).start();
+    }
+
+    private EmbedBuilder createApplyGuild(String name) {
+        if (name.length() > 25) {
+            return defaultEmbed("Error").setDescription("Name cannot be more than 25 letters");
+        }
+
+        List<AutomatedApplication> currentApplys = database.getAllApplySettings(event.getGuild().getId());
+        currentApplys.removeIf(o1 -> o1.getName() == null);
+
+        if (currentApplys.size() == 2) {
+            return defaultEmbed("Error").setDescription("You can reached the max amount of apply guilds (2/2)");
+        }
+
+        for (AutomatedApplication currentApply : currentApplys) {
+            if (currentApply.getName().equalsIgnoreCase(name)) {
+                return defaultEmbed("Error").setDescription(name + " name is taken");
+            }
+        }
+
+        AutomatedApplication newApply = new AutomatedApplication(name);
+
+        int responseCode = database.updateApplySettings(event.getGuild().getId(), newApply);
+        if (responseCode != 200) {
+            return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+        }
+
+        EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName());
+        eb.setDescription("Created new apply guild with name `" + name + "`");
+        return eb;
     }
 
     /* Guild Role Settings */
@@ -1189,8 +1252,8 @@ public class SettingsCommand extends Command {
         return eb;
     }
 
-    private boolean allowApplyEnable() {
-        JsonObject currentSettings = database.getApplySettings(event.getGuild().getId()).getAsJsonObject();
+    private boolean allowApplyEnable(String name) {
+        JsonObject currentSettings = database.getApplySettings(event.getGuild().getId(), name).getAsJsonObject();
         currentSettings.remove("previousMessageId");
         currentSettings.remove("applyUsersCache");
         currentSettings.remove("waitlistedMessageText");
@@ -1204,9 +1267,9 @@ public class SettingsCommand extends Command {
         return true;
     }
 
-    private EmbedBuilder setApplyEnable(String enable) {
+    private EmbedBuilder setApplyEnable(String name, String enable) {
         if (enable.equalsIgnoreCase("true") || enable.equalsIgnoreCase("false")) {
-            int responseCode = updateApplySettings("enable", enable);
+            int responseCode = updateApplySettings(name, "enable", enable);
             if (responseCode != 200) {
                 return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
             }
@@ -1219,12 +1282,12 @@ public class SettingsCommand extends Command {
         return defaultEmbed("Invalid Input", null);
     }
 
-    private EmbedBuilder setApplyMessageTextChannelId(String textChannel) {
+    private EmbedBuilder setApplyMessageTextChannelId(String name, String textChannel) {
         try {
             TextChannel applyMessageTextChannel = event.getGuild()
                     .getTextChannelById(textChannel.replaceAll("[<#>]", ""));
 
-            int responseCode = updateApplySettings("messageTextChannelId", applyMessageTextChannel.getId());
+            int responseCode = updateApplySettings(name, "messageTextChannelId", applyMessageTextChannel.getId());
             if (responseCode != 200) {
                 return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
             }
@@ -1237,10 +1300,10 @@ public class SettingsCommand extends Command {
         return defaultEmbed("Invalid Text Channel", null);
     }
 
-    private EmbedBuilder setApplyMessageStaffChannelId(String textChannel) {
+    private EmbedBuilder setApplyMessageStaffChannelId(String name, String textChannel) {
         try {
             TextChannel staffTextChannel = event.getGuild().getTextChannelById(textChannel.replaceAll("[<#>]", ""));
-            int responseCode = updateApplySettings("messageStaffChannelId", staffTextChannel.getId());
+            int responseCode = updateApplySettings(name, "messageStaffChannelId", staffTextChannel.getId());
             if (responseCode != 200) {
                 return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
             }
@@ -1253,12 +1316,12 @@ public class SettingsCommand extends Command {
         return defaultEmbed("Invalid Text Channel", null);
     }
 
-    private EmbedBuilder setApplyNewChannelPrefix(String channelPrefix) {
+    private EmbedBuilder setApplyNewChannelPrefix(String name, String channelPrefix) {
         if (channelPrefix.length() > 0) {
             if (EmojiParser.parseToAliases(channelPrefix).length() > 25) {
                 return defaultEmbed("Error", null).setDescription("Prefix cannot be longer than 25 letters!");
             }
-            int responseCode = updateApplySettings("newChannelPrefix", EmojiParser.parseToAliases(channelPrefix));
+            int responseCode = updateApplySettings(name, "newChannelPrefix", EmojiParser.parseToAliases(channelPrefix));
             if (responseCode != 200) {
                 return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
             }
@@ -1270,12 +1333,12 @@ public class SettingsCommand extends Command {
         return defaultEmbed("Invalid Input", null);
     }
 
-    private EmbedBuilder setApplyMessageText(String verifyText) {
+    private EmbedBuilder setApplyMessageText(String name, String verifyText) {
         if (verifyText.length() > 0) {
             if (EmojiParser.parseToAliases(verifyText).length() > 1500) {
                 return defaultEmbed("Error", null).setDescription("Text cannot be longer than 1500 letters!");
             }
-            int responseCode = updateApplySettings("messageText", EmojiParser.parseToAliases(verifyText));
+            int responseCode = updateApplySettings(name, "messageText", EmojiParser.parseToAliases(verifyText));
             if (responseCode != 200) {
                 return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
             }
@@ -1287,13 +1350,13 @@ public class SettingsCommand extends Command {
         return defaultEmbed("Invalid Input", null);
     }
 
-    private EmbedBuilder setApplyAcceptMessageText(String verifyText) {
+    private EmbedBuilder setApplyAcceptMessageText(String name, String verifyText) {
         if (verifyText.length() > 0) {
             if (EmojiParser.parseToAliases(verifyText).length() > 1500) {
                 return defaultEmbed("Error", null).setDescription("Text cannot be longer than 1500 letters!");
             }
 
-            int responseCode = updateApplySettings("acceptMessageText", EmojiParser.parseToAliases(verifyText));
+            int responseCode = updateApplySettings(name, "acceptMessageText", EmojiParser.parseToAliases(verifyText));
             if (responseCode != 200) {
                 return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
             }
@@ -1305,7 +1368,7 @@ public class SettingsCommand extends Command {
         return defaultEmbed("Invalid Input", null);
     }
 
-    private EmbedBuilder setApplyWaitListMessageText(String verifyText) {
+    private EmbedBuilder setApplyWaitListMessageText(String name, String verifyText) {
         if (verifyText.length() > 0) {
             if (verifyText.equalsIgnoreCase("none")) {
                 int responseCode = updateVerifySettings("waitlistedMessageText", "none");
@@ -1323,7 +1386,8 @@ public class SettingsCommand extends Command {
                 return defaultEmbed("Error", null).setDescription("Text cannot be longer than 1500 letters!");
             }
 
-            int responseCode = updateApplySettings("waitlistedMessageText", EmojiParser.parseToAliases(verifyText));
+            int responseCode = updateApplySettings(name, "waitlistedMessageText",
+                    EmojiParser.parseToAliases(verifyText));
             if (responseCode != 200) {
                 return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
             }
@@ -1335,13 +1399,13 @@ public class SettingsCommand extends Command {
         return defaultEmbed("Invalid Input", null);
     }
 
-    private EmbedBuilder setApplyDenyMessageText(String denyText) {
+    private EmbedBuilder setApplyDenyMessageText(String name, String denyText) {
         if (denyText.length() > 0) {
             if (EmojiParser.parseToAliases(denyText).length() > 1500) {
                 return defaultEmbed("Error", null).setDescription("Text cannot be longer than 1500 letters!");
             }
 
-            int responseCode = updateApplySettings("denyMessageText", EmojiParser.parseToAliases(denyText));
+            int responseCode = updateApplySettings(name, "denyMessageText", EmojiParser.parseToAliases(denyText));
             if (responseCode != 200) {
                 return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
             }
@@ -1353,11 +1417,11 @@ public class SettingsCommand extends Command {
         return defaultEmbed("Invalid Input", null);
     }
 
-    private EmbedBuilder setApplyStaffPingRoleId(String staffPingRoleMention) {
+    private EmbedBuilder setApplyStaffPingRoleId(String name, String staffPingRoleMention) {
         try {
             Role verifyGuildRole = event.getGuild().getRoleById(staffPingRoleMention.replaceAll("[<@&>]", ""));
             if (!(verifyGuildRole.isPublicRole() || verifyGuildRole.isManaged())) {
-                int responseCode = updateApplySettings("staffPingRoleId", verifyGuildRole.getId());
+                int responseCode = updateApplySettings(name, "staffPingRoleId", verifyGuildRole.getId());
                 if (responseCode != 200) {
                     return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
                 }
@@ -1371,11 +1435,11 @@ public class SettingsCommand extends Command {
         return defaultEmbed("Invalid Role", null);
     }
 
-    private EmbedBuilder setApplyNewChannelCategory(String messageCategory) {
+    private EmbedBuilder setApplyNewChannelCategory(String name, String messageCategory) {
         try {
             net.dv8tion.jda.api.entities.Category applyCategory = event.getGuild()
                     .getCategoryById(messageCategory.replaceAll("[<#>]", ""));
-            int responseCode = updateApplySettings("newChannelCategory", applyCategory.getId());
+            int responseCode = updateApplySettings(name, "newChannelCategory", applyCategory.getId());
             if (responseCode != 200) {
                 return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
             }
@@ -1388,10 +1452,10 @@ public class SettingsCommand extends Command {
         return defaultEmbed("Invalid Guild Category", null);
     }
 
-    private EmbedBuilder removeApplyRequirement(String reqNumber) {
+    private EmbedBuilder removeApplyRequirement(String name, String reqNumber) {
         JsonArray currentReqs;
         try {
-            currentReqs = database.getApplyReqs(event.getGuild().getId()).getAsJsonArray();
+            currentReqs = database.getApplyReqs(event.getGuild().getId(), name).getAsJsonArray();
         } catch (Exception ignored) {
             return defaultEmbed("Error").setDescription("Unable to get current settings");
         }
@@ -1400,7 +1464,7 @@ public class SettingsCommand extends Command {
             JsonElement req = currentReqs.get(Integer.parseInt(reqNumber) - 1);
             currentReqs.remove(Integer.parseInt(reqNumber) - 1);
 
-            int responseCode = database.updateApplyReqs(event.getGuild().getId(), currentReqs);
+            int responseCode = database.updateApplyReqs(event.getGuild().getId(), name, currentReqs);
 
             if (responseCode != 200) {
                 return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
@@ -1419,10 +1483,10 @@ public class SettingsCommand extends Command {
         }
     }
 
-    private EmbedBuilder addApplyRequirement(String reqArgs) {
+    private EmbedBuilder addApplyRequirement(String name, String reqArgs) {
         JsonArray currentReqs;
         try {
-            currentReqs = database.getApplyReqs(event.getGuild().getId()).getAsJsonArray();
+            currentReqs = database.getApplyReqs(event.getGuild().getId(), name).getAsJsonArray();
         } catch (Exception ignored) {
             return defaultEmbed("Error").setDescription("Unable to get current settings");
         }
@@ -1461,7 +1525,7 @@ public class SettingsCommand extends Command {
 
         currentReqs.add(new Gson().toJsonTree(toAddReq));
 
-        int responseCode = database.updateApplyReqs(event.getGuild().getId(), currentReqs);
+        int responseCode = database.updateApplyReqs(event.getGuild().getId(), name, currentReqs);
 
         if (responseCode != 200) {
             return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
@@ -1473,8 +1537,8 @@ public class SettingsCommand extends Command {
         return eb;
     }
 
-    private int updateApplySettings(String key, String newValue) {
-        JsonObject newApplyJson = database.getApplySettings(event.getGuild().getId()).getAsJsonObject();
+    private int updateApplySettings(String name, String key, String newValue) {
+        JsonObject newApplyJson = database.getApplySettings(event.getGuild().getId(), name).getAsJsonObject();
         newApplyJson.remove(key);
         newApplyJson.addProperty(key, newValue);
         return database.updateApplySettings(event.getGuild().getId(), newApplyJson);

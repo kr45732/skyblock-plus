@@ -1,9 +1,11 @@
 package com.skyblockplus.eventlisteners;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.api.discordserversettings.automatedapplication.AutomatedApplication;
 import com.skyblockplus.api.discordserversettings.skyblockevent.EventMember;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
 import com.skyblockplus.eventlisteners.apply.ApplyGuild;
@@ -37,7 +39,7 @@ import static com.skyblockplus.utils.Utils.*;
 
 public class AutomaticGuild {
     public final String guildId;
-    public ApplyGuild applyGuild = new ApplyGuild();
+    public List<ApplyGuild> applyGuild = new ArrayList<>();
     public VerifyGuild verifyGuild = new VerifyGuild();
     public SkyblockEvent skyblockEvent = new SkyblockEvent();
     public List<EventMember> eventMemberList = new ArrayList<>();
@@ -66,7 +68,7 @@ public class AutomaticGuild {
         this.eventMemberListLastUpdated = eventMemberListLastUpdated;
     }
 
-    public ApplyGuild getApplyGuild() {
+    public List<ApplyGuild> getApplyGuild() {
         return applyGuild;
     }
 
@@ -225,7 +227,12 @@ public class AutomaticGuild {
     }
 
     public boolean allowApplyReload() {
-        return applyGuild.applyUserListSize() == 0;
+        for (ApplyGuild apply : applyGuild) {
+            if (apply.getApplyUserList().size() != 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public void verifyConstructor(GenericGuildEvent event) {
@@ -276,48 +283,46 @@ public class AutomaticGuild {
     }
 
     public void applyConstructor(GenericGuildEvent event) {
-        JsonElement currentSettings = database.getApplySettings(event.getGuild().getId());
+        List<AutomatedApplication> currentSettings = database.getAllApplySettings(event.getGuild().getId());
         if (currentSettings == null) {
             return;
         }
 
-        try {
-            if (higherDepth(currentSettings, "enable") == null || (higherDepth(currentSettings, "enable") != null
-                    && !higherDepth(currentSettings, "enable").getAsBoolean())) {
-                return;
-            }
+        for (AutomatedApplication currentSetting : currentSettings) {
+            try {
+                if (currentSetting.getEnable() == null || currentSetting.getEnable().equalsIgnoreCase("false")) {
+                    continue;
+                }
 
-            if (higherDepth(currentSettings, "enable").getAsBoolean()) {
                 TextChannel reactChannel = event.getGuild()
-                        .getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
+                        .getTextChannelById(currentSetting.getMessageTextChannelId());
 
                 EmbedBuilder eb = defaultEmbed("Apply For Guild");
-                eb.setDescription(higherDepth(currentSettings, "messageText").getAsString());
+                eb.setDescription(currentSetting.getMessageText());
 
                 try {
-                    Message reactMessage = reactChannel
-                            .retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString())
+                    Message reactMessage = reactChannel.retrieveMessageById(currentSetting.getPreviousMessageId())
                             .complete();
                     reactMessage.editMessage(eb.build()).queue();
 
-                    applyGuild = new ApplyGuild(reactMessage, currentSettings);
-                    return;
-                } catch (Exception ignored) {
+                    applyGuild.removeIf(o1 -> higherDepth(o1.currentSettings, "name").getAsString()
+                            .equals(currentSetting.getName()));
+                    applyGuild.add(new ApplyGuild(reactMessage, new Gson().toJsonTree(currentSetting)));
+                } catch (Exception e) {
+                    Message reactMessage = reactChannel.sendMessage(eb.build()).complete();
+                    reactMessage.addReaction("✅").queue();
+
+                    currentSetting.setPreviousMessageId(reactMessage.getId());
+                    database.updateApplySettings(event.getGuild().getId(), new Gson().toJsonTree(currentSetting));
+
+                    applyGuild.removeIf(o1 -> higherDepth(o1.currentSettings, "name").getAsString()
+                            .equals(currentSetting.getName()));
+                    applyGuild.add(new ApplyGuild(reactMessage, new Gson().toJsonTree(currentSetting)));
                 }
-
-                Message reactMessage = reactChannel.sendMessage(eb.build()).complete();
-                reactMessage.addReaction("✅").queue();
-
-                JsonObject newSettings = currentSettings.getAsJsonObject();
-                newSettings.remove("previousMessageId");
-                newSettings.addProperty("previousMessageId", reactMessage.getId());
-                database.updateApplySettings(event.getGuild().getId(), newSettings);
-
-                applyGuild = new ApplyGuild(reactMessage, currentSettings);
+            } catch (Exception e) {
+                System.out.println("== Stack Trace (Apply constructor error - " + event.getGuild().getId() + ") ==");
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            System.out.println("== Stack Trace (Apply constructor error - " + event.getGuild().getId() + ") ==");
-            e.printStackTrace();
         }
     }
 
@@ -327,52 +332,58 @@ public class AutomaticGuild {
             return "Invalid guild";
         }
 
-        JsonElement currentSettings = database.getApplySettings(guild.getId());
-        if (currentSettings == null) {
-            return "No settings found";
+        List<AutomatedApplication> currentSettings = database.getAllApplySettings(guildId);
+        currentSettings.removeIf(o1 -> o1.getName() == null);
+
+        if (currentSettings.size() == 0) {
+            return "No enabled apply settings";
         }
 
-        try {
-            if (higherDepth(currentSettings, "enable").getAsBoolean()) {
-                TextChannel reactChannel = guild
-                        .getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
+        String applyStr = "";
+        for (AutomatedApplication currentSetting : currentSettings) {
+            try {
+                if (currentSetting.getEnable().equalsIgnoreCase("true")) {
+                    TextChannel reactChannel = guild.getTextChannelById(currentSetting.getMessageTextChannelId());
 
-                EmbedBuilder eb = defaultEmbed("Apply For Guild");
-                eb.setDescription(higherDepth(currentSettings, "messageText").getAsString());
+                    EmbedBuilder eb = defaultEmbed("Apply For Guild");
+                    eb.setDescription(currentSetting.getMessageText());
 
-                try {
-                    Message reactMessage = reactChannel
-                            .retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString())
-                            .complete();
-                    reactMessage.editMessage(eb.build()).queue();
+                    try {
+                        Message reactMessage = reactChannel.retrieveMessageById(currentSetting.getPreviousMessageId())
+                                .complete();
+                        reactMessage.editMessage(eb.build()).queue();
+                        applyGuild.removeIf(o1 -> higherDepth(o1.currentSettings, "name").getAsString()
+                                .equals(currentSetting.getName()));
+                        applyGuild.add(new ApplyGuild(reactMessage, new Gson().toJsonTree(currentSetting)));
+                        applyStr += "Reloaded `" + currentSetting.getName() + "`\n";
+                    } catch (Exception e) {
+                        Message reactMessage = reactChannel.sendMessage(eb.build()).complete();
+                        reactMessage.addReaction("✅").queue();
 
-                    applyGuild = new ApplyGuild(reactMessage, currentSettings);
-                    return "Reloaded";
-                } catch (Exception ignored) {
+                        currentSetting.setPreviousMessageId(reactMessage.getId());
+                        database.updateApplySettings(guild.getId(), new Gson().toJsonTree(currentSetting));
+
+                        applyGuild.removeIf(o1 -> higherDepth(o1.currentSettings, "name").getAsString()
+                                .equals(currentSetting.getName()));
+                        applyGuild.add(new ApplyGuild(reactMessage, new Gson().toJsonTree(currentSetting)));
+                        applyStr += "Reloaded `" + currentSetting.getName() + "`\n";
+                    }
+                } else {
+                    applyGuild.removeIf(o1 -> higherDepth(o1.currentSettings, "name").getAsString()
+                            .equals(currentSetting.getName()));
+                    applyStr += "`" + currentSetting.getName() + "` is disabled\n";
                 }
-
-                Message reactMessage = reactChannel.sendMessage(eb.build()).complete();
-                reactMessage.addReaction("✅").queue();
-
-                JsonObject newSettings = currentSettings.getAsJsonObject();
-                newSettings.remove("previousMessageId");
-                newSettings.addProperty("previousMessageId", reactMessage.getId());
-                database.updateApplySettings(guild.getId(), newSettings);
-
-                applyGuild = new ApplyGuild(reactMessage, currentSettings);
-                return "Reloaded";
-            } else {
-                applyGuild = new ApplyGuild();
-                return "Not enabled";
-            }
-        } catch (Exception e) {
-            System.out.println("== Stack Trace (Reload apply constructor error - " + guildId + ") ==");
-            e.printStackTrace();
-            if (e.getMessage().contains("Missing permission")) {
-                return "Error Reloading\nMissing permission: " + e.getMessage().split("Missing permission: ")[1];
+            } catch (Exception e) {
+                System.out.println("== Stack Trace (Reload apply constructor error - " + guildId + ") ==");
+                e.printStackTrace();
+                if (e.getMessage().contains("Missing permission")) {
+                    applyStr += "Error Reloading\nMissing permission: "
+                            + e.getMessage().split("Missing permission: ")[1] + " for `" + currentSetting.getName()
+                            + "`\n";
+                }
             }
         }
-        return "Error Reloading";
+        return applyStr.length() > 0 ? applyStr : "Error reloading";
     }
 
     public String reloadVerifyConstructor(String guildId) {
@@ -431,7 +442,7 @@ public class AutomaticGuild {
     }
 
     public void onMessageReactionAdd(MessageReactionAddEvent event) {
-        applyGuild.onMessageReactionAdd(event);
+        applyGuild.forEach(o1 -> o1.onMessageReactionAdd(event));
     }
 
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
@@ -447,7 +458,7 @@ public class AutomaticGuild {
     }
 
     public void onTextChannelDelete(TextChannelDeleteEvent event) {
-        applyGuild.onTextChannelDelete(event);
+        applyGuild.forEach(o1 -> o1.onTextChannelDelete(event));
     }
 
     public void createSkyblockEvent(CommandEvent event) {

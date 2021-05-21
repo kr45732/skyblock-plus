@@ -1,21 +1,27 @@
 package com.skyblockplus.guilds;
 
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.formatNumber;
+import static com.skyblockplus.utils.Utils.globalCooldown;
+import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.Utils.loadingEmbed;
+import static com.skyblockplus.utils.Utils.logCommand;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Utils.*;
 
 public class GuildRequirementsCommand extends Command {
 
     public GuildRequirementsCommand() {
         this.name = "guild-requirements";
         this.cooldown = globalCooldown;
-        this.aliases = new String[]{"g-reqs", "guild-reqs"};
+        this.aliases = new String[] { "g-reqs", "guild-reqs" };
     }
 
     @Override
@@ -24,12 +30,16 @@ public class GuildRequirementsCommand extends Command {
             EmbedBuilder eb = loadingEmbed();
             Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
             String content = event.getMessage().getContentRaw();
+            String[] args = content.split(" ");
 
             logCommand(event.getGuild(), event.getAuthor(), content);
-
+            if (args.length != 2) {
+                ebMessage.editMessage(defaultEmbed("Error").setDescription("Invalid name").build()).queue();
+                return;
+            }
             JsonArray guildReqs = null;
             try {
-                guildReqs = database.getApplyReqs(event.getGuild().getId()).getAsJsonArray();
+                guildReqs = database.getApplyReqs(event.getGuild().getId(), args[1]).getAsJsonArray();
             } catch (Exception ignored) {
             }
 
