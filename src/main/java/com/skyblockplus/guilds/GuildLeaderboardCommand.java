@@ -209,8 +209,6 @@ public class GuildLeaderboardCommand extends Command {
                     continue;
                 }
 
-                System.out.println(currentPlayer.getName());
-
                 String playerRank = currentPlayer.getGuildRank().toLowerCase();
                 String playerUsername = currentPlayer.getName();
                 if (topRoleName.contains(playerRank)) {
