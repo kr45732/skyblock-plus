@@ -110,7 +110,7 @@ public class MainClassUtils {
                     .toDays() > 1).findAny().ifPresent(notUpdated -> {
                         try {
                             DiscordInfoStruct discordInfo = getPlayerDiscordInfo(notUpdated.getMinecraftUsername());
-                            User updateUser = jda.getUserById(notUpdated.getDiscordId());
+                            User updateUser = jda.retrieveUserById(notUpdated.getDiscordId()).complete();
                             if (discordInfo.discordTag.equals(updateUser.getAsTag())) {
                                 database.addLinkedUser(new LinkedAccountModel("" + Instant.now().toEpochMilli(),
                                         updateUser.getId(), discordInfo.minecraftUuid, discordInfo.minecraftUsername));

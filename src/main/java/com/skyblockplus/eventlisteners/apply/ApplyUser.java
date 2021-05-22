@@ -129,7 +129,7 @@ public class ApplyUser implements Serializable {
             return false;
         }
 
-        User applyingUser = jda.getUserById(applyingUserId);
+        User applyingUser = jda.retrieveUserById(applyingUserId).complete();
         TextChannel applicationChannel = jda.getTextChannelById(applicationChannelId);
         Message reactMessage = applicationChannel.retrieveMessageById(reactMessageId).complete();
         JsonElement currentSettings = JsonParser.parseString(currentSettingsString);
@@ -290,6 +290,11 @@ public class ApplyUser implements Serializable {
         if (event.getUser().isBot()) {
             return false;
         }
+
+        if (!event.getMessageId().equals(reactMessageId)) {
+            return false;
+        }
+
         TextChannel applicationChannel = jda.getTextChannelById(applicationChannelId);
         try {
             if (shouldDeleteChannel && (event.getMessageId().equals(reactMessageId))) {
@@ -305,15 +310,12 @@ public class ApplyUser implements Serializable {
                 return false;
             }
         } catch (Exception ignored) {
+        }
 
-        }
-        if (!event.getMessageId().equals(reactMessageId)) {
-            return false;
-        }
         JsonElement currentSettings = JsonParser.parseString(currentSettingsString);
 
         TextChannel staffChannel = jda.getTextChannelById(staffChannelId);
-        User applyingUser = jda.getUserById(applyingUserId);
+        User applyingUser = jda.retrieveUserById(applyingUserId).complete();
         Message reactMessage = event.getChannel().retrieveMessageById(event.getMessageId()).complete();
         if (event.getReactionEmote().getEmoji().equals("❌")) {
             reactMessage.clearReactions().queue();
@@ -366,10 +368,21 @@ public class ApplyUser implements Serializable {
             } catch (Exception ignored) {
             }
 
+            try {
+                TextChannel waitInviteChannel = jda
+                        .getTextChannelById(higherDepth(currentSettings, "waitingChannelId").getAsString());
+                waitInviteChannel.sendMessage(defaultEmbed("Waiting for invite")
+                        .setDescription("`" + playerUsername + "`\n\n" + "**React with ✅ to delete this message**")
+                        .build()).complete().addReaction("✅").queue();
+                ;
+            } catch (Exception ignored) {
+            }
+
             this.reactMessageId = reactMessage.getId();
             shouldDeleteChannel = true;
         } else if (event.getReactionEmote().getEmoji().equals("\uD83D\uDD50")) {
             if (higherDepth(currentSettings, "waitlistedMessageText") != null
+                    && higherDepth(currentSettings, "waitlistedMessageText").getAsString().length() > 0
                     && !higherDepth(currentSettings, "waitlistedMessageText").getAsString().equals("none")) {
                 reactMessage.clearReactions().queue();
                 reactMessage.delete().queueAfter(5, TimeUnit.SECONDS);
@@ -392,10 +405,21 @@ public class ApplyUser implements Serializable {
 
                 reactMessage = applicationChannel.sendMessage(eb.build()).complete();
                 reactMessage.addReaction("✅").queue();
+
+                try {
+                    TextChannel waitInviteChannel = jda
+                            .getTextChannelById(higherDepth(currentSettings, "waitingChannelId").getAsString());
+                    waitInviteChannel.sendMessage(defaultEmbed("Waiting for invite")
+                            .setDescription("`" + playerUsername + "`\n\n" + "**React with ✅ to delete this message**")
+                            .build()).complete().addReaction("✅").queue();
+                    ;
+                } catch (Exception ignored) {
+                }
+
+                this.reactMessageId = reactMessage.getId();
+                shouldDeleteChannel = true;
             }
 
-            this.reactMessageId = reactMessage.getId();
-            shouldDeleteChannel = true;
         }
         return false;
     }
@@ -413,8 +437,9 @@ public class ApplyUser implements Serializable {
         applyPlayerStats.addField("Progress average skill level", playerSkills, true);
         applyPlayerStats.addField("Catacombs level", "" + playerCatacombs, true);
         applyPlayerStats.addField("To accept the application,", "React with ✅", true);
-        if (higherDepth(currentSettings, "waitlistedMessageText") != null
-                && !higherDepth(currentSettings, "waitlistedMessageText").getAsString().equals("none")) {
+        JsonElement waitlistMsg = higherDepth(currentSettings, "waitlistedMessageText");
+        if (waitlistMsg != null && waitlistMsg.getAsString().length() > 0
+                && !waitlistMsg.getAsString().equals("none")) {
             applyPlayerStats.addField("To waitlist the application,", "React with \uD83D\uDD50", true);
         }
         applyPlayerStats.addField("To deny the application,", "React with ❌", true);
@@ -422,8 +447,8 @@ public class ApplyUser implements Serializable {
                 .complete();
         Message reactMessage = staffChannel.sendMessage(applyPlayerStats.build()).complete();
         reactMessage.addReaction("✅").queue();
-        if (higherDepth(currentSettings, "waitlistedMessageText") != null
-                && !higherDepth(currentSettings, "waitlistedMessageText").getAsString().equals("none")) {
+        if (waitlistMsg != null && waitlistMsg.getAsString().length() > 0
+                && !waitlistMsg.getAsString().equals("none")) {
             reactMessage.addReaction("\uD83D\uDD50").queue();
         }
         reactMessage.addReaction("❌").queue();

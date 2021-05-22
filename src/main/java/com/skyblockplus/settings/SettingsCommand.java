@@ -183,7 +183,7 @@ public class SettingsCommand extends Command {
                 } else if (args.length == 3) {
                     eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
                     JsonElement applySettings = database.getApplySettings(event.getGuild().getId(), args[2]);
-                    if (!applySettings.isJsonNull()) {
+                    if (applySettings != null && !applySettings.isJsonNull()) {
                         eb = getCurrentApplySettings(applySettings);
                     } else {
                         eb = defaultEmbed("Error").setDescription("Invalid name");
@@ -192,7 +192,8 @@ public class SettingsCommand extends Command {
                     if (args[2].equals("create")) {
                         eb = createApplyGuild(args[3]);
                     } else {
-                        if (!database.getApplySettings(event.getGuild().getId(), args[2]).isJsonNull()) {
+                        JsonElement applySettings = database.getApplySettings(event.getGuild().getId(), args[2]);
+                        if (applySettings != null && !applySettings.isJsonNull()) {
                             if (args[3].equals("enable")) {
                                 if (allowApplyEnable(args[2])) {
                                     eb = setApplyEnable(args[2], "true");
@@ -211,7 +212,8 @@ public class SettingsCommand extends Command {
                     }
 
                 } else if (args.length == 5) {
-                    if (database.getApplySettings(event.getGuild().getId(), args[2]).isJsonNull()) {
+                    JsonElement applySettings = database.getApplySettings(event.getGuild().getId(), args[2]);
+                    if (applySettings == null || applySettings.isJsonNull()) {
                         eb = defaultEmbed("Error", null).setDescription("Invalid name");
                     } else {
                         switch (args[3]) {
@@ -261,6 +263,9 @@ public class SettingsCommand extends Command {
                                 break;
                             case "ironman":
                                 eb = setIsIronman(args[2], args[4]);
+                                break;
+                            case "waiting_channel":
+                                eb = setWaitingChannel(args[2], args[4]);
                                 break;
                             default:
                                 eb = defaultEmbed("Error", null).setDescription("Invalid setting");
@@ -368,36 +373,6 @@ public class SettingsCommand extends Command {
 
             ebMessage.editMessage(eb.build()).queue();
         }).start();
-    }
-
-    private EmbedBuilder createApplyGuild(String name) {
-        if (name.length() > 25) {
-            return defaultEmbed("Error").setDescription("Name cannot be more than 25 letters");
-        }
-
-        List<AutomatedApplication> currentApplys = database.getAllApplySettings(event.getGuild().getId());
-        currentApplys.removeIf(o1 -> o1.getName() == null);
-
-        if (currentApplys.size() == 2) {
-            return defaultEmbed("Error").setDescription("You can reached the max amount of apply guilds (2/2)");
-        }
-
-        for (AutomatedApplication currentApply : currentApplys) {
-            if (currentApply.getName().equalsIgnoreCase(name)) {
-                return defaultEmbed("Error").setDescription(name + " name is taken");
-            }
-        }
-
-        AutomatedApplication newApply = new AutomatedApplication(name);
-
-        int responseCode = database.updateApplySettings(event.getGuild().getId(), newApply);
-        if (responseCode != 200) {
-            return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
-        }
-
-        EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName());
-        eb.setDescription("Created new apply guild with name `" + name + "`");
-        return eb;
     }
 
     /* Guild Role Settings */
@@ -1238,19 +1213,67 @@ public class SettingsCommand extends Command {
     /* Apply Settings */
     private EmbedBuilder getCurrentApplySettings(JsonElement applySettings) {
         EmbedBuilder eb = defaultEmbed("Apply Settings");
-        eb.setDescription("**" + displaySettings(applySettings, "enable") + "**");
+        eb.setDescription("**" + displaySettings(applySettings, "enable").replace("•", "").trim() + "**");
         eb.addField("React Message Channel", displaySettings(applySettings, "messageTextChannelId"), true);
         eb.addField("Staff Message Channel", displaySettings(applySettings, "messageStaffChannelId"), true);
+        eb.addField("Waiting For Invite Channel", displaySettings(applySettings, "waitingChannelId"), true);
         eb.addField("Staff Ping Role", displaySettings(applySettings, "staffPingRoleId"), true);
         eb.addField("New Channel Prefix", displaySettings(applySettings, "newChannelPrefix"), true);
         eb.addField("New Channel Category", displaySettings(applySettings, "newChannelCategory"), true);
         eb.addField("Ironman only", displaySettings(applySettings, "ironmanOnly"), true);
         eb.addField("React Message Text", displaySettings(applySettings, "messageText"), true);
         eb.addField("Accepted Message", displaySettings(applySettings, "acceptMessageText"), true);
-        eb.addField("Waitlisted Message", displaySettings(applySettings, "acceptMessageText"), true);
         eb.addField("Waitlisted Message", displaySettings(applySettings, "waitlistedMessageText"), true);
         eb.addField("Denied Message", displaySettings(applySettings, "denyMessageText"), true);
         eb.addField("Requirements", displaySettings(applySettings, "applyReqs"), true);
+        return eb;
+    }
+
+    private EmbedBuilder setWaitingChannel(String name, String textChannel) {
+        try {
+            TextChannel applyMessageTextChannel = event.getGuild()
+                    .getTextChannelById(textChannel.replaceAll("[<#>]", ""));
+
+            int responseCode = updateApplySettings(name, "waitingChannelId", applyMessageTextChannel.getId());
+            if (responseCode != 200) {
+                return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+            }
+
+            EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+            eb.setDescription("**Apply text channel set to:** " + applyMessageTextChannel.getAsMention());
+            return eb;
+        } catch (Exception ignored) {
+        }
+        return defaultEmbed("Invalid Text Channel", null);
+    }
+
+    private EmbedBuilder createApplyGuild(String name) {
+        if (name.length() > 25) {
+            return defaultEmbed("Error").setDescription("Name cannot be more than 25 letters");
+        }
+
+        List<AutomatedApplication> currentApplys = database.getAllApplySettings(event.getGuild().getId());
+        currentApplys.removeIf(o1 -> o1.getName() == null);
+
+        if (currentApplys.size() == 2) {
+            return defaultEmbed("Error").setDescription("You can reached the max amount of apply guilds (2/2)");
+        }
+
+        for (AutomatedApplication currentApply : currentApplys) {
+            if (currentApply.getName().equalsIgnoreCase(name)) {
+                return defaultEmbed("Error").setDescription(name + " name is taken");
+            }
+        }
+
+        AutomatedApplication newApply = new AutomatedApplication(name);
+
+        int responseCode = database.updateApplySettings(event.getGuild().getId(), newApply);
+        if (responseCode != 200) {
+            return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+        }
+
+        EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName());
+        eb.setDescription("Created new apply guild with name `" + name + "`");
         return eb;
     }
 
@@ -1261,6 +1284,7 @@ public class SettingsCommand extends Command {
         currentSettings.remove("waitlistedMessageText");
         currentSettings.remove("applyReqs");
         currentSettings.remove("ironmanOnly");
+        currentSettings.remove("waitingChannelId");
 
         for (String key : getJsonKeys(currentSettings)) {
             if (higherDepth(currentSettings, key).getAsString().length() == 0) {

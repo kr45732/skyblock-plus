@@ -8,12 +8,14 @@ import static com.skyblockplus.utils.Utils.higherDepth;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.PrivateChannel;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
@@ -22,12 +24,23 @@ public class ApplyGuild {
     public Message reactMessage;
     public JsonElement currentSettings;
     public boolean enable = true;
+    public TextChannel waitInviteChannel = null;
 
     public ApplyGuild(Message reactMessage, JsonElement currentSettings) {
         this.reactMessage = reactMessage;
         this.currentSettings = currentSettings;
         this.applyUserList = getApplyGuildUsersCache(reactMessage.getGuild().getId(),
                 higherDepth(currentSettings, "name").getAsString());
+        try {
+            this.waitInviteChannel = jda
+                    .getTextChannelById(higherDepth(currentSettings, "waitingChannelId").getAsString());
+        } catch (Exception ignored) {
+        }
+    }
+
+    public ApplyGuild(Message reactMessage, JsonElement currentSettings, List<ApplyUser> prevApplyUsers) {
+        this(reactMessage, currentSettings);
+        applyUserList.addAll(prevApplyUsers);
     }
 
     public ApplyGuild() {
@@ -51,7 +64,35 @@ public class ApplyGuild {
             return;
         }
 
-        onMessageReactionAdd_ExistingApplyUser(event);
+        if (onMessageReactionAdd_ExistingApplyUser(event)) {
+            return;
+        }
+
+        onMessageReactionAdd_WaitingForInviteApplyUser(event);
+    }
+
+    private void onMessageReactionAdd_WaitingForInviteApplyUser(MessageReactionAddEvent event) {
+        if (event.getUser().isBot()) {
+            return;
+        }
+
+        if (!event.getChannel().equals(waitInviteChannel)) {
+            return;
+        }
+
+        if (!event.getReactionEmote().getName().equals("✅")) {
+            return;
+        }
+
+        Message msg = waitInviteChannel.retrieveMessageById(event.getMessageId()).complete();
+
+        if (!msg.getAuthor().getId().equals(jda.getSelfUser().getId())) {
+            return;
+        }
+
+        msg.clearReactions().complete();
+
+        msg.delete().queueAfter(3, TimeUnit.SECONDS);
     }
 
     public boolean onMessageReactionAdd_ExistingApplyUser(MessageReactionAddEvent event) {
@@ -69,26 +110,27 @@ public class ApplyGuild {
     }
 
     public boolean onMessageReactionAdd_NewApplyUser(MessageReactionAddEvent event) {
-        if (event.getMessageIdLong() != reactMessage.getIdLong()) {
+        if (event.getUser().isBot()) {
             return false;
         }
-        if (event.getUser().isBot()) {
+
+        if (event.getMessageIdLong() != reactMessage.getIdLong()) {
             return false;
         }
 
         event.getReaction().removeReaction(event.getUser()).queue();
         if (!event.getReactionEmote().getName().equals("✅")) {
-            return false;
+            return true;
         }
 
         if (event.getGuild().getTextChannelsByName(higherDepth(currentSettings, "newChannelPrefix").getAsString() + "-"
                 + event.getUser().getName().replace(" ", "-"), true).size() > 0) {
-            return false;
+            return true;
         }
 
         JsonElement linkedAccount = database.getLinkedUserByDiscordId(event.getUserId());
 
-        if ((linkedAccount.isJsonNull())
+        if (linkedAccount.isJsonNull()
                 || !higherDepth(linkedAccount, "discordId").getAsString().equals(event.getUserId())) {
             PrivateChannel dmChannel = event.getUser().openPrivateChannel().complete();
             if (linkedAccount.isJsonNull()) {
@@ -97,18 +139,20 @@ public class ApplyGuild {
                         .build()).queue();
             } else {
                 dmChannel
-                        .sendMessage(defaultEmbed("Error")
-                                .setDescription(
-                                        "Account " + higherDepth(linkedAccount, "minecraftUsername").getAsString()
+                        .sendMessage(
+                                defaultEmbed("Error")
+                                        .setDescription("Account "
+                                                + higherDepth(linkedAccount, "minecraftUsername").getAsString()
                                                 + " is linked with the discord tag "
-                                                + jda.getUserById(higherDepth(linkedAccount, "discordId").getAsString())
-                                                        .getAsTag()
+                                                + jda.retrieveUserById(
+                                                        higherDepth(linkedAccount, "discordId").getAsString())
+                                                        .complete().getAsTag()
                                                 + "\nYour current discord tag is " + event.getUser().getAsTag()
                                                 + ".\nPlease relink and try again")
-                                .build())
+                                        .build())
                         .queue();
             }
-            return false;
+            return true;
         }
 
         Player player = new Player(higherDepth(linkedAccount, "minecraftUsername").getAsString());
@@ -118,7 +162,7 @@ public class ApplyGuild {
             dmChannel.sendMessage(defaultEmbed("Error").setDescription(
                     "Unable to fetch player data. Please make sure that all APIs are enabled and/or try relinking")
                     .build()).queue();
-            return false;
+            return true;
         } else {
             boolean isIronman = false;
             try {
@@ -131,7 +175,7 @@ public class ApplyGuild {
                         .sendMessage(
                                 defaultEmbed("Error").setDescription("You have no ironman profiles created").build())
                         .queue();
-                return false;
+                return true;
             }
         }
 

@@ -27,11 +27,7 @@ public class MainListener extends ListenerAdapter {
     public static String onApplyReload(String guildId) {
         String reloadStatus = "Error reloading";
         if (guildMap.containsKey(guildId)) {
-            if (guildMap.get(guildId).allowApplyReload()) {
-                reloadStatus = guildMap.get(guildId).reloadApplyConstructor(guildId);
-            } else {
-                reloadStatus = "Application in progress";
-            }
+            reloadStatus = guildMap.get(guildId).reloadApplyConstructor(guildId);
         }
         return reloadStatus;
     }

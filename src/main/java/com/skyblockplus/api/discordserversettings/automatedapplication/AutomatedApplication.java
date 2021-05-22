@@ -18,14 +18,14 @@ import lombok.Data;
 @AllArgsConstructor
 @Embeddable
 public class AutomatedApplication {
-    private String name = "";
+    private String name;
 
     private String enable = "false";
     private String messageTextChannelId = "";
     private String messageStaffChannelId = "";
     private String newChannelPrefix = "";
     private String newChannelCategory = "";
-
+    private String waitingChannelId = "";
     private String ironmanOnly = "false";
 
     @Column(length = 2048)

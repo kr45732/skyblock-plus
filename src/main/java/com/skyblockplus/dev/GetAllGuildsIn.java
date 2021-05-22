@@ -54,7 +54,7 @@ public class GetAllGuildsIn extends Command {
                                 paginateBuilder.addItems(
                                         "**" + guild.getName() + " (" + guild.getMemberCount() + ")**\nInvite Link: "
                                                 + guild.getChannels().get(0).createInvite().setMaxAge(0).complete()
-                                                .getUrl()
+                                                        .getUrl()
                                                 + "\nId: " + guild.getId() + "\nOwner: "
                                                 + guild.getOwner().getEffectiveName() + " (" + guild.getOwnerId()
                                                 + ")\n");

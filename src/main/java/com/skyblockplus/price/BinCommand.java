@@ -43,6 +43,10 @@ public class BinCommand extends Command {
 
     private EmbedBuilder getLowestBin(String item) {
         JsonElement lowestBinJson = getJson("https://moulberry.codes/lowestbin.json");
+        if (lowestBinJson == null) {
+            return defaultEmbed("Error fetching auctions");
+        }
+
         if (higherDepth(lowestBinJson, item) != null) {
             EmbedBuilder eb = defaultEmbed("Lowest bin");
             eb.addField(capitalizeString(item.toLowerCase()),

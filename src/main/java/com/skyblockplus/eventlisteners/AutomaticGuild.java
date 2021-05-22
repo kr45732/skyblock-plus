@@ -1,5 +1,28 @@
 package com.skyblockplus.eventlisteners;
 
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.eventlisteners.skyblockevent.SkyblockEventCommand.endSkyblockEvent;
+import static com.skyblockplus.utils.Utils.HYPIXEL_API_KEY;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.getJson;
+import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.Utils.logCommand;
+
+import java.io.File;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -9,33 +32,22 @@ import com.skyblockplus.api.discordserversettings.automatedapplication.Automated
 import com.skyblockplus.api.discordserversettings.skyblockevent.EventMember;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
 import com.skyblockplus.eventlisteners.apply.ApplyGuild;
+import com.skyblockplus.eventlisteners.apply.ApplyUser;
 import com.skyblockplus.eventlisteners.skyblockevent.SkyblockEvent;
 import com.skyblockplus.eventlisteners.verify.VerifyGuild;
+
+import org.apache.commons.collections4.ListUtils;
+
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
-import org.apache.commons.collections4.ListUtils;
-
-import java.io.File;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.eventlisteners.skyblockevent.SkyblockEventCommand.endSkyblockEvent;
-import static com.skyblockplus.utils.Utils.*;
 
 public class AutomaticGuild {
     public final String guildId;
@@ -226,15 +238,6 @@ public class AutomaticGuild {
         }
     }
 
-    public boolean allowApplyReload() {
-        for (ApplyGuild apply : applyGuild) {
-            if (apply.getApplyUserList().size() != 0) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     public void verifyConstructor(GenericGuildEvent event) {
         JsonElement currentSettings = database.getVerifySettings(event.getGuild().getId());
         if (currentSettings == null) {
@@ -348,14 +351,26 @@ public class AutomaticGuild {
                     EmbedBuilder eb = defaultEmbed("Apply For Guild");
                     eb.setDescription(currentSetting.getMessageText());
 
+                    List<ApplyUser> curApplyUsers = new ArrayList<>();
+                    for (Iterator<ApplyGuild> iterator = applyGuild.iterator(); iterator.hasNext();) {
+                        ApplyGuild applyG = iterator.next();
+
+                        if (higherDepth(applyG.currentSettings, "name").getAsString()
+                                .equals(currentSetting.getName())) {
+                            curApplyUsers.addAll(applyG.getApplyUserList());
+                            iterator.remove();
+                            break;
+                        }
+                    }
+
                     try {
                         Message reactMessage = reactChannel.retrieveMessageById(currentSetting.getPreviousMessageId())
                                 .complete();
                         reactMessage.editMessage(eb.build()).queue();
-                        applyGuild.removeIf(o1 -> higherDepth(o1.currentSettings, "name").getAsString()
-                                .equals(currentSetting.getName()));
-                        applyGuild.add(new ApplyGuild(reactMessage, new Gson().toJsonTree(currentSetting)));
-                        applyStr += "Reloaded `" + currentSetting.getName() + "`\n";
+
+                        applyGuild.add(
+                                new ApplyGuild(reactMessage, new Gson().toJsonTree(currentSetting), curApplyUsers));
+                        applyStr += "• Reloaded `" + currentSetting.getName() + "`\n";
                     } catch (Exception e) {
                         Message reactMessage = reactChannel.sendMessage(eb.build()).complete();
                         reactMessage.addReaction("✅").queue();
@@ -363,27 +378,27 @@ public class AutomaticGuild {
                         currentSetting.setPreviousMessageId(reactMessage.getId());
                         database.updateApplySettings(guild.getId(), new Gson().toJsonTree(currentSetting));
 
-                        applyGuild.removeIf(o1 -> higherDepth(o1.currentSettings, "name").getAsString()
-                                .equals(currentSetting.getName()));
-                        applyGuild.add(new ApplyGuild(reactMessage, new Gson().toJsonTree(currentSetting)));
-                        applyStr += "Reloaded `" + currentSetting.getName() + "`\n";
+                        applyGuild.add(
+                                new ApplyGuild(reactMessage, new Gson().toJsonTree(currentSetting), curApplyUsers));
+                        applyStr += "• Reloaded `" + currentSetting.getName() + "`\n";
                     }
                 } else {
                     applyGuild.removeIf(o1 -> higherDepth(o1.currentSettings, "name").getAsString()
                             .equals(currentSetting.getName()));
-                    applyStr += "`" + currentSetting.getName() + "` is disabled\n";
+                    applyStr += "• `" + currentSetting.getName() + "` is disabled\n";
                 }
             } catch (Exception e) {
                 System.out.println("== Stack Trace (Reload apply constructor error - " + guildId + ") ==");
                 e.printStackTrace();
                 if (e.getMessage().contains("Missing permission")) {
-                    applyStr += "Error Reloading\nMissing permission: "
-                            + e.getMessage().split("Missing permission: ")[1] + " for `" + currentSetting.getName()
-                            + "`\n";
+                    applyStr += "• Error Reloading for `" + currentSetting.getName() + "` - missing permission(s): "
+                            + e.getMessage().split("Missing permission: ")[1] + "\n";
+                } else {
+                    applyStr += "• Error Reloading for `" + currentSetting.getName() + "`\n";
                 }
             }
         }
-        return applyStr.length() > 0 ? applyStr : "Error reloading";
+        return applyStr.length() > 0 ? applyStr : "• Error reloading";
     }
 
     public String reloadVerifyConstructor(String guildId) {

@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.User;
 
 import java.awt.*;
 import java.util.Random;
+import static com.skyblockplus.Main.*;
 
 import static com.skyblockplus.utils.Utils.*;
 
@@ -21,7 +22,8 @@ public class BaldCommand extends Command {
     @Override
     protected void execute(CommandEvent event) {
         new Thread(() -> {
-            if (!(event.getGuild().getId().equals("782154976243089429") || event.getGuild().getId().equals("796790757947867156"))) {
+            if (!(event.getGuild().getId().equals("782154976243089429")
+                    || event.getGuild().getId().equals("796790757947867156"))) {
                 return;
             }
 
@@ -37,7 +39,7 @@ public class BaldCommand extends Command {
 
             try {
                 String id = args[1].replaceAll("[<@!>]", "");
-                User user = event.getJDA().getUserById(id);
+                User user = jda.retrieveUserById(id).complete();
                 if (user != null && !user.isBot()) {
                     eb = defaultEmbed("Baldness Checker");
                     if (user.getId().equals("385939031596466176") || user.getId().equals("225045405526654977")) {
