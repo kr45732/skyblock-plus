@@ -1240,7 +1240,7 @@ public class SettingsCommand extends Command {
             }
 
             EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
-            eb.setDescription("**Apply text channel set to:** " + applyMessageTextChannel.getAsMention());
+            eb.setDescription("**Apply waiting for invite channel set to:** " + applyMessageTextChannel.getAsMention());
             return eb;
         } catch (Exception ignored) {
         }
@@ -1615,6 +1615,7 @@ public class SettingsCommand extends Command {
             if (currentSettingValue.length() > 0) {
                 switch (settingName) {
                     case "messageTextChannelId":
+                    case "waitingChannelId":
                     case "messageStaffChannelId":
                         try {
                             return "<#" + currentSettingValue + ">";

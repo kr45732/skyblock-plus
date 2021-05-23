@@ -194,6 +194,8 @@ public class HelpCommand extends Command {
                                 "settings apply [name] category " + "[category id]")
                         + generateHelp("Channel where new applications will be sent to be reviewed by staff",
                                 "settings apply [name] staff_channel " + "[#channel]")
+                        + generateHelp("Channel where ign's of players who were accepted or waitlisted will be sent",
+                                "settings apply [name] waiting_channel [#channel]")
                         + generateHelp("Message that will be sent if applicant is accepted",
                                 "settings apply [name] accept_message [message]")
                         + generateHelp("Message that will be sent if applicant is waitlisted. Can be set to none",
