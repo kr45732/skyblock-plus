@@ -151,7 +151,8 @@ public class HelpCommand extends Command {
                             "weight calculate [skill avg] [slayer] [cata level] [avg dungeon class level]")
                     + generateHelp("Get Hypixel information about a player", "hypixel [player]")
                     + generateHelp("Get fastest Hypixel lobby parkour for a player", "hypixel parkour [player]")
-                    + generateHelp("Get a information about all of a player's profiles", "profiles [player]"));
+                    + generateHelp("Get a information about all of a player's profiles", "profiles [player]")
+                    + generateHelp("Get a player's missing talismans", "missing [player] <profile>"));
 
             paginateBuilder.addItems(
                     (isAdmin ? generateHelp("Interactive message to create a Skyblock event", "event create") : "")
@@ -171,9 +172,10 @@ public class HelpCommand extends Command {
                         + generateHelp("Message that users will see and react to in order to verify",
                                 "settings" + " verify message [message]")
                         + generateHelp(
-                                "Role that user will receive "
+                                "Add a role that user will receive "
                                         + "upon being verified. Cannot be @everyone or a managed role",
-                                "settings verify role " + "[@role]")
+                                "settings verify role add [@role]")
+                        + generateHelp("Remove a verify role", "settings verify role remove [@role]")
                         + generateHelp("Channel where the message to react for verifying will sent",
                                 "settings verify " + "channel [#channel]")
                         + generateHelp("The nickname template on verifying. Can be set to none.",
@@ -200,6 +202,8 @@ public class HelpCommand extends Command {
                                 "settings apply [name] accept_message [message]")
                         + generateHelp("Message that will be sent if applicant is waitlisted. Can be set to none",
                                 "settings apply [name] waitlist_message [message]")
+                        + generateHelp("Whether applicants must use an ironman profile. Default is false",
+                                "settings apply [name] ironman [true|false]")
                         + generateHelp("Message that will be sent if applicant is denied",
                                 "settings apply [name] deny_message [message]")
                         + generateHelp(

@@ -42,7 +42,7 @@ public class SetupCommand extends Command {
                     + "• Example video linked [__here__](https://i.imgur.com/VzQUJrE.mp4)\n\n" + "**__Setup__**\n"
                     + "In order to enable automatic verify, all the following settings must be set:\n"
                     + "- `settings verify message [message]` - the message that users will see and react to in order to verify.\n"
-                    + "- `settings verify role [@role]` - the role users will get once verified. This role cannot be @everyone or a managed role.\n"
+                    + "- `settings verify role add [@role]` - add a role users will get once verified. This role cannot be @everyone or a managed role.\n"
                     + "- `settings verify channel [#channel]` - the channel where the message to react too will be sent.\n\n"
                     + "Optional settings:\n"
                     + "- `settings verify nickname <prefix> [IGN] <postfix>` - the nickname template where IGN will be the players name. Can also be set to none.\n"
