@@ -1019,6 +1019,10 @@ public class NetworthExecute {
     }
 
     private double getLowestPrice(String itemId, String tempName) {
+        if (isIgnoredItem(itemId)) {
+            return 0;
+        }
+
         double lowestBin = -1;
         double averageAuction = -1;
 
@@ -1089,10 +1093,6 @@ public class NetworthExecute {
                 }
             }
         } catch (Exception ignored) {
-        }
-
-        if (isIgnoredItem(itemId)) {
-            return 0;
         }
 
         tempSet.add(itemId + " - " + tempName);
