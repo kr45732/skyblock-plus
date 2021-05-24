@@ -924,10 +924,12 @@ public class SettingsCommand extends Command {
         Gson gson = new Gson();
         currentLevels.add(gson.toJsonTree(new RoleObject(roleValue, role.getId())));
 
-        RoleObject[] temp = gson.fromJson(currentLevels, new TypeToken<RoleObject[]>() {
-        }.getType());
-        Arrays.sort(temp, Comparator.comparingInt(o -> Integer.parseInt(o.getValue())));
-        currentLevels = gson.toJsonTree(temp).getAsJsonArray();
+        if (!roleName.equals("guild_member")) {
+            RoleObject[] temp = gson.fromJson(currentLevels, new TypeToken<RoleObject[]>() {
+            }.getType());
+            Arrays.sort(temp, Comparator.comparingInt(o -> Integer.parseInt(o.getValue())));
+            currentLevels = gson.toJsonTree(temp).getAsJsonArray();
+        }
 
         newRoleSettings.remove("levels");
         newRoleSettings.add("levels", currentLevels);

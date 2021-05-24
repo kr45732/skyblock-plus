@@ -12,7 +12,7 @@ public class PartyFinderCommand extends Command {
     public PartyFinderCommand() {
         this.name = "partyfinder";
         this.cooldown = globalCooldown;
-        this.aliases = new String[]{"pf"};
+        this.aliases = new String[] { "pf" };
     }
 
     @Override
@@ -50,9 +50,8 @@ public class PartyFinderCommand extends Command {
             eb.appendDescription(
                     player.getBonemerang() != -1
                             ? ((player.getBonemerang() == 1 ? "\n**Bonemerang:** " : "\n**Bonemerangs:** ")
-                            + player.getBonemerang())
+                                    + player.getBonemerang())
                             : "");
-            eb.setThumbnail(player.getThumbnailUrl());
             return eb;
         }
         return defaultEmbed("Unable to fetch player data");

@@ -14,7 +14,7 @@ public class CatacombsCommand extends Command {
     public CatacombsCommand() {
         this.name = "dungeons";
         this.cooldown = globalCooldown;
-        this.aliases = new String[]{"cata", "catacombs"};
+        this.aliases = new String[] { "cata", "catacombs" };
     }
 
     @Override
@@ -52,7 +52,7 @@ public class CatacombsCommand extends Command {
                 eb.setDescription("True catacombs level: " + skillInfo.skillLevel + "\nProgress catacombs level: "
                         + roundAndFormat(skillInfo.skillLevel + skillInfo.progressToNext));
 
-                for (String className : new String[]{"healer", "mage", "berserk", "archer", "tank"}) {
+                for (String className : new String[] { "healer", "mage", "berserk", "archer", "tank" }) {
                     skillInfo = player.getDungeonClass(className);
                     eb.addField(capitalizeString(className) + " (" + skillInfo.skillLevel + ")",
                             simplifyNumber(skillInfo.expCurrent) + " / " + simplifyNumber(skillInfo.expForNext)
@@ -61,7 +61,6 @@ public class CatacombsCommand extends Command {
                             true);
                 }
                 eb.addBlankField(true);
-                eb.setThumbnail(player.getThumbnailUrl());
 
                 return eb;
             } catch (NullPointerException e) {

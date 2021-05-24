@@ -79,6 +79,8 @@ public class Utils {
     private static JsonElement petsJson;
     private static JsonElement reforgeStonesJson;
     private static JsonElement bitsJson;
+    private static JsonElement miscJson;
+    private static JsonElement talismanJson;
 
     public static void setApplicationSettings() {
         Properties appProps = new Properties();
@@ -114,6 +116,24 @@ public class Utils {
             API_PASSWORD = System.getenv("API_PASSWORD");
             API_BASE_URL = System.getenv("API_BASE_URL");
         }
+    }
+
+    public static JsonElement getMiscJson() {
+        if (miscJson == null) {
+            miscJson = getJson(
+                    "https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/misc.json");
+        }
+
+        return miscJson;
+    }
+
+    public static JsonElement getTalismanJson() {
+        if (talismanJson == null) {
+            talismanJson = parseJsString(getSkyCryptData(
+                    "https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/talismans.js"));
+        }
+
+        return talismanJson;
     }
 
     public static JsonElement getBitsJson() {

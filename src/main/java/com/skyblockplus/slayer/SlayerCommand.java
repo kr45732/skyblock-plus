@@ -112,7 +112,6 @@ public class SlayerCommand extends Command {
             eb.addField("Boss Kills", revKills, true);
             eb.addField("Boss Kills", taraKills, true);
 
-            eb.setThumbnail(player.getThumbnailUrl());
             return eb;
         }
         return defaultEmbed("Unable to fetch player data");

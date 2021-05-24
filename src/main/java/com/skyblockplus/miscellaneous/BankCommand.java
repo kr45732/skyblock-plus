@@ -74,7 +74,6 @@ public class BankCommand extends Command {
             eb.addField("Purse coins",
                     playerPurseCoins == -1 ? "Banking API disabled" : simplifyNumber(playerPurseCoins) + " coins",
                     false);
-            eb.setThumbnail(player.getThumbnailUrl());
             return eb;
         }
         return defaultEmbed("Unable to fetch player data");
@@ -98,7 +97,7 @@ public class BankCommand extends Command {
                     JsonElement currentTransaction = bankHistoryArray.get(i);
                     String valueString = simplifyNumber(higherDepth(currentTransaction, "amount").getAsLong()) + " "
                             + (higherDepth(currentTransaction, "action").getAsString().equals("DEPOSIT") ? "deposited"
-                            : "withdrawn")
+                                    : "withdrawn")
                             + " by " + parseMcCodes(higherDepth(currentTransaction, "initiator_name").getAsString());
 
                     String time = dateTimeFormatter

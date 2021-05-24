@@ -18,7 +18,7 @@ public class SkillsCommand extends Command {
     public SkillsCommand() {
         this.name = "skills";
         this.cooldown = globalCooldown;
-        this.aliases = new String[]{"skill"};
+        this.aliases = new String[] { "skill" };
     }
 
     @Override
@@ -77,7 +77,7 @@ public class SkillsCommand extends Command {
                             simplifyNumber(skillInfo.expCurrent) + " / " + simplifyNumber(skillInfo.expForNext)
                                     + "\nTotal XP: " + simplifyNumber(skillInfo.totalSkillExp) + "\nProgress: "
                                     + (skillInfo.skillLevel == skillInfo.maxSkillLevel ? "MAX"
-                                    : roundProgress(skillInfo.progressToNext)),
+                                            : roundProgress(skillInfo.progressToNext)),
                             true);
                     if (!skill.equals("runecrafting") && !skill.equals("carpentry")) {
                         trueSA += skillInfo.skillLevel;
@@ -92,7 +92,6 @@ public class SkillsCommand extends Command {
             progressSA /= (skills.size() - 2);
             eb.setDescription("True skill average: " + roundAndFormat(trueSA) + "\nProgress skill average: "
                     + roundAndFormat(progressSA));
-            eb.setThumbnail(player.getThumbnailUrl());
             return eb;
         }
         return defaultEmbed("Unable to fetch player data");

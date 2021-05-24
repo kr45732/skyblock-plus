@@ -1348,7 +1348,13 @@ public class Player {
     public EmbedBuilder defaultPlayerEmbed() {
         return defaultEmbed(
                 fixUsername(getUsername()) + (higherDepth(outerProfileJson, "game_mode") != null ? " ♻️" : ""),
-                skyblockStatsLink(getUsername(), getProfileName()));
+                skyblockStatsLink(getUsername(), getProfileName())).setThumbnail(getThumbnailUrl());
+    }
+
+    public EmbedBuilder defaultPlayerEmbed(boolean noProfile) {
+        return defaultEmbed(
+                fixUsername(getUsername()) + (higherDepth(outerProfileJson, "game_mode") != null ? " ♻️" : ""),
+                skyblockStatsLink(getUsername(), ""));
     }
 
     public String skyblockStatsLink(String username, String profileName) {

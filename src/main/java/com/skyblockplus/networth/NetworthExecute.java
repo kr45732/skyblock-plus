@@ -133,7 +133,6 @@ public class NetworthExecute {
         Player player = profileName == null ? new Player(username) : new Player(username, profileName);
         if (player.isValid()) {
             EmbedBuilder eb = player.defaultPlayerEmbed();
-            eb.setThumbnail(player.getThumbnailUrl());
 
             lowestBinJson = getJson("https://moulberry.codes/lowestbin.json");
             averageAuctionJson = getJson("https://moulberry.codes/auction_averages/3day.json");
@@ -1106,7 +1105,15 @@ public class NetworthExecute {
             return true;
         }
 
-        if (s.startsWith("stained_glass_pane")) {
+        if (s.startsWith("stained_glass")) {
+            return true;
+        }
+
+        if (s.equalsIgnoreCase("redstone_torch_on")) {
+            return true;
+        }
+
+        if (s.equalsIgnoreCase("book")) {
             return true;
         }
 

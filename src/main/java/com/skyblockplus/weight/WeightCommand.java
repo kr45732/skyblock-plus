@@ -44,7 +44,7 @@ public class WeightCommand extends Command {
     }
 
     private EmbedBuilder calculateWeight(String skillAverage, String slayer, String catacombs,
-                                         String averageDungeonClass) {
+            String averageDungeonClass) {
         try {
             double skillAverageD = Double.parseDouble(skillAverage);
             double slayerD = Double.parseDouble(slayer);
@@ -71,7 +71,6 @@ public class WeightCommand extends Command {
             eb.addField("Slayer Weight", roundAndFormat(playerWeight.getSlayerWeight()), false);
             eb.addField("Skills Weight", roundAndFormat(playerWeight.getSkillsWeight()), false);
             eb.addField("Dungeons Weight", roundAndFormat(playerWeight.getDungeonsWeight()), false);
-            eb.setThumbnail(player.getThumbnailUrl());
             return eb;
         }
         return defaultEmbed("Unable to fetch player data");

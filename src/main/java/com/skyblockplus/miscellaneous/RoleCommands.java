@@ -508,7 +508,6 @@ public class RoleCommands extends Command {
                         if (errorRoles.length() > 0) {
                             eb.addField("Error giving roles:", errorRoles.toString(), false);
                         }
-                        eb.setThumbnail(player.getThumbnailUrl());
                     } else {
                         eb = defaultEmbed("Error fetching server's settings");
                     }

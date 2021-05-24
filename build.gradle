@@ -51,7 +51,7 @@ dependencies {
     // NBT parser
     implementation 'com.github.TheNullicorn:Nedit:1.0.0'
 
-    // Spring boot and postgres
+    // Spring boot and postgresql
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
