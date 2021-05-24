@@ -302,19 +302,28 @@ public class SettingsCommand extends Command {
                         case "message":
                             eb = setVerifyMessageText(args[3]);
                             break;
-                        case "role":
-                            eb = setVerifyVerifiedRole(args[3]);
-                            break;
                         case "channel":
                             eb = setVerifyMessageTextChannelId(args[3]);
                             break;
                         case "nickname":
                             eb = setVerifyNickname(args[3]);
                             break;
+                        case "role":
+                            args = content.split(" ");
+                            if (args[3].equals("add")) {
+                                eb = addVerifyRole(args[4]);
+                            } else if (args[3].equals("remove")) {
+                                eb = removeVerifyRole(args[4]);
+                            } else {
+                                eb = defaultEmbed("Error").setDescription("Invalid setting");
+                            }
+                            break;
                         default:
                             eb = defaultEmbed("Error", null).setDescription("Invalid setting");
                             break;
                     }
+                } else if (content.split(" ").length == 5 && args[2].equals("role")) {
+
                 }
             } else if ((args.length >= 2) && args[1].equals("guild")) {
                 if (args.length == 2) {
@@ -373,6 +382,68 @@ public class SettingsCommand extends Command {
 
             ebMessage.editMessage(eb.build()).queue();
         }).start();
+    }
+
+    private EmbedBuilder removeVerifyRole(String roleMention) {
+        Role verifyRole;
+        try {
+            verifyRole = event.getGuild().getRoleById(roleMention.replaceAll("[<@&>]", ""));
+            if ((verifyRole.isPublicRole() || verifyRole.isManaged())) {
+                return defaultEmbed("Error").setDescription("Invalid role");
+            }
+        } catch (Exception e) {
+            return defaultEmbed("Invalid Role", null);
+        }
+
+        JsonArray currentVerifyRoles = higherDepth(database.getVerifySettings(event.getGuild().getId()),
+                "verifiedRoles").getAsJsonArray();
+
+        for (int i = currentVerifyRoles.size() - 1; i >= 0; i--) {
+            if (currentVerifyRoles.get(i).getAsString().equals(verifyRole.getId())) {
+                currentVerifyRoles.remove(i);
+            }
+        }
+
+        int responseCode = database.updateVerifyRolesSettings(event.getGuild().getId(), currentVerifyRoles);
+
+        if (responseCode != 200) {
+            return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+        }
+
+        if (currentVerifyRoles.size() == 0) {
+            updateVerifySettings("enable", "false");
+        }
+
+        EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName());
+        return eb.setDescription("**Removed verify role:** " + verifyRole.getAsMention());
+    }
+
+    private EmbedBuilder addVerifyRole(String roleMention) {
+        Role verifyRole;
+        try {
+            verifyRole = event.getGuild().getRoleById(roleMention.replaceAll("[<@&>]", ""));
+            if ((verifyRole.isPublicRole() || verifyRole.isManaged())) {
+                return defaultEmbed("Error").setDescription("Role cannot be managed or @everyone");
+            }
+        } catch (Exception e) {
+            return defaultEmbed("Invalid Role", null);
+        }
+
+        JsonArray currentVerifyRoles = higherDepth(database.getVerifySettings(event.getGuild().getId()),
+                "verifiedRoles").getAsJsonArray();
+        if (currentVerifyRoles.size() == 5) {
+            return defaultEmbed("You have reached the max number of verify roles (5/5)");
+        }
+
+        currentVerifyRoles.add(verifyRole.getId());
+        int responseCode = database.updateVerifyRolesSettings(event.getGuild().getId(), currentVerifyRoles);
+
+        if (responseCode != 200) {
+            return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+        }
+
+        EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+        return eb.setDescription("**Verify role added:** " + verifyRole.getAsMention());
     }
 
     /* Guild Role Settings */
@@ -1076,7 +1147,7 @@ public class SettingsCommand extends Command {
         ebFieldString += "**" + displaySettings(verifySettings, "enable") + "**";
         ebFieldString += "\n**• React Message Text:** " + displaySettings(verifySettings, "messageText");
         ebFieldString += "\n**• React Message Channel:** " + displaySettings(verifySettings, "messageTextChannelId");
-        ebFieldString += "\n**• Verified Role:** " + displaySettings(verifySettings, "verifiedRole");
+        ebFieldString += "\n**• Verified Role(s):** " + displaySettings(verifySettings, "verifiedRoles");
         ebFieldString += "\n**• Nickname Template:** " + displaySettings(verifySettings, "verifiedNickname");
         return ebFieldString;
     }
@@ -1141,24 +1212,6 @@ public class SettingsCommand extends Command {
         } catch (Exception ignored) {
         }
         return defaultEmbed("Invalid Text Channel", null);
-    }
-
-    private EmbedBuilder setVerifyVerifiedRole(String verifyRole) {
-        try {
-            Role verifyGuildRole = event.getGuild().getRoleById(verifyRole.replaceAll("[<@&>]", ""));
-            if (!(verifyGuildRole.isPublicRole() || verifyGuildRole.isManaged())) {
-                int responseCode = updateVerifySettings("verifiedRole", verifyGuildRole.getId());
-                if (responseCode != 200) {
-                    return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
-                }
-
-                EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
-                eb.setDescription("**Verify role set to:** " + verifyGuildRole.getAsMention());
-                return eb;
-            }
-        } catch (Exception ignored) {
-        }
-        return defaultEmbed("Invalid Role", null);
     }
 
     private EmbedBuilder setVerifyNickname(String nickname) {
@@ -1611,6 +1664,18 @@ public class SettingsCommand extends Command {
                 }
 
                 return reqsString.toString();
+            } else if (settingName.equals("verifiedRoles")) {
+                JsonArray roles = higherDepth(jsonSettings, settingName).getAsJsonArray();
+                String ebStr = "";
+                for (JsonElement role : roles) {
+                    ebStr += "<@&" + role.getAsString() + ">" + " ";
+                }
+
+                if (ebStr.length() == 0) {
+                    ebStr = "None";
+                }
+
+                return ebStr;
             }
 
             String currentSettingValue = higherDepth(jsonSettings, settingName).getAsString();
@@ -1627,7 +1692,6 @@ public class SettingsCommand extends Command {
                             }
                         }
                         break;
-                    case "verifiedRole":
                     case "staffPingRoleId":
                     case "roleId":
                         try {

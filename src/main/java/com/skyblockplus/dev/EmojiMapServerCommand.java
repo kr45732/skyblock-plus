@@ -20,7 +20,8 @@ public class EmojiMapServerCommand extends Command {
 
             StringBuilder ebString = new StringBuilder();
             for (Emote emote : event.getGuild().getEmotes()) {
-                ebString.append("emojiMap.put(\"").append(emote.getName()).append("\", \"\\").append(emote.getAsMention()).append("\");").append("\n");
+                ebString.append("emojiMap.put(\"").append(emote.getName()).append("\", \"\\")
+                        .append(emote.getAsMention()).append("\");").append("\n");
             }
             event.reply(ebString.toString());
         }).start();

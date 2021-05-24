@@ -195,4 +195,9 @@ public class SpringDatabaseComponent {
         return settingsService.updateApplySettings(serverId, gson.fromJson(newSettings, AutomatedApplication.class))
                 .getStatusCodeValue();
     }
+
+    public int updateVerifyRolesSettings(String serverId, JsonArray newsettings) {
+        return settingsService.updateVerifyRolesSettings(serverId, gson.fromJson(newsettings, String[].class))
+                .getStatusCodeValue();
+    }
 }

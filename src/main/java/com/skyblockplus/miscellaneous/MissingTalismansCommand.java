@@ -121,9 +121,10 @@ public class MissingTalismansCommand extends Command {
             missingInternalArr.sort(Comparator.comparingDouble(
                     o1 -> higherDepth(lowestBinJson, o1) != null ? higherDepth(lowestBinJson, o1).getAsDouble() : 0));
 
-            String ebStr = "Sorted roughly from the least to greatest cost. Some talismans may have higher tiers.\n\n";
+            String ebStr = "Sorted roughly from the least to greatest cost. Talismans with a `*` have higher tiers.\n\n";
             for (String i : missingInternalArr) {
-                ebStr += "• " + capitalizeString(i.toLowerCase().replace("_", " ")) + "\n";
+                ebStr += "• " + capitalizeString(i.toLowerCase().replace("_", " "))
+                        + (higherDepth(talismanUpgrades, i) != null ? "*" : "") + "\n";
             }
             return player.defaultPlayerEmbed().setDescription(ebStr);
         }
