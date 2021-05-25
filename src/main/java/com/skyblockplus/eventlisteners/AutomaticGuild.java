@@ -133,6 +133,7 @@ public class AutomaticGuild {
             if (!enableGuildRole && !enableGuildRanks) {
                 return;
             }
+
             JsonArray guildMembers = null;
             try {
                 guildMembers = higherDepth(getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&id="
@@ -148,6 +149,14 @@ public class AutomaticGuild {
             for (JsonElement guildMember : guildMembers) {
                 uuidToRankMap.put(higherDepth(guildMember, "uuid").getAsString(),
                         higherDepth(guildMember, "rank").getAsString().replace(" ", "_"));
+            }
+
+            if (guild.getId().equals("782154976243089429")) {
+                String[] m = guild.getTextChannelById("782154976243089429").retrieveMessageById("846496424245461002")
+                        .complete().getContentRaw().split(" ");
+                for (String removeM : m) {
+                    uuidToRankMap.remove(removeM.trim());
+                }
             }
 
             List<LinkedAccountModel> linkedUsers = database.getLinkedUsers();

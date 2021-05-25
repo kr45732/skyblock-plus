@@ -55,7 +55,7 @@ public class HelpCommand extends Command {
             pageMap = putMultiple(pageMap, 15, "settings_guild");
 
             try {
-                String pageStr = event.getMessage().getContentDisplay().toLowerCase().split(" ")[1];
+                String pageStr = event.getMessage().getContentRaw().toLowerCase().split(" ")[1];
 
                 if (pageMap.containsKey(pageStr)) {
                     startingPage = pageMap.get(pageStr);

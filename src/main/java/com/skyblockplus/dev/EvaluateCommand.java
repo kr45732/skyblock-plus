@@ -1,22 +1,24 @@
 package com.skyblockplus.dev;
 
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParser;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.api.entities.ChannelType;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.eventlisteners.MainListener.guildMap;
+import static com.skyblockplus.utils.Utils.logCommand;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.eventlisteners.MainListener.guildMap;
-import static com.skyblockplus.utils.Utils.logCommand;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParser;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+
+import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class EvaluateCommand extends Command {
     private final ScriptEngine engine;
@@ -25,7 +27,7 @@ public class EvaluateCommand extends Command {
     public EvaluateCommand() {
         this.name = "evaluate";
         this.ownerCommand = true;
-        this.aliases = new String[]{"eval", "ev"};
+        this.aliases = new String[] { "eval", "ev" };
 
         engine = new ScriptEngineManager().getEngineByName("nashorn");
         try {
@@ -48,6 +50,7 @@ public class EvaluateCommand extends Command {
 
             logCommand(event.getGuild(), event.getAuthor(), content);
             MessageReceivedEvent jdaEvent = event.getEvent();
+
             try {
                 engine.put("event", jdaEvent);
                 engine.put("message", jdaEvent.getMessage());
@@ -61,8 +64,9 @@ public class EvaluateCommand extends Command {
                     engine.put("member", jdaEvent.getMember());
                 }
 
-                Object out = engine.eval("(function() {" + "with (imports) {return"
-                        + jdaEvent.getMessage().getContentDisplay().substring(args[0].length()) + "}" + "})();");
+                Object out = engine.eval("(function() {with (imports) {return"
+                        + jdaEvent.getMessage().getContentRaw().substring(args[0].length()) + "}" + "})();");
+
                 if (out == null) {
                     ebMessage.editMessage("Success (null output)").queue();
                 } else if (out.toString().length() >= 2000) {
