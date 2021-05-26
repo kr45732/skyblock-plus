@@ -339,6 +339,26 @@ public class Utils {
         return null;
     }
 
+    public static String makeHastePost(String body) {
+        try {
+
+            CloseableHttpClient client = HttpClientBuilder.create().build();
+
+            HttpPost httpPost = new HttpPost("https://hst.sh/documents");
+
+            StringEntity entity = new StringEntity(body);
+            httpPost.setEntity(entity);
+
+            CloseableHttpResponse response = client.execute(httpPost);
+            client.close();
+            return "https://hst.sh/"
+                    + higherDepth(JsonParser.parseReader(new InputStreamReader(response.getEntity().getContent())),
+                            "key").getAsString();
+        } catch (Exception ignored) {
+        }
+        return null;
+    }
+
     public static int postJson(String jsonUrl, Object postObject) {
         try {
             CredentialsProvider provider = new BasicCredentialsProvider();

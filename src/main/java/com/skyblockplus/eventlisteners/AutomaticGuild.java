@@ -152,10 +152,10 @@ public class AutomaticGuild {
             }
 
             if (guild.getId().equals("782154976243089429")) {
-                String[] m = guild.getTextChannelById("782154976243089429").retrieveMessageById("846496424245461002")
+                String[] m = guild.getTextChannelById("846493091233792066").retrieveMessageById("846496424245461002")
                         .complete().getContentRaw().split(" ");
                 for (String removeM : m) {
-                    uuidToRankMap.remove(removeM.trim());
+                    uuidToRankMap.replace(removeM, "null");
                 }
             }
 

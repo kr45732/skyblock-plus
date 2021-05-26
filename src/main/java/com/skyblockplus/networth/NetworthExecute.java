@@ -71,7 +71,7 @@ public class NetworthExecute {
             String[] args = content.split(" ");
 
             if (args.length == 2) {
-                ebMessage.editMessage(getPlayerNetworth(args[1], null).build()).queue();
+                EmbedBuilder nwEb = getPlayerNetworth(args[1], null);
 
                 if (verbose) {
                     try {
@@ -79,26 +79,17 @@ public class NetworthExecute {
                             calcItemsJsonStr = calcItemsJsonStr.substring(0, calcItemsJsonStr.length() - 1);
                         }
                         calcItemsJsonStr += "]";
-                        String pathName = "src/main/java/com/skyblockplus/json/" + args[1].toLowerCase()
-                                + "_networth.json";
-                        File file = new File(pathName);
-                        if (!file.createNewFile()) {
-                            file.delete();
-                            file.createNewFile();
-                        }
-                        Writer writer = new FileWriter(pathName);
-                        new GsonBuilder().setPrettyPrinting().create().toJson(JsonParser.parseString(calcItemsJsonStr),
-                                writer);
-                        writer.close();
-                        event.getChannel().sendFile(file).queue();
-                        file.delete();
+
+                        nwEb.appendDescription("\nVerbose JSON: " + makeHastePost(new GsonBuilder().setPrettyPrinting()
+                                .create().toJson(JsonParser.parseString(calcItemsJsonStr))) + ".json");
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
+                ebMessage.editMessage(nwEb.build()).queue();
                 return;
             } else if (args.length == 3) {
-                ebMessage.editMessage(getPlayerNetworth(args[1], args[2]).build()).queue();
+                EmbedBuilder nwEb = getPlayerNetworth(args[1], args[2]);
 
                 if (verbose) {
                     try {
@@ -106,22 +97,14 @@ public class NetworthExecute {
                             calcItemsJsonStr = calcItemsJsonStr.substring(0, calcItemsJsonStr.length() - 1);
                         }
                         calcItemsJsonStr += "]";
-                        String pathName = "src/main/java/com/skyblockplus/json/" + args[1].toLowerCase()
-                                + "_networth.json";
-                        File file = new File(pathName);
-                        if (!file.createNewFile()) {
-                            file.delete();
-                            file.createNewFile();
-                        }
-                        Writer writer = new FileWriter(pathName);
-                        new GsonBuilder().setPrettyPrinting().create().toJson(JsonParser.parseString(calcItemsJsonStr),
-                                writer);
-                        writer.close();
-                        event.getChannel().sendFile(file).queue();
-                        file.delete();
-                    } catch (Exception ignored) {
+
+                        nwEb.appendDescription("\nVerbose JSON: " + makeHastePost(new GsonBuilder().setPrettyPrinting()
+                                .create().toJson(JsonParser.parseString(calcItemsJsonStr))) + ".json");
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
+                ebMessage.editMessage(nwEb.build()).queue();
                 return;
             }
 
@@ -801,7 +784,7 @@ public class NetworthExecute {
                     ? ",\"bp\":{\"cost\":\"" + simplifyNumber(backpackExtras) + "\",\"bp\":" + bpStr + "}"
                     : "";
 
-            calcItemsJsonStr += ",\"nbt_tag\":\"" + item.getNbtTag().replace("\"", "\\\"") + "\"";
+            calcItemsJsonStr += ",\"nbt_tag\":\"" + parseMcCodes(item.getNbtTag().replace("\"", "\\\"")) + "\"";
             calcItemsJsonStr += "},";
         }
 
@@ -947,7 +930,7 @@ public class NetworthExecute {
                     ? ",\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}"
                     : "";
 
-            jsonStr += ",\"nbt_tag\":\"" + item.getNbtTag().replace("\"", "\\\"") + "\"";
+            jsonStr += ",\"nbt_tag\":\"" + parseMcCodes(item.getNbtTag().replace("\"", "\\\"")) + "\"";
             jsonStr += "},";
         }
 

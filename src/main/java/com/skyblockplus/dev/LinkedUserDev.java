@@ -1,19 +1,20 @@
 package com.skyblockplus.dev;
 
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.errorMessage;
+import static com.skyblockplus.utils.Utils.loadingEmbed;
+import static com.skyblockplus.utils.Utils.logCommand;
+import static com.skyblockplus.utils.Utils.makeHastePost;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.Writer;
-
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Utils.*;
 
 public class LinkedUserDev extends Command {
 
@@ -69,23 +70,11 @@ public class LinkedUserDev extends Command {
         }
 
         try {
-            String pathName = "src/main/java/com/skyblockplus/json/All_Linked_Users.json";
-            File file = new File(pathName);
-            if (!file.createNewFile()) {
-                file.delete();
-                file.createNewFile();
-            }
-
-            Writer writer = new FileWriter(pathName);
-            new GsonBuilder().setPrettyPrinting().create().toJson(allSettings, writer);
-            writer.close();
-
-            event.getChannel().sendMessage("All linked users").addFile(file).complete();
-
-            if (file.delete()) {
-                return true;
-            }
-
+            event.getChannel()
+                    .sendMessage(
+                            makeHastePost(new GsonBuilder().setPrettyPrinting().create().toJson(allSettings)) + ".json")
+                    .queue();
+            return true;
         } catch (Exception ignored) {
         }
         return false;

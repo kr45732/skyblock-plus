@@ -3,40 +3,30 @@ package com.skyblockplus.dev;
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.eventlisteners.MainListener.guildMap;
 import static com.skyblockplus.utils.Utils.logCommand;
+import static com.skyblockplus.utils.Utils.makeHastePost;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.Writer;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 
+import groovy.lang.GroovyShell;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class EvaluateCommand extends Command {
-    private final ScriptEngine engine;
-    private int count = 0;
+    private String importString = "";
 
     public EvaluateCommand() {
         this.name = "evaluate";
         this.ownerCommand = true;
         this.aliases = new String[] { "eval", "ev" };
 
-        engine = new ScriptEngineManager().getEngineByName("nashorn");
-        try {
-            engine.eval("var imports = new JavaImporter(" + "java.io," + "java.lang," + "java.util,"
-                    + "Packages.net.dv8tion.jda.api," + "Packages.net.dv8tion.jda.api.entities,"
-                    + "Packages.net.dv8tion.jda.api.entities.impl," + "Packages.net.dv8tion.jda.api.managers,"
-                    + "Packages.net.dv8tion.jda.api.managers.impl," + "Packages.net.dv8tion.jda.api.utils);");
-        } catch (Exception e) {
-            e.printStackTrace();
+        String[] packageImports = { "java.io", "java.lang", "java.math", "java.time", "java.util",
+                "java.util.concurrent", "java.util.stream", "net.dv8tion.jda.api", "net.dv8tion.jda.api.entities",
+                "net.dv8tion.jda.api.entities.impl", "net.dv8tion.jda.api.managers",
+                "net.dv8tion.jda.api.managers.impl", "net.dv8tion.jda.api.utils" };
+        for (String packageImport : packageImports) {
+            importString += "import " + packageImport + ".*\n";
         }
     }
 
@@ -45,50 +35,45 @@ public class EvaluateCommand extends Command {
         new Thread(() -> {
             Message ebMessage = event.getChannel().sendMessage("Loading").complete();
             String content = event.getMessage().getContentRaw();
-            String[] args = content.split("\\s+");
-            count++;
+            String[] args = content.split("\\s+", 2);
 
             logCommand(event.getGuild(), event.getAuthor(), content);
+
+            if (args.length < 2) {
+                ebMessage.editMessage("Invalid Input").queue();
+                return;
+            }
+
+            String arg = args[1];
+
+            if (arg.startsWith("```") && arg.endsWith("```")) {
+                arg = arg.replaceAll("```(.*)\n", "").replaceAll("\n?```", "");
+            }
+
             MessageReceivedEvent jdaEvent = event.getEvent();
 
+            GroovyShell shell = new GroovyShell();
+
             try {
-                engine.put("event", jdaEvent);
-                engine.put("message", jdaEvent.getMessage());
-                engine.put("channel", jdaEvent.getChannel());
-                engine.put("args", args);
-                engine.put("jda", jdaEvent.getJDA());
-                engine.put("guilds", guildMap);
-                engine.put("db", database);
+                shell.setProperty("event", jdaEvent);
+                shell.setProperty("message", jdaEvent.getMessage());
+                shell.setProperty("channel", jdaEvent.getChannel());
+                shell.setProperty("args", args);
+                shell.setProperty("jda", jdaEvent.getJDA());
+                shell.setProperty("guilds", guildMap);
+                shell.setProperty("db", database);
                 if (jdaEvent.isFromType(ChannelType.TEXT)) {
-                    engine.put("guild", jdaEvent.getGuild());
-                    engine.put("member", jdaEvent.getMember());
+                    shell.setProperty("guild", jdaEvent.getGuild());
+                    shell.setProperty("member", jdaEvent.getMember());
                 }
 
-                Object out = engine.eval("(function() {with (imports) {return"
-                        + jdaEvent.getMessage().getContentRaw().substring(args[0].length()) + "}" + "})();");
+                String script = importString + arg;
+                Object out = shell.evaluate(script);
 
                 if (out == null) {
                     ebMessage.editMessage("Success (null output)").queue();
                 } else if (out.toString().length() >= 2000) {
-                    String pathName = "src/main/java/com/skyblockplus/json/" + count + "_eval_cmd.json";
-                    File file = new File(pathName);
-                    if (!file.createNewFile()) {
-                        file.delete();
-                        file.createNewFile();
-                    }
-
-                    Writer writer = new FileWriter(pathName);
-                    try {
-                        new GsonBuilder().setPrettyPrinting().create().toJson(JsonParser.parseString(out.toString()),
-                                writer);
-                    } catch (Exception e) {
-                        writer.write(out.toString());
-                    }
-                    writer.close();
-
-                    ebMessage.delete().queue();
-                    event.getChannel().sendFile(file).queue();
-                    file.delete();
+                    ebMessage.editMessage(makeHastePost(out.toString()) + ".json").queue();
                 } else {
                     ebMessage.editMessage(out.toString()).queue();
                 }

@@ -1,21 +1,20 @@
 package com.skyblockplus.dev;
 
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.utils.Utils.errorMessage;
+import static com.skyblockplus.utils.Utils.logCommand;
+import static com.skyblockplus.utils.Utils.makeHastePost;
+
+import java.util.List;
+
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSettingsModel;
+
 import net.dv8tion.jda.api.entities.Guild;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.Writer;
-import java.util.List;
-
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.utils.Utils.errorMessage;
-import static com.skyblockplus.utils.Utils.logCommand;
 
 public class GetSettingsFile extends Command {
 
@@ -59,23 +58,11 @@ public class GetSettingsFile extends Command {
         }
 
         try {
-            String pathName = "src/main/java/com/skyblockplus/json/All_Settings.json";
-            File file = new File(pathName);
-            if (!file.createNewFile()) {
-                file.delete();
-                file.createNewFile();
-            }
-
-            Writer writer = new FileWriter(pathName);
-            new GsonBuilder().setPrettyPrinting().create().toJson(allSettings, writer);
-            writer.close();
-
-            event.getChannel().sendMessage("All settings").addFile(file).complete();
-
-            if (file.delete()) {
-                return true;
-            }
-
+            event.getChannel()
+                    .sendMessage(
+                            makeHastePost(new GsonBuilder().setPrettyPrinting().create().toJson(allSettings)) + ".json")
+                    .queue();
+            return true;
         } catch (Exception ignored) {
         }
         return false;
@@ -89,23 +76,10 @@ public class GetSettingsFile extends Command {
         }
 
         try {
-            String pathName = "src/main/java/com/skyblockplus/json/" + guild.getName() + "_Settings.json";
-            File file = new File(pathName);
-            if (!file.createNewFile()) {
-                file.delete();
-                file.createNewFile();
-            }
-
-            Writer writer = new FileWriter(pathName);
-            new GsonBuilder().setPrettyPrinting().create().toJson(currentSettings, writer);
-            writer.close();
-
-            event.getChannel().sendMessage("Settings for " + guild.getName()).addFile(file).complete();
-
-            if (file.delete()) {
-                return true;
-            }
-
+            event.getChannel().sendMessage(
+                    makeHastePost(new GsonBuilder().setPrettyPrinting().create().toJson(currentSettings)) + ".json")
+                    .queue();
+            return true;
         } catch (Exception ignored) {
         }
 

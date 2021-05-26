@@ -67,10 +67,11 @@ dependencies {
     implementation 'com.vdurmont:emoji-java:5.1.1'
 
     // Apache common text
-    compile 'org.apache.commons:commons-text:1.9'
+    implementation 'org.apache.commons:commons-text:1.9'
+
+    // Groovy
+    implementation "org.codehaus.groovy:groovy:3.0.7"
 
     // Misc
     implementation "ch.qos.logback:logback-classic:1.2.3"
-
-
 }
