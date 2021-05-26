@@ -37,6 +37,10 @@ public class SpringDatabaseComponent {
         this.linkedAccountService = linkedAccountService;
     }
 
+    public int removeApplySettings(String serverId, String name) {
+        return settingsService.removeApplySettings(serverId, name).getStatusCodeValue();
+    }
+
     public int addLinkedUser(LinkedAccountModel newUser) {
         return linkedAccountService.addNewLinkedAccount(newUser).getStatusCodeValue();
     }

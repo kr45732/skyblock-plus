@@ -546,4 +546,26 @@ public class ServerSettingsService {
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
+
+    public ResponseEntity<HttpStatus> removeApplySettings(String serverId, String name) {
+        ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+        if (currentServerSettings != null) {
+            AutomatedApplication applyOne = currentServerSettings.getAutomatedApplicationOne();
+            AutomatedApplication applyTwo = currentServerSettings.getAutomatedApplicationTwo();
+
+            if (applyOne != null && applyOne.getName().equalsIgnoreCase(name)) {
+                currentServerSettings.setAutomatedApplicationOne(new AutomatedApplication());
+            } else if (applyTwo != null && applyTwo.getName().equalsIgnoreCase(name)) {
+                currentServerSettings.setAutomatedApplicationTwo(new AutomatedApplication());
+            } else {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            settingsRepository.save(currentServerSettings);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
 }

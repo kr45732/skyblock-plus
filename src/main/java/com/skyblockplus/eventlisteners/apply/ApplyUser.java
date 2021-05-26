@@ -1,6 +1,5 @@
 package com.skyblockplus.eventlisteners.apply;
 
-import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.Utils.emojiToProfileName;
@@ -27,7 +26,6 @@ import com.skyblockplus.utils.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -358,15 +356,6 @@ public class ApplyUser implements Serializable {
 
             reactMessage = applicationChannel.sendMessage(eb.build()).complete();
             reactMessage.addReaction("✅").queue();
-
-            try {
-                JsonElement guildRoleSettings = database.getGuildRoleSettings(guildId);
-                Guild guild = jda.getGuildById(guildId);
-
-                guild.addRoleToMember(applyingUserId,
-                        guild.getRoleById(higherDepth(guildRoleSettings, "roleId").getAsString())).queue();
-            } catch (Exception ignored) {
-            }
 
             try {
                 TextChannel waitInviteChannel = jda

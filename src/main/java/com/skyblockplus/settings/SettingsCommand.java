@@ -69,8 +69,8 @@ public class SettingsCommand extends Command {
                     }
                 } else {
                     ebMessage.editMessage(defaultEmbed("Error").setDescription(
-                            "To delete the server settings rerun this command with the `--confirm` flag (`" + BOT_PREFIX
-                                    + "settings delete --confirm`)")
+                            "To confirm deleting the server settings rerun this command with the `--confirm` flag (`"
+                                    + BOT_PREFIX + "settings delete --confirm`)")
                             .build()).queue();
                 }
                 return;
@@ -86,12 +86,8 @@ public class SettingsCommand extends Command {
                     eb.addField("Verify Settings", "Error! Data not found", false);
                 }
 
-                if (higherDepth(currentSettings, "automatedApplication") != null) {
-                    eb.addField("Apply Settings",
-                            "Use `" + BOT_PREFIX + "settings apply` to see the current apply settings", false);
-                } else {
-                    eb.addField("Apply Settings", "Error! Data not found", false);
-                }
+                eb.addField("Apply Settings", "Use `" + BOT_PREFIX + "settings apply` to see all apply settings",
+                        false);
 
                 if (higherDepth(currentSettings, "automatedRoles") != null) {
                     eb.addField("Roles Settings",
@@ -191,6 +187,8 @@ public class SettingsCommand extends Command {
                 } else if (args.length == 4) {
                     if (args[2].equals("create")) {
                         eb = createApplyGuild(args[3]);
+                    } else if (args[2].equals("delete")) {
+                        eb = deleteApplyGuild(args[3]);
                     } else {
                         JsonElement applySettings = database.getApplySettings(event.getGuild().getId(), args[2]);
                         if (applySettings != null && !applySettings.isJsonNull()) {
@@ -382,6 +380,10 @@ public class SettingsCommand extends Command {
 
             ebMessage.editMessage(eb.build()).queue();
         }).start();
+    }
+
+    private EmbedBuilder deleteApplyGuild(String name) {
+        return defaultEmbed("Database returned code: " + database.removeApplySettings(event.getGuild().getId(), name));
     }
 
     private EmbedBuilder removeVerifyRole(String roleMention) {

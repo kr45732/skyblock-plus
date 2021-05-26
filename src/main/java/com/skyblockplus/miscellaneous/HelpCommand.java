@@ -165,7 +165,8 @@ public class HelpCommand extends Command {
             if (isAdmin) {
                 paginateBuilder.addItems(generateHelp("Get the current settings for the bot", "settings")
                         + generateHelp("A walk-through on how to setup the bot", "setup")
-                        + generateHelp("Get the id's of all categories in guild", "categories"));
+                        + generateHelp("Get the id's of all categories in guild", "categories")
+                        + generateHelp("Delete the current server settings", "settings delete --confirm"));
 
                 paginateBuilder.addItems(generateHelp("Get the current verify settings for the bot", "settings verify")
                         + generateHelp("Enable or disable automatic verify", "settings verify [enable|disable]")
