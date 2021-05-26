@@ -1,5 +1,31 @@
 package com.skyblockplus.networth;
 
+import static com.skyblockplus.utils.Utils.capitalizeString;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.errorMessage;
+import static com.skyblockplus.utils.Utils.formatNumber;
+import static com.skyblockplus.utils.Utils.getJson;
+import static com.skyblockplus.utils.Utils.getJsonKeys;
+import static com.skyblockplus.utils.Utils.getReforgeStonesJson;
+import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.Utils.loadingEmbed;
+import static com.skyblockplus.utils.Utils.logCommand;
+import static com.skyblockplus.utils.Utils.makeHastePost;
+import static com.skyblockplus.utils.Utils.parseMcCodes;
+import static com.skyblockplus.utils.Utils.simplifyNumber;
+import static com.skyblockplus.utils.Utils.toRomanNumerals;
+
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -9,22 +35,14 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.InvItem;
 import com.skyblockplus.utils.structs.NwItemPrice;
 
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.InputStreamReader;
-import java.io.Writer;
-import java.net.URI;
-import java.util.*;
-
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 
 public class NetworthExecute {
     private final Set<String> tempSet = new HashSet<>();
