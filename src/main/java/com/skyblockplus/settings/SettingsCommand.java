@@ -891,8 +891,16 @@ public class SettingsCommand extends Command {
             ebFieldString.append(higherDepth(currentRoleSettings, "enable").getAsString().equals("true") ? "• Enabled"
                     : "• Disabled");
             if (roleName.equals("guild_ranks")) {
-                ebFieldString.append("\n• View the current guild ranks in `" + BOT_PREFIX + "settings guild [name]`");
-                pageTitles.add(roleName + " (__no level role__)");
+
+                if (higherDepth(currentRoleSettings, "levels").getAsJsonArray().size() == 0) {
+                    ebFieldString.append("\n• No ranks added");
+                } else {
+                    for (JsonElement roleLevel : higherDepth(currentRoleSettings, "levels").getAsJsonArray()) {
+                        String rName = higherDepth(roleLevel, "value").getAsString();
+                        ebFieldString.append("\n• ")
+                                .append(rName + "(view the ranks in " + BOT_PREFIX + "`settings guild " + rName + "`");
+                    }
+                }
             } else if (isOneLevelRole(roleName)) {
                 try {
                     ebFieldString.append("\n• default - ").append("<@&"

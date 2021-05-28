@@ -227,14 +227,16 @@ public class HelpCommand extends Command {
                                 "settings roles stackable [roleName] [true|false]")
                         + generateHelp("Set a one level role's role", "settings roles set [roleName] [@role]"));
 
-                paginateBuilder.addItems(generateHelp("Enable or disable automatic guild role assigning",
-                        "settings guild [enable|disable] role")
-                        + generateHelp("Set the guild name", "settings guild set [guild_name]")
-                        + generateHelp("Set the role to give guild member's", "settings guild role [@role]")
+                paginateBuilder.addItems(generateHelp("Create a new guild roles with name `name`",
+                        "settings guild create [name]")
+                        + generateHelp("Enable or disable automatic guild role assigning",
+                                "settings guild [name] [enable|disable] role")
+                        + generateHelp("Set the guild name", "settings guild [name] set [guild_name]")
+                        + generateHelp("Set the role to give guild member's", "settings guild [name] role [@role]")
                         + generateHelp("Enable or disable automatic guild rank assigning",
-                                "settings guild [enable|disable] rank")
-                        + generateHelp("Add an automatic guild rank", "settings guild add [rank_name] [@role]")
-                        + generateHelp("Remove an automatic guild rank", "settings guild remove [rank_name]"));
+                                "settings guild [name] [enable|disable] rank")
+                        + generateHelp("Add an automatic guild rank", "settings guild [name] add [rank_name] [@role]")
+                        + generateHelp("Remove an automatic guild rank", "settings guild [name] remove [rank_name]"));
             }
 
             paginateBuilder.build().paginate(event.getChannel(), startingPage);
