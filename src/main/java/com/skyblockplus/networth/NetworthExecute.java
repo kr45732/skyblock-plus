@@ -1118,6 +1118,14 @@ public class NetworthExecute {
             return true;
         }
 
+        if (s.equalsIgnoreCase("smooth_brick")) {
+            return true;
+        }
+
+        if (s.equalsIgnoreCase("zombie_talisman")) {
+            return true;
+        }
+
         return s.equals("skyblock_menu");
     }
 

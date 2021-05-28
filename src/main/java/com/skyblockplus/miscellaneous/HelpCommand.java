@@ -184,6 +184,7 @@ public class HelpCommand extends Command {
 
                 paginateBuilder.addItems(generateHelp("Get the current apply names for the bot", "settings apply")
                         + generateHelp("Create a new automatic apply with name 'name'", "settings apply create [name]")
+                        + generateHelp("Delete an automatic apply", "settings apply remove [name]")
                         + generateHelp("Enable or disable automatic apply", "settings apply [name] [enable|disable]")
                         + generateHelp("Message that users will see and react to in order to apply",
                                 "settings" + " apply [name] message [message]")

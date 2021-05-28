@@ -120,13 +120,13 @@ public class SpringDatabaseComponent {
                 .getStatusCodeValue();
     }
 
-    public JsonElement getGuildRoleSettings(String serverId) {
-        return gson.toJsonTree(settingsService.getGuildRolesSettings(serverId).getBody());
-    }
-
     public int updateGuildRoleSettings(String serverId, JsonObject currentSettings) {
         return settingsService.updateGuildRoleSettings(serverId, gson.fromJson(currentSettings, GuildRole.class))
                 .getStatusCodeValue();
+    }
+
+    public int updateGuildRoleSettings(String serverId, GuildRole currentSettings) {
+        return settingsService.updateGuildRoleSettings(serverId, currentSettings).getStatusCodeValue();
     }
 
     public int updateApplyCacheSettings(String serverId, String name, String currentSettings) {
@@ -203,5 +203,13 @@ public class SpringDatabaseComponent {
     public int updateVerifyRolesSettings(String serverId, JsonArray newsettings) {
         return settingsService.updateVerifyRolesSettings(serverId, gson.fromJson(newsettings, String[].class))
                 .getStatusCodeValue();
+    }
+
+    public List<GuildRole> getAllGuildRoles(String serverId) {
+        return settingsService.getAllGuildRolesSettings(serverId);
+    }
+
+    public JsonElement getGuildRoleSettings(String serverId, String name) {
+        return gson.toJsonTree(settingsService.getGuildRoleSettingsExt(serverId, name).getBody());
     }
 }

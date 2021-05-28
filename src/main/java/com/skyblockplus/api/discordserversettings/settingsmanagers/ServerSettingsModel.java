@@ -42,7 +42,10 @@ public class ServerSettingsModel {
     private AutomatedRoles automatedRoles = new AutomatedRoles();
 
     @Embedded
-    private GuildRole automaticGuildRoles = new GuildRole();
+    private GuildRole automaticGuildRolesOne = null;
+
+    @Embedded
+    private GuildRole automaticGuildRolesTwo = null;
 
     @Embedded
     private SbEvent sbEvent = new SbEvent();

@@ -24,9 +24,15 @@ public class EvaluateCommand extends Command {
         String[] packageImports = { "java.io", "java.lang", "java.math", "java.time", "java.util",
                 "java.util.concurrent", "java.util.stream", "net.dv8tion.jda.api", "net.dv8tion.jda.api.entities",
                 "net.dv8tion.jda.api.entities.impl", "net.dv8tion.jda.api.managers",
-                "net.dv8tion.jda.api.managers.impl", "net.dv8tion.jda.api.utils" };
+                "net.dv8tion.jda.api.managers.impl", "net.dv8tion.jda.api.utils", "com.skyblockplus" };
+        String[] staticImports = { "com.skyblockplus.utils.Utils.*" };
+
         for (String packageImport : packageImports) {
             importString += "import " + packageImport + ".*\n";
+        }
+
+        for (String staticImport : staticImports) {
+            importString += "import static " + staticImport + "\n";
         }
     }
 

@@ -4,7 +4,7 @@ import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.eventlisteners.skyblockevent.SkyblockEventCommand.endSkyblockEvent;
 import static com.skyblockplus.utils.Utils.HYPIXEL_API_KEY;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.*;
 import static com.skyblockplus.utils.Utils.getJson;
 import static com.skyblockplus.utils.Utils.higherDepth;
 import static com.skyblockplus.utils.Utils.logCommand;
@@ -14,9 +14,11 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -29,6 +31,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.discordserversettings.automatedapplication.AutomatedApplication;
+import com.skyblockplus.api.discordserversettings.automatedguildroles.GuildRank;
+import com.skyblockplus.api.discordserversettings.automatedguildroles.GuildRole;
 import com.skyblockplus.api.discordserversettings.skyblockevent.EventMember;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
 import com.skyblockplus.eventlisteners.apply.ApplyGuild;
@@ -87,7 +91,7 @@ public class AutomaticGuild {
     public void schedulerConstructor() {
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         int eventDelay = (int) (Math.random() * 60 + 1);
-        scheduler.scheduleAtFixedRate(this::updateGuildRoles, eventDelay, 180, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(this::updateGuildRoles, eventDelay, 240, TimeUnit.MINUTES);
         scheduler.scheduleAtFixedRate(this::updateSkyblockEvent, eventDelay, 60, TimeUnit.MINUTES);
     }
 
@@ -112,59 +116,22 @@ public class AutomaticGuild {
             long startTime = System.currentTimeMillis();
 
             Guild guild = jda.getGuildById(guildId);
-            JsonElement currentSettings = database.getGuildRoleSettings(guild.getId());
+            List<GuildRole> currentSettings = database.getAllGuildRoles(guild.getId());
 
             if (currentSettings == null) {
                 return;
             }
 
-            boolean enableGuildRole = false;
-            boolean enableGuildRanks = false;
-            try {
-                enableGuildRole = higherDepth(currentSettings, "enableGuildRole").getAsBoolean();
-            } catch (Exception ignored) {
-            }
+            currentSettings.removeIf(o1 -> o1.getName() == null || (!o1.getEnableGuildRole().equalsIgnoreCase("true")
+                    && !o1.getEnableGuildRanks().equalsIgnoreCase("true")));
 
-            try {
-                enableGuildRanks = higherDepth(currentSettings, "enableGuildRanks").getAsBoolean();
-            } catch (Exception ignored) {
-            }
-
-            if (!enableGuildRole && !enableGuildRanks) {
+            if (currentSettings.size() == 0) {
                 return;
-            }
-
-            JsonArray guildMembers = null;
-            try {
-                guildMembers = higherDepth(getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&id="
-                        + higherDepth(currentSettings, "guildId").getAsString()), "guild.members").getAsJsonArray();
-            } catch (Exception ignored) {
-            }
-
-            if (guildMembers == null) {
-                return;
-            }
-
-            Map<String, String> uuidToRankMap = new HashMap<>();
-            for (JsonElement guildMember : guildMembers) {
-                uuidToRankMap.put(higherDepth(guildMember, "uuid").getAsString(),
-                        higherDepth(guildMember, "rank").getAsString().replace(" ", "_"));
-            }
-
-            if (guild.getId().equals("782154976243089429")) {
-                String[] m = guild.getTextChannelById("846493091233792066").retrieveMessageById("846496424245461002")
-                        .complete().getContentRaw().split(" ");
-                for (String removeM : m) {
-                    uuidToRankMap.replace(removeM, "null");
-                }
             }
 
             List<LinkedAccountModel> linkedUsers = database.getLinkedUsers();
-            Role guildMemberRole = enableGuildRole
-                    ? guild.getRoleById(higherDepth(currentSettings, "roleId").getAsString())
-                    : null;
 
-            int memberCount = 0;
+            Set<String> memberCountList = new HashSet<>();
             List<List<LinkedAccountModel>> linkedUsersLists = ListUtils.partition(linkedUsers, 100);
 
             AtomicInteger requestCount = new AtomicInteger();
@@ -200,46 +167,75 @@ public class AutomaticGuild {
                 e.printStackTrace();
             }
 
-            for (Member linkedUser : inGuildUsers) {
-                if (enableGuildRole) {
-                    if (uuidToRankMap.containsKey(discordIdToUuid.get(linkedUser.getId()))) {
-                        guild.addRoleToMember(linkedUser, guildMemberRole).queue(s -> {
-                        }, f -> logCommand(guild, linkedUser.getUser(), "Failed to add guild role"));
-                    } else {
-                        guild.removeRoleFromMember(linkedUser, guildMemberRole).queue(s -> {
-                        }, f -> logCommand(guild, linkedUser.getUser(), "Failed to remove guild role"));
+            for (GuildRole currentSetting : currentSettings) {
+                JsonArray guildMembers = null;
+                try {
+                    guildMembers = higherDepth(getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&id="
+                            + currentSetting.getGuildId()), "guild.members").getAsJsonArray();
+                } catch (Exception ignored) {
+                }
+
+                if (guildMembers == null) {
+                    continue;
+                }
+
+                Map<String, String> uuidToRankMap = new HashMap<>();
+                for (JsonElement guildMember : guildMembers) {
+                    uuidToRankMap.put(higherDepth(guildMember, "uuid").getAsString(),
+                            higherDepth(guildMember, "rank").getAsString().replace(" ", "_"));
+                }
+
+                if (guild.getId().equals("782154976243089429")) {
+                    String[] m = guild.getTextChannelById("846493091233792066")
+                            .retrieveMessageById("846496424245461002").complete().getContentRaw().split(" ");
+                    for (String removeM : m) {
+                        uuidToRankMap.replace(removeM, "null");
                     }
                 }
 
-                if (enableGuildRanks) {
-                    JsonArray guildRanksArr = higherDepth(currentSettings, "guildRanks").getAsJsonArray();
-                    if (!uuidToRankMap.containsKey(discordIdToUuid.get(linkedUser.getId()))) {
-                        for (JsonElement guildRank : guildRanksArr) {
-                            guild.removeRoleFromMember(linkedUser,
-                                    guild.getRoleById(higherDepth(guildRank, "discordRoleId").getAsString()))
-                                    .queue(s -> {
-                                    }, f -> logCommand(guild, linkedUser.getUser(), "Failed to remove guild rank"));
+                boolean enableGuildRole = currentSetting.getEnableGuildRole().equalsIgnoreCase("true");
+                boolean enableGuildRanks = currentSetting.getEnableGuildRanks().equalsIgnoreCase("true");
+
+                Role guildMemberRole = enableGuildRole ? guild.getRoleById(currentSetting.getRoleId()) : null;
+
+                for (Member linkedUser : inGuildUsers) {
+                    if (enableGuildRole) {
+                        if (uuidToRankMap.containsKey(discordIdToUuid.get(linkedUser.getId()))) {
+                            guild.addRoleToMember(linkedUser, guildMemberRole).queue(s -> {
+                            }, f -> logCommand(guild, linkedUser.getUser(), "Failed to add guild role"));
+                        } else {
+                            guild.removeRoleFromMember(linkedUser, guildMemberRole).queue(s -> {
+                            }, f -> logCommand(guild, linkedUser.getUser(), "Failed to remove guild role"));
                         }
-                    } else {
-                        String currentRank = uuidToRankMap.get(discordIdToUuid.get(linkedUser.getId()));
-                        for (JsonElement guildRank : guildRanksArr) {
-                            Role currentRankRole = guild
-                                    .getRoleById(higherDepth(guildRank, "discordRoleId").getAsString());
-                            if (higherDepth(guildRank, "minecraftRoleName").getAsString()
-                                    .equalsIgnoreCase(currentRank)) {
-                                guild.addRoleToMember(linkedUser, currentRankRole).queue(s -> {
-                                }, f -> logCommand(guild, linkedUser.getUser(), "Failed to add guild rank"));
-                            } else {
-                                guild.removeRoleFromMember(linkedUser, currentRankRole).queue(s -> {
-                                }, f -> logCommand(guild, linkedUser.getUser(), "Failed to remove guild rank"));
+                    }
+
+                    if (enableGuildRanks) {
+                        List<GuildRank> guildRanksArr = currentSetting.getGuildRanks();
+                        if (!uuidToRankMap.containsKey(discordIdToUuid.get(linkedUser.getId()))) {
+                            for (GuildRank guildRank : guildRanksArr) {
+                                guild.removeRoleFromMember(linkedUser, guild.getRoleById(guildRank.getDiscordRoleId()))
+                                        .queue(s -> {
+                                        }, f -> logCommand(guild, linkedUser.getUser(), "Failed to remove guild rank"));
+                            }
+                        } else {
+                            String currentRank = uuidToRankMap.get(discordIdToUuid.get(linkedUser.getId()));
+                            for (GuildRank guildRank : guildRanksArr) {
+                                Role currentRankRole = guild.getRoleById(guildRank.getDiscordRoleId());
+                                if (guildRank.getMinecraftRoleName().equalsIgnoreCase(currentRank)) {
+                                    guild.addRoleToMember(linkedUser, currentRankRole).queue(s -> {
+                                    }, f -> logCommand(guild, linkedUser.getUser(), "Failed to add guild rank"));
+                                } else {
+                                    guild.removeRoleFromMember(linkedUser, currentRankRole).queue(s -> {
+                                    }, f -> logCommand(guild, linkedUser.getUser(), "Failed to remove guild rank"));
+                                }
                             }
                         }
                     }
-                }
 
-                memberCount++;
+                    memberCountList.add(linkedUser.getId());
+                }
             }
-            logCommand(guild, "Guild Role | Users (" + memberCount + ") | Time ("
+            logCommand(guild, "Guild Role | Users (" + memberCountList.size() + ") | Time ("
                     + ((System.currentTimeMillis() - startTime) / 1000) + "s)");
         } catch (Exception e) {
             System.out.println("== Stack Trace (updateGuildRoles - " + guildId + ") ==");

@@ -280,27 +280,6 @@ public class ServerSettingsService {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    public ResponseEntity<?> getGuildRolesSettings(String serverId) {
-        ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
-
-        if (currentServerSettings != null) {
-            return new ResponseEntity<>(currentServerSettings.getAutomaticGuildRoles(), HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    }
-
-    public ResponseEntity<HttpStatus> updateGuildRoleSettings(String serverId, GuildRole newSettings) {
-        ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
-
-        if (currentServerSettings != null) {
-            currentServerSettings.setAutomaticGuildRoles(newSettings);
-            settingsRepository.save(currentServerSettings);
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-
-    }
-
     public ResponseEntity<?> getApplyUsersCache(String serverId, String name) {
         AutomatedApplication automatedApplication = getApplySettings(serverId, name);
 
@@ -504,6 +483,37 @@ public class ServerSettingsService {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
+    public ResponseEntity<HttpStatus> updateGuildRoleSettings(String serverId, GuildRole newSettings) {
+        ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+        if (currentServerSettings != null) {
+            String name = newSettings.getName();
+            if (name == null || name.length() == 0) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+            if (currentServerSettings.getAutomaticGuildRolesOne().getName() != null
+                    && currentServerSettings.getAutomaticGuildRolesOne().getName().equalsIgnoreCase(name)) {
+                currentServerSettings.setAutomaticGuildRolesOne(newSettings);
+            } else if (currentServerSettings.getAutomaticGuildRolesTwo().getName() != null
+                    && currentServerSettings.getAutomaticGuildRolesTwo().getName().equalsIgnoreCase(name)) {
+                currentServerSettings.setAutomaticGuildRolesTwo(newSettings);
+            } else {
+                if (currentServerSettings.getAutomaticGuildRolesOne().getName() == null) {
+                    currentServerSettings.setAutomaticGuildRolesOne(newSettings);
+                } else if (currentServerSettings.getAutomaticGuildRolesTwo().getName() == null) {
+                    currentServerSettings.setAutomaticGuildRolesTwo(newSettings);
+                } else {
+                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                }
+            }
+
+            settingsRepository.save(currentServerSettings);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
     public AutomatedApplication getApplySettings(String serverId, String name) {
         ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
@@ -564,6 +574,31 @@ public class ServerSettingsService {
 
             settingsRepository.save(currentServerSettings);
             return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    public List<GuildRole> getAllGuildRolesSettings(String serverId) {
+        ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+        if (currentServerSettings != null) {
+            return new ArrayList<>(Arrays.asList(currentServerSettings.getAutomaticGuildRolesOne(),
+                    currentServerSettings.getAutomaticGuildRolesTwo()));
+        }
+        return null;
+    }
+
+    public ResponseEntity<?> getGuildRoleSettingsExt(String serverId, String name) {
+        ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+        if (currentServerSettings != null) {
+            if (currentServerSettings.getAutomaticGuildRolesOne().getName() != null
+                    && currentServerSettings.getAutomaticGuildRolesOne().getName().equalsIgnoreCase(name)) {
+                return new ResponseEntity<>(currentServerSettings.getAutomaticGuildRolesOne(), HttpStatus.OK);
+            } else if (currentServerSettings.getAutomaticGuildRolesTwo().getName() != null
+                    && currentServerSettings.getAutomaticGuildRolesTwo().getName().equalsIgnoreCase(name)) {
+                return new ResponseEntity<>(currentServerSettings.getAutomaticGuildRolesTwo(), HttpStatus.OK);
+            }
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }

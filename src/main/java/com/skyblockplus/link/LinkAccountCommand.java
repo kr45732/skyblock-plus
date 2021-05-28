@@ -12,6 +12,8 @@ import static com.skyblockplus.utils.Utils.loadingEmbed;
 import static com.skyblockplus.utils.Utils.logCommand;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -55,11 +57,11 @@ public class LinkAccountCommand extends Command {
                         nicknameTemplate = nicknameTemplate.replace("[IGN]", playerInfo.minecraftUsername);
                         if (nicknameTemplate.contains("[GUILD_RANK]")) {
                             try {
-                                String settingsGuildId = higherDepth(database.getGuildRoleSettings(guild.getId()),
-                                        "guildId").getAsString();
+                                List<String> settingsGuildId = database.getAllGuildRoles(guild.getId()).stream()
+                                        .map(o1 -> o1.getGuildId()).collect(Collectors.toList());
                                 JsonElement playerGuild = higherDepth(getJson("https://api.hypixel.net/guild?key="
                                         + HYPIXEL_API_KEY + "&player=" + playerInfo.minecraftUuid), "guild");
-                                if (higherDepth(playerGuild, "_id").getAsString().equals(settingsGuildId)) {
+                                if (settingsGuildId.contains(higherDepth(playerGuild, "_id").getAsString())) {
                                     JsonArray guildMembers = higherDepth(playerGuild, "members").getAsJsonArray();
                                     for (JsonElement guildMember : guildMembers) {
                                         if (higherDepth(guildMember, "uuid").getAsString()
