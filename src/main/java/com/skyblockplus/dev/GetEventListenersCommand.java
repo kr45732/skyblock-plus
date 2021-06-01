@@ -9,29 +9,25 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 
 public class GetEventListenersCommand extends Command {
 
-  public GetEventListenersCommand() {
-    this.name = "d-listeners";
-    this.ownerCommand = true;
-  }
+	public GetEventListenersCommand() {
+		this.name = "d-listeners";
+		this.ownerCommand = true;
+	}
 
-  @Override
-  protected void execute(CommandEvent event) {
-    new Thread(
-      () -> {
-        logCommand(
-          event.getGuild(),
-          event.getAuthor(),
-          BOT_PREFIX + "d-listeners"
-        );
+	@Override
+	protected void execute(CommandEvent event) {
+		new Thread(
+			() -> {
+				logCommand(event.getGuild(), event.getAuthor(), BOT_PREFIX + "d-listeners");
 
-        StringBuilder ebString = new StringBuilder();
-        for (Object i : jda.getRegisteredListeners()) {
-          ebString.append("\n• ").append(i);
-        }
+				StringBuilder ebString = new StringBuilder();
+				for (Object i : jda.getRegisteredListeners()) {
+					ebString.append("\n• ").append(i);
+				}
 
-        event.reply(ebString.toString());
-      }
-    )
-      .start();
-  }
+				event.reply(ebString.toString());
+			}
+		)
+			.start();
+	}
 }

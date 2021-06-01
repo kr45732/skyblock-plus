@@ -9,34 +9,30 @@ import net.dv8tion.jda.api.entities.Emote;
 
 public class EmojiMapServerCommand extends Command {
 
-  public EmojiMapServerCommand() {
-    this.name = "d-emojis";
-    this.ownerCommand = true;
-  }
+	public EmojiMapServerCommand() {
+		this.name = "d-emojis";
+		this.ownerCommand = true;
+	}
 
-  @Override
-  protected void execute(CommandEvent event) {
-    new Thread(
-      () -> {
-        logCommand(
-          event.getGuild(),
-          event.getAuthor(),
-          BOT_PREFIX + "d-emojis"
-        );
+	@Override
+	protected void execute(CommandEvent event) {
+		new Thread(
+			() -> {
+				logCommand(event.getGuild(), event.getAuthor(), BOT_PREFIX + "d-emojis");
 
-        StringBuilder ebString = new StringBuilder();
-        for (Emote emote : event.getGuild().getEmotes()) {
-          ebString
-            .append("emojiMap.put(\"")
-            .append(emote.getName())
-            .append("\", \"\\")
-            .append(emote.getAsMention())
-            .append("\");")
-            .append("\n");
-        }
-        event.reply(ebString.toString());
-      }
-    )
-      .start();
-  }
+				StringBuilder ebString = new StringBuilder();
+				for (Emote emote : event.getGuild().getEmotes()) {
+					ebString
+						.append("emojiMap.put(\"")
+						.append(emote.getName())
+						.append("\", \"\\")
+						.append(emote.getAsMention())
+						.append("\");")
+						.append("\n");
+				}
+				event.reply(ebString.toString());
+			}
+		)
+			.start();
+	}
 }

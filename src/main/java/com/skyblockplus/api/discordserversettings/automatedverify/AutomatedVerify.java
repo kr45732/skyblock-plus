@@ -16,20 +16,20 @@ import org.hibernate.annotations.FetchMode;
 @Embeddable
 public class AutomatedVerify {
 
-  private String enable = "false";
+	private String enable = "false";
 
-  @Column(length = 2048)
-  private String messageText = "";
+	@Column(length = 2048)
+	private String messageText = "";
 
-  private String messageTextChannelId = "";
+	private String messageTextChannelId = "";
 
-  @ElementCollection(fetch = FetchType.EAGER)
-  @Fetch(value = FetchMode.SUBSELECT)
-  private List<String> verifiedRoles = new ArrayList<>();
+	@ElementCollection(fetch = FetchType.EAGER)
+	@Fetch(value = FetchMode.SUBSELECT)
+	private List<String> verifiedRoles = new ArrayList<>();
 
-  private String verifiedNickname = "";
+	private String verifiedNickname = "";
 
-  private String previousMessageId = "";
+	private String previousMessageId = "";
 
-  public AutomatedVerify() {}
+	public AutomatedVerify() {}
 }

@@ -19,19 +19,19 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class RunningEvent {
 
-  private String eventType = "";
-  private String announcementId = "";
-  private String timeEndingSeconds = "";
+	private String eventType = "";
+	private String announcementId = "";
+	private String timeEndingSeconds = "";
 
-  @ElementCollection(fetch = FetchType.EAGER)
-  @Fetch(value = FetchMode.SUBSELECT)
-  private Map<Integer, String> prizeMap = new HashMap<>();
+	@ElementCollection(fetch = FetchType.EAGER)
+	@Fetch(value = FetchMode.SUBSELECT)
+	private Map<Integer, String> prizeMap = new HashMap<>();
 
-  @ElementCollection(fetch = FetchType.EAGER)
-  @Fetch(value = FetchMode.SUBSELECT)
-  private List<EventMember> membersList = new ArrayList<>();
+	@ElementCollection(fetch = FetchType.EAGER)
+	@Fetch(value = FetchMode.SUBSELECT)
+	private List<EventMember> membersList = new ArrayList<>();
 
-  private String eventGuildId = "";
+	private String eventGuildId = "";
 
-  public RunningEvent() {}
+	public RunningEvent() {}
 }

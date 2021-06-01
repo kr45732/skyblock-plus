@@ -19,260 +19,196 @@ import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
 public class ApplyGuild {
 
-  public List<ApplyUser> applyUserList = new ArrayList<>();
-  public Message reactMessage;
-  public JsonElement currentSettings;
-  public boolean enable = true;
-  public TextChannel waitInviteChannel = null;
+	public List<ApplyUser> applyUserList = new ArrayList<>();
+	public Message reactMessage;
+	public JsonElement currentSettings;
+	public boolean enable = true;
+	public TextChannel waitInviteChannel = null;
 
-  public ApplyGuild(Message reactMessage, JsonElement currentSettings) {
-    this.reactMessage = reactMessage;
-    this.currentSettings = currentSettings;
-    this.applyUserList =
-      getApplyGuildUsersCache(
-        reactMessage.getGuild().getId(),
-        higherDepth(currentSettings, "name").getAsString()
-      );
-    try {
-      this.waitInviteChannel =
-        jda.getTextChannelById(
-          higherDepth(currentSettings, "waitingChannelId").getAsString()
-        );
-    } catch (Exception ignored) {}
-  }
+	public ApplyGuild(Message reactMessage, JsonElement currentSettings) {
+		this.reactMessage = reactMessage;
+		this.currentSettings = currentSettings;
+		this.applyUserList = getApplyGuildUsersCache(reactMessage.getGuild().getId(), higherDepth(currentSettings, "name").getAsString());
+		try {
+			this.waitInviteChannel = jda.getTextChannelById(higherDepth(currentSettings, "waitingChannelId").getAsString());
+		} catch (Exception ignored) {}
+	}
 
-  public ApplyGuild(
-    Message reactMessage,
-    JsonElement currentSettings,
-    List<ApplyUser> prevApplyUsers
-  ) {
-    this(reactMessage, currentSettings);
-    applyUserList.addAll(prevApplyUsers);
-  }
+	public ApplyGuild(Message reactMessage, JsonElement currentSettings, List<ApplyUser> prevApplyUsers) {
+		this(reactMessage, currentSettings);
+		applyUserList.addAll(prevApplyUsers);
+	}
 
-  public ApplyGuild() {
-    this.enable = false;
-  }
+	public ApplyGuild() {
+		this.enable = false;
+	}
 
-  public int applyUserListSize() {
-    return applyUserList.size();
-  }
+	public int applyUserListSize() {
+		return applyUserList.size();
+	}
 
-  public List<ApplyUser> getApplyUserList() {
-    return applyUserList;
-  }
+	public List<ApplyUser> getApplyUserList() {
+		return applyUserList;
+	}
 
-  public void onMessageReactionAdd(MessageReactionAddEvent event) {
-    if (!enable) {
-      return;
-    }
+	public void onMessageReactionAdd(MessageReactionAddEvent event) {
+		if (!enable) {
+			return;
+		}
 
-    if (onMessageReactionAdd_NewApplyUser(event)) {
-      return;
-    }
+		if (onMessageReactionAdd_NewApplyUser(event)) {
+			return;
+		}
 
-    if (onMessageReactionAdd_ExistingApplyUser(event)) {
-      return;
-    }
+		if (onMessageReactionAdd_ExistingApplyUser(event)) {
+			return;
+		}
 
-    onMessageReactionAdd_WaitingForInviteApplyUser(event);
-  }
+		onMessageReactionAdd_WaitingForInviteApplyUser(event);
+	}
 
-  private void onMessageReactionAdd_WaitingForInviteApplyUser(
-    MessageReactionAddEvent event
-  ) {
-    if (event.getUser().isBot()) {
-      return;
-    }
+	private void onMessageReactionAdd_WaitingForInviteApplyUser(MessageReactionAddEvent event) {
+		if (event.getUser().isBot()) {
+			return;
+		}
 
-    if (!event.getChannel().equals(waitInviteChannel)) {
-      return;
-    }
+		if (!event.getChannel().equals(waitInviteChannel)) {
+			return;
+		}
 
-    if (!event.getReactionEmote().getName().equals("✅")) {
-      return;
-    }
+		if (!event.getReactionEmote().getName().equals("✅")) {
+			return;
+		}
 
-    Message msg = waitInviteChannel
-      .retrieveMessageById(event.getMessageId())
-      .complete();
+		Message msg = waitInviteChannel.retrieveMessageById(event.getMessageId()).complete();
 
-    if (!msg.getAuthor().getId().equals(jda.getSelfUser().getId())) {
-      return;
-    }
+		if (!msg.getAuthor().getId().equals(jda.getSelfUser().getId())) {
+			return;
+		}
 
-    msg.clearReactions().complete();
+		msg.clearReactions().complete();
 
-    msg.delete().queueAfter(3, TimeUnit.SECONDS);
-  }
+		msg.delete().queueAfter(3, TimeUnit.SECONDS);
+	}
 
-  public boolean onMessageReactionAdd_ExistingApplyUser(
-    MessageReactionAddEvent event
-  ) {
-    ApplyUser findApplyUser = applyUserList
-      .stream()
-      .filter(
-        applyUser -> applyUser.getMessageReactId().equals(event.getMessageId())
-      )
-      .findFirst()
-      .orElse(null);
-    if (findApplyUser != null) {
-      if (findApplyUser.onMessageReactionAdd(event)) {
-        applyUserList.remove(findApplyUser);
-      }
-      return true;
-    }
+	public boolean onMessageReactionAdd_ExistingApplyUser(MessageReactionAddEvent event) {
+		ApplyUser findApplyUser = applyUserList
+			.stream()
+			.filter(applyUser -> applyUser.getMessageReactId().equals(event.getMessageId()))
+			.findFirst()
+			.orElse(null);
+		if (findApplyUser != null) {
+			if (findApplyUser.onMessageReactionAdd(event)) {
+				applyUserList.remove(findApplyUser);
+			}
+			return true;
+		}
 
-    return false;
-  }
+		return false;
+	}
 
-  public boolean onMessageReactionAdd_NewApplyUser(
-    MessageReactionAddEvent event
-  ) {
-    if (event.getUser().isBot()) {
-      return false;
-    }
+	public boolean onMessageReactionAdd_NewApplyUser(MessageReactionAddEvent event) {
+		if (event.getUser().isBot()) {
+			return false;
+		}
 
-    if (event.getMessageIdLong() != reactMessage.getIdLong()) {
-      return false;
-    }
+		if (event.getMessageIdLong() != reactMessage.getIdLong()) {
+			return false;
+		}
 
-    event.getReaction().removeReaction(event.getUser()).queue();
-    if (!event.getReactionEmote().getName().equals("✅")) {
-      return true;
-    }
+		event.getReaction().removeReaction(event.getUser()).queue();
+		if (!event.getReactionEmote().getName().equals("✅")) {
+			return true;
+		}
 
-    if (
-      event
-        .getGuild()
-        .getTextChannelsByName(
-          higherDepth(currentSettings, "newChannelPrefix").getAsString() +
-          "-" +
-          event.getUser().getName().replace(" ", "-"),
-          true
-        )
-        .size() >
-      0
-    ) {
-      return true;
-    }
+		if (
+			event
+				.getGuild()
+				.getTextChannelsByName(
+					higherDepth(currentSettings, "newChannelPrefix").getAsString() + "-" + event.getUser().getName().replace(" ", "-"),
+					true
+				)
+				.size() >
+			0
+		) {
+			return true;
+		}
 
-    JsonElement linkedAccount = database.getLinkedUserByDiscordId(
-      event.getUserId()
-    );
+		JsonElement linkedAccount = database.getLinkedUserByDiscordId(event.getUserId());
 
-    if (
-      linkedAccount.isJsonNull() ||
-      !higherDepth(linkedAccount, "discordId")
-        .getAsString()
-        .equals(event.getUserId())
-    ) {
-      PrivateChannel dmChannel = event
-        .getUser()
-        .openPrivateChannel()
-        .complete();
-      if (linkedAccount.isJsonNull()) {
-        dmChannel
-          .sendMessage(
-            defaultEmbed("Error")
-              .setDescription(
-                "You are not linked to the bot. Please run `+link [IGN]` and try again."
-              )
-              .build()
-          )
-          .queue();
-      } else {
-        dmChannel
-          .sendMessage(
-            defaultEmbed("Error")
-              .setDescription(
-                "Account " +
-                higherDepth(linkedAccount, "minecraftUsername").getAsString() +
-                " is linked with the discord tag " +
-                jda
-                  .retrieveUserById(
-                    higherDepth(linkedAccount, "discordId").getAsString()
-                  )
-                  .complete()
-                  .getAsTag() +
-                "\nYour current discord tag is " +
-                event.getUser().getAsTag() +
-                ".\nPlease relink and try again"
-              )
-              .build()
-          )
-          .queue();
-      }
-      return true;
-    }
+		if (linkedAccount.isJsonNull() || !higherDepth(linkedAccount, "discordId").getAsString().equals(event.getUserId())) {
+			PrivateChannel dmChannel = event.getUser().openPrivateChannel().complete();
+			if (linkedAccount.isJsonNull()) {
+				dmChannel
+					.sendMessage(
+						defaultEmbed("Error")
+							.setDescription("You are not linked to the bot. Please run `+link [IGN]` and try again.")
+							.build()
+					)
+					.queue();
+			} else {
+				dmChannel
+					.sendMessage(
+						defaultEmbed("Error")
+							.setDescription(
+								"Account " +
+								higherDepth(linkedAccount, "minecraftUsername").getAsString() +
+								" is linked with the discord tag " +
+								jda.retrieveUserById(higherDepth(linkedAccount, "discordId").getAsString()).complete().getAsTag() +
+								"\nYour current discord tag is " +
+								event.getUser().getAsTag() +
+								".\nPlease relink and try again"
+							)
+							.build()
+					)
+					.queue();
+			}
+			return true;
+		}
 
-    Player player = new Player(
-      higherDepth(linkedAccount, "minecraftUsername").getAsString()
-    );
+		Player player = new Player(higherDepth(linkedAccount, "minecraftUsername").getAsString());
 
-    if (!player.isValid()) {
-      PrivateChannel dmChannel = event
-        .getUser()
-        .openPrivateChannel()
-        .complete();
-      dmChannel
-        .sendMessage(
-          defaultEmbed("Error")
-            .setDescription(
-              "Unable to fetch player data. Please make sure that all APIs are enabled and/or try relinking"
-            )
-            .build()
-        )
-        .queue();
-      return true;
-    } else {
-      boolean isIronman = false;
-      try {
-        isIronman = higherDepth(currentSettings, "ironmanOnly").getAsBoolean();
-      } catch (Exception ignored) {}
-      if (isIronman && player.getAllProfileNames(isIronman).length == 0) {
-        PrivateChannel dmChannel = event
-          .getUser()
-          .openPrivateChannel()
-          .complete();
-        dmChannel
-          .sendMessage(
-            defaultEmbed("Error")
-              .setDescription("You have no ironman profiles created")
-              .build()
-          )
-          .queue();
-        return true;
-      }
-    }
+		if (!player.isValid()) {
+			PrivateChannel dmChannel = event.getUser().openPrivateChannel().complete();
+			dmChannel
+				.sendMessage(
+					defaultEmbed("Error")
+						.setDescription("Unable to fetch player data. Please make sure that all APIs are enabled and/or try relinking")
+						.build()
+				)
+				.queue();
+			return true;
+		} else {
+			boolean isIronman = false;
+			try {
+				isIronman = higherDepth(currentSettings, "ironmanOnly").getAsBoolean();
+			} catch (Exception ignored) {}
+			if (isIronman && player.getAllProfileNames(isIronman).length == 0) {
+				PrivateChannel dmChannel = event.getUser().openPrivateChannel().complete();
+				dmChannel.sendMessage(defaultEmbed("Error").setDescription("You have no ironman profiles created").build()).queue();
+				return true;
+			}
+		}
 
-    ApplyUser applyUser = new ApplyUser(
-      event,
-      currentSettings,
-      higherDepth(linkedAccount, "minecraftUsername").getAsString()
-    );
-    applyUserList.add(applyUser);
-    return true;
-  }
+		ApplyUser applyUser = new ApplyUser(event, currentSettings, higherDepth(linkedAccount, "minecraftUsername").getAsString());
+		applyUserList.add(applyUser);
+		return true;
+	}
 
-  public void onTextChannelDelete(TextChannelDeleteEvent event) {
-    applyUserList.removeIf(
-      applyUser -> {
-        if (
-          applyUser.getApplicationChannelId().equals(event.getChannel().getId())
-        ) {
-          return true;
-        } else {
-          try {
-            if (
-              applyUser.getStaffChannelId().equals(event.getChannel().getId())
-            ) {
-              return true;
-            }
-          } catch (Exception ignored) {}
-        }
-        return false;
-      }
-    );
-  }
+	public void onTextChannelDelete(TextChannelDeleteEvent event) {
+		applyUserList.removeIf(
+			applyUser -> {
+				if (applyUser.getApplicationChannelId().equals(event.getChannel().getId())) {
+					return true;
+				} else {
+					try {
+						if (applyUser.getStaffChannelId().equals(event.getChannel().getId())) {
+							return true;
+						}
+					} catch (Exception ignored) {}
+				}
+				return false;
+			}
+		);
+	}
 }

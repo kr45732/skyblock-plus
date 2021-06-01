@@ -12,10 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class SbEvent {
 
-  @Embedded
-  RunningEvent runningEvent = new RunningEvent();
+	@Embedded
+	RunningEvent runningEvent = new RunningEvent();
 
-  private String eventActive = "false";
+	private String eventActive = "false";
 
-  public SbEvent() {}
+	public SbEvent() {}
 }

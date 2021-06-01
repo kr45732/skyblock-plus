@@ -14,98 +14,93 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class EvaluateCommand extends Command {
 
-  private String importString = "";
+	private String importString = "";
 
-  public EvaluateCommand() {
-    this.name = "evaluate";
-    this.ownerCommand = true;
-    this.aliases = new String[] { "eval", "ev" };
+	public EvaluateCommand() {
+		this.name = "evaluate";
+		this.ownerCommand = true;
+		this.aliases = new String[] { "eval", "ev" };
 
-    String[] packageImports = {
-      "java.io",
-      "java.lang",
-      "java.math",
-      "java.time",
-      "java.util",
-      "java.util.concurrent",
-      "java.util.stream",
-      "net.dv8tion.jda.api",
-      "net.dv8tion.jda.api.entities",
-      "net.dv8tion.jda.api.entities.impl",
-      "net.dv8tion.jda.api.managers",
-      "net.dv8tion.jda.api.managers.impl",
-      "net.dv8tion.jda.api.utils",
-      "com.skyblockplus",
-    };
-    String[] staticImports = { "com.skyblockplus.utils.Utils.*" };
+		String[] packageImports = {
+			"java.io",
+			"java.lang",
+			"java.math",
+			"java.time",
+			"java.util",
+			"java.util.concurrent",
+			"java.util.stream",
+			"net.dv8tion.jda.api",
+			"net.dv8tion.jda.api.entities",
+			"net.dv8tion.jda.api.entities.impl",
+			"net.dv8tion.jda.api.managers",
+			"net.dv8tion.jda.api.managers.impl",
+			"net.dv8tion.jda.api.utils",
+			"com.skyblockplus",
+		};
+		String[] staticImports = { "com.skyblockplus.utils.Utils.*" };
 
-    for (String packageImport : packageImports) {
-      importString += "import " + packageImport + ".*\n";
-    }
+		for (String packageImport : packageImports) {
+			importString += "import " + packageImport + ".*\n";
+		}
 
-    for (String staticImport : staticImports) {
-      importString += "import static " + staticImport + "\n";
-    }
-  }
+		for (String staticImport : staticImports) {
+			importString += "import static " + staticImport + "\n";
+		}
+	}
 
-  @Override
-  protected void execute(CommandEvent event) {
-    new Thread(
-      () -> {
-        Message ebMessage = event
-          .getChannel()
-          .sendMessage("Loading")
-          .complete();
-        String content = event.getMessage().getContentRaw();
-        String[] args = content.split("\\s+", 2);
+	@Override
+	protected void execute(CommandEvent event) {
+		new Thread(
+			() -> {
+				Message ebMessage = event.getChannel().sendMessage("Loading").complete();
+				String content = event.getMessage().getContentRaw();
+				String[] args = content.split("\\s+", 2);
 
-        logCommand(event.getGuild(), event.getAuthor(), content);
+				logCommand(event.getGuild(), event.getAuthor(), content);
 
-        if (args.length < 2) {
-          ebMessage.editMessage("Invalid Input").queue();
-          return;
-        }
+				if (args.length < 2) {
+					ebMessage.editMessage("Invalid Input").queue();
+					return;
+				}
 
-        String arg = args[1];
+				String arg = args[1];
 
-        if (arg.startsWith("```") && arg.endsWith("```")) {
-          arg = arg.replaceAll("```(.*)\n", "").replaceAll("\n?```", "");
-        }
+				if (arg.startsWith("```") && arg.endsWith("```")) {
+					arg = arg.replaceAll("```(.*)\n", "").replaceAll("\n?```", "");
+				}
 
-        MessageReceivedEvent jdaEvent = event.getEvent();
+				MessageReceivedEvent jdaEvent = event.getEvent();
 
-        GroovyShell shell = new GroovyShell();
+				GroovyShell shell = new GroovyShell();
 
-        try {
-          shell.setProperty("event", jdaEvent);
-          shell.setProperty("message", jdaEvent.getMessage());
-          shell.setProperty("channel", jdaEvent.getChannel());
-          shell.setProperty("args", args);
-          shell.setProperty("jda", jdaEvent.getJDA());
-          shell.setProperty("guilds", guildMap);
-          shell.setProperty("db", database);
-          if (jdaEvent.isFromType(ChannelType.TEXT)) {
-            shell.setProperty("guild", jdaEvent.getGuild());
-            shell.setProperty("member", jdaEvent.getMember());
-          }
+				try {
+					shell.setProperty("event", jdaEvent);
+					shell.setProperty("message", jdaEvent.getMessage());
+					shell.setProperty("channel", jdaEvent.getChannel());
+					shell.setProperty("args", args);
+					shell.setProperty("jda", jdaEvent.getJDA());
+					shell.setProperty("guilds", guildMap);
+					shell.setProperty("db", database);
+					if (jdaEvent.isFromType(ChannelType.TEXT)) {
+						shell.setProperty("guild", jdaEvent.getGuild());
+						shell.setProperty("member", jdaEvent.getMember());
+					}
 
-          String script = importString + arg;
-          Object out = shell.evaluate(script);
+					String script = importString + arg;
+					Object out = shell.evaluate(script);
 
-          if (out == null) {
-            ebMessage.editMessage("Success (null output)").queue();
-          } else if (out.toString().length() >= 2000) {
-            ebMessage
-              .editMessage(makeHastePost(out.toString()) + ".json")
-              .queue();
-          } else {
-            ebMessage.editMessage(out.toString()).queue();
-          }
-        } catch (Exception e) {
-          ebMessage.editMessage(e.getMessage()).queue();
-        }
-      }
-    )
-      .start();
-  }
+					if (out == null) {
+						ebMessage.editMessage("Success (null output)").queue();
+					} else if (out.toString().length() >= 2000) {
+						ebMessage.editMessage(makeHastePost(out.toString()) + ".json").queue();
+					} else {
+						ebMessage.editMessage(out.toString()).queue();
+					}
+				} catch (Exception e) {
+					ebMessage.editMessage(e.getMessage()).queue();
+				}
+			}
+		)
+			.start();
+	}
 }

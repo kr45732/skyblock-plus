@@ -16,136 +16,112 @@ import net.dv8tion.jda.api.entities.Message;
 
 public class GetAllGuildsIn extends Command {
 
-  public GetAllGuildsIn() {
-    this.name = "d-servers";
-    this.ownerCommand = true;
-  }
+	public GetAllGuildsIn() {
+		this.name = "d-servers";
+		this.ownerCommand = true;
+	}
 
-  @Override
-  protected void execute(CommandEvent event) {
-    new Thread(
-      () -> {
-        EmbedBuilder eb = loadingEmbed();
-        Message ebMessage = event
-          .getChannel()
-          .sendMessage(eb.build())
-          .complete();
-        String content = event.getMessage().getContentRaw();
-        String[] args = content.split(" ");
+	@Override
+	protected void execute(CommandEvent event) {
+		new Thread(
+			() -> {
+				EmbedBuilder eb = loadingEmbed();
+				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				String content = event.getMessage().getContentRaw();
+				String[] args = content.split(" ");
 
-        logCommand(event.getGuild(), event.getAuthor(), content);
+				logCommand(event.getGuild(), event.getAuthor(), content);
 
-        if (args.length == 2) {
-          if (args[1].equals("list")) {
-            CustomPaginator.Builder paginateBuilder = defaultPaginator(
-              waiter,
-              event.getAuthor()
-            )
-              .setColumns(1)
-              .setItemsPerPage(10);
+				if (args.length == 2) {
+					if (args[1].equals("list")) {
+						CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor())
+							.setColumns(1)
+							.setItemsPerPage(10);
 
-            for (Guild guild : jda.getGuilds()) {
-              if (guild.getName().startsWith("Skyblock Plus - Emoji Server")) {
-                continue;
-              }
+						for (Guild guild : jda.getGuilds()) {
+							if (guild.getName().startsWith("Skyblock Plus - Emoji Server")) {
+								continue;
+							}
 
-              try {
-                List<Invite> invites = guild.retrieveInvites().complete();
+							try {
+								List<Invite> invites = guild.retrieveInvites().complete();
 
-                if (invites.size() > 0) {
-                  paginateBuilder.addItems(
-                    "**" +
-                    guild.getName() +
-                    " (" +
-                    guild.getMemberCount() +
-                    ")**\nInvite Link: " +
-                    invites.get(0).getUrl() +
-                    "\nId: " +
-                    guild.getId() +
-                    "\nOwner: " +
-                    guild.getOwner().getEffectiveName() +
-                    " (" +
-                    guild.getOwnerId() +
-                    ")\n"
-                  );
-                } else {
-                  paginateBuilder.addItems(
-                    "**" +
-                    guild.getName() +
-                    " (" +
-                    guild.getMemberCount() +
-                    ")**\nInvite Link: " +
-                    guild
-                      .getChannels()
-                      .get(0)
-                      .createInvite()
-                      .setMaxAge(0)
-                      .complete()
-                      .getUrl() +
-                    "\nId: " +
-                    guild.getId() +
-                    "\nOwner: " +
-                    guild.getOwner().getEffectiveName() +
-                    " (" +
-                    guild.getOwnerId() +
-                    ")\n"
-                  );
-                }
-              } catch (Exception e) {
-                paginateBuilder.addItems(
-                  "**" +
-                  guild.getName() +
-                  " (" +
-                  guild.getMemberCount() +
-                  ")**\nId: " +
-                  guild.getId() +
-                  "\nOwner: " +
-                  guild.getOwner().getEffectiveName() +
-                  " (" +
-                  guild.getOwnerId() +
-                  ")\n"
-                );
-              }
-            }
+								if (invites.size() > 0) {
+									paginateBuilder.addItems(
+										"**" +
+										guild.getName() +
+										" (" +
+										guild.getMemberCount() +
+										")**\nInvite Link: " +
+										invites.get(0).getUrl() +
+										"\nId: " +
+										guild.getId() +
+										"\nOwner: " +
+										guild.getOwner().getEffectiveName() +
+										" (" +
+										guild.getOwnerId() +
+										")\n"
+									);
+								} else {
+									paginateBuilder.addItems(
+										"**" +
+										guild.getName() +
+										" (" +
+										guild.getMemberCount() +
+										")**\nInvite Link: " +
+										guild.getChannels().get(0).createInvite().setMaxAge(0).complete().getUrl() +
+										"\nId: " +
+										guild.getId() +
+										"\nOwner: " +
+										guild.getOwner().getEffectiveName() +
+										" (" +
+										guild.getOwnerId() +
+										")\n"
+									);
+								}
+							} catch (Exception e) {
+								paginateBuilder.addItems(
+									"**" +
+									guild.getName() +
+									" (" +
+									guild.getMemberCount() +
+									")**\nId: " +
+									guild.getId() +
+									"\nOwner: " +
+									guild.getOwner().getEffectiveName() +
+									" (" +
+									guild.getOwnerId() +
+									")\n"
+								);
+							}
+						}
 
-            paginateBuilder.setPaginatorExtras(
-              new PaginatorExtras().setEveryPageTitle("Server List")
-            );
+						paginateBuilder.setPaginatorExtras(new PaginatorExtras().setEveryPageTitle("Server List"));
 
-            ebMessage.delete().queue();
-            paginateBuilder.build().paginate(event.getChannel(), 0);
-            return;
-          } else if (args[1].equals("count")) {
-            eb =
-              defaultEmbed("Server Count")
-                .addField(
-                  "Total guild count",
-                  jda.getGuilds().size() + " servers",
-                  false
-                );
+						ebMessage.delete().queue();
+						paginateBuilder.build().paginate(event.getChannel(), 0);
+						return;
+					} else if (args[1].equals("count")) {
+						eb = defaultEmbed("Server Count").addField("Total guild count", jda.getGuilds().size() + " servers", false);
 
-            int guildCount = 0;
-            for (Guild guild : jda.getGuilds()) {
-              if (!guild.getName().startsWith("Skyblock Plus - Emoji Server")) {
-                guildCount++;
-              }
-            }
+						int guildCount = 0;
+						for (Guild guild : jda.getGuilds()) {
+							if (!guild.getName().startsWith("Skyblock Plus - Emoji Server")) {
+								guildCount++;
+							}
+						}
 
-            eb.addField(
-              "Total guild count without emoji servers",
-              guildCount + " servers",
-              false
-            );
-            eb.addField("Total users", "" + jda.getUsers().size(), false);
+						eb.addField("Total guild count without emoji servers", guildCount + " servers", false);
+						eb.addField("Total users", "" + jda.getUsers().size(), false);
 
-            ebMessage.editMessage(eb.build()).queue();
-            return;
-          }
-        }
+						ebMessage.editMessage(eb.build()).queue();
+						return;
+					}
+				}
 
-        ebMessage.editMessage(defaultEmbed("Invalid input").build()).queue();
-      }
-    )
-      .start();
-  }
+				ebMessage.editMessage(defaultEmbed("Invalid input").build()).queue();
+			}
+		)
+			.start();
+	}
 }

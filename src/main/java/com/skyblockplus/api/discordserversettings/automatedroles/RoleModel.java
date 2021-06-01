@@ -17,13 +17,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class RoleModel {
 
-  private String enable = "false";
+	private String enable = "false";
 
-  @ElementCollection(fetch = FetchType.EAGER)
-  @Fetch(value = FetchMode.SUBSELECT)
-  private List<RoleObject> levels = new ArrayList<>();
+	@ElementCollection(fetch = FetchType.EAGER)
+	@Fetch(value = FetchMode.SUBSELECT)
+	private List<RoleObject> levels = new ArrayList<>();
 
-  private String stackable = "false";
+	private String stackable = "false";
 
-  public RoleModel() {}
+	public RoleModel() {}
 }

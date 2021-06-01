@@ -16,42 +16,42 @@ import org.hibernate.annotations.FetchMode;
 @Embeddable
 public class AutomatedApplication {
 
-  private String name;
+	private String name;
 
-  private String enable = "false";
-  private String messageTextChannelId = "";
-  private String messageStaffChannelId = "";
-  private String newChannelPrefix = "";
-  private String newChannelCategory = "";
-  private String waitingChannelId = "";
-  private String ironmanOnly = "false";
+	private String enable = "false";
+	private String messageTextChannelId = "";
+	private String messageStaffChannelId = "";
+	private String newChannelPrefix = "";
+	private String newChannelCategory = "";
+	private String waitingChannelId = "";
+	private String ironmanOnly = "false";
 
-  @Column(length = 2048)
-  private String messageText = "";
+	@Column(length = 2048)
+	private String messageText = "";
 
-  @Column(length = 2048)
-  private String acceptMessageText = "";
+	@Column(length = 2048)
+	private String acceptMessageText = "";
 
-  @Column(length = 2048)
-  private String denyMessageText = "";
+	@Column(length = 2048)
+	private String denyMessageText = "";
 
-  @Column(length = 2048)
-  private String waitlistedMessageText = "";
+	@Column(length = 2048)
+	private String waitlistedMessageText = "";
 
-  private String staffPingRoleId = "";
+	private String staffPingRoleId = "";
 
-  private String previousMessageId = "";
+	private String previousMessageId = "";
 
-  @Column(columnDefinition = "TEXT")
-  private String applyUsersCache = "";
+	@Column(columnDefinition = "TEXT")
+	private String applyUsersCache = "";
 
-  @ElementCollection(fetch = FetchType.EAGER)
-  @Fetch(value = FetchMode.SUBSELECT)
-  private List<ApplyRequirements> applyReqs = new ArrayList<>();
+	@ElementCollection(fetch = FetchType.EAGER)
+	@Fetch(value = FetchMode.SUBSELECT)
+	private List<ApplyRequirements> applyReqs = new ArrayList<>();
 
-  public AutomatedApplication() {}
+	public AutomatedApplication() {}
 
-  public AutomatedApplication(String name) {
-    this.name = name;
-  }
+	public AutomatedApplication(String name) {
+		this.name = name;
+	}
 }

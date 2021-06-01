@@ -690,6 +690,7 @@
     "guild_leaderboard": {
       "types": ["skills", "slayer", "catacombs"],
       "staff_ranks": ["moderator", "senior officer", "guild master"],
+      "ignore_staff": true,
       "default_role": ["rookie", "member"],
       "ranks": [
         {
@@ -707,7 +708,8 @@
     "name": "Skyblock Gods",
     "guild_leaderboard": {
       "types": ["weight"],
-      "staff_ranks": ["ignore"],
+      "staff_ranks": ["staff", "guild master"],
+      "ignore_staff": false,
       "default_role": ["member"],
       "ranks": [
         {

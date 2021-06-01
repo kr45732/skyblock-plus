@@ -15,20 +15,20 @@ import org.hibernate.annotations.FetchMode;
 @Embeddable
 public class GuildRole {
 
-  private String name;
-  private String enableGuildRole = "false";
-  private String guildId = "";
-  private String roleId = "";
+	private String name;
+	private String enableGuildRole = "false";
+	private String guildId = "";
+	private String roleId = "";
 
-  private String enableGuildRanks = "";
+	private String enableGuildRanks = "";
 
-  @ElementCollection(fetch = FetchType.EAGER)
-  @Fetch(value = FetchMode.SUBSELECT)
-  private List<GuildRank> guildRanks = new ArrayList<>();
+	@ElementCollection(fetch = FetchType.EAGER)
+	@Fetch(value = FetchMode.SUBSELECT)
+	private List<GuildRank> guildRanks = new ArrayList<>();
 
-  public GuildRole() {}
+	public GuildRole() {}
 
-  public GuildRole(String name) {
-    this.name = name;
-  }
+	public GuildRole(String name) {
+		this.name = name;
+	}
 }

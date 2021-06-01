@@ -9,10 +9,10 @@ import lombok.Data;
 @Embeddable
 public class EventMember {
 
-  private String username = "";
-  private String uuid = "";
-  private String startingAmount = "";
-  private String profileName = "";
+	private String username = "";
+	private String uuid = "";
+	private String startingAmount = "";
+	private String profileName = "";
 
-  public EventMember() {}
+	public EventMember() {}
 }

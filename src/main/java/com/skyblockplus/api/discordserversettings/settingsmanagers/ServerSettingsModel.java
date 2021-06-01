@@ -20,38 +20,38 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ServerSettingsModel {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
 
-  private String serverName;
-  private String serverId;
+	private String serverName;
+	private String serverId;
 
-  @Embedded
-  private AutomatedVerify automatedVerify = new AutomatedVerify();
+	@Embedded
+	private AutomatedVerify automatedVerify = new AutomatedVerify();
 
-  @Embedded
-  private AutomatedApplication automatedApplicationOne = null;
+	@Embedded
+	private AutomatedApplication automatedApplicationOne = null;
 
-  @Embedded
-  private AutomatedApplication automatedApplicationTwo = null;
+	@Embedded
+	private AutomatedApplication automatedApplicationTwo = null;
 
-  @Embedded
-  private AutomatedRoles automatedRoles = new AutomatedRoles();
+	@Embedded
+	private AutomatedRoles automatedRoles = new AutomatedRoles();
 
-  @Embedded
-  private GuildRole automaticGuildRolesOne = null;
+	@Embedded
+	private GuildRole automaticGuildRolesOne = null;
 
-  @Embedded
-  private GuildRole automaticGuildRolesTwo = null;
+	@Embedded
+	private GuildRole automaticGuildRolesTwo = null;
 
-  @Embedded
-  private SbEvent sbEvent = new SbEvent();
+	@Embedded
+	private SbEvent sbEvent = new SbEvent();
 
-  public ServerSettingsModel() {}
+	public ServerSettingsModel() {}
 
-  public ServerSettingsModel(String serverName, String serverId) {
-    this.serverName = serverName;
-    this.serverId = serverId;
-  }
+	public ServerSettingsModel(String serverName, String serverId) {
+		this.serverName = serverName;
+		this.serverId = serverId;
+	}
 }

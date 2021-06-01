@@ -11,14 +11,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class DataSourceConfig {
 
-  @ConfigurationProperties(prefix = "application.properties")
-  @Bean
-  public DataSource getDataSource() {
-    return DataSourceBuilder
-      .create()
-      .url(DATABASE_URL)
-      .username(DATABASE_USERNAME)
-      .password(DATABASE_PASSWORD)
-      .build();
-  }
+	@ConfigurationProperties(prefix = "application.properties")
+	@Bean
+	public DataSource getDataSource() {
+		return DataSourceBuilder.create().url(DATABASE_URL).username(DATABASE_USERNAME).password(DATABASE_PASSWORD).build();
+	}
 }

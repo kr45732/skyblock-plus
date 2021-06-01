@@ -12,26 +12,21 @@ import lombok.Data;
 @Entity
 public class LinkedAccountModel {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
 
-  private String lastUpdated = "";
-  private String discordId = "";
-  private String minecraftUuid = "";
-  private String minecraftUsername = "";
+	private String lastUpdated = "";
+	private String discordId = "";
+	private String minecraftUuid = "";
+	private String minecraftUsername = "";
 
-  public LinkedAccountModel(
-    String lastUpdated,
-    String discordId,
-    String minecraftUuid,
-    String minecraftUsername
-  ) {
-    this.lastUpdated = lastUpdated;
-    this.discordId = discordId;
-    this.minecraftUuid = minecraftUuid;
-    this.minecraftUsername = minecraftUsername;
-  }
+	public LinkedAccountModel(String lastUpdated, String discordId, String minecraftUuid, String minecraftUsername) {
+		this.lastUpdated = lastUpdated;
+		this.discordId = discordId;
+		this.minecraftUuid = minecraftUuid;
+		this.minecraftUsername = minecraftUsername;
+	}
 
-  public LinkedAccountModel() {}
+	public LinkedAccountModel() {}
 }

@@ -9,8 +9,8 @@ import lombok.Data;
 @Embeddable
 public class RoleObject {
 
-  private String value = "";
-  private String roleId = "";
+	private String value = "";
+	private String roleId = "";
 
-  public RoleObject() {}
+	public RoleObject() {}
 }

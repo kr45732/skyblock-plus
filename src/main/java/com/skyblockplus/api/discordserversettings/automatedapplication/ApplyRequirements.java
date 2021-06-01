@@ -9,10 +9,10 @@ import lombok.Data;
 @Embeddable
 public class ApplyRequirements {
 
-  private String slayerReq = "";
-  private String skillsReq = "";
-  private String catacombsReq = "";
-  private String weightReq = "";
+	private String slayerReq = "";
+	private String skillsReq = "";
+	private String catacombsReq = "";
+	private String weightReq = "";
 
-  public ApplyRequirements() {}
+	public ApplyRequirements() {}
 }

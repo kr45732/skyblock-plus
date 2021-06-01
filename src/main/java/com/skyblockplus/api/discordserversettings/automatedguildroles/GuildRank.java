@@ -9,8 +9,8 @@ import lombok.Data;
 @Embeddable
 public class GuildRank {
 
-  public String minecraftRoleName;
-  public String discordRoleId;
+	public String minecraftRoleName;
+	public String discordRoleId;
 
-  public GuildRank() {}
+	public GuildRank() {}
 }
