@@ -24,3 +24,10 @@ jobs:
         run: chmod +x gradlew
       - name: Build with Gradle
         run: ./gradlew build
+      - name: Format code
+        uses: lwerner-lshigh/prettier_action_java@v1.1.1
+        with:
+          branch: ${{ github.head_ref }}
+          commit_message: Automatically format code
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

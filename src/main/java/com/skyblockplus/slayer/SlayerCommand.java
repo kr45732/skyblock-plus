@@ -86,6 +86,19 @@ public class SlayerCommand extends Command {
                     ? higherDepth(slayer, "spider.boss_kills_tier_3").getAsInt()
                     : 0;
 
+            int endermanOneKills = higherDepth(slayer, "enderman.boss_kills_tier_0") != null
+                    ? higherDepth(slayer, "enderman.boss_kills_tier_0").getAsInt()
+                    : 0;
+            int endermanTwoKills = higherDepth(slayer, "enderman.boss_kills_tier_1") != null
+                    ? higherDepth(slayer, "enderman.boss_kills_tier_1").getAsInt()
+                    : 0;
+            int endermanThreeKills = higherDepth(slayer, "enderman.boss_kills_tier_2") != null
+                    ? higherDepth(slayer, "enderman.boss_kills_tier_2").getAsInt()
+                    : 0;
+            int endermanFourKills = higherDepth(slayer, "enderman.boss_kills_tier_3") != null
+                    ? higherDepth(slayer, "enderman.boss_kills_tier_3").getAsInt()
+                    : 0;
+
             String svenKills = "**Tier 1:** " + svenOneKills + "\n**Tier 2:** " + svenTwoKills + "\n**Tier 3:** "
                     + svenThreeKills + "\n**Tier 4:** " + svenFourKills;
 
@@ -94,6 +107,9 @@ public class SlayerCommand extends Command {
 
             String taraKills = "**Tier 1:** " + taraOneKills + "\n**Tier 2:** " + taraTwoKills + "\n**Tier 3:** "
                     + taraThreeKills + "\n**Tier 4:** " + taraFourKills;
+
+            String endermanKills = "**Tier 1:** " + endermanOneKills + "\n**Tier 2:** " + endermanTwoKills
+                    + "\n**Tier 3:** " + endermanThreeKills + "\n**Tier 4:** " + endermanFourKills;
 
             long coinsSpentOnSlayers = 100L * (svenOneKills + revOneKills + taraOneKills)
                     + 2000L * (svenTwoKills + revTwoKills + taraTwoKills)
@@ -111,6 +127,12 @@ public class SlayerCommand extends Command {
             eb.addField("Boss Kills", svenKills, true);
             eb.addField("Boss Kills", revKills, true);
             eb.addField("Boss Kills", taraKills, true);
+
+            eb.addField("<:voidgloom_seraph:849280131281059881> Enderman (" + player.getSlayerLevel("enderman") + ")",
+                    simplifyNumber(player.getEndermanXp()) + " XP", true);
+            eb.addBlankField(true);
+            eb.addBlankField(true);
+            eb.addField("Boss Kills", endermanKills, true);
 
             return eb;
         }

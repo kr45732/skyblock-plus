@@ -229,7 +229,7 @@ public class Player {
     }
 
     public int getSlayer() {
-        return getWolfXp() + getZombieXp() + getSpiderXp();
+        return getWolfXp() + getZombieXp() + getSpiderXp() + getEndermanXp();
     }
 
     public int getSlayer(String slayerName) {
@@ -240,6 +240,8 @@ public class Player {
                 return getZombieXp();
             case "tara":
                 return getSpiderXp();
+            case "enderman":
+                return getEndermanXp();
         }
         return -1;
     }
@@ -539,8 +541,32 @@ public class Player {
                     }
                 }
                 return (prevSpiderMax + 1);
+            case "enderman":
+                JsonArray endermanLevelArray = higherDepth(getLevelingJson(), "slayer_xp.spider").getAsJsonArray(); // TODO:
+                                                                                                                    // Change
+                                                                                                                    // to
+                                                                                                                    // enderman
+                                                                                                                    // once
+                                                                                                                    // added
+                int endermanXp = getEndermanXp();
+                int prevEndermanMax = 0;
+                for (int i = 0; i < endermanLevelArray.size(); i++) {
+                    if (endermanXp >= endermanLevelArray.get(i).getAsInt()) {
+                        prevEndermanMax = i;
+                    } else {
+                        break;
+                    }
+                }
+                return (prevEndermanMax + 1);
         }
         return 0;
+    }
+
+    public int getEndermanXp() {
+        JsonElement profileSlayer = higherDepth(profileJson, "slayer_bosses");
+
+        return higherDepth(profileSlayer, "enderman.xp") != null ? higherDepth(profileSlayer, "enderman.xp").getAsInt()
+                : 0;
     }
 
     public JsonElement getProfileJson() {
