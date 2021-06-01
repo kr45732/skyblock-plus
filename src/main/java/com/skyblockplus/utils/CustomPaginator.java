@@ -1,8 +1,19 @@
 package com.skyblockplus.utils;
 
+import java.awt.Color;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.jagrosh.jdautilities.menu.Menu;
 import com.skyblockplus.utils.structs.PaginatorExtras;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -13,16 +24,6 @@ import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.internal.utils.Checks;
-
-import java.awt.*;
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
 
 public class CustomPaginator extends Menu {
     private static final String BIG_LEFT = "\u23EA";
@@ -42,9 +43,9 @@ public class CustomPaginator extends Menu {
     private final PaginatorExtras extras;
 
     CustomPaginator(EventWaiter waiter, Set<User> users, Set<Role> roles, long timeout, TimeUnit unit,
-                    BiFunction<Integer, Integer, Color> color, Consumer<Message> finalAction, int columns, int itemsPerPage,
-                    boolean showPageNumbers, boolean numberItems, List<String> items, int bulkSkipNumber, boolean wrapPageEnds,
-                    PaginatorExtras extras) {
+            BiFunction<Integer, Integer, Color> color, Consumer<Message> finalAction, int columns, int itemsPerPage,
+            boolean showPageNumbers, boolean numberItems, List<String> items, int bulkSkipNumber, boolean wrapPageEnds,
+            PaginatorExtras extras) {
         super(waiter, users, roles, timeout, unit);
         this.color = color;
         this.columns = columns;
@@ -121,7 +122,8 @@ public class CustomPaginator extends Menu {
                 return isValidUser(event.getUser(), event.isFromGuild() ? event.getGuild() : null);
             case BIG_LEFT:
             case BIG_RIGHT:
-                return bulkSkipNumber > 1 && isValidUser(event.getUser(), event.isFromGuild() ? event.getGuild() : null);
+                return bulkSkipNumber > 1
+                        && isValidUser(event.getUser(), event.isFromGuild() ? event.getGuild() : null);
             default:
                 event.getReaction().removeReaction(event.getUser()).queue();
                 return false;

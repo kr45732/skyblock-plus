@@ -10,5 +10,6 @@ public class GuildLeaderboardStruct {
     public double skills;
     public double slayer;
     public double catacombs;
+    public double weight;
     public String guildRank;
 }

@@ -61,7 +61,7 @@ public class GuildKickerCommand extends Command {
     }
 
     private EmbedBuilder getGuildKicker(String username, String reqs, CommandEvent event) {
-        String[] reqsArr = reqs.split("]\\[");
+        String[] reqsArr = reqs.split("] \\[");
         if (reqsArr.length > 3) {
             return defaultEmbed("Error").setDescription("You can only enter a maximum of 3 sets of requirements");
         }
@@ -70,17 +70,17 @@ public class GuildKickerCommand extends Command {
             for (String indvReq : indvReqs) {
                 String[] reqDashSplit = indvReq.split(":");
                 if (reqDashSplit.length != 2) {
-                    return defaultEmbed("Error").setDescription(indvReq + " is an invalid requirement");
+                    return defaultEmbed("Error").setDescription(indvReq + " is an invalid requirement format");
                 }
 
                 if (!"slayerskillscatacombsweight".contains(reqDashSplit[0])) {
-                    return defaultEmbed("Error").setDescription(indvReq + " is an invalid requirement");
+                    return defaultEmbed("Error").setDescription(indvReq + " is an invalid requirement type");
                 }
 
                 try {
                     Double.parseDouble(reqDashSplit[1]);
                 } catch (Exception e) {
-                    return defaultEmbed("Error").setDescription(indvReq + " is an invalid requirement");
+                    return defaultEmbed("Error").setDescription(indvReq + " is an invalid requirement value");
                 }
 
             }

@@ -34,7 +34,29 @@ public class LinkAccountCommand extends Command {
         this.cooldown = globalCooldown;
     }
 
-    public static EmbedBuilder linkAccount(String username, User user, Guild guild) {
+    @Override
+    protected void execute(CommandEvent event) {
+        new Thread(() -> {
+            EmbedBuilder eb = loadingEmbed();
+            Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+            String content = event.getMessage().getContentRaw();
+            String[] args = content.split(" ");
+
+            logCommand(event.getGuild(), event.getAuthor(), content);
+
+            if (args.length == 2) {
+                ebMessage.editMessage(linkAccount(args[1], event.getAuthor(), event.getGuild()).build()).queue();
+                return;
+            } else if (args.length == 1) {
+                ebMessage.editMessage(getLinkedAccount(event).build()).queue();
+                return;
+            }
+
+            ebMessage.editMessage(errorMessage(this.name).build()).queue();
+        }).start();
+    }
+
+    private EmbedBuilder linkAccount(String username, User user, Guild guild) {
         DiscordInfoStruct playerInfo = getPlayerDiscordInfo(username);
         if (playerInfo != null) {
             if (!user.getAsTag().equals(playerInfo.discordTag)) {
@@ -87,10 +109,14 @@ public class LinkAccountCommand extends Command {
                     for (JsonElement verifyRole : verifyRoles) {
                         try {
                             guild.addRoleToMember(user.getId(), guild.getRoleById(verifyRole.getAsString())).queue();
-                        } catch (Exception ignored) {
+                        } catch (Exception e) {
+                            System.out.println("== Stack Trace (linkAccount - add role inside for) ==");
+                            e.printStackTrace();
                         }
                     }
-                } catch (Exception ignored) {
+                } catch (Exception e) {
+                    System.out.println("== Stack Trace (linkAccount - add role outside for) ==");
+                    e.printStackTrace();
                 }
 
                 return defaultEmbed("Success").setDescription(
@@ -103,28 +129,6 @@ public class LinkAccountCommand extends Command {
 
         return defaultEmbed("Error").setDescription(username
                 + " is not linked to a Discord account. For help on how to link view [__**this**__](https://streamable.com/sdq8tp) video");
-    }
-
-    @Override
-    protected void execute(CommandEvent event) {
-        new Thread(() -> {
-            EmbedBuilder eb = loadingEmbed();
-            Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-            String content = event.getMessage().getContentRaw();
-            String[] args = content.split(" ");
-
-            logCommand(event.getGuild(), event.getAuthor(), content);
-
-            if (args.length == 2) {
-                ebMessage.editMessage(linkAccount(args[1], event.getAuthor(), event.getGuild()).build()).queue();
-                return;
-            } else if (args.length == 1) {
-                ebMessage.editMessage(getLinkedAccount(event).build()).queue();
-                return;
-            }
-
-            ebMessage.editMessage(errorMessage(this.name).build()).queue();
-        }).start();
     }
 
     private EmbedBuilder getLinkedAccount(CommandEvent event) {
