@@ -1,31 +1,21 @@
 package com.skyblockplus.dev;
 
-import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.Utils.loadingEmbed;
 import static com.skyblockplus.utils.Utils.logCommand;
-import static com.skyblockplus.utils.Utils.usernameToUuid;
 
-import java.io.FileReader;
-import java.time.Instant;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map.Entry;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
 
 public class PlaceholderCommand extends Command {
     public PlaceholderCommand() {
@@ -102,32 +92,6 @@ public class PlaceholderCommand extends Command {
                                 + " | Owner: " + guild.getOwner().getEffectiveName() + " (" + guild.getOwnerId() + ")");
                     }
 
-                    break;
-                case "test":
-                    try {
-                        JsonObject json = JsonParser
-                                .parseReader(new FileReader("src/main/java/com/skyblockplus/json/discToMc.json"))
-                                .getAsJsonObject();
-
-                        for (Entry<String, JsonElement> i : json.entrySet()) {
-                            try {
-                                User user = jda.getUserByTag(i.getKey());
-
-                                LinkedAccountModel toAdd = new LinkedAccountModel("" + Instant.now().toEpochMilli(),
-                                        user.getId(), usernameToUuid(i.getValue().getAsString()).playerUuid,
-                                        i.getValue().getAsString());
-
-                                if (database.addLinkedUser(toAdd) == 200) {
-                                    System.out.println("Added " + user.getAsTag());
-                                } else {
-                                    System.out.println("Failed to add " + user.getAsTag());
-                                }
-                            } catch (Exception ignored) {
-                            }
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
                     break;
             }
 

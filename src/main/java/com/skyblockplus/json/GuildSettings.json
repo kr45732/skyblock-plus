@@ -707,7 +707,7 @@
     "name": "Skyblock Gods",
     "guild_leaderboard": {
       "types": ["weight"],
-      "staff_ranks": ["staff", "guild master"],
+      "staff_ranks": ["none"],
       "default_role": ["member"],
       "ranks": [
         {
