@@ -45,6 +45,10 @@ public class AverageAuctionCommand extends Command {
 
 	private EmbedBuilder getAverageAuctionPrice(String item) {
 		JsonElement averageAhJson = getJson("https://moulberry.codes/auction_averages/3day.json");
+		if (averageAhJson == null) {
+			return defaultEmbed("Error fetching auctions");
+		}
+
 		if (higherDepth(averageAhJson, item) != null) {
 			JsonElement itemJson = higherDepth(averageAhJson, item);
 			EmbedBuilder eb;
