@@ -1,62 +1,68 @@
 package com.skyblockplus.utils.structs;
 
 public class ArmorStruct {
-    private String helmet;
-    private String chestplate;
-    private String leggings;
-    private String boots;
 
-    public ArmorStruct() {
-        this.helmet = "Empty";
-        this.chestplate = "Empty";
-        this.leggings = "Empty";
-        this.boots = "Empty";
-    }
+  private String helmet;
+  private String chestplate;
+  private String leggings;
+  private String boots;
 
-    public ArmorStruct(String helmet, String chestplate, String leggings, String boots) {
-        this.helmet = helmet;
-        this.chestplate = chestplate;
-        this.leggings = leggings;
-        this.boots = boots;
-    }
+  public ArmorStruct() {
+    this.helmet = "Empty";
+    this.chestplate = "Empty";
+    this.leggings = "Empty";
+    this.boots = "Empty";
+  }
 
-    public String getHelmet() {
-        return helmet;
-    }
+  public ArmorStruct(
+    String helmet,
+    String chestplate,
+    String leggings,
+    String boots
+  ) {
+    this.helmet = helmet;
+    this.chestplate = chestplate;
+    this.leggings = leggings;
+    this.boots = boots;
+  }
 
-    public void setHelmet(String helmet) {
-        this.helmet = helmet;
-    }
+  public String getHelmet() {
+    return helmet;
+  }
 
-    public String getChestplate() {
-        return chestplate;
-    }
+  public void setHelmet(String helmet) {
+    this.helmet = helmet;
+  }
 
-    public void setChestplate(String chestplate) {
-        this.chestplate = chestplate;
-    }
+  public String getChestplate() {
+    return chestplate;
+  }
 
-    public String getLeggings() {
-        return leggings;
-    }
+  public void setChestplate(String chestplate) {
+    this.chestplate = chestplate;
+  }
 
-    public void setLeggings(String leggings) {
-        this.leggings = leggings;
-    }
+  public String getLeggings() {
+    return leggings;
+  }
 
-    public String getBoots() {
-        return boots;
-    }
+  public void setLeggings(String leggings) {
+    this.leggings = leggings;
+  }
 
-    public void setBoots(String boots) {
-        this.boots = boots;
-    }
+  public String getBoots() {
+    return boots;
+  }
 
-    public ArmorStruct makeBold() {
-        setHelmet("**" + getHelmet() + "**");
-        setChestplate("**" + getChestplate() + "**");
-        setLeggings("**" + getLeggings() + "**");
-        setBoots("**" + getBoots() + "**");
-        return this;
-    }
+  public void setBoots(String boots) {
+    this.boots = boots;
+  }
+
+  public ArmorStruct makeBold() {
+    setHelmet("**" + getHelmet() + "**");
+    setChestplate("**" + getChestplate() + "**");
+    setLeggings("**" + getLeggings() + "**");
+    setBoots("**" + getBoots() + "**");
+    return this;
+  }
 }

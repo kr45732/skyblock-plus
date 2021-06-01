@@ -1,21 +1,18 @@
 package com.skyblockplus.api.discordserversettings.settingsmanagers;
 
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-
 import com.skyblockplus.api.discordserversettings.automatedapplication.AutomatedApplication;
 import com.skyblockplus.api.discordserversettings.automatedguildroles.GuildRole;
 import com.skyblockplus.api.discordserversettings.automatedroles.AutomatedRoles;
 import com.skyblockplus.api.discordserversettings.automatedverify.AutomatedVerify;
 import com.skyblockplus.api.discordserversettings.skyblockevent.SbEvent;
-
-import org.springframework.transaction.annotation.Transactional;
-
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.transaction.annotation.Transactional;
 
 @Data
 @AllArgsConstructor
@@ -23,38 +20,38 @@ import lombok.Data;
 @Transactional
 public class ServerSettingsModel {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-    private String serverName;
-    private String serverId;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private Long id;
 
-    @Embedded
-    private AutomatedVerify automatedVerify = new AutomatedVerify();
+  private String serverName;
+  private String serverId;
 
-    @Embedded
-    private AutomatedApplication automatedApplicationOne = null;
+  @Embedded
+  private AutomatedVerify automatedVerify = new AutomatedVerify();
 
-    @Embedded
-    private AutomatedApplication automatedApplicationTwo = null;
+  @Embedded
+  private AutomatedApplication automatedApplicationOne = null;
 
-    @Embedded
-    private AutomatedRoles automatedRoles = new AutomatedRoles();
+  @Embedded
+  private AutomatedApplication automatedApplicationTwo = null;
 
-    @Embedded
-    private GuildRole automaticGuildRolesOne = null;
+  @Embedded
+  private AutomatedRoles automatedRoles = new AutomatedRoles();
 
-    @Embedded
-    private GuildRole automaticGuildRolesTwo = null;
+  @Embedded
+  private GuildRole automaticGuildRolesOne = null;
 
-    @Embedded
-    private SbEvent sbEvent = new SbEvent();
+  @Embedded
+  private GuildRole automaticGuildRolesTwo = null;
 
-    public ServerSettingsModel() {
-    }
+  @Embedded
+  private SbEvent sbEvent = new SbEvent();
 
-    public ServerSettingsModel(String serverName, String serverId) {
-        this.serverName = serverName;
-        this.serverId = serverId;
-    }
+  public ServerSettingsModel() {}
+
+  public ServerSettingsModel(String serverName, String serverId) {
+    this.serverName = serverName;
+    this.serverId = serverId;
+  }
 }
