@@ -46,7 +46,7 @@ public class SkillsCommand extends Command {
 			.start();
 	}
 
-	private EmbedBuilder getPlayerSkill(String username, String profileName) {
+	public static EmbedBuilder getPlayerSkill(String username, String profileName) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 
 		if (player.isValid()) {

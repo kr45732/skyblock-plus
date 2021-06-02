@@ -7,6 +7,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
 
 public class UnlinkAccountCommand extends Command {
 
@@ -25,14 +26,14 @@ public class UnlinkAccountCommand extends Command {
 
 				logCommand(event.getGuild(), event.getAuthor(), content);
 
-				ebMessage.editMessage(unlinkAccount(event).build()).queue();
+				ebMessage.editMessage(unlinkAccount(event.getAuthor()).build()).queue();
 			}
 		)
 			.start();
 	}
 
-	private EmbedBuilder unlinkAccount(CommandEvent event) {
-		database.deleteLinkedUserByDiscordId(event.getAuthor().getId());
+	public static EmbedBuilder unlinkAccount(User user) {
+		database.deleteLinkedUserByDiscordId(user.getId());
 		return defaultEmbed("Success").setDescription("You were unlinked");
 	}
 }

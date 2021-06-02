@@ -47,7 +47,7 @@ public class LinkAccountCommand extends Command {
 					ebMessage.editMessage(linkAccount(args[1], event.getAuthor(), event.getGuild()).build()).queue();
 					return;
 				} else if (args.length == 1) {
-					ebMessage.editMessage(getLinkedAccount(event).build()).queue();
+					ebMessage.editMessage(getLinkedAccount(event.getAuthor()).build()).queue();
 					return;
 				}
 
@@ -57,7 +57,7 @@ public class LinkAccountCommand extends Command {
 			.start();
 	}
 
-	private EmbedBuilder linkAccount(String username, User user, Guild guild) {
+	public static EmbedBuilder linkAccount(String username, User user, Guild guild) {
 		DiscordInfoStruct playerInfo = getPlayerDiscordInfo(username);
 		if (playerInfo != null) {
 			if (!user.getAsTag().equals(playerInfo.discordTag)) {
@@ -145,20 +145,16 @@ public class LinkAccountCommand extends Command {
 			);
 	}
 
-	private EmbedBuilder getLinkedAccount(CommandEvent event) {
-		JsonElement userInfo = database.getLinkedUserByDiscordId(event.getAuthor().getId());
+	public static EmbedBuilder getLinkedAccount(User user) {
+		JsonElement userInfo = database.getLinkedUserByDiscordId(user.getId());
 
 		try {
 			return defaultEmbed("Success")
 				.setDescription(
-					"`" +
-					event.getAuthor().getAsTag() +
-					"` is linked to `" +
-					(higherDepth(userInfo, "minecraftUsername").getAsString()) +
-					"`"
+					"`" + user.getAsTag() + "` is linked to `" + (higherDepth(userInfo, "minecraftUsername").getAsString()) + "`"
 				);
 		} catch (Exception e) {
-			return defaultEmbed("Error").setDescription("`" + event.getAuthor().getAsTag() + "` is not linked");
+			return defaultEmbed("Error").setDescription("`" + user.getAsTag() + "` is not linked");
 		}
 	}
 }

@@ -41,7 +41,7 @@ public class SlayerCommand extends Command {
 			.start();
 	}
 
-	private EmbedBuilder getPlayerSlayer(String username, String profileName) {
+	public static EmbedBuilder getPlayerSlayer(String username, String profileName) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			EmbedBuilder eb = player.defaultPlayerEmbed();

@@ -20,6 +20,7 @@ import com.skyblockplus.dev.LinkedUserDev;
 import com.skyblockplus.dev.PlaceholderCommand;
 import com.skyblockplus.dev.QuickSetupTestCommand;
 import com.skyblockplus.dev.ShutdownCommand;
+import com.skyblockplus.dev.UpdateSlashCommands;
 import com.skyblockplus.dev.UuidCommand;
 import com.skyblockplus.dungeons.CatacombsCommand;
 import com.skyblockplus.dungeons.EssenceCommand;
@@ -37,14 +38,18 @@ import com.skyblockplus.inventory.SacksCommand;
 import com.skyblockplus.inventory.TalismanBagCommand;
 import com.skyblockplus.inventory.WardrobeCommand;
 import com.skyblockplus.link.LinkAccountCommand;
+import com.skyblockplus.link.LinkSlashCommand;
 import com.skyblockplus.link.UnlinkAccountCommand;
+import com.skyblockplus.link.UnlinkSlashCommand;
 import com.skyblockplus.miscellaneous.BaldCommand;
 import com.skyblockplus.miscellaneous.BankCommand;
 import com.skyblockplus.miscellaneous.CategoriesCommand;
 import com.skyblockplus.miscellaneous.HelpCommand;
 import com.skyblockplus.miscellaneous.HypixelCommand;
 import com.skyblockplus.miscellaneous.InformationCommand;
+import com.skyblockplus.miscellaneous.InformationSlashCommand;
 import com.skyblockplus.miscellaneous.InviteCommand;
+import com.skyblockplus.miscellaneous.InviteSlashCommand;
 import com.skyblockplus.miscellaneous.MissingTalismansCommand;
 import com.skyblockplus.miscellaneous.ProfilesCommand;
 import com.skyblockplus.miscellaneous.ReloadCommand;
@@ -63,8 +68,11 @@ import com.skyblockplus.settings.SettingsCommand;
 import com.skyblockplus.settings.SetupCommand;
 import com.skyblockplus.settings.SpringDatabaseComponent;
 import com.skyblockplus.skills.SkillsCommand;
+import com.skyblockplus.skills.SkillsSlashCommand;
 import com.skyblockplus.slayer.SlayerCommand;
+import com.skyblockplus.slayer.SlayerSlashCommand;
 import com.skyblockplus.timeout.MessageTimeout;
+import com.skyblockplus.utils.slashcommands.SlashCommandImpl;
 import com.skyblockplus.weight.WeightCommand;
 import javax.annotation.PreDestroy;
 import javax.security.auth.login.LoginException;
@@ -72,9 +80,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.asynchttpclient.AsyncHttpClient;
@@ -158,7 +164,18 @@ public class Main {
 			new EvaluateCommand(),
 			new GuildRequirementsCommand(),
 			new GuildKickerCommand(),
-			new MissingTalismansCommand()
+			new MissingTalismansCommand(),
+			new UpdateSlashCommands()
+		);
+
+		SlashCommandImpl slashCommands = new SlashCommandImpl();
+		slashCommands.addSlashCommmands(
+			new InviteSlashCommand(),
+			new InformationSlashCommand(),
+			new LinkSlashCommand(),
+			new UnlinkSlashCommand(),
+			new SlayerSlashCommand(),
+			new SkillsSlashCommand()
 		);
 
 		jda =
@@ -168,7 +185,7 @@ public class Main {
 				.setChunkingFilter(ChunkingFilter.ALL)
 				.setMemberCachePolicy(MemberCachePolicy.ALL)
 				.enableIntents(GatewayIntent.GUILD_MEMBERS)
-				.addEventListeners(waiter, client.build(), new MessageTimeout(), new MainListener())
+				.addEventListeners(waiter, client.build(), new MessageTimeout(), new MainListener(), slashCommands)
 				.setActivity(Activity.playing("Loading..."))
 				.build();
 
@@ -178,10 +195,6 @@ public class Main {
 
 		jda.getPresence().setActivity(Activity.watching(BOT_PREFIX + "help in " + jda.getGuilds().size() + " servers"));
 		// scheduleUpdateLinkedAccounts();
-
-		CommandListUpdateAction slashCommands = jda.getGuildById("796790757947867156").updateCommands();
-		slashCommands.addCommands(new CommandData("information", "Get information about this bot"));
-		slashCommands.queue();
 	}
 
 	@PreDestroy
