@@ -6,6 +6,7 @@ import static com.skyblockplus.utils.Utils.BOT_PREFIX;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.Utils.logCommand;
 
+import com.skyblockplus.miscellaneous.InformationCommand;
 import java.util.HashMap;
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -15,6 +16,7 @@ import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -134,20 +136,22 @@ public class MainListener extends ListenerAdapter {
 		}
 	}
 
-	// @Override
-	// public void onSlashCommand(SlashCommandEvent event) {
-	// 	if (event.getGuild() == null) {
-	// 		return;
-	// 	}
+	@Override
+	public void onSlashCommand(SlashCommandEvent event) {
+		if (event.getGuild() == null) {
+			return;
+		}
 
-	// 	switch (event.getName()) {
-	// 		case "help":
-	// 			event.reply("a").addActionRow(Button.primary("test", "Click me!")).queue();
-	// 			break;
-	// 		default:
-	// 			event.reply("Invalid Command").setEphemeral(true).queue();
-	// 	}
-	// }
+		event.deferReply().complete();
+
+		switch (event.getName()) {
+			case "information":
+				event.getHook().editOriginalEmbeds(InformationCommand.getInformation().build()).queue();
+				break;
+			default:
+				event.reply("Invalid Command").setEphemeral(true).queue();
+		}
+	}
 
 	@Override
 	public void onButtonClick(ButtonClickEvent event) {

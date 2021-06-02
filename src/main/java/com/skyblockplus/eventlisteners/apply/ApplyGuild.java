@@ -3,7 +3,6 @@ package com.skyblockplus.eventlisteners.apply;
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.MainClassUtils.getApplyGuildUsersCache;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.Utils.higherDepth;
 
 import com.google.gson.JsonElement;
@@ -12,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
@@ -102,94 +100,6 @@ public class ApplyGuild {
 		}
 
 		return false;
-	}
-
-	public boolean onMessageReactionAdd_NewApplyUser(MessageReactionAddEvent event) {
-		if (event.getUser().isBot()) {
-			return false;
-		}
-
-		if (event.getMessageIdLong() != reactMessage.getIdLong()) {
-			return false;
-		}
-
-		event.getReaction().removeReaction(event.getUser()).queue();
-		if (!event.getReactionEmote().getName().equals("✅")) {
-			return true;
-		}
-
-		if (
-			event
-				.getGuild()
-				.getTextChannelsByName(
-					higherDepth(currentSettings, "newChannelPrefix").getAsString() + "-" + event.getUser().getName().replace(" ", "-"),
-					true
-				)
-				.size() >
-			0
-		) {
-			return true;
-		}
-
-		JsonElement linkedAccount = database.getLinkedUserByDiscordId(event.getUserId());
-
-		if (linkedAccount.isJsonNull() || !higherDepth(linkedAccount, "discordId").getAsString().equals(event.getUserId())) {
-			PrivateChannel dmChannel = event.getUser().openPrivateChannel().complete();
-			if (linkedAccount.isJsonNull()) {
-				dmChannel
-					.sendMessage(
-						defaultEmbed("Error")
-							.setDescription("You are not linked to the bot. Please run `+link [IGN]` and try again.")
-							.build()
-					)
-					.queue();
-			} else {
-				dmChannel
-					.sendMessage(
-						defaultEmbed("Error")
-							.setDescription(
-								"Account " +
-								higherDepth(linkedAccount, "minecraftUsername").getAsString() +
-								" is linked with the discord tag " +
-								jda.retrieveUserById(higherDepth(linkedAccount, "discordId").getAsString()).complete().getAsTag() +
-								"\nYour current discord tag is " +
-								event.getUser().getAsTag() +
-								".\nPlease relink and try again"
-							)
-							.build()
-					)
-					.queue();
-			}
-			return true;
-		}
-
-		Player player = new Player(higherDepth(linkedAccount, "minecraftUsername").getAsString());
-
-		if (!player.isValid()) {
-			PrivateChannel dmChannel = event.getUser().openPrivateChannel().complete();
-			dmChannel
-				.sendMessage(
-					defaultEmbed("Error")
-						.setDescription("Unable to fetch player data. Please make sure that all APIs are enabled and/or try relinking")
-						.build()
-				)
-				.queue();
-			return true;
-		} else {
-			boolean isIronman = false;
-			try {
-				isIronman = higherDepth(currentSettings, "ironmanOnly").getAsBoolean();
-			} catch (Exception ignored) {}
-			if (isIronman && player.getAllProfileNames(isIronman).length == 0) {
-				PrivateChannel dmChannel = event.getUser().openPrivateChannel().complete();
-				dmChannel.sendMessage(defaultEmbed("Error").setDescription("You have no ironman profiles created").build()).queue();
-				return true;
-			}
-		}
-
-		// ApplyUser applyUser = new ApplyUser(event, currentSettings, higherDepth(linkedAccount, "minecraftUsername").getAsString());
-		// applyUserList.add(applyUser);
-		return true;
 	}
 
 	public void onTextChannelDelete(TextChannelDeleteEvent event) {

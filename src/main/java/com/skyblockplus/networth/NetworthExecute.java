@@ -1202,6 +1202,10 @@ public class NetworthExecute {
 			return true;
 		}
 
+		if (s.equalsIgnoreCase("zombie_commander_whip")) {
+			return true;
+		}
+
 		return s.equals("skyblock_menu");
 	}
 

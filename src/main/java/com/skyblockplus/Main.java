@@ -72,7 +72,9 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.asynchttpclient.AsyncHttpClient;
@@ -177,9 +179,9 @@ public class Main {
 		jda.getPresence().setActivity(Activity.watching(BOT_PREFIX + "help in " + jda.getGuilds().size() + " servers"));
 		// scheduleUpdateLinkedAccounts();
 
-		// CommandListUpdateAction slashCommands = jda.getGuildById("796790757947867156").updateCommands();
-		// slashCommands.addCommands(new CommandData("help", "Show the help menu"));
-		// slashCommands.queue();
+		CommandListUpdateAction slashCommands = jda.getGuildById("796790757947867156").updateCommands();
+		slashCommands.addCommands(new CommandData("information", "Get information about this bot"));
+		slashCommands.queue();
 	}
 
 	@PreDestroy
