@@ -46,8 +46,10 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
+import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.interactions.components.Button;
 import org.apache.commons.collections4.ListUtils;
 
 public class AutomaticGuild {
@@ -337,8 +339,10 @@ public class AutomaticGuild {
 					applyGuild.removeIf(o1 -> higherDepth(o1.currentSettings, "name").getAsString().equals(currentSetting.getName()));
 					applyGuild.add(new ApplyGuild(reactMessage, new Gson().toJsonTree(currentSetting)));
 				} catch (Exception e) {
-					Message reactMessage = reactChannel.sendMessage(eb.build()).complete();
-					reactMessage.addReaction("✅").queue();
+					Message reactMessage = reactChannel
+						.sendMessage(eb.build())
+						.setActionRow(Button.primary("create_application_button_" + currentSetting.getName(), "Apply Here"))
+						.complete();
 
 					currentSetting.setPreviousMessageId(reactMessage.getId());
 					database.updateApplySettings(event.getGuild().getId(), new Gson().toJsonTree(currentSetting));
@@ -393,8 +397,10 @@ public class AutomaticGuild {
 						applyGuild.add(new ApplyGuild(reactMessage, new Gson().toJsonTree(currentSetting), curApplyUsers));
 						applyStr += "• Reloaded `" + currentSetting.getName() + "`\n";
 					} catch (Exception e) {
-						Message reactMessage = reactChannel.sendMessage(eb.build()).complete();
-						reactMessage.addReaction("✅").queue();
+						Message reactMessage = reactChannel
+							.sendMessage(eb.build())
+							.setActionRow(Button.primary("create_application_button_" + currentSetting.getName(), "Apply Here"))
+							.complete();
 
 						currentSetting.setPreviousMessageId(reactMessage.getId());
 						database.updateApplySettings(guild.getId(), new Gson().toJsonTree(currentSetting));
@@ -409,7 +415,7 @@ public class AutomaticGuild {
 			} catch (Exception e) {
 				System.out.println("== Stack Trace (Reload apply constructor error - " + guildId + ") ==");
 				e.printStackTrace();
-				if (e.getMessage().contains("Missing permission")) {
+				if (e.getMessage() != null && e.getMessage().contains("Missing permission")) {
 					applyStr +=
 						"• Error Reloading for `" +
 						currentSetting.getName() +
@@ -498,5 +504,19 @@ public class AutomaticGuild {
 
 	public void createSkyblockEvent(CommandEvent event) {
 		skyblockEvent = new SkyblockEvent(event);
+	}
+
+	public void onButtonClick(ButtonClickEvent event) {
+		event.deferReply(true).complete();
+
+		applyGuild.forEach(
+			o1 -> {
+				String buttonClickReply = o1.onButtonClick(event);
+				if (buttonClickReply != null) {
+					event.getHook().editOriginal(buttonClickReply).queue();
+					return;
+				}
+			}
+		);
 	}
 }

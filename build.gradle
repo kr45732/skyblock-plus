@@ -28,19 +28,14 @@ repositories {
     // Use maven dependencies in gradle
     jcenter()
     mavenCentral()
-    maven {
-        url 'https://jitpack.io'
-    }
-
-    maven {
-        name 'm2-dv8tion'
-        url 'https://m2.dv8tion.net/releases'
-    }
+    maven { url 'https://m2.dv8tion.net/releases' }
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
     // JDA (Discord API wrapper)
-    implementation "net.dv8tion:JDA:4.2.1_262"
+    // implementation "net.dv8tion:JDA:4.2.1_262"
+    implementation 'com.github.DV8FromTheWorld:JDA:05d58f1b08d4233ce79833410b0a09001f6aca62'
 
     // Gson (Google json)
     implementation 'com.google.code.gson:gson:2.8.6'

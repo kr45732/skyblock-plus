@@ -1,25 +1,74 @@
 package com.skyblockplus;
 
-import static com.skyblockplus.utils.MainClassUtils.*;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.MainClassUtils.cacheApplyGuildUsers;
+import static com.skyblockplus.utils.MainClassUtils.closeAsyncHttpClient;
+import static com.skyblockplus.utils.Utils.BOT_PREFIX;
+import static com.skyblockplus.utils.Utils.BOT_TOKEN;
+import static com.skyblockplus.utils.Utils.setApplicationSettings;
 
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.skyblockplus.dev.*;
-import com.skyblockplus.dungeons.*;
+import com.skyblockplus.api.discordserversettings.automatedapplication.AutomatedApplication;
+import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSettingsModel;
+import com.skyblockplus.dev.DeleteMessagesCommand;
+import com.skyblockplus.dev.EmojiMapServerCommand;
+import com.skyblockplus.dev.EvaluateCommand;
+import com.skyblockplus.dev.GetAllGuildsIn;
+import com.skyblockplus.dev.GetEventListenersCommand;
+import com.skyblockplus.dev.GetSettingsFile;
+import com.skyblockplus.dev.GetThreadPools;
+import com.skyblockplus.dev.InstantTimeNow;
+import com.skyblockplus.dev.LinkedUserDev;
+import com.skyblockplus.dev.PlaceholderCommand;
+import com.skyblockplus.dev.QuickSetupTestCommand;
+import com.skyblockplus.dev.ShutdownCommand;
+import com.skyblockplus.dev.UuidCommand;
+import com.skyblockplus.dungeons.CatacombsCommand;
+import com.skyblockplus.dungeons.EssenceCommand;
+import com.skyblockplus.dungeons.PartyFinderCommand;
 import com.skyblockplus.eventlisteners.MainListener;
 import com.skyblockplus.eventlisteners.skyblockevent.SkyblockEventCommand;
-import com.skyblockplus.guilds.*;
-import com.skyblockplus.inventory.*;
-import com.skyblockplus.link.*;
-import com.skyblockplus.miscellaneous.*;
+import com.skyblockplus.guilds.GuildCommand;
+import com.skyblockplus.guilds.GuildKickerCommand;
+import com.skyblockplus.guilds.GuildLeaderboardCommand;
+import com.skyblockplus.guilds.GuildRequirementsCommand;
+import com.skyblockplus.inventory.EnderChestCommand;
+import com.skyblockplus.inventory.InventoryCommand;
+import com.skyblockplus.inventory.PetsCommand;
+import com.skyblockplus.inventory.SacksCommand;
+import com.skyblockplus.inventory.TalismanBagCommand;
+import com.skyblockplus.inventory.WardrobeCommand;
+import com.skyblockplus.link.LinkAccountCommand;
+import com.skyblockplus.link.UnlinkAccountCommand;
+import com.skyblockplus.miscellaneous.BaldCommand;
+import com.skyblockplus.miscellaneous.BankCommand;
+import com.skyblockplus.miscellaneous.CategoriesCommand;
+import com.skyblockplus.miscellaneous.HelpCommand;
+import com.skyblockplus.miscellaneous.HypixelCommand;
+import com.skyblockplus.miscellaneous.InformationCommand;
+import com.skyblockplus.miscellaneous.InviteCommand;
+import com.skyblockplus.miscellaneous.MissingTalismansCommand;
+import com.skyblockplus.miscellaneous.ProfilesCommand;
+import com.skyblockplus.miscellaneous.ReloadCommand;
+import com.skyblockplus.miscellaneous.RoleCommands;
+import com.skyblockplus.miscellaneous.SkyblockCommand;
+import com.skyblockplus.miscellaneous.VersionCommand;
 import com.skyblockplus.networth.NetworthCommand;
-import com.skyblockplus.price.*;
-import com.skyblockplus.settings.*;
+import com.skyblockplus.price.AuctionCommand;
+import com.skyblockplus.price.AverageAuctionCommand;
+import com.skyblockplus.price.BazaarCommand;
+import com.skyblockplus.price.BidsCommand;
+import com.skyblockplus.price.BinCommand;
+import com.skyblockplus.price.BitsCommand;
+import com.skyblockplus.price.QueryAuctionCommand;
+import com.skyblockplus.settings.SettingsCommand;
+import com.skyblockplus.settings.SetupCommand;
+import com.skyblockplus.settings.SpringDatabaseComponent;
 import com.skyblockplus.skills.SkillsCommand;
 import com.skyblockplus.slayer.SlayerCommand;
 import com.skyblockplus.timeout.MessageTimeout;
 import com.skyblockplus.weight.WeightCommand;
+import java.util.List;
 import javax.annotation.PreDestroy;
 import javax.security.auth.login.LoginException;
 import net.dv8tion.jda.api.JDA;
@@ -113,29 +162,16 @@ public class Main {
 			new MissingTalismansCommand()
 		);
 
-		if (BOT_PREFIX.equals("+")) {
-			jda =
-				JDABuilder
-					.createDefault(BOT_TOKEN)
-					.setStatus(OnlineStatus.DO_NOT_DISTURB)
-					.setChunkingFilter(ChunkingFilter.ALL)
-					.setMemberCachePolicy(MemberCachePolicy.ALL)
-					.enableIntents(GatewayIntent.GUILD_MEMBERS)
-					.setActivity(Activity.playing("Loading..."))
-					.addEventListeners(waiter, client.build(), new MessageTimeout(), new MainListener())
-					.build();
-		} else {
-			jda =
-				JDABuilder
-					.createDefault(BOT_TOKEN)
-					.setStatus(OnlineStatus.DO_NOT_DISTURB)
-					.setChunkingFilter(ChunkingFilter.ALL)
-					.setMemberCachePolicy(MemberCachePolicy.ALL)
-					.enableIntents(GatewayIntent.GUILD_MEMBERS)
-					.setActivity(Activity.playing("Loading..."))
-					.addEventListeners(waiter, client.build(), new MessageTimeout(), new MainListener())
-					.build();
-		}
+		jda =
+			JDABuilder
+				.createDefault(BOT_TOKEN)
+				.setStatus(OnlineStatus.DO_NOT_DISTURB)
+				.setChunkingFilter(ChunkingFilter.ALL)
+				.setMemberCachePolicy(MemberCachePolicy.ALL)
+				.enableIntents(GatewayIntent.GUILD_MEMBERS)
+				.addEventListeners(waiter, client.build(), new MessageTimeout(), new MainListener())
+				.setActivity(Activity.playing("Loading..."))
+				.build();
 
 		try {
 			jda.awaitReady();
@@ -143,6 +179,10 @@ public class Main {
 
 		jda.getPresence().setActivity(Activity.watching(BOT_PREFIX + "help in " + jda.getGuilds().size() + " servers"));
 		// scheduleUpdateLinkedAccounts();
+
+		// CommandListUpdateAction slashCommands = jda.getGuildById("796790757947867156").updateCommands();
+		// slashCommands.addCommands(new CommandData("help", "Show the help menu"));
+		// slashCommands.queue();
 	}
 
 	@PreDestroy

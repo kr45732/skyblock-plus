@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
+import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -130,6 +131,28 @@ public class MainListener extends ListenerAdapter {
 	public void onTextChannelDelete(TextChannelDeleteEvent event) {
 		if (guildMap.containsKey(event.getGuild().getId())) {
 			guildMap.get(event.getGuild().getId()).onTextChannelDelete(event);
+		}
+	}
+
+	// @Override
+	// public void onSlashCommand(SlashCommandEvent event) {
+	// 	if (event.getGuild() == null) {
+	// 		return;
+	// 	}
+
+	// 	switch (event.getName()) {
+	// 		case "help":
+	// 			event.reply("a").addActionRow(Button.primary("test", "Click me!")).queue();
+	// 			break;
+	// 		default:
+	// 			event.reply("Invalid Command").setEphemeral(true).queue();
+	// 	}
+	// }
+
+	@Override
+	public void onButtonClick(ButtonClickEvent event) {
+		if (guildMap.containsKey(event.getGuild().getId())) {
+			guildMap.get(event.getGuild().getId()).onButtonClick(event);
 		}
 	}
 }

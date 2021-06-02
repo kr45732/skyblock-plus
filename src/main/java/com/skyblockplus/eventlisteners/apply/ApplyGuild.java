@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
+import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
 public class ApplyGuild {
@@ -56,9 +57,9 @@ public class ApplyGuild {
 			return;
 		}
 
-		if (onMessageReactionAdd_NewApplyUser(event)) {
-			return;
-		}
+		// if (onMessageReactionAdd_NewApplyUser(event)) {
+		// 	return;
+		// }
 
 		if (onMessageReactionAdd_ExistingApplyUser(event)) {
 			return;
@@ -190,8 +191,8 @@ public class ApplyGuild {
 			}
 		}
 
-		ApplyUser applyUser = new ApplyUser(event, currentSettings, higherDepth(linkedAccount, "minecraftUsername").getAsString());
-		applyUserList.add(applyUser);
+		// ApplyUser applyUser = new ApplyUser(event, currentSettings, higherDepth(linkedAccount, "minecraftUsername").getAsString());
+		// applyUserList.add(applyUser);
 		return true;
 	}
 
@@ -210,5 +211,78 @@ public class ApplyGuild {
 				return false;
 			}
 		);
+	}
+
+	public String onMessageReactionAdd_NewApplyUser(ButtonClickEvent event) {
+		if (event.getUser().isBot()) {
+			return null;
+		}
+
+		if (event.getMessageIdLong() != reactMessage.getIdLong()) {
+			return null;
+		}
+
+		if (!event.getButton().getId().equals("create_application_button_" + higherDepth(currentSettings, "name").getAsString())) {
+			return null;
+		}
+
+		List<TextChannel> openApplys = event
+			.getGuild()
+			.getTextChannelsByName(
+				higherDepth(currentSettings, "newChannelPrefix").getAsString() + "-" + event.getUser().getName().replace(" ", "-"),
+				true
+			);
+
+		if (openApplys.size() > 0) {
+			return "❌ There is already an application open in " + openApplys.get(0).getAsMention();
+		}
+
+		JsonElement linkedAccount = database.getLinkedUserByDiscordId(event.getUser().getId());
+
+		if (linkedAccount.isJsonNull() || !higherDepth(linkedAccount, "discordId").getAsString().equals((event.getUser().getId()))) {
+			if (linkedAccount.isJsonNull()) {
+				return "❌ You are not linked to the bot. Please run `+link [IGN]` and try again.";
+			} else {
+				return (
+					"❌ Account " +
+					higherDepth(linkedAccount, "minecraftUsername").getAsString() +
+					" is linked with the discord tag " +
+					jda.retrieveUserById(higherDepth(linkedAccount, "discordId").getAsString()).complete().getAsTag() +
+					"\nYour current discord tag is " +
+					event.getUser().getAsTag() +
+					".\nPlease relink and try again"
+				);
+			}
+		}
+
+		Player player = new Player(higherDepth(linkedAccount, "minecraftUsername").getAsString());
+
+		if (!player.isValid()) {
+			return "❌ Unable to fetch player data. Please make sure that all APIs are enabled and/or try relinking";
+		} else {
+			boolean isIronman = false;
+			try {
+				isIronman = higherDepth(currentSettings, "ironmanOnly").getAsBoolean();
+			} catch (Exception ignored) {}
+			if (isIronman && player.getAllProfileNames(isIronman).length == 0) {
+				return "❌ You have no ironman profiles created";
+			}
+		}
+
+		ApplyUser applyUser = new ApplyUser(event, currentSettings, higherDepth(linkedAccount, "minecraftUsername").getAsString());
+		applyUserList.add(applyUser);
+		openApplys =
+			event
+				.getGuild()
+				.getTextChannelsByName(
+					higherDepth(currentSettings, "newChannelPrefix").getAsString() + "-" + event.getUser().getName().replace(" ", "-"),
+					true
+				);
+
+		return "✅ A new application was created in " + openApplys.get(0).getAsMention();
+	}
+
+	public String onButtonClick(ButtonClickEvent event) {
+		return onMessageReactionAdd_NewApplyUser(event);
 	}
 }

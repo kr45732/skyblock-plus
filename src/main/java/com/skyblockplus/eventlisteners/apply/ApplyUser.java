@@ -27,6 +27,7 @@ import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
 public class ApplyUser implements Serializable {
@@ -49,7 +50,7 @@ public class ApplyUser implements Serializable {
 	public String ironmanSymbol;
 	public String playerProfileName;
 
-	public ApplyUser(MessageReactionAddEvent event, JsonElement currentSettings, String playerUsername) {
+	public ApplyUser(ButtonClickEvent event, JsonElement currentSettings, String playerUsername) {
 		User applyingUser = event.getUser();
 
 		logCommand(event.getGuild(), applyingUser, "apply " + applyingUser.getName());

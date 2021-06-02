@@ -22,6 +22,7 @@ import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.vdurmont.emoji.EmojiParser;
 import java.util.*;
+import java.util.Map.Entry;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
@@ -397,6 +398,8 @@ public class SettingsCommand extends Command {
 					} else if (args.length == 4) {
 						if (args[2].equals("create")) {
 							eb = createGuildRoles(args[3]);
+						} else {
+							eb = defaultEmbed("Error").addField("Guild Role Settings", "Invalid Settings", false);
 						}
 					} else if (args.length == 5) {
 						JsonElement guildRoleSettings = database.getGuildRoleSettings(event.getGuild().getId(), args[2]);
@@ -981,7 +984,9 @@ public class SettingsCommand extends Command {
 				} else {
 					for (JsonElement roleLevel : higherDepth(currentRoleSettings, "levels").getAsJsonArray()) {
 						String rName = higherDepth(roleLevel, "value").getAsString();
-						ebFieldString.append("\n• ").append(rName + "(view the ranks in " + BOT_PREFIX + "`settings guild " + rName + "`");
+						ebFieldString
+							.append("\n• ")
+							.append(rName + " (view the ranks in " + BOT_PREFIX + "`settings guild " + rName + "`)");
 					}
 				}
 			} else if (isOneLevelRole(roleName)) {
@@ -1164,10 +1169,19 @@ public class SettingsCommand extends Command {
 			return defaultEmbed("Error", null).setDescription("Invalid role");
 		}
 
+		int totalRoleCount = 0;
+		JsonObject allRoleSettings = database.getRolesSettings(event.getGuild().getId()).getAsJsonObject();
+
+		for (Entry<String, JsonElement> i : allRoleSettings.entrySet()) {
+			try {
+				totalRoleCount += higherDepth(i.getValue(), "levels").getAsJsonArray().size();
+			} catch (Exception ignored) {}
+		}
+
 		JsonArray currentLevels = newRoleSettings.get("levels").getAsJsonArray();
 
-		if (currentLevels.size() >= 5) {
-			return defaultEmbed("Error").setDescription("This role has reached the max limit of levels (5/5)");
+		if (totalRoleCount >= 120) {
+			return defaultEmbed("Error").setDescription("You have reached the max amount of total levels (120/120)");
 		}
 
 		for (JsonElement level : currentLevels) {
