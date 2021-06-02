@@ -57,10 +57,6 @@ public class ApplyGuild {
 			return;
 		}
 
-		// if (onMessageReactionAdd_NewApplyUser(event)) {
-		// 	return;
-		// }
-
 		if (onMessageReactionAdd_ExistingApplyUser(event)) {
 			return;
 		}

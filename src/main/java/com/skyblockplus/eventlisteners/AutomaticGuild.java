@@ -49,6 +49,7 @@ import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
 import org.apache.commons.collections4.ListUtils;
 
@@ -334,7 +335,10 @@ public class AutomaticGuild {
 
 				try {
 					Message reactMessage = reactChannel.retrieveMessageById(currentSetting.getPreviousMessageId()).complete();
-					reactMessage.editMessage(eb.build()).queue();
+					reactMessage
+						.editMessage(eb.build())
+						.setActionRow(Button.primary("create_application_button_" + currentSetting.getName(), "Apply Here"))
+						.queue();
 
 					applyGuild.removeIf(o1 -> higherDepth(o1.currentSettings, "name").getAsString().equals(currentSetting.getName()));
 					applyGuild.add(new ApplyGuild(reactMessage, new Gson().toJsonTree(currentSetting)));
@@ -392,7 +396,10 @@ public class AutomaticGuild {
 
 					try {
 						Message reactMessage = reactChannel.retrieveMessageById(currentSetting.getPreviousMessageId()).complete();
-						reactMessage.editMessage(eb.build()).queue();
+						reactMessage
+							.editMessage(eb.build())
+							.setActionRow(Button.primary("create_application_button_" + currentSetting.getName(), "Apply Here"))
+							.queue();
 
 						applyGuild.add(new ApplyGuild(reactMessage, new Gson().toJsonTree(currentSetting), curApplyUsers));
 						applyStr += "• Reloaded `" + currentSetting.getName() + "`\n";
@@ -509,14 +516,22 @@ public class AutomaticGuild {
 	public void onButtonClick(ButtonClickEvent event) {
 		event.deferReply(true).complete();
 
-		applyGuild.forEach(
-			o1 -> {
-				String buttonClickReply = o1.onButtonClick(event);
-				if (buttonClickReply != null) {
-					event.getHook().editOriginal(buttonClickReply).queue();
-					return;
-				}
+		for (ApplyGuild o1 : applyGuild) {
+			String buttonClickReply = o1.onButtonClick(event);
+			if (buttonClickReply != null) {
+				event.getHook().editOriginal(buttonClickReply).queue();
+				return;
 			}
-		);
+		}
+
+		event
+			.getHook()
+			.editMessageComponentsById(
+				event.getMessageId(),
+				ActionRow.of(Button.primary("create_application_button_disabled", "Disabled").asDisabled())
+			)
+			.queue();
+
+		event.getHook().editOriginal("❌ This button has been disabled").queue();
 	}
 }

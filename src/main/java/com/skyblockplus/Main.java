@@ -8,8 +8,6 @@ import static com.skyblockplus.utils.Utils.setApplicationSettings;
 
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.skyblockplus.api.discordserversettings.automatedapplication.AutomatedApplication;
-import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSettingsModel;
 import com.skyblockplus.dev.DeleteMessagesCommand;
 import com.skyblockplus.dev.EmojiMapServerCommand;
 import com.skyblockplus.dev.EvaluateCommand;
@@ -68,7 +66,6 @@ import com.skyblockplus.skills.SkillsCommand;
 import com.skyblockplus.slayer.SlayerCommand;
 import com.skyblockplus.timeout.MessageTimeout;
 import com.skyblockplus.weight.WeightCommand;
-import java.util.List;
 import javax.annotation.PreDestroy;
 import javax.security.auth.login.LoginException;
 import net.dv8tion.jda.api.JDA;
