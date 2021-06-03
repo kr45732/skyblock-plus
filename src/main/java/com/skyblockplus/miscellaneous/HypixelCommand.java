@@ -219,7 +219,10 @@ public class HypixelCommand extends Command {
 					}
 				} catch (Exception ignored) {}
 
-				eb.addField("Karma", formatNumber(higherDepth(hypixelJson, "karma").getAsLong()), true);
+				try {
+					eb.addField("Karma", formatNumber(higherDepth(hypixelJson, "karma").getAsLong()), true);
+				} catch (Exception ignored) {}
+
 				try {
 					eb.addField("Achievement Points", formatNumber(higherDepth(hypixelJson, "achievementPoints").getAsLong()), true);
 				} catch (Exception ignored) {}

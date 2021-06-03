@@ -17,11 +17,11 @@ public abstract class SlashCommand {
 	public int getRemainingCooldown(SlashCommandExecutedEvent event) {
 		if (cooldown > 0) {
 			String key = cooldownScope.genKey(name, event.getUser().getIdLong());
-			int remaining = event.getSlashCommandImpl().getRemainingCooldown(key);
+			int remaining = event.getSlashCommandClient().getRemainingCooldown(key);
 			if (remaining > 0) {
 				return remaining;
 			} else {
-				event.getSlashCommandImpl().applyCooldown(key, cooldown);
+				event.getSlashCommandClient().applyCooldown(key, cooldown);
 			}
 		}
 

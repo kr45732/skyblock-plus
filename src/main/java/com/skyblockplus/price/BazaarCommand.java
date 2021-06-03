@@ -43,7 +43,7 @@ public class BazaarCommand extends Command {
 			.start();
 	}
 
-	private EmbedBuilder getBazaarItem(String itemName) {
+	public static EmbedBuilder getBazaarItem(String itemName) {
 		JsonElement bazaarItems = getJson("https://api.slothpixel.me/api/skyblock/bazaar");
 		List<String> itemsUnformated = getJsonKeys(bazaarItems);
 		String formattedItemName = itemName.replace(" ", "_").toUpperCase();

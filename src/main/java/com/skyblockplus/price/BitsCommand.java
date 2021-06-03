@@ -40,7 +40,7 @@ public class BitsCommand extends Command {
 			.start();
 	}
 
-	private EmbedBuilder getBitPrices(String itemName) {
+	public static EmbedBuilder getBitPrices(String itemName) {
 		JsonElement bitsJson = getBitsJson();
 
 		if (higherDepth(bitsJson, itemName) != null) {

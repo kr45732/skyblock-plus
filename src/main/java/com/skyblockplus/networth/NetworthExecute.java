@@ -810,7 +810,7 @@ public class NetworthExecute {
 			List<String> enchants = item.getEnchantsFormatted();
 			for (String enchant : enchants) {
 				try {
-					if (item.getDungeonFloor() != 0 && enchant.equalsIgnoreCase("scavenger;5")) {
+					if (item.getDungeonFloor() != -1 && enchant.equalsIgnoreCase("scavenger;5")) {
 						continue;
 					}
 
@@ -966,7 +966,7 @@ public class NetworthExecute {
 			List<String> enchants = item.getEnchantsFormatted();
 			for (String enchant : enchants) {
 				try {
-					if (item.getDungeonFloor() != 0 && enchant.equalsIgnoreCase("scavenger;5")) {
+					if (item.getDungeonFloor() != -1 && enchant.equalsIgnoreCase("scavenger;5")) {
 						continue;
 					}
 

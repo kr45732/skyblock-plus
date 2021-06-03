@@ -1,10 +1,12 @@
+package com.skyblockplus.miscellaneous;
+
 import com.skyblockplus.utils.slashcommands.SlashCommand;
 import com.skyblockplus.utils.slashcommands.SlashCommandExecutedEvent;
 
-public class _SlashCommand extends SlashCommand {
+public class HelpSlashCommand extends SlashCommand {
 
-	public _SlashCommand() {
-		this.name = "";
+	public HelpSlashCommand() {
+		this.name = "help";
 	}
 
 	@Override
@@ -12,8 +14,7 @@ public class _SlashCommand extends SlashCommand {
 		new Thread(
 			() -> {
 				event.logCommandGuildUserCommand();
-                
-				event.getHook().editOriginalEmbeds().queue();
+				HelpCommand.getHelp(event.getOptionStrNotNull("page"), event.getMember(), null, event.getHook());
 			}
 		)
 			.start();

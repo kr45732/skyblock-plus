@@ -119,14 +119,14 @@ public class LinkAccountCommand extends Command {
 					JsonArray verifyRoles = higherDepth(database.getVerifySettings(guild.getId()), "verifiedRoles").getAsJsonArray();
 					for (JsonElement verifyRole : verifyRoles) {
 						try {
-							guild.addRoleToMember(user.getId(), guild.getRoleById(verifyRole.getAsString())).queue();
+							guild.addRoleToMember(user.getId(), guild.getRoleById(verifyRole.getAsString())).complete();
 						} catch (Exception e) {
-							System.out.println("== Stack Trace (linkAccount - add role inside for) ==");
+							System.out.println("== Stack Trace (linkAccount - add role inside for - " + user.getId() + ") ==");
 							e.printStackTrace();
 						}
 					}
 				} catch (Exception e) {
-					System.out.println("== Stack Trace (linkAccount - add role outside for) ==");
+					System.out.println("== Stack Trace (linkAccount - add role outside for - " + user.getId() + ") ==");
 					e.printStackTrace();
 				}
 

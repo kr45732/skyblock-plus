@@ -125,7 +125,7 @@ public class Player {
 						itemInfo.setHbpCount(item.getInt("tag.ExtraAttributes.hot_potato_count", 0));
 						itemInfo.setRecombobulated(item.getInt("tag.ExtraAttributes.rarity_upgrades", 0) == 1);
 						itemInfo.setModifier(item.getString("tag.ExtraAttributes.modifier", "None"));
-						itemInfo.setDungeonFloor(Integer.parseInt(item.getString("tag.ExtraAttributes.item_tier", "0")));
+						itemInfo.setDungeonFloor(Integer.parseInt(item.getString("tag.ExtraAttributes.item_tier", "-1")));
 						itemInfo.setNbtTag(item.toString());
 
 						try {

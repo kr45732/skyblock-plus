@@ -59,7 +59,7 @@ public class BidsCommand extends Command {
 			.start();
 	}
 
-	private EmbedBuilder getPlayerBids(String username) {
+	public static EmbedBuilder getPlayerBids(String username) {
 		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
 		if (usernameUuidStruct == null) {
 			return defaultEmbed("Error fetching player data");
@@ -123,7 +123,7 @@ public class BidsCommand extends Command {
 		return eb;
 	}
 
-	private JsonArray queryAhApi(String uuid) {
+	private static JsonArray queryAhApi(String uuid) {
 		CloseableHttpClient httpclient = HttpClientBuilder.create().build();
 		try {
 			HttpGet httpget = new HttpGet("https://api.eastarcti.ca/auctions/");

@@ -26,7 +26,10 @@ import java.time.Duration;
 import java.time.Instant;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed.Field;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 
 public class AuctionCommand extends Command {
 
@@ -48,7 +51,7 @@ public class AuctionCommand extends Command {
 				logCommand(event.getGuild(), event.getAuthor(), content);
 
 				if (args.length == 2) {
-					eb = getPlayerAuction(args[1], event);
+					eb = getPlayerAuction(args[1], event.getAuthor(), event.getChannel(), null);
 
 					if (eb == null) {
 						ebMessage.delete().queue();
@@ -64,7 +67,7 @@ public class AuctionCommand extends Command {
 			.start();
 	}
 
-	private EmbedBuilder getPlayerAuction(String username, CommandEvent event) {
+	public static EmbedBuilder getPlayerAuction(String username, User user, MessageChannel channel, InteractionHook hook) {
 		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
 		if (usernameUuidStruct == null) {
 			return defaultEmbed("Error fetching player data");
@@ -135,7 +138,7 @@ public class AuctionCommand extends Command {
 			}
 		}
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(10);
+		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, user).setColumns(1).setItemsPerPage(10);
 		PaginatorExtras extras = new PaginatorExtras()
 			.setEveryPageTitle(usernameUuidStruct.playerUsername)
 			.setEveryPageThumbnail("https://cravatar.eu/helmavatar/" + usernameUuidStruct.playerUuid + "/64.png")
@@ -153,7 +156,11 @@ public class AuctionCommand extends Command {
 						extras.addEmbedField(new Field(strings[0], strings[1], false));
 					}
 				}
-				paginateBuilder.setPaginatorExtras(extras).build().paginate(event.getChannel(), 0);
+				if (channel != null) {
+					paginateBuilder.setPaginatorExtras(extras).build().paginate(channel, 0);
+				} else {
+					paginateBuilder.setPaginatorExtras(extras).build().paginate(hook, 0);
+				}
 				return null;
 			}
 		}

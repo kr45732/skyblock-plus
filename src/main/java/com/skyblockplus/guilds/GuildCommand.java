@@ -18,6 +18,9 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 
 public class GuildCommand extends Command {
 
@@ -41,7 +44,7 @@ public class GuildCommand extends Command {
 				if (args.length == 3 && ("experience".equals(args[1]) || "exp".equals(args[1]))) {
 					if (args[2].toLowerCase().startsWith("u:")) {
 						String username = args[2].split(":")[1];
-						eb = getGuildExp(username, event);
+						eb = getGuildExp(username, event.getAuthor(), event.getChannel(), null);
 						if (eb == null) {
 							ebMessage.delete().queue();
 						} else {
@@ -62,7 +65,7 @@ public class GuildCommand extends Command {
 				} else if (args.length == 3 && "members".equals(args[1])) {
 					if (args[2].toLowerCase().startsWith("u:")) {
 						String usernameMembers = args[2].split(":")[1];
-						eb = getGuildMembers(usernameMembers, event);
+						eb = getGuildMembers(usernameMembers, event.getAuthor(), event.getChannel(), null);
 						if (eb == null) {
 							ebMessage.delete().queue();
 						} else {
@@ -81,7 +84,7 @@ public class GuildCommand extends Command {
 			.start();
 	}
 
-	private EmbedBuilder getGuildExp(String username, CommandEvent event) {
+	public static EmbedBuilder getGuildExp(String username, User user, MessageChannel channel, InteractionHook hook) {
 		UsernameUuidStruct uuidUsername = usernameToUuid(username);
 		if (uuidUsername == null) {
 			return defaultEmbed("Error fetching player data");
@@ -156,7 +159,7 @@ public class GuildCommand extends Command {
 				}
 			);
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(2).setItemsPerPage(20);
+		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, user).setColumns(2).setItemsPerPage(20);
 
 		String rankStr =
 			"**Player:** " +
@@ -178,18 +181,23 @@ public class GuildCommand extends Command {
 		for (Map.Entry<String, Integer> k : reverseSortedMap.entrySet()) {
 			if (!k.getKey().startsWith("@null")) {
 				paginateBuilder.addItems(
-					"`" + (counter + 1) + ")` " + fixUsername(k.getKey()) + ": " + formatNumber(k.getValue()) + " EXP\n"
+					"`" + (counter + 1) + ")` " + fixUsername(k.getKey()) + ": " + formatNumber(k.getValue()) + " EXP  "
 				);
 			}
 
 			counter++;
 		}
 
-		paginateBuilder.build().paginate(event.getChannel(), 0);
+		if (channel != null) {
+			paginateBuilder.build().paginate(channel, 0);
+		} else {
+			paginateBuilder.build().paginate(hook, 0);
+		}
+
 		return null;
 	}
 
-	private EmbedBuilder getGuildPlayer(String username) {
+	public static EmbedBuilder getGuildPlayer(String username) {
 		UsernameUuidStruct uuidUsername = usernameToUuid(username);
 		if (uuidUsername == null) {
 			return defaultEmbed("Error fetching player data");
@@ -214,7 +222,7 @@ public class GuildCommand extends Command {
 		}
 	}
 
-	private EmbedBuilder getGuildInfo(String username) {
+	public static EmbedBuilder getGuildInfo(String username) {
 		UsernameUuidStruct uuidUsername = usernameToUuid(username);
 		if (uuidUsername == null) {
 			return defaultEmbed("Error fetching player data");
@@ -236,7 +244,7 @@ public class GuildCommand extends Command {
 		return eb;
 	}
 
-	private EmbedBuilder guildInfoFromGuildName(String guildName) {
+	public static EmbedBuilder guildInfoFromGuildName(String guildName) {
 		try {
 			String guildId = higherDepth(
 				getJson("https://api.hypixel.net/findGuild?key=" + HYPIXEL_API_KEY + "&byName=" + guildName.replace(" ", "%20")),
@@ -260,7 +268,7 @@ public class GuildCommand extends Command {
 		}
 	}
 
-	private String getGuildInfo(JsonElement guildJson) {
+	private static String getGuildInfo(JsonElement guildJson) {
 		String guildInfo = "";
 		String guildName = higherDepth(guildJson, "guild.name").getAsString();
 
@@ -307,7 +315,7 @@ public class GuildCommand extends Command {
 		return guildInfo;
 	}
 
-	private EmbedBuilder getGuildMembers(String username, CommandEvent event) {
+	public static EmbedBuilder getGuildMembers(String username, User user, MessageChannel channel, InteractionHook hook) {
 		UsernameUuidStruct uuidUsername = usernameToUuid(username);
 		if (uuidUsername == null) {
 			return defaultEmbed("Error fetching player data");
@@ -355,7 +363,7 @@ public class GuildCommand extends Command {
 			e.printStackTrace();
 		}
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(3).setItemsPerPage(27);
+		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, user).setColumns(3).setItemsPerPage(27);
 
 		paginateBuilder.setPaginatorExtras(
 			new PaginatorExtras()
@@ -367,15 +375,19 @@ public class GuildCommand extends Command {
 
 		for (String member : guildMembers) {
 			if (member != null) {
-				paginateBuilder.addItems("• " + fixUsername(member) + "  \n");
+				paginateBuilder.addItems("• " + fixUsername(member) + "  ");
 			}
 		}
 
-		paginateBuilder.build().paginate(event.getChannel(), 0);
+		if (channel != null) {
+			paginateBuilder.build().paginate(channel, 0);
+		} else {
+			paginateBuilder.build().paginate(hook, 0);
+		}
 		return null;
 	}
 
-	private int guildExpToLevel(int guildExp) {
+	private static int guildExpToLevel(int guildExp) {
 		int[] guildExpTable = new int[] {
 			100000,
 			150000,

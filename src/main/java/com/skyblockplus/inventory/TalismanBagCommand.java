@@ -2,7 +2,12 @@ package com.skyblockplus.inventory;
 
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.defaultPaginator;
+import static com.skyblockplus.utils.Utils.errorMessage;
+import static com.skyblockplus.utils.Utils.globalCooldown;
+import static com.skyblockplus.utils.Utils.loadingEmbed;
+import static com.skyblockplus.utils.Utils.logCommand;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -13,10 +18,8 @@ import com.skyblockplus.utils.structs.PaginatorExtras;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.exceptions.PermissionException;
 
 public class TalismanBagCommand extends Command {
 
@@ -99,24 +102,7 @@ public class TalismanBagCommand extends Command {
 				List<String> pageTitles = new ArrayList<>();
 				List<String> pageThumbnails = new ArrayList<>();
 
-				CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor())
-					.setColumns(1)
-					.setItemsPerPage(1)
-					.showPageNumbers(true)
-					.useNumberedItems(false)
-					.setFinalAction(
-						m -> {
-							try {
-								m.clearReactions().queue();
-							} catch (PermissionException ex) {
-								m.delete().queue();
-							}
-						}
-					)
-					.setEventWaiter(waiter)
-					.setTimeout(30, TimeUnit.SECONDS)
-					.setColor(botColor)
-					.setUsers(event.getAuthor());
+				CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(1);
 
 				for (Map.Entry<Integer, InvItem> currentTalisman : talismanBagMap.entrySet()) {
 					InvItem currentTalismanStruct = currentTalisman.getValue();

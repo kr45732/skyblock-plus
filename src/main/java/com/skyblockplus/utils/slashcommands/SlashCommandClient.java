@@ -8,17 +8,17 @@ import java.util.List;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
-public class SlashCommandImpl extends ListenerAdapter {
+public class SlashCommandClient extends ListenerAdapter {
 
 	private List<SlashCommand> slashCommands;
 	private HashMap<String, OffsetDateTime> cooldowns;
 
-	public SlashCommandImpl() {
+	public SlashCommandClient() {
 		this.slashCommands = new ArrayList<>();
 		this.cooldowns = new HashMap<>();
 	}
 
-	public SlashCommandImpl addSlashCommmands(SlashCommand... commands) {
+	public SlashCommandClient addSlashCommmands(SlashCommand... commands) {
 		for (SlashCommand command : commands) {
 			slashCommands.add(command);
 		}
@@ -47,7 +47,7 @@ public class SlashCommandImpl extends ListenerAdapter {
 			}
 		}
 
-		slashCommandExecutedEvent.getHook().editOriginal("Invalid Command").queue();
+		slashCommandExecutedEvent.getHook().editOriginalEmbeds(slashCommandExecutedEvent.invalidCommandMessage().build()).queue();
 	}
 
 	public int getRemainingCooldown(String name) {

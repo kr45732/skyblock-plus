@@ -23,14 +23,18 @@ import com.skyblockplus.dev.ShutdownCommand;
 import com.skyblockplus.dev.UpdateSlashCommands;
 import com.skyblockplus.dev.UuidCommand;
 import com.skyblockplus.dungeons.CatacombsCommand;
+import com.skyblockplus.dungeons.DungeonsSlashCommand;
 import com.skyblockplus.dungeons.EssenceCommand;
+import com.skyblockplus.dungeons.EssenceSlashCommand;
 import com.skyblockplus.dungeons.PartyFinderCommand;
+import com.skyblockplus.dungeons.PartyFinderSlashCommand;
 import com.skyblockplus.eventlisteners.MainListener;
 import com.skyblockplus.eventlisteners.skyblockevent.SkyblockEventCommand;
 import com.skyblockplus.guilds.GuildCommand;
 import com.skyblockplus.guilds.GuildKickerCommand;
 import com.skyblockplus.guilds.GuildLeaderboardCommand;
 import com.skyblockplus.guilds.GuildRequirementsCommand;
+import com.skyblockplus.guilds.GuildSlashCommand;
 import com.skyblockplus.inventory.EnderChestCommand;
 import com.skyblockplus.inventory.InventoryCommand;
 import com.skyblockplus.inventory.PetsCommand;
@@ -45,6 +49,7 @@ import com.skyblockplus.miscellaneous.BaldCommand;
 import com.skyblockplus.miscellaneous.BankCommand;
 import com.skyblockplus.miscellaneous.CategoriesCommand;
 import com.skyblockplus.miscellaneous.HelpCommand;
+import com.skyblockplus.miscellaneous.HelpSlashCommand;
 import com.skyblockplus.miscellaneous.HypixelCommand;
 import com.skyblockplus.miscellaneous.InformationCommand;
 import com.skyblockplus.miscellaneous.InformationSlashCommand;
@@ -55,15 +60,21 @@ import com.skyblockplus.miscellaneous.ProfilesCommand;
 import com.skyblockplus.miscellaneous.ReloadCommand;
 import com.skyblockplus.miscellaneous.RoleCommands;
 import com.skyblockplus.miscellaneous.SkyblockCommand;
-import com.skyblockplus.miscellaneous.VersionCommand;
 import com.skyblockplus.networth.NetworthCommand;
 import com.skyblockplus.price.AuctionCommand;
+import com.skyblockplus.price.AuctionsSlashCommand;
 import com.skyblockplus.price.AverageAuctionCommand;
+import com.skyblockplus.price.AverageAuctionSlashCommand;
 import com.skyblockplus.price.BazaarCommand;
+import com.skyblockplus.price.BazaarSlashCommand;
 import com.skyblockplus.price.BidsCommand;
+import com.skyblockplus.price.BidsSlashCommand;
 import com.skyblockplus.price.BinCommand;
+import com.skyblockplus.price.BinSlashCommand;
 import com.skyblockplus.price.BitsCommand;
+import com.skyblockplus.price.BitsSlashCommand;
 import com.skyblockplus.price.QueryAuctionCommand;
+import com.skyblockplus.price.QueryAuctionsSlashCommand;
 import com.skyblockplus.settings.SettingsCommand;
 import com.skyblockplus.settings.SetupCommand;
 import com.skyblockplus.settings.SpringDatabaseComponent;
@@ -72,7 +83,7 @@ import com.skyblockplus.skills.SkillsSlashCommand;
 import com.skyblockplus.slayer.SlayerCommand;
 import com.skyblockplus.slayer.SlayerSlashCommand;
 import com.skyblockplus.timeout.MessageTimeout;
-import com.skyblockplus.utils.slashcommands.SlashCommandImpl;
+import com.skyblockplus.utils.slashcommands.SlashCommandClient;
 import com.skyblockplus.weight.WeightCommand;
 import javax.annotation.PreDestroy;
 import javax.security.auth.login.LoginException;
@@ -119,7 +130,6 @@ public class Main {
 			new SkillsCommand(),
 			new CatacombsCommand(),
 			new ShutdownCommand(),
-			new VersionCommand(),
 			new RoleCommands(),
 			new GuildLeaderboardCommand(),
 			new EssenceCommand(),
@@ -168,14 +178,26 @@ public class Main {
 			new UpdateSlashCommands()
 		);
 
-		SlashCommandImpl slashCommands = new SlashCommandImpl();
+		SlashCommandClient slashCommands = new SlashCommandClient();
 		slashCommands.addSlashCommmands(
 			new InviteSlashCommand(),
 			new InformationSlashCommand(),
 			new LinkSlashCommand(),
 			new UnlinkSlashCommand(),
 			new SlayerSlashCommand(),
-			new SkillsSlashCommand()
+			new SkillsSlashCommand(),
+			new DungeonsSlashCommand(),
+			new EssenceSlashCommand(),
+			new PartyFinderSlashCommand(),
+			new GuildSlashCommand(),
+			new HelpSlashCommand(),
+			new AuctionsSlashCommand(),
+			new BinSlashCommand(),
+			new BazaarSlashCommand(),
+			new AverageAuctionSlashCommand(),
+			new BidsSlashCommand(),
+			new QueryAuctionsSlashCommand(),
+			new BitsSlashCommand()
 		);
 
 		jda =

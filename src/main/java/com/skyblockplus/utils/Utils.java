@@ -23,7 +23,6 @@ import java.text.NumberFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -507,6 +506,9 @@ public class Utils {
 			case "FLYCATCHER":
 				preFormattedItem = "FLYCATCHER_UPGRADE";
 				break;
+			case "SPIRIT_SCEPTRE":
+				preFormattedItem = "BAT_WAND";
+				break;
 			default:
 				if (preFormattedItem.contains("GOLDEN") && preFormattedItem.contains("HEAD")) {
 					preFormattedItem = preFormattedItem.replace("GOLDEN", "GOLD");
@@ -614,12 +616,7 @@ public class Utils {
 
 	public static ArrayList<String> getJsonKeys(JsonElement jsonElement) {
 		try {
-			return jsonElement
-				.getAsJsonObject()
-				.entrySet()
-				.stream()
-				.map(Map.Entry::getKey)
-				.collect(Collectors.toCollection(ArrayList::new));
+			return new ArrayList<>(jsonElement.getAsJsonObject().keySet());
 		} catch (Exception e) {
 			return null;
 		}
@@ -688,7 +685,6 @@ public class Utils {
 			.setColumns(1)
 			.setItemsPerPage(1)
 			.showPageNumbers(true)
-			.useNumberedItems(false)
 			.setFinalAction(
 				m -> {
 					try {

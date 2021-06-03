@@ -35,7 +35,7 @@ repositories {
 dependencies {
     // JDA (Discord API wrapper)
     // implementation "net.dv8tion:JDA:4.2.1_262"
-    implementation 'com.github.DV8FromTheWorld:JDA:05d58f1b08d4233ce79833410b0a09001f6aca62'
+    implementation 'com.github.DV8FromTheWorld:JDA:bf71f2223922cf0fff5420c08b5aad3350418961'
 
     // Gson (Google json)
     implementation 'com.google.code.gson:gson:2.8.6'

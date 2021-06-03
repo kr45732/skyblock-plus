@@ -81,7 +81,7 @@ public class QueryAuctionCommand extends Command {
 			.start();
 	}
 
-	private EmbedBuilder queryAuctions(String query) {
+	public static EmbedBuilder queryAuctions(String query) {
 		List<String> enchantsList = getJsonKeys(higherDepth(getEnchantsJson(), "enchants_min_level"));
 		for (String enchant : enchantsList) {
 			if (query.replace(" ", "_").toLowerCase().contains(enchant)) {

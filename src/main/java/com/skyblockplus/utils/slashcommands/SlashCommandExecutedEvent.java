@@ -1,7 +1,8 @@
 package com.skyblockplus.utils.slashcommands;
 
-import static com.skyblockplus.utils.Utils.logCommand;
+import static com.skyblockplus.utils.Utils.*;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -13,16 +14,16 @@ public class SlashCommandExecutedEvent {
 
 	private SlashCommandEvent event;
 	private InteractionHook hook;
-	private SlashCommandImpl slashCommandImpl;
+	private SlashCommandClient slashCommandClient;
 
-	public SlashCommandExecutedEvent(SlashCommandEvent event, SlashCommandImpl slashCommandImpl) {
+	public SlashCommandExecutedEvent(SlashCommandEvent event, SlashCommandClient slashCommandClient) {
 		this.event = event;
+		this.slashCommandClient = slashCommandClient;
 		this.hook = event.getHook();
-		this.slashCommandImpl = slashCommandImpl;
 	}
 
-	public SlashCommandImpl getSlashCommandImpl() {
-		return slashCommandImpl;
+	public SlashCommandClient getSlashCommandClient() {
+		return slashCommandClient;
 	}
 
 	public InteractionHook getHook() {
@@ -52,5 +53,18 @@ public class SlashCommandExecutedEvent {
 	public String getOptionStr(String name) {
 		OptionMapping option = event.getOption(name);
 		return option == null ? null : option.getAsString();
+	}
+
+	public String getOptionStrNotNull(String name) {
+		OptionMapping option = event.getOption(name);
+		return option == null ? "" : option.getAsString();
+	}
+
+	public EmbedBuilder disabledCommandMessage() {
+		return defaultEmbed("Error").setDescription("❌ This command is disabled");
+	}
+
+	public EmbedBuilder invalidCommandMessage() {
+		return defaultEmbed("Error").setDescription("❌ Invalid Command");
 	}
 }

@@ -42,7 +42,7 @@ public class PartyFinderCommand extends Command {
 			.start();
 	}
 
-	private EmbedBuilder getPlayerDungeonInfo(String username, String profileName) {
+	public static EmbedBuilder getPlayerDungeonInfo(String username, String profileName) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			EmbedBuilder eb = player.defaultPlayerEmbed();

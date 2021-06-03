@@ -20,6 +20,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.exceptions.PermissionException;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.internal.utils.Checks;
 
@@ -33,7 +34,6 @@ public class CustomPaginator extends Menu {
 	private final int columns;
 	private final int itemsPerPage;
 	private final boolean showPageNumbers;
-	private final boolean numberItems;
 	private final List<String> strings;
 	private final int pages;
 	private final Consumer<Message> finalAction;
@@ -52,7 +52,6 @@ public class CustomPaginator extends Menu {
 		int columns,
 		int itemsPerPage,
 		boolean showPageNumbers,
-		boolean numberItems,
 		List<String> items,
 		int bulkSkipNumber,
 		boolean wrapPageEnds,
@@ -63,11 +62,9 @@ public class CustomPaginator extends Menu {
 		this.columns = columns;
 		this.itemsPerPage = itemsPerPage;
 		this.showPageNumbers = showPageNumbers;
-		this.numberItems = numberItems;
 		this.strings = items;
 		this.extras = extras;
-		this.pages =
-			(int) Math.ceil((double) (extras.getEmbedFields().size() > 0 ? extras.getEmbedFields().size() : strings.size()) / itemsPerPage);
+		this.pages = (int) Math.ceil((double) Math.max(extras.getEmbedFields().size(), strings.size()) / itemsPerPage);
 		this.finalAction = finalAction;
 		this.bulkSkipNumber = bulkSkipNumber;
 		this.wrapPageEnds = wrapPageEnds;
@@ -87,6 +84,12 @@ public class CustomPaginator extends Menu {
 		if (pageNum < 1) pageNum = 1; else if (pageNum > pages) pageNum = pages;
 		Message msg = renderPage(pageNum);
 		initialize(channel.sendMessage(msg), pageNum);
+	}
+
+	public void paginate(InteractionHook channel, int pageNum) {
+		if (pageNum < 1) pageNum = 1; else if (pageNum > pages) pageNum = pages;
+		Message msg = renderPage(pageNum);
+		initialize(channel.editOriginal(msg), pageNum);
 	}
 
 	public void paginate(Message message, int pageNum) {
@@ -113,9 +116,8 @@ public class CustomPaginator extends Menu {
 	private void pagination(Message message, int pageNum) {
 		waiter.waitForEvent(
 			MessageReactionAddEvent.class,
-			event -> checkReaction(event, message.getIdLong()), // Check
-			// Reaction
-			event -> handleMessageReactionAddAction(event, message, pageNum), // Handle Reaction
+			event -> checkReaction(event, message.getIdLong()),
+			event -> handleMessageReactionAddAction(event, message, pageNum),
 			timeout,
 			unit,
 			() -> finalAction.accept(message)
@@ -208,19 +210,13 @@ public class CustomPaginator extends Menu {
 			}
 		} else if (columns == 1) {
 			StringBuilder stringBuilder = new StringBuilder();
-			for (int i = start; i < end; i++) stringBuilder
-				.append("\n")
-				.append(numberItems ? "`" + (i + 1) + ".` " : "")
-				.append(strings.get(i));
+			for (int i = start; i < end; i++) stringBuilder.append("\n").append(strings.get(i));
 			embedBuilder.appendDescription(stringBuilder.toString());
 		} else {
 			int per = (int) Math.ceil((double) (end - start) / columns);
 			for (int k = 0; k < columns; k++) {
 				StringBuilder stringBuilder = new StringBuilder();
-				for (int i = start + k * per; i < end && i < start + (k + 1) * per; i++) stringBuilder
-					.append("\n")
-					.append(numberItems ? (i + 1) + ". " : "")
-					.append(strings.get(i));
+				for (int i = start + k * per; i < end && i < start + (k + 1) * per; i++) stringBuilder.append("\n").append(strings.get(i));
 				embedBuilder.addField("", stringBuilder.toString(), true);
 			}
 		}
@@ -242,10 +238,9 @@ public class CustomPaginator extends Menu {
 		private int columns = 1;
 		private int itemsPerPage = 12;
 		private boolean showPageNumbers = true;
-		private boolean numberItems = false;
 		private int bulkSkipNumber = 1;
 		private boolean wrapPageEnds = false;
-		private PaginatorExtras extras;
+		private PaginatorExtras extras = new PaginatorExtras();
 
 		@Override
 		public CustomPaginator build() {
@@ -263,7 +258,6 @@ public class CustomPaginator extends Menu {
 				columns,
 				itemsPerPage,
 				showPageNumbers,
-				numberItems,
 				strings,
 				bulkSkipNumber,
 				wrapPageEnds,
@@ -300,11 +294,6 @@ public class CustomPaginator extends Menu {
 
 		public Builder showPageNumbers(boolean show) {
 			this.showPageNumbers = show;
-			return this;
-		}
-
-		public Builder useNumberedItems(boolean number) {
-			this.numberItems = number;
 			return this;
 		}
 

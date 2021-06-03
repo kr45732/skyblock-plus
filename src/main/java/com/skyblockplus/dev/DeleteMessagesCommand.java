@@ -26,7 +26,7 @@ public class DeleteMessagesCommand extends Command {
 
 				if (args.length == 2) {
 					try {
-						int messageCount = Math.min(Integer.parseInt(args[1]), 100);
+						int messageCount = Math.min(Integer.parseInt(args[1]) + 1, 100);
 						List<Message> toDelete = event.getChannel().getHistory().retrievePast(messageCount).complete();
 						event.getChannel().purgeMessages(toDelete);
 						Message ebMessage = event

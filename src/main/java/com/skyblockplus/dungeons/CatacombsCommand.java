@@ -41,7 +41,7 @@ public class CatacombsCommand extends Command {
 			.start();
 	}
 
-	private EmbedBuilder getPlayerCatacombs(String username, String profileName) {
+	public static EmbedBuilder getPlayerCatacombs(String username, String profileName) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			EmbedBuilder eb = player.defaultPlayerEmbed();
