@@ -681,7 +681,7 @@ public class Utils {
 	}
 
 	public static CustomPaginator.Builder defaultPaginator(EventWaiter waiter, User eventAuthor) {
-		return new CustomPaginator.Builder()
+		CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder()
 			.setColumns(1)
 			.setItemsPerPage(1)
 			.showPageNumbers(true)
@@ -696,8 +696,11 @@ public class Utils {
 			)
 			.setEventWaiter(waiter)
 			.setTimeout(30, TimeUnit.SECONDS)
-			.setColor(botColor)
-			.setUsers(eventAuthor);
+			.setColor(botColor);
+		if (eventAuthor != null) {
+			paginateBuilder.setUsers(eventAuthor);
+		}
+		return paginateBuilder;
 	}
 
 	public static String profileNameToEmoji(String profileName) {

@@ -13,7 +13,9 @@ import com.skyblockplus.api.discordserversettings.skyblockevent.EventMember;
 import com.skyblockplus.api.discordserversettings.skyblockevent.RunningEvent;
 import com.skyblockplus.api.discordserversettings.skyblockevent.SbEvent;
 import com.skyblockplus.eventlisteners.AutomaticGuild;
+import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.structs.PaginatorExtras;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -93,7 +95,7 @@ public class SkyblockEventCommand extends Command {
 											guildMemberUsernameResponse,
 											higherDepth(guildMember, "profileName").getAsString(),
 											guildMemberOuterProfileJson,
-											higherDepth(guildMember, "startingAmount").getAsLong()
+											higherDepth(guildMember, "startingAmount").getAsDouble()
 										);
 
 										if (guildMemberPlayer.isValid()) {
@@ -181,48 +183,72 @@ public class SkyblockEventCommand extends Command {
 							);
 							break;
 						}
+					case "weight":
+						{
+							eventMemberList.add(
+								new EventMember(
+									guildMember.getUsername(),
+									guildMember.getUuid(),
+									"" + (guildMember.getWeight() - guildMember.getStartingAmount()),
+									guildMember.getProfileName()
+								)
+							);
+							break;
+						}
 				}
 			} catch (Exception ignored) {}
 		}
 
-		eventMemberList.sort(Comparator.comparingInt(o1 -> -Integer.parseInt(o1.getStartingAmount())));
+		eventMemberList.sort(Comparator.comparingDouble(o1 -> -Double.parseDouble(o1.getStartingAmount())));
 
-		StringBuilder ebString = new StringBuilder();
-		EmbedBuilder eb = defaultEmbed("Event Leaderboard");
+		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, null)
+			.setColumns(1)
+			.setItemsPerPage(25)
+			.setPaginatorExtras(new PaginatorExtras().setEveryPageTitle("Event Leaderboard"))
+			.setTimeout(24, TimeUnit.HOURS);
 
 		for (int i = 0; i < eventMemberList.size(); i++) {
 			EventMember eventMember = eventMemberList.get(i);
-			ebString
-				.append("`")
-				.append(i + 1)
-				.append(")` ")
-				.append(eventMember.getUsername())
-				.append(" | +")
-				.append(formatNumber(Long.parseLong(eventMember.getStartingAmount())))
-				.append("\n");
+			paginateBuilder.addItems(
+				"`" +
+				(i + 1) +
+				")` " +
+				eventMember.getUsername() +
+				" | +" +
+				formatNumber(Double.parseDouble(eventMember.getStartingAmount()))
+			);
 		}
 
-		eb.setDescription(ebString.toString());
-		announcementChannel.sendMessage(eb.build()).complete();
+		if (paginateBuilder.getItemsSize() > 0) {
+			paginateBuilder.build().paginate(announcementChannel, 0);
+		} else {
+			announcementChannel.sendMessage(defaultEmbed("Event Leaderboard").setDescription("No one joined the event").build()).complete();
+		}
 
 		try {
-			StringBuilder ebStringPrize = new StringBuilder();
+			paginateBuilder =
+				defaultPaginator(waiter, null)
+					.setColumns(1)
+					.setItemsPerPage(25)
+					.setPaginatorExtras(new PaginatorExtras().setEveryPageTitle("Prizes"))
+					.setTimeout(24, TimeUnit.HOURS);
+
 			ArrayList<String> prizeListKeys = getJsonKeys(higherDepth(runningEventSettings, "prizeMap"));
 			for (int i = 0; i < prizeListKeys.size(); i++) {
-				ebStringPrize
-					.append(i + 1)
-					.append(") ")
-					.append(higherDepth(runningEventSettings, "prizeMap." + prizeListKeys.get(i)).getAsString())
-					.append(" - ")
-					.append(eventMemberList.get(i).getUsername())
-					.append(" (")
-					.append(eventMemberList.get(i).getUuid())
-					.append(")")
-					.append("\n");
+				paginateBuilder.addItems(
+					(i + 1) +
+					") " +
+					higherDepth(runningEventSettings, "prizeMap." + prizeListKeys.get(i)).getAsString() +
+					" - " +
+					eventMemberList.get(i).getUsername() +
+					" (" +
+					eventMemberList.get(i).getUuid() +
+					")"
+				);
 			}
 
-			if (ebStringPrize.length() > 0) {
-				announcementChannel.sendMessage(defaultEmbed("Prizes").setDescription(ebStringPrize.toString()).build()).complete();
+			if (paginateBuilder.getItemsSize() > 0) {
+				paginateBuilder.build().paginate(announcementChannel, 0);
 				database.updateSkyblockEventSettings(guildId, new SbEvent());
 				return;
 			}
@@ -405,7 +431,7 @@ public class SkyblockEventCommand extends Command {
 										Player player = args.length == 3 ? new Player(username, args[2]) : new Player(username);
 
 										if (player.isValid()) {
-											long startingAmount = 0;
+											double startingAmount = 0;
 											String startingAmountFormatted = "";
 											String eventType = higherDepth(
 												database.getRunningEventSettings(event.getGuild().getId()),
@@ -417,19 +443,25 @@ public class SkyblockEventCommand extends Command {
 													case "slayer":
 														{
 															startingAmount = player.getSlayer();
-															startingAmountFormatted = startingAmount + " total slayer xp";
+															startingAmountFormatted = formatNumber(startingAmount) + " total slayer xp";
 															break;
 														}
 													case "skills":
 														{
 															startingAmount = player.getTotalSkillsXp();
-															startingAmountFormatted = startingAmount + " total skills xp";
+															startingAmountFormatted = formatNumber(startingAmount) + " total skills xp";
 															break;
 														}
 													case "catacombs":
 														{
 															startingAmount = player.getCatacombsSkill().totalSkillExp;
-															startingAmountFormatted = startingAmount + " total catacombs xp";
+															startingAmountFormatted = formatNumber(startingAmount) + " total catacombs xp";
+															break;
+														}
+													case "weight":
+														{
+															startingAmount = player.getWeight();
+															startingAmountFormatted = formatNumber(startingAmount) + " total weight";
 															break;
 														}
 												}
@@ -541,7 +573,7 @@ public class SkyblockEventCommand extends Command {
 											.append(")` ")
 											.append(eventMember.getUsername())
 											.append(" | +")
-											.append(formatNumber(Long.parseLong(eventMember.getStartingAmount())))
+											.append(formatNumber(Double.parseDouble(eventMember.getStartingAmount())))
 											.append("\n");
 									}
 									eb = defaultEmbed("Event Leaderboard");
@@ -633,14 +665,16 @@ public class SkyblockEventCommand extends Command {
 																	guildMemberUsernameResponse,
 																	higherDepth(guildMember, "profileName").getAsString(),
 																	guildMemberOuterProfileJson,
-																	higherDepth(guildMember, "startingAmount").getAsLong()
+																	higherDepth(guildMember, "startingAmount").getAsDouble()
 																);
 
 																if (guildMemberPlayer.isValid()) {
 																	guildMemberPlayersList.add(guildMemberPlayer);
 																	return true;
 																}
-															} catch (Exception ignored) {}
+															} catch (Exception e) {
+																e.printStackTrace();
+															}
 															guildMemberPlayersList.add(null);
 															return false;
 														}
@@ -720,28 +754,53 @@ public class SkyblockEventCommand extends Command {
 													);
 													break;
 												}
+											case "weight":
+												{
+													eventMemberList.add(
+														new EventMember(
+															guildMember.getUsername(),
+															guildMember.getUuid(),
+															"" + (guildMember.getWeight() - guildMember.getStartingAmount()),
+															guildMember.getProfileName()
+														)
+													);
+													break;
+												}
 										}
-									} catch (Exception ignored) {}
+									} catch (Exception e) {
+										e.printStackTrace();
+									}
 								}
 
-								eventMemberList.sort(Comparator.comparingInt(o1 -> -Integer.parseInt(o1.getStartingAmount())));
+								eventMemberList.sort(Comparator.comparingDouble(o1 -> -Double.parseDouble(o1.getStartingAmount())));
 
-								StringBuilder ebString = new StringBuilder();
+								CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor())
+									.setColumns(1)
+									.setItemsPerPage(25);
+
 								for (int i = 0; i < eventMemberList.size(); i++) {
 									EventMember eventMember = eventMemberList.get(i);
-									ebString
-										.append("`")
-										.append(i + 1)
-										.append(")` ")
-										.append(eventMember.getUsername())
-										.append(" | +")
-										.append(formatNumber(Long.parseLong(eventMember.getStartingAmount())))
-										.append("\n");
+									paginateBuilder.addItems(
+										"`" +
+										(i + 1) +
+										")` " +
+										eventMember.getUsername() +
+										" | +" +
+										formatNumber(Double.parseDouble(eventMember.getStartingAmount()))
+									);
 								}
 
-								eb = defaultEmbed("Event Leaderboard");
-								eb.setDescription(ebString.toString());
-								ebMessage.editMessage(eb.build()).queue();
+								paginateBuilder.setPaginatorExtras(new PaginatorExtras().setEveryPageTitle("Event Leaderboard"));
+								ebMessage.delete().queue();
+
+								if (paginateBuilder.getItemsSize() > 0) {
+									paginateBuilder.build().paginate(event.getChannel(), 0);
+								} else {
+									event
+										.getChannel()
+										.sendMessage(defaultEmbed("Event Leaderboard").setDescription("No one joined the event").build())
+										.queue();
+								}
 
 								getGuildMap().get(event.getGuild().getId()).setEventMemberList(eventMemberList);
 								getGuildMap().get(event.getGuild().getId()).setEventMemberListLastUpdated(Instant.now());

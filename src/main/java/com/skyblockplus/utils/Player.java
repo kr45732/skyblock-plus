@@ -20,7 +20,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 public class Player {
 
 	public String invMissing = "";
-	private long startingAmount;
+	private double startingAmount;
 	private boolean validPlayer = false;
 	private JsonElement profileJson;
 	private JsonElement outerProfileJson;
@@ -88,7 +88,7 @@ public class Player {
 		this.validPlayer = true;
 	}
 
-	public Player(String playerUuid, String playerUsername, String profileName, JsonElement outerProfileJson, long startingAmount) {
+	public Player(String playerUuid, String playerUsername, String profileName, JsonElement outerProfileJson, double startingAmount) {
 		this.playerUuid = playerUuid;
 		this.playerUsername = playerUsername;
 		this.startingAmount = startingAmount;
@@ -195,7 +195,7 @@ public class Player {
 		return profileNameList.toArray(new String[0]);
 	}
 
-	public long getStartingAmount() {
+	public double getStartingAmount() {
 		return startingAmount;
 	}
 
@@ -1627,5 +1627,14 @@ public class Player {
 			return getGenericInventoryMap(parsedContents);
 		} catch (Exception ignored) {}
 		return null;
+	}
+
+	@Override
+	public String toString() {
+		if (isValid()) {
+			return "Valid Player | " + playerUsername + " | " + playerUuid;
+		} else {
+			return "Invalid Player";
+		}
 	}
 }

@@ -320,5 +320,9 @@ public class CustomPaginator extends Menu {
 			this.wrapPageEnds = wrapPageEnds;
 			return this;
 		}
+
+		public int getItemsSize() {
+			return strings.size();
+		}
 	}
 }

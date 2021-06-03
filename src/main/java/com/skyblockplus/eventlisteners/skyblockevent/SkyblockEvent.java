@@ -129,7 +129,7 @@ public class SkyblockEvent {
 							higherDepth(guildJson, "guild.members").getAsJsonArray().size(),
 							false
 						)
-						.setDescription("Is this a __catacombs__, __slayer__, or __skills__ event?");
+						.setDescription("Is this a __catacombs__, __slayer__, __skills__, or __weight__ event?");
 					state++;
 				} catch (Exception e) {
 					eb.setDescription("Invalid guild name: " + event.getMessage().getContentRaw());
@@ -138,13 +138,21 @@ public class SkyblockEvent {
 				break;
 			case 1:
 				String replyMessage = event.getMessage().getContentRaw().toLowerCase();
-				if (replyMessage.equals("catacombs") || replyMessage.equals("slayer") || replyMessage.equals("skills")) {
+				if (
+					replyMessage.equals("catacombs") ||
+					replyMessage.equals("slayer") ||
+					replyMessage.equals("skills") ||
+					replyMessage.equals("weight")
+				) {
 					if (replyMessage.equals("catacombs")) {
 						eb.addField("Event Type", "Catacombs", false);
 						eventType = "catacombs";
 					} else if (replyMessage.equals("slayer")) {
 						eb.addField("Event Type", "Slayer", false);
 						eventType = "slayer";
+					} else if (replyMessage.equals("weight")) {
+						eb.addField("Event Type", "Weight", false);
+						eventType = "weight";
 					} else {
 						eb.addField("Event Type", "Skills", false);
 						eventType = "skills";
@@ -152,7 +160,7 @@ public class SkyblockEvent {
 					eb.setDescription("Please enter the number of __hours__ the event should last");
 					state++;
 				} else {
-					eb.setDescription(replyMessage + " is an invalid option\nPlease choose from catacombs, slayer, or skills");
+					eb.setDescription(replyMessage + " is an invalid option\nPlease choose from catacombs, slayer, skills, or weight");
 				}
 				sendEmbedMessage(eb);
 				break;
@@ -249,11 +257,11 @@ public class SkyblockEvent {
 
 						temp
 							.editMessage(defaultEmbed("Create a Skyblock competition").setDescription("Event started").build())
-							.queueAfter(3, TimeUnit.SECONDS);
+							.queueAfter(1, TimeUnit.SECONDS);
 					} else {
 						temp
 							.editMessage(defaultEmbed("Create a Skyblock competition").setDescription("**Error starting event**").build())
-							.queueAfter(3, TimeUnit.SECONDS);
+							.queueAfter(1, TimeUnit.SECONDS);
 					}
 				} else {
 					sendEmbedMessage(defaultEmbed("Create a Skyblock competition").setDescription("Canceled"));
