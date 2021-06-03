@@ -45,7 +45,7 @@ public class WeightCommand extends Command {
 			.start();
 	}
 
-	private EmbedBuilder calculateWeight(String skillAverage, String slayer, String catacombs, String averageDungeonClass) {
+	public static EmbedBuilder calculateWeight(String skillAverage, String slayer, String catacombs, String averageDungeonClass) {
 		try {
 			double skillAverageD = Double.parseDouble(skillAverage);
 			double slayerD = Double.parseDouble(slayer);
@@ -63,7 +63,7 @@ public class WeightCommand extends Command {
 		}
 	}
 
-	private EmbedBuilder getPlayerWeight(String username, String profileName) {
+	public static EmbedBuilder getPlayerWeight(String username, String profileName) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			Weight playerWeight = new Weight(player);

@@ -60,7 +60,7 @@ public class MissingTalismansCommand extends Command {
 			.start();
 	}
 
-	private EmbedBuilder getMissingTalismans(String username, String profileName) {
+	public static EmbedBuilder getMissingTalismans(String username, String profileName) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			Set<String> playerItems;
@@ -133,7 +133,7 @@ public class MissingTalismansCommand extends Command {
 				ebStr +=
 					"• " +
 					capitalizeString(i.toLowerCase().replace("_", " ")) +
-					(higherDepth(talismanUpgrades, i) != null ? "*" : "") +
+					(higherDepth(talismanUpgrades, i) != null ? "*****" : "") +
 					"\n";
 			}
 			return player.defaultPlayerEmbed().setDescription(ebStr);

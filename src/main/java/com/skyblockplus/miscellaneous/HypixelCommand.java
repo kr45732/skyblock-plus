@@ -58,7 +58,7 @@ public class HypixelCommand extends Command {
 			.start();
 	}
 
-	private EmbedBuilder getParkourStats(String username) {
+	public static EmbedBuilder getParkourStats(String username) {
 		UsernameUuidStruct usernameUuid = usernameToUuid(username);
 		if (usernameUuid != null) {
 			JsonElement hypixelJson = getJson("https://api.hypixel.net/player?key=" + HYPIXEL_API_KEY + "&uuid=" + usernameUuid.playerUuid);
@@ -100,7 +100,7 @@ public class HypixelCommand extends Command {
 		return defaultEmbed("Invalid username");
 	}
 
-	private EmbedBuilder getHypixelStats(String username) {
+	public static EmbedBuilder getHypixelStats(String username) {
 		UsernameUuidStruct usernameUuid = usernameToUuid(username);
 		if (usernameUuid != null) {
 			JsonElement hypixelJson = getJson("https://api.hypixel.net/player?key=" + HYPIXEL_API_KEY + "&uuid=" + usernameUuid.playerUuid);

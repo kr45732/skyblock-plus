@@ -17,6 +17,9 @@ import java.time.format.FormatStyle;
 import java.util.Locale;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 
 public class BankCommand extends Command {
 
@@ -38,9 +41,9 @@ public class BankCommand extends Command {
 
 				if ((args.length == 3 || args.length == 4) && args[1].equals("history")) {
 					if (args.length == 4) {
-						eb = getPlayerBankHistory(args[2], args[3], event);
+						eb = getPlayerBankHistory(args[2], args[3], event.getAuthor(), event.getChannel(), null);
 					} else {
-						eb = getPlayerBankHistory(args[2], null, event);
+						eb = getPlayerBankHistory(args[2], null, event.getAuthor(), event.getChannel(), null);
 					}
 
 					if (eb == null) {
@@ -63,7 +66,7 @@ public class BankCommand extends Command {
 			.start();
 	}
 
-	private EmbedBuilder getPlayerBalance(String username, String profileName) {
+	public static EmbedBuilder getPlayerBalance(String username, String profileName) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			double playerBankBalance = player.getBankBalance();
@@ -86,7 +89,13 @@ public class BankCommand extends Command {
 		return defaultEmbed("Unable to fetch player data");
 	}
 
-	private EmbedBuilder getPlayerBankHistory(String username, String profileName, CommandEvent event) {
+	public static EmbedBuilder getPlayerBankHistory(
+		String username,
+		String profileName,
+		User user,
+		MessageChannel channel,
+		InteractionHook hook
+	) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			JsonArray bankHistoryArray = player.getBankHistory();
@@ -96,7 +105,7 @@ public class BankCommand extends Command {
 					.withLocale(Locale.US)
 					.withZone(ZoneId.systemDefault());
 
-				CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(20);
+				CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, user).setColumns(1).setItemsPerPage(20);
 
 				paginateBuilder.addItems(
 					"**Last Transaction Time:** " +
@@ -121,7 +130,12 @@ public class BankCommand extends Command {
 				paginateBuilder.setPaginatorExtras(
 					new PaginatorExtras().setEveryPageTitle(player.getUsername()).setEveryPageThumbnail(player.getThumbnailUrl())
 				);
-				paginateBuilder.build().paginate(event.getChannel(), 0);
+
+				if (channel != null) {
+					paginateBuilder.build().paginate(channel, 0);
+				} else {
+					paginateBuilder.build().paginate(hook, 0);
+				}
 				return null;
 			} else {
 				return defaultEmbed("Player banking API disabled");

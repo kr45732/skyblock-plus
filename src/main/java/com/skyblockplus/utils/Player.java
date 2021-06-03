@@ -1280,41 +1280,43 @@ public class Player {
 	public int getBonemerang() {
 		int boneCount = 0;
 
-		Map<Integer, InvItem> inventoryMap = getInventoryMap();
-		if (inventoryMap == null) {
-			return -1;
-		}
+		try {
+			Map<Integer, InvItem> inventoryMap = getInventoryMap();
+			if (inventoryMap == null) {
+				return -1;
+			}
 
-		for (InvItem item : inventoryMap.values()) {
-			if (!item.getBackpackItems().isEmpty()) {
-				List<InvItem> backpackItems = item.getBackpackItems();
-				for (InvItem backpackItem : backpackItems) {
-					if (backpackItem.getId().equalsIgnoreCase("bone_boomerang")) {
+			for (InvItem item : inventoryMap.values()) {
+				if (!item.getBackpackItems().isEmpty()) {
+					List<InvItem> backpackItems = item.getBackpackItems();
+					for (InvItem backpackItem : backpackItems) {
+						if (backpackItem.getId().equalsIgnoreCase("bone_boomerang")) {
+							boneCount++;
+						}
+					}
+				} else {
+					if (item.getId().equalsIgnoreCase("bone_boomerang")) {
 						boneCount++;
 					}
 				}
-			} else {
-				if (item.getId().equalsIgnoreCase("bone_boomerang")) {
-					boneCount++;
-				}
 			}
-		}
 
-		Map<Integer, InvItem> enderChestMap = getEnderChestMap();
-		for (InvItem item : enderChestMap.values()) {
-			if (!item.getBackpackItems().isEmpty()) {
-				List<InvItem> backpackItems = item.getBackpackItems();
-				for (InvItem backpackItem : backpackItems) {
-					if (backpackItem.getId().equalsIgnoreCase("bone_boomerang")) {
+			Map<Integer, InvItem> enderChestMap = getEnderChestMap();
+			for (InvItem item : enderChestMap.values()) {
+				if (!item.getBackpackItems().isEmpty()) {
+					List<InvItem> backpackItems = item.getBackpackItems();
+					for (InvItem backpackItem : backpackItems) {
+						if (backpackItem.getId().equalsIgnoreCase("bone_boomerang")) {
+							boneCount++;
+						}
+					}
+				} else {
+					if (item.getId().equalsIgnoreCase("bone_boomerang")) {
 						boneCount++;
 					}
 				}
-			} else {
-				if (item.getId().equalsIgnoreCase("bone_boomerang")) {
-					boneCount++;
-				}
 			}
-		}
+		} catch (Exception ignored) {}
 
 		return boneCount;
 	}

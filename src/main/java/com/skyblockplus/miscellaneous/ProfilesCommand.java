@@ -22,6 +22,9 @@ import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 
 public class ProfilesCommand extends Command {
 
@@ -42,7 +45,7 @@ public class ProfilesCommand extends Command {
 				logCommand(event.getGuild(), event.getAuthor(), content);
 
 				if (args.length == 2) {
-					eb = getPlayerProfiles(args[1], event);
+					eb = getPlayerProfiles(args[1], event.getAuthor(), event.getChannel(), null);
 					if (eb == null) {
 						ebMessage.delete().queue();
 					} else {
@@ -57,7 +60,7 @@ public class ProfilesCommand extends Command {
 			.start();
 	}
 
-	private EmbedBuilder getPlayerProfiles(String username, CommandEvent event) {
+	public static EmbedBuilder getPlayerProfiles(String username, User user, MessageChannel channel, InteractionHook hook) {
 		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
 		if (usernameUuidStruct != null) {
 			DateTimeFormatter dateTimeFormatter = DateTimeFormatter
@@ -108,7 +111,7 @@ public class ProfilesCommand extends Command {
 				}
 			}
 
-			CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(1);
+			CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, user).setColumns(1).setItemsPerPage(1);
 
 			List<String> pageTitles = new ArrayList<>();
 			int count = 0;
@@ -133,7 +136,12 @@ public class ProfilesCommand extends Command {
 			}
 
 			paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles));
-			paginateBuilder.build().paginate(event.getChannel(), 0);
+
+			if (channel != null) {
+				paginateBuilder.build().paginate(channel, 0);
+			} else {
+				paginateBuilder.build().paginate(hook, 0);
+			}
 			return null;
 		}
 		return defaultEmbed("Unable to fetch player data");

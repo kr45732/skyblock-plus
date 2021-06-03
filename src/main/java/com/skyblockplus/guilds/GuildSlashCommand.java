@@ -33,6 +33,8 @@ public class GuildSlashCommand extends SlashCommand {
 					case "experience":
 						eb = GuildCommand.getGuildExp(username, event.getUser(), null, event.getHook());
 						break;
+					default:
+						eb = event.invalidCommandMessage();
 				}
 
 				if (eb != null) {

@@ -47,18 +47,23 @@ import com.skyblockplus.link.UnlinkAccountCommand;
 import com.skyblockplus.link.UnlinkSlashCommand;
 import com.skyblockplus.miscellaneous.BaldCommand;
 import com.skyblockplus.miscellaneous.BankCommand;
+import com.skyblockplus.miscellaneous.BankSlashcommand;
 import com.skyblockplus.miscellaneous.CategoriesCommand;
 import com.skyblockplus.miscellaneous.HelpCommand;
 import com.skyblockplus.miscellaneous.HelpSlashCommand;
 import com.skyblockplus.miscellaneous.HypixelCommand;
+import com.skyblockplus.miscellaneous.HypixelSlashCommand;
 import com.skyblockplus.miscellaneous.InformationCommand;
 import com.skyblockplus.miscellaneous.InformationSlashCommand;
 import com.skyblockplus.miscellaneous.InviteCommand;
 import com.skyblockplus.miscellaneous.InviteSlashCommand;
 import com.skyblockplus.miscellaneous.MissingTalismansCommand;
+import com.skyblockplus.miscellaneous.MissingTalismansSlashCommand;
 import com.skyblockplus.miscellaneous.ProfilesCommand;
+import com.skyblockplus.miscellaneous.ProfilesSlashCommand;
 import com.skyblockplus.miscellaneous.ReloadCommand;
 import com.skyblockplus.miscellaneous.RoleCommands;
+import com.skyblockplus.miscellaneous.RolesSlashCommand;
 import com.skyblockplus.miscellaneous.SkyblockCommand;
 import com.skyblockplus.networth.NetworthCommand;
 import com.skyblockplus.price.AuctionCommand;
@@ -85,6 +90,7 @@ import com.skyblockplus.slayer.SlayerSlashCommand;
 import com.skyblockplus.timeout.MessageTimeout;
 import com.skyblockplus.utils.slashcommands.SlashCommandClient;
 import com.skyblockplus.weight.WeightCommand;
+import com.skyblockplus.weight.WeightSlashCommand;
 import javax.annotation.PreDestroy;
 import javax.security.auth.login.LoginException;
 import net.dv8tion.jda.api.JDA;
@@ -197,7 +203,13 @@ public class Main {
 			new AverageAuctionSlashCommand(),
 			new BidsSlashCommand(),
 			new QueryAuctionsSlashCommand(),
-			new BitsSlashCommand()
+			new BitsSlashCommand(),
+			new RolesSlashCommand(),
+			new BankSlashcommand(),
+			new WeightSlashCommand(),
+			new HypixelSlashCommand(),
+			new ProfilesSlashCommand(),
+			new MissingTalismansSlashCommand()
 		);
 
 		jda =
