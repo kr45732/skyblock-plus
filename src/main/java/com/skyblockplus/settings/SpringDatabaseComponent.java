@@ -14,6 +14,7 @@ import com.skyblockplus.api.discordserversettings.automatedverify.AutomatedVerif
 import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSettingsModel;
 import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSettingsService;
 import com.skyblockplus.api.discordserversettings.skyblockevent.EventMember;
+import com.skyblockplus.api.discordserversettings.skyblockevent.RunningEvent;
 import com.skyblockplus.api.discordserversettings.skyblockevent.SbEvent;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountService;
@@ -158,6 +159,10 @@ public class SpringDatabaseComponent {
 
 	public JsonElement getRunningEventSettings(String serverId) {
 		return gson.toJsonTree(settingsService.getRunningSkyblockEventSettings(serverId).getBody());
+	}
+
+	public int updateRunningEventSettings(String serverId, JsonElement newSettings) {
+		return settingsService.updateSkyblockRunningEvent(serverId, gson.fromJson(newSettings, RunningEvent.class)).getStatusCodeValue();
 	}
 
 	public int removeEventMemberToRunningEvent(String serverId, String minecraftUuid) {

@@ -564,19 +564,21 @@ public class SkyblockEventCommand extends Command {
 									(Duration.between(currentGuild.getEventMemberListLastUpdated(), Instant.now()).toMinutes() < 15)
 								) {
 									List<EventMember> eventMemberList = currentGuild.getEventMemberList();
-									StringBuilder ebString = new StringBuilder();
+
+									CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor())
+										.setColumns(1)
+										.setItemsPerPage(25);
 									for (int i = 0; i < eventMemberList.size(); i++) {
 										EventMember eventMember = eventMemberList.get(i);
-										ebString
-											.append("`")
-											.append(i + 1)
-											.append(")` ")
-											.append(eventMember.getUsername())
-											.append(" | +")
-											.append(formatNumber(Double.parseDouble(eventMember.getStartingAmount())))
-											.append("\n");
+										paginateBuilder.addItems(
+											"`" +
+											(i + 1) +
+											")` " +
+											eventMember.getUsername() +
+											" | +" +
+											formatNumber(Double.parseDouble(eventMember.getStartingAmount()))
+										);
 									}
-									eb = defaultEmbed("Event Leaderboard");
 									long minutesSinceUpdate = Duration
 										.between(currentGuild.getEventMemberListLastUpdated(), Instant.now())
 										.toMinutes();
@@ -590,8 +592,12 @@ public class SkyblockEventCommand extends Command {
 										minutesSinceUpdateString = minutesSinceUpdate + " minutes ";
 									}
 
-									eb.setDescription("**Last updated " + minutesSinceUpdateString + " ago**\n\n" + ebString);
-									ebMessage.editMessage(eb.build()).queue();
+									paginateBuilder.setPaginatorExtras(
+										new PaginatorExtras()
+											.setEveryPageTitle("Event Leaderboard")
+											.setEveryPageText("**Last updated " + minutesSinceUpdateString + " ago**\n\n")
+									);
+									paginateBuilder.build().paginate(event.getChannel(), 0);
 									return;
 								}
 
