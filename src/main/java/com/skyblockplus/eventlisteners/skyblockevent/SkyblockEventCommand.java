@@ -595,7 +595,7 @@ public class SkyblockEventCommand extends Command {
 									paginateBuilder.setPaginatorExtras(
 										new PaginatorExtras()
 											.setEveryPageTitle("Event Leaderboard")
-											.setEveryPageText("**Last updated " + minutesSinceUpdateString + " ago**\n\n")
+											.setEveryPageText("**Last updated " + minutesSinceUpdateString + " ago**\n")
 									);
 									paginateBuilder.build().paginate(event.getChannel(), 0);
 									ebMessage.delete().queue();

@@ -73,9 +73,9 @@ public class BazaarCommand extends Command {
 			}
 		}
 
-		if (closestMatch != null && higherDepth(bazaarItems, closestMatch) != null) {
-			closestMatch = itemsMap.get(closestMatch);
+		closestMatch = itemsMap.get(closestMatch);
 
+		if (closestMatch != null && higherDepth(bazaarItems, closestMatch) != null) {
 			JsonElement itemInfo = higherDepth(bazaarItems, closestMatch);
 			EmbedBuilder eb = defaultEmbed(
 				higherDepth(bazaarItems, closestMatch + ".name").getAsString(),

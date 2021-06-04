@@ -61,9 +61,10 @@ public class GuildRequirementsCommand extends Command {
 								.build()
 						)
 						.queue();
+					return;
 				}
 
-				if (guildReqs == null || guildReqs.size() == 0) {
+				if (guildReqs.size() == 0) {
 					ebMessage.editMessage(defaultEmbed("Error").setDescription("No requirements set for " + args[1]).build()).queue();
 					return;
 				}

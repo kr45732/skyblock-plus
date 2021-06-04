@@ -29,7 +29,6 @@ public class Player {
 	private String playerUuid;
 	private String playerUsername;
 	private String profileName;
-	private String playerGuildRank;
 
 	public Player(String username) {
 		if (usernameToUuid(username)) {
@@ -91,7 +90,7 @@ public class Player {
 	/* Inventory */
 	public static Map<Integer, InvItem> getGenericInventoryMap(NBTCompound parsedContents) {
 		try {
-			NBTList items = parsedContents.getList(".i");
+			NBTList items = parsedContents.getList("i");
 			Map<Integer, InvItem> itemsMap = new HashMap<>();
 
 			for (int i = 0; i < items.size(); i++) {
@@ -558,7 +557,7 @@ public class Player {
 			int equippedSlot = higherDepth(profileJson, "wardrobe_equipped_slot").getAsInt();
 			NBTCompound decodedWardrobeContents = NBTReader.readBase64(encodedWardrobeContents);
 
-			NBTList wardrobeFrames = decodedWardrobeContents.getList(".i");
+			NBTList wardrobeFrames = decodedWardrobeContents.getList("i");
 			Map<Integer, String> wardrobeFramesMap = new HashMap<>();
 			for (int i = 0; i < wardrobeFrames.size(); i++) {
 				NBTCompound displayName = wardrobeFrames.getCompound(i).getCompound("tag.display");
@@ -619,7 +618,7 @@ public class Player {
 			String encodedInventoryContents = higherDepth(profileJson, "wardrobe_contents.data").getAsString();
 			NBTCompound decodedInventoryContents = NBTReader.readBase64(encodedInventoryContents);
 
-			NBTList invFrames = decodedInventoryContents.getList(".i");
+			NBTList invFrames = decodedInventoryContents.getList("i");
 			Map<Integer, String> invFramesMap = new TreeMap<>();
 			for (int i = 0; i < invFrames.size(); i++) {
 				NBTCompound displayName = invFrames.getCompound(i).getCompound("tag.ExtraAttributes");
@@ -694,7 +693,7 @@ public class Player {
 			String encodedInventoryContents = higherDepth(profileJson, "inv_armor.data").getAsString();
 			NBTCompound decodedInventoryContents = NBTReader.readBase64(encodedInventoryContents);
 
-			NBTList talismanFrames = decodedInventoryContents.getList(".i");
+			NBTList talismanFrames = decodedInventoryContents.getList("i");
 
 			Map<Integer, String> armorFramesMap = new HashMap<>();
 			for (int i = 0; i < talismanFrames.size(); i++) {
@@ -716,7 +715,7 @@ public class Player {
 			String encodedInventoryContents = higherDepth(profileJson, "inv_contents.data").getAsString();
 			NBTCompound decodedInventoryContents = NBTReader.readBase64(encodedInventoryContents);
 
-			NBTList invFrames = decodedInventoryContents.getList(".i");
+			NBTList invFrames = decodedInventoryContents.getList("i");
 			Map<Integer, String> invFramesMap = new TreeMap<>();
 			for (int i = 0; i < invFrames.size(); i++) {
 				NBTCompound displayName = invFrames.getCompound(i).getCompound("tag.ExtraAttributes");
@@ -1306,7 +1305,7 @@ public class Player {
 			String encodedInventoryContents = higherDepth(profileJson, "ender_chest_contents.data").getAsString();
 			NBTCompound decodedInventoryContents = NBTReader.readBase64(encodedInventoryContents);
 
-			NBTList invFrames = decodedInventoryContents.getList(".i");
+			NBTList invFrames = decodedInventoryContents.getList("i");
 
 			Map<Integer, String> invFramesMap = new TreeMap<>();
 			for (int i = 0; i < invFrames.size(); i++) {
@@ -1367,7 +1366,7 @@ public class Player {
 			String encodedInventoryContents = higherDepth(profileJson, "talisman_bag.data").getAsString();
 			NBTCompound decodedInventoryContents = NBTReader.readBase64(encodedInventoryContents);
 
-			NBTList invFrames = decodedInventoryContents.getList(".i");
+			NBTList invFrames = decodedInventoryContents.getList("i");
 
 			Map<Integer, String> invFramesMap = new TreeMap<>();
 			for (int i = 0; i < invFrames.size(); i++) {
