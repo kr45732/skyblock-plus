@@ -598,6 +598,7 @@ public class SkyblockEventCommand extends Command {
 											.setEveryPageText("**Last updated " + minutesSinceUpdateString + " ago**\n\n")
 									);
 									paginateBuilder.build().paginate(event.getChannel(), 0);
+									ebMessage.delete().queue();
 									return;
 								}
 
