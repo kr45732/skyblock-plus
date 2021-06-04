@@ -14,10 +14,18 @@ public class DiscordInfoStruct {
 
 	@Override
 	public String toString() {
-		return "DiscordInfoStruct{" +
-				"discordTag='" + discordTag + '\'' +
-				", minecraftUsername='" + minecraftUsername + '\'' +
-				", minecraftUuid='" + minecraftUuid + '\'' +
-				'}';
+		return (
+			"DiscordInfoStruct{" +
+			"discordTag='" +
+			discordTag +
+			'\'' +
+			", minecraftUsername='" +
+			minecraftUsername +
+			'\'' +
+			", minecraftUuid='" +
+			minecraftUuid +
+			'\'' +
+			'}'
+		);
 	}
 }

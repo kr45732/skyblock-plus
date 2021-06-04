@@ -1576,11 +1576,20 @@ public class Player {
 
 	@Override
 	public String toString() {
-		return "Player{" +
-				"validPlayer=" + validPlayer +
-				", playerUuid='" + playerUuid + '\'' +
-				", playerUsername='" + playerUsername + '\'' +
-				", profileName='" + profileName + '\'' +
-				'}';
+		return (
+			"Player{" +
+			"validPlayer=" +
+			validPlayer +
+			", playerUuid='" +
+			playerUuid +
+			'\'' +
+			", playerUsername='" +
+			playerUsername +
+			'\'' +
+			", profileName='" +
+			profileName +
+			'\'' +
+			'}'
+		);
 	}
 }

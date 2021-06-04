@@ -12,9 +12,6 @@ public class NwItemPrice {
 
 	@Override
 	public String toString() {
-		return "NwItemPrice{" +
-				"price=" + price +
-				", json='" + json + '\'' +
-				'}';
+		return "NwItemPrice{" + "price=" + price + ", json='" + json + '\'' + '}';
 	}
 }

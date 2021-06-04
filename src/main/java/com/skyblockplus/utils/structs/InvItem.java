@@ -53,5 +53,4 @@ public class InvItem {
 		this.backpackItems.clear();
 		this.backpackItems.addAll(backpackItems);
 	}
-
 }

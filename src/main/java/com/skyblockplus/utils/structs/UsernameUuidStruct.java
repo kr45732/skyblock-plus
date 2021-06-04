@@ -12,9 +12,6 @@ public class UsernameUuidStruct {
 
 	@Override
 	public String toString() {
-		return "UsernameUuidStruct{" +
-				"playerUsername='" + playerUsername + '\'' +
-				", playerUuid='" + playerUuid + '\'' +
-				'}';
+		return "UsernameUuidStruct{" + "playerUsername='" + playerUsername + '\'' + ", playerUuid='" + playerUuid + '\'' + '}';
 	}
 }
