@@ -2,14 +2,14 @@ plugins {
     id 'application'
 
     // Shadow jar
-    id 'com.github.johnrengelman.shadow' version '5.2.0'
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
 
     // Spring boot
-    id 'org.springframework.boot' version '2.4.2'
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'org.springframework.boot' version '2.4.5'
+    id "io.spring.dependency-management" version "1.0.11.RELEASE"
 
     // Lombok annotations
-    id "io.freefair.lombok" version "5.3.0"
+    id "io.freefair.lombok" version "6.0.0-m2"
 }
 
 version = '0.0.1'
@@ -44,7 +44,7 @@ dependencies {
     implementation 'com.jagrosh:jda-utilities:3.0.5'
 
     // NBT parser
-    implementation 'com.github.TheNullicorn:Nedit:1.0.0'
+    implementation 'com.github.TheNullicorn:Nedit:v1.1.1'
 
     // Spring boot and postgresql
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'

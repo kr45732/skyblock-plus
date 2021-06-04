@@ -1,17 +1,12 @@
 package com.skyblockplus.dev;
 
-import static com.skyblockplus.Main.*;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.loadingEmbed;
 import static com.skyblockplus.utils.Utils.logCommand;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
