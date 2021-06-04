@@ -1,18 +1,7 @@
 package com.skyblockplus.guilds;
 
 import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.Utils.HYPIXEL_API_KEY;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.defaultPaginator;
-import static com.skyblockplus.utils.Utils.errorMessage;
-import static com.skyblockplus.utils.Utils.formatNumber;
-import static com.skyblockplus.utils.Utils.getJson;
-import static com.skyblockplus.utils.Utils.globalCooldown;
-import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.utils.Utils.loadingEmbed;
-import static com.skyblockplus.utils.Utils.logCommand;
-import static com.skyblockplus.utils.Utils.roundAndFormat;
-import static com.skyblockplus.utils.Utils.usernameToUuid;
+import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -75,7 +64,12 @@ public class GuildKickerCommand extends Command {
 					return defaultEmbed("Error").setDescription(indvReq + " is an invalid requirement format");
 				}
 
-				if (!"slayerskillscatacombsweight".contains(reqDashSplit[0])) {
+				if (
+					!reqDashSplit[0].equals("slayer") &&
+					!reqDashSplit[0].equals("skills") &&
+					!reqDashSplit[0].equals("catacombs") &&
+					!reqDashSplit[0].equals("weight")
+				) {
 					return defaultEmbed("Error").setDescription(indvReq + " is an invalid requirement type");
 				}
 
@@ -115,19 +109,19 @@ public class GuildKickerCommand extends Command {
 						double skillsReq = 0;
 						double catacombsReq = 0;
 						double weightReq = 0;
-						for (String reqIndv : reqSplit) {
-							switch (reqIndv.split(":")[0]) {
+						for (String reqIndividual : reqSplit) {
+							switch (reqIndividual.split(":")[0]) {
 								case "slayer":
-									slayerReq = Double.parseDouble(reqIndv.split(":")[1]);
+									slayerReq = Double.parseDouble(reqIndividual.split(":")[1]);
 									break;
 								case "skills":
-									skillsReq = Double.parseDouble(reqIndv.split(":")[1]);
+									skillsReq = Double.parseDouble(reqIndividual.split(":")[1]);
 									break;
 								case "catacombs":
-									catacombsReq = Double.parseDouble(reqIndv.split(":")[1]);
+									catacombsReq = Double.parseDouble(reqIndividual.split(":")[1]);
 									break;
 								case "weight":
-									weightReq = Double.parseDouble(reqIndv.split(":")[1]);
+									weightReq = Double.parseDouble(reqIndividual.split(":")[1]);
 									break;
 							}
 						}

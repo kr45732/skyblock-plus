@@ -22,27 +22,6 @@ public class AverageAuctionCommand extends Command {
 		this.aliases = new String[] { "avg" };
 	}
 
-	@Override
-	protected void execute(CommandEvent event) {
-		new Thread(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-				String args = event.getMessage().getContentRaw();
-
-				logCommand(event.getGuild(), event.getAuthor(), args);
-
-				if (args.split(" ").length >= 2) {
-					ebMessage.editMessage(getAverageAuctionPrice(args.split(" ", 2)[1]).build()).queue();
-					return;
-				}
-
-				ebMessage.editMessage(errorMessage(this.name).build()).queue();
-			}
-		)
-			.start();
-	}
-
 	public static EmbedBuilder getAverageAuctionPrice(String item) {
 		JsonElement averageAhJson = getJson("https://moulberry.codes/auction_averages/3day.json");
 		if (averageAhJson == null) {
@@ -293,5 +272,26 @@ public class AverageAuctionCommand extends Command {
 		}
 
 		return defaultEmbed("No auctions found for " + capitalizeString(item.toLowerCase()));
+	}
+
+	@Override
+	protected void execute(CommandEvent event) {
+		new Thread(
+			() -> {
+				EmbedBuilder eb = loadingEmbed();
+				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				String args = event.getMessage().getContentRaw();
+
+				logCommand(event.getGuild(), event.getAuthor(), args);
+
+				if (args.split(" ").length >= 2) {
+					ebMessage.editMessage(getAverageAuctionPrice(args.split(" ", 2)[1]).build()).queue();
+					return;
+				}
+
+				ebMessage.editMessage(errorMessage(this.name).build()).queue();
+			}
+		)
+			.start();
 	}
 }

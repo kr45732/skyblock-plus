@@ -28,44 +28,6 @@ public class BankCommand extends Command {
 		this.cooldown = globalCooldown;
 	}
 
-	@Override
-	protected void execute(CommandEvent event) {
-		new Thread(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-				String content = event.getMessage().getContentRaw();
-				String[] args = content.split(" ");
-
-				logCommand(event.getGuild(), event.getAuthor(), content);
-
-				if ((args.length == 3 || args.length == 4) && args[1].equals("history")) {
-					if (args.length == 4) {
-						eb = getPlayerBankHistory(args[2], args[3], event.getAuthor(), event.getChannel(), null);
-					} else {
-						eb = getPlayerBankHistory(args[2], null, event.getAuthor(), event.getChannel(), null);
-					}
-
-					if (eb == null) {
-						ebMessage.delete().queue();
-					} else {
-						ebMessage.editMessage(eb.build()).queue();
-					}
-					return;
-				} else if (args.length == 2) {
-					ebMessage.editMessage(getPlayerBalance(args[1], null).build()).queue();
-					return;
-				} else if (args.length == 3) {
-					ebMessage.editMessage(getPlayerBalance(args[1], args[2]).build()).queue();
-					return;
-				}
-
-				ebMessage.editMessage(errorMessage(this.name).build()).queue();
-			}
-		)
-			.start();
-	}
-
 	public static EmbedBuilder getPlayerBalance(String username, String profileName) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
@@ -142,5 +104,43 @@ public class BankCommand extends Command {
 			}
 		}
 		return defaultEmbed("Unable to fetch player data");
+	}
+
+	@Override
+	protected void execute(CommandEvent event) {
+		new Thread(
+			() -> {
+				EmbedBuilder eb = loadingEmbed();
+				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				String content = event.getMessage().getContentRaw();
+				String[] args = content.split(" ");
+
+				logCommand(event.getGuild(), event.getAuthor(), content);
+
+				if ((args.length == 3 || args.length == 4) && args[1].equals("history")) {
+					if (args.length == 4) {
+						eb = getPlayerBankHistory(args[2], args[3], event.getAuthor(), event.getChannel(), null);
+					} else {
+						eb = getPlayerBankHistory(args[2], null, event.getAuthor(), event.getChannel(), null);
+					}
+
+					if (eb == null) {
+						ebMessage.delete().queue();
+					} else {
+						ebMessage.editMessage(eb.build()).queue();
+					}
+					return;
+				} else if (args.length == 2) {
+					ebMessage.editMessage(getPlayerBalance(args[1], null).build()).queue();
+					return;
+				} else if (args.length == 3) {
+					ebMessage.editMessage(getPlayerBalance(args[1], args[2]).build()).queue();
+					return;
+				}
+
+				ebMessage.editMessage(errorMessage(this.name).build()).queue();
+			}
+		)
+			.start();
 	}
 }

@@ -1,12 +1,7 @@
 package com.skyblockplus.eventlisteners.skyblockevent;
 
 import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Utils.BOT_PREFIX;
-import static com.skyblockplus.utils.Utils.HYPIXEL_API_KEY;
-import static com.skyblockplus.utils.Utils.capitalizeString;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.getJson;
-import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -60,10 +55,6 @@ public class SkyblockEvent {
 		scheduler.scheduleAtFixedRate(this::checkForTimeout, 0, 1, TimeUnit.MINUTES);
 	}
 
-	public ScheduledExecutorService getScheduler() {
-		return scheduler;
-	}
-
 	private void checkForTimeout() {
 		try {
 			Duration res = Duration.between(lastMessageSentTime, Instant.now());
@@ -76,10 +67,6 @@ public class SkyblockEvent {
 			System.out.println("== Stack Trace (checkForTimeout) ==");
 			e.printStackTrace();
 		}
-	}
-
-	public boolean isEnable() {
-		return enable;
 	}
 
 	private Message sendEmbedMessage(EmbedBuilder eb) {
@@ -144,18 +131,23 @@ public class SkyblockEvent {
 					replyMessage.equals("skills") ||
 					replyMessage.equals("weight")
 				) {
-					if (replyMessage.equals("catacombs")) {
-						eb.addField("Event Type", "Catacombs", false);
-						eventType = "catacombs";
-					} else if (replyMessage.equals("slayer")) {
-						eb.addField("Event Type", "Slayer", false);
-						eventType = "slayer";
-					} else if (replyMessage.equals("weight")) {
-						eb.addField("Event Type", "Weight", false);
-						eventType = "weight";
-					} else {
-						eb.addField("Event Type", "Skills", false);
-						eventType = "skills";
+					switch (replyMessage) {
+						case "catacombs":
+							eb.addField("Event Type", "Catacombs", false);
+							eventType = "catacombs";
+							break;
+						case "slayer":
+							eb.addField("Event Type", "Slayer", false);
+							eventType = "slayer";
+							break;
+						case "weight":
+							eb.addField("Event Type", "Weight", false);
+							eventType = "weight";
+							break;
+						default:
+							eb.addField("Event Type", "Skills", false);
+							eventType = "skills";
+							break;
 					}
 					eb.setDescription("Please enter the number of __hours__ the event should last");
 					state++;

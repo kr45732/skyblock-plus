@@ -33,33 +33,6 @@ public class ProfilesCommand extends Command {
 		this.cooldown = globalCooldown;
 	}
 
-	@Override
-	protected void execute(CommandEvent event) {
-		new Thread(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-				String content = event.getMessage().getContentRaw();
-				String[] args = content.split(" ");
-
-				logCommand(event.getGuild(), event.getAuthor(), content);
-
-				if (args.length == 2) {
-					eb = getPlayerProfiles(args[1], event.getAuthor(), event.getChannel(), null);
-					if (eb == null) {
-						ebMessage.delete().queue();
-					} else {
-						ebMessage.editMessage(eb.build()).queue();
-					}
-					return;
-				}
-
-				ebMessage.editMessage(errorMessage(this.name).build()).queue();
-			}
-		)
-			.start();
-	}
-
 	public static EmbedBuilder getPlayerProfiles(String username, User user, MessageChannel channel, InteractionHook hook) {
 		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
 		if (usernameUuidStruct != null) {
@@ -145,5 +118,32 @@ public class ProfilesCommand extends Command {
 			return null;
 		}
 		return defaultEmbed("Unable to fetch player data");
+	}
+
+	@Override
+	protected void execute(CommandEvent event) {
+		new Thread(
+			() -> {
+				EmbedBuilder eb = loadingEmbed();
+				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				String content = event.getMessage().getContentRaw();
+				String[] args = content.split(" ");
+
+				logCommand(event.getGuild(), event.getAuthor(), content);
+
+				if (args.length == 2) {
+					eb = getPlayerProfiles(args[1], event.getAuthor(), event.getChannel(), null);
+					if (eb == null) {
+						ebMessage.delete().queue();
+					} else {
+						ebMessage.editMessage(eb.build()).queue();
+					}
+					return;
+				}
+
+				ebMessage.editMessage(errorMessage(this.name).build()).queue();
+			}
+		)
+			.start();
 	}
 }

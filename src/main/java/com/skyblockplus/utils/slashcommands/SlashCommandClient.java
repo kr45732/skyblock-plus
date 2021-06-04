@@ -3,6 +3,7 @@ package com.skyblockplus.utils.slashcommands;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -10,18 +11,16 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class SlashCommandClient extends ListenerAdapter {
 
-	private List<SlashCommand> slashCommands;
-	private HashMap<String, OffsetDateTime> cooldowns;
+	private final List<SlashCommand> slashCommands;
+	private final HashMap<String, OffsetDateTime> cooldowns;
 
 	public SlashCommandClient() {
 		this.slashCommands = new ArrayList<>();
 		this.cooldowns = new HashMap<>();
 	}
 
-	public SlashCommandClient addSlashCommmands(SlashCommand... commands) {
-		for (SlashCommand command : commands) {
-			slashCommands.add(command);
-		}
+	public SlashCommandClient addSlashCommands(SlashCommand... commands) {
+		slashCommands.addAll(Arrays.asList(commands));
 		return this;
 	}
 

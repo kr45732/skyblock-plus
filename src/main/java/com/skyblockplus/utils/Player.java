@@ -51,22 +51,6 @@ public class Player {
 		this.validPlayer = true;
 	}
 
-	public Player(String playerUuid, String playerUsername, JsonElement outerProfileJson, String playerGuildRank) {
-		this.playerUuid = playerUuid;
-		this.playerUsername = playerUsername;
-		this.playerGuildRank = playerGuildRank;
-
-		try {
-			if (getLatestProfile(higherDepth(outerProfileJson, "profiles").getAsJsonArray())) {
-				return;
-			}
-		} catch (Exception e) {
-			return;
-		}
-
-		this.validPlayer = true;
-	}
-
 	public Player(String username, String profileName) {
 		if (usernameToUuid(username)) {
 			return;
@@ -415,10 +399,6 @@ public class Player {
 
 	public String getUuid() {
 		return this.playerUuid;
-	}
-
-	public String getGuildRank() {
-		return playerGuildRank;
 	}
 
 	public JsonArray getPets() {
@@ -1378,13 +1358,6 @@ public class Player {
 			.setThumbnail(getThumbnailUrl());
 	}
 
-	public EmbedBuilder defaultPlayerEmbed(boolean noProfile) {
-		return defaultEmbed(
-			fixUsername(getUsername()) + (higherDepth(outerProfileJson, "game_mode") != null ? " ♻️" : ""),
-			skyblockStatsLink(getUsername(), "")
-		);
-	}
-
 	public String skyblockStatsLink(String username, String profileName) {
 		return ("https://sky.shiiyu.moe/stats/" + username + "/" + profileName);
 	}
@@ -1562,33 +1535,6 @@ public class Player {
 			return getGenericInventoryMap(parsedContents);
 		} catch (Exception ignored) {}
 		return null;
-	}
-
-	public List<InvItem> getPetsMapFormatted() {
-		JsonArray petsArr = getPets();
-
-		List<InvItem> petsNameFormatted = new ArrayList<>();
-
-		Map<String, String> rarityMap = new HashMap<>();
-		rarityMap.put("LEGENDARY", ";4");
-		rarityMap.put("EPIC", ";3");
-		rarityMap.put("RARE", ";2");
-		rarityMap.put("UNCOMMON", ";1");
-		rarityMap.put("COMMON", ";0");
-
-		for (JsonElement pet : petsArr) {
-			try {
-				InvItem invItemStruct = new InvItem();
-				invItemStruct.setName(capitalizeString(higherDepth(pet, "type").getAsString().toLowerCase()));
-				invItemStruct.setId(higherDepth(pet, "type").getAsString() + rarityMap.get(higherDepth(pet, "tier").getAsString()));
-				if (higherDepth(pet, "heldItem") != null) {
-					invItemStruct.addExtraValue(higherDepth(pet, "heldItem").getAsString());
-				}
-				petsNameFormatted.add(invItemStruct);
-			} catch (Exception ignored) {}
-		}
-
-		return petsNameFormatted;
 	}
 
 	public List<InvItem> getPetsMapNames() {

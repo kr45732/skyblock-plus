@@ -1,20 +1,9 @@
 package com.skyblockplus.eventlisteners.apply;
 
 import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.emojiToProfileName;
-import static com.skyblockplus.utils.Utils.fixUsername;
-import static com.skyblockplus.utils.Utils.formatNumber;
-import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.utils.Utils.logCommand;
-import static com.skyblockplus.utils.Utils.profileNameToEmoji;
-import static com.skyblockplus.utils.Utils.roundAndFormat;
+import static com.skyblockplus.utils.Utils.*;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import com.skyblockplus.utils.Player;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -96,22 +85,6 @@ public class ApplyUser implements Serializable {
 		}
 
 		reactMessage.addReaction("❌").queue();
-	}
-
-	public String getGuildId() {
-		return guildId;
-	}
-
-	public String getApplicationChannelId() {
-		return applicationChannelId;
-	}
-
-	public String getStaffChannelId() {
-		return staffChannelId;
-	}
-
-	public String getMessageReactId() {
-		return reactMessageId;
 	}
 
 	public boolean onMessageReactionAdd(MessageReactionAddEvent event) {

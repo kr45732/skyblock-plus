@@ -1,16 +1,7 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Utils.BOT_PREFIX;
-import static com.skyblockplus.utils.Utils.HYPIXEL_API_KEY;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.errorMessage;
-import static com.skyblockplus.utils.Utils.getJson;
-import static com.skyblockplus.utils.Utils.getJsonKeys;
-import static com.skyblockplus.utils.Utils.getPlayerDiscordInfo;
-import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.utils.Utils.loadingEmbed;
-import static com.skyblockplus.utils.Utils.logCommand;
+import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -23,12 +14,7 @@ import com.skyblockplus.utils.structs.DiscordInfoStruct;
 import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 
 public class RoleCommands extends Command {
 
@@ -38,38 +24,8 @@ public class RoleCommands extends Command {
 		this.aliases = new String[] { "role" };
 	}
 
-	@Override
-	protected void execute(CommandEvent event) {
-		new Thread(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				String content = event.getMessage().getContentRaw();
-				MessageChannel channel = event.getChannel();
-				Message ebMessage = channel.sendMessage(eb.build()).complete();
-
-				logCommand(event.getGuild(), event.getAuthor(), content);
-
-				String[] args = content.split(" ");
-				if (args.length < 2 || args.length > 3) {
-					ebMessage.editMessage(errorMessage(this.name).build());
-					return;
-				}
-
-				if (!args[1].equals("claim")) {
-					ebMessage.editMessage(errorMessage(this.name).build());
-					return;
-				}
-
-				eb = updateRoles(args.length == 3 ? args[2] : null, event.getGuild(), event.getAuthor(), event.getMember());
-
-				ebMessage.editMessage(eb.build()).queue();
-			}
-		)
-			.start();
-	}
-
 	public static EmbedBuilder updateRoles(String profile, Guild guild, User user, Member member) {
-		EmbedBuilder eb = defaultEmbed(null);
+		EmbedBuilder eb;
 
 		if (database.getLinkedUserByDiscordId(user.getId()).isJsonNull()) {
 			return defaultEmbed("You must be linked to run this command. Use `" + BOT_PREFIX + "link [IGN]` to link");
@@ -546,5 +502,35 @@ public class RoleCommands extends Command {
 
 	private static String roleChangeString(String name) {
 		return "• " + name + "\n";
+	}
+
+	@Override
+	protected void execute(CommandEvent event) {
+		new Thread(
+			() -> {
+				EmbedBuilder eb = loadingEmbed();
+				String content = event.getMessage().getContentRaw();
+				MessageChannel channel = event.getChannel();
+				Message ebMessage = channel.sendMessage(eb.build()).complete();
+
+				logCommand(event.getGuild(), event.getAuthor(), content);
+
+				String[] args = content.split(" ");
+				if (args.length < 2 || args.length > 3) {
+					ebMessage.editMessage(errorMessage(this.name).build()).queue();
+					return;
+				}
+
+				if (!args[1].equals("claim")) {
+					ebMessage.editMessage(errorMessage(this.name).build()).queue();
+					return;
+				}
+
+				eb = updateRoles(args.length == 3 ? args[2] : null, event.getGuild(), event.getAuthor(), event.getMember());
+
+				ebMessage.editMessage(eb.build()).queue();
+			}
+		)
+			.start();
 	}
 }

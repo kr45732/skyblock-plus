@@ -2,9 +2,7 @@ package com.skyblockplus.dev;
 
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.utils.Utils.errorMessage;
-import static com.skyblockplus.utils.Utils.logCommand;
-import static com.skyblockplus.utils.Utils.makeHastePost;
+import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;

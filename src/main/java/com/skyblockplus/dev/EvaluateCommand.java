@@ -37,10 +37,17 @@ public class EvaluateCommand extends Command {
 			"net.dv8tion.jda.api.utils",
 			"com.skyblockplus",
 		};
+
+		String[] classImports = { "com.skyblockplus.utils.Player" };
+
 		String[] staticImports = { "com.skyblockplus.utils.Utils.*" };
 
 		for (String packageImport : packageImports) {
 			importString += "import " + packageImport + ".*\n";
+		}
+
+		for (String classImport : classImports) {
+			importString += "import " + classImport + "\n";
 		}
 
 		for (String staticImport : staticImports) {

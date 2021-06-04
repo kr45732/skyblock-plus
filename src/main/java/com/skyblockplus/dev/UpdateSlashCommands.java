@@ -27,7 +27,7 @@ public class UpdateSlashCommands extends Command {
 				logCommand(event.getGuild(), event.getAuthor(), content);
 
 				CommandListUpdateAction slashCommands = jda.getGuildById("796790757947867156").updateCommands();
-				if (content.split(" ").length == 2 && content.split(" ")[1].equals("clear")) {} else {
+				if (content.split(" ").length != 2 || !content.split(" ")[1].equals("clear")) {
 					slashCommands.addCommands(
 						new CommandData("information", "Get information about this bot"),
 						new CommandData("invite", "Invite this bot to your server"),

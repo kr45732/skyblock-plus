@@ -60,27 +60,6 @@ public class QueryAuctionCommand extends Command {
 		return null;
 	}
 
-	@Override
-	protected void execute(CommandEvent event) {
-		new Thread(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-				String[] args = event.getMessage().getContentRaw().split(" ", 2);
-
-				logCommand(event.getGuild(), event.getAuthor(), event.getMessage().getContentRaw());
-
-				if (args.length == 2) {
-					ebMessage.editMessage(queryAuctions(args[1]).build()).queue();
-					return;
-				}
-
-				ebMessage.editMessage(errorMessage(this.name).build()).queue();
-			}
-		)
-			.start();
-	}
-
 	public static EmbedBuilder queryAuctions(String query) {
 		List<String> enchantsList = getJsonKeys(higherDepth(getEnchantsJson(), "enchants_min_level"));
 		for (String enchant : enchantsList) {
@@ -260,5 +239,26 @@ public class QueryAuctionCommand extends Command {
 		}
 
 		return eb;
+	}
+
+	@Override
+	protected void execute(CommandEvent event) {
+		new Thread(
+			() -> {
+				EmbedBuilder eb = loadingEmbed();
+				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				String[] args = event.getMessage().getContentRaw().split(" ", 2);
+
+				logCommand(event.getGuild(), event.getAuthor(), event.getMessage().getContentRaw());
+
+				if (args.length == 2) {
+					ebMessage.editMessage(queryAuctions(args[1]).build()).queue();
+					return;
+				}
+
+				ebMessage.editMessage(errorMessage(this.name).build()).queue();
+			}
+		)
+			.start();
 	}
 }

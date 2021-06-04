@@ -1,13 +1,8 @@
 package com.skyblockplus.utils;
 
-import static com.skyblockplus.Main.asyncHttpClient;
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.Main.*;
 import static com.skyblockplus.eventlisteners.MainListener.getGuildMap;
-import static com.skyblockplus.utils.Utils.BOT_PREFIX;
-import static com.skyblockplus.utils.Utils.getPlayerDiscordInfo;
-import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.utils.Utils.logCommand;
+import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -43,7 +38,7 @@ public class MainClassUtils {
 						automaticGuild.getKey(),
 						higherDepth(applySetting.currentSettings, "name").getAsString()
 					);
-					List<ApplyUser> applyUserList = applySetting.getApplyUserList();
+					List<ApplyUser> applyUserList = applySetting.applyUserList;
 					if (applyUserList.size() > 0) {
 						int code = database.updateApplyCacheSettings(
 							automaticGuild.getKey(),

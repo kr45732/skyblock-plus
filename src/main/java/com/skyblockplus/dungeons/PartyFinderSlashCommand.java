@@ -17,7 +17,7 @@ public class PartyFinderSlashCommand extends SlashCommand {
 				event.logCommandGuildUserCommand();
 
 				String profileName = event.getOptionStr("profile");
-				EmbedBuilder eb = null;
+				EmbedBuilder eb;
 				if (profileName != null) {
 					eb = PartyFinderCommand.getPlayerDungeonInfo(event.getEvent().getOption("player").getAsString(), profileName);
 				} else {

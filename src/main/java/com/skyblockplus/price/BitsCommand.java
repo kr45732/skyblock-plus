@@ -18,28 +18,6 @@ public class BitsCommand extends Command {
 		this.aliases = new String[] { "bit" };
 	}
 
-	@Override
-	protected void execute(CommandEvent event) {
-		new Thread(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-				String content = event.getMessage().getContentRaw();
-				String[] args = content.split(" ", 2);
-
-				logCommand(event.getGuild(), event.getAuthor(), content);
-
-				if (args.length == 2) {
-					ebMessage.editMessage(getBitPrices(args[1]).build()).queue();
-					return;
-				}
-
-				ebMessage.editMessage(errorMessage(this.name).build()).queue();
-			}
-		)
-			.start();
-	}
-
 	public static EmbedBuilder getBitPrices(String itemName) {
 		JsonElement bitsJson = getBitsJson();
 
@@ -64,5 +42,27 @@ public class BitsCommand extends Command {
 		}
 
 		return defaultEmbed("No bit price found for " + capitalizeString(itemName));
+	}
+
+	@Override
+	protected void execute(CommandEvent event) {
+		new Thread(
+			() -> {
+				EmbedBuilder eb = loadingEmbed();
+				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				String content = event.getMessage().getContentRaw();
+				String[] args = content.split(" ", 2);
+
+				logCommand(event.getGuild(), event.getAuthor(), content);
+
+				if (args.length == 2) {
+					ebMessage.editMessage(getBitPrices(args[1]).build()).queue();
+					return;
+				}
+
+				ebMessage.editMessage(errorMessage(this.name).build()).queue();
+			}
+		)
+			.start();
 	}
 }

@@ -1,19 +1,6 @@
 package com.skyblockplus.networth;
 
-import static com.skyblockplus.utils.Utils.capitalizeString;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.errorMessage;
-import static com.skyblockplus.utils.Utils.formatNumber;
-import static com.skyblockplus.utils.Utils.getJson;
-import static com.skyblockplus.utils.Utils.getJsonKeys;
-import static com.skyblockplus.utils.Utils.getReforgeStonesJson;
-import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.utils.Utils.loadingEmbed;
-import static com.skyblockplus.utils.Utils.logCommand;
-import static com.skyblockplus.utils.Utils.makeHastePost;
-import static com.skyblockplus.utils.Utils.parseMcCodes;
-import static com.skyblockplus.utils.Utils.simplifyNumber;
-import static com.skyblockplus.utils.Utils.toRomanNumerals;
+import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -25,14 +12,7 @@ import com.skyblockplus.utils.structs.InvItem;
 import com.skyblockplus.utils.structs.NwItemPrice;
 import java.io.InputStreamReader;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import org.apache.http.HttpResponse;
@@ -397,20 +377,25 @@ public class NetworthExecute {
 				for (Iterator<InvItem> iterator = invPets.iterator(); iterator.hasNext();) {
 					InvItem item = iterator.next();
 					if (item.getName().equalsIgnoreCase(auctionName) && item.getRarity().equalsIgnoreCase(auctionRarity)) {
-						String miscStr = "[";
+						StringBuilder miscStr = new StringBuilder("[");
 						double miscExtras = 0;
 						try {
 							List<String> extraStats = item.getExtraStats();
 							for (String extraItem : extraStats) {
 								double miscPrice = getLowestPrice(extraItem, " ");
 								miscExtras += miscPrice;
-								miscStr += "{\"name\":\"" + extraItem + "\",\"price\":\"" + simplifyNumber(miscPrice) + "\"},";
+								miscStr
+									.append("{\"name\":\"")
+									.append(extraItem)
+									.append("\",\"price\":\"")
+									.append(simplifyNumber(miscPrice))
+									.append("\"},");
 							}
 						} catch (Exception ignored) {}
-						if (miscStr.endsWith(",")) {
-							miscStr = miscStr.substring(0, miscStr.length() - 1);
+						if (miscStr.toString().endsWith(",")) {
+							miscStr = new StringBuilder(miscStr.substring(0, miscStr.length() - 1));
 						}
-						miscStr += "]";
+						miscStr.append("]");
 
 						invItems.add(addItemStr(item, auctionPrice + miscExtras));
 						invTotal += auctionPrice + miscExtras;
@@ -435,20 +420,25 @@ public class NetworthExecute {
 				for (Iterator<InvItem> iterator = petsPets.iterator(); iterator.hasNext();) {
 					InvItem item = iterator.next();
 					if (item.getName().equalsIgnoreCase(auctionName) && item.getRarity().equalsIgnoreCase(auctionRarity)) {
-						String miscStr = "[";
+						StringBuilder miscStr = new StringBuilder("[");
 						double miscExtras = 0;
 						try {
 							List<String> extraStats = item.getExtraStats();
 							for (String extraItem : extraStats) {
 								double miscPrice = getLowestPrice(extraItem, " ");
 								miscExtras += miscPrice;
-								miscStr += "{\"name\":\"" + extraItem + "\",\"price\":\"" + simplifyNumber(miscPrice) + "\"},";
+								miscStr
+									.append("{\"name\":\"")
+									.append(extraItem)
+									.append("\",\"price\":\"")
+									.append(simplifyNumber(miscPrice))
+									.append("\"},");
 							}
 						} catch (Exception ignored) {}
-						if (miscStr.endsWith(",")) {
-							miscStr = miscStr.substring(0, miscStr.length() - 1);
+						if (miscStr.toString().endsWith(",")) {
+							miscStr = new StringBuilder(miscStr.substring(0, miscStr.length() - 1));
 						}
-						miscStr += "]";
+						miscStr.append("]");
 
 						petsItems.add(addItemStr(item, auctionPrice + miscExtras));
 						petsTotal += auctionPrice + miscExtras;
@@ -473,20 +463,25 @@ public class NetworthExecute {
 				for (Iterator<InvItem> iterator = enderChestPets.iterator(); iterator.hasNext();) {
 					InvItem item = iterator.next();
 					if (item.getName().equalsIgnoreCase(auctionName) && item.getRarity().equalsIgnoreCase(auctionRarity)) {
-						String miscStr = "[";
+						StringBuilder miscStr = new StringBuilder("[");
 						double miscExtras = 0;
 						try {
 							List<String> extraStats = item.getExtraStats();
 							for (String extraItem : extraStats) {
 								double miscPrice = getLowestPrice(extraItem, " ");
 								miscExtras += miscPrice;
-								miscStr += "{\"name\":\"" + extraItem + "\",\"price\":\"" + simplifyNumber(miscPrice) + "\"},";
+								miscStr
+									.append("{\"name\":\"")
+									.append(extraItem)
+									.append("\",\"price\":\"")
+									.append(simplifyNumber(miscPrice))
+									.append("\"},");
 							}
 						} catch (Exception ignored) {}
-						if (miscStr.endsWith(",")) {
-							miscStr = miscStr.substring(0, miscStr.length() - 1);
+						if (miscStr.toString().endsWith(",")) {
+							miscStr = new StringBuilder(miscStr.substring(0, miscStr.length() - 1));
 						}
-						miscStr += "]";
+						miscStr.append("]");
 
 						enderChestItems.add(addItemStr(item, auctionPrice + miscExtras));
 						enderChestTotal += auctionPrice + miscExtras;
@@ -511,20 +506,25 @@ public class NetworthExecute {
 				for (Iterator<InvItem> iterator = storagePets.iterator(); iterator.hasNext();) {
 					InvItem item = iterator.next();
 					if (item.getName().equalsIgnoreCase(auctionName) && item.getRarity().equalsIgnoreCase(auctionRarity)) {
-						String miscStr = "[";
+						StringBuilder miscStr = new StringBuilder("[");
 						double miscExtras = 0;
 						try {
 							List<String> extraStats = item.getExtraStats();
 							for (String extraItem : extraStats) {
 								double miscPrice = getLowestPrice(extraItem, " ");
 								miscExtras += miscPrice;
-								miscStr += "{\"name\":\"" + extraItem + "\",\"price\":\"" + simplifyNumber(miscPrice) + "\"},";
+								miscStr
+									.append("{\"name\":\"")
+									.append(extraItem)
+									.append("\",\"price\":\"")
+									.append(simplifyNumber(miscPrice))
+									.append("\"},");
 							}
 						} catch (Exception ignored) {}
-						if (miscStr.endsWith(",")) {
-							miscStr = miscStr.substring(0, miscStr.length() - 1);
+						if (miscStr.toString().endsWith(",")) {
+							miscStr = new StringBuilder(miscStr.substring(0, miscStr.length() - 1));
 						}
-						miscStr += "]";
+						miscStr.append("]");
 
 						storageItems.add(addItemStr(item, auctionPrice + miscExtras));
 						storageTotal += auctionPrice + miscExtras;
@@ -563,20 +563,25 @@ public class NetworthExecute {
 				)
 					.getAsDouble();
 
-				String miscStr = "[";
+				StringBuilder miscStr = new StringBuilder("[");
 				double miscExtras = 0;
 				try {
 					List<String> extraStats = item.getExtraStats();
 					for (String extraItem : extraStats) {
 						double miscPrice = getLowestPrice(extraItem, " ");
 						miscExtras += miscPrice;
-						miscStr += "{\"name\":\"" + extraItem + "\",\"price\":\"" + simplifyNumber(miscPrice) + "\"},";
+						miscStr
+							.append("{\"name\":\"")
+							.append(extraItem)
+							.append("\",\"price\":\"")
+							.append(simplifyNumber(miscPrice))
+							.append("\"},");
 					}
 				} catch (Exception ignored) {}
-				if (miscStr.endsWith(",")) {
-					miscStr = miscStr.substring(0, miscStr.length() - 1);
+				if (miscStr.toString().endsWith(",")) {
+					miscStr = new StringBuilder(miscStr.substring(0, miscStr.length() - 1));
 				}
-				miscStr += "]";
+				miscStr.append("]");
 
 				storageItems.add(addItemStr(item, auctionPrice + miscExtras));
 				storageTotal += auctionPrice + miscExtras;
@@ -604,20 +609,25 @@ public class NetworthExecute {
 					item.getName().split("] ")[1].toLowerCase().trim() + rarityMap.get(item.getRarity())
 				)
 					.getAsDouble();
-				String miscStr = "[";
+				StringBuilder miscStr = new StringBuilder("[");
 				double miscExtras = 0;
 				try {
 					List<String> extraStats = item.getExtraStats();
 					for (String extraItem : extraStats) {
 						double miscPrice = getLowestPrice(extraItem, " ");
 						miscExtras += miscPrice;
-						miscStr += "{\"name\":\"" + extraItem + "\",\"price\":\"" + simplifyNumber(miscPrice) + "\"},";
+						miscStr
+							.append("{\"name\":\"")
+							.append(extraItem)
+							.append("\",\"price\":\"")
+							.append(simplifyNumber(miscPrice))
+							.append("\"},");
 					}
 				} catch (Exception ignored) {}
-				if (miscStr.endsWith(",")) {
-					miscStr = miscStr.substring(0, miscStr.length() - 1);
+				if (miscStr.toString().endsWith(",")) {
+					miscStr = new StringBuilder(miscStr.substring(0, miscStr.length() - 1));
 				}
-				miscStr += "]";
+				miscStr.append("]");
 
 				storageItems.add(addItemStr(item, auctionPrice + miscExtras));
 				storageTotal += auctionPrice + miscExtras;
@@ -645,20 +655,25 @@ public class NetworthExecute {
 					item.getName().split("] ")[1].toLowerCase().trim() + rarityMap.get(item.getRarity())
 				)
 					.getAsDouble();
-				String miscStr = "[";
+				StringBuilder miscStr = new StringBuilder("[");
 				double miscExtras = 0;
 				try {
 					List<String> extraStats = item.getExtraStats();
 					for (String extraItem : extraStats) {
 						double miscPrice = getLowestPrice(extraItem, " ");
 						miscExtras += miscPrice;
-						miscStr += "{\"name\":\"" + extraItem + "\",\"price\":\"" + simplifyNumber(miscPrice) + "\"},";
+						miscStr
+							.append("{\"name\":\"")
+							.append(extraItem)
+							.append("\",\"price\":\"")
+							.append(simplifyNumber(miscPrice))
+							.append("\"},");
 					}
 				} catch (Exception ignored) {}
-				if (miscStr.endsWith(",")) {
-					miscStr = miscStr.substring(0, miscStr.length() - 1);
+				if (miscStr.toString().endsWith(",")) {
+					miscStr = new StringBuilder(miscStr.substring(0, miscStr.length() - 1));
 				}
-				miscStr += "]";
+				miscStr.append("]");
 
 				storageItems.add(addItemStr(item, auctionPrice + miscExtras));
 				storageTotal += auctionPrice + miscExtras;
@@ -686,20 +701,25 @@ public class NetworthExecute {
 					item.getName().split("] ")[1].toLowerCase().trim() + rarityMap.get(item.getRarity())
 				)
 					.getAsDouble();
-				String miscStr = "[";
+				StringBuilder miscStr = new StringBuilder("[");
 				double miscExtras = 0;
 				try {
 					List<String> extraStats = item.getExtraStats();
 					for (String extraItem : extraStats) {
 						double miscPrice = getLowestPrice(extraItem, " ");
 						miscExtras += miscPrice;
-						miscStr += "{\"name\":\"" + extraItem + "\",\"price\":\"" + simplifyNumber(miscPrice) + "\"},";
+						miscStr
+							.append("{\"name\":\"")
+							.append(extraItem)
+							.append("\",\"price\":\"")
+							.append(simplifyNumber(miscPrice))
+							.append("\"},");
 					}
 				} catch (Exception ignored) {}
-				if (miscStr.endsWith(",")) {
-					miscStr = miscStr.substring(0, miscStr.length() - 1);
+				if (miscStr.toString().endsWith(",")) {
+					miscStr = new StringBuilder(miscStr.substring(0, miscStr.length() - 1));
 				}
-				miscStr += "]";
+				miscStr.append("]");
 
 				storageItems.add(addItemStr(item, auctionPrice + miscExtras));
 				storageTotal += auctionPrice + miscExtras;
@@ -805,7 +825,7 @@ public class NetworthExecute {
 					.getAsDouble();
 		} catch (Exception ignored) {}
 
-		String enchStr = "[";
+		StringBuilder enchStr = new StringBuilder("[");
 		try {
 			List<String> enchants = item.getEnchantsFormatted();
 			for (String enchant : enchants) {
@@ -816,45 +836,50 @@ public class NetworthExecute {
 
 					double enchantPrice = getLowestPriceEnchant(enchant.toUpperCase());
 					enchantsExtras += enchantPrice;
-					enchStr += "{\"type\":\"" + enchant + "\",\"price\":\"" + simplifyNumber(enchantPrice) + "\"},";
+					enchStr
+						.append("{\"type\":\"")
+						.append(enchant)
+						.append("\",\"price\":\"")
+						.append(simplifyNumber(enchantPrice))
+						.append("\"},");
 				} catch (Exception ignored) {}
 			}
 		} catch (Exception ignored) {}
 
-		if (enchStr.endsWith(",")) {
-			enchStr = enchStr.substring(0, enchStr.length() - 1);
+		if (enchStr.toString().endsWith(",")) {
+			enchStr = new StringBuilder(enchStr.substring(0, enchStr.length() - 1));
 		}
-		enchStr += "]";
+		enchStr.append("]");
 
 		try {
 			reforgeExtras = calculateReforgePrice(item.getModifier(), item.getRarity());
 		} catch (Exception ignored) {}
 
-		String miscStr = "[";
+		StringBuilder miscStr = new StringBuilder("[");
 		try {
 			List<String> extraStats = item.getExtraStats();
 			for (String extraItem : extraStats) {
 				double miscPrice = getLowestPrice(extraItem, " ");
 				miscExtras += miscPrice;
-				miscStr += "{\"name\":\"" + extraItem + "\",\"price\":\"" + simplifyNumber(miscPrice) + "\"},";
+				miscStr.append("{\"name\":\"").append(extraItem).append("\",\"price\":\"").append(simplifyNumber(miscPrice)).append("\"},");
 			}
 		} catch (Exception ignored) {}
 
-		if (miscStr.endsWith(",")) {
-			miscStr = miscStr.substring(0, miscStr.length() - 1);
+		if (miscStr.toString().endsWith(",")) {
+			miscStr = new StringBuilder(miscStr.substring(0, miscStr.length() - 1));
 		}
-		miscStr += "]";
+		miscStr.append("]");
 
-		String bpStr = "[";
+		StringBuilder bpStr = new StringBuilder("[");
 		try {
 			List<InvItem> backpackItems = item.getBackpackItems();
 			for (InvItem backpackItem : backpackItems) {
 				NwItemPrice bpItemPrice = calculateBpItemPrice(backpackItem, location);
 				backpackExtras += bpItemPrice.price;
-				bpStr += (bpItemPrice.json != null ? bpItemPrice.json : "");
+				bpStr.append(bpItemPrice.json != null ? bpItemPrice.json : "");
 			}
 		} catch (Exception ignored) {}
-		bpStr += "]";
+		bpStr.append("]");
 
 		double totalPrice =
 			itemCount *
@@ -961,7 +986,7 @@ public class NetworthExecute {
 					.getAsDouble();
 		} catch (Exception ignored) {}
 
-		String enchStr = "[";
+		StringBuilder enchStr = new StringBuilder("[");
 		try {
 			List<String> enchants = item.getEnchantsFormatted();
 			for (String enchant : enchants) {
@@ -972,34 +997,39 @@ public class NetworthExecute {
 
 					double enchantPrice = getLowestPriceEnchant(enchant.toUpperCase());
 					enchantsExtras += enchantPrice;
-					enchStr += "{\"type\":\"" + enchant + "\",\"price\":\"" + simplifyNumber(enchantPrice) + "\"},";
+					enchStr
+						.append("{\"type\":\"")
+						.append(enchant)
+						.append("\",\"price\":\"")
+						.append(simplifyNumber(enchantPrice))
+						.append("\"},");
 				} catch (Exception ignored) {}
 			}
 		} catch (Exception ignored) {}
 
-		if (enchStr.endsWith(",")) {
-			enchStr = enchStr.substring(0, enchStr.length() - 1);
+		if (enchStr.toString().endsWith(",")) {
+			enchStr = new StringBuilder(enchStr.substring(0, enchStr.length() - 1));
 		}
-		enchStr += "]";
+		enchStr.append("]");
 
 		try {
 			reforgeExtras = calculateReforgePrice(item.getModifier(), item.getRarity());
 		} catch (Exception ignored) {}
 
-		String miscStr = "[";
+		StringBuilder miscStr = new StringBuilder("[");
 		try {
 			List<String> extraStats = item.getExtraStats();
 			for (String extraItem : extraStats) {
 				double miscPrice = getLowestPrice(extraItem, " ");
 				miscExtras += miscPrice;
-				miscStr += "{\"name\":\"" + extraItem + "\",\"price\":\"" + simplifyNumber(miscPrice) + "\"},";
+				miscStr.append("{\"name\":\"").append(extraItem).append("\",\"price\":\"").append(simplifyNumber(miscPrice)).append("\"},");
 			}
 		} catch (Exception ignored) {}
 
-		if (miscStr.endsWith(",")) {
-			miscStr = miscStr.substring(0, miscStr.length() - 1);
+		if (miscStr.toString().endsWith(",")) {
+			miscStr = new StringBuilder(miscStr.substring(0, miscStr.length() - 1));
 		}
-		miscStr += "]";
+		miscStr.append("]");
 
 		double totalPrice =
 			itemCount * (itemCost + recombobulatedExtra + hbpExtras + enchantsExtras + fumingExtras + reforgeExtras + miscExtras);

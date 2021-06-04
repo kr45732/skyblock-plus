@@ -1,20 +1,13 @@
 package com.skyblockplus.link;
 
 import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Utils.HYPIXEL_API_KEY;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.errorMessage;
-import static com.skyblockplus.utils.Utils.getJson;
-import static com.skyblockplus.utils.Utils.getPlayerDiscordInfo;
-import static com.skyblockplus.utils.Utils.globalCooldown;
-import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.utils.Utils.loadingEmbed;
-import static com.skyblockplus.utils.Utils.logCommand;
+import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.api.discordserversettings.automatedguildroles.GuildRole;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
 import java.time.Instant;
@@ -30,31 +23,6 @@ public class LinkAccountCommand extends Command {
 	public LinkAccountCommand() {
 		this.name = "link";
 		this.cooldown = globalCooldown;
-	}
-
-	@Override
-	protected void execute(CommandEvent event) {
-		new Thread(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-				String content = event.getMessage().getContentRaw();
-				String[] args = content.split(" ");
-
-				logCommand(event.getGuild(), event.getAuthor(), content);
-
-				if (args.length == 2) {
-					ebMessage.editMessage(linkAccount(args[1], event.getAuthor(), event.getGuild()).build()).queue();
-					return;
-				} else if (args.length == 1) {
-					ebMessage.editMessage(getLinkedAccount(event.getAuthor()).build()).queue();
-					return;
-				}
-
-				ebMessage.editMessage(errorMessage(this.name).build()).queue();
-			}
-		)
-			.start();
 	}
 
 	public static EmbedBuilder linkAccount(String username, User user, Guild guild) {
@@ -92,7 +60,7 @@ public class LinkAccountCommand extends Command {
 								List<String> settingsGuildId = database
 									.getAllGuildRoles(guild.getId())
 									.stream()
-									.map(o1 -> o1.getGuildId())
+									.map(GuildRole::getGuildId)
 									.collect(Collectors.toList());
 								JsonElement playerGuild = higherDepth(
 									getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&player=" + playerInfo.minecraftUuid),
@@ -156,5 +124,30 @@ public class LinkAccountCommand extends Command {
 		} catch (Exception e) {
 			return defaultEmbed("Error").setDescription("`" + user.getAsTag() + "` is not linked");
 		}
+	}
+
+	@Override
+	protected void execute(CommandEvent event) {
+		new Thread(
+			() -> {
+				EmbedBuilder eb = loadingEmbed();
+				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				String content = event.getMessage().getContentRaw();
+				String[] args = content.split(" ");
+
+				logCommand(event.getGuild(), event.getAuthor(), content);
+
+				if (args.length == 2) {
+					ebMessage.editMessage(linkAccount(args[1], event.getAuthor(), event.getGuild()).build()).queue();
+					return;
+				} else if (args.length == 1) {
+					ebMessage.editMessage(getLinkedAccount(event.getAuthor()).build()).queue();
+					return;
+				}
+
+				ebMessage.editMessage(errorMessage(this.name).build()).queue();
+			}
+		)
+			.start();
 	}
 }

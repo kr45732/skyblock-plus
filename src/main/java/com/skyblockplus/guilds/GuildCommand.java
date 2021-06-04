@@ -30,60 +30,6 @@ public class GuildCommand extends Command {
 		this.aliases = new String[] { "g" };
 	}
 
-	@Override
-	protected void execute(CommandEvent event) {
-		new Thread(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-				String content = event.getMessage().getContentRaw();
-				String[] args = content.split(" ");
-
-				logCommand(event.getGuild(), event.getAuthor(), content);
-
-				if (args.length == 3 && ("experience".equals(args[1]) || "exp".equals(args[1]))) {
-					if (args[2].toLowerCase().startsWith("u:")) {
-						String username = args[2].split(":")[1];
-						eb = getGuildExp(username, event.getAuthor(), event.getChannel(), null);
-						if (eb == null) {
-							ebMessage.delete().queue();
-						} else {
-							ebMessage.editMessage(eb.build()).queue();
-						}
-						return;
-					}
-				} else if (args.length >= 3 && "info".equals(args[1])) {
-					if (args[2].toLowerCase().startsWith("u:")) {
-						String usernameInfo = args[2].split(":")[1];
-						ebMessage.editMessage(getGuildInfo(usernameInfo).build()).queue();
-						return;
-					} else if (args[2].toLowerCase().startsWith("g:")) {
-						String guildName = content.split(":")[1];
-						ebMessage.editMessage(guildInfoFromGuildName(guildName).build()).queue();
-						return;
-					}
-				} else if (args.length == 3 && "members".equals(args[1])) {
-					if (args[2].toLowerCase().startsWith("u:")) {
-						String usernameMembers = args[2].split(":")[1];
-						eb = getGuildMembers(usernameMembers, event.getAuthor(), event.getChannel(), null);
-						if (eb == null) {
-							ebMessage.delete().queue();
-						} else {
-							ebMessage.editMessage(eb.build()).queue();
-						}
-						return;
-					}
-				} else if (args.length == 2) {
-					ebMessage.editMessage(getGuildPlayer(args[1]).build()).queue();
-					return;
-				}
-
-				ebMessage.editMessage(errorMessage(this.name).build()).queue();
-			}
-		)
-			.start();
-	}
-
 	public static EmbedBuilder getGuildExp(String username, User user, MessageChannel channel, InteractionHook hook) {
 		UsernameUuidStruct uuidUsername = usernameToUuid(username);
 		if (uuidUsername == null) {
@@ -416,5 +362,59 @@ public class GuildCommand extends Command {
 				guildLevel++;
 			}
 		}
+	}
+
+	@Override
+	protected void execute(CommandEvent event) {
+		new Thread(
+			() -> {
+				EmbedBuilder eb = loadingEmbed();
+				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				String content = event.getMessage().getContentRaw();
+				String[] args = content.split(" ");
+
+				logCommand(event.getGuild(), event.getAuthor(), content);
+
+				if (args.length == 3 && ("experience".equals(args[1]) || "exp".equals(args[1]))) {
+					if (args[2].toLowerCase().startsWith("u:")) {
+						String username = args[2].split(":")[1];
+						eb = getGuildExp(username, event.getAuthor(), event.getChannel(), null);
+						if (eb == null) {
+							ebMessage.delete().queue();
+						} else {
+							ebMessage.editMessage(eb.build()).queue();
+						}
+						return;
+					}
+				} else if (args.length >= 3 && "info".equals(args[1])) {
+					if (args[2].toLowerCase().startsWith("u:")) {
+						String usernameInfo = args[2].split(":")[1];
+						ebMessage.editMessage(getGuildInfo(usernameInfo).build()).queue();
+						return;
+					} else if (args[2].toLowerCase().startsWith("g:")) {
+						String guildName = content.split(":")[1];
+						ebMessage.editMessage(guildInfoFromGuildName(guildName).build()).queue();
+						return;
+					}
+				} else if (args.length == 3 && "members".equals(args[1])) {
+					if (args[2].toLowerCase().startsWith("u:")) {
+						String usernameMembers = args[2].split(":")[1];
+						eb = getGuildMembers(usernameMembers, event.getAuthor(), event.getChannel(), null);
+						if (eb == null) {
+							ebMessage.delete().queue();
+						} else {
+							ebMessage.editMessage(eb.build()).queue();
+						}
+						return;
+					}
+				} else if (args.length == 2) {
+					ebMessage.editMessage(getGuildPlayer(args[1]).build()).queue();
+					return;
+				}
+
+				ebMessage.editMessage(errorMessage(this.name).build()).queue();
+			}
+		)
+			.start();
 	}
 }

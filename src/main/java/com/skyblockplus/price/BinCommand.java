@@ -23,27 +23,6 @@ public class BinCommand extends Command {
 		this.aliases = new String[] { "lbin" };
 	}
 
-	@Override
-	protected void execute(CommandEvent event) {
-		new Thread(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-				String args = event.getMessage().getContentRaw();
-
-				logCommand(event.getGuild(), event.getAuthor(), args);
-
-				if (args.split(" ").length >= 2) {
-					ebMessage.editMessage(getLowestBin(args.replace(BOT_PREFIX + "bin ", "")).build()).queue();
-					return;
-				}
-
-				ebMessage.editMessage(errorMessage(this.name).build()).queue();
-			}
-		)
-			.start();
-	}
-
 	public static EmbedBuilder getLowestBin(String item) {
 		JsonElement lowestBinJson = getJson("https://moulberry.codes/lowestbin.json");
 		if (lowestBinJson == null) {
@@ -228,5 +207,26 @@ public class BinCommand extends Command {
 		}
 
 		return defaultEmbed("No bin found for " + capitalizeString(item.toLowerCase()));
+	}
+
+	@Override
+	protected void execute(CommandEvent event) {
+		new Thread(
+			() -> {
+				EmbedBuilder eb = loadingEmbed();
+				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				String args = event.getMessage().getContentRaw();
+
+				logCommand(event.getGuild(), event.getAuthor(), args);
+
+				if (args.split(" ").length >= 2) {
+					ebMessage.editMessage(getLowestBin(args.replace(BOT_PREFIX + "bin ", "")).build()).queue();
+					return;
+				}
+
+				ebMessage.editMessage(errorMessage(this.name).build()).queue();
+			}
+		)
+			.start();
 	}
 }

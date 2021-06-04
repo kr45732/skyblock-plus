@@ -205,7 +205,6 @@ public class SettingsCommand extends Command {
 							false
 						);
 					} else if (args.length == 3) {
-						eb = defaultEmbed("Settings for " + event.getGuild().getName());
 						JsonElement applySettings = database.getApplySettings(event.getGuild().getId(), args[2]);
 						if (applySettings != null && !applySettings.isJsonNull()) {
 							eb = getCurrentApplySettings(applySettings);
@@ -351,7 +350,7 @@ public class SettingsCommand extends Command {
 								eb = defaultEmbed("Error", null).setDescription("Invalid setting");
 								break;
 						}
-					} else if (content.split(" ").length == 5 && args[2].equals("role")) {}
+					}
 				} else if ((args.length >= 2) && args[1].equals("guild")) {
 					if (args.length == 2) {
 						eb = defaultEmbed("All Guild Roles Settings");
@@ -405,47 +404,45 @@ public class SettingsCommand extends Command {
 						JsonElement guildRoleSettings = database.getGuildRoleSettings(event.getGuild().getId(), args[2]);
 						if (guildRoleSettings == null || guildRoleSettings.isJsonNull()) {
 							eb = defaultEmbed("Error", null).setDescription("Invalid name");
-						}
-
-						switch (args[3]) {
-							case "set":
-								eb = setGuildRoleId(args[2], args[4]);
-								break;
-							case "role":
-								eb = setGuildRoleName(args[2], args[4]);
-								break;
-							case "enable":
-								if (args[4].equals("role")) {
-									eb = setGuildRoleEnable(args[2], "true");
-								} else if (args[4].equals("rank")) {
-									eb = setGuildRankEnable(args[2], "true");
-								} else {
+						} else {
+							switch (args[3]) {
+								case "set":
+									eb = setGuildRoleId(args[2], args[4]);
+									break;
+								case "role":
+									eb = setGuildRoleName(args[2], args[4]);
+									break;
+								case "enable":
+									if (args[4].equals("role")) {
+										eb = setGuildRoleEnable(args[2], "true");
+									} else if (args[4].equals("rank")) {
+										eb = setGuildRankEnable(args[2], "true");
+									} else {
+										eb = defaultEmbed("Error").setDescription("Invalid setting");
+									}
+									break;
+								case "disable":
+									if (args[4].equals("role")) {
+										eb = setGuildRoleEnable(args[4], "false");
+									} else if (args[4].equals("rank")) {
+										eb = setGuildRankEnable(args[4], "false");
+									} else {
+										eb = defaultEmbed("Error").setDescription("Invalid setting");
+									}
+									break;
+								case "remove":
+									eb = removeGuildRank(args[2], args[4]);
+									break;
+								default:
 									eb = defaultEmbed("Error").setDescription("Invalid setting");
-								}
-								break;
-							case "disable":
-								if (args[4].equals("role")) {
-									eb = setGuildRoleEnable(args[4], "false");
-								} else if (args[4].equals("rank")) {
-									eb = setGuildRankEnable(args[4], "false");
-								} else {
-									eb = defaultEmbed("Error").setDescription("Invalid setting");
-								}
-								break;
-							case "remove":
-								eb = removeGuildRank(args[2], args[4]);
-								break;
-							default:
-								eb = defaultEmbed("Error").setDescription("Invalid setting");
-								break;
+									break;
+							}
 						}
 					} else if (args.length == 6) {
 						JsonElement guildRoleSettings = database.getGuildRoleSettings(event.getGuild().getId(), args[2]);
 						if (guildRoleSettings == null || guildRoleSettings.isJsonNull()) {
 							eb = defaultEmbed("Error", null).setDescription("Invalid name");
-						}
-
-						if (args[3].equals("add")) {
+						} else if (args[3].equals("add")) {
 							eb = addGuildRank(args[2], args[4], args[5]);
 						} else {
 							eb = defaultEmbed("Error").setDescription("Invalid setting");
@@ -552,7 +549,9 @@ public class SettingsCommand extends Command {
 					.append("\n• ")
 					.append(higherDepth(guildRank, "minecraftRoleName").getAsString())
 					.append(" - ")
-					.append("<@&" + higherDepth(guildRank, "discordRoleId").getAsString() + ">");
+					.append("<@&")
+					.append(higherDepth(guildRank, "discordRoleId").getAsString())
+					.append(">");
 			}
 		} catch (Exception ignored) {}
 
@@ -948,13 +947,14 @@ public class SettingsCommand extends Command {
 					}
 				case "guild_ranks":
 					{
-						ebFieldString.append(
-							"**If a player is in the guild set in `" +
-							BOT_PREFIX +
-							"settings guild`, they will be given the corresponding rank role set there**\nNote: this role can only be enabled, disabled, and linked here. To modify guild ranks use `" +
-							BOT_PREFIX +
-							"settings guild [name]`"
-						);
+						ebFieldString
+							.append("**If a player is in the guild set in `")
+							.append(BOT_PREFIX)
+							.append(
+								"settings guild`, they will be given the corresponding rank role set there**\nNote: this role can only be enabled, disabled, and linked here. To modify guild ranks use `"
+							)
+							.append(BOT_PREFIX)
+							.append("settings guild [name]`");
 						break;
 					}
 				case "all_slayer_nine":
@@ -986,18 +986,21 @@ public class SettingsCommand extends Command {
 						String rName = higherDepth(roleLevel, "value").getAsString();
 						ebFieldString
 							.append("\n• ")
-							.append(rName + " (view the ranks in " + BOT_PREFIX + "`settings guild " + rName + "`)");
+							.append(rName)
+							.append(" (view the ranks in ")
+							.append(BOT_PREFIX)
+							.append("`settings guild ")
+							.append(rName)
+							.append("`)");
 					}
 				}
 			} else if (isOneLevelRole(roleName)) {
 				try {
 					ebFieldString
 						.append("\n• default - ")
-						.append(
-							"<@&" +
-							higherDepth(higherDepth(currentRoleSettings, "levels").getAsJsonArray().get(0), "roleId").getAsString() +
-							">"
-						);
+						.append("<@&")
+						.append(higherDepth(higherDepth(currentRoleSettings, "levels").getAsJsonArray().get(0), "roleId").getAsString())
+						.append(">");
 				} catch (Exception ignored) {}
 				pageTitles.add(roleName + " (__one level role__)");
 			} else {
@@ -1013,7 +1016,9 @@ public class SettingsCommand extends Command {
 							.append("\n• ")
 							.append(higherDepth(guildJson, "guild.name").getAsString())
 							.append(" - ")
-							.append("<@&" + higherDepth(roleLevel, "roleId").getAsString() + ">");
+							.append("<@&")
+							.append(higherDepth(roleLevel, "roleId").getAsString())
+							.append(">");
 					}
 				} else {
 					for (JsonElement roleLevel : higherDepth(currentRoleSettings, "levels").getAsJsonArray()) {
@@ -1021,7 +1026,9 @@ public class SettingsCommand extends Command {
 							.append("\n• ")
 							.append(higherDepth(roleLevel, "value").getAsString())
 							.append(" - ")
-							.append("<@&" + higherDepth(roleLevel, "roleId").getAsString() + ">");
+							.append("<@&")
+							.append(higherDepth(roleLevel, "roleId").getAsString())
+							.append(">");
 					}
 				}
 
@@ -1501,14 +1508,14 @@ public class SettingsCommand extends Command {
 			return defaultEmbed("Error").setDescription("Name cannot be more than 25 letters");
 		}
 
-		List<AutomatedApplication> currentApplys = database.getAllApplySettings(event.getGuild().getId());
-		currentApplys.removeIf(o1 -> o1.getName() == null);
+		List<AutomatedApplication> currentApplications = database.getAllApplySettings(event.getGuild().getId());
+		currentApplications.removeIf(o1 -> o1.getName() == null);
 
-		if (currentApplys.size() == 2) {
+		if (currentApplications.size() == 2) {
 			return defaultEmbed("Error").setDescription("You can reached the max amount of apply guilds (2/2)");
 		}
 
-		for (AutomatedApplication currentApply : currentApplys) {
+		for (AutomatedApplication currentApply : currentApplications) {
 			if (currentApply.getName().equalsIgnoreCase(name)) {
 				return defaultEmbed("Error").setDescription(name + " name is taken");
 			}
@@ -1875,16 +1882,16 @@ public class SettingsCommand extends Command {
 				return reqsString.toString();
 			} else if (settingName.equals("verifiedRoles")) {
 				JsonArray roles = higherDepth(jsonSettings, settingName).getAsJsonArray();
-				String ebStr = "";
+				StringBuilder ebStr = new StringBuilder();
 				for (JsonElement role : roles) {
-					ebStr += "<@&" + role.getAsString() + ">" + " ";
+					ebStr.append("<@&").append(role.getAsString()).append(">").append(" ");
 				}
 
 				if (ebStr.length() == 0) {
-					ebStr = "None";
+					ebStr = new StringBuilder("None");
 				}
 
-				return ebStr;
+				return ebStr.toString();
 			}
 
 			String currentSettingValue = higherDepth(jsonSettings, settingName).getAsString();

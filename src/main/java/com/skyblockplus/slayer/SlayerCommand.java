@@ -16,31 +16,6 @@ public class SlayerCommand extends Command {
 		this.cooldown = globalCooldown;
 	}
 
-	@Override
-	protected void execute(CommandEvent event) {
-		new Thread(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-				String content = event.getMessage().getContentRaw();
-				String[] args = content.split(" ");
-
-				logCommand(event.getGuild(), event.getAuthor(), content);
-
-				if (args.length == 3) {
-					ebMessage.editMessage(getPlayerSlayer(args[1], args[2]).build()).queue();
-					return;
-				} else if (args.length == 2) {
-					ebMessage.editMessage(getPlayerSlayer(args[1], null).build()).queue();
-					return;
-				}
-
-				ebMessage.editMessage(errorMessage(this.name).build()).queue();
-			}
-		)
-			.start();
-	}
-
 	public static EmbedBuilder getPlayerSlayer(String username, String profileName) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
@@ -194,5 +169,30 @@ public class SlayerCommand extends Command {
 			return eb;
 		}
 		return defaultEmbed("Unable to fetch player data");
+	}
+
+	@Override
+	protected void execute(CommandEvent event) {
+		new Thread(
+			() -> {
+				EmbedBuilder eb = loadingEmbed();
+				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				String content = event.getMessage().getContentRaw();
+				String[] args = content.split(" ");
+
+				logCommand(event.getGuild(), event.getAuthor(), content);
+
+				if (args.length == 3) {
+					ebMessage.editMessage(getPlayerSlayer(args[1], args[2]).build()).queue();
+					return;
+				} else if (args.length == 2) {
+					ebMessage.editMessage(getPlayerSlayer(args[1], null).build()).queue();
+					return;
+				}
+
+				ebMessage.editMessage(errorMessage(this.name).build()).queue();
+			}
+		)
+			.start();
 	}
 }

@@ -1,6 +1,6 @@
 package com.skyblockplus.dungeons;
 
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.getEssenceCostsJson;
 
 import com.skyblockplus.utils.slashcommands.SlashCommand;
 import com.skyblockplus.utils.slashcommands.SlashCommandExecutedEvent;
@@ -22,7 +22,7 @@ public class EssenceSlashCommand extends SlashCommand {
 
 				System.out.println(subcommandName + " - " + itemName);
 
-				EmbedBuilder eb = null;
+				EmbedBuilder eb;
 				if (subcommandName.equals("upgrade")) {
 					eb = event.disabledCommandMessage();
 				} else if (subcommandName.equals("information")) {

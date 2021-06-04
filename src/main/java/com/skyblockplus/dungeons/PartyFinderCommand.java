@@ -16,6 +16,25 @@ public class PartyFinderCommand extends Command {
 		this.aliases = new String[] { "pf" };
 	}
 
+	public static EmbedBuilder getPlayerDungeonInfo(String username, String profileName) {
+		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+		if (player.isValid()) {
+			EmbedBuilder eb = player.defaultPlayerEmbed();
+			eb.setDescription("**Catacombs Level:** " + roundAndFormat(player.getCatacombsLevel()));
+			eb.appendDescription("\n**Secrets:** " + formatNumber(player.getDungeonSecrets()));
+			eb.appendDescription("\n**Selected Class:** " + player.getSelectedDungeonClass());
+			eb.appendDescription(player.getNecronBlade());
+			eb.appendDescription(player.getFastestF7Time());
+			eb.appendDescription(
+				player.getBonemerang() != -1
+					? ((player.getBonemerang() == 1 ? "\n**Bonemerang:** " : "\n**Bonemerangs:** ") + player.getBonemerang())
+					: ""
+			);
+			return eb;
+		}
+		return defaultEmbed("Unable to fetch player data");
+	}
+
 	@Override
 	protected void execute(CommandEvent event) {
 		new Thread(
@@ -40,24 +59,5 @@ public class PartyFinderCommand extends Command {
 			}
 		)
 			.start();
-	}
-
-	public static EmbedBuilder getPlayerDungeonInfo(String username, String profileName) {
-		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
-		if (player.isValid()) {
-			EmbedBuilder eb = player.defaultPlayerEmbed();
-			eb.setDescription("**Catacombs Level:** " + roundAndFormat(player.getCatacombsLevel()));
-			eb.appendDescription("\n**Secrets:** " + formatNumber(player.getDungeonSecrets()));
-			eb.appendDescription("\n**Selected Class:** " + player.getSelectedDungeonClass());
-			eb.appendDescription(player.getNecronBlade());
-			eb.appendDescription(player.getFastestF7Time());
-			eb.appendDescription(
-				player.getBonemerang() != -1
-					? ((player.getBonemerang() == 1 ? "\n**Bonemerang:** " : "\n**Bonemerangs:** ") + player.getBonemerang())
-					: ""
-			);
-			return eb;
-		}
-		return defaultEmbed("Unable to fetch player data");
 	}
 }

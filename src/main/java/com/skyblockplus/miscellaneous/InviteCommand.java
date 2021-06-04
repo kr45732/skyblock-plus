@@ -1,8 +1,6 @@
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.globalCooldown;
-import static com.skyblockplus.utils.Utils.logCommand;
+import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -15,18 +13,6 @@ public class InviteCommand extends Command {
 		this.cooldown = globalCooldown;
 	}
 
-	@Override
-	protected void execute(CommandEvent event) {
-		new Thread(
-			() -> {
-				logCommand(event.getGuild(), event.getAuthor(), event.getMessage().getContentRaw());
-
-				event.getChannel().sendMessage(getInvite().build()).queue();
-			}
-		)
-			.start();
-	}
-
 	public static EmbedBuilder getInvite() {
 		EmbedBuilder eb = defaultEmbed("Invite Skyblock Plus");
 		eb.addField(
@@ -37,5 +23,17 @@ public class InviteCommand extends Command {
 		eb.addField("Join my server", "[Click here](https://discord.gg/DpcCAwMXwp)", false);
 		eb.setThumbnail("https://cdn.discordapp.com/attachments/803419567958392832/825768516636508160/sb_loading.gif");
 		return eb;
+	}
+
+	@Override
+	protected void execute(CommandEvent event) {
+		new Thread(
+			() -> {
+				logCommand(event.getGuild(), event.getAuthor(), event.getMessage().getContentRaw());
+
+				event.getChannel().sendMessage(getInvite().build()).queue();
+			}
+		)
+			.start();
 	}
 }

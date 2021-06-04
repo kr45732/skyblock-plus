@@ -1,6 +1,7 @@
 package com.skyblockplus.utils.slashcommands;
 
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.logCommand;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -12,9 +13,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 public class SlashCommandExecutedEvent {
 
-	private SlashCommandEvent event;
-	private InteractionHook hook;
-	private SlashCommandClient slashCommandClient;
+	private final SlashCommandEvent event;
+	private final InteractionHook hook;
+	private final SlashCommandClient slashCommandClient;
 
 	public SlashCommandExecutedEvent(SlashCommandEvent event, SlashCommandClient slashCommandClient) {
 		this.event = event;

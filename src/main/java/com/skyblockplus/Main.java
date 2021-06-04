@@ -2,84 +2,23 @@ package com.skyblockplus;
 
 import static com.skyblockplus.utils.MainClassUtils.cacheApplyGuildUsers;
 import static com.skyblockplus.utils.MainClassUtils.closeAsyncHttpClient;
-import static com.skyblockplus.utils.Utils.BOT_PREFIX;
-import static com.skyblockplus.utils.Utils.BOT_TOKEN;
-import static com.skyblockplus.utils.Utils.setApplicationSettings;
+import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.skyblockplus.dev.DeleteMessagesCommand;
-import com.skyblockplus.dev.EmojiMapServerCommand;
-import com.skyblockplus.dev.EvaluateCommand;
-import com.skyblockplus.dev.GetAllGuildsIn;
-import com.skyblockplus.dev.GetEventListenersCommand;
-import com.skyblockplus.dev.GetSettingsFile;
-import com.skyblockplus.dev.GetThreadPools;
-import com.skyblockplus.dev.InstantTimeNow;
-import com.skyblockplus.dev.LinkedUserDev;
-import com.skyblockplus.dev.PlaceholderCommand;
-import com.skyblockplus.dev.QuickSetupTestCommand;
-import com.skyblockplus.dev.ShutdownCommand;
-import com.skyblockplus.dev.UpdateSlashCommands;
-import com.skyblockplus.dev.UuidCommand;
-import com.skyblockplus.dungeons.CatacombsCommand;
-import com.skyblockplus.dungeons.DungeonsSlashCommand;
-import com.skyblockplus.dungeons.EssenceCommand;
-import com.skyblockplus.dungeons.EssenceSlashCommand;
-import com.skyblockplus.dungeons.PartyFinderCommand;
-import com.skyblockplus.dungeons.PartyFinderSlashCommand;
+import com.skyblockplus.dev.*;
+import com.skyblockplus.dungeons.*;
 import com.skyblockplus.eventlisteners.MainListener;
 import com.skyblockplus.eventlisteners.skyblockevent.SkyblockEventCommand;
-import com.skyblockplus.guilds.GuildCommand;
-import com.skyblockplus.guilds.GuildKickerCommand;
-import com.skyblockplus.guilds.GuildLeaderboardCommand;
-import com.skyblockplus.guilds.GuildRequirementsCommand;
-import com.skyblockplus.guilds.GuildSlashCommand;
-import com.skyblockplus.inventory.EnderChestCommand;
-import com.skyblockplus.inventory.InventoryCommand;
-import com.skyblockplus.inventory.PetsCommand;
-import com.skyblockplus.inventory.SacksCommand;
-import com.skyblockplus.inventory.TalismanBagCommand;
-import com.skyblockplus.inventory.WardrobeCommand;
+import com.skyblockplus.guilds.*;
+import com.skyblockplus.inventory.*;
 import com.skyblockplus.link.LinkAccountCommand;
 import com.skyblockplus.link.LinkSlashCommand;
 import com.skyblockplus.link.UnlinkAccountCommand;
 import com.skyblockplus.link.UnlinkSlashCommand;
-import com.skyblockplus.miscellaneous.BaldCommand;
-import com.skyblockplus.miscellaneous.BankCommand;
-import com.skyblockplus.miscellaneous.BankSlashcommand;
-import com.skyblockplus.miscellaneous.CategoriesCommand;
-import com.skyblockplus.miscellaneous.HelpCommand;
-import com.skyblockplus.miscellaneous.HelpSlashCommand;
-import com.skyblockplus.miscellaneous.HypixelCommand;
-import com.skyblockplus.miscellaneous.HypixelSlashCommand;
-import com.skyblockplus.miscellaneous.InformationCommand;
-import com.skyblockplus.miscellaneous.InformationSlashCommand;
-import com.skyblockplus.miscellaneous.InviteCommand;
-import com.skyblockplus.miscellaneous.InviteSlashCommand;
-import com.skyblockplus.miscellaneous.MissingTalismansCommand;
-import com.skyblockplus.miscellaneous.MissingTalismansSlashCommand;
-import com.skyblockplus.miscellaneous.ProfilesCommand;
-import com.skyblockplus.miscellaneous.ProfilesSlashCommand;
-import com.skyblockplus.miscellaneous.ReloadCommand;
-import com.skyblockplus.miscellaneous.RoleCommands;
-import com.skyblockplus.miscellaneous.RolesSlashCommand;
-import com.skyblockplus.miscellaneous.SkyblockCommand;
+import com.skyblockplus.miscellaneous.*;
 import com.skyblockplus.networth.NetworthCommand;
-import com.skyblockplus.price.AuctionCommand;
-import com.skyblockplus.price.AuctionsSlashCommand;
-import com.skyblockplus.price.AverageAuctionCommand;
-import com.skyblockplus.price.AverageAuctionSlashCommand;
-import com.skyblockplus.price.BazaarCommand;
-import com.skyblockplus.price.BazaarSlashCommand;
-import com.skyblockplus.price.BidsCommand;
-import com.skyblockplus.price.BidsSlashCommand;
-import com.skyblockplus.price.BinCommand;
-import com.skyblockplus.price.BinSlashCommand;
-import com.skyblockplus.price.BitsCommand;
-import com.skyblockplus.price.BitsSlashCommand;
-import com.skyblockplus.price.QueryAuctionCommand;
-import com.skyblockplus.price.QueryAuctionsSlashCommand;
+import com.skyblockplus.price.*;
 import com.skyblockplus.settings.SettingsCommand;
 import com.skyblockplus.settings.SetupCommand;
 import com.skyblockplus.settings.SpringDatabaseComponent;
@@ -185,7 +124,7 @@ public class Main {
 		);
 
 		SlashCommandClient slashCommands = new SlashCommandClient();
-		slashCommands.addSlashCommmands(
+		slashCommands.addSlashCommands(
 			new InviteSlashCommand(),
 			new InformationSlashCommand(),
 			new LinkSlashCommand(),
@@ -205,7 +144,7 @@ public class Main {
 			new QueryAuctionsSlashCommand(),
 			new BitsSlashCommand(),
 			new RolesSlashCommand(),
-			new BankSlashcommand(),
+			new BankSlashCommand(),
 			new WeightSlashCommand(),
 			new HypixelSlashCommand(),
 			new ProfilesSlashCommand(),

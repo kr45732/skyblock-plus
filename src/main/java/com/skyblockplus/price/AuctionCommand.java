@@ -1,19 +1,7 @@
 package com.skyblockplus.price;
 
 import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.Utils.HYPIXEL_API_KEY;
-import static com.skyblockplus.utils.Utils.capitalizeString;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.defaultPaginator;
-import static com.skyblockplus.utils.Utils.errorMessage;
-import static com.skyblockplus.utils.Utils.getJson;
-import static com.skyblockplus.utils.Utils.globalCooldown;
-import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.utils.Utils.loadingEmbed;
-import static com.skyblockplus.utils.Utils.logCommand;
-import static com.skyblockplus.utils.Utils.parseMcCodes;
-import static com.skyblockplus.utils.Utils.simplifyNumber;
-import static com.skyblockplus.utils.Utils.usernameToUuid;
+import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -37,34 +25,6 @@ public class AuctionCommand extends Command {
 		this.name = "auction";
 		this.cooldown = globalCooldown;
 		this.aliases = new String[] { "ah", "auctions" };
-	}
-
-	@Override
-	protected void execute(CommandEvent event) {
-		new Thread(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-				String content = event.getMessage().getContentRaw();
-				String[] args = content.split(" ");
-
-				logCommand(event.getGuild(), event.getAuthor(), content);
-
-				if (args.length == 2) {
-					eb = getPlayerAuction(args[1], event.getAuthor(), event.getChannel(), null);
-
-					if (eb == null) {
-						ebMessage.delete().queue();
-					} else {
-						ebMessage.editMessage(eb.build()).queue();
-					}
-					return;
-				}
-
-				ebMessage.editMessage(errorMessage(this.name).build()).queue();
-			}
-		)
-			.start();
 	}
 
 	public static EmbedBuilder getPlayerAuction(String username, User user, MessageChannel channel, InteractionHook hook) {
@@ -171,5 +131,33 @@ public class AuctionCommand extends Command {
 		);
 		eb.setTitle("No auctions found for " + usernameUuidStruct.playerUsername, null);
 		return eb;
+	}
+
+	@Override
+	protected void execute(CommandEvent event) {
+		new Thread(
+			() -> {
+				EmbedBuilder eb = loadingEmbed();
+				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				String content = event.getMessage().getContentRaw();
+				String[] args = content.split(" ");
+
+				logCommand(event.getGuild(), event.getAuthor(), content);
+
+				if (args.length == 2) {
+					eb = getPlayerAuction(args[1], event.getAuthor(), event.getChannel(), null);
+
+					if (eb == null) {
+						ebMessage.delete().queue();
+					} else {
+						ebMessage.editMessage(eb.build()).queue();
+					}
+					return;
+				}
+
+				ebMessage.editMessage(errorMessage(this.name).build()).queue();
+			}
+		)
+			.start();
 	}
 }

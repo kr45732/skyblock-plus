@@ -1,18 +1,6 @@
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.Utils.HYPIXEL_API_KEY;
-import static com.skyblockplus.utils.Utils.capitalizeString;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.errorMessage;
-import static com.skyblockplus.utils.Utils.formatNumber;
-import static com.skyblockplus.utils.Utils.getJson;
-import static com.skyblockplus.utils.Utils.getJsonKeys;
-import static com.skyblockplus.utils.Utils.globalCooldown;
-import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.utils.Utils.loadingEmbed;
-import static com.skyblockplus.utils.Utils.logCommand;
-import static com.skyblockplus.utils.Utils.roundAndFormat;
-import static com.skyblockplus.utils.Utils.usernameToUuid;
+import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
@@ -31,31 +19,6 @@ public class HypixelCommand extends Command {
 	public HypixelCommand() {
 		this.name = "hypixel";
 		this.cooldown = globalCooldown;
-	}
-
-	@Override
-	protected void execute(CommandEvent event) {
-		new Thread(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-				String content = event.getMessage().getContentRaw();
-				String[] args = content.split(" ");
-
-				logCommand(event.getGuild(), event.getAuthor(), content);
-
-				if (args.length == 3 && args[1].equals("parkour")) {
-					ebMessage.editMessage(getParkourStats(args[2]).build()).queue();
-					return;
-				} else if (args.length == 2) {
-					ebMessage.editMessage(getHypixelStats(args[1]).build()).queue();
-					return;
-				}
-
-				ebMessage.editMessage(errorMessage(this.name).build()).queue();
-			}
-		)
-			.start();
 	}
 
 	public static EmbedBuilder getParkourStats(String username) {
@@ -297,5 +260,30 @@ public class HypixelCommand extends Command {
 			}
 		}
 		return defaultEmbed("Invalid username");
+	}
+
+	@Override
+	protected void execute(CommandEvent event) {
+		new Thread(
+			() -> {
+				EmbedBuilder eb = loadingEmbed();
+				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				String content = event.getMessage().getContentRaw();
+				String[] args = content.split(" ");
+
+				logCommand(event.getGuild(), event.getAuthor(), content);
+
+				if (args.length == 3 && args[1].equals("parkour")) {
+					ebMessage.editMessage(getParkourStats(args[2]).build()).queue();
+					return;
+				} else if (args.length == 2) {
+					ebMessage.editMessage(getHypixelStats(args[1]).build()).queue();
+					return;
+				}
+
+				ebMessage.editMessage(errorMessage(this.name).build()).queue();
+			}
+		)
+			.start();
 	}
 }

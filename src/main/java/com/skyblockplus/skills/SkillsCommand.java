@@ -21,31 +21,6 @@ public class SkillsCommand extends Command {
 		this.aliases = new String[] { "skill" };
 	}
 
-	@Override
-	protected void execute(CommandEvent event) {
-		new Thread(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-				String content = event.getMessage().getContentRaw();
-				String[] args = content.split(" ");
-
-				logCommand(event.getGuild(), event.getAuthor(), content);
-
-				if (args.length == 3) {
-					ebMessage.editMessage(getPlayerSkill(args[1], args[2]).build()).queue();
-					return;
-				} else if (args.length == 2) {
-					ebMessage.editMessage(getPlayerSkill(args[1], null).build()).queue();
-					return;
-				}
-
-				ebMessage.editMessage(errorMessage(this.name).build()).queue();
-			}
-		)
-			.start();
-	}
-
 	public static EmbedBuilder getPlayerSkill(String username, String profileName) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 
@@ -98,5 +73,30 @@ public class SkillsCommand extends Command {
 			return eb;
 		}
 		return defaultEmbed("Unable to fetch player data");
+	}
+
+	@Override
+	protected void execute(CommandEvent event) {
+		new Thread(
+			() -> {
+				EmbedBuilder eb = loadingEmbed();
+				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				String content = event.getMessage().getContentRaw();
+				String[] args = content.split(" ");
+
+				logCommand(event.getGuild(), event.getAuthor(), content);
+
+				if (args.length == 3) {
+					ebMessage.editMessage(getPlayerSkill(args[1], args[2]).build()).queue();
+					return;
+				} else if (args.length == 2) {
+					ebMessage.editMessage(getPlayerSkill(args[1], null).build()).queue();
+					return;
+				}
+
+				ebMessage.editMessage(errorMessage(this.name).build()).queue();
+			}
+		)
+			.start();
 	}
 }

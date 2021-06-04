@@ -3,7 +3,7 @@ package com.skyblockplus.utils;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.jagrosh.jdautilities.menu.Menu;
 import com.skyblockplus.utils.structs.PaginatorExtras;
-import java.awt.Color;
+import java.awt.*;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.LinkedList;

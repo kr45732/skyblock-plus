@@ -1,12 +1,12 @@
 package com.skyblockplus.utils.slashcommands;
 
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.globalCooldown;
 
 public abstract class SlashCommand {
 
+	protected final int cooldown = globalCooldown;
+	protected final CooldownScope cooldownScope = CooldownScope.USER;
 	protected String name = "null";
-	protected int cooldown = globalCooldown;
-	protected CooldownScope cooldownScope = CooldownScope.USER;
 
 	protected abstract void execute(SlashCommandExecutedEvent event);
 
@@ -15,14 +15,12 @@ public abstract class SlashCommand {
 	}
 
 	public int getRemainingCooldown(SlashCommandExecutedEvent event) {
-		if (cooldown > 0) {
-			String key = cooldownScope.genKey(name, event.getUser().getIdLong());
-			int remaining = event.getSlashCommandClient().getRemainingCooldown(key);
-			if (remaining > 0) {
-				return remaining;
-			} else {
-				event.getSlashCommandClient().applyCooldown(key, cooldown);
-			}
+		String key = cooldownScope.genKey(name, event.getUser().getIdLong());
+		int remaining = event.getSlashCommandClient().getRemainingCooldown(key);
+		if (remaining > 0) {
+			return remaining;
+		} else {
+			event.getSlashCommandClient().applyCooldown(key, cooldown);
 		}
 
 		return 0;
@@ -34,16 +32,10 @@ public abstract class SlashCommand {
 
 	public enum CooldownScope {
 		USER("U:%d", ""),
-		CHANNEL("C:%d", "in this channel"),
-		USER_CHANNEL("U:%d|C:%d", "in this channel"),
-		GUILD("G:%d", "in this server"),
-		USER_GUILD("U:%d|G:%d", "in this server"),
-		SHARD("S:%d", "on this shard"),
-		USER_SHARD("U:%d|S:%d", "on this shard"),
 		GLOBAL("Global", "globally");
 
-		private final String format;
 		final String errorSpecification;
+		private final String format;
 
 		CooldownScope(String format, String errorSpecification) {
 			this.format = format;

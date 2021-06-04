@@ -15,18 +15,6 @@ public class InformationCommand extends Command {
 		this.aliases = new String[] { "info" };
 	}
 
-	@Override
-	protected void execute(CommandEvent event) {
-		new Thread(
-			() -> {
-				logCommand(event.getGuild(), event.getAuthor(), BOT_PREFIX + "information");
-
-				event.getChannel().sendMessage(getInformation().setTimestamp(event.getClient().getStartTime()).build()).queue();
-			}
-		)
-			.start();
-	}
-
 	public static EmbedBuilder getInformation() {
 		EmbedBuilder eb = defaultEmbed("Skyblock Plus");
 
@@ -64,5 +52,17 @@ public class InformationCommand extends Command {
 		eb.setFooter("Last restart");
 
 		return eb;
+	}
+
+	@Override
+	protected void execute(CommandEvent event) {
+		new Thread(
+			() -> {
+				logCommand(event.getGuild(), event.getAuthor(), BOT_PREFIX + "information");
+
+				event.getChannel().sendMessage(getInformation().setTimestamp(event.getClient().getStartTime()).build()).queue();
+			}
+		)
+			.start();
 	}
 }

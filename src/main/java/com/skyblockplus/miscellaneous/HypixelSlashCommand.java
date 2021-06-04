@@ -17,7 +17,7 @@ public class HypixelSlashCommand extends SlashCommand {
 				event.logCommandGuildUserCommand();
 				String subcommandName = event.getEvent().getSubcommandName();
 				String username = event.getOptionStr("player");
-				EmbedBuilder eb = null;
+				EmbedBuilder eb;
 
 				if (subcommandName.equals("player")) {
 					eb = HypixelCommand.getHypixelStats(username);

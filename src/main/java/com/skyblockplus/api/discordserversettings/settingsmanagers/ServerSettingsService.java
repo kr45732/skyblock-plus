@@ -297,15 +297,6 @@ public class ServerSettingsService {
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 
-	public ResponseEntity<?> getSkyblockEventSettings(String serverId) {
-		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
-
-		if (currentServerSettings != null) {
-			return new ResponseEntity<>(currentServerSettings.getSbEvent(), HttpStatus.OK);
-		}
-		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-	}
-
 	public ResponseEntity<?> getRunningSkyblockEventSettings(String serverId) {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 

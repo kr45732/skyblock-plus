@@ -21,35 +21,13 @@ public class BazaarCommand extends Command {
 		this.aliases = new String[] { "bz" };
 	}
 
-	@Override
-	protected void execute(CommandEvent event) {
-		new Thread(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-				String content = event.getMessage().getContentRaw();
-				String[] args = content.split(" ", 2);
-
-				logCommand(event.getGuild(), event.getAuthor(), content);
-
-				if (args.length == 2) {
-					ebMessage.editMessage(getBazaarItem(args[1]).build()).queue();
-					return;
-				}
-
-				ebMessage.editMessage(errorMessage(this.name).build()).queue();
-			}
-		)
-			.start();
-	}
-
 	public static EmbedBuilder getBazaarItem(String itemName) {
 		JsonElement bazaarItems = getJson("https://api.slothpixel.me/api/skyblock/bazaar");
-		List<String> itemsUnformated = getJsonKeys(bazaarItems);
+		List<String> itemsUnformatted = getJsonKeys(bazaarItems);
 		String formattedItemName = itemName.replace(" ", "_").toUpperCase();
 		Map<String, String> itemsMap = new HashMap<>();
 
-		for (String item : itemsUnformated) {
+		for (String item : itemsUnformatted) {
 			String itemNameFormatted;
 			try {
 				itemNameFormatted = higherDepth(bazaarItems, item + ".name").getAsString();
@@ -122,5 +100,27 @@ public class BazaarCommand extends Command {
 		}
 
 		return defaultEmbed("Unable to find item");
+	}
+
+	@Override
+	protected void execute(CommandEvent event) {
+		new Thread(
+			() -> {
+				EmbedBuilder eb = loadingEmbed();
+				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				String content = event.getMessage().getContentRaw();
+				String[] args = content.split(" ", 2);
+
+				logCommand(event.getGuild(), event.getAuthor(), content);
+
+				if (args.length == 2) {
+					ebMessage.editMessage(getBazaarItem(args[1]).build()).queue();
+					return;
+				}
+
+				ebMessage.editMessage(errorMessage(this.name).build()).queue();
+			}
+		)
+			.start();
 	}
 }

@@ -12,7 +12,7 @@ public class PaginatorExtras {
 	private final List<Field> embedFields = new ArrayList<>();
 	private String everyPageText = null;
 	private String everyPageTitle = null;
-	private String everyPageThumnail = null;
+	private String everyPageThumbnail = null;
 
 	public List<String> getTitles() {
 		return titles;
@@ -40,12 +40,6 @@ public class PaginatorExtras {
 		return this;
 	}
 
-	public PaginatorExtras setThumbnails(String[] thumbnails) {
-		this.thumbnails.clear();
-		this.thumbnails.addAll(Arrays.asList(thumbnails));
-		return this;
-	}
-
 	public String getEveryPageText() {
 		return everyPageText;
 	}
@@ -65,11 +59,11 @@ public class PaginatorExtras {
 	}
 
 	public String getEveryPageThumbnail() {
-		return everyPageThumnail;
+		return everyPageThumbnail;
 	}
 
-	public PaginatorExtras setEveryPageThumbnail(String everyPageThumnail) {
-		this.everyPageThumnail = everyPageThumnail;
+	public PaginatorExtras setEveryPageThumbnail(String everyPageThumbnail) {
+		this.everyPageThumbnail = everyPageThumbnail;
 		return this;
 	}
 

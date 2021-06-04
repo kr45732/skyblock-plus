@@ -11,12 +11,8 @@ import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import java.awt.Color;
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.awt.*;
+import java.io.*;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -582,7 +578,7 @@ public class Utils {
 	}
 
 	public static String simplifyNumber(double number) {
-		String formattedNumber = "" + number;
+		String formattedNumber;
 		DecimalFormat df = new DecimalFormat("#.#");
 		df.setRoundingMode(RoundingMode.HALF_UP);
 		if (1000000000000D > number && number >= 1000000000) {

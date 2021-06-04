@@ -16,6 +16,11 @@ public class UnlinkAccountCommand extends Command {
 		this.cooldown = globalCooldown;
 	}
 
+	public static EmbedBuilder unlinkAccount(User user) {
+		database.deleteLinkedUserByDiscordId(user.getId());
+		return defaultEmbed("Success").setDescription("You were unlinked");
+	}
+
 	@Override
 	protected void execute(CommandEvent event) {
 		new Thread(
@@ -30,10 +35,5 @@ public class UnlinkAccountCommand extends Command {
 			}
 		)
 			.start();
-	}
-
-	public static EmbedBuilder unlinkAccount(User user) {
-		database.deleteLinkedUserByDiscordId(user.getId());
-		return defaultEmbed("Success").setDescription("You were unlinked");
 	}
 }

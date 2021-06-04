@@ -7,7 +7,6 @@ import static com.skyblockplus.utils.Utils.higherDepth;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.Message;
@@ -18,7 +17,7 @@ import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
 public class ApplyGuild {
 
-	public List<ApplyUser> applyUserList = new ArrayList<>();
+	public List<ApplyUser> applyUserList;
 	public Message reactMessage;
 	public JsonElement currentSettings;
 	public boolean enable = true;
@@ -36,18 +35,6 @@ public class ApplyGuild {
 	public ApplyGuild(Message reactMessage, JsonElement currentSettings, List<ApplyUser> prevApplyUsers) {
 		this(reactMessage, currentSettings);
 		applyUserList.addAll(prevApplyUsers);
-	}
-
-	public ApplyGuild() {
-		this.enable = false;
-	}
-
-	public int applyUserListSize() {
-		return applyUserList.size();
-	}
-
-	public List<ApplyUser> getApplyUserList() {
-		return applyUserList;
 	}
 
 	public void onMessageReactionAdd(MessageReactionAddEvent event) {
@@ -89,7 +76,7 @@ public class ApplyGuild {
 	public boolean onMessageReactionAdd_ExistingApplyUser(MessageReactionAddEvent event) {
 		ApplyUser findApplyUser = applyUserList
 			.stream()
-			.filter(applyUser -> applyUser.getMessageReactId().equals(event.getMessageId()))
+			.filter(applyUser -> applyUser.reactMessageId.equals(event.getMessageId()))
 			.findFirst()
 			.orElse(null);
 		if (findApplyUser != null) {
@@ -105,11 +92,11 @@ public class ApplyGuild {
 	public void onTextChannelDelete(TextChannelDeleteEvent event) {
 		applyUserList.removeIf(
 			applyUser -> {
-				if (applyUser.getApplicationChannelId().equals(event.getChannel().getId())) {
+				if (applyUser.applicationChannelId.equals(event.getChannel().getId())) {
 					return true;
 				} else {
 					try {
-						if (applyUser.getStaffChannelId().equals(event.getChannel().getId())) {
+						if (applyUser.staffChannelId.equals(event.getChannel().getId())) {
 							return true;
 						}
 					} catch (Exception ignored) {}
@@ -132,15 +119,15 @@ public class ApplyGuild {
 			return null;
 		}
 
-		List<TextChannel> openApplys = event
+		List<TextChannel> runningApplications = event
 			.getGuild()
 			.getTextChannelsByName(
 				higherDepth(currentSettings, "newChannelPrefix").getAsString() + "-" + event.getUser().getName().replace(" ", "-"),
 				true
 			);
 
-		if (openApplys.size() > 0) {
-			return "❌ There is already an application open in " + openApplys.get(0).getAsMention();
+		if (runningApplications.size() > 0) {
+			return "❌ There is already an application open in " + runningApplications.get(0).getAsMention();
 		}
 
 		JsonElement linkedAccount = database.getLinkedUserByDiscordId(event.getUser().getId());
@@ -170,14 +157,14 @@ public class ApplyGuild {
 			try {
 				isIronman = higherDepth(currentSettings, "ironmanOnly").getAsBoolean();
 			} catch (Exception ignored) {}
-			if (isIronman && player.getAllProfileNames(isIronman).length == 0) {
+			if (isIronman && player.getAllProfileNames(true).length == 0) {
 				return "❌ You have no ironman profiles created";
 			}
 		}
 
 		ApplyUser applyUser = new ApplyUser(event, currentSettings, higherDepth(linkedAccount, "minecraftUsername").getAsString());
 		applyUserList.add(applyUser);
-		openApplys =
+		runningApplications =
 			event
 				.getGuild()
 				.getTextChannelsByName(
@@ -185,7 +172,7 @@ public class ApplyGuild {
 					true
 				);
 
-		return "✅ A new application was created in " + openApplys.get(0).getAsMention();
+		return "✅ A new application was created in " + runningApplications.get(0).getAsMention();
 	}
 
 	public String onButtonClick(ButtonClickEvent event) {

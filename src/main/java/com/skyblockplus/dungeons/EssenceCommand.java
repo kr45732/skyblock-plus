@@ -19,44 +19,6 @@ public class EssenceCommand extends Command {
 		this.cooldown = globalCooldown;
 	}
 
-	@Override
-	protected void execute(CommandEvent event) {
-		new Thread(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-				String content = event.getMessage().getContentRaw();
-				String[] args = content.split(" ");
-
-				logCommand(event.getGuild(), event.getAuthor(), content);
-
-				JsonElement essenceCostsJson = getEssenceCostsJson();
-
-				if (args.length >= 3 && args[1].equals("upgrade")) {
-					String itemName = content.split(" ", 3)[2].replace(" ", "_").toUpperCase();
-
-					JsonElement itemJson = higherDepth(essenceCostsJson, itemName);
-					if (itemJson != null) {
-						jda.addEventListener(new EssenceWaiter(itemName, itemJson, ebMessage, event.getAuthor()));
-					} else {
-						eb = defaultEmbed("Invalid item name");
-						ebMessage.editMessage(eb.build()).queue();
-					}
-					return;
-				} else if (args.length >= 3 && (args[1].equals("info") || args[1].equals("information"))) {
-					String itemName = content.split(" ", 3)[2];
-
-					eb = getEssenceInformation(itemName, essenceCostsJson);
-					ebMessage.editMessage(eb.build()).queue();
-					return;
-				}
-
-				ebMessage.editMessage(errorMessage(this.name).build()).queue();
-			}
-		)
-			.start();
-	}
-
 	public static EmbedBuilder getEssenceInformation(String itemName, JsonElement essenceCostsJson) {
 		String preFormattedItem = itemName.replace("'s", "").replace(" ", "_").toUpperCase();
 		preFormattedItem = convertToInternalName(preFormattedItem);
@@ -101,5 +63,43 @@ public class EssenceCommand extends Command {
 			return eb;
 		}
 		return defaultEmbed("Invalid item name");
+	}
+
+	@Override
+	protected void execute(CommandEvent event) {
+		new Thread(
+			() -> {
+				EmbedBuilder eb = loadingEmbed();
+				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				String content = event.getMessage().getContentRaw();
+				String[] args = content.split(" ");
+
+				logCommand(event.getGuild(), event.getAuthor(), content);
+
+				JsonElement essenceCostsJson = getEssenceCostsJson();
+
+				if (args.length >= 3 && args[1].equals("upgrade")) {
+					String itemName = content.split(" ", 3)[2].replace(" ", "_").toUpperCase();
+
+					JsonElement itemJson = higherDepth(essenceCostsJson, itemName);
+					if (itemJson != null) {
+						jda.addEventListener(new EssenceWaiter(itemName, itemJson, ebMessage, event.getAuthor()));
+					} else {
+						eb = defaultEmbed("Invalid item name");
+						ebMessage.editMessage(eb.build()).queue();
+					}
+					return;
+				} else if (args.length >= 3 && (args[1].equals("info") || args[1].equals("information"))) {
+					String itemName = content.split(" ", 3)[2];
+
+					eb = getEssenceInformation(itemName, essenceCostsJson);
+					ebMessage.editMessage(eb.build()).queue();
+					return;
+				}
+
+				ebMessage.editMessage(errorMessage(this.name).build()).queue();
+			}
+		)
+			.start();
 	}
 }

@@ -1,10 +1,7 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.Utils.BOT_PREFIX;
-import static com.skyblockplus.utils.Utils.defaultPaginator;
-import static com.skyblockplus.utils.Utils.globalCooldown;
-import static com.skyblockplus.utils.Utils.logCommand;
+import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -23,20 +20,6 @@ public class HelpCommand extends Command {
 		this.name = "help";
 		this.aliases = new String[] { "commands" };
 		this.cooldown = globalCooldown;
-	}
-
-	@Override
-	protected void execute(CommandEvent event) {
-		new Thread(
-			() -> {
-				logCommand(event.getGuild(), event.getAuthor(), event.getMessage().getContentRaw());
-				String pageNum = event.getMessage().getContentRaw().toLowerCase().split(" ").length >= 2
-					? event.getMessage().getContentRaw().toLowerCase().split(" ")[1]
-					: "";
-				getHelp(pageNum, event.getMember(), event.getChannel(), null);
-			}
-		)
-			.start();
 	}
 
 	public static void getHelp(String pageStr, Member member, MessageChannel channel, InteractionHook hook) {
@@ -65,20 +48,20 @@ public class HelpCommand extends Command {
 
 		int startingPage = 0;
 		Map<String, Integer> pageMap = new HashMap<>();
-		pageMap = putMultiple(pageMap, 2, "general", "link", "unlink");
-		pageMap = putMultiple(pageMap, 3, "slayer");
-		pageMap = putMultiple(pageMap, 4, "skills");
-		pageMap = putMultiple(pageMap, 5, "dungeons", "essence", "catacombs", "cata");
-		pageMap = putMultiple(pageMap, 6, "guild");
-		pageMap = putMultiple(pageMap, 7, "auction", "auctions", "ah", "bazaar", "bz", "bin", "bids", "query", "bits", "bit");
-		pageMap = putMultiple(pageMap, 8, "wardrobe", "talisman", "inv", "inventory", "echest", "enderchest", "sacks");
-		pageMap = putMultiple(pageMap, 9, "roles", "networth", "nw", "bank", "weight", "hypixel", "profiles");
-		pageMap = putMultiple(pageMap, 10, "event");
-		pageMap = putMultiple(pageMap, 11, "categories", "settings", "setup");
-		pageMap = putMultiple(pageMap, 12, "settings_verify");
-		pageMap = putMultiple(pageMap, 13, "settings_apply");
-		pageMap = putMultiple(pageMap, 14, "settings_roles");
-		pageMap = putMultiple(pageMap, 15, "settings_guild");
+		putMultiple(pageMap, 2, "general", "link", "unlink");
+		putMultiple(pageMap, 3, "slayer");
+		putMultiple(pageMap, 4, "skills");
+		putMultiple(pageMap, 5, "dungeons", "essence", "catacombs", "cata");
+		putMultiple(pageMap, 6, "guild");
+		putMultiple(pageMap, 7, "auction", "auctions", "ah", "bazaar", "bz", "bin", "bids", "query", "bits", "bit");
+		putMultiple(pageMap, 8, "wardrobe", "talisman", "inv", "inventory", "echest", "enderchest", "sacks");
+		putMultiple(pageMap, 9, "roles", "networth", "nw", "bank", "weight", "hypixel", "profiles");
+		putMultiple(pageMap, 10, "event");
+		putMultiple(pageMap, 11, "categories", "settings", "setup");
+		putMultiple(pageMap, 12, "settings_verify");
+		putMultiple(pageMap, 13, "settings_apply");
+		putMultiple(pageMap, 14, "settings_roles");
+		putMultiple(pageMap, 15, "settings_guild");
 
 		try {
 			if (pageMap.containsKey(pageStr)) {
@@ -264,7 +247,7 @@ public class HelpCommand extends Command {
 					"settings apply [name] staff_channel " + "[#channel]"
 				) +
 				generateHelp(
-					"Channel where ign's of players who were accepted or waitlisted will be sent",
+					"Channel where the players who were accepted or waitlisted will be sent",
 					"settings apply [name] waiting_channel [#channel]"
 				) +
 				generateHelp("Message that will be sent if applicant is accepted", "settings apply [name] accept_message [message]") +
@@ -338,11 +321,23 @@ public class HelpCommand extends Command {
 		return generatedStr.toString();
 	}
 
-	private static Map<String, Integer> putMultiple(Map<String, Integer> map, int value, String... keys) {
+	private static void putMultiple(Map<String, Integer> map, int value, String... keys) {
 		for (String key : keys) {
 			map.put(key, value);
 		}
+	}
 
-		return map;
+	@Override
+	protected void execute(CommandEvent event) {
+		new Thread(
+			() -> {
+				logCommand(event.getGuild(), event.getAuthor(), event.getMessage().getContentRaw());
+				String pageNum = event.getMessage().getContentRaw().toLowerCase().split(" ").length >= 2
+					? event.getMessage().getContentRaw().toLowerCase().split(" ")[1]
+					: "";
+				getHelp(pageNum, event.getMember(), event.getChannel(), null);
+			}
+		)
+			.start();
 	}
 }
