@@ -9,4 +9,12 @@ public class UsernameUuidStruct {
 		this.playerUsername = playerUsername;
 		this.playerUuid = playerUuid;
 	}
+
+	@Override
+	public String toString() {
+		return "UsernameUuidStruct{" +
+				"playerUsername='" + playerUsername + '\'' +
+				", playerUuid='" + playerUuid + '\'' +
+				'}';
+	}
 }

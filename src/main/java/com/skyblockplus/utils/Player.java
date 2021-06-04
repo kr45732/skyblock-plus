@@ -21,11 +21,11 @@ public class Player {
 
 	public String invMissing = "";
 	private double startingAmount;
-	private boolean validPlayer = false;
 	private JsonElement profileJson;
 	private JsonElement outerProfileJson;
 	private JsonElement hypixelProfileJson;
 	private JsonArray profilesArray;
+	private boolean validPlayer = false;
 	private String playerUuid;
 	private String playerUsername;
 	private String profileName;
@@ -1576,10 +1576,11 @@ public class Player {
 
 	@Override
 	public String toString() {
-		if (isValid()) {
-			return "Valid Player | " + playerUsername + " | " + playerUuid;
-		} else {
-			return "Invalid Player";
-		}
+		return "Player{" +
+				"validPlayer=" + validPlayer +
+				", playerUuid='" + playerUuid + '\'' +
+				", playerUsername='" + playerUsername + '\'' +
+				", profileName='" + profileName + '\'' +
+				'}';
 	}
 }

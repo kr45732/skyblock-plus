@@ -9,4 +9,12 @@ public class NwItemPrice {
 		this.price = price;
 		this.json = json;
 	}
+
+	@Override
+	public String toString() {
+		return "NwItemPrice{" +
+				"price=" + price +
+				", json='" + json + '\'' +
+				'}';
+	}
 }

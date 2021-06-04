@@ -11,4 +11,13 @@ public class DiscordInfoStruct {
 		this.minecraftUsername = minecraftUsername;
 		this.minecraftUuid = minecraftUuid;
 	}
+
+	@Override
+	public String toString() {
+		return "DiscordInfoStruct{" +
+				"discordTag='" + discordTag + '\'' +
+				", minecraftUsername='" + minecraftUsername + '\'' +
+				", minecraftUuid='" + minecraftUuid + '\'' +
+				'}';
+	}
 }

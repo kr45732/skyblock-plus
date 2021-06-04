@@ -27,4 +27,17 @@ public class SkillsStruct {
 		this.expForNext = expForNext;
 		this.progressToNext = progressToNext;
 	}
+
+	@Override
+	public String toString() {
+		return "SkillsStruct{" +
+				"skillName='" + skillName + '\'' +
+				", skillLevel=" + skillLevel +
+				", maxSkillLevel=" + maxSkillLevel +
+				", totalSkillExp=" + totalSkillExp +
+				", expCurrent=" + expCurrent +
+				", expForNext=" + expForNext +
+				", progressToNext=" + progressToNext +
+				'}';
+	}
 }
