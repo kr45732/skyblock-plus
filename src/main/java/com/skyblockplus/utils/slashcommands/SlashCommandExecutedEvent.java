@@ -69,7 +69,7 @@ public class SlashCommandExecutedEvent {
 		return defaultEmbed("Error").setDescription("❌ Invalid Command");
 	}
 
-	public String getSubcommandName(){
+	public String getSubcommandName() {
 		return event.getSubcommandName();
 	}
 }

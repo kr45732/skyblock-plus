@@ -16,13 +16,13 @@ public class AuctionsSlashCommand extends SlashCommand {
 			() -> {
 				event.logCommandGuildUserCommand();
 				EmbedBuilder eb;
-				String subcommandName =event.getSubcommandName();
+				String subcommandName = event.getSubcommandName();
 
-				if(subcommandName.equals("player")){
+				if (subcommandName.equals("player")) {
 					eb = AuctionCommand.getPlayerAuction(event.getOptionStr("player"), event.getUser(), null, event.getHook());
-				}else if(subcommandName.equals("uuid")){
+				} else if (subcommandName.equals("uuid")) {
 					eb = AuctionCommand.getAuctionByUuid(event.getOptionStr("uuid"));
-				}else{
+				} else {
 					eb = event.invalidCommandMessage();
 				}
 

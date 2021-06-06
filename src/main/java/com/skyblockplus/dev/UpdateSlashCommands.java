@@ -67,12 +67,12 @@ public class UpdateSlashCommands extends Command {
 						new CommandData("help", "Show the help page for this bot")
 							.addOption(OptionType.STRING, "page", "Page number or name of a command"),
 						new CommandData("auctions", "Main auctions command")
-								.addSubcommands(
+							.addSubcommands(
 								new SubcommandData("player", "Get player's active (not claimed) auctions on all profiles")
-										.addOption(OptionType.STRING, "player", "Player username", true),
+									.addOption(OptionType.STRING, "player", "Player username", true),
 								new SubcommandData("uuid", "Get an auction by it's UUID")
-										.addOption(OptionType.STRING, "uuid", "Auction UUID", true)
-						),
+									.addOption(OptionType.STRING, "uuid", "Auction UUID", true)
+							),
 						new CommandData("bin", "Get the lowest bin of an item").addOption(OptionType.STRING, "item", "Item name", true),
 						new CommandData("bazaar", "Get bazaar prices of an item").addOption(OptionType.STRING, "item", "Item name", true),
 						new CommandData("average", "Get the average auction price of an item")
