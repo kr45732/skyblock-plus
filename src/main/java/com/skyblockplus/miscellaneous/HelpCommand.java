@@ -154,12 +154,14 @@ public class HelpCommand extends Command {
 
 		paginateBuilder.addItems(
 			generateHelp("Get player's active (not claimed) auctions on all profiles", "auction [player]", "ah [player]") +
+			generateHelp("Get an auction by it's UUID", "auction uuid [UUID]", "ah uuid [UUID]") +
 			generateHelp("Get the lowest bin of an item", "bin [item]") +
 			generateHelp("Get bazaar prices of an item", "bazaar [item]", "bz [item]") +
 			generateHelp("Get the average auction price of an item", "average [item]", "avg [item]") +
 			generateHelp("Get a player's bids", "bids [player]") +
 			generateHelp("Query the auction house", "query [item]") +
-			generateHelp("Get the price of an item from the bits shop", "bits [item]")
+			generateHelp("Get the price of an item from the bits shop", "bits [item]") +
+			generateHelp("Calculate the price of an item on the auction house using the auction's UUID", "price [uuid]")
 		);
 
 		paginateBuilder.addItems(

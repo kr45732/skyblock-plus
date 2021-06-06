@@ -15,6 +15,8 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 public class EvaluateCommand extends Command {
 
 	private String importString = "";
+	private boolean inSession = false;
+	private GroovyShell shell = new GroovyShell();
 
 	public EvaluateCommand() {
 		this.name = "evaluate";
@@ -70,6 +72,25 @@ public class EvaluateCommand extends Command {
 					return;
 				}
 
+				if (args[1].equals("start_session()")) {
+					inSession = true;
+					shell = new GroovyShell();
+					ebMessage.editMessage("Session started with " + shell).queue();
+					return;
+				} else if (args[1].equals("end_session()")) {
+					inSession = false;
+					shell = new GroovyShell();
+					ebMessage.editMessage("Session ended with " + shell).queue();
+					return;
+				} else if (args[1].equals("get_session()")) {
+					ebMessage.editMessage(inSession ? "Session running with " + shell : "No session running").queue();
+					return;
+				}
+
+				if (!inSession) {
+					shell = new GroovyShell();
+				}
+
 				String arg = args[1];
 
 				if (arg.startsWith("```") && arg.endsWith("```")) {
@@ -77,8 +98,6 @@ public class EvaluateCommand extends Command {
 				}
 
 				MessageReceivedEvent jdaEvent = event.getEvent();
-
-				GroovyShell shell = new GroovyShell();
 
 				try {
 					shell.setProperty("event", jdaEvent);

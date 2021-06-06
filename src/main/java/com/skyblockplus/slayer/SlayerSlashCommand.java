@@ -19,9 +19,9 @@ public class SlayerSlashCommand extends SlashCommand {
 				String profileName = event.getOptionStr("profile");
 				EmbedBuilder eb;
 				if (profileName != null) {
-					eb = SlayerCommand.getPlayerSlayer(event.getEvent().getOption("player").getAsString(), profileName);
+					eb = SlayerCommand.getPlayerSlayer(event.getOptionStr("player"), profileName);
 				} else {
-					eb = SlayerCommand.getPlayerSlayer(event.getEvent().getOption("player").getAsString(), null);
+					eb = SlayerCommand.getPlayerSlayer(event.getOptionStr("player"), null);
 				}
 
 				event.getHook().editOriginalEmbeds(eb.build()).queue();

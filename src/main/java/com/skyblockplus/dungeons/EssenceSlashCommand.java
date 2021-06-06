@@ -17,7 +17,7 @@ public class EssenceSlashCommand extends SlashCommand {
 		new Thread(
 			() -> {
 				event.logCommandGuildUserCommand();
-				String subcommandName = event.getEvent().getSubcommandName();
+				String subcommandName = event.getSubcommandName();
 				String itemName = event.getOptionStr("item");
 
 				System.out.println(subcommandName + " - " + itemName);

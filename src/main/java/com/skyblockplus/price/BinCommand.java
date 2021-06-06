@@ -24,7 +24,7 @@ public class BinCommand extends Command {
 	}
 
 	public static EmbedBuilder getLowestBin(String item) {
-		JsonElement lowestBinJson = getJson("https://moulberry.codes/lowestbin.json");
+		JsonElement lowestBinJson = getLowestBinJson();
 		if (lowestBinJson == null) {
 			return defaultEmbed("Error fetching auctions");
 		}

@@ -16,7 +16,7 @@ public class BankSlashCommand extends SlashCommand {
 			() -> {
 				event.logCommandGuildUserCommand();
 
-				String subcommandName = event.getEvent().getSubcommandName();
+				String subcommandName = event.getSubcommandName();
 				String username = event.getOptionStr("player");
 				String profileName = event.getOptionStr("profile");
 				EmbedBuilder eb;

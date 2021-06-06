@@ -85,7 +85,7 @@ public class MissingTalismansCommand extends Command {
 				}
 			);
 
-			JsonElement lowestBinJson = getJson("https://moulberry.codes/lowestbin.json");
+			JsonElement lowestBinJson = getLowestBinJson();
 			missingInternalArr.sort(
 				Comparator.comparingDouble(o1 -> higherDepth(lowestBinJson, o1) != null ? higherDepth(lowestBinJson, o1).getAsDouble() : 0)
 			);

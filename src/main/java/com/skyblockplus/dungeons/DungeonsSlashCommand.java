@@ -19,9 +19,9 @@ public class DungeonsSlashCommand extends SlashCommand {
 				String profileName = event.getOptionStr("profile");
 				EmbedBuilder eb;
 				if (profileName != null) {
-					eb = CatacombsCommand.getPlayerCatacombs(event.getEvent().getOption("player").getAsString(), profileName);
+					eb = CatacombsCommand.getPlayerCatacombs(event.getOptionStr("player"), profileName);
 				} else {
-					eb = CatacombsCommand.getPlayerCatacombs(event.getEvent().getOption("player").getAsString(), null);
+					eb = CatacombsCommand.getPlayerCatacombs(event.getOptionStr("player"), null);
 				}
 
 				event.getHook().editOriginalEmbeds(eb.build()).queue();

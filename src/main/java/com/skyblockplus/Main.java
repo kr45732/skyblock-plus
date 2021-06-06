@@ -120,7 +120,8 @@ public class Main {
 			new GuildRequirementsCommand(),
 			new GuildKickerCommand(),
 			new MissingTalismansCommand(),
-			new UpdateSlashCommands()
+			new UpdateSlashCommands(),
+			new PriceCommand()
 		);
 
 		SlashCommandClient slashCommands = new SlashCommandClient();

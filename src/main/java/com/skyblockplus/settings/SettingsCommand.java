@@ -1801,19 +1801,19 @@ public class SettingsCommand extends Command {
 		int weightReq = 0;
 
 		try {
-			slayerReq = Integer.parseInt(reqArgs.split("slayer-")[1].split(" ")[0]);
+			slayerReq = Integer.parseInt(reqArgs.split("slayer:")[1].split(" ")[0]);
 		} catch (Exception ignored) {}
 
 		try {
-			skillsReq = Integer.parseInt(reqArgs.split("skills-")[1].split(" ")[0]);
+			skillsReq = Integer.parseInt(reqArgs.split("skills:")[1].split(" ")[0]);
 		} catch (Exception ignored) {}
 
 		try {
-			cataReq = Integer.parseInt(reqArgs.split("catacombs-")[1].split(" ")[0]);
+			cataReq = Integer.parseInt(reqArgs.split("catacombs:")[1].split(" ")[0]);
 		} catch (Exception ignored) {}
 
 		try {
-			weightReq = Integer.parseInt(reqArgs.split("weight-")[1].split(" ")[0]);
+			weightReq = Integer.parseInt(reqArgs.split("weight:")[1].split(" ")[0]);
 		} catch (Exception ignored) {}
 
 		ApplyRequirements toAddReq = new ApplyRequirements("" + slayerReq, "" + skillsReq, "" + cataReq, "" + weightReq);

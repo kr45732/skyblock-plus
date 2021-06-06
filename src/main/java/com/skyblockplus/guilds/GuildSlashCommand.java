@@ -16,7 +16,7 @@ public class GuildSlashCommand extends SlashCommand {
 			() -> {
 				event.logCommandGuildUserCommand();
 
-				String subcommandName = event.getEvent().getSubcommandName();
+				String subcommandName = event.getSubcommandName();
 				EmbedBuilder eb;
 				String username = event.getOptionStr("player");
 

@@ -213,14 +213,8 @@ public class AutomaticGuild {
 					if (enableGuildRole) {
 						if (uuidToRankMap.containsKey(discordIdToUuid.get(linkedUser.getId()))) {
 							rolesToAdd.add(guildMemberRole);
-							//							guild
-							//								.addRoleToMember(linkedUser, guildMemberRole)
-							//								.queue(s -> {}, f -> logCommand(guild, linkedUser.getUser(), "Failed to add guild role"));
 						} else {
 							rolesToRemove.add(guildMemberRole);
-							//							guild
-							//								.removeRoleFromMember(linkedUser, guildMemberRole)
-							//								.queue(s -> {}, f -> logCommand(guild, linkedUser.getUser(), "Failed to remove guild role"));
 						}
 					}
 
@@ -229,9 +223,6 @@ public class AutomaticGuild {
 						if (!uuidToRankMap.containsKey(discordIdToUuid.get(linkedUser.getId()))) {
 							for (GuildRank guildRank : guildRanksArr) {
 								rolesToRemove.add(guild.getRoleById(guildRank.getDiscordRoleId()));
-								//								guild
-								//									.removeRoleFromMember(linkedUser, guild.getRoleById(guildRank.getDiscordRoleId()))
-								//									.queue(s -> {}, f -> logCommand(guild, linkedUser.getUser(), "Failed to remove guild rank"));
 							}
 						} else {
 							String currentRank = uuidToRankMap.get(discordIdToUuid.get(linkedUser.getId()));
@@ -239,14 +230,8 @@ public class AutomaticGuild {
 								Role currentRankRole = guild.getRoleById(guildRank.getDiscordRoleId());
 								if (guildRank.getMinecraftRoleName().equalsIgnoreCase(currentRank)) {
 									rolesToAdd.add(currentRankRole);
-									//									guild
-									//										.addRoleToMember(linkedUser, currentRankRole)
-									//										.queue(s -> {}, f -> logCommand(guild, linkedUser.getUser(), "Failed to add guild rank"));
 								} else {
 									rolesToRemove.add(currentRankRole);
-									//									guild
-									//										.removeRoleFromMember(linkedUser, currentRankRole)
-									//										.queue(s -> {}, f -> logCommand(guild, linkedUser.getUser(), "Failed to remove guild rank"));
 								}
 							}
 						}

@@ -15,7 +15,7 @@ public class WeightSlashCommand extends SlashCommand {
 		new Thread(
 			() -> {
 				event.logCommandGuildUserCommand();
-				String subcommandName = event.getEvent().getSubcommandName();
+				String subcommandName = event.getSubcommandName();
 				EmbedBuilder eb;
 
 				if (subcommandName.equals("player")) {

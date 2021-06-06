@@ -19,9 +19,9 @@ public class SkillsSlashCommand extends SlashCommand {
 				String profileName = event.getOptionStr("profile");
 				EmbedBuilder eb;
 				if (profileName != null) {
-					eb = SkillsCommand.getPlayerSkill(event.getEvent().getOption("player").getAsString(), profileName);
+					eb = SkillsCommand.getPlayerSkill(event.getOptionStr("player"), profileName);
 				} else {
-					eb = SkillsCommand.getPlayerSkill(event.getEvent().getOption("player").getAsString(), null);
+					eb = SkillsCommand.getPlayerSkill(event.getOptionStr("player"), null);
 				}
 
 				event.getHook().editOriginalEmbeds(eb.build()).queue();

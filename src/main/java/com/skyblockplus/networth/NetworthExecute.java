@@ -126,10 +126,10 @@ public class NetworthExecute {
 		if (player.isValid()) {
 			EmbedBuilder eb = player.defaultPlayerEmbed();
 
-			lowestBinJson = getJson("https://moulberry.codes/lowestbin.json");
-			averageAuctionJson = getJson("https://moulberry.codes/auction_averages/3day.json");
-			bazaarJson = higherDepth(getJson("https://api.hypixel.net/skyblock/bazaar"), "products");
-			sbzPrices = getJson("https://raw.githubusercontent.com/skyblockz/pricecheckbot/master/data.json").getAsJsonArray();
+			lowestBinJson = getLowestBinJson();
+			averageAuctionJson = getAverageAuctionJson();
+			bazaarJson = higherDepth(getBazaarJson(), "products");
+			sbzPrices = getSbzPricesJson();
 
 			bankBalance = player.getBankBalance();
 			purseCoins = player.getPurseCoins();
@@ -1207,7 +1207,7 @@ public class NetworthExecute {
 		return 0;
 	}
 
-	private boolean isIgnoredItem(String s) {
+	public static boolean isIgnoredItem(String s) {
 		if (s.equalsIgnoreCase("none")) {
 			return true;
 		}
@@ -1239,7 +1239,7 @@ public class NetworthExecute {
 		return s.equals("skyblock_menu");
 	}
 
-	private JsonArray queryAhApi(String query) {
+	public static JsonArray queryAhApi(String query) {
 		CloseableHttpClient httpclient = HttpClientBuilder.create().build();
 		try {
 			HttpGet httpget = new HttpGet("https://api.eastarcti.ca/auctions/");

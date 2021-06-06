@@ -12,6 +12,7 @@ import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.time.Duration;
 import java.time.Instant;
+import me.nullicorn.nedit.NBTReader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -133,6 +134,78 @@ public class AuctionCommand extends Command {
 		return eb;
 	}
 
+	public static EmbedBuilder getAuctionByUuid(String auctionUuid) {
+		JsonElement auctionJson = getJson("https://api.hypixel.net/skyblock/auction?key=" + HYPIXEL_API_KEY + "&uuid=" + auctionUuid);
+		if (higherDepth(auctionJson, "auctions").getAsJsonArray().size() == 0) {
+			return defaultEmbed("Error").setDescription("Invaid auction UUID");
+		}
+
+		auctionJson = higherDepth(auctionJson, "auctions").getAsJsonArray().get(0);
+		EmbedBuilder eb = defaultEmbed("Auction from UUID");
+		String itemName = higherDepth(auctionJson, "item_name").getAsString();
+
+		String itemId = "None";
+		try {
+			itemId =
+				NBTReader
+					.readBase64(higherDepth(auctionJson, "item_bytes").getAsString())
+					.getList("i")
+					.getCompound(0)
+					.getString("tag.ExtraAttributes.id", "None");
+		} catch (Exception ignored) {}
+
+		if (itemId.equals("ENCHANTED_BOOK")) {
+			itemName = parseMcCodes(higherDepth(auctionJson, "item_lore").getAsString().split("\n")[0]);
+		} else {
+			itemName =
+				(itemId.equals("PET") ? capitalizeString(higherDepth(auctionJson, "tier").getAsString().toLowerCase()) + " " : "") +
+				itemName;
+		}
+
+		Instant endingAt = Instant.ofEpochMilli(higherDepth(auctionJson, "end").getAsLong());
+		Duration duration = Duration.between(Instant.now(), endingAt);
+		long daysUntil = duration.toMinutes() / 1400;
+		long hoursUntil = duration.toMinutes() / 60 % 24;
+		long minutesUntil = duration.toMinutes() % 60;
+		String timeUntil = daysUntil > 0 ? daysUntil + "d " : "";
+		timeUntil += hoursUntil > 0 ? hoursUntil + "h " : "";
+		timeUntil += minutesUntil > 0 ? minutesUntil + "m " : "";
+
+		String ebStr = "**Item name:** " + itemName;
+		ebStr += "\n**Seller:** " + uuidToUsername(higherDepth(auctionJson, "auctioneer").getAsString());
+		ebStr += "\n**Command:** `/ah " + higherDepth(auctionJson, "uuid").getAsString() + "`";
+		long highestBid = higherDepth(auctionJson, "highest_bid_amount").getAsInt();
+		long startingBid = higherDepth(auctionJson, "starting_bid").getAsInt();
+		JsonArray bidsArr = higherDepth(auctionJson, "bids").getAsJsonArray();
+		boolean bin = higherDepth(auctionJson, "bin") != null;
+
+		if (timeUntil.length() > 0) {
+			if (bin) {
+				ebStr += "\n**BIN:** " + simplifyNumber(startingBid) + " coins | Ending in " + timeUntil;
+			} else {
+				ebStr += "\n**Current bid:** " + simplifyNumber(highestBid) + " | Ending in " + timeUntil;
+				ebStr +=
+					bidsArr.size() > 0
+						? "\n**Highest bidder:** " + uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString())
+						: "";
+			}
+		} else {
+			if (highestBid >= startingBid) {
+				ebStr +=
+					"\n**Auction sold** for " +
+					simplifyNumber(highestBid) +
+					" coins to " +
+					uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString());
+			} else {
+				ebStr = "\n**Auction did not sell**";
+			}
+		}
+
+		eb.setThumbnail("https://sky.lea.moe/item.gif/" + itemId);
+
+		return eb.setDescription(ebStr);
+	}
+
 	@Override
 	protected void execute(CommandEvent event) {
 		new Thread(
@@ -152,6 +225,10 @@ public class AuctionCommand extends Command {
 					} else {
 						ebMessage.editMessage(eb.build()).queue();
 					}
+					return;
+				} else if (args.length == 3 && args[1].equals("uuid")) {
+					eb = getAuctionByUuid(args[2]);
+					ebMessage.editMessage(eb.build()).queue();
 					return;
 				}
 
