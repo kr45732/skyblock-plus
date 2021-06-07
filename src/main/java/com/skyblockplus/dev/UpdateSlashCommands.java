@@ -125,7 +125,8 @@ public class UpdateSlashCommands extends Command {
 						new CommandData("missing", "Get a player's missing talismans")
 							.addOption(OptionType.STRING, "player", "Player username", true)
 							.addOption(OptionType.STRING, "profile", "Profile name"),
-							new CommandData("price", "Calculate the price of an auction").addOption(OptionType.STRING, "uuid", "Auction UUID", true)
+						new CommandData("price", "Calculate the price of an auction")
+							.addOption(OptionType.STRING, "uuid", "Auction UUID", true)
 					);
 				}
 

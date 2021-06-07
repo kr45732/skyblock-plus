@@ -1238,7 +1238,7 @@ public class NetworthExecute {
 			return true;
 		}
 
-		if(s.startsWith("step")){
+		if (s.startsWith("step")) {
 			return true;
 		}
 

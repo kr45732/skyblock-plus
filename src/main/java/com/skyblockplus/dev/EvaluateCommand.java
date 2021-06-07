@@ -40,7 +40,7 @@ public class EvaluateCommand extends Command {
 			"com.skyblockplus",
 		};
 
-		String[] classImports = { "com.skyblockplus.utils.Player", "me.nullicorn.nedit.NBTReader","import com.google.gson.JsonParser" };
+		String[] classImports = { "com.skyblockplus.utils.Player", "me.nullicorn.nedit.NBTReader", "import com.google.gson.JsonParser" };
 
 		String[] staticImports = { "com.skyblockplus.utils.Utils.*" };
 

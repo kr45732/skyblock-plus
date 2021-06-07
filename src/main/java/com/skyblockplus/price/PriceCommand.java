@@ -57,7 +57,11 @@ public class PriceCommand extends Command {
 	}
 
 	public static EmbedBuilder calculatePriceFromUuid(String auctionUuid) {
-		JsonArray auctionJson = higherDepth(getJson("https://api.hypixel.net/skyblock/auction?key=" + HYPIXEL_API_KEY + "&uuid=" + auctionUuid), "auctions").getAsJsonArray();
+		JsonArray auctionJson = higherDepth(
+			getJson("https://api.hypixel.net/skyblock/auction?key=" + HYPIXEL_API_KEY + "&uuid=" + auctionUuid),
+			"auctions"
+		)
+			.getAsJsonArray();
 		if (auctionJson.size() == 0) {
 			return defaultEmbed("Error").setDescription("Invalid auction UUID");
 		}
@@ -73,11 +77,7 @@ public class PriceCommand extends Command {
 				itemName = parseMcCodes(higherDepth(auction, "item_lore").getAsString().split("\n")[0]);
 			} else {
 				itemName =
-					(
-						item.getId().equals("PET")
-							? capitalizeString(higherDepth(auction, "tier").getAsString().toLowerCase()) + " "
-							: ""
-					) +
+					(item.getId().equals("PET") ? capitalizeString(higherDepth(auction, "tier").getAsString().toLowerCase()) + " " : "") +
 					itemName;
 			}
 

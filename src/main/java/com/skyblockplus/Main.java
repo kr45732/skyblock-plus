@@ -150,7 +150,7 @@ public class Main {
 			new HypixelSlashCommand(),
 			new ProfilesSlashCommand(),
 			new MissingTalismansSlashCommand(),
-				new PriceSlashCommand()
+			new PriceSlashCommand()
 		);
 
 		jda =
