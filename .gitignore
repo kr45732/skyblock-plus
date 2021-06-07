@@ -66,3 +66,5 @@ Temporary Items
 lombok.config
 .project
 .classpath
+/src/main/java/com/skyblockplus/price/items/
+/src/main/java/com/skyblockplus/price/AuctionFlipper.java

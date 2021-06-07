@@ -84,3 +84,41 @@ public class PlaceholderCommand extends Command {
 			.start();
 	}
 }
+/*
+File dir = new File("src/main/java/com/skyblockplus/price/items");
+File[] directoryListing = dir.listFiles();
+JsonObject arrayJson = new JsonObject();
+for (File child : directoryListing) {
+	try {
+		JsonElement json = JsonParser.parseReader(new FileReader(child));
+		String itemName = parseMcCodes(higherDepth(json, "displayname").getAsString()).replace("�", "");
+		String internalName = higherDepth(json, "internalname").getAsString();
+		if(itemName.contains("(")){
+			continue;
+		}
+		if(itemName.startsWith("[Lvl")){
+			itemName = internalName;
+		}
+		if(itemName.equals("Enchanted Book")){
+			itemName = internalName;
+		}
+		if(itemName.contains("⚚")){
+			itemName = itemName.replace("⚚ ", "STARRED ");
+		}
+		if(itemName.contains("Melody\\u0027s Hair")){
+			itemName = "MELODY_HAIR";
+		}
+		itemName = itemName.replace("™", "").replace("\u0027s", "").toUpperCase().replace("\u0027", "").replace(" ", "_");
+		if(itemName.contains("MELODY_HAIR")){
+			itemName = "MELODY_HAIR";
+		}
+		if(itemName.equals(internalName)){
+			continue;
+		}
+		arrayJson.addProperty(itemName, internalName);
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
+}
+System.out.println(makeHastePost(new GsonBuilder().setPrettyPrinting().create().toJson(arrayJson)) + ".json");
+*/

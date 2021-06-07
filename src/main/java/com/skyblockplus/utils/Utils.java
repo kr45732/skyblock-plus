@@ -82,6 +82,7 @@ public class Utils {
 	private static Instant averageAuctionJsonLastUpdated = Instant.now();
 	private static Instant bazaarJsonLastUpdated = Instant.now();
 	private static Instant sbzPricesJsonLastUpdated = Instant.now();
+	private static JsonElement internalJsonMappings;
 
 	public static JsonElement getLowestBinJson() {
 		if (lowestBinJson == null || Duration.between(lowestBinJsonLastUpdated, Instant.now()).toMinutes() > 1) {
@@ -430,7 +431,14 @@ public class Utils {
 	}
 
 	public static String convertToInternalName(String itemName) {
-		String preFormattedItem = itemName
+		if (internalJsonMappings == null) {
+			try {
+				internalJsonMappings =
+					JsonParser.parseReader(new FileReader("src/main/java/com/skyblockplus/json/InternalNameMappings.json"));
+			} catch (Exception ignored) {}
+		}
+
+		String internalName = itemName
 			.trim()
 			.toUpperCase()
 			.replace(" ", "_")
@@ -438,136 +446,32 @@ public class Utils {
 			.replace("FRAG", "FRAGMENT")
 			.replace(".", "");
 
-		switch (preFormattedItem) {
-			case "adaptive_blade":
-				preFormattedItem = "STONE_BLADE";
-				break;
-			case "NECRON_HELMET":
-				preFormattedItem = "POWER_WITHER_HELMET";
-				break;
-			case "NECRON_CHESTPLATE":
-				preFormattedItem = "POWER_WITHER_CHESTPLATE";
-				break;
-			case "NECRON_LEGGINGS":
-				preFormattedItem = "POWER_WITHER_LEGGINGS";
-				break;
-			case "NECRON_BOOTS":
-				preFormattedItem = "POWER_WITHER_BOOTS";
-				break;
-			case "STORM_HELMET":
-				preFormattedItem = "WISE_WITHER_HELMET";
-				break;
-			case "STORM_CHESTPLATE":
-				preFormattedItem = "WISE_WITHER_CHESTPLATE";
-				break;
-			case "STORM_LEGGINGS":
-				preFormattedItem = "WISE_WITHER_LEGGINGS";
-				break;
-			case "STORM_BOOTS":
-				preFormattedItem = "WISE_WITHER_BOOTS";
-				break;
-			case "MAXOR_HELMET":
-				preFormattedItem = "SPEED_WITHER_HELMET";
-				break;
-			case "MAXOR_CHESTPLATE":
-				preFormattedItem = "SPEED_WITHER_CHESTPLATE";
-				break;
-			case "MAXOR_LEGGINGS":
-				preFormattedItem = "SPEED_WITHER_LEGGINGS";
-				break;
-			case "MAXOR_BOOTS":
-				preFormattedItem = "SPEED_WITHER_BOOTS";
-				break;
-			case "GOLDOR_HELMET":
-				preFormattedItem = "TANK_WITHER_HELMET";
-				break;
-			case "GOLDOR_CHESTPLATE":
-				preFormattedItem = "TANK_WITHER_CHESTPLATE";
-				break;
-			case "GOLDOR_LEGGINGS":
-				preFormattedItem = "TANK_WITHER_LEGGINGS";
-				break;
-			case "GOLDOR_BOOTS":
-				preFormattedItem = "TANK_WITHER_BOOTS";
-				break;
-			case "BONEMERANG":
-				preFormattedItem = "BONE_BOOMERANG";
-				break;
+		switch (internalName) {
 			case "GOD_POT":
-				preFormattedItem = "GOD_POTION";
+				internalName = "GOD_POTION";
 				break;
 			case "AOTD":
-				preFormattedItem = "ASPECT_OF_THE_DRAGON";
+				internalName = "ASPECT_OF_THE_DRAGON";
 				break;
 			case "AOTE":
-				preFormattedItem = "ASPECT_OF_THE_END";
+				internalName = "ASPECT_OF_THE_END";
 				break;
-			case "ROD_OF_CHAMPIONS":
-				preFormattedItem = "CHAMP_ROD";
+			case "AOTV":
+				internalName = "ASPECT_OF_THE_VOID";
 				break;
-			case "ROD_OF_LEGENDS":
-				preFormattedItem = "LEGEND_ROD";
-				break;
-			case "CHALLENGING_ROD":
-				preFormattedItem = "CHALLENGE_ROD";
+			case "AOTS:":
+				internalName = "AXE_OF_THE_SHREDDED";
 				break;
 			case "LASR_EYE":
-				preFormattedItem = "GIANT_FRAGMENT_LASER";
+				internalName = "GIANT_FRAGMENT_LASER";
 				break;
-			case "DIAMANTE_HANDLE":
-				preFormattedItem = "GIANT_FRAGMENT_DIAMOND";
-				break;
-			case "BIGFOOT_LASSO":
-				preFormattedItem = "GIANT_FRAGMENT_BIGFOOT";
-				break;
-			case "JOLLY_PINK_ROCK":
-				preFormattedItem = "GIANT_FRAGMENT_BOULDER";
-				break;
-			case "HYPER_CATALYST":
-				preFormattedItem = "HYPER_CATALYST_UPGRADE";
-				break;
-			case "ENDER_HELMET":
-				preFormattedItem = "END_HELMET";
-				break;
-			case "ENDER_CHESTPLATE":
-				preFormattedItem = "END_CHESTPLATE";
-				break;
-			case "ENDER_LEGGINGS":
-				preFormattedItem = "END_LEGGINGS";
-				break;
-			case "ENDER_BOOTS":
-				preFormattedItem = "END_BOOTS";
-				break;
-			case "EMPEROR_SKULL":
-				preFormattedItem = "DIVER_FRAGMENT";
-				break;
-			case "COLOSSAL_EXP_BOTTLE":
-				preFormattedItem = "COLOSSAL_EXP_BOTTLE_UPGRADE";
-				break;
-			case "FLYCATCHER":
-				preFormattedItem = "FLYCATCHER_UPGRADE";
-				break;
-			case "SPIRIT_SCEPTRE":
-				preFormattedItem = "BAT_WAND";
-				break;
-			default:
-				if (preFormattedItem.contains("GOLDEN") && preFormattedItem.contains("HEAD")) {
-					preFormattedItem = preFormattedItem.replace("GOLDEN", "GOLD");
-				} else if (preFormattedItem.contains("PET_SKIN")) {
-					String tempItem = preFormattedItem.replace("PET_SKIN", "");
-					if (tempItem.startsWith("_") && tempItem.length() > 1) {
-						tempItem = tempItem.substring(1);
-					}
-
-					if (tempItem.endsWith("_") && tempItem.length() > 1) {
-						tempItem = tempItem.substring(0, tempItem.length() - 2);
-					}
-
-					preFormattedItem = "PET_SKIN_" + tempItem;
-				}
 		}
 
-		return preFormattedItem;
+		try {
+			internalName = higherDepth(internalJsonMappings, internalName).getAsString();
+		} catch (Exception ignored) {}
+
+		return internalName;
 	}
 
 	public static UsernameUuidStruct usernameToUuid(String username) {

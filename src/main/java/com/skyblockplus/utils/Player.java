@@ -521,12 +521,7 @@ public class Player {
 				}
 				return (prevSpiderMax + 1);
 			case "enderman":
-				JsonArray endermanLevelArray = higherDepth(getLevelingJson(), "slayer_xp.spider").getAsJsonArray(); // TODO:
-				// Change
-				// to
-				// enderman
-				// once
-				// added
+				JsonArray endermanLevelArray = higherDepth(getLevelingJson(), "slayer_xp.enderman").getAsJsonArray(); // TODO:
 				int endermanXp = getEndermanXp();
 				int prevEndermanMax = 0;
 				for (int i = 0; i < endermanLevelArray.size(); i++) {
