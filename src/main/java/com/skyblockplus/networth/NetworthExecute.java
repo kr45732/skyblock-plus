@@ -1208,6 +1208,8 @@ public class NetworthExecute {
 	}
 
 	public static boolean isIgnoredItem(String s) {
+		s = s.toLowerCase();
+
 		if (s.equalsIgnoreCase("none")) {
 			return true;
 		}
@@ -1233,6 +1235,10 @@ public class NetworthExecute {
 		}
 
 		if (s.equalsIgnoreCase("zombie_commander_whip")) {
+			return true;
+		}
+
+		if(s.startsWith("step")){
 			return true;
 		}
 

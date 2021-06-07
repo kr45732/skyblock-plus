@@ -30,7 +30,6 @@ public class PriceCommand extends Command {
 	public PriceCommand() {
 		this.name = "price";
 		this.cooldown = globalCooldown + 1;
-		this.ownerCommand = true;
 	}
 
 	@Override
@@ -58,29 +57,31 @@ public class PriceCommand extends Command {
 	}
 
 	public static EmbedBuilder calculatePriceFromUuid(String auctionUuid) {
-		JsonElement auctionJson = getJson("https://api.hypixel.net/skyblock/auction?key=" + HYPIXEL_API_KEY + "&uuid=" + auctionUuid);
-		if (higherDepth(auctionJson, "auctions").getAsJsonArray().size() == 0) {
+		JsonArray auctionJson = higherDepth(getJson("https://api.hypixel.net/skyblock/auction?key=" + HYPIXEL_API_KEY + "&uuid=" + auctionUuid), "auctions").getAsJsonArray();
+		if (auctionJson.size() == 0) {
 			return defaultEmbed("Error").setDescription("Invalid auction UUID");
 		}
 
+		JsonElement auction = auctionJson.get(0);
+
 		try {
-			NBTCompound itemNBTRaw = NBTReader.readBase64(higherDepth(auctionJson, "item_bytes").getAsString());
+			NBTCompound itemNBTRaw = NBTReader.readBase64(higherDepth(auction, "item_bytes.data").getAsString());
 			InvItem item = Player.getGenericInventoryMap(itemNBTRaw).get(0);
 			double price = calculateItemPrice(item);
-			String itemName = higherDepth(auctionJson, "item_name").getAsString();
+			String itemName = higherDepth(auction, "item_name").getAsString();
 			if (item.getId().equals("ENCHANTED_BOOK")) {
-				itemName = parseMcCodes(higherDepth(auctionJson, "item_lore").getAsString().split("\n")[0]);
+				itemName = parseMcCodes(higherDepth(auction, "item_lore").getAsString().split("\n")[0]);
 			} else {
 				itemName =
 					(
 						item.getId().equals("PET")
-							? capitalizeString(higherDepth(auctionJson, "tier").getAsString().toLowerCase()) + " "
+							? capitalizeString(higherDepth(auction, "tier").getAsString().toLowerCase()) + " "
 							: ""
 					) +
 					itemName;
 			}
 
-			Instant endingAt = Instant.ofEpochMilli(higherDepth(auctionJson, "end").getAsLong());
+			Instant endingAt = Instant.ofEpochMilli(higherDepth(auction, "end").getAsLong());
 			Duration duration = Duration.between(Instant.now(), endingAt);
 			long daysUntil = duration.toMinutes() / 1400;
 			long hoursUntil = duration.toMinutes() / 60 % 24;
@@ -90,12 +91,12 @@ public class PriceCommand extends Command {
 			timeUntil += minutesUntil > 0 ? minutesUntil + "m " : "";
 
 			String ebStr = "**Item name:** " + itemName;
-			ebStr += "\n**Seller:** " + uuidToUsername(higherDepth(auctionJson, "auctioneer").getAsString());
-			ebStr += "\n**Command:** `/ah " + higherDepth(auctionJson, "uuid").getAsString() + "`";
-			long highestBid = higherDepth(auctionJson, "highest_bid_amount").getAsInt();
-			long startingBid = higherDepth(auctionJson, "starting_bid").getAsInt();
-			JsonArray bidsArr = higherDepth(auctionJson, "bids").getAsJsonArray();
-			boolean bin = higherDepth(auctionJson, "bin") != null;
+			ebStr += "\n**Seller:** " + uuidToUsername(higherDepth(auction, "auctioneer").getAsString());
+			ebStr += "\n**Command:** `/ah " + higherDepth(auction, "uuid").getAsString() + "`";
+			long highestBid = higherDepth(auction, "highest_bid_amount").getAsInt();
+			long startingBid = higherDepth(auction, "starting_bid").getAsInt();
+			JsonArray bidsArr = higherDepth(auction, "bids").getAsJsonArray();
+			boolean bin = higherDepth(auction, "bin") != null;
 
 			if (timeUntil.length() > 0) {
 				if (bin) {
@@ -120,11 +121,12 @@ public class PriceCommand extends Command {
 				}
 			}
 
-			return defaultEmbed("Item Price Calculator")
+			return defaultEmbed("Auction Price Calculator")
 				.setThumbnail("https://sky.lea.moe/item.gif/" + item.getId())
 				.setDescription(ebStr)
-				.appendDescription("**Price:** " + roundAndFormat(price));
+				.appendDescription("\n**Calculated Price:** " + roundAndFormat(price));
 		} catch (Exception e) {
+			e.printStackTrace();
 			return defaultEmbed("Error parsing data");
 		}
 	}
@@ -151,7 +153,7 @@ public class PriceCommand extends Command {
 
 		try {
 			if (item.getId().equals("PET")) {
-				return calculateAllPetsPrice(item);
+				return calculatePetPrice(item);
 			} else {
 				itemCost = getLowestPrice(item.getId().toUpperCase());
 			}
@@ -244,14 +246,10 @@ public class PriceCommand extends Command {
 		return 0;
 	}
 
-	private static double calculateAllPetsPrice(InvItem pet) {
-		StringBuilder queryStr = new StringBuilder();
-		String petName = capitalizeString(pet.getName()).replace("lvl", "Lvl");
-		queryStr.append("\"").append(petName).append("\",");
+	private static double calculatePetPrice(InvItem pet) {
+		String queryStr = "\"" + capitalizeString(pet.getName()).replace("lvl", "Lvl") + "\"";
 
-		queryStr = new StringBuilder(queryStr.substring(0, queryStr.length() - 1));
-
-		JsonArray ahQuery = queryAhApi(queryStr.toString());
+		JsonArray ahQuery = queryAhApi(queryStr);
 
 		if (ahQuery != null) {
 			for (JsonElement auction : ahQuery) {

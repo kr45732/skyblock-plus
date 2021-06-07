@@ -149,7 +149,8 @@ public class Main {
 			new WeightSlashCommand(),
 			new HypixelSlashCommand(),
 			new ProfilesSlashCommand(),
-			new MissingTalismansSlashCommand()
+			new MissingTalismansSlashCommand(),
+				new PriceSlashCommand()
 		);
 
 		jda =

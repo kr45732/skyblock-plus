@@ -672,7 +672,12 @@ public class Utils {
 
 		EmbedBuilder eb = defaultEmbed(null);
 		eb.setAuthor(guild.getName() + " (" + guild.getId() + ")", null, guild.getIconUrl());
-		eb.addField(user.getName() + " (" + user.getId() + ")", "`" + commandInput + "`", false);
+		if(commandInput.length() > 1024) {
+			eb.addField(user.getName() + " (" + user.getId() + ")",  makeHastePost(commandInput) + ".json", false);
+		}else{
+			eb.addField(user.getName() + " (" + user.getId() + ")", "`" + commandInput + "`", false);
+		}
+
 		botLogChannel.sendMessage(eb.build()).queue();
 	}
 
