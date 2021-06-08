@@ -322,8 +322,8 @@ public class Utils {
 	public static JsonElement getJson(String jsonUrl) {
 		try {
 			if (remainingLimit < 5) {
-				TimeUnit.SECONDS.sleep(timeTillReset);
 				System.out.println("Sleeping for " + timeTillReset + " seconds");
+				TimeUnit.SECONDS.sleep(timeTillReset);
 			}
 		} catch (Exception ignored) {}
 

@@ -104,36 +104,36 @@ public class SkyblockEventCommand extends Command {
 
 	private static List<EventMember> getEventLeaderboardList(JsonElement runningSettings) {
 		List<EventMember> guildMemberPlayersList = new ArrayList<>();
-		List<CompletableFuture<EventMember>> futuresList = new ArrayList<>();
+		List<CompletableFuture<CompletableFuture<EventMember>>> futuresList = new ArrayList<>();
 		JsonArray membersArr = higherDepth(runningSettings, "membersList").getAsJsonArray();
 		String eventType = higherDepth(runningSettings, "eventType").getAsString();
 
 		for (JsonElement guildMember : membersArr) {
 			String guildMemberUuid = higherDepth(guildMember, "uuid").getAsString();
-
 			try {
 				if (remainingLimit < 5) {
-					TimeUnit.SECONDS.sleep(timeTillReset);
 					System.out.println("Sleeping for " + timeTillReset + " seconds");
+					TimeUnit.SECONDS.sleep(timeTillReset);
 				}
 			} catch (Exception ignored) {}
 
-			asyncHttpClient
-				.prepareGet("https://api.ashcon.app/mojang/v2/user/" + guildMemberUuid)
-				.execute()
-				.toCompletableFuture()
-				.thenApply(
-					uuidToUsernameResponse -> {
-						try {
-							return higherDepth(JsonParser.parseString(uuidToUsernameResponse.getResponseBody()), "username").getAsString();
-						} catch (Exception ignored) {}
-						return null;
-					}
-				)
-				.thenApply(
-					guildMemberUsernameResponse -> {
-						futuresList.add(
-							asyncHttpClient
+			futuresList.add(
+				asyncHttpClient
+					.prepareGet("https://api.ashcon.app/mojang/v2/user/" + guildMemberUuid)
+					.execute()
+					.toCompletableFuture()
+					.thenApply(
+						uuidToUsernameResponse -> {
+							try {
+								return higherDepth(JsonParser.parseString(uuidToUsernameResponse.getResponseBody()), "username")
+									.getAsString();
+							} catch (Exception ignored) {}
+							return null;
+						}
+					)
+					.thenApply(
+						guildMemberUsernameResponse -> {
+							return asyncHttpClient
 								.prepareGet("https://api.hypixel.net/skyblock/profiles?key=" + HYPIXEL_API_KEY + "&uuid=" + guildMemberUuid)
 								.execute()
 								.toCompletableFuture()
@@ -224,18 +224,17 @@ public class SkyblockEventCommand extends Command {
 										}
 										return null;
 									}
-								)
-						);
-						return null;
-					}
-				);
+								);
+						}
+					)
+			);
 		}
 
-		for (CompletableFuture<EventMember> future : futuresList) {
+		for (CompletableFuture<CompletableFuture<EventMember>> future : futuresList) {
 			try {
-				EventMember playerFuture = future.get();
-				if (playerFuture != null) {
-					guildMemberPlayersList.add(future.get());
+				EventMember playerFutureResponse = future.get().get();
+				if (playerFutureResponse != null) {
+					guildMemberPlayersList.add(playerFutureResponse);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
