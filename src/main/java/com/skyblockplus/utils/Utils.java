@@ -4,7 +4,6 @@ import static com.skyblockplus.Main.jda;
 import static java.lang.String.join;
 import static java.util.Collections.nCopies;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -31,15 +30,10 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.exceptions.PermissionException;
-import org.apache.http.HttpResponse;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
@@ -260,29 +254,21 @@ public class Utils {
 			return null;
 		}
 
-		CloseableHttpClient httpclient = HttpClientBuilder.create().build();
-		HttpGet httpget = new HttpGet(dataUrl);
-		httpget.setHeader("Authorization", "token " + GITHUB_TOKEN);
-		httpget.addHeader("content-type", "application/json; charset=UTF-8");
+		try (CloseableHttpClient httpclient = HttpClientBuilder.create().build()) {
+			HttpGet httpget = new HttpGet(dataUrl);
+			httpget.setHeader("Authorization", "token " + GITHUB_TOKEN);
+			httpget.addHeader("content-type", "application/json; charset=UTF-8");
 
-		try {
-			HttpResponse httpresponse = httpclient.execute(httpget);
-
-			InputStream inputStream = httpresponse.getEntity().getContent();
-			ByteArrayOutputStream result = new ByteArrayOutputStream();
-			byte[] buffer = new byte[1024];
-			for (int length; (length = inputStream.read(buffer)) != -1;) {
-				result.write(buffer, 0, length);
+			try (CloseableHttpResponse httpresponse = httpclient.execute(httpget)) {
+				InputStream inputStream = httpresponse.getEntity().getContent();
+				ByteArrayOutputStream result = new ByteArrayOutputStream();
+				byte[] buffer = new byte[1024];
+				for (int length; (length = inputStream.read(buffer)) != -1;) {
+					result.write(buffer, 0, length);
+				}
+				return result.toString().split("module.exports = ")[1];
 			}
-			return result.toString().split("module.exports = ")[1];
-		} catch (Exception ignored) {} finally {
-			try {
-				httpclient.close();
-			} catch (IOException e) {
-				System.out.println("== Stack Trace (SkyCrypt Close Http Client) ==");
-				e.printStackTrace();
-			}
-		}
+		} catch (Exception ignored) {}
 		return null;
 	}
 
@@ -341,81 +327,42 @@ public class Utils {
 			}
 		} catch (Exception ignored) {}
 
-		CloseableHttpClient httpclient = null;
-		try {
-			if (jsonUrl.contains(API_BASE_URL)) {
-				CredentialsProvider provider = new BasicCredentialsProvider();
-				UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(API_USERNAME, API_PASSWORD);
-				provider.setCredentials(AuthScope.ANY, credentials);
-				httpclient = HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
-			} else {
-				httpclient = HttpClientBuilder.create().build();
-			}
-
+		try (CloseableHttpClient httpclient = HttpClientBuilder.create().build()) {
 			HttpGet httpget = new HttpGet(jsonUrl);
 			if (jsonUrl.contains("raw.githubusercontent.com")) {
 				httpget.setHeader("Authorization", "token " + GITHUB_TOKEN);
 			}
 			httpget.addHeader("content-type", "application/json; charset=UTF-8");
 
-			HttpResponse httpresponse = httpclient.execute(httpget);
-			if (jsonUrl.toLowerCase().contains("api.hypixel.net")) {
-				try {
-					remainingLimit = Integer.parseInt(httpresponse.getFirstHeader("RateLimit-Remaining").getValue());
-					timeTillReset = Integer.parseInt(httpresponse.getFirstHeader("RateLimit-Reset").getValue());
-				} catch (Exception ignored) {}
-			}
+			try (CloseableHttpResponse httpresponse = httpclient.execute(httpget)) {
+				if (jsonUrl.toLowerCase().contains("api.hypixel.net")) {
+					try {
+						remainingLimit = Integer.parseInt(httpresponse.getFirstHeader("RateLimit-Remaining").getValue());
+						timeTillReset = Integer.parseInt(httpresponse.getFirstHeader("RateLimit-Reset").getValue());
+					} catch (Exception ignored) {}
+				}
 
-			return JsonParser.parseReader(new InputStreamReader(httpresponse.getEntity().getContent()));
-		} catch (Exception ignored) {} finally {
-			try {
-				httpclient.close();
-			} catch (Exception e) {
-				System.out.println("== Stack Trace (Get Json Close Http Client) ==");
-				e.printStackTrace();
+				return JsonParser.parseReader(new InputStreamReader(httpresponse.getEntity().getContent()));
 			}
-		}
+		} catch (Exception ignored) {}
 		return null;
 	}
 
 	public static String makeHastePost(String body) {
-		try {
-			CloseableHttpClient client = HttpClientBuilder.create().build();
-
+		try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
 			HttpPost httpPost = new HttpPost("https://hst.sh/documents");
 
 			StringEntity entity = new StringEntity(body);
 			httpPost.setEntity(entity);
 
-			CloseableHttpResponse response = client.execute(httpPost);
-			client.close();
-			return (
-				"https://hst.sh/" +
-				higherDepth(JsonParser.parseReader(new InputStreamReader(response.getEntity().getContent())), "key").getAsString()
-			);
+			try (CloseableHttpResponse response = client.execute(httpPost)) {
+				return (
+					"https://hst.sh/" +
+					higherDepth(JsonParser.parseReader(new InputStreamReader(response.getEntity().getContent())), "key").getAsString()
+				);
+			}
 		} catch (Exception ignored) {}
 		return null;
-	}
-
-	public static int postJson(String jsonUrl, Object postObject) {
-		try {
-			CredentialsProvider provider = new BasicCredentialsProvider();
-			UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(API_USERNAME, API_PASSWORD);
-			provider.setCredentials(AuthScope.ANY, credentials);
-
-			CloseableHttpClient client = HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
-
-			HttpPost httpPost = new HttpPost(jsonUrl);
-
-			StringEntity entity = new StringEntity((new Gson()).toJson(postObject));
-			httpPost.setEntity(entity);
-			httpPost.addHeader("content-type", "application/json; charset=UTF-8");
-
-			CloseableHttpResponse response = client.execute(httpPost);
-			client.close();
-			return response.getStatusLine().getStatusCode();
-		} catch (Exception ignored) {}
-		return -1;
 	}
 
 	public static EmbedBuilder errorMessage(String name) {

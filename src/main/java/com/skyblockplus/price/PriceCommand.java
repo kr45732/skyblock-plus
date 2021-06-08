@@ -32,30 +32,6 @@ public class PriceCommand extends Command {
 		this.cooldown = globalCooldown + 1;
 	}
 
-	@Override
-	protected void execute(CommandEvent event) {
-		new Thread(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-				String content = event.getMessage().getContentRaw();
-				String[] args = content.split(" ");
-
-				logCommand(event.getGuild(), event.getAuthor(), content);
-
-				if (args.length == 2) {
-					eb = calculatePriceFromUuid(args[1]);
-
-					ebMessage.editMessage(eb.build()).queue();
-					return;
-				}
-
-				ebMessage.editMessage(errorMessage(this.name).build()).queue();
-			}
-		)
-			.start();
-	}
-
 	public static EmbedBuilder calculatePriceFromUuid(String auctionUuid) {
 		JsonArray auctionJson = higherDepth(
 			getJson("https://api.hypixel.net/skyblock/auction?key=" + HYPIXEL_API_KEY + "&uuid=" + auctionUuid),
@@ -417,5 +393,29 @@ public class PriceCommand extends Command {
 			}
 		} catch (Exception ignored) {}
 		return 0;
+	}
+
+	@Override
+	protected void execute(CommandEvent event) {
+		new Thread(
+			() -> {
+				EmbedBuilder eb = loadingEmbed();
+				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				String content = event.getMessage().getContentRaw();
+				String[] args = content.split(" ");
+
+				logCommand(event.getGuild(), event.getAuthor(), content);
+
+				if (args.length == 2) {
+					eb = calculatePriceFromUuid(args[1]);
+
+					ebMessage.editMessage(eb.build()).queue();
+					return;
+				}
+
+				ebMessage.editMessage(errorMessage(this.name).build()).queue();
+			}
+		)
+			.start();
 	}
 }

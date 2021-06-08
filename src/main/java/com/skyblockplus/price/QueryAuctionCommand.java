@@ -18,7 +18,7 @@ import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -32,8 +32,7 @@ public class QueryAuctionCommand extends Command {
 	}
 
 	private static JsonArray queryAhApi(String query) {
-		CloseableHttpClient httpclient = HttpClientBuilder.create().build();
-		try {
+		try (CloseableHttpClient httpclient = HttpClientBuilder.create().build()) {
 			HttpGet httpget = new HttpGet("https://api.eastarcti.ca/auctions/");
 			httpget.addHeader("content-type", "application/json; charset=UTF-8");
 
@@ -47,16 +46,10 @@ public class QueryAuctionCommand extends Command {
 				.build();
 			httpget.setURI(uri);
 
-			HttpResponse httpresponse = httpclient.execute(httpget);
-			return JsonParser.parseReader(new InputStreamReader(httpresponse.getEntity().getContent())).getAsJsonArray();
-		} catch (Exception ignored) {} finally {
-			try {
-				httpclient.close();
-			} catch (Exception e) {
-				System.out.println("== Stack Trace (Auction Query Close Http Client) ==");
-				e.printStackTrace();
+			try (CloseableHttpResponse httpresponse = httpclient.execute(httpget)) {
+				return JsonParser.parseReader(new InputStreamReader(httpresponse.getEntity().getContent())).getAsJsonArray();
 			}
-		}
+		} catch (Exception ignored) {}
 		return null;
 	}
 

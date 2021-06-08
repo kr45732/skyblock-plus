@@ -1,7 +1,7 @@
 package com.skyblockplus.utils;
 
 import static com.skyblockplus.Main.*;
-import static com.skyblockplus.eventlisteners.MainListener.getGuildMap;
+import static com.skyblockplus.eventlisteners.MainListener.guildMap;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.Gson;
@@ -30,7 +30,7 @@ public class MainClassUtils {
 			return;
 		}
 
-		for (Map.Entry<String, AutomaticGuild> automaticGuild : getGuildMap().entrySet()) {
+		for (Map.Entry<String, AutomaticGuild> automaticGuild : guildMap.entrySet()) {
 			List<ApplyGuild> applySettings = automaticGuild.getValue().getApplyGuild();
 			for (ApplyGuild applySetting : applySettings) {
 				try {

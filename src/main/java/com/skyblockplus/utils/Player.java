@@ -71,6 +71,21 @@ public class Player {
 		this.validPlayer = true;
 	}
 
+	public Player(String playerUuid, String playerUsername, String profileName, JsonElement outerProfileJson) {
+		this.playerUuid = playerUuid;
+		this.playerUsername = playerUsername;
+
+		try {
+			if (profileIdFromName(profileName, higherDepth(outerProfileJson, "profiles").getAsJsonArray())) {
+				return;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		this.validPlayer = true;
+	}
+
 	public Player(String playerUuid, String playerUsername, String profileName, JsonElement outerProfileJson, double startingAmount) {
 		this.playerUuid = playerUuid;
 		this.playerUsername = playerUsername;
@@ -521,7 +536,7 @@ public class Player {
 				}
 				return (prevSpiderMax + 1);
 			case "enderman":
-				JsonArray endermanLevelArray = higherDepth(getLevelingJson(), "slayer_xp.enderman").getAsJsonArray(); // TODO:
+				JsonArray endermanLevelArray = higherDepth(getLevelingJson(), "slayer_xp.enderman").getAsJsonArray();
 				int endermanXp = getEndermanXp();
 				int prevEndermanMax = 0;
 				for (int i = 0; i < endermanLevelArray.size(); i++) {

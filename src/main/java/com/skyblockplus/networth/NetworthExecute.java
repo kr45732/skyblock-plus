@@ -15,7 +15,7 @@ import java.net.URI;
 import java.util.*;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -51,6 +51,62 @@ public class NetworthExecute {
 	private double storageTotal = 0;
 	private String calcItemsJsonStr = "[";
 	private boolean verbose = false;
+
+	public static boolean isIgnoredItem(String s) {
+		s = s.toLowerCase();
+
+		if (s.equalsIgnoreCase("none")) {
+			return true;
+		}
+
+		if (s.startsWith("stained_glass")) {
+			return true;
+		}
+
+		if (s.equalsIgnoreCase("redstone_torch_on")) {
+			return true;
+		}
+
+		if (s.equalsIgnoreCase("book")) {
+			return true;
+		}
+
+		if (s.equalsIgnoreCase("smooth_brick")) {
+			return true;
+		}
+
+		if (s.equalsIgnoreCase("zombie_talisman")) {
+			return true;
+		}
+
+		if (s.equalsIgnoreCase("zombie_commander_whip")) {
+			return true;
+		}
+
+		if (s.startsWith("step")) {
+			return true;
+		}
+
+		return s.equals("skyblock_menu");
+	}
+
+	public static JsonArray queryAhApi(String query) {
+		try (CloseableHttpClient httpclient = HttpClientBuilder.create().build()) {
+			HttpGet httpget = new HttpGet("https://api.eastarcti.ca/auctions/");
+			httpget.addHeader("content-type", "application/json; charset=UTF-8");
+
+			URI uri = new URIBuilder(httpget.getURI())
+				.addParameter("query", "{\"item_name\":{\"$in\":[" + query + "]},\"bin\":true}")
+				.addParameter("sort", "{\"starting_bid\":1}")
+				.build();
+			httpget.setURI(uri);
+
+			try (CloseableHttpResponse httpresponse = httpclient.execute(httpget)) {
+				return JsonParser.parseReader(new InputStreamReader(httpresponse.getEntity().getContent())).getAsJsonArray();
+			}
+		} catch (Exception ignored) {}
+		return null;
+	}
 
 	public void execute(CommandEvent event) {
 		new Thread(
@@ -1205,68 +1261,5 @@ public class NetworthExecute {
 		tempSet.add(itemId + " - " + tempName);
 		failedCount++;
 		return 0;
-	}
-
-	public static boolean isIgnoredItem(String s) {
-		s = s.toLowerCase();
-
-		if (s.equalsIgnoreCase("none")) {
-			return true;
-		}
-
-		if (s.startsWith("stained_glass")) {
-			return true;
-		}
-
-		if (s.equalsIgnoreCase("redstone_torch_on")) {
-			return true;
-		}
-
-		if (s.equalsIgnoreCase("book")) {
-			return true;
-		}
-
-		if (s.equalsIgnoreCase("smooth_brick")) {
-			return true;
-		}
-
-		if (s.equalsIgnoreCase("zombie_talisman")) {
-			return true;
-		}
-
-		if (s.equalsIgnoreCase("zombie_commander_whip")) {
-			return true;
-		}
-
-		if (s.startsWith("step")) {
-			return true;
-		}
-
-		return s.equals("skyblock_menu");
-	}
-
-	public static JsonArray queryAhApi(String query) {
-		CloseableHttpClient httpclient = HttpClientBuilder.create().build();
-		try {
-			HttpGet httpget = new HttpGet("https://api.eastarcti.ca/auctions/");
-			httpget.addHeader("content-type", "application/json; charset=UTF-8");
-
-			URI uri = new URIBuilder(httpget.getURI())
-				.addParameter("query", "{\"item_name\":{\"$in\":[" + query + "]},\"bin\":true}")
-				.addParameter("sort", "{\"starting_bid\":1}")
-				.build();
-			httpget.setURI(uri);
-
-			HttpResponse httpresponse = httpclient.execute(httpget);
-			return JsonParser.parseReader(new InputStreamReader(httpresponse.getEntity().getContent())).getAsJsonArray();
-		} catch (Exception ignored) {} finally {
-			try {
-				httpclient.close();
-			} catch (Exception e) {
-				System.out.println("== Stack Trace (Nw Query Close Http Client) ==");
-				e.printStackTrace();
-			}
-		}
-		return null;
 	}
 }

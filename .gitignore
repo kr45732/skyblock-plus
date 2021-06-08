@@ -59,7 +59,6 @@ Temporary Items
 /.gradle/
 /build/
 
-/src/main/java/com/skyblockplus/api/security/
 /src/main/java/com/skyblockplus/api/discordserversettings/settingsmanagers/ServerSettingsController.java
 /src/main/java/com/skyblockplus/json/test.json
 

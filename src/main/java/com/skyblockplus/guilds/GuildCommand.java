@@ -13,9 +13,11 @@ import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.time.Instant;
-import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -43,77 +45,62 @@ public class GuildCommand extends Command {
 
 		JsonElement members = higherDepth(guildJson, "guild.members");
 		JsonArray membersArr = members.getAsJsonArray();
-		Map<String, Integer> guildExpMap = new HashMap<>();
-
-		CountDownLatch httpGetsFinishedLatch = new CountDownLatch(1);
+		List<String> guildExpList = new ArrayList<>();
+		List<CompletableFuture<String>> futures = new ArrayList<>();
 		for (int i = 0; i < membersArr.size(); i++) {
 			int finalI = i;
-			asyncHttpClient
-				.prepareGet("https://api.ashcon.app/mojang/v2/user/" + higherDepth(membersArr.get(i), "uuid").getAsString())
-				.execute()
-				.toCompletableFuture()
-				.thenApply(
-					uuidToUsernameResponse -> {
-						try {
-							String currentUsername = higherDepth(
-								JsonParser.parseString(uuidToUsernameResponse.getResponseBody()),
-								"username"
-							)
-								.getAsString();
-							JsonElement expHistory = higherDepth(membersArr.get(finalI), "expHistory");
-							List<String> keys = getJsonKeys(expHistory);
-							int totalPlayerExp = 0;
+			futures.add(
+				asyncHttpClient
+					.prepareGet("https://api.ashcon.app/mojang/v2/user/" + higherDepth(membersArr.get(i), "uuid").getAsString())
+					.execute()
+					.toCompletableFuture()
+					.thenApply(
+						uuidToUsernameResponse -> {
+							try {
+								String currentUsername = higherDepth(
+									JsonParser.parseString(uuidToUsernameResponse.getResponseBody()),
+									"username"
+								)
+									.getAsString();
+								JsonElement expHistory = higherDepth(membersArr.get(finalI), "expHistory");
+								List<String> keys = getJsonKeys(expHistory);
+								int totalPlayerExp = 0;
 
-							for (String value : keys) {
-								totalPlayerExp += higherDepth(expHistory, value).getAsInt();
-							}
-
-							guildExpMap.put(currentUsername, totalPlayerExp);
-						} catch (Exception e) {
-							guildExpMap.put("@null" + finalI, 0);
+								for (String value : keys) {
+									totalPlayerExp += higherDepth(expHistory, value).getAsInt();
+								}
+								return currentUsername + "=:=" + totalPlayerExp;
+							} catch (Exception ignored) {}
+							return null;
 						}
-						return true;
-					}
-				)
-				.whenComplete(
-					(aBoolean, throwable) -> {
-						if (guildExpMap.size() == membersArr.size()) {
-							httpGetsFinishedLatch.countDown();
-						}
-					}
-				);
-		}
-
-		try {
-			httpGetsFinishedLatch.await(20, TimeUnit.SECONDS);
-		} catch (Exception e) {
-			System.out.println("== Stack Trace (Guild Exp Latch) ==");
-			e.printStackTrace();
-		}
-
-		LinkedHashMap<String, Integer> reverseSortedMap = new LinkedHashMap<>();
-
-		guildExpMap
-			.entrySet()
-			.stream()
-			.sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-			.forEachOrdered(
-				x -> {
-					try {
-						reverseSortedMap.put(x.getKey(), x.getValue());
-					} catch (Exception ignored) {}
-				}
+					)
 			);
+		}
+
+		for (CompletableFuture<String> future : futures) {
+			try {
+				String futureResponse = future.get();
+				if (futureResponse != null) {
+					guildExpList.add(futureResponse);
+				}
+			} catch (Exception ignored) {}
+		}
+
+		guildExpList.sort(Comparator.comparingInt(o1 -> -Integer.parseInt(o1.split("=:=")[1])));
 
 		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, user).setColumns(2).setItemsPerPage(20);
-
+		int guildRank = -1;
+		int guildExp = -1;
+		for (int i = 0; i < guildExpList.size(); i++) {
+			String[] curGuildRank = guildExpList.get(i).split("=:=");
+			if (curGuildRank[0].equals(uuidUsername.playerUsername)) {
+				guildRank = i;
+				guildExp = Integer.parseInt(curGuildRank[1]);
+				break;
+			}
+		}
 		String rankStr =
-			"**Player:** " +
-			uuidUsername.playerUsername +
-			"\n**Guild Rank:** #" +
-			(new ArrayList<>(reverseSortedMap.keySet()).indexOf(uuidUsername.playerUsername) + 1) +
-			"\n**Exp:** " +
-			formatNumber(reverseSortedMap.get(uuidUsername.playerUsername));
+			"**Player:** " + uuidUsername.playerUsername + "\n**Guild Rank:** #" + (guildRank + 1) + "\n**Exp:** " + formatNumber(guildExp);
 		paginateBuilder.setPaginatorExtras(
 			new PaginatorExtras()
 				.setEveryPageTitle(higherDepth(guildJson, "guild.name").getAsString())
@@ -123,15 +110,11 @@ public class GuildCommand extends Command {
 				.setEveryPageText(rankStr)
 		);
 
-		int counter = 0;
-		for (Map.Entry<String, Integer> k : reverseSortedMap.entrySet()) {
-			if (!k.getKey().startsWith("@null")) {
-				paginateBuilder.addItems(
-					"`" + (counter + 1) + ")` " + fixUsername(k.getKey()) + ": " + formatNumber(k.getValue()) + " EXP  "
-				);
-			}
-
-			counter++;
+		for (int i = 0; i < guildExpList.size(); i++) {
+			String[] curG = guildExpList.get(i).split("=:=");
+			paginateBuilder.addItems(
+				"`" + (i + 1) + ")` " + fixUsername(curG[0]) + ": " + formatNumber(Integer.parseInt(curG[1])) + " EXP  "
+			);
 		}
 
 		if (channel != null) {
@@ -273,43 +256,33 @@ public class GuildCommand extends Command {
 		}
 
 		JsonArray membersArr = higherDepth(guildJson, "guild.members").getAsJsonArray();
-
+		List<CompletableFuture<String>> futures = new ArrayList<>();
 		List<String> guildMembers = new ArrayList<>();
-		CountDownLatch httpGetsFinishedLatch = new CountDownLatch(1);
 		for (int i = 0; i < membersArr.size(); i++) {
-			asyncHttpClient
-				.prepareGet("https://api.ashcon.app/mojang/v2/user/" + higherDepth(membersArr.get(i), "uuid").getAsString())
-				.execute()
-				.toCompletableFuture()
-				.thenApply(
-					uuidToUsernameResponse -> {
-						try {
-							guildMembers.add(
-								higherDepth(JsonParser.parseString(uuidToUsernameResponse.getResponseBody()), "username").getAsString()
-							);
-						} catch (Exception e) {
-							guildMembers.add(null);
+			futures.add(
+				asyncHttpClient
+					.prepareGet("https://api.ashcon.app/mojang/v2/user/" + higherDepth(membersArr.get(i), "uuid").getAsString())
+					.execute()
+					.toCompletableFuture()
+					.thenApply(
+						uuidToUsernameResponse -> {
+							try {
+								return higherDepth(JsonParser.parseString(uuidToUsernameResponse.getResponseBody()), "username")
+									.getAsString();
+							} catch (Exception ignored) {}
+							return null;
 						}
-						return true;
-					}
-				)
-				.whenComplete(
-					(aBoolean, throwable) -> {
-						if (guildMembers.size() == membersArr.size()) {
-							httpGetsFinishedLatch.countDown();
-						}
-					}
-				);
+					)
+			);
 		}
 
-		try {
-			httpGetsFinishedLatch.await(20, TimeUnit.SECONDS);
-		} catch (Exception e) {
-			System.out.println("== Stack Trace (Guild Members Latch) ==");
-			e.printStackTrace();
+		for (CompletableFuture<String> future : futures) {
+			try {
+				guildMembers.add(future.get());
+			} catch (Exception ignored) {}
 		}
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, user).setColumns(3).setItemsPerPage(27);
+		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, user).setColumns(3).setItemsPerPage(33);
 
 		paginateBuilder.setPaginatorExtras(
 			new PaginatorExtras()

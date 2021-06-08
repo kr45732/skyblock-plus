@@ -38,10 +38,6 @@ public class MainListener extends ListenerAdapter {
 		return reloadStatus;
 	}
 
-	public static Map<String, AutomaticGuild> getGuildMap() {
-		return guildMap;
-	}
-
 	@Override
 	public void onGuildReady(GuildReadyEvent event) {
 		if (event.getGuild().getName().startsWith("Skyblock Plus - Emoji Server")) {
