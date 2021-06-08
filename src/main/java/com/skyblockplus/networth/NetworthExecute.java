@@ -49,7 +49,7 @@ public class NetworthExecute {
 	private double talismanTotal = 0;
 	private double invArmor = 0;
 	private double storageTotal = 0;
-	private String calcItemsJsonStr = "[";
+	private StringBuilder calcItemsJsonStr = new StringBuilder("[");
 	private boolean verbose = false;
 
 	public static boolean isIgnoredItem(String s) {
@@ -124,22 +124,27 @@ public class NetworthExecute {
 				String[] args = content.split(" ");
 
 				if (args.length == 2) {
+					long timeP = System.currentTimeMillis();
 					EmbedBuilder nwEb = getPlayerNetworth(args[1], null);
 
 					if (verbose) {
 						try {
-							if (calcItemsJsonStr.endsWith(",")) {
-								calcItemsJsonStr = calcItemsJsonStr.substring(0, calcItemsJsonStr.length() - 1);
+							if (calcItemsJsonStr.charAt(calcItemsJsonStr.length() - 1) == ',') {
+								calcItemsJsonStr.deleteCharAt(calcItemsJsonStr.length() - 1);
 							}
-							calcItemsJsonStr += "]";
+							calcItemsJsonStr.append("]");
 
 							nwEb.appendDescription(
 								"\nVerbose JSON: " +
 								makeHastePost(
-									new GsonBuilder().setPrettyPrinting().create().toJson(JsonParser.parseString(calcItemsJsonStr))
+									new GsonBuilder()
+										.setPrettyPrinting()
+										.create()
+										.toJson(JsonParser.parseString(calcItemsJsonStr.toString()))
 								) +
 								".json"
 							);
+							System.out.println("TIME: " + (System.currentTimeMillis() - timeP));
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -151,15 +156,18 @@ public class NetworthExecute {
 
 					if (verbose) {
 						try {
-							if (calcItemsJsonStr.endsWith(",")) {
-								calcItemsJsonStr = calcItemsJsonStr.substring(0, calcItemsJsonStr.length() - 1);
+							if (calcItemsJsonStr.charAt(calcItemsJsonStr.length() - 1) == ',') {
+								calcItemsJsonStr.deleteCharAt(calcItemsJsonStr.length() - 1);
 							}
-							calcItemsJsonStr += "]";
+							calcItemsJsonStr.append("]");
 
 							nwEb.appendDescription(
 								"\nVerbose JSON: " +
 								makeHastePost(
-									new GsonBuilder().setPrettyPrinting().create().toJson(JsonParser.parseString(calcItemsJsonStr))
+									new GsonBuilder()
+										.setPrettyPrinting()
+										.create()
+										.toJson(JsonParser.parseString(calcItemsJsonStr.toString()))
 								) +
 								".json"
 							);
@@ -456,18 +464,18 @@ public class NetworthExecute {
 						invItems.add(addItemStr(item, auctionPrice + miscExtras));
 						invTotal += auctionPrice + miscExtras;
 						if (verbose) {
-							calcItemsJsonStr +=
-								"{\"total\":\"" +
-								simplifyNumber(auctionPrice + miscExtras) +
-								"\",\"name\":\"" +
-								item.getName() +
-								"\",\"base_cost\":\"" +
-								simplifyNumber(auctionPrice) +
-								"\",\"misc\":{\"total\":\"" +
-								simplifyNumber(miscExtras) +
-								"\",\"miscs\":" +
-								miscStr +
-								"}},";
+							calcItemsJsonStr
+								.append("{\"total\":\"")
+								.append(simplifyNumber(auctionPrice + miscExtras))
+								.append("\",\"name\":\"")
+								.append(item.getName())
+								.append("\",\"base_cost\":\"")
+								.append(simplifyNumber(auctionPrice))
+								.append("\",\"misc\":{\"total\":\"")
+								.append(simplifyNumber(miscExtras))
+								.append("\",\"miscs\":")
+								.append(miscStr)
+								.append("}},");
 						}
 						iterator.remove();
 					}
@@ -499,18 +507,18 @@ public class NetworthExecute {
 						petsItems.add(addItemStr(item, auctionPrice + miscExtras));
 						petsTotal += auctionPrice + miscExtras;
 						if (verbose) {
-							calcItemsJsonStr +=
-								"{\"total\":\"" +
-								simplifyNumber(auctionPrice + miscExtras) +
-								"\",\"name\":\"" +
-								item.getName() +
-								"\",\"base_cost\":\"" +
-								simplifyNumber(auctionPrice) +
-								"\",\"misc\":{\"total\":\"" +
-								simplifyNumber(miscExtras) +
-								"\",\"miscs\":" +
-								miscStr +
-								"}},";
+							calcItemsJsonStr
+								.append("{\"total\":\"")
+								.append(simplifyNumber(auctionPrice + miscExtras))
+								.append("\",\"name\":\"")
+								.append(item.getName())
+								.append("\",\"base_cost\":\"")
+								.append(simplifyNumber(auctionPrice))
+								.append("\",\"misc\":{\"total\":\"")
+								.append(simplifyNumber(miscExtras))
+								.append("\",\"miscs\":")
+								.append(miscStr)
+								.append("}},");
 						}
 						iterator.remove();
 					}
@@ -542,18 +550,18 @@ public class NetworthExecute {
 						enderChestItems.add(addItemStr(item, auctionPrice + miscExtras));
 						enderChestTotal += auctionPrice + miscExtras;
 						if (verbose) {
-							calcItemsJsonStr +=
-								"{\"total\":\"" +
-								simplifyNumber(auctionPrice + miscExtras) +
-								"\",\"name\":\"" +
-								item.getName() +
-								"\",\"base_cost\":\"" +
-								simplifyNumber(auctionPrice) +
-								"\",\"misc\":{\"total\":\"" +
-								simplifyNumber(miscExtras) +
-								"\",\"miscs\":" +
-								miscStr +
-								"}},";
+							calcItemsJsonStr
+								.append("{\"total\":\"")
+								.append(simplifyNumber(auctionPrice + miscExtras))
+								.append("\",\"name\":\"")
+								.append(item.getName())
+								.append("\",\"base_cost\":\"")
+								.append(simplifyNumber(auctionPrice))
+								.append("\",\"misc\":{\"total\":\"")
+								.append(simplifyNumber(miscExtras))
+								.append("\",\"miscs\":")
+								.append(miscStr)
+								.append("}},");
 						}
 						iterator.remove();
 					}
@@ -585,18 +593,18 @@ public class NetworthExecute {
 						storageItems.add(addItemStr(item, auctionPrice + miscExtras));
 						storageTotal += auctionPrice + miscExtras;
 						if (verbose) {
-							calcItemsJsonStr +=
-								"{\"total\":\"" +
-								simplifyNumber(auctionPrice + miscExtras) +
-								"\",\"name\":\"" +
-								item.getName() +
-								"\",\"base_cost\":\"" +
-								simplifyNumber(auctionPrice) +
-								"\",\"misc\":{\"total\":\"" +
-								simplifyNumber(miscExtras) +
-								"\",\"miscs\":" +
-								miscStr +
-								"}},";
+							calcItemsJsonStr
+								.append("{\"total\":\"")
+								.append(simplifyNumber(auctionPrice + miscExtras))
+								.append("\",\"name\":\"")
+								.append(item.getName())
+								.append("\",\"base_cost\":\"")
+								.append(simplifyNumber(auctionPrice))
+								.append("\",\"misc\":{\"total\":\"")
+								.append(simplifyNumber(miscExtras))
+								.append("\",\"miscs\":")
+								.append(miscStr)
+								.append("}},");
 						}
 						iterator.remove();
 					}
@@ -642,18 +650,18 @@ public class NetworthExecute {
 				storageItems.add(addItemStr(item, auctionPrice + miscExtras));
 				storageTotal += auctionPrice + miscExtras;
 				if (verbose) {
-					calcItemsJsonStr +=
-						"{\"total\":\"" +
-						simplifyNumber(auctionPrice + miscExtras) +
-						"\",\"name\":\"" +
-						item.getName() +
-						"\",\"base_cost\":\"" +
-						simplifyNumber(auctionPrice) +
-						"\",\"misc\":{\"total\":\"" +
-						simplifyNumber(miscExtras) +
-						"\",\"miscs\":" +
-						miscStr +
-						"},\"fail_calc_lvl_cost\":true},";
+					calcItemsJsonStr
+						.append("{\"total\":\"")
+						.append(simplifyNumber(auctionPrice + miscExtras))
+						.append("\",\"name\":\"")
+						.append(item.getName())
+						.append("\",\"base_cost\":\"")
+						.append(simplifyNumber(auctionPrice))
+						.append("\",\"misc\":{\"total\":\"")
+						.append(simplifyNumber(miscExtras))
+						.append("\",\"miscs\":")
+						.append(miscStr)
+						.append("},\"fail_calc_lvl_cost\":true},");
 				}
 			} catch (Exception ignored) {}
 		}
@@ -688,18 +696,18 @@ public class NetworthExecute {
 				storageItems.add(addItemStr(item, auctionPrice + miscExtras));
 				storageTotal += auctionPrice + miscExtras;
 				if (verbose) {
-					calcItemsJsonStr +=
-						"{\"total\":\"" +
-						simplifyNumber(auctionPrice + miscExtras) +
-						"\",\"name\":\"" +
-						item.getName() +
-						"\",\"base_cost\":\"" +
-						simplifyNumber(auctionPrice) +
-						"\",\"misc\":{\"total\":\"" +
-						simplifyNumber(miscExtras) +
-						"\",\"miscs\":" +
-						miscStr +
-						"},\"fail_calc_lvl_cost\":true},";
+					calcItemsJsonStr
+						.append("{\"total\":\"")
+						.append(simplifyNumber(auctionPrice + miscExtras))
+						.append("\",\"name\":\"")
+						.append(item.getName())
+						.append("\",\"base_cost\":\"")
+						.append(simplifyNumber(auctionPrice))
+						.append("\",\"misc\":{\"total\":\"")
+						.append(simplifyNumber(miscExtras))
+						.append("\",\"miscs\":")
+						.append(miscStr)
+						.append("},\"fail_calc_lvl_cost\":true},");
 				}
 			} catch (Exception ignored) {}
 		}
@@ -734,18 +742,18 @@ public class NetworthExecute {
 				storageItems.add(addItemStr(item, auctionPrice + miscExtras));
 				storageTotal += auctionPrice + miscExtras;
 				if (verbose) {
-					calcItemsJsonStr +=
-						"{\"total\":\"" +
-						simplifyNumber(auctionPrice + miscExtras) +
-						"\",\"name\":\"" +
-						item.getName() +
-						"\",\"base_cost\":\"" +
-						simplifyNumber(auctionPrice) +
-						"\",\"misc\":{\"total\":\"" +
-						simplifyNumber(miscExtras) +
-						"\",\"miscs\":" +
-						miscStr +
-						"},\"fail_calc_lvl_cost\":true},";
+					calcItemsJsonStr
+						.append("{\"total\":\"")
+						.append(simplifyNumber(auctionPrice + miscExtras))
+						.append("\",\"name\":\"")
+						.append(item.getName())
+						.append("\",\"base_cost\":\"")
+						.append(simplifyNumber(auctionPrice))
+						.append("\",\"misc\":{\"total\":\"")
+						.append(simplifyNumber(miscExtras))
+						.append("\",\"miscs\":")
+						.append(miscStr)
+						.append("},\"fail_calc_lvl_cost\":true},");
 				}
 			} catch (Exception ignored) {}
 		}
@@ -780,18 +788,18 @@ public class NetworthExecute {
 				storageItems.add(addItemStr(item, auctionPrice + miscExtras));
 				storageTotal += auctionPrice + miscExtras;
 				if (verbose) {
-					calcItemsJsonStr +=
-						"{\"total\":\"" +
-						simplifyNumber(auctionPrice + miscExtras) +
-						"\",\"name\":\"" +
-						item.getName() +
-						"\",\"base_cost\":\"" +
-						simplifyNumber(auctionPrice) +
-						"\",\"misc\":{\"total\":\"" +
-						simplifyNumber(miscExtras) +
-						"\",\"miscs\":" +
-						miscStr +
-						"},\"fail_calc_lvl_cost\":true},";
+					calcItemsJsonStr
+						.append("{\"total\":\"")
+						.append(simplifyNumber(auctionPrice + miscExtras))
+						.append("\",\"name\":\"")
+						.append(item.getName())
+						.append("\",\"base_cost\":\"")
+						.append(simplifyNumber(auctionPrice))
+						.append("\",\"misc\":{\"total\":\"")
+						.append(simplifyNumber(miscExtras))
+						.append("\",\"miscs\":")
+						.append(miscStr)
+						.append("},\"fail_calc_lvl_cost\":true},");
 				}
 			} catch (Exception ignored) {}
 		}
@@ -942,32 +950,34 @@ public class NetworthExecute {
 			(itemCost + recombobulatedExtra + hbpExtras + enchantsExtras + fumingExtras + reforgeExtras + miscExtras + backpackExtras);
 
 		if (verbose) {
-			calcItemsJsonStr += "{";
-			calcItemsJsonStr += "\"total\":\"" + simplifyNumber(totalPrice) + "\"";
-			calcItemsJsonStr += ",\"name\":\"" + item.getName() + "\"";
-			calcItemsJsonStr += ",\"id\":\"" + item.getId() + "\"";
-			calcItemsJsonStr += ",\"count\":" + itemCount;
-			calcItemsJsonStr += ",\"base_cost\":\"" + simplifyNumber(itemCost) + "\"";
-			calcItemsJsonStr += recombobulatedExtra > 0 ? ",\"recomb\":\"" + simplifyNumber(recombobulatedExtra) + "\"" : "";
-			calcItemsJsonStr += (hbpExtras > 0 ? ",\"hbp\":\"" + simplifyNumber(hbpExtras) + "\"" : "");
-			calcItemsJsonStr +=
-				(
-					enchantsExtras > 0
-						? ",\"enchants\":{\"total\":\"" + simplifyNumber(enchantsExtras) + "\",\"enchants\":" + enchStr + "}"
-						: ""
-				);
-			calcItemsJsonStr += fumingExtras > 0 ? ",\"fuming\":\"" + simplifyNumber(fumingExtras) + "\"" : "";
-			calcItemsJsonStr +=
+			calcItemsJsonStr.append("{");
+			calcItemsJsonStr.append("\"total\":\"").append(simplifyNumber(totalPrice)).append("\"");
+			calcItemsJsonStr.append(",\"name\":\"").append(item.getName()).append("\"");
+			calcItemsJsonStr.append(",\"id\":\"").append(item.getId()).append("\"");
+			calcItemsJsonStr.append(",\"count\":").append(itemCount);
+			calcItemsJsonStr.append(",\"base_cost\":\"").append(simplifyNumber(itemCost)).append("\"");
+			calcItemsJsonStr.append(recombobulatedExtra > 0 ? ",\"recomb\":\"" + simplifyNumber(recombobulatedExtra) + "\"" : "");
+			calcItemsJsonStr.append(hbpExtras > 0 ? ",\"hbp\":\"" + simplifyNumber(hbpExtras) + "\"" : "");
+			calcItemsJsonStr.append(
+				enchantsExtras > 0
+					? ",\"enchants\":{\"total\":\"" + simplifyNumber(enchantsExtras) + "\",\"enchants\":" + enchStr + "}"
+					: ""
+			);
+			calcItemsJsonStr.append(fumingExtras > 0 ? ",\"fuming\":\"" + simplifyNumber(fumingExtras) + "\"" : "");
+			calcItemsJsonStr.append(
 				reforgeExtras > 0
 					? ",\"reforge\":{\"cost\":\"" + simplifyNumber(reforgeExtras) + "\",\"name\":\"" + item.getModifier() + "\"}"
-					: "";
-			calcItemsJsonStr +=
-				miscExtras > 0 ? ",\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}" : "";
-			calcItemsJsonStr +=
-				backpackExtras > 0 ? ",\"bp\":{\"cost\":\"" + simplifyNumber(backpackExtras) + "\",\"bp\":" + bpStr + "}" : "";
+					: ""
+			);
+			calcItemsJsonStr.append(
+				miscExtras > 0 ? ",\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}" : ""
+			);
+			calcItemsJsonStr.append(
+				backpackExtras > 0 ? ",\"bp\":{\"cost\":\"" + simplifyNumber(backpackExtras) + "\",\"bp\":" + bpStr + "}" : ""
+			);
 
-			calcItemsJsonStr += ",\"nbt_tag\":\"" + parseMcCodes(item.getNbtTag().replace("\"", "\\\"")) + "\"";
-			calcItemsJsonStr += "},";
+			calcItemsJsonStr.append(",\"nbt_tag\":\"").append(parseMcCodes(item.getNbtTag().replace("\"", "\\\""))).append("\"");
+			calcItemsJsonStr.append("},");
 		}
 
 		return totalPrice;

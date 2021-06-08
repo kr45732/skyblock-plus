@@ -132,8 +132,8 @@ public class SkyblockEventCommand extends Command {
 						}
 					)
 					.thenApply(
-						guildMemberUsernameResponse -> {
-							return asyncHttpClient
+						guildMemberUsernameResponse ->
+							asyncHttpClient
 								.prepareGet("https://api.hypixel.net/skyblock/profiles?key=" + HYPIXEL_API_KEY + "&uuid=" + guildMemberUuid)
 								.execute()
 								.toCompletableFuture()
@@ -224,8 +224,7 @@ public class SkyblockEventCommand extends Command {
 										}
 										return null;
 									}
-								);
-						}
+								)
 					)
 			);
 		}
