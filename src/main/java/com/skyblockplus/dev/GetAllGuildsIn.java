@@ -73,13 +73,7 @@ public class GetAllGuildsIn extends Command {
 								}
 							} catch (Exception e) {
 								paginateBuilder.addItems(
-									"**" +
-									guild.getName() +
-									"**\nId: " +
-									guild.getId() +
-									"\nOwner: " +
-									guild.getOwnerId() +
-									"\n"
+									"**" + guild.getName() + "**\nId: " + guild.getId() + "\nOwner: " + guild.getOwnerId() + "\n"
 								);
 							}
 						}

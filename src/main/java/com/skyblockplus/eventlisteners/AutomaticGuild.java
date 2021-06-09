@@ -519,13 +519,12 @@ public class AutomaticGuild {
 		event.getHook().editOriginal("❌ This button has been disabled").queue();
 	}
 
-	public void onGuildLeave()
-	{
-		if(skyblockEvent.scheduler != null){
+	public void onGuildLeave() {
+		if (skyblockEvent.scheduler != null) {
 			skyblockEvent.scheduler.shutdownNow();
 		}
 
-		if(scheduler != null){
+		if (scheduler != null) {
 			scheduler.shutdownNow();
 		}
 	}

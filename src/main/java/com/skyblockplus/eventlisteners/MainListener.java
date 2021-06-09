@@ -72,17 +72,18 @@ public class MainListener extends ListenerAdapter {
 
 		if (isUniqueGuild(event.getGuild().getId())) {
 			try {
-				EmbedBuilder eb = defaultEmbed("Thank you!").setDescription(
-					"- Thank you for adding me to " +
-					event.getGuild().getName() +
-					"\n- My prefix is `" +
-					BOT_PREFIX +
-					"`\n- You can view my commands by running `" +
-					BOT_PREFIX +
-					"help`\n- Make sure to check out `" +
-					BOT_PREFIX +
-					"setup` or the forum post [**here**](https://hypixel.net/threads/3980092) on how to setup the customizable features of this bot!"
-				);
+				EmbedBuilder eb = defaultEmbed("Thank you!")
+					.setDescription(
+						"- Thank you for adding me to " +
+						event.getGuild().getName() +
+						"\n- My prefix is `" +
+						BOT_PREFIX +
+						"`\n- You can view my commands by running `" +
+						BOT_PREFIX +
+						"help`\n- Make sure to check out `" +
+						BOT_PREFIX +
+						"setup` or the forum post [**here**](https://hypixel.net/threads/3980092) on how to setup the customizable features of this bot!"
+					);
 				TextChannel channel = event
 					.getGuild()
 					.getTextChannels()
@@ -97,8 +98,13 @@ public class MainListener extends ListenerAdapter {
 				}
 			} catch (Exception ignored) {}
 
-			logCommand(event.getGuild(), "Joined guild | #" + jda.getGuilds().size() + " | Users: " + event.getGuild().retrieveMetaData().complete().getApproximateMembers());
-
+			logCommand(
+				event.getGuild(),
+				"Joined guild | #" +
+				jda.getGuilds().size() +
+				" | Users: " +
+				event.getGuild().retrieveMetaData().complete().getApproximateMembers()
+			);
 
 			guildMap.put(event.getGuild().getId(), new AutomaticGuild(event));
 		} else {
