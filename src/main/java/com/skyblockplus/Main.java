@@ -159,7 +159,6 @@ public class Main {
 				.setStatus(OnlineStatus.DO_NOT_DISTURB)
 				.setChunkingFilter(ChunkingFilter.ALL)
 				.setMemberCachePolicy(MemberCachePolicy.ALL)
-				.enableIntents(GatewayIntent.GUILD_MEMBERS)
 				.addEventListeners(waiter, client.build(), new MessageTimeout(), new MainListener(), slashCommands)
 				.setActivity(Activity.playing("Loading..."))
 				.build();
