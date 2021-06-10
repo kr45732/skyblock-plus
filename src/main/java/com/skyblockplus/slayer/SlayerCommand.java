@@ -133,23 +133,23 @@ public class SlayerCommand extends Command {
 				revFiveKills;
 			eb.setDescription(
 				"**Total slayer:** " +
-				formatNumber(player.getSlayer()) +
+				formatNumber(player.getTotalSlayer()) +
 				" XP\n**Total coins spent:** " +
 				simplifyNumber(coinsSpentOnSlayers)
 			);
 			eb.addField(
 				"<:sven_packmaster:800002277648891914> Wolf (" + player.getSlayerLevel("sven") + ")",
-				simplifyNumber(player.getWolfXp()) + " XP",
+				simplifyNumber(player.getSlayer("sven")) + " XP",
 				true
 			);
 			eb.addField(
 				"<:revenant_horror:800002290987302943> Zombie (" + player.getSlayerLevel("rev") + ")",
-				simplifyNumber(player.getZombieXp()) + " XP",
+				simplifyNumber(player.getSlayer("rev")) + " XP",
 				true
 			);
 			eb.addField(
 				"<:tarantula_broodfather:800002277262884874> Spider (" + player.getSlayerLevel("tara") + ")",
-				simplifyNumber(player.getSpiderXp()) + " XP",
+				simplifyNumber(player.getSlayer("tara")) + " XP",
 				true
 			);
 
@@ -159,7 +159,7 @@ public class SlayerCommand extends Command {
 
 			eb.addField(
 				"<:voidgloom_seraph:849280131281059881> Enderman (" + player.getSlayerLevel("enderman") + ")",
-				simplifyNumber(player.getEndermanXp()) + " XP",
+				simplifyNumber(player.getSlayer("enderman")) + " XP",
 				true
 			);
 			eb.addBlankField(true);

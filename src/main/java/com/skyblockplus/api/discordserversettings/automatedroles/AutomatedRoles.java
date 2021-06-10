@@ -86,5 +86,8 @@ public class AutomatedRoles {
 	@Embedded
 	private RoleModel guild_ranks = new RoleModel();
 
+	@Embedded
+	private RoleModel enderman = new RoleModel();
+
 	public AutomatedRoles() {}
 }

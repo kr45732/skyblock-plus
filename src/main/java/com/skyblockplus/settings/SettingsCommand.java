@@ -793,6 +793,7 @@ public class SettingsCommand extends Command {
 		rolePageMap.put("pet_score", 23);
 		rolePageMap.put("dungeon_secrets", 24);
 		rolePageMap.put("guild_ranks", 25);
+		rolePageMap.put("enderman", 26);
 
 		if (rolePageMap.containsKey(roleName)) {
 			CustomPaginator.Builder currentRoleSettings = getCurrentRolesSettings(database.getRolesSettings(event.getGuild().getId()));
@@ -973,6 +974,14 @@ public class SettingsCommand extends Command {
 							.append("settings roles add dungeon_secrets 25000 @secret sweat`\n");
 						break;
 					}
+				case "enderman":
+					{
+						ebFieldString
+							.append("**A player's voidgloom seraph slayer xp**\nExample: `")
+							.append(BOT_PREFIX)
+							.append("settings roles add enderman 100000 @enderman 7`\n");
+						break;
+					}
 			}
 
 			ebFieldString.append("\nCurrent Settings:\n");
@@ -994,6 +1003,7 @@ public class SettingsCommand extends Command {
 							.append("`)");
 					}
 				}
+				pageTitles.add(roleName);
 			} else if (isOneLevelRole(roleName)) {
 				try {
 					ebFieldString

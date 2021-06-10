@@ -20,7 +20,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 public class Player {
 
 	public String invMissing = "";
-	private double startingAmount;
 	private JsonElement profileJson;
 	private JsonElement outerProfileJson;
 	private JsonElement hypixelProfileJson;
@@ -74,22 +73,6 @@ public class Player {
 	public Player(String playerUuid, String playerUsername, String profileName, JsonElement outerProfileJson) {
 		this.playerUuid = playerUuid;
 		this.playerUsername = playerUsername;
-
-		try {
-			if (profileIdFromName(profileName, higherDepth(outerProfileJson, "profiles").getAsJsonArray())) {
-				return;
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		this.validPlayer = true;
-	}
-
-	public Player(String playerUuid, String playerUsername, String profileName, JsonElement outerProfileJson, double startingAmount) {
-		this.playerUuid = playerUuid;
-		this.playerUsername = playerUsername;
-		this.startingAmount = startingAmount;
 
 		try {
 			if (profileIdFromName(profileName, higherDepth(outerProfileJson, "profiles").getAsJsonArray())) {
@@ -193,10 +176,6 @@ public class Player {
 		return profileNameList.toArray(new String[0]);
 	}
 
-	public double getStartingAmount() {
-		return startingAmount;
-	}
-
 	public JsonElement getOuterProfileJson() {
 		return outerProfileJson;
 	}
@@ -215,40 +194,23 @@ public class Player {
 		return validPlayer;
 	}
 
-	public int getSlayer() {
-		return getWolfXp() + getZombieXp() + getSpiderXp() + getEndermanXp();
+	public int getTotalSlayer() {
+		return getSlayer("sven") + getSlayer("rev") + getSlayer("tara") + getSlayer("enderman");
 	}
 
 	public int getSlayer(String slayerName) {
+		JsonElement profileSlayer = higherDepth(profileJson, "slayer_bosses");
 		switch (slayerName) {
 			case "sven":
-				return getWolfXp();
+				return higherDepth(profileSlayer, "wolf.xp") != null ? higherDepth(profileSlayer, "wolf.xp").getAsInt() : 0;
 			case "rev":
-				return getZombieXp();
+				return higherDepth(profileSlayer, "zombie.xp") != null ? higherDepth(profileSlayer, "zombie.xp").getAsInt() : 0;
 			case "tara":
-				return getSpiderXp();
+				return higherDepth(profileSlayer, "spider.xp") != null ? higherDepth(profileSlayer, "spider.xp").getAsInt() : 0;
 			case "enderman":
-				return getEndermanXp();
+				return higherDepth(profileSlayer, "enderman.xp") != null ? higherDepth(profileSlayer, "enderman.xp").getAsInt() : 0;
 		}
 		return -1;
-	}
-
-	public int getWolfXp() {
-		JsonElement profileSlayer = higherDepth(profileJson, "slayer_bosses");
-
-		return higherDepth(profileSlayer, "wolf.xp") != null ? higherDepth(profileSlayer, "wolf.xp").getAsInt() : 0;
-	}
-
-	public int getZombieXp() {
-		JsonElement profileSlayer = higherDepth(profileJson, "slayer_bosses");
-
-		return higherDepth(profileSlayer, "zombie.xp") != null ? higherDepth(profileSlayer, "zombie.xp").getAsInt() : 0;
-	}
-
-	public int getSpiderXp() {
-		JsonElement profileSlayer = higherDepth(profileJson, "slayer_bosses");
-
-		return higherDepth(profileSlayer, "spider.xp") != null ? higherDepth(profileSlayer, "spider.xp").getAsInt() : 0;
 	}
 
 	public double getCatacombsLevel() {
@@ -501,60 +463,54 @@ public class Player {
 		switch (slayerName) {
 			case "sven":
 				JsonArray wolfLevelArray = higherDepth(getLevelingJson(), "slayer_xp.wolf").getAsJsonArray();
-				int wolfXp = getWolfXp();
+				int wolfXp = getSlayer("sven");
 				int prevWolfLevel = 0;
 				for (int i = 0; i < wolfLevelArray.size(); i++) {
 					if (wolfXp >= wolfLevelArray.get(i).getAsInt()) {
-						prevWolfLevel = i;
+						prevWolfLevel = i + 1;
 					} else {
 						break;
 					}
 				}
-				return (prevWolfLevel + 1);
+				return prevWolfLevel;
 			case "rev":
 				JsonArray zombieLevelArray = higherDepth(getLevelingJson(), "slayer_xp.zombie").getAsJsonArray();
-				int zombieXp = getZombieXp();
+				int zombieXp = getSlayer("rev");
 				int prevZombieMax = 0;
 				for (int i = 0; i < zombieLevelArray.size(); i++) {
 					if (zombieXp >= zombieLevelArray.get(i).getAsInt()) {
-						prevZombieMax = i;
+						prevZombieMax = i + 1;
 					} else {
 						break;
 					}
 				}
-				return (prevZombieMax + 1);
+				return prevZombieMax;
 			case "tara":
 				JsonArray spiderLevelArray = higherDepth(getLevelingJson(), "slayer_xp.spider").getAsJsonArray();
-				int spiderXp = getSpiderXp();
+				int spiderXp = getSlayer("tara");
 				int prevSpiderMax = 0;
 				for (int i = 0; i < spiderLevelArray.size(); i++) {
 					if (spiderXp >= spiderLevelArray.get(i).getAsInt()) {
-						prevSpiderMax = i;
+						prevSpiderMax = i + 1;
 					} else {
 						break;
 					}
 				}
-				return (prevSpiderMax + 1);
+				return prevSpiderMax;
 			case "enderman":
 				JsonArray endermanLevelArray = higherDepth(getLevelingJson(), "slayer_xp.enderman").getAsJsonArray();
-				int endermanXp = getEndermanXp();
+				int endermanXp = getSlayer("enderman");
 				int prevEndermanMax = 0;
 				for (int i = 0; i < endermanLevelArray.size(); i++) {
 					if (endermanXp >= endermanLevelArray.get(i).getAsInt()) {
-						prevEndermanMax = i;
+						prevEndermanMax = i + 1;
 					} else {
 						break;
 					}
 				}
-				return (prevEndermanMax + 1);
+				return prevEndermanMax;
 		}
 		return 0;
-	}
-
-	public int getEndermanXp() {
-		JsonElement profileSlayer = higherDepth(profileJson, "slayer_bosses");
-
-		return higherDepth(profileSlayer, "enderman.xp") != null ? higherDepth(profileSlayer, "enderman.xp").getAsInt() : 0;
 	}
 
 	public JsonElement getProfileJson() {
@@ -1050,7 +1006,6 @@ public class Player {
 		emojiMap.put("fishing_rod", "<:fishing_rod:820521703028424705>");
 		emojiMap.put("razor_sharp_shark_tooth_necklace", "<:razor_sharp_shark_tooth_necklace:820521703536197642>");
 		emojiMap.put("jerry_talisman_green", "<:jerry_talisman_green:820521703339065414>");
-		emojiMap.put("rancher_boots", "<:rancher_boots:820521703541047316>");
 		emojiMap.put("leather_chestplate", "<:leather_chestplate:820521703066173461>");
 		emojiMap.put("jerry_candy", "<:jerry_candy:820521703368425512>");
 		emojiMap.put("king_talisman", "<:king_talisman:820521703427670046>");
@@ -1113,6 +1068,57 @@ public class Player {
 		emojiMap.put("spooky_pie", "<:spooky_pie:820536394866753546>");
 		emojiMap.put("spirit_mask", "<:spirit_mask:820536395130077194>");
 		emojiMap.put("shears", "<:shears:820536394136682507>");
+		emojiMap.put("dante_talisman", "<:dante_talisman:852390130525798480>");
+		emojiMap.put("elegant_tuxedo_chestplate", "<:elegant_tuxedo_chestplate:852389308953264128>");
+		emojiMap.put("edible_mace", "<:edible_mace:852382990931460126>");
+		emojiMap.put("strong_dragon_chestplate", "<:strong_dragon_chestplate:852389868700172328>");
+		emojiMap.put("resistance_chestplate", "<:resistance_chestplate:852385746853429248>");
+		emojiMap.put("strong_dragon_leggings", "<:strong_dragon_leggings:852389966658797568>");
+		emojiMap.put("recombobulator_3000", "<:recombobulator_3000:852647805813784597>");
+		emojiMap.put("royal_pigeon", "<:royal_pigeon:852384070642040852>");
+		emojiMap.put("axe_of_the_shredded", "<:axe_of_the_shredded:852382098379767839>");
+		emojiMap.put("mastiff_leggings", "<:mastiff_leggings:852386568374976562>");
+		emojiMap.put("bat_person_chestplate", "<:bat_person_chestplate:852388656245112872>");
+		emojiMap.put("euclid_wheat_hoe_tier_2", "<:euclid_wheat_hoe_tier_2:852384865982480404>");
+		emojiMap.put("pigman_sword", "<:pigman_sword:852382052899749929>");
+		emojiMap.put("yeti_sword", "<:yeti_sword:852381191092568067>");
+		emojiMap.put("bat_person_leggings", "<:bat_person_leggings:852388750616952842>");
+		emojiMap.put("farm_suit_chestplate", "<:farm_suit_chestplate:852386221267353610>");
+		emojiMap.put("melon_dicer", "<:melon_dicer:852383984918069319>");
+		emojiMap.put("end_stone_bow", "<:end_stone_bow:852390188498812949>");
+		emojiMap.put("angler_leggings", "<:angler_leggings:852389115328593920>");
+		emojiMap.put("silk_edge_sword", "<:silk_edge_sword:852380937063890944>");
+		emojiMap.put("elegant_tuxedo_leggings", "<:elegant_tuxedo_leggings:852389387047403550>");
+		emojiMap.put("bat_person_boots", "<:bat_person_boots:852388872288731146>");
+		emojiMap.put("lasr_eye", "<:lasr_eye:852390268753543168>");
+		emojiMap.put("speedster_legs", "<:speedster_legs:852389551438561310>");
+		emojiMap.put("staff_of_the_rising_sun", "<:staff_of_the_rising_sun:852384766077829180>");
+		emojiMap.put("strong_dragon_boots", "<:strong_dragon_boots:852389989056905246>");
+		emojiMap.put("farm_suit_leggings", "<:farm_suit_leggings:852386308449763358>");
+		emojiMap.put("angler_chestplate", "<:angler_chestplate:852389047183736904>");
+		emojiMap.put("resistance_leggings", "<:resistance_leggings:852385931754995762>");
+		emojiMap.put("crown_of_greed", "<:crown_of_greed:852385313531494420>");
+		emojiMap.put("farming_for_dummies", "<:farming_for_dummies:852385000916779038>");
+		emojiMap.put("wise_dragon_boots", "<:wise_dragon_boots:852387559387430932>");
+		emojiMap.put("superior_dragon_chestplate", "<:superior_dragon_chestplate:852390526950965268>");
+		emojiMap.put("jacob_ticket", "<:jacob_ticket:852384499493109780>");
+		emojiMap.put("resistance_boots", "<:resistance_boots:852385821914431508>");
+		emojiMap.put("angler_helmet", "<:angler_helmet:852388975293628468>");
+		emojiMap.put("ink_wand", "<:ink_wand:852382154905223189>");
+		emojiMap.put("mastiff_chestplate", "<:mastiff_chestplate:852386485700919317>");
+		emojiMap.put("mastiff_boots", "<:mastiff_boots:852386609738416188>");
+		emojiMap.put("astraea", "<:astraea:852376024805277707>");
+		emojiMap.put("recluse_fang", "<:recluse_fang:852385192890204210>");
+		emojiMap.put("rancher_boots", "<:rancher_boots:852386387415793725>");
+		emojiMap.put("diamante_handle", "<:diamante_handle:852390352555999282>");
+		emojiMap.put("dragon_leggings", "<:dragon_leggings:852387441217241108>");
+		emojiMap.put("stereo_leggings", "<:stereo_leggings:852385077890383922>");
+		emojiMap.put("angler_boots", "<:angler_boots:852389175536910366>");
+		emojiMap.put("elegant_tuxedo_boots", "<:elegant_tuxedo_boots:852389458980372480>");
+		emojiMap.put("titanium_drill_dr_x555", "<:titanium_drill_dr_x555:852384242842730498>");
+		emojiMap.put("wise_dragon_chestplate", "<:wise_dragon_chestplate:852386755494936576>");
+		emojiMap.put("wand_of_atonement", "<:wand_of_atonement:852383836284125188>");
+		emojiMap.put("superior_dragon_leggings", "<:superior_dragon_leggings:852651076011819058>");
 
 		itemName = itemName.replace("starred_", "");
 		if (emojiMap.containsKey(itemName)) {

@@ -121,7 +121,8 @@ public class Main {
 			new GuildKickerCommand(),
 			new MissingTalismansCommand(),
 			new UpdateSlashCommands(),
-			new PriceCommand()
+			new PriceCommand(),
+			new EmojiFromUrlCommand()
 		);
 
 		SlashCommandClient slashCommands = new SlashCommandClient();

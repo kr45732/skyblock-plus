@@ -6,8 +6,12 @@ import static com.skyblockplus.utils.Utils.*;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
+import java.net.URL;
 import java.util.List;
+import javax.imageio.ImageIO;
+import lombok.SneakyThrows;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Icon;
 import net.dv8tion.jda.api.entities.Message;
 
 public class EnderChestCommand extends Command {
@@ -17,9 +21,10 @@ public class EnderChestCommand extends Command {
 	public EnderChestCommand() {
 		this.name = "enderchest";
 		this.cooldown = globalCooldown;
-		this.aliases = new String[] { "echest" };
+		this.aliases = new String[] { "echest", "ec" };
 	}
 
+	@SneakyThrows
 	@Override
 	protected void execute(CommandEvent event) {
 		new Thread(

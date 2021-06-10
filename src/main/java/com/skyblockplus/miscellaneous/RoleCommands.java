@@ -211,12 +211,14 @@ public class RoleCommands extends Command {
 						case "pet_score":
 						case "dungeon_secrets":
 						case "slot_collector":
+						case "enderman":
 							{
 								double roleAmount = -1;
 								switch (currentRoleName) {
 									case "sven":
 									case "rev":
 									case "tara":
+									case "enderman":
 										{
 											roleAmount = player.getSlayer(currentRoleName);
 											break;
@@ -377,9 +379,9 @@ public class RoleCommands extends Command {
 								);
 
 								if (
-									(player.getWolfXp() >= 1000000) ||
-									(player.getZombieXp() >= 1000000) ||
-									(player.getSpiderXp() >= 1000000)
+									(player.getSlayer("sven") >= 1000000) ||
+									(player.getSlayer("rev") >= 1000000) ||
+									(player.getSlayer("tara") >= 1000000)
 								) {
 									if (!member.getRoles().contains(curRole)) {
 										if (botRole.canInteract(curRole)) {
@@ -408,9 +410,9 @@ public class RoleCommands extends Command {
 								);
 
 								if (
-									(player.getWolfXp() >= 1000000) &&
-									(player.getZombieXp() >= 1000000) &&
-									(player.getSpiderXp() >= 1000000)
+									(player.getSlayer("sven") >= 1000000) &&
+									(player.getSlayer("rev") >= 1000000) &&
+									(player.getSlayer("tara") >= 1000000)
 								) {
 									if (!member.getRoles().contains(curRole)) {
 										if (botRole.canInteract(curRole)) {

@@ -1,17 +1,11 @@
 package com.skyblockplus.dev;
 
-import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
 
 public class PlaceholderCommand extends Command {
 
@@ -45,6 +39,7 @@ public class PlaceholderCommand extends Command {
 					System.gc();
 					eb.addField("GC RUN", "GC RUN", false);
 				}
+
 				ebMessage.editMessage(eb.build()).queue();
 			}
 		)

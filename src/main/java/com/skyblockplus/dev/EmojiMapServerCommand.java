@@ -12,6 +12,7 @@ public class EmojiMapServerCommand extends Command {
 	public EmojiMapServerCommand() {
 		this.name = "d-emojis";
 		this.ownerCommand = true;
+		this.aliases = new String[] { "d-emoji" };
 	}
 
 	@Override

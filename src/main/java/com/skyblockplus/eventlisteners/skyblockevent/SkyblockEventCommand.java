@@ -167,7 +167,7 @@ public class SkyblockEventCommand extends Command {
 																guildMemberUuid,
 																"" +
 																(
-																	guildMemberPlayer.getSlayer() -
+																	guildMemberPlayer.getTotalSlayer() -
 																	higherDepth(guildMember, "startingAmount").getAsDouble()
 																),
 																higherDepth(guildMember, "profileName").getAsString()
@@ -458,7 +458,7 @@ public class SkyblockEventCommand extends Command {
 							switch (eventType) {
 								case "slayer":
 									{
-										startingAmount = player.getSlayer();
+										startingAmount = player.getTotalSlayer();
 										startingAmountFormatted = formatNumber(startingAmount) + " total slayer xp";
 										break;
 									}

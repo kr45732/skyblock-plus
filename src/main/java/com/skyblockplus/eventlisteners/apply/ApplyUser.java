@@ -154,7 +154,7 @@ public class ApplyUser implements Serializable {
 						int weightReq = higherDepth(req, "weightReq").getAsInt();
 
 						if (
-							player.getSlayer() >= slayerReq &&
+							player.getTotalSlayer() >= slayerReq &&
 							player.getSkillAverage() >= skillsReq &&
 							player.getCatacombsLevel() >= cataReq &&
 							player.getWeight() >= weightReq
@@ -192,7 +192,7 @@ public class ApplyUser implements Serializable {
 				}
 
 				try {
-					playerSlayer = formatNumber(player.getSlayer());
+					playerSlayer = formatNumber(player.getTotalSlayer());
 				} catch (Exception e) {
 					playerSlayer = "0";
 				}

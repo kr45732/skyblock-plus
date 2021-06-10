@@ -152,6 +152,8 @@ public class ServerSettingsService {
 					return new ResponseEntity<>(currentRoleSettings.getDungeon_secrets(), HttpStatus.OK);
 				case "guild_ranks":
 					return new ResponseEntity<>(currentRoleSettings.getGuild_ranks(), HttpStatus.OK);
+				case "enderman":
+					return new ResponseEntity<>(currentRoleSettings.getEnderman(), HttpStatus.OK);
 			}
 		}
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -245,6 +247,9 @@ public class ServerSettingsService {
 					break;
 				case "guild_ranks":
 					currentRoleSettings.setGuild_ranks(newRoleSettings);
+					break;
+				case "enderman":
+					currentRoleSettings.setEnderman(newRoleSettings);
 					break;
 			}
 			currentServerSettings.setAutomatedRoles(currentRoleSettings);
