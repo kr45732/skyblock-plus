@@ -29,10 +29,19 @@ public class PlaceholderCommand extends Command {
 				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 				String content = event.getMessage().getContentRaw();
 				String[] args = content.split(" ");
-
 				logCommand(event.getGuild(), event.getAuthor(), content);
 
-				ebMessage.editMessage(defaultEmbed("Done").build()).queue();
+				eb = defaultEmbed("Debug");
+				eb.addField("Total", ""+(Runtime.getRuntime().totalMemory()/1000000.0) + " MB", false);
+				eb.addField("Free", ""+(Runtime.getRuntime().freeMemory()/1000000.0) + " MB", false);
+				eb.addField("Used", ""+((Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/1000000.0) + " MB", false);
+				eb.addField("Max", ""+(Runtime.getRuntime().maxMemory()/1000000.0) + " MB", false);
+
+				if(args.length == 2 && args[1].equals("gc")){
+					System.gc();
+					eb.addField("GC RUN", "GC RUN",false);
+				}
+				ebMessage.editMessage(eb.build()).queue();
 			}
 		)
 			.start();
