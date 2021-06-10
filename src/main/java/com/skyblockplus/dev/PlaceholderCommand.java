@@ -32,14 +32,18 @@ public class PlaceholderCommand extends Command {
 				logCommand(event.getGuild(), event.getAuthor(), content);
 
 				eb = defaultEmbed("Debug");
-				eb.addField("Total", ""+(Runtime.getRuntime().totalMemory()/1000000.0) + " MB", false);
-				eb.addField("Free", ""+(Runtime.getRuntime().freeMemory()/1000000.0) + " MB", false);
-				eb.addField("Used", ""+((Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/1000000.0) + " MB", false);
-				eb.addField("Max", ""+(Runtime.getRuntime().maxMemory()/1000000.0) + " MB", false);
+				eb.addField("Total", "" + (Runtime.getRuntime().totalMemory() / 1000000.0) + " MB", false);
+				eb.addField("Free", "" + (Runtime.getRuntime().freeMemory() / 1000000.0) + " MB", false);
+				eb.addField(
+					"Used",
+					"" + ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1000000.0) + " MB",
+					false
+				);
+				eb.addField("Max", "" + (Runtime.getRuntime().maxMemory() / 1000000.0) + " MB", false);
 
-				if(args.length == 2 && args[1].equals("gc")){
+				if (args.length == 2 && args[1].equals("gc")) {
 					System.gc();
-					eb.addField("GC RUN", "GC RUN",false);
+					eb.addField("GC RUN", "GC RUN", false);
 				}
 				ebMessage.editMessage(eb.build()).queue();
 			}

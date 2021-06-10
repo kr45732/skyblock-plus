@@ -100,7 +100,6 @@ public class SkyblockEventCommand extends Command {
 		} catch (Exception ignored) {}
 		announcementChannel.sendMessage(defaultEmbed("Prizes").setDescription("None").build()).complete();
 		database.updateSkyblockEventSettings(guildId, new SbEvent());
-
 	}
 
 	private static List<EventMember> getEventLeaderboardList(JsonElement runningSettings) {
