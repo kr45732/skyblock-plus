@@ -99,10 +99,10 @@ public class LinkAccountCommand extends Command {
 				}
 
 				return defaultEmbed("Success")
-					.setDescription("`" + user.getAsTag() + "` was linked to `" + playerInfo.minecraftUsername + "`");
+					.setDescription("`" + user.getAsTag() + "` was linked to `" + fixUsername(playerInfo.minecraftUsername) + "`");
 			} else {
 				return defaultEmbed("Error")
-					.setDescription("Error linking `" + user.getAsTag() + " to `" + playerInfo.minecraftUsername + "`");
+					.setDescription("Error linking `" + user.getAsTag() + " to `" + fixUsername(playerInfo.minecraftUsername) + "`");
 			}
 		}
 

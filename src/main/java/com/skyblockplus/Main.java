@@ -36,9 +36,6 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.requests.GatewayIntent;
-import net.dv8tion.jda.api.utils.ChunkingFilter;
-import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.Dsl;
 import org.springframework.boot.SpringApplication;
@@ -76,7 +73,7 @@ public class Main {
 			new CatacombsCommand(),
 			new ShutdownCommand(),
 			new RoleCommands(),
-			new GuildLeaderboardCommand(),
+			new GuildRanksCommand(),
 			new EssenceCommand(),
 			new BankCommand(),
 			new WardrobeCommand(),
@@ -122,7 +119,8 @@ public class Main {
 			new MissingTalismansCommand(),
 			new UpdateSlashCommands(),
 			new PriceCommand(),
-			new EmojiFromUrlCommand()
+			new EmojiFromUrlCommand(),
+			new GuildLeaderboardsCommand()
 		);
 
 		SlashCommandClient slashCommands = new SlashCommandClient();

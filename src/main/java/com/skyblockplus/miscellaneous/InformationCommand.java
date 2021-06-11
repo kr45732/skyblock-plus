@@ -45,7 +45,9 @@ public class InformationCommand extends Command {
 
 		eb.addField(
 			"Links",
-			"[**Invite Link**](https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403040368&scope=bot)\n[**Discord Link**](https://discord.gg/DpcCAwMXwp)\n[**Forum Post**](https://hypixel.net/threads/3980092)",
+			"[**Invite Link**](https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403040368&scope=bot)\n[**Discord Link**](" +
+			DISCORD_SERVER_INVITE_LINK +
+			")\n[**Forum Post**](https://hypixel.net/threads/3980092)",
 			true
 		);
 		eb.setFooter("Last restart");

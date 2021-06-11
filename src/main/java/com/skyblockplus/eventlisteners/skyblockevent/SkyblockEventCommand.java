@@ -58,7 +58,7 @@ public class SkyblockEventCommand extends Command {
 				"`" +
 				(i + 1) +
 				")` " +
-				eventMember.getUsername() +
+				fixUsername(eventMember.getUsername()) +
 				" | +" +
 				formatNumber(Double.parseDouble(eventMember.getStartingAmount()))
 			);
@@ -85,7 +85,7 @@ public class SkyblockEventCommand extends Command {
 					") " +
 					higherDepth(runningEventSettings, "prizeMap." + prizeListKeys.get(i)).getAsString() +
 					" - " +
-					guildMemberPlayersList.get(i).getUsername() +
+					fixUsername(guildMemberPlayersList.get(i).getUsername()) +
 					" (" +
 					guildMemberPlayersList.get(i).getUuid() +
 					")"
@@ -313,7 +313,7 @@ public class SkyblockEventCommand extends Command {
 											"`" +
 											(i + 1) +
 											")` " +
-											eventMember.getUsername() +
+											fixUsername(eventMember.getUsername()) +
 											" | +" +
 											formatNumber(Double.parseDouble(eventMember.getStartingAmount()))
 										);
@@ -354,7 +354,7 @@ public class SkyblockEventCommand extends Command {
 										"`" +
 										(i + 1) +
 										")` " +
-										eventMember.getUsername() +
+										fixUsername(eventMember.getUsername()) +
 										" | +" +
 										formatNumber(Double.parseDouble(eventMember.getStartingAmount()))
 									);

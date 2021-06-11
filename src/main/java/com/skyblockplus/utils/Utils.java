@@ -53,6 +53,7 @@ public class Utils {
 	public static String API_USERNAME = "";
 	public static String API_PASSWORD = "";
 	public static String API_BASE_URL = "";
+	public static String DISCORD_SERVER_INVITE_LINK = "https://discord.gg/Z4Fn3eNDXT";
 	public static MessageChannel botLogChannel;
 	public static JsonElement essenceCostsJson;
 	public static JsonElement levelingJson;

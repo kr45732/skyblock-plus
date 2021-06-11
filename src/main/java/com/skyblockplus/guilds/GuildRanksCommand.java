@@ -16,9 +16,9 @@ import java.util.*;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
-public class GuildLeaderboardCommand extends Command {
+public class GuildRanksCommand extends Command {
 
-	public GuildLeaderboardCommand() {
+	public GuildRanksCommand() {
 		this.name = "guild-rank";
 		this.cooldown = globalCooldown;
 		this.aliases = new String[] { "g-rank" };
@@ -68,7 +68,14 @@ public class GuildLeaderboardCommand extends Command {
 		JsonElement guildJson = getJson(
 			"https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&player=" + usernameUuidStruct.playerUuid
 		);
-		String guildId = higherDepth(guildJson, "guild._id").getAsString();
+		String guildId;
+
+		try {
+			guildId = higherDepth(guildJson, "guild._id").getAsString();
+		} catch (Exception e) {
+			return defaultEmbed(usernameUuidStruct.playerUsername + " is not in a guild");
+		}
+
 		String guildName = higherDepth(guildJson, "guild.name").getAsString();
 		if (!guildName.equals("Skyblock Forceful") && !guildName.equals("Skyblock Gods")) {
 			return defaultEmbed("Only for SBF or SBG right now");

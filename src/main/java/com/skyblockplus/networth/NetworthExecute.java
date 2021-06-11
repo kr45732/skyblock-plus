@@ -809,7 +809,7 @@ public class NetworthExecute {
 		return (
 			(item.getCount() != 1 ? item.getCount() + "x " : "") +
 			item.getName() +
-			(item.isRecombobulated() ? " <:recombobulator_3000:841689479621378139>" : "") +
+			(item.isRecombobulated() ? " <:recombobulator_3000:852647805813784597>" : "") +
 			"@split@" +
 			itemPrice
 		);

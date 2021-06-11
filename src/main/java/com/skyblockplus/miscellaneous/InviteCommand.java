@@ -20,7 +20,7 @@ public class InviteCommand extends Command {
 			"[Click here](https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403040368&scope=bot)",
 			false
 		);
-		eb.addField("Join my server", "[Click here](https://discord.gg/DpcCAwMXwp)", false);
+		eb.addField("Join my server", "[Click here](" + DISCORD_SERVER_INVITE_LINK + ")", false);
 		eb.setThumbnail("https://cdn.discordapp.com/attachments/803419567958392832/825768516636508160/sb_loading.gif");
 		return eb;
 	}

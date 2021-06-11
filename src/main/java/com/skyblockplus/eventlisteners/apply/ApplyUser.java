@@ -321,24 +321,11 @@ public class ApplyUser implements Serializable {
 
 			try {
 				staffChannel
-					.sendMessage(
-						playerUsername +
-						" (" +
-						applyingUser.getAsMention() +
-						") was denied by " +
-						event.getUser().getName() +
-						" (" +
-						event.getUser().getAsMention() +
-						")"
-					)
+					.sendMessage(playerUsername + " (" + applyingUser.getAsMention() + ") was denied by " + event.getUser().getAsMention())
 					.queue();
 				applicationChannel.sendMessage(applyingUser.getAsMention()).queue();
 			} catch (Exception e) {
-				staffChannel
-					.sendMessage(
-						playerUsername + " was denied by " + event.getUser().getName() + " (" + event.getUser().getAsMention() + ")"
-					)
-					.queue();
+				staffChannel.sendMessage(playerUsername + " was denied by " + event.getUser().getAsMention()).queue();
 			}
 
 			EmbedBuilder eb = defaultEmbed("Application Not Accepted");
@@ -355,23 +342,12 @@ public class ApplyUser implements Serializable {
 			try {
 				staffChannel
 					.sendMessage(
-						playerUsername +
-						" (" +
-						applyingUser.getAsMention() +
-						") was accepted by " +
-						event.getUser().getName() +
-						" (" +
-						event.getUser().getAsMention() +
-						")"
+						playerUsername + " (" + applyingUser.getAsMention() + ") was accepted by " + event.getUser().getAsMention()
 					)
 					.queue();
 				applicationChannel.sendMessage(applyingUser.getAsMention()).queue();
 			} catch (Exception e) {
-				staffChannel
-					.sendMessage(
-						playerUsername + " was accepted by " + event.getUser().getName() + " (" + event.getUser().getAsMention() + ")"
-					)
-					.queue();
+				staffChannel.sendMessage(playerUsername + " was accepted by " + event.getUser().getAsMention()).queue();
 			}
 
 			EmbedBuilder eb = defaultEmbed("Application Accepted");
@@ -407,23 +383,12 @@ public class ApplyUser implements Serializable {
 				try {
 					staffChannel
 						.sendMessage(
-							playerUsername +
-							" (" +
-							applyingUser.getAsMention() +
-							") was waitlisted by " +
-							event.getUser().getName() +
-							" (" +
-							event.getUser().getAsMention() +
-							")"
+							playerUsername + " (" + applyingUser.getAsMention() + ") was waitlisted by " + event.getUser().getAsMention()
 						)
 						.queue();
 					applicationChannel.sendMessage(applyingUser.getAsMention()).queue();
 				} catch (Exception e) {
-					staffChannel
-						.sendMessage(
-							playerUsername + " was waitlisted by " + event.getUser().getName() + " (" + event.getUser().getAsMention() + ")"
-						)
-						.queue();
+					staffChannel.sendMessage(playerUsername + " was waitlisted by " + event.getUser().getAsMention()).queue();
 				}
 
 				EmbedBuilder eb = defaultEmbed("Application waitlisted");

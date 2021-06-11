@@ -36,14 +36,13 @@ public class EmojiFromUrlCommand extends Command {
 
 				try {
 					String[] itemNamesArr = args[1].split("/");
-					String itemName = itemNamesArr[itemNamesArr.length - 1].split("\\.")[0];
-					URL url = new URL(
-						"https://sky.shiiyu.moe" + args[1].replace("https://sky.shiiyu.moe/", "").replace("https://sky.shiiyu.moe", "")
-					);
+					String itemName = args.length == 2 ? itemNamesArr[itemNamesArr.length - 1].split("\\.")[0] : args[2];
+					URL url = new URL("https://sky.shiiyu.moe" + args[1].replace("https://sky.shiiyu.moe", ""));
 					Emote emote = event.getGuild().createEmote(itemName, Icon.from(url.openStream())).complete();
 					event.getChannel().sendMessage(emote.getAsMention()).queue();
 				} catch (Exception e) {
 					event.getChannel().sendMessage("Error\n" + e.getMessage()).queue();
+					e.printStackTrace();
 				}
 			}
 		)
