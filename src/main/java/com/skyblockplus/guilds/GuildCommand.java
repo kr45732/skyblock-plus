@@ -104,7 +104,7 @@ public class GuildCommand extends Command {
 		paginateBuilder.setPaginatorExtras(
 			new PaginatorExtras()
 				.setEveryPageTitle(higherDepth(guildJson, "guild.name").getAsString())
-				.setEveryPageThumbnail(
+				.setEveryPageTitleUrl(
 					"https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(guildJson, "guild._id").getAsString()
 				)
 				.setEveryPageText(rankStr)
@@ -287,7 +287,7 @@ public class GuildCommand extends Command {
 		paginateBuilder.setPaginatorExtras(
 			new PaginatorExtras()
 				.setEveryPageTitle(higherDepth(guildJson, "guild.name").getAsString())
-				.setEveryPageThumbnail(
+				.setEveryPageTitleUrl(
 					"https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(guildJson, "guild._id").getAsString()
 				)
 		);

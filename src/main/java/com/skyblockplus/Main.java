@@ -4,6 +4,7 @@ import static com.skyblockplus.utils.MainClassUtils.cacheApplyGuildUsers;
 import static com.skyblockplus.utils.MainClassUtils.closeAsyncHttpClient;
 import static com.skyblockplus.utils.Utils.*;
 
+import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.dev.*;

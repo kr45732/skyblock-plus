@@ -111,7 +111,10 @@ public class WardrobeCommand extends Command {
 					);
 				}
 				paginateBuilder.setPaginatorExtras(
-					new PaginatorExtras().setEveryPageTitle(player.getUsername()).setEveryPageThumbnail(player.getThumbnailUrl())
+					new PaginatorExtras()
+						.setEveryPageTitle(player.getUsername())
+						.setEveryPageThumbnail(player.getThumbnailUrl())
+						.setEveryPageTitleUrl(player.skyblockStatsLink())
 				);
 				paginateBuilder.build().paginate(event.getChannel(), 0);
 				return null;

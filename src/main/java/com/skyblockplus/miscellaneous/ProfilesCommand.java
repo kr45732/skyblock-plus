@@ -2,6 +2,7 @@ package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.Main.asyncHttpClient;
 import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.utils.Player.skyblockStatsLink;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -86,10 +87,10 @@ public class ProfilesCommand extends Command {
 
 			CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, user).setColumns(1).setItemsPerPage(1);
 
-			List<String> pageTitles = new ArrayList<>();
+			List<String> pageTitlesUrls = new ArrayList<>();
 			int count = 0;
 			for (JsonElement profile : profileArray) {
-				pageTitles.add("Profiles for " + usernameUuidStruct.playerUsername);
+				pageTitlesUrls.add(skyblockStatsLink(usernameUuidStruct.playerUsername, higherDepth(profile, "cute_name").getAsString()));
 				StringBuilder profileStr = new StringBuilder(
 					"• **Profile Name:** " +
 					higherDepth(profile, "cute_name").getAsString() +
@@ -108,7 +109,9 @@ public class ProfilesCommand extends Command {
 				paginateBuilder.addItems(profileStr.toString());
 			}
 
-			paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles));
+			paginateBuilder.setPaginatorExtras(
+				new PaginatorExtras().setEveryPageTitle(usernameUuidStruct.playerUsername).setTitleUrls(pageTitlesUrls)
+			);
 
 			if (channel != null) {
 				paginateBuilder.build().paginate(channel, 0);

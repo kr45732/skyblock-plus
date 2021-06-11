@@ -275,6 +275,7 @@ public class GuildRanksCommand extends Command {
 			.setPaginatorExtras(
 				new PaginatorExtras()
 					.setEveryPageTitle("Rank changes for " + guildName)
+					.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
 					.setEveryPageText("**Total rank changes:** " + totalChange)
 			)
 			.build()

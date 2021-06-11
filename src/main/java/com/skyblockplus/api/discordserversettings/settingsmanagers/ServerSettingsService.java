@@ -379,7 +379,7 @@ public class ServerSettingsService {
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 
-	public ResponseEntity<HttpStatus> removeEventMemberToRunningEvent(String serverId, String minecraftUuid) {
+	public ResponseEntity<HttpStatus> removeEventMemberFromRunningEvent(String serverId, String minecraftUuid) {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
 		if (currentServerSettings != null) {

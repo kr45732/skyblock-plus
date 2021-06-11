@@ -1441,8 +1441,15 @@ public class Player {
 			.setThumbnail(getThumbnailUrl());
 	}
 
-	public String skyblockStatsLink(String username, String profileName) {
-		return ("https://sky.shiiyu.moe/stats/" + username + "/" + profileName);
+	public static String skyblockStatsLink(String username, String profileName) {
+		if (username == null) {
+			return null;
+		}
+		return ("https://sky.shiiyu.moe/stats/" + username + (profileName != null ? "/" + profileName : ""));
+	}
+
+	public String skyblockStatsLink() {
+		return skyblockStatsLink(playerUsername, profileName);
 	}
 
 	public List<String[]> getTalismanBag() {

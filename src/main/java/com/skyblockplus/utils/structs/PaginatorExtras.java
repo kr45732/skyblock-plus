@@ -8,14 +8,28 @@ import net.dv8tion.jda.api.entities.MessageEmbed.Field;
 public class PaginatorExtras {
 
 	private final List<String> titles = new ArrayList<>();
+	private final List<String> titleUrls = new ArrayList<>();
 	private final List<String> thumbnails = new ArrayList<>();
 	private final List<Field> embedFields = new ArrayList<>();
 	private String everyPageText = null;
 	private String everyPageTitle = null;
+	private String everyPageTitleUrl = null;
 	private String everyPageThumbnail = null;
 
-	public List<String> getTitles() {
-		return titles;
+	public String getTitles(int index) {
+		try {
+			return titles.get(index);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	public String getTitleUrls(int index) {
+		try {
+			return titleUrls.get(index);
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	public PaginatorExtras setTitles(List<String> titles) {
@@ -27,6 +41,12 @@ public class PaginatorExtras {
 	public PaginatorExtras setTitles(String[] titles) {
 		this.titles.clear();
 		this.titles.addAll(Arrays.asList(titles));
+		return this;
+	}
+
+	public PaginatorExtras setTitleUrls(List<String> titleUrls) {
+		this.titleUrls.clear();
+		this.titleUrls.addAll(titleUrls);
 		return this;
 	}
 
@@ -49,7 +69,7 @@ public class PaginatorExtras {
 		return this;
 	}
 
-	public String getEverPageTitle() {
+	public String getEveryPageTitle() {
 		return everyPageTitle;
 	}
 
@@ -74,5 +94,14 @@ public class PaginatorExtras {
 
 	public List<Field> getEmbedFields() {
 		return this.embedFields;
+	}
+
+	public String getEveryPageTitleUrl() {
+		return everyPageTitleUrl;
+	}
+
+	public PaginatorExtras setEveryPageTitleUrl(String everyPageTitleUrl) {
+		this.everyPageTitleUrl = everyPageTitleUrl;
+		return this;
 	}
 }

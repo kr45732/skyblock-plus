@@ -90,7 +90,10 @@ public class BankCommand extends Command {
 				}
 
 				paginateBuilder.setPaginatorExtras(
-					new PaginatorExtras().setEveryPageTitle(player.getUsername()).setEveryPageThumbnail(player.getThumbnailUrl())
+					new PaginatorExtras()
+						.setEveryPageTitle(player.getUsername())
+						.setEveryPageThumbnail(player.getThumbnailUrl())
+						.setEveryPageTitleUrl(player.skyblockStatsLink())
 				);
 
 				if (channel != null) {

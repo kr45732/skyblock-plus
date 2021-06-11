@@ -1,6 +1,7 @@
 package com.skyblockplus.price;
 
 import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.utils.Player.skyblockStatsLink;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -102,6 +103,7 @@ public class AuctionCommand extends Command {
 		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, user).setColumns(1).setItemsPerPage(10);
 		PaginatorExtras extras = new PaginatorExtras()
 			.setEveryPageTitle(usernameUuidStruct.playerUsername)
+			.setEveryPageTitleUrl(skyblockStatsLink(usernameUuidStruct.playerUsername, null))
 			.setEveryPageThumbnail("https://cravatar.eu/helmavatar/" + usernameUuidStruct.playerUuid + "/64.png")
 			.setEveryPageText(
 				"**Sold Auctions Value:** " +

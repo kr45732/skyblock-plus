@@ -161,8 +161,8 @@ public class SpringDatabaseComponent {
 		return settingsService.updateSkyblockRunningEvent(serverId, gson.fromJson(newSettings, RunningEvent.class)).getStatusCodeValue();
 	}
 
-	public int removeEventMemberToRunningEvent(String serverId, String minecraftUuid) {
-		return settingsService.removeEventMemberToRunningEvent(serverId, minecraftUuid).getStatusCodeValue();
+	public int removeEventMemberFromRunningEvent(String serverId, String minecraftUuid) {
+		return settingsService.removeEventMemberFromRunningEvent(serverId, minecraftUuid).getStatusCodeValue();
 	}
 
 	public boolean eventHasMemberByUuid(String serverId, String minecraftUuid) {

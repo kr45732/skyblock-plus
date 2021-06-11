@@ -182,11 +182,22 @@ public class CustomPaginator extends Menu {
 		EmbedBuilder embedBuilder = new EmbedBuilder();
 
 		try {
-			if (extras.getEverPageTitle() != null) {
-				embedBuilder.setTitle(extras.getEverPageTitle());
+			String title;
+			String titleUrl;
+
+			if (extras.getEveryPageTitle() != null) {
+				title = extras.getEveryPageTitle();
 			} else {
-				embedBuilder.setTitle(extras.getTitles().get(pageNum - 1));
+				title = extras.getTitles(pageNum - 1);
 			}
+
+			if (extras.getEveryPageTitleUrl() != null) {
+				titleUrl = extras.getEveryPageTitleUrl();
+			} else {
+				titleUrl = extras.getTitleUrls(pageNum - 1);
+			}
+
+			embedBuilder.setTitle(title, titleUrl);
 		} catch (Exception ignored) {}
 
 		try {

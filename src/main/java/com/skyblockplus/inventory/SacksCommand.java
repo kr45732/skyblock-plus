@@ -60,7 +60,10 @@ public class SacksCommand extends Command {
 					paginateBuilder.addItems("**" + convertSkyblockIdName(currentSack.getKey()) + "**: " + currentSack.getValue());
 				}
 				paginateBuilder.setPaginatorExtras(
-					new PaginatorExtras().setEveryPageTitle(player.getUsername()).setEveryPageThumbnail(player.getThumbnailUrl())
+					new PaginatorExtras()
+						.setEveryPageTitle(player.getUsername())
+						.setEveryPageThumbnail(player.getThumbnailUrl())
+						.setEveryPageTitleUrl(player.skyblockStatsLink())
 				);
 				paginateBuilder.build().paginate(event.getChannel(), 0);
 				return null;

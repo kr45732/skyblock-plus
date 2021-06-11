@@ -14,7 +14,11 @@ public class InformationSlashCommand extends SlashCommand {
 		new Thread(
 			() -> {
 				event.logCommandGuildUserCommand();
-				event.getHook().editOriginalEmbeds(InformationCommand.getInformation().build()).queue();
+				event
+					.getHook()
+					.editOriginalEmbeds(InformationCommand.getInformation(event.getSlashCommandClient().getStartTime()).build())
+					.setActionRows(InformationCommand.getInformationActionRow())
+					.queue();
 			}
 		)
 			.start();

@@ -407,7 +407,7 @@ public class SkyblockEventCommand extends Command {
 			JsonElement linkedAccount = database.getLinkedUserByDiscordId(event.getAuthor().getId());
 			if (linkedAccount != null) {
 				String uuid = higherDepth(linkedAccount, "minecraftUuid").getAsString();
-				database.removeEventMemberToRunningEvent(event.getGuild().getId(), uuid);
+				database.removeEventMemberFromRunningEvent(event.getGuild().getId(), uuid);
 
 				return defaultEmbed("Success").setDescription("You left the event");
 			} else {

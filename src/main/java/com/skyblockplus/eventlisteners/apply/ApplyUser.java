@@ -1,6 +1,7 @@
 package com.skyblockplus.eventlisteners.apply;
 
 import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.utils.Player.skyblockStatsLink;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.*;
@@ -447,9 +448,6 @@ public class ApplyUser implements Serializable {
 	}
 
 	public EmbedBuilder defaultPlayerEmbed() {
-		return defaultEmbed(
-			fixUsername(playerUsername) + ironmanSymbol,
-			"https://sky.shiiyu.moe/stats/" + playerUsername + "/" + playerProfileName
-		);
+		return defaultEmbed(fixUsername(playerUsername) + ironmanSymbol, skyblockStatsLink(playerUsername, playerProfileName));
 	}
 }

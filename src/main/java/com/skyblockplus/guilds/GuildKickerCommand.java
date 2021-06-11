@@ -153,6 +153,7 @@ public class GuildKickerCommand extends Command {
 					.setPaginatorExtras(
 						new PaginatorExtras()
 							.setEveryPageTitle("Guild Kick Helper")
+							.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
 							.setEveryPageText("**Total missing requirements: " + missingReqsCount + "**\n")
 					)
 					.build()

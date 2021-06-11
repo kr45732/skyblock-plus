@@ -5,8 +5,10 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import java.util.stream.Collectors;
+import java.time.OffsetDateTime;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.Button;
 
 public class InformationCommand extends Command {
 
@@ -16,14 +18,22 @@ public class InformationCommand extends Command {
 		this.aliases = new String[] { "info" };
 	}
 
-	public static EmbedBuilder getInformation() {
+	public static ActionRow getInformationActionRow() {
+		return ActionRow.of(
+			Button.link("https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403040368&scope=bot", "Invite"),
+			Button.link(DISCORD_SERVER_INVITE_LINK, "Discord Link"),
+			Button.link("https://hypixel.net/threads/3980092", "Forum Post")
+		);
+	}
+
+	public static EmbedBuilder getInformation(OffsetDateTime starTime) {
 		EmbedBuilder eb = defaultEmbed("Skyblock Plus");
 
 		eb.setDescription(
 			"Skyblock Plus is a Skyblock focused discord bot that has many commands to help Skyblock players and guild staff! It allows for quick retrieval of Skyblock stats plus customizable features for a better Skyblock experience."
 		);
 		eb.addField(
-			"Stats",
+			"Statistics",
 			"**Servers:** " +
 			jda.getGuilds().size() +
 			"\n**Ping:** " +
@@ -43,14 +53,7 @@ public class InformationCommand extends Command {
 			true
 		);
 
-		eb.addField(
-			"Links",
-			"[**Invite Link**](https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403040368&scope=bot)\n[**Discord Link**](" +
-			DISCORD_SERVER_INVITE_LINK +
-			")\n[**Forum Post**](https://hypixel.net/threads/3980092)",
-			true
-		);
-		eb.setFooter("Last restart");
+		eb.setFooter("Last restart").setTimestamp(starTime);
 
 		return eb;
 	}
@@ -61,7 +64,11 @@ public class InformationCommand extends Command {
 			() -> {
 				logCommand(event.getGuild(), event.getAuthor(), BOT_PREFIX + "information");
 
-				event.getChannel().sendMessage(getInformation().setTimestamp(event.getClient().getStartTime()).build()).queue();
+				event
+					.getChannel()
+					.sendMessage(getInformation(event.getClient().getStartTime()).build())
+					.setActionRows(getInformationActionRow())
+					.queue();
 			}
 		)
 			.start();

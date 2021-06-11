@@ -11,6 +11,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -77,10 +78,10 @@ public class GuildLeaderboardsCommand extends Command {
 		JsonElement guildJson = getJson(
 			"https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&player=" + usernameUuidStruct.playerUuid
 		);
-		String guildId;
+		String guildName;
 
 		try {
-			guildId = higherDepth(guildJson, "guild._id").getAsString();
+			guildName = higherDepth(guildJson, "guild.name").getAsString();
 		} catch (Exception e) {
 			return defaultEmbed(usernameUuidStruct.playerUsername + " is not in a guild");
 		}
@@ -89,8 +90,6 @@ public class GuildLeaderboardsCommand extends Command {
 		List<CompletableFuture<CompletableFuture<String>>> futuresList = new ArrayList<>();
 
 		for (JsonElement guildMember : guildMembers) {
-			System.out.println("GMEMBER: " + guildMember);
-
 			String guildMemberUuid = higherDepth(guildMember, "uuid").getAsString();
 			try {
 				if (remainingLimit < 5) {
@@ -188,13 +187,40 @@ public class GuildLeaderboardsCommand extends Command {
 
 		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(2).setItemsPerPage(20);
 
+		int guildRank = -1;
+		String amt = "-1";
 		for (int i = 0, guildMemberPlayersListSize = guildMemberPlayersList.size(); i < guildMemberPlayersListSize; i++) {
-			String guildPlayer = guildMemberPlayersList.get(i);
-			String formattedAmt = roundAndFormat(Double.parseDouble(guildPlayer.split("=:=")[1]));
-			paginateBuilder.addItems("`" + i + ")` " + fixUsername(guildPlayer.split("=:=")[0]) + ": " + formattedAmt);
+			String[] guildPlayer = guildMemberPlayersList.get(i).split("=:=");
+			String formattedAmt = roundAndFormat(Double.parseDouble(guildPlayer[1]));
+			paginateBuilder.addItems("`" + (i + 1) + ")` " + fixUsername(guildPlayer[0]) + ": " + formattedAmt);
+
+			if (guildPlayer[0].equals(usernameUuidStruct.playerUsername)) {
+				guildRank = i;
+				amt = formattedAmt;
+			}
 		}
 
-		paginateBuilder.build().paginate(event.getChannel(), 0);
+		String ebStr =
+			"**Player:** " +
+			usernameUuidStruct.playerUsername +
+			"\n**Guild Rank:** #" +
+			(guildRank + 1) +
+			"\n**" +
+			capitalizeString(lbType) +
+			":** " +
+			amt;
+
+		paginateBuilder
+			.setPaginatorExtras(
+				new PaginatorExtras()
+					.setEveryPageTitle(guildName)
+					.setEveryPageText(ebStr)
+					.setEveryPageTitleUrl(
+						"https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(guildJson, "guild._id").getAsString()
+					)
+			)
+			.build()
+			.paginate(event.getChannel(), 0);
 
 		return null;
 	}

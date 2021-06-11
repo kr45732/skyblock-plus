@@ -13,10 +13,12 @@ public class SlashCommandClient extends ListenerAdapter {
 
 	private final List<SlashCommand> slashCommands;
 	private final HashMap<String, OffsetDateTime> cooldowns;
+	private final OffsetDateTime startTime;
 
 	public SlashCommandClient() {
 		this.slashCommands = new ArrayList<>();
 		this.cooldowns = new HashMap<>();
+		this.startTime = OffsetDateTime.now();
 	}
 
 	public SlashCommandClient addSlashCommands(SlashCommand... commands) {
@@ -63,5 +65,9 @@ public class SlashCommandClient extends ListenerAdapter {
 
 	public void applyCooldown(String name, int seconds) {
 		cooldowns.put(name, OffsetDateTime.now().plusSeconds(seconds));
+	}
+
+	public OffsetDateTime getStartTime() {
+		return startTime;
 	}
 }
