@@ -477,6 +477,9 @@ public class SkyblockEventCommand extends Command {
 								case "weight":
 									{
 										startingAmount = player.getWeight();
+										if (player.getTotalSkillsXp() == -1) {
+											startingAmount = -1;
+										}
 										startingAmountFormatted = formatNumber(startingAmount) + " total weight";
 										break;
 									}
@@ -503,6 +506,8 @@ public class SkyblockEventCommand extends Command {
 								} else {
 									return defaultEmbed("Error").setDescription("API returned code " + code);
 								}
+							} else {
+								return defaultEmbed("Error").setDescription("Please enable your skills API and retry");
 							}
 						} catch (Exception ignored) {}
 						return defaultEmbed("Error").setDescription("Unable to fetch player data");
