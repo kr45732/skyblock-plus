@@ -2,8 +2,6 @@ package com.skyblockplus.utils.slashcommands;
 
 import static com.skyblockplus.utils.Utils.globalCooldown;
 
-import java.time.OffsetDateTime;
-
 public abstract class SlashCommand {
 
 	protected final int cooldown = globalCooldown;

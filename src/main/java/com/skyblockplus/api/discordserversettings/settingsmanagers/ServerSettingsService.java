@@ -30,11 +30,8 @@ public class ServerSettingsService {
 	}
 
 	public List<ServerSettingsModel> getAllServerSettings() {
-		List<ServerSettingsModel> serverSettingsModels = settingsRepository.findAll();
-
-		for (ServerSettingsModel m : serverSettingsModels) {
-			m.setHypixelApiKey(null);
-		}
+		List<ServerSettingsModel> serverSettingsModels = new ArrayList<>();
+		settingsRepository.findAll().forEach(o1 -> serverSettingsModels.add(o1.copy(true)));
 
 		return serverSettingsModels;
 	}
@@ -57,11 +54,10 @@ public class ServerSettingsService {
 	}
 
 	public ResponseEntity<?> getServerSettingsById(String serverId) {
-		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId).copy();
+		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
 		if (currentServerSettings != null) {
-			currentServerSettings.setHypixelApiKey(null);
-			return new ResponseEntity<>(currentServerSettings, HttpStatus.OK);
+			return new ResponseEntity<>(currentServerSettings.copy(true), HttpStatus.OK);
 		}
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}

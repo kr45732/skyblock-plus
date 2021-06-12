@@ -49,7 +49,7 @@ public class NetworthExecute {
 	private double talismanTotal = 0;
 	private double invArmor = 0;
 	private double storageTotal = 0;
-	private StringBuilder calcItemsJsonStr = new StringBuilder("[");
+	private final StringBuilder calcItemsJsonStr = new StringBuilder("[");
 	private boolean verbose = false;
 
 	public static boolean isIgnoredItem(String s) {

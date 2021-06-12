@@ -34,23 +34,45 @@ public class GuildLeaderboardsCommand extends Command {
 		this.aliases = new String[] { "g-lb" };
 	}
 
+	public static JsonElement getHypixelJson(String jsonUrl) {
+		try {
+			if (remainingLimit.get() < 5) {
+				System.out.println("Sleeping for " + timeTillReset + " seconds");
+				TimeUnit.SECONDS.sleep(timeTillReset.get());
+			}
+		} catch (Exception ignored) {}
+
+		try (CloseableHttpClient httpclient = HttpClientBuilder.create().build()) {
+			HttpGet httpget = new HttpGet(jsonUrl);
+			httpget.addHeader("content-type", "application/json; charset=UTF-8");
+
+			try (CloseableHttpResponse httpresponse = httpclient.execute(httpget)) {
+				try {
+					remainingLimit.set(Integer.parseInt(httpresponse.getFirstHeader("RateLimit-Remaining").getValue()));
+					timeTillReset.set(Integer.parseInt(httpresponse.getFirstHeader("RateLimit-Reset").getValue()));
+				} catch (Exception ignored) {}
+
+				return JsonParser.parseReader(new InputStreamReader(httpresponse.getEntity().getContent()));
+			}
+		} catch (Exception ignored) {}
+		return null;
+	}
+
 	@Override
 	protected void execute(CommandEvent event) {
 		new Thread(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
 				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
-
 				String content = event.getMessage().getContentRaw();
-
 				String[] args = content.split(" ");
+				logCommand(event.getGuild(), event.getAuthor(), content);
+
 				if (args.length != 3) {
 					eb = errorMessage(this.name);
 					ebMessage.editMessage(eb.build()).queue();
 					return;
 				}
-
-				logCommand(event.getGuild(), event.getAuthor(), content);
 
 				if (args[2].toLowerCase().startsWith("u:")) {
 					eb = getLeaderboard(args[1], args[2].split(":")[1], event);
@@ -241,30 +263,6 @@ public class GuildLeaderboardsCommand extends Command {
 			.build()
 			.paginate(event.getChannel(), 0);
 
-		return null;
-	}
-
-	public static JsonElement getHypixelJson(String jsonUrl) {
-		try {
-			if (remainingLimit.get() < 5) {
-				System.out.println("Sleeping for " + timeTillReset + " seconds");
-				TimeUnit.SECONDS.sleep(timeTillReset.get());
-			}
-		} catch (Exception ignored) {}
-
-		try (CloseableHttpClient httpclient = HttpClientBuilder.create().build()) {
-			HttpGet httpget = new HttpGet(jsonUrl);
-			httpget.addHeader("content-type", "application/json; charset=UTF-8");
-
-			try (CloseableHttpResponse httpresponse = httpclient.execute(httpget)) {
-				try {
-					remainingLimit.set(Integer.parseInt(httpresponse.getFirstHeader("RateLimit-Remaining").getValue()));
-					timeTillReset.set(Integer.parseInt(httpresponse.getFirstHeader("RateLimit-Reset").getValue()));
-				} catch (Exception ignored) {}
-
-				return JsonParser.parseReader(new InputStreamReader(httpresponse.getEntity().getContent()));
-			}
-		} catch (Exception ignored) {}
 		return null;
 	}
 }

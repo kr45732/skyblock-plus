@@ -8,7 +8,6 @@ import com.skyblockplus.api.discordserversettings.skyblockevent.SbEvent;
 import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.apache.catalina.Server;
 import org.springframework.transaction.annotation.Transactional;
 
 @Data
@@ -47,6 +46,13 @@ public class ServerSettingsModel {
 
 	private String hypixelApiKey = "";
 
+	public ServerSettingsModel() {}
+
+	public ServerSettingsModel(String serverName, String serverId) {
+		this.serverName = serverName;
+		this.serverId = serverId;
+	}
+
 	public String getHypixelApiKey() {
 		return null;
 	}
@@ -55,14 +61,7 @@ public class ServerSettingsModel {
 		return hypixelApiKey;
 	}
 
-	public ServerSettingsModel() {}
-
-	public ServerSettingsModel(String serverName, String serverId) {
-		this.serverName = serverName;
-		this.serverId = serverId;
-	}
-
-	public ServerSettingsModel copy() {
+	public ServerSettingsModel copy(boolean nullHypixelApiKey) {
 		ServerSettingsModel copy = new ServerSettingsModel(serverName, serverId);
 		copy.setAutomatedVerify(automatedVerify);
 		copy.setAutomatedApplicationOne(automatedApplicationOne);
@@ -71,7 +70,7 @@ public class ServerSettingsModel {
 		copy.setAutomaticGuildRolesOne(automaticGuildRolesOne);
 		copy.setAutomaticGuildRolesTwo(automaticGuildRolesTwo);
 		copy.setSbEvent(sbEvent);
-		copy.setHypixelApiKey(hypixelApiKey);
+		copy.setHypixelApiKey(nullHypixelApiKey ? null : hypixelApiKey);
 
 		return copy;
 	}

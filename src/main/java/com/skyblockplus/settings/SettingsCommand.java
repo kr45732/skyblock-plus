@@ -50,7 +50,7 @@ public class SettingsCommand extends Command {
 				String content = event.getMessage().getContentRaw();
 				String[] args = content.split(" ");
 
-				logCommand(event.getGuild(), event.getAuthor(), content);
+				if (content.contains("set") && content.contains("hypixel_key")) logCommand(event.getGuild(), event.getAuthor(), content);
 
 				JsonElement currentSettings = database.getServerSettings(event.getGuild().getId());
 				if (higherDepth(currentSettings, "serverId") == null) {
@@ -60,8 +60,11 @@ public class SettingsCommand extends Command {
 					);
 					currentSettings = database.getServerSettings(event.getGuild().getId());
 				}
-
-				if ((args.length == 3) && (args[1].equals("delete"))) {
+				if (args.length == 4 && args[1].equals("set") && args[2].equals("hypixel_key")) {
+					eb = setHypixelKey(args[3]);
+				} else if (args.length == 3 && args[1].equals("delete") && args[2].equals("hypixel_key")) {
+					eb = deleteHypixelKey();
+				} else if ((args.length == 3) && (args[1].equals("delete"))) {
 					if (args[2].equals("--confirm")) {
 						if (database.deleteServerSettings(event.getGuild().getId()) == 200) {
 							ebMessage.editMessage(defaultEmbed("Success").setDescription("Server settings deleted").build()).queue();
@@ -450,10 +453,6 @@ public class SettingsCommand extends Command {
 					} else {
 						eb = defaultEmbed("Error").setDescription("Invalid setting");
 					}
-				} else if (args.length == 4 && args[1].equals("set") && args[2].equals("hypixel_key")) {
-					eb = setHypixelKey(args[3]);
-				} else if (args.length == 4 && args[1].equals("delete") && args[2].equals("hypixel_key")) {
-					eb = deleteHypixelKey();
 				} else {
 					eb = defaultEmbed("Error", null).setDescription("Invalid setting");
 				}

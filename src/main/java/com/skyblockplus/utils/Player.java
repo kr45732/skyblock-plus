@@ -171,6 +171,13 @@ public class Player {
 		return null;
 	}
 
+	public static String skyblockStatsLink(String username, String profileName) {
+		if (username == null) {
+			return null;
+		}
+		return ("https://sky.shiiyu.moe/stats/" + username + (profileName != null ? "/" + profileName : ""));
+	}
+
 	public String[] getAllProfileNames(boolean isIronman) {
 		List<String> profileNameList = new ArrayList<>();
 		if (this.profilesArray == null) {
@@ -1439,13 +1446,6 @@ public class Player {
 			skyblockStatsLink(getUsername(), getProfileName())
 		)
 			.setThumbnail(getThumbnailUrl());
-	}
-
-	public static String skyblockStatsLink(String username, String profileName) {
-		if (username == null) {
-			return null;
-		}
-		return ("https://sky.shiiyu.moe/stats/" + username + (profileName != null ? "/" + profileName : ""));
 	}
 
 	public String skyblockStatsLink() {
