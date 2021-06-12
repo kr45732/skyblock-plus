@@ -94,12 +94,12 @@ public class SkyblockEventCommand extends Command {
 
 			if (paginateBuilder.getItemsSize() > 0) {
 				paginateBuilder.build().paginate(announcementChannel, 0);
-				database.updateSkyblockEventSettings(guildId, new SbEvent());
+				database.setSkyblockEventSettings(guildId, new SbEvent());
 				return;
 			}
 		} catch (Exception ignored) {}
 		announcementChannel.sendMessage(defaultEmbed("Prizes").setDescription("None").build()).complete();
-		database.updateSkyblockEventSettings(guildId, new SbEvent());
+		database.setSkyblockEventSettings(guildId, new SbEvent());
 	}
 
 	private static List<EventMember> getEventLeaderboardList(JsonElement runningSettings) {
@@ -569,7 +569,7 @@ public class SkyblockEventCommand extends Command {
 
 	private EmbedBuilder cancelSkyblockEvent(String guildId) {
 		if (database.getSkyblockEventActive(guildId)) {
-			int code = database.updateSkyblockEventSettings(guildId, new SbEvent(new RunningEvent(), "false"));
+			int code = database.setSkyblockEventSettings(guildId, new SbEvent(new RunningEvent(), "false"));
 
 			if (code == 200) {
 				return defaultEmbed("Event canceled");

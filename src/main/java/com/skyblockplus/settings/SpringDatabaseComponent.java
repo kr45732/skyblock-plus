@@ -89,16 +89,16 @@ public class SpringDatabaseComponent {
 		return gson.toJsonTree(settingsService.getVerifySettings(serverId).getBody());
 	}
 
-	public int updateVerifySettings(String serverId, JsonElement newVerifySettings) {
-		return settingsService.updateVerifySettings(serverId, gson.fromJson(newVerifySettings, AutomatedVerify.class)).getStatusCodeValue();
+	public int setVerifySettings(String serverId, JsonElement newVerifySettings) {
+		return settingsService.setVerifySettings(serverId, gson.fromJson(newVerifySettings, AutomatedVerify.class)).getStatusCodeValue();
 	}
 
 	public JsonElement getRolesSettings(String serverId) {
 		return gson.toJsonTree(settingsService.getRolesSettings(serverId).getBody());
 	}
 
-	public int updateRolesSettings(String serverId, JsonElement newRoleSettings) {
-		return settingsService.updateRolesSettings(serverId, gson.fromJson(newRoleSettings, AutomatedRoles.class)).getStatusCodeValue();
+	public int setRolesSettings(String serverId, JsonElement newRoleSettings) {
+		return settingsService.setRolesSettings(serverId, gson.fromJson(newRoleSettings, AutomatedRoles.class)).getStatusCodeValue();
 	}
 
 	public boolean serverByServerIdExists(String serverId) {
@@ -109,20 +109,20 @@ public class SpringDatabaseComponent {
 		return gson.toJsonTree(settingsService.getRoleSettings(serverId, roleName).getBody());
 	}
 
-	public int updateRoleSettings(String serverId, String roleName, JsonElement newRoleSettings) {
-		return settingsService.updateRoleSettings(serverId, gson.fromJson(newRoleSettings, RoleModel.class), roleName).getStatusCodeValue();
+	public int setRoleSettings(String serverId, String roleName, JsonElement newRoleSettings) {
+		return settingsService.setRoleSettings(serverId, gson.fromJson(newRoleSettings, RoleModel.class), roleName).getStatusCodeValue();
 	}
 
-	public int updateGuildRoleSettings(String serverId, JsonObject currentSettings) {
-		return settingsService.updateGuildRoleSettings(serverId, gson.fromJson(currentSettings, GuildRole.class)).getStatusCodeValue();
+	public int setGuildRoleSettings(String serverId, JsonObject currentSettings) {
+		return settingsService.setGuildRoleSettings(serverId, gson.fromJson(currentSettings, GuildRole.class)).getStatusCodeValue();
 	}
 
-	public int updateGuildRoleSettings(String serverId, GuildRole currentSettings) {
-		return settingsService.updateGuildRoleSettings(serverId, currentSettings).getStatusCodeValue();
+	public int setGuildRoleSettings(String serverId, GuildRole currentSettings) {
+		return settingsService.setGuildRoleSettings(serverId, currentSettings).getStatusCodeValue();
 	}
 
-	public int updateApplyCacheSettings(String serverId, String name, String currentSettings) {
-		return settingsService.updateApplyUsersCache(serverId, name, currentSettings).getStatusCodeValue();
+	public int setApplyCacheSettings(String serverId, String name, String currentSettings) {
+		return settingsService.setApplyUsersCache(serverId, name, currentSettings).getStatusCodeValue();
 	}
 
 	public JsonArray getApplyCacheSettings(String serverId, String name) {
@@ -134,11 +134,11 @@ public class SpringDatabaseComponent {
 	}
 
 	public int deleteApplyCacheSettings(String serverId, String name) {
-		return settingsService.updateApplyUsersCache(serverId, name, "[]").getStatusCodeValue();
+		return settingsService.setApplyUsersCache(serverId, name, "[]").getStatusCodeValue();
 	}
 
-	public int updateSkyblockEventSettings(String serverId, SbEvent currentSettings) {
-		return settingsService.updateSkyblockEventSettings(serverId, currentSettings).getStatusCodeValue();
+	public int setSkyblockEventSettings(String serverId, SbEvent currentSettings) {
+		return settingsService.setSkyblockEventSettings(serverId, currentSettings).getStatusCodeValue();
 	}
 
 	public int addEventMemberToRunningEvent(String serverId, EventMember newEventMember) {
@@ -157,8 +157,8 @@ public class SpringDatabaseComponent {
 		return gson.toJsonTree(settingsService.getRunningSkyblockEventSettings(serverId).getBody());
 	}
 
-	public int updateRunningEventSettings(String serverId, JsonElement newSettings) {
-		return settingsService.updateSkyblockRunningEvent(serverId, gson.fromJson(newSettings, RunningEvent.class)).getStatusCodeValue();
+	public int setRunningEventSettings(String serverId, JsonElement newSettings) {
+		return settingsService.setSkyblockRunningEvent(serverId, gson.fromJson(newSettings, RunningEvent.class)).getStatusCodeValue();
 	}
 
 	public int removeEventMemberFromRunningEvent(String serverId, String minecraftUuid) {
@@ -173,8 +173,8 @@ public class SpringDatabaseComponent {
 		return gson.toJsonTree(settingsService.getApplyReqs(serverId, name).getBody());
 	}
 
-	public int updateApplyReqs(String serverId, String name, JsonArray newApplyReqs) {
-		return settingsService.updateApplyReqs(serverId, name, gson.fromJson(newApplyReqs, ApplyRequirements[].class)).getStatusCodeValue();
+	public int setApplyReqs(String serverId, String name, JsonArray newApplyReqs) {
+		return settingsService.setApplyReqs(serverId, name, gson.fromJson(newApplyReqs, ApplyRequirements[].class)).getStatusCodeValue();
 	}
 
 	public List<AutomatedApplication> getAllApplySettings(String serverId) {
@@ -185,16 +185,16 @@ public class SpringDatabaseComponent {
 		return gson.toJsonTree(settingsService.getApplySettingsExt(serverId, name).getBody());
 	}
 
-	public int updateApplySettings(String serverId, AutomatedApplication newSettings) {
-		return settingsService.updateApplySettings(serverId, newSettings).getStatusCodeValue();
+	public int setApplySettings(String serverId, AutomatedApplication newSettings) {
+		return settingsService.setApplySettings(serverId, newSettings).getStatusCodeValue();
 	}
 
-	public int updateApplySettings(String serverId, JsonElement newSettings) {
-		return settingsService.updateApplySettings(serverId, gson.fromJson(newSettings, AutomatedApplication.class)).getStatusCodeValue();
+	public int setApplySettings(String serverId, JsonElement newSettings) {
+		return settingsService.setApplySettings(serverId, gson.fromJson(newSettings, AutomatedApplication.class)).getStatusCodeValue();
 	}
 
-	public int updateVerifyRolesSettings(String serverId, JsonArray newsettings) {
-		return settingsService.updateVerifyRolesSettings(serverId, gson.fromJson(newsettings, String[].class)).getStatusCodeValue();
+	public int setVerifyRolesSettings(String serverId, JsonArray newsettings) {
+		return settingsService.setVerifyRolesSettings(serverId, gson.fromJson(newsettings, String[].class)).getStatusCodeValue();
 	}
 
 	public List<GuildRole> getAllGuildRoles(String serverId) {
@@ -203,5 +203,15 @@ public class SpringDatabaseComponent {
 
 	public JsonElement getGuildRoleSettings(String serverId, String name) {
 		return gson.toJsonTree(settingsService.getGuildRoleSettingsExt(serverId, name).getBody());
+	}
+
+	public String getServerHypixelApiKey(String serverId) {
+		return settingsService.getServerHypixelApiKey(serverId).getBody() != null
+			? (String) settingsService.getServerHypixelApiKey(serverId).getBody()
+			: null;
+	}
+
+	public int setServerHypixelApiKey(String serverId, String newKey) {
+		return settingsService.setServerHypixelApiKey(serverId, newKey).getStatusCodeValue();
 	}
 }

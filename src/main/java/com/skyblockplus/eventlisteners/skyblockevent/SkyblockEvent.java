@@ -281,6 +281,6 @@ public class SkyblockEvent {
 		);
 		SbEvent newSkyblockEventSettings = new SbEvent(newRunningEvent, "true");
 
-		return (database.updateSkyblockEventSettings(commandEvent.getGuild().getId(), newSkyblockEventSettings) == 200);
+		return (database.setSkyblockEventSettings(commandEvent.getGuild().getId(), newSkyblockEventSettings) == 200);
 	}
 }

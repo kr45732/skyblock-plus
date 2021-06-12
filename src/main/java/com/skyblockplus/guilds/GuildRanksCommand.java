@@ -113,7 +113,7 @@ public class GuildRanksCommand extends Command {
 		}
 
 		List<String> uniqueGuildUuid = new ArrayList<>();
-		List<GuildLeaderboardStruct> gMembers = new ArrayList<>();
+		List<GuildRanksStruct> gMembers = new ArrayList<>();
 		JsonArray guildLbJson = higherDepth(getJson("https://hypixel-app-api.senither.com/leaderboard/players/" + guildId), "data")
 			.getAsJsonArray();
 		for (JsonElement lbM : guildLbJson) {
@@ -126,7 +126,7 @@ public class GuildRanksCommand extends Command {
 				}
 
 				gMembers.add(
-					new GuildLeaderboardStruct(
+					new GuildRanksStruct(
 						higherDepth(lbM, "username").getAsString(),
 						higherDepth(lbM, "average_skill_progress").getAsDouble(),
 						higherDepth(lbM, "total_slayer").getAsDouble(),
@@ -140,16 +140,16 @@ public class GuildRanksCommand extends Command {
 		}
 
 		gMembers.sort(Comparator.comparingDouble(o1 -> -o1.getSlayer()));
-		ArrayList<GuildLeaderboardStruct> guildSlayer = new ArrayList<>(gMembers);
+		ArrayList<GuildRanksStruct> guildSlayer = new ArrayList<>(gMembers);
 
 		gMembers.sort(Comparator.comparingDouble(o1 -> -o1.getSkills()));
-		ArrayList<GuildLeaderboardStruct> guildSkills = new ArrayList<>(gMembers);
+		ArrayList<GuildRanksStruct> guildSkills = new ArrayList<>(gMembers);
 
 		gMembers.sort(Comparator.comparingDouble(o1 -> -o1.getCatacombs()));
-		ArrayList<GuildLeaderboardStruct> guildCatacombs = new ArrayList<>(gMembers);
+		ArrayList<GuildRanksStruct> guildCatacombs = new ArrayList<>(gMembers);
 
 		gMembers.sort(Comparator.comparingDouble(o1 -> -o1.getWeight()));
-		ArrayList<GuildLeaderboardStruct> guildWeight = new ArrayList<>(gMembers);
+		ArrayList<GuildRanksStruct> guildWeight = new ArrayList<>(gMembers);
 
 		for (String s : uniqueGuildUuid) {
 			int slayerRank = -1;
@@ -220,7 +220,7 @@ public class GuildRanksCommand extends Command {
 			}
 		}
 
-		ArrayList<ArrayList<GuildLeaderboardStruct>> guildLeaderboards = new ArrayList<>();
+		ArrayList<ArrayList<GuildRanksStruct>> guildLeaderboards = new ArrayList<>();
 
 		if (rankTypes.contains("slayer")) {
 			guildLeaderboards.add(guildSlayer);
@@ -239,9 +239,9 @@ public class GuildRanksCommand extends Command {
 
 		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(20);
 		int totalChange = 0;
-		for (ArrayList<GuildLeaderboardStruct> currentLeaderboard : guildLeaderboards) {
+		for (ArrayList<GuildRanksStruct> currentLeaderboard : guildLeaderboards) {
 			for (int i = 0; i < currentLeaderboard.size(); i++) {
-				GuildLeaderboardStruct currentPlayer = currentLeaderboard.get(i);
+				GuildRanksStruct currentPlayer = currentLeaderboard.get(i);
 				if (currentPlayer == null) {
 					continue;
 				}

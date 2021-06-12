@@ -290,7 +290,7 @@ public class AutomaticGuild {
 				JsonObject newSettings = currentSettings.getAsJsonObject();
 				newSettings.remove("previousMessageId");
 				newSettings.addProperty("previousMessageId", reactMessage.getId());
-				database.updateVerifySettings(event.getGuild().getId(), newSettings);
+				database.setVerifySettings(event.getGuild().getId(), newSettings);
 
 				verifyGuild = new VerifyGuild(reactChannel, reactMessage);
 			}
@@ -333,7 +333,7 @@ public class AutomaticGuild {
 						.complete();
 
 					currentSetting.setPreviousMessageId(reactMessage.getId());
-					database.updateApplySettings(event.getGuild().getId(), new Gson().toJsonTree(currentSetting));
+					database.setApplySettings(event.getGuild().getId(), new Gson().toJsonTree(currentSetting));
 
 					applyGuild.removeIf(o1 -> higherDepth(o1.currentSettings, "name").getAsString().equals(currentSetting.getName()));
 					applyGuild.add(new ApplyGuild(reactMessage, new Gson().toJsonTree(currentSetting)));
@@ -394,7 +394,7 @@ public class AutomaticGuild {
 							.complete();
 
 						currentSetting.setPreviousMessageId(reactMessage.getId());
-						database.updateApplySettings(guild.getId(), new Gson().toJsonTree(currentSetting));
+						database.setApplySettings(guild.getId(), new Gson().toJsonTree(currentSetting));
 
 						applyGuild.add(new ApplyGuild(reactMessage, new Gson().toJsonTree(currentSetting), curApplyUsers));
 						applyStr.append("• Reloaded `").append(currentSetting.getName()).append("`\n");
@@ -455,7 +455,7 @@ public class AutomaticGuild {
 				JsonObject newSettings = currentSettings.getAsJsonObject();
 				newSettings.remove("previousMessageId");
 				newSettings.addProperty("previousMessageId", reactMessage.getId());
-				database.updateVerifySettings(guild.getId(), newSettings);
+				database.setVerifySettings(guild.getId(), newSettings);
 
 				verifyGuild = new VerifyGuild(reactChannel, reactMessage);
 				return "Reloaded";

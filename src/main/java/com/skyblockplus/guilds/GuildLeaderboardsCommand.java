@@ -1,7 +1,6 @@
 package com.skyblockplus.guilds;
 
-import static com.skyblockplus.Main.asyncHttpClient;
-import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.Main.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -13,13 +12,19 @@ import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 
 public class GuildLeaderboardsCommand extends Command {
 
@@ -27,7 +32,6 @@ public class GuildLeaderboardsCommand extends Command {
 		this.name = "guild-leaderboard";
 		this.cooldown = globalCooldown + 1;
 		this.aliases = new String[] { "g-lb" };
-		this.ownerCommand = true;
 	}
 
 	@Override
@@ -66,6 +70,18 @@ public class GuildLeaderboardsCommand extends Command {
 	}
 
 	private EmbedBuilder getLeaderboard(String lbType, String username, CommandEvent event) {
+		String HYPIXEL_KEY = database.getServerHypixelApiKey(event.getGuild().getId());
+
+		if (HYPIXEL_KEY == null) {
+			return defaultEmbed("Error").setDescription("You must set a Hypixel API key to use this command");
+		}
+
+		try {
+			higherDepth(getJson("https://api.hypixel.net/key?key=" + HYPIXEL_KEY), "record.key").getAsString();
+		} catch (Exception e) {
+			return defaultEmbed("Error").setDescription("The set Hypixel API key is invalid");
+		}
+
 		if (!(lbType.equals("slayer") || lbType.equals("skills") || lbType.equals("catacombs") || lbType.equals("weight"))) {
 			return defaultEmbed(lbType + " is an invalid leaderboard type");
 		}
@@ -75,9 +91,7 @@ public class GuildLeaderboardsCommand extends Command {
 			return null;
 		}
 
-		JsonElement guildJson = getJson(
-			"https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&player=" + usernameUuidStruct.playerUuid
-		);
+		JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_KEY + "&player=" + usernameUuidStruct.playerUuid);
 		String guildName;
 
 		try {
@@ -88,6 +102,9 @@ public class GuildLeaderboardsCommand extends Command {
 
 		JsonArray guildMembers = higherDepth(guildJson, "guild.members").getAsJsonArray();
 		List<CompletableFuture<CompletableFuture<String>>> futuresList = new ArrayList<>();
+
+		AtomicInteger remainingLimit = new AtomicInteger(120);
+		AtomicInteger timeTillReset = new AtomicInteger(60);
 
 		for (JsonElement guildMember : guildMembers) {
 			String guildMemberUuid = higherDepth(guildMember, "uuid").getAsString();
@@ -115,7 +132,7 @@ public class GuildLeaderboardsCommand extends Command {
 					.thenApply(
 						guildMemberUsernameResponse ->
 							asyncHttpClient
-								.prepareGet("https://api.hypixel.net/skyblock/profiles?key=" + HYPIXEL_API_KEY + "&uuid=" + guildMemberUuid)
+								.prepareGet("https://api.hypixel.net/skyblock/profiles?key=" + HYPIXEL_KEY + "&uuid=" + guildMemberUuid)
 								.execute()
 								.toCompletableFuture()
 								.thenApply(
@@ -224,6 +241,30 @@ public class GuildLeaderboardsCommand extends Command {
 			.build()
 			.paginate(event.getChannel(), 0);
 
+		return null;
+	}
+
+	public static JsonElement getHypixelJson(String jsonUrl) {
+		try {
+			if (remainingLimit.get() < 5) {
+				System.out.println("Sleeping for " + timeTillReset + " seconds");
+				TimeUnit.SECONDS.sleep(timeTillReset.get());
+			}
+		} catch (Exception ignored) {}
+
+		try (CloseableHttpClient httpclient = HttpClientBuilder.create().build()) {
+			HttpGet httpget = new HttpGet(jsonUrl);
+			httpget.addHeader("content-type", "application/json; charset=UTF-8");
+
+			try (CloseableHttpResponse httpresponse = httpclient.execute(httpget)) {
+				try {
+					remainingLimit.set(Integer.parseInt(httpresponse.getFirstHeader("RateLimit-Remaining").getValue()));
+					timeTillReset.set(Integer.parseInt(httpresponse.getFirstHeader("RateLimit-Reset").getValue()));
+				} catch (Exception ignored) {}
+
+				return JsonParser.parseReader(new InputStreamReader(httpresponse.getEntity().getContent()));
+			}
+		} catch (Exception ignored) {}
 		return null;
 	}
 }

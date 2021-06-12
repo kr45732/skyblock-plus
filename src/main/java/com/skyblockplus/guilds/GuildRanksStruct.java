@@ -5,7 +5,7 @@ import lombok.Data;
 
 @AllArgsConstructor
 @Data
-public class GuildLeaderboardStruct {
+public class GuildRanksStruct {
 
 	public String name;
 	public double skills;

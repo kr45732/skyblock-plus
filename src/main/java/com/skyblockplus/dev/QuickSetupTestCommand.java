@@ -57,7 +57,7 @@ public class QuickSetupTestCommand extends Command {
 	}
 
 	private EmbedBuilder deleteSkyblockEvent(String serverId) {
-		return defaultEmbed("API returned response code " + database.updateSkyblockEventSettings(serverId, new SbEvent()));
+		return defaultEmbed("API returned response code " + database.setSkyblockEventSettings(serverId, new SbEvent()));
 	}
 
 	private EmbedBuilder deleteServerApplyCache(String serverId, String name) {
@@ -84,7 +84,7 @@ public class QuickSetupTestCommand extends Command {
 				);
 			}
 
-			int responseCode = database.updateRoleSettings(event.getGuild().getId(), roleName, jsonElement);
+			int responseCode = database.setRoleSettings(event.getGuild().getId(), roleName, jsonElement);
 			return defaultEmbed("API returned response code: " + responseCode);
 		} catch (Exception ignored) {}
 		return defaultEmbed("Error updating settings");

@@ -450,6 +450,10 @@ public class SettingsCommand extends Command {
 					} else {
 						eb = defaultEmbed("Error").setDescription("Invalid setting");
 					}
+				} else if (args.length == 4 && args[1].equals("set") && args[2].equals("hypixel_key")) {
+					eb = setHypixelKey(args[3]);
+				} else if (args.length == 4 && args[1].equals("delete") && args[2].equals("hypixel_key")) {
+					eb = deleteHypixelKey();
 				} else {
 					eb = defaultEmbed("Error", null).setDescription("Invalid setting");
 				}
@@ -458,6 +462,37 @@ public class SettingsCommand extends Command {
 			}
 		)
 			.start();
+	}
+
+	private EmbedBuilder setHypixelKey(String newKey) {
+		try {
+			higherDepth(getJson("https://api.hypixel.net/key?key=" + newKey), "record.key").getAsString();
+		} catch (Exception e) {
+			return defaultEmbed("Error").setDescription("Invalid API key");
+		}
+
+		event.getMessage().delete().queue();
+
+		int responseCode = database.setServerHypixelApiKey(event.getGuild().getId(), newKey);
+
+		if (responseCode == 200) {
+			return defaultEmbed("Settings for " + event.getGuild().getName())
+				.setDescription(
+					"Set the Hypixel API key. Note that the set API key cannot be viewed for privacy. Your message was also deleted for your privacy."
+				);
+		}
+
+		return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+	}
+
+	private EmbedBuilder deleteHypixelKey() {
+		int responseCode = database.setServerHypixelApiKey(event.getGuild().getId(), "");
+
+		if (responseCode == 200) {
+			return defaultEmbed("Settings for " + event.getGuild().getName()).setDescription("Deleted the set Hypixel API key");
+		}
+
+		return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
 	}
 
 	private EmbedBuilder deleteApplyGuild(String name) {
@@ -493,7 +528,7 @@ public class SettingsCommand extends Command {
 			}
 		}
 
-		int responseCode = database.updateVerifyRolesSettings(event.getGuild().getId(), currentVerifyRoles);
+		int responseCode = database.setVerifyRolesSettings(event.getGuild().getId(), currentVerifyRoles);
 
 		if (responseCode != 200) {
 			return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
@@ -524,7 +559,7 @@ public class SettingsCommand extends Command {
 		}
 
 		currentVerifyRoles.add(verifyRole.getId());
-		int responseCode = database.updateVerifyRolesSettings(event.getGuild().getId(), currentVerifyRoles);
+		int responseCode = database.setVerifyRolesSettings(event.getGuild().getId(), currentVerifyRoles);
 
 		if (responseCode != 200) {
 			return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
@@ -568,7 +603,7 @@ public class SettingsCommand extends Command {
 
 		currentSettings.remove("enableGuildRole");
 		currentSettings.addProperty("enableGuildRole", enable);
-		int responseCode = database.updateGuildRoleSettings(event.getGuild().getId(), currentSettings);
+		int responseCode = database.setGuildRoleSettings(event.getGuild().getId(), currentSettings);
 		if (responseCode != 200) {
 			return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 		}
@@ -589,7 +624,7 @@ public class SettingsCommand extends Command {
 
 		currentSettings.remove("enableGuildRanks");
 		currentSettings.addProperty("enableGuildRanks", enable);
-		int responseCode = database.updateGuildRoleSettings(event.getGuild().getId(), currentSettings);
+		int responseCode = database.setGuildRoleSettings(event.getGuild().getId(), currentSettings);
 		if (responseCode != 200) {
 			return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 		}
@@ -645,7 +680,7 @@ public class SettingsCommand extends Command {
 				currentSettings.remove("guildRanks");
 				currentSettings.add("guildRanks", currentGuildRanks);
 
-				int responseCode = database.updateGuildRoleSettings(event.getGuild().getId(), currentSettings);
+				int responseCode = database.setGuildRoleSettings(event.getGuild().getId(), currentSettings);
 				if (responseCode != 200) {
 					return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 				}
@@ -679,7 +714,7 @@ public class SettingsCommand extends Command {
 				currentSettings.remove("guildRanks");
 				currentSettings.add("guildRanks", currentGuildRanksTemp);
 
-				int responseCode = database.updateGuildRoleSettings(event.getGuild().getId(), currentSettings);
+				int responseCode = database.setGuildRoleSettings(event.getGuild().getId(), currentSettings);
 				if (responseCode != 200) {
 					return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 				}
@@ -702,7 +737,7 @@ public class SettingsCommand extends Command {
 			JsonObject currentSettings = database.getGuildRoleSettings(event.getGuild().getId(), name).getAsJsonObject();
 			currentSettings.remove("guildId");
 			currentSettings.addProperty("guildId", guildId);
-			int responseCode = database.updateGuildRoleSettings(event.getGuild().getId(), currentSettings);
+			int responseCode = database.setGuildRoleSettings(event.getGuild().getId(), currentSettings);
 			if (responseCode != 200) {
 				return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 			}
@@ -722,7 +757,7 @@ public class SettingsCommand extends Command {
 				JsonObject currentSettings = database.getGuildRoleSettings(event.getGuild().getId(), name).getAsJsonObject();
 				currentSettings.remove("roleId");
 				currentSettings.addProperty("roleId", verifyGuildRole.getId());
-				int responseCode = database.updateGuildRoleSettings(event.getGuild().getId(), currentSettings);
+				int responseCode = database.setGuildRoleSettings(event.getGuild().getId(), currentSettings);
 
 				if (responseCode != 200) {
 					return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
@@ -756,7 +791,7 @@ public class SettingsCommand extends Command {
 
 		GuildRole newGuildRole = new GuildRole(name);
 
-		int responseCode = database.updateGuildRoleSettings(event.getGuild().getId(), newGuildRole);
+		int responseCode = database.setGuildRoleSettings(event.getGuild().getId(), newGuildRole);
 		if (responseCode != 200) {
 			return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
 		}
@@ -839,12 +874,12 @@ public class SettingsCommand extends Command {
 			StringBuilder ebFieldString = new StringBuilder();
 
 			if (higherDepth(currentRoleSettings, "enable") == null) {
-				database.updateRoleSettings(event.getGuild().getId(), roleName, new Gson().toJsonTree(new RoleModel()));
+				database.setRoleSettings(event.getGuild().getId(), roleName, new Gson().toJsonTree(new RoleModel()));
 				currentRoleSettings = database.getRoleSettings(event.getGuild().getId(), roleName);
 			}
 
 			if (higherDepth(currentRoleSettings, "stackable") == null) {
-				database.updateRoleSettings(event.getGuild().getId(), roleName, new Gson().toJsonTree(new RoleModel()));
+				database.setRoleSettings(event.getGuild().getId(), roleName, new Gson().toJsonTree(new RoleModel()));
 				currentRoleSettings = database.getRoleSettings(event.getGuild().getId(), roleName);
 			}
 
@@ -1070,7 +1105,7 @@ public class SettingsCommand extends Command {
 			JsonObject newRolesJson = database.getRolesSettings(event.getGuild().getId()).getAsJsonObject();
 			newRolesJson.remove("enable");
 			newRolesJson.addProperty("enable", enable);
-			int responseCode = database.updateRolesSettings(event.getGuild().getId(), newRolesJson);
+			int responseCode = database.setRolesSettings(event.getGuild().getId(), newRolesJson);
 			if (responseCode != 200) {
 				return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 			}
@@ -1095,7 +1130,7 @@ public class SettingsCommand extends Command {
 		if (currentRoleSettings.get("levels").getAsJsonArray().size() != 0) {
 			currentRoleSettings.remove("enable");
 			currentRoleSettings.addProperty("enable", enable);
-			int responseCode = database.updateRoleSettings(event.getGuild().getId(), roleName, currentRoleSettings);
+			int responseCode = database.setRoleSettings(event.getGuild().getId(), roleName, currentRoleSettings);
 			if (responseCode != 200) {
 				return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 			}
@@ -1106,7 +1141,7 @@ public class SettingsCommand extends Command {
 		} else {
 			currentRoleSettings.remove("enable");
 			currentRoleSettings.addProperty("enable", "false");
-			database.updateRoleSettings(event.getGuild().getId(), roleName, currentRoleSettings);
+			database.setRoleSettings(event.getGuild().getId(), roleName, currentRoleSettings);
 		}
 		EmbedBuilder eb = defaultEmbed("Error", null);
 		eb.setDescription("Specified role must have at least one configuration!");
@@ -1151,7 +1186,7 @@ public class SettingsCommand extends Command {
 				newRoleSettings.remove("levels");
 				newRoleSettings.add("levels", currentLevels);
 
-				int responseCode = database.updateRoleSettings(event.getGuild().getId(), roleName, newRoleSettings);
+				int responseCode = database.setRoleSettings(event.getGuild().getId(), roleName, newRoleSettings);
 				if (responseCode != 200) {
 					return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 				}
@@ -1220,7 +1255,7 @@ public class SettingsCommand extends Command {
 		newRoleSettings.remove("levels");
 		newRoleSettings.add("levels", currentLevels);
 
-		int responseCode = database.updateRoleSettings(event.getGuild().getId(), roleName, newRoleSettings);
+		int responseCode = database.setRoleSettings(event.getGuild().getId(), roleName, newRoleSettings);
 		if (responseCode != 200) {
 			return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 		}
@@ -1259,7 +1294,7 @@ public class SettingsCommand extends Command {
 				currentLevels.remove(level);
 				currentRoleSettings.remove("levels");
 				currentRoleSettings.add("levels", currentLevels);
-				int responseCode = database.updateRoleSettings(event.getGuild().getId(), roleName, currentRoleSettings);
+				int responseCode = database.setRoleSettings(event.getGuild().getId(), roleName, currentRoleSettings);
 				if (responseCode != 200) {
 					return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 				}
@@ -1293,7 +1328,7 @@ public class SettingsCommand extends Command {
 
 		currentRoleSettings.remove("stackable");
 		currentRoleSettings.addProperty("stackable", stackable);
-		int responseCode = database.updateRoleSettings(event.getGuild().getId(), roleName, currentRoleSettings);
+		int responseCode = database.setRoleSettings(event.getGuild().getId(), roleName, currentRoleSettings);
 		if (responseCode != 200) {
 			return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 		}
@@ -1338,7 +1373,7 @@ public class SettingsCommand extends Command {
 		newRoleSettings.remove("levels");
 		newRoleSettings.add("levels", currentLevels);
 
-		int responseCode = database.updateRoleSettings(event.getGuild().getId(), roleName, newRoleSettings);
+		int responseCode = database.setRoleSettings(event.getGuild().getId(), roleName, newRoleSettings);
 
 		if (responseCode != 200) {
 			return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
@@ -1479,7 +1514,7 @@ public class SettingsCommand extends Command {
 		JsonObject newVerifySettings = database.getVerifySettings(event.getGuild().getId()).getAsJsonObject();
 		newVerifySettings.remove(key);
 		newVerifySettings.addProperty(key, newValue);
-		return database.updateVerifySettings(event.getGuild().getId(), newVerifySettings);
+		return database.setVerifySettings(event.getGuild().getId(), newVerifySettings);
 	}
 
 	/* Apply Settings */
@@ -1537,7 +1572,7 @@ public class SettingsCommand extends Command {
 
 		AutomatedApplication newApply = new AutomatedApplication(name);
 
-		int responseCode = database.updateApplySettings(event.getGuild().getId(), newApply);
+		int responseCode = database.setApplySettings(event.getGuild().getId(), newApply);
 		if (responseCode != 200) {
 			return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
 		}
@@ -1773,7 +1808,7 @@ public class SettingsCommand extends Command {
 			JsonElement req = currentReqs.get(Integer.parseInt(reqNumber) - 1);
 			currentReqs.remove(Integer.parseInt(reqNumber) - 1);
 
-			int responseCode = database.updateApplyReqs(event.getGuild().getId(), name, currentReqs);
+			int responseCode = database.setApplyReqs(event.getGuild().getId(), name, currentReqs);
 
 			if (responseCode != 200) {
 				return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
@@ -1834,7 +1869,7 @@ public class SettingsCommand extends Command {
 
 		currentReqs.add(new Gson().toJsonTree(toAddReq));
 
-		int responseCode = database.updateApplyReqs(event.getGuild().getId(), name, currentReqs);
+		int responseCode = database.setApplyReqs(event.getGuild().getId(), name, currentReqs);
 
 		if (responseCode != 200) {
 			return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
@@ -1858,7 +1893,7 @@ public class SettingsCommand extends Command {
 		JsonObject newApplyJson = database.getApplySettings(event.getGuild().getId(), name).getAsJsonObject();
 		newApplyJson.remove(key);
 		newApplyJson.addProperty(key, newValue);
-		return database.updateApplySettings(event.getGuild().getId(), newApplyJson);
+		return database.setApplySettings(event.getGuild().getId(), newApplyJson);
 	}
 
 	/* Misc */

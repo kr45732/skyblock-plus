@@ -40,7 +40,7 @@ public class MainClassUtils {
 					);
 					List<ApplyUser> applyUserList = applySetting.applyUserList;
 					if (applyUserList.size() > 0) {
-						int code = database.updateApplyCacheSettings(
+						int code = database.setApplyCacheSettings(
 							automaticGuild.getKey(),
 							higherDepth(applySetting.currentSettings, "name").getAsString(),
 							new Gson().toJson(applyUserList)

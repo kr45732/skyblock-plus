@@ -30,7 +30,13 @@ public class ServerSettingsService {
 	}
 
 	public List<ServerSettingsModel> getAllServerSettings() {
-		return settingsRepository.findAll();
+		List<ServerSettingsModel> serverSettingsModels = settingsRepository.findAll();
+
+		for (ServerSettingsModel m : serverSettingsModels) {
+			m.setHypixelApiKey(null);
+		}
+
+		return serverSettingsModels;
 	}
 
 	public boolean serverByServerIdExists(String serverId) {
@@ -51,15 +57,36 @@ public class ServerSettingsService {
 	}
 
 	public ResponseEntity<?> getServerSettingsById(String serverId) {
-		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId).copy();
 
 		if (currentServerSettings != null) {
+			currentServerSettings.setHypixelApiKey(null);
 			return new ResponseEntity<>(currentServerSettings, HttpStatus.OK);
 		}
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 
-	public ResponseEntity<HttpStatus> updateServerSettings(String serverId, ServerSettingsModel newServerSettings) {
+	public ResponseEntity<?> getServerHypixelApiKey(String serverId) {
+		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+		if (currentServerSettings != null) {
+			return new ResponseEntity<>(currentServerSettings.getHypixelApiKeyInt(), HttpStatus.OK);
+		}
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	}
+
+	public ResponseEntity<HttpStatus> setServerHypixelApiKey(String serverId, String newKey) {
+		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+		if (currentServerSettings != null) {
+			currentServerSettings.setHypixelApiKey(newKey);
+			settingsRepository.save(currentServerSettings);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	}
+
+	public ResponseEntity<HttpStatus> setServerSettings(String serverId, ServerSettingsModel newServerSettings) {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
 		if (currentServerSettings != null) {
@@ -78,7 +105,7 @@ public class ServerSettingsService {
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 
-	public ResponseEntity<HttpStatus> updateVerifySettings(String serverId, AutomatedVerify newVerifySettings) {
+	public ResponseEntity<HttpStatus> setVerifySettings(String serverId, AutomatedVerify newVerifySettings) {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
 		if (currentServerSettings != null) {
@@ -159,7 +186,7 @@ public class ServerSettingsService {
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 
-	public ResponseEntity<HttpStatus> updateRolesSettings(String serverId, AutomatedRoles newRoleSettings) {
+	public ResponseEntity<HttpStatus> setRolesSettings(String serverId, AutomatedRoles newRoleSettings) {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
 		if (currentServerSettings != null) {
@@ -170,7 +197,7 @@ public class ServerSettingsService {
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 
-	public ResponseEntity<HttpStatus> updateRoleSettings(String serverId, RoleModel newRoleSettings, String roleName) {
+	public ResponseEntity<HttpStatus> setRoleSettings(String serverId, RoleModel newRoleSettings, String roleName) {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
 		if (currentServerSettings != null) {
@@ -259,7 +286,7 @@ public class ServerSettingsService {
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 
-	public ResponseEntity<HttpStatus> updateRolesEnable(String serverId, String newEnableSetting) {
+	public ResponseEntity<HttpStatus> setRolesEnable(String serverId, String newEnableSetting) {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
 		if (currentServerSettings != null) {
@@ -291,13 +318,13 @@ public class ServerSettingsService {
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 
-	public ResponseEntity<HttpStatus> updateApplyUsersCache(String serverId, String name, String newApplyCacheJsonString) {
+	public ResponseEntity<HttpStatus> setApplyUsersCache(String serverId, String name, String newApplyCacheJsonString) {
 		AutomatedApplication automatedApplication = getApplySettings(serverId, name);
 
 		if (automatedApplication != null) {
 			automatedApplication.setApplyUsersCache(newApplyCacheJsonString);
 
-			return updateApplySettings(serverId, automatedApplication);
+			return setApplySettings(serverId, automatedApplication);
 		}
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
@@ -326,7 +353,7 @@ public class ServerSettingsService {
 		return false;
 	}
 
-	public ResponseEntity<HttpStatus> updateSkyblockRunningEvent(String serverId, RunningEvent newSettings) {
+	public ResponseEntity<HttpStatus> setSkyblockRunningEvent(String serverId, RunningEvent newSettings) {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
 		if (currentServerSettings != null) {
@@ -339,7 +366,7 @@ public class ServerSettingsService {
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 
-	public ResponseEntity<HttpStatus> updateSkyblockEventSettings(String serverId, SbEvent newSettings) {
+	public ResponseEntity<HttpStatus> setSkyblockEventSettings(String serverId, SbEvent newSettings) {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
 		if (currentServerSettings != null) {
@@ -360,7 +387,7 @@ public class ServerSettingsService {
 				eventMembers.add(newEventMember);
 				runningEvent.setMembersList(eventMembers);
 
-				return new ResponseEntity<>(updateSkyblockRunningEvent(serverId, runningEvent).getStatusCode());
+				return new ResponseEntity<>(setSkyblockRunningEvent(serverId, runningEvent).getStatusCode());
 			}
 		}
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -389,7 +416,7 @@ public class ServerSettingsService {
 				eventMembers.removeIf(eventMember -> eventMember.getUuid().equals(minecraftUuid));
 				runningEvent.setMembersList(eventMembers);
 
-				return new ResponseEntity<>(updateSkyblockRunningEvent(serverId, runningEvent).getStatusCode());
+				return new ResponseEntity<>(setSkyblockRunningEvent(serverId, runningEvent).getStatusCode());
 			}
 		}
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -421,12 +448,12 @@ public class ServerSettingsService {
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 
-	public ResponseEntity<HttpStatus> updateApplyReqs(String serverId, String name, ApplyRequirements[] newReqs) {
+	public ResponseEntity<HttpStatus> setApplyReqs(String serverId, String name, ApplyRequirements[] newReqs) {
 		AutomatedApplication applySettings = getApplySettings(serverId, name);
 
 		if (applySettings != null) {
 			applySettings.setApplyReqs(new ArrayList<>(Arrays.asList(newReqs)));
-			return updateApplySettings(serverId, applySettings);
+			return setApplySettings(serverId, applySettings);
 		}
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
@@ -442,7 +469,7 @@ public class ServerSettingsService {
 		return null;
 	}
 
-	public ResponseEntity<HttpStatus> updateApplySettings(String serverId, AutomatedApplication newSettings) {
+	public ResponseEntity<HttpStatus> setApplySettings(String serverId, AutomatedApplication newSettings) {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
 		if (currentServerSettings != null) {
@@ -477,7 +504,7 @@ public class ServerSettingsService {
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 
-	public ResponseEntity<HttpStatus> updateGuildRoleSettings(String serverId, GuildRole newSettings) {
+	public ResponseEntity<HttpStatus> setGuildRoleSettings(String serverId, GuildRole newSettings) {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
 		if (currentServerSettings != null) {
@@ -550,7 +577,7 @@ public class ServerSettingsService {
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 
-	public ResponseEntity<HttpStatus> updateVerifyRolesSettings(String serverId, String[] newSettings) {
+	public ResponseEntity<HttpStatus> setVerifyRolesSettings(String serverId, String[] newSettings) {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
 		if (currentServerSettings != null) {
