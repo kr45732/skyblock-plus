@@ -1366,10 +1366,14 @@ public class SettingsCommand extends Command {
 		JsonObject currentSettings = database.getVerifySettings(event.getGuild().getId()).getAsJsonObject();
 		currentSettings.remove("previousMessageId");
 
-		for (String key : getJsonKeys(currentSettings)) {
-			if (higherDepth(currentSettings, key).getAsString().length() == 0) {
-				return false;
+		try {
+			for (Entry<String, JsonElement> key : currentSettings.entrySet()) {
+				if (key.getValue().getAsString().length() == 0) {
+					return false;
+				}
 			}
+		} catch (Exception e) {
+			return false;
 		}
 		return true;
 	}

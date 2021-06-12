@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.script.ScriptEngine;
@@ -57,8 +58,8 @@ public class Utils {
 	public static MessageChannel botLogChannel;
 	public static JsonElement essenceCostsJson;
 	public static JsonElement levelingJson;
-	public static int remainingLimit = 120;
-	public static int timeTillReset = 60;
+	public static AtomicInteger remainingLimit = new AtomicInteger(120);
+	public static AtomicInteger timeTillReset = new AtomicInteger(60);
 	public static String GITHUB_TOKEN = "";
 	public static JsonElement collectionsJson;
 	public static JsonElement petUrlJson;
@@ -322,9 +323,9 @@ public class Utils {
 
 	public static JsonElement getJson(String jsonUrl) {
 		try {
-			if (remainingLimit < 5) {
+			if (remainingLimit.get() < 5) {
 				System.out.println("Sleeping for " + timeTillReset + " seconds");
-				TimeUnit.SECONDS.sleep(timeTillReset);
+				TimeUnit.SECONDS.sleep(timeTillReset.get());
 			}
 		} catch (Exception ignored) {}
 
@@ -338,8 +339,8 @@ public class Utils {
 			try (CloseableHttpResponse httpresponse = httpclient.execute(httpget)) {
 				if (jsonUrl.toLowerCase().contains("api.hypixel.net")) {
 					try {
-						remainingLimit = Integer.parseInt(httpresponse.getFirstHeader("RateLimit-Remaining").getValue());
-						timeTillReset = Integer.parseInt(httpresponse.getFirstHeader("RateLimit-Reset").getValue());
+						remainingLimit.set(Integer.parseInt(httpresponse.getFirstHeader("RateLimit-Remaining").getValue()));
+						timeTillReset.set(Integer.parseInt(httpresponse.getFirstHeader("RateLimit-Reset").getValue()));
 					} catch (Exception ignored) {}
 				}
 

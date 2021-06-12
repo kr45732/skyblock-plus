@@ -44,6 +44,8 @@ public class ServerSettingsModel {
 	@Embedded
 	private SbEvent sbEvent = new SbEvent();
 
+	//	private String hypixelApiKey = "";
+
 	public ServerSettingsModel() {}
 
 	public ServerSettingsModel(String serverName, String serverId) {

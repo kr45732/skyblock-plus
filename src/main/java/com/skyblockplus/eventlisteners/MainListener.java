@@ -60,7 +60,7 @@ public class MainListener extends ListenerAdapter {
 		database.deleteServerSettings(event.getGuild().getId());
 
 		try {
-			logCommand(event.getGuild(), "Left guild | Users: " + event.getGuild().retrieveMetaData().complete().getApproximateMembers());
+			logCommand(event.getGuild(), "Left guild");
 		} catch (Exception ignored) {}
 	}
 

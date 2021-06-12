@@ -92,9 +92,9 @@ public class GuildLeaderboardsCommand extends Command {
 		for (JsonElement guildMember : guildMembers) {
 			String guildMemberUuid = higherDepth(guildMember, "uuid").getAsString();
 			try {
-				if (remainingLimit < 5) {
+				if (remainingLimit.get() < 5) {
 					System.out.println("Sleeping for " + timeTillReset + " seconds");
-					TimeUnit.SECONDS.sleep(timeTillReset);
+					TimeUnit.SECONDS.sleep(timeTillReset.get());
 				}
 			} catch (Exception ignored) {}
 
@@ -122,10 +122,12 @@ public class GuildLeaderboardsCommand extends Command {
 									guildMemberOuterProfileJsonResponse -> {
 										try {
 											try {
-												remainingLimit =
-													Integer.parseInt(guildMemberOuterProfileJsonResponse.getHeader("RateLimit-Remaining"));
-												timeTillReset =
-													Integer.parseInt(guildMemberOuterProfileJsonResponse.getHeader("RateLimit-Reset"));
+												remainingLimit.set(
+													Integer.parseInt(guildMemberOuterProfileJsonResponse.getHeader("RateLimit-Remaining"))
+												);
+												timeTillReset.set(
+													Integer.parseInt(guildMemberOuterProfileJsonResponse.getHeader("RateLimit-Reset"))
+												);
 											} catch (Exception ignored) {}
 
 											JsonElement guildMemberOuterProfileJson = JsonParser.parseString(
