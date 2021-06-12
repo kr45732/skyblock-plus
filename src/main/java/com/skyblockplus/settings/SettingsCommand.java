@@ -50,7 +50,9 @@ public class SettingsCommand extends Command {
 				String content = event.getMessage().getContentRaw();
 				String[] args = content.split(" ");
 
-				if (content.contains("set") && content.contains("hypixel_key")) logCommand(event.getGuild(), event.getAuthor(), content);
+				if (!content.contains("hypixel_key")) {
+					logCommand(event.getGuild(), event.getAuthor(), content);
+				}
 
 				JsonElement currentSettings = database.getServerSettings(event.getGuild().getId());
 				if (higherDepth(currentSettings, "serverId") == null) {
@@ -60,6 +62,7 @@ public class SettingsCommand extends Command {
 					);
 					currentSettings = database.getServerSettings(event.getGuild().getId());
 				}
+
 				if (args.length == 4 && args[1].equals("set") && args[2].equals("hypixel_key")) {
 					eb = setHypixelKey(args[3]);
 				} else if (args.length == 3 && args[1].equals("delete") && args[2].equals("hypixel_key")) {
@@ -85,9 +88,7 @@ public class SettingsCommand extends Command {
 							.queue();
 					}
 					return;
-				}
-
-				if (args.length == 1) {
+				} else if (args.length == 1) {
 					eb = defaultEmbed("Settings for " + event.getGuild().getName());
 
 					if (higherDepth(currentSettings, "automatedVerify") != null) {
