@@ -6,10 +6,10 @@ import java.util.Map;
 
 public class Weight {
 
-	private final Map<String, Double[]> slayerWeights;
-	private final Map<String, Double[]> skillWeights;
-	private final Map<String, Double> dungeonClassWeights;
-	private final Map<String, Double> catacombsWeights;
+	private static final Map<String, Double[]> slayerWeights = defaultSlayerWeights();
+	private static final Map<String, Double[]> skillWeights = defaultSkillWeights();
+	private static final Map<String, Double> dungeonClassWeights = defaultDungeonClassWeights();
+	private static final Map<String, Double> catacombsWeights = defaultCatacombsWeights();
 	private Player player;
 	private double skillAverage;
 	private double slayer;
@@ -17,61 +17,22 @@ public class Weight {
 	private double averageDungeonClass;
 
 	public Weight(Player player) {
-		this(player, defaultSlayerWeights(), defaultSkillWeights(), defaultDungeonClassWeights(), defaultCatacombsWeights());
+		this.player = player;
 	}
 
 	public Weight(double skillAverage, double slayer, double catacombs, double averageDungeonClass) {
-		this(
-			skillAverage,
-			slayer,
-			catacombs,
-			averageDungeonClass,
-			defaultSlayerWeights(),
-			defaultSkillWeights(),
-			defaultDungeonClassWeights(),
-			defaultCatacombsWeights()
-		);
-	}
-
-	public Weight(
-		Player player,
-		Map<String, Double[]> slayerWeights,
-		Map<String, Double[]> skillWeights,
-		Map<String, Double> dungeonClassWeights,
-		Map<String, Double> catacombsWeights
-	) {
-		this.player = player;
-		this.slayerWeights = slayerWeights;
-		this.skillWeights = skillWeights;
-		this.dungeonClassWeights = dungeonClassWeights;
-		this.catacombsWeights = catacombsWeights;
-	}
-
-	public Weight(
-		double skillAverage,
-		double slayer,
-		double catacombs,
-		double averageDungeonClass,
-		Map<String, Double[]> slayerWeights,
-		Map<String, Double[]> skillWeights,
-		Map<String, Double> dungeonClassWeights,
-		Map<String, Double> catacombsWeights
-	) {
 		this.skillAverage = skillAverage;
 		this.slayer = slayer;
 		this.catacombs = catacombs;
 		this.averageDungeonClass = averageDungeonClass;
-		this.slayerWeights = slayerWeights;
-		this.skillWeights = skillWeights;
-		this.dungeonClassWeights = dungeonClassWeights;
-		this.catacombsWeights = catacombsWeights;
 	}
 
 	private static Map<String, Double[]> defaultSlayerWeights() {
 		Map<String, Double[]> tempSlayerWeights = new HashMap<>();
 		tempSlayerWeights.put("rev", new Double[] { 2208D, 0.15D });
 		tempSlayerWeights.put("tara", new Double[] { 2118D, 0.08D });
-		tempSlayerWeights.put("sven", new Double[] { 1962D, 0.015 });
+		tempSlayerWeights.put("sven", new Double[] { 1962D, 0.015D });
+		tempSlayerWeights.put("enderman", new Double[] { 1430D, 0.017D });
 		return tempSlayerWeights;
 	}
 
@@ -117,6 +78,7 @@ public class Weight {
 		slayerWeight.addSlayerWeight("rev", slayerWeights.get("rev")[0], slayerWeights.get("rev")[1]);
 		slayerWeight.addSlayerWeight("sven", slayerWeights.get("sven")[0], slayerWeights.get("sven")[1]);
 		slayerWeight.addSlayerWeight("tara", slayerWeights.get("tara")[0], slayerWeights.get("tara")[1]);
+		slayerWeight.addSlayerWeight("enderman", slayerWeights.get("enderman")[0], slayerWeights.get("enderman")[1]);
 		return slayerWeight.getSlayerWeight();
 	}
 
@@ -156,8 +118,8 @@ public class Weight {
 		SlayerWeight slayerWeight = new SlayerWeight();
 		slayerWeight.addSlayerWeight(
 			slayer,
-			(slayerWeights.get("rev")[0] + slayerWeights.get("sven")[0] + slayerWeights.get("tara")[0]) / 3,
-			(slayerWeights.get("rev")[1] + slayerWeights.get("sven")[1] + slayerWeights.get("tara")[1]) / 3
+			(slayerWeights.get("rev")[0] + slayerWeights.get("sven")[0] + slayerWeights.get("tara")[0] + slayerWeights.get("enderman")[0]) / 4,
+			(slayerWeights.get("rev")[1] + slayerWeights.get("sven")[1] + slayerWeights.get("tara")[1]+ slayerWeights.get("enderman")[1]) / 4
 		);
 		return slayerWeight.getSlayerWeight();
 	}
