@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 
@@ -25,10 +26,10 @@ public class LinkAccountCommand extends Command {
 		this.cooldown = globalCooldown;
 	}
 
-	public static EmbedBuilder linkAccount(String username, User user, Guild guild) {
+	public static EmbedBuilder linkAccount(String username, Member member, Guild guild) {
 		DiscordInfoStruct playerInfo = getPlayerDiscordInfo(username);
 		if (playerInfo != null) {
-			if (!user.getAsTag().equals(playerInfo.discordTag)) {
+			if (!member.getUser().getAsTag().equals(playerInfo.discordTag)) {
 				EmbedBuilder eb = defaultEmbed("Discord tag mismatch");
 				eb.setDescription(
 					"Account " +
@@ -36,14 +37,14 @@ public class LinkAccountCommand extends Command {
 					" is linked with the discord tag " +
 					playerInfo.discordTag +
 					"\nYour current discord tag is " +
-					user.getAsTag()
+					member.getUser().getAsTag()
 				);
 				return eb;
 			}
 
 			LinkedAccountModel toAdd = new LinkedAccountModel(
 				"" + Instant.now().toEpochMilli(),
-				user.getId(),
+				member.getId(),
 				playerInfo.minecraftUuid,
 				playerInfo.minecraftUsername
 			);
@@ -79,7 +80,7 @@ public class LinkAccountCommand extends Command {
 							} catch (Exception ignored) {}
 						}
 
-						guild.getMember(user).modifyNickname(nicknameTemplate).queue();
+						member.modifyNickname(nicknameTemplate).queue();
 					}
 				} catch (Exception ignored) {}
 
@@ -87,22 +88,26 @@ public class LinkAccountCommand extends Command {
 					JsonArray verifyRoles = higherDepth(database.getVerifySettings(guild.getId()), "verifiedRoles").getAsJsonArray();
 					for (JsonElement verifyRole : verifyRoles) {
 						try {
-							guild.addRoleToMember(user.getId(), guild.getRoleById(verifyRole.getAsString())).complete();
+							guild.addRoleToMember(member.getId(), guild.getRoleById(verifyRole.getAsString())).complete();
 						} catch (Exception e) {
-							System.out.println("== Stack Trace (linkAccount - add role inside for - " + user.getId() + ") ==");
+							System.out.println("== Stack Trace (linkAccount - add role inside for - " + member.getId() + ") ==");
 							e.printStackTrace();
 						}
 					}
 				} catch (Exception e) {
-					System.out.println("== Stack Trace (linkAccount - add role outside for - " + user.getId() + ") ==");
+					System.out.println("== Stack Trace (linkAccount - add role outside for - " + member.getId() + ") ==");
 					e.printStackTrace();
 				}
 
 				return defaultEmbed("Success")
-					.setDescription("`" + user.getAsTag() + "` was linked to `" + fixUsername(playerInfo.minecraftUsername) + "`");
+					.setDescription(
+						"`" + member.getUser().getAsTag() + "` was linked to `" + fixUsername(playerInfo.minecraftUsername) + "`"
+					);
 			} else {
 				return defaultEmbed("Error")
-					.setDescription("Error linking `" + user.getAsTag() + " to `" + fixUsername(playerInfo.minecraftUsername) + "`");
+					.setDescription(
+						"Error linking `" + member.getUser().getAsTag() + " to `" + fixUsername(playerInfo.minecraftUsername) + "`"
+					);
 			}
 		}
 
@@ -138,7 +143,7 @@ public class LinkAccountCommand extends Command {
 				logCommand(event.getGuild(), event.getAuthor(), content);
 
 				if (args.length == 2) {
-					ebMessage.editMessage(linkAccount(args[1], event.getAuthor(), event.getGuild()).build()).queue();
+					ebMessage.editMessage(linkAccount(args[1], event.getMember(), event.getGuild()).build()).queue();
 					return;
 				} else if (args.length == 1) {
 					ebMessage.editMessage(getLinkedAccount(event.getAuthor()).build()).queue();

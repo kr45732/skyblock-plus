@@ -119,15 +119,14 @@ public class ApplyGuild {
 			return null;
 		}
 
-		List<TextChannel> runningApplications = event
-			.getGuild()
-			.getTextChannelsByName(
-				higherDepth(currentSettings, "newChannelPrefix").getAsString() + "-" + event.getUser().getName().replace(" ", "-"),
-				true
-			);
+		ApplyUser runningApplication = applyUserList
+			.stream()
+			.filter(o1 -> o1.applyingUserId.equals(event.getUser().getId()))
+			.findFirst()
+			.orElse(null);
 
-		if (runningApplications.size() > 0) {
-			return "❌ There is already an application open in " + runningApplications.get(0).getAsMention();
+		if (runningApplication != null) {
+			return "❌ There is already an application open in <#" + runningApplication.applicationChannelId + ">";
 		}
 
 		JsonElement linkedAccount = database.getLinkedUserByDiscordId(event.getUser().getId());
@@ -162,17 +161,9 @@ public class ApplyGuild {
 			}
 		}
 
-		ApplyUser applyUser = new ApplyUser(event, currentSettings, higherDepth(linkedAccount, "minecraftUsername").getAsString());
-		applyUserList.add(applyUser);
-		runningApplications =
-			event
-				.getGuild()
-				.getTextChannelsByName(
-					higherDepth(currentSettings, "newChannelPrefix").getAsString() + "-" + event.getUser().getName().replace(" ", "-"),
-					true
-				);
+		applyUserList.add(new ApplyUser(event, currentSettings, higherDepth(linkedAccount, "minecraftUsername").getAsString()));
 
-		return "✅ A new application was created in " + runningApplications.get(0).getAsMention();
+		return "✅ A new application was created";
 	}
 
 	public String onButtonClick(ButtonClickEvent event) {

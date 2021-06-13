@@ -18,7 +18,7 @@ public class LinkSlashCommand extends SlashCommand {
 				String linkOption = event.getOptionStr("player");
 				EmbedBuilder eb;
 				if (linkOption != null) {
-					eb = LinkAccountCommand.linkAccount(linkOption, event.getUser(), event.getGuild());
+					eb = LinkAccountCommand.linkAccount(linkOption, event.getMember(), event.getGuild());
 				} else {
 					eb = LinkAccountCommand.getLinkedAccount(event.getUser());
 				}

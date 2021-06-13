@@ -57,7 +57,7 @@ public class ApplyUser implements Serializable {
 		String channelPrefix = higherDepth(currentSettings, "newChannelPrefix").getAsString();
 		Category applyCategory = event.getGuild().getCategoryById(higherDepth(currentSettings, "newChannelCategory").getAsString());
 		TextChannel applicationChannel = applyCategory
-			.createTextChannel(channelPrefix + "-" + applyingUser.getName())
+			.createTextChannel(channelPrefix + "-" + playerUsername)
 			.addPermissionOverride(event.getMember(), EnumSet.of(Permission.VIEW_CHANNEL), null)
 			.addPermissionOverride(event.getGuild().getPublicRole(), null, EnumSet.of(Permission.VIEW_CHANNEL))
 			.complete();
