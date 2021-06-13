@@ -6,6 +6,7 @@ import static java.util.Collections.nCopies;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
@@ -19,6 +20,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -78,7 +80,7 @@ public class Utils {
 	private static Instant averageAuctionJsonLastUpdated = Instant.now();
 	private static Instant bazaarJsonLastUpdated = Instant.now();
 	private static Instant sbzPricesJsonLastUpdated = Instant.now();
-	private static JsonElement internalJsonMappings;
+	private static JsonObject internalJsonMappings;
 
 	public static JsonElement getLowestBinJson() {
 		if (lowestBinJson == null || Duration.between(lowestBinJsonLastUpdated, Instant.now()).toMinutes() > 1) {
@@ -268,7 +270,7 @@ public class Utils {
 				for (int length; (length = inputStream.read(buffer)) != -1;) {
 					result.write(buffer, 0, length);
 				}
-				return result.toString().split("module.exports = ")[1];
+				return result.toString().split("module.exports = ")[1].replace(";", "");
 			}
 		} catch (Exception ignored) {}
 		return null;
@@ -304,7 +306,6 @@ public class Utils {
 			collectionsJson =
 				parseJsString(
 					getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/collections.js")
-						.replace(";", "")
 				);
 		}
 
@@ -383,7 +384,9 @@ public class Utils {
 		if (internalJsonMappings == null) {
 			try {
 				internalJsonMappings =
-					JsonParser.parseReader(new FileReader("src/main/java/com/skyblockplus/json/InternalNameMappings.json"));
+					JsonParser
+						.parseReader(new FileReader("src/main/java/com/skyblockplus/json/InternalNameMappings.json"))
+						.getAsJsonObject();
 			} catch (Exception ignored) {}
 		}
 
@@ -417,10 +420,33 @@ public class Utils {
 		}
 
 		try {
-			internalName = higherDepth(internalJsonMappings, internalName).getAsString();
+			internalName = internalJsonMappings.getAsJsonArray(internalName).get(0).getAsString();
 		} catch (Exception ignored) {}
 
 		return internalName;
+	}
+
+	public static String convertFromInternalName(String internalName) {
+		if (internalJsonMappings == null) {
+			try {
+				internalJsonMappings =
+					JsonParser
+						.parseReader(new FileReader("src/main/java/com/skyblockplus/json/InternalNameMappings.json"))
+						.getAsJsonObject();
+			} catch (Exception ignored) {}
+		}
+
+		internalName = internalName.toUpperCase();
+
+		for (Map.Entry<String, JsonElement> i : internalJsonMappings.entrySet()) {
+			for (JsonElement j : i.getValue().getAsJsonArray()) {
+				if (j.getAsString().equals(internalName)) {
+					return capitalizeString(i.getKey().replace("_", " "));
+				}
+			}
+		}
+
+		return capitalizeString(internalName.replace("_", " "));
 	}
 
 	public static UsernameUuidStruct usernameToUuid(String username) {

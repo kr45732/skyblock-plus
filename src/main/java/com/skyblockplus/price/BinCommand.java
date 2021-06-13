@@ -31,7 +31,7 @@ public class BinCommand extends Command {
 
 		if (higherDepth(lowestBinJson, item) != null) {
 			EmbedBuilder eb = defaultEmbed("Lowest bin");
-			eb.addField(capitalizeString(item.toLowerCase()), formatNumber(higherDepth(lowestBinJson, item).getAsLong()), false);
+			eb.addField(capitalizeString(item), formatNumber(higherDepth(lowestBinJson, item).getAsLong()), false);
 			eb.setThumbnail("https://sky.lea.moe/item.gif/" + item);
 			return eb;
 		}

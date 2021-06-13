@@ -96,8 +96,8 @@ public class MissingTalismansCommand extends Command {
 			for (String i : missingInternalArr) {
 				ebStr
 					.append("• ")
-					.append(capitalizeString(i.toLowerCase().replace("_", " ")))
-					.append(higherDepth(talismanUpgrades, i) != null ? "*****" : "")
+					.append(convertFromInternalName(i))
+					.append(higherDepth(talismanUpgrades, i) != null ? "**\\***" : "")
 					.append("\n");
 			}
 			return player.defaultPlayerEmbed().setDescription(ebStr.toString());

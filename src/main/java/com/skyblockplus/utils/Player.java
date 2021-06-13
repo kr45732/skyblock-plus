@@ -80,7 +80,7 @@ public class Player {
 				return;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			return;
 		}
 
 		this.validPlayer = true;
@@ -95,7 +95,7 @@ public class Player {
 				return;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			return;
 		}
 
 		this.validPlayer = true;

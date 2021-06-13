@@ -33,8 +33,8 @@ public class PetsCommand extends Command {
 
 				if (args.length == 2 || args.length == 3) {
 					if (args.length == 3) {
-						eb = getPlayerSacks(args[1], args[2], event);
-					} else eb = getPlayerSacks(args[1], null, event);
+						eb = getPlayerPets(args[1], args[2], event);
+					} else eb = getPlayerPets(args[1], null, event);
 
 					if (eb == null) {
 						ebMessage.delete().queue();
@@ -50,27 +50,16 @@ public class PetsCommand extends Command {
 			.start();
 	}
 
-	private EmbedBuilder getPlayerSacks(String username, String profileName, CommandEvent event) {
+	private EmbedBuilder getPlayerPets(String username, String profileName, CommandEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
-			CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(2).setItemsPerPage(20);
+			CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(3).setItemsPerPage(15);
 
 			JsonArray playerPets = player.getPets();
 			for (JsonElement pet : playerPets) {
 				String petItem = null;
 				try {
-					petItem = higherDepth(pet, "heldItem").getAsString().replace("PET_ITEM_", "").replace("_", " ").toLowerCase();
-					if (petItem.endsWith(" common")) {
-						petItem = "common " + petItem.replace(" common", "");
-					} else if (petItem.endsWith(" uncommon")) {
-						petItem = "uncommon " + petItem.replace(" uncommon", "");
-					} else if (petItem.endsWith(" rare")) {
-						petItem = "rare " + petItem.replace(" rare", "");
-					} else if (petItem.endsWith(" epic")) {
-						petItem = "epic " + petItem.replace(" epic", "");
-					} else if (petItem.endsWith(" legendary")) {
-						petItem = "legendary " + petItem.replace(" legendary", "");
-					}
+					petItem = convertFromInternalName(higherDepth(pet, "heldItem").getAsString()).toLowerCase();
 				} catch (Exception ignored) {}
 
 				paginateBuilder.addItems(

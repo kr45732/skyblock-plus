@@ -215,7 +215,9 @@ public class HelpCommand extends Command {
 				generateHelp("Get the current settings for the bot", "settings") +
 				generateHelp("A walk-through on how to setup the bot", "setup") +
 				generateHelp("Get the id's of all categories in guild", "categories") +
-				generateHelp("Delete the current server settings", "settings delete --confirm")
+				generateHelp("Delete the current server settings", "settings delete --confirm") +
+				generateHelp("Set a Hypixel API key for this server", "settings set hypixel_key [key]") +
+				generateHelp("Delete the set Hypixel API of this server", "settings delete hypixel_key")
 			);
 
 			paginateBuilder.addItems(
