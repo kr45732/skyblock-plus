@@ -146,7 +146,7 @@ public class Player {
 					lastProfileSave = lastSaveLoop;
 					this.profileName = higherDepth(profilesArray.get(i), "cute_name").getAsString();
 				} else if (
-						Instant.ofEpochMilli(Long.parseLong(lastSaveLoop)).isAfter(Instant.ofEpochMilli(Long.parseLong(lastProfileSave)))
+					Instant.ofEpochMilli(Long.parseLong(lastSaveLoop)).isAfter(Instant.ofEpochMilli(Long.parseLong(lastProfileSave)))
 				) {
 					this.profileJson = higherDepth(profilesArray.get(i), "members." + this.playerUuid);
 					this.outerProfileJson = profilesArray.get(i);
@@ -258,7 +258,6 @@ public class Player {
 		if (skillName.equals("farming")) {
 			return isWeight ? 60 : (higherDepth(getLevelingJson(), "leveling_caps." + skillName).getAsInt() + getFarmingCapUpgrade());
 		}
-
 
 		return higherDepth(getLevelingJson(), "leveling_caps." + skillName).getAsInt();
 	}
@@ -592,7 +591,7 @@ public class Player {
 						InvItem itemInfo = new InvItem();
 						itemInfo.setName(parseMcCodes(item.getString("tag.display.Name", "None")));
 						itemInfo.setLore(
-								parseMcCodes(item.getString("tag.display.Lore", "None").replace(", ", "\n").replace("[", "").replace("]", ""))
+							parseMcCodes(item.getString("tag.display.Lore", "None").replace(", ", "\n").replace("[", "").replace("]", ""))
 						);
 						itemInfo.setCount(Integer.parseInt(item.getString("Count", "0").replace("b", " ")));
 						itemInfo.setId(item.getString("tag.ExtraAttributes.id", "None"));
@@ -967,19 +966,19 @@ public class Player {
 				if (displayName != null) {
 					invFramesMap.put(i + 1, displayName.getString("id", "empty").toLowerCase());
 				} else if (
-						(equippedArmor != null) &&
-								(equippedWardrobeSlot <= 9) &&
-								((((i + 1) - equippedWardrobeSlot) % 9) == 0) &&
-								((i + 1) <= 36) &&
-								(equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9) + 1)) != null
+					(equippedArmor != null) &&
+					(equippedWardrobeSlot <= 9) &&
+					((((i + 1) - equippedWardrobeSlot) % 9) == 0) &&
+					((i + 1) <= 36) &&
+					(equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9) + 1)) != null
 				) {
 					invFramesMap.put(i + 1, equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9) + 1).getId().toLowerCase());
 				} else if (
-						(equippedArmor != null) &&
-								(equippedWardrobeSlot > 9) &&
-								((((i + 1) - equippedWardrobeSlot) % 9) == 0) &&
-								((i + 1) > 36) &&
-								(equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9) + 1 - 3)) != null
+					(equippedArmor != null) &&
+					(equippedWardrobeSlot > 9) &&
+					((((i + 1) - equippedWardrobeSlot) % 9) == 0) &&
+					((i + 1) > 36) &&
+					(equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9) + 1 - 3)) != null
 				) {
 					invFramesMap.put(i + 1, equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9) + 1 - 3).getId().toLowerCase());
 				} else {
@@ -1054,15 +1053,16 @@ public class Player {
 	public JsonArray getPets() {
 		return higherDepth(profileJson, "pets").getAsJsonArray();
 	}
+
 	/* -- End inventory -- */
-	
+
 	/* Miscellaneous */
 	public String[] getAllProfileNames(boolean isIronman) {
 		List<String> profileNameList = new ArrayList<>();
 		if (this.profilesArray == null) {
 			this.profilesArray =
-					higherDepth(getJson("https://api.hypixel.net/skyblock/profiles?key=" + HYPIXEL_API_KEY + "&uuid=" + playerUuid), "profiles")
-							.getAsJsonArray();
+				higherDepth(getJson("https://api.hypixel.net/skyblock/profiles?key=" + HYPIXEL_API_KEY + "&uuid=" + playerUuid), "profiles")
+					.getAsJsonArray();
 		}
 
 		for (JsonElement profile : profilesArray) {
@@ -1561,10 +1561,10 @@ public class Player {
 
 	public EmbedBuilder defaultPlayerEmbed() {
 		return defaultEmbed(
-				fixUsername(getUsername()) + (higherDepth(outerProfileJson, "game_mode") != null ? " ♻️" : ""),
-				skyblockStatsLink(getUsername(), getProfileName())
+			fixUsername(getUsername()) + (higherDepth(outerProfileJson, "game_mode") != null ? " ♻️" : ""),
+			skyblockStatsLink(getUsername(), getProfileName())
 		)
-				.setThumbnail(getThumbnailUrl());
+			.setThumbnail(getThumbnailUrl());
 	}
 
 	public int petLevelFromXp(long petExp, String rarity) {
@@ -1595,27 +1595,27 @@ public class Player {
 			}
 
 			int[] craftedMinionsToSlots = new int[] {
-					0,
-					5,
-					15,
-					30,
-					50,
-					75,
-					100,
-					125,
-					150,
-					175,
-					200,
-					225,
-					250,
-					275,
-					300,
-					350,
-					400,
-					450,
-					500,
-					550,
-					600,
+				0,
+				5,
+				15,
+				30,
+				50,
+				75,
+				100,
+				125,
+				150,
+				175,
+				200,
+				225,
+				250,
+				275,
+				300,
+				350,
+				400,
+				450,
+				500,
+				550,
+				600,
 			};
 
 			int prevMax = 0;

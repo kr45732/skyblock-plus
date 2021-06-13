@@ -118,8 +118,10 @@ public class Weight {
 		SlayerWeight slayerWeight = new SlayerWeight();
 		slayerWeight.addSlayerWeight(
 			slayer,
-			(slayerWeights.get("rev")[0] + slayerWeights.get("sven")[0] + slayerWeights.get("tara")[0] + slayerWeights.get("enderman")[0]) / 4,
-			(slayerWeights.get("rev")[1] + slayerWeights.get("sven")[1] + slayerWeights.get("tara")[1]+ slayerWeights.get("enderman")[1]) / 4
+			(slayerWeights.get("rev")[0] + slayerWeights.get("sven")[0] + slayerWeights.get("tara")[0] + slayerWeights.get("enderman")[0]) /
+			4,
+			(slayerWeights.get("rev")[1] + slayerWeights.get("sven")[1] + slayerWeights.get("tara")[1] + slayerWeights.get("enderman")[1]) /
+			4
 		);
 		return slayerWeight.getSlayerWeight();
 	}
