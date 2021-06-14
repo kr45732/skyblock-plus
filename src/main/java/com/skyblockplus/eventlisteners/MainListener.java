@@ -80,7 +80,9 @@ public class MainListener extends ListenerAdapter {
 						BOT_PREFIX +
 						"help`\n- Make sure to check out `" +
 						BOT_PREFIX +
-						"setup` or the forum post [**here**](" + FORUM_POST_LINK + ") on how to setup the customizable features of this bot!"
+						"setup` or the forum post [**here**](" +
+						FORUM_POST_LINK +
+						") on how to setup the customizable features of this bot!"
 					);
 				TextChannel channel = event
 					.getGuild()

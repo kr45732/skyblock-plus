@@ -56,7 +56,6 @@ public class InformationCommand extends Command {
 
 		eb.setThumbnail("https://cdn.discordapp.com/attachments/803419567958392832/825768516636508160/sb_loading.gif");
 
-
 		eb.setFooter("Last restart").setTimestamp(starTime);
 
 		return eb;

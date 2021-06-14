@@ -60,8 +60,10 @@ public class Utils {
 	public static String API_PASSWORD = "";
 	public static String API_BASE_URL = "";
 	public static String DISCORD_SERVER_INVITE_LINK = "https://discord.gg/Z4Fn3eNDXT";
-	public static String BOT_INVITE_LINK_REQUIRED_NO_SLASH = "https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403040368&scope=bot";
-	public static String BOT_INVITE_LINK_REQUIRED_SLASH = "https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403040368&scope=bot%20applications.commands";
+	public static String BOT_INVITE_LINK_REQUIRED_NO_SLASH =
+		"https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403040368&scope=bot";
+	public static String BOT_INVITE_LINK_REQUIRED_SLASH =
+		"https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403040368&scope=bot%20applications.commands";
 	public static String FORUM_POST_LINK = "https://hypixel.net/threads/3980092";
 	public static MessageChannel botLogChannel;
 	public static JsonElement essenceCostsJson;

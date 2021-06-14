@@ -94,8 +94,7 @@ public class LinkAccountCommand extends Command {
 							e.printStackTrace();
 						}
 					}
-				} catch (Exception ignored) {
-				}
+				} catch (Exception ignored) {}
 
 				return defaultEmbed("Success")
 					.setDescription(
