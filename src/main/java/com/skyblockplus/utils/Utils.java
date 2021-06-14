@@ -1,6 +1,7 @@
 package com.skyblockplus.utils;
 
 import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.guilds.GuildLeaderboardsCommand.keyCooldownMap;
 import static java.lang.String.join;
 import static java.util.Collections.nCopies;
 
@@ -9,6 +10,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.skyblockplus.guilds.HypixelKeyInformation;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.awt.*;
@@ -61,7 +63,7 @@ public class Utils {
 	public static JsonElement essenceCostsJson;
 	public static JsonElement levelingJson;
 	public static AtomicInteger remainingLimit = new AtomicInteger(120);
-	public static AtomicInteger timeTillReset = new AtomicInteger(60);
+	public static AtomicInteger timeTillReset = new AtomicInteger(0);
 	public static String GITHUB_TOKEN = "";
 	public static JsonElement collectionsJson;
 	public static JsonElement petUrlJson;
@@ -82,6 +84,7 @@ public class Utils {
 	private static Instant sbzPricesJsonLastUpdated = Instant.now();
 	private static JsonObject internalJsonMappings;
 
+	/* Getters */
 	public static JsonElement getLowestBinJson() {
 		if (lowestBinJson == null || Duration.between(lowestBinJsonLastUpdated, Instant.now()).toMinutes() > 1) {
 			lowestBinJson = getJson("https://moulberry.codes/lowestbin.json");
@@ -116,6 +119,78 @@ public class Utils {
 		}
 
 		return sbzPricesJson;
+	}
+
+	public static JsonElement getMiscJson() {
+		if (miscJson == null) {
+			miscJson = getJson("https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/misc.json");
+		}
+
+		return miscJson;
+	}
+
+	public static JsonElement getTalismanJson() {
+		if (talismanJson == null) {
+			talismanJson =
+					parseJsString(
+							getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/talismans.js")
+					);
+		}
+
+		return talismanJson;
+	}
+
+	public static JsonElement getBitsJson() {
+		if (bitsJson == null) {
+			bitsJson = getJson("https://raw.githubusercontent.com/SkyKings-Guild/SkyKings/main/bot-data/bit-prices.json");
+		}
+
+		return bitsJson;
+	}
+
+	public static JsonElement getReforgeStonesJson() {
+		if (reforgeStonesJson == null) {
+			reforgeStonesJson =
+					getJson("https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/reforgestones.json");
+		}
+
+		return reforgeStonesJson;
+	}
+
+	public static JsonElement getPetJson() {
+		if (petsJson == null) {
+			petsJson = getJson("https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/pets.json");
+		}
+		return petsJson;
+	}
+
+	public static JsonElement getPetNumsJson() {
+		if (petNumsJson == null) {
+			petNumsJson = getJson("https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/petnums.json");
+		}
+		return petNumsJson;
+	}
+
+	public static JsonElement getEnchantsJson() {
+		if (enchantsJson == null) {
+			enchantsJson = getJson("https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/enchants.json");
+		}
+		return enchantsJson;
+	}
+
+	public static JsonElement getLevelingJson() {
+		if (levelingJson == null) {
+			levelingJson = getJson("https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/leveling.json");
+		}
+		return levelingJson;
+	}
+
+	public static JsonElement getEssenceCostsJson() {
+		if (essenceCostsJson == null) {
+			essenceCostsJson =
+					getJson("https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/essencecosts.json");
+		}
+		return essenceCostsJson;
 	}
 
 	public static void setApplicationSettings() {
@@ -164,93 +239,34 @@ public class Utils {
 		}
 	}
 
-	public static JsonElement getMiscJson() {
-		if (miscJson == null) {
-			miscJson = getJson("https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/misc.json");
-		}
-
-		return miscJson;
-	}
-
-	public static JsonElement getTalismanJson() {
-		if (talismanJson == null) {
-			talismanJson =
-				parseJsString(
-					getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/talismans.js")
-				);
-		}
-
-		return talismanJson;
-	}
-
-	public static JsonElement getBitsJson() {
-		if (bitsJson == null) {
-			bitsJson = getJson("https://raw.githubusercontent.com/plun1331/SkyKings/main/bot-data/bit-prices.json");
-		}
-
-		return bitsJson;
-	}
-
-	public static JsonElement higherDepth(JsonElement element, String path) {
-		String[] paths = path.split("\\.");
-
+	/* Http requests */
+	public static JsonElement getJson(String jsonUrl) {
 		try {
-			for (String key : paths) {
-				element = element.getAsJsonObject().get(key);
+			if (jsonUrl.contains(HYPIXEL_API_KEY) && remainingLimit.get() < 5) {
+				System.out.println("Sleeping for " + timeTillReset + " seconds");
+				TimeUnit.SECONDS.sleep(timeTillReset.get());
 			}
-			return element;
-		} catch (Exception e) {
-			return null;
-		}
-	}
+		} catch (Exception ignored) {}
 
-	public static JsonElement getReforgeStonesJson() {
-		if (reforgeStonesJson == null) {
-			reforgeStonesJson =
-				getJson("https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/reforgestones.json");
-		}
+		try (CloseableHttpClient httpclient = HttpClientBuilder.create().build()) {
+			HttpGet httpget = new HttpGet(jsonUrl);
+			if (jsonUrl.contains("raw.githubusercontent.com")) {
+				httpget.setHeader("Authorization", "token " + GITHUB_TOKEN);
+			}
+			httpget.addHeader("content-type", "application/json; charset=UTF-8");
 
-		return reforgeStonesJson;
-	}
+			try (CloseableHttpResponse httpresponse = httpclient.execute(httpget)) {
+				if (jsonUrl.toLowerCase().contains("api.hypixel.net") && jsonUrl.contains(HYPIXEL_API_KEY)) {
+					try {
+						remainingLimit.set(Integer.parseInt(httpresponse.getFirstHeader("RateLimit-Remaining").getValue()));
+						timeTillReset.set(Integer.parseInt(httpresponse.getFirstHeader("RateLimit-Reset").getValue()));
+					} catch (Exception ignored) {}
+				}
 
-	public static JsonElement getPetJson() {
-		if (petsJson == null) {
-			petsJson = getJson("https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/pets.json");
-		}
-		return petsJson;
-	}
-
-	public static JsonElement getPetNumsJson() {
-		if (petNumsJson == null) {
-			petNumsJson = getJson("https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/petnums.json");
-		}
-		return petNumsJson;
-	}
-
-	public static JsonElement getEnchantsJson() {
-		if (enchantsJson == null) {
-			enchantsJson = getJson("https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/enchants.json");
-		}
-		return enchantsJson;
-	}
-
-	public static JsonElement getLevelingJson() {
-		if (levelingJson == null) {
-			levelingJson = getJson("https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/leveling.json");
-		}
-		return levelingJson;
-	}
-
-	public static JsonElement getEssenceCostsJson() {
-		if (essenceCostsJson == null) {
-			essenceCostsJson =
-				getJson("https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/essencecosts.json");
-		}
-		return essenceCostsJson;
-	}
-
-	public static String toRomanNumerals(int number) {
-		return join("", nCopies(number, "i")).replace("iiiii", "v").replace("iiii", "iv").replace("vv", "x").replace("viv", "ix");
+				return JsonParser.parseReader(new InputStreamReader(httpresponse.getEntity().getContent()));
+			}
+		} catch (Exception ignored) {}
+		return null;
 	}
 
 	public static String getSkyCryptData(String dataUrl) {
@@ -276,11 +292,54 @@ public class Utils {
 		return null;
 	}
 
-	public static JsonElement parseJsString(String jsString) {
+	public static String makeHastePost(String body) {
+		try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
+			HttpPost httpPost = new HttpPost("https://hst.sh/documents");
+
+			StringEntity entity = new StringEntity(body);
+			httpPost.setEntity(entity);
+
+			try (CloseableHttpResponse response = client.execute(httpPost)) {
+				return (
+						"https://hst.sh/" +
+								higherDepth(JsonParser.parseReader(new InputStreamReader(response.getEntity().getContent())), "key").getAsString()
+				);
+			}
+		} catch (Exception ignored) {}
+		return null;
+	}
+
+	public static UsernameUuidStruct usernameToUuid(String username) {
 		try {
-			return JsonParser.parseString(jsScriptEngine.eval(String.format("JSON.stringify(%s);", jsString)).toString());
+			JsonElement usernameJson = getJson("https://api.ashcon.app/mojang/v2/user/" + username);
+			return new UsernameUuidStruct(
+					higherDepth(usernameJson, "username").getAsString(),
+					higherDepth(usernameJson, "uuid").getAsString().replace("-", "")
+			);
+		} catch (Exception ignored) {}
+		return null;
+	}
+
+	public static String uuidToUsername(String uuid) {
+		try {
+			JsonElement usernameJson = getJson("https://api.ashcon.app/mojang/v2/user/" + uuid);
+			return higherDepth(usernameJson, "username").getAsString();
+		} catch (Exception ignored) {}
+		return null;
+	}
+
+	public static DiscordInfoStruct getPlayerDiscordInfo(String username) {
+		try {
+			JsonElement playerJson = getJson(
+					"https://api.hypixel.net/player?key=" + HYPIXEL_API_KEY + "&uuid=" + usernameToUuid(username).playerUuid
+			);
+
+			String discordTag = higherDepth(playerJson, "player.socialMedia.links.DISCORD").getAsString();
+			String minecraftUsername = higherDepth(playerJson, "player.displayname").getAsString();
+			String minecraftUuid = higherDepth(playerJson, "player.uuid").getAsString();
+
+			return new DiscordInfoStruct(discordTag, minecraftUsername, minecraftUuid);
 		} catch (Exception e) {
-			e.printStackTrace();
 			return null;
 		}
 	}
@@ -288,15 +347,193 @@ public class Utils {
 	public static String getPetUrl(String petName) {
 		if (petUrlJson == null) {
 			petUrlJson =
-				parseJsString(
-					getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/pets.js")
-						.split("pet_value")[0] +
-					"}"
-				);
+					parseJsString(
+							getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/pets.js")
+									.split("pet_value")[0] +
+									"}"
+					);
 		}
 		try {
 			return ("https://sky.lea.moe" + higherDepth(petUrlJson, "pet_data." + petName.toUpperCase() + ".head").getAsString());
 		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	/* Logging */
+	public static void logCommand(Guild guild, User user, String commandInput) {
+		System.out.println(commandInput);
+
+		if (botLogChannel == null) {
+			botLogChannel = jda.getGuildById("796790757947867156").getTextChannelById("818469899848515624");
+		}
+
+		EmbedBuilder eb = defaultEmbed(null);
+		eb.setAuthor(guild.getName() + " (" + guild.getId() + ")", null, guild.getIconUrl());
+		if (commandInput.length() > 1024) {
+			eb.addField(user.getName() + " (" + user.getId() + ")", makeHastePost(commandInput) + ".json", false);
+		} else {
+			eb.addField(user.getName() + " (" + user.getId() + ")", "`" + commandInput + "`", false);
+		}
+
+		botLogChannel.sendMessage(eb.build()).queue();
+	}
+
+	public static void logCommand(Guild guild, String commandInput) {
+		System.out.println(commandInput);
+
+		if (botLogChannel == null) {
+			botLogChannel = jda.getGuildById("796790757947867156").getTextChannelById("818469899848515624");
+		}
+
+		EmbedBuilder eb = defaultEmbed(null);
+		eb.setAuthor(guild.getName() + " (" + guild.getId() + ")", null, guild.getIconUrl());
+		eb.setDescription(commandInput);
+		botLogChannel.sendMessage(eb.build()).queue();
+	}
+
+	public static void logCommand(String commandInput) {
+		System.out.println(commandInput);
+
+		if (botLogChannel == null) {
+			botLogChannel = jda.getGuildById("796790757947867156").getTextChannelById("818469899848515624");
+		}
+
+		EmbedBuilder eb = defaultEmbed(null);
+		eb.setDescription(commandInput);
+		botLogChannel.sendMessage(eb.build()).queue();
+	}
+
+	/* Embeds and paginators */
+	public static EmbedBuilder defaultEmbed(String title, String titleUrl) {
+		EmbedBuilder eb = new EmbedBuilder();
+		eb.setColor(botColor);
+		eb.setFooter("Created by CrypticPlasma", null);
+		eb.setTitle(title, titleUrl);
+		eb.setTimestamp(Instant.now());
+		return eb;
+	}
+
+	public static EmbedBuilder defaultEmbed(String title) {
+		return defaultEmbed(title, null);
+	}
+
+	public static EmbedBuilder loadingEmbed() {
+		return defaultEmbed(null).setImage("https://cdn.discordapp.com/attachments/803419567958392832/825768516636508160/sb_loading.gif");
+	}
+
+	public static EmbedBuilder errorMessage(String name) {
+		return defaultEmbed("Invalid input. Type `" + BOT_PREFIX + "help " + name + "` for help");
+	}
+
+	public static CustomPaginator.Builder defaultPaginator(EventWaiter waiter, User eventAuthor) {
+		CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder()
+				.setColumns(1)
+				.setItemsPerPage(1)
+				.showPageNumbers(true)
+				.setFinalAction(
+						m -> {
+							try {
+								m.clearReactions().queue();
+							} catch (PermissionException ex) {
+								m.delete().queue();
+							}
+						}
+				)
+				.setEventWaiter(waiter)
+				.setTimeout(30, TimeUnit.SECONDS)
+				.setColor(botColor);
+		if (eventAuthor != null) {
+			paginateBuilder.setUsers(eventAuthor);
+		}
+		return paginateBuilder;
+	}
+
+	/* Format numbers or text */
+	public static String formatNumber(long number) {
+		return NumberFormat.getInstance(Locale.US).format(number);
+	}
+
+	public static String formatNumber(double number) {
+		return NumberFormat.getInstance(Locale.US).format(number);
+	}
+
+	public static String roundAndFormat(double number) {
+		DecimalFormat df = new DecimalFormat("#.##");
+		df.setRoundingMode(RoundingMode.HALF_UP);
+		return formatNumber(Double.parseDouble(df.format(number)));
+	}
+
+	public static String roundProgress(double number) {
+		DecimalFormat df = new DecimalFormat("#.###");
+		df.setRoundingMode(RoundingMode.HALF_UP);
+		return df.format(number * 100) + "%";
+	}
+
+	public static String simplifyNumber(double number) {
+		String formattedNumber;
+		DecimalFormat df = new DecimalFormat("#.#");
+		df.setRoundingMode(RoundingMode.HALF_UP);
+		if (1000000000000D > number && number >= 1000000000) {
+			df = new DecimalFormat("#.##");
+			df.setRoundingMode(RoundingMode.HALF_UP);
+			number = number >= 999999999950D ? 999999999949D : number;
+			formattedNumber = df.format(number / 1000000000) + "B";
+		} else if (number >= 1000000) {
+			number = number >= 999999950D ? 999999949D : number;
+			formattedNumber = df.format(number / 1000000) + "M";
+		} else if (number >= 1000) {
+			number = number >= 999950D ? 999949D : number;
+			formattedNumber = df.format(number / 1000) + "K";
+		} else if (number < 1) {
+			formattedNumber = "0";
+		} else {
+			df = new DecimalFormat("#.##");
+			df.setRoundingMode(RoundingMode.HALF_UP);
+			formattedNumber = df.format(number);
+		}
+		return formattedNumber;
+	}
+
+	public static String capitalizeString(String str) {
+		return Stream
+				.of(str.trim().split("\\s"))
+				.filter(word -> word.length() > 0)
+				.map(word -> word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase())
+				.collect(Collectors.joining(" "));
+	}
+
+	public static String parseMcCodes(String unformattedString) {
+		return unformattedString.replaceAll("§f|§a|§9|§5|§6|§d|§4|§c|§7|§8|§l|§o|§b|§2|§e|§r|§3|§1|§ka", "");
+	}
+
+	public static String fixUsername(String username) {
+		return username.replace("_", "\\_");
+	}
+
+	/* Miscellaneous */
+	public static JsonElement higherDepth(JsonElement element, String path) {
+		String[] paths = path.split("\\.");
+
+		try {
+			for (String key : paths) {
+				element = element.getAsJsonObject().get(key);
+			}
+			return element;
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	public static String toRomanNumerals(int number) {
+		return join("", nCopies(number, "i")).replace("iiiii", "v").replace("iiii", "iv").replace("vv", "x").replace("viv", "ix");
+	}
+
+	public static JsonElement parseJsString(String jsString) {
+		try {
+			return JsonParser.parseString(jsScriptEngine.eval(String.format("JSON.stringify(%s);", jsString)).toString());
+		} catch (Exception e) {
+			e.printStackTrace();
 			return null;
 		}
 	}
@@ -320,64 +557,6 @@ public class Utils {
 			}
 		} catch (Exception ignored) {}
 		return capitalizeString(itemName.replace("_", " ").toLowerCase());
-	}
-
-	public static JsonElement getJson(String jsonUrl) {
-		try {
-			if (remainingLimit.get() < 5) {
-				System.out.println("Sleeping for " + timeTillReset + " seconds");
-				TimeUnit.SECONDS.sleep(timeTillReset.get());
-			}
-		} catch (Exception ignored) {}
-
-		try (CloseableHttpClient httpclient = HttpClientBuilder.create().build()) {
-			HttpGet httpget = new HttpGet(jsonUrl);
-			if (jsonUrl.contains("raw.githubusercontent.com")) {
-				httpget.setHeader("Authorization", "token " + GITHUB_TOKEN);
-			}
-			httpget.addHeader("content-type", "application/json; charset=UTF-8");
-
-			try (CloseableHttpResponse httpresponse = httpclient.execute(httpget)) {
-				if (jsonUrl.toLowerCase().contains("api.hypixel.net")) {
-					try {
-						remainingLimit.set(Integer.parseInt(httpresponse.getFirstHeader("RateLimit-Remaining").getValue()));
-						timeTillReset.set(Integer.parseInt(httpresponse.getFirstHeader("RateLimit-Reset").getValue()));
-					} catch (Exception ignored) {}
-				}
-
-				return JsonParser.parseReader(new InputStreamReader(httpresponse.getEntity().getContent()));
-			}
-		} catch (Exception ignored) {}
-		return null;
-	}
-
-	public static String makeHastePost(String body) {
-		try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
-			HttpPost httpPost = new HttpPost("https://hst.sh/documents");
-
-			StringEntity entity = new StringEntity(body);
-			httpPost.setEntity(entity);
-
-			try (CloseableHttpResponse response = client.execute(httpPost)) {
-				return (
-					"https://hst.sh/" +
-					higherDepth(JsonParser.parseReader(new InputStreamReader(response.getEntity().getContent())), "key").getAsString()
-				);
-			}
-		} catch (Exception ignored) {}
-		return null;
-	}
-
-	public static EmbedBuilder errorMessage(String name) {
-		return defaultEmbed("Invalid input. Type `" + BOT_PREFIX + "help " + name + "` for help");
-	}
-
-	public static String uuidToUsername(String uuid) {
-		try {
-			JsonElement usernameJson = getJson("https://api.ashcon.app/mojang/v2/user/" + uuid);
-			return higherDepth(usernameJson, "username").getAsString();
-		} catch (Exception ignored) {}
-		return null;
 	}
 
 	public static String convertToInternalName(String itemName) {
@@ -449,183 +628,12 @@ public class Utils {
 		return capitalizeString(internalName.replace("_", " "));
 	}
 
-	public static UsernameUuidStruct usernameToUuid(String username) {
-		try {
-			JsonElement usernameJson = getJson("https://api.ashcon.app/mojang/v2/user/" + username);
-			return new UsernameUuidStruct(
-				higherDepth(usernameJson, "username").getAsString(),
-				higherDepth(usernameJson, "uuid").getAsString().replace("-", "")
-			);
-		} catch (Exception ignored) {}
-		return null;
-	}
-
-	public static EmbedBuilder defaultEmbed(String title, String titleUrl) {
-		EmbedBuilder eb = new EmbedBuilder();
-		eb.setColor(botColor);
-		eb.setFooter("Created by CrypticPlasma", null);
-		eb.setTitle(title, titleUrl);
-		eb.setTimestamp(Instant.now());
-		return eb;
-	}
-
-	public static EmbedBuilder defaultEmbed(String title) {
-		return defaultEmbed(title, null);
-	}
-
-	public static EmbedBuilder loadingEmbed() {
-		return defaultEmbed(null).setImage("https://cdn.discordapp.com/attachments/803419567958392832/825768516636508160/sb_loading.gif");
-	}
-
-	public static String fixUsername(String username) {
-		return username.replace("_", "\\_");
-	}
-
-	public static String formatNumber(long number) {
-		return NumberFormat.getInstance(Locale.US).format(number);
-	}
-
-	public static String formatNumber(double number) {
-		return NumberFormat.getInstance(Locale.US).format(number);
-	}
-
-	public static String roundAndFormat(double number) {
-		DecimalFormat df = new DecimalFormat("#.##");
-		df.setRoundingMode(RoundingMode.HALF_UP);
-		return formatNumber(Double.parseDouble(df.format(number)));
-	}
-
-	public static String roundProgress(double number) {
-		DecimalFormat df = new DecimalFormat("#.###");
-		df.setRoundingMode(RoundingMode.HALF_UP);
-		return df.format(number * 100) + "%";
-	}
-
-	public static String simplifyNumber(double number) {
-		String formattedNumber;
-		DecimalFormat df = new DecimalFormat("#.#");
-		df.setRoundingMode(RoundingMode.HALF_UP);
-		if (1000000000000D > number && number >= 1000000000) {
-			df = new DecimalFormat("#.##");
-			df.setRoundingMode(RoundingMode.HALF_UP);
-			number = number >= 999999999950D ? 999999999949D : number;
-			formattedNumber = df.format(number / 1000000000) + "B";
-		} else if (number >= 1000000) {
-			number = number >= 999999950D ? 999999949D : number;
-			formattedNumber = df.format(number / 1000000) + "M";
-		} else if (number >= 1000) {
-			number = number >= 999950D ? 999949D : number;
-			formattedNumber = df.format(number / 1000) + "K";
-		} else if (number < 1) {
-			formattedNumber = "0";
-		} else {
-			df = new DecimalFormat("#.##");
-			df.setRoundingMode(RoundingMode.HALF_UP);
-			formattedNumber = df.format(number);
-		}
-		return formattedNumber;
-	}
-
-	public static String capitalizeString(String str) {
-		return Stream
-			.of(str.trim().split("\\s"))
-			.filter(word -> word.length() > 0)
-			.map(word -> word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase())
-			.collect(Collectors.joining(" "));
-	}
-
 	public static ArrayList<String> getJsonKeys(JsonElement jsonElement) {
 		try {
 			return new ArrayList<>(jsonElement.getAsJsonObject().keySet());
 		} catch (Exception e) {
 			return null;
 		}
-	}
-
-	public static void logCommand(Guild guild, User user, String commandInput) {
-		System.out.println(commandInput);
-
-		if (botLogChannel == null) {
-			botLogChannel = jda.getGuildById("796790757947867156").getTextChannelById("818469899848515624");
-		}
-
-		EmbedBuilder eb = defaultEmbed(null);
-		eb.setAuthor(guild.getName() + " (" + guild.getId() + ")", null, guild.getIconUrl());
-		if (commandInput.length() > 1024) {
-			eb.addField(user.getName() + " (" + user.getId() + ")", makeHastePost(commandInput) + ".json", false);
-		} else {
-			eb.addField(user.getName() + " (" + user.getId() + ")", "`" + commandInput + "`", false);
-		}
-
-		botLogChannel.sendMessage(eb.build()).queue();
-	}
-
-	public static void logCommand(Guild guild, String commandInput) {
-		System.out.println(commandInput);
-
-		if (botLogChannel == null) {
-			botLogChannel = jda.getGuildById("796790757947867156").getTextChannelById("818469899848515624");
-		}
-
-		EmbedBuilder eb = defaultEmbed(null);
-		eb.setAuthor(guild.getName() + " (" + guild.getId() + ")", null, guild.getIconUrl());
-		eb.setDescription(commandInput);
-		botLogChannel.sendMessage(eb.build()).queue();
-	}
-
-	public static void logCommand(String commandInput) {
-		System.out.println(commandInput);
-
-		if (botLogChannel == null) {
-			botLogChannel = jda.getGuildById("796790757947867156").getTextChannelById("818469899848515624");
-		}
-
-		EmbedBuilder eb = defaultEmbed(null);
-		eb.setDescription(commandInput);
-		botLogChannel.sendMessage(eb.build()).queue();
-	}
-
-	public static DiscordInfoStruct getPlayerDiscordInfo(String username) {
-		try {
-			JsonElement playerJson = getJson(
-				"https://api.hypixel.net/player?key=" + HYPIXEL_API_KEY + "&uuid=" + usernameToUuid(username).playerUuid
-			);
-
-			String discordTag = higherDepth(playerJson, "player.socialMedia.links.DISCORD").getAsString();
-			String minecraftUsername = higherDepth(playerJson, "player.displayname").getAsString();
-			String minecraftUuid = higherDepth(playerJson, "player.uuid").getAsString();
-
-			return new DiscordInfoStruct(discordTag, minecraftUsername, minecraftUuid);
-		} catch (Exception e) {
-			return null;
-		}
-	}
-
-	public static String parseMcCodes(String unformattedString) {
-		return unformattedString.replaceAll("§f|§a|§9|§5|§6|§d|§4|§c|§7|§8|§l|§o|§b|§2|§e|§r|§3|§1|§ka", "");
-	}
-
-	public static CustomPaginator.Builder defaultPaginator(EventWaiter waiter, User eventAuthor) {
-		CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder()
-			.setColumns(1)
-			.setItemsPerPage(1)
-			.showPageNumbers(true)
-			.setFinalAction(
-				m -> {
-					try {
-						m.clearReactions().queue();
-					} catch (PermissionException ex) {
-						m.delete().queue();
-					}
-				}
-			)
-			.setEventWaiter(waiter)
-			.setTimeout(30, TimeUnit.SECONDS)
-			.setColor(botColor);
-		if (eventAuthor != null) {
-			paginateBuilder.setUsers(eventAuthor);
-		}
-		return paginateBuilder;
 	}
 
 	public static String profileNameToEmoji(String profileName) {
@@ -724,5 +732,23 @@ public class Utils {
 			default:
 				return null;
 		}
+	}
+
+	public static EmbedBuilder checkHypixelKey(String HYPIXEL_KEY){
+		if (HYPIXEL_KEY == null) {
+			return defaultEmbed("Error").setDescription("You must set a Hypixel API key to use this command");
+		}
+
+		try {
+			higherDepth(getJson("https://api.hypixel.net/key?key=" + HYPIXEL_KEY), "record.key").getAsString();
+		} catch (Exception e) {
+			return defaultEmbed("Error").setDescription("The set Hypixel API key is invalid");
+		}
+
+		if(!keyCooldownMap.containsKey(HYPIXEL_KEY)){
+			keyCooldownMap.put(HYPIXEL_KEY, new HypixelKeyInformation());
+		}
+
+		return null;
 	}
 }
