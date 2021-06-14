@@ -120,7 +120,7 @@ public class SetupCommand extends Command {
 					"If you need any help, have suggestions, or find any bugs for this bot be sure to join the discord server [here](" +
 					DISCORD_SERVER_INVITE_LINK +
 					")!\n" +
-					"You can also view the forums post [here](https://hypixel.net/threads/3980092)\n";
+					"You can also view the forums post [here](" + FORUM_POST_LINK + ")\n";
 
 				CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(1);
 

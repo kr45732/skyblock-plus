@@ -94,9 +94,7 @@ public class LinkAccountCommand extends Command {
 							e.printStackTrace();
 						}
 					}
-				} catch (Exception e) {
-					System.out.println("== Stack Trace (linkAccount - add role outside for - " + member.getId() + ") ==");
-					e.printStackTrace();
+				} catch (Exception ignored) {
 				}
 
 				return defaultEmbed("Success")

@@ -20,9 +20,10 @@ public class InformationCommand extends Command {
 
 	public static ActionRow getInformationActionRow() {
 		return ActionRow.of(
-			Button.link("https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403040368&scope=bot", "Invite"),
-			Button.link(DISCORD_SERVER_INVITE_LINK, "Discord Link"),
-			Button.link("https://hypixel.net/threads/3980092", "Forum Post")
+			Button.link(BOT_INVITE_LINK_REQUIRED_NO_SLASH, "Normal Invite"),
+			Button.link(BOT_INVITE_LINK_REQUIRED_SLASH, "Slash Commands Invite"),
+			Button.link(DISCORD_SERVER_INVITE_LINK, "Discord Server"),
+			Button.link(FORUM_POST_LINK, "Forum Post")
 		);
 	}
 
@@ -52,6 +53,9 @@ public class InformationCommand extends Command {
 			"%",
 			true
 		);
+
+		eb.setThumbnail("https://cdn.discordapp.com/attachments/803419567958392832/825768516636508160/sb_loading.gif");
+
 
 		eb.setFooter("Last restart").setTimestamp(starTime);
 

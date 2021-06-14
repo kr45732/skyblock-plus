@@ -17,7 +17,8 @@ public class InviteCommand extends Command {
 		EmbedBuilder eb = defaultEmbed("Invite Skyblock Plus");
 		eb.addField(
 			"Invite me to your server",
-			"[Click here](https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403040368&scope=bot)",
+			"[Normal Invite](" + BOT_INVITE_LINK_REQUIRED_NO_SLASH + ")\n"+
+					"[Slash Commands Invite](" + BOT_INVITE_LINK_REQUIRED_SLASH + ")",
 			false
 		);
 		eb.addField("Join my server", "[Click here](" + DISCORD_SERVER_INVITE_LINK + ")", false);
