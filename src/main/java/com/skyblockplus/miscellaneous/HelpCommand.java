@@ -52,7 +52,7 @@ public class HelpCommand extends Command {
 		putMultiple(pageMap, 3, "slayer");
 		putMultiple(pageMap, 4, "skills");
 		putMultiple(pageMap, 5, "dungeons", "essence", "catacombs", "cata");
-		putMultiple(pageMap, 6, "guild");
+		putMultiple(pageMap, 6, "guild", "guild-leaderboard", "g-lb", "guild-kicker", "g-kicker");
 		putMultiple(pageMap, 7, "auction", "auctions", "ah", "bazaar", "bz", "bin", "bids", "query", "bits", "bit");
 		putMultiple(pageMap, 8, "wardrobe", "talisman", "inv", "inventory", "echest", "enderchest", "sacks");
 		putMultiple(pageMap, 9, "roles", "networth", "nw", "bank", "weight", "hypixel", "profiles");
@@ -131,11 +131,7 @@ public class HelpCommand extends Command {
 		paginateBuilder.addItems(
 			generateHelp("Get the dungeons data of a player", "catacombs [player] <profile>", "cata [player] " + "<profile>") +
 			generateHelp("Interactive message to find the essence amount to upgrade an item", "essence upgrade [item]") +
-			generateHelp(
-				"Get the amount of essence to upgrade an item for each level",
-				"essence information [item]",
-				"essence info [item]"
-			) +
+			generateHelp("Get the amount of essence to upgrade an item for each level", "essence info [item]") +
 			generateHelp(
 				"A party finder helper that shows a player's dungeon stats",
 				"partyfinder [player] <profile>",
@@ -146,10 +142,18 @@ public class HelpCommand extends Command {
 		paginateBuilder.addItems(
 			generateHelp("Find what guild a player is in", "guild [player]") +
 			generateHelp("Get information and statistics about a player's guild", "guild info [u:player]") +
-			generateHelp("Get information and statistics about a guild", "guild info [g:player]") +
+			generateHelp("Get information and statistics about a guild", "guild info [g:guild name]") +
 			generateHelp("Get a list of all members in a player's guild", "guild members [u:player]") +
 			generateHelp("Get the experience leaderboard for a player's guild", "guild experience [u:player]", "guild exp [u:player]") +
-			generateHelp("Get the application requirements set for this server", "guild-requirements [name]", "g-reqs [name]")
+			generateHelp("Get the application requirements set for this server", "guild-requirements [name]", "g-reqs [name]") +
+			generateHelp(
+				"Get the weight, skills, catacombs, or slayer leaderboard for a player's guild",
+				"g-lb [weight|skills|catacombs|slayer] [u:player]"
+			) +
+			generateHelp(
+				"Get all player's who don't meet the provided requirements. The requirement name can be skills, slayer, catacombs, or weight. The requirement value must be an integer.",
+				"g-kicker u:crypticplasma [name:value] ..."
+			)
 		);
 
 		paginateBuilder.addItems(

@@ -105,15 +105,11 @@ public class SettingsCommand extends Command {
 						eb.addField("Roles Settings", "Error! Data not found", false);
 					}
 
-					if (higherDepth(currentSettings, "automaticGuildRoles") != null) {
-						eb.addField(
-							"Guild Role Settings",
-							"Use `" + BOT_PREFIX + "settings guild` to see the current guild role settings",
-							false
-						);
-					} else {
-						eb.addField("Guild Role Settings", "Error! Data not found", false);
-					}
+					eb.addField(
+						"Guild Role Settings",
+						"Use `" + BOT_PREFIX + "settings guild` to see all guild role/ranks settings",
+						false
+					);
 				} else if (args.length >= 2 && args[1].equals("roles")) {
 					if (args.length == 2) {
 						eb = defaultEmbed("Settings for " + event.getGuild().getName());

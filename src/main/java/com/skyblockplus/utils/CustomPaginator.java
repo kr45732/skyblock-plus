@@ -335,5 +335,12 @@ public class CustomPaginator extends Menu {
 		public int getItemsSize() {
 			return strings.size();
 		}
+
+		public Builder ifItemsEmpty(String emptyMessage) {
+			if (strings.isEmpty()) {
+				strings.add(emptyMessage);
+			}
+			return this;
+		}
 	}
 }

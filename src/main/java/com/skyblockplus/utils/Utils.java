@@ -132,9 +132,9 @@ public class Utils {
 	public static JsonElement getTalismanJson() {
 		if (talismanJson == null) {
 			talismanJson =
-					parseJsString(
-							getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/talismans.js")
-					);
+				parseJsString(
+					getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/talismans.js")
+				);
 		}
 
 		return talismanJson;
@@ -151,7 +151,7 @@ public class Utils {
 	public static JsonElement getReforgeStonesJson() {
 		if (reforgeStonesJson == null) {
 			reforgeStonesJson =
-					getJson("https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/reforgestones.json");
+				getJson("https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/reforgestones.json");
 		}
 
 		return reforgeStonesJson;
@@ -188,7 +188,7 @@ public class Utils {
 	public static JsonElement getEssenceCostsJson() {
 		if (essenceCostsJson == null) {
 			essenceCostsJson =
-					getJson("https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/essencecosts.json");
+				getJson("https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/essencecosts.json");
 		}
 		return essenceCostsJson;
 	}
@@ -301,8 +301,8 @@ public class Utils {
 
 			try (CloseableHttpResponse response = client.execute(httpPost)) {
 				return (
-						"https://hst.sh/" +
-								higherDepth(JsonParser.parseReader(new InputStreamReader(response.getEntity().getContent())), "key").getAsString()
+					"https://hst.sh/" +
+					higherDepth(JsonParser.parseReader(new InputStreamReader(response.getEntity().getContent())), "key").getAsString()
 				);
 			}
 		} catch (Exception ignored) {}
@@ -313,8 +313,8 @@ public class Utils {
 		try {
 			JsonElement usernameJson = getJson("https://api.ashcon.app/mojang/v2/user/" + username);
 			return new UsernameUuidStruct(
-					higherDepth(usernameJson, "username").getAsString(),
-					higherDepth(usernameJson, "uuid").getAsString().replace("-", "")
+				higherDepth(usernameJson, "username").getAsString(),
+				higherDepth(usernameJson, "uuid").getAsString().replace("-", "")
 			);
 		} catch (Exception ignored) {}
 		return null;
@@ -331,7 +331,7 @@ public class Utils {
 	public static DiscordInfoStruct getPlayerDiscordInfo(String username) {
 		try {
 			JsonElement playerJson = getJson(
-					"https://api.hypixel.net/player?key=" + HYPIXEL_API_KEY + "&uuid=" + usernameToUuid(username).playerUuid
+				"https://api.hypixel.net/player?key=" + HYPIXEL_API_KEY + "&uuid=" + usernameToUuid(username).playerUuid
 			);
 
 			String discordTag = higherDepth(playerJson, "player.socialMedia.links.DISCORD").getAsString();
@@ -347,11 +347,11 @@ public class Utils {
 	public static String getPetUrl(String petName) {
 		if (petUrlJson == null) {
 			petUrlJson =
-					parseJsString(
-							getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/pets.js")
-									.split("pet_value")[0] +
-									"}"
-					);
+				parseJsString(
+					getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/pets.js")
+						.split("pet_value")[0] +
+					"}"
+				);
 		}
 		try {
 			return ("https://sky.lea.moe" + higherDepth(petUrlJson, "pet_data." + petName.toUpperCase() + ".head").getAsString());
@@ -428,21 +428,21 @@ public class Utils {
 
 	public static CustomPaginator.Builder defaultPaginator(EventWaiter waiter, User eventAuthor) {
 		CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder()
-				.setColumns(1)
-				.setItemsPerPage(1)
-				.showPageNumbers(true)
-				.setFinalAction(
-						m -> {
-							try {
-								m.clearReactions().queue();
-							} catch (PermissionException ex) {
-								m.delete().queue();
-							}
-						}
-				)
-				.setEventWaiter(waiter)
-				.setTimeout(30, TimeUnit.SECONDS)
-				.setColor(botColor);
+			.setColumns(1)
+			.setItemsPerPage(1)
+			.showPageNumbers(true)
+			.setFinalAction(
+				m -> {
+					try {
+						m.clearReactions().queue();
+					} catch (PermissionException ex) {
+						m.delete().queue();
+					}
+				}
+			)
+			.setEventWaiter(waiter)
+			.setTimeout(30, TimeUnit.SECONDS)
+			.setColor(botColor);
 		if (eventAuthor != null) {
 			paginateBuilder.setUsers(eventAuthor);
 		}
@@ -497,10 +497,10 @@ public class Utils {
 
 	public static String capitalizeString(String str) {
 		return Stream
-				.of(str.trim().split("\\s"))
-				.filter(word -> word.length() > 0)
-				.map(word -> word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase())
-				.collect(Collectors.joining(" "));
+			.of(str.trim().split("\\s"))
+			.filter(word -> word.length() > 0)
+			.map(word -> word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase())
+			.collect(Collectors.joining(" "));
 	}
 
 	public static String parseMcCodes(String unformattedString) {
@@ -734,7 +734,7 @@ public class Utils {
 		}
 	}
 
-	public static EmbedBuilder checkHypixelKey(String HYPIXEL_KEY){
+	public static EmbedBuilder checkHypixelKey(String HYPIXEL_KEY) {
 		if (HYPIXEL_KEY == null) {
 			return defaultEmbed("Error").setDescription("You must set a Hypixel API key to use this command");
 		}
@@ -745,7 +745,7 @@ public class Utils {
 			return defaultEmbed("Error").setDescription("The set Hypixel API key is invalid");
 		}
 
-		if(!keyCooldownMap.containsKey(HYPIXEL_KEY)){
+		if (!keyCooldownMap.containsKey(HYPIXEL_KEY)) {
 			keyCooldownMap.put(HYPIXEL_KEY, new HypixelKeyInformation());
 		}
 

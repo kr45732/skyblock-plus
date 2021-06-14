@@ -1,5 +1,9 @@
 package com.skyblockplus.guilds;
 
+import static com.skyblockplus.Main.*;
+import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.checkHypixelKey;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -9,21 +13,17 @@ import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-
-import static com.skyblockplus.Main.*;
-import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.checkHypixelKey;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 
 public class GuildLeaderboardsCommand extends Command {
+
 	public static HashMap<String, HypixelKeyInformation> keyCooldownMap = new HashMap<>();
 
 	public GuildLeaderboardsCommand() {
@@ -127,12 +127,18 @@ public class GuildLeaderboardsCommand extends Command {
 									guildMemberOuterProfileJsonResponse -> {
 										try {
 											try {
-												keyCooldownMap.get(HYPIXEL_KEY).remainingLimit.set(
-													Integer.parseInt(guildMemberOuterProfileJsonResponse.getHeader("RateLimit-Remaining"))
-												);
-												keyCooldownMap.get(HYPIXEL_KEY).timeTillReset.set(
-													Integer.parseInt(guildMemberOuterProfileJsonResponse.getHeader("RateLimit-Reset"))
-												);
+												keyCooldownMap
+													.get(HYPIXEL_KEY)
+													.remainingLimit.set(
+														Integer.parseInt(
+															guildMemberOuterProfileJsonResponse.getHeader("RateLimit-Remaining")
+														)
+													);
+												keyCooldownMap
+													.get(HYPIXEL_KEY)
+													.timeTillReset.set(
+														Integer.parseInt(guildMemberOuterProfileJsonResponse.getHeader("RateLimit-Reset"))
+													);
 											} catch (Exception ignored) {}
 
 											JsonElement guildMemberOuterProfileJson = JsonParser.parseString(
