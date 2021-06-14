@@ -31,7 +31,7 @@ public class UpdateSlashCommands extends Command {
 					event
 						.getChannel()
 						.sendMessage(
-							defaultEmbed("Success - added " + slashCommands.complete().size() + "slash commands for this guild").build()
+							defaultEmbed("Success - added " + slashCommands.complete().size() + " slash commands for this guild").build()
 						)
 						.queue();
 					return;
@@ -43,11 +43,11 @@ public class UpdateSlashCommands extends Command {
 						return;
 					} else if (args[1].equals("global")) {
 						CommandListUpdateAction slashCommands = jda.updateCommands();
-						slashCommands.queue();
+						slashCommands.addCommands(generateSlashCommands()).queue();
 						event
 							.getChannel()
 							.sendMessage(
-								defaultEmbed("Success - added " + slashCommands.complete().size() + "slash commands globally").build()
+								defaultEmbed("Success - added " + slashCommands.complete().size() + " slash commands globally").build()
 							)
 							.queue();
 						return;
