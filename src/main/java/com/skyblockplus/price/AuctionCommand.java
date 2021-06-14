@@ -62,12 +62,7 @@ public class AuctionCommand extends Command {
 
 				Instant endingAt = Instant.ofEpochMilli(higherDepth(currentAuction, "end").getAsLong());
 				Duration duration = Duration.between(Instant.now(), endingAt);
-				long daysUntil = duration.toMinutes() / 1400;
-				long hoursUntil = duration.toMinutes() / 60 % 24;
-				long minutesUntil = duration.toMinutes() % 60;
-				String timeUntil = daysUntil > 0 ? daysUntil + "d " : "";
-				timeUntil += hoursUntil > 0 ? hoursUntil + "h " : "";
-				timeUntil += minutesUntil > 0 ? minutesUntil + "m " : "";
+				String timeUntil = instantToDHM(duration);
 
 				if (higherDepth(currentAuction, "item_name").getAsString().equals("Enchanted Book")) {
 					auctions[i][0] = parseMcCodes(higherDepth(currentAuction, "item_lore").getAsString().split("\n")[0]);
@@ -166,12 +161,7 @@ public class AuctionCommand extends Command {
 
 		Instant endingAt = Instant.ofEpochMilli(higherDepth(auctionJson, "end").getAsLong());
 		Duration duration = Duration.between(Instant.now(), endingAt);
-		long daysUntil = duration.toMinutes() / 1400;
-		long hoursUntil = duration.toMinutes() / 60 % 24;
-		long minutesUntil = duration.toMinutes() % 60;
-		String timeUntil = daysUntil > 0 ? daysUntil + "d " : "";
-		timeUntil += hoursUntil > 0 ? hoursUntil + "h " : "";
-		timeUntil += minutesUntil > 0 ? minutesUntil + "m " : "";
+		String timeUntil = instantToDHM(duration);
 
 		String ebStr = "**Item name:** " + itemName;
 		ebStr += "\n**Seller:** " + uuidToUsername(higherDepth(auctionJson, "auctioneer").getAsString());

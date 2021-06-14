@@ -757,4 +757,15 @@ public class Utils {
 
 		return null;
 	}
+
+	public static String instantToDHM(Duration duration) {
+		long daysUntil = duration.toMinutes() / 1400;
+		long hoursUntil = duration.toMinutes() / 60 % 24;
+		long minutesUntil = duration.toMinutes() % 60;
+		String timeUntil = daysUntil > 0 ? daysUntil + "d " : "";
+		timeUntil += hoursUntil > 0 ? hoursUntil + "h " : "";
+		timeUntil += minutesUntil > 0 ? minutesUntil + "m " : "";
+
+		return timeUntil;
+	}
 }

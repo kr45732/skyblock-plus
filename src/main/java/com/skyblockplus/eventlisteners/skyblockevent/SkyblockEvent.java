@@ -27,7 +27,7 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class SkyblockEvent {
 
-	public final DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withZone(ZoneId.of("UTC"));
+	public static final DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withZone(ZoneId.of("UTC"));
 	public final boolean enable;
 	public EmbedBuilder eb;
 	public TextChannel announcementChannel;
@@ -49,7 +49,7 @@ public class SkyblockEvent {
 	public SkyblockEvent(CommandEvent commandEvent) {
 		this.enable = true;
 		this.commandEvent = commandEvent;
-		this.eb = defaultEmbed("Create a Skyblock competition").setFooter("Type `exit` to cancel");
+		this.eb = defaultEmbed("Create a Skyblock competition").setFooter("Type exit or cancel to cancel");
 		lastMessageSentTime = Instant.now();
 		scheduler = Executors.newScheduledThreadPool(1);
 		scheduler.scheduleAtFixedRate(this::checkForTimeout, 0, 1, TimeUnit.MINUTES);
@@ -92,7 +92,7 @@ public class SkyblockEvent {
 
 		lastMessageSentTime = Instant.now();
 
-		if (event.getMessage().getContentRaw().equalsIgnoreCase("exit")) {
+		if (event.getMessage().getContentRaw().equalsIgnoreCase("exit") || event.getMessage().getContentRaw().equalsIgnoreCase("cancel")) {
 			sendEmbedMessage(defaultEmbed("Create a Skyblock competition").setDescription("Canceled"));
 			return "delete";
 		}
@@ -165,7 +165,9 @@ public class SkyblockEvent {
 					} else if (eventDuration > 336) {
 						eb.setDescription("Event must be at most 2 weeks (336 hours)");
 					} else {
-						eb.addField("End Date", formatter.format(Instant.now().plus(eventDuration, ChronoUnit.HOURS)) + " UTC", false);
+						Instant endsAt = Instant.now().plus(eventDuration, ChronoUnit.HOURS);
+						Duration duration = Duration.between(Instant.now(), endsAt);
+						eb.addField("End Date", "Ends in " + instantToDHM(duration) + " (" + formatter.format(endsAt) + " UTC)", false);
 						eb.setDescription(
 							"If there are no prizes please type \"none\", else please enter the prizes in one message following the format in the example below (place number : prize):\n1 : 15 mil coins\n2 : 10 mil\n3 : 500k"
 						);
@@ -222,10 +224,12 @@ public class SkyblockEvent {
 					announcementEb.setDescription("A new " + eventType + " event has been created! Please see below for more information.");
 					announcementEb.addField("Guild Name", higherDepth(guildJson, "guild.name").getAsString(), false);
 
-					epochSecondEndingTime = Instant.now().plus(eventDuration, ChronoUnit.HOURS).getEpochSecond();
+					Instant endsAt = Instant.now().plus(eventDuration, ChronoUnit.HOURS);
+					epochSecondEndingTime = endsAt.getEpochSecond();
+					Duration duration = Duration.between(Instant.now(), endsAt);
 					announcementEb.addField(
 						"End Date",
-						formatter.format(Instant.now().plus(eventDuration, ChronoUnit.HOURS)) + " UTC",
+						"Ends in " + instantToDHM(duration) + " (" + formatter.format(endsAt) + " UTC)",
 						false
 					);
 

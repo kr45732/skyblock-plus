@@ -90,13 +90,7 @@ public class QueryAuctionCommand extends Command {
 								lowestBinStr += "\n**Seller:** " + uuidToUsername(higherDepth(lowestBinAh, "auctioneer").getAsString());
 								lowestBinStr += "\n**Auction:** `/ah " + higherDepth(lowestBinAh, "uuid").getAsString() + "`";
 
-								long daysUntil = duration.toMinutes() / 1400;
-								long hoursUntil = duration.toMinutes() / 60 % 24;
-								long minutesUntil = duration.toMinutes() % 60;
-								String timeUntil = daysUntil > 0 ? daysUntil + "d " : "";
-								timeUntil += hoursUntil > 0 ? hoursUntil + "h " : "";
-								timeUntil += minutesUntil > 0 ? minutesUntil + "m " : "";
-								lowestBinStr += "\n**Ends in:** " + timeUntil;
+								lowestBinStr += "\n**Ends in:** " + instantToDHM(duration);
 
 								eb.addField("Lowest Bin", lowestBinStr, false);
 								eb.setThumbnail("https://sky.lea.moe/item.gif/ENCHANTED_BOOK");
@@ -168,13 +162,7 @@ public class QueryAuctionCommand extends Command {
 							lowestBinStr += "\n**Seller:** " + uuidToUsername(higherDepth(lowestBinAh, "auctioneer").getAsString());
 							lowestBinStr += "\n**Auction:** `/ah " + higherDepth(lowestBinAh, "uuid").getAsString() + "`";
 
-							long daysUntil = duration.toMinutes() / 1400;
-							long hoursUntil = duration.toMinutes() / 60 % 24;
-							long minutesUntil = duration.toMinutes() % 60;
-							String timeUntil = daysUntil > 0 ? daysUntil + "d " : "";
-							timeUntil += hoursUntil > 0 ? hoursUntil + "h " : "";
-							timeUntil += minutesUntil > 0 ? minutesUntil + "m " : "";
-							lowestBinStr += "\n**Ends in:** " + timeUntil;
+							lowestBinStr += "\n**Ends in:** " + instantToDHM(duration);
 
 							eb.setThumbnail(getPetUrl(pet));
 							eb.addField("Lowest Bin", lowestBinStr, false);
@@ -207,13 +195,7 @@ public class QueryAuctionCommand extends Command {
 			lowestBinStr += "\n**Seller:** " + uuidToUsername(higherDepth(lowestBinAh, "auctioneer").getAsString());
 			lowestBinStr += "\n**Auction:** `/ah " + higherDepth(lowestBinAh, "uuid").getAsString() + "`";
 
-			long daysUntil = duration.toMinutes() / 1400;
-			long hoursUntil = duration.toMinutes() / 60 % 24;
-			long minutesUntil = duration.toMinutes() % 60;
-			String timeUntil = daysUntil > 0 ? daysUntil + "d " : "";
-			timeUntil += hoursUntil > 0 ? hoursUntil + "h " : "";
-			timeUntil += minutesUntil > 0 ? minutesUntil + "m " : "";
-			lowestBinStr += "\n**Ends in:** " + timeUntil;
+			lowestBinStr += "\n**Ends in:** " + instantToDHM(duration);
 
 			try {
 				NBTCompound nbtData = NBTReader.readBase64(higherDepth(lowestBinAh, "item_bytes").getAsString());

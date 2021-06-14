@@ -2,6 +2,7 @@ package com.skyblockplus.guilds;
 
 import static com.skyblockplus.Main.*;
 import static com.skyblockplus.Main.asyncHttpClient;
+import static com.skyblockplus.eventlisteners.skyblockevent.SkyblockEvent.formatter;
 import static com.skyblockplus.guilds.GuildLeaderboardsCommand.keyCooldownMap;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -14,6 +15,8 @@ import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -103,9 +106,15 @@ public class GuildKickerCommand extends Command {
 			CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(20);
 			if (higherDepth(guildLbJson, "data") != null) {
 				JsonArray guildMembers = higherDepth(guildLbJson, "data").getAsJsonArray();
+				Instant lastUpdated = Instant.now();
 
 				int missingReqsCount = 0;
 				for (JsonElement guildMember : guildMembers) {
+					Instant curLastUpdated = Instant.parse(higherDepth(guildMember, "last_updated_at").getAsString());
+					if (curLastUpdated.isBefore(lastUpdated)) {
+						lastUpdated = curLastUpdated;
+					}
+
 					double slayer = higherDepth(guildMember, "total_slayer").getAsDouble();
 					double skills = higherDepth(guildMember, "average_skill_progress").getAsDouble();
 					double catacombs = higherDepth(guildMember, "catacomb").getAsDouble();
@@ -159,12 +168,20 @@ public class GuildKickerCommand extends Command {
 					}
 				}
 
+				Duration duration = Duration.between(lastUpdated, Instant.now());
+
 				paginateBuilder
 					.setPaginatorExtras(
 						new PaginatorExtras()
 							.setEveryPageTitle("Guild Kick Helper")
 							.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
-							.setEveryPageText("**Total missing requirements: " + missingReqsCount + "**\n")
+							.setEveryPageText(
+								"**Total missing requirements:** " +
+								missingReqsCount +
+								"\n**Updated:** " +
+								instantToDHM(duration) +
+								" ago\n"
+							)
 					)
 					.ifItemsEmpty("Everyone meets the requirements")
 					.build()

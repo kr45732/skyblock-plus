@@ -2,6 +2,7 @@ package com.skyblockplus.eventlisteners.skyblockevent;
 
 import static com.skyblockplus.Main.*;
 import static com.skyblockplus.eventlisteners.MainListener.guildMap;
+import static com.skyblockplus.eventlisteners.skyblockevent.SkyblockEvent.formatter;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -32,8 +33,6 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 
 public class SkyblockEventCommand extends Command {
-
-	final DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withZone(ZoneId.of("UTC"));
 
 	public SkyblockEventCommand() {
 		this.name = "event";
@@ -541,7 +540,9 @@ public class SkyblockEventCommand extends Command {
 
 			Instant eventInstantEnding = Instant.ofEpochSecond(higherDepth(currentSettings, "timeEndingSeconds").getAsLong());
 
-			eb.addField("End Date", formatter.format(eventInstantEnding) + " UTC", false);
+			Duration duration = Duration.between(Instant.now(), eventInstantEnding);
+
+			eb.addField("End Date", "Ends in " + instantToDHM(duration) + " (" + formatter.format(eventInstantEnding) + " UTC)", false);
 
 			ArrayList<String> prizesKeys = getJsonKeys(higherDepth(currentSettings, "prizeMap"));
 			StringBuilder ebString = new StringBuilder();
