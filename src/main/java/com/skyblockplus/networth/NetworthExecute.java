@@ -51,6 +51,9 @@ public class NetworthExecute {
 	private double storageTotal = 0;
 	private final StringBuilder calcItemsJsonStr = new StringBuilder("[");
 	private boolean verbose = false;
+	private double recombPrice;
+	private double fumingPrice;
+	private double hbpPrice;
 
 	public static boolean isIgnoredItem(String s) {
 		s = s.toLowerCase();
@@ -194,6 +197,15 @@ public class NetworthExecute {
 			averageAuctionJson = getAverageAuctionJson();
 			bazaarJson = higherDepth(getBazaarJson(), "products");
 			sbzPrices = getSbzPricesJson();
+
+			recombPrice =
+				higherDepth(higherDepth(bazaarJson, "RECOMBOBULATOR_3000.sell_summary").getAsJsonArray().get(0), "pricePerUnit")
+					.getAsDouble();
+			hbpPrice =
+				higherDepth(higherDepth(bazaarJson, "HOT_POTATO_BOOK.sell_summary").getAsJsonArray().get(0), "pricePerUnit").getAsDouble();
+			fumingPrice =
+				higherDepth(higherDepth(bazaarJson, "FUMING_POTATO_BOOK.sell_summary").getAsJsonArray().get(0), "pricePerUnit")
+					.getAsDouble();
 
 			bankBalance = player.getBankBalance();
 			purseCoins = player.getPurseCoins();
@@ -861,32 +873,15 @@ public class NetworthExecute {
 		} catch (Exception ignored) {}
 
 		try {
-			if (
-				item.isRecombobulated() &&
-				(
-					itemCost *
-					2 >=
-					higherDepth(higherDepth(bazaarJson, "RECOMBOBULATOR_3000.sell_summary").getAsJsonArray().get(0), "pricePerUnit")
-						.getAsDouble()
-				)
-			) {
-				recombobulatedExtra =
-					higherDepth(higherDepth(bazaarJson, "RECOMBOBULATOR_3000.sell_summary").getAsJsonArray().get(0), "pricePerUnit")
-						.getAsDouble();
-			}
+			if (item.isRecombobulated() && (itemCost * 2 >= recombPrice)) {}
 		} catch (Exception ignored) {}
 
 		try {
-			hbpExtras =
-				item.getHbpCount() *
-				higherDepth(higherDepth(bazaarJson, "HOT_POTATO_BOOK.sell_summary").getAsJsonArray().get(0), "pricePerUnit").getAsDouble();
+			hbpExtras = item.getHbpCount() * hbpPrice;
 		} catch (Exception ignored) {}
 
 		try {
-			fumingExtras =
-				item.getFumingCount() *
-				higherDepth(higherDepth(bazaarJson, "FUMING_POTATO_BOOK.sell_summary").getAsJsonArray().get(0), "pricePerUnit")
-					.getAsDouble();
+			fumingExtras = item.getFumingCount() * fumingPrice;
 		} catch (Exception ignored) {}
 
 		StringBuilder enchStr = new StringBuilder("[");
@@ -1024,32 +1019,17 @@ public class NetworthExecute {
 		} catch (Exception ignored) {}
 
 		try {
-			if (
-				item.isRecombobulated() &&
-				(
-					itemCost *
-					2 >=
-					higherDepth(higherDepth(bazaarJson, "RECOMBOBULATOR_3000.sell_summary").getAsJsonArray().get(0), "pricePerUnit")
-						.getAsDouble()
-				)
-			) {
-				recombobulatedExtra =
-					higherDepth(higherDepth(bazaarJson, "RECOMBOBULATOR_3000.sell_summary").getAsJsonArray().get(0), "pricePerUnit")
-						.getAsDouble();
+			if (item.isRecombobulated() && (itemCost * 2 >= recombPrice)) {
+				recombobulatedExtra = recombPrice;
 			}
 		} catch (Exception ignored) {}
 
 		try {
-			hbpExtras =
-				item.getHbpCount() *
-				higherDepth(higherDepth(bazaarJson, "HOT_POTATO_BOOK.sell_summary").getAsJsonArray().get(0), "pricePerUnit").getAsDouble();
+			hbpExtras = item.getHbpCount() * hbpPrice;
 		} catch (Exception ignored) {}
 
 		try {
-			fumingExtras =
-				item.getFumingCount() *
-				higherDepth(higherDepth(bazaarJson, "FUMING_POTATO_BOOK.sell_summary").getAsJsonArray().get(0), "pricePerUnit")
-					.getAsDouble();
+			fumingExtras = item.getFumingCount() * fumingPrice;
 		} catch (Exception ignored) {}
 
 		StringBuilder enchStr = new StringBuilder("[");
@@ -1224,7 +1204,7 @@ public class NetworthExecute {
 		}
 
 		try {
-			return higherDepth(higherDepth(bazaarJson, itemId + "sell_summary").getAsJsonArray().get(0), "pricePerUnit").getAsDouble();
+			return higherDepth(higherDepth(bazaarJson, itemId + ".sell_summary").getAsJsonArray().get(0), "pricePerUnit").getAsDouble();
 		} catch (Exception ignored) {}
 
 		try {

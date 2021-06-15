@@ -29,6 +29,7 @@ public class SlashCommandClient extends ListenerAdapter {
 	@Override
 	public void onSlashCommand(SlashCommandEvent event) {
 		if (event.getGuild() == null) {
+			event.reply("❌ This command cannot be used in Direct messages").queue();
 			return;
 		}
 

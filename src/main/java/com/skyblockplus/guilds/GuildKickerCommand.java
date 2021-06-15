@@ -2,9 +2,8 @@ package com.skyblockplus.guilds;
 
 import static com.skyblockplus.Main.*;
 import static com.skyblockplus.Main.asyncHttpClient;
-import static com.skyblockplus.eventlisteners.skyblockevent.SkyblockEvent.formatter;
-import static com.skyblockplus.guilds.GuildLeaderboardsCommand.keyCooldownMap;
 import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.keyCooldownMap;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -28,7 +27,7 @@ public class GuildKickerCommand extends Command {
 
 	public GuildKickerCommand() {
 		this.name = "guild-kicker";
-		this.cooldown = globalCooldown;
+		this.cooldown = globalCooldown + 1;
 		this.aliases = new String[] { "g-kicker" };
 	}
 
@@ -104,7 +103,7 @@ public class GuildKickerCommand extends Command {
 			JsonElement guildLbJson = getJson("https://hypixel-app-api.senither.com/leaderboard/players/" + guildId);
 
 			CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(20);
-			if (higherDepth(guildLbJson, "data") != null) {
+			if (higherDepth(guildLbJson, "data") != null && !(event.getMessage().getContentRaw().toLowerCase().contains("--usekey"))) {
 				JsonArray guildMembers = higherDepth(guildLbJson, "data").getAsJsonArray();
 				Instant lastUpdated = Instant.now();
 
@@ -186,8 +185,6 @@ public class GuildKickerCommand extends Command {
 					.ifItemsEmpty("Everyone meets the requirements")
 					.build()
 					.paginate(event.getChannel(), 0);
-
-				return null;
 			} else {
 				String HYPIXEL_KEY = database.getServerHypixelApiKey(event.getGuild().getId());
 
@@ -346,9 +343,8 @@ public class GuildKickerCommand extends Command {
 					.ifItemsEmpty("Everyone meets the requirements")
 					.build()
 					.paginate(event.getChannel(), 0);
-
-				return null;
 			}
+			return null;
 		}
 
 		return defaultEmbed("Unable to fetch guild data");

@@ -52,7 +52,7 @@ public class HelpCommand extends Command {
 		putMultiple(pageMap, 3, "slayer");
 		putMultiple(pageMap, 4, "skills");
 		putMultiple(pageMap, 5, "dungeons", "essence", "catacombs", "cata");
-		putMultiple(pageMap, 6, "guild", "guild-leaderboard", "g-lb", "guild-kicker", "g-kicker");
+		putMultiple(pageMap, 6, "g", "guild", "guild-leaderboard", "g-lb", "guild-kicker", "g-kicker");
 		putMultiple(pageMap, 7, "auction", "auctions", "ah", "bazaar", "bz", "bin", "bids", "query", "bits", "bit");
 		putMultiple(pageMap, 8, "wardrobe", "talisman", "inv", "inventory", "echest", "enderchest", "sacks");
 		putMultiple(pageMap, 9, "roles", "networth", "nw", "bank", "weight", "hypixel", "profiles");

@@ -20,7 +20,7 @@ public class GuildRanksCommand extends Command {
 
 	public GuildRanksCommand() {
 		this.name = "guild-rank";
-		this.cooldown = globalCooldown;
+		this.cooldown = globalCooldown + 1;
 		this.aliases = new String[] { "g-rank" };
 	}
 

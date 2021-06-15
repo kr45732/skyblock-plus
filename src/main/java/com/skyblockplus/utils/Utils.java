@@ -1,7 +1,7 @@
 package com.skyblockplus.utils;
 
 import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.guilds.GuildLeaderboardsCommand.keyCooldownMap;
+import static com.skyblockplus.utils.CustomPaginator.throwableConsumer;
 import static java.lang.String.join;
 import static java.util.Collections.nCopies;
 
@@ -10,8 +10,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.skyblockplus.guilds.HypixelKeyInformation;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
+import com.skyblockplus.utils.structs.HypixelGuildCache;
+import com.skyblockplus.utils.structs.HypixelKeyInformation;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.awt.*;
 import java.io.*;
@@ -20,10 +21,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -33,7 +31,6 @@ import javax.script.ScriptEngineManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.MessageSticker;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -84,6 +81,8 @@ public class Utils {
 	public static JsonElement averageAuctionJson;
 	public static JsonElement bazaarJson;
 	public static JsonArray sbzPricesJson;
+	public static HashMap<String, HypixelKeyInformation> keyCooldownMap = new HashMap<>();
+	public static HashMap<String, HypixelGuildCache> hypixelGuildsCacheMap = new HashMap<>();
 	private static Instant lowestBinJsonLastUpdated = Instant.now();
 	private static Instant averageAuctionJsonLastUpdated = Instant.now();
 	private static Instant bazaarJsonLastUpdated = Instant.now();
@@ -440,9 +439,9 @@ public class Utils {
 			.setFinalAction(
 				m -> {
 					try {
-						m.clearReactions().queue();
+						m.clearReactions().queue(null, throwableConsumer);
 					} catch (PermissionException ex) {
-						m.delete().queue();
+						m.delete().queue(null, throwableConsumer);
 					}
 				}
 			)

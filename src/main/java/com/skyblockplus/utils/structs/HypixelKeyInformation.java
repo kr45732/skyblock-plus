@@ -1,4 +1,4 @@
-package com.skyblockplus.guilds;
+package com.skyblockplus.utils.structs;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

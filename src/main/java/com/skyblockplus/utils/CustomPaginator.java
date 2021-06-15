@@ -40,6 +40,11 @@ public class CustomPaginator extends Menu {
 	private final int bulkSkipNumber;
 	private final boolean wrapPageEnds;
 	private final PaginatorExtras extras;
+	public static final Consumer<Throwable> throwableConsumer = e -> {
+		if (!e.getMessage().contains("Unknown Message")) {
+			e.printStackTrace();
+		}
+	};
 
 	CustomPaginator(
 		EventWaiter waiter,
@@ -134,7 +139,7 @@ public class CustomPaginator extends Menu {
 			case BIG_RIGHT:
 				return (bulkSkipNumber > 1 && isValidUser(event.getUser(), event.isFromGuild() ? event.getGuild() : null));
 			default:
-				event.getReaction().removeReaction(event.getUser()).queue();
+				event.getReaction().removeReaction(event.getUser()).queue(null, throwableConsumer);
 				return false;
 		}
 	}
@@ -170,11 +175,11 @@ public class CustomPaginator extends Menu {
 		}
 
 		try {
-			event.getReaction().removeReaction(event.getUser()).queue();
+			event.getReaction().removeReaction(event.getUser()).queue(null, throwableConsumer);
 		} catch (PermissionException ignored) {}
 
 		int n = newPageNum;
-		message.editMessage(renderPage(newPageNum)).queue(m -> pagination(m, n));
+		message.editMessage(renderPage(newPageNum)).queue(m -> pagination(m, n), throwableConsumer);
 	}
 
 	private Message renderPage(int pageNum) {
@@ -245,7 +250,7 @@ public class CustomPaginator extends Menu {
 
 		private final List<String> strings = new LinkedList<>();
 		private BiFunction<Integer, Integer, Color> color = (page, pages) -> null;
-		private Consumer<Message> finalAction = m -> m.delete().queue();
+		private Consumer<Message> finalAction = m -> m.delete().queue(null, throwableConsumer);
 		private int columns = 1;
 		private int itemsPerPage = 12;
 		private boolean showPageNumbers = true;

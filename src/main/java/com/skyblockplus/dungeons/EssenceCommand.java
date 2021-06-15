@@ -1,6 +1,7 @@
 package com.skyblockplus.dungeons;
 
 import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.Main.waiter;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
@@ -79,7 +80,23 @@ public class EssenceCommand extends Command {
 				JsonElement essenceCostsJson = getEssenceCostsJson();
 
 				if (args.length >= 3 && args[1].equals("upgrade")) {
-					String itemName = content.split(" ", 3)[2].replace(" ", "_").toUpperCase();
+					String itemName = content.split(" ", 3)[2].replace("'s", "").replace(" ", "_").toUpperCase();
+					itemName = convertToInternalName(itemName);
+
+					if (higherDepth(essenceCostsJson, itemName) == null) {
+						LevenshteinDistance matchCalc = LevenshteinDistance.getDefaultInstance();
+						List<String> items = getJsonKeys(essenceCostsJson);
+						int minDistance = matchCalc.apply(items.get(0), itemName);
+						String closestMatch = items.get(0);
+						for (String itemF : items) {
+							int currentDistance = matchCalc.apply(itemF, itemName);
+							if (currentDistance < minDistance) {
+								minDistance = currentDistance;
+								closestMatch = itemF;
+							}
+						}
+						itemName = closestMatch != null ? closestMatch : itemName;
+					}
 
 					JsonElement itemJson = higherDepth(essenceCostsJson, itemName);
 					if (itemJson != null) {
