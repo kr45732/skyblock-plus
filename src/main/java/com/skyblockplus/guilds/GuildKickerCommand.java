@@ -4,6 +4,7 @@ import static com.skyblockplus.Main.*;
 import static com.skyblockplus.Main.asyncHttpClient;
 import static com.skyblockplus.utils.Utils.*;
 import static com.skyblockplus.utils.Utils.keyCooldownMap;
+import static com.skyblockplus.utils.structs.HypixelGuildCache.memberCacheFromPlayer;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -271,17 +272,7 @@ public class GuildKickerCommand extends Command {
 														);
 
 														if (guildMemberPlayer.isValid()) {
-															return (
-																guildMemberUsernameResponse +
-																"=:=" +
-																guildMemberPlayer.getHighestAmount("slayer") +
-																"=:=" +
-																guildMemberPlayer.getHighestAmount("skills") +
-																"=:=" +
-																guildMemberPlayer.getHighestAmount("catacombs") +
-																"=:=" +
-																guildMemberPlayer.getHighestAmount("weight")
-															);
+															return memberCacheFromPlayer(guildMemberPlayer);
 														}
 													} catch (Exception e) {
 														e.printStackTrace();

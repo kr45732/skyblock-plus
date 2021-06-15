@@ -87,7 +87,7 @@ public class MainClassUtils {
 
 	public static void scheduleUpdateLinkedAccounts() {
 		ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-		scheduler.scheduleAtFixedRate(MainClassUtils::updateLinkedAccounts, 0, 1, TimeUnit.MINUTES);
+		scheduler.scheduleAtFixedRate(MainClassUtils::updateLinkedAccounts, 1, 1, TimeUnit.MINUTES);
 	}
 
 	public static void closeAsyncHttpClient() {
@@ -140,7 +140,7 @@ public class MainClassUtils {
 					}
 				);
 		} catch (Exception e) {
-			System.out.println("== Stack Trace (updateGuildRoles) ==");
+			System.out.println("== Stack Trace (update link) ==");
 			e.printStackTrace();
 		}
 	}

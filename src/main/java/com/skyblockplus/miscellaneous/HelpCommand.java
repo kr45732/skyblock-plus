@@ -152,7 +152,7 @@ public class HelpCommand extends Command {
 			) +
 			generateHelp(
 				"Get all player's who don't meet the provided requirements. The requirement name can be skills, slayer, catacombs, or weight. The requirement value must be an integer.",
-				"g-kicker u:crypticplasma [name:value] ..."
+				"g-kicker [u:IGN] [name:value] ..."
 			)
 		);
 

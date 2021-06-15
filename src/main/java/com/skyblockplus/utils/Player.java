@@ -1735,33 +1735,35 @@ public class Player {
 
 	public double getHighestAmount(String type) {
 		double highestAmount = -1.0;
-		switch (type) {
-			case "slayer":
-				for (JsonElement profile : profilesArray) {
+		for (JsonElement profile : profilesArray) {
+			switch (type) {
+				case "slayer":
 					highestAmount = Math.max(highestAmount, getTotalSlayer(higherDepth(profile, "members." + this.playerUuid)));
-				}
-				return highestAmount;
-			case "skills":
-				for (JsonElement profile : profilesArray) {
+				case "skills":
 					highestAmount = Math.max(highestAmount, getSkillAverage(higherDepth(profile, "members." + this.playerUuid)));
-				}
-				return highestAmount;
-			case "catacombs":
-				for (JsonElement profile : profilesArray) {
+					break;
+				case "catacombs":
 					SkillsStruct cataSkill = getCatacombsSkill(higherDepth(profile, "members." + this.playerUuid));
 					if (cataSkill != null) {
 						highestAmount = Math.max(highestAmount, getCatacombsLevel(profile));
 					}
-				}
-				return highestAmount;
-			case "weight":
-				for (JsonElement profile : profilesArray) {
+					break;
+				case "weight":
 					highestAmount = Math.max(highestAmount, getWeight(higherDepth(profile, "members." + this.playerUuid)));
-				}
-				return highestAmount;
-			default:
-				return -1;
+					break;
+				case "svenXp":
+				case "revXp":
+				case "taraXp":
+				case "endermanXp":
+					highestAmount =
+						Math.max(highestAmount, getSlayer(higherDepth(profile, "members." + this.playerUuid), type.replace("Xp", "")));
+					break;
+				default:
+					return -1;
+			}
 		}
+
+		return highestAmount;
 	}
 
 	@Override

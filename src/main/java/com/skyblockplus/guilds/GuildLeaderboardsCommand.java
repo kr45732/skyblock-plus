@@ -3,6 +3,7 @@ package com.skyblockplus.guilds;
 import static com.skyblockplus.Main.*;
 import static com.skyblockplus.utils.Utils.*;
 import static com.skyblockplus.utils.Utils.checkHypixelKey;
+import static com.skyblockplus.utils.structs.HypixelGuildCache.memberCacheFromPlayer;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -87,8 +88,23 @@ public class GuildLeaderboardsCommand extends Command {
 			case "weight":
 				lbTypeNum = 4;
 				break;
+			case "sven_xp":
+				lbTypeNum = 5;
+				break;
+			case "rev_xp":
+				lbTypeNum = 6;
+				break;
+			case "tara_xp":
+				lbTypeNum = 7;
+				break;
+			case "enderman_xp":
+				lbTypeNum = 8;
+				break;
 			default:
-				return defaultEmbed(lbType + " is an invalid leaderboard type");
+				return defaultEmbed(
+					lbType +
+					" is an invalid leaderboard type. Valid types are: `slayer`, `skills`, `catacombs`, `weight`, `sven_xp`, `rev_xp`, `tara_xp`, and `enderman_xp`"
+				);
 		}
 
 		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
@@ -119,6 +135,12 @@ public class GuildLeaderboardsCommand extends Command {
 			List<CompletableFuture<CompletableFuture<String>>> futuresList = new ArrayList<>();
 
 			for (JsonElement guildMember : guildMembers) {
+				try {
+					TimeUnit.MILLISECONDS.sleep(500);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+
 				String guildMemberUuid = higherDepth(guildMember, "uuid").getAsString();
 				try {
 					if (keyCooldownMap.get(HYPIXEL_KEY).remainingLimit.get() < 5) {
@@ -178,17 +200,7 @@ public class GuildLeaderboardsCommand extends Command {
 												);
 
 												if (guildMemberPlayer.isValid()) {
-													return (
-														guildMemberUsernameResponse +
-														"=:=" +
-														guildMemberPlayer.getHighestAmount("slayer") +
-														"=:=" +
-														guildMemberPlayer.getHighestAmount("skills") +
-														"=:=" +
-														guildMemberPlayer.getHighestAmount("catacombs") +
-														"=:=" +
-														guildMemberPlayer.getHighestAmount("weight")
-													);
+													return memberCacheFromPlayer(guildMemberPlayer);
 												}
 											} catch (Exception e) {
 												e.printStackTrace();
@@ -235,7 +247,7 @@ public class GuildLeaderboardsCommand extends Command {
 			"\n**Guild Rank:** #" +
 			(guildRank + 1) +
 			"\n**" +
-			capitalizeString(lbType) +
+			capitalizeString(lbType.replace("_", " ")) +
 			":** " +
 			amt +
 			(lastUpdated != null ? "\n**Last updated:** " + instantToDHM(Duration.between(lastUpdated, Instant.now())) + " ago" : "");
