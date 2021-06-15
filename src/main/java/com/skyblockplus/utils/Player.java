@@ -58,12 +58,10 @@ public class Player {
 		}
 
 		try {
-			JsonArray profileArray = higherDepth(
-				getJson("https://api.hypixel.net/skyblock/profiles?key=" + HYPIXEL_API_KEY + "&uuid=" + playerUuid),
-				"profiles"
-			)
-				.getAsJsonArray();
-			if (profileIdFromName(profileName, profileArray)) {
+			this.profilesArray =
+				higherDepth(getJson("https://api.hypixel.net/skyblock/profiles?key=" + HYPIXEL_API_KEY + "&uuid=" + playerUuid), "profiles")
+					.getAsJsonArray();
+			if (profileIdFromName(profileName, profilesArray)) {
 				return;
 			}
 		} catch (Exception e) {
@@ -78,7 +76,8 @@ public class Player {
 		this.playerUsername = playerUsername;
 
 		try {
-			if (getLatestProfile(higherDepth(outerProfileJson, "profiles").getAsJsonArray())) {
+			this.profilesArray = higherDepth(outerProfileJson, "profiles").getAsJsonArray();
+			if (getLatestProfile(profilesArray)) {
 				return;
 			}
 		} catch (Exception e) {
@@ -93,7 +92,8 @@ public class Player {
 		this.playerUsername = playerUsername;
 
 		try {
-			if (profileIdFromName(profileName, higherDepth(outerProfileJson, "profiles").getAsJsonArray())) {
+			this.profilesArray = higherDepth(outerProfileJson, "profiles").getAsJsonArray();
+			if (profileIdFromName(profileName, profilesArray)) {
 				return;
 			}
 		} catch (Exception e) {
@@ -131,23 +131,17 @@ public class Player {
 
 	public boolean getLatestProfile(JsonArray profilesArray) {
 		try {
-			String lastProfileSave = "";
+			Instant lastProfileSave = Instant.EPOCH;
 			for (int i = 0; i < profilesArray.size(); i++) {
-				String lastSaveLoop;
+				Instant lastSaveLoop;
 				try {
-					lastSaveLoop = higherDepth(profilesArray.get(i), "members." + this.playerUuid + ".last_save").getAsString();
+					lastSaveLoop =
+						Instant.ofEpochMilli(higherDepth(profilesArray.get(i), "members." + this.playerUuid + ".last_save").getAsLong());
 				} catch (Exception e) {
 					continue;
 				}
 
-				if (i == 0) {
-					this.profileJson = higherDepth(profilesArray.get(i), "members." + this.playerUuid);
-					this.outerProfileJson = profilesArray.get(i);
-					lastProfileSave = lastSaveLoop;
-					this.profileName = higherDepth(profilesArray.get(i), "cute_name").getAsString();
-				} else if (
-					Instant.ofEpochMilli(Long.parseLong(lastSaveLoop)).isAfter(Instant.ofEpochMilli(Long.parseLong(lastProfileSave)))
-				) {
+				if (lastSaveLoop.isAfter(lastProfileSave)) {
 					this.profileJson = higherDepth(profilesArray.get(i), "members." + this.playerUuid);
 					this.outerProfileJson = profilesArray.get(i);
 					lastProfileSave = lastSaveLoop;
@@ -155,7 +149,9 @@ public class Player {
 				}
 			}
 			return false;
-		} catch (Exception ignored) {}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return true;
 	}
 
@@ -227,6 +223,10 @@ public class Player {
 
 	/* Skills */
 	public int getTotalSkillsXp() {
+		return getTotalSkillsXp(profileJson);
+	}
+
+	public int getTotalSkillsXp(JsonElement profile) {
 		JsonElement skillsCap = higherDepth(getLevelingJson(), "leveling_caps");
 
 		List<String> skills = getJsonKeys(skillsCap);
@@ -236,7 +236,7 @@ public class Player {
 
 		int totalSkillXp = 0;
 		for (String skill : skills) {
-			SkillsStruct skillInfo = getSkill(skill);
+			SkillsStruct skillInfo = getSkill(profile, skill);
 			if (skillInfo == null) {
 				return -1;
 			} else {
@@ -262,19 +262,23 @@ public class Player {
 		return higherDepth(getLevelingJson(), "leveling_caps." + skillName).getAsInt();
 	}
 
-	public double getSkillXp(String skillName) {
+	public double getSkillXp(JsonElement profile, String skillName) {
 		try {
 			if (skillName.equals("catacombs")) {
-				return higherDepth(profileJson, "dungeons.dungeon_types.catacombs.experience").getAsDouble();
+				return higherDepth(profile, "dungeons.dungeon_types.catacombs.experience").getAsDouble();
 			}
-			return higherDepth(profileJson, "experience_skill_" + skillName).getAsDouble();
+			return higherDepth(profile, "experience_skill_" + skillName).getAsDouble();
 		} catch (Exception ignored) {}
 		return -1;
 	}
 
 	public SkillsStruct getSkill(String skillName) {
+		return getSkill(profileJson, skillName);
+	}
+
+	public SkillsStruct getSkill(JsonElement profile, String skillName) {
 		try {
-			double skillExp = higherDepth(profileJson, "experience_skill_" + skillName).getAsDouble();
+			double skillExp = higherDepth(profile, "experience_skill_" + skillName).getAsDouble();
 			return skillInfoFromExp(skillExp, skillName);
 		} catch (Exception ignored) {}
 		return null;
@@ -292,6 +296,28 @@ public class Player {
 		for (String skill : skills) {
 			try {
 				double skillExp = higherDepth(profileJson, "experience_skill_" + skill).getAsDouble();
+				SkillsStruct skillInfo = skillInfoFromExp(skillExp, skill);
+				progressSA += skillInfo.skillLevel + skillInfo.progressToNext;
+			} catch (Exception e) {
+				return -1;
+			}
+		}
+		progressSA /= skills.size();
+		return progressSA;
+	}
+
+	public double getSkillAverage(JsonElement profile) {
+		JsonElement skillsCap = higherDepth(getLevelingJson(), "leveling_caps");
+
+		List<String> skills = getJsonKeys(skillsCap);
+		skills.remove("catacombs");
+		skills.remove("runecrafting");
+		skills.remove("carpentry");
+
+		double progressSA = 0;
+		for (String skill : skills) {
+			try {
+				double skillExp = higherDepth(profile, "experience_skill_" + skill).getAsDouble();
 				SkillsStruct skillInfo = skillInfoFromExp(skillExp, skill);
 				progressSA += skillInfo.skillLevel + skillInfo.progressToNext;
 			} catch (Exception e) {
@@ -348,11 +374,19 @@ public class Player {
 
 	/* Slayer */
 	public int getTotalSlayer() {
-		return getSlayer("sven") + getSlayer("rev") + getSlayer("tara") + getSlayer("enderman");
+		return getTotalSlayer(profileJson);
+	}
+
+	public int getTotalSlayer(JsonElement profile) {
+		return getSlayer(profile, "sven") + getSlayer(profile, "rev") + getSlayer(profile, "tara") + getSlayer(profile, "enderman");
 	}
 
 	public int getSlayer(String slayerName) {
-		JsonElement profileSlayer = higherDepth(profileJson, "slayer_bosses");
+		return getSlayer(profileJson, slayerName);
+	}
+
+	public int getSlayer(JsonElement profile, String slayerName) {
+		JsonElement profileSlayer = higherDepth(profile, "slayer_bosses");
 		switch (slayerName) {
 			case "sven":
 				return higherDepth(profileSlayer, "wolf.xp") != null ? higherDepth(profileSlayer, "wolf.xp").getAsInt() : 0;
@@ -545,7 +579,11 @@ public class Player {
 	}
 
 	public double getDungeonClassLevel(String className) {
-		SkillsStruct dungeonClassLevel = skillInfoFromExp(getDungeonClassXp(className), "catacombs");
+		return getDungeonClassLevel(profileJson, className);
+	}
+
+	public double getDungeonClassLevel(JsonElement profile, String className) {
+		SkillsStruct dungeonClassLevel = skillInfoFromExp(getDungeonClassXp(profile, className), "catacombs");
 		return dungeonClassLevel.skillLevel + dungeonClassLevel.progressToNext;
 	}
 
@@ -554,7 +592,11 @@ public class Player {
 	}
 
 	public double getCatacombsLevel() {
-		SkillsStruct catacombsInfo = getCatacombsSkill();
+		return getCatacombsLevel(profileJson);
+	}
+
+	public double getCatacombsLevel(JsonElement profile) {
+		SkillsStruct catacombsInfo = getCatacombsSkill(profile);
 		if (catacombsInfo != null) {
 			return catacombsInfo.skillLevel + catacombsInfo.progressToNext;
 		}
@@ -562,8 +604,12 @@ public class Player {
 	}
 
 	public SkillsStruct getCatacombsSkill() {
+		return getCatacombsSkill(profileJson);
+	}
+
+	public SkillsStruct getCatacombsSkill(JsonElement profile) {
 		try {
-			double skillExp = higherDepth(profileJson, "dungeons.dungeon_types.catacombs.experience").getAsDouble();
+			double skillExp = higherDepth(profile, "dungeons.dungeon_types.catacombs.experience").getAsDouble();
 			return skillInfoFromExp(skillExp, "catacombs");
 		} catch (Exception e) {
 			return null;
@@ -571,8 +617,12 @@ public class Player {
 	}
 
 	public double getDungeonClassXp(String className) {
+		return getDungeonClassXp(profileJson, className);
+	}
+
+	public double getDungeonClassXp(JsonElement profile, String className) {
 		try {
-			return higherDepth(profileJson, "dungeons.player_classes." + className + ".experience").getAsDouble();
+			return higherDepth(profile, "dungeons.player_classes." + className + ".experience").getAsDouble();
 		} catch (Exception e) {
 			return 0;
 		}
@@ -1052,6 +1102,12 @@ public class Player {
 
 	public JsonArray getPets() {
 		return higherDepth(profileJson, "pets").getAsJsonArray();
+	}
+
+	@SuppressWarnings("unchecked")
+	public HashMap<String, Integer> getPlayerSacks() {
+		JsonElement sacksJson = higherDepth(profileJson, "sacks_counts");
+		return new Gson().fromJson(sacksJson, HashMap.class);
 	}
 
 	/* -- End inventory -- */
@@ -1554,9 +1610,13 @@ public class Player {
 		return "❓";
 	}
 
-	public double getWeight() {
-		Weight playerWeight = new Weight(this);
+	public double getWeight(JsonElement profile) {
+		Weight playerWeight = new Weight(profile, this);
 		return playerWeight.getTotalWeight();
+	}
+
+	public double getWeight() {
+		return getWeight(profileJson);
 	}
 
 	public EmbedBuilder defaultPlayerEmbed() {
@@ -1673,10 +1733,35 @@ public class Player {
 		return petScore;
 	}
 
-	@SuppressWarnings("unchecked")
-	public HashMap<String, Integer> getPlayerSacks() {
-		JsonElement sacksJson = higherDepth(profileJson, "sacks_counts");
-		return new Gson().fromJson(sacksJson, HashMap.class);
+	public double getHighestAmount(String type) {
+		double highestAmount = -1.0;
+		switch (type) {
+			case "slayer":
+				for (JsonElement profile : profilesArray) {
+					highestAmount = Math.max(highestAmount, getTotalSlayer(higherDepth(profile, "members." + this.playerUuid)));
+				}
+				return highestAmount;
+			case "skills":
+				for (JsonElement profile : profilesArray) {
+					highestAmount = Math.max(highestAmount, getSkillAverage(higherDepth(profile, "members." + this.playerUuid)));
+				}
+				return highestAmount;
+			case "catacombs":
+				for (JsonElement profile : profilesArray) {
+					SkillsStruct cataSkill = getCatacombsSkill(higherDepth(profile, "members." + this.playerUuid));
+					if (cataSkill != null) {
+						highestAmount = Math.max(highestAmount, getCatacombsLevel(profile));
+					}
+				}
+				return highestAmount;
+			case "weight":
+				for (JsonElement profile : profilesArray) {
+					highestAmount = Math.max(highestAmount, getWeight(higherDepth(profile, "members." + this.playerUuid)));
+				}
+				return highestAmount;
+			default:
+				return -1;
+		}
 	}
 
 	@Override

@@ -49,11 +49,7 @@ public class GuildLeaderboardsCommand extends Command {
 				}
 
 				if (args[2].toLowerCase().startsWith("u:")) {
-					try {
-						eb = getLeaderboard(args[1], args[2].split(":")[1], event);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
+					eb = getLeaderboard(args[1], args[2].split(":")[1], event);
 
 					if (eb == null) {
 						ebMessage.delete().queue();
@@ -69,7 +65,7 @@ public class GuildLeaderboardsCommand extends Command {
 			.start();
 	}
 
-	private EmbedBuilder getLeaderboard(String lbType, String username, CommandEvent event) throws InterruptedException {
+	private EmbedBuilder getLeaderboard(String lbType, String username, CommandEvent event) {
 		String HYPIXEL_KEY = database.getServerHypixelApiKey(event.getGuild().getId());
 
 		EmbedBuilder eb = checkHypixelKey(HYPIXEL_KEY);
@@ -101,8 +97,8 @@ public class GuildLeaderboardsCommand extends Command {
 		}
 
 		JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_KEY + "&player=" + usernameUuidStruct.playerUuid);
-		String guildName;
 
+		String guildName;
 		try {
 			guildName = higherDepth(guildJson, "guild.name").getAsString();
 		} catch (Exception e) {
@@ -111,11 +107,10 @@ public class GuildLeaderboardsCommand extends Command {
 		String guildId = higherDepth(guildJson, "guild._id").getAsString();
 
 		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(2).setItemsPerPage(20);
-
 		HypixelGuildCache guildCache = hypixelGuildsCacheMap.getOrDefault(guildId, null);
 		List<String> guildMemberPlayersList = new ArrayList<>();
-
 		Instant lastUpdated = null;
+
 		if (guildCache != null && Duration.between(guildCache.lastUpdated, Instant.now()).toMinutes() < 15) {
 			guildMemberPlayersList = guildCache.membersCache;
 			lastUpdated = guildCache.lastUpdated;
@@ -186,13 +181,13 @@ public class GuildLeaderboardsCommand extends Command {
 													return (
 														guildMemberUsernameResponse +
 														"=:=" +
-														guildMemberPlayer.getTotalSlayer() +
+														guildMemberPlayer.getHighestAmount("slayer") +
 														"=:=" +
-														guildMemberPlayer.getTotalSkillsXp() +
+														guildMemberPlayer.getHighestAmount("skills") +
 														"=:=" +
-														guildMemberPlayer.getCatacombsSkill().totalSkillExp +
+														guildMemberPlayer.getHighestAmount("catacombs") +
 														"=:=" +
-														guildMemberPlayer.getWeight()
+														guildMemberPlayer.getHighestAmount("weight")
 													);
 												}
 											} catch (Exception e) {
@@ -241,7 +236,6 @@ public class GuildLeaderboardsCommand extends Command {
 			(guildRank + 1) +
 			"\n**" +
 			capitalizeString(lbType) +
-			(!lbType.equals("weight") ? " XP" : "") +
 			":** " +
 			amt +
 			(lastUpdated != null ? "\n**Last updated:** " + instantToDHM(Duration.between(lastUpdated, Instant.now())) + " ago" : "");

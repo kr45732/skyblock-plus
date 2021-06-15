@@ -22,6 +22,7 @@ import java.text.NumberFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -81,8 +82,8 @@ public class Utils {
 	public static JsonElement averageAuctionJson;
 	public static JsonElement bazaarJson;
 	public static JsonArray sbzPricesJson;
-	public static HashMap<String, HypixelKeyInformation> keyCooldownMap = new HashMap<>();
-	public static HashMap<String, HypixelGuildCache> hypixelGuildsCacheMap = new HashMap<>();
+	public static ConcurrentHashMap<String, HypixelKeyInformation> keyCooldownMap = new ConcurrentHashMap<>();
+	public static ConcurrentHashMap<String, HypixelGuildCache> hypixelGuildsCacheMap = new ConcurrentHashMap<>();
 	private static Instant lowestBinJsonLastUpdated = Instant.now();
 	private static Instant averageAuctionJsonLastUpdated = Instant.now();
 	private static Instant bazaarJsonLastUpdated = Instant.now();
@@ -765,6 +766,6 @@ public class Utils {
 		timeUntil += hoursUntil > 0 ? hoursUntil + "h " : "";
 		timeUntil += minutesUntil > 0 ? minutesUntil + "m " : "";
 
-		return timeUntil;
+		return timeUntil.length() > 0 ? timeUntil.trim() : "0m";
 	}
 }

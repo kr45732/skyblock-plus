@@ -1,5 +1,6 @@
 package com.skyblockplus.weight;
 
+import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,6 +11,7 @@ public class Weight {
 	private static final Map<String, Double[]> skillWeights = defaultSkillWeights();
 	private static final Map<String, Double> dungeonClassWeights = defaultDungeonClassWeights();
 	private static final Map<String, Double> catacombsWeights = defaultCatacombsWeights();
+	private JsonElement profile;
 	private Player player;
 	private double skillAverage;
 	private double slayer;
@@ -17,7 +19,12 @@ public class Weight {
 	private double averageDungeonClass;
 
 	public Weight(Player player) {
+		this(player.getProfileJson(), player);
+	}
+
+	public Weight(JsonElement profile, Player player) {
 		this.player = player;
+		this.profile = profile;
 	}
 
 	public Weight(double skillAverage, double slayer, double catacombs, double averageDungeonClass) {
@@ -74,7 +81,7 @@ public class Weight {
 	}
 
 	public double getSlayerWeight() {
-		SlayerWeight slayerWeight = new SlayerWeight(player);
+		SlayerWeight slayerWeight = new SlayerWeight(profile, player);
 		slayerWeight.addSlayerWeight("rev", slayerWeights.get("rev")[0], slayerWeights.get("rev")[1]);
 		slayerWeight.addSlayerWeight("sven", slayerWeights.get("sven")[0], slayerWeights.get("sven")[1]);
 		slayerWeight.addSlayerWeight("tara", slayerWeights.get("tara")[0], slayerWeights.get("tara")[1]);
@@ -83,7 +90,7 @@ public class Weight {
 	}
 
 	public double getSkillsWeight() {
-		SkillsWeight skillsWeight = new SkillsWeight(player);
+		SkillsWeight skillsWeight = new SkillsWeight(profile, player);
 		skillsWeight.addSkillWeight("mining", skillWeights.get("mining")[0], skillWeights.get("mining")[1]);
 		skillsWeight.addSkillWeight("foraging", skillWeights.get("foraging")[0], skillWeights.get("foraging")[1]);
 		skillsWeight.addSkillWeight("enchanting", skillWeights.get("enchanting")[0], skillWeights.get("enchanting")[1]);
@@ -96,7 +103,7 @@ public class Weight {
 	}
 
 	public double getDungeonsWeight() {
-		DungeonsWeight dungeonsWeight = new DungeonsWeight(player);
+		DungeonsWeight dungeonsWeight = new DungeonsWeight(profile, player);
 		dungeonsWeight.addDungeonClassWeight("healer", dungeonClassWeights.get("healer"));
 		dungeonsWeight.addDungeonClassWeight("mage", dungeonClassWeights.get("mage"));
 		dungeonsWeight.addDungeonClassWeight("berserk", dungeonClassWeights.get("berserk"));

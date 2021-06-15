@@ -8,7 +8,7 @@ import lombok.Data;
 public class HypixelGuildCache {
 
 	public Instant lastUpdated;
-	public List<String> membersCache = new ArrayList<>(); // Username=:=Slayer=:=Skills=:=Catacombs=:=Weight
+	public List<String> membersCache; // Username=:=Slayer=:=Skills=:=Catacombs=:=Weight
 
 	public HypixelGuildCache(Instant lastUpdated, List<String> membersCache) {
 		this.lastUpdated = lastUpdated;

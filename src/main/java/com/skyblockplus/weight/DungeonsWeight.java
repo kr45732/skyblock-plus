@@ -1,14 +1,17 @@
 package com.skyblockplus.weight;
 
+import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
 
 public class DungeonsWeight {
 
 	private final double level50Xp = 569809640;
+	private JsonElement profile;
 	private Player player;
 	private double totalDungeonsWeight;
 
-	public DungeonsWeight(Player player) {
+	public DungeonsWeight(JsonElement profile, Player player) {
+		this.profile = profile;
 		this.player = player;
 	}
 
@@ -19,8 +22,8 @@ public class DungeonsWeight {
 	}
 
 	public void addDungeonClassWeight(String className, double maxPoints) {
-		double currentClassLevel = player.getDungeonClassLevel(className);
-		double currentClassXp = player.getDungeonClassXp(className);
+		double currentClassLevel = player.getDungeonClassLevel(profile, className);
+		double currentClassXp = player.getDungeonClassXp(profile, className);
 		double base = Math.pow(currentClassLevel, 4.5) * maxPoints;
 
 		if (currentClassXp <= level50Xp) {
@@ -33,8 +36,8 @@ public class DungeonsWeight {
 	}
 
 	public void addCatacombsWeight(double maxPoints) {
-		double catacombsSkillXp = player.getSkillXp("catacombs");
-		double level = player.getCatacombsLevel();
+		double catacombsSkillXp = player.getSkillXp(profile, "catacombs");
+		double level = player.getCatacombsLevel(profile);
 		double base = Math.pow(level, 4.5) * maxPoints;
 
 		if (catacombsSkillXp <= level50Xp) {

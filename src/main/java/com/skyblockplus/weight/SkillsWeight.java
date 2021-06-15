@@ -1,13 +1,16 @@
 package com.skyblockplus.weight;
 
+import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
 
 public class SkillsWeight {
 
+	private JsonElement profile;
 	private Player player;
 	private double totalSkillWeight;
 
-	public SkillsWeight(Player player) {
+	public SkillsWeight(JsonElement profile, Player player) {
+		this.profile = profile;
 		this.player = player;
 	}
 
@@ -18,11 +21,11 @@ public class SkillsWeight {
 	}
 
 	public void addSkillWeight(String skillName, double exponent, double divider) {
-		double currentSkillXp = player.getSkillXp(skillName);
+		double currentSkillXp = player.getSkillXp(profile, skillName);
 
 		if (currentSkillXp != -1) {
 			int maxLevel = player.getSkillMaxLevel(skillName, true);
-			double level = player.getSkill(skillName).skillLevel + player.getSkill(skillName).progressToNext;
+			double level = player.getSkill(profile, skillName).skillLevel + player.getSkill(profile, skillName).progressToNext;
 			double maxLevelExp = maxLevel == 50 ? 55172425 : 111672425;
 			double base = Math.pow(level * 10, 0.5 + exponent + (level / 100)) / 1250;
 

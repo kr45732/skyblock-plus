@@ -1480,7 +1480,15 @@ public class SettingsCommand extends Command {
 
 		if (nickname.contains("[GUILD_RANK]")) {
 			List<GuildRole> guildRoleSettings = database.getAllGuildRoles(event.getGuild().getId());
-			guildRoleSettings.removeIf(o1 -> o1 == null || !o1.getEnableGuildRanks().equalsIgnoreCase("true"));
+			guildRoleSettings.removeIf(
+				o1 -> {
+					try {
+						return !o1.getEnableGuildRanks().equalsIgnoreCase("true");
+					} catch (Exception e) {
+						return true;
+					}
+				}
+			);
 			if (guildRoleSettings.size() == 0) {
 				return defaultEmbed("Error")
 					.setDescription(

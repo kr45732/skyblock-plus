@@ -1,13 +1,16 @@
 package com.skyblockplus.weight;
 
+import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
 
 public class SlayerWeight {
 
+	private JsonElement profile;
 	private Player player;
 	private double totalSlayerWeight;
 
-	public SlayerWeight(Player player) {
+	public SlayerWeight(JsonElement profile, Player player) {
+		this.profile = profile;
 		this.player = player;
 	}
 
@@ -18,7 +21,7 @@ public class SlayerWeight {
 	}
 
 	public void addSlayerWeight(String slayerName, double divider, double modifier) {
-		int currentSlayerXp = player.getSlayer(slayerName);
+		int currentSlayerXp = player.getSlayer(profile, slayerName);
 
 		if (currentSlayerXp <= 1000000) {
 			totalSlayerWeight += currentSlayerXp == 0 ? 0 : currentSlayerXp / divider;
