@@ -119,9 +119,9 @@ public class NetworthExecute {
 				String content = event.getMessage().getContentRaw();
 				logCommand(event.getGuild(), event.getAuthor(), content);
 
-				if (content.contains("verbose:true")) {
+				if (content.contains("--verbose")) {
 					verbose = true;
-					content = content.replace("verbose:true", "").trim();
+					content = content.replace("--verbose", "").trim();
 				}
 
 				String[] args = content.split(" ");

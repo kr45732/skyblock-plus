@@ -135,12 +135,6 @@ public class GuildLeaderboardsCommand extends Command {
 			List<CompletableFuture<CompletableFuture<String>>> futuresList = new ArrayList<>();
 
 			for (JsonElement guildMember : guildMembers) {
-				try {
-					TimeUnit.MILLISECONDS.sleep(500);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-
 				String guildMemberUuid = higherDepth(guildMember, "uuid").getAsString();
 				try {
 					if (keyCooldownMap.get(HYPIXEL_KEY).remainingLimit.get() < 5) {

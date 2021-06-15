@@ -191,8 +191,8 @@ public class HelpCommand extends Command {
 			generateHelp("Get a player's networth", "networth [player] <profile>", "nw [player] <profile>") +
 			generateHelp(
 				"Get a player's networth with a detailed JSON of each item cost",
-				"networth [player] <profile> verbose:true",
-				"nw [player] <profile> verbose:true"
+				"networth [player] <profile> --verbose",
+				"nw [player] <profile> --verbose"
 			) +
 			generateHelp("Get a player's weight", "weight [player] <profile>") +
 			generateHelp(
