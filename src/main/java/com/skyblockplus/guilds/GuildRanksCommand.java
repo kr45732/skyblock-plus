@@ -21,7 +21,7 @@ public class GuildRanksCommand extends Command {
 	public GuildRanksCommand() {
 		this.name = "guild-rank";
 		this.cooldown = globalCooldown + 1;
-		this.aliases = new String[] { "g-rank","g-ranks" };
+		this.aliases = new String[] { "g-rank", "g-ranks" };
 	}
 
 	@Override
