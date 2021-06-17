@@ -7,6 +7,7 @@ import com.skyblockplus.api.discordserversettings.automatedguildroles.GuildRole;
 import com.skyblockplus.api.discordserversettings.automatedroles.AutomatedRoles;
 import com.skyblockplus.api.discordserversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.discordserversettings.automatedverify.AutomatedVerify;
+import com.skyblockplus.api.discordserversettings.mee6bypasser.Mee6Data;
 import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSettingsModel;
 import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSettingsService;
 import com.skyblockplus.api.discordserversettings.skyblockevent.EventMember;
@@ -213,5 +214,13 @@ public class SpringDatabaseComponent {
 
 	public int setServerHypixelApiKey(String serverId, String newKey) {
 		return settingsService.setServerHypixelApiKey(serverId, newKey).getStatusCodeValue();
+	}
+
+	public JsonElement getMee6Settings(String serverId) {
+		return gson.toJsonTree(settingsService.getMee6Settings(serverId).getBody());
+	}
+
+	public int setMee6Settings(String serverId, JsonElement newSettings) {
+		return settingsService.setMee6Settings(serverId, gson.fromJson(newSettings, Mee6Data.class)).getStatusCodeValue();
 	}
 }

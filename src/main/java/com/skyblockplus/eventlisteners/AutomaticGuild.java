@@ -47,13 +47,16 @@ public class AutomaticGuild {
 	public SkyblockEvent skyblockEvent = new SkyblockEvent();
 	public List<EventMember> eventMemberList = new ArrayList<>();
 	public Instant eventMemberListLastUpdated = null;
-	private ScheduledExecutorService scheduler;
+	public ScheduledExecutorService scheduler;
+	public JsonElement currentMee6Settings;
+	public Instant lastMee6RankUpdate = null;
 
 	public AutomaticGuild(GenericGuildEvent event) {
 		guildId = event.getGuild().getId();
 		applyConstructor(event);
 		verifyConstructor(event);
 		schedulerConstructor();
+		currentMee6Settings = database.getMee6Settings(guildId);
 	}
 
 	public List<EventMember> getEventMemberList() {
@@ -473,11 +476,31 @@ public class AutomaticGuild {
 		return "Error Reloading";
 	}
 
+	public String reloadMee6Settings(String guildId) {
+		Guild guild = jda.getGuildById(guildId);
+		if (guild == null) {
+			return "Invalid guild";
+		}
+
+		JsonElement currentSettings = database.getMee6Settings(guild.getId());
+		if (currentSettings == null) {
+			return "No settings found";
+		}
+
+		currentMee6Settings = currentSettings;
+		boolean enabled = higherDepth(currentSettings, "enable") != null && higherDepth(currentSettings, "enable").getAsBoolean();
+		return "Mee6 bypasser is " + (enabled ? "enabled" : "disabled");
+	}
+
 	public void onMessageReactionAdd(MessageReactionAddEvent event) {
 		applyGuild.forEach(o1 -> o1.onMessageReactionAdd(event));
 	}
 
 	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
+		if (mee6BypasserRanks(event)) {
+			return;
+		}
+
 		if (verifyGuild.onGuildMessageReceived(event)) {
 			return;
 		}
@@ -486,6 +509,73 @@ public class AutomaticGuild {
 		if (s.equals("delete")) {
 			skyblockEvent.scheduler.shutdownNow();
 			skyblockEvent = new SkyblockEvent();
+		}
+	}
+
+	public boolean mee6BypasserRanks(GuildMessageReceivedEvent event) {
+		if (event.getMessage().getContentRaw().startsWith("!rank")) {
+			try {
+				if (!higherDepth(currentMee6Settings, "enable").getAsBoolean()) {
+					return true;
+				}
+			} catch (Exception e) {
+				return true;
+			}
+
+			if (lastMee6RankUpdate != null && Duration.between(lastMee6RankUpdate, Instant.now()).toMinutes() <= 3) {
+				return true;
+			}
+
+			lastMee6RankUpdate = Instant.now();
+
+			int pageNum = 0;
+			while (true) {
+				JsonArray leaderboardArr = getMee6Leaderboard(pageNum);
+				if (leaderboardArr == null || leaderboardArr.size() == 0) {
+					return true;
+				}
+
+				Member member;
+				if (event.getMessage().getMentionedMembers().isEmpty()) {
+					member = event.getMember();
+				} else {
+					member = event.getMessage().getMentionedMembers().get(0);
+				}
+
+				for (JsonElement player : leaderboardArr) {
+					if (higherDepth(player, "id").getAsString().equals(event.getAuthor().getId())) {
+						int playerLevel = higherDepth(player, "level").getAsInt();
+						JsonArray curRoles = higherDepth(currentMee6Settings, "mee6Ranks").getAsJsonArray();
+						List<Role> toAdd = new ArrayList<>();
+						List<Role> toRemove = new ArrayList<>();
+						for (JsonElement curRole : curRoles) {
+							if (playerLevel >= higherDepth(curRole, "value").getAsInt()) {
+								toAdd.add(event.getGuild().getRoleById(higherDepth(curRole, "roleId").getAsString()));
+							} else {
+								toRemove.add(event.getGuild().getRoleById(higherDepth(curRole, "roleId").getAsString()));
+							}
+						}
+						event.getGuild().modifyMemberRoles(member, toAdd, toRemove).queue();
+						return true;
+					}
+				}
+
+				pageNum++;
+			}
+		}
+
+		return false;
+	}
+
+	private JsonArray getMee6Leaderboard(int pageNumber) {
+		try {
+			return higherDepth(
+				getJson("https://mee6.xyz/api/plugins/levels/leaderboard/" + guildId + "?limit=1000&page=" + pageNumber),
+				"players"
+			)
+				.getAsJsonArray();
+		} catch (Exception e) {
+			return null;
 		}
 	}
 

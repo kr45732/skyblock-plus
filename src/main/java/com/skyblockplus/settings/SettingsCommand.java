@@ -63,10 +63,32 @@ public class SettingsCommand extends Command {
 					currentSettings = database.getServerSettings(event.getGuild().getId());
 				}
 
-				if (args.length == 4 && args[1].equals("set") && args[2].equals("hypixel_key")) {
-					eb = setHypixelKey(args[3]);
-				} else if (args.length == 3 && args[1].equals("delete") && args[2].equals("hypixel_key")) {
-					eb = deleteHypixelKey();
+				if (args.length == 4 && args[2].equals("hypixel_key")) {
+					if (args[1].equals("set")) {
+						eb = setHypixelKey(args[3]);
+					} else if (args[1].equals("delete")) {
+						eb = deleteHypixelKey();
+					} else {
+						eb = defaultEmbed("Invalid setting");
+					}
+				} else if (args.length >= 2 && args[1].equals("mee6")) {
+					if (args.length == 2) {
+						eb = getMee6DataSettings();
+					} else if (args.length == 3) {
+						if (args[2].equals("enable")) {
+							eb = setMee6Enable(true);
+						} else if (args[2].equals("disable")) {
+							eb = setMee6Enable(false);
+						} else {
+							eb = defaultEmbed("Invalid setting");
+						}
+					} else if (args.length == 4 && args[2].equals("remove")) {
+						eb = removeMee6Role(args[3]);
+					} else if (args.length == 5 && args[2].equals("add")) {
+						eb = addMee6Role(args[3], args[4]);
+					} else {
+						eb = defaultEmbed("Invalid setting");
+					}
 				} else if ((args.length == 3) && (args[1].equals("delete"))) {
 					if (args[2].equals("--confirm")) {
 						if (database.deleteServerSettings(event.getGuild().getId()) == 200) {
@@ -1898,6 +1920,161 @@ public class SettingsCommand extends Command {
 		newApplyJson.remove(key);
 		newApplyJson.addProperty(key, newValue);
 		return database.setApplySettings(event.getGuild().getId(), newApplyJson);
+	}
+
+	/* Mee6 */
+	private EmbedBuilder getMee6DataSettings() {
+		JsonElement curSettings = database.getMee6Settings(event.getGuild().getId());
+		EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName());
+		eb.appendDescription(
+			"**• Enable:** " + (higherDepth(curSettings, "enable") != null ? higherDepth(curSettings, "enable").getAsBoolean() : "false")
+		);
+		JsonArray curRoles = higherDepth(curSettings, "mee6Ranks").getAsJsonArray();
+		if (curRoles.size() == 0) {
+			eb.appendDescription("\n**• Leveling roles:** None");
+		} else {
+			for (JsonElement curRole : curRoles) {
+				eb.appendDescription(
+					"\n• Level " +
+					higherDepth(curRole, "value").getAsString() +
+					" - <@&" +
+					higherDepth(curRole, "roleId").getAsString() +
+					">"
+				);
+			}
+		}
+
+		return eb;
+	}
+
+	private EmbedBuilder setMee6Enable(boolean enable) {
+		if (!enable) {
+			int responseCode = updateMee6Enable("false");
+			if (responseCode != 200) {
+				return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+			}
+
+			return defaultEmbed("Settings").setDescription("Disabled Mee6 bypasser");
+		}
+
+		JsonElement curSettings = database.getMee6Settings(event.getGuild().getId());
+
+		if (higherDepth(curSettings, "mee6Ranks").getAsJsonArray().size() == 0) {
+			return defaultEmbed("Error").setDescription("There must be at least one leveling role set");
+		}
+
+		try {
+			if (
+				higherDepth(getJson("https://mee6.xyz/api/plugins/levels/leaderboard/" + event.getGuild().getId()), "players")
+					.getAsJsonArray()
+					.size() ==
+				0
+			) {
+				return defaultEmbed("Error").setDescription("The Mee6 isn't public for this server");
+			}
+		} catch (Exception e) {
+			return defaultEmbed("Error").setDescription("The Mee6 isn't public for this server");
+		}
+
+		int responseCode = updateMee6Enable("true");
+		if (responseCode != 200) {
+			return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+		}
+
+		return defaultEmbed("Settings for " + event.getGuild().getName()).setDescription("Enabled Mee6 bypasser");
+	}
+
+	private EmbedBuilder addMee6Role(String level, String roleMention) {
+		try {
+			Role verifyGuildRole = event.getGuild().getRoleById(roleMention.replaceAll("[<@&>]", ""));
+			if (!(verifyGuildRole.isPublicRole() || verifyGuildRole.isManaged())) {
+				int intLevel;
+				try {
+					intLevel = Integer.parseInt(level);
+				} catch (Exception e) {
+					return defaultEmbed("Error").setDescription("The level must be an integer");
+				}
+
+				if (intLevel <= 0 || intLevel >= 250) {
+					return defaultEmbed("Error").setDescription("The level must be more than 0 and less than 250");
+				}
+
+				JsonObject curSettings = database.getMee6Settings(event.getGuild().getId()).getAsJsonObject();
+				JsonArray curRanks = curSettings.get("mee6Ranks").getAsJsonArray();
+
+				if (curRanks.size() >= 10) {
+					return defaultEmbed("You have reached the max amount of Mee6 leveling roles (10/10)");
+				}
+
+				for (JsonElement rank : curRanks) {
+					if (higherDepth(rank, "value").getAsInt() == intLevel) {
+						curRanks.remove(rank);
+						break;
+					}
+				}
+
+				curRanks.add(new Gson().toJsonTree(new RoleObject("" + intLevel, verifyGuildRole.getId())));
+				curSettings.remove("mee6Ranks");
+				curSettings.add("mee6Ranks", curRanks);
+
+				int responseCode = database.setMee6Settings(event.getGuild().getId(), curSettings);
+				if (responseCode != 200) {
+					return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
+				}
+
+				EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName());
+				eb.setDescription("**Added Mee6 Rank:** rank " + intLevel + " - " + verifyGuildRole.getAsMention());
+				return eb;
+			}
+		} catch (Exception ignored) {}
+		return defaultEmbed("Invalid Role", null);
+	}
+
+	private EmbedBuilder removeMee6Role(String level) {
+		try {
+			int intLevel;
+			try {
+				intLevel = Integer.parseInt(level);
+			} catch (Exception e) {
+				return defaultEmbed("Invalid level");
+			}
+
+			if (intLevel <= 0 || intLevel >= 250) {
+				return defaultEmbed("Invalid level");
+			}
+
+			JsonObject curSettings = database.getMee6Settings(event.getGuild().getId()).getAsJsonObject();
+			JsonArray curRanks = curSettings.get("mee6Ranks").getAsJsonArray();
+
+			for (JsonElement rank : curRanks) {
+				if (higherDepth(rank, "value").getAsInt() == intLevel) {
+					curRanks.remove(rank);
+					if (curRanks.size() == 0) {
+						curSettings.remove("enable");
+						curSettings.addProperty("enable", "false");
+					}
+					curSettings.remove("mee6Ranks");
+					curSettings.add("mee6Ranks", curRanks);
+
+					int responseCode = database.setMee6Settings(event.getGuild().getId(), curSettings);
+					if (responseCode != 200) {
+						return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
+					}
+
+					EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName());
+					eb.setDescription("**Removed Mee6 Rank:** rank " + intLevel);
+					return eb;
+				}
+			}
+		} catch (Exception ignored) {}
+		return defaultEmbed("Invalid level");
+	}
+
+	private int updateMee6Enable(String newValue) {
+		JsonObject newApplyJson = database.getMee6Settings(event.getGuild().getId()).getAsJsonObject();
+		newApplyJson.remove("enable");
+		newApplyJson.addProperty("enable", newValue);
+		return database.setMee6Settings(event.getGuild().getId(), newApplyJson);
 	}
 
 	/* Misc */

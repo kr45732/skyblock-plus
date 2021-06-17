@@ -6,6 +6,7 @@ import com.skyblockplus.api.discordserversettings.automatedguildroles.GuildRole;
 import com.skyblockplus.api.discordserversettings.automatedroles.AutomatedRoles;
 import com.skyblockplus.api.discordserversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.discordserversettings.automatedverify.AutomatedVerify;
+import com.skyblockplus.api.discordserversettings.mee6bypasser.Mee6Data;
 import com.skyblockplus.api.discordserversettings.skyblockevent.EventMember;
 import com.skyblockplus.api.discordserversettings.skyblockevent.RunningEvent;
 import com.skyblockplus.api.discordserversettings.skyblockevent.SbEvent;
@@ -633,6 +634,27 @@ public class ServerSettingsService {
 			) {
 				return new ResponseEntity<>(currentServerSettings.getAutomaticGuildRolesTwo(), HttpStatus.OK);
 			}
+		}
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	}
+
+	public ResponseEntity<?> getMee6Settings(String serverId) {
+		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+		if (currentServerSettings != null) {
+			return new ResponseEntity<>(currentServerSettings.getMee6Data(), HttpStatus.OK);
+		}
+
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	}
+
+	public ResponseEntity<HttpStatus> setMee6Settings(String serverId, Mee6Data newSettings) {
+		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+		if (currentServerSettings != null) {
+			currentServerSettings.setMee6Data(newSettings);
+			settingsRepository.save(currentServerSettings);
+			return new ResponseEntity<>(HttpStatus.OK);
 		}
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}

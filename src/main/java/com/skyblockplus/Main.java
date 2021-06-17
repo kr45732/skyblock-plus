@@ -30,12 +30,16 @@ import com.skyblockplus.timeout.MessageTimeout;
 import com.skyblockplus.utils.slashcommands.SlashCommandClient;
 import com.skyblockplus.weight.WeightCommand;
 import com.skyblockplus.weight.WeightSlashCommand;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import javax.annotation.PreDestroy;
 import javax.security.auth.login.LoginException;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.TextChannel;
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.Dsl;
 import org.springframework.boot.SpringApplication;
@@ -165,7 +169,8 @@ public class Main {
 		} catch (Exception ignored) {}
 
 		jda.getPresence().setActivity(Activity.watching(BOT_PREFIX + "help in " + jda.getGuilds().size() + " servers"));
-		// scheduleUpdateLinkedAccounts();
+		//		scheduleUpdateLinkedAccounts();
+		//		AuctionFlipper.scheduleFlipper();
 	}
 
 	@PreDestroy

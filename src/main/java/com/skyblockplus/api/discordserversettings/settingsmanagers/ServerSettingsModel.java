@@ -4,6 +4,7 @@ import com.skyblockplus.api.discordserversettings.automatedapplication.Automated
 import com.skyblockplus.api.discordserversettings.automatedguildroles.GuildRole;
 import com.skyblockplus.api.discordserversettings.automatedroles.AutomatedRoles;
 import com.skyblockplus.api.discordserversettings.automatedverify.AutomatedVerify;
+import com.skyblockplus.api.discordserversettings.mee6bypasser.Mee6Data;
 import com.skyblockplus.api.discordserversettings.skyblockevent.SbEvent;
 import javax.persistence.*;
 import lombok.AllArgsConstructor;
@@ -45,6 +46,9 @@ public class ServerSettingsModel {
 	private SbEvent sbEvent = new SbEvent();
 
 	private String hypixelApiKey = "";
+
+	@Embedded
+	private Mee6Data mee6Data = new Mee6Data();
 
 	public ServerSettingsModel() {}
 

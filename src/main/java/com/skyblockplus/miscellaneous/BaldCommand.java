@@ -6,12 +6,17 @@ import static com.skyblockplus.utils.Utils.*;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 
 public class BaldCommand extends Command {
+
+	private final List<String> allowedGuilds = Arrays.asList("782154976243089429", "796790757947867156", "766365919231344661");
 
 	public BaldCommand() {
 		this.name = "bald";
@@ -22,7 +27,7 @@ public class BaldCommand extends Command {
 	protected void execute(CommandEvent event) {
 		new Thread(
 			() -> {
-				if (!(event.getGuild().getId().equals("782154976243089429") || event.getGuild().getId().equals("796790757947867156"))) {
+				if (!allowedGuilds.contains(event.getGuild().getId())) {
 					return;
 				}
 

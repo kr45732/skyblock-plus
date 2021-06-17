@@ -759,7 +759,7 @@ public class Utils {
 	}
 
 	public static String instantToDHM(Duration duration) {
-		long daysUntil = duration.toMinutes() / 1400;
+		long daysUntil = duration.toMinutes() / 1440;
 		long hoursUntil = duration.toMinutes() / 60 % 24;
 		long minutesUntil = duration.toMinutes() % 60;
 		String timeUntil = daysUntil > 0 ? daysUntil + "d " : "";
@@ -767,5 +767,16 @@ public class Utils {
 		timeUntil += minutesUntil > 0 ? minutesUntil + "m " : "";
 
 		return timeUntil.length() > 0 ? timeUntil.trim() : "0m";
+	}
+
+	public static String instantToMS(Duration duration) {
+		long secondsDuration = duration.toMillis() / 1000;
+		long minutesUntil = secondsDuration / 60 % 60;
+		long secondsUntil = secondsDuration % 60;
+
+		String timeUntil = minutesUntil > 0 ? minutesUntil + "m " : "";
+		timeUntil += secondsUntil > 0 ? secondsUntil + "s " : "";
+
+		return timeUntil.length() > 0 ? timeUntil.trim() : "0s";
 	}
 }

@@ -54,35 +54,23 @@ public class NetworthExecute {
 	private double recombPrice;
 	private double fumingPrice;
 	private double hbpPrice;
+	private static List<String> ignoredItemList = Arrays.asList(
+		"skyblock_menu",
+		"snow",
+		"wood",
+		"zombie_commander_whip",
+		"zombie_talisman",
+		"smooth_brick",
+		"none",
+		"redstone_torch_on",
+		"book",
+		""
+	);
 
 	public static boolean isIgnoredItem(String s) {
 		s = s.toLowerCase();
 
-		if (s.equalsIgnoreCase("none")) {
-			return true;
-		}
-
 		if (s.startsWith("stained_glass")) {
-			return true;
-		}
-
-		if (s.equalsIgnoreCase("redstone_torch_on")) {
-			return true;
-		}
-
-		if (s.equalsIgnoreCase("book")) {
-			return true;
-		}
-
-		if (s.equalsIgnoreCase("smooth_brick")) {
-			return true;
-		}
-
-		if (s.equalsIgnoreCase("zombie_talisman")) {
-			return true;
-		}
-
-		if (s.equalsIgnoreCase("zombie_commander_whip")) {
 			return true;
 		}
 
@@ -90,7 +78,7 @@ public class NetworthExecute {
 			return true;
 		}
 
-		return s.equals("skyblock_menu");
+		return ignoredItemList.contains(s);
 	}
 
 	public static JsonArray queryAhApi(String query) {
