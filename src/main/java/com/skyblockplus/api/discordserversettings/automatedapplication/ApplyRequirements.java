@@ -1,18 +1,20 @@
 package com.skyblockplus.api.discordserversettings.automatedapplication;
 
-import javax.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+
+import javax.persistence.Embeddable;
 
 @Data
 @AllArgsConstructor
 @Embeddable
 public class ApplyRequirements {
 
-	private String slayerReq = "";
-	private String skillsReq = "";
-	private String catacombsReq = "";
-	private String weightReq = "";
+    private String slayerReq = "";
+    private String skillsReq = "";
+    private String catacombsReq = "";
+    private String weightReq = "";
 
-	public ApplyRequirements() {}
+    public ApplyRequirements() {
+    }
 }

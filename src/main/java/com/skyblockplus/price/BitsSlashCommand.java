@@ -6,21 +6,21 @@ import net.dv8tion.jda.api.EmbedBuilder;
 
 public class BitsSlashCommand extends SlashCommand {
 
-	public BitsSlashCommand() {
-		this.name = "bits";
-	}
+    public BitsSlashCommand() {
+        this.name = "bits";
+    }
 
-	@Override
-	protected void execute(SlashCommandExecutedEvent event) {
-		new Thread(
-			() -> {
-				event.logCommandGuildUserCommand();
+    @Override
+    protected void execute(SlashCommandExecutedEvent event) {
+        new Thread(
+                () -> {
+                    event.logCommandGuildUserCommand();
 
-				EmbedBuilder eb = BitsCommand.getBitPrices(event.getOptionStr("item"));
+                    EmbedBuilder eb = BitsCommand.getBitPrices(event.getOptionStr("item"));
 
-				event.getHook().editOriginalEmbeds(eb.build()).queue();
-			}
-		)
-			.start();
-	}
+                    event.getHook().editOriginalEmbeds(eb.build()).queue();
+                }
+        )
+                .start();
+    }
 }

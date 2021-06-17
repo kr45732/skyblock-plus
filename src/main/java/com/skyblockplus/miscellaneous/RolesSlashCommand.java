@@ -6,26 +6,26 @@ import net.dv8tion.jda.api.EmbedBuilder;
 
 public class RolesSlashCommand extends SlashCommand {
 
-	public RolesSlashCommand() {
-		this.name = "roles";
-	}
+    public RolesSlashCommand() {
+        this.name = "roles";
+    }
 
-	@Override
-	protected void execute(SlashCommandExecutedEvent event) {
-		new Thread(
-			() -> {
-				event.logCommandGuildUserCommand();
+    @Override
+    protected void execute(SlashCommandExecutedEvent event) {
+        new Thread(
+                () -> {
+                    event.logCommandGuildUserCommand();
 
-				EmbedBuilder eb = RoleCommands.updateRoles(
-					event.getOptionStr("profile"),
-					event.getGuild(),
-					event.getUser(),
-					event.getMember()
-				);
+                    EmbedBuilder eb = RoleCommands.updateRoles(
+                            event.getOptionStr("profile"),
+                            event.getGuild(),
+                            event.getUser(),
+                            event.getMember()
+                    );
 
-				event.getHook().editOriginalEmbeds(eb.build()).queue();
-			}
-		)
-			.start();
-	}
+                    event.getHook().editOriginalEmbeds(eb.build()).queue();
+                }
+        )
+                .start();
+    }
 }

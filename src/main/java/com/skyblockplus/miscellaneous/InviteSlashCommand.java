@@ -5,19 +5,19 @@ import com.skyblockplus.utils.slashcommands.SlashCommandExecutedEvent;
 
 public class InviteSlashCommand extends SlashCommand {
 
-	public InviteSlashCommand() {
-		this.name = "invite";
-	}
+    public InviteSlashCommand() {
+        this.name = "invite";
+    }
 
-	@Override
-	protected void execute(SlashCommandExecutedEvent event) {
-		new Thread(
-			() -> {
-				event.logCommandGuildUserCommand();
+    @Override
+    protected void execute(SlashCommandExecutedEvent event) {
+        new Thread(
+                () -> {
+                    event.logCommandGuildUserCommand();
 
-				event.getHook().editOriginalEmbeds(InviteCommand.getInvite().build()).queue();
-			}
-		)
-			.start();
-	}
+                    event.getHook().editOriginalEmbeds(InviteCommand.getInvite().build()).queue();
+                }
+        )
+                .start();
+    }
 }

@@ -6,27 +6,27 @@ import net.dv8tion.jda.api.EmbedBuilder;
 
 public class SkillsSlashCommand extends SlashCommand {
 
-	public SkillsSlashCommand() {
-		this.name = "skills";
-	}
+    public SkillsSlashCommand() {
+        this.name = "skills";
+    }
 
-	@Override
-	protected void execute(SlashCommandExecutedEvent event) {
-		new Thread(
-			() -> {
-				event.logCommandGuildUserCommand();
+    @Override
+    protected void execute(SlashCommandExecutedEvent event) {
+        new Thread(
+                () -> {
+                    event.logCommandGuildUserCommand();
 
-				String profileName = event.getOptionStr("profile");
-				EmbedBuilder eb;
-				if (profileName != null) {
-					eb = SkillsCommand.getPlayerSkill(event.getOptionStr("player"), profileName);
-				} else {
-					eb = SkillsCommand.getPlayerSkill(event.getOptionStr("player"), null);
-				}
+                    String profileName = event.getOptionStr("profile");
+                    EmbedBuilder eb;
+                    if (profileName != null) {
+                        eb = SkillsCommand.getPlayerSkill(event.getOptionStr("player"), profileName);
+                    } else {
+                        eb = SkillsCommand.getPlayerSkill(event.getOptionStr("player"), null);
+                    }
 
-				event.getHook().editOriginalEmbeds(eb.build()).queue();
-			}
-		)
-			.start();
-	}
+                    event.getHook().editOriginalEmbeds(eb.build()).queue();
+                }
+        )
+                .start();
+    }
 }
