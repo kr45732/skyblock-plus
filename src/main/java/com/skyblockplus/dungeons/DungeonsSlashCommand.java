@@ -6,27 +6,27 @@ import net.dv8tion.jda.api.EmbedBuilder;
 
 public class DungeonsSlashCommand extends SlashCommand {
 
-    public DungeonsSlashCommand() {
-        this.name = "dungeons";
-    }
+	public DungeonsSlashCommand() {
+		this.name = "dungeons";
+	}
 
-    @Override
-    protected void execute(SlashCommandExecutedEvent event) {
-        new Thread(
-                () -> {
-                    event.logCommandGuildUserCommand();
+	@Override
+	protected void execute(SlashCommandExecutedEvent event) {
+		new Thread(
+			() -> {
+				event.logCommandGuildUserCommand();
 
-                    String profileName = event.getOptionStr("profile");
-                    EmbedBuilder eb;
-                    if (profileName != null) {
-                        eb = CatacombsCommand.getPlayerCatacombs(event.getOptionStr("player"), profileName);
-                    } else {
-                        eb = CatacombsCommand.getPlayerCatacombs(event.getOptionStr("player"), null);
-                    }
+				String profileName = event.getOptionStr("profile");
+				EmbedBuilder eb;
+				if (profileName != null) {
+					eb = CatacombsCommand.getPlayerCatacombs(event.getOptionStr("player"), profileName);
+				} else {
+					eb = CatacombsCommand.getPlayerCatacombs(event.getOptionStr("player"), null);
+				}
 
-                    event.getHook().editOriginalEmbeds(eb.build()).queue();
-                }
-        )
-                .start();
-    }
+				event.getHook().editOriginalEmbeds(eb.build()).queue();
+			}
+		)
+			.start();
+	}
 }

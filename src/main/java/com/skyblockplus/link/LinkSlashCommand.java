@@ -6,25 +6,25 @@ import net.dv8tion.jda.api.EmbedBuilder;
 
 public class LinkSlashCommand extends SlashCommand {
 
-    public LinkSlashCommand() {
-        this.name = "link";
-    }
+	public LinkSlashCommand() {
+		this.name = "link";
+	}
 
-    @Override
-    protected void execute(SlashCommandExecutedEvent event) {
-        new Thread(
-                () -> {
-                    event.logCommandGuildUserCommand();
-                    String linkOption = event.getOptionStr("player");
-                    EmbedBuilder eb;
-                    if (linkOption != null) {
-                        eb = LinkAccountCommand.linkAccount(linkOption, event.getMember(), event.getGuild());
-                    } else {
-                        eb = LinkAccountCommand.getLinkedAccount(event.getUser());
-                    }
-                    event.getHook().editOriginalEmbeds(eb.build()).queue();
-                }
-        )
-                .start();
-    }
+	@Override
+	protected void execute(SlashCommandExecutedEvent event) {
+		new Thread(
+			() -> {
+				event.logCommandGuildUserCommand();
+				String linkOption = event.getOptionStr("player");
+				EmbedBuilder eb;
+				if (linkOption != null) {
+					eb = LinkAccountCommand.linkAccount(linkOption, event.getMember(), event.getGuild());
+				} else {
+					eb = LinkAccountCommand.getLinkedAccount(event.getUser());
+				}
+				event.getHook().editOriginalEmbeds(eb.build()).queue();
+			}
+		)
+			.start();
+	}
 }

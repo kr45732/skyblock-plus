@@ -6,21 +6,21 @@ import net.dv8tion.jda.api.EmbedBuilder;
 
 public class BazaarSlashCommand extends SlashCommand {
 
-    public BazaarSlashCommand() {
-        this.name = "bazaar";
-    }
+	public BazaarSlashCommand() {
+		this.name = "bazaar";
+	}
 
-    @Override
-    protected void execute(SlashCommandExecutedEvent event) {
-        new Thread(
-                () -> {
-                    event.logCommandGuildUserCommand();
+	@Override
+	protected void execute(SlashCommandExecutedEvent event) {
+		new Thread(
+			() -> {
+				event.logCommandGuildUserCommand();
 
-                    EmbedBuilder eb = BazaarCommand.getBazaarItem(event.getOptionStr("item"));
+				EmbedBuilder eb = BazaarCommand.getBazaarItem(event.getOptionStr("item"));
 
-                    event.getHook().editOriginalEmbeds(eb.build()).queue();
-                }
-        )
-                .start();
-    }
+				event.getHook().editOriginalEmbeds(eb.build()).queue();
+			}
+		)
+			.start();
+	}
 }

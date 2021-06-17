@@ -7,10 +7,10 @@ import lombok.Data;
 @Data
 public class GuildRanksStruct {
 
-    public String name;
-    public double skills;
-    public double slayer;
-    public double catacombs;
-    public double weight;
-    public String guildRank;
+	public String name;
+	public double skills;
+	public double slayer;
+	public double catacombs;
+	public double weight;
+	public String guildRank;
 }

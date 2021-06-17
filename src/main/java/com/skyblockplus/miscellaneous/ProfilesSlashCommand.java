@@ -6,23 +6,23 @@ import net.dv8tion.jda.api.EmbedBuilder;
 
 public class ProfilesSlashCommand extends SlashCommand {
 
-    public ProfilesSlashCommand() {
-        this.name = "profiles";
-    }
+	public ProfilesSlashCommand() {
+		this.name = "profiles";
+	}
 
-    @Override
-    protected void execute(SlashCommandExecutedEvent event) {
-        new Thread(
-                () -> {
-                    event.logCommandGuildUserCommand();
+	@Override
+	protected void execute(SlashCommandExecutedEvent event) {
+		new Thread(
+			() -> {
+				event.logCommandGuildUserCommand();
 
-                    EmbedBuilder eb = ProfilesCommand.getPlayerProfiles(event.getOptionStr("player"), event.getUser(), null, event.getHook());
+				EmbedBuilder eb = ProfilesCommand.getPlayerProfiles(event.getOptionStr("player"), event.getUser(), null, event.getHook());
 
-                    if (eb != null) {
-                        event.getHook().editOriginalEmbeds(eb.build()).queue();
-                    }
-                }
-        )
-                .start();
-    }
+				if (eb != null) {
+					event.getHook().editOriginalEmbeds(eb.build()).queue();
+				}
+			}
+		)
+			.start();
+	}
 }
