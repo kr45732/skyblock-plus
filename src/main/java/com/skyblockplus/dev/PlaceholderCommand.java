@@ -2,10 +2,20 @@ package com.skyblockplus.dev;
 
 import static com.skyblockplus.utils.Utils.*;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.stream.Collectors;
+import javax.script.ScriptException;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 
 public class PlaceholderCommand extends Command {
 
@@ -45,6 +55,20 @@ public class PlaceholderCommand extends Command {
 		)
 			.start();
 	}
+	//	public static void main(String[] args) {
+	//		for(String i:getEmojiMap().keySet()){
+	//			if(getJson("https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/items/" + i.toUpperCase() + ".json") == null){
+	//				System.out.println("BAD: " + i);
+	//			}
+	//		}
+	//
+	//		/*
+	//		* BAD: euclid_wheat_hoe_tier_2
+	//		* BAD: titanium_drill_dr_x555
+	//		*/
+	//
+	//	}
+
 	//	public static void main(String[] args) {
 	//		setApplicationSettings();
 	//		File dir = new File("src/main/java/com/skyblockplus/json/NotEnoughUpdates-REPO-master/items");

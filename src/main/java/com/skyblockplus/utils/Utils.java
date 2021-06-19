@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -49,6 +50,7 @@ public class Utils {
 	public static final Color botColor = new Color(223, 5, 5);
 	public static final int globalCooldown = 4;
 	public static final ScriptEngine jsScriptEngine = new ScriptEngineManager().getEngineByName("js");
+	public static ScriptEngine es6ScriptEngine = new NashornScriptEngineFactory().getScriptEngine("--language=es6");
 	public static String HYPIXEL_API_KEY = "";
 	public static String BOT_TOKEN = "";
 	public static String BOT_PREFIX = "";
@@ -87,11 +89,12 @@ public class Utils {
 	public static JsonArray sbzPricesJson;
 	public static ConcurrentHashMap<String, HypixelKeyInformation> keyCooldownMap = new ConcurrentHashMap<>();
 	public static ConcurrentHashMap<String, HypixelGuildCache> hypixelGuildsCacheMap = new ConcurrentHashMap<>();
-	private static Instant lowestBinJsonLastUpdated = Instant.now();
-	private static Instant averageAuctionJsonLastUpdated = Instant.now();
-	private static Instant bazaarJsonLastUpdated = Instant.now();
-	private static Instant sbzPricesJsonLastUpdated = Instant.now();
-	private static JsonObject internalJsonMappings;
+	public static Instant lowestBinJsonLastUpdated = Instant.now();
+	public static Instant averageAuctionJsonLastUpdated = Instant.now();
+	public static Instant bazaarJsonLastUpdated = Instant.now();
+	public static Instant sbzPricesJsonLastUpdated = Instant.now();
+	public static JsonObject internalJsonMappings;
+	public static JsonObject emojiMap;
 
 	/* Getters */
 	public static JsonElement getLowestBinJson() {
@@ -101,6 +104,28 @@ public class Utils {
 		}
 
 		return lowestBinJson;
+	}
+
+	public static JsonObject getEmojiMap() {
+		if (emojiMap == null) {
+			try {
+				emojiMap =
+					JsonParser.parseReader(new FileReader("src/main/java/com/skyblockplus/json/IdToEmojiMappings.json")).getAsJsonObject();
+			} catch (Exception ignored) {}
+		}
+
+		return emojiMap;
+	}
+
+	public static boolean getEmojiMap(boolean y) {
+		if (y) {
+			try {
+				emojiMap =
+					JsonParser.parseReader(new FileReader("src/main/java/com/skyblockplus/json/IdToEmojiMappings.json")).getAsJsonObject();
+			} catch (Exception ignored) {}
+		}
+
+		return (emojiMap != null) && y;
 	}
 
 	public static JsonElement getAverageAuctionJson() {
@@ -367,6 +392,21 @@ public class Utils {
 		} catch (Exception e) {
 			return null;
 		}
+	}
+
+	public static String getUrl(String url) {
+		try (CloseableHttpClient httpclient = HttpClientBuilder.create().build()) {
+			HttpGet httpget = new HttpGet(url);
+			httpget.addHeader("content-type", "application/json; charset=UTF-8");
+
+			try (CloseableHttpResponse httpresponse = httpclient.execute(httpget)) {
+				return new BufferedReader(new InputStreamReader(httpresponse.getEntity().getContent()))
+					.lines()
+					.parallel()
+					.collect(Collectors.joining("\n"));
+			}
+		} catch (Exception ignored) {}
+		return null;
 	}
 
 	/* Logging */

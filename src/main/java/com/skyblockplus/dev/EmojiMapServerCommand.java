@@ -1,8 +1,8 @@
 package com.skyblockplus.dev;
 
-import static com.skyblockplus.utils.Utils.BOT_PREFIX;
-import static com.skyblockplus.utils.Utils.logCommand;
+import static com.skyblockplus.utils.Utils.*;
 
+import com.google.gson.JsonObject;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.entities.Emote;
@@ -21,17 +21,11 @@ public class EmojiMapServerCommand extends Command {
 			() -> {
 				logCommand(event.getGuild(), event.getAuthor(), BOT_PREFIX + "d-emojis");
 
-				StringBuilder ebString = new StringBuilder();
+				JsonObject toAdd = new JsonObject();
 				for (Emote emote : event.getGuild().getEmotes()) {
-					ebString
-						.append("emojiMap.put(\"")
-						.append(emote.getName())
-						.append("\", \"\\")
-						.append(emote.getAsMention())
-						.append("\");")
-						.append("\n");
+					toAdd.addProperty(emote.getName().toUpperCase(), emote.getAsMention());
 				}
-				event.reply(ebString.toString());
+				event.reply(makeHastePost(toAdd.toString()));
 			}
 		)
 			.start();
