@@ -33,7 +33,8 @@ public class NetworthExecute {
 		"none",
 		"redstone_torch_on",
 		"book",
-		""
+		"paper",
+		"vine"
 	);
 	private final Set<String> tempSet = new HashSet<>();
 	private final List<InvItem> invPets = new ArrayList<>();
@@ -861,7 +862,9 @@ public class NetworthExecute {
 		} catch (Exception ignored) {}
 
 		try {
-			if (item.isRecombobulated() && (itemCost * 2 >= recombPrice)) {}
+			if (item.isRecombobulated() && (itemCost * 2 >= recombPrice)) {
+				recombobulatedExtra = recombPrice;
+			}
 		} catch (Exception ignored) {}
 
 		try {

@@ -50,7 +50,7 @@ public class Utils {
 	public static final Color botColor = new Color(223, 5, 5);
 	public static final int globalCooldown = 4;
 	public static final ScriptEngine jsScriptEngine = new ScriptEngineManager().getEngineByName("js");
-	public static ScriptEngine es6ScriptEngine = new NashornScriptEngineFactory().getScriptEngine("--language=es6");
+	public static final ScriptEngine es6ScriptEngine = new NashornScriptEngineFactory().getScriptEngine("--language=es6");
 	public static String HYPIXEL_API_KEY = "";
 	public static String BOT_TOKEN = "";
 	public static String BOT_PREFIX = "";
@@ -62,17 +62,17 @@ public class Utils {
 	public static String API_USERNAME = "";
 	public static String API_PASSWORD = "";
 	public static String API_BASE_URL = "";
-	public static String DISCORD_SERVER_INVITE_LINK = "https://discord.gg/Z4Fn3eNDXT";
-	public static String BOT_INVITE_LINK_REQUIRED_NO_SLASH =
+	public static final String DISCORD_SERVER_INVITE_LINK = "https://discord.gg/Z4Fn3eNDXT";
+	public static final String BOT_INVITE_LINK_REQUIRED_NO_SLASH =
 		"https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403040368&scope=bot";
-	public static String BOT_INVITE_LINK_REQUIRED_SLASH =
+	public static final String BOT_INVITE_LINK_REQUIRED_SLASH =
 		"https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403040368&scope=bot%20applications.commands";
-	public static String FORUM_POST_LINK = "https://hypixel.net/threads/3980092";
+	public static final String FORUM_POST_LINK = "https://hypixel.net/threads/3980092";
 	public static MessageChannel botLogChannel;
 	public static JsonElement essenceCostsJson;
 	public static JsonElement levelingJson;
-	public static AtomicInteger remainingLimit = new AtomicInteger(120);
-	public static AtomicInteger timeTillReset = new AtomicInteger(0);
+	public static final AtomicInteger remainingLimit = new AtomicInteger(120);
+	public static final AtomicInteger timeTillReset = new AtomicInteger(0);
 	public static String GITHUB_TOKEN = "";
 	public static JsonElement collectionsJson;
 	public static JsonElement petUrlJson;
@@ -87,8 +87,8 @@ public class Utils {
 	public static JsonElement averageAuctionJson;
 	public static JsonElement bazaarJson;
 	public static JsonArray sbzPricesJson;
-	public static ConcurrentHashMap<String, HypixelKeyInformation> keyCooldownMap = new ConcurrentHashMap<>();
-	public static ConcurrentHashMap<String, HypixelGuildCache> hypixelGuildsCacheMap = new ConcurrentHashMap<>();
+	public static final ConcurrentHashMap<String, HypixelKeyInformation> keyCooldownMap = new ConcurrentHashMap<>();
+	public static final ConcurrentHashMap<String, HypixelGuildCache> hypixelGuildsCacheMap = new ConcurrentHashMap<>();
 	public static Instant lowestBinJsonLastUpdated = Instant.now();
 	public static Instant averageAuctionJsonLastUpdated = Instant.now();
 	public static Instant bazaarJsonLastUpdated = Instant.now();
@@ -117,15 +117,15 @@ public class Utils {
 		return emojiMap;
 	}
 
-	public static boolean getEmojiMap(boolean y) {
-		if (y) {
+	public static boolean getEmojiMap(boolean forceReload) {
+		if (forceReload) {
 			try {
 				emojiMap =
 					JsonParser.parseReader(new FileReader("src/main/java/com/skyblockplus/json/IdToEmojiMappings.json")).getAsJsonObject();
 			} catch (Exception ignored) {}
 		}
 
-		return (emojiMap != null) && y;
+		return emojiMap != null && forceReload;
 	}
 
 	public static JsonElement getAverageAuctionJson() {

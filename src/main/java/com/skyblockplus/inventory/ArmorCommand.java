@@ -15,12 +15,11 @@ import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
-public class InventoryCommand extends Command {
+public class ArmorCommand extends Command {
 
-	public InventoryCommand() {
-		this.name = "inventory";
+	public ArmorCommand() {
+		this.name = "armor";
 		this.cooldown = globalCooldown;
-		this.aliases = new String[] { "inv" };
 	}
 
 	@Override
@@ -34,39 +33,17 @@ public class InventoryCommand extends Command {
 
 				logCommand(event.getGuild(), event.getAuthor(), content);
 
-				if (((args.length == 3) && args[2].startsWith("slot")) || ((args.length == 4) && args[3].startsWith("slot"))) {
-					if (args.length == 4) {
-						eb = getPlayerInventoryList(args[1], args[2], args[3], event);
+				if (args.length == 2 || args.length == 3) {
+					if (args.length == 3) {
+						eb = getPlayerEquippedArmor(args[1], args[2], event);
 					} else {
-						eb = getPlayerInventoryList(args[1], null, args[2], event);
+						eb = getPlayerEquippedArmor(args[1], null, event);
 					}
 
 					if (eb == null) {
 						ebMessage.delete().queue();
 					} else {
 						ebMessage.editMessage(eb.build()).queue();
-					}
-					return;
-				} else if (args.length == 2 || args.length == 3) {
-					String[] playerInventory;
-					if (args.length == 3) {
-						playerInventory = getPlayerInventory(args[1], args[2]);
-					} else {
-						playerInventory = getPlayerInventory(args[1], null);
-					}
-
-					if (playerInventory != null) {
-						ebMessage.delete().queue();
-						ebMessage.getChannel().sendMessage(playerInventory[0]).queue();
-						ebMessage.getChannel().sendMessage(playerInventory[1]).queue();
-						if (playerInventory[2].length() > 0) {
-							ebMessage
-								.getChannel()
-								.sendMessage(defaultEmbed("Missing Items").setDescription(playerInventory[2]).build())
-								.queue();
-						}
-					} else {
-						ebMessage.editMessage(defaultEmbed("Error").setDescription("Unable to fetch player data").build()).queue();
 					}
 					return;
 				}
@@ -77,10 +54,10 @@ public class InventoryCommand extends Command {
 			.start();
 	}
 
-	private EmbedBuilder getPlayerInventoryList(String username, String profileName, String slotNum, CommandEvent event) {
+	private EmbedBuilder getPlayerEquippedArmor(String username, String profileName, CommandEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
-			Map<Integer, InvItem> inventoryMap = player.getInventoryMap();
+			Map<Integer, InvItem> inventoryMap = player.getInventoryArmorMap();
 			if (inventoryMap != null) {
 				List<String> pageTitles = new ArrayList<>();
 				List<String> pageThumbnails = new ArrayList<>();
@@ -93,12 +70,46 @@ public class InventoryCommand extends Command {
 					if (currentInvStruct == null) {
 						pageTitles.add("Empty");
 						pageThumbnails.add(null);
-						paginateBuilder.addItems("**Slot:** " + (currentInvSlot.getKey() + 1));
+
+						String slotName = "";
+						switch ((currentInvSlot.getKey())) {
+							case 4:
+								slotName = "Boots";
+								break;
+							case 3:
+								slotName = "Leggings";
+								break;
+							case 2:
+								slotName = "Chestplate";
+								break;
+							case 1:
+								slotName = "Helmet";
+								break;
+						}
+
+						paginateBuilder.addItems("**Slot:** " + slotName);
 					} else {
 						pageTitles.add(currentInvStruct.getName() + " x" + currentInvStruct.getCount());
 						pageThumbnails.add("https://sky.lea.moe/item.gif/" + currentInvStruct.getId());
 						String itemString = "";
-						itemString += "**Slot:** " + (currentInvSlot.getKey() + 1);
+
+						String slotName = "";
+						switch ((currentInvSlot.getKey())) {
+							case 4:
+								slotName = "Boots";
+								break;
+							case 3:
+								slotName = "Leggings";
+								break;
+							case 2:
+								slotName = "Chestplate";
+								break;
+							case 1:
+								slotName = "Helmet";
+								break;
+						}
+
+						itemString += "**Slot:** " + slotName;
 						itemString += "\n\n**Lore:**\n" + currentInvStruct.getLore();
 						if (currentInvStruct.isRecombobulated()) {
 							itemString += "\n(Recombobulated)";
@@ -110,25 +121,10 @@ public class InventoryCommand extends Command {
 				}
 				paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles).setThumbnails(pageThumbnails));
 
-				int slotNumber = 1;
-				try {
-					slotNumber = Integer.parseInt(slotNum.replace("slot:", ""));
-				} catch (Exception ignored) {}
-				paginateBuilder.build().paginate(event.getChannel(), slotNumber);
+				paginateBuilder.build().paginate(event.getChannel(), 0);
 				return null;
 			}
 		}
 		return defaultEmbed("Unable to fetch player data");
-	}
-
-	private String[] getPlayerInventory(String username, String profileName) {
-		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
-		if (player.isValid()) {
-			String[] temp = player.getInventory();
-			if (temp != null) {
-				return new String[] { temp[0], temp[1], player.invMissing };
-			}
-		}
-		return null;
 	}
 }

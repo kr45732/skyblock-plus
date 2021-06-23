@@ -13,6 +13,7 @@ public class SlayerCommand extends Command {
 
 	public SlayerCommand() {
 		this.name = "slayer";
+		this.aliases = new String[] { "slayers" };
 		this.cooldown = globalCooldown;
 	}
 

@@ -120,7 +120,8 @@ public class Main {
 			new UpdateSlashCommands(),
 			new PriceCommand(),
 			new EmojiFromUrlCommand(),
-			new GuildLeaderboardsCommand()
+			new GuildLeaderboardsCommand(),
+			new ArmorCommand()
 		);
 
 		SlashCommandClient slashCommands = new SlashCommandClient();

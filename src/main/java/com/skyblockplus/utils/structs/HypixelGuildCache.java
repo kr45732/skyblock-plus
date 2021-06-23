@@ -6,8 +6,8 @@ import java.util.List;
 
 public class HypixelGuildCache {
 
-	public Instant lastUpdated;
-	public List<String> membersCache;
+	public final Instant lastUpdated;
+	public final List<String> membersCache;
 
 	public HypixelGuildCache(Instant lastUpdated, List<String> membersCache) {
 		this.lastUpdated = lastUpdated;

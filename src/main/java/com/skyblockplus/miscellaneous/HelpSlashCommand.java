@@ -2,6 +2,7 @@ package com.skyblockplus.miscellaneous;
 
 import com.skyblockplus.utils.slashcommands.SlashCommand;
 import com.skyblockplus.utils.slashcommands.SlashCommandExecutedEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class HelpSlashCommand extends SlashCommand {
 
@@ -14,7 +15,10 @@ public class HelpSlashCommand extends SlashCommand {
 		new Thread(
 			() -> {
 				event.logCommandGuildUserCommand();
-				HelpCommand.getHelp(event.getOptionStrNotNull("page"), event.getMember(), null, event.getHook());
+				EmbedBuilder eb = HelpCommand.getHelp(event.getOptionStrNotNull("page"), event.getMember(), null, event.getHook());
+				if (eb != null) {
+					event.getHook().editOriginalEmbeds(eb.build()).queue();
+				}
 			}
 		)
 			.start();

@@ -14,7 +14,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class EvaluateCommand extends Command {
 
-	private String importString = "";
+	private StringBuilder importString = new StringBuilder();
 	private boolean inSession = false;
 	private GroovyShell shell = new GroovyShell();
 
@@ -45,15 +45,15 @@ public class EvaluateCommand extends Command {
 		String[] staticImports = { "com.skyblockplus.utils.Utils.*" };
 
 		for (String packageImport : packageImports) {
-			importString += "import " + packageImport + ".*\n";
+			importString.append("import ").append(packageImport).append(".*\n");
 		}
 
 		for (String classImport : classImports) {
-			importString += "import " + classImport + "\n";
+			importString.append("import ").append(classImport).append("\n");
 		}
 
 		for (String staticImport : staticImports) {
-			importString += "import static " + staticImport + "\n";
+			importString.append("import static ").append(staticImport).append("\n");
 		}
 	}
 
@@ -72,19 +72,20 @@ public class EvaluateCommand extends Command {
 					return;
 				}
 
-				if (args[1].equals("start_session()")) {
-					inSession = true;
-					shell = new GroovyShell();
-					ebMessage.editMessage("Session started with " + shell).queue();
-					return;
-				} else if (args[1].equals("end_session()")) {
-					inSession = false;
-					shell = new GroovyShell();
-					ebMessage.editMessage("Session ended with " + shell).queue();
-					return;
-				} else if (args[1].equals("get_session()")) {
-					ebMessage.editMessage(inSession ? "Session running with " + shell : "No session running").queue();
-					return;
+				switch (args[1]) {
+					case "start_session()":
+						inSession = true;
+						shell = new GroovyShell();
+						ebMessage.editMessage("Session started with " + shell).queue();
+						return;
+					case "end_session()":
+						inSession = false;
+						shell = new GroovyShell();
+						ebMessage.editMessage("Session ended with " + shell).queue();
+						return;
+					case "get_session()":
+						ebMessage.editMessage(inSession ? "Session running with " + shell : "No session running").queue();
+						return;
 				}
 
 				if (!inSession) {
@@ -112,7 +113,7 @@ public class EvaluateCommand extends Command {
 						shell.setProperty("member", jdaEvent.getMember());
 					}
 
-					String script = importString + arg;
+					String script = importString.toString() + arg;
 					Object out = shell.evaluate(script);
 
 					if (out == null) {

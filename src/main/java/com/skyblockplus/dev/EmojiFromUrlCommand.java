@@ -17,11 +17,24 @@ import net.dv8tion.jda.api.entities.Icon;
 
 public class EmojiFromUrlCommand extends Command {
 
+	public static final JsonObject addedObj = new JsonObject();
 	private final List<String> allowedUsers = Arrays.asList("385939031596466176", "409889861441421315");
-	public static JsonObject addedObj = new JsonObject();
 
 	public EmojiFromUrlCommand() {
 		this.name = "em";
+	}
+
+	public static JsonElement getSkyCryptItemsJson(String name) {
+		String websiteContent = getUrl("https://sky.shiiyu.moe/stats/" + name)
+			.split("const items = ")[1].split("const calculated =")[0].trim();
+		websiteContent = websiteContent.substring(0, websiteContent.length() - 1);
+
+		try {
+			return JsonParser.parseString(es6ScriptEngine.eval("JSON.stringify(" + websiteContent + ")").toString());
+		} catch (ScriptException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	@Override
@@ -97,18 +110,5 @@ public class EmojiFromUrlCommand extends Command {
 			}
 		)
 			.start();
-	}
-
-	public static JsonElement getSkyCryptItemsJson(String name) {
-		String websiteContent = getUrl("https://sky.shiiyu.moe/stats/" + name)
-			.split("const items = ")[1].split("const calculated =")[0].trim();
-		websiteContent = websiteContent.substring(0, websiteContent.length() - 1);
-
-		try {
-			return JsonParser.parseString(es6ScriptEngine.eval("JSON.stringify(" + websiteContent + ")").toString());
-		} catch (ScriptException e) {
-			e.printStackTrace();
-			return null;
-		}
 	}
 }

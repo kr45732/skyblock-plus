@@ -359,7 +359,7 @@ public class GuildCommand extends Command {
 						}
 						return;
 					}
-				} else if (args.length >= 3 && "info".equals(args[1])) {
+				} else if (args.length >= 3 && (args[1].equals("information") || args[1].equals("info"))) {
 					if (args[2].toLowerCase().startsWith("u:")) {
 						String usernameInfo = args[2].split(":")[1];
 						ebMessage.editMessage(getGuildInfo(usernameInfo).build()).queue();

@@ -24,9 +24,9 @@ import net.dv8tion.jda.api.interactions.InteractionHook;
 public class AuctionCommand extends Command {
 
 	public AuctionCommand() {
-		this.name = "auction";
+		this.name = "auctions";
 		this.cooldown = globalCooldown;
-		this.aliases = new String[] { "ah", "auctions" };
+		this.aliases = new String[] { "ah", "auction" };
 	}
 
 	public static EmbedBuilder getPlayerAuction(String username, User user, MessageChannel channel, InteractionHook hook) {
@@ -134,7 +134,7 @@ public class AuctionCommand extends Command {
 	public static EmbedBuilder getAuctionByUuid(String auctionUuid) {
 		JsonElement auctionJson = getJson("https://api.hypixel.net/skyblock/auction?key=" + HYPIXEL_API_KEY + "&uuid=" + auctionUuid);
 		if (higherDepth(auctionJson, "auctions").getAsJsonArray().size() == 0) {
-			return defaultEmbed("Error").setDescription("Invaid auction UUID");
+			return defaultEmbed("Error").setDescription("Invalid auction UUID");
 		}
 
 		auctionJson = higherDepth(auctionJson, "auctions").getAsJsonArray().get(0);

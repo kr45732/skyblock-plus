@@ -2,20 +2,10 @@ package com.skyblockplus.dev;
 
 import static com.skyblockplus.utils.Utils.*;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.stream.Collectors;
-import javax.script.ScriptException;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 
 public class PlaceholderCommand extends Command {
 

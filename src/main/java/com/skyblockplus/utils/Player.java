@@ -1142,10 +1142,10 @@ public class Player {
 	}
 
 	public String itemToEmoji(String itemName) {
-		itemName = itemName.replace("starred_", "");
+		itemName = itemName.toUpperCase();
 
 		try {
-			getEmojiMap().get(itemName).getAsString();
+			return getEmojiMap().get(itemName).getAsString();
 		} catch (Exception ignored) {}
 
 		if (!invMissing.contains(itemName)) {

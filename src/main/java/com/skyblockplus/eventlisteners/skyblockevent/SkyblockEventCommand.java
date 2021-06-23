@@ -76,16 +76,16 @@ public class SkyblockEventCommand extends Command {
 
 			ArrayList<String> prizeListKeys = getJsonKeys(higherDepth(runningEventSettings, "prizeMap"));
 			for (int i = 0; i < prizeListKeys.size(); i++) {
-				paginateBuilder.addItems(
-					(i + 1) +
-					") " +
-					higherDepth(runningEventSettings, "prizeMap." + prizeListKeys.get(i)).getAsString() +
-					" - " +
-					fixUsername(guildMemberPlayersList.get(i).getUsername()) +
-					" (" +
-					guildMemberPlayersList.get(i).getUuid() +
-					")"
-				);
+				try {
+					paginateBuilder.addItems(
+						"`" +
+						(i + 1) +
+						")` " +
+						higherDepth(runningEventSettings, "prizeMap." + prizeListKeys.get(i)).getAsString() +
+						" - " +
+						fixUsername(guildMemberPlayersList.get(i).getUsername())
+					);
+				} catch (Exception ignored) {}
 			}
 
 			if (paginateBuilder.getItemsSize() > 0) {
@@ -263,7 +263,12 @@ public class SkyblockEventCommand extends Command {
 									.sendMessage("❌ You must have the Administrator permission in this Guild to use that!")
 									.queue();
 							} else {
-								ebMessage.editMessage(createSkyblockEvent(event).build()).queue();
+								eb = createSkyblockEvent(event);
+								if (eb == null) {
+									ebMessage.delete().queue();
+								} else {
+									ebMessage.editMessage(eb.build()).queue();
+								}
 							}
 							return;
 						case "current":
@@ -478,7 +483,7 @@ public class SkyblockEventCommand extends Command {
 										if (player.getTotalSkillsXp() == -1) {
 											startingAmount = -1;
 										}
-										startingAmountFormatted = formatNumber(startingAmount) + " total weight";
+										startingAmountFormatted = formatNumber(startingAmount) + " weight";
 										break;
 									}
 							}
@@ -492,13 +497,11 @@ public class SkyblockEventCommand extends Command {
 								if (code == 200) {
 									return defaultEmbed("Success")
 										.setDescription(
-											"You have joined the " +
-											eventType +
-											" Skyblock event as " +
+											"Joined the Skyblock event!\nUsername: " +
 											username +
-											" on profile " +
+											"\nProfile: " +
 											player.getProfileName() +
-											" with a starting amount of " +
+											"\nStarting amount: " +
 											startingAmountFormatted
 										);
 								} else {
@@ -583,8 +586,7 @@ public class SkyblockEventCommand extends Command {
 		boolean sbEventActive = database.getSkyblockEventActive(event.getGuild().getId());
 		if (guildMap.containsKey(event.getGuild().getId()) && !sbEventActive) {
 			guildMap.get(event.getGuild().getId()).createSkyblockEvent(event);
-			return defaultEmbed("Create a Skyblock competition")
-				.setDescription("Please enter the name of the guild you want to track\nTo cancel type `exit`");
+			return null;
 		} else if (sbEventActive) {
 			return defaultEmbed("Error").setDescription("Event already running");
 		}

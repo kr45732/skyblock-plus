@@ -505,11 +505,7 @@ public class AutomaticGuild {
 			return;
 		}
 
-		String s = skyblockEvent.onGuildMessageReceived(event);
-		if (s.equals("delete")) {
-			skyblockEvent.scheduler.shutdownNow();
-			skyblockEvent = new SkyblockEvent();
-		}
+		skyblockEvent.onGuildMessageReceived(event);
 	}
 
 	public boolean mee6BypasserRanks(GuildMessageReceivedEvent event) {
@@ -584,6 +580,9 @@ public class AutomaticGuild {
 	}
 
 	public void createSkyblockEvent(CommandEvent event) {
+		if (skyblockEvent != null && skyblockEvent.scheduler != null) {
+			skyblockEvent.scheduler.shutdownNow();
+		}
 		skyblockEvent = new SkyblockEvent(event);
 	}
 
@@ -617,5 +616,9 @@ public class AutomaticGuild {
 		if (scheduler != null) {
 			scheduler.shutdownNow();
 		}
+	}
+
+	public void setSkyblockEvent(SkyblockEvent skyblockEvent) {
+		this.skyblockEvent = skyblockEvent;
 	}
 }

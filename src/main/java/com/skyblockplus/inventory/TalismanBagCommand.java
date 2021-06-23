@@ -23,6 +23,7 @@ public class TalismanBagCommand extends Command {
 	public TalismanBagCommand() {
 		this.name = "talisman";
 		this.cooldown = globalCooldown;
+		this.aliases = new String[] { "talismans" };
 	}
 
 	@Override

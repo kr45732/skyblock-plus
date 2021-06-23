@@ -17,10 +17,10 @@ import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
 public class ApplyGuild {
 
-	public List<ApplyUser> applyUserList;
-	public Message reactMessage;
-	public JsonElement currentSettings;
-	public boolean enable = true;
+	public final List<ApplyUser> applyUserList;
+	public final Message reactMessage;
+	public final JsonElement currentSettings;
+	public final boolean enable = true;
 	public TextChannel waitInviteChannel = null;
 
 	public ApplyGuild(Message reactMessage, JsonElement currentSettings) {
