@@ -1,4 +1,4 @@
-package com.skyblockplus.miscellaneous;
+package com.skyblockplus.help;
 
 import static com.skyblockplus.utils.Utils.*;
 
@@ -15,14 +15,14 @@ public class HelpData {
 	private final List<String> aliases = new ArrayList<>();
 	private final List<String> examples = new ArrayList<>();
 	private final List<HelpData> subcommands = new ArrayList<>();
+	private boolean ignoreSuperCommand;
 	private HelpData superCommand;
-	private boolean showSelf = false;
 	private String secondDescription;
 	private String secondUsage;
 
-	public HelpData(String name, String description, String usage, boolean showSelf) {
+	public HelpData(String name, String description, String usage, boolean ignoreSuperCommand) {
 		this(name, description, usage);
-		this.showSelf = showSelf;
+		this.ignoreSuperCommand = ignoreSuperCommand;
 	}
 
 	public HelpData(String name, String description) {
@@ -51,7 +51,7 @@ public class HelpData {
 
 	public EmbedBuilder getHelp(String subcommandName) {
 		if (subcommandName != null) {
-			HelpData subcommand = subcommands.stream().filter(cmd -> cmd.matchTo(subcommandName)).findFirst().orElse(null);
+			HelpData subcommand = subcommands.stream().filter(cmd -> cmd.matchTo(subcommandName.split(" ")[0])).findFirst().orElse(null);
 			if (subcommand != null) {
 				return subcommand.getHelp(subcommandName.split(" ", 2).length == 2 ? subcommandName.split(" ", 2)[1] : null);
 			}
@@ -79,27 +79,43 @@ public class HelpData {
 	}
 
 	public String getUsage() {
-		if (superCommand != null) {
+		if (superCommand != null && !ignoreSuperCommand) {
 			return superCommand.getUsage() + " " + usage;
 		}
 
 		return usage;
 	}
 
-	public String getUsage(String usage) {
-		if (superCommand != null) {
-			return superCommand.getUsage() + " " + usage;
+	public String getSecondUsage(HelpData command) {
+		if (command.superCommand != null) {
+			return command.superCommand.getUsage() + " " + command.secondUsage;
 		}
 
-		return usage;
+		return command.secondUsage;
 	}
 
 	public String getUsageFormatted() {
-		if (subcommands.size() == 0) {
-			return "`" + BOT_PREFIX + getUsage() + "`" + (secondUsage != null ? "\n`" + BOT_PREFIX + getUsage(secondUsage) + "`" : "");
+		return getUsageFormatted(this);
+	}
+
+	public String getUsageFormatted(HelpData command) {
+		if (command.subcommands.size() == 0) {
+			return (
+				"`" +
+				BOT_PREFIX +
+				command.getUsage() +
+				"`" +
+				(command.secondUsage != null ? "\n`" + BOT_PREFIX + getSecondUsage(command) + "`" : "")
+			);
 		}
 
-		return (showSelf ? "`" + BOT_PREFIX + getUsage() + "\n" : "") + "`" + BOT_PREFIX + getUsage() + " [subcommand]`";
+		return (
+			"`" +
+			BOT_PREFIX +
+			command.getUsage() +
+			" [subcommand]`" +
+			(command.secondUsage != null ? "\n`" + BOT_PREFIX + getSecondUsage(command) + "`" : "")
+		);
 	}
 
 	public String getSubcommands() {
@@ -109,7 +125,7 @@ public class HelpData {
 				subcommandsStr.append("\n");
 			}
 
-			subcommandsStr.append("`").append(BOT_PREFIX).append(name).append(" ").append(subcommands.get(i).usage).append("`");
+			subcommandsStr.append(getUsageFormatted(subcommands.get(i)));
 		}
 
 		return subcommandsStr.toString();
@@ -155,7 +171,7 @@ public class HelpData {
 			examplesStr
 				.append("`")
 				.append(BOT_PREFIX)
-				.append(superCommand != null ? superCommand.getUsage() + " " : "")
+				.append(superCommand != null && !ignoreSuperCommand ? superCommand.getUsage() + " " : "")
 				.append(examples.get(i))
 				.append("`");
 		}

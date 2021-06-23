@@ -399,7 +399,7 @@ public class SkyblockEventCommand extends Command {
 					}
 				}
 
-				ebMessage.editMessage(errorMessage(this.name).build()).queue();
+				ebMessage.editMessage(errorEmbed(this.name).build()).queue();
 			}
 		)
 			.start();

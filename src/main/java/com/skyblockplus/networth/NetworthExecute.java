@@ -171,7 +171,7 @@ public class NetworthExecute {
 					return;
 				}
 
-				ebMessage.editMessage(errorMessage("networth").build()).queue();
+				ebMessage.editMessage(errorEmbed("networth").build()).queue();
 			}
 		)
 			.start();

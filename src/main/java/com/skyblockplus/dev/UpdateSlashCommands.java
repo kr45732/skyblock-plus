@@ -54,7 +54,7 @@ public class UpdateSlashCommands extends Command {
 					}
 				}
 
-				event.getChannel().sendMessage(errorMessage(name).build()).queue();
+				event.getChannel().sendMessage(errorEmbed(name).build()).queue();
 			}
 		)
 			.start();

@@ -224,7 +224,7 @@ public class BinCommand extends Command {
 					return;
 				}
 
-				ebMessage.editMessage(errorMessage(this.name).build()).queue();
+				ebMessage.editMessage(errorEmbed(this.name).build()).queue();
 			}
 		)
 			.start();

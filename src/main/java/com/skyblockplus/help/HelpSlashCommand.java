@@ -1,4 +1,4 @@
-package com.skyblockplus.miscellaneous;
+package com.skyblockplus.help;
 
 import com.skyblockplus.utils.slashcommands.SlashCommand;
 import com.skyblockplus.utils.slashcommands.SlashCommandExecutedEvent;
@@ -15,7 +15,7 @@ public class HelpSlashCommand extends SlashCommand {
 		new Thread(
 			() -> {
 				event.logCommandGuildUserCommand();
-				EmbedBuilder eb = HelpCommand.getHelp(event.getOptionStrNotNull("page"), event.getMember(), null, event.getHook());
+				EmbedBuilder eb = HelpCommand.getHelp(event.getOptionStr("page"), event.getMember(), null, event.getHook());
 				if (eb != null) {
 					event.getHook().editOriginalEmbeds(eb.build()).queue();
 				}

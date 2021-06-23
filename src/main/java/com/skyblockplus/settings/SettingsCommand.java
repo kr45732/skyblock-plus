@@ -49,28 +49,22 @@ public class SettingsCommand extends Command {
 				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
 				String content = event.getMessage().getContentRaw();
 				String[] args = content.split(" ");
+				eb = null;
 
 				if (!content.contains("hypixel_key")) {
 					logCommand(event.getGuild(), event.getAuthor(), content);
 				}
 
-				JsonElement currentSettings = database.getServerSettings(event.getGuild().getId());
-				if (higherDepth(currentSettings, "serverId") == null) {
+				if (!database.serverByServerIdExists(event.getGuild().getId())) {
 					database.addNewServerSettings(
 						event.getGuild().getId(),
 						new ServerSettingsModel(event.getGuild().getName(), event.getGuild().getId())
 					);
-					currentSettings = database.getServerSettings(event.getGuild().getId());
 				}
+				JsonElement currentSettings = database.getServerSettings(event.getGuild().getId());
 
-				if (args.length == 4 && args[2].equals("hypixel_key")) {
-					if (args[1].equals("set")) {
-						eb = setHypixelKey(args[3]);
-					} else if (args[1].equals("delete")) {
-						eb = deleteHypixelKey();
-					} else {
-						eb = defaultEmbed("Invalid setting");
-					}
+				if (args.length == 4 && args[1].equals("set") && args[2].equals("hypixel_key")) {
+					eb = setHypixelKey(args[3]);
 				} else if (args.length >= 2 && args[1].equals("mee6")) {
 					if (args.length == 2) {
 						eb = getMee6DataSettings();
@@ -79,77 +73,52 @@ public class SettingsCommand extends Command {
 							eb = setMee6Enable(true);
 						} else if (args[2].equals("disable")) {
 							eb = setMee6Enable(false);
-						} else {
-							eb = defaultEmbed("Invalid setting");
 						}
 					} else if (args.length == 4 && args[2].equals("remove")) {
 						eb = removeMee6Role(args[3]);
 					} else if (args.length == 5 && args[2].equals("add")) {
 						eb = addMee6Role(args[3], args[4]);
-					} else {
-						eb = defaultEmbed("Invalid setting");
 					}
-				} else if ((args.length == 3) && (args[1].equals("delete"))) {
-					if (args[2].equals("--confirm")) {
+
+					if (eb == null) {
+						eb = errorEmbed("settings mee6");
+					}
+				} else if (args.length == 3 && args[1].equals("delete")) {
+					if (args[2].equals("all")) {
 						if (database.deleteServerSettings(event.getGuild().getId()) == 200) {
-							ebMessage.editMessage(defaultEmbed("Success").setDescription("Server settings deleted").build()).queue();
+							eb = defaultEmbed("Success").setDescription("Server settings deleted");
 						} else {
-							ebMessage.editMessage(defaultEmbed("Error").setDescription("Error deleting server settings").build()).queue();
+							eb = defaultEmbed("Error").setDescription("Error deleting server settings");
 						}
-					} else {
-						ebMessage
-							.editMessage(
-								defaultEmbed("Error")
-									.setDescription(
-										"To confirm deleting the server settings rerun this command with the `--confirm` flag (`" +
-										BOT_PREFIX +
-										"settings delete --confirm`)"
-									)
-									.build()
-							)
-							.queue();
+					} else if (args[2].equals("hypixel_key")) {
+						eb = deleteHypixelKey();
 					}
-					return;
+
+					if (eb == null) {
+						eb = errorEmbed("settings delete");
+					}
 				} else if (args.length == 1) {
-					eb = defaultEmbed("Settings for " + event.getGuild().getName());
-
-					if (higherDepth(currentSettings, "automatedVerify") != null) {
-						eb.addField("Verify Settings", "Use `" + BOT_PREFIX + "settings verify` to see the current verify settings", false);
-					} else {
-						eb.addField("Verify Settings", "Error! Data not found", false);
-					}
-
-					eb.addField("Apply Settings", "Use `" + BOT_PREFIX + "settings apply` to see all apply settings", false);
-
-					if (higherDepth(currentSettings, "automatedRoles") != null) {
-						eb.addField("Roles Settings", "Use `" + BOT_PREFIX + "settings roles` to see the current roles settings", false);
-					} else {
-						eb.addField("Roles Settings", "Error! Data not found", false);
-					}
-
-					eb.addField(
-						"Guild Role Settings",
-						"Use `" + BOT_PREFIX + "settings guild` to see all guild role/ranks settings",
-						false
-					);
+					eb = defaultEmbed("Settings");
+					eb.addField("Verify Settings", "Use `" + BOT_PREFIX + "settings verify` to see the current settings", false);
+					eb.addField("Apply Settings", "Use `" + BOT_PREFIX + "settings apply` to see the current settings", false);
+					eb.addField("Roles Settings", "Use `" + BOT_PREFIX + "settings roles` to see the current settings", false);
+					eb.addField("Guild Role/Ranks Settings", "Use `" + BOT_PREFIX + "settings guild` to see the current settings", false);
+					eb.addField("Mee6 Roles Settings", "Use `" + BOT_PREFIX + "settings mee6` to see the current settings", false);
 				} else if (args.length >= 2 && args[1].equals("roles")) {
 					if (args.length == 2) {
-						eb = defaultEmbed("Settings for " + event.getGuild().getName());
 						if (higherDepth(currentSettings, "automatedRoles") != null) {
 							ebMessage.delete().queue();
-							getCurrentRolesSettings(higherDepth(currentSettings, "automatedRoles"))
-								.build()
-								.paginate(ebMessage.getChannel(), 0);
+							getCurrentRolesSettings(higherDepth(currentSettings, "automatedRoles")).build().paginate(event.getChannel(), 0);
 							return;
 						} else {
-							eb.addField("Roles Settings", "Error! Data not found", false);
+							eb = defaultEmbed("Settings").addField("Roles Settings", "Error! Data not found", false);
 						}
 					} else if (args.length == 3) {
 						if (args[2].equals("enable")) {
 							if (allowRolesEnable()) {
 								eb = setRolesEnable("true");
 							} else {
-								eb = defaultEmbed("Error").setDescription("No roles set!");
+								eb = defaultEmbed("Error").setDescription("No roles enabled");
 							}
 						} else if (args[2].equals("disable")) {
 							eb = setRolesEnable("false");
@@ -165,8 +134,6 @@ public class SettingsCommand extends Command {
 							eb = setRoleEnable(args[3], "true");
 						} else if (args[2].equals("disable")) {
 							eb = setRoleEnable(args[3], "false");
-						} else {
-							eb = defaultEmbed("Error").setDescription("Invalid setting");
 						}
 					} else if (args.length == 5) {
 						if (args[2].equals("stackable") && args[4].equals("true")) {
@@ -179,21 +146,18 @@ public class SettingsCommand extends Command {
 							eb = setOneLevelRole(args[3], args[4]);
 						} else if (args[2].equals("add") && args[3].equals("guild_ranks")) {
 							eb = addRoleLevel(args[3], args[4], null);
-						} else {
-							eb = defaultEmbed("Error").setDescription("Invalid setting");
 						}
 					} else if (args.length == 6 && args[2].equals("add")) {
 						eb = addRoleLevel(args[3], args[4], args[5]);
-					} else {
-						eb = defaultEmbed("Error", null).setDescription("Invalid setting");
 					}
 
-					ebMessage.editMessage(eb.build()).queue();
-					return;
+					if (eb == null) {
+						eb = errorEmbed("settings roles");
+					}
 				} else if (content.split(" ", 5).length >= 2 && content.split(" ", 5)[1].equals("apply")) {
 					args = content.split(" ", 5);
 					if (args.length == 2) {
-						eb = defaultEmbed("All Apply Settings");
+						eb = defaultEmbed("Settings");
 						eb.addField(
 							"Automatic Apply One",
 							(
@@ -230,8 +194,6 @@ public class SettingsCommand extends Command {
 						JsonElement applySettings = database.getApplySettings(event.getGuild().getId(), args[2]);
 						if (applySettings != null && !applySettings.isJsonNull()) {
 							eb = getCurrentApplySettings(applySettings);
-						} else {
-							eb = defaultEmbed("Error").setDescription("Invalid name");
 						}
 					} else if (args.length == 4) {
 						if (args[2].equals("create")) {
@@ -251,18 +213,12 @@ public class SettingsCommand extends Command {
 									}
 								} else if (args[3].equals("disable")) {
 									eb = setApplyEnable(args[2], "false");
-								} else {
-									eb = defaultEmbed("Error", null).setDescription("Invalid setting");
 								}
-							} else {
-								eb = defaultEmbed("Error").setDescription("Invalid name");
 							}
 						}
 					} else if (args.length == 5) {
 						JsonElement applySettings = database.getApplySettings(event.getGuild().getId(), args[2]);
-						if (applySettings == null || applySettings.isJsonNull()) {
-							eb = defaultEmbed("Error", null).setDescription("Invalid name");
-						} else {
+						if (applySettings != null && !applySettings.isJsonNull()) {
 							switch (args[3]) {
 								case "message":
 									eb = setApplyMessageText(args[2], args[4]);
@@ -295,17 +251,12 @@ public class SettingsCommand extends Command {
 								case "req":
 								case "requirements":
 									args = content.split(" ");
-
 									if (args.length >= 6) {
 										if (args[4].equals("add")) {
 											eb = addApplyRequirement(args[2], content.split(" ", 6)[5]);
 										} else if (args[4].equals("remove")) {
 											eb = removeApplyRequirement(args[2], args[5]);
-										} else {
-											eb = defaultEmbed("Error").setDescription("Invalid setting");
 										}
-									} else {
-										eb = defaultEmbed("Error").setDescription("Invalid setting");
 									}
 									break;
 								case "ironman":
@@ -314,16 +265,17 @@ public class SettingsCommand extends Command {
 								case "waiting_channel":
 									eb = setWaitingChannel(args[2], args[4]);
 									break;
-								default:
-									eb = defaultEmbed("Error", null).setDescription("Invalid setting");
-									break;
 							}
 						}
+					}
+
+					if (eb == null) {
+						eb = errorEmbed("settings apply");
 					}
 				} else if (content.split(" ", 4).length >= 2 && content.split(" ", 4)[1].equals("verify")) {
 					args = content.split(" ", 4);
 					if (args.length == 2) {
-						eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+						eb = defaultEmbed("Settings");
 						if (higherDepth(currentSettings, "automatedVerify") != null) {
 							eb.addField(
 								"Verify Settings",
@@ -344,8 +296,6 @@ public class SettingsCommand extends Command {
 							}
 						} else if (args[2].equals("disable")) {
 							eb = setVerifyEnable("false");
-						} else {
-							eb = defaultEmbed("Error", null).setDescription("Invalid setting");
 						}
 					} else if (args.length == 4) {
 						switch (args[2]) {
@@ -368,14 +318,15 @@ public class SettingsCommand extends Command {
 									eb = defaultEmbed("Error").setDescription("Invalid setting");
 								}
 								break;
-							default:
-								eb = defaultEmbed("Error", null).setDescription("Invalid setting");
-								break;
 						}
+					}
+
+					if (eb == null) {
+						eb = errorEmbed("settings verify");
 					}
 				} else if ((args.length >= 2) && args[1].equals("guild")) {
 					if (args.length == 2) {
-						eb = defaultEmbed("All Guild Roles Settings");
+						eb = defaultEmbed("Settings");
 						eb.addField(
 							"Guild Roles One",
 							(
@@ -409,7 +360,7 @@ public class SettingsCommand extends Command {
 							false
 						);
 					} else if (args.length == 3) {
-						eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+						eb = defaultEmbed("Settings");
 						JsonElement guildRoleSettings = database.getGuildRoleSettings(event.getGuild().getId(), args[2]);
 						if (guildRoleSettings != null && !guildRoleSettings.isJsonNull()) {
 							eb.addField("Guild Role Settings", getCurrentGuildRoleSettings(guildRoleSettings), false);
@@ -419,14 +370,10 @@ public class SettingsCommand extends Command {
 					} else if (args.length == 4) {
 						if (args[2].equals("create")) {
 							eb = createGuildRoles(args[3]);
-						} else {
-							eb = defaultEmbed("Error").addField("Guild Role Settings", "Invalid Settings", false);
 						}
 					} else if (args.length == 5) {
 						JsonElement guildRoleSettings = database.getGuildRoleSettings(event.getGuild().getId(), args[2]);
-						if (guildRoleSettings == null || guildRoleSettings.isJsonNull()) {
-							eb = defaultEmbed("Error", null).setDescription("Invalid name");
-						} else {
+						if (guildRoleSettings != null && !guildRoleSettings.isJsonNull()) {
 							switch (args[3]) {
 								case "set":
 									eb = setGuildRoleId(args[2], args[4]);
@@ -439,8 +386,6 @@ public class SettingsCommand extends Command {
 										eb = setGuildRoleEnable(args[2], "true");
 									} else if (args[4].equals("rank")) {
 										eb = setGuildRankEnable(args[2], "true");
-									} else {
-										eb = defaultEmbed("Error").setDescription("Invalid setting");
 									}
 									break;
 								case "disable":
@@ -448,15 +393,10 @@ public class SettingsCommand extends Command {
 										eb = setGuildRoleEnable(args[4], "false");
 									} else if (args[4].equals("rank")) {
 										eb = setGuildRankEnable(args[4], "false");
-									} else {
-										eb = defaultEmbed("Error").setDescription("Invalid setting");
 									}
 									break;
 								case "remove":
 									eb = removeGuildRank(args[2], args[4]);
-									break;
-								default:
-									eb = defaultEmbed("Error").setDescription("Invalid setting");
 									break;
 							}
 						}
@@ -466,14 +406,16 @@ public class SettingsCommand extends Command {
 							eb = defaultEmbed("Error", null).setDescription("Invalid name");
 						} else if (args[3].equals("add")) {
 							eb = addGuildRank(args[2], args[4], args[5]);
-						} else {
-							eb = defaultEmbed("Error").setDescription("Invalid setting");
 						}
-					} else {
-						eb = defaultEmbed("Error").setDescription("Invalid setting");
 					}
-				} else {
-					eb = defaultEmbed("Error", null).setDescription("Invalid setting");
+
+					if (eb == null) {
+						eb = errorEmbed("settings guild");
+					}
+				}
+
+				if (eb == null) {
+					eb = errorEmbed("settings");
 				}
 
 				ebMessage.editMessage(eb.build()).queue();
@@ -494,9 +436,9 @@ public class SettingsCommand extends Command {
 		int responseCode = database.setServerHypixelApiKey(event.getGuild().getId(), newKey);
 
 		if (responseCode == 200) {
-			return defaultEmbed("Settings for " + event.getGuild().getName())
+			return defaultEmbed("Settings")
 				.setDescription(
-					"Set the Hypixel API key. Note that the set API key cannot be viewed for privacy. Your message was also deleted for your privacy."
+					"Set the Hypixel API key. Note that you cannot view the set API key cannot be viewed for the privacy of the key owner."
 				);
 		}
 
@@ -507,7 +449,7 @@ public class SettingsCommand extends Command {
 		int responseCode = database.setServerHypixelApiKey(event.getGuild().getId(), "");
 
 		if (responseCode == 200) {
-			return defaultEmbed("Settings for " + event.getGuild().getName()).setDescription("Deleted the set Hypixel API key");
+			return defaultEmbed("Settings").setDescription("Deleted the set Hypixel API key");
 		}
 
 		return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
@@ -517,8 +459,7 @@ public class SettingsCommand extends Command {
 		if (database.getApplySettings(event.getGuild().getId(), name) != null) {
 			int responseCode = database.removeApplySettings(event.getGuild().getId(), name);
 			if (responseCode == 200) {
-				return defaultEmbed("Settings for " + event.getGuild().getName())
-					.setDescription("Apply settings with name `" + name + "` was deleted");
+				return defaultEmbed("Settings").setDescription("Apply settings with name `" + name + "` was deleted");
 			}
 
 			return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
@@ -556,7 +497,7 @@ public class SettingsCommand extends Command {
 			updateVerifySettings("enable", "false");
 		}
 
-		EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName());
+		EmbedBuilder eb = defaultEmbed("Settings");
 		return eb.setDescription("**Removed verify role:** " + verifyRole.getAsMention());
 	}
 
@@ -572,8 +513,8 @@ public class SettingsCommand extends Command {
 		}
 
 		JsonArray currentVerifyRoles = higherDepth(database.getVerifySettings(event.getGuild().getId()), "verifiedRoles").getAsJsonArray();
-		if (currentVerifyRoles.size() == 5) {
-			return defaultEmbed("You have reached the max number of verify roles (5/5)");
+		if (currentVerifyRoles.size() >= 3) {
+			return defaultEmbed("You have reached the max number of verify roles (3/3)");
 		}
 
 		currentVerifyRoles.add(verifyRole.getId());
@@ -583,7 +524,7 @@ public class SettingsCommand extends Command {
 			return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
 		}
 
-		EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+		EmbedBuilder eb = defaultEmbed("Settings");
 		return eb.setDescription("**Verify role added:** " + verifyRole.getAsMention());
 	}
 
@@ -626,7 +567,7 @@ public class SettingsCommand extends Command {
 			return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 		}
 
-		EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName());
+		EmbedBuilder eb = defaultEmbed("Settings");
 		eb.setDescription("Guild role " + (enable.equals("true") ? "enabled" : "disabled"));
 		return eb;
 	}
@@ -644,10 +585,10 @@ public class SettingsCommand extends Command {
 		currentSettings.addProperty("enableGuildRanks", enable);
 		int responseCode = database.setGuildRoleSettings(event.getGuild().getId(), currentSettings);
 		if (responseCode != 200) {
-			return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
+			return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
 		}
 
-		EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName());
+		EmbedBuilder eb = defaultEmbed("Settings");
 		eb.setDescription("Guild ranks " + (enable.equals("true") ? "enabled" : "disabled"));
 		return eb;
 	}
@@ -660,7 +601,7 @@ public class SettingsCommand extends Command {
 				return defaultEmbed("Error").setDescription("Role cannot be managed or @everyone");
 			}
 		} catch (Exception e) {
-			return defaultEmbed("Invalid Role", null);
+			return defaultEmbed("Invalid Role");
 		}
 
 		JsonObject currentSettings = database.getGuildRoleSettings(event.getGuild().getId(), name).getAsJsonObject();
@@ -703,7 +644,7 @@ public class SettingsCommand extends Command {
 					return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 				}
 
-				EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+				EmbedBuilder eb = defaultEmbed("Settings");
 				eb.setDescription(
 					"**Guild rank added:** " + higherDepth(guildRank, "name").getAsString() + " - " + guildRankRole.getAsMention()
 				);
@@ -737,7 +678,7 @@ public class SettingsCommand extends Command {
 					return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 				}
 
-				EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+				EmbedBuilder eb = defaultEmbed("Settings");
 				eb.setDescription("**Guild rank removed:** " + rankName);
 				return eb;
 			}
@@ -760,7 +701,7 @@ public class SettingsCommand extends Command {
 				return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 			}
 
-			EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+			EmbedBuilder eb = defaultEmbed("Settings");
 			eb.setDescription("**Guild set to:** " + higherDepth(guildJson, "guild.name").getAsString());
 			return eb;
 		} catch (Exception e) {
@@ -781,7 +722,7 @@ public class SettingsCommand extends Command {
 					return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 				}
 
-				EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+				EmbedBuilder eb = defaultEmbed("Settings");
 				eb.setDescription("**Guild role set to:** " + verifyGuildRole.getAsMention());
 				return eb;
 			}
@@ -814,7 +755,7 @@ public class SettingsCommand extends Command {
 			return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
 		}
 
-		EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName());
+		EmbedBuilder eb = defaultEmbed("Settings");
 		eb.setDescription("Created new guild role with name `" + name + "`");
 		return eb;
 	}
@@ -1128,7 +1069,7 @@ public class SettingsCommand extends Command {
 				return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 			}
 
-			EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+			EmbedBuilder eb = defaultEmbed("Settings");
 			eb.setDescription("**Roles:** " + (enable.equalsIgnoreCase("true") ? "enabled" : "disabled"));
 			return eb;
 		}
@@ -1153,7 +1094,7 @@ public class SettingsCommand extends Command {
 				return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 			}
 
-			EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+			EmbedBuilder eb = defaultEmbed("Settings");
 			eb.setDescription("**" + roleName + " role:** " + (enable.equalsIgnoreCase("true") ? "enabled" : "disabled"));
 			return eb;
 		} else {
@@ -1209,8 +1150,7 @@ public class SettingsCommand extends Command {
 					return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 				}
 
-				return defaultEmbed("Settings for " + event.getGuild().getName(), null)
-					.setDescription("Added guild ranks for guild roles with name `" + roleValue + "`");
+				return defaultEmbed("Settings").setDescription("Added guild ranks for guild roles with name `" + roleValue + "`");
 			}
 
 			return defaultEmbed("Error").setDescription("Invalid guild role name or guild ranks not enabled");
@@ -1282,8 +1222,7 @@ public class SettingsCommand extends Command {
 			roleValue = guildName;
 		}
 
-		return defaultEmbed("Settings for " + event.getGuild().getName(), null)
-			.setDescription(roleName + " " + roleValue + " set to " + role.getAsMention());
+		return defaultEmbed("Settings").setDescription(roleName + " " + roleValue + " set to " + role.getAsMention());
 	}
 
 	private EmbedBuilder removeRoleLevel(String roleName, String value) {
@@ -1327,7 +1266,7 @@ public class SettingsCommand extends Command {
 					setRolesEnable("false");
 				}
 
-				return defaultEmbed("Settings for " + event.getGuild().getName(), null).setDescription(roleName + " " + value + " removed");
+				return defaultEmbed("Settings").setDescription(roleName + " " + value + " removed");
 			}
 		}
 		return defaultEmbed("Error", null).setDescription("Invalid role value");
@@ -1351,7 +1290,7 @@ public class SettingsCommand extends Command {
 			return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 		}
 
-		EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+		EmbedBuilder eb = defaultEmbed("Settings");
 		eb.setDescription("**" + roleName + " role:** " + (stackable.equalsIgnoreCase("true") ? "stackable" : "not stackable"));
 		return eb;
 	}
@@ -1397,7 +1336,7 @@ public class SettingsCommand extends Command {
 			return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 		}
 
-		return defaultEmbed("Settings for " + event.getGuild().getName(), null).setDescription(roleName + " set to " + role.getAsMention());
+		return defaultEmbed("Settings").setDescription(roleName + " set to " + role.getAsMention());
 	}
 
 	private boolean isOneLevelRole(String roleName) {
@@ -1438,7 +1377,7 @@ public class SettingsCommand extends Command {
 				return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 			}
 
-			EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+			EmbedBuilder eb = defaultEmbed("Settings");
 			eb.setDescription(
 				"**Verify:** " +
 				(enable.equalsIgnoreCase("true") ? "enabled" : "disabled") +
@@ -1462,7 +1401,7 @@ public class SettingsCommand extends Command {
 				return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 			}
 
-			EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+			EmbedBuilder eb = defaultEmbed("Settings");
 			eb.setDescription("**Verify message set to:** " + verifyText);
 			return eb;
 		}
@@ -1477,7 +1416,7 @@ public class SettingsCommand extends Command {
 				return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 			}
 
-			EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+			EmbedBuilder eb = defaultEmbed("Settings");
 			eb.setDescription("**Verify text channel set to:** " + verifyMessageTextChannel.getAsMention());
 			return eb;
 		} catch (Exception ignored) {}
@@ -1493,7 +1432,7 @@ public class SettingsCommand extends Command {
 					return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 				}
 
-				EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+				EmbedBuilder eb = defaultEmbed("Settings");
 				eb.setDescription("**Verify nickname disabled**");
 				return eb;
 			}
@@ -1531,7 +1470,7 @@ public class SettingsCommand extends Command {
 			return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 		}
 
-		EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+		EmbedBuilder eb = defaultEmbed("Settings");
 		eb.setDescription("**Verify nickname set to:** " + nickname);
 		return eb;
 	}
@@ -1571,7 +1510,7 @@ public class SettingsCommand extends Command {
 				return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
 			}
 
-			EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+			EmbedBuilder eb = defaultEmbed("Settings");
 			eb.setDescription("**Apply waiting for invite channel set to:** " + applyMessageTextChannel.getAsMention());
 			return eb;
 		} catch (Exception ignored) {}
@@ -1603,7 +1542,7 @@ public class SettingsCommand extends Command {
 			return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
 		}
 
-		EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName());
+		EmbedBuilder eb = defaultEmbed("Settings");
 		eb.setDescription("Created new apply guild with name `" + name + "`");
 		return eb;
 	}
@@ -1632,7 +1571,7 @@ public class SettingsCommand extends Command {
 				return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 			}
 
-			EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+			EmbedBuilder eb = defaultEmbed("Settings");
 			eb.setDescription(
 				"**Apply:** " +
 				(enable.equalsIgnoreCase("true") ? "enabled" : "disabled") +
@@ -1652,7 +1591,7 @@ public class SettingsCommand extends Command {
 				return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
 			}
 
-			EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+			EmbedBuilder eb = defaultEmbed("Settings");
 			eb.setDescription("**Ironman only:** " + (isIronman.equalsIgnoreCase("true") ? "enabled" : "disabled"));
 			return eb;
 		}
@@ -1668,7 +1607,7 @@ public class SettingsCommand extends Command {
 				return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 			}
 
-			EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+			EmbedBuilder eb = defaultEmbed("Settings");
 			eb.setDescription("**Apply text channel set to:** " + applyMessageTextChannel.getAsMention());
 			return eb;
 		} catch (Exception ignored) {}
@@ -1683,7 +1622,7 @@ public class SettingsCommand extends Command {
 				return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 			}
 
-			EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+			EmbedBuilder eb = defaultEmbed("Settings");
 			eb.setDescription("**Apply staff channel set to:** " + staffTextChannel.getAsMention());
 			return eb;
 		} catch (Exception ignored) {}
@@ -1700,7 +1639,7 @@ public class SettingsCommand extends Command {
 				return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 			}
 
-			EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+			EmbedBuilder eb = defaultEmbed("Settings");
 			eb.setDescription("**Apply new channel prefix set to:** " + channelPrefix);
 			return eb;
 		}
@@ -1717,7 +1656,7 @@ public class SettingsCommand extends Command {
 				return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 			}
 
-			EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+			EmbedBuilder eb = defaultEmbed("Settings");
 			eb.setDescription("**Apply message set to:** " + verifyText);
 			return eb;
 		}
@@ -1735,7 +1674,7 @@ public class SettingsCommand extends Command {
 				return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 			}
 
-			EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+			EmbedBuilder eb = defaultEmbed("Settings");
 			eb.setDescription("**Apply accept message set to:** " + verifyText);
 			return eb;
 		}
@@ -1751,7 +1690,7 @@ public class SettingsCommand extends Command {
 					return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 				}
 
-				EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+				EmbedBuilder eb = defaultEmbed("Settings");
 				eb.setDescription("**Waitlist message disabled**");
 				return eb;
 			}
@@ -1765,7 +1704,7 @@ public class SettingsCommand extends Command {
 				return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 			}
 
-			EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+			EmbedBuilder eb = defaultEmbed("Settings");
 			eb.setDescription("**Waitlisted message set to:** " + verifyText);
 			return eb;
 		}
@@ -1783,7 +1722,7 @@ public class SettingsCommand extends Command {
 				return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 			}
 
-			EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+			EmbedBuilder eb = defaultEmbed("Settings");
 			eb.setDescription("**Apply deny message set to:** " + denyText);
 			return eb;
 		}
@@ -1799,7 +1738,7 @@ public class SettingsCommand extends Command {
 					return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 				}
 
-				EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+				EmbedBuilder eb = defaultEmbed("Settings");
 				eb.setDescription("**Apply staff ping role set to:** " + verifyGuildRole.getAsMention());
 				return eb;
 			}
@@ -1815,7 +1754,7 @@ public class SettingsCommand extends Command {
 				return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 			}
 
-			EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName(), null);
+			EmbedBuilder eb = defaultEmbed("Settings");
 			eb.setDescription("**Apply new channel category set to:** <#" + applyCategory.getId() + ">");
 			return eb;
 		} catch (Exception ignored) {}
@@ -1840,7 +1779,7 @@ public class SettingsCommand extends Command {
 				return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 			}
 
-			EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName());
+			EmbedBuilder eb = defaultEmbed("Settings");
 			eb.setDescription(
 				"**Removed application requirement of:**\n• Slayer - " +
 				higherDepth(req, "slayerReq").getAsInt() +
@@ -1901,7 +1840,7 @@ public class SettingsCommand extends Command {
 			return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 		}
 
-		EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName());
+		EmbedBuilder eb = defaultEmbed("Settings");
 		eb.setDescription(
 			"**Application requirement added:**\n• Slayer - " +
 			slayerReq +
@@ -1925,7 +1864,7 @@ public class SettingsCommand extends Command {
 	/* Mee6 */
 	private EmbedBuilder getMee6DataSettings() {
 		JsonElement curSettings = database.getMee6Settings(event.getGuild().getId());
-		EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName());
+		EmbedBuilder eb = defaultEmbed("Settings");
 		eb.appendDescription(
 			"**• Enable:** " + (higherDepth(curSettings, "enable") != null ? higherDepth(curSettings, "enable").getAsBoolean() : "false")
 		);
@@ -1954,7 +1893,7 @@ public class SettingsCommand extends Command {
 				return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
 			}
 
-			return defaultEmbed("Settings").setDescription("Disabled Mee6 bypasser");
+			return defaultEmbed("Settings").setDescription("Disabled Mee6 roles");
 		}
 
 		JsonElement curSettings = database.getMee6Settings(event.getGuild().getId());
@@ -1981,7 +1920,7 @@ public class SettingsCommand extends Command {
 			return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
 		}
 
-		return defaultEmbed("Settings for " + event.getGuild().getName()).setDescription("Enabled Mee6 bypasser");
+		return defaultEmbed("Settings").setDescription("Enabled Mee6 roles");
 	}
 
 	private EmbedBuilder addMee6Role(String level, String roleMention) {
@@ -2003,7 +1942,7 @@ public class SettingsCommand extends Command {
 				JsonArray curRanks = curSettings.get("mee6Ranks").getAsJsonArray();
 
 				if (curRanks.size() >= 10) {
-					return defaultEmbed("You have reached the max amount of Mee6 leveling roles (10/10)");
+					return defaultEmbed("You have reached the max amount of Mee6 roles (10/10)");
 				}
 
 				for (JsonElement rank : curRanks) {
@@ -2022,8 +1961,8 @@ public class SettingsCommand extends Command {
 					return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 				}
 
-				EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName());
-				eb.setDescription("**Added Mee6 Rank:** rank " + intLevel + " - " + verifyGuildRole.getAsMention());
+				EmbedBuilder eb = defaultEmbed("Settings");
+				eb.setDescription("**Added Mee6 Role:** rank " + intLevel + " - " + verifyGuildRole.getAsMention());
 				return eb;
 			}
 		} catch (Exception ignored) {}
@@ -2061,8 +2000,8 @@ public class SettingsCommand extends Command {
 						return defaultEmbed("Error", null).setDescription("API returned response code " + responseCode);
 					}
 
-					EmbedBuilder eb = defaultEmbed("Settings for " + event.getGuild().getName());
-					eb.setDescription("**Removed Mee6 Rank:** rank " + intLevel);
+					EmbedBuilder eb = defaultEmbed("Settings");
+					eb.setDescription("**Removed Mee6 Role:** rank " + intLevel);
 					return eb;
 				}
 			}

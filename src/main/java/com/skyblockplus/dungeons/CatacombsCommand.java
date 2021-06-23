@@ -83,7 +83,7 @@ public class CatacombsCommand extends Command {
 					ebMessage.editMessage(getPlayerCatacombs(args[1], null).build()).queue();
 					return;
 				}
-				ebMessage.editMessage(errorMessage(this.name).build()).queue();
+				ebMessage.editMessage(errorEmbed(this.name).build()).queue();
 			}
 		)
 			.start();

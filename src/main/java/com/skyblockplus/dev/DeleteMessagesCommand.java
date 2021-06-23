@@ -42,7 +42,7 @@ public class DeleteMessagesCommand extends Command {
 					}
 				}
 
-				event.getChannel().sendMessage(errorMessage(this.name).build()).queue();
+				event.getChannel().sendMessage(errorEmbed(this.name).build()).queue();
 			}
 		)
 			.start();

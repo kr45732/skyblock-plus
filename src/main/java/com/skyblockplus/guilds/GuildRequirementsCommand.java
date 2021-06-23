@@ -31,7 +31,7 @@ public class GuildRequirementsCommand extends Command {
 
 				logCommand(event.getGuild(), event.getAuthor(), content);
 				if (args.length != 2) {
-					ebMessage.editMessage(errorMessage(name).build()).queue();
+					ebMessage.editMessage(errorEmbed(name).build()).queue();
 					return;
 				}
 

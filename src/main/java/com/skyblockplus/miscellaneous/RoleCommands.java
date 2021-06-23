@@ -529,12 +529,12 @@ public class RoleCommands extends Command {
 
 				String[] args = content.split(" ");
 				if (args.length < 2 || args.length > 3) {
-					ebMessage.editMessage(errorMessage(this.name).build()).queue();
+					ebMessage.editMessage(errorEmbed(this.name).build()).queue();
 					return;
 				}
 
 				if (!args[1].equals("claim")) {
-					ebMessage.editMessage(errorMessage(this.name).build()).queue();
+					ebMessage.editMessage(errorEmbed(this.name).build()).queue();
 					return;
 				}
 

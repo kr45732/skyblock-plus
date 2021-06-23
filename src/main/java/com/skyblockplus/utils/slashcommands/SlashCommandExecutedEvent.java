@@ -56,11 +56,6 @@ public class SlashCommandExecutedEvent {
 		return option == null ? null : option.getAsString();
 	}
 
-	public String getOptionStrNotNull(String name) {
-		OptionMapping option = event.getOption(name);
-		return option == null ? "" : option.getAsString();
-	}
-
 	public EmbedBuilder disabledCommandMessage() {
 		return defaultEmbed("Error").setDescription("❌ This command is disabled");
 	}

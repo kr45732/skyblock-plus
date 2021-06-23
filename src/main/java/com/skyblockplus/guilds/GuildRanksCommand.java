@@ -35,7 +35,7 @@ public class GuildRanksCommand extends Command {
 
 				String[] args = content.split(" ");
 				if (args.length != 2) {
-					eb = errorMessage(this.name);
+					eb = errorEmbed(this.name);
 					ebMessage.editMessage(eb.build()).queue();
 					return;
 				}
@@ -53,7 +53,7 @@ public class GuildRanksCommand extends Command {
 					return;
 				}
 
-				ebMessage.editMessage(errorMessage(this.name).build()).queue();
+				ebMessage.editMessage(errorEmbed(this.name).build()).queue();
 			}
 		)
 			.start();

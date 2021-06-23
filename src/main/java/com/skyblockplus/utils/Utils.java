@@ -471,7 +471,7 @@ public class Utils {
 		return defaultEmbed(null).setImage("https://cdn.discordapp.com/attachments/803419567958392832/825768516636508160/sb_loading.gif");
 	}
 
-	public static EmbedBuilder errorMessage(String name) {
+	public static EmbedBuilder errorEmbed(String name) {
 		return defaultEmbed("Invalid input. Type `" + BOT_PREFIX + "help " + name + "` for help");
 	}
 

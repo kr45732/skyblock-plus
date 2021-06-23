@@ -11,6 +11,8 @@ import com.skyblockplus.dungeons.*;
 import com.skyblockplus.eventlisteners.MainListener;
 import com.skyblockplus.eventlisteners.skyblockevent.SkyblockEventCommand;
 import com.skyblockplus.guilds.*;
+import com.skyblockplus.help.HelpCommand;
+import com.skyblockplus.help.HelpSlashCommand;
 import com.skyblockplus.inventory.*;
 import com.skyblockplus.link.LinkAccountCommand;
 import com.skyblockplus.link.LinkSlashCommand;
@@ -61,7 +63,6 @@ public class Main {
 		client.setEmojis("✅", "⚠️", "❌");
 		client.useHelpBuilder(false);
 		client.setPrefix(BOT_PREFIX);
-
 		client.addCommands(
 			new InformationCommand(),
 			new SlayerCommand(),

@@ -43,7 +43,7 @@ public class GuildLeaderboardsCommand extends Command {
 				logCommand(event.getGuild(), event.getAuthor(), content);
 
 				if (args.length != 3) {
-					eb = errorMessage(this.name);
+					eb = errorEmbed(this.name);
 					ebMessage.editMessage(eb.build()).queue();
 					return;
 				}
@@ -59,7 +59,7 @@ public class GuildLeaderboardsCommand extends Command {
 					return;
 				}
 
-				ebMessage.editMessage(errorMessage(this.name).build()).queue();
+				ebMessage.editMessage(errorEmbed(this.name).build()).queue();
 			}
 		)
 			.start();
