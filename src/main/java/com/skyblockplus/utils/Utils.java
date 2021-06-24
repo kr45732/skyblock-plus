@@ -22,6 +22,7 @@ import java.text.NumberFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -38,6 +39,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.exceptions.PermissionException;
+import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -47,10 +49,17 @@ import org.apache.http.impl.client.HttpClientBuilder;
 
 public class Utils {
 
+	/* Constants */
 	public static final Color botColor = new Color(223, 5, 5);
 	public static final int globalCooldown = 4;
-	public static final ScriptEngine jsScriptEngine = new ScriptEngineManager().getEngineByName("js");
-	public static final ScriptEngine es6ScriptEngine = new NashornScriptEngineFactory().getScriptEngine("--language=es6");
+	public static final String DISCORD_SERVER_INVITE_LINK = "https://discord.gg/Z4Fn3eNDXT";
+	public static final String BOT_INVITE_LINK_REQUIRED_NO_SLASH =
+		"https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403040368&scope=bot";
+	public static final String BOT_INVITE_LINK_REQUIRED_SLASH =
+		"https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403040368&scope=bot%20applications.commands";
+	public static final String FORUM_POST_LINK = "https://hypixel.net/threads/3980092";
+
+	/* Configuration File */
 	public static String HYPIXEL_API_KEY = "";
 	public static String BOT_TOKEN = "";
 	public static String BOT_PREFIX = "";
@@ -62,19 +71,16 @@ public class Utils {
 	public static String API_USERNAME = "";
 	public static String API_PASSWORD = "";
 	public static String API_BASE_URL = "";
-	public static final String DISCORD_SERVER_INVITE_LINK = "https://discord.gg/Z4Fn3eNDXT";
-	public static final String BOT_INVITE_LINK_REQUIRED_NO_SLASH =
-		"https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403040368&scope=bot";
-	public static final String BOT_INVITE_LINK_REQUIRED_SLASH =
-		"https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403040368&scope=bot%20applications.commands";
-	public static final String FORUM_POST_LINK = "https://hypixel.net/threads/3980092";
-	public static MessageChannel botLogChannel;
+	public static String GITHUB_TOKEN = "";
+
+	/* Script Engines */
+	public static final ScriptEngine jsScriptEngine = new ScriptEngineManager().getEngineByName("js");
+	public static final ScriptEngine es6ScriptEngine = new NashornScriptEngineFactory().getScriptEngine("--language=es6");
+
+	/* JSON */
 	public static JsonElement essenceCostsJson;
 	public static JsonElement levelingJson;
-	public static final AtomicInteger remainingLimit = new AtomicInteger(120);
-	public static final AtomicInteger timeTillReset = new AtomicInteger(0);
-	public static String GITHUB_TOKEN = "";
-	public static JsonElement collectionsJson;
+	public static JsonObject collectionsJson;
 	public static JsonElement petUrlJson;
 	public static JsonElement enchantsJson;
 	public static JsonElement petNumsJson;
@@ -87,18 +93,23 @@ public class Utils {
 	public static JsonElement averageAuctionJson;
 	public static JsonElement bazaarJson;
 	public static JsonArray sbzPricesJson;
+	public static JsonObject internalJsonMappings;
+	public static JsonObject emojiMap;
+
+	/* Miscellaneous */
+	public static MessageChannel botLogChannel;
+	public static final AtomicInteger remainingLimit = new AtomicInteger(120);
+	public static final AtomicInteger timeTillReset = new AtomicInteger(0);
 	public static final ConcurrentHashMap<String, HypixelKeyInformation> keyCooldownMap = new ConcurrentHashMap<>();
 	public static final ConcurrentHashMap<String, HypixelGuildCache> hypixelGuildsCacheMap = new ConcurrentHashMap<>();
 	public static Instant lowestBinJsonLastUpdated = Instant.now();
 	public static Instant averageAuctionJsonLastUpdated = Instant.now();
 	public static Instant bazaarJsonLastUpdated = Instant.now();
 	public static Instant sbzPricesJsonLastUpdated = Instant.now();
-	public static JsonObject internalJsonMappings;
-	public static JsonObject emojiMap;
 
 	/* Getters */
 	public static JsonElement getLowestBinJson() {
-		if (lowestBinJson == null || Duration.between(lowestBinJsonLastUpdated, Instant.now()).toMinutes() > 1) {
+		if (lowestBinJson == null || Duration.between(lowestBinJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
 			lowestBinJson = getJson("https://moulberry.codes/lowestbin.json");
 			lowestBinJsonLastUpdated = Instant.now();
 		}
@@ -129,7 +140,7 @@ public class Utils {
 	}
 
 	public static JsonElement getAverageAuctionJson() {
-		if (averageAuctionJson == null || Duration.between(averageAuctionJsonLastUpdated, Instant.now()).toMinutes() > 1) {
+		if (averageAuctionJson == null || Duration.between(averageAuctionJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
 			averageAuctionJson = getJson("https://moulberry.codes/auction_averages/3day.json");
 			averageAuctionJsonLastUpdated = Instant.now();
 		}
@@ -138,7 +149,7 @@ public class Utils {
 	}
 
 	public static JsonElement getBazaarJson() {
-		if (bazaarJson == null || Duration.between(bazaarJsonLastUpdated, Instant.now()).toMinutes() > 1) {
+		if (bazaarJson == null || Duration.between(bazaarJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
 			bazaarJson = getJson("https://api.hypixel.net/skyblock/bazaar");
 			bazaarJsonLastUpdated = Instant.now();
 		}
@@ -147,7 +158,7 @@ public class Utils {
 	}
 
 	public static JsonArray getSbzPricesJson() {
-		if (sbzPricesJson == null || Duration.between(sbzPricesJsonLastUpdated, Instant.now()).toMinutes() > 5) {
+		if (sbzPricesJson == null || Duration.between(sbzPricesJsonLastUpdated, Instant.now()).toMinutes() >= 15) {
 			sbzPricesJson = getJson("https://raw.githubusercontent.com/skyblockz/pricecheckbot/master/data.json").getAsJsonArray();
 			sbzPricesJsonLastUpdated = Instant.now();
 		}
@@ -227,50 +238,30 @@ public class Utils {
 		return essenceCostsJson;
 	}
 
-	public static void setApplicationSettings() {
-		Properties appProps = new Properties();
-		try {
-			appProps.load(new FileInputStream("DevSettings.properties"));
-			BOT_PREFIX = (String) appProps.get("BOT_PREFIX");
-			HYPIXEL_API_KEY = (String) appProps.get("HYPIXEL_API_KEY");
-			BOT_TOKEN = (String) appProps.get("BOT_TOKEN");
-			CLIENT_ID = (String) appProps.get("CLIENT_ID");
-			CLIENT_SECRET = (String) appProps.get("CLIENT_SECRET");
-			String[] database_url_unformatted = ((String) appProps.get("DATABASE_URL")).split(":", 3);
-			DATABASE_USERNAME = database_url_unformatted[1].replace("/", "");
-			DATABASE_PASSWORD = database_url_unformatted[2].split("@")[0];
-			DATABASE_URL =
-				"jdbc:postgresql://" +
-				database_url_unformatted[2].split("@")[1] +
-				"?sslmode=require&user=" +
-				DATABASE_USERNAME +
-				"&password=" +
-				DATABASE_PASSWORD;
-			GITHUB_TOKEN = (String) appProps.get("GITHUB_TOKEN");
-			API_USERNAME = (String) appProps.get("API_USERNAME");
-			API_PASSWORD = (String) appProps.get("API_PASSWORD");
-			API_BASE_URL = (String) appProps.get("API_BASE_URL");
-		} catch (IOException e) {
-			BOT_PREFIX = System.getenv("BOT_PREFIX");
-			HYPIXEL_API_KEY = System.getenv("HYPIXEL_API_KEY");
-			BOT_TOKEN = System.getenv("BOT_TOKEN");
-			CLIENT_ID = System.getenv("CLIENT_ID");
-			CLIENT_SECRET = System.getenv("CLIENT_SECRET");
-			String[] database_url_unformatted = System.getenv("DATABASE_URL").split(":", 3);
-			DATABASE_USERNAME = database_url_unformatted[1].replace("/", "");
-			DATABASE_PASSWORD = database_url_unformatted[2].split("@")[0];
-			DATABASE_URL =
-				"jdbc:postgresql://" +
-				database_url_unformatted[2].split("@")[1] +
-				"?sslmode=require&user=" +
-				DATABASE_USERNAME +
-				"&password=" +
-				DATABASE_PASSWORD;
-			GITHUB_TOKEN = System.getenv("GITHUB_TOKEN");
-			API_USERNAME = System.getenv("API_USERNAME");
-			API_PASSWORD = System.getenv("API_PASSWORD");
-			API_BASE_URL = System.getenv("API_BASE_URL");
+	public static JsonObject getCollectionsJson() {
+		if (collectionsJson == null) {
+			collectionsJson = new JsonObject();
+			JsonObject hypixelCollectionsJson = higherDepth(
+				getJson("https://api.hypixel.net/resources/skyblock/collections"),
+				"collections"
+			)
+				.getAsJsonObject();
+			for (Map.Entry<String, JsonElement> collectionType : hypixelCollectionsJson.entrySet()) {
+				JsonObject collectionItems = higherDepth(collectionType.getValue(), "items").getAsJsonObject();
+				for (Map.Entry<String, JsonElement> item : collectionItems.entrySet()) {
+					JsonArray tierAmounts = new JsonArray();
+					for (JsonElement tierAmount : higherDepth(item.getValue(), "tiers").getAsJsonArray()) {
+						tierAmounts.add(higherDepth(tierAmount, "amountRequired"));
+					}
+					JsonObject idAndTier = new JsonObject();
+					idAndTier.add("name", higherDepth(item.getValue(), "name"));
+					idAndTier.add("tiers", tierAmounts);
+					collectionsJson.add(item.getKey(), idAndTier);
+				}
+			}
 		}
+
+		return collectionsJson;
 	}
 
 	/* Http requests */
@@ -341,6 +332,15 @@ public class Utils {
 			}
 		} catch (Exception ignored) {}
 		return null;
+	}
+
+	public static String makeJsonHastePost(String body) {
+		String url = makeHastePost(body);
+		if (url == null) {
+			return null;
+		}
+
+		return "https://hst.sh/raw/" + url.split("https://hst.sh/")[1] + ".json";
 	}
 
 	public static UsernameUuidStruct usernameToUuid(String username) {
@@ -588,24 +588,10 @@ public class Utils {
 	}
 
 	public static String convertSkyblockIdName(String itemName) {
-		if (collectionsJson == null) {
-			collectionsJson =
-				parseJsString(
-					getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/collections.js")
-				);
-		}
-
 		try {
-			JsonArray collectionsArray = higherDepth(collectionsJson, "collection_data").getAsJsonArray();
-			for (JsonElement collection : collectionsArray) {
-				try {
-					if (higherDepth(collection, "skyblockId").getAsString().equals(itemName)) {
-						return higherDepth(collection, "name").getAsString();
-					}
-				} catch (Exception ignored) {}
-			}
+			return higherDepth(getCollectionsJson(), itemName + ".name").getAsString();
 		} catch (Exception ignored) {}
-		return capitalizeString(itemName.replace("_", " ").toLowerCase());
+		return capitalizeString(itemName.replace("_", " "));
 	}
 
 	public static String convertToInternalName(String itemName) {
@@ -821,5 +807,66 @@ public class Utils {
 		timeUntil += secondsUntil > 0 ? secondsUntil + "s " : "";
 
 		return timeUntil.length() > 0 ? timeUntil.trim() : "0s";
+	}
+
+	public static void setApplicationSettings() {
+		Properties appProps = new Properties();
+		try {
+			appProps.load(new FileInputStream("DevSettings.properties"));
+			BOT_PREFIX = (String) appProps.get("BOT_PREFIX");
+			HYPIXEL_API_KEY = (String) appProps.get("HYPIXEL_API_KEY");
+			BOT_TOKEN = (String) appProps.get("BOT_TOKEN");
+			CLIENT_ID = (String) appProps.get("CLIENT_ID");
+			CLIENT_SECRET = (String) appProps.get("CLIENT_SECRET");
+			String[] database_url_unformatted = ((String) appProps.get("DATABASE_URL")).split(":", 3);
+			DATABASE_USERNAME = database_url_unformatted[1].replace("/", "");
+			DATABASE_PASSWORD = database_url_unformatted[2].split("@")[0];
+			DATABASE_URL =
+				"jdbc:postgresql://" +
+				database_url_unformatted[2].split("@")[1] +
+				"?sslmode=require&user=" +
+				DATABASE_USERNAME +
+				"&password=" +
+				DATABASE_PASSWORD;
+			GITHUB_TOKEN = (String) appProps.get("GITHUB_TOKEN");
+			API_USERNAME = (String) appProps.get("API_USERNAME");
+			API_PASSWORD = (String) appProps.get("API_PASSWORD");
+			API_BASE_URL = (String) appProps.get("API_BASE_URL");
+		} catch (IOException e) {
+			BOT_PREFIX = System.getenv("BOT_PREFIX");
+			HYPIXEL_API_KEY = System.getenv("HYPIXEL_API_KEY");
+			BOT_TOKEN = System.getenv("BOT_TOKEN");
+			CLIENT_ID = System.getenv("CLIENT_ID");
+			CLIENT_SECRET = System.getenv("CLIENT_SECRET");
+			String[] database_url_unformatted = System.getenv("DATABASE_URL").split(":", 3);
+			DATABASE_USERNAME = database_url_unformatted[1].replace("/", "");
+			DATABASE_PASSWORD = database_url_unformatted[2].split("@")[0];
+			DATABASE_URL =
+				"jdbc:postgresql://" +
+				database_url_unformatted[2].split("@")[1] +
+				"?sslmode=require&user=" +
+				DATABASE_USERNAME +
+				"&password=" +
+				DATABASE_PASSWORD;
+			GITHUB_TOKEN = System.getenv("GITHUB_TOKEN");
+			API_USERNAME = System.getenv("API_USERNAME");
+			API_PASSWORD = System.getenv("API_PASSWORD");
+			API_BASE_URL = System.getenv("API_BASE_URL");
+		}
+	}
+
+	public static String getClosestMatch(String toMatch, List<String> matchFrom) {
+		LevenshteinDistance matchCalc = LevenshteinDistance.getDefaultInstance();
+		int minDistance = matchCalc.apply(matchFrom.get(0), toMatch);
+		String closestMatch = matchFrom.get(0);
+		for (String itemF : matchFrom) {
+			int currentDistance = matchCalc.apply(itemF, toMatch);
+			if (currentDistance < minDistance) {
+				minDistance = currentDistance;
+				closestMatch = itemF;
+			}
+		}
+
+		return closestMatch;
 	}
 }

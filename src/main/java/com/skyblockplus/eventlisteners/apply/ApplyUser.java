@@ -223,7 +223,7 @@ public class ApplyUser implements Serializable {
 				playerProfileName = player.getProfileName();
 
 				EmbedBuilder statsEmbed = player.defaultPlayerEmbed();
-				statsEmbed.setDescription("**Total Skyblock weight:** " + playerWeight);
+				statsEmbed.setDescription("**Skyblock weight:** " + playerWeight);
 				statsEmbed.addField("Total slayer", playerSlayer, true);
 				statsEmbed.addField("Progress skill level", playerSkills, true);
 				statsEmbed.addField("Catacombs level", "" + playerCatacombs, true);
@@ -427,7 +427,7 @@ public class ApplyUser implements Serializable {
 		staffChannelId = staffChannel.getId();
 
 		EmbedBuilder applyPlayerStats = defaultPlayerEmbed();
-		applyPlayerStats.setDescription("**Total Skyblock weight:** " + playerWeight);
+		applyPlayerStats.setDescription("**Skyblock weight:** " + playerWeight);
 		applyPlayerStats.addField("Total slayer", playerSlayer, true);
 		applyPlayerStats.addField("Progress average skill level", playerSkills, true);
 		applyPlayerStats.addField("Catacombs level", "" + playerCatacombs, true);

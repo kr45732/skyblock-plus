@@ -36,7 +36,11 @@ public class SlashCommandExecutedEvent {
 	}
 
 	public void logCommandGuildUserCommand() {
-		logCommand(event.getGuild(), event.getUser(), "/" + event.getCommandPath().replace("/", " "));
+		StringBuilder options = new StringBuilder();
+		for (OptionMapping option : event.getOptions()) {
+			options.append(" ").append(option.getAsString());
+		}
+		logCommand(event.getGuild(), event.getUser(), "/" + event.getCommandPath().replace("/", " ") + " " + options.toString());
 	}
 
 	public User getUser() {

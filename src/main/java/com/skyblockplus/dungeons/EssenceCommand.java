@@ -24,17 +24,7 @@ public class EssenceCommand extends Command {
 		preFormattedItem = convertToInternalName(preFormattedItem);
 
 		if (higherDepth(essenceCostsJson, preFormattedItem) == null) {
-			LevenshteinDistance matchCalc = LevenshteinDistance.getDefaultInstance();
-			List<String> items = getJsonKeys(essenceCostsJson);
-			int minDistance = matchCalc.apply(items.get(0), preFormattedItem);
-			String closestMatch = items.get(0);
-			for (String itemF : items) {
-				int currentDistance = matchCalc.apply(itemF, preFormattedItem);
-				if (currentDistance < minDistance) {
-					minDistance = currentDistance;
-					closestMatch = itemF;
-				}
-			}
+			String closestMatch = getClosestMatch(preFormattedItem, getJsonKeys(essenceCostsJson));
 			preFormattedItem = closestMatch != null ? closestMatch : preFormattedItem;
 		}
 
@@ -83,17 +73,7 @@ public class EssenceCommand extends Command {
 					itemName = convertToInternalName(itemName);
 
 					if (higherDepth(essenceCostsJson, itemName) == null) {
-						LevenshteinDistance matchCalc = LevenshteinDistance.getDefaultInstance();
-						List<String> items = getJsonKeys(essenceCostsJson);
-						int minDistance = matchCalc.apply(items.get(0), itemName);
-						String closestMatch = items.get(0);
-						for (String itemF : items) {
-							int currentDistance = matchCalc.apply(itemF, itemName);
-							if (currentDistance < minDistance) {
-								minDistance = currentDistance;
-								closestMatch = itemF;
-							}
-						}
+						String closestMatch = getClosestMatch(itemName, getJsonKeys(essenceCostsJson));
 						itemName = closestMatch != null ? closestMatch : itemName;
 					}
 

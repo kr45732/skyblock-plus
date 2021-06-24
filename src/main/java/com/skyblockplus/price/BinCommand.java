@@ -159,17 +159,7 @@ public class BinCommand extends Command {
 			}
 		}
 
-		LevenshteinDistance matchCalc = LevenshteinDistance.getDefaultInstance();
-		List<String> items = getJsonKeys(lowestBinJson);
-		int minDistance = matchCalc.apply(items.get(0), preFormattedItem);
-		String closestMatch = items.get(0);
-		for (String itemF : items) {
-			int currentDistance = matchCalc.apply(itemF, preFormattedItem);
-			if (currentDistance < minDistance) {
-				minDistance = currentDistance;
-				closestMatch = itemF;
-			}
-		}
+		String closestMatch = getClosestMatch(preFormattedItem, getJsonKeys(lowestBinJson));
 
 		if (closestMatch != null && higherDepth(lowestBinJson, closestMatch) != null) {
 			EmbedBuilder eb = defaultEmbed("Lowest bin");

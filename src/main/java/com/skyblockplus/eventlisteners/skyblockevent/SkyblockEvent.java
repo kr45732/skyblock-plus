@@ -16,6 +16,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.Executors;
@@ -109,7 +110,7 @@ public class SkyblockEvent {
 							higherDepth(guildJson, "guild.members").getAsJsonArray().size(),
 							false
 						)
-						.setDescription("Is this a catacombs, slayer, skills, or weight event?");
+						.setDescription("Is this a catacombs, slayer, skills, weight, or collections event?");
 					state++;
 				} catch (Exception e) {
 					eb.setDescription("`" + replyMessage + "` is invalid. Please try again.");
@@ -135,6 +136,11 @@ public class SkyblockEvent {
 						eb.addField("Event Type", "Skills", false);
 						eventType = "skills";
 						break;
+					case "collections":
+						state = 6;
+						eb.setDescription("Which collection should this event track?");
+						sendEmbedMessage(eb);
+						return;
 				}
 				if (eventType != null) {
 					eb.setDescription("How many hours should the event last?");
@@ -214,7 +220,9 @@ public class SkyblockEvent {
 				if (replyMessage.equalsIgnoreCase("start")) {
 					EmbedBuilder announcementEb = defaultEmbed("Skyblock Event");
 					announcementEb.setDescription(
-						"A new " + eventType + " Skyblock competition has been created! Please see below for more information."
+						"A new " +
+						(eventType.startsWith("collection.") ? eventType.split("-")[1] + " collection" : eventType) +
+						" Skyblock competition has been created! Please see below for more information."
 					);
 					announcementEb.addField("Guild Name", higherDepth(guildJson, "guild.name").getAsString(), false);
 
@@ -254,6 +262,26 @@ public class SkyblockEvent {
 				} else {
 					resetSkyblockEvent(defaultEmbed("Skyblock competition").setDescription("Canceled event creation"));
 				}
+				return;
+			case 6:
+				Map<String, String> collections = new HashMap<>();
+				for (Map.Entry<String, JsonElement> collection : getCollectionsJson().entrySet()) {
+					String collectionName = higherDepth(collection.getValue(), "name").getAsString();
+					if (collectionName.equalsIgnoreCase(replyMessage)) {
+						eb.addField("Event Type", capitalizeString(collectionName) + " collection", false);
+						eventType = "collection." + collection.getKey() + "-" + collectionName.toLowerCase();
+						eb.setDescription("How many hours should the event last?");
+						state = 2;
+						sendEmbedMessage(eb);
+						return;
+					}
+					collections.put(collectionName, collection.getKey());
+				}
+
+				String closestMatch = getClosestMatch(replyMessage, new ArrayList<>(collections.keySet()));
+				eb.setDescription("`" + replyMessage + "` is invalid. Did you mean `" + closestMatch.toLowerCase() + "`?");
+				attemptsLeft--;
+				sendEmbedMessage(eb);
 		}
 
 		if (attemptsLeft == 0) {

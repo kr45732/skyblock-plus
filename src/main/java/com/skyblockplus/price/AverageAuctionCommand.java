@@ -197,17 +197,7 @@ public class AverageAuctionCommand extends Command {
 			}
 		}
 
-		LevenshteinDistance matchCalc = LevenshteinDistance.getDefaultInstance();
-		List<String> items = getJsonKeys(averageAhJson);
-		int minDistance = matchCalc.apply(items.get(0), internalName);
-		String closestMatch = items.get(0);
-		for (String itemF : items) {
-			int currentDistance = matchCalc.apply(itemF, internalName);
-			if (currentDistance < minDistance) {
-				minDistance = currentDistance;
-				closestMatch = itemF;
-			}
-		}
+		String closestMatch = getClosestMatch(internalName, getJsonKeys(averageAhJson));
 
 		if (closestMatch != null && higherDepth(averageAhJson, closestMatch) != null) {
 			EmbedBuilder eb = defaultEmbed("Average Auction");

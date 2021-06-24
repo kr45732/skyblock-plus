@@ -240,7 +240,10 @@ public class AutomaticGuild {
 							}
 						}
 					}
-					guild.modifyMemberRoles(linkedUser, rolesToAdd, rolesToRemove).complete();
+
+					try {
+						guild.modifyMemberRoles(linkedUser, rolesToAdd, rolesToRemove).complete();
+					} catch (Exception ignored) {}
 
 					memberCountList.add(linkedUser.getId());
 				}

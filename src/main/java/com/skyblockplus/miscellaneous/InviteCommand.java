@@ -11,6 +11,7 @@ public class InviteCommand extends Command {
 	public InviteCommand() {
 		this.name = "invite";
 		this.cooldown = globalCooldown;
+		this.guildOnly = false;
 	}
 
 	public static EmbedBuilder getInvite() {

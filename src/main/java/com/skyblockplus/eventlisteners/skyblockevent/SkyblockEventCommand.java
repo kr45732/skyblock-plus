@@ -215,6 +215,33 @@ public class SkyblockEventCommand extends Command {
 																higherDepth(guildMember, "profileName").getAsString()
 															);
 														}
+													default:
+														{
+															if (eventType.startsWith("collection.")) {
+																return new EventMember(
+																	guildMemberUsernameResponse,
+																	guildMemberUuid,
+																	"" +
+																	(
+																		(
+																			higherDepth(
+																					guildMemberPlayer.getProfileJson(),
+																					eventType.split("-")[0]
+																				) !=
+																				null
+																				? higherDepth(
+																					guildMemberPlayer.getProfileJson(),
+																					eventType.split("-")[0]
+																				)
+																					.getAsDouble()
+																				: 0
+																		) -
+																		higherDepth(guildMember, "startingAmount").getAsDouble()
+																	),
+																	higherDepth(guildMember, "profileName").getAsString()
+																);
+															}
+														}
 												}
 											}
 										} catch (Exception e) {
@@ -321,26 +348,35 @@ public class SkyblockEventCommand extends Command {
 											formatNumber(Double.parseDouble(eventMember.getStartingAmount()))
 										);
 									}
-									long minutesSinceUpdate = Duration
-										.between(currentGuild.getEventMemberListLastUpdated(), Instant.now())
-										.toMinutes();
 
-									String minutesSinceUpdateString;
-									if (minutesSinceUpdate == 0) {
-										minutesSinceUpdateString = " less than a minute ";
-									} else if (minutesSinceUpdate == 1) {
-										minutesSinceUpdateString = " 1 minute ";
+									if (paginateBuilder.getItemsSize() > 0) {
+										long minutesSinceUpdate = Duration
+											.between(currentGuild.getEventMemberListLastUpdated(), Instant.now())
+											.toMinutes();
+
+										String minutesSinceUpdateString;
+										if (minutesSinceUpdate == 0) {
+											minutesSinceUpdateString = " less than a minute ";
+										} else if (minutesSinceUpdate == 1) {
+											minutesSinceUpdateString = " 1 minute ";
+										} else {
+											minutesSinceUpdateString = minutesSinceUpdate + " minutes ";
+										}
+
+										paginateBuilder.setPaginatorExtras(
+											new PaginatorExtras()
+												.setEveryPageTitle("Event Leaderboard")
+												.setEveryPageText("**Last updated " + minutesSinceUpdateString + " ago**\n")
+										);
+										paginateBuilder.build().paginate(event.getChannel(), 0);
+										ebMessage.delete().queue();
 									} else {
-										minutesSinceUpdateString = minutesSinceUpdate + " minutes ";
+										ebMessage
+											.editMessage(
+												defaultEmbed("Event Leaderboard").setDescription("No one joined the event").build()
+											)
+											.queue();
 									}
-
-									paginateBuilder.setPaginatorExtras(
-										new PaginatorExtras()
-											.setEveryPageTitle("Event Leaderboard")
-											.setEveryPageText("**Last updated " + minutesSinceUpdateString + " ago**\n")
-									);
-									paginateBuilder.build().paginate(event.getChannel(), 0);
-									ebMessage.delete().queue();
 									return;
 								}
 								JsonElement runningSettings = database.getRunningEventSettings(event.getGuild().getId());
@@ -437,7 +473,7 @@ public class SkyblockEventCommand extends Command {
 				if (database.eventHasMemberByUuid(event.getGuild().getId(), uuid)) {
 					return defaultEmbed("Error")
 						.setDescription(
-							"You are already in the event! If you want to leave or change profile run `" + BOT_PREFIX + "event leave`"
+							"You are already in the event! If you want to leave or change profile use `" + BOT_PREFIX + "event leave`"
 						);
 				}
 
@@ -486,6 +522,18 @@ public class SkyblockEventCommand extends Command {
 										startingAmountFormatted = formatNumber(startingAmount) + " weight";
 										break;
 									}
+								default:
+									{
+										if (eventType.startsWith("collection.")) {
+											startingAmount =
+												higherDepth(player.getProfileJson(), eventType.split("-")[0]) != null
+													? higherDepth(player.getProfileJson(), eventType.split("-")[0]).getAsDouble()
+													: 0;
+											startingAmountFormatted =
+												formatNumber(startingAmount) + " " + eventType.split("-")[1] + " collection";
+											break;
+										}
+									}
 							}
 
 							if (startingAmount != -1) {
@@ -497,11 +545,11 @@ public class SkyblockEventCommand extends Command {
 								if (code == 200) {
 									return defaultEmbed("Success")
 										.setDescription(
-											"Joined the Skyblock event!\nUsername: " +
+											"**Username:** " +
 											username +
-											"\nProfile: " +
+											"\n**Profile:** " +
 											player.getProfileName() +
-											"\nStarting amount: " +
+											"\n**Starting amount:** " +
 											startingAmountFormatted
 										);
 								} else {
@@ -536,7 +584,12 @@ public class SkyblockEventCommand extends Command {
 			);
 
 			eb.addField("Guild", higherDepth(guildJson, "guild.name").getAsString(), false);
-			eb.addField("Event Type", capitalizeString(higherDepth(currentSettings, "eventType").getAsString()), false);
+			String eventType = higherDepth(currentSettings, "eventType").getAsString();
+			eb.addField(
+				"Event Type",
+				capitalizeString(eventType.startsWith("collection.") ? eventType.split("-")[1] + " collection" : eventType),
+				false
+			);
 
 			Instant eventInstantEnding = Instant.ofEpochSecond(higherDepth(currentSettings, "timeEndingSeconds").getAsLong());
 

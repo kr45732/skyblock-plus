@@ -61,18 +61,7 @@ public class BazaarCommand extends Command {
 			}
 		}
 
-		List<String> items = new ArrayList<>(itemsMap.keySet());
-		LevenshteinDistance matchCalc = LevenshteinDistance.getDefaultInstance();
-		int minDistance = matchCalc.apply(items.get(0), itemName);
-		String closestMatch = items.get(0);
-		for (String itemF : items) {
-			int currentDistance = matchCalc.apply(itemF, itemName);
-			if (currentDistance < minDistance) {
-				minDistance = currentDistance;
-				closestMatch = itemF;
-			}
-		}
-
+		String closestMatch = getClosestMatch(itemName, new ArrayList<>(itemsMap.keySet()));
 		closestMatch = itemsMap.get(closestMatch);
 
 		if (closestMatch != null && higherDepth(bazaarItems, closestMatch) != null) {

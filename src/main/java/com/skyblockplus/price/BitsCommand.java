@@ -25,17 +25,7 @@ public class BitsCommand extends Command {
 			return defaultEmbed("Bits Price").addField(itemName, formatNumber(higherDepth(bitsJson, itemName).getAsLong()), false);
 		}
 
-		LevenshteinDistance matchCalc = LevenshteinDistance.getDefaultInstance();
-		List<String> items = getJsonKeys(bitsJson);
-		int minDistance = matchCalc.apply(items.get(0), itemName);
-		String closestMatch = items.get(0);
-		for (String itemF : items) {
-			int currentDistance = matchCalc.apply(itemF, itemName);
-			if (currentDistance < minDistance) {
-				minDistance = currentDistance;
-				closestMatch = itemF;
-			}
-		}
+		String closestMatch = getClosestMatch(itemName, getJsonKeys(bitsJson));
 
 		if (closestMatch != null && higherDepth(bitsJson, closestMatch) != null) {
 			return defaultEmbed("Bits Price").addField(closestMatch, formatNumber(higherDepth(bitsJson, closestMatch).getAsLong()), false);
