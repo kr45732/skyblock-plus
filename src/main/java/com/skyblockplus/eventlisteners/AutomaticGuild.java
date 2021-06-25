@@ -118,8 +118,7 @@ public class AutomaticGuild {
 				GuildRole curSettings = currentSettings.get(i);
 				if (curSettings.getName() == null) {
 					currentSettings.remove(i);
-				}
-				if (
+				} else if (
 					curSettings.getEnableGuildRole().equalsIgnoreCase("true") || curSettings.getEnableGuildRanks().equalsIgnoreCase("true")
 				) {
 					anyGuildRoleRankEnable = true;
