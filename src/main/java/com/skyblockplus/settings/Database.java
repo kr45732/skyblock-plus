@@ -22,14 +22,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-public class SpringDatabaseComponent {
+public class Database {
 
-	private final ServerSettingsService settingsService;
-	private final LinkedAccountService linkedAccountService;
+	public final ServerSettingsService settingsService;
+	public final LinkedAccountService linkedAccountService;
 	private final Gson gson = new Gson();
 
 	@Autowired
-	public SpringDatabaseComponent(ServerSettingsService settingsService, LinkedAccountService linkedAccountService) {
+	public Database(ServerSettingsService settingsService, LinkedAccountService linkedAccountService) {
 		this.settingsService = settingsService;
 		this.linkedAccountService = linkedAccountService;
 	}

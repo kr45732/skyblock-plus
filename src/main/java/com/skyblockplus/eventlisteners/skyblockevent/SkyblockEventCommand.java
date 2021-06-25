@@ -33,7 +33,7 @@ public class SkyblockEventCommand extends Command {
 
 	public SkyblockEventCommand() {
 		this.name = "event";
-		this.cooldown = 10;
+		this.cooldown = globalCooldown + 3;
 	}
 
 	public static void endSkyblockEvent(String guildId) {

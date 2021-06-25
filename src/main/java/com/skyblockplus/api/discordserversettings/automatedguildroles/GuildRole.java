@@ -26,6 +26,9 @@ public class GuildRole {
 	@Fetch(value = FetchMode.SUBSELECT)
 	private List<GuildRank> guildRanks = new ArrayList<>();
 
+	private String enableGuildUserCount = "false";
+	private String guildUserChannelId = "";
+
 	public GuildRole() {}
 
 	public GuildRole(String name) {

@@ -21,9 +21,9 @@ import com.skyblockplus.link.UnlinkSlashCommand;
 import com.skyblockplus.miscellaneous.*;
 import com.skyblockplus.networth.NetworthCommand;
 import com.skyblockplus.price.*;
+import com.skyblockplus.settings.Database;
 import com.skyblockplus.settings.SettingsCommand;
 import com.skyblockplus.settings.SetupCommand;
-import com.skyblockplus.settings.SpringDatabaseComponent;
 import com.skyblockplus.skills.SkillsCommand;
 import com.skyblockplus.skills.SkillsSlashCommand;
 import com.skyblockplus.slayer.SlayerCommand;
@@ -48,13 +48,13 @@ public class Main {
 
 	public static final AsyncHttpClient asyncHttpClient = Dsl.asyncHttpClient();
 	public static JDA jda;
-	public static SpringDatabaseComponent database;
+	public static Database database;
 	public static EventWaiter waiter;
 
 	public static void main(String[] args) throws LoginException, IllegalArgumentException {
 		setApplicationSettings();
 
-		Main.database = SpringApplication.run(Main.class, args).getBean(SpringDatabaseComponent.class);
+		Main.database = SpringApplication.run(Main.class, args).getBean(Database.class);
 
 		Main.waiter = new EventWaiter();
 		CommandClientBuilder client = new CommandClientBuilder();

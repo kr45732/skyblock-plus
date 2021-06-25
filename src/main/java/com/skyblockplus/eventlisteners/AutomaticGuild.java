@@ -13,6 +13,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.discordserversettings.automatedapplication.AutomatedApplication;
 import com.skyblockplus.api.discordserversettings.automatedguildroles.GuildRank;
 import com.skyblockplus.api.discordserversettings.automatedguildroles.GuildRole;
+import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSettingsModel;
 import com.skyblockplus.api.discordserversettings.skyblockevent.EventMember;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
 import com.skyblockplus.eventlisteners.apply.ApplyGuild;
@@ -112,145 +113,186 @@ public class AutomaticGuild {
 				return;
 			}
 
-			currentSettings.removeIf(
-				o1 ->
-					o1.getName() == null ||
-					(!o1.getEnableGuildRole().equalsIgnoreCase("true") && !o1.getEnableGuildRanks().equalsIgnoreCase("true"))
-			);
+			boolean anyGuildRoleRankEnable = false;
+			for (int i = currentSettings.size() - 1; i >= 0; i--) {
+				GuildRole curSettings = currentSettings.get(i);
+				if (curSettings.getName() == null) {
+					currentSettings.remove(i);
+				}
+				if (
+					curSettings.getEnableGuildRole().equalsIgnoreCase("true") || curSettings.getEnableGuildRanks().equalsIgnoreCase("true")
+				) {
+					anyGuildRoleRankEnable = true;
+				} else if (
+					curSettings.getEnableGuildUserCount() == null || curSettings.getEnableGuildUserCount().equalsIgnoreCase("false")
+				) {
+					currentSettings.remove(i);
+				}
+			}
 
 			if (currentSettings.size() == 0) {
 				return;
 			}
 
-			List<LinkedAccountModel> linkedUsers = database.getLinkedUsers();
-
 			Set<String> memberCountList = new HashSet<>();
-			List<List<LinkedAccountModel>> linkedUsersLists = ListUtils.partition(linkedUsers, 100);
-
-			AtomicInteger requestCount = new AtomicInteger();
 			List<Member> inGuildUsers = new ArrayList<>();
-			CountDownLatch latch = new CountDownLatch(1);
 			Map<String, String> discordIdToUuid = new HashMap<>();
+			int counterUpdate = 0;
+			if (anyGuildRoleRankEnable) {
+				List<LinkedAccountModel> linkedUsers = database.getLinkedUsers();
+				List<List<LinkedAccountModel>> linkedUsersLists = ListUtils.partition(linkedUsers, 100);
+				AtomicInteger requestCount = new AtomicInteger();
+				CountDownLatch latch = new CountDownLatch(1);
+				for (List<LinkedAccountModel> linkedUsersList : linkedUsersLists) {
+					List<String> linkedUsersIds = new ArrayList<>();
+					for (LinkedAccountModel linkedUser : linkedUsersList) {
+						linkedUsersIds.add(linkedUser.getDiscordId());
+						discordIdToUuid.put(linkedUser.getDiscordId(), linkedUser.getMinecraftUuid());
+					}
 
-			for (List<LinkedAccountModel> linkedUsersList : linkedUsersLists) {
-				List<String> linkedUsersIds = new ArrayList<>();
-				for (LinkedAccountModel linkedUser : linkedUsersList) {
-					linkedUsersIds.add(linkedUser.getDiscordId());
-					discordIdToUuid.put(linkedUser.getDiscordId(), linkedUser.getMinecraftUuid());
+					guild
+						.retrieveMembersByIds(linkedUsersIds.toArray(new String[0]))
+						.onSuccess(
+							members -> {
+								inGuildUsers.addAll(members);
+								requestCount.incrementAndGet();
+								if (requestCount.get() == linkedUsersLists.size()) {
+									latch.countDown();
+								}
+							}
+						)
+						.onError(
+							error -> {
+								requestCount.incrementAndGet();
+								if (requestCount.get() == linkedUsersLists.size()) {
+									latch.countDown();
+								}
+							}
+						);
 				}
 
-				guild
-					.retrieveMembersByIds(linkedUsersIds.toArray(new String[0]))
-					.onSuccess(
-						members -> {
-							inGuildUsers.addAll(members);
-							requestCount.incrementAndGet();
-							if (requestCount.get() == linkedUsersLists.size()) {
-								latch.countDown();
-							}
-						}
-					)
-					.onError(
-						error -> {
-							requestCount.incrementAndGet();
-							if (requestCount.get() == linkedUsersLists.size()) {
-								latch.countDown();
-							}
-						}
-					);
-			}
-
-			try {
-				latch.await(15, TimeUnit.SECONDS);
-			} catch (Exception e) {
-				System.out.println("== Stack Trace (updateGuildRoles latch - " + guildId + ") ==");
-				e.printStackTrace();
+				try {
+					latch.await(15, TimeUnit.SECONDS);
+				} catch (Exception e) {
+					System.out.println("== Stack Trace (updateGuildRoles latch - " + guildId + ") ==");
+					e.printStackTrace();
+				}
 			}
 
 			for (GuildRole currentSetting : currentSettings) {
+				JsonElement guildJson = null;
 				JsonArray guildMembers = null;
 				try {
-					guildMembers =
-						higherDepth(
-							getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&id=" + currentSetting.getGuildId()),
-							"guild.members"
-						)
-							.getAsJsonArray();
+					guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&id=" + currentSetting.getGuildId());
+					guildMembers = higherDepth(guildJson, "guild.members").getAsJsonArray();
 				} catch (Exception ignored) {}
 
 				if (guildMembers == null) {
 					continue;
 				}
 
-				Map<String, String> uuidToRankMap = new HashMap<>();
-				for (JsonElement guildMember : guildMembers) {
-					uuidToRankMap.put(
-						higherDepth(guildMember, "uuid").getAsString(),
-						higherDepth(guildMember, "rank").getAsString().replace(" ", "_")
-					);
-				}
-
-				try {
-					if (guild.getId().equals("782154976243089429")) {
-						TextChannel ignoreChannel = guild.getTextChannelById("846493091233792066");
-						String[] messageContent = ignoreChannel
-							.retrieveMessageById(ignoreChannel.getLatestMessageId())
-							.complete()
-							.getContentRaw()
-							.split(" ");
-
-						for (String removeM : messageContent) {
-							uuidToRankMap.replace(removeM, "null");
-						}
-					}
-				} catch (Exception ignored) {}
-
 				boolean enableGuildRole = currentSetting.getEnableGuildRole().equalsIgnoreCase("true");
 				boolean enableGuildRanks = currentSetting.getEnableGuildRanks().equalsIgnoreCase("true");
-
-				Role guildMemberRole = enableGuildRole ? guild.getRoleById(currentSetting.getRoleId()) : null;
-
-				for (Member linkedUser : inGuildUsers) {
-					List<Role> rolesToAdd = new ArrayList<>();
-					List<Role> rolesToRemove = new ArrayList<>();
-
-					if (enableGuildRole) {
-						if (uuidToRankMap.containsKey(discordIdToUuid.get(linkedUser.getId()))) {
-							rolesToAdd.add(guildMemberRole);
-						} else {
-							rolesToRemove.add(guildMemberRole);
-						}
-					}
-
-					if (enableGuildRanks) {
-						List<GuildRank> guildRanksArr = currentSetting.getGuildRanks();
-						if (!uuidToRankMap.containsKey(discordIdToUuid.get(linkedUser.getId()))) {
-							for (GuildRank guildRank : guildRanksArr) {
-								rolesToRemove.add(guild.getRoleById(guildRank.getDiscordRoleId()));
-							}
-						} else {
-							String currentRank = uuidToRankMap.get(discordIdToUuid.get(linkedUser.getId()));
-							for (GuildRank guildRank : guildRanksArr) {
-								Role currentRankRole = guild.getRoleById(guildRank.getDiscordRoleId());
-								if (guildRank.getMinecraftRoleName().equalsIgnoreCase(currentRank)) {
-									rolesToAdd.add(currentRankRole);
-								} else {
-									rolesToRemove.add(currentRankRole);
-								}
-							}
-						}
+				if (enableGuildRanks || enableGuildRole) {
+					Map<String, String> uuidToRankMap = new HashMap<>();
+					for (JsonElement guildMember : guildMembers) {
+						uuidToRankMap.put(
+							higherDepth(guildMember, "uuid").getAsString(),
+							higherDepth(guildMember, "rank").getAsString().replace(" ", "_")
+						);
 					}
 
 					try {
-						guild.modifyMemberRoles(linkedUser, rolesToAdd, rolesToRemove).complete();
+						if (guild.getId().equals("782154976243089429")) {
+							TextChannel ignoreChannel = guild.getTextChannelById("846493091233792066");
+							String[] messageContent = ignoreChannel
+								.retrieveMessageById(ignoreChannel.getLatestMessageId())
+								.complete()
+								.getContentRaw()
+								.split(" ");
+
+							for (String removeM : messageContent) {
+								uuidToRankMap.replace(removeM, "null");
+							}
+						}
 					} catch (Exception ignored) {}
 
-					memberCountList.add(linkedUser.getId());
+					Role guildMemberRole = enableGuildRole ? guild.getRoleById(currentSetting.getRoleId()) : null;
+					for (Member linkedUser : inGuildUsers) {
+						List<Role> rolesToAdd = new ArrayList<>();
+						List<Role> rolesToRemove = new ArrayList<>();
+
+						if (enableGuildRole) {
+							if (uuidToRankMap.containsKey(discordIdToUuid.get(linkedUser.getId()))) {
+								rolesToAdd.add(guildMemberRole);
+							} else {
+								rolesToRemove.add(guildMemberRole);
+							}
+						}
+
+						if (enableGuildRanks) {
+							List<GuildRank> guildRanksArr = currentSetting.getGuildRanks();
+							if (!uuidToRankMap.containsKey(discordIdToUuid.get(linkedUser.getId()))) {
+								for (GuildRank guildRank : guildRanksArr) {
+									rolesToRemove.add(guild.getRoleById(guildRank.getDiscordRoleId()));
+								}
+							} else {
+								String currentRank = uuidToRankMap.get(discordIdToUuid.get(linkedUser.getId()));
+								for (GuildRank guildRank : guildRanksArr) {
+									Role currentRankRole = guild.getRoleById(guildRank.getDiscordRoleId());
+									if (guildRank.getMinecraftRoleName().equalsIgnoreCase(currentRank)) {
+										rolesToAdd.add(currentRankRole);
+									} else {
+										rolesToRemove.add(currentRankRole);
+									}
+								}
+							}
+						}
+
+						try {
+							guild.modifyMemberRoles(linkedUser, rolesToAdd, rolesToRemove).complete();
+						} catch (Exception ignored) {}
+
+						memberCountList.add(linkedUser.getId());
+					}
+				}
+
+				if (currentSetting.getEnableGuildUserCount().equals("true")) {
+					VoiceChannel curVc;
+					try {
+						curVc = guild.getVoiceChannelById(currentSetting.getGuildUserChannelId());
+					} catch (Exception e) {
+						currentSetting.setEnableGuildUserCount("false");
+						database.setGuildRoleSettings(guild.getId(), currentSetting);
+						continue;
+					}
+
+					if (curVc.getName().contains(guildMembers.size() + "/125")) {
+						continue;
+					}
+
+					if (curVc.getName().split(":").length == 2) {
+						curVc.getManager().setName(curVc.getName().split(":")[0].trim() + ": " + guildMembers.size() + "/125").complete();
+					} else {
+						curVc
+							.getManager()
+							.setName(higherDepth(guildJson, "guild.name").getAsString() + " Members: " + guildMembers.size() + "/125")
+							.complete();
+					}
+
+					counterUpdate++;
 				}
 			}
+
 			logCommand(
 				guild,
-				"Guild Role | Users (" + memberCountList.size() + ") | Time (" + ((System.currentTimeMillis() - startTime) / 1000) + "s)"
+				"Guild Role | Users (" +
+				memberCountList.size() +
+				") | Time (" +
+				((System.currentTimeMillis() - startTime) / 1000) +
+				"s) | Counters Updated (" +
+				counterUpdate +
+				")"
 			);
 		} catch (Exception e) {
 			System.out.println("== Stack Trace (updateGuildRoles - " + guildId + ") ==");
