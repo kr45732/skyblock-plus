@@ -8,13 +8,14 @@ import static com.skyblockplus.utils.Utils.makeHastePost;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import groovy.lang.GroovyShell;
+import java.util.Arrays;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class EvaluateCommand extends Command {
 
-	private StringBuilder importString = new StringBuilder();
+	private final StringBuilder importString = new StringBuilder();
 	private boolean inSession = false;
 	private GroovyShell shell = new GroovyShell();
 
@@ -23,6 +24,7 @@ public class EvaluateCommand extends Command {
 		this.ownerCommand = true;
 		this.aliases = new String[] { "eval", "ev" };
 
+		// import [name].*
 		String[] packageImports = {
 			"java.io",
 			"java.lang",
@@ -38,10 +40,13 @@ public class EvaluateCommand extends Command {
 			"net.dv8tion.jda.api.managers.impl",
 			"net.dv8tion.jda.api.utils",
 			"com.skyblockplus",
+			"com.google.gson",
 		};
 
-		String[] classImports = { "com.skyblockplus.utils.Player", "me.nullicorn.nedit.NBTReader", "com.google.gson.JsonParser" };
+		// import [name]
+		String[] classImports = { "com.skyblockplus.utils.Player", "me.nullicorn.nedit.NBTReader" };
 
+		// import static [name]
 		String[] staticImports = { "com.skyblockplus.utils.Utils.*" };
 
 		for (String packageImport : packageImports) {
@@ -124,7 +129,7 @@ public class EvaluateCommand extends Command {
 						ebMessage.editMessage(out.toString()).queue();
 					}
 				} catch (Exception e) {
-					ebMessage.editMessage(e.getMessage()).queue();
+					ebMessage.editMessage(e.getMessage().length() >= 2000 ? makeHastePost(e.getMessage()) : e.getMessage()).queue();
 				}
 			}
 		)

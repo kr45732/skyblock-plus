@@ -13,7 +13,6 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.discordserversettings.automatedapplication.AutomatedApplication;
 import com.skyblockplus.api.discordserversettings.automatedguildroles.GuildRank;
 import com.skyblockplus.api.discordserversettings.automatedguildroles.GuildRole;
-import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSettingsModel;
 import com.skyblockplus.api.discordserversettings.skyblockevent.EventMember;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
 import com.skyblockplus.eventlisteners.apply.ApplyGuild;
@@ -256,7 +255,7 @@ public class AutomaticGuild {
 					}
 				}
 
-				if (currentSetting.getEnableGuildUserCount().equals("true")) {
+				if (currentSetting.getEnableGuildUserCount() != null && currentSetting.getEnableGuildUserCount().equals("true")) {
 					VoiceChannel curVc;
 					try {
 						curVc = guild.getVoiceChannelById(currentSetting.getGuildUserChannelId());

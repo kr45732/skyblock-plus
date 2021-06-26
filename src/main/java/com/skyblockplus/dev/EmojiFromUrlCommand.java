@@ -22,6 +22,7 @@ public class EmojiFromUrlCommand extends Command {
 
 	public EmojiFromUrlCommand() {
 		this.name = "em";
+		this.ownerCommand = true;
 	}
 
 	public static JsonElement getSkyCryptItemsJson(String name) {
@@ -33,8 +34,9 @@ public class EmojiFromUrlCommand extends Command {
 			return JsonParser.parseString(es6ScriptEngine.eval("JSON.stringify(" + websiteContent + ")").toString());
 		} catch (ScriptException e) {
 			e.printStackTrace();
-			return null;
 		}
+
+		return null;
 	}
 
 	@Override

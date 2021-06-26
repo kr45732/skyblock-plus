@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import org.apache.commons.text.similarity.LevenshteinDistance;
 
 public class BazaarCommand extends Command {
 

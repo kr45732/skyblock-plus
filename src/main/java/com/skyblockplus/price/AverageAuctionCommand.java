@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import org.apache.commons.text.similarity.LevenshteinDistance;
 
 public class AverageAuctionCommand extends Command {
 
