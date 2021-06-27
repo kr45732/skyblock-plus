@@ -118,7 +118,7 @@ public class EvaluateCommand extends Command {
 						shell.setProperty("member", jdaEvent.getMember());
 					}
 
-					String script = importString.toString() + arg;
+					String script = importString + arg;
 					Object out = shell.evaluate(script);
 
 					if (out == null) {
@@ -129,7 +129,8 @@ public class EvaluateCommand extends Command {
 						ebMessage.editMessage(out.toString()).queue();
 					}
 				} catch (Exception e) {
-					ebMessage.editMessage(e.getMessage().length() >= 2000 ? makeHastePost(e.getMessage()) : e.getMessage()).queue();
+					String msg = e.getMessage() != null ? e.getMessage() : Arrays.toString(e.getStackTrace());
+					ebMessage.editMessage("" + (msg.length() >= 2000 ? makeHastePost(msg) : msg)).queue();
 				}
 			}
 		)

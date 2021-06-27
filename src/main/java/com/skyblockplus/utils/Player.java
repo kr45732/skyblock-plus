@@ -532,52 +532,41 @@ public class Player {
 		}
 	}
 
-	public String getNecronBlade() {
-		Map<Integer, InvItem> inventoryMap = getInventoryMap();
-		if (inventoryMap == null) {
-			return "\n**Inventory API Disabled**";
+	public Set<String> getItemsPlayerHas(List<String> items) {
+		Map<Integer, InvItem> invItemMap = getInventoryMap();
+		if (invItemMap == null) {
+			return null;
 		}
 
-		for (InvItem item : inventoryMap.values()) {
+		Collection<InvItem> itemsMap = new ArrayList<>(invItemMap.values());
+		itemsMap.addAll(new ArrayList<>(getEnderChestMap().values()));
+		itemsMap.addAll(new ArrayList<>(getStorageMap().values()));
+		Set<String> itemsPlayerHas = new HashSet<>();
+
+		for (InvItem item : itemsMap) {
+			if(item == null){
+				continue;
+			}
+
 			if (!item.getBackpackItems().isEmpty()) {
 				List<InvItem> backpackItems = item.getBackpackItems();
 				for (InvItem backpackItem : backpackItems) {
-					if (backpackItem.getId().equalsIgnoreCase("hyperion")) {
-						return "\n**Hyperion:** yes";
-					} else if (backpackItem.getId().equalsIgnoreCase("valkyrie")) {
-						return "\n**Valkyrie:** yes";
+					if(backpackItem == null){
+						continue;
+					}
+
+					if(items.contains(backpackItem.getId())){
+						itemsPlayerHas.add(capitalizeString(backpackItem.getId().toLowerCase().replace("_", " ")));
 					}
 				}
 			} else {
-				if (item.getId().equalsIgnoreCase("hyperion")) {
-					return "\n**Hyperion:** yes";
-				} else if (item.getId().equalsIgnoreCase("valkyrie")) {
-					return "\n**Valkyrie:** yes";
+				if(items.contains(item.getId())){
+					itemsPlayerHas.add(capitalizeString(item.getId().toLowerCase().replace("_", " ")));
 				}
 			}
 		}
 
-		Map<Integer, InvItem> enderChestMap = getEnderChestMap();
-		for (InvItem item : enderChestMap.values()) {
-			if (!item.getBackpackItems().isEmpty()) {
-				List<InvItem> backpackItems = item.getBackpackItems();
-				for (InvItem backpackItem : backpackItems) {
-					if (backpackItem.getId().equalsIgnoreCase("hyperion")) {
-						return "\n**Hyperion:** yes";
-					} else if (backpackItem.getId().equalsIgnoreCase("valkyrie")) {
-						return "\n**Valkyrie:** yes";
-					}
-				}
-			} else {
-				if (item.getId().equalsIgnoreCase("hyperion")) {
-					return "\n**Hyperion:** yes";
-				} else if (item.getId().equalsIgnoreCase("valkyrie")) {
-					return "\n**Valkyrie:** yes";
-				}
-			}
-		}
-
-		return "\n**No Hyperion or Valkyrie**";
+		return itemsPlayerHas;
 	}
 
 	public String getFastestF7Time() {
@@ -591,49 +580,7 @@ public class Player {
 		}
 	}
 
-	public int getBonemerang() {
-		int boneCount = 0;
 
-		try {
-			Map<Integer, InvItem> inventoryMap = getInventoryMap();
-			if (inventoryMap == null) {
-				return -1;
-			}
-
-			for (InvItem item : inventoryMap.values()) {
-				if (!item.getBackpackItems().isEmpty()) {
-					List<InvItem> backpackItems = item.getBackpackItems();
-					for (InvItem backpackItem : backpackItems) {
-						if (backpackItem.getId().equalsIgnoreCase("bone_boomerang")) {
-							boneCount++;
-						}
-					}
-				} else {
-					if (item.getId().equalsIgnoreCase("bone_boomerang")) {
-						boneCount++;
-					}
-				}
-			}
-
-			Map<Integer, InvItem> enderChestMap = getEnderChestMap();
-			for (InvItem item : enderChestMap.values()) {
-				if (!item.getBackpackItems().isEmpty()) {
-					List<InvItem> backpackItems = item.getBackpackItems();
-					for (InvItem backpackItem : backpackItems) {
-						if (backpackItem.getId().equalsIgnoreCase("bone_boomerang")) {
-							boneCount++;
-						}
-					}
-				} else {
-					if (item.getId().equalsIgnoreCase("bone_boomerang")) {
-						boneCount++;
-					}
-				}
-			}
-		} catch (Exception ignored) {}
-
-		return boneCount;
-	}
 
 	public int getDungeonSecrets() {
 		if (hypixelProfileJson == null) {

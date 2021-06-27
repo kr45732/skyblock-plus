@@ -288,7 +288,7 @@ public class AutomaticGuild {
 				memberCountList.size() +
 				") | Time (" +
 				((System.currentTimeMillis() - startTime) / 1000) +
-				"s) | Counters Updated (" +
+				"s) | Counters (" +
 				counterUpdate +
 				")"
 			);
