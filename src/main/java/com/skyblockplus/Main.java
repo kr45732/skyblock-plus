@@ -1,7 +1,6 @@
 package com.skyblockplus;
 
-import static com.skyblockplus.utils.MainClassUtils.cacheApplyGuildUsers;
-import static com.skyblockplus.utils.MainClassUtils.closeAsyncHttpClient;
+import static com.skyblockplus.utils.MainClassUtils.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
@@ -38,6 +37,8 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.Dsl;
 import org.springframework.boot.SpringApplication;
@@ -47,6 +48,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class Main {
 
 	public static final AsyncHttpClient asyncHttpClient = Dsl.asyncHttpClient();
+	public static final CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 	public static JDA jda;
 	public static Database database;
 	public static EventWaiter waiter;
@@ -177,6 +179,9 @@ public class Main {
 
 		System.out.println("== Caching Apply Users ==");
 		cacheApplyGuildUsers();
+
+		System.out.println("== Closing Http Client ==");
+		closeHttpClient();
 
 		System.out.println("== Closing Async Http Client ==");
 		closeAsyncHttpClient();

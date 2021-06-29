@@ -1,5 +1,6 @@
 package com.skyblockplus.price;
 
+import static com.skyblockplus.Main.httpClient;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -87,15 +88,15 @@ public class BidsCommand extends Command {
 	}
 
 	private static JsonArray queryAhApi(String uuid) {
-		try (CloseableHttpClient httpclient = HttpClientBuilder.create().build()) {
+		try  {
 			HttpGet httpget = new HttpGet("https://api.eastarcti.ca/auctions/");
 			httpget.addHeader("content-type", "application/json; charset=UTF-8");
 
 			URI uri = new URIBuilder(httpget.getURI()).addParameter("query", "{\"bids.bidder\":\"" + uuid + "\"}").build();
 			httpget.setURI(uri);
 
-			try (CloseableHttpResponse httpresponse = httpclient.execute(httpget)) {
-				return JsonParser.parseReader(new InputStreamReader(httpresponse.getEntity().getContent())).getAsJsonArray();
+			try (CloseableHttpResponse httpResponse = httpClient.execute(httpget)) {
+				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
 			}
 		} catch (Exception ignored) {}
 		return null;

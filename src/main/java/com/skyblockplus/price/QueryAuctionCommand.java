@@ -1,5 +1,6 @@
 package com.skyblockplus.price;
 
+import static com.skyblockplus.Main.httpClient;
 import static com.skyblockplus.utils.Player.getGenericInventoryMap;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -32,7 +33,7 @@ public class QueryAuctionCommand extends Command {
 	}
 
 	private static JsonArray queryAhApi(String query) {
-		try (CloseableHttpClient httpclient = HttpClientBuilder.create().build()) {
+		try  {
 			HttpGet httpget = new HttpGet("https://api.eastarcti.ca/auctions/");
 			httpget.addHeader("content-type", "application/json; charset=UTF-8");
 
@@ -46,8 +47,8 @@ public class QueryAuctionCommand extends Command {
 				.build();
 			httpget.setURI(uri);
 
-			try (CloseableHttpResponse httpresponse = httpclient.execute(httpget)) {
-				return JsonParser.parseReader(new InputStreamReader(httpresponse.getEntity().getContent())).getAsJsonArray();
+			try (CloseableHttpResponse httpResponse = httpClient.execute(httpget)) {
+				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
 			}
 		} catch (Exception ignored) {}
 		return null;

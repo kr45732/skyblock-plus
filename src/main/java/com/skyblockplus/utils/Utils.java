@@ -1,5 +1,6 @@
 package com.skyblockplus.utils;
 
+import static com.skyblockplus.Main.httpClient;
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.CustomPaginator.throwableConsumer;
 import static java.lang.String.join;
@@ -273,22 +274,22 @@ public class Utils {
 			}
 		} catch (Exception ignored) {}
 
-		try (CloseableHttpClient httpclient = HttpClientBuilder.create().build()) {
+		try {
 			HttpGet httpget = new HttpGet(jsonUrl);
 			if (jsonUrl.contains("raw.githubusercontent.com")) {
 				httpget.setHeader("Authorization", "token " + GITHUB_TOKEN);
 			}
 			httpget.addHeader("content-type", "application/json; charset=UTF-8");
 
-			try (CloseableHttpResponse httpresponse = httpclient.execute(httpget)) {
+			try (CloseableHttpResponse httpResponse = httpClient.execute(httpget)) {
 				if (jsonUrl.toLowerCase().contains("api.hypixel.net") && jsonUrl.contains(HYPIXEL_API_KEY)) {
 					try {
-						remainingLimit.set(Integer.parseInt(httpresponse.getFirstHeader("RateLimit-Remaining").getValue()));
-						timeTillReset.set(Integer.parseInt(httpresponse.getFirstHeader("RateLimit-Reset").getValue()));
+						remainingLimit.set(Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Remaining").getValue()));
+						timeTillReset.set(Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Reset").getValue()));
 					} catch (Exception ignored) {}
 				}
 
-				return JsonParser.parseReader(new InputStreamReader(httpresponse.getEntity().getContent()));
+				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent()));
 			}
 		} catch (Exception ignored) {}
 		return null;
@@ -299,13 +300,13 @@ public class Utils {
 			return null;
 		}
 
-		try (CloseableHttpClient httpclient = HttpClientBuilder.create().build()) {
+		try {
 			HttpGet httpget = new HttpGet(dataUrl);
 			httpget.setHeader("Authorization", "token " + GITHUB_TOKEN);
 			httpget.addHeader("content-type", "application/json; charset=UTF-8");
 
-			try (CloseableHttpResponse httpresponse = httpclient.execute(httpget)) {
-				InputStream inputStream = httpresponse.getEntity().getContent();
+			try (CloseableHttpResponse httpResponse = httpClient.execute(httpget)) {
+				InputStream inputStream = httpResponse.getEntity().getContent();
 				ByteArrayOutputStream result = new ByteArrayOutputStream();
 				byte[] buffer = new byte[1024];
 				for (int length; (length = inputStream.read(buffer)) != -1;) {
@@ -318,16 +319,16 @@ public class Utils {
 	}
 
 	public static String makeHastePost(String body) {
-		try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
+		try  {
 			HttpPost httpPost = new HttpPost("https://hst.sh/documents");
 
 			StringEntity entity = new StringEntity(body);
 			httpPost.setEntity(entity);
 
-			try (CloseableHttpResponse response = client.execute(httpPost)) {
+			try (CloseableHttpResponse httpResponse = httpClient.execute(httpPost)) {
 				return (
 					"https://hst.sh/" +
-					higherDepth(JsonParser.parseReader(new InputStreamReader(response.getEntity().getContent())), "key").getAsString()
+					higherDepth(JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())), "key").getAsString()
 				);
 			}
 		} catch (Exception ignored) {}
@@ -395,12 +396,12 @@ public class Utils {
 	}
 
 	public static String getUrl(String url) {
-		try (CloseableHttpClient httpclient = HttpClientBuilder.create().build()) {
+		try  {
 			HttpGet httpget = new HttpGet(url);
 			httpget.addHeader("content-type", "application/json; charset=UTF-8");
 
-			try (CloseableHttpResponse httpresponse = httpclient.execute(httpget)) {
-				return new BufferedReader(new InputStreamReader(httpresponse.getEntity().getContent()))
+			try (CloseableHttpResponse httpResponse = httpClient.execute(httpget)) {
+				return new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent()))
 					.lines()
 					.parallel()
 					.collect(Collectors.joining("\n"));

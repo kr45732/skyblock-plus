@@ -100,6 +100,16 @@ public class MainClassUtils {
 		}
 	}
 
+	public static void closeHttpClient() {
+		try {
+			httpClient.close();
+			System.out.println("== Successfully Closed Http Client ==");
+		} catch (Exception e) {
+			System.out.println("== Stack Trace (Close Http Client)");
+			e.printStackTrace();
+		}
+	}
+
 	public static void updateLinkedAccounts() {
 		try {
 			database
