@@ -39,7 +39,7 @@ dependencies {
      }
 
     // Gson (Google json)
-    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.google.code.gson:gson:2.8.7'
 
     // JDA addon
     implementation 'com.jagrosh:jda-utilities:3.0.5'
