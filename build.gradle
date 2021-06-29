@@ -45,7 +45,7 @@ dependencies {
     implementation 'com.jagrosh:jda-utilities:3.0.5'
 
     // NBT parser
-    implementation 'com.github.TheNullicorn:Nedit:v1.1.1'
+    implementation 'com.github.TheNullicorn:Nedit:2.0.0'
 
     // Spring boot and postgresql
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
