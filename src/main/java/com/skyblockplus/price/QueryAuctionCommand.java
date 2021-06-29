@@ -33,7 +33,7 @@ public class QueryAuctionCommand extends Command {
 	}
 
 	private static JsonArray queryAhApi(String query) {
-		try  {
+		try {
 			HttpGet httpget = new HttpGet("https://api.eastarcti.ca/auctions/");
 			httpget.addHeader("content-type", "application/json; charset=UTF-8");
 

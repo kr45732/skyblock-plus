@@ -88,7 +88,7 @@ public class BidsCommand extends Command {
 	}
 
 	private static JsonArray queryAhApi(String uuid) {
-		try  {
+		try {
 			HttpGet httpget = new HttpGet("https://api.eastarcti.ca/auctions/");
 			httpget.addHeader("content-type", "application/json; charset=UTF-8");
 

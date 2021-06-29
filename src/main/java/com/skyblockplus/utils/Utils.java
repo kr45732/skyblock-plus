@@ -319,7 +319,7 @@ public class Utils {
 	}
 
 	public static String makeHastePost(String body) {
-		try  {
+		try {
 			HttpPost httpPost = new HttpPost("https://hst.sh/documents");
 
 			StringEntity entity = new StringEntity(body);
@@ -396,7 +396,7 @@ public class Utils {
 	}
 
 	public static String getUrl(String url) {
-		try  {
+		try {
 			HttpGet httpget = new HttpGet(url);
 			httpget.addHeader("content-type", "application/json; charset=UTF-8");
 
