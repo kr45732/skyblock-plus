@@ -73,7 +73,7 @@ public class ApplyUser implements Serializable {
 		Player player = new Player(playerUsername);
 		this.profileNames = player.getAllProfileNames(isIronman);
 
-		EmbedBuilder welcomeEb = defaultEmbed("Application for " + applyingUser.getName());
+		EmbedBuilder welcomeEb = defaultEmbed("Application for " + player.getUsername());
 		welcomeEb.setDescription(
 			"Please react with the emoji that corresponds to the profile you want to apply with or react with ❌ to cancel the application"
 		);
@@ -247,7 +247,7 @@ public class ApplyUser implements Serializable {
 				staffCaseConstructor();
 				break;
 			case 2:
-				EmbedBuilder retryEmbed = defaultEmbed("Application for " + applyingUser.getName());
+				EmbedBuilder retryEmbed = defaultEmbed("Application for " + playerUsername);
 				retryEmbed.setDescription(
 					"Please react with the emoji that corresponds to the profile you want to apply with or react with ❌ to cancel the application"
 				);

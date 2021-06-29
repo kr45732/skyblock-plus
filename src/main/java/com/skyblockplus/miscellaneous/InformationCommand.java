@@ -15,7 +15,7 @@ public class InformationCommand extends Command {
 	public InformationCommand() {
 		this.name = "information";
 		this.cooldown = globalCooldown;
-		this.aliases = new String[] { "info" };
+		this.aliases = new String[] { "info", "about" };
 	}
 
 	public static ActionRow getInformationActionRow() {

@@ -42,7 +42,7 @@ public class SetupCommand extends Command {
 					"This will walk you through how to setup custom settings for the bot!\n\n**Pages:**\n• Page 2 - Features\n• Page 3 - Automatic Verify\n• Page 4 - Automatic Apply\n• Page 5 - Automatic Guild Roles\n• Page 6 - Automatic Roles\n• Page 7 - More Help";
 
 				String features =
-					"**I have many default features including, but not limited to:**\n• Slayer\n• Skills\n• Dungeons\n• Guilds\n• Auction house and Bazaar\n• Inventory\n• Skyblock Events\n• And much more that can be seen by running `" +
+					"**I have many default features including, but not limited to:**\n• Slayer\n• Skills\n• Dungeons\n• Guilds\n• Auction house and Bazaar\n• Inventory Viewers\n• Skyblock Events\n• And much more that can be seen by running `" +
 					BOT_PREFIX +
 					"help`!\n\nI also have customizable features such as automatic verify, automatic apply, automatic roles, and automatic guild role and ranks!";
 
@@ -62,7 +62,7 @@ public class SetupCommand extends Command {
 					"• Tutorial video linked [__here__](https://streamable.com/pibmus)\n\n" +
 					"**__Enable__**\n" +
 					"- Once all the required settings are set run `settings verify enable` to enable verify*.\n" +
-					"- For more help type `help settings_verify` or watch the video linked above\n" +
+					"- For more help type `help settings verify` or watch the video linked above\n" +
 					"\n" +
 					"*You __must__ run `reload` in order for the changes to take effect";
 
@@ -74,12 +74,12 @@ public class SetupCommand extends Command {
 					"4) The user will react to the emoji for the profile they want to apply with and then confirm the stats which sends it to staff\n" +
 					"5) The staff role will be pinged with the stats of the user\n" +
 					"6) The user will receive the a message depending on if they are accepted, denied, or waitlisted\n" +
-					"• Example video linked [__here__](https://streamable.com/4mg5ny)\n\n" +
+					"• Example video linked [__here__](https://streamable.com/iq543q)\n\n" +
 					"**__Setup__**\n" +
 					" • Please watch the tutorial video linked [__here__](https://streamable.com/pnlzop)\n\n" +
 					"**__Enable__**\n" +
 					"- Once all these settings are set run `settings apply [name] enable` to enable apply*\n" +
-					"- For more help type `help settings_apply` or watch the video linked above\n\n" +
+					"- For more help type `help settings apply` or watch the video linked above\n\n" +
 					"*You __must__ run `reload` in order for the changes to take effect";
 
 				String roles =
@@ -97,7 +97,7 @@ public class SetupCommand extends Command {
 					"**__Enable__**\n" +
 					"- Once all these settings are set run `settings roles enable` to enable roles.\n" +
 					"- To view all the roles, their descriptions, and examples, type `settings roles`\n" +
-					"- For more help type `help settings_roles` or watch the video linked above\n";
+					"- For more help type `help settings roles` or watch the video linked above\n";
 
 				String guildRoles =
 					"**__Overview__**\n" +
@@ -114,7 +114,7 @@ public class SetupCommand extends Command {
 					"**__Enable__**\n" +
 					"- Once these settings are set run `settings guild [name] enable role` to enable guild roles and/or `settings guild [name] enable rank` to enable guild ranks.\n" +
 					"- To view all the current settings type `settings guild [name]`\n" +
-					"- For more help type `help settings_guild`\n";
+					"- For more help type `help settings guild`\n";
 
 				String moreHelp =
 					"If you need any help, have suggestions, or find any bugs for this bot be sure to join the discord server [here](" +

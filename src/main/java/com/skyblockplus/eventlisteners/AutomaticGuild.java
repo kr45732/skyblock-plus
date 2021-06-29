@@ -582,7 +582,7 @@ public class AutomaticGuild {
 				}
 
 				for (JsonElement player : leaderboardArr) {
-					if (higherDepth(player, "id").getAsString().equals(event.getAuthor().getId())) {
+					if (higherDepth(player, "id").getAsString().equals(member.getId())) {
 						int playerLevel = higherDepth(player, "level").getAsInt();
 						JsonArray curRoles = higherDepth(currentMee6Settings, "mee6Ranks").getAsJsonArray();
 						List<Role> toAdd = new ArrayList<>();
@@ -644,7 +644,7 @@ public class AutomaticGuild {
 			.getHook()
 			.editMessageComponentsById(
 				event.getMessageId(),
-				ActionRow.of(Button.primary("create_application_button_disabled", "Disabled").asDisabled())
+				ActionRow.of(Button.danger("create_application_button_disabled", "Disabled").asDisabled())
 			)
 			.queue();
 

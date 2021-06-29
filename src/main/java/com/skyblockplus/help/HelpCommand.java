@@ -75,16 +75,16 @@ public class HelpCommand extends Command {
 		helpDataList.clear();
 		helpDataList.addAll(
 			Arrays.asList(
-				new HelpData("help", "Show the help page", "help")
+				new HelpData("help", "Show the help page.", "help")
 					.addSecondData("Get help about a specific command.", "help [command]")
 					.addExamples("help", "help Guild Experience")
 					.addAliases("commands"),
-				new HelpData("information", "Get information about this bot.").addAliases("info"),
+				new HelpData("information", "Get information about this bot.").addAliases("info", "about"),
 				new HelpData("invite", "Invite this bot to your server."),
 				new HelpData("link", "Get what account you are linked too.", "link")
 					.addSecondData("Link your Hypixel account to the bot.", "link [player]")
 					.addExamples("link CrypticPlasma"),
-				new HelpData("unlink", "Unlink your account from the bot"),
+				new HelpData("unlink", "Unlink your account from the bot."),
 				new HelpData("slayer", "Get the slayer data of a player.", "slayer [player] <profile>")
 					.addAliases("slayers")
 					.addExamples("slayer CrypticPlasma", "slayer CrypticPlasma Zucchini"),
@@ -471,13 +471,13 @@ public class HelpCommand extends Command {
 		paginateBuilder.addItems("Use the arrow emojis to navigate through the pages" + generatePageMap(isAdmin));
 
 		paginateBuilder.addItems(
-			generateHelp("help", "Show this help page") +
-			generateHelp("help [command name]", "Go to the help page of a specific command") +
-			generateHelp("information", "Get information about this bot") +
-			generateHelp("invite", "Invite this bot to your server") +
-			generateHelp("link [player]", "Link your discord and Hypixel account") +
-			generateHelp("link", "Get what Hypixel account you are linked to") +
-			generateHelp("unlink", "Unlink your account")
+			generateHelp("help", "Show the help page.") +
+			generateHelp("help [command name]", "Get help about a specific command.") +
+			generateHelp("information", "Get information about this bot.") +
+			generateHelp("invite", "Invite this bot to your server.") +
+			generateHelp("link [player]", "Link your Hypixel account to the bot.") +
+			generateHelp("link", "Get what account you are linked too.") +
+			generateHelp("unlink", "Unlink your account from the bot.")
 		);
 
 		paginateBuilder.addItems(generateHelp("slayer [player] <profile>", "Get the slayer data of a player"));
