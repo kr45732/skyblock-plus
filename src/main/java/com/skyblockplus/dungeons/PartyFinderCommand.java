@@ -5,13 +5,12 @@ import static com.skyblockplus.utils.Utils.*;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 
 public class PartyFinderCommand extends Command {
 
@@ -29,8 +28,13 @@ public class PartyFinderCommand extends Command {
 			eb.appendDescription("\n**Secrets:** " + formatNumber(player.getDungeonSecrets()));
 			eb.appendDescription("\n**Selected Class:** " + player.getSelectedDungeonClass());
 			eb.appendDescription(player.getFastestF7Time());
-			Set<String> necronBlade = player.getItemsPlayerHas(Arrays.asList("HYPERION", "VALKYRIE", "SCYLLA", "AXE_OF_THE_SHREDDED", "JUJU_SHORTBOW", "TERMINATOR"));
-			eb.appendDescription( "\n**Meta Items player has:** " + (necronBlade != null ?( necronBlade.size() > 0 ? String.join(", ", necronBlade) : "None" ): "Inventory API disabled"));
+			Set<String> necronBlade = player.getItemsPlayerHas(
+				Arrays.asList("HYPERION", "VALKYRIE", "SCYLLA", "AXE_OF_THE_SHREDDED", "JUJU_SHORTBOW", "TERMINATOR")
+			);
+			eb.appendDescription(
+				"\n**Meta Items player has:** " +
+				(necronBlade != null ? (necronBlade.size() > 0 ? String.join(", ", necronBlade) : "None") : "Inventory API disabled")
+			);
 			return eb;
 		}
 		return defaultEmbed("Unable to fetch player data");

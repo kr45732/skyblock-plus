@@ -544,23 +544,23 @@ public class Player {
 		Set<String> itemsPlayerHas = new HashSet<>();
 
 		for (InvItem item : itemsMap) {
-			if(item == null){
+			if (item == null) {
 				continue;
 			}
 
 			if (!item.getBackpackItems().isEmpty()) {
 				List<InvItem> backpackItems = item.getBackpackItems();
 				for (InvItem backpackItem : backpackItems) {
-					if(backpackItem == null){
+					if (backpackItem == null) {
 						continue;
 					}
 
-					if(items.contains(backpackItem.getId())){
+					if (items.contains(backpackItem.getId())) {
 						itemsPlayerHas.add(capitalizeString(backpackItem.getId().toLowerCase().replace("_", " ")));
 					}
 				}
 			} else {
-				if(items.contains(item.getId())){
+				if (items.contains(item.getId())) {
 					itemsPlayerHas.add(capitalizeString(item.getId().toLowerCase().replace("_", " ")));
 				}
 			}
@@ -579,8 +579,6 @@ public class Player {
 			return "\n**No F7 S+ time found**";
 		}
 	}
-
-
 
 	public int getDungeonSecrets() {
 		if (hypixelProfileJson == null) {
