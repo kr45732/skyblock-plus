@@ -67,3 +67,4 @@ lombok.config
 .classpath
 /src/main/java/com/skyblockplus/price/AuctionFlipper.java
 /src/main/java/com/skyblockplus/json/items/
+/src/main/java/com/skyblockplus/api/CommandEndpoints.java
