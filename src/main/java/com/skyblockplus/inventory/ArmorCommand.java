@@ -1,5 +1,6 @@
 package com.skyblockplus.inventory;
 
+import static com.skyblockplus.Main.executor;
 import static com.skyblockplus.Main.waiter;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -24,7 +25,7 @@ public class ArmorCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
 				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
@@ -50,8 +51,7 @@ public class ArmorCommand extends Command {
 
 				ebMessage.editMessage(errorEmbed(this.name).build()).queue();
 			}
-		)
-			.start();
+		);
 	}
 
 	private EmbedBuilder getPlayerEquippedArmor(String username, String profileName, CommandEvent event) {

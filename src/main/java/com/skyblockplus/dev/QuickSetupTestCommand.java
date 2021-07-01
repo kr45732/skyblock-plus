@@ -1,6 +1,7 @@
 package com.skyblockplus.dev;
 
 import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.executor;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.Gson;
@@ -22,7 +23,7 @@ public class QuickSetupTestCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
 				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
@@ -52,8 +53,7 @@ public class QuickSetupTestCommand extends Command {
 
 				ebMessage.editMessage(defaultEmbed("Invalid input").build()).queue();
 			}
-		)
-			.start();
+		);
 	}
 
 	private EmbedBuilder deleteSkyblockEvent(String serverId) {

@@ -1,5 +1,7 @@
 package com.skyblockplus.dungeons;
 
+import static com.skyblockplus.Main.executor;
+
 import com.skyblockplus.utils.slashcommands.SlashCommand;
 import com.skyblockplus.utils.slashcommands.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -12,21 +14,20 @@ public class DungeonsSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				event.logCommandGuildUserCommand();
 
 				String profileName = event.getOptionStr("profile");
 				EmbedBuilder eb;
 				if (profileName != null) {
-					eb = CatacombsCommand.getPlayerCatacombs(event.getOptionStr("player"), profileName);
+					eb = DungeonsCommand.getPlayerCatacombs(event.getOptionStr("player"), profileName);
 				} else {
-					eb = CatacombsCommand.getPlayerCatacombs(event.getOptionStr("player"), null);
+					eb = DungeonsCommand.getPlayerCatacombs(event.getOptionStr("player"), null);
 				}
 
 				event.getHook().editOriginalEmbeds(eb.build()).queue();
 			}
-		)
-			.start();
+		);
 	}
 }

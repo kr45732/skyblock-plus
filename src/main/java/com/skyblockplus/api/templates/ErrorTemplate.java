@@ -2,15 +2,15 @@ package com.skyblockplus.api.templates;
 
 public class ErrorTemplate {
 
-	private final String success;
+	private final boolean success;
 	private final String cause;
 
-	public ErrorTemplate(String success, String cause) {
+	public ErrorTemplate(boolean success, String cause) {
 		this.success = success;
 		this.cause = cause;
 	}
 
-	public String getSuccess() {
+	public boolean getSuccess() {
 		return success;
 	}
 

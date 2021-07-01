@@ -1,5 +1,6 @@
 package com.skyblockplus.dev;
 
+import static com.skyblockplus.Main.executor;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
@@ -17,7 +18,7 @@ public class UuidCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
 				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
@@ -33,8 +34,7 @@ public class UuidCommand extends Command {
 
 				ebMessage.editMessage(errorEmbed(this.name).build()).queue();
 			}
-		)
-			.start();
+		);
 	}
 
 	private EmbedBuilder getUuidPlayer(String username) {

@@ -1,5 +1,6 @@
 package com.skyblockplus.slayer;
 
+import static com.skyblockplus.Main.executor;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
@@ -24,60 +25,26 @@ public class SlayerCommand extends Command {
 
 			JsonElement slayer = higherDepth(player.getProfileJson(), "slayer_bosses");
 
-			int svenOneKills = higherDepth(slayer, "wolf.boss_kills_tier_0") != null
-				? higherDepth(slayer, "wolf.boss_kills_tier_0").getAsInt()
-				: 0;
-			int svenTwoKills = higherDepth(slayer, "wolf.boss_kills_tier_1") != null
-				? higherDepth(slayer, "wolf.boss_kills_tier_1").getAsInt()
-				: 0;
-			int svenThreeKills = higherDepth(slayer, "wolf.boss_kills_tier_2") != null
-				? higherDepth(slayer, "wolf.boss_kills_tier_2").getAsInt()
-				: 0;
-			int svenFourKills = higherDepth(slayer, "wolf.boss_kills_tier_3") != null
-				? higherDepth(slayer, "wolf.boss_kills_tier_3").getAsInt()
-				: 0;
+			int svenOneKills = player.getSlayerBossKills("wolf", 0);
+			int svenTwoKills = player.getSlayerBossKills("wolf", 1);
+			int svenThreeKills = player.getSlayerBossKills("wolf", 2);
+			int svenFourKills = player.getSlayerBossKills("wolf", 3);
 
-			int revOneKills = higherDepth(slayer, "zombie.boss_kills_tier_0") != null
-				? higherDepth(slayer, "zombie.boss_kills_tier_0").getAsInt()
-				: 0;
-			int revTwoKills = higherDepth(slayer, "zombie.boss_kills_tier_1") != null
-				? higherDepth(slayer, "zombie.boss_kills_tier_1").getAsInt()
-				: 0;
-			int revThreeKills = higherDepth(slayer, "zombie.boss_kills_tier_2") != null
-				? higherDepth(slayer, "zombie.boss_kills_tier_2").getAsInt()
-				: 0;
-			int revFourKills = higherDepth(slayer, "zombie.boss_kills_tier_3") != null
-				? higherDepth(slayer, "zombie.boss_kills_tier_3").getAsInt()
-				: 0;
-			int revFiveKills = higherDepth(slayer, "zombie.boss_kills_tier_4") != null
-				? higherDepth(slayer, "zombie.boss_kills_tier_4").getAsInt()
-				: 0;
+			int revOneKills = player.getSlayerBossKills("zombie", 0);
+			int revTwoKills = player.getSlayerBossKills("zombie", 1);
+			int revThreeKills = player.getSlayerBossKills("zombie", 2);
+			int revFourKills = player.getSlayerBossKills("zombie", 3);
+			int revFiveKills = player.getSlayerBossKills("zombie", 4);
 
-			int taraOneKills = higherDepth(slayer, "spider.boss_kills_tier_0") != null
-				? higherDepth(slayer, "spider.boss_kills_tier_0").getAsInt()
-				: 0;
-			int taraTwoKills = higherDepth(slayer, "spider.boss_kills_tier_1") != null
-				? higherDepth(slayer, "spider.boss_kills_tier_1").getAsInt()
-				: 0;
-			int taraThreeKills = higherDepth(slayer, "spider.boss_kills_tier_2") != null
-				? higherDepth(slayer, "spider.boss_kills_tier_2").getAsInt()
-				: 0;
-			int taraFourKills = higherDepth(slayer, "spider.boss_kills_tier_3") != null
-				? higherDepth(slayer, "spider.boss_kills_tier_3").getAsInt()
-				: 0;
+			int taraOneKills = player.getSlayerBossKills("spider", 0);
+			int taraTwoKills = player.getSlayerBossKills("spider", 1);
+			int taraThreeKills = player.getSlayerBossKills("spider", 2);
+			int taraFourKills = player.getSlayerBossKills("spider", 3);
 
-			int endermanOneKills = higherDepth(slayer, "enderman.boss_kills_tier_0") != null
-				? higherDepth(slayer, "enderman.boss_kills_tier_0").getAsInt()
-				: 0;
-			int endermanTwoKills = higherDepth(slayer, "enderman.boss_kills_tier_1") != null
-				? higherDepth(slayer, "enderman.boss_kills_tier_1").getAsInt()
-				: 0;
-			int endermanThreeKills = higherDepth(slayer, "enderman.boss_kills_tier_2") != null
-				? higherDepth(slayer, "enderman.boss_kills_tier_2").getAsInt()
-				: 0;
-			int endermanFourKills = higherDepth(slayer, "enderman.boss_kills_tier_3") != null
-				? higherDepth(slayer, "enderman.boss_kills_tier_3").getAsInt()
-				: 0;
+			int endermanOneKills = player.getSlayerBossKills("enderman", 0);
+			int endermanTwoKills = player.getSlayerBossKills("enderman", 1);
+			int endermanThreeKills = player.getSlayerBossKills("enderman", 2);
+			int endermanFourKills = player.getSlayerBossKills("enderman", 3);
 
 			String svenKills =
 				"**Tier 1:** " +
@@ -131,7 +98,15 @@ public class SlayerCommand extends Command {
 				50000L *
 				(svenFourKills + revFourKills + taraFourKills) +
 				100000L *
-				revFiveKills;
+				revFiveKills +
+				2000L *
+				endermanOneKills +
+				7500L *
+				endermanTwoKills +
+				20000L *
+				endermanThreeKills +
+				50000L *
+				endermanFourKills;
 			eb.setDescription(
 				"**Total slayer:** " +
 				formatNumber(player.getTotalSlayer()) +
@@ -174,7 +149,7 @@ public class SlayerCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
 				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
@@ -193,7 +168,6 @@ public class SlayerCommand extends Command {
 
 				ebMessage.editMessage(errorEmbed(this.name).build()).queue();
 			}
-		)
-			.start();
+		);
 	}
 }

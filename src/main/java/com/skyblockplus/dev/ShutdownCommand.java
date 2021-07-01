@@ -1,5 +1,6 @@
 package com.skyblockplus.dev;
 
+import static com.skyblockplus.Main.executor;
 import static com.skyblockplus.utils.Utils.BOT_PREFIX;
 import static com.skyblockplus.utils.Utils.logCommand;
 
@@ -15,13 +16,12 @@ public class ShutdownCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				logCommand(event.getGuild(), event.getAuthor(), BOT_PREFIX + "d-shutdown");
 				event.reactWarning();
 				event.getJDA().shutdown();
 			}
-		)
-			.start();
+		);
 	}
 }

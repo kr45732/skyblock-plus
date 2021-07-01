@@ -1,5 +1,7 @@
 package com.skyblockplus.link;
 
+import static com.skyblockplus.Main.executor;
+
 import com.skyblockplus.utils.slashcommands.SlashCommand;
 import com.skyblockplus.utils.slashcommands.SlashCommandExecutedEvent;
 
@@ -11,12 +13,11 @@ public class UnlinkSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				event.logCommandGuildUserCommand();
 				event.getHook().editOriginalEmbeds(UnlinkAccountCommand.unlinkAccount(event.getUser()).build()).queue();
 			}
-		)
-			.start();
+		);
 	}
 }

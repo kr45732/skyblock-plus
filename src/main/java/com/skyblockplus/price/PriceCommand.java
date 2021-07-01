@@ -1,5 +1,6 @@
 package com.skyblockplus.price;
 
+import static com.skyblockplus.Main.executor;
 import static com.skyblockplus.networth.NetworthExecute.isIgnoredItem;
 import static com.skyblockplus.networth.NetworthExecute.queryAhApi;
 import static com.skyblockplus.utils.Utils.*;
@@ -392,7 +393,7 @@ public class PriceCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
 				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
@@ -410,7 +411,6 @@ public class PriceCommand extends Command {
 
 				ebMessage.editMessage(errorEmbed(this.name).build()).queue();
 			}
-		)
-			.start();
+		);
 	}
 }

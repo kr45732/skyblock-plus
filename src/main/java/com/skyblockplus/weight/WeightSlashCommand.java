@@ -1,5 +1,7 @@
 package com.skyblockplus.weight;
 
+import static com.skyblockplus.Main.executor;
+
 import com.skyblockplus.utils.slashcommands.SlashCommand;
 import com.skyblockplus.utils.slashcommands.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -12,7 +14,7 @@ public class WeightSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				event.logCommandGuildUserCommand();
 				String subcommandName = event.getSubcommandName();
@@ -34,7 +36,6 @@ public class WeightSlashCommand extends SlashCommand {
 
 				event.getHook().editOriginalEmbeds(eb.build()).queue();
 			}
-		)
-			.start();
+		);
 	}
 }

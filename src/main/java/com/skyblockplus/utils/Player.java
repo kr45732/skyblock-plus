@@ -30,6 +30,32 @@ public class Player {
 	private String playerUsername;
 	private String profileName;
 
+	private String failCause = "Unknown Cause";
+
+	private static final int[] craftedMinionsToSlots = new int[] {
+		0,
+		5,
+		15,
+		30,
+		50,
+		75,
+		100,
+		125,
+		150,
+		175,
+		200,
+		225,
+		250,
+		275,
+		300,
+		350,
+		400,
+		450,
+		500,
+		550,
+		600,
+	};
+
 	/* Constructors */
 	public Player(String username) {
 		if (usernameToUuid(username)) {
@@ -93,6 +119,33 @@ public class Player {
 		try {
 			this.profilesArray = higherDepth(outerProfileJson, "profiles").getAsJsonArray();
 			if (profileIdFromName(profileName, profilesArray)) {
+				return;
+			}
+		} catch (Exception e) {
+			return;
+		}
+
+		this.validPlayer = true;
+	}
+
+	public Player(String playerUuid, String hypixelKey, boolean isAPI) {
+		this.playerUuid = playerUuid;
+
+		try {
+			JsonElement playerJson = getJson("https://api.hypixel.net/skyblock/profiles?key=" + hypixelKey + "&uuid=" + playerUuid);
+			if (higherDepth(playerJson, "cause") != null) {
+				failCause = higherDepth(playerJson, "cause").getAsString();
+				return;
+			}
+
+			if (higherDepth(playerJson, "profiles") != null && higherDepth(playerJson, "profiles").isJsonNull()) {
+				failCause = "Player has no SkyBlock profiles";
+				return;
+			}
+
+			this.profilesArray = higherDepth(playerJson, "profiles").getAsJsonArray();
+
+			if (getLatestProfile(profilesArray)) {
 				return;
 			}
 		} catch (Exception e) {
@@ -255,6 +308,10 @@ public class Player {
 
 	public boolean isValid() {
 		return validPlayer;
+	}
+
+	public String getFailCause() {
+		return failCause;
 	}
 
 	public String skyblockStatsLink() {
@@ -448,6 +505,11 @@ public class Player {
 
 	public int getTotalSlayer(JsonElement profile) {
 		return getSlayer(profile, "sven") + getSlayer(profile, "rev") + getSlayer(profile, "tara") + getSlayer(profile, "enderman");
+	}
+
+	public int getSlayerBossKills(String slayerName, int tier) {
+		JsonElement slayerBossKills = higherDepth(profileJson, "slayer_bosses." + slayerName + ".boss_kills_tier_" + tier);
+		return slayerBossKills != null ? slayerBossKills.getAsInt() : 0;
 	}
 
 	public int getSlayer(String slayerName) {
@@ -1142,30 +1204,6 @@ public class Player {
 					}
 				} catch (Exception ignored) {}
 			}
-
-			int[] craftedMinionsToSlots = new int[] {
-				0,
-				5,
-				15,
-				30,
-				50,
-				75,
-				100,
-				125,
-				150,
-				175,
-				200,
-				225,
-				250,
-				275,
-				300,
-				350,
-				400,
-				450,
-				500,
-				550,
-				600,
-			};
 
 			int prevMax = 0;
 			for (int i = 0; i < craftedMinionsToSlots.length; i++) {

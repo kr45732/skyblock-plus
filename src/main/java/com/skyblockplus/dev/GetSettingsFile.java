@@ -1,7 +1,6 @@
 package com.skyblockplus.dev;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.Main.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.GsonBuilder;
@@ -21,7 +20,7 @@ public class GetSettingsFile extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				String content = event.getMessage().getContentRaw();
 				String[] args = content.split(" ");
@@ -46,8 +45,7 @@ public class GetSettingsFile extends Command {
 
 				event.getChannel().sendMessage(errorEmbed(this.name).build()).queue();
 			}
-		)
-			.start();
+		);
 	}
 
 	private boolean getAllServerSettings(CommandEvent event) {

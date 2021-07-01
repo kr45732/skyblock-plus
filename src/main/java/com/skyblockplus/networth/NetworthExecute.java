@@ -1,5 +1,6 @@
 package com.skyblockplus.networth;
 
+import static com.skyblockplus.Main.executor;
 import static com.skyblockplus.Main.httpClient;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -102,7 +103,7 @@ public class NetworthExecute {
 	}
 
 	public void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
 				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
@@ -174,8 +175,7 @@ public class NetworthExecute {
 
 				ebMessage.editMessage(errorEmbed("networth").build()).queue();
 			}
-		)
-			.start();
+		);
 	}
 
 	private EmbedBuilder getPlayerNetworth(String username, String profileName) {

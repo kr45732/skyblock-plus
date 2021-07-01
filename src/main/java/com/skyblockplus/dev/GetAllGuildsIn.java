@@ -1,7 +1,6 @@
 package com.skyblockplus.dev;
 
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.Main.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
@@ -23,7 +22,7 @@ public class GetAllGuildsIn extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
 				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
@@ -102,7 +101,6 @@ public class GetAllGuildsIn extends Command {
 
 				ebMessage.editMessage(defaultEmbed("Invalid input").build()).queue();
 			}
-		)
-			.start();
+		);
 	}
 }

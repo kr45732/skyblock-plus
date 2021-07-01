@@ -271,7 +271,7 @@ public class SkyblockEventCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
 				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
@@ -437,8 +437,7 @@ public class SkyblockEventCommand extends Command {
 
 				ebMessage.editMessage(errorEmbed(this.name).build()).queue();
 			}
-		)
-			.start();
+		);
 	}
 
 	private EmbedBuilder leaveSkyblockEvent(CommandEvent event) {

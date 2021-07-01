@@ -1,6 +1,7 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.executor;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -518,7 +519,7 @@ public class RoleCommands extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
 				String content = event.getMessage().getContentRaw();
@@ -542,7 +543,6 @@ public class RoleCommands extends Command {
 
 				ebMessage.editMessage(eb.build()).queue();
 			}
-		)
-			.start();
+		);
 	}
 }

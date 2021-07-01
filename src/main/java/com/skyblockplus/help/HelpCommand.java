@@ -1,5 +1,6 @@
 package com.skyblockplus.help;
 
+import static com.skyblockplus.Main.executor;
 import static com.skyblockplus.Main.waiter;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -388,7 +389,7 @@ public class HelpCommand extends Command {
 									)
 							),
 						new HelpData("roles", "Main command for automatic roles settings.")
-							.addSecondData("Get the current roles settings for the bot.", "apply")
+							.addSecondData("Get the current roles settings for the bot.", "roles")
 							.addSubcommands(
 								new HelpData("enable", "Enable automatic roles.")
 									.addSecondData("Enable a specific automatic role (disabled by default).", "enable [roleName]")
@@ -487,7 +488,7 @@ public class HelpCommand extends Command {
 		paginateBuilder.addItems(
 			generateHelp("catacombs [player] <profile>", "Get the dungeons data of a player") +
 			generateHelp("essence upgrade [item]", "Interactive message to find the essence amount to upgrade an item") +
-			generateHelp("essence info [item]", "Get the amount of essence to upgrade an item for each level") +
+			generateHelp("essence information [item]", "Get the amount of essence to upgrade an item for each level") +
 			generateHelp("partyfinder [player] <profile>", "A party finder helper that shows a player's dungeon stats")
 		);
 
@@ -669,7 +670,7 @@ public class HelpCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				logCommand(event.getGuild(), event.getAuthor(), event.getMessage().getContentRaw());
 				String[] args = event.getMessage().getContentRaw().toLowerCase().split(" ", 2);
@@ -679,7 +680,6 @@ public class HelpCommand extends Command {
 					event.getChannel().sendMessage(eb.build()).queue();
 				}
 			}
-		)
-			.start();
+		);
 	}
 }

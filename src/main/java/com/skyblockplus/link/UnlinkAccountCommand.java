@@ -1,6 +1,7 @@
 package com.skyblockplus.link;
 
 import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.executor;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
@@ -23,7 +24,7 @@ public class UnlinkAccountCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
 				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
@@ -33,7 +34,6 @@ public class UnlinkAccountCommand extends Command {
 
 				ebMessage.editMessage(unlinkAccount(event.getAuthor()).build()).queue();
 			}
-		)
-			.start();
+		);
 	}
 }

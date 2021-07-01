@@ -1,5 +1,6 @@
 package com.skyblockplus.dev;
 
+import static com.skyblockplus.Main.executor;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonObject;
@@ -17,7 +18,7 @@ public class EmojiMapServerCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				logCommand(event.getGuild(), event.getAuthor(), BOT_PREFIX + "d-emojis");
 
@@ -27,7 +28,6 @@ public class EmojiMapServerCommand extends Command {
 				}
 				event.reply(makeHastePost(toAdd.toString()));
 			}
-		)
-			.start();
+		);
 	}
 }

@@ -1,5 +1,6 @@
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.Main.executor;
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -63,7 +64,7 @@ public class InformationCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				logCommand(event.getGuild(), event.getAuthor(), BOT_PREFIX + "information");
 
@@ -73,7 +74,6 @@ public class InformationCommand extends Command {
 					.setActionRows(getInformationActionRow())
 					.queue();
 			}
-		)
-			.start();
+		);
 	}
 }

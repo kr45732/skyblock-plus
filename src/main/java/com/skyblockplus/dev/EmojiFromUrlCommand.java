@@ -1,5 +1,6 @@
 package com.skyblockplus.dev;
 
+import static com.skyblockplus.Main.executor;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -41,7 +42,7 @@ public class EmojiFromUrlCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				if (!allowedUsers.contains(event.getAuthor().getId())) {
 					return;
@@ -110,7 +111,6 @@ public class EmojiFromUrlCommand extends Command {
 					e.printStackTrace();
 				}
 			}
-		)
-			.start();
+		);
 	}
 }

@@ -31,6 +31,8 @@ import com.skyblockplus.timeout.MessageTimeout;
 import com.skyblockplus.utils.slashcommands.SlashCommandClient;
 import com.skyblockplus.weight.WeightCommand;
 import com.skyblockplus.weight.WeightSlashCommand;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import javax.annotation.PreDestroy;
 import javax.security.auth.login.LoginException;
 import net.dv8tion.jda.api.JDA;
@@ -49,6 +51,7 @@ public class Main {
 
 	public static final AsyncHttpClient asyncHttpClient = Dsl.asyncHttpClient();
 	public static final CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+	public static final ExecutorService executor = Executors.newCachedThreadPool();
 	public static JDA jda;
 	public static Database database;
 	public static EventWaiter waiter;
@@ -73,7 +76,7 @@ public class Main {
 			new AuctionCommand(),
 			new BinCommand(),
 			new SkillsCommand(),
-			new CatacombsCommand(),
+			new DungeonsCommand(),
 			new ShutdownCommand(),
 			new RoleCommands(),
 			new GuildRanksCommand(),

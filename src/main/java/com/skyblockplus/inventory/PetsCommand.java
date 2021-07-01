@@ -1,5 +1,6 @@
 package com.skyblockplus.inventory;
 
+import static com.skyblockplus.Main.executor;
 import static com.skyblockplus.Main.waiter;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -22,7 +23,7 @@ public class PetsCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
 				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
@@ -46,8 +47,7 @@ public class PetsCommand extends Command {
 
 				ebMessage.editMessage(errorEmbed(this.name).build()).queue();
 			}
-		)
-			.start();
+		);
 	}
 
 	private EmbedBuilder getPlayerPets(String username, String profileName, CommandEvent event) {

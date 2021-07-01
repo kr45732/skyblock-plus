@@ -1,7 +1,6 @@
 package com.skyblockplus.guilds;
 
-import static com.skyblockplus.Main.asyncHttpClient;
-import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.Main.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -339,7 +338,7 @@ public class GuildCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
 				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
@@ -387,7 +386,6 @@ public class GuildCommand extends Command {
 
 				ebMessage.editMessage(errorEmbed(this.name).build()).queue();
 			}
-		)
-			.start();
+		);
 	}
 }

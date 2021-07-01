@@ -1,5 +1,6 @@
 package com.skyblockplus.dev;
 
+import static com.skyblockplus.Main.executor;
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -19,7 +20,7 @@ public class UpdateSlashCommands extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				String content = event.getMessage().getContentRaw();
 				String[] args = content.split(" ");
@@ -56,8 +57,7 @@ public class UpdateSlashCommands extends Command {
 
 				event.getChannel().sendMessage(errorEmbed(name).build()).queue();
 			}
-		)
-			.start();
+		);
 	}
 
 	private CommandData[] generateSlashCommands() {
@@ -138,7 +138,7 @@ public class UpdateSlashCommands extends Command {
 					new SubcommandData("calculate", "Calculate predicted weight using given stats (not 100% accurate)")
 						.addOption(OptionType.STRING, "skill_average", "Player's skill average", true)
 						.addOption(OptionType.STRING, "slayer", "Player's slayer XP", true)
-						.addOption(OptionType.STRING, "catacombs", "Player's catacombs level", true)
+						.addOption(OptionType.STRING, "dungeons", "Player's catacombs level", true)
 						.addOption(OptionType.STRING, "average_class", "Player's average dungeon class level", true)
 				),
 			new CommandData("hypixel", "Main hypixel command")

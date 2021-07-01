@@ -1,7 +1,6 @@
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.Main.asyncHttpClient;
-import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.Main.*;
 import static com.skyblockplus.utils.Player.skyblockStatsLink;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -125,7 +124,7 @@ public class ProfilesCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
 				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
@@ -146,7 +145,6 @@ public class ProfilesCommand extends Command {
 
 				ebMessage.editMessage(errorEmbed(this.name).build()).queue();
 			}
-		)
-			.start();
+		);
 	}
 }

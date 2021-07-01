@@ -1,7 +1,6 @@
 package com.skyblockplus.inventory;
 
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.Main.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
@@ -28,7 +27,7 @@ public class TalismanBagCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
 				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
@@ -73,8 +72,7 @@ public class TalismanBagCommand extends Command {
 
 				ebMessage.editMessage(errorEmbed(this.name).build()).queue();
 			}
-		)
-			.start();
+		);
 	}
 
 	private List<String[]> getPlayerTalismansEmoji(String username, String profileName) {

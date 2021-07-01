@@ -1,5 +1,6 @@
 package com.skyblockplus.inventory;
 
+import static com.skyblockplus.Main.executor;
 import static com.skyblockplus.Main.waiter;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -25,7 +26,7 @@ public class InventoryCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
 				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
@@ -73,8 +74,7 @@ public class InventoryCommand extends Command {
 
 				ebMessage.editMessage(errorEmbed(this.name).build()).queue();
 			}
-		)
-			.start();
+		);
 	}
 
 	private EmbedBuilder getPlayerInventoryList(String username, String profileName, String slotNum, CommandEvent event) {

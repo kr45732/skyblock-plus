@@ -1,5 +1,6 @@
 package com.skyblockplus.dungeons;
 
+import static com.skyblockplus.Main.executor;
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -55,7 +56,7 @@ public class EssenceCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
 				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
@@ -93,7 +94,6 @@ public class EssenceCommand extends Command {
 
 				ebMessage.editMessage(errorEmbed(this.name).build()).queue();
 			}
-		)
-			.start();
+		);
 	}
 }

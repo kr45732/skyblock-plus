@@ -1,5 +1,6 @@
 package com.skyblockplus.dev;
 
+import static com.skyblockplus.Main.executor;
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.BOT_PREFIX;
 import static com.skyblockplus.utils.Utils.logCommand;
@@ -16,7 +17,7 @@ public class GetEventListenersCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				logCommand(event.getGuild(), event.getAuthor(), BOT_PREFIX + "d-listeners");
 
@@ -27,7 +28,6 @@ public class GetEventListenersCommand extends Command {
 
 				event.reply(ebString.toString());
 			}
-		)
-			.start();
+		);
 	}
 }

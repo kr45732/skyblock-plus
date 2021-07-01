@@ -10,7 +10,7 @@ public class CustomErrorController implements ErrorController {
 
 	@RequestMapping("/error")
 	public ErrorTemplate error() {
-		return new ErrorTemplate("false", "Invalid request");
+		return new ErrorTemplate(false, "Invalid request");
 	}
 
 	@Override

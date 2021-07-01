@@ -1,5 +1,6 @@
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.Main.executor;
 import static com.skyblockplus.eventlisteners.MainListener.*;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -19,7 +20,7 @@ public class ReloadCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				logCommand(event.getGuild(), event.getAuthor(), event.getMessage().getContentRaw());
 
@@ -32,7 +33,6 @@ public class ReloadCommand extends Command {
 				eb.addField("Mee6 bypasser reload status", onMee6Reload(event.getGuild().getId()), false);
 				ebMessage.editMessage(eb.build()).queue();
 			}
-		)
-			.start();
+		);
 	}
 }

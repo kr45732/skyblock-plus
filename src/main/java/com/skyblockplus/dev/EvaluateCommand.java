@@ -1,6 +1,7 @@
 package com.skyblockplus.dev;
 
 import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.executor;
 import static com.skyblockplus.eventlisteners.MainListener.guildMap;
 import static com.skyblockplus.utils.Utils.logCommand;
 import static com.skyblockplus.utils.Utils.makeHastePost;
@@ -41,13 +42,14 @@ public class EvaluateCommand extends Command {
 			"net.dv8tion.jda.api.utils",
 			"com.skyblockplus",
 			"com.google.gson",
+			"com.skyblockplus.utils.structs",
 		};
 
 		// import [name]
 		String[] classImports = { "com.skyblockplus.utils.Player", "me.nullicorn.nedit.NBTReader" };
 
 		// import static [name]
-		String[] staticImports = { "com.skyblockplus.utils.Utils.*" };
+		String[] staticImports = { "com.skyblockplus.utils.Utils.*", "com.skyblockplus.Main.*" };
 
 		for (String packageImport : packageImports) {
 			importString.append("import ").append(packageImport).append(".*\n");
@@ -64,7 +66,7 @@ public class EvaluateCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				Message ebMessage = event.getChannel().sendMessage("Loading").complete();
 				String content = event.getMessage().getContentRaw();
@@ -133,7 +135,6 @@ public class EvaluateCommand extends Command {
 					ebMessage.editMessage("" + (msg.length() >= 2000 ? makeHastePost(msg) : msg)).queue();
 				}
 			}
-		)
-			.start();
+		);
 	}
 }

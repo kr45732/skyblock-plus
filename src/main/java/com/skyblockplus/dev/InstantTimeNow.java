@@ -1,5 +1,6 @@
 package com.skyblockplus.dev;
 
+import static com.skyblockplus.Main.executor;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
@@ -15,13 +16,12 @@ public class InstantTimeNow extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				logCommand(event.getGuild(), event.getAuthor(), BOT_PREFIX + "d-instant");
 
 				event.reply(defaultEmbed("Instant Time Now").setDescription(Instant.now().toString()).build());
 			}
-		)
-			.start();
+		);
 	}
 }

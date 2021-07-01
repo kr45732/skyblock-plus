@@ -1,5 +1,7 @@
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.Main.executor;
+
 import com.skyblockplus.utils.slashcommands.SlashCommand;
 import com.skyblockplus.utils.slashcommands.SlashCommandExecutedEvent;
 
@@ -11,7 +13,7 @@ public class InformationSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				event.logCommandGuildUserCommand();
 				event
@@ -20,7 +22,6 @@ public class InformationSlashCommand extends SlashCommand {
 					.setActionRows(InformationCommand.getInformationActionRow())
 					.queue();
 			}
-		)
-			.start();
+		);
 	}
 }

@@ -1,5 +1,6 @@
 package com.skyblockplus.settings;
 
+import static com.skyblockplus.Main.executor;
 import static com.skyblockplus.Main.waiter;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -21,7 +22,7 @@ public class SetupCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
 				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
@@ -131,7 +132,6 @@ public class SetupCommand extends Command {
 				ebMessage.delete().queue();
 				paginateBuilder.build().paginate(event.getChannel(), 0);
 			}
-		)
-			.start();
+		);
 	}
 }

@@ -9,13 +9,13 @@ public class _SlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				event.logCommandGuildUserCommand();
                 
 				event.getHook().editOriginalEmbeds().queue();
 			}
 		)
-			.start();
+			;
 	}
 }

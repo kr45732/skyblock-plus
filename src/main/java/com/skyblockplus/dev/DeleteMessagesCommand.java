@@ -1,5 +1,6 @@
 package com.skyblockplus.dev;
 
+import static com.skyblockplus.Main.executor;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
@@ -17,7 +18,7 @@ public class DeleteMessagesCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				String content = event.getMessage().getContentRaw();
 				String[] args = content.split(" ");
@@ -44,7 +45,6 @@ public class DeleteMessagesCommand extends Command {
 
 				event.getChannel().sendMessage(errorEmbed(this.name).build()).queue();
 			}
-		)
-			.start();
+		);
 	}
 }

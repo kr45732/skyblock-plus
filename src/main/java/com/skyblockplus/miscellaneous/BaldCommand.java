@@ -1,5 +1,6 @@
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.Main.executor;
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -24,7 +25,7 @@ public class BaldCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				if (!allowedGuilds.contains(event.getGuild().getId())) {
 					return;
@@ -89,7 +90,6 @@ public class BaldCommand extends Command {
 				} catch (Exception ignored) {}
 				ebMessage.editMessage(defaultEmbed("Invalid usage. Try `" + BOT_PREFIX + "bald @mention`").build()).queue();
 			}
-		)
-			.start();
+		);
 	}
 }

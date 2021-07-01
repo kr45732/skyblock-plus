@@ -1,5 +1,6 @@
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.Main.executor;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
@@ -33,13 +34,12 @@ public class InviteCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				logCommand(event.getGuild(), event.getAuthor(), event.getMessage().getContentRaw());
 
 				event.getChannel().sendMessage(getInvite().build()).queue();
 			}
-		)
-			.start();
+		);
 	}
 }

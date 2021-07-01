@@ -42,7 +42,7 @@ public class SettingsCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				this.event = event;
 				EmbedBuilder eb = loadingEmbed();
@@ -424,8 +424,7 @@ public class SettingsCommand extends Command {
 
 				ebMessage.editMessage(eb.build()).queue();
 			}
-		)
-			.start();
+		);
 	}
 
 	private EmbedBuilder setHypixelKey(String newKey) {

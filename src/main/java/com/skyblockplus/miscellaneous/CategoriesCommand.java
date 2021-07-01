@@ -1,5 +1,6 @@
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.Main.executor;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
@@ -18,7 +19,7 @@ public class CategoriesCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
 				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
@@ -33,7 +34,6 @@ public class CategoriesCommand extends Command {
 				eb = defaultEmbed("Guild Categories").setDescription(ebString.length() == 0 ? "None" : ebString.toString());
 				ebMessage.editMessage(eb.build()).queue();
 			}
-		)
-			.start();
+		);
 	}
 }

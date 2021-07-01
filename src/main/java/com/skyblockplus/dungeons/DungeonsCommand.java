@@ -1,5 +1,6 @@
 package com.skyblockplus.dungeons;
 
+import static com.skyblockplus.Main.executor;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
@@ -9,9 +10,9 @@ import com.skyblockplus.utils.structs.SkillsStruct;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
-public class CatacombsCommand extends Command {
+public class DungeonsCommand extends Command {
 
-	public CatacombsCommand() {
+	public DungeonsCommand() {
 		this.name = "dungeons";
 		this.cooldown = globalCooldown;
 		this.aliases = new String[] { "cata", "catacombs" };
@@ -67,7 +68,7 @@ public class CatacombsCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
 				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
@@ -85,7 +86,6 @@ public class CatacombsCommand extends Command {
 				}
 				ebMessage.editMessage(errorEmbed(this.name).build()).queue();
 			}
-		)
-			.start();
+		);
 	}
 }

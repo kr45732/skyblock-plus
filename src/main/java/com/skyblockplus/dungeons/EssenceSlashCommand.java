@@ -1,5 +1,6 @@
 package com.skyblockplus.dungeons;
 
+import static com.skyblockplus.Main.executor;
 import static com.skyblockplus.utils.Utils.getEssenceCostsJson;
 
 import com.skyblockplus.utils.slashcommands.SlashCommand;
@@ -14,7 +15,7 @@ public class EssenceSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				event.logCommandGuildUserCommand();
 				String subcommandName = event.getSubcommandName();
@@ -33,7 +34,6 @@ public class EssenceSlashCommand extends SlashCommand {
 
 				event.getHook().editOriginalEmbeds(eb.build()).queue();
 			}
-		)
-			.start();
+		);
 	}
 }

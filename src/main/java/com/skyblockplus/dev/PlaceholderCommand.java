@@ -1,5 +1,6 @@
 package com.skyblockplus.dev;
 
+import static com.skyblockplus.Main.executor;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
@@ -17,7 +18,7 @@ public class PlaceholderCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new Thread(
+		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
 				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
@@ -42,8 +43,7 @@ public class PlaceholderCommand extends Command {
 
 				ebMessage.editMessage(eb.build()).queue();
 			}
-		)
-			.start();
+		);
 	}
 	//	public static void main(String[] args) {
 	//		for(String i:getEmojiMap().keySet()){
