@@ -1,14 +1,14 @@
 package com.skyblockplus.eventlisteners.skyblockevent;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.eventlisteners.MainListener.guildMap;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSettingsModel;
 import com.skyblockplus.api.discordserversettings.skyblockevent.RunningEvent;
 import com.skyblockplus.api.discordserversettings.skyblockevent.SbEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -19,12 +19,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.scheduler;
+import static com.skyblockplus.eventlisteners.MainListener.guildMap;
+import static com.skyblockplus.utils.Utils.*;
 
 public class SkyblockEvent {
 
@@ -40,7 +41,7 @@ public class SkyblockEvent {
 	public int eventDuration;
 	public long epochSecondEndingTime;
 	public Instant lastMessageSentTime;
-	public ScheduledExecutorService scheduler;
+	public ScheduledFuture<?> scheduledFuture;
 	public int attemptsLeft = 3;
 
 	public SkyblockEvent() {
@@ -54,8 +55,7 @@ public class SkyblockEvent {
 		eb.setDescription("What is the name of the guild I should track?");
 		sendEmbedMessage(eb);
 		lastMessageSentTime = Instant.now();
-		scheduler = Executors.newScheduledThreadPool(1);
-		scheduler.scheduleAtFixedRate(this::checkForTimeout, 0, 1, TimeUnit.MINUTES);
+		scheduledFuture = scheduler.scheduleAtFixedRate(this::checkForTimeout, 0, 1, TimeUnit.MINUTES);
 	}
 
 	private void checkForTimeout() {
@@ -311,9 +311,10 @@ public class SkyblockEvent {
 	}
 
 	public void resetSkyblockEvent(EmbedBuilder eb) {
-		if (scheduler != null) {
-			scheduler.shutdownNow();
+		if(scheduledFuture != null) {
+			scheduledFuture.cancel(true);
 		}
+
 		if (eb != null) {
 			sendEmbedMessage(eb);
 		}

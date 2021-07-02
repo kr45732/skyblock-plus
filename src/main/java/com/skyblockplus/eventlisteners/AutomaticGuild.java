@@ -1,7 +1,6 @@
 package com.skyblockplus.eventlisteners;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.Main.*;
 import static com.skyblockplus.eventlisteners.skyblockevent.SkyblockEventCommand.endSkyblockEvent;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -23,10 +22,7 @@ import java.io.File;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -47,9 +43,9 @@ public class AutomaticGuild {
 	public SkyblockEvent skyblockEvent = new SkyblockEvent();
 	public List<EventMember> eventMemberList = new ArrayList<>();
 	public Instant eventMemberListLastUpdated = null;
-	public ScheduledExecutorService scheduler;
 	public JsonElement currentMee6Settings;
 	public Instant lastMee6RankUpdate = null;
+	public List<ScheduledFuture<?>> scheduledFutures = new ArrayList<>();
 
 	public AutomaticGuild(GenericGuildEvent event) {
 		guildId = event.getGuild().getId();
@@ -80,10 +76,9 @@ public class AutomaticGuild {
 	}
 
 	public void schedulerConstructor() {
-		scheduler = Executors.newScheduledThreadPool(1);
 		int eventDelay = (int) (Math.random() * 60 + 1);
-		scheduler.scheduleAtFixedRate(this::updateGuildRoles, eventDelay, 210, TimeUnit.MINUTES);
-		scheduler.scheduleAtFixedRate(this::updateSkyblockEvent, eventDelay, 60, TimeUnit.MINUTES);
+		scheduledFutures.add(scheduler.scheduleAtFixedRate(this::updateGuildRoles, eventDelay, 210, TimeUnit.MINUTES));
+		scheduledFutures.add(scheduler.scheduleAtFixedRate(this::updateSkyblockEvent, eventDelay, 60, TimeUnit.MINUTES));
 	}
 
 	private void updateSkyblockEvent() {
@@ -623,8 +618,8 @@ public class AutomaticGuild {
 	}
 
 	public void createSkyblockEvent(CommandEvent event) {
-		if (skyblockEvent != null && skyblockEvent.scheduler != null) {
-			skyblockEvent.scheduler.shutdownNow();
+		if (skyblockEvent != null && skyblockEvent.scheduledFuture != null) {
+			skyblockEvent.scheduledFuture.cancel(true);
 		}
 		skyblockEvent = new SkyblockEvent(event);
 	}
@@ -652,12 +647,12 @@ public class AutomaticGuild {
 	}
 
 	public void onGuildLeave() {
-		if (skyblockEvent.scheduler != null) {
-			skyblockEvent.scheduler.shutdownNow();
+		if (skyblockEvent.scheduledFuture != null) {
+			skyblockEvent.scheduledFuture.cancel(true);
 		}
 
-		if (scheduler != null) {
-			scheduler.shutdownNow();
+		for (ScheduledFuture<?> scheduledFuture : scheduledFutures) {
+			scheduledFuture.cancel(true);
 		}
 	}
 

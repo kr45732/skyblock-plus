@@ -1,18 +1,18 @@
 package com.skyblockplus.timeout;
 
-import static com.skyblockplus.Main.jda;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.ReadyEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.jetbrains.annotations.NotNull;
+
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.Main.scheduler;
 
 public class MessageTimeout extends ListenerAdapter {
 
@@ -34,7 +34,6 @@ public class MessageTimeout extends ListenerAdapter {
 
 	@Override
 	public void onReady(@NotNull ReadyEvent event) {
-		ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 		scheduler.scheduleAtFixedRate(this::updateMessages, 1, 1, TimeUnit.MINUTES);
 	}
 
