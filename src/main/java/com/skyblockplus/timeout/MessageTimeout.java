@@ -1,18 +1,17 @@
 package com.skyblockplus.timeout;
 
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.ReadyEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.jetbrains.annotations.NotNull;
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.Main.scheduler;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.Main.scheduler;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 
 public class MessageTimeout extends ListenerAdapter {
 

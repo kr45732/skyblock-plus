@@ -1,14 +1,15 @@
 package com.skyblockplus.eventlisteners.skyblockevent;
 
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.scheduler;
+import static com.skyblockplus.eventlisteners.MainListener.guildMap;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSettingsModel;
 import com.skyblockplus.api.discordserversettings.skyblockevent.RunningEvent;
 import com.skyblockplus.api.discordserversettings.skyblockevent.SbEvent;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -21,11 +22,9 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.scheduler;
-import static com.skyblockplus.eventlisteners.MainListener.guildMap;
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class SkyblockEvent {
 
@@ -311,7 +310,7 @@ public class SkyblockEvent {
 	}
 
 	public void resetSkyblockEvent(EmbedBuilder eb) {
-		if(scheduledFuture != null) {
+		if (scheduledFuture != null) {
 			scheduledFuture.cancel(true);
 		}
 

@@ -53,7 +53,7 @@ public class Main {
 	public static final AsyncHttpClient asyncHttpClient = Dsl.asyncHttpClient();
 	public static final CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 	public static final ExecutorService executor = Executors.newCachedThreadPool();
-	public static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(3);;
+	public static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(3);
 	public static JDA jda;
 	public static Database database;
 	public static EventWaiter waiter;
