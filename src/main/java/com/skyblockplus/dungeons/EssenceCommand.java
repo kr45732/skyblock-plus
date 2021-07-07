@@ -58,7 +58,7 @@ public class EssenceCommand extends Command {
 		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
 				String content = event.getMessage().getContentRaw();
 				String[] args = content.split(" ");
 
@@ -80,18 +80,18 @@ public class EssenceCommand extends Command {
 						jda.addEventListener(new EssenceWaiter(itemName, itemJson, ebMessage, event.getAuthor()));
 					} else {
 						eb = defaultEmbed("Invalid item name");
-						ebMessage.editMessage(eb.build()).queue();
+						ebMessage.editMessageEmbeds(eb.build()).queue();
 					}
 					return;
 				} else if (args.length >= 3 && (args[1].equals("info") || args[1].equals("information"))) {
 					String itemName = content.split(" ", 3)[2];
 
 					eb = getEssenceInformation(itemName, essenceCostsJson);
-					ebMessage.editMessage(eb.build()).queue();
+					ebMessage.editMessageEmbeds(eb.build()).queue();
 					return;
 				}
 
-				ebMessage.editMessage(errorEmbed(this.name).build()).queue();
+				ebMessage.editMessageEmbeds(errorEmbed(this.name).build()).queue();
 			}
 		);
 	}

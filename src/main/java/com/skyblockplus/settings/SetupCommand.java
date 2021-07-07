@@ -25,7 +25,7 @@ public class SetupCommand extends Command {
 		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
 
 				logCommand(event.getGuild(), event.getAuthor(), getGuildPrefix(event.getGuild().getId()) + "setup");
 

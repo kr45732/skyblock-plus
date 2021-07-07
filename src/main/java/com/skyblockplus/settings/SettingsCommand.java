@@ -49,7 +49,7 @@ public class SettingsCommand extends Command {
 			() -> {
 				this.event = event;
 				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
 				String content = event.getMessage().getContentRaw();
 				String[] args = content.split(" ");
 				eb = null;
@@ -463,7 +463,7 @@ public class SettingsCommand extends Command {
 					eb = errorEmbed("settings");
 				}
 
-				ebMessage.editMessage(eb.build()).queue();
+				ebMessage.editMessageEmbeds(eb.build()).queue();
 			}
 		);
 	}

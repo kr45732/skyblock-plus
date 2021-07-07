@@ -219,17 +219,17 @@ public class QueryAuctionCommand extends Command {
 		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
 				String[] args = event.getMessage().getContentRaw().split(" ", 2);
 
 				logCommand(event.getGuild(), event.getAuthor(), event.getMessage().getContentRaw());
 
 				if (args.length == 2) {
-					ebMessage.editMessage(queryAuctions(args[1]).build()).queue();
+					ebMessage.editMessageEmbeds(queryAuctions(args[1]).build()).queue();
 					return;
 				}
 
-				ebMessage.editMessage(errorEmbed(this.name).build()).queue();
+				ebMessage.editMessageEmbeds(errorEmbed(this.name).build()).queue();
 			}
 		);
 	}

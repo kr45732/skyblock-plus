@@ -70,7 +70,7 @@ public class SkyblockEvent {
 	}
 
 	private void sendEmbedMessage(EmbedBuilder eb) {
-		commandEvent.getChannel().sendMessage(eb.build()).complete();
+		commandEvent.getChannel().sendMessageEmbeds(eb.build()).complete();
 	}
 
 	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
@@ -252,7 +252,7 @@ public class SkyblockEvent {
 					);
 
 					if (setSkyblockEventInDatabase()) {
-						announcementChannel.sendMessage(announcementEb.build()).complete();
+						announcementChannel.sendMessageEmbeds(announcementEb.build()).complete();
 						resetSkyblockEvent(
 							defaultEmbed("Skyblock competition")
 								.setDescription("Event successfully started in " + announcementChannel.getAsMention())

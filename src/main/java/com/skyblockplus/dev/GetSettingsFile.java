@@ -44,7 +44,7 @@ public class GetSettingsFile extends Command {
 					}
 				}
 
-				event.getChannel().sendMessage(errorEmbed(this.name).build()).queue();
+				event.getChannel().sendMessageEmbeds(errorEmbed(this.name).build()).queue();
 			}
 		);
 	}

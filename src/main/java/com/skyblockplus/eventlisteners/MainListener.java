@@ -100,9 +100,9 @@ public class MainListener extends ListenerAdapter {
 					.findFirst()
 					.orElse(null);
 				if (channel != null) {
-					channel.sendMessage(eb.build()).queue();
+					channel.sendMessageEmbeds(eb.build()).queue();
 				} else {
-					event.getGuild().getDefaultChannel().sendMessage(eb.build()).queue();
+					event.getGuild().getDefaultChannel().sendMessageEmbeds(eb.build()).queue();
 				}
 			} catch (Exception ignored) {}
 

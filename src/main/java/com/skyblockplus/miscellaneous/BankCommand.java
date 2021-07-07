@@ -114,7 +114,7 @@ public class BankCommand extends Command {
 		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
 				String content = event.getMessage().getContentRaw();
 				String[] args = content.split(" ");
 
@@ -130,18 +130,18 @@ public class BankCommand extends Command {
 					if (eb == null) {
 						ebMessage.delete().queue();
 					} else {
-						ebMessage.editMessage(eb.build()).queue();
+						ebMessage.editMessageEmbeds(eb.build()).queue();
 					}
 					return;
 				} else if (args.length == 2) {
-					ebMessage.editMessage(getPlayerBalance(args[1], null).build()).queue();
+					ebMessage.editMessageEmbeds(getPlayerBalance(args[1], null).build()).queue();
 					return;
 				} else if (args.length == 3) {
-					ebMessage.editMessage(getPlayerBalance(args[1], args[2]).build()).queue();
+					ebMessage.editMessageEmbeds(getPlayerBalance(args[1], args[2]).build()).queue();
 					return;
 				}
 
-				ebMessage.editMessage(errorEmbed(this.name).build()).queue();
+				ebMessage.editMessageEmbeds(errorEmbed(this.name).build()).queue();
 			}
 		);
 	}

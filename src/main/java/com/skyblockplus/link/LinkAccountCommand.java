@@ -133,21 +133,21 @@ public class LinkAccountCommand extends Command {
 		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
 				String content = event.getMessage().getContentRaw();
 				String[] args = content.split(" ");
 
 				logCommand(event.getGuild(), event.getAuthor(), content);
 
 				if (args.length == 2) {
-					ebMessage.editMessage(linkAccount(args[1], event.getMember(), event.getGuild()).build()).queue();
+					ebMessage.editMessageEmbeds(linkAccount(args[1], event.getMember(), event.getGuild()).build()).queue();
 					return;
 				} else if (args.length == 1) {
-					ebMessage.editMessage(getLinkedAccount(event.getAuthor()).build()).queue();
+					ebMessage.editMessageEmbeds(getLinkedAccount(event.getAuthor()).build()).queue();
 					return;
 				}
 
-				ebMessage.editMessage(errorEmbed(this.name).build()).queue();
+				ebMessage.editMessageEmbeds(errorEmbed(this.name).build()).queue();
 			}
 		);
 	}

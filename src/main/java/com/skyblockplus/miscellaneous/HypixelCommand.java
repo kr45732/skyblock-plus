@@ -267,21 +267,21 @@ public class HypixelCommand extends Command {
 		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
 				String content = event.getMessage().getContentRaw();
 				String[] args = content.split(" ");
 
 				logCommand(event.getGuild(), event.getAuthor(), content);
 
 				if (args.length == 3 && args[1].equals("parkour")) {
-					ebMessage.editMessage(getParkourStats(args[2]).build()).queue();
+					ebMessage.editMessageEmbeds(getParkourStats(args[2]).build()).queue();
 					return;
 				} else if (args.length == 2) {
-					ebMessage.editMessage(getHypixelStats(args[1]).build()).queue();
+					ebMessage.editMessageEmbeds(getHypixelStats(args[1]).build()).queue();
 					return;
 				}
 
-				ebMessage.editMessage(errorEmbed(this.name).build()).queue();
+				ebMessage.editMessageEmbeds(errorEmbed(this.name).build()).queue();
 			}
 		);
 	}

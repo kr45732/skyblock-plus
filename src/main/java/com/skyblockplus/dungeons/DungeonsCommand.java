@@ -70,20 +70,20 @@ public class DungeonsCommand extends Command {
 		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
 				String content = event.getMessage().getContentRaw();
 				String[] args = content.split(" ");
 
 				logCommand(event.getGuild(), event.getAuthor(), content);
 
 				if (args.length == 3) {
-					ebMessage.editMessage(getPlayerCatacombs(args[1], args[2]).build()).queue();
+					ebMessage.editMessageEmbeds(getPlayerCatacombs(args[1], args[2]).build()).queue();
 					return;
 				} else if (args.length == 2) {
-					ebMessage.editMessage(getPlayerCatacombs(args[1], null).build()).queue();
+					ebMessage.editMessageEmbeds(getPlayerCatacombs(args[1], null).build()).queue();
 					return;
 				}
-				ebMessage.editMessage(errorEmbed(this.name).build()).queue();
+				ebMessage.editMessageEmbeds(errorEmbed(this.name).build()).queue();
 			}
 		);
 	}

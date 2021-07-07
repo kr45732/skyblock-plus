@@ -23,7 +23,7 @@ public class LinkedUserDev extends Command {
 		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
 				String content = event.getMessage().getContentRaw();
 				String[] args = content.split(" ");
 
@@ -34,15 +34,15 @@ public class LinkedUserDev extends Command {
 						switch (args[2]) {
 							case "discordId":
 								database.deleteLinkedUserByDiscordId(args[3]);
-								ebMessage.editMessage(defaultEmbed("Done").build()).queue();
+								ebMessage.editMessageEmbeds(defaultEmbed("Done").build()).queue();
 								return;
 							case "username":
 								database.deleteLinkedUserByMinecraftUsername(args[3]);
-								ebMessage.editMessage(defaultEmbed("Done").build()).queue();
+								ebMessage.editMessageEmbeds(defaultEmbed("Done").build()).queue();
 								return;
 							case "uuid":
 								database.deleteLinkedUserByMinecraftUuid(args[3]);
-								ebMessage.editMessage(defaultEmbed("Done").build()).queue();
+								ebMessage.editMessageEmbeds(defaultEmbed("Done").build()).queue();
 								return;
 						}
 					}
@@ -55,7 +55,7 @@ public class LinkedUserDev extends Command {
 					}
 				}
 
-				ebMessage.editMessage(errorEmbed(this.name).build()).queue();
+				ebMessage.editMessageEmbeds(errorEmbed(this.name).build()).queue();
 			}
 		);
 	}

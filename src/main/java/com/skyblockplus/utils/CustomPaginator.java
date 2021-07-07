@@ -242,7 +242,7 @@ public class CustomPaginator extends Menu {
 			embedBuilder.setFooter("Created By CrypticPlasma • Page " + pageNum + "/" + pages, null);
 		}
 		embedBuilder.setTimestamp(Instant.now());
-		messageBuilder.setEmbed(embedBuilder.build());
+		messageBuilder.setEmbeds(embedBuilder.build());
 		return messageBuilder.build();
 	}
 

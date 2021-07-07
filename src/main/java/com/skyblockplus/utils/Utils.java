@@ -423,7 +423,7 @@ public class Utils {
 			eb.addField(user.getName() + " (" + user.getId() + ")", "`" + commandInput + "`", false);
 		}
 
-		botLogChannel.sendMessage(eb.build()).queue();
+		botLogChannel.sendMessageEmbeds(eb.build()).queue();
 	}
 
 	public static void logCommand(Guild guild, String commandInput) {
@@ -436,7 +436,7 @@ public class Utils {
 		EmbedBuilder eb = defaultEmbed(null);
 		eb.setAuthor(guild.getName() + " (" + guild.getId() + ")", null, guild.getIconUrl());
 		eb.setDescription(commandInput);
-		botLogChannel.sendMessage(eb.build()).queue();
+		botLogChannel.sendMessageEmbeds(eb.build()).queue();
 	}
 
 	public static void logCommand(String commandInput) {
@@ -448,7 +448,7 @@ public class Utils {
 
 		EmbedBuilder eb = defaultEmbed(null);
 		eb.setDescription(commandInput);
-		botLogChannel.sendMessage(eb.build()).queue();
+		botLogChannel.sendMessageEmbeds(eb.build()).queue();
 	}
 
 	/* Embeds and paginators */

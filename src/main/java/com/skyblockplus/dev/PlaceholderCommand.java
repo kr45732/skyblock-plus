@@ -20,7 +20,7 @@ public class PlaceholderCommand extends Command {
 		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
 				String content = event.getMessage().getContentRaw();
 				String[] args = content.split(" ");
 				logCommand(event.getGuild(), event.getAuthor(), content);
@@ -40,7 +40,7 @@ public class PlaceholderCommand extends Command {
 					eb.addField("GC RUN", "GC RUN", false);
 				}
 
-				ebMessage.editMessage(eb.build()).queue();
+				ebMessage.editMessageEmbeds(eb.build()).queue();
 			}
 		);
 	}

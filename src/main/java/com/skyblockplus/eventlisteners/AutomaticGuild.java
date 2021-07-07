@@ -371,7 +371,7 @@ public class AutomaticGuild {
 				try {
 					Message reactMessage = reactChannel.retrieveMessageById(currentSetting.getPreviousMessageId()).complete();
 					reactMessage
-						.editMessage(eb.build())
+						.editMessageEmbeds(eb.build())
 						.setActionRow(Button.primary("create_application_button_" + currentSetting.getName(), "Apply Here"))
 						.queue();
 
@@ -379,7 +379,7 @@ public class AutomaticGuild {
 					applyGuild.add(new ApplyGuild(reactMessage, new Gson().toJsonTree(currentSetting)));
 				} catch (Exception e) {
 					Message reactMessage = reactChannel
-						.sendMessage(eb.build())
+						.sendMessageEmbeds(eb.build())
 						.setActionRow(Button.primary("create_application_button_" + currentSetting.getName(), "Apply Here"))
 						.complete();
 
@@ -432,7 +432,7 @@ public class AutomaticGuild {
 					try {
 						Message reactMessage = reactChannel.retrieveMessageById(currentSetting.getPreviousMessageId()).complete();
 						reactMessage
-							.editMessage(eb.build())
+							.editMessageEmbeds(eb.build())
 							.setActionRow(Button.primary("create_application_button_" + currentSetting.getName(), "Apply Here"))
 							.queue();
 
@@ -440,7 +440,7 @@ public class AutomaticGuild {
 						applyStr.append("• Reloaded `").append(currentSetting.getName()).append("`\n");
 					} catch (Exception e) {
 						Message reactMessage = reactChannel
-							.sendMessage(eb.build())
+							.sendMessageEmbeds(eb.build())
 							.setActionRow(Button.primary("create_application_button_" + currentSetting.getName(), "Apply Here"))
 							.complete();
 

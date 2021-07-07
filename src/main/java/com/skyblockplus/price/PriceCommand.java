@@ -395,7 +395,7 @@ public class PriceCommand extends Command {
 		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
 				String content = event.getMessage().getContentRaw();
 				String[] args = content.split(" ");
 
@@ -404,11 +404,11 @@ public class PriceCommand extends Command {
 				if (args.length == 2) {
 					eb = calculatePriceFromUuid(args[1]);
 
-					ebMessage.editMessage(eb.build()).queue();
+					ebMessage.editMessageEmbeds(eb.build()).queue();
 					return;
 				}
 
-				ebMessage.editMessage(errorEmbed(this.name).build()).queue();
+				ebMessage.editMessageEmbeds(errorEmbed(this.name).build()).queue();
 			}
 		);
 	}

@@ -691,7 +691,7 @@ public class HelpCommand extends Command {
 					event.getGuild().getId()
 				);
 				if (eb != null) {
-					event.getChannel().sendMessage(eb.build()).queue();
+					event.getChannel().sendMessageEmbeds(eb.build()).queue();
 				}
 			}
 		);

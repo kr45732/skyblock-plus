@@ -102,7 +102,7 @@ public class NetworthExecute {
 		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
 				String content = event.getMessage().getContentRaw();
 				logCommand(event.getGuild(), event.getAuthor(), content);
 
@@ -139,7 +139,7 @@ public class NetworthExecute {
 							e.printStackTrace();
 						}
 					}
-					ebMessage.editMessage(nwEb.build()).queue();
+					ebMessage.editMessageEmbeds(nwEb.build()).queue();
 					return;
 				} else if (args.length == 3) {
 					EmbedBuilder nwEb = getPlayerNetworth(args[1], args[2]);
@@ -165,11 +165,11 @@ public class NetworthExecute {
 							e.printStackTrace();
 						}
 					}
-					ebMessage.editMessage(nwEb.build()).queue();
+					ebMessage.editMessageEmbeds(nwEb.build()).queue();
 					return;
 				}
 
-				ebMessage.editMessage(errorEmbed("networth").build()).queue();
+				ebMessage.editMessageEmbeds(errorEmbed("networth").build()).queue();
 			}
 		);
 	}

@@ -37,7 +37,7 @@ public class InviteCommand extends Command {
 			() -> {
 				logCommand(event.getGuild(), event.getAuthor(), event.getMessage().getContentRaw());
 
-				event.getChannel().sendMessage(getInvite().build()).queue();
+				event.getChannel().sendMessageEmbeds(getInvite().build()).queue();
 			}
 		);
 	}

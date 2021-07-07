@@ -519,24 +519,24 @@ public class RoleCommands extends Command {
 				EmbedBuilder eb = loadingEmbed();
 				String content = event.getMessage().getContentRaw();
 				MessageChannel channel = event.getChannel();
-				Message ebMessage = channel.sendMessage(eb.build()).complete();
+				Message ebMessage = channel.sendMessageEmbeds(eb.build()).complete();
 
 				logCommand(event.getGuild(), event.getAuthor(), content);
 
 				String[] args = content.split(" ");
 				if (args.length < 2 || args.length > 3) {
-					ebMessage.editMessage(errorEmbed(this.name).build()).queue();
+					ebMessage.editMessageEmbeds(errorEmbed(this.name).build()).queue();
 					return;
 				}
 
 				if (!args[1].equals("claim")) {
-					ebMessage.editMessage(errorEmbed(this.name).build()).queue();
+					ebMessage.editMessageEmbeds(errorEmbed(this.name).build()).queue();
 					return;
 				}
 
 				eb = updateRoles(args.length == 3 ? args[2] : null, event.getGuild(), event.getAuthor(), event.getMember());
 
-				ebMessage.editMessage(eb.build()).queue();
+				ebMessage.editMessageEmbeds(eb.build()).queue();
 			}
 		);
 	}

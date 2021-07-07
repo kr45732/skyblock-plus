@@ -77,7 +77,7 @@ public class ApplyUser implements Serializable {
 		welcomeEb.setDescription(
 			"Please react with the emoji that corresponds to the profile you want to apply with or react with ❌ to cancel the application"
 		);
-		Message reactMessage = applicationChannel.sendMessage(welcomeEb.build()).complete();
+		Message reactMessage = applicationChannel.sendMessageEmbeds(welcomeEb.build()).complete();
 		this.reactMessageId = reactMessage.getId();
 
 		for (String profileName : profileNames) {
@@ -185,7 +185,7 @@ public class ApplyUser implements Serializable {
 					);
 					reqEmbed.appendDescription("\n• React with ✅ to close the channel");
 
-					reactMessage = applicationChannel.sendMessage(reqEmbed.build()).complete();
+					reactMessage = applicationChannel.sendMessageEmbeds(reqEmbed.build()).complete();
 					reactMessage.addReaction("✅").queue();
 					this.reactMessageId = reactMessage.getId();
 					state = 5;
@@ -229,7 +229,7 @@ public class ApplyUser implements Serializable {
 				statsEmbed.addField("Catacombs level", "" + playerCatacombs, true);
 				statsEmbed.addField("Are the above stats correct?", "React with ✅ for yes, ↩️ to retry, and ❌ to cancel", false);
 
-				reactMessage = applicationChannel.sendMessage(statsEmbed.build()).complete();
+				reactMessage = applicationChannel.sendMessageEmbeds(statsEmbed.build()).complete();
 				reactMessage.addReaction("✅").queue();
 				reactMessage.addReaction("↩️").queue();
 				reactMessage.addReaction("❌").queue();
@@ -241,7 +241,7 @@ public class ApplyUser implements Serializable {
 				finishApplyEmbed.setDescription(
 					"**Your stats have been submitted to staff**\nYou will be notified once staff review your stats"
 				);
-				applicationChannel.sendMessage(finishApplyEmbed.build()).queue();
+				applicationChannel.sendMessageEmbeds(finishApplyEmbed.build()).queue();
 
 				state = 4;
 				staffCaseConstructor();
@@ -251,7 +251,7 @@ public class ApplyUser implements Serializable {
 				retryEmbed.setDescription(
 					"Please react with the emoji that corresponds to the profile you want to apply with or react with ❌ to cancel the application"
 				);
-				reactMessage = applicationChannel.sendMessage(retryEmbed.build()).complete();
+				reactMessage = applicationChannel.sendMessageEmbeds(retryEmbed.build()).complete();
 				this.reactMessageId = reactMessage.getId();
 
 				for (String profileName : profileNames) {
@@ -264,7 +264,7 @@ public class ApplyUser implements Serializable {
 			case 3:
 				EmbedBuilder cancelEmbed = defaultEmbed("Canceling application");
 				cancelEmbed.setDescription("Channel closing");
-				applicationChannel.sendMessage(cancelEmbed.build()).queue();
+				applicationChannel.sendMessageEmbeds(cancelEmbed.build()).queue();
 				event
 					.getGuild()
 					.getTextChannelById(event.getChannel().getId())
@@ -274,7 +274,7 @@ public class ApplyUser implements Serializable {
 				return true;
 			case 5:
 				EmbedBuilder closeChannelEmbed = defaultEmbed("Channel closing");
-				applicationChannel.sendMessage(closeChannelEmbed.build()).queue();
+				applicationChannel.sendMessageEmbeds(closeChannelEmbed.build()).queue();
 				event
 					.getGuild()
 					.getTextChannelById(event.getChannel().getId())
@@ -301,7 +301,7 @@ public class ApplyUser implements Serializable {
 				if (event.getReactionEmote().getName().equals("✅")) {
 					event.getReaction().clearReactions().queue();
 					EmbedBuilder eb = defaultEmbed("Channel closing");
-					applicationChannel.sendMessage(eb.build()).queue();
+					applicationChannel.sendMessageEmbeds(eb.build()).queue();
 					applicationChannel.delete().reason("Applicant read final message").queueAfter(10, TimeUnit.SECONDS);
 					return true;
 				} else {
@@ -332,7 +332,7 @@ public class ApplyUser implements Serializable {
 			EmbedBuilder eb = defaultEmbed("Application Not Accepted");
 			eb.setDescription(higherDepth(currentSettings, "denyMessageText").getAsString() + "\n**React with ✅ to close the channel**");
 
-			reactMessage = applicationChannel.sendMessage(eb.build()).complete();
+			reactMessage = applicationChannel.sendMessageEmbeds(eb.build()).complete();
 			reactMessage.addReaction("✅").queue();
 			this.reactMessageId = reactMessage.getId();
 			shouldDeleteChannel = true;
@@ -354,13 +354,13 @@ public class ApplyUser implements Serializable {
 			EmbedBuilder eb = defaultEmbed("Application Accepted");
 			eb.setDescription(higherDepth(currentSettings, "acceptMessageText").getAsString() + "\n**React with ✅ to close the channel**");
 
-			reactMessage = applicationChannel.sendMessage(eb.build()).complete();
+			reactMessage = applicationChannel.sendMessageEmbeds(eb.build()).complete();
 			reactMessage.addReaction("✅").queue();
 
 			try {
 				TextChannel waitInviteChannel = jda.getTextChannelById(higherDepth(currentSettings, "waitingChannelId").getAsString());
 				waitInviteChannel
-					.sendMessage(
+					.sendMessageEmbeds(
 						defaultEmbed("Waiting for invite")
 							.setDescription("`" + playerUsername + "`\n\n" + "**React with ✅ to delete this message**")
 							.build()
@@ -397,13 +397,13 @@ public class ApplyUser implements Serializable {
 					higherDepth(currentSettings, "waitlistedMessageText").getAsString() + "\n**React with ✅ to close the channel**"
 				);
 
-				reactMessage = applicationChannel.sendMessage(eb.build()).complete();
+				reactMessage = applicationChannel.sendMessageEmbeds(eb.build()).complete();
 				reactMessage.addReaction("✅").queue();
 
 				try {
 					TextChannel waitInviteChannel = jda.getTextChannelById(higherDepth(currentSettings, "waitingChannelId").getAsString());
 					waitInviteChannel
-						.sendMessage(
+						.sendMessageEmbeds(
 							defaultEmbed("Waiting for invite")
 								.setDescription("`" + playerUsername + "`\n\n" + "**React with ✅ to delete this message**")
 								.build()
@@ -438,7 +438,7 @@ public class ApplyUser implements Serializable {
 		}
 		applyPlayerStats.addField("To deny the application,", "React with ❌", true);
 		staffChannel.sendMessage("<@&" + higherDepth(currentSettings, "staffPingRoleId").getAsString() + ">").complete();
-		Message reactMessage = staffChannel.sendMessage(applyPlayerStats.build()).complete();
+		Message reactMessage = staffChannel.sendMessageEmbeds(applyPlayerStats.build()).complete();
 		reactMessage.addReaction("✅").queue();
 		if (waitlistMsg != null && waitlistMsg.getAsString().length() > 0 && !waitlistMsg.getAsString().equals("none")) {
 			reactMessage.addReaction("\uD83D\uDD50").queue();

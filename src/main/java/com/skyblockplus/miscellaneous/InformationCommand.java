@@ -70,7 +70,7 @@ public class InformationCommand extends Command {
 
 				event
 					.getChannel()
-					.sendMessage(getInformation(event.getClient().getStartTime()).build())
+					.sendMessageEmbeds(getInformation(event.getClient().getStartTime()).build())
 					.setActionRows(getInformationActionRow())
 					.queue();
 			}

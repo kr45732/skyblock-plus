@@ -95,18 +95,18 @@ public class BazaarCommand extends Command {
 		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
 				String content = event.getMessage().getContentRaw();
 				String[] args = content.split(" ", 2);
 
 				logCommand(event.getGuild(), event.getAuthor(), content);
 
 				if (args.length == 2) {
-					ebMessage.editMessage(getBazaarItem(args[1]).build()).queue();
+					ebMessage.editMessageEmbeds(getBazaarItem(args[1]).build()).queue();
 					return;
 				}
 
-				ebMessage.editMessage(errorEmbed(this.name).build()).queue();
+				ebMessage.editMessageEmbeds(errorEmbed(this.name).build()).queue();
 			}
 		);
 	}

@@ -25,7 +25,7 @@ public class QuickSetupTestCommand extends Command {
 		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
 				String content = event.getMessage().getContentRaw();
 				String[] args = content.split(" ", 4);
 
@@ -33,24 +33,24 @@ public class QuickSetupTestCommand extends Command {
 
 				if (args.length >= 4) {
 					if (args[1].equals("roles")) {
-						ebMessage.editMessage(setRoleSettings(args[2], args[3], event).build()).queue();
+						ebMessage.editMessageEmbeds(setRoleSettings(args[2], args[3], event).build()).queue();
 						return;
 					} else if (args[1].equals("delete")) {
 						switch (args[2]) {
 							case "server":
-								ebMessage.editMessage(deleteServer(args[3]).build()).queue();
+								ebMessage.editMessageEmbeds(deleteServer(args[3]).build()).queue();
 								return;
 							case "apply_cache":
-								ebMessage.editMessage(deleteServerApplyCache(args[3], args[4]).build()).queue();
+								ebMessage.editMessageEmbeds(deleteServerApplyCache(args[3], args[4]).build()).queue();
 								return;
 							case "skyblock_event":
-								ebMessage.editMessage(deleteSkyblockEvent(args[3]).build()).queue();
+								ebMessage.editMessageEmbeds(deleteSkyblockEvent(args[3]).build()).queue();
 								return;
 						}
 					}
 				}
 
-				ebMessage.editMessage(defaultEmbed("Invalid input").build()).queue();
+				ebMessage.editMessageEmbeds(defaultEmbed("Invalid input").build()).queue();
 			}
 		);
 	}

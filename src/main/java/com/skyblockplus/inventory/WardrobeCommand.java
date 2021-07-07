@@ -29,7 +29,7 @@ public class WardrobeCommand extends Command {
 		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
 				String content = event.getMessage().getContentRaw();
 				String[] args = content.split(" ");
 
@@ -45,7 +45,7 @@ public class WardrobeCommand extends Command {
 					if (eb == null) {
 						ebMessage.delete().queue();
 					} else {
-						ebMessage.editMessage(eb.build()).queue();
+						ebMessage.editMessageEmbeds(eb.build()).queue();
 					}
 					return;
 				} else if (args.length == 2 || args.length == 3) {
@@ -59,17 +59,20 @@ public class WardrobeCommand extends Command {
 					if (playerEnderChest != null) {
 						ebMessage.delete().queue();
 						if (missingEmoji.length() > 0) {
-							ebMessage.getChannel().sendMessage(defaultEmbed("Missing Items").setDescription(missingEmoji).build()).queue();
+							ebMessage
+								.getChannel()
+								.sendMessageEmbeds(defaultEmbed("Missing Items").setDescription(missingEmoji).build())
+								.queue();
 						}
 
 						jda.addEventListener(new InventoryPaginator(playerEnderChest, ebMessage.getChannel(), event.getAuthor()));
 					} else {
-						ebMessage.editMessage(defaultEmbed("Error").setDescription("Unable to fetch player data").build()).queue();
+						ebMessage.editMessageEmbeds(defaultEmbed("Error").setDescription("Unable to fetch player data").build()).queue();
 					}
 					return;
 				}
 
-				ebMessage.editMessage(errorEmbed(this.name).build()).queue();
+				ebMessage.editMessageEmbeds(errorEmbed(this.name).build()).queue();
 			}
 		);
 	}

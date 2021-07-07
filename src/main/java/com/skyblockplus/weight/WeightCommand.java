@@ -52,7 +52,7 @@ public class WeightCommand extends Command {
 		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
 				String content = event.getMessage().getContentRaw();
 				String[] args = content.split(" ");
 
@@ -60,18 +60,18 @@ public class WeightCommand extends Command {
 
 				if (args.length == 6 && args[1].equals("calculate")) {
 					try {
-						ebMessage.editMessage(calculateWeight(args[2], args[3], args[4], args[5]).build()).queue();
+						ebMessage.editMessageEmbeds(calculateWeight(args[2], args[3], args[4], args[5]).build()).queue();
 						return;
 					} catch (Exception ignored) {}
 				} else if (args.length == 3) {
-					ebMessage.editMessage(getPlayerWeight(args[1], args[2]).build()).queue();
+					ebMessage.editMessageEmbeds(getPlayerWeight(args[1], args[2]).build()).queue();
 					return;
 				} else if (args.length == 2) {
-					ebMessage.editMessage(getPlayerWeight(args[1], null).build()).queue();
+					ebMessage.editMessageEmbeds(getPlayerWeight(args[1], null).build()).queue();
 					return;
 				}
 
-				ebMessage.editMessage(errorEmbed(this.name).build()).queue();
+				ebMessage.editMessageEmbeds(errorEmbed(this.name).build()).queue();
 			}
 		);
 	}

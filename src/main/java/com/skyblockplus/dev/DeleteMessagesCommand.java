@@ -28,21 +28,25 @@ public class DeleteMessagesCommand extends Command {
 					try {
 						int messageCount = Math.min(Integer.parseInt(args[1]) + 1, 100);
 						List<Message> toDelete = event.getChannel().getHistory().retrievePast(messageCount).complete();
-						event.getChannel().purgeMessages(toDelete);
 						Message ebMessage = event
 							.getChannel()
-							.sendMessage(defaultEmbed("Deleted " + messageCount + " messages").build())
+							.sendMessageEmbeds(
+								defaultEmbed("Deleted " + event.getChannel().purgeMessages(toDelete).size() + " messages").build()
+							)
 							.complete();
 						ebMessage.delete().queueAfter(3, TimeUnit.SECONDS);
 						return;
 					} catch (Exception e) {
-						Message ebMessage = event.getChannel().sendMessage(defaultEmbed("Invalid Amount").build()).complete();
+						Message ebMessage = event
+							.getChannel()
+							.sendMessageEmbeds(defaultEmbed("Error: " + e.getMessage()).build())
+							.complete();
 						ebMessage.delete().queueAfter(3, TimeUnit.SECONDS);
 						return;
 					}
 				}
 
-				event.getChannel().sendMessage(errorEmbed(this.name).build()).queue();
+				event.getChannel().sendMessageEmbeds(errorEmbed(this.name).build()).queue();
 			}
 		);
 	}

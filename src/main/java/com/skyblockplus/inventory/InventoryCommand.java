@@ -28,7 +28,7 @@ public class InventoryCommand extends Command {
 		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
 				String content = event.getMessage().getContentRaw();
 				String[] args = content.split(" ");
 
@@ -44,7 +44,7 @@ public class InventoryCommand extends Command {
 					if (eb == null) {
 						ebMessage.delete().queue();
 					} else {
-						ebMessage.editMessage(eb.build()).queue();
+						ebMessage.editMessageEmbeds(eb.build()).queue();
 					}
 					return;
 				} else if (args.length == 2 || args.length == 3) {
@@ -62,16 +62,16 @@ public class InventoryCommand extends Command {
 						if (playerInventory[2].length() > 0) {
 							ebMessage
 								.getChannel()
-								.sendMessage(defaultEmbed("Missing Items").setDescription(playerInventory[2]).build())
+								.sendMessageEmbeds(defaultEmbed("Missing Items").setDescription(playerInventory[2]).build())
 								.queue();
 						}
 					} else {
-						ebMessage.editMessage(defaultEmbed("Error").setDescription("Unable to fetch player data").build()).queue();
+						ebMessage.editMessageEmbeds(defaultEmbed("Error").setDescription("Unable to fetch player data").build()).queue();
 					}
 					return;
 				}
 
-				ebMessage.editMessage(errorEmbed(this.name).build()).queue();
+				ebMessage.editMessageEmbeds(errorEmbed(this.name).build()).queue();
 			}
 		);
 	}

@@ -268,17 +268,17 @@ public class AverageAuctionCommand extends Command {
 		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
 				String args = event.getMessage().getContentRaw();
 
 				logCommand(event.getGuild(), event.getAuthor(), args);
 
 				if (args.split(" ").length >= 2) {
-					ebMessage.editMessage(getAverageAuctionPrice(args.split(" ", 2)[1]).build()).queue();
+					ebMessage.editMessageEmbeds(getAverageAuctionPrice(args.split(" ", 2)[1]).build()).queue();
 					return;
 				}
 
-				ebMessage.editMessage(errorEmbed(this.name).build()).queue();
+				ebMessage.editMessageEmbeds(errorEmbed(this.name).build()).queue();
 			}
 		);
 	}

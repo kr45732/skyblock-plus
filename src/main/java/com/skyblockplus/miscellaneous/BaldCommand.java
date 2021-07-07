@@ -31,12 +31,12 @@ public class BaldCommand extends Command {
 				}
 
 				EmbedBuilder eb = defaultEmbed("Checking if bald...");
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
 
 				String[] args = event.getMessage().getContentRaw().split(" ");
 				if (args.length != 2) {
 					eb = defaultEmbed("Invalid usage. Try `bald @mention`");
-					ebMessage.editMessage(eb.build()).queue();
+					ebMessage.editMessageEmbeds(eb.build()).queue();
 					return;
 				}
 
@@ -49,7 +49,7 @@ public class BaldCommand extends Command {
 							eb.setDescription(user.getName() + " is not bald!");
 							eb.setImage(user.getAvatarUrl());
 							eb.setColor(Color.GREEN.darker());
-							ebMessage.editMessage(eb.build()).queue();
+							ebMessage.editMessageEmbeds(eb.build()).queue();
 							event.getMessage().addReaction(":green_check_custom:799774962394988574").queue();
 							return;
 						} else if (
@@ -61,12 +61,12 @@ public class BaldCommand extends Command {
 								eb.setDescription(user.getName() + " is not bald!");
 								eb.setImage(user.getAvatarUrl());
 								eb.setColor(Color.GREEN.darker());
-								ebMessage.editMessage(eb.build()).queue();
+								ebMessage.editMessageEmbeds(eb.build()).queue();
 								event.getMessage().addReaction(":green_check_custom:799774962394988574").queue();
 							} else {
 								eb.setDescription("**WARNING** - " + user.getName() + " is bald!!!");
 								eb.setImage(user.getAvatarUrl());
-								ebMessage.editMessage(eb.build()).queue();
+								ebMessage.editMessageEmbeds(eb.build()).queue();
 								event.getMessage().addReaction("⚠️").queue();
 							}
 							return;
@@ -75,19 +75,19 @@ public class BaldCommand extends Command {
 								eb.setDescription(user.getName() + " is not bald!");
 								eb.setImage(user.getAvatarUrl());
 								eb.setColor(Color.GREEN.darker());
-								ebMessage.editMessage(eb.build()).queue();
+								ebMessage.editMessageEmbeds(eb.build()).queue();
 								event.getMessage().addReaction(":green_check_custom:799774962394988574").queue();
 							} else {
 								eb.setDescription("**WARNING** - " + user.getName() + " is bald!!!");
 								eb.setImage(user.getAvatarUrl());
-								ebMessage.editMessage(eb.build()).queue();
+								ebMessage.editMessageEmbeds(eb.build()).queue();
 								event.getMessage().addReaction("⚠️").queue();
 							}
 							return;
 						}
 					}
 				} catch (Exception ignored) {}
-				ebMessage.editMessage(defaultEmbed("Invalid usage. Try `bald @mention`").build()).queue();
+				ebMessage.editMessageEmbeds(defaultEmbed("Invalid usage. Try `bald @mention`").build()).queue();
 			}
 		);
 	}

@@ -26,7 +26,7 @@ public class GetAllGuildsIn extends Command {
 		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
 				String content = event.getMessage().getContentRaw();
 				String[] args = content.split(" ");
 
@@ -95,12 +95,12 @@ public class GetAllGuildsIn extends Command {
 
 						eb.addField("Total guild count without emoji servers", guildCount + " servers", false);
 
-						ebMessage.editMessage(eb.build()).queue();
+						ebMessage.editMessageEmbeds(eb.build()).queue();
 						return;
 					}
 				}
 
-				ebMessage.editMessage(defaultEmbed("Invalid input").build()).queue();
+				ebMessage.editMessageEmbeds(defaultEmbed("Invalid input").build()).queue();
 			}
 		);
 	}

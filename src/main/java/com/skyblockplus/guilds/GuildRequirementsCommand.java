@@ -25,13 +25,13 @@ public class GuildRequirementsCommand extends Command {
 		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
 				String content = event.getMessage().getContentRaw();
 				String[] args = content.split(" ");
 
 				logCommand(event.getGuild(), event.getAuthor(), content);
 				if (args.length != 2) {
-					ebMessage.editMessage(errorEmbed(name).build()).queue();
+					ebMessage.editMessageEmbeds(errorEmbed(name).build()).queue();
 					return;
 				}
 
@@ -49,7 +49,7 @@ public class GuildRequirementsCommand extends Command {
 					} catch (Exception ignored) {}
 
 					ebMessage
-						.editMessage(
+						.editMessageEmbeds(
 							defaultEmbed("Error")
 								.setDescription(
 									(
@@ -65,7 +65,7 @@ public class GuildRequirementsCommand extends Command {
 				}
 
 				if (guildReqs.size() == 0) {
-					ebMessage.editMessage(defaultEmbed("Error").setDescription("No requirements set for " + args[1]).build()).queue();
+					ebMessage.editMessageEmbeds(defaultEmbed("Error").setDescription("No requirements set for " + args[1]).build()).queue();
 					return;
 				}
 
@@ -85,7 +85,7 @@ public class GuildRequirementsCommand extends Command {
 					);
 				}
 
-				ebMessage.editMessage(eb.build()).queue();
+				ebMessage.editMessageEmbeds(eb.build()).queue();
 			}
 		);
 	}

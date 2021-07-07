@@ -64,7 +64,9 @@ public class SkyblockEventCommand extends Command {
 		if (paginateBuilder.getItemsSize() > 0) {
 			paginateBuilder.build().paginate(announcementChannel, 0);
 		} else {
-			announcementChannel.sendMessage(defaultEmbed("Event Leaderboard").setDescription("No one joined the event").build()).complete();
+			announcementChannel
+				.sendMessageEmbeds(defaultEmbed("Event Leaderboard").setDescription("No one joined the event").build())
+				.complete();
 		}
 
 		try {
@@ -95,7 +97,7 @@ public class SkyblockEventCommand extends Command {
 				return;
 			}
 		} catch (Exception ignored) {}
-		announcementChannel.sendMessage(defaultEmbed("Prizes").setDescription("None").build()).complete();
+		announcementChannel.sendMessageEmbeds(defaultEmbed("Prizes").setDescription("None").build()).complete();
 		database.setSkyblockEventSettings(guildId, new SbEvent());
 	}
 
@@ -275,7 +277,7 @@ public class SkyblockEventCommand extends Command {
 		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
 				String content = event.getMessage().getContentRaw();
 				String[] args = content.split(" ");
 
@@ -295,12 +297,12 @@ public class SkyblockEventCommand extends Command {
 								if (eb == null) {
 									ebMessage.delete().queue();
 								} else {
-									ebMessage.editMessage(eb.build()).queue();
+									ebMessage.editMessageEmbeds(eb.build()).queue();
 								}
 							}
 							return;
 						case "current":
-							ebMessage.editMessage(getCurrentSkyblockEvent(event.getGuild().getId()).build()).queue();
+							ebMessage.editMessageEmbeds(getCurrentSkyblockEvent(event.getGuild().getId()).build()).queue();
 							return;
 						case "cancel":
 							if (!event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
@@ -310,20 +312,20 @@ public class SkyblockEventCommand extends Command {
 									.sendMessage("❌ You must have the Administrator permission in this Guild to use that!")
 									.queue();
 							} else {
-								ebMessage.editMessage(cancelSkyblockEvent(event.getGuild().getId()).build()).queue();
+								ebMessage.editMessageEmbeds(cancelSkyblockEvent(event.getGuild().getId()).build()).queue();
 							}
 							return;
 						case "join":
-							ebMessage.editMessage(joinSkyblockEvent(event, args).build()).queue();
+							ebMessage.editMessageEmbeds(joinSkyblockEvent(event, args).build()).queue();
 							return;
 						case "leave":
-							ebMessage.editMessage(leaveSkyblockEvent(event).build()).queue();
+							ebMessage.editMessageEmbeds(leaveSkyblockEvent(event).build()).queue();
 							return;
 						case "leaderboard":
 						case "lb":
 							if (database.getSkyblockEventActive(event.getGuild().getId())) {
 								if (!guildMap.containsKey(event.getGuild().getId())) {
-									ebMessage.editMessage(defaultEmbed("No guild found").build()).queue();
+									ebMessage.editMessageEmbeds(defaultEmbed("No guild found").build()).queue();
 									return;
 								}
 
@@ -373,7 +375,7 @@ public class SkyblockEventCommand extends Command {
 										ebMessage.delete().queue();
 									} else {
 										ebMessage
-											.editMessage(
+											.editMessageEmbeds(
 												defaultEmbed("Event Leaderboard").setDescription("No one joined the event").build()
 											)
 											.queue();
@@ -407,14 +409,16 @@ public class SkyblockEventCommand extends Command {
 									ebMessage.delete().queue();
 								} else {
 									ebMessage
-										.editMessage(defaultEmbed("Event Leaderboard").setDescription("No one joined the event").build())
+										.editMessageEmbeds(
+											defaultEmbed("Event Leaderboard").setDescription("No one joined the event").build()
+										)
 										.queue();
 								}
 
 								guildMap.get(event.getGuild().getId()).setEventMemberList(guildMemberPlayersList);
 								guildMap.get(event.getGuild().getId()).setEventMemberListLastUpdated(Instant.now());
 							} else {
-								ebMessage.editMessage(defaultEmbed("No event running").build()).queue();
+								ebMessage.editMessageEmbeds(defaultEmbed("No event running").build()).queue();
 							}
 							return;
 						case "end":
@@ -427,16 +431,16 @@ public class SkyblockEventCommand extends Command {
 							} else {
 								if (database.getSkyblockEventActive(event.getGuild().getId())) {
 									endSkyblockEvent(event.getGuild().getId());
-									ebMessage.editMessage(defaultEmbed("Success").setDescription("Event Ended").build()).queue();
+									ebMessage.editMessageEmbeds(defaultEmbed("Success").setDescription("Event Ended").build()).queue();
 								} else {
-									ebMessage.editMessage(defaultEmbed("No event running").build()).queue();
+									ebMessage.editMessageEmbeds(defaultEmbed("No event running").build()).queue();
 								}
 							}
 							return;
 					}
 				}
 
-				ebMessage.editMessage(errorEmbed(this.name).build()).queue();
+				ebMessage.editMessageEmbeds(errorEmbed(this.name).build()).queue();
 			}
 		);
 	}

@@ -26,12 +26,12 @@ public class UnlinkAccountCommand extends Command {
 		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
 				String content = event.getMessage().getContentRaw();
 
 				logCommand(event.getGuild(), event.getAuthor(), content);
 
-				ebMessage.editMessage(unlinkAccount(event.getAuthor()).build()).queue();
+				ebMessage.editMessageEmbeds(unlinkAccount(event.getAuthor()).build()).queue();
 			}
 		);
 	}

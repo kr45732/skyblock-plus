@@ -22,7 +22,7 @@ public class CategoriesCommand extends Command {
 		executor.submit(
 			() -> {
 				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessage(eb.build()).complete();
+				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
 
 				logCommand(event.getGuild(), event.getAuthor(), getGuildPrefix(event.getGuild().getId()) + "categories");
 
@@ -32,7 +32,7 @@ public class CategoriesCommand extends Command {
 				}
 
 				eb = defaultEmbed("Guild Categories").setDescription(ebString.length() == 0 ? "None" : ebString.toString());
-				ebMessage.editMessage(eb.build()).queue();
+				ebMessage.editMessageEmbeds(eb.build()).queue();
 			}
 		);
 	}
