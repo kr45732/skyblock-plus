@@ -1,11 +1,6 @@
 package com.skyblockplus;
 
-import static com.skyblockplus.eventlisteners.AutomaticGuild.getGuildPrefix;
-import static com.skyblockplus.utils.MainClassUtils.*;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
-import com.jagrosh.jdautilities.command.GuildSettingsProvider;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.dev.*;
 import com.skyblockplus.dungeons.*;
@@ -30,21 +25,22 @@ import com.skyblockplus.skills.SkillsSlashCommand;
 import com.skyblockplus.slayer.SlayerCommand;
 import com.skyblockplus.slayer.SlayerSlashCommand;
 import com.skyblockplus.timeout.MessageTimeout;
+import com.skyblockplus.utils.GuildPrefixManager;
 import com.skyblockplus.utils.slashcommands.SlashCommandClient;
 import com.skyblockplus.weight.WeightCommand;
 import com.skyblockplus.weight.WeightSlashCommand;
-import java.util.Collection;
-import java.util.Collections;
-import javax.annotation.PreDestroy;
-import javax.security.auth.login.LoginException;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.Guild;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import javax.annotation.PreDestroy;
+import javax.security.auth.login.LoginException;
+
+import static com.skyblockplus.utils.MainClassUtils.*;
+import static com.skyblockplus.utils.Utils.*;
 
 @SpringBootApplication
 public class Main {
@@ -64,7 +60,7 @@ public class Main {
 		client.setOwnerId("385939031596466176");
 		client.setEmojis("✅", "⚠️", "❌");
 		client.useHelpBuilder(false);
-		client.setGuildSettingsManager(GuildSettings::new);
+		client.setGuildSettingsManager(GuildPrefixManager::new);
 		client.addCommands(
 			new InformationCommand(),
 			new SlayerCommand(),
@@ -190,18 +186,5 @@ public class Main {
 		System.out.println("== Finished ==");
 	}
 
-	static class GuildSettings implements GuildSettingsProvider {
 
-		final Guild guild;
-
-		public GuildSettings(Guild guild) {
-			this.guild = guild;
-		}
-
-		@Nullable
-		@Override
-		public Collection<String> getPrefixes() {
-			return Collections.singletonList(getGuildPrefix(guild.getId()));
-		}
-	}
 }

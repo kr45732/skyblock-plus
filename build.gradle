@@ -25,7 +25,6 @@ task stage(dependsOn: ['shadowJar']) {
 }
 
 repositories {
-    // Use maven dependencies in gradle
     jcenter()
     mavenCentral()
     maven { url 'https://m2.dv8tion.net/releases' }
@@ -50,7 +49,7 @@ dependencies {
     // Spring boot and postgresql
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-//    implementation 'org.springframework.boot:spring-boot-starter-security'
+    // implementation 'org.springframework.boot:spring-boot-starter-security'
     runtimeOnly 'org.postgresql:postgresql'
 
     // Http Client
