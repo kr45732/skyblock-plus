@@ -1,5 +1,8 @@
 package com.skyblockplus;
 
+import static com.skyblockplus.utils.MainClassUtils.*;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.dev.*;
@@ -29,18 +32,14 @@ import com.skyblockplus.utils.GuildPrefixManager;
 import com.skyblockplus.utils.slashcommands.SlashCommandClient;
 import com.skyblockplus.weight.WeightCommand;
 import com.skyblockplus.weight.WeightSlashCommand;
+import javax.annotation.PreDestroy;
+import javax.security.auth.login.LoginException;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import javax.annotation.PreDestroy;
-import javax.security.auth.login.LoginException;
-
-import static com.skyblockplus.utils.MainClassUtils.*;
-import static com.skyblockplus.utils.Utils.*;
 
 @SpringBootApplication
 public class Main {
@@ -185,6 +184,4 @@ public class Main {
 
 		System.out.println("== Finished ==");
 	}
-
-
 }
