@@ -8,10 +8,6 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Hypixel;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
-import java.util.Locale;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
@@ -79,18 +75,6 @@ public class HypixelCommand extends Command {
 					usernameUuid.playerUsername,
 					"https://plancke.io/hypixel/player/stats/" + usernameUuid.playerUuid
 				);
-				DateTimeFormatter dateTimeFormatter = DateTimeFormatter
-					.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
-					.withLocale(Locale.US)
-					.withZone(ZoneId.systemDefault());
-				DateTimeFormatter dateFormatterMedium = DateTimeFormatter
-					.ofLocalizedDate(FormatStyle.MEDIUM)
-					.withLocale(Locale.US)
-					.withZone(ZoneId.systemDefault());
-				DateTimeFormatter dateFormatterShort = DateTimeFormatter
-					.ofLocalizedDate(FormatStyle.SHORT)
-					.withLocale(Locale.US)
-					.withZone(ZoneId.systemDefault());
 
 				try {
 					if (higherDepth(hypixelJson, "lastLogin").getAsInt() > higherDepth(hypixelJson, "lastLogout").getAsInt()) {
@@ -100,7 +84,7 @@ public class HypixelCommand extends Command {
 
 						eb.addField(
 							"Last Updated",
-							dateTimeFormatter.format(Instant.ofEpochMilli(higherDepth(hypixelJson, "lastLogout").getAsLong())),
+							"<t:" + Instant.ofEpochMilli(higherDepth(hypixelJson, "lastLogout").getAsLong()).getEpochSecond() + ">",
 							true
 						);
 					}
@@ -109,7 +93,7 @@ public class HypixelCommand extends Command {
 				try {
 					eb.addField(
 						"First Login",
-						dateFormatterMedium.format(Instant.ofEpochMilli(higherDepth(hypixelJson, "firstLogin").getAsLong())),
+						"<t:" + Instant.ofEpochMilli(higherDepth(hypixelJson, "firstLogin").getAsLong()).getEpochSecond() + ":D>",
 						true
 					);
 				} catch (Exception ignored) {}
@@ -175,8 +159,8 @@ public class HypixelCommand extends Command {
 								true
 							);
 							eb.addField(
-								"Guild Joined",
-								dateFormatterMedium.format(Instant.ofEpochMilli(higherDepth(member, "joined").getAsLong())),
+								"Joined Guild",
+								"<t:" + Instant.ofEpochMilli(higherDepth(member, "joined").getAsLong()).getEpochSecond() + ":D>",
 								true
 							);
 						}
@@ -209,42 +193,54 @@ public class HypixelCommand extends Command {
 				if (higherDepth(hypixelJson, "skyblock_free_cookie") != null) {
 					skyblockItems +=
 						"• Free booster cookie: " +
-						dateFormatterShort.format(Instant.ofEpochMilli(higherDepth(hypixelJson, "skyblock_free_cookie").getAsLong())) +
+						"<t:" +
+						Instant.ofEpochMilli(higherDepth(hypixelJson, "skyblock_free_cookie").getAsLong()).getEpochSecond() +
+						":d>" +
 						"\n";
 				}
 
 				if (higherDepth(hypixelJson, "scorpius_bribe_96") != null) {
 					skyblockItems +=
 						"• Scorpius Bribe (Year 96): " +
-						dateFormatterShort.format(Instant.ofEpochMilli(higherDepth(hypixelJson, "scorpius_bribe_96").getAsLong())) +
+						"<t:" +
+						Instant.ofEpochMilli(higherDepth(hypixelJson, "scorpius_bribe_96").getAsLong()).getEpochSecond() +
+						":d>" +
 						"\n";
 				}
 
 				if (higherDepth(hypixelJson, "scorpius_bribe_120") != null) {
 					skyblockItems +=
 						"• Scorpius Bribe (Year 120): " +
-						dateFormatterShort.format(Instant.ofEpochMilli(higherDepth(hypixelJson, "scorpius_bribe_120").getAsLong())) +
+						"<t:" +
+						Instant.ofEpochMilli(higherDepth(hypixelJson, "scorpius_bribe_120").getAsLong()).getEpochSecond() +
+						":d>" +
 						"\n";
 				}
 
 				if (higherDepth(hypixelJson, "claimed_potato_talisman") != null) {
 					skyblockItems +=
 						"• Potato Talisman: " +
-						dateFormatterShort.format(Instant.ofEpochMilli(higherDepth(hypixelJson, "claimed_potato_talisman").getAsLong())) +
+						"<t:" +
+						Instant.ofEpochMilli(higherDepth(hypixelJson, "claimed_potato_talisman").getAsLong()).getEpochSecond() +
+						"d:>" +
 						"\n";
 				}
 
 				if (higherDepth(hypixelJson, "claimed_potato_basket") != null) {
 					skyblockItems +=
 						"• Potato Basket: " +
-						dateFormatterShort.format(Instant.ofEpochMilli(higherDepth(hypixelJson, "claimed_potato_basket").getAsLong())) +
+						"<t:" +
+						Instant.ofEpochMilli(higherDepth(hypixelJson, "claimed_potato_basket").getAsLong()).getEpochSecond() +
+						"d:>" +
 						"\n";
 				}
 
 				if (higherDepth(hypixelJson, "claim_potato_war_crown") != null) {
 					skyblockItems +=
 						"• Potato War Crown: " +
-						dateFormatterShort.format(Instant.ofEpochMilli(higherDepth(hypixelJson, "claim_potato_war_crown").getAsLong())) +
+						"<t:" +
+						Instant.ofEpochMilli(higherDepth(hypixelJson, "claim_potato_war_crown").getAsLong()).getEpochSecond() +
+						"d:>" +
 						"\n";
 				}
 

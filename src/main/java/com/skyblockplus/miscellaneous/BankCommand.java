@@ -11,10 +11,6 @@ import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
-import java.util.Locale;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -62,18 +58,15 @@ public class BankCommand extends Command {
 		if (player.isValid()) {
 			JsonArray bankHistoryArray = player.getBankHistory();
 			if (bankHistoryArray != null) {
-				DateTimeFormatter dateTimeFormatter = DateTimeFormatter
-					.ofLocalizedDate(FormatStyle.MEDIUM)
-					.withLocale(Locale.US)
-					.withZone(ZoneId.systemDefault());
-
 				CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, user).setColumns(1).setItemsPerPage(20);
 
 				paginateBuilder.addItems(
 					"**Last Transaction Time:** " +
-					dateTimeFormatter.format(
-						Instant.ofEpochMilli(higherDepth(bankHistoryArray.get(bankHistoryArray.size() - 1), "timestamp").getAsLong())
-					) +
+					"<t:" +
+					Instant
+						.ofEpochMilli(higherDepth(bankHistoryArray.get(bankHistoryArray.size() - 1), "timestamp").getAsLong())
+						.getEpochSecond() +
+					":D>" +
 					"\n"
 				);
 				for (int i = bankHistoryArray.size() - 1; i >= 0; i--) {
@@ -85,8 +78,12 @@ public class BankCommand extends Command {
 						" by " +
 						parseMcCodes(higherDepth(currentTransaction, "initiator_name").getAsString());
 
-					String time = dateTimeFormatter.format(Instant.ofEpochMilli(higherDepth(currentTransaction, "timestamp").getAsLong()));
-					paginateBuilder.addItems("**" + time + "**: " + valueString);
+					paginateBuilder.addItems(
+						"**<t:" +
+						Instant.ofEpochMilli(higherDepth(currentTransaction, "timestamp").getAsLong()).getEpochSecond() +
+						"D:>**: " +
+						valueString
+					);
 				}
 
 				paginateBuilder.setPaginatorExtras(

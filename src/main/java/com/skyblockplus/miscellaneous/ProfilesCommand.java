@@ -6,7 +6,6 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.CustomPaginator;
@@ -14,12 +13,8 @@ import com.skyblockplus.utils.Hypixel;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -37,11 +32,6 @@ public class ProfilesCommand extends Command {
 	public static EmbedBuilder getPlayerProfiles(String username, User user, MessageChannel channel, InteractionHook hook) {
 		UsernameUuidStruct usernameUuidStruct = Hypixel.usernameToUuid(username);
 		if (usernameUuidStruct != null) {
-			DateTimeFormatter dateTimeFormatter = DateTimeFormatter
-				.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
-				.withLocale(Locale.US)
-				.withZone(ZoneId.systemDefault());
-
 			JsonArray profileArray;
 			try {
 				profileArray = higherDepth(Hypixel.skyblockProfilesFromUuid(usernameUuidStruct.playerUuid), "profiles").getAsJsonArray();
@@ -59,9 +49,12 @@ public class ProfilesCommand extends Command {
 						.asyncUuidToUsername(uuid)
 						.thenApply(
 							playerUsername -> {
-								String lastLogin = dateTimeFormatter.format(
-									Instant.ofEpochMilli(higherDepth(profile, "members." + uuid + ".last_save").getAsLong())
-								);
+								String lastLogin =
+									"<t:" +
+									Instant
+										.ofEpochMilli(higherDepth(profile, "members." + uuid + ".last_save").getAsLong())
+										.getEpochSecond() +
+									">";
 
 								return "\n• " + playerUsername + " last logged in on " + lastLogin;
 							}

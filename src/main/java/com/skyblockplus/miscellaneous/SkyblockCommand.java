@@ -12,10 +12,6 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.ArmorStruct;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
-import java.util.Locale;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
@@ -63,17 +59,13 @@ public class SkyblockCommand extends Command {
 			JsonElement profileJson = player.getProfileJson();
 			JsonElement statsJson = higherDepth(player.getProfileJson(), "stats");
 			JsonElement jacobJson = higherDepth(player.getProfileJson(), "jacob2");
-			DateTimeFormatter dateFormatter = DateTimeFormatter
-				.ofLocalizedDate(FormatStyle.LONG)
-				.withLocale(Locale.US)
-				.withZone(ZoneId.systemDefault());
 
 			// General
 			String generalPageString = "";
 			generalPageString +=
-				"**First Joined:** " +
-				dateFormatter.format(Instant.ofEpochMilli(higherDepth(profileJson, "first_join").getAsLong())) +
-				"\n";
+				"**First Joined:** <t:" +
+				Instant.ofEpochMilli(higherDepth(profileJson, "first_join").getAsLong()).getEpochSecond() +
+				":D>\n";
 			generalPageString += "**Purse:** " + simplifyNumber(player.getPurseCoins()) + "\n";
 			generalPageString +=
 				"**Bank Account:** " +

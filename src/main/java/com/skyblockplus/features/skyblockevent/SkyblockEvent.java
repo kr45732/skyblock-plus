@@ -12,9 +12,6 @@ import com.skyblockplus.api.serversettings.skyblockevent.RunningEvent;
 import com.skyblockplus.api.serversettings.skyblockevent.SbEvent;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,7 +25,6 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class SkyblockEvent {
 
-	public static final DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withZone(ZoneId.of("UTC"));
 	public final boolean enable;
 	public EmbedBuilder eb;
 	public TextChannel announcementChannel;
@@ -158,8 +154,7 @@ public class SkyblockEvent {
 						attemptsLeft--;
 					} else {
 						Instant endsAt = Instant.now().plus(eventDuration, ChronoUnit.HOURS);
-						Duration duration = Duration.between(Instant.now(), endsAt);
-						eb.addField("End Date", "Ends in " + instantToDHM(duration) + " (" + formatter.format(endsAt) + " UTC)", false);
+						eb.addField("End Date", "Ends in <t:" + endsAt.getEpochSecond() + ":R>", false);
 						eb.setDescription(
 							"If there are no prizes, type 'none'. Otherwise, type the prizes in one message following the format in the example below (place number:prize):\n1:15 mil coins\n2:10 mil\n3:500k"
 						);
@@ -227,12 +222,7 @@ public class SkyblockEvent {
 
 					Instant endsAt = Instant.now().plus(eventDuration, ChronoUnit.HOURS);
 					epochSecondEndingTime = endsAt.getEpochSecond();
-					Duration duration = Duration.between(Instant.now(), endsAt);
-					announcementEb.addField(
-						"End Date",
-						"Ends in " + instantToDHM(duration) + " (" + formatter.format(endsAt) + " UTC)",
-						false
-					);
+					announcementEb.addField("End Date", "Ends in <t:" + endsAt.getEpochSecond() + ":R>", false);
 
 					StringBuilder ebString = new StringBuilder();
 					if (prizeListMap != null) {

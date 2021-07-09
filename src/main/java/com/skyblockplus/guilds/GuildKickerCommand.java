@@ -7,7 +7,6 @@ import static com.skyblockplus.utils.structs.HypixelGuildCache.memberCacheFromPl
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.CustomPaginator;
