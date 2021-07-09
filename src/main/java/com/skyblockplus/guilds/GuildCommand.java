@@ -9,6 +9,7 @@ import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.CustomPaginator;
+import com.skyblockplus.utils.Hypixel;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.time.Instant;
@@ -32,7 +33,7 @@ public class GuildCommand extends Command {
 	}
 
 	public static EmbedBuilder getGuildExp(String username, User user, MessageChannel channel, InteractionHook hook) {
-		UsernameUuidStruct uuidUsername = usernameToUuid(username);
+		UsernameUuidStruct uuidUsername = Hypixel.usernameToUuid(username);
 		if (uuidUsername == null) {
 			return defaultEmbed("Error fetching player data");
 		}
@@ -49,18 +50,11 @@ public class GuildCommand extends Command {
 		for (int i = 0; i < membersArr.size(); i++) {
 			int finalI = i;
 			futures.add(
-				asyncHttpClient
-					.prepareGet("https://api.ashcon.app/mojang/v2/user/" + higherDepth(membersArr.get(i), "uuid").getAsString())
-					.execute()
-					.toCompletableFuture()
+				Hypixel
+					.asyncUuidToUsername(higherDepth(membersArr.get(i), "uuid").getAsString())
 					.thenApply(
-						uuidToUsernameResponse -> {
+						currentUsername -> {
 							try {
-								String currentUsername = higherDepth(
-									JsonParser.parseString(uuidToUsernameResponse.getResponseBody()),
-									"username"
-								)
-									.getAsString();
 								JsonElement expHistory = higherDepth(membersArr.get(finalI), "expHistory");
 								List<String> keys = getJsonKeys(expHistory);
 								int totalPlayerExp = 0;
@@ -126,7 +120,7 @@ public class GuildCommand extends Command {
 	}
 
 	public static EmbedBuilder getGuildPlayer(String username) {
-		UsernameUuidStruct uuidUsername = usernameToUuid(username);
+		UsernameUuidStruct uuidUsername = Hypixel.usernameToUuid(username);
 		if (uuidUsername == null) {
 			return defaultEmbed("Error fetching player data");
 		}
@@ -151,7 +145,7 @@ public class GuildCommand extends Command {
 	}
 
 	public static EmbedBuilder getGuildInfo(String username) {
-		UsernameUuidStruct uuidUsername = usernameToUuid(username);
+		UsernameUuidStruct uuidUsername = Hypixel.usernameToUuid(username);
 		if (uuidUsername == null) {
 			return defaultEmbed("Error fetching player data");
 		}
@@ -209,7 +203,8 @@ public class GuildCommand extends Command {
 			JsonElement currentMember = guildMembers.get(i).getAsJsonObject();
 			if (higherDepth(currentMember, "rank").getAsString().equals("Guild Master")) {
 				guildInfo +=
-					("• " + guildName + "'s guild master is " + uuidToUsername(higherDepth(currentMember, "uuid").getAsString())) + "\n";
+					("• " + guildName + "'s guild master is " + Hypixel.uuidToUsername(higherDepth(currentMember, "uuid").getAsString())) +
+					"\n";
 				break;
 			}
 		}
@@ -244,7 +239,7 @@ public class GuildCommand extends Command {
 	}
 
 	public static EmbedBuilder getGuildMembers(String username, User user, MessageChannel channel, InteractionHook hook) {
-		UsernameUuidStruct uuidUsername = usernameToUuid(username);
+		UsernameUuidStruct uuidUsername = Hypixel.usernameToUuid(username);
 		if (uuidUsername == null) {
 			return defaultEmbed("Error fetching player data");
 		}
@@ -258,21 +253,7 @@ public class GuildCommand extends Command {
 		List<CompletableFuture<String>> futures = new ArrayList<>();
 		List<String> guildMembers = new ArrayList<>();
 		for (int i = 0; i < membersArr.size(); i++) {
-			futures.add(
-				asyncHttpClient
-					.prepareGet("https://api.ashcon.app/mojang/v2/user/" + higherDepth(membersArr.get(i), "uuid").getAsString())
-					.execute()
-					.toCompletableFuture()
-					.thenApply(
-						uuidToUsernameResponse -> {
-							try {
-								return higherDepth(JsonParser.parseString(uuidToUsernameResponse.getResponseBody()), "username")
-									.getAsString();
-							} catch (Exception ignored) {}
-							return null;
-						}
-					)
-			);
+			futures.add(Hypixel.asyncUuidToUsername(higherDepth(membersArr.get(i), "uuid").getAsString()));
 		}
 
 		for (CompletableFuture<String> future : futures) {

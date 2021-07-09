@@ -2,16 +2,16 @@ package com.skyblockplus.utils;
 
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.eventlisteners.MainListener.guildMap;
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
-import com.skyblockplus.eventlisteners.AutomaticGuild;
-import com.skyblockplus.eventlisteners.apply.ApplyGuild;
-import com.skyblockplus.eventlisteners.apply.ApplyUser;
+import com.skyblockplus.features.listeners.AutomaticGuild;
+import com.skyblockplus.features.apply.ApplyGuild;
+import com.skyblockplus.features.apply.ApplyUser;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
 import java.time.Duration;
 import java.time.Instant;
@@ -32,7 +32,7 @@ public class MainClassUtils {
 		}
 
 		for (Map.Entry<String, AutomaticGuild> automaticGuild : guildMap.entrySet()) {
-			List<ApplyGuild> applySettings = automaticGuild.getValue().getApplyGuild();
+			List<ApplyGuild> applySettings = automaticGuild.getValue().applyGuild;
 			for (ApplyGuild applySetting : applySettings) {
 				try {
 					database.deleteApplyCacheSettings(

@@ -10,6 +10,7 @@ import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.CustomPaginator;
+import com.skyblockplus.utils.Hypixel;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.time.Instant;
@@ -34,7 +35,7 @@ public class ProfilesCommand extends Command {
 	}
 
 	public static EmbedBuilder getPlayerProfiles(String username, User user, MessageChannel channel, InteractionHook hook) {
-		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
+		UsernameUuidStruct usernameUuidStruct = Hypixel.usernameToUuid(username);
 		if (usernameUuidStruct != null) {
 			DateTimeFormatter dateTimeFormatter = DateTimeFormatter
 				.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
@@ -43,14 +44,7 @@ public class ProfilesCommand extends Command {
 
 			JsonArray profileArray;
 			try {
-				profileArray =
-					higherDepth(
-						getJson(
-							"https://api.hypixel.net/skyblock/profiles?key=" + HYPIXEL_API_KEY + "&uuid=" + usernameUuidStruct.playerUuid
-						),
-						"profiles"
-					)
-						.getAsJsonArray();
+				profileArray = higherDepth(Hypixel.skyblockProfilesFromUuid(usernameUuidStruct.playerUuid), "profiles").getAsJsonArray();
 			} catch (Exception e) {
 				return defaultEmbed("Unable to fetch player data");
 			}
@@ -61,26 +55,17 @@ public class ProfilesCommand extends Command {
 				List<String> uuids = getJsonKeys(higherDepth(profile, "members"));
 
 				for (String uuid : uuids) {
-					profileUsernameFutureList.add(
-						asyncHttpClient
-							.prepareGet("https://api.ashcon.app/mojang/v2/user/" + uuid)
-							.execute()
-							.toCompletableFuture()
-							.thenApply(
-								uuidToUsernameResponse -> {
-									String playerUsername = higherDepth(
-										JsonParser.parseString(uuidToUsernameResponse.getResponseBody()),
-										"username"
-									)
-										.getAsString();
-									String lastLogin = dateTimeFormatter.format(
-										Instant.ofEpochMilli(higherDepth(profile, "members." + uuid + ".last_save").getAsLong())
-									);
+					Hypixel
+						.asyncUuidToUsername(uuid)
+						.thenApply(
+							playerUsername -> {
+								String lastLogin = dateTimeFormatter.format(
+									Instant.ofEpochMilli(higherDepth(profile, "members." + uuid + ".last_save").getAsLong())
+								);
 
-									return ("\n• " + playerUsername + " last logged in on " + lastLogin);
-								}
-							)
-					);
+								return "\n• " + playerUsername + " last logged in on " + lastLogin;
+							}
+						);
 				}
 			}
 

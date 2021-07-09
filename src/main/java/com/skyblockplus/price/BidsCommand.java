@@ -7,6 +7,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.Hypixel;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.io.InputStreamReader;
 import java.net.URI;
@@ -26,7 +27,7 @@ public class BidsCommand extends Command {
 	}
 
 	public static EmbedBuilder getPlayerBids(String username) {
-		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
+		UsernameUuidStruct usernameUuidStruct = Hypixel.usernameToUuid(username);
 		if (usernameUuidStruct == null) {
 			return defaultEmbed("Error fetching player data");
 		}
@@ -63,7 +64,8 @@ public class BidsCommand extends Command {
 			if (timeUntil.length() > 0) {
 				auctionDesc = "Current bid: " + simplifyNumber(highestBid);
 				auctionDesc += " | Ending in " + timeUntil;
-				auctionDesc += "\nHighest bidder: " + uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString());
+				auctionDesc +=
+					"\nHighest bidder: " + Hypixel.uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString());
 				for (int i = bidsArr.size() - 1; i >= 0; i--) {
 					JsonElement curBid = bidsArr.get(i);
 					if (higherDepth(curBid, "bidder").getAsString().equals(usernameUuidStruct.playerUuid)) {
@@ -74,7 +76,9 @@ public class BidsCommand extends Command {
 			} else {
 				auctionDesc = "Auction sold for " + simplifyNumber(highestBid) + " coins";
 				auctionDesc +=
-					"\n " + uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()) + " won the auction";
+					"\n " +
+					Hypixel.uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()) +
+					" won the auction";
 			}
 
 			eb.setThumbnail("https://cravatar.eu/helmavatar/" + usernameUuidStruct.playerUuid + "/64.png");

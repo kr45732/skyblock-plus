@@ -59,7 +59,6 @@ Temporary Items
 /.gradle/
 /build/
 
-/src/main/java/com/skyblockplus/api/discordserversettings/settingsmanagers/ServerSettingsController.java
 /src/main/java/com/skyblockplus/json/test.json
 
 lombok.config
@@ -67,4 +66,3 @@ lombok.config
 .classpath
 /src/main/java/com/skyblockplus/price/AuctionFlipper.java
 /src/main/java/com/skyblockplus/json/items/
-/src/main/java/com/skyblockplus/api/CommandEndpoints.java

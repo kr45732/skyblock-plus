@@ -8,7 +8,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSettingsModel;
+import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import java.util.List;
 import net.dv8tion.jda.api.entities.Guild;
 

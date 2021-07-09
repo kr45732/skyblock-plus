@@ -7,9 +7,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.api.discordserversettings.automatedroles.RoleModel;
-import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSettingsModel;
-import com.skyblockplus.api.discordserversettings.skyblockevent.SbEvent;
+import com.skyblockplus.api.serversettings.automatedroles.RoleModel;
+import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
+import com.skyblockplus.api.serversettings.skyblockevent.SbEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 

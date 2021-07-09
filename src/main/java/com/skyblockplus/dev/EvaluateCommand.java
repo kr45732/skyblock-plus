@@ -1,7 +1,7 @@
 package com.skyblockplus.dev;
 
 import static com.skyblockplus.Main.database;
-import static com.skyblockplus.eventlisteners.MainListener.guildMap;
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;

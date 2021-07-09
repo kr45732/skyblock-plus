@@ -11,6 +11,7 @@ import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.CustomPaginator;
+import com.skyblockplus.utils.Hypixel;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.HypixelGuildCache;
 import com.skyblockplus.utils.structs.PaginatorExtras;
@@ -98,7 +99,7 @@ public class GuildKickerCommand extends Command {
 			reqsArr[i] = reqsArr[i].replace("[", "").replace("]", "");
 		}
 
-		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
+		UsernameUuidStruct usernameUuidStruct = Hypixel.usernameToUuid(username);
 		JsonElement guildJson = getJson(
 			"https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&player=" + usernameUuidStruct.playerUuid
 		);
@@ -191,9 +192,9 @@ public class GuildKickerCommand extends Command {
 					.build()
 					.paginate(event.getChannel(), 0);
 			} else {
-				String HYPIXEL_KEY = database.getServerHypixelApiKey(event.getGuild().getId());
+				String hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
 
-				EmbedBuilder eb = checkHypixelKey(HYPIXEL_KEY);
+				EmbedBuilder eb = checkHypixelKey(hypixelKey);
 				if (eb != null) {
 					return eb;
 				}
@@ -210,75 +211,40 @@ public class GuildKickerCommand extends Command {
 
 					for (JsonElement guildMember : guildMembers) {
 						String guildMemberUuid = higherDepth(guildMember, "uuid").getAsString();
-						try {
-							if (keyCooldownMap.get(HYPIXEL_KEY).remainingLimit.get() < 5) {
-								System.out.println("Sleeping for " + keyCooldownMap.get(HYPIXEL_KEY).timeTillReset + " seconds");
-								TimeUnit.SECONDS.sleep(keyCooldownMap.get(HYPIXEL_KEY).timeTillReset.get());
-							}
-						} catch (Exception ignored) {}
 
+						CompletableFuture<String> guildMemberUsername = Hypixel.asyncUuidToUsername(guildMemberUuid);
 						futuresList.add(
-							asyncHttpClient
-								.prepareGet("https://api.ashcon.app/mojang/v2/user/" + guildMemberUuid)
-								.execute()
-								.toCompletableFuture()
-								.thenApply(
-									uuidToUsernameResponse -> {
-										try {
-											return higherDepth(JsonParser.parseString(uuidToUsernameResponse.getResponseBody()), "username")
-												.getAsString();
-										} catch (Exception ignored) {}
-										return null;
-									}
-								)
-								.thenApply(
-									guildMemberUsernameResponse ->
-										asyncHttpClient
-											.prepareGet(
-												"https://api.hypixel.net/skyblock/profiles?key=" + HYPIXEL_KEY + "&uuid=" + guildMemberUuid
-											)
-											.execute()
-											.toCompletableFuture()
-											.thenApply(
-												guildMemberOuterProfileJsonResponse -> {
-													try {
-														try {
-															keyCooldownMap
-																.get(HYPIXEL_KEY)
-																.remainingLimit.set(
-																	Integer.parseInt(
-																		guildMemberOuterProfileJsonResponse.getHeader("RateLimit-Remaining")
-																	)
-																);
-															keyCooldownMap
-																.get(HYPIXEL_KEY)
-																.timeTillReset.set(
-																	Integer.parseInt(
-																		guildMemberOuterProfileJsonResponse.getHeader("RateLimit-Reset")
-																	)
-																);
-														} catch (Exception ignored) {}
+							guildMemberUsername.thenApply(
+								guildMemberUsernameResponse -> {
+									try {
+										if (keyCooldownMap.get(hypixelKey).remainingLimit.get() < 5) {
+											System.out.println("Sleeping for " + keyCooldownMap.get(hypixelKey).timeTillReset + " seconds");
+											TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).timeTillReset.get());
+										}
+									} catch (Exception ignored) {}
 
-														JsonElement guildMemberOuterProfileJson = JsonParser.parseString(
-															guildMemberOuterProfileJsonResponse.getResponseBody()
-														);
+									CompletableFuture<JsonElement> guildMemberProfileJson = Hypixel.asyncSkyblockProfilesFromUuid(
+										guildMemberUuid,
+										hypixelKey
+									);
 
-														Player guildMemberPlayer = new Player(
-															guildMemberUuid,
-															guildMemberUsernameResponse,
-															guildMemberOuterProfileJson
-														);
+									return guildMemberProfileJson.thenApply(
+										guildMemberProfileJsonResponse -> {
+											Player guildMemberPlayer = new Player(
+												guildMemberUuid,
+												guildMemberUsernameResponse,
+												guildMemberProfileJsonResponse
+											);
 
-														if (guildMemberPlayer.isValid()) {
-															return memberCacheFromPlayer(guildMemberPlayer);
-														}
-													} catch (Exception e) {
-														e.printStackTrace();
-													}
-													return null;
-												}
-											)
-								)
+											if (guildMemberPlayer.isValid()) {
+												return memberCacheFromPlayer(guildMemberPlayer);
+											}
+
+											return null;
+										}
+									);
+								}
+							)
 						);
 					}
 

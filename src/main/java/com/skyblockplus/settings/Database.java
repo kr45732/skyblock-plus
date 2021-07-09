@@ -1,18 +1,18 @@
 package com.skyblockplus.settings;
 
 import com.google.gson.*;
-import com.skyblockplus.api.discordserversettings.automatedapplication.ApplyRequirements;
-import com.skyblockplus.api.discordserversettings.automatedapplication.AutomatedApplication;
-import com.skyblockplus.api.discordserversettings.automatedguildroles.GuildRole;
-import com.skyblockplus.api.discordserversettings.automatedroles.AutomatedRoles;
-import com.skyblockplus.api.discordserversettings.automatedroles.RoleModel;
-import com.skyblockplus.api.discordserversettings.automatedverify.AutomatedVerify;
-import com.skyblockplus.api.discordserversettings.mee6bypasser.Mee6Data;
-import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSettingsModel;
-import com.skyblockplus.api.discordserversettings.settingsmanagers.ServerSettingsService;
-import com.skyblockplus.api.discordserversettings.skyblockevent.EventMember;
-import com.skyblockplus.api.discordserversettings.skyblockevent.RunningEvent;
-import com.skyblockplus.api.discordserversettings.skyblockevent.SbEvent;
+import com.skyblockplus.api.serversettings.automatedapply.ApplyRequirements;
+import com.skyblockplus.api.serversettings.automatedapply.AutomatedApply;
+import com.skyblockplus.api.serversettings.automatedguild.GuildRole;
+import com.skyblockplus.api.serversettings.automatedroles.AutomatedRoles;
+import com.skyblockplus.api.serversettings.automatedroles.RoleModel;
+import com.skyblockplus.api.serversettings.automatedverify.AutomatedVerify;
+import com.skyblockplus.api.serversettings.mee6roles.Mee6Data;
+import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
+import com.skyblockplus.api.serversettings.managers.ServerSettingsService;
+import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
+import com.skyblockplus.api.serversettings.skyblockevent.RunningEvent;
+import com.skyblockplus.api.serversettings.skyblockevent.SbEvent;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountService;
 import java.util.List;
@@ -178,7 +178,7 @@ public class Database {
 		return settingsService.setApplyReqs(serverId, name, gson.fromJson(newApplyReqs, ApplyRequirements[].class)).getStatusCodeValue();
 	}
 
-	public List<AutomatedApplication> getAllApplySettings(String serverId) {
+	public List<AutomatedApply> getAllApplySettings(String serverId) {
 		return settingsService.getAllApplySettings(serverId);
 	}
 
@@ -186,12 +186,12 @@ public class Database {
 		return gson.toJsonTree(settingsService.getApplySettingsExt(serverId, name).getBody());
 	}
 
-	public int setApplySettings(String serverId, AutomatedApplication newSettings) {
+	public int setApplySettings(String serverId, AutomatedApply newSettings) {
 		return settingsService.setApplySettings(serverId, newSettings).getStatusCodeValue();
 	}
 
 	public int setApplySettings(String serverId, JsonElement newSettings) {
-		return settingsService.setApplySettings(serverId, gson.fromJson(newSettings, AutomatedApplication.class)).getStatusCodeValue();
+		return settingsService.setApplySettings(serverId, gson.fromJson(newSettings, AutomatedApply.class)).getStatusCodeValue();
 	}
 
 	public int setVerifyRolesSettings(String serverId, JsonArray newSettings) {

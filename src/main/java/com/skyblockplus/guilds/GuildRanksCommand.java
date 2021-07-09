@@ -9,6 +9,7 @@ import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.CustomPaginator;
+import com.skyblockplus.utils.Hypixel;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.io.FileReader;
@@ -59,7 +60,7 @@ public class GuildRanksCommand extends Command {
 	}
 
 	private EmbedBuilder getLeaderboard(String username, CommandEvent event) {
-		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
+		UsernameUuidStruct usernameUuidStruct = Hypixel.usernameToUuid(username);
 		if (usernameUuidStruct == null) {
 			return null;
 		}

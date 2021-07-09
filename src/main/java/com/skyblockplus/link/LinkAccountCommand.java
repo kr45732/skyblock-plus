@@ -7,7 +7,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.api.discordserversettings.automatedguildroles.GuildRole;
+import com.skyblockplus.api.serversettings.automatedguild.GuildRole;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
 import java.time.Instant;

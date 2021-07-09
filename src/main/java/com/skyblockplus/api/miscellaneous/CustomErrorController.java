@@ -12,9 +12,4 @@ public class CustomErrorController implements ErrorController {
 	public ErrorTemplate error() {
 		return new ErrorTemplate(false, "Invalid request");
 	}
-
-	@Override
-	public String getErrorPath() {
-		return "/error";
-	}
 }

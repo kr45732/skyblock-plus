@@ -8,6 +8,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.Hypixel;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.InvItem;
 import java.time.Duration;
@@ -62,7 +63,7 @@ public class PriceCommand extends Command {
 			String timeUntil = instantToDHM(duration);
 
 			String ebStr = "**Item name:** " + itemName;
-			ebStr += "\n**Seller:** " + uuidToUsername(higherDepth(auction, "auctioneer").getAsString());
+			ebStr += "\n**Seller:** " + Hypixel.uuidToUsername(higherDepth(auction, "auctioneer").getAsString());
 			ebStr += "\n**Command:** `/ah " + higherDepth(auction, "uuid").getAsString() + "`";
 			long highestBid = higherDepth(auction, "highest_bid_amount").getAsInt();
 			long startingBid = higherDepth(auction, "starting_bid").getAsInt();
@@ -77,7 +78,7 @@ public class PriceCommand extends Command {
 					ebStr +=
 						bidsArr.size() > 0
 							? "\n**Highest bidder:** " +
-							uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString())
+							Hypixel.uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString())
 							: "";
 				}
 			} else {
@@ -86,7 +87,7 @@ public class PriceCommand extends Command {
 						"\n**Auction sold** for " +
 						simplifyNumber(highestBid) +
 						" coins to " +
-						uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString());
+						Hypixel.uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString());
 				} else {
 					ebStr = "\n**Auction did not sell**";
 				}

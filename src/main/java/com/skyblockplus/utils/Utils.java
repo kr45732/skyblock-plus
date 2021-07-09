@@ -13,7 +13,6 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
 import com.skyblockplus.utils.structs.HypixelGuildCache;
 import com.skyblockplus.utils.structs.HypixelKeyInformation;
-import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.awt.*;
 import java.io.*;
 import java.math.RoundingMode;
@@ -341,30 +340,9 @@ public class Utils {
 		return "https://hst.sh/raw/" + url.split("https://hst.sh/")[1] + ".json";
 	}
 
-	public static UsernameUuidStruct usernameToUuid(String username) {
-		try {
-			JsonElement usernameJson = getJson("https://api.ashcon.app/mojang/v2/user/" + username);
-			return new UsernameUuidStruct(
-				higherDepth(usernameJson, "username").getAsString(),
-				higherDepth(usernameJson, "uuid").getAsString().replace("-", "")
-			);
-		} catch (Exception ignored) {}
-		return null;
-	}
-
-	public static String uuidToUsername(String uuid) {
-		try {
-			JsonElement usernameJson = getJson("https://api.ashcon.app/mojang/v2/user/" + uuid);
-			return higherDepth(usernameJson, "username").getAsString();
-		} catch (Exception ignored) {}
-		return null;
-	}
-
 	public static DiscordInfoStruct getPlayerDiscordInfo(String username) {
 		try {
-			JsonElement playerJson = getJson(
-				"https://api.hypixel.net/player?key=" + HYPIXEL_API_KEY + "&uuid=" + usernameToUuid(username).playerUuid
-			);
+			JsonElement playerJson = Hypixel.playerFromUuid(Hypixel.usernameToUuid(username).playerUuid);
 
 			String discordTag = higherDepth(playerJson, "player.socialMedia.links.DISCORD").getAsString();
 			String minecraftUsername = higherDepth(playerJson, "player.displayname").getAsString();

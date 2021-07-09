@@ -8,6 +8,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.Hypixel;
 import com.skyblockplus.utils.structs.InvItem;
 import java.io.InputStreamReader;
 import java.net.URI;
@@ -85,7 +86,8 @@ public class QueryAuctionCommand extends Command {
 								String lowestBinStr = "";
 								lowestBinStr += "**Name:** " + enchantName.replaceAll("[_;]", " ");
 								lowestBinStr += "\n**Price:** " + simplifyNumber(higherDepth(lowestBinAh, "starting_bid").getAsDouble());
-								lowestBinStr += "\n**Seller:** " + uuidToUsername(higherDepth(lowestBinAh, "auctioneer").getAsString());
+								lowestBinStr +=
+									"\n**Seller:** " + Hypixel.uuidToUsername(higherDepth(lowestBinAh, "auctioneer").getAsString());
 								lowestBinStr += "\n**Auction:** `/ah " + higherDepth(lowestBinAh, "uuid").getAsString() + "`";
 
 								lowestBinStr += "\n**Ends in:** " + instantToDHM(duration);
@@ -157,7 +159,7 @@ public class QueryAuctionCommand extends Command {
 								" " +
 								higherDepth(lowestBinAh, "item_name").getAsString();
 							lowestBinStr += "\n**Price:** " + simplifyNumber(higherDepth(lowestBinAh, "starting_bid").getAsDouble());
-							lowestBinStr += "\n**Seller:** " + uuidToUsername(higherDepth(lowestBinAh, "auctioneer").getAsString());
+							lowestBinStr += "\n**Seller:** " + Hypixel.uuidToUsername(higherDepth(lowestBinAh, "auctioneer").getAsString());
 							lowestBinStr += "\n**Auction:** `/ah " + higherDepth(lowestBinAh, "uuid").getAsString() + "`";
 
 							lowestBinStr += "\n**Ends in:** " + instantToDHM(duration);
@@ -190,7 +192,7 @@ public class QueryAuctionCommand extends Command {
 			String lowestBinStr = "";
 			lowestBinStr += "**Name:** " + higherDepth(lowestBinAh, "item_name").getAsString();
 			lowestBinStr += "\n**Price:** " + simplifyNumber(higherDepth(lowestBinAh, "starting_bid").getAsDouble());
-			lowestBinStr += "\n**Seller:** " + uuidToUsername(higherDepth(lowestBinAh, "auctioneer").getAsString());
+			lowestBinStr += "\n**Seller:** " + Hypixel.uuidToUsername(higherDepth(lowestBinAh, "auctioneer").getAsString());
 			lowestBinStr += "\n**Auction:** `/ah " + higherDepth(lowestBinAh, "uuid").getAsString() + "`";
 
 			lowestBinStr += "\n**Ends in:** " + instantToDHM(duration);

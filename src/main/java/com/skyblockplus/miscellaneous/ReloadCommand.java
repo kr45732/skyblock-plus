@@ -1,6 +1,6 @@
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.eventlisteners.MainListener.*;
+import static com.skyblockplus.features.listeners.MainListener.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
@@ -29,7 +29,7 @@ public class ReloadCommand extends Command {
 				eb = defaultEmbed("Reload Settings for " + event.getGuild().getName());
 				eb.addField("Apply settings reload status", onApplyReload(event.getGuild().getId()), false);
 				eb.addField("Verify settings reload status", onVerifyReload(event.getGuild().getId()), false);
-				eb.addField("Mee6 bypasser reload status", onMee6Reload(event.getGuild().getId()), false);
+				eb.addField("Mee6 roles reload status", onMee6Reload(event.getGuild().getId()), false);
 				ebMessage.editMessageEmbeds(eb.build()).queue();
 			}
 		);

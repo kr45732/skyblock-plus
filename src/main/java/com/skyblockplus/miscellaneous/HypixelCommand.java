@@ -5,6 +5,7 @@ import static com.skyblockplus.utils.Utils.*;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.Hypixel;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -22,9 +23,9 @@ public class HypixelCommand extends Command {
 	}
 
 	public static EmbedBuilder getParkourStats(String username) {
-		UsernameUuidStruct usernameUuid = usernameToUuid(username);
+		UsernameUuidStruct usernameUuid = Hypixel.usernameToUuid(username);
 		if (usernameUuid != null) {
-			JsonElement hypixelJson = getJson("https://api.hypixel.net/player?key=" + HYPIXEL_API_KEY + "&uuid=" + usernameUuid.playerUuid);
+			JsonElement hypixelJson = Hypixel.playerFromUuid(usernameUuid.playerUuid);
 			if (higherDepth(hypixelJson, "player") != null) {
 				hypixelJson = higherDepth(hypixelJson, "player");
 
@@ -64,9 +65,9 @@ public class HypixelCommand extends Command {
 	}
 
 	public static EmbedBuilder getHypixelStats(String username) {
-		UsernameUuidStruct usernameUuid = usernameToUuid(username);
+		UsernameUuidStruct usernameUuid = Hypixel.usernameToUuid(username);
 		if (usernameUuid != null) {
-			JsonElement hypixelJson = getJson("https://api.hypixel.net/player?key=" + HYPIXEL_API_KEY + "&uuid=" + usernameUuid.playerUuid);
+			JsonElement hypixelJson = Hypixel.playerFromUuid(usernameUuid.playerUuid);
 			if (higherDepth(hypixelJson, "player") != null) {
 				if (higherDepth(hypixelJson, "player").isJsonNull()) {
 					return defaultEmbed(usernameUuid.playerUsername + " has not played Hypixel");

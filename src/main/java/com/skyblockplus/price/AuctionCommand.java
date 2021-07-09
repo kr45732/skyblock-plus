@@ -9,6 +9,7 @@ import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.CustomPaginator;
+import com.skyblockplus.utils.Hypixel;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.time.Duration;
@@ -30,7 +31,7 @@ public class AuctionCommand extends Command {
 	}
 
 	public static EmbedBuilder getPlayerAuction(String username, User user, MessageChannel channel, InteractionHook hook) {
-		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
+		UsernameUuidStruct usernameUuidStruct = Hypixel.usernameToUuid(username);
 		if (usernameUuidStruct == null) {
 			return defaultEmbed("Error fetching player data");
 		}
@@ -164,7 +165,7 @@ public class AuctionCommand extends Command {
 		String timeUntil = instantToDHM(duration);
 
 		String ebStr = "**Item name:** " + itemName;
-		ebStr += "\n**Seller:** " + uuidToUsername(higherDepth(auctionJson, "auctioneer").getAsString());
+		ebStr += "\n**Seller:** " + Hypixel.uuidToUsername(higherDepth(auctionJson, "auctioneer").getAsString());
 		ebStr += "\n**Command:** `/ah " + higherDepth(auctionJson, "uuid").getAsString() + "`";
 		long highestBid = higherDepth(auctionJson, "highest_bid_amount").getAsInt();
 		long startingBid = higherDepth(auctionJson, "starting_bid").getAsInt();
@@ -178,7 +179,8 @@ public class AuctionCommand extends Command {
 				ebStr += "\n**Current bid:** " + simplifyNumber(highestBid) + " | Ending in " + timeUntil;
 				ebStr +=
 					bidsArr.size() > 0
-						? "\n**Highest bidder:** " + uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString())
+						? "\n**Highest bidder:** " +
+						Hypixel.uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString())
 						: "";
 			}
 		} else {
@@ -187,7 +189,7 @@ public class AuctionCommand extends Command {
 					"\n**Auction sold** for " +
 					simplifyNumber(highestBid) +
 					" coins to " +
-					uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString());
+					Hypixel.uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString());
 			} else {
 				ebStr = "\n**Auction did not sell**";
 			}

@@ -7,7 +7,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.api.discordserversettings.automatedapplication.AutomatedApplication;
+import com.skyblockplus.api.serversettings.automatedapply.AutomatedApply;
 import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -41,7 +41,7 @@ public class GuildRequirementsCommand extends Command {
 				} catch (Exception ignored) {}
 
 				if (guildReqs == null) {
-					List<AutomatedApplication> allGuilds = database.getAllApplySettings(event.getGuild().getId());
+					List<AutomatedApply> allGuilds = database.getAllApplySettings(event.getGuild().getId());
 
 					String ebStr = null;
 					try {

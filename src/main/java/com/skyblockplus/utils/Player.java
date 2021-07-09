@@ -61,9 +61,7 @@ public class Player {
 		}
 
 		try {
-			this.profilesArray =
-				higherDepth(getJson("https://api.hypixel.net/skyblock/profiles?key=" + HYPIXEL_API_KEY + "&uuid=" + playerUuid), "profiles")
-					.getAsJsonArray();
+			this.profilesArray = higherDepth(Hypixel.skyblockProfilesFromUuid(playerUuid), "profiles").getAsJsonArray();
 
 			if (getLatestProfile(profilesArray)) {
 				return;
@@ -81,9 +79,7 @@ public class Player {
 		}
 
 		try {
-			this.profilesArray =
-				higherDepth(getJson("https://api.hypixel.net/skyblock/profiles?key=" + HYPIXEL_API_KEY + "&uuid=" + playerUuid), "profiles")
-					.getAsJsonArray();
+			this.profilesArray = higherDepth(Hypixel.skyblockProfilesFromUuid(playerUuid), "profiles").getAsJsonArray();
 			if (profileIdFromName(profileName, profilesArray)) {
 				return;
 			}
@@ -130,7 +126,7 @@ public class Player {
 		this.playerUuid = playerUuid;
 
 		try {
-			JsonElement playerJson = getJson("https://api.hypixel.net/skyblock/profiles?key=" + hypixelKey + "&uuid=" + playerUuid);
+			JsonElement playerJson = Hypixel.skyblockProfilesFromUuid(playerUuid, hypixelKey, false);
 			if (higherDepth(playerJson, "cause") != null) {
 				failCause = higherDepth(playerJson, "cause").getAsString();
 				return;
@@ -234,7 +230,7 @@ public class Player {
 	/* Constructor helper methods */
 	public boolean usernameToUuid(String username) {
 		try {
-			UsernameUuidStruct usernameJson = Utils.usernameToUuid(username);
+			UsernameUuidStruct usernameJson = Hypixel.usernameToUuid(username);
 			this.playerUsername = usernameJson.playerUsername;
 			this.playerUuid = usernameJson.playerUuid;
 			return false;
@@ -642,7 +638,7 @@ public class Player {
 
 	public int getDungeonSecrets() {
 		if (hypixelProfileJson == null) {
-			this.hypixelProfileJson = getJson("https://api.hypixel.net/player?key=" + HYPIXEL_API_KEY + "&uuid=" + playerUuid);
+			this.hypixelProfileJson = Hypixel.playerFromUuid(playerUuid);
 		}
 
 		try {
@@ -1115,9 +1111,7 @@ public class Player {
 	public String[] getAllProfileNames(boolean isIronman) {
 		List<String> profileNameList = new ArrayList<>();
 		if (this.profilesArray == null) {
-			this.profilesArray =
-				higherDepth(getJson("https://api.hypixel.net/skyblock/profiles?key=" + HYPIXEL_API_KEY + "&uuid=" + playerUuid), "profiles")
-					.getAsJsonArray();
+			this.profilesArray = higherDepth(Hypixel.skyblockProfilesFromUuid(playerUuid), "profiles").getAsJsonArray();
 		}
 
 		for (JsonElement profile : profilesArray) {

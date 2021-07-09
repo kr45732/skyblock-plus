@@ -1,6 +1,6 @@
 package com.skyblockplus.utils;
 
-import static com.skyblockplus.eventlisteners.AutomaticGuild.getGuildPrefix;
+import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 
 import com.jagrosh.jdautilities.command.GuildSettingsProvider;
 import java.util.Collection;
