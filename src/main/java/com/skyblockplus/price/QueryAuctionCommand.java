@@ -1,5 +1,7 @@
 package com.skyblockplus.price;
 
+import static com.skyblockplus.utils.Constants.enchantNames;
+import static com.skyblockplus.utils.Constants.petNames;
 import static com.skyblockplus.utils.Player.getGenericInventoryMap;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -14,7 +16,6 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
 import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -53,8 +54,7 @@ public class QueryAuctionCommand extends Command {
 	}
 
 	public static EmbedBuilder queryAuctions(String query) {
-		List<String> enchantsList = getJsonKeys(higherDepth(getEnchantsJson(), "enchants_min_level"));
-		for (String enchant : enchantsList) {
+		for (String enchant : enchantNames) {
 			if (query.replace(" ", "_").toLowerCase().contains(enchant)) {
 				String enchantName = enchant + ";";
 				try {
@@ -93,7 +93,7 @@ public class QueryAuctionCommand extends Command {
 								lowestBinStr += "\n**Ends in:** " + instantToDHM(duration);
 
 								eb.addField("Lowest Bin", lowestBinStr, false);
-								eb.setThumbnail("https://sky.lea.moe/item.gif/ENCHANTED_BOOK");
+								eb.setThumbnail("https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK");
 								return eb;
 							}
 						}
@@ -103,9 +103,7 @@ public class QueryAuctionCommand extends Command {
 			}
 		}
 
-		List<String> petsList = getJsonKeys(higherDepth(getPetJson(), "pet_types"));
-
-		for (String pet : petsList) {
+		for (String pet : petNames) {
 			if (query.replace(" ", "_").toUpperCase().contains(pet)) {
 				query = query.toLowerCase();
 				String rarity = "ANY";
@@ -201,11 +199,11 @@ public class QueryAuctionCommand extends Command {
 				NBTCompound nbtData = NBTReader.readBase64(higherDepth(lowestBinAh, "item_bytes").getAsString());
 				InvItem itemStruct = getGenericInventoryMap(nbtData).get(0);
 				if (itemStruct.getId().equals("ENCHANTED_BOOK")) {
-					eb.setThumbnail("https://sky.lea.moe/item.gif/ENCHANTED_BOOK");
+					eb.setThumbnail("https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK");
 				} else if (itemStruct.getId().equals("PET")) {
 					eb.setThumbnail(getPetUrl(itemStruct.getName().split("] ")[1].toUpperCase().replace(" ", "_")));
 				} else {
-					eb.setThumbnail("https://sky.lea.moe/item.gif/" + itemStruct.getId());
+					eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemStruct.getId());
 				}
 			} catch (Exception ignored) {}
 

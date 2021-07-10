@@ -1,10 +1,13 @@
 package com.skyblockplus.price;
 
+import static com.skyblockplus.utils.Constants.enchantNames;
+import static com.skyblockplus.utils.Constants.petNames;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.Constants;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +42,7 @@ public class AverageAuctionCommand extends Command {
 				eb.addField(capitalizeString(item.toLowerCase()), formatNumber(higherDepth(itemJson, "price").getAsLong()), false);
 			}
 
-			eb.setThumbnail("https://sky.lea.moe/item.gif/" + item);
+			eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + item);
 			return eb;
 		}
 
@@ -57,26 +60,9 @@ public class AverageAuctionCommand extends Command {
 				eb.addField(capitalizeString(item.toLowerCase()), formatNumber(higherDepth(itemJson, "price").getAsLong()), false);
 			}
 
-			eb.setThumbnail("https://sky.lea.moe/item.gif/" + internalName);
+			eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + internalName);
 			return eb;
 		}
-
-		JsonElement enchantsJson = higherDepth(getEnchantsJson(), "enchants_min_level");
-
-		List<String> enchantNames = enchantsJson
-			.getAsJsonObject()
-			.entrySet()
-			.stream()
-			.map(i -> i.getKey().toUpperCase())
-			.collect(Collectors.toCollection(ArrayList::new));
-		enchantNames.add("ULTIMATE_JERRY");
-
-		Map<String, String> rarityMap = new HashMap<>();
-		rarityMap.put("LEGENDARY", ";4");
-		rarityMap.put("EPIC", ";3");
-		rarityMap.put("RARE", ";2");
-		rarityMap.put("UNCOMMON", ";1");
-		rarityMap.put("COMMON", ";0");
 
 		String formattedName;
 		for (String i : enchantNames) {
@@ -98,7 +84,7 @@ public class AverageAuctionCommand extends Command {
 						eb.addField(capitalizeString(enchantName), formatNumber(higherDepth(itemJson, "price").getAsLong()), false);
 					}
 
-					eb.setThumbnail("https://sky.lea.moe/item.gif/ENCHANTED_BOOK");
+					eb.setThumbnail("https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK");
 					return eb;
 				} catch (NumberFormatException e) {
 					try {
@@ -130,7 +116,7 @@ public class AverageAuctionCommand extends Command {
 						if (eb.getFields().size() == 0) {
 							return defaultEmbed("No auctions found for " + capitalizeString(item.toLowerCase()));
 						}
-						eb.setThumbnail("https://sky.lea.moe/item.gif/ENCHANTED_BOOK");
+						eb.setThumbnail("https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK");
 						return eb;
 					} catch (NullPointerException ex) {
 						return defaultEmbed("No auctions found for " + capitalizeString(item.toLowerCase()));
@@ -143,19 +129,12 @@ public class AverageAuctionCommand extends Command {
 
 		JsonElement petJson = getPetNumsJson();
 
-		List<String> petNames = petJson
-			.getAsJsonObject()
-			.entrySet()
-			.stream()
-			.map(Map.Entry::getKey)
-			.collect(Collectors.toCollection(ArrayList::new));
-
 		for (String i : petNames) {
 			if (internalName.contains(i)) {
 				String petName = "";
 				formattedName = i;
 				boolean raritySpecified = false;
-				for (Map.Entry<String, String> j : rarityMap.entrySet()) {
+				for (Map.Entry<String, String> j : Constants.rarityToNumberMap.entrySet()) {
 					if (internalName.contains(j.getKey())) {
 						petName = j.getKey().toLowerCase() + " " + formattedName.toLowerCase().replace("_", " ");
 						formattedName += j.getValue();
@@ -167,15 +146,15 @@ public class AverageAuctionCommand extends Command {
 				if (!raritySpecified) {
 					List<String> petRarities = higherDepth(petJson, formattedName)
 						.getAsJsonObject()
-						.entrySet()
+						.keySet()
 						.stream()
-						.map(j -> j.getKey().toUpperCase())
+						.map(String::toUpperCase)
 						.collect(Collectors.toCollection(ArrayList::new));
 
 					for (String j : petRarities) {
-						if (higherDepth(averageAhJson, formattedName + rarityMap.get(j)) != null) {
+						if (higherDepth(averageAhJson, formattedName + Constants.rarityToNumberMap.get(j)) != null) {
 							petName = j.toLowerCase() + " " + formattedName.toLowerCase().replace("_", " ");
-							formattedName += rarityMap.get(j);
+							formattedName += Constants.rarityToNumberMap.get(j);
 							break;
 						}
 					}
@@ -212,7 +191,7 @@ public class AverageAuctionCommand extends Command {
 					eb.addField(capitalizeString(itemName), formatNumber(higherDepth(itemJson, "price").getAsLong()), false);
 				}
 
-				eb.setThumbnail("https://sky.lea.moe/item.gif/ENCHANTED_BOOK");
+				eb.setThumbnail("https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK");
 			} else if (petNames.contains(closestMatch.split(";")[0].trim())) {
 				Map<String, String> rarityMapRev = new HashMap<>();
 				rarityMapRev.put("4", "LEGENDARY");
@@ -254,7 +233,7 @@ public class AverageAuctionCommand extends Command {
 						false
 					);
 				}
-				eb.setThumbnail("https://sky.lea.moe/item.gif/" + closestMatch);
+				eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + closestMatch);
 			}
 
 			return eb;

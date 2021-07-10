@@ -3,7 +3,6 @@ package com.skyblockplus.features.skyblockevent;
 import static com.skyblockplus.Main.*;
 import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.features.skyblockevent.SkyblockEvent.formatter;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -572,9 +571,7 @@ public class SkyblockEventCommand extends Command {
 
 			Instant eventInstantEnding = Instant.ofEpochSecond(higherDepth(currentSettings, "timeEndingSeconds").getAsLong());
 
-			Duration duration = Duration.between(Instant.now(), eventInstantEnding);
-
-			eb.addField("End Date", "Ends in " + instantToDHM(duration) + " (" + formatter.format(eventInstantEnding) + " UTC)", false);
+			eb.addField("End Date", "Ends in <t:" + eventInstantEnding.getEpochSecond() + ":R>", false);
 
 			ArrayList<String> prizesKeys = getJsonKeys(higherDepth(currentSettings, "prizeMap"));
 			StringBuilder ebString = new StringBuilder();

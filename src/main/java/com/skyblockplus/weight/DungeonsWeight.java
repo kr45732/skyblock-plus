@@ -1,11 +1,11 @@
 package com.skyblockplus.weight;
 
 import com.google.gson.JsonElement;
+import com.skyblockplus.utils.Constants;
 import com.skyblockplus.utils.Player;
 
 public class DungeonsWeight {
 
-	private final double level50Xp = 569809640;
 	private JsonElement profile;
 	private Player player;
 	private double totalDungeonsWeight;
@@ -26,11 +26,11 @@ public class DungeonsWeight {
 		double currentClassXp = player.getDungeonClassXp(profile, className);
 		double base = Math.pow(currentClassLevel, 4.5) * maxPoints;
 
-		if (currentClassXp <= level50Xp) {
+		if (currentClassXp <= Constants.catacombsLevel50Xp) {
 			totalDungeonsWeight += base;
 		} else {
-			double remaining = currentClassXp - level50Xp;
-			double splitter = (4 * level50Xp) / base;
+			double remaining = currentClassXp - Constants.catacombsLevel50Xp;
+			double splitter = (4 * Constants.catacombsLevel50Xp) / base;
 			totalDungeonsWeight += (Math.floor(base) + Math.pow(remaining / splitter, 0.968));
 		}
 	}
@@ -40,11 +40,11 @@ public class DungeonsWeight {
 		double level = player.getCatacombsLevel(profile);
 		double base = Math.pow(level, 4.5) * maxPoints;
 
-		if (catacombsSkillXp <= level50Xp) {
+		if (catacombsSkillXp <= Constants.catacombsLevel50Xp) {
 			totalDungeonsWeight += base;
 		} else {
-			double remaining = catacombsSkillXp - level50Xp;
-			double splitter = (4 * level50Xp) / base;
+			double remaining = catacombsSkillXp - Constants.catacombsLevel50Xp;
+			double splitter = (4 * Constants.catacombsLevel50Xp) / base;
 			totalDungeonsWeight += (Math.floor(base) + Math.pow(remaining / splitter, 0.968));
 		}
 	}

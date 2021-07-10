@@ -89,7 +89,7 @@ public class ArmorCommand extends Command {
 						paginateBuilder.addItems("**Slot:** " + slotName);
 					} else {
 						pageTitles.add(currentInvStruct.getName() + " x" + currentInvStruct.getCount());
-						pageThumbnails.add("https://sky.lea.moe/item.gif/" + currentInvStruct.getId());
+						pageThumbnails.add("https://sky.shiiyu.moe/item.gif/" + currentInvStruct.getId());
 						String itemString = "";
 
 						String slotName = "";

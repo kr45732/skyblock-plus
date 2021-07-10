@@ -76,13 +76,13 @@ public class HelpCommand extends Command {
 		helpDataList.clear();
 		helpDataList.addAll(
 			Arrays.asList(
-				new HelpData("help", "Show the help page.", "help")
-					.addSecondData("Get help about a specific command.", "help [command]")
+				new HelpData("help", "Show the help menu with all the commands.", "help")
+					.addSecondData("Show the help menu for a certain command.", "help [command]")
 					.addExamples("help", "help Guild Experience")
 					.addAliases("commands"),
 				new HelpData("information", "Get information about this bot.").addAliases("info", "about"),
-				new HelpData("invite", "Invite this bot to your server."),
-				new HelpData("link", "Get what account you are linked too.", "link")
+				new HelpData("invite", "Get the invite link and Discord link for the bot."),
+				new HelpData("link", "Get what Hypixel account you are linked to.", "link")
 					.addSecondData("Link your Hypixel account to the bot.", "link [player]")
 					.addExamples("link CrypticPlasma"),
 				new HelpData("unlink", "Unlink your account from the bot."),
@@ -94,7 +94,7 @@ public class HelpCommand extends Command {
 					.addExamples("skills CrypticPlasma", "skills CrypticPlasma Zucchini"),
 				new HelpData("dungeons", "Get the dungeons data of a player.", "dungeons [player] <profile>")
 					.addAliases("cata", "catacombs")
-					.addExamples("catacombs CrypticPlasma", "catacombs CrypticPlasma Zucchini"),
+					.addExamples("dungeons CrypticPlasma", "dungeons CrypticPlasma Zucchini"),
 				new HelpData("essence", "Main essence command.")
 					.addSubcommands(
 						new HelpData("upgrade", "Interactive message to find the essence amount to upgrade an item.", "upgrade [item]")
@@ -107,6 +107,7 @@ public class HelpCommand extends Command {
 					.addAliases("pf")
 					.addExamples("partyfinder CrypticPlasma", "partyfinder CrypticPlasma Zucchini"),
 				new HelpData("guild", "Main guild command")
+					.addSecondData("Find what guild a player is in.", "guild [player]")
 					.addSubcommands(
 						new HelpData("information", "Get information and statistics about a player's guild.", "information [u:player]")
 							.addSecondData("Get information and statistics about a guild.", "information [g:guild name]")
@@ -140,7 +141,7 @@ public class HelpCommand extends Command {
 				)
 					.addAliases("g-kicker")
 					.addExamples("guild-kicker u:CrypticPlasma [weight:4000 skills:40] [weight:4500]"),
-				new HelpData("auctions", "Get a player's not claimed auctions on all profiles.", "auctions [player]")
+				new HelpData("auctions", "Get a player's unclaimed auctions on all profiles.", "auctions [player]")
 					.addSecondData("Get information about an auction by it's UUID", "auctions uuid [UUID]")
 					.addAliases("auction", "ah")
 					.addExamples("auctions CrypticPlasma"),
@@ -151,7 +152,7 @@ public class HelpCommand extends Command {
 				new HelpData("average", "Get the average auction price of an item.", "average [item]")
 					.addAliases("avg")
 					.addExamples("average Necron's Handle"),
-				new HelpData("bids", "Get a player's auction bids", "bids [player].").addExamples("bids CrypticPlasma"),
+				new HelpData("bids", "Get a player's auction house bids", "bids [player].").addExamples("bids CrypticPlasma"),
 				new HelpData(
 					"query",
 					"Query the auction house for the lowest bin of an item. This command lets you make more specific queries than the lowest bin command."
@@ -209,9 +210,9 @@ public class HelpCommand extends Command {
 						"bank history CrypticPlasma",
 						"bank history CrypticPlasma Zucchini"
 					),
-				new HelpData("networth", "Get a player's networth.", "networth [player] <profile>")
+				new HelpData("networth", "Calculate a player's networth.", "networth [player] <profile>")
 					.addSecondData(
-						"Get a player's networth with a detailed JSON of each item cost.",
+						"Calculate a player's networth with a detailed JSON of each item cost.",
 						"networth [player] <profile> --verbose"
 					)
 					.addAliases("nw")
@@ -221,7 +222,7 @@ public class HelpCommand extends Command {
 						"networth CrypticPlasma --verbose",
 						"networth CrypticPlasma Zucchini --verbose"
 					),
-				new HelpData("weight", "Get a player's weight.", "weight [player] <profile>")
+				new HelpData("weight", "Get a player's slayer, skills, dungeons, and total weight.", "weight [player] <profile>")
 					.addSecondData(
 						"Calculate predicted weight using given stats (not 100% accurate).",
 						"weight calculate [skill avg] [slayer] [cata level] [avg dungeon class level]"
@@ -244,7 +245,7 @@ public class HelpCommand extends Command {
 						new HelpData("end", "Force end the event.")
 					),
 				new HelpData("settings", "Main settings command.")
-					.addSecondData("Get the current settings for the bot.", "settings")
+					.addSecondData("View the current settings for the Discord server.", "settings")
 					.addSubcommands(
 						new HelpData("delete", "Delete certain settings or all settings from the database.")
 							.addSubcommands(
@@ -437,7 +438,7 @@ public class HelpCommand extends Command {
 							)
 					),
 				new HelpData("setup", "A short walk-through on how to setup the bot."),
-				new HelpData("categories", "Get the id's of all categories in guild")
+				new HelpData("categories", "Get the id's of all categories in the Discord server.")
 			)
 		);
 	}
@@ -472,13 +473,13 @@ public class HelpCommand extends Command {
 
 		HelpGenerator helpGen = new HelpGenerator(getGuildPrefix(guildId));
 		paginateBuilder.addItems(
-			helpGen.genHelp("help", "Show the help page.") +
-			helpGen.genHelp("help [command name]", "Get help about a specific command.") +
-			helpGen.genHelp("information", "Get information about this bot.") +
-			helpGen.genHelp("invite", "Invite this bot to your server.") +
-			helpGen.genHelp("link [player]", "Link your Hypixel account to the bot.") +
-			helpGen.genHelp("link", "Get what account you are linked too.") +
-			helpGen.genHelp("unlink", "Unlink your account from the bot.")
+			helpGen.genHelp("help", "Show the help menu with all the commands") +
+			helpGen.genHelp("help [command name]", "Show the help menu for a certain command") +
+			helpGen.genHelp("information", "Show information and statistics about the bot") +
+			helpGen.genHelp("invite", "Get the invite link and Discord link for the bot") +
+			helpGen.genHelp("link [player]", "Link your Hypixel account to the bot") +
+			helpGen.genHelp("link", "Get what Hypixel account you are linked to") +
+			helpGen.genHelp("unlink", "Unlink your account from the bot")
 		);
 
 		paginateBuilder.addItems(helpGen.genHelp("slayer [player] <profile>", "Get the slayer data of a player"));
@@ -486,16 +487,16 @@ public class HelpCommand extends Command {
 		paginateBuilder.addItems(helpGen.genHelp("skills [player] <profile>", "Get the skills data of a player"));
 
 		paginateBuilder.addItems(
-			helpGen.genHelp("catacombs [player] <profile>", "Get the dungeons data of a player") +
+			helpGen.genHelp("dungeons [player] <profile>", "Get the dungeons data of a player") +
 			helpGen.genHelp("essence upgrade [item]", "Interactive message to find the essence amount to upgrade an item") +
 			helpGen.genHelp("essence information [item]", "Get the amount of essence to upgrade an item for each level") +
-			helpGen.genHelp("partyfinder [player] <profile>", "A party finder helper that shows a player's dungeon stats")
+			helpGen.genHelp("partyfinder [player] <profile>", "A party finder helper that shows a player's dungeon stats.")
 		);
 
 		paginateBuilder.addItems(
 			helpGen.genHelp("guild [player]", "Find what guild a player is in") +
-			helpGen.genHelp("guild info [u:player]", "Get information and statistics about a player's guild") +
-			helpGen.genHelp("guild info [g:guild name]", "Get information and statistics about a guild") +
+			helpGen.genHelp("guild information [u:player]", "Get information and statistics about a player's guild") +
+			helpGen.genHelp("guild information [g:guild name]", "Get information and statistics about a guild") +
 			helpGen.genHelp("guild members [u:player]", "Get a list of all members in a player's guild") +
 			helpGen.genHelp("guild experience [u:player]", "Get the experience leaderboard for a player's guild") +
 			helpGen.genHelp("guild-requirements [name]", "Get the application requirements set for this server") +
@@ -510,14 +511,14 @@ public class HelpCommand extends Command {
 		);
 
 		paginateBuilder.addItems(
-			helpGen.genHelp("auctions [player]", "Get a player's active (not claimed) auctions on all profiles") +
+			helpGen.genHelp("auctions [player]", "Get a player's not claimed auctions on all profiles") +
 			helpGen.genHelp("auction uuid [UUID]", "Get an auction by it's UUID") +
 			helpGen.genHelp("bin [item]", "Get the lowest bin of an item") +
 			helpGen.genHelp("bazaar [item]", "Get bazaar prices of an item") +
 			helpGen.genHelp("average [item]", "Get the average auction price of an item") +
-			helpGen.genHelp("bids [player]", "Get a player's bids") +
-			helpGen.genHelp("query [item]", "Query the auction house") +
-			helpGen.genHelp("bits [item]", "Get the price of an item from the bits shop") +
+			helpGen.genHelp("bids [player]", "Get a player's auction house bids") +
+			helpGen.genHelp("query [item]", "Query the auction house for the lowest bin of an item") +
+			helpGen.genHelp("bits [item]", "Get the bits cost of an item from the bits shop") +
 			helpGen.genHelp("price [uuid]", "Calculate the price of an item on the auction house using the auction's UUID")
 		);
 
@@ -534,12 +535,15 @@ public class HelpCommand extends Command {
 		);
 
 		paginateBuilder.addItems(
-			helpGen.genHelp("roles claim <profile>", "Claim automatic Skyblock roles. The player must be linked") +
+			helpGen.genHelp("roles claim <profile>", "Claim your automatic Skyblock roles. The player must be linked") +
 			helpGen.genHelp("bank [player] <profile>", "Get a player's bank and purse coins") +
 			helpGen.genHelp("bank history [player] <profile>", "Get a player's bank transaction history") +
-			helpGen.genHelp("networth [player] <profile>", "Get a player's networth") +
-			helpGen.genHelp("networth [player] <profile> --verbose", "Get a player's networth with a detailed JSON of each item cost") +
-			helpGen.genHelp("weight [player] <profile>", "Get a player's weight") +
+			helpGen.genHelp("networth [player] <profile>", "Calculate a player's networth") +
+			helpGen.genHelp(
+				"networth [player] <profile> --verbose",
+				"Calculate a player's networth with a detailed JSON of each item cost"
+			) +
+			helpGen.genHelp("weight [player] <profile>", "Get a player's slayer, skills, dungeons, and total weight") +
 			helpGen.genHelp(
 				"weight calculate [skill avg] [slayer] [cata level] [avg dungeon class level]",
 				"Calculate predicted weight using given stats (not 100% accurate)"
@@ -561,12 +565,14 @@ public class HelpCommand extends Command {
 
 		if (isAdmin) {
 			paginateBuilder.addItems(
-				helpGen.genHelp("settings", "Get the current settings for the bot") +
-				helpGen.genHelp("setup", "A walk-through on how to setup the bot") +
-				helpGen.genHelp("categories", "Get the id's of all categories in guild") +
-				helpGen.genHelp("settings delete --confirm", "Delete the current server settings") +
+				helpGen.genHelp("settings", "View the current settings for the Discord server") +
+				helpGen.genHelp("setup", "A short walk-through on how to setup the bot") +
+				helpGen.genHelp("categories", "Get the id's of all categories in the Discord server") +
+				helpGen.genHelp("settings delete all", "Delete the current server settings") +
 				helpGen.genHelp("settings set hypixel_key [key]", "Set a Hypixel API key for this server") +
-				helpGen.genHelp("settings delete hypixel_key", "Delete the set Hypixel API of this server")
+				helpGen.genHelp("settings delete hypixel_key", "Delete the set Hypixel API of this server") +
+				helpGen.genHelp("settings set prefix [prefix]", "Set the prefix of the bot") +
+				helpGen.genHelp("settings delete prefix", "Reset the prefix of the bot")
 			);
 
 			paginateBuilder.addItems(
@@ -641,7 +647,7 @@ public class HelpCommand extends Command {
 				helpGen.genHelp("settings roles enable [roleName]", "Enable a specific automatic role (set to disable by default)") +
 				helpGen.genHelp(
 					"settings roles add [roleName] [value] [@role]",
-					"Add a new level to a role with its corresponding discord role"
+					"Add a new level to a role with its corresponding Discord role"
 				) +
 				helpGen.genHelp("settings roles remove [roleName] [value]", "Remove a role level for a role") +
 				helpGen.genHelp("settings roles stackable [roleName] [true|false]", "Make a specific role stackable") +
@@ -655,7 +661,8 @@ public class HelpCommand extends Command {
 				helpGen.genHelp("settings guild [name] role [@role]", "Set the role to give guild member's") +
 				helpGen.genHelp("settings guild [name] [enable|disable] rank", "Enable or disable automatic guild rank assigning") +
 				helpGen.genHelp("settings guild [name] add [rank_name] [@role]", "Add an automatic guild rank") +
-				helpGen.genHelp("settings guild [name] remove [rank_name]", "Remove an automatic guild rank")
+				helpGen.genHelp("settings guild [name] remove [rank_name]", "Remove an automatic guild rank") +
+				helpGen.genHelp("settings guild [name] [enable|disable] counter", "Enable or disable guild members counter")
 			);
 		}
 

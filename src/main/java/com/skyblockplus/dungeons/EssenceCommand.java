@@ -1,6 +1,7 @@
 package com.skyblockplus.dungeons;
 
 import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.utils.Constants.essenceItemNames;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
@@ -22,7 +23,7 @@ public class EssenceCommand extends Command {
 		preFormattedItem = convertToInternalName(preFormattedItem);
 
 		if (higherDepth(essenceCostsJson, preFormattedItem) == null) {
-			String closestMatch = getClosestMatch(preFormattedItem, getJsonKeys(essenceCostsJson));
+			String closestMatch = getClosestMatch(preFormattedItem, essenceItemNames);
 			preFormattedItem = closestMatch != null ? closestMatch : preFormattedItem;
 		}
 
@@ -47,7 +48,7 @@ public class EssenceCommand extends Command {
 						break;
 				}
 			}
-			eb.setThumbnail("https://sky.lea.moe/item.gif/" + preFormattedItem);
+			eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + preFormattedItem);
 			return eb;
 		}
 		return defaultEmbed("Invalid item name");
@@ -71,7 +72,7 @@ public class EssenceCommand extends Command {
 					itemName = convertToInternalName(itemName);
 
 					if (higherDepth(essenceCostsJson, itemName) == null) {
-						String closestMatch = getClosestMatch(itemName, getJsonKeys(essenceCostsJson));
+						String closestMatch = getClosestMatch(itemName, essenceItemNames);
 						itemName = closestMatch != null ? closestMatch : itemName;
 					}
 

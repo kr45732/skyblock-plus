@@ -111,7 +111,7 @@ public class TalismanBagCommand extends Command {
 						paginateBuilder.addItems("**Slot:** " + (currentTalisman.getKey() + 1));
 					} else {
 						pageTitles.add(currentTalismanStruct.getName() + " x" + currentTalismanStruct.getCount());
-						pageThumbnails.add("https://sky.lea.moe/item.gif/" + currentTalismanStruct.getId());
+						pageThumbnails.add("https://sky.shiiyu.moe/item.gif/" + currentTalismanStruct.getId());
 						String itemString = "";
 						itemString += "**Slot:** " + (currentTalisman.getKey() + 1);
 						itemString += "\n\n**Lore:**\n" + currentTalismanStruct.getLore();

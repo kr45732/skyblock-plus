@@ -1,5 +1,6 @@
 package com.skyblockplus.dungeons;
 
+import static com.skyblockplus.utils.Constants.dungeonClassNames;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
@@ -41,7 +42,7 @@ public class DungeonsCommand extends Command {
 					roundAndFormat(skillInfo.skillLevel + skillInfo.progressToNext)
 				);
 
-				for (String className : new String[] { "healer", "mage", "berserk", "archer", "tank" }) {
+				for (String className : dungeonClassNames) {
 					skillInfo = player.getDungeonClass(className);
 					eb.addField(
 						capitalizeString(className) + " (" + skillInfo.skillLevel + ")",

@@ -55,7 +55,7 @@ public class BazaarCommand extends Command {
 				eb.addField("Buy Volume", simplifyNumber(higherDepth(itemInfo, "quick_status.buyVolume").getAsDouble()), true);
 				eb.addField("Sell Volume", simplifyNumber(higherDepth(itemInfo, "quick_status.sellVolume").getAsDouble()), true);
 				eb.addBlankField(true);
-				eb.setThumbnail("https://sky.lea.moe/item.gif/" + item);
+				eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + item);
 				return eb;
 			}
 		}
@@ -83,7 +83,7 @@ public class BazaarCommand extends Command {
 			eb.addField("Buy Volume", simplifyNumber(higherDepth(itemInfo, "quick_status.buyVolume").getAsDouble()), true);
 			eb.addField("Sell Volume", simplifyNumber(higherDepth(itemInfo, "quick_status.sellVolume").getAsDouble()), true);
 			eb.addBlankField(true);
-			eb.setThumbnail("https://sky.lea.moe/item.gif/" + closestMatch);
+			eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + closestMatch);
 			return eb;
 		}
 

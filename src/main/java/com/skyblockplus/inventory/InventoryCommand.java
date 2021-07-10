@@ -95,7 +95,7 @@ public class InventoryCommand extends Command {
 						paginateBuilder.addItems("**Slot:** " + (currentInvSlot.getKey() + 1));
 					} else {
 						pageTitles.add(currentInvStruct.getName() + " x" + currentInvStruct.getCount());
-						pageThumbnails.add("https://sky.lea.moe/item.gif/" + currentInvStruct.getId());
+						pageThumbnails.add("https://sky.shiiyu.moe/item.gif/" + currentInvStruct.getId());
 						String itemString = "";
 						itemString += "**Slot:** " + (currentInvSlot.getKey() + 1);
 						itemString += "\n\n**Lore:**\n" + currentInvStruct.getLore();

@@ -83,7 +83,7 @@ public class Utils {
 	public static JsonElement essenceCostsJson;
 	public static JsonElement levelingJson;
 	public static JsonObject collectionsJson;
-	public static JsonElement petUrlJson;
+	public static JsonElement skyCryptPetJson;
 	public static JsonElement enchantsJson;
 	public static JsonElement petNumsJson;
 	public static JsonElement petsJson;
@@ -261,6 +261,18 @@ public class Utils {
 		return collectionsJson;
 	}
 
+	public static JsonElement getSkyCryptPetJson() {
+		if (skyCryptPetJson == null) {
+			skyCryptPetJson =
+				parseJsString(
+					getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/pets.js")
+						.replaceAll("(description: `)(.*?)(\\s*`,)", "")
+				);
+		}
+
+		return skyCryptPetJson;
+	}
+
 	/* Http requests */
 	public static JsonElement getJson(String jsonUrl) {
 		try {
@@ -355,16 +367,15 @@ public class Utils {
 	}
 
 	public static String getPetUrl(String petName) {
-		if (petUrlJson == null) {
-			petUrlJson =
+		if (skyCryptPetJson == null) {
+			skyCryptPetJson =
 				parseJsString(
 					getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/pets.js")
-						.split("pet_value")[0] +
-					"}"
+						.replaceAll("(description: `)(.*?)(\\s*`,)", "")
 				);
 		}
 		try {
-			return ("https://sky.lea.moe" + higherDepth(petUrlJson, "pet_data." + petName.toUpperCase() + ".head").getAsString());
+			return ("https://sky.shiiyu.moe" + higherDepth(skyCryptPetJson, "pet_data." + petName.toUpperCase() + ".head").getAsString());
 		} catch (Exception e) {
 			return null;
 		}

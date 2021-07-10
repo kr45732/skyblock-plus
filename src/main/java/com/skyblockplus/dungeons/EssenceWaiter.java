@@ -55,7 +55,7 @@ public class EssenceWaiter extends ListenerAdapter {
 			initialMessageInfo += "⏫ - Not dungeonized\n";
 		}
 		eb.addField("Levels", initialMessageInfo + "0⃣ - 0 stars\n1⃣ - 1 star\n2⃣ - 2 stars\n3⃣ - 3 stars\n4⃣ - 4 stars", false);
-		eb.setThumbnail("https://sky.lea.moe/item.gif/" + itemName);
+		eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemName);
 		reactMessage.editMessageEmbeds(eb.build()).queue();
 
 		validReactions.add("0⃣");
@@ -109,7 +109,7 @@ public class EssenceWaiter extends ListenerAdapter {
 						}
 					}
 					eb.addField("Levels", levelsString.toString(), false);
-					eb.setThumbnail("https://sky.lea.moe/item.gif/" + itemName);
+					eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemName);
 
 					reactMessage.editMessageEmbeds(eb.build()).queue();
 					state = 1;
@@ -137,7 +137,7 @@ public class EssenceWaiter extends ListenerAdapter {
 						totalEssence + " " + higherDepth(itemJson, "type").getAsString().toLowerCase() + " essence",
 						false
 					);
-					eb.setThumbnail("https://sky.lea.moe/item.gif/" + itemName);
+					eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemName);
 					reactMessage.editMessageEmbeds(eb.build()).queue();
 
 					removeMessage(this);

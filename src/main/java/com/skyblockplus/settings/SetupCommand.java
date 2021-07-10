@@ -102,7 +102,7 @@ public class SetupCommand extends Command {
 
 				String guildRoles =
 					"**__Overview__**\n" +
-					"1) Every 4 hours, the bot will loop through all players **linked to the bot** in the discord server\n" +
+					"1) Every 4 hours, the bot will loop through all players **linked to the bot** in the Discord server\n" +
 					"2) If a guild member role is set, then the player will be given the corresponding role if they are in the Hypixel guild\n" +
 					"3) If the guild ranks are set, then the player will given the corresponding role if they are in the Hypixel guild and have the certain rank\n\n" +
 					"**__Setup__**\n" +
@@ -118,7 +118,7 @@ public class SetupCommand extends Command {
 					"- For more help type `help settings guild`\n";
 
 				String moreHelp =
-					"If you need any help, have suggestions, or find any bugs for this bot be sure to join the discord server [here](" +
+					"If you need any help, have suggestions, or find any bugs for this bot be sure to join the Discord server [here](" +
 					DISCORD_SERVER_INVITE_LINK +
 					")!\n" +
 					"You can also view the forums post [here](" +

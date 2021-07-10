@@ -1,15 +1,14 @@
 package com.skyblockplus.api.miscellaneous;
 
+import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.api.templates.ErrorTemplate;
 import com.skyblockplus.api.templates.Template;
-import java.util.ArrayList;
-import java.util.HashMap;
+import com.skyblockplus.utils.Constants;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,7 +34,7 @@ public class CommandEndpoints {
 			preFormattedItem = convertToInternalName(preFormattedItem);
 
 			if (higherDepth(essenceJson, preFormattedItem) == null) {
-				String closestMatch = getClosestMatch(preFormattedItem, getJsonKeys(essenceJson));
+				String closestMatch = getClosestMatch(preFormattedItem, essenceItemNames);
 				preFormattedItem = closestMatch != null ? closestMatch : preFormattedItem;
 			}
 
@@ -77,23 +76,6 @@ public class CommandEndpoints {
 				return new ResponseEntity<>(template, HttpStatus.OK);
 			}
 
-			JsonElement enchantsJson = higherDepth(getEnchantsJson(), "enchants_min_level");
-
-			List<String> enchantNames = enchantsJson
-				.getAsJsonObject()
-				.keySet()
-				.stream()
-				.map(String::toUpperCase)
-				.collect(Collectors.toCollection(ArrayList::new));
-			enchantNames.add("ULTIMATE_JERRY");
-
-			Map<String, String> rarityMap = new HashMap<>();
-			rarityMap.put("LEGENDARY", ";4");
-			rarityMap.put("EPIC", ";3");
-			rarityMap.put("RARE", ";2");
-			rarityMap.put("UNCOMMON", ";1");
-			rarityMap.put("COMMON", ";0");
-
 			String formattedName;
 			for (String i : enchantNames) {
 				if (preFormattedItem.contains(i)) {
@@ -111,12 +93,11 @@ public class CommandEndpoints {
 			}
 
 			JsonElement petJson = getPetNumsJson();
-			List<String> petNames = getJsonKeys(petJson);
 			for (String i : petNames) {
 				if (preFormattedItem.contains(i)) {
 					formattedName = i;
 					boolean raritySpecified = false;
-					for (Map.Entry<String, String> j : rarityMap.entrySet()) {
+					for (Map.Entry<String, String> j : Constants.rarityToNumberMap.entrySet()) {
 						if (preFormattedItem.contains(j.getKey())) {
 							formattedName += j.getValue();
 							raritySpecified = true;
@@ -127,8 +108,8 @@ public class CommandEndpoints {
 					if (!raritySpecified) {
 						List<String> petRarities = getJsonKeys(higherDepth(petJson, formattedName));
 						for (String j : petRarities) {
-							if (higherDepth(lowestBinJson, formattedName + rarityMap.get(j)) != null) {
-								formattedName += rarityMap.get(j);
+							if (higherDepth(lowestBinJson, formattedName + Constants.rarityToNumberMap.get(j)) != null) {
+								formattedName += Constants.rarityToNumberMap.get(j);
 								break;
 							}
 						}
@@ -187,24 +168,6 @@ public class CommandEndpoints {
 				return new ResponseEntity<>(template, HttpStatus.OK);
 			}
 
-			JsonElement enchantsJson = higherDepth(getEnchantsJson(), "enchants_min_level");
-
-			List<String> enchantNames = enchantsJson
-					.getAsJsonObject()
-					.keySet()
-					.stream()
-					.map(String::toUpperCase)
-					.collect(Collectors.toCollection(ArrayList::new));
-			enchantNames.add("ULTIMATE_JERRY");
-
-			Map<String, String> rarityMap = new HashMap<>();
-			rarityMap.put("LEGENDARY", ";4");
-			rarityMap.put("EPIC", ";3");
-			rarityMap.put("RARE", ";2");
-			rarityMap.put("UNCOMMON", ";1");
-			rarityMap.put("COMMON", ";0");
-
-
 			String formattedName;
 			for (String i : enchantNames) {
 				if (internalName.contains(i)) {
@@ -225,7 +188,7 @@ public class CommandEndpoints {
 							eb.addField(capitalizeString(enchantName), formatNumber(higherDepth(itemJson, "price").getAsLong()), false);
 						}
 
-						eb.setThumbnail("https://sky.lea.moe/item.gif/ENCHANTED_BOOK");
+						eb.setThumbnail("https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK");
 						return eb;
 					} catch (Exception ignored) {
 					}
@@ -233,7 +196,6 @@ public class CommandEndpoints {
 			}
 
 			JsonElement petJson = getPetNumsJson();
-			List<String> petNames = getJsonKeys(petJson);
 			for (String i : petNames) {
 				if (internalName.contains(i)) {
 					String petName = "";
@@ -296,7 +258,7 @@ public class CommandEndpoints {
 						eb.addField(capitalizeString(itemName), formatNumber(higherDepth(itemJson, "price").getAsLong()), false);
 					}
 
-					eb.setThumbnail("https://sky.lea.moe/item.gif/ENCHANTED_BOOK");
+					eb.setThumbnail("https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK");
 				} else if (petNames.contains(closestMatch.split(";")[0].trim())) {
 					Map<String, String> rarityMapRev = new HashMap<>();
 					rarityMapRev.put("4", "LEGENDARY");
@@ -338,14 +300,13 @@ public class CommandEndpoints {
 								false
 						);
 					}
-					eb.setThumbnail("https://sky.lea.moe/item.gif/" + closestMatch);
+					eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + closestMatch);
 				}
 
 				return eb;
 			}
 
 			return defaultEmbed("No auctions found for " + capitalizeString(item.toLowerCase()));
-
 
 
 			JsonElement lowestBinJson = getLowestBinJson();
@@ -362,23 +323,6 @@ public class CommandEndpoints {
 				template.addData("price", higherDepth(lowestBinJson, preFormattedItem).getAsLong());
 				return new ResponseEntity<>(template, HttpStatus.OK);
 			}
-
-			JsonElement enchantsJson = higherDepth(getEnchantsJson(), "enchants_min_level");
-
-			List<String> enchantNames = enchantsJson
-					.getAsJsonObject()
-					.keySet()
-					.stream()
-					.map(String::toUpperCase)
-					.collect(Collectors.toCollection(ArrayList::new));
-			enchantNames.add("ULTIMATE_JERRY");
-
-			Map<String, String> rarityMap = new HashMap<>();
-			rarityMap.put("LEGENDARY", ";4");
-			rarityMap.put("EPIC", ";3");
-			rarityMap.put("RARE", ";2");
-			rarityMap.put("UNCOMMON", ";1");
-			rarityMap.put("COMMON", ";0");
 
 			String formattedName;
 			for (String i : enchantNames) {
@@ -398,7 +342,6 @@ public class CommandEndpoints {
 			}
 
 			JsonElement petJson = getPetNumsJson();
-			List<String> petNames = getJsonKeys(petJson);
 			for (String i : petNames) {
 				if (preFormattedItem.contains(i)) {
 					formattedName = i;

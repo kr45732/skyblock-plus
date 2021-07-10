@@ -1,5 +1,6 @@
 package com.skyblockplus.networth;
 
+import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.GsonBuilder;
@@ -610,18 +611,11 @@ public class NetworthExecute {
 			}
 		}
 
-		Map<String, String> rarityMap = new HashMap<>();
-		rarityMap.put("LEGENDARY", ";4");
-		rarityMap.put("EPIC", ";3");
-		rarityMap.put("RARE", ";2");
-		rarityMap.put("UNCOMMON", ";1");
-		rarityMap.put("COMMON", ";0");
-
 		for (InvItem item : invPets) {
 			try {
 				double auctionPrice = higherDepth(
 					lowestBinJson,
-					item.getName().split("] ")[1].toLowerCase().trim() + rarityMap.get(item.getRarity())
+					item.getName().split("] ")[1].toLowerCase().trim() + rarityToNumberMap.get(item.getRarity())
 				)
 					.getAsDouble();
 
@@ -668,7 +662,7 @@ public class NetworthExecute {
 			try {
 				double auctionPrice = higherDepth(
 					lowestBinJson,
-					item.getName().split("] ")[1].toLowerCase().trim() + rarityMap.get(item.getRarity())
+					item.getName().split("] ")[1].toLowerCase().trim() + rarityToNumberMap.get(item.getRarity())
 				)
 					.getAsDouble();
 				StringBuilder miscStr = new StringBuilder("[");
@@ -714,7 +708,7 @@ public class NetworthExecute {
 			try {
 				double auctionPrice = higherDepth(
 					lowestBinJson,
-					item.getName().split("] ")[1].toLowerCase().trim() + rarityMap.get(item.getRarity())
+					item.getName().split("] ")[1].toLowerCase().trim() + rarityToNumberMap.get(item.getRarity())
 				)
 					.getAsDouble();
 				StringBuilder miscStr = new StringBuilder("[");
@@ -760,7 +754,7 @@ public class NetworthExecute {
 			try {
 				double auctionPrice = higherDepth(
 					lowestBinJson,
-					item.getName().split("] ")[1].toLowerCase().trim() + rarityMap.get(item.getRarity())
+					item.getName().split("] ")[1].toLowerCase().trim() + rarityToNumberMap.get(item.getRarity())
 				)
 					.getAsDouble();
 				StringBuilder miscStr = new StringBuilder("[");
@@ -804,13 +798,26 @@ public class NetworthExecute {
 	}
 
 	private String addItemStr(InvItem item, double itemPrice) {
-		return (
+		String formattedStr =
 			(item.getCount() != 1 ? item.getCount() + "x " : "") +
-			item.getName() +
-			(item.isRecombobulated() ? " <:recombobulator_3000:852647805813784597>" : "") +
-			"@split@" +
-			itemPrice
-		);
+			(item.getId().equals("PET") ? capitalizeString(item.getRarity()) + " " : "") +
+			item.getName();
+
+		if (item.getId().equals("PET")) {
+			for (String extraItem : item.getExtraStats()) {
+				if (petItemNames.contains(extraItem)) {
+					JsonElement petItemEmoji = getEmojiMap().get(extraItem);
+					if (petItemEmoji != null) {
+						formattedStr += " " + petItemEmoji.getAsString();
+					}
+					break;
+				}
+			}
+		}
+
+		formattedStr += (item.isRecombobulated() ? " <:recombobulator_3000:852647805813784597>" : "") + "@split@" + itemPrice;
+
+		return formattedStr;
 	}
 
 	private double calculateItemPrice(InvItem item) {
@@ -1100,9 +1107,8 @@ public class NetworthExecute {
 
 	private double calculateReforgePrice(String reforgeName, String itemRarity) {
 		JsonElement reforgesStonesJson = getReforgeStonesJson();
-		List<String> reforgeStones = getJsonKeys(reforgesStonesJson);
 
-		for (String reforgeStone : reforgeStones) {
+		for (String reforgeStone : reforgeStoneNames) {
 			JsonElement reforgeStoneInfo = higherDepth(reforgesStonesJson, reforgeStone);
 			if (higherDepth(reforgeStoneInfo, "reforgeName").getAsString().equalsIgnoreCase(reforgeName)) {
 				String reforgeStoneName = higherDepth(reforgeStoneInfo, "internalName").getAsString();

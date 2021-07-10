@@ -138,9 +138,9 @@ public class ApplyGuild {
 				return (
 					"❌ Account " +
 					higherDepth(linkedAccount, "minecraftUsername").getAsString() +
-					" is linked with the discord tag " +
+					" is linked with the Discord tag " +
 					jda.retrieveUserById(higherDepth(linkedAccount, "discordId").getAsString()).complete().getAsTag() +
-					"\nYour current discord tag is " +
+					"\nYour current Discord tag is " +
 					event.getUser().getAsTag() +
 					".\nPlease relink and try again"
 				);

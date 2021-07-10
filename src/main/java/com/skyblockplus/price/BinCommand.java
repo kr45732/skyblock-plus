@@ -1,10 +1,13 @@
 package com.skyblockplus.price;
 
+import static com.skyblockplus.utils.Constants.enchantNames;
+import static com.skyblockplus.utils.Constants.petNames;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.Constants;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +34,7 @@ public class BinCommand extends Command {
 		if (higherDepth(lowestBinJson, item) != null) {
 			EmbedBuilder eb = defaultEmbed("Lowest bin");
 			eb.addField(capitalizeString(item), formatNumber(higherDepth(lowestBinJson, item).getAsLong()), false);
-			eb.setThumbnail("https://sky.lea.moe/item.gif/" + item);
+			eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + item);
 			return eb;
 		}
 
@@ -44,26 +47,9 @@ public class BinCommand extends Command {
 				formatNumber(higherDepth(lowestBinJson, preFormattedItem).getAsLong()),
 				false
 			);
-			eb.setThumbnail("https://sky.lea.moe/item.gif/" + preFormattedItem);
+			eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + preFormattedItem);
 			return eb;
 		}
-
-		JsonElement enchantsJson = higherDepth(getEnchantsJson(), "enchants_min_level");
-
-		List<String> enchantNames = enchantsJson
-			.getAsJsonObject()
-			.entrySet()
-			.stream()
-			.map(i -> i.getKey().toUpperCase())
-			.collect(Collectors.toCollection(ArrayList::new));
-		enchantNames.add("ULTIMATE_JERRY");
-
-		Map<String, String> rarityMap = new HashMap<>();
-		rarityMap.put("LEGENDARY", ";4");
-		rarityMap.put("EPIC", ";3");
-		rarityMap.put("RARE", ";2");
-		rarityMap.put("UNCOMMON", ";1");
-		rarityMap.put("COMMON", ";0");
 
 		String formattedName;
 		for (String i : enchantNames) {
@@ -75,7 +61,7 @@ public class BinCommand extends Command {
 					formattedName = i + ";" + enchantLevel;
 					EmbedBuilder eb = defaultEmbed("Lowest bin");
 					eb.addField(capitalizeString(enchantName), formatNumber(higherDepth(lowestBinJson, formattedName).getAsLong()), false);
-					eb.setThumbnail("https://sky.lea.moe/item.gif/ENCHANTED_BOOK");
+					eb.setThumbnail("https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK");
 					return eb;
 				} catch (NumberFormatException e) {
 					try {
@@ -94,7 +80,7 @@ public class BinCommand extends Command {
 						if (eb.getFields().size() == 0) {
 							return defaultEmbed("No bin found for " + capitalizeString(item.toLowerCase()));
 						}
-						eb.setThumbnail("https://sky.lea.moe/item.gif/ENCHANTED_BOOK");
+						eb.setThumbnail("https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK");
 						return eb;
 					} catch (NullPointerException ex) {
 						return defaultEmbed("No bin found for " + capitalizeString(item.toLowerCase()));
@@ -107,19 +93,12 @@ public class BinCommand extends Command {
 
 		JsonElement petJson = getPetNumsJson();
 
-		List<String> petNames = petJson
-			.getAsJsonObject()
-			.entrySet()
-			.stream()
-			.map(Entry::getKey)
-			.collect(Collectors.toCollection(ArrayList::new));
-
 		for (String i : petNames) {
 			if (preFormattedItem.contains(i)) {
 				String petName = "";
 				formattedName = i;
 				boolean raritySpecified = false;
-				for (Entry<String, String> j : rarityMap.entrySet()) {
+				for (Entry<String, String> j : Constants.rarityToNumberMap.entrySet()) {
 					if (preFormattedItem.contains(j.getKey())) {
 						petName = j.getKey().toLowerCase() + " " + formattedName.toLowerCase().replace("_", " ");
 						formattedName += j.getValue();
@@ -131,15 +110,15 @@ public class BinCommand extends Command {
 				if (!raritySpecified) {
 					List<String> petRarities = higherDepth(petJson, formattedName)
 						.getAsJsonObject()
-						.entrySet()
+						.keySet()
 						.stream()
-						.map(j -> j.getKey().toUpperCase())
+						.map(String::toUpperCase)
 						.collect(Collectors.toCollection(ArrayList::new));
 
 					for (String j : petRarities) {
-						if (higherDepth(lowestBinJson, formattedName + rarityMap.get(j)) != null) {
+						if (higherDepth(lowestBinJson, formattedName + Constants.rarityToNumberMap.get(j)) != null) {
 							petName = j.toLowerCase() + " " + formattedName.toLowerCase().replace("_", " ");
-							formattedName += rarityMap.get(j);
+							formattedName += Constants.rarityToNumberMap.get(j);
 							break;
 						}
 					}
@@ -163,7 +142,7 @@ public class BinCommand extends Command {
 		if (closestMatch != null && higherDepth(lowestBinJson, closestMatch) != null) {
 			EmbedBuilder eb = defaultEmbed("Lowest bin");
 			if (enchantNames.contains(closestMatch.split(";")[0].trim())) {
-				eb.setThumbnail("https://sky.lea.moe/item.gif/ENCHANTED_BOOK");
+				eb.setThumbnail("https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK");
 				eb.addField(
 					capitalizeString(closestMatch.toLowerCase().replace("_", " ").replace(";", " ")),
 					formatNumber(higherDepth(lowestBinJson, closestMatch).getAsLong()),
@@ -184,7 +163,7 @@ public class BinCommand extends Command {
 					false
 				);
 			} else {
-				eb.setThumbnail("https://sky.lea.moe/item.gif/" + closestMatch);
+				eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + closestMatch);
 				eb.addField(
 					capitalizeString(closestMatch.toLowerCase().replace("_", " ")),
 					formatNumber(higherDepth(lowestBinJson, closestMatch).getAsLong()),

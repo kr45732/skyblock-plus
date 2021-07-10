@@ -1,7 +1,8 @@
 package com.skyblockplus;
 
 import static com.skyblockplus.utils.MainClassUtils.*;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.BOT_TOKEN;
+import static com.skyblockplus.utils.Utils.DEFAULT_PREFIX;
 
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -28,7 +29,9 @@ import com.skyblockplus.skills.SkillsSlashCommand;
 import com.skyblockplus.slayer.SlayerCommand;
 import com.skyblockplus.slayer.SlayerSlashCommand;
 import com.skyblockplus.timeout.MessageTimeout;
+import com.skyblockplus.utils.Constants;
 import com.skyblockplus.utils.GuildPrefixManager;
+import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.slashcommands.SlashCommandClient;
 import com.skyblockplus.weight.WeightCommand;
 import com.skyblockplus.weight.WeightSlashCommand;
@@ -49,7 +52,8 @@ public class Main {
 	public static EventWaiter waiter;
 
 	public static void main(String[] args) throws LoginException, IllegalArgumentException {
-		setApplicationSettings();
+		Utils.setApplicationSettings();
+		Constants.initialize();
 
 		Main.database = SpringApplication.run(Main.class, args).getBean(Database.class);
 

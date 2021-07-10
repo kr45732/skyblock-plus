@@ -2,20 +2,20 @@ package com.skyblockplus.price;
 
 import static com.skyblockplus.networth.NetworthExecute.isIgnoredItem;
 import static com.skyblockplus.networth.NetworthExecute.queryAhApi;
+import static com.skyblockplus.utils.Constants.reforgeStoneNames;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.Constants;
 import com.skyblockplus.utils.Hypixel;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.InvItem;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -94,7 +94,7 @@ public class PriceCommand extends Command {
 			}
 
 			return defaultEmbed("Auction Price Calculator")
-				.setThumbnail("https://sky.lea.moe/item.gif/" + item.getId())
+				.setThumbnail("https://sky.shiiyu.moe/item.gif/" + item.getId())
 				.setDescription(ebStr)
 				.appendDescription("\n**Calculated Price:** " + roundAndFormat(price));
 		} catch (Exception e) {
@@ -203,9 +203,8 @@ public class PriceCommand extends Command {
 
 	private static double calculateReforgePrice(String reforgeName, String itemRarity) {
 		JsonElement reforgesStonesJson = getReforgeStonesJson();
-		List<String> reforgeStones = getJsonKeys(reforgesStonesJson);
 
-		for (String reforgeStone : reforgeStones) {
+		for (String reforgeStone : reforgeStoneNames) {
 			JsonElement reforgeStoneInfo = higherDepth(reforgesStonesJson, reforgeStone);
 			if (higherDepth(reforgeStoneInfo, "reforgeName").getAsString().equalsIgnoreCase(reforgeName)) {
 				String reforgeStoneName = higherDepth(reforgeStoneInfo, "internalName").getAsString();
@@ -243,17 +242,10 @@ public class PriceCommand extends Command {
 			}
 		}
 
-		Map<String, String> rarityMap = new HashMap<>();
-		rarityMap.put("LEGENDARY", ";4");
-		rarityMap.put("EPIC", ";3");
-		rarityMap.put("RARE", ";2");
-		rarityMap.put("UNCOMMON", ";1");
-		rarityMap.put("COMMON", ";0");
-
 		try {
 			double auctionPrice = higherDepth(
 				lowestBinJson,
-				pet.getName().split("] ")[1].toLowerCase().trim() + rarityMap.get(pet.getRarity())
+				pet.getName().split("] ")[1].toLowerCase().trim() + Constants.rarityToNumberMap.get(pet.getRarity())
 			)
 				.getAsDouble();
 

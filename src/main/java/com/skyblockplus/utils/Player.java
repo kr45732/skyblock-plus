@@ -1,5 +1,7 @@
 package com.skyblockplus.utils;
 
+import static com.skyblockplus.utils.Constants.craftedMinionsToSlots;
+import static com.skyblockplus.utils.Constants.skillNames;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.Gson;
@@ -20,29 +22,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 
 public class Player {
 
-	private static final int[] craftedMinionsToSlots = new int[] {
-		0,
-		5,
-		15,
-		30,
-		50,
-		75,
-		100,
-		125,
-		150,
-		175,
-		200,
-		225,
-		250,
-		275,
-		300,
-		350,
-		400,
-		450,
-		500,
-		550,
-		600,
-	};
 	public String invMissing = "";
 	private JsonElement profileJson;
 	private JsonElement outerProfileJson;
@@ -347,15 +326,8 @@ public class Player {
 	}
 
 	public int getTotalSkillsXp(JsonElement profile) {
-		JsonElement skillsCap = higherDepth(getLevelingJson(), "leveling_caps");
-
-		List<String> skills = getJsonKeys(skillsCap);
-		skills.remove("catacombs");
-		skills.remove("runecrafting");
-		skills.remove("carpentry");
-
 		int totalSkillXp = 0;
-		for (String skill : skills) {
+		for (String skill : skillNames) {
 			SkillsStruct skillInfo = getSkill(profile, skill);
 			if (skillInfo == null) {
 				return -1;
@@ -375,11 +347,13 @@ public class Player {
 	}
 
 	public int getSkillMaxLevel(String skillName, boolean isWeight) {
+		int maxLevel = higherDepth(getLevelingJson(), "leveling_caps." + skillName).getAsInt();
+
 		if (skillName.equals("farming")) {
-			return isWeight ? 60 : (higherDepth(getLevelingJson(), "leveling_caps." + skillName).getAsInt() + getFarmingCapUpgrade());
+			maxLevel = isWeight ? 60 : maxLevel + getFarmingCapUpgrade();
 		}
 
-		return higherDepth(getLevelingJson(), "leveling_caps." + skillName).getAsInt();
+		return maxLevel;
 	}
 
 	public double getSkillXp(JsonElement profile, String skillName) {
@@ -405,37 +379,12 @@ public class Player {
 	}
 
 	public double getSkillAverage() {
-		JsonElement skillsCap = higherDepth(getLevelingJson(), "leveling_caps");
-
-		List<String> skills = getJsonKeys(skillsCap);
-		skills.remove("catacombs");
-		skills.remove("runecrafting");
-		skills.remove("carpentry");
-
-		double progressSA = 0;
-		for (String skill : skills) {
-			try {
-				double skillExp = higherDepth(profileJson, "experience_skill_" + skill).getAsDouble();
-				SkillsStruct skillInfo = skillInfoFromExp(skillExp, skill);
-				progressSA += skillInfo.skillLevel + skillInfo.progressToNext;
-			} catch (Exception e) {
-				return -1;
-			}
-		}
-		progressSA /= skills.size();
-		return progressSA;
+		return getSkillAverage(profileJson);
 	}
 
 	public double getSkillAverage(JsonElement profile) {
-		JsonElement skillsCap = higherDepth(getLevelingJson(), "leveling_caps");
-
-		List<String> skills = getJsonKeys(skillsCap);
-		skills.remove("catacombs");
-		skills.remove("runecrafting");
-		skills.remove("carpentry");
-
 		double progressSA = 0;
-		for (String skill : skills) {
+		for (String skill : skillNames) {
 			try {
 				double skillExp = higherDepth(profile, "experience_skill_" + skill).getAsDouble();
 				SkillsStruct skillInfo = skillInfoFromExp(skillExp, skill);
@@ -444,13 +393,11 @@ public class Player {
 				return -1;
 			}
 		}
-		progressSA /= skills.size();
+		progressSA /= skillNames.size();
 		return progressSA;
 	}
 
 	public SkillsStruct skillInfoFromExp(double skillExp, String skill) {
-		JsonElement skillsCap = higherDepth(getLevelingJson(), "leveling_caps");
-
 		JsonArray skillsTable;
 		if (skill.equals("catacombs")) {
 			skillsTable = higherDepth(getLevelingJson(), "catacombs").getAsJsonArray();
@@ -459,16 +406,8 @@ public class Player {
 		} else {
 			skillsTable = higherDepth(getLevelingJson(), "leveling_xp").getAsJsonArray();
 		}
-		int maxLevel;
-		try {
-			maxLevel = higherDepth(skillsCap, skill).getAsInt();
-		} catch (Exception e) {
-			maxLevel = 50;
-		}
 
-		if (skill.equals("farming")) {
-			maxLevel += getFarmingCapUpgrade();
-		}
+		int maxLevel = getSkillMaxLevel(skill, false);
 
 		long xpTotal = 0L;
 		int level = 1;
@@ -1193,8 +1132,8 @@ public class Player {
 			}
 
 			int prevMax = 0;
-			for (int i = 0; i < craftedMinionsToSlots.length; i++) {
-				if (uniqueCraftedMinions.size() >= craftedMinionsToSlots[i]) {
+			for (int i = 0; i < craftedMinionsToSlots.size(); i++) {
+				if (uniqueCraftedMinions.size() >= craftedMinionsToSlots.get(i)) {
 					prevMax = i;
 				} else {
 					break;

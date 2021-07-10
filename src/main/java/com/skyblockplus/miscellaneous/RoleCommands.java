@@ -46,9 +46,9 @@ public class RoleCommands extends Command {
 			eb.setDescription(
 				"Account **" +
 				playerInfo.minecraftUsername +
-				"** is linked with the discord tag `" +
+				"** is linked with the Discord tag `" +
 				playerInfo.discordTag +
-				"`\nYour current discord tag is `" +
+				"`\nYour current Discord tag is `" +
 				user.getAsTag() +
 				"`"
 			);

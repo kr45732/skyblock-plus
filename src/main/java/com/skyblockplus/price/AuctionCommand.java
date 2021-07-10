@@ -195,7 +195,7 @@ public class AuctionCommand extends Command {
 			}
 		}
 
-		eb.setThumbnail("https://sky.lea.moe/item.gif/" + itemId);
+		eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId);
 
 		return eb.setDescription(ebStr);
 	}
