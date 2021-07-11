@@ -111,7 +111,7 @@ public class GuildLeaderboardsCommand extends Command {
 			return defaultEmbed("Invalid username");
 		}
 
-		JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + hypixelKey + "&player=" + usernameUuidStruct.playerUuid);
+		JsonElement guildJson = Hypixel.getGuildFromPlayer(usernameUuidStruct.playerUuid, true);
 
 		String guildName;
 		try {

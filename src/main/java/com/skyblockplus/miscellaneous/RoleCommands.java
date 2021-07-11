@@ -10,6 +10,7 @@ import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.Hypixel;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
 import java.util.ArrayList;
@@ -95,11 +96,10 @@ public class RoleCommands extends Command {
 						case "guild_member":
 							{
 								if (guildJson == null) {
-									guildJson =
-										getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&player=" + player.getUuid());
+									guildJson = Hypixel.getGuildFromPlayer(player.getUuid(), true);
 								}
 
-								if (guildJson != null && !higherDepth(guildJson, "guild").isJsonNull()) {
+								if (guildJson != null) {
 									JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
 									String playerGuildId = higherDepth(guildJson, "guild._id").getAsString();
 
@@ -132,11 +132,10 @@ public class RoleCommands extends Command {
 						case "guild_ranks":
 							{
 								if (guildJson == null) {
-									guildJson =
-										getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&player=" + player.getUuid());
+									guildJson = Hypixel.getGuildFromPlayer(player.getUuid(), true);
 								}
 
-								if (guildJson != null && !higherDepth(guildJson, "guild").isJsonNull()) {
+								if (guildJson != null) {
 									JsonArray curLevels = higherDepth(currentRole, "levels").getAsJsonArray();
 									List<JsonElement> guildRoles = new ArrayList<>();
 									for (JsonElement curLevel : curLevels) {

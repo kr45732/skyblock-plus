@@ -65,17 +65,13 @@ public class GuildRanksCommand extends Command {
 			return null;
 		}
 
-		JsonElement guildJson = getJson(
-			"https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&player=" + usernameUuidStruct.playerUuid
-		);
-		String guildId;
+		JsonElement guildJson = Hypixel.getGuildFromPlayer(usernameUuidStruct.playerUuid, true);
 
-		try {
-			guildId = higherDepth(guildJson, "guild._id").getAsString();
-		} catch (Exception e) {
+		if(guildJson == null){
 			return defaultEmbed(usernameUuidStruct.playerUsername + " is not in a guild");
 		}
 
+		String guildId = higherDepth(guildJson, "guild._id").getAsString();
 		String guildName = higherDepth(guildJson, "guild.name").getAsString();
 		if (!guildName.equals("Skyblock Forceful") && !guildName.equals("Skyblock Gods")) {
 			return defaultEmbed("Only for SBF or SBG right now");

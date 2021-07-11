@@ -99,11 +99,9 @@ public class GuildKickerCommand extends Command {
 		}
 
 		UsernameUuidStruct usernameUuidStruct = Hypixel.usernameToUuid(username);
-		JsonElement guildJson = getJson(
-			"https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&player=" + usernameUuidStruct.playerUuid
-		);
+		JsonElement guildJson = Hypixel.getGuildFromPlayer(usernameUuidStruct.playerUuid, true);
 
-		if (guildJson != null && !higherDepth(guildJson, "guild").isJsonNull()) {
+		if (guildJson != null) {
 			String guildId = higherDepth(guildJson, "guild._id").getAsString();
 			JsonElement guildLbJson = getJson("https://hypixel-app-api.senither.com/leaderboard/players/" + guildId);
 

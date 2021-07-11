@@ -453,15 +453,13 @@ public class SkyblockEventCommand extends Command {
 						);
 				}
 
-				JsonElement guildIn = getJson("https://api.hypixel.net/findGuild?key=" + HYPIXEL_API_KEY + "&byUuid=" + uuid);
+				JsonElement guildJson = Hypixel.getGuildFromPlayer(uuid, true);
 
-				try {
-					higherDepth(guildIn, "guild").getAsString();
-				} catch (Exception e) {
+				if(guildJson == null){
 					return defaultEmbed("Error").setDescription("You must be in the guild to join the event");
 				}
 
-				if (higherDepth(guildIn, "guild").getAsString().equals(database.getSkyblockEventGuildId(event.getGuild().getId()))) {
+				if (higherDepth(guildJson, "guild._id").getAsString().equals(database.getSkyblockEventGuildId(event.getGuild().getId()))) {
 					Player player = args.length == 3 ? new Player(username, args[2]) : new Player(username);
 
 					if (player.isValid()) {
@@ -557,9 +555,7 @@ public class SkyblockEventCommand extends Command {
 			JsonElement currentSettings = database.getRunningEventSettings(guildId);
 			EmbedBuilder eb = defaultEmbed("Current Event");
 
-			JsonElement guildJson = getJson(
-				"https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&id=" + higherDepth(currentSettings, "eventGuildId").getAsString()
-			);
+			JsonElement guildJson = Hypixel.getGuildFromId(higherDepth(currentSettings, "eventGuildId").getAsString(), true);
 
 			eb.addField("Guild", higherDepth(guildJson, "guild.name").getAsString(), false);
 			String eventType = higherDepth(currentSettings, "eventType").getAsString();

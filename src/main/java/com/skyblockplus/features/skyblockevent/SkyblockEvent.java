@@ -19,6 +19,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+
+import com.skyblockplus.utils.Hypixel;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -94,8 +96,7 @@ public class SkyblockEvent {
 		switch (state) {
 			case 0:
 				try {
-					guildJson =
-						getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&name=" + replyMessage.replace(" ", "%20"));
+					guildJson = Hypixel.getGuildFromName(replyMessage, true);
 					eb
 						.addField(
 							"Guild",

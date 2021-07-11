@@ -4,6 +4,7 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
@@ -181,5 +182,50 @@ public class Hypixel {
 		}
 
 		return null;
+	}
+
+	public static JsonArray getSkyblockAuctionGeneric(String query){
+		JsonElement auctionResponse = getJson("https://api.hypixel.net/skyblock/auction?key=" + HYPIXEL_API_KEY + query);
+		if(auctionResponse != null && higherDepth(auctionResponse, "auctions") != null && higherDepth(auctionResponse, "auctions").isJsonArray()){
+			return higherDepth(auctionResponse, "auctions").getAsJsonArray();
+		}
+
+		return null;
+	}
+
+	public static JsonArray getSkyblockAuctionFromPlayer(String playerUuid){
+		return getSkyblockAuctionGeneric("&player=" + playerUuid);
+	}
+
+	public static JsonArray getSkyblockAuctionFromUuid(String auctionUuid){
+		return getSkyblockAuctionGeneric("&uuid=" + auctionUuid);
+	}
+
+	public static JsonElement getGuildGeneric(String query, boolean checkIfInGuild){
+		JsonElement guildResponse = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + query);
+		if(guildResponse != null && higherDepth(guildResponse, "guild") != null){
+			if(!checkIfInGuild){
+				return higherDepth(guildResponse, "guild");
+			}
+
+			if (!higherDepth(guildResponse, "guild").isJsonNull()) {
+				return higherDepth(guildResponse, "guild");
+			}
+		}
+
+		return null;
+	}
+
+	public static JsonElement getGuildFromPlayer(String playerUuid, boolean checkIfInGuild){
+		return getGuildGeneric("&player=" + playerUuid, checkIfInGuild);
+	}
+
+	public static JsonElement getGuildFromId(String guildId, boolean checkIfInGuild){
+		return getGuildGeneric("&id=" + guildId, checkIfInGuild);
+	}
+
+	public static JsonElement getGuildFromName(String guildName, boolean checkIfInGuild){
+		return getGuildGeneric("&name=" + guildName.replace(" ", "%20"), checkIfInGuild);
+
 	}
 }

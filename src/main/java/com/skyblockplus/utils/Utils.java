@@ -756,19 +756,19 @@ public class Utils {
 		}
 	}
 
-	public static EmbedBuilder checkHypixelKey(String HYPIXEL_KEY) {
-		if (HYPIXEL_KEY == null) {
+	public static EmbedBuilder checkHypixelKey(String hypixelKey) {
+		if (hypixelKey == null) {
 			return defaultEmbed("Error").setDescription("You must set a Hypixel API key to use this command");
 		}
 
 		try {
-			higherDepth(getJson("https://api.hypixel.net/key?key=" + HYPIXEL_KEY), "record.key").getAsString();
+			higherDepth(getJson("https://api.hypixel.net/key?key=" + hypixelKey), "record.key").getAsString();
 		} catch (Exception e) {
 			return defaultEmbed("Error").setDescription("The set Hypixel API key is invalid");
 		}
 
-		if (!keyCooldownMap.containsKey(HYPIXEL_KEY)) {
-			keyCooldownMap.put(HYPIXEL_KEY, new HypixelKeyInformation());
+		if (!keyCooldownMap.containsKey(hypixelKey)) {
+			keyCooldownMap.put(hypixelKey, new HypixelKeyInformation());
 		}
 
 		return null;

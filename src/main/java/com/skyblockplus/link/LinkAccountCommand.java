@@ -9,6 +9,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
 import com.skyblockplus.api.serversettings.automatedguild.GuildRole;
+import com.skyblockplus.utils.Hypixel;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
 import java.time.Instant;
 import java.util.List;
@@ -58,22 +59,22 @@ public class LinkAccountCommand extends Command {
 						nicknameTemplate = nicknameTemplate.replace("[IGN]", playerInfo.minecraftUsername);
 						if (nicknameTemplate.contains("[GUILD_RANK]")) {
 							try {
-								List<String> settingsGuildId = database
-									.getAllGuildRoles(guild.getId())
-									.stream()
-									.map(GuildRole::getGuildId)
-									.collect(Collectors.toList());
-								JsonElement playerGuild = higherDepth(
-									getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&player=" + playerInfo.minecraftUuid),
-									"guild"
-								);
-								if (settingsGuildId.contains(higherDepth(playerGuild, "_id").getAsString())) {
-									JsonArray guildMembers = higherDepth(playerGuild, "members").getAsJsonArray();
-									for (JsonElement guildMember : guildMembers) {
-										if (higherDepth(guildMember, "uuid").getAsString().equals(playerInfo.minecraftUuid)) {
-											nicknameTemplate =
-												nicknameTemplate.replace("[GUILD_RANK]", higherDepth(guildMember, "rank").getAsString());
-											break;
+								JsonElement playerGuild = Hypixel.getGuildFromPlayer(playerInfo.minecraftUuid, true);
+								if(playerGuild != null){
+									List<String> settingsGuildId = database
+											.getAllGuildRoles(guild.getId())
+											.stream()
+											.map(GuildRole::getGuildId)
+											.collect(Collectors.toList());
+
+									if (settingsGuildId.contains(higherDepth(playerGuild, "_id").getAsString())) {
+										JsonArray guildMembers = higherDepth(playerGuild, "members").getAsJsonArray();
+										for (JsonElement guildMember : guildMembers) {
+											if (higherDepth(guildMember, "uuid").getAsString().equals(playerInfo.minecraftUuid)) {
+												nicknameTemplate =
+														nicknameTemplate.replace("[GUILD_RANK]", higherDepth(guildMember, "rank").getAsString());
+												break;
+											}
 										}
 									}
 								}

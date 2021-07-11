@@ -56,13 +56,3 @@ public class MessageTimeout extends ListenerAdapter {
 	}
 }
 
-class MessageTimeoutStruct {
-
-	public final Message message;
-	public final Object eventListener;
-
-	public MessageTimeoutStruct(Message message, Object eventListener) {
-		this.message = message;
-		this.eventListener = eventListener;
-	}
-}

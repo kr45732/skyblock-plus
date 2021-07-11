@@ -20,6 +20,7 @@ import com.skyblockplus.api.serversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.utils.CustomPaginator;
+import com.skyblockplus.utils.Hypixel;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.vdurmont.emoji.EmojiParser;
 import java.util.*;
@@ -621,9 +622,7 @@ public class SettingsExecute {
 					return defaultEmbed("Guild name must be set before enabling");
 				}
 
-				JsonElement guildJson = getJson(
-					"https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&id=" + higherDepth(currentSettings, "guildId").getAsString()
-				);
+				JsonElement guildJson = Hypixel.getGuildFromId(higherDepth(currentSettings, "guildId").getAsString(), true);
 
 				if (higherDepth(guildJson, "guild") == null || higherDepth(guildJson, "guild").isJsonNull()) {
 					return defaultEmbed("Current guild name is invalid");
@@ -682,9 +681,9 @@ public class SettingsExecute {
 
 		String guildId = higherDepth(currentSettings, "guildId").getAsString();
 
-		JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&id=" + guildId);
+		JsonElement guildJson = Hypixel.getGuildFromId(guildId, true);
 
-		if (higherDepth(guildJson, "guild") == null || higherDepth(guildJson, "guild").isJsonNull()) {
+		if (guildJson == null) {
 			return defaultEmbed("Current guild name is invalid");
 		}
 
@@ -759,9 +758,7 @@ public class SettingsExecute {
 
 	private EmbedBuilder setGuildRoleId(String name, String guildName) {
 		try {
-			JsonElement guildJson = getJson(
-				"https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&name=" + guildName.replace("_", "%20")
-			);
+			JsonElement guildJson = Hypixel.getGuildFromName(guildName, true);
 			String guildId = higherDepth(guildJson, "guild._id").getAsString();
 			JsonObject currentSettings = database.getGuildRoleSettings(event.getGuild().getId(), name).getAsJsonObject();
 			currentSettings.remove("guildId");
@@ -1094,14 +1091,24 @@ public class SettingsExecute {
 				if (roleName.equals("guild_member")) {
 					for (JsonElement roleLevel : higherDepth(currentRoleSettings, "levels").getAsJsonArray()) {
 						String guildId = higherDepth(roleLevel, "value").getAsString();
-						JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&id=" + guildId);
-						ebFieldString
-							.append("\n• ")
-							.append(higherDepth(guildJson, "guild.name").getAsString())
-							.append(" - ")
-							.append("<@&")
-							.append(higherDepth(roleLevel, "roleId").getAsString())
-							.append(">");
+						JsonElement guildJson = Hypixel.getGuildFromId(guildId, true);
+						if(guildJson != null) {
+							ebFieldString
+									.append("\n• ")
+									.append(higherDepth(guildJson, "guild.name").getAsString())
+									.append(" - ")
+									.append("<@&")
+									.append(higherDepth(roleLevel, "roleId").getAsString())
+									.append(">");
+						}else{
+							ebFieldString
+									.append("\n• ")
+									.append("Invalid guild")
+									.append(" - ")
+									.append("<@&")
+									.append(higherDepth(roleLevel, "roleId").getAsString())
+									.append(">");
+						}
 					}
 				} else {
 					for (JsonElement roleLevel : higherDepth(currentRoleSettings, "levels").getAsJsonArray()) {
@@ -1190,9 +1197,7 @@ public class SettingsExecute {
 		String guildName = "";
 		if (roleName.equals("guild_member")) {
 			try {
-				JsonElement guildJson = getJson(
-					"https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&name=" + roleValue.replace("_", "%20")
-				);
+				JsonElement guildJson = Hypixel.getGuildFromName(roleValue, true);
 				roleValue = higherDepth(guildJson, "guild._id").getAsString();
 				guildName = higherDepth(guildJson, "guild.name").getAsString();
 			} catch (Exception e) {
@@ -1324,9 +1329,7 @@ public class SettingsExecute {
 		for (JsonElement level : currentLevels) {
 			String currentValue = higherDepth(level, "value").getAsString();
 			if (roleName.equals("guild_member")) {
-				JsonElement guildJson = getJson(
-					"https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&id=" + higherDepth(level, "value").getAsString()
-				);
+				JsonElement guildJson = Hypixel.getGuildFromId(higherDepth(level, "value").getAsString(), true);
 				currentValue = higherDepth(guildJson, "guild.name").getAsString();
 			}
 
@@ -2167,9 +2170,7 @@ public class SettingsExecute {
 						return currentSettingValue.equals("true") ? "• Enabled" : "• Disabled";
 					case "guildId":
 						try {
-							JsonElement guildJson = getJson(
-								"https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&id=" + currentSettingValue
-							);
+							JsonElement guildJson = Hypixel.getGuildFromId(currentSettingValue, true);
 							return higherDepth(guildJson, "guild.name").getAsString();
 						} catch (Exception e) {
 							return ("Error finding guild associated with " + currentSettingValue + " id");

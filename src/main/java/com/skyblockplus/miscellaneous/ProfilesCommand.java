@@ -1,6 +1,7 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.utils.Hypixel.usernameToUuid;
 import static com.skyblockplus.utils.Player.skyblockStatsLink;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -30,7 +31,7 @@ public class ProfilesCommand extends Command {
 	}
 
 	public static EmbedBuilder getPlayerProfiles(String username, User user, MessageChannel channel, InteractionHook hook) {
-		UsernameUuidStruct usernameUuidStruct = Hypixel.usernameToUuid(username);
+		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
 		if (usernameUuidStruct != null) {
 			JsonArray profileArray;
 			try {

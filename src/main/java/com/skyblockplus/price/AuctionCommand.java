@@ -36,13 +36,8 @@ public class AuctionCommand extends Command {
 			return defaultEmbed("Error fetching player data");
 		}
 
-		JsonElement playerAuctions = getJson(
-			"https://api.hypixel.net/skyblock/auction?key=" + HYPIXEL_API_KEY + "&player=" + usernameUuidStruct.playerUuid
-		);
-		JsonArray auctionsArray;
-		try {
-			auctionsArray = higherDepth(playerAuctions, "auctions").getAsJsonArray();
-		} catch (Exception e) {
+		JsonArray auctionsArray = Hypixel.getSkyblockAuctionFromPlayer(usernameUuidStruct.playerUuid);
+		if(auctionsArray==null) {
 			return defaultEmbed("Error fetching player data");
 		}
 
@@ -133,12 +128,12 @@ public class AuctionCommand extends Command {
 	}
 
 	public static EmbedBuilder getAuctionByUuid(String auctionUuid) {
-		JsonElement auctionJson = getJson("https://api.hypixel.net/skyblock/auction?key=" + HYPIXEL_API_KEY + "&uuid=" + auctionUuid);
-		if (higherDepth(auctionJson, "auctions").getAsJsonArray().size() == 0) {
+		JsonArray auctionArray =  Hypixel.getSkyblockAuctionFromUuid(auctionUuid);
+		if (auctionArray == null || auctionArray.size() == 0) {
 			return defaultEmbed("Error").setDescription("Invalid auction UUID");
 		}
 
-		auctionJson = higherDepth(auctionJson, "auctions").getAsJsonArray().get(0);
+	 	JsonElement	auctionJson = auctionArray.get(0);
 		EmbedBuilder eb = defaultEmbed("Auction from UUID");
 		String itemName = higherDepth(auctionJson, "item_name").getAsString();
 

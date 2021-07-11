@@ -1,6 +1,7 @@
 package com.skyblockplus.guilds;
 
 import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.utils.Constants.guildExpToLevel;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -37,7 +38,8 @@ public class GuildCommand extends Command {
 			return defaultEmbed("Error fetching player data");
 		}
 
-		JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&player=" + uuidUsername.playerUuid);
+
+		JsonElement guildJson = Hypixel.getGuildFromPlayer(uuidUsername.playerUuid, true);
 		if (guildJson == null) {
 			return defaultEmbed("Error fetching guild data");
 		}
@@ -124,7 +126,7 @@ public class GuildCommand extends Command {
 			return defaultEmbed("Error fetching player data");
 		}
 
-		JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&player=" + uuidUsername.playerUuid);
+		JsonElement guildJson = Hypixel.getGuildFromPlayer(uuidUsername.playerUuid, true);
 		if (guildJson == null) {
 			return defaultEmbed("Error fetching guild data");
 		}
@@ -149,7 +151,8 @@ public class GuildCommand extends Command {
 			return defaultEmbed("Error fetching player data");
 		}
 
-		JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&player=" + uuidUsername.playerUuid);
+
+		JsonElement guildJson = Hypixel.getGuildFromPlayer(uuidUsername.playerUuid, true);
 		if (guildJson == null) {
 			return defaultEmbed("Error fetching guild data");
 		}
@@ -167,12 +170,7 @@ public class GuildCommand extends Command {
 
 	public static EmbedBuilder guildInfoFromGuildName(String guildName) {
 		try {
-			String guildId = higherDepth(
-				getJson("https://api.hypixel.net/findGuild?key=" + HYPIXEL_API_KEY + "&byName=" + guildName.replace(" ", "%20")),
-				"guild"
-			)
-				.getAsString();
-			JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&id=" + guildId);
+			JsonElement guildJson = Hypixel.getGuildFromName(guildName, true);
 			if (guildJson == null) {
 				return defaultEmbed("Error fetching guild data");
 			}
@@ -243,7 +241,7 @@ public class GuildCommand extends Command {
 			return defaultEmbed("Error fetching player data");
 		}
 
-		JsonElement guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&player=" + uuidUsername.playerUuid);
+		JsonElement guildJson = Hypixel.getGuildFromPlayer(uuidUsername.playerUuid, true);
 		if (guildJson == null) {
 			return defaultEmbed("Error fetching guild data");
 		}
@@ -286,27 +284,10 @@ public class GuildCommand extends Command {
 	}
 
 	private static int guildExpToLevel(int guildExp) {
-		int[] guildExpTable = new int[] {
-			100000,
-			150000,
-			250000,
-			500000,
-			750000,
-			1000000,
-			1250000,
-			1500000,
-			2000000,
-			2500000,
-			2500000,
-			2500000,
-			2500000,
-			2500000,
-			3000000,
-		};
 		int guildLevel = 0;
 
 		for (int i = 0;; i++) {
-			int expNeeded = i >= guildExpTable.length ? guildExpTable[guildExpTable.length - 1] : guildExpTable[i];
+			int expNeeded = i >= guildExpToLevel.size() ? guildExpToLevel.get(guildExpToLevel.size() - 1) : guildExpToLevel.get(i);
 			guildExp -= expNeeded;
 			if (guildExp < 0) {
 				return guildLevel;

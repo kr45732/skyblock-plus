@@ -28,6 +28,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import com.skyblockplus.utils.Hypixel;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
@@ -226,7 +228,7 @@ public class AutomaticGuild {
 
 				Message reactMessage = reactChannel
 					.sendMessage(higherDepth(currentSettings, "messageText").getAsString())
-					.addFile(new File("src/main/java/com/skyblockplus/eventlisteners/verify/Link_Discord_To_Hypixel.mp4"))
+					.addFile(new File("src/main/java/com/skyblockplus/features/verify/Link_Discord_To_Hypixel.mp4"))
 					.complete();
 
 				JsonObject newSettings = currentSettings.getAsJsonObject();
@@ -270,7 +272,7 @@ public class AutomaticGuild {
 
 				Message reactMessage = reactChannel
 					.sendMessage(higherDepth(currentSettings, "messageText").getAsString())
-					.addFile(new File("src/main/java/com/skyblockplus/eventlisteners/verify/Link_Discord_To_Hypixel.mp4"))
+					.addFile(new File("src/main/java/com/skyblockplus/features/verify/Link_Discord_To_Hypixel.mp4"))
 					.complete();
 
 				JsonObject newSettings = currentSettings.getAsJsonObject();
@@ -375,7 +377,7 @@ public class AutomaticGuild {
 				JsonElement guildJson = null;
 				JsonArray guildMembers = null;
 				try {
-					guildJson = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&id=" + currentSetting.getGuildId());
+					guildJson = Hypixel.getGuildFromId(currentSetting.getGuildId(), true);
 					guildMembers = higherDepth(guildJson, "guild.members").getAsJsonArray();
 				} catch (Exception ignored) {}
 

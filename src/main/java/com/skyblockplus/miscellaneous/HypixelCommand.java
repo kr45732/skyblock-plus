@@ -143,9 +143,8 @@ public class HypixelCommand extends Command {
 				} catch (Exception ignored) {}
 
 				try {
-					JsonElement guildJson = getJson(
-						"https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + "&player=" + usernameUuid.playerUuid
-					);
+					JsonElement guildJson =
+						Hypixel.getGuildFromPlayer(usernameUuid.playerUuid, true);
 
 					eb.addField("Guild", higherDepth(guildJson, "guild.name").getAsString(), true);
 
