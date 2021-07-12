@@ -400,7 +400,7 @@ public class NetworthExecute {
 
 			return eb;
 		}
-		return defaultEmbed("Unable to fetch player data");
+		return invalidEmbed(player.getFailCause());
 	}
 
 	private void calculateAllPetsPrice() {

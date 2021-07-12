@@ -44,7 +44,7 @@ public class WeightCommand extends Command {
 			eb.addField("Dungeons Weight", roundAndFormat(playerWeight.getDungeonsWeight()), false);
 			return eb;
 		}
-		return defaultEmbed("Unable to fetch player data");
+		return invalidEmbed(player.getFailCause());
 	}
 
 	@Override

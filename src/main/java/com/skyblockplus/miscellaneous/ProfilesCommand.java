@@ -1,16 +1,15 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.Hypixel.usernameToUuid;
-import static com.skyblockplus.utils.Player.skyblockStatsLink;
+import static com.skyblockplus.utils.Hypixel.*;
 import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.skyblockStatsLink;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.CustomPaginator;
-import com.skyblockplus.utils.Hypixel;
+import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.time.Instant;
@@ -31,23 +30,24 @@ public class ProfilesCommand extends Command {
 	}
 
 	public static EmbedBuilder getPlayerProfiles(String username, User user, MessageChannel channel, InteractionHook hook) {
-		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
-		if (usernameUuidStruct != null) {
-			JsonArray profileArray;
-			try {
-				profileArray = higherDepth(Hypixel.skyblockProfilesFromUuid(usernameUuidStruct.playerUuid), "profiles").getAsJsonArray();
-			} catch (Exception e) {
-				return defaultEmbed("Unable to fetch player data");
-			}
+		UsernameUuidStruct usernameUuid = usernameToUuid(username);
+		if (usernameUuid.isNotValid()) {
+			return invalidEmbed(usernameUuid.failCause);
+		}
 
-			List<CompletableFuture<String>> profileUsernameFutureList = new ArrayList<>();
+		HypixelResponse hypixelJson = playerFromUuid(usernameUuid.playerUuid);
+		if (hypixelJson.isNotValid()) {
+			return invalidEmbed(hypixelJson.failCause);
+		}
 
-			for (JsonElement profile : profileArray) {
-				List<String> uuids = getJsonKeys(higherDepth(profile, "members"));
+		List<CompletableFuture<String>> profileUsernameFutureList = new ArrayList<>();
 
-				for (String uuid : uuids) {
-					Hypixel
-						.asyncUuidToUsername(uuid)
+		for (JsonElement profile : hypixelJson.response.getAsJsonArray()) {
+			List<String> uuids = getJsonKeys(higherDepth(profile, "members"));
+
+			for (String uuid : uuids) {
+				profileUsernameFutureList.add(
+					asyncUuidToUsername(uuid)
 						.thenApply(
 							playerUsername -> {
 								String lastLogin =
@@ -59,46 +59,45 @@ public class ProfilesCommand extends Command {
 
 								return "\n• " + playerUsername + " last logged in on " + lastLogin;
 							}
-						);
-				}
-			}
-
-			CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, user).setColumns(1).setItemsPerPage(1);
-
-			List<String> pageTitlesUrls = new ArrayList<>();
-			int count = 0;
-			for (JsonElement profile : profileArray) {
-				pageTitlesUrls.add(skyblockStatsLink(usernameUuidStruct.playerUsername, higherDepth(profile, "cute_name").getAsString()));
-				StringBuilder profileStr = new StringBuilder(
-					"• **Profile Name:** " +
-					higherDepth(profile, "cute_name").getAsString() +
-					(higherDepth(profile, "game_mode") != null ? " ♻️" : "")
+						)
 				);
-				List<String> uuids = getJsonKeys(higherDepth(profile, "members"));
-				profileStr.append("\n• **Member Count:** ").append(uuids.size());
-				profileStr.append("\n\n**Members:** ");
-
-				for (String uuid : uuids) {
-					try {
-						profileStr.append(profileUsernameFutureList.get(count).get());
-					} catch (Exception ignored) {}
-					count++;
-				}
-				paginateBuilder.addItems(profileStr.toString());
 			}
-
-			paginateBuilder.setPaginatorExtras(
-				new PaginatorExtras().setEveryPageTitle(usernameUuidStruct.playerUsername).setTitleUrls(pageTitlesUrls)
-			);
-
-			if (channel != null) {
-				paginateBuilder.build().paginate(channel, 0);
-			} else {
-				paginateBuilder.build().paginate(hook, 0);
-			}
-			return null;
 		}
-		return defaultEmbed("Unable to fetch player data");
+
+		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, user).setColumns(1).setItemsPerPage(1);
+
+		List<String> pageTitlesUrls = new ArrayList<>();
+		int count = 0;
+		for (JsonElement profile : hypixelJson.response.getAsJsonArray()) {
+			pageTitlesUrls.add(skyblockStatsLink(usernameUuid.playerUsername, higherDepth(profile, "cute_name").getAsString()));
+			StringBuilder profileStr = new StringBuilder(
+				"• **Profile Name:** " +
+				higherDepth(profile, "cute_name").getAsString() +
+				(higherDepth(profile, "game_mode") != null ? " ♻️" : "")
+			);
+			List<String> uuids = getJsonKeys(higherDepth(profile, "members"));
+			profileStr.append("\n• **Member Count:** ").append(uuids.size());
+			profileStr.append("\n\n**Members:** ");
+
+			for (String uuid : uuids) {
+				try {
+					profileStr.append(profileUsernameFutureList.get(count).get());
+				} catch (Exception ignored) {}
+				count++;
+			}
+			paginateBuilder.addItems(profileStr.toString());
+		}
+
+		paginateBuilder.setPaginatorExtras(
+			new PaginatorExtras().setEveryPageTitle(usernameUuid.playerUsername).setTitleUrls(pageTitlesUrls)
+		);
+
+		if (channel != null) {
+			paginateBuilder.build().paginate(channel, 0);
+		} else {
+			paginateBuilder.build().paginate(hook, 0);
+		}
+		return null;
 	}
 
 	@Override

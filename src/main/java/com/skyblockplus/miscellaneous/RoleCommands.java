@@ -2,6 +2,7 @@ package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
+import static com.skyblockplus.utils.Hypixel.getGuildFromPlayer;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -10,9 +11,9 @@ import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.utils.Hypixel;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
+import com.skyblockplus.utils.structs.HypixelResponse;
 import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -36,10 +37,8 @@ public class RoleCommands extends Command {
 		JsonElement linkedInfo = database.getLinkedUserByDiscordId(user.getId());
 		DiscordInfoStruct playerInfo = getPlayerDiscordInfo(higherDepth(linkedInfo, "minecraftUuid").getAsString());
 
-		if (playerInfo == null) {
-			eb = defaultEmbed("Discord tag error");
-			eb.setDescription("Unable to get Discord tag linked with Hypixel account");
-			return eb;
+		if (playerInfo.isNotValid()) {
+			return invalidEmbed(playerInfo.failCause);
 		}
 
 		if (!user.getAsTag().equals(playerInfo.discordTag)) {
@@ -59,10 +58,7 @@ public class RoleCommands extends Command {
 		String username = playerInfo.minecraftUsername;
 		Player player = profile == null ? new Player(username) : new Player(username, profile);
 		if (!player.isValid()) {
-			eb = defaultEmbed("Error fetching data");
-			eb.setDescription("**Please check linked username or given profile**");
-			eb.appendDescription("\nFormat for command is `" + getGuildPrefix(guild.getId()) + "roles claim <profile>`");
-			return eb;
+			return invalidEmbed(player.getFailCause());
 		}
 
 		try {
@@ -96,12 +92,15 @@ public class RoleCommands extends Command {
 						case "guild_member":
 							{
 								if (guildJson == null) {
-									guildJson = Hypixel.getGuildFromPlayer(player.getUuid(), true);
+									HypixelResponse response = getGuildFromPlayer(player.getUuid());
+									if (!response.isNotValid()) {
+										guildJson = response.response;
+									}
 								}
 
 								if (guildJson != null) {
 									JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
-									String playerGuildId = higherDepth(guildJson, "guild._id").getAsString();
+									String playerGuildId = higherDepth(guildJson, "_id").getAsString();
 
 									for (JsonElement currentLevel : levelsArray) {
 										String currentLevelValue = higherDepth(currentLevel, "value").getAsString();
@@ -132,7 +131,10 @@ public class RoleCommands extends Command {
 						case "guild_ranks":
 							{
 								if (guildJson == null) {
-									guildJson = Hypixel.getGuildFromPlayer(player.getUuid(), true);
+									HypixelResponse response = getGuildFromPlayer(player.getUuid());
+									if (!response.isNotValid()) {
+										guildJson = response.response;
+									}
 								}
 
 								if (guildJson != null) {
@@ -148,18 +150,17 @@ public class RoleCommands extends Command {
 										if (
 											higherDepth(guildRoleSettings, "guildId")
 												.getAsString()
-												.equals(higherDepth(guildJson, "guild._id").getAsString())
+												.equals(higherDepth(guildJson, "_id").getAsString())
 										) {
 											JsonArray guildRanks = higherDepth(guildRoleSettings, "guildRanks").getAsJsonArray();
 
-											JsonArray guildMembers = higherDepth(guildJson, "guild.members").getAsJsonArray();
+											JsonArray guildMembers = higherDepth(guildJson, "members").getAsJsonArray();
 
 											for (JsonElement guildMember : guildMembers) {
 												if (higherDepth(guildMember, "uuid").getAsString().equals(player.getUuid())) {
 													String guildMemberRank = higherDepth(guildMember, "rank")
 														.getAsString()
 														.replace(" ", "_");
-
 													for (JsonElement guildRank : guildRanks) {
 														Role currentLevelRole = guild.getRoleById(
 															higherDepth(guildRank, "discordRoleId").getAsString()

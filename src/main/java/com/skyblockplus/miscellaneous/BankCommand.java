@@ -44,7 +44,7 @@ public class BankCommand extends Command {
 			);
 			return eb;
 		}
-		return defaultEmbed("Unable to fetch player data");
+		return invalidEmbed(player.getFailCause());
 	}
 
 	public static EmbedBuilder getPlayerBankHistory(
@@ -100,10 +100,10 @@ public class BankCommand extends Command {
 				}
 				return null;
 			} else {
-				return defaultEmbed("Player banking API disabled");
+				return invalidEmbed("Player banking API disabled");
 			}
 		}
-		return defaultEmbed("Unable to fetch player data");
+		return invalidEmbed(player.getFailCause());
 	}
 
 	@Override

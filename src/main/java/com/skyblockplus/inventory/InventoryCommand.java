@@ -66,7 +66,7 @@ public class InventoryCommand extends Command {
 								.queue();
 						}
 					} else {
-						ebMessage.editMessageEmbeds(defaultEmbed("Error").setDescription("Unable to fetch player data").build()).queue();
+						ebMessage.editMessageEmbeds(invalidEmbed("Unable to fetch player data").build()).queue();
 					}
 					return;
 				}
@@ -117,7 +117,7 @@ public class InventoryCommand extends Command {
 				return null;
 			}
 		}
-		return defaultEmbed("Unable to fetch player data");
+		return invalidEmbed(player.getFailCause());
 	}
 
 	private String[] getPlayerInventory(String username, String profileName) {

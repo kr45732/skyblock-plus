@@ -1,10 +1,10 @@
 package com.skyblockplus.dev;
 
+import static com.skyblockplus.utils.Hypixel.usernameToUuid;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.utils.Hypixel;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -38,10 +38,10 @@ public class UuidCommand extends Command {
 	}
 
 	private EmbedBuilder getUuidPlayer(String username) {
-		UsernameUuidStruct usernameUuid = Hypixel.usernameToUuid(username);
-		if (usernameUuid != null) {
-			return defaultEmbed("Uuid for " + usernameUuid.playerUsername).setDescription("**Uuid:** " + usernameUuid.playerUuid);
+		UsernameUuidStruct usernameUuid = usernameToUuid(username);
+		if (usernameUuid.isNotValid()) {
+			return invalidEmbed(usernameUuid.failCause);
 		}
-		return defaultEmbed("Invalid username");
+		return defaultEmbed("Uuid for " + usernameUuid.playerUsername).setDescription("**Uuid:** " + usernameUuid.playerUuid);
 	}
 }

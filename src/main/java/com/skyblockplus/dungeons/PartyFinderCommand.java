@@ -35,7 +35,8 @@ public class PartyFinderCommand extends Command {
 			);
 			return eb;
 		}
-		return defaultEmbed("Unable to fetch player data");
+
+		return invalidEmbed(player.getFailCause());
 	}
 
 	@Override

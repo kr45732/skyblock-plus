@@ -2,16 +2,29 @@ package com.skyblockplus.utils.structs;
 
 public class UsernameUuidStruct {
 
-	public final String playerUsername;
-	public final String playerUuid;
+	public String playerUsername;
+	public String playerUuid;
+	public String failCause;
 
 	public UsernameUuidStruct(String playerUsername, String playerUuid) {
 		this.playerUsername = playerUsername;
 		this.playerUuid = playerUuid;
 	}
 
+	public UsernameUuidStruct(String failCause) {
+		this.failCause = failCause;
+	}
+
+	public UsernameUuidStruct() {
+		this.failCause = "Unknown Fail Cause";
+	}
+
+	public boolean isNotValid() {
+		return playerUsername == null || playerUuid == null;
+	}
+
 	@Override
 	public String toString() {
-		return "UsernameUuidStruct{" + "playerUsername='" + playerUsername + '\'' + ", playerUuid='" + playerUuid + '\'' + '}';
+		return "UsernameUuidStruct{" + "username='" + playerUsername + '\'' + ", uuid='" + playerUuid + '\'' + '}';
 	}
 }

@@ -3,6 +3,7 @@ package com.skyblockplus.features.skyblockevent;
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.utils.Hypixel.getGuildFromName;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
@@ -10,6 +11,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.api.serversettings.skyblockevent.RunningEvent;
 import com.skyblockplus.api.serversettings.skyblockevent.SbEvent;
+import com.skyblockplus.utils.structs.HypixelResponse;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -19,8 +21,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-
-import com.skyblockplus.utils.Hypixel;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -95,22 +95,22 @@ public class SkyblockEvent {
 
 		switch (state) {
 			case 0:
-				try {
-					guildJson = Hypixel.getGuildFromName(replyMessage, true);
+				HypixelResponse response = getGuildFromName(replyMessage);
+				if (response.isNotValid()) {
+					eb.setDescription(response.failCause + ". Please try again.");
+					attemptsLeft--;
+				} else {
 					eb
 						.addField(
 							"Guild",
 							"Name: " +
-							higherDepth(guildJson, "guild.name").getAsString() +
+							higherDepth(guildJson, "name").getAsString() +
 							"\nMembers: " +
-							higherDepth(guildJson, "guild.members").getAsJsonArray().size(),
+							higherDepth(guildJson, "members").getAsJsonArray().size(),
 							false
 						)
 						.setDescription("Is this a catacombs, slayer, skills, weight, or collections event?");
 					state++;
-				} catch (Exception e) {
-					eb.setDescription("`" + replyMessage + "` is invalid. Please try again.");
-					attemptsLeft--;
 				}
 				sendEmbedMessage(eb);
 				break;
@@ -219,7 +219,7 @@ public class SkyblockEvent {
 						(eventType.startsWith("collection.") ? eventType.split("-")[1] + " collection" : eventType) +
 						" Skyblock competition has been created! Please see below for more information."
 					);
-					announcementEb.addField("Guild Name", higherDepth(guildJson, "guild.name").getAsString(), false);
+					announcementEb.addField("Guild Name", higherDepth(guildJson, "name").getAsString(), false);
 
 					Instant endsAt = Instant.now().plus(eventDuration, ChronoUnit.HOURS);
 					epochSecondEndingTime = endsAt.getEpochSecond();
@@ -295,7 +295,7 @@ public class SkyblockEvent {
 			"" + epochSecondEndingTime,
 			prizeListMap,
 			new ArrayList<>(),
-			higherDepth(guildJson, "guild._id").getAsString()
+			higherDepth(guildJson, "_id").getAsString()
 		);
 		SbEvent newSkyblockEventSettings = new SbEvent(newRunningEvent, "true");
 

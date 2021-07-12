@@ -4,6 +4,8 @@ import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.waiter;
 import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.utils.Hypixel.getGuildFromId;
+import static com.skyblockplus.utils.Hypixel.getGuildFromName;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.Gson;
@@ -20,7 +22,7 @@ import com.skyblockplus.api.serversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.utils.CustomPaginator;
-import com.skyblockplus.utils.Hypixel;
+import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.vdurmont.emoji.EmojiParser;
 import java.util.*;
@@ -91,7 +93,7 @@ public class SettingsExecute {
 							if (database.deleteServerSettings(event.getGuild().getId()) == 200) {
 								eb = defaultEmbed("Success").setDescription("Server settings deleted");
 							} else {
-								eb = defaultEmbed("Error").setDescription("Error deleting server settings");
+								eb = invalidEmbed("Error deleting server settings");
 							}
 							break;
 						case "hypixel_key":
@@ -126,7 +128,7 @@ public class SettingsExecute {
 							if (allowRolesEnable()) {
 								eb = setRolesEnable("true");
 							} else {
-								eb = defaultEmbed("Error").setDescription("No roles enabled");
+								eb = invalidEmbed("No roles enabled");
 							}
 						} else if (args[2].equals("disable")) {
 							eb = setRolesEnable("false");
@@ -215,9 +217,7 @@ public class SettingsExecute {
 									if (allowApplyEnable(args[2])) {
 										eb = setApplyEnable(args[2], "true");
 									} else {
-										eb =
-											defaultEmbed("Error")
-												.setDescription("All other apply settings must be set before " + "enabling apply!");
+										eb = invalidEmbed("All other apply settings must be set before " + "enabling apply!");
 									}
 								} else if (args[3].equals("disable")) {
 									eb = setApplyEnable(args[2], "false");
@@ -295,9 +295,7 @@ public class SettingsExecute {
 							if (allowVerifyEnable()) {
 								eb = setVerifyEnable("true");
 							} else {
-								eb =
-									defaultEmbed("Error")
-										.setDescription("All other verify settings must be set before " + "enabling verify!");
+								eb = invalidEmbed("All other verify settings must be set before " + "enabling verify!");
 							}
 						} else if (args[2].equals("disable")) {
 							eb = setVerifyEnable("false");
@@ -320,7 +318,7 @@ public class SettingsExecute {
 								} else if (args[3].equals("remove")) {
 									eb = removeVerifyRole(args[4]);
 								} else {
-									eb = defaultEmbed("Error").setDescription("Invalid setting");
+									eb = invalidEmbed("Invalid setting");
 								}
 								break;
 						}
@@ -420,7 +418,7 @@ public class SettingsExecute {
 					} else if (args.length == 6) {
 						JsonElement guildRoleSettings = database.getGuildRoleSettings(event.getGuild().getId(), args[2]);
 						if (guildRoleSettings == null || guildRoleSettings.isJsonNull()) {
-							eb = defaultEmbed("Error").setDescription("Invalid name");
+							eb = invalidEmbed("Invalid name");
 						} else if (args[3].equals("add")) {
 							eb = addGuildRank(args[2], args[4], args[5]);
 						}
@@ -444,7 +442,7 @@ public class SettingsExecute {
 		try {
 			higherDepth(getJson("https://api.hypixel.net/key?key=" + newKey), "record.key").getAsString();
 		} catch (Exception e) {
-			return defaultEmbed("Error").setDescription("Invalid API key");
+			return invalidEmbed("Invalid API key");
 		}
 
 		event.getMessage().delete().queue();
@@ -458,7 +456,7 @@ public class SettingsExecute {
 				);
 		}
 
-		return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+		return invalidEmbed("API returned response code " + responseCode);
 	}
 
 	private EmbedBuilder deleteHypixelKey() {
@@ -468,7 +466,7 @@ public class SettingsExecute {
 			return defaultEmbed("Settings").setDescription("Deleted the set Hypixel API key");
 		}
 
-		return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+		return invalidEmbed("API returned response code " + responseCode);
 	}
 
 	private EmbedBuilder deleteApplyGuild(String name) {
@@ -478,10 +476,10 @@ public class SettingsExecute {
 				return defaultEmbed("Settings").setDescription("Apply settings with name `" + name + "` was deleted");
 			}
 
-			return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+			return invalidEmbed("API returned response code " + responseCode);
 		}
 
-		return defaultEmbed("Error").setDescription("Invalid Name");
+		return invalidEmbed("Invalid Name");
 	}
 
 	private EmbedBuilder removeVerifyRole(String roleMention) {
@@ -489,7 +487,7 @@ public class SettingsExecute {
 		try {
 			verifyRole = event.getGuild().getRoleById(roleMention.replaceAll("[<@&>]", ""));
 			if ((verifyRole.isPublicRole() || verifyRole.isManaged())) {
-				return defaultEmbed("Error").setDescription("Invalid role");
+				return invalidEmbed("Invalid role");
 			}
 		} catch (Exception e) {
 			return defaultEmbed("Invalid Role");
@@ -506,7 +504,7 @@ public class SettingsExecute {
 		int responseCode = database.setVerifyRolesSettings(event.getGuild().getId(), currentVerifyRoles);
 
 		if (responseCode != 200) {
-			return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+			return invalidEmbed("API returned response code " + responseCode);
 		}
 
 		if (currentVerifyRoles.size() == 0) {
@@ -522,7 +520,7 @@ public class SettingsExecute {
 		try {
 			verifyRole = event.getGuild().getRoleById(roleMention.replaceAll("[<@&>]", ""));
 			if ((verifyRole.isPublicRole() || verifyRole.isManaged())) {
-				return defaultEmbed("Error").setDescription("Role cannot be managed or @everyone");
+				return invalidEmbed("Role cannot be managed or @everyone");
 			}
 		} catch (Exception e) {
 			return defaultEmbed("Invalid Role");
@@ -537,7 +535,7 @@ public class SettingsExecute {
 		int responseCode = database.setVerifyRolesSettings(event.getGuild().getId(), currentVerifyRoles);
 
 		if (responseCode != 200) {
-			return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+			return invalidEmbed("API returned response code " + responseCode);
 		}
 
 		EmbedBuilder eb = defaultEmbed("Settings");
@@ -580,7 +578,7 @@ public class SettingsExecute {
 		currentSettings.addProperty("enableGuildRole", enable);
 		int responseCode = database.setGuildRoleSettings(event.getGuild().getId(), currentSettings);
 		if (responseCode != 200) {
-			return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+			return invalidEmbed("API returned response code " + responseCode);
 		}
 
 		EmbedBuilder eb = defaultEmbed("Settings");
@@ -594,14 +592,14 @@ public class SettingsExecute {
 		if (
 			(higherDepth(currentSettings, "guildId") == null) || (higherDepth(currentSettings, "guildRanks").getAsJsonArray().size() == 0)
 		) {
-			return defaultEmbed("Error").setDescription("The guild name and a guild rank must be set");
+			return invalidEmbed("The guild name and a guild rank must be set");
 		}
 
 		currentSettings.remove("enableGuildRanks");
 		currentSettings.addProperty("enableGuildRanks", enable);
 		int responseCode = database.setGuildRoleSettings(event.getGuild().getId(), currentSettings);
 		if (responseCode != 200) {
-			return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+			return invalidEmbed("API returned response code " + responseCode);
 		}
 
 		EmbedBuilder eb = defaultEmbed("Settings");
@@ -622,19 +620,16 @@ public class SettingsExecute {
 					return defaultEmbed("Guild name must be set before enabling");
 				}
 
-				JsonElement guildJson = Hypixel.getGuildFromId(higherDepth(currentSettings, "guildId").getAsString(), true);
+				HypixelResponse guildJson = getGuildFromId(higherDepth(currentSettings, "guildId").getAsString());
 
-				if (higherDepth(guildJson, "guild") == null || higherDepth(guildJson, "guild").isJsonNull()) {
-					return defaultEmbed("Current guild name is invalid");
+				if (guildJson.isNotValid()) {
+					return invalidEmbed(guildJson.failCause);
 				}
 
 				VoiceChannel guildMemberCounterChannel = event
 					.getGuild()
 					.createVoiceChannel(
-						higherDepth(guildJson, "guild.name").getAsString() +
-						" Members: " +
-						higherDepth(guildJson, "guild.members").getAsJsonArray().size() +
-						"/125"
+						guildJson.get("name").getAsString() + " Members: " + guildJson.get("members").getAsJsonArray().size() + "/125"
 					)
 					.addPermissionOverride(
 						event.getGuild().getPublicRole(),
@@ -653,7 +648,7 @@ public class SettingsExecute {
 
 			int responseCode = database.setGuildRoleSettings(event.getGuild().getId(), currentSettings);
 			if (responseCode != 200) {
-				return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+				return invalidEmbed("API returned response code " + responseCode);
 			}
 		}
 
@@ -667,7 +662,7 @@ public class SettingsExecute {
 		try {
 			guildRankRole = event.getGuild().getRoleById(roleMention.replaceAll("[<@&>]", ""));
 			if ((guildRankRole.isPublicRole() || guildRankRole.isManaged())) {
-				return defaultEmbed("Error").setDescription("Role cannot be managed or @everyone");
+				return invalidEmbed("Role cannot be managed or @everyone");
 			}
 		} catch (Exception e) {
 			return defaultEmbed("Invalid Role");
@@ -681,13 +676,13 @@ public class SettingsExecute {
 
 		String guildId = higherDepth(currentSettings, "guildId").getAsString();
 
-		JsonElement guildJson = Hypixel.getGuildFromId(guildId, true);
+		HypixelResponse guildJson = getGuildFromId(guildId);
 
-		if (guildJson == null) {
-			return defaultEmbed("Current guild name is invalid");
+		if (guildJson.isNotValid()) {
+			return invalidEmbed(guildJson.failCause);
 		}
 
-		JsonArray guildRanks = higherDepth(guildJson, "guild.ranks").getAsJsonArray();
+		JsonArray guildRanks = higherDepth(guildJson.response, "ranks").getAsJsonArray();
 
 		StringBuilder guildRanksString = new StringBuilder();
 		for (JsonElement guildRank : guildRanks) {
@@ -710,7 +705,7 @@ public class SettingsExecute {
 
 				int responseCode = database.setGuildRoleSettings(event.getGuild().getId(), currentSettings);
 				if (responseCode != 200) {
-					return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+					return invalidEmbed("API returned response code " + responseCode);
 				}
 
 				EmbedBuilder eb = defaultEmbed("Settings");
@@ -744,7 +739,7 @@ public class SettingsExecute {
 
 				int responseCode = database.setGuildRoleSettings(event.getGuild().getId(), currentSettings);
 				if (responseCode != 200) {
-					return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+					return invalidEmbed("API returned response code " + responseCode);
 				}
 
 				EmbedBuilder eb = defaultEmbed("Settings");
@@ -753,27 +748,27 @@ public class SettingsExecute {
 			}
 		}
 
-		return defaultEmbed("Error").setDescription("Invalid rank name");
+		return invalidEmbed("Invalid rank name");
 	}
 
 	private EmbedBuilder setGuildRoleId(String name, String guildName) {
-		try {
-			JsonElement guildJson = Hypixel.getGuildFromName(guildName, true);
-			String guildId = higherDepth(guildJson, "guild._id").getAsString();
-			JsonObject currentSettings = database.getGuildRoleSettings(event.getGuild().getId(), name).getAsJsonObject();
-			currentSettings.remove("guildId");
-			currentSettings.addProperty("guildId", guildId);
-			int responseCode = database.setGuildRoleSettings(event.getGuild().getId(), currentSettings);
-			if (responseCode != 200) {
-				return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
-			}
-
-			EmbedBuilder eb = defaultEmbed("Settings");
-			eb.setDescription("**Guild set to:** " + higherDepth(guildJson, "guild.name").getAsString());
-			return eb;
-		} catch (Exception e) {
-			return defaultEmbed("Error").setDescription("Invalid guild name");
+		HypixelResponse guildJson = getGuildFromName(guildName);
+		if (guildJson.isNotValid()) {
+			return invalidEmbed(guildJson.failCause);
 		}
+
+		String guildId = guildJson.get("_id").getAsString();
+		JsonObject currentSettings = database.getGuildRoleSettings(event.getGuild().getId(), name).getAsJsonObject();
+		currentSettings.remove("guildId");
+		currentSettings.addProperty("guildId", guildId);
+		int responseCode = database.setGuildRoleSettings(event.getGuild().getId(), currentSettings);
+		if (responseCode != 200) {
+			return invalidEmbed("API returned response code " + responseCode);
+		}
+
+		EmbedBuilder eb = defaultEmbed("Settings");
+		eb.setDescription("**Guild set to:** " + guildJson.get("name").getAsString());
+		return eb;
 	}
 
 	private EmbedBuilder setGuildRoleName(String name, String roleMention) {
@@ -786,7 +781,7 @@ public class SettingsExecute {
 				int responseCode = database.setGuildRoleSettings(event.getGuild().getId(), currentSettings);
 
 				if (responseCode != 200) {
-					return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+					return invalidEmbed("API returned response code " + responseCode);
 				}
 
 				EmbedBuilder eb = defaultEmbed("Settings");
@@ -799,19 +794,19 @@ public class SettingsExecute {
 
 	private EmbedBuilder createGuildRoles(String name) {
 		if (name.length() > 25) {
-			return defaultEmbed("Error").setDescription("Name cannot be more than 25 letters");
+			return invalidEmbed("Name cannot be more than 25 letters");
 		}
 
 		List<GuildRole> currentGuildRoles = database.getAllGuildRoles(event.getGuild().getId());
 		currentGuildRoles.removeIf(o1 -> o1.getGuildId() == null);
 
 		if (currentGuildRoles.size() == 2) {
-			return defaultEmbed("Error").setDescription("You can reached the max amount of apply guilds (2/2)");
+			return invalidEmbed("You can reached the max amount of apply guilds (2/2)");
 		}
 
 		for (GuildRole currentGuildRole : currentGuildRoles) {
 			if (currentGuildRole.getName().equalsIgnoreCase(name)) {
-				return defaultEmbed("Error").setDescription(name + " name is taken");
+				return invalidEmbed(name + " name is taken");
 			}
 		}
 
@@ -819,7 +814,7 @@ public class SettingsExecute {
 
 		int responseCode = database.setGuildRoleSettings(event.getGuild().getId(), newGuildRole);
 		if (responseCode != 200) {
-			return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+			return invalidEmbed("API returned response code " + responseCode);
 		}
 
 		EmbedBuilder eb = defaultEmbed("Settings");
@@ -873,7 +868,7 @@ public class SettingsExecute {
 			} catch (Exception ignored) {}
 		}
 
-		return defaultEmbed("Error").setDescription("Invalid role name");
+		return invalidEmbed("Invalid role name");
 	}
 
 	private CustomPaginator.Builder getCurrentRolesSettings(JsonElement rolesSettings) {
@@ -1091,23 +1086,23 @@ public class SettingsExecute {
 				if (roleName.equals("guild_member")) {
 					for (JsonElement roleLevel : higherDepth(currentRoleSettings, "levels").getAsJsonArray()) {
 						String guildId = higherDepth(roleLevel, "value").getAsString();
-						JsonElement guildJson = Hypixel.getGuildFromId(guildId, true);
-						if(guildJson != null) {
+						HypixelResponse guildJson = getGuildFromId(guildId);
+						if (!guildJson.isNotValid()) {
 							ebFieldString
-									.append("\n• ")
-									.append(higherDepth(guildJson, "guild.name").getAsString())
-									.append(" - ")
-									.append("<@&")
-									.append(higherDepth(roleLevel, "roleId").getAsString())
-									.append(">");
-						}else{
+								.append("\n• ")
+								.append(guildJson.get("name").getAsString())
+								.append(" - ")
+								.append("<@&")
+								.append(higherDepth(roleLevel, "roleId").getAsString())
+								.append(">");
+						} else {
 							ebFieldString
-									.append("\n• ")
-									.append("Invalid guild")
-									.append(" - ")
-									.append("<@&")
-									.append(higherDepth(roleLevel, "roleId").getAsString())
-									.append(">");
+								.append("\n• ")
+								.append("Invalid guild")
+								.append(" - ")
+								.append("<@&")
+								.append(higherDepth(roleLevel, "roleId").getAsString())
+								.append(">");
 						}
 					}
 				} else {
@@ -1152,7 +1147,7 @@ public class SettingsExecute {
 			newRolesJson.addProperty("enable", enable);
 			int responseCode = database.setRolesSettings(event.getGuild().getId(), newRolesJson);
 			if (responseCode != 200) {
-				return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+				return invalidEmbed("API returned response code " + responseCode);
 			}
 
 			EmbedBuilder eb = defaultEmbed("Settings");
@@ -1169,7 +1164,7 @@ public class SettingsExecute {
 		} catch (Exception ignored) {}
 
 		if (currentRoleSettings == null) {
-			return defaultEmbed("Error").setDescription("Invalid role name");
+			return invalidEmbed("Invalid role name");
 		}
 
 		if (currentRoleSettings.get("levels").getAsJsonArray().size() != 0) {
@@ -1177,7 +1172,7 @@ public class SettingsExecute {
 			currentRoleSettings.addProperty("enable", enable);
 			int responseCode = database.setRoleSettings(event.getGuild().getId(), roleName, currentRoleSettings);
 			if (responseCode != 200) {
-				return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+				return invalidEmbed("API returned response code " + responseCode);
 			}
 
 			EmbedBuilder eb = defaultEmbed("Settings");
@@ -1188,27 +1183,24 @@ public class SettingsExecute {
 			currentRoleSettings.addProperty("enable", "false");
 			database.setRoleSettings(event.getGuild().getId(), roleName, currentRoleSettings);
 		}
-		EmbedBuilder eb = defaultEmbed("Error");
-		eb.setDescription("Specified role must have at least one configuration!");
-		return eb;
+		return invalidEmbed("Specified role must have at least one configuration!");
 	}
 
 	private EmbedBuilder addRoleLevel(String roleName, String roleValue, String roleMention) {
 		String guildName = "";
 		if (roleName.equals("guild_member")) {
-			try {
-				JsonElement guildJson = Hypixel.getGuildFromName(roleValue, true);
-				roleValue = higherDepth(guildJson, "guild._id").getAsString();
-				guildName = higherDepth(guildJson, "guild.name").getAsString();
-			} catch (Exception e) {
-				return defaultEmbed("Error").setDescription("Invalid username");
+			HypixelResponse guildJson = getGuildFromName(roleValue);
+			if (guildJson.isNotValid()) {
+				return invalidEmbed(guildJson.failCause);
 			}
+			roleValue = guildJson.get("_id").getAsString();
+			guildName = guildJson.get("name").getAsString();
 		} else if (roleName.equals("guild_ranks")) {
 			JsonObject newRoleSettings = database.getRoleSettings(event.getGuild().getId(), "guild_ranks").getAsJsonObject();
 			JsonArray currentLevels = newRoleSettings.get("levels").getAsJsonArray();
 
 			if (currentLevels.size() >= 2) {
-				return defaultEmbed("Error").setDescription("This role has reached the max limit of levels (2/2)");
+				return invalidEmbed("This role has reached the max limit of levels (2/2)");
 			}
 			JsonElement guildRoleSettings = database.getGuildRoleSettings(event.getGuild().getId(), roleValue);
 			if (
@@ -1231,13 +1223,13 @@ public class SettingsExecute {
 
 				int responseCode = database.setRoleSettings(event.getGuild().getId(), roleName, newRoleSettings);
 				if (responseCode != 200) {
-					return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+					return invalidEmbed("API returned response code " + responseCode);
 				}
 
 				return defaultEmbed("Settings").setDescription("Added guild ranks for guild roles with name `" + roleValue + "`");
 			}
 
-			return defaultEmbed("Error").setDescription("Invalid guild role name or guild ranks not enabled");
+			return invalidEmbed("Invalid guild role name or guild ranks not enabled");
 		} else if (isOneLevelRole(roleName)) {
 			return defaultEmbed(
 				"These roles do not support levels. Use `" + guildPrefix + "settings roles set [roleName] [@role]` instead"
@@ -1246,23 +1238,23 @@ public class SettingsExecute {
 			try {
 				Integer.parseInt(roleValue);
 			} catch (Exception e) {
-				return defaultEmbed("Error").setDescription("Role value must be an integer");
+				return invalidEmbed("Role value must be an integer");
 			}
 		}
 
 		Role role = event.getGuild().getRoleById(roleMention.replaceAll("[<@&>]", ""));
 		if (role == null) {
-			return defaultEmbed("Error").setDescription("Invalid role mention");
+			return invalidEmbed("Invalid role mention");
 		}
 
 		if (role.isPublicRole() || role.isManaged()) {
-			return defaultEmbed("Error").setDescription("Role cannot be managed or @everyone!");
+			return invalidEmbed("Role cannot be managed or @everyone!");
 		}
 		JsonObject newRoleSettings;
 		try {
 			newRoleSettings = database.getRoleSettings(event.getGuild().getId(), roleName).getAsJsonObject();
 		} catch (Exception e) {
-			return defaultEmbed("Error").setDescription("Invalid role");
+			return invalidEmbed("Invalid role");
 		}
 
 		int totalRoleCount = 0;
@@ -1277,7 +1269,7 @@ public class SettingsExecute {
 		JsonArray currentLevels = newRoleSettings.get("levels").getAsJsonArray();
 
 		if (totalRoleCount >= 120) {
-			return defaultEmbed("Error").setDescription("You have reached the max amount of total levels (120/120)");
+			return invalidEmbed("You have reached the max amount of total levels (120/120)");
 		}
 
 		for (JsonElement level : currentLevels) {
@@ -1301,7 +1293,7 @@ public class SettingsExecute {
 
 		int responseCode = database.setRoleSettings(event.getGuild().getId(), roleName, newRoleSettings);
 		if (responseCode != 200) {
-			return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+			return invalidEmbed("API returned response code " + responseCode);
 		}
 
 		if (roleName.equals("guild_member")) {
@@ -1322,15 +1314,18 @@ public class SettingsExecute {
 		try {
 			currentRoleSettings = database.getRoleSettings(event.getGuild().getId(), roleName).getAsJsonObject();
 		} catch (Exception e) {
-			return defaultEmbed("Error").setDescription("Invalid role name");
+			return invalidEmbed("Invalid role name");
 		}
 
 		JsonArray currentLevels = currentRoleSettings.get("levels").getAsJsonArray();
 		for (JsonElement level : currentLevels) {
 			String currentValue = higherDepth(level, "value").getAsString();
 			if (roleName.equals("guild_member")) {
-				JsonElement guildJson = Hypixel.getGuildFromId(higherDepth(level, "value").getAsString(), true);
-				currentValue = higherDepth(guildJson, "guild.name").getAsString();
+				HypixelResponse guildJson = getGuildFromId(higherDepth(level, "value").getAsString());
+				if (guildJson.isNotValid()) {
+					return invalidEmbed(guildJson.failCause);
+				}
+				currentValue = guildJson.get("name").getAsString();
 			}
 
 			if (currentValue.equalsIgnoreCase(value.replace("_", " "))) {
@@ -1339,7 +1334,7 @@ public class SettingsExecute {
 				currentRoleSettings.add("levels", currentLevels);
 				int responseCode = database.setRoleSettings(event.getGuild().getId(), roleName, currentRoleSettings);
 				if (responseCode != 200) {
-					return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+					return invalidEmbed("API returned response code " + responseCode);
 				}
 
 				currentRoleSettings = database.getRoleSettings(event.getGuild().getId(), roleName).getAsJsonObject();
@@ -1355,25 +1350,25 @@ public class SettingsExecute {
 				return defaultEmbed("Settings").setDescription(roleName + " " + value + " removed");
 			}
 		}
-		return defaultEmbed("Error").setDescription("Invalid role value");
+		return invalidEmbed("Invalid role value");
 	}
 
 	private EmbedBuilder setRoleStackable(String roleName, String stackable) {
 		if (isOneLevelRole(roleName) || roleName.equals("guild_ranks")) {
-			return defaultEmbed("Error").setDescription("This role does not support stacking");
+			return invalidEmbed("This role does not support stacking");
 		}
 		JsonObject currentRoleSettings;
 		try {
 			currentRoleSettings = database.getRoleSettings(event.getGuild().getId(), roleName).getAsJsonObject();
 		} catch (Exception e) {
-			return defaultEmbed("Error").setDescription("Invalid Role");
+			return invalidEmbed("Invalid Role");
 		}
 
 		currentRoleSettings.remove("stackable");
 		currentRoleSettings.addProperty("stackable", stackable);
 		int responseCode = database.setRoleSettings(event.getGuild().getId(), roleName, currentRoleSettings);
 		if (responseCode != 200) {
-			return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+			return invalidEmbed("API returned response code " + responseCode);
 		}
 
 		EmbedBuilder eb = defaultEmbed("Settings");
@@ -1383,25 +1378,24 @@ public class SettingsExecute {
 
 	private EmbedBuilder setOneLevelRole(String roleName, String roleMention) {
 		if (!isOneLevelRole(roleName)) {
-			return defaultEmbed("Error")
-				.setDescription(
-					"This role does is not a one level role. Use `" + guildPrefix + "settings roles add [roleName] [value] [@role]` instead"
-				);
+			return invalidEmbed(
+				"This role does is not a one level role. Use `" + guildPrefix + "settings roles add [roleName] [value] [@role]` instead"
+			);
 		}
 
 		Role role = event.getGuild().getRoleById(roleMention.replaceAll("[<@&>]", ""));
 		if (role == null) {
-			return defaultEmbed("Error").setDescription("Invalid role mention");
+			return invalidEmbed("Invalid role mention");
 		}
 		if (role.isPublicRole() || role.isManaged()) {
-			return defaultEmbed("Error").setDescription("Role cannot be managed or @everyone!");
+			return invalidEmbed("Role cannot be managed or @everyone!");
 		}
 
 		JsonObject newRoleSettings;
 		try {
 			newRoleSettings = database.getRoleSettings(event.getGuild().getId(), roleName).getAsJsonObject();
 		} catch (Exception e) {
-			return defaultEmbed("Error").setDescription("Invalid role");
+			return invalidEmbed("Invalid role");
 		}
 
 		JsonArray currentLevels = newRoleSettings.get("levels").getAsJsonArray();
@@ -1419,7 +1413,7 @@ public class SettingsExecute {
 		int responseCode = database.setRoleSettings(event.getGuild().getId(), roleName, newRoleSettings);
 
 		if (responseCode != 200) {
-			return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+			return invalidEmbed("API returned response code " + responseCode);
 		}
 
 		return defaultEmbed("Settings").setDescription(roleName + " set to " + role.getAsMention());
@@ -1460,7 +1454,7 @@ public class SettingsExecute {
 		if (enable.equalsIgnoreCase("true") || enable.equalsIgnoreCase("false")) {
 			int responseCode = updateVerifySettings("enable", enable);
 			if (responseCode != 200) {
-				return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+				return invalidEmbed("API returned response code " + responseCode);
 			}
 
 			EmbedBuilder eb = defaultEmbed("Settings");
@@ -1479,12 +1473,12 @@ public class SettingsExecute {
 	private EmbedBuilder setVerifyMessageText(String verifyText) {
 		if (verifyText.length() > 0) {
 			if (EmojiParser.parseToAliases(verifyText).length() > 1500) {
-				return defaultEmbed("Error").setDescription("Text cannot be longer than 1500 letters!");
+				return invalidEmbed("Text cannot be longer than 1500 letters!");
 			}
 
 			int responseCode = updateVerifySettings("messageText", EmojiParser.parseToAliases(verifyText));
 			if (responseCode != 200) {
-				return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+				return invalidEmbed("API returned response code " + responseCode);
 			}
 
 			EmbedBuilder eb = defaultEmbed("Settings");
@@ -1499,7 +1493,7 @@ public class SettingsExecute {
 			TextChannel verifyMessageTextChannel = event.getGuild().getTextChannelById(textChannel.replaceAll("[<#>]", ""));
 			int responseCode = updateVerifySettings("messageTextChannelId", verifyMessageTextChannel.getId());
 			if (responseCode != 200) {
-				return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+				return invalidEmbed("API returned response code " + responseCode);
 			}
 
 			EmbedBuilder eb = defaultEmbed("Settings");
@@ -1515,14 +1509,14 @@ public class SettingsExecute {
 				int responseCode = updateVerifySettings("verifiedNickname", "none");
 
 				if (responseCode != 200) {
-					return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+					return invalidEmbed("API returned response code " + responseCode);
 				}
 
 				EmbedBuilder eb = defaultEmbed("Settings");
 				eb.setDescription("**Verify nickname disabled**");
 				return eb;
 			}
-			return defaultEmbed("Error").setDescription("Nickname must contain [IGN] parameter");
+			return invalidEmbed("Nickname must contain [IGN] parameter");
 		}
 
 		if (nickname.contains("[GUILD_RANK]")) {
@@ -1537,23 +1531,20 @@ public class SettingsExecute {
 				}
 			);
 			if (guildRoleSettings.size() == 0) {
-				return defaultEmbed("Error")
-					.setDescription(
-						"At least one guild ranks must be enabled in " +
-						guildPrefix +
-						"`settings guild [name]` to use the [GUILD_RANK] prefix"
-					);
+				return invalidEmbed(
+					"At least one guild ranks must be enabled in " + guildPrefix + "`settings guild [name]` to use the [GUILD_RANK] prefix"
+				);
 			}
 		}
 
 		if (nickname.replace("[IGN]", "").length() > 15) {
-			return defaultEmbed("Error").setDescription("Nickname prefix and/or postfix must be less than or equal to 15 letters");
+			return invalidEmbed("Nickname prefix and/or postfix must be less than or equal to 15 letters");
 		}
 
 		int responseCode = updateVerifySettings("verifiedNickname", nickname);
 
 		if (responseCode != 200) {
-			return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+			return invalidEmbed("API returned response code " + responseCode);
 		}
 
 		EmbedBuilder eb = defaultEmbed("Settings");
@@ -1592,7 +1583,7 @@ public class SettingsExecute {
 
 			int responseCode = updateApplySettings(name, "waitingChannelId", applyMessageTextChannel.getId());
 			if (responseCode != 200) {
-				return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+				return invalidEmbed("API returned response code " + responseCode);
 			}
 
 			EmbedBuilder eb = defaultEmbed("Settings");
@@ -1604,19 +1595,19 @@ public class SettingsExecute {
 
 	private EmbedBuilder createApplyGuild(String name) {
 		if (name.length() > 25) {
-			return defaultEmbed("Error").setDescription("Name cannot be more than 25 letters");
+			return invalidEmbed("Name cannot be more than 25 letters");
 		}
 
 		List<AutomatedApply> currentApplications = database.getAllApplySettings(event.getGuild().getId());
 		currentApplications.removeIf(o1 -> o1.getName() == null);
 
 		if (currentApplications.size() == 2) {
-			return defaultEmbed("Error").setDescription("You can reached the max amount of apply guilds (2/2)");
+			return invalidEmbed("You can reached the max amount of apply guilds (2/2)");
 		}
 
 		for (AutomatedApply currentApply : currentApplications) {
 			if (currentApply.getName().equalsIgnoreCase(name)) {
-				return defaultEmbed("Error").setDescription(name + " name is taken");
+				return invalidEmbed(name + " name is taken");
 			}
 		}
 
@@ -1624,7 +1615,7 @@ public class SettingsExecute {
 
 		int responseCode = database.setApplySettings(event.getGuild().getId(), newApply);
 		if (responseCode != 200) {
-			return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+			return invalidEmbed("API returned response code " + responseCode);
 		}
 
 		EmbedBuilder eb = defaultEmbed("Settings");
@@ -1653,7 +1644,7 @@ public class SettingsExecute {
 		if (enable.equalsIgnoreCase("true") || enable.equalsIgnoreCase("false")) {
 			int responseCode = updateApplySettings(name, "enable", enable);
 			if (responseCode != 200) {
-				return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+				return invalidEmbed("API returned response code " + responseCode);
 			}
 
 			EmbedBuilder eb = defaultEmbed("Settings");
@@ -1673,7 +1664,7 @@ public class SettingsExecute {
 		if (isIronman.equalsIgnoreCase("true") || isIronman.equalsIgnoreCase("false")) {
 			int responseCode = updateApplySettings(name, "ironmanOnly", isIronman.toLowerCase());
 			if (responseCode != 200) {
-				return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+				return invalidEmbed("API returned response code " + responseCode);
 			}
 
 			EmbedBuilder eb = defaultEmbed("Settings");
@@ -1689,7 +1680,7 @@ public class SettingsExecute {
 
 			int responseCode = updateApplySettings(name, "messageTextChannelId", applyMessageTextChannel.getId());
 			if (responseCode != 200) {
-				return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+				return invalidEmbed("API returned response code " + responseCode);
 			}
 
 			EmbedBuilder eb = defaultEmbed("Settings");
@@ -1704,7 +1695,7 @@ public class SettingsExecute {
 			TextChannel staffTextChannel = event.getGuild().getTextChannelById(textChannel.replaceAll("[<#>]", ""));
 			int responseCode = updateApplySettings(name, "messageStaffChannelId", staffTextChannel.getId());
 			if (responseCode != 200) {
-				return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+				return invalidEmbed("API returned response code " + responseCode);
 			}
 
 			EmbedBuilder eb = defaultEmbed("Settings");
@@ -1717,11 +1708,11 @@ public class SettingsExecute {
 	private EmbedBuilder setApplyMessageText(String name, String verifyText) {
 		if (verifyText.length() > 0) {
 			if (EmojiParser.parseToAliases(verifyText).length() > 1500) {
-				return defaultEmbed("Error").setDescription("Text cannot be longer than 1500 letters!");
+				return invalidEmbed("Text cannot be longer than 1500 letters!");
 			}
 			int responseCode = updateApplySettings(name, "messageText", EmojiParser.parseToAliases(verifyText));
 			if (responseCode != 200) {
-				return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+				return invalidEmbed("API returned response code " + responseCode);
 			}
 
 			EmbedBuilder eb = defaultEmbed("Settings");
@@ -1734,12 +1725,12 @@ public class SettingsExecute {
 	private EmbedBuilder setApplyAcceptMessageText(String name, String verifyText) {
 		if (verifyText.length() > 0) {
 			if (EmojiParser.parseToAliases(verifyText).length() > 1500) {
-				return defaultEmbed("Error").setDescription("Text cannot be longer than 1500 letters!");
+				return invalidEmbed("Text cannot be longer than 1500 letters!");
 			}
 
 			int responseCode = updateApplySettings(name, "acceptMessageText", EmojiParser.parseToAliases(verifyText));
 			if (responseCode != 200) {
-				return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+				return invalidEmbed("API returned response code " + responseCode);
 			}
 
 			EmbedBuilder eb = defaultEmbed("Settings");
@@ -1755,7 +1746,7 @@ public class SettingsExecute {
 				int responseCode = updateVerifySettings("waitlistedMessageText", "none");
 
 				if (responseCode != 200) {
-					return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+					return invalidEmbed("API returned response code " + responseCode);
 				}
 
 				EmbedBuilder eb = defaultEmbed("Settings");
@@ -1764,12 +1755,12 @@ public class SettingsExecute {
 			}
 
 			if (EmojiParser.parseToAliases(verifyText).length() > 1500) {
-				return defaultEmbed("Error").setDescription("Text cannot be longer than 1500 letters!");
+				return invalidEmbed("Text cannot be longer than 1500 letters!");
 			}
 
 			int responseCode = updateApplySettings(name, "waitlistedMessageText", EmojiParser.parseToAliases(verifyText));
 			if (responseCode != 200) {
-				return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+				return invalidEmbed("API returned response code " + responseCode);
 			}
 
 			EmbedBuilder eb = defaultEmbed("Settings");
@@ -1782,12 +1773,12 @@ public class SettingsExecute {
 	private EmbedBuilder setApplyDenyMessageText(String name, String denyText) {
 		if (denyText.length() > 0) {
 			if (EmojiParser.parseToAliases(denyText).length() > 1500) {
-				return defaultEmbed("Error").setDescription("Text cannot be longer than 1500 letters!");
+				return invalidEmbed("Text cannot be longer than 1500 letters!");
 			}
 
 			int responseCode = updateApplySettings(name, "denyMessageText", EmojiParser.parseToAliases(denyText));
 			if (responseCode != 200) {
-				return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+				return invalidEmbed("API returned response code " + responseCode);
 			}
 
 			EmbedBuilder eb = defaultEmbed("Settings");
@@ -1803,7 +1794,7 @@ public class SettingsExecute {
 			if (!(verifyGuildRole.isPublicRole() || verifyGuildRole.isManaged())) {
 				int responseCode = updateApplySettings(name, "staffPingRoleId", verifyGuildRole.getId());
 				if (responseCode != 200) {
-					return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+					return invalidEmbed("API returned response code " + responseCode);
 				}
 
 				EmbedBuilder eb = defaultEmbed("Settings");
@@ -1819,7 +1810,7 @@ public class SettingsExecute {
 			net.dv8tion.jda.api.entities.Category applyCategory = event.getGuild().getCategoryById(messageCategory.replaceAll("[<#>]", ""));
 			int responseCode = updateApplySettings(name, "newChannelCategory", applyCategory.getId());
 			if (responseCode != 200) {
-				return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+				return invalidEmbed("API returned response code " + responseCode);
 			}
 
 			EmbedBuilder eb = defaultEmbed("Settings");
@@ -1834,7 +1825,7 @@ public class SettingsExecute {
 		try {
 			currentReqs = database.getApplyReqs(event.getGuild().getId(), name).getAsJsonArray();
 		} catch (Exception ignored) {
-			return defaultEmbed("Error").setDescription("Unable to get current settings");
+			return invalidEmbed("Unable to get current settings");
 		}
 
 		try {
@@ -1844,7 +1835,7 @@ public class SettingsExecute {
 			int responseCode = database.setApplyReqs(event.getGuild().getId(), name, currentReqs);
 
 			if (responseCode != 200) {
-				return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+				return invalidEmbed("API returned response code " + responseCode);
 			}
 
 			EmbedBuilder eb = defaultEmbed("Settings");
@@ -1860,10 +1851,9 @@ public class SettingsExecute {
 			);
 			return eb;
 		} catch (Exception ignored) {
-			return defaultEmbed("Error")
-				.setDescription(
-					"Invalid requirement number. Run `" + guildPrefix + "settings apply` to see the current apply requirements"
-				);
+			return invalidEmbed(
+				"Invalid requirement number. Run `" + guildPrefix + "settings apply` to see the current apply requirements"
+			);
 		}
 	}
 
@@ -1872,11 +1862,11 @@ public class SettingsExecute {
 		try {
 			currentReqs = database.getApplyReqs(event.getGuild().getId(), name).getAsJsonArray();
 		} catch (Exception ignored) {
-			return defaultEmbed("Error").setDescription("Unable to get current settings");
+			return invalidEmbed("Unable to get current settings");
 		}
 
 		if (currentReqs.size() >= 3) {
-			return defaultEmbed("Error").setDescription("You can only have up to 3 requirements");
+			return invalidEmbed("You can only have up to 3 requirements");
 		}
 
 		int slayerReq = 0;
@@ -1907,7 +1897,7 @@ public class SettingsExecute {
 		int responseCode = database.setApplyReqs(event.getGuild().getId(), name, currentReqs);
 
 		if (responseCode != 200) {
-			return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+			return invalidEmbed("API returned response code " + responseCode);
 		}
 
 		EmbedBuilder eb = defaultEmbed("Settings");
@@ -1960,7 +1950,7 @@ public class SettingsExecute {
 		if (!enable) {
 			int responseCode = updateMee6Enable("false");
 			if (responseCode != 200) {
-				return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+				return invalidEmbed("API returned response code " + responseCode);
 			}
 
 			return defaultEmbed("Settings").setDescription("Disabled Mee6 roles");
@@ -1969,7 +1959,7 @@ public class SettingsExecute {
 		JsonElement curSettings = database.getMee6Settings(event.getGuild().getId());
 
 		if (higherDepth(curSettings, "mee6Ranks").getAsJsonArray().size() == 0) {
-			return defaultEmbed("Error").setDescription("There must be at least one leveling role set");
+			return invalidEmbed("There must be at least one leveling role set");
 		}
 
 		try {
@@ -1979,15 +1969,15 @@ public class SettingsExecute {
 					.size() ==
 				0
 			) {
-				return defaultEmbed("Error").setDescription("The Mee6 isn't public for this server");
+				return invalidEmbed("The Mee6 isn't public for this server");
 			}
 		} catch (Exception e) {
-			return defaultEmbed("Error").setDescription("The Mee6 isn't public for this server");
+			return invalidEmbed("The Mee6 isn't public for this server");
 		}
 
 		int responseCode = updateMee6Enable("true");
 		if (responseCode != 200) {
-			return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+			return invalidEmbed("API returned response code " + responseCode);
 		}
 
 		return defaultEmbed("Settings").setDescription("Enabled Mee6 roles");
@@ -2001,11 +1991,11 @@ public class SettingsExecute {
 				try {
 					intLevel = Integer.parseInt(level);
 				} catch (Exception e) {
-					return defaultEmbed("Error").setDescription("The level must be an integer");
+					return invalidEmbed("The level must be an integer");
 				}
 
 				if (intLevel <= 0 || intLevel >= 250) {
-					return defaultEmbed("Error").setDescription("The level must be more than 0 and less than 250");
+					return invalidEmbed("The level must be more than 0 and less than 250");
 				}
 
 				JsonObject curSettings = database.getMee6Settings(event.getGuild().getId()).getAsJsonObject();
@@ -2028,7 +2018,7 @@ public class SettingsExecute {
 
 				int responseCode = database.setMee6Settings(event.getGuild().getId(), curSettings);
 				if (responseCode != 200) {
-					return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+					return invalidEmbed("API returned response code " + responseCode);
 				}
 
 				EmbedBuilder eb = defaultEmbed("Settings");
@@ -2067,7 +2057,7 @@ public class SettingsExecute {
 
 					int responseCode = database.setMee6Settings(event.getGuild().getId(), curSettings);
 					if (responseCode != 200) {
-						return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+						return invalidEmbed("API returned response code " + responseCode);
 					}
 
 					EmbedBuilder eb = defaultEmbed("Settings");
@@ -2170,8 +2160,8 @@ public class SettingsExecute {
 						return currentSettingValue.equals("true") ? "• Enabled" : "• Disabled";
 					case "guildId":
 						try {
-							JsonElement guildJson = Hypixel.getGuildFromId(currentSettingValue, true);
-							return higherDepth(guildJson, "guild.name").getAsString();
+							HypixelResponse guildJson = getGuildFromId(currentSettingValue);
+							return guildJson.get("guild.name").getAsString();
 						} catch (Exception e) {
 							return ("Error finding guild associated with " + currentSettingValue + " id");
 						}
@@ -2188,13 +2178,13 @@ public class SettingsExecute {
 
 	private EmbedBuilder setPrefix(String prefix) {
 		if (prefix.length() == 0 || prefix.length() > 5) {
-			return defaultEmbed("Error").setDescription("The prefix must be a least on character and no more than 5");
+			return invalidEmbed("The prefix must be a least on character and no more than 5");
 		}
 
 		int responseCode = database.setPrefix(event.getGuild().getId(), prefix);
 
 		if (responseCode != 200) {
-			return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+			return invalidEmbed("API returned response code " + responseCode);
 		}
 
 		guildMap.get(event.getGuild().getId()).setPrefix(prefix);
@@ -2206,7 +2196,7 @@ public class SettingsExecute {
 		int responseCode = database.setPrefix(event.getGuild().getId(), null);
 
 		if (responseCode != 200) {
-			return defaultEmbed("Error").setDescription("API returned response code " + responseCode);
+			return invalidEmbed("API returned response code " + responseCode);
 		}
 
 		guildMap.get(event.getGuild().getId()).setPrefix(DEFAULT_PREFIX);

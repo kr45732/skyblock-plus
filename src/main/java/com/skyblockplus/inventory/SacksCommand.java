@@ -68,6 +68,6 @@ public class SacksCommand extends Command {
 				return null;
 			}
 		}
-		return defaultEmbed("Unable to fetch player data");
+		return invalidEmbed(player.getFailCause());
 	}
 }

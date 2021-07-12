@@ -3,7 +3,9 @@ package com.skyblockplus.features.skyblockevent;
 import static com.skyblockplus.Main.*;
 import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.utils.Hypixel.*;
 import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.invalidEmbed;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -14,8 +16,8 @@ import com.skyblockplus.api.serversettings.skyblockevent.RunningEvent;
 import com.skyblockplus.api.serversettings.skyblockevent.SbEvent;
 import com.skyblockplus.features.listeners.AutomaticGuild;
 import com.skyblockplus.utils.CustomPaginator;
-import com.skyblockplus.utils.Hypixel;
 import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import java.time.Duration;
 import java.time.Instant;
@@ -109,7 +111,7 @@ public class SkyblockEventCommand extends Command {
 		for (JsonElement guildMember : membersArr) {
 			String guildMemberUuid = higherDepth(guildMember, "uuid").getAsString();
 
-			CompletableFuture<String> guildMemberUsername = Hypixel.asyncUuidToUsername(guildMemberUuid);
+			CompletableFuture<String> guildMemberUsername = asyncUuidToUsername(guildMemberUuid);
 			futuresList.add(
 				guildMemberUsername.thenApply(
 					guildMemberUsernameResponse -> {
@@ -120,7 +122,7 @@ public class SkyblockEventCommand extends Command {
 							}
 						} catch (Exception ignored) {}
 
-						CompletableFuture<JsonElement> guildMemberProfileJson = Hypixel.asyncSkyblockProfilesFromUuid(
+						CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(
 							guildMemberUuid,
 							HYPIXEL_API_KEY
 						);
@@ -445,108 +447,106 @@ public class SkyblockEventCommand extends Command {
 				}
 
 				if (database.eventHasMemberByUuid(event.getGuild().getId(), uuid)) {
-					return defaultEmbed("Error")
-						.setDescription(
-							"You are already in the event! If you want to leave or change profile use `" +
-							getGuildPrefix(event.getGuild().getId()) +
-							"event leave`"
-						);
+					return invalidEmbed(
+						"You are already in the event! If you want to leave or change profile use `" +
+						getGuildPrefix(event.getGuild().getId()) +
+						"event leave`"
+					);
 				}
 
-				JsonElement guildJson = Hypixel.getGuildFromPlayer(uuid, true);
+				HypixelResponse guildJson = getGuildFromPlayer(uuid);
 
-				if(guildJson == null){
-					return defaultEmbed("Error").setDescription("You must be in the guild to join the event");
+				if (guildJson.isNotValid()) {
+					return invalidEmbed(guildJson.failCause);
 				}
 
-				if (higherDepth(guildJson, "guild._id").getAsString().equals(database.getSkyblockEventGuildId(event.getGuild().getId()))) {
-					Player player = args.length == 3 ? new Player(username, args[2]) : new Player(username);
+				if (!guildJson.get("_id").getAsString().equals(database.getSkyblockEventGuildId(event.getGuild().getId()))) {
+					return invalidEmbed("You must be in the guild to join the event");
+				}
+				Player player = args.length == 3 ? new Player(username, args[2]) : new Player(username);
 
-					if (player.isValid()) {
+				if (player.isValid()) {
+					try {
 						double startingAmount = 0;
 						String startingAmountFormatted = "";
 						String eventType = higherDepth(database.getRunningEventSettings(event.getGuild().getId()), "eventType")
 							.getAsString();
-						try {
-							switch (eventType) {
-								case "slayer":
-									{
-										startingAmount = player.getTotalSlayer();
-										startingAmountFormatted = formatNumber(startingAmount) + " total slayer xp";
-										break;
-									}
-								case "skills":
-									{
-										startingAmount = player.getTotalSkillsXp();
-										startingAmountFormatted = formatNumber(startingAmount) + " total skills xp";
-										break;
-									}
-								case "catacombs":
-									{
-										startingAmount = player.getCatacombsSkill().totalSkillExp;
-										startingAmountFormatted = formatNumber(startingAmount) + " total catacombs xp";
-										break;
-									}
-								case "weight":
-									{
-										startingAmount = player.getWeight();
-										if (player.getTotalSkillsXp() == -1) {
-											startingAmount = -1;
-										}
-										startingAmountFormatted = formatNumber(startingAmount) + " weight";
-										break;
-									}
-								default:
-									{
-										if (eventType.startsWith("collection.")) {
-											startingAmount =
-												higherDepth(player.getProfileJson(), eventType.split("-")[0]) != null
-													? higherDepth(player.getProfileJson(), eventType.split("-")[0]).getAsDouble()
-													: 0;
-											startingAmountFormatted =
-												formatNumber(startingAmount) + " " + eventType.split("-")[1] + " collection";
-											break;
-										}
-									}
-							}
 
-							if (startingAmount != -1) {
-								int code = database.addEventMemberToRunningEvent(
-									event.getGuild().getId(),
-									new EventMember(username, uuid, "" + startingAmount, player.getProfileName())
-								);
-
-								if (code == 200) {
-									return defaultEmbed("Success")
-										.setDescription(
-											"**Username:** " +
-											username +
-											"\n**Profile:** " +
-											player.getProfileName() +
-											"\n**Starting amount:** " +
-											startingAmountFormatted
-										);
-								} else {
-									return defaultEmbed("Error").setDescription("API returned code " + code);
+						switch (eventType) {
+							case "slayer":
+								{
+									startingAmount = player.getTotalSlayer();
+									startingAmountFormatted = formatNumber(startingAmount) + " total slayer xp";
+									break;
 								}
-							} else {
-								return defaultEmbed("Error").setDescription("Please enable your skills API and retry");
-							}
-						} catch (Exception ignored) {}
-						return defaultEmbed("Error").setDescription("Unable to fetch player data");
-					} else {
-						return defaultEmbed("Error").setDescription("Invalid player");
-					}
-				} else {
-					return defaultEmbed("Error").setDescription("You must be in the guild to join the event");
+							case "skills":
+								{
+									startingAmount = player.getTotalSkillsXp();
+									startingAmountFormatted = formatNumber(startingAmount) + " total skills xp";
+									break;
+								}
+							case "catacombs":
+								{
+									startingAmount = player.getCatacombsSkill().totalSkillExp;
+									startingAmountFormatted = formatNumber(startingAmount) + " total catacombs xp";
+									break;
+								}
+							case "weight":
+								{
+									startingAmount = player.getWeight();
+									if (player.getTotalSkillsXp() == -1) {
+										startingAmount = -1;
+									}
+									startingAmountFormatted = formatNumber(startingAmount) + " weight";
+									break;
+								}
+							default:
+								{
+									if (eventType.startsWith("collection.")) {
+										startingAmount =
+											higherDepth(player.getProfileJson(), eventType.split("-")[0]) != null
+												? higherDepth(player.getProfileJson(), eventType.split("-")[0]).getAsDouble()
+												: 0;
+										startingAmountFormatted =
+											formatNumber(startingAmount) + " " + eventType.split("-")[1] + " collection";
+										break;
+									}
+								}
+						}
+
+						if (startingAmount == -1) {
+							return invalidEmbed("Please enable your skills API and retry");
+						}
+
+						int code = database.addEventMemberToRunningEvent(
+							event.getGuild().getId(),
+							new EventMember(username, uuid, "" + startingAmount, player.getProfileName())
+						);
+
+						if (code == 200) {
+							return defaultEmbed("Success")
+								.setDescription(
+									"**Username:** " +
+									username +
+									"\n**Profile:** " +
+									player.getProfileName() +
+									"\n**Starting amount:** " +
+									startingAmountFormatted
+								);
+						} else {
+							return invalidEmbed("API returned code " + code);
+						}
+					} catch (Exception ignored) {}
 				}
+
+				return invalidEmbed(player.getFailCause());
 			} else {
-				return defaultEmbed(
+				return invalidEmbed(
 					"You must be linked to run this command. Use `" + getGuildPrefix(event.getGuild().getId()) + "link [IGN]` to link"
 				);
 			}
 		} else {
-			return defaultEmbed("No event running");
+			return invalidEmbed("No event running");
 		}
 	}
 
@@ -555,9 +555,11 @@ public class SkyblockEventCommand extends Command {
 			JsonElement currentSettings = database.getRunningEventSettings(guildId);
 			EmbedBuilder eb = defaultEmbed("Current Event");
 
-			JsonElement guildJson = Hypixel.getGuildFromId(higherDepth(currentSettings, "eventGuildId").getAsString(), true);
-
-			eb.addField("Guild", higherDepth(guildJson, "guild.name").getAsString(), false);
+			HypixelResponse guildJson = getGuildFromId(higherDepth(currentSettings, "eventGuildId").getAsString());
+			if (guildJson.isNotValid()) {
+				return invalidEmbed(guildJson.failCause);
+			}
+			eb.addField("Guild", guildJson.get("name").getAsString(), false);
 			String eventType = higherDepth(currentSettings, "eventType").getAsString();
 			eb.addField(
 				"Event Type",
@@ -613,9 +615,9 @@ public class SkyblockEventCommand extends Command {
 			guildMap.get(event.getGuild().getId()).createSkyblockEvent(event);
 			return null;
 		} else if (sbEventActive) {
-			return defaultEmbed("Error").setDescription("Event already running");
+			return invalidEmbed("Event already running");
 		}
 
-		return defaultEmbed("Error").setDescription("Cannot find server");
+		return invalidEmbed("Cannot find server");
 	}
 }

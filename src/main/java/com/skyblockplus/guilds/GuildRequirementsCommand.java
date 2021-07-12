@@ -50,14 +50,13 @@ public class GuildRequirementsCommand extends Command {
 
 					ebMessage
 						.editMessageEmbeds(
-							defaultEmbed("Error")
-								.setDescription(
-									(
-										ebStr != null
-											? args[1] + " is an invalid name\nValid options are: " + ebStr
-											: "No requirements set for " + args[1]
-									)
+							invalidEmbed(
+								(
+									ebStr != null
+										? args[1] + " is an invalid name\nValid options are: " + ebStr
+										: "No requirements set for " + args[1]
 								)
+							)
 								.build()
 						)
 						.queue();
@@ -65,7 +64,7 @@ public class GuildRequirementsCommand extends Command {
 				}
 
 				if (guildReqs.size() == 0) {
-					ebMessage.editMessageEmbeds(defaultEmbed("Error").setDescription("No requirements set for " + args[1]).build()).queue();
+					ebMessage.editMessageEmbeds(invalidEmbed("No requirements set for " + args[1]).build()).queue();
 					return;
 				}
 

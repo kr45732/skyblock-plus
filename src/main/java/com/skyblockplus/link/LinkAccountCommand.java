@@ -1,6 +1,7 @@
 package com.skyblockplus.link;
 
 import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.Hypixel.getGuildFromPlayer;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -9,8 +10,8 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
 import com.skyblockplus.api.serversettings.automatedguild.GuildRole;
-import com.skyblockplus.utils.Hypixel;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
+import com.skyblockplus.utils.structs.HypixelResponse;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,91 +30,81 @@ public class LinkAccountCommand extends Command {
 
 	public static EmbedBuilder linkAccount(String username, Member member, Guild guild) {
 		DiscordInfoStruct playerInfo = getPlayerDiscordInfo(username);
-		if (playerInfo != null) {
-			if (!member.getUser().getAsTag().equals(playerInfo.discordTag)) {
-				EmbedBuilder eb = defaultEmbed("Discord tag mismatch");
-				eb.setDescription(
-					"Account " +
-					playerInfo.minecraftUsername +
-					" is linked with the Discord tag " +
-					playerInfo.discordTag +
-					"\nYour current Discord tag is " +
-					member.getUser().getAsTag()
-				);
-				return eb;
-			}
+		if (playerInfo.isNotValid()) {
+			return invalidEmbed(playerInfo.failCause);
+		}
 
-			LinkedAccountModel toAdd = new LinkedAccountModel(
-				"" + Instant.now().toEpochMilli(),
-				member.getId(),
-				playerInfo.minecraftUuid,
-				playerInfo.minecraftUsername
+		if (!member.getUser().getAsTag().equals(playerInfo.discordTag)) {
+			EmbedBuilder eb = defaultEmbed("Discord tag mismatch");
+			eb.setDescription(
+				"Account " +
+				playerInfo.minecraftUsername +
+				" is linked with the Discord tag " +
+				playerInfo.discordTag +
+				"\nYour current Discord tag is " +
+				member.getUser().getAsTag()
 			);
+			return eb;
+		}
 
-			if (database.addLinkedUser(toAdd) == 200) {
-				try {
-					if (
-						!higherDepth(database.getVerifySettings(guild.getId()), "verifiedNickname").getAsString().equalsIgnoreCase("none")
-					) {
-						String nicknameTemplate = higherDepth(database.getVerifySettings(guild.getId()), "verifiedNickname").getAsString();
-						nicknameTemplate = nicknameTemplate.replace("[IGN]", playerInfo.minecraftUsername);
-						if (nicknameTemplate.contains("[GUILD_RANK]")) {
-							try {
-								JsonElement playerGuild = Hypixel.getGuildFromPlayer(playerInfo.minecraftUuid, true);
-								if(playerGuild != null){
-									List<String> settingsGuildId = database
-											.getAllGuildRoles(guild.getId())
-											.stream()
-											.map(GuildRole::getGuildId)
-											.collect(Collectors.toList());
+		LinkedAccountModel toAdd = new LinkedAccountModel(
+			"" + Instant.now().toEpochMilli(),
+			member.getId(),
+			playerInfo.minecraftUuid,
+			playerInfo.minecraftUsername
+		);
 
-									if (settingsGuildId.contains(higherDepth(playerGuild, "_id").getAsString())) {
-										JsonArray guildMembers = higherDepth(playerGuild, "members").getAsJsonArray();
-										for (JsonElement guildMember : guildMembers) {
-											if (higherDepth(guildMember, "uuid").getAsString().equals(playerInfo.minecraftUuid)) {
-												nicknameTemplate =
-														nicknameTemplate.replace("[GUILD_RANK]", higherDepth(guildMember, "rank").getAsString());
-												break;
-											}
+		if (database.addLinkedUser(toAdd) == 200) {
+			try {
+				if (!higherDepth(database.getVerifySettings(guild.getId()), "verifiedNickname").getAsString().equalsIgnoreCase("none")) {
+					String nicknameTemplate = higherDepth(database.getVerifySettings(guild.getId()), "verifiedNickname").getAsString();
+					nicknameTemplate = nicknameTemplate.replace("[IGN]", playerInfo.minecraftUsername);
+					if (nicknameTemplate.contains("[GUILD_RANK]")) {
+						try {
+							HypixelResponse playerGuild = getGuildFromPlayer(playerInfo.minecraftUuid);
+							if (!playerGuild.isNotValid()) {
+								List<String> settingsGuildId = database
+									.getAllGuildRoles(guild.getId())
+									.stream()
+									.map(GuildRole::getGuildId)
+									.collect(Collectors.toList());
+
+								if (settingsGuildId.contains(playerGuild.get("_id").getAsString())) {
+									JsonArray guildMembers = playerGuild.get("members").getAsJsonArray();
+									for (JsonElement guildMember : guildMembers) {
+										if (higherDepth(guildMember, "uuid").getAsString().equals(playerInfo.minecraftUuid)) {
+											nicknameTemplate =
+												nicknameTemplate.replace("[GUILD_RANK]", higherDepth(guildMember, "rank").getAsString());
+											break;
 										}
 									}
 								}
-							} catch (Exception ignored) {}
-						}
-
-						member.modifyNickname(nicknameTemplate).queue();
+							}
+						} catch (Exception ignored) {}
 					}
-				} catch (Exception ignored) {}
 
-				try {
-					JsonArray verifyRoles = higherDepth(database.getVerifySettings(guild.getId()), "verifiedRoles").getAsJsonArray();
-					for (JsonElement verifyRole : verifyRoles) {
-						try {
-							guild.addRoleToMember(member.getId(), guild.getRoleById(verifyRole.getAsString())).complete();
-						} catch (Exception e) {
-							System.out.println("== Stack Trace (linkAccount - add role inside for - " + member.getId() + ") ==");
-							e.printStackTrace();
-						}
+					member.modifyNickname(nicknameTemplate).queue();
+				}
+			} catch (Exception ignored) {}
+
+			try {
+				JsonArray verifyRoles = higherDepth(database.getVerifySettings(guild.getId()), "verifiedRoles").getAsJsonArray();
+				for (JsonElement verifyRole : verifyRoles) {
+					try {
+						guild.addRoleToMember(member.getId(), guild.getRoleById(verifyRole.getAsString())).complete();
+					} catch (Exception e) {
+						System.out.println("== Stack Trace (linkAccount - add role inside for - " + member.getId() + ") ==");
+						e.printStackTrace();
 					}
-				} catch (Exception ignored) {}
+				}
+			} catch (Exception ignored) {}
 
-				return defaultEmbed("Success")
-					.setDescription(
-						"`" + member.getUser().getAsTag() + "` was linked to `" + fixUsername(playerInfo.minecraftUsername) + "`"
-					);
-			} else {
-				return defaultEmbed("Error")
-					.setDescription(
-						"Error linking `" + member.getUser().getAsTag() + " to `" + fixUsername(playerInfo.minecraftUsername) + "`"
-					);
-			}
-		}
-
-		return defaultEmbed("Error")
-			.setDescription(
-				username +
-				" is not linked to a Discord account. For help on how to link view [__**this**__](https://streamable.com/sdq8tp) video"
+			return invalidEmbed("`" + member.getUser().getAsTag() + "` was linked to `" + fixUsername(playerInfo.minecraftUsername) + "`");
+		} else {
+			return invalidEmbed(
+				"Error linking `" + member.getUser().getAsTag() + " to `" + fixUsername(playerInfo.minecraftUsername) + "`"
 			);
+		}
 	}
 
 	public static EmbedBuilder getLinkedAccount(User user) {
@@ -125,7 +116,7 @@ public class LinkAccountCommand extends Command {
 					"`" + user.getAsTag() + "` is linked to `" + (higherDepth(userInfo, "minecraftUsername").getAsString()) + "`"
 				);
 		} catch (Exception e) {
-			return defaultEmbed("Error").setDescription("`" + user.getAsTag() + "` is not linked");
+			return invalidEmbed("`" + user.getAsTag() + "` is not linked");
 		}
 	}
 

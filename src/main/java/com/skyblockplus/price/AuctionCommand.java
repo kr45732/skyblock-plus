@@ -1,15 +1,16 @@
 package com.skyblockplus.price;
 
 import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.Player.skyblockStatsLink;
+import static com.skyblockplus.utils.Hypixel.*;
 import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.skyblockStatsLink;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.CustomPaginator;
-import com.skyblockplus.utils.Hypixel;
+import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.time.Duration;
@@ -31,15 +32,16 @@ public class AuctionCommand extends Command {
 	}
 
 	public static EmbedBuilder getPlayerAuction(String username, User user, MessageChannel channel, InteractionHook hook) {
-		UsernameUuidStruct usernameUuidStruct = Hypixel.usernameToUuid(username);
-		if (usernameUuidStruct == null) {
-			return defaultEmbed("Error fetching player data");
+		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
+		if (usernameUuidStruct.isNotValid()) {
+			return invalidEmbed(usernameUuidStruct.failCause);
 		}
 
-		JsonArray auctionsArray = Hypixel.getSkyblockAuctionFromPlayer(usernameUuidStruct.playerUuid);
-		if(auctionsArray==null) {
-			return defaultEmbed("Error fetching player data");
+		HypixelResponse auctionsResponse = getSkyblockAuctionFromPlayer(usernameUuidStruct.playerUuid);
+		if (auctionsResponse.isNotValid()) {
+			return invalidEmbed(auctionsResponse.failCause);
 		}
+		JsonArray auctionsArray = auctionsResponse.response.getAsJsonArray();
 
 		String[][] auctions = new String[auctionsArray.size()][2];
 
@@ -128,12 +130,12 @@ public class AuctionCommand extends Command {
 	}
 
 	public static EmbedBuilder getAuctionByUuid(String auctionUuid) {
-		JsonArray auctionArray =  Hypixel.getSkyblockAuctionFromUuid(auctionUuid);
-		if (auctionArray == null || auctionArray.size() == 0) {
-			return defaultEmbed("Error").setDescription("Invalid auction UUID");
+		HypixelResponse auctionResponse = getSkyblockAuctionFromUuid(auctionUuid);
+		if (auctionResponse.isNotValid()) {
+			return invalidEmbed(auctionResponse.failCause);
 		}
 
-	 	JsonElement	auctionJson = auctionArray.get(0);
+		JsonElement auctionJson = auctionResponse.response.getAsJsonArray().get(0);
 		EmbedBuilder eb = defaultEmbed("Auction from UUID");
 		String itemName = higherDepth(auctionJson, "item_name").getAsString();
 
@@ -160,7 +162,7 @@ public class AuctionCommand extends Command {
 		String timeUntil = instantToDHM(duration);
 
 		String ebStr = "**Item name:** " + itemName;
-		ebStr += "\n**Seller:** " + Hypixel.uuidToUsername(higherDepth(auctionJson, "auctioneer").getAsString());
+		ebStr += "\n**Seller:** " + uuidToUsername(higherDepth(auctionJson, "auctioneer").getAsString());
 		ebStr += "\n**Command:** `/ah " + higherDepth(auctionJson, "uuid").getAsString() + "`";
 		long highestBid = higherDepth(auctionJson, "highest_bid_amount").getAsInt();
 		long startingBid = higherDepth(auctionJson, "starting_bid").getAsInt();
@@ -174,8 +176,7 @@ public class AuctionCommand extends Command {
 				ebStr += "\n**Current bid:** " + simplifyNumber(highestBid) + " | Ending in " + timeUntil;
 				ebStr +=
 					bidsArr.size() > 0
-						? "\n**Highest bidder:** " +
-						Hypixel.uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString())
+						? "\n**Highest bidder:** " + uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString())
 						: "";
 			}
 		} else {
@@ -184,7 +185,7 @@ public class AuctionCommand extends Command {
 					"\n**Auction sold** for " +
 					simplifyNumber(highestBid) +
 					" coins to " +
-					Hypixel.uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString());
+					uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString());
 			} else {
 				ebStr = "\n**Auction did not sell**";
 			}

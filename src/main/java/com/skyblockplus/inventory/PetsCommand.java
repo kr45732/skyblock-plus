@@ -81,6 +81,6 @@ public class PetsCommand extends Command {
 			paginateBuilder.build().paginate(event.getChannel(), 0);
 			return null;
 		}
-		return defaultEmbed("Unable to fetch player data");
+		return invalidEmbed(player.getFailCause());
 	}
 }

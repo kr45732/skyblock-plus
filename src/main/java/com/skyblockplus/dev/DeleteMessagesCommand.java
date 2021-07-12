@@ -5,7 +5,6 @@ import static com.skyblockplus.utils.Utils.*;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.Message;
 
@@ -33,13 +32,12 @@ public class DeleteMessagesCommand extends Command {
 
 						event
 							.getChannel()
-							.sendMessageEmbeds(
-								defaultEmbed("Purged messages").build()
-							)
-							.complete().delete().queueAfter(3, TimeUnit.SECONDS);
+							.sendMessageEmbeds(defaultEmbed("Purged messages").build())
+							.complete()
+							.delete()
+							.queueAfter(3, TimeUnit.SECONDS);
 						return;
-					} catch (Exception ignored) {
-					}
+					} catch (Exception ignored) {}
 				}
 
 				event.getChannel().sendMessageEmbeds(errorEmbed(this.name).build()).queue();

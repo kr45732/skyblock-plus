@@ -2,15 +2,15 @@ package com.skyblockplus.price;
 
 import static com.skyblockplus.utils.Constants.enchantNames;
 import static com.skyblockplus.utils.Constants.petNames;
-import static com.skyblockplus.utils.Player.getGenericInventoryMap;
+import static com.skyblockplus.utils.Hypixel.uuidToUsername;
 import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.getGenericInventoryMap;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.utils.Hypixel;
 import com.skyblockplus.utils.structs.InvItem;
 import java.io.InputStreamReader;
 import java.net.URI;
@@ -66,7 +66,7 @@ public class QueryAuctionCommand extends Command {
 				JsonArray ahQueryArr = queryAhApi("enchanted book");
 
 				if (ahQueryArr == null) {
-					return defaultEmbed("Error").setDescription("Error fetching auctions data");
+					return invalidEmbed("Error fetching auctions data");
 				}
 
 				EmbedBuilder eb = defaultEmbed("Query Auctions");
@@ -86,8 +86,7 @@ public class QueryAuctionCommand extends Command {
 								String lowestBinStr = "";
 								lowestBinStr += "**Name:** " + enchantName.replaceAll("[_;]", " ");
 								lowestBinStr += "\n**Price:** " + simplifyNumber(higherDepth(lowestBinAh, "starting_bid").getAsDouble());
-								lowestBinStr +=
-									"\n**Seller:** " + Hypixel.uuidToUsername(higherDepth(lowestBinAh, "auctioneer").getAsString());
+								lowestBinStr += "\n**Seller:** " + uuidToUsername(higherDepth(lowestBinAh, "auctioneer").getAsString());
 								lowestBinStr += "\n**Auction:** `/ah " + higherDepth(lowestBinAh, "uuid").getAsString() + "`";
 
 								lowestBinStr += "\n**Ends in:** " + instantToDHM(duration);
@@ -130,7 +129,7 @@ public class QueryAuctionCommand extends Command {
 				JsonArray ahQueryArr = queryAhApi(query);
 
 				if (ahQueryArr == null) {
-					return defaultEmbed("Error").setDescription("Error fetching auctions data");
+					return invalidEmbed("Error fetching auctions data");
 				}
 
 				EmbedBuilder eb = defaultEmbed("Query Auctions");
@@ -157,7 +156,7 @@ public class QueryAuctionCommand extends Command {
 								" " +
 								higherDepth(lowestBinAh, "item_name").getAsString();
 							lowestBinStr += "\n**Price:** " + simplifyNumber(higherDepth(lowestBinAh, "starting_bid").getAsDouble());
-							lowestBinStr += "\n**Seller:** " + Hypixel.uuidToUsername(higherDepth(lowestBinAh, "auctioneer").getAsString());
+							lowestBinStr += "\n**Seller:** " + uuidToUsername(higherDepth(lowestBinAh, "auctioneer").getAsString());
 							lowestBinStr += "\n**Auction:** `/ah " + higherDepth(lowestBinAh, "uuid").getAsString() + "`";
 
 							lowestBinStr += "\n**Ends in:** " + instantToDHM(duration);
@@ -175,7 +174,7 @@ public class QueryAuctionCommand extends Command {
 		JsonArray ahQueryArr = queryAhApi(query);
 
 		if (ahQueryArr == null) {
-			return defaultEmbed("Error").setDescription("Error fetching auctions data");
+			return invalidEmbed("Error fetching auctions data");
 		}
 
 		EmbedBuilder eb = defaultEmbed("Query Auctions").setDescription("Found `" + ahQueryArr.size() + "` bins matching `" + query + "`");
@@ -190,7 +189,7 @@ public class QueryAuctionCommand extends Command {
 			String lowestBinStr = "";
 			lowestBinStr += "**Name:** " + higherDepth(lowestBinAh, "item_name").getAsString();
 			lowestBinStr += "\n**Price:** " + simplifyNumber(higherDepth(lowestBinAh, "starting_bid").getAsDouble());
-			lowestBinStr += "\n**Seller:** " + Hypixel.uuidToUsername(higherDepth(lowestBinAh, "auctioneer").getAsString());
+			lowestBinStr += "\n**Seller:** " + uuidToUsername(higherDepth(lowestBinAh, "auctioneer").getAsString());
 			lowestBinStr += "\n**Auction:** `/ah " + higherDepth(lowestBinAh, "uuid").getAsString() + "`";
 
 			lowestBinStr += "\n**Ends in:** " + instantToDHM(duration);

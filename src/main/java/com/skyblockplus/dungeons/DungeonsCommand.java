@@ -60,10 +60,11 @@ public class DungeonsCommand extends Command {
 
 				return eb;
 			} catch (NullPointerException e) {
-				return defaultEmbed("Error fetching player dungeons data");
+				return invalidEmbed("Player has not played dungeons");
 			}
 		}
-		return defaultEmbed("Unable to fetch player data");
+
+		return invalidEmbed(player.getFailCause());
 	}
 
 	@Override

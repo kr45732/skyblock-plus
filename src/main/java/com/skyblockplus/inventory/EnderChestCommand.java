@@ -50,7 +50,7 @@ public class EnderChestCommand extends Command {
 
 						jda.addEventListener(new InventoryPaginator(playerEnderChest, ebMessage.getChannel(), event.getAuthor()));
 					} else {
-						ebMessage.editMessageEmbeds(defaultEmbed("Error").setDescription("Unable to fetch player data").build()).queue();
+						ebMessage.editMessageEmbeds(invalidEmbed("Unable to fetch player data").build()).queue();
 					}
 					return;
 				}

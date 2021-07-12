@@ -4,6 +4,7 @@ import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.features.skyblockevent.SkyblockEventCommand.endSkyblockEvent;
+import static com.skyblockplus.utils.Hypixel.getGuildFromId;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.Gson;
@@ -20,6 +21,7 @@ import com.skyblockplus.features.apply.ApplyGuild;
 import com.skyblockplus.features.apply.ApplyUser;
 import com.skyblockplus.features.skyblockevent.SkyblockEvent;
 import com.skyblockplus.features.verify.VerifyGuild;
+import com.skyblockplus.utils.structs.HypixelResponse;
 import java.io.File;
 import java.time.Duration;
 import java.time.Instant;
@@ -28,8 +30,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import com.skyblockplus.utils.Hypixel;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
@@ -374,16 +374,12 @@ public class AutomaticGuild {
 			}
 
 			for (GuildRole currentSetting : currentSettings) {
-				JsonElement guildJson = null;
-				JsonArray guildMembers = null;
-				try {
-					guildJson = Hypixel.getGuildFromId(currentSetting.getGuildId(), true);
-					guildMembers = higherDepth(guildJson, "guild.members").getAsJsonArray();
-				} catch (Exception ignored) {}
-
-				if (guildMembers == null) {
+				HypixelResponse response = getGuildFromId(currentSetting.getGuildId());
+				if (response.isNotValid()) {
 					continue;
 				}
+
+				JsonArray guildMembers = response.get("members").getAsJsonArray();
 
 				boolean enableGuildRole = currentSetting.getEnableGuildRole().equalsIgnoreCase("true");
 				boolean enableGuildRanks = currentSetting.getEnableGuildRanks().equalsIgnoreCase("true");
@@ -470,7 +466,7 @@ public class AutomaticGuild {
 					} else {
 						curVc
 							.getManager()
-							.setName(higherDepth(guildJson, "guild.name").getAsString() + " Members: " + guildMembers.size() + "/125")
+							.setName(response.get("name").getAsString() + " Members: " + guildMembers.size() + "/125")
 							.complete();
 					}
 

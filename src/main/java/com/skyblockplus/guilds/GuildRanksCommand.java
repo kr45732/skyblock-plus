@@ -1,6 +1,8 @@
 package com.skyblockplus.guilds;
 
 import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.utils.Hypixel.getGuildFromPlayer;
+import static com.skyblockplus.utils.Hypixel.usernameToUuid;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -9,7 +11,7 @@ import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.CustomPaginator;
-import com.skyblockplus.utils.Hypixel;
+import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.io.FileReader;
@@ -60,19 +62,20 @@ public class GuildRanksCommand extends Command {
 	}
 
 	private EmbedBuilder getLeaderboard(String username, CommandEvent event) {
-		UsernameUuidStruct usernameUuidStruct = Hypixel.usernameToUuid(username);
-		if (usernameUuidStruct == null) {
-			return null;
+		UsernameUuidStruct usernameUuid = usernameToUuid(username);
+		if (usernameUuid.isNotValid()) {
+			return invalidEmbed(usernameUuid.failCause);
 		}
 
-		JsonElement guildJson = Hypixel.getGuildFromPlayer(usernameUuidStruct.playerUuid, true);
-
-		if(guildJson == null){
-			return defaultEmbed(usernameUuidStruct.playerUsername + " is not in a guild");
+		HypixelResponse guildResponse = getGuildFromPlayer(usernameUuid.playerUuid);
+		if (guildResponse.isNotValid()) {
+			return invalidEmbed(guildResponse.failCause);
 		}
 
-		String guildId = higherDepth(guildJson, "guild._id").getAsString();
-		String guildName = higherDepth(guildJson, "guild.name").getAsString();
+		JsonElement guildJson = guildResponse.response;
+
+		String guildId = higherDepth(guildJson, "_id").getAsString();
+		String guildName = higherDepth(guildJson, "name").getAsString();
 		if (!guildName.equals("Skyblock Forceful") && !guildName.equals("Skyblock Gods")) {
 			return defaultEmbed("Only for SBF or SBG right now");
 		}
@@ -102,7 +105,7 @@ public class GuildRanksCommand extends Command {
 
 		boolean ignoreStaff = higherDepth(lbSettings, "ignore_staff").getAsBoolean();
 
-		JsonArray guildMembers = higherDepth(guildJson, "guild.members").getAsJsonArray();
+		JsonArray guildMembers = higherDepth(guildJson, "members").getAsJsonArray();
 		Map<String, String> ranksMap = new HashMap<>();
 		for (JsonElement guildM : guildMembers) {
 			ranksMap.put(higherDepth(guildM, "uuid").getAsString(), higherDepth(guildM, "rank").getAsString().toLowerCase());

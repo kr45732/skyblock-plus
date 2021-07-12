@@ -1,7 +1,6 @@
 package com.skyblockplus.utils.slashcommands;
 
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.logCommand;
+import static com.skyblockplus.utils.Utils.*;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -61,11 +60,11 @@ public class SlashCommandExecutedEvent {
 	}
 
 	public EmbedBuilder disabledCommandMessage() {
-		return defaultEmbed("Error").setDescription("❌ This command is disabled");
+		return invalidEmbed("❌ This command is disabled");
 	}
 
 	public EmbedBuilder invalidCommandMessage() {
-		return defaultEmbed("Error").setDescription("❌ Invalid Command");
+		return invalidEmbed("❌ Invalid Command");
 	}
 
 	public String getSubcommandName() {

@@ -2,6 +2,7 @@ package com.skyblockplus.guilds;
 
 import static com.skyblockplus.Main.waiter;
 import static com.skyblockplus.utils.Constants.guildExpToLevel;
+import static com.skyblockplus.utils.Hypixel.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -9,7 +10,7 @@ import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.CustomPaginator;
-import com.skyblockplus.utils.Hypixel;
+import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.time.Instant;
@@ -33,26 +34,25 @@ public class GuildCommand extends Command {
 	}
 
 	public static EmbedBuilder getGuildExp(String username, User user, MessageChannel channel, InteractionHook hook) {
-		UsernameUuidStruct uuidUsername = Hypixel.usernameToUuid(username);
-		if (uuidUsername == null) {
-			return defaultEmbed("Error fetching player data");
+		UsernameUuidStruct usernameUuid = usernameToUuid(username);
+		if (usernameUuid.isNotValid()) {
+			return invalidEmbed(usernameUuid.failCause);
 		}
 
-
-		JsonElement guildJson = Hypixel.getGuildFromPlayer(uuidUsername.playerUuid, true);
-		if (guildJson == null) {
-			return defaultEmbed("Error fetching guild data");
+		HypixelResponse hypixelResponse = getGuildFromPlayer(usernameUuid.playerUuid);
+		if (hypixelResponse.isNotValid()) {
+			return invalidEmbed(hypixelResponse.failCause);
 		}
+		JsonElement guildJson = hypixelResponse.response;
 
-		JsonElement members = higherDepth(guildJson, "guild.members");
+		JsonElement members = higherDepth(guildJson, "members");
 		JsonArray membersArr = members.getAsJsonArray();
 		List<String> guildExpList = new ArrayList<>();
 		List<CompletableFuture<String>> futures = new ArrayList<>();
 		for (int i = 0; i < membersArr.size(); i++) {
 			int finalI = i;
 			futures.add(
-				Hypixel
-					.asyncUuidToUsername(higherDepth(membersArr.get(i), "uuid").getAsString())
+				asyncUuidToUsername(higherDepth(membersArr.get(i), "uuid").getAsString())
 					.thenApply(
 						currentUsername -> {
 							try {
@@ -87,20 +87,18 @@ public class GuildCommand extends Command {
 		int guildExp = -1;
 		for (int i = 0; i < guildExpList.size(); i++) {
 			String[] curGuildRank = guildExpList.get(i).split("=:=");
-			if (curGuildRank[0].equals(uuidUsername.playerUsername)) {
+			if (curGuildRank[0].equals(usernameUuid.playerUsername)) {
 				guildRank = i;
 				guildExp = Integer.parseInt(curGuildRank[1]);
 				break;
 			}
 		}
 		String rankStr =
-			"**Player:** " + uuidUsername.playerUsername + "\n**Guild Rank:** #" + (guildRank + 1) + "\n**Exp:** " + formatNumber(guildExp);
+			"**Player:** " + usernameUuid.playerUsername + "\n**Guild Rank:** #" + (guildRank + 1) + "\n**Exp:** " + formatNumber(guildExp);
 		paginateBuilder.setPaginatorExtras(
 			new PaginatorExtras()
-				.setEveryPageTitle(higherDepth(guildJson, "guild.name").getAsString())
-				.setEveryPageTitleUrl(
-					"https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(guildJson, "guild._id").getAsString()
-				)
+				.setEveryPageTitle(higherDepth(guildJson, "name").getAsString())
+				.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(guildJson, "_id").getAsString())
 				.setEveryPageText(rankStr)
 		);
 
@@ -121,47 +119,48 @@ public class GuildCommand extends Command {
 	}
 
 	public static EmbedBuilder getGuildPlayer(String username) {
-		UsernameUuidStruct uuidUsername = Hypixel.usernameToUuid(username);
-		if (uuidUsername == null) {
-			return defaultEmbed("Error fetching player data");
+		UsernameUuidStruct usernameUuid = usernameToUuid(username);
+		if (usernameUuid.isNotValid()) {
+			return invalidEmbed(usernameUuid.failCause);
 		}
 
-		JsonElement guildJson = Hypixel.getGuildFromPlayer(uuidUsername.playerUuid, true);
-		if (guildJson == null) {
-			return defaultEmbed("Error fetching guild data");
+		HypixelResponse hypixelResponse = getGuildFromPlayer(usernameUuid.playerUuid);
+		if (hypixelResponse.isNotValid()) {
+			return invalidEmbed(hypixelResponse.failCause);
 		}
+		JsonElement guildJson = hypixelResponse.response;
 
 		try {
-			String guildName = higherDepth(guildJson, "guild.name").getAsString();
+			String guildName = higherDepth(guildJson, "name").getAsString();
 			EmbedBuilder eb = defaultEmbed(
-				uuidUsername.playerUsername + " is in " + guildName,
-				"https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(guildJson, "guild._id").getAsString()
+				usernameUuid.playerUsername + " is in " + guildName,
+				"https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(guildJson, "_id").getAsString()
 			);
 			eb.addField("Guild statistics:", getGuildInfo(guildJson), false);
-			eb.setThumbnail("https://cravatar.eu/helmavatar/" + uuidUsername.playerUuid + "/64.png");
+			eb.setThumbnail("https://cravatar.eu/helmavatar/" + usernameUuid.playerUuid + "/64.png");
 			return eb;
 		} catch (Exception e) {
-			return defaultEmbed(uuidUsername.playerUsername + " is not in a guild");
+			return defaultEmbed(usernameUuid.playerUsername + " is not in a guild");
 		}
 	}
 
 	public static EmbedBuilder getGuildInfo(String username) {
-		UsernameUuidStruct uuidUsername = Hypixel.usernameToUuid(username);
-		if (uuidUsername == null) {
-			return defaultEmbed("Error fetching player data");
+		UsernameUuidStruct usernameUuid = usernameToUuid(username);
+		if (usernameUuid.isNotValid()) {
+			return invalidEmbed(usernameUuid.failCause);
 		}
 
-
-		JsonElement guildJson = Hypixel.getGuildFromPlayer(uuidUsername.playerUuid, true);
-		if (guildJson == null) {
-			return defaultEmbed("Error fetching guild data");
+		HypixelResponse hypixelResponse = getGuildFromPlayer(usernameUuid.playerUuid);
+		if (hypixelResponse.isNotValid()) {
+			return invalidEmbed(hypixelResponse.failCause);
 		}
+		JsonElement guildJson = hypixelResponse.response;
 
-		String guildName = higherDepth(guildJson, "guild.name").getAsString();
+		String guildName = higherDepth(guildJson, "name").getAsString();
 
 		EmbedBuilder eb = defaultEmbed(
 			guildName,
-			"https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(guildJson, "guild._id").getAsString()
+			"https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(guildJson, "_id").getAsString()
 		);
 		eb.addField("Guild statistics:", getGuildInfo(guildJson), false);
 
@@ -170,15 +169,16 @@ public class GuildCommand extends Command {
 
 	public static EmbedBuilder guildInfoFromGuildName(String guildName) {
 		try {
-			JsonElement guildJson = Hypixel.getGuildFromName(guildName, true);
-			if (guildJson == null) {
-				return defaultEmbed("Error fetching guild data");
+			HypixelResponse guildResponse = getGuildFromName(guildName);
+			if (guildResponse.isNotValid()) {
+				return invalidEmbed(guildResponse.failCause);
 			}
-			guildName = higherDepth(guildJson, "guild.name").getAsString();
+			JsonElement guildJson = guildResponse.response;
+			guildName = higherDepth(guildJson, "name").getAsString();
 
 			EmbedBuilder eb = defaultEmbed(
 				guildName,
-				"https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(guildJson, "guild._id").getAsString()
+				"https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(guildJson, "_id").getAsString()
 			);
 			eb.addField("Guild statistics:", getGuildInfo(guildJson), false);
 			return eb;
@@ -189,28 +189,27 @@ public class GuildCommand extends Command {
 
 	private static String getGuildInfo(JsonElement guildJson) {
 		String guildInfo = "";
-		String guildName = higherDepth(guildJson, "guild.name").getAsString();
+		String guildName = higherDepth(guildJson, "name").getAsString();
 
-		JsonElement created = higherDepth(guildJson, "guild.created");
+		JsonElement created = higherDepth(guildJson, "created");
 		String[] date = Date.from(Instant.ofEpochMilli(created.getAsLong())).toString().split(" ");
 		guildInfo += ("• " + guildName + " was created on " + date[1] + " " + date[2] + ", " + date[5]) + "\n";
 
-		JsonArray guildMembers = higherDepth(guildJson, "guild.members").getAsJsonArray();
+		JsonArray guildMembers = higherDepth(guildJson, "members").getAsJsonArray();
 		for (int i = 0; i < guildMembers.size(); i++) {
 			JsonElement currentMember = guildMembers.get(i).getAsJsonObject();
 			if (higherDepth(currentMember, "rank").getAsString().equals("Guild Master")) {
 				guildInfo +=
-					("• " + guildName + "'s guild master is " + Hypixel.uuidToUsername(higherDepth(currentMember, "uuid").getAsString())) +
-					"\n";
+					("• " + guildName + "'s guild master is " + uuidToUsername(higherDepth(currentMember, "uuid").getAsString())) + "\n";
 				break;
 			}
 		}
 
-		int numGuildMembers = higherDepth(guildJson, "guild.members").getAsJsonArray().size();
+		int numGuildMembers = higherDepth(guildJson, "members").getAsJsonArray().size();
 		guildInfo += ("• " + guildName + " has " + numGuildMembers + " members") + "\n";
 		JsonArray preferredGames;
 		try {
-			preferredGames = higherDepth(guildJson, "guild.preferredGames").getAsJsonArray();
+			preferredGames = higherDepth(guildJson, "preferredGames").getAsJsonArray();
 		} catch (Exception e) {
 			preferredGames = new JsonArray();
 		}
@@ -228,7 +227,7 @@ public class GuildCommand extends Command {
 			guildInfo += ("• " + guildName + "'s preferred game is " + preferredGames.get(0).getAsString().toLowerCase()) + "\n";
 		}
 
-		int guildExp = higherDepth(guildJson, "guild.exp").getAsInt();
+		int guildExp = higherDepth(guildJson, "exp").getAsInt();
 
 		guildInfo += ("• " + guildName + " is guild level " + guildExpToLevel(guildExp)) + "\n";
 
@@ -236,21 +235,22 @@ public class GuildCommand extends Command {
 	}
 
 	public static EmbedBuilder getGuildMembers(String username, User user, MessageChannel channel, InteractionHook hook) {
-		UsernameUuidStruct uuidUsername = Hypixel.usernameToUuid(username);
-		if (uuidUsername == null) {
-			return defaultEmbed("Error fetching player data");
+		UsernameUuidStruct usernameUuid = usernameToUuid(username);
+		if (usernameUuid.isNotValid()) {
+			return invalidEmbed(usernameUuid.failCause);
 		}
 
-		JsonElement guildJson = Hypixel.getGuildFromPlayer(uuidUsername.playerUuid, true);
-		if (guildJson == null) {
-			return defaultEmbed("Error fetching guild data");
+		HypixelResponse hypixelResponse = getGuildFromPlayer(usernameUuid.playerUuid);
+		if (hypixelResponse.isNotValid()) {
+			return invalidEmbed(hypixelResponse.failCause);
 		}
+		JsonElement guildJson = hypixelResponse.response;
 
-		JsonArray membersArr = higherDepth(guildJson, "guild.members").getAsJsonArray();
+		JsonArray membersArr = higherDepth(guildJson, "members").getAsJsonArray();
 		List<CompletableFuture<String>> futures = new ArrayList<>();
 		List<String> guildMembers = new ArrayList<>();
 		for (int i = 0; i < membersArr.size(); i++) {
-			futures.add(Hypixel.asyncUuidToUsername(higherDepth(membersArr.get(i), "uuid").getAsString()));
+			futures.add(asyncUuidToUsername(higherDepth(membersArr.get(i), "uuid").getAsString()));
 		}
 
 		for (CompletableFuture<String> future : futures) {
@@ -263,10 +263,8 @@ public class GuildCommand extends Command {
 
 		paginateBuilder.setPaginatorExtras(
 			new PaginatorExtras()
-				.setEveryPageTitle(higherDepth(guildJson, "guild.name").getAsString())
-				.setEveryPageTitleUrl(
-					"https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(guildJson, "guild._id").getAsString()
-				)
+				.setEveryPageTitle(higherDepth(guildJson, "name").getAsString())
+				.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(guildJson, "_id").getAsString())
 		);
 
 		for (String member : guildMembers) {

@@ -87,7 +87,7 @@ public class BazaarCommand extends Command {
 			return eb;
 		}
 
-		return defaultEmbed("Unable to find item");
+		return invalidEmbed("Invalid item name");
 	}
 
 	@Override

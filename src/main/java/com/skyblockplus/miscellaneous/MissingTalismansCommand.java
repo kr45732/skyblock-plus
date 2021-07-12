@@ -39,7 +39,7 @@ public class MissingTalismansCommand extends Command {
 					player.getTalismanBagMap().values().stream().filter(Objects::nonNull).map(InvItem::getId).collect(Collectors.toSet())
 				);
 			} catch (Exception e) {
-				return defaultEmbed("Error").setDescription("Inventory API is disabled");
+				return invalidEmbed("Inventory API is disabled");
 			}
 
 			JsonObject talismanUpgrades = higherDepth(getMiscJson(), "talisman_upgrades").getAsJsonObject();
@@ -91,7 +91,7 @@ public class MissingTalismansCommand extends Command {
 			);
 
 			StringBuilder ebStr = new StringBuilder(
-				"Sorted roughly from the least to greatest cost. Talismans with a `*` have higher tiers.\n\n"
+				"Sorted roughly from the least to greatest cost. Talismans with a * have higher tiers.\n\n"
 			);
 			for (String i : missingInternalArr) {
 				ebStr
@@ -102,7 +102,7 @@ public class MissingTalismansCommand extends Command {
 			}
 			return player.defaultPlayerEmbed().setDescription(ebStr.toString());
 		}
-		return defaultEmbed("Unable to fetch player data");
+		return invalidEmbed(player.getFailCause());
 	}
 
 	@Override

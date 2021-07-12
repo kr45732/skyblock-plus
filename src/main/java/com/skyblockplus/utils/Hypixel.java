@@ -6,7 +6,9 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -45,30 +47,41 @@ public class Hypixel {
 		}
 
 		try {
-			JsonElement usernameJson = Utils.getJson("https://api.ashcon.app/mojang/v2/user/" + username);
-			UsernameUuidStruct usernameUuidStruct = new UsernameUuidStruct(
-				Utils.higherDepth(usernameJson, "username").getAsString(),
-				Utils.higherDepth(usernameJson, "uuid").getAsString().replace("-", "")
-			);
-			uuidToUsernameCache.put(usernameUuidStruct.playerUuid, usernameUuidStruct.playerUsername);
-			return usernameUuidStruct;
+			JsonElement usernameJson = getJson("https://api.ashcon.app/mojang/v2/user/" + username);
+			try {
+				UsernameUuidStruct usernameUuidStruct = new UsernameUuidStruct(
+					higherDepth(usernameJson, "username").getAsString(),
+					higherDepth(usernameJson, "uuid").getAsString().replace("-", "")
+				);
+				uuidToUsernameCache.put(usernameUuidStruct.playerUuid, usernameUuidStruct.playerUsername);
+				return usernameUuidStruct;
+			} catch (Exception e) {
+				return new UsernameUuidStruct(higherDepth(usernameJson, "reason").getAsString());
+			}
 		} catch (Exception ignored) {}
-		return null;
+		return new UsernameUuidStruct();
 	}
 
-	public static String uuidToUsername(String uuid) {
+	public static UsernameUuidStruct uuidToUsername(String uuid) {
 		String cachedResponse = uuidToUsernameCache.getIfPresent(uuid);
 		if (cachedResponse != null) {
-			return cachedResponse;
+			return new UsernameUuidStruct(cachedResponse, uuid);
 		}
 
 		try {
-			JsonElement usernameJson = Utils.getJson("https://api.ashcon.app/mojang/v2/user/" + uuid);
-			String responseUUID = Utils.higherDepth(usernameJson, "uuid").getAsString().replace("-", "");
-			uuidToUsernameCache.put(responseUUID, Utils.higherDepth(usernameJson, "username").getAsString());
-			return responseUUID;
+			JsonElement usernameJson = getJson("https://api.ashcon.app/mojang/v2/user/" + uuid);
+			try {
+				UsernameUuidStruct usernameUuidStruct = new UsernameUuidStruct(
+					higherDepth(usernameJson, "username").getAsString(),
+					higherDepth(usernameJson, "uuid").getAsString().replace("-", "")
+				);
+				uuidToUsernameCache.put(usernameUuidStruct.playerUuid, usernameUuidStruct.playerUsername);
+				return usernameUuidStruct;
+			} catch (Exception e) {
+				return new UsernameUuidStruct(higherDepth(usernameJson, "reason").getAsString());
+			}
 		} catch (Exception ignored) {}
-		return null;
+		return new UsernameUuidStruct();
 	}
 
 	public static CompletableFuture<String> asyncUuidToUsername(String uuid) {
@@ -100,28 +113,33 @@ public class Hypixel {
 		return future;
 	}
 
-	public static JsonElement skyblockProfilesFromUuid(String uuid) {
-		return skyblockProfilesFromUuid(uuid, HYPIXEL_API_KEY, true);
+	public static HypixelResponse skyblockProfilesFromUuid(String uuid) {
+		return skyblockProfilesFromUuid(uuid, HYPIXEL_API_KEY);
 	}
 
-	public static JsonElement skyblockProfilesFromUuid(String uuid, String hypixelApiKey, boolean checkIfValid) {
+	public static HypixelResponse skyblockProfilesFromUuid(String uuid, String hypixelApiKey) {
 		JsonElement cachedResponse = uuidToSkyblockProfilesCache.getIfPresent(uuid);
 		if (cachedResponse != null) {
-			return cachedResponse;
+			return new HypixelResponse(cachedResponse);
 		}
 
-		JsonElement profilesJson = getJson("https://api.hypixel.net/skyblock/profiles?key=" + hypixelApiKey + "&uuid=" + uuid);
+		try {
+			JsonElement profilesJson = getJson("https://api.hypixel.net/skyblock/profiles?key=" + hypixelApiKey + "&uuid=" + uuid);
 
-		if (!checkIfValid) {
-			return profilesJson;
-		}
+			try {
+				if (higherDepth(profilesJson, "profiles").isJsonNull()) {
+					return new HypixelResponse("Player has no SkyBlock profiles");
+				}
 
-		if (profilesJson != null && higherDepth(profilesJson, "profiles") != null && !higherDepth(profilesJson, "profiles").isJsonNull()) {
-			uuidToSkyblockProfilesCache.put(uuid, profilesJson);
-			return profilesJson;
-		}
+				JsonArray profileArray = higherDepth(profilesJson, "profiles").getAsJsonArray();
+				uuidToSkyblockProfilesCache.put(uuid, profileArray);
+				return new HypixelResponse(profileArray);
+			} catch (Exception e) {
+				return new HypixelResponse(higherDepth(profilesJson, "cause").getAsString());
+			}
+		} catch (Exception ignored) {}
 
-		return null;
+		return new HypixelResponse();
 	}
 
 	public static CompletableFuture<JsonElement> asyncSkyblockProfilesFromUuid(String uuid, String hypixelApiKey) {
@@ -148,16 +166,11 @@ public class Hypixel {
 										.timeTillReset.set(Integer.parseInt(profilesResponse.getHeader("RateLimit-Reset")));
 								} catch (Exception ignored) {}
 
-								JsonElement profilesJson = JsonParser.parseString(profilesResponse.getResponseBody());
-								if (
-									profilesJson != null &&
-									higherDepth(profilesJson, "profiles") != null &&
-									!higherDepth(profilesJson, "profiles").isJsonNull()
-								) {
-									uuidToSkyblockProfilesCache.put(uuid, profilesJson);
-								}
+								JsonArray profileArray = higherDepth(JsonParser.parseString(profilesResponse.getResponseBody()), "profiles")
+									.getAsJsonArray();
+								uuidToSkyblockProfilesCache.put(uuid, profileArray);
 
-								return profilesJson;
+								return profileArray;
 							} catch (Exception e) {
 								e.printStackTrace();
 							}
@@ -169,63 +182,84 @@ public class Hypixel {
 		return future;
 	}
 
-	public static JsonElement playerFromUuid(String uuid) {
+	public static HypixelResponse playerFromUuid(String uuid) {
 		JsonElement cachedResponse = uuidToPlayerCache.getIfPresent(uuid);
 		if (cachedResponse != null) {
-			return cachedResponse;
+			return new HypixelResponse(cachedResponse);
 		}
 
-		JsonElement playerJson = getJson("https://api.hypixel.net/player?key=" + HYPIXEL_API_KEY + "&uuid=" + uuid);
-		if (playerJson != null && higherDepth(playerJson, "player") != null && !higherDepth(playerJson, "player").isJsonNull()) {
-			uuidToPlayerCache.put(uuid, playerJson);
-			return playerJson;
-		}
+		try {
+			JsonElement playerJson = getJson("https://api.hypixel.net/player?key=" + HYPIXEL_API_KEY + "&uuid=" + uuid);
 
-		return null;
+			try {
+				if (higherDepth(playerJson, "player").isJsonNull()) {
+					return new HypixelResponse("Player has not played on Hypixel");
+				}
+
+				JsonObject playerObject = higherDepth(playerJson, "player").getAsJsonObject();
+				uuidToPlayerCache.put(uuid, playerObject);
+				return new HypixelResponse(playerObject);
+			} catch (Exception e) {
+				return new HypixelResponse(higherDepth(playerJson, "cause").getAsString());
+			}
+		} catch (Exception ignored) {}
+
+		return new HypixelResponse();
 	}
 
-	public static JsonArray getSkyblockAuctionGeneric(String query){
-		JsonElement auctionResponse = getJson("https://api.hypixel.net/skyblock/auction?key=" + HYPIXEL_API_KEY + query);
-		if(auctionResponse != null && higherDepth(auctionResponse, "auctions") != null && higherDepth(auctionResponse, "auctions").isJsonArray()){
-			return higherDepth(auctionResponse, "auctions").getAsJsonArray();
-		}
+	public static HypixelResponse getSkyblockAuctionGeneric(String query) {
+		try {
+			JsonElement auctionResponse = getJson("https://api.hypixel.net/skyblock/auction?key=" + HYPIXEL_API_KEY + query);
+			try {
+				return new HypixelResponse(higherDepth(auctionResponse, "auctions").getAsJsonArray());
+			} catch (Exception e) {
+				return new HypixelResponse(higherDepth(auctionResponse, "cause").getAsString());
+			}
+		} catch (Exception ignored) {}
 
-		return null;
+		return new HypixelResponse();
 	}
 
-	public static JsonArray getSkyblockAuctionFromPlayer(String playerUuid){
+	public static HypixelResponse getSkyblockAuctionFromPlayer(String playerUuid) {
 		return getSkyblockAuctionGeneric("&player=" + playerUuid);
 	}
 
-	public static JsonArray getSkyblockAuctionFromUuid(String auctionUuid){
+	public static HypixelResponse getSkyblockAuctionFromUuid(String auctionUuid) {
 		return getSkyblockAuctionGeneric("&uuid=" + auctionUuid);
 	}
 
-	public static JsonElement getGuildGeneric(String query, boolean checkIfInGuild){
-		JsonElement guildResponse = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + query);
-		if(guildResponse != null && higherDepth(guildResponse, "guild") != null){
-			if(!checkIfInGuild){
-				return higherDepth(guildResponse, "guild");
+	public static HypixelResponse getGuildGeneric(String query) {
+		try {
+			JsonElement guildResponse = getJson("https://api.hypixel.net/guild?key=" + HYPIXEL_API_KEY + query);
+
+			try {
+				if (higherDepth(guildResponse, "guild").isJsonNull()) {
+					if (query.startsWith("&player=")) {
+						return new HypixelResponse("Player is not in a guild");
+					} else if (query.startsWith("&id=")) {
+						return new HypixelResponse("Invalid guild id");
+					} else if (query.startsWith("&name=")) {
+						return new HypixelResponse("Invalid guild name");
+					}
+				}
+				return new HypixelResponse(higherDepth(guildResponse, "guild").getAsJsonObject());
+			} catch (Exception e) {
+				return new HypixelResponse(higherDepth(guildResponse, "cause").getAsString());
 			}
+		} catch (Exception ignored) {}
 
-			if (!higherDepth(guildResponse, "guild").isJsonNull()) {
-				return higherDepth(guildResponse, "guild");
-			}
-		}
-
-		return null;
+		return new HypixelResponse();
 	}
 
-	public static JsonElement getGuildFromPlayer(String playerUuid, boolean checkIfInGuild){
-		return getGuildGeneric("&player=" + playerUuid, checkIfInGuild);
+	public static HypixelResponse getGuildFromPlayer(String playerUuid) {
+		return getGuildGeneric("&player=" + playerUuid);
 	}
 
-	public static JsonElement getGuildFromId(String guildId, boolean checkIfInGuild){
-		return getGuildGeneric("&id=" + guildId, checkIfInGuild);
+	public static HypixelResponse getGuildFromId(String guildId) {
+		return getGuildGeneric("&id=" + guildId);
 	}
 
-	public static JsonElement getGuildFromName(String guildName, boolean checkIfInGuild){
-		return getGuildGeneric("&name=" + guildName.replace(" ", "%20"), checkIfInGuild);
-
+	public static HypixelResponse getGuildFromName(String guildName) {
+		return getGuildGeneric("&name=" + guildName.replace(" ", "%20"));
 	}
 }

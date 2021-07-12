@@ -2,6 +2,8 @@ package com.skyblockplus.utils;
 
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.CustomPaginator.throwableConsumer;
+import static com.skyblockplus.utils.Hypixel.playerFromUuid;
+import static com.skyblockplus.utils.Hypixel.usernameToUuid;
 import static java.lang.String.join;
 import static java.util.Collections.nCopies;
 
@@ -10,9 +12,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.skyblockplus.utils.structs.DiscordInfoStruct;
-import com.skyblockplus.utils.structs.HypixelGuildCache;
-import com.skyblockplus.utils.structs.HypixelKeyInformation;
+import com.skyblockplus.utils.structs.*;
 import java.awt.*;
 import java.io.*;
 import java.math.RoundingMode;
@@ -29,6 +29,9 @@ import java.util.stream.Stream;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
+import me.nullicorn.nedit.NBTReader;
+import me.nullicorn.nedit.type.NBTCompound;
+import me.nullicorn.nedit.type.NBTList;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -354,7 +357,15 @@ public class Utils {
 
 	public static DiscordInfoStruct getPlayerDiscordInfo(String username) {
 		try {
-			JsonElement playerJson = Hypixel.playerFromUuid(Hypixel.usernameToUuid(username).playerUuid);
+			UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
+			if (usernameUuidStruct.isNotValid()) {
+				return new DiscordInfoStruct(usernameUuidStruct.failCause);
+			}
+			HypixelResponse playerResponse = playerFromUuid(usernameUuidStruct.playerUuid);
+			if (playerResponse.isNotValid()) {
+				return new DiscordInfoStruct(playerResponse.failCause);
+			}
+			JsonElement playerJson = playerResponse.response;
 
 			String discordTag = higherDepth(playerJson, "player.socialMedia.links.DISCORD").getAsString();
 			String minecraftUsername = higherDepth(playerJson, "player.displayname").getAsString();
@@ -362,7 +373,7 @@ public class Utils {
 
 			return new DiscordInfoStruct(discordTag, minecraftUsername, minecraftUuid);
 		} catch (Exception e) {
-			return null;
+			return new DiscordInfoStruct();
 		}
 	}
 
@@ -452,6 +463,10 @@ public class Utils {
 
 	public static EmbedBuilder defaultEmbed(String title) {
 		return defaultEmbed(title, null);
+	}
+
+	public static EmbedBuilder invalidEmbed(String failCause) {
+		return defaultEmbed("Error").setDescription(failCause);
 	}
 
 	public static EmbedBuilder loadingEmbed() {
@@ -758,13 +773,13 @@ public class Utils {
 
 	public static EmbedBuilder checkHypixelKey(String hypixelKey) {
 		if (hypixelKey == null) {
-			return defaultEmbed("Error").setDescription("You must set a Hypixel API key to use this command");
+			return invalidEmbed("You must set a Hypixel API key to use this command");
 		}
 
 		try {
 			higherDepth(getJson("https://api.hypixel.net/key?key=" + hypixelKey), "record.key").getAsString();
 		} catch (Exception e) {
-			return defaultEmbed("Error").setDescription("The set Hypixel API key is invalid");
+			return invalidEmbed("The set Hypixel API key is invalid");
 		}
 
 		if (!keyCooldownMap.containsKey(hypixelKey)) {
@@ -855,5 +870,81 @@ public class Utils {
 		}
 
 		return closestMatch;
+	}
+
+	public static String skyblockStatsLink(String username, String profileName) {
+		if (username == null) {
+			return null;
+		}
+		return ("https://sky.shiiyu.moe/stats/" + username + (profileName != null ? "/" + profileName : ""));
+	}
+
+	public static Map<Integer, InvItem> getGenericInventoryMap(NBTCompound parsedContents) {
+		try {
+			NBTList items = parsedContents.getList("i");
+			Map<Integer, InvItem> itemsMap = new HashMap<>();
+
+			for (int i = 0; i < items.size(); i++) {
+				try {
+					NBTCompound item = items.getCompound(i);
+					if (!item.isEmpty()) {
+						InvItem itemInfo = new InvItem();
+						itemInfo.setName(parseMcCodes(item.getString("tag.display.Name", "None")));
+						itemInfo.setLore(
+							parseMcCodes(item.getString("tag.display.Lore", "None").replace(", ", "\n").replace("[", "").replace("]", ""))
+						);
+						itemInfo.setCount(Integer.parseInt(item.getString("Count", "0").replace("b", " ")));
+						itemInfo.setId(item.getString("tag.ExtraAttributes.id", "None"));
+						itemInfo.setCreationTimestamp(item.getString("tag.ExtraAttributes.timestamp", "None"));
+						itemInfo.setHbpCount(item.getInt("tag.ExtraAttributes.hot_potato_count", 0));
+						itemInfo.setRecombobulated(item.getInt("tag.ExtraAttributes.rarity_upgrades", 0) == 1);
+						itemInfo.setModifier(item.getString("tag.ExtraAttributes.modifier", "None"));
+						itemInfo.setDungeonFloor(Integer.parseInt(item.getString("tag.ExtraAttributes.item_tier", "-1")));
+						itemInfo.setNbtTag(item.toString());
+
+						try {
+							NBTCompound enchants = item.getCompound("tag.ExtraAttributes.enchantments");
+							List<String> enchantsList = new ArrayList<>();
+							for (Map.Entry<String, Object> enchant : enchants.entrySet()) {
+								enchantsList.add(enchant.getKey() + ";" + enchant.getValue());
+							}
+							itemInfo.setEnchantsFormatted(enchantsList);
+						} catch (Exception ignored) {}
+
+						String itemSkinStr = item.getString("tag.ExtraAttributes.skin", "None");
+						if (!itemSkinStr.equals("None")) {
+							itemInfo.addExtraValue("PET_SKIN_" + itemSkinStr);
+						}
+
+						try {
+							NBTList necronBladeScrolls = item.getList("tag.ExtraAttributes.ability_scroll");
+							for (Object scroll : necronBladeScrolls) {
+								try {
+									itemInfo.addExtraValue("" + scroll);
+								} catch (Exception ignored) {}
+							}
+						} catch (Exception ignored) {}
+
+						if (item.getInt("tag.ExtraAttributes.wood_singularity_count", 0) == 1) {
+							itemInfo.addExtraValue("WOOD_SINGULARITY");
+						}
+
+						try {
+							byte[] backpackContents = item.getByteArray("tag.ExtraAttributes." + itemInfo.getId().toLowerCase() + "_data");
+							NBTCompound parsedContentsBackpack = NBTReader.read(new ByteArrayInputStream(backpackContents));
+							itemInfo.setBackpackItems(getGenericInventoryMap(parsedContentsBackpack).values());
+						} catch (Exception ignored) {}
+
+						itemsMap.put(i, itemInfo);
+						continue;
+					}
+				} catch (Exception ignored) {}
+				itemsMap.put(i, null);
+			}
+
+			return itemsMap;
+		} catch (Exception ignored) {}
+
+		return null;
 	}
 }

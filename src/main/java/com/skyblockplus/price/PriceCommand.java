@@ -3,6 +3,8 @@ package com.skyblockplus.price;
 import static com.skyblockplus.networth.NetworthExecute.isIgnoredItem;
 import static com.skyblockplus.networth.NetworthExecute.queryAhApi;
 import static com.skyblockplus.utils.Constants.reforgeStoneNames;
+import static com.skyblockplus.utils.Hypixel.getSkyblockAuctionFromUuid;
+import static com.skyblockplus.utils.Hypixel.uuidToUsername;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -10,8 +12,7 @@ import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Constants;
-import com.skyblockplus.utils.Hypixel;
-import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.InvItem;
 import java.time.Duration;
 import java.time.Instant;
@@ -34,17 +35,17 @@ public class PriceCommand extends Command {
 	}
 
 	public static EmbedBuilder calculatePriceFromUuid(String auctionUuid) {
-		JsonArray auctionJson =  Hypixel.getSkyblockAuctionFromUuid(auctionUuid);
+		HypixelResponse auctionResponse = getSkyblockAuctionFromUuid(auctionUuid);
 
-		if (auctionJson == null || auctionJson.size() == 0) {
-			return defaultEmbed("Error").setDescription("Invalid auction UUID");
+		if (auctionResponse.isNotValid()) {
+			return invalidEmbed(auctionResponse.failCause);
 		}
 
-		JsonElement auction = auctionJson.get(0);
+		JsonElement auction = auctionResponse.response.getAsJsonArray().get(0);
 
 		try {
 			NBTCompound itemNBTRaw = NBTReader.readBase64(higherDepth(auction, "item_bytes.data").getAsString());
-			InvItem item = Player.getGenericInventoryMap(itemNBTRaw).get(0);
+			InvItem item = getGenericInventoryMap(itemNBTRaw).get(0);
 			double price = calculateItemPrice(item);
 			String itemName = higherDepth(auction, "item_name").getAsString();
 			if (item.getId().equals("ENCHANTED_BOOK")) {
@@ -60,7 +61,7 @@ public class PriceCommand extends Command {
 			String timeUntil = instantToDHM(duration);
 
 			String ebStr = "**Item name:** " + itemName;
-			ebStr += "\n**Seller:** " + Hypixel.uuidToUsername(higherDepth(auction, "auctioneer").getAsString());
+			ebStr += "\n**Seller:** " + uuidToUsername(higherDepth(auction, "auctioneer").getAsString());
 			ebStr += "\n**Command:** `/ah " + higherDepth(auction, "uuid").getAsString() + "`";
 			long highestBid = higherDepth(auction, "highest_bid_amount").getAsInt();
 			long startingBid = higherDepth(auction, "starting_bid").getAsInt();
@@ -75,7 +76,7 @@ public class PriceCommand extends Command {
 					ebStr +=
 						bidsArr.size() > 0
 							? "\n**Highest bidder:** " +
-							Hypixel.uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString())
+							uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString())
 							: "";
 				}
 			} else {
@@ -84,7 +85,7 @@ public class PriceCommand extends Command {
 						"\n**Auction sold** for " +
 						simplifyNumber(highestBid) +
 						" coins to " +
-						Hypixel.uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString());
+						uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString());
 				} else {
 					ebStr = "\n**Auction did not sell**";
 				}

@@ -2,6 +2,7 @@ package com.skyblockplus.guilds;
 
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.utils.Hypixel.*;
 import static com.skyblockplus.utils.Utils.*;
 import static com.skyblockplus.utils.structs.HypixelGuildCache.memberCacheFromPlayer;
 
@@ -10,9 +11,9 @@ import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.CustomPaginator;
-import com.skyblockplus.utils.Hypixel;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.HypixelGuildCache;
+import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.time.Duration;
@@ -106,20 +107,19 @@ public class GuildLeaderboardsCommand extends Command {
 				);
 		}
 
-		UsernameUuidStruct usernameUuidStruct = Hypixel.usernameToUuid(username);
-		if (usernameUuidStruct == null) {
-			return defaultEmbed("Invalid username");
+		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
+		if (usernameUuidStruct.isNotValid()) {
+			return invalidEmbed(usernameUuidStruct.failCause);
 		}
 
-		JsonElement guildJson = Hypixel.getGuildFromPlayer(usernameUuidStruct.playerUuid, true);
-
-		String guildName;
-		try {
-			guildName = higherDepth(guildJson, "guild.name").getAsString();
-		} catch (Exception e) {
-			return defaultEmbed(usernameUuidStruct.playerUsername + " is not in a guild");
+		HypixelResponse guildResponse = getGuildFromPlayer(usernameUuidStruct.playerUuid);
+		if (guildResponse.isNotValid()) {
+			return invalidEmbed(guildResponse.failCause);
 		}
-		String guildId = higherDepth(guildJson, "guild._id").getAsString();
+
+		JsonElement guildJson = guildResponse.response;
+		String guildName = higherDepth(guildJson, "name").getAsString();
+		String guildId = higherDepth(guildJson, "_id").getAsString();
 
 		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(2).setItemsPerPage(20);
 		HypixelGuildCache guildCache = hypixelGuildsCacheMap.getOrDefault(guildId, null);
@@ -130,13 +130,13 @@ public class GuildLeaderboardsCommand extends Command {
 			guildMemberPlayersList = guildCache.membersCache;
 			lastUpdated = guildCache.lastUpdated;
 		} else {
-			JsonArray guildMembers = higherDepth(guildJson, "guild.members").getAsJsonArray();
+			JsonArray guildMembers = higherDepth(guildJson, "members").getAsJsonArray();
 			List<CompletableFuture<CompletableFuture<String>>> futuresList = new ArrayList<>();
 
 			for (JsonElement guildMember : guildMembers) {
 				String guildMemberUuid = higherDepth(guildMember, "uuid").getAsString();
 
-				CompletableFuture<String> guildMemberUsername = Hypixel.asyncUuidToUsername(guildMemberUuid);
+				CompletableFuture<String> guildMemberUsername = asyncUuidToUsername(guildMemberUuid);
 				futuresList.add(
 					guildMemberUsername.thenApply(
 						guildMemberUsernameResponse -> {
@@ -147,7 +147,7 @@ public class GuildLeaderboardsCommand extends Command {
 								}
 							} catch (Exception ignored) {}
 
-							CompletableFuture<JsonElement> guildMemberProfileJson = Hypixel.asyncSkyblockProfilesFromUuid(
+							CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(
 								guildMemberUuid,
 								hypixelKey
 							);

@@ -143,6 +143,6 @@ public class SkyblockCommand extends Command {
 
 			return null;
 		}
-		return defaultEmbed("Invalid username or profile");
+		return invalidEmbed(player.getFailCause());
 	}
 }

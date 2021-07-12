@@ -2,17 +2,15 @@ package com.skyblockplus.utils;
 
 import static com.skyblockplus.utils.Constants.craftedMinionsToSlots;
 import static com.skyblockplus.utils.Constants.skillNames;
+import static com.skyblockplus.utils.Hypixel.playerFromUuid;
+import static com.skyblockplus.utils.Hypixel.skyblockProfilesFromUuid;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.skyblockplus.utils.structs.ArmorStruct;
-import com.skyblockplus.utils.structs.InvItem;
-import com.skyblockplus.utils.structs.SkillsStruct;
-import com.skyblockplus.utils.structs.UsernameUuidStruct;
+import com.skyblockplus.utils.structs.*;
 import com.skyblockplus.weight.Weight;
-import java.io.ByteArrayInputStream;
 import java.time.Instant;
 import java.util.*;
 import me.nullicorn.nedit.NBTReader;
@@ -31,7 +29,7 @@ public class Player {
 	private String playerUuid;
 	private String playerUsername;
 	private String profileName;
-	private String failCause = "Unknown Cause";
+	private String failCause = "Unknown Fail Cause";
 
 	/* Constructors */
 	public Player(String username) {
@@ -40,7 +38,13 @@ public class Player {
 		}
 
 		try {
-			this.profilesArray = higherDepth(Hypixel.skyblockProfilesFromUuid(playerUuid), "profiles").getAsJsonArray();
+			HypixelResponse response = skyblockProfilesFromUuid(playerUuid);
+			if (response.isNotValid()) {
+				failCause = response.failCause;
+				return;
+			}
+
+			this.profilesArray = response.response.getAsJsonArray();
 
 			if (getLatestProfile(profilesArray)) {
 				return;
@@ -58,11 +62,19 @@ public class Player {
 		}
 
 		try {
-			this.profilesArray = higherDepth(Hypixel.skyblockProfilesFromUuid(playerUuid), "profiles").getAsJsonArray();
+			HypixelResponse response = skyblockProfilesFromUuid(playerUuid);
+			if (response.isNotValid()) {
+				failCause = response.failCause;
+				return;
+			}
+
+			this.profilesArray = response.response.getAsJsonArray();
+
 			if (profileIdFromName(profileName, profilesArray)) {
 				return;
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			return;
 		}
 
@@ -74,11 +86,13 @@ public class Player {
 		this.playerUsername = playerUsername;
 
 		try {
-			this.profilesArray = higherDepth(outerProfileJson, "profiles").getAsJsonArray();
+			this.profilesArray = outerProfileJson.getAsJsonArray();
+
 			if (getLatestProfile(profilesArray)) {
 				return;
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			return;
 		}
 
@@ -90,7 +104,7 @@ public class Player {
 		this.playerUsername = playerUsername;
 
 		try {
-			this.profilesArray = higherDepth(outerProfileJson, "profiles").getAsJsonArray();
+			this.profilesArray = outerProfileJson.getAsJsonArray();
 			if (profileIdFromName(profileName, profilesArray)) {
 				return;
 			}
@@ -101,120 +115,17 @@ public class Player {
 		this.validPlayer = true;
 	}
 
-	public Player(String playerUuid, String hypixelKey, boolean isAPI) {
-		this.playerUuid = playerUuid;
-
-		try {
-			JsonElement playerJson = Hypixel.skyblockProfilesFromUuid(playerUuid, hypixelKey, false);
-			if (higherDepth(playerJson, "cause") != null) {
-				failCause = higherDepth(playerJson, "cause").getAsString();
-				return;
-			}
-
-			if (higherDepth(playerJson, "profiles") != null && higherDepth(playerJson, "profiles").isJsonNull()) {
-				failCause = "Player has no SkyBlock profiles";
-				return;
-			}
-
-			this.profilesArray = higherDepth(playerJson, "profiles").getAsJsonArray();
-
-			if (getLatestProfile(profilesArray)) {
-				return;
-			}
-		} catch (Exception e) {
-			return;
-		}
-
-		this.validPlayer = true;
-	}
-
-	/* Links */
-	public static String skyblockStatsLink(String username, String profileName) {
-		if (username == null) {
-			return null;
-		}
-		return ("https://sky.shiiyu.moe/stats/" + username + (profileName != null ? "/" + profileName : ""));
-	}
-
-	/* -- Start inventory -- */
-	public static Map<Integer, InvItem> getGenericInventoryMap(NBTCompound parsedContents) {
-		try {
-			NBTList items = parsedContents.getList("i");
-			Map<Integer, InvItem> itemsMap = new HashMap<>();
-
-			for (int i = 0; i < items.size(); i++) {
-				try {
-					NBTCompound item = items.getCompound(i);
-					if (!item.isEmpty()) {
-						InvItem itemInfo = new InvItem();
-						itemInfo.setName(parseMcCodes(item.getString("tag.display.Name", "None")));
-						itemInfo.setLore(
-							parseMcCodes(item.getString("tag.display.Lore", "None").replace(", ", "\n").replace("[", "").replace("]", ""))
-						);
-						itemInfo.setCount(Integer.parseInt(item.getString("Count", "0").replace("b", " ")));
-						itemInfo.setId(item.getString("tag.ExtraAttributes.id", "None"));
-						itemInfo.setCreationTimestamp(item.getString("tag.ExtraAttributes.timestamp", "None"));
-						itemInfo.setHbpCount(item.getInt("tag.ExtraAttributes.hot_potato_count", 0));
-						itemInfo.setRecombobulated(item.getInt("tag.ExtraAttributes.rarity_upgrades", 0) == 1);
-						itemInfo.setModifier(item.getString("tag.ExtraAttributes.modifier", "None"));
-						itemInfo.setDungeonFloor(Integer.parseInt(item.getString("tag.ExtraAttributes.item_tier", "-1")));
-						itemInfo.setNbtTag(item.toString());
-
-						try {
-							NBTCompound enchants = item.getCompound("tag.ExtraAttributes.enchantments");
-							List<String> enchantsList = new ArrayList<>();
-							for (Map.Entry<String, Object> enchant : enchants.entrySet()) {
-								enchantsList.add(enchant.getKey() + ";" + enchant.getValue());
-							}
-							itemInfo.setEnchantsFormatted(enchantsList);
-						} catch (Exception ignored) {}
-
-						String itemSkinStr = item.getString("tag.ExtraAttributes.skin", "None");
-						if (!itemSkinStr.equals("None")) {
-							itemInfo.addExtraValue("PET_SKIN_" + itemSkinStr);
-						}
-
-						try {
-							NBTList necronBladeScrolls = item.getList("tag.ExtraAttributes.ability_scroll");
-							for (Object scroll : necronBladeScrolls) {
-								try {
-									itemInfo.addExtraValue("" + scroll);
-								} catch (Exception ignored) {}
-							}
-						} catch (Exception ignored) {}
-
-						if (item.getInt("tag.ExtraAttributes.wood_singularity_count", 0) == 1) {
-							itemInfo.addExtraValue("WOOD_SINGULARITY");
-						}
-
-						try {
-							byte[] backpackContents = item.getByteArray("tag.ExtraAttributes." + itemInfo.getId().toLowerCase() + "_data");
-							NBTCompound parsedContentsBackpack = NBTReader.read(new ByteArrayInputStream(backpackContents));
-							itemInfo.setBackpackItems(getGenericInventoryMap(parsedContentsBackpack).values());
-						} catch (Exception ignored) {}
-
-						itemsMap.put(i, itemInfo);
-						continue;
-					}
-				} catch (Exception ignored) {}
-				itemsMap.put(i, null);
-			}
-
-			return itemsMap;
-		} catch (Exception ignored) {}
-
-		return null;
-	}
-
 	/* Constructor helper methods */
 	public boolean usernameToUuid(String username) {
-		try {
-			UsernameUuidStruct usernameJson = Hypixel.usernameToUuid(username);
-			this.playerUsername = usernameJson.playerUsername;
-			this.playerUuid = usernameJson.playerUuid;
-			return false;
-		} catch (Exception ignored) {}
-		return true;
+		UsernameUuidStruct response = Hypixel.usernameToUuid(username);
+		if (response.isNotValid()) {
+			failCause = response.failCause;
+			return true;
+		}
+
+		this.playerUsername = response.playerUsername;
+		this.playerUuid = response.playerUuid;
+		return false;
 	}
 
 	public boolean profileIdFromName(String profileName, JsonArray profilesArray) {
@@ -287,8 +198,9 @@ public class Player {
 		return failCause;
 	}
 
+	/* Links */
 	public String skyblockStatsLink() {
-		return skyblockStatsLink(playerUsername, profileName);
+		return Utils.skyblockStatsLink(playerUsername, profileName);
 	}
 
 	public String getThumbnailUrl() {
@@ -577,7 +489,7 @@ public class Player {
 
 	public int getDungeonSecrets() {
 		if (hypixelProfileJson == null) {
-			this.hypixelProfileJson = Hypixel.playerFromUuid(playerUuid);
+			this.hypixelProfileJson = playerFromUuid(playerUuid).response;
 		}
 
 		try {
@@ -632,6 +544,7 @@ public class Player {
 		}
 	}
 
+	/* -- Start inventory -- */
 	/* InvItem maps */
 	public Map<Integer, InvItem> getInventoryMap() {
 		try {
@@ -1050,7 +963,7 @@ public class Player {
 	public String[] getAllProfileNames(boolean isIronman) {
 		List<String> profileNameList = new ArrayList<>();
 		if (this.profilesArray == null) {
-			this.profilesArray = higherDepth(Hypixel.skyblockProfilesFromUuid(playerUuid), "profiles").getAsJsonArray();
+			this.profilesArray = skyblockProfilesFromUuid(playerUuid).response.getAsJsonArray();
 		}
 
 		for (JsonElement profile : profilesArray) {
@@ -1099,7 +1012,7 @@ public class Player {
 	public EmbedBuilder defaultPlayerEmbed() {
 		return defaultEmbed(
 			fixUsername(getUsername()) + (higherDepth(outerProfileJson, "game_mode") != null ? " ♻️" : ""),
-			skyblockStatsLink(getUsername(), getProfileName())
+			Utils.skyblockStatsLink(getUsername(), getProfileName())
 		)
 			.setThumbnail(getThumbnailUrl());
 	}
