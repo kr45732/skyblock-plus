@@ -30,8 +30,12 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SkyblockEventCommand extends Command {
+
+	private static final Logger log = LoggerFactory.getLogger(SkyblockEventCommand.class);
 
 	public SkyblockEventCommand() {
 		this.name = "event";
@@ -117,7 +121,7 @@ public class SkyblockEventCommand extends Command {
 					guildMemberUsernameResponse -> {
 						try {
 							if (remainingLimit.get() < 5) {
-								System.out.println("Sleeping for " + timeTillReset + " seconds");
+								log.info("Sleeping for " + timeTillReset + " seconds");
 								TimeUnit.SECONDS.sleep(timeTillReset.get());
 							}
 						} catch (Exception ignored) {}

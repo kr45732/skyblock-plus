@@ -11,6 +11,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.api.serversettings.skyblockevent.RunningEvent;
 import com.skyblockplus.api.serversettings.skyblockevent.SbEvent;
+import com.skyblockplus.timeout.MessageTimeout;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import java.time.Duration;
 import java.time.Instant;
@@ -24,8 +25,12 @@ import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SkyblockEvent {
+
+	private static final Logger log = LoggerFactory.getLogger(SkyblockEvent.class);
 
 	public final boolean enable;
 	public EmbedBuilder eb;
@@ -62,7 +67,7 @@ public class SkyblockEvent {
 				resetSkyblockEvent(defaultEmbed("Timeout"));
 			}
 		} catch (Exception e) {
-			System.out.println("== Stack Trace (checkForTimeout) ==");
+			log.error("checkForTimeout()", e);
 			e.printStackTrace();
 		}
 	}

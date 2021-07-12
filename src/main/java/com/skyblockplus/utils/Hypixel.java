@@ -22,17 +22,17 @@ public class Hypixel {
 		.recordStats()
 		.build();
 
-	public static final Cache<String, JsonElement> uuidToSkyblockProfilesCache = CacheBuilder
-		.newBuilder()
-		.expireAfterWrite(90, TimeUnit.SECONDS)
-		.recordStats()
-		.build();
-
-	public static final Cache<String, JsonElement> uuidToPlayerCache = CacheBuilder
-		.newBuilder()
-		.expireAfterWrite(90, TimeUnit.SECONDS)
-		.recordStats()
-		.build();
+	//	public static final Cache<String, JsonElement> uuidToSkyblockProfilesCache = CacheBuilder
+	//		.newBuilder()
+	//		.expireAfterWrite(90, TimeUnit.SECONDS)
+	//		.recordStats()
+	//		.build();
+	//
+	//	public static final Cache<String, JsonElement> uuidToPlayerCache = CacheBuilder
+	//		.newBuilder()
+	//		.expireAfterWrite(90, TimeUnit.SECONDS)
+	//		.recordStats()
+	//		.build();
 
 	public static UsernameUuidStruct usernameToUuid(String username) {
 		Map.Entry<String, String> cachedResponse = uuidToUsernameCache
@@ -118,10 +118,10 @@ public class Hypixel {
 	}
 
 	public static HypixelResponse skyblockProfilesFromUuid(String uuid, String hypixelApiKey) {
-		JsonElement cachedResponse = uuidToSkyblockProfilesCache.getIfPresent(uuid);
-		if (cachedResponse != null) {
-			return new HypixelResponse(cachedResponse);
-		}
+		//		JsonElement cachedResponse = uuidToSkyblockProfilesCache.getIfPresent(uuid);
+		//		if (cachedResponse != null) {
+		//			return new HypixelResponse(cachedResponse);
+		//		}
 
 		try {
 			JsonElement profilesJson = getJson("https://api.hypixel.net/skyblock/profiles?key=" + hypixelApiKey + "&uuid=" + uuid);
@@ -132,7 +132,7 @@ public class Hypixel {
 				}
 
 				JsonArray profileArray = higherDepth(profilesJson, "profiles").getAsJsonArray();
-				uuidToSkyblockProfilesCache.put(uuid, profileArray);
+				//				uuidToSkyblockProfilesCache.put(uuid, profileArray);
 				return new HypixelResponse(profileArray);
 			} catch (Exception e) {
 				return new HypixelResponse(higherDepth(profilesJson, "cause").getAsString());
@@ -145,48 +145,48 @@ public class Hypixel {
 	public static CompletableFuture<JsonElement> asyncSkyblockProfilesFromUuid(String uuid, String hypixelApiKey) {
 		CompletableFuture<JsonElement> future = new CompletableFuture<>();
 
-		JsonElement cachedResponse = uuidToSkyblockProfilesCache.getIfPresent(uuid);
-		if (cachedResponse != null) {
-			future.complete(cachedResponse);
-		} else {
-			future =
-				asyncHttpClient
-					.prepareGet("https://api.hypixel.net/skyblock/profiles?key=" + hypixelApiKey + "&uuid=" + uuid)
-					.execute()
-					.toCompletableFuture()
-					.thenApply(
-						profilesResponse -> {
+		//		JsonElement cachedResponse = uuidToSkyblockProfilesCache.getIfPresent(uuid);
+		//		if (cachedResponse != null) {
+		//			future.complete(cachedResponse);
+		//		} else {
+		future =
+			asyncHttpClient
+				.prepareGet("https://api.hypixel.net/skyblock/profiles?key=" + hypixelApiKey + "&uuid=" + uuid)
+				.execute()
+				.toCompletableFuture()
+				.thenApply(
+					profilesResponse -> {
+						try {
 							try {
-								try {
-									keyCooldownMap
-										.get(hypixelApiKey)
-										.remainingLimit.set(Integer.parseInt(profilesResponse.getHeader("RateLimit-Remaining")));
-									keyCooldownMap
-										.get(hypixelApiKey)
-										.timeTillReset.set(Integer.parseInt(profilesResponse.getHeader("RateLimit-Reset")));
-								} catch (Exception ignored) {}
+								keyCooldownMap
+									.get(hypixelApiKey)
+									.remainingLimit.set(Integer.parseInt(profilesResponse.getHeader("RateLimit-Remaining")));
+								keyCooldownMap
+									.get(hypixelApiKey)
+									.timeTillReset.set(Integer.parseInt(profilesResponse.getHeader("RateLimit-Reset")));
+							} catch (Exception ignored) {}
 
-								JsonArray profileArray = higherDepth(JsonParser.parseString(profilesResponse.getResponseBody()), "profiles")
-									.getAsJsonArray();
-								uuidToSkyblockProfilesCache.put(uuid, profileArray);
+							JsonArray profileArray = higherDepth(JsonParser.parseString(profilesResponse.getResponseBody()), "profiles")
+								.getAsJsonArray();
+							//								uuidToSkyblockProfilesCache.put(uuid, profileArray);
 
-								return profileArray;
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-							return null;
+							return profileArray;
+						} catch (Exception e) {
+							e.printStackTrace();
 						}
-					);
-		}
+						return null;
+					}
+				);
+		//		}
 
 		return future;
 	}
 
 	public static HypixelResponse playerFromUuid(String uuid) {
-		JsonElement cachedResponse = uuidToPlayerCache.getIfPresent(uuid);
-		if (cachedResponse != null) {
-			return new HypixelResponse(cachedResponse);
-		}
+		//		JsonElement cachedResponse = uuidToPlayerCache.getIfPresent(uuid);
+		//		if (cachedResponse != null) {
+		//			return new HypixelResponse(cachedResponse);
+		//		}
 
 		try {
 			JsonElement playerJson = getJson("https://api.hypixel.net/player?key=" + HYPIXEL_API_KEY + "&uuid=" + uuid);
@@ -197,7 +197,7 @@ public class Hypixel {
 				}
 
 				JsonObject playerObject = higherDepth(playerJson, "player").getAsJsonObject();
-				uuidToPlayerCache.put(uuid, playerObject);
+				//				uuidToPlayerCache.put(uuid, playerObject);
 				return new HypixelResponse(playerObject);
 			} catch (Exception e) {
 				return new HypixelResponse(higherDepth(playerJson, "cause").getAsString());

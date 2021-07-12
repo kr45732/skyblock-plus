@@ -17,8 +17,12 @@ import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
 import me.nullicorn.nedit.type.NBTList;
 import net.dv8tion.jda.api.EmbedBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Player {
+
+	private static final Logger log = LoggerFactory.getLogger(Player.class);
 
 	public String invMissing = "";
 	private JsonElement profileJson;
@@ -74,7 +78,7 @@ public class Player {
 				return;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("ign={" + username + "}, profile={" + profileName + "}", e);
 			return;
 		}
 
@@ -92,7 +96,7 @@ public class Player {
 				return;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("uuid={" + playerUuid + "}, ign={" + playerUsername + "}, json={...}\n", e);
 			return;
 		}
 
@@ -164,7 +168,7 @@ public class Player {
 			}
 			return false;
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 		return true;
 	}
@@ -493,7 +497,7 @@ public class Player {
 		}
 
 		try {
-			return higherDepth(hypixelProfileJson, "player.achievements.skyblock_treasure_hunter").getAsInt();
+			return higherDepth(hypixelProfileJson, "achievements.skyblock_treasure_hunter").getAsInt();
 		} catch (Exception e) {
 			return 0;
 		}
@@ -920,7 +924,7 @@ public class Player {
 			}
 			return enderChestPages;
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 		return null;
 	}

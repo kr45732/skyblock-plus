@@ -4,7 +4,10 @@ import static com.skyblockplus.utils.MainClassUtils.*;
 import static com.skyblockplus.utils.Utils.BOT_TOKEN;
 import static com.skyblockplus.utils.Utils.DEFAULT_PREFIX;
 
+import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.jagrosh.jdautilities.command.CommandListener;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.dev.*;
 import com.skyblockplus.dungeons.*;
@@ -29,9 +32,9 @@ import com.skyblockplus.skills.SkillsSlashCommand;
 import com.skyblockplus.slayer.SlayerCommand;
 import com.skyblockplus.slayer.SlayerSlashCommand;
 import com.skyblockplus.timeout.MessageTimeout;
-import com.skyblockplus.utils.Constants;
-import com.skyblockplus.utils.GuildPrefixManager;
-import com.skyblockplus.utils.Utils;
+import com.skyblockplus.utils.*;
+import com.skyblockplus.utils.exceptionhandlers.ExceptionEventListener;
+import com.skyblockplus.utils.exceptionhandlers.GlobalExceptionHandler;
 import com.skyblockplus.utils.slashcommands.SlashCommandClient;
 import com.skyblockplus.weight.WeightCommand;
 import com.skyblockplus.weight.WeightSlashCommand;
@@ -41,17 +44,27 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.requests.RestAction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class Main {
 
+	private static final Logger log = LoggerFactory.getLogger(Main.class);
+
 	public static JDA jda;
 	public static Database database;
 	public static EventWaiter waiter;
+	public static GlobalExceptionHandler globalExceptionHandler;
 
 	public static void main(String[] args) throws LoginException, IllegalArgumentException {
+		Main.globalExceptionHandler = new GlobalExceptionHandler();
+		Thread.setDefaultUncaughtExceptionHandler(globalExceptionHandler);
+		RestAction.setDefaultFailure(e -> globalExceptionHandler.uncaughtException(null, e));
+
 		Utils.setApplicationSettings();
 		Constants.initialize();
 
@@ -155,37 +168,49 @@ public class Main {
 			new PriceSlashCommand()
 		);
 
+		client.setListener(
+			new CommandListener() {
+				@Override
+				public void onCommandException(CommandEvent event, Command command, Throwable throwable) {
+					globalExceptionHandler.uncaughtException(event, command, throwable);
+				}
+			}
+		);
+
 		jda =
 			JDABuilder
 				.createDefault(BOT_TOKEN)
 				.setStatus(OnlineStatus.DO_NOT_DISTURB)
-				.addEventListeners(waiter, client.build(), new MessageTimeout(), new MainListener(), slashCommands)
+				.addEventListeners(
+					new ExceptionEventListener(waiter),
+					client.build(),
+					new ExceptionEventListener(new MessageTimeout()),
+					new ExceptionEventListener(new MainListener()),
+					slashCommands
+				)
 				.setActivity(Activity.playing("Loading..."))
 				.build();
-
 		try {
 			jda.awaitReady();
 		} catch (Exception ignored) {}
-
 		jda.getPresence().setActivity(Activity.watching(DEFAULT_PREFIX + "help in " + jda.getGuilds().size() + " servers"));
-		//		scheduleUpdateLinkedAccounts();
-		//		AuctionFlipper.scheduleFlipper();
-
+		//				scheduleUpdateLinkedAccounts();
+		//				AuctionFlipper.scheduleFlipper();
 	}
 
 	@PreDestroy
 	public void onExit() {
-		System.out.println("== Stopping ==");
+		log.info("Stopping");
 
-		System.out.println("== Caching Apply Users ==");
+		log.info("Caching Apply Users");
 		cacheApplyGuildUsers();
 
-		System.out.println("== Closing Http Client ==");
+		log.info("Closing Http Client");
 		closeHttpClient();
 
-		System.out.println("== Closing Async Http Client ==");
+		log.info("Closing Async Http Client");
 		closeAsyncHttpClient();
 
-		System.out.println("== Finished ==");
+		log.info("Finished");
 	}
 }

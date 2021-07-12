@@ -39,7 +39,7 @@ public class SlashCommandExecutedEvent {
 		for (OptionMapping option : event.getOptions()) {
 			options.append(" ").append(option.getAsString());
 		}
-		logCommand(event.getGuild(), event.getUser(), "/" + event.getCommandPath().replace("/", " ") + " " + options);
+		logCommand(event.getGuild(), event.getUser(), ("/" + event.getCommandPath().replace("/", " ") + " " + options).trim());
 	}
 
 	public User getUser() {

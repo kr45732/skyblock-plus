@@ -61,7 +61,7 @@ public class PriceCommand extends Command {
 			String timeUntil = instantToDHM(duration);
 
 			String ebStr = "**Item name:** " + itemName;
-			ebStr += "\n**Seller:** " + uuidToUsername(higherDepth(auction, "auctioneer").getAsString());
+			ebStr += "\n**Seller:** " + uuidToUsername(higherDepth(auction, "auctioneer").getAsString()).playerUsername;
 			ebStr += "\n**Command:** `/ah " + higherDepth(auction, "uuid").getAsString() + "`";
 			long highestBid = higherDepth(auction, "highest_bid_amount").getAsInt();
 			long startingBid = higherDepth(auction, "starting_bid").getAsInt();
@@ -76,7 +76,7 @@ public class PriceCommand extends Command {
 					ebStr +=
 						bidsArr.size() > 0
 							? "\n**Highest bidder:** " +
-							uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString())
+							uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).playerUsername
 							: "";
 				}
 			} else {
@@ -85,7 +85,7 @@ public class PriceCommand extends Command {
 						"\n**Auction sold** for " +
 						simplifyNumber(highestBid) +
 						" coins to " +
-						uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString());
+						uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).playerUsername;
 				} else {
 					ebStr = "\n**Auction did not sell**";
 				}

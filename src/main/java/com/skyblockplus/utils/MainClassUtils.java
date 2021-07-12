@@ -22,8 +22,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MainClassUtils {
+
+	private static final Logger log = LoggerFactory.getLogger(MainClassUtils.class);
 
 	public static void cacheApplyGuildUsers() {
 		long startTime = System.currentTimeMillis();
@@ -48,16 +52,15 @@ public class MainClassUtils {
 						);
 
 						if (code == 200) {
-							System.out.println("Successfully cached ApplyUser | " + automaticGuild.getKey() + " | " + applyUserList.size());
+							log.info("Successfully cached ApplyUser | " + automaticGuild.getKey() + " | " + applyUserList.size());
 						}
 					}
 				} catch (Exception e) {
-					System.out.println("== Stack Trace (Cache ApplyUser - " + automaticGuild.getKey() + ")");
-					e.printStackTrace();
+					log.error("cacheApplyGuildUsers - " + automaticGuild.getKey(), e);
 				}
 			}
 		}
-		System.out.println("== Cached apply users in " + ((System.currentTimeMillis() - startTime) / 1000) + "s ==");
+		log.info("Cached apply users in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
 	}
 
 	public static List<ApplyUser> getApplyGuildUsersCache(String guildId, String name) {
@@ -74,13 +77,12 @@ public class MainClassUtils {
 				applyUsersCacheList.add(currentApplyUserCache);
 			}
 			if (applyUsersCacheList.size() > 0) {
-				System.out.println("Retrieved cache (" + applyUsersCacheList.size() + ") - " + guildId);
+				log.info("Retrieved cache (" + applyUsersCacheList.size() + ") - guildId={" + guildId + "}, name={" + name + "}");
 				database.deleteApplyCacheSettings(guildId, name);
 				return applyUsersCacheList;
 			}
 		} catch (Exception e) {
-			System.out.println("== Stack Trace (Get cache ApplyUser - " + guildId + ")");
-			e.printStackTrace();
+			log.error("getApplyGuildUsersCache(guildId={" + guildId + "}, name={" + name + "})", e);
 		}
 
 		return new ArrayList<>();
@@ -94,20 +96,18 @@ public class MainClassUtils {
 	public static void closeAsyncHttpClient() {
 		try {
 			asyncHttpClient.close();
-			System.out.println("== Successfully Closed Async Http Client ==");
+			log.info("Successfully Closed Async Http Client");
 		} catch (Exception e) {
-			System.out.println("== Stack Trace (Close Async Http Client)");
-			e.printStackTrace();
+			log.error("closeAsyncHttpClient()", e);
 		}
 	}
 
 	public static void closeHttpClient() {
 		try {
 			httpClient.close();
-			System.out.println("== Successfully Closed Http Client ==");
+			log.info("Successfully Closed Http Client");
 		} catch (Exception e) {
-			System.out.println("== Stack Trace (Close Http Client)");
-			e.printStackTrace();
+			log.error("closeHttpClient()", e);
 		}
 	}
 
@@ -151,8 +151,7 @@ public class MainClassUtils {
 					}
 				);
 		} catch (Exception e) {
-			System.out.println("== Stack Trace (update link) ==");
-			e.printStackTrace();
+			log.error("updateLinkedAccounts()", e);
 		}
 	}
 }

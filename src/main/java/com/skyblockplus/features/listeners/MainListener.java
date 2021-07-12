@@ -4,6 +4,7 @@ import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.*;
 
+import com.skyblockplus.features.skyblockevent.SkyblockEventCommand;
 import java.util.HashMap;
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -17,9 +18,13 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
 
 public class MainListener extends ListenerAdapter {
 
+	private static final Logger log = LoggerFactory.getLogger(SkyblockEventCommand.class);
 	public static final Map<String, AutomaticGuild> guildMap = new HashMap<>();
 
 	public static String onApplyReload(String guildId) {
@@ -55,7 +60,7 @@ public class MainListener extends ListenerAdapter {
 		if (isUniqueGuild(event.getGuild().getId())) {
 			guildMap.put(event.getGuild().getId(), new AutomaticGuild(event));
 		} else {
-			System.out.println(event.getGuild().getId() + " is not unique - ready");
+			log.warn("GuildReadyEvent - " + event.getGuild() + " exists in guildMap");
 		}
 	}
 
@@ -116,7 +121,7 @@ public class MainListener extends ListenerAdapter {
 
 			guildMap.put(event.getGuild().getId(), new AutomaticGuild(event));
 		} else {
-			System.out.println(event.getGuild().getId() + " is not unique - join");
+			log.warn("GuildJoinEvent - " + event.getGuild() + " exists in guildMap");
 		}
 	}
 

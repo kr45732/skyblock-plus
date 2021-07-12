@@ -200,7 +200,13 @@ public class GuildCommand extends Command {
 			JsonElement currentMember = guildMembers.get(i).getAsJsonObject();
 			if (higherDepth(currentMember, "rank").getAsString().equals("Guild Master")) {
 				guildInfo +=
-					("• " + guildName + "'s guild master is " + uuidToUsername(higherDepth(currentMember, "uuid").getAsString())) + "\n";
+					(
+						"• " +
+						guildName +
+						"'s guild master is " +
+						uuidToUsername(higherDepth(currentMember, "uuid").getAsString()).playerUsername
+					) +
+					"\n";
 				break;
 			}
 		}

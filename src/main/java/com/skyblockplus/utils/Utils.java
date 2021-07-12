@@ -12,6 +12,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.skyblockplus.Main;
 import com.skyblockplus.utils.structs.*;
 import java.awt.*;
 import java.io.*;
@@ -35,6 +36,7 @@ import me.nullicorn.nedit.type.NBTList;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import org.apache.commons.text.similarity.LevenshteinDistance;
@@ -46,8 +48,12 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.Dsl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Utils {
+
+	private static final Logger log = LoggerFactory.getLogger(Utils.class);
 
 	/* Constants */
 	public static final Color botColor = new Color(223, 5, 5);
@@ -101,7 +107,8 @@ public class Utils {
 	public static JsonObject internalJsonMappings;
 	public static JsonObject emojiMap;
 	/* Miscellaneous */
-	public static MessageChannel botLogChannel;
+	public static TextChannel botLogChannel;
+	public static TextChannel errorLogChannel;
 	public static Instant lowestBinJsonLastUpdated = Instant.now();
 	public static Instant averageAuctionJsonLastUpdated = Instant.now();
 	public static Instant bazaarJsonLastUpdated = Instant.now();
@@ -280,7 +287,7 @@ public class Utils {
 	public static JsonElement getJson(String jsonUrl) {
 		try {
 			if (jsonUrl.contains(HYPIXEL_API_KEY) && remainingLimit.get() < 5) {
-				System.out.println("Sleeping for " + timeTillReset + " seconds");
+				log.info("Sleeping for " + timeTillReset + " seconds");
 				TimeUnit.SECONDS.sleep(timeTillReset.get());
 			}
 		} catch (Exception ignored) {}
@@ -361,15 +368,20 @@ public class Utils {
 			if (usernameUuidStruct.isNotValid()) {
 				return new DiscordInfoStruct(usernameUuidStruct.failCause);
 			}
-			HypixelResponse playerResponse = playerFromUuid(usernameUuidStruct.playerUuid);
-			if (playerResponse.isNotValid()) {
-				return new DiscordInfoStruct(playerResponse.failCause);
+			HypixelResponse response = playerFromUuid(usernameUuidStruct.playerUuid);
+			if (response.isNotValid()) {
+				return new DiscordInfoStruct(response.failCause);
 			}
-			JsonElement playerJson = playerResponse.response;
 
-			String discordTag = higherDepth(playerJson, "player.socialMedia.links.DISCORD").getAsString();
-			String minecraftUsername = higherDepth(playerJson, "player.displayname").getAsString();
-			String minecraftUuid = higherDepth(playerJson, "player.uuid").getAsString();
+			if (response.get("socialMedia.links.DISCORD") == null) {
+				return new DiscordInfoStruct(
+					"Player is not linked on Hypixel. For help on how to link view [__**this video**__](https://streamable.com/sdq8tp)."
+				);
+			}
+
+			String discordTag = response.get("socialMedia.links.DISCORD").getAsString();
+			String minecraftUsername = response.get("displayname").getAsString();
+			String minecraftUuid = response.get("uuid").getAsString();
 
 			return new DiscordInfoStruct(discordTag, minecraftUsername, minecraftUuid);
 		} catch (Exception e) {
@@ -584,7 +596,7 @@ public class Utils {
 		try {
 			return JsonParser.parseString(jsScriptEngine.eval(String.format("JSON.stringify(%s);", jsString)).toString());
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("parseJsString()", e);
 			return null;
 		}
 	}

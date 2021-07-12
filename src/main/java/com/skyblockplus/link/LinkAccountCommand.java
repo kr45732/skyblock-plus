@@ -10,6 +10,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
 import com.skyblockplus.api.serversettings.automatedguild.GuildRole;
+import com.skyblockplus.features.skyblockevent.SkyblockEventCommand;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import java.time.Instant;
@@ -20,6 +21,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LinkAccountCommand extends Command {
 
@@ -92,10 +95,7 @@ public class LinkAccountCommand extends Command {
 				for (JsonElement verifyRole : verifyRoles) {
 					try {
 						guild.addRoleToMember(member.getId(), guild.getRoleById(verifyRole.getAsString())).complete();
-					} catch (Exception e) {
-						System.out.println("== Stack Trace (linkAccount - add role inside for - " + member.getId() + ") ==");
-						e.printStackTrace();
-					}
+					} catch (Exception ignored) {}
 				}
 			} catch (Exception ignored) {}
 

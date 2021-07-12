@@ -21,8 +21,6 @@ public class EssenceSlashCommand extends SlashCommand {
 				String subcommandName = event.getSubcommandName();
 				String itemName = event.getOptionStr("item");
 
-				System.out.println(subcommandName + " - " + itemName);
-
 				EmbedBuilder eb;
 				if (subcommandName.equals("upgrade")) {
 					eb = event.disabledCommandMessage();

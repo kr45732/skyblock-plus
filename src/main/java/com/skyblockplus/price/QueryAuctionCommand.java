@@ -86,7 +86,8 @@ public class QueryAuctionCommand extends Command {
 								String lowestBinStr = "";
 								lowestBinStr += "**Name:** " + enchantName.replaceAll("[_;]", " ");
 								lowestBinStr += "\n**Price:** " + simplifyNumber(higherDepth(lowestBinAh, "starting_bid").getAsDouble());
-								lowestBinStr += "\n**Seller:** " + uuidToUsername(higherDepth(lowestBinAh, "auctioneer").getAsString());
+								lowestBinStr +=
+									"\n**Seller:** " + uuidToUsername(higherDepth(lowestBinAh, "auctioneer").getAsString()).playerUsername;
 								lowestBinStr += "\n**Auction:** `/ah " + higherDepth(lowestBinAh, "uuid").getAsString() + "`";
 
 								lowestBinStr += "\n**Ends in:** " + instantToDHM(duration);
@@ -156,7 +157,8 @@ public class QueryAuctionCommand extends Command {
 								" " +
 								higherDepth(lowestBinAh, "item_name").getAsString();
 							lowestBinStr += "\n**Price:** " + simplifyNumber(higherDepth(lowestBinAh, "starting_bid").getAsDouble());
-							lowestBinStr += "\n**Seller:** " + uuidToUsername(higherDepth(lowestBinAh, "auctioneer").getAsString());
+							lowestBinStr +=
+								"\n**Seller:** " + uuidToUsername(higherDepth(lowestBinAh, "auctioneer").getAsString()).playerUsername;
 							lowestBinStr += "\n**Auction:** `/ah " + higherDepth(lowestBinAh, "uuid").getAsString() + "`";
 
 							lowestBinStr += "\n**Ends in:** " + instantToDHM(duration);
@@ -189,7 +191,7 @@ public class QueryAuctionCommand extends Command {
 			String lowestBinStr = "";
 			lowestBinStr += "**Name:** " + higherDepth(lowestBinAh, "item_name").getAsString();
 			lowestBinStr += "\n**Price:** " + simplifyNumber(higherDepth(lowestBinAh, "starting_bid").getAsDouble());
-			lowestBinStr += "\n**Seller:** " + uuidToUsername(higherDepth(lowestBinAh, "auctioneer").getAsString());
+			lowestBinStr += "\n**Seller:** " + uuidToUsername(higherDepth(lowestBinAh, "auctioneer").getAsString()).playerUsername;
 			lowestBinStr += "\n**Auction:** `/ah " + higherDepth(lowestBinAh, "uuid").getAsString() + "`";
 
 			lowestBinStr += "\n**Ends in:** " + instantToDHM(duration);

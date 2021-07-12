@@ -40,8 +40,12 @@ import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
 import org.apache.commons.collections4.ListUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AutomaticGuild {
+
+	private static final Logger log = LoggerFactory.getLogger(AutomaticGuild.class);
 
 	/* Automated Apply */
 	public final List<ApplyGuild> applyGuild = new ArrayList<>();
@@ -113,8 +117,7 @@ public class AutomaticGuild {
 					applyGuild.add(new ApplyGuild(reactMessage, new Gson().toJsonTree(currentSetting)));
 				}
 			} catch (Exception e) {
-				System.out.println("== Stack Trace (Apply constructor error - " + event.getGuild().getId() + ") ==");
-				e.printStackTrace();
+				log.error("Apply constructor error - " + event.getGuild().getId(), e);
 			}
 		}
 	}
@@ -178,8 +181,7 @@ public class AutomaticGuild {
 					applyStr.append("• `").append(currentSetting.getName()).append("` is disabled\n");
 				}
 			} catch (Exception e) {
-				System.out.println("== Stack Trace (Reload apply constructor error - " + guildId + ") ==");
-				e.printStackTrace();
+				log.error("Reload apply constructor error - " + guildId, e);
 				if (e.getMessage() != null && e.getMessage().contains("Missing permission")) {
 					applyStr
 						.append("• Error Reloading for `")
@@ -239,8 +241,7 @@ public class AutomaticGuild {
 				verifyGuild = new VerifyGuild(reactChannel, reactMessage);
 			}
 		} catch (Exception e) {
-			System.out.println("== Stack Trace (Verify constructor error - " + event.getGuild().getId() + ") ==");
-			e.printStackTrace();
+			log.error("Verify constructor error - " + event.getGuild().getId(), e);
 		}
 	}
 
@@ -287,8 +288,7 @@ public class AutomaticGuild {
 				return "Not enabled";
 			}
 		} catch (Exception e) {
-			System.out.println("== Stack Trace (Reload verify constructor error - " + guildId + ") ==");
-			e.printStackTrace();
+			log.error("Reload verify constructor error - " + guildId, e);
 			if (e.getMessage().contains("Missing permission")) {
 				return ("Error Reloading\nMissing permission: " + e.getMessage().split("Missing permission: ")[1]);
 			}
@@ -368,8 +368,7 @@ public class AutomaticGuild {
 				try {
 					latch.await(15, TimeUnit.SECONDS);
 				} catch (Exception e) {
-					System.out.println("== Stack Trace (updateGuild latch - " + guildId + ") ==");
-					e.printStackTrace();
+					log.error("updateGuild latch - " + guildId, e);
 				}
 			}
 
@@ -485,8 +484,7 @@ public class AutomaticGuild {
 				")"
 			);
 		} catch (Exception e) {
-			System.out.println("== Stack Trace (updateGuild - " + guildId + ") ==");
-			e.printStackTrace();
+			log.error("updateGuild - " + guildId, e);
 		}
 	}
 
@@ -505,8 +503,7 @@ public class AutomaticGuild {
 				}
 			}
 		} catch (Exception e) {
-			System.out.println("== Stack Trace (updateSkyblockEvent) ==");
-			e.printStackTrace();
+			log.error("updateSkyblockEvent - " + guildId, e);
 		}
 	}
 
