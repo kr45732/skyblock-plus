@@ -287,9 +287,13 @@ public class Player {
 	}
 
 	public SkillsStruct getSkill(JsonElement profile, String skillName) {
+		return getSkill(profile, skillName, false);
+	}
+
+	public SkillsStruct getSkill(JsonElement profile, String skillName, boolean isWeight) {
 		try {
 			double skillExp = higherDepth(profile, "experience_skill_" + skillName).getAsDouble();
-			return skillInfoFromExp(skillExp, skillName);
+			return skillInfoFromExp(skillExp, skillName, isWeight);
 		} catch (Exception ignored) {}
 		return null;
 	}
@@ -314,6 +318,10 @@ public class Player {
 	}
 
 	public SkillsStruct skillInfoFromExp(double skillExp, String skill) {
+		return skillInfoFromExp(skillExp, skill, false);
+	}
+
+	public SkillsStruct skillInfoFromExp(double skillExp, String skill, boolean isWeight) {
 		JsonArray skillsTable;
 		if (skill.equals("catacombs")) {
 			skillsTable = higherDepth(getLevelingJson(), "catacombs").getAsJsonArray();
@@ -323,7 +331,7 @@ public class Player {
 			skillsTable = higherDepth(getLevelingJson(), "leveling_xp").getAsJsonArray();
 		}
 
-		int maxLevel = getSkillMaxLevel(skill, false);
+		int maxLevel = getSkillMaxLevel(skill, isWeight);
 
 		long xpTotal = 0L;
 		int level = 1;
