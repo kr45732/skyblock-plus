@@ -11,7 +11,6 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.api.serversettings.skyblockevent.RunningEvent;
 import com.skyblockplus.api.serversettings.skyblockevent.SbEvent;
-import com.skyblockplus.timeout.MessageTimeout;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import java.time.Duration;
 import java.time.Instant;

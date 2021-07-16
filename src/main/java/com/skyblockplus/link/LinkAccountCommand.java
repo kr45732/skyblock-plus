@@ -10,7 +10,6 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
 import com.skyblockplus.api.serversettings.automatedguild.GuildRole;
-import com.skyblockplus.features.skyblockevent.SkyblockEventCommand;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import java.time.Instant;
@@ -21,8 +20,6 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class LinkAccountCommand extends Command {
 
@@ -99,7 +96,8 @@ public class LinkAccountCommand extends Command {
 				}
 			} catch (Exception ignored) {}
 
-			return invalidEmbed("`" + member.getUser().getAsTag() + "` was linked to `" + fixUsername(playerInfo.minecraftUsername) + "`");
+			return defaultEmbed()
+				.setDescription("`" + member.getUser().getAsTag() + "` was linked to `" + fixUsername(playerInfo.minecraftUsername) + "`");
 		} else {
 			return invalidEmbed(
 				"Error linking `" + member.getUser().getAsTag() + " to `" + fixUsername(playerInfo.minecraftUsername) + "`"

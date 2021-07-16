@@ -20,10 +20,8 @@ public class SlayerCommand extends Command {
 	public static EmbedBuilder getPlayerSlayer(String username, String profileName) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
-			EmbedBuilder eb = player.defaultPlayerEmbed();
-
-			JsonElement slayer = higherDepth(player.getProfileJson(), "slayer_bosses");
-
+            EmbedBuilder eb = player.defaultPlayerEmbed();
+            
 			int svenOneKills = player.getSlayerBossKills("wolf", 0);
 			int svenTwoKills = player.getSlayerBossKills("wolf", 1);
 			int svenThreeKills = player.getSlayerBossKills("wolf", 2);
