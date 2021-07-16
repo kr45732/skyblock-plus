@@ -7,7 +7,6 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
-
 public class PlaceholderCommand extends Command {
 
 	public PlaceholderCommand() {
