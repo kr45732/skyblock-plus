@@ -96,7 +96,7 @@ public class LinkAccountCommand extends Command {
 				}
 			} catch (Exception ignored) {}
 
-			return defaultEmbed()
+			return defaultEmbed("Success")
 				.setDescription("`" + member.getUser().getAsTag() + "` was linked to `" + fixUsername(playerInfo.minecraftUsername) + "`");
 		} else {
 			return invalidEmbed(

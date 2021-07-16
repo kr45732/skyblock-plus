@@ -2,7 +2,6 @@ package com.skyblockplus.slayer;
 
 import static com.skyblockplus.utils.Utils.*;
 
-import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
@@ -20,8 +19,8 @@ public class SlayerCommand extends Command {
 	public static EmbedBuilder getPlayerSlayer(String username, String profileName) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
-            EmbedBuilder eb = player.defaultPlayerEmbed();
-            
+			EmbedBuilder eb = player.defaultPlayerEmbed();
+
 			int svenOneKills = player.getSlayerBossKills("wolf", 0);
 			int svenTwoKills = player.getSlayerBossKills("wolf", 1);
 			int svenThreeKills = player.getSlayerBossKills("wolf", 2);
