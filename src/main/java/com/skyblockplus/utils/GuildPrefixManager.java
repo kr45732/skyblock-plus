@@ -1,6 +1,7 @@
 package com.skyblockplus.utils;
 
 import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
+import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.GuildSettingsProvider;
 import java.util.Collection;
@@ -19,6 +20,10 @@ public class GuildPrefixManager implements GuildSettingsProvider {
 	@Nullable
 	@Override
 	public Collection<String> getPrefixes() {
+		if (IS_API) {
+			return Collections.singletonList(DEFAULT_PREFIX);
+		}
+
 		return Collections.singletonList(getGuildPrefix(guild.getId()));
 	}
 }

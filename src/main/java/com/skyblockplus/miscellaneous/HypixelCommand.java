@@ -209,7 +209,7 @@ public class HypixelCommand extends Command {
 				"• Potato Talisman: " +
 				"<t:" +
 				Instant.ofEpochMilli(higherDepth(hypixelJson, "claimed_potato_talisman").getAsLong()).getEpochSecond() +
-				"d:>" +
+				":d>" +
 				"\n";
 		}
 
@@ -218,7 +218,7 @@ public class HypixelCommand extends Command {
 				"• Potato Basket: " +
 				"<t:" +
 				Instant.ofEpochMilli(higherDepth(hypixelJson, "claimed_potato_basket").getAsLong()).getEpochSecond() +
-				"d:>" +
+				":d>" +
 				"\n";
 		}
 
@@ -227,7 +227,7 @@ public class HypixelCommand extends Command {
 				"• Potato War Crown: " +
 				"<t:" +
 				Instant.ofEpochMilli(higherDepth(hypixelJson, "claim_potato_war_crown").getAsLong()).getEpochSecond() +
-				"d:>" +
+				":d>" +
 				"\n";
 		}
 

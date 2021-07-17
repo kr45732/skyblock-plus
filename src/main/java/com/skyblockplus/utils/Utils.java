@@ -86,6 +86,7 @@ public class Utils {
 	public static String API_BASE_URL = "";
 	public static String GITHUB_TOKEN = "";
 	public static String DEFAULT_PREFIX = "";
+	public static boolean IS_API = false;
 	/* JSON */
 	public static JsonElement essenceCostsJson;
 	public static JsonElement levelingJson;
@@ -824,6 +825,7 @@ public class Utils {
 	public static void setApplicationSettings() {
 		Properties appProps = new Properties();
 		try {
+			IS_API = false;
 			appProps.load(new FileInputStream("DevSettings.properties"));
 			HYPIXEL_API_KEY = (String) appProps.get("HYPIXEL_API_KEY");
 			BOT_TOKEN = (String) appProps.get("BOT_TOKEN");
@@ -863,6 +865,7 @@ public class Utils {
 			API_USERNAME = System.getenv("API_USERNAME");
 			API_PASSWORD = System.getenv("API_PASSWORD");
 			API_BASE_URL = System.getenv("API_BASE_URL");
+			IS_API = API_BASE_URL.equals("https://skyblock-plus.up.railway.app/");
 			DEFAULT_PREFIX = System.getenv("DEFAULT_PREFIX");
 		}
 	}

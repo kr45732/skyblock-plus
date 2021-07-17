@@ -14,6 +14,10 @@ public class DataSourceConfig {
 	@ConfigurationProperties(prefix = "application.properties")
 	@Bean
 	public DataSource getDataSource() {
+		if (IS_API) {
+			return null;
+		}
+
 		return DataSourceBuilder.create().url(DATABASE_URL).username(DATABASE_USERNAME).password(DATABASE_PASSWORD).build();
 	}
 }

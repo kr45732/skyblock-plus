@@ -81,7 +81,7 @@ public class BankCommand extends Command {
 					paginateBuilder.addItems(
 						"**<t:" +
 						Instant.ofEpochMilli(higherDepth(currentTransaction, "timestamp").getAsLong()).getEpochSecond() +
-						"D:>**: " +
+						":D>**: " +
 						valueString
 					);
 				}

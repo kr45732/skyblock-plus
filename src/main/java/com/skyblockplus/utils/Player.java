@@ -90,13 +90,15 @@ public class Player {
 		this.playerUsername = playerUsername;
 
 		try {
-			this.profilesArray = outerProfileJson.getAsJsonArray();
+			if (outerProfileJson == null) {
+				return;
+			}
 
+			this.profilesArray = outerProfileJson.getAsJsonArray();
 			if (getLatestProfile(profilesArray)) {
 				return;
 			}
 		} catch (Exception e) {
-			log.error("uuid={" + playerUuid + "}, ign={" + playerUsername + "}, json={...}\n", e);
 			return;
 		}
 
@@ -108,6 +110,10 @@ public class Player {
 		this.playerUsername = playerUsername;
 
 		try {
+			if (outerProfileJson == null) {
+				return;
+			}
+
 			this.profilesArray = outerProfileJson.getAsJsonArray();
 			if (profileIdFromName(profileName, profilesArray)) {
 				return;

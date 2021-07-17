@@ -1,8 +1,7 @@
 package com.skyblockplus;
 
 import static com.skyblockplus.utils.MainClassUtils.*;
-import static com.skyblockplus.utils.Utils.BOT_TOKEN;
-import static com.skyblockplus.utils.Utils.DEFAULT_PREFIX;
+import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
@@ -177,19 +176,23 @@ public class Main {
 			}
 		);
 
-		jda =
-			JDABuilder
-				.createDefault(BOT_TOKEN)
-				.setStatus(OnlineStatus.DO_NOT_DISTURB)
-				.addEventListeners(
-					new ExceptionEventListener(waiter),
-					client.build(),
-					new ExceptionEventListener(new MessageTimeout()),
-					new ExceptionEventListener(new MainListener()),
-					slashCommands
-				)
-				.setActivity(Activity.playing("Loading..."))
-				.build();
+		JDABuilder jdaBuilder = JDABuilder
+			.createDefault(BOT_TOKEN)
+			.setStatus(OnlineStatus.DO_NOT_DISTURB)
+			.addEventListeners(
+				new ExceptionEventListener(waiter),
+				client.build(),
+				new ExceptionEventListener(new MessageTimeout()),
+				slashCommands
+			)
+			.setActivity(Activity.playing("Loading..."));
+
+		if (!IS_API) {
+			jdaBuilder.addEventListeners(new ExceptionEventListener(new MainListener()));
+		}
+
+		jda = jdaBuilder.build();
+
 		try {
 			jda.awaitReady();
 		} catch (Exception ignored) {}
@@ -214,3 +217,5 @@ public class Main {
 		log.info("Finished");
 	}
 }
+// worker: java $JAVA_OPTS -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:+UseStringDeduplication -jar build/libs/SkyblockPlus-0.0.1.jar
+// web: java -Dserver.port=${PORT} -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:+UseStringDeduplication -jar build/libs/SkyblockPlus-0.0.1.jar

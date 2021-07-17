@@ -24,7 +24,7 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
 		}
 
 		try {
-			StringBuilder outputStr = new StringBuilder("```java\n");
+			StringBuilder outputStr = new StringBuilder("```java\n" + e.getMessage() +"\n");
 			for (StackTraceElement s : e.getStackTrace()) {
 				outputStr.append(s.toString()).append("\n");
 			}
@@ -55,7 +55,7 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
 		}
 
 		try {
-			StringBuilder outputStr = new StringBuilder("```java\n");
+			StringBuilder outputStr = new StringBuilder("```java\n" + e.getMessage() + "\n");
 			for (StackTraceElement s : e.getStackTrace()) {
 				outputStr.append(s.toString()).append("\n");
 			}
