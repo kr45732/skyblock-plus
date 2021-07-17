@@ -114,9 +114,10 @@ public class NetworthExecute {
 
 				String[] args = content.split(" ");
 
-				if (args.length == 2) {
+				if (args.length == 2 || args.length == 3) {
+					EmbedBuilder nwEb = args.length == 2 ? getPlayerNetworth(args[1], null) : getPlayerNetworth(args[1], args[2]);
+
 					long timeP = System.currentTimeMillis();
-					EmbedBuilder nwEb = getPlayerNetworth(args[1], null);
 
 					if (verbose) {
 						try {
@@ -136,32 +137,6 @@ public class NetworthExecute {
 								".json"
 							);
 							System.out.println("TIME: " + (System.currentTimeMillis() - timeP));
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-					ebMessage.editMessageEmbeds(nwEb.build()).queue();
-					return;
-				} else if (args.length == 3) {
-					EmbedBuilder nwEb = getPlayerNetworth(args[1], args[2]);
-
-					if (verbose) {
-						try {
-							if (calcItemsJsonStr.charAt(calcItemsJsonStr.length() - 1) == ',') {
-								calcItemsJsonStr.deleteCharAt(calcItemsJsonStr.length() - 1);
-							}
-							calcItemsJsonStr.append("]");
-
-							nwEb.appendDescription(
-								"\nVerbose JSON: " +
-								makeHastePost(
-									new GsonBuilder()
-										.setPrettyPrinting()
-										.create()
-										.toJson(JsonParser.parseString(calcItemsJsonStr.toString()))
-								) +
-								".json"
-							);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -210,48 +185,58 @@ public class NetworthExecute {
 			}
 
 			Map<Integer, InvItem> playerTalismans = player.getTalismanBagMap();
-			for (InvItem item : playerTalismans.values()) {
-				double itemPrice = calculateItemPrice(item);
-				talismanTotal += itemPrice;
-				if (item != null) {
-					talismanItems.add(addItemStr(item, itemPrice));
+			if (playerTalismans != null) {
+				for (InvItem item : playerTalismans.values()) {
+					double itemPrice = calculateItemPrice(item);
+					talismanTotal += itemPrice;
+					if (item != null) {
+						talismanItems.add(addItemStr(item, itemPrice));
+					}
 				}
 			}
 
 			Map<Integer, InvItem> invArmorMap = player.getInventoryArmorMap();
-			for (InvItem item : invArmorMap.values()) {
-				double itemPrice = calculateItemPrice(item);
-				invArmor += itemPrice;
-				if (item != null) {
-					armorItems.add(addItemStr(item, itemPrice));
+			if (invArmorMap != null) {
+				for (InvItem item : invArmorMap.values()) {
+					double itemPrice = calculateItemPrice(item);
+					invArmor += itemPrice;
+					if (item != null) {
+						armorItems.add(addItemStr(item, itemPrice));
+					}
 				}
 			}
 
 			Map<Integer, InvItem> wardrobeMap = player.getWardrobeMap();
-			for (InvItem item : wardrobeMap.values()) {
-				double itemPrice = calculateItemPrice(item);
-				wardrobeTotal += itemPrice;
-				if (item != null) {
-					wardrobeItems.add(addItemStr(item, itemPrice));
+			if (wardrobeMap != null) {
+				for (InvItem item : wardrobeMap.values()) {
+					double itemPrice = calculateItemPrice(item);
+					wardrobeTotal += itemPrice;
+					if (item != null) {
+						wardrobeItems.add(addItemStr(item, itemPrice));
+					}
 				}
 			}
 
 			List<InvItem> petsMap = player.getPetsMapNames();
-			for (InvItem item : petsMap) {
-				petsTotal += calculateItemPrice(item, "pets");
-			}
-
-			Map<Integer, InvItem> enderChest = player.getEnderChestMap();
-			for (InvItem item : enderChest.values()) {
-				double itemPrice = calculateItemPrice(item, "enderchest");
-				enderChestTotal += itemPrice;
-				if (item != null) {
-					enderChestItems.add(addItemStr(item, itemPrice));
+			if (petsMap != null) {
+				for (InvItem item : petsMap) {
+					petsTotal += calculateItemPrice(item, "pets");
 				}
 			}
 
-			try {
-				Map<Integer, InvItem> storageMap = player.getStorageMap();
+			Map<Integer, InvItem> enderChest = player.getEnderChestMap();
+			if (enderChest != null) {
+				for (InvItem item : enderChest.values()) {
+					double itemPrice = calculateItemPrice(item, "enderchest");
+					enderChestTotal += itemPrice;
+					if (item != null) {
+						enderChestItems.add(addItemStr(item, itemPrice));
+					}
+				}
+			}
+
+			Map<Integer, InvItem> storageMap = player.getStorageMap();
+			if (storageMap != null) {
 				for (InvItem item : storageMap.values()) {
 					double itemPrice = calculateItemPrice(item, "storage");
 					storageTotal += itemPrice;
@@ -259,7 +244,7 @@ public class NetworthExecute {
 						storageItems.add(addItemStr(item, itemPrice));
 					}
 				}
-			} catch (Exception ignored) {}
+			}
 
 			calculateAllPetsPrice();
 

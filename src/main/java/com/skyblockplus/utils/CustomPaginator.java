@@ -23,12 +23,16 @@ import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.internal.utils.Checks;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CustomPaginator extends Menu {
 
+	private static final Logger log = LoggerFactory.getLogger(CustomPaginator.class);
+
 	public static final Consumer<Throwable> throwableConsumer = e -> {
 		if (!e.getMessage().contains("Unknown Message")) {
-			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 	};
 	private static final String BIG_LEFT = "\u23EA";

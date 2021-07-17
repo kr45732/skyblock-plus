@@ -173,9 +173,7 @@ public class Player {
 				}
 			}
 			return false;
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-		}
+		} catch (Exception ignored) {}
 		return true;
 	}
 
@@ -937,9 +935,7 @@ public class Player {
 				}
 			}
 			return enderChestPages;
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-		}
+		} catch (Exception ignored) {}
 		return null;
 	}
 
