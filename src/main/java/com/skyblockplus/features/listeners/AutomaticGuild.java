@@ -662,6 +662,9 @@ public class AutomaticGuild {
 	/* Miscellaneous */
 	public void schedulerConstructor() {
 		int eventDelay = (int) (Math.random() * 60 + 1);
+		if (guildId.equals("796790757947867156")) {
+			eventDelay = 1;
+		}
 		scheduledFutures.add(scheduler.scheduleAtFixedRate(this::updateGuild, eventDelay, 210, TimeUnit.MINUTES));
 		scheduledFutures.add(scheduler.scheduleAtFixedRate(this::updateSkyblockEvent, eventDelay, 60, TimeUnit.MINUTES));
 	}

@@ -1015,8 +1015,7 @@ public class Player {
 	}
 
 	public double getWeight(JsonElement profile) {
-		Weight playerWeight = new Weight(profile, this);
-		return playerWeight.getTotalWeight();
+		return new Weight(profile, this).getTotalWeight(true).getRaw();
 	}
 
 	public double getWeight() {

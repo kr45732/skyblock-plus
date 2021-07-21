@@ -66,7 +66,7 @@ public class SkyblockEvent {
 				resetSkyblockEvent(defaultEmbed("Timeout"));
 			}
 		} catch (Exception e) {
-			log.error("checkForTimeout()", e);
+			log.error(e.getMessage(), e);
 			e.printStackTrace();
 		}
 	}

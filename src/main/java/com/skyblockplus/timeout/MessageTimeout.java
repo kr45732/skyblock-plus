@@ -53,7 +53,7 @@ public class MessageTimeout extends ListenerAdapter {
 				}
 			}
 		} catch (Exception e) {
-			log.error("updateMessages()", e);
+			log.error(e.getMessage(), e);
 		}
 	}
 }

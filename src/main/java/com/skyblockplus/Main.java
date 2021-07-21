@@ -108,7 +108,6 @@ public class Main {
 			new QuickSetupTestCommand(),
 			new EmojiMapServerCommand(),
 			new EnderChestCommand(),
-			new InstantTimeNow(),
 			new GetEventListenersCommand(),
 			new GetAllGuildsIn(),
 			new LinkAccountCommand(),
@@ -183,7 +182,7 @@ public class Main {
 				new ExceptionEventListener(waiter),
 				client.build(),
 				new ExceptionEventListener(new MessageTimeout()),
-				slashCommands
+				new ExceptionEventListener(slashCommands)
 			)
 			.setActivity(Activity.playing("Loading..."));
 

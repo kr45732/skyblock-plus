@@ -29,6 +29,7 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
 				outputStr.append(s.toString()).append("\n");
 			}
 			outputStr.append("\n```");
+
 			errorLogChannel
 				.sendMessageEmbeds(
 					defaultEmbed("Error | " + t)

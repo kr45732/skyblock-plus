@@ -9,6 +9,8 @@ import com.skyblockplus.api.templates.Template;
 import com.skyblockplus.utils.Constants;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,13 +22,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/api/public")
 public class CommandEndpoints {
 
+	private static final Logger log = LoggerFactory.getLogger(CommandEndpoints.class);
+
 	@GetMapping("/essence/information")
 	public ResponseEntity<?> getEssenceInformation(@RequestParam(value = "key") String key, @RequestParam(value = "name") String name) {
 		try {
-			System.out.println("/api/public/essence/information?name=" + name);
+			log.info("/api/public/essence/information?name=" + name);
 
 			JsonElement essenceJson = getEssenceCostsJson();
 			if (essenceJson == null) {
+				log.error("Null essenceJson");
 				return new ResponseEntity<>(new ErrorTemplate(false, "Internal Server Error"), HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 
@@ -52,6 +57,7 @@ public class CommandEndpoints {
 
 			return new ResponseEntity<>(new ErrorTemplate(false, "Invalid Name"), HttpStatus.OK);
 		} catch (Exception e) {
+			log.error(e.getMessage(), e);
 			return new ResponseEntity<>(new ErrorTemplate(false, "Internal Server Error"), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -59,10 +65,11 @@ public class CommandEndpoints {
 	@GetMapping("/bin")
 	public ResponseEntity<?> getLowestBin(@RequestParam(value = "key") String key, @RequestParam(value = "name") String name) {
 		try {
-			System.out.println("/api/public/bin?name=" + name);
+			log.info("/api/public/bin?name=" + name);
 
 			JsonElement lowestBinJson = getLowestBinJson();
 			if (lowestBinJson == null) {
+				log.error("Null lowestBinJson");
 				return new ResponseEntity<>(new ErrorTemplate(false, "Internal Server Error"), HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 
@@ -137,6 +144,7 @@ public class CommandEndpoints {
 
 			return new ResponseEntity<>(new ErrorTemplate(false, "Invalid Name"), HttpStatus.OK);
 		} catch (Exception e) {
+			log.error(e.getMessage(), e);
 			return new ResponseEntity<>(new ErrorTemplate(false, "Internal Server Error"), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -144,10 +152,11 @@ public class CommandEndpoints {
 	@GetMapping("/average")
 	public ResponseEntity<?> getAverageAuction(@RequestParam(value = "key") String key, @RequestParam(value = "name") String name) {
 		try {
-			System.out.println("/api/public/average?name=" + name);
+			log.info("/api/public/average?name=" + name);
 
 			JsonElement avgAhJson = getAverageAuctionJson();
 			if (avgAhJson == null) {
+				log.error("Null averageAuctionJson");
 				return new ResponseEntity<>(new ErrorTemplate(false, "Internal Server Error"), HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 
@@ -222,13 +231,15 @@ public class CommandEndpoints {
 
 			return new ResponseEntity<>(new ErrorTemplate(false, "Invalid Name"), HttpStatus.OK);
 		} catch (Exception e) {
+			log.error(e.getMessage(), e);
 			return new ResponseEntity<>(new ErrorTemplate(false, "Internal Server Error"), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
+	/* Utils */
 	private long getAvgPrice(JsonElement itemJson) {
 		return higherDepth(itemJson, "clean_price") != null
 			? higherDepth(itemJson, "clean_price").getAsLong()
-			: higherDepth(itemJson, "clean").getAsLong();
+			: higherDepth(itemJson, "price").getAsLong();
 	}
 }

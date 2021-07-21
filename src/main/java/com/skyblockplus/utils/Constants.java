@@ -40,6 +40,7 @@ public class Constants {
 	public static final Map<String, String> skillsEmojiMap = new HashMap<>();
 	public static final List<String> petNames = new ArrayList<>();
 	public static final List<String> dungeonClassNames = Arrays.asList("healer", "mage", "berserk", "archer", "tank");
+	public static final List<String> slayerNames = Arrays.asList("sven", "tara", "rev", "enderman");
 	public static final List<String> reforgeStoneNames = new ArrayList<>();
 	public static final List<String> essenceItemNames = new ArrayList<>();
 	public static final List<String> bitsItemNames = new ArrayList<>();
@@ -61,6 +62,11 @@ public class Constants {
 		2500000,
 		3000000
 	);
+	public static final Map<String, Double[]> slayerWeights = new HashMap<>();
+	public static final Map<String, Double[]> skillWeights = new HashMap<>();
+	public static final Map<String, Double> dungeonClassWeights = new HashMap<>();
+	public static final Map<String, Double> dungeonWeights = new HashMap<>();
+	public static final List<String> vanillaItems = new ArrayList<>();
 
 	public static void initialize() {
 		/* rarityToNumberMap */
@@ -113,5 +119,36 @@ public class Constants {
 
 		/* petItemNames */
 		petItemNames.addAll(higherDepth(getSkyCryptPetJson(), "pet_items").getAsJsonObject().keySet());
+
+		/* slayerWeights */
+		slayerWeights.put("rev", new Double[] { 2208D, 0.15D });
+		slayerWeights.put("tara", new Double[] { 2118D, 0.08D });
+		slayerWeights.put("sven", new Double[] { 1962D, 0.015D });
+		slayerWeights.put("enderman", new Double[] { 1430D, 0.017D });
+
+		/* skillWeights */
+		skillWeights.put("mining", new Double[] { 1.18207448, 259634D });
+		skillWeights.put("foraging", new Double[] { 1.232826, 259634D });
+		skillWeights.put("enchanting", new Double[] { 0.96976583, 882758D });
+		skillWeights.put("farming", new Double[] { 1.217848139, 220689D });
+		skillWeights.put("combat", new Double[] { 1.15797687265, 275862D });
+		skillWeights.put("fishing", new Double[] { 1.406418, 88274D });
+		skillWeights.put("alchemy", new Double[] { 1.0, 1103448D });
+		skillWeights.put("taming", new Double[] { 1.14744, 441379D });
+
+		/* dungeonClassWeights */
+		dungeonClassWeights.put("healer", 0.0000045254834D);
+		dungeonClassWeights.put("mage", 0.0000045254834D);
+		dungeonClassWeights.put("berserk", 0.0000045254834D);
+		dungeonClassWeights.put("archer", 0.0000045254834D);
+		dungeonClassWeights.put("tank", 0.0000045254834D);
+
+		/* dungeonWeights */
+		dungeonWeights.put("catacombs", 0.0002149604615D);
+		/* vanillaItems */
+		// JsonArray vanillaItemsJson = getVanillaItemsJson().getAsJsonArray();
+		// for(JsonElement vanillaItem: vanillaItemsJson){
+
+		// }
 	}
 }

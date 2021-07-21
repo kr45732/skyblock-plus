@@ -151,7 +151,7 @@ public class MainClassUtils {
 					}
 				);
 		} catch (Exception e) {
-			log.error("updateLinkedAccounts()", e);
+			log.error(e.getMessage(), e);
 		}
 	}
 }

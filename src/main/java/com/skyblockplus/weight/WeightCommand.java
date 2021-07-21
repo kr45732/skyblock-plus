@@ -1,5 +1,6 @@
 package com.skyblockplus.weight;
 
+import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
@@ -21,12 +22,11 @@ public class WeightCommand extends Command {
 			double slayerD = Double.parseDouble(slayer);
 			double catacombsD = Double.parseDouble(catacombs);
 			double averageDungeonClassD = Double.parseDouble(averageDungeonClass);
-			Weight calculatedWeight = new Weight(skillAverageD, slayerD, catacombsD, averageDungeonClassD);
 			EmbedBuilder eb = defaultEmbed("Weight Calculator");
-			eb.setDescription("**Total Weight**: " + roundAndFormat(calculatedWeight.calculateTotalWeight()));
-			eb.addField("Slayer Weight", roundAndFormat(calculatedWeight.calculateSlayerWeight()), false);
-			eb.addField("Skills Weight", roundAndFormat(calculatedWeight.calculateSkillsWeight()), false);
-			eb.addField("Dungeons Weight", roundAndFormat(calculatedWeight.calculateDungeonsWeight()), false);
+			eb.setDescription("**Total Weight**: " + Weight.of(skillAverageD, slayerD, catacombsD, averageDungeonClassD));
+			eb.addField("Slayer Weight", roundAndFormat(Weight.calculateSkillsWeight(skillAverageD)), false);
+			eb.addField("Skills Weight", roundAndFormat(Weight.calculateSlayerWeight(slayerD)), false);
+			eb.addField("Dungeons Weight", roundAndFormat(Weight.calculateDungeonsWeight(catacombsD, averageDungeonClassD)), false);
 			return eb;
 		} catch (NumberFormatException e) {
 			return defaultEmbed("Invalid input");
@@ -36,12 +36,27 @@ public class WeightCommand extends Command {
 	public static EmbedBuilder getPlayerWeight(String username, String profileName) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
-			Weight playerWeight = new Weight(player);
+			Weight weight = new Weight(player);
 			EmbedBuilder eb = player.defaultPlayerEmbed();
-			eb.setDescription("**Total Weight**: " + roundAndFormat(playerWeight.getTotalWeight()));
-			eb.addField("Slayer Weight", roundAndFormat(playerWeight.getSlayerWeight()), false);
-			eb.addField("Skills Weight", roundAndFormat(playerWeight.getSkillsWeight()), false);
-			eb.addField("Dungeons Weight", roundAndFormat(playerWeight.getDungeonsWeight()), false);
+			String slayerStr = "";
+			for (String slayerName : slayerNames) {
+				slayerStr += capitalizeString(slayerName) + ": " + weight.getSlayerWeight().getSlayerWeight(slayerName).get() + "\n";
+			}
+			String skillsStr = "";
+			for (String skillName : skillNames) {
+				skillsStr += capitalizeString(skillName) + ": " + weight.getSkillsWeight().getSkillsWeight(skillName).get() + "\n";
+			}
+			String dungeonsStr = "";
+			dungeonsStr += capitalizeString("catacombs") + ": " + weight.getDungeonsWeight().getDungeonWeight("catacombs").get() + "\n";
+			for (String dungeonClassName : dungeonClassNames) {
+				dungeonsStr +=
+					capitalizeString(dungeonClassName) + ": " + weight.getDungeonsWeight().getClassWeight(dungeonClassName).get() + "\n";
+			}
+
+			eb.addField("Slayer | " + weight.getSlayerWeight().getWeightStruct().get(), slayerStr, false);
+			eb.addField("Skills | " + weight.getSkillsWeight().getWeightStruct().get(), skillsStr, false);
+			eb.addField("Dungeons | " + weight.getDungeonsWeight().getWeightStruct().get(), dungeonsStr, false);
+			eb.setDescription("**Total Weight:** " + weight.getTotalWeight(false).get());
 			return eb;
 		}
 		return invalidEmbed(player.getFailCause());
