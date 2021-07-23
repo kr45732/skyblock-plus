@@ -45,9 +45,9 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
 		} catch (Exception ignored) {}
 
 		System.out.println("here22");
-		if (t != null) {
+		try {
 			uncaughtExceptionHandler.uncaughtException(t, e);
-		} else {
+		}catch (Exception ex){
 			log.error(e.getMessage(), e);
 		}
 		System.out.println("here33");
