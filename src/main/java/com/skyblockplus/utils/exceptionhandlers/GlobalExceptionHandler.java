@@ -19,7 +19,6 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
 
 	@Override
 	public void uncaughtException(Thread t, Throwable e) {
-		System.out.println("here11");
 		try {
 			if (errorLogChannel == null) {
 				errorLogChannel = jda.getGuildById("796790757947867156").getTextChannelById("864156114060705814");
@@ -44,17 +43,14 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
 				.queue();
 		} catch (Exception ignored) {}
 
-		System.out.println("here22");
-		try {
+		if (t != null) {
 			uncaughtExceptionHandler.uncaughtException(t, e);
-		}catch (Exception ex){
+		} else {
 			log.error(e.getMessage(), e);
 		}
-		System.out.println("here33");
 	}
 
 	public void uncaughtException(CommandEvent event, Command command, Throwable e) {
-		System.out.println("here12");
 		try {
 			if (errorLogChannel == null) {
 				errorLogChannel = jda.getGuildById("796790757947867156").getTextChannelById("864156114060705814");
@@ -83,11 +79,9 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
 				.queue();
 		} catch (Exception ignored) {}
 
-		System.out.println("here 23");
 		log.error(
 			"Error | " + (command != null ? command.getName() : "null") + " | " + (event != null ? event.getGuild().getId() : "null"),
 			e
 		);
-		System.out.println("here 34");
 	}
 }
