@@ -265,7 +265,7 @@ public class Hypixel {
 	}
 
 	public static HypixelResponse getGuildFromName(String guildName) {
-		return getGuildGeneric("&name=" + guildName.replace(" ", "%20"));
+		return getGuildGeneric("&name=" + guildName.replace(" ", "%20").replace("_", "%20"));
 	}
 
 	public static JsonArray getAuctionsByQuery(String query) {

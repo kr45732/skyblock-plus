@@ -230,7 +230,9 @@ public class CustomPaginator extends Menu {
 			}
 		} else if (columns == 1) {
 			StringBuilder stringBuilder = new StringBuilder();
-			for (int i = start; i < end; i++) stringBuilder.append("\n").append(strings.get(i));
+			for (int i = start; i < end; i++) {
+				stringBuilder.append("\n").append(strings.get(i));
+			}
 			embedBuilder.appendDescription(stringBuilder.toString());
 		} else {
 			int per = (int) Math.ceil((double) (end - start) / columns);

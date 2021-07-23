@@ -95,6 +95,7 @@ public class UpdateSlashCommands extends Command {
 						.addOption(OptionType.STRING, "player", "Player username", true),
 					new SubcommandData("experience", "Get the experience leaderboard for a player's guild")
 						.addOption(OptionType.STRING, "player", "Player username", true)
+						.addOption(OptionType.INTEGER, "days", "Number of days", false)
 				),
 			new CommandData("help", "Show the help page for this bot")
 				.addOption(OptionType.STRING, "page", "Page number or name of a command"),

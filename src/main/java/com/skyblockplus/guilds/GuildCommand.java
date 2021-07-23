@@ -33,18 +33,14 @@ public class GuildCommand extends Command {
 		this.aliases = new String[] { "g" };
 	}
 
-	public static EmbedBuilder getGuildExp(String username, User user, MessageChannel channel, InteractionHook hook) {
-		UsernameUuidStruct usernameUuid = usernameToUuid(username);
-		if (usernameUuid.isNotValid()) {
-			return invalidEmbed(usernameUuid.failCause);
-		}
-
-		HypixelResponse hypixelResponse = getGuildFromPlayer(usernameUuid.playerUuid);
-		if (hypixelResponse.isNotValid()) {
-			return invalidEmbed(hypixelResponse.failCause);
-		}
-		JsonElement guildJson = hypixelResponse.response;
-
+	public static EmbedBuilder getGuildExp(
+		JsonElement guildJson,
+		long days,
+		String playerUsername,
+		User user,
+		MessageChannel channel,
+		InteractionHook hook
+	) {
 		JsonElement members = higherDepth(guildJson, "members");
 		JsonArray membersArr = members.getAsJsonArray();
 		List<String> guildExpList = new ArrayList<>();
@@ -60,7 +56,8 @@ public class GuildCommand extends Command {
 								List<String> keys = getJsonKeys(expHistory);
 								int totalPlayerExp = 0;
 
-								for (String value : keys) {
+								for (int j = 0; j < days; j++) {
+									String value = keys.get(j);
 									totalPlayerExp += higherDepth(expHistory, value).getAsInt();
 								}
 								return currentUsername + "=:=" + totalPlayerExp;
@@ -83,24 +80,26 @@ public class GuildCommand extends Command {
 		guildExpList.sort(Comparator.comparingInt(o1 -> -Integer.parseInt(o1.split("=:=")[1])));
 
 		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, user).setColumns(2).setItemsPerPage(20);
-		int guildRank = -1;
-		int guildExp = -1;
-		for (int i = 0; i < guildExpList.size(); i++) {
-			String[] curGuildRank = guildExpList.get(i).split("=:=");
-			if (curGuildRank[0].equals(usernameUuid.playerUsername)) {
-				guildRank = i;
-				guildExp = Integer.parseInt(curGuildRank[1]);
-				break;
+		PaginatorExtras extras = new PaginatorExtras()
+			.setEveryPageTitle(higherDepth(guildJson, "name").getAsString())
+			.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(guildJson, "_id").getAsString());
+
+		if (playerUsername != null) {
+			int guildRank = -2;
+			int guildExp = -1;
+			for (int i = 0; i < guildExpList.size(); i++) {
+				String[] curGuildRank = guildExpList.get(i).split("=:=");
+				if (curGuildRank[0].equals(playerUsername)) {
+					guildRank = i;
+					guildExp = Integer.parseInt(curGuildRank[1]);
+					break;
+				}
 			}
+			extras.setEveryPageText(
+				"**Player:** " + playerUsername + "\n**Guild Rank:** #" + (guildRank + 1) + "\n**Exp:** " + formatNumber(guildExp)
+			);
 		}
-		String rankStr =
-			"**Player:** " + usernameUuid.playerUsername + "\n**Guild Rank:** #" + (guildRank + 1) + "\n**Exp:** " + formatNumber(guildExp);
-		paginateBuilder.setPaginatorExtras(
-			new PaginatorExtras()
-				.setEveryPageTitle(higherDepth(guildJson, "name").getAsString())
-				.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(guildJson, "_id").getAsString())
-				.setEveryPageText(rankStr)
-		);
+		paginateBuilder.setPaginatorExtras(extras);
 
 		for (int i = 0; i < guildExpList.size(); i++) {
 			String[] curG = guildExpList.get(i).split("=:=");
@@ -116,6 +115,39 @@ public class GuildCommand extends Command {
 		}
 
 		return null;
+	}
+
+	public static EmbedBuilder getGuildExpFromPlayer(String username, long days, User user, MessageChannel channel, InteractionHook hook) {
+		if (days < 1 || days > 7) {
+			return invalidEmbed("Days must be between 1 to 7");
+		}
+
+		UsernameUuidStruct usernameUuid = usernameToUuid(username);
+		if (usernameUuid.isNotValid()) {
+			return invalidEmbed(usernameUuid.failCause);
+		}
+
+		HypixelResponse hypixelResponse = getGuildFromPlayer(usernameUuid.playerUuid);
+		if (hypixelResponse.isNotValid()) {
+			return invalidEmbed(hypixelResponse.failCause);
+		}
+		JsonElement guildJson = hypixelResponse.response;
+
+		return getGuildExp(guildJson, days, usernameUuid.playerUsername, user, channel, hook);
+	}
+
+	public static EmbedBuilder getGuildExpFromName(String guildName, long days, CommandEvent event) {
+		if (days < 1 || days > 7) {
+			return invalidEmbed("Days must be between 1 to 7");
+		}
+
+		HypixelResponse hypixelResponse = getGuildFromName(guildName);
+		if (hypixelResponse.isNotValid()) {
+			return invalidEmbed(hypixelResponse.failCause);
+		}
+		JsonElement guildJson = hypixelResponse.response;
+
+		return getGuildExp(guildJson, days, null, event.getAuthor(), event.getChannel(), null);
 	}
 
 	public static EmbedBuilder getGuildPlayer(String username) {
@@ -240,18 +272,7 @@ public class GuildCommand extends Command {
 		return guildInfo;
 	}
 
-	public static EmbedBuilder getGuildMembers(String username, User user, MessageChannel channel, InteractionHook hook) {
-		UsernameUuidStruct usernameUuid = usernameToUuid(username);
-		if (usernameUuid.isNotValid()) {
-			return invalidEmbed(usernameUuid.failCause);
-		}
-
-		HypixelResponse hypixelResponse = getGuildFromPlayer(usernameUuid.playerUuid);
-		if (hypixelResponse.isNotValid()) {
-			return invalidEmbed(hypixelResponse.failCause);
-		}
-		JsonElement guildJson = hypixelResponse.response;
-
+	public static EmbedBuilder getGuildMembers(JsonElement guildJson, User user, MessageChannel channel, InteractionHook hook) {
 		JsonArray membersArr = higherDepth(guildJson, "members").getAsJsonArray();
 		List<CompletableFuture<String>> futures = new ArrayList<>();
 		List<String> guildMembers = new ArrayList<>();
@@ -287,6 +308,31 @@ public class GuildCommand extends Command {
 		return null;
 	}
 
+	public static EmbedBuilder getGuildMembersFromPlayer(String username, User user, MessageChannel channel, InteractionHook hook) {
+		UsernameUuidStruct usernameUuid = usernameToUuid(username);
+		if (usernameUuid.isNotValid()) {
+			return invalidEmbed(usernameUuid.failCause);
+		}
+
+		HypixelResponse hypixelResponse = getGuildFromPlayer(usernameUuid.playerUuid);
+		if (hypixelResponse.isNotValid()) {
+			return invalidEmbed(hypixelResponse.failCause);
+		}
+		JsonElement guildJson = hypixelResponse.response;
+
+		return getGuildMembers(guildJson, user, channel, null);
+	}
+
+	public static EmbedBuilder getGuildMembersFromName(String guildName, CommandEvent event) {
+		HypixelResponse hypixelResponse = getGuildFromName(guildName);
+		if (hypixelResponse.isNotValid()) {
+			return invalidEmbed(hypixelResponse.failCause);
+		}
+		JsonElement guildJson = hypixelResponse.response;
+
+		return getGuildMembers(guildJson, event.getAuthor(), event.getChannel(), null);
+	}
+
 	private static int guildExpToLevel(int guildExp) {
 		int guildLevel = 0;
 
@@ -312,10 +358,29 @@ public class GuildCommand extends Command {
 
 				logCommand(event.getGuild(), event.getAuthor(), content);
 
-				if (args.length == 3 && ("experience".equals(args[1]) || "exp".equals(args[1]))) {
-					if (args[2].toLowerCase().startsWith("u:")) {
-						String username = args[2].split(":")[1];
-						eb = getGuildExp(username, event.getAuthor(), event.getChannel(), null);
+				if ((args.length == 3 || args.length == 4) && ("experience".equals(args[1]) || "exp".equals(args[1]))) {
+					int days = 7;
+					if (args.length == 4 && args[3].startsWith("days:")) {
+						try {
+							days = Integer.parseInt(args[3].split("days:")[1]);
+						} catch (Exception e) {
+							ebMessage.editMessageEmbeds(invalidEmbed("Invalid days amount").build()).queue();
+							return;
+						}
+					}
+
+					if (args[2].startsWith("u:")) {
+						String username = args[2].split("u:")[1];
+						eb = getGuildExpFromPlayer(username, days, event.getAuthor(), event.getChannel(), null);
+						if (eb == null) {
+							ebMessage.delete().queue();
+						} else {
+							ebMessage.editMessageEmbeds(eb.build()).queue();
+						}
+						return;
+					} else if (args[2].startsWith("g:")) {
+						String guildName = args[2].split("g:")[1];
+						eb = getGuildExpFromName(guildName, days, event);
 						if (eb == null) {
 							ebMessage.delete().queue();
 						} else {
@@ -328,15 +393,24 @@ public class GuildCommand extends Command {
 						String usernameInfo = args[2].split(":")[1];
 						ebMessage.editMessageEmbeds(getGuildInfo(usernameInfo).build()).queue();
 						return;
-					} else if (args[2].toLowerCase().startsWith("g:")) {
+					} else if (args[2].startsWith("g:")) {
 						String guildName = content.split(":")[1];
 						ebMessage.editMessageEmbeds(guildInfoFromGuildName(guildName).build()).queue();
 						return;
 					}
 				} else if (args.length == 3 && "members".equals(args[1])) {
-					if (args[2].toLowerCase().startsWith("u:")) {
-						String usernameMembers = args[2].split(":")[1];
-						eb = getGuildMembers(usernameMembers, event.getAuthor(), event.getChannel(), null);
+					if (args[2].startsWith("u:")) {
+						String playerName = args[2].split("u:")[1];
+						eb = getGuildMembersFromPlayer(playerName, event.getAuthor(), event.getChannel(), null);
+						if (eb == null) {
+							ebMessage.delete().queue();
+						} else {
+							ebMessage.editMessageEmbeds(eb.build()).queue();
+						}
+						return;
+					} else if (args[2].startsWith("g:")) {
+						String guildName = args[2].split("g:")[1];
+						eb = getGuildMembersFromName(guildName, event);
 						if (eb == null) {
 							ebMessage.delete().queue();
 						} else {

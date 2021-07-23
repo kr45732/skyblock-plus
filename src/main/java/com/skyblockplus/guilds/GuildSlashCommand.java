@@ -5,6 +5,7 @@ import static com.skyblockplus.utils.Utils.executor;
 import com.skyblockplus.utils.slashcommands.SlashCommand;
 import com.skyblockplus.utils.slashcommands.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 public class GuildSlashCommand extends SlashCommand {
 
@@ -30,10 +31,18 @@ public class GuildSlashCommand extends SlashCommand {
 						eb = GuildCommand.getGuildInfo(username);
 						break;
 					case "members":
-						eb = GuildCommand.getGuildMembers(username, event.getUser(), null, event.getHook());
+						eb = GuildCommand.getGuildMembersFromPlayer(username, event.getUser(), null, event.getHook());
 						break;
 					case "experience":
-						eb = GuildCommand.getGuildExp(username, event.getUser(), null, event.getHook());
+						OptionMapping numDays = event.getEvent().getOption("days");
+						eb =
+							GuildCommand.getGuildExpFromPlayer(
+								username,
+								numDays != null ? numDays.getAsLong() : 7,
+								event.getUser(),
+								null,
+								event.getHook()
+							);
 						break;
 					default:
 						eb = event.invalidCommandMessage();
