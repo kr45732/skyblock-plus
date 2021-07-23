@@ -61,15 +61,21 @@ public class Main {
 	public static GlobalExceptionHandler globalExceptionHandler;
 
 	public static void main(String[] args) throws LoginException, IllegalArgumentException {
+		System.out.println("startup");
 		Main.globalExceptionHandler = new GlobalExceptionHandler();
+		System.out.println("here1");
 		Thread.setDefaultUncaughtExceptionHandler(globalExceptionHandler);
+		System.out.println("here2");
 		RestAction.setDefaultFailure(e -> globalExceptionHandler.uncaughtException(null, e));
+		System.out.println("after uncaught");
 
 		Utils.setApplicationSettings();
 		Constants.initialize();
 
+		System.out.println("start spring");
 		Main.database = SpringApplication.run(Main.class, args).getBean(Database.class);
 
+		System.out.println("waiter");
 		Main.waiter = new EventWaiter();
 		CommandClientBuilder client = new CommandClientBuilder();
 		client.setActivity(Activity.watching(DEFAULT_PREFIX + "help"));
@@ -77,6 +83,7 @@ public class Main {
 		client.setEmojis("✅", "⚠️", "❌");
 		client.useHelpBuilder(false);
 		client.setGuildSettingsManager(GuildPrefixManager::new);
+		System.out.println("listener");
 		client.setListener(
 			new CommandListener() {
 				@Override
@@ -85,6 +92,7 @@ public class Main {
 				}
 			}
 		);
+		System.out.println("cmd");
 		client.addCommands(
 			new InformationCommand(),
 			new SlayerCommand(),
@@ -175,6 +183,7 @@ public class Main {
 			new PriceSlashCommand()
 		);
 
+		System.out.println("builder");
 		JDABuilder jdaBuilder = JDABuilder
 			.createDefault(BOT_TOKEN)
 			.setStatus(OnlineStatus.DO_NOT_DISTURB)
@@ -190,14 +199,18 @@ public class Main {
 			jdaBuilder.addEventListeners(new ExceptionEventListener(new MainListener()));
 		}
 
+		System.out.println("build");
 		jda = jdaBuilder.build();
 
+		System.out.println("await");
 		try {
 			jda.awaitReady();
 		} catch (Exception ignored) {}
+		System.out.println("pres");
 		jda.getPresence().setActivity(Activity.watching(DEFAULT_PREFIX + "help in " + jda.getGuilds().size() + " servers"));
 		//				scheduleUpdateLinkedAccounts();
 		//				AuctionFlipper.scheduleFlipper();
+		System.out.println("over");
 	}
 
 	@PreDestroy
