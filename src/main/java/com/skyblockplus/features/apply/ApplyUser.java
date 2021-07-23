@@ -397,7 +397,11 @@ public class ApplyUser implements Serializable {
 			try {
 				staffChannel
 					.sendMessage(
-						fixUsername(playerUsername) + " (" + applyingUser.getAsMention() + ") was accepted by " + event.getUser().getAsMention()
+						fixUsername(playerUsername) +
+						" (" +
+						applyingUser.getAsMention() +
+						") was accepted by " +
+						event.getUser().getAsMention()
 					)
 					.queue();
 				applicationChannel.sendMessage(applyingUser.getAsMention()).queue();
@@ -438,7 +442,11 @@ public class ApplyUser implements Serializable {
 				try {
 					staffChannel
 						.sendMessage(
-								fixUsername(playerUsername) + " (" + applyingUser.getAsMention() + ") was waitlisted by " + event.getUser().getAsMention()
+							fixUsername(playerUsername) +
+							" (" +
+							applyingUser.getAsMention() +
+							") was waitlisted by " +
+							event.getUser().getAsMention()
 						)
 						.queue();
 					applicationChannel.sendMessage(applyingUser.getAsMention()).queue();

@@ -78,12 +78,12 @@ public class Main {
 		client.useHelpBuilder(false);
 		client.setGuildSettingsManager(GuildPrefixManager::new);
 		client.setListener(
-				new CommandListener() {
-					@Override
-					public void onCommandException(CommandEvent event, Command command, Throwable throwable) {
-						globalExceptionHandler.uncaughtException(event, command, throwable);
-					}
+			new CommandListener() {
+				@Override
+				public void onCommandException(CommandEvent event, Command command, Throwable throwable) {
+					globalExceptionHandler.uncaughtException(event, command, throwable);
 				}
+			}
 		);
 		client.addCommands(
 			new InformationCommand(),
