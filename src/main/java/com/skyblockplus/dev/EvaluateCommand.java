@@ -47,7 +47,7 @@ public class EvaluateCommand extends Command {
 		String[] classImports = { "com.skyblockplus.utils.Player", "me.nullicorn.nedit.NBTReader" };
 
 		// import static [name]
-		String[] staticImports = { "com.skyblockplus.utils.Utils.*", "com.skyblockplus.Main.*" };
+		String[] staticImports = { "com.skyblockplus.utils.Utils.*", "com.skyblockplus.Main.*", "com.skyblockplus.utils.Hypixel.*" };
 
 		for (String packageImport : packageImports) {
 			importString.append("import ").append(packageImport).append(".*\n");

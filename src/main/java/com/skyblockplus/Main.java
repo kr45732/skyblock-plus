@@ -77,6 +77,14 @@ public class Main {
 		client.setEmojis("✅", "⚠️", "❌");
 		client.useHelpBuilder(false);
 		client.setGuildSettingsManager(GuildPrefixManager::new);
+		client.setListener(
+				new CommandListener() {
+					@Override
+					public void onCommandException(CommandEvent event, Command command, Throwable throwable) {
+						globalExceptionHandler.uncaughtException(event, command, throwable);
+					}
+				}
+		);
 		client.addCommands(
 			new InformationCommand(),
 			new SlayerCommand(),
@@ -165,15 +173,6 @@ public class Main {
 			new ProfilesSlashCommand(),
 			new MissingTalismansSlashCommand(),
 			new PriceSlashCommand()
-		);
-
-		client.setListener(
-			new CommandListener() {
-				@Override
-				public void onCommandException(CommandEvent event, Command command, Throwable throwable) {
-					globalExceptionHandler.uncaughtException(event, command, throwable);
-				}
-			}
 		);
 
 		JDABuilder jdaBuilder = JDABuilder

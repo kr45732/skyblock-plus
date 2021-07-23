@@ -4,10 +4,10 @@ import static com.skyblockplus.Main.globalExceptionHandler;
 
 import java.util.concurrent.*;
 
-public class ExecptionExecutor extends ThreadPoolExecutor {
+public class ExceptionExecutor extends ThreadPoolExecutor {
 
-	public ExecptionExecutor() {
-		super(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>());
+	public ExceptionExecutor() {
+		super(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>());
 	}
 
 	protected void afterExecute(Runnable r, Throwable t) {

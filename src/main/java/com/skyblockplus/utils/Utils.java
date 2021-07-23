@@ -12,7 +12,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.skyblockplus.utils.exceptionhandlers.ExecptionExecutor;
+import com.skyblockplus.utils.exceptionhandlers.ExceptionExecutor;
 import com.skyblockplus.utils.structs.*;
 import java.awt.*;
 import java.io.*;
@@ -63,7 +63,7 @@ public class Utils {
 	public static final String FORUM_POST_LINK = "https://hypixel.net/threads/3980092";
 	public static final AsyncHttpClient asyncHttpClient = Dsl.asyncHttpClient();
 	public static final CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-	public static final ExecutorService executor = new ExecptionExecutor();
+	public static final ExecutorService executor = new ExceptionExecutor();
 	public static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(3);
 	/* Script Engines */
 	public static final ScriptEngine jsScriptEngine = new ScriptEngineManager().getEngineByName("js");

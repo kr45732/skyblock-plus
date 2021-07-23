@@ -175,7 +175,7 @@ public class ApplyUser implements Serializable {
 				staffCaseConstructor();
 				break;
 			case 2:
-				EmbedBuilder retryEmbed = defaultEmbed("Application for " + playerUsername);
+				EmbedBuilder retryEmbed = defaultEmbed("Application for " + fixUsername(playerUsername));
 				retryEmbed.setDescription(
 					"Please react with the emoji that corresponds to the profile you want to apply with or react with ❌ to cancel the application.\n"
 				);
@@ -397,12 +397,12 @@ public class ApplyUser implements Serializable {
 			try {
 				staffChannel
 					.sendMessage(
-						playerUsername + " (" + applyingUser.getAsMention() + ") was accepted by " + event.getUser().getAsMention()
+						fixUsername(playerUsername) + " (" + applyingUser.getAsMention() + ") was accepted by " + event.getUser().getAsMention()
 					)
 					.queue();
 				applicationChannel.sendMessage(applyingUser.getAsMention()).queue();
 			} catch (Exception e) {
-				staffChannel.sendMessage(playerUsername + " was accepted by " + event.getUser().getAsMention()).queue();
+				staffChannel.sendMessage(fixUsername(playerUsername) + " was accepted by " + event.getUser().getAsMention()).queue();
 			}
 
 			EmbedBuilder eb = defaultEmbed("Application Accepted");
@@ -416,7 +416,7 @@ public class ApplyUser implements Serializable {
 				waitInviteChannel
 					.sendMessageEmbeds(
 						defaultEmbed("Waiting for invite")
-							.setDescription("`" + playerUsername + "`\n\n" + "**React with ✅ to delete this message**")
+							.setDescription("`" + fixUsername(playerUsername) + "`\n\n" + "**React with ✅ to delete this message**")
 							.build()
 					)
 					.complete()
@@ -438,12 +438,12 @@ public class ApplyUser implements Serializable {
 				try {
 					staffChannel
 						.sendMessage(
-							playerUsername + " (" + applyingUser.getAsMention() + ") was waitlisted by " + event.getUser().getAsMention()
+								fixUsername(playerUsername) + " (" + applyingUser.getAsMention() + ") was waitlisted by " + event.getUser().getAsMention()
 						)
 						.queue();
 					applicationChannel.sendMessage(applyingUser.getAsMention()).queue();
 				} catch (Exception e) {
-					staffChannel.sendMessage(playerUsername + " was waitlisted by " + event.getUser().getAsMention()).queue();
+					staffChannel.sendMessage(fixUsername(playerUsername) + " was waitlisted by " + event.getUser().getAsMention()).queue();
 				}
 
 				EmbedBuilder eb = defaultEmbed("Application waitlisted");
@@ -459,7 +459,7 @@ public class ApplyUser implements Serializable {
 					waitInviteChannel
 						.sendMessageEmbeds(
 							defaultEmbed("Waiting for invite")
-								.setDescription("`" + playerUsername + "`\n\n" + "**React with ✅ to delete this message**")
+								.setDescription("`" + fixUsername(playerUsername) + "`\n\n" + "**React with ✅ to delete this message**")
 								.build()
 						)
 						.complete()

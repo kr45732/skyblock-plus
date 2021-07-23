@@ -19,11 +19,11 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
 
 	@Override
 	public void uncaughtException(Thread t, Throwable e) {
-		if (errorLogChannel == null) {
-			errorLogChannel = jda.getGuildById("796790757947867156").getTextChannelById("864156114060705814");
-		}
-
 		try {
+			if (errorLogChannel == null) {
+				errorLogChannel = jda.getGuildById("796790757947867156").getTextChannelById("864156114060705814");
+			}
+
 			StringBuilder outputStr = new StringBuilder("```java\n" + e.toString() + ": " + e.getMessage() + "\n");
 			for (StackTraceElement s : e.getStackTrace()) {
 				outputStr.append(s.toString()).append("\n");
@@ -51,11 +51,11 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
 	}
 
 	public void uncaughtException(CommandEvent event, Command command, Throwable e) {
-		if (errorLogChannel == null) {
-			errorLogChannel = jda.getGuildById("796790757947867156").getTextChannelById("864156114060705814");
-		}
-
 		try {
+			if (errorLogChannel == null) {
+				errorLogChannel = jda.getGuildById("796790757947867156").getTextChannelById("864156114060705814");
+			}
+
 			StringBuilder outputStr = new StringBuilder("```java\n" + e.toString() + ": " + e.getMessage() + "\n");
 			for (StackTraceElement s : e.getStackTrace()) {
 				outputStr.append(s.toString()).append("\n");
