@@ -1,17 +1,13 @@
 package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.Constants.enchantNames;
-import static com.skyblockplus.utils.Constants.petNames;
+import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.utils.Constants;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -28,87 +24,67 @@ public class BinCommand extends Command {
 	public static EmbedBuilder getLowestBin(String item) {
 		JsonElement lowestBinJson = getLowestBinJson();
 		if (lowestBinJson == null) {
-			return defaultEmbed("Error fetching auctions");
+			return invalidEmbed("Error fetching auctions");
 		}
 
-		if (higherDepth(lowestBinJson, item) != null) {
+		String itemId = nameToId(item);
+		if (higherDepth(lowestBinJson, itemId) != null) {
 			EmbedBuilder eb = defaultEmbed("Lowest bin");
-			eb.addField(capitalizeString(item), formatNumber(higherDepth(lowestBinJson, item).getAsLong()), false);
-			eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + item);
+			eb.addField(idToName(itemId), formatNumber(higherDepth(lowestBinJson, itemId).getAsLong()), false);
+			eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId);
 			return eb;
 		}
 
-		String preFormattedItem = convertToInternalName(item);
-
-		if (higherDepth(lowestBinJson, preFormattedItem) != null) {
-			EmbedBuilder eb = defaultEmbed("Lowest bin");
-			eb.addField(
-				capitalizeString(item.toLowerCase()),
-				formatNumber(higherDepth(lowestBinJson, preFormattedItem).getAsLong()),
-				false
-			);
-			eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + preFormattedItem);
-			return eb;
-		}
-
-		String formattedName;
 		for (String i : enchantNames) {
-			if (preFormattedItem.contains(i)) {
-				String enchantName;
+			if (itemId.contains(i)) {
 				try {
-					int enchantLevel = Integer.parseInt(preFormattedItem.replaceAll("\\D+", ""));
-					enchantName = i.toLowerCase().replace("_", " ") + " " + enchantLevel;
-					formattedName = i + ";" + enchantLevel;
-					EmbedBuilder eb = defaultEmbed("Lowest bin");
-					eb.addField(capitalizeString(enchantName), formatNumber(higherDepth(lowestBinJson, formattedName).getAsLong()), false);
-					eb.setThumbnail("https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK");
-					return eb;
-				} catch (NumberFormatException e) {
-					try {
+					String enchantedBookId = i + ";" + Integer.parseInt(itemId.replaceAll("\\D+", ""));
+					if (higherDepth(lowestBinJson, enchantedBookId) != null) {
 						EmbedBuilder eb = defaultEmbed("Lowest bin");
-						for (int j = 10; j > 0; j--) {
-							try {
-								formattedName = i + ";" + j;
-								enchantName = i.toLowerCase().replace("_", " ") + " " + j;
-								eb.addField(
-									capitalizeString(enchantName),
-									formatNumber(higherDepth(lowestBinJson, formattedName).getAsLong()),
-									false
-								);
-							} catch (NullPointerException ignored) {}
-						}
-						if (eb.getFields().size() == 0) {
-							return defaultEmbed("No bin found for " + capitalizeString(item.toLowerCase()));
-						}
+						eb.addField(
+							idToName(enchantedBookId),
+							formatNumber(higherDepth(lowestBinJson, enchantedBookId).getAsLong()),
+							false
+						);
 						eb.setThumbnail("https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK");
 						return eb;
-					} catch (NullPointerException ex) {
-						return defaultEmbed("No bin found for " + capitalizeString(item.toLowerCase()));
 					}
-				} catch (NullPointerException e) {
-					return defaultEmbed("No bin found for " + capitalizeString(item.toLowerCase()));
+				} catch (NumberFormatException e) {
+					EmbedBuilder eb = defaultEmbed("Lowest bin");
+					for (int j = 10; j > 0; j--) {
+						String enchantedBookId = i + ";" + j;
+						if (higherDepth(lowestBinJson, enchantedBookId) != null) {
+							eb.addField(
+								idToName(enchantedBookId),
+								formatNumber(higherDepth(lowestBinJson, enchantedBookId).getAsLong()),
+								false
+							);
+						}
+					}
+
+					if (eb.getFields().size() != 0) {
+						eb.setThumbnail("https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK");
+						return eb;
+					}
 				}
 			}
 		}
 
 		JsonElement petJson = getPetNumsJson();
-
 		for (String i : petNames) {
-			if (preFormattedItem.contains(i)) {
-				String petName = "";
-				formattedName = i;
+			if (itemId.contains(i)) {
+				String petId = i;
 				boolean raritySpecified = false;
-				for (Entry<String, String> j : Constants.rarityToNumberMap.entrySet()) {
-					if (preFormattedItem.contains(j.getKey())) {
-						petName = j.getKey().toLowerCase() + " " + formattedName.toLowerCase().replace("_", " ");
-						formattedName += j.getValue();
+				for (Entry<String, String> j : rarityToNumberMap.entrySet()) {
+					if (itemId.contains(j.getKey())) {
+						petId += j.getValue();
 						raritySpecified = true;
 						break;
 					}
 				}
 
 				if (!raritySpecified) {
-					List<String> petRarities = higherDepth(petJson, formattedName)
+					List<String> petRarities = higherDepth(petJson, petId)
 						.getAsJsonObject()
 						.keySet()
 						.stream()
@@ -116,65 +92,38 @@ public class BinCommand extends Command {
 						.collect(Collectors.toCollection(ArrayList::new));
 
 					for (String j : petRarities) {
-						if (higherDepth(lowestBinJson, formattedName + Constants.rarityToNumberMap.get(j)) != null) {
-							petName = j.toLowerCase() + " " + formattedName.toLowerCase().replace("_", " ");
-							formattedName += Constants.rarityToNumberMap.get(j);
+						if (higherDepth(lowestBinJson, petId + rarityToNumberMap.get(j)) != null) {
+							petId += rarityToNumberMap.get(j);
 							break;
 						}
 					}
 				}
-				EmbedBuilder eb = defaultEmbed("Lowest bin");
 
-				try {
-					eb.addField(
-						capitalizeString(petName) + " pet",
-						formatNumber(higherDepth(lowestBinJson, formattedName).getAsLong()),
-						false
-					);
-					eb.setThumbnail(getPetUrl(formattedName.split(";")[0]));
+				if (higherDepth(lowestBinJson, petId) != null) {
+					EmbedBuilder eb = defaultEmbed("Lowest bin");
+					eb.addField(idToName(petId) + " pet", formatNumber(higherDepth(lowestBinJson, petId).getAsLong()), false);
+					eb.setThumbnail(getPetUrl(petId.split(";")[0]));
 					return eb;
-				} catch (Exception ignored) {}
+				}
 			}
 		}
 
-		String closestMatch = getClosestMatch(preFormattedItem, getJsonKeys(lowestBinJson));
-
-		if (closestMatch != null && higherDepth(lowestBinJson, closestMatch) != null) {
+		String closestMatch = getClosestMatch(itemId, getJsonKeys(lowestBinJson));
+		if (closestMatch != null) {
 			EmbedBuilder eb = defaultEmbed("Lowest bin");
 			if (enchantNames.contains(closestMatch.split(";")[0].trim())) {
 				eb.setThumbnail("https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK");
-				eb.addField(
-					capitalizeString(closestMatch.toLowerCase().replace("_", " ").replace(";", " ")),
-					formatNumber(higherDepth(lowestBinJson, closestMatch).getAsLong()),
-					false
-				);
 			} else if (petNames.contains(closestMatch.split(";")[0].trim())) {
-				Map<String, String> rarityMapRev = new HashMap<>();
-				rarityMapRev.put("4", "LEGENDARY");
-				rarityMapRev.put("3", "EPIC");
-				rarityMapRev.put("2", "RARE");
-				rarityMapRev.put("1", "UNCOMMON");
-				rarityMapRev.put("0", "COMMON");
-				String[] itemS = closestMatch.split(";");
-				eb.setThumbnail(getPetUrl(itemS[0]));
-				eb.addField(
-					capitalizeString(rarityMapRev.get(itemS[1].toUpperCase()) + " " + itemS[0].replace("_", " ")),
-					formatNumber(higherDepth(lowestBinJson, closestMatch).getAsLong()),
-					false
-				);
+				eb.setThumbnail(getPetUrl(closestMatch.split(";")[0].trim()));
 			} else {
 				eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + closestMatch);
-				eb.addField(
-					capitalizeString(closestMatch.toLowerCase().replace("_", " ")),
-					formatNumber(higherDepth(lowestBinJson, closestMatch).getAsLong()),
-					false
-				);
 			}
 
+			eb.addField(idToName(closestMatch), formatNumber(higherDepth(lowestBinJson, closestMatch).getAsLong()), false);
 			return eb;
 		}
 
-		return defaultEmbed("No bin found for " + capitalizeString(item.toLowerCase()));
+		return defaultEmbed("No bin found for " + idToName(item));
 	}
 
 	@Override

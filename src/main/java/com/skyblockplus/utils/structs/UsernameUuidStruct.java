@@ -16,7 +16,7 @@ public class UsernameUuidStruct {
 	}
 
 	public UsernameUuidStruct() {
-		this.failCause = "Unknown Fail Cause";
+		this.failCause = "Unknown fail cause";
 	}
 
 	public boolean isNotValid() {

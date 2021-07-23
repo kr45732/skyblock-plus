@@ -1,6 +1,6 @@
 package com.skyblockplus.weight;
 
-import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.Constants.skillWeights;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Constants;
@@ -18,6 +18,10 @@ public class SkillsWeight {
 		this.profile = profile;
 		this.player = player;
 		this.weightStruct = new WeightStruct();
+	}
+
+	public static double of(double skillAverage, double exponent) {
+		return (8 * (Math.pow(skillAverage * 10, 0.5 + exponent + (skillAverage / 100)) / 1250));
 	}
 
 	public WeightStruct getWeightStruct() {
@@ -44,9 +48,5 @@ public class SkillsWeight {
 		}
 
 		return weightStruct.add(new WeightStruct());
-	}
-
-	public static double of(double skillAverage, double exponent) {
-		return (8 * (Math.pow(skillAverage * 10, 0.5 + exponent + (skillAverage / 100)) / 1250));
 	}
 }

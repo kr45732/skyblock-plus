@@ -1,10 +1,8 @@
 package com.skyblockplus.price;
 
 import static com.skyblockplus.networth.NetworthExecute.isIgnoredItem;
-import static com.skyblockplus.networth.NetworthExecute.queryAhApi;
 import static com.skyblockplus.utils.Constants.reforgeStoneNames;
-import static com.skyblockplus.utils.Hypixel.getSkyblockAuctionFromUuid;
-import static com.skyblockplus.utils.Hypixel.uuidToUsername;
+import static com.skyblockplus.utils.Hypixel.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -218,8 +216,7 @@ public class PriceCommand extends Command {
 	private static double calculatePetPrice(InvItem pet) {
 		String queryStr = "\"" + capitalizeString(pet.getName()).replace("lvl", "Lvl") + "\"";
 
-		JsonArray ahQuery = queryAhApi(queryStr);
-
+		JsonArray ahQuery = getAuctionPetsByName(queryStr);
 		if (ahQuery != null) {
 			for (JsonElement auction : ahQuery) {
 				String auctionName = higherDepth(auction, "item_name").getAsString();

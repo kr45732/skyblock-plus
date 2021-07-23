@@ -18,7 +18,7 @@ public class HypixelResponse {
 	}
 
 	public HypixelResponse() {
-		this.failCause = "Unknown Fail Cause";
+		this.failCause = "Unknown fail cause";
 	}
 
 	public boolean isNotValid() {

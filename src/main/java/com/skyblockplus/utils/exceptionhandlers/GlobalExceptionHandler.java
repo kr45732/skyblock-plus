@@ -10,8 +10,8 @@ import org.slf4j.LoggerFactory;
 
 public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
 
-	private final Thread.UncaughtExceptionHandler uncaughtExceptionHandler;
 	private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+	private final Thread.UncaughtExceptionHandler uncaughtExceptionHandler;
 
 	public GlobalExceptionHandler() {
 		this.uncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();

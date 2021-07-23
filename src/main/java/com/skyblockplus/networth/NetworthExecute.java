@@ -1,6 +1,7 @@
 package com.skyblockplus.networth;
 
 import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.Hypixel.getAuctionPetsByName;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.GsonBuilder;
@@ -11,14 +12,9 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.InvItem;
 import com.skyblockplus.utils.structs.NwItemPrice;
-import java.io.InputStreamReader;
-import java.net.URI;
 import java.util.*;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
 
 public class NetworthExecute {
 
@@ -79,24 +75,6 @@ public class NetworthExecute {
 		}
 
 		return ignoredItemList.contains(s);
-	}
-
-	public static JsonArray queryAhApi(String query) {
-		try {
-			HttpGet httpget = new HttpGet("https://api.eastarcti.ca/auctions/");
-			httpget.addHeader("content-type", "application/json; charset=UTF-8");
-
-			URI uri = new URIBuilder(httpget.getURI())
-				.addParameter("query", "{\"item_name\":{\"$in\":[" + query + "]},\"bin\":true}")
-				.addParameter("sort", "{\"starting_bid\":1}")
-				.build();
-			httpget.setURI(uri);
-
-			try (CloseableHttpResponse httpResponse = httpClient.execute(httpget)) {
-				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
-			}
-		} catch (Exception ignored) {}
-		return null;
 	}
 
 	public void execute(CommandEvent event) {
@@ -414,7 +392,7 @@ public class NetworthExecute {
 
 		queryStr = new StringBuilder(queryStr.substring(0, queryStr.length() - 1));
 
-		JsonArray ahQuery = queryAhApi(queryStr.toString());
+		JsonArray ahQuery = getAuctionPetsByName(queryStr.toString());
 
 		if (ahQuery != null) {
 			for (JsonElement auction : ahQuery) {

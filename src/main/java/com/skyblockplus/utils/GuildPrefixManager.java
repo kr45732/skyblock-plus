@@ -1,7 +1,8 @@
 package com.skyblockplus.utils;
 
 import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.DEFAULT_PREFIX;
+import static com.skyblockplus.utils.Utils.IS_API;
 
 import com.jagrosh.jdautilities.command.GuildSettingsProvider;
 import java.util.Collection;

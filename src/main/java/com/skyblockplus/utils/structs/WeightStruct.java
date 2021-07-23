@@ -1,6 +1,6 @@
 package com.skyblockplus.utils.structs;
 
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.roundAndFormat;
 
 public class WeightStruct {
 

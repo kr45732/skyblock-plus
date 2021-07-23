@@ -17,8 +17,8 @@ import org.slf4j.LoggerFactory;
 
 public class MessageTimeout extends ListenerAdapter {
 
-	private static final Logger log = LoggerFactory.getLogger(MessageTimeout.class);
 	public static final List<MessageTimeoutStruct> messageList = new ArrayList<>();
+	private static final Logger log = LoggerFactory.getLogger(MessageTimeout.class);
 
 	public static void addMessage(Message message, Object eventListener) {
 		messageList.add(new MessageTimeoutStruct(message, eventListener));

@@ -58,7 +58,7 @@ public class PetsCommand extends Command {
 			for (JsonElement pet : playerPets) {
 				String petItem = null;
 				try {
-					petItem = convertFromInternalName(higherDepth(pet, "heldItem").getAsString()).toLowerCase();
+					petItem = idToName(higherDepth(pet, "heldItem").getAsString()).toLowerCase();
 				} catch (Exception ignored) {}
 
 				paginateBuilder.addItems(

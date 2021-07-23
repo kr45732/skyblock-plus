@@ -31,7 +31,9 @@ import com.skyblockplus.skills.SkillsSlashCommand;
 import com.skyblockplus.slayer.SlayerCommand;
 import com.skyblockplus.slayer.SlayerSlashCommand;
 import com.skyblockplus.timeout.MessageTimeout;
-import com.skyblockplus.utils.*;
+import com.skyblockplus.utils.Constants;
+import com.skyblockplus.utils.GuildPrefixManager;
+import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.exceptionhandlers.ExceptionEventListener;
 import com.skyblockplus.utils.exceptionhandlers.GlobalExceptionHandler;
 import com.skyblockplus.utils.slashcommands.SlashCommandClient;
@@ -53,7 +55,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class Main {
 
 	private static final Logger log = LoggerFactory.getLogger(Main.class);
-
 	public static JDA jda;
 	public static Database database;
 	public static EventWaiter waiter;

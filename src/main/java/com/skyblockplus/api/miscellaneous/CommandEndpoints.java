@@ -36,7 +36,7 @@ public class CommandEndpoints {
 			}
 
 			String preFormattedItem = name;
-			preFormattedItem = convertToInternalName(preFormattedItem);
+			preFormattedItem = nameToId(preFormattedItem);
 
 			if (higherDepth(essenceJson, preFormattedItem) == null) {
 				String closestMatch = getClosestMatch(preFormattedItem, essenceItemNames);
@@ -47,7 +47,7 @@ public class CommandEndpoints {
 			if (itemJson != null) {
 				Template template = new Template(true);
 				template.addData("id", preFormattedItem);
-				template.addData("name", convertFromInternalName(preFormattedItem));
+				template.addData("name", idToName(preFormattedItem));
 				for (String level : getJsonKeys(itemJson)) {
 					template.addData(level, higherDepth(itemJson, level));
 				}
@@ -73,12 +73,12 @@ public class CommandEndpoints {
 				return new ResponseEntity<>(new ErrorTemplate(false, "Internal Server Error"), HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 
-			String preFormattedItem = convertToInternalName(name);
+			String preFormattedItem = nameToId(name);
 
 			if (higherDepth(lowestBinJson, preFormattedItem) != null) {
 				Template template = new Template(true);
 				template.addData("id", preFormattedItem);
-				template.addData("name", convertFromInternalName(preFormattedItem));
+				template.addData("name", idToName(preFormattedItem));
 				template.addData("price", higherDepth(lowestBinJson, preFormattedItem).getAsLong());
 				return new ResponseEntity<>(template, HttpStatus.OK);
 			}
@@ -92,7 +92,7 @@ public class CommandEndpoints {
 						formattedName = i + ";" + enchantLevel;
 						Template template = new Template(true);
 						template.addData("id", enchantName);
-						template.addData("name", convertFromInternalName(enchantName));
+						template.addData("name", idToName(enchantName));
 						template.addData("price", higherDepth(lowestBinJson, formattedName).getAsLong());
 						return new ResponseEntity<>(template, HttpStatus.OK);
 					} catch (Exception ignored) {}
@@ -125,7 +125,7 @@ public class CommandEndpoints {
 					try {
 						Template template = new Template(true);
 						template.addData("id", formattedName);
-						template.addData("name", convertFromInternalName(formattedName));
+						template.addData("name", idToName(formattedName));
 						template.addData("price", higherDepth(lowestBinJson, formattedName).getAsLong());
 						return new ResponseEntity<>(template, HttpStatus.OK);
 					} catch (Exception ignored) {}
@@ -137,7 +137,7 @@ public class CommandEndpoints {
 			if (closestMatch != null && higherDepth(lowestBinJson, closestMatch) != null) {
 				Template template = new Template(true);
 				template.addData("id", closestMatch);
-				template.addData("name", convertFromInternalName(closestMatch));
+				template.addData("name", idToName(closestMatch));
 				template.addData("price", higherDepth(lowestBinJson, closestMatch).getAsLong());
 				return new ResponseEntity<>(template, HttpStatus.OK);
 			}
@@ -160,12 +160,12 @@ public class CommandEndpoints {
 				return new ResponseEntity<>(new ErrorTemplate(false, "Internal Server Error"), HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 
-			String preFormattedItem = convertToInternalName(name);
+			String preFormattedItem = nameToId(name);
 
 			if (higherDepth(avgAhJson, preFormattedItem) != null) {
 				Template template = new Template(true);
 				template.addData("id", preFormattedItem);
-				template.addData("name", convertFromInternalName(preFormattedItem));
+				template.addData("name", idToName(preFormattedItem));
 				template.addData("price", getAvgPrice(higherDepth(avgAhJson, preFormattedItem)));
 				return new ResponseEntity<>(template, HttpStatus.OK);
 			}
@@ -179,7 +179,7 @@ public class CommandEndpoints {
 						formattedName = i + ";" + enchantLevel;
 						Template template = new Template(true);
 						template.addData("id", enchantName);
-						template.addData("name", convertFromInternalName(enchantName));
+						template.addData("name", idToName(enchantName));
 						template.addData("price", getAvgPrice(higherDepth(avgAhJson, formattedName)));
 						return new ResponseEntity<>(template, HttpStatus.OK);
 					} catch (Exception ignored) {}
@@ -212,7 +212,7 @@ public class CommandEndpoints {
 					try {
 						Template template = new Template(true);
 						template.addData("id", formattedName);
-						template.addData("name", convertFromInternalName(formattedName));
+						template.addData("name", idToName(formattedName));
 						template.addData("price", getAvgPrice(higherDepth(avgAhJson, formattedName)));
 						return new ResponseEntity<>(template, HttpStatus.OK);
 					} catch (Exception ignored) {}
@@ -224,7 +224,7 @@ public class CommandEndpoints {
 			if (closestMatch != null && higherDepth(avgAhJson, closestMatch) != null) {
 				Template template = new Template(true);
 				template.addData("id", closestMatch);
-				template.addData("name", convertFromInternalName(closestMatch));
+				template.addData("name", idToName(closestMatch));
 				template.addData("price", getAvgPrice(higherDepth(avgAhJson, closestMatch)));
 				return new ResponseEntity<>(template, HttpStatus.OK);
 			}

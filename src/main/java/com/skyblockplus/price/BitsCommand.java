@@ -20,13 +20,8 @@ public class BitsCommand extends Command {
 	public static EmbedBuilder getBitPrices(String itemName) {
 		JsonElement bitsJson = getBitsJson();
 
-		if (higherDepth(bitsJson, itemName) != null) {
-			return defaultEmbed("Bits Price").addField(itemName, formatNumber(higherDepth(bitsJson, itemName).getAsLong()), false);
-		}
-
 		String closestMatch = getClosestMatch(itemName, bitsItemNames);
-
-		if (closestMatch != null && higherDepth(bitsJson, closestMatch) != null) {
+		if (closestMatch != null) {
 			return defaultEmbed("Bits Price").addField(closestMatch, formatNumber(higherDepth(bitsJson, closestMatch).getAsLong()), false);
 		}
 

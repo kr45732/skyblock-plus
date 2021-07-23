@@ -67,6 +67,7 @@ public class Constants {
 	public static final Map<String, Double> dungeonClassWeights = new HashMap<>();
 	public static final Map<String, Double> dungeonWeights = new HashMap<>();
 	public static final List<String> vanillaItems = new ArrayList<>();
+	public static final Map<String, String> dungeonEmojiMap = new HashMap<>();
 
 	public static void initialize() {
 		/* rarityToNumberMap */
@@ -145,10 +146,32 @@ public class Constants {
 
 		/* dungeonWeights */
 		dungeonWeights.put("catacombs", 0.0002149604615D);
+
+		/* dungeonEmojiMap */
+		dungeonEmojiMap.put("healer", "<:healer:867508034914091058>");
+		dungeonEmojiMap.put("mage", "<:mage:867508034602663947>");
+		dungeonEmojiMap.put("berserk", "<:berserk:867508034870968350>");
+		dungeonEmojiMap.put("archer", "<:archer:867508034561507329>");
+		dungeonEmojiMap.put("tank", "<:tank:867508034888663050>");
+		dungeonEmojiMap.put("catacombs_0", "<:entrance:867511391438503946>");
+		dungeonEmojiMap.put("catacombs_1", "<:floor_1:867511391400230942>");
+		dungeonEmojiMap.put("catacombs_2", "<:floor_2:867511391287640074>");
+		dungeonEmojiMap.put("catacombs_3", "<:floor_3:867511391333253180>");
+		dungeonEmojiMap.put("catacombs_4", "<:floor_4:867511391615057950>");
+		dungeonEmojiMap.put("catacombs_5", "<:floor_5:867511391434178581>");
+		dungeonEmojiMap.put("catacombs_6", "<:floor_6:867511391284101210>");
+		dungeonEmojiMap.put("catacombs_7", "<:floor_7:867511391635111936>");
+		dungeonEmojiMap.put("master_catacombs_1", "<:master_floor_1:867511391488835645>");
+		dungeonEmojiMap.put("master_catacombs_2", "<:master_floor_2:867511391477170207>");
+		dungeonEmojiMap.put("master_catacombs_3", "<:master_floor_3:867511391282921522>");
+		dungeonEmojiMap.put("master_catacombs_4", "<:master_floor_4:867511391535759440>");
+		dungeonEmojiMap.put("master_catacombs_5", "<:master_floor_5:867511391518457877>");
+		dungeonEmojiMap.put("master_catacombs_6", "<:master_floor_6:867511391228657685>");
+		dungeonEmojiMap.put("master_catacombs_7", "<:master_floor_7:867511391644549120>");
+		dungeonEmojiMap.put("catacombs", "<:catacombs:867535694103707679>");
 		/* vanillaItems */
 		// JsonArray vanillaItemsJson = getVanillaItemsJson().getAsJsonArray();
 		// for(JsonElement vanillaItem: vanillaItemsJson){
-
 		// }
 	}
 }

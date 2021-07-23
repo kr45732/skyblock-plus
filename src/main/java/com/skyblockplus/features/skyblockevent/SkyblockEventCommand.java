@@ -5,7 +5,6 @@ import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.Hypixel.*;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.invalidEmbed;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

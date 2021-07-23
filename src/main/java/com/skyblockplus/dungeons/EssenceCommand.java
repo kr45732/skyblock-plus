@@ -20,7 +20,7 @@ public class EssenceCommand extends Command {
 
 	public static EmbedBuilder getEssenceInformation(String itemName, JsonElement essenceCostsJson) {
 		String preFormattedItem = itemName.replace("'s", "").replace(" ", "_").toUpperCase();
-		preFormattedItem = convertToInternalName(preFormattedItem);
+		preFormattedItem = nameToId(preFormattedItem);
 
 		if (higherDepth(essenceCostsJson, preFormattedItem) == null) {
 			String closestMatch = getClosestMatch(preFormattedItem, essenceItemNames);
@@ -69,7 +69,7 @@ public class EssenceCommand extends Command {
 
 				if (args.length >= 3 && args[1].equals("upgrade")) {
 					String itemName = content.split(" ", 3)[2].replace("'s", "").replace(" ", "_").toUpperCase();
-					itemName = convertToInternalName(itemName);
+					itemName = nameToId(itemName);
 
 					if (higherDepth(essenceCostsJson, itemName) == null) {
 						String closestMatch = getClosestMatch(itemName, essenceItemNames);

@@ -33,7 +33,7 @@ public class Player {
 	private String playerUuid;
 	private String playerUsername;
 	private String profileName;
-	private String failCause = "Unknown Fail Cause";
+	private String failCause = "Unknown fail cause";
 
 	/* Constructors */
 	public Player(String username) {
@@ -75,6 +75,7 @@ public class Player {
 			this.profilesArray = response.response.getAsJsonArray();
 
 			if (profileIdFromName(profileName, profilesArray)) {
+				failCause = failCause.equals("Unknown fail cause") ? "Invalid profile name" : "";
 				return;
 			}
 		} catch (Exception e) {
@@ -116,6 +117,7 @@ public class Player {
 
 			this.profilesArray = outerProfileJson.getAsJsonArray();
 			if (profileIdFromName(profileName, profilesArray)) {
+				failCause = failCause.equals("Unknown fail cause") ? "Invalid profile name" : "";
 				return;
 			}
 		} catch (Exception e) {
@@ -496,7 +498,7 @@ public class Player {
 		try {
 			int f7TimeMilliseconds = higherDepth(profileJson, "dungeons.dungeon_types.catacombs.fastest_time_s_plus.7").getAsInt();
 			int minutes = f7TimeMilliseconds / 1000 / 60;
-			int seconds = f7TimeMilliseconds % 1000 % 60;
+			int seconds = f7TimeMilliseconds / 1000 % 60;
 			return ("\n**Fastest F7 S+:** " + minutes + ":" + (seconds >= 10 ? seconds : "0" + seconds));
 		} catch (Exception e) {
 			return "\n**No F7 S+ time found**";

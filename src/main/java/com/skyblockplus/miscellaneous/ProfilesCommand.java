@@ -3,7 +3,6 @@ package com.skyblockplus.miscellaneous;
 import static com.skyblockplus.Main.waiter;
 import static com.skyblockplus.utils.Hypixel.*;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.skyblockStatsLink;
 
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
@@ -35,14 +34,14 @@ public class ProfilesCommand extends Command {
 			return invalidEmbed(usernameUuid.failCause);
 		}
 
-		HypixelResponse hypixelJson = playerFromUuid(usernameUuid.playerUuid);
-		if (hypixelJson.isNotValid()) {
-			return invalidEmbed(hypixelJson.failCause);
+		HypixelResponse profilesJson = skyblockProfilesFromUuid(usernameUuid.playerUuid);
+		if (profilesJson.isNotValid()) {
+			return invalidEmbed(profilesJson.failCause);
 		}
 
 		List<CompletableFuture<String>> profileUsernameFutureList = new ArrayList<>();
 
-		for (JsonElement profile : hypixelJson.response.getAsJsonArray()) {
+		for (JsonElement profile : profilesJson.response.getAsJsonArray()) {
 			List<String> uuids = getJsonKeys(higherDepth(profile, "members"));
 
 			for (String uuid : uuids) {
@@ -68,7 +67,7 @@ public class ProfilesCommand extends Command {
 
 		List<String> pageTitlesUrls = new ArrayList<>();
 		int count = 0;
-		for (JsonElement profile : hypixelJson.response.getAsJsonArray()) {
+		for (JsonElement profile : profilesJson.response.getAsJsonArray()) {
 			pageTitlesUrls.add(skyblockStatsLink(usernameUuid.playerUsername, higherDepth(profile, "cute_name").getAsString()));
 			StringBuilder profileStr = new StringBuilder(
 				"• **Profile Name:** " +

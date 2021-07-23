@@ -1,6 +1,6 @@
 package com.skyblockplus.weight;
 
-import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.Constants.slayerWeights;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
@@ -16,6 +16,28 @@ public class SlayerWeight {
 		this.profile = profile;
 		this.player = player;
 		this.weightStruct = new WeightStruct();
+	}
+
+	public static double of(double slayerXp, double divider, double modifier) {
+		slayerXp = slayerXp / 3;
+
+		if (slayerXp <= 1000000) {
+			return 3 * (slayerXp == 0 ? 0 : slayerXp / divider);
+		} else {
+			double base = 1000000 / divider;
+			double remaining = slayerXp - 1000000;
+			double overflow = 0;
+
+			while (remaining > 0) {
+				double left = Math.min(remaining, 1000000);
+
+				overflow += Math.pow(left / (divider * (1.5 + modifier)), 0.942);
+				modifier += modifier;
+				remaining -= left;
+			}
+
+			return 3 * (base + overflow);
+		}
 	}
 
 	public WeightStruct getWeightStruct() {
@@ -47,27 +69,5 @@ public class SlayerWeight {
 		}
 
 		return weightStruct.add(new WeightStruct(base, overflow));
-	}
-
-	public static double of(double slayerXp, double divider, double modifier) {
-		slayerXp = slayerXp / 3;
-
-		if (slayerXp <= 1000000) {
-			return 3 * (slayerXp == 0 ? 0 : slayerXp / divider);
-		} else {
-			double base = 1000000 / divider;
-			double remaining = slayerXp - 1000000;
-			double overflow = 0;
-
-			while (remaining > 0) {
-				double left = Math.min(remaining, 1000000);
-
-				overflow += Math.pow(left / (divider * (1.5 + modifier)), 0.942);
-				modifier += modifier;
-				remaining -= left;
-			}
-
-			return 3 * (base + overflow);
-		}
 	}
 }

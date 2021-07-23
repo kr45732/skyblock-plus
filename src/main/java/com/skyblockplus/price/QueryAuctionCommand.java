@@ -1,56 +1,27 @@
 package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.Constants.enchantNames;
-import static com.skyblockplus.utils.Constants.petNames;
+import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.Hypixel.getAuctionsByQuery;
 import static com.skyblockplus.utils.Hypixel.uuidToUsername;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.getGenericInventoryMap;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.structs.InvItem;
-import java.io.InputStreamReader;
-import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
 import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
 
 public class QueryAuctionCommand extends Command {
 
 	public QueryAuctionCommand() {
 		this.name = "query";
 		this.cooldown = globalCooldown;
-	}
-
-	private static JsonArray queryAhApi(String query) {
-		try {
-			HttpGet httpget = new HttpGet("https://api.eastarcti.ca/auctions/");
-			httpget.addHeader("content-type", "application/json; charset=UTF-8");
-
-			query = query.replace("[", "\\\\[");
-			URI uri = new URIBuilder(httpget.getURI())
-				// .addParameter("query", "{\"item_name\":{\"$regex\":\"" + query
-				// +
-				// "\",\"$options\":\"i\"},\"$or\":[{\"bin\":true},{\"bids\":{\"$lt\":{\"$size\":0}}}]}")
-				.addParameter("query", "{\"item_name\":{\"$regex\":\"" + query + "\",\"$options\":\"i\"},\"bin\":true}")
-				.addParameter("sort", "{\"starting_bid\":1}")
-				.build();
-			httpget.setURI(uri);
-
-			try (CloseableHttpResponse httpResponse = httpClient.execute(httpget)) {
-				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
-			}
-		} catch (Exception ignored) {}
-		return null;
 	}
 
 	public static EmbedBuilder queryAuctions(String query) {
@@ -63,8 +34,7 @@ public class QueryAuctionCommand extends Command {
 					enchantName += "5";
 				}
 
-				JsonArray ahQueryArr = queryAhApi("enchanted book");
-
+				JsonArray ahQueryArr = getAuctionsByQuery("enchanted book");
 				if (ahQueryArr == null) {
 					return invalidEmbed("Error fetching auctions data");
 				}
@@ -99,42 +69,27 @@ public class QueryAuctionCommand extends Command {
 						}
 					} catch (Exception ignored) {}
 				}
-				return eb.setDescription("No lowest bin found for `" + query + "` enchant");
 			}
 		}
 
 		for (String pet : petNames) {
 			if (query.replace(" ", "_").toUpperCase().contains(pet)) {
 				query = query.toLowerCase();
+
 				String rarity = "ANY";
-				if (query.contains("common")) {
-					rarity = "COMMON";
-					query = query.replace("common", "").trim();
-				} else if (query.contains("uncommon")) {
-					rarity = "UNCOMMON";
-					query = query.replace("uncommon", "").trim();
-				} else if (query.contains("rare")) {
-					rarity = "RARE";
-					query = query.replace("rare", "").trim();
-				} else if (query.contains("epic")) {
-					rarity = "EPIC";
-					query = query.replace("epic", "").trim();
-				} else if (query.contains("legendary")) {
-					rarity = "LEGENDARY";
-					query = query.replace("legendary", "").trim();
-				} else if (query.contains("mythic")) {
-					rarity = "MYTHIC";
-					query = query.replace("mythic", "").trim();
+				for (String rarityName : rarityToNumberMap.keySet()) {
+					if (query.contains(rarity.toLowerCase())) {
+						rarity = rarityName;
+						query = query.replace(rarityName.toLowerCase(), "").trim();
+					}
 				}
 
-				JsonArray ahQueryArr = queryAhApi(query);
-
+				JsonArray ahQueryArr = getAuctionsByQuery(query);
 				if (ahQueryArr == null) {
 					return invalidEmbed("Error fetching auctions data");
 				}
 
 				EmbedBuilder eb = defaultEmbed("Query Auctions");
-
 				for (JsonElement lowestBinAh : ahQueryArr) {
 					Instant endingAt = Instant.ofEpochMilli(higherDepth(lowestBinAh, "end").getAsLong());
 					Duration duration = Duration.between(Instant.now(), endingAt);
@@ -169,18 +124,15 @@ public class QueryAuctionCommand extends Command {
 						}
 					} catch (Exception ignored) {}
 				}
-				return eb.setDescription("No lowest bin found for `" + query + "` pet");
 			}
 		}
 
-		JsonArray ahQueryArr = queryAhApi(query);
-
+		JsonArray ahQueryArr = getAuctionsByQuery(query);
 		if (ahQueryArr == null) {
 			return invalidEmbed("Error fetching auctions data");
 		}
 
 		EmbedBuilder eb = defaultEmbed("Query Auctions").setDescription("Found `" + ahQueryArr.size() + "` bins matching `" + query + "`");
-
 		for (JsonElement lowestBinAh : ahQueryArr) {
 			Instant endingAt = Instant.ofEpochMilli(higherDepth(lowestBinAh, "end").getAsLong());
 			Duration duration = Duration.between(Instant.now(), endingAt);

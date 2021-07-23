@@ -3,6 +3,7 @@ package com.skyblockplus.utils.structs;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed.Field;
 
 public class PaginatorExtras {
@@ -87,8 +88,13 @@ public class PaginatorExtras {
 		return this;
 	}
 
-	public PaginatorExtras addEmbedField(Field embedField) {
-		this.embedFields.add(embedField);
+	public PaginatorExtras addEmbedField(String name, String value, boolean inline) {
+		this.embedFields.add(new Field(name, value, inline));
+		return this;
+	}
+
+	public PaginatorExtras addBlankField(boolean inline) {
+		this.embedFields.add(new Field(EmbedBuilder.ZERO_WIDTH_SPACE, EmbedBuilder.ZERO_WIDTH_SPACE, inline));
 		return this;
 	}
 

@@ -74,7 +74,8 @@ public class AutomaticGuild {
 	}
 
 	public static String getGuildPrefix(String guildId) {
-		return guildMap.get(guildId).prefix;
+		AutomaticGuild automaticGuild = guildMap.getOrDefault(guildId, null);
+		return automaticGuild != null ? automaticGuild.prefix : DEFAULT_PREFIX;
 	}
 
 	/* Automated Apply Methods */
@@ -662,9 +663,6 @@ public class AutomaticGuild {
 	/* Miscellaneous */
 	public void schedulerConstructor() {
 		int eventDelay = (int) (Math.random() * 60 + 1);
-		if (guildId.equals("796790757947867156")) {
-			eventDelay = 1;
-		}
 		scheduledFutures.add(scheduler.scheduleAtFixedRate(this::updateGuild, eventDelay, 210, TimeUnit.MINUTES));
 		scheduledFutures.add(scheduler.scheduleAtFixedRate(this::updateSkyblockEvent, eventDelay, 60, TimeUnit.MINUTES));
 	}

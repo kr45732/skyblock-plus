@@ -19,14 +19,17 @@ public class DungeonsSlashCommand extends SlashCommand {
 				event.logCommandGuildUserCommand();
 
 				String profileName = event.getOptionStr("profile");
-				EmbedBuilder eb;
-				if (profileName != null) {
-					eb = DungeonsCommand.getPlayerCatacombs(event.getOptionStr("player"), profileName);
-				} else {
-					eb = DungeonsCommand.getPlayerCatacombs(event.getOptionStr("player"), null);
-				}
+				EmbedBuilder eb = DungeonsCommand.getPlayerDungeons(
+					event.getOptionStr("player"),
+					profileName,
+					event.getUser(),
+					null,
+					event.getHook()
+				);
 
-				event.getHook().editOriginalEmbeds(eb.build()).queue();
+				if (eb != null) {
+					event.getHook().editOriginalEmbeds(eb.build()).queue();
+				}
 			}
 		);
 	}

@@ -10,9 +10,14 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
+import java.io.InputStreamReader;
+import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
 
 public class Hypixel {
 
@@ -261,5 +266,60 @@ public class Hypixel {
 
 	public static HypixelResponse getGuildFromName(String guildName) {
 		return getGuildGeneric("&name=" + guildName.replace(" ", "%20"));
+	}
+
+	public static JsonArray getAuctionsByQuery(String query) {
+		try {
+			HttpGet httpget = new HttpGet("https://api.eastarcti.ca/auctions/");
+			httpget.addHeader("content-type", "application/json; charset=UTF-8");
+
+			query = query.replace("[", "\\\\[");
+			URI uri = new URIBuilder(httpget.getURI())
+				// .addParameter("query", "{\"item_name\":{\"$regex\":\"" + query
+				// +
+				// "\",\"$options\":\"i\"},\"$or\":[{\"bin\":true},{\"bids\":{\"$lt\":{\"$size\":0}}}]}")
+				.addParameter("query", "{\"item_name\":{\"$regex\":\"" + query + "\",\"$options\":\"i\"},\"bin\":true}")
+				.addParameter("sort", "{\"starting_bid\":1}")
+				.build();
+			httpget.setURI(uri);
+
+			try (CloseableHttpResponse httpResponse = httpClient.execute(httpget)) {
+				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
+			}
+		} catch (Exception ignored) {}
+		return null;
+	}
+
+	public static JsonArray getBidsFromUuid(String uuid) {
+		try {
+			HttpGet httpget = new HttpGet("https://api.eastarcti.ca/auctions/");
+			httpget.addHeader("content-type", "application/json; charset=UTF-8");
+
+			URI uri = new URIBuilder(httpget.getURI()).addParameter("query", "{\"bids.bidder\":\"" + uuid + "\"}").build();
+			httpget.setURI(uri);
+
+			try (CloseableHttpResponse httpResponse = httpClient.execute(httpget)) {
+				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
+			}
+		} catch (Exception ignored) {}
+		return null;
+	}
+
+	public static JsonArray getAuctionPetsByName(String query) {
+		try {
+			HttpGet httpget = new HttpGet("https://api.eastarcti.ca/auctions/");
+			httpget.addHeader("content-type", "application/json; charset=UTF-8");
+
+			URI uri = new URIBuilder(httpget.getURI())
+				.addParameter("query", "{\"item_name\":{\"$in\":[" + query + "]},\"bin\":true}")
+				.addParameter("sort", "{\"starting_bid\":1}")
+				.build();
+			httpget.setURI(uri);
+
+			try (CloseableHttpResponse httpResponse = httpClient.execute(httpget)) {
+				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
+			}
+		} catch (Exception ignored) {}
+		return null;
 	}
 }

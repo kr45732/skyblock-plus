@@ -26,7 +26,7 @@ public class InviteCommand extends Command {
 			")",
 			false
 		);
-		eb.addField("Join my server", "[Click here](" + DISCORD_SERVER_INVITE_LINK + ")", false);
+		eb.addField("Support Server", "[Click here](" + DISCORD_SERVER_INVITE_LINK + ")", false);
 		eb.setThumbnail("https://cdn.discordapp.com/attachments/803419567958392832/825768516636508160/sb_loading.gif");
 		return eb;
 	}

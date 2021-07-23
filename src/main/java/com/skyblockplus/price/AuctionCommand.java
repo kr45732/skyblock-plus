@@ -3,7 +3,6 @@ package com.skyblockplus.price;
 import static com.skyblockplus.Main.waiter;
 import static com.skyblockplus.utils.Hypixel.*;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.skyblockStatsLink;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -19,7 +18,6 @@ import me.nullicorn.nedit.NBTReader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.MessageEmbed.Field;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 
@@ -109,7 +107,7 @@ public class AuctionCommand extends Command {
 			if (auction[0] != null) {
 				for (String[] strings : auctions) {
 					if (strings[0] != null) {
-						extras.addEmbedField(new Field(strings[0], strings[1], false));
+						extras.addEmbedField(strings[0], strings[1], false);
 					}
 				}
 				if (channel != null) {

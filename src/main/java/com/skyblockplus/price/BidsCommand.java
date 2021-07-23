@@ -1,24 +1,17 @@
 package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.Hypixel.usernameToUuid;
-import static com.skyblockplus.utils.Hypixel.uuidToUsername;
+import static com.skyblockplus.utils.Hypixel.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import java.io.InputStreamReader;
-import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
 
 public class BidsCommand extends Command {
 
@@ -33,7 +26,7 @@ public class BidsCommand extends Command {
 			return invalidEmbed(usernameUuidStruct.failCause);
 		}
 
-		JsonArray bids = queryAhApi(usernameUuidStruct.playerUuid);
+		JsonArray bids = getBidsFromUuid(usernameUuidStruct.playerUuid);
 
 		if (bids == null || bids.size() == 0) {
 			return defaultEmbed("No bids found for " + usernameUuidStruct.playerUsername);
@@ -88,21 +81,6 @@ public class BidsCommand extends Command {
 		}
 
 		return eb;
-	}
-
-	private static JsonArray queryAhApi(String uuid) {
-		try {
-			HttpGet httpget = new HttpGet("https://api.eastarcti.ca/auctions/");
-			httpget.addHeader("content-type", "application/json; charset=UTF-8");
-
-			URI uri = new URIBuilder(httpget.getURI()).addParameter("query", "{\"bids.bidder\":\"" + uuid + "\"}").build();
-			httpget.setURI(uri);
-
-			try (CloseableHttpResponse httpResponse = httpClient.execute(httpget)) {
-				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
-			}
-		} catch (Exception ignored) {}
-		return null;
 	}
 
 	@Override

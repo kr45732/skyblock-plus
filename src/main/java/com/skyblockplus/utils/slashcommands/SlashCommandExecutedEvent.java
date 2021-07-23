@@ -1,6 +1,7 @@
 package com.skyblockplus.utils.slashcommands;
 
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.invalidEmbed;
+import static com.skyblockplus.utils.Utils.logCommand;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;

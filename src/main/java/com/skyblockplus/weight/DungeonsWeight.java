@@ -1,6 +1,7 @@
 package com.skyblockplus.weight;
 
-import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.Constants.dungeonClassWeights;
+import static com.skyblockplus.utils.Constants.dungeonWeights;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Constants;
@@ -17,6 +18,10 @@ public class DungeonsWeight {
 		this.profile = profile;
 		this.player = player;
 		this.weightStruct = new WeightStruct();
+	}
+
+	public static double of(double averageDungeonClass, double maxClassPoints, double catacombs, double maxDungeonPoints) {
+		return (5 * Math.pow(averageDungeonClass, 4.5) * maxClassPoints) + (Math.pow(catacombs, 4.5) * maxDungeonPoints);
 	}
 
 	public WeightStruct getWeightStruct() {
@@ -49,9 +54,5 @@ public class DungeonsWeight {
 		double remaining = catacombsSkillXp - Constants.catacombsLevel50Xp;
 		double splitter = (4 * Constants.catacombsLevel50Xp) / base;
 		return weightStruct.add(new WeightStruct(Math.floor(base), Math.pow(remaining / splitter, 0.968)));
-	}
-
-	public static double of(double averageDungeonClass, double maxClassPoints, double catacombs, double maxDungeonPoints) {
-		return (5 * Math.pow(averageDungeonClass, 4.5) * maxClassPoints) + (Math.pow(catacombs, 4.5) * maxDungeonPoints);
 	}
 }

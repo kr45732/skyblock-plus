@@ -16,44 +16,10 @@ public class Weight {
 		this(player.getProfileJson(), player);
 	}
 
-	public SkillsWeight getSkillsWeight() {
-		return skillsWeight;
-	}
-
-	public SlayerWeight getSlayerWeight() {
-		return slayerWeight;
-	}
-
-	public DungeonsWeight getDungeonsWeight() {
-		return dungeonsWeight;
-	}
-
 	public Weight(JsonElement profile, Player player) {
 		this.slayerWeight = new SlayerWeight(profile, player);
 		this.skillsWeight = new SkillsWeight(profile, player);
 		this.dungeonsWeight = new DungeonsWeight(profile, player);
-	}
-
-	public WeightStruct getTotalWeight(boolean needToCalc) {
-		if (needToCalc) {
-			for (String slayerName : slayerNames) {
-				slayerWeight.getSlayerWeight(slayerName);
-			}
-			for (String skillName : skillNames) {
-				skillsWeight.getSkillsWeight(skillName);
-			}
-			dungeonsWeight.getDungeonWeight("catacombs");
-			for (String dungeonClassName : dungeonClassNames) {
-				dungeonsWeight.getClassWeight(dungeonClassName);
-			}
-		}
-
-		WeightStruct w = new WeightStruct();
-		w.add(slayerWeight.getWeightStruct());
-		w.add(skillsWeight.getWeightStruct());
-		w.add(dungeonsWeight.getWeightStruct());
-
-		return w;
 	}
 
 	public static double of(double skillAverage, double slayer, double catacombs, double averageDungeonClass) {
@@ -105,5 +71,39 @@ public class Weight {
 			catacombs,
 			dungeonWeights.get("catacombs")
 		);
+	}
+
+	public SkillsWeight getSkillsWeight() {
+		return skillsWeight;
+	}
+
+	public SlayerWeight getSlayerWeight() {
+		return slayerWeight;
+	}
+
+	public DungeonsWeight getDungeonsWeight() {
+		return dungeonsWeight;
+	}
+
+	public WeightStruct getTotalWeight(boolean needToCalc) {
+		if (needToCalc) {
+			for (String slayerName : slayerNames) {
+				slayerWeight.getSlayerWeight(slayerName);
+			}
+			for (String skillName : skillNames) {
+				skillsWeight.getSkillsWeight(skillName);
+			}
+			dungeonsWeight.getDungeonWeight("catacombs");
+			for (String dungeonClassName : dungeonClassNames) {
+				dungeonsWeight.getClassWeight(dungeonClassName);
+			}
+		}
+
+		WeightStruct w = new WeightStruct();
+		w.add(slayerWeight.getWeightStruct());
+		w.add(skillsWeight.getWeightStruct());
+		w.add(dungeonsWeight.getWeightStruct());
+
+		return w;
 	}
 }

@@ -2,16 +2,20 @@ package com.skyblockplus.features.apply;
 
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.skyblockStatsLink;
 
 import com.google.gson.*;
 import com.skyblockplus.utils.Player;
 import java.io.Serializable;
-import java.util.*;
+import java.util.EnumSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Category;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 

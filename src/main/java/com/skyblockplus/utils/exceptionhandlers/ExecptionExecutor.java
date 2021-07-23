@@ -1,13 +1,8 @@
 package com.skyblockplus.utils.exceptionhandlers;
 
-import static com.skyblockplus.Main.*;
+import static com.skyblockplus.Main.globalExceptionHandler;
 
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class ExecptionExecutor extends ThreadPoolExecutor {
 

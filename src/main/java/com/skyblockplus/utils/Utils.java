@@ -52,8 +52,6 @@ import org.slf4j.LoggerFactory;
 
 public class Utils {
 
-	private static final Logger log = LoggerFactory.getLogger(Utils.class);
-
 	/* Constants */
 	public static final Color botColor = new Color(223, 5, 5);
 	public static final int globalCooldown = 4;
@@ -74,6 +72,7 @@ public class Utils {
 	public static final AtomicInteger timeTillReset = new AtomicInteger(0);
 	public static final ConcurrentHashMap<String, HypixelKeyInformation> keyCooldownMap = new ConcurrentHashMap<>();
 	public static final ConcurrentHashMap<String, HypixelGuildCache> hypixelGuildsCacheMap = new ConcurrentHashMap<>();
+	private static final Logger log = LoggerFactory.getLogger(Utils.class);
 	/* Configuration File */
 	public static String HYPIXEL_API_KEY = "";
 	public static String BOT_TOKEN = "";
@@ -106,7 +105,6 @@ public class Utils {
 	public static JsonArray sbzPricesJson;
 	public static JsonObject internalJsonMappings;
 	public static JsonObject emojiMap;
-	private static JsonElement vanillaItemsJson;
 	/* Miscellaneous */
 	public static TextChannel botLogChannel;
 	public static TextChannel errorLogChannel;
@@ -114,6 +112,7 @@ public class Utils {
 	public static Instant averageAuctionJsonLastUpdated = Instant.now();
 	public static Instant bazaarJsonLastUpdated = Instant.now();
 	public static Instant sbzPricesJsonLastUpdated = Instant.now();
+	private static JsonElement vanillaItemsJson;
 
 	/* Getters */
 	public static JsonElement getLowestBinJson() {
@@ -617,7 +616,7 @@ public class Utils {
 		return capitalizeString(itemName.replace("_", " "));
 	}
 
-	public static String convertToInternalName(String itemName) {
+	public static String nameToId(String itemName) {
 		if (internalJsonMappings == null) {
 			try {
 				internalJsonMappings =
@@ -663,7 +662,7 @@ public class Utils {
 		return internalName;
 	}
 
-	public static String convertFromInternalName(String internalName) {
+	public static String idToName(String id) {
 		if (internalJsonMappings == null) {
 			try {
 				internalJsonMappings =
@@ -673,24 +672,24 @@ public class Utils {
 			} catch (Exception ignored) {}
 		}
 
-		internalName = internalName.toUpperCase();
+		id = id.toUpperCase();
 
 		for (Map.Entry<String, JsonElement> i : internalJsonMappings.entrySet()) {
 			for (JsonElement j : i.getValue().getAsJsonArray()) {
-				if (j.getAsString().equals(internalName)) {
+				if (j.getAsString().equals(id)) {
 					return capitalizeString(i.getKey().replace("_", " "));
 				}
 			}
 		}
 
-		return capitalizeString(internalName.replace("_", " "));
+		return capitalizeString(id.replace("_", " "));
 	}
 
 	public static ArrayList<String> getJsonKeys(JsonElement jsonElement) {
 		try {
 			return new ArrayList<>(jsonElement.getAsJsonObject().keySet());
 		} catch (Exception e) {
-			return null;
+			return new ArrayList<>();
 		}
 	}
 

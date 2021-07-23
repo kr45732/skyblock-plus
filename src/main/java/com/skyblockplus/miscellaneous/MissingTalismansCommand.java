@@ -94,11 +94,7 @@ public class MissingTalismansCommand extends Command {
 				"Sorted roughly from the least to greatest cost. Talismans with a * have higher tiers.\n\n"
 			);
 			for (String i : missingInternalArr) {
-				ebStr
-					.append("• ")
-					.append(convertFromInternalName(i))
-					.append(higherDepth(talismanUpgrades, i) != null ? "**\\***" : "")
-					.append("\n");
+				ebStr.append("• ").append(idToName(i)).append(higherDepth(talismanUpgrades, i) != null ? "**\\***" : "").append("\n");
 			}
 			return player.defaultPlayerEmbed().setDescription(ebStr.toString());
 		}

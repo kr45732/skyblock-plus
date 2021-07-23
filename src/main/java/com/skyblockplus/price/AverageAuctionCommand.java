@@ -1,15 +1,12 @@
 package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.Constants.enchantNames;
-import static com.skyblockplus.utils.Constants.petNames;
+import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.utils.Constants;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -30,121 +27,86 @@ public class AverageAuctionCommand extends Command {
 			return defaultEmbed("Error fetching auctions");
 		}
 
-		if (higherDepth(averageAhJson, item) != null) {
-			JsonElement itemJson = higherDepth(averageAhJson, item);
+		String itemId = nameToId(item);
+		if (higherDepth(averageAhJson, itemId) != null) {
+			JsonElement itemJson = higherDepth(averageAhJson, itemId);
 			EmbedBuilder eb;
 
 			if (higherDepth(itemJson, "clean_price") != null) {
 				eb = defaultEmbed("Average auction (clean)");
-				eb.addField(capitalizeString(item.toLowerCase()), formatNumber(higherDepth(itemJson, "clean_price").getAsLong()), false);
+				eb.addField(idToName(itemId), formatNumber(higherDepth(itemJson, "clean_price").getAsLong()), false);
 			} else {
 				eb = defaultEmbed("Average auction");
-				eb.addField(capitalizeString(item.toLowerCase()), formatNumber(higherDepth(itemJson, "price").getAsLong()), false);
+				eb.addField(idToName(itemId), formatNumber(higherDepth(itemJson, "price").getAsLong()), false);
 			}
 
-			eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + item);
+			eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId);
 			return eb;
 		}
 
-		String internalName = convertToInternalName(item);
-
-		if (higherDepth(averageAhJson, internalName) != null) {
-			JsonElement itemJson = higherDepth(averageAhJson, internalName);
-			EmbedBuilder eb;
-
-			if (higherDepth(itemJson, "clean_price") != null) {
-				eb = defaultEmbed("Average auction (clean)");
-				eb.addField(capitalizeString(item.toLowerCase()), formatNumber(higherDepth(itemJson, "clean_price").getAsLong()), false);
-			} else {
-				eb = defaultEmbed("Average auction");
-				eb.addField(capitalizeString(item.toLowerCase()), formatNumber(higherDepth(itemJson, "price").getAsLong()), false);
-			}
-
-			eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + internalName);
-			return eb;
-		}
-
-		String formattedName;
 		for (String i : enchantNames) {
-			if (internalName.contains(i)) {
-				String enchantName;
+			if (itemId.contains(i)) {
 				try {
-					int enchantLevel = Integer.parseInt(internalName.replaceAll("\\D+", ""));
-					enchantName = i.toLowerCase().replace("_", " ") + " " + enchantLevel;
-					formattedName = i + ";" + enchantLevel;
+					String enchantedBookId = i + ";" + Integer.parseInt(itemId.replaceAll("\\D+", ""));
+					if (higherDepth(averageAhJson, enchantedBookId) != null) {
+						JsonElement itemJson = higherDepth(averageAhJson, enchantedBookId);
+						EmbedBuilder eb;
 
-					JsonElement itemJson = higherDepth(averageAhJson, formattedName);
-					EmbedBuilder eb;
-
-					if (higherDepth(itemJson, "clean_price") != null) {
-						eb = defaultEmbed("Average auction (clean)");
-						eb.addField(capitalizeString(enchantName), formatNumber(higherDepth(itemJson, "clean_price").getAsLong()), false);
-					} else {
-						eb = defaultEmbed("Average auction");
-						eb.addField(capitalizeString(enchantName), formatNumber(higherDepth(itemJson, "price").getAsLong()), false);
-					}
-
-					eb.setThumbnail("https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK");
-					return eb;
-				} catch (NumberFormatException e) {
-					try {
-						EmbedBuilder eb = defaultEmbed("Average auction");
-						for (int j = 10; j > 0; j--) {
-							try {
-								formattedName = i + ";" + j;
-								enchantName = i.toLowerCase().replace("_", " ") + " " + j;
-
-								JsonElement itemJson = higherDepth(averageAhJson, formattedName);
-
-								if (higherDepth(itemJson, "clean_price") != null) {
-									eb.setTitle("Average auction (clean)");
-									eb.addField(
-										capitalizeString(enchantName),
-										formatNumber(higherDepth(itemJson, "clean_price").getAsLong()),
-										false
-									);
-								} else {
-									eb.setTitle("Average auction");
-									eb.addField(
-										capitalizeString(enchantName),
-										formatNumber(higherDepth(itemJson, "price").getAsLong()),
-										false
-									);
-								}
-							} catch (NullPointerException ignored) {}
+						if (higherDepth(itemJson, "clean_price") != null) {
+							eb = defaultEmbed("Average auction (clean)");
+							eb.addField(idToName(enchantedBookId), formatNumber(higherDepth(itemJson, "clean_price").getAsLong()), false);
+						} else {
+							eb = defaultEmbed("Average auction");
+							eb.addField(idToName(enchantedBookId), formatNumber(higherDepth(itemJson, "price").getAsLong()), false);
 						}
-						if (eb.getFields().size() == 0) {
-							return defaultEmbed("No auctions found for " + capitalizeString(item.toLowerCase()));
-						}
+
 						eb.setThumbnail("https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK");
 						return eb;
-					} catch (NullPointerException ex) {
-						return defaultEmbed("No auctions found for " + capitalizeString(item.toLowerCase()));
 					}
-				} catch (NullPointerException e) {
-					return defaultEmbed("No auctions found for " + capitalizeString(item.toLowerCase()));
+				} catch (NumberFormatException e) {
+					EmbedBuilder eb = defaultEmbed("Average auction");
+					for (int j = 10; j > 0; j--) {
+						String enchantedBookId = i + ";" + j;
+						if (higherDepth(averageAhJson, enchantedBookId) != null) {
+							JsonElement itemJson = higherDepth(averageAhJson, enchantedBookId);
+
+							if (higherDepth(itemJson, "clean_price") != null) {
+								eb.setTitle("Average auction (clean)");
+								eb.addField(
+									idToName(enchantedBookId),
+									formatNumber(higherDepth(itemJson, "clean_price").getAsLong()),
+									false
+								);
+							} else {
+								eb.setTitle("Average auction");
+								eb.addField(idToName(enchantedBookId), formatNumber(higherDepth(itemJson, "price").getAsLong()), false);
+							}
+						}
+					}
+
+					if (eb.getFields().size() != 0) {
+						eb.setThumbnail("https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK");
+						return eb;
+					}
 				}
 			}
 		}
 
 		JsonElement petJson = getPetNumsJson();
-
 		for (String i : petNames) {
-			if (internalName.contains(i)) {
-				String petName = "";
-				formattedName = i;
+			if (itemId.contains(i)) {
+				String petId = i;
 				boolean raritySpecified = false;
-				for (Map.Entry<String, String> j : Constants.rarityToNumberMap.entrySet()) {
-					if (internalName.contains(j.getKey())) {
-						petName = j.getKey().toLowerCase() + " " + formattedName.toLowerCase().replace("_", " ");
-						formattedName += j.getValue();
+				for (Map.Entry<String, String> j : rarityToNumberMap.entrySet()) {
+					if (itemId.contains(j.getKey())) {
+						petId += j.getValue();
 						raritySpecified = true;
 						break;
 					}
 				}
 
 				if (!raritySpecified) {
-					List<String> petRarities = higherDepth(petJson, formattedName)
+					List<String> petRarities = higherDepth(petJson, petId)
 						.getAsJsonObject()
 						.keySet()
 						.stream()
@@ -152,94 +114,55 @@ public class AverageAuctionCommand extends Command {
 						.collect(Collectors.toCollection(ArrayList::new));
 
 					for (String j : petRarities) {
-						if (higherDepth(averageAhJson, formattedName + Constants.rarityToNumberMap.get(j)) != null) {
-							petName = j.toLowerCase() + " " + formattedName.toLowerCase().replace("_", " ");
-							formattedName += Constants.rarityToNumberMap.get(j);
+						if (higherDepth(averageAhJson, petId + rarityToNumberMap.get(j)) != null) {
+							petId += rarityToNumberMap.get(j);
 							break;
 						}
 					}
 				}
-				JsonElement itemJson = higherDepth(averageAhJson, formattedName);
-				EmbedBuilder eb;
 
-				if (higherDepth(itemJson, "clean_price") != null) {
-					eb = defaultEmbed("Average auction (clean)");
-					eb.addField(capitalizeString(petName + " pet"), formatNumber(higherDepth(itemJson, "clean_price").getAsLong()), false);
-				} else {
-					eb = defaultEmbed("Average auction");
-					eb.addField(capitalizeString(petName + " pet"), formatNumber(higherDepth(itemJson, "price").getAsLong()), false);
+				if (higherDepth(averageAhJson, petId) != null) {
+					JsonElement itemJson = higherDepth(averageAhJson, petId);
+					EmbedBuilder eb;
+
+					if (higherDepth(itemJson, "clean_price") != null) {
+						eb = defaultEmbed("Average auction (clean)");
+						eb.addField(idToName(petId), formatNumber(higherDepth(itemJson, "clean_price").getAsLong()), false);
+					} else {
+						eb = defaultEmbed("Average auction");
+						eb.addField(idToName(petId), formatNumber(higherDepth(itemJson, "price").getAsLong()), false);
+					}
+
+					eb.setThumbnail(getPetUrl(petId.split(";")[0]));
+					return eb;
 				}
-
-				eb.setThumbnail(getPetUrl(formattedName.split(";")[0]));
-				return eb;
 			}
 		}
 
-		String closestMatch = getClosestMatch(internalName, getJsonKeys(averageAhJson));
-
-		if (closestMatch != null && higherDepth(averageAhJson, closestMatch) != null) {
+		String closestMatch = getClosestMatch(itemId, getJsonKeys(averageAhJson));
+		if (closestMatch != null) {
 			EmbedBuilder eb = defaultEmbed("Average Auction");
 			JsonElement itemJson = higherDepth(averageAhJson, closestMatch);
 
 			if (enchantNames.contains(closestMatch.split(";")[0].trim())) {
-				String itemName = closestMatch.toLowerCase().replace("_", " ").replace(";", " ");
-				if (higherDepth(itemJson, "clean_price") != null) {
-					eb = defaultEmbed("Average auction (clean)");
-					eb.addField(capitalizeString(itemName), formatNumber(higherDepth(itemJson, "clean_price").getAsLong()), false);
-				} else {
-					eb = defaultEmbed("Average auction");
-					eb.addField(capitalizeString(itemName), formatNumber(higherDepth(itemJson, "price").getAsLong()), false);
-				}
-
 				eb.setThumbnail("https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK");
 			} else if (petNames.contains(closestMatch.split(";")[0].trim())) {
-				Map<String, String> rarityMapRev = new HashMap<>();
-				rarityMapRev.put("4", "LEGENDARY");
-				rarityMapRev.put("3", "EPIC");
-				rarityMapRev.put("2", "RARE");
-				rarityMapRev.put("1", "UNCOMMON");
-				rarityMapRev.put("0", "COMMON");
-				eb.setThumbnail(getPetUrl(closestMatch.split(";")[0]));
-				String[] itemS = closestMatch.toLowerCase().replace("_", " ").split(";");
-
-				if (higherDepth(itemJson, "clean_price") != null) {
-					eb = defaultEmbed("Average auction (clean)");
-					eb.addField(
-						capitalizeString(rarityMapRev.get(itemS[1].toUpperCase()) + " " + itemS[0]),
-						formatNumber(higherDepth(itemJson, "clean_price").getAsLong()),
-						false
-					);
-				} else {
-					eb = defaultEmbed("Average auction");
-					eb.addField(
-						capitalizeString(rarityMapRev.get(itemS[1].toUpperCase()) + " " + itemS[0]),
-						formatNumber(higherDepth(itemJson, "price").getAsLong()),
-						false
-					);
-				}
+				eb.setThumbnail(getPetUrl(closestMatch.split(";")[0].trim()));
 			} else {
-				if (higherDepth(itemJson, "clean_price") != null) {
-					eb = defaultEmbed("Average auction (clean)");
-					eb.addField(
-						capitalizeString(closestMatch.toLowerCase().replace("_", " ")),
-						formatNumber(higherDepth(itemJson, "clean_price").getAsLong()),
-						false
-					);
-				} else {
-					eb = defaultEmbed("Average auction");
-					eb.addField(
-						capitalizeString(closestMatch.toLowerCase().replace("_", " ")),
-						formatNumber(higherDepth(itemJson, "price").getAsLong()),
-						false
-					);
-				}
 				eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + closestMatch);
 			}
 
+			if (higherDepth(itemJson, "clean_price") != null) {
+				eb = defaultEmbed("Average auction (clean)");
+				eb.addField(idToName(closestMatch), formatNumber(higherDepth(itemJson, "clean_price").getAsLong()), false);
+			} else {
+				eb = defaultEmbed("Average auction");
+				eb.addField(idToName(closestMatch), formatNumber(higherDepth(itemJson, "price").getAsLong()), false);
+			}
 			return eb;
 		}
 
-		return defaultEmbed("No auctions found for " + capitalizeString(item.toLowerCase()));
+		return defaultEmbed("No auctions found for " + idToName(item));
 	}
 
 	@Override
