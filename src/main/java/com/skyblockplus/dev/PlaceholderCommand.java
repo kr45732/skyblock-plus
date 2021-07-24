@@ -2,10 +2,17 @@ package com.skyblockplus.dev;
 
 import static com.skyblockplus.utils.Utils.*;
 
+import com.google.gson.*;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.HashMap;
+import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import org.apache.commons.lang3.StringUtils;
 
 public class PlaceholderCommand extends Command {
 
@@ -58,36 +65,6 @@ public class PlaceholderCommand extends Command {
 	//
 	//	}
 
-	//	public static void main(String[] args) {
-	//		setApplicationSettings();
-	//		File dir = new File("src/main/java/com/skyblockplus/json/NotEnoughUpdates-REPO-master/items");
-	//		File[] directoryListing = dir.listFiles();
-	//		List<String> enchantsList = getJsonKeys(higherDepth(getEnchantsJson(), "enchants_min_level"));
-	//
-	//		for (File child : directoryListing) {
-	//			try {
-	//				for(String enchant:enchantsList){
-	//					if(child.getName().startsWith(enchant.toUpperCase())){
-	//						JsonObject json = JsonParser.parseReader(new FileReader(child)).getAsJsonObject();
-	//						String itemName = parseMcCodes(json.getAsJsonArray("lore").get(0).getAsString());
-	//
-	//						String newJson =  new GsonBuilder()
-	//								.setPrettyPrinting()
-	//								.create().toJson(JsonParser.parseString(json.toString().replace("Enchanted Book", itemName)));
-	//						System.out.println(newJson);
-	//
-	//						PrintWriter prw= new PrintWriter(child.getAbsolutePath());
-	//						prw.println(newJson);
-	//						prw.close();
-	//						break;
-	//					}
-	//				}
-	//			}catch (Exception e){
-	//				e.printStackTrace();
-	//			}
-	//		}
-	//	}
-
 	//		public static void main(String[] args) throws FileNotFoundException {
 	//			File dir = new File("src/main/java/com/skyblockplus/json/items");
 	//			File[] directoryListing = dir.listFiles();
@@ -126,9 +103,9 @@ public class PlaceholderCommand extends Command {
 	//						itemName = "MELODY_HAIR";
 	//					}
 	//
-	//	//				if (itemName.equals(internalName)) {
-	//	//					continue;
-	//	//				}
+	//					if (internalName.contains("-")) {
+	//						internalName = internalName.replace("-", ":");
+	//					}
 	//
 	//					JsonArray temp = new JsonArray();
 	//					if (arrayJson.has(itemName)) {
@@ -143,5 +120,4 @@ public class PlaceholderCommand extends Command {
 	//			}
 	//			System.out.println(makeHastePost(new GsonBuilder().setPrettyPrinting().create().toJson(arrayJson)) + ".json");
 	//		}
-
 }
