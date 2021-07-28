@@ -36,7 +36,7 @@ public class MessageTimeout extends ListenerAdapter {
 
 	@Override
 	public void onReady(@NotNull ReadyEvent event) {
-		scheduler.scheduleAtFixedRate(this::updateMessages, 1, 1, TimeUnit.MINUTES);
+		scheduler.scheduleWithFixedDelay(this::updateMessages, 1, 1, TimeUnit.MINUTES);
 	}
 
 	public void updateMessages() {

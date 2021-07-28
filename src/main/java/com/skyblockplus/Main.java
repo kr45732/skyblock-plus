@@ -33,6 +33,7 @@ import com.skyblockplus.slayer.SlayerSlashCommand;
 import com.skyblockplus.timeout.MessageTimeout;
 import com.skyblockplus.utils.Constants;
 import com.skyblockplus.utils.GuildPrefixManager;
+import com.skyblockplus.utils.Hypixel;
 import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.exceptionhandlers.ExceptionEventListener;
 import com.skyblockplus.utils.exceptionhandlers.GlobalExceptionHandler;
@@ -193,6 +194,8 @@ public class Main {
 			jda.awaitReady();
 		} catch (Exception ignored) {}
 		jda.getPresence().setActivity(Activity.watching(DEFAULT_PREFIX + "help in " + jda.getGuilds().size() + " servers"));
+
+		Hypixel.scheduleUpdateCache();
 		//				scheduleUpdateLinkedAccounts();
 		//				AuctionFlipper.scheduleFlipper();
 	}

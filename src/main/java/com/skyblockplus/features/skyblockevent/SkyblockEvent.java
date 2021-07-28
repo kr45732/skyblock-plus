@@ -58,7 +58,7 @@ public class SkyblockEvent {
 		eb.setDescription("What is the name of the guild I should track?");
 		sendEmbedMessage(eb);
 		lastMessageSentTime = Instant.now();
-		scheduledFuture = scheduler.scheduleAtFixedRate(this::checkForTimeout, 0, 1, TimeUnit.MINUTES);
+		scheduledFuture = scheduler.scheduleWithFixedDelay(this::checkForTimeout, 0, 1, TimeUnit.MINUTES);
 	}
 
 	private void checkForTimeout() {

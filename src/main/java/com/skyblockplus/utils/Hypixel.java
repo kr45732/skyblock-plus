@@ -4,7 +4,10 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.gson.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.io.InputStreamReader;
@@ -14,8 +17,12 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import okhttp3.*;
+import okhttp3.MediaType;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
@@ -140,7 +147,7 @@ public class Hypixel {
 					return new HypixelResponse("Player has no SkyBlock profiles");
 				}
 
-				JsonArray profileArray = higherDepth(profilesJson, "profiles").getAsJsonArray();
+				JsonArray profileArray = processSkyblockProfilesArray(higherDepth(profilesJson, "profiles").getAsJsonArray());
 				cacheJson("profiles", uuid, profileArray);
 				return new HypixelResponse(profileArray);
 			} catch (Exception e) {
@@ -175,15 +182,14 @@ public class Hypixel {
 										.timeTillReset.set(Integer.parseInt(profilesResponse.getHeader("RateLimit-Reset")));
 								} catch (Exception ignored) {}
 
-								JsonArray profileArray = higherDepth(JsonParser.parseString(profilesResponse.getResponseBody()), "profiles")
-									.getAsJsonArray();
+								JsonArray profileArray = processSkyblockProfilesArray(
+									higherDepth(JsonParser.parseString(profilesResponse.getResponseBody()), "profiles").getAsJsonArray()
+								);
 
 								cacheJson("profiles", uuid, profileArray);
 
 								return profileArray;
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
+							} catch (Exception ignored) {}
 							return null;
 						}
 					);
@@ -390,8 +396,8 @@ public class Hypixel {
 	}
 
 	@SuppressWarnings("EmptyTryBlock")
-	public static void deleteCachedJson(String type, String playerUuid) {
-		executor.submit(
+	public static Future<?> deleteCachedJson(String type, String playerUuid) {
+		return executor.submit(
 			() -> {
 				uuidToTimeSkyblockProfiles.remove(playerUuid);
 
@@ -409,5 +415,64 @@ public class Hypixel {
 			}
 		);
 	}
-	// TODO: add a method to clean old cache every 5 min? prob don't renew it
+
+	public static void scheduleUpdateCache() {
+		scheduler.scheduleWithFixedDelay(Hypixel::updateCache, 1, 5, TimeUnit.MINUTES);
+	}
+
+	public static void updateCache() {
+		try {
+			MediaType mediaType = MediaType.parse("application/json");
+			RequestBody body = RequestBody.create(
+				mediaType,
+				"{\"operation\": \"sql\",\"sql\":\"SELECT uuid FROM dev.profiles WHERE __updatedtime__ < " +
+				Instant.now().minusSeconds(90).toEpochMilli() +
+				"\"}"
+			);
+			Request request = new Request.Builder()
+				.url(databaseUrl)
+				.method("POST", body)
+				.addHeader("Content-Type", "application/json")
+				.addHeader("Authorization", "Basic " + CACHE_DATABASE_TOKEN)
+				.build();
+			Response response = okHttpClient.newCall(request).execute();
+			JsonArray expiredCaches = JsonParser.parseString(response.body().string()).getAsJsonArray();
+			for (JsonElement expiredCache : expiredCaches) {
+				try {
+					deleteCachedJson("profiles", higherDepth(expiredCache, "uuid").getAsString()).get();
+					TimeUnit.SECONDS.sleep(1);
+				} catch (Exception ignored) {}
+			}
+		} catch (Exception ignored) {}
+	}
+
+	public static JsonArray processSkyblockProfilesArray(JsonArray array) {
+		for (int i = 0; i < array.size(); i++) {
+			JsonObject currentProfile = array.get(i).getAsJsonObject();
+			currentProfile.remove("community_upgrades");
+
+			JsonObject currentProfileMembers = higherDepth(currentProfile, "members").getAsJsonObject();
+			for (String currentProfileMemberUuid : currentProfileMembers.keySet()) {
+				JsonObject currentProfileMember = currentProfileMembers.getAsJsonObject(currentProfileMemberUuid);
+				currentProfileMember.remove("stats");
+				currentProfileMember.remove("objectives");
+				currentProfileMember.remove("tutorial");
+				currentProfileMember.remove("quests");
+				currentProfileMember.remove("visited_zones");
+				currentProfileMember.remove("griffin");
+				currentProfileMember.remove("experimentation");
+				currentProfileMember.remove("unlocked_coll_tiers");
+				currentProfileMember.remove("backpack_icons");
+				currentProfileMember.remove("achievement_spawned_island_types");
+				currentProfileMember.remove("slayer_quest");
+
+				currentProfileMembers.add(currentProfileMemberUuid, currentProfileMember);
+			}
+
+			currentProfile.add("members", currentProfileMembers);
+			array.set(i, currentProfile);
+		}
+
+		return array;
+	}
 }

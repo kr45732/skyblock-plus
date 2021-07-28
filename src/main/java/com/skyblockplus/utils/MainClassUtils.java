@@ -90,7 +90,7 @@ public class MainClassUtils {
 
 	public static void scheduleUpdateLinkedAccounts() {
 		ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-		scheduler.scheduleAtFixedRate(MainClassUtils::updateLinkedAccounts, 1, 1, TimeUnit.MINUTES);
+		scheduler.scheduleWithFixedDelay(MainClassUtils::updateLinkedAccounts, 1, 1, TimeUnit.MINUTES);
 	}
 
 	public static void closeAsyncHttpClient() {
