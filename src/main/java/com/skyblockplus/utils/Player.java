@@ -25,10 +25,9 @@ public class Player {
 	private static final Logger log = LoggerFactory.getLogger(Player.class);
 
 	public String invMissing = "";
-	private JsonElement profileJson;
-	private JsonElement outerProfileJson;
-	private JsonElement hypixelProfileJson;
 	private JsonArray profilesArray;
+	private int profileIndex;
+	private JsonElement hypixelProfileJson;
 	private boolean validPlayer = false;
 	private String playerUuid;
 	private String playerUsername;
@@ -146,8 +145,7 @@ public class Player {
 				String currentProfileName = higherDepth(profilesArray.get(i), "cute_name").getAsString();
 				if (currentProfileName.equalsIgnoreCase(profileName)) {
 					this.profileName = currentProfileName;
-					this.outerProfileJson = profilesArray.get(i);
-					this.profileJson = higherDepth(profilesArray.get(i), "members." + this.playerUuid);
+					this.profileIndex = i;
 					return false;
 				}
 			}
@@ -168,8 +166,7 @@ public class Player {
 				}
 
 				if (lastSaveLoop.isAfter(lastProfileSave)) {
-					this.profileJson = higherDepth(profilesArray.get(i), "members." + this.playerUuid);
-					this.outerProfileJson = profilesArray.get(i);
+					this.profileIndex = i;
 					lastProfileSave = lastSaveLoop;
 					this.profileName = higherDepth(profilesArray.get(i), "cute_name").getAsString();
 				}
@@ -180,8 +177,8 @@ public class Player {
 	}
 
 	/* Getters */
-	public JsonElement getProfileJson() {
-		return profileJson;
+	public JsonElement profileJson() {
+		return higherDepth(profilesArray.get(profileIndex), "members." + this.playerUuid);
 	}
 
 	public String getUsername() {
@@ -197,7 +194,7 @@ public class Player {
 	}
 
 	public JsonElement getOuterProfileJson() {
-		return outerProfileJson;
+		return profilesArray.get(profileIndex);
 	}
 
 	public boolean isValid() {
@@ -220,7 +217,7 @@ public class Player {
 	/* Bank and purse */
 	public double getBankBalance() {
 		try {
-			return higherDepth(outerProfileJson, "banking.balance").getAsDouble();
+			return higherDepth(getOuterProfileJson(), "banking.balance").getAsDouble();
 		} catch (Exception e) {
 			return -1;
 		}
@@ -228,7 +225,7 @@ public class Player {
 
 	public double getPurseCoins() {
 		try {
-			return higherDepth(profileJson, "coin_purse").getAsLong();
+			return higherDepth(profileJson(), "coin_purse").getAsLong();
 		} catch (Exception e) {
 			return -1;
 		}
@@ -236,7 +233,7 @@ public class Player {
 
 	public JsonArray getBankHistory() {
 		try {
-			return higherDepth(outerProfileJson, "banking.transactions").getAsJsonArray();
+			return higherDepth(getOuterProfileJson(), "banking.transactions").getAsJsonArray();
 		} catch (Exception e) {
 			return null;
 		}
@@ -244,7 +241,7 @@ public class Player {
 
 	/* Skills */
 	public int getTotalSkillsXp() {
-		return getTotalSkillsXp(profileJson);
+		return getTotalSkillsXp(profileJson());
 	}
 
 	public int getTotalSkillsXp(JsonElement profile) {
@@ -262,7 +259,7 @@ public class Player {
 
 	public int getFarmingCapUpgrade() {
 		try {
-			return higherDepth(profileJson, "jacob2.perks.farming_level_cap").getAsInt();
+			return higherDepth(profileJson(), "jacob2.perks.farming_level_cap").getAsInt();
 		} catch (Exception e) {
 			return 0;
 		}
@@ -279,7 +276,7 @@ public class Player {
 	}
 
 	public double getSkillXp(String skillName) {
-		return getSkillXp(profileJson, skillName);
+		return getSkillXp(profileJson(), skillName);
 	}
 
 	public double getSkillXp(JsonElement profile, String skillName) {
@@ -293,7 +290,7 @@ public class Player {
 	}
 
 	public SkillsStruct getSkill(String skillName) {
-		return getSkill(profileJson, skillName);
+		return getSkill(profileJson(), skillName);
 	}
 
 	public SkillsStruct getSkill(JsonElement profile, String skillName) {
@@ -309,7 +306,7 @@ public class Player {
 	}
 
 	public double getSkillAverage() {
-		return getSkillAverage(profileJson);
+		return getSkillAverage(profileJson());
 	}
 
 	public double getSkillAverage(JsonElement profile) {
@@ -367,7 +364,7 @@ public class Player {
 
 	/* Slayer */
 	public int getTotalSlayer() {
-		return getTotalSlayer(profileJson);
+		return getTotalSlayer(profileJson());
 	}
 
 	public int getTotalSlayer(JsonElement profile) {
@@ -375,12 +372,12 @@ public class Player {
 	}
 
 	public int getSlayerBossKills(String slayerName, int tier) {
-		JsonElement slayerBossKills = higherDepth(profileJson, "slayer_bosses." + slayerName + ".boss_kills_tier_" + tier);
+		JsonElement slayerBossKills = higherDepth(profileJson(), "slayer_bosses." + slayerName + ".boss_kills_tier_" + tier);
 		return slayerBossKills != null ? slayerBossKills.getAsInt() : 0;
 	}
 
 	public int getSlayer(String slayerName) {
-		return getSlayer(profileJson, slayerName);
+		return getSlayer(profileJson(), slayerName);
 	}
 
 	public int getSlayer(JsonElement profile, String slayerName) {
@@ -455,7 +452,7 @@ public class Player {
 	/* Dungeons */
 	public String getSelectedDungeonClass() {
 		try {
-			return higherDepth(profileJson, "dungeons.selected_dungeon_class").getAsString();
+			return higherDepth(profileJson(), "dungeons.selected_dungeon_class").getAsString();
 		} catch (Exception e) {
 			return "none";
 		}
@@ -500,7 +497,7 @@ public class Player {
 
 	public String getFastestF7Time() {
 		try {
-			int f7TimeMilliseconds = higherDepth(profileJson, "dungeons.dungeon_types.catacombs.fastest_time_s_plus.7").getAsInt();
+			int f7TimeMilliseconds = higherDepth(profileJson(), "dungeons.dungeon_types.catacombs.fastest_time_s_plus.7").getAsInt();
 			int minutes = f7TimeMilliseconds / 1000 / 60;
 			int seconds = f7TimeMilliseconds / 1000 % 60;
 			return ("\n**Fastest F7 S+:** " + minutes + ":" + (seconds >= 10 ? seconds : "0" + seconds));
@@ -522,7 +519,7 @@ public class Player {
 	}
 
 	public double getDungeonClassLevel(String className) {
-		return getDungeonClassLevel(profileJson, className);
+		return getDungeonClassLevel(profileJson(), className);
 	}
 
 	public double getDungeonClassLevel(JsonElement profile, String className) {
@@ -535,7 +532,7 @@ public class Player {
 	}
 
 	public double getCatacombsLevel() {
-		return getCatacombsLevel(profileJson);
+		return getCatacombsLevel(profileJson());
 	}
 
 	public double getCatacombsLevel(JsonElement profile) {
@@ -544,7 +541,7 @@ public class Player {
 	}
 
 	public SkillsStruct getCatacombsSkill() {
-		return getCatacombsSkill(profileJson);
+		return getCatacombsSkill(profileJson());
 	}
 
 	public SkillsStruct getCatacombsSkill(JsonElement profile) {
@@ -555,7 +552,7 @@ public class Player {
 	}
 
 	public double getDungeonClassXp(String className) {
-		return getDungeonClassXp(profileJson, className);
+		return getDungeonClassXp(profileJson(), className);
 	}
 
 	public double getDungeonClassXp(JsonElement profile, String className) {
@@ -570,7 +567,7 @@ public class Player {
 	/* InvItem maps */
 	public Map<Integer, InvItem> getInventoryMap() {
 		try {
-			String contents = higherDepth(profileJson, "inv_contents.data").getAsString();
+			String contents = higherDepth(profileJson(), "inv_contents.data").getAsString();
 			NBTCompound parsedContents = NBTReader.readBase64(contents);
 			return getGenericInventoryMap(parsedContents);
 		} catch (Exception ignored) {}
@@ -579,7 +576,7 @@ public class Player {
 
 	public Map<Integer, InvItem> getStorageMap() {
 		try {
-			JsonElement backpackContents = higherDepth(profileJson, "backpack_contents");
+			JsonElement backpackContents = higherDepth(profileJson(), "backpack_contents");
 			List<String> backpackCount = getJsonKeys(backpackContents);
 			Map<Integer, InvItem> storageMap = new HashMap<>();
 			int counter = 1;
@@ -601,7 +598,7 @@ public class Player {
 
 	public Map<Integer, InvItem> getTalismanBagMap() {
 		try {
-			String contents = higherDepth(profileJson, "talisman_bag.data").getAsString();
+			String contents = higherDepth(profileJson(), "talisman_bag.data").getAsString();
 			NBTCompound parsedContents = NBTReader.readBase64(contents);
 			return getGenericInventoryMap(parsedContents);
 		} catch (Exception ignored) {}
@@ -610,7 +607,7 @@ public class Player {
 
 	public Map<Integer, InvItem> getInventoryArmorMap() {
 		try {
-			String contents = higherDepth(profileJson, "inv_armor.data").getAsString();
+			String contents = higherDepth(profileJson(), "inv_armor.data").getAsString();
 			NBTCompound parsedContents = NBTReader.readBase64(contents);
 			return getGenericInventoryMap(parsedContents);
 		} catch (Exception ignored) {}
@@ -619,7 +616,7 @@ public class Player {
 
 	public Map<Integer, InvItem> getWardrobeMap() {
 		try {
-			String contents = higherDepth(profileJson, "wardrobe_contents.data").getAsString();
+			String contents = higherDepth(profileJson(), "wardrobe_contents.data").getAsString();
 			NBTCompound parsedContents = NBTReader.readBase64(contents);
 			return getGenericInventoryMap(parsedContents);
 		} catch (Exception ignored) {}
@@ -657,7 +654,7 @@ public class Player {
 
 	public Map<Integer, InvItem> getEnderChestMap() {
 		try {
-			String contents = higherDepth(profileJson, "ender_chest_contents.data").getAsString();
+			String contents = higherDepth(profileJson(), "ender_chest_contents.data").getAsString();
 			NBTCompound parsedContents = NBTReader.readBase64(contents);
 			return getGenericInventoryMap(parsedContents);
 		} catch (Exception ignored) {}
@@ -667,7 +664,7 @@ public class Player {
 	/* Emoji viewer arrays / other inventory */
 	public List<String[]> getTalismanBag() {
 		try {
-			String encodedInventoryContents = higherDepth(profileJson, "talisman_bag.data").getAsString();
+			String encodedInventoryContents = higherDepth(profileJson(), "talisman_bag.data").getAsString();
 			NBTCompound decodedInventoryContents = NBTReader.readBase64(encodedInventoryContents);
 
 			NBTList invFrames = decodedInventoryContents.getList("i");
@@ -724,7 +721,7 @@ public class Player {
 
 	public List<String[]> getEnderChest() {
 		try {
-			String encodedInventoryContents = higherDepth(profileJson, "ender_chest_contents.data").getAsString();
+			String encodedInventoryContents = higherDepth(profileJson(), "ender_chest_contents.data").getAsString();
 			NBTCompound decodedInventoryContents = NBTReader.readBase64(encodedInventoryContents);
 
 			NBTList invFrames = decodedInventoryContents.getList("i");
@@ -773,7 +770,7 @@ public class Player {
 
 	public String[] getInventory() {
 		try {
-			String encodedInventoryContents = higherDepth(profileJson, "inv_contents.data").getAsString();
+			String encodedInventoryContents = higherDepth(profileJson(), "inv_contents.data").getAsString();
 			NBTCompound decodedInventoryContents = NBTReader.readBase64(encodedInventoryContents);
 
 			NBTList invFrames = decodedInventoryContents.getList("i");
@@ -812,8 +809,8 @@ public class Player {
 
 	public Map<Integer, ArmorStruct> getWardrobeList() {
 		try {
-			String encodedWardrobeContents = higherDepth(profileJson, "wardrobe_contents.data").getAsString();
-			int equippedSlot = higherDepth(profileJson, "wardrobe_equipped_slot").getAsInt();
+			String encodedWardrobeContents = higherDepth(profileJson(), "wardrobe_contents.data").getAsString();
+			int equippedSlot = higherDepth(profileJson(), "wardrobe_equipped_slot").getAsInt();
 			NBTCompound decodedWardrobeContents = NBTReader.readBase64(encodedWardrobeContents);
 
 			NBTList wardrobeFrames = decodedWardrobeContents.getList("i");
@@ -871,10 +868,10 @@ public class Player {
 
 	public List<String[]> getWardrobe() {
 		try {
-			int equippedWardrobeSlot = higherDepth(profileJson, "wardrobe_equipped_slot").getAsInt();
+			int equippedWardrobeSlot = higherDepth(profileJson(), "wardrobe_equipped_slot").getAsInt();
 			Map<Integer, InvItem> equippedArmor = equippedWardrobeSlot != -1 ? getInventoryArmorMap() : null;
 
-			String encodedInventoryContents = higherDepth(profileJson, "wardrobe_contents.data").getAsString();
+			String encodedInventoryContents = higherDepth(profileJson(), "wardrobe_contents.data").getAsString();
 			NBTCompound decodedInventoryContents = NBTReader.readBase64(encodedInventoryContents);
 
 			NBTList invFrames = decodedInventoryContents.getList("i");
@@ -947,7 +944,7 @@ public class Player {
 
 	public ArmorStruct getInventoryArmor() {
 		try {
-			String encodedInventoryContents = higherDepth(profileJson, "inv_armor.data").getAsString();
+			String encodedInventoryContents = higherDepth(profileJson(), "inv_armor.data").getAsString();
 			NBTCompound decodedInventoryContents = NBTReader.readBase64(encodedInventoryContents);
 
 			NBTList talismanFrames = decodedInventoryContents.getList("i");
@@ -968,12 +965,12 @@ public class Player {
 	}
 
 	public JsonArray getPets() {
-		return higherDepth(profileJson, "pets").getAsJsonArray();
+		return higherDepth(profileJson(), "pets").getAsJsonArray();
 	}
 
 	@SuppressWarnings("unchecked")
 	public HashMap<String, Integer> getPlayerSacks() {
-		JsonElement sacksJson = higherDepth(profileJson, "sacks_counts");
+		JsonElement sacksJson = higherDepth(profileJson(), "sacks_counts");
 		return new Gson().fromJson(sacksJson, HashMap.class);
 	}
 
@@ -1001,7 +998,7 @@ public class Player {
 
 	public int getFairySouls() {
 		try {
-			return higherDepth(profileJson, "fairy_souls_collected").getAsInt();
+			return higherDepth(profileJson(), "fairy_souls_collected").getAsInt();
 		} catch (Exception e) {
 			return -1;
 		}
@@ -1025,12 +1022,12 @@ public class Player {
 	}
 
 	public double getWeight() {
-		return getWeight(profileJson);
+		return getWeight(profileJson());
 	}
 
 	public EmbedBuilder defaultPlayerEmbed() {
 		return defaultEmbed(
-			fixUsername(getUsername()) + (higherDepth(outerProfileJson, "game_mode") != null ? " ♻️" : ""),
+			fixUsername(getUsername()) + (higherDepth(getOuterProfileJson(), "game_mode") != null ? " ♻️" : ""),
 			Utils.skyblockStatsLink(getUsername(), getProfileName())
 		)
 			.setThumbnail(getThumbnailUrl());
@@ -1051,12 +1048,13 @@ public class Player {
 
 	public int getNumberMinionSlots() {
 		try {
-			List<String> profileMembers = getJsonKeys(higherDepth(outerProfileJson, "members"));
+			List<String> profileMembers = getJsonKeys(higherDepth(getOuterProfileJson(), "members"));
 			Set<String> uniqueCraftedMinions = new HashSet<>();
 
 			for (String member : profileMembers) {
 				try {
-					JsonArray craftedMinions = higherDepth(outerProfileJson, "members." + member + ".crafted_generators").getAsJsonArray();
+					JsonArray craftedMinions = higherDepth(getOuterProfileJson(), "members." + member + ".crafted_generators")
+						.getAsJsonArray();
 					for (JsonElement minion : craftedMinions) {
 						uniqueCraftedMinions.add(minion.getAsString());
 					}

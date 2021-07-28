@@ -682,17 +682,3 @@ public class AutomaticGuild {
 		this.prefix = prefix;
 	}
 }
-/*
-++ev
-```java
-import net.dv8tion.jda.api.interactions.components.Button;
-
-event.getChannel().sendMessageEmbeds(defaultEmbed("Setup").setDescription("Choose one of the buttons below to setup the corresponding feature").build()).setActionRow(
-                Button.primary("setup_command_verify", "Verification"),
-                Button.primary("setup_command_apply", "Application"),
-                Button.primary("setup_command_guild", "Guild Roles & Ranks"),
-                Button.primary("setup_command_roles", "Automatic Roles"),
-                Button.primary("setup_command_prefix", "Prefix")
-        ).queue();
-```
- */

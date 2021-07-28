@@ -335,13 +335,17 @@ public class Hypixel {
 				try {
 					uuidToTimeSkyblockProfiles.put(playerUuid, Instant.now());
 
-					JsonObject obj = new JsonObject();
-					obj.addProperty("uuid", playerUuid);
-					obj.add("data", json);
-
 					RequestBody body = RequestBody.create(
 						MediaType.parse("application/json"),
-						"{\"operation\":\"insert\",\"schema\":\"dev\",\"table\":\"" + type + "\",\"records\":[" + obj + "]}"
+						"{\"operation\":\"insert\",\"schema\":\"dev\",\"table\":\"" +
+						type +
+						"\",\"records\":[" +
+						"{\"uuid\":\"" +
+						playerUuid +
+						"\", \"data\":" +
+						json +
+						"}" +
+						"]}"
 					);
 					Request request = new Request.Builder()
 						.url(databaseUrl)
@@ -405,4 +409,5 @@ public class Hypixel {
 			}
 		);
 	}
+	// TODO: add a method to clean old cache every 5 min? prob don't renew it
 }

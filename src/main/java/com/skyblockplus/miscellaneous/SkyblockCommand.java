@@ -56,9 +56,9 @@ public class SkyblockCommand extends Command {
 	private EmbedBuilder getSkyblockStats(String username, String profileName, CommandEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
-			JsonElement profileJson = player.getProfileJson();
-			JsonElement statsJson = higherDepth(player.getProfileJson(), "stats");
-			JsonElement jacobJson = higherDepth(player.getProfileJson(), "jacob2");
+			JsonElement profileJson = player.profileJson();
+			JsonElement statsJson = higherDepth(player.profileJson(), "stats");
+			JsonElement jacobJson = higherDepth(player.profileJson(), "jacob2");
 
 			// General
 			String generalPageString = "";

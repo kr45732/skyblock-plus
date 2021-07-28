@@ -13,7 +13,7 @@ public class Weight {
 	private final DungeonsWeight dungeonsWeight;
 
 	public Weight(Player player) {
-		this(player.getProfileJson(), player);
+		this(player.profileJson(), player);
 	}
 
 	public Weight(JsonElement profile, Player player) {

@@ -188,12 +188,9 @@ public class SkyblockEventCommand extends Command {
 														"" +
 														(
 															(
-																higherDepth(guildMemberPlayer.getProfileJson(), eventType.split("-")[0]) !=
+																higherDepth(guildMemberPlayer.profileJson(), eventType.split("-")[0]) !=
 																	null
-																	? higherDepth(
-																		guildMemberPlayer.getProfileJson(),
-																		eventType.split("-")[0]
-																	)
+																	? higherDepth(guildMemberPlayer.profileJson(), eventType.split("-")[0])
 																		.getAsDouble()
 																	: 0
 															) -
@@ -508,8 +505,8 @@ public class SkyblockEventCommand extends Command {
 								{
 									if (eventType.startsWith("collection.")) {
 										startingAmount =
-											higherDepth(player.getProfileJson(), eventType.split("-")[0]) != null
-												? higherDepth(player.getProfileJson(), eventType.split("-")[0]).getAsDouble()
+											higherDepth(player.profileJson(), eventType.split("-")[0]) != null
+												? higherDepth(player.profileJson(), eventType.split("-")[0]).getAsDouble()
 												: 0;
 										startingAmountFormatted =
 											formatNumber(startingAmount) + " " + eventType.split("-")[1] + " collection";

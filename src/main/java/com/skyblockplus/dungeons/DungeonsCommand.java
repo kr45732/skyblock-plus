@@ -75,8 +75,8 @@ public class DungeonsCommand extends Command {
 
 				extras.addBlankField(true);
 
-				for (String dungeonType : getJsonKeys(higherDepth(player.getProfileJson(), "dungeons.dungeon_types"))) {
-					JsonElement curDungeonType = higherDepth(player.getProfileJson(), "dungeons.dungeon_types." + dungeonType);
+				for (String dungeonType : getJsonKeys(higherDepth(player.profileJson(), "dungeons.dungeon_types"))) {
+					JsonElement curDungeonType = higherDepth(player.profileJson(), "dungeons.dungeon_types." + dungeonType);
 					int min = (dungeonType.equals("catacombs") ? 0 : 1);
 					int max = (dungeonType.equals("catacombs") ? 8 : 7);
 					for (int i = min; i < max; i++) {
