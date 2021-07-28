@@ -1,7 +1,6 @@
 package com.skyblockplus.features.listeners;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.Main.*;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.features.skyblockevent.SkyblockEventCommand.endSkyblockEvent;
 import static com.skyblockplus.utils.Hypixel.getGuildFromId;
@@ -19,6 +18,7 @@ import com.skyblockplus.api.serversettings.automatedguild.GuildRole;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
 import com.skyblockplus.features.apply.ApplyGuild;
 import com.skyblockplus.features.apply.ApplyUser;
+import com.skyblockplus.features.setup.SetupCommandHandler;
 import com.skyblockplus.features.skyblockevent.SkyblockEvent;
 import com.skyblockplus.features.verify.VerifyGuild;
 import com.skyblockplus.utils.structs.HypixelResponse;
@@ -37,8 +37,8 @@ import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import org.apache.commons.collections4.ListUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -235,7 +235,6 @@ public class AutomaticGuild {
 					.complete();
 
 				JsonObject newSettings = currentSettings.getAsJsonObject();
-				newSettings.remove("previousMessageId");
 				newSettings.addProperty("previousMessageId", reactMessage.getId());
 				database.setVerifySettings(event.getGuild().getId(), newSettings);
 
@@ -278,7 +277,6 @@ public class AutomaticGuild {
 					.complete();
 
 				JsonObject newSettings = currentSettings.getAsJsonObject();
-				newSettings.remove("previousMessageId");
 				newSettings.addProperty("previousMessageId", reactMessage.getId());
 				database.setVerifySettings(guild.getId(), newSettings);
 
@@ -629,7 +627,15 @@ public class AutomaticGuild {
 	}
 
 	public void onButtonClick(ButtonClickEvent event) {
-		event.deferReply(true).complete();
+		if (event.getComponentId().startsWith("setup_command_")) {
+			event.deferReply().complete();
+			SetupCommandHandler handler = new SetupCommandHandler(event, event.getComponentId().split("setup_command_")[1]);
+			if (handler.isValid()) {
+				return;
+			}
+		} else {
+			event.deferReply(true).complete();
+		}
 
 		for (ApplyGuild o1 : applyGuild) {
 			String buttonClickReply = o1.onButtonClick(event);
@@ -639,13 +645,18 @@ public class AutomaticGuild {
 			}
 		}
 
-		event
-			.getHook()
-			.editMessageComponentsById(
-				event.getMessageId(),
-				ActionRow.of(Button.danger("create_application_button_disabled", "Disabled").asDisabled())
-			)
-			.queue();
+		if (event.getMessage() != null) {
+			event
+				.editButton(
+					event
+						.getButton()
+						.asDisabled()
+						.withId(event.getButton().getId() + "_disabled")
+						.withLabel("Disabled")
+						.withStyle(ButtonStyle.DANGER)
+				)
+				.queue();
+		}
 
 		event.getHook().editOriginal("❌ This button has been disabled").queue();
 	}
@@ -671,3 +682,17 @@ public class AutomaticGuild {
 		this.prefix = prefix;
 	}
 }
+/*
+++ev
+```java
+import net.dv8tion.jda.api.interactions.components.Button;
+
+event.getChannel().sendMessageEmbeds(defaultEmbed("Setup").setDescription("Choose one of the buttons below to setup the corresponding feature").build()).setActionRow(
+                Button.primary("setup_command_verify", "Verification"),
+                Button.primary("setup_command_apply", "Application"),
+                Button.primary("setup_command_guild", "Guild Roles & Ranks"),
+                Button.primary("setup_command_roles", "Automatic Roles"),
+                Button.primary("setup_command_prefix", "Prefix")
+        ).queue();
+```
+ */

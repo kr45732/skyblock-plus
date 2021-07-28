@@ -624,6 +624,27 @@ public class ServerSettingsService {
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 
+	public ResponseEntity<HttpStatus> removeGuildSettings(String serverId, String name) {
+		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+		if (currentServerSettings != null) {
+			GuildRole applyOne = currentServerSettings.getAutomaticGuildRolesOne();
+			GuildRole applyTwo = currentServerSettings.getAutomaticGuildRolesTwo();
+
+			if (applyOne != null && applyOne.getName().equalsIgnoreCase(name)) {
+				currentServerSettings.setAutomaticGuildRolesOne(new GuildRole());
+			} else if (applyTwo != null && applyTwo.getName().equalsIgnoreCase(name)) {
+				currentServerSettings.setAutomaticGuildRolesTwo(new GuildRole());
+			} else {
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			}
+
+			settingsRepository.save(currentServerSettings);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	}
+
 	public List<GuildRole> getAllGuildRolesSettings(String serverId) {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 

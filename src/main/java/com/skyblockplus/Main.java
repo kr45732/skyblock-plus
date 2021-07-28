@@ -11,6 +11,7 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.dev.*;
 import com.skyblockplus.dungeons.*;
 import com.skyblockplus.features.listeners.MainListener;
+import com.skyblockplus.features.setup.SetupCommand;
 import com.skyblockplus.features.skyblockevent.SkyblockEventCommand;
 import com.skyblockplus.guilds.*;
 import com.skyblockplus.help.HelpCommand;
@@ -25,7 +26,6 @@ import com.skyblockplus.networth.NetworthCommand;
 import com.skyblockplus.price.*;
 import com.skyblockplus.settings.Database;
 import com.skyblockplus.settings.SettingsCommand;
-import com.skyblockplus.settings.SetupCommand;
 import com.skyblockplus.skills.SkillsCommand;
 import com.skyblockplus.skills.SkillsSlashCommand;
 import com.skyblockplus.slayer.SlayerCommand;
@@ -70,9 +70,8 @@ public class Main {
 
 		Main.database = SpringApplication.run(Main.class, args).getBean(Database.class);
 
-		Main.waiter = new EventWaiter();
+		Main.waiter = new EventWaiter(scheduler, true);
 		CommandClientBuilder client = new CommandClientBuilder();
-		client.setActivity(Activity.watching(DEFAULT_PREFIX + "help"));
 		client.setOwnerId("385939031596466176");
 		client.setEmojis("✅", "⚠️", "❌");
 		client.useHelpBuilder(false);
@@ -108,7 +107,6 @@ public class Main {
 			new HypixelCommand(),
 			new UuidCommand(),
 			new SkyblockCommand(),
-			new BaldCommand(),
 			new SettingsCommand(),
 			new ReloadCommand(),
 			new SetupCommand(),

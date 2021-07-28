@@ -153,20 +153,6 @@ public class SkyblockEventCommand extends Command {
 													higherDepth(guildMember, "profileName").getAsString()
 												);
 											}
-										case "skills":
-											{
-												int totalSkillsXp = guildMemberPlayer.getTotalSkillsXp();
-
-												if (totalSkillsXp != -1) {
-													return new EventMember(
-														guildMemberUsernameResponse,
-														guildMemberUuid,
-														"" + (totalSkillsXp - higherDepth(guildMember, "startingAmount").getAsDouble()),
-														higherDepth(guildMember, "profileName").getAsString()
-													);
-												}
-												break;
-											}
 										case "catacombs":
 											{
 												return new EventMember(
@@ -215,6 +201,20 @@ public class SkyblockEventCommand extends Command {
 														),
 														higherDepth(guildMember, "profileName").getAsString()
 													);
+												} else if (eventType.startsWith("skills.")) {
+													String skillType = eventType.split("skills.")[1];
+													double skillXp = skillType.equals("all")
+														? guildMemberPlayer.getTotalSkillsXp()
+														: guildMemberPlayer.getSkillXp(skillType);
+
+													if (skillXp != -1) {
+														return new EventMember(
+															guildMemberUsernameResponse,
+															guildMemberUuid,
+															"" + (skillXp - higherDepth(guildMember, "startingAmount").getAsDouble()),
+															higherDepth(guildMember, "profileName").getAsString()
+														);
+													}
 												}
 											}
 									}
@@ -304,6 +304,7 @@ public class SkyblockEventCommand extends Command {
 
 								if (
 									(currentGuild.eventMemberList != null) &&
+									(currentGuild.eventMemberListLastUpdated != null) &&
 									(Duration.between(currentGuild.eventMemberListLastUpdated, Instant.now()).toMinutes() < 15)
 								) {
 									List<EventMember> eventMemberList = currentGuild.eventMemberList;
@@ -512,13 +513,22 @@ public class SkyblockEventCommand extends Command {
 												: 0;
 										startingAmountFormatted =
 											formatNumber(startingAmount) + " " + eventType.split("-")[1] + " collection";
+									} else if (eventType.startsWith("skills.")) {
+										String skillType = eventType.split("skills.")[1];
+										startingAmount = skillType.equals("all") ? player.getTotalSkillsXp() : player.getSkillXp(skillType);
+										startingAmountFormatted =
+											formatNumber(startingAmount) +
+											" " +
+											(skillType.equals("all") ? "total skills" : skillType) +
+											"  xp";
 										break;
 									}
+									break;
 								}
 						}
 
 						if (startingAmount == -1) {
-							return invalidEmbed("Please enable your skills API and retry");
+							return invalidEmbed("Please enable your skills API and try again");
 						}
 
 						int code = database.addEventMemberToRunningEvent(
@@ -527,7 +537,7 @@ public class SkyblockEventCommand extends Command {
 						);
 
 						if (code == 200) {
-							return defaultEmbed("Success")
+							return defaultEmbed("Joined event")
 								.setDescription(
 									"**Username:** " +
 									username +
@@ -563,12 +573,16 @@ public class SkyblockEventCommand extends Command {
 				return invalidEmbed(guildJson.failCause);
 			}
 			eb.addField("Guild", guildJson.get("name").getAsString(), false);
+
 			String eventType = higherDepth(currentSettings, "eventType").getAsString();
-			eb.addField(
-				"Event Type",
-				capitalizeString(eventType.startsWith("collection.") ? eventType.split("-")[1] + " collection" : eventType),
-				false
-			);
+			String eventTypeFormatted = eventType;
+			if (eventType.startsWith("collection.")) {
+				eventTypeFormatted = eventType.split("-")[1] + " collection";
+			} else if (eventType.startsWith("skills.")) {
+				eventTypeFormatted = eventType.split("skills.")[1].equals("all") ? "skills" : eventType.split("skills.")[1];
+			}
+
+			eb.addField("Event Type", capitalizeString(eventTypeFormatted), false);
 
 			Instant eventInstantEnding = Instant.ofEpochSecond(higherDepth(currentSettings, "timeEndingSeconds").getAsLong());
 

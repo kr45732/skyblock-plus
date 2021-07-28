@@ -38,6 +38,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.exceptions.PermissionException;
+import okhttp3.OkHttpClient;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -63,6 +64,7 @@ public class Utils {
 	public static final String FORUM_POST_LINK = "https://hypixel.net/threads/3980092";
 	public static final AsyncHttpClient asyncHttpClient = Dsl.asyncHttpClient();
 	public static final CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+	public static final OkHttpClient okHttpClient = new OkHttpClient().newBuilder().build();
 	public static final ExecutorService executor = new ExceptionExecutor();
 	public static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(3);
 	/* Script Engines */
@@ -86,6 +88,7 @@ public class Utils {
 	public static String API_BASE_URL = "";
 	public static String GITHUB_TOKEN = "";
 	public static String DEFAULT_PREFIX = "";
+	public static String CACHE_DATABASE_TOKEN = "";
 	public static boolean IS_API = false;
 	/* JSON */
 	public static JsonElement essenceCostsJson;
@@ -855,6 +858,7 @@ public class Utils {
 			API_PASSWORD = (String) appProps.get("API_PASSWORD");
 			API_BASE_URL = (String) appProps.get("API_BASE_URL");
 			DEFAULT_PREFIX = (String) appProps.get("DEFAULT_PREFIX");
+			CACHE_DATABASE_TOKEN = (String) appProps.get("CACHE_DATABASE_TOKEN");
 		} catch (IOException e) {
 			HYPIXEL_API_KEY = System.getenv("HYPIXEL_API_KEY");
 			BOT_TOKEN = System.getenv("BOT_TOKEN");
@@ -876,10 +880,15 @@ public class Utils {
 			API_BASE_URL = System.getenv("API_BASE_URL");
 			IS_API = API_BASE_URL.equals("https://skyblock-plus.up.railway.app/");
 			DEFAULT_PREFIX = System.getenv("DEFAULT_PREFIX");
+			CACHE_DATABASE_TOKEN = System.getenv("CACHE_DATABASE_TOKEN");
 		}
 	}
 
 	public static String getClosestMatch(String toMatch, List<String> matchFrom) {
+		if (matchFrom == null || matchFrom.size() == 0) {
+			return toMatch;
+		}
+
 		LevenshteinDistance matchCalc = LevenshteinDistance.getDefaultInstance();
 		int minDistance = matchCalc.apply(matchFrom.get(0), toMatch);
 		String closestMatch = matchFrom.get(0);

@@ -38,6 +38,7 @@ public class EvaluateCommand extends Command {
 			"net.dv8tion.jda.api.managers",
 			"net.dv8tion.jda.api.managers.impl",
 			"net.dv8tion.jda.api.utils",
+			"net.dv8tion.jda.api.interactions",
 			"com.skyblockplus",
 			"com.google.gson",
 			"com.skyblockplus.utils.structs",

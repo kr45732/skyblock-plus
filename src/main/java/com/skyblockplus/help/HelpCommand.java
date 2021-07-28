@@ -265,7 +265,7 @@ public class HelpCommand extends Command {
 							.addSubcommands(
 								new HelpData("enable", "Enable automatic verify."),
 								new HelpData("disable", "Disable automatic verify."),
-								new HelpData("message", "Message that users will see and react to in order to verify.", "message [message]")
+								new HelpData("message", "The message that users will see when verifying.", "message [message]")
 									.addExamples("message Run +link [IGN] replacing IGN with your IGN to verify!"),
 								new HelpData("role", "Modify roles given on verification")
 									.addSubcommands(
@@ -296,11 +296,7 @@ public class HelpCommand extends Command {
 								new HelpData("remove", "Delete an automatic apply.", "remove [name]").addExamples("remove myGuild"),
 								new HelpData("enable", " Enable automatic apply.", "[name] enable").addExamples("myGuild enable"),
 								new HelpData("disable", " Enable automatic disable.", "[name] disable").addExamples("myGuild disable"),
-								new HelpData(
-									"message",
-									"Message that users will see and react to in order to apply.",
-									"[name] message [message]"
-								)
+								new HelpData("message", "The message that users will see when verifying.", "[name] message [message]")
 									.addExamples("myGuild message Click the button below to start an application!"),
 								new HelpData(
 									"staff_role",
@@ -314,12 +310,6 @@ public class HelpCommand extends Command {
 									"[name] channel [#channel]"
 								)
 									.addExamples("myGuild channel #apply-for-guild"),
-								new HelpData(
-									"prefix",
-									"Prefix that all new application channels will start with (prefix-discordName).",
-									"[name] prefix [prefix]"
-								)
-									.addExamples("myGuild prefix application"),
 								new HelpData(
 									"category",
 									"Category where new apply channels will be made. Run `categories` to get the ID's of all categories in the server.",
@@ -578,7 +568,7 @@ public class HelpCommand extends Command {
 			paginateBuilder.addItems(
 				helpGen.genHelp("settings verify", "Get the current verify settings for the bot") +
 				helpGen.genHelp("settings verify [enable|disable]", "Enable or disable automatic verify") +
-				helpGen.genHelp("settings" + " verify message [message]", "Message that users will see and react to in order to verify") +
+				helpGen.genHelp("settings" + " verify message [message]", "The message that users will see when verifying") +
 				helpGen.genHelp(
 					"settings verify role add [@role]",
 					"Add a role that user will receive " + "upon being verified. Cannot be @everyone or a managed role"
@@ -596,10 +586,7 @@ public class HelpCommand extends Command {
 				helpGen.genHelp("settings apply create [name]", "Create a new automatic apply with name 'name'") +
 				helpGen.genHelp("settings apply remove [name]", "Delete an automatic apply") +
 				helpGen.genHelp("settings apply [name] [enable|disable]", "Enable or disable automatic apply") +
-				helpGen.genHelp(
-					"settings" + " apply [name] message [message]",
-					"Message that users will see and react to in order to apply"
-				) +
+				helpGen.genHelp("settings" + " apply [name] message [message]", "The message that users will see when verifying") +
 				helpGen.genHelp(
 					"settings apply [name] staff_role [@role]",
 					"Role that will be pinged when a new application is submitted"
@@ -607,10 +594,6 @@ public class HelpCommand extends Command {
 				helpGen.genHelp(
 					"settings apply [name] " + "channel [#channel]",
 					"Channel where the message to react for applying will sent"
-				) +
-				helpGen.genHelp(
-					"settings apply [name] prefix [prefix]",
-					"Prefix that all new apply channels should start with (prefix-discordName)"
 				) +
 				helpGen.genHelp("settings apply [name] category " + "[category id]", "Category where new apply channels will be made") +
 				helpGen.genHelp(

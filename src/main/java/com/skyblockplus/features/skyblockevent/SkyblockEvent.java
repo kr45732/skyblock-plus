@@ -3,6 +3,8 @@ package com.skyblockplus.features.skyblockevent;
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.utils.Constants.allSkillNames;
+import static com.skyblockplus.utils.Constants.skillNames;
 import static com.skyblockplus.utils.Hypixel.getGuildFromName;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -104,6 +106,7 @@ public class SkyblockEvent {
 					eb.setDescription(response.failCause + ". Please try again.");
 					attemptsLeft--;
 				} else {
+					guildJson = response.response;
 					eb
 						.addField(
 							"Guild",
@@ -133,9 +136,12 @@ public class SkyblockEvent {
 						eventType = "weight";
 						break;
 					case "skills":
-						eb.addField("Event Type", "Skills", false);
-						eventType = "skills";
-						break;
+						state = 7;
+						eb.setDescription(
+							"Reply with the skill this event should track or 'all' for all skills excluding cosmetic skills."
+						);
+						sendEmbedMessage(eb);
+						return;
 					case "collections":
 						state = 6;
 						eb.setDescription("Which collection should this event track?");
@@ -218,9 +224,16 @@ public class SkyblockEvent {
 			case 5:
 				if (replyMessage.equalsIgnoreCase("start")) {
 					EmbedBuilder announcementEb = defaultEmbed("Skyblock Event");
+					String eventTypeFormatted = eventType;
+					if (eventType.startsWith("collection.")) {
+						eventTypeFormatted = eventType.split("-")[1] + " collection";
+					} else if (eventType.startsWith("skills.")) {
+						eventTypeFormatted = eventType.split("skills.")[1].equals("all") ? "skills" : eventType.split("skills.")[1];
+					}
+
 					announcementEb.setDescription(
 						"A new " +
-						(eventType.startsWith("collection.") ? eventType.split("-")[1] + " collection" : eventType) +
+						eventTypeFormatted.toLowerCase() +
 						" Skyblock competition has been created! Please see below for more information."
 					);
 					announcementEb.addField("Guild Name", higherDepth(guildJson, "name").getAsString(), false);
@@ -278,6 +291,20 @@ public class SkyblockEvent {
 				eb.setDescription("`" + replyMessage + "` is invalid. Did you mean `" + closestMatch.toLowerCase() + "`?");
 				attemptsLeft--;
 				sendEmbedMessage(eb);
+				break;
+			case 7:
+				if (replyMessage.equalsIgnoreCase("all") || allSkillNames.contains(replyMessage.toLowerCase())) {
+					eb.addField("Event Type", capitalizeString(replyMessage.equalsIgnoreCase("all") ? "skills" : replyMessage), false);
+					eventType = "skills." + replyMessage.toLowerCase();
+					eb.setDescription("How many hours should the event last?");
+					state = 2;
+				} else {
+					String closestSkill = getClosestMatch(replyMessage, allSkillNames);
+					eb.setDescription("`" + replyMessage + "` is invalid. Did you mean `" + closestSkill.toLowerCase() + "`?");
+					attemptsLeft--;
+				}
+				sendEmbedMessage(eb);
+				break;
 		}
 
 		if (attemptsLeft == 0) {

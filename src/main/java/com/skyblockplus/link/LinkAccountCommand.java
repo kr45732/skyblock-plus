@@ -37,12 +37,13 @@ public class LinkAccountCommand extends Command {
 		if (!member.getUser().getAsTag().equals(playerInfo.discordTag)) {
 			EmbedBuilder eb = defaultEmbed("Discord tag mismatch");
 			eb.setDescription(
-				"Account " +
+				"**Player Username:** `" +
 				playerInfo.minecraftUsername +
-				" is linked with the Discord tag " +
+				"`\n**API Discord Tag:** `" +
 				playerInfo.discordTag +
-				"\nYour current Discord tag is " +
-				member.getUser().getAsTag()
+				"`\n**Your Discord Tag:** `" +
+				member.getUser().getAsTag() +
+				"`"
 			);
 			return eb;
 		}

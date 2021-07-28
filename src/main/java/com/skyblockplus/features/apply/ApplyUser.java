@@ -420,7 +420,7 @@ public class ApplyUser implements Serializable {
 				waitInviteChannel
 					.sendMessageEmbeds(
 						defaultEmbed("Waiting for invite")
-							.setDescription("`" + fixUsername(playerUsername) + "`\n\n" + "**React with ✅ to delete this message**")
+							.setDescription("`" + playerUsername + "`\n\n" + "**React with ✅ to delete this message**")
 							.build()
 					)
 					.complete()
@@ -467,7 +467,7 @@ public class ApplyUser implements Serializable {
 					waitInviteChannel
 						.sendMessageEmbeds(
 							defaultEmbed("Waiting for invite")
-								.setDescription("`" + fixUsername(playerUsername) + "`\n\n" + "**React with ✅ to delete this message**")
+								.setDescription("`" + playerUsername + "`\n\n" + "**React with ✅ to delete this message**")
 								.build()
 						)
 						.complete()

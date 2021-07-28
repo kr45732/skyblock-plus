@@ -278,6 +278,10 @@ public class Player {
 		return maxLevel;
 	}
 
+	public double getSkillXp(String skillName) {
+		return getSkillXp(profileJson, skillName);
+	}
+
 	public double getSkillXp(JsonElement profile, String skillName) {
 		try {
 			if (skillName.equals("catacombs")) {

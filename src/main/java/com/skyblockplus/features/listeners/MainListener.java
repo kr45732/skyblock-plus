@@ -100,7 +100,7 @@ public class MainListener extends ListenerAdapter {
 					.getGuild()
 					.getTextChannels()
 					.stream()
-					.filter(textChannel -> textChannel.getName().toLowerCase().contains("general"))
+					.filter(textChannel -> textChannel.getName().toLowerCase().contains("general") && textChannel.canTalk())
 					.findFirst()
 					.orElse(null);
 				if (channel != null) {
@@ -151,6 +151,10 @@ public class MainListener extends ListenerAdapter {
 
 	@Override
 	public void onButtonClick(ButtonClickEvent event) {
+		if (event.getGuild() == null) {
+			return;
+		}
+
 		if (guildMap.containsKey(event.getGuild().getId())) {
 			guildMap.get(event.getGuild().getId()).onButtonClick(event);
 		}

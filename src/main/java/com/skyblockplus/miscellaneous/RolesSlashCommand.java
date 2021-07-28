@@ -18,12 +18,7 @@ public class RolesSlashCommand extends SlashCommand {
 			() -> {
 				event.logCommandGuildUserCommand();
 
-				EmbedBuilder eb = RoleCommands.updateRoles(
-					event.getOptionStr("profile"),
-					event.getGuild(),
-					event.getUser(),
-					event.getMember()
-				);
+				EmbedBuilder eb = RoleCommands.updateRoles(event.getOptionStr("profile"), event.getGuild(), event.getMember());
 
 				event.getHook().editOriginalEmbeds(eb.build()).queue();
 			}

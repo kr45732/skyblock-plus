@@ -35,7 +35,7 @@ public class AuctionCommand extends Command {
 			return invalidEmbed(usernameUuidStruct.failCause);
 		}
 
-		HypixelResponse auctionsResponse = getSkyblockAuctionFromPlayer(usernameUuidStruct.playerUuid);
+		HypixelResponse auctionsResponse = getAuctionFromPlayer(usernameUuidStruct.playerUuid);
 		if (auctionsResponse.isNotValid()) {
 			return invalidEmbed(auctionsResponse.failCause);
 		}
@@ -128,7 +128,7 @@ public class AuctionCommand extends Command {
 	}
 
 	public static EmbedBuilder getAuctionByUuid(String auctionUuid) {
-		HypixelResponse auctionResponse = getSkyblockAuctionFromUuid(auctionUuid);
+		HypixelResponse auctionResponse = getAuctionFromUuid(auctionUuid);
 		if (auctionResponse.isNotValid()) {
 			return invalidEmbed(auctionResponse.failCause);
 		}

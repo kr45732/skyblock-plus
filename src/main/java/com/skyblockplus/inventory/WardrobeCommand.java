@@ -61,7 +61,7 @@ public class WardrobeCommand extends Command {
 						if (missingEmoji.length() > 0) {
 							ebMessage
 								.getChannel()
-								.sendMessageEmbeds(defaultEmbed("Missing Items").setDescription(missingEmoji).build())
+								.sendMessageEmbeds(defaultEmbed("Missing emojis").setDescription(missingEmoji).build())
 								.queue();
 						}
 

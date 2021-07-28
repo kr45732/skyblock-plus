@@ -4,17 +4,18 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import okhttp3.*;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
@@ -27,6 +28,8 @@ public class Hypixel {
 		.recordStats()
 		.build();
 
+	public static final ConcurrentHashMap<String, Instant> uuidToTimeSkyblockProfiles = new ConcurrentHashMap<>();
+
 	//	public static final Cache<String, JsonElement> uuidToSkyblockProfilesCache = CacheBuilder
 	//		.newBuilder()
 	//		.expireAfterWrite(90, TimeUnit.SECONDS)
@@ -38,6 +41,7 @@ public class Hypixel {
 	//		.expireAfterWrite(90, TimeUnit.SECONDS)
 	//		.recordStats()
 	//		.build();
+	private static final String databaseUrl = "https://cache-skyblockplus.harperdbcloud.com";
 
 	public static UsernameUuidStruct usernameToUuid(String username) {
 		Map.Entry<String, String> cachedResponse = uuidToUsernameCache
@@ -123,10 +127,10 @@ public class Hypixel {
 	}
 
 	public static HypixelResponse skyblockProfilesFromUuid(String uuid, String hypixelApiKey) {
-		//		JsonElement cachedResponse = uuidToSkyblockProfilesCache.getIfPresent(uuid);
-		//		if (cachedResponse != null) {
-		//			return new HypixelResponse(cachedResponse);
-		//		}
+		JsonElement cachedResponse = getCachedJson("profiles", uuid);
+		if (cachedResponse != null) {
+			return new HypixelResponse(cachedResponse);
+		}
 
 		try {
 			JsonElement profilesJson = getJson("https://api.hypixel.net/skyblock/profiles?key=" + hypixelApiKey + "&uuid=" + uuid);
@@ -137,7 +141,7 @@ public class Hypixel {
 				}
 
 				JsonArray profileArray = higherDepth(profilesJson, "profiles").getAsJsonArray();
-				//				uuidToSkyblockProfilesCache.put(uuid, profileArray);
+				cacheJson("profiles", uuid, profileArray);
 				return new HypixelResponse(profileArray);
 			} catch (Exception e) {
 				return new HypixelResponse(higherDepth(profilesJson, "cause").getAsString());
@@ -150,39 +154,40 @@ public class Hypixel {
 	public static CompletableFuture<JsonElement> asyncSkyblockProfilesFromUuid(String uuid, String hypixelApiKey) {
 		CompletableFuture<JsonElement> future = new CompletableFuture<>();
 
-		//		JsonElement cachedResponse = uuidToSkyblockProfilesCache.getIfPresent(uuid);
-		//		if (cachedResponse != null) {
-		//			future.complete(cachedResponse);
-		//		} else {
-		future =
-			asyncHttpClient
-				.prepareGet("https://api.hypixel.net/skyblock/profiles?key=" + hypixelApiKey + "&uuid=" + uuid)
-				.execute()
-				.toCompletableFuture()
-				.thenApply(
-					profilesResponse -> {
-						try {
+		JsonElement cachedResponse = getCachedJson("profiles", uuid);
+		if (cachedResponse != null) {
+			future.complete(cachedResponse);
+		} else {
+			future =
+				asyncHttpClient
+					.prepareGet("https://api.hypixel.net/skyblock/profiles?key=" + hypixelApiKey + "&uuid=" + uuid)
+					.execute()
+					.toCompletableFuture()
+					.thenApply(
+						profilesResponse -> {
 							try {
-								keyCooldownMap
-									.get(hypixelApiKey)
-									.remainingLimit.set(Integer.parseInt(profilesResponse.getHeader("RateLimit-Remaining")));
-								keyCooldownMap
-									.get(hypixelApiKey)
-									.timeTillReset.set(Integer.parseInt(profilesResponse.getHeader("RateLimit-Reset")));
-							} catch (Exception ignored) {}
+								try {
+									keyCooldownMap
+										.get(hypixelApiKey)
+										.remainingLimit.set(Integer.parseInt(profilesResponse.getHeader("RateLimit-Remaining")));
+									keyCooldownMap
+										.get(hypixelApiKey)
+										.timeTillReset.set(Integer.parseInt(profilesResponse.getHeader("RateLimit-Reset")));
+								} catch (Exception ignored) {}
 
-							JsonArray profileArray = higherDepth(JsonParser.parseString(profilesResponse.getResponseBody()), "profiles")
-								.getAsJsonArray();
-							//								uuidToSkyblockProfilesCache.put(uuid, profileArray);
+								JsonArray profileArray = higherDepth(JsonParser.parseString(profilesResponse.getResponseBody()), "profiles")
+									.getAsJsonArray();
 
-							return profileArray;
-						} catch (Exception e) {
-							e.printStackTrace();
+								cacheJson("profiles", uuid, profileArray);
+
+								return profileArray;
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+							return null;
 						}
-						return null;
-					}
-				);
-		//		}
+					);
+		}
 
 		return future;
 	}
@@ -212,7 +217,7 @@ public class Hypixel {
 		return new HypixelResponse();
 	}
 
-	public static HypixelResponse getSkyblockAuctionGeneric(String query) {
+	public static HypixelResponse getAuctionGeneric(String query) {
 		try {
 			JsonElement auctionResponse = getJson("https://api.hypixel.net/skyblock/auction?key=" + HYPIXEL_API_KEY + query);
 			try {
@@ -225,12 +230,12 @@ public class Hypixel {
 		return new HypixelResponse();
 	}
 
-	public static HypixelResponse getSkyblockAuctionFromPlayer(String playerUuid) {
-		return getSkyblockAuctionGeneric("&player=" + playerUuid);
+	public static HypixelResponse getAuctionFromPlayer(String playerUuid) {
+		return getAuctionGeneric("&player=" + playerUuid);
 	}
 
-	public static HypixelResponse getSkyblockAuctionFromUuid(String auctionUuid) {
-		return getSkyblockAuctionGeneric("&uuid=" + auctionUuid);
+	public static HypixelResponse getAuctionFromUuid(String auctionUuid) {
+		return getAuctionGeneric("&uuid=" + auctionUuid);
 	}
 
 	public static HypixelResponse getGuildGeneric(String query) {
@@ -321,5 +326,83 @@ public class Hypixel {
 			}
 		} catch (Exception ignored) {}
 		return null;
+	}
+
+	@SuppressWarnings("EmptyTryBlock")
+	public static void cacheJson(String type, String playerUuid, JsonElement json) {
+		executor.submit(
+			() -> {
+				try {
+					uuidToTimeSkyblockProfiles.put(playerUuid, Instant.now());
+
+					JsonObject obj = new JsonObject();
+					obj.addProperty("uuid", playerUuid);
+					obj.add("data", json);
+
+					RequestBody body = RequestBody.create(
+						MediaType.parse("application/json"),
+						"{\"operation\":\"insert\",\"schema\":\"dev\",\"table\":\"" + type + "\",\"records\":[" + obj + "]}"
+					);
+					Request request = new Request.Builder()
+						.url(databaseUrl)
+						.method("POST", body)
+						.addHeader("Content-Type", "application/json")
+						.addHeader("Authorization", "Basic " + CACHE_DATABASE_TOKEN)
+						.build();
+					try (Response ignored = okHttpClient.newCall(request).execute()) {}
+				} catch (Exception ignored) {}
+			}
+		);
+	}
+
+	public static JsonElement getCachedJson(String type, String playerUuid) {
+		Instant lastUpdated = uuidToTimeSkyblockProfiles.getOrDefault(playerUuid, null);
+		if (lastUpdated != null && Duration.between(lastUpdated, Instant.now()).toMillis() > 90000) {
+			deleteCachedJson(type, playerUuid);
+		} else {
+			RequestBody body = RequestBody.create(
+				MediaType.parse("application/json"),
+				"{\"operation\":\"sql\",\"sql\":\"SELECT * FROM dev." + type + " where uuid = '" + playerUuid + "'\"}"
+			);
+			Request request = new Request.Builder()
+				.url(databaseUrl)
+				.method("POST", body)
+				.addHeader("Content-Type", "application/json")
+				.addHeader("Authorization", "Basic " + CACHE_DATABASE_TOKEN)
+				.build();
+
+			try (Response response = okHttpClient.newCall(request).execute()) {
+				JsonElement jsonResponse = JsonParser.parseString(response.body().string());
+				Instant lastUpdatedResponse = Instant.ofEpochMilli(higherDepth(jsonResponse, "__updatedtime__").getAsLong());
+				if (Duration.between(lastUpdatedResponse, Instant.now()).toMillis() > 90000) {
+					deleteCachedJson(type, playerUuid);
+				} else {
+					uuidToTimeSkyblockProfiles.put(playerUuid, lastUpdatedResponse);
+					return higherDepth(jsonResponse, "data");
+				}
+			} catch (Exception ignored) {}
+		}
+		return null;
+	}
+
+	@SuppressWarnings("EmptyTryBlock")
+	public static void deleteCachedJson(String type, String playerUuid) {
+		executor.submit(
+			() -> {
+				uuidToTimeSkyblockProfiles.remove(playerUuid);
+
+				RequestBody body = RequestBody.create(
+					MediaType.parse("application/json"),
+					"{\"operation\":\"delete\",\"table\":\"" + type + "\",\"schema\":\"dev\",\"hash_values\":[" + playerUuid + "]}"
+				);
+				Request request = new Request.Builder()
+					.url(databaseUrl)
+					.method("POST", body)
+					.addHeader("Content-Type", "application/json")
+					.addHeader("Authorization", "Basic " + CACHE_DATABASE_TOKEN)
+					.build();
+				try (Response ignored = okHttpClient.newCall(request).execute()) {} catch (Exception ignored) {}
+			}
+		);
 	}
 }

@@ -38,6 +38,10 @@ public class Database {
 		return settingsService.removeApplySettings(serverId, name).getStatusCodeValue();
 	}
 
+	public int removeGuildSettings(String serverId, String name) {
+		return settingsService.removeGuildSettings(serverId, name).getStatusCodeValue();
+	}
+
 	public int addLinkedUser(LinkedAccountModel newUser) {
 		return linkedAccountService.addNewLinkedAccount(newUser).getStatusCodeValue();
 	}

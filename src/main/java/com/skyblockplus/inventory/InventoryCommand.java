@@ -62,7 +62,7 @@ public class InventoryCommand extends Command {
 						if (playerInventory[2].length() > 0) {
 							ebMessage
 								.getChannel()
-								.sendMessageEmbeds(defaultEmbed("Missing Items").setDescription(playerInventory[2]).build())
+								.sendMessageEmbeds(defaultEmbed("Missing emojis").setDescription(playerInventory[2]).build())
 								.queue();
 						}
 					} else {

@@ -27,29 +27,29 @@ public class RoleCommands extends Command {
 		this.aliases = new String[] { "role" };
 	}
 
-	public static EmbedBuilder updateRoles(String profile, Guild guild, User user, Member member) {
+	public static EmbedBuilder updateRoles(String profile, Guild guild, Member member) {
 		EmbedBuilder eb;
 
-		if (database.getLinkedUserByDiscordId(user.getId()).isJsonNull()) {
+		if (database.getLinkedUserByDiscordId(member.getId()).isJsonNull()) {
 			return defaultEmbed("You must be linked to run this command. Use `" + getGuildPrefix(guild.getId()) + "link [IGN]` to link");
 		}
 
-		JsonElement linkedInfo = database.getLinkedUserByDiscordId(user.getId());
+		JsonElement linkedInfo = database.getLinkedUserByDiscordId(member.getId());
 		DiscordInfoStruct playerInfo = getPlayerDiscordInfo(higherDepth(linkedInfo, "minecraftUuid").getAsString());
 
 		if (playerInfo.isNotValid()) {
 			return invalidEmbed(playerInfo.failCause);
 		}
 
-		if (!user.getAsTag().equals(playerInfo.discordTag)) {
+		if (!member.getUser().getAsTag().equals(playerInfo.discordTag)) {
 			eb = defaultEmbed("Discord tag mismatch");
 			eb.setDescription(
-				"Account **" +
+				"**Player Username:** `" +
 				playerInfo.minecraftUsername +
-				"** is linked with the Discord tag `" +
+				"`\n**API Discord Tag:** `" +
 				playerInfo.discordTag +
-				"`\nYour current Discord tag is `" +
-				user.getAsTag() +
+				"`\n**Your Discord Tag:** `" +
+				member.getUser().getAsTag() +
 				"`"
 			);
 			return eb;
@@ -534,7 +534,7 @@ public class RoleCommands extends Command {
 					return;
 				}
 
-				eb = updateRoles(args.length == 3 ? args[2] : null, event.getGuild(), event.getAuthor(), event.getMember());
+				eb = updateRoles(args.length == 3 ? args[2] : null, event.getGuild(), event.getMember());
 
 				ebMessage.editMessageEmbeds(eb.build()).queue();
 			}

@@ -33,7 +33,7 @@ public class PriceCommand extends Command {
 	}
 
 	public static EmbedBuilder calculatePriceFromUuid(String auctionUuid) {
-		HypixelResponse auctionResponse = getSkyblockAuctionFromUuid(auctionUuid);
+		HypixelResponse auctionResponse = getAuctionFromUuid(auctionUuid);
 
 		if (auctionResponse.isNotValid()) {
 			return invalidEmbed(auctionResponse.failCause);

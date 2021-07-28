@@ -101,7 +101,7 @@ public class BinCommand extends Command {
 
 				if (higherDepth(lowestBinJson, petId) != null) {
 					EmbedBuilder eb = defaultEmbed("Lowest bin");
-					eb.addField(idToName(petId) + " pet", formatNumber(higherDepth(lowestBinJson, petId).getAsLong()), false);
+					eb.addField(idToName(petId), formatNumber(higherDepth(lowestBinJson, petId).getAsLong()), false);
 					eb.setThumbnail(getPetUrl(petId.split(";")[0]));
 					return eb;
 				}
