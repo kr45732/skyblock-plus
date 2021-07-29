@@ -239,8 +239,8 @@ public class CommandEndpoints {
 	@PostMapping("/heroku")
 	public ResponseEntity<?> herokuToDiscordWebhook(
 		@RequestBody Object body,
-		@RequestHeader(value = "Authorization") String authorization,
-		@RequestHeader(value = "Heroku-Webhook-Hmac-SHA256") String herokuHash
+		@RequestHeader(value = "Authorization", required = false) String authorization,
+		@RequestHeader(value = "Heroku-Webhook-Hmac-SHA256", required = false) String herokuHash
 	) {
 		JsonElement jsonBody = new Gson().toJsonTree(body);
 		System.out.println(jsonBody);
@@ -251,29 +251,29 @@ public class CommandEndpoints {
 		actorEmail = actorEmail.contains("@gmail.com") ? "kr45732" : actorEmail;
 
 		String description = "";
-		if (higherDepth(jsonBody, "data.release.version") != null) {
+		try {
 			description += "**Version:** " + higherDepth(jsonBody, "data.release.version").getAsInt() + "\n";
-		}
+		} catch (Exception ignored) {}
 
-		if (higherDepth(jsonBody, "data.description") != null) {
+		try {
 			description += "**Description:** " + higherDepth(jsonBody, "data.description").getAsString() + "\n";
-		}
+		} catch (Exception ignored) {}
 
-		if (higherDepth(jsonBody, "data.status") != null) {
+		try {
 			description += "**Status:** " + higherDepth(jsonBody, "data.status").getAsString() + "\n";
-		}
+		} catch (Exception ignored) {}
 
-		if (higherDepth(jsonBody, "data.output_stream_url") != null) {
+		try {
 			description += "**Output stream:** [link](" + higherDepth(jsonBody, "data.output_stream_url").getAsString() + ")\n";
-		}
+		} catch (Exception ignored) {}
 
-		if (higherDepth(jsonBody, "resource") != null) {
+		try {
 			description += "**Resource:** " + higherDepth(jsonBody, "resource").getAsString() + "\n";
-		}
+		} catch (Exception ignored) {}
 
-		if (higherDepth(jsonBody, "action") != null) {
+		try {
 			description += "**Action:** " + higherDepth(jsonBody, "action").getAsString() + "\n";
-		}
+		} catch (Exception ignored) {}
 
 		if (webhookClient == null) {
 			webhookClient =
