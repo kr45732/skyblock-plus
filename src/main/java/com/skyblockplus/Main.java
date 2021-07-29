@@ -196,8 +196,8 @@ public class Main {
 		jda.getPresence().setActivity(Activity.watching(DEFAULT_PREFIX + "help in " + jda.getGuilds().size() + " servers"));
 
 		Hypixel.scheduleUpdateCache();
-		//				scheduleUpdateLinkedAccounts();
-		//				AuctionFlipper.scheduleFlipper();
+		//	scheduleUpdateLinkedAccounts();
+		//	AuctionFlipper.scheduleFlipper();
 	}
 
 	@PreDestroy

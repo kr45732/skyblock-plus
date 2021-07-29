@@ -7,6 +7,8 @@ import static com.skyblockplus.utils.Hypixel.usernameToUuid;
 import static java.lang.String.join;
 import static java.util.Collections.nCopies;
 
+import club.minnced.discord.webhook.WebhookClientBuilder;
+import club.minnced.discord.webhook.external.JDAWebhookClient;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -111,6 +113,7 @@ public class Utils {
 	/* Miscellaneous */
 	public static TextChannel botLogChannel;
 	public static TextChannel errorLogChannel;
+	public static JDAWebhookClient webhookClient;
 	public static Instant lowestBinJsonLastUpdated = Instant.now();
 	public static Instant averageAuctionJsonLastUpdated = Instant.now();
 	public static Instant bazaarJsonLastUpdated = Instant.now();

@@ -3,20 +3,20 @@ package com.skyblockplus.api.miscellaneous;
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
 
+import club.minnced.discord.webhook.WebhookClientBuilder;
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.skyblockplus.api.templates.ErrorTemplate;
 import com.skyblockplus.api.templates.Template;
 import com.skyblockplus.utils.Constants;
+import java.awt.*;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/api/public")
@@ -234,6 +234,67 @@ public class CommandEndpoints {
 			log.error(e.getMessage(), e);
 			return new ResponseEntity<>(new ErrorTemplate(false, "Internal Server Error"), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+	}
+
+	@PostMapping("/heroku")
+	public ResponseEntity<?> herokuToDiscordWebhook(
+		@RequestBody Object body,
+		@RequestHeader(value = "Authorization") String authorization,
+		@RequestHeader(value = "Heroku-Webhook-Hmac-SHA256") String herokuHash
+	) {
+		JsonElement jsonBody = new Gson().toJsonTree(body);
+		System.out.println(jsonBody);
+		System.out.println("Authorization: " + authorization);
+		System.out.println("Heroku-Webhook-Hmac-SHA256: " + herokuHash);
+
+		String actorEmail = higherDepth(jsonBody, "actor.email") != null ? higherDepth(jsonBody, "actor.email").getAsString() : "Null";
+		actorEmail = actorEmail.contains("@gmail.com") ? "kr45732" : actorEmail;
+
+		String description = "";
+		if (higherDepth(jsonBody, "data.release.version") != null) {
+			description += "**Version:** " + higherDepth(jsonBody, "data.release.version").getAsInt() + "\n";
+		}
+
+		if (higherDepth(jsonBody, "data.description") != null) {
+			description += "**Description:** " + higherDepth(jsonBody, "data.description").getAsString() + "\n";
+		}
+
+		if (higherDepth(jsonBody, "data.status") != null) {
+			description += "**Status:** " + higherDepth(jsonBody, "data.status").getAsString() + "\n";
+		}
+
+		if (higherDepth(jsonBody, "data.output_stream_url") != null) {
+			description += "**Output stream:** [link](" + higherDepth(jsonBody, "data.output_stream_url").getAsString() + ")\n";
+		}
+
+		if (higherDepth(jsonBody, "resource") != null) {
+			description += "**Resource:** " + higherDepth(jsonBody, "resource").getAsString() + "\n";
+		}
+
+		if (higherDepth(jsonBody, "action") != null) {
+			description += "**Action:** " + higherDepth(jsonBody, "action").getAsString() + "\n";
+		}
+
+		if (webhookClient == null) {
+			webhookClient =
+				new WebhookClientBuilder(
+					"https://discord.com/api/webhooks/870080904758952037/mI2Xoa5av_Y3CIKofCua-K_zDrMJX1O3KjXG65sgRTW52eMXbY3geN8fQVLKd2DH75Xf"
+				)
+					.setExecutorService(scheduler)
+					.setHttpClient(okHttpClient)
+					.buildJDA();
+		}
+
+		String appName = higherDepth(jsonBody, "data.app.name") != null ? higherDepth(jsonBody, "data.app.name").getAsString() : "Null";
+		webhookClient.send(
+			defaultEmbed(appName, "https://dashboard.heroku.com/apps/" + appName)
+				.setAuthor(actorEmail)
+				.setColor(Color.GREEN)
+				.setDescription(description)
+				.build()
+		);
+
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
 	/* Utils */

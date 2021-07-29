@@ -23,8 +23,32 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests().antMatchers("/api/public/**").permitAll().antMatchers("/api/private/**").authenticated().and().httpBasic();
+		http
+			.authorizeRequests()
+			.antMatchers("/api/public/**")
+			.permitAll()
+			.antMatchers("/api/private/**")
+			.authenticated()
+			.and()
+			.httpBasic()
+			.and()
+			.csrf()
+			.disable();
 	}
+
+	/*
+	@Bean
+	CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration configuration = new CorsConfiguration();
+		configuration.setAllowedOrigins(Arrays.asList("*"));
+		configuration.setAllowedMethods(Arrays.asList("*"));
+		configuration.setAllowedHeaders(Arrays.asList("*"));
+		configuration.setAllowCredentials(true);
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/api/public/**", configuration);
+		return source;
+	}
+*/
 
 	@Bean
 	PasswordEncoder passwordEncoder() {

@@ -5,7 +5,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '6.1.0'
 
     // Spring boot
-    id 'org.springframework.boot' version '2.5.2'
+    id 'org.springframework.boot' version '2.5.3'
     id "io.spring.dependency-management" version "1.0.11.RELEASE"
 
     // Lombok annotations
@@ -36,6 +36,7 @@ dependencies {
      implementation ('net.dv8tion:JDA:4.3.0_295') {
          exclude module: 'opus-java'
      }
+    implementation "club.minnced:discord-webhooks:0.5.7"
 
     // Google libraries
     implementation 'com.google.code.gson:gson:2.8.7'
@@ -49,8 +50,8 @@ dependencies {
 
     // Spring boot and postgresql
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
     runtimeOnly 'org.postgresql:postgresql'
 
     // Http Client
