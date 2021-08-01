@@ -41,7 +41,6 @@ public class EvaluateCommand extends Command {
 			"net.dv8tion.jda.api.interactions",
 			"com.skyblockplus",
 			"com.google.gson",
-			"com.skyblockplus.utils.structs",
 		};
 
 		// import [name]

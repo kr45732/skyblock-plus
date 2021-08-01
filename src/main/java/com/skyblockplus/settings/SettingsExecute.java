@@ -20,7 +20,7 @@ import com.skyblockplus.api.serversettings.automatedguild.GuildRole;
 import com.skyblockplus.api.serversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
-import com.skyblockplus.utils.CustomPaginator;
+import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.vdurmont.emoji.EmojiParser;
@@ -44,8 +44,8 @@ public class SettingsExecute {
 		this(event.getGuild(), event.getMessage(), event.getChannel(), event.getAuthor());
 	}
 
-	public SettingsExecute(MessageReceivedEvent event) {
-		this(event.getGuild(), event.getMessage(), event.getChannel(), event.getAuthor());
+	public SettingsExecute(Guild guild, MessageReceivedEvent event) {
+		this(guild, event.getMessage(), event.getChannel(), event.getAuthor());
 	}
 
 	public SettingsExecute(Guild guild, Message message, MessageChannel channel, User author) {
@@ -639,7 +639,11 @@ public class SettingsExecute {
 						guildJson.get("name").getAsString() + " Members: " + guildJson.get("members").getAsJsonArray().size() + "/125"
 					)
 					.addPermissionOverride(guild.getPublicRole(), EnumSet.of(Permission.VIEW_CHANNEL), EnumSet.of(Permission.VOICE_CONNECT))
-					.addMemberPermissionOverride(jda.getSelfUser().getIdLong(), EnumSet.of(Permission.VOICE_CONNECT), null)
+					.addMemberPermissionOverride(
+						jda.getSelfUser().getIdLong(),
+						EnumSet.of(Permission.VIEW_CHANNEL, Permission.MANAGE_CHANNEL, Permission.VOICE_CONNECT),
+						null
+					)
 					.complete();
 				currentSettings.addProperty("guildUserChannelId", guildMemberCounterChannel.getId());
 			} else {

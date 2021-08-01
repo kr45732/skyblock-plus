@@ -14,6 +14,7 @@ public class WeightCommand extends Command {
 	public WeightCommand() {
 		this.name = "weight";
 		this.cooldown = globalCooldown;
+		this.aliases = new String[] { "we" };
 	}
 
 	public static EmbedBuilder calculateWeight(String skillAverage, String slayer, String catacombs, String averageDungeonClass) {

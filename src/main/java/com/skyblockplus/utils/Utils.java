@@ -1,19 +1,19 @@
 package com.skyblockplus.utils;
 
 import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.utils.CustomPaginator.throwableConsumer;
 import static com.skyblockplus.utils.Hypixel.playerFromUuid;
 import static com.skyblockplus.utils.Hypixel.usernameToUuid;
+import static com.skyblockplus.utils.command.CustomPaginator.throwableConsumer;
 import static java.lang.String.join;
 import static java.util.Collections.nCopies;
 
-import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.external.JDAWebhookClient;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.exceptionhandlers.ExceptionExecutor;
 import com.skyblockplus.utils.structs.*;
 import java.awt.*;

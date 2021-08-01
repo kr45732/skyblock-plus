@@ -6,19 +6,19 @@ import static com.skyblockplus.utils.Constants.dungeonEmojiMap;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.command.CommandBase;
+import com.skyblockplus.utils.command.CustomPaginator;
+import com.skyblockplus.utils.command.LinkedStatus;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.SkillsStruct;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 
-public class DungeonsCommand extends Command {
+public class DungeonsCommand extends CommandBase {
 
 	public DungeonsCommand() {
 		this.name = "dungeons";
@@ -116,27 +116,33 @@ public class DungeonsCommand extends Command {
 	}
 
 	@Override
-	protected void execute(CommandEvent event) {
-		executor.submit(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
-				String content = event.getMessage().getContentRaw();
-				String[] args = content.split(" ");
+	protected void onExecute(CommandEvent event) {
+		logCommand();
 
-				logCommand(event.getGuild(), event.getAuthor(), content);
+		if (args.length == 3 || args.length == 2) {
+			String username = args[1];
 
-				if (args.length == 3 || args.length == 2) {
-					eb = getPlayerDungeons(args[1], args.length == 3 ? args[2] : null, event.getAuthor(), event.getChannel(), null);
-					if (eb == null) {
-						ebMessage.delete().queue();
-					} else {
-						ebMessage.editMessageEmbeds(eb.build()).queue();
-					}
-					return;
-				}
-				ebMessage.editMessageEmbeds(errorEmbed(this.name).build()).queue();
+			LinkedStatus linkedStatus = getMentionedUserId(1);
+			if (linkedStatus.equals(LinkedStatus.LINKED)) {
+				username = linkedUser;
+			} else if (linkedStatus.equals(LinkedStatus.NOT_LINKED)) {
+				sendNotLinkedEmbed(linkedStatus.id);
+				return;
 			}
-		);
+
+			paginate(getPlayerDungeons(username, args.length == 3 ? args[2] : null, event.getAuthor(), event.getChannel(), null));
+			return;
+		}
+
+		if (args.length == 1) {
+			if (getLinkedUser()) {
+				paginate(getPlayerDungeons(linkedUser, null, event.getAuthor(), event.getChannel(), null));
+			} else {
+				sendNotLinkedEmbed();
+			}
+			return;
+		}
+
+		sendErrorEmbed();
 	}
 }

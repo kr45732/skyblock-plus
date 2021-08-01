@@ -30,11 +30,11 @@ public class MainClassUtils {
 	private static final Logger log = LoggerFactory.getLogger(MainClassUtils.class);
 
 	public static void cacheApplyGuildUsers() {
-		long startTime = System.currentTimeMillis();
 		if (!DEFAULT_PREFIX.equals("+")) {
 			return;
 		}
 
+		long startTime = System.currentTimeMillis();
 		for (Map.Entry<String, AutomaticGuild> automaticGuild : guildMap.entrySet()) {
 			List<ApplyGuild> applySettings = automaticGuild.getValue().applyGuild;
 			for (ApplyGuild applySetting : applySettings) {

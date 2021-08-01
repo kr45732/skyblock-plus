@@ -2,8 +2,8 @@ package com.skyblockplus.dungeons;
 
 import static com.skyblockplus.utils.Utils.executor;
 
-import com.skyblockplus.utils.slashcommands.SlashCommand;
-import com.skyblockplus.utils.slashcommands.SlashCommandExecutedEvent;
+import com.skyblockplus.utils.slashcommand.SlashCommand;
+import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 
 public class PartyFinderSlashCommand extends SlashCommand {

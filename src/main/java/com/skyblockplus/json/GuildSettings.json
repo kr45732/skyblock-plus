@@ -694,8 +694,8 @@
         "catacombs"
       ],
       "staff_ranks": [
-        "moderator",
-        "senior officer",
+        "manager",
+        "officer",
         "guild master"
       ],
       "ignore_staff": true,

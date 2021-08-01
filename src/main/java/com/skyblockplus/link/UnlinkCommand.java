@@ -9,9 +9,9 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 
-public class UnlinkAccountCommand extends Command {
+public class UnlinkCommand extends Command {
 
-	public UnlinkAccountCommand() {
+	public UnlinkCommand() {
 		this.name = "unlink";
 		this.cooldown = globalCooldown;
 	}

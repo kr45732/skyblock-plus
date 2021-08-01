@@ -1,4 +1,4 @@
-package com.skyblockplus.utils;
+package com.skyblockplus.utils.command;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.jagrosh.jdautilities.menu.Menu;
@@ -317,10 +317,6 @@ public class CustomPaginator extends Menu {
 		public Builder showPageNumbers(boolean show) {
 			this.showPageNumbers = show;
 			return this;
-		}
-
-		public void clearItems() {
-			strings.clear();
 		}
 
 		public void addItems(String... items) {

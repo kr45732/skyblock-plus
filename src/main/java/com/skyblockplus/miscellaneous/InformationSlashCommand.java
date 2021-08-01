@@ -2,8 +2,8 @@ package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.Utils.executor;
 
-import com.skyblockplus.utils.slashcommands.SlashCommand;
-import com.skyblockplus.utils.slashcommands.SlashCommandExecutedEvent;
+import com.skyblockplus.utils.slashcommand.SlashCommand;
+import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 
 public class InformationSlashCommand extends SlashCommand {
 

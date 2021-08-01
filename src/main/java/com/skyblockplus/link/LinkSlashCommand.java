@@ -2,8 +2,8 @@ package com.skyblockplus.link;
 
 import static com.skyblockplus.utils.Utils.executor;
 
-import com.skyblockplus.utils.slashcommands.SlashCommand;
-import com.skyblockplus.utils.slashcommands.SlashCommandExecutedEvent;
+import com.skyblockplus.utils.slashcommand.SlashCommand;
+import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 
 public class LinkSlashCommand extends SlashCommand {
@@ -20,9 +20,9 @@ public class LinkSlashCommand extends SlashCommand {
 				String linkOption = event.getOptionStr("player");
 				EmbedBuilder eb;
 				if (linkOption != null) {
-					eb = LinkAccountCommand.linkAccount(linkOption, event.getMember(), event.getGuild());
+					eb = LinkCommand.linkAccount(linkOption, event.getMember(), event.getGuild());
 				} else {
-					eb = LinkAccountCommand.getLinkedAccount(event.getUser());
+					eb = LinkCommand.getLinkedAccount(event.getUser());
 				}
 				event.getHook().editOriginalEmbeds(eb.build()).queue();
 			}

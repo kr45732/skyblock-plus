@@ -1,4 +1,4 @@
-package com.skyblockplus.utils.slashcommands;
+package com.skyblockplus.utils.slashcommand;
 
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;

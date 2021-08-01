@@ -1,4 +1,4 @@
-package com.skyblockplus.utils.slashcommands;
+package com.skyblockplus.utils.slashcommand;
 
 import static com.skyblockplus.utils.Utils.invalidEmbed;
 import static com.skyblockplus.utils.Utils.logCommand;

@@ -68,6 +68,7 @@ public class Constants {
 	public static final Map<String, Double> dungeonWeights = new HashMap<>();
 	public static final List<String> vanillaItems = new ArrayList<>();
 	public static final Map<String, String> dungeonEmojiMap = new HashMap<>();
+	public static final List<String> fetchurItems = new ArrayList<>();
 
 	public static void initialize() {
 		/* rarityToNumberMap */
@@ -169,6 +170,20 @@ public class Constants {
 		dungeonEmojiMap.put("master_catacombs_6", "<:master_floor_6:867511391228657685>");
 		dungeonEmojiMap.put("master_catacombs_7", "<:master_floor_7:867511391644549120>");
 		dungeonEmojiMap.put("catacombs", "<:catacombs:867535694103707679>");
+
+		fetchurItems.add("**Item:** Red Wool\n**Quantity:** 50|WOOL:14");
+		fetchurItems.add("**Item:** Yellow Stained Glass\n**Quantity:** 20|STAINED_GLASS:4");
+		fetchurItems.add("**Item:** Compass\n**Quantity:** 1|COMPASS");
+		fetchurItems.add("**Item:** Mithril\n**Quantity:** 20|MITHRIL_ORE");
+		fetchurItems.add("**Item:** Firework Rocket\n**Quantity:** 1|FIREWORK");
+		fetchurItems.add("**Item:** Cheap Coffee or Decent Coffee\n**Quantity:** 1|CHEAP_COFFEE");
+		fetchurItems.add("**Item:** Iron Door or Any Wooden Door\n**Quantity:** 20|WOOD_DOOR");
+		fetchurItems.add("**Item:** Rabbit's Feet\n**Quantity:** 3|RABBIT_FOOT");
+		fetchurItems.add("**Item:** Superboom TNT\n**Quantity:** 1|SUPERBOOM_TNT");
+		fetchurItems.add("**Item:** Pumpkin\n**Quantity:** 1|PUMPKIN");
+		fetchurItems.add("**Item:** Flint and Steel\n**Quantity:** 1|FLINT_AND_STEEL");
+		fetchurItems.add("**Item:** Nether Quartz Ore\n**Quantity:** 50|QUARTZ");
+		fetchurItems.add("**Item:** Ender Pearl\n**Quantity:** 16|ENDER_PEARL");
 		/* vanillaItems */
 		// JsonArray vanillaItemsJson = getVanillaItemsJson().getAsJsonArray();
 		// for(JsonElement vanillaItem: vanillaItemsJson){

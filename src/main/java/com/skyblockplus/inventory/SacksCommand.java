@@ -5,8 +5,8 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.utils.CustomPaginator;
 import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;

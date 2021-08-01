@@ -19,6 +19,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -48,9 +49,20 @@ public class Hypixel {
 	//		.expireAfterWrite(90, TimeUnit.SECONDS)
 	//		.recordStats()
 	//		.build();
+
 	private static final String databaseUrl = "https://cache-skyblockplus.harperdbcloud.com";
 
+	private static final Pattern minecraftUsernameRegex = Pattern.compile("^\\w+$", Pattern.CASE_INSENSITIVE);
+
+	public static boolean isValidMinecraftUsername(String username) {
+		return username.length() > 2 && username.length() < 17 && minecraftUsernameRegex.matcher(username).find();
+	}
+
 	public static UsernameUuidStruct usernameToUuid(String username) {
+		if (!isValidMinecraftUsername(username)) {
+			return new UsernameUuidStruct("No user with the name '" + username + "' was found");
+		}
+
 		Map.Entry<String, String> cachedResponse = uuidToUsernameCache
 			.asMap()
 			.entrySet()
@@ -403,7 +415,7 @@ public class Hypixel {
 
 				RequestBody body = RequestBody.create(
 					MediaType.parse("application/json"),
-					"{\"operation\":\"delete\",\"table\":\"" + type + "\",\"schema\":\"dev\",\"hash_values\":[" + playerUuid + "]}"
+					"{\"operation\":\"delete\",\"table\":\"" + type + "\",\"schema\":\"dev\",\"hash_values\":[\"" + playerUuid + "\"]}"
 				);
 				Request request = new Request.Builder()
 					.url(databaseUrl)
@@ -417,17 +429,16 @@ public class Hypixel {
 	}
 
 	public static void scheduleUpdateCache() {
-		scheduler.scheduleWithFixedDelay(Hypixel::updateCache, 1, 5, TimeUnit.MINUTES);
+		scheduler.scheduleWithFixedDelay(Hypixel::updateCache, 1, 1, TimeUnit.MINUTES);
 	}
 
 	public static void updateCache() {
 		try {
-			MediaType mediaType = MediaType.parse("application/json");
 			RequestBody body = RequestBody.create(
-				mediaType,
+				MediaType.parse("application/json"),
 				"{\"operation\": \"sql\",\"sql\":\"SELECT uuid FROM dev.profiles WHERE __updatedtime__ < " +
 				Instant.now().minusSeconds(90).toEpochMilli() +
-				"\"}"
+				" LIMIT 3\"}"
 			);
 			Request request = new Request.Builder()
 				.url(databaseUrl)
@@ -435,13 +446,14 @@ public class Hypixel {
 				.addHeader("Content-Type", "application/json")
 				.addHeader("Authorization", "Basic " + CACHE_DATABASE_TOKEN)
 				.build();
-			Response response = okHttpClient.newCall(request).execute();
-			JsonArray expiredCaches = JsonParser.parseString(response.body().string()).getAsJsonArray();
-			for (JsonElement expiredCache : expiredCaches) {
-				try {
-					deleteCachedJson("profiles", higherDepth(expiredCache, "uuid").getAsString()).get();
-					TimeUnit.SECONDS.sleep(1);
-				} catch (Exception ignored) {}
+
+			try (Response response = okHttpClient.newCall(request).execute()) {
+				JsonArray expiredCaches = JsonParser.parseString(response.body().string()).getAsJsonArray();
+				for (JsonElement expiredCache : expiredCaches) {
+					try {
+						deleteCachedJson("profiles", higherDepth(expiredCache, "uuid").getAsString()).get();
+					} catch (Exception ignored) {}
+				}
 			}
 		} catch (Exception ignored) {}
 	}

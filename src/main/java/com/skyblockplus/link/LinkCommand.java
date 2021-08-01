@@ -13,17 +13,15 @@ import com.skyblockplus.api.serversettings.automatedguild.GuildRole;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import java.time.Instant;
-import java.util.List;
-import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 
-public class LinkAccountCommand extends Command {
+public class LinkCommand extends Command {
 
-	public LinkAccountCommand() {
+	public LinkCommand() {
 		this.name = "link";
 		this.cooldown = globalCooldown;
 	}
@@ -56,53 +54,62 @@ public class LinkAccountCommand extends Command {
 		);
 
 		if (database.addLinkedUser(toAdd) == 200) {
-			try {
-				if (!higherDepth(database.getVerifySettings(guild.getId()), "verifiedNickname").getAsString().equalsIgnoreCase("none")) {
-					String nicknameTemplate = higherDepth(database.getVerifySettings(guild.getId()), "verifiedNickname").getAsString();
-					nicknameTemplate = nicknameTemplate.replace("[IGN]", playerInfo.minecraftUsername);
-					if (nicknameTemplate.contains("[GUILD_RANK]")) {
-						try {
-							HypixelResponse playerGuild = getGuildFromPlayer(playerInfo.minecraftUuid);
-							if (!playerGuild.isNotValid()) {
-								List<String> settingsGuildId = database
-									.getAllGuildRoles(guild.getId())
-									.stream()
-									.map(GuildRole::getGuildId)
-									.collect(Collectors.toList());
+			JsonElement verifySettings = database.getVerifySettings(guild.getId());
+			if (verifySettings != null) {
+				try {
+					String nicknameTemplate = higherDepth(verifySettings, "verifiedNickname").getAsString();
+					if (!nicknameTemplate.equalsIgnoreCase("none")) {
+						nicknameTemplate = nicknameTemplate.replace("[IGN]", playerInfo.minecraftUsername);
 
-								if (settingsGuildId.contains(playerGuild.get("_id").getAsString())) {
-									JsonArray guildMembers = playerGuild.get("members").getAsJsonArray();
-									for (JsonElement guildMember : guildMembers) {
-										if (higherDepth(guildMember, "uuid").getAsString().equals(playerInfo.minecraftUuid)) {
-											nicknameTemplate =
-												nicknameTemplate.replace("[GUILD_RANK]", higherDepth(guildMember, "rank").getAsString());
-											break;
+						if (nicknameTemplate.contains("[GUILD_RANK]")) {
+							try {
+								HypixelResponse playerGuild = getGuildFromPlayer(playerInfo.minecraftUuid);
+								if (!playerGuild.isNotValid()) {
+									GuildRole settingsGuildId = database
+										.getAllGuildRoles(guild.getId())
+										.stream()
+										.filter(guildRole -> guildRole.getGuildId().equalsIgnoreCase(playerGuild.get("_id").getAsString()))
+										.findFirst()
+										.orElse(null);
+
+									if (settingsGuildId != null) {
+										JsonArray guildMembers = playerGuild.get("members").getAsJsonArray();
+										for (JsonElement guildMember : guildMembers) {
+											if (higherDepth(guildMember, "uuid").getAsString().equals(playerInfo.minecraftUuid)) {
+												nicknameTemplate =
+													nicknameTemplate.replace(
+														"[GUILD_RANK]",
+														higherDepth(guildMember, "rank").getAsString()
+													);
+												break;
+											}
 										}
 									}
 								}
-							}
-						} catch (Exception ignored) {}
+							} catch (Exception ignored) {}
+						}
+
+						member.modifyNickname(nicknameTemplate).queue();
 					}
+				} catch (Exception ignored) {}
 
-					member.modifyNickname(nicknameTemplate).queue();
-				}
-			} catch (Exception ignored) {}
-
-			try {
-				JsonArray verifyRoles = higherDepth(database.getVerifySettings(guild.getId()), "verifiedRoles").getAsJsonArray();
-				for (JsonElement verifyRole : verifyRoles) {
-					try {
-						guild.addRoleToMember(member.getId(), guild.getRoleById(verifyRole.getAsString())).complete();
-					} catch (Exception ignored) {}
-				}
-			} catch (Exception ignored) {}
+				try {
+					JsonArray verifyRoles = higherDepth(verifySettings, "verifiedRoles").getAsJsonArray();
+					for (JsonElement verifyRole : verifyRoles) {
+						try {
+							guild.addRoleToMember(member.getId(), guild.getRoleById(verifyRole.getAsString())).complete();
+						} catch (Exception e) {
+							System.out.println(verifyRole);
+							e.printStackTrace();
+						}
+					}
+				} catch (Exception ignored) {}
+			}
 
 			return defaultEmbed("Success")
-				.setDescription("`" + member.getUser().getAsTag() + "` was linked to `" + fixUsername(playerInfo.minecraftUsername) + "`");
+				.setDescription("`" + member.getUser().getAsTag() + "` was linked to `" + playerInfo.minecraftUsername + "`");
 		} else {
-			return invalidEmbed(
-				"Error linking `" + member.getUser().getAsTag() + " to `" + fixUsername(playerInfo.minecraftUsername) + "`"
-			);
+			return invalidEmbed("Error linking `" + member.getUser().getAsTag() + " to `" + playerInfo.minecraftUsername + "`");
 		}
 	}
 

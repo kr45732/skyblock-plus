@@ -12,6 +12,7 @@ import com.skyblockplus.utils.Constants;
 import java.awt.*;
 import java.util.List;
 import java.util.Map;
+import net.dv8tion.jda.api.EmbedBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -239,28 +240,27 @@ public class CommandEndpoints {
 	@PostMapping("/heroku")
 	public ResponseEntity<?> herokuToDiscordWebhook(
 		@RequestBody Object body,
-		@RequestHeader(value = "Authorization", required = false) String authorization,
-		@RequestHeader(value = "Heroku-Webhook-Hmac-SHA256", required = false) String herokuHash
+		@RequestHeader(value = "Heroku-Webhook-Hmac-SHA256") String herokuHMAC
 	) {
-		JsonElement jsonBody = new Gson().toJsonTree(body);
-		System.out.println(jsonBody);
-		System.out.println("Authorization: " + authorization);
-		System.out.println("Heroku-Webhook-Hmac-SHA256: " + herokuHash);
+		log.info("/api/public/heroku");
 
+		JsonElement jsonBody = new Gson().toJsonTree(body);
+		System.out.println("Heroku-Webhook-Hmac-SHA256: " + herokuHMAC);
+		System.out.println(jsonBody);
+
+		String appName = higherDepth(jsonBody, "data.app.name") != null ? higherDepth(jsonBody, "data.app.name").getAsString() : "Null";
 		String actorEmail = higherDepth(jsonBody, "actor.email") != null ? higherDepth(jsonBody, "actor.email").getAsString() : "Null";
 		actorEmail = actorEmail.contains("@gmail.com") ? "kr45732" : actorEmail;
-
 		String description = "";
+
+		EmbedBuilder eb = defaultEmbed(appName, "https://dashboard.heroku.com/apps/" + appName).setAuthor(actorEmail).setColor(Color.GREEN);
+
 		try {
 			description += "**Version:** " + higherDepth(jsonBody, "data.release.version").getAsInt() + "\n";
 		} catch (Exception ignored) {}
 
 		try {
 			description += "**Description:** " + higherDepth(jsonBody, "data.description").getAsString() + "\n";
-		} catch (Exception ignored) {}
-
-		try {
-			description += "**Status:** " + higherDepth(jsonBody, "data.status").getAsString() + "\n";
 		} catch (Exception ignored) {}
 
 		try {
@@ -275,6 +275,10 @@ public class CommandEndpoints {
 			description += "**Action:** " + higherDepth(jsonBody, "action").getAsString() + "\n";
 		} catch (Exception ignored) {}
 
+		try {
+			description += "**Status:** " + higherDepth(jsonBody, "data.status").getAsString() + "\n";
+		} catch (Exception ignored) {}
+
 		if (webhookClient == null) {
 			webhookClient =
 				new WebhookClientBuilder(
@@ -285,14 +289,7 @@ public class CommandEndpoints {
 					.buildJDA();
 		}
 
-		String appName = higherDepth(jsonBody, "data.app.name") != null ? higherDepth(jsonBody, "data.app.name").getAsString() : "Null";
-		webhookClient.send(
-			defaultEmbed(appName, "https://dashboard.heroku.com/apps/" + appName)
-				.setAuthor(actorEmail)
-				.setColor(Color.GREEN)
-				.setDescription(description)
-				.build()
-		);
+		webhookClient.send(eb.setDescription(description).build());
 
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}

@@ -17,9 +17,9 @@ import com.skyblockplus.guilds.*;
 import com.skyblockplus.help.HelpCommand;
 import com.skyblockplus.help.HelpSlashCommand;
 import com.skyblockplus.inventory.*;
-import com.skyblockplus.link.LinkAccountCommand;
+import com.skyblockplus.link.LinkCommand;
 import com.skyblockplus.link.LinkSlashCommand;
-import com.skyblockplus.link.UnlinkAccountCommand;
+import com.skyblockplus.link.UnlinkCommand;
 import com.skyblockplus.link.UnlinkSlashCommand;
 import com.skyblockplus.miscellaneous.*;
 import com.skyblockplus.networth.NetworthCommand;
@@ -37,7 +37,7 @@ import com.skyblockplus.utils.Hypixel;
 import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.exceptionhandlers.ExceptionEventListener;
 import com.skyblockplus.utils.exceptionhandlers.GlobalExceptionHandler;
-import com.skyblockplus.utils.slashcommands.SlashCommandClient;
+import com.skyblockplus.utils.slashcommand.SlashCommandClient;
 import com.skyblockplus.weight.WeightCommand;
 import com.skyblockplus.weight.WeightSlashCommand;
 import javax.annotation.PreDestroy;
@@ -47,6 +47,7 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.RestAction;
+import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -118,9 +119,9 @@ public class Main {
 			new EnderChestCommand(),
 			new GetEventListenersCommand(),
 			new GetAllGuildsIn(),
-			new LinkAccountCommand(),
+			new LinkCommand(),
 			new GetSettingsFile(),
-			new UnlinkAccountCommand(),
+			new UnlinkCommand(),
 			new LinkedUserDev(),
 			new BazaarCommand(),
 			new AverageAuctionCommand(),
@@ -183,7 +184,8 @@ public class Main {
 				new ExceptionEventListener(new MessageTimeout()),
 				new ExceptionEventListener(slashCommands)
 			)
-			.setActivity(Activity.playing("Loading..."));
+			.setActivity(Activity.playing("Loading..."))
+			.disableCache(CacheFlag.VOICE_STATE);
 
 		if (!IS_API) {
 			jdaBuilder.addEventListeners(new ExceptionEventListener(new MainListener()));
