@@ -68,6 +68,7 @@ public class EvaluateCommand extends Command {
 		new CommandExecute(this, event, false) {
 			@Override
 			protected void execute() {
+				setArgs(2);
 				Message ebMessage = event.getChannel().sendMessage("Loading").complete();
 
 				if (args.length < 2) {

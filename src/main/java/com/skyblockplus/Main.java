@@ -137,7 +137,8 @@ public class Main {
 				new PriceCommand(),
 				new EmojiFromUrlCommand(),
 				new GuildLeaderboardsCommand(),
-				new ArmorCommand()
+				new ArmorCommand(),
+				new FetchurCommand()
 			);
 
 		SlashCommandClient slashCommands = new SlashCommandClient();
