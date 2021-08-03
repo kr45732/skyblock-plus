@@ -1,4 +1,4 @@
-package com.skyblockplus.guilds;
+package com.skyblockplus.utils.structs;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

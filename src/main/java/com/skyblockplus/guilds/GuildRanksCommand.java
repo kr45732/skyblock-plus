@@ -10,14 +10,15 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
+import com.skyblockplus.utils.structs.GuildRanksStruct;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.io.FileReader;
 import java.util.*;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 
 public class GuildRanksCommand extends Command {
 
@@ -29,36 +30,19 @@ public class GuildRanksCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		executor.submit(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
 
-				String content = event.getMessage().getContentRaw();
-
-				String[] args = content.split(" ");
-				if (args.length != 2) {
-					eb = errorEmbed(this.name);
-					ebMessage.editMessageEmbeds(eb.build()).queue();
-					return;
+				if (args.length == 2 && args[1].toLowerCase().startsWith("u:")) {
+					paginate(getLeaderboard(args[1].split(":")[1], event));
 				}
 
-				logCommand(event.getGuild(), event.getAuthor(), content);
-
-				if (args[1].toLowerCase().startsWith("u:")) {
-					eb = getLeaderboard(args[1].split(":")[1], event);
-
-					if (eb == null) {
-						ebMessage.delete().queue();
-					} else {
-						ebMessage.editMessageEmbeds(eb.build()).queue();
-					}
-					return;
-				}
-
-				ebMessage.editMessageEmbeds(errorEmbed(this.name).build()).queue();
+				sendErrorEmbed();
 			}
-		);
+		}
+			.submit();
 	}
 
 	private EmbedBuilder getLeaderboard(String username, CommandEvent event) {

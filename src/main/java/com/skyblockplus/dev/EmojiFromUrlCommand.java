@@ -8,9 +8,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.command.CommandExecute;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
 import javax.script.ScriptException;
 import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.entities.Icon;
@@ -18,7 +17,6 @@ import net.dv8tion.jda.api.entities.Icon;
 public class EmojiFromUrlCommand extends Command {
 
 	public static final JsonObject addedObj = new JsonObject();
-	private final List<String> allowedUsers = Arrays.asList("385939031596466176", "409889861441421315");
 
 	public EmojiFromUrlCommand() {
 		this.name = "em";
@@ -41,19 +39,14 @@ public class EmojiFromUrlCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		executor.submit(
-			() -> {
-				if (!allowedUsers.contains(event.getAuthor().getId())) {
-					return;
-				}
-
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
 				if (!event.getGuild().getName().startsWith("Skyblock Plus - Emoji Server")) {
 					return;
 				}
 
-				String content = event.getMessage().getContentRaw();
-				String[] args = content.split(" ");
-				logCommand(event.getGuild(), event.getAuthor(), content);
+				logCommand();
 
 				try {
 					JsonElement itemsJson = getSkyCryptItemsJson(args[1]);
@@ -110,6 +103,7 @@ public class EmojiFromUrlCommand extends Command {
 					e.printStackTrace();
 				}
 			}
-		);
+		}
+			.submit();
 	}
 }

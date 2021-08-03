@@ -11,6 +11,7 @@ import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.HypixelGuildCache;
 import com.skyblockplus.utils.structs.HypixelResponse;
@@ -23,7 +24,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 
 public class GuildKickerCommand extends Command {
 
@@ -35,10 +35,10 @@ public class GuildKickerCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		executor.submit(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
 
 				String content = event.getMessage().getContentRaw();
 				boolean useKey = false;
@@ -46,25 +46,17 @@ public class GuildKickerCommand extends Command {
 					useKey = true;
 					content = content.replace("--usekey", "").trim();
 				}
-
-				String[] args = content.split(" ", 3);
-
-				logCommand(event.getGuild(), event.getAuthor(), content);
+				args = content.split(" ", 3);
 
 				if (args.length == 3 && args[1].toLowerCase().startsWith("u:")) {
-					eb = getGuildKicker(args[1].split(":")[1], args[2], useKey, event);
-
-					if (eb == null) {
-						ebMessage.delete().queue();
-					} else {
-						ebMessage.editMessageEmbeds(eb.build()).queue();
-					}
+					paginate(getGuildKicker(args[1].split(":")[1], args[2], useKey, event));
 					return;
 				}
 
-				ebMessage.editMessageEmbeds(errorEmbed(this.name).build()).queue();
+				sendErrorEmbed();
 			}
-		);
+		}
+			.submit();
 	}
 
 	private EmbedBuilder getGuildKicker(String username, String reqs, boolean useKey, CommandEvent event) {

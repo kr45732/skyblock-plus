@@ -1,13 +1,14 @@
 package com.skyblockplus.dev;
 
 import static com.skyblockplus.utils.Hypixel.usernameToUuid;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.invalidEmbed;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 
 public class UuidCommand extends Command {
 
@@ -18,23 +19,20 @@ public class UuidCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		executor.submit(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
-				String content = event.getMessage().getContentRaw();
-				String[] args = content.split(" ");
-
-				logCommand(event.getGuild(), event.getAuthor(), content);
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
 
 				if (args.length == 2) {
-					ebMessage.editMessageEmbeds(getUuidPlayer(args[1]).build()).queue();
+					embed(getUuidPlayer(args[1]));
 					return;
 				}
 
-				ebMessage.editMessageEmbeds(errorEmbed(this.name).build()).queue();
+				sendErrorEmbed();
 			}
-		);
+		}
+			.submit();
 	}
 
 	private EmbedBuilder getUuidPlayer(String username) {

@@ -69,6 +69,14 @@ public class Constants {
 	public static final List<String> vanillaItems = new ArrayList<>();
 	public static final Map<String, String> dungeonEmojiMap = new HashMap<>();
 	public static final List<String> fetchurItems = new ArrayList<>();
+	public static final List<String> dungeonMetaItems = Arrays.asList(
+		"HYPERION",
+		"VALKYRIE",
+		"SCYLLA",
+		"AXE_OF_THE_SHREDDED",
+		"JUJU_SHORTBOW",
+		"TERMINATOR"
+	);
 
 	public static void initialize() {
 		/* rarityToNumberMap */
@@ -171,6 +179,7 @@ public class Constants {
 		dungeonEmojiMap.put("master_catacombs_7", "<:master_floor_7:867511391644549120>");
 		dungeonEmojiMap.put("catacombs", "<:catacombs:867535694103707679>");
 
+		/* fetchurItems */
 		fetchurItems.add("**Item:** Red Wool\n**Quantity:** 50|WOOL:14");
 		fetchurItems.add("**Item:** Yellow Stained Glass\n**Quantity:** 20|STAINED_GLASS:4");
 		fetchurItems.add("**Item:** Compass\n**Quantity:** 1|COMPASS");

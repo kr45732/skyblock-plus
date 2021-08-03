@@ -1,7 +1,8 @@
 package com.skyblockplus.dev;
 
 import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.higherDepth;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -10,8 +11,8 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.serversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.api.serversettings.skyblockevent.SbEvent;
+import com.skyblockplus.utils.command.CommandExecute;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 
 public class QuickSetupTestCommand extends Command {
 
@@ -22,37 +23,36 @@ public class QuickSetupTestCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		executor.submit(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
-				String content = event.getMessage().getContentRaw();
-				String[] args = content.split(" ", 4);
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
+				setArgs(4);
 
-				logCommand(event.getGuild(), event.getAuthor(), content);
-
-				if (args.length >= 4) {
+				if (args.length == 4) {
 					if (args[1].equals("roles")) {
-						ebMessage.editMessageEmbeds(setRoleSettings(args[2], args[3], event).build()).queue();
+						embed(setRoleSettings(args[2], args[3], event));
 						return;
 					} else if (args[1].equals("delete")) {
 						switch (args[2]) {
 							case "server":
-								ebMessage.editMessageEmbeds(deleteServer(args[3]).build()).queue();
+								embed(deleteServer(args[3]));
 								return;
 							case "apply_cache":
-								ebMessage.editMessageEmbeds(deleteServerApplyCache(args[3], args[4]).build()).queue();
+								setArgs(5);
+								embed(deleteServerApplyCache(args[3], args[4]));
 								return;
 							case "skyblock_event":
-								ebMessage.editMessageEmbeds(deleteSkyblockEvent(args[3]).build()).queue();
+								embed(deleteSkyblockEvent(args[3]));
 								return;
 						}
 					}
 				}
 
-				ebMessage.editMessageEmbeds(defaultEmbed("Invalid input").build()).queue();
+				sendErrorEmbed();
 			}
-		);
+		}
+			.submit();
 	}
 
 	private EmbedBuilder deleteSkyblockEvent(String serverId) {

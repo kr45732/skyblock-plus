@@ -6,6 +6,7 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import java.util.ArrayList;
@@ -668,23 +669,24 @@ public class HelpCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		executor.submit(
-			() -> {
-				logCommand(event.getGuild(), event.getAuthor(), event.getMessage().getContentRaw());
-				String[] args = event.getMessage().getContentRaw().toLowerCase().split(" ", 2);
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
+				setArgs(2);
 
-				EmbedBuilder eb = getHelp(
-					args.length >= 2 ? args[1] : null,
-					event.getMember(),
-					event.getChannel(),
-					null,
-					event.getGuild().getId()
+				paginate(
+					getHelp(
+						args.length >= 2 ? args[1].toLowerCase() : null,
+						event.getMember(),
+						event.getChannel(),
+						null,
+						event.getGuild().getId()
+					)
 				);
-				if (eb != null) {
-					event.getChannel().sendMessageEmbeds(eb.build()).queue();
-				}
 			}
-		);
+		}
+			.submit();
 	}
 
 	static class HelpGenerator {

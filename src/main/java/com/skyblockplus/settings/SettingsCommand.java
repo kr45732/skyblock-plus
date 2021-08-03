@@ -16,6 +16,6 @@ public class SettingsCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new SettingsExecute(event).execute();
+		new SettingsExecute(event).execute(this, event);
 	}
 }

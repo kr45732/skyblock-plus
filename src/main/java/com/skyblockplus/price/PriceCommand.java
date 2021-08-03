@@ -10,6 +10,7 @@ import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Constants;
+import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.InvItem;
 import java.time.Duration;
@@ -18,7 +19,6 @@ import java.util.List;
 import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 
 public class PriceCommand extends Command {
 
@@ -380,24 +380,19 @@ public class PriceCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		executor.submit(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
-				String content = event.getMessage().getContentRaw();
-				String[] args = content.split(" ");
-
-				logCommand(event.getGuild(), event.getAuthor(), content);
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
 
 				if (args.length == 2) {
-					eb = calculatePriceFromUuid(args[1]);
-
-					ebMessage.editMessageEmbeds(eb.build()).queue();
+					embed(calculatePriceFromUuid(args[1]));
 					return;
 				}
 
-				ebMessage.editMessageEmbeds(errorEmbed(this.name).build()).queue();
+				sendErrorEmbed();
 			}
-		);
+		}
+			.submit();
 	}
 }

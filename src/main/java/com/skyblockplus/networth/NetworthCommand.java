@@ -15,6 +15,6 @@ public class NetworthCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new NetworthExecute().execute(event);
+		new NetworthExecute().execute(this, event);
 	}
 }

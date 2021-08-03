@@ -1,10 +1,12 @@
 package com.skyblockplus.dev;
 
 import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.errorEmbed;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.command.CommandExecute;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
@@ -19,11 +21,10 @@ public class UpdateSlashCommands extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		executor.submit(
-			() -> {
-				String content = event.getMessage().getContentRaw();
-				String[] args = content.split(" ");
-				logCommand(event.getGuild(), event.getAuthor(), content);
+		new CommandExecute(this, event, false) {
+			@Override
+			protected void execute() {
+				logCommand();
 
 				if (args.length == 1) {
 					CommandListUpdateAction slashCommands = jda.getGuildById(event.getGuild().getId()).updateCommands();
@@ -56,7 +57,8 @@ public class UpdateSlashCommands extends Command {
 
 				event.getChannel().sendMessageEmbeds(errorEmbed(name).build()).queue();
 			}
-		);
+		}
+			.submit();
 	}
 
 	private CommandData[] generateSlashCommands() {

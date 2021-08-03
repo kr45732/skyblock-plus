@@ -610,7 +610,7 @@ public class Utils {
 		try {
 			return JsonParser.parseString(jsScriptEngine.eval(String.format("JSON.stringify(%s);", jsString)).toString());
 		} catch (Exception e) {
-			log.error("parseJsString()", e);
+			log.error(e.getMessage(), e);
 			return null;
 		}
 	}

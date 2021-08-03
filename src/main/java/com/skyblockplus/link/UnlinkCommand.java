@@ -1,12 +1,13 @@
 package com.skyblockplus.link;
 
 import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.globalCooldown;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.command.CommandExecute;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 
 public class UnlinkCommand extends Command {
@@ -23,16 +24,14 @@ public class UnlinkCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		executor.submit(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
-				String content = event.getMessage().getContentRaw();
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
 
-				logCommand(event.getGuild(), event.getAuthor(), content);
-
-				ebMessage.editMessageEmbeds(unlinkAccount(event.getAuthor()).build()).queue();
+				embed(unlinkAccount(event.getAuthor()));
 			}
-		);
+		}
+			.submit();
 	}
 }

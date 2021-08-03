@@ -8,10 +8,10 @@ import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 
 public class PetsCommand extends Command {
 
@@ -22,31 +22,24 @@ public class PetsCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		executor.submit(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
-				String content = event.getMessage().getContentRaw();
-				String[] args = content.split(" ");
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
 
-				logCommand(event.getGuild(), event.getAuthor(), content);
-
-				if (args.length == 2 || args.length == 3) {
-					if (args.length == 3) {
-						eb = getPlayerPets(args[1], args[2], event);
-					} else eb = getPlayerPets(args[1], null, event);
-
-					if (eb == null) {
-						ebMessage.delete().queue();
-					} else {
-						ebMessage.editMessageEmbeds(eb.build()).queue();
+				if (args.length == 3 || args.length == 2 || args.length == 1) {
+					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
+						return;
 					}
+
+					paginate(getPlayerPets(username, args.length == 3 ? args[2] : null, event));
 					return;
 				}
 
-				ebMessage.editMessageEmbeds(errorEmbed(this.name).build()).queue();
+				sendErrorEmbed();
 			}
-		);
+		}
+			.submit();
 	}
 
 	private EmbedBuilder getPlayerPets(String username, String profileName, CommandEvent event) {

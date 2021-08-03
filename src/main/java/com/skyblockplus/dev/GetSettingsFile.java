@@ -2,13 +2,15 @@ package com.skyblockplus.dev;
 
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.errorEmbed;
+import static com.skyblockplus.utils.Utils.makeHastePost;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
+import com.skyblockplus.utils.command.CommandExecute;
 import java.util.List;
 import net.dv8tion.jda.api.entities.Guild;
 
@@ -21,12 +23,10 @@ public class GetSettingsFile extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		executor.submit(
-			() -> {
-				String content = event.getMessage().getContentRaw();
-				String[] args = content.split(" ");
-
-				logCommand(event.getGuild(), event.getAuthor(), content);
+		new CommandExecute(this, event, false) {
+			@Override
+			protected void execute() {
+				logCommand();
 
 				if (args.length == 2) {
 					if (args[1].equals("current")) {
@@ -44,9 +44,10 @@ public class GetSettingsFile extends Command {
 					}
 				}
 
-				event.getChannel().sendMessageEmbeds(errorEmbed(this.name).build()).queue();
+				event.getChannel().sendMessageEmbeds(errorEmbed(name).build()).queue();
 			}
-		);
+		}
+			.submit();
 	}
 
 	private boolean getAllServerSettings(CommandEvent event) {

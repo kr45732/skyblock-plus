@@ -15,6 +15,7 @@ import com.skyblockplus.api.serversettings.skyblockevent.RunningEvent;
 import com.skyblockplus.api.serversettings.skyblockevent.SbEvent;
 import com.skyblockplus.features.listeners.AutomaticGuild;
 import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
@@ -27,7 +28,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -242,176 +242,139 @@ public class SkyblockEventCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		executor.submit(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
-				String content = event.getMessage().getContentRaw();
-				String[] args = content.split(" ");
-
-				logCommand(event.getGuild(), event.getAuthor(), content);
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
 
 				if (args.length == 2 || args.length == 3) {
+					if (
+						(args[1].equals("create") || args[1].equals("cancel") || args[1].equals("end")) &&
+						!event.getMember().hasPermission(Permission.ADMINISTRATOR)
+					) {
+						ebMessage.delete().complete();
+						event.getChannel().sendMessage("❌ You must have the Administrator permission in this Guild to use that!").queue();
+						return;
+					}
+
 					switch (args[1]) {
 						case "create":
-							if (!event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
-								ebMessage.delete().complete();
-								event
-									.getChannel()
-									.sendMessage("❌ You must have the Administrator permission in this Guild to use that!")
-									.queue();
-							} else {
-								eb = createSkyblockEvent(event);
-								if (eb == null) {
-									ebMessage.delete().queue();
-								} else {
-									ebMessage.editMessageEmbeds(eb.build()).queue();
-								}
-							}
+							paginate(createSkyblockEvent(event));
 							return;
 						case "current":
-							ebMessage.editMessageEmbeds(getCurrentSkyblockEvent(event.getGuild().getId()).build()).queue();
+							embed(getCurrentSkyblockEvent(event.getGuild().getId()));
 							return;
 						case "cancel":
-							if (!event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
-								ebMessage.delete().complete();
-								event
-									.getChannel()
-									.sendMessage("❌ You must have the Administrator permission in this Guild to use that!")
-									.queue();
-							} else {
-								ebMessage.editMessageEmbeds(cancelSkyblockEvent(event.getGuild().getId()).build()).queue();
-							}
+							embed(cancelSkyblockEvent(event.getGuild().getId()));
 							return;
 						case "join":
-							ebMessage.editMessageEmbeds(joinSkyblockEvent(event, args).build()).queue();
+							embed(joinSkyblockEvent(event, args));
 							return;
 						case "leave":
-							ebMessage.editMessageEmbeds(leaveSkyblockEvent(event).build()).queue();
+							embed(leaveSkyblockEvent(event));
 							return;
 						case "leaderboard":
 						case "lb":
-							if (database.getSkyblockEventActive(event.getGuild().getId())) {
-								if (!guildMap.containsKey(event.getGuild().getId())) {
-									ebMessage.editMessageEmbeds(defaultEmbed("No guild found").build()).queue();
-									return;
-								}
-
-								AutomaticGuild currentGuild = guildMap.get(event.getGuild().getId());
-
-								if (
-									(currentGuild.eventMemberList != null) &&
-									(currentGuild.eventMemberListLastUpdated != null) &&
-									(Duration.between(currentGuild.eventMemberListLastUpdated, Instant.now()).toMinutes() < 15)
-								) {
-									List<EventMember> eventMemberList = currentGuild.eventMemberList;
-
-									CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor())
-										.setColumns(1)
-										.setItemsPerPage(25);
-									for (int i = 0; i < eventMemberList.size(); i++) {
-										EventMember eventMember = eventMemberList.get(i);
-										paginateBuilder.addItems(
-											"`" +
-											(i + 1) +
-											")` " +
-											fixUsername(eventMember.getUsername()) +
-											" | +" +
-											formatNumber(Double.parseDouble(eventMember.getStartingAmount()))
-										);
-									}
-
-									if (paginateBuilder.getItemsSize() > 0) {
-										long minutesSinceUpdate = Duration
-											.between(currentGuild.eventMemberListLastUpdated, Instant.now())
-											.toMinutes();
-
-										String minutesSinceUpdateString;
-										if (minutesSinceUpdate == 0) {
-											minutesSinceUpdateString = " less than a minute ";
-										} else if (minutesSinceUpdate == 1) {
-											minutesSinceUpdateString = " 1 minute ";
-										} else {
-											minutesSinceUpdateString = minutesSinceUpdate + " minutes ";
-										}
-
-										paginateBuilder.setPaginatorExtras(
-											new PaginatorExtras()
-												.setEveryPageTitle("Event Leaderboard")
-												.setEveryPageText("**Last updated " + minutesSinceUpdateString + " ago**\n")
-										);
-										paginateBuilder.build().paginate(event.getChannel(), 0);
-										ebMessage.delete().queue();
-									} else {
-										ebMessage
-											.editMessageEmbeds(
-												defaultEmbed("Event Leaderboard").setDescription("No one joined the event").build()
-											)
-											.queue();
-									}
-									return;
-								}
-								JsonElement runningSettings = database.getRunningEventSettings(event.getGuild().getId());
-
-								CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor())
-									.setColumns(1)
-									.setItemsPerPage(25);
-
-								List<EventMember> guildMemberPlayersList = getEventLeaderboardList(runningSettings);
-
-								for (int i = 0; i < guildMemberPlayersList.size(); i++) {
-									EventMember eventMember = guildMemberPlayersList.get(i);
-									paginateBuilder.addItems(
-										"`" +
-										(i + 1) +
-										")` " +
-										fixUsername(eventMember.getUsername()) +
-										" | +" +
-										formatNumber(Double.parseDouble(eventMember.getStartingAmount()))
-									);
-								}
-
-								paginateBuilder.setPaginatorExtras(new PaginatorExtras().setEveryPageTitle("Event Leaderboard"));
-
-								if (paginateBuilder.getItemsSize() > 0) {
-									paginateBuilder.build().paginate(event.getChannel(), 0);
-									ebMessage.delete().queue();
-								} else {
-									ebMessage
-										.editMessageEmbeds(
-											defaultEmbed("Event Leaderboard").setDescription("No one joined the event").build()
-										)
-										.queue();
-								}
-
-								guildMap.get(event.getGuild().getId()).setEventMemberList(guildMemberPlayersList);
-								guildMap.get(event.getGuild().getId()).setEventMemberListLastUpdated(Instant.now());
-							} else {
-								ebMessage.editMessageEmbeds(defaultEmbed("No event running").build()).queue();
-							}
+							paginate(getEventLeaderboard(event));
 							return;
 						case "end":
-							if (!event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
-								ebMessage.delete().complete();
-								event
-									.getChannel()
-									.sendMessage("❌ You must have the Administrator permission in this Guild to use that!")
-									.queue();
+							if (database.getSkyblockEventActive(event.getGuild().getId())) {
+								endSkyblockEvent(event.getGuild().getId());
+								embed(defaultEmbed("Success").setDescription("Event Ended"));
 							} else {
-								if (database.getSkyblockEventActive(event.getGuild().getId())) {
-									endSkyblockEvent(event.getGuild().getId());
-									ebMessage.editMessageEmbeds(defaultEmbed("Success").setDescription("Event Ended").build()).queue();
-								} else {
-									ebMessage.editMessageEmbeds(defaultEmbed("No event running").build()).queue();
-								}
+								embed(defaultEmbed("No event running"));
 							}
 							return;
 					}
 				}
 
-				ebMessage.editMessageEmbeds(errorEmbed(this.name).build()).queue();
+				sendErrorEmbed();
 			}
-		);
+		}
+			.submit();
+	}
+
+	private EmbedBuilder getEventLeaderboard(CommandEvent event) {
+		if (!database.getSkyblockEventActive(event.getGuild().getId())) {
+			return defaultEmbed("No event running");
+		}
+
+		if (!guildMap.containsKey(event.getGuild().getId())) {
+			return defaultEmbed("No guild found");
+		}
+
+		AutomaticGuild currentGuild = guildMap.get(event.getGuild().getId());
+
+		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(25);
+
+		if (
+			(currentGuild.eventMemberList != null) &&
+			(currentGuild.eventMemberListLastUpdated != null) &&
+			(Duration.between(currentGuild.eventMemberListLastUpdated, Instant.now()).toMinutes() < 15)
+		) {
+			List<EventMember> eventMemberList = currentGuild.eventMemberList;
+			for (int i = 0; i < eventMemberList.size(); i++) {
+				EventMember eventMember = eventMemberList.get(i);
+				paginateBuilder.addItems(
+					"`" +
+					(i + 1) +
+					")` " +
+					fixUsername(eventMember.getUsername()) +
+					" | +" +
+					formatNumber(Double.parseDouble(eventMember.getStartingAmount()))
+				);
+			}
+
+			if (paginateBuilder.getItemsSize() > 0) {
+				long minutesSinceUpdate = Duration.between(currentGuild.eventMemberListLastUpdated, Instant.now()).toMinutes();
+
+				String minutesSinceUpdateString;
+				if (minutesSinceUpdate == 0) {
+					minutesSinceUpdateString = " less than a minute ";
+				} else if (minutesSinceUpdate == 1) {
+					minutesSinceUpdateString = " 1 minute ";
+				} else {
+					minutesSinceUpdateString = minutesSinceUpdate + " minutes ";
+				}
+
+				paginateBuilder.setPaginatorExtras(
+					new PaginatorExtras()
+						.setEveryPageTitle("Event Leaderboard")
+						.setEveryPageText("**Last updated " + minutesSinceUpdateString + " ago**\n")
+				);
+				paginateBuilder.build().paginate(event.getChannel(), 0);
+				return null;
+			}
+
+			return defaultEmbed("Event Leaderboard").setDescription("No one joined the event");
+		}
+
+		JsonElement runningSettings = database.getRunningEventSettings(event.getGuild().getId());
+		List<EventMember> guildMemberPlayersList = getEventLeaderboardList(runningSettings);
+
+		for (int i = 0; i < guildMemberPlayersList.size(); i++) {
+			EventMember eventMember = guildMemberPlayersList.get(i);
+			paginateBuilder.addItems(
+				"`" +
+				(i + 1) +
+				")` " +
+				fixUsername(eventMember.getUsername()) +
+				" | +" +
+				formatNumber(Double.parseDouble(eventMember.getStartingAmount()))
+			);
+		}
+
+		paginateBuilder.setPaginatorExtras(new PaginatorExtras().setEveryPageTitle("Event Leaderboard"));
+
+		guildMap.get(event.getGuild().getId()).setEventMemberList(guildMemberPlayersList);
+		guildMap.get(event.getGuild().getId()).setEventMemberListLastUpdated(Instant.now());
+
+		if (paginateBuilder.getItemsSize() > 0) {
+			paginateBuilder.build().paginate(event.getChannel(), 0);
+			return null;
+		}
+
+		return defaultEmbed("Event Leaderboard").setDescription("No one joined the event");
 	}
 
 	private EmbedBuilder leaveSkyblockEvent(CommandEvent event) {

@@ -9,6 +9,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
@@ -20,7 +21,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.InteractionHook;
@@ -320,7 +320,7 @@ public class GuildCommand extends Command {
 		}
 		JsonElement guildJson = hypixelResponse.response;
 
-		return getGuildMembers(guildJson, user, channel, null);
+		return getGuildMembers(guildJson, user, channel, hook);
 	}
 
 	public static EmbedBuilder getGuildMembersFromName(String guildName, CommandEvent event) {
@@ -349,14 +349,10 @@ public class GuildCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		executor.submit(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
-				String content = event.getMessage().getContentRaw();
-				String[] args = content.split(" ");
-
-				logCommand(event.getGuild(), event.getAuthor(), content);
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
 
 				if ((args.length == 3 || args.length == 4) && ("experience".equals(args[1]) || "exp".equals(args[1]))) {
 					int days = 7;
@@ -364,67 +360,42 @@ public class GuildCommand extends Command {
 						try {
 							days = Integer.parseInt(args[3].split("days:")[1]);
 						} catch (Exception e) {
-							ebMessage.editMessageEmbeds(invalidEmbed("Invalid days amount").build()).queue();
+							embed(invalidEmbed("Invalid days amount"));
 							return;
 						}
 					}
 
 					if (args[2].startsWith("u:")) {
-						String username = args[2].split("u:")[1];
-						eb = getGuildExpFromPlayer(username, days, event.getAuthor(), event.getChannel(), null);
-						if (eb == null) {
-							ebMessage.delete().queue();
-						} else {
-							ebMessage.editMessageEmbeds(eb.build()).queue();
-						}
+						paginate(getGuildExpFromPlayer(args[2].split("u:")[1], days, event.getAuthor(), event.getChannel(), null));
 						return;
 					} else if (args[2].startsWith("g:")) {
-						String guildName = args[2].split("g:")[1];
-						eb = getGuildExpFromName(guildName, days, event);
-						if (eb == null) {
-							ebMessage.delete().queue();
-						} else {
-							ebMessage.editMessageEmbeds(eb.build()).queue();
-						}
+						paginate(getGuildExpFromName(args[2].split("g:")[1], days, event));
 						return;
 					}
 				} else if (args.length >= 3 && (args[1].equals("information") || args[1].equals("info"))) {
 					if (args[2].toLowerCase().startsWith("u:")) {
-						String usernameInfo = args[2].split(":")[1];
-						ebMessage.editMessageEmbeds(getGuildInfo(usernameInfo).build()).queue();
+						embed(getGuildInfo(args[2].split(":")[1]));
 						return;
 					} else if (args[2].startsWith("g:")) {
-						String guildName = content.split(":")[1];
-						ebMessage.editMessageEmbeds(guildInfoFromGuildName(guildName).build()).queue();
+						embed(guildInfoFromGuildName(args[2].split(":")[1]));
 						return;
 					}
 				} else if (args.length == 3 && "members".equals(args[1])) {
 					if (args[2].startsWith("u:")) {
-						String playerName = args[2].split("u:")[1];
-						eb = getGuildMembersFromPlayer(playerName, event.getAuthor(), event.getChannel(), null);
-						if (eb == null) {
-							ebMessage.delete().queue();
-						} else {
-							ebMessage.editMessageEmbeds(eb.build()).queue();
-						}
+						paginate(getGuildMembersFromPlayer(args[2].split("u:")[1], event.getAuthor(), event.getChannel(), null));
 						return;
 					} else if (args[2].startsWith("g:")) {
-						String guildName = args[2].split("g:")[1];
-						eb = getGuildMembersFromName(guildName, event);
-						if (eb == null) {
-							ebMessage.delete().queue();
-						} else {
-							ebMessage.editMessageEmbeds(eb.build()).queue();
-						}
+						paginate(getGuildMembersFromName(args[2].split("g:")[1], event));
 						return;
 					}
 				} else if (args.length == 2) {
-					ebMessage.editMessageEmbeds(getGuildPlayer(args[1]).build()).queue();
+					embed(getGuildPlayer(args[1]));
 					return;
 				}
 
-				ebMessage.editMessageEmbeds(errorEmbed(this.name).build()).queue();
+				sendErrorEmbed();
 			}
-		);
+		}
+			.submit();
 	}
 }

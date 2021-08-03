@@ -1,10 +1,11 @@
 package com.skyblockplus.features.setup;
 
-import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.globalCooldown;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.command.CommandExecute;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.interactions.components.Button;
 
@@ -18,13 +19,13 @@ public class SetupCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		executor.submit(
-			() -> {
-				logCommand(event.getGuild(), event.getAuthor(), getGuildPrefix(event.getGuild().getId()) + "setup");
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
 
-				event
-					.getChannel()
-					.sendMessageEmbeds(
+				ebMessage
+					.editMessageEmbeds(
 						defaultEmbed("Setup").setDescription("Choose one of the buttons below to setup the corresponding feature").build()
 					)
 					.setActionRow(
@@ -36,6 +37,7 @@ public class SetupCommand extends Command {
 					)
 					.queue();
 			}
-		);
+		}
+			.submit();
 	}
 }

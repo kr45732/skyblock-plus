@@ -14,10 +14,11 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import okhttp3.MediaType;
@@ -146,7 +147,7 @@ public class Hypixel {
 	}
 
 	public static HypixelResponse skyblockProfilesFromUuid(String uuid, String hypixelApiKey) {
-		JsonElement cachedResponse = getCachedJson("profiles", uuid);
+		JsonElement cachedResponse = getCachedJson(uuid);
 		if (cachedResponse != null) {
 			return new HypixelResponse(cachedResponse);
 		}
@@ -160,7 +161,7 @@ public class Hypixel {
 				}
 
 				JsonArray profileArray = processSkyblockProfilesArray(higherDepth(profilesJson, "profiles").getAsJsonArray());
-				cacheJson("profiles", uuid, profileArray);
+				cacheJson(uuid, profileArray);
 				return new HypixelResponse(profileArray);
 			} catch (Exception e) {
 				return new HypixelResponse(higherDepth(profilesJson, "cause").getAsString());
@@ -173,7 +174,7 @@ public class Hypixel {
 	public static CompletableFuture<JsonElement> asyncSkyblockProfilesFromUuid(String uuid, String hypixelApiKey) {
 		CompletableFuture<JsonElement> future = new CompletableFuture<>();
 
-		JsonElement cachedResponse = getCachedJson("profiles", uuid);
+		JsonElement cachedResponse = getCachedJson(uuid);
 		if (cachedResponse != null) {
 			future.complete(cachedResponse);
 		} else {
@@ -198,7 +199,7 @@ public class Hypixel {
 									higherDepth(JsonParser.parseString(profilesResponse.getResponseBody()), "profiles").getAsJsonArray()
 								);
 
-								cacheJson("profiles", uuid, profileArray);
+								cacheJson(uuid, profileArray);
 
 								return profileArray;
 							} catch (Exception ignored) {}
@@ -347,7 +348,7 @@ public class Hypixel {
 	}
 
 	@SuppressWarnings("EmptyTryBlock")
-	public static void cacheJson(String type, String playerUuid, JsonElement json) {
+	public static void cacheJson(String playerUuid, JsonElement json) {
 		executor.submit(
 			() -> {
 				try {
@@ -355,9 +356,7 @@ public class Hypixel {
 
 					RequestBody body = RequestBody.create(
 						MediaType.parse("application/json"),
-						"{\"operation\":\"insert\",\"schema\":\"dev\",\"table\":\"" +
-						type +
-						"\",\"records\":[" +
+						"{\"operation\":\"insert\",\"schema\":\"dev\",\"table\":\"profiles\",\"records\":[" +
 						"{\"uuid\":\"" +
 						playerUuid +
 						"\", \"data\":" +
@@ -377,14 +376,14 @@ public class Hypixel {
 		);
 	}
 
-	public static JsonElement getCachedJson(String type, String playerUuid) {
+	public static JsonElement getCachedJson(String playerUuid) {
 		Instant lastUpdated = uuidToTimeSkyblockProfiles.getOrDefault(playerUuid, null);
 		if (lastUpdated != null && Duration.between(lastUpdated, Instant.now()).toMillis() > 90000) {
-			deleteCachedJson(type, playerUuid);
+			deleteCachedJson(playerUuid);
 		} else {
 			RequestBody body = RequestBody.create(
 				MediaType.parse("application/json"),
-				"{\"operation\":\"sql\",\"sql\":\"SELECT * FROM dev." + type + " where uuid = '" + playerUuid + "'\"}"
+				"{\"operation\":\"sql\",\"sql\":\"SELECT * FROM dev.profiles where uuid = '" + playerUuid + "'\"}"
 			);
 			Request request = new Request.Builder()
 				.url(databaseUrl)
@@ -397,7 +396,7 @@ public class Hypixel {
 				JsonElement jsonResponse = JsonParser.parseString(response.body().string());
 				Instant lastUpdatedResponse = Instant.ofEpochMilli(higherDepth(jsonResponse, "__updatedtime__").getAsLong());
 				if (Duration.between(lastUpdatedResponse, Instant.now()).toMillis() > 90000) {
-					deleteCachedJson(type, playerUuid);
+					deleteCachedJson(playerUuid);
 				} else {
 					uuidToTimeSkyblockProfiles.put(playerUuid, lastUpdatedResponse);
 					return higherDepth(jsonResponse, "data");
@@ -408,14 +407,18 @@ public class Hypixel {
 	}
 
 	@SuppressWarnings("EmptyTryBlock")
-	public static Future<?> deleteCachedJson(String type, String playerUuid) {
-		return executor.submit(
+	public static void deleteCachedJson(String... playerUuids) {
+		executor.submit(
 			() -> {
-				uuidToTimeSkyblockProfiles.remove(playerUuid);
+				for (String playerUuid : playerUuids) {
+					uuidToTimeSkyblockProfiles.remove(playerUuid);
+				}
 
 				RequestBody body = RequestBody.create(
 					MediaType.parse("application/json"),
-					"{\"operation\":\"delete\",\"table\":\"" + type + "\",\"schema\":\"dev\",\"hash_values\":[\"" + playerUuid + "\"]}"
+					"{\"operation\":\"delete\",\"table\":\"profiles\",\"schema\":\"dev\",\"hash_values\":[\"" +
+					String.join("\",\"", playerUuids) +
+					"\"]}"
 				);
 				Request request = new Request.Builder()
 					.url(databaseUrl)
@@ -449,11 +452,14 @@ public class Hypixel {
 
 			try (Response response = okHttpClient.newCall(request).execute()) {
 				JsonArray expiredCaches = JsonParser.parseString(response.body().string()).getAsJsonArray();
+				List<String> expiredCacheUuidList = new ArrayList<>();
 				for (JsonElement expiredCache : expiredCaches) {
 					try {
-						deleteCachedJson("profiles", higherDepth(expiredCache, "uuid").getAsString()).get();
+						expiredCacheUuidList.add(higherDepth(expiredCache, "uuid").getAsString());
 					} catch (Exception ignored) {}
 				}
+
+				deleteCachedJson(expiredCacheUuidList.toArray(new String[0]));
 			}
 		} catch (Exception ignored) {}
 	}

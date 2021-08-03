@@ -6,11 +6,11 @@ import static com.skyblockplus.utils.Utils.*;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.time.Instant;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 
 public class HypixelCommand extends Command {
 
@@ -245,25 +245,28 @@ public class HypixelCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		executor.submit(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
-				String content = event.getMessage().getContentRaw();
-				String[] args = content.split(" ");
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				if ((args.length == 3 || args.length == 2) && args[1].equals("parkour")) {
+					if (getMentionedUsername(args.length == 2 ? -1 : 1)) {
+						return;
+					}
 
-				logCommand(event.getGuild(), event.getAuthor(), content);
-
-				if (args.length == 3 && args[1].equals("parkour")) {
-					ebMessage.editMessageEmbeds(getParkourStats(args[2]).build()).queue();
+					embed(getParkourStats(username));
 					return;
-				} else if (args.length == 2) {
-					ebMessage.editMessageEmbeds(getHypixelStats(args[1]).build()).queue();
+				} else if (args.length == 2 || args.length == 1) {
+					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
+						return;
+					}
+
+					embed(getHypixelStats(username));
 					return;
 				}
 
-				ebMessage.editMessageEmbeds(errorEmbed(this.name).build()).queue();
+				sendErrorEmbed();
 			}
-		);
+		}
+			.submit();
 	}
 }

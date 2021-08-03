@@ -6,11 +6,11 @@ import static com.skyblockplus.utils.Constants.dungeonEmojiMap;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
+import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.command.CommandBase;
+import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
-import com.skyblockplus.utils.command.LinkedStatus;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.SkillsStruct;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -18,7 +18,7 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 
-public class DungeonsCommand extends CommandBase {
+public class DungeonsCommand extends Command {
 
 	public DungeonsCommand() {
 		this.name = "dungeons";
@@ -116,33 +116,24 @@ public class DungeonsCommand extends CommandBase {
 	}
 
 	@Override
-	protected void onExecute(CommandEvent event) {
-		logCommand();
+	protected void execute(CommandEvent event) {
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
 
-		if (args.length == 3 || args.length == 2) {
-			String username = args[1];
+				if (args.length == 3 || args.length == 2 || args.length == 1) {
+					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
+						return;
+					}
 
-			LinkedStatus linkedStatus = getMentionedUserId(1);
-			if (linkedStatus.equals(LinkedStatus.LINKED)) {
-				username = linkedUser;
-			} else if (linkedStatus.equals(LinkedStatus.NOT_LINKED)) {
-				sendNotLinkedEmbed(linkedStatus.id);
-				return;
+					paginate(getPlayerDungeons(username, args.length == 3 ? args[2] : null, event.getAuthor(), event.getChannel(), null));
+					return;
+				}
+
+				sendErrorEmbed();
 			}
-
-			paginate(getPlayerDungeons(username, args.length == 3 ? args[2] : null, event.getAuthor(), event.getChannel(), null));
-			return;
 		}
-
-		if (args.length == 1) {
-			if (getLinkedUser()) {
-				paginate(getPlayerDungeons(linkedUser, null, event.getAuthor(), event.getChannel(), null));
-			} else {
-				sendNotLinkedEmbed();
-			}
-			return;
-		}
-
-		sendErrorEmbed();
+			.submit();
 	}
 }

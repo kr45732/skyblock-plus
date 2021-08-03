@@ -8,9 +8,8 @@ import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.serversettings.automatedapply.AutomatedApply;
+import com.skyblockplus.utils.command.CommandExecute;
 import java.util.List;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 
 public class GuildRequirementsCommand extends Command {
 
@@ -22,34 +21,26 @@ public class GuildRequirementsCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		executor.submit(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
-				String content = event.getMessage().getContentRaw();
-				String[] args = content.split(" ");
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
 
-				logCommand(event.getGuild(), event.getAuthor(), content);
-				if (args.length != 2) {
-					ebMessage.editMessageEmbeds(errorEmbed(name).build()).queue();
-					return;
-				}
-
-				JsonArray guildReqs = null;
-				try {
-					guildReqs = database.getApplyReqs(event.getGuild().getId(), args[1]).getAsJsonArray();
-				} catch (Exception ignored) {}
-
-				if (guildReqs == null) {
-					List<AutomatedApply> allGuilds = database.getAllApplySettings(event.getGuild().getId());
-
-					String ebStr = null;
+				if (args.length == 2) {
+					JsonArray guildReqs = null;
 					try {
-						ebStr = allGuilds.get(0).getName() + " or " + allGuilds.get(1).getName();
+						guildReqs = database.getApplyReqs(event.getGuild().getId(), args[1]).getAsJsonArray();
 					} catch (Exception ignored) {}
 
-					ebMessage
-						.editMessageEmbeds(
+					if (guildReqs == null) {
+						List<AutomatedApply> allGuilds = database.getAllApplySettings(event.getGuild().getId());
+
+						String ebStr = null;
+						try {
+							ebStr = allGuilds.get(0).getName() + " or " + allGuilds.get(1).getName();
+						} catch (Exception ignored) {}
+
+						embed(
 							invalidEmbed(
 								(
 									ebStr != null
@@ -57,35 +48,38 @@ public class GuildRequirementsCommand extends Command {
 										: "No requirements set for " + args[1]
 								)
 							)
-								.build()
-						)
-						.queue();
+						);
+						return;
+					}
+
+					if (guildReqs.size() == 0) {
+						embed(invalidEmbed("No requirements set for " + args[1]));
+						return;
+					}
+
+					eb = defaultEmbed("Guild Requirements");
+					for (JsonElement req : guildReqs) {
+						eb.addField(
+							"Requirement",
+							"Slayer: " +
+							formatNumber(higherDepth(req, "slayerReq").getAsInt()) +
+							"\nSkill Average: " +
+							formatNumber(higherDepth(req, "skillsReq").getAsInt()) +
+							"\nCatacombs: " +
+							formatNumber(higherDepth(req, "catacombsReq").getAsInt()) +
+							"\nWeight: " +
+							formatNumber(higherDepth(req, "weightReq").getAsInt()),
+							false
+						);
+					}
+
+					embed(eb);
 					return;
 				}
 
-				if (guildReqs.size() == 0) {
-					ebMessage.editMessageEmbeds(invalidEmbed("No requirements set for " + args[1]).build()).queue();
-					return;
-				}
-
-				eb = defaultEmbed("Guild Requirements");
-				for (JsonElement req : guildReqs) {
-					eb.addField(
-						"Requirement",
-						"Slayer: " +
-						formatNumber(higherDepth(req, "slayerReq").getAsInt()) +
-						"\nSkill Average: " +
-						formatNumber(higherDepth(req, "skillsReq").getAsInt()) +
-						"\nCatacombs: " +
-						formatNumber(higherDepth(req, "catacombsReq").getAsInt()) +
-						"\nWeight: " +
-						formatNumber(higherDepth(req, "weightReq").getAsInt()),
-						false
-					);
-				}
-
-				ebMessage.editMessageEmbeds(eb.build()).queue();
+				sendErrorEmbed();
 			}
-		);
+		}
+			.submit();
 	}
 }

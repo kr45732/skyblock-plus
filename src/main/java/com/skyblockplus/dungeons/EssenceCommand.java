@@ -7,13 +7,11 @@ import static com.skyblockplus.utils.Utils.*;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.command.CommandExecute;
 import java.util.Locale;
-
-import com.skyblockplus.utils.command.CommandBase;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 
-public class EssenceCommand extends CommandBase {
+public class EssenceCommand extends Command {
 
 	public EssenceCommand() {
 		this.name = "essence";
@@ -59,35 +57,36 @@ public class EssenceCommand extends CommandBase {
 	}
 
 	@Override
-	protected void onExecute(CommandEvent event) {
-		logCommand();
+	protected void execute(CommandEvent event) {
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
+				setArgs(3);
 
-		if (args.length >= 3 && args[1].equals("upgrade")) {
-			String itemName = content.split(" ", 3)[2].replace("'s", "").replace(" ", "_").toUpperCase();
-			itemName = nameToId(itemName);
+				if (args.length == 3 && args[1].equals("upgrade")) {
+					String itemName = nameToId(args[2]);
 
-			JsonElement essenceCostsJson =  getEssenceCostsJson();
-			if (higherDepth(essenceCostsJson, itemName) == null) {
-				String closestMatch = getClosestMatch(itemName, essenceItemNames);
-				itemName = closestMatch != null ? closestMatch : itemName;
+					if (higherDepth(getEssenceCostsJson(), itemName) == null) {
+						String closestMatch = getClosestMatch(itemName, essenceItemNames);
+						itemName = closestMatch != null ? closestMatch : itemName;
+					}
+
+					JsonElement itemJson = higherDepth(getEssenceCostsJson(), itemName);
+					if (itemJson != null) {
+						jda.addEventListener(new EssenceWaiter(itemName, itemJson, ebMessage, event.getAuthor()));
+					} else {
+						embed(invalidEmbed("Invalid item name"));
+					}
+					return;
+				} else if (args.length == 3 && (args[1].equals("info") || args[1].equals("information"))) {
+					embed(getEssenceInformation(args[2]));
+					return;
+				}
+
+				sendErrorEmbed();
 			}
-
-			JsonElement itemJson = higherDepth(essenceCostsJson, itemName);
-			if (itemJson != null) {
-				jda.addEventListener(new EssenceWaiter(itemName, itemJson, ebMessage, event.getAuthor()));
-			} else {
-				eb = defaultEmbed("Invalid item name");
-				ebMessage.editMessageEmbeds(eb.build()).queue();
-			}
-			return;
-		} else if (args.length >= 3 && (args[1].equals("info") || args[1].equals("information"))) {
-			String itemName = content.split(" ", 3)[2];
-
-			eb = getEssenceInformation(itemName);
-			ebMessage.editMessageEmbeds(eb.build()).queue();
-			return;
 		}
-
-		sendErrorEmbed();
+			.submit();
 	}
 }

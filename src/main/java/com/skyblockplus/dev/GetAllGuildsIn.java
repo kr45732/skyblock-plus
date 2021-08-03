@@ -2,17 +2,17 @@ package com.skyblockplus.dev;
 
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.defaultPaginator;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import java.util.List;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Invite;
-import net.dv8tion.jda.api.entities.Message;
 
 public class GetAllGuildsIn extends Command {
 
@@ -23,14 +23,10 @@ public class GetAllGuildsIn extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		executor.submit(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
-				String content = event.getMessage().getContentRaw();
-				String[] args = content.split(" ");
-
-				logCommand(event.getGuild(), event.getAuthor(), content);
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
 
 				if (args.length == 2) {
 					if (args[1].equals("list")) {
@@ -94,14 +90,14 @@ public class GetAllGuildsIn extends Command {
 						}
 
 						eb.addField("Total guild count without emoji servers", guildCount + " servers", false);
-
-						ebMessage.editMessageEmbeds(eb.build()).queue();
+						embed(eb);
 						return;
 					}
 				}
 
-				ebMessage.editMessageEmbeds(defaultEmbed("Invalid input").build()).queue();
+				sendErrorEmbed();
 			}
-		);
+		}
+			.submit();
 	}
 }

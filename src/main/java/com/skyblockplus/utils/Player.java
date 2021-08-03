@@ -74,11 +74,10 @@ public class Player {
 			this.profilesArray = response.response.getAsJsonArray();
 
 			if (profileIdFromName(profileName, profilesArray)) {
-				failCause = failCause.equals("Unknown fail cause") ? "Invalid profile name" : "";
+				failCause = failCause.equals("Unknown fail cause") ? "Invalid profile name" : failCause;
 				return;
 			}
 		} catch (Exception e) {
-			log.error("ign={" + username + "}, profile={" + profileName + "}", e);
 			return;
 		}
 

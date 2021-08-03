@@ -5,7 +5,6 @@ import static com.skyblockplus.Main.waiter;
 import static com.skyblockplus.features.listeners.MainListener.onApplyReload;
 import static com.skyblockplus.features.listeners.MainListener.onVerifyReload;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.invalidEmbed;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -21,10 +20,10 @@ import net.dv8tion.jda.api.interactions.components.Button;
 
 public class SetupCommandHandler {
 
-	private int state = 0;
-	private String featureType = null;
 	private final ButtonClickEvent buttonEvent;
 	private final SettingsExecute settings;
+	private int state = 0;
+	private String featureType = null;
 	private int attemptsLeft = 3;
 	private String name;
 

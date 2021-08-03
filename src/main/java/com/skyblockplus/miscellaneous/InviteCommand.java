@@ -4,6 +4,7 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.command.CommandExecute;
 import net.dv8tion.jda.api.EmbedBuilder;
 
 public class InviteCommand extends Command {
@@ -33,12 +34,14 @@ public class InviteCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		executor.submit(
-			() -> {
-				logCommand(event.getGuild(), event.getAuthor(), event.getMessage().getContentRaw());
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
 
-				event.getChannel().sendMessageEmbeds(getInvite().build()).queue();
+				embed(getInvite());
 			}
-		);
+		}
+			.submit();
 	}
 }

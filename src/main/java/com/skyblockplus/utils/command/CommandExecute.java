@@ -1,0 +1,111 @@
+package com.skyblockplus.utils.command;
+
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.Utils.*;
+
+import com.google.gson.JsonElement;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import java.util.regex.Matcher;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
+
+public abstract class CommandExecute {
+
+	protected final CommandEvent event;
+	protected final Command command;
+	protected Message ebMessage;
+	protected String[] args;
+	protected String username;
+	protected EmbedBuilder eb;
+	private boolean sendLoadingEmbed = true;
+
+	public CommandExecute(Command command, CommandEvent event) {
+		this.command = command;
+		this.event = event;
+	}
+
+	public CommandExecute(Command command, CommandEvent event, boolean sendLoadingEmbed) {
+		this.command = command;
+		this.event = event;
+		this.sendLoadingEmbed = sendLoadingEmbed;
+	}
+
+	protected abstract void execute();
+
+	public void submit() {
+		executor.submit(
+			() -> {
+				if (sendLoadingEmbed) {
+					this.ebMessage = event.getChannel().sendMessageEmbeds(loadingEmbed().build()).complete();
+				}
+				this.args = event.getMessage().getContentRaw().split("\\s+", 0);
+				execute();
+			}
+		);
+	}
+
+	protected void logCommand() {
+		com.skyblockplus.utils.Utils.logCommand(event.getGuild(), event.getAuthor(), event.getMessage().getContentRaw());
+	}
+
+	protected void setArgs(int limit) {
+		args = event.getMessage().getContentRaw().split("\\s+", limit);
+	}
+
+	protected void embed(EmbedBuilder embedBuilder) {
+		ebMessage.editMessageEmbeds(embedBuilder.build()).queue();
+	}
+
+	protected void paginate(EmbedBuilder embedBuilder) {
+		if (embedBuilder == null) {
+			ebMessage.delete().queue();
+		} else {
+			ebMessage.editMessageEmbeds(embedBuilder.build()).queue();
+		}
+	}
+
+	protected void sendErrorEmbed() {
+		ebMessage.editMessageEmbeds(errorEmbed(command.getName()).build()).queue();
+	}
+
+	/**
+	 * @return true if the command's author is not linked, false otherwise (the command's author is linked)
+	 */
+	protected boolean getAuthorUsername() {
+		return getLinkedUser(event.getAuthor().getId());
+	}
+
+	/**
+	 * @param index which arg index the mention is located at
+	 * @return true if a mention was found and the mentioned user is not linked, otherwise false (no mention found or the user is linked)
+	 */
+	protected boolean getMentionedUsername(int index) {
+		if (index == -1) {
+			return getAuthorUsername();
+		}
+
+		username = args[index];
+		Matcher matcher = Message.MentionType.USER.getPattern().matcher(args[index]);
+		if (!matcher.matches()) {
+			return false;
+		}
+
+		return getLinkedUser(matcher.group(1));
+	}
+
+	/**
+	 * @param userId the user's Discord id
+	 * @return true if the provided userId is not linked to the bot, otherwise false (the provided userId is linked)
+	 */
+	protected boolean getLinkedUser(String userId) {
+		JsonElement linkedUserUsername = higherDepth(database.getLinkedUserByDiscordId(userId), "minecraftUsername");
+		if (linkedUserUsername != null) {
+			username = linkedUserUsername.getAsString();
+			return false;
+		}
+
+		ebMessage.editMessageEmbeds(invalidEmbed("<@" + userId + "> is not linked to the bot.").build()).queue();
+		return true;
+	}
+}

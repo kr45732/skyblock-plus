@@ -1,7 +1,7 @@
 package com.skyblockplus.dungeons;
 
-import static com.skyblockplus.timeout.MessageTimeout.addMessage;
-import static com.skyblockplus.timeout.MessageTimeout.removeMessage;
+import static com.skyblockplus.utils.MessageTimeout.addMessage;
+import static com.skyblockplus.utils.MessageTimeout.removeMessage;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.Utils.higherDepth;
 

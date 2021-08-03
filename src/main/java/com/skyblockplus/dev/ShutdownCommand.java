@@ -1,11 +1,8 @@
 package com.skyblockplus.dev;
 
-import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
-import static com.skyblockplus.utils.Utils.executor;
-import static com.skyblockplus.utils.Utils.logCommand;
-
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.command.CommandExecute;
 
 public class ShutdownCommand extends Command {
 
@@ -16,12 +13,14 @@ public class ShutdownCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		executor.submit(
-			() -> {
-				logCommand(event.getGuild(), event.getAuthor(), getGuildPrefix(event.getGuild().getId()) + "d-shutdown");
+		new CommandExecute(this, event, false) {
+			@Override
+			protected void execute() {
+				logCommand();
 				event.reactWarning();
 				event.getJDA().shutdown();
 			}
-		);
+		}
+			.submit();
 	}
 }

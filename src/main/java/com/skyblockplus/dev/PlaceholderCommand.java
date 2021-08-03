@@ -1,18 +1,10 @@
 package com.skyblockplus.dev;
 
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
 
-import com.google.gson.*;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.util.HashMap;
-import java.util.Map;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
-import org.apache.commons.lang3.StringUtils;
+import com.skyblockplus.utils.command.CommandExecute;
 
 public class PlaceholderCommand extends Command {
 
@@ -24,13 +16,10 @@ public class PlaceholderCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		executor.submit(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
-				String content = event.getMessage().getContentRaw();
-				String[] args = content.split(" ");
-				logCommand(event.getGuild(), event.getAuthor(), content);
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
 
 				eb = defaultEmbed("Debug");
 				eb.addField("Total", "" + (Runtime.getRuntime().totalMemory() / 1000000.0) + " MB", false);
@@ -47,9 +36,10 @@ public class PlaceholderCommand extends Command {
 					eb.addField("GC RUN", "GC RUN", false);
 				}
 
-				ebMessage.editMessageEmbeds(eb.build()).queue();
+				embed(eb);
 			}
-		);
+		}
+			.submit();
 	}
 	//	public static void main(String[] args) {
 	//		for(String i:getEmojiMap().keySet()){

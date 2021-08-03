@@ -1,15 +1,15 @@
 package com.skyblockplus.dev;
 
 import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.makeHastePost;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
+import com.skyblockplus.utils.command.CommandExecute;
 
 public class LinkedUserDev extends Command {
 
@@ -20,29 +20,25 @@ public class LinkedUserDev extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		executor.submit(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
-				String content = event.getMessage().getContentRaw();
-				String[] args = content.split(" ");
-
-				logCommand(event.getGuild(), event.getAuthor(), content);
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
 
 				if (args.length == 4) {
 					if (args[1].equals("delete")) {
 						switch (args[2]) {
 							case "discordId":
 								database.deleteLinkedUserByDiscordId(args[3]);
-								ebMessage.editMessageEmbeds(defaultEmbed("Done").build()).queue();
+								embed(defaultEmbed("Done"));
 								return;
 							case "username":
 								database.deleteLinkedUserByMinecraftUsername(args[3]);
-								ebMessage.editMessageEmbeds(defaultEmbed("Done").build()).queue();
+								embed(defaultEmbed("Done"));
 								return;
 							case "uuid":
 								database.deleteLinkedUserByMinecraftUuid(args[3]);
-								ebMessage.editMessageEmbeds(defaultEmbed("Done").build()).queue();
+								embed(defaultEmbed("Done"));
 								return;
 						}
 					}
@@ -55,9 +51,10 @@ public class LinkedUserDev extends Command {
 					}
 				}
 
-				ebMessage.editMessageEmbeds(errorEmbed(this.name).build()).queue();
+				sendErrorEmbed();
 			}
-		);
+		}
+			.submit();
 	}
 
 	private boolean getAllLinkedUsers(CommandEvent event) {

@@ -5,10 +5,10 @@ import static com.skyblockplus.utils.Utils.*;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.command.CommandExecute;
 import java.util.Arrays;
 import java.util.Set;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 
 public class PartyFinderCommand extends Command {
 
@@ -41,26 +41,23 @@ public class PartyFinderCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		executor.submit(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
-				String content = event.getMessage().getContentRaw();
-				String[] args = content.split(" ");
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
 
-				logCommand(event.getGuild(), event.getAuthor(), content);
-
-				if (args.length == 2 || args.length == 3) {
-					if (args.length == 3) {
-						ebMessage.editMessageEmbeds(getPlayerDungeonInfo(args[1], args[2]).build()).queue();
-					} else {
-						ebMessage.editMessageEmbeds(getPlayerDungeonInfo(args[1], null).build()).queue();
+				if (args.length == 3 || args.length == 2 || args.length == 1) {
+					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
+						return;
 					}
+
+					embed(getPlayerDungeonInfo(username, args.length == 3 ? args[2] : null));
 					return;
 				}
 
-				ebMessage.editMessageEmbeds(errorEmbed(this.name).build()).queue();
+				sendErrorEmbed();
 			}
-		);
+		}
+			.submit();
 	}
 }

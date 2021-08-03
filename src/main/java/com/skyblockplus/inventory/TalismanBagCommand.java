@@ -7,6 +7,7 @@ import static com.skyblockplus.utils.Utils.*;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.InvItem;
 import com.skyblockplus.utils.structs.PaginatorExtras;
@@ -14,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 
 public class TalismanBagCommand extends Command {
 
@@ -28,36 +28,29 @@ public class TalismanBagCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		executor.submit(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
-				String content = event.getMessage().getContentRaw();
-				String[] args = content.split(" ");
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
 
-				logCommand(event.getGuild(), event.getAuthor(), content);
-
-				if (((args.length == 3) && args[2].startsWith("slot")) || ((args.length == 4) && args[3].startsWith("slot"))) {
-					if (args.length == 4) {
-						eb = getPlayerTalismansList(args[1], args[2], args[3], event);
-					} else {
-						eb = getPlayerTalismansList(args[1], null, args[2], event);
+				if (
+					((args.length == 4) && args[3].startsWith("slot")) ||
+					((args.length == 3) && args[2].startsWith("slot")) ||
+					((args.length == 2) && args[1].startsWith("slot"))
+				) {
+					if (getMentionedUsername(args.length == 2 ? -1 : 1)) {
+						return;
 					}
-
-					if (eb == null) {
-						ebMessage.delete().queue();
-					} else {
-						ebMessage.editMessageEmbeds(eb.build()).queue();
-					}
+					paginate(
+						getPlayerTalismansList(username, args.length == 4 ? args[2] : null, args.length == 4 ? args[3] : args[2], event)
+					);
 					return;
-				} else if (args.length == 2 || args.length == 3) {
-					List<String[]> playerEnderChest;
-					if (args.length == 3) {
-						playerEnderChest = getPlayerTalismansEmoji(args[1], args[2]);
-					} else {
-						playerEnderChest = getPlayerTalismansEmoji(args[1], null);
+				} else if (args.length == 3 || args.length == 2 || args.length == 1) {
+					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
+						return;
 					}
 
+					List<String[]> playerEnderChest = getPlayerTalismansEmoji(username, args.length == 3 ? args[2] : null);
 					if (playerEnderChest != null) {
 						ebMessage.delete().queue();
 						if (missingEmoji.length() > 0) {
@@ -69,14 +62,15 @@ public class TalismanBagCommand extends Command {
 
 						jda.addEventListener(new InventoryPaginator(playerEnderChest, ebMessage.getChannel(), event.getAuthor()));
 					} else {
-						ebMessage.editMessageEmbeds(invalidEmbed("Unable to fetch player data").build()).queue();
+						embed(invalidEmbed("Unable to fetch player data"));
 					}
 					return;
 				}
 
-				ebMessage.editMessageEmbeds(errorEmbed(this.name).build()).queue();
+				sendErrorEmbed();
 			}
-		);
+		}
+			.submit();
 	}
 
 	private List<String[]> getPlayerTalismansEmoji(String username, String profileName) {

@@ -6,9 +6,8 @@ import static com.skyblockplus.utils.Utils.*;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.command.CommandExecute;
 import java.util.List;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 
 public class EnderChestCommand extends Command {
 
@@ -22,23 +21,17 @@ public class EnderChestCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		executor.submit(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
-				String content = event.getMessage().getContentRaw();
-				String[] args = content.split(" ");
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
 
-				logCommand(event.getGuild(), event.getAuthor(), content);
-
-				if (args.length == 2 || args.length == 3) {
-					List<String[]> playerEnderChest;
-					if (args.length == 3) {
-						playerEnderChest = getPlayerEnderChest(args[1], args[2]);
-					} else {
-						playerEnderChest = getPlayerEnderChest(args[1], null);
+				if (args.length == 3 || args.length == 2 || args.length == 1) {
+					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
+						return;
 					}
 
+					List<String[]> playerEnderChest = getPlayerEnderChest(username, args.length == 3 ? args[2] : null);
 					if (playerEnderChest != null) {
 						ebMessage.delete().queue();
 						if (missingEmoji.length() > 0) {
@@ -50,14 +43,15 @@ public class EnderChestCommand extends Command {
 
 						jda.addEventListener(new InventoryPaginator(playerEnderChest, ebMessage.getChannel(), event.getAuthor()));
 					} else {
-						ebMessage.editMessageEmbeds(invalidEmbed("Unable to fetch player data").build()).queue();
+						embed(invalidEmbed("Unable to fetch player data"));
 					}
 					return;
 				}
 
-				ebMessage.editMessageEmbeds(errorEmbed(this.name).build()).queue();
+				sendErrorEmbed();
 			}
-		);
+		}
+			.submit();
 	}
 
 	private List<String[]> getPlayerEnderChest(String username, String profileName) {

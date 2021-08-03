@@ -1,6 +1,6 @@
 package com.skyblockplus.inventory;
 
-import static com.skyblockplus.timeout.MessageTimeout.addMessage;
+import static com.skyblockplus.utils.MessageTimeout.addMessage;
 
 import java.util.List;
 import net.dv8tion.jda.api.entities.Message;
@@ -44,15 +44,16 @@ public class InventoryPaginator extends ListenerAdapter {
 		}
 
 		if (!event.getUser().equals(user)) {
-			pagePart2.removeReaction(event.getReaction().getReactionEmote().getAsReactionCode(), event.getUser()).queue();
 			return;
 		}
 
 		if (event.getReaction().getReactionEmote().getAsReactionCode().equals("◀️")) {
+			pagePart2.removeReaction("◀️", user).queue();
 			if ((pageNumber - 1) >= 0) {
 				pageNumber -= 1;
 			}
 		} else if (event.getReaction().getReactionEmote().getAsReactionCode().equals("▶️")) {
+			pagePart2.removeReaction("▶️", user).queue();
 			if ((pageNumber + 1) <= maxPageNumber) {
 				pageNumber += 1;
 			}
@@ -60,8 +61,5 @@ public class InventoryPaginator extends ListenerAdapter {
 
 		pagePart1.editMessage(enderChestPages.get(pageNumber)[0]).complete();
 		pagePart2.editMessage(enderChestPages.get(pageNumber)[1]).complete();
-
-		pagePart2.removeReaction("◀️", user).queue();
-		pagePart2.removeReaction("▶️", user).queue();
 	}
 }

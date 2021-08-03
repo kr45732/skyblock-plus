@@ -12,16 +12,19 @@ import com.google.gson.JsonSyntaxException;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 
-public class RoleCommands extends Command {
+public class RoleCommand extends Command {
 
-	public RoleCommands() {
+	public RoleCommand() {
 		this.name = "roles";
 		this.cooldown = 10;
 		this.aliases = new String[] { "role" };
@@ -514,30 +517,19 @@ public class RoleCommands extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		executor.submit(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				String content = event.getMessage().getContentRaw();
-				MessageChannel channel = event.getChannel();
-				Message ebMessage = channel.sendMessageEmbeds(eb.build()).complete();
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
 
-				logCommand(event.getGuild(), event.getAuthor(), content);
-
-				String[] args = content.split(" ");
-				if (args.length < 2 || args.length > 3) {
-					ebMessage.editMessageEmbeds(errorEmbed(this.name).build()).queue();
+				if ((args.length == 3 || args.length == 2) && args[1].equals("claim")) {
+					embed(updateRoles(args.length == 3 ? args[2] : null, event.getGuild(), event.getMember()));
 					return;
 				}
 
-				if (!args[1].equals("claim")) {
-					ebMessage.editMessageEmbeds(errorEmbed(this.name).build()).queue();
-					return;
-				}
-
-				eb = updateRoles(args.length == 3 ? args[2] : null, event.getGuild(), event.getMember());
-
-				ebMessage.editMessageEmbeds(eb.build()).queue();
+				sendErrorEmbed();
 			}
-		);
+		}
+			.submit();
 	}
 }

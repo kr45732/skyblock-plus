@@ -12,6 +12,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.serversettings.automatedapply.ApplyRequirements;
 import com.skyblockplus.api.serversettings.automatedapply.AutomatedApply;
@@ -20,6 +21,7 @@ import com.skyblockplus.api.serversettings.automatedguild.GuildRole;
 import com.skyblockplus.api.serversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
+import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
@@ -60,17 +62,13 @@ public class SettingsExecute {
 		}
 	}
 
-	public void execute() {
-		executor.submit(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = channel.sendMessageEmbeds(eb.build()).complete();
+	public void execute(Command command, CommandEvent event) {
+		new CommandExecute(command, event) {
+			@Override
+			protected void execute() {
 				String content = message.getContentRaw();
-				String[] args = content.split(" ");
-				eb = null;
-
 				if (!content.contains("hypixel_key")) {
-					logCommand(guild, author, content);
+					logCommand();
 				}
 
 				JsonElement currentSettings = database.getServerSettings(guild.getId());
@@ -444,9 +442,10 @@ public class SettingsExecute {
 					eb = errorEmbed("settings");
 				}
 
-				ebMessage.editMessageEmbeds(eb.build()).queue();
+				embed(eb);
 			}
-		);
+		}
+			.submit();
 	}
 
 	public EmbedBuilder setHypixelKey(String newKey) {

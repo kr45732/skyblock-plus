@@ -1,13 +1,12 @@
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.globalCooldown;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.api.EmbedBuilder;
+import com.skyblockplus.utils.command.CommandExecute;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Message;
 
 public class CategoriesCommand extends Command {
 
@@ -19,21 +18,19 @@ public class CategoriesCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		executor.submit(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
-
-				logCommand(event.getGuild(), event.getAuthor(), getGuildPrefix(event.getGuild().getId()) + "categories");
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
 
 				StringBuilder ebString = new StringBuilder();
 				for (net.dv8tion.jda.api.entities.Category category : event.getGuild().getCategories()) {
 					ebString.append("\n• ").append(category.getName()).append(" --> ").append(category.getId());
 				}
 
-				eb = defaultEmbed("Guild Categories").setDescription(ebString.length() == 0 ? "None" : ebString.toString());
-				ebMessage.editMessageEmbeds(eb.build()).queue();
+				embed(defaultEmbed("Guild Categories").setDescription(ebString.length() == 0 ? "None" : ebString.toString()));
 			}
-		);
+		}
+			.submit();
 	}
 }

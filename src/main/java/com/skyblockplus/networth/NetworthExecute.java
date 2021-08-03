@@ -8,13 +8,14 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.InvItem;
 import com.skyblockplus.utils.structs.NwItemPrice;
 import java.util.*;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 
 public class NetworthExecute {
 
@@ -77,23 +78,22 @@ public class NetworthExecute {
 		return ignoredItemList.contains(s);
 	}
 
-	public void execute(CommandEvent event) {
-		executor.submit(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
-				String content = event.getMessage().getContentRaw();
-				logCommand(event.getGuild(), event.getAuthor(), content);
-
-				if (content.contains("--verbose")) {
+	public void execute(Command command, CommandEvent event) {
+		new CommandExecute(command, event) {
+			@Override
+			protected void execute() {
+				logCommand();
+				if (event.getMessage().getContentRaw().contains("--verbose")) {
 					verbose = true;
-					content = content.replace("--verbose", "").trim();
+					args = event.getMessage().getContentRaw().replace("--verbose", "").trim().split(" ");
 				}
 
-				String[] args = content.split(" ");
+				if (args.length == 3 || args.length == 2 || args.length == 1) {
+					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
+						return;
+					}
 
-				if (args.length == 2 || args.length == 3) {
-					EmbedBuilder nwEb = args.length == 2 ? getPlayerNetworth(args[1], null) : getPlayerNetworth(args[1], args[2]);
+					EmbedBuilder nwEb = getPlayerNetworth(username, args.length == 3 ? args[2] : null);
 
 					long timeP = System.currentTimeMillis();
 
@@ -119,13 +119,14 @@ public class NetworthExecute {
 							e.printStackTrace();
 						}
 					}
-					ebMessage.editMessageEmbeds(nwEb.build()).queue();
+					embed(nwEb);
 					return;
 				}
 
-				ebMessage.editMessageEmbeds(errorEmbed("networth").build()).queue();
+				sendErrorEmbed();
 			}
-		);
+		}
+			.submit();
 	}
 
 	private EmbedBuilder getPlayerNetworth(String username, String profileName) {

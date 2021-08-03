@@ -8,11 +8,11 @@ import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import java.time.Instant;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.InteractionHook;
@@ -108,38 +108,32 @@ public class BankCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		executor.submit(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
-				String content = event.getMessage().getContentRaw();
-				String[] args = content.split(" ");
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
 
-				logCommand(event.getGuild(), event.getAuthor(), content);
-
-				if ((args.length == 3 || args.length == 4) && args[1].equals("history")) {
-					if (args.length == 4) {
-						eb = getPlayerBankHistory(args[2], args[3], event.getAuthor(), event.getChannel(), null);
-					} else {
-						eb = getPlayerBankHistory(args[2], null, event.getAuthor(), event.getChannel(), null);
+				if ((args.length == 4 || args.length == 3 || args.length == 2) && args[1].equals("history")) {
+					if (getMentionedUsername(args.length == 2 ? -1 : 1)) {
+						return;
 					}
 
-					if (eb == null) {
-						ebMessage.delete().queue();
-					} else {
-						ebMessage.editMessageEmbeds(eb.build()).queue();
+					paginate(
+						getPlayerBankHistory(username, args.length == 4 ? args[3] : null, event.getAuthor(), event.getChannel(), null)
+					);
+					return;
+				} else if (args.length == 3 || args.length == 2 || args.length == 1) {
+					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
+						return;
 					}
-					return;
-				} else if (args.length == 2) {
-					ebMessage.editMessageEmbeds(getPlayerBalance(args[1], null).build()).queue();
-					return;
-				} else if (args.length == 3) {
-					ebMessage.editMessageEmbeds(getPlayerBalance(args[1], args[2]).build()).queue();
+
+					embed(getPlayerBalance(username, args.length == 3 ? args[2] : null));
 					return;
 				}
 
-				ebMessage.editMessageEmbeds(errorEmbed(this.name).build()).queue();
+				sendErrorEmbed();
 			}
-		);
+		}
+			.submit();
 	}
 }

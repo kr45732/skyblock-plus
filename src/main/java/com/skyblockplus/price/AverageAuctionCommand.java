@@ -6,12 +6,12 @@ import static com.skyblockplus.utils.Utils.*;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.command.CommandExecute;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 
 public class AverageAuctionCommand extends Command {
 
@@ -167,21 +167,20 @@ public class AverageAuctionCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		executor.submit(
-			() -> {
-				EmbedBuilder eb = loadingEmbed();
-				Message ebMessage = event.getChannel().sendMessageEmbeds(eb.build()).complete();
-				String args = event.getMessage().getContentRaw();
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
+				setArgs(2);
 
-				logCommand(event.getGuild(), event.getAuthor(), args);
-
-				if (args.split(" ").length >= 2) {
-					ebMessage.editMessageEmbeds(getAverageAuctionPrice(args.split(" ", 2)[1]).build()).queue();
+				if (args.length == 2) {
+					embed(getAverageAuctionPrice(args[1]));
 					return;
 				}
 
-				ebMessage.editMessageEmbeds(errorEmbed(this.name).build()).queue();
+				sendErrorEmbed();
 			}
-		);
+		}
+			.submit();
 	}
 }

@@ -1,11 +1,11 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.command.CommandExecute;
 import java.time.OffsetDateTime;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -64,16 +64,17 @@ public class InformationCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		executor.submit(
-			() -> {
-				logCommand(event.getGuild(), event.getAuthor(), getGuildPrefix(event.getGuild().getId()) + "information");
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
 
-				event
-					.getChannel()
-					.sendMessageEmbeds(getInformation(event.getClient().getStartTime()).build())
+				ebMessage
+					.editMessageEmbeds(getInformation(event.getClient().getStartTime()).build())
 					.setActionRows(getInformationActionRow())
 					.queue();
 			}
-		);
+		}
+			.submit();
 	}
 }

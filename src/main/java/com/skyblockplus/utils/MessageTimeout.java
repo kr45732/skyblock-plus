@@ -1,8 +1,9 @@
-package com.skyblockplus.timeout;
+package com.skyblockplus.utils;
 
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.scheduler;
 
+import com.skyblockplus.utils.structs.MessageTimeoutStruct;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Iterator;

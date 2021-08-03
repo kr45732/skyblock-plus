@@ -1,12 +1,12 @@
 package com.skyblockplus.dev;
 
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.errorEmbed;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import java.util.List;
+import com.skyblockplus.utils.command.CommandExecute;
 import java.util.concurrent.TimeUnit;
-import net.dv8tion.jda.api.entities.Message;
 
 public class DeleteMessagesCommand extends Command {
 
@@ -17,18 +17,15 @@ public class DeleteMessagesCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		executor.submit(
-			() -> {
-				String content = event.getMessage().getContentRaw();
-				String[] args = content.split(" ");
-
-				logCommand(event.getGuild(), event.getAuthor(), content);
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
 
 				if (args.length == 2) {
 					try {
 						int messageCount = Math.min(Integer.parseInt(args[1]) + 1, 100);
-						List<Message> toDelete = event.getChannel().getHistory().retrievePast(messageCount).complete();
-						event.getChannel().purgeMessages(toDelete);
+						event.getChannel().purgeMessages(event.getChannel().getHistory().retrievePast(messageCount).complete());
 
 						event
 							.getChannel()
@@ -40,8 +37,9 @@ public class DeleteMessagesCommand extends Command {
 					} catch (Exception ignored) {}
 				}
 
-				event.getChannel().sendMessageEmbeds(errorEmbed(this.name).build()).queue();
+				event.getChannel().sendMessageEmbeds(errorEmbed(name).build()).queue();
 			}
-		);
+		}
+			.submit();
 	}
 }
