@@ -1,5 +1,7 @@
 package com.skyblockplus.utils;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.gson.JsonArray;
@@ -8,14 +10,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
-
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.time.Duration;
@@ -27,8 +21,13 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
-
-import static com.skyblockplus.utils.Utils.*;
+import okhttp3.MediaType;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
 
 public class Hypixel {
 
@@ -54,7 +53,9 @@ public class Hypixel {
 
 	private static final String databaseUrl = "https://cache-skyblockplus.harperdbcloud.com";
 	private static final Pattern minecraftUsernameRegex = Pattern.compile("^\\w+$", Pattern.CASE_INSENSITIVE);
-	private static final Pattern minecraftUuidRegex = Pattern.compile("[0-9a-f]{32}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
+	private static final Pattern minecraftUuidRegex = Pattern.compile(
+		"[0-9a-f]{32}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+	);
 
 	public static boolean isValidMinecraftUsername(String username) {
 		return username.length() > 2 && username.length() < 17 && minecraftUsernameRegex.matcher(username).find();
@@ -66,7 +67,7 @@ public class Hypixel {
 
 	public static UsernameUuidStruct usernameToUuid(String username) {
 		if (!isValidMinecraftUsername(username)) {
-			if(!isValidMinecraftUuid(username)){
+			if (!isValidMinecraftUuid(username)) {
 				return new UsernameUuidStruct("No user with the name '" + username + "' was found");
 			}
 		}
