@@ -66,7 +66,7 @@ public class Constants {
 	public static final Map<String, Double[]> skillWeights = new HashMap<>();
 	public static final Map<String, Double> dungeonClassWeights = new HashMap<>();
 	public static final Map<String, Double> dungeonWeights = new HashMap<>();
-	public static final List<String> vanillaItems = new ArrayList<>();
+	//	public static final List<String> vanillaItems = new ArrayList<>();
 	public static final Map<String, String> dungeonEmojiMap = new HashMap<>();
 	public static final List<String> fetchurItems = new ArrayList<>();
 	public static final List<String> dungeonMetaItems = Arrays.asList(

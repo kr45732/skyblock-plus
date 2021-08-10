@@ -26,8 +26,7 @@ public class BidsCommand extends Command {
 			return invalidEmbed(usernameUuidStruct.failCause);
 		}
 
-		JsonArray bids = getBidsFromUuid(usernameUuidStruct.playerUuid);
-
+		JsonArray bids = getBidsFromPlayer(usernameUuidStruct.playerUuid);
 		if (bids == null || bids.size() == 0) {
 			return defaultEmbed("No bids found for " + usernameUuidStruct.playerUsername);
 		}
@@ -36,10 +35,11 @@ public class BidsCommand extends Command {
 			usernameUuidStruct.playerUsername,
 			"https://auctions.craftlink.xyz/players/" + usernameUuidStruct.playerUuid
 		);
+
 		for (JsonElement bid : bids) {
 			String auctionDesc;
 			String itemName;
-			boolean isPet = higherDepth(bid, "item_lore").getAsString().toLowerCase().contains("pet");
+			boolean isPet = higherDepth(bid, "item_id").getAsString().equals("PET");
 
 			Instant endingAt = Instant.ofEpochMilli(higherDepth(bid, "end").getAsLong());
 			Duration duration = Duration.between(Instant.now(), endingAt);
@@ -55,7 +55,7 @@ public class BidsCommand extends Command {
 
 			long highestBid = higherDepth(bid, "highest_bid_amount").getAsInt();
 			JsonArray bidsArr = higherDepth(bid, "bids").getAsJsonArray();
-			if (timeUntil.length() > 0) {
+			if (duration.toMillis() > 0) {
 				auctionDesc = "Current bid: " + simplifyNumber(highestBid);
 				auctionDesc += " | Ending in " + timeUntil;
 				auctionDesc +=

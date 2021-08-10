@@ -37,6 +37,8 @@ public class PriceCommand extends Command {
 
 		if (auctionResponse.isNotValid()) {
 			return invalidEmbed(auctionResponse.failCause);
+		} else if (auctionResponse.response.getAsJsonArray().size() == 0) {
+			return invalidEmbed("Invalid auction UUID");
 		}
 
 		JsonElement auction = auctionResponse.response.getAsJsonArray().get(0);
@@ -60,13 +62,13 @@ public class PriceCommand extends Command {
 
 			String ebStr = "**Item name:** " + itemName;
 			ebStr += "\n**Seller:** " + uuidToUsername(higherDepth(auction, "auctioneer").getAsString()).playerUsername;
-			ebStr += "\n**Command:** `/ah " + higherDepth(auction, "uuid").getAsString() + "`";
+			ebStr += "\n**Command:** `/viewauction " + higherDepth(auction, "uuid").getAsString() + "`";
 			long highestBid = higherDepth(auction, "highest_bid_amount").getAsInt();
 			long startingBid = higherDepth(auction, "starting_bid").getAsInt();
 			JsonArray bidsArr = higherDepth(auction, "bids").getAsJsonArray();
 			boolean bin = higherDepth(auction, "bin") != null;
 
-			if (timeUntil.length() > 0) {
+			if (duration.toMillis() > 0) {
 				if (bin) {
 					ebStr += "\n**BIN:** " + simplifyNumber(startingBid) + " coins | Ending in " + timeUntil;
 				} else {

@@ -1,5 +1,6 @@
 package com.skyblockplus.dungeons;
 
+import static com.skyblockplus.utils.Constants.dungeonMetaItems;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
@@ -26,9 +27,7 @@ public class PartyFinderCommand extends Command {
 			eb.appendDescription("\n**Secrets:** " + formatNumber(player.getDungeonSecrets()));
 			eb.appendDescription("\n**Selected Class:** " + player.getSelectedDungeonClass());
 			eb.appendDescription(player.getFastestF7Time());
-			Set<String> necronBlade = player.getItemsPlayerHas(
-				Arrays.asList("HYPERION", "VALKYRIE", "SCYLLA", "AXE_OF_THE_SHREDDED", "JUJU_SHORTBOW", "TERMINATOR")
-			);
+			Set<String> necronBlade = player.getItemsPlayerHas(dungeonMetaItems);
 			eb.appendDescription(
 				"\n**Meta Items player has:** " +
 				(necronBlade != null ? (necronBlade.size() > 0 ? String.join(", ", necronBlade) : "None") : "Inventory API disabled")

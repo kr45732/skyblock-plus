@@ -1,6 +1,8 @@
 package com.skyblockplus.utils;
 
+import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.Hypixel.playerFromUuid;
 import static com.skyblockplus.utils.Hypixel.usernameToUuid;
 import static com.skyblockplus.utils.command.CustomPaginator.throwableConsumer;
@@ -8,11 +10,12 @@ import static java.lang.String.join;
 import static java.util.Collections.nCopies;
 
 import club.minnced.discord.webhook.external.JDAWebhookClient;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
+import com.skyblockplus.features.apply.ApplyGuild;
+import com.skyblockplus.features.apply.ApplyUser;
+import com.skyblockplus.features.listeners.AutomaticGuild;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.exceptionhandlers.ExceptionExecutor;
 import com.skyblockplus.utils.structs.*;
@@ -200,7 +203,7 @@ public class Utils {
 
 	public static JsonElement getBitsJson() {
 		if (bitsJson == null) {
-			bitsJson = getJson("https://raw.githubusercontent.com/SkyKings-Guild/SkyKings/main/bot-data/bit-prices.json");
+			bitsJson = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/BitPricesJson.json");
 		}
 
 		return bitsJson;
@@ -367,15 +370,6 @@ public class Utils {
 		return null;
 	}
 
-	public static String makeJsonHastePost(String body) {
-		String url = makeHastePost(body);
-		if (url == null) {
-			return null;
-		}
-
-		return "https://hst.sh/raw/" + url.split("https://hst.sh/")[1] + ".json";
-	}
-
 	public static DiscordInfoStruct getPlayerDiscordInfo(String username) {
 		try {
 			UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
@@ -442,7 +436,11 @@ public class Utils {
 		}
 
 		EmbedBuilder eb = defaultEmbed(null);
-		eb.setAuthor(guild.getName() + " (" + guild.getId() + ")", null, guild.getIconUrl());
+
+		if (guild != null) {
+			eb.setAuthor(guild.getName() + " (" + guild.getId() + ")", null, guild.getIconUrl());
+		}
+
 		if (commandInput.length() > 1024) {
 			eb.addField(user.getName() + " (" + user.getId() + ")", makeHastePost(commandInput) + ".json", false);
 		} else {
@@ -472,9 +470,7 @@ public class Utils {
 			botLogChannel = jda.getGuildById("796790757947867156").getTextChannelById("818469899848515624");
 		}
 
-		EmbedBuilder eb = defaultEmbed(null);
-		eb.setDescription(commandInput);
-		botLogChannel.sendMessageEmbeds(eb.build()).queue();
+		botLogChannel.sendMessageEmbeds(defaultEmbed(null).setDescription(commandInput).build()).queue();
 	}
 
 	/* Embeds and paginators */
@@ -602,6 +598,19 @@ public class Utils {
 		}
 	}
 
+	public static int higherDepth(JsonElement element, String path, int defaultVal) {
+		String[] paths = path.split("\\.");
+
+		try {
+			for (String key : paths) {
+				element = element.getAsJsonObject().get(key);
+			}
+			return element.getAsInt();
+		} catch (Exception e) {
+			return defaultVal;
+		}
+	}
+
 	public static String toRomanNumerals(int number) {
 		return join("", nCopies(number, "i")).replace("iiiii", "v").replace("iiii", "iv").replace("vv", "x").replace("viv", "ix");
 	}
@@ -624,12 +633,8 @@ public class Utils {
 
 	public static String nameToId(String itemName) {
 		if (internalJsonMappings == null) {
-			try {
-				internalJsonMappings =
-					JsonParser
-						.parseReader(new FileReader("src/main/java/com/skyblockplus/json/InternalNameMappings.json"))
-						.getAsJsonObject();
-			} catch (Exception ignored) {}
+			internalJsonMappings =
+				getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json").getAsJsonObject();
 		}
 
 		String internalName = itemName
@@ -672,8 +677,7 @@ public class Utils {
 		if (internalJsonMappings == null) {
 			try {
 				internalJsonMappings =
-					JsonParser
-						.parseReader(new FileReader("src/main/java/com/skyblockplus/json/InternalNameMappings.json"))
+					getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json")
 						.getAsJsonObject();
 			} catch (Exception ignored) {}
 		}
@@ -743,55 +747,6 @@ public class Utils {
 				return "\uD83C\uDF49";
 			case "zucchini":
 				return "zucchini:828636746358194206";
-			default:
-				return null;
-		}
-	}
-
-	public static String emojiToProfileName(String emoji) {
-		switch (emoji) {
-			case "\uD83C\uDF4E":
-				return "apple";
-			case "\uD83C\uDF4C":
-				return "banana";
-			case "\uD83E\uDED0":
-				return "blueberry";
-			case "\uD83E\uDD65":
-				return "coconut";
-			case "\uD83E\uDD52":
-				return "cucumber";
-			case "\uD83C\uDF47":
-				return "grapes";
-			case "\uD83E\uDD5D":
-				return "kiwi";
-			case "\uD83C\uDF4B":
-				return "lemon";
-			case "lime:828632854174498837":
-				return "lime";
-			case "\uD83E\uDD6D":
-				return "mango";
-			case "orange:828634110360289331":
-				return "orange";
-			case "papaya:828633125370200085":
-				return "papaya";
-			case "\uD83C\uDF51":
-				return "peach";
-			case "\uD83C\uDF50":
-				return "pear";
-			case "\uD83C\uDF4D":
-				return "pineapple";
-			case "pomegranate:828632397032456232":
-				return "pomegranate";
-			case "raspberry:828632035127853064":
-				return "raspberry";
-			case "\uD83C\uDF53":
-				return "strawberry";
-			case "\uD83C\uDF45":
-				return "tomato";
-			case "\uD83C\uDF49":
-				return "watermelon";
-			case "zucchini:828636746358194206":
-				return "zucchini";
 			default:
 				return null;
 		}
@@ -980,5 +935,131 @@ public class Utils {
 		} catch (Exception ignored) {}
 
 		return null;
+	}
+
+	public static void cacheApplyGuildUsers() {
+		if (!DEFAULT_PREFIX.equals("+")) {
+			return;
+		}
+
+		long startTime = System.currentTimeMillis();
+		for (Map.Entry<String, AutomaticGuild> automaticGuild : guildMap.entrySet()) {
+			List<ApplyGuild> applySettings = automaticGuild.getValue().applyGuild;
+			for (ApplyGuild applySetting : applySettings) {
+				try {
+					database.deleteApplyCacheSettings(
+						automaticGuild.getKey(),
+						higherDepth(applySetting.currentSettings, "name").getAsString()
+					);
+					List<ApplyUser> applyUserList = applySetting.applyUserList;
+					if (applyUserList.size() > 0) {
+						int code = database.setApplyCacheSettings(
+							automaticGuild.getKey(),
+							higherDepth(applySetting.currentSettings, "name").getAsString(),
+							new Gson().toJson(applyUserList)
+						);
+
+						if (code == 200) {
+							log.info("Successfully cached ApplyUser | " + automaticGuild.getKey() + " | " + applyUserList.size());
+						}
+					}
+				} catch (Exception e) {
+					log.error("cacheApplyGuildUsers - " + automaticGuild.getKey(), e);
+				}
+			}
+		}
+		log.info("Cached apply users in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
+	}
+
+	public static List<ApplyUser> getApplyGuildUsersCache(String guildId, String name) {
+		if (!DEFAULT_PREFIX.equals("+")) {
+			return new ArrayList<>();
+		}
+
+		JsonArray applyUsersCache = database.getApplyCacheSettings(guildId, name);
+
+		try {
+			List<ApplyUser> applyUsersCacheList = new ArrayList<>();
+			for (JsonElement applyUserCache : applyUsersCache) {
+				ApplyUser currentApplyUserCache = new Gson().fromJson(applyUserCache, ApplyUser.class);
+				applyUsersCacheList.add(currentApplyUserCache);
+			}
+			if (applyUsersCacheList.size() > 0) {
+				log.info("Retrieved cache (" + applyUsersCacheList.size() + ") - guildId={" + guildId + "}, name={" + name + "}");
+				database.deleteApplyCacheSettings(guildId, name);
+				return applyUsersCacheList;
+			}
+		} catch (Exception e) {
+			log.error("getApplyGuildUsersCache(guildId={" + guildId + "}, name={" + name + "})", e);
+		}
+
+		return new ArrayList<>();
+	}
+
+	public static void scheduleUpdateLinkedAccounts() {
+		ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+		scheduler.scheduleWithFixedDelay(Utils::updateLinkedAccounts, 1, 1, TimeUnit.MINUTES);
+	}
+
+	public static void closeAsyncHttpClient() {
+		try {
+			asyncHttpClient.close();
+			log.info("Successfully Closed Async Http Client");
+		} catch (Exception e) {
+			log.error("closeAsyncHttpClient()", e);
+		}
+	}
+
+	public static void closeHttpClient() {
+		try {
+			httpClient.close();
+			log.info("Successfully Closed Http Client");
+		} catch (Exception e) {
+			log.error("closeHttpClient()", e);
+		}
+	}
+
+	public static void updateLinkedAccounts() {
+		try {
+			database
+				.getLinkedUsers()
+				.stream()
+				.filter(
+					linkedAccountModel ->
+						Duration
+							.between(Instant.ofEpochMilli(Long.parseLong(linkedAccountModel.getLastUpdated())), Instant.now())
+							.toDays() >
+						1
+				)
+				.findAny()
+				.ifPresent(
+					notUpdated -> {
+						try {
+							DiscordInfoStruct discordInfo = getPlayerDiscordInfo(notUpdated.getMinecraftUsername());
+							User updateUser = jda.retrieveUserById(notUpdated.getDiscordId()).complete();
+							if (discordInfo.discordTag.equals(updateUser.getAsTag())) {
+								database.addLinkedUser(
+									new LinkedAccountModel(
+										"" + Instant.now().toEpochMilli(),
+										updateUser.getId(),
+										discordInfo.minecraftUuid,
+										discordInfo.minecraftUsername
+									)
+								);
+								try {
+									logCommand("Updated linked user: " + notUpdated.getMinecraftUsername());
+								} catch (Exception ignored) {}
+								return;
+							}
+						} catch (Exception ignored) {}
+						database.deleteLinkedUserByMinecraftUsername(notUpdated.getMinecraftUsername());
+						try {
+							logCommand("Error updating linked user: " + notUpdated.getMinecraftUsername());
+						} catch (Exception ignored) {}
+					}
+				);
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		}
 	}
 }

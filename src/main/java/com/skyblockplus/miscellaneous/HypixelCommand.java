@@ -6,10 +6,11 @@ import static com.skyblockplus.utils.Utils.*;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.HypixelPlayer;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.HypixelResponse;
-import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.time.Instant;
+import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
 
 public class HypixelCommand extends Command {
@@ -20,25 +21,17 @@ public class HypixelCommand extends Command {
 	}
 
 	public static EmbedBuilder getParkourStats(String username) {
-		UsernameUuidStruct usernameUuid = usernameToUuid(username);
-		if (usernameUuid.isNotValid()) {
-			return invalidEmbed(usernameUuid.failCause);
-		}
-
-		HypixelResponse hypixelJson = playerFromUuid(usernameUuid.playerUuid);
-		if (hypixelJson.isNotValid()) {
-			return invalidEmbed(hypixelJson.failCause);
+		HypixelPlayer player = new HypixelPlayer(username);
+		if (!player.isValid()) {
+			return invalidEmbed(player.getFailCause());
 		}
 
 		try {
-			EmbedBuilder eb = defaultEmbed(
-				usernameUuid.playerUsername,
-				"https://plancke.io/hypixel/player/stats/" + usernameUuid.playerUuid
-			);
+			EmbedBuilder eb = player.getDefaultEmbed();
 			StringBuilder parkourCompletionString = new StringBuilder();
-			for (String parkourLocation : getJsonKeys(hypixelJson.get("parkourCompletions"))) {
+			for (String parkourLocation : getJsonKeys(player.get("parkourCompletions"))) {
 				int fastestTime = -1;
-				for (JsonElement parkourTime : hypixelJson.get("parkourCompletions." + parkourLocation).getAsJsonArray()) {
+				for (JsonElement parkourTime : player.get("parkourCompletions." + parkourLocation).getAsJsonArray()) {
 					if (higherDepth(parkourTime, "timeTook").getAsInt() > fastestTime) {
 						fastestTime = higherDepth(parkourTime, "timeTook").getAsInt();
 					}
@@ -57,118 +50,75 @@ public class HypixelCommand extends Command {
 	}
 
 	public static EmbedBuilder getHypixelStats(String username) {
-		UsernameUuidStruct usernameUuid = usernameToUuid(username);
-		if (usernameUuid.isNotValid()) {
-			return invalidEmbed(usernameUuid.failCause);
+		HypixelPlayer player = new HypixelPlayer(username);
+		if (!player.isValid()) {
+			return invalidEmbed(player.getFailCause());
 		}
 
-		HypixelResponse hypixelResponse = playerFromUuid(usernameUuid.playerUuid);
-		if (hypixelResponse.isNotValid()) {
-			return invalidEmbed(hypixelResponse.failCause);
-		}
-		EmbedBuilder eb = defaultEmbed(usernameUuid.playerUsername, "https://plancke.io/hypixel/player/stats/" + usernameUuid.playerUuid);
+		EmbedBuilder eb = player.getDefaultEmbed();
+		if (player.isOnline()) {
+			eb.addField("Status", "🟢", true);
+		} else {
+			eb.addField("Status", "🔴", true);
 
-		JsonElement hypixelJson = hypixelResponse.response;
+			if (player.getLastLogin() != null) {
+				eb.addField("Last Login", "<t:" + player.getLastLogin().getEpochSecond() + ">", true);
+			}
+		}
+
+		if (player.getFirstLogin() != null) {
+			eb.addField("First Login", "<t:" + player.getFirstLogin().getEpochSecond() + ":D>", true);
+		}
+
+		eb.addField("Hypixel Level", roundAndFormat(player.getHypixelLevel()), true);
+		eb.addField("Hypixel Rank", player.getRank(), true);
+
 		try {
-			if (higherDepth(hypixelJson, "lastLogin").getAsInt() > higherDepth(hypixelJson, "lastLogout").getAsInt()) {
-				eb.addField("Online", "🟢", true);
-			} else {
-				eb.addField("Status", "🔴", true);
-
+			for (Map.Entry<String, JsonElement> socialMedia : player.getSocialMediaLinks().entrySet()) {
 				eb.addField(
-					"Last Updated",
-					"<t:" + Instant.ofEpochMilli(higherDepth(hypixelJson, "lastLogout").getAsLong()).getEpochSecond() + ">",
+					socialMedia.getKey().equals("HYPIXEL") ? "Hypixel Forums" : capitalizeString(socialMedia.getValue().getAsString()),
+					socialMedia.getValue().getAsString().contains("http")
+						? "[Link](" + socialMedia.getValue().getAsString() + ")"
+						: socialMedia.getValue().getAsString(),
 					true
 				);
 			}
 		} catch (Exception ignored) {}
 
 		try {
-			eb.addField(
-				"First Login",
-				"<t:" + Instant.ofEpochMilli(higherDepth(hypixelJson, "firstLogin").getAsLong()).getEpochSecond() + ":D>",
-				true
-			);
+			eb.addField("Most Recent Lobby", capitalizeString(player.get("mostRecentGameType").getAsString().toLowerCase()), true);
 		} catch (Exception ignored) {}
 
-		double networkLevel = (Math.sqrt((2 * higherDepth(hypixelJson, "networkExp").getAsLong()) + 30625) / 50) - 2.5;
-		eb.addField("Hypixel Level", roundAndFormat(networkLevel), true);
+		HypixelResponse guildResponse = getGuildFromPlayer(player.getUuid());
+		if (!guildResponse.isNotValid()) {
+			eb.addField("Guild", guildResponse.get("name").getAsString(), true);
 
-		String hypixelRank = "None";
-		if (higherDepth(hypixelJson, "rank") != null && !higherDepth(hypixelJson, "rank").getAsString().equals("NORMAL")) {
-			hypixelRank = capitalizeString(higherDepth(hypixelJson, "rank").getAsString());
-		} else if (
-			higherDepth(hypixelJson, "monthlyPackageRank") != null &&
-			higherDepth(hypixelJson, "monthlyPackageRank").getAsString().equals("SUPERSTAR")
-		) {
-			hypixelRank = "MVP++";
-		} else if (
-			higherDepth(hypixelJson, "newPackageRank") != null && !higherDepth(hypixelJson, "newPackageRank").getAsString().equals("NONE")
-		) {
-			hypixelRank = higherDepth(hypixelJson, "newPackageRank").getAsString().replace("PLUS", "+").replace("_", "");
-		} else if (
-			higherDepth(hypixelJson, "packageRank") != null && !higherDepth(hypixelJson, "packageRank").getAsString().equals("NONE")
-		) {
-			hypixelRank = higherDepth(hypixelJson, "packageRank").getAsString().replace("PLUS", "+").replace("_", "");
-		}
-
-		eb.addField("Hypixel Rank", hypixelRank, true);
-
-		try {
-			for (String socialMedia : getJsonKeys(higherDepth(hypixelJson, "socialMedia.links"))) {
-				String currentSocialMediaLink = higherDepth(higherDepth(hypixelJson, "socialMedia.links"), socialMedia).getAsString();
-				eb.addField(
-					socialMedia.equals("HYPIXEL") ? "Hypixel Forums" : capitalizeString(socialMedia.toLowerCase()),
-					currentSocialMediaLink.contains("http") ? "[Link](" + currentSocialMediaLink + ")" : currentSocialMediaLink,
-					true
-				);
-			}
-		} catch (Exception ignored) {}
-
-		try {
-			eb.addField(
-				"Most Recent Lobby",
-				capitalizeString(higherDepth(hypixelJson, "mostRecentGameType").getAsString().toLowerCase()),
-				true
-			);
-		} catch (Exception ignored) {}
-
-		try {
-			HypixelResponse guildResponse = getGuildFromPlayer(usernameUuid.playerUuid);
-			if (!guildResponse.isNotValid()) {
-				eb.addField("Guild", guildResponse.get("name").getAsString(), true);
-
-				for (JsonElement member : guildResponse.get("members").getAsJsonArray()) {
-					if (higherDepth(member, "uuid").getAsString().equals(usernameUuid.playerUuid)) {
-						eb.addField(
-							"Guild Rank",
-							higherDepth(member, "rank").getAsString().equals("GUILDMASTER")
-								? "Guild Master"
-								: higherDepth(member, "rank").getAsString(),
-							true
-						);
-						eb.addField(
-							"Joined Guild",
-							"<t:" + Instant.ofEpochMilli(higherDepth(member, "joined").getAsLong()).getEpochSecond() + ":D>",
-							true
-						);
-					}
+			for (JsonElement member : guildResponse.get("members").getAsJsonArray()) {
+				if (higherDepth(member, "uuid").getAsString().equals(player.getUuid())) {
+					eb.addField(
+						"Guild Rank",
+						higherDepth(member, "rank").getAsString().equals("GUILDMASTER")
+							? "Guild Master"
+							: higherDepth(member, "rank").getAsString(),
+						true
+					);
+					eb.addField(
+						"Joined Guild",
+						"<t:" + Instant.ofEpochMilli(higherDepth(member, "joined").getAsLong()).getEpochSecond() + ":D>",
+						true
+					);
+					break;
 				}
 			}
-		} catch (Exception ignored) {}
+		}
 
-		try {
-			eb.addField("Karma", formatNumber(higherDepth(hypixelJson, "karma").getAsLong()), true);
-		} catch (Exception ignored) {}
-
-		try {
-			eb.addField("Achievement Points", formatNumber(higherDepth(hypixelJson, "achievementPoints").getAsLong()), true);
-		} catch (Exception ignored) {}
+		eb.addField("Karma", formatNumber(player.getKarma()), true);
+		eb.addField("Achievement Points", formatNumber(player.getAchievementPoints()), true);
 
 		StringBuilder namesString = new StringBuilder();
-		for (JsonElement name : higherDepth(getJson("https://api.ashcon.app/mojang/v2/user/" + usernameUuid.playerUuid), "username_history")
+		for (JsonElement name : higherDepth(getJson("https://api.ashcon.app/mojang/v2/user/" + player.getUuid()), "username_history")
 			.getAsJsonArray()) {
-			if (!higherDepth(name, "username").getAsString().equals(usernameUuid.playerUsername)) {
+			if (!higherDepth(name, "username").getAsString().equals(player.getUsername())) {
 				namesString.append("• ").append(higherDepth(name, "username").getAsString()).append("\n");
 			}
 		}
@@ -177,69 +127,68 @@ public class HypixelCommand extends Command {
 		}
 
 		String skyblockItems = "";
-		if (higherDepth(hypixelJson, "skyblock_free_cookie") != null) {
+		if (player.get("skyblock_free_cookie") != null) {
 			skyblockItems +=
 				"• Free booster cookie: " +
 				"<t:" +
-				Instant.ofEpochMilli(higherDepth(hypixelJson, "skyblock_free_cookie").getAsLong()).getEpochSecond() +
+				Instant.ofEpochMilli(player.get("skyblock_free_cookie").getAsLong()).getEpochSecond() +
 				":d>" +
 				"\n";
 		}
 
-		if (higherDepth(hypixelJson, "scorpius_bribe_96") != null) {
+		if (player.get("scorpius_bribe_96") != null) {
 			skyblockItems +=
 				"• Scorpius Bribe (Year 96): " +
 				"<t:" +
-				Instant.ofEpochMilli(higherDepth(hypixelJson, "scorpius_bribe_96").getAsLong()).getEpochSecond() +
+				Instant.ofEpochMilli(player.get("scorpius_bribe_96").getAsLong()).getEpochSecond() +
 				":d>" +
 				"\n";
 		}
 
-		if (higherDepth(hypixelJson, "scorpius_bribe_120") != null) {
+		if (player.get("scorpius_bribe_120") != null) {
 			skyblockItems +=
 				"• Scorpius Bribe (Year 120): " +
 				"<t:" +
-				Instant.ofEpochMilli(higherDepth(hypixelJson, "scorpius_bribe_120").getAsLong()).getEpochSecond() +
+				Instant.ofEpochMilli(player.get("scorpius_bribe_120").getAsLong()).getEpochSecond() +
 				":d>" +
 				"\n";
 		}
 
-		if (higherDepth(hypixelJson, "claimed_potato_talisman") != null) {
+		if (player.get("claimed_potato_talisman") != null) {
 			skyblockItems +=
 				"• Potato Talisman: " +
 				"<t:" +
-				Instant.ofEpochMilli(higherDepth(hypixelJson, "claimed_potato_talisman").getAsLong()).getEpochSecond() +
+				Instant.ofEpochMilli(player.get("claimed_potato_talisman").getAsLong()).getEpochSecond() +
 				":d>" +
 				"\n";
 		}
 
-		if (higherDepth(hypixelJson, "claimed_potato_basket") != null) {
+		if (player.get("claimed_potato_basket") != null) {
 			skyblockItems +=
 				"• Potato Basket: " +
 				"<t:" +
-				Instant.ofEpochMilli(higherDepth(hypixelJson, "claimed_potato_basket").getAsLong()).getEpochSecond() +
+				Instant.ofEpochMilli(player.get("claimed_potato_basket").getAsLong()).getEpochSecond() +
 				":d>" +
 				"\n";
 		}
 
-		if (higherDepth(hypixelJson, "claim_potato_war_crown") != null) {
+		if (player.get("claim_potato_war_crown") != null) {
 			skyblockItems +=
 				"• Potato War Crown: " +
 				"<t:" +
-				Instant.ofEpochMilli(higherDepth(hypixelJson, "claim_potato_war_crown").getAsLong()).getEpochSecond() +
+				Instant.ofEpochMilli(player.get("claim_potato_war_crown").getAsLong()).getEpochSecond() +
 				":d>" +
 				"\n";
 		}
 
 		if (skyblockItems.length() > 0) {
-			eb.addField("Skyblock Misc", skyblockItems, true);
+			eb.addField("Skyblock", skyblockItems, true);
 		}
 
 		int fillGap = 3 - ((eb.getFields().size() % 3) == 0 ? 3 : (eb.getFields().size() % 3));
 		for (int i = 0; i < fillGap; i++) {
 			eb.addBlankField(true);
 		}
-		eb.setThumbnail("https://cravatar.eu/helmavatar/" + usernameUuid.playerUuid + "/64.png");
 		return eb;
 	}
 

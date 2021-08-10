@@ -23,14 +23,16 @@ public class NetworthExecute {
 		"skyblock_menu",
 		"snow",
 		"wood",
-		"zombie_commander_whip",
-		"zombie_talisman",
 		"smooth_brick",
 		"none",
 		"redstone_torch_on",
 		"book",
 		"paper",
-		"vine"
+		"vine",
+		"tnt",
+		"arrow",
+		"tripwire_hook",
+		"infinite_superboom_tnt"
 	);
 	private final Set<String> tempSet = new HashSet<>();
 	private final List<InvItem> invPets = new ArrayList<>();

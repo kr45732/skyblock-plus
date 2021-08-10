@@ -1,6 +1,5 @@
 package com.skyblockplus;
 
-import static com.skyblockplus.utils.MainClassUtils.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;

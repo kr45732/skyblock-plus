@@ -2,7 +2,7 @@ package com.skyblockplus.features.apply;
 
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.utils.MainClassUtils.getApplyGuildUsersCache;
+import static com.skyblockplus.utils.Utils.getApplyGuildUsersCache;
 import static com.skyblockplus.utils.Utils.higherDepth;
 
 import com.google.gson.JsonElement;

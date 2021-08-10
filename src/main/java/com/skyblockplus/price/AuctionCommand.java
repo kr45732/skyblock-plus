@@ -70,7 +70,7 @@ public class AuctionCommand extends Command {
 
 				long highestBid = higherDepth(currentAuction, "highest_bid_amount").getAsInt();
 				long startingBid = higherDepth(currentAuction, "starting_bid").getAsInt();
-				if (timeUntil.length() > 0) {
+				if (duration.toMillis() > 0) {
 					if (bin) {
 						auction = "BIN: " + simplifyNumber(startingBid) + " coins";
 						totalPendingValue += startingBid;
@@ -161,13 +161,13 @@ public class AuctionCommand extends Command {
 
 		String ebStr = "**Item name:** " + itemName;
 		ebStr += "\n**Seller:** " + uuidToUsername(higherDepth(auctionJson, "auctioneer").getAsString()).playerUsername;
-		ebStr += "\n**Command:** `/ah " + higherDepth(auctionJson, "uuid").getAsString() + "`";
+		ebStr += "\n**Command:** `/viewauction " + higherDepth(auctionJson, "uuid").getAsString() + "`";
 		long highestBid = higherDepth(auctionJson, "highest_bid_amount").getAsInt();
 		long startingBid = higherDepth(auctionJson, "starting_bid").getAsInt();
 		JsonArray bidsArr = higherDepth(auctionJson, "bids").getAsJsonArray();
 		boolean bin = higherDepth(auctionJson, "bin") != null;
 
-		if (timeUntil.length() > 0) {
+		if (duration.toMillis() > 0) {
 			if (bin) {
 				ebStr += "\n**BIN:** " + simplifyNumber(startingBid) + " coins | Ending in " + timeUntil;
 			} else {

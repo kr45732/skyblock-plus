@@ -47,7 +47,7 @@ public class VerifyGuild {
 			}
 		}
 
-		event.getMessage().delete().queueAfter(7, TimeUnit.SECONDS);
+		event.getMessage().delete().queueAfter(10, TimeUnit.SECONDS);
 		return true;
 	}
 }
