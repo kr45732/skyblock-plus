@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.interactions.components.Button;
 
 public class ApplyUser implements Serializable {
 
@@ -418,13 +419,8 @@ public class ApplyUser implements Serializable {
 			try {
 				TextChannel waitInviteChannel = jda.getTextChannelById(higherDepth(currentSettings, "waitingChannelId").getAsString());
 				waitInviteChannel
-					.sendMessageEmbeds(
-						defaultEmbed("Waiting for invite")
-							.setDescription("`" + playerUsername + "`\n\n" + "**React with ✅ to delete this message**")
-							.build()
-					)
-					.complete()
-					.addReaction("✅")
+					.sendMessageEmbeds(defaultEmbed("Waiting for invite").setDescription("`" + playerUsername + "`").build())
+					.setActionRow(Button.success("apply_user_" + higherDepth(currentSettings, "name").getAsString(), "Invited"))
 					.queue();
 			} catch (Exception ignored) {}
 
@@ -465,13 +461,8 @@ public class ApplyUser implements Serializable {
 				try {
 					TextChannel waitInviteChannel = jda.getTextChannelById(higherDepth(currentSettings, "waitingChannelId").getAsString());
 					waitInviteChannel
-						.sendMessageEmbeds(
-							defaultEmbed("Waiting for invite")
-								.setDescription("`" + playerUsername + "`\n\n" + "**React with ✅ to delete this message**")
-								.build()
-						)
-						.complete()
-						.addReaction("✅")
+						.sendMessageEmbeds(defaultEmbed("Waiting for invite").setDescription("`" + playerUsername + "`").build())
+						.setActionRow(Button.success("apply_user_" + higherDepth(currentSettings, "name").getAsString(), "Invited"))
 						.queue();
 				} catch (Exception ignored) {}
 

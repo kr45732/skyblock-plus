@@ -9,6 +9,7 @@ import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
@@ -42,35 +43,7 @@ public class ApplyGuild {
 			return;
 		}
 
-		if (onMessageReactionAdd_ExistingApplyUser(event)) {
-			return;
-		}
-
-		onMessageReactionAdd_WaitingForInviteApplyUser(event);
-	}
-
-	private void onMessageReactionAdd_WaitingForInviteApplyUser(MessageReactionAddEvent event) {
-		if (event.getUser().isBot()) {
-			return;
-		}
-
-		if (!event.getChannel().equals(waitInviteChannel)) {
-			return;
-		}
-
-		if (!event.getReactionEmote().getName().equals("✅")) {
-			return;
-		}
-
-		Message msg = waitInviteChannel.retrieveMessageById(event.getMessageId()).complete();
-
-		if (!msg.getAuthor().getId().equals(jda.getSelfUser().getId())) {
-			return;
-		}
-
-		msg.clearReactions().complete();
-
-		msg.delete().queueAfter(3, TimeUnit.SECONDS);
+		onMessageReactionAdd_ExistingApplyUser(event);
 	}
 
 	public boolean onMessageReactionAdd_ExistingApplyUser(MessageReactionAddEvent event) {
@@ -167,6 +140,36 @@ public class ApplyGuild {
 	}
 
 	public String onButtonClick(ButtonClickEvent event) {
+		String waitingForInvite = onButtonClick_WaitingForInviteApplyUser(event);
+		if (waitingForInvite != null) {
+			return waitingForInvite;
+		}
+
 		return onMessageReactionAdd_NewApplyUser(event);
+	}
+
+	public String onButtonClick_WaitingForInviteApplyUser(ButtonClickEvent event) {
+		if (!event.getChannel().equals(waitInviteChannel)) {
+			return null;
+		}
+
+		if (!event.getComponentId().equals("apply_user_" + higherDepth(currentSettings, "name").getAsString())) {
+			return null;
+		}
+
+		if (
+			!(
+				event
+					.getMember()
+					.getRoles()
+					.contains(event.getGuild().getRoleById(higherDepth(currentSettings, "staffPingRoleId").getAsString())) ||
+				event.getMember().hasPermission(Permission.ADMINISTRATOR)
+			)
+		) {
+			return "❌ You are missing the required permissions in this Guild to use that!";
+		}
+
+		event.getMessage().delete().queueAfter(3, TimeUnit.SECONDS);
+		return "✅ Player was invited";
 	}
 }
