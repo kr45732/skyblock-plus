@@ -1,17 +1,11 @@
 package com.skyblockplus.api.miscellaneous;
 
-import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import club.minnced.discord.webhook.WebhookClientBuilder;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.skyblockplus.api.templates.ErrorTemplate;
-import com.skyblockplus.api.templates.Template;
-import com.skyblockplus.utils.Constants;
 import java.awt.*;
-import java.util.List;
-import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +19,7 @@ public class CommandEndpoints {
 
 	private static final Logger log = LoggerFactory.getLogger(CommandEndpoints.class);
 
+	/*
 	@GetMapping("/essence/information")
 	public ResponseEntity<?> getEssenceInformation(@RequestParam(value = "key") String key, @RequestParam(value = "name") String name) {
 		try {
@@ -237,6 +232,13 @@ public class CommandEndpoints {
 		}
 	}
 
+	private long getAvgPrice(JsonElement itemJson) {
+		return higherDepth(itemJson, "clean_price") != null
+			? higherDepth(itemJson, "clean_price").getAsLong()
+			: higherDepth(itemJson, "price").getAsLong();
+	}
+*/
+
 	@PostMapping("/heroku")
 	public ResponseEntity<?> herokuToDiscordWebhook(
 		@RequestBody Object body,
@@ -292,12 +294,5 @@ public class CommandEndpoints {
 		webhookClient.send(eb.setDescription(description).build());
 
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-	}
-
-	/* Utils */
-	private long getAvgPrice(JsonElement itemJson) {
-		return higherDepth(itemJson, "clean_price") != null
-			? higherDepth(itemJson, "clean_price").getAsLong()
-			: higherDepth(itemJson, "price").getAsLong();
 	}
 }

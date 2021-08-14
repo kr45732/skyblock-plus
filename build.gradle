@@ -33,17 +33,19 @@ repositories {
 
 dependencies {
     // JDA (Discord API wrapper)
-     implementation ('net.dv8tion:JDA:4.3.0_303') {
+     implementation ('net.dv8tion:JDA:4.3.0_309') {
          exclude module: 'opus-java'
      }
-    implementation "club.minnced:discord-webhooks:0.5.7"
+
+    // Discord webhooks
+    implementation 'club.minnced:discord-webhooks:0.5.8'
+
+    // JDA utilities
+    implementation 'com.jagrosh:jda-utilities:3.0.5'
 
     // Google libraries
     implementation 'com.google.code.gson:gson:2.8.7'
     implementation 'com.google.guava:guava:30.1.1-jre'
-
-    // JDA addon
-    implementation 'com.jagrosh:jda-utilities:3.0.5'
 
     // NBT parser
     implementation 'com.github.TheNullicorn:Nedit:2.0.0'
@@ -69,6 +71,9 @@ dependencies {
     // Groovy
     implementation "org.codehaus.groovy:groovy:3.0.8"
 
-    // Misc
+    // Logging
     implementation 'ch.qos.logback:logback-classic:1.2.5'
+
+    // Git
+    implementation 'org.eclipse.jgit:org.eclipse.jgit:5.12.0.202106070339-r'
 }

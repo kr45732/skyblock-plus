@@ -96,23 +96,23 @@ public class Utils {
 	public static String CACHE_DATABASE_TOKEN = "";
 	public static boolean IS_API = false;
 	/* JSON */
-	public static JsonElement essenceCostsJson;
-	public static JsonElement levelingJson;
-	public static JsonObject collectionsJson;
-	public static JsonElement skyCryptPetJson;
-	public static JsonElement enchantsJson;
-	public static JsonElement petNumsJson;
-	public static JsonElement petsJson;
-	public static JsonElement reforgeStonesJson;
-	public static JsonElement bitsJson;
-	public static JsonElement miscJson;
-	public static JsonElement talismanJson;
-	public static JsonElement lowestBinJson;
-	public static JsonElement averageAuctionJson;
-	public static JsonElement bazaarJson;
-	public static JsonArray sbzPricesJson;
+	private static JsonElement essenceCostsJson;
+	private static JsonElement levelingJson;
+	private static JsonObject collectionsJson;
+	private static JsonElement skyCryptPetJson;
+	private static JsonElement enchantsJson;
+	private static JsonElement petNumsJson;
+	private static JsonElement petsJson;
+	private static JsonElement reforgeStonesJson;
+	private static JsonElement bitsJson;
+	private static JsonElement miscJson;
+	private static JsonElement talismanJson;
+	private static JsonElement lowestBinJson;
+	private static JsonElement averageAuctionJson;
+	private static JsonElement bazaarJson;
+	private static JsonArray sbzPricesJson;
 	public static JsonObject internalJsonMappings;
-	public static JsonObject emojiMap;
+	private static JsonObject emojiMap;
 	/* Miscellaneous */
 	public static TextChannel botLogChannel;
 	public static TextChannel errorLogChannel;
@@ -792,7 +792,7 @@ public class Utils {
 		return timeUntil.length() > 0 ? timeUntil.trim() : "0s";
 	}
 
-	public static void setApplicationSettings() {
+	public static void initialize() {
 		Properties appProps = new Properties();
 		try {
 			IS_API = false;

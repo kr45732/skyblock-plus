@@ -688,34 +688,18 @@
   "5e4e6d0d8ea8c9feb3f0e44f": {
     "name": "Skyblock Forceful",
     "guild_leaderboard": {
-      "types": [
-        "skills",
-        "slayer",
-        "catacombs"
-      ],
-      "staff_ranks": [
-        "manager",
-        "officer",
-        "guild master"
-      ],
+      "types": ["skills", "slayer", "catacombs"],
+      "staff_ranks": ["manager", "officer", "guild master"],
       "ignore_staff": true,
-      "default_role": [
-        "rookie",
-        "member"
-      ],
+      "default_role": ["rookie", "member"],
       "ranks": [
         {
           "range": 5,
-          "names": [
-            "elite"
-          ]
+          "names": ["elite"]
         },
         {
           "range": 15,
-          "names": [
-            "trainee",
-            "kings"
-          ]
+          "names": ["trainee", "kings"]
         }
       ]
     }
@@ -723,35 +707,22 @@
   "5fea32eb8ea8c9724b8e3f3c": {
     "name": "Skyblock Gods",
     "guild_leaderboard": {
-      "types": [
-        "weight"
-      ],
-      "staff_ranks": [
-        "staff",
-        "guild master"
-      ],
+      "types": ["weight"],
+      "staff_ranks": ["staff", "guild master"],
       "ignore_staff": false,
-      "default_role": [
-        "member"
-      ],
+      "default_role": ["member"],
       "ranks": [
         {
           "range": 5,
-          "names": [
-            "skyblock god"
-          ]
+          "names": ["skyblock god"]
         },
         {
           "range": 20,
-          "names": [
-            "skyblock king"
-          ]
+          "names": ["skyblock king"]
         },
         {
           "range": 60,
-          "names": [
-            "elite"
-          ]
+          "names": ["elite"]
         }
       ]
     }

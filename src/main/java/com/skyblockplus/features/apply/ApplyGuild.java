@@ -121,7 +121,7 @@ public class ApplyGuild {
 		}
 
 		Player player = new Player(higherDepth(linkedAccount, "minecraftUsername").getAsString());
-
+		event.getGuild().getTextChannelById("").getHistory().retrievePast(100).complete().forEach(m -> m.clearReactions().queue());
 		if (!player.isValid()) {
 			return "❌ Unable to fetch player data. Please make sure that all APIs are enabled and/or try relinking";
 		} else {

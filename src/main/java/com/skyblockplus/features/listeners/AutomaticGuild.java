@@ -7,10 +7,7 @@ import static com.skyblockplus.features.skyblockevent.SkyblockEventCommand.endSk
 import static com.skyblockplus.utils.Hypixel.getGuildFromId;
 import static com.skyblockplus.utils.Utils.*;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
 import com.skyblockplus.api.serversettings.automatedapply.AutomatedApply;
@@ -24,6 +21,9 @@ import com.skyblockplus.features.skyblockevent.SkyblockEvent;
 import com.skyblockplus.features.verify.VerifyGuild;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.Writer;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
@@ -41,6 +41,9 @@ import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import org.apache.commons.collections4.ListUtils;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -612,6 +615,25 @@ public class AutomaticGuild {
 	}
 
 	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
+		if (event.getGuild().getId().equals("796790757947867156") && event.getChannel().getId().equals("869278025018114108")) {
+			String descriptionMessage = event.getMessage().getEmbeds().get(0).getDescription();
+			if (descriptionMessage.contains("https://github.com/Moulberry/NotEnoughUpdates-REPO/commit/")) {
+				if (IS_API) {
+					updateItemMappings();
+				}
+
+				scheduler.schedule(
+					() ->
+						internalJsonMappings =
+							getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json")
+								.getAsJsonObject(),
+					5,
+					TimeUnit.MINUTES
+				);
+			}
+			return;
+		}
+
 		if (mee6Roles(event)) {
 			return;
 		}
@@ -681,5 +703,111 @@ public class AutomaticGuild {
 
 	public void setPrefix(String prefix) {
 		this.prefix = prefix;
+	}
+
+	public static void updateItemMappings() {
+		try {
+			File neuDir = new File("src/main/java/com/skyblockplus/json/neu");
+			if (neuDir.exists()) {
+				FileUtils.deleteDirectory(neuDir);
+			}
+			neuDir.mkdir();
+
+			File skyblockPlusDir = new File("src/main/java/com/skyblockplus/json/skyblock_plus");
+			if (skyblockPlusDir.exists()) {
+				FileUtils.deleteDirectory(skyblockPlusDir);
+			}
+			skyblockPlusDir.mkdir();
+
+			Git neuRepo = Git
+				.cloneRepository()
+				.setURI("https://github.com/Moulberry/NotEnoughUpdates-REPO.git")
+				.setDirectory(neuDir)
+				.call();
+
+			Git skyblockPlusDataRepo = Git
+				.cloneRepository()
+				.setURI("https://github.com/kr45732/skyblock-plus-data.git")
+				.setDirectory(skyblockPlusDir)
+				.call();
+
+			try (Writer writer = new FileWriter("src/main/java/com/skyblockplus/json/skyblock_plus/InternalNameMappings.json")) {
+				new GsonBuilder().setPrettyPrinting().create().toJson(getItemMappingsFile(), writer);
+				writer.flush();
+			}
+
+			skyblockPlusDataRepo.add().addFilepattern("InternalNameMappings.json").call();
+			skyblockPlusDataRepo
+				.commit()
+				.setAuthor("kr45632", "52721908+kr45732@users.noreply.github.com")
+				.setMessage(
+					"Automatic update for InternalNameMappings.json (" +
+					neuRepo.log().setMaxCount(1).call().iterator().next().getName() +
+					")"
+				)
+				.call();
+			skyblockPlusDataRepo.push().setCredentialsProvider(new UsernamePasswordCredentialsProvider(GITHUB_TOKEN, "")).call();
+
+			FileUtils.deleteDirectory(neuDir);
+			FileUtils.deleteDirectory(skyblockPlusDir);
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		}
+	}
+
+	public static JsonElement getItemMappingsFile() {
+		File dir = new File("src/main/java/com/skyblockplus/json/neu/items");
+		JsonObject outputArray = new JsonObject();
+
+		Map<String, String> rarityMapRev = new HashMap<>();
+		rarityMapRev.put("5", "Mythic");
+		rarityMapRev.put("4", "Legendary");
+		rarityMapRev.put("3", "Epic");
+		rarityMapRev.put("2", "Rare");
+		rarityMapRev.put("1", "Uncommon");
+		rarityMapRev.put("0", "Common");
+
+		for (File child : dir.listFiles()) {
+			try {
+				JsonElement itemJson = JsonParser.parseReader(new FileReader(child));
+				String itemName = parseMcCodes(higherDepth(itemJson, "displayname").getAsString()).replace("�", "");
+				String internalName = higherDepth(itemJson, "internalname").getAsString();
+				if (itemName.contains("(")) {
+					continue;
+				}
+
+				if (itemName.startsWith("[Lvl")) {
+					itemName = rarityMapRev.get(internalName.split(";")[1]) + " " + itemName.split("] ")[1];
+				}
+				if (itemName.equals("Enchanted Book")) {
+					itemName = parseMcCodes(higherDepth(itemJson, "lore").getAsJsonArray().get(0).getAsString());
+				}
+				if (itemName.contains("⚚")) {
+					itemName = itemName.replace("⚚ ", "STARRED ");
+				}
+				if (itemName.contains("Melody\\u0027s Hair")) {
+					itemName = "MELODY_HAIR";
+				}
+				itemName = itemName.replace("™", "").replace("\u0027s", "").toUpperCase().replace("\u0027", "").replace(" ", "_");
+				if (itemName.contains("MELODY_HAIR")) {
+					itemName = "MELODY_HAIR";
+				}
+				if (internalName.contains("-")) {
+					internalName = internalName.replace("-", ":");
+				}
+
+				JsonArray toAdd = new JsonArray();
+				toAdd.add(internalName);
+				if (outputArray.has(itemName)) {
+					toAdd.addAll(outputArray.get(itemName).getAsJsonArray());
+				}
+
+				outputArray.add(itemName, toAdd);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		return outputArray;
 	}
 }

@@ -62,7 +62,7 @@ public class Main {
 		Thread.setDefaultUncaughtExceptionHandler(globalExceptionHandler);
 		RestAction.setDefaultFailure(e -> globalExceptionHandler.uncaughtException(null, e));
 
-		Utils.setApplicationSettings();
+		Utils.initialize();
 		Constants.initialize();
 
 		Main.database = SpringApplication.run(Main.class, args).getBean(Database.class);
