@@ -616,8 +616,16 @@ public class AutomaticGuild {
 
 	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
 		if (event.getGuild().getId().equals("796790757947867156") && event.getChannel().getId().equals("869278025018114108")) {
-			String descriptionMessage = event.getMessage().getEmbeds().get(0).getDescription();
-			if (descriptionMessage.contains("https://github.com/Moulberry/NotEnoughUpdates-REPO/commit/")) {
+			if (
+				event.getMessage().getEmbeds().size() > 0 &&
+				event.getMessage().getEmbeds().get(0).getDescription() != null &&
+				event
+					.getMessage()
+					.getEmbeds()
+					.get(0)
+					.getDescription()
+					.contains("https://github.com/Moulberry/NotEnoughUpdates-REPO/commit/")
+			) {
 				if (IS_API) {
 					updateItemMappings();
 				}
@@ -627,7 +635,7 @@ public class AutomaticGuild {
 						internalJsonMappings =
 							getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json")
 								.getAsJsonObject(),
-					5,
+					3,
 					TimeUnit.MINUTES
 				);
 			}
@@ -740,6 +748,7 @@ public class AutomaticGuild {
 			skyblockPlusDataRepo
 				.commit()
 				.setAuthor("kr45632", "52721908+kr45732@users.noreply.github.com")
+				.setCommitter("kr45632", "52721908+kr45732@users.noreply.github.com")
 				.setMessage(
 					"Automatic update for InternalNameMappings.json (" +
 					neuRepo.log().setMaxCount(1).call().iterator().next().getName() +
@@ -751,7 +760,7 @@ public class AutomaticGuild {
 			FileUtils.deleteDirectory(neuDir);
 			FileUtils.deleteDirectory(skyblockPlusDir);
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			log.error("Exception while automatically updating item mappings", e);
 		}
 	}
 

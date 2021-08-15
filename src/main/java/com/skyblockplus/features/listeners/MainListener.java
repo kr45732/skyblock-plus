@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -152,6 +153,20 @@ public class MainListener extends ListenerAdapter {
 	@Override
 	public void onButtonClick(ButtonClickEvent event) {
 		if (event.getGuild() == null) {
+			if (event.getMessage() != null) {
+				event
+					.editButton(
+						event
+							.getButton()
+							.asDisabled()
+							.withId(event.getButton().getId() + "_disabled")
+							.withLabel("Disabled")
+							.withStyle(ButtonStyle.DANGER)
+					)
+					.queue();
+			}
+
+			event.getHook().editOriginal("❌ This button has been disabled").queue();
 			return;
 		}
 

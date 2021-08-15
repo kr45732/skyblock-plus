@@ -169,23 +169,21 @@ public class Main {
 			new PriceSlashCommand()
 		);
 
-		JDABuilder jdaBuilder = JDABuilder
-			.createDefault(BOT_TOKEN)
-			.setStatus(OnlineStatus.DO_NOT_DISTURB)
-			.addEventListeners(
-				new ExceptionEventListener(waiter),
-				client.build(),
-				new ExceptionEventListener(new MessageTimeout()),
-				new ExceptionEventListener(slashCommands)
-			)
-			.setActivity(Activity.playing("Loading..."))
-			.disableCache(CacheFlag.VOICE_STATE);
+		jda =
+			JDABuilder
+				.createDefault(BOT_TOKEN)
+				.setStatus(OnlineStatus.DO_NOT_DISTURB)
+				.addEventListeners(
+					new ExceptionEventListener(waiter),
+					client.build(),
+					new ExceptionEventListener(new MessageTimeout()),
+					new ExceptionEventListener(slashCommands),
+					new ExceptionEventListener(new MainListener())
+				)
+				.setActivity(Activity.playing("Loading..."))
+				.disableCache(CacheFlag.VOICE_STATE)
+				.build();
 
-		if (!IS_API) {
-			jdaBuilder.addEventListeners(new ExceptionEventListener(new MainListener()));
-		}
-
-		jda = jdaBuilder.build();
 		try {
 			jda.awaitReady();
 		} catch (Exception ignored) {}
