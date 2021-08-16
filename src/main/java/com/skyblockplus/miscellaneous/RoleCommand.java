@@ -454,8 +454,7 @@ public class RoleCommand extends Command {
 									String currentPetRarity = higherDepth(currentPet, "tier").getAsString().toLowerCase();
 									if (currentPetRarity.equals("epic") || currentPetRarity.equals("legendary")) {
 										if (!excludedPets.contains(higherDepth(currentPet, "type").getAsString().toLowerCase())) {
-											long currentPetExp = higherDepth(currentPet, "exp").getAsLong();
-											if (player.petLevelFromXp(currentPetExp, currentPetRarity) == 100) {
+											if (petLevelFromXp(higherDepth(currentPet, "exp", 0L), currentPetRarity) == 100) {
 												isPetEnthusiast = true;
 												if (!member.getRoles().contains(petEnthusiastRole)) {
 													if (botRole.canInteract(petEnthusiastRole)) {

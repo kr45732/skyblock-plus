@@ -71,7 +71,7 @@ public class QueryAuctionCommand extends Command {
 		}
 
 		if (lowestBinArr.size() == 0) {
-			return invalidEmbed("No auctions matching '" + query + "' found");
+			return invalidEmbed("No bins matching '" + query + "' found");
 		}
 
 		JsonElement lowestBinAuction = lowestBinArr.get(0);
@@ -80,7 +80,7 @@ public class QueryAuctionCommand extends Command {
 
 		String lowestBinStr = "";
 		lowestBinStr += "**Name:** " + (tempName == null ? higherDepth(lowestBinAuction, "item_name").getAsString() : tempName);
-		lowestBinStr += "\n**Rarity:** " + higherDepth(lowestBinAuction, "tier").getAsString();
+		lowestBinStr += "\n**Rarity:** " + higherDepth(lowestBinAuction, "tier").getAsString().toLowerCase();
 		lowestBinStr += "\n**Price:** " + simplifyNumber(higherDepth(lowestBinAuction, "starting_bid").getAsDouble());
 		lowestBinStr += "\n**Seller:** " + uuidToUsername(higherDepth(lowestBinAuction, "auctioneer").getAsString()).playerUsername;
 		lowestBinStr += "\n**Auction:** `/viewauction " + higherDepth(lowestBinAuction, "uuid").getAsString() + "`";

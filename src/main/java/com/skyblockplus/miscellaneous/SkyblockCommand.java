@@ -83,34 +83,17 @@ public class SkyblockCommand extends Command {
 				"• **Unique Golds:** " +
 				(higherDepth(jacobJson, "unique_golds2") != null ? higherDepth(jacobJson, "unique_golds2").getAsJsonArray().size() : 0) +
 				"\n";
-			skillsPageString +=
-				"• **Current Golds:** " +
-				(higherDepth(jacobJson, "medals_inv.gold") == null ? 0 : higherDepth(jacobJson, "medals_inv.gold").getAsInt()) +
-				"\n";
-			skillsPageString +=
-				"• **Current Silvers:** " +
-				(higherDepth(jacobJson, "medals_inv.silver") == null ? 0 : higherDepth(jacobJson, "medals_inv.silver").getAsInt()) +
-				"\n";
-			skillsPageString +=
-				"• **Current Bronzes:** " +
-				(higherDepth(jacobJson, "medals_inv.bronze") == null ? 0 : higherDepth(jacobJson, "medals_inv.bronze").getAsInt()) +
-				"\n";
+			skillsPageString += "• **Current Golds:** " + higherDepth(jacobJson, "medals_inv.gold", 0) + "\n";
+			skillsPageString += "• **Current Silvers:** " + higherDepth(jacobJson, "medals_inv.silver", 0) + "\n";
+			skillsPageString += "• **Current Bronzes:** " + higherDepth(jacobJson, "medals_inv.bronze", 0) + "\n";
 			skillsPageString += "\n";
 
 			skillsPageString += "__**Fishing**__" + "\n";
-			skillsPageString += "• **Items Fished:** " + formatNumber(higherDepth(statsJson, "items_fished").getAsInt()) + "\n";
+			skillsPageString += "• **Items Fished:** " + formatNumber(higherDepth(statsJson, "items_fished", 0)) + "\n";
+			skillsPageString += "• **Treasures Fished:** " + formatNumber(higherDepth(statsJson, "items_fished_treasure", 0)) + "\n";
 			skillsPageString +=
-				"• **Treasures Fished:** " + formatNumber(higherDepth(statsJson, "items_fished_treasure").getAsInt()) + "\n";
-			skillsPageString +=
-				"• **Large Treasures Fished:** " + formatNumber(higherDepth(statsJson, "items_fished_large_treasure").getAsInt()) + "\n";
-			skillsPageString +=
-				"• **Fished With Shredder:** " +
-				(
-					higherDepth(statsJson, "shredder_fished") != null
-						? formatNumber(higherDepth(statsJson, "shredder_fished").getAsInt())
-						: 0
-				) +
-				"\n";
+				"• **Large Treasures Fished:** " + formatNumber(higherDepth(statsJson, "items_fished_large_treasure", 0)) + "\n";
+			skillsPageString += "• **Fished With Shredder:** " + (higherDepth(statsJson, "shredder_fished", 0)) + "\n";
 
 			// Dungeons
 			String dungeonsPageString = "";

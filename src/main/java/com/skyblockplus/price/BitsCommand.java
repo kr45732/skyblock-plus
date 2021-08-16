@@ -22,7 +22,7 @@ public class BitsCommand extends Command {
 
 		String closestMatch = getClosestMatch(itemName, bitsItemNames);
 		if (closestMatch != null) {
-			return defaultEmbed("Bits Price").addField(closestMatch, formatNumber(higherDepth(bitsJson, closestMatch).getAsLong()), false);
+			return defaultEmbed("Bits Price").addField(closestMatch, formatNumber(higherDepth(bitsJson, closestMatch, 0L)), false);
 		}
 
 		return defaultEmbed("No bit price found for " + capitalizeString(itemName));

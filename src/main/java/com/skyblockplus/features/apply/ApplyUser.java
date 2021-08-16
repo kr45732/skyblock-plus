@@ -253,10 +253,10 @@ public class ApplyUser implements Serializable {
 			meetReqs = true;
 		} else {
 			for (JsonElement req : currentReqs) {
-				int slayerReq = higherDepth(req, "slayerReq").getAsInt();
-				int skillsReq = higherDepth(req, "skillsReq").getAsInt();
-				int cataReq = higherDepth(req, "catacombsReq").getAsInt();
-				int weightReq = higherDepth(req, "weightReq").getAsInt();
+				int slayerReq = higherDepth(req, "slayerReq", 0);
+				int skillsReq = higherDepth(req, "skillsReq", 0);
+				int cataReq = higherDepth(req, "catacombsReq", 0);
+				int weightReq = higherDepth(req, "weightReq", 0);
 
 				if (
 					player.getTotalSlayer() >= slayerReq &&

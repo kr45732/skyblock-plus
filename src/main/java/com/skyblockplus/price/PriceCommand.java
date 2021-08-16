@@ -1,6 +1,5 @@
 package com.skyblockplus.price;
 
-import static com.skyblockplus.networth.NetworthExecute.isIgnoredItem;
 import static com.skyblockplus.utils.Constants.reforgeStoneNames;
 import static com.skyblockplus.utils.Hypixel.*;
 import static com.skyblockplus.utils.Utils.*;
@@ -63,8 +62,8 @@ public class PriceCommand extends Command {
 			String ebStr = "**Item name:** " + itemName;
 			ebStr += "\n**Seller:** " + uuidToUsername(higherDepth(auction, "auctioneer").getAsString()).playerUsername;
 			ebStr += "\n**Command:** `/viewauction " + higherDepth(auction, "uuid").getAsString() + "`";
-			long highestBid = higherDepth(auction, "highest_bid_amount").getAsInt();
-			long startingBid = higherDepth(auction, "starting_bid").getAsInt();
+			long highestBid = higherDepth(auction, "highest_bid_amount", 0L);
+			long startingBid = higherDepth(auction, "starting_bid", 0L);
 			JsonArray bidsArr = higherDepth(auction, "bids").getAsJsonArray();
 			boolean bin = higherDepth(auction, "bin") != null;
 
@@ -139,12 +138,12 @@ public class PriceCommand extends Command {
 				(
 					itemCost *
 					2 >=
-					higherDepth(higherDepth(bazaarJson, "RECOMBOBULATOR_3000.sell_summary").getAsJsonArray().get(0), "pricePerUnit")
+					higherDepth(higherDepth(bazaarJson, "RECOMBOBULATOR_3000.buy_summary").getAsJsonArray().get(0), "pricePerUnit")
 						.getAsDouble()
 				)
 			) {
 				recombobulatedExtra =
-					higherDepth(higherDepth(bazaarJson, "RECOMBOBULATOR_3000.sell_summary").getAsJsonArray().get(0), "pricePerUnit")
+					higherDepth(higherDepth(bazaarJson, "RECOMBOBULATOR_3000.buy_summary").getAsJsonArray().get(0), "pricePerUnit")
 						.getAsDouble();
 			}
 		} catch (Exception ignored) {}
@@ -152,13 +151,13 @@ public class PriceCommand extends Command {
 		try {
 			hbpExtras =
 				item.getHbpCount() *
-				higherDepth(higherDepth(bazaarJson, "HOT_POTATO_BOOK.sell_summary").getAsJsonArray().get(0), "pricePerUnit").getAsDouble();
+				higherDepth(higherDepth(bazaarJson, "HOT_POTATO_BOOK.buy_summary").getAsJsonArray().get(0), "pricePerUnit").getAsDouble();
 		} catch (Exception ignored) {}
 
 		try {
 			fumingExtras =
 				item.getFumingCount() *
-				higherDepth(higherDepth(bazaarJson, "FUMING_POTATO_BOOK.sell_summary").getAsJsonArray().get(0), "pricePerUnit")
+				higherDepth(higherDepth(bazaarJson, "FUMING_POTATO_BOOK.buy_summary").getAsJsonArray().get(0), "pricePerUnit")
 					.getAsDouble();
 		} catch (Exception ignored) {}
 
@@ -306,8 +305,9 @@ public class PriceCommand extends Command {
 	}
 
 	private static double getLowestPrice(String itemId) {
-		if (isIgnoredItem(itemId)) {
-			return 0;
+		double priceOverride = getPriceOverride(itemId);
+		if (priceOverride != -1) {
+			return priceOverride;
 		}
 
 		double lowestBin = -1;
@@ -334,7 +334,7 @@ public class PriceCommand extends Command {
 		}
 
 		try {
-			return higherDepth(higherDepth(bazaarJson, itemId + "sell_summary").getAsJsonArray().get(0), "pricePerUnit").getAsDouble();
+			return higherDepth(higherDepth(bazaarJson, itemId + ".buy_summary").getAsJsonArray().get(0), "pricePerUnit").getAsDouble();
 		} catch (Exception ignored) {}
 
 		try {

@@ -58,7 +58,7 @@ public class PetsCommand extends Command {
 					"**" +
 					capitalizeString(higherDepth(pet, "type").getAsString().toLowerCase().replace("_", " ")) +
 					" (" +
-					player.petLevelFromXp(higherDepth(pet, "exp").getAsLong(), higherDepth(pet, "tier").getAsString()) +
+					petLevelFromXp(higherDepth(pet, "exp", 0L), higherDepth(pet, "tier").getAsString()) +
 					")**" +
 					"\nTier: " +
 					higherDepth(pet, "tier").getAsString().toLowerCase() +

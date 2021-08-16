@@ -64,7 +64,7 @@ public class HypixelPlayer {
 
 	/* Hypixel */
 	public double getHypixelLevel() {
-		return (Math.sqrt((2 * higherDepth(playerJson, "networkExp").getAsLong()) + 30625) / 50) - 2.5;
+		return (Math.sqrt((2 * higherDepth(playerJson, "networkExp", 0L)) + 30625) / 50) - 2.5;
 	}
 
 	public boolean isOnline() {

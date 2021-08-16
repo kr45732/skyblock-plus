@@ -9,6 +9,7 @@ import static com.skyblockplus.utils.Utils.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.skyblockplus.utils.structs.*;
 import com.skyblockplus.weight.Weight;
 import java.time.Instant;
@@ -223,11 +224,7 @@ public class Player {
 	}
 
 	public double getPurseCoins() {
-		try {
-			return higherDepth(profileJson(), "coin_purse").getAsLong();
-		} catch (Exception e) {
-			return -1;
-		}
+		return higherDepth(profileJson(), "coin_purse", -1L);
 	}
 
 	public JsonArray getBankHistory() {
@@ -257,15 +254,11 @@ public class Player {
 	}
 
 	public int getFarmingCapUpgrade() {
-		try {
-			return higherDepth(profileJson(), "jacob2.perks.farming_level_cap").getAsInt();
-		} catch (Exception e) {
-			return 0;
-		}
+		return higherDepth(profileJson(), "jacob2.perks.farming_level_cap", 0);
 	}
 
 	public int getSkillMaxLevel(String skillName, boolean isWeight) {
-		int maxLevel = higherDepth(getLevelingJson(), "leveling_caps." + skillName).getAsInt();
+		int maxLevel = higherDepth(getLevelingJson(), "leveling_caps." + skillName, 0);
 
 		if (skillName.equals("farming")) {
 			maxLevel = isWeight ? 60 : maxLevel + getFarmingCapUpgrade();
@@ -371,8 +364,7 @@ public class Player {
 	}
 
 	public int getSlayerBossKills(String slayerName, int tier) {
-		JsonElement slayerBossKills = higherDepth(profileJson(), "slayer_bosses." + slayerName + ".boss_kills_tier_" + tier);
-		return slayerBossKills != null ? slayerBossKills.getAsInt() : 0;
+		return higherDepth(profileJson(), "slayer_bosses." + slayerName + ".boss_kills_tier_" + tier, 0);
 	}
 
 	public int getSlayer(String slayerName) {
@@ -383,13 +375,13 @@ public class Player {
 		JsonElement profileSlayer = higherDepth(profile, "slayer_bosses");
 		switch (slayerName) {
 			case "sven":
-				return higherDepth(profileSlayer, "wolf.xp") != null ? higherDepth(profileSlayer, "wolf.xp").getAsInt() : 0;
+				return higherDepth(profileSlayer, "wolf.xp", 0);
 			case "rev":
-				return higherDepth(profileSlayer, "zombie.xp") != null ? higherDepth(profileSlayer, "zombie.xp").getAsInt() : 0;
+				return higherDepth(profileSlayer, "zombie.xp", 0);
 			case "tara":
-				return higherDepth(profileSlayer, "spider.xp") != null ? higherDepth(profileSlayer, "spider.xp").getAsInt() : 0;
+				return higherDepth(profileSlayer, "spider.xp", 0);
 			case "enderman":
-				return higherDepth(profileSlayer, "enderman.xp") != null ? higherDepth(profileSlayer, "enderman.xp").getAsInt() : 0;
+				return higherDepth(profileSlayer, "enderman.xp", 0);
 		}
 		return -1;
 	}
@@ -510,11 +502,7 @@ public class Player {
 			this.hypixelProfileJson = playerFromUuid(playerUuid).response;
 		}
 
-		try {
-			return higherDepth(hypixelProfileJson, "achievements.skyblock_treasure_hunter").getAsInt();
-		} catch (Exception e) {
-			return 0;
-		}
+		return higherDepth(hypixelProfileJson, "achievements.skyblock_treasure_hunter", 0);
 	}
 
 	public double getDungeonClassLevel(String className) {
@@ -632,7 +620,7 @@ public class Player {
 				InvItem invItemStruct = new InvItem();
 				invItemStruct.setName(
 					"[Lvl " +
-					petLevelFromXp(higherDepth(pet, "exp").getAsLong(), higherDepth(pet, "tier").getAsString().toLowerCase()) +
+					petLevelFromXp(higherDepth(pet, "exp", 0L), higherDepth(pet, "tier").getAsString().toLowerCase()) +
 					"] " +
 					capitalizeString(higherDepth(pet, "type").getAsString().toUpperCase().replace("_", " "))
 				);
@@ -967,10 +955,14 @@ public class Player {
 		return higherDepth(profileJson(), "pets").getAsJsonArray();
 	}
 
-	@SuppressWarnings("unchecked")
-	public HashMap<String, Integer> getPlayerSacks() {
-		JsonElement sacksJson = higherDepth(profileJson(), "sacks_counts");
-		return new Gson().fromJson(sacksJson, HashMap.class);
+	public Map<String, Integer> getPlayerSacks() {
+		JsonObject sacksJson = higherDepth(profileJson(), "sacks_counts").getAsJsonObject();
+		Map<String, Integer> sacksMap = new HashMap<>();
+		for (Map.Entry<String, JsonElement> sacksEntry : sacksJson.entrySet()) {
+			sacksMap.put(sacksEntry.getKey(), sacksEntry.getValue().getAsInt());
+		}
+
+		return sacksMap;
 	}
 
 	/* -- End inventory -- */
@@ -996,11 +988,7 @@ public class Player {
 	}
 
 	public int getFairySouls() {
-		try {
-			return higherDepth(profileJson(), "fairy_souls_collected").getAsInt();
-		} catch (Exception e) {
-			return -1;
-		}
+		return higherDepth(profileJson(), "fairy_souls_collected", 0);
 	}
 
 	public String itemToEmoji(String itemName) {
@@ -1030,19 +1018,6 @@ public class Player {
 			Utils.skyblockStatsLink(getUsername(), getProfileName())
 		)
 			.setThumbnail(getThumbnailUrl());
-	}
-
-	public int petLevelFromXp(long petExp, String rarity) {
-		int petRarityOffset = higherDepth(getPetJson(), "pet_rarity_offset." + rarity.toUpperCase()).getAsInt();
-		JsonArray petLevelsXpPer = higherDepth(getPetJson(), "pet_levels").getAsJsonArray();
-		long totalExp = 0;
-		for (int i = petRarityOffset; i < petLevelsXpPer.size(); i++) {
-			totalExp += petLevelsXpPer.get(i).getAsLong();
-			if (totalExp >= petExp) {
-				return (Math.min(i - petRarityOffset + 1, 100));
-			}
-		}
-		return 100;
 	}
 
 	public int getNumberMinionSlots() {

@@ -68,8 +68,8 @@ public class AuctionCommand extends Command {
 						higherDepth(currentAuction, "item_name").getAsString();
 				}
 
-				long highestBid = higherDepth(currentAuction, "highest_bid_amount").getAsInt();
-				long startingBid = higherDepth(currentAuction, "starting_bid").getAsInt();
+				long highestBid = higherDepth(currentAuction, "highest_bid_amount", 0);
+				long startingBid = higherDepth(currentAuction, "starting_bid", 0);
 				if (duration.toMillis() > 0) {
 					if (bin) {
 						auction = "BIN: " + simplifyNumber(startingBid) + " coins";
@@ -162,8 +162,8 @@ public class AuctionCommand extends Command {
 		String ebStr = "**Item name:** " + itemName;
 		ebStr += "\n**Seller:** " + uuidToUsername(higherDepth(auctionJson, "auctioneer").getAsString()).playerUsername;
 		ebStr += "\n**Command:** `/viewauction " + higherDepth(auctionJson, "uuid").getAsString() + "`";
-		long highestBid = higherDepth(auctionJson, "highest_bid_amount").getAsInt();
-		long startingBid = higherDepth(auctionJson, "starting_bid").getAsInt();
+		long highestBid = higherDepth(auctionJson, "highest_bid_amount", 0L);
+		long startingBid = higherDepth(auctionJson, "starting_bid", 0L);
 		JsonArray bidsArr = higherDepth(auctionJson, "bids").getAsJsonArray();
 		boolean bin = higherDepth(auctionJson, "bin") != null;
 

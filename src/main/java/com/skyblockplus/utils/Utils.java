@@ -30,6 +30,7 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.script.ScriptEngine;
@@ -67,6 +68,7 @@ public class Utils {
 	public static final String BOT_INVITE_LINK_REQUIRED_SLASH =
 		"https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403040368&scope=bot%20applications.commands";
 	public static final String FORUM_POST_LINK = "https://hypixel.net/threads/3980092";
+	private static final Pattern patternControlCode = Pattern.compile("(?i)\\u00A7[0-9A-FK-OR]");
 	public static final AsyncHttpClient asyncHttpClient = Dsl.asyncHttpClient();
 	public static final CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 	public static final OkHttpClient okHttpClient = new OkHttpClient().newBuilder().build();
@@ -113,6 +115,8 @@ public class Utils {
 	private static JsonArray sbzPricesJson;
 	public static JsonObject internalJsonMappings;
 	private static JsonObject emojiMap;
+	private static JsonElement vanillaItemsJson;
+	public static JsonObject priceOverrideJson;
 	/* Miscellaneous */
 	public static TextChannel botLogChannel;
 	public static TextChannel errorLogChannel;
@@ -121,7 +125,6 @@ public class Utils {
 	public static Instant averageAuctionJsonLastUpdated = Instant.now();
 	public static Instant bazaarJsonLastUpdated = Instant.now();
 	public static Instant sbzPricesJsonLastUpdated = Instant.now();
-	private static JsonElement vanillaItemsJson;
 
 	/* Getters */
 	public static JsonElement getLowestBinJson() {
@@ -577,7 +580,7 @@ public class Utils {
 	}
 
 	public static String parseMcCodes(String unformattedString) {
-		return unformattedString.replaceAll("§f|§a|§9|§5|§6|§d|§4|§c|§7|§8|§l|§o|§b|§2|§e|§r|§3|§1|§ka", "");
+		return patternControlCode.matcher(unformattedString).replaceAll("");
 	}
 
 	public static String fixUsername(String username) {
@@ -598,7 +601,33 @@ public class Utils {
 		}
 	}
 
-	public static int higherDepth(JsonElement element, String path, int defaultVal) {
+	public static String higherDepth(JsonElement element, String path, String defaultValue) {
+		String[] paths = path.split("\\.");
+
+		try {
+			for (String key : paths) {
+				element = element.getAsJsonObject().get(key);
+			}
+			return element.getAsString();
+		} catch (Exception e) {
+			return defaultValue;
+		}
+	}
+
+	public static long higherDepth(JsonElement element, String path, long defaultValue) {
+		String[] paths = path.split("\\.");
+
+		try {
+			for (String key : paths) {
+				element = element.getAsJsonObject().get(key);
+			}
+			return element.getAsLong();
+		} catch (Exception e) {
+			return defaultValue;
+		}
+	}
+
+	public static int higherDepth(JsonElement element, String path, int defaultValue) {
 		String[] paths = path.split("\\.");
 
 		try {
@@ -607,7 +636,7 @@ public class Utils {
 			}
 			return element.getAsInt();
 		} catch (Exception e) {
-			return defaultVal;
+			return defaultValue;
 		}
 	}
 
@@ -918,6 +947,24 @@ public class Utils {
 							itemInfo.addExtraValue("WOOD_SINGULARITY");
 						}
 
+						if (item.getInt("tag.ExtraAttributes.art_of_war_count", 0) == 1) {
+							itemInfo.addExtraValue("THE_ART_OF_WAR");
+						}
+
+						if (item.getInt("tag.ExtraAttributes,dungeon_item_level", 0) > 5) {
+							int masterStarCount = item.getInt("tag.ExtraAttributes,dungeon_item_level", 5) - 5;
+							switch (masterStarCount) {
+								case 4:
+									itemInfo.addExtraValue("FOURTH_MASTER_STAR");
+								case 3:
+									itemInfo.addExtraValue("THIRD_MASTER_STAR");
+								case 2:
+									itemInfo.addExtraValue("SECOND_MASTER_STAR");
+								case 1:
+									itemInfo.addExtraValue("FIRST_MASTER_STAR");
+							}
+						}
+
 						try {
 							byte[] backpackContents = item.getByteArray("tag.ExtraAttributes." + itemInfo.getId().toLowerCase() + "_data");
 							NBTCompound parsedContentsBackpack = NBTReader.read(new ByteArrayInputStream(backpackContents));
@@ -1061,5 +1108,27 @@ public class Utils {
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
+	}
+
+	public static int petLevelFromXp(long petExp, String rarity) {
+		int petRarityOffset = higherDepth(getPetJson(), "pet_rarity_offset." + rarity.toUpperCase()).getAsInt();
+		JsonArray petLevelsXpPer = higherDepth(getPetJson(), "pet_levels").getAsJsonArray();
+		long totalExp = 0;
+		for (int i = petRarityOffset; i < petLevelsXpPer.size(); i++) {
+			totalExp += petLevelsXpPer.get(i).getAsLong();
+			if (totalExp >= petExp) {
+				return (Math.min(i - petRarityOffset + 1, 100));
+			}
+		}
+		return 100;
+	}
+
+	public static double getPriceOverride(String itemId) {
+		if (priceOverrideJson == null) {
+			priceOverrideJson =
+				getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/PriceOverrides.json").getAsJsonObject();
+		}
+
+		return priceOverrideJson.has(itemId) ? priceOverrideJson.get(itemId).getAsDouble() : -1;
 	}
 }

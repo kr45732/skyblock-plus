@@ -53,7 +53,7 @@ public class BidsCommand extends Command {
 					higherDepth(bid, "item_name").getAsString();
 			}
 
-			long highestBid = higherDepth(bid, "highest_bid_amount").getAsInt();
+			long highestBid = higherDepth(bid, "highest_bid_amount", 0L);
 			JsonArray bidsArr = higherDepth(bid, "bids").getAsJsonArray();
 			if (duration.toMillis() > 0) {
 				auctionDesc = "Current bid: " + simplifyNumber(highestBid);

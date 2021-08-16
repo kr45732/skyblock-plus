@@ -32,10 +32,9 @@ public class HypixelCommand extends Command {
 			for (String parkourLocation : getJsonKeys(player.get("parkourCompletions"))) {
 				int fastestTime = -1;
 				for (JsonElement parkourTime : player.get("parkourCompletions." + parkourLocation).getAsJsonArray()) {
-					if (higherDepth(parkourTime, "timeTook").getAsInt() > fastestTime) {
-						fastestTime = higherDepth(parkourTime, "timeTook").getAsInt();
-					}
+					fastestTime = Math.max(higherDepth(parkourTime, "timeTook", -1), fastestTime);
 				}
+
 				if (fastestTime != -1) {
 					parkourCompletionString.append("• ").append(parkourLocation).append(": ").append(fastestTime / 1000).append("s\n");
 				}

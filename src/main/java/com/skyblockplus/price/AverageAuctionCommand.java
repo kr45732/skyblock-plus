@@ -34,10 +34,10 @@ public class AverageAuctionCommand extends Command {
 
 			if (higherDepth(itemJson, "clean_price") != null) {
 				eb = defaultEmbed("Average auction (clean)");
-				eb.addField(idToName(itemId), formatNumber(higherDepth(itemJson, "clean_price").getAsLong()), false);
+				eb.addField(idToName(itemId), formatNumber(higherDepth(itemJson, "clean_price", 0L)), false);
 			} else {
 				eb = defaultEmbed("Average auction");
-				eb.addField(idToName(itemId), formatNumber(higherDepth(itemJson, "price").getAsLong()), false);
+				eb.addField(idToName(itemId), formatNumber(higherDepth(itemJson, "price", 0L)), false);
 			}
 
 			eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId);
@@ -54,10 +54,10 @@ public class AverageAuctionCommand extends Command {
 
 						if (higherDepth(itemJson, "clean_price") != null) {
 							eb = defaultEmbed("Average auction (clean)");
-							eb.addField(idToName(enchantedBookId), formatNumber(higherDepth(itemJson, "clean_price").getAsLong()), false);
+							eb.addField(idToName(enchantedBookId), formatNumber(higherDepth(itemJson, "clean_price", 0L)), false);
 						} else {
 							eb = defaultEmbed("Average auction");
-							eb.addField(idToName(enchantedBookId), formatNumber(higherDepth(itemJson, "price").getAsLong()), false);
+							eb.addField(idToName(enchantedBookId), formatNumber(higherDepth(itemJson, "price", 0L)), false);
 						}
 
 						eb.setThumbnail("https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK");
@@ -72,14 +72,10 @@ public class AverageAuctionCommand extends Command {
 
 							if (higherDepth(itemJson, "clean_price") != null) {
 								eb.setTitle("Average auction (clean)");
-								eb.addField(
-									idToName(enchantedBookId),
-									formatNumber(higherDepth(itemJson, "clean_price").getAsLong()),
-									false
-								);
+								eb.addField(idToName(enchantedBookId), formatNumber(higherDepth(itemJson, "clean_price", 0L)), false);
 							} else {
 								eb.setTitle("Average auction");
-								eb.addField(idToName(enchantedBookId), formatNumber(higherDepth(itemJson, "price").getAsLong()), false);
+								eb.addField(idToName(enchantedBookId), formatNumber(higherDepth(itemJson, "price", 0L)), false);
 							}
 						}
 					}
@@ -127,10 +123,10 @@ public class AverageAuctionCommand extends Command {
 
 					if (higherDepth(itemJson, "clean_price") != null) {
 						eb = defaultEmbed("Average auction (clean)");
-						eb.addField(idToName(petId), formatNumber(higherDepth(itemJson, "clean_price").getAsLong()), false);
+						eb.addField(idToName(petId), formatNumber(higherDepth(itemJson, "clean_price", 0L)), false);
 					} else {
 						eb = defaultEmbed("Average auction");
-						eb.addField(idToName(petId), formatNumber(higherDepth(itemJson, "price").getAsLong()), false);
+						eb.addField(idToName(petId), formatNumber(higherDepth(itemJson, "price", 0L)), false);
 					}
 
 					eb.setThumbnail(getPetUrl(petId.split(";")[0]));
@@ -154,10 +150,10 @@ public class AverageAuctionCommand extends Command {
 
 			if (higherDepth(itemJson, "clean_price") != null) {
 				eb = defaultEmbed("Average auction (clean)");
-				eb.addField(idToName(closestMatch), formatNumber(higherDepth(itemJson, "clean_price").getAsLong()), false);
+				eb.addField(idToName(closestMatch), formatNumber(higherDepth(itemJson, "clean_price", 0L)), false);
 			} else {
 				eb = defaultEmbed("Average auction");
-				eb.addField(idToName(closestMatch), formatNumber(higherDepth(itemJson, "price").getAsLong()), false);
+				eb.addField(idToName(closestMatch), formatNumber(higherDepth(itemJson, "price", 0L)), false);
 			}
 			return eb;
 		}

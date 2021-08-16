@@ -80,18 +80,15 @@ public class DungeonsCommand extends Command {
 					int min = (dungeonType.equals("catacombs") ? 0 : 1);
 					int max = (dungeonType.equals("catacombs") ? 8 : 7);
 					for (int i = min; i < max; i++) {
-						JsonElement completions = higherDepth(curDungeonType, "tier_completions." + i);
-						JsonElement bestScore = higherDepth(curDungeonType, "best_score." + i);
-						JsonElement fastestSPlus = higherDepth(curDungeonType, "fastest_time_s_plus." + i);
-						int fastestSPlusInt = fastestSPlus != null ? fastestSPlus.getAsInt() : 0;
+						int fastestSPlusInt = higherDepth(curDungeonType, "fastest_time_s_plus." + i, -1);
 						int minutes = fastestSPlusInt / 1000 / 60;
 						int seconds = fastestSPlusInt / 1000 % 60;
 						String name = i == 0 ? "Entrance" : ((dungeonType.equals("catacombs") ? "Floor " : "Master ") + i);
 
-						String ebStr = "Completions: " + (completions != null ? completions.getAsInt() : "0");
-						ebStr += "\nBest Score: " + (bestScore != null ? bestScore.getAsInt() : "None");
+						String ebStr = "Completions: " + higherDepth(curDungeonType, "tier_completions." + i, 0);
+						ebStr += "\nBest Score: " + higherDepth(curDungeonType, "best_score." + i, 0);
 						ebStr +=
-							"\nFastest S+: " + (fastestSPlus != null ? minutes + ":" + (seconds >= 10 ? seconds : "0" + seconds) : "None");
+							"\nFastest S+: " + (fastestSPlusInt != -1 ? minutes + ":" + (seconds >= 10 ? seconds : "0" + seconds) : "None");
 
 						extras.addEmbedField(dungeonEmojiMap.get(dungeonType + "_" + i) + " " + capitalizeString(name), ebStr, true);
 					}

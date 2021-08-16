@@ -122,9 +122,9 @@ public class EssenceWaiter extends ListenerAdapter {
 					int totalEssence = 0;
 					for (int i = (startingLevel + 1); i <= endingLevel; i++) {
 						if (i == 0) {
-							totalEssence += higherDepth(itemJson, "dungeonize").getAsInt();
+							totalEssence += higherDepth(itemJson, "dungeonize", 0);
 						} else {
-							totalEssence += higherDepth(itemJson, "" + i).getAsInt();
+							totalEssence += higherDepth(itemJson, "" + i, 0);
 						}
 					}
 					EmbedBuilder eb = defaultEmbed("Essence upgrade for " + itemName.toLowerCase().replace("_", " "));

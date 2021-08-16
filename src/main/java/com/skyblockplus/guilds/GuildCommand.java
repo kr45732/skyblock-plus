@@ -51,18 +51,15 @@ public class GuildCommand extends Command {
 				asyncUuidToUsername(higherDepth(membersArr.get(i), "uuid").getAsString())
 					.thenApply(
 						currentUsername -> {
-							try {
-								JsonElement expHistory = higherDepth(membersArr.get(finalI), "expHistory");
-								List<String> keys = getJsonKeys(expHistory);
-								int totalPlayerExp = 0;
+							JsonElement expHistory = higherDepth(membersArr.get(finalI), "expHistory");
+							List<String> keys = getJsonKeys(expHistory);
+							int totalPlayerExp = 0;
 
-								for (int j = 0; j < days; j++) {
-									String value = keys.get(j);
-									totalPlayerExp += higherDepth(expHistory, value).getAsInt();
-								}
-								return currentUsername + "=:=" + totalPlayerExp;
-							} catch (Exception ignored) {}
-							return null;
+							for (int j = 0; j < days; j++) {
+								String value = keys.get(j);
+								totalPlayerExp += higherDepth(expHistory, value, 0);
+							}
+							return currentUsername + "=:=" + totalPlayerExp;
 						}
 					)
 			);
@@ -265,7 +262,7 @@ public class GuildCommand extends Command {
 			guildInfo += ("• " + guildName + "'s preferred game is " + preferredGames.get(0).getAsString().toLowerCase()) + "\n";
 		}
 
-		int guildExp = higherDepth(guildJson, "exp").getAsInt();
+		int guildExp = higherDepth(guildJson, "exp", 0);
 
 		guildInfo += ("• " + guildName + " is guild level " + guildExpToLevel(guildExp)) + "\n";
 

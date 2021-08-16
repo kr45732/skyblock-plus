@@ -72,7 +72,7 @@ public class BankCommand extends Command {
 				for (int i = bankHistoryArray.size() - 1; i >= 0; i--) {
 					JsonElement currentTransaction = bankHistoryArray.get(i);
 					String valueString =
-						simplifyNumber(higherDepth(currentTransaction, "amount").getAsLong()) +
+						simplifyNumber(higherDepth(currentTransaction, "amount", 0L)) +
 						" " +
 						(higherDepth(currentTransaction, "action").getAsString().equals("DEPOSIT") ? "deposited" : "withdrawn") +
 						" by " +

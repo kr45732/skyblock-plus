@@ -237,7 +237,7 @@ public class GuildRanksCommand extends Command {
 				String playerUsername = currentPlayer.getName();
 
 				for (JsonElement rank : ranksArr) {
-					if (i <= higherDepth(rank, "range").getAsInt() - 1) {
+					if (i <= higherDepth(rank, "range", 0) - 1) {
 						JsonArray rankNames = higherDepth(rank, "names").getAsJsonArray();
 						List<String> rankNamesList = new ArrayList<>();
 						for (JsonElement rankName : rankNames) {

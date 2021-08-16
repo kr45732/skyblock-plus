@@ -6,6 +6,7 @@ import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.features.skyblockevent.SkyblockEventCommand.endSkyblockEvent;
 import static com.skyblockplus.utils.Hypixel.getGuildFromId;
 import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.higherDepth;
 
 import com.google.gson.*;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -574,12 +575,12 @@ public class AutomaticGuild {
 
 				for (JsonElement player : leaderboardArr) {
 					if (higherDepth(player, "id").getAsString().equals(member.getId())) {
-						int playerLevel = higherDepth(player, "level").getAsInt();
+						int playerLevel = higherDepth(player, "level", 0);
 						JsonArray curRoles = higherDepth(currentMee6Settings, "mee6Ranks").getAsJsonArray();
 						List<Role> toAdd = new ArrayList<>();
 						List<Role> toRemove = new ArrayList<>();
 						for (JsonElement curRole : curRoles) {
-							if (playerLevel >= higherDepth(curRole, "value").getAsInt()) {
+							if (playerLevel >= higherDepth(curRole, "value", 0)) {
 								toAdd.add(event.getGuild().getRoleById(higherDepth(curRole, "roleId").getAsString()));
 							} else {
 								toRemove.add(event.getGuild().getRoleById(higherDepth(curRole, "roleId").getAsString()));
@@ -631,11 +632,15 @@ public class AutomaticGuild {
 				}
 
 				scheduler.schedule(
-					() ->
+					() -> {
 						internalJsonMappings =
 							getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json")
-								.getAsJsonObject(),
-					3,
+								.getAsJsonObject();
+						priceOverrideJson =
+							getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/PriceOverrides.json")
+								.getAsJsonObject();
+					},
+					5,
 					TimeUnit.MINUTES
 				);
 			}
@@ -713,7 +718,7 @@ public class AutomaticGuild {
 		this.prefix = prefix;
 	}
 
-	public static void updateItemMappings() {
+	public void updateItemMappings() {
 		try {
 			File neuDir = new File("src/main/java/com/skyblockplus/json/neu");
 			if (neuDir.exists()) {
@@ -740,20 +745,21 @@ public class AutomaticGuild {
 				.call();
 
 			try (Writer writer = new FileWriter("src/main/java/com/skyblockplus/json/skyblock_plus/InternalNameMappings.json")) {
-				new GsonBuilder().setPrettyPrinting().create().toJson(getItemMappingsFile(), writer);
+				new GsonBuilder().setPrettyPrinting().create().toJson(getUpdatedItemMappingsJson(), writer);
 				writer.flush();
 			}
 
-			skyblockPlusDataRepo.add().addFilepattern("InternalNameMappings.json").call();
+			try (Writer writer = new FileWriter("src/main/java/com/skyblockplus/json/skyblock_plus/PriceOverrides.json")) {
+				new GsonBuilder().setPrettyPrinting().create().toJson(getUpdatedPriceOverridesJson(), writer);
+				writer.flush();
+			}
+
+			skyblockPlusDataRepo.add().addFilepattern("InternalNameMappings.json").addFilepattern("PriceOverrides.json").call();
 			skyblockPlusDataRepo
 				.commit()
 				.setAuthor("kr45632", "52721908+kr45732@users.noreply.github.com")
 				.setCommitter("kr45632", "52721908+kr45732@users.noreply.github.com")
-				.setMessage(
-					"Automatic update for InternalNameMappings.json (" +
-					neuRepo.log().setMaxCount(1).call().iterator().next().getName() +
-					")"
-				)
+				.setMessage("Automatic update (" + neuRepo.log().setMaxCount(1).call().iterator().next().getName() + ")")
 				.call();
 			skyblockPlusDataRepo.push().setCredentialsProvider(new UsernamePasswordCredentialsProvider(GITHUB_TOKEN, "")).call();
 
@@ -764,7 +770,7 @@ public class AutomaticGuild {
 		}
 	}
 
-	public static JsonElement getItemMappingsFile() {
+	public JsonElement getUpdatedItemMappingsJson() {
 		File dir = new File("src/main/java/com/skyblockplus/json/neu/items");
 		JsonObject outputArray = new JsonObject();
 
@@ -818,5 +824,42 @@ public class AutomaticGuild {
 		}
 
 		return outputArray;
+	}
+
+	public JsonElement getUpdatedPriceOverridesJson() {
+		File dir = new File("src/main/java/com/skyblockplus/json/neu/items");
+		JsonElement bazaarJson = higherDepth(getBazaarJson(), "products");
+		JsonArray sbzPricesJson = getSbzPricesJson();
+		JsonObject outputObject = new JsonObject();
+
+		for (File child : dir.listFiles()) {
+			try {
+				JsonObject itemJson = JsonParser.parseReader(new FileReader(child)).getAsJsonObject();
+				if (itemJson.has("vanilla")) {
+					String name = parseMcCodes(itemJson.get("displayname").getAsString());
+					String id = itemJson.get("internalname").getAsString();
+					long price = 0;
+
+					try {
+						higherDepth(higherDepth(bazaarJson, id + ".buy_summary").getAsJsonArray().get(0), "pricePerUnit").getAsDouble();
+						continue;
+					} catch (Exception ignored) {}
+
+					for (JsonElement itemPrice : sbzPricesJson) {
+						String itemNamePrice = higherDepth(itemPrice, "name").getAsString();
+						if (itemNamePrice.equalsIgnoreCase(id) || itemNamePrice.equalsIgnoreCase(name.replace(" ", "_"))) {
+							price = higherDepth(itemPrice, "low").getAsLong();
+							break;
+						}
+					}
+
+					outputObject.addProperty(id, price);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		return outputObject;
 	}
 }

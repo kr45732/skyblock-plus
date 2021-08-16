@@ -30,7 +30,7 @@ public class BinCommand extends Command {
 		String itemId = nameToId(item);
 		if (higherDepth(lowestBinJson, itemId) != null) {
 			EmbedBuilder eb = defaultEmbed("Lowest bin");
-			eb.addField(idToName(itemId), formatNumber(higherDepth(lowestBinJson, itemId).getAsLong()), false);
+			eb.addField(idToName(itemId), formatNumber(higherDepth(lowestBinJson, itemId, 0L)), false);
 			eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId);
 			return eb;
 		}
@@ -41,11 +41,7 @@ public class BinCommand extends Command {
 					String enchantedBookId = i + ";" + Integer.parseInt(itemId.replaceAll("\\D+", ""));
 					if (higherDepth(lowestBinJson, enchantedBookId) != null) {
 						EmbedBuilder eb = defaultEmbed("Lowest bin");
-						eb.addField(
-							idToName(enchantedBookId),
-							formatNumber(higherDepth(lowestBinJson, enchantedBookId).getAsLong()),
-							false
-						);
+						eb.addField(idToName(enchantedBookId), formatNumber(higherDepth(lowestBinJson, enchantedBookId, 0L)), false);
 						eb.setThumbnail("https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK");
 						return eb;
 					}
@@ -54,11 +50,7 @@ public class BinCommand extends Command {
 					for (int j = 10; j > 0; j--) {
 						String enchantedBookId = i + ";" + j;
 						if (higherDepth(lowestBinJson, enchantedBookId) != null) {
-							eb.addField(
-								idToName(enchantedBookId),
-								formatNumber(higherDepth(lowestBinJson, enchantedBookId).getAsLong()),
-								false
-							);
+							eb.addField(idToName(enchantedBookId), formatNumber(higherDepth(lowestBinJson, enchantedBookId, 0L)), false);
 						}
 					}
 
@@ -101,7 +93,7 @@ public class BinCommand extends Command {
 
 				if (higherDepth(lowestBinJson, petId) != null) {
 					EmbedBuilder eb = defaultEmbed("Lowest bin");
-					eb.addField(idToName(petId), formatNumber(higherDepth(lowestBinJson, petId).getAsLong()), false);
+					eb.addField(idToName(petId), formatNumber(higherDepth(lowestBinJson, petId, 0L)), false);
 					eb.setThumbnail(getPetUrl(petId.split(";")[0]));
 					return eb;
 				}
@@ -119,7 +111,7 @@ public class BinCommand extends Command {
 				eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + closestMatch);
 			}
 
-			eb.addField(idToName(closestMatch), formatNumber(higherDepth(lowestBinJson, closestMatch).getAsLong()), false);
+			eb.addField(idToName(closestMatch), formatNumber(higherDepth(lowestBinJson, closestMatch, 0L)), false);
 			return eb;
 		}
 

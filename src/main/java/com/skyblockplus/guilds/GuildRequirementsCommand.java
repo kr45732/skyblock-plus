@@ -62,13 +62,13 @@ public class GuildRequirementsCommand extends Command {
 						eb.addField(
 							"Requirement",
 							"Slayer: " +
-							formatNumber(higherDepth(req, "slayerReq").getAsInt()) +
+							formatNumber(higherDepth(req, "slayerReq", 0)) +
 							"\nSkill Average: " +
-							formatNumber(higherDepth(req, "skillsReq").getAsInt()) +
+							formatNumber(higherDepth(req, "skillsReq", 0)) +
 							"\nCatacombs: " +
-							formatNumber(higherDepth(req, "catacombsReq").getAsInt()) +
+							formatNumber(higherDepth(req, "catacombsReq", 0)) +
 							"\nWeight: " +
-							formatNumber(higherDepth(req, "weightReq").getAsInt()),
+							formatNumber(higherDepth(req, "weightReq", 0)),
 							false
 						);
 					}

@@ -1848,13 +1848,13 @@ public class SettingsExecute {
 			EmbedBuilder eb = defaultEmbed("Settings");
 			eb.setDescription(
 				"**Removed application requirement of:**\n• Slayer - " +
-				higherDepth(req, "slayerReq").getAsInt() +
+				higherDepth(req, "slayerReq", 0) +
 				"\n• Skills - " +
-				higherDepth(req, "skillsReq").getAsInt() +
+				higherDepth(req, "skillsReq", 0) +
 				"\n• Catacombs - " +
-				higherDepth(req, "catacombsReq").getAsInt() +
+				higherDepth(req, "catacombsReq", 0) +
 				"\n• Weight - " +
-				higherDepth(req, "weightReq").getAsInt()
+				higherDepth(req, "weightReq", 0)
 			);
 			return eb;
 		} catch (Exception ignored) {

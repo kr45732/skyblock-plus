@@ -250,8 +250,8 @@ public class CommandEndpoints {
 		System.out.println("Heroku-Webhook-Hmac-SHA256: " + herokuHMAC);
 		System.out.println(jsonBody);
 
-		String appName = higherDepth(jsonBody, "data.app.name") != null ? higherDepth(jsonBody, "data.app.name").getAsString() : "Null";
-		String actorEmail = higherDepth(jsonBody, "actor.email") != null ? higherDepth(jsonBody, "actor.email").getAsString() : "Null";
+		String appName = higherDepth(jsonBody, "data.app.name", "Null");
+		String actorEmail = higherDepth(jsonBody, "actor.email", "Null");
 		actorEmail = actorEmail.contains("@gmail.com") ? "kr45732" : actorEmail;
 		String description = "";
 
