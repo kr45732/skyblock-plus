@@ -16,8 +16,11 @@ public class InviteSlashCommand extends SlashCommand {
 		executor.submit(
 			() -> {
 				event.logCommandGuildUserCommand();
-
-				event.getHook().editOriginalEmbeds(InviteCommand.getInvite().build()).queue();
+				event
+					.getHook()
+					.editOriginalEmbeds(InformationCommand.getInformation(event.getSlashCommandClient().getStartTime()).build())
+					.setActionRows(InformationCommand.getInformationActionRow())
+					.queue();
 			}
 		);
 	}

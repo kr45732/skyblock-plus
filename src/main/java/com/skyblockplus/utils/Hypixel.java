@@ -21,10 +21,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+import okhttp3.*;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
@@ -504,17 +501,18 @@ public class Hypixel {
 		);
 	}
 
-	public static void scheduleUpdateCache() {
-		scheduler.scheduleWithFixedDelay(Hypixel::updateCache, 1, 1, TimeUnit.MINUTES);
+	public static void scheduleDatabaseUpdated() {
+		scheduler.scheduleWithFixedDelay(Hypixel::updateCache, 60, 90, TimeUnit.SECONDS);
+		//		scheduler.scheduleWithFixedDelay(Hypixel::clearDatabase, 1, 60, TimeUnit.MINUTES);
 	}
 
 	public static void updateCache() {
 		try {
 			RequestBody body = RequestBody.create(
 				MediaType.parse("application/json"),
-				"{\"operation\": \"sql\",\"sql\":\"SELECT uuid FROM dev.profiles WHERE __updatedtime__ < " +
-				Instant.now().minusSeconds(90).toEpochMilli() +
-				" LIMIT 3\"}"
+				"{\"operation\":\"delete_records_before\",\"date\":\"" +
+				Instant.now().minusSeconds(90).toString() +
+				"\",\"schema\":\"dev\",\"table\":\"profiles\"}"
 			);
 			Request request = new Request.Builder()
 				.url(databaseUrl)
@@ -536,6 +534,57 @@ public class Hypixel {
 			}
 		} catch (Exception ignored) {}
 	}
+
+	/*
+	public static void clearDatabase(){
+		try {
+			RequestBody body = RequestBody.create(
+					MediaType.parse("application/json"),"{\"operation\":\"system_information\",\"attributes\":[\"disk\"]}"
+			);
+			Request request = new Request.Builder()
+					.url(databaseUrl)
+					.method("POST", body)
+					.addHeader("Content-Type", "application/json")
+					.addHeader("Authorization", "Basic " + CACHE_DATABASE_TOKEN)
+					.build();
+
+			try (Response response = okHttpClient.newCall(request).execute()) {
+				JsonArray databaseSizes = higherDepth(JsonParser.parseString(response.body().string()), "disk.size").getAsJsonArray();
+				for (JsonElement expiredCache : databaseSizes) {
+					if(higherDepth(expiredCache, "fs").getAsString().equals("/dev/mapper/hdb_vg-hdb_lv")){
+						if(higherDepth(expiredCache, "use").getAsDouble() > 0.90){
+							RequestBody body1 = RequestBody.create(
+									MediaType.parse("application/json"),"{\"operation\":\"drop_table\",\"schema\":\"dev\",\"table\": \"profiles\"}"
+							);
+							Request request1 = new Request.Builder()
+									.url(databaseUrl)
+									.method("POST", body1)
+									.addHeader("Content-Type", "application/json")
+									.addHeader("Authorization", "Basic " + CACHE_DATABASE_TOKEN)
+									.build();
+
+							try (Response response1 = okHttpClient.newCall(request1).execute()) {}
+
+							RequestBody body1 = RequestBody.create(
+									MediaType.parse("application/json"),"{\"operation\":\"drop_table\",\"schema\":\"dev\",\"table\": \"profiles\"}"
+							);
+							Request request1 = new Request.Builder()
+									.url(databaseUrl)
+									.method("POST", body1)
+									.addHeader("Content-Type", "application/json")
+									.addHeader("Authorization", "Basic " + CACHE_DATABASE_TOKEN)
+									.build();
+
+							try (Response response1 = okHttpClient.newCall(request1).execute()) {}
+						}
+						return;
+					}
+				}
+			}
+		} catch (Exception ignored) {}
+
+	}
+*/
 
 	public static JsonArray processSkyblockProfilesArray(JsonArray array) {
 		for (int i = 0; i < array.size(); i++) {

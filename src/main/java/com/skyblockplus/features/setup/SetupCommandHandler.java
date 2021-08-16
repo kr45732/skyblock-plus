@@ -406,7 +406,12 @@ public class SetupCommandHandler {
 
 					for (String guildRank : guildRanks) {
 						String[] guildRanksSplit = guildRank.split(" ");
-						eb = settings.addGuildRank(name, guildRanksSplit[0], guildRanksSplit[1]);
+						eb =
+							settings.addGuildRank(
+								name,
+								guildRanksSplit.length >= 1 ? guildRanksSplit[0] : null,
+								guildRanksSplit.length >= 2 ? guildRanksSplit[1] : null
+							);
 						if (!eb.build().getTitle().equals("Settings")) {
 							break;
 						}

@@ -99,7 +99,6 @@ public class Main {
 				new TalismanBagCommand(),
 				new InventoryCommand(),
 				new SacksCommand(),
-				new InviteCommand(),
 				new WeightCommand(),
 				new HypixelCommand(),
 				new UuidCommand(),
@@ -189,7 +188,7 @@ public class Main {
 		} catch (Exception ignored) {}
 		jda.getPresence().setActivity(Activity.watching(DEFAULT_PREFIX + "help in " + jda.getGuilds().size() + " servers"));
 
-		Hypixel.scheduleUpdateCache();
+		Hypixel.scheduleDatabaseUpdated();
 		//	scheduleUpdateLinkedAccounts();
 		//	AuctionFlipper.scheduleFlipper();
 	}
