@@ -830,6 +830,8 @@ public class AutomaticGuild {
 		File dir = new File("src/main/java/com/skyblockplus/json/neu/items");
 		JsonElement bazaarJson = higherDepth(getBazaarJson(), "products");
 		JsonArray sbzPricesJson = getSbzPricesJson();
+		JsonElement binJson = getLowestBinJson();
+		JsonElement averageJson = getAverageAuctionJson();
 		JsonObject outputObject = new JsonObject();
 
 		for (File child : dir.listFiles()) {
@@ -848,7 +850,18 @@ public class AutomaticGuild {
 					for (JsonElement itemPrice : sbzPricesJson) {
 						String itemNamePrice = higherDepth(itemPrice, "name").getAsString();
 						if (itemNamePrice.equalsIgnoreCase(id) || itemNamePrice.equalsIgnoreCase(name.replace(" ", "_"))) {
-							price = higherDepth(itemPrice, "low").getAsLong();
+							long sbzPrice = higherDepth(itemPrice, "low").getAsLong();
+							long binPrice = higherDepth(binJson, id, Long.MAX_VALUE);
+							long averagePrice = higherDepth(averageJson, id) != null
+								? Math.min(
+									higherDepth(averageJson, id + ".price", Long.MAX_VALUE),
+									higherDepth(averageJson, id + ".clean_price", Long.MAX_VALUE)
+								)
+								: Long.MAX_VALUE;
+							long minPrice = Math.min(sbzPrice, Math.min(binPrice, averagePrice));
+							if (minPrice != Long.MAX_VALUE) {
+								price = minPrice;
+							}
 							break;
 						}
 					}
