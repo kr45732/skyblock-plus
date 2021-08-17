@@ -24,7 +24,7 @@ public class AutomatedRoles {
 	private RoleModel tara = new RoleModel();
 
 	@Embedded
-	private RoleModel bank_coins = new RoleModel();
+	private RoleModel enderman = new RoleModel();
 
 	@Embedded
 	private RoleModel alchemy = new RoleModel();
@@ -57,7 +57,16 @@ public class AutomatedRoles {
 	private RoleModel catacombs = new RoleModel();
 
 	@Embedded
+	private RoleModel weight = new RoleModel();
+
+	@Embedded
 	private RoleModel guild_member = new RoleModel();
+
+	@Embedded
+	private RoleModel guild_ranks = new RoleModel();
+
+	@Embedded
+	private RoleModel bank_coins = new RoleModel();
 
 	@Embedded
 	private RoleModel fairy_souls = new RoleModel();
@@ -67,6 +76,9 @@ public class AutomatedRoles {
 
 	@Embedded
 	private RoleModel pet_enthusiast = new RoleModel();
+
+	@Embedded
+	private RoleModel total_slayer = new RoleModel();
 
 	@Embedded
 	private RoleModel doom_slayer = new RoleModel();
@@ -82,15 +94,6 @@ public class AutomatedRoles {
 
 	@Embedded
 	private RoleModel dungeon_secrets = new RoleModel();
-
-	@Embedded
-	private RoleModel guild_ranks = new RoleModel();
-
-	@Embedded
-	private RoleModel enderman = new RoleModel();
-
-	@Embedded
-	private RoleModel weight = new RoleModel();
 
 	public AutomatedRoles() {}
 }

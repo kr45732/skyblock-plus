@@ -182,6 +182,8 @@ public class ServerSettingsService {
 					return new ResponseEntity<>(currentRoleSettings.getEnderman(), HttpStatus.OK);
 				case "weight":
 					return new ResponseEntity<>(currentRoleSettings.getWeight(), HttpStatus.OK);
+				case "total_slayer":
+					return new ResponseEntity<>(currentRoleSettings.getTotal_slayer(), HttpStatus.OK);
 			}
 		}
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -281,6 +283,9 @@ public class ServerSettingsService {
 					break;
 				case "weight":
 					currentRoleSettings.setWeight(newRoleSettings);
+					break;
+				case "total_slayer":
+					currentRoleSettings.setTotal_slayer(newRoleSettings);
 					break;
 			}
 			currentServerSettings.setAutomatedRoles(currentRoleSettings);

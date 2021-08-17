@@ -580,7 +580,12 @@ public class SettingsExecute {
 
 	public EmbedBuilder setGuildRoleEnable(String name, String enable) {
 		JsonObject currentSettings = database.getGuildRoleSettings(guild.getId(), name).getAsJsonObject();
-		if ((higherDepth(currentSettings, "guildId") == null) || (higherDepth(currentSettings, "roleId") == null)) {
+		if (
+			higherDepth(currentSettings, "guildId") == null ||
+			higherDepth(currentSettings, "guildId").getAsString().isEmpty() ||
+			higherDepth(currentSettings, "roleId") == null ||
+			higherDepth(currentSettings, "roleId").getAsString().isEmpty()
+		) {
 			return defaultEmbed("Guild name and role must be set before enabling");
 		}
 
@@ -1049,11 +1054,22 @@ public class SettingsExecute {
 							.append("settings roles add weight 5000 @5k weight`\n");
 						break;
 					}
+				case "slayer":
+					ebFieldString
+						.append("**A player's total slayer**\nExample: `")
+						.append(guildPrefix)
+						.append("settings roles add total_slayer 1000000 @1m slayer`\n");
+					break;
 			}
 
 			ebFieldString.append("\nCurrent Settings:\n");
 
-			ebFieldString.append(higherDepth(currentRoleSettings, "enable").getAsString().equals("true") ? "• Enabled" : "• Disabled");
+			ebFieldString.append(
+				higherDepth(currentRoleSettings, "enable") != null &&
+					higherDepth(currentRoleSettings, "enable").getAsString().equals("true")
+					? "• Enabled"
+					: "• Disabled"
+			);
 			if (roleName.equals("guild_ranks")) {
 				if (higherDepth(currentRoleSettings, "levels").getAsJsonArray().size() == 0) {
 					ebFieldString.append("\n• No ranks added");
@@ -1082,7 +1098,10 @@ public class SettingsExecute {
 				pageTitles.add(roleName + " (__one level role__)");
 			} else {
 				ebFieldString.append(
-					higherDepth(currentRoleSettings, "stackable").getAsString().equals("true") ? "\n• Stackable" : "\n• Not stackable"
+					higherDepth(currentRoleSettings, "stackable") != null &&
+						higherDepth(currentRoleSettings, "stackable").getAsString().equals("true")
+						? "\n• Stackable"
+						: "\n• Not stackable"
 				);
 
 				if (roleName.equals("guild_member")) {
@@ -1393,15 +1412,8 @@ public class SettingsExecute {
 			return invalidEmbed("Invalid role");
 		}
 
-		JsonArray currentLevels = newRoleSettings.get("levels").getAsJsonArray();
-
-		Gson gson = new Gson();
-		currentLevels.add(gson.toJsonTree(new RoleObject("default", role.getId())));
-
-		RoleObject[] temp = gson.fromJson(currentLevels, new TypeToken<RoleObject[]>() {}.getType());
-		Arrays.sort(temp, Comparator.comparing(RoleObject::getValue));
-		currentLevels = gson.toJsonTree(temp).getAsJsonArray();
-
+		JsonArray currentLevels = new JsonArray();
+		currentLevels.add(new Gson().toJsonTree(new RoleObject("default", role.getId())));
 		newRoleSettings.add("levels", currentLevels);
 
 		int responseCode = database.setRoleSettings(guild.getId(), roleName, newRoleSettings);
@@ -1438,9 +1450,7 @@ public class SettingsExecute {
 					return false;
 				}
 			}
-		} catch (Exception e) {
-			return false;
-		}
+		} catch (Exception ignored) {}
 		return true;
 	}
 
@@ -1638,12 +1648,15 @@ public class SettingsExecute {
 		currentSettings.remove("applyReqs");
 		currentSettings.remove("ironmanOnly");
 		currentSettings.remove("waitingChannelId");
+		currentSettings.remove("staffPingRoleId");
 
-		for (String key : getJsonKeys(currentSettings)) {
-			if (higherDepth(currentSettings, key).getAsString().length() == 0) {
-				return false;
+		try {
+			for (String key : getJsonKeys(currentSettings)) {
+				if (higherDepth(currentSettings, key).getAsString().length() == 0) {
+					return false;
+				}
 			}
-		}
+		} catch (Exception ignored) {}
 		return true;
 	}
 
@@ -1797,6 +1810,17 @@ public class SettingsExecute {
 
 	public EmbedBuilder setApplyStaffPingRoleId(String name, String staffPingRoleMention) {
 		try {
+			if (staffPingRoleMention.equalsIgnoreCase("none")) {
+				int responseCode = updateApplySettings(name, "staffPingRoleId", "none");
+				if (responseCode != 200) {
+					return invalidEmbed("API returned response code " + responseCode);
+				}
+
+				EmbedBuilder eb = defaultEmbed("Settings");
+				eb.setDescription("**Apply staff ping role set to:** none");
+				return eb;
+			}
+
 			Role verifyGuildRole = guild.getRoleById(staffPingRoleMention.replaceAll("[<@&>]", ""));
 			if (!(verifyGuildRole.isPublicRole() || verifyGuildRole.isManaged())) {
 				int responseCode = updateApplySettings(name, "staffPingRoleId", verifyGuildRole.getId());
@@ -2140,15 +2164,9 @@ public class SettingsExecute {
 						}
 						break;
 					case "staffPingRoleId":
+						return currentSettingValue.equals("none") ? "None" : "<@&" + currentSettingValue + ">";
 					case "roleId":
-						try {
-							return "<@&" + currentSettingValue + ">";
-						} catch (PermissionException e) {
-							if (e.getMessage().contains("Missing permission")) {
-								return ("Missing permission: " + e.getMessage().split("Missing permission: ")[1]);
-							}
-						}
-						break;
+						return "<@&" + currentSettingValue + ">";
 					case "newChannelCategory":
 						try {
 							return ("<#" + guild.getCategoryById(currentSettingValue).getId() + ">");

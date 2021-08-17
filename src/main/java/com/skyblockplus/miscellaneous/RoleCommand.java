@@ -223,6 +223,7 @@ public class RoleCommand extends Command {
 						case "slot_collector":
 						case "enderman":
 						case "weight":
+						case "total_slayer":
 							{
 								double roleAmount = -1;
 								switch (currentRoleName) {
@@ -296,6 +297,9 @@ public class RoleCommand extends Command {
 											disabledAPI.append(roleChangeString("Skills (for weight) API disabled"));
 										}
 										roleAmount = player.getWeight();
+										break;
+									case "total_slayer":
+										roleAmount = player.getTotalSlayer();
 										break;
 								}
 
@@ -417,7 +421,8 @@ public class RoleCommand extends Command {
 								if (
 									(player.getSlayer("sven") >= 1000000) &&
 									(player.getSlayer("rev") >= 1000000) &&
-									(player.getSlayer("tara") >= 1000000)
+									(player.getSlayer("tara") >= 1000000) &&
+									(player.getSlayer("enderman") >= 1000000)
 								) {
 									if (!member.getRoles().contains(curRole)) {
 										if (botRole.canInteract(curRole)) {
@@ -531,66 +536,33 @@ public class RoleCommand extends Command {
 				continue;
 			}
 
-			switch (currentRoleName) {
-				case "guild_ranks":
-					{
-						JsonArray curLevels = higherDepth(currentRole, "levels").getAsJsonArray();
-						for (JsonElement curLevel : curLevels) {
-							JsonElement guildRoleSettings = database.getGuildRoleSettings(
-								guild.getId(),
-								higherDepth(curLevel, "value").getAsString()
-							);
-							JsonArray guildRanks = higherDepth(guildRoleSettings, "guildRanks").getAsJsonArray();
-							for (JsonElement guildRank : guildRanks) {
-								paginateBuilder.addItems(
-									guild.getRoleById(higherDepth(guildRank, "discordRoleId").getAsString()).getAsMention()
-								);
-							}
-						}
-						break;
+			if ("guild_ranks".equals(currentRoleName)) {
+				JsonArray curLevels = higherDepth(currentRole, "levels").getAsJsonArray();
+				for (JsonElement curLevel : curLevels) {
+					JsonElement guildRoleSettings = database.getGuildRoleSettings(
+						guild.getId(),
+						higherDepth(curLevel, "value").getAsString()
+					);
+					JsonArray guildRanks = higherDepth(guildRoleSettings, "guildRanks").getAsJsonArray();
+					for (JsonElement guildRank : guildRanks) {
+						paginateBuilder.addItems(guild.getRoleById(higherDepth(guildRank, "discordRoleId").getAsString()).getAsMention());
 					}
-				case "guild_member":
-				case "sven":
-				case "rev":
-				case "tara":
-				case "bank_coins":
-				case "alchemy":
-				case "combat":
-				case "fishing":
-				case "farming":
-				case "foraging":
-				case "carpentry":
-				case "mining":
-				case "taming":
-				case "enchanting":
-				case "catacombs":
-				case "fairy_souls":
-				case "skill_average":
-				case "pet_score":
-				case "dungeon_secrets":
-				case "slot_collector":
-				case "enderman":
-				case "weight":
-					{
-						JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
-						for (JsonElement currentLevel : levelsArray) {
-							paginateBuilder.addItems(guild.getRoleById(higherDepth(currentLevel, "roleId").getAsString()).getAsMention());
-						}
-						break;
-					}
-				case "doom_slayer":
-				case "all_slayer_nine":
-				case "pet_enthusiast":
-					{
-						paginateBuilder.addItems(
-							guild
-								.getRoleById(
-									higherDepth(higherDepth(currentRole, "levels").getAsJsonArray().get(0), "roleId").getAsString()
-								)
-								.getAsMention()
-						);
-						break;
-					}
+				}
+			} else if (
+				"doom_slayer".equals(currentRoleName) ||
+				"all_slayer_nine".equals(currentRoleName) ||
+				"pet_enthusiast".equals(currentRoleName)
+			) {
+				paginateBuilder.addItems(
+					guild
+						.getRoleById(higherDepth(higherDepth(currentRole, "levels").getAsJsonArray().get(0), "roleId").getAsString())
+						.getAsMention()
+				);
+			} else {
+				JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
+				for (JsonElement currentLevel : levelsArray) {
+					paginateBuilder.addItems(guild.getRoleById(higherDepth(currentLevel, "roleId").getAsString()).getAsMention());
+				}
 			}
 		}
 

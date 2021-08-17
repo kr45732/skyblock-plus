@@ -27,8 +27,9 @@ public class PriceCommand extends Command {
 	private static JsonArray sbzPrices;
 
 	public PriceCommand() {
-		this.name = "price";
+		this.name = "calculate";
 		this.cooldown = globalCooldown + 1;
+		this.aliases = new String[] { "calc" };
 	}
 
 	public static EmbedBuilder calculatePriceFromUuid(String auctionUuid) {

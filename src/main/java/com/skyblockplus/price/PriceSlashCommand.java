@@ -8,7 +8,7 @@ import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 public class PriceSlashCommand extends SlashCommand {
 
 	public PriceSlashCommand() {
-		this.name = "price";
+		this.name = "calculate";
 	}
 
 	@Override

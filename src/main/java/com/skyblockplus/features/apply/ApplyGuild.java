@@ -158,10 +158,13 @@ public class ApplyGuild {
 
 		if (
 			!(
-				event
-					.getMember()
-					.getRoles()
-					.contains(event.getGuild().getRoleById(higherDepth(currentSettings, "staffPingRoleId").getAsString())) ||
+				(
+					!higherDepth(currentSettings, "staffPingRoleId").getAsString().equals("none") &&
+					event
+						.getMember()
+						.getRoles()
+						.contains(event.getGuild().getRoleById(higherDepth(currentSettings, "staffPingRoleId").getAsString()))
+				) ||
 				event.getMember().hasPermission(Permission.ADMINISTRATOR)
 			)
 		) {

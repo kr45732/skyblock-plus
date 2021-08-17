@@ -133,10 +133,13 @@ public class ApplyUser implements Serializable {
 		if (!event.getUser().equals(applyingUser)) {
 			if (
 				!(
-					event
-						.getMember()
-						.getRoles()
-						.contains(event.getGuild().getRoleById(higherDepth(currentSettings, "staffPingRoleId").getAsString())) ||
+					(
+						!higherDepth(currentSettings, "staffPingRoleId").getAsString().equals("none") &&
+						event
+							.getMember()
+							.getRoles()
+							.contains(event.getGuild().getRoleById(higherDepth(currentSettings, "staffPingRoleId").getAsString()))
+					) ||
 					event.getMember().hasPermission(Permission.ADMINISTRATOR)
 				)
 			) {
@@ -490,8 +493,12 @@ public class ApplyUser implements Serializable {
 			applyPlayerStats.addField("To waitlist the application,", "React with \uD83D\uDD50", true);
 		}
 		applyPlayerStats.addField("To deny the application,", "React with ❌", true);
-		staffChannel.sendMessage("<@&" + higherDepth(currentSettings, "staffPingRoleId").getAsString() + ">").complete();
-		Message reactMessage = staffChannel.sendMessageEmbeds(applyPlayerStats.build()).complete();
+		Message reactMessage = higherDepth(currentSettings, "staffPingRoleId").getAsString().equals("none")
+			? staffChannel.sendMessageEmbeds(applyPlayerStats.build()).complete()
+			: staffChannel
+				.sendMessage("<@&" + higherDepth(currentSettings, "staffPingRoleId").getAsString() + ">")
+				.setEmbeds(applyPlayerStats.build())
+				.complete();
 		reactMessage.addReaction("✅").queue();
 		if (waitlistMsg != null && waitlistMsg.getAsString().length() > 0 && !waitlistMsg.getAsString().equals("none")) {
 			reactMessage.addReaction("\uD83D\uDD50").queue();

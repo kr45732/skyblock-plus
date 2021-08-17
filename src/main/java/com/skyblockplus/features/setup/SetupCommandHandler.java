@@ -279,7 +279,9 @@ public class SetupCommandHandler {
 						break;
 					case 4:
 						eb = settings.setApplyMessageStaffChannelId(name, event.getMessage().getContentRaw());
-						eb2.setDescription("Reply with the staff role that should be pinged when an application is received");
+						eb2.setDescription(
+							"Reply with the staff role that should be pinged when an application is received. Reply with 'none' for no ping."
+						);
 						break;
 					case 5:
 						eb = settings.setApplyStaffPingRoleId(name, event.getMessage().getContentRaw());

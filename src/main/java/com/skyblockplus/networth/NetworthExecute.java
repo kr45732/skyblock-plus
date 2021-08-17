@@ -202,7 +202,7 @@ public class NetworthExecute {
 			if (sacksMap != null) {
 				for (Map.Entry<String, Integer> sackEntry : sacksMap.entrySet()) {
 					if (sackEntry.getValue() > 0) {
-						sacksTotal += getLowestPrice(sackEntry.getKey(), sackEntry.getKey()) * sackEntry.getValue();
+						sacksTotal += getLowestPrice(sackEntry.getKey(), sackEntry.getKey(), true) * sackEntry.getValue();
 					}
 				}
 			}
@@ -348,7 +348,13 @@ public class NetworthExecute {
 			eb.addField("Pets | " + simplifyNumber(petsTotal), petsStr.length() == 0 ? "Empty" : petsStr.toString(), false);
 			eb.addField("Talisman | " + simplifyNumber(talismanTotal), talismanStr.length() == 0 ? "Empty" : talismanStr.toString(), false);
 
-			tempSet.forEach(System.out::println);
+			tempSet.forEach(
+				str -> {
+					if (!str.toLowerCase().contains("skyblock_menu") && !str.toLowerCase().startsWith("rune_")) {
+						System.out.println(str);
+					}
+				}
+			);
 
 			return eb;
 		}
@@ -1021,7 +1027,7 @@ public class NetworthExecute {
 		try {
 			List<String> extraStats = item.getExtraStats();
 			for (String extraItem : extraStats) {
-				double miscPrice = getLowestPrice(extraItem, " ");
+				double miscPrice = getLowestPrice(extraItem, "");
 				miscExtras += miscPrice;
 				miscStr.append("{\"name\":\"").append(extraItem).append("\",\"price\":\"").append(simplifyNumber(miscPrice)).append("\"},");
 			}
@@ -1072,7 +1078,7 @@ public class NetworthExecute {
 			JsonElement reforgeStoneInfo = higherDepth(reforgesStonesJson, reforgeStone);
 			if (higherDepth(reforgeStoneInfo, "reforgeName").getAsString().equalsIgnoreCase(reforgeName)) {
 				String reforgeStoneName = higherDepth(reforgeStoneInfo, "internalName").getAsString();
-				double reforgeStoneCost = getLowestPrice(reforgeStoneName, " ");
+				double reforgeStoneCost = getLowestPrice(reforgeStoneName, idToName(reforgeStoneName));
 				double reforgeApplyCost = higherDepth(reforgeStoneInfo, "reforgeCosts." + itemRarity.toUpperCase()).getAsDouble();
 				return reforgeStoneCost + reforgeApplyCost;
 			}
@@ -1131,13 +1137,14 @@ public class NetworthExecute {
 	}
 
 	private double getLowestPrice(String itemId, String iName) {
+		return getLowestPrice(itemId, iName, false);
+	}
+
+	private double getLowestPrice(String itemId, String iName, boolean onlyBazaar) {
 		double priceOverride = getPriceOverride(itemId);
 		if (priceOverride != -1) {
 			return priceOverride;
 		}
-
-		double lowestBin = -1;
-		double averageAuction = -1;
 
 		try {
 			return Math.max(
@@ -1146,77 +1153,82 @@ public class NetworthExecute {
 			);
 		} catch (Exception ignored) {}
 
-		try {
-			lowestBin = higherDepth(lowestBinJson, itemId).getAsDouble();
-		} catch (Exception ignored) {}
+		if (!onlyBazaar) {
+			double lowestBin = -1;
+			double averageAuction = -1;
 
-		try {
-			JsonElement avgInfo = higherDepth(averageAuctionJson, itemId);
-			averageAuction =
-				higherDepth(avgInfo, "clean_price") != null
-					? higherDepth(avgInfo, "clean_price").getAsDouble()
-					: higherDepth(avgInfo, "price").getAsDouble();
-		} catch (Exception ignored) {}
+			try {
+				lowestBin = higherDepth(lowestBinJson, itemId).getAsDouble();
+			} catch (Exception ignored) {}
 
-		if (lowestBin == -1 && averageAuction != -1) {
-			return Math.max(averageAuction, 0);
-		} else if (lowestBin != -1 && averageAuction == -1) {
-			return Math.max(lowestBin, 0);
-		} else if (lowestBin != -1 && averageAuction != -1) {
-			return Math.max(Math.min(lowestBin, averageAuction), 0);
-		}
+			try {
+				JsonElement avgInfo = higherDepth(averageAuctionJson, itemId);
+				averageAuction =
+					higherDepth(avgInfo, "clean_price") != null
+						? higherDepth(avgInfo, "clean_price").getAsDouble()
+						: higherDepth(avgInfo, "price").getAsDouble();
+			} catch (Exception ignored) {}
 
-		try {
-			itemId = itemId.toLowerCase();
-			switch (itemId) {
-				case "magic_mushroom_soup":
-					itemId = "magical_mushroom_soup";
-					break;
-				case "mine_talisman":
-					itemId = "mine_affinity_talisman";
-					break;
-				case "village_talisman":
-					itemId = "village_affinity_talisman";
-					break;
-				case "coin_talisman":
-					itemId = "talisman_of_coins";
-					break;
-				case "melody_hair":
-					itemId = "melodys_hair";
-					break;
-				case "theoretical_hoe":
-					itemId = "mathematical_hoe_blueprint";
-					break;
-				case "dctr_space_helm":
-					itemId = "dctrs_space_helmet";
-					break;
-				default:
-					if (itemId.contains("generator")) {
-						String minionName = itemId.split("_generator_")[0];
-						int level = Integer.parseInt(itemId.split("_generator_")[1]);
+			if (lowestBin == -1 && averageAuction != -1) {
+				return Math.max(averageAuction, 0);
+			} else if (lowestBin != -1 && averageAuction == -1) {
+				return Math.max(lowestBin, 0);
+			} else if (lowestBin != -1 && averageAuction != -1) {
+				return Math.max(Math.min(lowestBin, averageAuction), 0);
+			}
 
-						itemId = minionName + "_minion_" + toRomanNumerals(level);
-					} else if (itemId.startsWith("theoretical_hoe_")) {
-						String parseHoe = itemId.split("theoretical_hoe_")[1];
-						String hoeType = parseHoe.split("_")[0];
-						int hoeLevel = Integer.parseInt(parseHoe.split("_")[1]);
+			try {
+				itemId = itemId.toLowerCase();
+				switch (itemId) {
+					case "magic_mushroom_soup":
+						itemId = "magical_mushroom_soup";
+						break;
+					case "mine_talisman":
+						itemId = "mine_affinity_talisman";
+						break;
+					case "village_talisman":
+						itemId = "village_affinity_talisman";
+						break;
+					case "coin_talisman":
+						itemId = "talisman_of_coins";
+						break;
+					case "melody_hair":
+						itemId = "melodys_hair";
+						break;
+					case "theoretical_hoe":
+						itemId = "mathematical_hoe_blueprint";
+						break;
+					case "dctr_space_helm":
+						itemId = "dctrs_space_helmet";
+						break;
+					default:
+						if (itemId.contains("generator")) {
+							String minionName = itemId.split("_generator_")[0];
+							int level = Integer.parseInt(itemId.split("_generator_")[1]);
+							itemId = minionName + "_minion_" + toRomanNumerals(level);
+						} else if (itemId.startsWith("theoretical_hoe_")) {
+							String parseHoe = itemId.split("theoretical_hoe_")[1];
+							String hoeType = parseHoe.split("_")[0];
+							int hoeLevel = Integer.parseInt(parseHoe.split("_")[1]);
 
-						for (JsonElement itemPrice : sbzPrices) {
-							String itemNamePrice = higherDepth(itemPrice, "name").getAsString();
-							if (itemNamePrice.startsWith("tier_" + hoeLevel) && itemNamePrice.endsWith(hoeType + "_hoe")) {
-								return Math.max(higherDepth(itemPrice, "low").getAsDouble(), 0);
+							for (JsonElement itemPrice : sbzPrices) {
+								String itemNamePrice = higherDepth(itemPrice, "name").getAsString();
+								if (itemNamePrice.startsWith("tier_" + hoeLevel) && itemNamePrice.endsWith(hoeType + "_hoe")) {
+									return Math.max(higherDepth(itemPrice, "low").getAsDouble(), 0);
+								}
 							}
 						}
-					}
-					break;
-			}
-
-			for (JsonElement itemPrice : sbzPrices) {
-				if (higherDepth(itemPrice, "name").getAsString().equalsIgnoreCase(itemId)) {
-					return Math.max(higherDepth(itemPrice, "low").getAsDouble(), 0);
+						break;
 				}
-			}
-		} catch (Exception ignored) {}
+
+				for (JsonElement itemPrice : sbzPrices) {
+					String itemName = higherDepth(itemPrice, "name").getAsString();
+					if (itemName.equalsIgnoreCase(itemId) || itemName.equalsIgnoreCase(itemName.toLowerCase().replace(" ", "_"))) {
+						return Math.max(higherDepth(itemPrice, "low").getAsDouble(), 0);
+					}
+				}
+			} catch (Exception ignored) {}
+		}
 
 		tempSet.add(itemId + " - " + iName);
 		return 0;

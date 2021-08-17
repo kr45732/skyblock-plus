@@ -162,7 +162,7 @@ public class HelpCommand extends Command {
 				new HelpData("bits", "Get the bits cost of an item from the bits shop.", "bits [item]")
 					.addExamples("bits God Potion")
 					.addAliases("bit"),
-				new HelpData("price", "Calculate the price of an item on the auction house using the auction's UUID.", "price [UUID]")
+				new HelpData("calculate", "Calculate the price of an item on the auction house using the auction's UUID.", "price [UUID]")
 					.addExamples("price 8be8bef8c46f4dbda2eccd1ca0c30e27"),
 				new HelpData("inventory", "Get a player's inventory represented in emojis.", "inventory [player] <profile>")
 					.addSecondData("Get a player's inventory with lore.", "inventory [player] <profile> [slot:number]")

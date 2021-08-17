@@ -951,7 +951,7 @@ public class Utils {
 							itemInfo.addExtraValue("THE_ART_OF_WAR");
 						}
 
-						if (item.getInt("tag.ExtraAttributes,dungeon_item_level", 0) > 5) {
+						if (item.getInt("tag.ExtraAttributes.dungeon_item_level", 0) > 5) {
 							int masterStarCount = item.getInt("tag.ExtraAttributes,dungeon_item_level", 5) - 5;
 							switch (masterStarCount) {
 								case 4:
@@ -963,6 +963,10 @@ public class Utils {
 								case 1:
 									itemInfo.addExtraValue("FIRST_MASTER_STAR");
 							}
+						}
+
+						for (int j = 0; j < item.getInt("tag.ExtraAttributes.farming_for_dummies_count", 0); j++) {
+							itemInfo.addExtraValue("FARMING_FOR_DUMMIES");
 						}
 
 						try {
