@@ -11,7 +11,7 @@ public class PlaceholderCommand extends Command {
 	public PlaceholderCommand() {
 		this.name = "d-placeholder";
 		this.ownerCommand = true;
-		this.aliases = new String[]{"ph"};
+		this.aliases = new String[] { "ph" };
 	}
 
 	@Override
@@ -25,9 +25,9 @@ public class PlaceholderCommand extends Command {
 				eb.addField("Total", "" + (Runtime.getRuntime().totalMemory() / 1000000.0) + " MB", false);
 				eb.addField("Free", "" + (Runtime.getRuntime().freeMemory() / 1000000.0) + " MB", false);
 				eb.addField(
-						"Used",
-						"" + ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1000000.0) + " MB",
-						false
+					"Used",
+					"" + ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1000000.0) + " MB",
+					false
 				);
 				eb.addField("Max", "" + (Runtime.getRuntime().maxMemory() / 1000000.0) + " MB", false);
 
@@ -39,9 +39,8 @@ public class PlaceholderCommand extends Command {
 				embed(eb);
 			}
 		}
-				.submit();
+			.submit();
 	}
-
 	//	public static void main(String[] args) {
 	//		for(String i:getEmojiMap().keySet()){
 	//			if(getJson("https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/items/" + i.toUpperCase() + ".json") == null){

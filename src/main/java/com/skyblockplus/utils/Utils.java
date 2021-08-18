@@ -1150,15 +1150,15 @@ public class Utils {
 		return priceOverrideJson.has(itemId) ? priceOverrideJson.get(itemId).getAsDouble() : -1;
 	}
 
-	public static double getMin(double val1, double val2){
+	public static double getMin(double val1, double val2) {
 		val1 = val1 < 0 ? -1 : val1;
 		val2 = val2 < 0 ? -1 : val2;
 
-		if(val1 != -1 && val2 != -1){
+		if (val1 != -1 && val2 != -1) {
 			return Math.max(Math.min(val1, val2), 0);
-		}else if(val1 != -1){
+		} else if (val1 != -1) {
 			return val1;
-		}else {
+		} else {
 			return val2;
 		}
 	}

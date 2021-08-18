@@ -1120,7 +1120,10 @@ public class NetworthExecute {
 
 		for (JsonElement sbzPrice : sbzPrices) {
 			String sbzItemName = higherDepth(sbzPrice, "name").getAsString();
-			if(sbzItemName.equalsIgnoreCase(enchantName + "_" + enchantLevel) || sbzItemName.equalsIgnoreCase(enchantName + "_" + toRomanNumerals(enchantLevel))){
+			if (
+				sbzItemName.equalsIgnoreCase(enchantName + "_" + enchantLevel) ||
+				sbzItemName.equalsIgnoreCase(enchantName + "_" + toRomanNumerals(enchantLevel))
+			) {
 				return higherDepth(sbzPrice, "low").getAsLong();
 			}
 		}
@@ -1160,7 +1163,7 @@ public class NetworthExecute {
 			} catch (Exception ignored) {}
 
 			double minBinAverage = getMin(lowestBin, averageAuction);
-			if(minBinAverage != -1){
+			if (minBinAverage != -1) {
 				return minBinAverage;
 			}
 
