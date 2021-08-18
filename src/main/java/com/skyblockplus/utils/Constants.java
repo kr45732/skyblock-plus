@@ -88,7 +88,7 @@ public class Constants {
 		rarityToNumberMap.put("COMMON", ";0");
 
 		/* enchantNames */
-		for (String enchantName : getEnchantsJson().getAsJsonObject().keySet()) {
+		for (String enchantName : higherDepth(getEnchantsJson(), "enchants_min_level").getAsJsonObject().keySet()) {
 			enchantNames.add(enchantName.toUpperCase());
 		}
 		if (!enchantNames.contains("ULTIMATE_JERRY")) {

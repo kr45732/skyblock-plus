@@ -3,6 +3,7 @@ package com.skyblockplus.networth;
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Hypixel.getAuctionPetsByName;
 import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.getMin;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -1108,28 +1109,20 @@ public class NetworthExecute {
 
 			try {
 				JsonElement avgInfo = higherDepth(averageAuctionJson, enchantName + ";" + i);
-				averageAuction =
-					higherDepth(avgInfo, "clean_price") != null
-						? higherDepth(avgInfo, "clean_price").getAsDouble()
-						: higherDepth(avgInfo, "price").getAsDouble();
+				averageAuction = getMin(higherDepth(avgInfo, "clean_price", -1.0), higherDepth(avgInfo, "price", -1.0));
 			} catch (Exception ignored) {}
 
-			if (lowestBin == -1 && averageAuction != -1) {
-				return Math.pow(2, enchantLevel - i) * averageAuction;
-			} else if (lowestBin != -1 && averageAuction == -1) {
-				return Math.pow(2, enchantLevel - i) * lowestBin;
-			} else if (lowestBin != -1 && averageAuction != -1) {
-				return (Math.pow(2, enchantLevel - i) * Math.min(lowestBin, averageAuction));
+			double min = getMin(Math.pow(2, enchantLevel - i) * lowestBin, Math.pow(2, enchantLevel - i) * averageAuction);
+			if (min != -1) {
+				return min;
 			}
 		}
 
-		// TODO: this doesn't work widew
-		if (higherDepth(sbzPrices, enchantName + "_1") != null) {
-			return (Math.pow(2, enchantLevel - 1) * higherDepth(sbzPrices, enchantName + "_1").getAsDouble());
-		}
-
-		if (higherDepth(sbzPrices, enchantName + "_i") != null) {
-			return (Math.pow(2, enchantLevel - 1) * higherDepth(sbzPrices, enchantName + "_i").getAsDouble());
+		for (JsonElement sbzPrice : sbzPrices) {
+			String sbzItemName = higherDepth(sbzPrice, "name").getAsString();
+			if(sbzItemName.equalsIgnoreCase(enchantName + "_" + enchantLevel) || sbzItemName.equalsIgnoreCase(enchantName + "_" + toRomanNumerals(enchantLevel))){
+				return higherDepth(sbzPrice, "low").getAsLong();
+			}
 		}
 
 		tempSet.add(enchantId);
@@ -1163,18 +1156,12 @@ public class NetworthExecute {
 
 			try {
 				JsonElement avgInfo = higherDepth(averageAuctionJson, itemId);
-				averageAuction =
-					higherDepth(avgInfo, "clean_price") != null
-						? higherDepth(avgInfo, "clean_price").getAsDouble()
-						: higherDepth(avgInfo, "price").getAsDouble();
+				averageAuction = getMin(higherDepth(avgInfo, "clean_price", -1.0), higherDepth(avgInfo, "price", -1.0));
 			} catch (Exception ignored) {}
 
-			if (lowestBin == -1 && averageAuction != -1) {
-				return Math.max(averageAuction, 0);
-			} else if (lowestBin != -1 && averageAuction == -1) {
-				return Math.max(lowestBin, 0);
-			} else if (lowestBin != -1 && averageAuction != -1) {
-				return Math.max(Math.min(lowestBin, averageAuction), 0);
+			double minBinAverage = getMin(lowestBin, averageAuction);
+			if(minBinAverage != -1){
+				return minBinAverage;
 			}
 
 			try {

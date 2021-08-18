@@ -32,6 +32,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
@@ -627,7 +629,7 @@ public class AutomaticGuild {
 					.getDescription()
 					.contains("https://github.com/Moulberry/NotEnoughUpdates-REPO/commit/")
 			) {
-				if (IS_API) {
+				if (!IS_API) {
 					updateItemMappings();
 				}
 
@@ -782,17 +784,17 @@ public class AutomaticGuild {
 		rarityMapRev.put("1", "Uncommon");
 		rarityMapRev.put("0", "Common");
 
-		for (File child : dir.listFiles()) {
+		for (File child : Arrays.stream(dir.listFiles()).sorted(Comparator.comparing(File::getName)).collect(Collectors.toList())) {
 			try {
 				JsonElement itemJson = JsonParser.parseReader(new FileReader(child));
 				String itemName = parseMcCodes(higherDepth(itemJson, "displayname").getAsString()).replace("�", "");
-				String internalName = higherDepth(itemJson, "internalname").getAsString();
+				String itemId = higherDepth(itemJson, "internalname").getAsString();
 				if (itemName.contains("(")) {
 					continue;
 				}
 
 				if (itemName.startsWith("[Lvl")) {
-					itemName = rarityMapRev.get(internalName.split(";")[1]) + " " + itemName.split("] ")[1];
+					itemName = rarityMapRev.get(itemId.split(";")[1]) + " " + itemName.split("] ")[1];
 				}
 				if (itemName.equals("Enchanted Book")) {
 					itemName = parseMcCodes(higherDepth(itemJson, "lore").getAsJsonArray().get(0).getAsString());
@@ -807,12 +809,12 @@ public class AutomaticGuild {
 				if (itemName.contains("MELODY_HAIR")) {
 					itemName = "MELODY_HAIR";
 				}
-				if (internalName.contains("-")) {
-					internalName = internalName.replace("-", ":");
+				if (itemId.contains("-")) {
+					itemId = itemId.replace("-", ":");
 				}
 
 				JsonArray toAdd = new JsonArray();
-				toAdd.add(internalName);
+				toAdd.add(itemId);
 				if (outputArray.has(itemName)) {
 					toAdd.addAll(outputArray.get(itemName).getAsJsonArray());
 				}
@@ -840,6 +842,9 @@ public class AutomaticGuild {
 				if (itemJson.has("vanilla")) {
 					String name = parseMcCodes(itemJson.get("displayname").getAsString());
 					String id = itemJson.get("internalname").getAsString();
+					if (id.contains("-")) {
+						id = id.replace("-", ":");
+					}
 					long price = 0;
 
 					try {

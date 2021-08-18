@@ -48,9 +48,10 @@ public class QueryAuctionCommand extends Command {
 
 					String rarity = "ANY";
 					for (String rarityName : rarityToNumberMap.keySet()) {
-						if (query.contains(rarity.toLowerCase())) {
+						if (query.contains(rarityName.toLowerCase())) {
 							rarity = rarityName;
 							query = query.replace(rarityName.toLowerCase(), "").trim().replaceAll("\\s+", " ");
+							break;
 						}
 					}
 

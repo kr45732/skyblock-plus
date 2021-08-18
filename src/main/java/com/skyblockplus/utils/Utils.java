@@ -54,6 +54,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.Dsl;
+import org.dom4j.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -640,6 +641,19 @@ public class Utils {
 		}
 	}
 
+	public static double higherDepth(JsonElement element, String path, double defaultValue) {
+		String[] paths = path.split("\\.");
+
+		try {
+			for (String key : paths) {
+				element = element.getAsJsonObject().get(key);
+			}
+			return element.getAsDouble();
+		} catch (Exception e) {
+			return defaultValue;
+		}
+	}
+
 	public static String toRomanNumerals(int number) {
 		return join("", nCopies(number, "i")).replace("iiiii", "v").replace("iiii", "iv").replace("vv", "x").replace("viv", "ix");
 	}
@@ -1134,5 +1148,18 @@ public class Utils {
 		}
 
 		return priceOverrideJson.has(itemId) ? priceOverrideJson.get(itemId).getAsDouble() : -1;
+	}
+
+	public static double getMin(double val1, double val2){
+		val1 = val1 < 0 ? -1 : val1;
+		val2 = val2 < 0 ? -1 : val2;
+
+		if(val1 != -1 && val2 != -1){
+			return Math.max(Math.min(val1, val2), 0);
+		}else if(val1 != -1){
+			return val1;
+		}else {
+			return val2;
+		}
 	}
 }
