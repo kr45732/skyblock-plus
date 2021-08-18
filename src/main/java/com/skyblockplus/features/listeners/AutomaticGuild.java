@@ -628,7 +628,7 @@ public class AutomaticGuild {
 					.getDescription()
 					.contains("https://github.com/Moulberry/NotEnoughUpdates-REPO/commit/")
 			) {
-				if (!IS_API) {
+				if (IS_API) {
 					updateItemMappings();
 				}
 
