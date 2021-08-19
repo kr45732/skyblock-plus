@@ -637,9 +637,7 @@ public class AutomaticGuild {
 						internalJsonMappings =
 							getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json")
 								.getAsJsonObject();
-						priceOverrideJson =
-							getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/PriceOverrides.json")
-								.getAsJsonObject();
+						refreshPriceOverrideJson();
 					},
 					5,
 					TimeUnit.MINUTES
@@ -877,6 +875,17 @@ public class AutomaticGuild {
 			}
 		}
 
-		return outputObject;
+		JsonObject finalOutput = new JsonObject();
+		try {
+			JsonElement currentPriceOverrides = JsonParser.parseReader(
+				new FileReader("src/main/java/com/skyblockplus/json/skyblock_plus/PriceOverrides.json")
+			);
+			if (currentPriceOverrides != null && higherDepth(currentPriceOverrides, "manual") != null) {
+				finalOutput.add("manual", higherDepth(currentPriceOverrides, "manual"));
+			}
+		} catch (Exception ignored) {}
+
+		finalOutput.add("automatic", outputObject);
+		return finalOutput;
 	}
 }

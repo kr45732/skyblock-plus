@@ -60,8 +60,6 @@ public class ApplyUser implements Serializable {
 			.complete();
 		this.applicationChannelId = applicationChannel.getId();
 
-		applicationChannel.sendMessage("Welcome " + applyingUser.getAsMention() + "!").complete();
-
 		boolean isIronman = false;
 		try {
 			isIronman = higherDepth(currentSettings, "ironmanOnly").getAsBoolean();
@@ -71,6 +69,7 @@ public class ApplyUser implements Serializable {
 		String[] profileNames = player.getAllProfileNames(isIronman);
 
 		if (profileNames.length == 1) {
+			applicationChannel.sendMessage(applyingUser.getAsMention()).complete();
 			caseOne(profileNames[0], currentSettings, applicationChannel);
 		} else {
 			EmbedBuilder welcomeEb = defaultEmbed("Application for " + player.getUsername());
@@ -101,7 +100,7 @@ public class ApplyUser implements Serializable {
 			);
 			profileEmojiToName.put("↩️", player.getProfileName());
 
-			Message reactMessage = applicationChannel.sendMessageEmbeds(welcomeEb.build()).complete();
+			Message reactMessage = applicationChannel.sendMessage(applyingUser.getAsMention()).setEmbeds(welcomeEb.build()).complete();
 			this.reactMessageId = reactMessage.getId();
 
 			for (String profileEmoji : profileEmojiToName.keySet()) {

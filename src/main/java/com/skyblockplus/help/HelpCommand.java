@@ -216,7 +216,7 @@ public class HelpCommand extends Command {
 						"Calculate a player's networth with a detailed JSON of each item cost.",
 						"networth [player] <profile> --verbose"
 					)
-					.addAliases("nw")
+					.addAliases("nw", "n")
 					.addExamples(
 						"networth CrypticPlasma",
 						"networth CrypticPlasma Zucchini",

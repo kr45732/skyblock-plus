@@ -1141,10 +1141,18 @@ public class Utils {
 		return 100;
 	}
 
+	public static void refreshPriceOverrideJson() {
+		JsonElement splitPriceOverrides = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/PriceOverrides.json")
+			.getAsJsonObject();
+		priceOverrideJson = higherDepth(splitPriceOverrides, "automatic").getAsJsonObject();
+		for (Map.Entry<String, JsonElement> manualOverride : higherDepth(splitPriceOverrides, "manual").getAsJsonObject().entrySet()) {
+			priceOverrideJson.add(manualOverride.getKey(), manualOverride.getValue());
+		}
+	}
+
 	public static double getPriceOverride(String itemId) {
 		if (priceOverrideJson == null) {
-			priceOverrideJson =
-				getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/PriceOverrides.json").getAsJsonObject();
+			refreshPriceOverrideJson();
 		}
 
 		return priceOverrideJson.has(itemId) ? priceOverrideJson.get(itemId).getAsDouble() : -1;

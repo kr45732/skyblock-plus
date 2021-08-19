@@ -3,7 +3,6 @@ package com.skyblockplus.networth;
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Hypixel.getAuctionPetsByName;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.getMin;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -221,7 +220,6 @@ public class NetworthExecute {
 					.append(simplifyNumber(Double.parseDouble(item.split("@split@")[1])))
 					.append("\n");
 				if (i == 4) {
-					echestStr.append("• And more...");
 					break;
 				}
 			}
@@ -237,7 +235,6 @@ public class NetworthExecute {
 					.append(simplifyNumber(Double.parseDouble(item.split("@split@")[1])))
 					.append("\n");
 				if (i == 4) {
-					storageStr.append("• And more...");
 					break;
 				}
 			}
@@ -253,7 +250,6 @@ public class NetworthExecute {
 					.append(simplifyNumber(Double.parseDouble(item.split("@split@")[1])))
 					.append("\n");
 				if (i == 4) {
-					invStr.append("• And more...");
 					break;
 				}
 			}
@@ -284,7 +280,6 @@ public class NetworthExecute {
 					.append(simplifyNumber(Double.parseDouble(item.split("@split@")[1])))
 					.append("\n");
 				if (i == 4) {
-					wardrobeStr.append("• And more...");
 					break;
 				}
 			}
@@ -300,7 +295,6 @@ public class NetworthExecute {
 					.append(simplifyNumber(Double.parseDouble(item.split("@split@")[1])))
 					.append("\n");
 				if (i == 4) {
-					petsStr.append("• And more...");
 					break;
 				}
 			}
@@ -316,7 +310,6 @@ public class NetworthExecute {
 					.append(simplifyNumber(Double.parseDouble(item.split("@split@")[1])))
 					.append("\n");
 				if (i == 4) {
-					talismanStr.append("• And more...");
 					break;
 				}
 			}
@@ -348,14 +341,9 @@ public class NetworthExecute {
 			eb.addField("Wardrobe | " + simplifyNumber(wardrobeTotal), wardrobeStr.length() == 0 ? "Empty" : wardrobeStr.toString(), false);
 			eb.addField("Pets | " + simplifyNumber(petsTotal), petsStr.length() == 0 ? "Empty" : petsStr.toString(), false);
 			eb.addField("Talisman | " + simplifyNumber(talismanTotal), talismanStr.length() == 0 ? "Empty" : talismanStr.toString(), false);
+			eb.addField("Bug in the price calculation?", "[Please submit a bug report here!](https://forms.gle/RBmN2AFBLafGyx5E7)", false);
 
-			tempSet.forEach(
-				str -> {
-					if (!str.toLowerCase().contains("skyblock_menu") && !str.toLowerCase().startsWith("rune_")) {
-						System.out.println(str);
-					}
-				}
-			);
+			tempSet.stream().filter(str -> !str.toLowerCase().startsWith("rune_")).forEach(System.out::println);
 
 			return eb;
 		}

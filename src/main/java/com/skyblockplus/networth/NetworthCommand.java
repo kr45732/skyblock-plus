@@ -10,7 +10,7 @@ public class NetworthCommand extends Command {
 	public NetworthCommand() {
 		this.name = "networth";
 		this.cooldown = globalCooldown + 1;
-		this.aliases = new String[] { "nw" };
+		this.aliases = new String[] { "nw", "n" };
 	}
 
 	@Override
