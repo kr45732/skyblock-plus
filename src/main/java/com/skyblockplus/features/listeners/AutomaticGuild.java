@@ -20,6 +20,7 @@ import com.skyblockplus.features.apply.ApplyUser;
 import com.skyblockplus.features.setup.SetupCommandHandler;
 import com.skyblockplus.features.skyblockevent.SkyblockEvent;
 import com.skyblockplus.features.verify.VerifyGuild;
+import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import java.io.File;
 import java.io.FileReader;
@@ -743,13 +744,16 @@ public class AutomaticGuild {
 				.setDirectory(skyblockPlusDir)
 				.call();
 
-			try (Writer writer = new FileWriter("src/main/java/com/skyblockplus/json/skyblock_plus/InternalNameMappings.json")) {
-				new GsonBuilder().setPrettyPrinting().create().toJson(getUpdatedItemMappingsJson(), writer);
+			JsonElement currentPriceOverrides = JsonParser.parseReader(
+				new FileReader("src/main/java/com/skyblockplus/json/skyblock_plus/PriceOverrides.json")
+			);
+			try (Writer writer = new FileWriter("src/main/java/com/skyblockplus/json/skyblock_plus/PriceOverrides.json")) {
+				new GsonBuilder().setPrettyPrinting().create().toJson(getUpdatedPriceOverridesJson(currentPriceOverrides), writer);
 				writer.flush();
 			}
 
-			try (Writer writer = new FileWriter("src/main/java/com/skyblockplus/json/skyblock_plus/PriceOverrides.json")) {
-				new GsonBuilder().setPrettyPrinting().create().toJson(getUpdatedPriceOverridesJson(), writer);
+			try (Writer writer = new FileWriter("src/main/java/com/skyblockplus/json/skyblock_plus/InternalNameMappings.json")) {
+				new GsonBuilder().setPrettyPrinting().create().toJson(getUpdatedItemMappingsJson(), writer);
 				writer.flush();
 			}
 
@@ -825,7 +829,7 @@ public class AutomaticGuild {
 		return outputArray;
 	}
 
-	public JsonElement getUpdatedPriceOverridesJson() {
+	public JsonElement getUpdatedPriceOverridesJson(JsonElement currentPriceOverrides) {
 		File dir = new File("src/main/java/com/skyblockplus/json/neu/items");
 		JsonElement bazaarJson = higherDepth(getBazaarJson(), "products");
 		JsonArray sbzPricesJson = getSbzPricesJson();
@@ -876,15 +880,7 @@ public class AutomaticGuild {
 		}
 
 		JsonObject finalOutput = new JsonObject();
-		try {
-			JsonElement currentPriceOverrides = JsonParser.parseReader(
-				new FileReader("src/main/java/com/skyblockplus/json/skyblock_plus/PriceOverrides.json")
-			);
-			if (currentPriceOverrides != null && higherDepth(currentPriceOverrides, "manual") != null) {
-				finalOutput.add("manual", higherDepth(currentPriceOverrides, "manual"));
-			}
-		} catch (Exception ignored) {}
-
+		finalOutput.add("manual", higherDepth(currentPriceOverrides, "manual"));
 		finalOutput.add("automatic", outputObject);
 		return finalOutput;
 	}
