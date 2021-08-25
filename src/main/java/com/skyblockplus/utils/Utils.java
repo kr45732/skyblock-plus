@@ -41,6 +41,7 @@ import me.nullicorn.nedit.type.NBTCompound;
 import me.nullicorn.nedit.type.NBTList;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.exceptions.PermissionException;
@@ -54,7 +55,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.Dsl;
-import org.dom4j.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -482,7 +482,11 @@ public class Utils {
 		EmbedBuilder eb = new EmbedBuilder();
 		eb.setColor(botColor);
 		eb.setFooter("Created by CrypticPlasma", null);
-		eb.setTitle(title, titleUrl);
+		if (titleUrl != null && titleUrl.length() <= MessageEmbed.URL_MAX_LENGTH && EmbedBuilder.URL_PATTERN.matcher(titleUrl).matches()) {
+			eb.setTitle(title, titleUrl);
+		} else {
+			eb.setTitle(title);
+		}
 		eb.setTimestamp(Instant.now());
 		return eb;
 	}

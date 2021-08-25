@@ -1,7 +1,6 @@
 package com.skyblockplus.networth;
 
 import static com.skyblockplus.utils.Constants.*;
-import static com.skyblockplus.utils.Hypixel.getAuctionPetsByName;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.GsonBuilder;
@@ -285,19 +284,21 @@ public class NetworthExecute {
 			}
 
 			petsItems.sort(Comparator.comparingDouble(item -> -Double.parseDouble(item.split("@split@")[1])));
-			StringBuilder petsStr = new StringBuilder();
-			for (int i = 0; i < petsItems.size(); i++) {
-				String item = petsItems.get(i);
-				petsStr
-					.append("• ")
-					.append(item.split("@split@")[0])
-					.append(" ➜ ")
-					.append(simplifyNumber(Double.parseDouble(item.split("@split@")[1])))
-					.append("\n");
-				if (i == 4) {
-					break;
-				}
-			}
+			StringBuilder petsStr = new StringBuilder(
+				"Pet calculations will not be working for the time being due to the API I was using being shut down. I working on a replacement for this. Please join the Skyblock Plus Discord for the latest update."
+			);
+			//			for (int i = 0; i < petsItems.size(); i++) {
+			//				String item = petsItems.get(i);
+			//				petsStr
+			//					.append("• ")
+			//					.append(item.split("@split@")[0])
+			//					.append(" ➜ ")
+			//					.append(simplifyNumber(Double.parseDouble(item.split("@split@")[1])))
+			//					.append("\n");
+			//				if (i == 4) {
+			//					break;
+			//				}
+			//			}
 
 			talismanItems.sort(Comparator.comparingDouble(item -> -Double.parseDouble(item.split("@split@")[1])));
 			StringBuilder talismanStr = new StringBuilder();
@@ -351,405 +352,406 @@ public class NetworthExecute {
 	}
 
 	private void calculateAllPetsPrice() {
-		StringBuilder queryStr = new StringBuilder();
-		for (InvItem item : invPets) {
-			String petName = capitalizeString(item.getName()).replace("lvl", "Lvl");
-			queryStr.append("\"").append(petName).append("\",");
-		}
-		for (InvItem item : petsPets) {
-			String petName = capitalizeString(item.getName()).replace("lvl", "Lvl");
-			queryStr.append("\"").append(petName).append("\",");
-		}
-		for (InvItem item : enderChestPets) {
-			String petName = capitalizeString(item.getName()).replace("lvl", "Lvl");
-			queryStr.append("\"").append(petName).append("\",");
-		}
+		// TODO: Fix
+		//		StringBuilder queryStr = new StringBuilder();
+		//		for (InvItem item : invPets) {
+		//			String petName = capitalizeString(item.getName()).replace("lvl", "Lvl");
+		//			queryStr.append("\"").append(petName).append("\",");
+		//		}
+		//		for (InvItem item : petsPets) {
+		//			String petName = capitalizeString(item.getName()).replace("lvl", "Lvl");
+		//			queryStr.append("\"").append(petName).append("\",");
+		//		}
+		//		for (InvItem item : enderChestPets) {
+		//			String petName = capitalizeString(item.getName()).replace("lvl", "Lvl");
+		//			queryStr.append("\"").append(petName).append("\",");
+		//		}
+		//
+		//		for (InvItem item : storagePets) {
+		//			String petName = capitalizeString(item.getName()).replace("lvl", "Lvl");
+		//			queryStr.append("\"").append(petName).append("\",");
+		//		}
+		//
+		//		if (queryStr.length() == 0) {
+		//			return;
+		//		}
+		//
+		//		queryStr = new StringBuilder(queryStr.substring(0, queryStr.length() - 1));
+		//
+		//		JsonArray ahQuery = getAuctionPetsByName(queryStr.toString());
+		//
+		//		if (ahQuery != null) {
+		//			for (JsonElement auction : ahQuery) {
+		//				String auctionName = higherDepth(auction, "item_name").getAsString();
+		//				double auctionPrice = higherDepth(auction, "starting_bid").getAsDouble();
+		//				String auctionRarity = higherDepth(auction, "tier").getAsString();
+		//
+		//				for (Iterator<InvItem> iterator = invPets.iterator(); iterator.hasNext();) {
+		//					InvItem item = iterator.next();
+		//					if (item.getName().equalsIgnoreCase(auctionName) && item.getRarity().equalsIgnoreCase(auctionRarity)) {
+		//						StringBuilder miscStr = new StringBuilder("[");
+		//						double miscExtras = 0;
+		//						try {
+		//							List<String> extraStats = item.getExtraStats();
+		//							for (String extraItem : extraStats) {
+		//								double miscPrice = getLowestPrice(extraItem, " ");
+		//								miscExtras += miscPrice;
+		//								miscStr
+		//									.append("{\"name\":\"")
+		//									.append(extraItem)
+		//									.append("\",\"price\":\"")
+		//									.append(simplifyNumber(miscPrice))
+		//									.append("\"},");
+		//							}
+		//						} catch (Exception ignored) {}
+		//						if (miscStr.toString().endsWith(",")) {
+		//							miscStr = new StringBuilder(miscStr.substring(0, miscStr.length() - 1));
+		//						}
+		//						miscStr.append("]");
+		//
+		//						invItems.add(addItemStr(item, auctionPrice + miscExtras));
+		//						invTotal += auctionPrice + miscExtras;
+		//						if (verbose) {
+		//							calcItemsJsonStr
+		//								.append("{\"total\":\"")
+		//								.append(simplifyNumber(auctionPrice + miscExtras))
+		//								.append("\",\"name\":\"")
+		//								.append(item.getName())
+		//								.append("\",\"base_cost\":\"")
+		//								.append(simplifyNumber(auctionPrice))
+		//								.append("\"")
+		//								.append(
+		//									miscExtras > 0
+		//										? ",\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}"
+		//										: ""
+		//								)
+		//								.append("},");
+		//						}
+		//						iterator.remove();
+		//					}
+		//				}
+		//
+		//				for (Iterator<InvItem> iterator = petsPets.iterator(); iterator.hasNext();) {
+		//					InvItem item = iterator.next();
+		//					if (item.getName().equalsIgnoreCase(auctionName) && item.getRarity().equalsIgnoreCase(auctionRarity)) {
+		//						StringBuilder miscStr = new StringBuilder("[");
+		//						double miscExtras = 0;
+		//						try {
+		//							List<String> extraStats = item.getExtraStats();
+		//							for (String extraItem : extraStats) {
+		//								double miscPrice = getLowestPrice(extraItem, " ");
+		//								miscExtras += miscPrice;
+		//								miscStr
+		//									.append("{\"name\":\"")
+		//									.append(extraItem)
+		//									.append("\",\"price\":\"")
+		//									.append(simplifyNumber(miscPrice))
+		//									.append("\"},");
+		//							}
+		//						} catch (Exception ignored) {}
+		//						if (miscStr.toString().endsWith(",")) {
+		//							miscStr = new StringBuilder(miscStr.substring(0, miscStr.length() - 1));
+		//						}
+		//						miscStr.append("]");
+		//
+		//						petsItems.add(addItemStr(item, auctionPrice + miscExtras));
+		//						petsTotal += auctionPrice + miscExtras;
+		//						if (verbose) {
+		//							calcItemsJsonStr
+		//								.append("{\"total\":\"")
+		//								.append(simplifyNumber(auctionPrice + miscExtras))
+		//								.append("\",\"name\":\"")
+		//								.append(item.getName())
+		//								.append("\",\"base_cost\":\"")
+		//								.append(simplifyNumber(auctionPrice))
+		//								.append("\"")
+		//								.append(
+		//									miscExtras > 0
+		//										? ",\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}"
+		//										: ""
+		//								)
+		//								.append("},");
+		//						}
+		//						iterator.remove();
+		//					}
+		//				}
+		//
+		//				for (Iterator<InvItem> iterator = enderChestPets.iterator(); iterator.hasNext();) {
+		//					InvItem item = iterator.next();
+		//					if (item.getName().equalsIgnoreCase(auctionName) && item.getRarity().equalsIgnoreCase(auctionRarity)) {
+		//						StringBuilder miscStr = new StringBuilder("[");
+		//						double miscExtras = 0;
+		//						try {
+		//							List<String> extraStats = item.getExtraStats();
+		//							for (String extraItem : extraStats) {
+		//								double miscPrice = getLowestPrice(extraItem, " ");
+		//								miscExtras += miscPrice;
+		//								miscStr
+		//									.append("{\"name\":\"")
+		//									.append(extraItem)
+		//									.append("\",\"price\":\"")
+		//									.append(simplifyNumber(miscPrice))
+		//									.append("\"},");
+		//							}
+		//						} catch (Exception ignored) {}
+		//						if (miscStr.toString().endsWith(",")) {
+		//							miscStr = new StringBuilder(miscStr.substring(0, miscStr.length() - 1));
+		//						}
+		//						miscStr.append("]");
+		//
+		//						enderChestItems.add(addItemStr(item, auctionPrice + miscExtras));
+		//						enderChestTotal += auctionPrice + miscExtras;
+		//						if (verbose) {
+		//							calcItemsJsonStr
+		//								.append("{\"total\":\"")
+		//								.append(simplifyNumber(auctionPrice + miscExtras))
+		//								.append("\",\"name\":\"")
+		//								.append(item.getName())
+		//								.append("\",\"base_cost\":\"")
+		//								.append(simplifyNumber(auctionPrice))
+		//								.append("\"")
+		//								.append(
+		//									miscExtras > 0
+		//										? ",\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}"
+		//										: ""
+		//								)
+		//								.append("},");
+		//						}
+		//						iterator.remove();
+		//					}
+		//				}
+		//
+		//				for (Iterator<InvItem> iterator = storagePets.iterator(); iterator.hasNext();) {
+		//					InvItem item = iterator.next();
+		//					if (item.getName().equalsIgnoreCase(auctionName) && item.getRarity().equalsIgnoreCase(auctionRarity)) {
+		//						StringBuilder miscStr = new StringBuilder("[");
+		//						double miscExtras = 0;
+		//						try {
+		//							List<String> extraStats = item.getExtraStats();
+		//							for (String extraItem : extraStats) {
+		//								double miscPrice = getLowestPrice(extraItem, " ");
+		//								miscExtras += miscPrice;
+		//								miscStr
+		//									.append("{\"name\":\"")
+		//									.append(extraItem)
+		//									.append("\",\"price\":\"")
+		//									.append(simplifyNumber(miscPrice))
+		//									.append("\"},");
+		//							}
+		//						} catch (Exception ignored) {}
+		//						if (miscStr.toString().endsWith(",")) {
+		//							miscStr = new StringBuilder(miscStr.substring(0, miscStr.length() - 1));
+		//						}
+		//						miscStr.append("]");
+		//
+		//						storageItems.add(addItemStr(item, auctionPrice + miscExtras));
+		//						storageTotal += auctionPrice + miscExtras;
+		//						if (verbose) {
+		//							calcItemsJsonStr
+		//								.append("{\"total\":\"")
+		//								.append(simplifyNumber(auctionPrice + miscExtras))
+		//								.append("\",\"name\":\"")
+		//								.append(item.getName())
+		//								.append("\",\"base_cost\":\"")
+		//								.append(simplifyNumber(auctionPrice))
+		//								.append("\"")
+		//								.append(
+		//									miscExtras > 0
+		//										? ",\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}"
+		//										: ""
+		//								)
+		//								.append("},");
+		//						}
+		//						iterator.remove();
+		//					}
+		//				}
+		//			}
+		//		}
 
-		for (InvItem item : storagePets) {
-			String petName = capitalizeString(item.getName()).replace("lvl", "Lvl");
-			queryStr.append("\"").append(petName).append("\",");
-		}
-
-		if (queryStr.length() == 0) {
-			return;
-		}
-
-		queryStr = new StringBuilder(queryStr.substring(0, queryStr.length() - 1));
-
-		JsonArray ahQuery = getAuctionPetsByName(queryStr.toString());
-
-		if (ahQuery != null) {
-			for (JsonElement auction : ahQuery) {
-				String auctionName = higherDepth(auction, "item_name").getAsString();
-				double auctionPrice = higherDepth(auction, "starting_bid").getAsDouble();
-				String auctionRarity = higherDepth(auction, "tier").getAsString();
-
-				for (Iterator<InvItem> iterator = invPets.iterator(); iterator.hasNext();) {
-					InvItem item = iterator.next();
-					if (item.getName().equalsIgnoreCase(auctionName) && item.getRarity().equalsIgnoreCase(auctionRarity)) {
-						StringBuilder miscStr = new StringBuilder("[");
-						double miscExtras = 0;
-						try {
-							List<String> extraStats = item.getExtraStats();
-							for (String extraItem : extraStats) {
-								double miscPrice = getLowestPrice(extraItem, " ");
-								miscExtras += miscPrice;
-								miscStr
-									.append("{\"name\":\"")
-									.append(extraItem)
-									.append("\",\"price\":\"")
-									.append(simplifyNumber(miscPrice))
-									.append("\"},");
-							}
-						} catch (Exception ignored) {}
-						if (miscStr.toString().endsWith(",")) {
-							miscStr = new StringBuilder(miscStr.substring(0, miscStr.length() - 1));
-						}
-						miscStr.append("]");
-
-						invItems.add(addItemStr(item, auctionPrice + miscExtras));
-						invTotal += auctionPrice + miscExtras;
-						if (verbose) {
-							calcItemsJsonStr
-								.append("{\"total\":\"")
-								.append(simplifyNumber(auctionPrice + miscExtras))
-								.append("\",\"name\":\"")
-								.append(item.getName())
-								.append("\",\"base_cost\":\"")
-								.append(simplifyNumber(auctionPrice))
-								.append("\"")
-								.append(
-									miscExtras > 0
-										? ",\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}"
-										: ""
-								)
-								.append("},");
-						}
-						iterator.remove();
-					}
-				}
-
-				for (Iterator<InvItem> iterator = petsPets.iterator(); iterator.hasNext();) {
-					InvItem item = iterator.next();
-					if (item.getName().equalsIgnoreCase(auctionName) && item.getRarity().equalsIgnoreCase(auctionRarity)) {
-						StringBuilder miscStr = new StringBuilder("[");
-						double miscExtras = 0;
-						try {
-							List<String> extraStats = item.getExtraStats();
-							for (String extraItem : extraStats) {
-								double miscPrice = getLowestPrice(extraItem, " ");
-								miscExtras += miscPrice;
-								miscStr
-									.append("{\"name\":\"")
-									.append(extraItem)
-									.append("\",\"price\":\"")
-									.append(simplifyNumber(miscPrice))
-									.append("\"},");
-							}
-						} catch (Exception ignored) {}
-						if (miscStr.toString().endsWith(",")) {
-							miscStr = new StringBuilder(miscStr.substring(0, miscStr.length() - 1));
-						}
-						miscStr.append("]");
-
-						petsItems.add(addItemStr(item, auctionPrice + miscExtras));
-						petsTotal += auctionPrice + miscExtras;
-						if (verbose) {
-							calcItemsJsonStr
-								.append("{\"total\":\"")
-								.append(simplifyNumber(auctionPrice + miscExtras))
-								.append("\",\"name\":\"")
-								.append(item.getName())
-								.append("\",\"base_cost\":\"")
-								.append(simplifyNumber(auctionPrice))
-								.append("\"")
-								.append(
-									miscExtras > 0
-										? ",\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}"
-										: ""
-								)
-								.append("},");
-						}
-						iterator.remove();
-					}
-				}
-
-				for (Iterator<InvItem> iterator = enderChestPets.iterator(); iterator.hasNext();) {
-					InvItem item = iterator.next();
-					if (item.getName().equalsIgnoreCase(auctionName) && item.getRarity().equalsIgnoreCase(auctionRarity)) {
-						StringBuilder miscStr = new StringBuilder("[");
-						double miscExtras = 0;
-						try {
-							List<String> extraStats = item.getExtraStats();
-							for (String extraItem : extraStats) {
-								double miscPrice = getLowestPrice(extraItem, " ");
-								miscExtras += miscPrice;
-								miscStr
-									.append("{\"name\":\"")
-									.append(extraItem)
-									.append("\",\"price\":\"")
-									.append(simplifyNumber(miscPrice))
-									.append("\"},");
-							}
-						} catch (Exception ignored) {}
-						if (miscStr.toString().endsWith(",")) {
-							miscStr = new StringBuilder(miscStr.substring(0, miscStr.length() - 1));
-						}
-						miscStr.append("]");
-
-						enderChestItems.add(addItemStr(item, auctionPrice + miscExtras));
-						enderChestTotal += auctionPrice + miscExtras;
-						if (verbose) {
-							calcItemsJsonStr
-								.append("{\"total\":\"")
-								.append(simplifyNumber(auctionPrice + miscExtras))
-								.append("\",\"name\":\"")
-								.append(item.getName())
-								.append("\",\"base_cost\":\"")
-								.append(simplifyNumber(auctionPrice))
-								.append("\"")
-								.append(
-									miscExtras > 0
-										? ",\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}"
-										: ""
-								)
-								.append("},");
-						}
-						iterator.remove();
-					}
-				}
-
-				for (Iterator<InvItem> iterator = storagePets.iterator(); iterator.hasNext();) {
-					InvItem item = iterator.next();
-					if (item.getName().equalsIgnoreCase(auctionName) && item.getRarity().equalsIgnoreCase(auctionRarity)) {
-						StringBuilder miscStr = new StringBuilder("[");
-						double miscExtras = 0;
-						try {
-							List<String> extraStats = item.getExtraStats();
-							for (String extraItem : extraStats) {
-								double miscPrice = getLowestPrice(extraItem, " ");
-								miscExtras += miscPrice;
-								miscStr
-									.append("{\"name\":\"")
-									.append(extraItem)
-									.append("\",\"price\":\"")
-									.append(simplifyNumber(miscPrice))
-									.append("\"},");
-							}
-						} catch (Exception ignored) {}
-						if (miscStr.toString().endsWith(",")) {
-							miscStr = new StringBuilder(miscStr.substring(0, miscStr.length() - 1));
-						}
-						miscStr.append("]");
-
-						storageItems.add(addItemStr(item, auctionPrice + miscExtras));
-						storageTotal += auctionPrice + miscExtras;
-						if (verbose) {
-							calcItemsJsonStr
-								.append("{\"total\":\"")
-								.append(simplifyNumber(auctionPrice + miscExtras))
-								.append("\",\"name\":\"")
-								.append(item.getName())
-								.append("\",\"base_cost\":\"")
-								.append(simplifyNumber(auctionPrice))
-								.append("\"")
-								.append(
-									miscExtras > 0
-										? ",\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}"
-										: ""
-								)
-								.append("},");
-						}
-						iterator.remove();
-					}
-				}
-			}
-		}
-
-		for (InvItem item : invPets) {
-			try {
-				double auctionPrice = higherDepth(
-					lowestBinJson,
-					item.getName().split("] ")[1].toLowerCase().trim() + rarityToNumberMap.get(item.getRarity())
-				)
-					.getAsDouble();
-
-				StringBuilder miscStr = new StringBuilder("[");
-				double miscExtras = 0;
-				try {
-					List<String> extraStats = item.getExtraStats();
-					for (String extraItem : extraStats) {
-						double miscPrice = getLowestPrice(extraItem, " ");
-						miscExtras += miscPrice;
-						miscStr
-							.append("{\"name\":\"")
-							.append(extraItem)
-							.append("\",\"price\":\"")
-							.append(simplifyNumber(miscPrice))
-							.append("\"},");
-					}
-				} catch (Exception ignored) {}
-				if (miscStr.toString().endsWith(",")) {
-					miscStr = new StringBuilder(miscStr.substring(0, miscStr.length() - 1));
-				}
-				miscStr.append("]");
-
-				invItems.add(addItemStr(item, auctionPrice + miscExtras));
-				invTotal += auctionPrice + miscExtras;
-				if (verbose) {
-					calcItemsJsonStr
-						.append("{\"total\":\"")
-						.append(simplifyNumber(auctionPrice + miscExtras))
-						.append("\",\"name\":\"")
-						.append(item.getName())
-						.append("\",\"base_cost\":\"")
-						.append(simplifyNumber(auctionPrice))
-						.append("\",")
-						.append(
-							miscExtras > 0 ? "\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}," : ""
-						)
-						.append("\"fail_calc_lvl_cost\":true},");
-				}
-			} catch (Exception ignored) {}
-		}
-
-		for (InvItem item : petsPets) {
-			try {
-				double auctionPrice = higherDepth(
-					lowestBinJson,
-					item.getName().split("] ")[1].toLowerCase().trim() + rarityToNumberMap.get(item.getRarity())
-				)
-					.getAsDouble();
-				StringBuilder miscStr = new StringBuilder("[");
-				double miscExtras = 0;
-				try {
-					List<String> extraStats = item.getExtraStats();
-					for (String extraItem : extraStats) {
-						double miscPrice = getLowestPrice(extraItem, " ");
-						miscExtras += miscPrice;
-						miscStr
-							.append("{\"name\":\"")
-							.append(extraItem)
-							.append("\",\"price\":\"")
-							.append(simplifyNumber(miscPrice))
-							.append("\"},");
-					}
-				} catch (Exception ignored) {}
-				if (miscStr.toString().endsWith(",")) {
-					miscStr = new StringBuilder(miscStr.substring(0, miscStr.length() - 1));
-				}
-				miscStr.append("]");
-
-				petsItems.add(addItemStr(item, auctionPrice + miscExtras));
-				petsTotal += auctionPrice + miscExtras;
-				if (verbose) {
-					calcItemsJsonStr
-						.append("{\"total\":\"")
-						.append(simplifyNumber(auctionPrice + miscExtras))
-						.append("\",\"name\":\"")
-						.append(item.getName())
-						.append("\",\"base_cost\":\"")
-						.append(simplifyNumber(auctionPrice))
-						.append("\",")
-						.append(
-							miscExtras > 0 ? "\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}," : ""
-						)
-						.append("\"fail_calc_lvl_cost\":true},");
-				}
-			} catch (Exception ignored) {}
-		}
-
-		for (InvItem item : enderChestPets) {
-			try {
-				double auctionPrice = higherDepth(
-					lowestBinJson,
-					item.getName().split("] ")[1].toLowerCase().trim() + rarityToNumberMap.get(item.getRarity())
-				)
-					.getAsDouble();
-				StringBuilder miscStr = new StringBuilder("[");
-				double miscExtras = 0;
-				try {
-					List<String> extraStats = item.getExtraStats();
-					for (String extraItem : extraStats) {
-						double miscPrice = getLowestPrice(extraItem, " ");
-						miscExtras += miscPrice;
-						miscStr
-							.append("{\"name\":\"")
-							.append(extraItem)
-							.append("\",\"price\":\"")
-							.append(simplifyNumber(miscPrice))
-							.append("\"},");
-					}
-				} catch (Exception ignored) {}
-				if (miscStr.toString().endsWith(",")) {
-					miscStr = new StringBuilder(miscStr.substring(0, miscStr.length() - 1));
-				}
-				miscStr.append("]");
-
-				enderChestItems.add(addItemStr(item, auctionPrice + miscExtras));
-				enderChestTotal += auctionPrice + miscExtras;
-				if (verbose) {
-					calcItemsJsonStr
-						.append("{\"total\":\"")
-						.append(simplifyNumber(auctionPrice + miscExtras))
-						.append("\",\"name\":\"")
-						.append(item.getName())
-						.append("\",\"base_cost\":\"")
-						.append(simplifyNumber(auctionPrice))
-						.append("\",")
-						.append(
-							miscExtras > 0 ? "\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}," : ""
-						)
-						.append("\"fail_calc_lvl_cost\":true},");
-				}
-			} catch (Exception ignored) {}
-		}
-
-		for (InvItem item : storagePets) {
-			try {
-				double auctionPrice = higherDepth(
-					lowestBinJson,
-					item.getName().split("] ")[1].toLowerCase().trim() + rarityToNumberMap.get(item.getRarity())
-				)
-					.getAsDouble();
-				StringBuilder miscStr = new StringBuilder("[");
-				double miscExtras = 0;
-				try {
-					List<String> extraStats = item.getExtraStats();
-					for (String extraItem : extraStats) {
-						double miscPrice = getLowestPrice(extraItem, " ");
-						miscExtras += miscPrice;
-						miscStr
-							.append("{\"name\":\"")
-							.append(extraItem)
-							.append("\",\"price\":\"")
-							.append(simplifyNumber(miscPrice))
-							.append("\"},");
-					}
-				} catch (Exception ignored) {}
-				if (miscStr.toString().endsWith(",")) {
-					miscStr = new StringBuilder(miscStr.substring(0, miscStr.length() - 1));
-				}
-				miscStr.append("]");
-
-				storageItems.add(addItemStr(item, auctionPrice + miscExtras));
-				storageTotal += auctionPrice + miscExtras;
-				if (verbose) {
-					calcItemsJsonStr
-						.append("{\"total\":\"")
-						.append(simplifyNumber(auctionPrice + miscExtras))
-						.append("\",\"name\":\"")
-						.append(item.getName())
-						.append("\",\"base_cost\":\"")
-						.append(simplifyNumber(auctionPrice))
-						.append("\",")
-						.append(
-							miscExtras > 0 ? "\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}," : ""
-						)
-						.append("\"fail_calc_lvl_cost\":true},");
-				}
-			} catch (Exception ignored) {}
-		}
+		//		for (InvItem item : invPets) {
+		//			try {
+		//				double auctionPrice = higherDepth(
+		//					lowestBinJson,
+		//					item.getName().split("] ")[1].toLowerCase().trim() + rarityToNumberMap.get(item.getRarity())
+		//				)
+		//					.getAsDouble();
+		//
+		//				StringBuilder miscStr = new StringBuilder("[");
+		//				double miscExtras = 0;
+		//				try {
+		//					List<String> extraStats = item.getExtraStats();
+		//					for (String extraItem : extraStats) {
+		//						double miscPrice = getLowestPrice(extraItem, " ");
+		//						miscExtras += miscPrice;
+		//						miscStr
+		//							.append("{\"name\":\"")
+		//							.append(extraItem)
+		//							.append("\",\"price\":\"")
+		//							.append(simplifyNumber(miscPrice))
+		//							.append("\"},");
+		//					}
+		//				} catch (Exception ignored) {}
+		//				if (miscStr.toString().endsWith(",")) {
+		//					miscStr = new StringBuilder(miscStr.substring(0, miscStr.length() - 1));
+		//				}
+		//				miscStr.append("]");
+		//
+		//				invItems.add(addItemStr(item, auctionPrice + miscExtras));
+		//				invTotal += auctionPrice + miscExtras;
+		//				if (verbose) {
+		//					calcItemsJsonStr
+		//						.append("{\"total\":\"")
+		//						.append(simplifyNumber(auctionPrice + miscExtras))
+		//						.append("\",\"name\":\"")
+		//						.append(item.getName())
+		//						.append("\",\"base_cost\":\"")
+		//						.append(simplifyNumber(auctionPrice))
+		//						.append("\",")
+		//						.append(
+		//							miscExtras > 0 ? "\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}," : ""
+		//						)
+		//						.append("\"fail_calc_lvl_cost\":true},");
+		//				}
+		//			} catch (Exception ignored) {}
+		//		}
+		//
+		//		for (InvItem item : petsPets) {
+		//			try {
+		//				double auctionPrice = higherDepth(
+		//					lowestBinJson,
+		//					item.getName().split("] ")[1].toLowerCase().trim() + rarityToNumberMap.get(item.getRarity())
+		//				)
+		//					.getAsDouble();
+		//				StringBuilder miscStr = new StringBuilder("[");
+		//				double miscExtras = 0;
+		//				try {
+		//					List<String> extraStats = item.getExtraStats();
+		//					for (String extraItem : extraStats) {
+		//						double miscPrice = getLowestPrice(extraItem, " ");
+		//						miscExtras += miscPrice;
+		//						miscStr
+		//							.append("{\"name\":\"")
+		//							.append(extraItem)
+		//							.append("\",\"price\":\"")
+		//							.append(simplifyNumber(miscPrice))
+		//							.append("\"},");
+		//					}
+		//				} catch (Exception ignored) {}
+		//				if (miscStr.toString().endsWith(",")) {
+		//					miscStr = new StringBuilder(miscStr.substring(0, miscStr.length() - 1));
+		//				}
+		//				miscStr.append("]");
+		//
+		//				petsItems.add(addItemStr(item, auctionPrice + miscExtras));
+		//				petsTotal += auctionPrice + miscExtras;
+		//				if (verbose) {
+		//					calcItemsJsonStr
+		//						.append("{\"total\":\"")
+		//						.append(simplifyNumber(auctionPrice + miscExtras))
+		//						.append("\",\"name\":\"")
+		//						.append(item.getName())
+		//						.append("\",\"base_cost\":\"")
+		//						.append(simplifyNumber(auctionPrice))
+		//						.append("\",")
+		//						.append(
+		//							miscExtras > 0 ? "\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}," : ""
+		//						)
+		//						.append("\"fail_calc_lvl_cost\":true},");
+		//				}
+		//			} catch (Exception ignored) {}
+		//		}
+		//
+		//		for (InvItem item : enderChestPets) {
+		//			try {
+		//				double auctionPrice = higherDepth(
+		//					lowestBinJson,
+		//					item.getName().split("] ")[1].toLowerCase().trim() + rarityToNumberMap.get(item.getRarity())
+		//				)
+		//					.getAsDouble();
+		//				StringBuilder miscStr = new StringBuilder("[");
+		//				double miscExtras = 0;
+		//				try {
+		//					List<String> extraStats = item.getExtraStats();
+		//					for (String extraItem : extraStats) {
+		//						double miscPrice = getLowestPrice(extraItem, " ");
+		//						miscExtras += miscPrice;
+		//						miscStr
+		//							.append("{\"name\":\"")
+		//							.append(extraItem)
+		//							.append("\",\"price\":\"")
+		//							.append(simplifyNumber(miscPrice))
+		//							.append("\"},");
+		//					}
+		//				} catch (Exception ignored) {}
+		//				if (miscStr.toString().endsWith(",")) {
+		//					miscStr = new StringBuilder(miscStr.substring(0, miscStr.length() - 1));
+		//				}
+		//				miscStr.append("]");
+		//
+		//				enderChestItems.add(addItemStr(item, auctionPrice + miscExtras));
+		//				enderChestTotal += auctionPrice + miscExtras;
+		//				if (verbose) {
+		//					calcItemsJsonStr
+		//						.append("{\"total\":\"")
+		//						.append(simplifyNumber(auctionPrice + miscExtras))
+		//						.append("\",\"name\":\"")
+		//						.append(item.getName())
+		//						.append("\",\"base_cost\":\"")
+		//						.append(simplifyNumber(auctionPrice))
+		//						.append("\",")
+		//						.append(
+		//							miscExtras > 0 ? "\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}," : ""
+		//						)
+		//						.append("\"fail_calc_lvl_cost\":true},");
+		//				}
+		//			} catch (Exception ignored) {}
+		//		}
+		//
+		//		for (InvItem item : storagePets) {
+		//			try {
+		//				double auctionPrice = higherDepth(
+		//					lowestBinJson,
+		//					item.getName().split("] ")[1].toLowerCase().trim() + rarityToNumberMap.get(item.getRarity())
+		//				)
+		//					.getAsDouble();
+		//				StringBuilder miscStr = new StringBuilder("[");
+		//				double miscExtras = 0;
+		//				try {
+		//					List<String> extraStats = item.getExtraStats();
+		//					for (String extraItem : extraStats) {
+		//						double miscPrice = getLowestPrice(extraItem, " ");
+		//						miscExtras += miscPrice;
+		//						miscStr
+		//							.append("{\"name\":\"")
+		//							.append(extraItem)
+		//							.append("\",\"price\":\"")
+		//							.append(simplifyNumber(miscPrice))
+		//							.append("\"},");
+		//					}
+		//				} catch (Exception ignored) {}
+		//				if (miscStr.toString().endsWith(",")) {
+		//					miscStr = new StringBuilder(miscStr.substring(0, miscStr.length() - 1));
+		//				}
+		//				miscStr.append("]");
+		//
+		//				storageItems.add(addItemStr(item, auctionPrice + miscExtras));
+		//				storageTotal += auctionPrice + miscExtras;
+		//				if (verbose) {
+		//					calcItemsJsonStr
+		//						.append("{\"total\":\"")
+		//						.append(simplifyNumber(auctionPrice + miscExtras))
+		//						.append("\",\"name\":\"")
+		//						.append(item.getName())
+		//						.append("\",\"base_cost\":\"")
+		//						.append(simplifyNumber(auctionPrice))
+		//						.append("\",")
+		//						.append(
+		//							miscExtras > 0 ? "\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}," : ""
+		//						)
+		//						.append("\"fail_calc_lvl_cost\":true},");
+		//				}
+		//			} catch (Exception ignored) {}
+		//		}
 	}
 
 	private String addItemStr(InvItem item, double itemPrice) {
@@ -780,7 +782,11 @@ public class NetworthExecute {
 	}
 
 	private double calculateItemPrice(InvItem item, String location) {
-		if (item == null) {
+		if (item == null || item.getId().equals("None")) {
+			return 0;
+		}
+
+		if (getPriceOverride(item.getId()) == 0) {
 			return 0;
 		}
 
@@ -929,7 +935,11 @@ public class NetworthExecute {
 	}
 
 	private NwItemPrice calculateBpItemPrice(InvItem item, String location) {
-		if (item == null) {
+		if (item == null || item.getId().equals("None")) {
+			return new NwItemPrice(0, null);
+		}
+
+		if (getPriceOverride(item.getId()) == 0) {
 			return new NwItemPrice(0, null);
 		}
 

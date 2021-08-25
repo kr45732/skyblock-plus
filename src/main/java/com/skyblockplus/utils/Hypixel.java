@@ -10,8 +10,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import java.io.InputStreamReader;
-import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -21,10 +19,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
-import okhttp3.*;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
+import okhttp3.MediaType;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class Hypixel {
 
@@ -297,125 +295,125 @@ public class Hypixel {
 		return getGuildGeneric("&name=" + guildName.replace(" ", "%20").replace("_", "%20"));
 	}
 
-	public static JsonArray getBidsFromPlayer(String uuid) {
-		try {
-			HttpGet httpget = new HttpGet("https://api.eastarcti.ca/skyblock/auctions/dev/");
-			httpget.addHeader("content-type", "application/json; charset=UTF-8");
-
-			URI uri = new URIBuilder(httpget.getURI())
-				.addParameter("query", "{\"bids\":{\"$elemMatch\":{\"bidder\":\"" + uuid + "\"}}}")
-				.build();
-			httpget.setURI(uri);
-
-			try (CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpget)) {
-				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
-			}
-		} catch (Exception ignored) {}
-		return null;
-	}
-
-	public static JsonArray queryLowestBin(String query) {
-		try {
-			HttpGet httpget = new HttpGet("https://api.eastarcti.ca/skyblock/auctions/dev/");
-			httpget.addHeader("content-type", "application/json; charset=UTF-8");
-
-			query = query.replace("[", "\\\\[");
-			URI uri = new URIBuilder(httpget.getURI())
-				.addParameter(
-					"query",
-					"{\"item_name\":{\"$regex\":\"" +
-					query +
-					"\",\"$options\":\"i\"},\"bin\":true,\"end\":{\"$gt\":" +
-					Instant.now().toEpochMilli() +
-					"}}"
-				)
-				.addParameter("sort", "{\"starting_bid\":1}")
-				.addParameter("limit", "1")
-				.build();
-			httpget.setURI(uri);
-
-			try (CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpget)) {
-				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
-			}
-		} catch (Exception ignored) {}
-		return null;
-	}
-
-	public static JsonArray queryLowestBinPet(String petName, String rarity) {
-		try {
-			HttpGet httpGet = new HttpGet("https://api.eastarcti.ca/skyblock/auctions/dev/");
-			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
-
-			petName = petName.replace("[", "\\\\[");
-			URI uri = new URIBuilder(httpGet.getURI())
-				.addParameter(
-					"query",
-					"{\"item_name\":{\"$regex\":\"" +
-					petName +
-					"\",\"$options\":\"i\"}," +
-					(!rarity.equalsIgnoreCase("any") ? "\"tier\":\"" + rarity.toUpperCase() + "\"," : "") +
-					"\"bin\":true,\"end\":{\"$gt\":" +
-					Instant.now().toEpochMilli() +
-					"},\"item_id\":\"PET\"}"
-				)
-				.addParameter("sort", "{\"starting_bid\":1}")
-				.addParameter("limit", "1")
-				.build();
-			httpGet.setURI(uri);
-
-			try (CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpGet)) {
-				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
-			}
-		} catch (Exception ignored) {}
-		return null;
-	}
-
-	public static JsonArray queryLowestBinEnchant(String enchantId, int enchantLevel) {
-		try {
-			HttpGet httpGet = new HttpGet("https://api.eastarcti.ca/skyblock/auctions/dev/");
-			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
-
-			URI uri = new URIBuilder(httpGet.getURI())
-				.addParameter(
-					"query",
-					"{\"item_id\":\"ENCHANTED_BOOK\",\"end\":{\"$gt\":" +
-					Instant.now().toEpochMilli() +
-					"},\"nbt.value.i.value.value.0.tag.value.ExtraAttributes.value.enchantments.value." +
-					enchantId.toLowerCase() +
-					".value\":" +
-					enchantLevel +
-					",\"bin\":true}"
-				)
-				.addParameter("sort", "{\"starting_bid\":1}")
-				.addParameter("limit", "1")
-				.build();
-			httpGet.setURI(uri);
-
-			try (CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpGet)) {
-				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
-			}
-		} catch (Exception ignored) {}
-		return null;
-	}
-
-	public static JsonArray getAuctionPetsByName(String query) {
-		try {
-			HttpGet httpget = new HttpGet("https://api.eastarcti.ca/skyblock/auctions/prod/");
-			httpget.addHeader("content-type", "application/json; charset=UTF-8");
-
-			URI uri = new URIBuilder(httpget.getURI())
-				.addParameter("query", "{\"item_name\":{\"$in\":[" + query + "]},\"bin\":true}")
-				.addParameter("sort", "{\"starting_bid\":1}")
-				.addParameter("filter", "{\"item_name\":1,\"starting_bid\":1,\"tier\":1}")
-				.build();
-			httpget.setURI(uri);
-
-			try (CloseableHttpResponse httpResponse = httpClient.execute(httpget)) {
-				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
-			}
-		} catch (Exception ignored) {}
-		return null;
-	}
+	//	public static JsonArray getBidsFromPlayer(String uuid) {
+	//		try {
+	//			HttpGet httpget = new HttpGet("https://api.eastarcti.ca/skyblock/auctions/dev/");
+	//			httpget.addHeader("content-type", "application/json; charset=UTF-8");
+	//
+	//			URI uri = new URIBuilder(httpget.getURI())
+	//				.addParameter("query", "{\"bids\":{\"$elemMatch\":{\"bidder\":\"" + uuid + "\"}}}")
+	//				.build();
+	//			httpget.setURI(uri);
+	//
+	//			try (CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpget)) {
+	//				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
+	//			}
+	//		} catch (Exception ignored) {}
+	//		return null;
+	//	}
+	//
+	//	public static JsonArray queryLowestBin(String query) {
+	//		try {
+	//			HttpGet httpget = new HttpGet("https://api.eastarcti.ca/skyblock/auctions/dev/");
+	//			httpget.addHeader("content-type", "application/json; charset=UTF-8");
+	//
+	//			query = query.replace("[", "\\\\[");
+	//			URI uri = new URIBuilder(httpget.getURI())
+	//				.addParameter(
+	//					"query",
+	//					"{\"item_name\":{\"$regex\":\"" +
+	//					query +
+	//					"\",\"$options\":\"i\"},\"bin\":true,\"end\":{\"$gt\":" +
+	//					Instant.now().toEpochMilli() +
+	//					"}}"
+	//				)
+	//				.addParameter("sort", "{\"starting_bid\":1}")
+	//				.addParameter("limit", "1")
+	//				.build();
+	//			httpget.setURI(uri);
+	//
+	//			try (CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpget)) {
+	//				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
+	//			}
+	//		} catch (Exception ignored) {}
+	//		return null;
+	//	}
+	//
+	//	public static JsonArray queryLowestBinPet(String petName, String rarity) {
+	//		try {
+	//			HttpGet httpGet = new HttpGet("https://api.eastarcti.ca/skyblock/auctions/dev/");
+	//			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
+	//
+	//			petName = petName.replace("[", "\\\\[");
+	//			URI uri = new URIBuilder(httpGet.getURI())
+	//				.addParameter(
+	//					"query",
+	//					"{\"item_name\":{\"$regex\":\"" +
+	//					petName +
+	//					"\",\"$options\":\"i\"}," +
+	//					(!rarity.equalsIgnoreCase("any") ? "\"tier\":\"" + rarity.toUpperCase() + "\"," : "") +
+	//					"\"bin\":true,\"end\":{\"$gt\":" +
+	//					Instant.now().toEpochMilli() +
+	//					"},\"item_id\":\"PET\"}"
+	//				)
+	//				.addParameter("sort", "{\"starting_bid\":1}")
+	//				.addParameter("limit", "1")
+	//				.build();
+	//			httpGet.setURI(uri);
+	//
+	//			try (CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpGet)) {
+	//				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
+	//			}
+	//		} catch (Exception ignored) {}
+	//		return null;
+	//	}
+	//
+	//	public static JsonArray queryLowestBinEnchant(String enchantId, int enchantLevel) {
+	//		try {
+	//			HttpGet httpGet = new HttpGet("https://api.eastarcti.ca/skyblock/auctions/dev/");
+	//			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
+	//
+	//			URI uri = new URIBuilder(httpGet.getURI())
+	//				.addParameter(
+	//					"query",
+	//					"{\"item_id\":\"ENCHANTED_BOOK\",\"end\":{\"$gt\":" +
+	//					Instant.now().toEpochMilli() +
+	//					"},\"nbt.value.i.value.value.0.tag.value.ExtraAttributes.value.enchantments.value." +
+	//					enchantId.toLowerCase() +
+	//					".value\":" +
+	//					enchantLevel +
+	//					",\"bin\":true}"
+	//				)
+	//				.addParameter("sort", "{\"starting_bid\":1}")
+	//				.addParameter("limit", "1")
+	//				.build();
+	//			httpGet.setURI(uri);
+	//
+	//			try (CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpGet)) {
+	//				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
+	//			}
+	//		} catch (Exception ignored) {}
+	//		return null;
+	//	}
+	//
+	//	public static JsonArray getAuctionPetsByName(String query) {
+	//		try {
+	//			HttpGet httpget = new HttpGet("https://api.eastarcti.ca/skyblock/auctions/prod/");
+	//			httpget.addHeader("content-type", "application/json; charset=UTF-8");
+	//
+	//			URI uri = new URIBuilder(httpget.getURI())
+	//				.addParameter("query", "{\"item_name\":{\"$in\":[" + query + "]},\"bin\":true}")
+	//				.addParameter("sort", "{\"starting_bid\":1}")
+	//				.addParameter("filter", "{\"item_name\":1,\"starting_bid\":1,\"tier\":1}")
+	//				.build();
+	//			httpget.setURI(uri);
+	//
+	//			try (CloseableHttpResponse httpResponse = httpClient.execute(httpget)) {
+	//				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
+	//			}
+	//		} catch (Exception ignored) {}
+	//		return null;
+	//	}
 
 	@SuppressWarnings("EmptyTryBlock")
 	public static void cacheJson(String playerUuid, JsonElement json) {

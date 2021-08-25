@@ -1,14 +1,14 @@
 package com.skyblockplus.price;
 
 import static com.skyblockplus.utils.Constants.reforgeStoneNames;
-import static com.skyblockplus.utils.Hypixel.*;
+import static com.skyblockplus.utils.Hypixel.getAuctionFromUuid;
+import static com.skyblockplus.utils.Hypixel.uuidToUsername;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.utils.Constants;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.InvItem;
@@ -216,46 +216,47 @@ public class PriceCommand extends Command {
 	}
 
 	private static double calculatePetPrice(InvItem pet) {
-		String queryStr = "\"" + capitalizeString(pet.getName()).replace("lvl", "Lvl") + "\"";
-
-		JsonArray ahQuery = getAuctionPetsByName(queryStr);
-		if (ahQuery != null) {
-			for (JsonElement auction : ahQuery) {
-				String auctionName = higherDepth(auction, "item_name").getAsString();
-				double auctionPrice = higherDepth(auction, "starting_bid").getAsDouble();
-				String auctionRarity = higherDepth(auction, "tier").getAsString();
-
-				if (pet.getName().equalsIgnoreCase(auctionName) && pet.getRarity().equalsIgnoreCase(auctionRarity)) {
-					double miscExtras = 0;
-					try {
-						List<String> extraStats = pet.getExtraStats();
-						for (String extraItem : extraStats) {
-							miscExtras += getLowestPrice(extraItem);
-						}
-					} catch (Exception ignored) {}
-
-					return auctionPrice + miscExtras;
-				}
-			}
-		}
-
-		try {
-			double auctionPrice = higherDepth(
-				lowestBinJson,
-				pet.getName().split("] ")[1].toLowerCase().trim() + Constants.rarityToNumberMap.get(pet.getRarity())
-			)
-				.getAsDouble();
-
-			double miscExtras = 0;
-			try {
-				List<String> extraStats = pet.getExtraStats();
-				for (String extraItem : extraStats) {
-					miscExtras += getLowestPrice(extraItem);
-				}
-			} catch (Exception ignored) {}
-
-			return auctionPrice + miscExtras;
-		} catch (Exception ignored) {}
+		// TODO: fix
+		//		String queryStr = "\"" + capitalizeString(pet.getName()).replace("lvl", "Lvl") + "\"";
+		//
+		//		JsonArray ahQuery = getAuctionPetsByName(queryStr);
+		//		if (ahQuery != null) {
+		//			for (JsonElement auction : ahQuery) {
+		//				String auctionName = higherDepth(auction, "item_name").getAsString();
+		//				double auctionPrice = higherDepth(auction, "starting_bid").getAsDouble();
+		//				String auctionRarity = higherDepth(auction, "tier").getAsString();
+		//
+		//				if (pet.getName().equalsIgnoreCase(auctionName) && pet.getRarity().equalsIgnoreCase(auctionRarity)) {
+		//					double miscExtras = 0;
+		//					try {
+		//						List<String> extraStats = pet.getExtraStats();
+		//						for (String extraItem : extraStats) {
+		//							miscExtras += getLowestPrice(extraItem);
+		//						}
+		//					} catch (Exception ignored) {}
+		//
+		//					return auctionPrice + miscExtras;
+		//				}
+		//			}
+		//		}
+		//
+		//		try {
+		//			double auctionPrice = higherDepth(
+		//				lowestBinJson,
+		//				pet.getName().split("] ")[1].toLowerCase().trim() + Constants.rarityToNumberMap.get(pet.getRarity())
+		//			)
+		//				.getAsDouble();
+		//
+		//			double miscExtras = 0;
+		//			try {
+		//				List<String> extraStats = pet.getExtraStats();
+		//				for (String extraItem : extraStats) {
+		//					miscExtras += getLowestPrice(extraItem);
+		//				}
+		//			} catch (Exception ignored) {}
+		//
+		//			return auctionPrice + miscExtras;
+		//		} catch (Exception ignored) {}
 		return 0;
 	}
 

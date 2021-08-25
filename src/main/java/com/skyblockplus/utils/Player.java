@@ -6,7 +6,6 @@ import static com.skyblockplus.utils.Hypixel.playerFromUuid;
 import static com.skyblockplus.utils.Hypixel.skyblockProfilesFromUuid;
 import static com.skyblockplus.utils.Utils.*;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

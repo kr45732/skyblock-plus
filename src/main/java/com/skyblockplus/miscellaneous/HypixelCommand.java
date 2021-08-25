@@ -75,7 +75,7 @@ public class HypixelCommand extends Command {
 		try {
 			for (Map.Entry<String, JsonElement> socialMedia : player.getSocialMediaLinks().entrySet()) {
 				eb.addField(
-					socialMedia.getKey().equals("HYPIXEL") ? "Hypixel Forums" : capitalizeString(socialMedia.getValue().getAsString()),
+					socialMedia.getKey().equals("HYPIXEL") ? "Hypixel Forums" : capitalizeString(socialMedia.getKey()),
 					socialMedia.getValue().getAsString().contains("http")
 						? "[Link](" + socialMedia.getValue().getAsString() + ")"
 						: socialMedia.getValue().getAsString(),
