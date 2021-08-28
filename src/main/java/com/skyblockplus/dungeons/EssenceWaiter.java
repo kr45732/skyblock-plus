@@ -73,6 +73,7 @@ public class EssenceWaiter extends ListenerAdapter {
 		if (event.getMessageIdLong() != reactMessage.getIdLong()) {
 			return;
 		}
+
 		if (event.getUser().isBot()) {
 			return;
 		}

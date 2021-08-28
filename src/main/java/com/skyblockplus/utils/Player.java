@@ -22,8 +22,6 @@ import org.slf4j.LoggerFactory;
 
 public class Player {
 
-	private static final Logger log = LoggerFactory.getLogger(Player.class);
-
 	public String invMissing = "";
 	private JsonArray profilesArray;
 	private int profileIndex;
@@ -347,6 +345,11 @@ public class Player {
 		long xpCurrent = (long) Math.floor(skillExp - xpTotal);
 		long xpForNext = 0;
 		if (level < maxLevel) xpForNext = (long) Math.ceil(skillsTable.get(level).getAsLong());
+
+		if (skillExp == 0) {
+			level = 0;
+			xpForNext = 0;
+		}
 
 		double progress = xpForNext > 0 ? Math.max(0, Math.min(((double) xpCurrent) / xpForNext, 1)) : 0;
 

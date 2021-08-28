@@ -301,7 +301,7 @@ public class HelpCommand extends Command {
 									.addExamples("myGuild message Click the button below to start an application!"),
 								new HelpData(
 									"staff_role",
-									"Role that will be pinged when a new application is submitted.",
+									"Role that will be pinged when a new application is submitted. Optional and can be set to none.",
 									"[name] staff_role [@role]"
 								)
 									.addExamples("myGuild staff_role @Application Ping"),
@@ -590,7 +590,7 @@ public class HelpCommand extends Command {
 				helpGen.genHelp("settings" + " apply [name] message [message]", "The message that users will see when verifying") +
 				helpGen.genHelp(
 					"settings apply [name] staff_role [@role]",
-					"Role that will be pinged when a new application is submitted"
+					"Role that will be pinged when a new application is submitted. Can be set to none"
 				) +
 				helpGen.genHelp(
 					"settings apply [name] " + "channel [#channel]",

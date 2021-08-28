@@ -2,8 +2,7 @@ package com.skyblockplus.features.apply;
 
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.utils.Utils.getApplyGuildUsersCache;
-import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
@@ -46,44 +45,29 @@ public class ApplyGuild {
 		onMessageReactionAdd_ExistingApplyUser(event);
 	}
 
-	public boolean onMessageReactionAdd_ExistingApplyUser(MessageReactionAddEvent event) {
+	public void onMessageReactionAdd_ExistingApplyUser(MessageReactionAddEvent event) {
 		ApplyUser findApplyUser = applyUserList
 			.stream()
 			.filter(applyUser -> applyUser.reactMessageId.equals(event.getMessageId()))
 			.findFirst()
 			.orElse(null);
+
 		if (findApplyUser != null) {
 			if (findApplyUser.onMessageReactionAdd(event)) {
 				applyUserList.remove(findApplyUser);
 			}
-			return true;
 		}
-
-		return false;
 	}
 
 	public void onTextChannelDelete(TextChannelDeleteEvent event) {
 		applyUserList.removeIf(
-			applyUser -> {
-				if (applyUser.applicationChannelId.equals(event.getChannel().getId())) {
-					return true;
-				} else {
-					try {
-						if (applyUser.staffChannelId.equals(event.getChannel().getId())) {
-							return true;
-						}
-					} catch (Exception ignored) {}
-				}
-				return false;
-			}
+			applyUser ->
+				(applyUser.applicationChannelId != null && applyUser.applicationChannelId.equals(event.getChannel().getId())) ||
+				(applyUser.staffChannelId != null && applyUser.staffChannelId.equals(event.getChannel().getId()))
 		);
 	}
 
-	public String onMessageReactionAdd_NewApplyUser(ButtonClickEvent event) {
-		if (event.getUser().isBot()) {
-			return null;
-		}
-
+	public String onButtonClick_NewApplyUser(ButtonClickEvent event) {
 		if (event.getMessageIdLong() != reactMessage.getIdLong()) {
 			return null;
 		}
@@ -133,9 +117,10 @@ public class ApplyGuild {
 			}
 		}
 
-		applyUserList.add(new ApplyUser(event, currentSettings, higherDepth(linkedAccount, "minecraftUsername").getAsString()));
+		ApplyUser toAdd = new ApplyUser(event, currentSettings, higherDepth(linkedAccount, "minecraftUsername").getAsString());
+		applyUserList.add(toAdd);
 
-		return "✅ A new application was created";
+		return "✅ A new application was created in " + event.getGuild().getTextChannelById(toAdd.applicationChannelId).getAsMention();
 	}
 
 	public String onButtonClick(ButtonClickEvent event) {
@@ -144,7 +129,22 @@ public class ApplyGuild {
 			return waitingForInvite;
 		}
 
-		return onMessageReactionAdd_NewApplyUser(event);
+		boolean currentApplyUser = onButtonClick_CurrentApplyUser(event);
+		if (currentApplyUser) {
+			return "IGNORE_INTERNAL";
+		}
+
+		return onButtonClick_NewApplyUser(event);
+	}
+
+	public boolean onButtonClick_CurrentApplyUser(ButtonClickEvent event) {
+		ApplyUser findApplyUser = applyUserList
+			.stream()
+			.filter(applyUser -> applyUser.reactMessageId.equals(event.getMessageId()))
+			.findFirst()
+			.orElse(null);
+
+		return findApplyUser != null && findApplyUser.onButtonClick(event, this);
 	}
 
 	public String onButtonClick_WaitingForInviteApplyUser(ButtonClickEvent event) {
@@ -152,7 +152,7 @@ public class ApplyGuild {
 			return null;
 		}
 
-		if (!event.getComponentId().equals("apply_user_" + higherDepth(currentSettings, "name").getAsString())) {
+		if (!event.getComponentId().startsWith("apply_user_wait_" + higherDepth(currentSettings, "name").getAsString())) {
 			return null;
 		}
 
@@ -170,6 +170,16 @@ public class ApplyGuild {
 		) {
 			return "❌ You are missing the required permissions in this Guild to use that!";
 		}
+
+		try {
+			TextChannel toCloseChannel = event
+				.getGuild()
+				.getTextChannelById(
+					event.getComponentId().split("apply_user_wait_" + higherDepth(currentSettings, "name").getAsString() + "_")[1]
+				);
+			toCloseChannel.sendMessageEmbeds(defaultEmbed("Closing channel").build()).queue();
+			toCloseChannel.delete().reason("Application closed").queueAfter(10, TimeUnit.SECONDS);
+		} catch (Exception ignored) {}
 
 		event.getMessage().delete().queueAfter(3, TimeUnit.SECONDS);
 		return "✅ Player was invited";

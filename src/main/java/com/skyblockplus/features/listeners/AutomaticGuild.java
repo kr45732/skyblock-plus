@@ -6,7 +6,6 @@ import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.features.skyblockevent.SkyblockEventCommand.endSkyblockEvent;
 import static com.skyblockplus.utils.Hypixel.getGuildFromId;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.higherDepth;
 
 import com.google.gson.*;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -20,7 +19,6 @@ import com.skyblockplus.features.apply.ApplyUser;
 import com.skyblockplus.features.setup.SetupCommandHandler;
 import com.skyblockplus.features.skyblockevent.SkyblockEvent;
 import com.skyblockplus.features.verify.VerifyGuild;
-import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import java.io.File;
 import java.io.FileReader;
@@ -647,11 +645,15 @@ public class AutomaticGuild {
 			return;
 		}
 
-		if (mee6Roles(event)) {
+		if (verifyGuild.onGuildMessageReceived(event)) {
 			return;
 		}
 
-		if (verifyGuild.onGuildMessageReceived(event)) {
+		if (event.getAuthor().isBot()) {
+			return;
+		}
+
+		if (mee6Roles(event)) {
 			return;
 		}
 
@@ -669,6 +671,8 @@ public class AutomaticGuild {
 			if (handler.isValid()) {
 				return;
 			}
+		} else if (event.getButton().getId().startsWith("apply_user_") && !event.getButton().getId().startsWith("apply_user_wait_")) {
+			event.deferReply().complete();
 		} else {
 			event.deferReply(true).complete();
 		}
@@ -676,22 +680,17 @@ public class AutomaticGuild {
 		for (ApplyGuild o1 : applyGuild) {
 			String buttonClickReply = o1.onButtonClick(event);
 			if (buttonClickReply != null) {
+				if (buttonClickReply.equals("IGNORE_INTERNAL")) {
+					return;
+				}
+
 				event.getHook().editOriginal(buttonClickReply).queue();
 				return;
 			}
 		}
 
 		if (event.getMessage() != null) {
-			event
-				.editButton(
-					event
-						.getButton()
-						.asDisabled()
-						.withId(event.getButton().getId() + "_disabled")
-						.withLabel("Disabled")
-						.withStyle(ButtonStyle.DANGER)
-				)
-				.queue();
+			event.editButton(event.getButton().asDisabled().withId("disabled").withLabel("Disabled").withStyle(ButtonStyle.DANGER)).queue();
 		}
 
 		event.getHook().editOriginal("❌ This button has been disabled").queue();

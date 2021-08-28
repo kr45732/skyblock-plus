@@ -6,9 +6,7 @@ import static com.skyblockplus.utils.Utils.*;
 import com.google.gson.*;
 import com.skyblockplus.utils.Player;
 import java.io.Serializable;
-import java.util.EnumSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -19,6 +17,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.requests.restaction.MessageAction;
 
 public class ApplyUser implements Serializable {
 
@@ -30,13 +29,12 @@ public class ApplyUser implements Serializable {
 	public String reactMessageId;
 	public int state = 0;
 	public String staffChannelId;
-	public boolean shouldDeleteChannel = false;
 	public String playerSlayer;
 	public String playerSkills;
 	public String playerCatacombs;
 	public String playerWeight;
 	public String playerUsername;
-	public String ironmanSymbol;
+	public String ironmanSymbol = "";
 	public String playerProfileName;
 
 	public ApplyUser(ButtonClickEvent event, JsonElement currentSettings, String playerUsername) {
@@ -72,7 +70,7 @@ public class ApplyUser implements Serializable {
 			applicationChannel.sendMessage(applyingUser.getAsMention()).complete();
 			caseOne(profileNames[0], currentSettings, applicationChannel);
 		} else {
-			EmbedBuilder welcomeEb = defaultEmbed("Application for " + player.getUsername());
+			EmbedBuilder welcomeEb = this.defaultPlayerEmbed();
 			welcomeEb.setDescription(
 				"Please react with the emoji that corresponds to the profile you want to apply with or react with ❌ to cancel the application.\n"
 			);
@@ -112,14 +110,6 @@ public class ApplyUser implements Serializable {
 	}
 
 	public boolean onMessageReactionAdd(MessageReactionAddEvent event) {
-		if (event != null) if (event.getUser().isBot()) {
-			return false;
-		}
-
-		if (state == 4) {
-			return onMessageReactionAddStaff(event);
-		}
-
 		if (!event.getMessageId().equals(reactMessageId)) {
 			return false;
 		}
@@ -142,105 +132,26 @@ public class ApplyUser implements Serializable {
 					event.getMember().hasPermission(Permission.ADMINISTRATOR)
 				)
 			) {
-				reactMessage.removeReaction(event.getReactionEmote().getAsReactionCode(), event.getUser()).queue();
 				return false;
 			}
 		}
 
-		if (event.getReactionEmote().getAsReactionCode().equals("❌")) {
-			state = 3;
-		} else if (event.getReactionEmote().getAsReactionCode().equals("\uD83D\uDD04") && state == 1) {
-			state = 2;
-		} else if (
-			!(
-				(profileEmojiToName.containsKey(event.getReactionEmote().getAsReactionCode()) && (state == 0)) ||
-				(event.getReactionEmote().getAsReactionCode().equals("✅") && (state == 1 || state == 5))
-			)
-		) {
-			reactMessage.clearReactions(event.getReactionEmote().getAsReactionCode()).queue();
-			return false;
-		}
-
-		reactMessage.clearReactions().queue();
-
-		switch (state) {
-			case 0:
-				caseOne(profileEmojiToName.get(event.getReactionEmote().getAsReactionCode()), currentSettings, applicationChannel);
-				break;
-			case 1:
-				EmbedBuilder finishApplyEmbed = defaultEmbed("Thank you for applying!");
-				finishApplyEmbed.setDescription(
-					"**Your stats have been submitted to staff**\nYou will be notified once staff review your stats"
-				);
-				applicationChannel.sendMessageEmbeds(finishApplyEmbed.build()).queue();
-
-				state = 4;
-				staffCaseConstructor();
-				break;
-			case 2:
-				EmbedBuilder retryEmbed = defaultEmbed("Application for " + fixUsername(playerUsername));
-				retryEmbed.setDescription(
-					"Please react with the emoji that corresponds to the profile you want to apply with or react with ❌ to cancel the application.\n"
-				);
-
-				for (Map.Entry<String, String> profileEntry : profileEmojiToName.entrySet()) {
-					String profileEmoji = profileEntry.getKey().contains(":") ? "<:" + profileEntry.getKey() + ">" : profileEntry.getKey();
-					if (profileEntry.getKey().equals("↩️")) {
-						String lastPlayedProfile = profileEmojiToName.get("↩️");
-						retryEmbed.appendDescription(
-							"\n" +
-							profileEmoji +
-							" - [Last played profile (" +
-							lastPlayedProfile +
-							")](" +
-							skyblockStatsLink(playerUsername, lastPlayedProfile) +
-							")"
-						);
-					} else {
-						retryEmbed.appendDescription(
-							"\n" +
-							profileEmoji +
-							" - [" +
-							capitalizeString(profileEntry.getValue()) +
-							"](" +
-							skyblockStatsLink(playerUsername, profileEntry.getValue()) +
-							")"
-						);
-					}
-				}
-
-				reactMessage = applicationChannel.sendMessageEmbeds(retryEmbed.build()).complete();
-				this.reactMessageId = reactMessage.getId();
-
-				for (String profileEmoji : profileEmojiToName.keySet()) {
-					reactMessage.addReaction(profileEmoji).complete();
-				}
-
-				reactMessage.addReaction("❌").queue();
-				state = 0;
-				break;
-			case 3:
-				EmbedBuilder cancelEmbed = defaultEmbed("Canceling application");
-				cancelEmbed.setDescription("Channel closing");
-				applicationChannel.sendMessageEmbeds(cancelEmbed.build()).queue();
+		if (state == 0) {
+			reactMessage.clearReactions().queue();
+			if (event.getReactionEmote().getAsReactionCode().equals("❌")) {
+				event.getChannel().sendMessageEmbeds(defaultEmbed("Closing channel").build()).queue();
 				event
 					.getGuild()
 					.getTextChannelById(event.getChannel().getId())
 					.delete()
 					.reason("Application canceled")
-					.queueAfter(5, TimeUnit.SECONDS);
+					.queueAfter(10, TimeUnit.SECONDS);
 				return true;
-			case 5:
-				EmbedBuilder closeChannelEmbed = defaultEmbed("Channel closing");
-				applicationChannel.sendMessageEmbeds(closeChannelEmbed.build()).queue();
-				event
-					.getGuild()
-					.getTextChannelById(event.getChannel().getId())
-					.delete()
-					.reason("Application closed")
-					.queueAfter(5, TimeUnit.SECONDS);
-				return true;
+			} else if (profileEmojiToName.containsKey(event.getReactionEmote().getAsReactionCode())) {
+				caseOne(profileEmojiToName.get(event.getReactionEmote().getAsReactionCode()), currentSettings, applicationChannel);
+			}
 		}
+
 		return false;
 	}
 
@@ -290,12 +201,14 @@ public class ApplyUser implements Serializable {
 			reqEmbed.appendDescription(
 				"\n\n• If you think these values are incorrect make sure all your APIs are enabled and/or try relinking"
 			);
-			reqEmbed.appendDescription("\n• React with ✅ to close the channel");
 
-			reactMessage = applicationChannel.sendMessageEmbeds(reqEmbed.build()).complete();
-			reactMessage.addReaction("✅").queue();
+			reactMessage =
+				applicationChannel
+					.sendMessageEmbeds(reqEmbed.build())
+					.setActionRow(Button.success("apply_user_delete_channel", "Close Channel"))
+					.complete();
 			this.reactMessageId = reactMessage.getId();
-			state = 5;
+			state = 3;
 		} else {
 			try {
 				playerSlayer = formatNumber(player.getTotalSlayer());
@@ -328,185 +241,302 @@ public class ApplyUser implements Serializable {
 			playerProfileName = player.getProfileName();
 
 			EmbedBuilder statsEmbed = player.defaultPlayerEmbed();
-			statsEmbed.setDescription("**Skyblock weight:** " + playerWeight);
+			statsEmbed.setDescription("**Weight:** " + playerWeight);
 			statsEmbed.addField("Total slayer", playerSlayer, true);
 			statsEmbed.addField("Progress skill level", playerSkills, true);
 			statsEmbed.addField("Catacombs level", "" + playerCatacombs, true);
-			statsEmbed.addField("Are the above stats correct?", "React with ✅ for yes, 🔄 to retry, and ❌ to cancel", false);
 
-			reactMessage = applicationChannel.sendMessageEmbeds(statsEmbed.build()).complete();
-			reactMessage.addReaction("✅").queue();
-			reactMessage.addReaction("\uD83D\uDD04").queue();
-			reactMessage.addReaction("❌").queue();
+			reactMessage =
+				applicationChannel
+					.sendMessageEmbeds(statsEmbed.build())
+					.setActionRow(
+						Button.success("apply_user_submit", "Submit"),
+						Button.primary("apply_user_retry", "Retry"),
+						Button.danger("apply_user_cancel", "Cancel")
+					)
+					.complete();
 			this.reactMessageId = reactMessage.getId();
 			state = 1;
 		}
 	}
 
-	private boolean onMessageReactionAddStaff(MessageReactionAddEvent event) {
-		if (event.getUser().isBot()) {
-			return false;
-		}
-
-		if (!event.getMessageId().equals(reactMessageId)) {
-			return false;
-		}
-
-		TextChannel applicationChannel = jda.getTextChannelById(applicationChannelId);
-		try {
-			if (shouldDeleteChannel && (event.getMessageId().equals(reactMessageId))) {
-				if (event.getReactionEmote().getName().equals("✅")) {
-					event.getReaction().clearReactions().queue();
-					EmbedBuilder eb = defaultEmbed("Channel closing");
-					applicationChannel.sendMessageEmbeds(eb.build()).queue();
-					applicationChannel.delete().reason("Applicant read final message").queueAfter(10, TimeUnit.SECONDS);
-					return true;
-				} else {
-					event.getReaction().removeReaction(event.getUser()).queue();
-				}
-				return false;
-			}
-		} catch (Exception ignored) {}
-
-		JsonElement currentSettings = JsonParser.parseString(currentSettingsString);
-
-		TextChannel staffChannel = jda.getTextChannelById(staffChannelId);
-		User applyingUser = jda.retrieveUserById(applyingUserId).complete();
-		Message reactMessage = event.getChannel().retrieveMessageById(event.getMessageId()).complete();
-		if (event.getReactionEmote().getEmoji().equals("❌")) {
-			reactMessage.clearReactions().queue();
-			reactMessage.delete().queueAfter(5, TimeUnit.SECONDS);
-
-			try {
-				staffChannel
-					.sendMessage(playerUsername + " (" + applyingUser.getAsMention() + ") was denied by " + event.getUser().getAsMention())
-					.queue();
-				applicationChannel.sendMessage(applyingUser.getAsMention()).queue();
-			} catch (Exception e) {
-				staffChannel.sendMessage(playerUsername + " was denied by " + event.getUser().getAsMention()).queue();
-			}
-
-			EmbedBuilder eb = defaultEmbed("Application Not Accepted");
-			eb.setDescription(higherDepth(currentSettings, "denyMessageText").getAsString() + "\n**React with ✅ to close the channel**");
-
-			reactMessage = applicationChannel.sendMessageEmbeds(eb.build()).complete();
-			reactMessage.addReaction("✅").queue();
-			this.reactMessageId = reactMessage.getId();
-			shouldDeleteChannel = true;
-		} else if (event.getReactionEmote().getEmoji().equals("✅")) {
-			reactMessage.clearReactions().queue();
-			reactMessage.delete().queueAfter(5, TimeUnit.SECONDS);
-
-			try {
-				staffChannel
-					.sendMessage(
-						fixUsername(playerUsername) +
-						" (" +
-						applyingUser.getAsMention() +
-						") was accepted by " +
-						event.getUser().getAsMention()
-					)
-					.queue();
-				applicationChannel.sendMessage(applyingUser.getAsMention()).queue();
-			} catch (Exception e) {
-				staffChannel.sendMessage(fixUsername(playerUsername) + " was accepted by " + event.getUser().getAsMention()).queue();
-			}
-
-			EmbedBuilder eb = defaultEmbed("Application Accepted");
-			eb.setDescription(higherDepth(currentSettings, "acceptMessageText").getAsString() + "\n**React with ✅ to close the channel**");
-
-			reactMessage = applicationChannel.sendMessageEmbeds(eb.build()).complete();
-			reactMessage.addReaction("✅").queue();
-
-			try {
-				TextChannel waitInviteChannel = jda.getTextChannelById(higherDepth(currentSettings, "waitingChannelId").getAsString());
-				waitInviteChannel
-					.sendMessageEmbeds(defaultEmbed("Waiting for invite").setDescription("`" + playerUsername + "`").build())
-					.setActionRow(Button.success("apply_user_" + higherDepth(currentSettings, "name").getAsString(), "Invited"))
-					.queue();
-			} catch (Exception ignored) {}
-
-			this.reactMessageId = reactMessage.getId();
-			shouldDeleteChannel = true;
-		} else if (event.getReactionEmote().getEmoji().equals("\uD83D\uDD50")) {
-			if (
-				higherDepth(currentSettings, "waitlistedMessageText") != null &&
-				higherDepth(currentSettings, "waitlistedMessageText").getAsString().length() > 0 &&
-				!higherDepth(currentSettings, "waitlistedMessageText").getAsString().equals("none")
-			) {
-				reactMessage.clearReactions().queue();
-				reactMessage.delete().queueAfter(5, TimeUnit.SECONDS);
-
-				try {
-					staffChannel
-						.sendMessage(
-							fixUsername(playerUsername) +
-							" (" +
-							applyingUser.getAsMention() +
-							") was waitlisted by " +
-							event.getUser().getAsMention()
-						)
-						.queue();
-					applicationChannel.sendMessage(applyingUser.getAsMention()).queue();
-				} catch (Exception e) {
-					staffChannel.sendMessage(fixUsername(playerUsername) + " was waitlisted by " + event.getUser().getAsMention()).queue();
-				}
-
-				EmbedBuilder eb = defaultEmbed("Application waitlisted");
-				eb.setDescription(
-					higherDepth(currentSettings, "waitlistedMessageText").getAsString() + "\n**React with ✅ to close the channel**"
-				);
-
-				reactMessage = applicationChannel.sendMessageEmbeds(eb.build()).complete();
-				reactMessage.addReaction("✅").queue();
-
-				try {
-					TextChannel waitInviteChannel = jda.getTextChannelById(higherDepth(currentSettings, "waitingChannelId").getAsString());
-					waitInviteChannel
-						.sendMessageEmbeds(defaultEmbed("Waiting for invite").setDescription("`" + playerUsername + "`").build())
-						.setActionRow(Button.success("apply_user_" + higherDepth(currentSettings, "name").getAsString(), "Invited"))
-						.queue();
-				} catch (Exception ignored) {}
-
-				this.reactMessageId = reactMessage.getId();
-				shouldDeleteChannel = true;
-			}
-		}
-		return false;
-	}
-
-	private void staffCaseConstructor() {
-		JsonElement currentSettings = JsonParser.parseString(currentSettingsString);
-
-		TextChannel staffChannel = jda.getTextChannelById(higherDepth(currentSettings, "messageStaffChannelId").getAsString());
-		staffChannelId = staffChannel.getId();
-
-		EmbedBuilder applyPlayerStats = defaultPlayerEmbed();
-		applyPlayerStats.setDescription("**Skyblock weight:** " + playerWeight);
-		applyPlayerStats.addField("Total slayer", playerSlayer, true);
-		applyPlayerStats.addField("Progress average skill level", playerSkills, true);
-		applyPlayerStats.addField("Catacombs level", "" + playerCatacombs, true);
-		applyPlayerStats.addField("To accept the application,", "React with ✅", true);
-		JsonElement waitlistMsg = higherDepth(currentSettings, "waitlistedMessageText");
-		if (waitlistMsg != null && waitlistMsg.getAsString().length() > 0 && !waitlistMsg.getAsString().equals("none")) {
-			applyPlayerStats.addField("To waitlist the application,", "React with \uD83D\uDD50", true);
-		}
-		applyPlayerStats.addField("To deny the application,", "React with ❌", true);
-		Message reactMessage = higherDepth(currentSettings, "staffPingRoleId").getAsString().equals("none")
-			? staffChannel.sendMessageEmbeds(applyPlayerStats.build()).complete()
-			: staffChannel
-				.sendMessage("<@&" + higherDepth(currentSettings, "staffPingRoleId").getAsString() + ">")
-				.setEmbeds(applyPlayerStats.build())
-				.complete();
-		reactMessage.addReaction("✅").queue();
-		if (waitlistMsg != null && waitlistMsg.getAsString().length() > 0 && !waitlistMsg.getAsString().equals("none")) {
-			reactMessage.addReaction("\uD83D\uDD50").queue();
-		}
-		reactMessage.addReaction("❌").queue();
-		reactMessageId = reactMessage.getId();
-	}
-
 	public EmbedBuilder defaultPlayerEmbed() {
 		return defaultEmbed(fixUsername(playerUsername) + ironmanSymbol, skyblockStatsLink(playerUsername, playerProfileName));
+	}
+
+	public boolean onButtonClick(ButtonClickEvent event, ApplyGuild parent) {
+		if (!event.getMessage().getId().equals(reactMessageId)) {
+			return false;
+		}
+
+		switch (state) {
+			case 1:
+				switch (event.getButton().getId()) {
+					case "apply_user_submit":
+						event.getMessage().editMessageComponents().queue();
+
+						EmbedBuilder finishApplyEmbed = defaultEmbed("Thank you for applying!");
+						finishApplyEmbed.setDescription("You will be notified once staff review your application");
+
+						event.getHook().editOriginalEmbeds(finishApplyEmbed.build()).queue();
+
+						state = 2;
+
+						JsonElement currentSettings = JsonParser.parseString(currentSettingsString);
+
+						TextChannel staffChannel = jda.getTextChannelById(
+							higherDepth(currentSettings, "messageStaffChannelId").getAsString()
+						);
+						staffChannelId = staffChannel.getId();
+
+						EmbedBuilder applyPlayerStats = defaultPlayerEmbed();
+						applyPlayerStats.setDescription("**Weight:** " + playerWeight);
+						applyPlayerStats.addField("Total slayer", playerSlayer, true);
+						applyPlayerStats.addField("Progress average skill level", playerSkills, true);
+						applyPlayerStats.addField("Catacombs level", playerCatacombs, true);
+						applyPlayerStats.setThumbnail("https://cravatar.eu/helmavatar/" + playerUsername + "/64.png");
+						String waitlistMsg = higherDepth(currentSettings, "waitlistedMessageText", null);
+
+						List<Button> row = new ArrayList<>();
+						row.add(Button.success("apply_user_accept", "Accept"));
+						if (waitlistMsg != null && waitlistMsg.length() > 0 && !waitlistMsg.equals("none")) {
+							row.add(Button.primary("apply_user_waitlist", "Waitlist"));
+						}
+						row.add(Button.danger("apply_user_deny", "Deny"));
+						Message reactMessage = higherDepth(currentSettings, "staffPingRoleId").getAsString().equals("none")
+							? staffChannel.sendMessageEmbeds(applyPlayerStats.build()).complete()
+							: staffChannel
+								.sendMessage("<@&" + higherDepth(currentSettings, "staffPingRoleId").getAsString() + ">")
+								.setEmbeds(applyPlayerStats.build())
+								.setActionRow(row)
+								.complete();
+
+						reactMessageId = reactMessage.getId();
+						return true;
+					case "apply_user_retry":
+						EmbedBuilder retryEmbed = defaultPlayerEmbed();
+						retryEmbed.setDescription(
+							"Please react with the emoji that corresponds to the profile you want to apply with or react with ❌ to cancel the application."
+						);
+
+						for (Map.Entry<String, String> profileEntry : profileEmojiToName.entrySet()) {
+							String profileEmoji = profileEntry.getKey().contains(":")
+								? "<:" + profileEntry.getKey() + ">"
+								: profileEntry.getKey();
+							if (profileEntry.getKey().equals("↩️")) {
+								String lastPlayedProfile = profileEmojiToName.get("↩️");
+								retryEmbed.appendDescription(
+									"\n" +
+									profileEmoji +
+									" - [Last played profile (" +
+									lastPlayedProfile +
+									")](" +
+									skyblockStatsLink(playerUsername, lastPlayedProfile) +
+									")"
+								);
+							} else {
+								retryEmbed.appendDescription(
+									"\n" +
+									profileEmoji +
+									" - [" +
+									capitalizeString(profileEntry.getValue()) +
+									"](" +
+									skyblockStatsLink(playerUsername, profileEntry.getValue()) +
+									")"
+								);
+							}
+						}
+
+						event.getMessage().editMessageComponents().complete();
+						reactMessage = event.getHook().editOriginalEmbeds(retryEmbed.build()).complete();
+						this.reactMessageId = reactMessage.getId();
+
+						for (String profileEmoji : profileEmojiToName.keySet()) {
+							reactMessage.addReaction(profileEmoji).complete();
+						}
+
+						reactMessage.addReaction("❌").queue();
+
+						state = 0;
+						return true;
+					case "apply_user_cancel":
+						event.getMessage().editMessageComponents().queue();
+						event.getHook().editOriginalEmbeds(defaultEmbed("Canceling application & closing channel").build()).complete();
+						event
+							.getGuild()
+							.getTextChannelById(event.getChannel().getId())
+							.delete()
+							.reason("Application canceled")
+							.queueAfter(10, TimeUnit.SECONDS);
+						parent.applyUserList.remove(this);
+						return true;
+				}
+				break;
+			case 2:
+				TextChannel applicationChannel = jda.getTextChannelById(applicationChannelId);
+				JsonElement currentSettings = JsonParser.parseString(currentSettingsString);
+
+				User applyingUser = jda.retrieveUserById(applyingUserId).complete();
+				Message reactMessage = event.getChannel().retrieveMessageById(event.getMessageId()).complete();
+				switch (event.getButton().getId()) {
+					case "apply_user_accept":
+						event.getMessage().editMessageComponents().queue();
+						reactMessage.delete().queueAfter(5, TimeUnit.SECONDS);
+
+						try {
+							event
+								.getHook()
+								.editOriginal(
+									fixUsername(playerUsername) +
+									" (" +
+									applyingUser.getAsMention() +
+									") was accepted by " +
+									event.getUser().getAsMention()
+								)
+								.queue();
+						} catch (Exception e) {
+							event
+								.getHook()
+								.editOriginal(fixUsername(playerUsername) + " was accepted by " + event.getUser().getAsMention())
+								.queue();
+						}
+
+						TextChannel waitInviteChannel = null;
+						try {
+							waitInviteChannel = jda.getTextChannelById(higherDepth(currentSettings, "waitingChannelId").getAsString());
+						} catch (Exception ignored) {}
+
+						EmbedBuilder eb = defaultEmbed("Application Accepted");
+						eb.setDescription(higherDepth(currentSettings, "acceptMessageText").getAsString());
+						MessageAction action = applicationChannel.sendMessage(applyingUser.getAsMention()).setEmbeds(eb.build());
+						if (waitInviteChannel == null) {
+							action.setActionRow(Button.success("apply_user_delete_channel", "Close Channel"));
+						}
+
+						reactMessage = action.complete();
+
+						state = 3;
+						if (waitInviteChannel != null) {
+							waitInviteChannel
+								.sendMessageEmbeds(defaultEmbed("Waiting for invite").setDescription("`" + playerUsername + "`").build())
+								.setActionRow(
+									Button.success(
+										"apply_user_wait_" +
+										higherDepth(currentSettings, "name").getAsString() +
+										"_" +
+										applicationChannelId,
+										"Invited"
+									)
+								)
+								.queue();
+						}
+
+						this.reactMessageId = reactMessage.getId();
+						return true;
+					case "apply_user_waitlist":
+						if (
+							higherDepth(currentSettings, "waitlistedMessageText") != null &&
+							higherDepth(currentSettings, "waitlistedMessageText").getAsString().length() > 0 &&
+							!higherDepth(currentSettings, "waitlistedMessageText").getAsString().equals("none")
+						) {
+							event.getMessage().editMessageComponents().queue();
+							reactMessage.delete().queueAfter(5, TimeUnit.SECONDS);
+
+							try {
+								event
+									.getHook()
+									.editOriginal(
+										fixUsername(playerUsername) +
+										" (" +
+										applyingUser.getAsMention() +
+										") was waitlisted by " +
+										event.getUser().getAsMention()
+									)
+									.queue();
+							} catch (Exception e) {
+								event
+									.getHook()
+									.editOriginal(fixUsername(playerUsername) + " was waitlisted by " + event.getUser().getAsMention())
+									.queue();
+							}
+
+							waitInviteChannel = null;
+							try {
+								waitInviteChannel = jda.getTextChannelById(higherDepth(currentSettings, "waitingChannelId").getAsString());
+							} catch (Exception ignored) {}
+							eb = defaultEmbed("Application waitlisted");
+							eb.setDescription(higherDepth(currentSettings, "waitlistedMessageText").getAsString());
+
+							action = applicationChannel.sendMessage(applyingUser.getAsMention()).setEmbeds(eb.build());
+
+							if (waitInviteChannel == null) {
+								action.setActionRow(Button.success("apply_user_delete_channel", "Close Channel"));
+							}
+
+							reactMessage = action.complete();
+
+							state = 3;
+							if (waitInviteChannel != null) {
+								waitInviteChannel
+									.sendMessageEmbeds(
+										defaultEmbed("Waiting for invite").setDescription("`" + playerUsername + "`").build()
+									)
+									.setActionRow(
+										Button.success(
+											"apply_user_wait_" +
+											higherDepth(currentSettings, "name").getAsString() +
+											"_" +
+											applicationChannelId,
+											"Invited"
+										)
+									)
+									.queue();
+							}
+
+							this.reactMessageId = reactMessage.getId();
+						}
+						return true;
+					case "apply_user_deny":
+						event.getMessage().editMessageComponents().queue();
+						reactMessage.delete().queueAfter(5, TimeUnit.SECONDS);
+
+						try {
+							event
+								.getHook()
+								.editOriginal(
+									playerUsername +
+									" (" +
+									applyingUser.getAsMention() +
+									") was denied by " +
+									event.getUser().getAsMention()
+								)
+								.queue();
+						} catch (Exception e) {
+							event.getHook().editOriginal(playerUsername + " was denied by " + event.getUser().getAsMention()).queue();
+						}
+
+						eb = defaultEmbed("Application Not Accepted");
+						eb.setDescription(higherDepth(currentSettings, "denyMessageText").getAsString());
+
+						reactMessage =
+							applicationChannel
+								.sendMessage(applyingUser.getAsMention())
+								.setEmbeds(eb.build())
+								.setActionRow(Button.success("apply_user_delete_channel", "Close Channel"))
+								.complete();
+						state = 3;
+						this.reactMessageId = reactMessage.getId();
+						return true;
+				}
+				break;
+			case 3:
+				event.getMessage().editMessageComponents().queue();
+				event.getHook().editOriginalEmbeds(defaultEmbed("Closing Channel").build()).queue();
+				event.getTextChannel().delete().reason("Application closed").queueAfter(10, TimeUnit.SECONDS);
+				parent.applyUserList.remove(this);
+				return true;
+		}
+
+		return false;
 	}
 }

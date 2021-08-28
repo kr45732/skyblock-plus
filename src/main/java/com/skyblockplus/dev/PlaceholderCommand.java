@@ -41,17 +41,4 @@ public class PlaceholderCommand extends Command {
 		}
 			.submit();
 	}
-	//	public static void main(String[] args) {
-	//		for(String i:getEmojiMap().keySet()){
-	//			if(getJson("https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/items/" + i.toUpperCase() + ".json") == null){
-	//				System.out.println("BAD: " + i);
-	//			}
-	//		}
-	//
-	//		/*
-	//		* BAD: euclid_wheat_hoe_tier_2
-	//		* BAD: titanium_drill_dr_x555
-	//		*/
-	//
-	//	}
 }

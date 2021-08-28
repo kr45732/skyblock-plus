@@ -131,6 +131,10 @@ public class MainListener extends ListenerAdapter {
 
 	@Override
 	public void onMessageReactionAdd(MessageReactionAddEvent event) {
+		if (event.getUser() != null && event.getUser().isBot()) {
+			return;
+		}
+
 		if (guildMap.containsKey(event.getGuild().getId())) {
 			guildMap.get(event.getGuild().getId()).onMessageReactionAdd(event);
 		}
@@ -152,6 +156,10 @@ public class MainListener extends ListenerAdapter {
 
 	@Override
 	public void onButtonClick(ButtonClickEvent event) {
+		if (event.getUser().isBot()) {
+			return;
+		}
+
 		if (event.getGuild() == null) {
 			if (event.getMessage() != null) {
 				event
