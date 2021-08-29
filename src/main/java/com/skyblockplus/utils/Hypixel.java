@@ -10,6 +10,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
+
+import java.io.InputStreamReader;
+import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -23,6 +26,9 @@ import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
 
 public class Hypixel {
 
@@ -396,24 +402,25 @@ public class Hypixel {
 	//		return null;
 	//	}
 	//
-	//	public static JsonArray getAuctionPetsByName(String query) {
-	//		try {
-	//			HttpGet httpget = new HttpGet("https://api.eastarcti.ca/skyblock/auctions/prod/");
-	//			httpget.addHeader("content-type", "application/json; charset=UTF-8");
-	//
-	//			URI uri = new URIBuilder(httpget.getURI())
-	//				.addParameter("query", "{\"item_name\":{\"$in\":[" + query + "]},\"bin\":true}")
-	//				.addParameter("sort", "{\"starting_bid\":1}")
-	//				.addParameter("filter", "{\"item_name\":1,\"starting_bid\":1,\"tier\":1}")
-	//				.build();
-	//			httpget.setURI(uri);
-	//
-	//			try (CloseableHttpResponse httpResponse = httpClient.execute(httpget)) {
-	//				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
-	//			}
-	//		} catch (Exception ignored) {}
-	//		return null;
-	//	}
+		public static JsonArray getAuctionPetsByName(String query) {
+			try {
+				HttpGet httpget = new HttpGet("https://auction-api.kr45732.repl.co/");
+				httpget.addHeader("content-type", "application/json; charset=UTF-8");
+
+				URI uri = new URIBuilder(httpget.getURI())
+					.addParameter("query", "{\"item_name\":{\"$in\":[" + query + "]}}")
+					.addParameter("sort", "{\"starting_bid\":1}")
+						.addParameter("key", AUCTION_API_KEY)
+					.build();
+				httpget.setURI(uri);
+				System.out.println(uri);
+
+				try (CloseableHttpResponse httpResponse = httpClient.execute(httpget)) {
+					return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
+				}
+			} catch (Exception ignored) {}
+			return null;
+		}
 
 	@SuppressWarnings("EmptyTryBlock")
 	public static void cacheJson(String playerUuid, JsonElement json) {

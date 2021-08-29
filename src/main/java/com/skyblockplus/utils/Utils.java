@@ -97,6 +97,7 @@ public class Utils {
 	public static String GITHUB_TOKEN = "";
 	public static String DEFAULT_PREFIX = "";
 	public static String CACHE_DATABASE_TOKEN = "";
+	public static String AUCTION_API_KEY = "";
 	public static boolean IS_API = false;
 	/* JSON */
 	private static JsonElement essenceCostsJson;
@@ -864,6 +865,7 @@ public class Utils {
 			API_BASE_URL = (String) appProps.get("API_BASE_URL");
 			DEFAULT_PREFIX = (String) appProps.get("DEFAULT_PREFIX");
 			CACHE_DATABASE_TOKEN = (String) appProps.get("CACHE_DATABASE_TOKEN");
+			AUCTION_API_KEY = (String) appProps.get("AUCTION_API_KEY");
 		} catch (IOException e) {
 			HYPIXEL_API_KEY = System.getenv("HYPIXEL_API_KEY");
 			BOT_TOKEN = System.getenv("BOT_TOKEN");
@@ -886,6 +888,7 @@ public class Utils {
 			IS_API = API_BASE_URL.equals("https://skyblock-plus.up.railway.app/");
 			DEFAULT_PREFIX = System.getenv("DEFAULT_PREFIX");
 			CACHE_DATABASE_TOKEN = System.getenv("CACHE_DATABASE_TOKEN");
+			AUCTION_API_KEY = System.getenv("AUCTION_API_KEY");
 		}
 	}
 
