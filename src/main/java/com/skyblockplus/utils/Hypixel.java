@@ -10,7 +10,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
-
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.time.Duration;
@@ -402,25 +401,25 @@ public class Hypixel {
 	//		return null;
 	//	}
 	//
-		public static JsonArray getAuctionPetsByName(String query) {
-			try {
-				HttpGet httpget = new HttpGet("https://auction-api.kr45732.repl.co/");
-				httpget.addHeader("content-type", "application/json; charset=UTF-8");
+	public static JsonArray getAuctionPetsByName(String query) {
+		try {
+			HttpGet httpget = new HttpGet("https://auction-api.kr45732.repl.co/");
+			httpget.addHeader("content-type", "application/json; charset=UTF-8");
 
-				URI uri = new URIBuilder(httpget.getURI())
-					.addParameter("query", "{\"item_name\":{\"$in\":[" + query + "]}}")
-					.addParameter("sort", "{\"starting_bid\":1}")
-						.addParameter("key", AUCTION_API_KEY)
-					.build();
-				httpget.setURI(uri);
-				System.out.println(uri);
+			URI uri = new URIBuilder(httpget.getURI())
+				.addParameter("query", "{\"item_name\":{\"$in\":[" + query + "]}}")
+				.addParameter("sort", "{\"starting_bid\":1}")
+				.addParameter("key", AUCTION_API_KEY)
+				.build();
+			httpget.setURI(uri);
+			System.out.println(uri);
 
-				try (CloseableHttpResponse httpResponse = httpClient.execute(httpget)) {
-					return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
-				}
-			} catch (Exception ignored) {}
-			return null;
-		}
+			try (CloseableHttpResponse httpResponse = httpClient.execute(httpget)) {
+				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
+			}
+		} catch (Exception ignored) {}
+		return null;
+	}
 
 	@SuppressWarnings("EmptyTryBlock")
 	public static void cacheJson(String playerUuid, JsonElement json) {

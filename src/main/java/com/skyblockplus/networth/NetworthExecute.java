@@ -285,9 +285,9 @@ public class NetworthExecute {
 			}
 
 			petsItems.sort(Comparator.comparingDouble(item -> -Double.parseDouble(item.split("@split@")[1])));
-//			StringBuilder petsStr = new StringBuilder(
-//				"Pet calculations will not be working for the time being due to the API I was using being shut down. I working on a replacement for this. Please join the Skyblock Plus Discord for the latest update."
-//			);
+			//			StringBuilder petsStr = new StringBuilder(
+			//				"Pet calculations will not be working for the time being due to the API I was using being shut down. I working on a replacement for this. Please join the Skyblock Plus Discord for the latest update."
+			//			);
 			StringBuilder petsStr = new StringBuilder();
 			for (int i = 0; i < petsItems.size(); i++) {
 				String item = petsItems.get(i);
@@ -569,8 +569,10 @@ public class NetworthExecute {
 		}
 
 		for (InvItem item : invPets) {
-			double auctionPrice = getMinBinAvg(item.getName().split("] ")[1].toUpperCase().replace(" ", "_") + rarityToNumberMap.get(item.getRarity()));
-			if(auctionPrice != -1) {
+			double auctionPrice = getMinBinAvg(
+				item.getName().split("] ")[1].toUpperCase().replace(" ", "_") + rarityToNumberMap.get(item.getRarity())
+			);
+			if (auctionPrice != -1) {
 				StringBuilder miscStr = new StringBuilder("[");
 				double miscExtras = 0;
 				try {
@@ -579,14 +581,13 @@ public class NetworthExecute {
 						double miscPrice = getLowestPrice(extraItem, " ");
 						miscExtras += miscPrice;
 						miscStr
-								.append("{\"name\":\"")
-								.append(extraItem)
-								.append("\",\"price\":\"")
-								.append(simplifyNumber(miscPrice))
-								.append("\"},");
+							.append("{\"name\":\"")
+							.append(extraItem)
+							.append("\",\"price\":\"")
+							.append(simplifyNumber(miscPrice))
+							.append("\"},");
 					}
-				} catch (Exception ignored) {
-				}
+				} catch (Exception ignored) {}
 				if (miscStr.toString().endsWith(",")) {
 					miscStr = new StringBuilder(miscStr.substring(0, miscStr.length() - 1));
 				}
@@ -596,24 +597,26 @@ public class NetworthExecute {
 				invTotal += auctionPrice + miscExtras;
 				if (verbose) {
 					calcItemsJsonStr
-							.append("{\"total\":\"")
-							.append(simplifyNumber(auctionPrice + miscExtras))
-							.append("\",\"name\":\"")
-							.append(item.getName())
-							.append("\",\"base_cost\":\"")
-							.append(simplifyNumber(auctionPrice))
-							.append("\",")
-							.append(
-									miscExtras > 0 ? "\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}," : ""
-							)
-							.append("\"fail_calc_lvl_cost\":true},");
+						.append("{\"total\":\"")
+						.append(simplifyNumber(auctionPrice + miscExtras))
+						.append("\",\"name\":\"")
+						.append(item.getName())
+						.append("\",\"base_cost\":\"")
+						.append(simplifyNumber(auctionPrice))
+						.append("\",")
+						.append(
+							miscExtras > 0 ? "\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}," : ""
+						)
+						.append("\"fail_calc_lvl_cost\":true},");
 				}
 			}
 		}
 
 		for (InvItem item : petsPets) {
-			double auctionPrice = getMinBinAvg(item.getName().split("] ")[1].toUpperCase().replace(" ", "_") + rarityToNumberMap.get(item.getRarity()));
-			if(auctionPrice != -1) {
+			double auctionPrice = getMinBinAvg(
+				item.getName().split("] ")[1].toUpperCase().replace(" ", "_") + rarityToNumberMap.get(item.getRarity())
+			);
+			if (auctionPrice != -1) {
 				StringBuilder miscStr = new StringBuilder("[");
 				double miscExtras = 0;
 				try {
@@ -654,8 +657,10 @@ public class NetworthExecute {
 		}
 
 		for (InvItem item : enderChestPets) {
-			double auctionPrice = getMinBinAvg(item.getName().split("] ")[1].toUpperCase().replace(" ", "_") + rarityToNumberMap.get(item.getRarity()));
-			if(auctionPrice != -1) {
+			double auctionPrice = getMinBinAvg(
+				item.getName().split("] ")[1].toUpperCase().replace(" ", "_") + rarityToNumberMap.get(item.getRarity())
+			);
+			if (auctionPrice != -1) {
 				StringBuilder miscStr = new StringBuilder("[");
 				double miscExtras = 0;
 				try {
@@ -696,8 +701,10 @@ public class NetworthExecute {
 		}
 
 		for (InvItem item : storagePets) {
-			double auctionPrice = getMinBinAvg(item.getName().split("] ")[1].toUpperCase().replace(" ", "_") + rarityToNumberMap.get(item.getRarity()));
-			if(auctionPrice != -1) {
+			double auctionPrice = getMinBinAvg(
+				item.getName().split("] ")[1].toUpperCase().replace(" ", "_") + rarityToNumberMap.get(item.getRarity())
+			);
+			if (auctionPrice != -1) {
 				StringBuilder miscStr = new StringBuilder("[");
 				double miscExtras = 0;
 				try {
@@ -738,8 +745,11 @@ public class NetworthExecute {
 		}
 	}
 
-	private double getMinBinAvg(String id){
-		return getMin(higherDepth(lowestBinJson, id, -1.0), getMin(higherDepth(averageAuctionJson, id + ".clean_price", -1.0), higherDepth(averageAuctionJson, id + ".price", -1.0)));
+	private double getMinBinAvg(String id) {
+		return getMin(
+			higherDepth(lowestBinJson, id, -1.0),
+			getMin(higherDepth(averageAuctionJson, id + ".clean_price", -1.0), higherDepth(averageAuctionJson, id + ".price", -1.0))
+		);
 	}
 
 	private String addItemStr(InvItem item, double itemPrice) {
