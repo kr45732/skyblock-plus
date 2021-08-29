@@ -412,7 +412,6 @@ public class Hypixel {
 				.addParameter("key", AUCTION_API_KEY)
 				.build();
 			httpget.setURI(uri);
-			System.out.println(uri);
 
 			try (CloseableHttpResponse httpResponse = httpClient.execute(httpget)) {
 				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
