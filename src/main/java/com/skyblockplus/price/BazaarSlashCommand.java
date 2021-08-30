@@ -14,14 +14,12 @@ public class BazaarSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
-		executor.submit(
-			() -> {
-				event.logCommandGuildUserCommand();
+		executor.submit(() -> {
+			event.logCommandGuildUserCommand();
 
-				EmbedBuilder eb = BazaarCommand.getBazaarItem(event.getOptionStr("item"));
+			EmbedBuilder eb = BazaarCommand.getBazaarItem(event.getOptionStr("item"));
 
-				event.getHook().editOriginalEmbeds(eb.build()).queue();
-			}
-		);
+			event.getHook().editOriginalEmbeds(eb.build()).queue();
+		});
 	}
 }

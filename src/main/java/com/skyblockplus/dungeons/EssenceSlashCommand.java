@@ -14,23 +14,21 @@ public class EssenceSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
-		executor.submit(
-			() -> {
-				event.logCommandGuildUserCommand();
-				String subcommandName = event.getSubcommandName();
-				String itemName = event.getOptionStr("item");
+		executor.submit(() -> {
+			event.logCommandGuildUserCommand();
+			String subcommandName = event.getSubcommandName();
+			String itemName = event.getOptionStr("item");
 
-				EmbedBuilder eb;
-				if (subcommandName.equals("upgrade")) {
-					eb = event.disabledCommandMessage();
-				} else if (subcommandName.equals("information")) {
-					eb = EssenceCommand.getEssenceInformation(itemName);
-				} else {
-					eb = event.invalidCommandMessage();
-				}
-
-				event.getHook().editOriginalEmbeds(eb.build()).queue();
+			EmbedBuilder eb;
+			if (subcommandName.equals("upgrade")) {
+				eb = event.disabledCommandMessage();
+			} else if (subcommandName.equals("information")) {
+				eb = EssenceCommand.getEssenceInformation(itemName);
+			} else {
+				eb = event.invalidCommandMessage();
 			}
-		);
+
+			event.getHook().editOriginalEmbeds(eb.build()).queue();
+		});
 	}
 }

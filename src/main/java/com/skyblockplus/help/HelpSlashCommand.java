@@ -14,20 +14,18 @@ public class HelpSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
-		executor.submit(
-			() -> {
-				event.logCommandGuildUserCommand();
-				EmbedBuilder eb = HelpCommand.getHelp(
-					event.getOptionStr("page"),
-					event.getMember(),
-					null,
-					event.getHook(),
-					event.getGuild().getId()
-				);
-				if (eb != null) {
-					event.getHook().editOriginalEmbeds(eb.build()).queue();
-				}
+		executor.submit(() -> {
+			event.logCommandGuildUserCommand();
+			EmbedBuilder eb = HelpCommand.getHelp(
+				event.getOptionStr("page"),
+				event.getMember(),
+				null,
+				event.getHook(),
+				event.getGuild().getId()
+			);
+			if (eb != null) {
+				event.getHook().editOriginalEmbeds(eb.build()).queue();
 			}
-		);
+		});
 	}
 }
