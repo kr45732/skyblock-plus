@@ -39,6 +39,7 @@ import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
 import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
 import me.nullicorn.nedit.type.NBTList;
+import me.nullicorn.nedit.type.TagType;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -941,28 +942,26 @@ public class Utils {
 						itemInfo.setDungeonFloor(Integer.parseInt(item.getString("tag.ExtraAttributes.item_tier", "-1")));
 						itemInfo.setNbtTag(item.toString());
 
-						try {
+						if (item.containsTag("tag.ExtraAttributes.enchantments", TagType.COMPOUND)) {
 							NBTCompound enchants = item.getCompound("tag.ExtraAttributes.enchantments");
 							List<String> enchantsList = new ArrayList<>();
 							for (Map.Entry<String, Object> enchant : enchants.entrySet()) {
 								enchantsList.add(enchant.getKey() + ";" + enchant.getValue());
 							}
 							itemInfo.setEnchantsFormatted(enchantsList);
-						} catch (Exception ignored) {}
+						}
 
 						String itemSkinStr = item.getString("tag.ExtraAttributes.skin", "None");
 						if (!itemSkinStr.equals("None")) {
 							itemInfo.addExtraValue("PET_SKIN_" + itemSkinStr);
 						}
 
-						try {
+						if (item.containsTag("tag.ExtraAttributes.ability_scroll", TagType.LIST)) {
 							NBTList necronBladeScrolls = item.getList("tag.ExtraAttributes.ability_scroll");
 							for (Object scroll : necronBladeScrolls) {
-								try {
-									itemInfo.addExtraValue("" + scroll);
-								} catch (Exception ignored) {}
+								itemInfo.addExtraValue((String) scroll);
 							}
-						} catch (Exception ignored) {}
+						}
 
 						if (item.getInt("tag.ExtraAttributes.wood_singularity_count", 0) == 1) {
 							itemInfo.addExtraValue("WOOD_SINGULARITY");
@@ -988,6 +987,19 @@ public class Utils {
 
 						for (int j = 0; j < item.getInt("tag.ExtraAttributes.farming_for_dummies_count", 0); j++) {
 							itemInfo.addExtraValue("FARMING_FOR_DUMMIES");
+						}
+
+						if (item.containsTag("tag.ExtraAttributes.gems", TagType.COMPOUND)) {
+							NBTCompound gems = item.getCompound("tag.ExtraAttributes.gems");
+							if (gems.containsKey("UNIVERSAL_0") && gems.containsKey("UNIVERSAL_0_gem")) {
+								itemInfo.addExtraValue(
+									gems.getString("UNIVERSAL_0", "None") + "_" + gems.getString("UNIVERSAL_0_gem", "None") + "_" + "_GEM"
+								);
+							} else {
+								for (Map.Entry<String, Object> gem : gems.entrySet()) {
+									itemInfo.addExtraValue(gem.getValue() + "_" + gem.getKey().split("_")[0] + "_GEM");
+								}
+							}
 						}
 
 						try {
