@@ -13,12 +13,10 @@ public class PriceSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
-		executor.submit(
-			() -> {
-				event.logCommandGuildUserCommand();
+		executor.submit(() -> {
+			event.logCommandGuildUserCommand();
 
-				event.getHook().editOriginalEmbeds(PriceCommand.calculatePriceFromUuid(event.getOptionStr("uuid")).build()).queue();
-			}
-		);
+			event.getHook().editOriginalEmbeds(PriceCommand.calculatePriceFromUuid(event.getOptionStr("uuid")).build()).queue();
+		});
 	}
 }

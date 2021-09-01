@@ -108,18 +108,16 @@ public class CustomPaginator extends Menu {
 	}
 
 	private void initialize(RestAction<Message> action, int pageNum) {
-		action.queue(
-			m -> {
-				if (pages > 1) {
-					if (bulkSkipNumber > 1) m.addReaction(BIG_LEFT).queue();
-					m.addReaction(LEFT).queue();
-					if (bulkSkipNumber > 1) m.addReaction(RIGHT).queue();
-					m.addReaction(bulkSkipNumber > 1 ? BIG_RIGHT : RIGHT).queue(v -> pagination(m, pageNum), t -> pagination(m, pageNum));
-				} else {
-					finalAction.accept(m);
-				}
+		action.queue(m -> {
+			if (pages > 1) {
+				if (bulkSkipNumber > 1) m.addReaction(BIG_LEFT).queue();
+				m.addReaction(LEFT).queue();
+				if (bulkSkipNumber > 1) m.addReaction(RIGHT).queue();
+				m.addReaction(bulkSkipNumber > 1 ? BIG_RIGHT : RIGHT).queue(v -> pagination(m, pageNum), t -> pagination(m, pageNum));
+			} else {
+				finalAction.accept(m);
 			}
-		);
+		});
 	}
 
 	private void pagination(Message message, int pageNum) {

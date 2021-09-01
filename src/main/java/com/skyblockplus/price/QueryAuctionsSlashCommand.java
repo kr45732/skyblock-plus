@@ -14,14 +14,12 @@ public class QueryAuctionsSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
-		executor.submit(
-			() -> {
-				event.logCommandGuildUserCommand();
+		executor.submit(() -> {
+			event.logCommandGuildUserCommand();
 
-				EmbedBuilder eb = QueryAuctionCommand.queryAuctions(event.getOptionStr("item"));
+			EmbedBuilder eb = QueryAuctionCommand.queryAuctions(event.getOptionStr("item"));
 
-				event.getHook().editOriginalEmbeds(eb.build()).queue();
-			}
-		);
+			event.getHook().editOriginalEmbeds(eb.build()).queue();
+		});
 	}
 }

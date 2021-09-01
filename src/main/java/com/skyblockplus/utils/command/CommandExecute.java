@@ -34,15 +34,13 @@ public abstract class CommandExecute {
 	protected abstract void execute();
 
 	public void submit() {
-		executor.submit(
-			() -> {
-				if (sendLoadingEmbed) {
-					this.ebMessage = event.getChannel().sendMessageEmbeds(loadingEmbed().build()).complete();
-				}
-				this.args = event.getMessage().getContentRaw().split("\\s+", 0);
-				execute();
+		executor.submit(() -> {
+			if (sendLoadingEmbed) {
+				this.ebMessage = event.getChannel().sendMessageEmbeds(loadingEmbed().build()).complete();
 			}
-		);
+			this.args = event.getMessage().getContentRaw().split("\\s+", 0);
+			execute();
+		});
 	}
 
 	protected void logCommand() {
