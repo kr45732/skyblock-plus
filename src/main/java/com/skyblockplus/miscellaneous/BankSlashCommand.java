@@ -14,25 +14,27 @@ public class BankSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
-		executor.submit(() -> {
-			event.logCommandGuildUserCommand();
+		executor.submit(
+			() -> {
+				event.logCommandGuildUserCommand();
 
-			String subcommandName = event.getSubcommandName();
-			String username = event.getOptionStr("player");
-			String profileName = event.getOptionStr("profile");
-			EmbedBuilder eb;
+				String subcommandName = event.getSubcommandName();
+				String username = event.getOptionStr("player");
+				String profileName = event.getOptionStr("profile");
+				EmbedBuilder eb;
 
-			if (subcommandName.equals("total")) {
-				eb = BankCommand.getPlayerBalance(username, profileName);
-			} else if (subcommandName.equals("history")) {
-				eb = BankCommand.getPlayerBankHistory(username, profileName, event.getUser(), null, event.getHook());
-			} else {
-				eb = event.invalidCommandMessage();
+				if (subcommandName.equals("total")) {
+					eb = BankCommand.getPlayerBalance(username, profileName);
+				} else if (subcommandName.equals("history")) {
+					eb = BankCommand.getPlayerBankHistory(username, profileName, event.getUser(), null, event.getHook());
+				} else {
+					eb = event.invalidCommandMessage();
+				}
+
+				if (eb != null) {
+					event.getHook().editOriginalEmbeds(eb.build()).queue();
+				}
 			}
-
-			if (eb != null) {
-				event.getHook().editOriginalEmbeds(eb.build()).queue();
-			}
-		});
+		);
 	}
 }

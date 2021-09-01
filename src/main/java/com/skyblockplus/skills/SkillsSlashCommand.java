@@ -14,18 +14,20 @@ public class SkillsSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
-		executor.submit(() -> {
-			event.logCommandGuildUserCommand();
+		executor.submit(
+			() -> {
+				event.logCommandGuildUserCommand();
 
-			String profileName = event.getOptionStr("profile");
-			EmbedBuilder eb;
-			if (profileName != null) {
-				eb = SkillsCommand.getPlayerSkill(event.getOptionStr("player"), profileName);
-			} else {
-				eb = SkillsCommand.getPlayerSkill(event.getOptionStr("player"), null);
+				String profileName = event.getOptionStr("profile");
+				EmbedBuilder eb;
+				if (profileName != null) {
+					eb = SkillsCommand.getPlayerSkill(event.getOptionStr("player"), profileName);
+				} else {
+					eb = SkillsCommand.getPlayerSkill(event.getOptionStr("player"), null);
+				}
+
+				event.getHook().editOriginalEmbeds(eb.build()).queue();
 			}
-
-			event.getHook().editOriginalEmbeds(eb.build()).queue();
-		});
+		);
 	}
 }

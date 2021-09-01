@@ -14,14 +14,16 @@ public class ProfilesSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
-		executor.submit(() -> {
-			event.logCommandGuildUserCommand();
+		executor.submit(
+			() -> {
+				event.logCommandGuildUserCommand();
 
-			EmbedBuilder eb = ProfilesCommand.getPlayerProfiles(event.getOptionStr("player"), event.getUser(), null, event.getHook());
+				EmbedBuilder eb = ProfilesCommand.getPlayerProfiles(event.getOptionStr("player"), event.getUser(), null, event.getHook());
 
-			if (eb != null) {
-				event.getHook().editOriginalEmbeds(eb.build()).queue();
+				if (eb != null) {
+					event.getHook().editOriginalEmbeds(eb.build()).queue();
+				}
 			}
-		});
+		);
 	}
 }
