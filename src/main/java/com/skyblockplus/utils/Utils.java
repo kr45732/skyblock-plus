@@ -30,6 +30,7 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -198,10 +199,7 @@ public class Utils {
 
 	public static JsonElement getTalismanJson() {
 		if (talismanJson == null) {
-			talismanJson =
-				parseJsString(
-					getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/talismans.js")
-				);
+			talismanJson = parseJsString("{" + getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/talismans.js").replace("export const ", "").replace(" = ", ": ").replace(";", ",") + "}");
 		}
 
 		return talismanJson;
@@ -298,8 +296,9 @@ public class Utils {
 		if (skyCryptPetJson == null) {
 			skyCryptPetJson =
 				parseJsString(
-					getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/pets.js")
-						.replaceAll("(description: `)(.*?)(\\s*`,)", "")
+						Pattern.compile("/\\*(.*)\\*/", Pattern.DOTALL).matcher("{" + getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/pets.js")
+										.split("];")[1].replace("export const ", "").replace(" = ", ": ").replace(";", ",") + "}").replaceAll("").replace("//(.*)", "")
+								.replaceAll("(description: `)(.*?)(\\s*`,)", "")
 				);
 		}
 
@@ -353,7 +352,7 @@ public class Utils {
 				for (int length; (length = inputStream.read(buffer)) != -1;) {
 					result.write(buffer, 0, length);
 				}
-				return result.toString().split("module.exports = ")[1].replace(";", "");
+				return result.toString();
 			}
 		} catch (Exception ignored) {}
 		return null;
@@ -405,11 +404,7 @@ public class Utils {
 
 	public static String getPetUrl(String petName) {
 		if (skyCryptPetJson == null) {
-			skyCryptPetJson =
-				parseJsString(
-					getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/pets.js")
-						.replaceAll("(description: `)(.*?)(\\s*`,)", "")
-				);
+			skyCryptPetJson = getSkyCryptPetJson();
 		}
 		try {
 			return ("https://sky.shiiyu.moe" + higherDepth(skyCryptPetJson, "pet_data." + petName.toUpperCase() + ".head").getAsString());
