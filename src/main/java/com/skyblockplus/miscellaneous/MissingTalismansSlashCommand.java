@@ -14,14 +14,12 @@ public class MissingTalismansSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
-		executor.submit(
-			() -> {
-				event.logCommandGuildUserCommand();
+		executor.submit(() -> {
+			event.logCommandGuildUserCommand();
 
-				EmbedBuilder eb = MissingTalismansCommand.getMissingTalismans(event.getOptionStr("player"), event.getOptionStr("profile"));
+			EmbedBuilder eb = MissingTalismansCommand.getMissingTalismans(event.getOptionStr("player"), event.getOptionStr("profile"));
 
-				event.getHook().editOriginalEmbeds(eb.build()).queue();
-			}
-		);
+			event.getHook().editOriginalEmbeds(eb.build()).queue();
+		});
 	}
 }
