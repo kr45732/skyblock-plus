@@ -1,7 +1,7 @@
 package com.skyblockplus.dungeons;
 
 import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.utils.Constants.essenceItemNames;
+import static com.skyblockplus.utils.Constants.ESSENCE_ITEM_NAMES;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
@@ -25,7 +25,7 @@ public class EssenceCommand extends Command {
 		preFormattedItem = nameToId(preFormattedItem);
 
 		if (higherDepth(essenceCostsJson, preFormattedItem) == null) {
-			String closestMatch = getClosestMatch(preFormattedItem, essenceItemNames);
+			String closestMatch = getClosestMatch(preFormattedItem, ESSENCE_ITEM_NAMES);
 			preFormattedItem = closestMatch != null ? closestMatch : preFormattedItem;
 		}
 
@@ -68,7 +68,7 @@ public class EssenceCommand extends Command {
 					String itemName = nameToId(args[2]);
 
 					if (higherDepth(getEssenceCostsJson(), itemName) == null) {
-						String closestMatch = getClosestMatch(itemName, essenceItemNames);
+						String closestMatch = getClosestMatch(itemName, ESSENCE_ITEM_NAMES);
 						itemName = closestMatch != null ? closestMatch : itemName;
 					}
 

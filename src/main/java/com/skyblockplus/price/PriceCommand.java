@@ -1,6 +1,6 @@
 package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.Constants.reforgeStoneNames;
+import static com.skyblockplus.utils.Constants.REFORGE_STONE_NAMES;
 import static com.skyblockplus.utils.Hypixel.getAuctionFromUuid;
 import static com.skyblockplus.utils.Hypixel.uuidToUsername;
 import static com.skyblockplus.utils.Utils.*;
@@ -202,7 +202,7 @@ public class PriceCommand extends Command {
 	private static double calculateReforgePrice(String reforgeName, String itemRarity) {
 		JsonElement reforgesStonesJson = getReforgeStonesJson();
 
-		for (String reforgeStone : reforgeStoneNames) {
+		for (String reforgeStone : REFORGE_STONE_NAMES) {
 			JsonElement reforgeStoneInfo = higherDepth(reforgesStonesJson, reforgeStone);
 			if (higherDepth(reforgeStoneInfo, "reforgeName").getAsString().equalsIgnoreCase(reforgeName)) {
 				String reforgeStoneName = higherDepth(reforgeStoneInfo, "internalName").getAsString();

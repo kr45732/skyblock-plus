@@ -1,6 +1,6 @@
 package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.Constants.bitsItemNames;
+import static com.skyblockplus.utils.Constants.BITS_ITEM_NAMES;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
@@ -20,7 +20,7 @@ public class BitsCommand extends Command {
 	public static EmbedBuilder getBitPrices(String itemName) {
 		JsonElement bitsJson = getBitsJson();
 
-		String closestMatch = getClosestMatch(itemName, bitsItemNames);
+		String closestMatch = getClosestMatch(itemName, BITS_ITEM_NAMES);
 		if (closestMatch != null) {
 			return defaultEmbed("Bits Price").addField(closestMatch, formatNumber(higherDepth(bitsJson, closestMatch, 0L)), false);
 		}

@@ -570,7 +570,7 @@ public class NetworthExecute {
 
 		for (InvItem item : invPets) {
 			double auctionPrice = getMinBinAvg(
-				item.getName().split("] ")[1].toUpperCase().replace(" ", "_") + rarityToNumberMap.get(item.getRarity())
+				item.getName().split("] ")[1].toUpperCase().replace(" ", "_") + RARITY_TO_NUMBER_MAP.get(item.getRarity())
 			);
 			if (auctionPrice != -1) {
 				StringBuilder miscStr = new StringBuilder("[");
@@ -614,7 +614,7 @@ public class NetworthExecute {
 
 		for (InvItem item : petsPets) {
 			double auctionPrice = getMinBinAvg(
-				item.getName().split("] ")[1].toUpperCase().replace(" ", "_") + rarityToNumberMap.get(item.getRarity())
+				item.getName().split("] ")[1].toUpperCase().replace(" ", "_") + RARITY_TO_NUMBER_MAP.get(item.getRarity())
 			);
 			if (auctionPrice != -1) {
 				StringBuilder miscStr = new StringBuilder("[");
@@ -658,7 +658,7 @@ public class NetworthExecute {
 
 		for (InvItem item : enderChestPets) {
 			double auctionPrice = getMinBinAvg(
-				item.getName().split("] ")[1].toUpperCase().replace(" ", "_") + rarityToNumberMap.get(item.getRarity())
+				item.getName().split("] ")[1].toUpperCase().replace(" ", "_") + RARITY_TO_NUMBER_MAP.get(item.getRarity())
 			);
 			if (auctionPrice != -1) {
 				StringBuilder miscStr = new StringBuilder("[");
@@ -702,7 +702,7 @@ public class NetworthExecute {
 
 		for (InvItem item : storagePets) {
 			double auctionPrice = getMinBinAvg(
-				item.getName().split("] ")[1].toUpperCase().replace(" ", "_") + rarityToNumberMap.get(item.getRarity())
+				item.getName().split("] ")[1].toUpperCase().replace(" ", "_") + RARITY_TO_NUMBER_MAP.get(item.getRarity())
 			);
 			if (auctionPrice != -1) {
 				StringBuilder miscStr = new StringBuilder("[");
@@ -760,7 +760,7 @@ public class NetworthExecute {
 
 		if (item.getId().equals("PET")) {
 			for (String extraItem : item.getExtraStats()) {
-				if (petItemNames.contains(extraItem)) {
+				if (PET_ITEM_NAMES.contains(extraItem)) {
 					JsonElement petItemEmoji = getEmojiMap().get(extraItem);
 					if (petItemEmoji != null) {
 						formattedStr += " " + petItemEmoji.getAsString();
@@ -1071,7 +1071,7 @@ public class NetworthExecute {
 	private double calculateReforgePrice(String reforgeName, String itemRarity) {
 		JsonElement reforgesStonesJson = getReforgeStonesJson();
 
-		for (String reforgeStone : reforgeStoneNames) {
+		for (String reforgeStone : REFORGE_STONE_NAMES) {
 			JsonElement reforgeStoneInfo = higherDepth(reforgesStonesJson, reforgeStone);
 			if (higherDepth(reforgeStoneInfo, "reforgeName").getAsString().equalsIgnoreCase(reforgeName)) {
 				String reforgeStoneName = higherDepth(reforgeStoneInfo, "internalName").getAsString();

@@ -1,7 +1,7 @@
 package com.skyblockplus.utils;
 
-import static com.skyblockplus.utils.Constants.craftedMinionsToSlots;
-import static com.skyblockplus.utils.Constants.skillNames;
+import static com.skyblockplus.utils.Constants.CRAFTED_MINIONS_TO_SLOTS;
+import static com.skyblockplus.utils.Constants.SKILL_NAMES;
 import static com.skyblockplus.utils.Hypixel.playerFromUuid;
 import static com.skyblockplus.utils.Hypixel.skyblockProfilesFromUuid;
 import static com.skyblockplus.utils.Utils.*;
@@ -17,8 +17,6 @@ import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
 import me.nullicorn.nedit.type.NBTList;
 import net.dv8tion.jda.api.EmbedBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Player {
 
@@ -239,7 +237,7 @@ public class Player {
 
 	public int getTotalSkillsXp(JsonElement profile) {
 		int totalSkillXp = 0;
-		for (String skill : skillNames) {
+		for (String skill : SKILL_NAMES) {
 			SkillsStruct skillInfo = getSkill(profile, skill);
 			if (skillInfo == null) {
 				return -1;
@@ -300,7 +298,7 @@ public class Player {
 
 	public double getSkillAverage(JsonElement profile) {
 		double progressSA = 0;
-		for (String skill : skillNames) {
+		for (String skill : SKILL_NAMES) {
 			try {
 				double skillExp = higherDepth(profile, "experience_skill_" + skill).getAsDouble();
 				SkillsStruct skillInfo = skillInfoFromExp(skillExp, skill);
@@ -309,7 +307,7 @@ public class Player {
 				return -1;
 			}
 		}
-		progressSA /= skillNames.size();
+		progressSA /= SKILL_NAMES.size();
 		return progressSA;
 	}
 
@@ -1038,8 +1036,8 @@ public class Player {
 			}
 
 			int prevMax = 0;
-			for (int i = 0; i < craftedMinionsToSlots.size(); i++) {
-				if (uniqueCraftedMinions.size() >= craftedMinionsToSlots.get(i)) {
+			for (int i = 0; i < CRAFTED_MINIONS_TO_SLOTS.size(); i++) {
+				if (uniqueCraftedMinions.size() >= CRAFTED_MINIONS_TO_SLOTS.get(i)) {
 					prevMax = i;
 				} else {
 					break;

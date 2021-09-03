@@ -1,6 +1,6 @@
 package com.skyblockplus.weight;
 
-import static com.skyblockplus.utils.Constants.slayerWeights;
+import static com.skyblockplus.utils.Constants.SLAYER_WEIGHTS;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
@@ -45,7 +45,7 @@ public class SlayerWeight {
 	}
 
 	public WeightStruct getSlayerWeight(String slayerName) {
-		Double[] curWeights = slayerWeights.get(slayerName);
+		Double[] curWeights = SLAYER_WEIGHTS.get(slayerName);
 		double divider = curWeights[0];
 		double modifier = curWeights[1];
 

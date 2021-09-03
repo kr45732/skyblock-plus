@@ -1,7 +1,7 @@
 package com.skyblockplus.guilds;
 
 import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.Constants.guildExpToLevel;
+import static com.skyblockplus.utils.Constants.GUILD_EXP_TO_LEVEL;
 import static com.skyblockplus.utils.Hypixel.*;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -49,17 +49,19 @@ public class GuildCommand extends Command {
 			int finalI = i;
 			futures.add(
 				asyncUuidToUsername(higherDepth(membersArr.get(i), "uuid").getAsString())
-					.thenApply(currentUsername -> {
-						JsonElement expHistory = higherDepth(membersArr.get(finalI), "expHistory");
-						List<String> keys = getJsonKeys(expHistory);
-						int totalPlayerExp = 0;
+					.thenApply(
+						currentUsername -> {
+							JsonElement expHistory = higherDepth(membersArr.get(finalI), "expHistory");
+							List<String> keys = getJsonKeys(expHistory);
+							int totalPlayerExp = 0;
 
-						for (int j = 0; j < days; j++) {
-							String value = keys.get(j);
-							totalPlayerExp += higherDepth(expHistory, value, 0);
+							for (int j = 0; j < days; j++) {
+								String value = keys.get(j);
+								totalPlayerExp += higherDepth(expHistory, value, 0);
+							}
+							return currentUsername + "=:=" + totalPlayerExp;
 						}
-						return currentUsername + "=:=" + totalPlayerExp;
-					})
+					)
 			);
 		}
 
@@ -332,7 +334,9 @@ public class GuildCommand extends Command {
 		int guildLevel = 0;
 
 		for (int i = 0;; i++) {
-			int expNeeded = i >= guildExpToLevel.size() ? guildExpToLevel.get(guildExpToLevel.size() - 1) : guildExpToLevel.get(i);
+			int expNeeded = i >= GUILD_EXP_TO_LEVEL.size()
+				? GUILD_EXP_TO_LEVEL.get(GUILD_EXP_TO_LEVEL.size() - 1)
+				: GUILD_EXP_TO_LEVEL.get(i);
 			guildExp -= expNeeded;
 			if (guildExp < 0) {
 				return guildLevel;

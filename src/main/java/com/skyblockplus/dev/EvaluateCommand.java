@@ -9,6 +9,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import groovy.lang.GroovyShell;
 import java.util.Arrays;
+import java.util.regex.Pattern;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;

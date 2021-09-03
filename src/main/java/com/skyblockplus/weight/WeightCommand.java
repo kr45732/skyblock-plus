@@ -40,7 +40,7 @@ public class WeightCommand extends Command {
 			Weight weight = new Weight(player);
 			EmbedBuilder eb = player.defaultPlayerEmbed();
 			StringBuilder slayerStr = new StringBuilder();
-			for (String slayerName : slayerNames) {
+			for (String slayerName : SLAYER_NAMES) {
 				slayerStr
 					.append(capitalizeString(slayerName))
 					.append(": ")
@@ -48,7 +48,7 @@ public class WeightCommand extends Command {
 					.append("\n");
 			}
 			StringBuilder skillsStr = new StringBuilder();
-			for (String skillName : skillNames) {
+			for (String skillName : SKILL_NAMES) {
 				skillsStr
 					.append(capitalizeString(skillName))
 					.append(": ")
@@ -61,7 +61,7 @@ public class WeightCommand extends Command {
 				.append(": ")
 				.append(weight.getDungeonsWeight().getDungeonWeight("catacombs").get())
 				.append("\n");
-			for (String dungeonClassName : dungeonClassNames) {
+			for (String dungeonClassName : DUNGEON_CLASS_NAMES) {
 				dungeonsStr
 					.append(capitalizeString(dungeonClassName))
 					.append(": ")

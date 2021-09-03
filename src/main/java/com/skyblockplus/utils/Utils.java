@@ -30,13 +30,11 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
-import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
 import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
 import me.nullicorn.nedit.type.NBTList;
@@ -79,7 +77,6 @@ public class Utils {
 	public static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(3);
 	/* Script Engines */
 	public static final ScriptEngine jsScriptEngine = new ScriptEngineManager().getEngineByName("js");
-	public static final ScriptEngine es6ScriptEngine = new NashornScriptEngineFactory().getScriptEngine("--language=es6");
 	public static final AtomicInteger remainingLimit = new AtomicInteger(120);
 	public static final AtomicInteger timeTillReset = new AtomicInteger(0);
 	public static final ConcurrentHashMap<String, HypixelKeyInformation> keyCooldownMap = new ConcurrentHashMap<>();
@@ -119,7 +116,6 @@ public class Utils {
 	private static JsonArray sbzPricesJson;
 	public static JsonObject internalJsonMappings;
 	private static JsonObject emojiMap;
-	private static JsonElement vanillaItemsJson;
 	public static JsonObject priceOverrideJson;
 	/* Miscellaneous */
 	public static TextChannel botLogChannel;
@@ -199,7 +195,15 @@ public class Utils {
 
 	public static JsonElement getTalismanJson() {
 		if (talismanJson == null) {
-			talismanJson = parseJsString("{" + getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/talismans.js").replace("export const ", "").replace(" = ", ": ").replace(";", ",") + "}");
+			talismanJson =
+				parseJsString(
+					"{" +
+					getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/talismans.js")
+						.replace("export const ", "")
+						.replace(" = ", ": ")
+						.replace(";", ",") +
+					"}"
+				);
 		}
 
 		return talismanJson;
@@ -211,14 +215,6 @@ public class Utils {
 		}
 
 		return bitsJson;
-	}
-
-	public static JsonElement getVanillaItemsJson() {
-		if (vanillaItemsJson == null) {
-			vanillaItemsJson = getJson("https://raw.githubusercontent.com/PrismarineJS/minecraft-data/master/data/pc/1.8/items.json");
-		}
-
-		return vanillaItemsJson;
 	}
 
 	public static JsonElement getReforgeStonesJson() {
@@ -296,9 +292,19 @@ public class Utils {
 		if (skyCryptPetJson == null) {
 			skyCryptPetJson =
 				parseJsString(
-						Pattern.compile("/\\*(.*)\\*/", Pattern.DOTALL).matcher("{" + getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/pets.js")
-										.split("];")[1].replace("export const ", "").replace(" = ", ": ").replace(";", ",") + "}").replaceAll("").replace("//(.*)", "")
-								.replaceAll("(description: `)(.*?)(\\s*`,)", "")
+					Pattern
+						.compile("/\\*(.*)\\*/", Pattern.DOTALL)
+						.matcher(
+							"{" +
+							getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/pets.js")
+								.split("];")[1].replace("export const ", "")
+								.replace(" = ", ": ")
+								.replace(";", ",") +
+							"}"
+						)
+						.replaceAll("")
+						.replace("//(.*)", "")
+						.replaceAll("(description: `)(.*?)(\\s*`,)", "")
 				);
 		}
 
@@ -509,13 +515,15 @@ public class Utils {
 			.setColumns(1)
 			.setItemsPerPage(1)
 			.showPageNumbers(true)
-			.setFinalAction(m -> {
-				try {
-					m.clearReactions().queue(null, throwableConsumer);
-				} catch (PermissionException ex) {
-					m.delete().queue(null, throwableConsumer);
+			.setFinalAction(
+				m -> {
+					try {
+						m.clearReactions().queue(null, throwableConsumer);
+					} catch (PermissionException ex) {
+						m.delete().queue(null, throwableConsumer);
+					}
 				}
-			})
+			)
 			.setEventWaiter(waiter)
 			.setTimeout(30, TimeUnit.SECONDS)
 			.setColor(botColor);
@@ -1101,34 +1109,40 @@ public class Utils {
 			database
 				.getLinkedUsers()
 				.stream()
-				.filter(linkedAccountModel ->
-					Duration.between(Instant.ofEpochMilli(Long.parseLong(linkedAccountModel.getLastUpdated())), Instant.now()).toDays() > 1
+				.filter(
+					linkedAccountModel ->
+						Duration
+							.between(Instant.ofEpochMilli(Long.parseLong(linkedAccountModel.getLastUpdated())), Instant.now())
+							.toDays() >
+						1
 				)
 				.findAny()
-				.ifPresent(notUpdated -> {
-					try {
-						DiscordInfoStruct discordInfo = getPlayerDiscordInfo(notUpdated.getMinecraftUsername());
-						User updateUser = jda.retrieveUserById(notUpdated.getDiscordId()).complete();
-						if (discordInfo.discordTag.equals(updateUser.getAsTag())) {
-							database.addLinkedUser(
-								new LinkedAccountModel(
-									"" + Instant.now().toEpochMilli(),
-									updateUser.getId(),
-									discordInfo.minecraftUuid,
-									discordInfo.minecraftUsername
-								)
-							);
-							try {
-								logCommand("Updated linked user: " + notUpdated.getMinecraftUsername());
-							} catch (Exception ignored) {}
-							return;
-						}
-					} catch (Exception ignored) {}
-					database.deleteLinkedUserByMinecraftUsername(notUpdated.getMinecraftUsername());
-					try {
-						logCommand("Error updating linked user: " + notUpdated.getMinecraftUsername());
-					} catch (Exception ignored) {}
-				});
+				.ifPresent(
+					notUpdated -> {
+						try {
+							DiscordInfoStruct discordInfo = getPlayerDiscordInfo(notUpdated.getMinecraftUsername());
+							User updateUser = jda.retrieveUserById(notUpdated.getDiscordId()).complete();
+							if (discordInfo.discordTag.equals(updateUser.getAsTag())) {
+								database.addLinkedUser(
+									new LinkedAccountModel(
+										"" + Instant.now().toEpochMilli(),
+										updateUser.getId(),
+										discordInfo.minecraftUuid,
+										discordInfo.minecraftUsername
+									)
+								);
+								try {
+									logCommand("Updated linked user: " + notUpdated.getMinecraftUsername());
+								} catch (Exception ignored) {}
+								return;
+							}
+						} catch (Exception ignored) {}
+						database.deleteLinkedUserByMinecraftUsername(notUpdated.getMinecraftUsername());
+						try {
+							logCommand("Error updating linked user: " + notUpdated.getMinecraftUsername());
+						} catch (Exception ignored) {}
+					}
+				);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}

@@ -1,8 +1,8 @@
 package com.skyblockplus.dungeons;
 
 import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.Constants.dungeonClassNames;
-import static com.skyblockplus.utils.Constants.dungeonEmojiMap;
+import static com.skyblockplus.utils.Constants.DUNGEON_CLASS_NAMES;
+import static com.skyblockplus.utils.Constants.DUNGEON_EMOJI_MAP;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
@@ -45,7 +45,7 @@ public class DungeonsCommand extends Command {
 
 				SkillsStruct skillInfo = player.getCatacombsSkill();
 				extras.addEmbedField(
-					dungeonEmojiMap.get("catacombs") + " " + capitalizeString(skillInfo.skillName) + " (" + skillInfo.skillLevel + ")",
+					DUNGEON_EMOJI_MAP.get("catacombs") + " " + capitalizeString(skillInfo.skillName) + " (" + skillInfo.skillLevel + ")",
 					simplifyNumber(skillInfo.expCurrent) +
 					" / " +
 					simplifyNumber(skillInfo.expForNext) +
@@ -58,10 +58,10 @@ public class DungeonsCommand extends Command {
 
 				extras.addBlankField(true).addBlankField(true);
 
-				for (String className : dungeonClassNames) {
+				for (String className : DUNGEON_CLASS_NAMES) {
 					skillInfo = player.getDungeonClass(className);
 					extras.addEmbedField(
-						dungeonEmojiMap.get(className) + " " + capitalizeString(className) + " (" + skillInfo.skillLevel + ")",
+						DUNGEON_EMOJI_MAP.get(className) + " " + capitalizeString(className) + " (" + skillInfo.skillLevel + ")",
 						simplifyNumber(skillInfo.expCurrent) +
 						" / " +
 						simplifyNumber(skillInfo.expForNext) +
@@ -90,7 +90,7 @@ public class DungeonsCommand extends Command {
 						ebStr +=
 							"\nFastest S+: " + (fastestSPlusInt != -1 ? minutes + ":" + (seconds >= 10 ? seconds : "0" + seconds) : "None");
 
-						extras.addEmbedField(dungeonEmojiMap.get(dungeonType + "_" + i) + " " + capitalizeString(name), ebStr, true);
+						extras.addEmbedField(DUNGEON_EMOJI_MAP.get(dungeonType + "_" + i) + " " + capitalizeString(name), ebStr, true);
 					}
 
 					if (dungeonType.equals("catacombs")) {

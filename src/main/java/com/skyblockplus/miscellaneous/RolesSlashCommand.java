@@ -14,12 +14,14 @@ public class RolesSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
-		executor.submit(() -> {
-			event.logCommandGuildUserCommand();
+		executor.submit(
+			() -> {
+				event.logCommandGuildUserCommand();
 
-			EmbedBuilder eb = RoleCommand.updateRoles(event.getOptionStr("profile"), event.getGuild(), event.getMember());
+				EmbedBuilder eb = RoleCommand.updateRoles(event.getOptionStr("profile"), event.getGuild(), event.getMember());
 
-			event.getHook().editOriginalEmbeds(eb.build()).queue();
-		});
+				event.getHook().editOriginalEmbeds(eb.build()).queue();
+			}
+		);
 	}
 }

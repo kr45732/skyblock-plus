@@ -10,7 +10,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import java.net.URL;
-import javax.script.ScriptException;
+import java.net.URLConnection;
 import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.entities.Icon;
 
@@ -25,24 +25,21 @@ public class EmojiFromUrlCommand extends Command {
 
 	public static JsonElement getSkyCryptItemsJson(String name) {
 		String websiteContent = getUrl("https://sky.shiiyu.moe/stats/" + name)
-			.split("const items = ")[1].split("const calculated =")[0].trim();
-		websiteContent = websiteContent.substring(0, websiteContent.length() - 1);
+			.split("const items = JSON.parse\\(`")[1].split("const calculated =")[0].trim();
 
-		try {
-			return JsonParser.parseString(es6ScriptEngine.eval("JSON.stringify(" + websiteContent + ")").toString());
-		} catch (ScriptException e) {
-			e.printStackTrace();
-		}
+		websiteContent =
+			websiteContent.substring(0, websiteContent.length() - 3).replaceAll("<.*?>", "").replaceAll("\"Lore\":\\[.*?],", "");
 
-		return null;
+		return JsonParser.parseString(websiteContent);
 	}
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new CommandExecute(this, event) {
+		new CommandExecute(this, event, false) {
 			@Override
 			protected void execute() {
 				if (!event.getGuild().getName().startsWith("Skyblock Plus - Emoji Server")) {
+					event.reply("Wrong Server!");
 					return;
 				}
 
@@ -66,7 +63,7 @@ public class EmojiFromUrlCommand extends Command {
 					for (JsonElement i : all) {
 						try {
 							if (event.getGuild().getEmotes().size() >= event.getGuild().getMaxEmotes()) {
-								System.out.println("Broke out");
+								event.getChannel().sendMessage("50/50 emojis").queue();
 								break;
 							}
 						} catch (Exception e) {
@@ -86,9 +83,17 @@ public class EmojiFromUrlCommand extends Command {
 							if (!getEmojiMap().has(id) && !addedObj.has(id)) {
 								System.out.println(id + " - " + path);
 
+								URLConnection urlConn = new URL(path).openConnection();
+								urlConn.addRequestProperty("User-Agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)");
+
 								Emote emote = event
 									.getGuild()
-									.createEmote(id.toLowerCase(), Icon.from(new URL(path).openStream()))
+									.createEmote(
+										id.toLowerCase().startsWith("pet_item_")
+											? id.toLowerCase().split("pet_item_")[1]
+											: id.toLowerCase(),
+										Icon.from(urlConn.getInputStream())
+									)
 									.complete();
 								added.append(emote.getAsMention()).append(" ");
 								addedObj.addProperty(id, emote.getAsMention());
@@ -97,9 +102,9 @@ public class EmojiFromUrlCommand extends Command {
 							e.printStackTrace();
 						}
 					}
-					event.reply(added.toString());
+					event.reply(added.length() > 0 ? added.toString() : "No new emojis to add");
 				} catch (Exception e) {
-					event.reply("Error\n" + e.getMessage());
+					event.reply("Error: " + e.getMessage());
 					e.printStackTrace();
 				}
 			}

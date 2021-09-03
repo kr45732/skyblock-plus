@@ -14,21 +14,23 @@ public class HypixelSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
-		executor.submit(() -> {
-			event.logCommandGuildUserCommand();
-			String subcommandName = event.getSubcommandName();
-			String username = event.getOptionStr("player");
-			EmbedBuilder eb;
+		executor.submit(
+			() -> {
+				event.logCommandGuildUserCommand();
+				String subcommandName = event.getSubcommandName();
+				String username = event.getOptionStr("player");
+				EmbedBuilder eb;
 
-			if (subcommandName.equals("player")) {
-				eb = HypixelCommand.getHypixelStats(username);
-			} else if (subcommandName.equals("parkour")) {
-				eb = HypixelCommand.getParkourStats(username);
-			} else {
-				eb = event.invalidCommandMessage();
+				if (subcommandName.equals("player")) {
+					eb = HypixelCommand.getHypixelStats(username);
+				} else if (subcommandName.equals("parkour")) {
+					eb = HypixelCommand.getParkourStats(username);
+				} else {
+					eb = event.invalidCommandMessage();
+				}
+
+				event.getHook().editOriginalEmbeds(eb.build()).queue();
 			}
-
-			event.getHook().editOriginalEmbeds(eb.build()).queue();
-		});
+		);
 	}
 }

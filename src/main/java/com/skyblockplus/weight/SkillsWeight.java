@@ -1,6 +1,6 @@
 package com.skyblockplus.weight;
 
-import static com.skyblockplus.utils.Constants.skillWeights;
+import static com.skyblockplus.utils.Constants.SKILL_WEIGHTS;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Constants;
@@ -29,7 +29,7 @@ public class SkillsWeight {
 	}
 
 	public WeightStruct getSkillsWeight(String skillName) {
-		Double[] curWeights = skillWeights.get(skillName);
+		Double[] curWeights = SKILL_WEIGHTS.get(skillName);
 		double exponent = curWeights[0];
 		double divider = curWeights[1];
 		double currentSkillXp = player.getSkillXp(profile, skillName);
@@ -38,7 +38,7 @@ public class SkillsWeight {
 			int maxLevel = player.getSkillMaxLevel(skillName, true);
 			SkillsStruct skillsStruct = player.getSkill(profile, skillName, true);
 			double level = skillsStruct.skillLevel + skillsStruct.progressToNext;
-			double maxLevelExp = maxLevel == 50 ? Constants.skillsLevel50Xp : Constants.skillsLevel60Xp;
+			double maxLevelExp = maxLevel == 50 ? Constants.SKILLS_LEVEL_50_XP : Constants.SKILLS_LEVEL_60_XP;
 			double base = Math.pow(level * 10, 0.5 + exponent + (level / 100)) / 1250;
 			if (currentSkillXp <= maxLevelExp) {
 				return weightStruct.add(new WeightStruct(base));

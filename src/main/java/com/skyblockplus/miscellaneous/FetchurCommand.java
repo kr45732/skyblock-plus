@@ -1,6 +1,6 @@
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.Constants.fetchurItems;
+import static com.skyblockplus.utils.Constants.FETCHUR_ITEMS;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.Utils.globalCooldown;
 
@@ -30,8 +30,8 @@ public class FetchurCommand extends Command {
 	}
 
 	public EmbedBuilder getFetchurItem() {
-		String[] fetchurItem = fetchurItems
-			.get((LocalDate.now(ZoneId.of("America/New_York")).getDayOfMonth() - 1) % fetchurItems.size())
+		String[] fetchurItem = FETCHUR_ITEMS
+			.get((LocalDate.now(ZoneId.of("America/New_York")).getDayOfMonth() - 1) % FETCHUR_ITEMS.size())
 			.split("\\|");
 		return defaultEmbed("Fetchur item")
 			.setDescription(fetchurItem[0])

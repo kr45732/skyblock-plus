@@ -18,7 +18,7 @@ public class EmojiMapServerCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new CommandExecute(this, event) {
+		new CommandExecute(this, event, false) {
 			@Override
 			protected void execute() {
 				logCommand();

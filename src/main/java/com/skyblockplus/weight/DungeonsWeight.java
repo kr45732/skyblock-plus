@@ -1,7 +1,7 @@
 package com.skyblockplus.weight;
 
-import static com.skyblockplus.utils.Constants.dungeonClassWeights;
-import static com.skyblockplus.utils.Constants.dungeonWeights;
+import static com.skyblockplus.utils.Constants.DUNGEON_CLASS_WEIGHTS;
+import static com.skyblockplus.utils.Constants.DUNGEON_WEIGHTS;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Constants;
@@ -31,28 +31,28 @@ public class DungeonsWeight {
 	public WeightStruct getClassWeight(String className) {
 		double currentClassLevel = player.getDungeonClassLevel(profile, className);
 		double currentClassXp = player.getDungeonClassXp(profile, className);
-		double base = Math.pow(currentClassLevel, 4.5) * dungeonClassWeights.get(className);
+		double base = Math.pow(currentClassLevel, 4.5) * DUNGEON_CLASS_WEIGHTS.get(className);
 
-		if (currentClassXp <= Constants.catacombsLevel50Xp) {
+		if (currentClassXp <= Constants.CATACOMBS_LEVEL_50_XP) {
 			return weightStruct.add(new WeightStruct(base));
 		}
 
-		double remaining = currentClassXp - Constants.catacombsLevel50Xp;
-		double splitter = (4 * Constants.catacombsLevel50Xp) / base;
+		double remaining = currentClassXp - Constants.CATACOMBS_LEVEL_50_XP;
+		double splitter = (4 * Constants.CATACOMBS_LEVEL_50_XP) / base;
 		return weightStruct.add(new WeightStruct(Math.floor(base), Math.pow(remaining / splitter, 0.968)));
 	}
 
 	public WeightStruct getDungeonWeight(String dungeonName) {
 		double catacombsSkillXp = player.getSkillXp(profile, dungeonName);
 		double level = player.getCatacombsLevel(profile);
-		double base = Math.pow(level, 4.5) * dungeonWeights.get(dungeonName);
+		double base = Math.pow(level, 4.5) * DUNGEON_WEIGHTS.get(dungeonName);
 
-		if (catacombsSkillXp <= Constants.catacombsLevel50Xp) {
+		if (catacombsSkillXp <= Constants.CATACOMBS_LEVEL_50_XP) {
 			return weightStruct.add(new WeightStruct(base));
 		}
 
-		double remaining = catacombsSkillXp - Constants.catacombsLevel50Xp;
-		double splitter = (4 * Constants.catacombsLevel50Xp) / base;
+		double remaining = catacombsSkillXp - Constants.CATACOMBS_LEVEL_50_XP;
+		double splitter = (4 * Constants.CATACOMBS_LEVEL_50_XP) / base;
 		return weightStruct.add(new WeightStruct(Math.floor(base), Math.pow(remaining / splitter, 0.968)));
 	}
 }

@@ -136,7 +136,8 @@ public class Main {
 				new EmojiFromUrlCommand(),
 				new GuildLeaderboardsCommand(),
 				new ArmorCommand(),
-				new FetchurCommand()
+				new FetchurCommand(),
+				new CheckEmojisCommand()
 			);
 
 		SlashCommandClient slashCommands = new SlashCommandClient();

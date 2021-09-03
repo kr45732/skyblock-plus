@@ -26,11 +26,11 @@ public class SkillsCommand extends Command {
 			double progressSA = 0;
 			EmbedBuilder eb = player.defaultPlayerEmbed();
 
-			for (String skillName : allSkillNames) {
+			for (String skillName : ALL_SKILL_NAMES) {
 				SkillsStruct skillInfo = player.getSkill(skillName);
 				if (skillInfo != null) {
 					eb.addField(
-						skillsEmojiMap.get(skillName) + " " + capitalizeString(skillInfo.skillName) + " (" + skillInfo.skillLevel + ")",
+						SKILLS_EMOJI_MAP.get(skillName) + " " + capitalizeString(skillInfo.skillName) + " (" + skillInfo.skillLevel + ")",
 						simplifyNumber(skillInfo.expCurrent) +
 						" / " +
 						simplifyNumber(skillInfo.expForNext) +
@@ -40,16 +40,16 @@ public class SkillsCommand extends Command {
 						(skillInfo.skillLevel == skillInfo.maxSkillLevel ? "MAX" : roundProgress(skillInfo.progressToNext)),
 						true
 					);
-					if (!cosmeticSkillNames.contains(skillName)) {
+					if (!COSMETIC_SKILL_NAMES.contains(skillName)) {
 						trueSA += skillInfo.skillLevel;
 						progressSA += skillInfo.skillLevel + skillInfo.progressToNext;
 					}
 				} else {
-					eb.addField(skillsEmojiMap.get(skillName) + " " + capitalizeString(skillName) + " (?) ", "Unable to retrieve", true);
+					eb.addField(SKILLS_EMOJI_MAP.get(skillName) + " " + capitalizeString(skillName) + " (?) ", "Unable to retrieve", true);
 				}
 			}
-			trueSA /= skillNames.size();
-			progressSA /= skillNames.size();
+			trueSA /= SKILL_NAMES.size();
+			progressSA /= SKILL_NAMES.size();
 			eb.setDescription("True skill average: " + roundAndFormat(trueSA) + "\nProgress skill average: " + roundAndFormat(progressSA));
 			return eb;
 		}

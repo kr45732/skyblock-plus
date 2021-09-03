@@ -3,7 +3,7 @@ package com.skyblockplus.features.skyblockevent;
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.Constants.allSkillNames;
+import static com.skyblockplus.utils.Constants.ALL_SKILL_NAMES;
 import static com.skyblockplus.utils.Hypixel.getGuildFromName;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -292,13 +292,13 @@ public class SkyblockEvent {
 				sendEmbedMessage(eb);
 				break;
 			case 7:
-				if (replyMessage.equalsIgnoreCase("all") || allSkillNames.contains(replyMessage.toLowerCase())) {
+				if (replyMessage.equalsIgnoreCase("all") || ALL_SKILL_NAMES.contains(replyMessage.toLowerCase())) {
 					eb.addField("Event Type", capitalizeString(replyMessage.equalsIgnoreCase("all") ? "skills" : replyMessage), false);
 					eventType = "skills." + replyMessage.toLowerCase();
 					eb.setDescription("How many hours should the event last?");
 					state = 2;
 				} else {
-					String closestSkill = getClosestMatch(replyMessage, allSkillNames);
+					String closestSkill = getClosestMatch(replyMessage, ALL_SKILL_NAMES);
 					eb.setDescription("`" + replyMessage + "` is invalid. Did you mean `" + closestSkill.toLowerCase() + "`?");
 					attemptsLeft--;
 				}

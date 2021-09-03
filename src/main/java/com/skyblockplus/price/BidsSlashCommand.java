@@ -14,12 +14,14 @@ public class BidsSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
-		executor.submit(() -> {
-			event.logCommandGuildUserCommand();
+		executor.submit(
+			() -> {
+				event.logCommandGuildUserCommand();
 
-			EmbedBuilder eb = BidsCommand.getPlayerBids(event.getOptionStr("player"));
+				EmbedBuilder eb = BidsCommand.getPlayerBids(event.getOptionStr("player"));
 
-			event.getHook().editOriginalEmbeds(eb.build()).queue();
-		});
+				event.getHook().editOriginalEmbeds(eb.build()).queue();
+			}
+		);
 	}
 }

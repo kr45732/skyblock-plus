@@ -33,7 +33,7 @@ repositories {
 
 dependencies {
     // JDA (Discord API wrapper)
-     implementation ('net.dv8tion:JDA:4.3.0_314') {
+     implementation ('net.dv8tion:JDA:4.3.0_315') {
          exclude module: 'opus-java'
      }
 

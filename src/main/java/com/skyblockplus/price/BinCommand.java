@@ -35,7 +35,7 @@ public class BinCommand extends Command {
 			return eb;
 		}
 
-		for (String i : enchantNames) {
+		for (String i : ENCHANT_NAMES) {
 			if (itemId.contains(i)) {
 				try {
 					String enchantedBookId = i + ";" + Integer.parseInt(itemId.replaceAll("\\D+", ""));
@@ -63,11 +63,11 @@ public class BinCommand extends Command {
 		}
 
 		JsonElement petJson = getPetNumsJson();
-		for (String i : petNames) {
+		for (String i : PET_NAMES) {
 			if (itemId.contains(i)) {
 				String petId = i;
 				boolean raritySpecified = false;
-				for (Entry<String, String> j : rarityToNumberMap.entrySet()) {
+				for (Entry<String, String> j : RARITY_TO_NUMBER_MAP.entrySet()) {
 					if (itemId.contains(j.getKey())) {
 						petId += j.getValue();
 						raritySpecified = true;
@@ -84,8 +84,8 @@ public class BinCommand extends Command {
 						.collect(Collectors.toCollection(ArrayList::new));
 
 					for (String j : petRarities) {
-						if (higherDepth(lowestBinJson, petId + rarityToNumberMap.get(j)) != null) {
-							petId += rarityToNumberMap.get(j);
+						if (higherDepth(lowestBinJson, petId + RARITY_TO_NUMBER_MAP.get(j)) != null) {
+							petId += RARITY_TO_NUMBER_MAP.get(j);
 							break;
 						}
 					}
@@ -103,9 +103,9 @@ public class BinCommand extends Command {
 		String closestMatch = getClosestMatch(itemId, getJsonKeys(lowestBinJson));
 		if (closestMatch != null) {
 			EmbedBuilder eb = defaultEmbed("Lowest bin");
-			if (enchantNames.contains(closestMatch.split(";")[0].trim())) {
+			if (ENCHANT_NAMES.contains(closestMatch.split(";")[0].trim())) {
 				eb.setThumbnail("https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK");
-			} else if (petNames.contains(closestMatch.split(";")[0].trim())) {
+			} else if (PET_NAMES.contains(closestMatch.split(";")[0].trim())) {
 				eb.setThumbnail(getPetUrl(closestMatch.split(";")[0].trim()));
 			} else {
 				eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + closestMatch);

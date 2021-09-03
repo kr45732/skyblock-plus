@@ -44,7 +44,7 @@ public class AverageAuctionCommand extends Command {
 			return eb;
 		}
 
-		for (String i : enchantNames) {
+		for (String i : ENCHANT_NAMES) {
 			if (itemId.contains(i)) {
 				try {
 					String enchantedBookId = i + ";" + Integer.parseInt(itemId.replaceAll("\\D+", ""));
@@ -89,11 +89,11 @@ public class AverageAuctionCommand extends Command {
 		}
 
 		JsonElement petJson = getPetNumsJson();
-		for (String i : petNames) {
+		for (String i : PET_NAMES) {
 			if (itemId.contains(i)) {
 				String petId = i;
 				boolean raritySpecified = false;
-				for (Map.Entry<String, String> j : rarityToNumberMap.entrySet()) {
+				for (Map.Entry<String, String> j : RARITY_TO_NUMBER_MAP.entrySet()) {
 					if (itemId.contains(j.getKey())) {
 						petId += j.getValue();
 						raritySpecified = true;
@@ -110,8 +110,8 @@ public class AverageAuctionCommand extends Command {
 						.collect(Collectors.toCollection(ArrayList::new));
 
 					for (String j : petRarities) {
-						if (higherDepth(averageAhJson, petId + rarityToNumberMap.get(j)) != null) {
-							petId += rarityToNumberMap.get(j);
+						if (higherDepth(averageAhJson, petId + RARITY_TO_NUMBER_MAP.get(j)) != null) {
+							petId += RARITY_TO_NUMBER_MAP.get(j);
 							break;
 						}
 					}
@@ -140,9 +140,9 @@ public class AverageAuctionCommand extends Command {
 			EmbedBuilder eb = defaultEmbed("Average Auction");
 			JsonElement itemJson = higherDepth(averageAhJson, closestMatch);
 
-			if (enchantNames.contains(closestMatch.split(";")[0].trim())) {
+			if (ENCHANT_NAMES.contains(closestMatch.split(";")[0].trim())) {
 				eb.setThumbnail("https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK");
-			} else if (petNames.contains(closestMatch.split(";")[0].trim())) {
+			} else if (PET_NAMES.contains(closestMatch.split(";")[0].trim())) {
 				eb.setThumbnail(getPetUrl(closestMatch.split(";")[0].trim()));
 			} else {
 				eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + closestMatch);
