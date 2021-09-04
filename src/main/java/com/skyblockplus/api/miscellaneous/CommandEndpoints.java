@@ -3,7 +3,6 @@ package com.skyblockplus.api.miscellaneous;
 import static com.skyblockplus.utils.Utils.*;
 
 import club.minnced.discord.webhook.WebhookClientBuilder;
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import java.awt.*;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -246,7 +245,7 @@ public class CommandEndpoints {
 	) {
 		log.info("/api/public/heroku");
 
-		JsonElement jsonBody = new Gson().toJsonTree(body);
+		JsonElement jsonBody = gson.toJsonTree(body);
 		System.out.println("Heroku-Webhook-Hmac-SHA256: " + herokuHMAC);
 		System.out.println(jsonBody);
 

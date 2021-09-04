@@ -26,9 +26,6 @@ public class HypixelResponse {
 	}
 
 	public JsonElement get(String path) {
-		if (isNotValid()) {
-			return null;
-		}
 		return higherDepth(response, path);
 	}
 }

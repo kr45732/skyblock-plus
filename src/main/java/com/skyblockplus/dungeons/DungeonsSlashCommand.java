@@ -14,21 +14,23 @@ public class DungeonsSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
-		executor.submit(() -> {
-			event.logCommandGuildUserCommand();
+		executor.submit(
+			() -> {
+				event.logCommandGuildUserCommand();
 
-			String profileName = event.getOptionStr("profile");
-			EmbedBuilder eb = DungeonsCommand.getPlayerDungeons(
-				event.getOptionStr("player"),
-				profileName,
-				event.getUser(),
-				null,
-				event.getHook()
-			);
+				String profileName = event.getOptionStr("profile");
+				EmbedBuilder eb = DungeonsCommand.getPlayerDungeons(
+					event.getOptionStr("player"),
+					profileName,
+					event.getUser(),
+					null,
+					event.getHook()
+				);
 
-			if (eb != null) {
-				event.getHook().editOriginalEmbeds(eb.build()).queue();
+				if (eb != null) {
+					event.getHook().editOriginalEmbeds(eb.build()).queue();
+				}
 			}
-		});
+		);
 	}
 }

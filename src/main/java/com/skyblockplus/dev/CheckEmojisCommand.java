@@ -1,9 +1,7 @@
 package com.skyblockplus.dev;
 
-import static com.skyblockplus.utils.Utils.getEmojiMap;
-import static com.skyblockplus.utils.Utils.makeHastePost;
+import static com.skyblockplus.utils.Utils.*;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.jagrosh.jdautilities.command.Command;
@@ -48,7 +46,7 @@ public class CheckEmojisCommand extends Command {
 						.stream(dir.listFiles())
 						.map(file -> file.getName().replace(".json", ""))
 						.collect(Collectors.toList());
-					System.out.println(makeHastePost(new Gson().toJson(validIds)));
+					System.out.println(makeHastePost(gson.toJson(validIds)));
 					FileUtils.deleteDirectory(neuDir);
 
 					JsonArray invalidEmojis = new JsonArray();

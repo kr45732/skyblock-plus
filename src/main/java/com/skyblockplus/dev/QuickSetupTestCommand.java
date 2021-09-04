@@ -1,10 +1,8 @@
 package com.skyblockplus.dev;
 
 import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.Utils.*;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -75,7 +73,7 @@ public class QuickSetupTestCommand extends Command {
 
 	private EmbedBuilder setRoleSettings(String roleName, String json, CommandEvent event) {
 		try {
-			JsonElement jsonElement = new Gson().toJsonTree(new Gson().fromJson(json, RoleModel.class));
+			JsonElement jsonElement = gson.toJsonTree(gson.fromJson(json, RoleModel.class));
 			if (higherDepth(database.getServerSettings(event.getGuild().getId()), "serverId") == null) {
 				database.addNewServerSettings(
 					event.getGuild().getId(),

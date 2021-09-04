@@ -52,4 +52,8 @@ public class InvItem {
 		this.backpackItems.clear();
 		this.backpackItems.addAll(backpackItems);
 	}
+
+	public String getAuctionApiName() {
+		return (getName() + "_" + getRarity()).toUpperCase().replace(" ", "_");
+	}
 }

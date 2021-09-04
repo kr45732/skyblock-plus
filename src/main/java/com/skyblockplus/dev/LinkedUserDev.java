@@ -1,11 +1,8 @@
 package com.skyblockplus.dev;
 
 import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.makeHastePost;
+import static com.skyblockplus.utils.Utils.*;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -58,16 +55,13 @@ public class LinkedUserDev extends Command {
 	}
 
 	private boolean getAllLinkedUsers(CommandEvent event) {
-		JsonElement allSettings = new Gson().toJsonTree(database.getLinkedUsers());
+		JsonElement allSettings = gson.toJsonTree(database.getLinkedUsers());
 		if (allSettings == null) {
 			return false;
 		}
 
 		try {
-			event
-				.getChannel()
-				.sendMessage(makeHastePost(new GsonBuilder().setPrettyPrinting().create().toJson(allSettings)) + ".json")
-				.queue();
+			event.getChannel().sendMessage(makeHastePost(formattedGson.toJson(allSettings)) + ".json").queue();
 			return true;
 		} catch (Exception ignored) {}
 		return false;

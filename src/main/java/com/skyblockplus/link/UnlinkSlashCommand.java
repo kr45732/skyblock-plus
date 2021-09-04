@@ -13,9 +13,11 @@ public class UnlinkSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
-		executor.submit(() -> {
-			event.logCommandGuildUserCommand();
-			event.getHook().editOriginalEmbeds(UnlinkCommand.unlinkAccount(event.getUser()).build()).queue();
-		});
+		executor.submit(
+			() -> {
+				event.logCommandGuildUserCommand();
+				event.getHook().editOriginalEmbeds(UnlinkCommand.unlinkAccount(event.getUser()).build()).queue();
+			}
+		);
 	}
 }

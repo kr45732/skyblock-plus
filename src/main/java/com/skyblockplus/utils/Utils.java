@@ -75,13 +75,14 @@ public class Utils {
 	public static final OkHttpClient okHttpClient = new OkHttpClient().newBuilder().build();
 	public static final ExecutorService executor = new ExceptionExecutor();
 	public static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(3);
-	/* Script Engines */
 	public static final ScriptEngine jsScriptEngine = new ScriptEngineManager().getEngineByName("js");
 	public static final AtomicInteger remainingLimit = new AtomicInteger(120);
 	public static final AtomicInteger timeTillReset = new AtomicInteger(0);
 	public static final ConcurrentHashMap<String, HypixelKeyInformation> keyCooldownMap = new ConcurrentHashMap<>();
 	public static final ConcurrentHashMap<String, HypixelGuildCache> hypixelGuildsCacheMap = new ConcurrentHashMap<>();
 	private static final Logger log = LoggerFactory.getLogger(Utils.class);
+	public static final Gson gson = new Gson();
+	public static final Gson formattedGson = new GsonBuilder().setPrettyPrinting().create();
 	/* Configuration File */
 	public static String HYPIXEL_API_KEY = "";
 	public static String BOT_TOKEN = "";
@@ -515,13 +516,15 @@ public class Utils {
 			.setColumns(1)
 			.setItemsPerPage(1)
 			.showPageNumbers(true)
-			.setFinalAction(m -> {
-				try {
-					m.clearReactions().queue(null, throwableConsumer);
-				} catch (PermissionException ex) {
-					m.delete().queue(null, throwableConsumer);
+			.setFinalAction(
+				m -> {
+					try {
+						m.clearReactions().queue(null, throwableConsumer);
+					} catch (PermissionException ex) {
+						m.delete().queue(null, throwableConsumer);
+					}
 				}
-			})
+			)
 			.setEventWaiter(waiter)
 			.setTimeout(30, TimeUnit.SECONDS)
 			.setColor(botColor);
@@ -1001,6 +1004,10 @@ public class Utils {
 							}
 						}
 
+						for (int j = 0; j < item.getInt("tag.ExtraAttributes.gemstone_slots", 0); j++) {
+							itemInfo.addExtraValue("GEMSTONE_CHAMBER");
+						}
+
 						try {
 							byte[] backpackContents = item.getByteArray("tag.ExtraAttributes." + itemInfo.getId().toLowerCase() + "_data");
 							NBTCompound parsedContentsBackpack = NBTReader.read(new ByteArrayInputStream(backpackContents));
@@ -1039,7 +1046,7 @@ public class Utils {
 						int code = database.setApplyCacheSettings(
 							automaticGuild.getKey(),
 							higherDepth(applySetting.currentSettings, "name").getAsString(),
-							new Gson().toJson(applyUserList)
+							gson.toJson(applyUserList)
 						);
 
 						if (code == 200) {
@@ -1064,7 +1071,7 @@ public class Utils {
 		try {
 			List<ApplyUser> applyUsersCacheList = new ArrayList<>();
 			for (JsonElement applyUserCache : applyUsersCache) {
-				ApplyUser currentApplyUserCache = new Gson().fromJson(applyUserCache, ApplyUser.class);
+				ApplyUser currentApplyUserCache = gson.fromJson(applyUserCache, ApplyUser.class);
 				applyUsersCacheList.add(currentApplyUserCache);
 			}
 			if (applyUsersCacheList.size() > 0) {
@@ -1107,34 +1114,40 @@ public class Utils {
 			database
 				.getLinkedUsers()
 				.stream()
-				.filter(linkedAccountModel ->
-					Duration.between(Instant.ofEpochMilli(Long.parseLong(linkedAccountModel.getLastUpdated())), Instant.now()).toDays() > 1
+				.filter(
+					linkedAccountModel ->
+						Duration
+							.between(Instant.ofEpochMilli(Long.parseLong(linkedAccountModel.getLastUpdated())), Instant.now())
+							.toDays() >
+						1
 				)
 				.findAny()
-				.ifPresent(notUpdated -> {
-					try {
-						DiscordInfoStruct discordInfo = getPlayerDiscordInfo(notUpdated.getMinecraftUsername());
-						User updateUser = jda.retrieveUserById(notUpdated.getDiscordId()).complete();
-						if (discordInfo.discordTag.equals(updateUser.getAsTag())) {
-							database.addLinkedUser(
-								new LinkedAccountModel(
-									"" + Instant.now().toEpochMilli(),
-									updateUser.getId(),
-									discordInfo.minecraftUuid,
-									discordInfo.minecraftUsername
-								)
-							);
-							try {
-								logCommand("Updated linked user: " + notUpdated.getMinecraftUsername());
-							} catch (Exception ignored) {}
-							return;
-						}
-					} catch (Exception ignored) {}
-					database.deleteLinkedUserByMinecraftUsername(notUpdated.getMinecraftUsername());
-					try {
-						logCommand("Error updating linked user: " + notUpdated.getMinecraftUsername());
-					} catch (Exception ignored) {}
-				});
+				.ifPresent(
+					notUpdated -> {
+						try {
+							DiscordInfoStruct discordInfo = getPlayerDiscordInfo(notUpdated.getMinecraftUsername());
+							User updateUser = jda.retrieveUserById(notUpdated.getDiscordId()).complete();
+							if (discordInfo.discordTag.equals(updateUser.getAsTag())) {
+								database.addLinkedUser(
+									new LinkedAccountModel(
+										"" + Instant.now().toEpochMilli(),
+										updateUser.getId(),
+										discordInfo.minecraftUuid,
+										discordInfo.minecraftUsername
+									)
+								);
+								try {
+									logCommand("Updated linked user: " + notUpdated.getMinecraftUsername());
+								} catch (Exception ignored) {}
+								return;
+							}
+						} catch (Exception ignored) {}
+						database.deleteLinkedUserByMinecraftUsername(notUpdated.getMinecraftUsername());
+						try {
+							logCommand("Error updating linked user: " + notUpdated.getMinecraftUsername());
+						} catch (Exception ignored) {}
+					}
+				);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}

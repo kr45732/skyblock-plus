@@ -2,10 +2,8 @@ package com.skyblockplus.dev;
 
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.utils.Utils.errorEmbed;
-import static com.skyblockplus.utils.Utils.makeHastePost;
+import static com.skyblockplus.utils.Utils.*;
 
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -57,10 +55,7 @@ public class GetSettingsFile extends Command {
 		}
 
 		try {
-			event
-				.getChannel()
-				.sendMessage(makeHastePost(new GsonBuilder().setPrettyPrinting().create().toJson(allSettings)) + ".json")
-				.queue();
+			event.getChannel().sendMessage(makeHastePost(formattedGson.toJson(allSettings)) + ".json").queue();
 			return true;
 		} catch (Exception ignored) {}
 		return false;
@@ -74,10 +69,7 @@ public class GetSettingsFile extends Command {
 		}
 
 		try {
-			event
-				.getChannel()
-				.sendMessage(makeHastePost(new GsonBuilder().setPrettyPrinting().create().toJson(currentSettings)) + ".json")
-				.queue();
+			event.getChannel().sendMessage(makeHastePost(formattedGson.toJson(currentSettings)) + ".json").queue();
 			return true;
 		} catch (Exception ignored) {}
 

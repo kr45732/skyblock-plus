@@ -4,7 +4,6 @@ import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Hypixel.getAuctionPetsByName;
 import static com.skyblockplus.utils.Utils.*;
 
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -79,12 +78,7 @@ public class NetworthExecute {
 
 							nwEb.appendDescription(
 								"\nVerbose JSON: " +
-								makeHastePost(
-									new GsonBuilder()
-										.setPrettyPrinting()
-										.create()
-										.toJson(JsonParser.parseString(calcItemsJsonStr.toString()))
-								) +
+								makeHastePost(formattedGson.toJson(JsonParser.parseString(calcItemsJsonStr.toString()))) +
 								".json"
 							);
 							System.out.println("TIME: " + (System.currentTimeMillis() - timeP));
@@ -356,21 +350,17 @@ public class NetworthExecute {
 	private void calculateAllPetsPrice() {
 		StringBuilder queryStr = new StringBuilder();
 		for (InvItem item : invPets) {
-			String petName = capitalizeString(item.getName()).replace("lvl", "Lvl");
-			queryStr.append("\"").append(petName).append("\",");
+			queryStr.append("\"").append(item.getAuctionApiName()).append("\",");
 		}
 		for (InvItem item : petsPets) {
-			String petName = capitalizeString(item.getName()).replace("lvl", "Lvl");
-			queryStr.append("\"").append(petName).append("\",");
+			queryStr.append("\"").append(item.getAuctionApiName()).append("\",");
 		}
 		for (InvItem item : enderChestPets) {
-			String petName = capitalizeString(item.getName()).replace("lvl", "Lvl");
-			queryStr.append("\"").append(petName).append("\",");
+			queryStr.append("\"").append(item.getAuctionApiName()).append("\",");
 		}
 
 		for (InvItem item : storagePets) {
-			String petName = capitalizeString(item.getName()).replace("lvl", "Lvl");
-			queryStr.append("\"").append(petName).append("\",");
+			queryStr.append("\"").append(item.getAuctionApiName()).append("\",");
 		}
 
 		if (queryStr.length() == 0) {
@@ -384,11 +374,10 @@ public class NetworthExecute {
 			for (JsonElement auction : ahQuery) {
 				String auctionName = higherDepth(auction, "item_name").getAsString();
 				double auctionPrice = higherDepth(auction, "starting_bid").getAsDouble();
-				String auctionRarity = higherDepth(auction, "tier").getAsString();
 
 				for (Iterator<InvItem> iterator = invPets.iterator(); iterator.hasNext();) {
 					InvItem item = iterator.next();
-					if (item.getName().equalsIgnoreCase(auctionName) && item.getRarity().equalsIgnoreCase(auctionRarity)) {
+					if (item.getAuctionApiName().equals(auctionName)) {
 						StringBuilder miscStr = new StringBuilder("[");
 						double miscExtras = 0;
 						try {
@@ -433,7 +422,7 @@ public class NetworthExecute {
 
 				for (Iterator<InvItem> iterator = petsPets.iterator(); iterator.hasNext();) {
 					InvItem item = iterator.next();
-					if (item.getName().equalsIgnoreCase(auctionName) && item.getRarity().equalsIgnoreCase(auctionRarity)) {
+					if (item.getAuctionApiName().equals(auctionName)) {
 						StringBuilder miscStr = new StringBuilder("[");
 						double miscExtras = 0;
 						try {
@@ -478,7 +467,7 @@ public class NetworthExecute {
 
 				for (Iterator<InvItem> iterator = enderChestPets.iterator(); iterator.hasNext();) {
 					InvItem item = iterator.next();
-					if (item.getName().equalsIgnoreCase(auctionName) && item.getRarity().equalsIgnoreCase(auctionRarity)) {
+					if (item.getAuctionApiName().equals(auctionName)) {
 						StringBuilder miscStr = new StringBuilder("[");
 						double miscExtras = 0;
 						try {
@@ -523,7 +512,7 @@ public class NetworthExecute {
 
 				for (Iterator<InvItem> iterator = storagePets.iterator(); iterator.hasNext();) {
 					InvItem item = iterator.next();
-					if (item.getName().equalsIgnoreCase(auctionName) && item.getRarity().equalsIgnoreCase(auctionRarity)) {
+					if (item.getAuctionApiName().equals(auctionName)) {
 						StringBuilder miscStr = new StringBuilder("[");
 						double miscExtras = 0;
 						try {

@@ -14,22 +14,24 @@ public class AuctionsSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
-		executor.submit(() -> {
-			event.logCommandGuildUserCommand();
-			EmbedBuilder eb;
-			String subcommandName = event.getSubcommandName();
+		executor.submit(
+			() -> {
+				event.logCommandGuildUserCommand();
+				EmbedBuilder eb;
+				String subcommandName = event.getSubcommandName();
 
-			if (subcommandName.equals("player")) {
-				eb = AuctionCommand.getPlayerAuction(event.getOptionStr("player"), event.getUser(), null, event.getHook());
-			} else if (subcommandName.equals("uuid")) {
-				eb = AuctionCommand.getAuctionByUuid(event.getOptionStr("uuid"));
-			} else {
-				eb = event.invalidCommandMessage();
-			}
+				if (subcommandName.equals("player")) {
+					eb = AuctionCommand.getPlayerAuction(event.getOptionStr("player"), event.getUser(), null, event.getHook());
+				} else if (subcommandName.equals("uuid")) {
+					eb = AuctionCommand.getAuctionByUuid(event.getOptionStr("uuid"));
+				} else {
+					eb = event.invalidCommandMessage();
+				}
 
-			if (eb != null) {
-				event.getHook().editOriginalEmbeds(eb.build()).queue();
+				if (eb != null) {
+					event.getHook().editOriginalEmbeds(eb.build()).queue();
+				}
 			}
-		});
+		);
 	}
 }

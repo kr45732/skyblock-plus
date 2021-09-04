@@ -109,7 +109,7 @@ public class AutomaticGuild {
 						.queue();
 
 					applyGuild.removeIf(o1 -> higherDepth(o1.currentSettings, "name").getAsString().equals(currentSetting.getName()));
-					applyGuild.add(new ApplyGuild(reactMessage, new Gson().toJsonTree(currentSetting)));
+					applyGuild.add(new ApplyGuild(reactMessage, gson.toJsonTree(currentSetting)));
 				} catch (Exception e) {
 					Message reactMessage = reactChannel
 						.sendMessageEmbeds(eb.build())
@@ -117,10 +117,10 @@ public class AutomaticGuild {
 						.complete();
 
 					currentSetting.setPreviousMessageId(reactMessage.getId());
-					database.setApplySettings(event.getGuild().getId(), new Gson().toJsonTree(currentSetting));
+					database.setApplySettings(event.getGuild().getId(), gson.toJsonTree(currentSetting));
 
 					applyGuild.removeIf(o1 -> higherDepth(o1.currentSettings, "name").getAsString().equals(currentSetting.getName()));
-					applyGuild.add(new ApplyGuild(reactMessage, new Gson().toJsonTree(currentSetting)));
+					applyGuild.add(new ApplyGuild(reactMessage, gson.toJsonTree(currentSetting)));
 				}
 			} catch (Exception e) {
 				log.error("Apply constructor error - " + event.getGuild().getId(), e);
@@ -168,7 +168,7 @@ public class AutomaticGuild {
 							.setActionRow(Button.primary("create_application_button_" + currentSetting.getName(), "Apply Here"))
 							.queue();
 
-						applyGuild.add(new ApplyGuild(reactMessage, new Gson().toJsonTree(currentSetting), curApplyUsers));
+						applyGuild.add(new ApplyGuild(reactMessage, gson.toJsonTree(currentSetting), curApplyUsers));
 						applyStr.append("• Reloaded `").append(currentSetting.getName()).append("`\n");
 					} catch (Exception e) {
 						Message reactMessage = reactChannel
@@ -177,9 +177,9 @@ public class AutomaticGuild {
 							.complete();
 
 						currentSetting.setPreviousMessageId(reactMessage.getId());
-						database.setApplySettings(guild.getId(), new Gson().toJsonTree(currentSetting));
+						database.setApplySettings(guild.getId(), gson.toJsonTree(currentSetting));
 
-						applyGuild.add(new ApplyGuild(reactMessage, new Gson().toJsonTree(currentSetting), curApplyUsers));
+						applyGuild.add(new ApplyGuild(reactMessage, gson.toJsonTree(currentSetting), curApplyUsers));
 						applyStr.append("• Reloaded `").append(currentSetting.getName()).append("`\n");
 					}
 				} else {
@@ -350,19 +350,23 @@ public class AutomaticGuild {
 
 					guild
 						.retrieveMembersByIds(linkedUsersIds.toArray(new String[0]))
-						.onSuccess(members -> {
-							inGuildUsers.addAll(members);
-							requestCount.incrementAndGet();
-							if (requestCount.get() == linkedUsersLists.size()) {
-								latch.countDown();
+						.onSuccess(
+							members -> {
+								inGuildUsers.addAll(members);
+								requestCount.incrementAndGet();
+								if (requestCount.get() == linkedUsersLists.size()) {
+									latch.countDown();
+								}
 							}
-						})
-						.onError(error -> {
-							requestCount.incrementAndGet();
-							if (requestCount.get() == linkedUsersLists.size()) {
-								latch.countDown();
+						)
+						.onError(
+							error -> {
+								requestCount.incrementAndGet();
+								if (requestCount.get() == linkedUsersLists.size()) {
+									latch.countDown();
+								}
 							}
-						});
+						);
 				}
 
 				try {
@@ -743,12 +747,12 @@ public class AutomaticGuild {
 				new FileReader("src/main/java/com/skyblockplus/json/skyblock_plus/PriceOverrides.json")
 			);
 			try (Writer writer = new FileWriter("src/main/java/com/skyblockplus/json/skyblock_plus/PriceOverrides.json")) {
-				new GsonBuilder().setPrettyPrinting().create().toJson(getUpdatedPriceOverridesJson(currentPriceOverrides), writer);
+				formattedGson.toJson(getUpdatedPriceOverridesJson(currentPriceOverrides), writer);
 				writer.flush();
 			}
 
 			try (Writer writer = new FileWriter("src/main/java/com/skyblockplus/json/skyblock_plus/InternalNameMappings.json")) {
-				new GsonBuilder().setPrettyPrinting().create().toJson(getUpdatedItemMappingsJson(), writer);
+				formattedGson.toJson(getUpdatedItemMappingsJson(), writer);
 				writer.flush();
 			}
 

@@ -707,7 +707,6 @@ public class SettingsExecute {
 					}
 				}
 
-				Gson gson = new Gson();
 				currentGuildRanks.add(gson.toJsonTree(new GuildRank(rankName.toLowerCase(), guildRankRole.getId())));
 
 				currentSettings.add("guildRanks", currentGuildRanks);
@@ -903,12 +902,12 @@ public class SettingsExecute {
 			StringBuilder ebFieldString = new StringBuilder();
 
 			if (higherDepth(currentRoleSettings, "enable") == null) {
-				database.setRoleSettings(guild.getId(), roleName, new Gson().toJsonTree(new RoleModel()));
+				database.setRoleSettings(guild.getId(), roleName, gson.toJsonTree(new RoleModel()));
 				currentRoleSettings = database.getRoleSettings(guild.getId(), roleName);
 			}
 
 			if (higherDepth(currentRoleSettings, "stackable") == null) {
-				database.setRoleSettings(guild.getId(), roleName, new Gson().toJsonTree(new RoleModel()));
+				database.setRoleSettings(guild.getId(), roleName, gson.toJsonTree(new RoleModel()));
 				currentRoleSettings = database.getRoleSettings(guild.getId(), roleName);
 			}
 
@@ -1233,7 +1232,6 @@ public class SettingsExecute {
 					}
 				}
 
-				Gson gson = new Gson();
 				currentLevels.add(gson.toJsonTree(new RoleObject(roleValue, roleValue)));
 
 				newRoleSettings.add("levels", currentLevels);
@@ -1296,7 +1294,6 @@ public class SettingsExecute {
 			}
 		}
 
-		Gson gson = new Gson();
 		currentLevels.add(gson.toJsonTree(new RoleObject(roleValue, role.getId())));
 
 		if (!roleName.equals("guild_member")) {
@@ -1413,7 +1410,7 @@ public class SettingsExecute {
 		}
 
 		JsonArray currentLevels = new JsonArray();
-		currentLevels.add(new Gson().toJsonTree(new RoleObject("default", role.getId())));
+		currentLevels.add(gson.toJsonTree(new RoleObject("default", role.getId())));
 		newRoleSettings.add("levels", currentLevels);
 
 		int responseCode = database.setRoleSettings(guild.getId(), roleName, newRoleSettings);
@@ -1525,13 +1522,15 @@ public class SettingsExecute {
 
 		if (nickname.contains("[GUILD_RANK]")) {
 			List<GuildRole> guildRoleSettings = database.getAllGuildRoles(guild.getId());
-			guildRoleSettings.removeIf(o1 -> {
-				try {
-					return !o1.getEnableGuildRanks().equalsIgnoreCase("true");
-				} catch (Exception e) {
-					return true;
+			guildRoleSettings.removeIf(
+				o1 -> {
+					try {
+						return !o1.getEnableGuildRanks().equalsIgnoreCase("true");
+					} catch (Exception e) {
+						return true;
+					}
 				}
-			});
+			);
 			if (guildRoleSettings.size() == 0) {
 				return invalidEmbed(
 					"At least one guild ranks must be enabled in " + guildPrefix + "`settings guild [name]` to use the [GUILD_RANK] prefix"
@@ -1921,7 +1920,7 @@ public class SettingsExecute {
 
 		ApplyRequirements toAddReq = new ApplyRequirements("" + slayerReq, "" + skillsReq, "" + cataReq, "" + weightReq);
 
-		currentReqs.add(new Gson().toJsonTree(toAddReq));
+		currentReqs.add(gson.toJsonTree(toAddReq));
 
 		int responseCode = database.setApplyReqs(guild.getId(), name, currentReqs);
 
@@ -2040,7 +2039,7 @@ public class SettingsExecute {
 					}
 				}
 
-				curRanks.add(new Gson().toJsonTree(new RoleObject("" + intLevel, verifyGuildRole.getId())));
+				curRanks.add(gson.toJsonTree(new RoleObject("" + intLevel, verifyGuildRole.getId())));
 				curSettings.add("mee6Ranks", curRanks);
 
 				int responseCode = database.setMee6Settings(guild.getId(), curSettings);

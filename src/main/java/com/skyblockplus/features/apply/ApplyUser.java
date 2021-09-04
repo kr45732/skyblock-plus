@@ -46,7 +46,7 @@ public class ApplyUser implements Serializable {
 		currentSettings = currentSettingsObj.getAsJsonObject();
 
 		this.applyingUserId = applyingUser.getId();
-		this.currentSettingsString = new Gson().toJson(currentSettings);
+		this.currentSettingsString = gson.toJson(currentSettings);
 		this.guildId = event.getGuild().getId();
 		this.playerUsername = playerUsername;
 

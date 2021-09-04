@@ -5,6 +5,7 @@ import static com.skyblockplus.Main.waiter;
 import static com.skyblockplus.features.listeners.MainListener.onApplyReload;
 import static com.skyblockplus.features.listeners.MainListener.onVerifyReload;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.gson;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -170,7 +171,7 @@ public class SetupCommandHandler {
 	private void cancel() {
 		switch (featureType) {
 			case "verify":
-				database.setVerifySettings(buttonEvent.getGuild().getId(), new Gson().toJsonTree(new AutomatedVerify()));
+				database.setVerifySettings(buttonEvent.getGuild().getId(), gson.toJsonTree(new AutomatedVerify()));
 				break;
 			case "apply":
 				if (name != null) {

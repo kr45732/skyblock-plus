@@ -1,5 +1,7 @@
 package com.skyblockplus.settings;
 
+import static com.skyblockplus.utils.Utils.gson;
+
 import com.google.gson.*;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountService;
@@ -26,7 +28,6 @@ public class Database {
 
 	public final ServerSettingsService settingsService;
 	public final LinkedAccountService linkedAccountService;
-	private final Gson gson = new Gson();
 
 	@Autowired
 	public Database(ServerSettingsService settingsService, LinkedAccountService linkedAccountService) {
