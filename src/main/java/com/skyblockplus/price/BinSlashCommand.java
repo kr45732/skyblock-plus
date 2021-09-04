@@ -14,14 +14,12 @@ public class BinSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
-		executor.submit(
-			() -> {
-				event.logCommandGuildUserCommand();
+		executor.submit(() -> {
+			event.logCommandGuildUserCommand();
 
-				EmbedBuilder eb = BinCommand.getLowestBin(event.getOptionStr("item"));
+			EmbedBuilder eb = BinCommand.getLowestBin(event.getOptionStr("item"));
 
-				event.getHook().editOriginalEmbeds(eb.build()).queue();
-			}
-		);
+			event.getHook().editOriginalEmbeds(eb.build()).queue();
+		});
 	}
 }

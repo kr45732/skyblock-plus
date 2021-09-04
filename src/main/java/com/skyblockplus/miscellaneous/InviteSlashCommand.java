@@ -13,15 +13,13 @@ public class InviteSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
-		executor.submit(
-			() -> {
-				event.logCommandGuildUserCommand();
-				event
-					.getHook()
-					.editOriginalEmbeds(InformationCommand.getInformation(event.getSlashCommandClient().getStartTime()).build())
-					.setActionRows(InformationCommand.getInformationActionRow())
-					.queue();
-			}
-		);
+		executor.submit(() -> {
+			event.logCommandGuildUserCommand();
+			event
+				.getHook()
+				.editOriginalEmbeds(InformationCommand.getInformation(event.getSlashCommandClient().getStartTime()).build())
+				.setActionRows(InformationCommand.getInformationActionRow())
+				.queue();
+		});
 	}
 }
