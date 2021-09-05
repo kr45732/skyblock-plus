@@ -64,8 +64,6 @@ public class Utils {
 	public static final Color botColor = new Color(223, 5, 5);
 	public static final int globalCooldown = 4;
 	public static final String DISCORD_SERVER_INVITE_LINK = "https://discord.gg/Z4Fn3eNDXT";
-	public static final String BOT_INVITE_LINK_REQUIRED_NO_SLASH =
-		"https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403040368&scope=bot";
 	public static final String BOT_INVITE_LINK_REQUIRED_SLASH =
 		"https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403040368&scope=bot%20applications.commands";
 	public static final String FORUM_POST_LINK = "https://hypixel.net/threads/3980092";

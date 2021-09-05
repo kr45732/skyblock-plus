@@ -21,8 +21,7 @@ public class InformationCommand extends Command {
 
 	public static ActionRow getInformationActionRow() {
 		return ActionRow.of(
-			Button.link(BOT_INVITE_LINK_REQUIRED_NO_SLASH, "Normal Invite"),
-			Button.link(BOT_INVITE_LINK_REQUIRED_SLASH, "Slash Commands Invite"),
+			Button.link(BOT_INVITE_LINK_REQUIRED_SLASH, "Invite Link"),
 			Button.link(DISCORD_SERVER_INVITE_LINK, "Discord Server"),
 			Button.link(FORUM_POST_LINK, "Forum Post")
 		);
