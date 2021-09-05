@@ -28,7 +28,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,93 +117,112 @@ public class SkyblockEventCommand extends Command {
 
 			CompletableFuture<String> guildMemberUsername = asyncUuidToUsername(guildMemberUuid);
 			futuresList.add(
-				guildMemberUsername.thenApply(guildMemberUsernameResponse -> {
-					try {
-						if (remainingLimit.get() < 5) {
-							log.info("Sleeping for " + timeTillReset + " seconds");
-							TimeUnit.SECONDS.sleep(timeTillReset.get());
-						}
-					} catch (Exception ignored) {}
+				guildMemberUsername.thenApply(
+					guildMemberUsernameResponse -> {
+						try {
+							if (remainingLimit.get() < 5) {
+								log.info("Sleeping for " + timeTillReset + " seconds");
+								TimeUnit.SECONDS.sleep(timeTillReset.get());
+							}
+						} catch (Exception ignored) {}
 
-					CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(guildMemberUuid, HYPIXEL_API_KEY);
+						CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(
+							guildMemberUuid,
+							HYPIXEL_API_KEY
+						);
 
-					return guildMemberProfileJson.thenApply(guildMemberProfileJsonResponse -> {
-						Player guildMemberPlayer = new Player(guildMemberUuid, guildMemberUsernameResponse, guildMemberProfileJsonResponse);
+						return guildMemberProfileJson.thenApply(
+							guildMemberProfileJsonResponse -> {
+								Player guildMemberPlayer = new Player(
+									guildMemberUuid,
+									guildMemberUsernameResponse,
+									guildMemberProfileJsonResponse
+								);
 
-						if (guildMemberPlayer.isValid()) {
-							switch (eventType) {
-								case "slayer":
-									{
-										return new EventMember(
-											guildMemberUsernameResponse,
-											guildMemberUuid,
-											"" +
-											(guildMemberPlayer.getTotalSlayer() - higherDepth(guildMember, "startingAmount").getAsDouble()),
-											higherDepth(guildMember, "profileName").getAsString()
-										);
-									}
-								case "catacombs":
-									{
-										return new EventMember(
-											guildMemberUsernameResponse,
-											guildMemberUuid,
-											"" +
-											(
-												guildMemberPlayer.getCatacombsSkill().totalSkillExp -
-												higherDepth(guildMember, "startingAmount").getAsDouble()
-											),
-											higherDepth(guildMember, "profileName").getAsString()
-										);
-									}
-								case "weight":
-									{
-										return new EventMember(
-											guildMemberUsernameResponse,
-											guildMemberUuid,
-											"" + (guildMemberPlayer.getWeight() - higherDepth(guildMember, "startingAmount").getAsDouble()),
-											higherDepth(guildMember, "profileName").getAsString()
-										);
-									}
-								default:
-									{
-										if (eventType.startsWith("collection.")) {
-											return new EventMember(
-												guildMemberUsernameResponse,
-												guildMemberUuid,
-												"" +
-												(
-													(
-														higherDepth(guildMemberPlayer.profileJson(), eventType.split("-")[0]) != null
-															? higherDepth(guildMemberPlayer.profileJson(), eventType.split("-")[0])
-																.getAsDouble()
-															: 0
-													) -
-													higherDepth(guildMember, "startingAmount").getAsDouble()
-												),
-												higherDepth(guildMember, "profileName").getAsString()
-											);
-										} else if (eventType.startsWith("skills.")) {
-											String skillType = eventType.split("skills.")[1];
-											double skillXp = skillType.equals("all")
-												? guildMemberPlayer.getTotalSkillsXp()
-												: guildMemberPlayer.getSkillXp(skillType);
-
-											if (skillXp != -1) {
+								if (guildMemberPlayer.isValid()) {
+									switch (eventType) {
+										case "slayer":
+											{
 												return new EventMember(
 													guildMemberUsernameResponse,
 													guildMemberUuid,
-													"" + (skillXp - higherDepth(guildMember, "startingAmount").getAsDouble()),
+													"" +
+													(
+														guildMemberPlayer.getTotalSlayer() -
+														higherDepth(guildMember, "startingAmount").getAsDouble()
+													),
 													higherDepth(guildMember, "profileName").getAsString()
 												);
 											}
-										}
-									}
-							}
-						}
+										case "catacombs":
+											{
+												return new EventMember(
+													guildMemberUsernameResponse,
+													guildMemberUuid,
+													"" +
+													(
+														guildMemberPlayer.getCatacombsSkill().totalSkillExp -
+														higherDepth(guildMember, "startingAmount").getAsDouble()
+													),
+													higherDepth(guildMember, "profileName").getAsString()
+												);
+											}
+										case "weight":
+											{
+												return new EventMember(
+													guildMemberUsernameResponse,
+													guildMemberUuid,
+													"" +
+													(
+														guildMemberPlayer.getWeight() -
+														higherDepth(guildMember, "startingAmount").getAsDouble()
+													),
+													higherDepth(guildMember, "profileName").getAsString()
+												);
+											}
+										default:
+											{
+												if (eventType.startsWith("collection.")) {
+													return new EventMember(
+														guildMemberUsernameResponse,
+														guildMemberUuid,
+														"" +
+														(
+															(
+																higherDepth(guildMemberPlayer.profileJson(), eventType.split("-")[0]) !=
+																	null
+																	? higherDepth(guildMemberPlayer.profileJson(), eventType.split("-")[0])
+																		.getAsDouble()
+																	: 0
+															) -
+															higherDepth(guildMember, "startingAmount").getAsDouble()
+														),
+														higherDepth(guildMember, "profileName").getAsString()
+													);
+												} else if (eventType.startsWith("skills.")) {
+													String skillType = eventType.split("skills.")[1];
+													double skillXp = skillType.equals("all")
+														? guildMemberPlayer.getTotalSkillsXp()
+														: guildMemberPlayer.getSkillXp(skillType);
 
-						return null;
-					});
-				})
+													if (skillXp != -1) {
+														return new EventMember(
+															guildMemberUsernameResponse,
+															guildMemberUuid,
+															"" + (skillXp - higherDepth(guildMember, "startingAmount").getAsDouble()),
+															higherDepth(guildMember, "profileName").getAsString()
+														);
+													}
+												}
+											}
+									}
+								}
+
+								return null;
+							}
+						);
+					}
+				)
 			);
 		}
 
@@ -240,7 +260,7 @@ public class SkyblockEventCommand extends Command {
 
 					switch (args[1]) {
 						case "create":
-							paginate(createSkyblockEvent(event));
+							paginate(createSkyblockEvent(event.getChannel(), event.getAuthor(), event.getGuild()));
 							return;
 						case "current":
 							embed(getCurrentSkyblockEvent(event.getGuild().getId()));
@@ -249,14 +269,14 @@ public class SkyblockEventCommand extends Command {
 							embed(cancelSkyblockEvent(event.getGuild().getId()));
 							return;
 						case "join":
-							embed(joinSkyblockEvent(event, args));
+							embed(joinSkyblockEvent(event.getGuild().getId(), event.getAuthor().getId(), args));
 							return;
 						case "leave":
-							embed(leaveSkyblockEvent(event));
+							embed(leaveSkyblockEvent(event.getGuild().getId(), event.getAuthor().getId()));
 							return;
 						case "leaderboard":
 						case "lb":
-							paginate(getEventLeaderboard(event));
+							paginate(getEventLeaderboard(event.getGuild().getId(), event.getAuthor(), event.getChannel(), null));
 							return;
 						case "end":
 							if (database.getSkyblockEventActive(event.getGuild().getId())) {
@@ -275,18 +295,18 @@ public class SkyblockEventCommand extends Command {
 			.submit();
 	}
 
-	private EmbedBuilder getEventLeaderboard(CommandEvent event) {
-		if (!database.getSkyblockEventActive(event.getGuild().getId())) {
+	public static EmbedBuilder getEventLeaderboard(String guildId, User user, MessageChannel channel, InteractionHook hook) {
+		if (!database.getSkyblockEventActive(guildId)) {
 			return defaultEmbed("No event running");
 		}
 
-		if (!guildMap.containsKey(event.getGuild().getId())) {
+		if (!guildMap.containsKey(guildId)) {
 			return defaultEmbed("No guild found");
 		}
 
-		AutomaticGuild currentGuild = guildMap.get(event.getGuild().getId());
+		AutomaticGuild currentGuild = guildMap.get(guildId);
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(25);
+		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, user).setColumns(1).setItemsPerPage(25);
 
 		if (
 			(currentGuild.eventMemberList != null) &&
@@ -323,14 +343,18 @@ public class SkyblockEventCommand extends Command {
 						.setEveryPageTitle("Event Leaderboard")
 						.setEveryPageText("**Last updated " + minutesSinceUpdateString + " ago**\n")
 				);
-				paginateBuilder.build().paginate(event.getChannel(), 0);
+				if (channel != null) {
+					paginateBuilder.build().paginate(channel, 0);
+				} else {
+					paginateBuilder.build().paginate(hook, 0);
+				}
 				return null;
 			}
 
 			return defaultEmbed("Event Leaderboard").setDescription("No one joined the event");
 		}
 
-		JsonElement runningSettings = database.getRunningEventSettings(event.getGuild().getId());
+		JsonElement runningSettings = database.getRunningEventSettings(guildId);
 		List<EventMember> guildMemberPlayersList = getEventLeaderboardList(runningSettings);
 
 		for (int i = 0; i < guildMemberPlayersList.size(); i++) {
@@ -347,38 +371,40 @@ public class SkyblockEventCommand extends Command {
 
 		paginateBuilder.setPaginatorExtras(new PaginatorExtras().setEveryPageTitle("Event Leaderboard"));
 
-		guildMap.get(event.getGuild().getId()).setEventMemberList(guildMemberPlayersList);
-		guildMap.get(event.getGuild().getId()).setEventMemberListLastUpdated(Instant.now());
+		guildMap.get(guildId).setEventMemberList(guildMemberPlayersList);
+		guildMap.get(guildId).setEventMemberListLastUpdated(Instant.now());
 
 		if (paginateBuilder.getItemsSize() > 0) {
-			paginateBuilder.build().paginate(event.getChannel(), 0);
+			if (channel != null) {
+				paginateBuilder.build().paginate(channel, 0);
+			} else {
+				paginateBuilder.build().paginate(hook, 0);
+			}
 			return null;
 		}
 
 		return defaultEmbed("Event Leaderboard").setDescription("No one joined the event");
 	}
 
-	private EmbedBuilder leaveSkyblockEvent(CommandEvent event) {
-		if (database.getSkyblockEventActive(event.getGuild().getId())) {
-			JsonElement linkedAccount = database.getLinkedUserByDiscordId(event.getAuthor().getId());
+	public static EmbedBuilder leaveSkyblockEvent(String guildId, String userId) {
+		if (database.getSkyblockEventActive(guildId)) {
+			JsonElement linkedAccount = database.getLinkedUserByDiscordId(userId);
 			if (linkedAccount != null) {
 				String uuid = higherDepth(linkedAccount, "minecraftUuid").getAsString();
-				database.removeEventMemberFromRunningEvent(event.getGuild().getId(), uuid);
+				database.removeEventMemberFromRunningEvent(guildId, uuid);
 
 				return defaultEmbed("Success").setDescription("You left the event");
 			} else {
-				return defaultEmbed(
-					"You must be linked to run this command. Use `" + getGuildPrefix(event.getGuild().getId()) + "link [IGN]` to link"
-				);
+				return defaultEmbed("You must be linked to run this command. Use `" + getGuildPrefix(guildId) + "link [IGN]` to link");
 			}
 		} else {
 			return defaultEmbed("No event running");
 		}
 	}
 
-	private EmbedBuilder joinSkyblockEvent(CommandEvent event, String[] args) {
-		if (database.getSkyblockEventActive(event.getGuild().getId())) {
-			JsonElement linkedAccount = database.getLinkedUserByDiscordId(event.getAuthor().getId());
+	public static EmbedBuilder joinSkyblockEvent(String guildId, String userId, String[] args) {
+		if (database.getSkyblockEventActive(guildId)) {
+			JsonElement linkedAccount = database.getLinkedUserByDiscordId(userId);
 			if (linkedAccount != null) {
 				String uuid;
 				String username;
@@ -386,15 +412,13 @@ public class SkyblockEventCommand extends Command {
 					uuid = higherDepth(linkedAccount, "minecraftUuid").getAsString();
 					username = higherDepth(linkedAccount, "minecraftUsername").getAsString();
 				} catch (Exception e) {
-					return defaultEmbed(
-						"You must be linked to run this command. Use `" + getGuildPrefix(event.getGuild().getId()) + "link [IGN]` to link"
-					);
+					return defaultEmbed("You must be linked to run this command. Use `" + getGuildPrefix(guildId) + "link [IGN]` to link");
 				}
 
-				if (database.eventHasMemberByUuid(event.getGuild().getId(), uuid)) {
+				if (database.eventHasMemberByUuid(guildId, uuid)) {
 					return invalidEmbed(
 						"You are already in the event! If you want to leave or change profile use `" +
-						getGuildPrefix(event.getGuild().getId()) +
+						getGuildPrefix(guildId) +
 						"event leave`"
 					);
 				}
@@ -405,7 +429,7 @@ public class SkyblockEventCommand extends Command {
 					return invalidEmbed(guildJson.failCause);
 				}
 
-				if (!guildJson.get("_id").getAsString().equals(database.getSkyblockEventGuildId(event.getGuild().getId()))) {
+				if (!guildJson.get("_id").getAsString().equals(database.getSkyblockEventGuildId(guildId))) {
 					return invalidEmbed("You must be in the guild to join the event");
 				}
 				Player player = args.length == 3 ? new Player(username, args[2]) : new Player(username);
@@ -414,8 +438,7 @@ public class SkyblockEventCommand extends Command {
 					try {
 						double startingAmount = 0;
 						String startingAmountFormatted = "";
-						String eventType = higherDepth(database.getRunningEventSettings(event.getGuild().getId()), "eventType")
-							.getAsString();
+						String eventType = higherDepth(database.getRunningEventSettings(guildId), "eventType").getAsString();
 
 						switch (eventType) {
 							case "slayer":
@@ -473,7 +496,7 @@ public class SkyblockEventCommand extends Command {
 						}
 
 						int code = database.addEventMemberToRunningEvent(
-							event.getGuild().getId(),
+							guildId,
 							new EventMember(username, uuid, "" + startingAmount, player.getProfileName())
 						);
 
@@ -495,16 +518,14 @@ public class SkyblockEventCommand extends Command {
 
 				return invalidEmbed(player.getFailCause());
 			} else {
-				return invalidEmbed(
-					"You must be linked to run this command. Use `" + getGuildPrefix(event.getGuild().getId()) + "link [IGN]` to link"
-				);
+				return invalidEmbed("You must be linked to run this command. Use `" + getGuildPrefix(guildId) + "link [IGN]` to link");
 			}
 		} else {
 			return invalidEmbed("No event running");
 		}
 	}
 
-	private EmbedBuilder getCurrentSkyblockEvent(String guildId) {
+	public static EmbedBuilder getCurrentSkyblockEvent(String guildId) {
 		if (database.getSkyblockEventActive(guildId)) {
 			JsonElement currentSettings = database.getRunningEventSettings(guildId);
 			EmbedBuilder eb = defaultEmbed("Current Event");
@@ -553,7 +574,7 @@ public class SkyblockEventCommand extends Command {
 		}
 	}
 
-	private EmbedBuilder cancelSkyblockEvent(String guildId) {
+	public static EmbedBuilder cancelSkyblockEvent(String guildId) {
 		if (database.getSkyblockEventActive(guildId)) {
 			int code = database.setSkyblockEventSettings(guildId, new SbEvent(new RunningEvent(), "false"));
 
@@ -567,10 +588,10 @@ public class SkyblockEventCommand extends Command {
 		}
 	}
 
-	private EmbedBuilder createSkyblockEvent(CommandEvent event) {
-		boolean sbEventActive = database.getSkyblockEventActive(event.getGuild().getId());
-		if (guildMap.containsKey(event.getGuild().getId()) && !sbEventActive) {
-			guildMap.get(event.getGuild().getId()).createSkyblockEvent(event);
+	public static EmbedBuilder createSkyblockEvent(MessageChannel channel, User user, Guild guild) {
+		boolean sbEventActive = database.getSkyblockEventActive(guild.getId());
+		if (guildMap.containsKey(guild.getId()) && !sbEventActive) {
+			guildMap.get(guild.getId()).createSkyblockEvent(channel, user, guild);
 			return null;
 		} else if (sbEventActive) {
 			return invalidEmbed("Event already running");

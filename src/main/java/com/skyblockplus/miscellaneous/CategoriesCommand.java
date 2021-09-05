@@ -25,7 +25,7 @@ public class CategoriesCommand extends Command {
 
 				StringBuilder ebString = new StringBuilder();
 				for (net.dv8tion.jda.api.entities.Category category : event.getGuild().getCategories()) {
-					ebString.append("\n• ").append(category.getName()).append(" --> ").append(category.getId());
+					ebString.append("\n• ").append(category.getName()).append(" ⇢ `").append(category.getId()).append("`");
 				}
 
 				embed(defaultEmbed("Guild Categories").setDescription(ebString.length() == 0 ? "None" : ebString.toString()));

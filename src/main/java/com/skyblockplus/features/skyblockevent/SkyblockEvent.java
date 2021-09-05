@@ -8,7 +8,6 @@ import static com.skyblockplus.utils.Hypixel.getGuildFromName;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.api.serversettings.skyblockevent.RunningEvent;
 import com.skyblockplus.api.serversettings.skyblockevent.SbEvent;
@@ -23,7 +22,10 @@ import java.util.TreeMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +38,6 @@ public class SkyblockEvent {
 	public EmbedBuilder eb;
 	public TextChannel announcementChannel;
 	public Map<Integer, String> prizeListMap;
-	public CommandEvent commandEvent;
 	public int state = 0;
 	public JsonElement guildJson;
 	public String eventType;
@@ -45,14 +46,19 @@ public class SkyblockEvent {
 	public Instant lastMessageSentTime;
 	public ScheduledFuture<?> scheduledFuture;
 	public int attemptsLeft = 3;
+	public MessageChannel channel;
+	public User user;
+	public Guild guild;
 
 	public SkyblockEvent() {
 		this.enable = false;
 	}
 
-	public SkyblockEvent(CommandEvent commandEvent) {
+	public SkyblockEvent(MessageChannel channel, User user, Guild guild) {
+		this.channel = channel;
+		this.user = user;
+		this.guild = guild;
 		this.enable = true;
-		this.commandEvent = commandEvent;
 		this.eb = defaultEmbed("Skyblock competition").setFooter("Type 'cancel' to stop the process");
 		eb.setDescription("What is the name of the guild I should track?");
 		sendEmbedMessage(eb);
@@ -73,7 +79,7 @@ public class SkyblockEvent {
 	}
 
 	private void sendEmbedMessage(EmbedBuilder eb) {
-		commandEvent.getChannel().sendMessageEmbeds(eb.build()).complete();
+		channel.sendMessageEmbeds(eb.build()).complete();
 	}
 
 	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
@@ -81,11 +87,11 @@ public class SkyblockEvent {
 			return;
 		}
 
-		if (!commandEvent.getChannel().equals(event.getChannel())) {
+		if (!channel.equals(event.getChannel())) {
 			return;
 		}
 
-		if (!commandEvent.getAuthor().equals(event.getAuthor())) {
+		if (user.equals(event.getAuthor())) {
 			return;
 		}
 
@@ -312,11 +318,8 @@ public class SkyblockEvent {
 	}
 
 	private boolean setSkyblockEventInDatabase() {
-		if (!database.serverByServerIdExists(commandEvent.getGuild().getId())) {
-			database.addNewServerSettings(
-				commandEvent.getGuild().getId(),
-				new ServerSettingsModel(commandEvent.getGuild().getName(), commandEvent.getGuild().getId())
-			);
+		if (!database.serverByServerIdExists(guild.getId())) {
+			database.addNewServerSettings(guild.getId(), new ServerSettingsModel(guild.getName(), guild.getId()));
 		}
 
 		RunningEvent newRunningEvent = new RunningEvent(
@@ -329,7 +332,7 @@ public class SkyblockEvent {
 		);
 		SbEvent newSkyblockEventSettings = new SbEvent(newRunningEvent, "true");
 
-		return (database.setSkyblockEventSettings(commandEvent.getGuild().getId(), newSkyblockEventSettings) == 200);
+		return (database.setSkyblockEventSettings(guild.getId(), newSkyblockEventSettings) == 200);
 	}
 
 	public void resetSkyblockEvent(EmbedBuilder eb) {
@@ -340,6 +343,6 @@ public class SkyblockEvent {
 		if (eb != null) {
 			sendEmbedMessage(eb);
 		}
-		guildMap.get(commandEvent.getGuild().getId()).setSkyblockEvent(new SkyblockEvent());
+		guildMap.get(guild.getId()).setSkyblockEvent(new SkyblockEvent());
 	}
 }

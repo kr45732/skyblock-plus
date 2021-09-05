@@ -1,10 +1,7 @@
 package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.Utils.executor;
-
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
-import net.dv8tion.jda.api.EmbedBuilder;
 
 public class AuctionsSlashCommand extends SlashCommand {
 
@@ -14,22 +11,22 @@ public class AuctionsSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
-		executor.submit(() -> {
-			event.logCommandGuildUserCommand();
-			EmbedBuilder eb;
-			String subcommandName = event.getSubcommandName();
+		event.logCommand();
 
-			if (subcommandName.equals("player")) {
-				eb = AuctionCommand.getPlayerAuction(event.getOptionStr("player"), event.getUser(), null, event.getHook());
-			} else if (subcommandName.equals("uuid")) {
-				eb = AuctionCommand.getAuctionByUuid(event.getOptionStr("uuid"));
-			} else {
-				eb = event.invalidCommandMessage();
-			}
+		switch (event.getSubcommandName()) {
+			case "player":
+				if (event.invalidPlayerOption()) {
+					return;
+				}
 
-			if (eb != null) {
-				event.getHook().editOriginalEmbeds(eb.build()).queue();
-			}
-		});
+				event.paginate(AuctionCommand.getPlayerAuction(event.player, event.getUser(), null, event.getHook()));
+				break;
+			case "uuid":
+				event.embed(AuctionCommand.getAuctionByUuid(event.getOptionStr("uuid")));
+				break;
+			default:
+				event.embed(event.invalidCommandMessage());
+				break;
+		}
 	}
 }

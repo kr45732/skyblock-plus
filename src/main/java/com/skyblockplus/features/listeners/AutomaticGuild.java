@@ -33,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
@@ -350,19 +351,23 @@ public class AutomaticGuild {
 
 					guild
 						.retrieveMembersByIds(linkedUsersIds.toArray(new String[0]))
-						.onSuccess(members -> {
-							inGuildUsers.addAll(members);
-							requestCount.incrementAndGet();
-							if (requestCount.get() == linkedUsersLists.size()) {
-								latch.countDown();
+						.onSuccess(
+							members -> {
+								inGuildUsers.addAll(members);
+								requestCount.incrementAndGet();
+								if (requestCount.get() == linkedUsersLists.size()) {
+									latch.countDown();
+								}
 							}
-						})
-						.onError(error -> {
-							requestCount.incrementAndGet();
-							if (requestCount.get() == linkedUsersLists.size()) {
-								latch.countDown();
+						)
+						.onError(
+							error -> {
+								requestCount.incrementAndGet();
+								if (requestCount.get() == linkedUsersLists.size()) {
+									latch.countDown();
+								}
 							}
-						});
+						);
 				}
 
 				try {
@@ -511,11 +516,11 @@ public class AutomaticGuild {
 		this.eventMemberListLastUpdated = eventMemberListLastUpdated;
 	}
 
-	public void createSkyblockEvent(CommandEvent event) {
+	public void createSkyblockEvent(MessageChannel channel, User user, Guild guild) {
 		if (skyblockEvent != null && skyblockEvent.scheduledFuture != null) {
 			skyblockEvent.scheduledFuture.cancel(true);
 		}
-		skyblockEvent = new SkyblockEvent(event);
+		skyblockEvent = new SkyblockEvent(channel, user, guild);
 	}
 
 	public void setSkyblockEvent(SkyblockEvent skyblockEvent) {
@@ -663,6 +668,12 @@ public class AutomaticGuild {
 	public void onButtonClick(ButtonClickEvent event) {
 		if (event.getComponentId().startsWith("setup_command_")) {
 			event.deferReply().complete();
+
+			if (!event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
+				event.getHook().editOriginal("❌ You must have the Administrator permission in this Guild to use that!").queue();
+				return;
+			}
+
 			SetupCommandHandler handler = new SetupCommandHandler(event, event.getComponentId().split("setup_command_")[1]);
 			if (handler.isValid()) {
 				return;
@@ -688,7 +699,6 @@ public class AutomaticGuild {
 		if (event.getMessage() != null) {
 			event.editButton(event.getButton().asDisabled().withId("disabled").withLabel("Disabled").withStyle(ButtonStyle.DANGER)).queue();
 		}
-
 		event.getHook().editOriginal("❌ This button has been disabled").queue();
 	}
 

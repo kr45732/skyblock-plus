@@ -41,7 +41,7 @@ public class SlashCommandClient extends ListenerAdapter {
 				if (remainingCooldown > 0) {
 					command.replyCooldown(slashCommandExecutedEvent, remainingCooldown);
 				} else {
-					command.execute(slashCommandExecutedEvent);
+					command._execute(slashCommandExecutedEvent);
 				}
 
 				return;

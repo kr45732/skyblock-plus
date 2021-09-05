@@ -1,10 +1,7 @@
 package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.Utils.executor;
-
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
-import net.dv8tion.jda.api.EmbedBuilder;
 
 public class QueryAuctionsSlashCommand extends SlashCommand {
 
@@ -14,12 +11,8 @@ public class QueryAuctionsSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
-		executor.submit(() -> {
-			event.logCommandGuildUserCommand();
+		event.logCommand();
 
-			EmbedBuilder eb = QueryAuctionCommand.queryAuctions(event.getOptionStr("item"));
-
-			event.getHook().editOriginalEmbeds(eb.build()).queue();
-		});
+		event.embed(QueryAuctionCommand.queryAuctions(event.getOptionStr("item")));
 	}
 }

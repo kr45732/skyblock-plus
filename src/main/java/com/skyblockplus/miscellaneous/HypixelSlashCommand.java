@@ -1,10 +1,7 @@
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.Utils.executor;
-
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
-import net.dv8tion.jda.api.EmbedBuilder;
 
 public class HypixelSlashCommand extends SlashCommand {
 
@@ -14,21 +11,22 @@ public class HypixelSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
-		executor.submit(() -> {
-			event.logCommandGuildUserCommand();
-			String subcommandName = event.getSubcommandName();
-			String username = event.getOptionStr("player");
-			EmbedBuilder eb;
+		event.logCommand();
 
-			if (subcommandName.equals("player")) {
-				eb = HypixelCommand.getHypixelStats(username);
-			} else if (subcommandName.equals("parkour")) {
-				eb = HypixelCommand.getParkourStats(username);
-			} else {
-				eb = event.invalidCommandMessage();
-			}
+		if (event.invalidPlayerOption()) {
+			return;
+		}
 
-			event.getHook().editOriginalEmbeds(eb.build()).queue();
-		});
+		switch (event.getSubcommandName()) {
+			case "player":
+				event.embed(HypixelCommand.getHypixelStats(event.player));
+				break;
+			case "parkour":
+				event.embed(HypixelCommand.getParkourStats(event.player));
+				break;
+			default:
+				event.embed(event.invalidCommandMessage());
+				break;
+		}
 	}
 }

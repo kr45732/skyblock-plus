@@ -1,10 +1,7 @@
 package com.skyblockplus.dungeons;
 
-import static com.skyblockplus.utils.Utils.executor;
-
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
-import net.dv8tion.jda.api.EmbedBuilder;
 
 public class DungeonsSlashCommand extends SlashCommand {
 
@@ -14,21 +11,14 @@ public class DungeonsSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
-		executor.submit(() -> {
-			event.logCommandGuildUserCommand();
+		event.logCommand();
 
-			String profileName = event.getOptionStr("profile");
-			EmbedBuilder eb = DungeonsCommand.getPlayerDungeons(
-				event.getOptionStr("player"),
-				profileName,
-				event.getUser(),
-				null,
-				event.getHook()
-			);
+		if (event.invalidPlayerOption()) {
+			return;
+		}
 
-			if (eb != null) {
-				event.getHook().editOriginalEmbeds(eb.build()).queue();
-			}
-		});
+		event.paginate(
+			DungeonsCommand.getPlayerDungeons(event.player, event.getOptionStr("profile"), event.getUser(), null, event.getHook())
+		);
 	}
 }

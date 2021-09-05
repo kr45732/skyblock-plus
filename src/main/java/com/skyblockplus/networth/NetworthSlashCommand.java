@@ -1,12 +1,12 @@
-package com.skyblockplus.miscellaneous;
+package com.skyblockplus.networth;
 
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 
-public class MissingTalismansSlashCommand extends SlashCommand {
+public class NetworthSlashCommand extends SlashCommand {
 
-	public MissingTalismansSlashCommand() {
-		this.name = "missing";
+	public NetworthSlashCommand() {
+		this.name = "networth";
 	}
 
 	@Override
@@ -17,6 +17,6 @@ public class MissingTalismansSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.embed(MissingTalismansCommand.getMissingTalismans(event.player, event.getOptionStr("profile")));
+		event.embed(new NetworthExecute().getPlayerNetworth(event.player, event.getOptionStr("profile")));
 	}
 }

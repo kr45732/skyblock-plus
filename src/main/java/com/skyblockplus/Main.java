@@ -11,7 +11,9 @@ import com.skyblockplus.dev.*;
 import com.skyblockplus.dungeons.*;
 import com.skyblockplus.features.listeners.MainListener;
 import com.skyblockplus.features.setup.SetupCommand;
+import com.skyblockplus.features.setup.SetupSlashCommand;
 import com.skyblockplus.features.skyblockevent.SkyblockEventCommand;
+import com.skyblockplus.features.skyblockevent.SkyblockEventSlashCommand;
 import com.skyblockplus.guilds.*;
 import com.skyblockplus.help.HelpCommand;
 import com.skyblockplus.help.HelpSlashCommand;
@@ -22,6 +24,7 @@ import com.skyblockplus.link.UnlinkCommand;
 import com.skyblockplus.link.UnlinkSlashCommand;
 import com.skyblockplus.miscellaneous.*;
 import com.skyblockplus.networth.NetworthCommand;
+import com.skyblockplus.networth.NetworthSlashCommand;
 import com.skyblockplus.price.*;
 import com.skyblockplus.settings.Database;
 import com.skyblockplus.settings.SettingsCommand;
@@ -102,7 +105,6 @@ public class Main {
 				new WeightCommand(),
 				new HypixelCommand(),
 				new UuidCommand(),
-				new SkyblockCommand(),
 				new SettingsCommand(),
 				new ReloadCommand(),
 				new SetupCommand(),
@@ -132,7 +134,7 @@ public class Main {
 				new GuildKickerCommand(),
 				new MissingTalismansCommand(),
 				new UpdateSlashCommands(),
-				new PriceCommand(),
+				new CalculateCommand(),
 				new EmojiFromUrlCommand(),
 				new GuildLeaderboardsCommand(),
 				new ArmorCommand(),
@@ -166,7 +168,11 @@ public class Main {
 			new HypixelSlashCommand(),
 			new ProfilesSlashCommand(),
 			new MissingTalismansSlashCommand(),
-			new PriceSlashCommand()
+			new CalculateSlashCommand(),
+			new SetupSlashCommand(),
+			new SkyblockEventSlashCommand(),
+			new FetchurSlashCommand(),
+			new NetworthSlashCommand()
 		);
 
 		jda =
@@ -191,7 +197,6 @@ public class Main {
 
 		Hypixel.scheduleDatabaseUpdated();
 		//	scheduleUpdateLinkedAccounts();
-		//	AuctionFlipper.scheduleFlipper();
 	}
 
 	@PreDestroy

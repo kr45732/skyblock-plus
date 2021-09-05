@@ -243,7 +243,8 @@ public class HelpCommand extends Command {
 						new HelpData("join", "Join the current event."),
 						new HelpData("leave", "Leave the current event."),
 						new HelpData("leaderboard", "Get the leaderboard for current event.").addAliases("lb"),
-						new HelpData("end", "Force end the event.")
+						new HelpData("end", "Force end the event."),
+						new HelpData("cancel", "Cancel the event. No prizes or winners will be announced.")
 					),
 				new HelpData("settings", "Main settings command.")
 					.addSecondData("View the current settings for the Discord server.", "settings")

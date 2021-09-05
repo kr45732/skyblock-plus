@@ -1,5 +1,6 @@
 package com.skyblockplus.utils.slashcommand;
 
+import static com.skyblockplus.utils.Utils.executor;
 import static com.skyblockplus.utils.Utils.globalCooldown;
 
 public abstract class SlashCommand {
@@ -9,6 +10,10 @@ public abstract class SlashCommand {
 	protected String name = "null";
 
 	protected abstract void execute(SlashCommandExecutedEvent event);
+
+	protected void _execute(SlashCommandExecutedEvent event) {
+		executor.submit(() -> execute(event));
+	}
 
 	public String getName() {
 		return name;
@@ -31,25 +36,16 @@ public abstract class SlashCommand {
 	}
 
 	public enum CooldownScope {
-		USER("U:%d", ""),
-		GLOBAL("Global", "globally");
+		USER("U:%d");
 
-		final String errorSpecification;
 		private final String format;
 
-		CooldownScope(String format, String errorSpecification) {
+		CooldownScope(String format) {
 			this.format = format;
-			this.errorSpecification = errorSpecification;
 		}
 
 		String genKey(String name, long id) {
-			return genKey(name, id, -1);
-		}
-
-		String genKey(String name, long idOne, long idTwo) {
-			if (this.equals(GLOBAL)) return name + "|" + format; else if (idTwo == -1) return (
-				name + "|" + String.format(format, idOne)
-			); else return name + "|" + String.format(format, idOne, idTwo);
+			return name + "|" + String.format(format, id);
 		}
 	}
 }

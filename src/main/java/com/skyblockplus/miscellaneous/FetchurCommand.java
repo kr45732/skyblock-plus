@@ -29,7 +29,7 @@ public class FetchurCommand extends Command {
 			.submit();
 	}
 
-	public EmbedBuilder getFetchurItem() {
+	public static EmbedBuilder getFetchurItem() {
 		String[] fetchurItem = FETCHUR_ITEMS
 			.get((LocalDate.now(ZoneId.of("America/New_York")).getDayOfMonth() - 1) % FETCHUR_ITEMS.size())
 			.split("\\|");

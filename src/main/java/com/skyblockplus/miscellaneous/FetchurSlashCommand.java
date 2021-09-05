@@ -1,18 +1,18 @@
-package com.skyblockplus.price;
+package com.skyblockplus.miscellaneous;
 
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 
-public class BazaarSlashCommand extends SlashCommand {
+public class FetchurSlashCommand extends SlashCommand {
 
-	public BazaarSlashCommand() {
-		this.name = "bazaar";
+	public FetchurSlashCommand() {
+		this.name = "fetchur";
 	}
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
 		event.logCommand();
 
-		event.embed(BazaarCommand.getBazaarItem(event.getOptionStr("item")));
+		event.embed(FetchurCommand.getFetchurItem());
 	}
 }

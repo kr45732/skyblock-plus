@@ -65,28 +65,7 @@ public class NetworthExecute {
 						return;
 					}
 
-					EmbedBuilder nwEb = getPlayerNetworth(username, args.length == 3 ? args[2] : null);
-
-					long timeP = System.currentTimeMillis();
-
-					if (verbose) {
-						try {
-							if (calcItemsJsonStr.charAt(calcItemsJsonStr.length() - 1) == ',') {
-								calcItemsJsonStr.deleteCharAt(calcItemsJsonStr.length() - 1);
-							}
-							calcItemsJsonStr.append("]");
-
-							nwEb.appendDescription(
-								"\nVerbose JSON: " +
-								makeHastePost(formattedGson.toJson(JsonParser.parseString(calcItemsJsonStr.toString()))) +
-								".json"
-							);
-							System.out.println("TIME: " + (System.currentTimeMillis() - timeP));
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-					embed(nwEb);
+					embed(getPlayerNetworth(username, args.length == 3 ? args[2] : null));
 					return;
 				}
 
@@ -96,7 +75,7 @@ public class NetworthExecute {
 			.submit();
 	}
 
-	private EmbedBuilder getPlayerNetworth(String username, String profileName) {
+	public EmbedBuilder getPlayerNetworth(String username, String profileName) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			EmbedBuilder eb = player.defaultPlayerEmbed();
@@ -339,6 +318,26 @@ public class NetworthExecute {
 			eb.addField("Pets | " + simplifyNumber(petsTotal), petsStr.length() == 0 ? "Empty" : petsStr.toString(), false);
 			eb.addField("Talisman | " + simplifyNumber(talismanTotal), talismanStr.length() == 0 ? "Empty" : talismanStr.toString(), false);
 			eb.addField("Bug in the price calculation?", "[Please submit a bug report here!](https://forms.gle/RBmN2AFBLafGyx5E7)", false);
+
+			if (verbose) {
+				try {
+					long startTime = System.currentTimeMillis();
+
+					if (calcItemsJsonStr.charAt(calcItemsJsonStr.length() - 1) == ',') {
+						calcItemsJsonStr.deleteCharAt(calcItemsJsonStr.length() - 1);
+					}
+					calcItemsJsonStr.append("]");
+
+					eb.appendDescription(
+						"\nVerbose JSON: " +
+						makeHastePost(formattedGson.toJson(JsonParser.parseString(calcItemsJsonStr.toString()))) +
+						".json"
+					);
+					System.out.println("Verbose time: " + (System.currentTimeMillis() - startTime) + " ms");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 
 			tempSet.stream().filter(str -> !str.toLowerCase().startsWith("rune_")).forEach(System.out::println);
 

@@ -69,13 +69,13 @@ public class UpdateSlashCommands extends Command {
 				.addOption(OptionType.STRING, "player", "Link your Hypixel account to this bot"),
 			new CommandData("unlink", "Unlink your account from this bot"),
 			new CommandData("slayer", "Get the slayer data of a player")
-				.addOption(OptionType.STRING, "player", "Player username", true)
+				.addOption(OptionType.STRING, "player", "Player username or mention")
 				.addOption(OptionType.STRING, "profile", "Profile name"),
 			new CommandData("skills", "Get the skills data of a player")
-				.addOption(OptionType.STRING, "player", "Player username", true)
+				.addOption(OptionType.STRING, "player", "Player username or mention")
 				.addOption(OptionType.STRING, "profile", "Profile name"),
 			new CommandData("dungeons", "Get the dungeons data of a player")
-				.addOption(OptionType.STRING, "player", "Player username", true)
+				.addOption(OptionType.STRING, "player", "Player username or mention")
 				.addOption(OptionType.STRING, "profile", "Profile name"),
 			new CommandData("essence", "Get essence upgrade information for an item")
 				.addSubcommands(
@@ -85,32 +85,32 @@ public class UpdateSlashCommands extends Command {
 						.addOption(OptionType.STRING, "item", "Item name", true)
 				),
 			new CommandData("partyfinder", "A party finder helper that shows a player's dungeon stats")
-				.addOption(OptionType.STRING, "player", "Player username", true)
+				.addOption(OptionType.STRING, "player", "Player username or mention")
 				.addOption(OptionType.STRING, "profile", "Profile name"),
 			new CommandData("guild", "Main guild command")
 				.addSubcommands(
 					new SubcommandData("player", "Find what guild a player is in")
-						.addOption(OptionType.STRING, "player", "Player username", true),
+						.addOption(OptionType.STRING, "player", "Player username or mention"),
 					new SubcommandData("information", "Get information and statistics about a player's guild")
-						.addOption(OptionType.STRING, "player", "Player username", true),
+						.addOption(OptionType.STRING, "player", "Player username or mention"),
 					new SubcommandData("members", "Get a list of all members in a player's guild")
-						.addOption(OptionType.STRING, "player", "Player username", true),
+						.addOption(OptionType.STRING, "player", "Player username or mention"),
 					new SubcommandData("experience", "Get the experience leaderboard for a player's guild")
-						.addOption(OptionType.STRING, "player", "Player username", true)
-						.addOption(OptionType.INTEGER, "days", "Number of days", false)
+						.addOption(OptionType.STRING, "player", "Player username or mention")
+						.addOption(OptionType.INTEGER, "days", "Number of days")
 				),
 			new CommandData("help", "Show the help page for this bot")
 				.addOption(OptionType.STRING, "page", "Page number or name of a command"),
 			new CommandData("auctions", "Main auctions command")
 				.addSubcommands(
 					new SubcommandData("player", "Get player's active (not claimed) auctions on all profiles")
-						.addOption(OptionType.STRING, "player", "Player username", true),
+						.addOption(OptionType.STRING, "player", "Player username or mention"),
 					new SubcommandData("uuid", "Get an auction by it's UUID").addOption(OptionType.STRING, "uuid", "Auction UUID", true)
 				),
 			new CommandData("bin", "Get the lowest bin of an item").addOption(OptionType.STRING, "item", "Item name", true),
 			new CommandData("bazaar", "Get bazaar prices of an item").addOption(OptionType.STRING, "item", "Item name", true),
 			new CommandData("average", "Get the average auction price of an item").addOption(OptionType.STRING, "item", "Item name", true),
-			new CommandData("bids", "Get a player's bids").addOption(OptionType.STRING, "player", "Player username", true),
+			new CommandData("bids", "Get a player's bids").addOption(OptionType.STRING, "player", "Player username or mention"),
 			new CommandData("query", "Query the auction house for the lowest bin of an item")
 				.addOption(OptionType.STRING, "item", "Item name", true),
 			new CommandData("bits", "Get the price of an item from the bits shop").addOption(OptionType.STRING, "item", "Item name", true),
@@ -122,18 +122,18 @@ public class UpdateSlashCommands extends Command {
 			new CommandData("bank", "Main bank command")
 				.addSubcommands(
 					new SubcommandData("total", "Get a player's bank and purse coins")
-						.addOption(OptionType.STRING, "player", "Player username", true)
+						.addOption(OptionType.STRING, "player", "Player username or mention")
 						.addOption(OptionType.STRING, "profile", "Profile name")
 				)
 				.addSubcommands(
 					new SubcommandData("history", "Get a player's bank transaction history")
-						.addOption(OptionType.STRING, "player", "Player username", true)
+						.addOption(OptionType.STRING, "player", "Player username or mention")
 						.addOption(OptionType.STRING, "profile", "Profile name")
 				),
 			new CommandData("weight", "Main weight command")
 				.addSubcommands(
 					new SubcommandData("player", "Get a player's weight")
-						.addOption(OptionType.STRING, "player", "Player username", true)
+						.addOption(OptionType.STRING, "player", "Player username or mention")
 						.addOption(OptionType.STRING, "profile", "Profile name")
 				)
 				.addSubcommands(
@@ -146,18 +146,33 @@ public class UpdateSlashCommands extends Command {
 			new CommandData("hypixel", "Main hypixel command")
 				.addSubcommands(
 					new SubcommandData("player", "Get Hypixel information about a player")
-						.addOption(OptionType.STRING, "player", "Player username", true)
+						.addOption(OptionType.STRING, "player", "Player username or mention")
 				)
 				.addSubcommands(
 					new SubcommandData("parkour", "Get fastest Hypixel lobby parkour for a player")
-						.addOption(OptionType.STRING, "player", "Player username", true)
+						.addOption(OptionType.STRING, "player", "Player username or mention")
 				),
 			new CommandData("profiles", "Get a information about all of a player's profiles")
-				.addOption(OptionType.STRING, "player", "Player username", true),
+				.addOption(OptionType.STRING, "player", "Player username or mention"),
 			new CommandData("missing", "Get a player's missing talismans")
-				.addOption(OptionType.STRING, "player", "Player username", true)
+				.addOption(OptionType.STRING, "player", "Player username or mention")
 				.addOption(OptionType.STRING, "profile", "Profile name"),
 			new CommandData("calculate", "Calculate the price of an auction").addOption(OptionType.STRING, "uuid", "Auction UUID", true),
+			new CommandData("setup", "A short walk-through on how to setup the bot"),
+			new CommandData("event", "Main event command")
+				.addSubcommands(
+					new SubcommandData("create", "Interactive message to create a Skyblock event"),
+					new SubcommandData("end", "Force end the event"),
+					new SubcommandData("current", "Get information about the current event"),
+					new SubcommandData("join", "Join the current event"),
+					new SubcommandData("leave", "Leave the current event"),
+					new SubcommandData("cancel", "Cancel the event"),
+					new SubcommandData("leaderboard", "Get the leaderboard for current event")
+				),
+			new CommandData("fetchur", "Get the item that fetchur wants today"),
+			new CommandData("networth", "Calculate a player's networth.")
+				.addOption(OptionType.STRING, "player", "Player username or mention")
+				.addOption(OptionType.STRING, "profile", "Profile name"),
 		};
 	}
 }

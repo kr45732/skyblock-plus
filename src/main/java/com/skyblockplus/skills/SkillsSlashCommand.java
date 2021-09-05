@@ -1,10 +1,7 @@
 package com.skyblockplus.skills;
 
-import static com.skyblockplus.utils.Utils.executor;
-
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
-import net.dv8tion.jda.api.EmbedBuilder;
 
 public class SkillsSlashCommand extends SlashCommand {
 
@@ -14,18 +11,12 @@ public class SkillsSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
-		executor.submit(() -> {
-			event.logCommandGuildUserCommand();
+		event.logCommand();
 
-			String profileName = event.getOptionStr("profile");
-			EmbedBuilder eb;
-			if (profileName != null) {
-				eb = SkillsCommand.getPlayerSkill(event.getOptionStr("player"), profileName);
-			} else {
-				eb = SkillsCommand.getPlayerSkill(event.getOptionStr("player"), null);
-			}
+		if (event.invalidPlayerOption()) {
+			return;
+		}
 
-			event.getHook().editOriginalEmbeds(eb.build()).queue();
-		});
+		event.embed(SkillsCommand.getPlayerSkill(event.player, event.getOptionStr("profile")));
 	}
 }

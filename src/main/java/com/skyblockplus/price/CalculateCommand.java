@@ -19,14 +19,14 @@ import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
 import net.dv8tion.jda.api.EmbedBuilder;
 
-public class PriceCommand extends Command {
+public class CalculateCommand extends Command {
 
 	private static JsonElement lowestBinJson;
 	private static JsonElement averageAuctionJson;
 	private static JsonElement bazaarJson;
 	private static JsonArray sbzPrices;
 
-	public PriceCommand() {
+	public CalculateCommand() {
 		this.name = "calculate";
 		this.cooldown = globalCooldown + 1;
 		this.aliases = new String[] { "calc" };

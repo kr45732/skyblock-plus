@@ -1,10 +1,7 @@
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.Utils.executor;
-
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
-import net.dv8tion.jda.api.EmbedBuilder;
 
 public class BankSlashCommand extends SlashCommand {
 
@@ -14,25 +11,24 @@ public class BankSlashCommand extends SlashCommand {
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
-		executor.submit(() -> {
-			event.logCommandGuildUserCommand();
+		event.logCommand();
 
-			String subcommandName = event.getSubcommandName();
-			String username = event.getOptionStr("player");
-			String profileName = event.getOptionStr("profile");
-			EmbedBuilder eb;
+		if (event.invalidPlayerOption()) {
+			return;
+		}
 
-			if (subcommandName.equals("total")) {
-				eb = BankCommand.getPlayerBalance(username, profileName);
-			} else if (subcommandName.equals("history")) {
-				eb = BankCommand.getPlayerBankHistory(username, profileName, event.getUser(), null, event.getHook());
-			} else {
-				eb = event.invalidCommandMessage();
-			}
-
-			if (eb != null) {
-				event.getHook().editOriginalEmbeds(eb.build()).queue();
-			}
-		});
+		switch (event.getSubcommandName()) {
+			case "total":
+				event.embed(BankCommand.getPlayerBalance(event.player, event.getOptionStr("profile")));
+				break;
+			case "history":
+				event.paginate(
+					BankCommand.getPlayerBankHistory(event.player, event.getOptionStr("profile"), event.getUser(), null, event.getHook())
+				);
+				break;
+			default:
+				event.embed(event.invalidCommandMessage());
+				break;
+		}
 	}
 }

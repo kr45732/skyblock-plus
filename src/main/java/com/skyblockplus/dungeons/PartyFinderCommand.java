@@ -18,7 +18,7 @@ public class PartyFinderCommand extends Command {
 		this.aliases = new String[] { "pf" };
 	}
 
-	public static EmbedBuilder getPlayerDungeonInfo(String username, String profileName) {
+	public static EmbedBuilder getPartyFinderInfo(String username, String profileName) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			EmbedBuilder eb = player.defaultPlayerEmbed();
@@ -49,7 +49,7 @@ public class PartyFinderCommand extends Command {
 						return;
 					}
 
-					embed(getPlayerDungeonInfo(username, args.length == 3 ? args[2] : null));
+					embed(getPartyFinderInfo(username, args.length == 3 ? args[2] : null));
 					return;
 				}
 
