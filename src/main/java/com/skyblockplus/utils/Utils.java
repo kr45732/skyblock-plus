@@ -907,7 +907,11 @@ public class Utils {
 			return null;
 		}
 
-		return ("https://sky.shiiyu.moe/stats/" + username + (profileName != null && !profileName.equalsIgnoreCase("Not Allowed To Quit Skyblock Ever Again") ? "/" + profileName : ""));
+		return (
+			"https://sky.shiiyu.moe/stats/" +
+			username +
+			(profileName != null && !profileName.equalsIgnoreCase("Not Allowed To Quit Skyblock Ever Again") ? "/" + profileName : "")
+		);
 	}
 
 	public static Map<Integer, InvItem> getGenericInventoryMap(NBTCompound parsedContents) {
