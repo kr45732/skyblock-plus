@@ -27,6 +27,7 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,14 +55,23 @@ public class SkyblockEvent {
 		this.enable = false;
 	}
 
-	public SkyblockEvent(MessageChannel channel, User user, Guild guild) {
-		this.channel = channel;
+	public SkyblockEvent(User user, Guild guild, MessageChannel channel, InteractionHook hook) {
 		this.user = user;
 		this.guild = guild;
 		this.enable = true;
-		this.eb = defaultEmbed("Skyblock competition").setFooter("Type 'cancel' to stop the process");
-		eb.setDescription("What is the name of the guild I should track?");
-		sendEmbedMessage(eb);
+		this.eb =
+			defaultEmbed("Skyblock competition")
+				.setFooter("Type 'cancel' to stop the process")
+				.setDescription("What is the name of the guild I should track?");
+
+		if (channel != null) {
+			this.channel = channel;
+			sendEmbedMessage(eb);
+		} else {
+			this.channel = hook.getInteraction().getMessageChannel();
+			hook.editOriginalEmbeds(eb.build()).queue();
+		}
+
 		lastMessageSentTime = Instant.now();
 		scheduledFuture = scheduler.scheduleWithFixedDelay(this::checkForTimeout, 0, 1, TimeUnit.MINUTES);
 	}
@@ -69,7 +79,7 @@ public class SkyblockEvent {
 	private void checkForTimeout() {
 		try {
 			Duration res = Duration.between(lastMessageSentTime, Instant.now());
-			if (res.toMinutes() >= 5) {
+			if (res.toMinutes() >= 3) {
 				resetSkyblockEvent(defaultEmbed("Timeout"));
 			}
 		} catch (Exception e) {
@@ -91,7 +101,7 @@ public class SkyblockEvent {
 			return;
 		}
 
-		if (user.equals(event.getAuthor())) {
+		if (!user.equals(event.getAuthor())) {
 			return;
 		}
 

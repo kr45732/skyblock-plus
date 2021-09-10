@@ -74,14 +74,16 @@ public class MissingTalismansCommand extends Command {
 			List<String> missingInternalArr = new ArrayList<>(missingInternal);
 			List<String> missingInternalArrCopy = new ArrayList<>(missingInternalArr);
 
-			missingInternalArrCopy.forEach(o1 -> {
-				if (higherDepth(talismanUpgrades, o1) != null) {
-					JsonArray curUpgrades = higherDepth(talismanUpgrades, o1).getAsJsonArray();
-					for (JsonElement curUpgrade : curUpgrades) {
-						missingInternalArr.remove(curUpgrade.getAsString());
+			missingInternalArrCopy.forEach(
+				o1 -> {
+					if (higherDepth(talismanUpgrades, o1) != null) {
+						JsonArray curUpgrades = higherDepth(talismanUpgrades, o1).getAsJsonArray();
+						for (JsonElement curUpgrade : curUpgrades) {
+							missingInternalArr.remove(curUpgrade.getAsString());
+						}
 					}
 				}
-			});
+			);
 
 			JsonElement lowestBinJson = getLowestBinJson();
 			missingInternalArr.sort(

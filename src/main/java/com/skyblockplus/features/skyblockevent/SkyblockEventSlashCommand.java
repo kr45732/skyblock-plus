@@ -28,7 +28,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 
 		switch (subcommandName) {
 			case "create":
-				event.paginate(SkyblockEventCommand.createSkyblockEvent(event.getChannel(), event.getUser(), event.getGuild()));
+				event.paginate(SkyblockEventCommand.createSkyblockEvent(event.getUser(), event.getGuild(), null, event.getHook()));
 				return;
 			case "current":
 				event.embed(SkyblockEventCommand.getCurrentSkyblockEvent(event.getGuild().getId()));

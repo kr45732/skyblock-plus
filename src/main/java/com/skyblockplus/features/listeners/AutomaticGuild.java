@@ -42,6 +42,7 @@ import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import org.apache.commons.collections4.ListUtils;
@@ -353,19 +354,23 @@ public class AutomaticGuild {
 
 					guild
 						.retrieveMembersByIds(linkedUsersIds.toArray(new String[0]))
-						.onSuccess(members -> {
-							inGuildUsers.addAll(members);
-							requestCount.incrementAndGet();
-							if (requestCount.get() == linkedUsersLists.size()) {
-								latch.countDown();
+						.onSuccess(
+							members -> {
+								inGuildUsers.addAll(members);
+								requestCount.incrementAndGet();
+								if (requestCount.get() == linkedUsersLists.size()) {
+									latch.countDown();
+								}
 							}
-						})
-						.onError(error -> {
-							requestCount.incrementAndGet();
-							if (requestCount.get() == linkedUsersLists.size()) {
-								latch.countDown();
+						)
+						.onError(
+							error -> {
+								requestCount.incrementAndGet();
+								if (requestCount.get() == linkedUsersLists.size()) {
+									latch.countDown();
+								}
 							}
-						});
+						);
 				}
 
 				try {
@@ -514,11 +519,11 @@ public class AutomaticGuild {
 		this.eventMemberListLastUpdated = eventMemberListLastUpdated;
 	}
 
-	public void createSkyblockEvent(MessageChannel channel, User user, Guild guild) {
+	public void createSkyblockEvent(User user, Guild guild, MessageChannel channel, InteractionHook hook) {
 		if (skyblockEvent != null && skyblockEvent.scheduledFuture != null) {
 			skyblockEvent.scheduledFuture.cancel(true);
 		}
-		skyblockEvent = new SkyblockEvent(channel, user, guild);
+		skyblockEvent = new SkyblockEvent(user, guild, channel, hook);
 	}
 
 	public void setSkyblockEvent(SkyblockEvent skyblockEvent) {
