@@ -7,8 +7,10 @@ import static com.skyblockplus.features.skyblockevent.SkyblockEventCommand.endSk
 import static com.skyblockplus.utils.Hypixel.getGuildFromId;
 import static com.skyblockplus.utils.Utils.*;
 
-import com.google.gson.*;
-import com.jagrosh.jdautilities.command.CommandEvent;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
 import com.skyblockplus.api.serversettings.automatedapply.AutomatedApply;
 import com.skyblockplus.api.serversettings.automatedguild.GuildRank;
@@ -351,19 +353,23 @@ public class AutomaticGuild {
 
 					guild
 						.retrieveMembersByIds(linkedUsersIds.toArray(new String[0]))
-						.onSuccess(members -> {
-							inGuildUsers.addAll(members);
-							requestCount.incrementAndGet();
-							if (requestCount.get() == linkedUsersLists.size()) {
-								latch.countDown();
+						.onSuccess(
+							members -> {
+								inGuildUsers.addAll(members);
+								requestCount.incrementAndGet();
+								if (requestCount.get() == linkedUsersLists.size()) {
+									latch.countDown();
+								}
 							}
-						})
-						.onError(error -> {
-							requestCount.incrementAndGet();
-							if (requestCount.get() == linkedUsersLists.size()) {
-								latch.countDown();
+						)
+						.onError(
+							error -> {
+								requestCount.incrementAndGet();
+								if (requestCount.get() == linkedUsersLists.size()) {
+									latch.countDown();
+								}
 							}
-						});
+						);
 				}
 
 				try {
@@ -662,6 +668,10 @@ public class AutomaticGuild {
 	}
 
 	public void onButtonClick(ButtonClickEvent event) {
+		if (event.getComponentId().startsWith("paginator_")) {
+			return;
+		}
+
 		if (event.getComponentId().startsWith("setup_command_")) {
 			event.deferReply().complete();
 

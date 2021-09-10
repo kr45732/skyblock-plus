@@ -2,6 +2,8 @@ package com.skyblockplus.utils;
 
 import static com.skyblockplus.utils.Utils.*;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.skyblockplus.Main;
 import java.util.*;
 
@@ -102,8 +104,10 @@ public class Constants {
 			RARITY_TO_NUMBER_MAP.put("COMMON", ";0");
 
 			/* enchantNames */
-			for (String enchantName : higherDepth(getEnchantsJson(), "enchants_xp_cost").getAsJsonObject().keySet()) {
-				ENCHANT_NAMES.add(enchantName.toUpperCase());
+			for (Map.Entry<String, JsonElement> enchantArr : higherDepth(getEnchantsJson(), "enchants").getAsJsonObject().entrySet()) {
+				for (JsonElement enchantName : enchantArr.getValue().getAsJsonArray()) {
+					ENCHANT_NAMES.add(enchantName.getAsString().toUpperCase());
+				}
 			}
 			if (!ENCHANT_NAMES.contains("ULTIMATE_JERRY")) {
 				ENCHANT_NAMES.add("ULTIMATE_JERRY");

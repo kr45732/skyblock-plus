@@ -47,14 +47,18 @@ public class ProfilesCommand extends Command {
 			for (String uuid : uuids) {
 				profileUsernameFutureList.add(
 					asyncUuidToUsername(uuid)
-						.thenApply(playerUsername -> {
-							String lastLogin =
-								"<t:" +
-								Instant.ofEpochMilli(higherDepth(profile, "members." + uuid + ".last_save").getAsLong()).getEpochSecond() +
-								">";
+						.thenApply(
+							playerUsername -> {
+								String lastLogin =
+									"<t:" +
+									Instant
+										.ofEpochMilli(higherDepth(profile, "members." + uuid + ".last_save").getAsLong())
+										.getEpochSecond() +
+									">";
 
-							return "\n• " + playerUsername + " last logged in on " + lastLogin;
-						})
+								return "\n• " + playerUsername + " last logged in on " + lastLogin;
+							}
+						)
 				);
 			}
 		}
@@ -74,7 +78,7 @@ public class ProfilesCommand extends Command {
 			profileStr.append("\n• **Member Count:** ").append(uuids.size());
 			profileStr.append("\n\n**Members:** ");
 
-			for (String uuid : uuids) {
+			for (String ignored1 : uuids) {
 				try {
 					profileStr.append(profileUsernameFutureList.get(count).get());
 				} catch (Exception ignored) {}

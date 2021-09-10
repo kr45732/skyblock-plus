@@ -5,7 +5,6 @@ import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.Hypixel.playerFromUuid;
 import static com.skyblockplus.utils.Hypixel.usernameToUuid;
-import static com.skyblockplus.utils.command.CustomPaginator.throwableConsumer;
 import static java.lang.String.join;
 import static java.util.Collections.nCopies;
 
@@ -44,7 +43,6 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.exceptions.PermissionException;
 import okhttp3.OkHttpClient;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -514,13 +512,7 @@ public class Utils {
 			.setColumns(1)
 			.setItemsPerPage(1)
 			.showPageNumbers(true)
-			.setFinalAction(m -> {
-				try {
-					m.clearReactions().queue(null, throwableConsumer);
-				} catch (PermissionException ex) {
-					m.delete().queue(null, throwableConsumer);
-				}
-			})
+			.setFinalAction(m -> m.editMessageComponents().queue())
 			.setEventWaiter(waiter)
 			.setTimeout(30, TimeUnit.SECONDS)
 			.setColor(botColor);
@@ -914,6 +906,11 @@ public class Utils {
 		if (username == null) {
 			return null;
 		}
+
+		if (profileName.equalsIgnoreCase("Not Allowed To Quit Skyblock Ever Again")) {
+			return null;
+		}
+
 		return ("https://sky.shiiyu.moe/stats/" + username + (profileName != null ? "/" + profileName : ""));
 	}
 
@@ -1110,34 +1107,40 @@ public class Utils {
 			database
 				.getLinkedUsers()
 				.stream()
-				.filter(linkedAccountModel ->
-					Duration.between(Instant.ofEpochMilli(Long.parseLong(linkedAccountModel.getLastUpdated())), Instant.now()).toDays() > 1
+				.filter(
+					linkedAccountModel ->
+						Duration
+							.between(Instant.ofEpochMilli(Long.parseLong(linkedAccountModel.getLastUpdated())), Instant.now())
+							.toDays() >
+						1
 				)
 				.findAny()
-				.ifPresent(notUpdated -> {
-					try {
-						DiscordInfoStruct discordInfo = getPlayerDiscordInfo(notUpdated.getMinecraftUsername());
-						User updateUser = jda.retrieveUserById(notUpdated.getDiscordId()).complete();
-						if (discordInfo.discordTag.equals(updateUser.getAsTag())) {
-							database.addLinkedUser(
-								new LinkedAccountModel(
-									"" + Instant.now().toEpochMilli(),
-									updateUser.getId(),
-									discordInfo.minecraftUuid,
-									discordInfo.minecraftUsername
-								)
-							);
-							try {
-								logCommand("Updated linked user: " + notUpdated.getMinecraftUsername());
-							} catch (Exception ignored) {}
-							return;
-						}
-					} catch (Exception ignored) {}
-					database.deleteLinkedUserByMinecraftUsername(notUpdated.getMinecraftUsername());
-					try {
-						logCommand("Error updating linked user: " + notUpdated.getMinecraftUsername());
-					} catch (Exception ignored) {}
-				});
+				.ifPresent(
+					notUpdated -> {
+						try {
+							DiscordInfoStruct discordInfo = getPlayerDiscordInfo(notUpdated.getMinecraftUsername());
+							User updateUser = jda.retrieveUserById(notUpdated.getDiscordId()).complete();
+							if (discordInfo.discordTag.equals(updateUser.getAsTag())) {
+								database.addLinkedUser(
+									new LinkedAccountModel(
+										"" + Instant.now().toEpochMilli(),
+										updateUser.getId(),
+										discordInfo.minecraftUuid,
+										discordInfo.minecraftUsername
+									)
+								);
+								try {
+									logCommand("Updated linked user: " + notUpdated.getMinecraftUsername());
+								} catch (Exception ignored) {}
+								return;
+							}
+						} catch (Exception ignored) {}
+						database.deleteLinkedUserByMinecraftUsername(notUpdated.getMinecraftUsername());
+						try {
+							logCommand("Error updating linked user: " + notUpdated.getMinecraftUsername());
+						} catch (Exception ignored) {}
+					}
+				);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}

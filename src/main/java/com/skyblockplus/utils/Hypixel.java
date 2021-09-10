@@ -21,6 +21,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
+import lombok.var;
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -39,7 +40,7 @@ public class Hypixel {
 
 	public static final ConcurrentHashMap<String, Instant> uuidToTimeSkyblockProfiles = new ConcurrentHashMap<>();
 
-	private static final String databaseUrl = "https://cache-skyblockplus.harperdbcloud.com";
+	private static final String cacheDatabaseUrl = "https://cache-skyblockplus.harperdbcloud.com";
 	private static final Pattern minecraftUsernameRegex = Pattern.compile("^\\w+$", Pattern.CASE_INSENSITIVE);
 	private static final Pattern minecraftUuidRegex = Pattern.compile(
 		"[0-9a-f]{32}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
@@ -121,16 +122,18 @@ public class Hypixel {
 					.prepareGet("https://api.ashcon.app/mojang/v2/user/" + uuid)
 					.execute()
 					.toCompletableFuture()
-					.thenApply(uuidToUsernameResponse -> {
-						try {
-							String username = Utils
-								.higherDepth(JsonParser.parseString(uuidToUsernameResponse.getResponseBody()), "username")
-								.getAsString();
-							uuidToUsernameCache.put(uuid, username);
-							return username;
-						} catch (Exception ignored) {}
-						return null;
-					});
+					.thenApply(
+						uuidToUsernameResponse -> {
+							try {
+								String username = Utils
+									.higherDepth(JsonParser.parseString(uuidToUsernameResponse.getResponseBody()), "username")
+									.getAsString();
+								uuidToUsernameCache.put(uuid, username);
+								return username;
+							} catch (Exception ignored) {}
+							return null;
+						}
+					);
 		}
 
 		return future;
@@ -177,27 +180,29 @@ public class Hypixel {
 					.prepareGet("https://api.hypixel.net/skyblock/profiles?key=" + hypixelApiKey + "&uuid=" + uuid)
 					.execute()
 					.toCompletableFuture()
-					.thenApply(profilesResponse -> {
-						try {
+					.thenApply(
+						profilesResponse -> {
 							try {
-								keyCooldownMap
-									.get(hypixelApiKey)
-									.remainingLimit.set(Integer.parseInt(profilesResponse.getHeader("RateLimit-Remaining")));
-								keyCooldownMap
-									.get(hypixelApiKey)
-									.timeTillReset.set(Integer.parseInt(profilesResponse.getHeader("RateLimit-Reset")));
+								try {
+									keyCooldownMap
+										.get(hypixelApiKey)
+										.remainingLimit.set(Integer.parseInt(profilesResponse.getHeader("RateLimit-Remaining")));
+									keyCooldownMap
+										.get(hypixelApiKey)
+										.timeTillReset.set(Integer.parseInt(profilesResponse.getHeader("RateLimit-Reset")));
+								} catch (Exception ignored) {}
+
+								JsonArray profileArray = processSkyblockProfilesArray(
+									higherDepth(JsonParser.parseString(profilesResponse.getResponseBody()), "profiles").getAsJsonArray()
+								);
+
+								cacheJson(uuid, profileArray);
+
+								return profileArray;
 							} catch (Exception ignored) {}
-
-							JsonArray profileArray = processSkyblockProfilesArray(
-								higherDepth(JsonParser.parseString(profilesResponse.getResponseBody()), "profiles").getAsJsonArray()
-							);
-
-							cacheJson(uuid, profileArray);
-
-							return profileArray;
-						} catch (Exception ignored) {}
-						return null;
-					});
+							return null;
+						}
+					);
 		}
 
 		return future;
@@ -280,7 +285,7 @@ public class Hypixel {
 
 	//	public static JsonArray getBidsFromPlayer(String uuid) {
 	//		try {
-	//			HttpGet httpget = new HttpGet("https://api.eastarcti.ca/skyblock/auctions/dev/");
+	//			HttpGet httpget = new HttpGet("https://query-api.kr45732.repl.co/");
 	//			httpget.addHeader("content-type", "application/json; charset=UTF-8");
 	//
 	//			URI uri = new URIBuilder(httpget.getURI())
@@ -294,91 +299,94 @@ public class Hypixel {
 	//		} catch (Exception ignored) {}
 	//		return null;
 	//	}
-	//
-	//	public static JsonArray queryLowestBin(String query) {
-	//		try {
-	//			HttpGet httpget = new HttpGet("https://api.eastarcti.ca/skyblock/auctions/dev/");
-	//			httpget.addHeader("content-type", "application/json; charset=UTF-8");
-	//
-	//			query = query.replace("[", "\\\\[");
-	//			URI uri = new URIBuilder(httpget.getURI())
-	//				.addParameter(
-	//					"query",
-	//					"{\"item_name\":{\"$regex\":\"" +
-	//					query +
-	//					"\",\"$options\":\"i\"},\"bin\":true,\"end\":{\"$gt\":" +
-	//					Instant.now().toEpochMilli() +
-	//					"}}"
-	//				)
-	//				.addParameter("sort", "{\"starting_bid\":1}")
-	//				.addParameter("limit", "1")
-	//				.build();
-	//			httpget.setURI(uri);
-	//
-	//			try (CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpget)) {
-	//				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
-	//			}
-	//		} catch (Exception ignored) {}
-	//		return null;
-	//	}
-	//
-	//	public static JsonArray queryLowestBinPet(String petName, String rarity) {
-	//		try {
-	//			HttpGet httpGet = new HttpGet("https://api.eastarcti.ca/skyblock/auctions/dev/");
-	//			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
-	//
-	//			petName = petName.replace("[", "\\\\[");
-	//			URI uri = new URIBuilder(httpGet.getURI())
-	//				.addParameter(
-	//					"query",
-	//					"{\"item_name\":{\"$regex\":\"" +
-	//					petName +
-	//					"\",\"$options\":\"i\"}," +
-	//					(!rarity.equalsIgnoreCase("any") ? "\"tier\":\"" + rarity.toUpperCase() + "\"," : "") +
-	//					"\"bin\":true,\"end\":{\"$gt\":" +
-	//					Instant.now().toEpochMilli() +
-	//					"},\"item_id\":\"PET\"}"
-	//				)
-	//				.addParameter("sort", "{\"starting_bid\":1}")
-	//				.addParameter("limit", "1")
-	//				.build();
-	//			httpGet.setURI(uri);
-	//
-	//			try (CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpGet)) {
-	//				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
-	//			}
-	//		} catch (Exception ignored) {}
-	//		return null;
-	//	}
-	//
-	//	public static JsonArray queryLowestBinEnchant(String enchantId, int enchantLevel) {
-	//		try {
-	//			HttpGet httpGet = new HttpGet("https://api.eastarcti.ca/skyblock/auctions/dev/");
-	//			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
-	//
-	//			URI uri = new URIBuilder(httpGet.getURI())
-	//				.addParameter(
-	//					"query",
-	//					"{\"item_id\":\"ENCHANTED_BOOK\",\"end\":{\"$gt\":" +
-	//					Instant.now().toEpochMilli() +
-	//					"},\"nbt.value.i.value.value.0.tag.value.ExtraAttributes.value.enchantments.value." +
-	//					enchantId.toLowerCase() +
-	//					".value\":" +
-	//					enchantLevel +
-	//					",\"bin\":true}"
-	//				)
-	//				.addParameter("sort", "{\"starting_bid\":1}")
-	//				.addParameter("limit", "1")
-	//				.build();
-	//			httpGet.setURI(uri);
-	//
-	//			try (CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpGet)) {
-	//				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
-	//			}
-	//		} catch (Exception ignored) {}
-	//		return null;
-	//	}
-	//
+
+	public static JsonArray queryLowestBin(String query) {
+		try {
+			HttpGet httpget = new HttpGet("https://query-api.kr45732.repl.co/");
+			httpget.addHeader("content-type", "application/json; charset=UTF-8");
+
+			query = query.replace("[", "\\\\[");
+			URI uri = new URIBuilder(httpget.getURI())
+				.addParameter(
+					"query",
+					"{\"item_name\":{\"$regex\":\"" +
+					query +
+					"\",\"$options\":\"i\"},\"end\":{\"$gt\":" +
+					Instant.now().toEpochMilli() +
+					"}}"
+				)
+				.addParameter("sort", "{\"starting_bid\":1}")
+				.addParameter("limit", "1")
+				.addParameter("key", AUCTION_API_KEY)
+				.build();
+			httpget.setURI(uri);
+
+			try (CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpget)) {
+				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
+			}
+		} catch (Exception ignored) {}
+		return null;
+	}
+
+	public static JsonArray queryLowestBinPet(String petName, String rarity) {
+		try {
+			HttpGet httpGet = new HttpGet("https://query-api.kr45732.repl.co/");
+			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
+
+			petName = petName.replace("[", "\\\\[");
+			URI uri = new URIBuilder(httpGet.getURI())
+				.addParameter(
+					"query",
+					"{\"item_name\":{\"$regex\":\"" +
+					petName +
+					"\",\"$options\":\"i\"}," +
+					(!rarity.equalsIgnoreCase("any") ? "\"tier\":\"" + rarity.toUpperCase() + "\"," : "") +
+					"\"end\":{\"$gt\":" +
+					Instant.now().toEpochMilli() +
+					"},\"item_id\":\"PET\"}"
+				)
+				.addParameter("sort", "{\"starting_bid\":1}")
+				.addParameter("limit", "1")
+				.addParameter("key", AUCTION_API_KEY)
+				.build();
+			httpGet.setURI(uri);
+
+			try (CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpGet)) {
+				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
+			}
+		} catch (Exception ignored) {}
+		return null;
+	}
+
+	public static JsonArray queryLowestBinEnchant(String enchantId, int enchantLevel) {
+		try {
+			HttpGet httpGet = new HttpGet("https://query-api.kr45732.repl.co/");
+			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
+
+			URI uri = new URIBuilder(httpGet.getURI())
+				.addParameter(
+					"query",
+					"{\"item_id\":\"ENCHANTED_BOOK\",\"end\":{\"$gt\":" +
+					Instant.now().toEpochMilli() +
+					"},\"enchants\":\"" +
+					enchantId.toUpperCase() +
+					";" +
+					enchantLevel +
+					"\"}"
+				)
+				.addParameter("sort", "{\"starting_bid\":1}")
+				.addParameter("limit", "1")
+				.addParameter("key", AUCTION_API_KEY)
+				.build();
+			httpGet.setURI(uri);
+
+			try (CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpGet)) {
+				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
+			}
+		} catch (Exception ignored) {}
+		return null;
+	}
+
 	public static JsonArray getAuctionPetsByName(String query) {
 		try {
 			HttpGet httpget = new HttpGet("https://auction-api.kr45732.repl.co/");
@@ -399,29 +407,31 @@ public class Hypixel {
 
 	@SuppressWarnings("EmptyTryBlock")
 	public static void cacheJson(String playerUuid, JsonElement json) {
-		executor.submit(() -> {
-			try {
-				uuidToTimeSkyblockProfiles.put(playerUuid, Instant.now());
+		executor.submit(
+			() -> {
+				try {
+					uuidToTimeSkyblockProfiles.put(playerUuid, Instant.now());
 
-				RequestBody body = RequestBody.create(
-					MediaType.parse("application/json"),
-					"{\"operation\":\"insert\",\"schema\":\"dev\",\"table\":\"profiles\",\"records\":[" +
-					"{\"uuid\":\"" +
-					playerUuid +
-					"\", \"data\":" +
-					json +
-					"}" +
-					"]}"
-				);
-				Request request = new Request.Builder()
-					.url(databaseUrl)
-					.method("POST", body)
-					.addHeader("Content-Type", "application/json")
-					.addHeader("Authorization", "Basic " + CACHE_DATABASE_TOKEN)
-					.build();
-				try (Response ignored = okHttpClient.newCall(request).execute()) {}
-			} catch (Exception ignored) {}
-		});
+					RequestBody body = RequestBody.create(
+						MediaType.parse("application/json"),
+						"{\"operation\":\"insert\",\"schema\":\"dev\",\"table\":\"profiles\",\"records\":[" +
+						"{\"uuid\":\"" +
+						playerUuid +
+						"\", \"data\":" +
+						json +
+						"}" +
+						"]}"
+					);
+					Request request = new Request.Builder()
+						.url(cacheDatabaseUrl)
+						.method("POST", body)
+						.addHeader("Content-Type", "application/json")
+						.addHeader("Authorization", "Basic " + CACHE_DATABASE_TOKEN)
+						.build();
+					try (Response ignored = okHttpClient.newCall(request).execute()) {}
+				} catch (Exception ignored) {}
+			}
+		);
 	}
 
 	public static JsonElement getCachedJson(String playerUuid) {
@@ -434,7 +444,7 @@ public class Hypixel {
 				"{\"operation\":\"sql\",\"sql\":\"SELECT * FROM dev.profiles where uuid = '" + playerUuid + "'\"}"
 			);
 			Request request = new Request.Builder()
-				.url(databaseUrl)
+				.url(cacheDatabaseUrl)
 				.method("POST", body)
 				.addHeader("Content-Type", "application/json")
 				.addHeader("Authorization", "Basic " + CACHE_DATABASE_TOKEN)
@@ -456,25 +466,27 @@ public class Hypixel {
 
 	@SuppressWarnings("EmptyTryBlock")
 	public static void deleteCachedJson(String... playerUuids) {
-		executor.submit(() -> {
-			for (String playerUuid : playerUuids) {
-				uuidToTimeSkyblockProfiles.remove(playerUuid);
-			}
+		executor.submit(
+			() -> {
+				for (String playerUuid : playerUuids) {
+					uuidToTimeSkyblockProfiles.remove(playerUuid);
+				}
 
-			RequestBody body = RequestBody.create(
-				MediaType.parse("application/json"),
-				"{\"operation\":\"delete\",\"table\":\"profiles\",\"schema\":\"dev\",\"hash_values\":[\"" +
-				String.join("\",\"", playerUuids) +
-				"\"]}"
-			);
-			Request request = new Request.Builder()
-				.url(databaseUrl)
-				.method("POST", body)
-				.addHeader("Content-Type", "application/json")
-				.addHeader("Authorization", "Basic " + CACHE_DATABASE_TOKEN)
-				.build();
-			try (Response ignored = okHttpClient.newCall(request).execute()) {} catch (Exception ignored) {}
-		});
+				RequestBody body = RequestBody.create(
+					MediaType.parse("application/json"),
+					"{\"operation\":\"delete\",\"table\":\"profiles\",\"schema\":\"dev\",\"hash_values\":[\"" +
+					String.join("\",\"", playerUuids) +
+					"\"]}"
+				);
+				Request request = new Request.Builder()
+					.url(cacheDatabaseUrl)
+					.method("POST", body)
+					.addHeader("Content-Type", "application/json")
+					.addHeader("Authorization", "Basic " + CACHE_DATABASE_TOKEN)
+					.build();
+				try (Response ignored = okHttpClient.newCall(request).execute()) {} catch (Exception ignored) {}
+			}
+		);
 	}
 
 	public static void scheduleDatabaseUpdated() {
@@ -491,7 +503,7 @@ public class Hypixel {
 				"\",\"schema\":\"dev\",\"table\":\"profiles\"}"
 			);
 			Request request = new Request.Builder()
-				.url(databaseUrl)
+				.url(cacheDatabaseUrl)
 				.method("POST", body)
 				.addHeader("Content-Type", "application/json")
 				.addHeader("Authorization", "Basic " + CACHE_DATABASE_TOKEN)

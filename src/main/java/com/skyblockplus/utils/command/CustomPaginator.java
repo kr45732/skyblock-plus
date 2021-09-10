@@ -10,18 +10,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
-import net.dv8tion.jda.api.exceptions.PermissionException;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import net.dv8tion.jda.api.requests.RestAction;
+import net.dv8tion.jda.api.requests.restaction.MessageAction;
+import net.dv8tion.jda.api.requests.restaction.WebhookMessageUpdateAction;
 import net.dv8tion.jda.internal.utils.Checks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,18 +34,15 @@ public class CustomPaginator extends Menu {
 			log.error(e.getMessage(), e);
 		}
 	};
-	private static final String BIG_LEFT = "\u23EA";
-	private static final String LEFT = "\u25C0";
-	private static final String RIGHT = "\u25B6";
-	private static final String BIG_RIGHT = "\u23E9";
-	private final BiFunction<Integer, Integer, Color> color;
+	private static final String LEFT = "paginator_left_button";
+	private static final String RIGHT = "paginator_right_button";
+	private final Color color;
 	private final int columns;
 	private final int itemsPerPage;
 	private final boolean showPageNumbers;
 	private final List<String> strings;
 	private final int pages;
 	private final Consumer<Message> finalAction;
-	private final int bulkSkipNumber;
 	private final boolean wrapPageEnds;
 	private final PaginatorExtras extras;
 
@@ -56,13 +52,12 @@ public class CustomPaginator extends Menu {
 		Set<Role> roles,
 		long timeout,
 		TimeUnit unit,
-		BiFunction<Integer, Integer, Color> color,
+		Color color,
 		Consumer<Message> finalAction,
 		int columns,
 		int itemsPerPage,
 		boolean showPageNumbers,
 		List<String> items,
-		int bulkSkipNumber,
 		boolean wrapPageEnds,
 		PaginatorExtras extras
 	) {
@@ -75,7 +70,6 @@ public class CustomPaginator extends Menu {
 		this.extras = extras;
 		this.pages = (int) Math.ceil((double) Math.max(extras.getEmbedFields().size(), strings.size()) / itemsPerPage);
 		this.finalAction = finalAction;
-		this.bulkSkipNumber = bulkSkipNumber;
 		this.wrapPageEnds = wrapPageEnds;
 	}
 
@@ -90,102 +84,128 @@ public class CustomPaginator extends Menu {
 	}
 
 	public void paginate(MessageChannel channel, int pageNum) {
-		if (pageNum < 1) pageNum = 1; else if (pageNum > pages) pageNum = pages;
-		Message msg = renderPage(pageNum);
+		if (pageNum < 1) {
+			pageNum = 1;
+		} else if (pageNum > pages) {
+			pageNum = pages;
+		}
+		Message msg = new MessageBuilder().setEmbeds(getEmbedRender(pageNum)).build();
 		initialize(channel.sendMessage(msg), pageNum);
 	}
 
 	public void paginate(InteractionHook channel, int pageNum) {
-		if (pageNum < 1) pageNum = 1; else if (pageNum > pages) pageNum = pages;
-		Message msg = renderPage(pageNum);
+		if (pageNum < 1) {
+			pageNum = 1;
+		} else if (pageNum > pages) {
+			pageNum = pages;
+		}
+		Message msg = new MessageBuilder().setEmbeds(getEmbedRender(pageNum)).build();
 		initialize(channel.editOriginal(msg), pageNum);
 	}
 
 	public void paginate(Message message, int pageNum) {
-		if (pageNum < 1) pageNum = 1; else if (pageNum > pages) pageNum = pages;
-		Message msg = renderPage(pageNum);
+		if (pageNum < 1) {
+			pageNum = 1;
+		} else if (pageNum > pages) {
+			pageNum = pages;
+		}
+
+		Message msg = new MessageBuilder().setEmbeds(getEmbedRender(pageNum)).build();
 		initialize(message.editMessage(msg), pageNum);
 	}
 
 	private void initialize(RestAction<Message> action, int pageNum) {
-		action.queue(m -> {
-			if (pages > 1) {
-				if (bulkSkipNumber > 1) m.addReaction(BIG_LEFT).queue();
-				m.addReaction(LEFT).queue();
-				if (bulkSkipNumber > 1) m.addReaction(RIGHT).queue();
-				m.addReaction(bulkSkipNumber > 1 ? BIG_RIGHT : RIGHT).queue(v -> pagination(m, pageNum), t -> pagination(m, pageNum));
+		if (pages > 1) {
+			if (action instanceof MessageAction) {
+				((MessageAction) action).setActionRow(
+						Button.primary(LEFT, Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")),
+						Button.primary(RIGHT, Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
+					);
+			} else if (action instanceof WebhookMessageUpdateAction) {
+				((WebhookMessageUpdateAction<Message>) action).setActionRow(
+						Button.primary(LEFT, Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")),
+						Button.primary(RIGHT, Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
+					);
 			} else {
-				finalAction.accept(m);
+				log.error("This shouldn't happen | Class: " + action.getClass() + " | Action: " + action);
 			}
-		});
+		}
+
+		action.queue(
+			m -> {
+				if (pages > 1) {
+					pagination(m, pageNum);
+				} else {
+					finalAction.accept(m);
+				}
+			},
+			throwableConsumer
+		);
 	}
 
 	private void pagination(Message message, int pageNum) {
 		waiter.waitForEvent(
-			MessageReactionAddEvent.class,
-			event -> checkReaction(event, message.getIdLong()),
-			event -> handleMessageReactionAddAction(event, message, pageNum),
+			ButtonClickEvent.class,
+			event -> checkButton(event, message.getIdLong()),
+			event -> handleButtonClick(event, pageNum),
 			timeout,
 			unit,
 			() -> finalAction.accept(message)
 		);
 	}
 
-	private boolean checkReaction(MessageReactionAddEvent event, long messageId) {
-		if (event.getMessageIdLong() != messageId) return false;
-		switch (event.getReactionEmote().getName()) {
+	private boolean checkButton(ButtonClickEvent event, long messageId) {
+		if (event.getMessageIdLong() != messageId) {
+			return false;
+		}
+
+		if (event.getButton() == null || event.getButton().getId() == null) {
+			return false;
+		}
+
+		switch (event.getButton().getId()) {
 			case LEFT:
 			case RIGHT:
 				return isValidUser(event.getUser(), event.isFromGuild() ? event.getGuild() : null);
-			case BIG_LEFT:
-			case BIG_RIGHT:
-				return (bulkSkipNumber > 1 && isValidUser(event.getUser(), event.isFromGuild() ? event.getGuild() : null));
 			default:
-				event.getReaction().removeReaction(event.getUser()).queue(null, throwableConsumer);
+				event
+					.editButton(event.getButton().asDisabled().withId("disabled").withLabel("Disabled").withStyle(ButtonStyle.DANGER))
+					.queue();
 				return false;
 		}
 	}
 
-	private void handleMessageReactionAddAction(MessageReactionAddEvent event, Message message, int pageNum) {
+	private void handleButtonClick(ButtonClickEvent event, int pageNum) {
+		if (event.getButton() == null || event.getButton().getId() == null) {
+			return;
+		}
+
 		int newPageNum = pageNum;
 
-		switch (event.getReaction().getReactionEmote().getName()) {
+		switch (event.getButton().getId()) {
 			case LEFT:
-				if (newPageNum == 1 && wrapPageEnds) newPageNum = pages + 1;
-				if (newPageNum > 1) newPageNum--;
-				break;
-			case RIGHT:
-				if (newPageNum == pages && wrapPageEnds) newPageNum = 0;
-				if (newPageNum < pages) newPageNum++;
-				break;
-			case BIG_LEFT:
-				if (newPageNum > 1 || wrapPageEnds) {
-					for (int i = 1; (newPageNum > 1 || wrapPageEnds) && i < bulkSkipNumber; i++) {
-						if (newPageNum == 1) newPageNum = pages + 1;
-						newPageNum--;
-					}
+				if (newPageNum == 1 && wrapPageEnds) {
+					newPageNum = pages + 1;
+				}
+				if (newPageNum > 1) {
+					newPageNum--;
 				}
 				break;
-			case BIG_RIGHT:
-				if (newPageNum < pages || wrapPageEnds) {
-					for (int i = 1; (newPageNum < pages || wrapPageEnds) && i < bulkSkipNumber; i++) {
-						if (newPageNum == pages) newPageNum = 0;
-						newPageNum++;
-					}
+			case RIGHT:
+				if (newPageNum == pages && wrapPageEnds) {
+					newPageNum = 0;
+				}
+				if (newPageNum < pages) {
+					newPageNum++;
 				}
 				break;
 		}
 
-		try {
-			event.getReaction().removeReaction(event.getUser()).queue(null, throwableConsumer);
-		} catch (PermissionException ignored) {}
-
 		int n = newPageNum;
-		message.editMessage(renderPage(newPageNum)).queue(m -> pagination(m, n), throwableConsumer);
+		event.editMessageEmbeds(getEmbedRender(newPageNum)).queue(hook -> pagination(event.getMessage(), n), throwableConsumer);
 	}
 
-	private Message renderPage(int pageNum) {
-		MessageBuilder messageBuilder = new MessageBuilder();
+	private MessageEmbed getEmbedRender(int pageNum) {
 		EmbedBuilder embedBuilder = new EmbedBuilder();
 
 		try {
@@ -241,24 +261,23 @@ public class CustomPaginator extends Menu {
 			}
 		}
 
-		embedBuilder.setColor(color.apply(pageNum, pages));
+		embedBuilder.setColor(color);
 		if (showPageNumbers) {
 			embedBuilder.setFooter("Created By CrypticPlasma • Page " + pageNum + "/" + pages, null);
 		}
 		embedBuilder.setTimestamp(Instant.now());
-		messageBuilder.setEmbeds(embedBuilder.build());
-		return messageBuilder.build();
+
+		return embedBuilder.build();
 	}
 
 	public static class Builder extends Menu.Builder<CustomPaginator.Builder, CustomPaginator> {
 
 		private final List<String> strings = new LinkedList<>();
-		private BiFunction<Integer, Integer, Color> color = (page, pages) -> null;
+		private Color color = null;
 		private Consumer<Message> finalAction = m -> m.delete().queue(null, throwableConsumer);
 		private int columns = 1;
 		private int itemsPerPage = 12;
 		private boolean showPageNumbers = true;
-		private int bulkSkipNumber = 1;
 		private boolean wrapPageEnds = false;
 		private PaginatorExtras extras = new PaginatorExtras();
 
@@ -279,14 +298,13 @@ public class CustomPaginator extends Menu {
 				itemsPerPage,
 				showPageNumbers,
 				strings,
-				bulkSkipNumber,
 				wrapPageEnds,
 				extras
 			);
 		}
 
 		public Builder setColor(Color color) {
-			this.color = (i0, i1) -> color;
+			this.color = color;
 			return this;
 		}
 
@@ -324,11 +342,6 @@ public class CustomPaginator extends Menu {
 		public Builder setItems(String... items) {
 			strings.clear();
 			strings.addAll(Arrays.asList(items));
-			return this;
-		}
-
-		public Builder setBulkSkipNumber(int bulkSkipNumber) {
-			this.bulkSkipNumber = Math.max(bulkSkipNumber, 1);
 			return this;
 		}
 

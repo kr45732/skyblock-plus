@@ -13,7 +13,7 @@ plugins {
 }
 
 version = '0.0.1'
-sourceCompatibility = targetCompatibility = 1.8
+sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 mainClassName = 'com.skyblockplus.Main'
 
 task stage(dependsOn: ['shadowJar']) {
@@ -33,7 +33,7 @@ repositories {
 
 dependencies {
     // JDA (Discord API wrapper)
-     implementation ('net.dv8tion:JDA:4.3.0_315') {
+     implementation ('net.dv8tion:JDA:4.3.0_324') {
          exclude module: 'opus-java'
      }
 

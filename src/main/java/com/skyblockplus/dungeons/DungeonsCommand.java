@@ -41,7 +41,12 @@ public class DungeonsCommand extends Command {
 				extras
 					.setEveryPageTitle(player.getUsername())
 					.setEveryPageTitleUrl(player.skyblockStatsLink())
-					.setEveryPageText("**Secrets:** " + formatNumber(player.getDungeonSecrets()));
+					.setEveryPageText(
+						"**Secrets:** " +
+						formatNumber(player.getDungeonSecrets()) +
+						"\n**Selected class:** " +
+						player.getSelectedDungeonClass()
+					);
 
 				SkillsStruct skillInfo = player.getCatacombsSkill();
 				extras.addEmbedField(
