@@ -132,7 +132,7 @@ public class SkyblockEventCommand extends Command {
 						Player guildMemberPlayer = new Player(
 							guildMemberUuid,
 							guildMemberUsernameResponse,
-								guildMemberProfile,
+							guildMemberProfile,
 							guildMemberProfileJsonResponse
 						);
 
