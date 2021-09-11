@@ -131,8 +131,8 @@ public class SkyblockEventCommand extends Command {
 					return guildMemberProfileJson.thenApply(guildMemberProfileJsonResponse -> {
 						Player guildMemberPlayer = new Player(
 							guildMemberUuid,
-							guildMemberProfile,
 							guildMemberUsernameResponse,
+								guildMemberProfile,
 							guildMemberProfileJsonResponse
 						);
 
