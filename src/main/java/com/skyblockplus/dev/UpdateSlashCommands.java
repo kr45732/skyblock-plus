@@ -114,6 +114,44 @@ public class UpdateSlashCommands extends Command {
 			new CommandData("query", "Query the auction house for the lowest bin of an item")
 				.addOption(OptionType.STRING, "item", "Item name", true),
 			new CommandData("bits", "Get the price of an item from the bits shop").addOption(OptionType.STRING, "item", "Item name", true),
+			new CommandData("inventory", "Main inventory command")
+				.addSubcommands(
+					new SubcommandData("list", "Get a list of the player's inventory with lore")
+						.addOption(OptionType.STRING, "player", "Player username or mention")
+						.addOption(OptionType.STRING, "profile", "Profile name")
+						.addOption(OptionType.INTEGER, "slot", "Slot number"),
+					new SubcommandData("emoji", "Get a player's inventory represented in emojis")
+						.addOption(OptionType.STRING, "player", "Player username or mention")
+						.addOption(OptionType.STRING, "profile", "Profile name")
+				),
+			new CommandData("armor", "Get a player's equipped armor with lore")
+				.addOption(OptionType.STRING, "player", "Player username or mention")
+				.addOption(OptionType.STRING, "profile", "Profile name"),
+			new CommandData("enderchest", "Get a player's enderchest represented in emojis")
+				.addOption(OptionType.STRING, "player", "Player username or mention")
+				.addOption(OptionType.STRING, "profile", "Profile name"),
+			new CommandData("talisman", "Main talisman bag command")
+				.addSubcommands(
+					new SubcommandData("list", "Get a list of the player's talisman bag with lore")
+						.addOption(OptionType.STRING, "player", "Player username or mention")
+						.addOption(OptionType.STRING, "profile", "Profile name")
+						.addOption(OptionType.INTEGER, "slot", "Slot number"),
+					new SubcommandData("emoji", "Get a player's talisman bag represented in emojis")
+						.addOption(OptionType.STRING, "player", "Player username or mention")
+						.addOption(OptionType.STRING, "profile", "Profile name")
+				),
+			new CommandData("sacks", "Get a player's sacks' content bag represented in a list")
+				.addOption(OptionType.STRING, "player", "Player username or mention")
+				.addOption(OptionType.STRING, "profile", "Profile name"),
+			new CommandData("wardrobe", "Main wardrobe bag command")
+				.addSubcommands(
+					new SubcommandData("list", "Get a list of a player's wardrobe with lore")
+						.addOption(OptionType.STRING, "player", "Player username or mention")
+						.addOption(OptionType.STRING, "profile", "Profile name"),
+					new SubcommandData("emoji", "Get a player's wardrobe represented in emojis")
+						.addOption(OptionType.STRING, "player", "Player username or mention")
+						.addOption(OptionType.STRING, "profile", "Profile name")
+				),
 			new CommandData("roles", "Main roles command")
 				.addSubcommands(
 					new SubcommandData("claim", "Claim automatic Skyblock roles. The player must be linked to the bot")
@@ -170,9 +208,10 @@ public class UpdateSlashCommands extends Command {
 					new SubcommandData("leaderboard", "Get the leaderboard for current event")
 				),
 			new CommandData("fetchur", "Get the item that fetchur wants today"),
-			new CommandData("networth", "Calculate a player's networth.")
+			new CommandData("networth", "Calculate a player's networth")
 				.addOption(OptionType.STRING, "player", "Player username or mention")
-				.addOption(OptionType.STRING, "profile", "Profile name"),
+				.addOption(OptionType.STRING, "profile", "Profile name")
+				.addOption(OptionType.BOOLEAN, "verbose", "Links a detailed JSON with a breakdown of value of each item"),
 		};
 	}
 }

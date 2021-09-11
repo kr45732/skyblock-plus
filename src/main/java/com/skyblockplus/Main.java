@@ -130,7 +130,6 @@ public class Main {
 				new BidsCommand(),
 				new BitsCommand(),
 				new EvaluateCommand(),
-				new GuildRequirementsCommand(),
 				new GuildKickerCommand(),
 				new MissingTalismansCommand(),
 				new UpdateSlashCommands(),
@@ -172,7 +171,13 @@ public class Main {
 			new SetupSlashCommand(),
 			new SkyblockEventSlashCommand(),
 			new FetchurSlashCommand(),
-			new NetworthSlashCommand()
+			new NetworthSlashCommand(),
+			new InventorySlashCommand(),
+			new ArmorSlashCommand(),
+			new EnderChestSlashCommand(),
+			new TalismanBagSlashCommand(),
+			new SacksSlashCommand(),
+			new WardrobeSlashCommand()
 		);
 
 		jda =

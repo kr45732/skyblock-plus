@@ -14,6 +14,9 @@ import com.skyblockplus.utils.structs.PaginatorExtras;
 import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 
 public class WardrobeCommand extends Command {
 
@@ -36,7 +39,9 @@ public class WardrobeCommand extends Command {
 						return;
 					}
 
-					paginate(getPlayerWardrobeList(username, args.length == 4 ? args[3] : null, event));
+					paginate(
+						getPlayerWardrobeList(username, args.length == 4 ? args[3] : null, event.getAuthor(), event.getChannel(), null)
+					);
 					return;
 				} else if (args.length == 3 || args.length == 2 || args.length == 1) {
 					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
@@ -79,12 +84,18 @@ public class WardrobeCommand extends Command {
 		return null;
 	}
 
-	private EmbedBuilder getPlayerWardrobeList(String username, String profileName, CommandEvent event) {
+	public static EmbedBuilder getPlayerWardrobeList(
+		String username,
+		String profileName,
+		User user,
+		MessageChannel channel,
+		InteractionHook hook
+	) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			Map<Integer, ArmorStruct> armorStructMap = player.getWardrobeList();
 			if (armorStructMap != null) {
-				CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(4);
+				CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, user).setColumns(1).setItemsPerPage(4);
 
 				for (Map.Entry<Integer, ArmorStruct> currentArmour : armorStructMap.entrySet()) {
 					paginateBuilder.addItems(
@@ -107,7 +118,11 @@ public class WardrobeCommand extends Command {
 						.setEveryPageThumbnail(player.getThumbnailUrl())
 						.setEveryPageTitleUrl(player.skyblockStatsLink())
 				);
-				paginateBuilder.build().paginate(event.getChannel(), 0);
+				if (channel != null) {
+					paginateBuilder.build().paginate(channel, 0);
+				} else {
+					paginateBuilder.build().paginate(hook, 0);
+				}
 				return null;
 			}
 		}

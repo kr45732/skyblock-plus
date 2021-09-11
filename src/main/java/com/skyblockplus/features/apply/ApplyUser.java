@@ -2,8 +2,10 @@ package com.skyblockplus.features.apply;
 
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.formatNumber;
 
 import com.google.gson.*;
+import com.skyblockplus.networth.NetworthExecute;
 import com.skyblockplus.utils.Player;
 import java.io.Serializable;
 import java.util.*;
@@ -29,11 +31,13 @@ public class ApplyUser implements Serializable {
 	public String reactMessageId;
 	public int state = 0;
 	public String staffChannelId;
+	// Embed
 	public String playerSlayer;
 	public String playerSkills;
 	public String playerCatacombs;
 	public String playerWeight;
 	public String playerUsername;
+	public String playerCoins;
 	public String ironmanSymbol = "";
 	public String playerProfileName;
 
@@ -197,10 +201,26 @@ public class ApplyUser implements Serializable {
 		Message reactMessage;
 		if (!meetReqs) {
 			EmbedBuilder reqEmbed = defaultEmbed("Does not meet requirements");
-			reqEmbed.setDescription("You do not meet any of the following requirements:\n" + missingReqsStr);
-			reqEmbed.appendDescription(
-				"\n\n• If you think these values are incorrect make sure all your APIs are enabled and/or try relinking"
+			reqEmbed.setDescription(
+				"**Your statistics:**\n• Slayer - " +
+				formatNumber(player.getTotalSlayer()) +
+				" | Skill Average - " +
+				(player.getSkillAverage() == -1 ? "API disabled" : formatNumber(player.getSkillAverage())) +
+				" | Catacombs - " +
+				formatNumber(player.getCatacombsLevel()) +
+				" | Weight - " +
+				formatNumber(player.getWeight())
 			);
+			reqEmbed.appendDescription("\n\n**You do not meet any of the following requirements:**\n" + missingReqsStr);
+			reqEmbed.appendDescription(
+				"\nIf you think these values are incorrect make sure all your APIs are enabled and/or try relinking"
+			);
+
+			playerSlayer = formatNumber(player.getTotalSlayer());
+			playerSkills = roundAndFormat(player.getSkillAverage());
+			playerSkills = playerSkills.equals("-1") ? "API disabled" : playerSkills;
+			playerCatacombs = roundAndFormat(player.getCatacombsLevel());
+			playerWeight = roundAndFormat(player.getWeight());
 
 			reactMessage =
 				applicationChannel
@@ -239,12 +259,15 @@ public class ApplyUser implements Serializable {
 			playerUsername = player.getUsername();
 			ironmanSymbol = higherDepth(player.getOuterProfileJson(), "game_mode") != null ? " ♻️" : "";
 			playerProfileName = player.getProfileName();
+			double bankCoins = player.getBankBalance();
+			playerCoins = (bankCoins != -1 ? simplifyNumber(bankCoins) : "API disabled") + " + " + simplifyNumber(player.getPurseCoins());
 
 			EmbedBuilder statsEmbed = player.defaultPlayerEmbed();
-			statsEmbed.setDescription("**Weight:** " + playerWeight);
+			statsEmbed.addField("Weight", playerWeight, true);
 			statsEmbed.addField("Total slayer", playerSlayer, true);
 			statsEmbed.addField("Progress skill level", playerSkills, true);
 			statsEmbed.addField("Catacombs level", "" + playerCatacombs, true);
+			statsEmbed.addField("Bank & purse coins", playerCoins, true);
 
 			reactMessage =
 				applicationChannel
@@ -290,10 +313,21 @@ public class ApplyUser implements Serializable {
 						staffChannelId = staffChannel.getId();
 
 						EmbedBuilder applyPlayerStats = defaultPlayerEmbed();
-						applyPlayerStats.setDescription("**Weight:** " + playerWeight);
+						applyPlayerStats.addField("Weight", playerWeight, true);
 						applyPlayerStats.addField("Total slayer", playerSlayer, true);
 						applyPlayerStats.addField("Progress average skill level", playerSkills, true);
 						applyPlayerStats.addField("Catacombs level", playerCatacombs, true);
+						applyPlayerStats.addField("Bank & purse coins", playerCoins, true);
+						String networthStr = "Inventory API disabled";
+						try {
+							networthStr =
+								new NetworthExecute()
+									.getPlayerNetworth(playerUsername, playerProfileName)
+									.getDescriptionBuilder()
+									.toString()
+									.split("Total Networth: ")[1];
+						} catch (Exception ignored) {}
+						applyPlayerStats.addField("Networth", networthStr, true);
 						applyPlayerStats.setThumbnail("https://cravatar.eu/helmavatar/" + playerUsername + "/64.png");
 						String waitlistMsg = higherDepth(currentSettings, "waitlistedMessageText", null);
 

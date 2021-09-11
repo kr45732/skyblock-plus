@@ -50,6 +50,11 @@ public class NetworthExecute {
 	private double fumingPrice;
 	private double hbpPrice;
 
+	public NetworthExecute setVerbose(boolean verbose) {
+		this.verbose = verbose;
+		return this;
+	}
+
 	public void execute(Command command, CommandEvent event) {
 		new CommandExecute(command, event) {
 			@Override
@@ -349,17 +354,17 @@ public class NetworthExecute {
 	private void calculateAllPetsPrice() {
 		StringBuilder queryStr = new StringBuilder();
 		for (InvItem item : invPets) {
-			queryStr.append("\"").append(item.getAuctionApiName()).append("\",");
+			queryStr.append("\"").append(item.getPetApiName()).append("\",");
 		}
 		for (InvItem item : petsPets) {
-			queryStr.append("\"").append(item.getAuctionApiName()).append("\",");
+			queryStr.append("\"").append(item.getPetApiName()).append("\",");
 		}
 		for (InvItem item : enderChestPets) {
-			queryStr.append("\"").append(item.getAuctionApiName()).append("\",");
+			queryStr.append("\"").append(item.getPetApiName()).append("\",");
 		}
 
 		for (InvItem item : storagePets) {
-			queryStr.append("\"").append(item.getAuctionApiName()).append("\",");
+			queryStr.append("\"").append(item.getPetApiName()).append("\",");
 		}
 
 		if (queryStr.length() == 0) {
@@ -376,7 +381,7 @@ public class NetworthExecute {
 
 				for (Iterator<InvItem> iterator = invPets.iterator(); iterator.hasNext();) {
 					InvItem item = iterator.next();
-					if (item.getAuctionApiName().equals(auctionName)) {
+					if (item.getPetApiName().equals(auctionName)) {
 						StringBuilder miscStr = new StringBuilder("[");
 						double miscExtras = 0;
 						try {
@@ -421,7 +426,7 @@ public class NetworthExecute {
 
 				for (Iterator<InvItem> iterator = petsPets.iterator(); iterator.hasNext();) {
 					InvItem item = iterator.next();
-					if (item.getAuctionApiName().equals(auctionName)) {
+					if (item.getPetApiName().equals(auctionName)) {
 						StringBuilder miscStr = new StringBuilder("[");
 						double miscExtras = 0;
 						try {
@@ -466,7 +471,7 @@ public class NetworthExecute {
 
 				for (Iterator<InvItem> iterator = enderChestPets.iterator(); iterator.hasNext();) {
 					InvItem item = iterator.next();
-					if (item.getAuctionApiName().equals(auctionName)) {
+					if (item.getPetApiName().equals(auctionName)) {
 						StringBuilder miscStr = new StringBuilder("[");
 						double miscExtras = 0;
 						try {
@@ -511,7 +516,7 @@ public class NetworthExecute {
 
 				for (Iterator<InvItem> iterator = storagePets.iterator(); iterator.hasNext();) {
 					InvItem item = iterator.next();
-					if (item.getAuctionApiName().equals(auctionName)) {
+					if (item.getPetApiName().equals(auctionName)) {
 						StringBuilder miscStr = new StringBuilder("[");
 						double miscExtras = 0;
 						try {
@@ -1197,7 +1202,7 @@ public class NetworthExecute {
 
 				for (JsonElement itemPrice : sbzPrices) {
 					String itemName = higherDepth(itemPrice, "name").getAsString();
-					if (itemName.equalsIgnoreCase(itemId) || itemName.equalsIgnoreCase(itemName.toLowerCase().replace(" ", "_"))) {
+					if (itemName.equalsIgnoreCase(itemId) || itemName.equalsIgnoreCase(itemId.toLowerCase().replace(" ", "_"))) {
 						return Math.max(higherDepth(itemPrice, "low").getAsDouble(), 0);
 					}
 				}

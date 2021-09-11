@@ -53,7 +53,7 @@ public class InvItem {
 		this.backpackItems.addAll(backpackItems);
 	}
 
-	public String getAuctionApiName() {
+	public String getPetApiName() {
 		return (getName() + "_" + getRarity()).toUpperCase().replace(" ", "_");
 	}
 }

@@ -14,6 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 
 public class InventoryCommand extends Command {
 
@@ -39,8 +42,19 @@ public class InventoryCommand extends Command {
 						return;
 					}
 
+					int slotNumber = 0;
+					try {
+						slotNumber = Integer.parseInt(args.length == 4 ? args[3] : args[2].replace("slot:", ""));
+					} catch (Exception ignored) {}
 					paginate(
-						getPlayerInventoryList(username, args.length == 4 ? args[2] : null, args.length == 4 ? args[3] : args[2], event)
+						getPlayerInventoryList(
+							username,
+							args.length == 4 ? args[2] : null,
+							slotNumber,
+							event.getAuthor(),
+							event.getChannel(),
+							null
+						)
 					);
 					return;
 				} else if (args.length == 3 || args.length == 2 || args.length == 1) {
@@ -60,7 +74,7 @@ public class InventoryCommand extends Command {
 								.queue();
 						}
 					} else {
-						embed(invalidEmbed("Unable to fetch player data"));
+						embed(invalidEmbed("Inventory API disabled"));
 					}
 					return;
 				}
@@ -71,7 +85,14 @@ public class InventoryCommand extends Command {
 			.submit();
 	}
 
-	private EmbedBuilder getPlayerInventoryList(String username, String profileName, String slotNum, CommandEvent event) {
+	public static EmbedBuilder getPlayerInventoryList(
+		String username,
+		String profileName,
+		int slotNum,
+		User user,
+		MessageChannel channel,
+		InteractionHook hook
+	) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			Map<Integer, InvItem> inventoryMap = player.getInventoryMap();
@@ -79,7 +100,7 @@ public class InventoryCommand extends Command {
 				List<String> pageTitles = new ArrayList<>();
 				List<String> pageThumbnails = new ArrayList<>();
 
-				CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(1);
+				CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, user).setColumns(1).setItemsPerPage(1);
 
 				for (Map.Entry<Integer, InvItem> currentInvSlot : inventoryMap.entrySet()) {
 					InvItem currentInvStruct = currentInvSlot.getValue();
@@ -104,18 +125,18 @@ public class InventoryCommand extends Command {
 				}
 				paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles).setThumbnails(pageThumbnails));
 
-				int slotNumber = 1;
-				try {
-					slotNumber = Integer.parseInt(slotNum.replace("slot:", ""));
-				} catch (Exception ignored) {}
-				paginateBuilder.build().paginate(event.getChannel(), slotNumber);
+				if (channel != null) {
+					paginateBuilder.build().paginate(channel, slotNum);
+				} else {
+					paginateBuilder.build().paginate(hook, slotNum);
+				}
 				return null;
 			}
 		}
 		return invalidEmbed(player.getFailCause());
 	}
 
-	private String[] getPlayerInventory(String username, String profileName) {
+	public static String[] getPlayerInventory(String username, String profileName) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			String[] temp = player.getInventory();

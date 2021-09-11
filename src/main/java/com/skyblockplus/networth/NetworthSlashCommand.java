@@ -17,6 +17,10 @@ public class NetworthSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.embed(new NetworthExecute().getPlayerNetworth(event.player, event.getOptionStr("profile")));
+		event.embed(
+			new NetworthExecute()
+				.setVerbose(event.getOptionBoolean("verbose", false))
+				.getPlayerNetworth(event.player, event.getOptionStr("profile"))
+		);
 	}
 }

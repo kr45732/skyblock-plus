@@ -383,7 +383,7 @@ public class Player {
 			case "enderman":
 				return higherDepth(profileSlayer, "enderman.xp", 0);
 		}
-		return -1;
+		return 0;
 	}
 
 	public int getSlayerLevel(String slayerName) {
@@ -437,6 +437,7 @@ public class Player {
 				}
 				return prevEndermanMax;
 		}
+
 		return 0;
 	}
 

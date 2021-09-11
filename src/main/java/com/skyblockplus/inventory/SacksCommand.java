@@ -9,8 +9,12 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.PaginatorExtras;
+import java.util.Collections;
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 
 public class SacksCommand extends Command {
 
@@ -31,7 +35,7 @@ public class SacksCommand extends Command {
 						return;
 					}
 
-					paginate(getPlayerSacks(username, args.length == 3 ? args[2] : null, event));
+					paginate(getPlayerSacks(username, args.length == 3 ? args[2] : null, event.getAuthor(), event.getChannel(), null));
 					return;
 				}
 
@@ -41,23 +45,39 @@ public class SacksCommand extends Command {
 			.submit();
 	}
 
-	private EmbedBuilder getPlayerSacks(String username, String profileName, CommandEvent event) {
+	public static EmbedBuilder getPlayerSacks(
+		String username,
+		String profileName,
+		User user,
+		MessageChannel channel,
+		InteractionHook hook
+	) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			Map<String, Integer> sacksMap = player.getPlayerSacks();
 			if (sacksMap != null) {
-				CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(20);
+				CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, user).setColumns(1).setItemsPerPage(20);
 
-				for (Map.Entry<String, Integer> currentSack : sacksMap.entrySet()) {
-					paginateBuilder.addItems("**" + convertSkyblockIdName(currentSack.getKey()) + "**: " + currentSack.getValue());
-				}
+				sacksMap
+					.entrySet()
+					.stream()
+					.sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+					.forEach(
+						currentSack ->
+							paginateBuilder.addItems("**" + convertSkyblockIdName(currentSack.getKey()) + "**: " + currentSack.getValue())
+					);
+
 				paginateBuilder.setPaginatorExtras(
 					new PaginatorExtras()
 						.setEveryPageTitle(player.getUsername())
 						.setEveryPageThumbnail(player.getThumbnailUrl())
 						.setEveryPageTitleUrl(player.skyblockStatsLink())
 				);
-				paginateBuilder.build().paginate(event.getChannel(), 0);
+				if (channel != null) {
+					paginateBuilder.build().paginate(channel, 0);
+				} else {
+					paginateBuilder.build().paginate(hook, 0);
+				}
 				return null;
 			}
 		}

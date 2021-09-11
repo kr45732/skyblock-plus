@@ -70,10 +70,10 @@ public class HelpCommand extends Command {
 		this.name = "help";
 		this.aliases = new String[] { "commands" };
 		this.cooldown = globalCooldown;
-		addHelpList();
+		setHelpList();
 	}
 
-	public static void addHelpList() {
+	public static void setHelpList() {
 		helpDataList.clear();
 		helpDataList.addAll(
 			Arrays.asList(
@@ -125,8 +125,6 @@ public class HelpCommand extends Command {
 							.addExamples("experience u:CrypticPlasma")
 					)
 					.addAliases("g"),
-				new HelpData("guild-requirements", "Get the application requirements set for an application.", "guild-requirements [name]")
-					.addAliases("g-reqs", "guild-reqs"),
 				new HelpData(
 					"guild-leaderboard",
 					"Get a leaderboard for a guild. The type can be slayer, skills, catacombs, weight, sven_xp, rev_xp, tara_xp, and enderman_xp. A Hypixel API key must be set in " +
@@ -252,7 +250,8 @@ public class HelpCommand extends Command {
 						new HelpData("delete", "Delete certain settings or all settings from the database.")
 							.addSubcommands(
 								new HelpData("all", "Delete the current server settings."),
-								new HelpData("hypixel_key", "Delete the set Hypixel API of this server.")
+								new HelpData("hypixel_key", "Delete the set Hypixel API of this server."),
+								new HelpData("prefix", "Reset the prefix of the bot")
 							),
 						new HelpData("set", "Set certain settings.")
 							.addSubcommands(
@@ -260,6 +259,11 @@ public class HelpCommand extends Command {
 									"hypixel_key",
 									"Set a Hypixel API key for this server. Once set, this cannot be viewed for the privacy of the key owner. The key is currently only used in the guild leaderboard and guild kicker command.",
 									"hypixel_key [key]"
+								),
+								new HelpData(
+									"prefix",
+									"Set the prefix of the bot. Must be a least one character and no more than five.",
+									"prefix [prefix]"
 								)
 							),
 						new HelpData("verify", "Main command for verification settings.")
@@ -461,193 +465,184 @@ public class HelpCommand extends Command {
 
 		boolean isAdmin = member.hasPermission(Permission.ADMINISTRATOR);
 
-		paginateBuilder.addItems("Use the arrow emojis to navigate through the pages" + generatePageMap(isAdmin));
+		paginateBuilder.addItems("Use the arrow buttons to navigate through the pages" + generatePageMap(isAdmin));
 
-		HelpGenerator helpGen = new HelpGenerator(getGuildPrefix(guildId));
+		HelpGenerator help = new HelpGenerator(getGuildPrefix(guildId));
 		paginateBuilder.addItems(
-			helpGen.genHelp("help", "Show the help menu with all the commands") +
-			helpGen.genHelp("help [command name]", "Show the help menu for a certain command") +
-			helpGen.genHelp("information", "Show information and statistics about the bot") +
-			helpGen.genHelp("invite", "Get the invite link and Discord link for the bot") +
-			helpGen.genHelp("link [player]", "Link your Hypixel account to the bot") +
-			helpGen.genHelp("link", "Get what Hypixel account you are linked to") +
-			helpGen.genHelp("unlink", "Unlink your account from the bot")
+			help.create("help", "Show the help menu with all the commands") +
+			help.create("help [command name]", "Show the help menu for a certain command") +
+			help.create("information", "Show information and statistics about the bot") +
+			help.create("invite", "Get the invite link and Discord link for the bot") +
+			help.create("link [player]", "Link your Hypixel account to the bot") +
+			help.create("link", "Get what Hypixel account you are linked to") +
+			help.create("unlink", "Unlink your account from the bot")
 		);
 
-		paginateBuilder.addItems(helpGen.genHelp("slayer [player] <profile>", "Get the slayer data of a player"));
+		paginateBuilder.addItems(help.create("slayer [player] <profile>", "Get the slayer data of a player"));
 
-		paginateBuilder.addItems(helpGen.genHelp("skills [player] <profile>", "Get the skills data of a player"));
+		paginateBuilder.addItems(help.create("skills [player] <profile>", "Get the skills data of a player"));
 
 		paginateBuilder.addItems(
-			helpGen.genHelp("dungeons [player] <profile>", "Get the dungeons data of a player") +
-			helpGen.genHelp("essence upgrade [item]", "Interactive message to find the essence amount to upgrade an item") +
-			helpGen.genHelp("essence information [item]", "Get the amount of essence to upgrade an item for each level") +
-			helpGen.genHelp("partyfinder [player] <profile>", "A party finder helper that shows a player's dungeon stats.")
+			help.create("dungeons [player] <profile>", "Get the dungeons data of a player") +
+			help.create("essence upgrade [item]", "Interactive message to find the essence amount to upgrade an item") +
+			help.create("essence information [item]", "Get the amount of essence to upgrade an item for each level") +
+			help.create("partyfinder [player] <profile>", "A party finder helper that shows a player's dungeon stats")
 		);
 
 		paginateBuilder.addItems(
-			helpGen.genHelp("guild [player]", "Find what guild a player is in") +
-			helpGen.genHelp("guild information [u:player]", "Get information and statistics about a player's guild") +
-			helpGen.genHelp("guild information [g:guild name]", "Get information and statistics about a guild") +
-			helpGen.genHelp("guild members [u:player]", "Get a list of all members in a player's guild") +
-			helpGen.genHelp("guild experience [u:player]", "Get the experience leaderboard for a player's guild") +
-			helpGen.genHelp("guild-requirements [name]", "Get the application requirements set for this server") +
-			helpGen.genHelp(
+			help.create("guild [player]", "Find what guild a player is in") +
+			help.create("guild information [u:player]", "Get information and statistics about a player's guild") +
+			help.create("guild information [g:guild name]", "Get information and statistics about a guild") +
+			help.create("guild members [u:player]", "Get a list of all members in a player's guild") +
+			help.create("guild experience [u:player]", "Get the experience leaderboard for a player's guild") +
+			help.create(
 				"g-lb [weight|skills|catacombs|slayer] [u:player]",
 				"Get the weight, skills, catacombs, or slayer leaderboard for a player's guild"
 			) +
-			helpGen.genHelp(
+			help.create(
 				"g-kicker [u:IGN] [type:value] ...",
 				"Get all player's who don't meet the provided requirements. The requirement name can be skills, slayer, catacombs, or weight. The requirement value must be an integer."
 			)
 		);
 
 		paginateBuilder.addItems(
-			helpGen.genHelp("auctions [player]", "Get a player's not claimed auctions on all profiles") +
-			helpGen.genHelp("auction uuid [UUID]", "Get an auction by it's UUID") +
-			helpGen.genHelp("bin [item]", "Get the lowest bin of an item") +
-			helpGen.genHelp("bazaar [item]", "Get bazaar prices of an item") +
-			helpGen.genHelp("average [item]", "Get the average auction price of an item") +
-			helpGen.genHelp("bids [player]", "Get a player's auction house bids") +
-			helpGen.genHelp("query [item]", "Query the auction house for the lowest bin of an item") +
-			helpGen.genHelp("bits [item]", "Get the bits cost of an item from the bits shop") +
-			helpGen.genHelp("price [uuid]", "Calculate the price of an item on the auction house using the auction's UUID")
+			help.create("auctions [player]", "Get a player's not claimed auctions on all profiles") +
+			help.create("auction uuid [UUID]", "Get an auction by it's UUID") +
+			help.create("bin [item]", "Get the lowest bin of an item") +
+			help.create("bazaar [item]", "Get bazaar prices of an item") +
+			help.create("average [item]", "Get the average auction price of an item") +
+			help.create("bids [player]", "Get a player's auction house bids") +
+			help.create("query [item]", "Query the auction house for the lowest bin of an item") +
+			help.create("bits [item]", "Get the bits cost of an item from the bits shop") +
+			help.create("price [uuid]", "Calculate the price of an item on the auction house using the auction's UUID")
 		);
 
 		paginateBuilder.addItems(
-			helpGen.genHelp("inventory [player] <profile>", "Get a player's inventory represented in emojis") +
-			helpGen.genHelp("inventory [player] <profile> [slot:number]", "Get a player's inventory with lore") +
-			helpGen.genHelp("armor [player] <profile>", "Get a player's equipped armor with lore") +
-			helpGen.genHelp("enderchest [player] <profile>", "Get a player's ender chest represented in emojis") +
-			helpGen.genHelp("talisman [player] <profile>", "Get a player's talisman bag represented in emojis") +
-			helpGen.genHelp("talisman [player] <profile> [slot:number]", "Get a player's talisman bag with lore") +
-			helpGen.genHelp("sacks [player] <profile>", "Get a player's sacks' content bag represented in a list") +
-			helpGen.genHelp("wardrobe [player] <profile>", "Get a player's wardrobe armors represented in emojis") +
-			helpGen.genHelp("wardrobe list [player] <profile>", "Get a player's wardrobe armors represented in a list")
+			help.create("inventory [player] <profile>", "Get a player's inventory represented in emojis") +
+			help.create("inventory [player] <profile> [slot:number]", "Get a player's inventory with lore") +
+			help.create("armor [player] <profile>", "Get a player's equipped armor with lore") +
+			help.create("enderchest [player] <profile>", "Get a player's ender chest represented in emojis") +
+			help.create("talisman [player] <profile>", "Get a player's talisman bag represented in emojis") +
+			help.create("talisman [player] <profile> [slot:number]", "Get a player's talisman bag with lore") +
+			help.create("sacks [player] <profile>", "Get a player's sacks' content bag represented in a list") +
+			help.create("wardrobe [player] <profile>", "Get a player's wardrobe armors represented in emojis") +
+			help.create("wardrobe list [player] <profile>", "Get a player's wardrobe armors represented in a list")
 		);
 
 		paginateBuilder.addItems(
-			helpGen.genHelp("roles claim <profile>", "Claim your automatic Skyblock roles. The player must be linked") +
-			helpGen.genHelp("bank [player] <profile>", "Get a player's bank and purse coins") +
-			helpGen.genHelp("bank history [player] <profile>", "Get a player's bank transaction history") +
-			helpGen.genHelp("networth [player] <profile>", "Calculate a player's networth") +
-			helpGen.genHelp(
-				"networth [player] <profile> --verbose",
-				"Calculate a player's networth with a detailed JSON of each item cost"
-			) +
-			helpGen.genHelp("weight [player] <profile>", "Get a player's slayer, skills, dungeons, and total weight") +
-			helpGen.genHelp(
+			help.create("roles claim <profile>", "Claim your automatic Skyblock roles. The player must be linked") +
+			help.create("bank [player] <profile>", "Get a player's bank and purse coins") +
+			help.create("bank history [player] <profile>", "Get a player's bank transaction history") +
+			help.create("networth [player] <profile>", "Calculate a player's networth") +
+			help.create("networth [player] <profile> --verbose", "Calculate a player's networth with a detailed JSON of each item cost") +
+			help.create("weight [player] <profile>", "Get a player's slayer, skills, dungeons, and total weight") +
+			help.create(
 				"weight calculate [skill avg] [slayer] [cata level] [avg dungeon class level]",
 				"Calculate predicted weight using given stats (not 100% accurate)"
 			) +
-			helpGen.genHelp("hypixel [player]", "Get Hypixel information about a player") +
-			helpGen.genHelp("hypixel parkour [player]", "Get fastest Hypixel lobby parkour for a player") +
-			helpGen.genHelp("profiles [player]", "Get information about all of a player's profiles") +
-			helpGen.genHelp("missing [player] <profile>", "Get a player's missing talismans")
+			help.create("hypixel [player]", "Get Hypixel information about a player") +
+			help.create("hypixel parkour [player]", "Get fastest Hypixel lobby parkour for a player") +
+			help.create("profiles [player]", "Get information about all of a player's profiles") +
+			help.create("missing [player] <profile>", "Get a player's missing talismans") +
+			help.create("fetchur", "Get the item that fetchur wants today")
 		);
 
 		paginateBuilder.addItems(
-			(isAdmin ? helpGen.genHelp("event create", "Interactive message to create a Skyblock event") : "") +
-			helpGen.genHelp("event current", "Get information about the current event") +
-			helpGen.genHelp("event join", "Join the current event") +
-			helpGen.genHelp("event leave", "Leave the current event") +
-			helpGen.genHelp("event leaderboard", "Get the leaderboard for current event") +
-			(isAdmin ? helpGen.genHelp("event end", "Force end the event") : "")
+			(isAdmin ? help.create("event create", "Interactive message to create a Skyblock event") : "") +
+			help.create("event current", "Get information about the current event") +
+			help.create("event join", "Join the current event") +
+			help.create("event leave", "Leave the current event") +
+			help.create("event leaderboard", "Get the leaderboard for current event") +
+			(isAdmin ? help.create("event end", "Force end the event") : "")
 		);
 
 		if (isAdmin) {
 			paginateBuilder.addItems(
-				helpGen.genHelp("settings", "View the current settings for the Discord server") +
-				helpGen.genHelp("setup", "A short walk-through on how to setup the bot") +
-				helpGen.genHelp("categories", "Get the id's of all categories in the Discord server") +
-				helpGen.genHelp("settings delete all", "Delete the current server settings") +
-				helpGen.genHelp("settings set hypixel_key [key]", "Set a Hypixel API key for this server") +
-				helpGen.genHelp("settings delete hypixel_key", "Delete the set Hypixel API of this server") +
-				helpGen.genHelp("settings set prefix [prefix]", "Set the prefix of the bot") +
-				helpGen.genHelp("settings delete prefix", "Reset the prefix of the bot")
+				help.create("settings", "View the current settings for the Discord server") +
+				help.create("setup", "A short walk-through on how to setup the bot") +
+				help.create("categories", "Get the id's of all categories in the Discord server") +
+				help.create("settings delete all", "Delete the current server settings") +
+				help.create("settings set hypixel_key [key]", "Set a Hypixel API key for this server") +
+				help.create("settings delete hypixel_key", "Delete the set Hypixel API key of this server") +
+				help.create("settings set prefix [prefix]", "Set the prefix of the bot") +
+				help.create("settings delete prefix", "Reset the prefix of the bot")
 			);
 
 			paginateBuilder.addItems(
-				helpGen.genHelp("settings verify", "Get the current verify settings for the bot") +
-				helpGen.genHelp("settings verify [enable|disable]", "Enable or disable automatic verify") +
-				helpGen.genHelp("settings" + " verify message [message]", "The message that users will see when verifying") +
-				helpGen.genHelp(
+				help.create("settings verify", "Get the current verify settings for the bot") +
+				help.create("settings verify [enable|disable]", "Enable or disable automatic verify") +
+				help.create("settings verify message [message]", "The message that users will see when verifying") +
+				help.create(
 					"settings verify role add [@role]",
-					"Add a role that user will receive " + "upon being verified. Cannot be @everyone or a managed role"
+					"Add a role that user will receive upon being verified. Cannot be @everyone or a managed role"
 				) +
-				helpGen.genHelp("settings verify role remove [@role]", "Remove a verify role") +
-				helpGen.genHelp("settings verify " + "channel [#channel]", "Channel where the message to react for verifying will sent") +
-				helpGen.genHelp(
-					"settings verify nickname <prefix> [IGN] <postfix>",
-					"The nickname template on verifying. Can be set to none."
-				)
+				help.create("settings verify role remove [@role]", "Remove a verify role") +
+				help.create("settings verify channel [#channel]", "Channel where the message to react for verifying will sent") +
+				help.create("settings verify nickname <prefix> [IGN] <postfix>", "The nickname template on verifying. Can be set to none.")
 			);
 
 			paginateBuilder.addItems(
-				helpGen.genHelp("settings apply", "Get the current apply names for the bot") +
-				helpGen.genHelp("settings apply create [name]", "Create a new automatic apply with name 'name'") +
-				helpGen.genHelp("settings apply remove [name]", "Delete an automatic apply") +
-				helpGen.genHelp("settings apply [name] [enable|disable]", "Enable or disable automatic apply") +
-				helpGen.genHelp("settings" + " apply [name] message [message]", "The message that users will see when verifying") +
-				helpGen.genHelp(
+				help.create("settings apply", "Get the current apply names for the bot") +
+				help.create("settings apply create [name]", "Create a new automatic apply with name 'name'") +
+				help.create("settings apply remove [name]", "Delete an automatic apply") +
+				help.create("settings apply [name] [enable|disable]", "Enable or disable automatic apply") +
+				help.create("settings apply [name] message [message]", "The message that users will see when verifying") +
+				help.create(
 					"settings apply [name] staff_role [@role]",
 					"Role that will be pinged when a new application is submitted. Can be set to none"
 				) +
-				helpGen.genHelp(
-					"settings apply [name] " + "channel [#channel]",
-					"Channel where the message to react for applying will sent"
-				) +
-				helpGen.genHelp("settings apply [name] category " + "[category id]", "Category where new apply channels will be made") +
-				helpGen.genHelp(
+				help.create("settings apply [name] channel [#channel]", "Channel where the message to react for applying will sent") +
+				help.create("settings apply [name] category " + "[category id]", "Category where new apply channels will be made") +
+				help.create(
 					"settings apply [name] staff_channel " + "[#channel]",
 					"Channel where new applications will be sent to be reviewed by staff"
 				) +
-				helpGen.genHelp(
+				help.create(
 					"settings apply [name] waiting_channel [#channel]",
 					"Channel where the players who were accepted or waitlisted will be sent"
 				) +
-				helpGen.genHelp("settings apply [name] accept_message [message]", "Message that will be sent if applicant is accepted") +
-				helpGen.genHelp(
+				help.create("settings apply [name] accept_message [message]", "Message that will be sent if applicant is accepted") +
+				help.create(
 					"settings apply [name] waitlist_message [message]",
 					"Message that will be sent if applicant is waitlisted. Can be set to none"
 				) +
-				helpGen.genHelp(
+				help.create(
 					"settings apply [name] ironman [true|false]",
 					"Whether applicants must use an ironman profile. Default is false"
 				) +
-				helpGen.genHelp("settings apply [name] deny_message [message]", "Message that will be sent if applicant is denied") +
-				helpGen.genHelp(
+				help.create("settings apply [name] deny_message [message]", "Message that will be sent if applicant is denied") +
+				help.create(
 					"settings apply [name] reqs add <slayer:amount> <skills:amount> <catacombs:amount> <weight:amount>",
 					"Add a requirement that applicant must meet. At least one of the requirement types must be set"
 				) +
-				helpGen.genHelp(
+				help.create(
 					"settings apply [name] reqs remove [number]",
 					"Remove a requirement. Run `settings apply [name]` to see the index for all current requirements"
 				)
 			);
 
 			paginateBuilder.addItems(
-				helpGen.genHelp("settings roles", "Get the current roles settings for the bot") +
-				helpGen.genHelp("settings roles [enable|disable]", "Enable or disable automatic roles") +
-				helpGen.genHelp("settings roles enable [roleName]", "Enable a specific automatic role (set to disable by default)") +
-				helpGen.genHelp(
+				help.create("settings roles", "Get the current roles settings for the bot") +
+				help.create("settings roles [enable|disable]", "Enable or disable automatic roles") +
+				help.create("settings roles [enable|disable] [roleName]", "Enable or disable a specific automatic role") +
+				help.create(
 					"settings roles add [roleName] [value] [@role]",
 					"Add a new level to a role with its corresponding Discord role"
 				) +
-				helpGen.genHelp("settings roles remove [roleName] [value]", "Remove a role level for a role") +
-				helpGen.genHelp("settings roles stackable [roleName] [true|false]", "Make a specific role stackable") +
-				helpGen.genHelp("settings roles set [roleName] [@role]", "Set a one level role's role")
+				help.create("settings roles remove [roleName] [value]", "Remove a role level for a role") +
+				help.create("settings roles stackable [roleName] [true|false]", "Make a specific role stackable") +
+				help.create("settings roles set [roleName] [@role]", "Set a one level role's role")
 			);
 
 			paginateBuilder.addItems(
-				helpGen.genHelp("settings guild create [name]", "Create a new guild roles with name `name`") +
-				helpGen.genHelp("settings guild [name] [enable|disable] role", "Enable or disable automatic guild role assigning") +
-				helpGen.genHelp("settings guild [name] set [guild_name]", "Set the guild name") +
-				helpGen.genHelp("settings guild [name] role [@role]", "Set the role to give guild member's") +
-				helpGen.genHelp("settings guild [name] [enable|disable] rank", "Enable or disable automatic guild rank assigning") +
-				helpGen.genHelp("settings guild [name] add [rank_name] [@role]", "Add an automatic guild rank") +
-				helpGen.genHelp("settings guild [name] remove [rank_name]", "Remove an automatic guild rank") +
-				helpGen.genHelp("settings guild [name] [enable|disable] counter", "Enable or disable guild members counter")
+				help.create("settings guild create [name]", "Create a new guild roles with name `name`") +
+				help.create("settings guild [name] [enable|disable] role", "Enable or disable automatic guild role assigning") +
+				help.create("settings guild [name] set [guild_name]", "Set the guild name") +
+				help.create("settings guild [name] role [@role]", "Set the role to give guild member's") +
+				help.create("settings guild [name] [enable|disable] rank", "Enable or disable automatic guild rank assigning") +
+				help.create("settings guild [name] add [rank_name] [@role]", "Add an automatic guild rank") +
+				help.create("settings guild [name] remove [rank_name]", "Remove an automatic guild rank") +
+				help.create("settings guild [name] [enable|disable] counter", "Enable or disable guild members counter")
 			);
 		}
 
@@ -698,7 +693,7 @@ public class HelpCommand extends Command {
 			this.prefix = prefix;
 		}
 
-		public String genHelp(String commandName, String desc) {
+		public String create(String commandName, String desc) {
 			return "`" + prefix + commandName + "`: " + desc + "\n";
 		}
 	}
