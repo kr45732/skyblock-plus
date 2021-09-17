@@ -23,10 +23,8 @@ import com.skyblockplus.api.serversettings.automatedguild.GuildRole;
 import com.skyblockplus.api.serversettings.automatedroles.AutomatedRoles;
 import com.skyblockplus.api.serversettings.automatedverify.AutomatedVerify;
 import com.skyblockplus.api.serversettings.mee6roles.Mee6Data;
-
-import javax.persistence.*;
-
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
+import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.transaction.annotation.Transactional;
