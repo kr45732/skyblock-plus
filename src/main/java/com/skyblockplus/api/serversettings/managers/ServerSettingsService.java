@@ -1,3 +1,21 @@
+/*
+ * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
+ * Copyright (c) 2021 kr45732
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.skyblockplus.api.serversettings.managers;
 
 import static com.skyblockplus.utils.Utils.DEFAULT_PREFIX;
@@ -10,8 +28,8 @@ import com.skyblockplus.api.serversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.serversettings.automatedverify.AutomatedVerify;
 import com.skyblockplus.api.serversettings.mee6roles.Mee6Data;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
-import com.skyblockplus.api.serversettings.skyblockevent.RunningEvent;
-import com.skyblockplus.api.serversettings.skyblockevent.SbEvent;
+import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -295,19 +313,6 @@ public class ServerSettingsService {
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 
-	public ResponseEntity<HttpStatus> setRolesEnable(String serverId, String newEnableSetting) {
-		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
-
-		if (currentServerSettings != null) {
-			AutomatedRoles currentRoleSettings = currentServerSettings.getAutomatedRoles();
-			currentRoleSettings.setEnable(newEnableSetting);
-			currentServerSettings.setAutomatedRoles(currentRoleSettings);
-			settingsRepository.save(currentServerSettings);
-			return new ResponseEntity<>(HttpStatus.OK);
-		}
-		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-	}
-
 	public ResponseEntity<HttpStatus> deleteServerSettings(String serverId) {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
@@ -347,23 +352,12 @@ public class ServerSettingsService {
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 
-	public ResponseEntity<?> getRunningSkyblockEventSettings(String serverId) {
-		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
-
-		if (currentServerSettings != null) {
-			if (getSkyblockEventActive(serverId)) {
-				return new ResponseEntity<>(currentServerSettings.getSbEvent().getRunningEvent(), HttpStatus.OK);
-			}
-		}
-		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-	}
-
 	public boolean getSkyblockEventActive(String serverId) {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
 		if (currentServerSettings != null) {
 			try {
-				if (currentServerSettings.getSbEvent().getEventActive().equals("true")) {
+				if (currentServerSettings.getSbEvent().getEventType().length() > 0) {
 					return true;
 				}
 			} catch (Exception ignored) {}
@@ -371,20 +365,7 @@ public class ServerSettingsService {
 		return false;
 	}
 
-	public ResponseEntity<HttpStatus> setSkyblockRunningEvent(String serverId, RunningEvent newSettings) {
-		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
-
-		if (currentServerSettings != null) {
-			SbEvent currentSbEventSettings = currentServerSettings.getSbEvent();
-			currentSbEventSettings.setRunningEvent(newSettings);
-			currentServerSettings.setSbEvent(currentSbEventSettings);
-			settingsRepository.save(currentServerSettings);
-			return new ResponseEntity<>(HttpStatus.OK);
-		}
-		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-	}
-
-	public ResponseEntity<HttpStatus> setSkyblockEventSettings(String serverId, SbEvent newSettings) {
+	public ResponseEntity<HttpStatus> setSkyblockEventSettings(String serverId, EventSettings newSettings) {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
 		if (currentServerSettings != null) {
@@ -400,12 +381,12 @@ public class ServerSettingsService {
 
 		if (currentServerSettings != null) {
 			if (getSkyblockEventActive(serverId)) {
-				RunningEvent runningEvent = currentServerSettings.getSbEvent().getRunningEvent();
-				List<EventMember> eventMembers = runningEvent.getMembersList();
+				EventSettings eventSettings = currentServerSettings.getSbEvent();
+				List<EventMember> eventMembers = eventSettings.getMembersList();
 				eventMembers.add(newEventMember);
-				runningEvent.setMembersList(eventMembers);
+				eventSettings.setMembersList(eventMembers);
 
-				return new ResponseEntity<>(setSkyblockRunningEvent(serverId, runningEvent).getStatusCode());
+				return new ResponseEntity<>(setSkyblockEventSettings(serverId, eventSettings).getStatusCode());
 			}
 		}
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -416,9 +397,9 @@ public class ServerSettingsService {
 
 		if (currentServerSettings != null) {
 			if (getSkyblockEventActive(serverId)) {
-				RunningEvent runningEvent = currentServerSettings.getSbEvent().getRunningEvent();
+				EventSettings eventSettings = currentServerSettings.getSbEvent();
 
-				return new ResponseEntity<>(runningEvent.getEventGuildId(), HttpStatus.OK);
+				return new ResponseEntity<>(eventSettings.getEventGuildId(), HttpStatus.OK);
 			}
 		}
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -429,12 +410,12 @@ public class ServerSettingsService {
 
 		if (currentServerSettings != null) {
 			if (getSkyblockEventActive(serverId)) {
-				RunningEvent runningEvent = currentServerSettings.getSbEvent().getRunningEvent();
-				List<EventMember> eventMembers = runningEvent.getMembersList();
+				EventSettings eventSettings = currentServerSettings.getSbEvent();
+				List<EventMember> eventMembers = eventSettings.getMembersList();
 				eventMembers.removeIf(eventMember -> eventMember.getUuid().equals(minecraftUuid));
-				runningEvent.setMembersList(eventMembers);
+				eventSettings.setMembersList(eventMembers);
 
-				return new ResponseEntity<>(setSkyblockRunningEvent(serverId, runningEvent).getStatusCode());
+				return new ResponseEntity<>(setSkyblockEventSettings(serverId, eventSettings).getStatusCode());
 			}
 		}
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -445,8 +426,8 @@ public class ServerSettingsService {
 
 		if (currentServerSettings != null) {
 			if (getSkyblockEventActive(serverId)) {
-				RunningEvent runningEvent = currentServerSettings.getSbEvent().getRunningEvent();
-				List<EventMember> eventMembers = runningEvent.getMembersList();
+				EventSettings eventSettings = currentServerSettings.getSbEvent();
+				List<EventMember> eventMembers = eventSettings.getMembersList();
 				for (EventMember eventMember : eventMembers) {
 					if (eventMember.getUuid().equals(minecraftUuid)) {
 						return true;

@@ -1,3 +1,21 @@
+/*
+ * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
+ * Copyright (c) 2021 kr45732
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.skyblockplus.features.skyblockevent;
 
 import static com.skyblockplus.Main.database;
@@ -9,8 +27,7 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
-import com.skyblockplus.api.serversettings.skyblockevent.RunningEvent;
-import com.skyblockplus.api.serversettings.skyblockevent.SbEvent;
+import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import java.time.Duration;
 import java.time.Instant;
@@ -332,7 +349,7 @@ public class SkyblockEvent {
 			database.addNewServerSettings(guild.getId(), new ServerSettingsModel(guild.getName(), guild.getId()));
 		}
 
-		RunningEvent newRunningEvent = new RunningEvent(
+		EventSettings sbEvent = new EventSettings(
 			eventType,
 			announcementChannel.getId(),
 			"" + epochSecondEndingTime,
@@ -340,9 +357,8 @@ public class SkyblockEvent {
 			new ArrayList<>(),
 			higherDepth(guildJson, "_id").getAsString()
 		);
-		SbEvent newSkyblockEventSettings = new SbEvent(newRunningEvent, "true");
 
-		return (database.setSkyblockEventSettings(guild.getId(), newSkyblockEventSettings) == 200);
+		return (database.setSkyblockEventSettings(guild.getId(), sbEvent) == 200);
 	}
 
 	public void resetSkyblockEvent(EmbedBuilder eb) {

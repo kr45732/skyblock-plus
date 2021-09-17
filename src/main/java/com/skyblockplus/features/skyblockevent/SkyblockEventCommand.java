@@ -1,3 +1,21 @@
+/*
+ * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
+ * Copyright (c) 2021 kr45732
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.skyblockplus.features.skyblockevent;
 
 import static com.skyblockplus.Main.*;
@@ -11,8 +29,7 @@ import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
-import com.skyblockplus.api.serversettings.skyblockevent.RunningEvent;
-import com.skyblockplus.api.serversettings.skyblockevent.SbEvent;
+import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
 import com.skyblockplus.features.listeners.AutomaticGuild;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
@@ -98,12 +115,12 @@ public class SkyblockEventCommand extends Command {
 
 			if (paginateBuilder.getItemsSize() > 0) {
 				paginateBuilder.build().paginate(announcementChannel, 0);
-				database.setSkyblockEventSettings(guildId, new SbEvent());
+				database.setSkyblockEventSettings(guildId, new EventSettings());
 				return;
 			}
 		} catch (Exception ignored) {}
 		announcementChannel.sendMessageEmbeds(defaultEmbed("Prizes").setDescription("None").build()).complete();
-		database.setSkyblockEventSettings(guildId, new SbEvent());
+		database.setSkyblockEventSettings(guildId, new EventSettings());
 	}
 
 	private static List<EventMember> getEventLeaderboardList(JsonElement runningSettings) {
@@ -378,9 +395,13 @@ public class SkyblockEventCommand extends Command {
 			JsonElement linkedAccount = database.getLinkedUserByDiscordId(userId);
 			if (linkedAccount != null) {
 				String uuid = higherDepth(linkedAccount, "minecraftUuid").getAsString();
-				database.removeEventMemberFromRunningEvent(guildId, uuid);
+				int code = database.removeEventMemberFromRunningEvent(guildId, uuid);
 
-				return defaultEmbed("Success").setDescription("You left the event");
+				if(code == 200) {
+					return defaultEmbed("Success").setDescription("You left the event");
+				}else{
+					return invalidEmbed("An error occurred when leaving the event");
+				}
 			} else {
 				return defaultEmbed("You must be linked to run this command. Use `" + getGuildPrefix(guildId) + "link [IGN]` to link");
 			}
@@ -563,7 +584,7 @@ public class SkyblockEventCommand extends Command {
 
 	public static EmbedBuilder cancelSkyblockEvent(String guildId) {
 		if (database.getSkyblockEventActive(guildId)) {
-			int code = database.setSkyblockEventSettings(guildId, new SbEvent(new RunningEvent(), "false"));
+			int code = database.setSkyblockEventSettings(guildId, new EventSettings());
 
 			if (code == 200) {
 				return defaultEmbed("Event canceled");

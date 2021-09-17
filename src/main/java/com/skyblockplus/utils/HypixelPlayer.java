@@ -1,8 +1,25 @@
+/*
+ * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
+ * Copyright (c) 2021 kr45732
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.skyblockplus.utils;
 
 import static com.skyblockplus.utils.Hypixel.playerFromUuid;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -117,6 +134,26 @@ public class HypixelPlayer {
 	}
 
 	public String getRank() {
-		return "";
+		String hypixelRank = "NONE";
+		if (playerJson.has("prefix")) {
+			return higherDepth(playerJson, "prefix").getAsString();
+		} else if (playerJson.has("rank")  && !higherDepth(playerJson, "rank").getAsString().equals("NORMAL")) {
+			hypixelRank = higherDepth(playerJson, "rank").getAsString();
+		} else if (playerJson.has("monthlyPackageRank") && higherDepth(playerJson, "monthlyPackageRank").getAsString().equals("SUPERSTAR")) {
+			hypixelRank = "MVP_PLUS_PLUS";
+		} else if (playerJson.has("newPackageRank") && !higherDepth(playerJson, "newPackageRank").getAsString().equals("NONE")) {
+			hypixelRank = higherDepth(playerJson, "newPackageRank").getAsString();
+		} else if (playerJson.has("packageRank") && !higherDepth(playerJson, "packageRank").getAsString().equals("NONE")) {
+			hypixelRank = higherDepth(playerJson, "packageRank").getAsString();
+		}
+		hypixelRank = hypixelRank.toUpperCase();
+
+		if(!hypixelRank.equals("NONE")){
+			hypixelRank = "[" + hypixelRank.replace("_", " ").replace("PLUS", "+") + "]";
+		}else{
+			hypixelRank = "None";
+		}
+
+		return hypixelRank;
 	}
 }

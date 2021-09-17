@@ -1,3 +1,21 @@
+/*
+ * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
+ * Copyright (c) 2021 kr45732
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.skyblockplus.settings;
 
 import static com.skyblockplus.utils.Utils.gson;
@@ -15,8 +33,8 @@ import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsService;
 import com.skyblockplus.api.serversettings.mee6roles.Mee6Data;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
-import com.skyblockplus.api.serversettings.skyblockevent.RunningEvent;
-import com.skyblockplus.api.serversettings.skyblockevent.SbEvent;
+import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
+
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -143,7 +161,7 @@ public class Database {
 		return settingsService.setApplyUsersCache(serverId, name, "[]").getStatusCodeValue();
 	}
 
-	public int setSkyblockEventSettings(String serverId, SbEvent currentSettings) {
+	public int setSkyblockEventSettings(String serverId, EventSettings currentSettings) {
 		return settingsService.setSkyblockEventSettings(serverId, currentSettings).getStatusCodeValue();
 	}
 
@@ -160,11 +178,7 @@ public class Database {
 	}
 
 	public JsonElement getRunningEventSettings(String serverId) {
-		return gson.toJsonTree(settingsService.getRunningSkyblockEventSettings(serverId).getBody());
-	}
-
-	public int setRunningEventSettings(String serverId, JsonElement newSettings) {
-		return settingsService.setSkyblockRunningEvent(serverId, gson.fromJson(newSettings, RunningEvent.class)).getStatusCodeValue();
+		return gson.toJsonTree(settingsService.getSkyblockEventSettings(serverId).getBody());
 	}
 
 	public int removeEventMemberFromRunningEvent(String serverId, String minecraftUuid) {
