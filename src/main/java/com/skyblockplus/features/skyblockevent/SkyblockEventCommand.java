@@ -446,7 +446,8 @@ public class SkyblockEventCommand extends Command {
 					try {
 						double startingAmount = 0;
 						String startingAmountFormatted = "";
-						String eventType = higherDepth(database.getRunningEventSettings(guildId), "eventType").getAsString();
+						JsonElement eventSettings = database.getRunningEventSettings(guildId);
+						String eventType = higherDepth(eventSettings, "eventType").getAsString();
 
 						switch (eventType) {
 							case "slayer":
@@ -503,10 +504,27 @@ public class SkyblockEventCommand extends Command {
 							return invalidEmbed("Please enable your skills API and try again");
 						}
 
+						try {
+							int minAmt = Integer.parseInt(higherDepth(eventSettings, "minAmount").getAsString());
+							if(minAmt != -1 && startingAmount < minAmt){
+								return invalidEmbed("You must have at least " + formatNumber(minAmt) + " " + getEventTypeFormatted(eventType));
+							}
+						}catch (Exception ignored) {
+						}
+
+						try {
+							int maxAmt = Integer.parseInt(higherDepth(eventSettings, "maxAmount").getAsString());
+							if(maxAmt != -1 && startingAmount > maxAmt){
+								return invalidEmbed("You must have no more than " + formatNumber(maxAmt) + " " + getEventTypeFormatted(eventType));
+							}
+						}catch (Exception ignored) {
+						}
+
 						int code = database.addEventMemberToRunningEvent(
-							guildId,
-							new EventMember(username, uuid, "" + startingAmount, player.getProfileName())
+								guildId,
+								new EventMember(username, uuid, "" + startingAmount, player.getProfileName())
 						);
+
 
 						if (code == 200) {
 							return defaultEmbed("Joined event")
@@ -544,15 +562,7 @@ public class SkyblockEventCommand extends Command {
 			}
 			eb.addField("Guild", guildJson.get("name").getAsString(), false);
 
-			String eventType = higherDepth(currentSettings, "eventType").getAsString();
-			String eventTypeFormatted = eventType;
-			if (eventType.startsWith("collection.")) {
-				eventTypeFormatted = eventType.split("-")[1] + " collection";
-			} else if (eventType.startsWith("skills.")) {
-				eventTypeFormatted = eventType.split("skills.")[1].equals("all") ? "skills" : eventType.split("skills.")[1];
-			}
-
-			eb.addField("Event Type", capitalizeString(eventTypeFormatted), false);
+			eb.addField("Event Type", capitalizeString(getEventTypeFormatted(higherDepth(currentSettings, "eventType").getAsString())), false);
 
 			Instant eventInstantEnding = Instant.ofEpochSecond(higherDepth(currentSettings, "timeEndingSeconds").getAsLong());
 
@@ -606,5 +616,15 @@ public class SkyblockEventCommand extends Command {
 		}
 
 		return invalidEmbed("Cannot find server");
+	}
+
+	public static String getEventTypeFormatted(String eventType){
+		if (eventType.startsWith("collection.")) {
+			return eventType.split("-")[1] + " collection";
+		} else if (eventType.startsWith("skills.")) {
+			return eventType.split("skills.")[1].equals("all") ? "skills" : eventType.split("skills.")[1];
+		}
+
+		return eventType;
 	}
 }

@@ -38,7 +38,7 @@ public class GuildRole {
 	private String guildId = "";
 	private String roleId = "";
 
-	private String enableGuildRanks = "";
+	private String enableGuildRanks = "false";
 
 	@ElementCollection(fetch = FetchType.EAGER)
 	@Fetch(value = FetchMode.SUBSELECT)

@@ -37,7 +37,7 @@ import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
 import com.skyblockplus.features.apply.ApplyGuild;
 import com.skyblockplus.features.apply.ApplyUser;
 import com.skyblockplus.features.setup.SetupCommandHandler;
-import com.skyblockplus.features.skyblockevent.SkyblockEvent;
+import com.skyblockplus.features.skyblockevent.SkyblockEventHandler;
 import com.skyblockplus.features.verify.VerifyGuild;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import java.io.File;
@@ -82,7 +82,7 @@ public class AutomaticGuild {
 	/* Automated Verify */
 	public VerifyGuild verifyGuild = new VerifyGuild();
 	/* Skyblock event */
-	public SkyblockEvent skyblockEvent = new SkyblockEvent();
+	public SkyblockEventHandler skyblockEventHandler = new SkyblockEventHandler();
 	public List<EventMember> eventMemberList = new ArrayList<>();
 	public Instant eventMemberListLastUpdated = null;
 	/* Mee6 Roles */
@@ -534,14 +534,14 @@ public class AutomaticGuild {
 	}
 
 	public void createSkyblockEvent(User user, Guild guild, MessageChannel channel, InteractionHook hook) {
-		if (skyblockEvent != null && skyblockEvent.scheduledFuture != null) {
-			skyblockEvent.scheduledFuture.cancel(true);
+		if (skyblockEventHandler != null && skyblockEventHandler.scheduledFuture != null) {
+			skyblockEventHandler.scheduledFuture.cancel(true);
 		}
-		skyblockEvent = new SkyblockEvent(user, guild, channel, hook);
+		skyblockEventHandler = new SkyblockEventHandler(user, guild, channel, hook);
 	}
 
-	public void setSkyblockEvent(SkyblockEvent skyblockEvent) {
-		this.skyblockEvent = skyblockEvent;
+	public void setSkyblockEvent(SkyblockEventHandler skyblockEventHandler) {
+		this.skyblockEventHandler = skyblockEventHandler;
 	}
 
 	/* Mee6 Roles Methods */
@@ -675,7 +675,7 @@ public class AutomaticGuild {
 			return;
 		}
 
-		skyblockEvent.onGuildMessageReceived(event);
+		skyblockEventHandler.onGuildMessageReceived(event);
 	}
 
 	public void onTextChannelDelete(TextChannelDeleteEvent event) {
@@ -724,8 +724,8 @@ public class AutomaticGuild {
 	}
 
 	public void onGuildLeave() {
-		if (skyblockEvent.scheduledFuture != null) {
-			skyblockEvent.scheduledFuture.cancel(true);
+		if (skyblockEventHandler.scheduledFuture != null) {
+			skyblockEventHandler.scheduledFuture.cancel(true);
 		}
 
 		for (ScheduledFuture<?> scheduledFuture : scheduledFutures) {

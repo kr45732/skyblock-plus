@@ -29,6 +29,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.springframework.lang.Nullable;
 import org.springframework.transaction.annotation.Transactional;
 
 @Data
@@ -50,6 +51,9 @@ public class EventSettings {
 	private List<EventMember> membersList = new ArrayList<>();
 
 	private String eventGuildId = "";
+
+	private String minAmount = "-1";
+	private String maxAmount = "-1";
 
 	public EventSettings() {}
 }

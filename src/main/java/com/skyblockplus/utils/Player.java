@@ -237,7 +237,7 @@ public class Player {
 	}
 
 	public double getPurseCoins() {
-		return higherDepth(profileJson(), "coin_purse", -1L);
+		return higherDepth(profileJson(), "coin_purse", 0L);
 	}
 
 	public JsonArray getBankHistory() {

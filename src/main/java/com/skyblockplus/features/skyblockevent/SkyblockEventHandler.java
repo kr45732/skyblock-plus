@@ -48,9 +48,9 @@ import net.dv8tion.jda.api.interactions.InteractionHook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SkyblockEvent {
+public class SkyblockEventHandler {
 
-	private static final Logger log = LoggerFactory.getLogger(SkyblockEvent.class);
+	private static final Logger log = LoggerFactory.getLogger(SkyblockEventHandler.class);
 
 	public final boolean enable;
 	public EmbedBuilder eb;
@@ -67,12 +67,14 @@ public class SkyblockEvent {
 	public MessageChannel channel;
 	public User user;
 	public Guild guild;
+	public int minAmount = -1;
+	private int maxAmount = -1;
 
-	public SkyblockEvent() {
+	public SkyblockEventHandler() {
 		this.enable = false;
 	}
 
-	public SkyblockEvent(User user, Guild guild, MessageChannel channel, InteractionHook hook) {
+	public SkyblockEventHandler(User user, Guild guild, MessageChannel channel, InteractionHook hook) {
 		this.user = user;
 		this.guild = guild;
 		this.enable = true;
@@ -168,20 +170,20 @@ public class SkyblockEvent {
 						eventType = "weight";
 						break;
 					case "skills":
-						state = 7;
+						state = 8;
 						eb.setDescription(
 							"Reply with the skill this event should track or 'all' for all skills excluding cosmetic skills."
 						);
 						sendEmbedMessage(eb);
 						return;
 					case "collections":
-						state = 6;
+						state = 7;
 						eb.setDescription("Which collection should this event track?");
 						sendEmbedMessage(eb);
 						return;
 				}
 				if (eventType != null) {
-					eb.setDescription("How many hours should the event last?");
+					eb.setDescription("Reply with the minimum and/or maximum amount a player can have when joining the event or 'none'. Follow the format in the example below (type:value):\nmin:5000\nmax:8000");
 					state++;
 				} else {
 					eb.setDescription("`" + replyMessage + "` is invalid. Please try again.");
@@ -190,6 +192,50 @@ public class SkyblockEvent {
 				sendEmbedMessage(eb);
 				break;
 			case 2:
+				String[] minMax = replyMessage.toLowerCase().split("\n");
+				boolean failed = false;
+				for (String i:minMax){
+					if(i.startsWith("min:")){
+						try{
+							minAmount = Integer.parseInt(i.split("min:")[1]);
+							if(minAmount < 0){
+								failed = true;
+								break;
+							}
+						}catch (Exception e){
+							failed = true;
+							break;
+						}
+					}else if(i.startsWith("max:")){
+						try{
+							maxAmount = Integer.parseInt(i.split("max:")[1]);
+							if(maxAmount < 0){
+								failed = true;
+								break;
+							}else if(minAmount != -1 && minAmount > maxAmount){
+								failed = true;
+								break;
+							}
+						}catch (Exception e){
+							failed = true;
+							break;
+						}
+					}
+				}
+
+				if(failed){
+					attemptsLeft --;
+					eb.setDescription("`" + replyMessage + "` is invalid. Please try again.");
+				}else{
+					if(minAmount != - 1 || maxAmount != -1){
+						eb.addField("Minimum & maximum amount", (minAmount != -1 ?  "Minimum: " + formatNumber(minAmount)  : "") + "\n" + (maxAmount != -1 ? "Maximum: " + formatNumber(maxAmount) : ""), false);
+					}
+					eb.setDescription("How many hours should the event last?");
+					state ++;
+				}
+				sendEmbedMessage(eb);
+				break;
+			case 3:
 				try {
 					eventDuration = Integer.parseInt(replyMessage);
 					if (eventDuration <= 0 || eventDuration > 336) {
@@ -209,7 +255,7 @@ public class SkyblockEvent {
 				}
 				sendEmbedMessage(eb);
 				break;
-			case 3:
+			case 4:
 				if (replyMessage.equalsIgnoreCase("none")) {
 					eb.addField("Prizes", "None", false);
 					prizeListMap = null;
@@ -241,7 +287,7 @@ public class SkyblockEvent {
 				}
 				sendEmbedMessage(eb);
 				break;
-			case 4:
+			case 5:
 				try {
 					announcementChannel = event.getGuild().getTextChannelById(replyMessage.toLowerCase().replaceAll("[<#>]", ""));
 					eb.addField("Announcement Channel", announcementChannel.getAsMention(), false);
@@ -253,7 +299,7 @@ public class SkyblockEvent {
 				}
 				sendEmbedMessage(eb);
 				break;
-			case 5:
+			case 6:
 				if (replyMessage.equalsIgnoreCase("start")) {
 					EmbedBuilder announcementEb = defaultEmbed("Skyblock Event");
 					String eventTypeFormatted = eventType;
@@ -304,14 +350,14 @@ public class SkyblockEvent {
 					resetSkyblockEvent(defaultEmbed("Skyblock competition").setDescription("Canceled event creation"));
 				}
 				return;
-			case 6:
+			case 7:
 				Map<String, String> collections = new HashMap<>();
 				for (Map.Entry<String, JsonElement> collection : getCollectionsJson().entrySet()) {
 					String collectionName = higherDepth(collection.getValue(), "name").getAsString();
 					if (collectionName.equalsIgnoreCase(replyMessage)) {
 						eb.addField("Event Type", capitalizeString(collectionName) + " collection", false);
 						eventType = "collection." + collection.getKey() + "-" + collectionName.toLowerCase();
-						eb.setDescription("How many hours should the event last?");
+						eb.setDescription("Reply with the minimum and/or maximum amount a player can have when joining the event or 'none'. Follow the format in the example below (type:value):\nmin:5000\nmax:8000");
 						state = 2;
 						sendEmbedMessage(eb);
 						return;
@@ -324,11 +370,11 @@ public class SkyblockEvent {
 				attemptsLeft--;
 				sendEmbedMessage(eb);
 				break;
-			case 7:
+			case 8:
 				if (replyMessage.equalsIgnoreCase("all") || ALL_SKILL_NAMES.contains(replyMessage.toLowerCase())) {
 					eb.addField("Event Type", capitalizeString(replyMessage.equalsIgnoreCase("all") ? "skills" : replyMessage), false);
 					eventType = "skills." + replyMessage.toLowerCase();
-					eb.setDescription("How many hours should the event last?");
+					eb.setDescription("Reply with the minimum and/or maximum amount a player can have when joining the event or 'none'. Follow the format in the example below (type:value):\nmin:5000\nmax:8000");
 					state = 2;
 				} else {
 					String closestSkill = getClosestMatch(replyMessage, ALL_SKILL_NAMES);
@@ -355,7 +401,9 @@ public class SkyblockEvent {
 			"" + epochSecondEndingTime,
 			prizeListMap,
 			new ArrayList<>(),
-			higherDepth(guildJson, "_id").getAsString()
+			higherDepth(guildJson, "_id").getAsString(),
+				"" +  minAmount,
+				"" + maxAmount
 		);
 
 		return (database.setSkyblockEventSettings(guild.getId(), sbEvent) == 200);
@@ -369,6 +417,6 @@ public class SkyblockEvent {
 		if (eb != null) {
 			sendEmbedMessage(eb);
 		}
-		guildMap.get(guild.getId()).setSkyblockEvent(new SkyblockEvent());
+		guildMap.get(guild.getId()).setSkyblockEvent(new SkyblockEventHandler());
 	}
 }
