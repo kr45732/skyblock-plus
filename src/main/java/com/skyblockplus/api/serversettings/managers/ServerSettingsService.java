@@ -29,7 +29,6 @@ import com.skyblockplus.api.serversettings.automatedverify.AutomatedVerify;
 import com.skyblockplus.api.serversettings.mee6roles.Mee6Data;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

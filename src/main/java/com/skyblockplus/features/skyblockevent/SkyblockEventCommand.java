@@ -397,9 +397,9 @@ public class SkyblockEventCommand extends Command {
 				String uuid = higherDepth(linkedAccount, "minecraftUuid").getAsString();
 				int code = database.removeEventMemberFromRunningEvent(guildId, uuid);
 
-				if(code == 200) {
+				if (code == 200) {
 					return defaultEmbed("Success").setDescription("You left the event");
-				}else{
+				} else {
 					return invalidEmbed("An error occurred when leaving the event");
 				}
 			} else {

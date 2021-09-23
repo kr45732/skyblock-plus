@@ -137,9 +137,11 @@ public class HypixelPlayer {
 		String hypixelRank = "NONE";
 		if (playerJson.has("prefix")) {
 			return higherDepth(playerJson, "prefix").getAsString();
-		} else if (playerJson.has("rank")  && !higherDepth(playerJson, "rank").getAsString().equals("NORMAL")) {
+		} else if (playerJson.has("rank") && !higherDepth(playerJson, "rank").getAsString().equals("NORMAL")) {
 			hypixelRank = higherDepth(playerJson, "rank").getAsString();
-		} else if (playerJson.has("monthlyPackageRank") && higherDepth(playerJson, "monthlyPackageRank").getAsString().equals("SUPERSTAR")) {
+		} else if (
+			playerJson.has("monthlyPackageRank") && higherDepth(playerJson, "monthlyPackageRank").getAsString().equals("SUPERSTAR")
+		) {
 			hypixelRank = "MVP_PLUS_PLUS";
 		} else if (playerJson.has("newPackageRank") && !higherDepth(playerJson, "newPackageRank").getAsString().equals("NONE")) {
 			hypixelRank = higherDepth(playerJson, "newPackageRank").getAsString();
@@ -148,9 +150,9 @@ public class HypixelPlayer {
 		}
 		hypixelRank = hypixelRank.toUpperCase();
 
-		if(!hypixelRank.equals("NONE")){
+		if (!hypixelRank.equals("NONE")) {
 			hypixelRank = "[" + hypixelRank.replace("_", " ").replace("PLUS", "+") + "]";
-		}else{
+		} else {
 			hypixelRank = "None";
 		}
 
