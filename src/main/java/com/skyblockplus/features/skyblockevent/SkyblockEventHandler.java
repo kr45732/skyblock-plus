@@ -183,7 +183,9 @@ public class SkyblockEventHandler {
 						return;
 				}
 				if (eventType != null) {
-					eb.setDescription("Reply with the minimum and/or maximum amount a player can have when joining the event or 'none'. Follow the format in the example below (type:value):\nmin:5000\nmax:8000");
+					eb.setDescription(
+						"Reply with the minimum and/or maximum amount a player can have when joining the event or 'none'. Follow the format in the example below (type:value):\nmin:5000\nmax:8000"
+					);
 					state++;
 				} else {
 					eb.setDescription("`" + replyMessage + "` is invalid. Please try again.");
@@ -194,44 +196,50 @@ public class SkyblockEventHandler {
 			case 2:
 				String[] minMax = replyMessage.toLowerCase().split("\n");
 				boolean failed = false;
-				for (String i:minMax){
-					if(i.startsWith("min:")){
-						try{
+				for (String i : minMax) {
+					if (i.startsWith("min:")) {
+						try {
 							minAmount = Integer.parseInt(i.split("min:")[1]);
-							if(minAmount < 0){
+							if (minAmount < 0) {
 								failed = true;
 								break;
 							}
-						}catch (Exception e){
+						} catch (Exception e) {
 							failed = true;
 							break;
 						}
-					}else if(i.startsWith("max:")){
-						try{
+					} else if (i.startsWith("max:")) {
+						try {
 							maxAmount = Integer.parseInt(i.split("max:")[1]);
-							if(maxAmount < 0){
+							if (maxAmount < 0) {
 								failed = true;
 								break;
-							}else if(minAmount != -1 && minAmount > maxAmount){
+							} else if (minAmount != -1 && minAmount > maxAmount) {
 								failed = true;
 								break;
 							}
-						}catch (Exception e){
+						} catch (Exception e) {
 							failed = true;
 							break;
 						}
 					}
 				}
 
-				if(failed){
-					attemptsLeft --;
+				if (failed) {
+					attemptsLeft--;
 					eb.setDescription("`" + replyMessage + "` is invalid. Please try again.");
-				}else{
-					if(minAmount != - 1 || maxAmount != -1){
-						eb.addField("Minimum & maximum amount", (minAmount != -1 ?  "Minimum: " + formatNumber(minAmount)  : "") + "\n" + (maxAmount != -1 ? "Maximum: " + formatNumber(maxAmount) : ""), false);
+				} else {
+					if (minAmount != -1 || maxAmount != -1) {
+						eb.addField(
+							"Minimum & maximum amount",
+							(minAmount != -1 ? "Minimum: " + formatNumber(minAmount) : "") +
+							"\n" +
+							(maxAmount != -1 ? "Maximum: " + formatNumber(maxAmount) : ""),
+							false
+						);
 					}
 					eb.setDescription("How many hours should the event last?");
-					state ++;
+					state++;
 				}
 				sendEmbedMessage(eb);
 				break;
@@ -357,7 +365,9 @@ public class SkyblockEventHandler {
 					if (collectionName.equalsIgnoreCase(replyMessage)) {
 						eb.addField("Event Type", capitalizeString(collectionName) + " collection", false);
 						eventType = "collection." + collection.getKey() + "-" + collectionName.toLowerCase();
-						eb.setDescription("Reply with the minimum and/or maximum amount a player can have when joining the event or 'none'. Follow the format in the example below (type:value):\nmin:5000\nmax:8000");
+						eb.setDescription(
+							"Reply with the minimum and/or maximum amount a player can have when joining the event or 'none'. Follow the format in the example below (type:value):\nmin:5000\nmax:8000"
+						);
 						state = 2;
 						sendEmbedMessage(eb);
 						return;
@@ -374,7 +384,9 @@ public class SkyblockEventHandler {
 				if (replyMessage.equalsIgnoreCase("all") || ALL_SKILL_NAMES.contains(replyMessage.toLowerCase())) {
 					eb.addField("Event Type", capitalizeString(replyMessage.equalsIgnoreCase("all") ? "skills" : replyMessage), false);
 					eventType = "skills." + replyMessage.toLowerCase();
-					eb.setDescription("Reply with the minimum and/or maximum amount a player can have when joining the event or 'none'. Follow the format in the example below (type:value):\nmin:5000\nmax:8000");
+					eb.setDescription(
+						"Reply with the minimum and/or maximum amount a player can have when joining the event or 'none'. Follow the format in the example below (type:value):\nmin:5000\nmax:8000"
+					);
 					state = 2;
 				} else {
 					String closestSkill = getClosestMatch(replyMessage, ALL_SKILL_NAMES);
@@ -402,8 +414,8 @@ public class SkyblockEventHandler {
 			prizeListMap,
 			new ArrayList<>(),
 			higherDepth(guildJson, "_id").getAsString(),
-				"" +  minAmount,
-				"" + maxAmount
+			"" + minAmount,
+			"" + maxAmount
 		);
 
 		return (database.setSkyblockEventSettings(guild.getId(), sbEvent) == 200);

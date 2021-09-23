@@ -55,11 +55,7 @@ public class BankCommand extends Command {
 				playerBankBalance == -1 ? "Banking API disabled" : simplifyNumber(playerBankBalance) + " coins",
 				false
 			);
-			eb.addField(
-				"Purse coins",
-				simplifyNumber(playerPurseCoins) + " coins",
-				false
-			);
+			eb.addField("Purse coins", simplifyNumber(playerPurseCoins) + " coins", false);
 			return eb;
 		}
 		return invalidEmbed(player.getFailCause());

@@ -506,25 +506,26 @@ public class SkyblockEventCommand extends Command {
 
 						try {
 							int minAmt = Integer.parseInt(higherDepth(eventSettings, "minAmount").getAsString());
-							if(minAmt != -1 && startingAmount < minAmt){
-								return invalidEmbed("You must have at least " + formatNumber(minAmt) + " " + getEventTypeFormatted(eventType));
+							if (minAmt != -1 && startingAmount < minAmt) {
+								return invalidEmbed(
+									"You must have at least " + formatNumber(minAmt) + " " + getEventTypeFormatted(eventType)
+								);
 							}
-						}catch (Exception ignored) {
-						}
+						} catch (Exception ignored) {}
 
 						try {
 							int maxAmt = Integer.parseInt(higherDepth(eventSettings, "maxAmount").getAsString());
-							if(maxAmt != -1 && startingAmount > maxAmt){
-								return invalidEmbed("You must have no more than " + formatNumber(maxAmt) + " " + getEventTypeFormatted(eventType));
+							if (maxAmt != -1 && startingAmount > maxAmt) {
+								return invalidEmbed(
+									"You must have no more than " + formatNumber(maxAmt) + " " + getEventTypeFormatted(eventType)
+								);
 							}
-						}catch (Exception ignored) {
-						}
+						} catch (Exception ignored) {}
 
 						int code = database.addEventMemberToRunningEvent(
-								guildId,
-								new EventMember(username, uuid, "" + startingAmount, player.getProfileName())
+							guildId,
+							new EventMember(username, uuid, "" + startingAmount, player.getProfileName())
 						);
-
 
 						if (code == 200) {
 							return defaultEmbed("Joined event")
@@ -562,7 +563,11 @@ public class SkyblockEventCommand extends Command {
 			}
 			eb.addField("Guild", guildJson.get("name").getAsString(), false);
 
-			eb.addField("Event Type", capitalizeString(getEventTypeFormatted(higherDepth(currentSettings, "eventType").getAsString())), false);
+			eb.addField(
+				"Event Type",
+				capitalizeString(getEventTypeFormatted(higherDepth(currentSettings, "eventType").getAsString())),
+				false
+			);
 
 			Instant eventInstantEnding = Instant.ofEpochSecond(higherDepth(currentSettings, "timeEndingSeconds").getAsLong());
 
@@ -618,7 +623,7 @@ public class SkyblockEventCommand extends Command {
 		return invalidEmbed("Cannot find server");
 	}
 
-	public static String getEventTypeFormatted(String eventType){
+	public static String getEventTypeFormatted(String eventType) {
 		if (eventType.startsWith("collection.")) {
 			return eventType.split("-")[1] + " collection";
 		} else if (eventType.startsWith("skills.")) {
