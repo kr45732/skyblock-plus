@@ -151,7 +151,7 @@ public class HypixelPlayer {
 		hypixelRank = hypixelRank.toUpperCase();
 
 		if (!hypixelRank.equals("NONE")) {
-			hypixelRank = "[" + hypixelRank.replace("_", " ").replace("PLUS", "+") + "]";
+			hypixelRank = "[" + hypixelRank.replace("_", "").replace("PLUS", "+") + "]";
 		} else {
 			hypixelRank = "None";
 		}
