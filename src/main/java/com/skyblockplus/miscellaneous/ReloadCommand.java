@@ -20,6 +20,7 @@ package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.features.listeners.MainListener.*;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.defaultPerms;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -32,6 +33,7 @@ public class ReloadCommand extends Command {
 		this.name = "reload";
 		this.cooldown = 45;
 		this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
+		this.botPermissions = defaultPerms();
 	}
 
 	@Override

@@ -31,6 +31,7 @@ public class LinkedUserDev extends Command {
 	public LinkedUserDev() {
 		this.name = "d-linked";
 		this.ownerCommand = true;
+		this.botPermissions = defaultPerms();
 	}
 
 	@Override

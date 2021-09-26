@@ -39,6 +39,7 @@ public class EmojiFromUrlCommand extends Command {
 	public EmojiFromUrlCommand() {
 		this.name = "em";
 		this.ownerCommand = true;
+		this.botPermissions = defaultPerms();
 	}
 
 	public static JsonElement getSkyCryptItemsJson(String name) {

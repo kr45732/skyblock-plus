@@ -20,8 +20,7 @@ package com.skyblockplus.dev;
 
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.defaultPaginator;
+import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -37,6 +36,7 @@ public class GetAllGuildsIn extends Command {
 	public GetAllGuildsIn() {
 		this.name = "d-servers";
 		this.ownerCommand = true;
+		this.botPermissions = defaultPerms();
 	}
 
 	@Override

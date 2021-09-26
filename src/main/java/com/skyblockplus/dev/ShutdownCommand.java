@@ -22,11 +22,14 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 
+import static com.skyblockplus.utils.Utils.defaultPerms;
+
 public class ShutdownCommand extends Command {
 
 	public ShutdownCommand() {
 		this.name = "d-shutdown";
 		this.ownerCommand = true;
+		this.botPermissions = defaultPerms();
 	}
 
 	@Override

@@ -35,6 +35,7 @@ public class QuickSetupTestCommand extends Command {
 	public QuickSetupTestCommand() {
 		this.name = "d-settings";
 		this.ownerCommand = true;
+		this.botPermissions = defaultPerms();
 	}
 
 	@Override

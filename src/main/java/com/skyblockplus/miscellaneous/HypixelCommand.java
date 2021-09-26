@@ -36,6 +36,7 @@ public class HypixelCommand extends Command {
 	public HypixelCommand() {
 		this.name = "hypixel";
 		this.cooldown = globalCooldown;
+		this.botPermissions = defaultPerms();
 	}
 
 	public static EmbedBuilder getParkourStats(String username) {

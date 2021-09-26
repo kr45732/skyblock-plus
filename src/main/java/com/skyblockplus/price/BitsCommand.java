@@ -33,6 +33,7 @@ public class BitsCommand extends Command {
 		this.name = "bits";
 		this.cooldown = globalCooldown;
 		this.aliases = new String[] { "bit" };
+		this.botPermissions = defaultPerms();
 	}
 
 	public static EmbedBuilder getBitPrices(String itemName) {

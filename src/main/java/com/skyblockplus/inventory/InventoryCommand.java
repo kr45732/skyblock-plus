@@ -42,6 +42,7 @@ public class InventoryCommand extends Command {
 		this.name = "inventory";
 		this.cooldown = globalCooldown;
 		this.aliases = new String[] { "inv" };
+		this.botPermissions = defaultPerms();
 	}
 
 	@Override

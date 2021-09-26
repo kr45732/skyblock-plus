@@ -35,6 +35,7 @@ public class BazaarCommand extends Command {
 		this.name = "bazaar";
 		this.cooldown = globalCooldown;
 		this.aliases = new String[] { "bz" };
+		this.botPermissions = defaultPerms();
 	}
 
 	public static EmbedBuilder getBazaarItem(String itemNameU) {

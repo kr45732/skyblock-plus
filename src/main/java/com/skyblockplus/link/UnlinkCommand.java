@@ -19,8 +19,7 @@
 package com.skyblockplus.link;
 
 import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.globalCooldown;
+import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -33,6 +32,7 @@ public class UnlinkCommand extends Command {
 	public UnlinkCommand() {
 		this.name = "unlink";
 		this.cooldown = globalCooldown;
+		this.botPermissions = defaultPerms();
 	}
 
 	public static EmbedBuilder unlinkAccount(User user) {

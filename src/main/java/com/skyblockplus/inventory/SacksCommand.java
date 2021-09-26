@@ -39,6 +39,7 @@ public class SacksCommand extends Command {
 	public SacksCommand() {
 		this.name = "sacks";
 		this.cooldown = globalCooldown;
+		this.botPermissions = defaultPerms();
 	}
 
 	@Override

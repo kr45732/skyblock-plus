@@ -35,6 +35,7 @@ public class GetSettingsFile extends Command {
 	public GetSettingsFile() {
 		this.name = "d-getsettings";
 		this.ownerCommand = true;
+		this.botPermissions = defaultPerms();
 	}
 
 	@Override

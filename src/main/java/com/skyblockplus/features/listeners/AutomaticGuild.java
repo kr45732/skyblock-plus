@@ -57,6 +57,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
@@ -251,7 +252,7 @@ public class AutomaticGuild {
 					if (reactMessage != null) {
 						reactMessage.editMessage(higherDepth(currentSettings, "messageText").getAsString()).queue();
 
-						verifyGuild = new VerifyGuild(reactChannel, reactMessage);
+						verifyGuild = new VerifyGuild(reactChannel, reactMessage, currentSettings);
 						return;
 					}
 				} catch (Exception ignored) {}
@@ -265,7 +266,7 @@ public class AutomaticGuild {
 				newSettings.addProperty("previousMessageId", reactMessage.getId());
 				database.setVerifySettings(event.getGuild().getId(), newSettings);
 
-				verifyGuild = new VerifyGuild(reactChannel, reactMessage);
+				verifyGuild = new VerifyGuild(reactChannel, reactMessage, newSettings);
 			}
 		} catch (Exception e) {
 			log.error("Verify constructor error - " + event.getGuild().getId(), e);
@@ -293,7 +294,7 @@ public class AutomaticGuild {
 					if (reactMessage != null) {
 						reactMessage.editMessage(higherDepth(currentSettings, "messageText").getAsString()).queue();
 
-						verifyGuild = new VerifyGuild(reactChannel, reactMessage);
+						verifyGuild = new VerifyGuild(reactChannel, reactMessage, currentSettings);
 						return "Reloaded";
 					}
 				} catch (Exception ignored) {}
@@ -307,7 +308,7 @@ public class AutomaticGuild {
 				newSettings.addProperty("previousMessageId", reactMessage.getId());
 				database.setVerifySettings(guild.getId(), newSettings);
 
-				verifyGuild = new VerifyGuild(reactChannel, reactMessage);
+				verifyGuild = new VerifyGuild(reactChannel, reactMessage, newSettings);
 				return "Reloaded";
 			} else {
 				verifyGuild = new VerifyGuild();
@@ -909,5 +910,9 @@ public class AutomaticGuild {
 		finalOutput.add("manual", higherDepth(currentPriceOverrides, "manual"));
 		finalOutput.add("automatic", outputObject);
 		return finalOutput;
+	}
+
+	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
+		verifyGuild.onGuildMemberJoin(event);
 	}
 }

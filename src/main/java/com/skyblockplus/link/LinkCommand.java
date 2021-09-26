@@ -43,6 +43,7 @@ public class LinkCommand extends Command {
 		this.name = "link";
 		this.cooldown = globalCooldown;
 		this.aliases = new String[] { "verify" };
+		this.botPermissions = defaultPerms();
 	}
 
 	public static EmbedBuilder linkAccount(String username, Member member, Guild guild) {

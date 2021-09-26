@@ -37,6 +37,7 @@ public class BinCommand extends Command {
 		this.name = "bin";
 		this.cooldown = globalCooldown;
 		this.aliases = new String[] { "lbin" };
+		this.botPermissions = defaultPerms();
 	}
 
 	public static EmbedBuilder getLowestBin(String item) {

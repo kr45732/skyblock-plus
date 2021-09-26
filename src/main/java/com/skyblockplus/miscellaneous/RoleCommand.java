@@ -48,6 +48,7 @@ public class RoleCommand extends Command {
 		this.name = "roles";
 		this.cooldown = 10;
 		this.aliases = new String[] { "role" };
+		this.botPermissions = defaultPerms();
 	}
 
 	public static EmbedBuilder updateRoles(String profile, Guild guild, Member member) {

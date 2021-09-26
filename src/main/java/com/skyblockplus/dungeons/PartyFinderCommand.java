@@ -34,6 +34,7 @@ public class PartyFinderCommand extends Command {
 		this.name = "partyfinder";
 		this.cooldown = globalCooldown;
 		this.aliases = new String[] { "pf" };
+		this.botPermissions = defaultPerms();
 	}
 
 	public static EmbedBuilder getPartyFinderInfo(String username, String profileName) {

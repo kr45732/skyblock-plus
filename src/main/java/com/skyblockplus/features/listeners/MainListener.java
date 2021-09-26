@@ -31,6 +31,7 @@ import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
@@ -198,6 +199,13 @@ public class MainListener extends ListenerAdapter {
 
 		if (guildMap.containsKey(event.getGuild().getId())) {
 			guildMap.get(event.getGuild().getId()).onButtonClick(event);
+		}
+	}
+
+	@Override
+	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
+		if (guildMap.containsKey(event.getGuild().getId())) {
+			guildMap.get(event.getGuild().getId()).onGuildMemberJoin(event);
 		}
 	}
 }

@@ -35,7 +35,8 @@ public class QueryAuctionCommand extends Command {
 
 	public QueryAuctionCommand() {
 		this.name = "query";
-		this.cooldown = globalCooldown + 2;
+		this.cooldown = globalCooldown + 1;
+		this.botPermissions = defaultPerms();
 	}
 
 	public static EmbedBuilder queryAuctions(String query) {

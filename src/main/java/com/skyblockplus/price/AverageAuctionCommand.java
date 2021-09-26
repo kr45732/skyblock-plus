@@ -37,6 +37,7 @@ public class AverageAuctionCommand extends Command {
 		this.name = "average";
 		this.cooldown = globalCooldown;
 		this.aliases = new String[] { "avg" };
+		this.botPermissions = defaultPerms();
 	}
 
 	public static EmbedBuilder getAverageAuctionPrice(String item) {

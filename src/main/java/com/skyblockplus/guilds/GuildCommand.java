@@ -49,6 +49,7 @@ public class GuildCommand extends Command {
 		this.name = "guild";
 		this.cooldown = globalCooldown;
 		this.aliases = new String[] { "g" };
+		this.botPermissions = defaultPerms();
 	}
 
 	public static EmbedBuilder getGuildExp(

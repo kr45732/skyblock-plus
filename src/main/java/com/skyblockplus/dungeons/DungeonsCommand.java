@@ -42,6 +42,7 @@ public class DungeonsCommand extends Command {
 		this.name = "dungeons";
 		this.cooldown = globalCooldown;
 		this.aliases = new String[] { "cata", "catacombs" };
+		this.botPermissions = defaultPerms();
 	}
 
 	public static EmbedBuilder getPlayerDungeons(

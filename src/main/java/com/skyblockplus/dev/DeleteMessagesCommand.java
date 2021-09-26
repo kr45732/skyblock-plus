@@ -18,19 +18,19 @@
 
 package com.skyblockplus.dev;
 
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.errorEmbed;
-
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import java.util.concurrent.TimeUnit;
+
+import static com.skyblockplus.utils.Utils.*;
 
 public class DeleteMessagesCommand extends Command {
 
 	public DeleteMessagesCommand() {
 		this.name = "d-purge";
 		this.ownerCommand = true;
+		this.botPermissions = defaultPerms();
 	}
 
 	@Override

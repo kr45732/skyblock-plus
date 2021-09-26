@@ -499,9 +499,9 @@ public class Hypixel {
 		});
 	}
 
-	public static void scheduleDatabaseUpdated() {
+	public static void scheduleDatabaseUpdate() {
 		scheduler.scheduleWithFixedDelay(Hypixel::updateCache, 60, 90, TimeUnit.SECONDS);
-		//		scheduler.scheduleWithFixedDelay(Hypixel::clearDatabase, 1, 60, TimeUnit.MINUTES);
+		//	scheduler.scheduleWithFixedDelay(Hypixel::clearDatabase, 1, 60, TimeUnit.MINUTES);
 	}
 
 	public static void updateCache() {

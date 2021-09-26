@@ -35,6 +35,7 @@ public class EnderChestCommand extends Command {
 		this.name = "enderchest";
 		this.cooldown = globalCooldown;
 		this.aliases = new String[] { "echest", "ec" };
+		this.botPermissions = defaultPerms();
 	}
 
 	@Override

@@ -18,13 +18,12 @@
 
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.globalCooldown;
-
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import net.dv8tion.jda.api.Permission;
+
+import static com.skyblockplus.utils.Utils.*;
 
 public class CategoriesCommand extends Command {
 
@@ -32,6 +31,7 @@ public class CategoriesCommand extends Command {
 		this.name = "categories";
 		this.cooldown = globalCooldown;
 		this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
+		this.botPermissions = defaultPerms();
 	}
 
 	@Override

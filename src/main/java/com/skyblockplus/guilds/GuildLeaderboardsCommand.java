@@ -50,6 +50,7 @@ public class GuildLeaderboardsCommand extends Command {
 		this.name = "guild-leaderboard";
 		this.cooldown = globalCooldown + 1;
 		this.aliases = new String[] { "g-lb" };
+		this.botPermissions = defaultPerms();
 	}
 
 	@Override

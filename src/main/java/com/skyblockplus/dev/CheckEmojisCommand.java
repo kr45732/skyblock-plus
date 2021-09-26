@@ -37,6 +37,7 @@ public class CheckEmojisCommand extends Command {
 	public CheckEmojisCommand() {
 		this.name = "d-check";
 		this.ownerCommand = true;
+		this.botPermissions = defaultPerms();
 	}
 
 	@Override

@@ -32,6 +32,7 @@ public class SlayerCommand extends Command {
 		this.name = "slayer";
 		this.aliases = new String[] { "slayers" };
 		this.cooldown = globalCooldown;
+		this.botPermissions = defaultPerms();
 	}
 
 	public static EmbedBuilder getPlayerSlayer(String username, String profileName) {

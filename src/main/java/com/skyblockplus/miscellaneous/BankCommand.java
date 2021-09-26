@@ -40,6 +40,7 @@ public class BankCommand extends Command {
 	public BankCommand() {
 		this.name = "bank";
 		this.cooldown = globalCooldown;
+		this.botPermissions = defaultPerms();
 	}
 
 	public static EmbedBuilder getPlayerBalance(String username, String profileName) {

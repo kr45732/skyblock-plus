@@ -35,6 +35,7 @@ public class InformationCommand extends Command {
 		this.name = "information";
 		this.cooldown = globalCooldown;
 		this.aliases = new String[] { "info", "about", "invite" };
+		this.botPermissions = defaultPerms();
 	}
 
 	public static ActionRow getInformationActionRow() {

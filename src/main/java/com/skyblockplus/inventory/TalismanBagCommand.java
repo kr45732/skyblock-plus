@@ -45,6 +45,7 @@ public class TalismanBagCommand extends Command {
 		this.name = "talisman";
 		this.cooldown = globalCooldown;
 		this.aliases = new String[] { "talismans" };
+		this.botPermissions = defaultPerms();
 	}
 
 	@Override

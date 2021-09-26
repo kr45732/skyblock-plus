@@ -57,6 +57,7 @@ import me.nullicorn.nedit.type.NBTCompound;
 import me.nullicorn.nedit.type.NBTList;
 import me.nullicorn.nedit.type.TagType;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -100,7 +101,6 @@ public class Utils {
 	/* Configuration File */
 	public static String HYPIXEL_API_KEY = "";
 	public static String BOT_TOKEN = "";
-	public static String CLIENT_ID = "";
 	public static String CLIENT_SECRET = "";
 	public static String DATABASE_URL = "";
 	public static String DATABASE_USERNAME = "";
@@ -856,7 +856,6 @@ public class Utils {
 			appProps.load(new FileInputStream("DevSettings.properties"));
 			HYPIXEL_API_KEY = (String) appProps.get("HYPIXEL_API_KEY");
 			BOT_TOKEN = (String) appProps.get("BOT_TOKEN");
-			CLIENT_ID = (String) appProps.get("CLIENT_ID");
 			CLIENT_SECRET = (String) appProps.get("CLIENT_SECRET");
 			String[] database_url_unformatted = ((String) appProps.get("DATABASE_URL")).split(":", 3);
 			DATABASE_USERNAME = database_url_unformatted[1].replace("/", "");
@@ -878,7 +877,6 @@ public class Utils {
 		} catch (IOException e) {
 			HYPIXEL_API_KEY = System.getenv("HYPIXEL_API_KEY");
 			BOT_TOKEN = System.getenv("BOT_TOKEN");
-			CLIENT_ID = System.getenv("CLIENT_ID");
 			CLIENT_SECRET = System.getenv("CLIENT_SECRET");
 			String[] database_url_unformatted = System.getenv("DATABASE_URL").split(":", 3);
 			DATABASE_USERNAME = database_url_unformatted[1].replace("/", "");
@@ -1199,5 +1197,11 @@ public class Utils {
 		} else {
 			return val2;
 		}
+	}
+
+	public static Permission[] defaultPerms(Permission... otherPerms){
+		List<Permission> defaultPerms = new ArrayList<>(Arrays.asList(Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_MANAGE));
+		defaultPerms.addAll(Arrays.asList(otherPerms));
+		return defaultPerms.toArray(new Permission[0]);
 	}
 }

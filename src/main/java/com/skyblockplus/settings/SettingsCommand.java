@@ -18,6 +18,7 @@
 
 package com.skyblockplus.settings;
 
+import static com.skyblockplus.utils.Utils.defaultPerms;
 import static com.skyblockplus.utils.Utils.globalCooldown;
 
 import com.jagrosh.jdautilities.command.Command;
@@ -30,6 +31,7 @@ public class SettingsCommand extends Command {
 		this.name = "settings";
 		this.cooldown = globalCooldown + 1;
 		this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
+		this.botPermissions = defaultPerms();
 	}
 
 	@Override

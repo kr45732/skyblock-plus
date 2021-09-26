@@ -88,6 +88,7 @@ public class HelpCommand extends Command {
 		this.name = "help";
 		this.aliases = new String[] { "commands" };
 		this.cooldown = globalCooldown;
+		this.botPermissions = defaultPerms();
 		setHelpList();
 	}
 

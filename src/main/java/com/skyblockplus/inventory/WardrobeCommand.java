@@ -43,6 +43,7 @@ public class WardrobeCommand extends Command {
 	public WardrobeCommand() {
 		this.name = "wardrobe";
 		this.cooldown = globalCooldown;
+		this.botPermissions = defaultPerms();
 	}
 
 	@Override

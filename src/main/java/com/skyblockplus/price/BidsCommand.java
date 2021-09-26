@@ -18,24 +18,19 @@
 
 package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.Hypixel.*;
-import static com.skyblockplus.utils.Utils.*;
-
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
-import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import java.time.Duration;
-import java.time.Instant;
 import net.dv8tion.jda.api.EmbedBuilder;
+
+import static com.skyblockplus.utils.Utils.*;
 
 public class BidsCommand extends Command {
 
 	public BidsCommand() {
 		this.name = "bids";
 		this.cooldown = globalCooldown;
+		this.botPermissions = defaultPerms();
 	}
 
 	public static EmbedBuilder getPlayerBids(String username) {

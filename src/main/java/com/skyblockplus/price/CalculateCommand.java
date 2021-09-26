@@ -48,6 +48,7 @@ public class CalculateCommand extends Command {
 		this.name = "calculate";
 		this.cooldown = globalCooldown + 1;
 		this.aliases = new String[] { "calc" };
+		this.botPermissions = defaultPerms();
 	}
 
 	public static EmbedBuilder calculatePriceFromUuid(String auctionUuid) {

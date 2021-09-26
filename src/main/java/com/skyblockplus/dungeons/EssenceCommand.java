@@ -34,6 +34,7 @@ public class EssenceCommand extends Command {
 	public EssenceCommand() {
 		this.name = "essence";
 		this.cooldown = globalCooldown;
+		this.botPermissions = defaultPerms();
 	}
 
 	public static EmbedBuilder getEssenceInformation(String itemName) {

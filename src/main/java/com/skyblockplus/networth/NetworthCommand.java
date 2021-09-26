@@ -18,6 +18,7 @@
 
 package com.skyblockplus.networth;
 
+import static com.skyblockplus.utils.Utils.defaultPerms;
 import static com.skyblockplus.utils.Utils.globalCooldown;
 
 import com.jagrosh.jdautilities.command.Command;
@@ -29,6 +30,7 @@ public class NetworthCommand extends Command {
 		this.name = "networth";
 		this.cooldown = globalCooldown + 1;
 		this.aliases = new String[] { "nw", "n" };
+		this.botPermissions = defaultPerms();
 	}
 
 	@Override

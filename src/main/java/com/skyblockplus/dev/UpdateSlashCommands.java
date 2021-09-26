@@ -19,8 +19,7 @@
 package com.skyblockplus.dev;
 
 import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.errorEmbed;
+import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -35,6 +34,7 @@ public class UpdateSlashCommands extends Command {
 	public UpdateSlashCommands() {
 		this.name = "d-slash";
 		this.ownerCommand = true;
+		this.botPermissions = defaultPerms();
 	}
 
 	@Override

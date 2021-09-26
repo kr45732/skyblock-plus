@@ -20,6 +20,7 @@ package com.skyblockplus.dev;
 
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.utils.Utils.defaultPerms;
 import static com.skyblockplus.utils.Utils.makeHastePost;
 
 import com.jagrosh.jdautilities.command.Command;
@@ -42,6 +43,7 @@ public class EvaluateCommand extends Command {
 		this.name = "evaluate";
 		this.ownerCommand = true;
 		this.aliases = new String[] { "eval", "ev" };
+		this.botPermissions = defaultPerms();
 
 		// import [name].*
 		String[] packageImports = {

@@ -41,6 +41,7 @@ public class ArmorCommand extends Command {
 	public ArmorCommand() {
 		this.name = "armor";
 		this.cooldown = globalCooldown;
+		this.botPermissions = defaultPerms();
 	}
 
 	@Override

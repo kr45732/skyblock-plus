@@ -18,6 +18,7 @@
 
 package com.skyblockplus.dev;
 
+import static com.skyblockplus.utils.Utils.defaultPerms;
 import static com.skyblockplus.utils.Utils.makeHastePost;
 
 import com.google.gson.JsonObject;
@@ -32,6 +33,7 @@ public class EmojiMapServerCommand extends Command {
 		this.name = "d-emojis";
 		this.ownerCommand = true;
 		this.aliases = new String[] { "d-emoji" };
+		this.botPermissions = defaultPerms();
 	}
 
 	@Override

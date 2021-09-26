@@ -38,6 +38,7 @@ public class MissingTalismansCommand extends Command {
 	public MissingTalismansCommand() {
 		this.name = "missing";
 		this.cooldown = globalCooldown;
+		this.botPermissions = defaultPerms();
 	}
 
 	public static EmbedBuilder getMissingTalismans(String username, String profileName) {

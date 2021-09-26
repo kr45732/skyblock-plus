@@ -36,6 +36,7 @@ public class PetsCommand extends Command {
 	public PetsCommand() {
 		this.name = "pets";
 		this.cooldown = globalCooldown;
+		this.botPermissions = defaultPerms();
 	}
 
 	@Override

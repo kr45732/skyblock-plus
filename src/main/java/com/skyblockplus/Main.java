@@ -18,8 +18,6 @@
 
 package com.skyblockplus;
 
-import static com.skyblockplus.utils.Utils.*;
-
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -56,8 +54,6 @@ import com.skyblockplus.utils.exceptionhandlers.GlobalExceptionHandler;
 import com.skyblockplus.utils.slashcommand.SlashCommandClient;
 import com.skyblockplus.weight.WeightCommand;
 import com.skyblockplus.weight.WeightSlashCommand;
-import javax.annotation.PreDestroy;
-import javax.security.auth.login.LoginException;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -68,6 +64,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import javax.annotation.PreDestroy;
+import javax.security.auth.login.LoginException;
+
+import static com.skyblockplus.utils.Utils.*;
 
 @SpringBootApplication
 public class Main {
@@ -211,6 +212,7 @@ public class Main {
 				)
 				.setActivity(Activity.playing("Loading..."))
 				.disableCache(CacheFlag.VOICE_STATE)
+//				.enableIntents(GatewayIntent.GUILD_MEMBERS)
 				.build();
 
 		try {
@@ -218,7 +220,7 @@ public class Main {
 		} catch (Exception ignored) {}
 		jda.getPresence().setActivity(Activity.watching(DEFAULT_PREFIX + "help in " + jda.getGuilds().size() + " servers"));
 
-		Hypixel.scheduleDatabaseUpdated();
+		Hypixel.scheduleDatabaseUpdate();
 		//	scheduleUpdateLinkedAccounts();
 	}
 

@@ -44,6 +44,7 @@ public class GuildRanksCommand extends Command {
 		this.name = "guild-rank";
 		this.cooldown = globalCooldown + 1;
 		this.aliases = new String[] { "g-rank", "g-ranks" };
+		this.botPermissions = defaultPerms();
 	}
 
 	@Override

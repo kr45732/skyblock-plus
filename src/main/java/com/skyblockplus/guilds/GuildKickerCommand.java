@@ -49,6 +49,7 @@ public class GuildKickerCommand extends Command {
 		this.name = "guild-kicker";
 		this.cooldown = globalCooldown + 1;
 		this.aliases = new String[] { "g-kicker" };
+		this.botPermissions = defaultPerms();
 	}
 
 	@Override

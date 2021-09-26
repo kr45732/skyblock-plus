@@ -125,7 +125,7 @@ public abstract class CommandExecute {
 	 * @return true if the provided userId is not linked to the bot, otherwise false (the provided userId is linked)
 	 */
 	protected boolean getLinkedUser(String userId) {
-		JsonElement linkedUserUsername = higherDepth(database.getLinkedUserByDiscordId(userId), "minecraftUsername");
+		JsonElement linkedUserUsername = higherDepth(database.getLinkedUserByDiscordId(userId), "minecraftUuid");
 		if (linkedUserUsername != null) {
 			username = linkedUserUsername.getAsString();
 			return false;

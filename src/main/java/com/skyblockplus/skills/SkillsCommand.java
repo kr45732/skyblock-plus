@@ -34,6 +34,7 @@ public class SkillsCommand extends Command {
 		this.name = "skills";
 		this.cooldown = globalCooldown;
 		this.aliases = new String[] { "skill" };
+		this.botPermissions = defaultPerms();
 	}
 
 	public static EmbedBuilder getPlayerSkill(String username, String profileName) {

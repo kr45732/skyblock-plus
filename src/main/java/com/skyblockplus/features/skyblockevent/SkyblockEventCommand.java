@@ -57,6 +57,7 @@ public class SkyblockEventCommand extends Command {
 	public SkyblockEventCommand() {
 		this.name = "event";
 		this.cooldown = globalCooldown + 3;
+		this.botPermissions = defaultPerms();
 	}
 
 	public static void endSkyblockEvent(String guildId) {

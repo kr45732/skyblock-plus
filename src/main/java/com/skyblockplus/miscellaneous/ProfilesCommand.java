@@ -44,6 +44,7 @@ public class ProfilesCommand extends Command {
 	public ProfilesCommand() {
 		this.name = "profiles";
 		this.cooldown = globalCooldown;
+		this.botPermissions = defaultPerms();
 	}
 
 	public static EmbedBuilder getPlayerProfiles(String username, User user, MessageChannel channel, InteractionHook hook) {

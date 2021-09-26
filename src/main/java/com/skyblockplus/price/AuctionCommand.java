@@ -45,6 +45,7 @@ public class AuctionCommand extends Command {
 		this.name = "auctions";
 		this.cooldown = globalCooldown;
 		this.aliases = new String[] { "ah", "auction" };
+		this.botPermissions = defaultPerms();
 	}
 
 	public static EmbedBuilder getPlayerAuction(String username, User user, MessageChannel channel, InteractionHook hook) {

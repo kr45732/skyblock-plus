@@ -19,8 +19,7 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.Constants.FETCHUR_ITEMS;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.globalCooldown;
+import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -34,6 +33,7 @@ public class FetchurCommand extends Command {
 	public FetchurCommand() {
 		this.name = "fetchur";
 		this.cooldown = globalCooldown;
+		this.botPermissions = defaultPerms();
 	}
 
 	@Override
