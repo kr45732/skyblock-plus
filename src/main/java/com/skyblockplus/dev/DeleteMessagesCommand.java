@@ -18,12 +18,12 @@
 
 package com.skyblockplus.dev;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import java.util.concurrent.TimeUnit;
-
-import static com.skyblockplus.utils.Utils.*;
 
 public class DeleteMessagesCommand extends Command {
 

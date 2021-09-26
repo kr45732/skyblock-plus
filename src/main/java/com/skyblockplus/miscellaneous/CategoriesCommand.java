@@ -18,12 +18,12 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import net.dv8tion.jda.api.Permission;
-
-import static com.skyblockplus.utils.Utils.*;
 
 public class CategoriesCommand extends Command {
 

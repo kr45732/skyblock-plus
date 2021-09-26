@@ -18,6 +18,8 @@
 
 package com.skyblockplus.features.setup;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
@@ -26,14 +28,12 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
 
-import static com.skyblockplus.utils.Utils.*;
-
 public class SetupCommand extends Command {
 
 	public SetupCommand() {
 		this.name = "setup";
 		this.cooldown = globalCooldown;
-		this.userPermissions = new Permission[]{Permission.ADMINISTRATOR};
+		this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
 		this.botPermissions = defaultPerms();
 	}
 

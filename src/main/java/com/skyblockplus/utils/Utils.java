@@ -1199,8 +1199,10 @@ public class Utils {
 		}
 	}
 
-	public static Permission[] defaultPerms(Permission... otherPerms){
-		List<Permission> defaultPerms = new ArrayList<>(Arrays.asList(Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_MANAGE));
+	public static Permission[] defaultPerms(Permission... otherPerms) {
+		List<Permission> defaultPerms = new ArrayList<>(
+			Arrays.asList(Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_MANAGE)
+		);
 		defaultPerms.addAll(Arrays.asList(otherPerms));
 		return defaultPerms.toArray(new Permission[0]);
 	}

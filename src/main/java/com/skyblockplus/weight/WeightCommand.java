@@ -18,14 +18,14 @@
 
 package com.skyblockplus.weight;
 
+import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import net.dv8tion.jda.api.EmbedBuilder;
-
-import static com.skyblockplus.utils.Constants.*;
-import static com.skyblockplus.utils.Utils.*;
 
 public class WeightCommand extends Command {
 
