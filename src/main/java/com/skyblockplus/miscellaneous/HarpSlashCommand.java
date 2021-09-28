@@ -16,37 +16,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.dungeons;
+package com.skyblockplus.miscellaneous;
 
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 
-public class EssenceSlashCommand extends SlashCommand {
+public class HarpSlashCommand extends SlashCommand {
 
-	public EssenceSlashCommand() {
-		this.name = "essence";
+	public HarpSlashCommand() {
+		this.name = "harp";
 	}
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
 		event.logCommand();
 
-		switch (event.getSubcommandName()) {
-			case "upgrade":
-				event.embed(event.disabledCommandMessage());
-				break;
-			case "information":
-				event.embed(EssenceCommand.getEssenceInformation(event.getOptionStr("item")));
-				break;
-			case "player":
-				if (event.invalidPlayerOption()) {
-					return;
-				}
-				event.embed(EssenceCommand.getPlayerEssence(event.player, event.getOptionStr("profile")));
-				break;
-			default:
-				event.embed(event.invalidCommandMessage());
-				break;
+		if (event.invalidPlayerOption()) {
+			return;
 		}
+
+		event.embed(HarpCommand.getHarp(event.player, event.getOptionStr("profile")));
 	}
 }

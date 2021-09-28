@@ -25,8 +25,10 @@ import static com.skyblockplus.utils.Utils.*;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import java.util.Locale;
+import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
 
 public class EssenceCommand extends Command {
@@ -56,7 +58,7 @@ public class EssenceCommand extends Command {
 			for (String level : getJsonKeys(itemJson)) {
 				switch (level) {
 					case "type":
-						eb.setDescription("**Essence Type**: " + capitalizeString(essenceType) + " essence");
+						eb.setDescription("**Essence Type:** " + capitalizeString(essenceType) + " essence");
 						break;
 					case "dungeonize":
 						eb.addField("Dungeonize item", higherDepth(itemJson, level).getAsString() + " " + essenceType + " essence", false);
@@ -73,6 +75,29 @@ public class EssenceCommand extends Command {
 			return eb;
 		}
 		return defaultEmbed("Invalid item name");
+	}
+
+	public static EmbedBuilder getPlayerEssence(String username, String profileName) {
+		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+		if (player.isValid()) {
+			// TODO: finish this & remove ownerOnly when done
+			EmbedBuilder eb = player.defaultPlayerEmbed();
+
+			for (Map.Entry<String, JsonElement> entry : player.profileJson().getAsJsonObject().entrySet()) {
+				if (entry.getKey().startsWith("essence_")) {
+					eb.appendDescription(
+						"**• " +
+						capitalizeString(entry.getKey().split("essence_")[1]) +
+						" essence:** " +
+						formatNumber(entry.getValue().getAsInt()) +
+						"\n"
+					);
+				}
+			}
+
+			return eb;
+		}
+		return invalidEmbed(player.getFailCause());
 	}
 
 	@Override
@@ -101,6 +126,12 @@ public class EssenceCommand extends Command {
 				} else if (args.length == 3 && (args[1].equals("info") || args[1].equals("information"))) {
 					embed(getEssenceInformation(args[2]));
 					return;
+				} else if ((args.length == 4 || args.length == 3 || args.length == 2) && args[1].equals("player")) {
+					if (getMentionedUsername(args.length == 3 ? -1 : 2)) {
+						return;
+					}
+
+					embed(getPlayerEssence(username, args.length == 4 ? args[3] : null));
 				}
 
 				sendErrorEmbed();

@@ -100,7 +100,10 @@ public class UpdateSlashCommands extends Command {
 					new SubcommandData("upgrade", "Interactive message to find the essence amount to upgrade an item")
 						.addOption(OptionType.STRING, "item", "Item name", true),
 					new SubcommandData("information", "Get the amount of essence to upgrade an item for each level")
-						.addOption(OptionType.STRING, "item", "Item name", true)
+						.addOption(OptionType.STRING, "item", "Item name", true),
+					new SubcommandData("player", "Get the amount of each essence a player has")
+						.addOption(OptionType.STRING, "player", "Player username or mention")
+						.addOption(OptionType.STRING, "profile", "Profile name")
 				),
 			new CommandData("partyfinder", "A party finder helper that shows a player's dungeon stats")
 				.addOption(OptionType.STRING, "player", "Player username or mention")
@@ -230,6 +233,12 @@ public class UpdateSlashCommands extends Command {
 				.addOption(OptionType.STRING, "player", "Player username or mention")
 				.addOption(OptionType.STRING, "profile", "Profile name")
 				.addOption(OptionType.BOOLEAN, "verbose", "Links a detailed JSON with a breakdown of value of each item"),
+			new CommandData("cakes", "Get a player's active and inactive cake buffs")
+				.addOption(OptionType.STRING, "player", "Player username or mention")
+				.addOption(OptionType.STRING, "profile", "Profile name"),
+			new CommandData("harp", "Get a player's harp statistics")
+				.addOption(OptionType.STRING, "player", "Player username or mention")
+				.addOption(OptionType.STRING, "profile", "Profile name"),
 		};
 	}
 }

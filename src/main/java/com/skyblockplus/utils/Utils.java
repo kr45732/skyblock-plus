@@ -629,6 +629,19 @@ public class Utils {
 		}
 	}
 
+	public static boolean higherDepth(JsonElement element, String path, boolean defaultValue) {
+		String[] paths = path.split("\\.");
+
+		try {
+			for (String key : paths) {
+				element = element.getAsJsonObject().get(key);
+			}
+			return element.getAsBoolean();
+		} catch (Exception e) {
+			return defaultValue;
+		}
+	}
+
 	public static long higherDepth(JsonElement element, String path, long defaultValue) {
 		String[] paths = path.split("\\.");
 
@@ -1123,34 +1136,40 @@ public class Utils {
 			database
 				.getLinkedUsers()
 				.stream()
-				.filter(linkedAccountModel ->
-					Duration.between(Instant.ofEpochMilli(Long.parseLong(linkedAccountModel.getLastUpdated())), Instant.now()).toDays() > 1
+				.filter(
+					linkedAccountModel ->
+						Duration
+							.between(Instant.ofEpochMilli(Long.parseLong(linkedAccountModel.getLastUpdated())), Instant.now())
+							.toDays() >
+						1
 				)
 				.findAny()
-				.ifPresent(notUpdated -> {
-					try {
-						DiscordInfoStruct discordInfo = getPlayerDiscordInfo(notUpdated.getMinecraftUsername());
-						User updateUser = jda.retrieveUserById(notUpdated.getDiscordId()).complete();
-						if (discordInfo.discordTag.equals(updateUser.getAsTag())) {
-							database.addLinkedUser(
-								new LinkedAccountModel(
-									"" + Instant.now().toEpochMilli(),
-									updateUser.getId(),
-									discordInfo.minecraftUuid,
-									discordInfo.minecraftUsername
-								)
-							);
-							try {
-								logCommand("Updated linked user: " + notUpdated.getMinecraftUsername());
-							} catch (Exception ignored) {}
-							return;
-						}
-					} catch (Exception ignored) {}
-					database.deleteLinkedUserByMinecraftUsername(notUpdated.getMinecraftUsername());
-					try {
-						logCommand("Error updating linked user: " + notUpdated.getMinecraftUsername());
-					} catch (Exception ignored) {}
-				});
+				.ifPresent(
+					notUpdated -> {
+						try {
+							DiscordInfoStruct discordInfo = getPlayerDiscordInfo(notUpdated.getMinecraftUsername());
+							User updateUser = jda.retrieveUserById(notUpdated.getDiscordId()).complete();
+							if (discordInfo.discordTag.equals(updateUser.getAsTag())) {
+								database.addLinkedUser(
+									new LinkedAccountModel(
+										"" + Instant.now().toEpochMilli(),
+										updateUser.getId(),
+										discordInfo.minecraftUuid,
+										discordInfo.minecraftUsername
+									)
+								);
+								try {
+									logCommand("Updated linked user: " + notUpdated.getMinecraftUsername());
+								} catch (Exception ignored) {}
+								return;
+							}
+						} catch (Exception ignored) {}
+						database.deleteLinkedUserByMinecraftUsername(notUpdated.getMinecraftUsername());
+						try {
+							logCommand("Error updating linked user: " + notUpdated.getMinecraftUsername());
+						} catch (Exception ignored) {}
+					}
+				);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}

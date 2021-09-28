@@ -156,7 +156,10 @@ public class Main {
 				new GuildLeaderboardsCommand(),
 				new ArmorCommand(),
 				new FetchurCommand(),
-				new CheckEmojisCommand()
+				new CheckEmojisCommand(),
+				new HarpCommand(),
+				new CommunityUpgradesCommand(),
+				new CakesCommand()
 			);
 
 		SlashCommandClient slashCommands = new SlashCommandClient();
@@ -195,7 +198,9 @@ public class Main {
 			new EnderChestSlashCommand(),
 			new TalismanBagSlashCommand(),
 			new SacksSlashCommand(),
-			new WardrobeSlashCommand()
+			new WardrobeSlashCommand(),
+			new HarpSlashCommand(),
+			new CakesSlashCommand()
 		);
 
 		jda =

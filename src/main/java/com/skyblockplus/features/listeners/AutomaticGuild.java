@@ -373,19 +373,23 @@ public class AutomaticGuild {
 
 					guild
 						.retrieveMembersByIds(linkedUsersIds.toArray(new String[0]))
-						.onSuccess(members -> {
-							inGuildUsers.addAll(members);
-							requestCount.incrementAndGet();
-							if (requestCount.get() == linkedUsersLists.size()) {
-								latch.countDown();
+						.onSuccess(
+							members -> {
+								inGuildUsers.addAll(members);
+								requestCount.incrementAndGet();
+								if (requestCount.get() == linkedUsersLists.size()) {
+									latch.countDown();
+								}
 							}
-						})
-						.onError(error -> {
-							requestCount.incrementAndGet();
-							if (requestCount.get() == linkedUsersLists.size()) {
-								latch.countDown();
+						)
+						.onError(
+							error -> {
+								requestCount.incrementAndGet();
+								if (requestCount.get() == linkedUsersLists.size()) {
+									latch.countDown();
+								}
 							}
-						});
+						);
 				}
 
 				try {

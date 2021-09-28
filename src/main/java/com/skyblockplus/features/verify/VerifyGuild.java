@@ -167,32 +167,33 @@ public class VerifyGuild {
 		event
 			.getUser()
 			.openPrivateChannel()
-			.queue(privateChannel ->
-				privateChannel
-					.sendMessageEmbeds(
-						defaultEmbed("Member synced")
-							.setDescription(
-								"You have automatically been synced in `" +
-								event.getGuild().getName() +
-								"`" +
-								(
-									!finalUpdatedRoles.equals("false")
-										? finalUpdatedRoles.equals("true")
-											? "\n• Successfully synced your roles"
-											: "\n• Error syncing your roles"
-										: ""
-								) +
-								(
-									!finalUpdatedNickname.equals("false")
-										? finalUpdatedNickname.equals("true")
-											? "\n• Successfully synced your nickname"
-											: "\n• Error syncing your nickname"
-										: ""
+			.queue(
+				privateChannel ->
+					privateChannel
+						.sendMessageEmbeds(
+							defaultEmbed("Member synced")
+								.setDescription(
+									"You have automatically been synced in `" +
+									event.getGuild().getName() +
+									"`" +
+									(
+										!finalUpdatedRoles.equals("false")
+											? finalUpdatedRoles.equals("true")
+												? "\n• Successfully synced your roles"
+												: "\n• Error syncing your roles"
+											: ""
+									) +
+									(
+										!finalUpdatedNickname.equals("false")
+											? finalUpdatedNickname.equals("true")
+												? "\n• Successfully synced your nickname"
+												: "\n• Error syncing your nickname"
+											: ""
+									)
 								)
-							)
-							.build()
-					)
-					.queue()
+								.build()
+						)
+						.queue()
 			);
 	}
 }

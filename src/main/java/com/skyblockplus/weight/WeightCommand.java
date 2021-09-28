@@ -43,7 +43,7 @@ public class WeightCommand extends Command {
 			double catacombsD = Double.parseDouble(catacombs);
 			double averageDungeonClassD = Double.parseDouble(averageDungeonClass);
 			EmbedBuilder eb = defaultEmbed("Weight Calculator");
-			eb.setDescription("**Total Weight**: " + Weight.of(skillAverageD, slayerD, catacombsD, averageDungeonClassD));
+			eb.setDescription("**Total Weight:** " + Weight.of(skillAverageD, slayerD, catacombsD, averageDungeonClassD));
 			eb.addField("Slayer Weight", roundAndFormat(Weight.calculateSkillsWeight(skillAverageD)), false);
 			eb.addField("Skills Weight", roundAndFormat(Weight.calculateSlayerWeight(slayerD)), false);
 			eb.addField("Dungeons Weight", roundAndFormat(Weight.calculateDungeonsWeight(catacombsD, averageDungeonClassD)), false);

@@ -225,33 +225,37 @@ public class GuildKickerCommand extends Command {
 
 					CompletableFuture<String> guildMemberUsername = asyncUuidToUsername(guildMemberUuid);
 					futuresList.add(
-						guildMemberUsername.thenApply(guildMemberUsernameResponse -> {
-							try {
-								if (keyCooldownMap.get(hypixelKey).remainingLimit.get() < 5) {
-									System.out.println("Sleeping for " + keyCooldownMap.get(hypixelKey).timeTillReset + " seconds");
-									TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).timeTillReset.get());
-								}
-							} catch (Exception ignored) {}
+						guildMemberUsername.thenApply(
+							guildMemberUsernameResponse -> {
+								try {
+									if (keyCooldownMap.get(hypixelKey).remainingLimit.get() < 5) {
+										System.out.println("Sleeping for " + keyCooldownMap.get(hypixelKey).timeTillReset + " seconds");
+										TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).timeTillReset.get());
+									}
+								} catch (Exception ignored) {}
 
-							CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(
-								guildMemberUuid,
-								hypixelKey
-							);
-
-							return guildMemberProfileJson.thenApply(guildMemberProfileJsonResponse -> {
-								Player guildMemberPlayer = new Player(
+								CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(
 									guildMemberUuid,
-									guildMemberUsernameResponse,
-									guildMemberProfileJsonResponse
+									hypixelKey
 								);
 
-								if (guildMemberPlayer.isValid()) {
-									return memberCacheFromPlayer(guildMemberPlayer);
-								}
+								return guildMemberProfileJson.thenApply(
+									guildMemberProfileJsonResponse -> {
+										Player guildMemberPlayer = new Player(
+											guildMemberUuid,
+											guildMemberUsernameResponse,
+											guildMemberProfileJsonResponse
+										);
 
-								return null;
-							});
-						})
+										if (guildMemberPlayer.isValid()) {
+											return memberCacheFromPlayer(guildMemberPlayer);
+										}
+
+										return null;
+									}
+								);
+							}
+						)
 					);
 				}
 

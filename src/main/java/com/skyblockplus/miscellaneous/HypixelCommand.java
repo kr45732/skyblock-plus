@@ -172,6 +172,15 @@ public class HypixelCommand extends Command {
 				"\n";
 		}
 
+		if (player.get("scorpius_bribe_144") != null) {
+			skyblockItems +=
+				"• Scorpius Bribe (Year 144): " +
+				"<t:" +
+				Instant.ofEpochMilli(player.get("scorpius_bribe_144").getAsLong()).getEpochSecond() +
+				":d>" +
+				"\n";
+		}
+
 		if (player.get("claimed_potato_talisman") != null) {
 			skyblockItems +=
 				"• Potato Talisman: " +

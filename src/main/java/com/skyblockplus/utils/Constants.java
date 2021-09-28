@@ -111,6 +111,7 @@ public class Constants {
 		"JUJU_SHORTBOW",
 		"TERMINATOR"
 	);
+	public static final Map<String, String> HARP_SONG_ID_TO_NAME = new HashMap<>();
 
 	public static void initialize() {
 		try {/* rarityToNumberMap */
@@ -214,6 +215,21 @@ public class Constants {
 			DUNGEON_EMOJI_MAP.put("master_catacombs_6", "<:master_floor_6:867511391228657685>");
 			DUNGEON_EMOJI_MAP.put("master_catacombs_7", "<:master_floor_7:867511391644549120>");
 			DUNGEON_EMOJI_MAP.put("catacombs", "<:catacombs:867535694103707679>");
+
+			/* HARP_SONG_ID_TO_NAME */
+			HARP_SONG_ID_TO_NAME.put("hymn_joy", "Hymn to the Joy");
+			HARP_SONG_ID_TO_NAME.put("frere_jacques", "Frère Jacques");
+			HARP_SONG_ID_TO_NAME.put("amazing_grace", "Amazing Grace");
+			HARP_SONG_ID_TO_NAME.put("brahms", "Brahm's Lullaby");
+			HARP_SONG_ID_TO_NAME.put("happy_birthday", "Happy Birthday to You");
+			HARP_SONG_ID_TO_NAME.put("greensleeves", "Greensleeves");
+			HARP_SONG_ID_TO_NAME.put("jeopardy", "Geothermy?");
+			HARP_SONG_ID_TO_NAME.put("minuet", "Minuet");
+			HARP_SONG_ID_TO_NAME.put("joy_world", "Joy to the World");
+			HARP_SONG_ID_TO_NAME.put("pure_imagination", "Godly Imagination");
+			HARP_SONG_ID_TO_NAME.put("vie_en_rose", "La Vie en Rose");
+			HARP_SONG_ID_TO_NAME.put("fire_and_flames", "Through the Campfire");
+			HARP_SONG_ID_TO_NAME.put("pachelbel", "Pachelbel");
 		} catch (Exception e) {
 			Main.log.error("Exception while initializing constants", e);
 		}

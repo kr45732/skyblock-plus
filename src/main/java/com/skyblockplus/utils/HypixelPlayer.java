@@ -136,7 +136,7 @@ public class HypixelPlayer {
 	public String getRank() {
 		String hypixelRank = "NONE";
 		if (playerJson.has("prefix")) {
-			return higherDepth(playerJson, "prefix").getAsString();
+			return parseMcCodes(higherDepth(playerJson, "prefix").getAsString());
 		} else if (playerJson.has("rank") && !higherDepth(playerJson, "rank").getAsString().equals("NORMAL")) {
 			hypixelRank = higherDepth(playerJson, "rank").getAsString();
 		} else if (

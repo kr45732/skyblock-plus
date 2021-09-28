@@ -56,6 +56,7 @@ public class GuildRanksCommand extends Command {
 
 				if (args.length == 2 && args[1].toLowerCase().startsWith("u:")) {
 					paginate(getLeaderboard(args[1].split(":")[1], event));
+					return;
 				}
 
 				sendErrorEmbed();
