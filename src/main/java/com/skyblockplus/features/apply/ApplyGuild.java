@@ -78,10 +78,9 @@ public class ApplyGuild {
 	}
 
 	public void onTextChannelDelete(TextChannelDeleteEvent event) {
-		applyUserList.removeIf(
-			applyUser ->
-				(applyUser.applicationChannelId != null && applyUser.applicationChannelId.equals(event.getChannel().getId())) ||
-				(applyUser.staffChannelId != null && applyUser.staffChannelId.equals(event.getChannel().getId()))
+		applyUserList.removeIf(applyUser ->
+			(applyUser.applicationChannelId != null && applyUser.applicationChannelId.equals(event.getChannel().getId())) ||
+			(applyUser.staffChannelId != null && applyUser.staffChannelId.equals(event.getChannel().getId()))
 		);
 	}
 

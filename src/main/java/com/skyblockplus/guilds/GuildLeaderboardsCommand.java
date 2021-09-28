@@ -143,37 +143,30 @@ public class GuildLeaderboardsCommand extends Command {
 
 				CompletableFuture<String> guildMemberUsername = asyncUuidToUsername(guildMemberUuid);
 				futuresList.add(
-					guildMemberUsername.thenApply(
-						guildMemberUsernameResponse -> {
-							try {
-								if (keyCooldownMap.get(hypixelKey).remainingLimit.get() < 5) {
-									System.out.println("Sleeping for " + keyCooldownMap.get(hypixelKey).timeTillReset + " seconds");
-									TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).timeTillReset.get());
-								}
-							} catch (Exception ignored) {}
+					guildMemberUsername.thenApply(guildMemberUsernameResponse -> {
+						try {
+							if (keyCooldownMap.get(hypixelKey).remainingLimit.get() < 5) {
+								System.out.println("Sleeping for " + keyCooldownMap.get(hypixelKey).timeTillReset + " seconds");
+								TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).timeTillReset.get());
+							}
+						} catch (Exception ignored) {}
 
-							CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(
+						CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(guildMemberUuid, hypixelKey);
+
+						return guildMemberProfileJson.thenApply(guildMemberProfileJsonResponse -> {
+							Player guildMemberPlayer = new Player(
 								guildMemberUuid,
-								hypixelKey
+								guildMemberUsernameResponse,
+								guildMemberProfileJsonResponse
 							);
 
-							return guildMemberProfileJson.thenApply(
-								guildMemberProfileJsonResponse -> {
-									Player guildMemberPlayer = new Player(
-										guildMemberUuid,
-										guildMemberUsernameResponse,
-										guildMemberProfileJsonResponse
-									);
+							if (guildMemberPlayer.isValid()) {
+								return memberCacheFromPlayer(guildMemberPlayer);
+							}
 
-									if (guildMemberPlayer.isValid()) {
-										return memberCacheFromPlayer(guildMemberPlayer);
-									}
-
-									return null;
-								}
-							);
-						}
-					)
+							return null;
+						});
+					})
 				);
 			}
 

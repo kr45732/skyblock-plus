@@ -81,9 +81,8 @@ public class SacksCommand extends Command {
 					.entrySet()
 					.stream()
 					.sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
-					.forEach(
-						currentSack ->
-							paginateBuilder.addItems("**" + convertSkyblockIdName(currentSack.getKey()) + ":** " + currentSack.getValue())
+					.forEach(currentSack ->
+						paginateBuilder.addItems("**" + convertSkyblockIdName(currentSack.getKey()) + ":** " + currentSack.getValue())
 					);
 
 				paginateBuilder.setPaginatorExtras(
