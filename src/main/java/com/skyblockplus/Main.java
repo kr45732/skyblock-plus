@@ -87,119 +87,121 @@ public class Main {
 
 		Main.database = SpringApplication.run(Main.class, args).getBean(Database.class);
 		Main.waiter = new EventWaiter(scheduler, true);
-		Main.client = new CommandClientBuilder()
-			.setOwnerId("385939031596466176")
-			.setEmojis("✅", "⚠️", "❌")
-			.useHelpBuilder(false)
-			.setPrefixFunction(event -> getGuildPrefix(event.getGuild().getId()))
-			.setListener(
-				new CommandListener() {
-					@Override
-					public void onCommandException(CommandEvent event, Command command, Throwable throwable) {
-						globalExceptionHandler.uncaughtException(event, command, throwable);
+		Main.client =
+			new CommandClientBuilder()
+				.setOwnerId("385939031596466176")
+				.setEmojis("✅", "⚠️", "❌")
+				.useHelpBuilder(false)
+				.setPrefixFunction(event -> getGuildPrefix(event.getGuild().getId()))
+				.setListener(
+					new CommandListener() {
+						@Override
+						public void onCommandException(CommandEvent event, Command command, Throwable throwable) {
+							globalExceptionHandler.uncaughtException(event, command, throwable);
+						}
 					}
-				}
-			)
-			.addCommands(
-				new InformationCommand(),
-				new SlayerCommand(),
-				new HelpCommand(),
-				new GuildCommand(),
-				new AuctionCommand(),
-				new BinCommand(),
-				new SkillsCommand(),
-				new DungeonsCommand(),
-				new ShutdownCommand(),
-				new RoleCommand(),
-				new GuildRanksCommand(),
-				new EssenceCommand(),
-				new BankCommand(),
-				new WardrobeCommand(),
-				new TalismanBagCommand(),
-				new InventoryCommand(),
-				new SacksCommand(),
-				new WeightCommand(),
-				new HypixelCommand(),
-				new UuidCommand(),
-				new SettingsCommand(),
-				new ReloadCommand(),
-				new SetupCommand(),
-				new CategoriesCommand(),
-				new PartyFinderCommand(),
-				new QuickSetupTestCommand(),
-				new EmojiMapServerCommand(),
-				new EnderChestCommand(),
-				new GetAllGuildsIn(),
-				new LinkCommand(),
-				new GetSettingsFile(),
-				new UnlinkCommand(),
-				new LinkedUserDev(),
-				new BazaarCommand(),
-				new AverageAuctionCommand(),
-				new PetsCommand(),
-				new SkyblockEventCommand(),
-				new DeleteMessagesCommand(),
-				new PlaceholderCommand(),
-				new ProfilesCommand(),
-				new NetworthCommand(),
-				new QueryAuctionCommand(),
-				new BidsCommand(),
-				new BitsCommand(),
-				new EvaluateCommand(),
-				new GuildKickerCommand(),
-				new MissingTalismansCommand(),
-				new UpdateSlashCommands(),
-				new CalculateCommand(),
-				new EmojiFromUrlCommand(),
-				new GuildLeaderboardsCommand(),
-				new ArmorCommand(),
-				new FetchurCommand(),
-				new CheckEmojisCommand(),
-				new HarpCommand(),
-				new CommunityUpgradesCommand(),
-				new CakesCommand()
-			).build();
+				)
+				.addCommands(
+					new InformationCommand(),
+					new SlayerCommand(),
+					new HelpCommand(),
+					new GuildCommand(),
+					new AuctionCommand(),
+					new BinCommand(),
+					new SkillsCommand(),
+					new DungeonsCommand(),
+					new ShutdownCommand(),
+					new RoleCommand(),
+					new GuildRanksCommand(),
+					new EssenceCommand(),
+					new BankCommand(),
+					new WardrobeCommand(),
+					new TalismanBagCommand(),
+					new InventoryCommand(),
+					new SacksCommand(),
+					new WeightCommand(),
+					new HypixelCommand(),
+					new UuidCommand(),
+					new SettingsCommand(),
+					new ReloadCommand(),
+					new SetupCommand(),
+					new CategoriesCommand(),
+					new PartyFinderCommand(),
+					new QuickSetupTestCommand(),
+					new EmojiMapServerCommand(),
+					new EnderChestCommand(),
+					new GetAllGuildsIn(),
+					new LinkCommand(),
+					new GetSettingsFile(),
+					new UnlinkCommand(),
+					new LinkedUserDev(),
+					new BazaarCommand(),
+					new AverageAuctionCommand(),
+					new PetsCommand(),
+					new SkyblockEventCommand(),
+					new DeleteMessagesCommand(),
+					new PlaceholderCommand(),
+					new ProfilesCommand(),
+					new NetworthCommand(),
+					new QueryAuctionCommand(),
+					new BidsCommand(),
+					new BitsCommand(),
+					new EvaluateCommand(),
+					new GuildKickerCommand(),
+					new MissingTalismansCommand(),
+					new UpdateSlashCommands(),
+					new CalculateCommand(),
+					new EmojiFromUrlCommand(),
+					new GuildLeaderboardsCommand(),
+					new ArmorCommand(),
+					new FetchurCommand(),
+					new CheckEmojisCommand(),
+					new HarpCommand(),
+					new CommunityUpgradesCommand(),
+					new CakesCommand()
+				)
+				.build();
 
 		SlashCommandClient slashCommandClient = new SlashCommandClient()
-				.addSlashCommands(
-			new InviteSlashCommand(),
-			new InformationSlashCommand(),
-			new LinkSlashCommand(),
-			new UnlinkSlashCommand(),
-			new SlayerSlashCommand(),
-			new SkillsSlashCommand(),
-			new DungeonsSlashCommand(),
-			new EssenceSlashCommand(),
-			new PartyFinderSlashCommand(),
-			new GuildSlashCommand(),
-			new HelpSlashCommand(),
-			new AuctionsSlashCommand(),
-			new BinSlashCommand(),
-			new BazaarSlashCommand(),
-			new AverageAuctionSlashCommand(),
-			new BidsSlashCommand(),
-			new QueryAuctionsSlashCommand(),
-			new BitsSlashCommand(),
-			new RolesSlashCommand(),
-			new BankSlashCommand(),
-			new WeightSlashCommand(),
-			new HypixelSlashCommand(),
-			new ProfilesSlashCommand(),
-			new MissingTalismansSlashCommand(),
-			new CalculateSlashCommand(),
-			new SetupSlashCommand(),
-			new SkyblockEventSlashCommand(),
-			new FetchurSlashCommand(),
-			new NetworthSlashCommand(),
-			new InventorySlashCommand(),
-			new ArmorSlashCommand(),
-			new EnderChestSlashCommand(),
-			new TalismanBagSlashCommand(),
-			new SacksSlashCommand(),
-			new WardrobeSlashCommand(),
-			new HarpSlashCommand(),
-			new CakesSlashCommand()
-		);
+			.addSlashCommands(
+				new InviteSlashCommand(),
+				new InformationSlashCommand(),
+				new LinkSlashCommand(),
+				new UnlinkSlashCommand(),
+				new SlayerSlashCommand(),
+				new SkillsSlashCommand(),
+				new DungeonsSlashCommand(),
+				new EssenceSlashCommand(),
+				new PartyFinderSlashCommand(),
+				new GuildSlashCommand(),
+				new HelpSlashCommand(),
+				new AuctionsSlashCommand(),
+				new BinSlashCommand(),
+				new BazaarSlashCommand(),
+				new AverageAuctionSlashCommand(),
+				new BidsSlashCommand(),
+				new QueryAuctionsSlashCommand(),
+				new BitsSlashCommand(),
+				new RolesSlashCommand(),
+				new BankSlashCommand(),
+				new WeightSlashCommand(),
+				new HypixelSlashCommand(),
+				new ProfilesSlashCommand(),
+				new MissingTalismansSlashCommand(),
+				new CalculateSlashCommand(),
+				new SetupSlashCommand(),
+				new SkyblockEventSlashCommand(),
+				new FetchurSlashCommand(),
+				new NetworthSlashCommand(),
+				new InventorySlashCommand(),
+				new ArmorSlashCommand(),
+				new EnderChestSlashCommand(),
+				new TalismanBagSlashCommand(),
+				new SacksSlashCommand(),
+				new WardrobeSlashCommand(),
+				new HarpSlashCommand(),
+				new CakesSlashCommand()
+			);
 
 		jda =
 			JDABuilder

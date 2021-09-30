@@ -31,7 +31,7 @@ public class RolesSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandExecutedEvent event) {
 		event.logCommand();
 
-		switch (event.getSubcommandName()){
+		switch (event.getSubcommandName()) {
 			case "claim":
 				event.embed(RoleCommand.updateRoles(event.getOptionStr("profile"), event.getGuild(), event.getMember()));
 				break;

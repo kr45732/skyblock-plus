@@ -49,6 +49,9 @@ public abstract class SlashCommand {
 	}
 
 	public void replyCooldown(SlashCommandExecutedEvent event, int remainingCooldown) {
-		event.getHook().editOriginalEmbeds(invalidEmbed("⚠️ That command is on cooldown for " + remainingCooldown + " more seconds").build()).queue();
+		event
+			.getHook()
+			.editOriginalEmbeds(invalidEmbed("⚠️ That command is on cooldown for " + remainingCooldown + " more seconds").build())
+			.queue();
 	}
 }

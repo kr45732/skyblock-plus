@@ -18,15 +18,14 @@
 
 package com.skyblockplus.utils.slashcommand;
 
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import static com.skyblockplus.utils.Utils.invalidEmbed;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static com.skyblockplus.utils.Utils.invalidEmbed;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class SlashCommandClient extends ListenerAdapter {
 

@@ -565,8 +565,8 @@ public class HelpCommand extends Command {
 			help.create("profiles [player]", "Get information about all of a player's profiles") +
 			help.create("missing [player] <profile>", "Get a player's missing talismans") +
 			help.create("fetchur", "Get the item that fetchur wants today") +
-					help.create("cakes [player] <profile>", "Get a player's inactive and active cake buffs") +
-				help.create("harp [player] <profile>", "Get a player's harp statistics")
+			help.create("cakes [player] <profile>", "Get a player's inactive and active cake buffs") +
+			help.create("harp [player] <profile>", "Get a player's harp statistics")
 		);
 
 		paginateBuilder.addItems(
