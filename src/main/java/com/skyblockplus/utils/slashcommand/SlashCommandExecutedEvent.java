@@ -43,7 +43,7 @@ public class SlashCommandExecutedEvent {
 		this.hook = event.getHook();
 	}
 
-	public SlashCommandClient getSlashCommandClient() {
+	public SlashCommandClient getClient() {
 		return slashCommandClient;
 	}
 

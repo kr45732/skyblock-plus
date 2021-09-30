@@ -43,10 +43,10 @@ task stage(dependsOn: ['shadowJar']) {
 }
 
 repositories {
-    jcenter()
     mavenCentral()
     maven { url 'https://m2.dv8tion.net/releases' }
     maven { url 'https://jitpack.io' }
+    maven { url 'https://m2.chew.pro/releases' }
 }
 
 dependencies {
@@ -59,7 +59,8 @@ dependencies {
     implementation 'club.minnced:discord-webhooks:0.5.8'
 
     // JDA utilities
-    implementation 'com.jagrosh:jda-utilities:3.0.5'
+//    implementation 'com.jagrosh:jda-utilities:3.0.5'
+    implementation 'pw.chew:jda-chewtils:1.22.0'
 
     // Google libraries
     implementation 'com.google.code.gson:gson:2.8.8'

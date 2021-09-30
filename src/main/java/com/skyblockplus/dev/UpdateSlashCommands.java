@@ -176,8 +176,10 @@ public class UpdateSlashCommands extends Command {
 			new CommandData("roles", "Main roles command")
 				.addSubcommands(
 					new SubcommandData("claim", "Claim automatic Skyblock roles. The player must be linked to the bot")
-						.addOption(OptionType.STRING, "profile", "Profile name")
-				),
+						.addOption(OptionType.STRING, "profile", "Profile name"),
+					new SubcommandData("list", "List all roles that can be claimed through the bot")
+
+			),
 			new CommandData("bank", "Main bank command")
 				.addSubcommands(
 					new SubcommandData("total", "Get a player's bank and purse coins")

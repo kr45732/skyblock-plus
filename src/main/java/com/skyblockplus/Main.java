@@ -18,12 +18,10 @@
 
 package com.skyblockplus;
 
+import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.utils.Utils.*;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandClientBuilder;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.command.CommandListener;
+import com.jagrosh.jdautilities.command.*;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.dev.*;
 import com.skyblockplus.dungeons.*;
@@ -77,6 +75,7 @@ public class Main {
 	public static Database database;
 	public static EventWaiter waiter;
 	public static GlobalExceptionHandler globalExceptionHandler;
+	public static CommandClient client;
 
 	public static void main(String[] args) throws LoginException, IllegalArgumentException {
 		Main.globalExceptionHandler = new GlobalExceptionHandler();
@@ -87,13 +86,12 @@ public class Main {
 		Constants.initialize();
 
 		Main.database = SpringApplication.run(Main.class, args).getBean(Database.class);
-
 		Main.waiter = new EventWaiter(scheduler, true);
-		CommandClientBuilder client = new CommandClientBuilder()
+		Main.client = new CommandClientBuilder()
 			.setOwnerId("385939031596466176")
 			.setEmojis("✅", "⚠️", "❌")
 			.useHelpBuilder(false)
-			.setGuildSettingsManager(GuildPrefixManager::new)
+			.setPrefixFunction(event -> getGuildPrefix(event.getGuild().getId()))
 			.setListener(
 				new CommandListener() {
 					@Override
@@ -160,10 +158,10 @@ public class Main {
 				new HarpCommand(),
 				new CommunityUpgradesCommand(),
 				new CakesCommand()
-			);
+			).build();
 
-		SlashCommandClient slashCommands = new SlashCommandClient();
-		slashCommands.addSlashCommands(
+		SlashCommandClient slashCommandClient = new SlashCommandClient()
+				.addSlashCommands(
 			new InviteSlashCommand(),
 			new InformationSlashCommand(),
 			new LinkSlashCommand(),
@@ -209,14 +207,14 @@ public class Main {
 				.setStatus(OnlineStatus.DO_NOT_DISTURB)
 				.addEventListeners(
 					new ExceptionEventListener(waiter),
-					client.build(),
+					client,
 					new ExceptionEventListener(new MessageTimeout()),
-					new ExceptionEventListener(slashCommands),
+					new ExceptionEventListener(slashCommandClient),
 					new ExceptionEventListener(new MainListener())
 				)
 				.setActivity(Activity.playing("Loading..."))
 				.disableCache(CacheFlag.VOICE_STATE)
-				//				.enableIntents(GatewayIntent.GUILD_MEMBERS)
+				//	.enableIntents(GatewayIntent.GUILD_MEMBERS)
 				.build();
 
 		try {

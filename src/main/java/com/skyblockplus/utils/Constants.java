@@ -18,12 +18,12 @@
 
 package com.skyblockplus.utils;
 
-import static com.skyblockplus.utils.Utils.*;
-
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.skyblockplus.Main;
+
 import java.util.*;
+
+import static com.skyblockplus.utils.Utils.*;
 
 public class Constants {
 

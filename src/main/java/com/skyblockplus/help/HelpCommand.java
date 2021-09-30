@@ -550,6 +550,7 @@ public class HelpCommand extends Command {
 
 		paginateBuilder.addItems(
 			help.create("roles claim <profile>", "Claim your automatic Skyblock roles. The player must be linked") +
+			help.create("roles list", "List all roles that can be claimed through the bot") +
 			help.create("bank [player] <profile>", "Get a player's bank and purse coins") +
 			help.create("bank history [player] <profile>", "Get a player's bank transaction history") +
 			help.create("networth [player] <profile>", "Calculate a player's networth") +
@@ -563,7 +564,9 @@ public class HelpCommand extends Command {
 			help.create("hypixel parkour [player]", "Get fastest Hypixel lobby parkour for a player") +
 			help.create("profiles [player]", "Get information about all of a player's profiles") +
 			help.create("missing [player] <profile>", "Get a player's missing talismans") +
-			help.create("fetchur", "Get the item that fetchur wants today")
+			help.create("fetchur", "Get the item that fetchur wants today") +
+					help.create("cakes [player] <profile>", "Get a player's inactive and active cake buffs") +
+				help.create("harp [player] <profile>", "Get a player's harp statistics")
 		);
 
 		paginateBuilder.addItems(

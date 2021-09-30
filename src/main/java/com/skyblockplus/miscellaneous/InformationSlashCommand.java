@@ -33,7 +33,7 @@ public class InformationSlashCommand extends SlashCommand {
 
 		event
 			.getHook()
-			.editOriginalEmbeds(InformationCommand.getInformation(event.getSlashCommandClient().getStartTime()).build())
+			.editOriginalEmbeds(InformationCommand.getInformation(event.getClient().getStartTime()).build())
 			.setActionRows(InformationCommand.getInformationActionRow())
 			.queue();
 	}

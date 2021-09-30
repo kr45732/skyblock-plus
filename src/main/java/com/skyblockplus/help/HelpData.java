@@ -24,6 +24,8 @@ import static com.skyblockplus.utils.Utils.defaultEmbed;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 
 public class HelpData {

@@ -46,7 +46,7 @@ public class InformationCommand extends Command {
 		);
 	}
 
-	public static EmbedBuilder getInformation(OffsetDateTime starTime) {
+	public static EmbedBuilder getInformation(OffsetDateTime startTime) {
 		EmbedBuilder eb = defaultEmbed("Skyblock Plus");
 
 		eb.setDescription(
@@ -75,7 +75,7 @@ public class InformationCommand extends Command {
 
 		eb.setThumbnail("https://cdn.discordapp.com/attachments/803419567958392832/825768516636508160/sb_loading.gif");
 
-		eb.setFooter("Last restart").setTimestamp(starTime);
+		eb.setFooter("Last restart").setTimestamp(startTime);
 
 		return eb;
 	}
