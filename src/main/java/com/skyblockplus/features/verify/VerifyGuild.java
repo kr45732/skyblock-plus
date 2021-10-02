@@ -84,7 +84,7 @@ public class VerifyGuild {
 	}
 
 	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
-		if (!higherDepth(verifySettings, "enableMemberJoinSync").getAsString().equals("true")) {
+		if (verifySettings == null || !higherDepth(verifySettings, "enableMemberJoinSync").getAsString().equals("true")) {
 			return;
 		}
 
