@@ -173,7 +173,7 @@ public class SkyblockEventCommand extends Command {
 											guildMemberUuid,
 											"" +
 											(
-												guildMemberPlayer.getCatacombsSkill().totalSkillExp -
+												guildMemberPlayer.getCatacombsSkill().getTotalExp() -
 												higherDepth(guildMember, "startingAmount").getAsDouble()
 											),
 											higherDepth(guildMember, "profileName").getAsString()
@@ -435,7 +435,7 @@ public class SkyblockEventCommand extends Command {
 				HypixelResponse guildJson = getGuildFromPlayer(uuid);
 
 				if (guildJson.isNotValid()) {
-					return invalidEmbed(guildJson.failCause);
+					return invalidEmbed(guildJson.getFailCause());
 				}
 
 				if (!guildJson.get("_id").getAsString().equals(database.getSkyblockEventGuildId(guildId))) {
@@ -465,7 +465,7 @@ public class SkyblockEventCommand extends Command {
 								}
 							case "catacombs":
 								{
-									startingAmount = player.getCatacombsSkill().totalSkillExp;
+									startingAmount = player.getCatacombsSkill().getTotalExp();
 									startingAmountFormatted = formatNumber(startingAmount) + " total catacombs xp";
 									break;
 								}
@@ -560,7 +560,7 @@ public class SkyblockEventCommand extends Command {
 
 			HypixelResponse guildJson = getGuildFromId(higherDepth(currentSettings, "eventGuildId").getAsString());
 			if (guildJson.isNotValid()) {
-				return invalidEmbed(guildJson.failCause);
+				return invalidEmbed(guildJson.getFailCause());
 			}
 			eb.addField("Guild", guildJson.get("name").getAsString(), false);
 

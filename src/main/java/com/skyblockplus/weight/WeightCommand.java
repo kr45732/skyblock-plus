@@ -63,7 +63,7 @@ public class WeightCommand extends Command {
 				slayerStr
 					.append(capitalizeString(slayerName))
 					.append(": ")
-					.append(weight.getSlayerWeight().getSlayerWeight(slayerName).get())
+					.append(weight.getSlayerWeight().getSlayerWeight(slayerName).getFormatted())
 					.append("\n");
 			}
 			StringBuilder skillsStr = new StringBuilder();
@@ -71,27 +71,27 @@ public class WeightCommand extends Command {
 				skillsStr
 					.append(capitalizeString(skillName))
 					.append(": ")
-					.append(weight.getSkillsWeight().getSkillsWeight(skillName).get())
+					.append(weight.getSkillsWeight().getSkillsWeight(skillName).getFormatted())
 					.append("\n");
 			}
 			StringBuilder dungeonsStr = new StringBuilder();
 			dungeonsStr
 				.append(capitalizeString("catacombs"))
 				.append(": ")
-				.append(weight.getDungeonsWeight().getDungeonWeight("catacombs").get())
+				.append(weight.getDungeonsWeight().getDungeonWeight("catacombs").getFormatted())
 				.append("\n");
 			for (String dungeonClassName : DUNGEON_CLASS_NAMES) {
 				dungeonsStr
 					.append(capitalizeString(dungeonClassName))
 					.append(": ")
-					.append(weight.getDungeonsWeight().getClassWeight(dungeonClassName).get())
+					.append(weight.getDungeonsWeight().getClassWeight(dungeonClassName).getFormatted())
 					.append("\n");
 			}
 
-			eb.addField("Slayer | " + weight.getSlayerWeight().getWeightStruct().get(), slayerStr.toString(), false);
-			eb.addField("Skills | " + weight.getSkillsWeight().getWeightStruct().get(), skillsStr.toString(), false);
-			eb.addField("Dungeons | " + weight.getDungeonsWeight().getWeightStruct().get(), dungeonsStr.toString(), false);
-			eb.setDescription("**Total Weight:** " + weight.getTotalWeight(false).get());
+			eb.addField("Slayer | " + weight.getSlayerWeight().getWeightStruct().getFormatted(), slayerStr.toString(), false);
+			eb.addField("Skills | " + weight.getSkillsWeight().getWeightStruct().getFormatted(), skillsStr.toString(), false);
+			eb.addField("Dungeons | " + weight.getDungeonsWeight().getWeightStruct().getFormatted(), dungeonsStr.toString(), false);
+			eb.setDescription("**Total Weight:** " + weight.getTotalWeight(false).getFormatted());
 			return eb;
 		}
 		return invalidEmbed(player.getFailCause());

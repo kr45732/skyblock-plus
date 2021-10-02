@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.dev;
+package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.Hypixel.usernameToUuid;
 import static com.skyblockplus.utils.Utils.*;
@@ -30,8 +30,9 @@ import net.dv8tion.jda.api.EmbedBuilder;
 public class UuidCommand extends Command {
 
 	public UuidCommand() {
-		this.name = "d-uuid";
-		this.ownerCommand = true;
+		this.name = "uuid";
+		this.aliases = new String[]{"username"};
+		this.cooldown = globalCooldown + 1;
 		this.botPermissions = defaultPerms();
 	}
 
@@ -56,8 +57,9 @@ public class UuidCommand extends Command {
 	private EmbedBuilder getUuidPlayer(String username) {
 		UsernameUuidStruct usernameUuid = usernameToUuid(username);
 		if (usernameUuid.isNotValid()) {
-			return invalidEmbed(usernameUuid.failCause);
+			return invalidEmbed(usernameUuid.getFailCause());
 		}
-		return defaultEmbed("Uuid for " + usernameUuid.playerUsername).setDescription("**Uuid:** " + usernameUuid.playerUuid);
+
+		return defaultEmbed(usernameUuid.getUsername(), "https://plancke.io/hypixel/player/stats/" + usernameUuid.getUsername()).setDescription("**Username:** " + usernameUuid.getUsername() + "\n**Uuid:** " + usernameUuid.getUuid()) .setThumbnail(usernameUuid.getAvatarlUrl());
 	}
 }

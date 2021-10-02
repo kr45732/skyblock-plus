@@ -50,17 +50,17 @@ public class ProfilesCommand extends Command {
 	public static EmbedBuilder getPlayerProfiles(String username, User user, MessageChannel channel, InteractionHook hook) {
 		UsernameUuidStruct usernameUuid = usernameToUuid(username);
 		if (usernameUuid.isNotValid()) {
-			return invalidEmbed(usernameUuid.failCause);
+			return invalidEmbed(usernameUuid.getFailCause());
 		}
 
-		HypixelResponse profilesJson = skyblockProfilesFromUuid(usernameUuid.playerUuid);
+		HypixelResponse profilesJson = skyblockProfilesFromUuid(usernameUuid.getUuid());
 		if (profilesJson.isNotValid()) {
-			return invalidEmbed(profilesJson.failCause);
+			return invalidEmbed(profilesJson.getFailCause());
 		}
 
 		List<CompletableFuture<String>> profileUsernameFutureList = new ArrayList<>();
 
-		for (JsonElement profile : profilesJson.response.getAsJsonArray()) {
+		for (JsonElement profile : profilesJson.getResponse().getAsJsonArray()) {
 			List<String> uuids = getJsonKeys(higherDepth(profile, "members"));
 
 			for (String uuid : uuids) {
@@ -82,8 +82,8 @@ public class ProfilesCommand extends Command {
 
 		List<String> pageTitlesUrls = new ArrayList<>();
 		int count = 0;
-		for (JsonElement profile : profilesJson.response.getAsJsonArray()) {
-			pageTitlesUrls.add(skyblockStatsLink(usernameUuid.playerUsername, higherDepth(profile, "cute_name").getAsString()));
+		for (JsonElement profile : profilesJson.getResponse().getAsJsonArray()) {
+			pageTitlesUrls.add(skyblockStatsLink(usernameUuid.getUsername(), higherDepth(profile, "cute_name").getAsString()));
 			StringBuilder profileStr = new StringBuilder(
 				"• **Profile Name:** " +
 				higherDepth(profile, "cute_name").getAsString() +
@@ -103,7 +103,7 @@ public class ProfilesCommand extends Command {
 		}
 
 		paginateBuilder.setPaginatorExtras(
-			new PaginatorExtras().setEveryPageTitle(usernameUuid.playerUsername).setTitleUrls(pageTitlesUrls)
+			new PaginatorExtras().setEveryPageTitle(usernameUuid.getUsername()).setTitleUrls(pageTitlesUrls)
 		);
 
 		if (channel != null) {

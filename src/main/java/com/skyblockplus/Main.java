@@ -60,6 +60,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.slf4j.Logger;
@@ -210,13 +211,12 @@ public class Main {
 				.addEventListeners(
 					new ExceptionEventListener(waiter),
 					client,
-					new ExceptionEventListener(new MessageTimeout()),
 					new ExceptionEventListener(slashCommandClient),
 					new ExceptionEventListener(new MainListener())
 				)
 				.setActivity(Activity.playing("Loading..."))
 				.disableCache(CacheFlag.VOICE_STATE)
-				//	.enableIntents(GatewayIntent.GUILD_MEMBERS)
+				.enableIntents(GatewayIntent.GUILD_MEMBERS)
 				.build();
 
 		try {

@@ -18,43 +18,42 @@
 
 package com.skyblockplus.features.verify;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
-import static com.skyblockplus.utils.Hypixel.getGuildFromPlayer;
-import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.invalidEmbed;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
 import com.skyblockplus.api.serversettings.automatedguild.GuildRole;
-import com.skyblockplus.link.LinkCommand;
-import com.skyblockplus.utils.structs.DiscordInfoStruct;
 import com.skyblockplus.utils.structs.HypixelResponse;
-import java.time.Instant;
-import java.util.concurrent.TimeUnit;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
+import java.util.concurrent.TimeUnit;
+
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
+import static com.skyblockplus.utils.Hypixel.getGuildFromPlayer;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.higherDepth;
+
 public class VerifyGuild {
 
+	public final String guildId;
 	public TextChannel messageChannel;
 	public Message originalMessage;
 	public JsonElement verifySettings;
 	public boolean enable = true;
 
-	public VerifyGuild(TextChannel messageChannel, Message originalMessage, JsonElement verifySettings) {
+	public VerifyGuild(TextChannel messageChannel, Message originalMessage, JsonElement verifySettings, String guildId) {
 		this.messageChannel = messageChannel;
 		this.originalMessage = originalMessage;
 		this.verifySettings = verifySettings;
+		this.guildId = guildId;
 	}
 
-	public VerifyGuild() {
+	public VerifyGuild(String guildId) {
 		this.enable = false;
+		this.guildId = guildId;
 	}
 
 	public boolean onGuildMessageReceived(GuildMessageReceivedEvent event) {
@@ -86,10 +85,6 @@ public class VerifyGuild {
 	}
 
 	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
-		if (!enable) {
-			return;
-		}
-
 		if (!higherDepth(verifySettings, "enableMemberJoinSync").getAsString().equals("true")) {
 			return;
 		}
@@ -104,7 +99,7 @@ public class VerifyGuild {
 
 		try {
 			String nicknameTemplate = higherDepth(verifySettings, "verifiedNickname").getAsString();
-			if (!nicknameTemplate.equalsIgnoreCase("none")) {
+			if (!nicknameTemplate.equalsIgnoreCase("none") && !nicknameTemplate.isEmpty()) {
 				nicknameTemplate = nicknameTemplate.replace("[IGN]", higherDepth(linkedUser, "minecraftUsername").getAsString());
 
 				if (nicknameTemplate.contains("[GUILD_RANK]")) {
@@ -194,5 +189,11 @@ public class VerifyGuild {
 					)
 					.queue()
 			);
+	}
+
+	public void reloadSettingsJson(JsonElement newVerifySettings){
+		if(higherDepth(newVerifySettings, "enableMemberJoinSync", "").equals("true")) {
+			verifySettings = database.getVerifySettings(guildId);
+		}
 	}
 }

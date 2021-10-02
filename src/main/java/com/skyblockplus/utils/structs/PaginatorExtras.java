@@ -106,9 +106,8 @@ public class PaginatorExtras {
 		return this;
 	}
 
-	public PaginatorExtras addEmbedField(String name, String value, boolean inline) {
+	public void addEmbedField(String name, String value, boolean inline) {
 		this.embedFields.add(new Field(name, value, inline));
-		return this;
 	}
 
 	public PaginatorExtras addBlankField(boolean inline) {

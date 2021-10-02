@@ -45,11 +45,11 @@ public class HypixelPlayer {
 		try {
 			HypixelResponse response = playerFromUuid(playerUuid);
 			if (response.isNotValid()) {
-				failCause = response.failCause;
+				failCause = response.getFailCause();
 				return;
 			}
 
-			this.playerJson = response.response.getAsJsonObject();
+			this.playerJson = response.getResponse().getAsJsonObject();
 		} catch (Exception e) {
 			return;
 		}
@@ -58,8 +58,8 @@ public class HypixelPlayer {
 	}
 
 	/* Getters */
-	public boolean isValid() {
-		return validPlayer;
+	public boolean isNotValid() {
+		return !validPlayer;
 	}
 
 	public String getFailCause() {
@@ -124,12 +124,12 @@ public class HypixelPlayer {
 	private boolean usernameToUuid(String username) {
 		UsernameUuidStruct response = Hypixel.usernameToUuid(username);
 		if (response.isNotValid()) {
-			failCause = response.failCause;
+			failCause = response.getFailCause();
 			return true;
 		}
 
-		this.playerUsername = response.playerUsername;
-		this.playerUuid = response.playerUuid;
+		this.playerUsername = response.getUsername();
+		this.playerUuid = response.getUuid();
 		return false;
 	}
 

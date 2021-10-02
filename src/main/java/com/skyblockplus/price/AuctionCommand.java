@@ -51,14 +51,14 @@ public class AuctionCommand extends Command {
 	public static EmbedBuilder getPlayerAuction(String username, User user, MessageChannel channel, InteractionHook hook) {
 		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
 		if (usernameUuidStruct.isNotValid()) {
-			return invalidEmbed(usernameUuidStruct.failCause);
+			return invalidEmbed(usernameUuidStruct.getFailCause());
 		}
 
-		HypixelResponse auctionsResponse = getAuctionFromPlayer(usernameUuidStruct.playerUuid);
+		HypixelResponse auctionsResponse = getAuctionFromPlayer(usernameUuidStruct.getUuid());
 		if (auctionsResponse.isNotValid()) {
-			return invalidEmbed(auctionsResponse.failCause);
+			return invalidEmbed(auctionsResponse.getFailCause());
 		}
-		JsonArray auctionsArray = auctionsResponse.response.getAsJsonArray();
+		JsonArray auctionsArray = auctionsResponse.getResponse().getAsJsonArray();
 
 		String[][] auctions = new String[auctionsArray.size()][2];
 
@@ -112,9 +112,9 @@ public class AuctionCommand extends Command {
 
 		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, user).setColumns(1).setItemsPerPage(10);
 		PaginatorExtras extras = new PaginatorExtras()
-			.setEveryPageTitle(usernameUuidStruct.playerUsername)
-			.setEveryPageTitleUrl(skyblockStatsLink(usernameUuidStruct.playerUsername, null))
-			.setEveryPageThumbnail("https://cravatar.eu/helmavatar/" + usernameUuidStruct.playerUuid + "/64.png")
+			.setEveryPageTitle(usernameUuidStruct.getUsername())
+			.setEveryPageTitleUrl(skyblockStatsLink(usernameUuidStruct.getUsername(), null))
+			.setEveryPageThumbnail(usernameUuidStruct.getAvatarlUrl())
 			.setEveryPageText(
 				"**Sold Auctions Value:** " +
 				simplifyNumber(totalSoldValue) +
@@ -139,20 +139,20 @@ public class AuctionCommand extends Command {
 		}
 
 		EmbedBuilder eb = defaultEmbed(
-			usernameUuidStruct.playerUsername,
-			"https://auctions.craftlink.xyz/players/" + usernameUuidStruct.playerUuid
+			usernameUuidStruct.getUsername(),
+			usernameUuidStruct.getAuctionUrl()
 		);
-		eb.setTitle("No auctions found for " + usernameUuidStruct.playerUsername, null);
+		eb.setTitle("No auctions found for " + usernameUuidStruct.getUsername(), null);
 		return eb;
 	}
 
 	public static EmbedBuilder getAuctionByUuid(String auctionUuid) {
 		HypixelResponse auctionResponse = getAuctionFromUuid(auctionUuid);
 		if (auctionResponse.isNotValid()) {
-			return invalidEmbed(auctionResponse.failCause);
+			return invalidEmbed(auctionResponse.getFailCause());
 		}
 
-		JsonElement auctionJson = auctionResponse.response.getAsJsonArray().get(0);
+		JsonElement auctionJson = auctionResponse.getResponse().getAsJsonArray().get(0);
 		EmbedBuilder eb = defaultEmbed("Auction from UUID");
 		String itemName = higherDepth(auctionJson, "item_name").getAsString();
 
@@ -179,7 +179,7 @@ public class AuctionCommand extends Command {
 		String timeUntil = instantToDHM(duration);
 
 		String ebStr = "**Item name:** " + itemName;
-		ebStr += "\n**Seller:** " + uuidToUsername(higherDepth(auctionJson, "auctioneer").getAsString()).playerUsername;
+		ebStr += "\n**Seller:** " + uuidToUsername(higherDepth(auctionJson, "auctioneer").getAsString()).getUsername();
 		ebStr += "\n**Command:** `/viewauction " + higherDepth(auctionJson, "uuid").getAsString() + "`";
 		long highestBid = higherDepth(auctionJson, "highest_bid_amount", 0L);
 		long startingBid = higherDepth(auctionJson, "starting_bid", 0L);
@@ -194,7 +194,7 @@ public class AuctionCommand extends Command {
 				ebStr +=
 					bidsArr.size() > 0
 						? "\n**Highest bidder:** " +
-						uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).playerUsername
+							uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).getUsername()
 						: "";
 			}
 		} else {
@@ -203,7 +203,7 @@ public class AuctionCommand extends Command {
 					"\n**Auction sold** for " +
 					simplifyNumber(highestBid) +
 					" coins to " +
-					uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).playerUsername;
+							uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).getUsername();
 			} else {
 				ebStr = "\n**Auction did not sell**";
 			}

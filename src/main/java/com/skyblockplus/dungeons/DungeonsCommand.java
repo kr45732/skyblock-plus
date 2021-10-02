@@ -69,14 +69,14 @@ public class DungeonsCommand extends Command {
 
 				SkillsStruct skillInfo = player.getCatacombsSkill();
 				extras.addEmbedField(
-					DUNGEON_EMOJI_MAP.get("catacombs") + " " + capitalizeString(skillInfo.skillName) + " (" + skillInfo.skillLevel + ")",
-					simplifyNumber(skillInfo.expCurrent) +
+					DUNGEON_EMOJI_MAP.get("catacombs") + " " + capitalizeString(skillInfo.getName()) + " (" + skillInfo.getCurrentLevel() + ")",
+					simplifyNumber(skillInfo.getExpCurrent()) +
 					" / " +
-					simplifyNumber(skillInfo.expForNext) +
+					simplifyNumber(skillInfo.getExpForNext()) +
 					"\nTotal XP: " +
-					simplifyNumber(skillInfo.totalSkillExp) +
+					simplifyNumber(skillInfo.getTotalExp()) +
 					"\nProgress: " +
-					roundProgress(skillInfo.progressToNext),
+							(skillInfo.isMaxed() ? "MAX" : roundProgress(skillInfo.getProgressToNext())),
 					true
 				);
 
@@ -85,14 +85,14 @@ public class DungeonsCommand extends Command {
 				for (String className : DUNGEON_CLASS_NAMES) {
 					skillInfo = player.getDungeonClass(className);
 					extras.addEmbedField(
-						DUNGEON_EMOJI_MAP.get(className) + " " + capitalizeString(className) + " (" + skillInfo.skillLevel + ")",
-						simplifyNumber(skillInfo.expCurrent) +
+						DUNGEON_EMOJI_MAP.get(className) + " " + capitalizeString(className) + " (" + skillInfo.getCurrentLevel() + ")",
+						simplifyNumber(skillInfo.getExpCurrent()) +
 						" / " +
-						simplifyNumber(skillInfo.expForNext) +
+						simplifyNumber(skillInfo.getExpForNext()) +
 						"\nTotal XP: " +
-						simplifyNumber(skillInfo.totalSkillExp) +
+						simplifyNumber(skillInfo.getTotalExp()) +
 						"\nProgress: " +
-						roundProgress(skillInfo.progressToNext),
+								(skillInfo.isMaxed() ? "MAX" : roundProgress(skillInfo.getProgressToNext())),
 						true
 					);
 				}

@@ -31,7 +31,6 @@ import com.skyblockplus.api.serversettings.automatedverify.AutomatedVerify;
 import com.skyblockplus.settings.SettingsExecute;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -159,7 +158,7 @@ public class SetupCommandHandler {
 				} else if (featureType.startsWith("guild_counter_")) {
 					this.name = featureType.split("guild_counter_")[1];
 					this.featureType = "guild_counter";
-					EmbedBuilder eb = settings.setGuildCounterEnable(name, "true");
+					EmbedBuilder eb = settings.setGuildCounterEnable(name, true);
 					if (eb.build().getTitle().equals("Settings")) {
 						buttonEvent
 							.getHook()
@@ -407,7 +406,7 @@ public class SetupCommandHandler {
 			case "guild_role":
 				eb = settings.setGuildRoleName(name, event.getMessage().getContentRaw());
 				if (eb.build().getTitle().equals("Settings")) {
-					eb = settings.setGuildRoleEnable(name, "true");
+					eb = settings.setGuildRoleEnable(name, true);
 					if (eb.build().getTitle().equals("Settings")) {
 						sendEmbed(defaultEmbed("Success").setDescription("Enabled guild member role sync."));
 					} else {
@@ -440,7 +439,7 @@ public class SetupCommandHandler {
 				}
 
 				if (eb.build().getTitle().equals("Settings")) {
-					eb = settings.setGuildRankEnable(name, "true");
+					eb = settings.setGuildRankEnable(name, true);
 					if (eb.build().getTitle().equals("Settings")) {
 						sendEmbed(defaultEmbed("Success").setDescription("Enabled guild ranks sync."));
 					} else {

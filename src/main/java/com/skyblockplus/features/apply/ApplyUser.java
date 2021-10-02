@@ -20,7 +20,6 @@ package com.skyblockplus.features.apply;
 
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.formatNumber;
 
 import com.google.gson.*;
 import com.skyblockplus.networth.NetworthExecute;
@@ -196,7 +195,7 @@ public class ApplyUser implements Serializable {
 				if (
 					player.getTotalSlayer() >= slayerReq &&
 					player.getSkillAverage() >= skillsReq &&
-					player.getCatacombsLevel() >= cataReq &&
+					player.getCatacombsSkill().getProgressLevel() >= cataReq &&
 					player.getWeight() >= weightReq
 				) {
 					meetReqs = true;
@@ -225,7 +224,7 @@ public class ApplyUser implements Serializable {
 				" | Skill Average - " +
 				(player.getSkillAverage() == -1 ? "API disabled" : formatNumber(player.getSkillAverage())) +
 				" | Catacombs - " +
-				formatNumber(player.getCatacombsLevel()) +
+				formatNumber(player.getCatacombsSkill().getProgressLevel()) +
 				" | Weight - " +
 				formatNumber(player.getWeight())
 			);
@@ -237,7 +236,7 @@ public class ApplyUser implements Serializable {
 			playerSlayer = formatNumber(player.getTotalSlayer());
 			playerSkills = roundAndFormat(player.getSkillAverage());
 			playerSkills = playerSkills.equals("-1") ? "API disabled" : playerSkills;
-			playerCatacombs = roundAndFormat(player.getCatacombsLevel());
+			playerCatacombs = roundAndFormat(player.getCatacombsSkill().getProgressLevel());
 			playerWeight = roundAndFormat(player.getWeight());
 
 			reactMessage =
@@ -263,7 +262,7 @@ public class ApplyUser implements Serializable {
 			playerSkills = playerSkills.equals("-1") ? "API disabled" : playerSkills;
 
 			try {
-				playerCatacombs = roundAndFormat(player.getCatacombsSkill().skillLevel + player.getCatacombsSkill().progressToNext);
+				playerCatacombs = roundAndFormat(player.getCatacombsSkill().getProgressLevel());
 			} catch (Exception e) {
 				playerCatacombs = "0";
 			}
@@ -462,7 +461,7 @@ public class ApplyUser implements Serializable {
 						eb.setDescription(higherDepth(currentSettings, "acceptMessageText").getAsString());
 						MessageAction action = applicationChannel.sendMessage(applyingUser.getAsMention()).setEmbeds(eb.build());
 						if (waitInviteChannel == null) {
-							action.setActionRow(Button.success("apply_user_delete_channel", "Close Channel"));
+							action = action.setActionRow(Button.success("apply_user_delete_channel", "Close Channel"));
 						}
 
 						reactMessage = action.complete();
@@ -522,7 +521,7 @@ public class ApplyUser implements Serializable {
 							action = applicationChannel.sendMessage(applyingUser.getAsMention()).setEmbeds(eb.build());
 
 							if (waitInviteChannel == null) {
-								action.setActionRow(Button.success("apply_user_delete_channel", "Close Channel"));
+								action = action.setActionRow(Button.success("apply_user_delete_channel", "Close Channel"));
 							}
 
 							reactMessage = action.complete();

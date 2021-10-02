@@ -137,10 +137,10 @@ public class SkyblockEventHandler {
 			case 0:
 				HypixelResponse response = getGuildFromName(replyMessage);
 				if (response.isNotValid()) {
-					eb.setDescription(response.failCause + ". Please try again.");
+					eb.setDescription(response.getFailCause() + ". Please try again.");
 					attemptsLeft--;
 				} else {
-					guildJson = response.response;
+					guildJson = response.getResponse();
 					eb
 						.addField(
 							"Guild",

@@ -18,16 +18,17 @@
 
 package com.skyblockplus.inventory;
 
-import static com.skyblockplus.utils.MessageTimeout.addMessage;
-
-import java.util.List;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
-public class InventoryPaginator extends ListenerAdapter {
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import static com.skyblockplus.Main.waiter;
+
+public class InventoryPaginator {
 
 	private final List<String[]> enderChestPages;
 	private final Message pagePart1;
@@ -45,26 +46,22 @@ public class InventoryPaginator extends ListenerAdapter {
 		pagePart2 = channel.sendMessage(enderChestPages.get(0)[1]).complete();
 		pagePart2.addReaction("◀️").queue();
 		pagePart2.addReaction("▶️").queue();
-		addMessage(pagePart2, this);
+
+		waiter.waitForEvent(
+				GuildMessageReactionAddEvent.class,
+				this::condition,
+				this::action,
+				30,
+				TimeUnit.SECONDS,
+				() -> pagePart2.clearReactions().queue()
+		);
 	}
 
-	@Override
-	public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
-		if (event.getUser().isBot()) {
-			return;
-		}
+	private boolean condition(GuildMessageReactionAddEvent event) {
+		return !event.getUser().isBot() && event.getUser().equals(user) && event.getMessageId().equals(pagePart2.getId());
+	}
 
-		if (!event.getMessageId().equals(pagePart2.getId())) {
-			if (event.getMessageId().equals(pagePart1.getId())) {
-				pagePart1.clearReactions().queue();
-			}
-			return;
-		}
-
-		if (!event.getUser().equals(user)) {
-			return;
-		}
-
+	public void action(GuildMessageReactionAddEvent event) {
 		if (event.getReaction().getReactionEmote().getAsReactionCode().equals("◀️")) {
 			pagePart2.removeReaction("◀️", user).queue();
 			if ((pageNumber - 1) >= 0) {

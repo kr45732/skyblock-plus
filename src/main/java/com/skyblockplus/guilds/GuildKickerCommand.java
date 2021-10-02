@@ -112,13 +112,13 @@ public class GuildKickerCommand extends Command {
 
 		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
 		if (usernameUuidStruct.isNotValid()) {
-			return invalidEmbed(usernameUuidStruct.failCause);
+			return invalidEmbed(usernameUuidStruct.getFailCause());
 		}
-		HypixelResponse guildResponse = getGuildFromPlayer(usernameUuidStruct.playerUuid);
+		HypixelResponse guildResponse = getGuildFromPlayer(usernameUuidStruct.getUuid());
 		if (guildResponse.isNotValid()) {
-			return invalidEmbed(guildResponse.failCause);
+			return invalidEmbed(guildResponse.getFailCause());
 		}
-		JsonElement guildJson = guildResponse.response;
+		JsonElement guildJson = guildResponse.getResponse();
 
 		String guildId = higherDepth(guildJson, "_id").getAsString();
 		JsonElement guildLbJson = getJson("https://hypixel-app-api.senither.com/leaderboard/players/" + guildId);
@@ -227,9 +227,9 @@ public class GuildKickerCommand extends Command {
 					futuresList.add(
 						guildMemberUsername.thenApply(guildMemberUsernameResponse -> {
 							try {
-								if (keyCooldownMap.get(hypixelKey).remainingLimit.get() < 5) {
-									System.out.println("Sleeping for " + keyCooldownMap.get(hypixelKey).timeTillReset + " seconds");
-									TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).timeTillReset.get());
+								if (keyCooldownMap.get(hypixelKey).getRemainingLimit().get() < 5) {
+									System.out.println("Sleeping for " + keyCooldownMap.get(hypixelKey).getTimeTillReset().get() + " seconds");
+									TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).getTimeTillReset().get());
 								}
 							} catch (Exception ignored) {}
 

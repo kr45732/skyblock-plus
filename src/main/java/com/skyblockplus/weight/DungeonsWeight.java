@@ -24,6 +24,7 @@ import static com.skyblockplus.utils.Constants.DUNGEON_WEIGHTS;
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Constants;
 import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.structs.SkillsStruct;
 import com.skyblockplus.utils.structs.WeightStruct;
 
 public class DungeonsWeight {
@@ -47,8 +48,9 @@ public class DungeonsWeight {
 	}
 
 	public WeightStruct getClassWeight(String className) {
-		double currentClassLevel = player.getDungeonClassLevel(profile, className);
-		double currentClassXp = player.getDungeonClassXp(profile, className);
+		SkillsStruct dungeonSkill = player.getDungeonClass(profile, className);
+		double currentClassLevel = dungeonSkill.getProgressLevel();
+		double currentClassXp = dungeonSkill.getTotalExp();
 		double base = Math.pow(currentClassLevel, 4.5) * DUNGEON_CLASS_WEIGHTS.get(className);
 
 		if (currentClassXp <= Constants.CATACOMBS_LEVEL_50_XP) {
@@ -62,7 +64,7 @@ public class DungeonsWeight {
 
 	public WeightStruct getDungeonWeight(String dungeonName) {
 		double catacombsSkillXp = player.getSkillXp(profile, dungeonName);
-		double level = player.getCatacombsLevel(profile);
+		double level = player.getCatacombsSkill(profile).getProgressLevel();
 		double base = Math.pow(level, 4.5) * DUNGEON_WEIGHTS.get(dungeonName);
 
 		if (catacombsSkillXp <= Constants.CATACOMBS_LEVEL_50_XP) {

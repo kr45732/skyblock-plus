@@ -400,11 +400,11 @@ public class Utils {
 		try {
 			UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
 			if (usernameUuidStruct.isNotValid()) {
-				return new DiscordInfoStruct(usernameUuidStruct.failCause);
+				return new DiscordInfoStruct(usernameUuidStruct.getFailCause());
 			}
-			HypixelResponse response = playerFromUuid(usernameUuidStruct.playerUuid);
+			HypixelResponse response = playerFromUuid(usernameUuidStruct.getUuid());
 			if (response.isNotValid()) {
-				return new DiscordInfoStruct(response.failCause);
+				return new DiscordInfoStruct(response.getFailCause());
 			}
 
 			if (response.get("socialMedia.links.DISCORD") == null) {
@@ -595,7 +595,7 @@ public class Utils {
 	}
 
 	public static String parseMcCodes(String unformattedString) {
-		return patternControlCode.matcher(unformattedString).replaceAll("");
+		return patternControlCode.matcher(unformattedString.replace("\u00A7ka", "")).replaceAll("");
 	}
 
 	public static String fixUsername(String username) {
@@ -1015,13 +1015,13 @@ public class Utils {
 
 						if (item.containsTag("tag.ExtraAttributes.gems", TagType.COMPOUND)) {
 							NBTCompound gems = item.getCompound("tag.ExtraAttributes.gems");
-							if (gems.containsKey("UNIVERSAL_0") && gems.containsKey("UNIVERSAL_0_gem")) {
-								itemInfo.addExtraValue(
-									gems.getString("UNIVERSAL_0", "None") + "_" + gems.getString("UNIVERSAL_0_gem", "None") + "_" + "_GEM"
-								);
-							} else {
-								for (Map.Entry<String, Object> gem : gems.entrySet()) {
-									itemInfo.addExtraValue(gem.getValue() + "_" + gem.getKey().split("_")[0] + "_GEM");
+							for (Map.Entry<String, Object> gem : gems.entrySet()) {
+								if(!gem.getKey().endsWith("_gem")) {
+									if(gems.containsKey(gem.getKey() + "_gem")){
+										itemInfo.addExtraValue(gem.getValue() + "_" + gems.get(gem.getKey() + "_gem") + "_GEM");
+									}else {
+										itemInfo.addExtraValue(gem.getValue() + "_" + gem.getKey().split("_")[0] + "_GEM");
+									}
 								}
 							}
 						}
@@ -1144,13 +1144,13 @@ public class Utils {
 					try {
 						DiscordInfoStruct discordInfo = getPlayerDiscordInfo(notUpdated.getMinecraftUsername());
 						User updateUser = jda.retrieveUserById(notUpdated.getDiscordId()).complete();
-						if (discordInfo.discordTag.equals(updateUser.getAsTag())) {
+						if (discordInfo.getDiscordTag().equals(updateUser.getAsTag())) {
 							database.addLinkedUser(
 								new LinkedAccountModel(
 									"" + Instant.now().toEpochMilli(),
 									updateUser.getId(),
-									discordInfo.minecraftUuid,
-									discordInfo.minecraftUsername
+										discordInfo.getUuid(),
+										discordInfo.getUsername()
 								)
 							);
 							try {

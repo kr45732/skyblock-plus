@@ -39,7 +39,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
-import lombok.var;
+
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -97,7 +97,7 @@ public class Hypixel {
 					higherDepth(usernameJson, "username").getAsString(),
 					higherDepth(usernameJson, "uuid").getAsString().replace("-", "")
 				);
-				uuidToUsernameCache.put(usernameUuidStruct.playerUuid, usernameUuidStruct.playerUsername);
+				uuidToUsernameCache.put(usernameUuidStruct.getUuid(), usernameUuidStruct.getUsername());
 				return usernameUuidStruct;
 			} catch (Exception e) {
 				return new UsernameUuidStruct(higherDepth(usernameJson, "reason").getAsString());
@@ -119,7 +119,7 @@ public class Hypixel {
 					higherDepth(usernameJson, "username").getAsString(),
 					higherDepth(usernameJson, "uuid").getAsString().replace("-", "")
 				);
-				uuidToUsernameCache.put(usernameUuidStruct.playerUuid, usernameUuidStruct.playerUsername);
+				uuidToUsernameCache.put(usernameUuidStruct.getUuid(), usernameUuidStruct.getUsername());
 				return usernameUuidStruct;
 			} catch (Exception e) {
 				return new UsernameUuidStruct(higherDepth(usernameJson, "reason").getAsString());
@@ -201,10 +201,10 @@ public class Hypixel {
 							try {
 								keyCooldownMap
 									.get(hypixelApiKey)
-									.remainingLimit.set(Integer.parseInt(profilesResponse.getHeader("RateLimit-Remaining")));
+									.getRemainingLimit().set(Integer.parseInt(profilesResponse.getHeader("RateLimit-Remaining")));
 								keyCooldownMap
 									.get(hypixelApiKey)
-									.timeTillReset.set(Integer.parseInt(profilesResponse.getHeader("RateLimit-Reset")));
+									.getTimeTillReset().set(Integer.parseInt(profilesResponse.getHeader("RateLimit-Reset")));
 							} catch (Exception ignored) {}
 
 							JsonArray profileArray = processSkyblockProfilesArray(

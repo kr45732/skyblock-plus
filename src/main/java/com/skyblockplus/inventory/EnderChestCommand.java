@@ -18,14 +18,14 @@
 
 package com.skyblockplus.inventory;
 
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
+
 import java.util.List;
+
+import static com.skyblockplus.utils.Utils.*;
 
 public class EnderChestCommand extends Command {
 
@@ -60,7 +60,7 @@ public class EnderChestCommand extends Command {
 								.queue();
 						}
 
-						jda.addEventListener(new InventoryPaginator(playerEnderChest, ebMessage.getChannel(), event.getAuthor()));
+						new InventoryPaginator(playerEnderChest, ebMessage.getChannel(), event.getAuthor());
 					} else {
 						embed(invalidEmbed("Unable to fetch player data"));
 					}

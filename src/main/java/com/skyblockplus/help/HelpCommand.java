@@ -179,8 +179,8 @@ public class HelpCommand extends Command {
 				new HelpData("bits", "Get the bits cost of an item from the bits shop.", "bits [item]")
 					.addExamples("bits God Potion")
 					.addAliases("bit"),
-				new HelpData("calculate", "Calculate the price of an item on the auction house using the auction's UUID.", "price [UUID]")
-					.addExamples("price 8be8bef8c46f4dbda2eccd1ca0c30e27"),
+				new HelpData("calculate", "Calculate the price of an item on the auction house using the auction's UUID.", "calculate [UUID]")
+					.addExamples("calculate 8be8bef8c46f4dbda2eccd1ca0c30e27"),
 				new HelpData("inventory", "Get a player's inventory represented in emojis.", "inventory [player] <profile>")
 					.addSecondData("Get a player's inventory with lore.", "inventory [player] <profile> [slot:number]")
 					.addAliases("inv")
@@ -337,7 +337,7 @@ public class HelpCommand extends Command {
 									.addExamples("myGuild channel #apply-for-guild"),
 								new HelpData(
 									"category",
-									"Category where new apply channels will be made. Run `categories` to get the ID's of all categories in the server.",
+									"Category where new apply channels will be made. Run `categories` to getFormatted the ID's of all categories in the server.",
 									"[name] category [category id]"
 								),
 								new HelpData(
@@ -533,7 +533,7 @@ public class HelpCommand extends Command {
 			help.create("bids [player]", "Get a player's auction house bids") +
 			help.create("query [item]", "Query the auction house for the lowest bin of an item") +
 			help.create("bits [item]", "Get the bits cost of an item from the bits shop") +
-			help.create("price [uuid]", "Calculate the price of an item on the auction house using the auction's UUID")
+			help.create("calculate [uuid]", "Calculate the price of an item on the auction house using the auction's UUID")
 		);
 
 		paginateBuilder.addItems(
@@ -566,7 +566,8 @@ public class HelpCommand extends Command {
 			help.create("missing [player] <profile>", "Get a player's missing talismans") +
 			help.create("fetchur", "Get the item that fetchur wants today") +
 			help.create("cakes [player] <profile>", "Get a player's inactive and active cake buffs") +
-			help.create("harp [player] <profile>", "Get a player's harp statistics")
+			help.create("harp [player] <profile>", "Get a player's harp statistics") +
+			help.create("uuid [username|uuid]", "Convert username to UUID or UUID to username")
 		);
 
 		paginateBuilder.addItems(

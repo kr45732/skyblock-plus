@@ -18,17 +18,20 @@
 
 package com.skyblockplus.utils.structs;
 
+import lombok.Data;
+
+@Data
 public class DiscordInfoStruct {
 
-	public String discordTag;
-	public String minecraftUsername;
-	public String minecraftUuid;
-	public String failCause;
+	private String discordTag;
+	private String username;
+	private String uuid;
+	private String failCause;
 
-	public DiscordInfoStruct(String discordTag, String minecraftUsername, String minecraftUuid) {
+	public DiscordInfoStruct(String discordTag, String username, String uuid) {
 		this.discordTag = discordTag;
-		this.minecraftUsername = minecraftUsername;
-		this.minecraftUuid = minecraftUuid;
+		this.username = username;
+		this.uuid = uuid;
 	}
 
 	public DiscordInfoStruct(String failCause) {
@@ -40,23 +43,6 @@ public class DiscordInfoStruct {
 	}
 
 	public boolean isNotValid() {
-		return discordTag == null || minecraftUsername == null || minecraftUuid == null;
-	}
-
-	@Override
-	public String toString() {
-		return (
-			"DiscordInfoStruct{" +
-			"discordTag='" +
-			discordTag +
-			'\'' +
-			", minecraftUsername='" +
-			minecraftUsername +
-			'\'' +
-			", minecraftUuid='" +
-			minecraftUuid +
-			'\'' +
-			'}'
-		);
+		return discordTag == null || username == null || uuid == null;
 	}
 }

@@ -39,27 +39,27 @@ public class ServerSettingsController {
 		this.settingsService = settingsService;
 	}
 
-	@GetMapping("/get/all")
+	@GetMapping("/getFormatted/all")
 	public List<ServerSettingsModel> getAllServerSettings() {
 		return settingsService.getAllServerSettings();
 	}
 
-	@GetMapping("/get/byId")
+	@GetMapping("/getFormatted/byId")
 	public ResponseEntity<?> getServerSettings(@RequestParam(value = "serverId") String serverId) {
 		return settingsService.getServerSettingsById(serverId);
 	}
 
-	@GetMapping("/get/verify")
+	@GetMapping("/getFormatted/verify")
 	public ResponseEntity<?> getVerifySettings(@RequestParam(value = "serverId") String serverId) {
 		return settingsService.getVerifySettings(serverId);
 	}
 
-	@GetMapping("/get/apply/all")
+	@GetMapping("/getFormatted/apply/all")
 	public List<AutomatedApply> getAllApplySettings(@RequestParam(value = "serverId") String serverId) {
 		return settingsService.getAllApplySettings(serverId);
 	}
 
-	@GetMapping("/get/apply/byName")
+	@GetMapping("/getFormatted/apply/byName")
 	public ResponseEntity<?> getApplySettings(
 		@RequestParam(value = "serverId") String serverId,
 		@RequestParam(value = "name") String name
@@ -67,12 +67,12 @@ public class ServerSettingsController {
 		return settingsService.getApplySettingsExt(serverId, name);
 	}
 
-	@GetMapping("/get/roles")
+	@GetMapping("/getFormatted/roles")
 	public ResponseEntity<?> getRolesSettings(@RequestParam(value = "serverId") String serverId) {
 		return settingsService.getRolesSettings(serverId);
 	}
 
-	@GetMapping("/get/role")
+	@GetMapping("/getFormatted/role")
 	public ResponseEntity<?> getRoleSettings(
 		@RequestParam(value = "serverId") String serverId,
 		@RequestParam(value = "roleName") String roleName
@@ -80,12 +80,12 @@ public class ServerSettingsController {
 		return settingsService.getRoleSettings(serverId, roleName);
 	}
 
-	@GetMapping("/get/guild/all")
+	@GetMapping("/getFormatted/guild/all")
 	public List<GuildRole> getAllGuildRoleSettings(@RequestParam(value = "serverId") String serverId) {
 		return settingsService.getAllGuildRolesSettings(serverId);
 	}
 
-	@GetMapping("/get/guild/byName")
+	@GetMapping("/getFormatted/guild/byName")
 	public ResponseEntity<?> getGuildRoleSettings(
 		@RequestParam(value = "serverId") String serverId,
 		@RequestParam(value = "name") String name
@@ -93,12 +93,12 @@ public class ServerSettingsController {
 		return settingsService.getGuildRoleSettingsExt(serverId, name);
 	}
 
-	@GetMapping("/get/event")
+	@GetMapping("/getFormatted/event")
 	public ResponseEntity<?> getSkyblockEventSettings(@RequestParam(value = "serverId") String serverId) {
 		return settingsService.getSkyblockEventSettings(serverId);
 	}
 
-	@GetMapping("/get/mee6")
+	@GetMapping("/getFormatted/mee6")
 	public ResponseEntity<?> getMee6Settings(@RequestParam(value = "serverId") String serverId) {
 		return settingsService.getMee6Settings(serverId);
 	}

@@ -72,7 +72,7 @@ public class WardrobeSlashCommand extends SlashCommand {
 							.queue();
 					}
 
-					jda.addEventListener(new InventoryPaginator(wardrobePages, event.getChannel(), event.getUser()));
+					new InventoryPaginator(wardrobePages, event.getChannel(), event.getUser());
 				} else {
 					event.embed(invalidEmbed("Inventory API disabled"));
 				}

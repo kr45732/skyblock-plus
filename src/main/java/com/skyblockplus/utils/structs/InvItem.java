@@ -18,12 +18,11 @@
 
 package com.skyblockplus.utils.structs;
 
-import static com.skyblockplus.utils.Utils.parseMcCodes;
+import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import lombok.Data;
 
 @Data
 public class InvItem {
@@ -61,7 +60,7 @@ public class InvItem {
 	public void setLore(String lore) {
 		this.lore = lore;
 		if (lore != null) {
-			String[] loreArr = parseMcCodes(lore).split("\n");
+			String[] loreArr = lore.split("\n");
 			this.rarity = loreArr[loreArr.length - 1].trim().split(" ")[0];
 		}
 	}

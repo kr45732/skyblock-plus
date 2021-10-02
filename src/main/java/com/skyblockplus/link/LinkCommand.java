@@ -49,16 +49,16 @@ public class LinkCommand extends Command {
 	public static EmbedBuilder linkAccount(String username, Member member, Guild guild) {
 		DiscordInfoStruct playerInfo = getPlayerDiscordInfo(username);
 		if (playerInfo.isNotValid()) {
-			return invalidEmbed(playerInfo.failCause);
+			return invalidEmbed(playerInfo.getFailCause());
 		}
 
-		if (!member.getUser().getAsTag().equals(playerInfo.discordTag)) {
+		if (!member.getUser().getAsTag().equals(playerInfo.getDiscordTag())) {
 			EmbedBuilder eb = defaultEmbed("Discord tag mismatch");
 			eb.setDescription(
 				"**Player Username:** `" +
-				playerInfo.minecraftUsername +
+						playerInfo.getUsername() +
 				"`\n**API Discord Tag:** `" +
-				playerInfo.discordTag +
+						playerInfo.getDiscordTag() +
 				"`\n**Your Discord Tag:** `" +
 				member.getUser().getAsTag() +
 				"`"
@@ -69,8 +69,8 @@ public class LinkCommand extends Command {
 		LinkedAccountModel toAdd = new LinkedAccountModel(
 			"" + Instant.now().toEpochMilli(),
 			member.getId(),
-			playerInfo.minecraftUuid,
-			playerInfo.minecraftUsername
+				playerInfo.getUuid(),
+				playerInfo.getUsername()
 		);
 
 		if (database.addLinkedUser(toAdd) == 200) {
@@ -78,12 +78,12 @@ public class LinkCommand extends Command {
 			if (verifySettings != null) {
 				try {
 					String nicknameTemplate = higherDepth(verifySettings, "verifiedNickname").getAsString();
-					if (!nicknameTemplate.equalsIgnoreCase("none")) {
-						nicknameTemplate = nicknameTemplate.replace("[IGN]", playerInfo.minecraftUsername);
+					if (!nicknameTemplate.equalsIgnoreCase("none") && !nicknameTemplate.isEmpty()) {
+						nicknameTemplate = nicknameTemplate.replace("[IGN]", playerInfo.getUsername());
 
 						if (nicknameTemplate.contains("[GUILD_RANK]")) {
 							try {
-								HypixelResponse playerGuild = getGuildFromPlayer(playerInfo.minecraftUuid);
+								HypixelResponse playerGuild = getGuildFromPlayer(playerInfo.getUuid());
 								if (!playerGuild.isNotValid()) {
 									GuildRole settingsGuildId = database
 										.getAllGuildRoles(guild.getId())
@@ -95,7 +95,7 @@ public class LinkCommand extends Command {
 									if (settingsGuildId != null) {
 										JsonArray guildMembers = playerGuild.get("members").getAsJsonArray();
 										for (JsonElement guildMember : guildMembers) {
-											if (higherDepth(guildMember, "uuid").getAsString().equals(playerInfo.minecraftUuid)) {
+											if (higherDepth(guildMember, "uuid").getAsString().equals(playerInfo.getUuid())) {
 												nicknameTemplate =
 													nicknameTemplate.replace(
 														"[GUILD_RANK]",
@@ -127,9 +127,9 @@ public class LinkCommand extends Command {
 			}
 
 			return defaultEmbed("Success")
-				.setDescription("`" + member.getUser().getAsTag() + "` was linked to `" + playerInfo.minecraftUsername + "`");
+				.setDescription("`" + member.getUser().getAsTag() + "` was linked to `" + playerInfo.getUsername() + "`");
 		} else {
-			return invalidEmbed("Error linking `" + member.getUser().getAsTag() + " to `" + playerInfo.minecraftUsername + "`");
+			return invalidEmbed("Error linking `" + member.getUser().getAsTag() + " to `" + playerInfo.getUsername() + "`");
 		}
 	}
 
@@ -137,7 +137,7 @@ public class LinkCommand extends Command {
 		JsonElement userInfo = database.getLinkedUserByDiscordId(user.getId());
 
 		try {
-			return defaultEmbed("Success")
+			return defaultEmbed("Linked information")
 				.setDescription(
 					"`" + user.getAsTag() + "` is linked to `" + (higherDepth(userInfo, "minecraftUsername").getAsString()) + "`"
 				);

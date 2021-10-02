@@ -18,24 +18,23 @@
 
 package com.skyblockplus.dungeons;
 
-import static com.skyblockplus.utils.MessageTimeout.addMessage;
-import static com.skyblockplus.utils.MessageTimeout.removeMessage;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.higherDepth;
-
 import com.google.gson.JsonElement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.jetbrains.annotations.NotNull;
 
-public class EssenceWaiter extends ListenerAdapter {
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.higherDepth;
+
+public class EssenceWaiter{
 
 	private final String itemName;
 	private final JsonElement itemJson;
@@ -52,7 +51,6 @@ public class EssenceWaiter extends ListenerAdapter {
 		this.itemJson = itemJson;
 		this.reactMessage = reactMessage;
 		this.user = user;
-		addMessage(this.reactMessage, this);
 
 		essenceEmojiMap.put("⏫", -1);
 		essenceEmojiMap.put("0⃣", 0);
@@ -84,23 +82,22 @@ public class EssenceWaiter extends ListenerAdapter {
 		for (String i : validReactions) {
 			reactMessage.addReaction(i).queue();
 		}
+
+		waiter.waitForEvent(
+				MessageReactionAddEvent.class,
+				this::condition,
+				this::action,
+				30,
+				TimeUnit.SECONDS,
+				() -> reactMessage.clearReactions().queue()
+		);
 	}
 
-	@Override
-	public void onMessageReactionAdd(@NotNull MessageReactionAddEvent event) {
-		if (event.getMessageIdLong() != reactMessage.getIdLong()) {
-			return;
-		}
+	private boolean condition(MessageReactionAddEvent event){
+		return event.getMessageIdLong() == reactMessage.getIdLong() && !event.getUser().isBot() && event.getUser().equals(user);
+	}
 
-		if (event.getUser().isBot()) {
-			return;
-		}
-
-		if (!event.getUser().equals(user)) {
-			reactMessage.removeReaction(event.getReaction().getReactionEmote().getAsReactionCode(), event.getUser()).queue();
-			return;
-		}
-
+	private void action(MessageReactionAddEvent event) {
 		if (!validReactions.contains(event.getReactionEmote().getName())) {
 			reactMessage.removeReaction(event.getReaction().getReactionEmote().getAsReactionCode(), event.getUser()).queue();
 			return;
@@ -159,8 +156,6 @@ public class EssenceWaiter extends ListenerAdapter {
 					eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemName);
 					reactMessage.editMessageEmbeds(eb.build()).queue();
 
-					removeMessage(this);
-					event.getJDA().removeEventListener(this);
 					break;
 				}
 		}

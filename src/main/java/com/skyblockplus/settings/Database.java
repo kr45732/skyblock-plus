@@ -56,8 +56,8 @@ public class Database {
 		return settingsService.removeApplySettings(serverId, name).getStatusCodeValue();
 	}
 
-	public int removeGuildSettings(String serverId, String name) {
-		return settingsService.removeGuildSettings(serverId, name).getStatusCodeValue();
+	public void removeGuildSettings(String serverId, String name) {
+		settingsService.removeGuildSettings(serverId, name).getStatusCodeValue();
 	}
 
 	public int addLinkedUser(LinkedAccountModel newUser) {
@@ -100,8 +100,8 @@ public class Database {
 		return gson.toJsonTree(settingsService.getServerSettingsById(serverId).getBody());
 	}
 
-	public int addNewServerSettings(String serverId, ServerSettingsModel serverSettingsModel) {
-		return settingsService.addNewServerSettings(serverId, serverSettingsModel).getStatusCodeValue();
+	public void addNewServerSettings(String serverId, ServerSettingsModel serverSettingsModel) {
+		settingsService.addNewServerSettings(serverId, serverSettingsModel).getStatusCodeValue();
 	}
 
 	public int deleteServerSettings(String serverId) {

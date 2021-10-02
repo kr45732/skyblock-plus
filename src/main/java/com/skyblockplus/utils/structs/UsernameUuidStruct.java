@@ -18,15 +18,18 @@
 
 package com.skyblockplus.utils.structs;
 
+import lombok.Data;
+
+@Data
 public class UsernameUuidStruct {
 
-	public String playerUsername;
-	public String playerUuid;
-	public String failCause;
+	private String username;
+	private String uuid;
+	private String failCause;
 
-	public UsernameUuidStruct(String playerUsername, String playerUuid) {
-		this.playerUsername = playerUsername;
-		this.playerUuid = playerUuid;
+	public UsernameUuidStruct(String username, String uuid) {
+		this.username = username;
+		this.uuid = uuid;
 	}
 
 	public UsernameUuidStruct(String failCause) {
@@ -38,11 +41,14 @@ public class UsernameUuidStruct {
 	}
 
 	public boolean isNotValid() {
-		return playerUsername == null || playerUuid == null;
+		return username == null || uuid == null;
 	}
 
-	@Override
-	public String toString() {
-		return "UsernameUuidStruct{" + "username='" + playerUsername + '\'' + ", uuid='" + playerUuid + '\'' + '}';
+	public String getAvatarlUrl(){
+		return "https://cravatar.eu/helmavatar/" + uuid + "/64.png";
+	}
+
+	public String getAuctionUrl(){
+		return "https://auctions.craftlink.xyz/players/" + uuid;
 	}
 }

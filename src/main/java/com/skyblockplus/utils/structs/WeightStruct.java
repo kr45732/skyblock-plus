@@ -18,12 +18,15 @@
 
 package com.skyblockplus.utils.structs;
 
+import lombok.Data;
+
 import static com.skyblockplus.utils.Utils.roundAndFormat;
 
+@Data
 public class WeightStruct {
 
-	public double base;
-	public double overflow;
+	private double base;
+	private double overflow;
 
 	public WeightStruct() {
 		this(0, 0);
@@ -44,16 +47,11 @@ public class WeightStruct {
 		return o;
 	}
 
-	public String get() {
+	public String getFormatted() {
 		return roundAndFormat(base + overflow) + (overflow > 0 ? " (" + roundAndFormat(base) + " + " + roundAndFormat(overflow) + ")" : "");
 	}
 
 	public double getRaw() {
 		return base + overflow;
-	}
-
-	@Override
-	public String toString() {
-		return "base={" + base + "}, overflow={" + overflow + "}";
 	}
 }

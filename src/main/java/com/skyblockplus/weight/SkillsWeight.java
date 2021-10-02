@@ -55,7 +55,7 @@ public class SkillsWeight {
 		if (currentSkillXp != -1) {
 			int maxLevel = player.getSkillMaxLevel(skillName, true);
 			SkillsStruct skillsStruct = player.getSkill(profile, skillName, true);
-			double level = skillsStruct.skillLevel + skillsStruct.progressToNext;
+			double level = skillsStruct.getProgressLevel();
 			double maxLevelExp = maxLevel == 50 ? Constants.SKILLS_LEVEL_50_XP : Constants.SKILLS_LEVEL_60_XP;
 			double base = Math.pow(level * 10, 0.5 + exponent + (level / 100)) / 1250;
 			if (currentSkillXp <= maxLevelExp) {

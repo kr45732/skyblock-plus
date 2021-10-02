@@ -18,31 +18,25 @@
 
 package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.Constants.REFORGE_STONE_NAMES;
-import static com.skyblockplus.utils.Hypixel.getAuctionFromUuid;
-import static com.skyblockplus.utils.Hypixel.uuidToUsername;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.networth.NetworthExecute;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.InvItem;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.List;
 import me.nullicorn.nedit.NBTReader;
-import me.nullicorn.nedit.type.NBTCompound;
 import net.dv8tion.jda.api.EmbedBuilder;
 
-public class CalculateCommand extends Command {
+import java.time.Duration;
+import java.time.Instant;
 
-	private static JsonElement lowestBinJson;
-	private static JsonElement averageAuctionJson;
-	private static JsonElement bazaarJson;
-	private static JsonArray sbzPrices;
+import static com.skyblockplus.utils.Hypixel.getAuctionFromUuid;
+import static com.skyblockplus.utils.Hypixel.uuidToUsername;
+import static com.skyblockplus.utils.Utils.*;
+
+public class CalculateCommand extends Command {
 
 	public CalculateCommand() {
 		this.name = "calculate";
@@ -55,16 +49,14 @@ public class CalculateCommand extends Command {
 		HypixelResponse auctionResponse = getAuctionFromUuid(auctionUuid);
 
 		if (auctionResponse.isNotValid()) {
-			return invalidEmbed(auctionResponse.failCause);
-		} else if (auctionResponse.response.getAsJsonArray().size() == 0) {
+			return invalidEmbed(auctionResponse.getFailCause());
+		} else if (auctionResponse.getResponse().getAsJsonArray().size() == 0) {
 			return invalidEmbed("Invalid auction UUID");
 		}
 
-		JsonElement auction = auctionResponse.response.getAsJsonArray().get(0);
-
+		JsonElement auction = auctionResponse.getResponse().getAsJsonArray().get(0);
 		try {
-			NBTCompound itemNBTRaw = NBTReader.readBase64(higherDepth(auction, "item_bytes.data").getAsString());
-			InvItem item = getGenericInventoryMap(itemNBTRaw).get(0);
+			InvItem item = getGenericInventoryMap(NBTReader.readBase64(higherDepth(auction, "item_bytes.data").getAsString())).get(0);
 			double price = calculateItemPrice(item);
 			String itemName = higherDepth(auction, "item_name").getAsString();
 			if (item.getId().equals("ENCHANTED_BOOK")) {
@@ -80,7 +72,7 @@ public class CalculateCommand extends Command {
 			String timeUntil = instantToDHM(duration);
 
 			String ebStr = "**Item name:** " + itemName;
-			ebStr += "\n**Seller:** " + uuidToUsername(higherDepth(auction, "auctioneer").getAsString()).playerUsername;
+			ebStr += "\n**Seller:** " + uuidToUsername(higherDepth(auction, "auctioneer").getAsString()).getUsername();
 			ebStr += "\n**Command:** `/viewauction " + higherDepth(auction, "uuid").getAsString() + "`";
 			long highestBid = higherDepth(auction, "highest_bid_amount", 0L);
 			long startingBid = higherDepth(auction, "starting_bid", 0L);
@@ -95,7 +87,7 @@ public class CalculateCommand extends Command {
 					ebStr +=
 						bidsArr.size() > 0
 							? "\n**Highest bidder:** " +
-							uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).playerUsername
+								uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).getUsername()
 							: "";
 				}
 			} else {
@@ -104,7 +96,7 @@ public class CalculateCommand extends Command {
 						"\n**Auction sold** for " +
 						simplifyNumber(highestBid) +
 						" coins to " +
-						uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).playerUsername;
+								uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).getUsername();
 				} else {
 					ebStr = "\n**Auction did not sell**";
 				}
@@ -121,284 +113,7 @@ public class CalculateCommand extends Command {
 	}
 
 	private static double calculateItemPrice(InvItem item) {
-		if (item == null) {
-			return 0;
-		}
-
-		lowestBinJson = getLowestBinJson();
-		averageAuctionJson = getAverageAuctionJson();
-		bazaarJson = getBazaarJson();
-		sbzPrices = getSbzPricesJson();
-
-		double itemCost = 0;
-		double itemCount = 1;
-		double recombobulatedExtra = 0;
-		double hbpExtras = 0;
-		double enchantsExtras = 0;
-		double fumingExtras = 0;
-		double reforgeExtras = 0;
-		double miscExtras = 0;
-		double backpackExtras = 0;
-
-		try {
-			if (item.getId().equals("PET")) {
-				return calculatePetPrice(item);
-			} else {
-				itemCost = getLowestPrice(item.getId().toUpperCase());
-			}
-		} catch (Exception ignored) {}
-
-		try {
-			itemCount = item.getCount();
-		} catch (Exception ignored) {}
-
-		try {
-			if (
-				item.isRecombobulated() &&
-				(
-					itemCost *
-					2 >=
-					higherDepth(higherDepth(bazaarJson, "RECOMBOBULATOR_3000.buy_summary").getAsJsonArray().get(0), "pricePerUnit")
-						.getAsDouble()
-				)
-			) {
-				recombobulatedExtra =
-					higherDepth(higherDepth(bazaarJson, "RECOMBOBULATOR_3000.buy_summary").getAsJsonArray().get(0), "pricePerUnit")
-						.getAsDouble();
-			}
-		} catch (Exception ignored) {}
-
-		try {
-			hbpExtras =
-				item.getHbpCount() *
-				higherDepth(higherDepth(bazaarJson, "HOT_POTATO_BOOK.buy_summary").getAsJsonArray().get(0), "pricePerUnit").getAsDouble();
-		} catch (Exception ignored) {}
-
-		try {
-			fumingExtras =
-				item.getFumingCount() *
-				higherDepth(higherDepth(bazaarJson, "FUMING_POTATO_BOOK.buy_summary").getAsJsonArray().get(0), "pricePerUnit")
-					.getAsDouble();
-		} catch (Exception ignored) {}
-
-		try {
-			List<String> enchants = item.getEnchantsFormatted();
-			for (String enchant : enchants) {
-				try {
-					if (item.getDungeonFloor() != -1 && enchant.equalsIgnoreCase("scavenger;5")) {
-						continue;
-					}
-
-					enchantsExtras += getLowestPriceEnchant(enchant.toUpperCase());
-				} catch (Exception ignored) {}
-			}
-		} catch (Exception ignored) {}
-
-		try {
-			reforgeExtras = calculateReforgePrice(item.getModifier(), item.getRarity());
-		} catch (Exception ignored) {}
-
-		try {
-			List<String> extraStats = item.getExtraStats();
-			for (String extraItem : extraStats) {
-				miscExtras += getLowestPrice(extraItem);
-			}
-		} catch (Exception ignored) {}
-
-		try {
-			List<InvItem> backpackItems = item.getBackpackItems();
-			for (InvItem backpackItem : backpackItems) {
-				backpackExtras += calculateItemPrice(backpackItem);
-			}
-		} catch (Exception ignored) {}
-
-		return (
-			itemCount *
-			(itemCost + recombobulatedExtra + hbpExtras + enchantsExtras + fumingExtras + reforgeExtras + miscExtras + backpackExtras)
-		);
-	}
-
-	private static double calculateReforgePrice(String reforgeName, String itemRarity) {
-		JsonElement reforgesStonesJson = getReforgeStonesJson();
-
-		for (String reforgeStone : REFORGE_STONE_NAMES) {
-			JsonElement reforgeStoneInfo = higherDepth(reforgesStonesJson, reforgeStone);
-			if (higherDepth(reforgeStoneInfo, "reforgeName").getAsString().equalsIgnoreCase(reforgeName)) {
-				String reforgeStoneName = higherDepth(reforgeStoneInfo, "internalName").getAsString();
-				double reforgeStoneCost = getLowestPrice(reforgeStoneName);
-				double reforgeApplyCost = higherDepth(reforgeStoneInfo, "reforgeCosts." + itemRarity.toUpperCase()).getAsDouble();
-				return reforgeStoneCost + reforgeApplyCost;
-			}
-		}
-
-		return 0;
-	}
-
-	private static double calculatePetPrice(InvItem pet) {
-		// TODO: fix
-		//		String queryStr = "\"" + capitalizeString(pet.getName()).replace("lvl", "Lvl") + "\"";
-		//
-		//		JsonArray ahQuery = getAuctionPetsByName(queryStr);
-		//		if (ahQuery != null) {
-		//			for (JsonElement auction : ahQuery) {
-		//				String auctionName = higherDepth(auction, "item_name").getAsString();
-		//				double auctionPrice = higherDepth(auction, "starting_bid").getAsDouble();
-		//				String auctionRarity = higherDepth(auction, "tier").getAsString();
-		//
-		//				if (pet.getName().equalsIgnoreCase(auctionName) && pet.getRarity().equalsIgnoreCase(auctionRarity)) {
-		//					double miscExtras = 0;
-		//					try {
-		//						List<String> extraStats = pet.getExtraStats();
-		//						for (String extraItem : extraStats) {
-		//							miscExtras += getLowestPrice(extraItem);
-		//						}
-		//					} catch (Exception ignored) {}
-		//
-		//					return auctionPrice + miscExtras;
-		//				}
-		//			}
-		//		}
-		//
-		//		try {
-		//			double auctionPrice = higherDepth(
-		//				lowestBinJson,
-		//				pet.getName().split("] ")[1].toLowerCase().trim() + Constants.rarityToNumberMap.get(pet.getRarity())
-		//			)
-		//				.getAsDouble();
-		//
-		//			double miscExtras = 0;
-		//			try {
-		//				List<String> extraStats = pet.getExtraStats();
-		//				for (String extraItem : extraStats) {
-		//					miscExtras += getLowestPrice(extraItem);
-		//				}
-		//			} catch (Exception ignored) {}
-		//
-		//			return auctionPrice + miscExtras;
-		//		} catch (Exception ignored) {}
-		return 0;
-	}
-
-	private static double getLowestPriceEnchant(String enchantId) {
-		double lowestBin = -1;
-		double averageAuction = -1;
-		String enchantName = enchantId.split(";")[0];
-		int enchantLevel = Integer.parseInt(enchantId.split(";")[1]);
-
-		if (
-			enchantName.equalsIgnoreCase("compact") ||
-			enchantName.equalsIgnoreCase("expertise") ||
-			enchantName.equalsIgnoreCase("cultivating")
-		) {
-			enchantLevel = 1;
-		}
-
-		for (int i = enchantLevel; i >= 1; i--) {
-			try {
-				lowestBin = higherDepth(lowestBinJson, enchantName + ";" + i).getAsDouble();
-			} catch (Exception ignored) {}
-
-			try {
-				JsonElement avgInfo = higherDepth(averageAuctionJson, enchantName + ";" + i);
-				averageAuction =
-					higherDepth(avgInfo, "clean_price") != null
-						? higherDepth(avgInfo, "clean_price").getAsDouble()
-						: higherDepth(avgInfo, "price").getAsDouble();
-			} catch (Exception ignored) {}
-
-			if (lowestBin == -1 && averageAuction != -1) {
-				return Math.pow(2, enchantLevel - i) * averageAuction;
-			} else if (lowestBin != -1 && averageAuction == -1) {
-				return Math.pow(2, enchantLevel - i) * lowestBin;
-			} else if (lowestBin != -1 && averageAuction != -1) {
-				return (Math.pow(2, enchantLevel - i) * Math.min(lowestBin, averageAuction));
-			}
-		}
-
-		if (higherDepth(sbzPrices, enchantName + "_1") != null) {
-			return (Math.pow(2, enchantLevel - 1) * higherDepth(sbzPrices, enchantName + "_1").getAsDouble());
-		}
-
-		if (higherDepth(sbzPrices, enchantName + "_i") != null) {
-			return (Math.pow(2, enchantLevel - 1) * higherDepth(sbzPrices, enchantName + "_i").getAsDouble());
-		}
-		return 0;
-	}
-
-	private static double getLowestPrice(String itemId) {
-		double priceOverride = getPriceOverride(itemId);
-		if (priceOverride != -1) {
-			return priceOverride;
-		}
-
-		double lowestBin = -1;
-		double averageAuction = -1;
-
-		try {
-			lowestBin = higherDepth(lowestBinJson, itemId).getAsDouble();
-		} catch (Exception ignored) {}
-
-		try {
-			JsonElement avgInfo = higherDepth(averageAuctionJson, itemId);
-			averageAuction =
-				higherDepth(avgInfo, "clean_price") != null
-					? higherDepth(avgInfo, "clean_price").getAsDouble()
-					: higherDepth(avgInfo, "price").getAsDouble();
-		} catch (Exception ignored) {}
-
-		if (lowestBin == -1 && averageAuction != -1) {
-			return averageAuction;
-		} else if (lowestBin != -1 && averageAuction == -1) {
-			return lowestBin;
-		} else if (lowestBin != -1 && averageAuction != -1) {
-			return Math.min(lowestBin, averageAuction);
-		}
-
-		try {
-			return higherDepth(higherDepth(bazaarJson, itemId + ".buy_summary").getAsJsonArray().get(0), "pricePerUnit").getAsDouble();
-		} catch (Exception ignored) {}
-
-		try {
-			itemId = itemId.toLowerCase();
-			if (itemId.contains("generator")) {
-				String minionName = itemId.split("_generator_")[0];
-				int level = Integer.parseInt(itemId.split("_generator_")[1]);
-
-				itemId = minionName + "_minion_" + toRomanNumerals(level);
-			} else if (itemId.equals("magic_mushroom_soup")) {
-				itemId = "magical_mushroom_soup";
-			} else if (itemId.startsWith("theoretical_hoe_")) {
-				String parseHoe = itemId.split("theoretical_hoe_")[1];
-				String hoeType = parseHoe.split("_")[0];
-				int hoeLevel = Integer.parseInt(parseHoe.split("_")[1]);
-
-				for (JsonElement itemPrice : sbzPrices) {
-					String itemNamePrice = higherDepth(itemPrice, "name").getAsString();
-					if (itemNamePrice.startsWith("tier_" + hoeLevel) && itemNamePrice.endsWith(hoeType + "_hoe")) {
-						return higherDepth(itemPrice, "low").getAsDouble();
-					}
-				}
-			} else if (itemId.equals("mine_talisman")) {
-				itemId = "mine_affinity_talisman";
-			} else if (itemId.equals("village_talisman")) {
-				itemId = "village_affinity_talisman";
-			} else if (itemId.equals("coin_talisman")) {
-				itemId = "talisman_of_coins";
-			} else if (itemId.equals("melody_hair")) {
-				itemId = "melodys_hair";
-			} else if (itemId.equals("theoretical_hoe")) {
-				itemId = "mathematical_hoe_blueprint";
-			} else if (itemId.equals("dctr_space_helm")) {
-				itemId = "dctrs_space_helmet";
-			}
-
-			for (JsonElement itemPrice : sbzPrices) {
-				if (higherDepth(itemPrice, "name").getAsString().equalsIgnoreCase(itemId)) {
-					return higherDepth(itemPrice, "low").getAsDouble();
-				}
-			}
-		} catch (Exception ignored) {}
-		return 0;
+		return new NetworthExecute().initPrices().calculateItemPrice(item);
 	}
 
 	@Override

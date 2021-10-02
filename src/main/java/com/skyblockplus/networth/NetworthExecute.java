@@ -73,6 +73,14 @@ public class NetworthExecute {
 		return this;
 	}
 
+	public NetworthExecute initPrices(){
+		lowestBinJson = getLowestBinJson();
+		averageAuctionJson = getAverageAuctionJson();
+		bazaarJson = higherDepth(getBazaarJson(), "products");
+		sbzPrices = getSbzPricesJson();
+		return this;
+	}
+
 	public void execute(Command command, CommandEvent event) {
 		new CommandExecute(command, event) {
 			@Override
@@ -281,9 +289,6 @@ public class NetworthExecute {
 			}
 
 			petsItems.sort(Comparator.comparingDouble(item -> -Double.parseDouble(item.split("@split@")[1])));
-			//			StringBuilder petsStr = new StringBuilder(
-			//				"Pet calculations will not be working for the time being due to the API I was using being shut down. I working on a replacement for this. Please join the Skyblock Plus Discord for the latest update."
-			//			);
 			StringBuilder petsStr = new StringBuilder();
 			for (int i = 0; i < petsItems.size(); i++) {
 				String item = petsItems.get(i);
@@ -786,7 +791,7 @@ public class NetworthExecute {
 		return formattedStr;
 	}
 
-	private double calculateItemPrice(InvItem item) {
+	public double calculateItemPrice(InvItem item) {
 		return calculateItemPrice(item, null);
 	}
 
@@ -899,8 +904,8 @@ public class NetworthExecute {
 			List<InvItem> backpackItems = item.getBackpackItems();
 			for (InvItem backpackItem : backpackItems) {
 				NwItemPrice bpItemPrice = calculateBpItemPrice(backpackItem, location);
-				backpackExtras += bpItemPrice.price;
-				bpStr.append(bpItemPrice.json != null ? bpItemPrice.json : "");
+				backpackExtras += bpItemPrice.getPrice();
+				bpStr.append(bpItemPrice.getJson() != null ? bpItemPrice.getJson() : "");
 			}
 		} catch (Exception ignored) {}
 		bpStr.append("]");
@@ -1085,9 +1090,9 @@ public class NetworthExecute {
 		for (String reforgeStone : REFORGE_STONE_NAMES) {
 			JsonElement reforgeStoneInfo = higherDepth(reforgesStonesJson, reforgeStone);
 			if (higherDepth(reforgeStoneInfo, "reforgeName").getAsString().equalsIgnoreCase(reforgeName)) {
-				String reforgeStoneName = higherDepth(reforgeStoneInfo, "internalName").getAsString();
-				double reforgeStoneCost = getLowestPrice(reforgeStoneName, idToName(reforgeStoneName));
-				double reforgeApplyCost = higherDepth(reforgeStoneInfo, "reforgeCosts." + itemRarity.toUpperCase()).getAsDouble();
+				String reforgeStoneId = higherDepth(reforgeStoneInfo, "internalName").getAsString();
+				double reforgeStoneCost = getLowestPrice(reforgeStoneId, idToName(reforgeStoneId));
+				double reforgeApplyCost = higherDepth(reforgeStoneInfo, "reforgeCosts." + itemRarity.toUpperCase()).getAsLong();
 				return reforgeStoneCost + reforgeApplyCost;
 			}
 		}

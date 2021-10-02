@@ -18,18 +18,10 @@
 
 package com.skyblockplus.features.listeners;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.features.skyblockevent.SkyblockEventCommand.endSkyblockEvent;
-import static com.skyblockplus.utils.Hypixel.getGuildFromId;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
 import com.skyblockplus.api.serversettings.automatedapply.AutomatedApply;
 import com.skyblockplus.api.serversettings.automatedguild.GuildRank;
 import com.skyblockplus.api.serversettings.automatedguild.GuildRole;
@@ -40,18 +32,6 @@ import com.skyblockplus.features.setup.SetupCommandHandler;
 import com.skyblockplus.features.skyblockevent.SkyblockEventHandler;
 import com.skyblockplus.features.verify.VerifyGuild;
 import com.skyblockplus.utils.structs.HypixelResponse;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.Writer;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
@@ -64,12 +44,30 @@ import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
-import org.apache.commons.collections4.ListUtils;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.Writer;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.features.skyblockevent.SkyblockEventCommand.endSkyblockEvent;
+import static com.skyblockplus.utils.Hypixel.getGuildFromId;
+import static com.skyblockplus.utils.Utils.*;
 
 public class AutomaticGuild {
 
@@ -81,7 +79,7 @@ public class AutomaticGuild {
 	public final String guildId;
 	public final List<ScheduledFuture<?>> scheduledFutures = new ArrayList<>();
 	/* Automated Verify */
-	public VerifyGuild verifyGuild = new VerifyGuild();
+	public VerifyGuild verifyGuild;
 	/* Skyblock event */
 	public SkyblockEventHandler skyblockEventHandler = new SkyblockEventHandler();
 	public List<EventMember> eventMemberList = new ArrayList<>();
@@ -94,6 +92,7 @@ public class AutomaticGuild {
 	/* Constructor */
 	public AutomaticGuild(GenericGuildEvent event) {
 		guildId = event.getGuild().getId();
+		verifyGuild = new VerifyGuild(guildId);
 		applyConstructor(event);
 		verifyConstructor(event);
 		schedulerConstructor();
@@ -252,7 +251,7 @@ public class AutomaticGuild {
 					if (reactMessage != null) {
 						reactMessage.editMessage(higherDepth(currentSettings, "messageText").getAsString()).queue();
 
-						verifyGuild = new VerifyGuild(reactChannel, reactMessage, currentSettings);
+						verifyGuild = new VerifyGuild(reactChannel, reactMessage, currentSettings, guildId);
 						return;
 					}
 				} catch (Exception ignored) {}
@@ -266,7 +265,7 @@ public class AutomaticGuild {
 				newSettings.addProperty("previousMessageId", reactMessage.getId());
 				database.setVerifySettings(event.getGuild().getId(), newSettings);
 
-				verifyGuild = new VerifyGuild(reactChannel, reactMessage, newSettings);
+				verifyGuild = new VerifyGuild(reactChannel, reactMessage, newSettings, guildId);
 			}
 		} catch (Exception e) {
 			log.error("Verify constructor error - " + event.getGuild().getId(), e);
@@ -294,7 +293,7 @@ public class AutomaticGuild {
 					if (reactMessage != null) {
 						reactMessage.editMessage(higherDepth(currentSettings, "messageText").getAsString()).queue();
 
-						verifyGuild = new VerifyGuild(reactChannel, reactMessage, currentSettings);
+						verifyGuild = new VerifyGuild(reactChannel, reactMessage, currentSettings, guildId);
 						return "Reloaded";
 					}
 				} catch (Exception ignored) {}
@@ -308,10 +307,10 @@ public class AutomaticGuild {
 				newSettings.addProperty("previousMessageId", reactMessage.getId());
 				database.setVerifySettings(guild.getId(), newSettings);
 
-				verifyGuild = new VerifyGuild(reactChannel, reactMessage, newSettings);
+				verifyGuild = new VerifyGuild(reactChannel, reactMessage, newSettings, guildId);
 				return "Reloaded";
 			} else {
-				verifyGuild = new VerifyGuild();
+				verifyGuild = new VerifyGuild(guildId);
 				return "Not enabled";
 			}
 		} catch (Exception e) {
@@ -360,33 +359,16 @@ public class AutomaticGuild {
 			Map<String, String> discordIdToUuid = new HashMap<>();
 			int counterUpdate = 0;
 			if (anyGuildRoleRankEnable) {
-				List<LinkedAccountModel> linkedUsers = database.getLinkedUsers();
-				List<List<LinkedAccountModel>> linkedUsersLists = ListUtils.partition(linkedUsers, 100);
-				AtomicInteger requestCount = new AtomicInteger();
-				CountDownLatch latch = new CountDownLatch(1);
-				for (List<LinkedAccountModel> linkedUsersList : linkedUsersLists) {
-					List<String> linkedUsersIds = new ArrayList<>();
-					for (LinkedAccountModel linkedUser : linkedUsersList) {
-						linkedUsersIds.add(linkedUser.getDiscordId());
-						discordIdToUuid.put(linkedUser.getDiscordId(), linkedUser.getMinecraftUuid());
-					}
+				database.getLinkedUsers().forEach(linkedUser -> discordIdToUuid.put(linkedUser.getDiscordId(), linkedUser.getMinecraftUuid()));
 
-					guild
-						.retrieveMembersByIds(linkedUsersIds.toArray(new String[0]))
-						.onSuccess(members -> {
+				CountDownLatch latch = new CountDownLatch(1);
+				guild.findMembers(member -> discordIdToUuid.containsKey(member.getId())).onSuccess(members -> {
 							inGuildUsers.addAll(members);
-							requestCount.incrementAndGet();
-							if (requestCount.get() == linkedUsersLists.size()) {
-								latch.countDown();
-							}
+							latch.countDown();
 						})
 						.onError(error -> {
-							requestCount.incrementAndGet();
-							if (requestCount.get() == linkedUsersLists.size()) {
-								latch.countDown();
-							}
+							latch.countDown();
 						});
-				}
 
 				try {
 					latch.await(15, TimeUnit.SECONDS);
@@ -718,9 +700,8 @@ public class AutomaticGuild {
 			}
 		}
 
-		if (event.getMessage() != null) {
-			event.editButton(event.getButton().asDisabled().withId("disabled").withLabel("Disabled").withStyle(ButtonStyle.DANGER)).queue();
-		}
+		event.getMessage();
+		event.editButton(event.getButton().asDisabled().withId("disabled").withLabel("Disabled").withStyle(ButtonStyle.DANGER)).queue();
 		event.getHook().editOriginal("❌ This button has been disabled").queue();
 	}
 

@@ -18,15 +18,12 @@
 
 package com.skyblockplus.utils.structs;
 
+import lombok.Data;
 import net.dv8tion.jda.api.entities.Message;
 
+@Data
 public class MessageTimeoutStruct {
 
-	public final Message message;
-	public final Object eventListener;
-
-	public MessageTimeoutStruct(Message message, Object eventListener) {
-		this.message = message;
-		this.eventListener = eventListener;
-	}
+	private final Message message;
+	private final Object eventListener;
 }

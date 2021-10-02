@@ -18,14 +18,14 @@
 
 package com.skyblockplus.inventory;
 
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.invalidEmbed;
-
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+
 import java.util.List;
+
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.invalidEmbed;
 
 public class EnderChestSlashCommand extends SlashCommand {
 
@@ -56,7 +56,7 @@ public class EnderChestSlashCommand extends SlashCommand {
 				event.getChannel().sendMessageEmbeds(defaultEmbed("Missing emojis").setDescription(player.invMissing).build()).queue();
 			}
 
-			jda.addEventListener(new InventoryPaginator(playerEnderChest, event.getChannel(), event.getUser()));
+			new InventoryPaginator(playerEnderChest, event.getChannel(), event.getUser());
 		} else {
 			event.embed(invalidEmbed("Inventory API disabled"));
 		}

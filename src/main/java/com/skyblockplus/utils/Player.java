@@ -43,8 +43,8 @@ public class Player {
 	private int profileIndex;
 	private JsonElement hypixelProfileJson;
 	private boolean validPlayer = false;
-	private String playerUuid;
-	private String playerUsername;
+	private String uuid;
+	private String username;
 	private String profileName;
 	private String failCause = "Unknown fail cause";
 
@@ -55,13 +55,13 @@ public class Player {
 		}
 
 		try {
-			HypixelResponse response = skyblockProfilesFromUuid(playerUuid);
+			HypixelResponse response = skyblockProfilesFromUuid(uuid);
 			if (response.isNotValid()) {
-				failCause = response.failCause;
+				failCause = response.getFailCause();
 				return;
 			}
 
-			this.profilesArray = response.response.getAsJsonArray();
+			this.profilesArray = response.getResponse().getAsJsonArray();
 
 			if (getLatestProfile(profilesArray)) {
 				return;
@@ -79,13 +79,13 @@ public class Player {
 		}
 
 		try {
-			HypixelResponse response = skyblockProfilesFromUuid(playerUuid);
+			HypixelResponse response = skyblockProfilesFromUuid(uuid);
 			if (response.isNotValid()) {
-				failCause = response.failCause;
+				failCause = response.getFailCause();
 				return;
 			}
 
-			this.profilesArray = response.response.getAsJsonArray();
+			this.profilesArray = response.getResponse().getAsJsonArray();
 
 			if (profileIdFromName(profileName, profilesArray)) {
 				failCause = failCause.equals("Unknown fail cause") ? "Invalid profile name" : failCause;
@@ -98,9 +98,9 @@ public class Player {
 		this.validPlayer = true;
 	}
 
-	public Player(String playerUuid, String playerUsername, JsonElement outerProfileJson) {
-		this.playerUuid = playerUuid;
-		this.playerUsername = playerUsername;
+	public Player(String uuid, String username, JsonElement outerProfileJson) {
+		this.uuid = uuid;
+		this.username = username;
 
 		try {
 			if (outerProfileJson == null) {
@@ -118,9 +118,9 @@ public class Player {
 		this.validPlayer = true;
 	}
 
-	public Player(String playerUuid, String playerUsername, String profileName, JsonElement outerProfileJson) {
-		this.playerUuid = playerUuid;
-		this.playerUsername = playerUsername;
+	public Player(String uuid, String username, String profileName, JsonElement outerProfileJson) {
+		this.uuid = uuid;
+		this.username = username;
 
 		try {
 			if (outerProfileJson == null) {
@@ -143,12 +143,12 @@ public class Player {
 	public boolean usernameToUuid(String username) {
 		UsernameUuidStruct response = Hypixel.usernameToUuid(username);
 		if (response.isNotValid()) {
-			failCause = response.failCause;
+			failCause = response.getFailCause();
 			return true;
 		}
 
-		this.playerUsername = response.playerUsername;
-		this.playerUuid = response.playerUuid;
+		this.username = response.getUsername();
+		this.uuid = response.getUuid();
 		return false;
 	}
 
@@ -173,7 +173,7 @@ public class Player {
 				Instant lastSaveLoop;
 				try {
 					lastSaveLoop =
-						Instant.ofEpochMilli(higherDepth(profilesArray.get(i), "members." + this.playerUuid + ".last_save").getAsLong());
+						Instant.ofEpochMilli(higherDepth(profilesArray.get(i), "members." + this.uuid + ".last_save").getAsLong());
 				} catch (Exception e) {
 					continue;
 				}
@@ -191,11 +191,11 @@ public class Player {
 
 	/* Getters */
 	public JsonElement profileJson() {
-		return higherDepth(profilesArray.get(profileIndex), "members." + this.playerUuid);
+		return higherDepth(profilesArray.get(profileIndex), "members." + this.uuid);
 	}
 
 	public String getUsername() {
-		return this.playerUsername;
+		return this.username;
 	}
 
 	public String getProfileName() {
@@ -203,7 +203,7 @@ public class Player {
 	}
 
 	public String getUuid() {
-		return this.playerUuid;
+		return this.uuid;
 	}
 
 	public JsonElement getOuterProfileJson() {
@@ -220,11 +220,11 @@ public class Player {
 
 	/* Links */
 	public String skyblockStatsLink() {
-		return Utils.skyblockStatsLink(playerUsername, profileName);
+		return Utils.skyblockStatsLink(username, profileName);
 	}
 
 	public String getThumbnailUrl() {
-		return "https://cravatar.eu/helmavatar/" + playerUuid + "/64.png";
+		return "https://cravatar.eu/helmavatar/" + uuid + "/64.png";
 	}
 
 	/* Bank and purse */
@@ -260,7 +260,7 @@ public class Player {
 			if (skillInfo == null) {
 				return -1;
 			} else {
-				totalSkillXp += skillInfo.totalSkillExp;
+				totalSkillXp += skillInfo.getTotalExp();
 			}
 		}
 		return totalSkillXp;
@@ -318,9 +318,7 @@ public class Player {
 		double progressSA = 0;
 		for (String skill : SKILL_NAMES) {
 			try {
-				double skillExp = higherDepth(profile, "experience_skill_" + skill).getAsDouble();
-				SkillsStruct skillInfo = skillInfoFromExp(skillExp, skill);
-				progressSA += skillInfo.skillLevel + skillInfo.progressToNext;
+				progressSA += skillInfoFromExp(higherDepth(profile, "experience_skill_" + skill).getAsDouble(), skill).getProgressLevel();
 			} catch (Exception e) {
 				return -1;
 			}
@@ -518,32 +516,18 @@ public class Player {
 
 	public int getDungeonSecrets() {
 		if (hypixelProfileJson == null) {
-			this.hypixelProfileJson = playerFromUuid(playerUuid).response;
+			hypixelProfileJson = playerFromUuid(uuid).getResponse();
 		}
 
 		return higherDepth(hypixelProfileJson, "achievements.skyblock_treasure_hunter", 0);
 	}
 
-	public double getDungeonClassLevel(String className) {
-		return getDungeonClassLevel(profileJson(), className);
-	}
-
-	public double getDungeonClassLevel(JsonElement profile, String className) {
-		SkillsStruct dungeonClassLevel = skillInfoFromExp(getDungeonClassXp(profile, className), "catacombs");
-		return dungeonClassLevel.skillLevel + dungeonClassLevel.progressToNext;
-	}
-
 	public SkillsStruct getDungeonClass(String className) {
-		return skillInfoFromExp(getDungeonClassXp(className), "catacombs");
+		return getDungeonClass(profileJson(), className);
 	}
 
-	public double getCatacombsLevel() {
-		return getCatacombsLevel(profileJson());
-	}
-
-	public double getCatacombsLevel(JsonElement profile) {
-		SkillsStruct catacombsInfo = getCatacombsSkill(profile);
-		return catacombsInfo.skillLevel + catacombsInfo.progressToNext;
+	public SkillsStruct getDungeonClass(JsonElement profile, String className) {
+		return skillInfoFromExp(getDungeonClassXp(profile, className), "catacombs");
 	}
 
 	public SkillsStruct getCatacombsSkill() {
@@ -551,14 +535,7 @@ public class Player {
 	}
 
 	public SkillsStruct getCatacombsSkill(JsonElement profile) {
-		double skillExp = higherDepth(profile, "dungeons.dungeon_types.catacombs.experience") != null
-			? higherDepth(profile, "dungeons.dungeon_types.catacombs.experience").getAsDouble()
-			: 0;
-		return skillInfoFromExp(skillExp, "catacombs");
-	}
-
-	public double getDungeonClassXp(String className) {
-		return getDungeonClassXp(profileJson(), className);
+		return skillInfoFromExp(higherDepth(profile, "dungeons.dungeon_types.catacombs.experience", 0.0), "catacombs");
 	}
 
 	public double getDungeonClassXp(JsonElement profile, String className) {
@@ -990,7 +967,7 @@ public class Player {
 	public String[] getAllProfileNames(boolean isIronman) {
 		List<String> profileNameList = new ArrayList<>();
 		if (this.profilesArray == null) {
-			this.profilesArray = skyblockProfilesFromUuid(playerUuid).response.getAsJsonArray();
+			this.profilesArray = skyblockProfilesFromUuid(uuid).getResponse().getAsJsonArray();
 		}
 
 		for (JsonElement profile : profilesArray) {
@@ -1112,7 +1089,7 @@ public class Player {
 	public double getHighestAmount(String type) {
 		double highestAmount = -1.0;
 		for (JsonElement profile : profilesArray) {
-			profile = higherDepth(profile, "members." + this.playerUuid);
+			profile = higherDepth(profile, "members." + this.uuid);
 			switch (type) {
 				case "slayer":
 					highestAmount = Math.max(highestAmount, getTotalSlayer(profile));
@@ -1120,7 +1097,7 @@ public class Player {
 					highestAmount = Math.max(highestAmount, getSkillAverage(profile));
 					break;
 				case "catacombs":
-					highestAmount = Math.max(highestAmount, getCatacombsLevel(profile));
+					highestAmount = Math.max(highestAmount, getCatacombsSkill(profile).getProgressLevel());
 					break;
 				case "weight":
 					highestAmount = Math.max(highestAmount, getWeight(profile));
@@ -1146,10 +1123,10 @@ public class Player {
 			"validPlayer=" +
 			validPlayer +
 			", playerUuid='" +
-			playerUuid +
+					uuid +
 			'\'' +
 			", playerUsername='" +
-			playerUsername +
+					username +
 			'\'' +
 			", profileName='" +
 			profileName +

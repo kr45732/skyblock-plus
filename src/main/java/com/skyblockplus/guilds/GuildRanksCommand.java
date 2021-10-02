@@ -68,15 +68,15 @@ public class GuildRanksCommand extends Command {
 	private EmbedBuilder getLeaderboard(String username, CommandEvent event) {
 		UsernameUuidStruct usernameUuid = usernameToUuid(username);
 		if (usernameUuid.isNotValid()) {
-			return invalidEmbed(usernameUuid.failCause);
+			return invalidEmbed(usernameUuid.getFailCause());
 		}
 
-		HypixelResponse guildResponse = getGuildFromPlayer(usernameUuid.playerUuid);
+		HypixelResponse guildResponse = getGuildFromPlayer(usernameUuid.getUuid());
 		if (guildResponse.isNotValid()) {
-			return invalidEmbed(guildResponse.failCause);
+			return invalidEmbed(guildResponse.getFailCause());
 		}
 
-		JsonElement guildJson = guildResponse.response;
+		JsonElement guildJson = guildResponse.getResponse();
 
 		String guildId = higherDepth(guildJson, "_id").getAsString();
 		String guildName = higherDepth(guildJson, "name").getAsString();

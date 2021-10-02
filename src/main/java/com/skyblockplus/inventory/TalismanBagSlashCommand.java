@@ -73,7 +73,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 							.queue();
 					}
 
-					jda.addEventListener(new InventoryPaginator(talismanBagPages, event.getChannel(), event.getUser()));
+					new InventoryPaginator(talismanBagPages, event.getChannel(), event.getUser());
 				} else {
 					event.embed(invalidEmbed("Inventory API disabled"));
 				}

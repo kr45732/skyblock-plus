@@ -18,14 +18,12 @@
 
 package com.skyblockplus.dev;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.defaultPerms;
-
-import com.google.gson.JsonObject;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
+
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.defaultPerms;
 
 public class PlaceholderCommand extends Command {
 
@@ -42,14 +40,6 @@ public class PlaceholderCommand extends Command {
 			@Override
 			protected void execute() {
 				logCommand();
-
-				if (args.length == 2 && args[1].equals("test")) {
-					JsonObject s = database.getVerifySettings("869217817680044042").getAsJsonObject();
-					s.addProperty("enableMemberJoinSync", "true");
-					database.setVerifySettings("869217817680044042", s);
-					embed(defaultEmbed("done").setDescription("```json\n" + s + "```"));
-					return;
-				}
 
 				eb = defaultEmbed("Debug");
 				eb.addField("Total", "" + (Runtime.getRuntime().totalMemory() / 1000000.0) + " MB", false);

@@ -18,18 +18,18 @@
 
 package com.skyblockplus.dungeons;
 
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.utils.Constants.ESSENCE_ITEM_NAMES;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
+import net.dv8tion.jda.api.EmbedBuilder;
+
 import java.util.Locale;
 import java.util.Map;
-import net.dv8tion.jda.api.EmbedBuilder;
+
+import static com.skyblockplus.utils.Constants.ESSENCE_ITEM_NAMES;
+import static com.skyblockplus.utils.Utils.*;
 
 public class EssenceCommand extends Command {
 
@@ -80,7 +80,6 @@ public class EssenceCommand extends Command {
 	public static EmbedBuilder getPlayerEssence(String username, String profileName) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
-			// TODO: finish this & remove ownerOnly when done
 			EmbedBuilder eb = player.defaultPlayerEmbed();
 
 			for (Map.Entry<String, JsonElement> entry : player.profileJson().getAsJsonObject().entrySet()) {
@@ -118,7 +117,7 @@ public class EssenceCommand extends Command {
 
 					JsonElement itemJson = higherDepth(getEssenceCostsJson(), itemName);
 					if (itemJson != null) {
-						jda.addEventListener(new EssenceWaiter(itemName, itemJson, ebMessage, event.getAuthor()));
+						new EssenceWaiter(itemName, itemJson, ebMessage, event.getAuthor());
 					} else {
 						embed(invalidEmbed("Invalid item name"));
 					}

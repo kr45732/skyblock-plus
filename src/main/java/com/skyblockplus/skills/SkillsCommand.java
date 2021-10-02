@@ -49,19 +49,19 @@ public class SkillsCommand extends Command {
 				SkillsStruct skillInfo = player.getSkill(skillName);
 				if (skillInfo != null) {
 					eb.addField(
-						SKILLS_EMOJI_MAP.get(skillName) + " " + capitalizeString(skillInfo.skillName) + " (" + skillInfo.skillLevel + ")",
-						simplifyNumber(skillInfo.expCurrent) +
+						SKILLS_EMOJI_MAP.get(skillName) + " " + capitalizeString(skillInfo.getName()) + " (" + skillInfo.getCurrentLevel() + ")",
+						simplifyNumber(skillInfo.getExpCurrent()) +
 						" / " +
-						simplifyNumber(skillInfo.expForNext) +
+						simplifyNumber(skillInfo.getExpForNext()) +
 						"\nTotal XP: " +
-						simplifyNumber(skillInfo.totalSkillExp) +
+						simplifyNumber(skillInfo.getTotalExp()) +
 						"\nProgress: " +
-						(skillInfo.skillLevel == skillInfo.maxSkillLevel ? "MAX" : roundProgress(skillInfo.progressToNext)),
+						(skillInfo.isMaxed() ? "MAX" : roundProgress(skillInfo.getProgressToNext())),
 						true
 					);
 					if (!COSMETIC_SKILL_NAMES.contains(skillName)) {
-						trueSA += skillInfo.skillLevel;
-						progressSA += skillInfo.skillLevel + skillInfo.progressToNext;
+						trueSA += skillInfo.getCurrentLevel();
+						progressSA += skillInfo.getProgressLevel();
 					}
 				} else {
 					eb.addField(SKILLS_EMOJI_MAP.get(skillName) + " " + capitalizeString(skillName) + " (?) ", "Unable to retrieve", true);

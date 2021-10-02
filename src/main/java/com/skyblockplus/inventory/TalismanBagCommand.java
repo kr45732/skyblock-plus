@@ -94,7 +94,7 @@ public class TalismanBagCommand extends Command {
 								.queue();
 						}
 
-						jda.addEventListener(new InventoryPaginator(playerEnderChest, ebMessage.getChannel(), event.getAuthor()));
+						new InventoryPaginator(playerEnderChest, ebMessage.getChannel(), event.getAuthor());
 					} else {
 						embed(invalidEmbed("Unable to fetch player data"));
 					}

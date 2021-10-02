@@ -18,7 +18,6 @@
 
 package com.skyblockplus.inventory;
 
-import com.skyblockplus.slayer.SlayerCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 

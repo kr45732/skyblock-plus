@@ -138,16 +138,16 @@ public class GuildCommand extends Command {
 
 		UsernameUuidStruct usernameUuid = usernameToUuid(username);
 		if (usernameUuid.isNotValid()) {
-			return invalidEmbed(usernameUuid.failCause);
+			return invalidEmbed(usernameUuid.getFailCause());
 		}
 
-		HypixelResponse hypixelResponse = getGuildFromPlayer(usernameUuid.playerUuid);
+		HypixelResponse hypixelResponse = getGuildFromPlayer(usernameUuid.getUuid());
 		if (hypixelResponse.isNotValid()) {
-			return invalidEmbed(hypixelResponse.failCause);
+			return invalidEmbed(hypixelResponse.getFailCause());
 		}
-		JsonElement guildJson = hypixelResponse.response;
+		JsonElement guildJson = hypixelResponse.getResponse();
 
-		return getGuildExp(guildJson, days, usernameUuid.playerUsername, user, channel, hook);
+		return getGuildExp(guildJson, days, usernameUuid.getUsername(), user, channel, hook);
 	}
 
 	public static EmbedBuilder getGuildExpFromName(String guildName, long days, CommandEvent event) {
@@ -157,9 +157,9 @@ public class GuildCommand extends Command {
 
 		HypixelResponse hypixelResponse = getGuildFromName(guildName);
 		if (hypixelResponse.isNotValid()) {
-			return invalidEmbed(hypixelResponse.failCause);
+			return invalidEmbed(hypixelResponse.getFailCause());
 		}
-		JsonElement guildJson = hypixelResponse.response;
+		JsonElement guildJson = hypixelResponse.getResponse();
 
 		return getGuildExp(guildJson, days, null, event.getAuthor(), event.getChannel(), null);
 	}
@@ -167,40 +167,40 @@ public class GuildCommand extends Command {
 	public static EmbedBuilder getGuildPlayer(String username) {
 		UsernameUuidStruct usernameUuid = usernameToUuid(username);
 		if (usernameUuid.isNotValid()) {
-			return invalidEmbed(usernameUuid.failCause);
+			return invalidEmbed(usernameUuid.getFailCause());
 		}
 
-		HypixelResponse hypixelResponse = getGuildFromPlayer(usernameUuid.playerUuid);
+		HypixelResponse hypixelResponse = getGuildFromPlayer(usernameUuid.getUuid());
 		if (hypixelResponse.isNotValid()) {
-			return invalidEmbed(hypixelResponse.failCause);
+			return invalidEmbed(hypixelResponse.getFailCause());
 		}
-		JsonElement guildJson = hypixelResponse.response;
+		JsonElement guildJson = hypixelResponse.getResponse();
 
 		try {
 			String guildName = higherDepth(guildJson, "name").getAsString();
 			EmbedBuilder eb = defaultEmbed(
-				usernameUuid.playerUsername + " is in " + guildName,
+				usernameUuid.getUsername() + " is in " + guildName,
 				"https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(guildJson, "_id").getAsString()
 			);
 			eb.addField("Guild statistics:", getGuildInfo(guildJson), false);
-			eb.setThumbnail("https://cravatar.eu/helmavatar/" + usernameUuid.playerUuid + "/64.png");
+			eb.setThumbnail(usernameUuid.getAvatarlUrl());
 			return eb;
 		} catch (Exception e) {
-			return defaultEmbed(usernameUuid.playerUsername + " is not in a guild");
+			return defaultEmbed(usernameUuid.getUsername() + " is not in a guild");
 		}
 	}
 
 	public static EmbedBuilder getGuildInfo(String username) {
 		UsernameUuidStruct usernameUuid = usernameToUuid(username);
 		if (usernameUuid.isNotValid()) {
-			return invalidEmbed(usernameUuid.failCause);
+			return invalidEmbed(usernameUuid.getFailCause());
 		}
 
-		HypixelResponse hypixelResponse = getGuildFromPlayer(usernameUuid.playerUuid);
+		HypixelResponse hypixelResponse = getGuildFromPlayer(usernameUuid.getUuid());
 		if (hypixelResponse.isNotValid()) {
-			return invalidEmbed(hypixelResponse.failCause);
+			return invalidEmbed(hypixelResponse.getFailCause());
 		}
-		JsonElement guildJson = hypixelResponse.response;
+		JsonElement guildJson = hypixelResponse.getResponse();
 
 		String guildName = higherDepth(guildJson, "name").getAsString();
 
@@ -217,9 +217,9 @@ public class GuildCommand extends Command {
 		try {
 			HypixelResponse guildResponse = getGuildFromName(guildName);
 			if (guildResponse.isNotValid()) {
-				return invalidEmbed(guildResponse.failCause);
+				return invalidEmbed(guildResponse.getFailCause());
 			}
-			JsonElement guildJson = guildResponse.response;
+			JsonElement guildJson = guildResponse.getResponse();
 			guildName = higherDepth(guildJson, "name").getAsString();
 
 			EmbedBuilder eb = defaultEmbed(
@@ -250,7 +250,7 @@ public class GuildCommand extends Command {
 						"• " +
 						guildName +
 						"'s guild master is " +
-						uuidToUsername(higherDepth(currentMember, "uuid").getAsString()).playerUsername
+						uuidToUsername(higherDepth(currentMember, "uuid").getAsString()).getUsername()
 					) +
 					"\n";
 				break;
@@ -325,14 +325,14 @@ public class GuildCommand extends Command {
 	public static EmbedBuilder getGuildMembersFromPlayer(String username, User user, MessageChannel channel, InteractionHook hook) {
 		UsernameUuidStruct usernameUuid = usernameToUuid(username);
 		if (usernameUuid.isNotValid()) {
-			return invalidEmbed(usernameUuid.failCause);
+			return invalidEmbed(usernameUuid.getFailCause());
 		}
 
-		HypixelResponse hypixelResponse = getGuildFromPlayer(usernameUuid.playerUuid);
+		HypixelResponse hypixelResponse = getGuildFromPlayer(usernameUuid.getUuid());
 		if (hypixelResponse.isNotValid()) {
-			return invalidEmbed(hypixelResponse.failCause);
+			return invalidEmbed(hypixelResponse.getFailCause());
 		}
-		JsonElement guildJson = hypixelResponse.response;
+		JsonElement guildJson = hypixelResponse.getResponse();
 
 		return getGuildMembers(guildJson, user, channel, hook);
 	}
@@ -340,9 +340,9 @@ public class GuildCommand extends Command {
 	public static EmbedBuilder getGuildMembersFromName(String guildName, CommandEvent event) {
 		HypixelResponse hypixelResponse = getGuildFromName(guildName);
 		if (hypixelResponse.isNotValid()) {
-			return invalidEmbed(hypixelResponse.failCause);
+			return invalidEmbed(hypixelResponse.getFailCause());
 		}
-		JsonElement guildJson = hypixelResponse.response;
+		JsonElement guildJson = hypixelResponse.getResponse();
 
 		return getGuildMembers(guildJson, event.getAuthor(), event.getChannel(), null);
 	}

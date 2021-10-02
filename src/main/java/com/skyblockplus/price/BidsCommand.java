@@ -74,9 +74,9 @@ public class BidsCommand extends Command {
 		//				auctionDesc += " | Ending in " + timeUntil;
 		//				auctionDesc +=
 		//					"\nHighest bidder: " +
-		//					uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).playerUsername;
+		//					uuidToUsername(higherDepth(bidsArr.getFormatted(bidsArr.size() - 1), "bidder").getAsString()).playerUsername;
 		//				for (int i = bidsArr.size() - 1; i >= 0; i--) {
-		//					JsonElement curBid = bidsArr.get(i);
+		//					JsonElement curBid = bidsArr.getFormatted(i);
 		//					if (higherDepth(curBid, "bidder").getAsString().equals(usernameUuidStruct.playerUuid)) {
 		//						auctionDesc += "\nYour highest bid: " + simplifyNumber(higherDepth(curBid, "amount").getAsDouble());
 		//						break;
@@ -86,11 +86,11 @@ public class BidsCommand extends Command {
 		//				auctionDesc = "Auction sold for " + simplifyNumber(highestBid) + " coins";
 		//				auctionDesc +=
 		//					"\n " +
-		//					uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).playerUsername +
+		//					uuidToUsername(higherDepth(bidsArr.getFormatted(bidsArr.size() - 1), "bidder").getAsString()).playerUsername +
 		//					" won the auction";
 		//			}
 		//
-		//			eb.setThumbnail("https://cravatar.eu/helmavatar/" + usernameUuidStruct.playerUuid + "/64.png");
+		//			eb.setThumbnail(usernameUuidStruct.getAvatarlUrl());
 		//			eb.addField(itemName, auctionDesc, false);
 		//		}
 		//

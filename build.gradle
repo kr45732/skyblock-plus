@@ -64,16 +64,16 @@ dependencies {
 
     // Google libraries
     implementation 'com.google.code.gson:gson:2.8.8'
-    implementation 'com.google.guava:guava:30.1.1-jre'
+    implementation 'com.google.guava:guava:31.0.1-jre'
 
     // NBT parser
     implementation 'com.github.TheNullicorn:Nedit:2.0.0'
 
     // Spring boot and postgresql
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.5.4'
-    implementation 'org.springframework.boot:spring-boot-starter-security:2.5.4'
-    implementation 'org.springframework.boot:spring-boot-starter-web:2.5.4'
-    runtimeOnly 'org.postgresql:postgresql:42.2.23.jre7'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.5.5'
+    implementation 'org.springframework.boot:spring-boot-starter-security:2.5.5'
+    implementation 'org.springframework.boot:spring-boot-starter-web:2.5.5'
+    runtimeOnly 'org.postgresql:postgresql:42.2.24.jre7'
 
     // Http Client
     implementation 'org.apache.httpcomponents:httpclient:4.5.13'
@@ -91,8 +91,8 @@ dependencies {
     implementation "org.codehaus.groovy:groovy:3.0.8"
 
     // Logging
-    implementation 'ch.qos.logback:logback-classic:1.2.5'
+    implementation 'ch.qos.logback:logback-classic:1.2.6'
 
     // Git
-    implementation 'org.eclipse.jgit:org.eclipse.jgit:5.12.0.202106070339-r'
+    implementation 'org.eclipse.jgit:org.eclipse.jgit:5.13.0.202109080827-r'
 }

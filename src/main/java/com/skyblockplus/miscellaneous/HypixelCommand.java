@@ -41,7 +41,7 @@ public class HypixelCommand extends Command {
 
 	public static EmbedBuilder getParkourStats(String username) {
 		HypixelPlayer player = new HypixelPlayer(username);
-		if (!player.isValid()) {
+		if (player.isNotValid()) {
 			return invalidEmbed(player.getFailCause());
 		}
 
@@ -69,7 +69,7 @@ public class HypixelCommand extends Command {
 
 	public static EmbedBuilder getHypixelStats(String username) {
 		HypixelPlayer player = new HypixelPlayer(username);
-		if (!player.isValid()) {
+		if (player.isNotValid()) {
 			return invalidEmbed(player.getFailCause());
 		}
 

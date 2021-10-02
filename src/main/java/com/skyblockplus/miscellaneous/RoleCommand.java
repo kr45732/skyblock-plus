@@ -62,16 +62,16 @@ public class RoleCommand extends Command {
 		DiscordInfoStruct playerInfo = getPlayerDiscordInfo(higherDepth(linkedInfo, "minecraftUuid").getAsString());
 
 		if (playerInfo.isNotValid()) {
-			return invalidEmbed(playerInfo.failCause);
+			return invalidEmbed(playerInfo.getFailCause());
 		}
 
-		if (!member.getUser().getAsTag().equals(playerInfo.discordTag)) {
+		if (!member.getUser().getAsTag().equals(playerInfo.getDiscordTag())) {
 			eb = defaultEmbed("Discord tag mismatch");
 			eb.setDescription(
 				"**Player Username:** `" +
-				playerInfo.minecraftUsername +
+				playerInfo.getUsername() +
 				"`\n**API Discord Tag:** `" +
-				playerInfo.discordTag +
+				playerInfo.getDiscordTag() +
 				"`\n**Your Discord Tag:** `" +
 				member.getUser().getAsTag() +
 				"`"
@@ -79,7 +79,7 @@ public class RoleCommand extends Command {
 			return eb;
 		}
 
-		String username = playerInfo.minecraftUsername;
+		String username = playerInfo.getUsername();
 		Player player = profile == null ? new Player(username) : new Player(username, profile);
 		if (!player.isValid()) {
 			return invalidEmbed(player.getFailCause());
@@ -118,7 +118,7 @@ public class RoleCommand extends Command {
 								if (guildJson == null) {
 									HypixelResponse response = getGuildFromPlayer(player.getUuid());
 									if (!response.isNotValid()) {
-										guildJson = response.response;
+										guildJson = response.getResponse();
 									}
 								}
 
@@ -157,7 +157,7 @@ public class RoleCommand extends Command {
 								if (guildJson == null) {
 									HypixelResponse response = getGuildFromPlayer(player.getUuid());
 									if (!response.isNotValid()) {
-										guildJson = response.response;
+										guildJson = response.getResponse();
 									}
 								}
 
@@ -286,7 +286,7 @@ public class RoleCommand extends Command {
 									case "enchanting":
 										{
 											if (player.getSkill(currentRoleName) != null) {
-												roleAmount = player.getSkill(currentRoleName).skillLevel;
+												roleAmount = player.getSkill(currentRoleName).getCurrentLevel();
 											}
 											if (roleAmount == -1 && !disabledAPI.toString().contains("Skills")) {
 												disabledAPI.append(roleChangeString("Skills API disabled"));
@@ -295,7 +295,7 @@ public class RoleCommand extends Command {
 										}
 									case "catacombs":
 										{
-											roleAmount = player.getCatacombsSkill().skillLevel;
+											roleAmount = player.getCatacombsSkill().getCurrentLevel();
 											break;
 										}
 									case "fairy_souls":
@@ -585,7 +585,13 @@ public class RoleCommand extends Command {
 			}
 		}
 
-		paginateBuilder.setPaginatorExtras(new PaginatorExtras().setEveryPageTitle("Automatic roles list")).build().paginate(channel, 0);
+		paginateBuilder.setPaginatorExtras(new PaginatorExtras().setEveryPageTitle("Automatic roles list"));
+
+		if(channel != null)
+		{paginateBuilder.build().paginate(channel, 0);
+		}else{
+			paginateBuilder.build().paginate(hook, 0);
+		}
 		return null;
 	}
 

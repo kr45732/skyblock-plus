@@ -21,7 +21,6 @@ package com.skyblockplus.help;
 import static com.skyblockplus.utils.Utils.capitalizeString;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
 
-import com.jagrosh.jdautilities.commons.utils.FinderUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

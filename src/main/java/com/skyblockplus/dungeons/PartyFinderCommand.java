@@ -41,7 +41,7 @@ public class PartyFinderCommand extends Command {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			EmbedBuilder eb = player.defaultPlayerEmbed();
-			eb.setDescription("**Catacombs Level:** " + roundAndFormat(player.getCatacombsLevel()));
+			eb.setDescription("**Catacombs Level:** " + roundAndFormat(player.getCatacombsSkill().getProgressLevel()));
 			eb.appendDescription("\n**Secrets:** " + formatNumber(player.getDungeonSecrets()));
 			eb.appendDescription("\n**Selected Class:** " + player.getSelectedDungeonClass());
 			eb.appendDescription(player.getFastestF7Time());

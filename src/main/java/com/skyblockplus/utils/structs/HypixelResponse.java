@@ -21,11 +21,13 @@ package com.skyblockplus.utils.structs;
 import static com.skyblockplus.utils.Utils.higherDepth;
 
 import com.google.gson.JsonElement;
+import lombok.Data;
 
+@Data
 public class HypixelResponse {
 
-	public JsonElement response;
-	public String failCause;
+	private JsonElement response;
+	private String failCause;
 
 	public HypixelResponse(JsonElement response) {
 		this.response = response;

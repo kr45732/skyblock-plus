@@ -58,6 +58,7 @@ public class SettingsExecute {
 	private final MessageChannel channel;
 	private final User author;
 	private final String guildPrefix;
+	private final JsonObject serverSettings;
 
 	public SettingsExecute(CommandEvent event) {
 		this(event.getGuild(), event.getMessage(), event.getChannel(), event.getAuthor());
@@ -77,6 +78,7 @@ public class SettingsExecute {
 		if (!database.serverByServerIdExists(guild.getId())) {
 			database.addNewServerSettings(guild.getId(), new ServerSettingsModel(guild.getName(), guild.getId()));
 		}
+		this.serverSettings = database.getServerSettings(guild.getId()).getAsJsonObject();
 	}
 
 	public void execute(Command command, CommandEvent event) {
@@ -126,7 +128,7 @@ public class SettingsExecute {
 							eb = deleteHypixelKey();
 							break;
 						case "prefix":
-							eb = deletePrefix();
+							eb = resetPrefix();
 							break;
 					}
 
@@ -347,6 +349,16 @@ public class SettingsExecute {
 									eb = invalidEmbed("Invalid setting");
 								}
 								break;
+							case "enable":
+								if(args[3].equals("sync")) {
+									eb = setVerifySyncEnable("true");
+								}
+								break;
+							case "disable":
+								if(args[3].equals("sync")) {
+									eb = setVerifySyncEnable("false");
+								}
+								break;
 						}
 					}
 
@@ -389,13 +401,7 @@ public class SettingsExecute {
 							false
 						);
 					} else if (args.length == 3) {
-						eb = defaultEmbed("Settings");
-						JsonElement guildRoleSettings = database.getGuildRoleSettings(guild.getId(), args[2]);
-						if (guildRoleSettings != null && !guildRoleSettings.isJsonNull()) {
-							eb.addField("Guild Role Settings", getCurrentGuildRoleSettings(guildRoleSettings), false);
-						} else {
-							eb.addField("Guild Role Settings", "Error! Data not found", false);
-						}
+						eb = getCurrentGuildRoleSettings(args[2]);
 					} else if (args.length == 4) {
 						if (args[2].equals("create")) {
 							eb = createGuildRoles(args[3]);
@@ -413,26 +419,26 @@ public class SettingsExecute {
 								case "enable":
 									switch (args[4]) {
 										case "role":
-											eb = setGuildRoleEnable(args[2], "true");
+											eb = setGuildRoleEnable(args[2], true);
 											break;
 										case "rank":
-											eb = setGuildRankEnable(args[2], "true");
+											eb = setGuildRankEnable(args[2], true);
 											break;
 										case "counter":
-											eb = setGuildCounterEnable(args[2], "true");
+											eb = setGuildCounterEnable(args[2], true);
 											break;
 									}
 									break;
 								case "disable":
 									switch (args[4]) {
 										case "role":
-											eb = setGuildRoleEnable(args[4], "false");
+											eb = setGuildRoleEnable(args[4], false);
 											break;
 										case "rank":
-											eb = setGuildRankEnable(args[4], "false");
+											eb = setGuildRankEnable(args[4], false);
 											break;
 										case "counter":
-											eb = setGuildCounterEnable(args[2], "false");
+											eb = setGuildCounterEnable(args[2], false);
 											break;
 									}
 									break;
@@ -465,240 +471,153 @@ public class SettingsExecute {
 			.submit();
 	}
 
-	public EmbedBuilder setHypixelKey(String newKey) {
-		try {
-			higherDepth(getJson("https://api.hypixel.net/key?key=" + newKey), "record.key").getAsString();
-		} catch (Exception e) {
-			return invalidEmbed("Invalid API key");
-		}
-
-		message.delete().queue();
-
-		int responseCode = database.setServerHypixelApiKey(guild.getId(), newKey);
-
-		if (responseCode == 200) {
-			return defaultEmbed("Settings")
-				.setDescription(
-					"Set the Hypixel API key. Note that you cannot view the set API key cannot be viewed for the privacy of the key owner."
-				);
-		}
-
-		return invalidEmbed("API returned response code " + responseCode);
-	}
-
-	public EmbedBuilder deleteHypixelKey() {
-		int responseCode = database.setServerHypixelApiKey(guild.getId(), "");
-
-		if (responseCode == 200) {
-			return defaultEmbed("Settings").setDescription("Deleted the set Hypixel API key");
-		}
-
-		return invalidEmbed("API returned response code " + responseCode);
-	}
-
-	public EmbedBuilder deleteApplyGuild(String name) {
-		if (database.getApplySettings(guild.getId(), name) != null) {
-			int responseCode = database.removeApplySettings(guild.getId(), name);
-			if (responseCode == 200) {
-				return defaultEmbed("Settings").setDescription("Apply settings with name `" + name + "` was deleted");
-			}
-
-			return invalidEmbed("API returned response code " + responseCode);
-		}
-
-		return invalidEmbed("Invalid Name");
-	}
-
-	public EmbedBuilder removeVerifyRole(String roleMention) {
-		Role verifyRole;
-		try {
-			verifyRole = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
-			if ((verifyRole.isPublicRole() || verifyRole.isManaged())) {
-				return invalidEmbed("Invalid role");
-			}
-		} catch (Exception e) {
-			return defaultEmbed("Invalid Role");
-		}
-
-		JsonArray currentVerifyRoles = higherDepth(database.getVerifySettings(guild.getId()), "verifiedRoles").getAsJsonArray();
-
-		for (int i = currentVerifyRoles.size() - 1; i >= 0; i--) {
-			if (currentVerifyRoles.get(i).getAsString().equals(verifyRole.getId())) {
-				currentVerifyRoles.remove(i);
-			}
-		}
-
-		int responseCode = database.setVerifyRolesSettings(guild.getId(), currentVerifyRoles);
-
-		if (responseCode != 200) {
-			return invalidEmbed("API returned response code " + responseCode);
-		}
-
-		if (currentVerifyRoles.size() == 0) {
-			updateVerifySettings("enable", "false");
-		}
-
-		EmbedBuilder eb = defaultEmbed("Settings");
-		return eb.setDescription("**Removed verify role:** " + verifyRole.getAsMention());
-	}
-
-	public EmbedBuilder addVerifyRole(String roleMention) {
-		Role verifyRole;
-		try {
-			verifyRole = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
-			if ((verifyRole.isPublicRole() || verifyRole.isManaged())) {
-				return invalidEmbed("Role cannot be managed or @everyone");
-			}
-		} catch (Exception e) {
-			return defaultEmbed("Invalid Role");
-		}
-
-		JsonArray currentVerifyRoles = higherDepth(database.getVerifySettings(guild.getId()), "verifiedRoles").getAsJsonArray();
-		if (currentVerifyRoles.size() >= 3) {
-			return defaultEmbed("You have reached the max number of verify roles (3/3)");
-		}
-
-		currentVerifyRoles.add(verifyRole.getId());
-		int responseCode = database.setVerifyRolesSettings(guild.getId(), currentVerifyRoles);
-
-		if (responseCode != 200) {
-			return invalidEmbed("API returned response code " + responseCode);
-		}
-
-		EmbedBuilder eb = defaultEmbed("Settings");
-		return eb.setDescription("**Verify role added:** " + verifyRole.getAsMention());
-	}
-
 	/* Guild Role Settings */
-	public String getCurrentGuildRoleSettings(JsonElement currentSettings) {
-		String ebFieldString = "";
-		ebFieldString += "**" + displaySettings(currentSettings, "enableGuildRole") + "**";
-		ebFieldString += "\n**• Guild Name:** " + displaySettings(currentSettings, "guildId");
-		ebFieldString += "\n**• Guild Role:** " + displaySettings(currentSettings, "roleId");
-		ebFieldString += "\n\n**" + displaySettings(currentSettings, "enableGuildRanks") + "**";
+	public EmbedBuilder getCurrentGuildRoleSettings(String name) {
+		JsonElement settings = database.getGuildRoleSettings(guild.getId(), name);
+		if (settings == null || settings.isJsonNull()) {
+			return defaultSettingsEmbed().setDescription("Error! Data not found. Please report this to the developer.");
+		}
+
+		String settingsString = "**" + displaySettings(settings, "enableGuildRole") + "**"
+		+ "\n**• Guild Name:** " + displaySettings(settings, "guildId")
+		+ "\n**• Guild Role:** " + displaySettings(settings, "roleId")
+		+ "\n\n**" + displaySettings(settings, "enableGuildRanks") + "**";
 
 		StringBuilder guildRanksString = new StringBuilder();
-		try {
-			for (JsonElement guildRank : higherDepth(currentSettings, "guildRanks").getAsJsonArray()) {
-				guildRanksString
-					.append("\n• ")
-					.append(higherDepth(guildRank, "minecraftRoleName").getAsString())
-					.append(" - ")
-					.append("<@&")
-					.append(higherDepth(guildRank, "discordRoleId").getAsString())
-					.append(">");
+		for (JsonElement guildRank : higherDepth(settings, "guildRanks").getAsJsonArray()) {
+			guildRanksString
+				.append("\n• ")
+				.append(higherDepth(guildRank, "minecraftRoleName").getAsString())
+				.append(" - ")
+				.append("<@&")
+				.append(higherDepth(guildRank, "discordRoleId").getAsString())
+				.append(">");
+		}
+		settingsString += guildRanksString.length() > 0 ? guildRanksString.toString() : "\n• No guild ranks set";
+
+		return defaultSettingsEmbed().setDescription(settingsString);
+	}
+
+	public EmbedBuilder setGuildRoleEnable(String name, boolean enable) {
+		JsonObject settings = database.getGuildRoleSettings(guild.getId(), name).getAsJsonObject();
+
+		if(!enable){
+			settings.addProperty("enableGuildRole", "false");
+			int responseCode = database.setGuildRoleSettings(guild.getId(), settings);
+			if (responseCode != 200) {
+				return apiFailMessage(responseCode);
 			}
-		} catch (Exception ignored) {}
 
-		ebFieldString += guildRanksString.length() > 0 ? guildRanksString.toString() : "\n• No guild ranks set";
-
-		return ebFieldString;
-	}
-
-	public EmbedBuilder setGuildRoleEnable(String name, String enable) {
-		JsonObject currentSettings = database.getGuildRoleSettings(guild.getId(), name).getAsJsonObject();
-		if (
-			higherDepth(currentSettings, "guildId") == null ||
-			higherDepth(currentSettings, "guildId").getAsString().isEmpty() ||
-			higherDepth(currentSettings, "roleId") == null ||
-			higherDepth(currentSettings, "roleId").getAsString().isEmpty()
-		) {
-			return defaultEmbed("Guild name and role must be set before enabling");
+			return defaultSettingsEmbed().setDescription(("Disabled") + " automatic guild role.");
 		}
 
-		currentSettings.addProperty("enableGuildRole", enable);
-		int responseCode = database.setGuildRoleSettings(guild.getId(), currentSettings);
+		if (
+			higherDepth(settings, "guildId", "").isEmpty() ||
+			higherDepth(settings, "roleId", "").isEmpty()
+		) {
+			return invalidEmbed("The guild name and role must be set.");
+		}
+
+		settings.addProperty("enableGuildRole", "true");
+		int responseCode = database.setGuildRoleSettings(guild.getId(), settings);
 		if (responseCode != 200) {
-			return invalidEmbed("API returned response code " + responseCode);
+			return apiFailMessage(responseCode);
 		}
 
-		EmbedBuilder eb = defaultEmbed("Settings");
-		eb.setDescription("Guild role " + (enable.equals("true") ? "enabled" : "disabled"));
-		return eb;
+		return defaultSettingsEmbed().setDescription("Enabled automatic guild role.");
 	}
 
-	public EmbedBuilder setGuildRankEnable(String name, String enable) {
-		JsonObject currentSettings = database.getGuildRoleSettings(guild.getId(), name).getAsJsonObject();
+	public EmbedBuilder setGuildRankEnable(String name, boolean enable) {
+		JsonObject settings = database.getGuildRoleSettings(guild.getId(), name).getAsJsonObject();
 
-		if (
-			(higherDepth(currentSettings, "guildId") == null) || (higherDepth(currentSettings, "guildRanks").getAsJsonArray().size() == 0)
-		) {
-			return invalidEmbed("The guild name and a guild rank must be set");
+		if(!enable){
+			settings.addProperty("enableGuildRanks", "false");
+			int responseCode = database.setGuildRoleSettings(guild.getId(), settings);
+			if (responseCode != 200) {
+				return apiFailMessage(responseCode);
+			}
+
+			return defaultSettingsEmbed().setDescription("Disabled automatic guild ranks.");
 		}
 
-		currentSettings.addProperty("enableGuildRanks", enable);
-		int responseCode = database.setGuildRoleSettings(guild.getId(), currentSettings);
+		if (
+			(higherDepth(settings, "guildId", "").isEmpty()) || (higherDepth(settings, "guildRanks").getAsJsonArray().size() == 0)
+		) {
+			return invalidEmbed("The guild name and a at least one guild rank must be set.");
+		}
+
+		settings.addProperty("enableGuildRanks", "true");
+		int responseCode = database.setGuildRoleSettings(guild.getId(), settings);
 		if (responseCode != 200) {
-			return invalidEmbed("API returned response code " + responseCode);
+			return apiFailMessage(responseCode);
 		}
 
-		EmbedBuilder eb = defaultEmbed("Settings");
-		eb.setDescription("Guild ranks " + (enable.equals("true") ? "enabled" : "disabled"));
-		return eb;
+		return defaultEmbed("Settings").setDescription("Enabled automatic guild ranks.");
 	}
 
-	public EmbedBuilder setGuildCounterEnable(String name, String enable) {
-		JsonObject currentSettings = database.getGuildRoleSettings(guild.getId(), name).getAsJsonObject();
+	public EmbedBuilder setGuildCounterEnable(String name, boolean enable) {
+		JsonObject settings = database.getGuildRoleSettings(guild.getId(), name).getAsJsonObject();
 
-		if (
-			currentSettings.get("enableGuildUserCount") == null || !currentSettings.get("enableGuildUserCount").getAsString().equals(enable)
-		) {
-			currentSettings.addProperty("enableGuildUserCount", enable);
-			if (enable.equals("true")) {
-				if ((higherDepth(currentSettings, "guildId") == null) || (higherDepth(currentSettings, "roleId") == null)) {
-					return defaultEmbed("Guild name must be set before enabling");
-				}
+		if(!enable){
+			try {
+				guild.getVoiceChannelById(settings.get("guildUserChannelId").getAsString()).delete().complete();
+			} catch (Exception ignored) {}
 
-				HypixelResponse guildJson = getGuildFromId(higherDepth(currentSettings, "guildId").getAsString());
+			settings.addProperty("enableGuildUserCount", "false");
+			int responseCode = database.setGuildRoleSettings(guild.getId(), settings);
+			if (responseCode != 200) {
+				return apiFailMessage(responseCode);
+			}
 
-				if (guildJson.isNotValid()) {
-					return invalidEmbed(guildJson.failCause);
-				}
+			return defaultSettingsEmbed().setDescription("Disabled automatic guild member counter.");
+		}
 
-				VoiceChannel guildMemberCounterChannel = guild
-					.createVoiceChannel(
+		if (higherDepth(settings, "guildId", "").isEmpty()) {
+			return defaultEmbed("Guild name must be set before enabling.");
+		}
+
+		HypixelResponse guildJson = getGuildFromId(higherDepth(settings, "guildId").getAsString());
+		if (guildJson.isNotValid()) {
+			return invalidEmbed(guildJson.getFailCause());
+		}
+
+		VoiceChannel guildMemberCounterChannel = guild
+				.createVoiceChannel(
 						guildJson.get("name").getAsString() + " Members: " + guildJson.get("members").getAsJsonArray().size() + "/125"
-					)
-					.addPermissionOverride(guild.getPublicRole(), EnumSet.of(Permission.VIEW_CHANNEL), EnumSet.of(Permission.VOICE_CONNECT))
-					.addMemberPermissionOverride(
+				)
+				.addPermissionOverride(guild.getPublicRole(), EnumSet.of(Permission.VIEW_CHANNEL), EnumSet.of(Permission.VOICE_CONNECT))
+				.addMemberPermissionOverride(
 						jda.getSelfUser().getIdLong(),
 						EnumSet.of(Permission.VIEW_CHANNEL, Permission.MANAGE_CHANNEL, Permission.VOICE_CONNECT),
 						null
-					)
-					.complete();
-				currentSettings.addProperty("guildUserChannelId", guildMemberCounterChannel.getId());
-			} else {
-				try {
-					guild.getVoiceChannelById(currentSettings.get("guildUserChannelId").getAsString()).delete().complete();
-				} catch (Exception ignored) {}
-			}
+				)
+				.complete();
+		settings.addProperty("enableGuildUserCount", "true");
+		settings.addProperty("guildUserChannelId", guildMemberCounterChannel.getId());
 
-			int responseCode = database.setGuildRoleSettings(guild.getId(), currentSettings);
-			if (responseCode != 200) {
-				return invalidEmbed("API returned response code " + responseCode);
-			}
+		int responseCode = database.setGuildRoleSettings(guild.getId(), settings);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
 		}
 
-		EmbedBuilder eb = defaultEmbed("Settings");
-		eb.setDescription("Guild member counter " + (enable.equals("true") ? "enabled" : "disabled"));
-		return eb;
+		return defaultSettingsEmbed().setDescription("Enabled automatic guild member counter.");
 	}
 
 	public EmbedBuilder addGuildRank(String name, String rankName, String roleMention) {
-		Role guildRankRole;
+		Role role;
 		try {
-			guildRankRole = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
-			if ((guildRankRole.isPublicRole() || guildRankRole.isManaged())) {
-				return invalidEmbed("Role cannot be managed or @everyone");
+			role = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
+			if ((role.isPublicRole() || role.isManaged())) {
+				return invalidEmbed("The role cannot be managed or @everyone.");
 			}
 		} catch (Exception e) {
-			return defaultEmbed("Invalid Role");
+			return invalidEmbed("The provided role does not exist.");
 		}
 
 		JsonObject currentSettings = database.getGuildRoleSettings(guild.getId(), name).getAsJsonObject();
 
-		if (higherDepth(currentSettings, "guildId") == null) {
-			return defaultEmbed("Guild name must first be set");
+		if (higherDepth(currentSettings, "guildId", "").isEmpty()) {
+			return invalidEmbed("The guild name must set.");
 		}
 
 		String guildId = higherDepth(currentSettings, "guildId").getAsString();
@@ -706,10 +625,10 @@ public class SettingsExecute {
 		HypixelResponse guildJson = getGuildFromId(guildId);
 
 		if (guildJson.isNotValid()) {
-			return invalidEmbed(guildJson.failCause);
+			return invalidEmbed(guildJson.getFailCause());
 		}
 
-		JsonArray guildRanks = higherDepth(guildJson.response, "ranks").getAsJsonArray();
+		JsonArray guildRanks = higherDepth(guildJson.getResponse(), "ranks").getAsJsonArray();
 
 		StringBuilder guildRanksString = new StringBuilder();
 		for (JsonElement guildRank : guildRanks) {
@@ -724,7 +643,7 @@ public class SettingsExecute {
 					}
 				}
 
-				currentGuildRanks.add(gson.toJsonTree(new GuildRank(rankName.toLowerCase(), guildRankRole.getId())));
+				currentGuildRanks.add(gson.toJsonTree(new GuildRank(rankName.toLowerCase(), role.getId())));
 
 				currentSettings.add("guildRanks", currentGuildRanks);
 
@@ -735,7 +654,7 @@ public class SettingsExecute {
 
 				EmbedBuilder eb = defaultEmbed("Settings");
 				eb.setDescription(
-					"**Guild rank added:** " + higherDepth(guildRank, "name").getAsString() + " - " + guildRankRole.getAsMention()
+					"**Guild rank added:** " + higherDepth(guildRank, "name").getAsString() + " - " + role.getAsMention()
 				);
 				return eb;
 			}
@@ -777,7 +696,7 @@ public class SettingsExecute {
 	public EmbedBuilder setGuildRoleId(String name, String guildName) {
 		HypixelResponse guildJson = getGuildFromName(guildName);
 		if (guildJson.isNotValid()) {
-			return invalidEmbed(guildJson.failCause);
+			return invalidEmbed(guildJson.getFailCause());
 		}
 
 		String guildId = guildJson.get("_id").getAsString();
@@ -1225,7 +1144,7 @@ public class SettingsExecute {
 		if (roleName.equals("guild_member")) {
 			HypixelResponse guildJson = getGuildFromName(roleValue);
 			if (guildJson.isNotValid()) {
-				return invalidEmbed(guildJson.failCause);
+				return invalidEmbed(guildJson.getFailCause());
 			}
 			roleValue = guildJson.get("_id").getAsString();
 			guildName = guildJson.get("name").getAsString();
@@ -1353,7 +1272,7 @@ public class SettingsExecute {
 			if (roleName.equals("guild_member")) {
 				HypixelResponse guildJson = getGuildFromId(higherDepth(level, "value").getAsString());
 				if (guildJson.isNotValid()) {
-					return invalidEmbed(guildJson.failCause);
+					return invalidEmbed(guildJson.getFailCause());
 				}
 				currentValue = guildJson.get("name").getAsString();
 			}
@@ -1451,6 +1370,7 @@ public class SettingsExecute {
 		ebFieldString += "\n**• React Message Channel:** " + displaySettings(verifySettings, "messageTextChannelId");
 		ebFieldString += "\n**• Verified Role(s):** " + displaySettings(verifySettings, "verifiedRoles");
 		ebFieldString += "\n**• Nickname Template:** " + displaySettings(verifySettings, "verifiedNickname");
+		ebFieldString += "\n**• Member join sync:** " + displaySettings(verifySettings, "enableMemberJoinSync");
 		return ebFieldString;
 	}
 
@@ -1509,6 +1429,7 @@ public class SettingsExecute {
 	public EmbedBuilder setVerifyMessageTextChannelId(String textChannel) {
 		try {
 			TextChannel verifyMessageTextChannel = guild.getTextChannelById(textChannel.replaceAll("[<#>]", ""));
+			try{verifyMessageTextChannel.getManager().setSlowmode(5).queue();}catch (Exception ignored){}
 			int responseCode = updateVerifySettings("messageTextChannelId", verifyMessageTextChannel.getId());
 			if (responseCode != 200) {
 				return invalidEmbed("API returned response code " + responseCode);
@@ -1568,9 +1489,94 @@ public class SettingsExecute {
 		return eb;
 	}
 
+	public EmbedBuilder removeVerifyRole(String roleMention) {
+		Role verifyRole;
+		try {
+			verifyRole = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
+			if ((verifyRole.isPublicRole() || verifyRole.isManaged())) {
+				return invalidEmbed("Invalid role");
+			}
+		} catch (Exception e) {
+			return defaultEmbed("Invalid Role");
+		}
+
+		JsonElement verifySettings = database.getVerifySettings(guild.getId());
+		JsonArray currentVerifyRoles = higherDepth(verifySettings, "verifiedRoles").getAsJsonArray();
+
+		for (int i = currentVerifyRoles.size() - 1; i >= 0; i--) {
+			if (currentVerifyRoles.get(i).getAsString().equals(verifyRole.getId())) {
+				currentVerifyRoles.remove(i);
+			}
+		}
+
+		int responseCode = database.setVerifyRolesSettings(guild.getId(), currentVerifyRoles);
+
+		if (responseCode != 200) {
+			return invalidEmbed("API returned response code " + responseCode);
+		}
+
+		guildMap.get(guild.getId()).verifyGuild.reloadSettingsJson(verifySettings);
+
+		if (currentVerifyRoles.size() == 0) {
+			updateVerifySettings("enable", "false");
+		}
+
+		EmbedBuilder eb = defaultEmbed("Settings");
+		return eb.setDescription("**Removed verify role:** " + verifyRole.getAsMention());
+	}
+
+	public EmbedBuilder addVerifyRole(String roleMention) {
+		Role verifyRole;
+		try {
+			verifyRole = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
+			if ((verifyRole.isPublicRole() || verifyRole.isManaged())) {
+				return invalidEmbed("Role cannot be managed or @everyone");
+			}
+		} catch (Exception e) {
+			return defaultEmbed("Invalid Role");
+		}
+
+		JsonElement verifySettings = database.getVerifySettings(guild.getId());
+		JsonArray currentVerifyRoles = higherDepth(verifySettings, "verifiedRoles").getAsJsonArray();
+		if (currentVerifyRoles.size() >= 3) {
+			return defaultEmbed("You have reached the max number of verify roles (3/3)");
+		}
+
+		currentVerifyRoles.add(verifyRole.getId());
+		int responseCode = database.setVerifyRolesSettings(guild.getId(), currentVerifyRoles);
+
+		if (responseCode != 200) {
+			return invalidEmbed("API returned response code " + responseCode);
+		}
+		guildMap.get(guild.getId()).verifyGuild.reloadSettingsJson(verifySettings);
+
+		EmbedBuilder eb = defaultEmbed("Settings");
+		return eb.setDescription("**Verify role added:** " + verifyRole.getAsMention());
+	}
+
+	public EmbedBuilder setVerifySyncEnable(String enable){
+		JsonObject currentSettings = database.getVerifySettings(guild.getId()).getAsJsonObject();
+
+		String nickname = higherDepth(currentSettings, "verifiedNickname").getAsString();
+		if((nickname.isEmpty() || nickname.equals("none")) && higherDepth(currentSettings, "verifiedRoles").getAsJsonArray().size() == 0){
+			return invalidEmbed("You must have at least on verify role or a nickname template set.");
+		}
+
+		int responseCode = updateVerifySettings("enableMemberJoinSync", enable);
+		if (responseCode != 200) {
+			return invalidEmbed("API returned response code " + responseCode);
+		}
+
+		EmbedBuilder eb = defaultEmbed("Settings");
+		return eb.setDescription("Member join sync " + (enable.equals("true") ? "enabled" : "disabled"));
+	}
+
 	public int updateVerifySettings(String key, String newValue) {
 		JsonObject newVerifySettings = database.getVerifySettings(guild.getId()).getAsJsonObject();
 		newVerifySettings.addProperty(key, newValue);
+		if(key.equals("verifiedNickname") || key.equals("enableMemberJoinSync")){
+			guildMap.get(guild.getId()).verifyGuild.reloadSettingsJson(newVerifySettings);
+		}
 		return database.setVerifySettings(guild.getId(), newVerifySettings);
 	}
 
@@ -1868,7 +1874,7 @@ public class SettingsExecute {
 		try {
 			currentReqs = database.getApplyReqs(guild.getId(), name).getAsJsonArray();
 		} catch (Exception ignored) {
-			return invalidEmbed("Unable to get current settings");
+			return invalidEmbed("Unable to getFormatted current settings");
 		}
 
 		try {
@@ -1905,7 +1911,7 @@ public class SettingsExecute {
 		try {
 			currentReqs = database.getApplyReqs(guild.getId(), name).getAsJsonArray();
 		} catch (Exception ignored) {
-			return invalidEmbed("Unable to get current settings");
+			return invalidEmbed("Unable to getFormatted current settings");
 		}
 
 		if (currentReqs.size() >= 3) {
@@ -1957,6 +1963,19 @@ public class SettingsExecute {
 		return eb;
 	}
 
+	public EmbedBuilder deleteApplyGuild(String name) {
+		if (database.getApplySettings(guild.getId(), name) != null) {
+			int responseCode = database.removeApplySettings(guild.getId(), name);
+			if (responseCode == 200) {
+				return defaultEmbed("Settings").setDescription("Apply settings with name `" + name + "` was deleted");
+			}
+
+			return invalidEmbed("API returned response code " + responseCode);
+		}
+
+		return invalidEmbed("Invalid Name");
+	}
+
 	public int updateApplySettings(String name, String key, String newValue) {
 		JsonObject newApplyJson = database.getApplySettings(guild.getId(), name).getAsJsonObject();
 		newApplyJson.addProperty(key, newValue);
@@ -1965,20 +1984,19 @@ public class SettingsExecute {
 
 	/* Mee6 */
 	public EmbedBuilder getMee6DataSettings() {
-		JsonElement curSettings = database.getMee6Settings(guild.getId());
-		EmbedBuilder eb = defaultEmbed("Settings");
-		eb.appendDescription(
-			"**• Enable:** " + (higherDepth(curSettings, "enable") != null ? higherDepth(curSettings, "enable").getAsBoolean() : "false")
-		);
-		JsonArray curRoles = higherDepth(curSettings, "mee6Ranks").getAsJsonArray();
+		JsonObject settings = getMee6Json();
+
+		EmbedBuilder eb = defaultSettingsEmbed()
+				.appendDescription(higherDepth(settings, "enable", "false").equals("true") ?"**Enabled**" : "**Disabled" );
+		JsonArray curRoles = higherDepth(settings, "mee6Ranks").getAsJsonArray();
 		if (curRoles.size() == 0) {
-			eb.appendDescription("\n**• Leveling roles:** None");
+			eb.appendDescription("\n**• Leveling roles:** none");
 		} else {
 			for (JsonElement curRole : curRoles) {
 				eb.appendDescription(
-					"\n• Level " +
+					"\n• **Level " +
 					higherDepth(curRole, "value").getAsString() +
-					" - <@&" +
+					":** <@&" +
 					higherDepth(curRole, "roleId").getAsString() +
 					">"
 				);
@@ -1990,20 +2008,19 @@ public class SettingsExecute {
 
 	public EmbedBuilder setMee6Enable(boolean enable) {
 		if (!enable) {
-			int responseCode = updateMee6Enable("false");
+			int responseCode = setMee6Settings("enable", "false");
 			if (responseCode != 200) {
-				return invalidEmbed("API returned response code " + responseCode);
+				return apiFailMessage(responseCode);
 			}
 
-			return defaultEmbed("Settings").setDescription("Disabled Mee6 roles");
+			return defaultSettingsEmbed().setDescription("Disabled Mee6 automatic leveling roles.");
 		}
 
-		JsonElement curSettings = database.getMee6Settings(guild.getId());
+		JsonElement settings = getMee6Json();
 
-		if (higherDepth(curSettings, "mee6Ranks").getAsJsonArray().size() == 0) {
-			return invalidEmbed("There must be at least one leveling role set");
+		if (higherDepth(settings, "mee6Ranks").getAsJsonArray().size() == 0) {
+			return invalidEmbed("You must set at least one leveling role.");
 		}
-
 		try {
 			if (
 				higherDepth(getJson("https://mee6.xyz/api/plugins/levels/leaderboard/" + guild.getId()), "players")
@@ -2011,110 +2028,166 @@ public class SettingsExecute {
 					.size() ==
 				0
 			) {
-				return invalidEmbed("The Mee6 isn't public for this server");
+				return invalidEmbed("The Mee6 leveling leaderboard must be public for this server.");
 			}
 		} catch (Exception e) {
-			return invalidEmbed("The Mee6 isn't public for this server");
+			return invalidEmbed("The Mee6 leveling leaderboard must be public for this server.");
 		}
 
-		int responseCode = updateMee6Enable("true");
+		int responseCode = setMee6Settings("enable", "true");
 		if (responseCode != 200) {
-			return invalidEmbed("API returned response code " + responseCode);
+			return apiFailMessage(responseCode);
 		}
 
-		return defaultEmbed("Settings").setDescription("Enabled Mee6 roles");
+		return defaultSettingsEmbed().setDescription("Enabled Mee6 automatic leveling roles.");
 	}
 
 	public EmbedBuilder addMee6Role(String level, String roleMention) {
+		Role role = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
+		if(role == null){
+			return invalidEmbed("The provided role does not exist.");
+		}else if(role.isPublicRole()){
+			return invalidEmbed("The role cannot be the everyone role.");
+		}else if(role.isManaged()){
+			return invalidEmbed("The role cannot be a managed role");
+		}
+
+		int intLevel;
 		try {
-			Role verifyGuildRole = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
-			if (!(verifyGuildRole.isPublicRole() || verifyGuildRole.isManaged())) {
-				int intLevel;
-				try {
-					intLevel = Integer.parseInt(level);
-				} catch (Exception e) {
-					return invalidEmbed("The level must be an integer");
+			intLevel = Integer.parseInt(level);
+			if (intLevel <= 0 || intLevel >= 250) {
+				return invalidEmbed("The level must be between 0 and 50.");
+			}
+		} catch (Exception e) {
+			return invalidEmbed("The level must be an integer.");
+		}
+
+		JsonObject settings = getMee6Json();
+
+		JsonArray ranks = settings.getAsJsonArray("mee6Ranks");
+		if (ranks.size() >= 10) {
+			return defaultEmbed("You have reached the max amount of Mee6 roles (10/10).");
+		}
+		for (int i = ranks.size() - 1; i >= 0; i--) {
+			if (higherDepth(ranks.get(i), "value").getAsInt() == intLevel) {
+				ranks.remove(i);
+			}
+		}
+
+		ranks.add(gson.toJsonTree(new RoleObject("" + intLevel, role.getId())));
+		settings.add("mee6Ranks", ranks);
+
+		int responseCode = setMee6Settings(settings);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		return defaultSettingsEmbed()
+				.setDescription("Added a level " + intLevel + " Mee6 role as " + role.getAsMention() + ".");
+	}
+
+	public EmbedBuilder removeMee6Role(String level) {
+		int intLevel;
+		try {
+			intLevel = Integer.parseInt(level);
+			if (intLevel <= 0 || intLevel >= 250) {
+				return invalidEmbed("The level must be between 0 and 50.");
+			}
+		} catch (Exception e) {
+			return invalidEmbed("The level must be an integer.");
+		}
+
+		JsonObject curSettings = getMee6Json();
+		JsonArray curRanks = curSettings.get("mee6Ranks").getAsJsonArray();
+
+		for (JsonElement rank : curRanks) {
+			if (higherDepth(rank, "value").getAsInt() == intLevel) {
+				curRanks.remove(rank);
+				if (curRanks.size() == 0) {
+					curSettings.addProperty("enable", "false");
 				}
-
-				if (intLevel <= 0 || intLevel >= 250) {
-					return invalidEmbed("The level must be more than 0 and less than 250");
-				}
-
-				JsonObject curSettings = database.getMee6Settings(guild.getId()).getAsJsonObject();
-				JsonArray curRanks = curSettings.get("mee6Ranks").getAsJsonArray();
-
-				if (curRanks.size() >= 10) {
-					return defaultEmbed("You have reached the max amount of Mee6 roles (10/10)");
-				}
-
-				for (JsonElement rank : curRanks) {
-					if (higherDepth(rank, "value").getAsInt() == intLevel) {
-						curRanks.remove(rank);
-						break;
-					}
-				}
-
-				curRanks.add(gson.toJsonTree(new RoleObject("" + intLevel, verifyGuildRole.getId())));
 				curSettings.add("mee6Ranks", curRanks);
 
 				int responseCode = database.setMee6Settings(guild.getId(), curSettings);
 				if (responseCode != 200) {
-					return invalidEmbed("API returned response code " + responseCode);
+					return apiFailMessage(responseCode);
 				}
 
-				EmbedBuilder eb = defaultEmbed("Settings");
-				eb.setDescription("**Added Mee6 Role:** rank " + intLevel + " - " + verifyGuildRole.getAsMention());
-				return eb;
+				return defaultSettingsEmbed().setDescription("Removed Mee6 role for level " + intLevel + ".");
 			}
-		} catch (Exception ignored) {}
-		return defaultEmbed("Invalid Role");
+		}
+
+		return invalidEmbed("There is no role set for level " + intLevel + ".");
 	}
 
-	public EmbedBuilder removeMee6Role(String level) {
-		try {
-			int intLevel;
-			try {
-				intLevel = Integer.parseInt(level);
-			} catch (Exception e) {
-				return defaultEmbed("Invalid level");
-			}
-
-			if (intLevel <= 0 || intLevel >= 250) {
-				return defaultEmbed("Invalid level");
-			}
-
-			JsonObject curSettings = database.getMee6Settings(guild.getId()).getAsJsonObject();
-			JsonArray curRanks = curSettings.get("mee6Ranks").getAsJsonArray();
-
-			for (JsonElement rank : curRanks) {
-				if (higherDepth(rank, "value").getAsInt() == intLevel) {
-					curRanks.remove(rank);
-					if (curRanks.size() == 0) {
-						curSettings.addProperty("enable", "false");
-					}
-					curSettings.add("mee6Ranks", curRanks);
-
-					int responseCode = database.setMee6Settings(guild.getId(), curSettings);
-					if (responseCode != 200) {
-						return invalidEmbed("API returned response code " + responseCode);
-					}
-
-					EmbedBuilder eb = defaultEmbed("Settings");
-					eb.setDescription("**Removed Mee6 Role:** rank " + intLevel);
-					return eb;
-				}
-			}
-		} catch (Exception ignored) {}
-		return defaultEmbed("Invalid level");
+	public JsonObject getMee6Json(){
+		return serverSettings.getAsJsonObject("mee6Data");
 	}
 
-	public int updateMee6Enable(String newValue) {
-		JsonObject newApplyJson = database.getMee6Settings(guild.getId()).getAsJsonObject();
-		newApplyJson.addProperty("enable", newValue);
-		return database.setMee6Settings(guild.getId(), newApplyJson);
+	public int setMee6Settings(String key, String newValue) {
+		JsonObject newSettings = getMee6Json();
+		newSettings.addProperty(key, newValue);
+		return database.setMee6Settings(guild.getId(), newSettings);
+	}
+
+	public int setMee6Settings(JsonElement newSettings) {
+		return database.setMee6Settings(guild.getId(), newSettings);
 	}
 
 	/* Miscellaneous */
+	public EmbedBuilder setHypixelKey(String newKey) {
+		try {
+			higherDepth(getJson("https://api.hypixel.net/key?key=" + newKey), "record.key").getAsString();
+		} catch (Exception e) {
+			return invalidEmbed("Provided Hypixel API key is invalid.");
+		}
+
+		int responseCode = database.setServerHypixelApiKey(guild.getId(), newKey);
+		if(responseCode != 200){
+			return apiFailMessage(responseCode);
+		}
+
+		return defaultSettingsEmbed()
+				.setDescription(
+						"Set the Hypixel API key. Note that no one can view the key for the privacy of the key owner."
+				);
+	}
+
+	public EmbedBuilder deleteHypixelKey() {
+		int responseCode = database.setServerHypixelApiKey(guild.getId(), "");
+		if (responseCode != 200) {
+			apiFailMessage(responseCode);
+		}
+
+		return defaultSettingsEmbed().setDescription("Deleted the server's Hypixel API key.");
+	}
+
+	public EmbedBuilder setPrefix(String prefix) {
+		if (prefix.length() == 0 || prefix.length() > 5) {
+			return invalidEmbed("The prefix must be a least one character and no more than five.");
+		}
+
+		int responseCode = database.setPrefix(guild.getId(), prefix);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		guildMap.get(guild.getId()).setPrefix(prefix);
+		return defaultSettingsEmbed().setDescription("**Set the server's prefix to:** " + prefix);
+	}
+
+	public EmbedBuilder resetPrefix() {
+		int responseCode = database.setPrefix(guild.getId(), null);
+
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		guildMap.get(guild.getId()).setPrefix(DEFAULT_PREFIX);
+		return defaultSettingsEmbed().setDescription("**Reset the server's prefix to:** " + DEFAULT_PREFIX);
+	}
+
+	/* Helper functions */
 	public String displaySettings(JsonElement jsonSettings, String settingName) {
 		if (higherDepth(jsonSettings, settingName) != null) {
 			if (settingName.equals("applyReqs")) {
@@ -2133,17 +2206,17 @@ public class SettingsExecute {
 					String weightReq = higherDepth(req, "weightReq").getAsString();
 
 					reqsString
-						.append("`")
-						.append(i + 1)
-						.append(")` ")
-						.append(slayerReq)
-						.append(" slayer and ")
-						.append(skillsReq)
-						.append(" skill average and ")
-						.append(cataReq)
-						.append(" cata and ")
-						.append(weightReq)
-						.append(" weight\n");
+							.append("`")
+							.append(i + 1)
+							.append(")` ")
+							.append(slayerReq)
+							.append(" slayer and ")
+							.append(skillsReq)
+							.append(" skill average and ")
+							.append(cataReq)
+							.append(" cata and ")
+							.append(weightReq)
+							.append(" weight\n");
 				}
 
 				return reqsString.toString();
@@ -2208,35 +2281,15 @@ public class SettingsExecute {
 		return "None";
 	}
 
-	public EmbedBuilder setPrefix(String prefix) {
-		if (prefix.length() == 0 || prefix.length() > 5) {
-			return invalidEmbed("The prefix must be a least one character and no more than five");
-		}
-
-		int responseCode = database.setPrefix(guild.getId(), prefix);
-
-		if (responseCode != 200) {
-			return invalidEmbed("API returned response code " + responseCode);
-		}
-
-		guildMap.get(guild.getId()).setPrefix(prefix);
-
-		return defaultEmbed("Settings").setDescription("**Set prefix to:** " + prefix);
-	}
-
-	public EmbedBuilder deletePrefix() {
-		int responseCode = database.setPrefix(guild.getId(), null);
-
-		if (responseCode != 200) {
-			return invalidEmbed("API returned response code " + responseCode);
-		}
-
-		guildMap.get(guild.getId()).setPrefix(DEFAULT_PREFIX);
-
-		return defaultEmbed("Settings").setDescription("**Reset the prefix to:** " + DEFAULT_PREFIX);
-	}
-
 	public String getSettingsPrefix() {
 		return guildPrefix;
+	}
+
+	public EmbedBuilder apiFailMessage (int responseCode){
+		return invalidEmbed("API returned response code " + responseCode + ". Please report this to the developer.");
+	}
+
+	public EmbedBuilder defaultSettingsEmbed(){
+		return defaultEmbed("Settings");
 	}
 }
