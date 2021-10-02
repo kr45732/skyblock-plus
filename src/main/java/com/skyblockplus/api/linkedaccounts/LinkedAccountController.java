@@ -37,22 +37,22 @@ public class LinkedAccountController {
 		this.settingsService = settingsService;
 	}
 
-	@GetMapping("/getFormatted/all")
+	@GetMapping("/get/all")
 	public List<LinkedAccountModel> getAllServerSettings() {
 		return settingsService.getAllLinkedAccounts();
 	}
 
-	@GetMapping("/getFormatted/by/discordId")
+	@GetMapping("/get/by/discordId")
 	public ResponseEntity<?> getByDiscordId(@RequestParam(value = "discordId") String discordId) {
 		return settingsService.getByDiscordId(discordId);
 	}
 
-	@GetMapping("/getFormatted/by/minecraftUuid")
+	@GetMapping("/get/by/minecraftUuid")
 	public ResponseEntity<?> getByMinecraftUuid(@RequestParam(value = "minecraftUuid") String minecraftUuid) {
 		return settingsService.getByMinecraftUuid(minecraftUuid);
 	}
 
-	@GetMapping("/getFormatted/by/minecraftUsername")
+	@GetMapping("/get/by/minecraftUsername")
 	public ResponseEntity<?> getByMinecraftUsername(@RequestParam(value = "minecraftUsername") String minecraftUsername) {
 		return settingsService.getByMinecraftUsername(minecraftUsername);
 	}

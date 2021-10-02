@@ -181,7 +181,6 @@ public class MainListener extends ListenerAdapter {
 		}
 
 		if (event.getGuild() == null) {
-			event.getMessage();
 			event
 				.editButton(
 					event

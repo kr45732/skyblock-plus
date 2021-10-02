@@ -700,7 +700,6 @@ public class AutomaticGuild {
 			}
 		}
 
-		event.getMessage();
 		event.editButton(event.getButton().asDisabled().withId("disabled").withLabel("Disabled").withStyle(ButtonStyle.DANGER)).queue();
 		event.getHook().editOriginal("❌ This button has been disabled").queue();
 	}
@@ -718,7 +717,7 @@ public class AutomaticGuild {
 	/* Miscellaneous */
 	public void schedulerConstructor() {
 		int eventDelay = (int) (Math.random() * 60 + 1);
-		scheduledFutures.add(scheduler.scheduleWithFixedDelay(this::updateGuild, eventDelay, 210, TimeUnit.MINUTES));
+		scheduledFutures.add(scheduler.scheduleWithFixedDelay(this::updateGuild, eventDelay, 180, TimeUnit.MINUTES));
 		scheduledFutures.add(scheduler.scheduleWithFixedDelay(this::updateSkyblockEvent, eventDelay, 60, TimeUnit.MINUTES));
 	}
 

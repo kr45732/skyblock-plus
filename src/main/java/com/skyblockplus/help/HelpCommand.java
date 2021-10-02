@@ -337,7 +337,7 @@ public class HelpCommand extends Command {
 									.addExamples("myGuild channel #apply-for-guild"),
 								new HelpData(
 									"category",
-									"Category where new apply channels will be made. Run `categories` to getFormatted the ID's of all categories in the server.",
+									"Category where new apply channels will be made. Run `categories` to get the ID's of all categories in the server.",
 									"[name] category [category id]"
 								),
 								new HelpData(

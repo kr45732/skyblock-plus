@@ -1874,7 +1874,7 @@ public class SettingsExecute {
 		try {
 			currentReqs = database.getApplyReqs(guild.getId(), name).getAsJsonArray();
 		} catch (Exception ignored) {
-			return invalidEmbed("Unable to getFormatted current settings");
+			return invalidEmbed("Unable to get current settings");
 		}
 
 		try {
@@ -1911,7 +1911,7 @@ public class SettingsExecute {
 		try {
 			currentReqs = database.getApplyReqs(guild.getId(), name).getAsJsonArray();
 		} catch (Exception ignored) {
-			return invalidEmbed("Unable to getFormatted current settings");
+			return invalidEmbed("Unable to get current settings");
 		}
 
 		if (currentReqs.size() >= 3) {

@@ -128,8 +128,8 @@ public class CommandEndpoints {
 					if (!raritySpecified) {
 						List<String> petRarities = getJsonKeys(higherDepth(petJson, formattedName));
 						for (String j : petRarities) {
-							if (higherDepth(lowestBinJson, formattedName + Constants.rarityToNumberMap.getFormatted(j)) != null) {
-								formattedName += Constants.rarityToNumberMap.getFormatted(j);
+							if (higherDepth(lowestBinJson, formattedName + Constants.rarityToNumberMap.get(j)) != null) {
+								formattedName += Constants.rarityToNumberMap.get(j);
 								break;
 							}
 						}
@@ -215,8 +215,8 @@ public class CommandEndpoints {
 					if (!raritySpecified) {
 						List<String> petRarities = getJsonKeys(higherDepth(petJson, formattedName));
 						for (String j : petRarities) {
-							if (higherDepth(avgAhJson, formattedName + rarityToNumberMap.getFormatted(j)) != null) {
-								formattedName += rarityToNumberMap.getFormatted(j);
+							if (higherDepth(avgAhJson, formattedName + rarityToNumberMap.get(j)) != null) {
+								formattedName += rarityToNumberMap.get(j);
 								break;
 							}
 						}
