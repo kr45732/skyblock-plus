@@ -49,7 +49,12 @@ public class SkillsCommand extends Command {
 				SkillsStruct skillInfo = player.getSkill(skillName);
 				if (skillInfo != null) {
 					eb.addField(
-						SKILLS_EMOJI_MAP.get(skillName) + " " + capitalizeString(skillInfo.getName()) + " (" + skillInfo.getCurrentLevel() + ")",
+						SKILLS_EMOJI_MAP.get(skillName) +
+						" " +
+						capitalizeString(skillInfo.getName()) +
+						" (" +
+						skillInfo.getCurrentLevel() +
+						")",
 						simplifyNumber(skillInfo.getExpCurrent()) +
 						" / " +
 						simplifyNumber(skillInfo.getExpForNext()) +

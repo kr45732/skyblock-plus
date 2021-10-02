@@ -18,23 +18,22 @@
 
 package com.skyblockplus.features.verify;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.skyblockplus.api.serversettings.automatedguild.GuildRole;
-import com.skyblockplus.utils.structs.HypixelResponse;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-
-import java.util.concurrent.TimeUnit;
-
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.utils.Hypixel.getGuildFromPlayer;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.Utils.higherDepth;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.skyblockplus.api.serversettings.automatedguild.GuildRole;
+import com.skyblockplus.utils.structs.HypixelResponse;
+import java.util.concurrent.TimeUnit;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class VerifyGuild {
 
@@ -191,8 +190,8 @@ public class VerifyGuild {
 			);
 	}
 
-	public void reloadSettingsJson(JsonElement newVerifySettings){
-		if(higherDepth(newVerifySettings, "enableMemberJoinSync", "").equals("true")) {
+	public void reloadSettingsJson(JsonElement newVerifySettings) {
+		if (higherDepth(newVerifySettings, "enableMemberJoinSync", "").equals("true")) {
 			verifySettings = database.getVerifySettings(guildId);
 		}
 	}

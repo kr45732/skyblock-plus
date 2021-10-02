@@ -31,7 +31,7 @@ public class UuidCommand extends Command {
 
 	public UuidCommand() {
 		this.name = "uuid";
-		this.aliases = new String[]{"username"};
+		this.aliases = new String[] { "username" };
 		this.cooldown = globalCooldown + 1;
 		this.botPermissions = defaultPerms();
 	}
@@ -60,6 +60,8 @@ public class UuidCommand extends Command {
 			return invalidEmbed(usernameUuid.getFailCause());
 		}
 
-		return defaultEmbed(usernameUuid.getUsername(), "https://plancke.io/hypixel/player/stats/" + usernameUuid.getUsername()).setDescription("**Username:** " + usernameUuid.getUsername() + "\n**Uuid:** " + usernameUuid.getUuid()) .setThumbnail(usernameUuid.getAvatarlUrl());
+		return defaultEmbed(usernameUuid.getUsername(), "https://plancke.io/hypixel/player/stats/" + usernameUuid.getUsername())
+			.setDescription("**Username:** " + usernameUuid.getUsername() + "\n**Uuid:** " + usernameUuid.getUuid())
+			.setThumbnail(usernameUuid.getAvatarlUrl());
 	}
 }

@@ -201,7 +201,7 @@ public class GuildLeaderboardsCommand extends Command {
 
 		String ebStr =
 			"**Player:** " +
-					usernameUuidStruct.getUsername() +
+			usernameUuidStruct.getUsername() +
 			"\n**Guild Rank:** #" +
 			(guildRank + 1) +
 			"\n**" +

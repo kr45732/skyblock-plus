@@ -18,7 +18,13 @@
 
 package com.skyblockplus.features.listeners;
 
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.skyblockplus.features.skyblockevent.SkyblockEventCommand;
+import java.util.HashMap;
+import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
@@ -34,13 +40,6 @@ import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.utils.Utils.*;
 
 public class MainListener extends ListenerAdapter {
 

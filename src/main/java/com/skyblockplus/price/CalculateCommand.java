@@ -18,6 +18,10 @@
 
 package com.skyblockplus.price;
 
+import static com.skyblockplus.utils.Hypixel.getAuctionFromUuid;
+import static com.skyblockplus.utils.Hypixel.uuidToUsername;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
@@ -26,15 +30,10 @@ import com.skyblockplus.networth.NetworthExecute;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.InvItem;
-import me.nullicorn.nedit.NBTReader;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.time.Duration;
 import java.time.Instant;
-
-import static com.skyblockplus.utils.Hypixel.getAuctionFromUuid;
-import static com.skyblockplus.utils.Hypixel.uuidToUsername;
-import static com.skyblockplus.utils.Utils.*;
+import me.nullicorn.nedit.NBTReader;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class CalculateCommand extends Command {
 
@@ -87,7 +86,7 @@ public class CalculateCommand extends Command {
 					ebStr +=
 						bidsArr.size() > 0
 							? "\n**Highest bidder:** " +
-								uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).getUsername()
+							uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).getUsername()
 							: "";
 				}
 			} else {
@@ -96,7 +95,7 @@ public class CalculateCommand extends Command {
 						"\n**Auction sold** for " +
 						simplifyNumber(highestBid) +
 						" coins to " +
-								uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).getUsername();
+						uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).getUsername();
 				} else {
 					ebStr = "\n**Auction did not sell**";
 				}

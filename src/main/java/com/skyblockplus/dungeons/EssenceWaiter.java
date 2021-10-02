@@ -18,23 +18,22 @@
 
 package com.skyblockplus.dungeons;
 
-import com.google.gson.JsonElement;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.higherDepth;
 
+import com.google.gson.JsonElement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
-import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.higherDepth;
-
-public class EssenceWaiter{
+public class EssenceWaiter {
 
 	private final String itemName;
 	private final JsonElement itemJson;
@@ -84,16 +83,16 @@ public class EssenceWaiter{
 		}
 
 		waiter.waitForEvent(
-				MessageReactionAddEvent.class,
-				this::condition,
-				this::action,
-				30,
-				TimeUnit.SECONDS,
-				() -> reactMessage.clearReactions().queue()
+			MessageReactionAddEvent.class,
+			this::condition,
+			this::action,
+			30,
+			TimeUnit.SECONDS,
+			() -> reactMessage.clearReactions().queue()
 		);
 	}
 
-	private boolean condition(MessageReactionAddEvent event){
+	private boolean condition(MessageReactionAddEvent event) {
 		return event.getMessageIdLong() == reactMessage.getIdLong() && !event.getUser().isBot() && event.getUser().equals(user);
 	}
 

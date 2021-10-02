@@ -18,9 +18,8 @@
 
 package com.skyblockplus.utils.structs;
 
-import lombok.Data;
-
 import java.util.concurrent.atomic.AtomicInteger;
+import lombok.Data;
 
 @Data
 public class HypixelKeyInformation {

@@ -18,15 +18,14 @@
 
 package com.skyblockplus.inventory;
 
+import static com.skyblockplus.Main.waiter;
+
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
-
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import static com.skyblockplus.Main.waiter;
 
 public class InventoryPaginator {
 
@@ -48,12 +47,12 @@ public class InventoryPaginator {
 		pagePart2.addReaction("▶️").queue();
 
 		waiter.waitForEvent(
-				GuildMessageReactionAddEvent.class,
-				this::condition,
-				this::action,
-				30,
-				TimeUnit.SECONDS,
-				() -> pagePart2.clearReactions().queue()
+			GuildMessageReactionAddEvent.class,
+			this::condition,
+			this::action,
+			30,
+			TimeUnit.SECONDS,
+			() -> pagePart2.clearReactions().queue()
 		);
 	}
 

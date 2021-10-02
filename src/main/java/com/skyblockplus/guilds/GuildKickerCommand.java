@@ -228,7 +228,9 @@ public class GuildKickerCommand extends Command {
 						guildMemberUsername.thenApply(guildMemberUsernameResponse -> {
 							try {
 								if (keyCooldownMap.get(hypixelKey).getRemainingLimit().get() < 5) {
-									System.out.println("Sleeping for " + keyCooldownMap.get(hypixelKey).getTimeTillReset().get() + " seconds");
+									System.out.println(
+										"Sleeping for " + keyCooldownMap.get(hypixelKey).getTimeTillReset().get() + " seconds"
+									);
 									TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).getTimeTillReset().get());
 								}
 							} catch (Exception ignored) {}

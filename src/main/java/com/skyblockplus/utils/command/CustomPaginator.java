@@ -135,15 +135,17 @@ public class CustomPaginator extends Menu {
 	private void initialize(RestAction<Message> action, int pageNum) {
 		if (pages > 1) {
 			if (action instanceof MessageAction) {
-				action = ((MessageAction) action).setActionRow(
-						Button.primary(LEFT, Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")),
-						Button.primary(RIGHT, Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
-					);
+				action =
+					((MessageAction) action).setActionRow(
+							Button.primary(LEFT, Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")),
+							Button.primary(RIGHT, Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
+						);
 			} else if (action instanceof WebhookMessageUpdateAction) {
-				action = ((WebhookMessageUpdateAction<Message>) action).setActionRow(
-						Button.primary(LEFT, Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")),
-						Button.primary(RIGHT, Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
-					);
+				action =
+					((WebhookMessageUpdateAction<Message>) action).setActionRow(
+							Button.primary(LEFT, Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")),
+							Button.primary(RIGHT, Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
+						);
 			} else {
 				log.error("This shouldn't happen | Class: " + action.getClass() + " | Action: " + action);
 			}

@@ -31,11 +31,11 @@ public class SkillsStruct {
 	private final long expForNext;
 	private final double progressToNext;
 
-	public boolean isMaxed(){
+	public boolean isMaxed() {
 		return currentLevel == maxLevel;
 	}
 
-	public double getProgressLevel(){
+	public double getProgressLevel() {
 		return currentLevel + progressToNext;
 	}
 }

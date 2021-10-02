@@ -56,9 +56,9 @@ public class LinkCommand extends Command {
 			EmbedBuilder eb = defaultEmbed("Discord tag mismatch");
 			eb.setDescription(
 				"**Player Username:** `" +
-						playerInfo.getUsername() +
+				playerInfo.getUsername() +
 				"`\n**API Discord Tag:** `" +
-						playerInfo.getDiscordTag() +
+				playerInfo.getDiscordTag() +
 				"`\n**Your Discord Tag:** `" +
 				member.getUser().getAsTag() +
 				"`"
@@ -69,8 +69,8 @@ public class LinkCommand extends Command {
 		LinkedAccountModel toAdd = new LinkedAccountModel(
 			"" + Instant.now().toEpochMilli(),
 			member.getId(),
-				playerInfo.getUuid(),
-				playerInfo.getUsername()
+			playerInfo.getUuid(),
+			playerInfo.getUsername()
 		);
 
 		if (database.addLinkedUser(toAdd) == 200) {

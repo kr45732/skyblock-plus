@@ -18,9 +18,9 @@
 
 package com.skyblockplus.utils.structs;
 
-import lombok.Data;
-
 import static com.skyblockplus.utils.Utils.roundAndFormat;
+
+import lombok.Data;
 
 @Data
 public class WeightStruct {

@@ -18,18 +18,17 @@
 
 package com.skyblockplus.dungeons;
 
+import static com.skyblockplus.utils.Constants.ESSENCE_ITEM_NAMES;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.util.Locale;
 import java.util.Map;
-
-import static com.skyblockplus.utils.Constants.ESSENCE_ITEM_NAMES;
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class EssenceCommand extends Command {
 

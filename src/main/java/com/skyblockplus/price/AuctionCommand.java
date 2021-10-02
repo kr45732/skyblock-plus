@@ -138,10 +138,7 @@ public class AuctionCommand extends Command {
 			}
 		}
 
-		EmbedBuilder eb = defaultEmbed(
-			usernameUuidStruct.getUsername(),
-			usernameUuidStruct.getAuctionUrl()
-		);
+		EmbedBuilder eb = defaultEmbed(usernameUuidStruct.getUsername(), usernameUuidStruct.getAuctionUrl());
 		eb.setTitle("No auctions found for " + usernameUuidStruct.getUsername(), null);
 		return eb;
 	}
@@ -194,7 +191,7 @@ public class AuctionCommand extends Command {
 				ebStr +=
 					bidsArr.size() > 0
 						? "\n**Highest bidder:** " +
-							uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).getUsername()
+						uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).getUsername()
 						: "";
 			}
 		} else {
@@ -203,7 +200,7 @@ public class AuctionCommand extends Command {
 					"\n**Auction sold** for " +
 					simplifyNumber(highestBid) +
 					" coins to " +
-							uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).getUsername();
+					uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).getUsername();
 			} else {
 				ebStr = "\n**Auction did not sell**";
 			}

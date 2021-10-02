@@ -350,12 +350,12 @@ public class SettingsExecute {
 								}
 								break;
 							case "enable":
-								if(args[3].equals("sync")) {
+								if (args[3].equals("sync")) {
 									eb = setVerifySyncEnable("true");
 								}
 								break;
 							case "disable":
-								if(args[3].equals("sync")) {
+								if (args[3].equals("sync")) {
 									eb = setVerifySyncEnable("false");
 								}
 								break;
@@ -478,10 +478,17 @@ public class SettingsExecute {
 			return defaultSettingsEmbed().setDescription("Error! Data not found. Please report this to the developer.");
 		}
 
-		String settingsString = "**" + displaySettings(settings, "enableGuildRole") + "**"
-		+ "\n**• Guild Name:** " + displaySettings(settings, "guildId")
-		+ "\n**• Guild Role:** " + displaySettings(settings, "roleId")
-		+ "\n\n**" + displaySettings(settings, "enableGuildRanks") + "**";
+		String settingsString =
+			"**" +
+			displaySettings(settings, "enableGuildRole") +
+			"**" +
+			"\n**• Guild Name:** " +
+			displaySettings(settings, "guildId") +
+			"\n**• Guild Role:** " +
+			displaySettings(settings, "roleId") +
+			"\n\n**" +
+			displaySettings(settings, "enableGuildRanks") +
+			"**";
 
 		StringBuilder guildRanksString = new StringBuilder();
 		for (JsonElement guildRank : higherDepth(settings, "guildRanks").getAsJsonArray()) {
@@ -501,7 +508,7 @@ public class SettingsExecute {
 	public EmbedBuilder setGuildRoleEnable(String name, boolean enable) {
 		JsonObject settings = database.getGuildRoleSettings(guild.getId(), name).getAsJsonObject();
 
-		if(!enable){
+		if (!enable) {
 			settings.addProperty("enableGuildRole", "false");
 			int responseCode = database.setGuildRoleSettings(guild.getId(), settings);
 			if (responseCode != 200) {
@@ -511,10 +518,7 @@ public class SettingsExecute {
 			return defaultSettingsEmbed().setDescription(("Disabled") + " automatic guild role.");
 		}
 
-		if (
-			higherDepth(settings, "guildId", "").isEmpty() ||
-			higherDepth(settings, "roleId", "").isEmpty()
-		) {
+		if (higherDepth(settings, "guildId", "").isEmpty() || higherDepth(settings, "roleId", "").isEmpty()) {
 			return invalidEmbed("The guild name and role must be set.");
 		}
 
@@ -530,7 +534,7 @@ public class SettingsExecute {
 	public EmbedBuilder setGuildRankEnable(String name, boolean enable) {
 		JsonObject settings = database.getGuildRoleSettings(guild.getId(), name).getAsJsonObject();
 
-		if(!enable){
+		if (!enable) {
 			settings.addProperty("enableGuildRanks", "false");
 			int responseCode = database.setGuildRoleSettings(guild.getId(), settings);
 			if (responseCode != 200) {
@@ -540,9 +544,7 @@ public class SettingsExecute {
 			return defaultSettingsEmbed().setDescription("Disabled automatic guild ranks.");
 		}
 
-		if (
-			(higherDepth(settings, "guildId", "").isEmpty()) || (higherDepth(settings, "guildRanks").getAsJsonArray().size() == 0)
-		) {
+		if ((higherDepth(settings, "guildId", "").isEmpty()) || (higherDepth(settings, "guildRanks").getAsJsonArray().size() == 0)) {
 			return invalidEmbed("The guild name and a at least one guild rank must be set.");
 		}
 
@@ -558,7 +560,7 @@ public class SettingsExecute {
 	public EmbedBuilder setGuildCounterEnable(String name, boolean enable) {
 		JsonObject settings = database.getGuildRoleSettings(guild.getId(), name).getAsJsonObject();
 
-		if(!enable){
+		if (!enable) {
 			try {
 				guild.getVoiceChannelById(settings.get("guildUserChannelId").getAsString()).delete().complete();
 			} catch (Exception ignored) {}
@@ -582,16 +584,16 @@ public class SettingsExecute {
 		}
 
 		VoiceChannel guildMemberCounterChannel = guild
-				.createVoiceChannel(
-						guildJson.get("name").getAsString() + " Members: " + guildJson.get("members").getAsJsonArray().size() + "/125"
-				)
-				.addPermissionOverride(guild.getPublicRole(), EnumSet.of(Permission.VIEW_CHANNEL), EnumSet.of(Permission.VOICE_CONNECT))
-				.addMemberPermissionOverride(
-						jda.getSelfUser().getIdLong(),
-						EnumSet.of(Permission.VIEW_CHANNEL, Permission.MANAGE_CHANNEL, Permission.VOICE_CONNECT),
-						null
-				)
-				.complete();
+			.createVoiceChannel(
+				guildJson.get("name").getAsString() + " Members: " + guildJson.get("members").getAsJsonArray().size() + "/125"
+			)
+			.addPermissionOverride(guild.getPublicRole(), EnumSet.of(Permission.VIEW_CHANNEL), EnumSet.of(Permission.VOICE_CONNECT))
+			.addMemberPermissionOverride(
+				jda.getSelfUser().getIdLong(),
+				EnumSet.of(Permission.VIEW_CHANNEL, Permission.MANAGE_CHANNEL, Permission.VOICE_CONNECT),
+				null
+			)
+			.complete();
 		settings.addProperty("enableGuildUserCount", "true");
 		settings.addProperty("guildUserChannelId", guildMemberCounterChannel.getId());
 
@@ -653,9 +655,7 @@ public class SettingsExecute {
 				}
 
 				EmbedBuilder eb = defaultEmbed("Settings");
-				eb.setDescription(
-					"**Guild rank added:** " + higherDepth(guildRank, "name").getAsString() + " - " + role.getAsMention()
-				);
+				eb.setDescription("**Guild rank added:** " + higherDepth(guildRank, "name").getAsString() + " - " + role.getAsMention());
 				return eb;
 			}
 		}
@@ -1429,7 +1429,9 @@ public class SettingsExecute {
 	public EmbedBuilder setVerifyMessageTextChannelId(String textChannel) {
 		try {
 			TextChannel verifyMessageTextChannel = guild.getTextChannelById(textChannel.replaceAll("[<#>]", ""));
-			try{verifyMessageTextChannel.getManager().setSlowmode(5).queue();}catch (Exception ignored){}
+			try {
+				verifyMessageTextChannel.getManager().setSlowmode(5).queue();
+			} catch (Exception ignored) {}
 			int responseCode = updateVerifySettings("messageTextChannelId", verifyMessageTextChannel.getId());
 			if (responseCode != 200) {
 				return invalidEmbed("API returned response code " + responseCode);
@@ -1554,11 +1556,11 @@ public class SettingsExecute {
 		return eb.setDescription("**Verify role added:** " + verifyRole.getAsMention());
 	}
 
-	public EmbedBuilder setVerifySyncEnable(String enable){
+	public EmbedBuilder setVerifySyncEnable(String enable) {
 		JsonObject currentSettings = database.getVerifySettings(guild.getId()).getAsJsonObject();
 
 		String nickname = higherDepth(currentSettings, "verifiedNickname").getAsString();
-		if((nickname.isEmpty() || nickname.equals("none")) && higherDepth(currentSettings, "verifiedRoles").getAsJsonArray().size() == 0){
+		if ((nickname.isEmpty() || nickname.equals("none")) && higherDepth(currentSettings, "verifiedRoles").getAsJsonArray().size() == 0) {
 			return invalidEmbed("You must have at least on verify role or a nickname template set.");
 		}
 
@@ -1574,7 +1576,7 @@ public class SettingsExecute {
 	public int updateVerifySettings(String key, String newValue) {
 		JsonObject newVerifySettings = database.getVerifySettings(guild.getId()).getAsJsonObject();
 		newVerifySettings.addProperty(key, newValue);
-		if(key.equals("verifiedNickname") || key.equals("enableMemberJoinSync")){
+		if (key.equals("verifiedNickname") || key.equals("enableMemberJoinSync")) {
 			guildMap.get(guild.getId()).verifyGuild.reloadSettingsJson(newVerifySettings);
 		}
 		return database.setVerifySettings(guild.getId(), newVerifySettings);
@@ -1987,7 +1989,7 @@ public class SettingsExecute {
 		JsonObject settings = getMee6Json();
 
 		EmbedBuilder eb = defaultSettingsEmbed()
-				.appendDescription(higherDepth(settings, "enable", "false").equals("true") ?"**Enabled**" : "**Disabled" );
+			.appendDescription(higherDepth(settings, "enable", "false").equals("true") ? "**Enabled**" : "**Disabled");
 		JsonArray curRoles = higherDepth(settings, "mee6Ranks").getAsJsonArray();
 		if (curRoles.size() == 0) {
 			eb.appendDescription("\n**• Leveling roles:** none");
@@ -2044,11 +2046,11 @@ public class SettingsExecute {
 
 	public EmbedBuilder addMee6Role(String level, String roleMention) {
 		Role role = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
-		if(role == null){
+		if (role == null) {
 			return invalidEmbed("The provided role does not exist.");
-		}else if(role.isPublicRole()){
+		} else if (role.isPublicRole()) {
 			return invalidEmbed("The role cannot be the everyone role.");
-		}else if(role.isManaged()){
+		} else if (role.isManaged()) {
 			return invalidEmbed("The role cannot be a managed role");
 		}
 
@@ -2082,8 +2084,7 @@ public class SettingsExecute {
 			return apiFailMessage(responseCode);
 		}
 
-		return defaultSettingsEmbed()
-				.setDescription("Added a level " + intLevel + " Mee6 role as " + role.getAsMention() + ".");
+		return defaultSettingsEmbed().setDescription("Added a level " + intLevel + " Mee6 role as " + role.getAsMention() + ".");
 	}
 
 	public EmbedBuilder removeMee6Role(String level) {
@@ -2120,7 +2121,7 @@ public class SettingsExecute {
 		return invalidEmbed("There is no role set for level " + intLevel + ".");
 	}
 
-	public JsonObject getMee6Json(){
+	public JsonObject getMee6Json() {
 		return serverSettings.getAsJsonObject("mee6Data");
 	}
 
@@ -2143,14 +2144,12 @@ public class SettingsExecute {
 		}
 
 		int responseCode = database.setServerHypixelApiKey(guild.getId(), newKey);
-		if(responseCode != 200){
+		if (responseCode != 200) {
 			return apiFailMessage(responseCode);
 		}
 
 		return defaultSettingsEmbed()
-				.setDescription(
-						"Set the Hypixel API key. Note that no one can view the key for the privacy of the key owner."
-				);
+			.setDescription("Set the Hypixel API key. Note that no one can view the key for the privacy of the key owner.");
 	}
 
 	public EmbedBuilder deleteHypixelKey() {
@@ -2206,17 +2205,17 @@ public class SettingsExecute {
 					String weightReq = higherDepth(req, "weightReq").getAsString();
 
 					reqsString
-							.append("`")
-							.append(i + 1)
-							.append(")` ")
-							.append(slayerReq)
-							.append(" slayer and ")
-							.append(skillsReq)
-							.append(" skill average and ")
-							.append(cataReq)
-							.append(" cata and ")
-							.append(weightReq)
-							.append(" weight\n");
+						.append("`")
+						.append(i + 1)
+						.append(")` ")
+						.append(slayerReq)
+						.append(" slayer and ")
+						.append(skillsReq)
+						.append(" skill average and ")
+						.append(cataReq)
+						.append(" cata and ")
+						.append(weightReq)
+						.append(" weight\n");
 				}
 
 				return reqsString.toString();
@@ -2285,11 +2284,11 @@ public class SettingsExecute {
 		return guildPrefix;
 	}
 
-	public EmbedBuilder apiFailMessage (int responseCode){
+	public EmbedBuilder apiFailMessage(int responseCode) {
 		return invalidEmbed("API returned response code " + responseCode + ". Please report this to the developer.");
 	}
 
-	public EmbedBuilder defaultSettingsEmbed(){
+	public EmbedBuilder defaultSettingsEmbed() {
 		return defaultEmbed("Settings");
 	}
 }

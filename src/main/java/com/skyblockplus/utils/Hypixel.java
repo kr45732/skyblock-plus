@@ -39,7 +39,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
-
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -201,10 +200,12 @@ public class Hypixel {
 							try {
 								keyCooldownMap
 									.get(hypixelApiKey)
-									.getRemainingLimit().set(Integer.parseInt(profilesResponse.getHeader("RateLimit-Remaining")));
+									.getRemainingLimit()
+									.set(Integer.parseInt(profilesResponse.getHeader("RateLimit-Remaining")));
 								keyCooldownMap
 									.get(hypixelApiKey)
-									.getTimeTillReset().set(Integer.parseInt(profilesResponse.getHeader("RateLimit-Reset")));
+									.getTimeTillReset()
+									.set(Integer.parseInt(profilesResponse.getHeader("RateLimit-Reset")));
 							} catch (Exception ignored) {}
 
 							JsonArray profileArray = processSkyblockProfilesArray(

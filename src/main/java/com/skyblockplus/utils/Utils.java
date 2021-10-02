@@ -1016,10 +1016,10 @@ public class Utils {
 						if (item.containsTag("tag.ExtraAttributes.gems", TagType.COMPOUND)) {
 							NBTCompound gems = item.getCompound("tag.ExtraAttributes.gems");
 							for (Map.Entry<String, Object> gem : gems.entrySet()) {
-								if(!gem.getKey().endsWith("_gem")) {
-									if(gems.containsKey(gem.getKey() + "_gem")){
+								if (!gem.getKey().endsWith("_gem")) {
+									if (gems.containsKey(gem.getKey() + "_gem")) {
 										itemInfo.addExtraValue(gem.getValue() + "_" + gems.get(gem.getKey() + "_gem") + "_GEM");
-									}else {
+									} else {
 										itemInfo.addExtraValue(gem.getValue() + "_" + gem.getKey().split("_")[0] + "_GEM");
 									}
 								}
@@ -1149,8 +1149,8 @@ public class Utils {
 								new LinkedAccountModel(
 									"" + Instant.now().toEpochMilli(),
 									updateUser.getId(),
-										discordInfo.getUuid(),
-										discordInfo.getUsername()
+									discordInfo.getUuid(),
+									discordInfo.getUsername()
 								)
 							);
 							try {

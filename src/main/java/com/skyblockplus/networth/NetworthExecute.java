@@ -73,7 +73,7 @@ public class NetworthExecute {
 		return this;
 	}
 
-	public NetworthExecute initPrices(){
+	public NetworthExecute initPrices() {
 		lowestBinJson = getLowestBinJson();
 		averageAuctionJson = getAverageAuctionJson();
 		bazaarJson = higherDepth(getBazaarJson(), "products");

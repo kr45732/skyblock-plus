@@ -1123,10 +1123,10 @@ public class Player {
 			"validPlayer=" +
 			validPlayer +
 			", playerUuid='" +
-					uuid +
+			uuid +
 			'\'' +
 			", playerUsername='" +
-					username +
+			username +
 			'\'' +
 			", profileName='" +
 			profileName +

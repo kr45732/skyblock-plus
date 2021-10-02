@@ -587,9 +587,9 @@ public class RoleCommand extends Command {
 
 		paginateBuilder.setPaginatorExtras(new PaginatorExtras().setEveryPageTitle("Automatic roles list"));
 
-		if(channel != null)
-		{paginateBuilder.build().paginate(channel, 0);
-		}else{
+		if (channel != null) {
+			paginateBuilder.build().paginate(channel, 0);
+		} else {
 			paginateBuilder.build().paginate(hook, 0);
 		}
 		return null;

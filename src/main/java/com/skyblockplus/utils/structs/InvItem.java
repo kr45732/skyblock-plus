@@ -18,11 +18,10 @@
 
 package com.skyblockplus.utils.structs;
 
-import lombok.Data;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import lombok.Data;
 
 @Data
 public class InvItem {

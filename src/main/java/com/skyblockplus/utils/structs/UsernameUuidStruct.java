@@ -44,11 +44,11 @@ public class UsernameUuidStruct {
 		return username == null || uuid == null;
 	}
 
-	public String getAvatarlUrl(){
+	public String getAvatarlUrl() {
 		return "https://cravatar.eu/helmavatar/" + uuid + "/64.png";
 	}
 
-	public String getAuctionUrl(){
+	public String getAuctionUrl() {
 		return "https://auctions.craftlink.xyz/players/" + uuid;
 	}
 }
