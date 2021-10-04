@@ -33,24 +33,31 @@ public class HypixelGuildCache {
 	}
 
 	public static String memberCacheFromPlayer(Player player) {
+		return memberCacheFromPlayer(player, false);
+	}
+
+	public static String memberCacheFromPlayer(Player player, boolean ironmanOnly) {
 		return (
 			player.getUsername() +
 			"=:=" +
-			player.getHighestAmount("slayer") +
+			player.getHighestAmount("slayer", ironmanOnly) +
 			"=:=" +
-			player.getHighestAmount("skills") +
+			player.getHighestAmount("skills", ironmanOnly) +
 			"=:=" +
-			player.getHighestAmount("catacombs") +
+			player.getHighestAmount("catacombs", ironmanOnly) +
 			"=:=" +
-			player.getHighestAmount("weight") +
+			player.getHighestAmount("weight", ironmanOnly) +
 			"=:=" +
-			player.getHighestAmount("svenXp") +
+			player.getHighestAmount("svenXp", ironmanOnly) +
 			"=:=" +
-			player.getHighestAmount("revXp") +
+			player.getHighestAmount("revXp", ironmanOnly) +
 			"=:=" +
-			player.getHighestAmount("taraXp") +
+			player.getHighestAmount("taraXp", ironmanOnly) +
 			"=:=" +
-			player.getHighestAmount("endermanXp")
+			player.getHighestAmount("endermanXp", ironmanOnly) +
+					"=:=" +
+					player.getUuid()
+
 		);
 	}
 	// [0] - username
@@ -62,4 +69,5 @@ public class HypixelGuildCache {
 	// [6] - rev XP
 	// [7] - tara XP
 	// [8] - enderman XP
+	// [9] - uuid
 }

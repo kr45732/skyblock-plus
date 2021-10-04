@@ -20,6 +20,7 @@ package com.skyblockplus.features.setup;
 
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class SetupSlashCommand extends SlashCommand {
 
@@ -32,5 +33,10 @@ public class SetupSlashCommand extends SlashCommand {
 		event.logCommand();
 
 		event.getHook().editOriginalEmbeds(SetupCommand.getSetupEmbed().build()).setActionRows(SetupCommand.getSetupActionRow()).queue();
+	}
+
+	@Override
+	public CommandData getCommandData() {
+		return 			new CommandData("setup", "A short walk-through on how to setup the bot");
 	}
 }

@@ -1,705 +1,35 @@
 {
-  "796790757947867156": {
-    "name": "Skyblock Plus",
-    "automatedApplication": {
-      "enable": "false",
-      "messageTextChannelId": "800031085588512828",
-      "messageStaffChannelId": "800386981133156443",
-      "newChannelPrefix": "application",
-      "newChannelCategory": "800811801478037555",
-      "messageText": "React to this message to apply in test server",
-      "acceptMessageText": "Accepted",
-      "denyMessageText": "Denied",
-      "staffPingRoleId": "800859020139298816"
-    },
-    "automatedVerify": {
-      "enable": "true",
-      "messageText": "**Welcome to the Skyblock Plus Server!**\nTo gain access to the rest of the server:\n\n  1) Follow the video below, replacing CrypticPlasma's name and tag with your own\n  2) React to video below with ✅",
-      "messageTextChannelId": "801970206721179658",
-      "verifiedRole": "801987767890346014",
-      "newChannelPrefix": "verify",
-      "newChannelCategory": "800811801478037555"
-    },
-    "automated_roles": {
-      "enable": "true",
-      "guild_member": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "5e4e6d0d8ea8c9feb3f0e44f",
-            "roleId": "802352442788413491"
-          },
-          {
-            "value": "5fea32eb8ea8c9724b8e3f3c",
-            "roleId": "802637259567267901"
-          }
-        ],
-        "stackable": "false"
-      },
-      "sven": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "100000",
-            "roleId": "802352385329725440"
-          },
-          {
-            "value": "400000",
-            "roleId": "802550908327297063"
-          },
-          {
-            "value": "1000000",
-            "roleId": "802550929877893130"
-          }
-        ],
-        "stackable": "false"
-      },
-      "rev": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "100000",
-            "roleId": "802623315490504735"
-          },
-          {
-            "value": "400000",
-            "roleId": "802352308717223968"
-          },
-          {
-            "value": "1000000",
-            "roleId": "802569768224948225"
-          }
-        ],
-        "stackable": "false"
-      },
-      "tara": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "100000",
-            "roleId": "802570324242857994"
-          },
-          {
-            "value": "400000",
-            "roleId": "802570345940385792"
-          },
-          {
-            "value": "1000000",
-            "roleId": "802570358875357224"
-          }
-        ],
-        "stackable": "false"
-      },
-      "bank_coins": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "1000000",
-            "roleId": "802588450787164170"
-          },
-          {
-            "value": "10000000",
-            "roleId": "802589238453207050"
-          },
-          {
-            "value": "100000000",
-            "roleId": "802589361635590185"
-          }
-        ],
-        "stackable": "false"
-      },
-      "alchemy": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "30",
-            "roleId": "802603013046796338"
-          },
-          {
-            "value": "40",
-            "roleId": "802602174504370206"
-          },
-          {
-            "value": "50",
-            "roleId": "802596345050955806"
-          }
-        ],
-        "stackable": "false"
-      },
-      "combat": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "30",
-            "roleId": "802603052703023134"
-          },
-          {
-            "value": "40",
-            "roleId": "802602212849221684"
-          },
-          {
-            "value": "50",
-            "roleId": "802596380023193630"
-          }
-        ],
-        "stackable": "false"
-      },
-      "fishing": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "30",
-            "roleId": "802603077928615938"
-          },
-          {
-            "value": "40",
-            "roleId": "802602125045661756"
-          },
-          {
-            "value": "50",
-            "roleId": "802596409399312424"
-          }
-        ],
-        "stackable": "false"
-      },
-      "farming": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "30",
-            "roleId": "802603142407520286"
-          },
-          {
-            "value": "40",
-            "roleId": "802602754484731905"
-          },
-          {
-            "value": "50",
-            "roleId": "802596287836454932"
-          },
-          {
-            "value": "60",
-            "roleId": "802596211672219652"
-          }
-        ],
-        "stackable": "false"
-      },
-      "foraging": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "30",
-            "roleId": "802603109687361596"
-          },
-          {
-            "value": "40",
-            "roleId": "802602785228193802"
-          },
-          {
-            "value": "50",
-            "roleId": "802596435831947315"
-          }
-        ],
-        "stackable": "false"
-      },
-      "carpentry": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "30",
-            "roleId": "802603583160713287"
-          },
-          {
-            "value": "40",
-            "roleId": "802602903470604348"
-          },
-          {
-            "value": "50",
-            "roleId": "802602076671836190"
-          }
-        ],
-        "stackable": "false"
-      },
-      "mining": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "30",
-            "roleId": "802603528812101632"
-          },
-          {
-            "value": "40",
-            "roleId": "802602817704427540"
-          },
-          {
-            "value": "50",
-            "roleId": "802601952151207996"
-          },
-          {
-            "value": "60",
-            "roleId": "802596581228412931"
-          }
-        ],
-        "stackable": "false"
-      },
-      "taming": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "30",
-            "roleId": "802603554669985824"
-          },
-          {
-            "value": "40",
-            "roleId": "802602936546361354"
-          },
-          {
-            "value": "50",
-            "roleId": "802602037774516245"
-          }
-        ],
-        "stackable": "false"
-      },
-      "enchanting": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "30",
-            "roleId": "802603498222911538"
-          },
-          {
-            "value": "40",
-            "roleId": "802602820229791774"
-          },
-          {
-            "value": "50",
-            "roleId": "802601997399359579"
-          },
-          {
-            "value": "60",
-            "roleId": "802596253300949045"
-          }
-        ],
-        "stackable": "false"
-      },
-      "catacombs": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "20",
-            "roleId": "802602140232187915"
-          },
-          {
-            "value": "25",
-            "roleId": "802602140232187915"
-          },
-          {
-            "value": "30",
-            "roleId": "802596300163383346"
-          }
-        ],
-        "stackable": "false"
-      },
-      "fairy_souls": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "210",
-            "roleId": "802629322070425668"
-          }
-        ],
-        "stackable": "false"
-      },
-      "slot_collector": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "20",
-            "roleId": "805598267186085985"
-          }
-        ],
-        "stackable": "false"
-      },
-      "pet_enthusiast": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "default",
-            "roleId": "805567896809898009"
-          }
-        ],
-        "stackable": "false"
-      },
-      "doom_slayer": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "default",
-            "roleId": "802632224125354024"
-          }
-        ],
-        "stackable": "false"
-      }
-    }
-  },
-  "782154976243089429": {
-    "name": "Skyblock Forceful",
-    "automatedApplication": {
-      "enable": "true",
-      "messageTextChannelId": "800528706963374140",
-      "messageStaffChannelId": "800529287148601384",
-      "newChannelPrefix": "application",
-      "newChannelCategory": "800830955752259674",
-      "messageText": "React to this message with ✅ to apply for Skyblock Forceful!\n\nIf you do not get pinged in under 30 seconds then please open a ticket and link your sky.lea profile **OR** apply through the forums [here](https://hypixel.net/threads/skyblock-forceful-mid-late-game-guild.3583562/).",
-      "acceptMessageText": "You have been accepted! Please leave your current guild and you will receive an invite shortly after!",
-      "denyMessageText": "Sorry, but your application was not accepted. Feel free to apply again once you meet the requirements!",
-      "staffPingRoleId": "782154976666451976"
-    },
-    "automatedVerify": {
-      "enable": "true",
-      "messageText": "**Welcome to Skyblock Forceful!**\nCurrently, you only have access to certain channels. In order to gain full access to our server, you must verify.\n\nTo do this:\n  1) Follow the video below, replacing CrypticPlasma's name and tag with your own\n  2) React to video below with ✅\n\nIf you are not pinged in under 30 seconds, then please open a ticket",
-      "messageTextChannelId": "805607857381703680",
-      "verifiedRole": "782154976625426464",
-      "newChannelPrefix": "νerify",
-      "newChannelCategory": "800830955752259674"
-    },
-    "automated_roles": {
-      "enable": "true",
-      "guild_member": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "5e4e6d0d8ea8c9feb3f0e44f",
-            "roleId": "782154976625426469"
-          },
-          {
-            "value": "5fea32eb8ea8c9724b8e3f3c",
-            "roleId": "782154976625426468"
-          }
-        ],
-        "stackable": "false"
-      },
-      "sven": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "100000",
-            "roleId": "782154976243089437"
-          },
-          {
-            "value": "400000",
-            "roleId": "782684613319458878"
-          },
-          {
-            "value": "1000000",
-            "roleId": "785178529062453268"
-          }
-        ],
-        "stackable": "false"
-      },
-      "rev": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "100000",
-            "roleId": "782154976243089435"
-          },
-          {
-            "value": "400000",
-            "roleId": "782684120970690580"
-          },
-          {
-            "value": "1000000",
-            "roleId": "785178299855929366"
-          }
-        ],
-        "stackable": "false"
-      },
-      "tara": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "100000",
-            "roleId": "782154976243089436"
-          },
-          {
-            "value": "400000",
-            "roleId": "782684379372978196"
-          },
-          {
-            "value": "1000000",
-            "roleId": "785178685292019732"
-          }
-        ],
-        "stackable": "false"
-      },
-      "bank_coins": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "1000000",
-            "roleId": "782154976608387079"
-          },
-          {
-            "value": "10000000",
-            "roleId": "782154976608387080"
-          },
-          {
-            "value": "100000000",
-            "roleId": "782154976608387081"
-          }
-        ],
-        "stackable": "false"
-      },
-      "alchemy": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "30",
-            "roleId": "782154976562642952"
-          },
-          {
-            "value": "40",
-            "roleId": "785176715504386078"
-          },
-          {
-            "value": "50",
-            "roleId": "783046261719695360"
-          }
-        ],
-        "stackable": "false"
-      },
-      "combat": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "30",
-            "roleId": "782154976562642951"
-          },
-          {
-            "value": "40",
-            "roleId": "785175776806174720"
-          },
-          {
-            "value": "50",
-            "roleId": "782568379387084831"
-          }
-        ],
-        "stackable": "false"
-      },
-      "fishing": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "30",
-            "roleId": "782154976562642950"
-          },
-          {
-            "value": "40",
-            "roleId": "785175603493601320"
-          },
-          {
-            "value": "50",
-            "roleId": "782568595041026048"
-          }
-        ],
-        "stackable": "false"
-      },
-      "farming": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "30",
-            "roleId": "782154976562642949"
-          },
-          {
-            "value": "40",
-            "roleId": "785176857813057606"
-          },
-          {
-            "value": "50",
-            "roleId": "782571115029331978"
-          },
-          {
-            "value": "60",
-            "roleId": "788383928502583307"
-          }
-        ],
-        "stackable": "false"
-      },
-      "foraging": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "30",
-            "roleId": "782154976562642948"
-          },
-          {
-            "value": "40",
-            "roleId": "785177102857011230"
-          },
-          {
-            "value": "50",
-            "roleId": "782568968186888212"
-          }
-        ],
-        "stackable": "false"
-      },
-      "carpentry": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "30",
-            "roleId": "782154976562642944"
-          },
-          {
-            "value": "40",
-            "roleId": "785178855832420354"
-          },
-          {
-            "value": "50",
-            "roleId": "783049430806822942"
-          }
-        ],
-        "stackable": "false"
-      },
-      "mining": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "30",
-            "roleId": "782154976562642946"
-          },
-          {
-            "value": "40",
-            "roleId": "785175249971838987"
-          },
-          {
-            "value": "50",
-            "roleId": "783049212220669993"
-          },
-          {
-            "value": "60",
-            "roleId": "802596808769536061"
-          }
-        ],
-        "stackable": "false"
-      },
-      "taming": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "30",
-            "roleId": "782154976562642945"
-          },
-          {
-            "value": "40",
-            "roleId": "785175198404050954"
-          },
-          {
-            "value": "50",
-            "roleId": "782568504167497739"
-          }
-        ],
-        "stackable": "false"
-      },
-      "enchanting": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "30",
-            "roleId": "782154976562642947"
-          },
-          {
-            "value": "40",
-            "roleId": "785177901729316904"
-          },
-          {
-            "value": "50",
-            "roleId": "783245691664203817"
-          },
-          {
-            "value": "60",
-            "roleId": "788384125668687913"
-          }
-        ],
-        "stackable": "false"
-      },
-      "catacombs": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "25",
-            "roleId": "788410758219169815"
-          },
-          {
-            "value": "30",
-            "roleId": "782154976578895882"
-          },
-          {
-            "value": "40",
-            "roleId": "802613565953146920"
-          }
-        ],
-        "stackable": "false"
-      },
-      "fairy_souls": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "210",
-            "roleId": "782154976595935250"
-          }
-        ],
-        "stackable": "false"
-      },
-      "slot_collector": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "20",
-            "roleId": "782154976595935248"
-          }
-        ],
-        "stackable": "false"
-      },
-      "pet_enthusiast": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "default",
-            "roleId": "782154976608387072"
-          }
-        ],
-        "stackable": "false"
-      },
-      "doom_slayer": {
-        "enable": "true",
-        "levels": [
-          {
-            "value": "default",
-            "roleId": "782154976595935251"
-          }
-        ],
-        "stackable": "false"
-      }
-    }
-  },
   "5e4e6d0d8ea8c9feb3f0e44f": {
     "name": "Skyblock Forceful",
     "guild_leaderboard": {
-      "types": ["skills", "slayer", "catacombs"],
-      "staff_ranks": ["manager", "officer", "guild master"],
+      "types": [
+        "skills",
+        "slayer",
+        "catacombs"
+      ],
+      "staff_ranks": [
+        "manager",
+        "officer",
+        "guild master"
+      ],
       "ignore_staff": true,
-      "default_role": ["rookie", "member"],
+      "default_role": [
+        "rookie",
+        "member"
+      ],
       "ranks": [
         {
           "range": 5,
-          "names": ["elite"]
+          "names": [
+            "elite"
+          ]
         },
         {
           "range": 15,
-          "names": ["trainee", "kings"]
+          "names": [
+            "trainee",
+            "kings"
+          ]
         }
       ]
     }
@@ -707,22 +37,68 @@
   "5fea32eb8ea8c9724b8e3f3c": {
     "name": "Skyblock Gods",
     "guild_leaderboard": {
-      "types": ["weight"],
-      "staff_ranks": ["staff", "guild master"],
+      "types": [
+        "weight"
+      ],
+      "staff_ranks": [
+        "staff",
+        "guild master"
+      ],
       "ignore_staff": false,
-      "default_role": ["member"],
+      "default_role": [
+        "member"
+      ],
       "ranks": [
         {
           "range": 5,
-          "names": ["skyblock god"]
+          "names": [
+            "skyblock god"
+          ]
         },
         {
           "range": 20,
-          "names": ["skyblock king"]
+          "names": [
+            "skyblock king"
+          ]
         },
         {
           "range": 60,
-          "names": ["elite"]
+          "names": [
+            "elite"
+          ]
+        }
+      ]
+    }
+  },
+  "5fbea1f38ea8c9d1008d4940": {
+    "name": "Ironman Sweats",
+    "guild_leaderboard": {
+      "types": [
+        "skills",
+        "slayer",
+        "catacombs"
+      ],
+      "staff_ranks": [
+        "co-master",
+        "officer",
+        "guild master"
+      ],
+      "ignore_staff": true,
+      "default_role": [
+        "ironman"
+      ],
+      "ranks": [
+        {
+          "range": 5,
+          "names": [
+            "god"
+          ]
+        },
+        {
+          "range": 15,
+          "names": [
+            "king"
+          ]
         }
       ]
     }

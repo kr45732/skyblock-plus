@@ -16,13 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.weight;
+package com.skyblockplus.weight.senither;
 
-import static com.skyblockplus.utils.Constants.*;
-
-import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.WeightStruct;
+
+import static com.skyblockplus.utils.Constants.*;
 
 public class Weight {
 
@@ -31,13 +30,9 @@ public class Weight {
 	private final DungeonsWeight dungeonsWeight;
 
 	public Weight(Player player) {
-		this(player.profileJson(), player);
-	}
-
-	public Weight(JsonElement profile, Player player) {
-		this.slayerWeight = new SlayerWeight(profile, player);
-		this.skillsWeight = new SkillsWeight(profile, player);
-		this.dungeonsWeight = new DungeonsWeight(profile, player);
+		this.slayerWeight = new SlayerWeight(player);
+		this.skillsWeight = new SkillsWeight(player);
+		this.dungeonsWeight = new DungeonsWeight(player);
 	}
 
 	public static double of(double skillAverage, double slayer, double catacombs, double averageDungeonClass) {

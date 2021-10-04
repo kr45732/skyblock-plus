@@ -24,6 +24,9 @@ import static com.skyblockplus.utils.Utils.invalidEmbed;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+
 import java.util.List;
 
 public class EnderChestSlashCommand extends SlashCommand {
@@ -59,5 +62,12 @@ public class EnderChestSlashCommand extends SlashCommand {
 		} else {
 			event.embed(invalidEmbed("Inventory API disabled"));
 		}
+	}
+
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData("enderchest", "Get a player's enderchest represented in emojis")
+				.addOption(OptionType.STRING, "player", "Player username or mention")
+				.addOption(OptionType.STRING, "profile", "Profile name");
 	}
 }

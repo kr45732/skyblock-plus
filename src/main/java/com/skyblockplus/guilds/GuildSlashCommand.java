@@ -21,6 +21,9 @@ package com.skyblockplus.guilds;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class GuildSlashCommand extends SlashCommand {
 
@@ -61,5 +64,21 @@ public class GuildSlashCommand extends SlashCommand {
 			default:
 				event.embed(event.invalidCommandMessage());
 		}
+	}
+
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData("guild", "Main guild command")
+				.addSubcommands(
+						new SubcommandData("player", "Find what guild a player is in")
+								.addOption(OptionType.STRING, "player", "Player username or mention"),
+						new SubcommandData("information", "Get information and statistics about a player's guild")
+								.addOption(OptionType.STRING, "player", "Player username or mention"),
+						new SubcommandData("members", "Get a list of all members in a player's guild")
+								.addOption(OptionType.STRING, "player", "Player username or mention"),
+						new SubcommandData("experience", "Get the experience leaderboard for a player's guild")
+								.addOption(OptionType.STRING, "player", "Player username or mention")
+								.addOption(OptionType.INTEGER, "days", "Number of days")
+				);
 	}
 }

@@ -20,6 +20,8 @@ package com.skyblockplus.link;
 
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class LinkSlashCommand extends SlashCommand {
 
@@ -37,5 +39,11 @@ public class LinkSlashCommand extends SlashCommand {
 				? LinkCommand.linkAccount(linkOption, event.getMember(), event.getGuild())
 				: LinkCommand.getLinkedAccount(event.getUser())
 		);
+	}
+
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData("link", "Get what Hypixel account you are linked to")
+				.addOption(OptionType.STRING, "player", "Link your Hypixel account to this bot");
 	}
 }

@@ -18,7 +18,7 @@
 
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.Hypixel.usernameToUuid;
+import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;

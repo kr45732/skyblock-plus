@@ -22,7 +22,7 @@ import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.features.skyblockevent.SkyblockEventCommand.endSkyblockEvent;
-import static com.skyblockplus.utils.Hypixel.getGuildFromId;
+import static com.skyblockplus.utils.ApiHandler.getGuildFromId;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;

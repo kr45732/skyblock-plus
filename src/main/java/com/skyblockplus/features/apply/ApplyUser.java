@@ -195,7 +195,7 @@ public class ApplyUser implements Serializable {
 				if (
 					player.getTotalSlayer() >= slayerReq &&
 					player.getSkillAverage() >= skillsReq &&
-					player.getCatacombsSkill().getProgressLevel() >= cataReq &&
+					player.getCatacombs().getProgressLevel() >= cataReq &&
 					player.getWeight() >= weightReq
 				) {
 					meetReqs = true;
@@ -224,7 +224,7 @@ public class ApplyUser implements Serializable {
 				" | Skill Average - " +
 				(player.getSkillAverage() == -1 ? "API disabled" : formatNumber(player.getSkillAverage())) +
 				" | Catacombs - " +
-				formatNumber(player.getCatacombsSkill().getProgressLevel()) +
+				formatNumber(player.getCatacombs().getProgressLevel()) +
 				" | Weight - " +
 				formatNumber(player.getWeight())
 			);
@@ -236,7 +236,7 @@ public class ApplyUser implements Serializable {
 			playerSlayer = formatNumber(player.getTotalSlayer());
 			playerSkills = roundAndFormat(player.getSkillAverage());
 			playerSkills = playerSkills.equals("-1") ? "API disabled" : playerSkills;
-			playerCatacombs = roundAndFormat(player.getCatacombsSkill().getProgressLevel());
+			playerCatacombs = roundAndFormat(player.getCatacombs().getProgressLevel());
 			playerWeight = roundAndFormat(player.getWeight());
 
 			reactMessage =
@@ -262,7 +262,7 @@ public class ApplyUser implements Serializable {
 			playerSkills = playerSkills.equals("-1") ? "API disabled" : playerSkills;
 
 			try {
-				playerCatacombs = roundAndFormat(player.getCatacombsSkill().getProgressLevel());
+				playerCatacombs = roundAndFormat(player.getCatacombs().getProgressLevel());
 			} catch (Exception e) {
 				playerCatacombs = "0";
 			}
@@ -274,7 +274,7 @@ public class ApplyUser implements Serializable {
 			}
 
 			playerUsername = player.getUsername();
-			ironmanSymbol = higherDepth(player.getOuterProfileJson(), "game_mode") != null ? " ♻️" : "";
+			ironmanSymbol = player.isIronman() ? " ♻️" : "";
 			playerProfileName = player.getProfileName();
 			double bankCoins = player.getBankBalance();
 			playerCoins = (bankCoins != -1 ? simplifyNumber(bankCoins) : "API disabled") + " + " + simplifyNumber(player.getPurseCoins());

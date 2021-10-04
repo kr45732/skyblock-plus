@@ -20,6 +20,9 @@ package com.skyblockplus.miscellaneous;
 
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class BankSlashCommand extends SlashCommand {
 
@@ -48,5 +51,20 @@ public class BankSlashCommand extends SlashCommand {
 				event.embed(event.invalidCommandMessage());
 				break;
 		}
+	}
+
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData("bank", "Main bank command")
+				.addSubcommands(
+						new SubcommandData("total", "Get a player's bank and purse coins")
+								.addOption(OptionType.STRING, "player", "Player username or mention")
+								.addOption(OptionType.STRING, "profile", "Profile name")
+				)
+				.addSubcommands(
+						new SubcommandData("history", "Get a player's bank transaction history")
+								.addOption(OptionType.STRING, "player", "Player username or mention")
+								.addOption(OptionType.STRING, "profile", "Profile name")
+				);
 	}
 }

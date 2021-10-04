@@ -20,6 +20,7 @@ package com.skyblockplus.miscellaneous;
 
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class FetchurSlashCommand extends SlashCommand {
 
@@ -32,5 +33,10 @@ public class FetchurSlashCommand extends SlashCommand {
 		event.logCommand();
 
 		event.embed(FetchurCommand.getFetchurItem());
+	}
+
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData("fetchur", "Get the item that fetchur wants today");
 	}
 }

@@ -21,12 +21,14 @@ package com.skyblockplus.utils;
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.Hypixel.playerFromUuid;
-import static com.skyblockplus.utils.Hypixel.usernameToUuid;
+import static com.skyblockplus.utils.ApiHandler.playerFromUuid;
+import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
 import static java.lang.String.join;
 import static java.util.Collections.nCopies;
 
 import club.minnced.discord.webhook.external.JDAWebhookClient;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.gson.*;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
@@ -94,7 +96,10 @@ public class Utils {
 	public static final AtomicInteger remainingLimit = new AtomicInteger(120);
 	public static final AtomicInteger timeTillReset = new AtomicInteger(0);
 	public static final ConcurrentHashMap<String, HypixelKeyInformation> keyCooldownMap = new ConcurrentHashMap<>();
-	public static final ConcurrentHashMap<String, HypixelGuildCache> hypixelGuildsCacheMap = new ConcurrentHashMap<>();
+	public static final Cache<String, HypixelGuildCache> hypixelGuildsCacheMap = Caffeine
+			.newBuilder()
+			.expireAfterAccess(15, TimeUnit.MINUTES)
+			.build();
 	private static final Logger log = LoggerFactory.getLogger(Utils.class);
 	public static final Gson gson = new Gson();
 	public static final Gson formattedGson = new GsonBuilder().setPrettyPrinting().create();
@@ -841,6 +846,10 @@ public class Utils {
 	}
 
 	public static String instantToDHM(Duration duration) {
+		if(duration.toMinutes() == 0){
+			return instantToMS(duration);
+		}
+
 		long daysUntil = duration.toMinutes() / 1440;
 		long hoursUntil = duration.toMinutes() / 60 % 24;
 		long minutesUntil = duration.toMinutes() % 60;

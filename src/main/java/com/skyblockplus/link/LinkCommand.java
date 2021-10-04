@@ -19,7 +19,7 @@
 package com.skyblockplus.link;
 
 import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Hypixel.getGuildFromPlayer;
+import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;

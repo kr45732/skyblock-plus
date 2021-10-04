@@ -20,6 +20,8 @@ package com.skyblockplus.help;
 
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class HelpSlashCommand extends SlashCommand {
 
@@ -31,6 +33,12 @@ public class HelpSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandExecutedEvent event) {
 		event.logCommand();
 
-		event.paginate(HelpCommand.getHelp(event.getOptionStr("page"), event.getMember(), null, event.getHook(), event.getGuild().getId()));
+		event.paginate(HelpCommand.getHelp(event.getOptionStr("command"), event.getMember(), null, event.getHook(), event.getGuild().getId()));
+	}
+
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData("help", "Show the help page for this bot")
+				.addOption(OptionType.STRING, "command", "Name of command or page number");
 	}
 }

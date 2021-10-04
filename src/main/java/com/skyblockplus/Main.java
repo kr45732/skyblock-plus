@@ -77,6 +77,7 @@ public class Main {
 	public static EventWaiter waiter;
 	public static GlobalExceptionHandler globalExceptionHandler;
 	public static CommandClient client;
+	public static SlashCommandClient slashCommandClient;
 
 	public static void main(String[] args) throws LoginException, IllegalArgumentException {
 		Main.globalExceptionHandler = new GlobalExceptionHandler();
@@ -93,7 +94,7 @@ public class Main {
 				.setOwnerId("385939031596466176")
 				.setEmojis("✅", "⚠️", "❌")
 				.useHelpBuilder(false)
-				.setPrefixFunction(event -> getGuildPrefix(event.getGuild().getId()))
+				.setPrefixFunction(event -> event.isFromGuild() ? getGuildPrefix(event.getGuild().getId()) : DEFAULT_PREFIX)
 				.setListener(
 					new CommandListener() {
 						@Override
@@ -163,7 +164,7 @@ public class Main {
 				)
 				.build();
 
-		SlashCommandClient slashCommandClient = new SlashCommandClient()
+		slashCommandClient = new SlashCommandClient()
 			.addSlashCommands(
 				new InviteSlashCommand(),
 				new InformationSlashCommand(),
@@ -224,7 +225,7 @@ public class Main {
 		} catch (Exception ignored) {}
 		jda.getPresence().setActivity(Activity.watching(DEFAULT_PREFIX + "help in " + jda.getGuilds().size() + " servers"));
 
-		Hypixel.scheduleDatabaseUpdate();
+		ApiHandler.scheduleDatabaseUpdate();
 		//	scheduleUpdateLinkedAccounts();
 	}
 

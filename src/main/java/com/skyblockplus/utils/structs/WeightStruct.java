@@ -41,6 +41,7 @@ public class WeightStruct {
 		this.overflow = overflow;
 	}
 
+	/** Note: returns the weight struct being added, not this **/
 	public WeightStruct add(WeightStruct o) {
 		this.base += o.base;
 		this.overflow += o.overflow;

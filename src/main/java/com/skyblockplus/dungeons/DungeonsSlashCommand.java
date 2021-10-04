@@ -20,6 +20,8 @@ package com.skyblockplus.dungeons;
 
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class DungeonsSlashCommand extends SlashCommand {
 
@@ -38,5 +40,12 @@ public class DungeonsSlashCommand extends SlashCommand {
 		event.paginate(
 			DungeonsCommand.getPlayerDungeons(event.player, event.getOptionStr("profile"), event.getUser(), null, event.getHook())
 		);
+	}
+
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData("dungeons", "Get the dungeons data of a player")
+				.addOption(OptionType.STRING, "player", "Player username or mention")
+				.addOption(OptionType.STRING, "profile", "Profile name");
 	}
 }

@@ -20,6 +20,8 @@ package com.skyblockplus.miscellaneous;
 
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class ProfilesSlashCommand extends SlashCommand {
 
@@ -36,5 +38,11 @@ public class ProfilesSlashCommand extends SlashCommand {
 		}
 
 		event.paginate(ProfilesCommand.getPlayerProfiles(event.player, event.getUser(), null, event.getHook()));
+	}
+
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData("profiles", "Get a information about all of a player's profiles")
+				.addOption(OptionType.STRING, "player", "Player username or mention");
 	}
 }

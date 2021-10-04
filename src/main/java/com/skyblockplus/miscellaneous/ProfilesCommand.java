@@ -19,7 +19,7 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.Hypixel.*;
+import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;

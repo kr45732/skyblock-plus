@@ -20,6 +20,9 @@ package com.skyblockplus.miscellaneous;
 
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class HypixelSlashCommand extends SlashCommand {
 
@@ -46,5 +49,18 @@ public class HypixelSlashCommand extends SlashCommand {
 				event.embed(event.invalidCommandMessage());
 				break;
 		}
+	}
+
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData("hypixel", "Main hypixel command")
+				.addSubcommands(
+						new SubcommandData("player", "Get Hypixel information about a player")
+								.addOption(OptionType.STRING, "player", "Player username or mention")
+				)
+				.addSubcommands(
+						new SubcommandData("parkour", "Get fastest Hypixel lobby parkour for a player")
+								.addOption(OptionType.STRING, "player", "Player username or mention")
+				);
 	}
 }

@@ -20,6 +20,8 @@ package com.skyblockplus.networth;
 
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class NetworthSlashCommand extends SlashCommand {
 
@@ -40,5 +42,13 @@ public class NetworthSlashCommand extends SlashCommand {
 				.setVerbose(event.getOptionBoolean("verbose", false))
 				.getPlayerNetworth(event.player, event.getOptionStr("profile"))
 		);
+	}
+
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData("networth", "Calculate a player's networth")
+				.addOption(OptionType.STRING, "player", "Player username or mention")
+				.addOption(OptionType.STRING, "profile", "Profile name")
+				.addOption(OptionType.BOOLEAN, "verbose", "Links a detailed JSON with a breakdown of value of each item");
 	}
 }

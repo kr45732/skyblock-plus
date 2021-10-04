@@ -20,6 +20,7 @@ package com.skyblockplus.miscellaneous;
 
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class InviteSlashCommand extends SlashCommand {
 
@@ -36,5 +37,10 @@ public class InviteSlashCommand extends SlashCommand {
 			.editOriginalEmbeds(InformationCommand.getInformation(event.getClient().getStartTime()).build())
 			.setActionRows(InformationCommand.getInformationActionRow())
 			.queue();
+	}
+
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData("invite", "Invite this bot to your server");
 	}
 }

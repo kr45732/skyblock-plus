@@ -20,6 +20,8 @@ package com.skyblockplus.inventory;
 
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class ArmorSlashCommand extends SlashCommand {
 
@@ -38,5 +40,12 @@ public class ArmorSlashCommand extends SlashCommand {
 		event.paginate(
 			ArmorCommand.getPlayerEquippedArmor(event.player, event.getOptionStr("profile"), event.getUser(), null, event.getHook())
 		);
+	}
+
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData("armor", "Get a player's equipped armor with lore")
+				.addOption(OptionType.STRING, "player", "Player username or mention")
+				.addOption(OptionType.STRING, "profile", "Profile name");
 	}
 }

@@ -20,7 +20,7 @@ package com.skyblockplus.guilds;
 
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.Hypixel.*;
+import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Utils.*;
 import static com.skyblockplus.utils.structs.HypixelGuildCache.memberCacheFromPlayer;
 
@@ -60,8 +60,16 @@ public class GuildLeaderboardsCommand extends Command {
 			protected void execute() {
 				logCommand();
 
-				if (args.length == 3 && args[2].toLowerCase().startsWith("u:")) {
-					paginate(getLeaderboard(args[1], args[2].split(":")[1], event));
+				if ((args.length == 4 || args.length == 3) && args[2].toLowerCase().startsWith("u:")) {
+					boolean ironmanOnly = false;
+					for (int i = 0; i < args.length; i++) {
+						if (args[i].startsWith("mode:")) {
+							ironmanOnly = args[i].split("mode:")[1].equals("ironman");
+							removeArg(i);
+						}
+					}
+
+					paginate(getLeaderboard(args[1], args[2].split(":")[1], event, ironmanOnly));
 					return;
 				}
 
@@ -71,7 +79,7 @@ public class GuildLeaderboardsCommand extends Command {
 			.submit();
 	}
 
-	private EmbedBuilder getLeaderboard(String lbType, String username, CommandEvent event) {
+	private EmbedBuilder getLeaderboard(String lbType, String username, CommandEvent event, boolean ironmanOnly) {
 		String hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
 
 		EmbedBuilder eb = checkHypixelKey(hypixelKey);
@@ -106,7 +114,7 @@ public class GuildLeaderboardsCommand extends Command {
 				lbTypeNum = 8;
 				break;
 			default:
-				return defaultEmbed(
+				return invalidEmbed(
 					lbType +
 					" is an invalid leaderboard type. Valid types are: `slayer`, `skills`, `catacombs`, `weight`, `sven_xp`, `rev_xp`, `tara_xp`, and `enderman_xp`"
 				);
@@ -127,11 +135,11 @@ public class GuildLeaderboardsCommand extends Command {
 		String guildId = higherDepth(guildJson, "_id").getAsString();
 
 		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(2).setItemsPerPage(20);
-		HypixelGuildCache guildCache = hypixelGuildsCacheMap.getOrDefault(guildId, null);
+		HypixelGuildCache guildCache = hypixelGuildsCacheMap.getIfPresent(guildId);
 		List<String> guildMemberPlayersList = new ArrayList<>();
 		Instant lastUpdated = null;
 
-		if (guildCache != null && Duration.between(guildCache.lastUpdated, Instant.now()).toMinutes() < 15) {
+		if (guildCache != null) {
 			guildMemberPlayersList = guildCache.membersCache;
 			lastUpdated = guildCache.lastUpdated;
 		} else {
@@ -161,7 +169,7 @@ public class GuildLeaderboardsCommand extends Command {
 							);
 
 							if (guildMemberPlayer.isValid()) {
-								return memberCacheFromPlayer(guildMemberPlayer);
+								return memberCacheFromPlayer(guildMemberPlayer, ironmanOnly);
 							}
 
 							return null;

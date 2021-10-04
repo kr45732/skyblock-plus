@@ -20,7 +20,7 @@ package com.skyblockplus.guilds;
 
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.Hypixel.*;
+import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Utils.*;
 import static com.skyblockplus.utils.structs.HypixelGuildCache.memberCacheFromPlayer;
 
@@ -124,7 +124,11 @@ public class GuildKickerCommand extends Command {
 		JsonElement guildLbJson = getJson("https://hypixel-app-api.senither.com/leaderboard/players/" + guildId);
 
 		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(20);
-		if (higherDepth(guildLbJson, "data") != null && !(useKey)) {
+		if (!useKey) {
+			if(higherDepth(guildLbJson, "data") == null){
+				return invalidEmbed("This guild is not on the senither leaderboard so you must set the Hypixel API key for this server and rerun the command with `--usekey` flag");
+			}
+
 			JsonArray guildMembers = higherDepth(guildLbJson, "data").getAsJsonArray();
 			Instant lastUpdated = Instant.now();
 
@@ -210,10 +214,10 @@ public class GuildKickerCommand extends Command {
 				return eb;
 			}
 
-			HypixelGuildCache guildCache = hypixelGuildsCacheMap.getOrDefault(guildId, null);
+			HypixelGuildCache guildCache = hypixelGuildsCacheMap.getIfPresent(guildId);
 			List<String> guildMemberPlayersList = new ArrayList<>();
 			Instant lastUpdated = null;
-			if (guildCache != null && Duration.between(guildCache.lastUpdated, Instant.now()).toMinutes() < 15) {
+			if (guildCache != null) {
 				guildMemberPlayersList = guildCache.membersCache;
 				lastUpdated = guildCache.lastUpdated;
 			} else {

@@ -20,6 +20,8 @@ package com.skyblockplus.inventory;
 
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class SacksSlashCommand extends SlashCommand {
 
@@ -36,5 +38,12 @@ public class SacksSlashCommand extends SlashCommand {
 		}
 
 		event.paginate(SacksCommand.getPlayerSacks(event.player, event.getOptionStr("profile"), event.getUser(), null, event.getHook()));
+	}
+
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData("sacks", "Get a player's sacks' content bag represented in a list")
+				.addOption(OptionType.STRING, "player", "Player username or mention")
+				.addOption(OptionType.STRING, "profile", "Profile name");
 	}
 }

@@ -21,7 +21,7 @@ package com.skyblockplus.miscellaneous;
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.waiter;
 import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
-import static com.skyblockplus.utils.Hypixel.getGuildFromPlayer;
+import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -295,7 +295,7 @@ public class RoleCommand extends Command {
 										}
 									case "catacombs":
 										{
-											roleAmount = player.getCatacombsSkill().getCurrentLevel();
+											roleAmount = player.getCatacombs().getCurrentLevel();
 											break;
 										}
 									case "fairy_souls":

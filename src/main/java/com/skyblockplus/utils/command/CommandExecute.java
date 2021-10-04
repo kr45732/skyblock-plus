@@ -28,6 +28,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import java.util.regex.Matcher;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import org.apache.commons.lang3.ArrayUtils;
 
 public abstract class CommandExecute {
 
@@ -133,5 +134,9 @@ public abstract class CommandExecute {
 
 		ebMessage.editMessageEmbeds(invalidEmbed("<@" + userId + "> is not linked to the bot.").build()).queue();
 		return true;
+	}
+
+	protected void removeArg(int index){
+		args = ArrayUtils.remove(args, index);
 	}
 }

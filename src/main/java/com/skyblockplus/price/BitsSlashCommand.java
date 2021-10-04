@@ -20,6 +20,8 @@ package com.skyblockplus.price;
 
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class BitsSlashCommand extends SlashCommand {
 
@@ -32,5 +34,10 @@ public class BitsSlashCommand extends SlashCommand {
 		event.logCommand();
 
 		event.embed(BitsCommand.getBitPrices(event.getOptionStr("item")));
+	}
+
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData("bits", "Get the price of an item from the bits shop").addOption(OptionType.STRING, "item", "Item name", true);
 	}
 }

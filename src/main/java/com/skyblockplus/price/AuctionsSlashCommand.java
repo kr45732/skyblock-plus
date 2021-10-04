@@ -20,6 +20,9 @@ package com.skyblockplus.price;
 
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class AuctionsSlashCommand extends SlashCommand {
 
@@ -46,5 +49,15 @@ public class AuctionsSlashCommand extends SlashCommand {
 				event.embed(event.invalidCommandMessage());
 				break;
 		}
+	}
+
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData("auctions", "Main auctions command")
+				.addSubcommands(
+						new SubcommandData("player", "Get player's active (not claimed) auctions on all profiles")
+								.addOption(OptionType.STRING, "player", "Player username or mention"),
+						new SubcommandData("uuid", "Get an auction by it's UUID").addOption(OptionType.STRING, "uuid", "Auction UUID", true)
+				);
 	}
 }

@@ -21,8 +21,8 @@ package com.skyblockplus.settings;
 import static com.skyblockplus.Main.*;
 import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.Hypixel.getGuildFromId;
-import static com.skyblockplus.utils.Hypixel.getGuildFromName;
+import static com.skyblockplus.utils.ApiHandler.getGuildFromId;
+import static com.skyblockplus.utils.ApiHandler.getGuildFromName;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;

@@ -16,22 +16,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.weight;
+package com.skyblockplus.weight.senither;
 
-import static com.skyblockplus.utils.Constants.SLAYER_WEIGHTS;
-
-import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.WeightStruct;
 
+import static com.skyblockplus.utils.Constants.SLAYER_WEIGHTS;
+
 public class SlayerWeight {
 
-	private final JsonElement profile;
 	private final Player player;
 	private final WeightStruct weightStruct;
 
-	public SlayerWeight(JsonElement profile, Player player) {
-		this.profile = profile;
+	public SlayerWeight(Player player) {
 		this.player = player;
 		this.weightStruct = new WeightStruct();
 	}
@@ -67,7 +64,7 @@ public class SlayerWeight {
 		double divider = curWeights[0];
 		double modifier = curWeights[1];
 
-		int currentSlayerXp = player.getSlayer(profile, slayerName);
+		int currentSlayerXp = player.getSlayer(slayerName);
 
 		if (currentSlayerXp <= 1000000) {
 			return weightStruct.add(new WeightStruct(currentSlayerXp == 0 ? 0 : currentSlayerXp / divider));

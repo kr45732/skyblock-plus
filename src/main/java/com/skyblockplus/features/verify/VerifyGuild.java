@@ -21,7 +21,7 @@ package com.skyblockplus.features.verify;
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
-import static com.skyblockplus.utils.Hypixel.getGuildFromPlayer;
+import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.Utils.higherDepth;
 
@@ -186,7 +186,7 @@ public class VerifyGuild {
 							)
 							.build()
 					)
-					.queue()
+					.queue(ignored -> {}, ignored -> {})
 			);
 	}
 

@@ -20,6 +20,8 @@ package com.skyblockplus.dungeons;
 
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class PartyFinderSlashCommand extends SlashCommand {
 
@@ -36,5 +38,12 @@ public class PartyFinderSlashCommand extends SlashCommand {
 		}
 
 		event.embed(PartyFinderCommand.getPartyFinderInfo(event.player, event.getOptionStr("profile")));
+	}
+
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData("partyfinder", "A party finder helper that shows a player's dungeon stats")
+				.addOption(OptionType.STRING, "player", "Player username or mention")
+				.addOption(OptionType.STRING, "profile", "Profile name");
 	}
 }

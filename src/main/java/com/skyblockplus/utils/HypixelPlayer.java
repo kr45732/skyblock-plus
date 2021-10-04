@@ -18,7 +18,7 @@
 
 package com.skyblockplus.utils;
 
-import static com.skyblockplus.utils.Hypixel.playerFromUuid;
+import static com.skyblockplus.utils.ApiHandler.playerFromUuid;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
@@ -122,7 +122,7 @@ public class HypixelPlayer {
 
 	/* Helper methods */
 	private boolean usernameToUuid(String username) {
-		UsernameUuidStruct response = Hypixel.usernameToUuid(username);
+		UsernameUuidStruct response = ApiHandler.usernameToUuid(username);
 		if (response.isNotValid()) {
 			failCause = response.getFailCause();
 			return true;

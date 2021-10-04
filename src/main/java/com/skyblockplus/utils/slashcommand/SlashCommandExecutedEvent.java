@@ -80,8 +80,12 @@ public class SlashCommandExecutedEvent {
 	}
 
 	public String getOptionStr(String name) {
+		return getOptionStr(name, null);
+	}
+
+	public String getOptionStr(String name, String defaultValue) {
 		OptionMapping option = event.getOption(name);
-		return option == null ? null : option.getAsString();
+		return option == null ? defaultValue : option.getAsString();
 	}
 
 	public int getOptionInt(String name, int defaultValue) {

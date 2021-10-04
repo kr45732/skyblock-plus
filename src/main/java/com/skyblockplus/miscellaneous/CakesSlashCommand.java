@@ -20,6 +20,8 @@ package com.skyblockplus.miscellaneous;
 
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class CakesSlashCommand extends SlashCommand {
 
@@ -36,5 +38,12 @@ public class CakesSlashCommand extends SlashCommand {
 		}
 
 		event.embed(CakesCommand.getCakes(event.player, event.getOptionStr("profile")));
+	}
+
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData("cakes", "Get a player's active and inactive cake buffs")
+				.addOption(OptionType.STRING, "player", "Player username or mention")
+				.addOption(OptionType.STRING, "profile", "Profile name");
 	}
 }

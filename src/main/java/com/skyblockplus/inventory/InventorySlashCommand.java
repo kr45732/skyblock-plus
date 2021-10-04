@@ -23,6 +23,9 @@ import static com.skyblockplus.utils.Utils.invalidEmbed;
 
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class InventorySlashCommand extends SlashCommand {
 
@@ -71,5 +74,19 @@ public class InventorySlashCommand extends SlashCommand {
 				event.embed(event.invalidCommandMessage());
 				break;
 		}
+	}
+
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData("inventory", "Main inventory command")
+				.addSubcommands(
+						new SubcommandData("list", "Get a list of the player's inventory with lore")
+								.addOption(OptionType.STRING, "player", "Player username or mention")
+								.addOption(OptionType.STRING, "profile", "Profile name")
+								.addOption(OptionType.INTEGER, "slot", "Slot number"),
+						new SubcommandData("emoji", "Get a player's inventory represented in emojis")
+								.addOption(OptionType.STRING, "player", "Player username or mention")
+								.addOption(OptionType.STRING, "profile", "Profile name")
+				);
 	}
 }

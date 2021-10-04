@@ -20,6 +20,8 @@ package com.skyblockplus.price;
 
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class BinSlashCommand extends SlashCommand {
 
@@ -32,5 +34,10 @@ public class BinSlashCommand extends SlashCommand {
 		event.logCommand();
 
 		event.embed(BinCommand.getLowestBin(event.getOptionStr("item")));
+	}
+
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData("bin", "Get the lowest bin of an item").addOption(OptionType.STRING, "item", "Item name", true);
 	}
 }

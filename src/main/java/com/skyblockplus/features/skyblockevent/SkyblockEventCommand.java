@@ -21,7 +21,7 @@ package com.skyblockplus.features.skyblockevent;
 import static com.skyblockplus.Main.*;
 import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.Hypixel.*;
+import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -173,7 +173,7 @@ public class SkyblockEventCommand extends Command {
 											guildMemberUuid,
 											"" +
 											(
-												guildMemberPlayer.getCatacombsSkill().getTotalExp() -
+												guildMemberPlayer.getCatacombs().getTotalExp() -
 												higherDepth(guildMember, "startingAmount").getAsDouble()
 											),
 											higherDepth(guildMember, "profileName").getAsString()
@@ -465,7 +465,7 @@ public class SkyblockEventCommand extends Command {
 								}
 							case "catacombs":
 								{
-									startingAmount = player.getCatacombsSkill().getTotalExp();
+									startingAmount = player.getCatacombs().getTotalExp();
 									startingAmountFormatted = formatNumber(startingAmount) + " total catacombs xp";
 									break;
 								}

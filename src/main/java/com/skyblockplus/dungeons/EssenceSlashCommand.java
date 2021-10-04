@@ -20,6 +20,9 @@ package com.skyblockplus.dungeons;
 
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class EssenceSlashCommand extends SlashCommand {
 
@@ -48,5 +51,19 @@ public class EssenceSlashCommand extends SlashCommand {
 				event.embed(event.invalidCommandMessage());
 				break;
 		}
+	}
+
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData("essence", "Get essence upgrade information for an item")
+			.addSubcommands(
+				new SubcommandData("upgrade", "Interactive message to find the essence amount to upgrade an item")
+					.addOption(OptionType.STRING, "item", "Item name", true),
+				new SubcommandData("information", "Get the amount of essence to upgrade an item for each level")
+					.addOption(OptionType.STRING, "item", "Item name", true),
+				new SubcommandData("player", "Get the amount of each essence a player has")
+					.addOption(OptionType.STRING, "player", "Player username or mention")
+					.addOption(OptionType.STRING, "profile", "Profile name")
+			);
 	}
 }

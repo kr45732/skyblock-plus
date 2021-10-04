@@ -18,7 +18,7 @@
 
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.Hypixel.*;
+import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
@@ -134,11 +134,8 @@ public class HypixelCommand extends Command {
 		eb.addField("Achievement Points", formatNumber(player.getAchievementPoints()), true);
 
 		StringBuilder namesString = new StringBuilder();
-		for (JsonElement name : higherDepth(getJson("https://api.ashcon.app/mojang/v2/user/" + player.getUuid()), "username_history")
-			.getAsJsonArray()) {
-			if (!higherDepth(name, "username").getAsString().equals(player.getUsername())) {
-				namesString.append("• ").append(higherDepth(name, "username").getAsString()).append("\n");
-			}
+		for (String name : getNameHistory(player.getUuid())) {
+			namesString.append("• ").append(name).append("\n");
 		}
 		if (namesString.length() > 0) {
 			eb.addField("Aliases", namesString.toString(), true);

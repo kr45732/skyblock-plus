@@ -20,6 +20,8 @@ package com.skyblockplus.slayer;
 
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class SlayerSlashCommand extends SlashCommand {
 
@@ -36,5 +38,12 @@ public class SlayerSlashCommand extends SlashCommand {
 		}
 
 		event.embed(SlayerCommand.getPlayerSlayer(event.player, event.getOptionStr("profile")));
+	}
+
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData("slayer", "Get the slayer data of a player")
+				.addOption(OptionType.STRING, "player", "Player username or mention")
+				.addOption(OptionType.STRING, "profile", "Profile name");
 	}
 }

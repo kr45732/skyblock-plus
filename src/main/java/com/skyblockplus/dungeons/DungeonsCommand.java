@@ -67,7 +67,7 @@ public class DungeonsCommand extends Command {
 						player.getSelectedDungeonClass()
 					);
 
-				SkillsStruct skillInfo = player.getCatacombsSkill();
+				SkillsStruct skillInfo = player.getCatacombs();
 				extras.addEmbedField(
 					DUNGEON_EMOJI_MAP.get("catacombs") +
 					" " +

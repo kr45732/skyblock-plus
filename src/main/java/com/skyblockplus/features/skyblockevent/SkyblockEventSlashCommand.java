@@ -24,6 +24,8 @@ import static com.skyblockplus.utils.Utils.defaultEmbed;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class SkyblockEventSlashCommand extends SlashCommand {
 
@@ -74,5 +76,19 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 			default:
 				event.embed(event.invalidCommandMessage());
 		}
+	}
+
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData("event", "Main event command")
+				.addSubcommands(
+						new SubcommandData("create", "Interactive message to create a Skyblock event"),
+						new SubcommandData("end", "Force end the event"),
+						new SubcommandData("current", "Get information about the current event"),
+						new SubcommandData("join", "Join the current event"),
+						new SubcommandData("leave", "Leave the current event"),
+						new SubcommandData("cancel", "Cancel the event"),
+						new SubcommandData("leaderboard", "Get the leaderboard for current event")
+				);
 	}
 }

@@ -70,4 +70,8 @@ public class SlashCommandClient extends ListenerAdapter {
 	public OffsetDateTime getStartTime() {
 		return startTime;
 	}
+
+	public List<SlashCommand> getSlashCommands(){
+		return slashCommands;
+	}
 }

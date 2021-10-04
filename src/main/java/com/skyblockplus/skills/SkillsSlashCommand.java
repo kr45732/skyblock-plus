@@ -20,6 +20,8 @@ package com.skyblockplus.skills;
 
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class SkillsSlashCommand extends SlashCommand {
 
@@ -36,5 +38,12 @@ public class SkillsSlashCommand extends SlashCommand {
 		}
 
 		event.embed(SkillsCommand.getPlayerSkill(event.player, event.getOptionStr("profile")));
+	}
+
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData("skills", "Get the skills data of a player")
+				.addOption(OptionType.STRING, "player", "Player username or mention")
+				.addOption(OptionType.STRING, "profile", "Profile name");
 	}
 }

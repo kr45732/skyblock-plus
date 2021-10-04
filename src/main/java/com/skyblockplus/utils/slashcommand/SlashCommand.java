@@ -18,6 +18,8 @@
 
 package com.skyblockplus.utils.slashcommand;
 
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+
 import static com.skyblockplus.Main.client;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -54,4 +56,6 @@ public abstract class SlashCommand {
 			.editOriginalEmbeds(invalidEmbed("⚠️ That command is on cooldown for " + remainingCooldown + " more seconds").build())
 			.queue();
 	}
+
+    public abstract CommandData getCommandData();
 }

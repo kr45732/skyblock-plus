@@ -18,8 +18,8 @@
 
 package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.Hypixel.getAuctionFromUuid;
-import static com.skyblockplus.utils.Hypixel.uuidToUsername;
+import static com.skyblockplus.utils.ApiHandler.getAuctionFromUuid;
+import static com.skyblockplus.utils.ApiHandler.uuidToUsername;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
