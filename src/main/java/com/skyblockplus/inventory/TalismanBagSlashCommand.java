@@ -21,8 +21,8 @@ package com.skyblockplus.inventory;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.Utils.invalidEmbed;
 
-import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import java.util.List;
