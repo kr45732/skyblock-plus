@@ -18,7 +18,7 @@
 
 package com.skyblockplus.guilds;
 
-import com.skyblockplus.miscellaneous.PaginatorEvent;
+import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -52,17 +52,19 @@ public class GuildLeaderboardSlashCommand extends SlashCommand {
 	@Override
 	public CommandData getCommandData() {
 		return new CommandData("guild-leaderboard", "Get a leaderboard for a guild. The API key must be set for this server.")
-			.addOption(OptionType.STRING, "player", "Player username or mention")
-			.addOptions(
-				new OptionData(OptionType.STRING, "type", "The leaderboard type", true)
-					.addChoice("Slayer", "slayer")
-					.addChoice("Skills", "skills")
-					.addChoice("Catacombs", "catacombs")
-					.addChoice("Sven Xp", "sven_xp")
-					.addChoice("Revenant Xp", "rev_xp")
-					.addChoice("Tarantula Xp", "tara_xp")
-					.addChoice("Enderman Xp", "enderman_xp")
-			)
+
+				.addOptions(
+						new OptionData(OptionType.STRING, "type", "The leaderboard type", true)
+								.addChoice("Slayer", "slayer")
+								.addChoice("Skills", "skills")
+								.addChoice("Catacombs", "catacombs")
+								.addChoice("Sven Xp", "sven_xp")
+								.addChoice("Revenant Xp", "rev_xp")
+								.addChoice("Tarantula Xp", "tara_xp")
+								.addChoice("Enderman Xp", "enderman_xp")
+				)
+				.addOption(OptionType.STRING, "player", "Player username or mention")
+
 			.addOption(OptionType.BOOLEAN, "ironman", "If the leaderboard should be ironman only");
 	}
 }

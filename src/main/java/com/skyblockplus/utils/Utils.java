@@ -34,7 +34,7 @@ import com.skyblockplus.features.apply.ApplyGuild;
 import com.skyblockplus.features.apply.ApplyUser;
 import com.skyblockplus.features.listeners.AutomaticGuild;
 import com.skyblockplus.utils.command.CustomPaginator;
-import com.skyblockplus.utils.exceptionhandlers.ExceptionExecutor;
+import com.skyblockplus.utils.exceptionhandler.ExceptionExecutor;
 import com.skyblockplus.utils.structs.*;
 import java.awt.*;
 import java.io.*;

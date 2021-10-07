@@ -16,28 +16,37 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.utils.exceptionhandlers;
+package com.skyblockplus.utils.exceptionhandler;
 
 import static com.skyblockplus.Main.globalExceptionHandler;
 
-import net.dv8tion.jda.api.events.GenericEvent;
-import net.dv8tion.jda.api.hooks.EventListener;
-import org.jetbrains.annotations.NotNull;
+import java.util.concurrent.*;
 
-public class ExceptionEventListener implements EventListener {
+public class ExceptionExecutor extends ThreadPoolExecutor {
 
-	private final EventListener listener;
-
-	public ExceptionEventListener(EventListener listener) {
-		this.listener = listener;
+	public ExceptionExecutor() {
+		super(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>());
 	}
 
-	@Override
-	public void onEvent(@NotNull GenericEvent event) {
-		try {
-			listener.onEvent(event);
-		} catch (Exception e) {
-			globalExceptionHandler.uncaughtException(null, e);
+	protected void afterExecute(Runnable r, Throwable t) {
+		super.afterExecute(r, t);
+		if (t == null && r instanceof Future<?>) {
+			try {
+				Future<?> future = (Future<?>) r;
+				if (future.isDone()) {
+					future.get();
+				}
+			} catch (CancellationException ce) {
+				t = ce;
+			} catch (ExecutionException ee) {
+				t = ee.getCause();
+			} catch (InterruptedException ie) {
+				Thread.currentThread().interrupt();
+			}
+		}
+
+		if (t != null) {
+			globalExceptionHandler.uncaughtException(null, t);
 		}
 	}
 }
