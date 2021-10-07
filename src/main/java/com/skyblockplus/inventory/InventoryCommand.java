@@ -18,23 +18,21 @@
 
 package com.skyblockplus.inventory;
 
-import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.miscellaneous.PaginatorEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.InvItem;
 import com.skyblockplus.utils.structs.PaginatorExtras;
+import net.dv8tion.jda.api.EmbedBuilder;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.interactions.InteractionHook;
+
+import static com.skyblockplus.utils.Utils.*;
 
 public class InventoryCommand extends Command {
 
@@ -70,9 +68,7 @@ public class InventoryCommand extends Command {
 							username,
 							args.length == 4 ? args[2] : null,
 							slotNumber,
-							event.getAuthor(),
-							event.getChannel(),
-							null
+								new PaginatorEvent(event)
 						)
 					);
 					return;
@@ -108,9 +104,7 @@ public class InventoryCommand extends Command {
 		String username,
 		String profileName,
 		int slotNum,
-		User user,
-		MessageChannel channel,
-		InteractionHook hook
+		PaginatorEvent event
 	) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
@@ -119,7 +113,7 @@ public class InventoryCommand extends Command {
 				List<String> pageTitles = new ArrayList<>();
 				List<String> pageThumbnails = new ArrayList<>();
 
-				CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, user).setColumns(1).setItemsPerPage(1);
+				CustomPaginator.Builder paginateBuilder = defaultPaginator( event.getUser()).setColumns(1).setItemsPerPage(1);
 
 				for (Map.Entry<Integer, InvItem> currentInvSlot : inventoryMap.entrySet()) {
 					InvItem currentInvStruct = currentInvSlot.getValue();
@@ -144,11 +138,7 @@ public class InventoryCommand extends Command {
 				}
 				paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles).setThumbnails(pageThumbnails));
 
-				if (channel != null) {
-					paginateBuilder.build().paginate(channel, slotNum);
-				} else {
-					paginateBuilder.build().paginate(hook, slotNum);
-				}
+				event.paginate(paginateBuilder, slotNum);
 				return null;
 			}
 		}

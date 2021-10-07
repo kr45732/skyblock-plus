@@ -18,6 +18,7 @@
 
 package com.skyblockplus.inventory;
 
+import com.skyblockplus.miscellaneous.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -37,7 +38,7 @@ public class SacksSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.paginate(SacksCommand.getPlayerSacks(event.player, event.getOptionStr("profile"), event.getUser(), null, event.getHook()));
+		event.paginate(SacksCommand.getPlayerSacks(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
 	}
 
 	@Override

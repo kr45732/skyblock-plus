@@ -18,12 +18,6 @@
 
 package com.skyblockplus.features.skyblockevent;
 
-import static com.skyblockplus.Main.*;
-import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
-import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
@@ -31,11 +25,18 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
 import com.skyblockplus.features.listeners.AutomaticGuild;
+import com.skyblockplus.miscellaneous.PaginatorEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.TextChannel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -43,12 +44,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.interactions.InteractionHook;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static com.skyblockplus.Main.*;
+import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Utils.*;
 
 public class SkyblockEventCommand extends Command {
 
@@ -66,7 +67,7 @@ public class SkyblockEventCommand extends Command {
 
 		List<EventMember> guildMemberPlayersList = getEventLeaderboardList(runningEventSettings);
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, null)
+		CustomPaginator.Builder paginateBuilder = defaultPaginator()
 			.setColumns(1)
 			.setItemsPerPage(25)
 			.setPaginatorExtras(new PaginatorExtras().setEveryPageTitle("Event Leaderboard"))
@@ -94,7 +95,7 @@ public class SkyblockEventCommand extends Command {
 
 		try {
 			paginateBuilder =
-				defaultPaginator(waiter, null)
+				defaultPaginator()
 					.setColumns(1)
 					.setItemsPerPage(25)
 					.setPaginatorExtras(new PaginatorExtras().setEveryPageTitle("Prizes"))
@@ -265,7 +266,7 @@ public class SkyblockEventCommand extends Command {
 
 					switch (args[1]) {
 						case "create":
-							paginate(createSkyblockEvent(event.getAuthor(), event.getGuild(), event.getChannel(), null));
+							paginate(createSkyblockEvent(new PaginatorEvent(event)));
 							return;
 						case "current":
 							embed(getCurrentSkyblockEvent(event.getGuild().getId()));
@@ -281,7 +282,7 @@ public class SkyblockEventCommand extends Command {
 							return;
 						case "leaderboard":
 						case "lb":
-							paginate(getEventLeaderboard(event.getGuild().getId(), event.getAuthor(), event.getChannel(), null));
+							paginate(getEventLeaderboard(new PaginatorEvent(event)));
 							return;
 						case "end":
 							if (database.getSkyblockEventActive(event.getGuild().getId())) {
@@ -300,7 +301,8 @@ public class SkyblockEventCommand extends Command {
 			.submit();
 	}
 
-	public static EmbedBuilder getEventLeaderboard(String guildId, User user, MessageChannel channel, InteractionHook hook) {
+	public static EmbedBuilder getEventLeaderboard(PaginatorEvent event) {
+		String guildId = event.getGuild().getId();
 		if (!database.getSkyblockEventActive(guildId)) {
 			return defaultEmbed("No event running");
 		}
@@ -311,7 +313,7 @@ public class SkyblockEventCommand extends Command {
 
 		AutomaticGuild currentGuild = guildMap.get(guildId);
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, user).setColumns(1).setItemsPerPage(25);
+		CustomPaginator.Builder paginateBuilder = defaultPaginator( event.getUser()).setColumns(1).setItemsPerPage(25);
 
 		if (
 			(currentGuild.eventMemberList != null) &&
@@ -348,11 +350,7 @@ public class SkyblockEventCommand extends Command {
 						.setEveryPageTitle("Event Leaderboard")
 						.setEveryPageText("**Last updated " + minutesSinceUpdateString + " ago**\n")
 				);
-				if (channel != null) {
-					paginateBuilder.build().paginate(channel, 0);
-				} else {
-					paginateBuilder.build().paginate(hook, 0);
-				}
+				event.paginate(paginateBuilder);
 				return null;
 			}
 
@@ -380,12 +378,7 @@ public class SkyblockEventCommand extends Command {
 		guildMap.get(guildId).setEventMemberListLastUpdated(Instant.now());
 
 		if (paginateBuilder.getItemsSize() > 0) {
-			if (channel != null) {
-				paginateBuilder.build().paginate(channel, 0);
-			} else {
-				paginateBuilder.build().paginate(hook, 0);
-			}
-			return null;
+			event.paginate(paginateBuilder);
 		}
 
 		return defaultEmbed("Event Leaderboard").setDescription("No one joined the event");
@@ -612,10 +605,10 @@ public class SkyblockEventCommand extends Command {
 		}
 	}
 
-	public static EmbedBuilder createSkyblockEvent(User user, Guild guild, MessageChannel channel, InteractionHook hook) {
-		boolean sbEventActive = database.getSkyblockEventActive(guild.getId());
-		if (guildMap.containsKey(guild.getId()) && !sbEventActive) {
-			guildMap.get(guild.getId()).createSkyblockEvent(user, guild, channel, hook);
+	public static EmbedBuilder createSkyblockEvent(PaginatorEvent event) {
+		boolean sbEventActive = database.getSkyblockEventActive(event.getGuild().getId());
+		if (guildMap.containsKey(event.getGuild().getId()) && !sbEventActive) {
+			guildMap.get(event.getGuild().getId()).createSkyblockEvent(event);
 			return null;
 		} else if (sbEventActive) {
 			return invalidEmbed("Event already running");

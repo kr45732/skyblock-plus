@@ -98,12 +98,17 @@ public class SlashCommandExecutedEvent {
 		return option == null ? defaultValue : option.getAsBoolean();
 	}
 
+	public double getOptionDouble(String name, double defaultValue) {
+		OptionMapping option = event.getOption(name);
+		return option == null ? defaultValue : option.getAsDouble();
+	}
+
 	public EmbedBuilder disabledCommandMessage() {
-		return invalidEmbed("❌ This command is disabled");
+		return invalidEmbed("This command is disabled");
 	}
 
 	public EmbedBuilder invalidCommandMessage() {
-		return invalidEmbed("❌ Invalid Command");
+		return invalidEmbed("Invalid Command");
 	}
 
 	public String getSubcommandName() {

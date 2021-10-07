@@ -44,7 +44,7 @@ public class BankSlashCommand extends SlashCommand {
 				break;
 			case "history":
 				event.paginate(
-					BankCommand.getPlayerBankHistory(event.player, event.getOptionStr("profile"), event.getUser(), null, event.getHook())
+					BankCommand.getPlayerBankHistory(event.player, event.getOptionStr("profile"), new PaginatorEvent(event))
 				);
 				break;
 			default:

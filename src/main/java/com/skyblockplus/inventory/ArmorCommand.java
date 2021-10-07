@@ -18,11 +18,11 @@
 
 package com.skyblockplus.inventory;
 
-import static com.skyblockplus.Main.waiter;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.miscellaneous.PaginatorEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
@@ -32,9 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.interactions.InteractionHook;
 
 public class ArmorCommand extends Command {
 
@@ -57,7 +54,7 @@ public class ArmorCommand extends Command {
 					}
 
 					paginate(
-						getPlayerEquippedArmor(username, args.length == 3 ? args[2] : null, event.getAuthor(), event.getChannel(), null)
+						getPlayerEquippedArmor(username, args.length == 3 ? args[2] : null, new PaginatorEvent(event))
 					);
 					return;
 				}
@@ -71,9 +68,7 @@ public class ArmorCommand extends Command {
 	public static EmbedBuilder getPlayerEquippedArmor(
 		String username,
 		String profileName,
-		User user,
-		MessageChannel channel,
-		InteractionHook hook
+		PaginatorEvent event
 	) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
@@ -82,7 +77,7 @@ public class ArmorCommand extends Command {
 				List<String> pageTitles = new ArrayList<>();
 				List<String> pageThumbnails = new ArrayList<>();
 
-				CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, user).setColumns(1).setItemsPerPage(1);
+				CustomPaginator.Builder paginateBuilder = defaultPaginator( event.getUser()).setColumns(1).setItemsPerPage(1);
 
 				for (Map.Entry<Integer, InvItem> currentInvSlot : inventoryMap.entrySet()) {
 					InvItem currentInvStruct = currentInvSlot.getValue();
@@ -141,11 +136,7 @@ public class ArmorCommand extends Command {
 				}
 				paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles).setThumbnails(pageThumbnails));
 
-				if (channel != null) {
-					paginateBuilder.build().paginate(channel, 0);
-				} else {
-					paginateBuilder.build().paginate(hook, 0);
-				}
+				event.paginate(paginateBuilder);
 				return null;
 			}
 		}

@@ -21,6 +21,7 @@ package com.skyblockplus.features.skyblockevent;
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
 
+import com.skyblockplus.miscellaneous.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.Permission;
@@ -48,7 +49,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 
 		switch (subcommandName) {
 			case "create":
-				event.paginate(SkyblockEventCommand.createSkyblockEvent(event.getUser(), event.getGuild(), null, event.getHook()));
+				event.paginate(SkyblockEventCommand.createSkyblockEvent(new PaginatorEvent(event)));
 				return;
 			case "current":
 				event.embed(SkyblockEventCommand.getCurrentSkyblockEvent(event.getGuild().getId()));
@@ -64,7 +65,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 				return;
 			case "leaderboard":
 			case "lb":
-				event.paginate(SkyblockEventCommand.getEventLeaderboard(event.getGuild().getId(), event.getUser(), null, event.getHook()));
+				event.paginate(SkyblockEventCommand.getEventLeaderboard(new PaginatorEvent(event)));
 				return;
 			case "end":
 				if (database.getSkyblockEventActive(event.getGuild().getId())) {

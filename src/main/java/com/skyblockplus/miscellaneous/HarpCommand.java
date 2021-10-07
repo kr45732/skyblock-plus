@@ -40,10 +40,13 @@ public class HarpCommand extends Command {
 	public static EmbedBuilder getHarp(String username, String profileName) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
-			EmbedBuilder eb = player.defaultPlayerEmbed();
-
 			JsonElement harpJson = higherDepth(player.profileJson(), "harp_quest");
-			eb.setDescription(
+			if(harpJson == null){
+				return defaultEmbed("Player has not used the harp");
+			}
+
+			EmbedBuilder eb = player.defaultPlayerEmbed()
+			.setDescription(
 				"**Last played song:** " +
 				HARP_SONG_ID_TO_NAME.get(higherDepth(harpJson, "selected_song", "None")) +
 				"\n**Claimed melody's hair:** " +

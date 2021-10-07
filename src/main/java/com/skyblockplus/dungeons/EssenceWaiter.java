@@ -19,8 +19,7 @@
 package com.skyblockplus.dungeons;
 
 import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import java.util.ArrayList;
@@ -35,6 +34,7 @@ import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
 public class EssenceWaiter {
 
+	private final String itemId;
 	private final String itemName;
 	private final JsonElement itemJson;
 	private final Message reactMessage;
@@ -43,10 +43,10 @@ public class EssenceWaiter {
 	private final Map<String, Integer> essenceEmojiMap = new HashMap<>();
 	private final Map<Integer, String> emojiEssenceMap;
 	private int startingLevel;
-	private int state = 0;
 
-	public EssenceWaiter(String itemName, JsonElement itemJson, Message reactMessage, User user) {
-		this.itemName = itemName;
+	public EssenceWaiter(String itemId, JsonElement itemJson, Message reactMessage, User user) {
+		this.itemId = itemId;
+		this.itemName = idToName(itemId);
 		this.itemJson = itemJson;
 		this.reactMessage = reactMessage;
 		this.user = user;
@@ -60,7 +60,7 @@ public class EssenceWaiter {
 		essenceEmojiMap.put("5⃣", 5);
 		emojiEssenceMap = essenceEmojiMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
 
-		EmbedBuilder eb = defaultEmbed("Essence upgrade for " + itemName.toLowerCase().replace("_", " "));
+		EmbedBuilder eb = defaultEmbed("Essence upgrade for " + itemName);
 		eb.setDescription("Choose the current item level");
 
 		validReactions = new ArrayList<>();
@@ -70,7 +70,7 @@ public class EssenceWaiter {
 			initialMessageInfo += "⏫ - Not dungeonized\n";
 		}
 		eb.addField("Levels", initialMessageInfo + "0⃣ - 0 stars\n1⃣ - 1 star\n2⃣ - 2 stars\n3⃣ - 3 stars\n4⃣ - 4 stars", false);
-		eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemName);
+		eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId);
 		reactMessage.editMessageEmbeds(eb.build()).queue();
 
 		validReactions.add("0⃣");
@@ -85,7 +85,7 @@ public class EssenceWaiter {
 		waiter.waitForEvent(
 			MessageReactionAddEvent.class,
 			this::condition,
-			this::action,
+			this::actionOne,
 			30,
 			TimeUnit.SECONDS,
 			() -> reactMessage.clearReactions().queue()
@@ -93,70 +93,63 @@ public class EssenceWaiter {
 	}
 
 	private boolean condition(MessageReactionAddEvent event) {
-		return event.getMessageIdLong() == reactMessage.getIdLong() && !event.getUser().isBot() && event.getUser().equals(user);
+		return event.getMessageIdLong() == reactMessage.getIdLong() && !event.getUser().isBot() && event.getUser().equals(user) && validReactions.contains(event.getReactionEmote().getName());
 	}
 
-	private void action(MessageReactionAddEvent event) {
-		if (!validReactions.contains(event.getReactionEmote().getName())) {
-			reactMessage.removeReaction(event.getReaction().getReactionEmote().getAsReactionCode(), event.getUser()).queue();
-			return;
+	private void actionOne(MessageReactionAddEvent event) {
+		validReactions.clear();
+		startingLevel = essenceEmojiMap.get(event.getReactionEmote().getName());
+		reactMessage.clearReactions().complete();
+		EmbedBuilder eb = defaultEmbed("Essence upgrade for " + itemName);
+		eb.setDescription("Choose the ending item level");
+
+		StringBuilder levelsString = new StringBuilder();
+		for (int i = (startingLevel + 1); i <= 5; i++) {
+			reactMessage.addReaction(emojiEssenceMap.get(i)).queue();
+			validReactions.add(emojiEssenceMap.get(i));
+			if (startingLevel == -1 && i == 0) {
+				levelsString.append(emojiEssenceMap.get(i)).append(" - Dungeonized\n");
+			} else {
+				levelsString.append(emojiEssenceMap.get(i)).append(" - ").append(i).append(i == 1 ? " star\n" : " stars\n");
+			}
 		}
+		eb.addField("Levels", levelsString.toString(), false);
+		eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId);
 
-		switch (state) {
-			case 0:
-				{
-					validReactions.clear();
-					startingLevel = essenceEmojiMap.get(event.getReactionEmote().getName());
-					reactMessage.clearReactions().complete();
-					EmbedBuilder eb = defaultEmbed("Essence upgrade for " + itemName.toLowerCase().replace("_", " "));
-					eb.setDescription("Choose the ending item level");
+		reactMessage.editMessageEmbeds(eb.build()).queue();
 
-					StringBuilder levelsString = new StringBuilder();
-					for (int i = (startingLevel + 1); i <= 5; i++) {
-						reactMessage.addReaction(emojiEssenceMap.get(i)).queue();
-						validReactions.add(emojiEssenceMap.get(i));
-						if (startingLevel == -1 && i == 0) {
-							levelsString.append(emojiEssenceMap.get(i)).append(" - Dungeonized\n");
-						} else if (i == 1) {
-							levelsString.append(emojiEssenceMap.get(i)).append(" - ").append(i).append(" star\n");
-						} else {
-							levelsString.append(emojiEssenceMap.get(i)).append(" - ").append(i).append(" stars\n");
-						}
-					}
-					eb.addField("Levels", levelsString.toString(), false);
-					eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemName);
+		waiter.waitForEvent(
+				MessageReactionAddEvent.class,
+				this::condition,
+				this::actionTwo,
+				30,
+				TimeUnit.SECONDS,
+				() -> reactMessage.clearReactions().queue()
+		);
+	}
 
-					reactMessage.editMessageEmbeds(eb.build()).queue();
-					state = 1;
-					break;
-				}
-			case 1:
-				{
-					int endingLevel = essenceEmojiMap.get(event.getReactionEmote().getName());
-					reactMessage.clearReactions().complete();
-					int totalEssence = 0;
-					for (int i = (startingLevel + 1); i <= endingLevel; i++) {
-						if (i == 0) {
-							totalEssence += higherDepth(itemJson, "dungeonize", 0);
-						} else {
-							totalEssence += higherDepth(itemJson, "" + i, 0);
-						}
-					}
-					EmbedBuilder eb = defaultEmbed("Essence upgrade for " + itemName.toLowerCase().replace("_", " "));
-					eb.addField(
-						"From " +
+	private void actionTwo(MessageReactionAddEvent event){
+		int endingLevel = essenceEmojiMap.get(event.getReactionEmote().getName());
+		reactMessage.clearReactions().complete();
+		int totalEssence = 0;
+		for (int i = (startingLevel + 1); i <= endingLevel; i++) {
+			if (i == 0) {
+				totalEssence += higherDepth(itemJson, "dungeonize", 0);
+			} else {
+				totalEssence += higherDepth(itemJson, "" + i, 0);
+			}
+		}
+		EmbedBuilder eb = defaultEmbed("Essence upgrade for " + itemName);
+		eb.addField(
+				"From " +
 						(startingLevel == -1 ? "not dungeonized" : startingLevel + (startingLevel == 1 ? " star" : " stars")) +
 						" to " +
 						endingLevel +
 						(endingLevel == 1 ? " star" : " stars"),
-						totalEssence + " " + higherDepth(itemJson, "type").getAsString().toLowerCase() + " essence",
-						false
-					);
-					eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemName);
-					reactMessage.editMessageEmbeds(eb.build()).queue();
-
-					break;
-				}
-		}
+				totalEssence + " " + higherDepth(itemJson, "type").getAsString().toLowerCase() + " essence",
+				false
+		);
+		eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId);
+		reactMessage.editMessageEmbeds(eb.build()).queue();
 	}
 }

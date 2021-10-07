@@ -16,44 +16,35 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.miscellaneous;
+package com.skyblockplus.inventory;
 
+import com.skyblockplus.miscellaneous.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
-import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
-public class RolesSlashCommand extends SlashCommand {
+public class PetsSlashCommand extends SlashCommand {
 
-	public RolesSlashCommand() {
-		this.name = "roles";
+	public PetsSlashCommand() {
+		this.name = "pets";
 	}
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
 		event.logCommand();
 
-		switch (event.getSubcommandName()) {
-			case "claim":
-				event.embed(RoleCommand.updateRoles(event.getOptionStr("profile"), event.getGuild(), event.getMember()));
-				break;
-			case "list":
-				event.paginate(RoleCommand.listRoles(new PaginatorEvent(event)));
-				break;
-			default:
-				event.invalidCommandMessage();
-				break;
+		if (event.invalidPlayerOption()) {
+			return;
 		}
+
+		event.paginate(PetsCommand.getPlayerPets(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
 	}
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData("roles", "Main roles command")
-			.addSubcommands(
-				new SubcommandData("claim", "Claim automatic Skyblock roles. The player must be linked to the bot")
-					.addOption(OptionType.STRING, "profile", "Profile name"),
-				new SubcommandData("list", "List all roles that can be claimed through the bot")
-			);
+		return new CommandData("pets", "Get a player's pets menu")
+			.addOption(OptionType.STRING, "player", "Player username or mention")
+			.addOption(OptionType.STRING, "profile", "Profile name");
 	}
 }

@@ -54,7 +54,7 @@ public class UuidCommand extends Command {
 			.submit();
 	}
 
-	private EmbedBuilder getUuidPlayer(String username) {
+	public static EmbedBuilder getUuidPlayer(String username) {
 		UsernameUuidStruct usernameUuid = usernameToUuid(username);
 		if (usernameUuid.isNotValid()) {
 			return invalidEmbed(usernameUuid.getFailCause());

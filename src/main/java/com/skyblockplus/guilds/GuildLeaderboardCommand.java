@@ -18,16 +18,11 @@
 
 package com.skyblockplus.guilds;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.structs.HypixelGuildCache.memberCacheFromPlayer;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.miscellaneous.PaginatorEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
@@ -35,6 +30,8 @@ import com.skyblockplus.utils.structs.HypixelGuildCache;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
+import net.dv8tion.jda.api.EmbedBuilder;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -42,11 +39,15 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import net.dv8tion.jda.api.EmbedBuilder;
 
-public class GuildLeaderboardsCommand extends Command {
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.structs.HypixelGuildCache.memberCacheFromPlayer;
 
-	public GuildLeaderboardsCommand() {
+public class GuildLeaderboardCommand extends Command {
+
+	public GuildLeaderboardCommand() {
 		this.name = "guild-leaderboard";
 		this.cooldown = globalCooldown + 1;
 		this.aliases = new String[] { "g-lb" };
@@ -69,7 +70,7 @@ public class GuildLeaderboardsCommand extends Command {
 						}
 					}
 
-					paginate(getLeaderboard(args[1], args[2].split(":")[1], event, ironmanOnly));
+					paginate(getLeaderboard(args[1], args[2].split(":")[1], ironmanOnly, new PaginatorEvent(event)));
 					return;
 				}
 
@@ -79,7 +80,7 @@ public class GuildLeaderboardsCommand extends Command {
 			.submit();
 	}
 
-	private EmbedBuilder getLeaderboard(String lbType, String username, CommandEvent event, boolean ironmanOnly) {
+	public static EmbedBuilder getLeaderboard(String lbType, String username, boolean ironmanOnly, PaginatorEvent event) {
 		String hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
 
 		EmbedBuilder eb = checkHypixelKey(hypixelKey);
@@ -134,7 +135,7 @@ public class GuildLeaderboardsCommand extends Command {
 		String guildName = higherDepth(guildJson, "name").getAsString();
 		String guildId = higherDepth(guildJson, "_id").getAsString();
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(2).setItemsPerPage(20);
+		CustomPaginator.Builder paginateBuilder = defaultPaginator( event.getUser()).setColumns(2).setItemsPerPage(20);
 		HypixelGuildCache guildCache = hypixelGuildsCacheMap.getIfPresent(guildId);
 		List<String> guildMemberPlayersList = new ArrayList<>();
 		Instant lastUpdated = null;
@@ -224,9 +225,8 @@ public class GuildLeaderboardsCommand extends Command {
 					.setEveryPageTitle(guildName)
 					.setEveryPageText(ebStr)
 					.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
-			)
-			.build()
-			.paginate(event.getChannel(), 0);
+			);
+		event.paginate(paginateBuilder);
 
 		return null;
 	}

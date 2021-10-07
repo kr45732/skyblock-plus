@@ -21,6 +21,7 @@ package com.skyblockplus.inventory;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.Utils.invalidEmbed;
 
+import com.skyblockplus.miscellaneous.PaginatorEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
@@ -50,9 +51,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 						event.player,
 						event.getOptionStr("profile"),
 						event.getOptionInt("slot", 0),
-						event.getUser(),
-						null,
-						event.getHook()
+							new PaginatorEvent(event)
 					)
 				);
 				break;

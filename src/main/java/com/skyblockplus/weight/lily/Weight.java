@@ -18,26 +18,17 @@
 
 package com.skyblockplus.weight.lily;
 
-import static com.skyblockplus.utils.Constants.*;
-
 import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.WeightStruct;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+
+import static com.skyblockplus.utils.Constants.SKILL_NAMES;
+import static com.skyblockplus.utils.Constants.SLAYER_NAMES;
+import static com.skyblockplus.utils.Utils.getJson;
 
 public class Weight {
 
-	public static JsonElement lilyWeightConstants;
-
-	static {
-		try {
-			lilyWeightConstants = JsonParser.parseReader(new FileReader("src/main/java/com/skyblockplus/json/LilyWeight.json"));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
+	public static final JsonElement lilyWeightConstants = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/LilyWeight.json");
 
 	private final SlayerWeight slayerWeight;
 	private final SkillsWeight skillsWeight;

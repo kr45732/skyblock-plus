@@ -154,14 +154,15 @@ public class Main {
 					new UpdateSlashCommands(),
 					new CalculateCommand(),
 					new EmojiFromUrlCommand(),
-					new GuildLeaderboardsCommand(),
+					new GuildLeaderboardCommand(),
 					new ArmorCommand(),
 					new FetchurCommand(),
 					new CheckEmojisCommand(),
 					new HarpCommand(),
 					new CommunityUpgradesCommand(),
 					new CakesCommand(),
-					new ActiveCoinsCommand()
+					new ActiveCoinsCommand(),
+						new HotmCommand()
 				)
 				.build();
 
@@ -169,6 +170,7 @@ public class Main {
 			new SlashCommandClient()
 				.addSlashCommands(
 					new InviteSlashCommand(),
+					new HotmSlashCommand(),
 					new InformationSlashCommand(),
 					new LinkSlashCommand(),
 					new UnlinkSlashCommand(),
@@ -205,7 +207,12 @@ public class Main {
 					new WardrobeSlashCommand(),
 					new HarpSlashCommand(),
 					new CakesSlashCommand(),
-					new ActiveCoinsSlashCommand()
+					new ActiveCoinsSlashCommand(),
+						new GuildLeaderboardSlashCommand(),
+						new GuildRanksSlashCommand(),
+						new GuildKickerSlashCommand(),
+						new PetsSlashCommand(),
+						new UuidSlashCommand()
 				);
 
 		jda =
@@ -225,7 +232,9 @@ public class Main {
 
 		try {
 			jda.awaitReady();
-		} catch (Exception ignored) {}
+		} catch (InterruptedException e) {
+			log.error(e.getMessage(), e);
+		}
 		jda.getPresence().setActivity(Activity.watching(DEFAULT_PREFIX + "help in " + jda.getGuilds().size() + " servers"));
 
 		ApiHandler.scheduleDatabaseUpdate();

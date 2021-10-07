@@ -18,8 +18,7 @@
 
 package com.skyblockplus.utils;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.Main.*;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.playerFromUuid;
 import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
@@ -30,7 +29,6 @@ import club.minnced.discord.webhook.external.JDAWebhookClient;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.gson.*;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
 import com.skyblockplus.features.apply.ApplyGuild;
 import com.skyblockplus.features.apply.ApplyUser;
@@ -530,19 +528,16 @@ public class Utils {
 		return defaultEmbed("Invalid input. Run `help " + name + "` for help");
 	}
 
-	public static CustomPaginator.Builder defaultPaginator(EventWaiter waiter, User eventAuthor) {
-		CustomPaginator.Builder paginateBuilder = new CustomPaginator.Builder()
+	public static CustomPaginator.Builder defaultPaginator(User... eventAuthor) {
+		return new CustomPaginator.Builder()
 			.setColumns(1)
 			.setItemsPerPage(1)
 			.showPageNumbers(true)
 			.setFinalAction(m -> m.editMessageComponents().queue())
 			.setEventWaiter(waiter)
 			.setTimeout(30, TimeUnit.SECONDS)
-			.setColor(botColor);
-		if (eventAuthor != null) {
-			paginateBuilder.setUsers(eventAuthor);
-		}
-		return paginateBuilder;
+			.setColor(botColor)
+				.setUsers(eventAuthor);
 	}
 
 	/* Format numbers or text */

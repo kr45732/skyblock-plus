@@ -107,16 +107,16 @@ public class EssenceCommand extends Command {
 				setArgs(3);
 
 				if (args.length == 3 && args[1].equals("upgrade")) {
-					String itemName = nameToId(args[2]);
+					String itemId = nameToId(args[2]);
 
-					if (higherDepth(getEssenceCostsJson(), itemName) == null) {
-						String closestMatch = getClosestMatch(itemName, ESSENCE_ITEM_NAMES);
-						itemName = closestMatch != null ? closestMatch : itemName;
+					if (higherDepth(getEssenceCostsJson(), itemId) == null) {
+						String closestMatch = getClosestMatch(itemId, ESSENCE_ITEM_NAMES);
+						itemId = closestMatch != null ? closestMatch : itemId;
 					}
 
-					JsonElement itemJson = higherDepth(getEssenceCostsJson(), itemName);
+					JsonElement itemJson = higherDepth(getEssenceCostsJson(), itemId);
 					if (itemJson != null) {
-						new EssenceWaiter(itemName, itemJson, ebMessage, event.getAuthor());
+						new EssenceWaiter(itemId, itemJson, ebMessage, event.getAuthor());
 					} else {
 						embed(invalidEmbed("Invalid item name"));
 					}

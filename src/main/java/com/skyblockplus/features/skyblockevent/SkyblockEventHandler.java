@@ -18,17 +18,20 @@
 
 package com.skyblockplus.features.skyblockevent;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
-import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.ApiHandler.getGuildFromName;
-import static com.skyblockplus.utils.Constants.ALL_SKILL_NAMES;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.google.gson.JsonElement;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
+import com.skyblockplus.miscellaneous.PaginatorEvent;
 import com.skyblockplus.utils.structs.HypixelResponse;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -38,15 +41,13 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.interactions.InteractionHook;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.utils.ApiHandler.getGuildFromName;
+import static com.skyblockplus.utils.Constants.ALL_SKILL_NAMES;
+import static com.skyblockplus.utils.Utils.*;
 
 public class SkyblockEventHandler {
 
@@ -74,21 +75,20 @@ public class SkyblockEventHandler {
 		this.enable = false;
 	}
 
-	public SkyblockEventHandler(User user, Guild guild, MessageChannel channel, InteractionHook hook) {
-		this.user = user;
-		this.guild = guild;
+	public SkyblockEventHandler(PaginatorEvent event) {
+		this.user = event.getUser();
+		this.guild = event.getGuild();
 		this.enable = true;
 		this.eb =
 			defaultEmbed("Skyblock competition")
 				.setFooter("Type 'cancel' to stop the process")
 				.setDescription("What is the name of the guild I should track?");
 
-		if (channel != null) {
-			this.channel = channel;
+		this.channel = event.getChannel();
+		if(event.isSlashCommand()){
+			event.getSlashCommand().getHook().editOriginalEmbeds(eb.build()).queue();
+		}else{
 			sendEmbedMessage(eb);
-		} else {
-			this.channel = hook.getInteraction().getMessageChannel();
-			hook.editOriginalEmbeds(eb.build()).queue();
 		}
 
 		lastMessageSentTime = Instant.now();

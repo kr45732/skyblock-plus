@@ -18,33 +18,34 @@
 
 package com.skyblockplus.guilds;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.structs.HypixelGuildCache.memberCacheFromPlayer;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.miscellaneous.PaginatorEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.*;
+import net.dv8tion.jda.api.EmbedBuilder;
+
 import java.io.FileReader;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import net.dv8tion.jda.api.EmbedBuilder;
+
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.structs.HypixelGuildCache.memberCacheFromPlayer;
 
 public class GuildRanksCommand extends Command {
 
 	public GuildRanksCommand() {
-		this.name = "guild-rank";
+		this.name = "guild-ranks";
 		this.cooldown = globalCooldown + 1;
 		this.aliases = new String[] { "g-rank", "g-ranks" };
 		this.botPermissions = defaultPerms();
@@ -74,7 +75,7 @@ public class GuildRanksCommand extends Command {
 						}
 					}
 
-					paginate(getLeaderboard(args[1].split(":")[1], event, ironmanOnly, useKey));
+					paginate(getLeaderboard(args[1].split(":")[1], ironmanOnly, useKey, new PaginatorEvent(event)));
 					return;
 				}
 
@@ -84,7 +85,7 @@ public class GuildRanksCommand extends Command {
 			.submit();
 	}
 
-	private EmbedBuilder getLeaderboard(String username, CommandEvent event, boolean ironmanOnly, boolean useKey) {
+	public static EmbedBuilder getLeaderboard(String username, boolean ironmanOnly, boolean useKey, PaginatorEvent event) {
 		String hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
 
 		if (ironmanOnly) {
@@ -371,7 +372,7 @@ public class GuildRanksCommand extends Command {
 
 		JsonArray ranksArr = higherDepth(lbSettings, "ranks").getAsJsonArray();
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(20);
+		CustomPaginator.Builder paginateBuilder = defaultPaginator( event.getUser()).setColumns(1).setItemsPerPage(20);
 		int totalChange = 0;
 		for (ArrayList<GuildRanksStruct> currentLeaderboard : guildLeaderboards) {
 			for (int i = 0; i < currentLeaderboard.size(); i++) {
@@ -420,9 +421,8 @@ public class GuildRanksCommand extends Command {
 						) +
 						"\n"
 					)
-			)
-			.build()
-			.paginate(event.getChannel(), 0);
+			);
+		event.paginate(paginateBuilder);
 
 		return null;
 	}

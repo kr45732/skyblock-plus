@@ -37,17 +37,13 @@ public class WeightCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	public static EmbedBuilder calculateWeight(String skillAverage, String slayer, String catacombs, String averageDungeonClass) {
+	public static EmbedBuilder calculateWeight(double skillAverage, double slayer, double catacombs, double averageDungeonClass) {
 		try {
-			double skillAverageD = Double.parseDouble(skillAverage);
-			double slayerD = Double.parseDouble(slayer);
-			double catacombsD = Double.parseDouble(catacombs);
-			double averageDungeonClassD = Double.parseDouble(averageDungeonClass);
 			EmbedBuilder eb = defaultEmbed("Weight Calculator");
-			eb.setDescription("**Total Weight:** " + Weight.of(skillAverageD, slayerD, catacombsD, averageDungeonClassD));
-			eb.addField("Slayer Weight", roundAndFormat(Weight.calculateSkillsWeight(skillAverageD)), false);
-			eb.addField("Skills Weight", roundAndFormat(Weight.calculateSlayerWeight(slayerD)), false);
-			eb.addField("Dungeons Weight", roundAndFormat(Weight.calculateDungeonsWeight(catacombsD, averageDungeonClassD)), false);
+			eb.setDescription("**Total Weight:** " + Weight.of(skillAverage, slayer, catacombs, averageDungeonClass));
+			eb.addField("Slayer Weight", roundAndFormat(Weight.calculateSkillsWeight(skillAverage)), false);
+			eb.addField("Skills Weight", roundAndFormat(Weight.calculateSlayerWeight(slayer)), false);
+			eb.addField("Dungeons Weight", roundAndFormat(Weight.calculateDungeonsWeight(catacombs, averageDungeonClass)), false);
 			return eb;
 		} catch (NumberFormatException e) {
 			return defaultEmbed("Invalid input");
@@ -143,7 +139,15 @@ public class WeightCommand extends Command {
 				logCommand();
 
 				if (args.length == 6 && args[1].equals("calculate")) {
-					embed(calculateWeight(args[2], args[3], args[4], args[5]));
+					try {
+						double skillAverage = Double.parseDouble(args[2]);
+						double slayer = Double.parseDouble(args[3]);
+						double catacombs = Double.parseDouble(args[4]);
+						double averageDungeonClass = Double.parseDouble(args[5]);
+						embed(calculateWeight(skillAverage, slayer, catacombs, averageDungeonClass));
+					}catch (Exception e){
+						embed(invalidEmbed("One of the provided amounts are invalid."));
+					}
 					return;
 				} else if (args.length == 4 || args.length == 3 || args.length == 2 || args.length == 1) {
 					Player.WeightType type = Player.WeightType.SENITHER;

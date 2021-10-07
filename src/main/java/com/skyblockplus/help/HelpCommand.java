@@ -18,12 +18,12 @@
 
 package com.skyblockplus.help;
 
-import static com.skyblockplus.Main.waiter;
 import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.miscellaneous.PaginatorEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.PaginatorExtras;
@@ -32,9 +32,6 @@ import java.util.Arrays;
 import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.interactions.InteractionHook;
 
 public class HelpCommand extends Command {
 
@@ -462,7 +459,7 @@ public class HelpCommand extends Command {
 		);
 	}
 
-	public static EmbedBuilder getHelp(String pageStr, Member member, MessageChannel channel, InteractionHook hook, String guildId) {
+	public static EmbedBuilder getHelp(String pageStr, PaginatorEvent event) {
 		int startingPage = 0;
 		if (pageStr != null) {
 			String[] pageStrSplit = pageStr.split(" ", 2);
@@ -470,7 +467,7 @@ public class HelpCommand extends Command {
 			if (pageStrSplit.length >= 1) {
 				HelpData matchCmd = helpDataList.stream().filter(cmd -> cmd.matchTo(pageStrSplit[0])).findFirst().orElse(null);
 				if (matchCmd != null) {
-					return matchCmd.getHelp(pageStrSplit.length == 2 ? pageStrSplit[1] : null, getGuildPrefix(guildId));
+					return matchCmd.getHelp(pageStrSplit.length == 2 ? pageStrSplit[1] : null, getGuildPrefix(event.getGuild().getId()));
 				}
 			}
 
@@ -481,16 +478,16 @@ public class HelpCommand extends Command {
 			}
 		}
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, member.getUser())
+		CustomPaginator.Builder paginateBuilder = defaultPaginator( event.getUser())
 			.setColumns(1)
 			.setItemsPerPage(1)
 			.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles));
 
-		boolean isAdmin = member.hasPermission(Permission.ADMINISTRATOR);
+		boolean isAdmin = event.getMember().hasPermission(Permission.ADMINISTRATOR);
 
 		paginateBuilder.addItems("Use the arrow buttons to navigate through the pages" + generatePageMap(isAdmin));
 
-		HelpGenerator help = new HelpGenerator(getGuildPrefix(guildId));
+		HelpGenerator help = new HelpGenerator(getGuildPrefix(event.getGuild().getId()));
 		paginateBuilder.addItems(
 			help.create("help", "Show the help menu with all the commands") +
 			help.create("help [command name]", "Show the help menu for a certain command") +
@@ -673,12 +670,7 @@ public class HelpCommand extends Command {
 			);
 		}
 
-		if (channel != null) {
-			paginateBuilder.build().paginate(channel, startingPage);
-		} else {
-			paginateBuilder.build().paginate(hook, startingPage);
-		}
-
+		event.paginate(paginateBuilder, startingPage);
 		return null;
 	}
 
@@ -701,10 +693,7 @@ public class HelpCommand extends Command {
 				paginate(
 					getHelp(
 						args.length >= 2 ? args[1].toLowerCase() : null,
-						event.getMember(),
-						event.getChannel(),
-						null,
-						event.getGuild().getId()
+						new PaginatorEvent(event)
 					)
 				);
 			}

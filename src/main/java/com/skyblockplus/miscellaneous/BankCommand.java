@@ -18,7 +18,6 @@
 
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.Main.waiter;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -31,9 +30,6 @@ import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import java.time.Instant;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.interactions.InteractionHook;
 
 public class BankCommand extends Command {
 
@@ -65,15 +61,13 @@ public class BankCommand extends Command {
 	public static EmbedBuilder getPlayerBankHistory(
 		String username,
 		String profileName,
-		User user,
-		MessageChannel channel,
-		InteractionHook hook
+		PaginatorEvent event
 	) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			JsonArray bankHistoryArray = player.getBankHistory();
 			if (bankHistoryArray != null) {
-				CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, user).setColumns(1).setItemsPerPage(20);
+				CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(20);
 
 				paginateBuilder.addItems(
 					"**Last Transaction Time:** " +
@@ -108,11 +102,7 @@ public class BankCommand extends Command {
 						.setEveryPageTitleUrl(player.skyblockStatsLink())
 				);
 
-				if (channel != null) {
-					paginateBuilder.build().paginate(channel, 0);
-				} else {
-					paginateBuilder.build().paginate(hook, 0);
-				}
+				event.paginate(paginateBuilder);
 				return null;
 			} else {
 				return invalidEmbed("Player banking API disabled");
@@ -134,7 +124,7 @@ public class BankCommand extends Command {
 					}
 
 					paginate(
-						getPlayerBankHistory(username, args.length == 4 ? args[3] : null, event.getAuthor(), event.getChannel(), null)
+						getPlayerBankHistory(username, args.length == 4 ? args[3] : null, new PaginatorEvent(event))
 					);
 					return;
 				} else if (args.length == 3 || args.length == 2 || args.length == 1) {

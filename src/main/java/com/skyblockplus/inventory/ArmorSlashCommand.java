@@ -18,6 +18,7 @@
 
 package com.skyblockplus.inventory;
 
+import com.skyblockplus.miscellaneous.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -38,7 +39,7 @@ public class ArmorSlashCommand extends SlashCommand {
 		}
 
 		event.paginate(
-			ArmorCommand.getPlayerEquippedArmor(event.player, event.getOptionStr("profile"), event.getUser(), null, event.getHook())
+			ArmorCommand.getPlayerEquippedArmor(event.player, event.getOptionStr("profile"),new PaginatorEvent(event))
 		);
 	}
 

@@ -16,44 +16,45 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.miscellaneous;
+package com.skyblockplus.guilds;
 
+import com.skyblockplus.miscellaneous.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
-import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
-public class RolesSlashCommand extends SlashCommand {
+public class GuildLeaderboardSlashCommand extends SlashCommand {
 
-	public RolesSlashCommand() {
-		this.name = "roles";
+	public GuildLeaderboardSlashCommand() {
+		this.name = "guild-leaderboard";
 	}
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
 		event.logCommand();
 
-		switch (event.getSubcommandName()) {
-			case "claim":
-				event.embed(RoleCommand.updateRoles(event.getOptionStr("profile"), event.getGuild(), event.getMember()));
-				break;
-			case "list":
-				event.paginate(RoleCommand.listRoles(new PaginatorEvent(event)));
-				break;
-			default:
-				event.invalidCommandMessage();
-				break;
+		if (event.invalidPlayerOption()) {
+			return;
 		}
+
+		event.paginate(GuildLeaderboardCommand.getLeaderboard(event.getOptionStr("type"), event.player, event.getOptionBoolean("ironman", false), new PaginatorEvent(event)));
 	}
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData("roles", "Main roles command")
-			.addSubcommands(
-				new SubcommandData("claim", "Claim automatic Skyblock roles. The player must be linked to the bot")
-					.addOption(OptionType.STRING, "profile", "Profile name"),
-				new SubcommandData("list", "List all roles that can be claimed through the bot")
-			);
+		return new CommandData("guild-leaderboard", "Get a leaderboard for a guild. The API key must be set for this server.")
+				.addOption(OptionType.STRING, "player", "Player username or mention")
+				.addOptions(new OptionData(OptionType.STRING, "type", "The leaderboard type", true)
+						.addChoice("Slayer", "slayer")
+						.addChoice("Skills", "skills")
+						.addChoice("Catacombs", "catacombs")
+						.addChoice("Sven Xp", "sven_xp")
+						.addChoice("Revenant Xp", "rev_xp")
+						.addChoice("Tarantula Xp", "tara_xp")
+						.addChoice("Enderman Xp", "enderman_xp")
+				)
+				.addOption(OptionType.BOOLEAN, "ironman", "If the leaderboard should be ironman only");
 	}
 }

@@ -18,7 +18,6 @@
 
 package com.skyblockplus.miscellaneous;
 
-import com.skyblockplus.slayer.SlayerCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;

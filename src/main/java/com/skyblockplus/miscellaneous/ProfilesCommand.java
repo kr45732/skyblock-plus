@@ -18,10 +18,6 @@
 
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -30,14 +26,15 @@ import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
+import net.dv8tion.jda.api.EmbedBuilder;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.interactions.InteractionHook;
+
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Utils.*;
 
 public class ProfilesCommand extends Command {
 
@@ -47,7 +44,7 @@ public class ProfilesCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	public static EmbedBuilder getPlayerProfiles(String username, User user, MessageChannel channel, InteractionHook hook) {
+	public static EmbedBuilder getPlayerProfiles(String username, PaginatorEvent event) {
 		UsernameUuidStruct usernameUuid = usernameToUuid(username);
 		if (usernameUuid.isNotValid()) {
 			return invalidEmbed(usernameUuid.getFailCause());
@@ -78,7 +75,7 @@ public class ProfilesCommand extends Command {
 			}
 		}
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, user).setColumns(1).setItemsPerPage(1);
+		CustomPaginator.Builder paginateBuilder = defaultPaginator( event.getUser()).setColumns(1).setItemsPerPage(1);
 
 		List<String> pageTitlesUrls = new ArrayList<>();
 		int count = 0;
@@ -106,11 +103,7 @@ public class ProfilesCommand extends Command {
 			new PaginatorExtras().setEveryPageTitle(usernameUuid.getUsername()).setTitleUrls(pageTitlesUrls)
 		);
 
-		if (channel != null) {
-			paginateBuilder.build().paginate(channel, 0);
-		} else {
-			paginateBuilder.build().paginate(hook, 0);
-		}
+		event.paginate(paginateBuilder);
 		return null;
 	}
 
@@ -126,7 +119,7 @@ public class ProfilesCommand extends Command {
 						return;
 					}
 
-					paginate(getPlayerProfiles(username, event.getAuthor(), event.getChannel(), null));
+					paginate(getPlayerProfiles(username, new PaginatorEvent(event)));
 					return;
 				}
 

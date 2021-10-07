@@ -28,9 +28,6 @@ jobs:
           cache: "gradle"
       - name: Build with Gradle
         run: chmod +x gradlew && ./gradlew build --no-daemon
-      - uses: actions/upload-artifact@v2
-        with:
-          path: build/libs/*.jar
       - name: Format code
         uses: lwerner-lshigh/prettier_action_java@v1.1.1
         with:

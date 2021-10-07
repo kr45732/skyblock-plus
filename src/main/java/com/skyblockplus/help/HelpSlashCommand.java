@@ -18,6 +18,7 @@
 
 package com.skyblockplus.help;
 
+import com.skyblockplus.miscellaneous.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -34,7 +35,7 @@ public class HelpSlashCommand extends SlashCommand {
 		event.logCommand();
 
 		event.paginate(
-			HelpCommand.getHelp(event.getOptionStr("command"), event.getMember(), null, event.getHook(), event.getGuild().getId())
+			HelpCommand.getHelp(event.getOptionStr("command"), new PaginatorEvent(event))
 		);
 	}
 

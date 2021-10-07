@@ -18,23 +18,20 @@
 
 package com.skyblockplus.inventory;
 
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.miscellaneous.PaginatorEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.ArmorStruct;
 import com.skyblockplus.utils.structs.PaginatorExtras;
+import net.dv8tion.jda.api.EmbedBuilder;
+
 import java.util.List;
 import java.util.Map;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.interactions.InteractionHook;
+
+import static com.skyblockplus.utils.Utils.*;
 
 public class WardrobeCommand extends Command {
 
@@ -59,7 +56,7 @@ public class WardrobeCommand extends Command {
 					}
 
 					paginate(
-						getPlayerWardrobeList(username, args.length == 4 ? args[3] : null, event.getAuthor(), event.getChannel(), null)
+						getPlayerWardrobeList(username, args.length == 4 ? args[3] : null, new PaginatorEvent(event))
 					);
 					return;
 				} else if (args.length == 3 || args.length == 2 || args.length == 1) {
@@ -106,15 +103,13 @@ public class WardrobeCommand extends Command {
 	public static EmbedBuilder getPlayerWardrobeList(
 		String username,
 		String profileName,
-		User user,
-		MessageChannel channel,
-		InteractionHook hook
+		PaginatorEvent event
 	) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			Map<Integer, ArmorStruct> armorStructMap = player.getWardrobeList();
 			if (armorStructMap != null) {
-				CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, user).setColumns(1).setItemsPerPage(4);
+				CustomPaginator.Builder paginateBuilder = defaultPaginator( event.getUser()).setColumns(1).setItemsPerPage(4);
 
 				for (Map.Entry<Integer, ArmorStruct> currentArmour : armorStructMap.entrySet()) {
 					paginateBuilder.addItems(
@@ -137,11 +132,7 @@ public class WardrobeCommand extends Command {
 						.setEveryPageThumbnail(player.getThumbnailUrl())
 						.setEveryPageTitleUrl(player.skyblockStatsLink())
 				);
-				if (channel != null) {
-					paginateBuilder.build().paginate(channel, 0);
-				} else {
-					paginateBuilder.build().paginate(hook, 0);
-				}
+		event.paginate(paginateBuilder);
 				return null;
 			}
 		}

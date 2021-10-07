@@ -19,7 +19,6 @@
 package com.skyblockplus.dev;
 
 import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.Main.waiter;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
@@ -48,7 +47,7 @@ public class GetAllGuildsIn extends Command {
 
 				if (args.length == 2) {
 					if (args[1].equals("list")) {
-						CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor())
+						CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getAuthor())
 							.setColumns(1)
 							.setItemsPerPage(10);
 

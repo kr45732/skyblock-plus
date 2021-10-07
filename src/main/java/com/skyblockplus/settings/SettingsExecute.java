@@ -749,7 +749,7 @@ public class SettingsExecute {
 		}
 
 		for (GuildRole currentGuildRole : currentGuildRoles) {
-			if (currentGuildRole.getName().equalsIgnoreCase(name)) {
+			if (currentGuildRole.getName() != null && currentGuildRole.getName().equalsIgnoreCase(name)) {
 				return invalidEmbed(name + " name is taken");
 			}
 		}
@@ -814,7 +814,7 @@ public class SettingsExecute {
 	}
 
 	public CustomPaginator.Builder getCurrentRolesSettings(JsonElement rolesSettings) {
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, author).setColumns(1).setItemsPerPage(1);
+		CustomPaginator.Builder paginateBuilder = defaultPaginator(author).setColumns(1).setItemsPerPage(1);
 
 		ArrayList<String> pageTitles = new ArrayList<>();
 		pageTitles.add("Roles Settings");
@@ -1366,8 +1366,8 @@ public class SettingsExecute {
 	public String getCurrentVerifySettings(JsonElement verifySettings) {
 		String ebFieldString = "";
 		ebFieldString += "**" + displaySettings(verifySettings, "enable") + "**";
-		ebFieldString += "\n**• React Message Text:** " + displaySettings(verifySettings, "messageText");
-		ebFieldString += "\n**• React Message Channel:** " + displaySettings(verifySettings, "messageTextChannelId");
+		ebFieldString += "\n**• Message Text:** " + displaySettings(verifySettings, "messageText");
+		ebFieldString += "\n**• Channel:** " + displaySettings(verifySettings, "messageTextChannelId");
 		ebFieldString += "\n**• Verified Role(s):** " + displaySettings(verifySettings, "verifiedRoles");
 		ebFieldString += "\n**• Nickname Template:** " + displaySettings(verifySettings, "verifiedNickname");
 		ebFieldString += "\n**• Member join sync:** " + displaySettings(verifySettings, "enableMemberJoinSync");
@@ -1586,13 +1586,13 @@ public class SettingsExecute {
 	public EmbedBuilder getCurrentApplySettings(JsonElement applySettings) {
 		EmbedBuilder eb = defaultEmbed("Apply Settings");
 		eb.setDescription("**" + displaySettings(applySettings, "enable").replace("•", "").trim() + "**");
-		eb.addField("React Message Channel", displaySettings(applySettings, "messageTextChannelId"), true);
+		eb.addField("Button Message Channel", displaySettings(applySettings, "messageTextChannelId"), true);
 		eb.addField("Staff Message Channel", displaySettings(applySettings, "messageStaffChannelId"), true);
 		eb.addField("Waiting For Invite Channel", displaySettings(applySettings, "waitingChannelId"), true);
 		eb.addField("Staff Ping Role", displaySettings(applySettings, "staffPingRoleId"), true);
 		eb.addField("New Channel Category", displaySettings(applySettings, "newChannelCategory"), true);
-		eb.addField("Ironman only", displaySettings(applySettings, "ironmanOnly"), true);
-		eb.addField("React Message Text", displaySettings(applySettings, "messageText"), true);
+		eb.addField("Ironman Only", displaySettings(applySettings, "ironmanOnly"), true);
+		eb.addField("Button Message Text", displaySettings(applySettings, "messageText"), true);
 		eb.addField("Accepted Message", displaySettings(applySettings, "acceptMessageText"), true);
 		eb.addField("Waitlisted Message", displaySettings(applySettings, "waitlistedMessageText"), true);
 		eb.addField("Denied Message", displaySettings(applySettings, "denyMessageText"), true);

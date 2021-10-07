@@ -18,18 +18,18 @@
 
 package com.skyblockplus.inventory;
 
-import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.miscellaneous.PaginatorEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import net.dv8tion.jda.api.EmbedBuilder;
+
+import static com.skyblockplus.utils.Utils.*;
 
 public class PetsCommand extends Command {
 
@@ -51,7 +51,7 @@ public class PetsCommand extends Command {
 						return;
 					}
 
-					paginate(getPlayerPets(username, args.length == 3 ? args[2] : null, event));
+					paginate(getPlayerPets(username, args.length == 3 ? args[2] : null,new PaginatorEvent(event)));
 					return;
 				}
 
@@ -61,10 +61,10 @@ public class PetsCommand extends Command {
 			.submit();
 	}
 
-	private EmbedBuilder getPlayerPets(String username, String profileName, CommandEvent event) {
+	public static EmbedBuilder getPlayerPets(String username, String profileName, PaginatorEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
-			CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(3).setItemsPerPage(15);
+			CustomPaginator.Builder paginateBuilder = defaultPaginator( event.getUser()).setColumns(3).setItemsPerPage(15);
 
 			JsonArray playerPets = player.getPets();
 			for (JsonElement pet : playerPets) {
@@ -90,7 +90,7 @@ public class PetsCommand extends Command {
 					.setEveryPageThumbnail(player.getThumbnailUrl())
 					.setEveryPageTitleUrl(player.skyblockStatsLink())
 			);
-			paginateBuilder.build().paginate(event.getChannel(), 0);
+		event.paginate(paginateBuilder);
 			return null;
 		}
 		return invalidEmbed(player.getFailCause());

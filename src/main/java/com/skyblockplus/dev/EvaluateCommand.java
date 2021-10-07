@@ -133,7 +133,6 @@ public class EvaluateCommand extends Command {
 					shell.setProperty("event", jdaEvent);
 					shell.setProperty("message", jdaEvent.getMessage());
 					shell.setProperty("channel", jdaEvent.getChannel());
-					shell.setProperty("args", args);
 					shell.setProperty("jda", jdaEvent.getJDA());
 					shell.setProperty("guilds", guildMap);
 					shell.setProperty("db", database);

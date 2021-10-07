@@ -18,11 +18,15 @@
 
 package com.skyblockplus.dungeons;
 
+import com.google.gson.JsonElement;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+
+import static com.skyblockplus.utils.Constants.ESSENCE_ITEM_NAMES;
+import static com.skyblockplus.utils.Utils.*;
 
 public class EssenceSlashCommand extends SlashCommand {
 
@@ -36,7 +40,19 @@ public class EssenceSlashCommand extends SlashCommand {
 
 		switch (event.getSubcommandName()) {
 			case "upgrade":
-				event.embed(event.disabledCommandMessage());
+				String itemId = nameToId(event.getOptionStr("item"));
+
+				if (higherDepth(getEssenceCostsJson(), itemId) == null) {
+					String closestMatch = getClosestMatch(itemId, ESSENCE_ITEM_NAMES);
+					itemId = closestMatch != null ? closestMatch : itemId;
+				}
+
+				JsonElement itemJson = higherDepth(getEssenceCostsJson(), itemId);
+				if (itemJson != null) {
+					new EssenceWaiter(itemId, itemJson, event.getHook().retrieveOriginal().complete(), event.getUser());
+				} else {
+					event.embed(invalidEmbed("Invalid item name"));
+				}
 				break;
 			case "information":
 				event.embed(EssenceCommand.getEssenceInformation(event.getOptionStr("item")));

@@ -18,7 +18,6 @@
 
 package com.skyblockplus.price;
 
-import static com.skyblockplus.Main.waiter;
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -26,6 +25,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.miscellaneous.PaginatorEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.HypixelResponse;
@@ -38,9 +38,6 @@ import java.util.Locale;
 import java.util.stream.Stream;
 import me.nullicorn.nedit.NBTReader;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.interactions.InteractionHook;
 
 public class AuctionCommand extends Command {
 
@@ -53,11 +50,9 @@ public class AuctionCommand extends Command {
 
 	public static EmbedBuilder getPlayerAuction(
 		String username,
-		User user,
-		MessageChannel channel,
-		InteractionHook hook,
 		AuctionFilterType filterType,
-		AuctionSortType sortType
+		AuctionSortType sortType,
+		PaginatorEvent event
 	) {
 		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
 		if (usernameUuidStruct.isNotValid()) {
@@ -92,7 +87,7 @@ public class AuctionCommand extends Command {
 		long totalSoldValue = 0;
 		long totalPendingValue = 0;
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, user).setColumns(1).setItemsPerPage(10);
+		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(10);
 		PaginatorExtras extras = new PaginatorExtras();
 
 		for (int i = 0; i < auctionsArray.size(); i++) {
@@ -154,11 +149,7 @@ public class AuctionCommand extends Command {
 				simplifyNumber(totalPendingValue)
 			);
 
-		if (channel != null) {
-			paginateBuilder.setPaginatorExtras(extras).build().paginate(channel, 0);
-		} else {
-			paginateBuilder.setPaginatorExtras(extras).build().paginate(hook, 0);
-		}
+		event.paginate(paginateBuilder.setPaginatorExtras(extras));
 		return null;
 	}
 
@@ -269,7 +260,7 @@ public class AuctionCommand extends Command {
 						return;
 					}
 
-					paginate(getPlayerAuction(username, event.getAuthor(), event.getChannel(), null, filterType, sortType));
+					paginate(getPlayerAuction(username,filterType, sortType, new PaginatorEvent(event)));
 					return;
 				}
 

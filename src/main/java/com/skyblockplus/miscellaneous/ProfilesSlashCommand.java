@@ -37,7 +37,7 @@ public class ProfilesSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.paginate(ProfilesCommand.getPlayerProfiles(event.player, event.getUser(), null, event.getHook()));
+		event.paginate(ProfilesCommand.getPlayerProfiles(event.player, new PaginatorEvent(event)));
 	}
 
 	@Override

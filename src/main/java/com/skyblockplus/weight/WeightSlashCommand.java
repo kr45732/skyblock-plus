@@ -53,10 +53,10 @@ public class WeightSlashCommand extends SlashCommand {
 			case "calculate":
 				event.embed(
 					WeightCommand.calculateWeight(
-						event.getOptionStr("skill_average"),
-						event.getOptionStr("slayer"),
-						event.getOptionStr("catacombs"),
-						event.getOptionStr("average_class")
+						event.getOptionDouble("skill_average", 0),
+						event.getOptionDouble("slayer", 0),
+						event.getOptionDouble("catacombs", 0),
+						event.getOptionDouble("average_class", 0)
 					)
 				);
 				break;
@@ -81,10 +81,10 @@ public class WeightSlashCommand extends SlashCommand {
 			)
 			.addSubcommands(
 				new SubcommandData("calculate", "Calculate predicted weight using given stats (not 100% accurate)")
-					.addOption(OptionType.STRING, "skill_average", "Player's skill average", true)
-					.addOption(OptionType.STRING, "slayer", "Player's slayer XP", true)
-					.addOption(OptionType.STRING, "dungeons", "Player's catacombs level", true)
-					.addOption(OptionType.STRING, "average_class", "Player's average dungeon class level", true)
+					.addOption(OptionType.NUMBER, "skill_average", "Player's skill average", true)
+					.addOption(OptionType.NUMBER, "slayer", "Player's slayer XP", true)
+					.addOption(OptionType.NUMBER, "dungeons", "Player's catacombs level", true)
+					.addOption(OptionType.NUMBER, "average_class", "Player's average dungeon class level", true)
 			);
 	}
 }

@@ -38,6 +38,7 @@ import com.skyblockplus.features.apply.ApplyUser;
 import com.skyblockplus.features.setup.SetupCommandHandler;
 import com.skyblockplus.features.skyblockevent.SkyblockEventHandler;
 import com.skyblockplus.features.verify.VerifyGuild;
+import com.skyblockplus.miscellaneous.PaginatorEvent;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import java.io.File;
 import java.io.FileReader;
@@ -59,7 +60,6 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
-import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
@@ -369,9 +369,7 @@ public class AutomaticGuild {
 						inGuildUsers.addAll(members);
 						latch.countDown();
 					})
-					.onError(error -> {
-						latch.countDown();
-					});
+					.onError(error -> latch.countDown());
 
 				try {
 					latch.await(15, TimeUnit.SECONDS);
@@ -519,11 +517,11 @@ public class AutomaticGuild {
 		this.eventMemberListLastUpdated = eventMemberListLastUpdated;
 	}
 
-	public void createSkyblockEvent(User user, Guild guild, MessageChannel channel, InteractionHook hook) {
+	public void createSkyblockEvent(PaginatorEvent event) {
 		if (skyblockEventHandler != null && skyblockEventHandler.scheduledFuture != null) {
 			skyblockEventHandler.scheduledFuture.cancel(true);
 		}
-		skyblockEventHandler = new SkyblockEventHandler(user, guild, channel, hook);
+		skyblockEventHandler = new SkyblockEventHandler(event);
 	}
 
 	public void setSkyblockEvent(SkyblockEventHandler skyblockEventHandler) {

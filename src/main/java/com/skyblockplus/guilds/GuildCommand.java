@@ -18,30 +18,28 @@
 
 package com.skyblockplus.guilds;
 
-import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Constants.GUILD_EXP_TO_LEVEL;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.miscellaneous.PaginatorEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
+import net.dv8tion.jda.api.EmbedBuilder;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.interactions.InteractionHook;
+
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Constants.GUILD_EXP_TO_LEVEL;
+import static com.skyblockplus.utils.Utils.*;
 
 public class GuildCommand extends Command {
 
@@ -56,9 +54,7 @@ public class GuildCommand extends Command {
 		JsonElement guildJson,
 		long days,
 		String playerUsername,
-		User user,
-		MessageChannel channel,
-		InteractionHook hook
+		PaginatorEvent event
 	) {
 		JsonElement members = higherDepth(guildJson, "members");
 		JsonArray membersArr = members.getAsJsonArray();
@@ -93,7 +89,7 @@ public class GuildCommand extends Command {
 
 		guildExpList.sort(Comparator.comparingInt(o1 -> -Integer.parseInt(o1.split("=:=")[1])));
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, user).setColumns(2).setItemsPerPage(20);
+		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(2).setItemsPerPage(20);
 		PaginatorExtras extras = new PaginatorExtras()
 			.setEveryPageTitle(higherDepth(guildJson, "name").getAsString())
 			.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(guildJson, "_id").getAsString());
@@ -122,16 +118,12 @@ public class GuildCommand extends Command {
 			);
 		}
 
-		if (channel != null) {
-			paginateBuilder.build().paginate(channel, 0);
-		} else {
-			paginateBuilder.build().paginate(hook, 0);
-		}
+		event.paginate(paginateBuilder);
 
 		return null;
 	}
 
-	public static EmbedBuilder getGuildExpFromPlayer(String username, long days, User user, MessageChannel channel, InteractionHook hook) {
+	public static EmbedBuilder getGuildExpFromPlayer(String username, long days, PaginatorEvent event) {
 		if (days < 1 || days > 7) {
 			return invalidEmbed("Days must be between 1 to 7");
 		}
@@ -147,7 +139,7 @@ public class GuildCommand extends Command {
 		}
 		JsonElement guildJson = hypixelResponse.getResponse();
 
-		return getGuildExp(guildJson, days, usernameUuid.getUsername(), user, channel, hook);
+		return getGuildExp(guildJson, days, usernameUuid.getUsername(), new PaginatorEvent(event));
 	}
 
 	public static EmbedBuilder getGuildExpFromName(String guildName, long days, CommandEvent event) {
@@ -161,7 +153,7 @@ public class GuildCommand extends Command {
 		}
 		JsonElement guildJson = hypixelResponse.getResponse();
 
-		return getGuildExp(guildJson, days, null, event.getAuthor(), event.getChannel(), null);
+		return getGuildExp(guildJson, days, null, new PaginatorEvent(event));
 	}
 
 	public static EmbedBuilder getGuildPlayer(String username) {
@@ -286,7 +278,7 @@ public class GuildCommand extends Command {
 		return guildInfo;
 	}
 
-	public static EmbedBuilder getGuildMembers(JsonElement guildJson, User user, MessageChannel channel, InteractionHook hook) {
+	public static EmbedBuilder getGuildMembers(JsonElement guildJson, PaginatorEvent event) {
 		JsonArray membersArr = higherDepth(guildJson, "members").getAsJsonArray();
 		List<CompletableFuture<String>> futures = new ArrayList<>();
 		List<String> guildMembers = new ArrayList<>();
@@ -300,7 +292,7 @@ public class GuildCommand extends Command {
 			} catch (Exception ignored) {}
 		}
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, user).setColumns(3).setItemsPerPage(33);
+		CustomPaginator.Builder paginateBuilder = defaultPaginator( event.getUser()).setColumns(3).setItemsPerPage(33);
 
 		paginateBuilder.setPaginatorExtras(
 			new PaginatorExtras()
@@ -314,15 +306,11 @@ public class GuildCommand extends Command {
 			}
 		}
 
-		if (channel != null) {
-			paginateBuilder.build().paginate(channel, 0);
-		} else {
-			paginateBuilder.build().paginate(hook, 0);
-		}
+		event.paginate(paginateBuilder);
 		return null;
 	}
 
-	public static EmbedBuilder getGuildMembersFromPlayer(String username, User user, MessageChannel channel, InteractionHook hook) {
+	public static EmbedBuilder getGuildMembersFromPlayer(String username, PaginatorEvent event) {
 		UsernameUuidStruct usernameUuid = usernameToUuid(username);
 		if (usernameUuid.isNotValid()) {
 			return invalidEmbed(usernameUuid.getFailCause());
@@ -334,17 +322,17 @@ public class GuildCommand extends Command {
 		}
 		JsonElement guildJson = hypixelResponse.getResponse();
 
-		return getGuildMembers(guildJson, user, channel, hook);
+		return getGuildMembers(guildJson, event);
 	}
 
-	public static EmbedBuilder getGuildMembersFromName(String guildName, CommandEvent event) {
+	public static EmbedBuilder getGuildMembersFromName(String guildName, PaginatorEvent event) {
 		HypixelResponse hypixelResponse = getGuildFromName(guildName);
 		if (hypixelResponse.isNotValid()) {
 			return invalidEmbed(hypixelResponse.getFailCause());
 		}
 		JsonElement guildJson = hypixelResponse.getResponse();
 
-		return getGuildMembers(guildJson, event.getAuthor(), event.getChannel(), null);
+		return getGuildMembers(guildJson, event);
 	}
 
 	private static int guildExpToLevel(int guildExp) {
@@ -382,7 +370,7 @@ public class GuildCommand extends Command {
 					}
 
 					if (args[2].startsWith("u:")) {
-						paginate(getGuildExpFromPlayer(args[2].split("u:")[1], days, event.getAuthor(), event.getChannel(), null));
+						paginate(getGuildExpFromPlayer(args[2].split("u:")[1], days, new PaginatorEvent(event)));
 						return;
 					} else if (args[2].startsWith("g:")) {
 						paginate(getGuildExpFromName(args[2].split("g:")[1], days, event));
@@ -398,10 +386,10 @@ public class GuildCommand extends Command {
 					}
 				} else if (args.length == 3 && "members".equals(args[1])) {
 					if (args[2].startsWith("u:")) {
-						paginate(getGuildMembersFromPlayer(args[2].split("u:")[1], event.getAuthor(), event.getChannel(), null));
+						paginate(getGuildMembersFromPlayer(args[2].split("u:")[1], new PaginatorEvent(event)));
 						return;
 					} else if (args[2].startsWith("g:")) {
-						paginate(getGuildMembersFromName(args[2].split("g:")[1], event));
+						paginate(getGuildMembersFromName(args[2].split("g:")[1], new PaginatorEvent(event)));
 						return;
 					}
 				} else if (args.length == 2) {

@@ -18,6 +18,7 @@
 
 package com.skyblockplus.dungeons;
 
+import com.skyblockplus.miscellaneous.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -38,7 +39,7 @@ public class DungeonsSlashCommand extends SlashCommand {
 		}
 
 		event.paginate(
-			DungeonsCommand.getPlayerDungeons(event.player, event.getOptionStr("profile"), event.getUser(), null, event.getHook())
+			DungeonsCommand.getPlayerDungeons(event.player, event.getOptionStr("profile"), new PaginatorEvent(event))
 		);
 	}
 

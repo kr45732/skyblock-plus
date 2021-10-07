@@ -20,8 +20,7 @@ package com.skyblockplus.utils;
 
 import static com.skyblockplus.utils.ApiHandler.playerFromUuid;
 import static com.skyblockplus.utils.ApiHandler.skyblockProfilesFromUuid;
-import static com.skyblockplus.utils.Constants.CRAFTED_MINIONS_TO_SLOTS;
-import static com.skyblockplus.utils.Constants.SKILL_NAMES;
+import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -267,6 +266,10 @@ public class Player {
 			return 60;
 		}
 
+		if(skillName.equals("hotm")){
+			return 7;
+		}
+
 		int maxLevel = higherDepth(getLevelingJson(), "leveling_caps." + skillName, 0);
 
 		if (skillName.equals("farming")) {
@@ -315,12 +318,19 @@ public class Player {
 
 	public SkillsStruct skillInfoFromExp(long skillExp, String skill, WeightType weightType) {
 		JsonArray skillsTable;
-		if (skill.equals("catacombs")) {
-			skillsTable = higherDepth(getLevelingJson(), "catacombs").getAsJsonArray();
-		} else if (skill.equals("runecrafting")) {
-			skillsTable = higherDepth(getLevelingJson(), "runecrafting_xp").getAsJsonArray();
-		} else {
-			skillsTable = higherDepth(getLevelingJson(), "leveling_xp").getAsJsonArray();
+		switch (skill) {
+			case "catacombs":
+				skillsTable = higherDepth(getLevelingJson(), "catacombs").getAsJsonArray();
+				break;
+			case "runecrafting":
+				skillsTable = higherDepth(getLevelingJson(), "runecrafting_xp").getAsJsonArray();
+				break;
+			case "hotm":
+				skillsTable = gson.toJsonTree(HOTM_EXP_TO_LEVEL).getAsJsonArray();
+				break;
+			default:
+				skillsTable = higherDepth(getLevelingJson(), "leveling_xp").getAsJsonArray();
+				break;
 		}
 
 		int maxLevel = getSkillMaxLevel(skill, weightType);
@@ -967,7 +977,7 @@ public class Player {
 	}
 
 	public EmbedBuilder defaultPlayerEmbed(String extra) {
-		return defaultEmbed(fixUsername(getUsername()) + (isIronman() ? " ♻️" : "" + extra), skyblockStatsLink())
+		return defaultEmbed(fixUsername(getUsername()) + (isIronman() ? " ♻️" : "") + extra, skyblockStatsLink())
 			.setThumbnail(getThumbnailUrl());
 	}
 
@@ -1080,7 +1090,11 @@ public class Player {
 		return highestAmount;
 	}
 
-	public enum WeightType {
+    public SkillsStruct getHOTM() {
+		return skillInfoFromExp(higherDepth(profileJson(), "mining_core.experience").getAsLong(), "hotm");
+    }
+
+    public enum WeightType {
 		NONE,
 		SENITHER,
 		LILY,

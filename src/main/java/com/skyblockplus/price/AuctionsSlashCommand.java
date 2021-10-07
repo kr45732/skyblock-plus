@@ -18,6 +18,7 @@
 
 package com.skyblockplus.price;
 
+import com.skyblockplus.miscellaneous.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -44,11 +45,8 @@ public class AuctionsSlashCommand extends SlashCommand {
 				event.paginate(
 					AuctionCommand.getPlayerAuction(
 						event.player,
-						event.getUser(),
-						null,
-						event.getHook(),
 						AuctionCommand.AuctionFilterType.valueOf(event.getOptionStr("filter", "none").toUpperCase()),
-						AuctionCommand.AuctionSortType.valueOf(event.getOptionStr("sort", "none").toUpperCase())
+						AuctionCommand.AuctionSortType.valueOf(event.getOptionStr("sort", "none").toUpperCase()),new PaginatorEvent(event)
 					)
 				);
 				break;

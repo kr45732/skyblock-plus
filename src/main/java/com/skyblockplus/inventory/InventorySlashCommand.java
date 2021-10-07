@@ -21,6 +21,7 @@ package com.skyblockplus.inventory;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.Utils.invalidEmbed;
 
+import com.skyblockplus.miscellaneous.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -48,9 +49,7 @@ public class InventorySlashCommand extends SlashCommand {
 						event.player,
 						event.getOptionStr("profile"),
 						event.getOptionInt("slot", 0),
-						event.getUser(),
-						null,
-						event.getHook()
+							new PaginatorEvent(event)
 					)
 				);
 				break;
