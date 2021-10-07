@@ -18,6 +18,10 @@
 
 package com.skyblockplus.guilds;
 
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Constants.GUILD_EXP_TO_LEVEL;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
@@ -28,18 +32,13 @@ import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-
-import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Constants.GUILD_EXP_TO_LEVEL;
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class GuildCommand extends Command {
 
@@ -50,12 +49,7 @@ public class GuildCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	public static EmbedBuilder getGuildExp(
-		JsonElement guildJson,
-		long days,
-		String playerUsername,
-		PaginatorEvent event
-	) {
+	public static EmbedBuilder getGuildExp(JsonElement guildJson, long days, String playerUsername, PaginatorEvent event) {
 		JsonElement members = higherDepth(guildJson, "members");
 		JsonArray membersArr = members.getAsJsonArray();
 		List<String> guildExpList = new ArrayList<>();
@@ -292,7 +286,7 @@ public class GuildCommand extends Command {
 			} catch (Exception ignored) {}
 		}
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator( event.getUser()).setColumns(3).setItemsPerPage(33);
+		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(3).setItemsPerPage(33);
 
 		paginateBuilder.setPaginatorExtras(
 			new PaginatorExtras()

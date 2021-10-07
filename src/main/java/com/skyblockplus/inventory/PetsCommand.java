@@ -18,6 +18,8 @@
 
 package com.skyblockplus.inventory;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
@@ -28,8 +30,6 @@ import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import net.dv8tion.jda.api.EmbedBuilder;
-
-import static com.skyblockplus.utils.Utils.*;
 
 public class PetsCommand extends Command {
 
@@ -51,7 +51,7 @@ public class PetsCommand extends Command {
 						return;
 					}
 
-					paginate(getPlayerPets(username, args.length == 3 ? args[2] : null,new PaginatorEvent(event)));
+					paginate(getPlayerPets(username, args.length == 3 ? args[2] : null, new PaginatorEvent(event)));
 					return;
 				}
 
@@ -64,7 +64,7 @@ public class PetsCommand extends Command {
 	public static EmbedBuilder getPlayerPets(String username, String profileName, PaginatorEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
-			CustomPaginator.Builder paginateBuilder = defaultPaginator( event.getUser()).setColumns(3).setItemsPerPage(15);
+			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(3).setItemsPerPage(15);
 
 			JsonArray playerPets = player.getPets();
 			for (JsonElement pet : playerPets) {
@@ -90,7 +90,7 @@ public class PetsCommand extends Command {
 					.setEveryPageThumbnail(player.getThumbnailUrl())
 					.setEveryPageTitleUrl(player.skyblockStatsLink())
 			);
-		event.paginate(paginateBuilder);
+			event.paginate(paginateBuilder);
 			return null;
 		}
 		return invalidEmbed(player.getFailCause());

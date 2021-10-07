@@ -18,6 +18,8 @@
 
 package com.skyblockplus.inventory;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.miscellaneous.PaginatorEvent;
@@ -26,13 +28,10 @@ import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.InvItem;
 import com.skyblockplus.utils.structs.PaginatorExtras;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class InventoryCommand extends Command {
 
@@ -63,14 +62,7 @@ public class InventoryCommand extends Command {
 					try {
 						slotNumber = Integer.parseInt(args.length == 4 ? args[3] : args[2].replace("slot:", ""));
 					} catch (Exception ignored) {}
-					paginate(
-						getPlayerInventoryList(
-							username,
-							args.length == 4 ? args[2] : null,
-							slotNumber,
-								new PaginatorEvent(event)
-						)
-					);
+					paginate(getPlayerInventoryList(username, args.length == 4 ? args[2] : null, slotNumber, new PaginatorEvent(event)));
 					return;
 				} else if (args.length == 3 || args.length == 2 || args.length == 1) {
 					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
@@ -100,12 +92,7 @@ public class InventoryCommand extends Command {
 			.submit();
 	}
 
-	public static EmbedBuilder getPlayerInventoryList(
-		String username,
-		String profileName,
-		int slotNum,
-		PaginatorEvent event
-	) {
+	public static EmbedBuilder getPlayerInventoryList(String username, String profileName, int slotNum, PaginatorEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			Map<Integer, InvItem> inventoryMap = player.getInventoryMap();
@@ -113,7 +100,7 @@ public class InventoryCommand extends Command {
 				List<String> pageTitles = new ArrayList<>();
 				List<String> pageThumbnails = new ArrayList<>();
 
-				CustomPaginator.Builder paginateBuilder = defaultPaginator( event.getUser()).setColumns(1).setItemsPerPage(1);
+				CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(1);
 
 				for (Map.Entry<Integer, InvItem> currentInvSlot : inventoryMap.entrySet()) {
 					InvItem currentInvStruct = currentInvSlot.getValue();

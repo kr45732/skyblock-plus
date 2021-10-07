@@ -123,11 +123,11 @@ public class GuildKickerCommand extends Command {
 		String guildId = higherDepth(guildJson, "_id").getAsString();
 		JsonElement guildLbJson = getJson("https://hypixel-app-api.senither.com/leaderboard/players/" + guildId);
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator( event.getUser()).setColumns(1).setItemsPerPage(20);
+		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(20);
 		if (!useKey) {
 			if (higherDepth(guildLbJson, "data") == null) {
 				return invalidEmbed(
-						"This guild is not on the senither leaderboard so you must set the Hypixel API key for this server and rerun the command with `--usekey` flag"
+					"This guild is not on the senither leaderboard so you must set the Hypixel API key for this server and rerun the command with `--usekey` flag"
 				);
 			}
 
@@ -179,16 +179,16 @@ public class GuildKickerCommand extends Command {
 
 				if (!meetsReqs) {
 					paginateBuilder.addItems(
-							"• **" +
-									higherDepth(guildMember, "username").getAsString() +
-									"** | Slayer: " +
-									formatNumber(slayer) +
-									" | Skills: " +
-									roundAndFormat(skills) +
-									" | Cata: " +
-									roundAndFormat(catacombs) +
-									" | Weight: " +
-									roundAndFormat(weight)
+						"• **" +
+						higherDepth(guildMember, "username").getAsString() +
+						"** | Slayer: " +
+						formatNumber(slayer) +
+						" | Skills: " +
+						roundAndFormat(skills) +
+						" | Cata: " +
+						roundAndFormat(catacombs) +
+						" | Weight: " +
+						roundAndFormat(weight)
 					);
 					missingReqsCount++;
 				}
@@ -197,15 +197,15 @@ public class GuildKickerCommand extends Command {
 			Duration duration = Duration.between(lastUpdated, Instant.now());
 
 			paginateBuilder
-					.setPaginatorExtras(
-							new PaginatorExtras()
-									.setEveryPageTitle("Guild Kick Helper")
-									.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
-									.setEveryPageText(
-											"**Total missing requirements:** " + missingReqsCount + "\n**Updated:** " + instantToDHM(duration) + " ago\n"
-									)
-					)
-					.ifItemsEmpty("Everyone meets the requirements");
+				.setPaginatorExtras(
+					new PaginatorExtras()
+						.setEveryPageTitle("Guild Kick Helper")
+						.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
+						.setEveryPageText(
+							"**Total missing requirements:** " + missingReqsCount + "\n**Updated:** " + instantToDHM(duration) + " ago\n"
+						)
+				)
+				.ifItemsEmpty("Everyone meets the requirements");
 		} else {
 			String hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
 
@@ -345,8 +345,7 @@ public class GuildKickerCommand extends Command {
 							"\n"
 						)
 				)
-				.ifItemsEmpty("Everyone meets the requirements")
-				;
+				.ifItemsEmpty("Everyone meets the requirements");
 		}
 		event.paginate(paginateBuilder);
 		return null;

@@ -47,9 +47,7 @@ public class GetAllGuildsIn extends Command {
 
 				if (args.length == 2) {
 					if (args[1].equals("list")) {
-						CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getAuthor())
-							.setColumns(1)
-							.setItemsPerPage(10);
+						CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getAuthor()).setColumns(1).setItemsPerPage(10);
 
 						for (Guild guild : jda.getGuilds()) {
 							if (guild.getName().startsWith("Skyblock Plus - Emoji Server")) {

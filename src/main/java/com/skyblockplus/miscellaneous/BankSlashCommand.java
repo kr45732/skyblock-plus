@@ -43,9 +43,7 @@ public class BankSlashCommand extends SlashCommand {
 				event.embed(BankCommand.getPlayerBalance(event.player, event.getOptionStr("profile")));
 				break;
 			case "history":
-				event.paginate(
-					BankCommand.getPlayerBankHistory(event.player, event.getOptionStr("profile"), new PaginatorEvent(event))
-				);
+				event.paginate(BankCommand.getPlayerBankHistory(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
 				break;
 			default:
 				event.embed(event.invalidCommandMessage());

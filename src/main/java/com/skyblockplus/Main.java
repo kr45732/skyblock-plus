@@ -162,7 +162,7 @@ public class Main {
 					new CommunityUpgradesCommand(),
 					new CakesCommand(),
 					new ActiveCoinsCommand(),
-						new HotmCommand()
+					new HotmCommand()
 				)
 				.build();
 
@@ -208,11 +208,11 @@ public class Main {
 					new HarpSlashCommand(),
 					new CakesSlashCommand(),
 					new ActiveCoinsSlashCommand(),
-						new GuildLeaderboardSlashCommand(),
-						new GuildRanksSlashCommand(),
-						new GuildKickerSlashCommand(),
-						new PetsSlashCommand(),
-						new UuidSlashCommand()
+					new GuildLeaderboardSlashCommand(),
+					new GuildRanksSlashCommand(),
+					new GuildKickerSlashCommand(),
+					new PetsSlashCommand(),
+					new UuidSlashCommand()
 				);
 
 		jda =

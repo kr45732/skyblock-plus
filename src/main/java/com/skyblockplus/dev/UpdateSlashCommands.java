@@ -28,7 +28,6 @@ import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 

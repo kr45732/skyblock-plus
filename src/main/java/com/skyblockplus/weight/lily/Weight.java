@@ -18,17 +18,19 @@
 
 package com.skyblockplus.weight.lily;
 
-import com.google.gson.JsonElement;
-import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.structs.WeightStruct;
-
 import static com.skyblockplus.utils.Constants.SKILL_NAMES;
 import static com.skyblockplus.utils.Constants.SLAYER_NAMES;
 import static com.skyblockplus.utils.Utils.getJson;
 
+import com.google.gson.JsonElement;
+import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.structs.WeightStruct;
+
 public class Weight {
 
-	public static final JsonElement lilyWeightConstants = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/LilyWeight.json");
+	public static final JsonElement lilyWeightConstants = getJson(
+		"https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/LilyWeight.json"
+	);
 
 	private final SlayerWeight slayerWeight;
 	private final SkillsWeight skillsWeight;

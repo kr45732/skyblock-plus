@@ -24,60 +24,61 @@ import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.entities.*;
 
 public class PaginatorEvent {
-    public boolean isSlashCommand() {
-        return isSlashCommand;
-    }
 
-    private final boolean isSlashCommand;
-    private final SlashCommandExecutedEvent slashCommand;
+	public boolean isSlashCommand() {
+		return isSlashCommand;
+	}
 
-    public SlashCommandExecutedEvent getSlashCommand() {
-        return slashCommand;
-    }
+	private final boolean isSlashCommand;
+	private final SlashCommandExecutedEvent slashCommand;
 
-    public CommandEvent getCommand() {
-        return command;
-    }
+	public SlashCommandExecutedEvent getSlashCommand() {
+		return slashCommand;
+	}
 
-    private final CommandEvent command;
+	public CommandEvent getCommand() {
+		return command;
+	}
 
-    public PaginatorEvent(Object event) {
-        isSlashCommand = event instanceof SlashCommandExecutedEvent;
+	private final CommandEvent command;
 
-        if(isSlashCommand){
-            slashCommand = ((SlashCommandExecutedEvent) event);
-            command = null;
-        }else{
-            slashCommand = null;
-            command = ((CommandEvent) event);
-        }
-    }
+	public PaginatorEvent(Object event) {
+		isSlashCommand = event instanceof SlashCommandExecutedEvent;
 
-    public User getUser() {
-        return isSlashCommand ? slashCommand.getUser() : command.getAuthor();
-    }
+		if (isSlashCommand) {
+			slashCommand = ((SlashCommandExecutedEvent) event);
+			command = null;
+		} else {
+			slashCommand = null;
+			command = ((CommandEvent) event);
+		}
+	}
 
-    public void paginate(CustomPaginator.Builder builder) {
-        paginate(builder, 0);
-    }
+	public User getUser() {
+		return isSlashCommand ? slashCommand.getUser() : command.getAuthor();
+	}
 
-    public void paginate(CustomPaginator.Builder builder, int page) {
-        if (isSlashCommand) {
-            builder.build().paginate(slashCommand.getHook(), page);
-        } else {
-            builder.build().paginate(slashCommand.getChannel(), page);
-        }
-    }
+	public void paginate(CustomPaginator.Builder builder) {
+		paginate(builder, 0);
+	}
 
-    public Guild getGuild() {
-        return isSlashCommand ? slashCommand.getGuild() : command.getGuild();
-    }
+	public void paginate(CustomPaginator.Builder builder, int page) {
+		if (isSlashCommand) {
+			builder.build().paginate(slashCommand.getHook(), page);
+		} else {
+			builder.build().paginate(slashCommand.getChannel(), page);
+		}
+	}
 
-    public MessageChannel getChannel() {
-        return isSlashCommand ? slashCommand.getChannel() : command.getChannel();
-    }
+	public Guild getGuild() {
+		return isSlashCommand ? slashCommand.getGuild() : command.getGuild();
+	}
 
-    public Member getMember() {
-        return isSlashCommand ? slashCommand.getMember() : command.getMember();
-    }
+	public MessageChannel getChannel() {
+		return isSlashCommand ? slashCommand.getChannel() : command.getChannel();
+	}
+
+	public Member getMember() {
+		return isSlashCommand ? slashCommand.getMember() : command.getMember();
+	}
 }

@@ -42,11 +42,7 @@ public class DungeonsCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	public static EmbedBuilder getPlayerDungeons(
-		String username,
-		String profileName,
-		PaginatorEvent event
-	) {
+	public static EmbedBuilder getPlayerDungeons(String username, String profileName, PaginatorEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			try {

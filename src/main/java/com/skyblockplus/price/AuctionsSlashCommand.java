@@ -46,7 +46,8 @@ public class AuctionsSlashCommand extends SlashCommand {
 					AuctionCommand.getPlayerAuction(
 						event.player,
 						AuctionCommand.AuctionFilterType.valueOf(event.getOptionStr("filter", "none").toUpperCase()),
-						AuctionCommand.AuctionSortType.valueOf(event.getOptionStr("sort", "none").toUpperCase()),new PaginatorEvent(event)
+						AuctionCommand.AuctionSortType.valueOf(event.getOptionStr("sort", "none").toUpperCase()),
+						new PaginatorEvent(event)
 					)
 				);
 				break;

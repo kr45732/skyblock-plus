@@ -266,7 +266,7 @@ public class Player {
 			return 60;
 		}
 
-		if(skillName.equals("hotm")){
+		if (skillName.equals("hotm")) {
 			return 7;
 		}
 
@@ -1090,11 +1090,11 @@ public class Player {
 		return highestAmount;
 	}
 
-    public SkillsStruct getHOTM() {
+	public SkillsStruct getHOTM() {
 		return skillInfoFromExp(higherDepth(profileJson(), "mining_core.experience").getAsLong(), "hotm");
-    }
+	}
 
-    public enum WeightType {
+	public enum WeightType {
 		NONE,
 		SENITHER,
 		LILY,

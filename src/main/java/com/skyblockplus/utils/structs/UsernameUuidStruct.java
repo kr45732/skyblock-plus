@@ -52,5 +52,3 @@ public class UsernameUuidStruct {
 		return "https://auctions.craftlink.xyz/players/" + uuid;
 	}
 }
-
-

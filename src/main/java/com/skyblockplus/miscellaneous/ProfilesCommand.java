@@ -18,6 +18,9 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -26,15 +29,11 @@ import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-
-import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class ProfilesCommand extends Command {
 
@@ -75,7 +74,7 @@ public class ProfilesCommand extends Command {
 			}
 		}
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator( event.getUser()).setColumns(1).setItemsPerPage(1);
+		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(1);
 
 		List<String> pageTitlesUrls = new ArrayList<>();
 		int count = 0;

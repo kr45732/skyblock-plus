@@ -53,9 +53,7 @@ public class ArmorCommand extends Command {
 						return;
 					}
 
-					paginate(
-						getPlayerEquippedArmor(username, args.length == 3 ? args[2] : null, new PaginatorEvent(event))
-					);
+					paginate(getPlayerEquippedArmor(username, args.length == 3 ? args[2] : null, new PaginatorEvent(event)));
 					return;
 				}
 
@@ -65,11 +63,7 @@ public class ArmorCommand extends Command {
 			.submit();
 	}
 
-	public static EmbedBuilder getPlayerEquippedArmor(
-		String username,
-		String profileName,
-		PaginatorEvent event
-	) {
+	public static EmbedBuilder getPlayerEquippedArmor(String username, String profileName, PaginatorEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			Map<Integer, InvItem> inventoryMap = player.getInventoryArmorMap();
@@ -77,7 +71,7 @@ public class ArmorCommand extends Command {
 				List<String> pageTitles = new ArrayList<>();
 				List<String> pageThumbnails = new ArrayList<>();
 
-				CustomPaginator.Builder paginateBuilder = defaultPaginator( event.getUser()).setColumns(1).setItemsPerPage(1);
+				CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(1);
 
 				for (Map.Entry<Integer, InvItem> currentInvSlot : inventoryMap.entrySet()) {
 					InvItem currentInvStruct = currentInvSlot.getValue();

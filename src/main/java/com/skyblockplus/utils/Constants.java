@@ -111,11 +111,7 @@ public class Constants {
 		"TERMINATOR"
 	);
 	public static final Map<String, String> HARP_SONG_ID_TO_NAME = new HashMap<>();
-	public static final List<Integer> HOTM_EXP_TO_LEVEL = Arrays.asList(
-			0,
-			3000,
-			9000,25000,60000,100000,150000
-	);
+	public static final List<Integer> HOTM_EXP_TO_LEVEL = Arrays.asList(0, 3000, 9000, 25000, 60000, 100000, 150000);
 
 	public static void initialize() {
 		try {

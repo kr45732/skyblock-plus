@@ -537,7 +537,7 @@ public class Utils {
 			.setEventWaiter(waiter)
 			.setTimeout(30, TimeUnit.SECONDS)
 			.setColor(botColor)
-				.setUsers(eventAuthor);
+			.setUsers(eventAuthor);
 	}
 
 	/* Format numbers or text */

@@ -93,7 +93,12 @@ public class EssenceWaiter {
 	}
 
 	private boolean condition(MessageReactionAddEvent event) {
-		return event.getMessageIdLong() == reactMessage.getIdLong() && !event.getUser().isBot() && event.getUser().equals(user) && validReactions.contains(event.getReactionEmote().getName());
+		return (
+			event.getMessageIdLong() == reactMessage.getIdLong() &&
+			!event.getUser().isBot() &&
+			event.getUser().equals(user) &&
+			validReactions.contains(event.getReactionEmote().getName())
+		);
 	}
 
 	private void actionOne(MessageReactionAddEvent event) {
@@ -119,16 +124,16 @@ public class EssenceWaiter {
 		reactMessage.editMessageEmbeds(eb.build()).queue();
 
 		waiter.waitForEvent(
-				MessageReactionAddEvent.class,
-				this::condition,
-				this::actionTwo,
-				30,
-				TimeUnit.SECONDS,
-				() -> reactMessage.clearReactions().queue()
+			MessageReactionAddEvent.class,
+			this::condition,
+			this::actionTwo,
+			30,
+			TimeUnit.SECONDS,
+			() -> reactMessage.clearReactions().queue()
 		);
 	}
 
-	private void actionTwo(MessageReactionAddEvent event){
+	private void actionTwo(MessageReactionAddEvent event) {
 		int endingLevel = essenceEmojiMap.get(event.getReactionEmote().getName());
 		reactMessage.clearReactions().complete();
 		int totalEssence = 0;
@@ -141,13 +146,13 @@ public class EssenceWaiter {
 		}
 		EmbedBuilder eb = defaultEmbed("Essence upgrade for " + itemName);
 		eb.addField(
-				"From " +
-						(startingLevel == -1 ? "not dungeonized" : startingLevel + (startingLevel == 1 ? " star" : " stars")) +
-						" to " +
-						endingLevel +
-						(endingLevel == 1 ? " star" : " stars"),
-				totalEssence + " " + higherDepth(itemJson, "type").getAsString().toLowerCase() + " essence",
-				false
+			"From " +
+			(startingLevel == -1 ? "not dungeonized" : startingLevel + (startingLevel == 1 ? " star" : " stars")) +
+			" to " +
+			endingLevel +
+			(endingLevel == 1 ? " star" : " stars"),
+			totalEssence + " " + higherDepth(itemJson, "type").getAsString().toLowerCase() + " essence",
+			false
 		);
 		eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId);
 		reactMessage.editMessageEmbeds(eb.build()).queue();

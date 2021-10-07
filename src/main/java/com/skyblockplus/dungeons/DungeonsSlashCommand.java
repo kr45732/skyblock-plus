@@ -38,9 +38,7 @@ public class DungeonsSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.paginate(
-			DungeonsCommand.getPlayerDungeons(event.player, event.getOptionStr("profile"), new PaginatorEvent(event))
-		);
+		event.paginate(DungeonsCommand.getPlayerDungeons(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
 	}
 
 	@Override

@@ -145,7 +145,7 @@ public class WeightCommand extends Command {
 						double catacombs = Double.parseDouble(args[4]);
 						double averageDungeonClass = Double.parseDouble(args[5]);
 						embed(calculateWeight(skillAverage, slayer, catacombs, averageDungeonClass));
-					}catch (Exception e){
+					} catch (Exception e) {
 						embed(invalidEmbed("One of the provided amounts are invalid."));
 					}
 					return;

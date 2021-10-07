@@ -51,7 +51,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 						event.player,
 						event.getOptionStr("profile"),
 						event.getOptionInt("slot", 0),
-							new PaginatorEvent(event)
+						new PaginatorEvent(event)
 					)
 				);
 				break;

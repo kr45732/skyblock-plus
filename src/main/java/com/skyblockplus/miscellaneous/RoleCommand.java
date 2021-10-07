@@ -18,6 +18,11 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
+import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
@@ -30,18 +35,12 @@ import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
+import java.util.ArrayList;
+import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
-import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
-import static com.skyblockplus.utils.Utils.*;
 
 public class RoleCommand extends Command {
 
@@ -547,7 +546,7 @@ public class RoleCommand extends Command {
 			return defaultEmbed("Automatic roles not enabled for this server");
 		}
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator( event.getUser()).setColumns(1).setItemsPerPage(30);
+		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(30);
 		List<String> rolesID = getJsonKeys(rolesJson);
 		rolesID.remove("enable");
 		for (String currentRoleName : rolesID) {
@@ -565,7 +564,9 @@ public class RoleCommand extends Command {
 					);
 					JsonArray guildRanks = higherDepth(guildRoleSettings, "guildRanks").getAsJsonArray();
 					for (JsonElement guildRank : guildRanks) {
-						paginateBuilder.addItems(event.getGuild().getRoleById(higherDepth(guildRank, "discordRoleId").getAsString()).getAsMention());
+						paginateBuilder.addItems(
+							event.getGuild().getRoleById(higherDepth(guildRank, "discordRoleId").getAsString()).getAsMention()
+						);
 					}
 				}
 			} else if (
@@ -574,14 +575,17 @@ public class RoleCommand extends Command {
 				"pet_enthusiast".equals(currentRoleName)
 			) {
 				paginateBuilder.addItems(
-					event.getGuild()
+					event
+						.getGuild()
 						.getRoleById(higherDepth(higherDepth(currentRole, "levels").getAsJsonArray().get(0), "roleId").getAsString())
 						.getAsMention()
 				);
 			} else {
 				JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
 				for (JsonElement currentLevel : levelsArray) {
-					paginateBuilder.addItems(event.getGuild().getRoleById(higherDepth(currentLevel, "roleId").getAsString()).getAsMention());
+					paginateBuilder.addItems(
+						event.getGuild().getRoleById(higherDepth(currentLevel, "roleId").getAsString()).getAsMention()
+					);
 				}
 			}
 		}
@@ -603,7 +607,7 @@ public class RoleCommand extends Command {
 					embed(updateRoles(args.length == 3 ? args[2] : null, event.getGuild(), event.getMember()));
 					return;
 				} else if (args.length == 2 && args[1].equals("list")) {
-					paginate(listRoles( new PaginatorEvent(event)));
+					paginate(listRoles(new PaginatorEvent(event)));
 					return;
 				}
 

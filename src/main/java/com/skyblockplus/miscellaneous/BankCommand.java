@@ -58,11 +58,7 @@ public class BankCommand extends Command {
 		return invalidEmbed(player.getFailCause());
 	}
 
-	public static EmbedBuilder getPlayerBankHistory(
-		String username,
-		String profileName,
-		PaginatorEvent event
-	) {
+	public static EmbedBuilder getPlayerBankHistory(String username, String profileName, PaginatorEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			JsonArray bankHistoryArray = player.getBankHistory();
@@ -123,9 +119,7 @@ public class BankCommand extends Command {
 						return;
 					}
 
-					paginate(
-						getPlayerBankHistory(username, args.length == 4 ? args[3] : null, new PaginatorEvent(event))
-					);
+					paginate(getPlayerBankHistory(username, args.length == 4 ? args[3] : null, new PaginatorEvent(event)));
 					return;
 				} else if (args.length == 3 || args.length == 2 || args.length == 1) {
 					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {

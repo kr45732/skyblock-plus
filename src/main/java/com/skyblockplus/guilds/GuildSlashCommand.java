@@ -53,11 +53,7 @@ public class GuildSlashCommand extends SlashCommand {
 			case "experience":
 				OptionMapping numDays = event.getEvent().getOption("days");
 				event.paginate(
-					GuildCommand.getGuildExpFromPlayer(
-						event.player,
-						numDays != null ? numDays.getAsLong() : 7,
-							new PaginatorEvent(event)
-					)
+					GuildCommand.getGuildExpFromPlayer(event.player, numDays != null ? numDays.getAsLong() : 7, new PaginatorEvent(event))
 				);
 				break;
 			default:

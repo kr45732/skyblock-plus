@@ -38,14 +38,21 @@ public class GuildKickerSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.paginate(GuildKickerCommand.getGuildKicker(event.player, event.getOptionStr("requirements"), event.getOptionBoolean("usekey", false), new PaginatorEvent(event)));
+		event.paginate(
+			GuildKickerCommand.getGuildKicker(
+				event.player,
+				event.getOptionStr("requirements"),
+				event.getOptionBoolean("usekey", false),
+				new PaginatorEvent(event)
+			)
+		);
 	}
 
 	@Override
 	public CommandData getCommandData() {
 		return new CommandData("guild-kicker", "Get helper which shows who to promote or demote in your guild")
-				.addOption(OptionType.STRING, "player", "Player username or mention")
-				.addOption(OptionType.STRING, "requirements", "The requirements a player must meet")
-				.addOption(OptionType.BOOLEAN, "usekey", "If the API key for this server should be used for more accurate results");
+			.addOption(OptionType.STRING, "player", "Player username or mention")
+			.addOption(OptionType.STRING, "requirements", "The requirements a player must meet")
+			.addOption(OptionType.BOOLEAN, "usekey", "If the API key for this server should be used for more accurate results");
 	}
 }

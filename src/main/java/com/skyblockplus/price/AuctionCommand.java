@@ -260,7 +260,7 @@ public class AuctionCommand extends Command {
 						return;
 					}
 
-					paginate(getPlayerAuction(username,filterType, sortType, new PaginatorEvent(event)));
+					paginate(getPlayerAuction(username, filterType, sortType, new PaginatorEvent(event)));
 					return;
 				}
 

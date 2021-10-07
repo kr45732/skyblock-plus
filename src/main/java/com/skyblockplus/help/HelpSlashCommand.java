@@ -34,9 +34,7 @@ public class HelpSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandExecutedEvent event) {
 		event.logCommand();
 
-		event.paginate(
-			HelpCommand.getHelp(event.getOptionStr("command"), new PaginatorEvent(event))
-		);
+		event.paginate(HelpCommand.getHelp(event.getOptionStr("command"), new PaginatorEvent(event)));
 	}
 
 	@Override

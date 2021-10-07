@@ -18,19 +18,18 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.SkillsStruct;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class HotmCommand extends Command {
 
@@ -48,16 +47,26 @@ public class HotmCommand extends Command {
 			JsonElement miningJson = higherDepth(player.profileJson(), "mining_core");
 
 			eb.addField(
-					"Statistics",
-					"• **HOTM level:** " + skillInfo.getCurrentLevel() + " (**Progress:** " +  roundProgress(skillInfo.getProgressToNext())
-							+ ")\n• **Tokens:** " + higherDepth(miningJson, "tokens", 0)
-							+ " (**Spent:** " + higherDepth(miningJson, "tokens_spent", 0)
-					+ ")\n• **Mithril powder:** " + formatNumber(higherDepth(miningJson, "powder_mithril", 0))
-					+ " (**Spent:** " + formatNumber(higherDepth(miningJson, "powder_spent_mithril", 0))
-					+ ")\n• **Gemstone powder:** " + formatNumber(higherDepth(miningJson, "powder_gemstone", 0))
-					+ " (**Spent:** " + formatNumber(higherDepth(miningJson, "powder_spent_gemstone", 0))
-					+ ")\n• **Selected ability:** " + higherDepth(miningJson, "selected_pickaxe_ability", "none").replace("_", " ")
-					,false
+				"Statistics",
+				"• **HOTM level:** " +
+				skillInfo.getCurrentLevel() +
+				" (**Progress:** " +
+				roundProgress(skillInfo.getProgressToNext()) +
+				")\n• **Tokens:** " +
+				higherDepth(miningJson, "tokens", 0) +
+				" (**Spent:** " +
+				higherDepth(miningJson, "tokens_spent", 0) +
+				")\n• **Mithril powder:** " +
+				formatNumber(higherDepth(miningJson, "powder_mithril", 0)) +
+				" (**Spent:** " +
+				formatNumber(higherDepth(miningJson, "powder_spent_mithril", 0)) +
+				")\n• **Gemstone powder:** " +
+				formatNumber(higherDepth(miningJson, "powder_gemstone", 0)) +
+				" (**Spent:** " +
+				formatNumber(higherDepth(miningJson, "powder_spent_gemstone", 0)) +
+				")\n• **Selected ability:** " +
+				higherDepth(miningJson, "selected_pickaxe_ability", "none").replace("_", " "),
+				false
 			);
 
 			Map<String, String> hotmPerkIdToName = new HashMap<>();
@@ -67,29 +76,39 @@ public class HotmCommand extends Command {
 
 			StringBuilder perksStr = new StringBuilder();
 			for (Entry<String, JsonElement> perk : higherDepth(miningJson, "nodes").getAsJsonObject().entrySet()) {
-				if(!perk.getValue().getAsJsonPrimitive().isNumber()){
+				if (!perk.getValue().getAsJsonPrimitive().isNumber()) {
 					continue;
 				}
-				perksStr.append("• **").append(capitalizeString(hotmPerkIdToName.getOrDefault(perk.getKey(), perk.getKey().replace("_", " ")))).append(":** ").append(perk.getValue().getAsInt()).append("/");
-				switch (perk.getKey()){
+				perksStr
+					.append("• **")
+					.append(capitalizeString(hotmPerkIdToName.getOrDefault(perk.getKey(), perk.getKey().replace("_", " "))))
+					.append(":** ")
+					.append(perk.getValue().getAsInt())
+					.append("/");
+				switch (perk.getKey()) {
 					case "great_explorer":
 					case "forge_time":
 					case "fortunate":
-						perksStr.append(20);break;
+						perksStr.append(20);
+						break;
 					case "lonesome_miner":
 					case "random_event":
-						perksStr.append(45);break;
+						perksStr.append(45);
+						break;
 					case "daily_powder":
 					case "efficient_miner":
 					case "mining_experience":
-						perksStr.append(100);break;
+						perksStr.append(100);
+						break;
 					case "professional":
-						perksStr.append(140);break;
+						perksStr.append(140);
+						break;
 					case "mole":
 						perksStr.append(190);
 						break;
 					default:
-						perksStr.append(50);break;
+						perksStr.append(50);
+						break;
 				}
 				perksStr.append("\n");
 			}
@@ -118,6 +137,6 @@ public class HotmCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-				.submit();
+			.submit();
 	}
 }

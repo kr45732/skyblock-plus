@@ -18,6 +18,11 @@
 
 package com.skyblockplus.guilds;
 
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.structs.HypixelGuildCache.memberCacheFromPlayer;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
@@ -30,8 +35,6 @@ import com.skyblockplus.utils.structs.HypixelGuildCache;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -39,11 +42,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.structs.HypixelGuildCache.memberCacheFromPlayer;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class GuildLeaderboardCommand extends Command {
 
@@ -135,7 +134,7 @@ public class GuildLeaderboardCommand extends Command {
 		String guildName = higherDepth(guildJson, "name").getAsString();
 		String guildId = higherDepth(guildJson, "_id").getAsString();
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator( event.getUser()).setColumns(2).setItemsPerPage(20);
+		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(2).setItemsPerPage(20);
 		HypixelGuildCache guildCache = hypixelGuildsCacheMap.getIfPresent(guildId);
 		List<String> guildMemberPlayersList = new ArrayList<>();
 		Instant lastUpdated = null;
@@ -219,13 +218,12 @@ public class GuildLeaderboardCommand extends Command {
 			amt +
 			(lastUpdated != null ? "\n**Last updated:** " + instantToDHM(Duration.between(lastUpdated, Instant.now())) + " ago" : "");
 
-		paginateBuilder
-			.setPaginatorExtras(
-				new PaginatorExtras()
-					.setEveryPageTitle(guildName)
-					.setEveryPageText(ebStr)
-					.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
-			);
+		paginateBuilder.setPaginatorExtras(
+			new PaginatorExtras()
+				.setEveryPageTitle(guildName)
+				.setEveryPageText(ebStr)
+				.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
+		);
 		event.paginate(paginateBuilder);
 
 		return null;

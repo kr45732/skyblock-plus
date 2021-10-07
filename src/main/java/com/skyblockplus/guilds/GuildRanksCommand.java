@@ -18,6 +18,11 @@
 
 package com.skyblockplus.guilds;
 
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.structs.HypixelGuildCache.memberCacheFromPlayer;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -28,19 +33,13 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.*;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.io.FileReader;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.structs.HypixelGuildCache.memberCacheFromPlayer;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class GuildRanksCommand extends Command {
 
@@ -372,7 +371,7 @@ public class GuildRanksCommand extends Command {
 
 		JsonArray ranksArr = higherDepth(lbSettings, "ranks").getAsJsonArray();
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator( event.getUser()).setColumns(1).setItemsPerPage(20);
+		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(20);
 		int totalChange = 0;
 		for (ArrayList<GuildRanksStruct> currentLeaderboard : guildLeaderboards) {
 			for (int i = 0; i < currentLeaderboard.size(); i++) {
@@ -406,22 +405,21 @@ public class GuildRanksCommand extends Command {
 			}
 		}
 
-		paginateBuilder
-			.setPaginatorExtras(
-				new PaginatorExtras()
-					.setEveryPageTitle("Rank changes for " + guildName)
-					.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
-					.setEveryPageText(
-						"**Total rank changes:** " +
-						totalChange +
-						(
-							lastUpdated != null
-								? "\n**Last updated:** " + instantToDHM(Duration.between(lastUpdated, Instant.now())) + " ago"
-								: ""
-						) +
-						"\n"
-					)
-			);
+		paginateBuilder.setPaginatorExtras(
+			new PaginatorExtras()
+				.setEveryPageTitle("Rank changes for " + guildName)
+				.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
+				.setEveryPageText(
+					"**Total rank changes:** " +
+					totalChange +
+					(
+						lastUpdated != null
+							? "\n**Last updated:** " + instantToDHM(Duration.between(lastUpdated, Instant.now())) + " ago"
+							: ""
+					) +
+					"\n"
+				)
+		);
 		event.paginate(paginateBuilder);
 
 		return null;

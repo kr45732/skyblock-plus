@@ -18,15 +18,15 @@
 
 package com.skyblockplus.dungeons;
 
+import static com.skyblockplus.utils.Constants.ESSENCE_ITEM_NAMES;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
-
-import static com.skyblockplus.utils.Constants.ESSENCE_ITEM_NAMES;
-import static com.skyblockplus.utils.Utils.*;
 
 public class EssenceSlashCommand extends SlashCommand {
 

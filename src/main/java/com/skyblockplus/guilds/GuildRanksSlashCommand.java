@@ -38,14 +38,21 @@ public class GuildRanksSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.paginate(GuildRanksCommand.getLeaderboard(event.player, event.getOptionBoolean("ironman", false), event.getOptionBoolean("usekey", false), new PaginatorEvent(event)));
+		event.paginate(
+			GuildRanksCommand.getLeaderboard(
+				event.player,
+				event.getOptionBoolean("ironman", false),
+				event.getOptionBoolean("usekey", false),
+				new PaginatorEvent(event)
+			)
+		);
 	}
 
 	@Override
 	public CommandData getCommandData() {
 		return new CommandData("guild-ranks", "Get helper which shows who to promote or demote in your guild")
-				.addOption(OptionType.STRING, "player", "Player username or mention")
-				.addOption(OptionType.BOOLEAN, "ironman", "If the leaderboard should be ironman only")
-				.addOption(OptionType.BOOLEAN, "usekey", "If the API key for this server should be used for more accurate results");
+			.addOption(OptionType.STRING, "player", "Player username or mention")
+			.addOption(OptionType.BOOLEAN, "ironman", "If the leaderboard should be ironman only")
+			.addOption(OptionType.BOOLEAN, "usekey", "If the API key for this server should be used for more accurate results");
 	}
 }

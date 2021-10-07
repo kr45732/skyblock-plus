@@ -478,7 +478,7 @@ public class HelpCommand extends Command {
 			}
 		}
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator( event.getUser())
+		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser())
 			.setColumns(1)
 			.setItemsPerPage(1)
 			.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles));
@@ -690,12 +690,7 @@ public class HelpCommand extends Command {
 				logCommand();
 				setArgs(2);
 
-				paginate(
-					getHelp(
-						args.length >= 2 ? args[1].toLowerCase() : null,
-						new PaginatorEvent(event)
-					)
-				);
+				paginate(getHelp(args.length >= 2 ? args[1].toLowerCase() : null, new PaginatorEvent(event)));
 			}
 		}
 			.submit();

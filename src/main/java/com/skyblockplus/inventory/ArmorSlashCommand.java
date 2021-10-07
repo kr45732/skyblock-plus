@@ -38,9 +38,7 @@ public class ArmorSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.paginate(
-			ArmorCommand.getPlayerEquippedArmor(event.player, event.getOptionStr("profile"),new PaginatorEvent(event))
-		);
+		event.paginate(ArmorCommand.getPlayerEquippedArmor(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
 	}
 
 	@Override

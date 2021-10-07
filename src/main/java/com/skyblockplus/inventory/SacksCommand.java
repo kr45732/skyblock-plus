@@ -18,6 +18,8 @@
 
 package com.skyblockplus.inventory;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.miscellaneous.PaginatorEvent;
@@ -25,12 +27,9 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.PaginatorExtras;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.util.Collections;
 import java.util.Map;
-
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class SacksCommand extends Command {
 
@@ -52,7 +51,7 @@ public class SacksCommand extends Command {
 						return;
 					}
 
-					paginate(getPlayerSacks(username, args.length == 3 ? args[2] : null,new PaginatorEvent(event)));
+					paginate(getPlayerSacks(username, args.length == 3 ? args[2] : null, new PaginatorEvent(event)));
 					return;
 				}
 
@@ -62,16 +61,12 @@ public class SacksCommand extends Command {
 			.submit();
 	}
 
-	public static EmbedBuilder getPlayerSacks(
-		String username,
-		String profileName,
-		PaginatorEvent event
-	) {
+	public static EmbedBuilder getPlayerSacks(String username, String profileName, PaginatorEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			Map<String, Integer> sacksMap = player.getPlayerSacks();
 			if (sacksMap != null) {
-				CustomPaginator.Builder paginateBuilder = defaultPaginator( event.getUser()).setColumns(1).setItemsPerPage(20);
+				CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(20);
 
 				sacksMap
 					.entrySet()
