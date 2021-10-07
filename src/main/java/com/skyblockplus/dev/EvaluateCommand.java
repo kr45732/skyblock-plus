@@ -52,7 +52,7 @@ public class EvaluateCommand extends Command {
 			"java.time",
 			"java.util",
 			"java.util.concurrent",
-			"java.util.streamJsonArray",
+			"java.util.stream",
 			"net.dv8tion.jda.api",
 			"net.dv8tion.jda.api.entities",
 			"net.dv8tion.jda.api.entities.impl",

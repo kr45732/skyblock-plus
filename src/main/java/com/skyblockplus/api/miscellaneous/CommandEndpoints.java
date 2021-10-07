@@ -283,7 +283,7 @@ public class CommandEndpoints {
 		} catch (Exception ignored) {}
 
 		try {
-			description += "**Output streamJsonArray:** [link](" + higherDepth(jsonBody, "data.output_stream_url").getAsString() + ")\n";
+			description += "**Output stream:** [link](" + higherDepth(jsonBody, "data.output_stream_url").getAsString() + ")\n";
 		} catch (Exception ignored) {}
 
 		try {

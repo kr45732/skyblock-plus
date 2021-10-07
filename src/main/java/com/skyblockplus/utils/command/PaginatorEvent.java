@@ -68,7 +68,7 @@ public class PaginatorEvent {
 		if (isSlashCommand) {
 			builder.build().paginate(slashCommand.getHook(), page);
 		} else {
-			builder.build().paginate(slashCommand.getChannel(), page);
+			builder.build().paginate(command.getChannel(), page);
 		}
 	}
 

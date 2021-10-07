@@ -51,20 +51,23 @@ public class TalismanBagCommand extends Command {
 			protected void execute() {
 				logCommand();
 
-				if (
-					((args.length == 4) && args[3].startsWith("slot")) ||
-					((args.length == 3) && args[2].startsWith("slot")) ||
-					((args.length == 2) && args[1].startsWith("slot"))
-				) {
-					if (getMentionedUsername(args.length == 2 ? -1 : 1)) {
+				int slotNumber = -1;
+				for (int i = 0; i < args.length; i++) {
+					if (args[i].startsWith("slot:")) {
+						try{
+							slotNumber = Math.max(0, Integer.parseInt(args[i].split("slot:")[1]));
+							removeArg(i);}
+						catch (Exception ignored){}
+					}
+				}
+
+				if (slotNumber != -1  && (args.length == 3 || args.length == 2 || args.length == 1))
+				{
+					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
 						return;
 					}
 
-					int slotNumber = 1;
-					try {
-						slotNumber = Integer.parseInt(args.length == 4 ? args[3] : args[2].replace("slot:", ""));
-					} catch (Exception ignored) {}
-					paginate(getPlayerTalismansList(username, args.length == 4 ? args[2] : null, slotNumber, new PaginatorEvent(event)));
+					paginate(getPlayerTalismansList(username, args.length == 3 ? args[2] : null, slotNumber, new PaginatorEvent(event)));
 					return;
 				} else if (args.length == 3 || args.length == 2 || args.length == 1) {
 					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
