@@ -22,6 +22,7 @@ import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class AuctionsSlashCommand extends SlashCommand {
@@ -40,7 +41,7 @@ public class AuctionsSlashCommand extends SlashCommand {
 					return;
 				}
 
-				event.paginate(AuctionCommand.getPlayerAuction(event.player, event.getUser(), null, event.getHook()));
+				event.paginate(AuctionCommand.getPlayerAuction(event.player, event.getUser(), null, event.getHook(), AuctionCommand.AuctionFilterType.valueOf(event.getOptionStr("filter", "none").toUpperCase()), AuctionCommand.AuctionSortType.valueOf(event.getOptionStr("sort", "none").toUpperCase())));
 				break;
 			case "uuid":
 				event.embed(AuctionCommand.getAuctionByUuid(event.getOptionStr("uuid")));
@@ -56,7 +57,10 @@ public class AuctionsSlashCommand extends SlashCommand {
 		return new CommandData("auctions", "Main auctions command")
 				.addSubcommands(
 						new SubcommandData("player", "Get player's active (not claimed) auctions on all profiles")
-								.addOption(OptionType.STRING, "player", "Player username or mention"),
+								.addOption(OptionType.STRING, "player", "Player username or mention")
+								.addOptions(new OptionData(OptionType.STRING, "filter", "How the auctions should be filtered").addChoice("Sold", "sold").addChoice("Unsold", "Unsold"))
+								.addOptions(new OptionData(OptionType.STRING, "sort", "How the auctions should be sorted").addChoice("Low", "low").addChoice("High", "high"))
+						,
 						new SubcommandData("uuid", "Get an auction by it's UUID").addOption(OptionType.STRING, "uuid", "Auction UUID", true)
 				);
 	}

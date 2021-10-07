@@ -18,14 +18,6 @@
 
 package com.skyblockplus.utils;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.ApiHandler.playerFromUuid;
-import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
-import static java.lang.String.join;
-import static java.util.Collections.nCopies;
-
 import club.minnced.discord.webhook.external.JDAWebhookClient;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -38,22 +30,6 @@ import com.skyblockplus.features.listeners.AutomaticGuild;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.exceptionhandlers.ExceptionExecutor;
 import com.skyblockplus.utils.structs.*;
-import java.awt.*;
-import java.io.*;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.*;
-import java.util.List;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
 import me.nullicorn.nedit.type.NBTList;
@@ -76,6 +52,31 @@ import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.Dsl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import java.awt.*;
+import java.io.*;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.utils.ApiHandler.playerFromUuid;
+import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
+import static java.lang.String.join;
+import static java.util.Collections.nCopies;
 
 public class Utils {
 
@@ -1221,11 +1222,21 @@ public class Utils {
 		}
 	}
 
-	public static Permission[] defaultPerms(Permission... otherPerms) {
-		List<Permission> defaultPerms = new ArrayList<>(
-			Arrays.asList(Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_MANAGE)
-		);
-		defaultPerms.addAll(Arrays.asList(otherPerms));
-		return defaultPerms.toArray(new Permission[0]);
+	public static Permission[] defaultPerms() {
+		return new Permission[]{Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_MANAGE};
+	}
+
+	public static Stream<JsonElement> streamJsonArray(JsonArray array){
+		List<JsonElement> list = new ArrayList<>();
+		for (JsonElement element : array) {
+			list.add(element);
+		}
+		return list.stream();
+	}
+
+	public static JsonArray collectJsonArray(Stream<JsonElement> list){
+		JsonArray array = new JsonArray();
+		list.forEach(array::add);
+		return array;
 	}
 }

@@ -18,10 +18,6 @@
 
 package com.skyblockplus.price;
 
-import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
@@ -31,13 +27,21 @@ import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import java.time.Duration;
-import java.time.Instant;
 import me.nullicorn.nedit.NBTReader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.InteractionHook;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Comparator;
+import java.util.Locale;
+import java.util.stream.Stream;
+
+import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Utils.*;
 
 public class AuctionCommand extends Command {
 
@@ -48,7 +52,7 @@ public class AuctionCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	public static EmbedBuilder getPlayerAuction(String username, User user, MessageChannel channel, InteractionHook hook) {
+	public static EmbedBuilder getPlayerAuction(String username, User user, MessageChannel channel, InteractionHook hook, AuctionFilterType filterType, AuctionSortType sortType) {
 		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
 		if (usernameUuidStruct.isNotValid()) {
 			return invalidEmbed(usernameUuidStruct.getFailCause());
@@ -58,31 +62,39 @@ public class AuctionCommand extends Command {
 		if (auctionsResponse.isNotValid()) {
 			return invalidEmbed(auctionsResponse.getFailCause());
 		}
-		JsonArray auctionsArray = auctionsResponse.getResponse().getAsJsonArray();
 
-		String[][] auctions = new String[auctionsArray.size()][2];
+		JsonArray auctionsArray = auctionsResponse.getResponse().getAsJsonArray();
+		Stream<JsonElement> stream = streamJsonArray(auctionsArray);
+		if(filterType == AuctionFilterType.SOLD || filterType == AuctionFilterType.UNSOLD){
+			stream = stream.filter(auction -> (filterType == AuctionFilterType.SOLD) == (higherDepth(auction, "highest_bid_amount", 0) >= higherDepth(auction, "starting_bid", 0)));
+		}
+		if(sortType == AuctionSortType.LOW || sortType == AuctionSortType.HIGH){
+			stream = stream.sorted(Comparator.comparingLong(auction -> (sortType == AuctionSortType.LOW ? 1 : -1) * Math.max(higherDepth(auction, "highest_bid_amount", 0L), higherDepth(auction, "starting_bid", 0))));
+		}
+		auctionsArray = collectJsonArray(stream);
 
 		long totalSoldValue = 0;
 		long totalPendingValue = 0;
 
+		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, user).setColumns(1).setItemsPerPage(10);
+		PaginatorExtras extras = new PaginatorExtras();
+
 		for (int i = 0; i < auctionsArray.size(); i++) {
 			JsonElement currentAuction = auctionsArray.get(i);
 			if (!higherDepth(currentAuction, "claimed").getAsBoolean()) {
+				String auctionName;
 				String auction;
 				boolean isPet = higherDepth(currentAuction, "item_lore").getAsString().toLowerCase().contains("pet");
-				boolean bin = false;
-				try {
-					bin = higherDepth(currentAuction, "bin").getAsBoolean();
-				} catch (NullPointerException ignored) {}
+				boolean bin = higherDepth(currentAuction, "bin", false);
 
 				Instant endingAt = Instant.ofEpochMilli(higherDepth(currentAuction, "end").getAsLong());
 				Duration duration = Duration.between(Instant.now(), endingAt);
 				String timeUntil = instantToDHM(duration);
 
 				if (higherDepth(currentAuction, "item_name").getAsString().equals("Enchanted Book")) {
-					auctions[i][0] = parseMcCodes(higherDepth(currentAuction, "item_lore").getAsString().split("\n")[0]);
+					auctionName = parseMcCodes(higherDepth(currentAuction, "item_lore").getAsString().split("\n")[0]);
 				} else {
-					auctions[i][0] =
+					auctionName =
 						(isPet ? capitalizeString(higherDepth(currentAuction, "tier").getAsString().toLowerCase()) + " " : "") +
 						higherDepth(currentAuction, "item_name").getAsString();
 				}
@@ -106,41 +118,34 @@ public class AuctionCommand extends Command {
 						auction = "Auction did not sell";
 					}
 				}
-				auctions[i][1] = auction;
+
+					extras.addEmbedField(auctionName, auction, false);
 			}
 		}
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, user).setColumns(1).setItemsPerPage(10);
-		PaginatorExtras extras = new PaginatorExtras()
-			.setEveryPageTitle(usernameUuidStruct.getUsername())
-			.setEveryPageTitleUrl(skyblockStatsLink(usernameUuidStruct.getUsername(), null))
-			.setEveryPageThumbnail(usernameUuidStruct.getAvatarlUrl())
-			.setEveryPageText(
-				"**Sold Auctions Value:** " +
-				simplifyNumber(totalSoldValue) +
-				"\n**Unsold Auctions Value:** " +
-				simplifyNumber(totalPendingValue)
-			);
-
-		for (String[] auction : auctions) {
-			if (auction[0] != null) {
-				for (String[] strings : auctions) {
-					if (strings[0] != null) {
-						extras.addEmbedField(strings[0], strings[1], false);
-					}
-				}
-				if (channel != null) {
-					paginateBuilder.setPaginatorExtras(extras).build().paginate(channel, 0);
-				} else {
-					paginateBuilder.setPaginatorExtras(extras).build().paginate(hook, 0);
-				}
-				return null;
-			}
+		if(extras.getEmbedFields().size() == 0){
+			return invalidEmbed("No auctions found for " + usernameUuidStruct.getUsername());
 		}
 
-		EmbedBuilder eb = defaultEmbed(usernameUuidStruct.getUsername(), usernameUuidStruct.getAuctionUrl());
-		eb.setTitle("No auctions found for " + usernameUuidStruct.getUsername(), null);
-		return eb;
+		extras
+				.setEveryPageTitle(usernameUuidStruct.getUsername())
+				.setEveryPageTitleUrl(skyblockStatsLink(usernameUuidStruct.getUsername(), null))
+				.setEveryPageThumbnail(usernameUuidStruct.getAvatarlUrl())
+				.setEveryPageText(
+						"**Sold Auctions Value:** " +
+								simplifyNumber(totalSoldValue) +
+								"\n**Unsold Auctions Value:** " +
+								simplifyNumber(totalPendingValue)
+				);
+
+
+
+		if (channel != null) {
+			paginateBuilder.setPaginatorExtras(extras).build().paginate(channel, 0);
+		} else {
+			paginateBuilder.setPaginatorExtras(extras).build().paginate(hook, 0);
+		}
+		return null;
 	}
 
 	public static EmbedBuilder getAuctionByUuid(String auctionUuid) {
@@ -207,7 +212,6 @@ public class AuctionCommand extends Command {
 		}
 
 		eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId);
-
 		return eb.setDescription(ebStr);
 	}
 
@@ -221,12 +225,37 @@ public class AuctionCommand extends Command {
 				if (args.length == 3 && args[1].equals("uuid")) {
 					embed(getAuctionByUuid(args[2]));
 					return;
-				} else if (args.length == 2 || args.length == 1) {
+				} else if (args.length  == 4 || args.length == 3 || args.length == 2 || args.length == 1) {
+					AuctionFilterType filterType = AuctionFilterType.NONE;
+					for (int i = 0; i < args.length; i++) {
+						if (args[i].startsWith("filter:")) {
+							try {
+								filterType = AuctionFilterType.valueOf(args[i].split("filter:")[1].toUpperCase(Locale.ROOT));
+								removeArg(i);
+							}catch (IllegalArgumentException e){
+								embed(invalidEmbed("Invalid filter type provided"));
+								return ;
+							}
+						}
+					}
+					AuctionSortType sortType = AuctionSortType.NONE;
+					for (int i = 0; i < args.length; i++) {
+						if (args[i].startsWith("sort:")) {
+							try {
+								sortType = AuctionSortType.valueOf(args[i].split("sort:")[1].toUpperCase());
+								removeArg(i);
+							}catch (IllegalArgumentException e){
+								embed(invalidEmbed("Invalid sort type provided"));
+								return ;
+							}
+						}
+					}
+
 					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
 						return;
 					}
 
-					paginate(getPlayerAuction(username, event.getAuthor(), event.getChannel(), null));
+					paginate(getPlayerAuction(username, event.getAuthor(), event.getChannel(), null, filterType, sortType));
 					return;
 				}
 
@@ -234,5 +263,17 @@ public class AuctionCommand extends Command {
 			}
 		}
 			.submit();
+	}
+
+	public enum AuctionFilterType {
+		NONE,
+		SOLD,
+		UNSOLD
+	}
+
+	public enum AuctionSortType {
+		NONE,
+		LOW,
+		HIGH
 	}
 }

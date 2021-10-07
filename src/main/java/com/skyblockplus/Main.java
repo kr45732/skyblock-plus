@@ -160,7 +160,8 @@ public class Main {
 					new CheckEmojisCommand(),
 					new HarpCommand(),
 					new CommunityUpgradesCommand(),
-					new CakesCommand()
+					new CakesCommand(),
+						new ActiveCoinsCommand()
 				)
 				.build();
 
@@ -202,7 +203,8 @@ public class Main {
 				new SacksSlashCommand(),
 				new WardrobeSlashCommand(),
 				new HarpSlashCommand(),
-				new CakesSlashCommand()
+				new CakesSlashCommand(),
+					new ActiveCoinsSlashCommand()
 			);
 
 		jda =
