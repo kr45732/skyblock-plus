@@ -44,6 +44,6 @@ public class LinkSlashCommand extends SlashCommand {
 	@Override
 	public CommandData getCommandData() {
 		return new CommandData("link", "Get what Hypixel account you are linked to")
-				.addOption(OptionType.STRING, "player", "Link your Hypixel account to this bot");
+			.addOption(OptionType.STRING, "player", "Link your Hypixel account to this bot");
 	}
 }

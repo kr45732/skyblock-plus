@@ -43,7 +43,7 @@ public class HarpSlashCommand extends SlashCommand {
 	@Override
 	public CommandData getCommandData() {
 		return new CommandData("harp", "Get a player's harp statistics")
-				.addOption(OptionType.STRING, "player", "Player username or mention")
-				.addOption(OptionType.STRING, "profile", "Profile name");
+			.addOption(OptionType.STRING, "player", "Player username or mention")
+			.addOption(OptionType.STRING, "profile", "Profile name");
 	}
 }

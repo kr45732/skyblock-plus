@@ -18,6 +18,9 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.ApiHandler.getAuctionFromPlayer;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -25,13 +28,9 @@ import com.skyblockplus.utils.ApiHandler;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.HypixelResponse;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.time.Duration;
 import java.time.Instant;
-
-import static com.skyblockplus.utils.ApiHandler.getAuctionFromPlayer;
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class ActiveCoinsCommand extends Command {
 
@@ -49,10 +48,12 @@ public class ActiveCoinsCommand extends Command {
 			double bankBalance = player.getBankBalance();
 			double purseCoins = player.getPurseCoins();
 			double auctionCoins = 0;
-			HypixelResponse playerAuctions =  getAuctionFromPlayer(player.getUuid());
-			if(!playerAuctions.isNotValid()){
+			HypixelResponse playerAuctions = getAuctionFromPlayer(player.getUuid());
+			if (!playerAuctions.isNotValid()) {
 				for (JsonElement currentAuction : playerAuctions.getResponse().getAsJsonArray()) {
-					if (higherDepth(currentAuction, "claimed").getAsBoolean()) {continue;}
+					if (higherDepth(currentAuction, "claimed").getAsBoolean()) {
+						continue;
+					}
 					Instant endingAt = Instant.ofEpochMilli(higherDepth(currentAuction, "end").getAsLong());
 					Duration duration = Duration.between(Instant.now(), endingAt);
 					long highestBid = higherDepth(currentAuction, "highest_bid_amount", 0);

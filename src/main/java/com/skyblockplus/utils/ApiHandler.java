@@ -18,6 +18,8 @@
 
 package com.skyblockplus.utils;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.gson.JsonArray;
@@ -26,14 +28,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
-
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.time.Duration;
@@ -45,15 +39,17 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
-
-import static com.skyblockplus.utils.Utils.*;
+import okhttp3.MediaType;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
 
 public class ApiHandler {
 
-	public static final Cache<String, String> uuidToUsernameCache = Caffeine
-		.newBuilder()
-		.expireAfterAccess(30, TimeUnit.MINUTES)
-		.build();
+	public static final Cache<String, String> uuidToUsernameCache = Caffeine.newBuilder().expireAfterAccess(30, TimeUnit.MINUTES).build();
 
 	public static final ConcurrentHashMap<String, Instant> uuidToTimeSkyblockProfiles = new ConcurrentHashMap<>();
 
@@ -64,8 +60,13 @@ public class ApiHandler {
 	);
 	public static boolean useAlternativeApi = reloadSettingsJson();
 
-	public static boolean reloadSettingsJson(){
-		useAlternativeApi = higherDepth(getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/settings.json"), "useAlternativeApi", false);
+	public static boolean reloadSettingsJson() {
+		useAlternativeApi =
+			higherDepth(
+				getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/settings.json"),
+				"useAlternativeApi",
+				false
+			);
 		return useAlternativeApi;
 	}
 
@@ -107,26 +108,26 @@ public class ApiHandler {
 		return uuidUsername(uuid);
 	}
 
-	private static UsernameUuidStruct uuidUsername(String username){
+	private static UsernameUuidStruct uuidUsername(String username) {
 		try {
-			if(!useAlternativeApi) {
+			if (!useAlternativeApi) {
 				JsonElement usernameJson = getJson("https://api.ashcon.app/mojang/v2/user/" + username);
 				try {
 					UsernameUuidStruct usernameUuidStruct = new UsernameUuidStruct(
-							higherDepth(usernameJson, "username").getAsString(),
-							higherDepth(usernameJson, "uuid").getAsString().replace("-", "")
+						higherDepth(usernameJson, "username").getAsString(),
+						higherDepth(usernameJson, "uuid").getAsString().replace("-", "")
 					);
 					uuidToUsernameCache.put(usernameUuidStruct.getUuid(), usernameUuidStruct.getUsername());
 					return usernameUuidStruct;
 				} catch (Exception e) {
 					return new UsernameUuidStruct(higherDepth(usernameJson, "reason").getAsString());
 				}
-			}else{
+			} else {
 				JsonElement usernameJson = getJson("https://playerdb.co/api/player/minecraft/" + username);
 				try {
 					UsernameUuidStruct usernameUuidStruct = new UsernameUuidStruct(
-							higherDepth(usernameJson, "data.player.username").getAsString(),
-							higherDepth(usernameJson, "data.player.id").getAsString().replace("-", "")
+						higherDepth(usernameJson, "data.player.username").getAsString(),
+						higherDepth(usernameJson, "data.player.id").getAsString().replace("-", "")
 					);
 					uuidToUsernameCache.put(usernameUuidStruct.getUuid(), usernameUuidStruct.getUsername());
 					return usernameUuidStruct;
@@ -138,12 +139,12 @@ public class ApiHandler {
 		return new UsernameUuidStruct();
 	}
 
-	public static List<String> getNameHistory(String uuid){
+	public static List<String> getNameHistory(String uuid) {
 		try {
 			List<String> nameHistory = new ArrayList<>();
 
 			JsonElement usernameJson;
-			if(!useAlternativeApi) {
+			if (!useAlternativeApi) {
 				usernameJson = getJson("https://api.ashcon.app/mojang/v2/user/" + uuid);
 				String username = higherDepth(usernameJson, "username").getAsString();
 				for (JsonElement name : higherDepth(usernameJson, "username_history").getAsJsonArray()) {
@@ -151,7 +152,7 @@ public class ApiHandler {
 						nameHistory.add(higherDepth(name, "username").getAsString());
 					}
 				}
-			}else{
+			} else {
 				usernameJson = higherDepth(getJson("https://playerdb.co/api/player/minecraft/" + uuid), "data.player");
 				String username = higherDepth(usernameJson, "username").getAsString();
 				for (JsonElement name : higherDepth(usernameJson, "meta.name_history").getAsJsonArray()) {
@@ -161,7 +162,7 @@ public class ApiHandler {
 				}
 			}
 			return nameHistory;
-		}catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return new ArrayList<>();
@@ -176,21 +177,24 @@ public class ApiHandler {
 		} else {
 			future =
 				asyncHttpClient
-						.prepareGet((useAlternativeApi ? "https://playerdb.co/api/player/minecraft/" : "https://api.ashcon.app/mojang/v2/user/") + uuid)
-						.execute()
-						.toCompletableFuture()
-						.thenApply(uuidToUsernameResponse -> {
-							try {
-								String username = Utils
-										.higherDepth(JsonParser.parseString(uuidToUsernameResponse.getResponseBody()), (useAlternativeApi ? "data.player." : "") + "username")
-										.getAsString();
-								uuidToUsernameCache.put(uuid, username);
-								return username;
-							} catch (Exception ignored) {
-							}
-							return null;
-						});
-
+					.prepareGet(
+						(useAlternativeApi ? "https://playerdb.co/api/player/minecraft/" : "https://api.ashcon.app/mojang/v2/user/") + uuid
+					)
+					.execute()
+					.toCompletableFuture()
+					.thenApply(uuidToUsernameResponse -> {
+						try {
+							String username = Utils
+								.higherDepth(
+									JsonParser.parseString(uuidToUsernameResponse.getResponseBody()),
+									(useAlternativeApi ? "data.player." : "") + "username"
+								)
+								.getAsString();
+							uuidToUsernameCache.put(uuid, username);
+							return username;
+						} catch (Exception ignored) {}
+						return null;
+					});
 		}
 
 		return future;

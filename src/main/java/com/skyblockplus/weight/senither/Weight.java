@@ -18,10 +18,10 @@
 
 package com.skyblockplus.weight.senither;
 
+import static com.skyblockplus.utils.Constants.*;
+
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.WeightStruct;
-
-import static com.skyblockplus.utils.Constants.*;
 
 public class Weight {
 

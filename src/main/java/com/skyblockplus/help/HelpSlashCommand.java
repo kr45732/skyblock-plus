@@ -33,12 +33,14 @@ public class HelpSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandExecutedEvent event) {
 		event.logCommand();
 
-		event.paginate(HelpCommand.getHelp(event.getOptionStr("command"), event.getMember(), null, event.getHook(), event.getGuild().getId()));
+		event.paginate(
+			HelpCommand.getHelp(event.getOptionStr("command"), event.getMember(), null, event.getHook(), event.getGuild().getId())
+		);
 	}
 
 	@Override
 	public CommandData getCommandData() {
 		return new CommandData("help", "Show the help page for this bot")
-				.addOption(OptionType.STRING, "command", "Name of command or page number");
+			.addOption(OptionType.STRING, "command", "Name of command or page number");
 	}
 }

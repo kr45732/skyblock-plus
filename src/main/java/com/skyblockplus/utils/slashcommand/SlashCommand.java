@@ -18,10 +18,10 @@
 
 package com.skyblockplus.utils.slashcommand;
 
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
-
 import static com.skyblockplus.Main.client;
 import static com.skyblockplus.utils.Utils.*;
+
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public abstract class SlashCommand {
 
@@ -57,5 +57,5 @@ public abstract class SlashCommand {
 			.queue();
 	}
 
-    public abstract CommandData getCommandData();
+	public abstract CommandData getCommandData();
 }

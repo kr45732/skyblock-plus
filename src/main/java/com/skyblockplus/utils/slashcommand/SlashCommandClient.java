@@ -71,7 +71,7 @@ public class SlashCommandClient extends ListenerAdapter {
 		return startTime;
 	}
 
-	public List<SlashCommand> getSlashCommands(){
+	public List<SlashCommand> getSlashCommands() {
 		return slashCommands;
 	}
 }

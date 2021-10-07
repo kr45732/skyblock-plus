@@ -18,6 +18,10 @@
 
 package com.skyblockplus.price;
 
+import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
@@ -27,21 +31,16 @@ import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import me.nullicorn.nedit.NBTReader;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.interactions.InteractionHook;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.stream.Stream;
-
-import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Utils.*;
+import me.nullicorn.nedit.NBTReader;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 
 public class AuctionCommand extends Command {
 
@@ -52,7 +51,14 @@ public class AuctionCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	public static EmbedBuilder getPlayerAuction(String username, User user, MessageChannel channel, InteractionHook hook, AuctionFilterType filterType, AuctionSortType sortType) {
+	public static EmbedBuilder getPlayerAuction(
+		String username,
+		User user,
+		MessageChannel channel,
+		InteractionHook hook,
+		AuctionFilterType filterType,
+		AuctionSortType sortType
+	) {
 		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
 		if (usernameUuidStruct.isNotValid()) {
 			return invalidEmbed(usernameUuidStruct.getFailCause());
@@ -65,11 +71,21 @@ public class AuctionCommand extends Command {
 
 		JsonArray auctionsArray = auctionsResponse.getResponse().getAsJsonArray();
 		Stream<JsonElement> stream = streamJsonArray(auctionsArray);
-		if(filterType == AuctionFilterType.SOLD || filterType == AuctionFilterType.UNSOLD){
-			stream = stream.filter(auction -> (filterType == AuctionFilterType.SOLD) == (higherDepth(auction, "highest_bid_amount", 0) >= higherDepth(auction, "starting_bid", 0)));
+		if (filterType == AuctionFilterType.SOLD || filterType == AuctionFilterType.UNSOLD) {
+			stream =
+				stream.filter(auction ->
+					(filterType == AuctionFilterType.SOLD) ==
+					(higherDepth(auction, "highest_bid_amount", 0) >= higherDepth(auction, "starting_bid", 0))
+				);
 		}
-		if(sortType == AuctionSortType.LOW || sortType == AuctionSortType.HIGH){
-			stream = stream.sorted(Comparator.comparingLong(auction -> (sortType == AuctionSortType.LOW ? 1 : -1) * Math.max(higherDepth(auction, "highest_bid_amount", 0L), higherDepth(auction, "starting_bid", 0))));
+		if (sortType == AuctionSortType.LOW || sortType == AuctionSortType.HIGH) {
+			stream =
+				stream.sorted(
+					Comparator.comparingLong(auction ->
+						(sortType == AuctionSortType.LOW ? 1 : -1) *
+						Math.max(higherDepth(auction, "highest_bid_amount", 0L), higherDepth(auction, "starting_bid", 0))
+					)
+				);
 		}
 		auctionsArray = collectJsonArray(stream);
 
@@ -119,26 +135,24 @@ public class AuctionCommand extends Command {
 					}
 				}
 
-					extras.addEmbedField(auctionName, auction, false);
+				extras.addEmbedField(auctionName, auction, false);
 			}
 		}
 
-		if(extras.getEmbedFields().size() == 0){
+		if (extras.getEmbedFields().size() == 0) {
 			return invalidEmbed("No auctions found for " + usernameUuidStruct.getUsername());
 		}
 
 		extras
-				.setEveryPageTitle(usernameUuidStruct.getUsername())
-				.setEveryPageTitleUrl(skyblockStatsLink(usernameUuidStruct.getUsername(), null))
-				.setEveryPageThumbnail(usernameUuidStruct.getAvatarlUrl())
-				.setEveryPageText(
-						"**Sold Auctions Value:** " +
-								simplifyNumber(totalSoldValue) +
-								"\n**Unsold Auctions Value:** " +
-								simplifyNumber(totalPendingValue)
-				);
-
-
+			.setEveryPageTitle(usernameUuidStruct.getUsername())
+			.setEveryPageTitleUrl(skyblockStatsLink(usernameUuidStruct.getUsername(), null))
+			.setEveryPageThumbnail(usernameUuidStruct.getAvatarlUrl())
+			.setEveryPageText(
+				"**Sold Auctions Value:** " +
+				simplifyNumber(totalSoldValue) +
+				"\n**Unsold Auctions Value:** " +
+				simplifyNumber(totalPendingValue)
+			);
 
 		if (channel != null) {
 			paginateBuilder.setPaginatorExtras(extras).build().paginate(channel, 0);
@@ -225,16 +239,16 @@ public class AuctionCommand extends Command {
 				if (args.length == 3 && args[1].equals("uuid")) {
 					embed(getAuctionByUuid(args[2]));
 					return;
-				} else if (args.length  == 4 || args.length == 3 || args.length == 2 || args.length == 1) {
+				} else if (args.length == 4 || args.length == 3 || args.length == 2 || args.length == 1) {
 					AuctionFilterType filterType = AuctionFilterType.NONE;
 					for (int i = 0; i < args.length; i++) {
 						if (args[i].startsWith("filter:")) {
 							try {
 								filterType = AuctionFilterType.valueOf(args[i].split("filter:")[1].toUpperCase(Locale.ROOT));
 								removeArg(i);
-							}catch (IllegalArgumentException e){
+							} catch (IllegalArgumentException e) {
 								embed(invalidEmbed("Invalid filter type provided"));
-								return ;
+								return;
 							}
 						}
 					}
@@ -244,9 +258,9 @@ public class AuctionCommand extends Command {
 							try {
 								sortType = AuctionSortType.valueOf(args[i].split("sort:")[1].toUpperCase());
 								removeArg(i);
-							}catch (IllegalArgumentException e){
+							} catch (IllegalArgumentException e) {
 								embed(invalidEmbed("Invalid sort type provided"));
-								return ;
+								return;
 							}
 						}
 					}
@@ -268,12 +282,12 @@ public class AuctionCommand extends Command {
 	public enum AuctionFilterType {
 		NONE,
 		SOLD,
-		UNSOLD
+		UNSOLD,
 	}
 
 	public enum AuctionSortType {
 		NONE,
 		LOW,
-		HIGH
+		HIGH,
 	}
 }

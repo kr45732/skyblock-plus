@@ -125,8 +125,10 @@ public class GuildKickerCommand extends Command {
 
 		CustomPaginator.Builder paginateBuilder = defaultPaginator(waiter, event.getAuthor()).setColumns(1).setItemsPerPage(20);
 		if (!useKey) {
-			if(higherDepth(guildLbJson, "data") == null){
-				return invalidEmbed("This guild is not on the senither leaderboard so you must set the Hypixel API key for this server and rerun the command with `--usekey` flag");
+			if (higherDepth(guildLbJson, "data") == null) {
+				return invalidEmbed(
+					"This guild is not on the senither leaderboard so you must set the Hypixel API key for this server and rerun the command with `--usekey` flag"
+				);
 			}
 
 			JsonArray guildMembers = higherDepth(guildLbJson, "data").getAsJsonArray();

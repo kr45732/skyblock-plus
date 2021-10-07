@@ -42,7 +42,13 @@ public class WeightSlashCommand extends SlashCommand {
 					return;
 				}
 
-				event.embed(WeightCommand.getPlayerWeight(event.player, event.getOptionStr("profile"), event.getOptionStr("type", "senither").equals("senither") ? Player.WeightType.SENITHER : Player.WeightType.LILY ));
+				event.embed(
+					WeightCommand.getPlayerWeight(
+						event.player,
+						event.getOptionStr("profile"),
+						event.getOptionStr("type", "senither").equals("senither") ? Player.WeightType.SENITHER : Player.WeightType.LILY
+					)
+				);
 				break;
 			case "calculate":
 				event.embed(
@@ -63,18 +69,22 @@ public class WeightSlashCommand extends SlashCommand {
 	@Override
 	public CommandData getCommandData() {
 		return new CommandData("weight", "Main weight command")
-				.addSubcommands(
-						new SubcommandData("player", "Get a player's weight")
-								.addOption(OptionType.STRING, "player", "Player username or mention")
-								.addOption(OptionType.STRING, "profile", "Profile name")
-								.addOptions(new OptionData(OptionType.STRING, "type", "The weight system which should be used").addChoice("Senither", "senither").addChoice("Lily", "lily"))
-				)
-				.addSubcommands(
-						new SubcommandData("calculate", "Calculate predicted weight using given stats (not 100% accurate)")
-								.addOption(OptionType.STRING, "skill_average", "Player's skill average", true)
-								.addOption(OptionType.STRING, "slayer", "Player's slayer XP", true)
-								.addOption(OptionType.STRING, "dungeons", "Player's catacombs level", true)
-								.addOption(OptionType.STRING, "average_class", "Player's average dungeon class level", true)
-				);
+			.addSubcommands(
+				new SubcommandData("player", "Get a player's weight")
+					.addOption(OptionType.STRING, "player", "Player username or mention")
+					.addOption(OptionType.STRING, "profile", "Profile name")
+					.addOptions(
+						new OptionData(OptionType.STRING, "type", "The weight system which should be used")
+							.addChoice("Senither", "senither")
+							.addChoice("Lily", "lily")
+					)
+			)
+			.addSubcommands(
+				new SubcommandData("calculate", "Calculate predicted weight using given stats (not 100% accurate)")
+					.addOption(OptionType.STRING, "skill_average", "Player's skill average", true)
+					.addOption(OptionType.STRING, "slayer", "Player's slayer XP", true)
+					.addOption(OptionType.STRING, "dungeons", "Player's catacombs level", true)
+					.addOption(OptionType.STRING, "average_class", "Player's average dungeon class level", true)
+			);
 	}
 }

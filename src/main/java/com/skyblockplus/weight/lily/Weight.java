@@ -18,67 +18,67 @@
 
 package com.skyblockplus.weight.lily;
 
+import static com.skyblockplus.utils.Constants.*;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.WeightStruct;
-
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 
-import static com.skyblockplus.utils.Constants.*;
-
 public class Weight {
-    public static JsonElement lilyWeightConstants;
 
-    static {
-        try {
-            lilyWeightConstants = JsonParser.parseReader(new FileReader("src/main/java/com/skyblockplus/json/LilyWeight.json"));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
+	public static JsonElement lilyWeightConstants;
 
-    private final SlayerWeight slayerWeight;
-    private final SkillsWeight skillsWeight;
-    private final DungeonsWeight dungeonsWeight;
+	static {
+		try {
+			lilyWeightConstants = JsonParser.parseReader(new FileReader("src/main/java/com/skyblockplus/json/LilyWeight.json"));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
 
-    public Weight(Player player) {
-        this.slayerWeight = new SlayerWeight(player);
-        this.skillsWeight = new SkillsWeight(player);
-        this.dungeonsWeight = new DungeonsWeight(player);
-    }
+	private final SlayerWeight slayerWeight;
+	private final SkillsWeight skillsWeight;
+	private final DungeonsWeight dungeonsWeight;
 
-    public SkillsWeight getSkillsWeight() {
-        return skillsWeight;
-    }
+	public Weight(Player player) {
+		this.slayerWeight = new SlayerWeight(player);
+		this.skillsWeight = new SkillsWeight(player);
+		this.dungeonsWeight = new DungeonsWeight(player);
+	}
 
-    public SlayerWeight getSlayerWeight() {
-        return slayerWeight;
-    }
+	public SkillsWeight getSkillsWeight() {
+		return skillsWeight;
+	}
 
-    public DungeonsWeight getDungeonsWeight() {
-        return dungeonsWeight;
-    }
+	public SlayerWeight getSlayerWeight() {
+		return slayerWeight;
+	}
 
-    public WeightStruct getTotalWeight(boolean needToCalc) {
-        if (needToCalc) {
-            for (String slayerName : SLAYER_NAMES) {
-                slayerWeight.getSlayerWeight(slayerName);
-            }
-            for (String skillName : SKILL_NAMES) {
-                skillsWeight.getSkillsWeight(skillName);
-            }
-            dungeonsWeight.getDungeonWeight();
-            dungeonsWeight.getDungeonCompletionWeight("normal");
-            dungeonsWeight.getDungeonCompletionWeight("master");
-        }
+	public DungeonsWeight getDungeonsWeight() {
+		return dungeonsWeight;
+	}
 
-        WeightStruct w = new WeightStruct();
-        w.add(slayerWeight.getWeightStruct());
-        w.add(skillsWeight.getWeightStruct());
-        w.add(dungeonsWeight.getWeightStruct());
+	public WeightStruct getTotalWeight(boolean needToCalc) {
+		if (needToCalc) {
+			for (String slayerName : SLAYER_NAMES) {
+				slayerWeight.getSlayerWeight(slayerName);
+			}
+			for (String skillName : SKILL_NAMES) {
+				skillsWeight.getSkillsWeight(skillName);
+			}
+			dungeonsWeight.getDungeonWeight();
+			dungeonsWeight.getDungeonCompletionWeight("normal");
+			dungeonsWeight.getDungeonCompletionWeight("master");
+		}
 
-        return w;
-    }
+		WeightStruct w = new WeightStruct();
+		w.add(slayerWeight.getWeightStruct());
+		w.add(skillsWeight.getWeightStruct());
+		w.add(dungeonsWeight.getWeightStruct());
+
+		return w;
+	}
 }

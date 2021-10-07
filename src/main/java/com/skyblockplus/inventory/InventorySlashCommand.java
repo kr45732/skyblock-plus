@@ -79,14 +79,14 @@ public class InventorySlashCommand extends SlashCommand {
 	@Override
 	public CommandData getCommandData() {
 		return new CommandData("inventory", "Main inventory command")
-				.addSubcommands(
-						new SubcommandData("list", "Get a list of the player's inventory with lore")
-								.addOption(OptionType.STRING, "player", "Player username or mention")
-								.addOption(OptionType.STRING, "profile", "Profile name")
-								.addOption(OptionType.INTEGER, "slot", "Slot number"),
-						new SubcommandData("emoji", "Get a player's inventory represented in emojis")
-								.addOption(OptionType.STRING, "player", "Player username or mention")
-								.addOption(OptionType.STRING, "profile", "Profile name")
-				);
+			.addSubcommands(
+				new SubcommandData("list", "Get a list of the player's inventory with lore")
+					.addOption(OptionType.STRING, "player", "Player username or mention")
+					.addOption(OptionType.STRING, "profile", "Profile name")
+					.addOption(OptionType.INTEGER, "slot", "Slot number"),
+				new SubcommandData("emoji", "Get a player's inventory represented in emojis")
+					.addOption(OptionType.STRING, "player", "Player username or mention")
+					.addOption(OptionType.STRING, "profile", "Profile name")
+			);
 	}
 }

@@ -136,7 +136,7 @@ public abstract class CommandExecute {
 		return true;
 	}
 
-	protected void removeArg(int index){
+	protected void removeArg(int index) {
 		args = ArrayUtils.remove(args, index);
 	}
 }

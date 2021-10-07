@@ -18,6 +18,12 @@
 
 package com.skyblockplus.guilds;
 
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.structs.HypixelGuildCache.memberCacheFromPlayer;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -27,20 +33,13 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.*;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.io.FileReader;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.structs.HypixelGuildCache.memberCacheFromPlayer;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class GuildRanksCommand extends Command {
 
@@ -88,7 +87,7 @@ public class GuildRanksCommand extends Command {
 	private EmbedBuilder getLeaderboard(String username, CommandEvent event, boolean ironmanOnly, boolean useKey) {
 		String hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
 
-		if(ironmanOnly){
+		if (ironmanOnly) {
 			if (hypixelKey == null) {
 				return invalidEmbed("You must set a Hypixel API key to use the ironman only option");
 			}
@@ -101,7 +100,7 @@ public class GuildRanksCommand extends Command {
 				keyCooldownMap.put(hypixelKey, new HypixelKeyInformation());
 			}
 			useKey = true;
-		} else if(useKey){
+		} else if (useKey) {
 			EmbedBuilder eb = checkHypixelKey(hypixelKey);
 			if (eb != null) {
 				return eb;
@@ -123,7 +122,12 @@ public class GuildRanksCommand extends Command {
 		String guildId = higherDepth(guildJson, "_id").getAsString();
 		String guildName = higherDepth(guildJson, "name").getAsString();
 		if (!guildName.equals("Skyblock Forceful") && !guildName.equals("Skyblock Gods") && !guildName.equals("Ironman Sweats")) {
-			return invalidEmbed(guildName + "'s settings are not setup. Please join the [Skyblock Plus Discord](" + DISCORD_SERVER_INVITE_LINK + ") to setup this for your guild.");
+			return invalidEmbed(
+				guildName +
+				"'s settings are not setup. Please join the [Skyblock Plus Discord](" +
+				DISCORD_SERVER_INVITE_LINK +
+				") to setup this for your guild."
+			);
 		}
 
 		List<String> staffRankNames = new ArrayList<>();
@@ -136,7 +140,6 @@ public class GuildRanksCommand extends Command {
 					JsonParser.parseReader(new FileReader("src/main/java/com/skyblockplus/json/GuildSettings.json")),
 					guildId + ".guild_leaderboard"
 				);
-
 
 			for (JsonElement i : higherDepth(lbSettings, "staff_ranks").getAsJsonArray()) {
 				staffRankNames.add(i.getAsString().toLowerCase());
@@ -161,7 +164,7 @@ public class GuildRanksCommand extends Command {
 		}
 
 		Instant lastUpdated = null;
-		if(useKey){
+		if (useKey) {
 			HypixelGuildCache guildCache = hypixelGuildsCacheMap.getIfPresent(guildId);
 			List<String> guildMemberPlayersList = new ArrayList<>();
 			if (guildCache != null) {
@@ -175,35 +178,35 @@ public class GuildRanksCommand extends Command {
 
 					CompletableFuture<String> guildMemberUsername = asyncUuidToUsername(guildMemberUuid);
 					futuresList.add(
-							guildMemberUsername.thenApply(guildMemberUsernameResponse -> {
-								try {
-									if (keyCooldownMap.get(hypixelKey).getRemainingLimit().get() < 5) {
-										System.out.println(
-												"Sleeping for " + keyCooldownMap.get(hypixelKey).getTimeTillReset().get() + " seconds"
-										);
-										TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).getTimeTillReset().get());
-									}
-								} catch (Exception ignored) {}
+						guildMemberUsername.thenApply(guildMemberUsernameResponse -> {
+							try {
+								if (keyCooldownMap.get(hypixelKey).getRemainingLimit().get() < 5) {
+									System.out.println(
+										"Sleeping for " + keyCooldownMap.get(hypixelKey).getTimeTillReset().get() + " seconds"
+									);
+									TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).getTimeTillReset().get());
+								}
+							} catch (Exception ignored) {}
 
-								CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(
-										guildMemberUuid,
-										hypixelKey
+							CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(
+								guildMemberUuid,
+								hypixelKey
+							);
+
+							return guildMemberProfileJson.thenApply(guildMemberProfileJsonResponse -> {
+								Player guildMemberPlayer = new Player(
+									guildMemberUuid,
+									guildMemberUsernameResponse,
+									guildMemberProfileJsonResponse
 								);
 
-								return guildMemberProfileJson.thenApply(guildMemberProfileJsonResponse -> {
-									Player guildMemberPlayer = new Player(
-											guildMemberUuid,
-											guildMemberUsernameResponse,
-											guildMemberProfileJsonResponse
-									);
+								if (guildMemberPlayer.isValid()) {
+									return memberCacheFromPlayer(guildMemberPlayer, ironmanOnly);
+								}
 
-									if (guildMemberPlayer.isValid()) {
-										return memberCacheFromPlayer(guildMemberPlayer, ironmanOnly);
-									}
-
-									return null;
-								});
-							})
+								return null;
+							});
+						})
 					);
 				}
 
@@ -237,22 +240,13 @@ public class GuildRanksCommand extends Command {
 						continue;
 					}
 
-					gMembers.add(
-							new GuildRanksStruct(
-									gMemUsername,
-									skills,
-									slayer,
-									catacombs,
-									weight,
-									curRank
-							)
-					);
+					gMembers.add(new GuildRanksStruct(gMemUsername, skills, slayer, catacombs, weight, curRank));
 					uniqueGuildName.add(gMemUsername);
 				}
 			}
-		}else{
+		} else {
 			JsonArray guildLbJson = higherDepth(getJson("https://hypixel-app-api.senither.com/leaderboard/players/" + guildId), "data")
-					.getAsJsonArray();
+				.getAsJsonArray();
 			for (JsonElement lbM : guildLbJson) {
 				String lbUuid = higherDepth(lbM, "uuid").getAsString().replace("-", "");
 				String curRank = ranksMap.get(lbUuid);
@@ -263,14 +257,14 @@ public class GuildRanksCommand extends Command {
 					}
 
 					gMembers.add(
-							new GuildRanksStruct(
-									higherDepth(lbM, "username").getAsString(),
-									higherDepth(lbM, "average_skill_progress").getAsDouble(),
-									higherDepth(lbM, "total_slayer").getAsDouble(),
-									higherDepth(lbM, "catacomb").getAsDouble(),
-									higherDepth(lbM, "weight").getAsDouble(),
-									curRank
-							)
+						new GuildRanksStruct(
+							higherDepth(lbM, "username").getAsString(),
+							higherDepth(lbM, "average_skill_progress").getAsDouble(),
+							higherDepth(lbM, "total_slayer").getAsDouble(),
+							higherDepth(lbM, "catacomb").getAsDouble(),
+							higherDepth(lbM, "weight").getAsDouble(),
+							curRank
+						)
 					);
 					uniqueGuildName.add(higherDepth(lbM, "username").getAsString());
 					Instant mLastUpdated = Instant.parse(higherDepth(lbM, "last_updated_at").getAsString());
@@ -416,12 +410,16 @@ public class GuildRanksCommand extends Command {
 				new PaginatorExtras()
 					.setEveryPageTitle("Rank changes for " + guildName)
 					.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
-					.setEveryPageText("**Total rank changes:** " + totalChange +
-							(
-									lastUpdated != null
-											? "\n**Last updated:** " + instantToDHM(Duration.between(lastUpdated, Instant.now())) + " ago"
-											: ""
-							)  + "\n")
+					.setEveryPageText(
+						"**Total rank changes:** " +
+						totalChange +
+						(
+							lastUpdated != null
+								? "\n**Last updated:** " + instantToDHM(Duration.between(lastUpdated, Instant.now())) + " ago"
+								: ""
+						) +
+						"\n"
+					)
 			)
 			.build()
 			.paginate(event.getChannel(), 0);

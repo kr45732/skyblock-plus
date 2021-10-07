@@ -41,7 +41,16 @@ public class AuctionsSlashCommand extends SlashCommand {
 					return;
 				}
 
-				event.paginate(AuctionCommand.getPlayerAuction(event.player, event.getUser(), null, event.getHook(), AuctionCommand.AuctionFilterType.valueOf(event.getOptionStr("filter", "none").toUpperCase()), AuctionCommand.AuctionSortType.valueOf(event.getOptionStr("sort", "none").toUpperCase())));
+				event.paginate(
+					AuctionCommand.getPlayerAuction(
+						event.player,
+						event.getUser(),
+						null,
+						event.getHook(),
+						AuctionCommand.AuctionFilterType.valueOf(event.getOptionStr("filter", "none").toUpperCase()),
+						AuctionCommand.AuctionSortType.valueOf(event.getOptionStr("sort", "none").toUpperCase())
+					)
+				);
 				break;
 			case "uuid":
 				event.embed(AuctionCommand.getAuctionByUuid(event.getOptionStr("uuid")));
@@ -55,13 +64,20 @@ public class AuctionsSlashCommand extends SlashCommand {
 	@Override
 	public CommandData getCommandData() {
 		return new CommandData("auctions", "Main auctions command")
-				.addSubcommands(
-						new SubcommandData("player", "Get player's active (not claimed) auctions on all profiles")
-								.addOption(OptionType.STRING, "player", "Player username or mention")
-								.addOptions(new OptionData(OptionType.STRING, "filter", "How the auctions should be filtered").addChoice("Sold", "sold").addChoice("Unsold", "Unsold"))
-								.addOptions(new OptionData(OptionType.STRING, "sort", "How the auctions should be sorted").addChoice("Low", "low").addChoice("High", "high"))
-						,
-						new SubcommandData("uuid", "Get an auction by it's UUID").addOption(OptionType.STRING, "uuid", "Auction UUID", true)
-				);
+			.addSubcommands(
+				new SubcommandData("player", "Get player's active (not claimed) auctions on all profiles")
+					.addOption(OptionType.STRING, "player", "Player username or mention")
+					.addOptions(
+						new OptionData(OptionType.STRING, "filter", "How the auctions should be filtered")
+							.addChoice("Sold", "sold")
+							.addChoice("Unsold", "Unsold")
+					)
+					.addOptions(
+						new OptionData(OptionType.STRING, "sort", "How the auctions should be sorted")
+							.addChoice("Low", "low")
+							.addChoice("High", "high")
+					),
+				new SubcommandData("uuid", "Get an auction by it's UUID").addOption(OptionType.STRING, "uuid", "Auction UUID", true)
+			);
 	}
 }

@@ -69,16 +69,16 @@ public class GuildSlashCommand extends SlashCommand {
 	@Override
 	public CommandData getCommandData() {
 		return new CommandData("guild", "Main guild command")
-				.addSubcommands(
-						new SubcommandData("player", "Find what guild a player is in")
-								.addOption(OptionType.STRING, "player", "Player username or mention"),
-						new SubcommandData("information", "Get information and statistics about a player's guild")
-								.addOption(OptionType.STRING, "player", "Player username or mention"),
-						new SubcommandData("members", "Get a list of all members in a player's guild")
-								.addOption(OptionType.STRING, "player", "Player username or mention"),
-						new SubcommandData("experience", "Get the experience leaderboard for a player's guild")
-								.addOption(OptionType.STRING, "player", "Player username or mention")
-								.addOption(OptionType.INTEGER, "days", "Number of days")
-				);
+			.addSubcommands(
+				new SubcommandData("player", "Find what guild a player is in")
+					.addOption(OptionType.STRING, "player", "Player username or mention"),
+				new SubcommandData("information", "Get information and statistics about a player's guild")
+					.addOption(OptionType.STRING, "player", "Player username or mention"),
+				new SubcommandData("members", "Get a list of all members in a player's guild")
+					.addOption(OptionType.STRING, "player", "Player username or mention"),
+				new SubcommandData("experience", "Get the experience leaderboard for a player's guild")
+					.addOption(OptionType.STRING, "player", "Player username or mention")
+					.addOption(OptionType.INTEGER, "days", "Number of days")
+			);
 	}
 }

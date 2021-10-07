@@ -18,24 +18,23 @@
 
 package com.skyblockplus.utils;
 
+import static com.skyblockplus.utils.ApiHandler.playerFromUuid;
+import static com.skyblockplus.utils.ApiHandler.skyblockProfilesFromUuid;
+import static com.skyblockplus.utils.Constants.CRAFTED_MINIONS_TO_SLOTS;
+import static com.skyblockplus.utils.Constants.SKILL_NAMES;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.skyblockplus.utils.structs.*;
 import com.skyblockplus.weight.senither.Weight;
+import java.time.Instant;
+import java.util.*;
 import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
 import me.nullicorn.nedit.type.NBTList;
 import net.dv8tion.jda.api.EmbedBuilder;
-
-import java.time.Instant;
-import java.util.*;
-
-import static com.skyblockplus.utils.Constants.CRAFTED_MINIONS_TO_SLOTS;
-import static com.skyblockplus.utils.Constants.SKILL_NAMES;
-import static com.skyblockplus.utils.ApiHandler.playerFromUuid;
-import static com.skyblockplus.utils.ApiHandler.skyblockProfilesFromUuid;
-import static com.skyblockplus.utils.Utils.*;
 
 public class Player {
 
@@ -264,7 +263,7 @@ public class Player {
 	}
 
 	public int getSkillMaxLevel(String skillName, WeightType weightType) {
-		if(weightType == WeightType.LILY){
+		if (weightType == WeightType.LILY) {
 			return 60;
 		}
 
@@ -355,7 +354,7 @@ public class Player {
 
 	/* Slayer */
 	public int getTotalSlayer() {
-		return getSlayer( "sven") + getSlayer( "rev") + getSlayer( "tara") + getSlayer( "enderman");
+		return getSlayer("sven") + getSlayer("rev") + getSlayer("tara") + getSlayer("enderman");
 	}
 
 	public int getSlayerBossKills(String slayerName, int tier) {
@@ -968,11 +967,8 @@ public class Player {
 	}
 
 	public EmbedBuilder defaultPlayerEmbed(String extra) {
-		return defaultEmbed(
-				fixUsername(getUsername()) + (isIronman() ? " ♻️" : "" + extra),
-				skyblockStatsLink()
-		)
-				.setThumbnail(getThumbnailUrl());
+		return defaultEmbed(fixUsername(getUsername()) + (isIronman() ? " ♻️" : "" + extra), skyblockStatsLink())
+			.setThumbnail(getThumbnailUrl());
 	}
 
 	public int getNumberMinionSlots() {
@@ -1045,7 +1041,7 @@ public class Player {
 		return petScore;
 	}
 
-	public boolean isIronman(){
+	public boolean isIronman() {
 		return higherDepth(getOuterProfileJson(), "game_mode", "").equals("ironman");
 	}
 
@@ -1053,7 +1049,7 @@ public class Player {
 		double highestAmount = -1.0;
 		this.profileIndex = 0;
 		for (JsonElement ignored : profilesArray) {
-			if(ironmanOnly && !isIronman()){
+			if (ironmanOnly && !isIronman()) {
 				continue;
 			}
 
@@ -1078,16 +1074,16 @@ public class Player {
 				default:
 					return -1;
 			}
-			this.profileIndex ++;
+			this.profileIndex++;
 		}
 
 		return highestAmount;
 	}
 
-	public enum WeightType{
+	public enum WeightType {
 		NONE,
 		SENITHER,
-		LILY
+		LILY,
 	}
 
 	@Override

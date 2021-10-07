@@ -43,7 +43,7 @@ public class SlayerSlashCommand extends SlashCommand {
 	@Override
 	public CommandData getCommandData() {
 		return new CommandData("slayer", "Get the slayer data of a player")
-				.addOption(OptionType.STRING, "player", "Player username or mention")
-				.addOption(OptionType.STRING, "profile", "Profile name");
+			.addOption(OptionType.STRING, "player", "Player username or mention")
+			.addOption(OptionType.STRING, "profile", "Profile name");
 	}
 }

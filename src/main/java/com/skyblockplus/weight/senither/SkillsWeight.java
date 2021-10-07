@@ -18,12 +18,12 @@
 
 package com.skyblockplus.weight.senither;
 
+import static com.skyblockplus.utils.Constants.SKILL_WEIGHTS;
+
 import com.skyblockplus.utils.Constants;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.SkillsStruct;
 import com.skyblockplus.utils.structs.WeightStruct;
-
-import static com.skyblockplus.utils.Constants.SKILL_WEIGHTS;
 
 public class SkillsWeight {
 
@@ -47,11 +47,11 @@ public class SkillsWeight {
 		Double[] curWeights = SKILL_WEIGHTS.get(skillName);
 		double exponent = curWeights[0];
 		double divider = curWeights[1];
-		double currentSkillXp = player.getSkillXp( skillName);
+		double currentSkillXp = player.getSkillXp(skillName);
 
 		if (currentSkillXp != -1) {
 			int maxLevel = player.getSkillMaxLevel(skillName, Player.WeightType.SENITHER);
-			SkillsStruct skillsStruct = player.getSkill( skillName, Player.WeightType.SENITHER);
+			SkillsStruct skillsStruct = player.getSkill(skillName, Player.WeightType.SENITHER);
 			double level = skillsStruct.getProgressLevel();
 			double maxLevelExp = maxLevel == 50 ? Constants.SKILLS_LEVEL_50_XP : Constants.SKILLS_LEVEL_60_XP;
 			double base = Math.pow(level * 10, 0.5 + exponent + (level / 100)) / 1250;

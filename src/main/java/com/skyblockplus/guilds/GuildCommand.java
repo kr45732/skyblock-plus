@@ -19,8 +19,8 @@
 package com.skyblockplus.guilds;
 
 import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.utils.Constants.GUILD_EXP_TO_LEVEL;
 import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Constants.GUILD_EXP_TO_LEVEL;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;

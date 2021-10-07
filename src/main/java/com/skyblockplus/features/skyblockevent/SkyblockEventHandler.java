@@ -21,8 +21,8 @@ package com.skyblockplus.features.skyblockevent;
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.Constants.ALL_SKILL_NAMES;
 import static com.skyblockplus.utils.ApiHandler.getGuildFromName;
+import static com.skyblockplus.utils.Constants.ALL_SKILL_NAMES;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;

@@ -18,13 +18,13 @@
 
 package com.skyblockplus.weight.senither;
 
+import static com.skyblockplus.utils.Constants.DUNGEON_CLASS_WEIGHTS;
+import static com.skyblockplus.utils.Constants.DUNGEON_WEIGHTS;
+
 import com.skyblockplus.utils.Constants;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.SkillsStruct;
 import com.skyblockplus.utils.structs.WeightStruct;
-
-import static com.skyblockplus.utils.Constants.DUNGEON_CLASS_WEIGHTS;
-import static com.skyblockplus.utils.Constants.DUNGEON_WEIGHTS;
 
 public class DungeonsWeight {
 

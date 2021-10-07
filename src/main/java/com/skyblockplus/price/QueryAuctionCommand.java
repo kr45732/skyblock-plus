@@ -18,8 +18,8 @@
 
 package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;

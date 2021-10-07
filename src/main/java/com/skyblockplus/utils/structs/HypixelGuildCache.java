@@ -55,9 +55,8 @@ public class HypixelGuildCache {
 			player.getHighestAmount("taraXp", ironmanOnly) +
 			"=:=" +
 			player.getHighestAmount("endermanXp", ironmanOnly) +
-					"=:=" +
-					player.getUuid()
-
+			"=:=" +
+			player.getUuid()
 		);
 	}
 	// [0] - username

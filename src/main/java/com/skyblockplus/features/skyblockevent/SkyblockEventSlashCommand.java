@@ -81,14 +81,14 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 	@Override
 	public CommandData getCommandData() {
 		return new CommandData("event", "Main event command")
-				.addSubcommands(
-						new SubcommandData("create", "Interactive message to create a Skyblock event"),
-						new SubcommandData("end", "Force end the event"),
-						new SubcommandData("current", "Get information about the current event"),
-						new SubcommandData("join", "Join the current event"),
-						new SubcommandData("leave", "Leave the current event"),
-						new SubcommandData("cancel", "Cancel the event"),
-						new SubcommandData("leaderboard", "Get the leaderboard for current event")
-				);
+			.addSubcommands(
+				new SubcommandData("create", "Interactive message to create a Skyblock event"),
+				new SubcommandData("end", "Force end the event"),
+				new SubcommandData("current", "Get information about the current event"),
+				new SubcommandData("join", "Join the current event"),
+				new SubcommandData("leave", "Leave the current event"),
+				new SubcommandData("cancel", "Cancel the event"),
+				new SubcommandData("leaderboard", "Get the leaderboard for current event")
+			);
 	}
 }

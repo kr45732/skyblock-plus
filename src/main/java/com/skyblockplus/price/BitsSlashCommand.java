@@ -38,6 +38,7 @@ public class BitsSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData("bits", "Get the price of an item from the bits shop").addOption(OptionType.STRING, "item", "Item name", true);
+		return new CommandData("bits", "Get the price of an item from the bits shop")
+			.addOption(OptionType.STRING, "item", "Item name", true);
 	}
 }

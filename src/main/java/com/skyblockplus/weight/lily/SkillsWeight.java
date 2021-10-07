@@ -18,70 +18,79 @@
 
 package com.skyblockplus.weight.lily;
 
-import com.google.gson.JsonArray;
-import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.structs.SkillsStruct;
-import com.skyblockplus.utils.structs.WeightStruct;
-
 import static com.skyblockplus.utils.Constants.SKILLS_LEVEL_60_XP;
 import static com.skyblockplus.utils.Constants.SKILL_NAMES;
 import static com.skyblockplus.utils.Utils.higherDepth;
 import static com.skyblockplus.weight.lily.Weight.lilyWeightConstants;
 
+import com.google.gson.JsonArray;
+import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.structs.SkillsStruct;
+import com.skyblockplus.utils.structs.WeightStruct;
+
 public class SkillsWeight {
-    private final Player player;
-    private final WeightStruct weightStruct;
 
-    public SkillsWeight(Player player) {
-        this.player = player;
-        this.weightStruct = new WeightStruct();
-    }
+	private final Player player;
+	private final WeightStruct weightStruct;
 
-    public WeightStruct getWeightStruct() {
-        return weightStruct;
-    }
+	public SkillsWeight(Player player) {
+		this.player = player;
+		this.weightStruct = new WeightStruct();
+	}
 
-    public WeightStruct getSkillsWeight(String skillName) {
-        double skillAverage = 0;
-        for (String skill : SKILL_NAMES) {
-            try {
-                SkillsStruct skillsStruct = player.getSkill(skill, Player.WeightType.LILY);
-                skillAverage += skillsStruct.getCurrentLevel();
-            } catch (Exception e) {
-                return weightStruct;
-            }
-        }
-        skillAverage /= SKILL_NAMES.size();
+	public WeightStruct getWeightStruct() {
+		return weightStruct;
+	}
 
-        SkillsStruct skillsStruct = player.getSkill(skillName, Player.WeightType.LILY);
-        JsonArray srwTable = higherDepth(lilyWeightConstants, "skillRatioWeight." + skillName).getAsJsonArray();
-        double base = ((12 * Math.pow((skillAverage / 60), 2)) * srwTable.get(skillsStruct.getCurrentLevel()).getAsDouble() * srwTable.get(srwTable.size() - 1).getAsDouble()) + (srwTable.get(srwTable.size() - 1).getAsDouble() * Math.pow(skillsStruct.getCurrentLevel() / 60.0, Math.pow(2, 0.5)));
-        double overflow = 0;
-        if (skillsStruct.getTotalExp() > SKILLS_LEVEL_60_XP) {
-            double factor = higherDepth(lilyWeightConstants, "skillFactors." + skillName).getAsDouble();
-            double effectiveOver = effectiveXP(skillsStruct.getTotalExp() - SKILLS_LEVEL_60_XP, factor);
-            double t = (effectiveOver / SKILLS_LEVEL_60_XP) * (higherDepth(lilyWeightConstants, "skillOverflowMultipliers." + skillName).getAsDouble());
-            if (t > 0) {
-                overflow += t;
-            }
-        }
+	public WeightStruct getSkillsWeight(String skillName) {
+		double skillAverage = 0;
+		for (String skill : SKILL_NAMES) {
+			try {
+				SkillsStruct skillsStruct = player.getSkill(skill, Player.WeightType.LILY);
+				skillAverage += skillsStruct.getCurrentLevel();
+			} catch (Exception e) {
+				return weightStruct;
+			}
+		}
+		skillAverage /= SKILL_NAMES.size();
 
-        return weightStruct.add(new WeightStruct(base, overflow));
-    }
+		SkillsStruct skillsStruct = player.getSkill(skillName, Player.WeightType.LILY);
+		JsonArray srwTable = higherDepth(lilyWeightConstants, "skillRatioWeight." + skillName).getAsJsonArray();
+		double base =
+			(
+				(12 * Math.pow((skillAverage / 60), 2)) *
+				srwTable.get(skillsStruct.getCurrentLevel()).getAsDouble() *
+				srwTable.get(srwTable.size() - 1).getAsDouble()
+			) +
+			(srwTable.get(srwTable.size() - 1).getAsDouble() * Math.pow(skillsStruct.getCurrentLevel() / 60.0, Math.pow(2, 0.5)));
+		double overflow = 0;
+		if (skillsStruct.getTotalExp() > SKILLS_LEVEL_60_XP) {
+			double factor = higherDepth(lilyWeightConstants, "skillFactors." + skillName).getAsDouble();
+			double effectiveOver = effectiveXP(skillsStruct.getTotalExp() - SKILLS_LEVEL_60_XP, factor);
+			double t =
+				(effectiveOver / SKILLS_LEVEL_60_XP) *
+				(higherDepth(lilyWeightConstants, "skillOverflowMultipliers." + skillName).getAsDouble());
+			if (t > 0) {
+				overflow += t;
+			}
+		}
 
-    private double effectiveXP(double xp, double factor) {
-        if (xp < SKILLS_LEVEL_60_XP) {
-            return xp;
-        } else {
-            double remainingXP = xp;
-            double z = 0;
-            for (int i = 0; i <= (int) (xp / SKILLS_LEVEL_60_XP); i++) {
-                if (remainingXP >= SKILLS_LEVEL_60_XP) {
-                    remainingXP -= SKILLS_LEVEL_60_XP;
-                    z += Math.pow(factor, i);
-                }
-            }
-            return z * SKILLS_LEVEL_60_XP;
-        }
-    }
+		return weightStruct.add(new WeightStruct(base, overflow));
+	}
+
+	private double effectiveXP(double xp, double factor) {
+		if (xp < SKILLS_LEVEL_60_XP) {
+			return xp;
+		} else {
+			double remainingXP = xp;
+			double z = 0;
+			for (int i = 0; i <= (int) (xp / SKILLS_LEVEL_60_XP); i++) {
+				if (remainingXP >= SKILLS_LEVEL_60_XP) {
+					remainingXP -= SKILLS_LEVEL_60_XP;
+					z += Math.pow(factor, i);
+				}
+			}
+			return z * SKILLS_LEVEL_60_XP;
+		}
+	}
 }
