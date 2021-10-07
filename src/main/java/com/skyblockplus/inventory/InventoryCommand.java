@@ -52,15 +52,14 @@ public class InventoryCommand extends Command {
 				int slotNumber = -1;
 				for (int i = 0; i < args.length; i++) {
 					if (args[i].startsWith("slot:")) {
-						try{
+						try {
 							slotNumber = Math.max(0, Integer.parseInt(args[i].split("slot:")[1]));
-						removeArg(i);}
-						catch (Exception ignored){}
+							removeArg(i);
+						} catch (Exception ignored) {}
 					}
 				}
 
-				if (slotNumber != -1  && (args.length == 3 || args.length == 2 || args.length == 1))
-				 {
+				if (slotNumber != -1 && (args.length == 3 || args.length == 2 || args.length == 1)) {
 					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
 						return;
 					}

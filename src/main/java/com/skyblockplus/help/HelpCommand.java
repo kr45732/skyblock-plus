@@ -485,7 +485,9 @@ public class HelpCommand extends Command {
 
 		boolean isAdmin = event.getMember().hasPermission(Permission.ADMINISTRATOR);
 
-		paginateBuilder.addItems("Use the arrow buttons to navigate through the pages" + generatePageMap(isAdmin) +"\n\n*<> = required [] = optional");
+		paginateBuilder.addItems(
+			"Use the arrow buttons to navigate through the pages" + generatePageMap(isAdmin) + "\n\n*<> = required [] = optional"
+		);
 
 		HelpGenerator help = new HelpGenerator(getGuildPrefix(event.getGuild().getId()));
 		paginateBuilder.addItems(
@@ -500,8 +502,10 @@ public class HelpCommand extends Command {
 
 		paginateBuilder.addItems(help.create("slayer [player] [profile]", "Get the slayer data of a player"));
 
-		paginateBuilder.addItems(help.create("skills [player] [profile]", "Get the skills data of a player")
-		 + help.create("hotm [player] [profile]", "Get a player's heart of the mountain statistics"));
+		paginateBuilder.addItems(
+			help.create("skills [player] [profile]", "Get the skills data of a player") +
+			help.create("hotm [player] [profile]", "Get a player's heart of the mountain statistics")
+		);
 
 		paginateBuilder.addItems(
 			help.create("dungeons [player] [profile]", "Get the dungeons data of a player") +
@@ -524,9 +528,10 @@ public class HelpCommand extends Command {
 				"g-kicker <u:player> <type:value> ...",
 				"Get all player's who don't meet the provided requirements. The requirement name can be skills, slayer, catacombs, or weight. The requirement value must be an integer."
 			) +
-					help.create(
-							"g-ranks <u:player> [mode:normal|ironman]", "A customizable helper that will tell you who to promote or demote in your Hypixel guild"
-					)
+			help.create(
+				"g-ranks <u:player> [mode:normal|ironman]",
+				"A customizable helper that will tell you who to promote or demote in your Hypixel guild"
+			)
 		);
 
 		paginateBuilder.addItems(
@@ -551,7 +556,7 @@ public class HelpCommand extends Command {
 			help.create("sacks [player] [profile]", "Get a player's sacks' content bag represented in a list") +
 			help.create("wardrobe [player] [profile]", "Get a player's wardrobe armors represented in emojis") +
 			help.create("wardrobe list [player] [profile]", "Get a player's wardrobe armors represented in a list") +
-					help.create("pets [player] [profile]", "Get a player's pets")
+			help.create("pets [player] [profile]", "Get a player's pets")
 		);
 
 		paginateBuilder.addItems(
@@ -559,7 +564,7 @@ public class HelpCommand extends Command {
 			help.create("roles list", "List all roles that can be claimed through the bot") +
 			help.create("bank [player] [profile]", "Get a player's bank and purse coins") +
 			help.create("bank history [player] [profile]", "Get a player's bank transaction history") +
-					help.create("active-coins [player] [profile]", "Get a player's active coins (bank, purse, and sold auctions)") +
+			help.create("active-coins [player] [profile]", "Get a player's active coins (bank, purse, and sold auctions)") +
 			help.create("networth [player] [profile]", "Calculate a player's networth") +
 			help.create("networth [player] [profile] --verbose", "Calculate a player's networth with a detailed JSON of each item cost") +
 			help.create("weight [player] [profile]", "Get a player's slayer, skills, dungeons, and total weight") +
@@ -584,7 +589,7 @@ public class HelpCommand extends Command {
 			help.create("event leave", "Leave the current event") +
 			help.create("event leaderboard", "Get the leaderboard for current event") +
 			(isAdmin ? help.create("event end", "Force end the event") : "") +
-					(isAdmin ? help.create("event cancel", "Cancel the event. No announcement will be made.") : "")
+			(isAdmin ? help.create("event cancel", "Cancel the event. No announcement will be made.") : "")
 		);
 
 		if (isAdmin) {
@@ -593,25 +598,27 @@ public class HelpCommand extends Command {
 				help.create("setup", "A short walk-through on how to setup the bot") +
 				help.create("categories", "Get the name and id of all categories in this server") +
 				help.create("settings set hypixel_key [key]", "Set a Hypixel API key for this server") +
-						help.create("settings set prefix [prefix]", "Set the prefix of the bot") +
-						help.create("settings delete hypixel_key", "Delete the set Hypixel API key of this server") +
+				help.create("settings set prefix [prefix]", "Set the prefix of the bot") +
+				help.create("settings delete hypixel_key", "Delete the set Hypixel API key of this server") +
 				help.create("settings delete prefix", "Reset the prefix of the bot") +
-					help.create("settings delete all", "Delete the current server settings")
-
+				help.create("settings delete all", "Delete the current server settings")
 			);
 
 			paginateBuilder.addItems(
 				help.create("settings verify", "Get the current verify settings for the bot") +
 				help.create("settings verify [enable|disable]", "Enable or disable automatic verify") +
 				help.create("settings verify message [message]", "The message that users will see when verifying") +
-				help.create(
-					"settings verify role add [@role]",
-					"Add a role that user will receive upon being verified"
-				) +
+				help.create("settings verify role add [@role]", "Add a role that user will receive upon being verified") +
 				help.create("settings verify role remove [@role]", "Remove a verify role") +
-				help.create("settings verify channel [#channel]", "Channel where the verify message will be sent and messages will be auto deleted") +
-				help.create("settings verify nickname <prefix> [IGN] <postfix>", "The nickname template on verifying. Can be set to none.") +
-						help.create("settings verify [enable|disable] sync", "Enable or disable automatic verify role and nickname syncing")
+				help.create(
+					"settings verify channel [#channel]",
+					"Channel where the verify message will be sent and messages will be auto deleted"
+				) +
+				help.create(
+					"settings verify nickname <prefix> [IGN] <postfix>",
+					"The nickname template on verifying. Can be set to none."
+				) +
+				help.create("settings verify [enable|disable] sync", "Enable or disable automatic verify role and nickname syncing")
 			);
 
 			paginateBuilder.addItems(
