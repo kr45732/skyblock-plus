@@ -306,9 +306,7 @@ public class SettingsExecute {
 					if (args.length == 2) {
 						eb = defaultEmbed("Settings");
 						if (higherDepth(currentSettings, "automatedVerify") != null) {
-							eb.setDescription(
-								getCurrentVerifySettings(higherDepth(currentSettings, "automatedVerify"))
-							);
+							eb.setDescription(getCurrentVerifySettings(higherDepth(currentSettings, "automatedVerify")));
 						} else {
 							eb.setDescription("Error! Data not found");
 						}

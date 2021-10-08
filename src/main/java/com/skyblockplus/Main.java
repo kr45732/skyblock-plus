@@ -163,7 +163,7 @@ public class Main {
 					new CakesCommand(),
 					new ActiveCoinsCommand(),
 					new HotmCommand(),
-						new VoteCommand()
+					new VoteCommand()
 				)
 				.build();
 

@@ -108,7 +108,9 @@ public class MainListener extends ListenerAdapter {
 						event.getGuild().getName() +
 						"\n- My prefix is `" +
 						DEFAULT_PREFIX +
-						"` and can be changed using " + DEFAULT_PREFIX + "settings set prefix <prefix>\n- You can view my commands by running `" +
+						"` and can be changed using " +
+						DEFAULT_PREFIX +
+						"settings set prefix <prefix>\n- You can view my commands by running `" +
 						DEFAULT_PREFIX +
 						"help`\n- Make sure to check out `" +
 						DEFAULT_PREFIX +

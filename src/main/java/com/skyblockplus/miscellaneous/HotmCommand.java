@@ -65,7 +65,7 @@ public class HotmCommand extends Command {
 				" (**Spent:** " +
 				formatNumber(higherDepth(miningJson, "powder_spent_gemstone", 0)) +
 				")\n• **Selected ability:** " +
-						capitalizeString(higherDepth(miningJson, "selected_pickaxe_ability", "none").replace("_", " ")),
+				capitalizeString(higherDepth(miningJson, "selected_pickaxe_ability", "none").replace("_", " ")),
 				false
 			);
 

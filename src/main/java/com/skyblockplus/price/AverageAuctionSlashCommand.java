@@ -38,7 +38,6 @@ public class AverageAuctionSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData(name, "Get the average auction price of an item")
-			.addOption(OptionType.STRING, "item", "Item name", true);
+		return new CommandData(name, "Get the average auction price of an item").addOption(OptionType.STRING, "item", "Item name", true);
 	}
 }

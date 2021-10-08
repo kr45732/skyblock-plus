@@ -492,7 +492,7 @@ public class HelpCommand extends Command {
 			help.create("link <player>", "Link your Hypixel account to the bot") +
 			help.create("link", "Get what Hypixel account you are linked to") +
 			help.create("unlink", "Unlink your account from the bot") +
-				help.create("vote", "Vote for the bot")
+			help.create("vote", "Vote for the bot")
 		);
 
 		paginateBuilder.addItems(help.create("slayer [player] [profile]", "Get the slayer data of a player"));
