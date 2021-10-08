@@ -65,7 +65,7 @@ public class EnderChestSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData("enderchest", "Get a player's enderchest represented in emojis")
+		return new CommandData(name, "Get a player's enderchest represented in emojis")
 			.addOption(OptionType.STRING, "player", "Player username or mention")
 			.addOption(OptionType.STRING, "profile", "Profile name");
 	}

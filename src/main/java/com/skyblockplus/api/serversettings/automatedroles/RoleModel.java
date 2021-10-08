@@ -41,7 +41,5 @@ public class RoleModel {
 	@Fetch(value = FetchMode.SUBSELECT)
 	private List<RoleObject> levels = new ArrayList<>();
 
-	private String stackable = "false";
-
 	public RoleModel() {}
 }

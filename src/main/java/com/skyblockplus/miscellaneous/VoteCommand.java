@@ -16,39 +16,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.features.setup;
-
-import static com.skyblockplus.utils.Utils.*;
+package com.skyblockplus.miscellaneous;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.Button;
 
-public class SetupCommand extends Command {
+import static com.skyblockplus.utils.Utils.*;
 
-	public SetupCommand() {
-		this.name = "setup";
+public class VoteCommand extends Command {
+
+	public VoteCommand() {
+		this.name = "vote";
 		this.cooldown = globalCooldown;
-		this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
 		this.botPermissions = defaultPerms();
 	}
 
-	public static ActionRow getSetupActionRow() {
-		return ActionRow.of(
-			Button.primary("setup_command_verify", "Verification"),
-			Button.primary("setup_command_apply", "Application"),
-			Button.primary("setup_command_guild", "Guild Roles & Ranks"),
-			Button.primary("setup_command_roles", "Skyblock Roles"),
-			Button.primary("setup_command_prefix", "Prefix")
-		);
-	}
-
-	public static EmbedBuilder getSetupEmbed() {
-		return defaultEmbed("Setup").setDescription("Choose one of the buttons below to setup the corresponding feature");
+	public static EmbedBuilder getVoteEmbed() {
+		return defaultEmbed("Vote for Skyblock Plus")
+				.setDescription("You can vote for the bot on [**top.gg**](https://top.gg/bot/796791167366594592/vote), [**Discord Bot List**](https://discordbotlist.com/bots/skyblock-plus/upvote), and [**discords.com**](https://discords.com/bots/bot/796791167366594592/vote)"
+				);
 	}
 
 	@Override
@@ -58,7 +46,7 @@ public class SetupCommand extends Command {
 			protected void execute() {
 				logCommand();
 
-				ebMessage.editMessageEmbeds(getSetupEmbed().build()).setActionRows(getSetupActionRow()).queue();
+				embed(getVoteEmbed());
 			}
 		}
 			.submit();

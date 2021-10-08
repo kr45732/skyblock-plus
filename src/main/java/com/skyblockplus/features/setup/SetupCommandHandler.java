@@ -101,7 +101,6 @@ public class SetupCommandHandler {
 								"- In order to enable automatic roles, there must be at least one role setting enabled:\n" +
 								"- `settings roles add [roleName] [value] [@role]` - add a level to a role. Maximum for all roles __combined__ is 120.\n" +
 								"- `settings roles remove [roleName] [value]` - remove a level from a role.\n" +
-								"- `settings roles stackable [roleName] [true|false]` - make a role stackable or not stackable.\n" +
 								"- `settings roles set [roleName] [@role]` - set a one level role's role\n" +
 								"- `settings roles enable [roleName]` - enable a role.\n" +
 								"• Tutorial video linked [__here__](https://streamable.com/wninsw)\n\n" +

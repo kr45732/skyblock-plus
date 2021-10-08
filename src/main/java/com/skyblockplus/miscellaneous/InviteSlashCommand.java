@@ -41,6 +41,6 @@ public class InviteSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData("invite", "Invite this bot to your server");
+		return new CommandData(name, "Invite this bot to your server");
 	}
 }

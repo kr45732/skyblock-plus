@@ -20,30 +20,23 @@ package com.skyblockplus.miscellaneous;
 
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
-public class ActiveCoinsSlashCommand extends SlashCommand {
+public class VoteSlashCommand extends SlashCommand {
 
-	public ActiveCoinsSlashCommand() {
-		this.name = "active-coins";
+	public VoteSlashCommand() {
+		this.name = "vote";
 	}
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
 		event.logCommand();
 
-		if (event.invalidPlayerOption()) {
-			return;
-		}
-
-		event.embed(ActiveCoinsCommand.getActiveCoins(event.player, event.getOptionStr("profile")));
+		event.embed(VoteCommand.getVoteEmbed());
 	}
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData(name, "Get the active coins (bank, purse, and sold auctions) of a player")
-			.addOption(OptionType.STRING, "player", "Player username or mention")
-			.addOption(OptionType.STRING, "profile", "Profile name");
+		return new CommandData(name, "Get links where you can vote for the bot");
 	}
 }

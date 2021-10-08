@@ -174,11 +174,7 @@ public class SettingsExecute {
 							eb = setRoleEnable(args[3], "false");
 						}
 					} else if (args.length == 5) {
-						if (args[2].equals("stackable") && args[4].equals("true")) {
-							eb = setRoleStackable(args[3], "true");
-						} else if (args[2].equals("stackable") && args[4].equals("false")) {
-							eb = setRoleStackable(args[3], "false");
-						} else if (args[2].equals("remove")) {
+						if (args[2].equals("remove")) {
 							eb = removeRoleLevel(args[3], args[4]);
 						} else if (args[2].equals("set")) {
 							eb = setOneLevelRole(args[3], args[4]);
@@ -310,13 +306,11 @@ public class SettingsExecute {
 					if (args.length == 2) {
 						eb = defaultEmbed("Settings");
 						if (higherDepth(currentSettings, "automatedVerify") != null) {
-							eb.addField(
-								"Verify Settings",
-								getCurrentVerifySettings(higherDepth(currentSettings, "automatedVerify")),
-								false
+							eb.setDescription(
+								getCurrentVerifySettings(higherDepth(currentSettings, "automatedVerify"))
 							);
 						} else {
-							eb.addField("Verify Settings", "Error! Data not found", false);
+							eb.setDescription("Error! Data not found");
 						}
 					} else if (args.length == 3) {
 						if (args[2].equals("enable")) {
@@ -842,11 +836,6 @@ public class SettingsExecute {
 				currentRoleSettings = database.getRoleSettings(guild.getId(), roleName);
 			}
 
-			if (higherDepth(currentRoleSettings, "stackable") == null) {
-				database.setRoleSettings(guild.getId(), roleName, gson.toJsonTree(new RoleModel()));
-				currentRoleSettings = database.getRoleSettings(guild.getId(), roleName);
-			}
-
 			switch (roleName) {
 				case "guild_member":
 					{
@@ -1032,13 +1021,6 @@ public class SettingsExecute {
 				} catch (Exception ignored) {}
 				pageTitles.add(roleName + " (__one level role__)");
 			} else {
-				ebFieldString.append(
-					higherDepth(currentRoleSettings, "stackable") != null &&
-						higherDepth(currentRoleSettings, "stackable").getAsString().equals("true")
-						? "\n• Stackable"
-						: "\n• Not stackable"
-				);
-
 				if (roleName.equals("guild_member")) {
 					for (JsonElement roleLevel : higherDepth(currentRoleSettings, "levels").getAsJsonArray()) {
 						String guildId = higherDepth(roleLevel, "value").getAsString();
@@ -1299,28 +1281,6 @@ public class SettingsExecute {
 			}
 		}
 		return invalidEmbed("Invalid role value");
-	}
-
-	public EmbedBuilder setRoleStackable(String roleName, String stackable) {
-		if (isOneLevelRole(roleName) || roleName.equals("guild_ranks")) {
-			return invalidEmbed("This role does not support stacking");
-		}
-		JsonObject currentRoleSettings;
-		try {
-			currentRoleSettings = database.getRoleSettings(guild.getId(), roleName).getAsJsonObject();
-		} catch (Exception e) {
-			return invalidEmbed("Invalid Role");
-		}
-
-		currentRoleSettings.addProperty("stackable", stackable);
-		int responseCode = database.setRoleSettings(guild.getId(), roleName, currentRoleSettings);
-		if (responseCode != 200) {
-			return invalidEmbed("API returned response code " + responseCode);
-		}
-
-		EmbedBuilder eb = defaultEmbed("Settings");
-		eb.setDescription("**" + roleName + " role:** " + (stackable.equalsIgnoreCase("true") ? "stackable" : "not stackable"));
-		return eb;
 	}
 
 	public EmbedBuilder setOneLevelRole(String roleName, String roleMention) {
@@ -2278,10 +2238,6 @@ public class SettingsExecute {
 			}
 		}
 		return "None";
-	}
-
-	public String getSettingsPrefix() {
-		return guildPrefix;
 	}
 
 	public EmbedBuilder apiFailMessage(int responseCode) {

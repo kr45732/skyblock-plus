@@ -38,6 +38,6 @@ public class BinSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData("bin", "Get the lowest bin of an item").addOption(OptionType.STRING, "item", "Item name", true);
+		return new CommandData(name, "Get the lowest bin of an item").addOption(OptionType.STRING, "item", "Item name", true);
 	}
 }

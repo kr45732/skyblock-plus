@@ -82,7 +82,7 @@ public class WardrobeSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData("wardrobe", "Main wardrobe bag command")
+		return new CommandData(name, "Main wardrobe bag command")
 			.addSubcommands(
 				new SubcommandData("list", "Get a list of a player's wardrobe with lore")
 					.addOption(OptionType.STRING, "player", "Player username or mention")

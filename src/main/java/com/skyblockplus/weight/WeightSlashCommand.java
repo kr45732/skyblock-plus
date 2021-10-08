@@ -68,7 +68,7 @@ public class WeightSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData("weight", "Main weight command")
+		return new CommandData(name, "Main weight command")
 			.addSubcommands(
 				new SubcommandData("player", "Get a player's weight")
 					.addOption(OptionType.STRING, "player", "Player username or mention")

@@ -53,7 +53,7 @@ public class HypixelSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData("hypixel", "Main hypixel command")
+		return new CommandData(name, "Main hypixel command")
 			.addSubcommands(
 				new SubcommandData("player", "Get Hypixel information about a player")
 					.addOption(OptionType.STRING, "player", "Player username or mention")

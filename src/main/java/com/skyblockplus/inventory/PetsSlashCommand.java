@@ -43,7 +43,7 @@ public class PetsSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData("pets", "Get a player's pets menu")
+		return new CommandData(name, "Get a player's pets menu")
 			.addOption(OptionType.STRING, "player", "Player username or mention")
 			.addOption(OptionType.STRING, "profile", "Profile name");
 	}

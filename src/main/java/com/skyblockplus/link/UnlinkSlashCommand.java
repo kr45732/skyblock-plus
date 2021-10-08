@@ -36,6 +36,6 @@ public class UnlinkSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData("unlink", "Unlink your account from this bot");
+		return new CommandData(name, "Unlink your account from this bot");
 	}
 }

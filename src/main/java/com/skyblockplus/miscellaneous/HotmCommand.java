@@ -56,16 +56,16 @@ public class HotmCommand extends Command {
 				higherDepth(miningJson, "tokens", 0) +
 				" (**Spent:** " +
 				higherDepth(miningJson, "tokens_spent", 0) +
-				")\n• **Mithril powder:** " +
+				")\n• **Mithril Powder:** " +
 				formatNumber(higherDepth(miningJson, "powder_mithril", 0)) +
 				" (**Spent:** " +
 				formatNumber(higherDepth(miningJson, "powder_spent_mithril", 0)) +
-				")\n• **Gemstone powder:** " +
+				")\n• **Gemstone Powder:** " +
 				formatNumber(higherDepth(miningJson, "powder_gemstone", 0)) +
 				" (**Spent:** " +
 				formatNumber(higherDepth(miningJson, "powder_spent_gemstone", 0)) +
 				")\n• **Selected ability:** " +
-				higherDepth(miningJson, "selected_pickaxe_ability", "none").replace("_", " "),
+						capitalizeString(higherDepth(miningJson, "selected_pickaxe_ability", "none").replace("_", " ")),
 				false
 			);
 
@@ -73,6 +73,7 @@ public class HotmCommand extends Command {
 			hotmPerkIdToName.put("forge_time", "quick forge");
 			hotmPerkIdToName.put("random_event", "luck of the cave");
 			hotmPerkIdToName.put("mining_experience", "seasoned mineman");
+			hotmPerkIdToName.put("special_0", "peak of the mountain");
 
 			StringBuilder perksStr = new StringBuilder();
 			for (Entry<String, JsonElement> perk : higherDepth(miningJson, "nodes").getAsJsonObject().entrySet()) {
@@ -86,6 +87,9 @@ public class HotmCommand extends Command {
 					.append(perk.getValue().getAsInt())
 					.append("/");
 				switch (perk.getKey()) {
+					case "special_0":
+						perksStr.append(5);
+						break;
 					case "great_explorer":
 					case "forge_time":
 					case "fortunate":

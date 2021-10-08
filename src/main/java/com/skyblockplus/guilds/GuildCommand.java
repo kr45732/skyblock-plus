@@ -133,10 +133,10 @@ public class GuildCommand extends Command {
 		}
 		JsonElement guildJson = hypixelResponse.getResponse();
 
-		return getGuildExp(guildJson, days, usernameUuid.getUsername(), new PaginatorEvent(event));
+		return getGuildExp(guildJson, days, usernameUuid.getUsername(), event);
 	}
 
-	public static EmbedBuilder getGuildExpFromName(String guildName, long days, CommandEvent event) {
+	public static EmbedBuilder getGuildExpFromName(String guildName, long days, PaginatorEvent event) {
 		if (days < 1 || days > 7) {
 			return invalidEmbed("Days must be between 1 to 7");
 		}
@@ -147,7 +147,7 @@ public class GuildCommand extends Command {
 		}
 		JsonElement guildJson = hypixelResponse.getResponse();
 
-		return getGuildExp(guildJson, days, null, new PaginatorEvent(event));
+		return getGuildExp(guildJson, days, null, event);
 	}
 
 	public static EmbedBuilder getGuildPlayer(String username) {
@@ -367,7 +367,7 @@ public class GuildCommand extends Command {
 						paginate(getGuildExpFromPlayer(args[2].split("u:")[1], days, new PaginatorEvent(event)));
 						return;
 					} else if (args[2].startsWith("g:")) {
-						paginate(getGuildExpFromName(args[2].split("g:")[1], days, event));
+						paginate(getGuildExpFromName(args[2].split("g:")[1], days, new PaginatorEvent(event)));
 						return;
 					}
 				} else if (args.length >= 3 && (args[1].equals("information") || args[1].equals("info"))) {

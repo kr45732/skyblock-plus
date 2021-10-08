@@ -71,7 +71,7 @@ public class EssenceSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData("essence", "Get essence upgrade information for an item")
+		return new CommandData(name, "Get essence upgrade information for an item")
 			.addSubcommands(
 				new SubcommandData("upgrade", "Interactive message to find the essence amount to upgrade an item")
 					.addOption(OptionType.STRING, "item", "Item name", true),

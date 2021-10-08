@@ -329,32 +329,7 @@ public class RoleCommand extends Command {
 
 								JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
 
-								if (higherDepth(currentRole, "stackable").getAsBoolean()) {
-									for (JsonElement currentLevel : levelsArray) {
-										int currentLevelValue = higherDepth(currentLevel, "value").getAsInt();
-										Role currentLevelRole = guild.getRoleById(higherDepth(currentLevel, "roleId").getAsString());
 
-										if (roleAmount >= currentLevelValue) {
-											if (!member.getRoles().contains(currentLevelRole)) {
-												if (botRole.canInteract(currentLevelRole)) {
-													toAdd.add(currentLevelRole);
-													addedRoles.append(roleChangeString(currentLevelRole.getName()));
-												} else {
-													errorRoles.append(roleChangeString(currentLevelRole.getName()));
-												}
-											}
-										} else {
-											if (member.getRoles().contains(currentLevelRole)) {
-												if (botRole.canInteract(currentLevelRole)) {
-													toRemove.add(currentLevelRole);
-													removedRoles.append(roleChangeString(currentLevelRole.getName()));
-												} else {
-													errorRoles.append(roleChangeString(currentLevelRole.getName()));
-												}
-											}
-										}
-									}
-								} else {
 									for (int i = levelsArray.size() - 1; i >= 0; i--) {
 										JsonElement currentLevel = levelsArray.get(i);
 
@@ -397,7 +372,7 @@ public class RoleCommand extends Command {
 											}
 											break;
 										}
-									}
+
 									break;
 								}
 							}

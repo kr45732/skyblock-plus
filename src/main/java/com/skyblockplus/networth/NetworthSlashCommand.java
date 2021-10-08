@@ -46,7 +46,7 @@ public class NetworthSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData("networth", "Calculate a player's networth")
+		return new CommandData(name, "Calculate a player's networth")
 			.addOption(OptionType.STRING, "player", "Player username or mention")
 			.addOption(OptionType.STRING, "profile", "Profile name")
 			.addOption(OptionType.BOOLEAN, "verbose", "Links a detailed JSON with a breakdown of value of each item");

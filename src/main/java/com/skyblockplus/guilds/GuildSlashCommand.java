@@ -63,7 +63,7 @@ public class GuildSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData("guild", "Main guild command")
+		return new CommandData(name, "Main guild command")
 			.addSubcommands(
 				new SubcommandData("player", "Find what guild a player is in")
 					.addOption(OptionType.STRING, "player", "Player username or mention"),

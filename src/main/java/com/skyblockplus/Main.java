@@ -162,7 +162,8 @@ public class Main {
 					new CommunityUpgradesCommand(),
 					new CakesCommand(),
 					new ActiveCoinsCommand(),
-					new HotmCommand()
+					new HotmCommand(),
+						new VoteCommand()
 				)
 				.build();
 
@@ -170,6 +171,7 @@ public class Main {
 			new SlashCommandClient()
 				.addSlashCommands(
 					new InviteSlashCommand(),
+					new VoteSlashCommand(),
 					new HotmSlashCommand(),
 					new InformationSlashCommand(),
 					new LinkSlashCommand(),

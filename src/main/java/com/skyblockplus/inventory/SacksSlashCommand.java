@@ -43,7 +43,7 @@ public class SacksSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData("sacks", "Get a player's sacks' content bag represented in a list")
+		return new CommandData(name, "Get a player's sacks' content bag represented in a list")
 			.addOption(OptionType.STRING, "player", "Player username or mention")
 			.addOption(OptionType.STRING, "profile", "Profile name");
 	}

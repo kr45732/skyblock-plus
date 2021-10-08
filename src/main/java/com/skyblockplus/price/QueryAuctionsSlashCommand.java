@@ -38,7 +38,7 @@ public class QueryAuctionsSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData("query", "Query the auction house for the lowest bin of an item")
+		return new CommandData(name, "Query the auction house for the lowest bin of an item")
 			.addOption(OptionType.STRING, "item", "Item name", true);
 	}
 }

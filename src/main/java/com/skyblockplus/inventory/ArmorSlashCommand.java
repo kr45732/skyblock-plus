@@ -43,7 +43,7 @@ public class ArmorSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData("armor", "Get a player's equipped armor with lore")
+		return new CommandData(name, "Get a player's equipped armor with lore")
 			.addOption(OptionType.STRING, "player", "Player username or mention")
 			.addOption(OptionType.STRING, "profile", "Profile name");
 	}

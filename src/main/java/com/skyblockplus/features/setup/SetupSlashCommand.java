@@ -37,6 +37,6 @@ public class SetupSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData("setup", "A short walk-through on how to setup the bot");
+		return new CommandData(name, "A short walk-through on how to setup the bot");
 	}
 }

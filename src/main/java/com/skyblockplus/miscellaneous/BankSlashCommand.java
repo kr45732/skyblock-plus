@@ -54,7 +54,7 @@ public class BankSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData("bank", "Main bank command")
+		return new CommandData(name, "Main bank command")
 			.addSubcommands(
 				new SubcommandData("total", "Get a player's bank and purse coins")
 					.addOption(OptionType.STRING, "player", "Player username or mention")

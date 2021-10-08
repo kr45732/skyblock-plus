@@ -86,9 +86,11 @@ public class NetworthExecute {
 			@Override
 			protected void execute() {
 				logCommand();
-				if (event.getMessage().getContentRaw().contains("--verbose")) {
-					verbose = true;
-					args = event.getMessage().getContentRaw().replace("--verbose", "").trim().split(" ");
+				for (int i = 0; i < args.length; i++) {
+					if (args[i].equals("--verbose")) {
+						verbose = true;
+						removeArg(i);
+					}
 				}
 
 				if (args.length == 3 || args.length == 2 || args.length == 1) {

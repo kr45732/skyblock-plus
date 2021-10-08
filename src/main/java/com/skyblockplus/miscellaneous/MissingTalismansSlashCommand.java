@@ -42,7 +42,7 @@ public class MissingTalismansSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData("missing", "Get a player's missing talismans")
+		return new CommandData(name, "Get a player's missing talismans")
 			.addOption(OptionType.STRING, "player", "Player username or mention")
 			.addOption(OptionType.STRING, "profile", "Profile name");
 	}

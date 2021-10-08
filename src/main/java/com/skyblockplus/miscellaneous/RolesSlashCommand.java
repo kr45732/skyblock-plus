@@ -50,7 +50,7 @@ public class RolesSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData("roles", "Main roles command")
+		return new CommandData(name, "Main roles command")
 			.addSubcommands(
 				new SubcommandData("claim", "Claim automatic Skyblock roles. The player must be linked to the bot")
 					.addOption(OptionType.STRING, "profile", "Profile name"),

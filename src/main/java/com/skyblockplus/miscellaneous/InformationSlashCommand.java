@@ -41,6 +41,6 @@ public class InformationSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData("information", "Get information about this bot");
+		return new CommandData(name, "Get information about this bot");
 	}
 }

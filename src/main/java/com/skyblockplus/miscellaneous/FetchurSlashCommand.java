@@ -37,6 +37,6 @@ public class FetchurSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData("fetchur", "Get the item that fetchur wants today");
+		return new CommandData(name, "Get the item that fetchur wants today");
 	}
 }

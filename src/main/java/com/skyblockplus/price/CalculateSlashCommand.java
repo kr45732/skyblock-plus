@@ -38,6 +38,6 @@ public class CalculateSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData("calculate", "Calculate the price of an auction").addOption(OptionType.STRING, "uuid", "Auction UUID", true);
+		return new CommandData(name, "Calculate the price of an auction").addOption(OptionType.STRING, "uuid", "Auction UUID", true);
 	}
 }

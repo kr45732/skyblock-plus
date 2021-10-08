@@ -62,7 +62,7 @@ public class AuctionsSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData("auctions", "Main auctions command")
+		return new CommandData(name, "Main auctions command")
 			.addSubcommands(
 				new SubcommandData("player", "Get player's active (not claimed) auctions on all profiles")
 					.addOption(OptionType.STRING, "player", "Player username or mention")
