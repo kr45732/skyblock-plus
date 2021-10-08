@@ -357,7 +357,7 @@ public class RoleCommand extends Command {
 										for (int j = i - 1; j >= 0; j--) {
 											JsonElement currentLevelRemoveStackable = levelsArray.get(j);
 											Role currentLevelRoleRemoveStackable = guild.getRoleById(
-													higherDepth(currentLevelRemoveStackable, "roleId").getAsString()
+												higherDepth(currentLevelRemoveStackable, "roleId").getAsString()
 											);
 
 											if (member.getRoles().contains(currentLevelRoleRemoveStackable)) {
