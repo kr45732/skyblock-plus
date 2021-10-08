@@ -33,7 +33,7 @@ public class UuidSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandExecutedEvent event) {
 		event.logCommand();
 
-		if(event.invalidPlayerOption()){
+		if (event.invalidPlayerOption()) {
 			return;
 		}
 

@@ -164,7 +164,7 @@ public class Main {
 					new ActiveCoinsCommand(),
 					new HotmCommand(),
 					new VoteCommand(),
-						new TrackAuctionsCommand()
+					new TrackAuctionsCommand()
 				)
 				.build();
 
@@ -216,7 +216,7 @@ public class Main {
 					new GuildKickerSlashCommand(),
 					new PetsSlashCommand(),
 					new UuidSlashCommand(),
-						new TrackAuctionsSlashCommand()
+					new TrackAuctionsSlashCommand()
 				);
 
 		jda =

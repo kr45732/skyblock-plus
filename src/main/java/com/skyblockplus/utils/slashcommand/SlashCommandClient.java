@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -41,7 +40,7 @@ public class SlashCommandClient extends ListenerAdapter {
 
 	public SlashCommandClient addSlashCommands(SlashCommand... commands) {
 		for (SlashCommand command : commands) {
-			if(slashCommands.stream().anyMatch(auction -> auction.getName().equalsIgnoreCase(command.getName()))){
+			if (slashCommands.stream().anyMatch(auction -> auction.getName().equalsIgnoreCase(command.getName()))) {
 				throw new IllegalArgumentException("Command added has a name that has already been indexed: " + command.getName());
 			}
 		}

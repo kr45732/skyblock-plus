@@ -34,10 +34,9 @@ public class TrackAuctionsSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandExecutedEvent event) {
 		event.logCommand();
 
-
-		switch (event.getSubcommandName()){
+		switch (event.getSubcommandName()) {
 			case "auctions":
-				if(event.invalidPlayerOption()){
+				if (event.invalidPlayerOption()) {
 					return;
 				}
 				event.embed(TrackAuctionsCommand.trackAuctions(event.player, event.getUser().getId()));
@@ -54,9 +53,13 @@ public class TrackAuctionsSlashCommand extends SlashCommand {
 	@Override
 	public CommandData getCommandData() {
 		return new CommandData(name, "Main track command")
-				.addSubcommands(
-						new SubcommandData("auctions", "Track the auctions of a certain player. You will receive a DM from the bot when the player's auction ends").addOption(OptionType.STRING, "player", "Player username or mention"),
-						new SubcommandData("stop","Stop tracking a players auctions")
-				)	;
+			.addSubcommands(
+				new SubcommandData(
+					"auctions",
+					"Track the auctions of a certain player. You will receive a DM from the bot when the player's auction ends"
+				)
+					.addOption(OptionType.STRING, "player", "Player username or mention"),
+				new SubcommandData("stop", "Stop tracking a players auctions")
+			);
 	}
 }

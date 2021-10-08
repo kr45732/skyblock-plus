@@ -18,6 +18,10 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
@@ -25,17 +29,12 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.InvItem;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import me.nullicorn.nedit.NBTReader;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
-import static com.skyblockplus.utils.Utils.*;
+import me.nullicorn.nedit.NBTReader;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class TrackAuctionsCommand extends Command {
 
@@ -49,31 +48,33 @@ public class TrackAuctionsCommand extends Command {
 	}
 
 	public static EmbedBuilder trackAuctions(String username, String userId) {
-		if(commandAuthorToTrackingUser.containsKey(userId)){
+		if (commandAuthorToTrackingUser.containsKey(userId)) {
 			UsernameUuidStruct stoppedTracking = commandAuthorToTrackingUser.get(userId);
-			 return invalidEmbed("You are already tracking [**" + stoppedTracking.getUsername() + "**](" + stoppedTracking.getAuctionUrl() + ")");
+			return invalidEmbed(
+				"You are already tracking [**" + stoppedTracking.getUsername() + "**](" + stoppedTracking.getAuctionUrl() + ")"
+			);
 		}
 
 		UsernameUuidStruct uuidStruct = usernameToUuid(username);
-		if(uuidStruct.isNotValid()){
+		if (uuidStruct.isNotValid()) {
 			return invalidEmbed(uuidStruct.getFailCause());
 		}
 
 		commandAuthorToTrackingUser.put(userId, uuidStruct);
 
 		return defaultEmbed("Auction tracker")
-				.setDescription("Now tracking the auctions of [**" + uuidStruct.getUsername() + "**](" + uuidStruct.getAuctionUrl() + ")");
+			.setDescription("Now tracking the auctions of [**" + uuidStruct.getUsername() + "**](" + uuidStruct.getAuctionUrl() + ")");
 	}
 
-	private static void trackAuctionRunnable(){
-		if(commandAuthorToTrackingUser.isEmpty()){
+	private static void trackAuctionRunnable() {
+		if (commandAuthorToTrackingUser.isEmpty()) {
 			return;
 		}
 
 		JsonElement endedAuctionsJson = getJson("https://api.hypixel.net/skyblock/auctions_ended");
 		Instant jsonLastUpdated = Instant.ofEpochMilli(higherDepth(endedAuctionsJson, "lastUpdated").getAsLong());
 
-		if(lastUpdated == null || lastUpdated.isBefore(jsonLastUpdated)){
+		if (lastUpdated == null || lastUpdated.isBefore(jsonLastUpdated)) {
 			lastUpdated = jsonLastUpdated;
 
 			JsonArray endedAuctionsArray = higherDepth(endedAuctionsJson, "auctions").getAsJsonArray();
@@ -82,41 +83,62 @@ public class TrackAuctionsCommand extends Command {
 
 				String itemName = "???";
 				try {
-					InvItem item = getGenericInventoryMap(NBTReader.readBase64(higherDepth(endedAuction, "item_bytes").getAsString())).get(0);
-					itemName = (item.getCount() > 1  ? item.getCount() + "x ": "") + (item.getId().equals("ENCHANTED_BOOK") ? parseMcCodes(item.getLore().split("\n")[0]) : (item.getId().equals("PET") ? capitalizeString(item.getRarity()) + " " : "")) + item.getName();
-				} catch (Exception ignored) {
-				}
+					InvItem item = getGenericInventoryMap(NBTReader.readBase64(higherDepth(endedAuction, "item_bytes").getAsString()))
+						.get(0);
+					itemName =
+						(item.getCount() > 1 ? item.getCount() + "x " : "") +
+						(
+							item.getId().equals("ENCHANTED_BOOK")
+								? parseMcCodes(item.getLore().split("\n")[0])
+								: (item.getId().equals("PET") ? capitalizeString(item.getRarity()) + " " : "")
+						) +
+						item.getName();
+				} catch (Exception ignored) {}
 				String finalItemName = itemName;
 				String soldFor = formatNumber(higherDepth(endedAuction, "price").getAsLong());
 				long endedAt = higherDepth(endedAuction, "timestamp").getAsLong() / 1000;
 
-				commandAuthorToTrackingUser.entrySet().stream()
-						.filter(entry -> entry.getValue().getUuid().equals(seller)).forEach(
-								entry -> jda.openPrivateChannelById(entry.getKey()).queue(
-										dm -> dm.sendMessageEmbeds(
-													defaultEmbed("Auction tracker")
-															.setDescription(
-																	"**Seller:** " + entry.getValue().getUsername() +
-																			"\n**Item:** " + finalItemName +
-																			"\n**Sold for:** " + soldFor  +
-																			"\n**Ended:** <t:" + endedAt + ":R>"
-															).build()
-										).queue(ignored -> {}, ignored -> {})
-								)
-						);
+				commandAuthorToTrackingUser
+					.entrySet()
+					.stream()
+					.filter(entry -> entry.getValue().getUuid().equals(seller))
+					.forEach(entry ->
+						jda
+							.openPrivateChannelById(entry.getKey())
+							.queue(dm ->
+								dm
+									.sendMessageEmbeds(
+										defaultEmbed("Auction tracker")
+											.setDescription(
+												"**Seller:** " +
+												entry.getValue().getUsername() +
+												"\n**Item:** " +
+												finalItemName +
+												"\n**Sold for:** " +
+												soldFor +
+												"\n**Ended:** <t:" +
+												endedAt +
+												":R>"
+											)
+											.build()
+									)
+									.queue(ignored -> {}, ignored -> {})
+							)
+					);
 			}
 		}
 	}
 
-	public static void scheduleTrackingRunnable(){
+	public static void scheduleTrackingRunnable() {
 		scheduler.scheduleAtFixedRate(TrackAuctionsCommand::trackAuctionRunnable, 0, 30, TimeUnit.SECONDS);
 	}
 
 	public static EmbedBuilder stopTrackingAuctions(String userId) {
-		if(commandAuthorToTrackingUser.containsKey(userId)){
+		if (commandAuthorToTrackingUser.containsKey(userId)) {
 			UsernameUuidStruct stoppedTracking = commandAuthorToTrackingUser.get(userId);
 			commandAuthorToTrackingUser.remove(userId);
-			return defaultEmbed("Auction tracker").setDescription("Stopped tracking [**" + stoppedTracking.getUsername() + "**](" + stoppedTracking.getAuctionUrl() + ")");
+			return defaultEmbed("Auction tracker")
+				.setDescription("Stopped tracking [**" + stoppedTracking.getUsername() + "**](" + stoppedTracking.getAuctionUrl() + ")");
 		}
 
 		return defaultEmbed("Auction tracker").setDescription("You are not tracking anyone");
@@ -129,14 +151,14 @@ public class TrackAuctionsCommand extends Command {
 			protected void execute() {
 				logCommand();
 
-				if((args.length == 3 || args.length == 2) && args[1].equals("auctions")) {
+				if ((args.length == 3 || args.length == 2) && args[1].equals("auctions")) {
 					if (getMentionedUsername(args.length == 2 ? -1 : 2)) {
 						return;
 					}
 
 					embed(trackAuctions(username, event.getAuthor().getId()));
 					return;
-				}else if(args.length == 2 && args[1].equals("stop")){
+				} else if (args.length == 2 && args[1].equals("stop")) {
 					embed(stopTrackingAuctions(event.getAuthor().getId()));
 					return;
 				}
