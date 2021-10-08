@@ -163,7 +163,8 @@ public class Main {
 					new CakesCommand(),
 					new ActiveCoinsCommand(),
 					new HotmCommand(),
-					new VoteCommand()
+					new VoteCommand(),
+						new TrackAuctionsCommand()
 				)
 				.build();
 
@@ -214,7 +215,8 @@ public class Main {
 					new GuildRanksSlashCommand(),
 					new GuildKickerSlashCommand(),
 					new PetsSlashCommand(),
-					new UuidSlashCommand()
+					new UuidSlashCommand(),
+						new TrackAuctionsSlashCommand()
 				);
 
 		jda =
@@ -240,6 +242,7 @@ public class Main {
 		jda.getPresence().setActivity(Activity.watching(DEFAULT_PREFIX + "help in " + jda.getGuilds().size() + " servers"));
 
 		ApiHandler.scheduleDatabaseUpdate();
+		TrackAuctionsCommand.scheduleTrackingRunnable();
 		//	scheduleUpdateLinkedAccounts();
 	}
 

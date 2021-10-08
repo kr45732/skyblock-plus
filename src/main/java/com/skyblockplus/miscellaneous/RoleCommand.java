@@ -328,23 +328,11 @@ public class RoleCommand extends Command {
 								}
 
 								JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
-
-								for (int i = levelsArray.size() - 1; i >= 0; i--) {
-									JsonElement currentLevel = levelsArray.get(i);
-
+								for (JsonElement currentLevel : levelsArray) {
 									int currentLevelValue = higherDepth(currentLevel, "value").getAsInt();
 									Role currentLevelRole = guild.getRoleById(higherDepth(currentLevel, "roleId").getAsString());
 
-									if (roleAmount < currentLevelValue) {
-										if (member.getRoles().contains(currentLevelRole)) {
-											if (botRole.canInteract(currentLevelRole)) {
-												toRemove.add(currentLevelRole);
-												removedRoles.append(roleChangeString(currentLevelRole.getName()));
-											} else {
-												errorRoles.append(roleChangeString(currentLevelRole.getName()));
-											}
-										}
-									} else {
+									if (roleAmount >= currentLevelValue) {
 										if (!member.getRoles().contains(currentLevelRole)) {
 											if (botRole.canInteract(currentLevelRole)) {
 												toAdd.add(currentLevelRole);
@@ -353,27 +341,18 @@ public class RoleCommand extends Command {
 												errorRoles.append(roleChangeString(currentLevelRole.getName()));
 											}
 										}
-
-										for (int j = i - 1; j >= 0; j--) {
-											JsonElement currentLevelRemoveStackable = levelsArray.get(j);
-											Role currentLevelRoleRemoveStackable = guild.getRoleById(
-												higherDepth(currentLevelRemoveStackable, "roleId").getAsString()
-											);
-
-											if (member.getRoles().contains(currentLevelRoleRemoveStackable)) {
-												if (botRole.canInteract(currentLevelRole)) {
-													toRemove.add(currentLevelRoleRemoveStackable);
-													removedRoles.append(roleChangeString(currentLevelRoleRemoveStackable.getName()));
-												} else {
-													errorRoles.append(roleChangeString(currentLevelRoleRemoveStackable.getName()));
-												}
+									} else {
+										if (member.getRoles().contains(currentLevelRole)) {
+											if (botRole.canInteract(currentLevelRole)) {
+												toRemove.add(currentLevelRole);
+												removedRoles.append(roleChangeString(currentLevelRole.getName()));
+											} else {
+												errorRoles.append(roleChangeString(currentLevelRole.getName()));
 											}
 										}
-										break;
 									}
-
-									break;
 								}
+								break;
 							}
 						case "doom_slayer":
 							{
@@ -482,6 +461,7 @@ public class RoleCommand extends Command {
 							}
 					}
 				}
+
 				eb.setDescription(
 					"**Added Roles (" +
 					toAdd.size() +
@@ -497,7 +477,7 @@ public class RoleCommand extends Command {
 				}
 
 				if (errorRoles.length() > 0) {
-					eb.addField("Error giving roles:", errorRoles.toString(), false);
+					eb.addField("Unable to give:", errorRoles.toString(), false);
 				}
 
 				guild.modifyMemberRoles(member, toAdd, toRemove).queue();
@@ -517,7 +497,7 @@ public class RoleCommand extends Command {
 
 	public static EmbedBuilder listRoles(PaginatorEvent event) {
 		JsonElement rolesJson = database.getRolesSettings(event.getGuild().getId());
-		if (rolesJson == null || higherDepth(rolesJson, "enable") == null || !higherDepth(rolesJson, "enable").getAsBoolean()) {
+		if (rolesJson == null || !higherDepth(rolesJson, "enable", false)) {
 			return defaultEmbed("Automatic roles not enabled for this server");
 		}
 
@@ -526,7 +506,7 @@ public class RoleCommand extends Command {
 		rolesID.remove("enable");
 		for (String currentRoleName : rolesID) {
 			JsonElement currentRole = higherDepth(rolesJson, currentRoleName);
-			if ((higherDepth(currentRole, "enable") == null) || !higherDepth(currentRole, "enable").getAsBoolean()) {
+			if (!higherDepth(currentRole, "enable", false)) {
 				continue;
 			}
 

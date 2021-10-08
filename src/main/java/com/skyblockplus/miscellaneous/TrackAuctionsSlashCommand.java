@@ -22,27 +22,41 @@ import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
-public class UuidSlashCommand extends SlashCommand {
+public class TrackAuctionsSlashCommand extends SlashCommand {
 
-	public UuidSlashCommand() {
-		this.name = "uuid";
+	public TrackAuctionsSlashCommand() {
+		this.name = "track";
 	}
 
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
 		event.logCommand();
 
-		if(event.invalidPlayerOption()){
-			return;
-		}
 
-		event.embed(UuidCommand.getUuidPlayer(event.player));
+		switch (event.getSubcommandName()){
+			case "auctions":
+				if(event.invalidPlayerOption()){
+					return;
+				}
+				event.embed(TrackAuctionsCommand.trackAuctions(event.player, event.getUser().getId()));
+				break;
+			case "stop":
+				event.embed(TrackAuctionsCommand.stopTrackingAuctions(event.getUser().getId()));
+				break;
+			default:
+				event.embed(event.invalidCommandMessage());
+				break;
+		}
 	}
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData(name, "Convert a username to UUID or UUID to username")
-			.addOption(OptionType.STRING, "player", "Username or UUID");
+		return new CommandData(name, "Main track command")
+				.addSubcommands(
+						new SubcommandData("auctions", "Track the auctions of a certain player. You will receive a DM from the bot when the player's auction ends").addOption(OptionType.STRING, "player", "Player username or mention"),
+						new SubcommandData("stop","Stop tracking a players auctions")
+				)	;
 	}
 }
