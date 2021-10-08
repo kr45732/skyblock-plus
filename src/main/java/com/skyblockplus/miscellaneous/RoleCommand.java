@@ -328,20 +328,14 @@ public class RoleCommand extends Command {
 								}
 
 								JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
-								for (JsonElement currentLevel : levelsArray) {
+
+								for (int i = levelsArray.size() - 1; i >= 0; i--) {
+									JsonElement currentLevel = levelsArray.get(i);
+
 									int currentLevelValue = higherDepth(currentLevel, "value").getAsInt();
 									Role currentLevelRole = guild.getRoleById(higherDepth(currentLevel, "roleId").getAsString());
 
-									if (roleAmount >= currentLevelValue) {
-										if (!member.getRoles().contains(currentLevelRole)) {
-											if (botRole.canInteract(currentLevelRole)) {
-												toAdd.add(currentLevelRole);
-												addedRoles.append(roleChangeString(currentLevelRole.getName()));
-											} else {
-												errorRoles.append(roleChangeString(currentLevelRole.getName()));
-											}
-										}
-									} else {
+									if (roleAmount < currentLevelValue) {
 										if (member.getRoles().contains(currentLevelRole)) {
 											if (botRole.canInteract(currentLevelRole)) {
 												toRemove.add(currentLevelRole);
@@ -350,6 +344,32 @@ public class RoleCommand extends Command {
 												errorRoles.append(roleChangeString(currentLevelRole.getName()));
 											}
 										}
+									} else {
+										if (!member.getRoles().contains(currentLevelRole)) {
+											if (botRole.canInteract(currentLevelRole)) {
+												toAdd.add(currentLevelRole);
+												addedRoles.append(roleChangeString(currentLevelRole.getName()));
+											} else {
+												errorRoles.append(roleChangeString(currentLevelRole.getName()));
+											}
+										}
+
+										for (int j = i - 1; j >= 0; j--) {
+											JsonElement currentLevelRemoveStackable = levelsArray.get(j);
+											Role currentLevelRoleRemoveStackable = guild.getRoleById(
+													higherDepth(currentLevelRemoveStackable, "roleId").getAsString()
+											);
+
+											if (member.getRoles().contains(currentLevelRoleRemoveStackable)) {
+												if (botRole.canInteract(currentLevelRole)) {
+													toRemove.add(currentLevelRoleRemoveStackable);
+													removedRoles.append(roleChangeString(currentLevelRoleRemoveStackable.getName()));
+												} else {
+													errorRoles.append(roleChangeString(currentLevelRoleRemoveStackable.getName()));
+												}
+											}
+										}
+										break;
 									}
 								}
 								break;

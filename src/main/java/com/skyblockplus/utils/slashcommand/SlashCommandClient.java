@@ -42,6 +42,8 @@ public class SlashCommandClient extends ListenerAdapter {
 		for (SlashCommand command : commands) {
 			if (slashCommands.stream().anyMatch(auction -> auction.getName().equalsIgnoreCase(command.getName()))) {
 				throw new IllegalArgumentException("Command added has a name that has already been indexed: " + command.getName());
+			}else{
+				slashCommands.add(command);
 			}
 		}
 		return this;
