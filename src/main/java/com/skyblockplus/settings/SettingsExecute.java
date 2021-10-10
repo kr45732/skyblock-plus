@@ -30,9 +30,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.api.serversettings.automatedapply.ApplyBlacklist;
 import com.skyblockplus.api.serversettings.automatedapply.ApplyRequirements;
 import com.skyblockplus.api.serversettings.automatedapply.AutomatedApply;
-import com.skyblockplus.api.serversettings.automatedapply.ApplyBlacklist;
 import com.skyblockplus.api.serversettings.automatedguild.GuildRank;
 import com.skyblockplus.api.serversettings.automatedguild.GuildRole;
 import com.skyblockplus.api.serversettings.automatedroles.RoleModel;
@@ -98,12 +98,14 @@ public class SettingsExecute {
 					} else if (args[2].equals("prefix")) {
 						eb = setPrefix(content.split(" ", 4)[3]);
 					}
-				} else if((args.length == 4 || args.length == 5 || args.length == 6) && args[1].equals("apply") && args[2].equals("blacklist")){
-					if(args.length == 4 && args[3].equals("list")){
+				} else if (
+					(args.length == 4 || args.length == 5 || args.length == 6) && args[1].equals("apply") && args[2].equals("blacklist")
+				) {
+					if (args.length == 4 && args[3].equals("list")) {
 						eb = listApplyBlacklist();
-					}else if((args.length == 5 || args.length == 6) && args[3].equals("add")){
+					} else if ((args.length == 5 || args.length == 6) && args[3].equals("add")) {
 						eb = addApplyBlacklist(args[4], args.length == 6 ? args[5] : "not provided");
-					}else if(args.length == 5 && args[3].equals("remove")){
+					} else if (args.length == 5 && args[3].equals("remove")) {
 						eb = removeApplyBlacklist(args[4]);
 					}
 				} else if (args.length >= 2 && args[1].equals("mee6")) {
@@ -474,20 +476,24 @@ public class SettingsExecute {
 
 	private EmbedBuilder removeApplyBlacklist(String username) {
 		UsernameUuidStruct uuidStruct = usernameToUuid(username);
-		if(uuidStruct.isNotValid()){
+		if (uuidStruct.isNotValid()) {
 			return invalidEmbed(uuidStruct.getFailCause());
 		}
 
 		JsonArray currentBlacklist = database.getApplyBlacklist(guild.getId());
 		for (int i = 0; i < currentBlacklist.size(); i++) {
-			if(higherDepth(currentBlacklist.get(i), "uuid").getAsString().equals(uuidStruct.getUuid()) || higherDepth(currentBlacklist.get(i), "username").getAsString().equals(uuidStruct.getUsername())){
+			if (
+				higherDepth(currentBlacklist.get(i), "uuid").getAsString().equals(uuidStruct.getUuid()) ||
+				higherDepth(currentBlacklist.get(i), "username").getAsString().equals(uuidStruct.getUsername())
+			) {
 				currentBlacklist.remove(i);
 				int responseCode = database.setApplyBlacklist(guild.getId(), currentBlacklist);
 				if (responseCode != 200) {
 					return apiFailMessage(responseCode);
 				}
 
-				return defaultSettingsEmbed().setDescription("Un-blacklisted " + nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()));
+				return defaultSettingsEmbed()
+					.setDescription("Un-blacklisted " + nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()));
 			}
 		}
 
@@ -497,28 +503,40 @@ public class SettingsExecute {
 	private EmbedBuilder listApplyBlacklist() {
 		JsonArray currentBlacklist = database.getApplyBlacklist(guild.getId());
 		EmbedBuilder eb = defaultSettingsEmbed();
-		if(currentBlacklist.size() == 0){
+		if (currentBlacklist.size() == 0) {
 			return eb.setDescription("No one is blacklisted.");
 		}
 
 		for (JsonElement blacklisted : currentBlacklist) {
-			eb.appendDescription("• " + nameMcHyperLink(higherDepth(blacklisted, "username").getAsString(), higherDepth(blacklisted, "uuid").getAsString()) + " - " + higherDepth(blacklisted, "reason").getAsString() + "\n");
+			eb.appendDescription(
+				"• " +
+				nameMcHyperLink(higherDepth(blacklisted, "username").getAsString(), higherDepth(blacklisted, "uuid").getAsString()) +
+				" - " +
+				higherDepth(blacklisted, "reason").getAsString() +
+				"\n"
+			);
 		}
 		return eb;
 	}
 
 	public EmbedBuilder addApplyBlacklist(String username, String reason) {
 		UsernameUuidStruct uuidStruct = usernameToUuid(username);
-		if(uuidStruct.isNotValid()){
+		if (uuidStruct.isNotValid()) {
 			return invalidEmbed(uuidStruct.getFailCause());
 		}
 
 		JsonArray currentBlacklist = database.getApplyBlacklist(guild.getId());
 		JsonElement blacklistedUser = streamJsonArray(currentBlacklist)
-				.filter(blacklist -> higherDepth(blacklist, "uuid").getAsString().equals(uuidStruct.getUuid()) || higherDepth(blacklist, "username").getAsString().equals(uuidStruct.getUsername()))
-				.findFirst().orElse(null);
-		if(blacklistedUser != null){
-			return invalidEmbed( nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()) + " is already blacklisted with reason `" + reason + "`.");
+			.filter(blacklist ->
+				higherDepth(blacklist, "uuid").getAsString().equals(uuidStruct.getUuid()) ||
+				higherDepth(blacklist, "username").getAsString().equals(uuidStruct.getUsername())
+			)
+			.findFirst()
+			.orElse(null);
+		if (blacklistedUser != null) {
+			return invalidEmbed(
+				nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()) + " is already blacklisted with reason `" + reason + "`."
+			);
 		}
 
 		currentBlacklist.add(gson.toJsonTree(new ApplyBlacklist(uuidStruct.getUsername(), uuidStruct.getUuid(), reason)));
@@ -527,11 +545,14 @@ public class SettingsExecute {
 			return apiFailMessage(responseCode);
 		}
 
-		return defaultSettingsEmbed().setDescription("Blacklisted " + nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()) + " with reason `" + reason + "`.");
+		return defaultSettingsEmbed()
+			.setDescription(
+				"Blacklisted " + nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()) + " with reason `" + reason + "`."
+			);
 	}
 
-	public String nameMcHyperLink(String username, String uuid){
-		return "[**" + username + "**](https://mine.ly/" + uuid +")";
+	public String nameMcHyperLink(String username, String uuid) {
+		return "[**" + username + "**](https://mine.ly/" + uuid + ")";
 	}
 
 	/* Guild Role Settings */

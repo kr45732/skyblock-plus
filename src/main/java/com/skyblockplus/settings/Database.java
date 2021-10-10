@@ -23,9 +23,9 @@ import static com.skyblockplus.utils.Utils.gson;
 import com.google.gson.*;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountService;
+import com.skyblockplus.api.serversettings.automatedapply.ApplyBlacklist;
 import com.skyblockplus.api.serversettings.automatedapply.ApplyRequirements;
 import com.skyblockplus.api.serversettings.automatedapply.AutomatedApply;
-import com.skyblockplus.api.serversettings.automatedapply.ApplyBlacklist;
 import com.skyblockplus.api.serversettings.automatedguild.GuildRole;
 import com.skyblockplus.api.serversettings.automatedroles.AutomatedRoles;
 import com.skyblockplus.api.serversettings.automatedroles.RoleModel;
@@ -35,7 +35,6 @@ import com.skyblockplus.api.serversettings.managers.ServerSettingsService;
 import com.skyblockplus.api.serversettings.mee6roles.Mee6Data;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
-
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -251,9 +250,9 @@ public class Database {
 		return settingsService.getPrefix(serverId).getBody();
 	}
 
-    public JsonArray getApplyBlacklist(String serverId) {
+	public JsonArray getApplyBlacklist(String serverId) {
 		return gson.toJsonTree(settingsService.getApplyBlacklist(serverId).getBody()).getAsJsonArray();
-    }
+	}
 
 	public int setApplyBlacklist(String serverId, JsonArray newSettings) {
 		return settingsService.setApplyBlacklist(serverId, gson.fromJson(newSettings, ApplyBlacklist[].class)).getStatusCodeValue();

@@ -18,18 +18,18 @@
 
 package com.skyblockplus.api.serversettings.automatedapply;
 
+import javax.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import javax.persistence.Embeddable;
 
 @Data
 @AllArgsConstructor
 @Embeddable
 public class ApplyBlacklist {
-    private String username = "";
-    private String uuid = "";
-    private String reason = "";
 
-    public ApplyBlacklist() {}
+	private String username = "";
+	private String uuid = "";
+	private String reason = "";
+
+	public ApplyBlacklist() {}
 }

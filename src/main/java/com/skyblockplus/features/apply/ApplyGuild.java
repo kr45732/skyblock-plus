@@ -119,10 +119,14 @@ public class ApplyGuild {
 				);
 			}
 		}
-		JsonElement blacklisted =  streamJsonArray(database.getApplyBlacklist(event.getGuild().getId()))
-				.filter(blacklist -> higherDepth(blacklist, "uuid").getAsString().equals(higherDepth(linkedAccount, "minecraftUuid").getAsString()) || higherDepth(blacklist, "username").getAsString().equals(higherDepth(linkedAccount, "minecraftUsername").getAsString()))
-				.findFirst().orElse(null);
-		if(blacklisted != null){
+		JsonElement blacklisted = streamJsonArray(database.getApplyBlacklist(event.getGuild().getId()))
+			.filter(blacklist ->
+				higherDepth(blacklist, "uuid").getAsString().equals(higherDepth(linkedAccount, "minecraftUuid").getAsString()) ||
+				higherDepth(blacklist, "username").getAsString().equals(higherDepth(linkedAccount, "minecraftUsername").getAsString())
+			)
+			.findFirst()
+			.orElse(null);
+		if (blacklisted != null) {
 			return "❌ You have been blacklisted with reason `" + higherDepth(blacklisted, "reason").getAsString() + "`";
 		}
 

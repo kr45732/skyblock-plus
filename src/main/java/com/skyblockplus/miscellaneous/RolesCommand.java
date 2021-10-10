@@ -550,15 +550,12 @@ public class RolesCommand extends Command {
 				"pet_enthusiast".equals(currentRoleName)
 			) {
 				paginateBuilder.addItems(
-								"<@&" + higherDepth(higherDepth(currentRole, "levels").getAsJsonArray().get(0), "roleId").getAsString()
-						+ ">"
+					"<@&" + higherDepth(higherDepth(currentRole, "levels").getAsJsonArray().get(0), "roleId").getAsString() + ">"
 				);
 			} else {
 				JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
 				for (JsonElement currentLevel : levelsArray) {
-					paginateBuilder.addItems(
-						"<@&" + higherDepth(currentLevel, "roleId").getAsString() + ">"
-					);
+					paginateBuilder.addItems("<@&" + higherDepth(currentLevel, "roleId").getAsString() + ">");
 				}
 			}
 		}

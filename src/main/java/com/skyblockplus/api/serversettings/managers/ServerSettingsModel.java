@@ -18,22 +18,21 @@
 
 package com.skyblockplus.api.serversettings.managers;
 
-import com.skyblockplus.api.serversettings.automatedapply.AutomatedApply;
 import com.skyblockplus.api.serversettings.automatedapply.ApplyBlacklist;
+import com.skyblockplus.api.serversettings.automatedapply.AutomatedApply;
 import com.skyblockplus.api.serversettings.automatedguild.GuildRole;
 import com.skyblockplus.api.serversettings.automatedroles.AutomatedRoles;
 import com.skyblockplus.api.serversettings.automatedverify.AutomatedVerify;
 import com.skyblockplus.api.serversettings.mee6roles.Mee6Data;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
