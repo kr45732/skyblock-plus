@@ -99,8 +99,9 @@ public class SettingsExecute {
 						eb = setPrefix(content.split(" ", 4)[3]);
 					}
 				} else if (
-					(args.length == 4 || args.length == 5 || args.length == 6) && args[1].equals("apply") && args[2].equals("blacklist")
+					(args.length == 4 || args.length == 5 || content.split(" ", 6).length == 6) && args[1].equals("apply") && args[2].equals("blacklist")
 				) {
+					args = content.split(" ", 6);
 					if (args.length == 4 && args[3].equals("list")) {
 						eb = listApplyBlacklist();
 					} else if ((args.length == 5 || args.length == 6) && args[3].equals("add")) {
@@ -493,7 +494,7 @@ public class SettingsExecute {
 				}
 
 				return defaultSettingsEmbed()
-					.setDescription("Un-blacklisted " + nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()));
+					.setDescription("Removed " + nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()) + " from the blacklist");
 			}
 		}
 
@@ -535,7 +536,7 @@ public class SettingsExecute {
 			.orElse(null);
 		if (blacklistedUser != null) {
 			return invalidEmbed(
-				nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()) + " is already blacklisted with reason `" + reason + "`."
+				nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()) + " is already blacklisted with reason `" + higherDepth(blacklistedUser, "reason").getAsString() + "`"
 			);
 		}
 
@@ -547,7 +548,7 @@ public class SettingsExecute {
 
 		return defaultSettingsEmbed()
 			.setDescription(
-				"Blacklisted " + nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()) + " with reason `" + reason + "`."
+				"Blacklisted " + nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()) + " with reason `" + reason + "`"
 			);
 	}
 
