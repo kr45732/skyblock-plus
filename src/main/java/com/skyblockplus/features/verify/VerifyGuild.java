@@ -89,7 +89,7 @@ public class VerifyGuild {
 		}
 
 		JsonElement linkedUser = database.getLinkedUserByDiscordId(event.getUser().getId());
-		if (linkedUser == null) {
+		if (linkedUser == null || linkedUser.isJsonNull()) {
 			return;
 		}
 
