@@ -37,10 +37,10 @@ public class RolesSlashCommand extends SlashCommand {
 
 		switch (event.getSubcommandName()) {
 			case "claim":
-				event.embed(RoleCommand.updateRoles(event.getOptionStr("profile"), event.getGuild(), event.getMember()));
+				event.embed(RolesCommand.updateRoles(event.getOptionStr("profile"), event.getGuild(), event.getMember()));
 				break;
 			case "list":
-				event.paginate(RoleCommand.listRoles(new PaginatorEvent(event)));
+				event.paginate(RolesCommand.listRoles(new PaginatorEvent(event)));
 				break;
 			default:
 				event.invalidCommandMessage();

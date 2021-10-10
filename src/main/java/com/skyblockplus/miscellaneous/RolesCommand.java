@@ -43,9 +43,9 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 
-public class RoleCommand extends Command {
+public class RolesCommand extends Command {
 
-	public RoleCommand() {
+	public RolesCommand() {
 		this.name = "roles";
 		this.cooldown = 10;
 		this.aliases = new String[] { "role" };
@@ -550,16 +550,14 @@ public class RoleCommand extends Command {
 				"pet_enthusiast".equals(currentRoleName)
 			) {
 				paginateBuilder.addItems(
-					event
-						.getGuild()
-						.getRoleById(higherDepth(higherDepth(currentRole, "levels").getAsJsonArray().get(0), "roleId").getAsString())
-						.getAsMention()
+								"<@&" + higherDepth(higherDepth(currentRole, "levels").getAsJsonArray().get(0), "roleId").getAsString()
+						+ ">"
 				);
 			} else {
 				JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
 				for (JsonElement currentLevel : levelsArray) {
 					paginateBuilder.addItems(
-						event.getGuild().getRoleById(higherDepth(currentLevel, "roleId").getAsString()).getAsMention()
+						"<@&" + higherDepth(currentLevel, "roleId").getAsString() + ">"
 					);
 				}
 			}

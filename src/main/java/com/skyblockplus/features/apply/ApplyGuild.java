@@ -104,7 +104,6 @@ public class ApplyGuild {
 		}
 
 		JsonElement linkedAccount = database.getLinkedUserByDiscordId(event.getUser().getId());
-
 		if (linkedAccount.isJsonNull() || !higherDepth(linkedAccount, "discordId").getAsString().equals((event.getUser().getId()))) {
 			if (linkedAccount.isJsonNull()) {
 				return "❌ You are not linked to the bot. Please run `+link [IGN]` and try again.";
@@ -119,6 +118,12 @@ public class ApplyGuild {
 					".\nPlease relink and try again"
 				);
 			}
+		}
+		JsonElement blacklisted =  streamJsonArray(database.getApplyBlacklist(event.getGuild().getId()))
+				.filter(blacklist -> higherDepth(blacklist, "uuid").getAsString().equals(higherDepth(linkedAccount, "minecraftUuid").getAsString()) || higherDepth(blacklist, "username").getAsString().equals(higherDepth(linkedAccount, "minecraftUsername").getAsString()))
+				.findFirst().orElse(null);
+		if(blacklisted != null){
+			return "❌ You have been blacklisted with reason `" + higherDepth(blacklisted, "reason").getAsString() + "`";
 		}
 
 		Player player = new Player(higherDepth(linkedAccount, "minecraftUsername").getAsString());

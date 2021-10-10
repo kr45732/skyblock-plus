@@ -63,7 +63,7 @@ public class TrackAuctionsCommand extends Command {
 		commandAuthorToTrackingUser.put(userId, uuidStruct);
 
 		return defaultEmbed("Auction tracker")
-			.setDescription("Now tracking the auctions of [**" + uuidStruct.getUsername() + "**](" + uuidStruct.getAuctionUrl() + ")");
+			.setDescription("Now tracking the auctions of [**" + uuidStruct.getUsername() + "**](" + uuidStruct.getAuctionUrl() + "). You will receive a DM whenever one of this player's auctions sells.");
 	}
 
 	private static void trackAuctionRunnable() {

@@ -113,7 +113,7 @@ public class Main {
 					new SkillsCommand(),
 					new DungeonsCommand(),
 					new ShutdownCommand(),
-					new RoleCommand(),
+					new RolesCommand(),
 					new GuildRanksCommand(),
 					new EssenceCommand(),
 					new BankCommand(),

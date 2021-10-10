@@ -22,6 +22,7 @@ import static com.skyblockplus.utils.Utils.DEFAULT_PREFIX;
 
 import com.skyblockplus.api.serversettings.automatedapply.ApplyRequirements;
 import com.skyblockplus.api.serversettings.automatedapply.AutomatedApply;
+import com.skyblockplus.api.serversettings.automatedapply.ApplyBlacklist;
 import com.skyblockplus.api.serversettings.automatedguild.GuildRole;
 import com.skyblockplus.api.serversettings.automatedroles.AutomatedRoles;
 import com.skyblockplus.api.serversettings.automatedroles.RoleModel;
@@ -29,6 +30,7 @@ import com.skyblockplus.api.serversettings.automatedverify.AutomatedVerify;
 import com.skyblockplus.api.serversettings.mee6roles.Mee6Data;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -704,5 +706,27 @@ public class ServerSettingsService {
 		}
 
 		return new ResponseEntity<>(DEFAULT_PREFIX, HttpStatus.BAD_REQUEST);
+	}
+
+    public ResponseEntity<?> getApplyBlacklist(String serverId) {
+		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+		if (currentServerSettings != null) {
+			return new ResponseEntity<>(currentServerSettings.getApplicationBlacklist(), HttpStatus.OK);
+		}
+
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+	public ResponseEntity<HttpStatus> setApplyBlacklist(String serverId, ApplyBlacklist[] newSettings) {
+		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+		if (currentServerSettings != null) {
+			currentServerSettings.setApplicationBlacklist(new ArrayList<>(Arrays.asList(newSettings)));
+			settingsRepository.save(currentServerSettings);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 }

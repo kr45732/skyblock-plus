@@ -56,7 +56,7 @@ public class TrackAuctionsSlashCommand extends SlashCommand {
 			.addSubcommands(
 				new SubcommandData(
 					"auctions",
-					"Track the auctions of a certain player. You will receive a DM from the bot when the player's auction ends"
+					"Track the auctions of a certain player & receive a DM from the bot when the their auctions sell"
 				)
 					.addOption(OptionType.STRING, "player", "Player username or mention"),
 				new SubcommandData("stop", "Stop tracking a players auctions")

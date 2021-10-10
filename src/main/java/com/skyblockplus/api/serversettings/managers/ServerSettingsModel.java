@@ -19,6 +19,7 @@
 package com.skyblockplus.api.serversettings.managers;
 
 import com.skyblockplus.api.serversettings.automatedapply.AutomatedApply;
+import com.skyblockplus.api.serversettings.automatedapply.ApplyBlacklist;
 import com.skyblockplus.api.serversettings.automatedguild.GuildRole;
 import com.skyblockplus.api.serversettings.automatedroles.AutomatedRoles;
 import com.skyblockplus.api.serversettings.automatedverify.AutomatedVerify;
@@ -27,7 +28,12 @@ import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
 import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -50,6 +56,10 @@ public class ServerSettingsModel {
 
 	@Embedded
 	private AutomatedApply automatedApplicationTwo = null;
+
+	@ElementCollection(fetch = FetchType.EAGER)
+	@Fetch(value = FetchMode.SUBSELECT)
+	private List<ApplyBlacklist> applicationBlacklist = new ArrayList<>();
 
 	@Embedded
 	private AutomatedRoles automatedRoles = new AutomatedRoles();

@@ -16,14 +16,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.api.serversettings.managers;
+package com.skyblockplus.api.serversettings.automatedapply;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-@Repository
-public interface ServerSettingsRepository extends JpaRepository<ServerSettingsModel, Long> {
-	ServerSettingsModel findServerByServerId(String serverId);
+import javax.persistence.Embeddable;
 
-	void deleteByServerId(String serverId);
+@Data
+@AllArgsConstructor
+@Embeddable
+public class ApplyBlacklist {
+    private String username = "";
+    private String uuid = "";
+    private String reason = "";
+
+    public ApplyBlacklist() {}
 }
