@@ -18,6 +18,10 @@
 
 package com.skyblockplus.guilds;
 
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
@@ -30,18 +34,13 @@ import com.skyblockplus.utils.structs.HypixelGuildCache;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class GuildKickerCommand extends Command {
 
@@ -196,16 +195,14 @@ public class GuildKickerCommand extends Command {
 
 			Duration duration = Duration.between(lastUpdated, Instant.now());
 
-			paginateBuilder
-				.setPaginatorExtras(
-					new PaginatorExtras()
-						.setEveryPageTitle("Guild Kick Helper")
-						.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
-						.setEveryPageText(
-							"**Total missing requirements:** " + missingReqsCount + "\n**Updated:** " + instantToDHM(duration) + " ago\n"
-						)
-				)
-				;
+			paginateBuilder.setPaginatorExtras(
+				new PaginatorExtras()
+					.setEveryPageTitle("Guild Kick Helper")
+					.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
+					.setEveryPageText(
+						"**Total missing requirements:** " + missingReqsCount + "\n**Updated:** " + instantToDHM(duration) + " ago\n"
+					)
+			);
 		} else {
 			String hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
 
@@ -328,23 +325,21 @@ public class GuildKickerCommand extends Command {
 				}
 			}
 
-			paginateBuilder
-				.setPaginatorExtras(
-					new PaginatorExtras()
-						.setEveryPageTitle("Guild Kick Helper")
-						.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
-						.setEveryPageText(
-							"**Total missing requirements:** " +
-							paginateBuilder.getItemsSize() +
-							(
-								lastUpdated != null
-									? "\n**Last updated:** " + instantToDHM(Duration.between(lastUpdated, Instant.now())) + " ago"
-									: ""
-							) +
-							"\n"
-						)
-				)
-				;
+			paginateBuilder.setPaginatorExtras(
+				new PaginatorExtras()
+					.setEveryPageTitle("Guild Kick Helper")
+					.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
+					.setEveryPageText(
+						"**Total missing requirements:** " +
+						paginateBuilder.getItemsSize() +
+						(
+							lastUpdated != null
+								? "\n**Last updated:** " + instantToDHM(Duration.between(lastUpdated, Instant.now())) + " ago"
+								: ""
+						) +
+						"\n"
+					)
+			);
 		}
 		event.paginate(paginateBuilder);
 		return null;

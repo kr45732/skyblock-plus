@@ -41,13 +41,7 @@ public class WeightSlashCommand extends SlashCommand {
 					return;
 				}
 
-				event.paginate(
-					WeightCommand.getPlayerWeight(
-						event.player,
-						event.getOptionStr("profile"),
-							new PaginatorEvent(event)
-					)
-				);
+				event.paginate(WeightCommand.getPlayerWeight(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
 				break;
 			case "calculate":
 				event.embed(

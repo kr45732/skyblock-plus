@@ -57,38 +57,38 @@ public class WeightCommand extends Command {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(3);
-			PaginatorExtras extras =  new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
+			PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
 
 			Weight weight = new Weight(player);
 			EmbedBuilder eb = player.defaultPlayerEmbed(" | Senither Weight");
 			StringBuilder slayerStr = new StringBuilder();
 			for (String slayerName : SLAYER_NAMES) {
 				slayerStr
-						.append(capitalizeString(slayerName))
-						.append(": ")
-						.append(weight.getSlayerWeight().getSlayerWeight(slayerName).getFormatted())
-						.append("\n");
+					.append(capitalizeString(slayerName))
+					.append(": ")
+					.append(weight.getSlayerWeight().getSlayerWeight(slayerName).getFormatted())
+					.append("\n");
 			}
 			StringBuilder skillsStr = new StringBuilder();
 			for (String skillName : SKILL_NAMES) {
 				skillsStr
-						.append(capitalizeString(skillName))
-						.append(": ")
-						.append(weight.getSkillsWeight().getSkillsWeight(skillName).getFormatted())
-						.append("\n");
+					.append(capitalizeString(skillName))
+					.append(": ")
+					.append(weight.getSkillsWeight().getSkillsWeight(skillName).getFormatted())
+					.append("\n");
 			}
 			StringBuilder dungeonsStr = new StringBuilder();
 			dungeonsStr
-					.append(capitalizeString("catacombs"))
-					.append(": ")
-					.append(weight.getDungeonsWeight().getDungeonWeight("catacombs").getFormatted())
-					.append("\n");
+				.append(capitalizeString("catacombs"))
+				.append(": ")
+				.append(weight.getDungeonsWeight().getDungeonWeight("catacombs").getFormatted())
+				.append("\n");
 			for (String dungeonClassName : DUNGEON_CLASS_NAMES) {
 				dungeonsStr
-						.append(capitalizeString(dungeonClassName))
-						.append(": ")
-						.append(weight.getDungeonsWeight().getClassWeight(dungeonClassName).getFormatted())
-						.append("\n");
+					.append(capitalizeString(dungeonClassName))
+					.append(": ")
+					.append(weight.getDungeonsWeight().getClassWeight(dungeonClassName).getFormatted())
+					.append("\n");
 			}
 
 			eb.addField("Slayer | " + weight.getSlayerWeight().getWeightStruct().getFormatted(), slayerStr.toString(), false);
@@ -117,10 +117,10 @@ public class WeightCommand extends Command {
 			}
 			String lilyDungeonsStr =
 				"Catacombs: " +
-						lilyWeight.getDungeonsWeight().getDungeonWeight().getFormatted() +
+				lilyWeight.getDungeonsWeight().getDungeonWeight().getFormatted() +
 				"\n" +
 				"Normal floor completions: " +
-						lilyWeight.getDungeonsWeight().getDungeonCompletionWeight("normal").getFormatted() +
+				lilyWeight.getDungeonsWeight().getDungeonCompletionWeight("normal").getFormatted() +
 				"\n" +
 				"Master floor completions: " +
 				lilyWeight.getDungeonsWeight().getDungeonCompletionWeight("master").getFormatted() +

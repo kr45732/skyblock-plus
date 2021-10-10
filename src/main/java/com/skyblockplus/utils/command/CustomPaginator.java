@@ -234,7 +234,7 @@ public class CustomPaginator extends Menu {
 	private MessageEmbed getEmbedRender(int pageNum) {
 		EmbedBuilder embedBuilder = new EmbedBuilder();
 
-		if(extras.getType() == PaginatorExtras.PaginatorType.EMBED_PAGES){
+		if (extras.getType() == PaginatorExtras.PaginatorType.EMBED_PAGES) {
 			embedBuilder = extras.getEmbedPages().get(pageNum - 1);
 		} else {
 			try {
@@ -254,8 +254,7 @@ public class CustomPaginator extends Menu {
 				}
 
 				embedBuilder.setTitle(title, titleUrl);
-			} catch (Exception ignored) {
-			}
+			} catch (Exception ignored) {}
 
 			try {
 				if (extras.getEveryPageThumbnail() != null) {
@@ -263,13 +262,11 @@ public class CustomPaginator extends Menu {
 				} else {
 					embedBuilder.setThumbnail(extras.getThumbnails().get(pageNum - 1));
 				}
-			} catch (Exception ignored) {
-			}
+			} catch (Exception ignored) {}
 
 			try {
 				embedBuilder.setDescription(extras.getEveryPageText());
-			} catch (Exception ignored) {
-			}
+			} catch (Exception ignored) {}
 
 			int start = (pageNum - 1) * itemsPerPage;
 			int end = Math.min(strings.size(), pageNum * itemsPerPage);
@@ -288,17 +285,18 @@ public class CustomPaginator extends Menu {
 				int per = (int) Math.ceil((double) (end - start) / columns);
 				for (int k = 0; k < columns; k++) {
 					StringBuilder stringBuilder = new StringBuilder();
-					for (int i = start + k * per; i < end && i < start + (k + 1) * per; i++)
-						stringBuilder.append("\n").append(strings.get(i));
+					for (int i = start + k * per; i < end && i < start + (k + 1) * per; i++) stringBuilder
+						.append("\n")
+						.append(strings.get(i));
 					embedBuilder.addField("", stringBuilder.toString(), true);
 				}
 			}
 		}
 
 		embedBuilder
-				.setColor(color)
-				.setFooter("Created By CrypticPlasma • Page " + pageNum + "/" + pages, null)
-				.setTimestamp(Instant.now());
+			.setColor(color)
+			.setFooter("Created By CrypticPlasma • Page " + pageNum + "/" + pages, null)
+			.setTimestamp(Instant.now());
 
 		return embedBuilder.build();
 	}

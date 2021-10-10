@@ -19,7 +19,6 @@
 package com.skyblockplus.utils.structs;
 
 import com.skyblockplus.utils.Player;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +39,7 @@ public class HypixelGuildCache {
 		ironmanCache.add(memberCacheFromPlayer(player, true));
 	}
 
-	public Instant getLastUpdated(){
+	public Instant getLastUpdated() {
 		return lastUpdated;
 	}
 
@@ -49,38 +48,37 @@ public class HypixelGuildCache {
 		return this;
 	}
 
-	public List<String> getCache(){
+	public List<String> getCache() {
 		return getCache(false);
 	}
 
-	public List<String> getCache(boolean ironmanOnly){
+	public List<String> getCache(boolean ironmanOnly) {
 		return ironmanOnly ? ironmanCache : normalCache;
 	}
 
 	private String memberCacheFromPlayer(Player player, boolean ironmanOnly) {
 		return (
-				player.getUsername() +
-						"=:=" +
-						player.getHighestAmount("slayer", ironmanOnly) +
-						"=:=" +
-						player.getHighestAmount("skills", ironmanOnly) +
-						"=:=" +
-						player.getHighestAmount("catacombs", ironmanOnly) +
-						"=:=" +
-						player.getHighestAmount("weight", ironmanOnly) +
-						"=:=" +
-						player.getHighestAmount("svenXp", ironmanOnly) +
-						"=:=" +
-						player.getHighestAmount("revXp", ironmanOnly) +
-						"=:=" +
-						player.getHighestAmount("taraXp", ironmanOnly) +
-						"=:=" +
-						player.getHighestAmount("endermanXp", ironmanOnly) +
-						"=:=" +
-						player.getUuid()
+			player.getUsername() +
+			"=:=" +
+			player.getHighestAmount("slayer", ironmanOnly) +
+			"=:=" +
+			player.getHighestAmount("skills", ironmanOnly) +
+			"=:=" +
+			player.getHighestAmount("catacombs", ironmanOnly) +
+			"=:=" +
+			player.getHighestAmount("weight", ironmanOnly) +
+			"=:=" +
+			player.getHighestAmount("svenXp", ironmanOnly) +
+			"=:=" +
+			player.getHighestAmount("revXp", ironmanOnly) +
+			"=:=" +
+			player.getHighestAmount("taraXp", ironmanOnly) +
+			"=:=" +
+			player.getHighestAmount("endermanXp", ironmanOnly) +
+			"=:=" +
+			player.getUuid()
 		);
 	}
-
 	// [0] - username
 	// [1] - slayer
 	// [2] - skills

@@ -18,12 +18,11 @@
 
 package com.skyblockplus.utils.structs;
 
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageEmbed.Field;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed.Field;
 
 public class PaginatorExtras {
 
@@ -38,11 +37,11 @@ public class PaginatorExtras {
 	private String everyPageTitleUrl = null;
 	private String everyPageThumbnail = null;
 
-	public PaginatorExtras(){
+	public PaginatorExtras() {
 		this.type = PaginatorType.DEFAULT;
 	}
 
-	public PaginatorExtras(PaginatorType type){
+	public PaginatorExtras(PaginatorType type) {
 		this.type = type;
 	}
 
@@ -153,9 +152,9 @@ public class PaginatorExtras {
 		return this;
 	}
 
-	public enum PaginatorType{
+	public enum PaginatorType {
 		DEFAULT,
 		EMBED_FIELDS,
-		EMBED_PAGES
+		EMBED_PAGES,
 	}
 }
