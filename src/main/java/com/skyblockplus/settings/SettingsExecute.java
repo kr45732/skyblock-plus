@@ -99,7 +99,9 @@ public class SettingsExecute {
 						eb = setPrefix(content.split(" ", 4)[3]);
 					}
 				} else if (
-					(args.length == 4 || args.length == 5 || content.split(" ", 6).length == 6) && args[1].equals("apply") && args[2].equals("blacklist")
+					(args.length == 4 || args.length == 5 || content.split(" ", 6).length == 6) &&
+					args[1].equals("apply") &&
+					args[2].equals("blacklist")
 				) {
 					args = content.split(" ", 6);
 					if (args.length == 4 && args[3].equals("list")) {
@@ -536,7 +538,10 @@ public class SettingsExecute {
 			.orElse(null);
 		if (blacklistedUser != null) {
 			return invalidEmbed(
-				nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()) + " is already blacklisted with reason `" + higherDepth(blacklistedUser, "reason").getAsString() + "`"
+				nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()) +
+				" is already blacklisted with reason `" +
+				higherDepth(blacklistedUser, "reason").getAsString() +
+				"`"
 			);
 		}
 
