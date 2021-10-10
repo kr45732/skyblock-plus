@@ -85,7 +85,7 @@ public class CustomPaginator extends Menu {
 				this.pages = (int) Math.ceil((double) strings.size() / itemsPerPage);
 				break;
 			case EMBED_FIELDS:
-				this.pages = (int) Math.ceil((double) extras.getEmbedPages().size() / itemsPerPage);
+				this.pages = (int) Math.ceil((double) extras.getEmbedFields().size() / itemsPerPage);
 				break;
 			case EMBED_PAGES:
 				this.pages = extras.getEmbedPages().size();
