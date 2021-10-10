@@ -18,11 +18,12 @@
 
 package com.skyblockplus.utils.structs;
 
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed.Field;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageEmbed.Field;
 
 public class PaginatorExtras {
 
@@ -30,10 +31,20 @@ public class PaginatorExtras {
 	private final List<String> titleUrls = new ArrayList<>();
 	private final List<String> thumbnails = new ArrayList<>();
 	private final List<Field> embedFields = new ArrayList<>();
+	private final List<EmbedBuilder> embedPages = new ArrayList<>();
+	private final PaginatorType type;
 	private String everyPageText = null;
 	private String everyPageTitle = null;
 	private String everyPageTitleUrl = null;
 	private String everyPageThumbnail = null;
+
+	public PaginatorExtras(){
+		this.type = PaginatorType.DEFAULT;
+	}
+
+	public PaginatorExtras(PaginatorType type){
+		this.type = type;
+	}
 
 	public String getTitles(int index) {
 		try {
@@ -106,8 +117,9 @@ public class PaginatorExtras {
 		return this;
 	}
 
-	public void addEmbedField(String name, String value, boolean inline) {
+	public PaginatorExtras addEmbedField(String name, String value, boolean inline) {
 		this.embedFields.add(new Field(name, value, inline));
+		return this;
 	}
 
 	public PaginatorExtras addBlankField(boolean inline) {
@@ -126,5 +138,24 @@ public class PaginatorExtras {
 	public PaginatorExtras setEveryPageTitleUrl(String everyPageTitleUrl) {
 		this.everyPageTitleUrl = everyPageTitleUrl;
 		return this;
+	}
+
+	public PaginatorType getType() {
+		return type;
+	}
+
+	public List<EmbedBuilder> getEmbedPages() {
+		return embedPages;
+	}
+
+	public PaginatorExtras addEmbedPage(EmbedBuilder embedBuilder) {
+		this.embedPages.add(embedBuilder);
+		return this;
+	}
+
+	public enum PaginatorType{
+		DEFAULT,
+		EMBED_FIELDS,
+		EMBED_PAGES
 	}
 }

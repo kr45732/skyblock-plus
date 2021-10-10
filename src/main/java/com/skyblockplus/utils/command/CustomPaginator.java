@@ -23,10 +23,8 @@ import com.jagrosh.jdautilities.menu.Menu;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import java.awt.*;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -46,8 +44,7 @@ import org.slf4j.LoggerFactory;
 public class CustomPaginator extends Menu {
 
 	private static final Logger log = LoggerFactory.getLogger(CustomPaginator.class);
-
-	public static final Consumer<Throwable> throwableConsumer = e -> {
+	private static final Consumer<Throwable> throwableConsumer = e -> {
 		if (!e.getMessage().contains("Unknown Message")) {
 			log.error(e.getMessage(), e);
 		}
@@ -57,14 +54,13 @@ public class CustomPaginator extends Menu {
 	private final Color color;
 	private final int columns;
 	private final int itemsPerPage;
-	private final boolean showPageNumbers;
 	private final List<String> strings;
 	private final int pages;
 	private final Consumer<Message> finalAction;
 	private final boolean wrapPageEnds;
 	private final PaginatorExtras extras;
 
-	CustomPaginator(
+	private CustomPaginator(
 		EventWaiter waiter,
 		Set<User> users,
 		Set<Role> roles,
@@ -74,7 +70,6 @@ public class CustomPaginator extends Menu {
 		Consumer<Message> finalAction,
 		int columns,
 		int itemsPerPage,
-		boolean showPageNumbers,
 		List<String> items,
 		boolean wrapPageEnds,
 		PaginatorExtras extras
@@ -83,10 +78,21 @@ public class CustomPaginator extends Menu {
 		this.color = color;
 		this.columns = columns;
 		this.itemsPerPage = itemsPerPage;
-		this.showPageNumbers = showPageNumbers;
 		this.strings = items;
 		this.extras = extras;
-		this.pages = (int) Math.ceil((double) Math.max(extras.getEmbedFields().size(), strings.size()) / itemsPerPage);
+		switch (extras.getType()) {
+			case DEFAULT:
+				this.pages = (int) Math.ceil((double) strings.size() / itemsPerPage);
+				break;
+			case EMBED_FIELDS:
+				this.pages = (int) Math.ceil((double) extras.getEmbedPages().size() / itemsPerPage);
+				break;
+			case EMBED_PAGES:
+				this.pages = extras.getEmbedPages().size();
+				break;
+			default:
+				throw new IllegalArgumentException("Invalid paginator type");
+		}
 		this.finalAction = finalAction;
 		this.wrapPageEnds = wrapPageEnds;
 	}
@@ -166,7 +172,7 @@ public class CustomPaginator extends Menu {
 	private void pagination(Message message, int pageNum) {
 		waiter.waitForEvent(
 			ButtonClickEvent.class,
-			event -> checkButton(event, message.getIdLong()),
+			event -> checkButtonClick(event, message.getIdLong()),
 			event -> handleButtonClick(event, pageNum),
 			timeout,
 			unit,
@@ -174,7 +180,7 @@ public class CustomPaginator extends Menu {
 		);
 	}
 
-	private boolean checkButton(ButtonClickEvent event, long messageId) {
+	private boolean checkButtonClick(ButtonClickEvent event, long messageId) {
 		if (event.getMessageIdLong() != messageId) {
 			return false;
 		}
@@ -228,64 +234,71 @@ public class CustomPaginator extends Menu {
 	private MessageEmbed getEmbedRender(int pageNum) {
 		EmbedBuilder embedBuilder = new EmbedBuilder();
 
-		try {
-			String title;
-			String titleUrl;
-
-			if (extras.getEveryPageTitle() != null) {
-				title = extras.getEveryPageTitle();
-			} else {
-				title = extras.getTitles(pageNum - 1);
-			}
-
-			if (extras.getEveryPageTitleUrl() != null) {
-				titleUrl = extras.getEveryPageTitleUrl();
-			} else {
-				titleUrl = extras.getTitleUrls(pageNum - 1);
-			}
-
-			embedBuilder.setTitle(title, titleUrl);
-		} catch (Exception ignored) {}
-
-		try {
-			if (extras.getEveryPageThumbnail() != null) {
-				embedBuilder.setThumbnail(extras.getEveryPageThumbnail());
-			} else {
-				embedBuilder.setThumbnail(extras.getThumbnails().get(pageNum - 1));
-			}
-		} catch (Exception ignored) {}
-
-		try {
-			embedBuilder.setDescription(extras.getEveryPageText());
-		} catch (Exception ignored) {}
-
-		int start = (pageNum - 1) * itemsPerPage;
-		int end = Math.min(strings.size(), pageNum * itemsPerPage);
-		if (extras.getEmbedFields().size() > 0) {
-			end = Math.min(extras.getEmbedFields().size(), pageNum * itemsPerPage);
-			for (int i = start; i < end; i++) {
-				embedBuilder.addField(extras.getEmbedFields().get(i));
-			}
-		} else if (columns == 1) {
-			StringBuilder stringBuilder = new StringBuilder();
-			for (int i = start; i < end; i++) {
-				stringBuilder.append("\n").append(strings.get(i));
-			}
-			embedBuilder.appendDescription(stringBuilder.toString());
+		if(extras.getType() == PaginatorExtras.PaginatorType.EMBED_PAGES){
+			embedBuilder = extras.getEmbedPages().get(pageNum - 1);
 		} else {
-			int per = (int) Math.ceil((double) (end - start) / columns);
-			for (int k = 0; k < columns; k++) {
+			try {
+				String title;
+				String titleUrl;
+
+				if (extras.getEveryPageTitle() != null) {
+					title = extras.getEveryPageTitle();
+				} else {
+					title = extras.getTitles(pageNum - 1);
+				}
+
+				if (extras.getEveryPageTitleUrl() != null) {
+					titleUrl = extras.getEveryPageTitleUrl();
+				} else {
+					titleUrl = extras.getTitleUrls(pageNum - 1);
+				}
+
+				embedBuilder.setTitle(title, titleUrl);
+			} catch (Exception ignored) {
+			}
+
+			try {
+				if (extras.getEveryPageThumbnail() != null) {
+					embedBuilder.setThumbnail(extras.getEveryPageThumbnail());
+				} else {
+					embedBuilder.setThumbnail(extras.getThumbnails().get(pageNum - 1));
+				}
+			} catch (Exception ignored) {
+			}
+
+			try {
+				embedBuilder.setDescription(extras.getEveryPageText());
+			} catch (Exception ignored) {
+			}
+
+			int start = (pageNum - 1) * itemsPerPage;
+			int end = Math.min(strings.size(), pageNum * itemsPerPage);
+			if (extras.getType() == PaginatorExtras.PaginatorType.EMBED_FIELDS) {
+				end = Math.min(extras.getEmbedFields().size(), pageNum * itemsPerPage);
+				for (int i = start; i < end; i++) {
+					embedBuilder.addField(extras.getEmbedFields().get(i));
+				}
+			} else if (columns == 1) {
 				StringBuilder stringBuilder = new StringBuilder();
-				for (int i = start + k * per; i < end && i < start + (k + 1) * per; i++) stringBuilder.append("\n").append(strings.get(i));
-				embedBuilder.addField("", stringBuilder.toString(), true);
+				for (int i = start; i < end; i++) {
+					stringBuilder.append("\n").append(strings.get(i));
+				}
+				embedBuilder.appendDescription(stringBuilder.toString());
+			} else {
+				int per = (int) Math.ceil((double) (end - start) / columns);
+				for (int k = 0; k < columns; k++) {
+					StringBuilder stringBuilder = new StringBuilder();
+					for (int i = start + k * per; i < end && i < start + (k + 1) * per; i++)
+						stringBuilder.append("\n").append(strings.get(i));
+					embedBuilder.addField("", stringBuilder.toString(), true);
+				}
 			}
 		}
 
-		embedBuilder.setColor(color);
-		if (showPageNumbers) {
-			embedBuilder.setFooter("Created By CrypticPlasma • Page " + pageNum + "/" + pages, null);
-		}
-		embedBuilder.setTimestamp(Instant.now());
+		embedBuilder
+				.setColor(color)
+				.setFooter("Created By CrypticPlasma • Page " + pageNum + "/" + pages, null)
+				.setTimestamp(Instant.now());
 
 		return embedBuilder.build();
 	}
@@ -297,14 +310,25 @@ public class CustomPaginator extends Menu {
 		private Consumer<Message> finalAction = m -> m.delete().queue(null, throwableConsumer);
 		private int columns = 1;
 		private int itemsPerPage = 12;
-		private boolean showPageNumbers = true;
 		private boolean wrapPageEnds = false;
 		private PaginatorExtras extras = new PaginatorExtras();
 
 		@Override
 		public CustomPaginator build() {
 			Checks.check(waiter != null, "Must set an EventWaiter");
-			Checks.check(!strings.isEmpty() || !extras.getEmbedFields().isEmpty(), "Must include at least one item to paginate");
+			switch (extras.getType()) {
+				case DEFAULT:
+					Checks.check(!strings.isEmpty(), "Must include at least one item to paginate");
+					break;
+				case EMBED_FIELDS:
+					Checks.check(!extras.getEmbedFields().isEmpty(), "Must include at least one embed field to paginate");
+					break;
+				case EMBED_PAGES:
+					Checks.check(!extras.getEmbedPages().isEmpty(), "Must include at least one embed page to paginate");
+					break;
+				default:
+					throw new IllegalArgumentException("Invalid paginator type");
+			}
 
 			return new CustomPaginator(
 				waiter,
@@ -316,7 +340,6 @@ public class CustomPaginator extends Menu {
 				finalAction,
 				columns,
 				itemsPerPage,
-				showPageNumbers,
 				strings,
 				wrapPageEnds,
 				extras
@@ -350,18 +373,13 @@ public class CustomPaginator extends Menu {
 			return this;
 		}
 
-		public Builder showPageNumbers(boolean show) {
-			this.showPageNumbers = show;
-			return this;
-		}
-
 		public void addItems(String... items) {
 			strings.addAll(Arrays.asList(items));
 		}
 
 		public Builder setItems(String... items) {
 			strings.clear();
-			strings.addAll(Arrays.asList(items));
+			Collections.addAll(strings, items);
 			return this;
 		}
 
@@ -372,13 +390,6 @@ public class CustomPaginator extends Menu {
 
 		public int getItemsSize() {
 			return strings.size();
-		}
-
-		public Builder ifItemsEmpty(String emptyMessage) {
-			if (strings.isEmpty()) {
-				strings.add(emptyMessage);
-			}
-			return this;
 		}
 	}
 }

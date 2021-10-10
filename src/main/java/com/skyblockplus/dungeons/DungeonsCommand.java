@@ -47,7 +47,7 @@ public class DungeonsCommand extends Command {
 		if (player.isValid()) {
 			try {
 				CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(3).setItemsPerPage(9);
-				PaginatorExtras extras = new PaginatorExtras();
+				PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_FIELDS);
 				extras
 					.setEveryPageTitle(player.getUsername())
 					.setEveryPageTitleUrl(player.skyblockStatsLink())

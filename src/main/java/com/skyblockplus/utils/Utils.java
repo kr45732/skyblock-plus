@@ -530,11 +530,10 @@ public class Utils {
 
 	public static CustomPaginator.Builder defaultPaginator(User... eventAuthor) {
 		return new CustomPaginator.Builder()
+			.setEventWaiter(waiter)
 			.setColumns(1)
 			.setItemsPerPage(1)
-			.showPageNumbers(true)
 			.setFinalAction(m -> m.editMessageComponents().queue())
-			.setEventWaiter(waiter)
 			.setTimeout(30, TimeUnit.SECONDS)
 			.setColor(botColor)
 			.setUsers(eventAuthor);

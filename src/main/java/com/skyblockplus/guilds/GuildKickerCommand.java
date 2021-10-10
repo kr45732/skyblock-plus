@@ -18,11 +18,6 @@
 
 package com.skyblockplus.guilds;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.structs.HypixelGuildCache.memberCacheFromPlayer;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
@@ -35,13 +30,18 @@ import com.skyblockplus.utils.structs.HypixelGuildCache;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
+import net.dv8tion.jda.api.EmbedBuilder;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import net.dv8tion.jda.api.EmbedBuilder;
+
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Utils.*;
 
 public class GuildKickerCommand extends Command {
 
@@ -205,7 +205,7 @@ public class GuildKickerCommand extends Command {
 							"**Total missing requirements:** " + missingReqsCount + "\n**Updated:** " + instantToDHM(duration) + " ago\n"
 						)
 				)
-				.ifItemsEmpty("Everyone meets the requirements");
+				;
 		} else {
 			String hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
 
@@ -215,12 +215,14 @@ public class GuildKickerCommand extends Command {
 			}
 
 			HypixelGuildCache guildCache = hypixelGuildsCacheMap.getIfPresent(guildId);
-			List<String> guildMemberPlayersList = new ArrayList<>();
+			List<String> guildMemberPlayersList;
 			Instant lastUpdated = null;
+
 			if (guildCache != null) {
-				guildMemberPlayersList = guildCache.membersCache;
-				lastUpdated = guildCache.lastUpdated;
+				guildMemberPlayersList = guildCache.getCache();
+				lastUpdated = guildCache.getLastUpdated();
 			} else {
+				HypixelGuildCache newGuildCache = new HypixelGuildCache();
 				JsonArray guildMembers = higherDepth(guildJson, "members").getAsJsonArray();
 				List<CompletableFuture<CompletableFuture<String>>> futuresList = new ArrayList<>();
 
@@ -252,9 +254,8 @@ public class GuildKickerCommand extends Command {
 								);
 
 								if (guildMemberPlayer.isValid()) {
-									return memberCacheFromPlayer(guildMemberPlayer);
+									newGuildCache.addPlayer(guildMemberPlayer);
 								}
-
 								return null;
 							});
 						})
@@ -263,16 +264,14 @@ public class GuildKickerCommand extends Command {
 
 				for (CompletableFuture<CompletableFuture<String>> future : futuresList) {
 					try {
-						String playerFutureResponse = future.get().get();
-						if (playerFutureResponse != null) {
-							guildMemberPlayersList.add(playerFutureResponse);
-						}
+						future.get().get();
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
 				}
 
-				hypixelGuildsCacheMap.put(guildId, new HypixelGuildCache(Instant.now(), guildMemberPlayersList));
+				guildMemberPlayersList = newGuildCache.getCache();
+				hypixelGuildsCacheMap.put(guildId, newGuildCache.setLastUpdated());
 			}
 
 			for (String guildMember : guildMemberPlayersList) {
@@ -345,7 +344,7 @@ public class GuildKickerCommand extends Command {
 							"\n"
 						)
 				)
-				.ifItemsEmpty("Everyone meets the requirements");
+				;
 		}
 		event.paginate(paginateBuilder);
 		return null;

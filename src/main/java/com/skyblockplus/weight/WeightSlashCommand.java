@@ -18,12 +18,11 @@
 
 package com.skyblockplus.weight;
 
-import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class WeightSlashCommand extends SlashCommand {
@@ -42,11 +41,11 @@ public class WeightSlashCommand extends SlashCommand {
 					return;
 				}
 
-				event.embed(
+				event.paginate(
 					WeightCommand.getPlayerWeight(
 						event.player,
 						event.getOptionStr("profile"),
-						event.getOptionStr("type", "senither").equals("senither") ? Player.WeightType.SENITHER : Player.WeightType.LILY
+							new PaginatorEvent(event)
 					)
 				);
 				break;
@@ -73,11 +72,6 @@ public class WeightSlashCommand extends SlashCommand {
 				new SubcommandData("player", "Get a player's weight")
 					.addOption(OptionType.STRING, "player", "Player username or mention")
 					.addOption(OptionType.STRING, "profile", "Profile name")
-					.addOptions(
-						new OptionData(OptionType.STRING, "type", "The weight system which should be used")
-							.addChoice("Senither", "senither")
-							.addChoice("Lily", "lily")
-					)
 			)
 			.addSubcommands(
 				new SubcommandData("calculate", "Calculate predicted weight using given stats (not 100% accurate)")

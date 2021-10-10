@@ -19,46 +19,68 @@
 package com.skyblockplus.utils.structs;
 
 import com.skyblockplus.utils.Player;
+
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 public class HypixelGuildCache {
 
-	public final Instant lastUpdated;
-	public final List<String> membersCache;
+	private Instant lastUpdated;
+	private final List<String> normalCache;
+	private final List<String> ironmanCache;
 
-	public HypixelGuildCache(Instant lastUpdated, List<String> membersCache) {
-		this.lastUpdated = lastUpdated;
-		this.membersCache = membersCache;
+	public HypixelGuildCache() {
+		this.normalCache = new ArrayList<>();
+		this.ironmanCache = new ArrayList<>();
 	}
 
-	public static String memberCacheFromPlayer(Player player) {
-		return memberCacheFromPlayer(player, false);
+	public void addPlayer(Player player) {
+		normalCache.add(memberCacheFromPlayer(player, false));
+		ironmanCache.add(memberCacheFromPlayer(player, true));
 	}
 
-	public static String memberCacheFromPlayer(Player player, boolean ironmanOnly) {
+	public Instant getLastUpdated(){
+		return lastUpdated;
+	}
+
+	public HypixelGuildCache setLastUpdated() {
+		lastUpdated = Instant.now();
+		return this;
+	}
+
+	public List<String> getCache(){
+		return getCache(false);
+	}
+
+	public List<String> getCache(boolean ironmanOnly){
+		return ironmanOnly ? ironmanCache : normalCache;
+	}
+
+	private String memberCacheFromPlayer(Player player, boolean ironmanOnly) {
 		return (
-			player.getUsername() +
-			"=:=" +
-			player.getHighestAmount("slayer", ironmanOnly) +
-			"=:=" +
-			player.getHighestAmount("skills", ironmanOnly) +
-			"=:=" +
-			player.getHighestAmount("catacombs", ironmanOnly) +
-			"=:=" +
-			player.getHighestAmount("weight", ironmanOnly) +
-			"=:=" +
-			player.getHighestAmount("svenXp", ironmanOnly) +
-			"=:=" +
-			player.getHighestAmount("revXp", ironmanOnly) +
-			"=:=" +
-			player.getHighestAmount("taraXp", ironmanOnly) +
-			"=:=" +
-			player.getHighestAmount("endermanXp", ironmanOnly) +
-			"=:=" +
-			player.getUuid()
+				player.getUsername() +
+						"=:=" +
+						player.getHighestAmount("slayer", ironmanOnly) +
+						"=:=" +
+						player.getHighestAmount("skills", ironmanOnly) +
+						"=:=" +
+						player.getHighestAmount("catacombs", ironmanOnly) +
+						"=:=" +
+						player.getHighestAmount("weight", ironmanOnly) +
+						"=:=" +
+						player.getHighestAmount("svenXp", ironmanOnly) +
+						"=:=" +
+						player.getHighestAmount("revXp", ironmanOnly) +
+						"=:=" +
+						player.getHighestAmount("taraXp", ironmanOnly) +
+						"=:=" +
+						player.getHighestAmount("endermanXp", ironmanOnly) +
+						"=:=" +
+						player.getUuid()
 		);
 	}
+
 	// [0] - username
 	// [1] - slayer
 	// [2] - skills

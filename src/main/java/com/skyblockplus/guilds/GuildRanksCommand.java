@@ -18,11 +18,6 @@
 
 package com.skyblockplus.guilds;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.structs.HypixelGuildCache.memberCacheFromPlayer;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -33,13 +28,18 @@ import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.*;
+import net.dv8tion.jda.api.EmbedBuilder;
+
 import java.io.FileReader;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import net.dv8tion.jda.api.EmbedBuilder;
+
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Utils.*;
 
 public class GuildRanksCommand extends Command {
 
@@ -168,9 +168,10 @@ public class GuildRanksCommand extends Command {
 			HypixelGuildCache guildCache = hypixelGuildsCacheMap.getIfPresent(guildId);
 			List<String> guildMemberPlayersList = new ArrayList<>();
 			if (guildCache != null) {
-				guildMemberPlayersList = guildCache.membersCache;
-				lastUpdated = guildCache.lastUpdated;
+				guildMemberPlayersList = guildCache.getCache(ironmanOnly);
+				lastUpdated = guildCache.getLastUpdated();
 			} else {
+				HypixelGuildCache newGuildCache = new HypixelGuildCache();
 				List<CompletableFuture<CompletableFuture<String>>> futuresList = new ArrayList<>();
 
 				for (JsonElement guildMember : guildMembers) {
@@ -201,7 +202,7 @@ public class GuildRanksCommand extends Command {
 								);
 
 								if (guildMemberPlayer.isValid()) {
-									return memberCacheFromPlayer(guildMemberPlayer, ironmanOnly);
+									newGuildCache.addPlayer(guildMemberPlayer);
 								}
 
 								return null;
@@ -212,16 +213,14 @@ public class GuildRanksCommand extends Command {
 
 				for (CompletableFuture<CompletableFuture<String>> future : futuresList) {
 					try {
-						String playerFutureResponse = future.get().get();
-						if (playerFutureResponse != null) {
-							guildMemberPlayersList.add(playerFutureResponse);
-						}
+						future.get().get();
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
 				}
 
-				hypixelGuildsCacheMap.put(guildId, new HypixelGuildCache(Instant.now(), guildMemberPlayersList));
+				guildMemberPlayersList = newGuildCache.getCache(ironmanOnly);
+				hypixelGuildsCacheMap.put(guildId, newGuildCache.setLastUpdated());
 			}
 
 			for (String lbM : guildMemberPlayersList) {

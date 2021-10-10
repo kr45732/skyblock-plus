@@ -27,21 +27,8 @@ import net.dv8tion.jda.api.entities.User;
 
 public class PaginatorEvent {
 
-	public boolean isSlashCommand() {
-		return isSlashCommand;
-	}
-
 	private final boolean isSlashCommand;
 	private final SlashCommandExecutedEvent slashCommand;
-
-	public SlashCommandExecutedEvent getSlashCommand() {
-		return slashCommand;
-	}
-
-	public CommandEvent getCommand() {
-		return command;
-	}
-
 	private final CommandEvent command;
 
 	public PaginatorEvent(Object event) {
@@ -54,6 +41,18 @@ public class PaginatorEvent {
 			slashCommand = null;
 			command = ((CommandEvent) event);
 		}
+	}
+
+	public boolean isSlashCommand() {
+		return isSlashCommand;
+	}
+
+	public SlashCommandExecutedEvent getSlashCommand() {
+		return slashCommand;
+	}
+
+	public CommandEvent getCommand() {
+		return command;
 	}
 
 	public User getUser() {
