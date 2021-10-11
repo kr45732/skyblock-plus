@@ -154,8 +154,8 @@ public class ServerSettingsService {
 					return new ResponseEntity<>(currentRoleSettings.getRev(), HttpStatus.OK);
 				case "tara":
 					return new ResponseEntity<>(currentRoleSettings.getTara(), HttpStatus.OK);
-				case "bank_coins":
-					return new ResponseEntity<>(currentRoleSettings.getBank_coins(), HttpStatus.OK);
+				case "coins":
+					return new ResponseEntity<>(currentRoleSettings.getCoins(), HttpStatus.OK);
 				case "alchemy":
 					return new ResponseEntity<>(currentRoleSettings.getAlchemy(), HttpStatus.OK);
 				case "combat":
@@ -233,8 +233,8 @@ public class ServerSettingsService {
 				case "tara":
 					currentRoleSettings.setTara(newRoleSettings);
 					break;
-				case "bank_coins":
-					currentRoleSettings.setBank_coins(newRoleSettings);
+				case "coins":
+					currentRoleSettings.setCoins(newRoleSettings);
 					break;
 				case "alchemy":
 					currentRoleSettings.setAlchemy(newRoleSettings);

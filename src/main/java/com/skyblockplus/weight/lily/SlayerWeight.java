@@ -18,8 +18,8 @@
 
 package com.skyblockplus.weight.lily;
 
+import static com.skyblockplus.utils.Constants.SLAYER_DEPRECATION_SCALING;
 import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.weight.lily.Weight.lilyWeightConstants;
 
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.WeightStruct;
@@ -52,7 +52,7 @@ public class SlayerWeight {
 			score = Math.sqrt(4.0 / 3) * Math.cos(Math.acos(d * Math.pow(3, 5.0 / 2)) / 3) - 1;
 		}
 
-		double scaleFactor = higherDepth(lilyWeightConstants, "slayerDeprecationScaling." + slayerName).getAsDouble();
+		double scaleFactor = higherDepth(SLAYER_DEPRECATION_SCALING, slayerName).getAsDouble();
 		int intScore = (int) score;
 		double distance = slayerXp - actualInt(intScore);
 		double effectiveDistance = distance * Math.pow(scaleFactor, intScore);

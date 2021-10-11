@@ -225,7 +225,7 @@ public class RolesCommand extends Command {
 						case "sven":
 						case "rev":
 						case "tara":
-						case "bank_coins":
+						case "coins":
 						case "alchemy":
 						case "combat":
 						case "fishing":
@@ -255,11 +255,13 @@ public class RolesCommand extends Command {
 											roleAmount = player.getSlayer(currentRoleName);
 											break;
 										}
-									case "bank_coins":
+									case "coins":
 										{
 											roleAmount = player.getBankBalance();
 											if (roleAmount == -1 && !disabledAPI.toString().contains("Banking")) {
 												disabledAPI.append(roleChangeString("Banking API disabled"));
+											}else{
+												roleAmount += player.getPurseCoins();
 											}
 											break;
 										}

@@ -862,7 +862,7 @@ public class SettingsExecute {
 		rolePageMap.put("sven", 2);
 		rolePageMap.put("rev", 3);
 		rolePageMap.put("tara", 4);
-		rolePageMap.put("bank_coins", 5);
+		rolePageMap.put("coins", 5);
 		rolePageMap.put("alchemy", 6);
 		rolePageMap.put("combat", 7);
 		rolePageMap.put("fishing", 8);
@@ -965,12 +965,12 @@ public class SettingsExecute {
 							.append("settings roles add tara 100000 @tara 7`\n");
 						break;
 					}
-				case "bank_coins":
+				case "coins":
 					{
 						ebFieldString
-							.append("**Coins in a player's bank**\nExample: `")
+							.append("**Coins in a player's bank and purse**\nExample: `")
 							.append(guildPrefix)
-							.append("settings roles add bank_coins 1000000 @millionaire`\n");
+							.append("settings roles add coins 1000000 @millionaire`\n");
 						break;
 					}
 				case "alchemy":

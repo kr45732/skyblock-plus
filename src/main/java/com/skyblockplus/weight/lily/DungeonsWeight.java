@@ -18,9 +18,8 @@
 
 package com.skyblockplus.weight.lily;
 
-import static com.skyblockplus.utils.Constants.CATACOMBS_LEVEL_50_XP;
+import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.weight.lily.Weight.lilyWeightConstants;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -66,7 +65,7 @@ public class DungeonsWeight {
 	}
 
 	public WeightStruct getDungeonCompletionWeight(String cataMode) {
-		JsonObject dcw = higherDepth(lilyWeightConstants, "dungeonCompletionWorth").getAsJsonObject();
+		JsonObject dcw = DUNGEON_COMPLETION_WORTH;
 
 		double max1000 = 0;
 		double mMax1000 = 0;
@@ -110,7 +109,7 @@ public class DungeonsWeight {
 				return weightStruct;
 			}
 
-			JsonObject dcb = higherDepth(lilyWeightConstants, "dungeonCompletionBuffs").getAsJsonObject();
+			JsonObject dcb = DUNGEON_COMPLETION_BUFFS;
 			for (Map.Entry<String, JsonElement> masterFloor : higherDepth(
 				player.profileJson(),
 				"dungeons.dungeon_types.master_catacombs.tier_completions"

@@ -44,6 +44,8 @@ import com.skyblockplus.networth.NetworthSlashCommand;
 import com.skyblockplus.price.*;
 import com.skyblockplus.settings.Database;
 import com.skyblockplus.settings.SettingsCommand;
+import com.skyblockplus.skills.HotmCommand;
+import com.skyblockplus.skills.HotmSlashCommand;
 import com.skyblockplus.skills.SkillsCommand;
 import com.skyblockplus.skills.SkillsSlashCommand;
 import com.skyblockplus.slayer.SlayerCommand;

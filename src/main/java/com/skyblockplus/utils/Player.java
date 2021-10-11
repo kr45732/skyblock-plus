@@ -61,7 +61,6 @@ public class Player {
 			}
 
 			this.profilesArray = response.getResponse().getAsJsonArray();
-
 			if (getLatestProfile(profilesArray)) {
 				return;
 			}
@@ -85,7 +84,6 @@ public class Player {
 			}
 
 			this.profilesArray = response.getResponse().getAsJsonArray();
-
 			if (profileIdFromName(profileName, profilesArray)) {
 				failCause = failCause.equals("Unknown fail cause") ? "Invalid profile name" : failCause;
 				return;

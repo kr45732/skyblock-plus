@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.miscellaneous;
+package com.skyblockplus.skills;
 
 import static com.skyblockplus.utils.Utils.*;
 
@@ -87,6 +87,9 @@ public class HotmCommand extends Command {
 					.append(perk.getValue().getAsInt())
 					.append("/");
 				switch (perk.getKey()) {
+					case "mining_speed_boost":
+						perksStr.append(1);
+						break;
 					case "special_0":
 						perksStr.append(5);
 						break;

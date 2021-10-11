@@ -18,10 +18,8 @@
 
 package com.skyblockplus.weight.lily;
 
-import static com.skyblockplus.utils.Constants.SKILLS_LEVEL_60_XP;
-import static com.skyblockplus.utils.Constants.SKILL_NAMES;
+import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.weight.lily.Weight.lilyWeightConstants;
 
 import com.google.gson.JsonArray;
 import com.skyblockplus.utils.Player;
@@ -55,7 +53,7 @@ public class SkillsWeight {
 		skillAverage /= SKILL_NAMES.size();
 
 		SkillsStruct skillsStruct = player.getSkill(skillName, Player.WeightType.LILY);
-		JsonArray srwTable = higherDepth(lilyWeightConstants, "skillRatioWeight." + skillName).getAsJsonArray();
+		JsonArray srwTable = higherDepth(SKILL_RATIO_WEIGHT, skillName).getAsJsonArray();
 		double base =
 			(
 				(12 * Math.pow((skillAverage / 60), 2)) *
@@ -65,11 +63,11 @@ public class SkillsWeight {
 			(srwTable.get(srwTable.size() - 1).getAsDouble() * Math.pow(skillsStruct.getCurrentLevel() / 60.0, Math.pow(2, 0.5)));
 		double overflow = 0;
 		if (skillsStruct.getTotalExp() > SKILLS_LEVEL_60_XP) {
-			double factor = higherDepth(lilyWeightConstants, "skillFactors." + skillName).getAsDouble();
+			double factor = higherDepth(SKILL_FACTORS, skillName).getAsDouble();
 			double effectiveOver = effectiveXP(skillsStruct.getTotalExp() - SKILLS_LEVEL_60_XP, factor);
 			double t =
 				(effectiveOver / SKILLS_LEVEL_60_XP) *
-				(higherDepth(lilyWeightConstants, "skillOverflowMultipliers." + skillName).getAsDouble());
+				(higherDepth(SKILL_OVERFLOW_MULTIPLIERS, skillName).getAsDouble());
 			if (t > 0) {
 				overflow += t;
 			}

@@ -84,7 +84,7 @@ public class AutomatedRoles {
 	private RoleModel guild_ranks = new RoleModel();
 
 	@Embedded
-	private RoleModel bank_coins = new RoleModel();
+	private RoleModel coins = new RoleModel();
 
 	@Embedded
 	private RoleModel fairy_souls = new RoleModel();
