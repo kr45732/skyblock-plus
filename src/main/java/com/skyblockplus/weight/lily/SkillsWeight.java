@@ -65,9 +65,7 @@ public class SkillsWeight {
 		if (skillsStruct.getTotalExp() > SKILLS_LEVEL_60_XP) {
 			double factor = higherDepth(SKILL_FACTORS, skillName).getAsDouble();
 			double effectiveOver = effectiveXP(skillsStruct.getTotalExp() - SKILLS_LEVEL_60_XP, factor);
-			double t =
-				(effectiveOver / SKILLS_LEVEL_60_XP) *
-				(higherDepth(SKILL_OVERFLOW_MULTIPLIERS, skillName).getAsDouble());
+			double t = (effectiveOver / SKILLS_LEVEL_60_XP) * (higherDepth(SKILL_OVERFLOW_MULTIPLIERS, skillName).getAsDouble());
 			if (t > 0) {
 				overflow += t;
 			}

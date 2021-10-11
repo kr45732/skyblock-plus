@@ -24,7 +24,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.skyblockplus.Main;
-
 import java.lang.reflect.Type;
 import java.util.*;
 
@@ -69,13 +68,14 @@ public class Constants {
 
 	public static void initialize() {
 		try {
-			JsonObject constantsJson = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/Constants.json").getAsJsonObject();
+			JsonObject constantsJson = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/Constants.json")
+				.getAsJsonObject();
 
-			Type mapStringString = new TypeToken<Map<String, String>>(){}.getType();
-			Type listInteger = new TypeToken<List<Integer>>(){}.getType();
-			Type listString = new TypeToken<List<String>>(){}.getType();
-			Type mapStringDoubleArray = new TypeToken<Map<String, Double[]>>(){}.getType();
-			Type mapStringDouble = new TypeToken<Map<String, Double>>(){}.getType();
+			Type mapStringString = new TypeToken<Map<String, String>>() {}.getType();
+			Type listInteger = new TypeToken<List<Integer>>() {}.getType();
+			Type listString = new TypeToken<List<String>>() {}.getType();
+			Type mapStringDoubleArray = new TypeToken<Map<String, Double[]>>() {}.getType();
+			Type mapStringDouble = new TypeToken<Map<String, Double>>() {}.getType();
 
 			/* CATACOMBS_LEVEL_50_XP */
 			CATACOMBS_LEVEL_50_XP = higherDepth(constantsJson, "CATACOMBS_LEVEL_50_XP").getAsDouble();
@@ -93,16 +93,16 @@ public class Constants {
 			CRAFTED_MINIONS_TO_SLOTS = gson.fromJson(higherDepth(constantsJson, "CRAFTED_MINIONS_TO_SLOTS"), listInteger);
 
 			/* COSMETIC_SKILL_NAMES */
-			COSMETIC_SKILL_NAMES =  gson.fromJson(higherDepth(constantsJson, "COSMETIC_SKILL_NAMES"), listString);
+			COSMETIC_SKILL_NAMES = gson.fromJson(higherDepth(constantsJson, "COSMETIC_SKILL_NAMES"), listString);
 
 			/* SKILLS_EMOJI_MAP */
 			SKILLS_EMOJI_MAP = gson.fromJson(higherDepth(constantsJson, "SKILLS_EMOJI_MAP"), mapStringString);
 
 			/* DUNGEON_CLASS_NAMES */
-			DUNGEON_CLASS_NAMES =  gson.fromJson(higherDepth(constantsJson, "DUNGEON_CLASS_NAMES"), listString);
+			DUNGEON_CLASS_NAMES = gson.fromJson(higherDepth(constantsJson, "DUNGEON_CLASS_NAMES"), listString);
 
 			/* SLAYER_NAMES */
-			SLAYER_NAMES =  gson.fromJson(higherDepth(constantsJson, "SLAYER_NAMES"), listString);
+			SLAYER_NAMES = gson.fromJson(higherDepth(constantsJson, "SLAYER_NAMES"), listString);
 
 			/* GUILD_EXP_TO_LEVEL */
 			GUILD_EXP_TO_LEVEL = gson.fromJson(higherDepth(constantsJson, "GUILD_EXP_TO_LEVEL"), listInteger);
@@ -123,10 +123,10 @@ public class Constants {
 			DUNGEON_EMOJI_MAP = gson.fromJson(higherDepth(constantsJson, "DUNGEON_EMOJI_MAP"), mapStringString);
 
 			/* FETCHUR_ITEMS */
-			FETCHUR_ITEMS =  gson.fromJson(higherDepth(constantsJson, "FETCHUR_ITEMS"), listString);
+			FETCHUR_ITEMS = gson.fromJson(higherDepth(constantsJson, "FETCHUR_ITEMS"), listString);
 
 			/* DUNGEON_META_ITEMS */
-			DUNGEON_META_ITEMS =  gson.fromJson(higherDepth(constantsJson, "DUNGEON_META_ITEMS"), listString);
+			DUNGEON_META_ITEMS = gson.fromJson(higherDepth(constantsJson, "DUNGEON_META_ITEMS"), listString);
 
 			/* HARP_SONG_ID_TO_NAME */
 			HARP_SONG_ID_TO_NAME = gson.fromJson(higherDepth(constantsJson, "HARP_SONG_ID_TO_NAME"), mapStringString);
@@ -138,16 +138,16 @@ public class Constants {
 			SLAYER_DEPRECATION_SCALING = higherDepth(constantsJson, "SLAYER_DEPRECATION_SCALING");
 
 			/* SKILL_RATIO_WEIGHT */
-			SKILL_RATIO_WEIGHT= higherDepth(constantsJson, "SKILL_RATIO_WEIGHT");
+			SKILL_RATIO_WEIGHT = higherDepth(constantsJson, "SKILL_RATIO_WEIGHT");
 
 			/* SKILL_FACTORS */
-			SKILL_FACTORS= higherDepth(constantsJson, "SKILL_FACTORS");
+			SKILL_FACTORS = higherDepth(constantsJson, "SKILL_FACTORS");
 
 			/* SKILL_OVERFLOW_MULTIPLIERS */
-			SKILL_OVERFLOW_MULTIPLIERS= higherDepth(constantsJson, "SKILL_OVERFLOW_MULTIPLIERS");
+			SKILL_OVERFLOW_MULTIPLIERS = higherDepth(constantsJson, "SKILL_OVERFLOW_MULTIPLIERS");
 
 			/* DUNGEON_COMPLETION_WORTH */
-			DUNGEON_COMPLETION_WORTH= higherDepth(constantsJson, "DUNGEON_COMPLETION_WORTH").getAsJsonObject();
+			DUNGEON_COMPLETION_WORTH = higherDepth(constantsJson, "DUNGEON_COMPLETION_WORTH").getAsJsonObject();
 
 			/* DUNGEON_COMPLETION_BUFFS */
 			DUNGEON_COMPLETION_BUFFS = higherDepth(constantsJson, "DUNGEON_COMPLETION_BUFFS").getAsJsonObject();

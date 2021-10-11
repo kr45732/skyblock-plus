@@ -25,6 +25,7 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.WeightStruct;
 
 public class Weight {
+
 	private final SlayerWeight slayerWeight;
 	private final SkillsWeight skillsWeight;
 	private final DungeonsWeight dungeonsWeight;

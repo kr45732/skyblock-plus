@@ -260,7 +260,7 @@ public class RolesCommand extends Command {
 											roleAmount = player.getBankBalance();
 											if (roleAmount == -1 && !disabledAPI.toString().contains("Banking")) {
 												disabledAPI.append(roleChangeString("Banking API disabled"));
-											}else{
+											} else {
 												roleAmount += player.getPurseCoins();
 											}
 											break;
