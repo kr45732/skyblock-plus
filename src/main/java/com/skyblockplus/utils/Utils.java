@@ -607,9 +607,9 @@ public class Utils {
 
 		try {
 			for (String key : paths) {
-				if(key.startsWith("[") && key.endsWith("]") && key.length() >= 3){
-					element = element.getAsJsonArray().get(Integer.parseInt(key.substring(1, key.length() -1 )));
-				}else {
+				if (key.startsWith("[") && key.endsWith("]") && key.length() >= 3) {
+					element = element.getAsJsonArray().get(Integer.parseInt(key.substring(1, key.length() - 1)));
+				} else {
 					element = element.getAsJsonObject().get(key);
 				}
 			}
@@ -620,41 +620,41 @@ public class Utils {
 	}
 
 	public static String higherDepth(JsonElement element, String path, String defaultValue) {
-		try{
+		try {
 			return higherDepth(element, path).getAsString();
-		}catch (Exception e){
+		} catch (Exception e) {
 			return defaultValue;
 		}
 	}
 
 	public static boolean higherDepth(JsonElement element, String path, boolean defaultValue) {
-		try{
+		try {
 			return higherDepth(element, path).getAsBoolean();
-		}catch (Exception e){
+		} catch (Exception e) {
 			return defaultValue;
 		}
 	}
 
 	public static long higherDepth(JsonElement element, String path, long defaultValue) {
-		try{
+		try {
 			return higherDepth(element, path).getAsLong();
-		}catch (Exception e){
+		} catch (Exception e) {
 			return defaultValue;
 		}
 	}
 
 	public static int higherDepth(JsonElement element, String path, int defaultValue) {
-		try{
+		try {
 			return higherDepth(element, path).getAsInt();
-		}catch (Exception e){
+		} catch (Exception e) {
 			return defaultValue;
 		}
 	}
 
 	public static double higherDepth(JsonElement element, String path, double defaultValue) {
-		try{
+		try {
 			return higherDepth(element, path).getAsDouble();
-		}catch (Exception e){
+		} catch (Exception e) {
 			return defaultValue;
 		}
 	}

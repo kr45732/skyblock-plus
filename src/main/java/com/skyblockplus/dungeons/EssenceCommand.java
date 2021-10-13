@@ -94,7 +94,9 @@ public class EssenceCommand extends Command {
 			}
 
 			for (Map.Entry<String, JsonElement> perk : higherDepth(player.profileJson(), "perks").getAsJsonObject().entrySet()) {
-				eb.appendDescription("**• " + capitalizeString(perk.getKey().replace("_", " ")) + ":** " + perk.getValue().getAsInt() + "\n");
+				eb.appendDescription(
+					"**• " + capitalizeString(perk.getKey().replace("_", " ")) + ":** " + perk.getValue().getAsInt() + "\n"
+				);
 			}
 
 			return eb;

@@ -1083,12 +1083,14 @@ public class SettingsExecute {
 					break;
 			}
 
-			ebFieldString.append("\nCurrent Settings:\n").append(
-				higherDepth(currentRoleSettings, "enable") != null &&
-					higherDepth(currentRoleSettings, "enable").getAsString().equals("true")
-					? "• Enabled"
-					: "• Disabled"
-			);
+			ebFieldString
+				.append("\nCurrent Settings:\n")
+				.append(
+					higherDepth(currentRoleSettings, "enable") != null &&
+						higherDepth(currentRoleSettings, "enable").getAsString().equals("true")
+						? "• Enabled"
+						: "• Disabled"
+				);
 
 			if (roleName.equals("guild_ranks")) {
 				if (higherDepth(currentRoleSettings, "levels").getAsJsonArray().size() == 0) {

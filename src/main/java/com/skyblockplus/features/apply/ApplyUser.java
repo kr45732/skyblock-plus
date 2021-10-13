@@ -73,8 +73,9 @@ public class ApplyUser implements Serializable {
 		this.playerUsername = playerUsername;
 
 		Category applyCategory = event.getGuild().getCategoryById(higherDepth(currentSettings, "newChannelCategory").getAsString());
-		if(applyCategory.getChannels().size() == 50){
-			failCause = "Unable to create a new application due to the application category reaching 50/50 channels. Please report this to the server's staff.";
+		if (applyCategory.getChannels().size() == 50) {
+			failCause =
+				"Unable to create a new application due to the application category reaching 50/50 channels. Please report this to the server's staff.";
 			return;
 		}
 

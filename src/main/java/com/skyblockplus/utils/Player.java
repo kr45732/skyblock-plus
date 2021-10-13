@@ -982,7 +982,7 @@ public class Player {
 			.setThumbnail(getThumbnailUrl());
 	}
 
-	public EmbedBuilder getFailEmbed(){
+	public EmbedBuilder getFailEmbed() {
 		return invalidEmbed(failCause);
 	}
 

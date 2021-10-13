@@ -38,7 +38,7 @@ public class Weight {
 		this.skillsWeight = new SkillsWeight(player);
 		this.dungeonsWeight = new DungeonsWeight(player);
 
-		if(calculateWeight){
+		if (calculateWeight) {
 			calculateWeight();
 		}
 	}
@@ -125,7 +125,7 @@ public class Weight {
 		return w;
 	}
 
-	private void calculateWeight(){
+	private void calculateWeight() {
 		for (String slayerName : SLAYER_NAMES) {
 			slayerWeight.getSlayerWeight(slayerName);
 		}

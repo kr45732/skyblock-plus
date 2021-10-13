@@ -39,7 +39,8 @@ public class BitsCommand extends Command {
 	public static EmbedBuilder getBitPrices(String itemName) {
 		String closestMatch = getClosestMatch(nameToId(itemName), BITS_ITEM_NAMES);
 		if (closestMatch != null) {
-			return defaultEmbed("Bits Price").addField(idToName(closestMatch), formatNumber(higherDepth(getBitsJson(), closestMatch, 0L)), false);
+			return defaultEmbed("Bits Price")
+				.addField(idToName(closestMatch), formatNumber(higherDepth(getBitsJson(), closestMatch, 0L)), false);
 		}
 
 		return defaultEmbed("No bit price found for " + capitalizeString(itemName));
