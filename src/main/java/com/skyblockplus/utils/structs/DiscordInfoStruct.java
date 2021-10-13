@@ -19,6 +19,9 @@
 package com.skyblockplus.utils.structs;
 
 import lombok.Data;
+import net.dv8tion.jda.api.EmbedBuilder;
+
+import static com.skyblockplus.utils.Utils.invalidEmbed;
 
 @Data
 public class DiscordInfoStruct {
@@ -44,5 +47,9 @@ public class DiscordInfoStruct {
 
 	public boolean isNotValid() {
 		return discordTag == null || username == null || uuid == null;
+	}
+
+	public EmbedBuilder getFailEmbed(){
+		return invalidEmbed(failCause);
 	}
 }

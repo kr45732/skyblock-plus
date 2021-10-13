@@ -93,6 +93,6 @@ public class PetsCommand extends Command {
 			event.paginate(paginateBuilder);
 			return null;
 		}
-		return invalidEmbed(player.getFailCause());
+		return player.getFailEmbed();
 	}
 }

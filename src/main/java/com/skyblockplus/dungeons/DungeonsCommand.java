@@ -125,7 +125,7 @@ public class DungeonsCommand extends Command {
 			}
 		}
 
-		return invalidEmbed(player.getFailCause());
+		return player.getFailEmbed();
 	}
 
 	@Override

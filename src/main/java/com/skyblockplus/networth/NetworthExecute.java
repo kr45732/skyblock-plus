@@ -373,7 +373,7 @@ public class NetworthExecute {
 
 			return eb;
 		}
-		return invalidEmbed(player.getFailCause());
+		return player.getFailEmbed();
 	}
 
 	private void calculateAllPetsPrice() {

@@ -607,7 +607,11 @@ public class Utils {
 
 		try {
 			for (String key : paths) {
-				element = element.getAsJsonObject().get(key);
+				if(key.startsWith("[") && key.endsWith("]") && key.length() >= 3){
+					element = element.getAsJsonArray().get(Integer.parseInt(key.substring(1, key.length() -1 )));
+				}else {
+					element = element.getAsJsonObject().get(key);
+				}
 			}
 			return element;
 		} catch (Exception e) {
@@ -616,66 +620,41 @@ public class Utils {
 	}
 
 	public static String higherDepth(JsonElement element, String path, String defaultValue) {
-		String[] paths = path.split("\\.");
-
-		try {
-			for (String key : paths) {
-				element = element.getAsJsonObject().get(key);
-			}
-			return element.getAsString();
-		} catch (Exception e) {
+		try{
+			return higherDepth(element, path).getAsString();
+		}catch (Exception e){
 			return defaultValue;
 		}
 	}
 
 	public static boolean higherDepth(JsonElement element, String path, boolean defaultValue) {
-		String[] paths = path.split("\\.");
-
-		try {
-			for (String key : paths) {
-				element = element.getAsJsonObject().get(key);
-			}
-			return element.getAsBoolean();
-		} catch (Exception e) {
+		try{
+			return higherDepth(element, path).getAsBoolean();
+		}catch (Exception e){
 			return defaultValue;
 		}
 	}
 
 	public static long higherDepth(JsonElement element, String path, long defaultValue) {
-		String[] paths = path.split("\\.");
-
-		try {
-			for (String key : paths) {
-				element = element.getAsJsonObject().get(key);
-			}
-			return element.getAsLong();
-		} catch (Exception e) {
+		try{
+			return higherDepth(element, path).getAsLong();
+		}catch (Exception e){
 			return defaultValue;
 		}
 	}
 
 	public static int higherDepth(JsonElement element, String path, int defaultValue) {
-		String[] paths = path.split("\\.");
-
-		try {
-			for (String key : paths) {
-				element = element.getAsJsonObject().get(key);
-			}
-			return element.getAsInt();
-		} catch (Exception e) {
+		try{
+			return higherDepth(element, path).getAsInt();
+		}catch (Exception e){
 			return defaultValue;
 		}
 	}
 
 	public static double higherDepth(JsonElement element, String path, double defaultValue) {
-		String[] paths = path.split("\\.");
-
-		try {
-			for (String key : paths) {
-				element = element.getAsJsonObject().get(key);
-			}
-			return element.getAsDouble();
-		} catch (Exception e) {
+		try{
+			return higherDepth(element, path).getAsDouble();
+		}catch (Exception e){
 			return defaultValue;
 		}
 	}

@@ -103,10 +103,6 @@ public class SlashCommandExecutedEvent {
 		return option == null ? defaultValue : option.getAsDouble();
 	}
 
-	public EmbedBuilder disabledCommandMessage() {
-		return invalidEmbed("This command is disabled");
-	}
-
 	public EmbedBuilder invalidCommandMessage() {
 		return invalidEmbed("Invalid Command");
 	}

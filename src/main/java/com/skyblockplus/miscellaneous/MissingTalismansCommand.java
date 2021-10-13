@@ -115,7 +115,7 @@ public class MissingTalismansCommand extends Command {
 			}
 			return player.defaultPlayerEmbed().setDescription(ebStr.toString());
 		}
-		return invalidEmbed(player.getFailCause());
+		return player.getFailEmbed();
 	}
 
 	@Override

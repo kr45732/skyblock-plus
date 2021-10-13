@@ -74,7 +74,7 @@ public class HarpCommand extends Command {
 
 			return eb;
 		}
-		return invalidEmbed(player.getFailCause());
+		return player.getFailEmbed();
 	}
 
 	@Override

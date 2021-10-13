@@ -16,22 +16,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.inventory;
+package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.invalidEmbed;
-
-import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
-import java.util.List;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
-public class EnderChestSlashCommand extends SlashCommand {
+public class SkyblockSlashCommand extends SlashCommand {
 
-	public EnderChestSlashCommand() {
-		this.name = "enderchest";
+	public SkyblockSlashCommand() {
+		this.name = "skyblock";
 	}
 
 	@Override
@@ -42,30 +38,12 @@ public class EnderChestSlashCommand extends SlashCommand {
 			return;
 		}
 
-		Player player = event.getOptionStr("profile") == null
-			? new Player(event.player)
-			: new Player(event.player, event.getOptionStr("profile"));
-		if (!player.isValid()) {
-			event.embed(player.getFailEmbed());
-			return;
-		}
-
-		List<String[]> playerEnderChest = player.getEnderChest();
-		if (playerEnderChest != null) {
-			event.getHook().deleteOriginal().queue();
-			if (player.invMissing.length() > 0) {
-				event.getChannel().sendMessageEmbeds(defaultEmbed("Missing emojis").setDescription(player.invMissing).build()).queue();
-			}
-
-			new InventoryPaginator(playerEnderChest, event.getChannel(), event.getUser());
-		} else {
-			event.embed(invalidEmbed("Inventory API disabled"));
-		}
+		event.paginate(SkyblockCommand.getSkyblock(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
 	}
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData(name, "Get a player's enderchest represented in emojis")
+		return new CommandData(name, "Get an overfiew of a player's Skyblock statistics")
 			.addOption(OptionType.STRING, "player", "Player username or mention")
 			.addOption(OptionType.STRING, "profile", "Profile name");
 	}

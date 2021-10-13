@@ -134,6 +134,6 @@ public class ArmorCommand extends Command {
 				return null;
 			}
 		}
-		return invalidEmbed(player.getFailCause());
+		return player.getFailEmbed();
 	}
 }

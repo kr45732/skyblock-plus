@@ -131,7 +131,7 @@ public class InventoryCommand extends Command {
 				return null;
 			}
 		}
-		return invalidEmbed(player.getFailCause());
+		return player.getFailEmbed();
 	}
 
 	public static String[] getPlayerInventory(String username, String profileName) {

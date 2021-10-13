@@ -41,7 +41,7 @@ import net.dv8tion.jda.api.requests.restaction.MessageAction;
 public class ApplyUser implements Serializable {
 
 	public final String applyingUserId;
-	public final String applicationChannelId;
+	public String applicationChannelId;
 	public final String currentSettingsString;
 	public final String guildId;
 	public final Map<String, String> profileEmojiToName = new LinkedHashMap<>();
@@ -57,6 +57,7 @@ public class ApplyUser implements Serializable {
 	public String playerCoins;
 	public String ironmanSymbol = "";
 	public String playerProfileName;
+	public String failCause;
 
 	public ApplyUser(ButtonClickEvent event, JsonElement currentSettings, String playerUsername) {
 		User applyingUser = event.getUser();
@@ -72,6 +73,11 @@ public class ApplyUser implements Serializable {
 		this.playerUsername = playerUsername;
 
 		Category applyCategory = event.getGuild().getCategoryById(higherDepth(currentSettings, "newChannelCategory").getAsString());
+		if(applyCategory.getChannels().size() == 50){
+			failCause = "Unable to create a new application due to the application category reaching 50/50 channels. Please report this to the server's staff.";
+			return;
+		}
+
 		TextChannel applicationChannel = applyCategory
 			.createTextChannel("apply-" + playerUsername)
 			.addPermissionOverride(event.getMember(), EnumSet.of(Permission.VIEW_CHANNEL), null)

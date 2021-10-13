@@ -132,18 +132,18 @@ public class ApplyGuild {
 
 		Player player = new Player(higherDepth(linkedAccount, "minecraftUsername").getAsString());
 		if (!player.isValid()) {
-			return "❌ Unable to fetch player data. Please make sure that all APIs are enabled and/or try relinking";
+			return "❌ Unable to fetch player data. Failed cause: `" + player.getFailCause() + "`";
 		} else {
-			boolean isIronman = false;
-			try {
-				isIronman = higherDepth(currentSettings, "ironmanOnly").getAsBoolean();
-			} catch (Exception ignored) {}
-			if (isIronman && player.getAllProfileNames(true).length == 0) {
+			if (higherDepth(currentSettings, "ironmanOnly", false) && player.getAllProfileNames(true).length == 0) {
 				return "❌ You have no ironman profiles created";
 			}
 		}
 
 		ApplyUser toAdd = new ApplyUser(event, currentSettings, higherDepth(linkedAccount, "minecraftUsername").getAsString());
+		if(toAdd.failCause != null){
+			return "❌ " + toAdd.failCause;
+		}
+
 		applyUserList.add(toAdd);
 
 		return "✅ A new application was created in " + event.getGuild().getTextChannelById(toAdd.applicationChannelId).getAsMention();

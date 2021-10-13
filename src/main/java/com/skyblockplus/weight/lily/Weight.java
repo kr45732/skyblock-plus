@@ -31,9 +31,17 @@ public class Weight {
 	private final DungeonsWeight dungeonsWeight;
 
 	public Weight(Player player) {
+		this(player, false);
+	}
+
+	public Weight(Player player, boolean calculateWeight){
 		this.slayerWeight = new SlayerWeight(player);
 		this.skillsWeight = new SkillsWeight(player);
 		this.dungeonsWeight = new DungeonsWeight(player);
+
+		if(calculateWeight){
+			calculateWeight();
+		}
 	}
 
 	public SkillsWeight getSkillsWeight() {
@@ -48,24 +56,24 @@ public class Weight {
 		return dungeonsWeight;
 	}
 
-	public WeightStruct getTotalWeight(boolean needToCalc) {
-		if (needToCalc) {
-			for (String slayerName : SLAYER_NAMES) {
-				slayerWeight.getSlayerWeight(slayerName);
-			}
-			for (String skillName : SKILL_NAMES) {
-				skillsWeight.getSkillsWeight(skillName);
-			}
-			dungeonsWeight.getDungeonWeight();
-			dungeonsWeight.getDungeonCompletionWeight("normal");
-			dungeonsWeight.getDungeonCompletionWeight("master");
-		}
-
+	public WeightStruct getTotalWeight() {
 		WeightStruct w = new WeightStruct();
 		w.add(slayerWeight.getWeightStruct());
 		w.add(skillsWeight.getWeightStruct());
 		w.add(dungeonsWeight.getWeightStruct());
 
 		return w;
+	}
+
+	private void calculateWeight(){
+		for (String slayerName : SLAYER_NAMES) {
+			slayerWeight.getSlayerWeight(slayerName);
+		}
+		for (String skillName : SKILL_NAMES) {
+			skillsWeight.getSkillsWeight(skillName);
+		}
+		dungeonsWeight.getDungeonWeight();
+		dungeonsWeight.getDungeonCompletionWeight("normal");
+		dungeonsWeight.getDungeonCompletionWeight("master");
 	}
 }

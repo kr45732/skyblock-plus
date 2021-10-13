@@ -56,7 +56,7 @@ public class BankCommand extends Command {
 			eb.addField("Purse coins", simplifyNumber(playerPurseCoins) + " coins", false);
 			return eb;
 		}
-		return invalidEmbed(player.getFailCause());
+		return player.getFailEmbed();
 	}
 
 	public static EmbedBuilder getPlayerBankHistory(String username, String profileName, PaginatorEvent event) {
@@ -105,7 +105,7 @@ public class BankCommand extends Command {
 				return invalidEmbed("Player banking API disabled");
 			}
 		}
-		return invalidEmbed(player.getFailCause());
+		return player.getFailEmbed();
 	}
 
 	@Override

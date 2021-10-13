@@ -317,12 +317,30 @@ public class CustomPaginator extends Menu {
 			switch (extras.getType()) {
 				case DEFAULT:
 					Checks.check(!strings.isEmpty(), "Must include at least one item to paginate");
+					if(extras.getEmbedFields().size() > 0){
+						log.warn("Paginator type is DEFAULT but embed fields were also provided");
+					}
+					if(extras.getEmbedPages().size() > 0){
+						log.warn("Paginator type is DEFAULT but embed pages were also provided");
+					}
 					break;
 				case EMBED_FIELDS:
 					Checks.check(!extras.getEmbedFields().isEmpty(), "Must include at least one embed field to paginate");
+					if(strings.size() > 1){
+						log.warn("Paginator type is EMBED_FIELDS but strings were also provided");
+					}
+					if(extras.getEmbedPages().size() > 0){
+						log.warn("Paginator type is EMBED_FIELDS but embed pages were also provided");
+					}
 					break;
 				case EMBED_PAGES:
 					Checks.check(!extras.getEmbedPages().isEmpty(), "Must include at least one embed page to paginate");
+					if(strings.size() > 0){
+						log.warn("Paginator type is EMBED_PAGES but strings were also provided");
+					}
+					if(extras.getEmbedFields().size() > 0){
+						log.warn("Paginator type is EMBED_PAGES but embed fields were also provided");
+					}
 					break;
 				default:
 					throw new IllegalArgumentException("Invalid paginator type");

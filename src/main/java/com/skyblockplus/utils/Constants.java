@@ -153,6 +153,7 @@ public class Constants {
 			DUNGEON_COMPLETION_BUFFS = higherDepth(constantsJson, "DUNGEON_COMPLETION_BUFFS").getAsJsonObject();
 
 			/* ENCHANT_NAMES */
+			ENCHANT_NAMES = new ArrayList<>();
 			for (Map.Entry<String, JsonElement> enchantArr : higherDepth(getEnchantsJson(), "enchants").getAsJsonObject().entrySet()) {
 				for (JsonElement enchantName : enchantArr.getValue().getAsJsonArray()) {
 					ENCHANT_NAMES.add(enchantName.getAsString().toUpperCase());

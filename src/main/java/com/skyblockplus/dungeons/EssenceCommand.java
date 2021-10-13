@@ -93,9 +93,13 @@ public class EssenceCommand extends Command {
 				}
 			}
 
+			for (Map.Entry<String, JsonElement> perk : higherDepth(player.profileJson(), "perks").getAsJsonObject().entrySet()) {
+				eb.appendDescription("**• " + capitalizeString(perk.getKey().replace("_", " ")) + ":** " + perk.getValue().getAsInt() + "\n");
+			}
+
 			return eb;
 		}
-		return invalidEmbed(player.getFailCause());
+		return player.getFailEmbed();
 	}
 
 	@Override
@@ -125,11 +129,12 @@ public class EssenceCommand extends Command {
 					embed(getEssenceInformation(args[2]));
 					return;
 				} else if ((args.length == 4 || args.length == 3 || args.length == 2) && args[1].equals("player")) {
-					if (getMentionedUsername(args.length == 3 ? -1 : 2)) {
+					if (getMentionedUsername(args.length == 2 ? -1 : 2)) {
 						return;
 					}
 
 					embed(getPlayerEssence(username, args.length == 4 ? args[3] : null));
+					return;
 				}
 
 				sendErrorEmbed();

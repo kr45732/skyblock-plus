@@ -536,7 +536,7 @@ public class SkyblockEventCommand extends Command {
 					} catch (Exception ignored) {}
 				}
 
-				return invalidEmbed(player.getFailCause());
+				return player.getFailEmbed();
 			} else {
 				return invalidEmbed("You must be linked to run this command. Use `" + getGuildPrefix(guildId) + "link [IGN]` to link");
 			}

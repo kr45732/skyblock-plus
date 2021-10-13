@@ -224,6 +224,9 @@ public class Player {
 		return "https://cravatar.eu/helmavatar/" + uuid + "/64.png";
 	}
 
+	/**
+	 * Will return -1 if API is disabled
+	 */
 	/* Bank and purse */
 	public double getBankBalance() {
 		return higherDepth(getOuterProfileJson(), "banking.balance", -1.0);
@@ -967,7 +970,7 @@ public class Player {
 	}
 
 	public double getWeight() {
-		return new Weight(this).getTotalWeight(true).getRaw();
+		return new Weight(this, true).getTotalWeight().getRaw();
 	}
 
 	public EmbedBuilder defaultPlayerEmbed() {
@@ -977,6 +980,10 @@ public class Player {
 	public EmbedBuilder defaultPlayerEmbed(String extra) {
 		return defaultEmbed(fixUsername(getUsername()) + (isIronman() ? " ♻️" : "") + extra, skyblockStatsLink())
 			.setThumbnail(getThumbnailUrl());
+	}
+
+	public EmbedBuilder getFailEmbed(){
+		return invalidEmbed(failCause);
 	}
 
 	public int getNumberMinionSlots() {

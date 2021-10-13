@@ -94,22 +94,22 @@ public class HelpCommand extends Command {
 		helpDataList.addAll(
 			Arrays.asList(
 				new HelpData("help", "Show the help menu with all the commands.", "help")
-					.addSecondData("Show the help menu for a certain command.", "help [command]")
+					.addSecondData("Show the help menu for a certain command.", "help <command>")
 					.addExamples("help", "help Guild Experience")
 					.addAliases("commands"),
 				new HelpData("information", "Get information about this bot.").addAliases("info", "about"),
 				new HelpData("invite", "Get the invite link and Discord link for the bot."),
 				new HelpData("link", "Get what Hypixel account you are linked to.", "link")
-					.addSecondData("Link your Hypixel account to the bot.", "link [player]")
+					.addSecondData("Link your Hypixel account to the bot.", "link <player>")
 					.addExamples("link CrypticPlasma"),
 				new HelpData("unlink", "Unlink your account from the bot."),
-				new HelpData("slayer", "Get the slayer data of a player.", "slayer [player] <profile>")
+				new HelpData("slayer", "Get the slayer data of a player.", "slayer [player] [profile]")
 					.addAliases("slayers")
 					.addExamples("slayer CrypticPlasma", "slayer CrypticPlasma Zucchini"),
-				new HelpData("skills", "Get the skills data of a player.", "skills [player] <profile>")
+				new HelpData("skills", "Get the skills data of a player.", "skills [player] [profile]")
 					.addAliases("skill")
 					.addExamples("skills CrypticPlasma", "skills CrypticPlasma Zucchini"),
-				new HelpData("dungeons", "Get the dungeons data of a player.", "dungeons [player] <profile>")
+				new HelpData("dungeons", "Get the dungeons data of a player.", "dungeons [player] [profile]")
 					.addAliases("cata", "catacombs")
 					.addExamples("dungeons CrypticPlasma", "dungeons CrypticPlasma Zucchini"),
 				new HelpData("essence", "Main essence command.")

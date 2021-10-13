@@ -122,7 +122,7 @@ public class HotmCommand extends Command {
 			eb.addField("Perks", perksStr.toString(), false);
 			return eb;
 		}
-		return invalidEmbed(player.getFailCause());
+		return player.getFailEmbed();
 	}
 
 	@Override

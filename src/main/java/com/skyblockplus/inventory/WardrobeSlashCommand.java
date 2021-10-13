@@ -55,7 +55,7 @@ public class WardrobeSlashCommand extends SlashCommand {
 					? new Player(event.player)
 					: new Player(event.player, event.getOptionStr("profile"));
 				if (!player.isValid()) {
-					event.embed(invalidEmbed(player.getFailCause()));
+					event.embed(player.getFailEmbed());
 					return;
 				}
 

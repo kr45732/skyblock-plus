@@ -862,7 +862,7 @@ public class SettingsExecute {
 		rolePageMap.put("sven", 2);
 		rolePageMap.put("rev", 3);
 		rolePageMap.put("tara", 4);
-		rolePageMap.put("coins", 5);
+		rolePageMap.put("enderman", 5);
 		rolePageMap.put("alchemy", 6);
 		rolePageMap.put("combat", 7);
 		rolePageMap.put("fishing", 8);
@@ -873,18 +873,19 @@ public class SettingsExecute {
 		rolePageMap.put("taming", 13);
 		rolePageMap.put("enchanting", 14);
 		rolePageMap.put("catacombs", 15);
-		rolePageMap.put("guild_member", 16);
-		rolePageMap.put("fairy_souls", 17);
-		rolePageMap.put("slot_collector", 18);
-		rolePageMap.put("pet_enthusiast", 19);
-		rolePageMap.put("doom_slayer", 20);
-		rolePageMap.put("all_slayer_nine", 21);
-		rolePageMap.put("skill_average", 22);
-		rolePageMap.put("pet_score", 23);
-		rolePageMap.put("dungeon_secrets", 24);
-		rolePageMap.put("guild_ranks", 25);
-		rolePageMap.put("enderman", 26);
-		rolePageMap.put("weight", 27);
+		rolePageMap.put("weight", 16);
+		rolePageMap.put("guild_member", 17);
+		rolePageMap.put("guild_ranks", 18);
+		rolePageMap.put("coins", 19);
+		rolePageMap.put("fairy_souls", 20);
+		rolePageMap.put("slot_collector", 21);
+		rolePageMap.put("pet_enthusiast", 22);
+		rolePageMap.put("total_slayer", 23);
+		rolePageMap.put("doom_slayer", 24);
+		rolePageMap.put("all_slayer_nine", 25);
+		rolePageMap.put("skill_average", 26);
+		rolePageMap.put("pet_score", 27);
+		rolePageMap.put("dungeon_secrets", 28);
 
 		if (rolePageMap.containsKey(roleName)) {
 			CustomPaginator.Builder currentRoleSettings = getCurrentRolesSettings(database.getRolesSettings(guild.getId()));
@@ -1074,22 +1075,21 @@ public class SettingsExecute {
 							.append("settings roles add weight 5000 @5k weight`\n");
 						break;
 					}
-				case "slayer":
+				case "total_slayer":
 					ebFieldString
-						.append("**A player's total slayer**\nExample: `")
+						.append("**A player's total slayer xp**\nExample: `")
 						.append(guildPrefix)
 						.append("settings roles add total_slayer 1000000 @1m slayer`\n");
 					break;
 			}
 
-			ebFieldString.append("\nCurrent Settings:\n");
-
-			ebFieldString.append(
+			ebFieldString.append("\nCurrent Settings:\n").append(
 				higherDepth(currentRoleSettings, "enable") != null &&
 					higherDepth(currentRoleSettings, "enable").getAsString().equals("true")
 					? "• Enabled"
 					: "• Disabled"
 			);
+
 			if (roleName.equals("guild_ranks")) {
 				if (higherDepth(currentRoleSettings, "levels").getAsJsonArray().size() == 0) {
 					ebFieldString.append("\n• No ranks added");
@@ -1110,8 +1110,7 @@ public class SettingsExecute {
 			} else if (isOneLevelRole(roleName)) {
 				try {
 					ebFieldString
-						.append("\n• default - ")
-						.append("<@&")
+						.append("\n• <@&")
 						.append(higherDepth(higherDepth(currentRoleSettings, "levels").getAsJsonArray().get(0), "roleId").getAsString())
 						.append(">");
 				} catch (Exception ignored) {}
@@ -1152,7 +1151,7 @@ public class SettingsExecute {
 				}
 
 				if (higherDepth(currentRoleSettings, "levels").getAsJsonArray().size() == 0) {
-					ebFieldString.append("\n• No levels set");
+					ebFieldString.append("\n• No levels added");
 				}
 
 				pageTitles.add(roleName);
