@@ -20,12 +20,14 @@ package com.skyblockplus.features.setup;
 
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class SetupSlashCommand extends SlashCommand {
 
 	public SetupSlashCommand() {
 		this.name = "setup";
+		this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
 	}
 
 	@Override

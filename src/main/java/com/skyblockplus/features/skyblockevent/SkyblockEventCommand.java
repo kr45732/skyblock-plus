@@ -378,6 +378,7 @@ public class SkyblockEventCommand extends Command {
 
 		if (paginateBuilder.getItemsSize() > 0) {
 			event.paginate(paginateBuilder);
+			return null;
 		}
 
 		return defaultEmbed("Event Leaderboard").setDescription("No one joined the event");

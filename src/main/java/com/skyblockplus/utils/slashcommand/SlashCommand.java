@@ -18,19 +18,54 @@
 
 package com.skyblockplus.utils.slashcommand;
 
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+
 import static com.skyblockplus.Main.client;
 import static com.skyblockplus.utils.Utils.*;
-
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public abstract class SlashCommand {
 
 	protected final int cooldown = globalCooldown;
 	protected String name = "null";
+	protected Permission[] botPermissions = defaultPerms();
+	protected Permission[] userPermissions = new Permission[0];
 
 	protected abstract void execute(SlashCommandExecutedEvent event);
 
 	protected void run(SlashCommandExecutedEvent event) {
+		for (Permission p : userPermissions) {
+			if (p.isChannel()) {
+				if (!event.getMember().hasPermission(event.getTextChannel(), p)) {
+					event.embed(invalidEmbed("You must have the " + p.getName() + " permission in this channel to use that!"));
+					return;
+				}
+			} else {
+				if (!event.getMember().hasPermission(p)) {
+					event.embed(invalidEmbed("You must have the " + p.getName() + " permission in this server to use that!"));
+					return;
+				}
+			}
+		}
+
+		for (Permission p : botPermissions) {
+			if (p.isChannel()) {
+				if (!event.getSelfMember().hasPermission(event.getTextChannel(), p)) {
+					if (p == Permission.MESSAGE_WRITE) {
+						event.getUser().openPrivateChannel().queue(dm -> dm.sendMessageEmbeds(invalidEmbed("I need the " + p.getName() + " permission in " + event.getTextChannel().getAsMention() + "!").build()).queue());
+					} else {
+						event.embed(invalidEmbed("I need the " + p.getName() + " permission in this channel!"));
+					}
+					return;
+				}
+			} else {
+				if (!event.getSelfMember().hasPermission(p)) {
+					event.embed(invalidEmbed("I need the " + p.getName() + " permission in this server!"));
+					return;
+				}
+			}
+		}
+
 		executor.submit(() -> execute(event));
 	}
 
@@ -52,9 +87,9 @@ public abstract class SlashCommand {
 
 	public void replyCooldown(SlashCommandExecutedEvent event, int remainingCooldown) {
 		event
-			.getHook()
-			.editOriginalEmbeds(invalidEmbed("That command is on cooldown for " + remainingCooldown + " more seconds").build())
-			.queue();
+				.getHook()
+				.editOriginalEmbeds(invalidEmbed("That command is on cooldown for " + remainingCooldown + " more seconds").build())
+				.queue();
 	}
 
 	public abstract CommandData getCommandData();

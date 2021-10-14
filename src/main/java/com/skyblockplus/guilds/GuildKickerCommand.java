@@ -21,6 +21,8 @@ package com.skyblockplus.guilds;
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.structs.HypixelGuildCache.getDoubleFromCache;
+import static com.skyblockplus.utils.structs.HypixelGuildCache.getStringFromCache;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -272,11 +274,10 @@ public class GuildKickerCommand extends Command {
 			}
 
 			for (String guildMember : guildMemberPlayersList) {
-				String[] guildMemberSplit = guildMember.split("=:=");
-				double slayer = Double.parseDouble(guildMemberSplit[1]);
-				double skills = Double.parseDouble(guildMemberSplit[2]);
-				double catacombs = Double.parseDouble(guildMemberSplit[3]);
-				double weight = Double.parseDouble(guildMemberSplit[4]);
+				double slayer = getDoubleFromCache(guildMember, "slayer");
+				double skills = getDoubleFromCache(guildMember, "skills");
+				double catacombs = getDoubleFromCache(guildMember, "catacombs");
+				double weight = getDoubleFromCache(guildMember, "weight");
 
 				boolean meetsReqs = false;
 
@@ -312,7 +313,7 @@ public class GuildKickerCommand extends Command {
 				if (!meetsReqs) {
 					paginateBuilder.addItems(
 						"• **" +
-						guildMemberSplit[0] +
+						getStringFromCache(guildMember, "username") +
 						"** | Slayer: " +
 						formatNumber(slayer) +
 						" | Skills: " +

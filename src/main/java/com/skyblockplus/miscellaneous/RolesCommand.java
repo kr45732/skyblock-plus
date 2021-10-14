@@ -402,7 +402,7 @@ public class RolesCommand extends Command {
 					case "doom_slayer":
 						{
 							Role curRole = guild.getRoleById(
-								higherDepth(higherDepth(currentRole, "levels").getAsJsonArray().get(0), "roleId").getAsString()
+								higherDepth(currentRole, "levels.[0].roleId").getAsString()
 							);
 							if (curRole == null) {
 								errorRoles.append(roleDeletedString(higherDepth(currentRole, "levels.[0].roleId").getAsString()));
@@ -438,7 +438,7 @@ public class RolesCommand extends Command {
 					case "all_slayer_nine":
 						{
 							Role curRole = guild.getRoleById(
-								higherDepth(higherDepth(currentRole, "levels").getAsJsonArray().get(0), "roleId").getAsString()
+								higherDepth(currentRole, "levels.[0].roleId").getAsString()
 							);
 							if (curRole == null) {
 								errorRoles.append(roleDeletedString(higherDepth(currentRole, "levels.[0].roleId").getAsString()));
@@ -477,7 +477,7 @@ public class RolesCommand extends Command {
 							ArrayList<String> excludedPets = new ArrayList<>(Arrays.asList("guardian", "jellyfish", "parrot", "sheep"));
 
 							Role petEnthusiastRole = guild.getRoleById(
-								higherDepth(higherDepth(currentRole, "levels").getAsJsonArray().get(0), "roleId").getAsString()
+								higherDepth(currentRole, "levels.[0].roleId").getAsString()
 							);
 							if (petEnthusiastRole == null) {
 								errorRoles.append(roleDeletedString(higherDepth(currentRole, "levels.[0].roleId").getAsString()));
@@ -589,7 +589,7 @@ public class RolesCommand extends Command {
 				"pet_enthusiast".equals(currentRoleName)
 			) {
 				paginateBuilder.addItems(
-					"<@&" + higherDepth(higherDepth(currentRole, "levels").getAsJsonArray().get(0), "roleId").getAsString() + ">"
+					"<@&" + higherDepth(currentRole, "levels.[0].roleId").getAsString() + ">"
 				);
 			} else {
 				JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();

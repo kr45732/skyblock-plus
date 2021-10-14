@@ -1086,6 +1086,17 @@ public class Player {
 				case "endermanXp":
 					highestAmount = Math.max(highestAmount, getSlayer(type.replace("Xp", "")));
 					break;
+				case "alchemy":
+				case "combat":
+				case "fishing":
+				case "farming":
+				case "foraging":
+				case "carpentry":
+				case "mining":
+				case "taming":
+				case "enchanting":
+					highestAmount = Math.max(highestAmount, getSkill(type).getProgressLevel());
+					break;
 				default:
 					return -1;
 			}

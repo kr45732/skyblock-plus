@@ -96,7 +96,7 @@ public class Utils {
 	public static final ConcurrentHashMap<String, HypixelKeyInformation> keyCooldownMap = new ConcurrentHashMap<>();
 	public static final Cache<String, HypixelGuildCache> hypixelGuildsCacheMap = Caffeine
 		.newBuilder()
-		.expireAfterAccess(15, TimeUnit.MINUTES)
+		.expireAfterWrite(15, TimeUnit.MINUTES)
 		.build();
 	private static final Logger log = LoggerFactory.getLogger(Utils.class);
 	public static final Gson gson = new Gson();
@@ -1195,7 +1195,7 @@ public class Utils {
 	}
 
 	public static Permission[] defaultPerms() {
-		return new Permission[] { Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_MANAGE };
+		return new Permission[] { Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_MANAGE, Permission.MESSAGE_ADD_REACTION };
 	}
 
 	public static Stream<JsonElement> streamJsonArray(JsonArray array) {

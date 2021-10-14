@@ -60,8 +60,10 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
@@ -857,7 +859,7 @@ public class AutomaticGuild {
 					long price = 0;
 
 					try {
-						higherDepth(higherDepth(bazaarJson, id + ".buy_summary").getAsJsonArray().get(0), "pricePerUnit").getAsDouble();
+						higherDepth(bazaarJson, id + ".buy_summary.[0].pricePerUnit").getAsDouble();
 						continue;
 					} catch (Exception ignored) {}
 

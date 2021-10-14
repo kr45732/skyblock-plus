@@ -21,6 +21,7 @@ package com.skyblockplus.guilds;
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.structs.HypixelGuildCache.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -86,38 +87,12 @@ public class GuildLeaderboardCommand extends Command {
 			return eb;
 		}
 
-		int lbTypeNum;
-		switch (lbType) {
-			case "slayer":
-				lbTypeNum = 1;
-				break;
-			case "skills":
-				lbTypeNum = 2;
-				break;
-			case "catacombs":
-				lbTypeNum = 3;
-				break;
-			case "weight":
-				lbTypeNum = 4;
-				break;
-			case "sven_xp":
-				lbTypeNum = 5;
-				break;
-			case "rev_xp":
-				lbTypeNum = 6;
-				break;
-			case "tara_xp":
-				lbTypeNum = 7;
-				break;
-			case "enderman_xp":
-				lbTypeNum = 8;
-				break;
-			default:
-				return invalidEmbed(
+		if(typeToIndex(lbType.toLowerCase()) < 2) { // Type is invalid, username, or uuid
+			return invalidEmbed(
 					lbType +
-					" is an invalid leaderboard type. Valid types are: `slayer`, `skills`, `catacombs`, `weight`, `sven_xp`, `rev_xp`, `tara_xp`, and `enderman_xp`"
-				);
+							" is an invalid leaderboard type. Valid types are: `slayer`, `skills`, `catacombs`, `weight`, `sven_xp`, `rev_xp`, `tara_xp`, `enderman_xp`, `alchemy`, `combat`,`fishing`, `farming`, `foraging`, `carpentry`, `mining`, `taming`, and `enchanting`");
 		}
+		lbType = lbType.toLowerCase();
 
 		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
 		if (usernameUuidStruct.isNotValid()) {
@@ -188,16 +163,18 @@ public class GuildLeaderboardCommand extends Command {
 			hypixelGuildsCacheMap.put(guildId, newGuildCache.setLastUpdated());
 		}
 
-		guildMemberPlayersList.sort(Comparator.comparingDouble(o1 -> -Double.parseDouble(o1.split("=:=")[lbTypeNum])));
+		String finalLbType = lbType;
+		guildMemberPlayersList.sort(Comparator.comparingDouble(cache -> -getDoubleFromCache(cache, finalLbType)));
 
 		int guildRank = -1;
 		String amt = "-1";
 		for (int i = 0, guildMemberPlayersListSize = guildMemberPlayersList.size(); i < guildMemberPlayersListSize; i++) {
-			String[] guildPlayer = guildMemberPlayersList.get(i).split("=:=");
-			String formattedAmt = roundAndFormat(Double.parseDouble(guildPlayer[lbTypeNum]));
-			paginateBuilder.addItems("`" + (i + 1) + ")` " + fixUsername(guildPlayer[0]) + ": " + formattedAmt);
+			String guildPlayer =guildMemberPlayersList.get(i);
+			String formattedAmt = roundAndFormat(getDoubleFromCache(guildPlayer, lbType));
+			String guildPlayerUsername = getStringFromCache(guildPlayer, "username");
+			paginateBuilder.addItems("`" + (i + 1) + ")` " + fixUsername(guildPlayerUsername) + ": " + formattedAmt);
 
-			if (guildPlayer[0].equals(usernameUuidStruct.getUsername())) {
+			if (guildPlayerUsername.equals(usernameUuidStruct.getUsername())) {
 				guildRank = i;
 				amt = formattedAmt;
 			}

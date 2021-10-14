@@ -64,12 +64,12 @@ public class BazaarCommand extends Command {
 		EmbedBuilder eb = defaultEmbed(idToName(itemId), "https://bazaartracker.com/product/" + itemId);
 		eb.addField(
 			"Buy Price (Per)",
-			simplifyNumber(higherDepth(higherDepth(itemInfo, "buy_summary").getAsJsonArray().get(0), "pricePerUnit").getAsDouble()),
+			simplifyNumber(higherDepth(itemInfo, "buy_summary.[0].pricePerUnit").getAsDouble()),
 			true
 		);
 		eb.addField(
 			"Sell Price (Per)",
-			simplifyNumber(higherDepth(higherDepth(itemInfo, "sell_summary").getAsJsonArray().get(0), "pricePerUnit").getAsDouble()),
+			simplifyNumber(higherDepth(itemInfo, "sell_summary.[0].pricePerUnit").getAsDouble()),
 			true
 		);
 		eb.addBlankField(true);

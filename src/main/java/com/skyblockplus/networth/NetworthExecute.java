@@ -18,10 +18,6 @@
 
 package com.skyblockplus.networth;
 
-import static com.skyblockplus.utils.ApiHandler.getAuctionPetsByName;
-import static com.skyblockplus.utils.Constants.*;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -31,8 +27,13 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.InvItem;
 import com.skyblockplus.utils.structs.NwItemPrice;
-import java.util.*;
 import net.dv8tion.jda.api.EmbedBuilder;
+
+import java.util.*;
+
+import static com.skyblockplus.utils.ApiHandler.getAuctionPetsByName;
+import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.Utils.*;
 
 public class NetworthExecute {
 
@@ -119,12 +120,12 @@ public class NetworthExecute {
 			sbzPrices = getSbzPricesJson();
 
 			recombPrice =
-				higherDepth(higherDepth(bazaarJson, "RECOMBOBULATOR_3000.buy_summary").getAsJsonArray().get(0), "pricePerUnit")
+				higherDepth(bazaarJson, "RECOMBOBULATOR_3000.buy_summary.[0].pricePerUnit")
 					.getAsDouble();
 			hbpPrice =
-				higherDepth(higherDepth(bazaarJson, "HOT_POTATO_BOOK.buy_summary").getAsJsonArray().get(0), "pricePerUnit").getAsDouble();
+				higherDepth(bazaarJson, "HOT_POTATO_BOOK.buy_summary.[0].pricePerUnit").getAsDouble();
 			fumingPrice =
-				higherDepth(higherDepth(bazaarJson, "FUMING_POTATO_BOOK.buy_summary").getAsJsonArray().get(0), "pricePerUnit")
+				higherDepth(bazaarJson, "FUMING_POTATO_BOOK.buy_summary.[0].pricePerUnit")
 					.getAsDouble();
 
 			bankBalance = player.getBankBalance();
@@ -369,7 +370,9 @@ public class NetworthExecute {
 				}
 			}
 
-			tempSet.stream().filter(str -> !str.toLowerCase().startsWith("rune_")).forEach(System.out::println);
+			JsonArray arr = new JsonArray();
+			tempSet.stream().filter(str -> !str.toLowerCase().startsWith("rune_")).forEach(arr::add);
+			System.out.println(arr);
 
 			return eb;
 		}
@@ -1158,7 +1161,7 @@ public class NetworthExecute {
 
 		try {
 			return Math.max(
-				higherDepth(higherDepth(bazaarJson, itemId + ".buy_summary").getAsJsonArray().get(0), "pricePerUnit").getAsDouble(),
+				higherDepth(bazaarJson, itemId + ".buy_summary.[0].pricePerUnit").getAsDouble(),
 				0
 			);
 		} catch (Exception ignored) {}

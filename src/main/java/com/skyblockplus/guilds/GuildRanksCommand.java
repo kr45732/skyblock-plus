@@ -21,6 +21,8 @@ package com.skyblockplus.guilds;
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.structs.HypixelGuildCache.getDoubleFromCache;
+import static com.skyblockplus.utils.structs.HypixelGuildCache.getStringFromCache;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -165,7 +167,7 @@ public class GuildRanksCommand extends Command {
 		Instant lastUpdated = null;
 		if (useKey) {
 			HypixelGuildCache guildCache = hypixelGuildsCacheMap.getIfPresent(guildId);
-			List<String> guildMemberPlayersList = new ArrayList<>();
+			List<String> guildMemberPlayersList;
 			if (guildCache != null) {
 				guildMemberPlayersList = guildCache.getCache(ironmanOnly);
 				lastUpdated = guildCache.getLastUpdated();
@@ -223,13 +225,12 @@ public class GuildRanksCommand extends Command {
 			}
 
 			for (String lbM : guildMemberPlayersList) {
-				String[] guildMemberSplit = lbM.split("=:=");
-				String gMemUsername = guildMemberSplit[0];
-				String gMemUuid = guildMemberSplit[9];
-				double slayer = Double.parseDouble(guildMemberSplit[1]);
-				double skills = Double.parseDouble(guildMemberSplit[2]);
-				double catacombs = Double.parseDouble(guildMemberSplit[3]);
-				double weight = Double.parseDouble(guildMemberSplit[4]);
+				String gMemUsername = getStringFromCache(lbM, "username");
+				String gMemUuid = getStringFromCache(lbM, "uuid");
+				double slayer = getDoubleFromCache(lbM, "slayer");
+				double skills = getDoubleFromCache(lbM, "skills");
+				double catacombs = getDoubleFromCache(lbM, "catacombs");
+				double weight = getDoubleFromCache(lbM, "weight");
 
 				String curRank = ranksMap.get(gMemUuid);
 

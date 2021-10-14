@@ -49,7 +49,7 @@ import org.apache.http.client.utils.URIBuilder;
 
 public class ApiHandler {
 
-	public static final Cache<String, String> uuidToUsernameCache = Caffeine.newBuilder().expireAfterAccess(30, TimeUnit.MINUTES).build();
+	public static final Cache<String, String> uuidToUsernameCache = Caffeine.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build();
 
 	public static final ConcurrentHashMap<String, Instant> uuidToTimeSkyblockProfiles = new ConcurrentHashMap<>();
 

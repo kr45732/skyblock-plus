@@ -1113,7 +1113,7 @@ public class SettingsExecute {
 				try {
 					ebFieldString
 						.append("\n• <@&")
-						.append(higherDepth(higherDepth(currentRoleSettings, "levels").getAsJsonArray().get(0), "roleId").getAsString())
+						.append(higherDepth(currentRoleSettings, "levels.[0].roleId").getAsString())
 						.append(">");
 				} catch (Exception ignored) {}
 				pageTitles.add(roleName + " (__one level role__)");
