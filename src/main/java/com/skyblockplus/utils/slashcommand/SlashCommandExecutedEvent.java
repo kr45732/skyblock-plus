@@ -18,19 +18,18 @@
 
 package com.skyblockplus.utils.slashcommand;
 
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.Utils.invalidEmbed;
+
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Utils;
+import java.util.regex.Matcher;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-
-import java.util.regex.Matcher;
-
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.utils.Utils.invalidEmbed;
 
 public class SlashCommandExecutedEvent {
 
@@ -155,8 +154,7 @@ public class SlashCommandExecutedEvent {
 		event.getHook().editOriginal(string).queue();
 	}
 
-	public Member getSelfMember()
-	{
+	public Member getSelfMember() {
 		return event.getGuild().getSelfMember();
 	}
 

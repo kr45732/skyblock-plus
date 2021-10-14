@@ -18,6 +18,10 @@
 
 package com.skyblockplus.networth;
 
+import static com.skyblockplus.utils.ApiHandler.getAuctionPetsByName;
+import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -27,13 +31,8 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.InvItem;
 import com.skyblockplus.utils.structs.NwItemPrice;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.util.*;
-
-import static com.skyblockplus.utils.ApiHandler.getAuctionPetsByName;
-import static com.skyblockplus.utils.Constants.*;
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class NetworthExecute {
 
@@ -119,14 +118,9 @@ public class NetworthExecute {
 			bazaarJson = higherDepth(getBazaarJson(), "products");
 			sbzPrices = getSbzPricesJson();
 
-			recombPrice =
-				higherDepth(bazaarJson, "RECOMBOBULATOR_3000.buy_summary.[0].pricePerUnit")
-					.getAsDouble();
-			hbpPrice =
-				higherDepth(bazaarJson, "HOT_POTATO_BOOK.buy_summary.[0].pricePerUnit").getAsDouble();
-			fumingPrice =
-				higherDepth(bazaarJson, "FUMING_POTATO_BOOK.buy_summary.[0].pricePerUnit")
-					.getAsDouble();
+			recombPrice = higherDepth(bazaarJson, "RECOMBOBULATOR_3000.buy_summary.[0].pricePerUnit").getAsDouble();
+			hbpPrice = higherDepth(bazaarJson, "HOT_POTATO_BOOK.buy_summary.[0].pricePerUnit").getAsDouble();
+			fumingPrice = higherDepth(bazaarJson, "FUMING_POTATO_BOOK.buy_summary.[0].pricePerUnit").getAsDouble();
 
 			bankBalance = player.getBankBalance();
 			purseCoins = player.getPurseCoins();
@@ -1160,10 +1154,7 @@ public class NetworthExecute {
 		}
 
 		try {
-			return Math.max(
-				higherDepth(bazaarJson, itemId + ".buy_summary.[0].pricePerUnit").getAsDouble(),
-				0
-			);
+			return Math.max(higherDepth(bazaarJson, itemId + ".buy_summary.[0].pricePerUnit").getAsDouble(), 0);
 		} catch (Exception ignored) {}
 
 		if (!onlyBazaar) {

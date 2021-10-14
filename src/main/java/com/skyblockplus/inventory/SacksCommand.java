@@ -18,6 +18,8 @@
 
 package com.skyblockplus.inventory;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -26,12 +28,9 @@ import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.PaginatorExtras;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.util.Comparator;
 import java.util.Map;
-
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class SacksCommand extends Command {
 
@@ -74,7 +73,9 @@ public class SacksCommand extends Command {
 				sacksMap
 					.entrySet()
 					.stream()
-					.sorted(Comparator.comparingInt(entry -> -higherDepth(bazaarPrices, entry.getKey() + ".buy_summary.[0].pricePerUnit", 0)))
+					.sorted(
+						Comparator.comparingInt(entry -> -higherDepth(bazaarPrices, entry.getKey() + ".buy_summary.[0].pricePerUnit", 0))
+					)
 					.forEach(currentSack ->
 						paginateBuilder.addItems("**" + convertSkyblockIdName(currentSack.getKey()) + ":** " + currentSack.getValue())
 					);

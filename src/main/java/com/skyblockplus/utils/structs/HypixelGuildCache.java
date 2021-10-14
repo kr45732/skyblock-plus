@@ -19,7 +19,6 @@
 package com.skyblockplus.utils.structs;
 
 import com.skyblockplus.utils.Player;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -78,29 +77,29 @@ public class HypixelGuildCache {
 			"=:=" +
 			player.getHighestAmount("taraXp", ironmanOnly) +
 			"=:=" +
-			player.getHighestAmount("endermanXp", ironmanOnly)+
-					"=:=" +
-					player.getHighestAmount("alchemy", ironmanOnly)+
-					"=:=" +
-					player.getHighestAmount("combat", ironmanOnly)+
-					"=:=" +
-					player.getHighestAmount("fishing", ironmanOnly)+
-					"=:=" +
-					player.getHighestAmount("farming", ironmanOnly)+
-					"=:=" +
-					player.getHighestAmount("foraging", ironmanOnly)+
-					"=:=" +
-					player.getHighestAmount("carpentry", ironmanOnly)+
-					"=:=" +
-					player.getHighestAmount("mining", ironmanOnly)+
-					"=:=" +
-					player.getHighestAmount("taming", ironmanOnly)+
-					"=:=" +
-					player.getHighestAmount("enchanting", ironmanOnly)
+			player.getHighestAmount("endermanXp", ironmanOnly) +
+			"=:=" +
+			player.getHighestAmount("alchemy", ironmanOnly) +
+			"=:=" +
+			player.getHighestAmount("combat", ironmanOnly) +
+			"=:=" +
+			player.getHighestAmount("fishing", ironmanOnly) +
+			"=:=" +
+			player.getHighestAmount("farming", ironmanOnly) +
+			"=:=" +
+			player.getHighestAmount("foraging", ironmanOnly) +
+			"=:=" +
+			player.getHighestAmount("carpentry", ironmanOnly) +
+			"=:=" +
+			player.getHighestAmount("mining", ironmanOnly) +
+			"=:=" +
+			player.getHighestAmount("taming", ironmanOnly) +
+			"=:=" +
+			player.getHighestAmount("enchanting", ironmanOnly)
 		);
 	}
 
-	public static int typeToIndex(String type){
+	public static int typeToIndex(String type) {
 		switch (type) {
 			case "username":
 				return 0;
@@ -145,11 +144,11 @@ public class HypixelGuildCache {
 		}
 	}
 
-	public static String getStringFromCache(String cache, String type){
+	public static String getStringFromCache(String cache, String type) {
 		return cache.split("=:=")[typeToIndex(type)];
 	}
 
-	public static double getDoubleFromCache(String cache, String type){
+	public static double getDoubleFromCache(String cache, String type) {
 		return Double.parseDouble(getStringFromCache(cache, type));
 	}
 }

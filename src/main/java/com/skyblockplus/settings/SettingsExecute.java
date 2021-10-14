@@ -1111,10 +1111,7 @@ public class SettingsExecute {
 				pageTitles.add(roleName);
 			} else if (isOneLevelRole(roleName)) {
 				try {
-					ebFieldString
-						.append("\n• <@&")
-						.append(higherDepth(currentRoleSettings, "levels.[0].roleId").getAsString())
-						.append(">");
+					ebFieldString.append("\n• <@&").append(higherDepth(currentRoleSettings, "levels.[0].roleId").getAsString()).append(">");
 				} catch (Exception ignored) {}
 				pageTitles.add(roleName + " (__one level role__)");
 			} else {

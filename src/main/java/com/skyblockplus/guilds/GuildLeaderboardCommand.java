@@ -87,10 +87,11 @@ public class GuildLeaderboardCommand extends Command {
 			return eb;
 		}
 
-		if(typeToIndex(lbType.toLowerCase()) < 2) { // Type is invalid, username, or uuid
+		if (typeToIndex(lbType.toLowerCase()) < 2) { // Type is invalid, username, or uuid
 			return invalidEmbed(
-					lbType +
-							" is an invalid leaderboard type. Valid types are: `slayer`, `skills`, `catacombs`, `weight`, `sven_xp`, `rev_xp`, `tara_xp`, `enderman_xp`, `alchemy`, `combat`,`fishing`, `farming`, `foraging`, `carpentry`, `mining`, `taming`, and `enchanting`");
+				lbType +
+				" is an invalid leaderboard type. Valid types are: `slayer`, `skills`, `catacombs`, `weight`, `sven_xp`, `rev_xp`, `tara_xp`, `enderman_xp`, `alchemy`, `combat`,`fishing`, `farming`, `foraging`, `carpentry`, `mining`, `taming`, and `enchanting`"
+			);
 		}
 		lbType = lbType.toLowerCase();
 
@@ -169,7 +170,7 @@ public class GuildLeaderboardCommand extends Command {
 		int guildRank = -1;
 		String amt = "-1";
 		for (int i = 0, guildMemberPlayersListSize = guildMemberPlayersList.size(); i < guildMemberPlayersListSize; i++) {
-			String guildPlayer =guildMemberPlayersList.get(i);
+			String guildPlayer = guildMemberPlayersList.get(i);
 			String formattedAmt = roundAndFormat(getDoubleFromCache(guildPlayer, lbType));
 			String guildPlayerUsername = getStringFromCache(guildPlayer, "username");
 			paginateBuilder.addItems("`" + (i + 1) + ")` " + fixUsername(guildPlayerUsername) + ": " + formattedAmt);

@@ -401,9 +401,7 @@ public class RolesCommand extends Command {
 						}
 					case "doom_slayer":
 						{
-							Role curRole = guild.getRoleById(
-								higherDepth(currentRole, "levels.[0].roleId").getAsString()
-							);
+							Role curRole = guild.getRoleById(higherDepth(currentRole, "levels.[0].roleId").getAsString());
 							if (curRole == null) {
 								errorRoles.append(roleDeletedString(higherDepth(currentRole, "levels.[0].roleId").getAsString()));
 								continue;
@@ -437,9 +435,7 @@ public class RolesCommand extends Command {
 						}
 					case "all_slayer_nine":
 						{
-							Role curRole = guild.getRoleById(
-								higherDepth(currentRole, "levels.[0].roleId").getAsString()
-							);
+							Role curRole = guild.getRoleById(higherDepth(currentRole, "levels.[0].roleId").getAsString());
 							if (curRole == null) {
 								errorRoles.append(roleDeletedString(higherDepth(currentRole, "levels.[0].roleId").getAsString()));
 								continue;
@@ -476,9 +472,7 @@ public class RolesCommand extends Command {
 							JsonArray playerPets = player.getPets();
 							ArrayList<String> excludedPets = new ArrayList<>(Arrays.asList("guardian", "jellyfish", "parrot", "sheep"));
 
-							Role petEnthusiastRole = guild.getRoleById(
-								higherDepth(currentRole, "levels.[0].roleId").getAsString()
-							);
+							Role petEnthusiastRole = guild.getRoleById(higherDepth(currentRole, "levels.[0].roleId").getAsString());
 							if (petEnthusiastRole == null) {
 								errorRoles.append(roleDeletedString(higherDepth(currentRole, "levels.[0].roleId").getAsString()));
 								continue;
@@ -588,9 +582,7 @@ public class RolesCommand extends Command {
 				"all_slayer_nine".equals(currentRoleName) ||
 				"pet_enthusiast".equals(currentRoleName)
 			) {
-				paginateBuilder.addItems(
-					"<@&" + higherDepth(currentRole, "levels.[0].roleId").getAsString() + ">"
-				);
+				paginateBuilder.addItems("<@&" + higherDepth(currentRole, "levels.[0].roleId").getAsString() + ">");
 			} else {
 				JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
 				for (JsonElement currentLevel : levelsArray) {
