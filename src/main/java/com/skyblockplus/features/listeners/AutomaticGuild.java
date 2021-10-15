@@ -859,7 +859,7 @@ public class AutomaticGuild {
 					long price = 0;
 
 					try {
-						higherDepth(bazaarJson, id + ".buy_summary.[0].pricePerUnit").getAsDouble();
+						higherDepth(bazaarJson, id + ".sell_summary.[0].pricePerUnit").getAsDouble();
 						continue;
 					} catch (Exception ignored) {}
 

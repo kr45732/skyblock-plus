@@ -118,9 +118,9 @@ public class NetworthExecute {
 			bazaarJson = higherDepth(getBazaarJson(), "products");
 			sbzPrices = getSbzPricesJson();
 
-			recombPrice = higherDepth(bazaarJson, "RECOMBOBULATOR_3000.buy_summary.[0].pricePerUnit").getAsDouble();
-			hbpPrice = higherDepth(bazaarJson, "HOT_POTATO_BOOK.buy_summary.[0].pricePerUnit").getAsDouble();
-			fumingPrice = higherDepth(bazaarJson, "FUMING_POTATO_BOOK.buy_summary.[0].pricePerUnit").getAsDouble();
+			recombPrice = higherDepth(bazaarJson, "RECOMBOBULATOR_3000.sell_summary.[0].pricePerUnit").getAsDouble();
+			hbpPrice = higherDepth(bazaarJson, "HOT_POTATO_BOOK.sell_summary.[0].pricePerUnit").getAsDouble();
+			fumingPrice = higherDepth(bazaarJson, "FUMING_POTATO_BOOK.sell_summary.[0].pricePerUnit").getAsDouble();
 
 			bankBalance = player.getBankBalance();
 			purseCoins = player.getPurseCoins();
@@ -1154,7 +1154,7 @@ public class NetworthExecute {
 		}
 
 		try {
-			return Math.max(higherDepth(bazaarJson, itemId + ".buy_summary.[0].pricePerUnit").getAsDouble(), 0);
+			return Math.max(higherDepth(bazaarJson, itemId + ".sell_summary.[0].pricePerUnit").getAsDouble(), 0);
 		} catch (Exception ignored) {}
 
 		if (!onlyBazaar) {

@@ -70,14 +70,22 @@ public class SacksCommand extends Command {
 				CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(20);
 
 				JsonElement bazaarPrices = higherDepth(getBazaarJson(), "products");
+
+
+				final double[] total = {0};
 				sacksMap
 					.entrySet()
 					.stream()
 					.sorted(
-						Comparator.comparingInt(entry -> -higherDepth(bazaarPrices, entry.getKey() + ".buy_summary.[0].pricePerUnit", 0))
+						Comparator.comparingDouble(entry ->
+								-higherDepth(bazaarPrices, entry.getKey() + ".sell_summary.[0].pricePerUnit", 0.0) * entry.getValue()
+						)
 					)
-					.forEach(currentSack ->
-						paginateBuilder.addItems("**" + convertSkyblockIdName(currentSack.getKey()) + ":** " + currentSack.getValue())
+					.forEachOrdered(currentSack -> {
+								double sackPrice = higherDepth(bazaarPrices, currentSack.getKey() + ".sell_summary.[0].pricePerUnit", 0.0) * currentSack.getValue();
+								paginateBuilder.addItems("**" + convertSkyblockIdName(currentSack.getKey()) + ":** " + currentSack.getValue() + " ➜ " + simplifyNumber(sackPrice));
+						total[0] += sackPrice;
+							}
 					);
 
 				paginateBuilder.setPaginatorExtras(
@@ -85,6 +93,7 @@ public class SacksCommand extends Command {
 						.setEveryPageTitle(player.getUsername())
 						.setEveryPageThumbnail(player.getThumbnailUrl())
 						.setEveryPageTitleUrl(player.skyblockStatsLink())
+							.setEveryPageText("**Total value:** " + roundAndFormat(total[0]))
 				);
 				event.paginate(paginateBuilder);
 				return null;

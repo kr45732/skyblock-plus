@@ -79,7 +79,7 @@ public class VerifyGuild {
 			}
 		}
 
-		event.getMessage().delete().queueAfter(10, TimeUnit.SECONDS);
+		event.getMessage().delete().queueAfter(10, TimeUnit.SECONDS, ignored -> {}, ignored -> {});
 		return true;
 	}
 
@@ -97,8 +97,8 @@ public class VerifyGuild {
 		String updatedRoles = "false";
 
 		try {
-			String nicknameTemplate = higherDepth(verifySettings, "verifiedNickname").getAsString();
-			if (!nicknameTemplate.equalsIgnoreCase("none") && !nicknameTemplate.isEmpty()) {
+			String nicknameTemplate = higherDepth(verifySettings, "verifiedNickname", "none");
+			if (nicknameTemplate.contains("[IGN]")) {
 				nicknameTemplate = nicknameTemplate.replace("[IGN]", higherDepth(linkedUser, "minecraftUsername").getAsString());
 
 				if (nicknameTemplate.contains("[GUILD_RANK]")) {
