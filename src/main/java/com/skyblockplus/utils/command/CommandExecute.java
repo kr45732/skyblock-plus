@@ -132,7 +132,9 @@ public abstract class CommandExecute {
 			return false;
 		}
 
-		ebMessage.editMessageEmbeds(invalidEmbed("<@" + userId + "> is not linked to the bot.").build()).queue(ignored -> {}, ignored -> {});
+		ebMessage
+			.editMessageEmbeds(invalidEmbed("<@" + userId + "> is not linked to the bot.").build())
+			.queue(ignored -> {}, ignored -> {});
 		return true;
 	}
 

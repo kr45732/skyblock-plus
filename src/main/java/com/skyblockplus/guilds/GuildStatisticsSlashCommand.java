@@ -37,12 +37,7 @@ public class GuildStatisticsSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.embed(
-			GuildStatisticsCommand.getStatistics(
-				event.player,
-				event.getGuild()
-			)
-		);
+		event.embed(GuildStatisticsCommand.getStatistics(event.player, event.getGuild()));
 	}
 
 	@Override
