@@ -71,29 +71,36 @@ public class SacksCommand extends Command {
 
 				JsonElement bazaarPrices = higherDepth(getBazaarJson(), "products");
 
-
-				final double[] total = {0};
+				final double[] total = { 0 };
 				sacksMap
 					.entrySet()
 					.stream()
 					.sorted(
 						Comparator.comparingDouble(entry ->
-								-higherDepth(bazaarPrices, entry.getKey() + ".sell_summary.[0].pricePerUnit", 0.0) * entry.getValue()
+							-higherDepth(bazaarPrices, entry.getKey() + ".sell_summary.[0].pricePerUnit", 0.0) * entry.getValue()
 						)
 					)
 					.forEachOrdered(currentSack -> {
-								double sackPrice = higherDepth(bazaarPrices, currentSack.getKey() + ".sell_summary.[0].pricePerUnit", 0.0) * currentSack.getValue();
-								paginateBuilder.addItems("**" + convertSkyblockIdName(currentSack.getKey()) + ":** " + currentSack.getValue() + " ➜ " + simplifyNumber(sackPrice));
+						double sackPrice =
+							higherDepth(bazaarPrices, currentSack.getKey() + ".sell_summary.[0].pricePerUnit", 0.0) *
+							currentSack.getValue();
+						paginateBuilder.addItems(
+							"**" +
+							convertSkyblockIdName(currentSack.getKey()) +
+							":** " +
+							currentSack.getValue() +
+							" ➜ " +
+							simplifyNumber(sackPrice)
+						);
 						total[0] += sackPrice;
-							}
-					);
+					});
 
 				paginateBuilder.setPaginatorExtras(
 					new PaginatorExtras()
 						.setEveryPageTitle(player.getUsername())
 						.setEveryPageThumbnail(player.getThumbnailUrl())
 						.setEveryPageTitleUrl(player.skyblockStatsLink())
-							.setEveryPageText("**Total value:** " + roundAndFormat(total[0]))
+						.setEveryPageText("**Total value:** " + roundAndFormat(total[0]))
 				);
 				event.paginate(paginateBuilder);
 				return null;
