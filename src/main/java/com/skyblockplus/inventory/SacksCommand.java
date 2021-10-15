@@ -80,7 +80,7 @@ public class SacksCommand extends Command {
 							-higherDepth(bazaarPrices, entry.getKey() + ".sell_summary.[0].pricePerUnit", 0.0) * entry.getValue()
 						)
 					)
-					.forEachOrdered(currentSack -> {
+					.forEach(currentSack -> {
 						double sackPrice =
 							higherDepth(bazaarPrices, currentSack.getKey() + ".sell_summary.[0].pricePerUnit", 0.0) *
 							currentSack.getValue();
@@ -88,7 +88,7 @@ public class SacksCommand extends Command {
 							"**" +
 							convertSkyblockIdName(currentSack.getKey()) +
 							":** " +
-							currentSack.getValue() +
+							formatNumber(currentSack.getValue()) +
 							" ➜ " +
 							simplifyNumber(sackPrice)
 						);
@@ -100,7 +100,7 @@ public class SacksCommand extends Command {
 						.setEveryPageTitle(player.getUsername())
 						.setEveryPageThumbnail(player.getThumbnailUrl())
 						.setEveryPageTitleUrl(player.skyblockStatsLink())
-						.setEveryPageText("**Total value:** " + roundAndFormat(total[0]))
+						.setEveryPageText("**Total value:** " + roundAndFormat(total[0]) + "\n")
 				);
 				event.paginate(paginateBuilder);
 				return null;

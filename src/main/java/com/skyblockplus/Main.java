@@ -167,7 +167,8 @@ public class Main {
 					new HotmCommand(),
 					new VoteCommand(),
 					new TrackAuctionsCommand(),
-					new SkyblockCommand()
+					new SkyblockCommand(),
+						new GuildStatisticsCommand()
 				)
 				.build();
 
@@ -220,7 +221,8 @@ public class Main {
 					new PetsSlashCommand(),
 					new UuidSlashCommand(),
 					new TrackAuctionsSlashCommand(),
-					new SkyblockSlashCommand()
+					new SkyblockSlashCommand(),
+						new GuildStatisticsSlashCommand()
 				);
 
 		jda =

@@ -1095,7 +1095,7 @@ public class Player {
 				case "mining":
 				case "taming":
 				case "enchanting":
-					highestAmount = Math.max(highestAmount, getSkill(type).getProgressLevel());
+					highestAmount = Math.max(highestAmount, getSkill(type) != null ? getSkill(type).getProgressLevel() : -1);
 					break;
 				default:
 					return -1;
