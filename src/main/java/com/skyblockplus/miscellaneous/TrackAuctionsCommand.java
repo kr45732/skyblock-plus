@@ -108,30 +108,28 @@ public class TrackAuctionsCommand extends Command {
 					.entrySet()
 					.stream()
 					.filter(entry -> entry.getValue().getUuid().equals(seller))
-					.forEach(
-						entry ->
-							jda
-								.openPrivateChannelById(entry.getKey())
-								.queue(
-									dm ->
-										dm
-											.sendMessageEmbeds(
-												defaultEmbed("Auction tracker")
-													.setDescription(
-														"**Seller:** " +
-														entry.getValue().getUsername() +
-														"\n**Item:** " +
-														finalItemName +
-														"\n**Sold for:** " +
-														soldFor +
-														"\n**Ended:** <t:" +
-														endedAt +
-														":R>"
-													)
-													.build()
+					.forEach(entry ->
+						jda
+							.openPrivateChannelById(entry.getKey())
+							.queue(dm ->
+								dm
+									.sendMessageEmbeds(
+										defaultEmbed("Auction tracker")
+											.setDescription(
+												"**Seller:** " +
+												entry.getValue().getUsername() +
+												"\n**Item:** " +
+												finalItemName +
+												"\n**Sold for:** " +
+												soldFor +
+												"\n**Ended:** <t:" +
+												endedAt +
+												":R>"
 											)
-											.queue(ignored -> {}, ignored -> {})
-								)
+											.build()
+									)
+									.queue(ignored -> {}, ignored -> {})
+							)
 					);
 			}
 		}

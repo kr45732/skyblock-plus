@@ -365,12 +365,10 @@ public class AutomaticGuild {
 				CountDownLatch latch = new CountDownLatch(1);
 				guild
 					.findMembers(member -> discordIdToUuid.containsKey(member.getId()))
-					.onSuccess(
-						members -> {
-							inGuildUsers.addAll(members);
-							latch.countDown();
-						}
-					)
+					.onSuccess(members -> {
+						inGuildUsers.addAll(members);
+						latch.countDown();
+					})
 					.onError(error -> latch.countDown());
 
 				try {

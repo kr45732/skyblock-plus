@@ -531,10 +531,9 @@ public class SettingsExecute {
 
 		JsonArray currentBlacklist = database.getApplyBlacklist(guild.getId());
 		JsonElement blacklistedUser = streamJsonArray(currentBlacklist)
-			.filter(
-				blacklist ->
-					higherDepth(blacklist, "uuid").getAsString().equals(uuidStruct.getUuid()) ||
-					higherDepth(blacklist, "username").getAsString().equals(uuidStruct.getUsername())
+			.filter(blacklist ->
+				higherDepth(blacklist, "uuid").getAsString().equals(uuidStruct.getUuid()) ||
+				higherDepth(blacklist, "username").getAsString().equals(uuidStruct.getUsername())
 			)
 			.findFirst()
 			.orElse(null);
@@ -1518,15 +1517,13 @@ public class SettingsExecute {
 
 		if (nickname.contains("[GUILD_RANK]")) {
 			List<GuildRole> guildRoleSettings = database.getAllGuildRoles(guild.getId());
-			guildRoleSettings.removeIf(
-				o1 -> {
-					try {
-						return !o1.getEnableGuildRanks().equalsIgnoreCase("true");
-					} catch (Exception e) {
-						return true;
-					}
+			guildRoleSettings.removeIf(o1 -> {
+				try {
+					return !o1.getEnableGuildRanks().equalsIgnoreCase("true");
+				} catch (Exception e) {
+					return true;
 				}
-			);
+			});
 			if (guildRoleSettings.size() == 0) {
 				return invalidEmbed(
 					"At least one guild ranks must be enabled in " + guildPrefix + "`settings guild [name]` to use the [GUILD_RANK] prefix"

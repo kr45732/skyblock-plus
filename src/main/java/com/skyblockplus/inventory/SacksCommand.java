@@ -54,26 +54,24 @@ public class SacksCommand extends Command {
 					.entrySet()
 					.stream()
 					.sorted(
-						Comparator.comparingDouble(
-							entry -> -higherDepth(bazaarPrices, entry.getKey() + ".sell_summary.[0].pricePerUnit", 0.0) * entry.getValue()
+						Comparator.comparingDouble(entry ->
+							-higherDepth(bazaarPrices, entry.getKey() + ".sell_summary.[0].pricePerUnit", 0.0) * entry.getValue()
 						)
 					)
-					.forEach(
-						currentSack -> {
-							double sackPrice =
-								higherDepth(bazaarPrices, currentSack.getKey() + ".sell_summary.[0].pricePerUnit", 0.0) *
-								currentSack.getValue();
-							paginateBuilder.addItems(
-								"**" +
-								convertSkyblockIdName(currentSack.getKey()) +
-								":** " +
-								formatNumber(currentSack.getValue()) +
-								" ➜ " +
-								simplifyNumber(sackPrice)
-							);
-							total[0] += sackPrice;
-						}
-					);
+					.forEach(currentSack -> {
+						double sackPrice =
+							higherDepth(bazaarPrices, currentSack.getKey() + ".sell_summary.[0].pricePerUnit", 0.0) *
+							currentSack.getValue();
+						paginateBuilder.addItems(
+							"**" +
+							convertSkyblockIdName(currentSack.getKey()) +
+							":** " +
+							formatNumber(currentSack.getValue()) +
+							" ➜ " +
+							simplifyNumber(sackPrice)
+						);
+						total[0] += sackPrice;
+					});
 
 				paginateBuilder.setPaginatorExtras(
 					new PaginatorExtras()
