@@ -53,32 +53,6 @@ public class GuildKickerCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	@Override
-	protected void execute(CommandEvent event) {
-		new CommandExecute(this, event) {
-			@Override
-			protected void execute() {
-				logCommand();
-
-				String content = event.getMessage().getContentRaw();
-				boolean useKey = false;
-				if (content.contains("--usekey")) {
-					useKey = true;
-					content = content.replace("--usekey", "").trim();
-				}
-				args = content.split(" ", 3);
-
-				if (args.length == 3 && args[1].toLowerCase().startsWith("u:")) {
-					paginate(getGuildKicker(args[1].split(":")[1], args[2], useKey, new PaginatorEvent(event)));
-					return;
-				}
-
-				sendErrorEmbed();
-			}
-		}
-			.submit();
-	}
-
 	public static EmbedBuilder getGuildKicker(String username, String reqs, boolean useKey, PaginatorEvent event) {
 		String[] reqsArr = reqs.split("] \\[");
 		if (reqsArr.length > 3) {
@@ -230,34 +204,38 @@ public class GuildKickerCommand extends Command {
 
 					CompletableFuture<String> guildMemberUsername = asyncUuidToUsername(guildMemberUuid);
 					futuresList.add(
-						guildMemberUsername.thenApply(guildMemberUsernameResponse -> {
-							try {
-								if (keyCooldownMap.get(hypixelKey).getRemainingLimit().get() < 5) {
-									System.out.println(
-										"Sleeping for " + keyCooldownMap.get(hypixelKey).getTimeTillReset().get() + " seconds"
-									);
-									TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).getTimeTillReset().get());
-								}
-							} catch (Exception ignored) {}
+						guildMemberUsername.thenApply(
+							guildMemberUsernameResponse -> {
+								try {
+									if (keyCooldownMap.get(hypixelKey).getRemainingLimit().get() < 5) {
+										System.out.println(
+											"Sleeping for " + keyCooldownMap.get(hypixelKey).getTimeTillReset().get() + " seconds"
+										);
+										TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).getTimeTillReset().get());
+									}
+								} catch (Exception ignored) {}
 
-							CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(
-								guildMemberUuid,
-								hypixelKey
-							);
-
-							return guildMemberProfileJson.thenApply(guildMemberProfileJsonResponse -> {
-								Player guildMemberPlayer = new Player(
+								CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(
 									guildMemberUuid,
-									guildMemberUsernameResponse,
-									guildMemberProfileJsonResponse
+									hypixelKey
 								);
 
-								if (guildMemberPlayer.isValid()) {
-									newGuildCache.addPlayer(guildMemberPlayer);
-								}
-								return null;
-							});
-						})
+								return guildMemberProfileJson.thenApply(
+									guildMemberProfileJsonResponse -> {
+										Player guildMemberPlayer = new Player(
+											guildMemberUuid,
+											guildMemberUsernameResponse,
+											guildMemberProfileJsonResponse
+										);
+
+										if (guildMemberPlayer.isValid()) {
+											newGuildCache.addPlayer(guildMemberPlayer);
+										}
+										return null;
+									}
+								);
+							}
+						)
 					);
 				}
 
@@ -344,5 +322,31 @@ public class GuildKickerCommand extends Command {
 		}
 		event.paginate(paginateBuilder);
 		return null;
+	}
+
+	@Override
+	protected void execute(CommandEvent event) {
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
+
+				String content = event.getMessage().getContentRaw();
+				boolean useKey = false;
+				if (content.contains("--usekey")) {
+					useKey = true;
+					content = content.replace("--usekey", "").trim();
+				}
+				args = content.split(" ", 3);
+
+				if (args.length == 3 && args[1].toLowerCase().startsWith("u:")) {
+					paginate(getGuildKicker(args[1].split(":")[1], args[2], useKey, new PaginatorEvent(event)));
+					return;
+				}
+
+				sendErrorEmbed();
+			}
+		}
+			.submit();
 	}
 }

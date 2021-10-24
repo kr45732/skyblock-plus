@@ -18,6 +18,8 @@
 
 package com.skyblockplus.skills;
 
+import static com.skyblockplus.utils.Constants.HOTM_PERK_ID_TO_NAME;
+import static com.skyblockplus.utils.Constants.HOTM_PERK_MAX_LEVEL;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
@@ -26,8 +28,6 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.SkillsStruct;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 import net.dv8tion.jda.api.EmbedBuilder;
 
@@ -43,6 +43,9 @@ public class HotmCommand extends Command {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			SkillsStruct skillInfo = player.getHOTM();
+			if (skillInfo == null) {
+				return invalidEmbed("Player has not unlocked heart of the mountain");
+			}
 			EmbedBuilder eb = player.defaultPlayerEmbed();
 			JsonElement miningJson = higherDepth(player.profileJson(), "mining_core");
 
@@ -69,12 +72,6 @@ public class HotmCommand extends Command {
 				false
 			);
 
-			Map<String, String> hotmPerkIdToName = new HashMap<>();
-			hotmPerkIdToName.put("forge_time", "quick forge");
-			hotmPerkIdToName.put("random_event", "luck of the cave");
-			hotmPerkIdToName.put("mining_experience", "seasoned mineman");
-			hotmPerkIdToName.put("special_0", "peak of the mountain");
-
 			StringBuilder perksStr = new StringBuilder();
 			for (Entry<String, JsonElement> perk : higherDepth(miningJson, "nodes").getAsJsonObject().entrySet()) {
 				if (!perk.getValue().getAsJsonPrimitive().isNumber()) {
@@ -82,42 +79,12 @@ public class HotmCommand extends Command {
 				}
 				perksStr
 					.append("• **")
-					.append(capitalizeString(hotmPerkIdToName.getOrDefault(perk.getKey(), perk.getKey().replace("_", " "))))
+					.append(capitalizeString(HOTM_PERK_ID_TO_NAME.getOrDefault(perk.getKey(), perk.getKey().replace("_", " "))))
 					.append(":** ")
 					.append(perk.getValue().getAsInt())
-					.append("/");
-				switch (perk.getKey()) {
-					case "mining_speed_boost":
-						perksStr.append(1);
-						break;
-					case "special_0":
-						perksStr.append(5);
-						break;
-					case "great_explorer":
-					case "forge_time":
-					case "fortunate":
-						perksStr.append(20);
-						break;
-					case "lonesome_miner":
-					case "random_event":
-						perksStr.append(45);
-						break;
-					case "daily_powder":
-					case "efficient_miner":
-					case "mining_experience":
-						perksStr.append(100);
-						break;
-					case "professional":
-						perksStr.append(140);
-						break;
-					case "mole":
-						perksStr.append(190);
-						break;
-					default:
-						perksStr.append(50);
-						break;
-				}
-				perksStr.append("\n");
+					.append("/")
+					.append(HOTM_PERK_MAX_LEVEL.getOrDefault(perk.getKey(), 50))
+					.append("\n");
 			}
 			eb.addField("Perks", perksStr.toString(), false);
 			return eb;

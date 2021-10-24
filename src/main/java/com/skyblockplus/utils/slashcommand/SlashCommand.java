@@ -55,15 +55,20 @@ public abstract class SlashCommand {
 						event
 							.getUser()
 							.openPrivateChannel()
-							.queue(dm ->
-								dm
-									.sendMessageEmbeds(
-										invalidEmbed(
-											"I need the " + p.getName() + " permission in " + event.getTextChannel().getAsMention() + "!"
+							.queue(
+								dm ->
+									dm
+										.sendMessageEmbeds(
+											invalidEmbed(
+												"I need the " +
+												p.getName() +
+												" permission in " +
+												event.getTextChannel().getAsMention() +
+												"!"
+											)
+												.build()
 										)
-											.build()
-									)
-									.queue()
+										.queue(ignored -> {}, ignored -> {})
 							);
 					} else {
 						event.embed(invalidEmbed("I need the " + p.getName() + " permission in this channel!"));

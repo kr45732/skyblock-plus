@@ -39,28 +39,6 @@ public class PetsCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	@Override
-	protected void execute(CommandEvent event) {
-		new CommandExecute(this, event) {
-			@Override
-			protected void execute() {
-				logCommand();
-
-				if (args.length == 3 || args.length == 2 || args.length == 1) {
-					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
-						return;
-					}
-
-					paginate(getPlayerPets(username, args.length == 3 ? args[2] : null, new PaginatorEvent(event)));
-					return;
-				}
-
-				sendErrorEmbed();
-			}
-		}
-			.submit();
-	}
-
 	public static EmbedBuilder getPlayerPets(String username, String profileName, PaginatorEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
@@ -94,5 +72,27 @@ public class PetsCommand extends Command {
 			return null;
 		}
 		return player.getFailEmbed();
+	}
+
+	@Override
+	protected void execute(CommandEvent event) {
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
+
+				if (args.length == 3 || args.length == 2 || args.length == 1) {
+					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
+						return;
+					}
+
+					paginate(getPlayerPets(username, args.length == 3 ? args[2] : null, new PaginatorEvent(event)));
+					return;
+				}
+
+				sendErrorEmbed();
+			}
+		}
+			.submit();
 	}
 }

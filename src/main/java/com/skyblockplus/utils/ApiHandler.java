@@ -58,7 +58,6 @@ public class ApiHandler {
 	private static final Pattern minecraftUuidRegex = Pattern.compile(
 		"[0-9a-f]{32}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
 	);
-	public static boolean useAlternativeApi = reloadSettingsJson();
 
 	public static boolean reloadSettingsJson() {
 		useAlternativeApi =
@@ -69,6 +68,8 @@ public class ApiHandler {
 			);
 		return useAlternativeApi;
 	}
+
+	public static boolean useAlternativeApi = reloadSettingsJson();
 
 	public static boolean isValidMinecraftUsername(String username) {
 		return username.length() > 2 && username.length() < 17 && minecraftUsernameRegex.matcher(username).find();
@@ -182,19 +183,21 @@ public class ApiHandler {
 					)
 					.execute()
 					.toCompletableFuture()
-					.thenApply(uuidToUsernameResponse -> {
-						try {
-							String username = Utils
-								.higherDepth(
-									JsonParser.parseString(uuidToUsernameResponse.getResponseBody()),
-									(useAlternativeApi ? "data.player." : "") + "username"
-								)
-								.getAsString();
-							uuidToUsernameCache.put(uuid, username);
-							return username;
-						} catch (Exception ignored) {}
-						return null;
-					});
+					.thenApply(
+						uuidToUsernameResponse -> {
+							try {
+								String username = Utils
+									.higherDepth(
+										JsonParser.parseString(uuidToUsernameResponse.getResponseBody()),
+										(useAlternativeApi ? "data.player." : "") + "username"
+									)
+									.getAsString();
+								uuidToUsernameCache.put(uuid, username);
+								return username;
+							} catch (Exception ignored) {}
+							return null;
+						}
+					);
 		}
 
 		return future;
@@ -241,29 +244,31 @@ public class ApiHandler {
 					.prepareGet("https://api.hypixel.net/skyblock/profiles?key=" + hypixelApiKey + "&uuid=" + uuid)
 					.execute()
 					.toCompletableFuture()
-					.thenApply(profilesResponse -> {
-						try {
+					.thenApply(
+						profilesResponse -> {
 							try {
-								keyCooldownMap
-									.get(hypixelApiKey)
-									.getRemainingLimit()
-									.set(Integer.parseInt(profilesResponse.getHeader("RateLimit-Remaining")));
-								keyCooldownMap
-									.get(hypixelApiKey)
-									.getTimeTillReset()
-									.set(Integer.parseInt(profilesResponse.getHeader("RateLimit-Reset")));
+								try {
+									keyCooldownMap
+										.get(hypixelApiKey)
+										.getRemainingLimit()
+										.set(Integer.parseInt(profilesResponse.getHeader("RateLimit-Remaining")));
+									keyCooldownMap
+										.get(hypixelApiKey)
+										.getTimeTillReset()
+										.set(Integer.parseInt(profilesResponse.getHeader("RateLimit-Reset")));
+								} catch (Exception ignored) {}
+
+								JsonArray profileArray = processSkyblockProfilesArray(
+									higherDepth(JsonParser.parseString(profilesResponse.getResponseBody()), "profiles").getAsJsonArray()
+								);
+
+								cacheJson(uuid, profileArray);
+
+								return profileArray;
 							} catch (Exception ignored) {}
-
-							JsonArray profileArray = processSkyblockProfilesArray(
-								higherDepth(JsonParser.parseString(profilesResponse.getResponseBody()), "profiles").getAsJsonArray()
-							);
-
-							cacheJson(uuid, profileArray);
-
-							return profileArray;
-						} catch (Exception ignored) {}
-						return null;
-					});
+							return null;
+						}
+					);
 		}
 
 		return future;
@@ -344,23 +349,6 @@ public class ApiHandler {
 		return getGuildGeneric("&name=" + guildName.replace(" ", "%20").replace("_", "%20"));
 	}
 
-	//	public static JsonArray getBidsFromPlayer(String uuid) {
-	//		try {
-	//			HttpGet httpget = new HttpGet("https://query-api.kr45732.repl.co/");
-	//			httpget.addHeader("content-type", "application/json; charset=UTF-8");
-	//
-	//			URI uri = new URIBuilder(httpget.getURI())
-	//				.addParameter("query", "{\"bids\":{\"$elemMatch\":{\"bidder\":\"" + uuid + "\"}}}")
-	//				.build();
-	//			httpget.setURI(uri);
-	//
-	//			try (CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpget)) {
-	//				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
-	//			}
-	//		} catch (Exception ignored) {}
-	//		return null;
-	//	}
-
 	public static JsonArray queryLowestBin(String query) {
 		try {
 			HttpGet httpget = new HttpGet("https://query-api.kr45732.repl.co/");
@@ -388,6 +376,23 @@ public class ApiHandler {
 		} catch (Exception ignored) {}
 		return null;
 	}
+
+	//	public static JsonArray getBidsFromPlayer(String uuid) {
+	//		try {
+	//			HttpGet httpget = new HttpGet("https://query-api.kr45732.repl.co/");
+	//			httpget.addHeader("content-type", "application/json; charset=UTF-8");
+	//
+	//			URI uri = new URIBuilder(httpget.getURI())
+	//				.addParameter("query", "{\"bids\":{\"$elemMatch\":{\"bidder\":\"" + uuid + "\"}}}")
+	//				.build();
+	//			httpget.setURI(uri);
+	//
+	//			try (CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpget)) {
+	//				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
+	//			}
+	//		} catch (Exception ignored) {}
+	//		return null;
+	//	}
 
 	public static JsonArray queryLowestBinPet(String petName, String rarity) {
 		try {
@@ -468,29 +473,31 @@ public class ApiHandler {
 
 	@SuppressWarnings("EmptyTryBlock")
 	public static void cacheJson(String playerUuid, JsonElement json) {
-		executor.submit(() -> {
-			try {
-				uuidToTimeSkyblockProfiles.put(playerUuid, Instant.now());
+		executor.submit(
+			() -> {
+				try {
+					uuidToTimeSkyblockProfiles.put(playerUuid, Instant.now());
 
-				RequestBody body = RequestBody.create(
-					MediaType.parse("application/json"),
-					"{\"operation\":\"insert\",\"schema\":\"dev\",\"table\":\"profiles\",\"records\":[" +
-					"{\"uuid\":\"" +
-					playerUuid +
-					"\", \"data\":" +
-					json +
-					"}" +
-					"]}"
-				);
-				Request request = new Request.Builder()
-					.url(cacheDatabaseUrl)
-					.method("POST", body)
-					.addHeader("Content-Type", "application/json")
-					.addHeader("Authorization", "Basic " + CACHE_DATABASE_TOKEN)
-					.build();
-				try (Response ignored = okHttpClient.newCall(request).execute()) {}
-			} catch (Exception ignored) {}
-		});
+					RequestBody body = RequestBody.create(
+						MediaType.parse("application/json"),
+						"{\"operation\":\"insert\",\"schema\":\"dev\",\"table\":\"profiles\",\"records\":[" +
+						"{\"uuid\":\"" +
+						playerUuid +
+						"\", \"data\":" +
+						json +
+						"}" +
+						"]}"
+					);
+					Request request = new Request.Builder()
+						.url(cacheDatabaseUrl)
+						.method("POST", body)
+						.addHeader("Content-Type", "application/json")
+						.addHeader("Authorization", "Basic " + CACHE_DATABASE_TOKEN)
+						.build();
+					try (Response ignored = okHttpClient.newCall(request).execute()) {}
+				} catch (Exception ignored) {}
+			}
+		);
 	}
 
 	public static JsonElement getCachedJson(String playerUuid) {
@@ -525,25 +532,27 @@ public class ApiHandler {
 
 	@SuppressWarnings("EmptyTryBlock")
 	public static void deleteCachedJson(String... playerUuids) {
-		executor.submit(() -> {
-			for (String playerUuid : playerUuids) {
-				uuidToTimeSkyblockProfiles.remove(playerUuid);
-			}
+		executor.submit(
+			() -> {
+				for (String playerUuid : playerUuids) {
+					uuidToTimeSkyblockProfiles.remove(playerUuid);
+				}
 
-			RequestBody body = RequestBody.create(
-				MediaType.parse("application/json"),
-				"{\"operation\":\"delete\",\"table\":\"profiles\",\"schema\":\"dev\",\"hash_values\":[\"" +
-				String.join("\",\"", playerUuids) +
-				"\"]}"
-			);
-			Request request = new Request.Builder()
-				.url(cacheDatabaseUrl)
-				.method("POST", body)
-				.addHeader("Content-Type", "application/json")
-				.addHeader("Authorization", "Basic " + CACHE_DATABASE_TOKEN)
-				.build();
-			try (Response ignored = okHttpClient.newCall(request).execute()) {} catch (Exception ignored) {}
-		});
+				RequestBody body = RequestBody.create(
+					MediaType.parse("application/json"),
+					"{\"operation\":\"delete\",\"table\":\"profiles\",\"schema\":\"dev\",\"hash_values\":[\"" +
+					String.join("\",\"", playerUuids) +
+					"\"]}"
+				);
+				Request request = new Request.Builder()
+					.url(cacheDatabaseUrl)
+					.method("POST", body)
+					.addHeader("Content-Type", "application/json")
+					.addHeader("Authorization", "Basic " + CACHE_DATABASE_TOKEN)
+					.build();
+				try (Response ignored = okHttpClient.newCall(request).execute()) {} catch (Exception ignored) {}
+			}
+		);
 	}
 
 	public static void scheduleDatabaseUpdate() {
@@ -580,6 +589,35 @@ public class ApiHandler {
 		} catch (Exception ignored) {}
 	}
 
+	public static JsonArray processSkyblockProfilesArray(JsonArray array) {
+		for (int i = 0; i < array.size(); i++) {
+			JsonObject currentProfile = array.get(i).getAsJsonObject();
+			currentProfile.remove("community_upgrades");
+
+			JsonObject currentProfileMembers = higherDepth(currentProfile, "members").getAsJsonObject();
+			for (String currentProfileMemberUuid : currentProfileMembers.keySet()) {
+				JsonObject currentProfileMember = currentProfileMembers.getAsJsonObject(currentProfileMemberUuid);
+				currentProfileMember.remove("stats");
+				currentProfileMember.remove("objectives");
+				currentProfileMember.remove("tutorial");
+				currentProfileMember.remove("quests");
+				currentProfileMember.remove("visited_zones");
+				currentProfileMember.remove("griffin");
+				currentProfileMember.remove("experimentation");
+				currentProfileMember.remove("unlocked_coll_tiers");
+				currentProfileMember.remove("backpack_icons");
+				currentProfileMember.remove("achievement_spawned_island_types");
+				currentProfileMember.remove("slayer_quest");
+
+				currentProfileMembers.add(currentProfileMemberUuid, currentProfileMember);
+			}
+
+			currentProfile.add("members", currentProfileMembers);
+			array.set(i, currentProfile);
+		}
+
+		return array;
+	}
 	/*
 	public static void clearDatabase(){
 		try {
@@ -631,33 +669,4 @@ public class ApiHandler {
 	}
 */
 
-	public static JsonArray processSkyblockProfilesArray(JsonArray array) {
-		for (int i = 0; i < array.size(); i++) {
-			JsonObject currentProfile = array.get(i).getAsJsonObject();
-			currentProfile.remove("community_upgrades");
-
-			JsonObject currentProfileMembers = higherDepth(currentProfile, "members").getAsJsonObject();
-			for (String currentProfileMemberUuid : currentProfileMembers.keySet()) {
-				JsonObject currentProfileMember = currentProfileMembers.getAsJsonObject(currentProfileMemberUuid);
-				currentProfileMember.remove("stats");
-				currentProfileMember.remove("objectives");
-				currentProfileMember.remove("tutorial");
-				currentProfileMember.remove("quests");
-				currentProfileMember.remove("visited_zones");
-				currentProfileMember.remove("griffin");
-				currentProfileMember.remove("experimentation");
-				currentProfileMember.remove("unlocked_coll_tiers");
-				currentProfileMember.remove("backpack_icons");
-				currentProfileMember.remove("achievement_spawned_island_types");
-				currentProfileMember.remove("slayer_quest");
-
-				currentProfileMembers.add(currentProfileMemberUuid, currentProfileMember);
-			}
-
-			currentProfile.add("members", currentProfileMembers);
-			array.set(i, currentProfile);
-		}
-
-		return array;
-	}
 }

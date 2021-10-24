@@ -53,32 +53,6 @@ public class GuildLeaderboardCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	@Override
-	protected void execute(CommandEvent event) {
-		new CommandExecute(this, event) {
-			@Override
-			protected void execute() {
-				logCommand();
-
-				if ((args.length == 4 || args.length == 3) && args[2].toLowerCase().startsWith("u:")) {
-					boolean ironmanOnly = false;
-					for (int i = 0; i < args.length; i++) {
-						if (args[i].startsWith("mode:")) {
-							ironmanOnly = args[i].split("mode:")[1].equals("ironman");
-							removeArg(i);
-						}
-					}
-
-					paginate(getLeaderboard(args[1], args[2].split(":")[1], ironmanOnly, new PaginatorEvent(event)));
-					return;
-				}
-
-				sendErrorEmbed();
-			}
-		}
-			.submit();
-	}
-
 	public static EmbedBuilder getLeaderboard(String lbType, String username, boolean ironmanOnly, PaginatorEvent event) {
 		String hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
 
@@ -127,28 +101,37 @@ public class GuildLeaderboardCommand extends Command {
 
 				CompletableFuture<String> guildMemberUsername = asyncUuidToUsername(guildMemberUuid);
 				futuresList.add(
-					guildMemberUsername.thenApply(guildMemberUsernameResponse -> {
-						try {
-							if (keyCooldownMap.get(hypixelKey).getRemainingLimit().get() < 5) {
-								System.out.println("Sleeping for " + keyCooldownMap.get(hypixelKey).getTimeTillReset().get() + " seconds");
-								TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).getTimeTillReset().get());
-							}
-						} catch (Exception ignored) {}
+					guildMemberUsername.thenApply(
+						guildMemberUsernameResponse -> {
+							try {
+								if (keyCooldownMap.get(hypixelKey).getRemainingLimit().get() < 5) {
+									System.out.println(
+										"Sleeping for " + keyCooldownMap.get(hypixelKey).getTimeTillReset().get() + " seconds"
+									);
+									TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).getTimeTillReset().get());
+								}
+							} catch (Exception ignored) {}
 
-						CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(guildMemberUuid, hypixelKey);
-						return guildMemberProfileJson.thenApply(guildMemberProfileJsonResponse -> {
-							Player guildMemberPlayer = new Player(
+							CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(
 								guildMemberUuid,
-								guildMemberUsernameResponse,
-								guildMemberProfileJsonResponse
+								hypixelKey
 							);
+							return guildMemberProfileJson.thenApply(
+								guildMemberProfileJsonResponse -> {
+									Player guildMemberPlayer = new Player(
+										guildMemberUuid,
+										guildMemberUsernameResponse,
+										guildMemberProfileJsonResponse
+									);
 
-							if (guildMemberPlayer.isValid()) {
-								newGuildCache.addPlayer(guildMemberPlayer);
-							}
-							return null;
-						});
-					})
+									if (guildMemberPlayer.isValid()) {
+										newGuildCache.addPlayer(guildMemberPlayer);
+									}
+									return null;
+								}
+							);
+						}
+					)
 				);
 			}
 
@@ -201,5 +184,31 @@ public class GuildLeaderboardCommand extends Command {
 		event.paginate(paginateBuilder);
 
 		return null;
+	}
+
+	@Override
+	protected void execute(CommandEvent event) {
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
+
+				if ((args.length == 4 || args.length == 3) && args[2].toLowerCase().startsWith("u:")) {
+					boolean ironmanOnly = false;
+					for (int i = 0; i < args.length; i++) {
+						if (args[i].startsWith("mode:")) {
+							ironmanOnly = args[i].split("mode:")[1].equals("ironman");
+							removeArg(i);
+						}
+					}
+
+					paginate(getLeaderboard(args[1], args[2].split(":")[1], ironmanOnly, new PaginatorEvent(event)));
+					return;
+				}
+
+				sendErrorEmbed();
+			}
+		}
+			.submit();
 	}
 }

@@ -25,7 +25,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.skyblockplus.Main;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class Constants {
 
@@ -48,13 +50,14 @@ public class Constants {
 	public static List<String> FETCHUR_ITEMS;
 	public static List<String> DUNGEON_META_ITEMS;
 	public static Map<String, String> HARP_SONG_ID_TO_NAME;
-	public static List<Integer> HOTM_EXP_TO_LEVEL;
 	public static JsonElement SLAYER_DEPRECATION_SCALING;
 	public static JsonElement SKILL_RATIO_WEIGHT;
 	public static JsonElement SKILL_FACTORS;
 	public static JsonElement SKILL_OVERFLOW_MULTIPLIERS;
 	public static JsonObject DUNGEON_COMPLETION_WORTH;
 	public static JsonObject DUNGEON_COMPLETION_BUFFS;
+	public static Map<String, String> HOTM_PERK_ID_TO_NAME;
+	public static Map<String, Integer> HOTM_PERK_MAX_LEVEL;
 
 	/* Fetched from other sources */
 	public static List<String> ENCHANT_NAMES;
@@ -76,6 +79,7 @@ public class Constants {
 			Type listString = new TypeToken<List<String>>() {}.getType();
 			Type mapStringDoubleArray = new TypeToken<Map<String, Double[]>>() {}.getType();
 			Type mapStringDouble = new TypeToken<Map<String, Double>>() {}.getType();
+			Type mapStringInteger = new TypeToken<Map<String, Integer>>() {}.getType();
 
 			/* CATACOMBS_LEVEL_50_XP */
 			CATACOMBS_LEVEL_50_XP = higherDepth(constantsJson, "CATACOMBS_LEVEL_50_XP").getAsDouble();
@@ -131,9 +135,6 @@ public class Constants {
 			/* HARP_SONG_ID_TO_NAME */
 			HARP_SONG_ID_TO_NAME = gson.fromJson(higherDepth(constantsJson, "HARP_SONG_ID_TO_NAME"), mapStringString);
 
-			/* HOTM_EXP_TO_LEVEL */
-			HOTM_EXP_TO_LEVEL = gson.fromJson(higherDepth(constantsJson, "HOTM_EXP_TO_LEVEL"), listInteger);
-
 			/* SLAYER_DEPRECATION_SCALING */
 			SLAYER_DEPRECATION_SCALING = higherDepth(constantsJson, "SLAYER_DEPRECATION_SCALING");
 
@@ -152,6 +153,12 @@ public class Constants {
 			/* DUNGEON_COMPLETION_BUFFS */
 			DUNGEON_COMPLETION_BUFFS = higherDepth(constantsJson, "DUNGEON_COMPLETION_BUFFS").getAsJsonObject();
 
+			/* HOTM_PERK_ID_TO_NAME */
+			HOTM_PERK_ID_TO_NAME = gson.fromJson(higherDepth(constantsJson, "HOTM_PERK_ID_TO_NAME"), mapStringString);
+
+			/* HOTM_PERK_MAX_LEVEL */
+			HOTM_PERK_MAX_LEVEL = gson.fromJson(higherDepth(constantsJson, "HOTM_PERK_MAX_LEVEL"), mapStringInteger);
+
 			/* ENCHANT_NAMES */
 			ENCHANT_NAMES = new ArrayList<>();
 			for (Map.Entry<String, JsonElement> enchantArr : higherDepth(getEnchantsJson(), "enchants").getAsJsonObject().entrySet()) {
@@ -165,6 +172,7 @@ public class Constants {
 
 			/* ALL_SKILL_NAMES */
 			ALL_SKILL_NAMES = new ArrayList<>(higherDepth(getLevelingJson(), "leveling_caps").getAsJsonObject().keySet());
+			ALL_SKILL_NAMES.remove("HOTM");
 			ALL_SKILL_NAMES.remove("catacombs");
 
 			/* SKILL_NAMES */

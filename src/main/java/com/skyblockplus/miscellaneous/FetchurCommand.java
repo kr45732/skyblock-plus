@@ -36,6 +36,15 @@ public class FetchurCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
+	public static EmbedBuilder getFetchurItem() {
+		String[] fetchurItem = FETCHUR_ITEMS
+			.get((LocalDate.now(ZoneId.of("America/New_York")).getDayOfMonth() - 1) % FETCHUR_ITEMS.size())
+			.split("\\|");
+		return defaultEmbed("Fetchur item")
+			.setDescription(fetchurItem[0])
+			.setThumbnail("https://sky.shiiyu.moe/item.gif/" + fetchurItem[1]);
+	}
+
 	@Override
 	protected void execute(CommandEvent event) {
 		new CommandExecute(this, event) {
@@ -45,14 +54,5 @@ public class FetchurCommand extends Command {
 			}
 		}
 			.submit();
-	}
-
-	public static EmbedBuilder getFetchurItem() {
-		String[] fetchurItem = FETCHUR_ITEMS
-			.get((LocalDate.now(ZoneId.of("America/New_York")).getDayOfMonth() - 1) % FETCHUR_ITEMS.size())
-			.split("\\|");
-		return defaultEmbed("Fetchur item")
-			.setDescription(fetchurItem[0])
-			.setThumbnail("https://sky.shiiyu.moe/item.gif/" + fetchurItem[1]);
 	}
 }

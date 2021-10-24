@@ -36,6 +36,17 @@ public class UuidCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
+	public static EmbedBuilder getUuidPlayer(String username) {
+		UsernameUuidStruct usernameUuid = usernameToUuid(username);
+		if (usernameUuid.isNotValid()) {
+			return invalidEmbed(usernameUuid.getFailCause());
+		}
+
+		return defaultEmbed(usernameUuid.getUsername(), "https://plancke.io/hypixel/player/stats/" + usernameUuid.getUsername())
+			.setDescription("**Username:** " + usernameUuid.getUsername() + "\n**Uuid:** " + usernameUuid.getUuid())
+			.setThumbnail(usernameUuid.getAvatarlUrl());
+	}
+
 	@Override
 	protected void execute(CommandEvent event) {
 		new CommandExecute(this, event) {
@@ -52,16 +63,5 @@ public class UuidCommand extends Command {
 			}
 		}
 			.submit();
-	}
-
-	public static EmbedBuilder getUuidPlayer(String username) {
-		UsernameUuidStruct usernameUuid = usernameToUuid(username);
-		if (usernameUuid.isNotValid()) {
-			return invalidEmbed(usernameUuid.getFailCause());
-		}
-
-		return defaultEmbed(usernameUuid.getUsername(), "https://plancke.io/hypixel/player/stats/" + usernameUuid.getUsername())
-			.setDescription("**Username:** " + usernameUuid.getUsername() + "\n**Uuid:** " + usernameUuid.getUuid())
-			.setThumbnail(usernameUuid.getAvatarlUrl());
 	}
 }

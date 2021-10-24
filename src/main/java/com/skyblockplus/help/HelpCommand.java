@@ -480,7 +480,7 @@ public class HelpCommand extends Command {
 		boolean isAdmin = event.getMember().hasPermission(Permission.ADMINISTRATOR);
 
 		paginateBuilder.addItems(
-			"Use the arrow buttons to navigate through the pages" + generatePageMap(isAdmin) + "\n\n*<> = required [] = optional"
+			"Use the arrow buttons to navigate through the pages" + generatePageMap(isAdmin) + "\n\n<> = required [] = optional"
 		);
 
 		HelpGenerator help = new HelpGenerator(getGuildPrefix(event.getGuild().getId()));
@@ -515,10 +515,7 @@ public class HelpCommand extends Command {
 			help.create("guild information <g:guild name>", "Get information and statistics about a guild") +
 			help.create("guild members <u:player>", "Get a list of all members in a player's guild") +
 			help.create("guild experience <u:player>", "Get the experience leaderboard for a player's guild") +
-			help.create(
-				"g-lb <weight|skills|catacombs|slayer> <u:player> [mode:normal|ironman]",
-				"Get the weight, skills, catacombs, or slayer leaderboard for a player's guild"
-			) +
+			help.create("g-lb <type> <u:player> [mode:normal|ironman]", "Get a leaderboard for a player's guild") +
 			help.create(
 				"g-kicker <u:player> <type:value> ...",
 				"Get all player's who don't meet the provided requirements. The requirement name can be skills, slayer, catacombs, or weight. The requirement value must be an integer."
@@ -530,15 +527,17 @@ public class HelpCommand extends Command {
 		);
 
 		paginateBuilder.addItems(
-			help.create("auctions [player] [sort:low|high] [filter:unsold|sold]", "Get a player's not claimed auctions on all profiles") +
-			help.create("auction uuid <UUID>", "Get an auction by it's UUID") +
+			help.create("auctions [player] [sort:low|high] [filter:unsold|sold]", "Get a player's unclaimed auctions on all profiles") +
+			help.create("auction uuid <UUID>", "Get an auction by its UUID") +
 			help.create("bin <item>", "Get the lowest bin of an item") +
 			help.create("bazaar <item]", "Get bazaar prices of an item") +
 			help.create("average <item>", "Get the average auction price of an item") +
 			help.create("bids [player]", "Get a player's auction house bids") +
 			help.create("query <item>", "Query the auction house for the lowest bin of an item") +
 			help.create("bits <item>", "Get the bits cost of an item from the bits shop") +
-			help.create("calculate <uuid>", "Calculate the price of an item on the auction house using the auction's UUID")
+			help.create("calculate <uuid>", "Calculate the price of an item on the auction house using the auction's UUID") +
+			help.create("track auctions <player>", "Get a DM when any of a player's auctions sell") +
+			help.create("track stop", "Stop tracking a player's auctions")
 		);
 
 		paginateBuilder.addItems(
@@ -578,13 +577,13 @@ public class HelpCommand extends Command {
 		);
 
 		paginateBuilder.addItems(
-			(isAdmin ? help.create("event create", "Interactive message to create a Skyblock event") : "") +
+			help.createAdmin("event create", "Interactive message to create a Skyblock event", isAdmin) +
 			help.create("event current", "Get information about the current event") +
-			help.create("event join", "Join the current event") +
+			help.create("event join [profile]", "Join the current event") +
 			help.create("event leave", "Leave the current event") +
 			help.create("event leaderboard", "Get the leaderboard for current event") +
-			(isAdmin ? help.create("event end", "Force end the event") : "") +
-			(isAdmin ? help.create("event cancel", "Cancel the event. No announcement will be made.") : "")
+			help.createAdmin("event end", "Force end the event", isAdmin) +
+			help.createAdmin("event cancel", "Cancel the event. No announcement will be made", isAdmin)
 		);
 
 		if (isAdmin) {
@@ -601,10 +600,10 @@ public class HelpCommand extends Command {
 
 			paginateBuilder.addItems(
 				help.create("settings verify", "Get the current verify settings for the bot") +
-				help.create("settings verify [enable|disable]", "Enable or disable automatic verify") +
-				help.create("settings verify message [message]", "The message that users will see when verifying") +
-				help.create("settings verify role add [@role]", "Add a role that user will receive upon being verified") +
-				help.create("settings verify role remove [@role]", "Remove a verify role") +
+				help.create("settings verify <enable|disable>", "Enable or disable automatic verify") +
+				help.create("settings verify message <message>", "The message that users will see when verifying") +
+				help.create("settings verify role add <@role>", "Add a role that user will receive upon being verified") +
+				help.create("settings verify role remove <@role>", "Remove a verify role") +
 				help.create(
 					"settings verify channel <#channel>",
 					"Channel where the verify message will be sent and messages will be auto deleted"
@@ -669,14 +668,14 @@ public class HelpCommand extends Command {
 			);
 
 			paginateBuilder.addItems(
-				help.create("settings guild create [<name>", "Create a new automatic guild roles with a name of `name`") +
-				help.create("settings guild <name> [enable|disable] role", "Enable or disable automatic guild role assigning") +
-				help.create("settings guild <name> set [guild_name]", "Set the guild name") +
-				help.create("settings guild <name> role [@role]", "Set the role to give guild members") +
-				help.create("settings guild <name> [enable|disable] rank", "Enable or disable automatic guild rank assigning") +
-				help.create("settings guild <name> add [rank_name] [@role]", "Add an automatic guild rank") +
-				help.create("settings guild <name> remove [rank_name]", "Remove an automatic guild rank") +
-				help.create("settings guild <name> [enable|disable] counter", "Enable or disable guild members counter")
+				help.create("settings guild create <name>", "Create a new automatic guild roles with a name of `name`") +
+				help.create("settings guild <name> <enable|disable> role", "Enable or disable automatic guild role assigning") +
+				help.create("settings guild <name> set <guild_name>", "Set the guild name") +
+				help.create("settings guild <name> role <@role>", "Set the role to give guild members") +
+				help.create("settings guild <name> <enable|disable> rank", "Enable or disable automatic guild rank assigning") +
+				help.create("settings guild <name> add <rank_name> <@role>", "Add an automatic guild rank") +
+				help.create("settings guild <name> remove <rank_name>", "Remove an automatic guild rank") +
+				help.create("settings guild <name> <enable|disable> counter", "Enable or disable guild members counter")
 			);
 		}
 
@@ -716,6 +715,10 @@ public class HelpCommand extends Command {
 
 		public String create(String commandName, String desc) {
 			return "`" + prefix + commandName + "`: " + desc + "\n";
+		}
+
+		public String createAdmin(String commandName, String desc, boolean isAdmin) {
+			return isAdmin ? "`" + prefix + commandName + "`: " + desc + "\n" : "";
 		}
 	}
 }

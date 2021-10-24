@@ -25,14 +25,67 @@ import java.util.List;
 
 public class HypixelGuildCache {
 
-	private Instant lastUpdated;
 	private final List<String> normalCache;
 	private final List<String> ironmanCache;
+	private Instant lastUpdated;
 
 	public HypixelGuildCache() {
 		this.normalCache = new ArrayList<>();
 		this.ironmanCache = new ArrayList<>();
 		this.lastUpdated = Instant.now();
+	}
+
+	public static int typeToIndex(String type) {
+		switch (type) {
+			case "username":
+				return 0;
+			case "uuid":
+				return 1;
+			case "slayer":
+				return 2;
+			case "skills":
+				return 3;
+			case "catacombs":
+				return 4;
+			case "weight":
+				return 5;
+			case "sven_xp":
+				return 6;
+			case "rev_xp":
+				return 7;
+			case "tara_xp":
+				return 8;
+			case "enderman_xp":
+				return 9;
+			case "alchemy":
+				return 10;
+			case "combat":
+				return 11;
+			case "fishing":
+				return 12;
+			case "farming":
+				return 13;
+			case "foraging":
+				return 14;
+			case "carpentry":
+				return 15;
+			case "mining":
+				return 16;
+			case "taming":
+				return 17;
+			case "enchanting":
+				return 18;
+			default:
+				return -1;
+		}
+	}
+
+	public static String getStringFromCache(String cache, String type) {
+		return cache.split("=:=")[typeToIndex(type)];
+	}
+
+	public static double getDoubleFromCache(String cache, String type) {
+		return Double.parseDouble(getStringFromCache(cache, type));
 	}
 
 	public void addPlayer(Player player) {
@@ -97,58 +150,5 @@ public class HypixelGuildCache {
 			"=:=" +
 			player.getHighestAmount("enchanting", ironmanOnly)
 		);
-	}
-
-	public static int typeToIndex(String type) {
-		switch (type) {
-			case "username":
-				return 0;
-			case "uuid":
-				return 1;
-			case "slayer":
-				return 2;
-			case "skills":
-				return 3;
-			case "catacombs":
-				return 4;
-			case "weight":
-				return 5;
-			case "sven_xp":
-				return 6;
-			case "rev_xp":
-				return 7;
-			case "tara_xp":
-				return 8;
-			case "enderman_xp":
-				return 9;
-			case "alchemy":
-				return 10;
-			case "combat":
-				return 11;
-			case "fishing":
-				return 12;
-			case "farming":
-				return 13;
-			case "foraging":
-				return 14;
-			case "carpentry":
-				return 15;
-			case "mining":
-				return 16;
-			case "taming":
-				return 17;
-			case "enchanting":
-				return 18;
-			default:
-				return -1;
-		}
-	}
-
-	public static String getStringFromCache(String cache, String type) {
-		return cache.split("=:=")[typeToIndex(type)];
-	}
-
-	public static double getDoubleFromCache(String cache, String type) {
-		return Double.parseDouble(getStringFromCache(cache, type));
 	}
 }

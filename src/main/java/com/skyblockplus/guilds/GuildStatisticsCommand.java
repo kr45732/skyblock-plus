@@ -53,24 +53,6 @@ public class GuildStatisticsCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	@Override
-	protected void execute(CommandEvent event) {
-		new CommandExecute(this, event) {
-			@Override
-			protected void execute() {
-				logCommand();
-
-				if (args.length == 2 && args[1].toLowerCase().startsWith("u:")) {
-					embed(getStatistics(args[1].split("u:")[1], event.getGuild()));
-					return;
-				}
-
-				sendErrorEmbed();
-			}
-		}
-			.submit();
-	}
-
 	public static EmbedBuilder getStatistics(String username, Guild guild) {
 		String hypixelKey = database.getServerHypixelApiKey(guild.getId());
 
@@ -110,28 +92,37 @@ public class GuildStatisticsCommand extends Command {
 
 				CompletableFuture<String> guildMemberUsername = asyncUuidToUsername(guildMemberUuid);
 				futuresList.add(
-					guildMemberUsername.thenApply(guildMemberUsernameResponse -> {
-						try {
-							if (keyCooldownMap.get(hypixelKey).getRemainingLimit().get() < 5) {
-								System.out.println("Sleeping for " + keyCooldownMap.get(hypixelKey).getTimeTillReset().get() + " seconds");
-								TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).getTimeTillReset().get());
-							}
-						} catch (Exception ignored) {}
+					guildMemberUsername.thenApply(
+						guildMemberUsernameResponse -> {
+							try {
+								if (keyCooldownMap.get(hypixelKey).getRemainingLimit().get() < 5) {
+									System.out.println(
+										"Sleeping for " + keyCooldownMap.get(hypixelKey).getTimeTillReset().get() + " seconds"
+									);
+									TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).getTimeTillReset().get());
+								}
+							} catch (Exception ignored) {}
 
-						CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(guildMemberUuid, hypixelKey);
-						return guildMemberProfileJson.thenApply(guildMemberProfileJsonResponse -> {
-							Player guildMemberPlayer = new Player(
+							CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(
 								guildMemberUuid,
-								guildMemberUsernameResponse,
-								guildMemberProfileJsonResponse
+								hypixelKey
 							);
+							return guildMemberProfileJson.thenApply(
+								guildMemberProfileJsonResponse -> {
+									Player guildMemberPlayer = new Player(
+										guildMemberUuid,
+										guildMemberUsernameResponse,
+										guildMemberProfileJsonResponse
+									);
 
-							if (guildMemberPlayer.isValid()) {
-								newGuildCache.addPlayer(guildMemberPlayer);
-							}
-							return null;
-						});
-					})
+									if (guildMemberPlayer.isValid()) {
+										newGuildCache.addPlayer(guildMemberPlayer);
+									}
+									return null;
+								}
+							);
+						}
+					)
 				);
 			}
 
@@ -235,5 +226,23 @@ public class GuildStatisticsCommand extends Command {
 		eb.addField("Weight top 5", weightStr.toString(), false);
 
 		return eb;
+	}
+
+	@Override
+	protected void execute(CommandEvent event) {
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
+
+				if (args.length == 2 && args[1].toLowerCase().startsWith("u:")) {
+					embed(getStatistics(args[1].split("u:")[1], event.getGuild()));
+					return;
+				}
+
+				sendErrorEmbed();
+			}
+		}
+			.submit();
 	}
 }

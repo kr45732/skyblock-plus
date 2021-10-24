@@ -42,6 +42,41 @@ public class WardrobeCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
+	public static EmbedBuilder getPlayerWardrobeList(String username, String profileName, PaginatorEvent event) {
+		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+		if (player.isValid()) {
+			Map<Integer, ArmorStruct> armorStructMap = player.getWardrobeList();
+			if (armorStructMap != null) {
+				CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(4);
+
+				for (Map.Entry<Integer, ArmorStruct> currentArmour : armorStructMap.entrySet()) {
+					paginateBuilder.addItems(
+						"**__Slot " +
+						(currentArmour.getKey() + 1) +
+						"__**\n" +
+						currentArmour.getValue().getHelmet() +
+						"\n" +
+						currentArmour.getValue().getChestplate() +
+						"\n" +
+						currentArmour.getValue().getLeggings() +
+						"\n" +
+						currentArmour.getValue().getBoots() +
+						"\n"
+					);
+				}
+				paginateBuilder.setPaginatorExtras(
+					new PaginatorExtras()
+						.setEveryPageTitle(player.getUsername())
+						.setEveryPageThumbnail(player.getThumbnailUrl())
+						.setEveryPageTitleUrl(player.skyblockStatsLink())
+				);
+				event.paginate(paginateBuilder);
+				return null;
+			}
+		}
+		return player.getFailEmbed();
+	}
+
 	@Override
 	protected void execute(CommandEvent event) {
 		new CommandExecute(this, event) {
@@ -95,40 +130,5 @@ public class WardrobeCommand extends Command {
 			}
 		}
 		return null;
-	}
-
-	public static EmbedBuilder getPlayerWardrobeList(String username, String profileName, PaginatorEvent event) {
-		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
-		if (player.isValid()) {
-			Map<Integer, ArmorStruct> armorStructMap = player.getWardrobeList();
-			if (armorStructMap != null) {
-				CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(4);
-
-				for (Map.Entry<Integer, ArmorStruct> currentArmour : armorStructMap.entrySet()) {
-					paginateBuilder.addItems(
-						"**__Slot " +
-						(currentArmour.getKey() + 1) +
-						"__**\n" +
-						currentArmour.getValue().getHelmet() +
-						"\n" +
-						currentArmour.getValue().getChestplate() +
-						"\n" +
-						currentArmour.getValue().getLeggings() +
-						"\n" +
-						currentArmour.getValue().getBoots() +
-						"\n"
-					);
-				}
-				paginateBuilder.setPaginatorExtras(
-					new PaginatorExtras()
-						.setEveryPageTitle(player.getUsername())
-						.setEveryPageThumbnail(player.getThumbnailUrl())
-						.setEveryPageTitleUrl(player.skyblockStatsLink())
-				);
-				event.paginate(paginateBuilder);
-				return null;
-			}
-		}
-		return player.getFailEmbed();
 	}
 }

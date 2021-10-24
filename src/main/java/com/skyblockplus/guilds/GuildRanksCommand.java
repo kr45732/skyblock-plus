@@ -51,40 +51,6 @@ public class GuildRanksCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	@Override
-	protected void execute(CommandEvent event) {
-		new CommandExecute(this, event) {
-			@Override
-			protected void execute() {
-				logCommand();
-
-				if ((args.length == 3 || args.length == 2) && args[1].toLowerCase().startsWith("u:")) {
-					boolean ironmanOnly = false;
-					for (int i = 0; i < args.length; i++) {
-						if (args[i].startsWith("mode:")) {
-							ironmanOnly = args[i].split("mode:")[1].equals("ironman");
-							removeArg(i);
-						}
-					}
-
-					boolean useKey = false;
-					for (int i = 0; i < args.length; i++) {
-						if (args[i].equals("--usekey")) {
-							useKey = true;
-							removeArg(i);
-						}
-					}
-
-					paginate(getLeaderboard(args[1].split(":")[1], ironmanOnly, useKey, new PaginatorEvent(event)));
-					return;
-				}
-
-				sendErrorEmbed();
-			}
-		}
-			.submit();
-	}
-
 	public static EmbedBuilder getLeaderboard(String username, boolean ironmanOnly, boolean useKey, PaginatorEvent event) {
 		String hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
 
@@ -180,35 +146,39 @@ public class GuildRanksCommand extends Command {
 
 					CompletableFuture<String> guildMemberUsername = asyncUuidToUsername(guildMemberUuid);
 					futuresList.add(
-						guildMemberUsername.thenApply(guildMemberUsernameResponse -> {
-							try {
-								if (keyCooldownMap.get(hypixelKey).getRemainingLimit().get() < 5) {
-									System.out.println(
-										"Sleeping for " + keyCooldownMap.get(hypixelKey).getTimeTillReset().get() + " seconds"
-									);
-									TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).getTimeTillReset().get());
-								}
-							} catch (Exception ignored) {}
+						guildMemberUsername.thenApply(
+							guildMemberUsernameResponse -> {
+								try {
+									if (keyCooldownMap.get(hypixelKey).getRemainingLimit().get() < 5) {
+										System.out.println(
+											"Sleeping for " + keyCooldownMap.get(hypixelKey).getTimeTillReset().get() + " seconds"
+										);
+										TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).getTimeTillReset().get());
+									}
+								} catch (Exception ignored) {}
 
-							CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(
-								guildMemberUuid,
-								hypixelKey
-							);
-
-							return guildMemberProfileJson.thenApply(guildMemberProfileJsonResponse -> {
-								Player guildMemberPlayer = new Player(
+								CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(
 									guildMemberUuid,
-									guildMemberUsernameResponse,
-									guildMemberProfileJsonResponse
+									hypixelKey
 								);
 
-								if (guildMemberPlayer.isValid()) {
-									newGuildCache.addPlayer(guildMemberPlayer);
-								}
+								return guildMemberProfileJson.thenApply(
+									guildMemberProfileJsonResponse -> {
+										Player guildMemberPlayer = new Player(
+											guildMemberUuid,
+											guildMemberUsernameResponse,
+											guildMemberProfileJsonResponse
+										);
 
-								return null;
-							});
-						})
+										if (guildMemberPlayer.isValid()) {
+											newGuildCache.addPlayer(guildMemberPlayer);
+										}
+
+										return null;
+									}
+								);
+							}
+						)
 					);
 				}
 
@@ -422,5 +392,39 @@ public class GuildRanksCommand extends Command {
 		event.paginate(paginateBuilder);
 
 		return null;
+	}
+
+	@Override
+	protected void execute(CommandEvent event) {
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
+
+				if ((args.length == 3 || args.length == 2) && args[1].toLowerCase().startsWith("u:")) {
+					boolean ironmanOnly = false;
+					for (int i = 0; i < args.length; i++) {
+						if (args[i].startsWith("mode:")) {
+							ironmanOnly = args[i].split("mode:")[1].equals("ironman");
+							removeArg(i);
+						}
+					}
+
+					boolean useKey = false;
+					for (int i = 0; i < args.length; i++) {
+						if (args[i].equals("--usekey")) {
+							useKey = true;
+							removeArg(i);
+						}
+					}
+
+					paginate(getLeaderboard(args[1].split(":")[1], ironmanOnly, useKey, new PaginatorEvent(event)));
+					return;
+				}
+
+				sendErrorEmbed();
+			}
+		}
+			.submit();
 	}
 }

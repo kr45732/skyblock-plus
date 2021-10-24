@@ -19,9 +19,13 @@
 package com.skyblockplus.features.apply;
 
 import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.utils.ApiHandler.getNameHistory;
 import static com.skyblockplus.utils.Utils.*;
 
-import com.google.gson.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.skyblockplus.networth.NetworthExecute;
 import com.skyblockplus.utils.Player;
 import java.io.Serializable;
@@ -41,10 +45,10 @@ import net.dv8tion.jda.api.requests.restaction.MessageAction;
 public class ApplyUser implements Serializable {
 
 	public final String applyingUserId;
-	public String applicationChannelId;
 	public final String currentSettingsString;
 	public final String guildId;
 	public final Map<String, String> profileEmojiToName = new LinkedHashMap<>();
+	public String applicationChannelId;
 	public String reactMessageId;
 	public int state = 0;
 	public String staffChannelId;
@@ -54,12 +58,13 @@ public class ApplyUser implements Serializable {
 	public String playerCatacombs;
 	public String playerWeight;
 	public String playerUsername;
+	public String nameHistory = "";
 	public String playerCoins;
 	public String ironmanSymbol = "";
 	public String playerProfileName;
 	public String failCause;
 
-	public ApplyUser(ButtonClickEvent event, JsonElement currentSettings, String playerUsername) {
+	public ApplyUser(ButtonClickEvent event, JsonElement currentSettings, String playerUsername, String uuid) {
 		User applyingUser = event.getUser();
 		logCommand(event.getGuild(), applyingUser, "apply " + applyingUser.getName());
 
@@ -94,6 +99,7 @@ public class ApplyUser implements Serializable {
 		Player player = new Player(playerUsername);
 		String[] profileNames = player.getAllProfileNames(isIronman);
 
+		getNameHistory(player.getUuid()).forEach(i -> nameHistory += "\n• " + i);
 		if (profileNames.length == 1) {
 			applicationChannel.sendMessage(applyingUser.getAsMention()).complete();
 			caseOne(profileNames[0], currentSettings, applicationChannel);
@@ -279,8 +285,8 @@ public class ApplyUser implements Serializable {
 			} catch (Exception e) {
 				playerWeight = "API disabled";
 			}
-
 			playerUsername = player.getUsername();
+
 			ironmanSymbol = player.isIronman() ? " ♻️" : "";
 			playerProfileName = player.getProfileName();
 			double bankCoins = player.getBankBalance();
@@ -352,6 +358,10 @@ public class ApplyUser implements Serializable {
 									.split("Total Networth: ")[1];
 						} catch (Exception ignored) {}
 						applyPlayerStats.addField("Networth", networthStr, true);
+						System.out.println(nameHistory);
+						if (!nameHistory.isEmpty()) {
+							applyPlayerStats.addField("Name history", nameHistory, true);
+						}
 						applyPlayerStats.setThumbnail("https://cravatar.eu/helmavatar/" + playerUsername + "/64.png");
 						String waitlistMsg = higherDepth(currentSettings, "waitlistedMessageText", null);
 

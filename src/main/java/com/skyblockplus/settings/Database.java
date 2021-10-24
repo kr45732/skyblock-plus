@@ -20,7 +20,10 @@ package com.skyblockplus.settings;
 
 import static com.skyblockplus.utils.Utils.gson;
 
-import com.google.gson.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountService;
 import com.skyblockplus.api.serversettings.automatedapply.ApplyBlacklist;

@@ -84,7 +84,6 @@ public class Utils {
 	public static final String BOT_INVITE_LINK_REQUIRED_SLASH =
 		"https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403040368&scope=bot%20applications.commands";
 	public static final String FORUM_POST_LINK = "https://hypixel.net/threads/3980092";
-	private static final Pattern patternControlCode = Pattern.compile("(?i)\\u00A7[0-9A-FK-OR]");
 	public static final AsyncHttpClient asyncHttpClient = Dsl.asyncHttpClient();
 	public static final CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 	public static final OkHttpClient okHttpClient = new OkHttpClient().newBuilder().build();
@@ -98,9 +97,10 @@ public class Utils {
 		.newBuilder()
 		.expireAfterWrite(15, TimeUnit.MINUTES)
 		.build();
-	private static final Logger log = LoggerFactory.getLogger(Utils.class);
 	public static final Gson gson = new Gson();
 	public static final Gson formattedGson = new GsonBuilder().setPrettyPrinting().create();
+	private static final Pattern patternControlCode = Pattern.compile("(?i)\\u00A7[0-9A-FK-OR]");
+	private static final Logger log = LoggerFactory.getLogger(Utils.class);
 	/* Configuration File */
 	public static String HYPIXEL_API_KEY = "";
 	public static String BOT_TOKEN = "";
@@ -116,6 +116,16 @@ public class Utils {
 	public static String CACHE_DATABASE_TOKEN = "";
 	public static String AUCTION_API_KEY = "";
 	public static boolean IS_API = false;
+	public static JsonObject internalJsonMappings;
+	public static JsonObject priceOverrideJson;
+	/* Miscellaneous */
+	public static TextChannel botLogChannel;
+	public static TextChannel errorLogChannel;
+	public static JDAWebhookClient webhookClient;
+	public static Instant lowestBinJsonLastUpdated = Instant.now();
+	public static Instant averageAuctionJsonLastUpdated = Instant.now();
+	public static Instant bazaarJsonLastUpdated = Instant.now();
+	public static Instant sbzPricesJsonLastUpdated = Instant.now();
 	/* JSON */
 	private static JsonElement essenceCostsJson;
 	private static JsonElement levelingJson;
@@ -132,17 +142,7 @@ public class Utils {
 	private static JsonElement averageAuctionJson;
 	private static JsonElement bazaarJson;
 	private static JsonArray sbzPricesJson;
-	public static JsonObject internalJsonMappings;
 	private static JsonObject emojiMap;
-	public static JsonObject priceOverrideJson;
-	/* Miscellaneous */
-	public static TextChannel botLogChannel;
-	public static TextChannel errorLogChannel;
-	public static JDAWebhookClient webhookClient;
-	public static Instant lowestBinJsonLastUpdated = Instant.now();
-	public static Instant averageAuctionJsonLastUpdated = Instant.now();
-	public static Instant bazaarJsonLastUpdated = Instant.now();
-	public static Instant sbzPricesJsonLastUpdated = Instant.now();
 
 	/* Getters */
 	public static JsonElement getLowestBinJson() {
@@ -205,7 +205,7 @@ public class Utils {
 
 	public static JsonElement getMiscJson() {
 		if (miscJson == null) {
-			miscJson = getJson("https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/misc.json");
+			miscJson = getJson("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/misc.json");
 		}
 
 		return miscJson;
@@ -238,7 +238,7 @@ public class Utils {
 	public static JsonElement getReforgeStonesJson() {
 		if (reforgeStonesJson == null) {
 			reforgeStonesJson =
-				getJson("https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/reforgestones.json");
+				getJson("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/reforgestones.json");
 		}
 
 		return reforgeStonesJson;
@@ -246,28 +246,30 @@ public class Utils {
 
 	public static JsonElement getPetJson() {
 		if (petsJson == null) {
-			petsJson = getJson("https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/pets.json");
+			petsJson = getJson("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/pets.json");
 		}
 		return petsJson;
 	}
 
 	public static JsonElement getPetNumsJson() {
 		if (petNumsJson == null) {
-			petNumsJson = getJson("https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/petnums.json");
+			petNumsJson = getJson("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/petnums.json");
 		}
 		return petNumsJson;
 	}
 
 	public static JsonElement getEnchantsJson() {
 		if (enchantsJson == null) {
-			enchantsJson = getJson("https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/enchants.json");
+			enchantsJson =
+				getJson("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/enchants.json");
 		}
 		return enchantsJson;
 	}
 
 	public static JsonElement getLevelingJson() {
 		if (levelingJson == null) {
-			levelingJson = getJson("https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/leveling.json");
+			levelingJson =
+				getJson("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/leveling.json");
 		}
 		return levelingJson;
 	}
@@ -275,7 +277,7 @@ public class Utils {
 	public static JsonElement getEssenceCostsJson() {
 		if (essenceCostsJson == null) {
 			essenceCostsJson =
-				getJson("https://raw.githubusercontent.com/Moulberry/NotEnoughUpdates-REPO/master/constants/essencecosts.json");
+				getJson("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/essencecosts.json");
 		}
 		return essenceCostsJson;
 	}
@@ -607,7 +609,7 @@ public class Utils {
 
 		try {
 			for (String key : paths) {
-				if (key.startsWith("[") && key.endsWith("]") && key.length() >= 3) {
+				if (key.length() >= 3 && key.startsWith("[") && key.endsWith("]")) {
 					element = element.getAsJsonArray().get(Integer.parseInt(key.substring(1, key.length() - 1)));
 				} else {
 					element = element.getAsJsonObject().get(key);
@@ -1118,34 +1120,40 @@ public class Utils {
 			database
 				.getLinkedUsers()
 				.stream()
-				.filter(linkedAccountModel ->
-					Duration.between(Instant.ofEpochMilli(Long.parseLong(linkedAccountModel.getLastUpdated())), Instant.now()).toDays() > 1
+				.filter(
+					linkedAccountModel ->
+						Duration
+							.between(Instant.ofEpochMilli(Long.parseLong(linkedAccountModel.getLastUpdated())), Instant.now())
+							.toDays() >
+						1
 				)
 				.findAny()
-				.ifPresent(notUpdated -> {
-					try {
-						DiscordInfoStruct discordInfo = getPlayerDiscordInfo(notUpdated.getMinecraftUsername());
-						User updateUser = jda.retrieveUserById(notUpdated.getDiscordId()).complete();
-						if (discordInfo.getDiscordTag().equals(updateUser.getAsTag())) {
-							database.addLinkedUser(
-								new LinkedAccountModel(
-									"" + Instant.now().toEpochMilli(),
-									updateUser.getId(),
-									discordInfo.getUuid(),
-									discordInfo.getUsername()
-								)
-							);
-							try {
-								logCommand("Updated linked user: " + notUpdated.getMinecraftUsername());
-							} catch (Exception ignored) {}
-							return;
-						}
-					} catch (Exception ignored) {}
-					database.deleteLinkedUserByMinecraftUsername(notUpdated.getMinecraftUsername());
-					try {
-						logCommand("Error updating linked user: " + notUpdated.getMinecraftUsername());
-					} catch (Exception ignored) {}
-				});
+				.ifPresent(
+					notUpdated -> {
+						try {
+							DiscordInfoStruct discordInfo = getPlayerDiscordInfo(notUpdated.getMinecraftUsername());
+							User updateUser = jda.retrieveUserById(notUpdated.getDiscordId()).complete();
+							if (discordInfo.getDiscordTag().equals(updateUser.getAsTag())) {
+								database.addLinkedUser(
+									new LinkedAccountModel(
+										"" + Instant.now().toEpochMilli(),
+										updateUser.getId(),
+										discordInfo.getUuid(),
+										discordInfo.getUsername()
+									)
+								);
+								try {
+									logCommand("Updated linked user: " + notUpdated.getMinecraftUsername());
+								} catch (Exception ignored) {}
+								return;
+							}
+						} catch (Exception ignored) {}
+						database.deleteLinkedUserByMinecraftUsername(notUpdated.getMinecraftUsername());
+						try {
+							logCommand("Error updating linked user: " + notUpdated.getMinecraftUsername());
+						} catch (Exception ignored) {}
+					}
+				);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}

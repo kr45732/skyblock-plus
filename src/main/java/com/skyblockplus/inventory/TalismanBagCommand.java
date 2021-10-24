@@ -44,6 +44,46 @@ public class TalismanBagCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
+	public static EmbedBuilder getPlayerTalismansList(String username, String profileName, int slotNum, PaginatorEvent event) {
+		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+		if (player.isValid()) {
+			Map<Integer, InvItem> talismanBagMap = player.getTalismanBagMap();
+			if (talismanBagMap != null) {
+				List<String> pageTitles = new ArrayList<>();
+				List<String> pageThumbnails = new ArrayList<>();
+
+				CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(1);
+
+				for (Map.Entry<Integer, InvItem> currentTalisman : talismanBagMap.entrySet()) {
+					InvItem currentTalismanStruct = currentTalisman.getValue();
+
+					if (currentTalismanStruct == null) {
+						pageTitles.add("Empty");
+						pageThumbnails.add(null);
+						paginateBuilder.addItems("**Slot:** " + (currentTalisman.getKey() + 1));
+					} else {
+						pageTitles.add(currentTalismanStruct.getName() + " x" + currentTalismanStruct.getCount());
+						pageThumbnails.add("https://sky.shiiyu.moe/item.gif/" + currentTalismanStruct.getId());
+						String itemString = "";
+						itemString += "**Slot:** " + (currentTalisman.getKey() + 1);
+						itemString += "\n\n**Lore:**\n" + currentTalismanStruct.getLore();
+						if (currentTalismanStruct.isRecombobulated()) {
+							itemString += "\n(Recombobulated)";
+						}
+
+						itemString += "\n\n**Item Creation:** " + currentTalismanStruct.getCreationTimestamp();
+						paginateBuilder.addItems(itemString);
+					}
+				}
+				paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles).setThumbnails(pageThumbnails));
+
+				event.paginate(paginateBuilder, slotNum);
+				return null;
+			}
+		}
+		return player.getFailEmbed();
+	}
+
 	@Override
 	protected void execute(CommandEvent event) {
 		new CommandExecute(this, event) {
@@ -107,45 +147,5 @@ public class TalismanBagCommand extends Command {
 			}
 		}
 		return null;
-	}
-
-	public static EmbedBuilder getPlayerTalismansList(String username, String profileName, int slotNum, PaginatorEvent event) {
-		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
-		if (player.isValid()) {
-			Map<Integer, InvItem> talismanBagMap = player.getTalismanBagMap();
-			if (talismanBagMap != null) {
-				List<String> pageTitles = new ArrayList<>();
-				List<String> pageThumbnails = new ArrayList<>();
-
-				CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(1);
-
-				for (Map.Entry<Integer, InvItem> currentTalisman : talismanBagMap.entrySet()) {
-					InvItem currentTalismanStruct = currentTalisman.getValue();
-
-					if (currentTalismanStruct == null) {
-						pageTitles.add("Empty");
-						pageThumbnails.add(null);
-						paginateBuilder.addItems("**Slot:** " + (currentTalisman.getKey() + 1));
-					} else {
-						pageTitles.add(currentTalismanStruct.getName() + " x" + currentTalismanStruct.getCount());
-						pageThumbnails.add("https://sky.shiiyu.moe/item.gif/" + currentTalismanStruct.getId());
-						String itemString = "";
-						itemString += "**Slot:** " + (currentTalisman.getKey() + 1);
-						itemString += "\n\n**Lore:**\n" + currentTalismanStruct.getLore();
-						if (currentTalismanStruct.isRecombobulated()) {
-							itemString += "\n(Recombobulated)";
-						}
-
-						itemString += "\n\n**Item Creation:** " + currentTalismanStruct.getCreationTimestamp();
-						paginateBuilder.addItems(itemString);
-					}
-				}
-				paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles).setThumbnails(pageThumbnails));
-
-				event.paginate(paginateBuilder, slotNum);
-				return null;
-			}
-		}
-		return player.getFailEmbed();
 	}
 }

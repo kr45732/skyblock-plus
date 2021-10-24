@@ -42,6 +42,57 @@ public class InventoryCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
+	public static EmbedBuilder getPlayerInventoryList(String username, String profileName, int slotNum, PaginatorEvent event) {
+		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+		if (player.isValid()) {
+			Map<Integer, InvItem> inventoryMap = player.getInventoryMap();
+			if (inventoryMap != null) {
+				List<String> pageTitles = new ArrayList<>();
+				List<String> pageThumbnails = new ArrayList<>();
+
+				CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(1);
+
+				for (Map.Entry<Integer, InvItem> currentInvSlot : inventoryMap.entrySet()) {
+					InvItem currentInvStruct = currentInvSlot.getValue();
+
+					if (currentInvStruct == null) {
+						pageTitles.add("Empty");
+						pageThumbnails.add(null);
+						paginateBuilder.addItems("**Slot:** " + (currentInvSlot.getKey() + 1));
+					} else {
+						pageTitles.add(currentInvStruct.getName() + " x" + currentInvStruct.getCount());
+						pageThumbnails.add("https://sky.shiiyu.moe/item.gif/" + currentInvStruct.getId());
+						String itemString = "";
+						itemString += "**Slot:** " + (currentInvSlot.getKey() + 1);
+						itemString += "\n\n**Lore:**\n" + currentInvStruct.getLore();
+						if (currentInvStruct.isRecombobulated()) {
+							itemString += "\n(Recombobulated)";
+						}
+
+						itemString += "\n\n**Item Creation:** " + currentInvStruct.getCreationTimestamp();
+						paginateBuilder.addItems(itemString);
+					}
+				}
+				paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles).setThumbnails(pageThumbnails));
+
+				event.paginate(paginateBuilder, slotNum);
+				return null;
+			}
+		}
+		return player.getFailEmbed();
+	}
+
+	public static String[] getPlayerInventory(String username, String profileName) {
+		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+		if (player.isValid()) {
+			String[] temp = player.getInventory();
+			if (temp != null) {
+				return new String[] { temp[0], temp[1], player.invMissing };
+			}
+		}
+		return null;
+	}
+
 	@Override
 	protected void execute(CommandEvent event) {
 		new CommandExecute(this, event) {
@@ -92,56 +143,5 @@ public class InventoryCommand extends Command {
 			}
 		}
 			.submit();
-	}
-
-	public static EmbedBuilder getPlayerInventoryList(String username, String profileName, int slotNum, PaginatorEvent event) {
-		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
-		if (player.isValid()) {
-			Map<Integer, InvItem> inventoryMap = player.getInventoryMap();
-			if (inventoryMap != null) {
-				List<String> pageTitles = new ArrayList<>();
-				List<String> pageThumbnails = new ArrayList<>();
-
-				CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(1);
-
-				for (Map.Entry<Integer, InvItem> currentInvSlot : inventoryMap.entrySet()) {
-					InvItem currentInvStruct = currentInvSlot.getValue();
-
-					if (currentInvStruct == null) {
-						pageTitles.add("Empty");
-						pageThumbnails.add(null);
-						paginateBuilder.addItems("**Slot:** " + (currentInvSlot.getKey() + 1));
-					} else {
-						pageTitles.add(currentInvStruct.getName() + " x" + currentInvStruct.getCount());
-						pageThumbnails.add("https://sky.shiiyu.moe/item.gif/" + currentInvStruct.getId());
-						String itemString = "";
-						itemString += "**Slot:** " + (currentInvSlot.getKey() + 1);
-						itemString += "\n\n**Lore:**\n" + currentInvStruct.getLore();
-						if (currentInvStruct.isRecombobulated()) {
-							itemString += "\n(Recombobulated)";
-						}
-
-						itemString += "\n\n**Item Creation:** " + currentInvStruct.getCreationTimestamp();
-						paginateBuilder.addItems(itemString);
-					}
-				}
-				paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles).setThumbnails(pageThumbnails));
-
-				event.paginate(paginateBuilder, slotNum);
-				return null;
-			}
-		}
-		return player.getFailEmbed();
-	}
-
-	public static String[] getPlayerInventory(String username, String profileName) {
-		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
-		if (player.isValid()) {
-			String[] temp = player.getInventory();
-			if (temp != null) {
-				return new String[] { temp[0], temp[1], player.invMissing };
-			}
-		}
-		return null;
 	}
 }

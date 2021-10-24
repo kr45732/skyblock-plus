@@ -60,10 +60,8 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
-import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
-import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
@@ -367,10 +365,12 @@ public class AutomaticGuild {
 				CountDownLatch latch = new CountDownLatch(1);
 				guild
 					.findMembers(member -> discordIdToUuid.containsKey(member.getId()))
-					.onSuccess(members -> {
-						inGuildUsers.addAll(members);
-						latch.countDown();
-					})
+					.onSuccess(
+						members -> {
+							inGuildUsers.addAll(members);
+							latch.countDown();
+						}
+					)
 					.onError(error -> latch.countDown());
 
 				try {
@@ -629,7 +629,7 @@ public class AutomaticGuild {
 					.getEmbeds()
 					.get(0)
 					.getDescription()
-					.contains("https://github.com/Moulberry/NotEnoughUpdates-REPO/commit/")
+					.contains("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO/commit/")
 			) {
 				if (IS_API) {
 					updateItemMappings();
@@ -744,7 +744,7 @@ public class AutomaticGuild {
 
 			Git neuRepo = Git
 				.cloneRepository()
-				.setURI("https://github.com/Moulberry/NotEnoughUpdates-REPO.git")
+				.setURI("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO.git")
 				.setDirectory(neuDir)
 				.call();
 
@@ -808,7 +808,7 @@ public class AutomaticGuild {
 					itemName = rarityMapRev.get(itemId.split(";")[1]) + " " + itemName.split("] ")[1];
 				}
 				if (itemName.equals("Enchanted Book")) {
-					itemName = parseMcCodes(higherDepth(itemJson, "lore").getAsJsonArray().get(0).getAsString());
+					itemName = parseMcCodes(higherDepth(itemJson, "lore.[0]").getAsString());
 				}
 				if (itemName.contains("⚚")) {
 					itemName = itemName.replace("⚚ ", "STARRED ");

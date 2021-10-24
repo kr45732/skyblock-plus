@@ -31,8 +31,8 @@ import net.dv8tion.jda.api.EmbedBuilder;
 public class HypixelPlayer {
 
 	private JsonObject playerJson;
-	private String playerUuid;
-	private String playerUsername;
+	private String uuid;
+	private String username;
 	private boolean validPlayer = false;
 	private String failCause = "Unknown fail cause";
 
@@ -43,7 +43,7 @@ public class HypixelPlayer {
 		}
 
 		try {
-			HypixelResponse response = playerFromUuid(playerUuid);
+			HypixelResponse response = playerFromUuid(uuid);
 			if (response.isNotValid()) {
 				failCause = response.getFailCause();
 				return;
@@ -67,16 +67,16 @@ public class HypixelPlayer {
 	}
 
 	public String getUsername() {
-		return playerUsername;
+		return username;
 	}
 
 	public String getUuid() {
-		return playerUuid;
+		return uuid;
 	}
 
 	public EmbedBuilder getDefaultEmbed() {
-		return defaultEmbed(playerUsername, "https://plancke.io/hypixel/player/stats/" + playerUuid)
-			.setThumbnail("https://cravatar.eu/helmavatar/" + playerUuid + "/64.png");
+		return defaultEmbed(username, "https://plancke.io/hypixel/player/stats/" + uuid)
+			.setThumbnail("https://cravatar.eu/helmavatar/" + uuid + "/64.png");
 	}
 
 	/* Hypixel */
@@ -128,8 +128,8 @@ public class HypixelPlayer {
 			return true;
 		}
 
-		this.playerUsername = response.getUsername();
-		this.playerUuid = response.getUuid();
+		this.username = response.getUsername();
+		this.uuid = response.getUuid();
 		return false;
 	}
 

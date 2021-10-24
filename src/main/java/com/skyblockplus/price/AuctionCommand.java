@@ -68,17 +68,19 @@ public class AuctionCommand extends Command {
 		Stream<JsonElement> stream = streamJsonArray(auctionsArray);
 		if (filterType == AuctionFilterType.SOLD || filterType == AuctionFilterType.UNSOLD) {
 			stream =
-				stream.filter(auction ->
-					(filterType == AuctionFilterType.SOLD) ==
-					(higherDepth(auction, "highest_bid_amount", 0) >= higherDepth(auction, "starting_bid", 0))
+				stream.filter(
+					auction ->
+						(filterType == AuctionFilterType.SOLD) ==
+						(higherDepth(auction, "highest_bid_amount", 0) >= higherDepth(auction, "starting_bid", 0))
 				);
 		}
 		if (sortType == AuctionSortType.LOW || sortType == AuctionSortType.HIGH) {
 			stream =
 				stream.sorted(
-					Comparator.comparingLong(auction ->
-						(sortType == AuctionSortType.LOW ? 1 : -1) *
-						Math.max(higherDepth(auction, "highest_bid_amount", 0L), higherDepth(auction, "starting_bid", 0))
+					Comparator.comparingLong(
+						auction ->
+							(sortType == AuctionSortType.LOW ? 1 : -1) *
+							Math.max(higherDepth(auction, "highest_bid_amount", 0L), higherDepth(auction, "starting_bid", 0))
 					)
 				);
 		}
@@ -159,7 +161,7 @@ public class AuctionCommand extends Command {
 			return invalidEmbed(auctionResponse.getFailCause());
 		}
 
-		JsonElement auctionJson = auctionResponse.getResponse().getAsJsonArray().get(0);
+		JsonElement auctionJson = auctionResponse.get("[0]");
 		EmbedBuilder eb = defaultEmbed("Auction from UUID");
 		String itemName = higherDepth(auctionJson, "item_name").getAsString();
 

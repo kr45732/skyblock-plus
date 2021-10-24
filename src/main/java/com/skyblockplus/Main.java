@@ -50,7 +50,9 @@ import com.skyblockplus.skills.SkillsCommand;
 import com.skyblockplus.skills.SkillsSlashCommand;
 import com.skyblockplus.slayer.SlayerCommand;
 import com.skyblockplus.slayer.SlayerSlashCommand;
-import com.skyblockplus.utils.*;
+import com.skyblockplus.utils.ApiHandler;
+import com.skyblockplus.utils.Constants;
+import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.exceptionhandler.ExceptionEventListener;
 import com.skyblockplus.utils.exceptionhandler.GlobalExceptionHandler;
 import com.skyblockplus.utils.slashcommand.SlashCommandClient;
@@ -161,7 +163,6 @@ public class Main {
 					new FetchurCommand(),
 					new CheckEmojisCommand(),
 					new HarpCommand(),
-					new CommunityUpgradesCommand(),
 					new CakesCommand(),
 					new ActiveCoinsCommand(),
 					new HotmCommand(),
@@ -249,7 +250,8 @@ public class Main {
 
 		ApiHandler.scheduleDatabaseUpdate();
 		TrackAuctionsCommand.scheduleTrackingRunnable();
-		//	scheduleUpdateLinkedAccounts();
+		//		AuctionFlipper.scheduleFlipper();
+		//		Utils.scheduleUpdateLinkedAccounts();
 	}
 
 	@PreDestroy

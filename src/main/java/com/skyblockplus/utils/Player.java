@@ -20,7 +20,8 @@ package com.skyblockplus.utils;
 
 import static com.skyblockplus.utils.ApiHandler.playerFromUuid;
 import static com.skyblockplus.utils.ApiHandler.skyblockProfilesFromUuid;
-import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.Constants.CRAFTED_MINIONS_TO_SLOTS;
+import static com.skyblockplus.utils.Constants.SKILL_NAMES;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -267,10 +268,6 @@ public class Player {
 			return 60;
 		}
 
-		if (skillName.equals("hotm")) {
-			return 7;
-		}
-
 		int maxLevel = higherDepth(getLevelingJson(), "leveling_caps." + skillName, 0);
 
 		if (skillName.equals("farming")) {
@@ -326,8 +323,8 @@ public class Player {
 			case "runecrafting":
 				skillsTable = higherDepth(getLevelingJson(), "runecrafting_xp").getAsJsonArray();
 				break;
-			case "hotm":
-				skillsTable = gson.toJsonTree(HOTM_EXP_TO_LEVEL).getAsJsonArray();
+			case "HOTM":
+				skillsTable = higherDepth(getLevelingJson(), "HOTM").getAsJsonArray();
 				break;
 			default:
 				skillsTable = higherDepth(getLevelingJson(), "leveling_xp").getAsJsonArray();
@@ -1107,13 +1104,8 @@ public class Player {
 	}
 
 	public SkillsStruct getHOTM() {
-		return skillInfoFromExp(higherDepth(profileJson(), "mining_core.experience").getAsLong(), "hotm");
-	}
-
-	public enum WeightType {
-		NONE,
-		SENITHER,
-		LILY,
+		long xp = higherDepth(profileJson(), "mining_core.experience", -1L);
+		return xp == -1 ? null : skillInfoFromExp(xp, "HOTM");
 	}
 
 	@Override
@@ -1133,5 +1125,11 @@ public class Player {
 			'\'' +
 			'}'
 		);
+	}
+
+	public enum WeightType {
+		NONE,
+		SENITHER,
+		LILY,
 	}
 }

@@ -49,11 +49,9 @@ public class CalculateCommand extends Command {
 
 		if (auctionResponse.isNotValid()) {
 			return invalidEmbed(auctionResponse.getFailCause());
-		} else if (auctionResponse.getResponse().getAsJsonArray().size() == 0) {
-			return invalidEmbed("Invalid auction UUID");
 		}
 
-		JsonElement auction = auctionResponse.getResponse().getAsJsonArray().get(0);
+		JsonElement auction = auctionResponse.get("[0]");
 		try {
 			InvItem item = getGenericInventoryMap(NBTReader.readBase64(higherDepth(auction, "item_bytes.data").getAsString())).get(0);
 			double price = calculateItemPrice(item);
