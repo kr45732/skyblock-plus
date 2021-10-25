@@ -18,26 +18,28 @@
 
 package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.networth.NetworthExecute;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
+import me.nullicorn.nedit.NBTReader;
+import net.dv8tion.jda.api.EmbedBuilder;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.stream.Stream;
-import me.nullicorn.nedit.NBTReader;
-import net.dv8tion.jda.api.EmbedBuilder;
+
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Utils.*;
 
 public class AuctionCommand extends Command {
 
@@ -52,6 +54,7 @@ public class AuctionCommand extends Command {
 		String username,
 		AuctionFilterType filterType,
 		AuctionSortType sortType,
+		boolean verbose,
 		PaginatorEvent event
 	) {
 		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
@@ -86,9 +89,16 @@ public class AuctionCommand extends Command {
 
 		long totalSoldValue = 0;
 		long totalPendingValue = 0;
+		long failedToSell = 0;
 
 		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(10);
 		PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_FIELDS);
+
+		NetworthExecute calc = null;
+		if(verbose){
+			calc = new NetworthExecute().initPrices();
+			paginateBuilder.setItemsPerPage(7);
+		}
 
 		for (int i = 0; i < auctionsArray.size(); i++) {
 			JsonElement currentAuction = auctionsArray.get(i);
@@ -127,7 +137,16 @@ public class AuctionCommand extends Command {
 						totalSoldValue += highestBid;
 					} else {
 						auction = "Auction did not sell";
+						failedToSell += startingBid;
 					}
+				}
+				if(verbose){
+					String estimatedPrice = "error calculating";
+					try{
+						estimatedPrice = formatNumber(calc.calculateItemPrice(getGenericInventoryMap(NBTReader.readBase64(higherDepth(currentAuction, "item_bytes.data").getAsString())).get(0)));
+					}catch (Exception ignored) {}
+					auction += "\nEstimated value: " + estimatedPrice + "\nCommand: `/viewauction" + higherDepth(currentAuction, "uuid").getAsString()
+							+ "`";
 				}
 
 				extras.addEmbedField(auctionName, auction, false);
@@ -143,10 +162,13 @@ public class AuctionCommand extends Command {
 			.setEveryPageTitleUrl(skyblockStatsLink(usernameUuidStruct.getUsername(), null))
 			.setEveryPageThumbnail(usernameUuidStruct.getAvatarlUrl())
 			.setEveryPageText(
-				"**Sold Auctions Value:** " +
-				simplifyNumber(totalSoldValue) +
-				"\n**Unsold Auctions Value:** " +
-				simplifyNumber(totalPendingValue)
+					(totalSoldValue > 0 ? "**Sold Auctions Value:** " +
+				simplifyNumber(totalSoldValue) : "") +
+				(totalPendingValue > 0 ? "\n**Unsold Auctions Value:** " +
+				simplifyNumber(totalPendingValue) : "")
+							+
+							(failedToSell > 0 ? "\n**Did Not Sell Auctions Value:** " +
+									simplifyNumber(failedToSell) : "")
 			);
 
 		event.paginate(paginateBuilder.setPaginatorExtras(extras));
@@ -255,12 +277,19 @@ public class AuctionCommand extends Command {
 							}
 						}
 					}
+					boolean verbose = false;
+					for (int i = 0; i < args.length; i++) {
+						if (args[i].equals("--verbose")) {
+							verbose = true;
+							removeArg(i);
+						}
+					}
 
 					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
 						return;
 					}
 
-					paginate(getPlayerAuction(username, filterType, sortType, new PaginatorEvent(event)));
+					paginate(getPlayerAuction(username, filterType, sortType, verbose, new PaginatorEvent(event)));
 					return;
 				}
 

@@ -99,7 +99,7 @@ public class ApplyUser implements Serializable {
 		Player player = new Player(playerUsername);
 		String[] profileNames = player.getAllProfileNames(isIronman);
 
-		getNameHistory(player.getUuid()).forEach(i -> nameHistory += "\n• " + i);
+		getNameHistory(player.getUuid()).forEach(i -> nameHistory += "\n• " + fixUsername(i));
 		if (profileNames.length == 1) {
 			applicationChannel.sendMessage(applyingUser.getAsMention()).complete();
 			caseOne(profileNames[0], currentSettings, applicationChannel);

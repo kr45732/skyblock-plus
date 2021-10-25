@@ -136,7 +136,7 @@ public class HypixelCommand extends Command {
 
 		StringBuilder namesString = new StringBuilder();
 		for (String name : getNameHistory(player.getUuid())) {
-			namesString.append("• ").append(name).append("\n");
+			namesString.append("• ").append(fixUsername(name)).append("\n");
 		}
 		if (namesString.length() > 0) {
 			eb.addField("Aliases", namesString.toString(), true);

@@ -47,6 +47,7 @@ public class AuctionsSlashCommand extends SlashCommand {
 						event.player,
 						AuctionCommand.AuctionFilterType.valueOf(event.getOptionStr("filter", "none").toUpperCase()),
 						AuctionCommand.AuctionSortType.valueOf(event.getOptionStr("sort", "none").toUpperCase()),
+						event.getOptionBoolean("verbose", false),
 						new PaginatorEvent(event)
 					)
 				);
@@ -75,7 +76,7 @@ public class AuctionsSlashCommand extends SlashCommand {
 						new OptionData(OptionType.STRING, "sort", "How the auctions should be sorted")
 							.addChoice("Low", "low")
 							.addChoice("High", "high")
-					),
+					).addOption(OptionType.BOOLEAN, "verbose", "Get more information & a detailed breakdown for each auction"),
 				new SubcommandData("uuid", "Get an auction by it's UUID").addOption(OptionType.STRING, "uuid", "Auction UUID", true)
 			);
 	}
