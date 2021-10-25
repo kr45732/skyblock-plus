@@ -18,6 +18,9 @@
 
 package com.skyblockplus.price;
 
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
@@ -29,17 +32,13 @@ import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import me.nullicorn.nedit.NBTReader;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.stream.Stream;
-
-import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Utils.*;
+import me.nullicorn.nedit.NBTReader;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class AuctionCommand extends Command {
 
@@ -95,7 +94,7 @@ public class AuctionCommand extends Command {
 		PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_FIELDS);
 
 		NetworthExecute calc = null;
-		if(verbose){
+		if (verbose) {
 			calc = new NetworthExecute().initPrices();
 			paginateBuilder.setItemsPerPage(7);
 		}
@@ -140,13 +139,25 @@ public class AuctionCommand extends Command {
 						failedToSell += startingBid;
 					}
 				}
-				if(verbose){
+				if (verbose) {
 					String estimatedPrice = "error calculating";
-					try{
-						estimatedPrice = formatNumber(calc.calculateItemPrice(getGenericInventoryMap(NBTReader.readBase64(higherDepth(currentAuction, "item_bytes.data").getAsString())).get(0)));
-					}catch (Exception ignored) {}
-					auction += "\nEstimated value: " + estimatedPrice + "\nCommand: `/viewauction" + higherDepth(currentAuction, "uuid").getAsString()
-							+ "`";
+					try {
+						estimatedPrice =
+							formatNumber(
+								calc.calculateItemPrice(
+									getGenericInventoryMap(
+										NBTReader.readBase64(higherDepth(currentAuction, "item_bytes.data").getAsString())
+									)
+										.get(0)
+								)
+							);
+					} catch (Exception ignored) {}
+					auction +=
+						"\nEstimated value: " +
+						estimatedPrice +
+						"\nCommand: `/viewauction" +
+						higherDepth(currentAuction, "uuid").getAsString() +
+						"`";
 				}
 
 				extras.addEmbedField(auctionName, auction, false);
@@ -162,13 +173,9 @@ public class AuctionCommand extends Command {
 			.setEveryPageTitleUrl(skyblockStatsLink(usernameUuidStruct.getUsername(), null))
 			.setEveryPageThumbnail(usernameUuidStruct.getAvatarlUrl())
 			.setEveryPageText(
-					(totalSoldValue > 0 ? "**Sold Auctions Value:** " +
-				simplifyNumber(totalSoldValue) : "") +
-				(totalPendingValue > 0 ? "\n**Unsold Auctions Value:** " +
-				simplifyNumber(totalPendingValue) : "")
-							+
-							(failedToSell > 0 ? "\n**Did Not Sell Auctions Value:** " +
-									simplifyNumber(failedToSell) : "")
+				(totalSoldValue > 0 ? "**Sold Auctions Value:** " + simplifyNumber(totalSoldValue) : "") +
+				(totalPendingValue > 0 ? "\n**Unsold Auctions Value:** " + simplifyNumber(totalPendingValue) : "") +
+				(failedToSell > 0 ? "\n**Did Not Sell Auctions Value:** " + simplifyNumber(failedToSell) : "")
 			);
 
 		event.paginate(paginateBuilder.setPaginatorExtras(extras));
