@@ -833,7 +833,7 @@ public class SettingsExecute {
 		}
 
 		List<GuildRole> currentGuildRoles = database.getAllGuildRoles(guild.getId());
-		currentGuildRoles.removeIf(o1 -> o1.getGuildId() == null);
+		currentGuildRoles.removeIf(o1 -> o1 == null || o1.getGuildId() == null);
 
 		if (currentGuildRoles.size() == 2) {
 			return invalidEmbed("You can reached the max amount of automatic guilds (2/2)");

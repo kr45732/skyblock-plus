@@ -41,36 +41,27 @@ public class LinkedAccountService {
 	}
 
 	public ResponseEntity<?> getByDiscordId(String discordId) {
-		if (accountByDiscordIdExists(discordId)) {
-			return new ResponseEntity<>(settingsRepository.findByDiscordId(discordId), HttpStatus.OK);
+		LinkedAccountModel linkedAccount = settingsRepository.findByDiscordId(discordId);
+		if (linkedAccount != null) {
+			return new ResponseEntity<>(linkedAccount, HttpStatus.OK);
 		}
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-	}
-
-	private boolean accountByDiscordIdExists(String discordId) {
-		return settingsRepository.findByDiscordId(discordId) != null;
 	}
 
 	public ResponseEntity<?> getByMinecraftUuid(String minecraftUuid) {
-		if (accountByMinecraftUuidExists(minecraftUuid)) {
-			return new ResponseEntity<>(settingsRepository.findByMinecraftUuid(minecraftUuid), HttpStatus.OK);
+		LinkedAccountModel linkedAccount = settingsRepository.findByMinecraftUuid(minecraftUuid);
+		if (linkedAccount != null) {
+			return new ResponseEntity<>(linkedAccount, HttpStatus.OK);
 		}
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-	}
-
-	private boolean accountByMinecraftUuidExists(String minecraftUuid) {
-		return settingsRepository.findByMinecraftUuid(minecraftUuid) != null;
 	}
 
 	public ResponseEntity<?> getByMinecraftUsername(String minecraftUsername) {
-		if (accountByMinecraftUsernameExists(minecraftUsername)) {
-			return new ResponseEntity<>(settingsRepository.findByMinecraftUsername(minecraftUsername), HttpStatus.OK);
+		LinkedAccountModel linkedAccount = settingsRepository.findByMinecraftUsername(minecraftUsername);
+		if (linkedAccount != null) {
+			return new ResponseEntity<>(linkedAccount, HttpStatus.OK);
 		}
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-	}
-
-	private boolean accountByMinecraftUsernameExists(String minecraftUsername) {
-		return (settingsRepository.findByMinecraftUsername(minecraftUsername) != null);
 	}
 
 	public void deleteByMinecraftUsername(String minecraftUsername) {
@@ -88,9 +79,11 @@ public class LinkedAccountService {
 	public ResponseEntity<HttpStatus> addNewLinkedAccount(LinkedAccountModel linkedAccountModel) {
 		if (settingsRepository.existsByMinecraftUsername(linkedAccountModel.getMinecraftUsername())) {
 			deleteByMinecraftUsername(linkedAccountModel.getMinecraftUsername());
-		} else if (settingsRepository.existsByMinecraftUuid(linkedAccountModel.getMinecraftUuid())) {
+		}
+		if (settingsRepository.existsByMinecraftUuid(linkedAccountModel.getMinecraftUuid())) {
 			deleteByMinecraftUuid(linkedAccountModel.getMinecraftUuid());
-		} else if (settingsRepository.existsByDiscordId(linkedAccountModel.getDiscordId())) {
+		}
+		if (settingsRepository.existsByDiscordId(linkedAccountModel.getDiscordId())) {
 			deleteByDiscordId(linkedAccountModel.getDiscordId());
 		}
 

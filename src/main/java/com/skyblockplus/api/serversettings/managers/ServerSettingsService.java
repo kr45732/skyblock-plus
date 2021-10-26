@@ -617,9 +617,9 @@ public class ServerSettingsService {
 			GuildRole applyOne = currentServerSettings.getAutomaticGuildRolesOne();
 			GuildRole applyTwo = currentServerSettings.getAutomaticGuildRolesTwo();
 
-			if (applyOne != null && applyOne.getName().equalsIgnoreCase(name)) {
+			if (applyOne != null && applyOne.getName() != null && applyOne.getName().equalsIgnoreCase(name)) {
 				currentServerSettings.setAutomaticGuildRolesOne(new GuildRole());
-			} else if (applyTwo != null && applyTwo.getName().equalsIgnoreCase(name)) {
+			} else if (applyTwo != null && applyTwo.getName() != null && applyTwo.getName().equalsIgnoreCase(name)) {
 				currentServerSettings.setAutomaticGuildRolesTwo(new GuildRole());
 			} else {
 				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

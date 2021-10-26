@@ -355,14 +355,9 @@ public class NetworthExecute {
 				try {
 					long startTime = System.currentTimeMillis();
 
-					if (calcItemsJsonStr.charAt(calcItemsJsonStr.length() - 1) == ',') {
-						calcItemsJsonStr.deleteCharAt(calcItemsJsonStr.length() - 1);
-					}
-					calcItemsJsonStr.append("]");
-
 					eb.appendDescription(
 						"\nVerbose JSON: " +
-						makeHastePost(formattedGson.toJson(JsonParser.parseString(calcItemsJsonStr.toString()))) +
+						makeHastePost(formattedGson.toJson(getVerboseJson())) +
 						".json"
 					);
 					System.out.println("Verbose time: " + (System.currentTimeMillis() - startTime) + " ms");
@@ -1254,5 +1249,17 @@ public class NetworthExecute {
 
 	public String getItemInfo() {
 		return itemInfo;
+	}
+
+	public JsonElement getVerboseJson(){
+		if(!verbose){
+			return null;
+		}
+
+		if (calcItemsJsonStr.charAt(calcItemsJsonStr.length() - 1) == ',') {
+			calcItemsJsonStr.deleteCharAt(calcItemsJsonStr.length() - 1);
+		}
+		calcItemsJsonStr.append("]");
+		return JsonParser.parseString(calcItemsJsonStr.toString());
 	}
 }
