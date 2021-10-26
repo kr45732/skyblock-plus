@@ -18,6 +18,9 @@
 
 package com.skyblockplus.price;
 
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
@@ -29,17 +32,13 @@ import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import me.nullicorn.nedit.NBTReader;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.stream.Stream;
-
-import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Utils.*;
+import me.nullicorn.nedit.NBTReader;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class AuctionCommand extends Command {
 
@@ -176,8 +175,8 @@ public class AuctionCommand extends Command {
 			.setEveryPageText(
 				(totalSoldValue > 0 ? "**Sold Auctions Value:** " + simplifyNumber(totalSoldValue) : "") +
 				(totalPendingValue > 0 ? "\n**Unsold Auctions Value:** " + simplifyNumber(totalPendingValue) : "") +
-				(failedToSell > 0 ? "\n**Did Not Sell Auctions Value:** " + simplifyNumber(failedToSell) : "")
-					+ (verbose ? "\n**Verbose JSON:** " + makeHastePost(formattedGson.toJson(calc.getVerboseJson())) + ".json": "")
+				(failedToSell > 0 ? "\n**Did Not Sell Auctions Value:** " + simplifyNumber(failedToSell) : "") +
+				(verbose ? "\n**Verbose JSON:** " + makeHastePost(formattedGson.toJson(calc.getVerboseJson())) + ".json" : "")
 			);
 
 		event.paginate(paginateBuilder.setPaginatorExtras(extras));

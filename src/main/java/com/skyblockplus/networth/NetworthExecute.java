@@ -355,11 +355,7 @@ public class NetworthExecute {
 				try {
 					long startTime = System.currentTimeMillis();
 
-					eb.appendDescription(
-						"\nVerbose JSON: " +
-						makeHastePost(formattedGson.toJson(getVerboseJson())) +
-						".json"
-					);
+					eb.appendDescription("\nVerbose JSON: " + makeHastePost(formattedGson.toJson(getVerboseJson())) + ".json");
 					System.out.println("Verbose time: " + (System.currentTimeMillis() - startTime) + " ms");
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -1251,8 +1247,8 @@ public class NetworthExecute {
 		return itemInfo;
 	}
 
-	public JsonElement getVerboseJson(){
-		if(!verbose){
+	public JsonElement getVerboseJson() {
+		if (!verbose) {
 			return null;
 		}
 

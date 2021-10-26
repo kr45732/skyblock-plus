@@ -535,7 +535,7 @@ public class Utils {
 			.setEventWaiter(waiter)
 			.setColumns(1)
 			.setItemsPerPage(1)
-			.setFinalAction(m -> m.editMessageComponents().queue((ignored) -> {}, (ignored) -> {}))
+			.setFinalAction(m -> m.editMessageComponents().queue(ignored -> {}, ignored -> {}))
 			.setTimeout(30, TimeUnit.SECONDS)
 			.setColor(botColor)
 			.setUsers(eventAuthor);
