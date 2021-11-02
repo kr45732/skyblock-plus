@@ -135,7 +135,7 @@ public class TrackAuctionsCommand extends Command {
 		}
 	}
 
-	public static void scheduleTrackingRunnable() {
+	public static void initialize() {
 		scheduler.scheduleAtFixedRate(TrackAuctionsCommand::trackAuctionRunnable, 0, 30, TimeUnit.SECONDS);
 	}
 

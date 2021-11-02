@@ -28,10 +28,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.springframework.transaction.annotation.Transactional;
 
 @Data
 @AllArgsConstructor
 @Embeddable
+@Transactional
 public class Mee6Data {
 
 	private String enable = "false";

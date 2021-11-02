@@ -208,6 +208,10 @@ public class Player {
 		return profilesArray.get(profileIndex);
 	}
 
+	public JsonArray getProfileArray() {
+		return profilesArray;
+	}
+
 	public boolean isValid() {
 		return validPlayer;
 	}
@@ -1127,7 +1131,7 @@ public class Player {
 		);
 	}
 
-	public enum WeightType {
+    public enum WeightType {
 		NONE,
 		SENITHER,
 		LILY,

@@ -131,6 +131,7 @@ public class EvaluateCommand extends Command {
 
 				try {
 					shell.setProperty("event", jdaEvent);
+					shell.setProperty("cmdEvent", event);
 					shell.setProperty("message", jdaEvent.getMessage());
 					shell.setProperty("channel", jdaEvent.getChannel());
 					shell.setProperty("jda", jdaEvent.getJDA());

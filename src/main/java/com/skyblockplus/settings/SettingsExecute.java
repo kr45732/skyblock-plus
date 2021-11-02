@@ -558,10 +558,6 @@ public class SettingsExecute {
 			);
 	}
 
-	public String nameMcHyperLink(String username, String uuid) {
-		return "[**" + username + "**](https://mine.ly/" + uuid + ")";
-	}
-
 	/* Guild Role Settings */
 	public EmbedBuilder getCurrentGuildRoleSettings(String name) {
 		JsonElement settings = database.getGuildRoleSettings(guild.getId(), name);
@@ -2043,8 +2039,7 @@ public class SettingsExecute {
 	public EmbedBuilder getMee6DataSettings() {
 		JsonObject settings = getMee6Json();
 
-		EmbedBuilder eb = defaultSettingsEmbed()
-			.appendDescription(higherDepth(settings, "enable", "false").equals("true") ? "**Enabled**" : "**Disabled");
+		EmbedBuilder eb = defaultSettingsEmbed(higherDepth(settings, "enable", "false").equals("true") ? "**Enabled**" : "**Disabled**");
 		JsonArray curRoles = higherDepth(settings, "mee6Ranks").getAsJsonArray();
 		if (curRoles.size() == 0) {
 			eb.appendDescription("\n**• Leveling roles:** none");
@@ -2070,7 +2065,7 @@ public class SettingsExecute {
 				return apiFailMessage(responseCode);
 			}
 
-			return defaultSettingsEmbed().setDescription("Disabled Mee6 automatic leveling roles.");
+			return defaultSettingsEmbed("Disabled Mee6 automatic leveling roles.");
 		}
 
 		JsonElement settings = getMee6Json();
@@ -2096,32 +2091,25 @@ public class SettingsExecute {
 			return apiFailMessage(responseCode);
 		}
 
-		return defaultSettingsEmbed().setDescription("Enabled Mee6 automatic leveling roles.");
+		return defaultSettingsEmbed("Enabled Mee6 automatic leveling roles.");
 	}
 
 	public EmbedBuilder addMee6Role(String level, String roleMention) {
 		Role role = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
-		if (role == null) {
-			return invalidEmbed("The provided role does not exist.");
-		} else if (role.isPublicRole()) {
-			return invalidEmbed("The role cannot be the everyone role.");
-		} else if (role.isManaged()) {
-			return invalidEmbed("The role cannot be a managed role");
-		}
+		EmbedBuilder eb = checkRoleEmebd(role);
+		if(eb != null){return eb;}
 
-		int intLevel;
+		int intLevel = -1;
 		try {
 			intLevel = Integer.parseInt(level);
-			if (intLevel <= 0 || intLevel >= 250) {
-				return invalidEmbed("The level must be between 0 and 50.");
-			}
-		} catch (Exception e) {
-			return invalidEmbed("The level must be an integer.");
+		} catch (Exception ignored) {}
+		if (intLevel <= 0 || intLevel >= 250) {
+			return invalidEmbed("The level must be an integer between 0 and 250.");
 		}
 
 		JsonObject settings = getMee6Json();
-
 		JsonArray ranks = settings.getAsJsonArray("mee6Ranks");
+
 		if (ranks.size() >= 10) {
 			return defaultEmbed("You have reached the max amount of Mee6 roles (10/10).");
 		}
@@ -2139,23 +2127,20 @@ public class SettingsExecute {
 			return apiFailMessage(responseCode);
 		}
 
-		return defaultSettingsEmbed().setDescription("Added a level " + intLevel + " Mee6 role as " + role.getAsMention() + ".");
+		return defaultSettingsEmbed("Added level " + intLevel + " role as " + role.getAsMention() + ".");
 	}
 
 	public EmbedBuilder removeMee6Role(String level) {
-		int intLevel;
+		int intLevel = -1;
 		try {
 			intLevel = Integer.parseInt(level);
-			if (intLevel <= 0 || intLevel >= 250) {
-				return invalidEmbed("The level must be between 0 and 50.");
-			}
-		} catch (Exception e) {
-			return invalidEmbed("The level must be an integer.");
+		} catch (Exception ignored) {}
+		if (intLevel <= 0 || intLevel >= 250) {
+			return invalidEmbed("The level must be an integer between 0 and 250.");
 		}
 
 		JsonObject curSettings = getMee6Json();
 		JsonArray curRanks = curSettings.get("mee6Ranks").getAsJsonArray();
-
 		for (JsonElement rank : curRanks) {
 			if (higherDepth(rank, "value").getAsInt() == intLevel) {
 				curRanks.remove(rank);
@@ -2169,7 +2154,7 @@ public class SettingsExecute {
 					return apiFailMessage(responseCode);
 				}
 
-				return defaultSettingsEmbed().setDescription("Removed Mee6 role for level " + intLevel + ".");
+				return defaultSettingsEmbed("Removed the role for level " + intLevel + ".");
 			}
 		}
 
@@ -2183,7 +2168,7 @@ public class SettingsExecute {
 	public int setMee6Settings(String key, String newValue) {
 		JsonObject newSettings = getMee6Json();
 		newSettings.addProperty(key, newValue);
-		return database.setMee6Settings(guild.getId(), newSettings);
+		return setMee6Settings(newSettings);
 	}
 
 	public int setMee6Settings(JsonElement newSettings) {
@@ -2193,7 +2178,7 @@ public class SettingsExecute {
 	/* Miscellaneous */
 	public EmbedBuilder setHypixelKey(String newKey) {
 		try {
-			higherDepth(getJson("https://api.hypixel.net/key?key=" + newKey), "record.key").getAsString();
+			newKey = higherDepth(getJson("https://api.hypixel.net/key?key=" + newKey), "record.key").getAsString();
 		} catch (Exception e) {
 			return invalidEmbed("Provided Hypixel API key is invalid.");
 		}
@@ -2203,8 +2188,7 @@ public class SettingsExecute {
 			return apiFailMessage(responseCode);
 		}
 
-		return defaultSettingsEmbed()
-			.setDescription("Set the Hypixel API key. Note that no one can view the key for the privacy of the key owner.");
+		return defaultSettingsEmbed("Set the Hypixel API key. Note that no one can view the key for the privacy of the key owner.");
 	}
 
 	public EmbedBuilder deleteHypixelKey() {
@@ -2213,7 +2197,7 @@ public class SettingsExecute {
 			apiFailMessage(responseCode);
 		}
 
-		return defaultSettingsEmbed().setDescription("Deleted the server's Hypixel API key.");
+		return defaultSettingsEmbed("Deleted the server's Hypixel API key.");
 	}
 
 	public EmbedBuilder setPrefix(String prefix) {
@@ -2227,7 +2211,7 @@ public class SettingsExecute {
 		}
 
 		guildMap.get(guild.getId()).setPrefix(prefix);
-		return defaultSettingsEmbed().setDescription("**Set the server's prefix to:** " + prefix);
+		return defaultSettingsEmbed("**Set the server's prefix to:** " + prefix);
 	}
 
 	public EmbedBuilder resetPrefix() {
@@ -2238,7 +2222,7 @@ public class SettingsExecute {
 		}
 
 		guildMap.get(guild.getId()).setPrefix(DEFAULT_PREFIX);
-		return defaultSettingsEmbed().setDescription("**Reset the server's prefix to:** " + DEFAULT_PREFIX);
+		return defaultSettingsEmbed("**Reset the server's prefix to:** " + DEFAULT_PREFIX);
 	}
 
 	/* Helper functions */
@@ -2336,10 +2320,27 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder apiFailMessage(int responseCode) {
-		return invalidEmbed("API returned response code " + responseCode + ". Please report this to the developer.");
+		return invalidEmbed("API returned response code of `" + responseCode + "`. Please report this to the developer.");
 	}
 
 	public EmbedBuilder defaultSettingsEmbed() {
-		return defaultEmbed("Settings");
+		return defaultSettingsEmbed(null);
 	}
+
+	public EmbedBuilder defaultSettingsEmbed(String description) {
+		return defaultEmbed("Settings").setDescription(description);
+	}
+
+	public EmbedBuilder checkRoleEmebd(Role role){
+		if (role == null) {
+			return invalidEmbed("The provided role does not exist.");
+		} else if (role.isPublicRole()) {
+			return invalidEmbed("The role cannot be the everyone role.");
+		} else if (role.isManaged()) {
+			return invalidEmbed("The role cannot be a managed role");
+		}else{
+			return null;
+		}
+	}
+
 }

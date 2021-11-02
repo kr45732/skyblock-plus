@@ -169,7 +169,8 @@ public class Main {
 					new VoteCommand(),
 					new TrackAuctionsCommand(),
 					new SkyblockCommand(),
-					new GuildStatisticsCommand()
+					new GuildStatisticsCommand(),
+						new GuildTrackerCommand()
 				)
 				.build();
 
@@ -248,10 +249,10 @@ public class Main {
 		}
 		jda.getPresence().setActivity(Activity.watching(DEFAULT_PREFIX + "help in " + jda.getGuilds().size() + " servers"));
 
-		ApiHandler.scheduleDatabaseUpdate();
-		TrackAuctionsCommand.scheduleTrackingRunnable();
+		ApiHandler.initialize();
+		TrackAuctionsCommand.initialize();
+		GuildTrackerCommand.initialize();
 		//		AuctionFlipper.scheduleFlipper();
-		//		Utils.scheduleUpdateLinkedAccounts();
 	}
 
 	@PreDestroy

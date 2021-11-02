@@ -18,40 +18,16 @@
 
 package com.skyblockplus.utils;
 
-import static com.skyblockplus.Main.*;
-import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.ApiHandler.playerFromUuid;
-import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
-import static java.lang.String.join;
-import static java.util.Collections.nCopies;
-
 import club.minnced.discord.webhook.external.JDAWebhookClient;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.gson.*;
-import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
 import com.skyblockplus.features.apply.ApplyGuild;
 import com.skyblockplus.features.apply.ApplyUser;
 import com.skyblockplus.features.listeners.AutomaticGuild;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.exceptionhandler.ExceptionExecutor;
 import com.skyblockplus.utils.structs.*;
-import java.awt.*;
-import java.io.*;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.*;
-import java.util.List;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
 import me.nullicorn.nedit.type.NBTList;
@@ -75,13 +51,37 @@ import org.asynchttpclient.Dsl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import java.awt.*;
+import java.io.*;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.skyblockplus.Main.*;
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.utils.ApiHandler.playerFromUuid;
+import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
+import static java.lang.String.join;
+import static java.util.Collections.nCopies;
+
 public class Utils {
 
 	/* Constants */
 	public static final Color botColor = new Color(223, 5, 5);
 	public static final int globalCooldown = 4;
-	public static final String DISCORD_SERVER_INVITE_LINK = "https://discord.gg/Z4Fn3eNDXT";
-	public static final String BOT_INVITE_LINK_REQUIRED_SLASH =
+	public static final String DISCORD_SERVER_INVITE_LINK = "https://dsc.gg/skyblock-plus";
+	public static final String BOT_INVITE_LINK =
 		"https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403040368&scope=bot%20applications.commands";
 	public static final String FORUM_POST_LINK = "https://hypixel.net/threads/3980092";
 	public static final AsyncHttpClient asyncHttpClient = Dsl.asyncHttpClient();
@@ -115,9 +115,10 @@ public class Utils {
 	public static String DEFAULT_PREFIX = "";
 	public static String CACHE_DATABASE_TOKEN = "";
 	public static String AUCTION_API_KEY = "";
+	public static String PLANET_SCALE_URL = "";
+	public static String PLANET_SCALE_USERNAME = "";
+	public static String PLANET_SCALE_PASSWORD = "";
 	public static boolean IS_API = false;
-	public static JsonObject internalJsonMappings;
-	public static JsonObject priceOverrideJson;
 	/* Miscellaneous */
 	public static TextChannel botLogChannel;
 	public static TextChannel errorLogChannel;
@@ -143,6 +144,8 @@ public class Utils {
 	private static JsonElement bazaarJson;
 	private static JsonArray sbzPricesJson;
 	private static JsonObject emojiMap;
+	public static JsonObject internalJsonMappings;
+	public static JsonObject priceOverrideJson;
 
 	/* Getters */
 	public static JsonElement getLowestBinJson() {
@@ -871,6 +874,9 @@ public class Utils {
 			DEFAULT_PREFIX = (String) appProps.get("DEFAULT_PREFIX");
 			CACHE_DATABASE_TOKEN = (String) appProps.get("CACHE_DATABASE_TOKEN");
 			AUCTION_API_KEY = (String) appProps.get("AUCTION_API_KEY");
+			PLANET_SCALE_URL = (String) appProps.get("PLANET_SCALE_URL");
+			PLANET_SCALE_USERNAME = (String) appProps.get("PLANET_SCALE_USERNAME");
+			PLANET_SCALE_PASSWORD = (String) appProps.get("PLANET_SCALE_PASSWORD");
 		} catch (IOException e) {
 			HYPIXEL_API_KEY = System.getenv("HYPIXEL_API_KEY");
 			BOT_TOKEN = System.getenv("BOT_TOKEN");
@@ -893,6 +899,9 @@ public class Utils {
 			DEFAULT_PREFIX = System.getenv("DEFAULT_PREFIX");
 			CACHE_DATABASE_TOKEN = System.getenv("CACHE_DATABASE_TOKEN");
 			AUCTION_API_KEY = System.getenv("AUCTION_API_KEY");
+			PLANET_SCALE_URL = System.getenv("PLANET_SCALE_URL");
+			PLANET_SCALE_USERNAME = System.getenv("PLANET_SCALE_USERNAME");
+			PLANET_SCALE_PASSWORD = System.getenv("PLANET_SCALE_PASSWORD");
 		}
 	}
 
@@ -1092,11 +1101,6 @@ public class Utils {
 		return new ArrayList<>();
 	}
 
-	public static void scheduleUpdateLinkedAccounts() {
-		ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-		scheduler.scheduleWithFixedDelay(Utils::updateLinkedAccounts, 1, 1, TimeUnit.MINUTES);
-	}
-
 	public static void closeAsyncHttpClient() {
 		try {
 			asyncHttpClient.close();
@@ -1112,44 +1116,6 @@ public class Utils {
 			log.info("Successfully Closed Http Client");
 		} catch (Exception e) {
 			log.error("closeHttpClient()", e);
-		}
-	}
-
-	public static void updateLinkedAccounts() {
-		try {
-			database
-				.getLinkedUsers()
-				.stream()
-				.filter(linkedAccountModel ->
-					Duration.between(Instant.ofEpochMilli(Long.parseLong(linkedAccountModel.getLastUpdated())), Instant.now()).toDays() > 1
-				)
-				.findAny()
-				.ifPresent(notUpdated -> {
-					try {
-						DiscordInfoStruct discordInfo = getPlayerDiscordInfo(notUpdated.getMinecraftUsername());
-						User updateUser = jda.retrieveUserById(notUpdated.getDiscordId()).complete();
-						if (discordInfo.getDiscordTag().equals(updateUser.getAsTag())) {
-							database.addLinkedUser(
-								new LinkedAccountModel(
-									"" + Instant.now().toEpochMilli(),
-									updateUser.getId(),
-									discordInfo.getUuid(),
-									discordInfo.getUsername()
-								)
-							);
-							try {
-								logCommand("Updated linked user: " + notUpdated.getMinecraftUsername());
-							} catch (Exception ignored) {}
-							return;
-						}
-					} catch (Exception ignored) {}
-					database.deleteLinkedUserByMinecraftUsername(notUpdated.getMinecraftUsername());
-					try {
-						logCommand("Error updating linked user: " + notUpdated.getMinecraftUsername());
-					} catch (Exception ignored) {}
-				});
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
 		}
 	}
 
@@ -1218,4 +1184,8 @@ public class Utils {
 		list.forEach(array::add);
 		return array;
 	}
+
+    public static String nameMcHyperLink(String username, String uuid) {
+        return "[**" + username + "**](https://mine.ly/" + uuid + ")";
+    }
 }

@@ -146,7 +146,7 @@ public class GuildKickerCommand extends Command {
 						}
 					}
 
-					if (slayer >= slayerReq && skills >= skillsReq && catacombs >= catacombsReq && weight >= weightReq) {
+					if (slayer >= slayerReq && Math.max(0, skills) >= skillsReq && catacombs >= catacombsReq && weight >= weightReq) {
 						meetsReqs = true;
 						break;
 					}
@@ -278,7 +278,7 @@ public class GuildKickerCommand extends Command {
 						}
 					}
 
-					if (slayer >= slayerReq && skills >= skillsReq && catacombs >= catacombsReq && weight >= weightReq) {
+					if (slayer >= slayerReq && Math.max(0, skills) >= skillsReq && catacombs >= catacombsReq && weight >= weightReq) {
 						meetsReqs = true;
 						break;
 					}

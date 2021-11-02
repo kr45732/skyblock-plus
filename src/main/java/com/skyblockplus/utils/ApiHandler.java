@@ -18,18 +18,24 @@
 
 package com.skyblockplus.utils;
 
-import static com.skyblockplus.utils.Utils.*;
-
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.sql.*;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -39,25 +45,38 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
+
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.Utils.*;
 
 public class ApiHandler {
 
+
 	public static final Cache<String, String> uuidToUsernameCache = Caffeine.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build();
-
 	public static final ConcurrentHashMap<String, Instant> uuidToTimeSkyblockProfiles = new ConcurrentHashMap<>();
-
-	private static final String cacheDatabaseUrl = "https://cache-skyblockplus.harperdbcloud.com";
 	private static final Pattern minecraftUsernameRegex = Pattern.compile("^\\w+$", Pattern.CASE_INSENSITIVE);
 	private static final Pattern minecraftUuidRegex = Pattern.compile(
 		"[0-9a-f]{32}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
 	);
+	public static Connection cacheDatabaseConnection;
+	private static final Logger log = LoggerFactory.getLogger(ApiHandler.class);
+	public static boolean useAlternativeApi;
+
+	public static void initialize(){
+		try {
+			cacheDatabaseConnection = DriverManager.getConnection(
+					PLANET_SCALE_URL,
+					PLANET_SCALE_USERNAME, PLANET_SCALE_PASSWORD);
+			useAlternativeApi = reloadSettingsJson();
+			scheduler.scheduleWithFixedDelay(ApiHandler::updateCache, 60, 90, TimeUnit.SECONDS);
+			scheduler.scheduleWithFixedDelay(ApiHandler::updateLinkedAccounts, 60, 15, TimeUnit.SECONDS);
+		} catch (SQLException e) {
+			log.error("Exception when connecting to cache database", e);
+		}catch (Exception e){
+			log.error("Exception when initializing the ApiHandler", e);
+		}
+
+	}
 
 	public static boolean reloadSettingsJson() {
 		useAlternativeApi =
@@ -68,8 +87,6 @@ public class ApiHandler {
 			);
 		return useAlternativeApi;
 	}
-
-	public static boolean useAlternativeApi = reloadSettingsJson();
 
 	public static boolean isValidMinecraftUsername(String username) {
 		return username.length() > 2 && username.length() < 17 && minecraftUsernameRegex.matcher(username).find();
@@ -144,9 +161,8 @@ public class ApiHandler {
 		try {
 			List<String> nameHistory = new ArrayList<>();
 
-			JsonElement usernameJson;
 			if (!useAlternativeApi) {
-				usernameJson = getJson("https://api.ashcon.app/mojang/v2/user/" + uuid);
+				JsonElement usernameJson = getJson("https://api.ashcon.app/mojang/v2/user/" + uuid);
 				String username = higherDepth(usernameJson, "username").getAsString();
 				for (JsonElement name : higherDepth(usernameJson, "username_history").getAsJsonArray()) {
 					if (!higherDepth(name, "username").getAsString().equals(username)) {
@@ -154,7 +170,7 @@ public class ApiHandler {
 					}
 				}
 			} else {
-				usernameJson = higherDepth(getJson("https://playerdb.co/api/player/minecraft/" + uuid), "data.player");
+				JsonElement usernameJson = higherDepth(getJson("https://playerdb.co/api/player/minecraft/" + uuid), "data.player");
 				String username = higherDepth(usernameJson, "username").getAsString();
 				for (JsonElement name : higherDepth(usernameJson, "meta.name_history").getAsJsonArray()) {
 					if (!higherDepth(name, "name").getAsString().equals(username)) {
@@ -163,8 +179,7 @@ public class ApiHandler {
 				}
 			}
 			return nameHistory;
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ignored) {
 		}
 		return new ArrayList<>();
 	}
@@ -467,29 +482,13 @@ public class ApiHandler {
 		return null;
 	}
 
-	@SuppressWarnings("EmptyTryBlock")
 	public static void cacheJson(String playerUuid, JsonElement json) {
 		executor.submit(() -> {
-			try {
-				uuidToTimeSkyblockProfiles.put(playerUuid, Instant.now());
+			try(Statement statement = cacheDatabaseConnection.createStatement()) {
+				Instant now = Instant.now();
+				uuidToTimeSkyblockProfiles.put(playerUuid, now);
 
-				RequestBody body = RequestBody.create(
-					MediaType.parse("application/json"),
-					"{\"operation\":\"insert\",\"schema\":\"dev\",\"table\":\"profiles\",\"records\":[" +
-					"{\"uuid\":\"" +
-					playerUuid +
-					"\", \"data\":" +
-					json +
-					"}" +
-					"]}"
-				);
-				Request request = new Request.Builder()
-					.url(cacheDatabaseUrl)
-					.method("POST", body)
-					.addHeader("Content-Type", "application/json")
-					.addHeader("Authorization", "Basic " + CACHE_DATABASE_TOKEN)
-					.build();
-				try (Response ignored = okHttpClient.newCall(request).execute()) {}
+				statement.executeUpdate("INSERT INTO profiles VALUES ('" + playerUuid + "', " + now.toEpochMilli() + ", '" + json + "') ON DUPLICATE KEY UPDATE uuid = VALUES(uuid), time = VALUES(time), data = VALUES(data)");
 			} catch (Exception ignored) {}
 		});
 	}
@@ -499,86 +498,60 @@ public class ApiHandler {
 		if (lastUpdated != null && Duration.between(lastUpdated, Instant.now()).toMillis() > 90000) {
 			deleteCachedJson(playerUuid);
 		} else {
-			RequestBody body = RequestBody.create(
-				MediaType.parse("application/json"),
-				"{\"operation\":\"sql\",\"sql\":\"SELECT * FROM dev.profiles where uuid = '" + playerUuid + "'\"}"
-			);
-			Request request = new Request.Builder()
-				.url(cacheDatabaseUrl)
-				.method("POST", body)
-				.addHeader("Content-Type", "application/json")
-				.addHeader("Authorization", "Basic " + CACHE_DATABASE_TOKEN)
-				.build();
-
-			try (Response response = okHttpClient.newCall(request).execute()) {
-				JsonElement jsonResponse = JsonParser.parseString(response.body().string());
-				Instant lastUpdatedResponse = Instant.ofEpochMilli(higherDepth(jsonResponse, "__updatedtime__").getAsLong());
-				if (Duration.between(lastUpdatedResponse, Instant.now()).toMillis() > 90000) {
-					deleteCachedJson(playerUuid);
-				} else {
-					uuidToTimeSkyblockProfiles.put(playerUuid, lastUpdatedResponse);
-					return higherDepth(jsonResponse, "data");
+			try(Statement statement = cacheDatabaseConnection.createStatement()) {
+				try(ResultSet response = statement.executeQuery("SELECT * FROM profiles where uuid = '" + playerUuid + "'")) {
+					if (response.next()) {
+						Instant lastUpdatedResponse = Instant.ofEpochMilli(response.getLong("time"));
+						if (Duration.between(lastUpdatedResponse, Instant.now()).toMillis() > 90000) {
+							deleteCachedJson(playerUuid);
+						} else {
+							uuidToTimeSkyblockProfiles.put(playerUuid, lastUpdatedResponse);
+							return JsonParser.parseString(response.getString("data"));
+						}
+					}
 				}
-			} catch (Exception ignored) {}
+			}catch (Exception ignored){}
 		}
 		return null;
 	}
 
-	@SuppressWarnings("EmptyTryBlock")
 	public static void deleteCachedJson(String... playerUuids) {
+		if(playerUuids.length == 0){
+			return;
+		}
+
 		executor.submit(() -> {
+			StringBuilder query = new StringBuilder();
 			for (String playerUuid : playerUuids) {
 				uuidToTimeSkyblockProfiles.remove(playerUuid);
+				query.append("'").append(playerUuid).append("',");
+			}
+			if (query.charAt(query.length() - 1) == ',') {
+				query.deleteCharAt(query.length() - 1);
 			}
 
-			RequestBody body = RequestBody.create(
-				MediaType.parse("application/json"),
-				"{\"operation\":\"delete\",\"table\":\"profiles\",\"schema\":\"dev\",\"hash_values\":[\"" +
-				String.join("\",\"", playerUuids) +
-				"\"]}"
-			);
-			Request request = new Request.Builder()
-				.url(cacheDatabaseUrl)
-				.method("POST", body)
-				.addHeader("Content-Type", "application/json")
-				.addHeader("Authorization", "Basic " + CACHE_DATABASE_TOKEN)
-				.build();
-			try (Response ignored = okHttpClient.newCall(request).execute()) {} catch (Exception ignored) {}
+			try(Statement statement = cacheDatabaseConnection.createStatement()) {
+				statement.executeUpdate("DELETE FROM profiles WHERE uuid IN (" + query + ")");
+			}catch (Exception ignored){}
 		});
 	}
 
-	public static void scheduleDatabaseUpdate() {
-		scheduler.scheduleWithFixedDelay(ApiHandler::updateCache, 60, 90, TimeUnit.SECONDS);
-		//	scheduler.scheduleWithFixedDelay(Hypixel::clearDatabase, 1, 60, TimeUnit.MINUTES);
-	}
-
 	public static void updateCache() {
-		try {
-			RequestBody body = RequestBody.create(
-				MediaType.parse("application/json"),
-				"{\"operation\":\"delete_records_before\",\"date\":\"" +
-				Instant.now().minusSeconds(90).toString() +
-				"\",\"schema\":\"dev\",\"table\":\"profiles\"}"
-			);
-			Request request = new Request.Builder()
-				.url(cacheDatabaseUrl)
-				.method("POST", body)
-				.addHeader("Content-Type", "application/json")
-				.addHeader("Authorization", "Basic " + CACHE_DATABASE_TOKEN)
-				.build();
-
-			try (Response response = okHttpClient.newCall(request).execute()) {
-				JsonArray expiredCaches = JsonParser.parseString(response.body().string()).getAsJsonArray();
+		long now = Instant.now().minusSeconds(90).toEpochMilli();
+		try(Statement statement = cacheDatabaseConnection.createStatement()) {
+			try(ResultSet response = statement.executeQuery("SELECT uuid FROM profiles WHERE time < " + now + "")){
 				List<String> expiredCacheUuidList = new ArrayList<>();
-				for (JsonElement expiredCache : expiredCaches) {
-					try {
-						expiredCacheUuidList.add(higherDepth(expiredCache, "uuid").getAsString());
-					} catch (Exception ignored) {}
+				while (response.next()){
+					expiredCacheUuidList.add(response.getString("uuid"));
 				}
-
 				deleteCachedJson(expiredCacheUuidList.toArray(new String[0]));
 			}
-		} catch (Exception ignored) {}
+		}catch (Exception ignored){}
+
+
+		try(Statement statement = cacheDatabaseConnection.createStatement()) {
+			statement.executeUpdate("DELETE FROM profiles WHERE time < " + now + "");
+		}catch (Exception ignored){}
 	}
 
 	public static JsonArray processSkyblockProfilesArray(JsonArray array) {
@@ -607,58 +580,36 @@ public class ApiHandler {
 			currentProfile.add("members", currentProfileMembers);
 			array.set(i, currentProfile);
 		}
-
 		return array;
 	}
-	/*
-	public static void clearDatabase(){
+
+	public static void updateLinkedAccounts() {
+
 		try {
-			RequestBody body = RequestBody.create(
-					MediaType.parse("application/json"),"{\"operation\":\"system_information\",\"attributes\":[\"disk\"]}"
-			);
-			Request request = new Request.Builder()
-					.url(databaseUrl)
-					.method("POST", body)
-					.addHeader("Content-Type", "application/json")
-					.addHeader("Authorization", "Basic " + CACHE_DATABASE_TOKEN)
-					.build();
-
-			try (Response response = okHttpClient.newCall(request).execute()) {
-				JsonArray databaseSizes = higherDepth(JsonParser.parseString(response.body().string()), "disk.size").getAsJsonArray();
-				for (JsonElement expiredCache : databaseSizes) {
-					if(higherDepth(expiredCache, "fs").getAsString().equals("/dev/mapper/hdb_vg-hdb_lv")){
-						if(higherDepth(expiredCache, "use").getAsDouble() > 0.90){
-							RequestBody body1 = RequestBody.create(
-									MediaType.parse("application/json"),"{\"operation\":\"drop_table\",\"schema\":\"dev\",\"table\": \"profiles\"}"
-							);
-							Request request1 = new Request.Builder()
-									.url(databaseUrl)
-									.method("POST", body1)
-									.addHeader("Content-Type", "application/json")
-									.addHeader("Authorization", "Basic " + CACHE_DATABASE_TOKEN)
-									.build();
-
-							try (Response response1 = okHttpClient.newCall(request1).execute()) {}
-
-							RequestBody body1 = RequestBody.create(
-									MediaType.parse("application/json"),"{\"operation\":\"drop_table\",\"schema\":\"dev\",\"table\": \"profiles\"}"
-							);
-							Request request1 = new Request.Builder()
-									.url(databaseUrl)
-									.method("POST", body1)
-									.addHeader("Content-Type", "application/json")
-									.addHeader("Authorization", "Basic " + CACHE_DATABASE_TOKEN)
-									.build();
-
-							try (Response response1 = okHttpClient.newCall(request1).execute()) {}
-						}
-						return;
-					}
-				}
-			}
-		} catch (Exception ignored) {}
-
+			database
+					.getLinkedUsers()
+					.stream()
+					.filter(linkedAccountModel ->
+							Duration.between(Instant.ofEpochMilli(Long.parseLong(linkedAccountModel.getLastUpdated())), Instant.now()).toDays() > 5
+					).limit(10).forEach(o ->
+							asyncUuidToUsername(o.getMinecraftUuid()).thenApply(
+									username -> {
+										if(username != null){
+											database.addLinkedUser(
+													new LinkedAccountModel(
+															"" + Instant.now().toEpochMilli(),
+															o.getDiscordId(),
+															o.getMinecraftUuid(),
+															username
+													)
+											);
+										}
+										return null;
+									}
+							)
+					);
+		} catch (Exception e) {
+			log.error("Exception when updating linked accounts", e);
+		}
 	}
-*/
-
 }

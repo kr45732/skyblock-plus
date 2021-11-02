@@ -40,9 +40,10 @@ public class InformationCommand extends Command {
 
 	public static ActionRow getInformationActionRow() {
 		return ActionRow.of(
-			Button.link(BOT_INVITE_LINK_REQUIRED_SLASH, "Invite Link"),
+			Button.link(BOT_INVITE_LINK, "Invite Link"),
 			Button.link(DISCORD_SERVER_INVITE_LINK, "Discord Server"),
-			Button.link(FORUM_POST_LINK, "Forum Post")
+			Button.link(FORUM_POST_LINK, "Forum Post"),
+				Button.link("https://www.patreon.com/skyblock_plus", "Patreon")
 		);
 	}
 

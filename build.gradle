@@ -74,6 +74,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web:2.5.5'
     runtimeOnly 'org.postgresql:postgresql:42.2.24.jre7'
 
+    // MySQL
+    implementation 'mysql:mysql-connector-java:8.0.27'
+
     // Http Client
     implementation 'org.apache.httpcomponents:httpclient:4.5.13'
 

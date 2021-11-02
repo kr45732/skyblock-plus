@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
 public class MainListener extends ListenerAdapter {
 
 	public static final Map<String, AutomaticGuild> guildMap = new HashMap<>();
-	private static final Logger log = LoggerFactory.getLogger(SkyblockEventCommand.class);
+	private static final Logger log = LoggerFactory.getLogger(MainListener.class);
 
 	public static String onApplyReload(String guildId) {
 		String reloadStatus = "Error reloading";

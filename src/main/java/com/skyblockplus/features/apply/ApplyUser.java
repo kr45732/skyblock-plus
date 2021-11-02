@@ -40,6 +40,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 
 public class ApplyUser implements Serializable {
@@ -84,11 +85,16 @@ public class ApplyUser implements Serializable {
 			return;
 		}
 
-		TextChannel applicationChannel = applyCategory
+		ChannelAction<TextChannel> applicationChannelAction = applyCategory
 			.createTextChannel("apply-" + playerUsername)
 			.addPermissionOverride(event.getMember(), EnumSet.of(Permission.VIEW_CHANNEL), null)
-			.addPermissionOverride(event.getGuild().getPublicRole(), null, EnumSet.of(Permission.VIEW_CHANNEL))
-			.complete();
+			.addPermissionOverride(event.getGuild().getPublicRole(), null, EnumSet.of(Permission.VIEW_CHANNEL));
+
+		if (!higherDepth(currentSettings, "staffPingRoleId","none").equals("none")){
+			applicationChannelAction = applicationChannelAction.addPermissionOverride(event.getGuild().getRoleById(higherDepth(currentSettings, "staffPingRoleId").getAsString()), EnumSet.of(Permission.VIEW_CHANNEL), null);
+		}
+		TextChannel applicationChannel = applicationChannelAction.complete();
+
 		this.applicationChannelId = applicationChannel.getId();
 
 		boolean isIronman = false;
@@ -318,8 +324,9 @@ public class ApplyUser implements Serializable {
 	}
 
 	public boolean onButtonClick(ButtonClickEvent event, ApplyGuild parent) {
-		if (!event.getMessage().getId().equals(reactMessageId)) {
-			return false;
+		JsonElement currentSettings = JsonParser.parseString(currentSettingsString);
+		if(!event.getUser().getId().equals(applyingUserId) && !event.getMember().hasPermission(Permission.ADMINISTRATOR) && !(!higherDepth(currentSettings, "staffPingRoleId", "none").equals("none") && event.getMember().getRoles().contains(event.getGuild().getRoleById(higherDepth(currentSettings, "staffPingRoleId").getAsString())))){
+			return true;
 		}
 
 		switch (state) {
@@ -334,8 +341,6 @@ public class ApplyUser implements Serializable {
 						event.getHook().editOriginalEmbeds(finishApplyEmbed.build()).queue();
 
 						state = 2;
-
-						JsonElement currentSettings = JsonParser.parseString(currentSettingsString);
 
 						TextChannel staffChannel = jda.getTextChannelById(
 							higherDepth(currentSettings, "messageStaffChannelId").getAsString()
@@ -358,7 +363,6 @@ public class ApplyUser implements Serializable {
 									.split("Total Networth: ")[1];
 						} catch (Exception ignored) {}
 						applyPlayerStats.addField("Networth", networthStr, true);
-						System.out.println(nameHistory);
 						if (!nameHistory.isEmpty()) {
 							applyPlayerStats.addField("Name history", nameHistory, true);
 						}
@@ -442,8 +446,6 @@ public class ApplyUser implements Serializable {
 				break;
 			case 2:
 				TextChannel applicationChannel = jda.getTextChannelById(applicationChannelId);
-				JsonElement currentSettings = JsonParser.parseString(currentSettingsString);
-
 				User applyingUser = jda.retrieveUserById(applyingUserId).complete();
 				Message reactMessage = event.getChannel().retrieveMessageById(event.getMessageId()).complete();
 				switch (event.getButton().getId()) {
