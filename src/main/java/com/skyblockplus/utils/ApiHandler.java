@@ -18,6 +18,9 @@
 
 package com.skyblockplus.utils;
 
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.gson.JsonArray;
@@ -27,12 +30,6 @@ import com.google.gson.JsonParser;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.sql.*;
@@ -45,12 +42,13 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
-
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Utils.*;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ApiHandler {
-
 
 	public static final Cache<String, String> uuidToUsernameCache = Caffeine.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build();
 	public static final ConcurrentHashMap<String, Instant> uuidToTimeSkyblockProfiles = new ConcurrentHashMap<>();
@@ -62,20 +60,17 @@ public class ApiHandler {
 	private static final Logger log = LoggerFactory.getLogger(ApiHandler.class);
 	public static boolean useAlternativeApi;
 
-	public static void initialize(){
+	public static void initialize() {
 		try {
-			cacheDatabaseConnection = DriverManager.getConnection(
-					PLANET_SCALE_URL,
-					PLANET_SCALE_USERNAME, PLANET_SCALE_PASSWORD);
+			cacheDatabaseConnection = DriverManager.getConnection(PLANET_SCALE_URL, PLANET_SCALE_USERNAME, PLANET_SCALE_PASSWORD);
 			useAlternativeApi = reloadSettingsJson();
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateCache, 60, 90, TimeUnit.SECONDS);
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateLinkedAccounts, 60, 15, TimeUnit.SECONDS);
 		} catch (SQLException e) {
 			log.error("Exception when connecting to cache database", e);
-		}catch (Exception e){
+		} catch (Exception e) {
 			log.error("Exception when initializing the ApiHandler", e);
 		}
-
 	}
 
 	public static boolean reloadSettingsJson() {
@@ -179,8 +174,7 @@ public class ApiHandler {
 				}
 			}
 			return nameHistory;
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 		return new ArrayList<>();
 	}
 
@@ -484,11 +478,19 @@ public class ApiHandler {
 
 	public static void cacheJson(String playerUuid, JsonElement json) {
 		executor.submit(() -> {
-			try(Statement statement = cacheDatabaseConnection.createStatement()) {
+			try (Statement statement = cacheDatabaseConnection.createStatement()) {
 				Instant now = Instant.now();
 				uuidToTimeSkyblockProfiles.put(playerUuid, now);
 
-				statement.executeUpdate("INSERT INTO profiles VALUES ('" + playerUuid + "', " + now.toEpochMilli() + ", '" + json + "') ON DUPLICATE KEY UPDATE uuid = VALUES(uuid), time = VALUES(time), data = VALUES(data)");
+				statement.executeUpdate(
+					"INSERT INTO profiles VALUES ('" +
+					playerUuid +
+					"', " +
+					now.toEpochMilli() +
+					", '" +
+					json +
+					"') ON DUPLICATE KEY UPDATE uuid = VALUES(uuid), time = VALUES(time), data = VALUES(data)"
+				);
 			} catch (Exception ignored) {}
 		});
 	}
@@ -498,8 +500,8 @@ public class ApiHandler {
 		if (lastUpdated != null && Duration.between(lastUpdated, Instant.now()).toMillis() > 90000) {
 			deleteCachedJson(playerUuid);
 		} else {
-			try(Statement statement = cacheDatabaseConnection.createStatement()) {
-				try(ResultSet response = statement.executeQuery("SELECT * FROM profiles where uuid = '" + playerUuid + "'")) {
+			try (Statement statement = cacheDatabaseConnection.createStatement()) {
+				try (ResultSet response = statement.executeQuery("SELECT * FROM profiles where uuid = '" + playerUuid + "'")) {
 					if (response.next()) {
 						Instant lastUpdatedResponse = Instant.ofEpochMilli(response.getLong("time"));
 						if (Duration.between(lastUpdatedResponse, Instant.now()).toMillis() > 90000) {
@@ -510,13 +512,13 @@ public class ApiHandler {
 						}
 					}
 				}
-			}catch (Exception ignored){}
+			} catch (Exception ignored) {}
 		}
 		return null;
 	}
 
 	public static void deleteCachedJson(String... playerUuids) {
-		if(playerUuids.length == 0){
+		if (playerUuids.length == 0) {
 			return;
 		}
 
@@ -530,28 +532,27 @@ public class ApiHandler {
 				query.deleteCharAt(query.length() - 1);
 			}
 
-			try(Statement statement = cacheDatabaseConnection.createStatement()) {
+			try (Statement statement = cacheDatabaseConnection.createStatement()) {
 				statement.executeUpdate("DELETE FROM profiles WHERE uuid IN (" + query + ")");
-			}catch (Exception ignored){}
+			} catch (Exception ignored) {}
 		});
 	}
 
 	public static void updateCache() {
 		long now = Instant.now().minusSeconds(90).toEpochMilli();
-		try(Statement statement = cacheDatabaseConnection.createStatement()) {
-			try(ResultSet response = statement.executeQuery("SELECT uuid FROM profiles WHERE time < " + now + "")){
+		try (Statement statement = cacheDatabaseConnection.createStatement()) {
+			try (ResultSet response = statement.executeQuery("SELECT uuid FROM profiles WHERE time < " + now + "")) {
 				List<String> expiredCacheUuidList = new ArrayList<>();
-				while (response.next()){
+				while (response.next()) {
 					expiredCacheUuidList.add(response.getString("uuid"));
 				}
 				deleteCachedJson(expiredCacheUuidList.toArray(new String[0]));
 			}
-		}catch (Exception ignored){}
+		} catch (Exception ignored) {}
 
-
-		try(Statement statement = cacheDatabaseConnection.createStatement()) {
+		try (Statement statement = cacheDatabaseConnection.createStatement()) {
 			statement.executeUpdate("DELETE FROM profiles WHERE time < " + now + "");
-		}catch (Exception ignored){}
+		} catch (Exception ignored) {}
 	}
 
 	public static JsonArray processSkyblockProfilesArray(JsonArray array) {
@@ -584,30 +585,30 @@ public class ApiHandler {
 	}
 
 	public static void updateLinkedAccounts() {
-
 		try {
 			database
-					.getLinkedUsers()
-					.stream()
-					.filter(linkedAccountModel ->
-							Duration.between(Instant.ofEpochMilli(Long.parseLong(linkedAccountModel.getLastUpdated())), Instant.now()).toDays() > 5
-					).limit(10).forEach(o ->
-							asyncUuidToUsername(o.getMinecraftUuid()).thenApply(
-									username -> {
-										if(username != null){
-											database.addLinkedUser(
-													new LinkedAccountModel(
-															"" + Instant.now().toEpochMilli(),
-															o.getDiscordId(),
-															o.getMinecraftUuid(),
-															username
-													)
-											);
-										}
-										return null;
-									}
-							)
-					);
+				.getLinkedUsers()
+				.stream()
+				.filter(linkedAccountModel ->
+					Duration.between(Instant.ofEpochMilli(Long.parseLong(linkedAccountModel.getLastUpdated())), Instant.now()).toDays() > 5
+				)
+				.limit(10)
+				.forEach(o ->
+					asyncUuidToUsername(o.getMinecraftUuid())
+						.thenApply(username -> {
+							if (username != null) {
+								database.addLinkedUser(
+									new LinkedAccountModel(
+										"" + Instant.now().toEpochMilli(),
+										o.getDiscordId(),
+										o.getMinecraftUuid(),
+										username
+									)
+								);
+							}
+							return null;
+						})
+				);
 		} catch (Exception e) {
 			log.error("Exception when updating linked accounts", e);
 		}

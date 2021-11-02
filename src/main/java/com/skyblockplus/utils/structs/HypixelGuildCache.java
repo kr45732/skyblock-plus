@@ -149,8 +149,8 @@ public class HypixelGuildCache {
 			player.getHighestAmount("taming", ironmanOnly) +
 			"=:=" +
 			player.getHighestAmount("enchanting", ironmanOnly) +
-					"=:=" +
-					player.getHighestAmount("enchanting", ironmanOnly)
+			"=:=" +
+			player.getHighestAmount("enchanting", ironmanOnly)
 		);
 	}
 }

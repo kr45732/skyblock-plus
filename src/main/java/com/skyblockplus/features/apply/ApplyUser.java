@@ -90,8 +90,13 @@ public class ApplyUser implements Serializable {
 			.addPermissionOverride(event.getMember(), EnumSet.of(Permission.VIEW_CHANNEL), null)
 			.addPermissionOverride(event.getGuild().getPublicRole(), null, EnumSet.of(Permission.VIEW_CHANNEL));
 
-		if (!higherDepth(currentSettings, "staffPingRoleId","none").equals("none")){
-			applicationChannelAction = applicationChannelAction.addPermissionOverride(event.getGuild().getRoleById(higherDepth(currentSettings, "staffPingRoleId").getAsString()), EnumSet.of(Permission.VIEW_CHANNEL), null);
+		if (!higherDepth(currentSettings, "staffPingRoleId", "none").equals("none")) {
+			applicationChannelAction =
+				applicationChannelAction.addPermissionOverride(
+					event.getGuild().getRoleById(higherDepth(currentSettings, "staffPingRoleId").getAsString()),
+					EnumSet.of(Permission.VIEW_CHANNEL),
+					null
+				);
 		}
 		TextChannel applicationChannel = applicationChannelAction.complete();
 
@@ -325,7 +330,17 @@ public class ApplyUser implements Serializable {
 
 	public boolean onButtonClick(ButtonClickEvent event, ApplyGuild parent) {
 		JsonElement currentSettings = JsonParser.parseString(currentSettingsString);
-		if(!event.getUser().getId().equals(applyingUserId) && !event.getMember().hasPermission(Permission.ADMINISTRATOR) && !(!higherDepth(currentSettings, "staffPingRoleId", "none").equals("none") && event.getMember().getRoles().contains(event.getGuild().getRoleById(higherDepth(currentSettings, "staffPingRoleId").getAsString())))){
+		if (
+			!event.getUser().getId().equals(applyingUserId) &&
+			!event.getMember().hasPermission(Permission.ADMINISTRATOR) &&
+			!(
+				!higherDepth(currentSettings, "staffPingRoleId", "none").equals("none") &&
+				event
+					.getMember()
+					.getRoles()
+					.contains(event.getGuild().getRoleById(higherDepth(currentSettings, "staffPingRoleId").getAsString()))
+			)
+		) {
 			return true;
 		}
 

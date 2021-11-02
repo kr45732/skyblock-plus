@@ -39,7 +39,7 @@ public class GuildTrackerSlashCommand extends SlashCommand {
 			return;
 		}
 
-		switch (event.getSubcommandName()){
+		switch (event.getSubcommandName()) {
 			case "start":
 				event.embed(GuildTrackerCommand.startGuildTracker(event.player, event.getGuild()));
 				break;
@@ -58,13 +58,16 @@ public class GuildTrackerSlashCommand extends SlashCommand {
 	@Override
 	public CommandData getCommandData() {
 		return new CommandData(name, "Main guild tracker command")
-				.addSubcommands(
-						new SubcommandData("start", "Start tracking the change in a player's guild's mining and farming collections for each member")
-								.addOption(OptionType.STRING, "player", "Player username or mention"),
-						new SubcommandData("stop", "Stop tracking a player's guild")
-								.addOption(OptionType.STRING, "player", "Player username or mention"),
-						new SubcommandData("get", "Stop tracking a player's guild")
-								.addOption(OptionType.STRING, "player", "Get the tracker for the past 3 days. Updates every midnight")
-				);
+			.addSubcommands(
+				new SubcommandData(
+					"start",
+					"Start tracking the change in a player's guild's mining and farming collections for each member"
+				)
+					.addOption(OptionType.STRING, "player", "Player username or mention"),
+				new SubcommandData("stop", "Stop tracking a player's guild")
+					.addOption(OptionType.STRING, "player", "Player username or mention"),
+				new SubcommandData("get", "Stop tracking a player's guild")
+					.addOption(OptionType.STRING, "player", "Get the tracker for the past 3 days. Updates every midnight")
+			);
 	}
 }

@@ -18,6 +18,10 @@
 
 package com.skyblockplus.guilds;
 
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -32,9 +36,6 @@ import com.skyblockplus.utils.structs.HypixelGuildCache;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.time.Duration;
@@ -48,14 +49,12 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 
 public class GuildTrackerCommand extends Command {
-	private static final Pattern removeZeroProfilesPattern = Pattern.compile(".*[1-9].*");
 
+	private static final Pattern removeZeroProfilesPattern = Pattern.compile(".*[1-9].*");
 
 	public GuildTrackerCommand() {
 		this.name = "guild-tracker";
@@ -82,7 +81,9 @@ public class GuildTrackerCommand extends Command {
 			return invalidEmbed(guildResponse.getFailCause());
 		}
 
-		return addTrackingGuild(guild.getId(), guildResponse.get("_id").getAsString()) ? defaultEmbed("Success").setDescription("Now tracking " + guildResponse.get("name").getAsString()) : invalidEmbed("You are tracking 3/3 guilds");
+		return addTrackingGuild(guild.getId(), guildResponse.get("_id").getAsString())
+			? defaultEmbed("Success").setDescription("Now tracking " + guildResponse.get("name").getAsString())
+			: invalidEmbed("You are tracking 3/3 guilds");
 	}
 
 	public static EmbedBuilder stopGuildTracker(String username, Guild guild) {
@@ -96,11 +97,12 @@ public class GuildTrackerCommand extends Command {
 			return invalidEmbed(guildResponse.getFailCause());
 		}
 
-		return removeTrackingGuild(guild.getId(), guildResponse.get("_id").getAsString()) ? defaultEmbed("Success").setDescription("Stopped tracking " + guildResponse.get("name")) : invalidEmbed("You are not tracking " + guildResponse.get("name").getAsString());
+		return removeTrackingGuild(guild.getId(), guildResponse.get("_id").getAsString())
+			? defaultEmbed("Success").setDescription("Stopped tracking " + guildResponse.get("name"))
+			: invalidEmbed("You are not tracking " + guildResponse.get("name").getAsString());
 	}
 
-
-	public static EmbedBuilder getGuildTracker(String username, PaginatorEvent event){
+	public static EmbedBuilder getGuildTracker(String username, PaginatorEvent event) {
 		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
 		if (usernameUuidStruct.isNotValid()) {
 			return invalidEmbed(usernameUuidStruct.getFailCause());
@@ -112,25 +114,40 @@ public class GuildTrackerCommand extends Command {
 		}
 
 		for (JsonElement guildObject : getTrackingGuilds()) {
-			if(higherDepth(guildObject, "guild_id").getAsString().equals(guildResponse.get("_id").getAsString())){
+			if (higherDepth(guildObject, "guild_id").getAsString().equals(guildResponse.get("_id").getAsString())) {
 				CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(10);
-				PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_FIELDS).setEveryPageTitle(guildResponse.get("name").getAsString())
-						.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildResponse.get("_id").getAsString());
+				PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_FIELDS)
+					.setEveryPageTitle(guildResponse.get("name").getAsString())
+					.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildResponse.get("_id").getAsString());
 
 				JsonArray days = higherDepth(guildObject, "days").getAsJsonArray();
 				JsonArray dayMembers = higherDepth(days, "[0].members").getAsJsonArray();
 				for (JsonElement dayMember : dayMembers) {
 					StringBuilder dayMemberStr = new StringBuilder();
-					for(JsonElement dayProfile: higherDepth(dayMember, "profiles").getAsJsonArray()){
-						StringBuilder curProfileFarming = new StringBuilder("Farming: " + simplifyNumber(higherDepth(dayProfile, "farming", 0L)));
-						StringBuilder curProfileMining = new StringBuilder("Mining: " + simplifyNumber(higherDepth(dayProfile, "mining", 0L)));
-						for(int i= 1; i<days.size(); i++){
-							for(JsonElement otherDayMembers: higherDepth(days, "[" + i + "].members").getAsJsonArray()){
-								if(higherDepth(otherDayMembers, "uuid").getAsString().equals(higherDepth(dayMember, "uuid").getAsString())){
+					for (JsonElement dayProfile : higherDepth(dayMember, "profiles").getAsJsonArray()) {
+						StringBuilder curProfileFarming = new StringBuilder(
+							"Farming: " + simplifyNumber(higherDepth(dayProfile, "farming", 0L))
+						);
+						StringBuilder curProfileMining = new StringBuilder(
+							"Mining: " + simplifyNumber(higherDepth(dayProfile, "mining", 0L))
+						);
+						for (int i = 1; i < days.size(); i++) {
+							for (JsonElement otherDayMembers : higherDepth(days, "[" + i + "].members").getAsJsonArray()) {
+								if (
+									higherDepth(otherDayMembers, "uuid").getAsString().equals(higherDepth(dayMember, "uuid").getAsString())
+								) {
 									for (JsonElement otherDayProfile : higherDepth(otherDayMembers, "profiles").getAsJsonArray()) {
-										if(higherDepth(otherDayProfile, "name").getAsString().equals(higherDepth(dayProfile, "name").getAsString())){
-											curProfileFarming.append(" ➜ ").append(simplifyNumber(higherDepth(otherDayProfile, "farming", 0L)));
-											curProfileMining.append(" ➜ ").append(simplifyNumber(higherDepth(otherDayProfile, "mining", 0L)));
+										if (
+											higherDepth(otherDayProfile, "name")
+												.getAsString()
+												.equals(higherDepth(dayProfile, "name").getAsString())
+										) {
+											curProfileFarming
+												.append(" ➜ ")
+												.append(simplifyNumber(higherDepth(otherDayProfile, "farming", 0L)));
+											curProfileMining
+												.append(" ➜ ")
+												.append(simplifyNumber(higherDepth(otherDayProfile, "mining", 0L)));
 											break;
 										}
 									}
@@ -138,14 +155,20 @@ public class GuildTrackerCommand extends Command {
 								}
 							}
 						}
-						dayMemberStr.append(higherDepth(dayProfile, "name").getAsString()).append(" | ").append(curProfileFarming).append(" | ").append(curProfileMining).append("\n");
+						dayMemberStr
+							.append(higherDepth(dayProfile, "name").getAsString())
+							.append(" | ")
+							.append(curProfileFarming)
+							.append(" | ")
+							.append(curProfileMining)
+							.append("\n");
 					}
 					Matcher matcher = removeZeroProfilesPattern.matcher(dayMemberStr.toString().trim());
 					dayMemberStr = new StringBuilder();
-					while(matcher.find()){
+					while (matcher.find()) {
 						dayMemberStr.append(matcher.group()).append("\n");
 					}
-					if(dayMemberStr.length() > 0) {
+					if (dayMemberStr.length() > 0) {
 						extras.addEmbedField(higherDepth(dayMember, "username").getAsString(), dayMemberStr.toString().trim(), false);
 					}
 				}
@@ -156,7 +179,7 @@ public class GuildTrackerCommand extends Command {
 		return invalidEmbed(guildResponse.get("name").getAsString() + " is not currently being tracked");
 	}
 
-	public static void updateTrackingGuilds(){
+	public static void updateTrackingGuilds() {
 		JsonArray trackingArray = getTrackingGuilds();
 
 		for (int i = trackingArray.size() - 1; i >= 0; i--) {
@@ -165,18 +188,18 @@ public class GuildTrackerCommand extends Command {
 			String hypixelKey = null;
 			for (JsonElement requestedBy : higherDepth(guildObject, "requested_by").getAsJsonArray()) {
 				hypixelKey = database.getServerHypixelApiKey(requestedBy.getAsString());
-				if(hypixelKey != null){
+				if (hypixelKey != null) {
 					break;
 				}
 			}
-			if(hypixelKey == null){
+			if (hypixelKey == null) {
 				trackingArray.remove(i);
 				continue;
 			}
 			String finalHypixelKey = hypixelKey;
 
 			HypixelResponse guildResponse = getGuildFromId(higherDepth(guildObject, "guild_id").getAsString());
-			if(guildResponse.isNotValid()){
+			if (guildResponse.isNotValid()) {
 				trackingArray.remove(i);
 				continue;
 			}
@@ -193,42 +216,67 @@ public class GuildTrackerCommand extends Command {
 
 				CompletableFuture<String> guildMemberUsername = asyncUuidToUsername(guildMemberUuid);
 				futuresList.add(
-						guildMemberUsername.thenApply(guildMemberUsernameResponse -> {
-							try {
-								if (keyCooldownMap.get(finalHypixelKey).getRemainingLimit().get() < 5) {
-									System.out.println("Sleeping for " + keyCooldownMap.get(finalHypixelKey).getTimeTillReset().get() + " seconds");
-									TimeUnit.SECONDS.sleep(keyCooldownMap.get(finalHypixelKey).getTimeTillReset().get());
-								}
-							} catch (Exception ignored) {}
+					guildMemberUsername.thenApply(guildMemberUsernameResponse -> {
+						try {
+							if (keyCooldownMap.get(finalHypixelKey).getRemainingLimit().get() < 5) {
+								System.out.println(
+									"Sleeping for " + keyCooldownMap.get(finalHypixelKey).getTimeTillReset().get() + " seconds"
+								);
+								TimeUnit.SECONDS.sleep(keyCooldownMap.get(finalHypixelKey).getTimeTillReset().get());
+							}
+						} catch (Exception ignored) {}
 
-							// TODO: move skyblockProfilesFromUuid back to async if better hosting service
-							Player guildMemberPlayer = new Player(
-									guildMemberUuid,
-									guildMemberUsernameResponse,
-									skyblockProfilesFromUuid(guildMemberUuid, finalHypixelKey).getResponse()
+						// TODO: move skyblockProfilesFromUuid back to async if better hosting service
+						Player guildMemberPlayer = new Player(
+							guildMemberUuid,
+							guildMemberUsernameResponse,
+							skyblockProfilesFromUuid(guildMemberUuid, finalHypixelKey).getResponse()
+						);
+
+						JsonObject memberObj = new JsonObject();
+						memberObj.addProperty("username", guildMemberPlayer.getUsername());
+						memberObj.addProperty("uuid", guildMemberPlayer.getUuid());
+						JsonArray profilesObject = new JsonArray();
+						for (JsonElement profile : guildMemberPlayer.getProfileArray()) {
+							JsonObject profileObj = new JsonObject();
+							profileObj.add("name", higherDepth(profile, "cute_name"));
+							int scale = Math.min(higherDepth(profile, "members").getAsJsonObject().size(), 3);
+							JsonElement col = higherDepth(profile, "members." + guildMemberPlayer.getUuid() + ".collection");
+							profileObj.addProperty(
+								"farming",
+								scale *
+								(
+									higherDepth(col, "POTATO_ITEM", 0L) +
+									higherDepth(col, "CARROT_ITEM", 0L) +
+									higherDepth(col, "WHEAT", 0L) +
+									higherDepth(col, "INK_SACK:3", 0L) +
+									higherDepth(col, "SUGAR_CANE", 0L) +
+									higherDepth(col, "NETHER_STALK", 0L)
+								)
 							);
+							profileObj.addProperty(
+								"mining",
+								scale *
+								(
+									higherDepth(col, "DIAMOND", 0L) +
+									higherDepth(col, "GOLD_INGOT", 0L) +
+									higherDepth(col, "IRON_INGOT", 0L) +
+									higherDepth(col, "COAL", 0L) +
+									higherDepth(col, "REDSTONE", 0L) +
+									higherDepth(col, "QUARTZ", 0L) +
+									higherDepth(col, "EMERALD", 0L)
+								)
+							);
+							profilesObject.add(profileObj);
+						}
+						memberObj.add("profiles", profilesObject);
+						newMembersArray.add(memberObj);
 
-							JsonObject memberObj = new JsonObject();
-							memberObj.addProperty("username", guildMemberPlayer.getUsername());
-							memberObj.addProperty("uuid", guildMemberPlayer.getUuid());
-							JsonArray profilesObject = new JsonArray();
-							for (JsonElement profile : guildMemberPlayer.getProfileArray()) {
-								JsonObject profileObj = new JsonObject();
-								profileObj.add("name", higherDepth(profile, "cute_name"));
-								int scale = Math.min(higherDepth(profile, "members").getAsJsonObject().size(), 3);
-								JsonElement col = higherDepth(profile, "members." + guildMemberPlayer.getUuid() + ".collection");
-								profileObj.addProperty("farming", scale * (higherDepth(col, "POTATO_ITEM", 0L) + higherDepth(col, "CARROT_ITEM", 0L) + higherDepth(col, "WHEAT", 0L) + higherDepth(col, "INK_SACK:3", 0L) + higherDepth(col, "SUGAR_CANE", 0L) + higherDepth(col, "NETHER_STALK", 0L)));
-								profileObj.addProperty("mining", scale * (higherDepth(col, "DIAMOND", 0L) + higherDepth(col, "GOLD_INGOT", 0L) + higherDepth(col, "IRON_INGOT", 0L) + higherDepth(col, "COAL", 0L) + higherDepth(col, "REDSTONE", 0L) + higherDepth(col, "QUARTZ", 0L) + higherDepth(col, "EMERALD", 0L)));
-								profilesObject.add(profileObj);
-							}
-							memberObj.add("profiles", profilesObject);
-							newMembersArray.add(memberObj);
-
-							if (guildMemberPlayer.isValid()) {
-								newGuildCache.addPlayer(guildMemberPlayer);
-							}
-							return null;
-						})
+						if (guildMemberPlayer.isValid()) {
+							newGuildCache.addPlayer(guildMemberPlayer);
+						}
+						return null;
+					})
 				);
 			}
 
@@ -247,7 +295,9 @@ public class GuildTrackerCommand extends Command {
 			dayObject.add("members", newMembersArray);
 			JsonArray daysObject = higherDepth(guildObject, "days").getAsJsonArray();
 			if (daysObject.size() >= 3) {
-				daysObject.remove(streamJsonArray(daysObject).min(Comparator.comparingLong(day -> higherDepth(day, "time").getAsLong())).orElse(null));
+				daysObject.remove(
+					streamJsonArray(daysObject).min(Comparator.comparingLong(day -> higherDepth(day, "time").getAsLong())).orElse(null)
+				);
 			}
 			daysObject.add(dayObject);
 			guildObject.add("days", daysObject);
@@ -257,11 +307,17 @@ public class GuildTrackerCommand extends Command {
 		setTrackingJson(trackingArray);
 	}
 
-
-	public static void initialize(){
-		ZoneId z = ZoneId.of( "America/New_York" );
-		long minutesTillMidnight = Duration.between(Instant.now(), ZonedDateTime.now( z ).toLocalDate().plusDays(1).atStartOfDay( z )).toMinutes();
-		scheduler.scheduleAtFixedRate(GuildTrackerCommand::updateTrackingGuilds, minutesTillMidnight, TimeUnit.DAYS.toMinutes(1), TimeUnit.MINUTES);
+	public static void initialize() {
+		ZoneId z = ZoneId.of("America/New_York");
+		long minutesTillMidnight = Duration
+			.between(Instant.now(), ZonedDateTime.now(z).toLocalDate().plusDays(1).atStartOfDay(z))
+			.toMinutes();
+		scheduler.scheduleAtFixedRate(
+			GuildTrackerCommand::updateTrackingGuilds,
+			minutesTillMidnight,
+			TimeUnit.DAYS.toMinutes(1),
+			TimeUnit.MINUTES
+		);
 	}
 
 	@Override
@@ -272,12 +328,12 @@ public class GuildTrackerCommand extends Command {
 				logCommand();
 
 				if (args.length == 3 && args[1].equals("start") && args[2].startsWith("u:")) {
-					embed(startGuildTracker(args[2].split("u:")[1],event.getGuild()));
+					embed(startGuildTracker(args[2].split("u:")[1], event.getGuild()));
 					return;
-				}else if (args.length == 3 && args[1].equals("stop") && args[2].startsWith("u:")) {
+				} else if (args.length == 3 && args[1].equals("stop") && args[2].startsWith("u:")) {
 					embed(stopGuildTracker(args[2].split("u:")[1], event.getGuild()));
 					return;
-				} else if(args.length == 3 && args[1].equals("get") && args[2].startsWith("u:")){
+				} else if (args.length == 3 && args[1].equals("get") && args[2].startsWith("u:")) {
 					paginate(getGuildTracker(args[2].split("u:")[1], new PaginatorEvent(event)));
 					return;
 				}
@@ -288,13 +344,13 @@ public class GuildTrackerCommand extends Command {
 			.submit();
 	}
 
-	public static boolean addTrackingGuild(String serverId, String guildId){
+	public static boolean addTrackingGuild(String serverId, String guildId) {
 		JsonArray trackingArray = getTrackingGuilds();
 
 		int numTracking = 0;
 		for (int i = trackingArray.size() - 1; i >= 0; i--) {
 			JsonObject guildObject = trackingArray.get(i).getAsJsonObject();
-			if(higherDepth(guildObject, "guild_id", "").equals(guildId)){
+			if (higherDepth(guildObject, "guild_id", "").equals(guildId)) {
 				JsonArray requestedBy = higherDepth(guildObject, "requested_by").getAsJsonArray();
 				requestedBy.add(serverId);
 				guildObject.add("requested_by", requestedBy);
@@ -303,12 +359,12 @@ public class GuildTrackerCommand extends Command {
 				return true;
 			}
 
-			if(streamJsonArray(guildObject.get("requested_by").getAsJsonArray()).anyMatch(g -> g.getAsString().equals(serverId))){
-				numTracking ++;
+			if (streamJsonArray(guildObject.get("requested_by").getAsJsonArray()).anyMatch(g -> g.getAsString().equals(serverId))) {
+				numTracking++;
 			}
 		}
 
-		if(numTracking == 3){
+		if (numTracking == 3) {
 			return false;
 		}
 
@@ -324,39 +380,39 @@ public class GuildTrackerCommand extends Command {
 		return true;
 	}
 
-	public static void setTrackingJson(JsonElement data){
-		try(Statement statement = cacheDatabaseConnection.createStatement()){
+	public static void setTrackingJson(JsonElement data) {
+		try (Statement statement = cacheDatabaseConnection.createStatement()) {
 			statement.executeUpdate("INSERT INTO tracking VALUES (1, '" + data + "') ON DUPLICATE KEY UPDATE data = VALUES(data)");
-		}catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	public static JsonArray getTrackingGuilds(){
-		try(Statement statement = cacheDatabaseConnection.createStatement()){
-			try(ResultSet response = statement.executeQuery("SELECT * FROM tracking")){
+	public static JsonArray getTrackingGuilds() {
+		try (Statement statement = cacheDatabaseConnection.createStatement()) {
+			try (ResultSet response = statement.executeQuery("SELECT * FROM tracking")) {
 				response.next();
 				return JsonParser.parseString(response.getString("data")).getAsJsonArray();
 			}
-		}catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
-	public static boolean removeTrackingGuild(String serverId, String guildId){
+	public static boolean removeTrackingGuild(String serverId, String guildId) {
 		JsonArray trackingGuilds = getTrackingGuilds();
 
 		for (int i = trackingGuilds.size() - 1; i >= 0; i--) {
 			JsonObject guildObject = trackingGuilds.get(i).getAsJsonObject();
-			if(higherDepth(guildObject, "guild_id", "").equals(guildId)){
+			if (higherDepth(guildObject, "guild_id", "").equals(guildId)) {
 				JsonArray requestedBy = higherDepth(guildObject, "requested_by").getAsJsonArray();
 				for (JsonElement requested : requestedBy) {
-					if(requested.getAsString().equals(serverId)){
+					if (requested.getAsString().equals(serverId)) {
 						requestedBy.remove(requested);
-						if(requestedBy.size() == 0){
+						if (requestedBy.size() == 0) {
 							trackingGuilds.remove(i);
-						}else{
+						} else {
 							guildObject.add("requested_by", requestedBy);
 							trackingGuilds.set(i, guildObject);
 						}

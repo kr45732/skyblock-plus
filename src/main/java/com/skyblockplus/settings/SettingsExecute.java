@@ -2097,7 +2097,9 @@ public class SettingsExecute {
 	public EmbedBuilder addMee6Role(String level, String roleMention) {
 		Role role = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
 		EmbedBuilder eb = checkRoleEmebd(role);
-		if(eb != null){return eb;}
+		if (eb != null) {
+			return eb;
+		}
 
 		int intLevel = -1;
 		try {
@@ -2331,16 +2333,15 @@ public class SettingsExecute {
 		return defaultEmbed("Settings").setDescription(description);
 	}
 
-	public EmbedBuilder checkRoleEmebd(Role role){
+	public EmbedBuilder checkRoleEmebd(Role role) {
 		if (role == null) {
 			return invalidEmbed("The provided role does not exist.");
 		} else if (role.isPublicRole()) {
 			return invalidEmbed("The role cannot be the everyone role.");
 		} else if (role.isManaged()) {
 			return invalidEmbed("The role cannot be a managed role");
-		}else{
+		} else {
 			return null;
 		}
 	}
-
 }

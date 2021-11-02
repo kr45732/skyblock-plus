@@ -1131,7 +1131,7 @@ public class Player {
 		);
 	}
 
-    public enum WeightType {
+	public enum WeightType {
 		NONE,
 		SENITHER,
 		LILY,

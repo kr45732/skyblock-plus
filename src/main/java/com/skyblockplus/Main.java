@@ -170,7 +170,7 @@ public class Main {
 					new TrackAuctionsCommand(),
 					new SkyblockCommand(),
 					new GuildStatisticsCommand(),
-						new GuildTrackerCommand()
+					new GuildTrackerCommand()
 				)
 				.build();
 
@@ -225,7 +225,7 @@ public class Main {
 					new TrackAuctionsSlashCommand(),
 					new SkyblockSlashCommand(),
 					new GuildStatisticsSlashCommand(),
-						new GuildTrackerSlashCommand()
+					new GuildTrackerSlashCommand()
 				);
 
 		jda =
