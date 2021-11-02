@@ -21,15 +21,14 @@ package com.skyblockplus.guilds;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
-public class GuildSlashCommand extends SlashCommand {
+public class GuildTrackerSlashCommand extends SlashCommand {
 
-	public GuildSlashCommand() {
-		this.name = "guild";
+	public GuildTrackerSlashCommand() {
+		this.name = "guild-tracker";
 	}
 
 	@Override
@@ -40,21 +39,15 @@ public class GuildSlashCommand extends SlashCommand {
 			return;
 		}
 
-		switch (event.getSubcommandName()) {
-			case "player":
-				event.embed(GuildCommand.getGuildPlayer(event.player));
+		switch (event.getSubcommandName()){
+			case "start":
+				event.embed(GuildTrackerCommand.startGuildTracker(event.player, event.getGuild()));
 				break;
-			case "information":
-				event.embed(GuildCommand.getGuildInfo(event.player));
+			case "stop":
+				event.embed(GuildTrackerCommand.stopGuildTracker(event.player, event.getGuild()));
 				break;
-			case "members":
-				event.paginate(GuildCommand.getGuildMembersFromPlayer(event.player, new PaginatorEvent(event)));
-				break;
-			case "experience":
-				OptionMapping numDays = event.getEvent().getOption("days");
-				event.paginate(
-					GuildCommand.getGuildExpFromPlayer(event.player, numDays != null ? numDays.getAsLong() : 7, new PaginatorEvent(event))
-				);
+			case "get":
+				event.paginate(GuildTrackerCommand.getGuildTracker(event.player, new PaginatorEvent(event)));
 				break;
 			default:
 				event.embed(event.invalidCommandMessage());
@@ -64,17 +57,14 @@ public class GuildSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData(name, "Main guild command")
-			.addSubcommands(
-				new SubcommandData("player", "Find what guild a player is in")
-					.addOption(OptionType.STRING, "player", "Player username or mention"),
-				new SubcommandData("information", "Get information and statistics about a player's guild")
-					.addOption(OptionType.STRING, "player", "Player username or mention"),
-				new SubcommandData("members", "Get a list of all members in a player's guild")
-					.addOption(OptionType.STRING, "player", "Player username or mention"),
-				new SubcommandData("experience", "Get the experience leaderboard for a player's guild")
-					.addOption(OptionType.STRING, "player", "Player username or mention")
-					.addOption(OptionType.INTEGER, "days", "Number of days")
-			);
+		return new CommandData(name, "Main guild tracker command")
+				.addSubcommands(
+						new SubcommandData("start", "Start tracking the change in a player's guild's mining and farming collections for each member")
+								.addOption(OptionType.STRING, "player", "Player username or mention"),
+						new SubcommandData("stop", "Stop tracking a player's guild")
+								.addOption(OptionType.STRING, "player", "Player username or mention"),
+						new SubcommandData("get", "Stop tracking a player's guild")
+								.addOption(OptionType.STRING, "player", "Get the tracker for the past 3 days. Updates every midnight")
+				);
 	}
 }

@@ -224,7 +224,8 @@ public class Main {
 					new UuidSlashCommand(),
 					new TrackAuctionsSlashCommand(),
 					new SkyblockSlashCommand(),
-					new GuildStatisticsSlashCommand()
+					new GuildStatisticsSlashCommand(),
+						new GuildTrackerSlashCommand()
 				);
 
 		jda =
