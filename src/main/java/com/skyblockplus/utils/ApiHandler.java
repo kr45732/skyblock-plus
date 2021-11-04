@@ -36,6 +36,7 @@ import java.sql.*;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -58,14 +59,13 @@ public class ApiHandler {
 	);
 	public static Connection cacheDatabaseConnection;
 	private static final Logger log = LoggerFactory.getLogger(ApiHandler.class);
-	public static boolean useAlternativeApi;
+	public static boolean useAlternativeApi = reloadSettingsJson();
 
 	public static void initialize() {
 		try {
 			cacheDatabaseConnection = DriverManager.getConnection(PLANET_SCALE_URL, PLANET_SCALE_USERNAME, PLANET_SCALE_PASSWORD);
-			useAlternativeApi = reloadSettingsJson();
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateCache, 60, 90, TimeUnit.SECONDS);
-			scheduler.scheduleWithFixedDelay(ApiHandler::updateLinkedAccounts, 60, 15, TimeUnit.SECONDS);
+			scheduler.scheduleWithFixedDelay(ApiHandler::updateLinkedAccounts, 60, 30, TimeUnit.SECONDS);
 		} catch (SQLException e) {
 			log.error("Exception when connecting to cache database", e);
 		} catch (Exception e) {
@@ -316,7 +316,8 @@ public class ApiHandler {
 	}
 
 	public static HypixelResponse getAuctionFromUuid(String auctionUuid) {
-		return getAuctionGeneric("&uuid=" + auctionUuid);
+		HypixelResponse response = getAuctionGeneric("&uuid=" + auctionUuid);
+		return response.isNotValid() ? response : (response.get("[0]") != null ? response : new HypixelResponse("Invalid auction UUID"));
 	}
 
 	public static HypixelResponse getGuildGeneric(String query) {

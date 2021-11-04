@@ -47,7 +47,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +66,8 @@ public class SkyblockEventCommand extends Command {
 	public static void endSkyblockEvent(String guildId) {
 		JsonElement runningEventSettings = database.getRunningEventSettings(guildId);
 		TextChannel announcementChannel = jda.getTextChannelById(higherDepth(runningEventSettings, "announcementId").getAsString());
+		guildMap.get(guildId).setEventMemberListLastUpdated(null);
+		announcementChannel.retrieveMessageById(higherDepth(runningEventSettings, "announcementMessageId").getAsString()).queue(m -> m.editMessageComponents().queue());
 
 		List<EventMember> guildMemberPlayersList = getEventLeaderboardList(runningEventSettings);
 
@@ -245,6 +249,90 @@ public class SkyblockEventCommand extends Command {
 
 		guildMemberPlayersList.sort(Comparator.comparingDouble(o1 -> -Double.parseDouble(o1.getStartingAmount())));
 		return guildMemberPlayersList;
+	}
+
+	public static EmbedBuilder getEventLeaderboard(ButtonClickEvent event) {
+		String guildId = event.getGuild().getId();
+		if (!database.getSkyblockEventActive(guildId)) {
+			return defaultEmbed("No event running");
+		}
+
+		if (!guildMap.containsKey(guildId)) {
+			return defaultEmbed("No guild found");
+		}
+
+		AutomaticGuild currentGuild = guildMap.get(guildId);
+
+		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(25);
+
+		if (
+				(currentGuild.eventMemberList != null) &&
+						(currentGuild.eventMemberListLastUpdated != null) &&
+						(Duration.between(currentGuild.eventMemberListLastUpdated, Instant.now()).toMinutes() < 15)
+		) {
+			List<EventMember> eventMemberList = currentGuild.eventMemberList;
+			for (int i = 0; i < eventMemberList.size(); i++) {
+				EventMember eventMember = eventMemberList.get(i);
+				paginateBuilder.addItems(
+						"`" +
+								(i + 1) +
+								")` " +
+								fixUsername(eventMember.getUsername()) +
+								" | +" +
+								formatNumber(Double.parseDouble(eventMember.getStartingAmount()))
+				);
+			}
+
+			if (paginateBuilder.getItemsSize() > 0) {
+				long minutesSinceUpdate = Duration.between(currentGuild.eventMemberListLastUpdated, Instant.now()).toMinutes();
+
+				String minutesSinceUpdateString;
+				if (minutesSinceUpdate == 0) {
+					minutesSinceUpdateString = " less than a minute ";
+				} else if (minutesSinceUpdate == 1) {
+					minutesSinceUpdateString = " 1 minute ";
+				} else {
+					minutesSinceUpdateString = minutesSinceUpdate + " minutes ";
+				}
+
+				paginateBuilder.setPaginatorExtras(
+						new PaginatorExtras()
+								.setEveryPageTitle("Event Leaderboard")
+								.setEveryPageText("**Last updated " + minutesSinceUpdateString + " ago**\n")
+				);
+				paginateBuilder.build().paginate(event.getHook(), 0);
+				return null;
+			}
+
+			return defaultEmbed("Event Leaderboard").setDescription("No one joined the event");
+		}
+
+		JsonElement runningSettings = database.getRunningEventSettings(guildId);
+		List<EventMember> guildMemberPlayersList = getEventLeaderboardList(runningSettings);
+
+		for (int i = 0; i < guildMemberPlayersList.size(); i++) {
+			EventMember eventMember = guildMemberPlayersList.get(i);
+			paginateBuilder.addItems(
+					"`" +
+							(i + 1) +
+							")` " +
+							fixUsername(eventMember.getUsername()) +
+							" | +" +
+							formatNumber(Double.parseDouble(eventMember.getStartingAmount()))
+			);
+		}
+
+		paginateBuilder.setPaginatorExtras(new PaginatorExtras().setEveryPageTitle("Event Leaderboard"));
+
+		guildMap.get(guildId).setEventMemberList(guildMemberPlayersList);
+		guildMap.get(guildId).setEventMemberListLastUpdated(Instant.now());
+
+		if (paginateBuilder.getItemsSize() > 0) {
+			paginateBuilder.build().paginate(event.getHook(), 0);
+			return null;
+		}
+
+		return defaultEmbed("Event Leaderboard").setDescription("No one joined the event");
 	}
 
 	public static EmbedBuilder getEventLeaderboard(PaginatorEvent event) {
@@ -512,15 +600,15 @@ public class SkyblockEventCommand extends Command {
 
 			Instant eventInstantEnding = Instant.ofEpochSecond(higherDepth(currentSettings, "timeEndingSeconds").getAsLong());
 
-			eb.addField("End Date", "Ends in <t:" + eventInstantEnding.getEpochSecond() + ":R>", false);
+			eb.addField("End Date", "Ends <t:" + eventInstantEnding.getEpochSecond() + ":R>", false);
 
 			ArrayList<String> prizesKeys = getJsonKeys(higherDepth(currentSettings, "prizeMap"));
 			StringBuilder ebString = new StringBuilder();
 			for (String prizePlace : prizesKeys) {
 				ebString
-					.append("• ")
+					.append("`")
 					.append(prizePlace)
-					.append(") - ")
+					.append(")` ")
 					.append(higherDepth(currentSettings, "prizeMap." + prizePlace).getAsString())
 					.append("\n");
 			}
@@ -538,9 +626,12 @@ public class SkyblockEventCommand extends Command {
 		}
 	}
 
-	public static EmbedBuilder cancelSkyblockEvent(String guildId) {
-		if (database.getSkyblockEventActive(guildId)) {
-			int code = database.setSkyblockEventSettings(guildId, new EventSettings());
+	public static EmbedBuilder cancelSkyblockEvent(Guild guild) {
+		JsonElement settings = database.getRunningEventSettings(guild.getId());
+		if (higherDepth(settings, "eventType", "").length() > 0) {
+			guild.getTextChannelById(higherDepth(settings, "announcementId").getAsString()).retrieveMessageById(higherDepth(settings, "announcementMessageId").getAsString()).queue(m -> m.editMessageComponents().queue());
+			guildMap.get(guild.getId()).setEventMemberListLastUpdated(null);
+			int code =  database.setSkyblockEventSettings(guild.getId(), new EventSettings());
 
 			if (code == 200) {
 				return defaultEmbed("Event canceled");
@@ -599,7 +690,7 @@ public class SkyblockEventCommand extends Command {
 							embed(getCurrentSkyblockEvent(event.getGuild().getId()));
 							return;
 						case "cancel":
-							embed(cancelSkyblockEvent(event.getGuild().getId()));
+							embed(cancelSkyblockEvent(event.getGuild()));
 							return;
 						case "join":
 							embed(joinSkyblockEvent(event.getGuild().getId(), event.getAuthor().getId(), args));

@@ -44,45 +44,49 @@ public class SacksCommand extends Command {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			Map<String, Integer> sacksMap = player.getPlayerSacks();
-			if (sacksMap != null) {
-				CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(20);
-
-				JsonElement bazaarPrices = higherDepth(getBazaarJson(), "products");
-
-				final double[] total = { 0 };
-				sacksMap
-					.entrySet()
-					.stream()
-					.sorted(
-						Comparator.comparingDouble(entry ->
-							-higherDepth(bazaarPrices, entry.getKey() + ".sell_summary.[0].pricePerUnit", 0.0) * entry.getValue()
-						)
-					)
-					.forEach(currentSack -> {
-						double sackPrice =
-							higherDepth(bazaarPrices, currentSack.getKey() + ".sell_summary.[0].pricePerUnit", 0.0) *
-							currentSack.getValue();
-						paginateBuilder.addItems(
-							"**" +
-							convertSkyblockIdName(currentSack.getKey()) +
-							":** " +
-							formatNumber(currentSack.getValue()) +
-							" ➜ " +
-							simplifyNumber(sackPrice)
-						);
-						total[0] += sackPrice;
-					});
-
-				paginateBuilder.setPaginatorExtras(
-					new PaginatorExtras()
-						.setEveryPageTitle(player.getUsername())
-						.setEveryPageThumbnail(player.getThumbnailUrl())
-						.setEveryPageTitleUrl(player.skyblockStatsLink())
-						.setEveryPageText("**Total value:** " + roundAndFormat(total[0]) + "\n")
-				);
-				event.paginate(paginateBuilder);
-				return null;
+			if(sacksMap == null) {
+				return invalidEmbed("Inventory API disabled");
 			}
+
+			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(20);
+
+			JsonElement bazaarPrices = higherDepth(getBazaarJson(), "products");
+
+			final double[] total = { 0 };
+			sacksMap
+				.entrySet()
+				.stream()
+				.sorted(
+					Comparator.comparingDouble(entry ->
+						-higherDepth(bazaarPrices, entry.getKey() + ".sell_summary.[0].pricePerUnit", 0.0) * entry.getValue()
+					)
+				)
+				.forEach(currentSack -> {
+					double sackPrice =
+						higherDepth(bazaarPrices, currentSack.getKey() + ".sell_summary.[0].pricePerUnit", 0.0) *
+						currentSack.getValue();
+					paginateBuilder.addItems(
+						"**" +
+						convertSkyblockIdName(currentSack.getKey()) +
+						":** " +
+						formatNumber(currentSack.getValue()) +
+						" ➜ " +
+						simplifyNumber(sackPrice)
+					);
+					total[0] += sackPrice;
+				});
+
+			paginateBuilder.setPaginatorExtras(
+				new PaginatorExtras()
+					.setEveryPageTitle(player.getUsername())
+					.setEveryPageThumbnail(player.getThumbnailUrl())
+					.setEveryPageTitleUrl(player.skyblockStatsLink())
+					.setEveryPageText("**Total value:** " + roundAndFormat(total[0]) + "\n")
+			);
+			event.paginate(paginateBuilder);
+			return null;
+
+
 		}
 		return player.getFailEmbed();
 	}

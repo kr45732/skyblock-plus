@@ -18,13 +18,6 @@
 
 package com.skyblockplus.settings;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
-import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -45,13 +38,21 @@ import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import com.vdurmont.emoji.EmojiParser;
-import java.util.*;
-import java.util.Map.Entry;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.PermissionException;
+
+import java.util.*;
+import java.util.Map.Entry;
+
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Utils.*;
 
 public class SettingsExecute {
 
@@ -184,9 +185,9 @@ public class SettingsExecute {
 						}
 					} else if (args.length == 4) {
 						if (args[2].equals("enable")) {
-							eb = setRoleEnable(args[3], "true");
+							eb = setRoleEnable(args[3], true);
 						} else if (args[2].equals("disable")) {
-							eb = setRoleEnable(args[3], "false");
+							eb = setRoleEnable(args[3], false);
 						}
 					} else if (args.length == 5) {
 						if (args[2].equals("remove")) {
@@ -883,6 +884,7 @@ public class SettingsExecute {
 		rolePageMap.put("skill_average", 26);
 		rolePageMap.put("pet_score", 27);
 		rolePageMap.put("dungeon_secrets", 28);
+		rolePageMap.put("accessory_count", 29);
 
 		if (rolePageMap.containsKey(roleName)) {
 			CustomPaginator.Builder currentRoleSettings = getCurrentRolesSettings(database.getRolesSettings(guild.getId()));
@@ -1056,6 +1058,14 @@ public class SettingsExecute {
 							.append("settings roles add dungeon_secrets 25000 @secret sweat`\n");
 						break;
 					}
+				case "accessory_count":
+				{
+					ebFieldString
+							.append("**A player's dungeon unique accessory count**\nExample: `")
+							.append(guildPrefix)
+							.append("settings roles add accessory_count 75 @accessory collector`\n");
+					break;
+				}
 				case "enderman":
 					{
 						ebFieldString
@@ -1185,7 +1195,32 @@ public class SettingsExecute {
 		return defaultEmbed("Invalid Input");
 	}
 
-	public EmbedBuilder setRoleEnable(String roleName, String enable) {
+	public EmbedBuilder setRoleEnable(String roleName, boolean enable) {
+		if(roleName.equals("")){
+			JsonObject roleSettings = database.getRolesSettings(guild.getId()).getAsJsonObject();
+			if(enable){
+				List<String> enabled = new ArrayList<>();
+				for (Entry<String, JsonElement> role : roleSettings.entrySet()) {
+					if(!role.getKey().equals("enable") && higherDepth(role.getValue(), "levels").getAsJsonArray().size() > 0){
+						JsonObject curRole = role.getValue().getAsJsonObject();
+						curRole.addProperty("enable", "true");
+						roleSettings.add(role.getKey(), curRole);
+						enabled.add(role.getKey());
+					}
+				}
+				return defaultSettingsEmbed().setDescription("**Enabled the following roles:** " + String.join(", ", enabled));
+			}else{
+				for (Entry<String, JsonElement> role : roleSettings.entrySet()) {
+					if(!role.getKey().equals("enable")){
+						JsonObject curRole = role.getValue().getAsJsonObject();
+						curRole.addProperty("enable", "false");
+						roleSettings.add(role.getKey(), curRole);
+					}
+				}
+				return defaultSettingsEmbed().setDescription("Disabled all automatic roles");
+			}
+		}
+
 		JsonObject currentRoleSettings = null;
 		try {
 			currentRoleSettings = database.getRoleSettings(guild.getId(), roleName).getAsJsonObject();
@@ -1203,7 +1238,7 @@ public class SettingsExecute {
 			}
 
 			EmbedBuilder eb = defaultEmbed("Settings");
-			eb.setDescription("**" + roleName + " role:** " + (enable.equalsIgnoreCase("true") ? "enabled" : "disabled"));
+			eb.setDescription("**" + roleName + " role:** " + (enable ? "enabled" : "disabled"));
 			return eb;
 		} else {
 			currentRoleSettings.addProperty("enable", "false");
@@ -1361,7 +1396,7 @@ public class SettingsExecute {
 				currentRoleSettings = database.getRoleSettings(guild.getId(), roleName).getAsJsonObject();
 
 				if (currentRoleSettings.get("levels").getAsJsonArray().size() == 0) {
-					setRoleEnable(roleName, "false");
+					setRoleEnable(roleName, false);
 				}
 
 				if (!allowRolesEnable()) {
@@ -2040,7 +2075,7 @@ public class SettingsExecute {
 		JsonObject settings = getMee6Json();
 
 		EmbedBuilder eb = defaultSettingsEmbed(higherDepth(settings, "enable", "false").equals("true") ? "**Enabled**" : "**Disabled**");
-		JsonArray curRoles = higherDepth(settings, "mee6Ranks").getAsJsonArray();
+		JsonArray curRoles = higherDepth(settings, "levels").getAsJsonArray();
 		if (curRoles.size() == 0) {
 			eb.appendDescription("\n**• Leveling roles:** none");
 		} else {
@@ -2070,7 +2105,7 @@ public class SettingsExecute {
 
 		JsonElement settings = getMee6Json();
 
-		if (higherDepth(settings, "mee6Ranks").getAsJsonArray().size() == 0) {
+		if (higherDepth(settings, "levels").getAsJsonArray().size() == 0) {
 			return invalidEmbed("You must set at least one leveling role.");
 		}
 		try {
@@ -2110,7 +2145,7 @@ public class SettingsExecute {
 		}
 
 		JsonObject settings = getMee6Json();
-		JsonArray ranks = settings.getAsJsonArray("mee6Ranks");
+		JsonArray ranks = settings.getAsJsonArray("levels");
 
 		if (ranks.size() >= 10) {
 			return defaultEmbed("You have reached the max amount of Mee6 roles (10/10).");
@@ -2122,7 +2157,7 @@ public class SettingsExecute {
 		}
 
 		ranks.add(gson.toJsonTree(new RoleObject("" + intLevel, role.getId())));
-		settings.add("mee6Ranks", ranks);
+		settings.add("levels", ranks);
 
 		int responseCode = setMee6Settings(settings);
 		if (responseCode != 200) {
@@ -2142,14 +2177,14 @@ public class SettingsExecute {
 		}
 
 		JsonObject curSettings = getMee6Json();
-		JsonArray curRanks = curSettings.get("mee6Ranks").getAsJsonArray();
+		JsonArray curRanks = curSettings.get("levels").getAsJsonArray();
 		for (JsonElement rank : curRanks) {
 			if (higherDepth(rank, "value").getAsInt() == intLevel) {
 				curRanks.remove(rank);
 				if (curRanks.size() == 0) {
 					curSettings.addProperty("enable", "false");
 				}
-				curSettings.add("mee6Ranks", curRanks);
+				curSettings.add("levels", curRanks);
 
 				int responseCode = database.setMee6Settings(guild.getId(), curSettings);
 				if (responseCode != 200) {

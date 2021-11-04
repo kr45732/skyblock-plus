@@ -113,5 +113,8 @@ public class AutomatedRoles {
 	@Embedded
 	private RoleModel dungeon_secrets = new RoleModel();
 
+	@Embedded
+	private RoleModel accessory_count = new RoleModel();
+
 	public AutomatedRoles() {}
 }

@@ -54,7 +54,7 @@ public class CalculateCommand extends Command {
 		JsonElement auction = auctionResponse.get("[0]");
 		try {
 			InvItem item = getGenericInventoryMap(NBTReader.readBase64(higherDepth(auction, "item_bytes.data").getAsString())).get(0);
-			double price = calculateItemPrice(item);
+			double price = new NetworthExecute().initPrices().calculateItemPrice(item);
 			String itemName = higherDepth(auction, "item_name").getAsString();
 			if (item.getId().equals("ENCHANTED_BOOK")) {
 				itemName = parseMcCodes(higherDepth(auction, "item_lore").getAsString().split("\n")[0]);
@@ -107,10 +107,6 @@ public class CalculateCommand extends Command {
 			e.printStackTrace();
 			return defaultEmbed("Error parsing data");
 		}
-	}
-
-	private static double calculateItemPrice(InvItem item) {
-		return new NetworthExecute().initPrices().calculateItemPrice(item);
 	}
 
 	@Override

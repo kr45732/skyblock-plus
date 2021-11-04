@@ -20,8 +20,7 @@ package com.skyblockplus.utils;
 
 import static com.skyblockplus.utils.ApiHandler.playerFromUuid;
 import static com.skyblockplus.utils.ApiHandler.skyblockProfilesFromUuid;
-import static com.skyblockplus.utils.Constants.CRAFTED_MINIONS_TO_SLOTS;
-import static com.skyblockplus.utils.Constants.SKILL_NAMES;
+import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -452,7 +451,7 @@ public class Player {
 		}
 	}
 
-	public Set<String> getItemsPlayerHas(List<String> items) {
+	public Set<String> getItemsPlayerHas(List<String> items, InvItem... extras) {
 		Map<Integer, InvItem> invItemMap = getInventoryMap();
 		if (invItemMap == null) {
 			return null;
@@ -461,6 +460,7 @@ public class Player {
 		Collection<InvItem> itemsMap = new ArrayList<>(invItemMap.values());
 		itemsMap.addAll(new ArrayList<>(getEnderChestMap().values()));
 		itemsMap.addAll(new ArrayList<>(getStorageMap().values()));
+		Collections.addAll(itemsMap, extras);
 		Set<String> itemsPlayerHas = new HashSet<>();
 
 		for (InvItem item : itemsMap) {
@@ -922,13 +922,17 @@ public class Player {
 	}
 
 	public Map<String, Integer> getPlayerSacks() {
-		JsonObject sacksJson = higherDepth(profileJson(), "sacks_counts").getAsJsonObject();
-		Map<String, Integer> sacksMap = new HashMap<>();
-		for (Map.Entry<String, JsonElement> sacksEntry : sacksJson.entrySet()) {
-			sacksMap.put(sacksEntry.getKey(), sacksEntry.getValue().getAsInt());
-		}
+		try {
+			JsonObject sacksJson = higherDepth(profileJson(), "sacks_counts").getAsJsonObject();
+			Map<String, Integer> sacksMap = new HashMap<>();
+			for (Map.Entry<String, JsonElement> sacksEntry : sacksJson.entrySet()) {
+				sacksMap.put(sacksEntry.getKey(), sacksEntry.getValue().getAsInt());
+			}
 
-		return sacksMap;
+			return sacksMap;
+		}catch (Exception e){
+			return null;
+		}
 	}
 
 	/* -- End inventory -- */
@@ -1131,7 +1135,11 @@ public class Player {
 		);
 	}
 
-	public enum WeightType {
+    public int getAccessoryCount() {
+		return getItemsPlayerHas(new ArrayList<>(ALL_TALISMANS), getTalismanBagMap().values().toArray(new InvItem[0])).size();
+    }
+
+    public enum WeightType {
 		NONE,
 		SENITHER,
 		LILY,

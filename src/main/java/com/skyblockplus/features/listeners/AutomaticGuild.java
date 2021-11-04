@@ -36,6 +36,7 @@ import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
 import com.skyblockplus.features.apply.ApplyGuild;
 import com.skyblockplus.features.apply.ApplyUser;
 import com.skyblockplus.features.setup.SetupCommandHandler;
+import com.skyblockplus.features.skyblockevent.SkyblockEventCommand;
 import com.skyblockplus.features.skyblockevent.SkyblockEventHandler;
 import com.skyblockplus.features.verify.VerifyGuild;
 import com.skyblockplus.utils.command.PaginatorEvent;
@@ -80,7 +81,6 @@ public class AutomaticGuild {
 	/* Automated Verify */
 	public VerifyGuild verifyGuild;
 	/* Skyblock event */
-	public SkyblockEventHandler skyblockEventHandler = new SkyblockEventHandler();
 	public List<EventMember> eventMemberList = new ArrayList<>();
 	public Instant eventMemberListLastUpdated = null;
 	/* Mee6 Roles */
@@ -518,14 +518,7 @@ public class AutomaticGuild {
 	}
 
 	public void createSkyblockEvent(PaginatorEvent event) {
-		if (skyblockEventHandler != null && skyblockEventHandler.scheduledFuture != null) {
-			skyblockEventHandler.scheduledFuture.cancel(true);
-		}
-		skyblockEventHandler = new SkyblockEventHandler(event);
-	}
-
-	public void setSkyblockEvent(SkyblockEventHandler skyblockEventHandler) {
-		this.skyblockEventHandler = skyblockEventHandler;
+		new SkyblockEventHandler(event);
 	}
 
 	/* Mee6 Roles Methods */
@@ -578,7 +571,7 @@ public class AutomaticGuild {
 				for (JsonElement player : leaderboardArr) {
 					if (higherDepth(player, "id").getAsString().equals(member.getId())) {
 						int playerLevel = higherDepth(player, "level", 0);
-						JsonArray curRoles = higherDepth(currentMee6Settings, "mee6Ranks").getAsJsonArray();
+						JsonArray curRoles = higherDepth(currentMee6Settings, "levels").getAsJsonArray();
 						List<Role> toAdd = new ArrayList<>();
 						List<Role> toRemove = new ArrayList<>();
 						for (JsonElement curRole : curRoles) {
@@ -658,8 +651,6 @@ public class AutomaticGuild {
 		if (mee6Roles(event)) {
 			return;
 		}
-
-		skyblockEventHandler.onGuildMessageReceived(event);
 	}
 
 	public void onTextChannelDelete(TextChannelDeleteEvent event) {
@@ -669,9 +660,19 @@ public class AutomaticGuild {
 	public void onButtonClick(ButtonClickEvent event) {
 		if (event.getComponentId().startsWith("paginator_")) {
 			return;
-		}
+		} else if(event.getComponentId().startsWith("event_message_")){
+			event.deferReply(true).complete();
 
-		if (event.getComponentId().startsWith("setup_command_")) {
+			if(event.getComponentId().equals("event_message_join")){
+				event.getHook().editOriginalEmbeds(SkyblockEventCommand.joinSkyblockEvent(event.getGuild().getId(), event.getUser().getId(), new String[0]).build()).queue();
+			}else{
+				EmbedBuilder eb = SkyblockEventCommand.getEventLeaderboard(event);
+				if(eb != null){
+					event.getHook().editOriginalEmbeds(eb.build()).queue();
+				}
+			}
+			return;
+		} else if (event.getComponentId().startsWith("setup_command_")) {
 			event.deferReply().complete();
 
 			if (!event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
@@ -701,15 +702,11 @@ public class AutomaticGuild {
 			}
 		}
 
-		event.editButton(event.getButton().asDisabled().withId("disabled").withLabel("Disabled").withStyle(ButtonStyle.DANGER)).queue();
+		event.editButton(event.getButton().asDisabled().withLabel("Disabled").withStyle(ButtonStyle.DANGER)).queue();
 		event.getHook().editOriginal("❌ This button has been disabled").queue();
 	}
 
 	public void onGuildLeave() {
-		if (skyblockEventHandler.scheduledFuture != null) {
-			skyblockEventHandler.scheduledFuture.cancel(true);
-		}
-
 		for (ScheduledFuture<?> scheduledFuture : scheduledFutures) {
 			scheduledFuture.cancel(true);
 		}

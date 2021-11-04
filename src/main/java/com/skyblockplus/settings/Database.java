@@ -35,7 +35,6 @@ import com.skyblockplus.api.serversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.serversettings.automatedverify.AutomatedVerify;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsService;
-import com.skyblockplus.api.serversettings.mee6roles.Mee6Data;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
 import java.util.List;
@@ -156,7 +155,7 @@ public class Database {
 		try {
 			return JsonParser.parseString((String) settingsService.getApplyUsersCache(serverId, name).getBody()).getAsJsonArray();
 		} catch (Exception e) {
-			return JsonParser.parseString("[]").getAsJsonArray();
+			return new JsonArray();
 		}
 	}
 
@@ -242,7 +241,7 @@ public class Database {
 	}
 
 	public int setMee6Settings(String serverId, JsonElement newSettings) {
-		return settingsService.setMee6Settings(serverId, gson.fromJson(newSettings, Mee6Data.class)).getStatusCodeValue();
+		return settingsService.setMee6Settings(serverId, gson.fromJson(newSettings, RoleModel.class)).getStatusCodeValue();
 	}
 
 	public int setPrefix(String serverId, String prefix) {

@@ -27,7 +27,6 @@ import com.skyblockplus.api.serversettings.automatedguild.GuildRole;
 import com.skyblockplus.api.serversettings.automatedroles.AutomatedRoles;
 import com.skyblockplus.api.serversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.serversettings.automatedverify.AutomatedVerify;
-import com.skyblockplus.api.serversettings.mee6roles.Mee6Data;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
 import java.util.ArrayList;
@@ -194,6 +193,8 @@ public class ServerSettingsService {
 					return new ResponseEntity<>(currentRoleSettings.getPet_score(), HttpStatus.OK);
 				case "dungeon_secrets":
 					return new ResponseEntity<>(currentRoleSettings.getDungeon_secrets(), HttpStatus.OK);
+				case "accessory_count":
+					return new ResponseEntity<>(currentRoleSettings.getAccessory_count(), HttpStatus.OK);
 				case "guild_ranks":
 					return new ResponseEntity<>(currentRoleSettings.getGuild_ranks(), HttpStatus.OK);
 				case "enderman":
@@ -292,6 +293,9 @@ public class ServerSettingsService {
 					break;
 				case "dungeon_secrets":
 					currentRoleSettings.setDungeon_secrets(newRoleSettings);
+					break;
+				case "accessory_count":
+					currentRoleSettings.setAccessory_count(newRoleSettings);
 					break;
 				case "guild_ranks":
 					currentRoleSettings.setGuild_ranks(newRoleSettings);
@@ -671,7 +675,7 @@ public class ServerSettingsService {
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 
-	public ResponseEntity<HttpStatus> setMee6Settings(String serverId, Mee6Data newSettings) {
+	public ResponseEntity<HttpStatus> setMee6Settings(String serverId, RoleModel newSettings) {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
 		if (currentServerSettings != null) {

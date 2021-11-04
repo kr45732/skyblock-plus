@@ -187,7 +187,6 @@ public class MainListener extends ListenerAdapter {
 					event
 						.getButton()
 						.asDisabled()
-						.withId(event.getButton().getId() + "_disabled")
 						.withLabel("Disabled")
 						.withStyle(ButtonStyle.DANGER)
 				)

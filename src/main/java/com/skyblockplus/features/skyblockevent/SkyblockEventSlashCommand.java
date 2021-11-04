@@ -50,23 +50,23 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 		switch (subcommandName) {
 			case "create":
 				event.paginate(SkyblockEventCommand.createSkyblockEvent(new PaginatorEvent(event)));
-				return;
+				break;
 			case "current":
 				event.embed(SkyblockEventCommand.getCurrentSkyblockEvent(event.getGuild().getId()));
-				return;
+				break;
 			case "cancel":
-				event.embed(SkyblockEventCommand.cancelSkyblockEvent(event.getGuild().getId()));
-				return;
+				event.embed(SkyblockEventCommand.cancelSkyblockEvent(event.getGuild()));
+				break;
 			case "join":
 				event.embed(SkyblockEventCommand.joinSkyblockEvent(event.getGuild().getId(), event.getUser().getId(), new String[] {}));
-				return;
+				break;
 			case "leave":
 				event.embed(SkyblockEventCommand.leaveSkyblockEvent(event.getGuild().getId(), event.getUser().getId()));
-				return;
+				break;
 			case "leaderboard":
 			case "lb":
 				event.paginate(SkyblockEventCommand.getEventLeaderboard(new PaginatorEvent(event)));
-				return;
+				break;
 			case "end":
 				if (database.getSkyblockEventActive(event.getGuild().getId())) {
 					SkyblockEventCommand.endSkyblockEvent(event.getGuild().getId());
@@ -74,8 +74,10 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 				} else {
 					event.embed(defaultEmbed("No event running"));
 				}
+				break;
 			default:
 				event.embed(event.invalidCommandMessage());
+				break;
 		}
 	}
 

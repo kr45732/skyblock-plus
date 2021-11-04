@@ -2,6 +2,7 @@
   "5e4e6d0d8ea8c9feb3f0e44f": {
     "name": "Skyblock Forceful",
     "guild_leaderboard": {
+      "lb_type": "position",
       "types": [
         "skills",
         "slayer",
@@ -37,6 +38,7 @@
   "5fea32eb8ea8c9724b8e3f3c": {
     "name": "Skyblock Gods",
     "guild_leaderboard": {
+      "lb_type": "position",
       "types": [
         "weight"
       ],
@@ -73,6 +75,7 @@
   "5fbea1f38ea8c9d1008d4940": {
     "name": "Ironman Sweats",
     "guild_leaderboard": {
+      "lb_type": "position",
       "types": [
         "skills",
         "slayer",
@@ -98,6 +101,34 @@
           "range": 15,
           "names": [
             "king"
+          ]
+        }
+      ]
+    }
+  },
+  "60062d798ea8c9e004b033cb": {
+    "name": "BananaRepublic",
+    "guild_leaderboard": {
+      "lb_type": "amount",
+      "staff_ranks": [
+        "officer",
+        "lobbyist",
+        "guild master"
+      ],
+      "ignore_staff": true,
+      "default_role": [
+        "customer"
+      ],
+      "ranks": [
+        {
+          "requirements": [
+            {
+              "amount": 4500,
+              "type": "weight"
+            }
+          ],
+          "names": [
+            "shareholder"
           ]
         }
       ]

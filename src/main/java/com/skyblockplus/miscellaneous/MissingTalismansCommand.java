@@ -18,6 +18,7 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.Constants.ALL_TALISMANS;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -29,7 +30,6 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.InvItem;
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 
@@ -62,19 +62,7 @@ public class MissingTalismansCommand extends Command {
 			}
 
 			JsonObject talismanUpgrades = higherDepth(getMiscJson(), "talisman_upgrades").getAsJsonObject();
-			JsonObject allTalismans = higherDepth(getTalismanJson(), "talismans").getAsJsonObject();
-
-			Set<String> missingInternal = new HashSet<>();
-			for (Entry<String, JsonElement> talismanUpgrade : allTalismans.entrySet()) {
-				missingInternal.add(talismanUpgrade.getKey());
-				if (higherDepth(getTalismanJson(), "talisman_duplicates." + talismanUpgrade.getKey()) != null) {
-					JsonArray duplicates = higherDepth(getTalismanJson(), "talisman_duplicates." + talismanUpgrade.getKey())
-						.getAsJsonArray();
-					for (JsonElement duplicate : duplicates) {
-						missingInternal.add(duplicate.getAsString());
-					}
-				}
-			}
+			Set<String> missingInternal = new HashSet<>(ALL_TALISMANS);
 
 			for (String playerItem : playerItems) {
 				missingInternal.remove(playerItem);
