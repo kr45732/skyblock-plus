@@ -36,11 +36,11 @@ public class PaginatorEvent {
 			isSlashCommand = true;
 			slashCommand = ((SlashCommandExecutedEvent) event);
 			command = null;
-		} else if (event instanceof CommandEvent){
+		} else if (event instanceof CommandEvent) {
 			isSlashCommand = false;
 			slashCommand = null;
 			command = ((CommandEvent) event);
-		}else {
+		} else {
 			throw new IllegalArgumentException("Invalid event class type provided: " + event.getClass());
 		}
 	}

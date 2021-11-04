@@ -67,7 +67,9 @@ public class SkyblockEventCommand extends Command {
 		JsonElement runningEventSettings = database.getRunningEventSettings(guildId);
 		TextChannel announcementChannel = jda.getTextChannelById(higherDepth(runningEventSettings, "announcementId").getAsString());
 		guildMap.get(guildId).setEventMemberListLastUpdated(null);
-		announcementChannel.retrieveMessageById(higherDepth(runningEventSettings, "announcementMessageId").getAsString()).queue(m -> m.editMessageComponents().queue());
+		announcementChannel
+			.retrieveMessageById(higherDepth(runningEventSettings, "announcementMessageId").getAsString())
+			.queue(m -> m.editMessageComponents().queue());
 
 		List<EventMember> guildMemberPlayersList = getEventLeaderboardList(runningEventSettings);
 
@@ -266,20 +268,20 @@ public class SkyblockEventCommand extends Command {
 		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(25);
 
 		if (
-				(currentGuild.eventMemberList != null) &&
-						(currentGuild.eventMemberListLastUpdated != null) &&
-						(Duration.between(currentGuild.eventMemberListLastUpdated, Instant.now()).toMinutes() < 15)
+			(currentGuild.eventMemberList != null) &&
+			(currentGuild.eventMemberListLastUpdated != null) &&
+			(Duration.between(currentGuild.eventMemberListLastUpdated, Instant.now()).toMinutes() < 15)
 		) {
 			List<EventMember> eventMemberList = currentGuild.eventMemberList;
 			for (int i = 0; i < eventMemberList.size(); i++) {
 				EventMember eventMember = eventMemberList.get(i);
 				paginateBuilder.addItems(
-						"`" +
-								(i + 1) +
-								")` " +
-								fixUsername(eventMember.getUsername()) +
-								" | +" +
-								formatNumber(Double.parseDouble(eventMember.getStartingAmount()))
+					"`" +
+					(i + 1) +
+					")` " +
+					fixUsername(eventMember.getUsername()) +
+					" | +" +
+					formatNumber(Double.parseDouble(eventMember.getStartingAmount()))
 				);
 			}
 
@@ -296,9 +298,9 @@ public class SkyblockEventCommand extends Command {
 				}
 
 				paginateBuilder.setPaginatorExtras(
-						new PaginatorExtras()
-								.setEveryPageTitle("Event Leaderboard")
-								.setEveryPageText("**Last updated " + minutesSinceUpdateString + " ago**\n")
+					new PaginatorExtras()
+						.setEveryPageTitle("Event Leaderboard")
+						.setEveryPageText("**Last updated " + minutesSinceUpdateString + " ago**\n")
 				);
 				paginateBuilder.build().paginate(event.getHook(), 0);
 				return null;
@@ -313,12 +315,12 @@ public class SkyblockEventCommand extends Command {
 		for (int i = 0; i < guildMemberPlayersList.size(); i++) {
 			EventMember eventMember = guildMemberPlayersList.get(i);
 			paginateBuilder.addItems(
-					"`" +
-							(i + 1) +
-							")` " +
-							fixUsername(eventMember.getUsername()) +
-							" | +" +
-							formatNumber(Double.parseDouble(eventMember.getStartingAmount()))
+				"`" +
+				(i + 1) +
+				")` " +
+				fixUsername(eventMember.getUsername()) +
+				" | +" +
+				formatNumber(Double.parseDouble(eventMember.getStartingAmount()))
 			);
 		}
 
@@ -629,9 +631,12 @@ public class SkyblockEventCommand extends Command {
 	public static EmbedBuilder cancelSkyblockEvent(Guild guild) {
 		JsonElement settings = database.getRunningEventSettings(guild.getId());
 		if (higherDepth(settings, "eventType", "").length() > 0) {
-			guild.getTextChannelById(higherDepth(settings, "announcementId").getAsString()).retrieveMessageById(higherDepth(settings, "announcementMessageId").getAsString()).queue(m -> m.editMessageComponents().queue());
+			guild
+				.getTextChannelById(higherDepth(settings, "announcementId").getAsString())
+				.retrieveMessageById(higherDepth(settings, "announcementMessageId").getAsString())
+				.queue(m -> m.editMessageComponents().queue());
 			guildMap.get(guild.getId()).setEventMemberListLastUpdated(null);
-			int code =  database.setSkyblockEventSettings(guild.getId(), new EventSettings());
+			int code = database.setSkyblockEventSettings(guild.getId(), new EventSettings());
 
 			if (code == 200) {
 				return defaultEmbed("Event canceled");

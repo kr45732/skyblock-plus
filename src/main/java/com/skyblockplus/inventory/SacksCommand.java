@@ -44,7 +44,7 @@ public class SacksCommand extends Command {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			Map<String, Integer> sacksMap = player.getPlayerSacks();
-			if(sacksMap == null) {
+			if (sacksMap == null) {
 				return invalidEmbed("Inventory API disabled");
 			}
 
@@ -63,8 +63,7 @@ public class SacksCommand extends Command {
 				)
 				.forEach(currentSack -> {
 					double sackPrice =
-						higherDepth(bazaarPrices, currentSack.getKey() + ".sell_summary.[0].pricePerUnit", 0.0) *
-						currentSack.getValue();
+						higherDepth(bazaarPrices, currentSack.getKey() + ".sell_summary.[0].pricePerUnit", 0.0) * currentSack.getValue();
 					paginateBuilder.addItems(
 						"**" +
 						convertSkyblockIdName(currentSack.getKey()) +
@@ -85,8 +84,6 @@ public class SacksCommand extends Command {
 			);
 			event.paginate(paginateBuilder);
 			return null;
-
-
 		}
 		return player.getFailEmbed();
 	}

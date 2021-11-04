@@ -18,6 +18,13 @@
 
 package com.skyblockplus.settings;
 
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -38,21 +45,13 @@ import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import com.vdurmont.emoji.EmojiParser;
+import java.util.*;
+import java.util.Map.Entry;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.PermissionException;
-
-import java.util.*;
-import java.util.Map.Entry;
-
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
-import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Utils.*;
 
 public class SettingsExecute {
 
@@ -1059,13 +1058,13 @@ public class SettingsExecute {
 						break;
 					}
 				case "accessory_count":
-				{
-					ebFieldString
+					{
+						ebFieldString
 							.append("**A player's dungeon unique accessory count**\nExample: `")
 							.append(guildPrefix)
 							.append("settings roles add accessory_count 75 @accessory collector`\n");
-					break;
-				}
+						break;
+					}
 				case "enderman":
 					{
 						ebFieldString
@@ -1196,12 +1195,12 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder setRoleEnable(String roleName, boolean enable) {
-		if(roleName.equals("")){
+		if (roleName.equals("")) {
 			JsonObject roleSettings = database.getRolesSettings(guild.getId()).getAsJsonObject();
-			if(enable){
+			if (enable) {
 				List<String> enabled = new ArrayList<>();
 				for (Entry<String, JsonElement> role : roleSettings.entrySet()) {
-					if(!role.getKey().equals("enable") && higherDepth(role.getValue(), "levels").getAsJsonArray().size() > 0){
+					if (!role.getKey().equals("enable") && higherDepth(role.getValue(), "levels").getAsJsonArray().size() > 0) {
 						JsonObject curRole = role.getValue().getAsJsonObject();
 						curRole.addProperty("enable", "true");
 						roleSettings.add(role.getKey(), curRole);
@@ -1209,9 +1208,9 @@ public class SettingsExecute {
 					}
 				}
 				return defaultSettingsEmbed().setDescription("**Enabled the following roles:** " + String.join(", ", enabled));
-			}else{
+			} else {
 				for (Entry<String, JsonElement> role : roleSettings.entrySet()) {
-					if(!role.getKey().equals("enable")){
+					if (!role.getKey().equals("enable")) {
 						JsonObject curRole = role.getValue().getAsJsonObject();
 						curRole.addProperty("enable", "false");
 						roleSettings.add(role.getKey(), curRole);

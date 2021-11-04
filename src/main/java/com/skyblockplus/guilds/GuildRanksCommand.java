@@ -91,16 +91,16 @@ public class GuildRanksCommand extends Command {
 		JsonElement lbSettings;
 		try {
 			lbSettings =
-					higherDepth(
-							JsonParser.parseReader(new FileReader("src/main/java/com/skyblockplus/json/GuildSettings.json")),
-							guildId + ".guild_leaderboard"
-					);
+				higherDepth(
+					JsonParser.parseReader(new FileReader("src/main/java/com/skyblockplus/json/GuildSettings.json")),
+					guildId + ".guild_leaderboard"
+				);
 		} catch (Exception e) {
 			return invalidEmbed(
-					guildName +
-							"'s settings are not setup. Please join the [Skyblock Plus Discord](" +
-							DISCORD_SERVER_INVITE_LINK +
-							") to setup this for your guild."
+				guildName +
+				"'s settings are not setup. Please join the [Skyblock Plus Discord](" +
+				DISCORD_SERVER_INVITE_LINK +
+				") to setup this for your guild."
 			);
 		}
 
@@ -112,7 +112,7 @@ public class GuildRanksCommand extends Command {
 			staffRankNames.add(i.getAsString().toLowerCase());
 		}
 
-		if(lbType.equals("position")) {
+		if (lbType.equals("position")) {
 			for (JsonElement i : higherDepth(lbSettings, "types").getAsJsonArray()) {
 				rankTypes.add(i.getAsString().toLowerCase());
 			}
@@ -236,7 +236,7 @@ public class GuildRanksCommand extends Command {
 			}
 		}
 
-		if(lbType.equals("position")) {
+		if (lbType.equals("position")) {
 			gMembers.sort(Comparator.comparingDouble(o1 -> -o1.getSlayer()));
 			ArrayList<GuildRanksStruct> guildSlayer = new ArrayList<>(gMembers);
 
@@ -262,8 +262,7 @@ public class GuildRanksCommand extends Command {
 								slayerRank = j;
 								break;
 							}
-						} catch (NullPointerException ignored) {
-						}
+						} catch (NullPointerException ignored) {}
 					}
 				}
 
@@ -274,8 +273,7 @@ public class GuildRanksCommand extends Command {
 								skillsRank = j;
 								break;
 							}
-						} catch (NullPointerException ignored) {
-						}
+						} catch (NullPointerException ignored) {}
 					}
 				}
 
@@ -286,8 +284,7 @@ public class GuildRanksCommand extends Command {
 								catacombsRank = j;
 								break;
 							}
-						} catch (NullPointerException ignored) {
-						}
+						} catch (NullPointerException ignored) {}
 					}
 				}
 
@@ -298,8 +295,7 @@ public class GuildRanksCommand extends Command {
 								weightRank = j;
 								break;
 							}
-						} catch (NullPointerException ignored) {
-						}
+						} catch (NullPointerException ignored) {}
 					}
 				}
 
@@ -374,32 +370,32 @@ public class GuildRanksCommand extends Command {
 			}
 
 			paginateBuilder.setPaginatorExtras(
-					new PaginatorExtras()
-							.setEveryPageTitle("Rank changes for " + guildName)
-							.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
-							.setEveryPageText(
-									"**Total rank changes:** " +
-											totalChange +
-											(
-													lastUpdated != null
-															? "\n**Last updated:** " + instantToDHM(Duration.between(lastUpdated, Instant.now())) + " ago"
-															: ""
-											) +
-											"\n"
-							)
+				new PaginatorExtras()
+					.setEveryPageTitle("Rank changes for " + guildName)
+					.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
+					.setEveryPageText(
+						"**Total rank changes:** " +
+						totalChange +
+						(
+							lastUpdated != null
+								? "\n**Last updated:** " + instantToDHM(Duration.between(lastUpdated, Instant.now())) + " ago"
+								: ""
+						) +
+						"\n"
+					)
 			);
 			event.paginate(paginateBuilder);
-		}else{
+		} else {
 			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(20);
 			int totalChange = 0;
 			for (GuildRanksStruct gMember : gMembers) {
 				for (JsonElement rank : higherDepth(lbSettings, "ranks").getAsJsonArray()) {
 					boolean meetsReq = true;
 					List<String> rankNamesList = new ArrayList<>();
-					for (JsonElement rankName :  higherDepth(rank, "names").getAsJsonArray()) {
+					for (JsonElement rankName : higherDepth(rank, "names").getAsJsonArray()) {
 						rankNamesList.add(rankName.getAsString());
 					}
-					for(JsonElement req: higherDepth(rank, "requirements").getAsJsonArray()) {
+					for (JsonElement req : higherDepth(rank, "requirements").getAsJsonArray()) {
 						double amount = 0;
 						switch (higherDepth(req, "type").getAsString()) {
 							case "slayer":
@@ -416,19 +412,19 @@ public class GuildRanksCommand extends Command {
 								break;
 						}
 
-						if(amount < higherDepth(req, "amount").getAsDouble()){
+						if (amount < higherDepth(req, "amount").getAsDouble()) {
 							meetsReq = false;
 							break;
 						}
 					}
 
-					if(meetsReq){
+					if (meetsReq) {
 						if (!rankNamesList.contains(gMember.getGuildRank().toLowerCase())) {
 							paginateBuilder.addItems(("- /g setrank " + fixUsername(gMember.getGuildRank()) + " " + rankNamesList.get(0)));
 							totalChange++;
 						}
 						break;
-					}else{
+					} else {
 						if (!rankNamesList.contains(gMember.getGuildRank().toLowerCase())) {
 							paginateBuilder.addItems(("- /g setrank " + fixUsername(gMember.getGuildRank()) + " " + rankNamesList.get(0)));
 							totalChange++;
@@ -438,19 +434,19 @@ public class GuildRanksCommand extends Command {
 				}
 			}
 			paginateBuilder.setPaginatorExtras(
-					new PaginatorExtras()
-							.setEveryPageTitle("Rank changes for " + guildName)
-							.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
-							.setEveryPageText(
-									"**Total rank changes:** " +
-											totalChange +
-											(
-													lastUpdated != null
-															? "\n**Last updated:** " + instantToDHM(Duration.between(lastUpdated, Instant.now())) + " ago"
-															: ""
-											) +
-											"\n"
-							)
+				new PaginatorExtras()
+					.setEveryPageTitle("Rank changes for " + guildName)
+					.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
+					.setEveryPageText(
+						"**Total rank changes:** " +
+						totalChange +
+						(
+							lastUpdated != null
+								? "\n**Last updated:** " + instantToDHM(Duration.between(lastUpdated, Instant.now())) + " ago"
+								: ""
+						) +
+						"\n"
+					)
 			);
 			event.paginate(paginateBuilder);
 		}

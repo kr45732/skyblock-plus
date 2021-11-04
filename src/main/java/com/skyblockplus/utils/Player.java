@@ -930,7 +930,7 @@ public class Player {
 			}
 
 			return sacksMap;
-		}catch (Exception e){
+		} catch (Exception e) {
 			return null;
 		}
 	}
@@ -1135,11 +1135,11 @@ public class Player {
 		);
 	}
 
-    public int getAccessoryCount() {
+	public int getAccessoryCount() {
 		return getItemsPlayerHas(new ArrayList<>(ALL_TALISMANS), getTalismanBagMap().values().toArray(new InvItem[0])).size();
-    }
+	}
 
-    public enum WeightType {
+	public enum WeightType {
 		NONE,
 		SENITHER,
 		LILY,

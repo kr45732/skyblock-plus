@@ -660,14 +660,19 @@ public class AutomaticGuild {
 	public void onButtonClick(ButtonClickEvent event) {
 		if (event.getComponentId().startsWith("paginator_")) {
 			return;
-		} else if(event.getComponentId().startsWith("event_message_")){
+		} else if (event.getComponentId().startsWith("event_message_")) {
 			event.deferReply(true).complete();
 
-			if(event.getComponentId().equals("event_message_join")){
-				event.getHook().editOriginalEmbeds(SkyblockEventCommand.joinSkyblockEvent(event.getGuild().getId(), event.getUser().getId(), new String[0]).build()).queue();
-			}else{
+			if (event.getComponentId().equals("event_message_join")) {
+				event
+					.getHook()
+					.editOriginalEmbeds(
+						SkyblockEventCommand.joinSkyblockEvent(event.getGuild().getId(), event.getUser().getId(), new String[0]).build()
+					)
+					.queue();
+			} else {
 				EmbedBuilder eb = SkyblockEventCommand.getEventLeaderboard(event);
-				if(eb != null){
+				if (eb != null) {
 					event.getHook().editOriginalEmbeds(eb.build()).queue();
 				}
 			}

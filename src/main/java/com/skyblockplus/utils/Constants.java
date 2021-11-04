@@ -18,15 +18,14 @@
 
 package com.skyblockplus.utils;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.skyblockplus.Main;
-
 import java.lang.reflect.Type;
 import java.util.*;
-
-import static com.skyblockplus.utils.Utils.*;
 
 public class Constants {
 
@@ -196,16 +195,17 @@ public class Constants {
 
 			/* ALL_TALISMANS */
 			ALL_TALISMANS = new HashSet<>();
-			for (Map.Entry<String, JsonElement> talismanUpgrade : higherDepth(getTalismanJson(), "talismans").getAsJsonObject().entrySet()) {
+			for (Map.Entry<String, JsonElement> talismanUpgrade : higherDepth(getTalismanJson(), "talismans")
+				.getAsJsonObject()
+				.entrySet()) {
 				ALL_TALISMANS.add(talismanUpgrade.getKey());
 				if (higherDepth(getTalismanJson(), "talisman_duplicates." + talismanUpgrade.getKey()) != null) {
 					for (JsonElement duplicate : higherDepth(getTalismanJson(), "talisman_duplicates." + talismanUpgrade.getKey())
-							.getAsJsonArray()) {
+						.getAsJsonArray()) {
 						ALL_TALISMANS.add(duplicate.getAsString());
 					}
 				}
 			}
-
 		} catch (Exception e) {
 			Main.log.error("Exception while initializing constants", e);
 		}
