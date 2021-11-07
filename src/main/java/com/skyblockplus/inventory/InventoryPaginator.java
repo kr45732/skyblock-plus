@@ -57,7 +57,7 @@ public class InventoryPaginator {
 	}
 
 	private boolean condition(GuildMessageReactionAddEvent event) {
-		return !event.getUser().isBot() && event.getUser().equals(user) && event.getMessageId().equals(pagePart2.getId());
+		return !event.getUser().isBot() && event.getUser().getId().equals(user.getId()) && event.getMessageId().equals(pagePart2.getId());
 	}
 
 	public void action(GuildMessageReactionAddEvent event) {

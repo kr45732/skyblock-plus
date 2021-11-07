@@ -96,7 +96,7 @@ public class MissingTalismansCommand extends Command {
 			);
 
 			StringBuilder ebStr = new StringBuilder(
-				"Sorted roughly from the least to greatest cost. Talismans with a * have higher tiers.\n\n"
+				"Missing " + missingInternalArr.size() + "talismans. Sorted by ascending cost. Talismans with a * have higher tiers.\n\n"
 			);
 			for (String i : missingInternalArr) {
 				ebStr.append("• ").append(idToName(i)).append(higherDepth(talismanUpgrades, i) != null ? "**\\***" : "").append("\n");

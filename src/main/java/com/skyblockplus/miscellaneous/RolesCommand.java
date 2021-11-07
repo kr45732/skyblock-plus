@@ -52,7 +52,7 @@ public class RolesCommand extends Command {
 		EmbedBuilder eb;
 
 		if (database.getLinkedUserByDiscordId(member.getId()).isJsonNull()) {
-			return defaultEmbed("You must be linked to run this command. Use `" + getGuildPrefix(guild.getId()) + "link [IGN]` to link");
+			return defaultEmbed("You must be linked to run this command. Use `/link <player>` to link");
 		}
 
 		JsonElement linkedInfo = database.getLinkedUserByDiscordId(member.getId());

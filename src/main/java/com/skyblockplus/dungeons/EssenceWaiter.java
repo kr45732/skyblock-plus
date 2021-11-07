@@ -96,7 +96,7 @@ public class EssenceWaiter {
 		return (
 			event.getMessageIdLong() == reactMessage.getIdLong() &&
 			!event.getUser().isBot() &&
-			event.getUser().equals(user) &&
+			event.getUser().getId().equals(user.getId()) &&
 			validReactions.contains(event.getReactionEmote().getName())
 		);
 	}

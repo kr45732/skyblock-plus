@@ -26,6 +26,8 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.dev.*;
 import com.skyblockplus.dungeons.*;
 import com.skyblockplus.features.listeners.MainListener;
+import com.skyblockplus.features.party.PartyCommand;
+import com.skyblockplus.features.party.PartySlashCommand;
 import com.skyblockplus.features.setup.SetupCommand;
 import com.skyblockplus.features.setup.SetupSlashCommand;
 import com.skyblockplus.features.skyblockevent.SkyblockEventCommand;
@@ -66,6 +68,7 @@ import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.RestAction;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -170,7 +173,8 @@ public class Main {
 					new TrackAuctionsCommand(),
 					new SkyblockCommand(),
 					new GuildStatisticsCommand(),
-					new GuildTrackerCommand()
+					new GuildTrackerCommand(),
+						new PartyCommand()
 				)
 				.build();
 
@@ -225,7 +229,8 @@ public class Main {
 					new TrackAuctionsSlashCommand(),
 					new SkyblockSlashCommand(),
 					new GuildStatisticsSlashCommand(),
-					new GuildTrackerSlashCommand()
+					new GuildTrackerSlashCommand(),
+						new PartySlashCommand()
 				);
 
 		jda =
@@ -239,6 +244,7 @@ public class Main {
 					new ExceptionEventListener(new MainListener())
 				)
 				.setActivity(Activity.playing("Loading..."))
+				.setMemberCachePolicy(MemberCachePolicy.ALL)
 				.disableCache(CacheFlag.VOICE_STATE)
 				.enableIntents(GatewayIntent.GUILD_MEMBERS)
 				.build();
@@ -254,8 +260,8 @@ public class Main {
 			ApiHandler.initialize();
 			TrackAuctionsCommand.initialize();
 			GuildTrackerCommand.initialize();
+//			AuctionFlipper.scheduleFlipper();
 		}
-		//		AuctionFlipper.scheduleFlipper();
 	}
 
 	@PreDestroy

@@ -20,7 +20,6 @@ package com.skyblockplus.features.skyblockevent;
 
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Utils.*;
@@ -63,15 +62,19 @@ public class SkyblockEventCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	public static void endSkyblockEvent(String guildId) {
-		JsonElement runningEventSettings = database.getRunningEventSettings(guildId);
+	public static EmbedBuilder endSkyblockEvent(String guildId) {
+		JsonElement runningEventSettings = database.getSkyblockEventSettings(guildId);
 		TextChannel announcementChannel = jda.getTextChannelById(higherDepth(runningEventSettings, "announcementId").getAsString());
+		List<EventMember> guildMemberPlayersList = getEventLeaderboardList(runningEventSettings, guildId);
+		if(guildMemberPlayersList == null){
+			return invalidEmbed("A Hypixel API key must be set for events over 30 members so the leaderboard can be calculated before it ends");
+		}
+
 		guildMap.get(guildId).setEventMemberListLastUpdated(null);
 		announcementChannel
 			.retrieveMessageById(higherDepth(runningEventSettings, "announcementMessageId").getAsString())
 			.queue(m -> m.editMessageComponents().queue());
 
-		List<EventMember> guildMemberPlayersList = getEventLeaderboardList(runningEventSettings);
 
 		CustomPaginator.Builder paginateBuilder = defaultPaginator()
 			.setColumns(1)
@@ -124,34 +127,45 @@ public class SkyblockEventCommand extends Command {
 			if (paginateBuilder.getItemsSize() > 0) {
 				paginateBuilder.build().paginate(announcementChannel, 0);
 				database.setSkyblockEventSettings(guildId, new EventSettings());
-				return;
+				return defaultEmbed("Success").setDescription("Ended skyblock event");
 			}
 		} catch (Exception ignored) {}
 		announcementChannel.sendMessageEmbeds(defaultEmbed("Prizes").setDescription("None").build()).complete();
 		database.setSkyblockEventSettings(guildId, new EventSettings());
+		return defaultEmbed("Success").setDescription("Ended skyblock event");
 	}
 
-	private static List<EventMember> getEventLeaderboardList(JsonElement runningSettings) {
+	private static List<EventMember> getEventLeaderboardList(JsonElement runningSettings, String guildId) {
 		List<EventMember> guildMemberPlayersList = new ArrayList<>();
 		List<CompletableFuture<CompletableFuture<EventMember>>> futuresList = new ArrayList<>();
 		JsonArray membersArr = higherDepth(runningSettings, "membersList").getAsJsonArray();
 		String eventType = higherDepth(runningSettings, "eventType").getAsString();
+
+		String key = null;
+		if(membersArr.size() > 30){
+			key = database.getServerHypixelApiKey(guildId);
+			if(key == null){
+				return null;
+			}
+		}
+		String hypixelKey = key;
 
 		for (JsonElement guildMember : membersArr) {
 			String guildMemberUuid = higherDepth(guildMember, "uuid").getAsString();
 			String guildMemberProfile = higherDepth(guildMember, "profileName").getAsString();
 
 			CompletableFuture<String> guildMemberUsername = asyncUuidToUsername(guildMemberUuid);
+
 			futuresList.add(
 				guildMemberUsername.thenApply(guildMemberUsernameResponse -> {
 					try {
-						if (remainingLimit.get() < 5) {
-							log.info("Sleeping for " + timeTillReset + " seconds");
-							TimeUnit.SECONDS.sleep(timeTillReset.get());
+						if ((hypixelKey != null ? keyCooldownMap.get(hypixelKey).getRemainingLimit().get() : remainingLimit.get()) < 5) {
+							log.info("Sleeping for " + (hypixelKey != null ? keyCooldownMap.get(hypixelKey).getTimeTillReset() : timeTillReset) + " seconds");
+							TimeUnit.SECONDS.sleep(hypixelKey != null ? keyCooldownMap.get(hypixelKey).getTimeTillReset().get() : timeTillReset.get());
 						}
 					} catch (Exception ignored) {}
 
-					CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(guildMemberUuid, HYPIXEL_API_KEY);
+					CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(guildMemberUuid, hypixelKey != null ? hypixelKey : HYPIXEL_API_KEY);
 
 					return guildMemberProfileJson.thenApply(guildMemberProfileJsonResponse -> {
 						Player guildMemberPlayer = new Player(
@@ -309,8 +323,11 @@ public class SkyblockEventCommand extends Command {
 			return defaultEmbed("Event Leaderboard").setDescription("No one joined the event");
 		}
 
-		JsonElement runningSettings = database.getRunningEventSettings(guildId);
-		List<EventMember> guildMemberPlayersList = getEventLeaderboardList(runningSettings);
+		JsonElement runningSettings = database.getSkyblockEventSettings(guildId);
+		List<EventMember> guildMemberPlayersList = getEventLeaderboardList(runningSettings, guildId);
+		if(guildMemberPlayersList == null){
+			return  invalidEmbed("A Hypixel API key must be set for events with over 30 members");
+		}
 
 		for (int i = 0; i < guildMemberPlayersList.size(); i++) {
 			EventMember eventMember = guildMemberPlayersList.get(i);
@@ -393,8 +410,11 @@ public class SkyblockEventCommand extends Command {
 			return defaultEmbed("Event Leaderboard").setDescription("No one joined the event");
 		}
 
-		JsonElement runningSettings = database.getRunningEventSettings(guildId);
-		List<EventMember> guildMemberPlayersList = getEventLeaderboardList(runningSettings);
+		JsonElement runningSettings = database.getSkyblockEventSettings(guildId);
+		List<EventMember> guildMemberPlayersList = getEventLeaderboardList(runningSettings, guildId);
+		if(guildMemberPlayersList == null){
+			return  invalidEmbed("A Hypixel API key must be set for events with over 30 members");
+		}
 
 		for (int i = 0; i < guildMemberPlayersList.size(); i++) {
 			EventMember eventMember = guildMemberPlayersList.get(i);
@@ -426,7 +446,7 @@ public class SkyblockEventCommand extends Command {
 			JsonElement linkedAccount = database.getLinkedUserByDiscordId(userId);
 			if (linkedAccount != null) {
 				String uuid = higherDepth(linkedAccount, "minecraftUuid").getAsString();
-				int code = database.removeEventMemberFromRunningEvent(guildId, uuid);
+				int code = database.removeMemberFromSkyblockEvent(guildId, uuid);
 
 				if (code == 200) {
 					return defaultEmbed("Success").setDescription("You left the event");
@@ -434,7 +454,7 @@ public class SkyblockEventCommand extends Command {
 					return invalidEmbed("An error occurred when leaving the event");
 				}
 			} else {
-				return defaultEmbed("You must be linked to run this command. Use `" + getGuildPrefix(guildId) + "link [IGN]` to link");
+				return defaultEmbed("You must be linked to run this command. Use `/link <player>` to link");
 			}
 		} else {
 			return defaultEmbed("No event running");
@@ -451,14 +471,12 @@ public class SkyblockEventCommand extends Command {
 					uuid = higherDepth(linkedAccount, "minecraftUuid").getAsString();
 					username = higherDepth(linkedAccount, "minecraftUsername").getAsString();
 				} catch (Exception e) {
-					return defaultEmbed("You must be linked to run this command. Use `" + getGuildPrefix(guildId) + "link [IGN]` to link");
+					return defaultEmbed("You must be linked to run this command. Use `/link <player>` to link");
 				}
 
 				if (database.eventHasMemberByUuid(guildId, uuid)) {
 					return invalidEmbed(
-						"You are already in the event! If you want to leave or change profile use `" +
-						getGuildPrefix(guildId) +
-						"event leave`"
+						"You are already in the event! If you want to leave or change profile use `/event leave`"
 					);
 				}
 
@@ -477,7 +495,7 @@ public class SkyblockEventCommand extends Command {
 					try {
 						double startingAmount = 0;
 						String startingAmountFormatted = "";
-						JsonElement eventSettings = database.getRunningEventSettings(guildId);
+						JsonElement eventSettings = database.getSkyblockEventSettings(guildId);
 						String eventType = higherDepth(eventSettings, "eventType").getAsString();
 
 						switch (eventType) {
@@ -553,7 +571,7 @@ public class SkyblockEventCommand extends Command {
 							}
 						} catch (Exception ignored) {}
 
-						int code = database.addEventMemberToRunningEvent(
+						int code = database.addMemberToSkyblockEvent(
 							guildId,
 							new EventMember(username, uuid, "" + startingAmount, player.getProfileName())
 						);
@@ -576,7 +594,7 @@ public class SkyblockEventCommand extends Command {
 
 				return player.getFailEmbed();
 			} else {
-				return invalidEmbed("You must be linked to run this command. Use `" + getGuildPrefix(guildId) + "link [IGN]` to link");
+				return invalidEmbed("You must be linked to run this command. Use `/link <player>` to link");
 			}
 		} else {
 			return invalidEmbed("No event running");
@@ -585,7 +603,7 @@ public class SkyblockEventCommand extends Command {
 
 	public static EmbedBuilder getCurrentSkyblockEvent(String guildId) {
 		if (database.getSkyblockEventActive(guildId)) {
-			JsonElement currentSettings = database.getRunningEventSettings(guildId);
+			JsonElement currentSettings = database.getSkyblockEventSettings(guildId);
 			EmbedBuilder eb = defaultEmbed("Current Event");
 
 			HypixelResponse guildJson = getGuildFromId(higherDepth(currentSettings, "eventGuildId").getAsString());
@@ -629,7 +647,7 @@ public class SkyblockEventCommand extends Command {
 	}
 
 	public static EmbedBuilder cancelSkyblockEvent(Guild guild) {
-		JsonElement settings = database.getRunningEventSettings(guild.getId());
+		JsonElement settings = database.getSkyblockEventSettings(guild.getId());
 		if (higherDepth(settings, "eventType", "").length() > 0) {
 			guild
 				.getTextChannelById(higherDepth(settings, "announcementId").getAsString())
@@ -650,14 +668,18 @@ public class SkyblockEventCommand extends Command {
 
 	public static EmbedBuilder createSkyblockEvent(PaginatorEvent event) {
 		boolean sbEventActive = database.getSkyblockEventActive(event.getGuild().getId());
-		if (guildMap.containsKey(event.getGuild().getId()) && !sbEventActive) {
-			guildMap.get(event.getGuild().getId()).createSkyblockEvent(event);
-			return null;
-		} else if (sbEventActive) {
+		if(sbEventActive){
 			return invalidEmbed("Event already running");
+		}else if (guildMap.containsKey(event.getGuild().getId())) {
+			if(guildMap.get(event.getGuild().getId()).skyblockEventHandler == null){
+				guildMap.get(event.getGuild().getId()).setSkyblockEventHandler(new SkyblockEventHandler(event));
+				return null;
+			}else{
+				return invalidEmbed("Someone is already creating an event in this server");
+			}
+		}else{
+			return invalidEmbed("Cannot find server");
 		}
-
-		return invalidEmbed("Cannot find server");
 	}
 
 	public static String getEventTypeFormatted(String eventType) {
@@ -709,8 +731,7 @@ public class SkyblockEventCommand extends Command {
 							return;
 						case "end":
 							if (database.getSkyblockEventActive(event.getGuild().getId())) {
-								endSkyblockEvent(event.getGuild().getId());
-								embed(defaultEmbed("Success").setDescription("Event Ended"));
+								embed(endSkyblockEvent(event.getGuild().getId()));
 							} else {
 								embed(defaultEmbed("No event running"));
 							}

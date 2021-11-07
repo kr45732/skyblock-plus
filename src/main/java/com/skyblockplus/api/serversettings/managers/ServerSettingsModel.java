@@ -79,6 +79,8 @@ public class ServerSettingsModel {
 
 	private String prefix = null;
 
+	private String pfCategoryId = "";
+
 	public ServerSettingsModel() {}
 
 	public ServerSettingsModel(String serverName, String serverId) {

@@ -20,7 +20,7 @@ package com.skyblockplus.features.skyblockevent;
 
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.features.skyblockevent.SkyblockEventCommand.getEventTypeFormatted;
 import static com.skyblockplus.utils.ApiHandler.getGuildFromName;
 import static com.skyblockplus.utils.Constants.ALL_SKILL_NAMES;
@@ -65,7 +65,7 @@ public class SkyblockEventHandler {
 		if (paginatorEvent.isSlashCommand()) {
 			paginatorEvent.getSlashCommand().getHook().editOriginalEmbeds(eb.build()).queue();
 		} else {
-			sendEmbedMessage(eb, false);
+			paginatorEvent.getChannel().sendMessageEmbeds(eb.build()).queue();
 		}
 
 		this.eventSettings = new EventSettings();
@@ -80,7 +80,7 @@ public class SkyblockEventHandler {
 	}
 
 	private boolean condition(GuildMessageReceivedEvent event) {
-		return paginatorEvent.getChannel() == event.getChannel() && paginatorEvent.getUser() == event.getAuthor();
+		return paginatorEvent.getChannel().getId().equals(event.getChannel().getId()) && paginatorEvent.getUser().getId().equals(event.getAuthor().getId());
 	}
 
 	private void action(GuildMessageReceivedEvent event) {
@@ -338,18 +338,15 @@ public class SkyblockEventHandler {
 					} else {
 						ebString.append("None");
 					}
-					String guildPrefix = getGuildPrefix(event.getGuild().getId());
 					announcementEb.addField("Prizes", ebString.toString(), false);
 					announcementEb.addField(
 						"Join the event",
-						"Click the join button below or run `" +
-						guildPrefix +
-						"event join` to join! You must be linked to the bot and in the guild.",
+						"Click the join button below or run `/event join` to join! You must be linked to the bot and in the guild.",
 						false
 					);
 					announcementEb.addField(
 						"Leaderboard",
-						"Click the leaderboard button below or run `" + guildPrefix + "event leaderboard`. to view the leaderboard.",
+						"Click the leaderboard button below or run `/event leaderboard`. to view the leaderboard.",
 						false
 					);
 
@@ -389,6 +386,7 @@ public class SkyblockEventHandler {
 				.getChannel()
 				.sendMessageEmbeds(defaultEmbed("Skyblock Event").setDescription("Canceled event creation (3/3 failed attempts)").build())
 				.queue();
+			guildMap.get(paginatorEvent.getGuild().getId()).setSkyblockEventHandler(null);
 		} else if (waitForReply) {
 			waiter.waitForEvent(
 				GuildMessageReceivedEvent.class,
@@ -398,6 +396,8 @@ public class SkyblockEventHandler {
 				TimeUnit.MINUTES,
 				() -> sendEmbedMessage(defaultEmbed("Skyblock Event").setDescription("Event creation timed out"), false)
 			);
+		}else {
+			guildMap.get(paginatorEvent.getGuild().getId()).setSkyblockEventHandler(null);
 		}
 	}
 

@@ -81,7 +81,7 @@ public class Utils {
 	public static final int globalCooldown = 4;
 	public static final String DISCORD_SERVER_INVITE_LINK = "https://dsc.gg/skyblock-plus";
 	public static final String BOT_INVITE_LINK =
-		"https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403040368&scope=bot%20applications.commands";
+		"https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403040337&scope=bot%20applications.commands";
 	public static final String FORUM_POST_LINK = "https://hypixel.net/threads/3980092";
 	public static final AsyncHttpClient asyncHttpClient = Dsl.asyncHttpClient();
 	public static final CloseableHttpClient httpClient = HttpClientBuilder.create().build();
@@ -699,28 +699,37 @@ public class Utils {
 
 		switch (internalName) {
 			case "GOD_POT":
-				internalName = "GOD_POTION";
-				break;
+				return "GOD_POTION";
 			case "AOTD":
-				internalName = "ASPECT_OF_THE_DRAGON";
-				break;
+				return "ASPECT_OF_THE_DRAGON";
 			case "AOTE":
-				internalName = "ASPECT_OF_THE_END";
-				break;
+				return "ASPECT_OF_THE_END";
 			case "AOTV":
-				internalName = "ASPECT_OF_THE_VOID";
-				break;
+				return "ASPECT_OF_THE_VOID";
 			case "AOTS:":
-				internalName = "AXE_OF_THE_SHREDDED";
-				break;
+				return "AXE_OF_THE_SHREDDED";
 			case "LASR_EYE":
-				internalName = "GIANT_FRAGMENT_LASER";
-				break;
+				return "GIANT_FRAGMENT_LASER";
+			case "HYPE":
+				return "HYPERION";
+			case "GS":
+				return "GIANTS_SWORD";
+			case "TERM":
+				return "TERMINATOR";
+			case "TREECAP":
+				return "TREECAPITATOR_AXE";
+			case "JUJU":
+				return "JUJU_SHORTBOW";
+			case "VALK":
+				return "VALKYRIE";
 		}
 
-		try {
-			internalName = internalJsonMappings.getAsJsonArray(internalName).get(0).getAsString();
-		} catch (Exception ignored) {}
+		for (Map.Entry<String, JsonElement> entry : internalJsonMappings.entrySet()) {
+			if(higherDepth(entry.getValue(), "name").getAsString().equalsIgnoreCase(itemName) || higherDepth(entry.getValue(), "id").getAsString().equalsIgnoreCase(internalName)){
+				internalName = entry.getKey();
+				break;
+			}
+		}
 
 		return internalName;
 	}
@@ -735,16 +744,7 @@ public class Utils {
 		}
 
 		id = id.toUpperCase();
-
-		for (Map.Entry<String, JsonElement> i : internalJsonMappings.entrySet()) {
-			for (JsonElement j : i.getValue().getAsJsonArray()) {
-				if (j.getAsString().equals(id)) {
-					return capitalizeString(i.getKey().replace("_", " "));
-				}
-			}
-		}
-
-		return capitalizeString(id.replace("_", " "));
+		return higherDepth(internalJsonMappings, id + ".name", capitalizeString(id.replace("_", " ")));
 	}
 
 	public static ArrayList<String> getJsonKeys(JsonElement jsonElement) {

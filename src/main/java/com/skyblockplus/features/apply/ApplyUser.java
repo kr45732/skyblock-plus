@@ -65,7 +65,7 @@ public class ApplyUser implements Serializable {
 	public String playerProfileName;
 	public String failCause;
 
-	public ApplyUser(ButtonClickEvent event, JsonElement currentSettings, String playerUsername, String uuid) {
+	public ApplyUser(ButtonClickEvent event, JsonElement currentSettings, String playerUsername) {
 		User applyingUser = event.getUser();
 		logCommand(event.getGuild(), applyingUser, "apply " + applyingUser.getName());
 
@@ -90,14 +90,15 @@ public class ApplyUser implements Serializable {
 			.addPermissionOverride(event.getMember(), EnumSet.of(Permission.VIEW_CHANNEL), null)
 			.addPermissionOverride(event.getGuild().getPublicRole(), null, EnumSet.of(Permission.VIEW_CHANNEL));
 
-		if (!higherDepth(currentSettings, "staffPingRoleId", "none").equals("none")) {
+		try{
 			applicationChannelAction =
 				applicationChannelAction.addPermissionOverride(
 					event.getGuild().getRoleById(higherDepth(currentSettings, "staffPingRoleId").getAsString()),
 					EnumSet.of(Permission.VIEW_CHANNEL),
 					null
 				);
-		}
+		}catch (Exception ignored){}
+
 		TextChannel applicationChannel = applicationChannelAction.complete();
 
 		this.applicationChannelId = applicationChannel.getId();
@@ -164,7 +165,7 @@ public class ApplyUser implements Serializable {
 		Message reactMessage = applicationChannel.retrieveMessageById(reactMessageId).complete();
 		JsonElement currentSettings = JsonParser.parseString(currentSettingsString);
 
-		if (!event.getUser().equals(applyingUser)) {
+		if (!event.getUser().getId().equals(applyingUser.getId())) {
 			if (
 				!(
 					(

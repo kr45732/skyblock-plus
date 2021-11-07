@@ -94,10 +94,16 @@ public class SettingsExecute {
 
 				JsonElement currentSettings = database.getServerSettings(guild.getId());
 				if (content.split(" ", 4).length == 4 && args[1].equals("set")) {
-					if (args[2].equals("hypixel_key")) {
-						eb = setHypixelKey(args[3]);
-					} else if (args[2].equals("prefix")) {
-						eb = setPrefix(content.split(" ", 4)[3]);
+					switch (args[2]) {
+						case "hypixel_key":
+							eb = setHypixelKey(args[3]);
+							break;
+						case "prefix":
+							eb = setPrefix(content.split(" ", 4)[3]);
+							break;
+						case "pf_category":
+							eb = setPartyFinderCategory(args[3]);
+							break;
 					}
 				} else if (
 					(args.length == 4 || args.length == 5 || content.split(" ", 6).length == 6) &&
@@ -1943,7 +1949,7 @@ public class SettingsExecute {
 
 	public EmbedBuilder setApplyNewChannelCategory(String name, String messageCategory) {
 		try {
-			net.dv8tion.jda.api.entities.Category applyCategory = guild.getCategoryById(messageCategory.replaceAll("[<#>]", ""));
+			Category applyCategory = guild.getCategoryById(messageCategory.replaceAll("[<#>]", ""));
 			int responseCode = updateApplySettings(name, "newChannelCategory", applyCategory.getId());
 			if (responseCode != 200) {
 				return invalidEmbed("API returned response code " + responseCode);
@@ -2377,5 +2383,28 @@ public class SettingsExecute {
 		} else {
 			return null;
 		}
+	}
+
+	private EmbedBuilder setPartyFinderCategory(String category) {
+		try {
+			if(category.equalsIgnoreCase("none")){
+				int responseCode = database.setPartyFinderCategoryId(guild.getId(), "none");
+				if (responseCode != 200) {
+					return invalidEmbed("API returned response code " + responseCode);
+				}
+				guildMap.get(guild.getId()).setPartyFinderCategory(null);
+				return defaultSettingsEmbed("**Party finder new channel category disabled**");
+			}else {
+				Category pfCategory = guild.getCategoryById(category.replaceAll("[<#>]", ""));
+				int responseCode = database.setPartyFinderCategoryId(guild.getId(), pfCategory.getId());
+				if (responseCode != 200) {
+					return invalidEmbed("API returned response code " + responseCode);
+				}
+				guildMap.get(guild.getId()).setPartyFinderCategory(pfCategory);
+
+				return defaultSettingsEmbed("**Party finder new channel category set to:** <#" + pfCategory.getId() + ">");
+			}
+		} catch (Exception ignored) {}
+		return invalidEmbed("Invalid guild category id");
 	}
 }

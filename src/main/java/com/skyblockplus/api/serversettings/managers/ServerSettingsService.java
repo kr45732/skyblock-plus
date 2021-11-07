@@ -380,7 +380,7 @@ public class ServerSettingsService {
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 
-	public ResponseEntity<HttpStatus> addEventMemberToRunningEvent(String serverId, EventMember newEventMember) {
+	public ResponseEntity<HttpStatus> addMemberToSkyblockEvent(String serverId, EventMember newEventMember) {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
 		if (currentServerSettings != null) {
@@ -409,7 +409,7 @@ public class ServerSettingsService {
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 
-	public ResponseEntity<HttpStatus> removeEventMemberFromRunningEvent(String serverId, String minecraftUuid) {
+	public ResponseEntity<HttpStatus> removeMemberFromSkyblockEvent(String serverId, String minecraftUuid) {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
 		if (currentServerSettings != null) {
@@ -726,6 +726,28 @@ public class ServerSettingsService {
 
 		if (currentServerSettings != null) {
 			currentServerSettings.setApplicationBlacklist(new ArrayList<>(Arrays.asList(newSettings)));
+			settingsRepository.save(currentServerSettings);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	}
+
+    public ResponseEntity<?> getPartyFinderCategoryId(String serverId) {
+		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+		if (currentServerSettings != null) {
+			return new ResponseEntity<>(currentServerSettings.getPfCategoryId(), HttpStatus.OK);
+		}
+
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+	public ResponseEntity<HttpStatus> setPartyFinderCategoryId(String serverId, String newCategoryId) {
+		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+		if (currentServerSettings != null) {
+			currentServerSettings.setPfCategoryId(newCategoryId);
 			settingsRepository.save(currentServerSettings);
 			return new ResponseEntity<>(HttpStatus.OK);
 		}

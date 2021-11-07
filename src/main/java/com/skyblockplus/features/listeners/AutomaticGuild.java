@@ -35,11 +35,11 @@ import com.skyblockplus.api.serversettings.automatedguild.GuildRole;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
 import com.skyblockplus.features.apply.ApplyGuild;
 import com.skyblockplus.features.apply.ApplyUser;
+import com.skyblockplus.features.party.Party;
 import com.skyblockplus.features.setup.SetupCommandHandler;
 import com.skyblockplus.features.skyblockevent.SkyblockEventCommand;
 import com.skyblockplus.features.skyblockevent.SkyblockEventHandler;
 import com.skyblockplus.features.verify.VerifyGuild;
-import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import java.io.File;
 import java.io.FileReader;
@@ -75,17 +75,21 @@ public class AutomaticGuild {
 
 	/* Automated Apply */
 	public final List<ApplyGuild> applyGuild = new ArrayList<>();
-	/* Miscellaneous */
-	public final String guildId;
-	public final List<ScheduledFuture<?>> scheduledFutures = new ArrayList<>();
 	/* Automated Verify */
 	public VerifyGuild verifyGuild;
 	/* Skyblock event */
+	public SkyblockEventHandler skyblockEventHandler = null;
 	public List<EventMember> eventMemberList = new ArrayList<>();
 	public Instant eventMemberListLastUpdated = null;
 	/* Mee6 Roles */
 	public JsonElement currentMee6Settings;
 	public Instant lastMee6RankUpdate = null;
+	/* Party */
+	public List<Party> partyList = new ArrayList<>();
+	public Category partyFinderCategory = null;
+	/* Miscellaneous */
+	public final String guildId;
+	public final List<ScheduledFuture<?>> scheduledFutures = new ArrayList<>();
 	public String prefix;
 
 	/* Constructor */
@@ -97,6 +101,7 @@ public class AutomaticGuild {
 		schedulerConstructor();
 		currentMee6Settings = database.getMee6Settings(guildId);
 		prefix = database.getPrefix(guildId);
+		try{partyFinderCategory = event.getGuild().getCategoryById(database.getPartyFinderCategoryId(guildId));}catch (Exception ignored){}
 	}
 
 	public static String getGuildPrefix(String guildId) {
@@ -502,9 +507,9 @@ public class AutomaticGuild {
 	public void updateSkyblockEvent() {
 		try {
 			if (database.getSkyblockEventActive(guildId)) {
-				JsonElement currentSettings = database.getRunningEventSettings(guildId);
+				JsonElement currentSettings = database.getSkyblockEventSettings(guildId);
 				Instant endingTime = Instant.ofEpochSecond(higherDepth(currentSettings, "timeEndingSeconds").getAsLong());
-				if (Duration.between(Instant.now(), endingTime).toMinutes() <= 0) {
+				if (Duration.between(Instant.now(), endingTime).toMinutes() <= 5) {
 					endSkyblockEvent(guildId);
 				}
 			}
@@ -517,8 +522,8 @@ public class AutomaticGuild {
 		this.eventMemberListLastUpdated = eventMemberListLastUpdated;
 	}
 
-	public void createSkyblockEvent(PaginatorEvent event) {
-		new SkyblockEventHandler(event);
+	public void setSkyblockEventHandler(SkyblockEventHandler skyblockEventHandler){
+		this.skyblockEventHandler = skyblockEventHandler;
 	}
 
 	/* Mee6 Roles Methods */
@@ -691,6 +696,14 @@ public class AutomaticGuild {
 			}
 		} else if (event.getButton().getId().startsWith("apply_user_") && !event.getButton().getId().startsWith("apply_user_wait_")) {
 			event.deferReply().complete();
+		} else if(event.getButton().getId().startsWith("party_finder_channel_close_")){
+			if(event.getUser().getId().equalsIgnoreCase(event.getButton().getId().split("party_finder_channel_close_")[1])){
+				event.replyEmbeds(defaultEmbed("Party Finder").setDescription("Closing channel").build()).queue();
+				event.getTextChannel().delete().queueAfter(5, TimeUnit.SECONDS);
+			}else{
+				event.replyEmbeds(invalidEmbed("Only the party leader can close the channel").build()).setEphemeral(true).queue();
+			}
+			return;
 		} else {
 			event.deferReply(true).complete();
 		}
@@ -715,6 +728,10 @@ public class AutomaticGuild {
 		for (ScheduledFuture<?> scheduledFuture : scheduledFutures) {
 			scheduledFuture.cancel(true);
 		}
+	}
+
+	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
+		verifyGuild.onGuildMemberJoin(event);
 	}
 
 	/* Miscellaneous */
@@ -785,7 +802,7 @@ public class AutomaticGuild {
 
 	public JsonElement getUpdatedItemMappingsJson() {
 		File dir = new File("src/main/java/com/skyblockplus/json/neu/items");
-		JsonObject outputArray = new JsonObject();
+		JsonObject outputObj = new JsonObject();
 
 		Map<String, String> rarityMapRev = new HashMap<>();
 		rarityMapRev.put("5", "Mythic");
@@ -810,33 +827,22 @@ public class AutomaticGuild {
 				if (itemName.equals("Enchanted Book")) {
 					itemName = parseMcCodes(higherDepth(itemJson, "lore.[0]").getAsString());
 				}
-				if (itemName.contains("⚚")) {
-					itemName = itemName.replace("⚚ ", "STARRED ");
-				}
-				if (itemName.contains("Melody\\u0027s Hair")) {
-					itemName = "MELODY_HAIR";
-				}
-				itemName = itemName.replace("™", "").replace("\u0027s", "").toUpperCase().replace("\u0027", "").replace(" ", "_");
-				if (itemName.contains("MELODY_HAIR")) {
-					itemName = "MELODY_HAIR";
-				}
 				if (itemId.contains("-")) {
 					itemId = itemId.replace("-", ":");
 				}
 
-				JsonArray toAdd = new JsonArray();
-				toAdd.add(itemId);
-				if (outputArray.has(itemName)) {
-					toAdd.addAll(outputArray.get(itemName).getAsJsonArray());
-				}
+				JsonObject toAdd = new JsonObject();
+				toAdd.addProperty("name", itemName);
+//				toAdd.add("recipe", higherDepth(itemJson, "recipe"));
+				toAdd.add("wiki", higherDepth(itemJson, "infoType", "").equals("WIKI_URL") ? higherDepth(itemJson, "info.[0]") : null);
 
-				outputArray.add(itemName, toAdd);
+				outputObj.add(itemId, toAdd);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 
-		return outputArray;
+		return outputObj;
 	}
 
 	public JsonElement getUpdatedPriceOverridesJson(JsonElement currentPriceOverrides) {
@@ -895,7 +901,7 @@ public class AutomaticGuild {
 		return finalOutput;
 	}
 
-	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
-		verifyGuild.onGuildMemberJoin(event);
+	public void setPartyFinderCategory(Category category){
+		this.partyFinderCategory = category;
 	}
 }

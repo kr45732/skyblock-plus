@@ -451,6 +451,15 @@ public class Player {
 		}
 	}
 
+	public int getHighestPlayedDungeonFloor(){
+		int master = higherDepth(profileJson(), "dungeons.dungeon_types.master_catacombs.highest_tier_completed", -1);
+		if(master != -1){
+			return master + 7;
+		}
+
+		return higherDepth(profileJson(), "dungeons.dungeon_types.catacombs.highest_tier_completed", -1);
+	}
+
 	public Set<String> getItemsPlayerHas(List<String> items, InvItem... extras) {
 		Map<Integer, InvItem> invItemMap = getInventoryMap();
 		if (invItemMap == null) {

@@ -38,7 +38,7 @@ public class FetchurCommand extends Command {
 
 	public static EmbedBuilder getFetchurItem() {
 		String[] fetchurItem = FETCHUR_ITEMS
-			.get((LocalDate.now(ZoneId.of("America/New_York")).getDayOfMonth() - 1) % FETCHUR_ITEMS.size())
+			.get((LocalDate.now(ZoneId.of("America/New_York")).getDayOfMonth() + 1) % FETCHUR_ITEMS.size() - 1)
 			.split("\\|");
 		return defaultEmbed("Fetchur item")
 			.setDescription(fetchurItem[0])
@@ -50,6 +50,8 @@ public class FetchurCommand extends Command {
 		new CommandExecute(this, event) {
 			@Override
 			protected void execute() {
+				logCommand();
+
 				embed(getFetchurItem());
 			}
 		}

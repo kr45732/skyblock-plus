@@ -142,8 +142,7 @@ public class ApplyGuild {
 		ApplyUser toAdd = new ApplyUser(
 			event,
 			currentSettings,
-			higherDepth(linkedAccount, "minecraftUsername").getAsString(),
-			higherDepth(linkedAccount, "minecraftUuid").getAsString()
+			higherDepth(linkedAccount, "minecraftUsername").getAsString()
 		);
 		if (toAdd.failCause != null) {
 			return "❌ " + toAdd.failCause;

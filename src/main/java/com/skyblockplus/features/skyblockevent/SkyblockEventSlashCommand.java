@@ -69,8 +69,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 				break;
 			case "end":
 				if (database.getSkyblockEventActive(event.getGuild().getId())) {
-					SkyblockEventCommand.endSkyblockEvent(event.getGuild().getId());
-					event.embed(defaultEmbed("Success").setDescription("Event Ended"));
+					event.embed(SkyblockEventCommand.endSkyblockEvent(event.getGuild().getId()));
 				} else {
 					event.embed(defaultEmbed("No event running"));
 				}

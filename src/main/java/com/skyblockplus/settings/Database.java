@@ -167,8 +167,8 @@ public class Database {
 		return settingsService.setSkyblockEventSettings(serverId, currentSettings).getStatusCodeValue();
 	}
 
-	public int addEventMemberToRunningEvent(String serverId, EventMember newEventMember) {
-		return settingsService.addEventMemberToRunningEvent(serverId, newEventMember).getStatusCodeValue();
+	public int addMemberToSkyblockEvent(String serverId, EventMember newEventMember) {
+		return settingsService.addMemberToSkyblockEvent(serverId, newEventMember).getStatusCodeValue();
 	}
 
 	public boolean getSkyblockEventActive(String serverId) {
@@ -179,12 +179,12 @@ public class Database {
 		return (String) settingsService.getSkyblockEventGuildId(serverId).getBody();
 	}
 
-	public JsonElement getRunningEventSettings(String serverId) {
+	public JsonElement getSkyblockEventSettings(String serverId) {
 		return gson.toJsonTree(settingsService.getSkyblockEventSettings(serverId).getBody());
 	}
 
-	public int removeEventMemberFromRunningEvent(String serverId, String minecraftUuid) {
-		return settingsService.removeEventMemberFromRunningEvent(serverId, minecraftUuid).getStatusCodeValue();
+	public int removeMemberFromSkyblockEvent(String serverId, String minecraftUuid) {
+		return settingsService.removeMemberFromSkyblockEvent(serverId, minecraftUuid).getStatusCodeValue();
 	}
 
 	public boolean eventHasMemberByUuid(String serverId, String minecraftUuid) {
@@ -258,5 +258,13 @@ public class Database {
 
 	public int setApplyBlacklist(String serverId, JsonArray newSettings) {
 		return settingsService.setApplyBlacklist(serverId, gson.fromJson(newSettings, ApplyBlacklist[].class)).getStatusCodeValue();
+	}
+
+    public String getPartyFinderCategoryId(String serverId) {
+		try{return (String) settingsService.getPartyFinderCategoryId(serverId).getBody();}catch (Exception e){return null;}
+    }
+
+	public int setPartyFinderCategoryId(String serverId, String newSettings) {
+		return settingsService.setPartyFinderCategoryId(serverId, newSettings).getStatusCodeValue();
 	}
 }

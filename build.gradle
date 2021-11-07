@@ -69,10 +69,10 @@ dependencies {
     implementation 'com.github.TheNullicorn:Nedit:2.1.0'
 
     // Spring boot and postgresql
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.5.5'
-    implementation 'org.springframework.boot:spring-boot-starter-security:2.5.5'
-    implementation 'org.springframework.boot:spring-boot-starter-web:2.5.5'
-    runtimeOnly 'org.postgresql:postgresql:42.2.24.jre7'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.5.6'
+    implementation 'org.springframework.boot:spring-boot-starter-security:2.5.6'
+    implementation 'org.springframework.boot:spring-boot-starter-web:2.5.6'
+    runtimeOnly 'org.postgresql:postgresql:42.3.1'
 
     // MySQL
     implementation 'mysql:mysql-connector-java:8.0.27'
