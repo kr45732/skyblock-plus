@@ -725,10 +725,7 @@ public class Utils {
 		}
 
 		for (Map.Entry<String, JsonElement> entry : internalJsonMappings.entrySet()) {
-			if (
-				higherDepth(entry.getValue(), "name").getAsString().equalsIgnoreCase(itemName) ||
-				higherDepth(entry.getValue(), "id").getAsString().equalsIgnoreCase(internalName)
-			) {
+			if(higherDepth(entry.getValue(), "name").getAsString().equalsIgnoreCase(itemName) || entry.getKey().equalsIgnoreCase(internalName)){
 				internalName = entry.getKey();
 				break;
 			}
