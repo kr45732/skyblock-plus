@@ -80,7 +80,10 @@ public class SkyblockEventHandler {
 	}
 
 	private boolean condition(GuildMessageReceivedEvent event) {
-		return paginatorEvent.getChannel().getId().equals(event.getChannel().getId()) && paginatorEvent.getUser().getId().equals(event.getAuthor().getId());
+		return (
+			paginatorEvent.getChannel().getId().equals(event.getChannel().getId()) &&
+			paginatorEvent.getUser().getId().equals(event.getAuthor().getId())
+		);
 	}
 
 	private void action(GuildMessageReceivedEvent event) {
@@ -396,7 +399,7 @@ public class SkyblockEventHandler {
 				TimeUnit.MINUTES,
 				() -> sendEmbedMessage(defaultEmbed("Skyblock Event").setDescription("Event creation timed out"), false)
 			);
-		}else {
+		} else {
 			guildMap.get(paginatorEvent.getGuild().getId()).setSkyblockEventHandler(null);
 		}
 	}

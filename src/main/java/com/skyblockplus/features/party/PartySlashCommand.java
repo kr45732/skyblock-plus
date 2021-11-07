@@ -35,7 +35,7 @@ public class PartySlashCommand extends SlashCommand {
 	protected void execute(SlashCommandExecutedEvent event) {
 		event.logCommand();
 
-		switch (event.getSubcommandName()){
+		switch (event.getSubcommandName()) {
 			case "create":
 				event.paginate(PartyCommand.createParty(new PaginatorEvent(event)), true);
 				return;
@@ -65,17 +65,15 @@ public class PartySlashCommand extends SlashCommand {
 	@Override
 	public CommandData getCommandData() {
 		return new CommandData(name, "Main party command")
-				.addSubcommands(
-						new SubcommandData("create", "Interactive message to create a new party"),
-						new SubcommandData("list", "List all active parties"),
-						new SubcommandData("leave", "Leave your current party"),
-						new SubcommandData("disband", "Disband your current party"),
-						new SubcommandData("current", "Get information about the party you are currently in"),
-						new SubcommandData("join", "Join a party")
-								.addOption(OptionType.STRING, "username", "The party leader's username", true),
-						new SubcommandData("kick", "Kick a member from your party")
-								.addOption(OptionType.STRING, "username", "The party member's username", true)
-				);
+			.addSubcommands(
+				new SubcommandData("create", "Interactive message to create a new party"),
+				new SubcommandData("list", "List all active parties"),
+				new SubcommandData("leave", "Leave your current party"),
+				new SubcommandData("disband", "Disband your current party"),
+				new SubcommandData("current", "Get information about the party you are currently in"),
+				new SubcommandData("join", "Join a party").addOption(OptionType.STRING, "username", "The party leader's username", true),
+				new SubcommandData("kick", "Kick a member from your party")
+					.addOption(OptionType.STRING, "username", "The party member's username", true)
+			);
 	}
 }
-

@@ -90,14 +90,14 @@ public class ApplyUser implements Serializable {
 			.addPermissionOverride(event.getMember(), EnumSet.of(Permission.VIEW_CHANNEL), null)
 			.addPermissionOverride(event.getGuild().getPublicRole(), null, EnumSet.of(Permission.VIEW_CHANNEL));
 
-		try{
+		try {
 			applicationChannelAction =
 				applicationChannelAction.addPermissionOverride(
 					event.getGuild().getRoleById(higherDepth(currentSettings, "staffPingRoleId").getAsString()),
 					EnumSet.of(Permission.VIEW_CHANNEL),
 					null
 				);
-		}catch (Exception ignored){}
+		} catch (Exception ignored) {}
 
 		TextChannel applicationChannel = applicationChannelAction.complete();
 

@@ -733,7 +733,7 @@ public class ServerSettingsService {
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 
-    public ResponseEntity<?> getPartyFinderCategoryId(String serverId) {
+	public ResponseEntity<?> getPartyFinderCategoryId(String serverId) {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
 		if (currentServerSettings != null) {
@@ -741,7 +741,7 @@ public class ServerSettingsService {
 		}
 
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    }
+	}
 
 	public ResponseEntity<HttpStatus> setPartyFinderCategoryId(String serverId, String newCategoryId) {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);

@@ -174,7 +174,7 @@ public class Main {
 					new SkyblockCommand(),
 					new GuildStatisticsCommand(),
 					new GuildTrackerCommand(),
-						new PartyCommand()
+					new PartyCommand()
 				)
 				.build();
 
@@ -230,7 +230,7 @@ public class Main {
 					new SkyblockSlashCommand(),
 					new GuildStatisticsSlashCommand(),
 					new GuildTrackerSlashCommand(),
-						new PartySlashCommand()
+					new PartySlashCommand()
 				);
 
 		jda =
@@ -260,7 +260,7 @@ public class Main {
 			ApiHandler.initialize();
 			TrackAuctionsCommand.initialize();
 			GuildTrackerCommand.initialize();
-//			AuctionFlipper.scheduleFlipper();
+			//			AuctionFlipper.scheduleFlipper();
 		}
 	}
 

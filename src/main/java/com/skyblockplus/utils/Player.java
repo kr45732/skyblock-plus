@@ -451,9 +451,9 @@ public class Player {
 		}
 	}
 
-	public int getHighestPlayedDungeonFloor(){
+	public int getHighestPlayedDungeonFloor() {
 		int master = higherDepth(profileJson(), "dungeons.dungeon_types.master_catacombs.highest_tier_completed", -1);
-		if(master != -1){
+		if (master != -1) {
 			return master + 7;
 		}
 

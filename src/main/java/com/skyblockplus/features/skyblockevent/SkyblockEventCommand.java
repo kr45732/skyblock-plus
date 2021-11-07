@@ -66,15 +66,16 @@ public class SkyblockEventCommand extends Command {
 		JsonElement runningEventSettings = database.getSkyblockEventSettings(guildId);
 		TextChannel announcementChannel = jda.getTextChannelById(higherDepth(runningEventSettings, "announcementId").getAsString());
 		List<EventMember> guildMemberPlayersList = getEventLeaderboardList(runningEventSettings, guildId);
-		if(guildMemberPlayersList == null){
-			return invalidEmbed("A Hypixel API key must be set for events over 30 members so the leaderboard can be calculated before it ends");
+		if (guildMemberPlayersList == null) {
+			return invalidEmbed(
+				"A Hypixel API key must be set for events over 30 members so the leaderboard can be calculated before it ends"
+			);
 		}
 
 		guildMap.get(guildId).setEventMemberListLastUpdated(null);
 		announcementChannel
 			.retrieveMessageById(higherDepth(runningEventSettings, "announcementMessageId").getAsString())
 			.queue(m -> m.editMessageComponents().queue());
-
 
 		CustomPaginator.Builder paginateBuilder = defaultPaginator()
 			.setColumns(1)
@@ -142,9 +143,9 @@ public class SkyblockEventCommand extends Command {
 		String eventType = higherDepth(runningSettings, "eventType").getAsString();
 
 		String key = null;
-		if(membersArr.size() > 30){
+		if (membersArr.size() > 30) {
 			key = database.getServerHypixelApiKey(guildId);
-			if(key == null){
+			if (key == null) {
 				return null;
 			}
 		}
@@ -160,12 +161,21 @@ public class SkyblockEventCommand extends Command {
 				guildMemberUsername.thenApply(guildMemberUsernameResponse -> {
 					try {
 						if ((hypixelKey != null ? keyCooldownMap.get(hypixelKey).getRemainingLimit().get() : remainingLimit.get()) < 5) {
-							log.info("Sleeping for " + (hypixelKey != null ? keyCooldownMap.get(hypixelKey).getTimeTillReset() : timeTillReset) + " seconds");
-							TimeUnit.SECONDS.sleep(hypixelKey != null ? keyCooldownMap.get(hypixelKey).getTimeTillReset().get() : timeTillReset.get());
+							log.info(
+								"Sleeping for " +
+								(hypixelKey != null ? keyCooldownMap.get(hypixelKey).getTimeTillReset() : timeTillReset) +
+								" seconds"
+							);
+							TimeUnit.SECONDS.sleep(
+								hypixelKey != null ? keyCooldownMap.get(hypixelKey).getTimeTillReset().get() : timeTillReset.get()
+							);
 						}
 					} catch (Exception ignored) {}
 
-					CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(guildMemberUuid, hypixelKey != null ? hypixelKey : HYPIXEL_API_KEY);
+					CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(
+						guildMemberUuid,
+						hypixelKey != null ? hypixelKey : HYPIXEL_API_KEY
+					);
 
 					return guildMemberProfileJson.thenApply(guildMemberProfileJsonResponse -> {
 						Player guildMemberPlayer = new Player(
@@ -325,8 +335,8 @@ public class SkyblockEventCommand extends Command {
 
 		JsonElement runningSettings = database.getSkyblockEventSettings(guildId);
 		List<EventMember> guildMemberPlayersList = getEventLeaderboardList(runningSettings, guildId);
-		if(guildMemberPlayersList == null){
-			return  invalidEmbed("A Hypixel API key must be set for events with over 30 members");
+		if (guildMemberPlayersList == null) {
+			return invalidEmbed("A Hypixel API key must be set for events with over 30 members");
 		}
 
 		for (int i = 0; i < guildMemberPlayersList.size(); i++) {
@@ -412,8 +422,8 @@ public class SkyblockEventCommand extends Command {
 
 		JsonElement runningSettings = database.getSkyblockEventSettings(guildId);
 		List<EventMember> guildMemberPlayersList = getEventLeaderboardList(runningSettings, guildId);
-		if(guildMemberPlayersList == null){
-			return  invalidEmbed("A Hypixel API key must be set for events with over 30 members");
+		if (guildMemberPlayersList == null) {
+			return invalidEmbed("A Hypixel API key must be set for events with over 30 members");
 		}
 
 		for (int i = 0; i < guildMemberPlayersList.size(); i++) {
@@ -475,9 +485,7 @@ public class SkyblockEventCommand extends Command {
 				}
 
 				if (database.eventHasMemberByUuid(guildId, uuid)) {
-					return invalidEmbed(
-						"You are already in the event! If you want to leave or change profile use `/event leave`"
-					);
+					return invalidEmbed("You are already in the event! If you want to leave or change profile use `/event leave`");
 				}
 
 				HypixelResponse guildJson = getGuildFromPlayer(uuid);
@@ -668,16 +676,16 @@ public class SkyblockEventCommand extends Command {
 
 	public static EmbedBuilder createSkyblockEvent(PaginatorEvent event) {
 		boolean sbEventActive = database.getSkyblockEventActive(event.getGuild().getId());
-		if(sbEventActive){
+		if (sbEventActive) {
 			return invalidEmbed("Event already running");
-		}else if (guildMap.containsKey(event.getGuild().getId())) {
-			if(guildMap.get(event.getGuild().getId()).skyblockEventHandler == null){
+		} else if (guildMap.containsKey(event.getGuild().getId())) {
+			if (guildMap.get(event.getGuild().getId()).skyblockEventHandler == null) {
 				guildMap.get(event.getGuild().getId()).setSkyblockEventHandler(new SkyblockEventHandler(event));
 				return null;
-			}else{
+			} else {
 				return invalidEmbed("Someone is already creating an event in this server");
 			}
-		}else{
+		} else {
 			return invalidEmbed("Cannot find server");
 		}
 	}

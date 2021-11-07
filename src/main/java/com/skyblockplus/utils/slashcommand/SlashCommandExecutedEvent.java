@@ -151,7 +151,7 @@ public class SlashCommandExecutedEvent {
 	public void paginate(EmbedBuilder failEmbed, boolean deleteOriginal) {
 		if (failEmbed != null) {
 			event.getHook().editOriginalEmbeds(failEmbed.build()).queue(ignored -> {}, ignored -> {});
-		}else if(deleteOriginal){
+		} else if (deleteOriginal) {
 			event.getHook().deleteOriginal().queue();
 		}
 	}

@@ -101,7 +101,9 @@ public class AutomaticGuild {
 		schedulerConstructor();
 		currentMee6Settings = database.getMee6Settings(guildId);
 		prefix = database.getPrefix(guildId);
-		try{partyFinderCategory = event.getGuild().getCategoryById(database.getPartyFinderCategoryId(guildId));}catch (Exception ignored){}
+		try {
+			partyFinderCategory = event.getGuild().getCategoryById(database.getPartyFinderCategoryId(guildId));
+		} catch (Exception ignored) {}
 	}
 
 	public static String getGuildPrefix(String guildId) {
@@ -522,7 +524,7 @@ public class AutomaticGuild {
 		this.eventMemberListLastUpdated = eventMemberListLastUpdated;
 	}
 
-	public void setSkyblockEventHandler(SkyblockEventHandler skyblockEventHandler){
+	public void setSkyblockEventHandler(SkyblockEventHandler skyblockEventHandler) {
 		this.skyblockEventHandler = skyblockEventHandler;
 	}
 
@@ -696,11 +698,11 @@ public class AutomaticGuild {
 			}
 		} else if (event.getButton().getId().startsWith("apply_user_") && !event.getButton().getId().startsWith("apply_user_wait_")) {
 			event.deferReply().complete();
-		} else if(event.getButton().getId().startsWith("party_finder_channel_close_")){
-			if(event.getUser().getId().equalsIgnoreCase(event.getButton().getId().split("party_finder_channel_close_")[1])){
+		} else if (event.getButton().getId().startsWith("party_finder_channel_close_")) {
+			if (event.getUser().getId().equalsIgnoreCase(event.getButton().getId().split("party_finder_channel_close_")[1])) {
 				event.replyEmbeds(defaultEmbed("Party Finder").setDescription("Closing channel").build()).queue();
 				event.getTextChannel().delete().queueAfter(5, TimeUnit.SECONDS);
-			}else{
+			} else {
 				event.replyEmbeds(invalidEmbed("Only the party leader can close the channel").build()).setEphemeral(true).queue();
 			}
 			return;
@@ -833,7 +835,7 @@ public class AutomaticGuild {
 
 				JsonObject toAdd = new JsonObject();
 				toAdd.addProperty("name", itemName);
-//				toAdd.add("recipe", higherDepth(itemJson, "recipe"));
+				//				toAdd.add("recipe", higherDepth(itemJson, "recipe"));
 				toAdd.add("wiki", higherDepth(itemJson, "infoType", "").equals("WIKI_URL") ? higherDepth(itemJson, "info.[0]") : null);
 
 				outputObj.add(itemId, toAdd);
@@ -901,7 +903,7 @@ public class AutomaticGuild {
 		return finalOutput;
 	}
 
-	public void setPartyFinderCategory(Category category){
+	public void setPartyFinderCategory(Category category) {
 		this.partyFinderCategory = category;
 	}
 }

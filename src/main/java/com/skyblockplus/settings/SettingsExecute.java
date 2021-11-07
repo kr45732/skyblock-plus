@@ -2387,14 +2387,14 @@ public class SettingsExecute {
 
 	private EmbedBuilder setPartyFinderCategory(String category) {
 		try {
-			if(category.equalsIgnoreCase("none")){
+			if (category.equalsIgnoreCase("none")) {
 				int responseCode = database.setPartyFinderCategoryId(guild.getId(), "none");
 				if (responseCode != 200) {
 					return invalidEmbed("API returned response code " + responseCode);
 				}
 				guildMap.get(guild.getId()).setPartyFinderCategory(null);
 				return defaultSettingsEmbed("**Party finder new channel category disabled**");
-			}else {
+			} else {
 				Category pfCategory = guild.getCategoryById(category.replaceAll("[<#>]", ""));
 				int responseCode = database.setPartyFinderCategoryId(guild.getId(), pfCategory.getId());
 				if (responseCode != 200) {

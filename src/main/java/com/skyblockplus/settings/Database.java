@@ -260,9 +260,13 @@ public class Database {
 		return settingsService.setApplyBlacklist(serverId, gson.fromJson(newSettings, ApplyBlacklist[].class)).getStatusCodeValue();
 	}
 
-    public String getPartyFinderCategoryId(String serverId) {
-		try{return (String) settingsService.getPartyFinderCategoryId(serverId).getBody();}catch (Exception e){return null;}
-    }
+	public String getPartyFinderCategoryId(String serverId) {
+		try {
+			return (String) settingsService.getPartyFinderCategoryId(serverId).getBody();
+		} catch (Exception e) {
+			return null;
+		}
+	}
 
 	public int setPartyFinderCategoryId(String serverId, String newSettings) {
 		return settingsService.setPartyFinderCategoryId(serverId, newSettings).getStatusCodeValue();
