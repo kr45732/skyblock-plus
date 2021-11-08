@@ -125,9 +125,9 @@ public class NetworthExecute {
 			bazaarJson = higherDepth(getBazaarJson(), "products");
 			sbzPrices = getSbzPricesJson();
 
-			recombPrice = higherDepth(bazaarJson, "RECOMBOBULATOR_3000.sell_summary.[0].pricePerUnit").getAsDouble();
-			hbpPrice = higherDepth(bazaarJson, "HOT_POTATO_BOOK.sell_summary.[0].pricePerUnit").getAsDouble();
-			fumingPrice = higherDepth(bazaarJson, "FUMING_POTATO_BOOK.sell_summary.[0].pricePerUnit").getAsDouble();
+			recombPrice = higherDepth(bazaarJson, "RECOMBOBULATOR_3000.sell_summary.[0].pricePerUnit", 0.0);
+			hbpPrice = higherDepth(bazaarJson, "HOT_POTATO_BOOK.sell_summary.[0].pricePerUnit", 0.0);
+			fumingPrice = higherDepth(bazaarJson, "FUMING_POTATO_BOOK.sell_summary.[0].pricePerUnit", 0.0);
 
 			bankBalance = player.getBankBalance();
 			purseCoins = player.getPurseCoins();

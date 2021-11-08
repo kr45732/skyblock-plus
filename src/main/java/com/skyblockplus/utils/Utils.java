@@ -156,6 +156,16 @@ public class Utils {
 		return lowestBinJson;
 	}
 
+	public static JsonObject getInternalJsonMappings(){
+		if(internalJsonMappings == null){
+			internalJsonMappings =
+					getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json")
+							.getAsJsonObject();
+		}
+
+		return internalJsonMappings;
+	}
+
 	public static JsonObject getEmojiMap() {
 		if (emojiMap == null) {
 			try {
@@ -684,10 +694,7 @@ public class Utils {
 	}
 
 	public static String nameToId(String itemName) {
-		if (internalJsonMappings == null) {
-			internalJsonMappings =
-				getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json").getAsJsonObject();
-		}
+		getInternalJsonMappings();
 
 		String internalName = itemName
 			.trim()
@@ -738,13 +745,7 @@ public class Utils {
 	}
 
 	public static String idToName(String id) {
-		if (internalJsonMappings == null) {
-			try {
-				internalJsonMappings =
-					getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json")
-						.getAsJsonObject();
-			} catch (Exception ignored) {}
-		}
+		getInternalJsonMappings();
 
 		id = id.toUpperCase();
 		return higherDepth(internalJsonMappings, id + ".name", capitalizeString(id.replace("_", " ")));

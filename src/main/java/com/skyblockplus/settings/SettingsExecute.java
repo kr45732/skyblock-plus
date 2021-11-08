@@ -1201,7 +1201,7 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder setRoleEnable(String roleName, boolean enable) {
-		if (roleName.equals("")) {
+		if (roleName.equals("all")) {
 			JsonObject roleSettings = database.getRolesSettings(guild.getId()).getAsJsonObject();
 			if (enable) {
 				List<String> enabled = new ArrayList<>();
@@ -1290,12 +1290,12 @@ public class SettingsExecute {
 					return invalidEmbed("API returned response code " + responseCode);
 				}
 
-				return defaultEmbed("Settings").setDescription("Added guild ranks for guild roles with name `" + roleValue + "`");
+				return defaultSettingsEmbed("Added guild ranks for guild roles with name `" + roleValue + "`");
 			}
 
 			return invalidEmbed("Invalid guild role name or guild ranks not enabled");
 		} else if (isOneLevelRole(roleName)) {
-			return defaultEmbed(
+			return invalidEmbed(
 				"These roles do not support levels. Use `" + guildPrefix + "settings roles set [roleName] [@role]` instead"
 			);
 		} else {
@@ -1306,7 +1306,8 @@ public class SettingsExecute {
 			}
 		}
 
-		Role role = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
+		Role role = null;
+		try{role = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));}catch (Exception ignored){}
 		if (role == null) {
 			return invalidEmbed("Invalid role mention");
 		}

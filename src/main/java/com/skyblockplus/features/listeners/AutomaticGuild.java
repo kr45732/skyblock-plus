@@ -635,9 +635,8 @@ public class AutomaticGuild {
 
 				scheduler.schedule(
 					() -> {
-						internalJsonMappings =
-							getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json")
-								.getAsJsonObject();
+						internalJsonMappings = null;
+						getInternalJsonMappings();
 						refreshPriceOverrideJson();
 					},
 					5,

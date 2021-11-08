@@ -40,6 +40,8 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 
 public class GuildRanksCommand extends Command {
@@ -388,13 +390,11 @@ public class GuildRanksCommand extends Command {
 		} else {
 			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(20);
 			int totalChange = 0;
+			List<String> defaultRank = streamJsonArray(higherDepth(lbSettings, "default_role").getAsJsonArray()).map(JsonElement::getAsString).collect(Collectors.toList());
 			for (GuildRanksStruct gMember : gMembers) {
 				for (JsonElement rank : higherDepth(lbSettings, "ranks").getAsJsonArray()) {
 					boolean meetsReq = true;
-					List<String> rankNamesList = new ArrayList<>();
-					for (JsonElement rankName : higherDepth(rank, "names").getAsJsonArray()) {
-						rankNamesList.add(rankName.getAsString());
-					}
+					List<String> rankNamesList = streamJsonArray(higherDepth(rank, "names").getAsJsonArray()).map(JsonElement::getAsString).collect(Collectors.toList());
 					for (JsonElement req : higherDepth(rank, "requirements").getAsJsonArray()) {
 						double amount = 0;
 						switch (higherDepth(req, "type").getAsString()) {
@@ -420,19 +420,19 @@ public class GuildRanksCommand extends Command {
 
 					if (meetsReq) {
 						if (!rankNamesList.contains(gMember.getGuildRank().toLowerCase())) {
-							paginateBuilder.addItems(("- /g setrank " + fixUsername(gMember.getGuildRank()) + " " + rankNamesList.get(0)));
+							paginateBuilder.addItems(("- /g setrank " + fixUsername(gMember.getName()) + " " + rankNamesList.get(0)));
 							totalChange++;
 						}
-						break;
 					} else {
-						if (!rankNamesList.contains(gMember.getGuildRank().toLowerCase())) {
-							paginateBuilder.addItems(("- /g setrank " + fixUsername(gMember.getGuildRank()) + " " + rankNamesList.get(0)));
+						if (!defaultRank.contains(gMember.getGuildRank().toLowerCase())) {
+							paginateBuilder.addItems(("- /g setrank " + fixUsername(gMember.getName()) + " " + defaultRank.get(0)));
 							totalChange++;
 						}
-						break;
 					}
+					break;
 				}
 			}
+
 			paginateBuilder.setPaginatorExtras(
 				new PaginatorExtras()
 					.setEveryPageTitle("Rank changes for " + guildName)
