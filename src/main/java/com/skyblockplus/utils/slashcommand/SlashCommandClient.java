@@ -23,7 +23,6 @@ import static com.skyblockplus.utils.Utils.invalidEmbed;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -55,7 +54,7 @@ public class SlashCommandClient extends ListenerAdapter {
 			event.replyEmbeds(invalidEmbed("This command cannot be used in direct messages").build()).queue();
 			return;
 		}
-		if(event.getChannelType() != ChannelType.TEXT){
+		if (event.getChannelType() != ChannelType.TEXT) {
 			event.replyEmbeds(invalidEmbed("This command cannot only be used in text channels").build()).queue();
 			return;
 		}

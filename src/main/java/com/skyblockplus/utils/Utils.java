@@ -156,11 +156,10 @@ public class Utils {
 		return lowestBinJson;
 	}
 
-	public static JsonObject getInternalJsonMappings(){
-		if(internalJsonMappings == null){
+	public static JsonObject getInternalJsonMappings() {
+		if (internalJsonMappings == null) {
 			internalJsonMappings =
-					getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json")
-							.getAsJsonObject();
+				getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json").getAsJsonObject();
 		}
 
 		return internalJsonMappings;

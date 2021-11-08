@@ -41,7 +41,6 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 
 public class GuildRanksCommand extends Command {
@@ -390,11 +389,15 @@ public class GuildRanksCommand extends Command {
 		} else {
 			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(20);
 			int totalChange = 0;
-			List<String> defaultRank = streamJsonArray(higherDepth(lbSettings, "default_role").getAsJsonArray()).map(JsonElement::getAsString).collect(Collectors.toList());
+			List<String> defaultRank = streamJsonArray(higherDepth(lbSettings, "default_role").getAsJsonArray())
+				.map(JsonElement::getAsString)
+				.collect(Collectors.toList());
 			for (GuildRanksStruct gMember : gMembers) {
 				for (JsonElement rank : higherDepth(lbSettings, "ranks").getAsJsonArray()) {
 					boolean meetsReq = true;
-					List<String> rankNamesList = streamJsonArray(higherDepth(rank, "names").getAsJsonArray()).map(JsonElement::getAsString).collect(Collectors.toList());
+					List<String> rankNamesList = streamJsonArray(higherDepth(rank, "names").getAsJsonArray())
+						.map(JsonElement::getAsString)
+						.collect(Collectors.toList());
 					for (JsonElement req : higherDepth(rank, "requirements").getAsJsonArray()) {
 						double amount = 0;
 						switch (higherDepth(req, "type").getAsString()) {

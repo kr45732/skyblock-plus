@@ -1307,7 +1307,9 @@ public class SettingsExecute {
 		}
 
 		Role role = null;
-		try{role = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));}catch (Exception ignored){}
+		try {
+			role = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
+		} catch (Exception ignored) {}
 		if (role == null) {
 			return invalidEmbed("Invalid role mention");
 		}

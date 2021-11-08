@@ -38,23 +38,25 @@ public class HelpCommand extends Command {
 
 	public static final List<HelpData> helpDataList = new ArrayList<>();
 	private static final String[] nonAdmin = {
-			"General",
-			"Slayer",
-			"Skills",
-			"Dungeons",
-			"Guild",
-			"Price Commands",
-			"Inventory",
-			"Miscellaneous Commands",
-			"Party",
-			"Skyblock Event",
+		"General",
+		"Slayer",
+		"Skills",
+		"Dungeons",
+		"Guild",
+		"Price Commands",
+		"Inventory",
+		"Miscellaneous Commands",
+		"Party",
+		"Skyblock Event",
 	};
-	private static final String[] admin = ArrayUtils.addAll(nonAdmin,
-			"Settings",
-			"Verify Settings",
-			"Apply Settings",
-			"Roles Settings",
-			"Guild Roles Settings");
+	private static final String[] admin = ArrayUtils.addAll(
+		nonAdmin,
+		"Settings",
+		"Verify Settings",
+		"Apply Settings",
+		"Roles Settings",
+		"Guild Roles Settings"
+	);
 
 	private static final String[] pageTitles = ArrayUtils.addFirst(admin, "Navigation");
 
@@ -70,7 +72,7 @@ public class HelpCommand extends Command {
 		helpDataList.clear();
 		helpDataList.addAll(
 			Arrays.asList(
-					// General
+				// General
 				new HelpData("help", "Show the help menu with all the commands.", "help")
 					.addSecondData("Show the help menu for a certain command.", "help <command>")
 					.addExamples("help", "help Guild Experience")
@@ -81,7 +83,7 @@ public class HelpCommand extends Command {
 					.addSecondData("Link your Hypixel account to the bot.", "link <player>")
 					.addExamples("link CrypticPlasma"),
 				new HelpData("unlink", "Unlink your account from the bot."),
-					new HelpData("vote", "Links for where you can vote for the bot."),
+				new HelpData("vote", "Links for where you can vote for the bot."),
 				// Slayer
 				new HelpData("slayer", "Get the slayer data of a player.", "slayer [player] [profile]")
 					.addAliases("slayers")
@@ -90,8 +92,8 @@ public class HelpCommand extends Command {
 				new HelpData("skills", "Get the skills data of a player.", "skills [player] [profile]")
 					.addAliases("skill")
 					.addExamples("skills CrypticPlasma", "skills CrypticPlasma Zucchini"),
-					new HelpData("hotm", "Get a player's heart of the mountain statistics.", "hotm [player] [profile]")
-							.addExamples("hotm CrypticPlasma", "hotm CrypticPlasma Zucchini"),
+				new HelpData("hotm", "Get a player's heart of the mountain statistics.", "hotm [player] [profile]")
+					.addExamples("hotm CrypticPlasma", "hotm CrypticPlasma Zucchini"),
 				// Dungeons
 				new HelpData("dungeons", "Get the dungeons data of a player.", "dungeons [player] [profile]")
 					.addAliases("cata", "catacombs")
@@ -104,7 +106,7 @@ public class HelpCommand extends Command {
 							.addExamples("information Hyperion")
 							.addAliases("info"),
 						new HelpData("player", "Get a player's essence amounts and their essence shop upgrades.", "[player] [profile]")
-								.addExamples("player CrypticPlasma", "player CrypticPlasma Zucchini")
+							.addExamples("player CrypticPlasma", "player CrypticPlasma Zucchini")
 					),
 				new HelpData("partyfinder", "A party finder helper that shows a player's dungeon stats.", "partyfinder [player] [profile]")
 					.addAliases("pf")
@@ -118,15 +120,18 @@ public class HelpCommand extends Command {
 							.addAliases("info")
 							.addExamples("information u:CrypticPlasma", "information g:Skyblock_Forceful"),
 						new HelpData("members", "Get a list of all members in a player's guild.", "members <u:player>")
-								.addSecondData("Get a list of all members in a guild.", "members <g:guild_name>")
-								.addExamples("members u:CrypticPlasma", "members g:Skyblock_Forceful"),
+							.addSecondData("Get a list of all members in a guild.", "members <g:guild_name>")
+							.addExamples("members u:CrypticPlasma", "members g:Skyblock_Forceful"),
 						new HelpData(
 							"experience",
 							"Get the experience leaderboard for a player's guild. Days can range from 1 to 7, default number of days is 7.",
 							"experience <u:player> [days:days]"
 						)
 							.addAliases("exp")
-							.addSecondData("Get the experience leaderboard for a guild. Days can range from 1 to 7, default number of days is 7.", "experience <g:guild_name> [days:days]")
+							.addSecondData(
+								"Get the experience leaderboard for a guild. Days can range from 1 to 7, default number of days is 7.",
+								"experience <g:guild_name> [days:days]"
+							)
 							.addExamples("experience u:CrypticPlasma", "experience g:Skyblock_Forceful days:4")
 					)
 					.addAliases("g"),
@@ -144,14 +149,14 @@ public class HelpCommand extends Command {
 				)
 					.addAliases("g-kicker")
 					.addExamples("guild-kicker u:CrypticPlasma [weight:4000 skills:40] [weight:4500]"),
-					new HelpData(
-							"guild-ranks",
-							"A customizable helper that will tell you who to promote or demote in your Hypixel guild. Please DM me or join the Skyblock Plus Discord server to set this up for your guild.",
-							"guild-ranks <u:player> [mode:normal|ironman]"
-					)
-							.addAliases("g-ranks")
-							.addAliases("g-rank")
-							.addExamples("guild-ranks u:CrypticPlasma"),
+				new HelpData(
+					"guild-ranks",
+					"A customizable helper that will tell you who to promote or demote in your Hypixel guild. Please DM me or join the Skyblock Plus Discord server to set this up for your guild.",
+					"guild-ranks <u:player> [mode:normal|ironman]"
+				)
+					.addAliases("g-ranks")
+					.addAliases("g-rank")
+					.addExamples("guild-ranks u:CrypticPlasma"),
 				// Auctions
 				new HelpData("auctions", "Get a player's unclaimed auctions on all profiles.", "auctions [player]")
 					.addSecondData("Get information about an auction by it's UUID", "auctions uuid <UUID>")
@@ -168,7 +173,7 @@ public class HelpCommand extends Command {
 				new HelpData(
 					"query",
 					"Query the auction house for the lowest bin of an item. This command lets you make more specific queries than the lowest bin command.",
-						"query <item>"
+					"query <item>"
 				)
 					.addExamples("query Necron's Chestplate ✪✪✪✪✪"),
 				new HelpData("bits", "Get the bits cost of an item from the bits shop.", "bits <item>")
@@ -180,15 +185,16 @@ public class HelpCommand extends Command {
 					"calculate <UUID>"
 				)
 					.addExamples("calculate 8be8bef8c46f4dbda2eccd1ca0c30e27"),
-					new HelpData(
-							"track",
-							"Main track command"
-					).addSubcommands(
-							new HelpData("auctions", "Track a player's auctions. You will get a DM whenever any of a player's auctions sell.", "track [player]")
-									.addExamples("auctions CrypticPlasma"),
-							new HelpData("stop", "Stop tracking a player's auctions")
-					)
-					,
+				new HelpData("track", "Main track command")
+					.addSubcommands(
+						new HelpData(
+							"auctions",
+							"Track a player's auctions. You will get a DM whenever any of a player's auctions sell.",
+							"track [player]"
+						)
+							.addExamples("auctions CrypticPlasma"),
+						new HelpData("stop", "Stop tracking a player's auctions")
+					),
 				// Inventory
 				new HelpData("inventory", "Get a player's inventory represented in emojis.", "inventory [player] [profile]")
 					.addSecondData("Get a player's inventory with lore.", "inventory [player] [profile] <slot:number>")
@@ -213,7 +219,11 @@ public class HelpCommand extends Command {
 						"talisman CrypticPlasma Zucchini slot:1"
 					)
 					.addAliases("talismans"),
-				new HelpData("sacks", "Get a player's sacks' content bag represented in a list. Sorted by descending price.", "sacks [player] [profile]")
+				new HelpData(
+					"sacks",
+					"Get a player's sacks' content bag represented in a list. Sorted by descending price.",
+					"sacks [player] [profile]"
+				)
 					.addExamples("sacks CrypticPlasma", "sacks CrypticPlasma Zucchini"),
 				new HelpData("wardrobe", "Get a player's wardrobe armors represented in emojis.", "wardrobe [player] [profile]")
 					.addSecondData("Get a player's wardrobe armors represented in a list.", "wardrobe list [player] [profile]")
@@ -223,9 +233,10 @@ public class HelpCommand extends Command {
 						"wardrobe list CrypticPlasma",
 						"wardrobe list CrypticPlasma Zucchini"
 					),
-					new HelpData("pets", "Get a player's pets.", "pets [player] [profile]").addExamples("pets CrypticPlasma", "pets CrypticPlasma Zucchini"),
-// Misc
-		new HelpData("roles", "Main roles command.")
+				new HelpData("pets", "Get a player's pets.", "pets [player] [profile]")
+					.addExamples("pets CrypticPlasma", "pets CrypticPlasma Zucchini"),
+				// Misc
+				new HelpData("roles", "Main roles command.")
 					.addAliases("role")
 					.addSubcommands(
 						new HelpData("claim", "Claim your automatic Skyblock roles. You must be linked to the bot.", "claim <profile>")
@@ -251,9 +262,18 @@ public class HelpCommand extends Command {
 						"networth CrypticPlasma --verbose",
 						"networth CrypticPlasma Zucchini --verbose"
 					),
-					new HelpData("active-coins", "Get a player's active coins. This is the sum of their bank, purse, and sold auction coins.", "active-coins [player] [profile]")
-							.addExamples("active-coins CrypticPlasma", "active-coins CrypticPlasma Zucchini").addAliases("ac"),
-				new HelpData("weight", "Get a player's slayer, skills, dungeons, and total weight. Shows both senither and lily weight.", "weight [player] [profile]")
+				new HelpData(
+					"active-coins",
+					"Get a player's active coins. This is the sum of their bank, purse, and sold auction coins.",
+					"active-coins [player] [profile]"
+				)
+					.addExamples("active-coins CrypticPlasma", "active-coins CrypticPlasma Zucchini")
+					.addAliases("ac"),
+				new HelpData(
+					"weight",
+					"Get a player's slayer, skills, dungeons, and total weight. Shows both senither and lily weight.",
+					"weight [player] [profile]"
+				)
 					.addSecondData(
 						"Calculate predicted senither weight using given stats (not 100% accurate).",
 						"weight calculate [skill avg] [slayer] [cata level] [avg dungeon class level]"
@@ -266,24 +286,25 @@ public class HelpCommand extends Command {
 					.addExamples("missing CrypticPlasma", "missing CrypticPlasma Zucchini"),
 				new HelpData("profiles", "Get information about all of a player's profiles.", "missing [player] [profile]")
 					.addExamples("profiles CrypticPlasma", "profiles CrypticPlasma Zucchini"),
-					new HelpData("cakes", "Get a player's active and inactive cake buffs.", "cakes [player] [profile]")
-							.addExamples("cakes CrypticPlasma", "cakes CrypticPlasma Zucchini"),
-					new HelpData("harp", "Get a player's harp statistics.", "harp [player] [profile]")
-							.addExamples("harp CrypticPlasma", "harp CrypticPlasma Zucchini"),
-					new HelpData("uuid", "Convert username to UUID or UUID to username.", "uuid [username|uuid]")
-							.addExamples("uuid CrypticPlasma", "uuid 044903b7a9d3416d957f929557af6c88"),
-					new HelpData("fetchur", "Get the item that fetchur wants today"),
+				new HelpData("cakes", "Get a player's active and inactive cake buffs.", "cakes [player] [profile]")
+					.addExamples("cakes CrypticPlasma", "cakes CrypticPlasma Zucchini"),
+				new HelpData("harp", "Get a player's harp statistics.", "harp [player] [profile]")
+					.addExamples("harp CrypticPlasma", "harp CrypticPlasma Zucchini"),
+				new HelpData("uuid", "Convert username to UUID or UUID to username.", "uuid [username|uuid]")
+					.addExamples("uuid CrypticPlasma", "uuid 044903b7a9d3416d957f929557af6c88"),
+				new HelpData("fetchur", "Get the item that fetchur wants today"),
 				// Party
-					new HelpData("party", "Main party command.")
-							.addSubcommands(
-									new HelpData("create", "Interactive message to create a new party."),
-									new HelpData("current", "Get information about your current party."),
-									new HelpData("join <username>", "Join a player's party where username is the party leader's IGN.").addExamples("join CrypticPlasma"),
-									new HelpData("leave", "Leave your current party."),
-									new HelpData("list", "List all active parties"),
-									new HelpData("disband", "Disband your current party."),
-									new HelpData("kick <username>", "Kick a member from your party").addExamples("kick CrypticPlasma")
-							),
+				new HelpData("party", "Main party command.")
+					.addSubcommands(
+						new HelpData("create", "Interactive message to create a new party."),
+						new HelpData("current", "Get information about your current party."),
+						new HelpData("join <username>", "Join a player's party where username is the party leader's IGN.")
+							.addExamples("join CrypticPlasma"),
+						new HelpData("leave", "Leave your current party."),
+						new HelpData("list", "List all active parties"),
+						new HelpData("disband", "Disband your current party."),
+						new HelpData("kick <username>", "Kick a member from your party").addExamples("kick CrypticPlasma")
+					),
 				// Skyblock event
 				new HelpData("event", "Main event command.")
 					.addSubcommands(
@@ -297,7 +318,7 @@ public class HelpCommand extends Command {
 					),
 				// Settings
 				new HelpData("settings", "Main settings command.")
-						.addAliases("config", "configuration")
+					.addAliases("config", "configuration")
 					.addSecondData("View the current settings for the Discord server.", "settings")
 					.addSubcommands(
 						new HelpData("delete", "Delete certain settings or all settings from the database.")
@@ -318,11 +339,11 @@ public class HelpCommand extends Command {
 									"Set the prefix of the bot. Must be a least one character and no more than five.",
 									"prefix [prefix]"
 								),
-									new HelpData(
-											"pf_category",
-											"Set the category where new channels will be created for the bot's party feature. Can be set to 'none' to disable creating new channels.",
-											"pf_category <category>"
-									)
+								new HelpData(
+									"pf_category",
+									"Set the category where new channels will be created for the bot's party feature. Can be set to 'none' to disable creating new channels.",
+									"pf_category <category>"
+								)
 							),
 						new HelpData("verify", "Main command for verification settings.")
 							.addSecondData("Get the current verification settings for the bot.", "verify")
@@ -421,7 +442,8 @@ public class HelpCommand extends Command {
 									"requirements",
 									"Requirements applications must meet. An application will be auto-denied if they do not meet the requirements.",
 									"<name> requirements"
-								).addAliases("reqs", "req")
+								)
+									.addAliases("reqs", "req")
 									.addSubcommands(
 										new HelpData(
 											"add",
@@ -544,7 +566,7 @@ public class HelpCommand extends Command {
 			help.create("dungeons [player] [profile]", "Get the dungeons data of a player") +
 			help.create("essence upgrade <item>", "Interactive message to find the essence amount to upgrade an item") +
 			help.create("essence information <item>", "Get the amount of essence to upgrade an item for each level") +
-					help.create("essence player [player] [profile]", "Get a player's essence amounts and essence shop upgrades") +
+			help.create("essence player [player] [profile]", "Get a player's essence amounts and essence shop upgrades") +
 			help.create("partyfinder [player] [profile]", "A party finder helper that shows a player's dungeon statistics")
 		);
 
@@ -553,9 +575,9 @@ public class HelpCommand extends Command {
 			help.create("guild information <u:player>", "Get information and statistics about a player's guild") +
 			help.create("guild information <g:guild_name>", "Get information and statistics about a guild") +
 			help.create("guild members <u:player>", "Get a list of all members in a player's guild") +
-					help.create("guild members <g:guild_name>", "Get a list of all members in a guild") +
+			help.create("guild members <g:guild_name>", "Get a list of all members in a guild") +
 			help.create("guild experience <u:player>", "Get the experience leaderboard for a player's guild") +
-					help.create("guild experience <g:guild_name>", "Get the experience leaderboard for a guild") +
+			help.create("guild experience <g:guild_name>", "Get the experience leaderboard for a guild") +
 			help.create("g-lb <type> <u:player> [mode:normal|ironman]", "Get a leaderboard for a player's guild") +
 			help.create(
 				"g-kicker <u:player> <type:value> ...",
@@ -644,7 +666,10 @@ public class HelpCommand extends Command {
 				help.create("categories", "Get the name and id of all categories in this server") +
 				help.create("settings set hypixel_key <key>", "Set a Hypixel API key for this server") +
 				help.create("settings set prefix <prefix>", "Set the prefix of the bot") +
-						help.create("settings set pf_category <category>", "Set the category where new channels will be created for the bot's party feature") +
+				help.create(
+					"settings set pf_category <category>",
+					"Set the category where new channels will be created for the bot's party feature"
+				) +
 				help.create("settings delete hypixel_key", "Delete the set Hypixel API key of this server") +
 				help.create("settings delete prefix", "Reset the prefix of the bot") +
 				help.create("settings delete all", "Delete the current server settings")
@@ -710,7 +735,10 @@ public class HelpCommand extends Command {
 			paginateBuilder.addItems(
 				help.create("settings roles", "Get the current roles settings for the bot") +
 				help.create("settings roles <enable|disable>", "Enable or disable automatic roles") +
-				help.create("settings roles <enable|disable> <roleName|all>", "Enable or disable a specific automatic role or enable or disable each automatic role") +
+				help.create(
+					"settings roles <enable|disable> <roleName|all>",
+					"Enable or disable a specific automatic role or enable or disable each automatic role"
+				) +
 				help.create(
 					"settings roles add <roleName> <value> <@role>",
 					"Add a new level to a role with its corresponding Discord role"

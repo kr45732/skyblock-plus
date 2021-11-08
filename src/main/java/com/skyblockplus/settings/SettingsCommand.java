@@ -32,7 +32,7 @@ public class SettingsCommand extends Command {
 		this.cooldown = globalCooldown + 1;
 		this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
 		this.botPermissions = defaultPerms();
-		this.aliases = new String[]{"config", "configuration"};
+		this.aliases = new String[] { "config", "configuration" };
 	}
 
 	@Override
