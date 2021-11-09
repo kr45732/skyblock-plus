@@ -400,33 +400,33 @@ public class GuildRanksCommand extends Command {
 					boolean meetsReqOr = false;
 					for (JsonElement reqOr : higherDepth(rank, "requirements").getAsJsonArray()) {
 						boolean meetsReqAnd = true;
-                        for (JsonElement reqAnd : reqOr.getAsJsonArray()) {
-                            double amount = 0;
-                            switch (higherDepth(reqAnd, "type").getAsString()) {
-                                case "slayer":
-                                    amount = gMember.getSlayer();
-                                    break;
-                                case "skills":
-                                    amount = gMember.getSkills();
-                                    break;
-                                case "catacombs":
-                                    amount = gMember.getCatacombs();
-                                    break;
-                                case "weight":
-                                    amount = gMember.getWeight();
-                                    break;
-                            }
+						for (JsonElement reqAnd : reqOr.getAsJsonArray()) {
+							double amount = 0;
+							switch (higherDepth(reqAnd, "type").getAsString()) {
+								case "slayer":
+									amount = gMember.getSlayer();
+									break;
+								case "skills":
+									amount = gMember.getSkills();
+									break;
+								case "catacombs":
+									amount = gMember.getCatacombs();
+									break;
+								case "weight":
+									amount = gMember.getWeight();
+									break;
+							}
 
-                            if (amount < higherDepth(reqAnd, "amount").getAsDouble()) {
+							if (amount < higherDepth(reqAnd, "amount").getAsDouble()) {
 								meetsReqAnd = false;
-                                break;
-                            }
-                        }
-						meetsReqOr = meetsReqAnd;
-                        if(meetsReqAnd){
-                        	break;
+								break;
+							}
 						}
-                    }
+						meetsReqOr = meetsReqAnd;
+						if (meetsReqAnd) {
+							break;
+						}
+					}
 
 					if (meetsReqOr) {
 						if (!rankNamesList.contains(gMember.getGuildRank().toLowerCase())) {

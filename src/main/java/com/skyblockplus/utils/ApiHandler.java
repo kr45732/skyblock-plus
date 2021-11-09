@@ -84,7 +84,7 @@ public class ApiHandler {
 	}
 
 	public static Connection getCacheDatabaseConnection() throws SQLException {
-		if(cacheDatabaseConnection == null || cacheDatabaseConnection.isClosed()){
+		if (cacheDatabaseConnection == null || cacheDatabaseConnection.isClosed()) {
 			cacheDatabaseConnection = DriverManager.getConnection(PLANET_SCALE_URL, PLANET_SCALE_USERNAME, PLANET_SCALE_PASSWORD);
 		}
 

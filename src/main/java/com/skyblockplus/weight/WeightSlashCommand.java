@@ -70,10 +70,12 @@ public class WeightSlashCommand extends SlashCommand {
 			)
 			.addSubcommands(
 				new SubcommandData("calculate", "Calculate predicted weight using given stats (not 100% accurate)")
-					.addOptions(new OptionData(OptionType.NUMBER, "skill_average", "Player's skill average", true).setRequiredRange(0, 55),
-							new OptionData(OptionType.NUMBER, "slayer", "Player's slayer XP", true).setRequiredRange(0, 500000000),
-							new OptionData(OptionType.NUMBER, "dungeons", "Player's catacombs level", true).setRequiredRange(0, 50),
-							new OptionData(OptionType.NUMBER, "average_class", "Player's average dungeon class level", true).setRequiredRange(0, 50)
+					.addOptions(
+						new OptionData(OptionType.NUMBER, "skill_average", "Player's skill average", true).setRequiredRange(0, 55),
+						new OptionData(OptionType.NUMBER, "slayer", "Player's slayer XP", true).setRequiredRange(0, 500000000),
+						new OptionData(OptionType.NUMBER, "dungeons", "Player's catacombs level", true).setRequiredRange(0, 50),
+						new OptionData(OptionType.NUMBER, "average_class", "Player's average dungeon class level", true)
+							.setRequiredRange(0, 50)
 					)
 			);
 	}
