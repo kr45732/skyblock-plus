@@ -165,7 +165,7 @@ public class GuildCommand extends Command {
 		try {
 			String guildName = higherDepth(guildJson, "name").getAsString();
 			EmbedBuilder eb = defaultEmbed(
-				usernameUuid.getUsername() + " is in " + guildName,
+				fixUsername(usernameUuid.getUsername()) + " is in " + guildName,
 				"https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(guildJson, "_id").getAsString()
 			);
 			eb.addField("Guild statistics:", getGuildInfo(guildJson), false);

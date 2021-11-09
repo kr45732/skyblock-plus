@@ -394,34 +394,41 @@ public class GuildRanksCommand extends Command {
 				.collect(Collectors.toList());
 			for (GuildRanksStruct gMember : gMembers) {
 				for (JsonElement rank : higherDepth(lbSettings, "ranks").getAsJsonArray()) {
-					boolean meetsReq = true;
 					List<String> rankNamesList = streamJsonArray(higherDepth(rank, "names").getAsJsonArray())
 						.map(JsonElement::getAsString)
 						.collect(Collectors.toList());
-					for (JsonElement req : higherDepth(rank, "requirements").getAsJsonArray()) {
-						double amount = 0;
-						switch (higherDepth(req, "type").getAsString()) {
-							case "slayer":
-								amount = gMember.getSlayer();
-								break;
-							case "skills":
-								amount = gMember.getSkills();
-								break;
-							case "catacombs":
-								amount = gMember.getCatacombs();
-								break;
-							case "weight":
-								amount = gMember.getWeight();
-								break;
-						}
+					boolean meetsReqOr = false;
+					for (JsonElement reqOr : higherDepth(rank, "requirements").getAsJsonArray()) {
+						boolean meetsReqAnd = true;
+                        for (JsonElement reqAnd : reqOr.getAsJsonArray()) {
+                            double amount = 0;
+                            switch (higherDepth(reqAnd, "type").getAsString()) {
+                                case "slayer":
+                                    amount = gMember.getSlayer();
+                                    break;
+                                case "skills":
+                                    amount = gMember.getSkills();
+                                    break;
+                                case "catacombs":
+                                    amount = gMember.getCatacombs();
+                                    break;
+                                case "weight":
+                                    amount = gMember.getWeight();
+                                    break;
+                            }
 
-						if (amount < higherDepth(req, "amount").getAsDouble()) {
-							meetsReq = false;
-							break;
+                            if (amount < higherDepth(reqAnd, "amount").getAsDouble()) {
+								meetsReqAnd = false;
+                                break;
+                            }
+                        }
+						meetsReqOr = meetsReqAnd;
+                        if(meetsReqAnd){
+                        	break;
 						}
-					}
+                    }
 
-					if (meetsReq) {
+					if (meetsReqOr) {
 						if (!rankNamesList.contains(gMember.getGuildRank().toLowerCase())) {
 							paginateBuilder.addItems(("- /g setrank " + fixUsername(gMember.getName()) + " " + rankNamesList.get(0)));
 							totalChange++;

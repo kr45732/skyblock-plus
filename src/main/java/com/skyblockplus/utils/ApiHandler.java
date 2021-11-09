@@ -56,13 +56,14 @@ public class ApiHandler {
 	private static final Pattern minecraftUuidRegex = Pattern.compile(
 		"[0-9a-f]{32}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
 	);
+
 	public static Connection cacheDatabaseConnection;
 	private static final Logger log = LoggerFactory.getLogger(ApiHandler.class);
 	public static boolean useAlternativeApi = reloadSettingsJson();
 
 	public static void initialize() {
 		try {
-			cacheDatabaseConnection = DriverManager.getConnection(PLANET_SCALE_URL, PLANET_SCALE_USERNAME, PLANET_SCALE_PASSWORD);
+			getCacheDatabaseConnection();
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateCache, 60, 90, TimeUnit.SECONDS);
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateLinkedAccounts, 60, 30, TimeUnit.SECONDS);
 		} catch (SQLException e) {
@@ -80,6 +81,14 @@ public class ApiHandler {
 				false
 			);
 		return useAlternativeApi;
+	}
+
+	public static Connection getCacheDatabaseConnection() throws SQLException {
+		if(cacheDatabaseConnection == null || cacheDatabaseConnection.isClosed()){
+			cacheDatabaseConnection = DriverManager.getConnection(PLANET_SCALE_URL, PLANET_SCALE_USERNAME, PLANET_SCALE_PASSWORD);
+		}
+
+		return cacheDatabaseConnection;
 	}
 
 	public static boolean isValidMinecraftUsername(String username) {
@@ -478,7 +487,7 @@ public class ApiHandler {
 
 	public static void cacheJson(String playerUuid, JsonElement json) {
 		executor.submit(() -> {
-			try (Statement statement = cacheDatabaseConnection.createStatement()) {
+			try (Statement statement = getCacheDatabaseConnection().createStatement()) {
 				Instant now = Instant.now();
 				uuidToTimeSkyblockProfiles.put(playerUuid, now);
 
@@ -500,7 +509,7 @@ public class ApiHandler {
 		if (lastUpdated != null && Duration.between(lastUpdated, Instant.now()).toMillis() > 90000) {
 			deleteCachedJson(playerUuid);
 		} else {
-			try (Statement statement = cacheDatabaseConnection.createStatement()) {
+			try (Statement statement = getCacheDatabaseConnection().createStatement()) {
 				try (ResultSet response = statement.executeQuery("SELECT * FROM profiles where uuid = '" + playerUuid + "'")) {
 					if (response.next()) {
 						Instant lastUpdatedResponse = Instant.ofEpochMilli(response.getLong("time"));
@@ -532,7 +541,7 @@ public class ApiHandler {
 				query.deleteCharAt(query.length() - 1);
 			}
 
-			try (Statement statement = cacheDatabaseConnection.createStatement()) {
+			try (Statement statement = getCacheDatabaseConnection().createStatement()) {
 				statement.executeUpdate("DELETE FROM profiles WHERE uuid IN (" + query + ")");
 			} catch (Exception ignored) {}
 		});
@@ -540,7 +549,7 @@ public class ApiHandler {
 
 	public static void updateCache() {
 		long now = Instant.now().minusSeconds(90).toEpochMilli();
-		try (Statement statement = cacheDatabaseConnection.createStatement()) {
+		try (Statement statement = getCacheDatabaseConnection().createStatement()) {
 			try (ResultSet response = statement.executeQuery("SELECT uuid FROM profiles WHERE time < " + now + "")) {
 				List<String> expiredCacheUuidList = new ArrayList<>();
 				while (response.next()) {
@@ -550,7 +559,7 @@ public class ApiHandler {
 			}
 		} catch (Exception ignored) {}
 
-		try (Statement statement = cacheDatabaseConnection.createStatement()) {
+		try (Statement statement = getCacheDatabaseConnection().createStatement()) {
 			statement.executeUpdate("DELETE FROM profiles WHERE time < " + now + "");
 		} catch (Exception ignored) {}
 	}

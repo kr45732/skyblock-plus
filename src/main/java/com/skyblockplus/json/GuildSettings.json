@@ -122,10 +122,26 @@
       "ranks": [
         {
           "requirements": [
-            {
-              "amount": 4500,
-              "type": "weight"
-            }
+            [
+              {
+                "amount": 4500,
+                "type": "weight"
+              }
+            ],
+            [
+              {
+                "amount": 35,
+                "type": "skills"
+              },
+              {
+                "amount": 28,
+                "type": "catacombs"
+              },
+              {
+                "amount": 500000,
+                "type": "slayer"
+              }
+            ]
           ],
           "names": [
             "shareholder"

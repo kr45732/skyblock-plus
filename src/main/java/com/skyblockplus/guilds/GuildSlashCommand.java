@@ -24,6 +24,7 @@ import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class GuildSlashCommand extends SlashCommand {
@@ -74,7 +75,7 @@ public class GuildSlashCommand extends SlashCommand {
 					.addOption(OptionType.STRING, "player", "Player username or mention"),
 				new SubcommandData("experience", "Get the experience leaderboard for a player's guild")
 					.addOption(OptionType.STRING, "player", "Player username or mention")
-					.addOption(OptionType.INTEGER, "days", "Number of days")
+					.addOptions(new OptionData(OptionType.INTEGER, "days", "Number of days").setRequiredRange(1, 7))
 			);
 	}
 }

@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class SlashCommandClient extends ListenerAdapter {

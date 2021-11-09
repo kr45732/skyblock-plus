@@ -23,6 +23,7 @@ import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class WeightSlashCommand extends SlashCommand {
@@ -69,10 +70,11 @@ public class WeightSlashCommand extends SlashCommand {
 			)
 			.addSubcommands(
 				new SubcommandData("calculate", "Calculate predicted weight using given stats (not 100% accurate)")
-					.addOption(OptionType.NUMBER, "skill_average", "Player's skill average", true)
-					.addOption(OptionType.NUMBER, "slayer", "Player's slayer XP", true)
-					.addOption(OptionType.NUMBER, "dungeons", "Player's catacombs level", true)
-					.addOption(OptionType.NUMBER, "average_class", "Player's average dungeon class level", true)
+					.addOptions(new OptionData(OptionType.NUMBER, "skill_average", "Player's skill average", true).setRequiredRange(0, 55),
+							new OptionData(OptionType.NUMBER, "slayer", "Player's slayer XP", true).setRequiredRange(0, 500000000),
+							new OptionData(OptionType.NUMBER, "dungeons", "Player's catacombs level", true).setRequiredRange(0, 50),
+							new OptionData(OptionType.NUMBER, "average_class", "Player's average dungeon class level", true).setRequiredRange(0, 50)
+					)
 			);
 	}
 }
