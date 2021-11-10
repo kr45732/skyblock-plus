@@ -63,8 +63,8 @@ public class SlashCommandClient extends ListenerAdapter {
 
 		try {
 			event.deferReply().complete();
-		}catch(ErrorResponseException e){
-			if(e.getErrorCode() != ErrorResponse.UNKNOWN_INTERACTION.getCode()){
+		} catch (ErrorResponseException e) {
+			if (e.getErrorCode() != ErrorResponse.UNKNOWN_INTERACTION.getCode()) {
 				throw e;
 			}
 			return;

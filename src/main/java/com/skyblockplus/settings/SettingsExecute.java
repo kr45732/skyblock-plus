@@ -1073,13 +1073,13 @@ public class SettingsExecute {
 						break;
 					}
 				case "networth":
-				{
-					ebFieldString
+					{
+						ebFieldString
 							.append("**A player's networth**\nExample: `")
 							.append(guildPrefix)
 							.append("settings roles add networth 1000000000 @billionaire`\n");
-					break;
-				}
+						break;
+					}
 				case "enderman":
 					{
 						ebFieldString

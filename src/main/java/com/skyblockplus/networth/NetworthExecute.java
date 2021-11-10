@@ -225,7 +225,7 @@ public class NetworthExecute {
 
 			calculateAllPetsPrice();
 
-			if(onlyTotal){
+			if (onlyTotal) {
 				return invalidEmbed("Only total is enabled");
 			}
 
@@ -364,30 +364,34 @@ public class NetworthExecute {
 				}
 			}
 
-			System.out.println(collectJsonArray(tempSet.stream().filter(str -> !str.toLowerCase().startsWith("rune_")).map(JsonPrimitive::new)));
+			System.out.println(
+				collectJsonArray(tempSet.stream().filter(str -> !str.toLowerCase().startsWith("rune_")).map(JsonPrimitive::new))
+			);
 
 			return eb;
 		}
 		return player.getFailEmbed();
 	}
 
-	public static double getTotalNetworth(String username, String profileName){
+	public static double getTotalNetworth(String username, String profileName) {
 		NetworthExecute calc = new NetworthExecute().setOnlyTotal(true);
 		calc.getPlayerNetworth(username, profileName);
 		return calc.getTotalCalculatedNetworth();
 	}
 
 	public double getTotalCalculatedNetworth() {
-		return invTotal == -1 ? -1 :bankBalance +
-				purseCoins +
-				invTotal +
-				talismanTotal +
-				invArmor +
-				wardrobeTotal +
-				petsTotal +
-				enderChestTotal +
-				storageTotal +
-				sacksTotal;
+		return invTotal == -1
+			? -1
+			: bankBalance +
+			purseCoins +
+			invTotal +
+			talismanTotal +
+			invArmor +
+			wardrobeTotal +
+			petsTotal +
+			enderChestTotal +
+			storageTotal +
+			sacksTotal;
 	}
 
 	private void calculateAllPetsPrice() {

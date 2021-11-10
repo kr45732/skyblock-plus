@@ -1149,11 +1149,11 @@ public class Player {
 		return getItemsPlayerHas(new ArrayList<>(ALL_TALISMANS), getTalismanBagMap().values().toArray(new InvItem[0])).size();
 	}
 
-    public double getNetworth() {
+	public double getNetworth() {
 		return NetworthExecute.getTotalNetworth(username, profileName);
-    }
+	}
 
-    public enum WeightType {
+	public enum WeightType {
 		NONE,
 		SENITHER,
 		LILY,

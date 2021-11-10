@@ -370,7 +370,11 @@ public class ApplyUser implements Serializable {
 						applyPlayerStats.addField("Catacombs level", playerCatacombs, true);
 						applyPlayerStats.addField("Bank & purse coins", playerCoins, true);
 						double playerNetworth = NetworthExecute.getTotalNetworth(playerUsername, playerProfileName);
-						applyPlayerStats.addField("Networth", playerNetworth == -1 ? "Inventory API disabled" : roundAndFormat(playerNetworth), true);
+						applyPlayerStats.addField(
+							"Networth",
+							playerNetworth == -1 ? "Inventory API disabled" : roundAndFormat(playerNetworth),
+							true
+						);
 						if (!nameHistory.isEmpty()) {
 							applyPlayerStats.addField("Name history", nameHistory, true);
 						}

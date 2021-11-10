@@ -36,7 +36,7 @@ public class UnlinkCommand extends Command {
 		this.name = "unlink";
 		this.cooldown = globalCooldown;
 		this.botPermissions = defaultPerms();
-		this.aliases = new String[]{"unverify"};
+		this.aliases = new String[] { "unverify" };
 	}
 
 	public static EmbedBuilder unlinkAccount(PaginatorEvent event) {
@@ -44,7 +44,10 @@ public class UnlinkCommand extends Command {
 		try {
 			for (JsonElement verifyRole : higherDepth(verifySettings, "verifiedRoles").getAsJsonArray()) {
 				try {
-					event.getGuild().removeRoleFromMember(event.getMember().getId(), event.getGuild().getRoleById(verifyRole.getAsString())).complete();
+					event
+						.getGuild()
+						.removeRoleFromMember(event.getMember().getId(), event.getGuild().getRoleById(verifyRole.getAsString()))
+						.complete();
 				} catch (Exception e) {
 					System.out.println(verifyRole);
 					e.printStackTrace();
