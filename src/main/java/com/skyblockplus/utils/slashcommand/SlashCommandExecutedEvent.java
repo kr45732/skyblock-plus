@@ -117,7 +117,7 @@ public class SlashCommandExecutedEvent {
 	}
 
 	private boolean getLinkedUser(String id) {
-		JsonElement linkedUserUsername = higherDepth(database.getLinkedUserByDiscordId(id), "minecraftUuuid");
+		JsonElement linkedUserUsername = higherDepth(database.getLinkedUserByDiscordId(id), "minecraftUuid");
 		if (linkedUserUsername != null) {
 			player = linkedUserUsername.getAsString();
 			return false;

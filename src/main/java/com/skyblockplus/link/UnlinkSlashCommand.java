@@ -18,6 +18,7 @@
 
 package com.skyblockplus.link;
 
+import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -31,7 +32,7 @@ public class UnlinkSlashCommand extends SlashCommand {
 	@Override
 	protected void execute(SlashCommandExecutedEvent event) {
 		event.logCommand();
-		event.embed(UnlinkCommand.unlinkAccount(event.getUser()));
+		event.embed(UnlinkCommand.unlinkAccount(new PaginatorEvent(event)));
 	}
 
 	@Override

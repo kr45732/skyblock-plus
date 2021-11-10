@@ -369,16 +369,8 @@ public class ApplyUser implements Serializable {
 						applyPlayerStats.addField("Progress average skill level", playerSkills, true);
 						applyPlayerStats.addField("Catacombs level", playerCatacombs, true);
 						applyPlayerStats.addField("Bank & purse coins", playerCoins, true);
-						String networthStr = "Inventory API disabled";
-						try {
-							networthStr =
-								new NetworthExecute()
-									.getPlayerNetworth(playerUsername, playerProfileName)
-									.getDescriptionBuilder()
-									.toString()
-									.split("Total Networth: ")[1];
-						} catch (Exception ignored) {}
-						applyPlayerStats.addField("Networth", networthStr, true);
+						double playerNetworth = NetworthExecute.getTotalNetworth(playerUsername, playerProfileName);
+						applyPlayerStats.addField("Networth", playerNetworth == -1 ? "Inventory API disabled" : roundAndFormat(playerNetworth), true);
 						if (!nameHistory.isEmpty()) {
 							applyPlayerStats.addField("Name history", nameHistory, true);
 						}

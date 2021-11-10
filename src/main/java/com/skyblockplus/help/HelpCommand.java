@@ -82,7 +82,7 @@ public class HelpCommand extends Command {
 				new HelpData("link", "Get what Hypixel account you are linked to.", "link")
 					.addSecondData("Link your Hypixel account to the bot.", "link <player>")
 					.addExamples("link CrypticPlasma"),
-				new HelpData("unlink", "Unlink your account from the bot."),
+				new HelpData("unlink", "Unlink your account from the bot.").addAliases("unverify"),
 				new HelpData("vote", "Links for where you can vote for the bot."),
 				// Slayer
 				new HelpData("slayer", "Get the slayer data of a player.", "slayer [player] [profile]")

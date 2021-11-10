@@ -890,6 +890,7 @@ public class SettingsExecute {
 		rolePageMap.put("pet_score", 27);
 		rolePageMap.put("dungeon_secrets", 28);
 		rolePageMap.put("accessory_count", 29);
+		rolePageMap.put("networth", 30);
 
 		if (rolePageMap.containsKey(roleName)) {
 			CustomPaginator.Builder currentRoleSettings = getCurrentRolesSettings(database.getRolesSettings(guild.getId()));
@@ -1071,6 +1072,14 @@ public class SettingsExecute {
 							.append("settings roles add accessory_count 75 @accessory collector`\n");
 						break;
 					}
+				case "networth":
+				{
+					ebFieldString
+							.append("**A player's networth**\nExample: `")
+							.append(guildPrefix)
+							.append("settings roles add networth 1000000000 @billionaire`\n");
+					break;
+				}
 				case "enderman":
 					{
 						ebFieldString

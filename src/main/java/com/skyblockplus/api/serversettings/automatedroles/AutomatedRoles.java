@@ -116,5 +116,8 @@ public class AutomatedRoles {
 	@Embedded
 	private RoleModel accessory_count = new RoleModel();
 
+	@Embedded
+	private RoleModel networth = new RoleModel();
+
 	public AutomatedRoles() {}
 }

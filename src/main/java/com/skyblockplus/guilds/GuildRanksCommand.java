@@ -458,6 +458,9 @@ public class GuildRanksCommand extends Command {
 						"\n"
 					)
 			);
+			if(paginateBuilder.getItemsSize() == 0){
+				return defaultEmbed("No rank changes");
+			}
 			event.paginate(paginateBuilder);
 		}
 		return null;

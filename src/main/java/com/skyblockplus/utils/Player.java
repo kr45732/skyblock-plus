@@ -26,6 +26,7 @@ import static com.skyblockplus.utils.Utils.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.skyblockplus.networth.NetworthExecute;
 import com.skyblockplus.utils.structs.*;
 import com.skyblockplus.weight.senither.Weight;
 import java.time.Instant;
@@ -1148,7 +1149,11 @@ public class Player {
 		return getItemsPlayerHas(new ArrayList<>(ALL_TALISMANS), getTalismanBagMap().values().toArray(new InvItem[0])).size();
 	}
 
-	public enum WeightType {
+    public double getNetworth() {
+		return NetworthExecute.getTotalNetworth(username, profileName);
+    }
+
+    public enum WeightType {
 		NONE,
 		SENITHER,
 		LILY,

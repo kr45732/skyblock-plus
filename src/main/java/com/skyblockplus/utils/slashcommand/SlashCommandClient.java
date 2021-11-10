@@ -27,6 +27,7 @@ import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 
 public class SlashCommandClient extends ListenerAdapter {
 
@@ -59,7 +60,15 @@ public class SlashCommandClient extends ListenerAdapter {
 			event.replyEmbeds(invalidEmbed("This command cannot only be used in text channels").build()).queue();
 			return;
 		}
-		event.deferReply().complete();
+
+		try {
+			event.deferReply().complete();
+		}catch(ErrorResponseException e){
+			if(e.getErrorCode() != ErrorResponse.UNKNOWN_INTERACTION.getCode()){
+				throw e;
+			}
+			return;
+		}
 
 		SlashCommandExecutedEvent slashCommandExecutedEvent = new SlashCommandExecutedEvent(event, this);
 		for (SlashCommand command : slashCommands) {

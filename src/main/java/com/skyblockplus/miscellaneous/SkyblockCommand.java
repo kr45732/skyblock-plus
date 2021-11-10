@@ -18,13 +18,9 @@
 
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.Constants.*;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.networth.NetworthExecute;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
@@ -33,6 +29,9 @@ import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.SkillsStruct;
 import com.skyblockplus.weight.senither.Weight;
 import net.dv8tion.jda.api.EmbedBuilder;
+
+import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.Utils.*;
 
 public class SkyblockCommand extends Command {
 
@@ -58,16 +57,8 @@ public class SkyblockCommand extends Command {
 			eb.addField("Skill weight", weight.getSkillsWeight().getWeightStruct().getFormatted(), true);
 			eb.addField("Slayer weight", weight.getSlayerWeight().getWeightStruct().getFormatted(), true);
 			eb.addField("Dungeons weight", weight.getDungeonsWeight().getWeightStruct().getFormatted(), true);
-			String networthStr = "Inventory API disabled";
-			try {
-				networthStr =
-					new NetworthExecute()
-						.getPlayerNetworth(player.getUsername(), player.getProfileName())
-						.getDescriptionBuilder()
-						.toString()
-						.split("Total Networth: ")[1];
-			} catch (Exception ignored) {}
-			eb.addField("Networth", networthStr, true);
+			double playerNetworth = player.getNetworth();
+			eb.addField("Networth", playerNetworth == -1 ? "Inventory API disabled" : roundAndFormat(playerNetworth), true);
 			eb.addField(
 				"Bank & purse coins",
 				(player.getBankBalance() == -1 ? "API disabled" : simplifyNumber(player.getBankBalance())) +
