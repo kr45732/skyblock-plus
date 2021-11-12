@@ -55,7 +55,9 @@ public class AutomatedApply {
 	@Column(length = 2048)
 	private String waitlistedMessageText = "";
 
-	private String staffPingRoleId = "";
+	@ElementCollection(fetch = FetchType.EAGER)
+	@Fetch(value = FetchMode.SUBSELECT)
+	private List<String> staffPingRoles = new ArrayList<>();
 
 	private String previousMessageId = "";
 

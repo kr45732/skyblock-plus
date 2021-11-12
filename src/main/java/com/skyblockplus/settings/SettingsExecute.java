@@ -276,14 +276,22 @@ public class SettingsExecute {
 								case "message":
 									eb = setApplyMessageText(args[2], args[4]);
 									break;
-								case "staff_role":
-									eb = setApplyStaffPingRoleId(args[2], args[4]);
-									break;
 								case "channel":
 									eb = setApplyMessageTextChannelId(args[2], args[4]);
 									break;
 								case "category":
 									eb = setApplyNewChannelCategory(args[2], args[4]);
+									break;
+								case "staff_role":
+									System.out.println("here1");
+									args = content.split(" ", 6);
+									if (args[4].equals("add")) {
+										System.out.println("here2");
+										eb = addApplyStaffRole(args[2], args[5]);
+									} else if (args[4].equals("remove")) {
+										System.out.println("here3");
+										eb = removeApplyStaffRole(args[2], args[5]);
+									}
 									break;
 								case "staff_channel":
 									eb = setApplyMessageStaffChannelId(args[2], args[4]);
@@ -1692,7 +1700,7 @@ public class SettingsExecute {
 		eb.addField("Button Message Channel", displaySettings(applySettings, "messageTextChannelId"), true);
 		eb.addField("Staff Message Channel", displaySettings(applySettings, "messageStaffChannelId"), true);
 		eb.addField("Waiting For Invite Channel", displaySettings(applySettings, "waitingChannelId"), true);
-		eb.addField("Staff Ping Role", displaySettings(applySettings, "staffPingRoleId"), true);
+		eb.addField("Staff Ping Roles", displaySettings(applySettings, "staffPingRoles"), true);
 		eb.addField("New Channel Category", displaySettings(applySettings, "newChannelCategory"), true);
 		eb.addField("Ironman Only", displaySettings(applySettings, "ironmanOnly"), true);
 		eb.addField("Button Message Text", displaySettings(applySettings, "messageText"), true);
@@ -1771,7 +1779,7 @@ public class SettingsExecute {
 		currentSettings.remove("applyReqs");
 		currentSettings.remove("ironmanOnly");
 		currentSettings.remove("waitingChannelId");
-		currentSettings.remove("staffPingRoleId");
+		currentSettings.remove("staffPingRoles");
 
 		try {
 			for (String key : getJsonKeys(currentSettings)) {
@@ -1931,33 +1939,67 @@ public class SettingsExecute {
 		return defaultEmbed("Invalid Input");
 	}
 
-	public EmbedBuilder setApplyStaffPingRoleId(String name, String staffPingRoleMention) {
+	public EmbedBuilder addApplyStaffRole(String name, String staffPingRoleMention) {
 		try {
-			if (staffPingRoleMention.equalsIgnoreCase("none")) {
-				int responseCode = updateApplySettings(name, "staffPingRoleId", "none");
-				if (responseCode != 200) {
-					return invalidEmbed("API returned response code " + responseCode);
-				}
-
-				EmbedBuilder eb = defaultEmbed("Settings");
-				eb.setDescription("**Apply staff ping role set to:** none");
-				return eb;
-			}
-
 			Role verifyGuildRole = guild.getRoleById(staffPingRoleMention.replaceAll("[<@&>]", ""));
 			if (!(verifyGuildRole.isPublicRole() || verifyGuildRole.isManaged())) {
-				int responseCode = updateApplySettings(name, "staffPingRoleId", verifyGuildRole.getId());
+				JsonObject applySettings = database.getApplySettings(guild.getId(), name).getAsJsonObject();
+				JsonArray staffRoles = higherDepth(applySettings, "staffPingRoles").getAsJsonArray();
+				if (staffRoles.size() >= 3) {
+					return defaultEmbed("You have reached the max number of staff ping roles (3/3)");
+				}
+
+				for (int i = staffRoles.size() - 1; i >= 0; i--) {
+					if (staffRoles.get(i).getAsString().equals(verifyGuildRole.getId())) {
+						staffRoles.remove(i);
+					}
+				}
+
+				staffRoles.add(verifyGuildRole.getId());
+				applySettings.add("staffPingRoles", staffRoles);
+				int responseCode = database.setApplySettings(guild.getId(), applySettings);
 				if (responseCode != 200) {
 					return invalidEmbed("API returned response code " + responseCode);
 				}
 
 				EmbedBuilder eb = defaultEmbed("Settings");
-				eb.setDescription("**Apply staff ping role set to:** " + verifyGuildRole.getAsMention());
+				eb.setDescription("**Added apply staff ping role:** " + verifyGuildRole.getAsMention());
 				return eb;
 			}
 		} catch (Exception ignored) {}
 		return defaultEmbed("Invalid Role");
 	}
+
+	public EmbedBuilder removeApplyStaffRole(String name, String staffPingRoleMention) {
+		Role staffRole;
+		try {
+			staffRole = guild.getRoleById(staffPingRoleMention.replaceAll("[<@&>]", ""));
+			if ((staffRole.isPublicRole() || staffRole.isManaged())) {
+				return invalidEmbed("Invalid role");
+			}
+		} catch (Exception e) {
+			return defaultEmbed("Invalid Role");
+		}
+
+		JsonObject applySettings = database.getApplySettings(guild.getId(), name).getAsJsonObject();
+		JsonArray currentStaffRoles = higherDepth(applySettings, "staffPingRoles").getAsJsonArray();
+
+		for (int i = currentStaffRoles.size() - 1; i >= 0; i--) {
+			if (currentStaffRoles.get(i).getAsString().equals(staffRole.getId())) {
+				currentStaffRoles.remove(i);
+			}
+		}
+
+		applySettings.add("staffPingRoles", currentStaffRoles);
+
+		int responseCode = database.setApplySettings(guild.getId(), applySettings);
+		if (responseCode != 200) {
+			return invalidEmbed("API returned response code " + responseCode);
+		}
+
+		return defaultSettingsEmbed("**Removed apply staff ping role:** " + staffRole.getAsMention());
+	}
+
 
 	public EmbedBuilder setApplyNewChannelCategory(String name, String messageCategory) {
 		try {
@@ -2312,7 +2354,7 @@ public class SettingsExecute {
 				}
 
 				return reqsString.toString();
-			} else if (settingName.equals("verifiedRoles")) {
+			} else if (settingName.equals("verifiedRoles") || settingName.equals("staffPingRoles")) {
 				JsonArray roles = higherDepth(jsonSettings, settingName).getAsJsonArray();
 				StringBuilder ebStr = new StringBuilder();
 				for (JsonElement role : roles) {
@@ -2340,8 +2382,6 @@ public class SettingsExecute {
 							}
 						}
 						break;
-					case "staffPingRoleId":
-						return currentSettingValue.equals("none") ? "None" : "<@&" + currentSettingValue + ">";
 					case "roleId":
 						return "<@&" + currentSettingValue + ">";
 					case "newChannelCategory":

@@ -31,6 +31,8 @@ import com.skyblockplus.utils.Player;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
@@ -91,12 +93,14 @@ public class ApplyUser implements Serializable {
 			.addPermissionOverride(event.getGuild().getPublicRole(), null, EnumSet.of(Permission.VIEW_CHANNEL));
 
 		try {
-			applicationChannelAction =
-				applicationChannelAction.addPermissionOverride(
-					event.getGuild().getRoleById(higherDepth(currentSettings, "staffPingRoleId").getAsString()),
-					EnumSet.of(Permission.VIEW_CHANNEL),
-					null
-				);
+			for (JsonElement staffPingRole : higherDepth(currentSettings, "staffPingRoles").getAsJsonArray()) {
+				applicationChannelAction =
+						applicationChannelAction.addPermissionOverride(
+								event.getGuild().getRoleById(staffPingRole.getAsString()),
+								EnumSet.of(Permission.VIEW_CHANNEL),
+								null
+						);
+			}
 		} catch (Exception ignored) {}
 
 		TextChannel applicationChannel = applicationChannelAction.complete();
@@ -165,19 +169,19 @@ public class ApplyUser implements Serializable {
 		Message reactMessage = applicationChannel.retrieveMessageById(reactMessageId).complete();
 		JsonElement currentSettings = JsonParser.parseString(currentSettingsString);
 
-		if (!event.getUser().getId().equals(applyingUser.getId())) {
-			if (
-				!(
-					(
-						!higherDepth(currentSettings, "staffPingRoleId").getAsString().equals("none") &&
-						event
-							.getMember()
-							.getRoles()
-							.contains(event.getGuild().getRoleById(higherDepth(currentSettings, "staffPingRoleId").getAsString()))
-					) ||
-					event.getMember().hasPermission(Permission.ADMINISTRATOR)
-				)
-			) {
+		if (!event.getUser().getId().equals(applyingUserId) && !event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
+			JsonArray staffPingRoles = higherDepth(currentSettings, "staffPingRoles").getAsJsonArray();
+			boolean hasStaffRole = false;
+			if (staffPingRoles.size() != 0) {
+				for (JsonElement staffPingRole : staffPingRoles) {
+					if (event.getMember().getRoles().contains(event.getGuild().getRoleById(staffPingRole.getAsString()))) {
+						hasStaffRole = true;
+						break;
+					}
+				}
+			}
+
+			if (!hasStaffRole) {
 				return false;
 			}
 		}
@@ -331,18 +335,21 @@ public class ApplyUser implements Serializable {
 
 	public boolean onButtonClick(ButtonClickEvent event, ApplyGuild parent) {
 		JsonElement currentSettings = JsonParser.parseString(currentSettingsString);
-		if (
-			!event.getUser().getId().equals(applyingUserId) &&
-			!event.getMember().hasPermission(Permission.ADMINISTRATOR) &&
-			!(
-				!higherDepth(currentSettings, "staffPingRoleId", "none").equals("none") &&
-				event
-					.getMember()
-					.getRoles()
-					.contains(event.getGuild().getRoleById(higherDepth(currentSettings, "staffPingRoleId").getAsString()))
-			)
-		) {
-			return true;
+		if (!event.getUser().getId().equals(applyingUserId) && !event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
+			JsonArray staffPingRoles = higherDepth(currentSettings, "staffPingRoles").getAsJsonArray();
+			boolean hasStaffRole = false;
+			if (staffPingRoles.size() != 0) {
+				for (JsonElement staffPingRole : staffPingRoles) {
+					if (event.getMember().getRoles().contains(event.getGuild().getRoleById(staffPingRole.getAsString()))) {
+						hasStaffRole = true;
+						break;
+					}
+				}
+			}
+
+			if (!hasStaffRole) {
+				return false;
+			}
 		}
 
 		switch (state) {
@@ -387,10 +394,11 @@ public class ApplyUser implements Serializable {
 							row.add(Button.primary("apply_user_waitlist", "Waitlist"));
 						}
 						row.add(Button.danger("apply_user_deny", "Deny"));
-						Message reactMessage = higherDepth(currentSettings, "staffPingRoleId").getAsString().equals("none")
+						String staffPingMentions = streamJsonArray(higherDepth(currentSettings, "staffPingRoles").getAsJsonArray()).map(r -> "<@&" + r.getAsString() + ">").collect(Collectors.joining(" "));
+						Message reactMessage = staffPingMentions.isEmpty()
 							? staffChannel.sendMessageEmbeds(applyPlayerStats.build()).complete()
 							: staffChannel
-								.sendMessage("<@&" + higherDepth(currentSettings, "staffPingRoleId").getAsString() + ">")
+								.sendMessage(staffPingMentions)
 								.setEmbeds(applyPlayerStats.build())
 								.setActionRow(row)
 								.complete();
