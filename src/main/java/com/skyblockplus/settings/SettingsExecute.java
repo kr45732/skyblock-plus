@@ -2000,7 +2000,6 @@ public class SettingsExecute {
 		return defaultSettingsEmbed("**Removed apply staff ping role:** " + staffRole.getAsMention());
 	}
 
-
 	public EmbedBuilder setApplyNewChannelCategory(String name, String messageCategory) {
 		try {
 			Category applyCategory = guild.getCategoryById(messageCategory.replaceAll("[<#>]", ""));

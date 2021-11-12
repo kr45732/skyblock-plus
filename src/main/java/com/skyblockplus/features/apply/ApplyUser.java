@@ -32,7 +32,6 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
@@ -95,11 +94,11 @@ public class ApplyUser implements Serializable {
 		try {
 			for (JsonElement staffPingRole : higherDepth(currentSettings, "staffPingRoles").getAsJsonArray()) {
 				applicationChannelAction =
-						applicationChannelAction.addPermissionOverride(
-								event.getGuild().getRoleById(staffPingRole.getAsString()),
-								EnumSet.of(Permission.VIEW_CHANNEL),
-								null
-						);
+					applicationChannelAction.addPermissionOverride(
+						event.getGuild().getRoleById(staffPingRole.getAsString()),
+						EnumSet.of(Permission.VIEW_CHANNEL),
+						null
+					);
 			}
 		} catch (Exception ignored) {}
 
@@ -394,14 +393,12 @@ public class ApplyUser implements Serializable {
 							row.add(Button.primary("apply_user_waitlist", "Waitlist"));
 						}
 						row.add(Button.danger("apply_user_deny", "Deny"));
-						String staffPingMentions = streamJsonArray(higherDepth(currentSettings, "staffPingRoles").getAsJsonArray()).map(r -> "<@&" + r.getAsString() + ">").collect(Collectors.joining(" "));
+						String staffPingMentions = streamJsonArray(higherDepth(currentSettings, "staffPingRoles").getAsJsonArray())
+							.map(r -> "<@&" + r.getAsString() + ">")
+							.collect(Collectors.joining(" "));
 						Message reactMessage = staffPingMentions.isEmpty()
 							? staffChannel.sendMessageEmbeds(applyPlayerStats.build()).complete()
-							: staffChannel
-								.sendMessage(staffPingMentions)
-								.setEmbeds(applyPlayerStats.build())
-								.setActionRow(row)
-								.complete();
+							: staffChannel.sendMessage(staffPingMentions).setEmbeds(applyPlayerStats.build()).setActionRow(row).complete();
 
 						reactMessageId = reactMessage.getId();
 						return true;

@@ -383,20 +383,23 @@ public class HelpCommand extends Command {
 								new HelpData("disable", " Enable automatic disable.", "<name> disable").addExamples("myGuild disable"),
 								new HelpData("message", "The message that users will see when verifying.", "<name> message <message>")
 									.addExamples("myGuild message Click the button below to start an application!"),
-								new HelpData(
-									"staff_role",
-									"Modify roles that will be pinged for an application"
-								).addSubcommands(
+								new HelpData("staff_role", "Modify roles that will be pinged for an application")
+									.addSubcommands(
 										new HelpData(
-												"add",
-												"Add a role which will be pinged when a new application is submitted.",
-												"settings apply <name> staff_role add <@role>", true).addExamples("settings apply myGuild staff_role add @New Staff"),
-										new HelpData(
-												"remove",
-												"Remove a staff ping role.",
-												"settings apply <name> staff_role remove <@role>", true).addExamples("settings apply myGuild staff_role remove @Old Staff")
+											"add",
+											"Add a role which will be pinged when a new application is submitted.",
+											"settings apply <name> staff_role add <@role>",
+											true
 										)
-									,
+											.addExamples("settings apply myGuild staff_role add @New Staff"),
+										new HelpData(
+											"remove",
+											"Remove a staff ping role.",
+											"settings apply <name> staff_role remove <@role>",
+											true
+										)
+											.addExamples("settings apply myGuild staff_role remove @Old Staff")
+									),
 								new HelpData(
 									"channel",
 									"Channel where the message to react for applying will sent.",
@@ -710,10 +713,7 @@ public class HelpCommand extends Command {
 					"settings apply <name> add staff_role <@role>",
 					"Add a role that will be pinged when a new application is submitted"
 				) +
-						help.create(
-								"settings apply <name> remove staff_role <@role>",
-								"Remove a staff ping role"
-						) +
+				help.create("settings apply <name> remove staff_role <@role>", "Remove a staff ping role") +
 				help.create("settings apply <name> channel <#channel>", "Channel where the message to click for applying will sent") +
 				help.create("settings apply <name> category <category>", "Category where new apply channels will be made") +
 				help.create(

@@ -183,19 +183,19 @@ public class ApplyGuild {
 			return null;
 		}
 
-		if(!event.getMember().hasPermission(Permission.ADMINISTRATOR)){
+		if (!event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
 			JsonArray staffPingRoles = higherDepth(currentSettings, "staffPingRoles").getAsJsonArray();
 			boolean hasStaffRole = false;
-			if(staffPingRoles.size() != 0){
+			if (staffPingRoles.size() != 0) {
 				for (JsonElement staffPingRole : staffPingRoles) {
-					if(event.getMember().getRoles().contains(event.getGuild().getRoleById(staffPingRole.getAsString()))){
+					if (event.getMember().getRoles().contains(event.getGuild().getRoleById(staffPingRole.getAsString()))) {
 						hasStaffRole = true;
 						break;
 					}
 				}
 			}
 
-			if(!hasStaffRole){
+			if (!hasStaffRole) {
 				return "❌ You are missing the required permissions in this Guild to use that!";
 			}
 		}
