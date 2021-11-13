@@ -63,7 +63,14 @@ public class SacksCommand extends Command {
 							npcPrice = getNpcSellPrice(entry.getKey());
 						}
 
-						return -(npcPrice != -1 ? npcPrice : higherDepth(bazaarPrices, entry.getKey() + ".sell_summary.[0].pricePerUnit", 0.0)) * entry.getValue();
+						return (
+							-(
+								npcPrice != -1
+									? npcPrice
+									: higherDepth(bazaarPrices, entry.getKey() + ".sell_summary.[0].pricePerUnit", 0.0)
+							) *
+							entry.getValue()
+						);
 					})
 				)
 				.forEach(currentSack -> {
@@ -71,7 +78,13 @@ public class SacksCommand extends Command {
 					if (useNpcPrice) {
 						npcPrice = getNpcSellPrice(currentSack.getKey());
 					}
-					double sackPrice = (npcPrice != -1 ? npcPrice : higherDepth(bazaarPrices, currentSack.getKey() + ".sell_summary.[0].pricePerUnit", 0.0)) * currentSack.getValue();
+					double sackPrice =
+						(
+							npcPrice != -1
+								? npcPrice
+								: higherDepth(bazaarPrices, currentSack.getKey() + ".sell_summary.[0].pricePerUnit", 0.0)
+						) *
+						currentSack.getValue();
 					paginateBuilder.addItems(
 						"**" +
 						convertSkyblockIdName(currentSack.getKey()) +
@@ -88,7 +101,12 @@ public class SacksCommand extends Command {
 					.setEveryPageTitle(player.getUsername())
 					.setEveryPageThumbnail(player.getThumbnailUrl())
 					.setEveryPageTitleUrl(player.skyblockStatsLink())
-					.setEveryPageText("**Total value:** " + roundAndFormat(total[0] + total[1]) + (useNpcPrice ? " (" + roundAndFormat(total[1]) + " npc + " + roundAndFormat(total[0]) + " bazaar)" : "") + "\n")
+					.setEveryPageText(
+						"**Total value:** " +
+						roundAndFormat(total[0] + total[1]) +
+						(useNpcPrice ? " (" + roundAndFormat(total[1]) + " npc + " + roundAndFormat(total[0]) + " bazaar)" : "") +
+						"\n"
+					)
 			);
 			event.paginate(paginateBuilder);
 			return null;

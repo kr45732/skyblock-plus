@@ -38,13 +38,11 @@ public class FetchurCommand extends Command {
 
 	public static EmbedBuilder getFetchurItem() {
 		int index = LocalDate.now(ZoneId.of("America/New_York")).getDayOfMonth() % FETCHUR_ITEMS.size() - 1;
-		if(index == -1){
+		if (index == -1) {
 			index = FETCHUR_ITEMS.size() - 1;
 		}
 
-		String[] fetchurItem = FETCHUR_ITEMS
-			.get(index)
-			.split("\\|");
+		String[] fetchurItem = FETCHUR_ITEMS.get(index).split("\\|");
 		return defaultEmbed("Fetchur item")
 			.setDescription(fetchurItem[0])
 			.setThumbnail("https://sky.shiiyu.moe/item.gif/" + fetchurItem[1]);

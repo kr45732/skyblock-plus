@@ -207,13 +207,13 @@ public class Utils {
 		return bazaarJson;
 	}
 
-	public static double getNpcSellPrice(String id){
-		if(npcSellPrices == null){
+	public static double getNpcSellPrice(String id) {
+		if (npcSellPrices == null) {
 			npcSellPrices = higherDepth(getJson("https://api.hypixel.net/resources/skyblock/items"), "items").getAsJsonArray();
 		}
 
 		for (JsonElement npcSellPrice : npcSellPrices) {
-			if(higherDepth(npcSellPrice, "id").getAsString().equals(id)){
+			if (higherDepth(npcSellPrice, "id").getAsString().equals(id)) {
 				return higherDepth(npcSellPrice, "npc_sell_price", -1.0);
 			}
 		}
