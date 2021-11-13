@@ -184,7 +184,7 @@ public class ApplyGuild {
 		}
 
 		if (!event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
-			JsonArray staffPingRoles = higherDepth(currentSettings, "staffPingRoles").getAsJsonArray();
+			JsonArray staffPingRoles = higherDepth(currentSettings, "staffRoles").getAsJsonArray();
 			boolean hasStaffRole = false;
 			if (staffPingRoles.size() != 0) {
 				for (JsonElement staffPingRole : staffPingRoles) {

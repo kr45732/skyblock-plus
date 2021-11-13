@@ -1700,7 +1700,7 @@ public class SettingsExecute {
 		eb.addField("Button Message Channel", displaySettings(applySettings, "messageTextChannelId"), true);
 		eb.addField("Staff Message Channel", displaySettings(applySettings, "messageStaffChannelId"), true);
 		eb.addField("Waiting For Invite Channel", displaySettings(applySettings, "waitingChannelId"), true);
-		eb.addField("Staff Ping Roles", displaySettings(applySettings, "staffPingRoles"), true);
+		eb.addField("Staff Ping Roles", displaySettings(applySettings, "staffRoles"), true);
 		eb.addField("New Channel Category", displaySettings(applySettings, "newChannelCategory"), true);
 		eb.addField("Ironman Only", displaySettings(applySettings, "ironmanOnly"), true);
 		eb.addField("Button Message Text", displaySettings(applySettings, "messageText"), true);
@@ -1779,7 +1779,7 @@ public class SettingsExecute {
 		currentSettings.remove("applyReqs");
 		currentSettings.remove("ironmanOnly");
 		currentSettings.remove("waitingChannelId");
-		currentSettings.remove("staffPingRoles");
+		currentSettings.remove("staffRoles");
 
 		try {
 			for (String key : getJsonKeys(currentSettings)) {
@@ -1944,7 +1944,7 @@ public class SettingsExecute {
 			Role verifyGuildRole = guild.getRoleById(staffPingRoleMention.replaceAll("[<@&>]", ""));
 			if (!(verifyGuildRole.isPublicRole() || verifyGuildRole.isManaged())) {
 				JsonObject applySettings = database.getApplySettings(guild.getId(), name).getAsJsonObject();
-				JsonArray staffRoles = higherDepth(applySettings, "staffPingRoles").getAsJsonArray();
+				JsonArray staffRoles = higherDepth(applySettings, "staffRoles").getAsJsonArray();
 				if (staffRoles.size() >= 3) {
 					return defaultEmbed("You have reached the max number of staff ping roles (3/3)");
 				}
@@ -1956,7 +1956,7 @@ public class SettingsExecute {
 				}
 
 				staffRoles.add(verifyGuildRole.getId());
-				applySettings.add("staffPingRoles", staffRoles);
+				applySettings.add("staffRoles", staffRoles);
 				int responseCode = database.setApplySettings(guild.getId(), applySettings);
 				if (responseCode != 200) {
 					return invalidEmbed("API returned response code " + responseCode);
@@ -1982,7 +1982,7 @@ public class SettingsExecute {
 		}
 
 		JsonObject applySettings = database.getApplySettings(guild.getId(), name).getAsJsonObject();
-		JsonArray currentStaffRoles = higherDepth(applySettings, "staffPingRoles").getAsJsonArray();
+		JsonArray currentStaffRoles = higherDepth(applySettings, "staffRoles").getAsJsonArray();
 
 		for (int i = currentStaffRoles.size() - 1; i >= 0; i--) {
 			if (currentStaffRoles.get(i).getAsString().equals(staffRole.getId())) {
@@ -1990,7 +1990,7 @@ public class SettingsExecute {
 			}
 		}
 
-		applySettings.add("staffPingRoles", currentStaffRoles);
+		applySettings.add("staffRoles", currentStaffRoles);
 
 		int responseCode = database.setApplySettings(guild.getId(), applySettings);
 		if (responseCode != 200) {
@@ -2353,7 +2353,7 @@ public class SettingsExecute {
 				}
 
 				return reqsString.toString();
-			} else if (settingName.equals("verifiedRoles") || settingName.equals("staffPingRoles")) {
+			} else if (settingName.equals("verifiedRoles") || settingName.equals("staffRoles")) {
 				JsonArray roles = higherDepth(jsonSettings, settingName).getAsJsonArray();
 				StringBuilder ebStr = new StringBuilder();
 				for (JsonElement role : roles) {

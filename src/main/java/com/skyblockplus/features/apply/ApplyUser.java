@@ -92,7 +92,7 @@ public class ApplyUser implements Serializable {
 			.addPermissionOverride(event.getGuild().getPublicRole(), null, EnumSet.of(Permission.VIEW_CHANNEL));
 
 		try {
-			for (JsonElement staffPingRole : higherDepth(currentSettings, "staffPingRoles").getAsJsonArray()) {
+			for (JsonElement staffPingRole : higherDepth(currentSettings, "staffRoles").getAsJsonArray()) {
 				applicationChannelAction =
 					applicationChannelAction.addPermissionOverride(
 						event.getGuild().getRoleById(staffPingRole.getAsString()),
@@ -169,7 +169,7 @@ public class ApplyUser implements Serializable {
 		JsonElement currentSettings = JsonParser.parseString(currentSettingsString);
 
 		if (!event.getUser().getId().equals(applyingUserId) && !event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
-			JsonArray staffPingRoles = higherDepth(currentSettings, "staffPingRoles").getAsJsonArray();
+			JsonArray staffPingRoles = higherDepth(currentSettings, "staffRoles").getAsJsonArray();
 			boolean hasStaffRole = false;
 			if (staffPingRoles.size() != 0) {
 				for (JsonElement staffPingRole : staffPingRoles) {
@@ -335,7 +335,7 @@ public class ApplyUser implements Serializable {
 	public boolean onButtonClick(ButtonClickEvent event, ApplyGuild parent) {
 		JsonElement currentSettings = JsonParser.parseString(currentSettingsString);
 		if (!event.getUser().getId().equals(applyingUserId) && !event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
-			JsonArray staffPingRoles = higherDepth(currentSettings, "staffPingRoles").getAsJsonArray();
+			JsonArray staffPingRoles = higherDepth(currentSettings, "staffRoles").getAsJsonArray();
 			boolean hasStaffRole = false;
 			if (staffPingRoles.size() != 0) {
 				for (JsonElement staffPingRole : staffPingRoles) {
@@ -393,7 +393,7 @@ public class ApplyUser implements Serializable {
 							row.add(Button.primary("apply_user_waitlist", "Waitlist"));
 						}
 						row.add(Button.danger("apply_user_deny", "Deny"));
-						String staffPingMentions = streamJsonArray(higherDepth(currentSettings, "staffPingRoles").getAsJsonArray())
+						String staffPingMentions = streamJsonArray(higherDepth(currentSettings, "staffRoles").getAsJsonArray())
 							.map(r -> "<@&" + r.getAsString() + ">")
 							.collect(Collectors.joining(" "));
 						Message reactMessage = staffPingMentions.isEmpty()

@@ -57,7 +57,7 @@ public class AutomatedApply {
 
 	@ElementCollection(fetch = FetchType.EAGER)
 	@Fetch(value = FetchMode.SUBSELECT)
-	private List<String> staffPingRoles = new ArrayList<>();
+	private List<String> staffRoles = new ArrayList<>();
 
 	private String previousMessageId = "";
 
