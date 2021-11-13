@@ -750,6 +750,6 @@ public class SkyblockEventCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

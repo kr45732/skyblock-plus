@@ -134,6 +134,6 @@ public class ArmorCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

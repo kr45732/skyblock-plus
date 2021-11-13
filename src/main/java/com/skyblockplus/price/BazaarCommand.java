@@ -88,6 +88,6 @@ public class BazaarCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

@@ -111,6 +111,6 @@ public class HotmCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

@@ -93,6 +93,6 @@ public class ActiveCoinsCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

@@ -482,13 +482,7 @@ public class GuildRanksCommand extends Command {
 						}
 					}
 
-					boolean useKey = false;
-					for (int i = 0; i < args.length; i++) {
-						if (args[i].equals("--usekey")) {
-							useKey = true;
-							removeArg(i);
-						}
-					}
+					boolean useKey = getBooleanArg("--usekey");
 
 					paginate(getLeaderboard(args[1].split(":")[1], ironmanOnly, useKey, new PaginatorEvent(event)));
 					return;
@@ -497,6 +491,6 @@ public class GuildRanksCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

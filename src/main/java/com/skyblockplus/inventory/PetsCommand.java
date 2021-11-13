@@ -93,6 +93,6 @@ public class PetsCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

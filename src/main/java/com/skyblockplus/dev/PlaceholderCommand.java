@@ -59,6 +59,6 @@ public class PlaceholderCommand extends Command {
 				embed(eb);
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

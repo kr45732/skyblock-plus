@@ -100,12 +100,7 @@ public class NetworthExecute {
 			@Override
 			protected void execute() {
 				logCommand();
-				for (int i = 0; i < args.length; i++) {
-					if (args[i].equals("--verbose")) {
-						verbose = true;
-						removeArg(i);
-					}
-				}
+				verbose = getBooleanArg("--verbose");
 
 				if (args.length == 3 || args.length == 2 || args.length == 1) {
 					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
@@ -119,7 +114,7 @@ public class NetworthExecute {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 
 	public EmbedBuilder getPlayerNetworth(String username, String profileName) {

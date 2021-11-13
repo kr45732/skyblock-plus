@@ -108,6 +108,6 @@ public class CakesCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

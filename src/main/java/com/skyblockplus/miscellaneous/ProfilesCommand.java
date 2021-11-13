@@ -126,6 +126,6 @@ public class ProfilesCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

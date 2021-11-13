@@ -61,6 +61,6 @@ public class SetupCommand extends Command {
 				ebMessage.editMessageEmbeds(getSetupEmbed().build()).setActionRows(getSetupActionRow()).queue();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

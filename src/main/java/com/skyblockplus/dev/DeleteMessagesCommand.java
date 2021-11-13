@@ -58,6 +58,6 @@ public class DeleteMessagesCommand extends Command {
 				event.getChannel().sendMessageEmbeds(errorEmbed(name).build()).queue();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

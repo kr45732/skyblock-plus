@@ -136,6 +136,6 @@ public class MissingTalismansCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

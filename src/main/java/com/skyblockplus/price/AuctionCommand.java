@@ -285,13 +285,7 @@ public class AuctionCommand extends Command {
 							}
 						}
 					}
-					boolean verbose = false;
-					for (int i = 0; i < args.length; i++) {
-						if (args[i].equals("--verbose")) {
-							verbose = true;
-							removeArg(i);
-						}
-					}
+					boolean verbose = getBooleanArg("--verbose");
 
 					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
 						return;
@@ -304,7 +298,7 @@ public class AuctionCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 
 	public enum AuctionFilterType {

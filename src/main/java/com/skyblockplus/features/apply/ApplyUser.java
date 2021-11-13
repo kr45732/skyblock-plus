@@ -397,7 +397,7 @@ public class ApplyUser implements Serializable {
 							.map(r -> "<@&" + r.getAsString() + ">")
 							.collect(Collectors.joining(" "));
 						Message reactMessage = staffPingMentions.isEmpty()
-							? staffChannel.sendMessageEmbeds(applyPlayerStats.build()).complete()
+							? staffChannel.sendMessageEmbeds(applyPlayerStats.build()).setActionRow(row).complete()
 							: staffChannel.sendMessage(staffPingMentions).setEmbeds(applyPlayerStats.build()).setActionRow(row).complete();
 
 						reactMessageId = reactMessage.getId();

@@ -75,6 +75,6 @@ public class PartyFinderCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

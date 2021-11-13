@@ -61,6 +61,6 @@ public class BitsCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

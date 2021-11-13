@@ -51,6 +51,6 @@ public class ReloadCommand extends Command {
 				embed(eb);
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

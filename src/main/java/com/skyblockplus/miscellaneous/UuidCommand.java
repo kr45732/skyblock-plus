@@ -62,6 +62,6 @@ public class UuidCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

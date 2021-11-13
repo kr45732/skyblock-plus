@@ -116,6 +116,6 @@ public class BidsCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

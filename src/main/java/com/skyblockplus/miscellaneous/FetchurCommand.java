@@ -37,8 +37,13 @@ public class FetchurCommand extends Command {
 	}
 
 	public static EmbedBuilder getFetchurItem() {
+		int index = LocalDate.now(ZoneId.of("America/New_York")).getDayOfMonth() % FETCHUR_ITEMS.size() - 1;
+		if(index == -1){
+			index = FETCHUR_ITEMS.size() - 1;
+		}
+
 		String[] fetchurItem = FETCHUR_ITEMS
-			.get((LocalDate.now(ZoneId.of("America/New_York")).getDayOfMonth() + 1) % FETCHUR_ITEMS.size() - 1)
+			.get(index)
 			.split("\\|");
 		return defaultEmbed("Fetchur item")
 			.setDescription(fetchurItem[0])
@@ -55,6 +60,6 @@ public class FetchurCommand extends Command {
 				embed(getFetchurItem());
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

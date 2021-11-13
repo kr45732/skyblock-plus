@@ -234,6 +234,6 @@ public class GuildStatisticsCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

@@ -116,7 +116,7 @@ public class WardrobeCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 
 	private List<String[]> getPlayerWardrobe(String username, String profileName) {

@@ -50,6 +50,6 @@ public class EmojiMapServerCommand extends Command {
 				event.reply(makeHastePost(toAdd.toString()));
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

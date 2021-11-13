@@ -794,7 +794,7 @@ public class HelpCommand extends Command {
 				paginate(getHelp(args.length >= 2 ? args[1].toLowerCase() : null, new PaginatorEvent(event)));
 			}
 		}
-			.submit();
+			.queue();
 	}
 
 	static class HelpGenerator {

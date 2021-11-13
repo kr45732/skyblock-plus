@@ -70,7 +70,7 @@ public class LinkedUserDev extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 
 	private boolean getAllLinkedUsers(CommandEvent event) {

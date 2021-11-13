@@ -78,7 +78,7 @@ public class UpdateSlashCommands extends Command {
 				event.getChannel().sendMessageEmbeds(errorEmbed(name).build()).queue();
 			}
 		}
-			.submit();
+			.queue();
 	}
 
 	private List<CommandData> generateSlashCommands() {

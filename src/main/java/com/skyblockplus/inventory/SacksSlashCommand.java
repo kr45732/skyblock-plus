@@ -38,13 +38,15 @@ public class SacksSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.paginate(SacksCommand.getPlayerSacks(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
+		event.paginate(SacksCommand.getPlayerSacks(event.player, event.getOptionStr("profile"), event.getOptionBoolean("npc", false), new PaginatorEvent(event)));
 	}
 
 	@Override
 	public CommandData getCommandData() {
 		return new CommandData(name, "Get a player's sacks' content bag represented in a list")
 			.addOption(OptionType.STRING, "player", "Player username or mention")
-			.addOption(OptionType.STRING, "profile", "Profile name");
+			.addOption(OptionType.STRING, "profile", "Profile name")
+				.addOption(OptionType.BOOLEAN, "npc", "Use npc sell prices (bazaar will be used for items that don't have an npc price)")
+				;
 	}
 }

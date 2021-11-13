@@ -69,7 +69,7 @@ public class EnderChestCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 
 	private List<String[]> getPlayerEnderChest(String username, String profileName) {

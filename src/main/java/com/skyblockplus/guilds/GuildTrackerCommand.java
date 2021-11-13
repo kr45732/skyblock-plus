@@ -355,7 +355,7 @@ public class GuildTrackerCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 
 	public static boolean addTrackingGuild(String serverId, String guildId) {

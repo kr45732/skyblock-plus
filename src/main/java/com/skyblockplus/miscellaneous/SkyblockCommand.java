@@ -314,6 +314,6 @@ public class SkyblockCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

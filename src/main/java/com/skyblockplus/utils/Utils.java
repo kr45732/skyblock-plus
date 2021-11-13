@@ -37,6 +37,7 @@ import com.skyblockplus.utils.exceptionhandler.ExceptionExecutor;
 import com.skyblockplus.utils.structs.*;
 import java.awt.*;
 import java.io.*;
+import java.lang.ref.Reference;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -145,6 +146,7 @@ public class Utils {
 	private static JsonObject emojiMap;
 	public static JsonObject internalJsonMappings;
 	public static JsonObject priceOverrideJson;
+	private static JsonArray npcSellPrices;
 
 	/* Getters */
 	public static JsonElement getLowestBinJson() {
@@ -203,6 +205,20 @@ public class Utils {
 		}
 
 		return bazaarJson;
+	}
+
+	public static double getNpcSellPrice(String id){
+		if(npcSellPrices == null){
+			npcSellPrices = higherDepth(getJson("https://api.hypixel.net/resources/skyblock/items"), "items").getAsJsonArray();
+		}
+
+		for (JsonElement npcSellPrice : npcSellPrices) {
+			if(higherDepth(npcSellPrice, "id").getAsString().equals(id)){
+				return higherDepth(npcSellPrice, "npc_sell_price", -1.0);
+			}
+		}
+
+		return -1.0;
 	}
 
 	public static JsonArray getSbzPricesJson() {

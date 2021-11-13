@@ -140,6 +140,6 @@ public class EssenceCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

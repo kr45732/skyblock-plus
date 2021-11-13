@@ -138,6 +138,6 @@ public class QueryAuctionCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

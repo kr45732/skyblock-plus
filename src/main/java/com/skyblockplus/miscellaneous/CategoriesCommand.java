@@ -49,6 +49,6 @@ public class CategoriesCommand extends Command {
 				embed(defaultEmbed("Guild Categories").setDescription(ebString.length() == 0 ? "None" : ebString.toString()));
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

@@ -21,14 +21,12 @@ package com.skyblockplus.link;
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.utils.Utils.*;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.User;
 
 public class UnlinkCommand extends Command {
 
@@ -68,6 +66,6 @@ public class UnlinkCommand extends Command {
 				embed(unlinkAccount(new PaginatorEvent(event)));
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

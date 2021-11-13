@@ -394,6 +394,6 @@ public class GuildCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

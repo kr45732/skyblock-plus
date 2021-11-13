@@ -241,6 +241,6 @@ public class HypixelCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

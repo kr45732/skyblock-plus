@@ -113,6 +113,6 @@ public class GetAllGuildsIn extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

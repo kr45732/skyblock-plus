@@ -42,6 +42,6 @@ public class ShutdownCommand extends Command {
 				event.getJDA().shutdown();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

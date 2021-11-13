@@ -53,7 +53,7 @@ public abstract class CommandExecute {
 
 	protected abstract void execute();
 
-	public void submit() {
+	public void queue() {
 		executor.submit(() -> {
 			if (sendLoadingEmbed) {
 				this.ebMessage =
@@ -140,5 +140,17 @@ public abstract class CommandExecute {
 
 	protected void removeArg(int index) {
 		args = ArrayUtils.remove(args, index);
+	}
+
+	protected boolean getBooleanArg(String match){
+		boolean arg = false;
+		for (int i = 0; i < args.length; i++) {
+			if (args[i].equals(match)) {
+				arg = true;
+				removeArg(i);
+			}
+		}
+
+		return arg;
 	}
 }

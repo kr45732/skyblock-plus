@@ -343,6 +343,6 @@ public class GuildKickerCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

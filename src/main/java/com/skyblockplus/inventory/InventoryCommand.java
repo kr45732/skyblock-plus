@@ -142,6 +142,6 @@ public class InventoryCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

@@ -158,6 +158,6 @@ public class EvaluateCommand extends Command {
 				}
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

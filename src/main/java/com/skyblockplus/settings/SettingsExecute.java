@@ -489,7 +489,7 @@ public class SettingsExecute {
 				embed(eb);
 			}
 		}
-			.submit();
+			.queue();
 	}
 
 	private EmbedBuilder removeApplyBlacklist(String username) {

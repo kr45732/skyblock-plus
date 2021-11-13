@@ -64,7 +64,7 @@ public class GetSettingsFile extends Command {
 				event.getChannel().sendMessageEmbeds(errorEmbed(name).build()).queue();
 			}
 		}
-			.submit();
+			.queue();
 	}
 
 	private boolean getAllServerSettings(CommandEvent event) {

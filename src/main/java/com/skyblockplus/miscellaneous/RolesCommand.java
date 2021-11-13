@@ -624,6 +624,6 @@ public class RolesCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

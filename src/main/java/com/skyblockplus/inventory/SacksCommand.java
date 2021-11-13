@@ -40,7 +40,7 @@ public class SacksCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	public static EmbedBuilder getPlayerSacks(String username, String profileName, PaginatorEvent event) {
+	public static EmbedBuilder getPlayerSacks(String username, String profileName, boolean useNpcPrice, PaginatorEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			Map<String, Integer> sacksMap = player.getPlayerSacks();
@@ -52,18 +52,26 @@ public class SacksCommand extends Command {
 
 			JsonElement bazaarPrices = higherDepth(getBazaarJson(), "products");
 
-			final double[] total = { 0 };
+			final double[] total = { 0, 0 };
 			sacksMap
 				.entrySet()
 				.stream()
 				.sorted(
-					Comparator.comparingDouble(entry ->
-						-higherDepth(bazaarPrices, entry.getKey() + ".sell_summary.[0].pricePerUnit", 0.0) * entry.getValue()
-					)
+					Comparator.comparingDouble(entry -> {
+						double npcPrice = -1;
+						if (useNpcPrice) {
+							npcPrice = getNpcSellPrice(entry.getKey());
+						}
+
+						return -(npcPrice != -1 ? npcPrice : higherDepth(bazaarPrices, entry.getKey() + ".sell_summary.[0].pricePerUnit", 0.0)) * entry.getValue();
+					})
 				)
 				.forEach(currentSack -> {
-					double sackPrice =
-						higherDepth(bazaarPrices, currentSack.getKey() + ".sell_summary.[0].pricePerUnit", 0.0) * currentSack.getValue();
+					double npcPrice = -1;
+					if (useNpcPrice) {
+						npcPrice = getNpcSellPrice(currentSack.getKey());
+					}
+					double sackPrice = (npcPrice != -1 ? npcPrice : higherDepth(bazaarPrices, currentSack.getKey() + ".sell_summary.[0].pricePerUnit", 0.0)) * currentSack.getValue();
 					paginateBuilder.addItems(
 						"**" +
 						convertSkyblockIdName(currentSack.getKey()) +
@@ -72,7 +80,7 @@ public class SacksCommand extends Command {
 						" ➜ " +
 						simplifyNumber(sackPrice)
 					);
-					total[0] += sackPrice;
+					total[npcPrice != -1 ? 1 : 0] += sackPrice;
 				});
 
 			paginateBuilder.setPaginatorExtras(
@@ -80,7 +88,7 @@ public class SacksCommand extends Command {
 					.setEveryPageTitle(player.getUsername())
 					.setEveryPageThumbnail(player.getThumbnailUrl())
 					.setEveryPageTitleUrl(player.skyblockStatsLink())
-					.setEveryPageText("**Total value:** " + roundAndFormat(total[0]) + "\n")
+					.setEveryPageText("**Total value:** " + roundAndFormat(total[0] + total[1]) + (useNpcPrice ? " (" + roundAndFormat(total[1]) + " npc + " + roundAndFormat(total[0]) + " bazaar)" : "") + "\n")
 			);
 			event.paginate(paginateBuilder);
 			return null;
@@ -96,17 +104,19 @@ public class SacksCommand extends Command {
 				logCommand();
 
 				if (args.length == 3 || args.length == 2 || args.length == 1) {
+					boolean useNpc = getBooleanArg("--npc");
+
 					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
 						return;
 					}
 
-					paginate(getPlayerSacks(username, args.length == 3 ? args[2] : null, new PaginatorEvent(event)));
+					paginate(getPlayerSacks(username, args.length == 3 ? args[2] : null, useNpc, new PaginatorEvent(event)));
 					return;
 				}
 
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

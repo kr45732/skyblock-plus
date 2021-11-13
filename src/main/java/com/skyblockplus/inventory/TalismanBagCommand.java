@@ -133,7 +133,7 @@ public class TalismanBagCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 
 	private List<String[]> getPlayerTalismansEmoji(String username, String profileName) {

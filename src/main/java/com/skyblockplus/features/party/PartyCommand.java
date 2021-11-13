@@ -86,7 +86,7 @@ public class PartyCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 
 	public static EmbedBuilder getCurrentParty(PaginatorEvent event) {

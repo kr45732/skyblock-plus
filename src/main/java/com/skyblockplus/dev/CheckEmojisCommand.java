@@ -82,6 +82,6 @@ public class CheckEmojisCommand extends Command {
 				}
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

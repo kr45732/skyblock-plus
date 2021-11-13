@@ -147,6 +147,6 @@ public class DungeonsCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

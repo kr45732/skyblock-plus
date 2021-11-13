@@ -164,6 +164,6 @@ public class LinkCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

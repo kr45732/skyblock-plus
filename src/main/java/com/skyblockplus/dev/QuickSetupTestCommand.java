@@ -69,7 +69,7 @@ public class QuickSetupTestCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 
 	private EmbedBuilder deleteSkyblockEvent(String serverId) {

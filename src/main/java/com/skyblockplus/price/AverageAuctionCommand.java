@@ -196,6 +196,6 @@ public class AverageAuctionCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

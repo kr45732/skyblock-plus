@@ -181,6 +181,6 @@ public class SlayerCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

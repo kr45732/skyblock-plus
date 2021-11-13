@@ -200,6 +200,6 @@ public class GuildLeaderboardCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

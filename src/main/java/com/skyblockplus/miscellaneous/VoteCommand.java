@@ -50,6 +50,6 @@ public class VoteCommand extends Command {
 				embed(getVoteEmbed());
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

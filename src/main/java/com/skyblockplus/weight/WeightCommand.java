@@ -168,6 +168,6 @@ public class WeightCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

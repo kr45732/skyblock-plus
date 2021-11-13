@@ -128,6 +128,6 @@ public class EmojiFromUrlCommand extends Command {
 				}
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

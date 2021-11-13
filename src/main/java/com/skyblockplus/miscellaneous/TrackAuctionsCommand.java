@@ -172,6 +172,6 @@ public class TrackAuctionsCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

@@ -94,6 +94,6 @@ public class InformationCommand extends Command {
 					.queue();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

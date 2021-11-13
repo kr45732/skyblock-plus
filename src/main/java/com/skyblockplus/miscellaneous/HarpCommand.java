@@ -96,6 +96,6 @@ public class HarpCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }

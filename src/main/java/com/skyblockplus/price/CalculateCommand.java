@@ -124,6 +124,6 @@ public class CalculateCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.submit();
+			.queue();
 	}
 }
