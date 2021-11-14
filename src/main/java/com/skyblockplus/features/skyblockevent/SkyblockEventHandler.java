@@ -128,9 +128,12 @@ public class SkyblockEventHandler {
 						eventSettings.setEventType("slayer");
 						break;
 					case "weight":
-						eb.addField("Event Type", "Weight", false);
-						eventSettings.setEventType("weight");
-						break;
+						state = 9;
+						eb.setDescription(
+								"Reply with the weight type this event should track or 'all' for total weight."
+						);
+						sendEmbedMessage(eb);
+						return;
 					case "skills":
 						state = 8;
 						eb.setDescription(
@@ -194,6 +197,21 @@ public class SkyblockEventHandler {
 				} else {
 					String closestSkill = getClosestMatch(replyMessage, ALL_SKILL_NAMES);
 					eb.setDescription("`" + replyMessage + "` is invalid. Did you mean `" + closestSkill.toLowerCase() + "`?");
+					attemptsLeft--;
+				}
+				sendEmbedMessage(eb);
+				break;
+			case 9:
+				if (replyMessage.equalsIgnoreCase("all") || replyMessage.equalsIgnoreCase("skills") ||replyMessage.equalsIgnoreCase("dungeons") || replyMessage.equalsIgnoreCase("slayer")) {
+					String eventType = "weight." + replyMessage.toLowerCase();
+					eb.addField("Event Type", getEventTypeFormatted(eventType), false);
+					eventSettings.setEventType(eventType);
+					eb.setDescription(
+							"Reply with the minimum and/or maximum amount a player can have when joining the event. Follow the format in the example below (type:value):\nmin:5000\nmax:8000\n\nOptional and can be set to 'none'."
+					);
+					state = 2;
+				} else {
+					eb.setDescription("`" + replyMessage + "` is invalid. Please choose from 'all', 'skills', 'slayer', or 'dungeons'");
 					attemptsLeft--;
 				}
 				sendEmbedMessage(eb);

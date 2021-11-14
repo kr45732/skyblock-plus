@@ -988,6 +988,22 @@ public class Player {
 		return new Weight(this, true).getTotalWeight().getRaw();
 	}
 
+	public double getWeight(String weightType) {
+		Weight weight = new Weight(this, true);
+		switch (weightType){
+			case "all":
+				return weight.getTotalWeight().getRaw();
+			case "slayer":
+				return weight.getSlayerWeight().getWeightStruct().getRaw();
+			case "skills":
+				return weight.getSkillsWeight().getWeightStruct().getRaw();
+			case "dungeons":
+				return weight.getDungeonsWeight().getWeightStruct().getRaw();
+			default:
+				throw new IllegalArgumentException("Invalid weight type");
+		}
+	}
+
 	public EmbedBuilder defaultPlayerEmbed() {
 		return defaultPlayerEmbed("");
 	}

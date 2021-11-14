@@ -283,13 +283,10 @@ public class SettingsExecute {
 									eb = setApplyNewChannelCategory(args[2], args[4]);
 									break;
 								case "staff_role":
-									System.out.println("here1");
 									args = content.split(" ", 6);
 									if (args[4].equals("add")) {
-										System.out.println("here2");
 										eb = addApplyStaffRole(args[2], args[5]);
 									} else if (args[4].equals("remove")) {
-										System.out.println("here3");
 										eb = removeApplyStaffRole(args[2], args[5]);
 									}
 									break;

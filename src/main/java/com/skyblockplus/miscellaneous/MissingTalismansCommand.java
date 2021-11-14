@@ -100,17 +100,18 @@ public class MissingTalismansCommand extends Command {
 				missingInternalArr.size() +
 				" talisman" +
 				(missingInternalArr.size() > 1 ? "s" : "") +
-				". Sorted by ascending cost. Talismans with a * have higher tiers.\n\n"
+				". " + (missingInternalArr.size() > 40 ? "Only the cheapest 40 are shown. " : "") + "Sorted by ascending cost. Talismans with a * have higher tiers.\n\n"
 			);
 
 			JsonObject mappings = getInternalJsonMappings();
-			for (String i : missingInternalArr) {
+			for (int i = 0; i < Math.max(missingInternalArr.size(), 40); i++) {
+				String cur = missingInternalArr.get(i);
 				String wikiLink = higherDepth(mappings, i + ".wiki", null);
 				ebStr
-					.append("• ")
-					.append(wikiLink == null ? idToName(i) : "[" + idToName(i) + "](" + wikiLink + ")")
-					.append(higherDepth(talismanUpgrades, i) != null ? "**\\***" : "")
-					.append("\n");
+						.append("• ")
+						.append(wikiLink == null ? idToName(cur) : "[" + idToName(cur) + "](" + wikiLink + ")")
+						.append(higherDepth(talismanUpgrades, cur) != null ? "**\\***" : "")
+						.append("\n");
 			}
 			return player.defaultPlayerEmbed().setDescription(ebStr.toString());
 		}
