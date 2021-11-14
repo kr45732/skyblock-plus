@@ -19,6 +19,7 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.Main.database;
+import static com.skyblockplus.settings.SettingsExecute.isOneLevelRole;
 import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -97,7 +98,7 @@ public class RolesCommand extends Command {
 
 			List<String> allRoleNames = getJsonKeys(rolesJson);
 			allRoleNames.remove("enable");
-			Role botRole = guild.getBotRole();
+			Role botRole = guild.getSelfMember().getRoles().get(0);
 			if (botRole == null) {
 				return invalidEmbed("My role in this server doesn't exist. This shouldn't happen!");
 			}
@@ -476,6 +477,35 @@ public class RolesCommand extends Command {
 							}
 							break;
 						}
+					case "ironman":
+					{
+						Role curRole = guild.getRoleById(higherDepth(currentRole, "levels.[0].roleId").getAsString());
+						if (curRole == null) {
+							errorRoles.append(roleDeletedString(higherDepth(currentRole, "levels.[0].roleId").getAsString()));
+							continue;
+						}
+
+						if(player.isIronman()){
+							if (!member.getRoles().contains(curRole)) {
+								if (botRole.canInteract(curRole)) {
+									toAdd.add(curRole);
+									addedRoles.append(roleChangeString(curRole.getName()));
+								} else {
+									errorRoles.append(roleChangeString(curRole.getName()));
+								}
+							}
+						}else{
+							if (member.getRoles().contains(curRole)) {
+								if (botRole.canInteract(curRole)) {
+									removedRoles.append(roleChangeString(curRole.getName()));
+									toRemove.add(curRole);
+								} else {
+									errorRoles.append(roleChangeString(curRole.getName()));
+								}
+							}
+						}
+						break;
+					}
 					case "pet_enthusiast":
 						{
 							JsonArray playerPets = player.getPets();
@@ -587,9 +617,7 @@ public class RolesCommand extends Command {
 					}
 				}
 			} else if (
-				"doom_slayer".equals(currentRoleName) ||
-				"all_slayer_nine".equals(currentRoleName) ||
-				"pet_enthusiast".equals(currentRoleName)
+					isOneLevelRole(currentRoleName)
 			) {
 				paginateBuilder.addItems("<@&" + higherDepth(currentRole, "levels.[0].roleId").getAsString() + ">");
 			} else {

@@ -119,5 +119,8 @@ public class AutomatedRoles {
 	@Embedded
 	private RoleModel networth = new RoleModel();
 
+	@Embedded
+	private RoleModel ironman = new RoleModel();
+
 	public AutomatedRoles() {}
 }

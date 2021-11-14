@@ -896,6 +896,7 @@ public class SettingsExecute {
 		rolePageMap.put("dungeon_secrets", 28);
 		rolePageMap.put("accessory_count", 29);
 		rolePageMap.put("networth", 30);
+		rolePageMap.put("ironman", 31);
 
 		if (rolePageMap.containsKey(roleName)) {
 			CustomPaginator.Builder currentRoleSettings = getCurrentRolesSettings(database.getRolesSettings(guild.getId()));
@@ -1061,6 +1062,14 @@ public class SettingsExecute {
 							.append("settings roles set all_slayer_nine @role`\n");
 						break;
 					}
+				case "ironman":
+				{
+					ebFieldString
+							.append("**Playing on a ironman profile**\nExample: `")
+							.append(guildPrefix)
+							.append("settings roles set ironman @ironman`\n");
+					break;
+				}
 				case "dungeon_secrets":
 					{
 						ebFieldString
@@ -1466,8 +1475,8 @@ public class SettingsExecute {
 		return defaultEmbed("Settings").setDescription(roleName + " set to " + role.getAsMention());
 	}
 
-	public boolean isOneLevelRole(String roleName) {
-		return (roleName.equals("pet_enthusiast") || roleName.equals("doom_slayer") || roleName.equals("all_slayer_nine"));
+	public static boolean isOneLevelRole(String roleName) {
+		return roleName.equals("pet_enthusiast") || roleName.equals("doom_slayer") || roleName.equals("all_slayer_nine") || roleName.equals("ironman");
 	}
 
 	/* Verify Settings */

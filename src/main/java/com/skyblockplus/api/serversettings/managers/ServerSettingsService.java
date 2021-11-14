@@ -187,6 +187,8 @@ public class ServerSettingsService {
 					return new ResponseEntity<>(currentRoleSettings.getDoom_slayer(), HttpStatus.OK);
 				case "all_slayer_nine":
 					return new ResponseEntity<>(currentRoleSettings.getAll_slayer_nine(), HttpStatus.OK);
+				case "ironman":
+					return new ResponseEntity<>(currentRoleSettings.getIronman(), HttpStatus.OK);
 				case "skill_average":
 					return new ResponseEntity<>(currentRoleSettings.getSkill_average(), HttpStatus.OK);
 				case "pet_score":
@@ -286,6 +288,9 @@ public class ServerSettingsService {
 					break;
 				case "all_slayer_nine":
 					currentRoleSettings.setAll_slayer_nine(newRoleSettings);
+					break;
+				case "ironman":
+					currentRoleSettings.setIronman(newRoleSettings);
 					break;
 				case "skill_average":
 					currentRoleSettings.setSkill_average(newRoleSettings);

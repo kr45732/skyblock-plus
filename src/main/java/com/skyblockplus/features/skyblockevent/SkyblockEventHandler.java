@@ -211,7 +211,7 @@ public class SkyblockEventHandler {
 					);
 					state = 2;
 				} else {
-					eb.setDescription("`" + replyMessage + "` is invalid. Please choose from 'all', 'skills', 'slayer', or 'dungeons'");
+					eb.setDescription("`" + replyMessage + "` is invalid. Please choose from all, skills, slayer, or dungeons");
 					attemptsLeft--;
 				}
 				sendEmbedMessage(eb);
