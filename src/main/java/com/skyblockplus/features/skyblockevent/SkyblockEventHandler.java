@@ -129,9 +129,7 @@ public class SkyblockEventHandler {
 						break;
 					case "weight":
 						state = 9;
-						eb.setDescription(
-								"Reply with the weight type this event should track or 'all' for total weight."
-						);
+						eb.setDescription("Reply with the weight type this event should track or 'all' for total weight.");
 						sendEmbedMessage(eb);
 						return;
 					case "skills":
@@ -202,12 +200,17 @@ public class SkyblockEventHandler {
 				sendEmbedMessage(eb);
 				break;
 			case 9:
-				if (replyMessage.equalsIgnoreCase("all") || replyMessage.equalsIgnoreCase("skills") ||replyMessage.equalsIgnoreCase("dungeons") || replyMessage.equalsIgnoreCase("slayer")) {
+				if (
+					replyMessage.equalsIgnoreCase("all") ||
+					replyMessage.equalsIgnoreCase("skills") ||
+					replyMessage.equalsIgnoreCase("dungeons") ||
+					replyMessage.equalsIgnoreCase("slayer")
+				) {
 					String eventType = "weight." + replyMessage.toLowerCase();
 					eb.addField("Event Type", getEventTypeFormatted(eventType), false);
 					eventSettings.setEventType(eventType);
 					eb.setDescription(
-							"Reply with the minimum and/or maximum amount a player can have when joining the event. Follow the format in the example below (type:value):\nmin:5000\nmax:8000\n\nOptional and can be set to 'none'."
+						"Reply with the minimum and/or maximum amount a player can have when joining the event. Follow the format in the example below (type:value):\nmin:5000\nmax:8000\n\nOptional and can be set to 'none'."
 					);
 					state = 2;
 				} else {

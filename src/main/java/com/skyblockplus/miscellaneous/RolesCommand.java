@@ -478,34 +478,34 @@ public class RolesCommand extends Command {
 							break;
 						}
 					case "ironman":
-					{
-						Role curRole = guild.getRoleById(higherDepth(currentRole, "levels.[0].roleId").getAsString());
-						if (curRole == null) {
-							errorRoles.append(roleDeletedString(higherDepth(currentRole, "levels.[0].roleId").getAsString()));
-							continue;
-						}
+						{
+							Role curRole = guild.getRoleById(higherDepth(currentRole, "levels.[0].roleId").getAsString());
+							if (curRole == null) {
+								errorRoles.append(roleDeletedString(higherDepth(currentRole, "levels.[0].roleId").getAsString()));
+								continue;
+							}
 
-						if(player.isIronman()){
-							if (!member.getRoles().contains(curRole)) {
-								if (botRole.canInteract(curRole)) {
-									toAdd.add(curRole);
-									addedRoles.append(roleChangeString(curRole.getName()));
-								} else {
-									errorRoles.append(roleChangeString(curRole.getName()));
+							if (player.isIronman()) {
+								if (!member.getRoles().contains(curRole)) {
+									if (botRole.canInteract(curRole)) {
+										toAdd.add(curRole);
+										addedRoles.append(roleChangeString(curRole.getName()));
+									} else {
+										errorRoles.append(roleChangeString(curRole.getName()));
+									}
+								}
+							} else {
+								if (member.getRoles().contains(curRole)) {
+									if (botRole.canInteract(curRole)) {
+										removedRoles.append(roleChangeString(curRole.getName()));
+										toRemove.add(curRole);
+									} else {
+										errorRoles.append(roleChangeString(curRole.getName()));
+									}
 								}
 							}
-						}else{
-							if (member.getRoles().contains(curRole)) {
-								if (botRole.canInteract(curRole)) {
-									removedRoles.append(roleChangeString(curRole.getName()));
-									toRemove.add(curRole);
-								} else {
-									errorRoles.append(roleChangeString(curRole.getName()));
-								}
-							}
+							break;
 						}
-						break;
-					}
 					case "pet_enthusiast":
 						{
 							JsonArray playerPets = player.getPets();
@@ -616,9 +616,7 @@ public class RolesCommand extends Command {
 						);
 					}
 				}
-			} else if (
-					isOneLevelRole(currentRoleName)
-			) {
+			} else if (isOneLevelRole(currentRoleName)) {
 				paginateBuilder.addItems("<@&" + higherDepth(currentRole, "levels.[0].roleId").getAsString() + ">");
 			} else {
 				JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();

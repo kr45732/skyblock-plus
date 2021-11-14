@@ -1063,13 +1063,13 @@ public class SettingsExecute {
 						break;
 					}
 				case "ironman":
-				{
-					ebFieldString
+					{
+						ebFieldString
 							.append("**Playing on a ironman profile**\nExample: `")
 							.append(guildPrefix)
 							.append("settings roles set ironman @ironman`\n");
-					break;
-				}
+						break;
+					}
 				case "dungeon_secrets":
 					{
 						ebFieldString
@@ -1476,7 +1476,12 @@ public class SettingsExecute {
 	}
 
 	public static boolean isOneLevelRole(String roleName) {
-		return roleName.equals("pet_enthusiast") || roleName.equals("doom_slayer") || roleName.equals("all_slayer_nine") || roleName.equals("ironman");
+		return (
+			roleName.equals("pet_enthusiast") ||
+			roleName.equals("doom_slayer") ||
+			roleName.equals("all_slayer_nine") ||
+			roleName.equals("ironman")
+		);
 	}
 
 	/* Verify Settings */

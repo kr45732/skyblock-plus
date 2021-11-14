@@ -257,10 +257,10 @@ public class SkyblockEventCommand extends Command {
 
 											if (skillXp != -1) {
 												return new EventMember(
-														guildMemberUsernameResponse,
-														guildMemberUuid,
-														"" + (skillXp - higherDepth(guildMember, "startingAmount").getAsDouble()),
-														higherDepth(guildMember, "profileName").getAsString()
+													guildMemberUsernameResponse,
+													guildMemberUuid,
+													"" + (skillXp - higherDepth(guildMember, "startingAmount").getAsDouble()),
+													higherDepth(guildMember, "profileName").getAsString()
 												);
 											}
 										}
@@ -567,9 +567,7 @@ public class SkyblockEventCommand extends Command {
 									} else if (eventType.startsWith("weight.")) {
 										String skillType = eventType.split("weight.")[1];
 										startingAmount = player.getWeight(skillType);
-										startingAmountFormatted =
-												formatNumber(startingAmount) +
-														" " + getEventTypeFormatted(eventType);
+										startingAmountFormatted = formatNumber(startingAmount) + " " + getEventTypeFormatted(eventType);
 										break;
 									}
 									break;
@@ -714,7 +712,7 @@ public class SkyblockEventCommand extends Command {
 			return eventType.split("-")[1] + " collection";
 		} else if (eventType.startsWith("skills.")) {
 			return eventType.split("skills.")[1].equals("all") ? "skills" : eventType.split("skills.")[1];
-		}else if (eventType.startsWith("weight.")) {
+		} else if (eventType.startsWith("weight.")) {
 			return eventType.split("weight.")[1].equals("all") ? "weight" : eventType.split("weight.")[1] + " weight";
 		}
 

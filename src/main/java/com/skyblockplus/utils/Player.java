@@ -990,7 +990,7 @@ public class Player {
 
 	public double getWeight(String weightType) {
 		Weight weight = new Weight(this, true);
-		switch (weightType){
+		switch (weightType) {
 			case "all":
 				return weight.getTotalWeight().getRaw();
 			case "slayer":
