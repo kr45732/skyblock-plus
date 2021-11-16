@@ -392,17 +392,17 @@ public class NetworthExecute {
 	private void calculateAllPetsPrice() {
 		StringBuilder queryStr = new StringBuilder();
 		for (InvItem item : invPets) {
-			queryStr.append("\"").append(item.getPetApiName()).append("\",");
+			queryStr.append("'").append(item.getPetApiName()).append("',");
 		}
 		for (InvItem item : petsPets) {
-			queryStr.append("\"").append(item.getPetApiName()).append("\",");
+			queryStr.append("'").append(item.getPetApiName()).append("',");
 		}
 		for (InvItem item : enderChestPets) {
-			queryStr.append("\"").append(item.getPetApiName()).append("\",");
+			queryStr.append("'").append(item.getPetApiName()).append("',");
 		}
 
 		for (InvItem item : storagePets) {
-			queryStr.append("\"").append(item.getPetApiName()).append("\",");
+			queryStr.append("'").append(item.getPetApiName()).append("',");
 		}
 
 		if (queryStr.length() == 0) {
@@ -414,8 +414,8 @@ public class NetworthExecute {
 
 		if (ahQuery != null) {
 			for (JsonElement auction : ahQuery) {
-				String auctionName = higherDepth(auction, "item_name").getAsString();
-				double auctionPrice = higherDepth(auction, "starting_bid").getAsDouble();
+				String auctionName = higherDepth(auction, "name").getAsString();
+				double auctionPrice = higherDepth(auction, "price").getAsDouble();
 
 				for (Iterator<InvItem> iterator = invPets.iterator(); iterator.hasNext();) {
 					InvItem item = iterator.next();

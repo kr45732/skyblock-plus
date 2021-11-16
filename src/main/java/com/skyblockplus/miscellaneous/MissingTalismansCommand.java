@@ -106,7 +106,7 @@ public class MissingTalismansCommand extends Command {
 			);
 
 			JsonObject mappings = getInternalJsonMappings();
-			for (int i = 0; i < Math.max(missingInternalArr.size(), 40); i++) {
+			for (int i = 0; i < Math.min(missingInternalArr.size(), 40); i++) {
 				String cur = missingInternalArr.get(i);
 				String wikiLink = higherDepth(mappings, i + ".wiki", null);
 				ebStr

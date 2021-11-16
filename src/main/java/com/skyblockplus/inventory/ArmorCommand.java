@@ -60,17 +60,17 @@ public class ArmorCommand extends Command {
 
 						String slotName = "";
 						switch ((currentInvSlot.getKey())) {
-							case 4:
-								slotName = "Boots";
-								break;
-							case 3:
-								slotName = "Leggings";
-								break;
-							case 2:
-								slotName = "Chestplate";
+							case 0:
+								slotName = "Helmet";
 								break;
 							case 1:
-								slotName = "Helmet";
+								slotName = "Chestplate";
+								break;
+							case 2:
+								slotName = "Leggings";
+								break;
+							case 3:
+								slotName = "Boots";
 								break;
 						}
 
@@ -82,17 +82,17 @@ public class ArmorCommand extends Command {
 
 						String slotName = "";
 						switch ((currentInvSlot.getKey())) {
-							case 4:
-								slotName = "Boots";
-								break;
-							case 3:
-								slotName = "Leggings";
-								break;
-							case 2:
-								slotName = "Chestplate";
+							case 0:
+								slotName = "Helmet";
 								break;
 							case 1:
-								slotName = "Helmet";
+								slotName = "Chestplate";
+								break;
+							case 2:
+								slotName = "Leggings";
+								break;
+							case 3:
+								slotName = "Boots";
 								break;
 						}
 

@@ -572,7 +572,13 @@ public class Player {
 		try {
 			String contents = higherDepth(profileJson(), "inv_armor.data").getAsString();
 			NBTCompound parsedContents = NBTReader.readBase64(contents);
-			return getGenericInventoryMap(parsedContents);
+			Map<Integer, InvItem> oldMap =  getGenericInventoryMap(parsedContents);
+			Map<Integer, InvItem> fixedMap = new HashMap<>();
+			fixedMap.put(0, oldMap.getOrDefault(3, null));
+			fixedMap.put(1, oldMap.getOrDefault(2, null));
+			fixedMap.put(2, oldMap.getOrDefault(1, null));
+			fixedMap.put(3, oldMap.getOrDefault(0, null));
+			return fixedMap;
 		} catch (Exception ignored) {}
 		return null;
 	}
@@ -849,17 +855,17 @@ public class Player {
 					(equippedWardrobeSlot <= 9) &&
 					((((i + 1) - equippedWardrobeSlot) % 9) == 0) &&
 					((i + 1) <= 36) &&
-					(equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9) + 1)) != null
+					(equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9))) != null
 				) {
-					invFramesMap.put(i + 1, equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9) + 1).getId().toLowerCase());
+					invFramesMap.put(i + 1, equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9)).getId().toLowerCase());
 				} else if (
 					(equippedArmor != null) &&
 					(equippedWardrobeSlot > 9) &&
 					((((i + 1) - equippedWardrobeSlot) % 9) == 0) &&
 					((i + 1) > 36) &&
-					(equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9) + 1 - 3)) != null
+					(equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9) - 3)) != null
 				) {
-					invFramesMap.put(i + 1, equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9) + 1 - 3).getId().toLowerCase());
+					invFramesMap.put(i + 1, equippedArmor.get((((i + 1) - equippedWardrobeSlot) / 9) - 3).getId().toLowerCase());
 				} else {
 					invFramesMap.put(i + 1, "empty");
 				}

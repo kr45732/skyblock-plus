@@ -468,12 +468,13 @@ public class ApiHandler {
 	}
 
 	public static JsonArray getAuctionPetsByName(String query) {
+		// Query should be 'name','name','name'...
 		try {
-			HttpGet httpget = new HttpGet("https://auction-api.kr45732.repl.co/");
+			HttpGet httpget = new HttpGet("https://auctions.tyman.tech/pets");
 			httpget.addHeader("content-type", "application/json; charset=UTF-8");
 
 			URI uri = new URIBuilder(httpget.getURI())
-				.addParameter("query", "{\"item_name\":{\"$in\":[" + query + "]}}")
+				.addParameter("query", query)
 				.addParameter("key", AUCTION_API_KEY)
 				.build();
 			httpget.setURI(uri);

@@ -413,14 +413,14 @@ public class Utils {
 
 	public static String makeHastePost(String body) {
 		try {
-			HttpPost httpPost = new HttpPost("https://hst.sh/documents");
+			HttpPost httpPost = new HttpPost("https://mystb.in/documents");
 
 			StringEntity entity = new StringEntity(body);
 			httpPost.setEntity(entity);
 
 			try (CloseableHttpResponse httpResponse = httpClient.execute(httpPost)) {
 				return (
-					"https://hst.sh/" +
+					"https://mystb.in/" +
 					higherDepth(JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())), "key").getAsString()
 				);
 			}
