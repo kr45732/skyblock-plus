@@ -473,10 +473,7 @@ public class ApiHandler {
 			HttpGet httpget = new HttpGet("https://auctions.tyman.tech/pets");
 			httpget.addHeader("content-type", "application/json; charset=UTF-8");
 
-			URI uri = new URIBuilder(httpget.getURI())
-				.addParameter("query", query)
-				.addParameter("key", AUCTION_API_KEY)
-				.build();
+			URI uri = new URIBuilder(httpget.getURI()).addParameter("query", query).addParameter("key", AUCTION_API_KEY).build();
 			httpget.setURI(uri);
 
 			try (CloseableHttpResponse httpResponse = httpClient.execute(httpget)) {

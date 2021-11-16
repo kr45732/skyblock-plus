@@ -572,7 +572,7 @@ public class Player {
 		try {
 			String contents = higherDepth(profileJson(), "inv_armor.data").getAsString();
 			NBTCompound parsedContents = NBTReader.readBase64(contents);
-			Map<Integer, InvItem> oldMap =  getGenericInventoryMap(parsedContents);
+			Map<Integer, InvItem> oldMap = getGenericInventoryMap(parsedContents);
 			Map<Integer, InvItem> fixedMap = new HashMap<>();
 			fixedMap.put(0, oldMap.getOrDefault(3, null));
 			fixedMap.put(1, oldMap.getOrDefault(2, null));

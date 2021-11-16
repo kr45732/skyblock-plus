@@ -179,7 +179,6 @@ public class Main {
 				.build();
 
 		slashCommandClient =
-
 			new SlashCommandClient()
 				.addSlashCommands(
 					new InviteSlashCommand(),
