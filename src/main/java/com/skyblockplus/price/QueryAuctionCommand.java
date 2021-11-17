@@ -96,7 +96,7 @@ public class QueryAuctionCommand extends Command {
 
 		JsonElement lowestBinAuction = lowestBinArr.get(0);
 		EmbedBuilder eb = defaultEmbed("Query Auctions");
-		Duration duration = Duration.between(Instant.now(), Instant.ofEpochMilli(higherDepth(lowestBinAuction, "end").getAsLong()));
+		Duration duration = Duration.between(Instant.now(), Instant.ofEpochMilli(higherDepth(lowestBinAuction, "end_t").getAsLong()));
 
 		String lowestBinStr = "";
 		lowestBinStr += "**Name:** " + (tempName == null ? higherDepth(lowestBinAuction, "item_name").getAsString() : tempName);

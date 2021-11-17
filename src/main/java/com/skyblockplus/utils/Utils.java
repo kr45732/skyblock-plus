@@ -47,6 +47,7 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -413,14 +414,14 @@ public class Utils {
 
 	public static String makeHastePost(String body) {
 		try {
-			HttpPost httpPost = new HttpPost("https://mystb.in/documents");
+			HttpPost httpPost = new HttpPost("https://hst.sh/documents");
 
 			StringEntity entity = new StringEntity(body);
 			httpPost.setEntity(entity);
 
 			try (CloseableHttpResponse httpResponse = httpClient.execute(httpPost)) {
 				return (
-					"https://mystb.in/" +
+					"https://hst.sh/" +
 					higherDepth(JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())), "key").getAsString()
 				);
 			}

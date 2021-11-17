@@ -65,17 +65,18 @@ public class SkyblockEventCommand extends Command {
 	public static EmbedBuilder endSkyblockEvent(String guildId) {
 		JsonElement runningEventSettings = database.getSkyblockEventSettings(guildId);
 		TextChannel announcementChannel = jda.getTextChannelById(higherDepth(runningEventSettings, "announcementId").getAsString());
+		guildMap.get(guildId).setEventMemberListLastUpdated(null);
 		List<EventMember> guildMemberPlayersList = getEventLeaderboardList(runningEventSettings, guildId);
 		if (guildMemberPlayersList == null) {
 			return invalidEmbed(
 				"A Hypixel API key must be set for events over 30 members so the leaderboard can be calculated before it ends"
 			);
 		}
-
 		guildMap.get(guildId).setEventMemberListLastUpdated(null);
+
 		announcementChannel
 			.retrieveMessageById(higherDepth(runningEventSettings, "announcementMessageId").getAsString())
-			.queue(m -> m.editMessageComponents().queue());
+			.queue(m -> m.editMessageComponents().queue(), ignored -> {});
 
 		CustomPaginator.Builder paginateBuilder = defaultPaginator()
 			.setColumns(1)

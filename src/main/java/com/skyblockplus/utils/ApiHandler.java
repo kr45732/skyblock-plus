@@ -363,34 +363,6 @@ public class ApiHandler {
 		return getGuildGeneric("&name=" + guildName.replace(" ", "%20").replace("_", "%20"));
 	}
 
-	public static JsonArray queryLowestBin(String query) {
-		try {
-			HttpGet httpget = new HttpGet("https://query-api.kr45732.repl.co/");
-			httpget.addHeader("content-type", "application/json; charset=UTF-8");
-
-			query = query.replace("[", "\\\\[");
-			URI uri = new URIBuilder(httpget.getURI())
-				.addParameter(
-					"query",
-					"{\"item_name\":{\"$regex\":\"" +
-					query +
-					"\",\"$options\":\"i\"},\"end\":{\"$gt\":" +
-					Instant.now().toEpochMilli() +
-					"}}"
-				)
-				.addParameter("sort", "{\"starting_bid\":1}")
-				.addParameter("limit", "1")
-				.addParameter("key", AUCTION_API_KEY)
-				.build();
-			httpget.setURI(uri);
-
-			try (CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpget)) {
-				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
-			}
-		} catch (Exception ignored) {}
-		return null;
-	}
-
 	//	public static JsonArray getBidsFromPlayer(String uuid) {
 	//		try {
 	//			HttpGet httpget = new HttpGet("https://query-api.kr45732.repl.co/");
@@ -408,30 +380,49 @@ public class ApiHandler {
 	//		return null;
 	//	}
 
-	public static JsonArray queryLowestBinPet(String petName, String rarity) {
+	public static JsonArray queryLowestBin(String query) {
 		try {
-			HttpGet httpGet = new HttpGet("https://query-api.kr45732.repl.co/");
-			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
+			HttpGet httpget = new HttpGet("https://auctions.tyman.tech/query");
+			httpget.addHeader("content-type", "application/json; charset=UTF-8");
 
-			petName = petName.replace("[", "\\\\[");
-			URI uri = new URIBuilder(httpGet.getURI())
+			URI uri = new URIBuilder(httpget.getURI())
 				.addParameter(
 					"query",
-					"{\"item_name\":{\"$regex\":\"" +
-					petName +
-					"\",\"$options\":\"i\"}," +
-					(!rarity.equalsIgnoreCase("any") ? "\"tier\":\"" + rarity.toUpperCase() + "\"," : "") +
-					"\"end\":{\"$gt\":" +
-					Instant.now().toEpochMilli() +
-					"},\"item_id\":\"PET\"}"
+					"end_t > " + Instant.now().toEpochMilli()
+				).addParameter("name", "%" + query + "%")
+				.addParameter("sort", "starting_bid")
+					.addParameter("limit", "1")
+				.addParameter("key", AUCTION_API_KEY)
+				.build();
+			httpget.setURI(uri);
+
+			try (CloseableHttpResponse httpResponse = httpClient.execute(httpget)) {
+				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
+			}
+		} catch (Exception ignored) {}
+		return null;
+	}
+
+	public static JsonArray queryLowestBinPet(String petName, String rarity) {
+		try {
+			HttpGet httpGet = new HttpGet("https://auctions.tyman.tech/query");
+			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
+
+			URI uri = new URIBuilder(httpGet.getURI())
+				.addParameter(
+						"query",
+						"end_t > " + Instant.now().toEpochMilli() +
+								" AND item_id = 'PET'"
+								+ (!rarity.equalsIgnoreCase("any") ? " AND tier = '" + rarity.toUpperCase()  +"'" :"")
 				)
-				.addParameter("sort", "{\"starting_bid\":1}")
-				.addParameter("limit", "1")
+				.addParameter("name", "%" + petName + "%")
+				.addParameter("sort", "starting_bid")
+					.addParameter("limit", "1")
 				.addParameter("key", AUCTION_API_KEY)
 				.build();
 			httpGet.setURI(uri);
 
-			try (CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpGet)) {
+			try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
 				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
 			}
 		} catch (Exception ignored) {}
@@ -440,27 +431,25 @@ public class ApiHandler {
 
 	public static JsonArray queryLowestBinEnchant(String enchantId, int enchantLevel) {
 		try {
-			HttpGet httpGet = new HttpGet("https://query-api.kr45732.repl.co/");
+			HttpGet httpGet = new HttpGet("https://auctions.tyman.tech/query");
 			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
 
 			URI uri = new URIBuilder(httpGet.getURI())
 				.addParameter(
-					"query",
-					"{\"item_id\":\"ENCHANTED_BOOK\",\"end\":{\"$gt\":" +
-					Instant.now().toEpochMilli() +
-					"},\"enchants\":\"" +
-					enchantId.toUpperCase() +
-					";" +
-					enchantLevel +
-					"\"}"
+						"query",
+						"end_t > " + Instant.now().toEpochMilli() +
+								" AND item_id = 'ENCHANTED_BOOK' AND '" + enchantId.toUpperCase() +
+								";" +
+								enchantLevel
+								+ "' = ANY (enchants)"
 				)
-				.addParameter("sort", "{\"starting_bid\":1}")
-				.addParameter("limit", "1")
+				.addParameter("sort", "starting_bid")
+					.addParameter("limit", "1")
 				.addParameter("key", AUCTION_API_KEY)
 				.build();
 			httpGet.setURI(uri);
 
-			try (CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpGet)) {
+			try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
 				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
 			}
 		} catch (Exception ignored) {}
