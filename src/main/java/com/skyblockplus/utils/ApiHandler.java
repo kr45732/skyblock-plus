@@ -386,12 +386,10 @@ public class ApiHandler {
 			httpget.addHeader("content-type", "application/json; charset=UTF-8");
 
 			URI uri = new URIBuilder(httpget.getURI())
-				.addParameter(
-					"query",
-					"end_t > " + Instant.now().toEpochMilli()
-				).addParameter("name", "%" + query + "%")
+				.addParameter("query", "end_t > " + Instant.now().toEpochMilli())
+				.addParameter("name", "%" + query + "%")
 				.addParameter("sort", "starting_bid")
-					.addParameter("limit", "1")
+				.addParameter("limit", "1")
 				.addParameter("key", AUCTION_API_KEY)
 				.build();
 			httpget.setURI(uri);
@@ -410,14 +408,15 @@ public class ApiHandler {
 
 			URI uri = new URIBuilder(httpGet.getURI())
 				.addParameter(
-						"query",
-						"end_t > " + Instant.now().toEpochMilli() +
-								" AND item_id = 'PET'"
-								+ (!rarity.equalsIgnoreCase("any") ? " AND tier = '" + rarity.toUpperCase()  +"'" :"")
+					"query",
+					"end_t > " +
+					Instant.now().toEpochMilli() +
+					" AND item_id = 'PET'" +
+					(!rarity.equalsIgnoreCase("any") ? " AND tier = '" + rarity.toUpperCase() + "'" : "")
 				)
 				.addParameter("name", "%" + petName + "%")
 				.addParameter("sort", "starting_bid")
-					.addParameter("limit", "1")
+				.addParameter("limit", "1")
 				.addParameter("key", AUCTION_API_KEY)
 				.build();
 			httpGet.setURI(uri);
@@ -436,15 +435,17 @@ public class ApiHandler {
 
 			URI uri = new URIBuilder(httpGet.getURI())
 				.addParameter(
-						"query",
-						"end_t > " + Instant.now().toEpochMilli() +
-								" AND item_id = 'ENCHANTED_BOOK' AND '" + enchantId.toUpperCase() +
-								";" +
-								enchantLevel
-								+ "' = ANY (enchants)"
+					"query",
+					"end_t > " +
+					Instant.now().toEpochMilli() +
+					" AND item_id = 'ENCHANTED_BOOK' AND '" +
+					enchantId.toUpperCase() +
+					";" +
+					enchantLevel +
+					"' = ANY (enchants)"
 				)
 				.addParameter("sort", "starting_bid")
-					.addParameter("limit", "1")
+				.addParameter("limit", "1")
 				.addParameter("key", AUCTION_API_KEY)
 				.build();
 			httpGet.setURI(uri);
