@@ -261,6 +261,7 @@ public class RolesCommand extends Command {
 					case "total_slayer":
 					case "accessory_count":
 					case "networth":
+					case "slayer_nine":
 						{
 							double roleAmount = -1;
 							switch (currentRoleName) {
@@ -348,6 +349,12 @@ public class RolesCommand extends Command {
 								case "total_slayer":
 									roleAmount = player.getTotalSlayer();
 									break;
+								case "slayer_nine":
+									roleAmount = player.getSlayer("sven") >= 1000000 ? 1 : 0;
+									roleAmount = player.getSlayer("rev") >= 1000000 ? roleAmount + 1 : roleAmount;
+									roleAmount = player.getSlayer("tara") >= 1000000 ? roleAmount + 1 : roleAmount;
+									roleAmount = player.getSlayer("enderman") >= 1000000 ? roleAmount + 1 : roleAmount;
+									break;
 							}
 
 							if (roleAmount == -1) {
@@ -405,74 +412,6 @@ public class RolesCommand extends Command {
 										}
 									}
 									break;
-								}
-							}
-							break;
-						}
-					case "doom_slayer":
-						{
-							Role curRole = guild.getRoleById(higherDepth(currentRole, "levels.[0].roleId").getAsString());
-							if (curRole == null) {
-								errorRoles.append(roleDeletedString(higherDepth(currentRole, "levels.[0].roleId").getAsString()));
-								continue;
-							}
-
-							if (
-								(player.getSlayer("sven") >= 1000000) ||
-								(player.getSlayer("rev") >= 1000000) ||
-								(player.getSlayer("tara") >= 1000000) ||
-								(player.getSlayer("enderman") >= 1000000)
-							) {
-								if (!member.getRoles().contains(curRole)) {
-									if (botRole.canInteract(curRole)) {
-										toAdd.add(curRole);
-										addedRoles.append(roleChangeString(curRole.getName()));
-									} else {
-										errorRoles.append(roleChangeString(curRole.getName()));
-									}
-								}
-							} else {
-								if (member.getRoles().contains(curRole)) {
-									if (botRole.canInteract(curRole)) {
-										removedRoles.append(roleChangeString(curRole.getName()));
-										toRemove.add(curRole);
-									} else {
-										errorRoles.append(roleChangeString(curRole.getName()));
-									}
-								}
-							}
-							break;
-						}
-					case "all_slayer_nine":
-						{
-							Role curRole = guild.getRoleById(higherDepth(currentRole, "levels.[0].roleId").getAsString());
-							if (curRole == null) {
-								errorRoles.append(roleDeletedString(higherDepth(currentRole, "levels.[0].roleId").getAsString()));
-								continue;
-							}
-
-							if (
-								(player.getSlayer("sven") >= 1000000) &&
-								(player.getSlayer("rev") >= 1000000) &&
-								(player.getSlayer("tara") >= 1000000) &&
-								(player.getSlayer("enderman") >= 1000000)
-							) {
-								if (!member.getRoles().contains(curRole)) {
-									if (botRole.canInteract(curRole)) {
-										toAdd.add(curRole);
-										addedRoles.append(roleChangeString(curRole.getName()));
-									} else {
-										errorRoles.append(roleChangeString(curRole.getName()));
-									}
-								}
-							} else {
-								if (member.getRoles().contains(curRole)) {
-									if (botRole.canInteract(curRole)) {
-										removedRoles.append(roleChangeString(curRole.getName()));
-										toRemove.add(curRole);
-									} else {
-										errorRoles.append(roleChangeString(curRole.getName()));
-									}
 								}
 							}
 							break;

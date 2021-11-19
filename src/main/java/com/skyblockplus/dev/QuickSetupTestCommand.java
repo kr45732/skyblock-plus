@@ -94,7 +94,7 @@ public class QuickSetupTestCommand extends Command {
 		try {
 			JsonElement jsonElement = gson.toJsonTree(gson.fromJson(json, RoleModel.class));
 			if (higherDepth(database.getServerSettings(event.getGuild().getId()), "serverId") == null) {
-				database.addNewServerSettings(
+				database.newServerSettings(
 					event.getGuild().getId(),
 					new ServerSettingsModel(event.getGuild().getName(), event.getGuild().getId())
 				);

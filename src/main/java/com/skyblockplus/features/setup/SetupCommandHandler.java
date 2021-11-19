@@ -325,7 +325,7 @@ public class SetupCommandHandler {
 						eb2.setDescription("Reply with 'yes' if the applications should be ironman only.");
 						break;
 					case 10:
-						eb = settings.setIsIronman(name, "" + event.getMessage().getContentRaw().equalsIgnoreCase("yes"));
+						eb = settings.setIsIronman(name, event.getMessage().getContentRaw().equalsIgnoreCase("yes"));
 						eb2.setDescription(
 							"Reply with the requirements that an applicant must meet. Separate multiple requirements with a comma and a space. (Example: `weight:4000 skills:40, slayer:1500000 catacombs:30, weight:5000`). Reply with 'none' if you do not want this."
 						);
@@ -352,7 +352,7 @@ public class SetupCommandHandler {
 						break;
 					case 12:
 						if (event.getMessage().getContentRaw().equalsIgnoreCase("enable")) {
-							eb = settings.setApplyEnable(name, "true");
+							eb = settings.setApplyEnable(name, true);
 							if (eb.build().getTitle().equals("Settings")) {
 								String msg = onApplyReload(event.getGuild().getId());
 								if (msg.contains("• Reloaded `" + name + "`")) {

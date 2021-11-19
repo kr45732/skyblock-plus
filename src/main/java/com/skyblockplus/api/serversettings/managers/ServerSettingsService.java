@@ -183,10 +183,8 @@ public class ServerSettingsService {
 					return new ResponseEntity<>(currentRoleSettings.getSlot_collector(), HttpStatus.OK);
 				case "pet_enthusiast":
 					return new ResponseEntity<>(currentRoleSettings.getPet_enthusiast(), HttpStatus.OK);
-				case "doom_slayer":
-					return new ResponseEntity<>(currentRoleSettings.getDoom_slayer(), HttpStatus.OK);
-				case "all_slayer_nine":
-					return new ResponseEntity<>(currentRoleSettings.getAll_slayer_nine(), HttpStatus.OK);
+				case "slayer_nine":
+					return new ResponseEntity<>(currentRoleSettings.getSlayer_nine(), HttpStatus.OK);
 				case "ironman":
 					return new ResponseEntity<>(currentRoleSettings.getIronman(), HttpStatus.OK);
 				case "skill_average":
@@ -283,11 +281,8 @@ public class ServerSettingsService {
 				case "pet_enthusiast":
 					currentRoleSettings.setPet_enthusiast(newRoleSettings);
 					break;
-				case "doom_slayer":
-					currentRoleSettings.setDoom_slayer(newRoleSettings);
-					break;
-				case "all_slayer_nine":
-					currentRoleSettings.setAll_slayer_nine(newRoleSettings);
+				case "slayer_nine":
+					currentRoleSettings.setSlayer_nine(newRoleSettings);
 					break;
 				case "ironman":
 					currentRoleSettings.setIronman(newRoleSettings);

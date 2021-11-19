@@ -497,7 +497,7 @@ public class HelpCommand extends Command {
 									"Set the Discord role for a one level role.",
 									"set <roleName> <@role>"
 								)
-									.addExamples("set all_slayer_nine @maxed slayers", "set pet_enthusiast @pet lover")
+									.addExamples("set ironman @ironman player", "set pet_enthusiast @pet lover")
 							),
 						new HelpData("guild", "Main command for automatic guild roles and ranks settings.")
 							.addSecondData("Get the current automatic guild names for the bot.", "guild")

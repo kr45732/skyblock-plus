@@ -103,7 +103,7 @@ public class Database {
 		return gson.toJsonTree(settingsService.getServerSettingsById(serverId).getBody());
 	}
 
-	public void addNewServerSettings(String serverId, ServerSettingsModel serverSettingsModel) {
+	public void newServerSettings(String serverId, ServerSettingsModel serverSettingsModel) {
 		settingsService.addNewServerSettings(serverId, serverSettingsModel).getStatusCodeValue();
 	}
 

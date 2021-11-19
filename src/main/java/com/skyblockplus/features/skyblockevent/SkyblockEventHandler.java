@@ -427,7 +427,7 @@ public class SkyblockEventHandler {
 
 	private boolean setSkyblockEventInDatabase() {
 		if (!database.serverByServerIdExists(paginatorEvent.getGuild().getId())) {
-			database.addNewServerSettings(
+			database.newServerSettings(
 				paginatorEvent.getGuild().getId(),
 				new ServerSettingsModel(paginatorEvent.getGuild().getName(), paginatorEvent.getGuild().getId())
 			);

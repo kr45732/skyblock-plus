@@ -28,7 +28,6 @@ import static com.skyblockplus.utils.Utils.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.serversettings.automatedapply.ApplyBlacklist;
@@ -47,6 +46,8 @@ import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import com.vdurmont.emoji.EmojiParser;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
@@ -78,7 +79,7 @@ public class SettingsExecute {
 		this.guildPrefix = getGuildPrefix(guild.getId());
 
 		if (!database.serverByServerIdExists(guild.getId())) {
-			database.addNewServerSettings(guild.getId(), new ServerSettingsModel(guild.getName(), guild.getId()));
+			database.newServerSettings(guild.getId(), new ServerSettingsModel(guild.getName(), guild.getId()));
 		}
 		this.serverSettings = database.getServerSettings(guild.getId()).getAsJsonObject();
 	}
@@ -167,22 +168,18 @@ public class SettingsExecute {
 					if (args.length == 2) {
 						if (higherDepth(currentSettings, "automatedRoles") != null) {
 							ebMessage.delete().queue();
-							getCurrentRolesSettings(higherDepth(currentSettings, "automatedRoles")).build().paginate(channel, 0);
+							getRolesSettings(higherDepth(currentSettings, "automatedRoles")).build().paginate(channel, 0);
 							return;
 						} else {
 							eb = defaultEmbed("Settings").addField("Roles Settings", "Error! Data not found", false);
 						}
 					} else if (args.length == 3) {
 						if (args[2].equals("enable")) {
-							if (allowRolesEnable()) {
-								eb = setRolesEnable("true");
-							} else {
-								eb = invalidEmbed("No roles enabled");
-							}
+							eb = setRolesEnable(true);
 						} else if (args[2].equals("disable")) {
-							eb = setRolesEnable("false");
+							eb = setRolesEnable(false);
 						} else {
-							eb = getCurrentRoleSettings(args[2]);
+							eb = getRoleSettings(args[2]);
 							if (eb == null) {
 								ebMessage.delete().queue();
 								return;
@@ -259,13 +256,9 @@ public class SettingsExecute {
 							JsonElement applySettings = database.getApplySettings(guild.getId(), args[2]);
 							if (applySettings != null && !applySettings.isJsonNull()) {
 								if (args[3].equals("enable")) {
-									if (allowApplyEnable(args[2])) {
-										eb = setApplyEnable(args[2], "true");
-									} else {
-										eb = invalidEmbed("All other apply settings must be set before " + "enabling apply!");
-									}
+									eb = setApplyEnable(args[2], true);
 								} else if (args[3].equals("disable")) {
-									eb = setApplyEnable(args[2], "false");
+									eb = setApplyEnable(args[2], false);
 								}
 							}
 						}
@@ -315,7 +308,9 @@ public class SettingsExecute {
 									}
 									break;
 								case "ironman":
-									eb = setIsIronman(args[2], args[4]);
+									if (args[4].equals("true") || args[4].equals("false")) {
+										eb = setIsIronman(args[2], args[4].equals("true"));
+									}
 									break;
 								case "waiting_channel":
 									eb = setWaitingChannel(args[2], args[4]);
@@ -419,7 +414,7 @@ public class SettingsExecute {
 							false
 						);
 					} else if (args.length == 3) {
-						eb = getCurrentGuildRoleSettings(args[2]);
+						eb = getGuildRoleSettings(args[2]);
 					} else if (args.length == 4) {
 						if (args[2].equals("create")) {
 							eb = createGuildRoles(args[3]);
@@ -489,118 +484,35 @@ public class SettingsExecute {
 			.queue();
 	}
 
-	private EmbedBuilder removeApplyBlacklist(String username) {
-		UsernameUuidStruct uuidStruct = usernameToUuid(username);
-		if (uuidStruct.isNotValid()) {
-			return invalidEmbed(uuidStruct.getFailCause());
-		}
-
-		JsonArray currentBlacklist = database.getApplyBlacklist(guild.getId());
-		for (int i = 0; i < currentBlacklist.size(); i++) {
-			if (
-				higherDepth(currentBlacklist.get(i), "uuid").getAsString().equals(uuidStruct.getUuid()) ||
-				higherDepth(currentBlacklist.get(i), "username").getAsString().equals(uuidStruct.getUsername())
-			) {
-				currentBlacklist.remove(i);
-				int responseCode = database.setApplyBlacklist(guild.getId(), currentBlacklist);
-				if (responseCode != 200) {
-					return apiFailMessage(responseCode);
-				}
-
-				return defaultSettingsEmbed()
-					.setDescription("Removed " + nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()) + " from the blacklist");
-			}
-		}
-
-		return invalidEmbed("" + nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()) + " is not blacklisted");
-	}
-
-	private EmbedBuilder listApplyBlacklist() {
-		JsonArray currentBlacklist = database.getApplyBlacklist(guild.getId());
-		EmbedBuilder eb = defaultSettingsEmbed();
-		if (currentBlacklist.size() == 0) {
-			return eb.setDescription("No one is blacklisted.");
-		}
-
-		for (JsonElement blacklisted : currentBlacklist) {
-			eb.appendDescription(
-				"• " +
-				nameMcHyperLink(higherDepth(blacklisted, "username").getAsString(), higherDepth(blacklisted, "uuid").getAsString()) +
-				" - " +
-				higherDepth(blacklisted, "reason").getAsString() +
-				"\n"
-			);
-		}
-		return eb;
-	}
-
-	public EmbedBuilder addApplyBlacklist(String username, String reason) {
-		UsernameUuidStruct uuidStruct = usernameToUuid(username);
-		if (uuidStruct.isNotValid()) {
-			return invalidEmbed(uuidStruct.getFailCause());
-		}
-
-		JsonArray currentBlacklist = database.getApplyBlacklist(guild.getId());
-		JsonElement blacklistedUser = streamJsonArray(currentBlacklist)
-			.filter(blacklist ->
-				higherDepth(blacklist, "uuid").getAsString().equals(uuidStruct.getUuid()) ||
-				higherDepth(blacklist, "username").getAsString().equals(uuidStruct.getUsername())
-			)
-			.findFirst()
-			.orElse(null);
-		if (blacklistedUser != null) {
-			return invalidEmbed(
-				nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()) +
-				" is already blacklisted with reason `" +
-				higherDepth(blacklistedUser, "reason").getAsString() +
-				"`"
-			);
-		}
-
-		currentBlacklist.add(gson.toJsonTree(new ApplyBlacklist(uuidStruct.getUsername(), uuidStruct.getUuid(), reason)));
-		int responseCode = database.setApplyBlacklist(guild.getId(), currentBlacklist);
-		if (responseCode != 200) {
-			return apiFailMessage(responseCode);
-		}
-
-		return defaultSettingsEmbed()
-			.setDescription(
-				"Blacklisted " + nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()) + " with reason `" + reason + "`"
-			);
-	}
-
 	/* Guild Role Settings */
-	public EmbedBuilder getCurrentGuildRoleSettings(String name) {
+	public EmbedBuilder getGuildRoleSettings(String name) {
 		JsonElement settings = database.getGuildRoleSettings(guild.getId(), name);
 		if (settings == null || settings.isJsonNull()) {
-			return defaultSettingsEmbed().setDescription("Error! Data not found. Please report this to the developer.");
+			return defaultSettingsEmbed("Invalid setting name. Use " + guildPrefix + "guild to see all current guild role settings.");
 		}
 
-		String settingsString =
-			"**" +
-			displaySettings(settings, "enableGuildRole") +
-			"**" +
-			"\n**• Guild Name:** " +
-			displaySettings(settings, "guildId") +
-			"\n**• Guild Role:** " +
-			displaySettings(settings, "roleId") +
-			"\n\n**" +
-			displaySettings(settings, "enableGuildRanks") +
-			"**";
+		EmbedBuilder eb = defaultSettingsEmbed();
+		eb.addField("Guild Role", "**" + displaySettings(settings, "enableGuildRole") +
+				"**" +
+				"\n**• Guild Name:** " +
+				displaySettings(settings, "guildId") +
+				"\n**• Guild Role:** " +
+				displaySettings(settings, "roleId"), false);
+
 
 		StringBuilder guildRanksString = new StringBuilder();
 		for (JsonElement guildRank : higherDepth(settings, "guildRanks").getAsJsonArray()) {
 			guildRanksString
 				.append("\n• ")
 				.append(higherDepth(guildRank, "minecraftRoleName").getAsString())
-				.append(" - ")
-				.append("<@&")
+				.append(" - <@&")
 				.append(higherDepth(guildRank, "discordRoleId").getAsString())
 				.append(">");
 		}
-		settingsString += guildRanksString.length() > 0 ? guildRanksString.toString() : "\n• No guild ranks set";
+		eb.addField("Guild Ranks", guildRanksString.length() > 0 ? guildRanksString.toString() : "\n• No guild ranks set", false);
 
-		return defaultSettingsEmbed().setDescription(settingsString);
+		eb.addField("Guild Counter", higherDepth(settings, "enableGuildUserCount", "false").equals("true") ? "Enabled" : "Disabled", false);
+		return eb;
 	}
 
 	public EmbedBuilder setGuildRoleEnable(String name, boolean enable) {
@@ -613,7 +525,7 @@ public class SettingsExecute {
 				return apiFailMessage(responseCode);
 			}
 
-			return defaultSettingsEmbed().setDescription(("Disabled") + " automatic guild role.");
+			return defaultSettingsEmbed("Disabled automatic guild role.");
 		}
 
 		if (higherDepth(settings, "guildId", "").isEmpty() || higherDepth(settings, "roleId", "").isEmpty()) {
@@ -626,7 +538,7 @@ public class SettingsExecute {
 			return apiFailMessage(responseCode);
 		}
 
-		return defaultSettingsEmbed().setDescription("Enabled automatic guild role.");
+		return defaultSettingsEmbed("Enabled automatic guild role.");
 	}
 
 	public EmbedBuilder setGuildRankEnable(String name, boolean enable) {
@@ -639,10 +551,10 @@ public class SettingsExecute {
 				return apiFailMessage(responseCode);
 			}
 
-			return defaultSettingsEmbed().setDescription("Disabled automatic guild ranks.");
+			return defaultSettingsEmbed("Disabled automatic guild ranks.");
 		}
 
-		if ((higherDepth(settings, "guildId", "").isEmpty()) || (higherDepth(settings, "guildRanks").getAsJsonArray().size() == 0)) {
+		if (higherDepth(settings, "guildId", "").isEmpty() || higherDepth(settings, "guildRanks").getAsJsonArray().size() == 0) {
 			return invalidEmbed("The guild name and a at least one guild rank must be set.");
 		}
 
@@ -652,7 +564,7 @@ public class SettingsExecute {
 			return apiFailMessage(responseCode);
 		}
 
-		return defaultEmbed("Settings").setDescription("Enabled automatic guild ranks.");
+		return defaultSettingsEmbed("Enabled automatic guild ranks.");
 	}
 
 	public EmbedBuilder setGuildCounterEnable(String name, boolean enable) {
@@ -660,7 +572,7 @@ public class SettingsExecute {
 
 		if (!enable) {
 			try {
-				guild.getVoiceChannelById(settings.get("guildUserChannelId").getAsString()).delete().complete();
+				guild.getVoiceChannelById(settings.get("guildUserChannelId").getAsString()).delete().queue();
 			} catch (Exception ignored) {}
 
 			settings.addProperty("enableGuildUserCount", "false");
@@ -669,7 +581,7 @@ public class SettingsExecute {
 				return apiFailMessage(responseCode);
 			}
 
-			return defaultSettingsEmbed().setDescription("Disabled automatic guild member counter.");
+			return defaultSettingsEmbed("Disabled automatic guild member counter.");
 		}
 
 		if (higherDepth(settings, "guildId", "").isEmpty()) {
@@ -700,18 +612,14 @@ public class SettingsExecute {
 			return apiFailMessage(responseCode);
 		}
 
-		return defaultSettingsEmbed().setDescription("Enabled automatic guild member counter.");
+		return defaultSettingsEmbed("Enabled automatic guild member counter.");
 	}
 
 	public EmbedBuilder addGuildRank(String name, String rankName, String roleMention) {
-		Role role;
-		try {
-			role = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
-			if ((role.isPublicRole() || role.isManaged())) {
-				return invalidEmbed("The role cannot be managed or @everyone.");
-			}
-		} catch (Exception e) {
-			return invalidEmbed("The provided role does not exist.");
+		Role role = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
+		EmbedBuilder eb = checkRoleEmebd(role);
+		if(eb != null){
+			return eb;
 		}
 
 		JsonObject currentSettings = database.getGuildRoleSettings(guild.getId(), name).getAsJsonObject();
@@ -720,46 +628,35 @@ public class SettingsExecute {
 			return invalidEmbed("The guild name must set.");
 		}
 
-		String guildId = higherDepth(currentSettings, "guildId").getAsString();
-
-		HypixelResponse guildJson = getGuildFromId(guildId);
-
+		HypixelResponse guildJson = getGuildFromId(higherDepth(currentSettings, "guildId").getAsString());
 		if (guildJson.isNotValid()) {
 			return invalidEmbed(guildJson.getFailCause());
 		}
 
-		JsonArray guildRanks = higherDepth(guildJson.getResponse(), "ranks").getAsJsonArray();
-
-		StringBuilder guildRanksString = new StringBuilder();
+		JsonArray guildRanks = guildJson.get("ranks").getAsJsonArray();
 		for (JsonElement guildRank : guildRanks) {
-			guildRanksString.append("\n• ").append(higherDepth(guildRank, "name").getAsString().replace(" ", "_"));
 			if (higherDepth(guildRank, "name").getAsString().equalsIgnoreCase(rankName.replace("_", " "))) {
 				JsonArray currentGuildRanks = currentSettings.get("guildRanks").getAsJsonArray();
 
-				for (JsonElement level : currentGuildRanks) {
-					if (higherDepth(level, "minecraftRoleName").getAsString().equalsIgnoreCase(rankName)) {
-						currentGuildRanks.remove(level);
-						break;
+				for (int i = currentGuildRanks.size() - 1; i >= 0; i--) {
+					if (higherDepth(currentGuildRanks.get(i), "minecraftRoleName").getAsString().equalsIgnoreCase(rankName)) {
+						currentGuildRanks.remove(i);
 					}
 				}
 
 				currentGuildRanks.add(gson.toJsonTree(new GuildRank(rankName.toLowerCase(), role.getId())));
-
 				currentSettings.add("guildRanks", currentGuildRanks);
 
 				int responseCode = database.setGuildRoleSettings(guild.getId(), currentSettings);
 				if (responseCode != 200) {
-					return invalidEmbed("API returned response code " + responseCode);
+					return apiFailMessage( responseCode);
 				}
 
-				EmbedBuilder eb = defaultEmbed("Settings");
-				eb.setDescription("**Guild rank added:** " + higherDepth(guildRank, "name").getAsString() + " - " + role.getAsMention());
-				return eb;
+				return defaultSettingsEmbed("**Added guild rank:** " + higherDepth(guildRank, "name").getAsString() + " - " + role.getAsMention());
 			}
 		}
 
-		return defaultEmbed("Invalid guild rank")
-			.setDescription((guildRanksString.length() > 0 ? "Valid guild ranks are: " + guildRanksString : "No guild ranks found"));
+		return invalidEmbed("Invalid guild rank name. " + (guildRanks.size() > 0 ? "Valid guild ranks are: " + streamJsonArray(guildRanks).map(r -> higherDepth(r, "name").getAsString().replace(" ", "_")).collect(Collectors.joining(", ")) : "No guild ranks found"));
 	}
 
 	public EmbedBuilder removeGuildRank(String name, String rankName) {
@@ -768,27 +665,24 @@ public class SettingsExecute {
 
 		for (JsonElement guildRank : currentGuildRanks) {
 			if (higherDepth(guildRank, "minecraftRoleName").getAsString().equalsIgnoreCase(rankName)) {
-				JsonArray currentGuildRanksTemp = currentSettings.get("guildRanks").getAsJsonArray();
-				currentGuildRanksTemp.remove(guildRank);
+				currentGuildRanks.remove(guildRank);
 
-				if (currentGuildRanksTemp.size() == 0) {
+				if (currentGuildRanks.size() == 0) {
 					currentSettings.addProperty("enableGuildRanks", "false");
 				}
 
-				currentSettings.add("guildRanks", currentGuildRanksTemp);
+				currentSettings.add("guildRanks", currentGuildRanks);
 
 				int responseCode = database.setGuildRoleSettings(guild.getId(), currentSettings);
 				if (responseCode != 200) {
-					return invalidEmbed("API returned response code " + responseCode);
+					return apiFailMessage(responseCode);
 				}
 
-				EmbedBuilder eb = defaultEmbed("Settings");
-				eb.setDescription("**Guild rank removed:** " + rankName);
-				return eb;
+				return defaultSettingsEmbed("**Removed guild rank:** " + rankName);
 			}
 		}
 
-		return invalidEmbed("Invalid rank name");
+		return invalidEmbed("Invalid guild rank name");
 	}
 
 	public EmbedBuilder setGuildRoleId(String name, String guildName) {
@@ -797,44 +691,38 @@ public class SettingsExecute {
 			return invalidEmbed(guildJson.getFailCause());
 		}
 
-		String guildId = guildJson.get("_id").getAsString();
 		JsonObject currentSettings = database.getGuildRoleSettings(guild.getId(), name).getAsJsonObject();
-		currentSettings.addProperty("guildId", guildId);
+		currentSettings.addProperty("guildId", guildJson.get("_id").getAsString());
 		int responseCode = database.setGuildRoleSettings(guild.getId(), currentSettings);
 		if (responseCode != 200) {
-			return invalidEmbed("API returned response code " + responseCode);
+			return apiFailMessage(responseCode);
 		}
 
-		EmbedBuilder eb = defaultEmbed("Settings");
-		eb.setDescription("**Guild set to:** " + guildJson.get("name").getAsString());
-		return eb;
+		return defaultSettingsEmbed("**Set guild name to:** " + guildJson.get("name").getAsString());
 	}
 
 	public EmbedBuilder setGuildRoleName(String name, String roleMention) {
-		try {
-			Role verifyGuildRole = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
-			if (!(verifyGuildRole.isPublicRole() || verifyGuildRole.isManaged())) {
-				JsonObject currentSettings = database.getGuildRoleSettings(guild.getId(), name).getAsJsonObject();
-				currentSettings.addProperty("roleId", verifyGuildRole.getId());
-				int responseCode = database.setGuildRoleSettings(guild.getId(), currentSettings);
+		Role role = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
+		EmbedBuilder eb = checkRoleEmebd(role);
+		if(eb != null){
+			return eb;
+		}
 
-				if (responseCode != 200) {
-					return invalidEmbed("API returned response code " + responseCode);
-				}
+		JsonObject currentSettings = database.getGuildRoleSettings(guild.getId(), name).getAsJsonObject();
+		currentSettings.addProperty("roleId", role.getId());
 
-				EmbedBuilder eb = defaultEmbed("Settings");
-				eb.setDescription("**Guild role set to:** " + verifyGuildRole.getAsMention());
-				return eb;
-			}
-		} catch (Exception ignored) {}
-		return defaultEmbed("Invalid Role");
+		int responseCode = database.setGuildRoleSettings(guild.getId(), currentSettings);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		return defaultSettingsEmbed("**Set guild role to:** " + role.getAsMention());
 	}
 
 	public EmbedBuilder createGuildRoles(String name) {
 		if (name.length() > 25) {
 			return invalidEmbed("Name cannot be more than 25 letters");
 		}
-
 		if (name.contains(" ")) {
 			return invalidEmbed("Name cannot contain spaces");
 		}
@@ -848,24 +736,21 @@ public class SettingsExecute {
 
 		for (GuildRole currentGuildRole : currentGuildRoles) {
 			if (currentGuildRole.getName() != null && currentGuildRole.getName().equalsIgnoreCase(name)) {
-				return invalidEmbed(name + " name is taken");
+				return invalidEmbed("A guild role settings called `" + name + "` already exists");
 			}
 		}
 
-		GuildRole newGuildRole = new GuildRole(name);
-
-		int responseCode = database.setGuildRoleSettings(guild.getId(), newGuildRole);
+		int responseCode = database.setGuildRoleSettings(guild.getId(), new GuildRole(name));
 		if (responseCode != 200) {
-			return invalidEmbed("API returned response code " + responseCode);
+			return apiFailMessage(responseCode);
 		}
 
-		EmbedBuilder eb = defaultEmbed("Settings");
-		eb.setDescription("Created new guild role with name `" + name + "`");
-		return eb;
+
+		return defaultSettingsEmbed("Created new guild role settings called `" + name + "`");
 	}
 
 	/* Roles Settings */
-	public EmbedBuilder getCurrentRoleSettings(String roleName) {
+	public EmbedBuilder getRoleSettings(String roleName) {
 		Map<String, Integer> rolePageMap = new HashMap<>();
 		rolePageMap.put("sven", 2);
 		rolePageMap.put("rev", 3);
@@ -889,40 +774,34 @@ public class SettingsExecute {
 		rolePageMap.put("slot_collector", 21);
 		rolePageMap.put("pet_enthusiast", 22);
 		rolePageMap.put("total_slayer", 23);
-		rolePageMap.put("doom_slayer", 24);
-		rolePageMap.put("all_slayer_nine", 25);
-		rolePageMap.put("skill_average", 26);
-		rolePageMap.put("pet_score", 27);
-		rolePageMap.put("dungeon_secrets", 28);
-		rolePageMap.put("accessory_count", 29);
-		rolePageMap.put("networth", 30);
-		rolePageMap.put("ironman", 31);
+		rolePageMap.put("slayer_nine", 24);
+		rolePageMap.put("skill_average", 25);
+		rolePageMap.put("pet_score", 26);
+		rolePageMap.put("dungeon_secrets", 27);
+		rolePageMap.put("accessory_count", 28);
+		rolePageMap.put("networth", 29);
+		rolePageMap.put("ironman", 30);
 
 		if (rolePageMap.containsKey(roleName)) {
-			CustomPaginator.Builder currentRoleSettings = getCurrentRolesSettings(database.getRolesSettings(guild.getId()));
-			currentRoleSettings.build().paginate(channel, rolePageMap.get(roleName));
+			getRolesSettings(database.getRolesSettings(guild.getId())).build().paginate(channel, rolePageMap.get(roleName));
 			return null;
 		} else {
 			try {
-				if (rolePageMap.containsValue(Integer.parseInt(roleName))) {
-					CustomPaginator.Builder currentRoleSettings = getCurrentRolesSettings(database.getRolesSettings(guild.getId()));
-					currentRoleSettings.build().paginate(channel, rolePageMap.get(roleName));
-					return null;
-				}
+				int roleIndex = Integer.parseInt(roleName);
+				getRolesSettings(database.getRolesSettings(guild.getId())).build().paginate(channel,  roleIndex);
+				return null;
 			} catch (Exception ignored) {}
 		}
 
-		return invalidEmbed("Invalid role name");
+		return invalidEmbed("Invalid role name or index");
 	}
 
-	public CustomPaginator.Builder getCurrentRolesSettings(JsonElement rolesSettings) {
+	public CustomPaginator.Builder getRolesSettings(JsonElement rolesSettings) {
 		CustomPaginator.Builder paginateBuilder = defaultPaginator(author).setColumns(1).setItemsPerPage(1);
 
 		ArrayList<String> pageTitles = new ArrayList<>();
 		pageTitles.add("Roles Settings");
-
 		ArrayList<String> roleNames = getJsonKeys(rolesSettings);
-
 		StringBuilder pageNumbers = new StringBuilder();
 		for (int i = 1; i < roleNames.size(); i++) {
 			pageNumbers.append("\n**Page ").append(i + 1).append(":** ").append(roleNames.get(i));
@@ -1034,14 +913,6 @@ public class SettingsExecute {
 							.append("settings roles set pet_enthusiast @level 100 pet`\n");
 						break;
 					}
-				case "doom_slayer":
-					{
-						ebFieldString
-							.append("**Having at least one level nine slayer**\nExample: `")
-							.append(guildPrefix)
-							.append("settings roles set doom_slayer @level nine slayer`\n");
-						break;
-					}
 				case "guild_ranks":
 					{
 						ebFieldString
@@ -1051,15 +922,15 @@ public class SettingsExecute {
 								"settings guild`, they will be given the corresponding rank role set there**\nNote: this role can only be enabled, disabled, and linked here. To modify guild ranks use `"
 							)
 							.append(guildPrefix)
-							.append("settings guild [name]`");
+							.append("settings guild [name]`\n");
 						break;
 					}
-				case "all_slayer_nine":
+				case "slayer_nine":
 					{
 						ebFieldString
-							.append("**Having all level nine slayers**\nExample: `")
+							.append("**The number of level nine slayers a player has**\nExample: `")
 							.append(guildPrefix)
-							.append("settings roles set all_slayer_nine @role`\n");
+							.append("settings roles add slayer_nine 3 @role`\n");
 						break;
 					}
 				case "ironman":
@@ -1119,13 +990,10 @@ public class SettingsExecute {
 			}
 
 			ebFieldString
-				.append("\nCurrent Settings:\n")
-				.append(
-					higherDepth(currentRoleSettings, "enable") != null &&
-						higherDepth(currentRoleSettings, "enable").getAsString().equals("true")
-						? "• Enabled"
-						: "• Disabled"
-				);
+					.append("\nSettings\n").append("**").append(higherDepth(currentRoleSettings, "enable") != null &&
+							higherDepth(currentRoleSettings, "enable").getAsString().equals("true")
+							? "• Enabled"
+							: "• Disabled").append("**");
 
 			if (roleName.equals("guild_ranks")) {
 				if (higherDepth(currentRoleSettings, "levels").getAsJsonArray().size() == 0) {
@@ -1136,18 +1004,16 @@ public class SettingsExecute {
 						ebFieldString
 							.append("\n• ")
 							.append(rName)
-							.append(" (view the ranks in ")
+							.append(" (view the ranks using `")
 							.append(guildPrefix)
-							.append("`settings guild ")
+							.append("settings guild ")
 							.append(rName)
 							.append("`)");
 					}
 				}
 				pageTitles.add(roleName);
 			} else if (isOneLevelRole(roleName)) {
-				try {
-					ebFieldString.append("\n• <@&").append(higherDepth(currentRoleSettings, "levels.[0].roleId").getAsString()).append(">");
-				} catch (Exception ignored) {}
+				ebFieldString.append(higherDepth(currentRoleSettings, "levels").getAsJsonArray().size() > 0 ? "\n• <@&" + higherDepth(currentRoleSettings, "levels.[0].roleId").getAsString() + ">" : "\n • No role set");
 				pageTitles.add(roleName + " (__one level role__)");
 			} else {
 				if (roleName.equals("guild_member")) {
@@ -1199,28 +1065,33 @@ public class SettingsExecute {
 	public boolean allowRolesEnable() {
 		JsonObject currentSettings = database.getRolesSettings(guild.getId()).getAsJsonObject();
 		currentSettings.remove("enable");
-		for (String role : getJsonKeys(currentSettings)) {
-			if (higherDepth(currentSettings, role + ".enable").getAsBoolean()) {
-				return true;
-			}
-		}
-		return false;
+		return getJsonKeys(currentSettings).stream().anyMatch(role -> higherDepth(currentSettings, role + ".enable").getAsBoolean());
 	}
 
-	public EmbedBuilder setRolesEnable(String enable) {
-		if (enable.equalsIgnoreCase("true") || enable.equalsIgnoreCase("false")) {
+	public EmbedBuilder setRolesEnable(boolean enable) {
+		if(!enable){
 			JsonObject newRolesJson = database.getRolesSettings(guild.getId()).getAsJsonObject();
-			newRolesJson.addProperty("enable", enable);
+			newRolesJson.addProperty("enable", false);
 			int responseCode = database.setRolesSettings(guild.getId(), newRolesJson);
 			if (responseCode != 200) {
-				return invalidEmbed("API returned response code " + responseCode);
+				return apiFailMessage(responseCode);
 			}
 
-			EmbedBuilder eb = defaultEmbed("Settings");
-			eb.setDescription("**Roles:** " + (enable.equalsIgnoreCase("true") ? "enabled" : "disabled"));
-			return eb;
+			return defaultSettingsEmbed("**Automatic roles:** disabled");
 		}
-		return defaultEmbed("Invalid Input");
+
+		if(!allowRolesEnable()){
+			return invalidEmbed("At least one individual role must be enabled");
+		}
+
+		JsonObject newRolesJson = database.getRolesSettings(guild.getId()).getAsJsonObject();
+		newRolesJson.addProperty("enable", true);
+		int responseCode = database.setRolesSettings(guild.getId(), newRolesJson);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		return defaultSettingsEmbed("**Roles:** enabled");
 	}
 
 	public EmbedBuilder setRoleEnable(String roleName, boolean enable) {
@@ -1229,14 +1100,19 @@ public class SettingsExecute {
 			if (enable) {
 				List<String> enabled = new ArrayList<>();
 				for (Entry<String, JsonElement> role : roleSettings.entrySet()) {
-					if (!role.getKey().equals("enable") && higherDepth(role.getValue(), "levels").getAsJsonArray().size() > 0) {
+					if (!role.getKey().equals("enable") && !higherDepth(role.getValue(), "levels").getAsJsonArray().isEmpty()) {
 						JsonObject curRole = role.getValue().getAsJsonObject();
 						curRole.addProperty("enable", "true");
 						roleSettings.add(role.getKey(), curRole);
 						enabled.add(role.getKey());
 					}
 				}
-				return defaultSettingsEmbed().setDescription("**Enabled the following roles:** " + String.join(", ", enabled));
+				int responseCode = database.setRolesSettings(guild.getId(), roleSettings);
+				if (responseCode != 200) {
+					return apiFailMessage( responseCode);
+				}
+
+				return defaultSettingsEmbed("**Enabled:** " + (enabled.size() > 0 ? String.join(", ", enabled) : " no roles"));
 			} else {
 				for (Entry<String, JsonElement> role : roleSettings.entrySet()) {
 					if (!role.getKey().equals("enable")) {
@@ -1245,7 +1121,12 @@ public class SettingsExecute {
 						roleSettings.add(role.getKey(), curRole);
 					}
 				}
-				return defaultSettingsEmbed().setDescription("Disabled all automatic roles");
+				int responseCode = database.setRolesSettings(guild.getId(), roleSettings);
+				if (responseCode != 200) {
+					return apiFailMessage( responseCode);
+				}
+
+				return defaultSettingsEmbed("Disabled all automatic roles");
 			}
 		}
 
@@ -1253,7 +1134,6 @@ public class SettingsExecute {
 		try {
 			currentRoleSettings = database.getRoleSettings(guild.getId(), roleName).getAsJsonObject();
 		} catch (Exception ignored) {}
-
 		if (currentRoleSettings == null) {
 			return invalidEmbed("Invalid role name");
 		}
@@ -1262,17 +1142,12 @@ public class SettingsExecute {
 			currentRoleSettings.addProperty("enable", enable);
 			int responseCode = database.setRoleSettings(guild.getId(), roleName, currentRoleSettings);
 			if (responseCode != 200) {
-				return invalidEmbed("API returned response code " + responseCode);
+				return apiFailMessage( responseCode);
 			}
 
-			EmbedBuilder eb = defaultEmbed("Settings");
-			eb.setDescription("**" + roleName + " role:** " + (enable ? "enabled" : "disabled"));
-			return eb;
-		} else {
-			currentRoleSettings.addProperty("enable", "false");
-			database.setRoleSettings(guild.getId(), roleName, currentRoleSettings);
+			return defaultSettingsEmbed("**" + (enable ? "Enabled" : "Disabled") + ":** " + roleName);
 		}
-		return invalidEmbed("Specified role must have at least one configuration!");
+		return invalidEmbed("Specified role must have at least one level");
 	}
 
 	public EmbedBuilder addRoleLevel(String roleName, String roleValue, String roleMention) {
@@ -1305,21 +1180,20 @@ public class SettingsExecute {
 				}
 
 				currentLevels.add(gson.toJsonTree(new RoleObject(roleValue, roleValue)));
-
 				newRoleSettings.add("levels", currentLevels);
 
 				int responseCode = database.setRoleSettings(guild.getId(), roleName, newRoleSettings);
 				if (responseCode != 200) {
-					return invalidEmbed("API returned response code " + responseCode);
+					return apiFailMessage(responseCode);
 				}
 
-				return defaultSettingsEmbed("Added guild ranks for guild roles with name `" + roleValue + "`");
+				return defaultSettingsEmbed("Added guild ranks for automatic guild roles called  `" + roleValue + "`");
 			}
 
 			return invalidEmbed("Invalid guild role name or guild ranks not enabled");
 		} else if (isOneLevelRole(roleName)) {
 			return invalidEmbed(
-				"These roles do not support levels. Use `" + guildPrefix + "settings roles set [roleName] [@role]` instead"
+				"These roles do not support levels. Use `" + guildPrefix + "settings roles set <roleName> <@role>` instead"
 			);
 		} else {
 			try {
@@ -1329,17 +1203,12 @@ public class SettingsExecute {
 			}
 		}
 
-		Role role = null;
-		try {
-			role = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
-		} catch (Exception ignored) {}
-		if (role == null) {
-			return invalidEmbed("Invalid role mention");
+		Role role = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
+		EmbedBuilder eb = checkRoleEmebd(role);
+		if(eb != null){
+			return eb;
 		}
 
-		if (role.isPublicRole() || role.isManaged()) {
-			return invalidEmbed("Role cannot be managed or @everyone!");
-		}
 		JsonObject newRoleSettings;
 		try {
 			newRoleSettings = database.getRoleSettings(guild.getId(), roleName).getAsJsonObject();
@@ -1347,21 +1216,18 @@ public class SettingsExecute {
 			return invalidEmbed("Invalid role");
 		}
 
-		int totalRoleCount = 0;
 		JsonObject allRoleSettings = database.getRolesSettings(guild.getId()).getAsJsonObject();
-
+		int totalRoleCount = 0;
 		for (Entry<String, JsonElement> i : allRoleSettings.entrySet()) {
 			try {
 				totalRoleCount += higherDepth(i.getValue(), "levels").getAsJsonArray().size();
 			} catch (Exception ignored) {}
 		}
-
-		JsonArray currentLevels = newRoleSettings.get("levels").getAsJsonArray();
-
 		if (totalRoleCount >= 120) {
 			return invalidEmbed("You have reached the max amount of total levels (120/120)");
 		}
 
+		JsonArray currentLevels = newRoleSettings.get("levels").getAsJsonArray();
 		for (JsonElement level : currentLevels) {
 			if (higherDepth(level, "value").getAsString().equals(roleValue)) {
 				currentLevels.remove(level);
@@ -1372,29 +1238,24 @@ public class SettingsExecute {
 		currentLevels.add(gson.toJsonTree(new RoleObject(roleValue, role.getId())));
 
 		if (!roleName.equals("guild_member")) {
-			RoleObject[] temp = gson.fromJson(currentLevels, new TypeToken<RoleObject[]>() {}.getType());
-			Arrays.sort(temp, Comparator.comparingInt(o -> Integer.parseInt(o.getValue())));
-			currentLevels = gson.toJsonTree(temp).getAsJsonArray();
+			currentLevels = collectJsonArray(streamJsonArray(currentLevels).sorted(Comparator.comparingInt(o -> higherDepth(o, "value").getAsInt())));
+		}else{
+			roleValue = guildName;
 		}
-
 		newRoleSettings.add("levels", currentLevels);
 
 		int responseCode = database.setRoleSettings(guild.getId(), roleName, newRoleSettings);
 		if (responseCode != 200) {
-			return invalidEmbed("API returned response code " + responseCode);
+			return apiFailMessage(responseCode);
 		}
 
-		if (roleName.equals("guild_member")) {
-			roleValue = guildName;
-		}
-
-		return defaultEmbed("Settings").setDescription(roleName + " " + roleValue + " set to " + role.getAsMention());
+		return defaultSettingsEmbed("Set " + roleName + " " + roleValue + " to " + role.getAsMention());
 	}
 
 	public EmbedBuilder removeRoleLevel(String roleName, String value) {
 		if (isOneLevelRole(roleName)) {
 			return defaultEmbed(
-				"These roles do not support levels. Use `" + guildPrefix + "settings roles set [roleName] [@role]` instead"
+				"These roles do not support levels. Use `" + guildPrefix + "settings roles set <roleName> <@role>` instead"
 			);
 		}
 
@@ -1421,7 +1282,7 @@ public class SettingsExecute {
 				currentRoleSettings.add("levels", currentLevels);
 				int responseCode = database.setRoleSettings(guild.getId(), roleName, currentRoleSettings);
 				if (responseCode != 200) {
-					return invalidEmbed("API returned response code " + responseCode);
+					return apiFailMessage(responseCode);
 				}
 
 				currentRoleSettings = database.getRoleSettings(guild.getId(), roleName).getAsJsonObject();
@@ -1431,10 +1292,10 @@ public class SettingsExecute {
 				}
 
 				if (!allowRolesEnable()) {
-					setRolesEnable("false");
+					setRolesEnable(false);
 				}
 
-				return defaultEmbed("Settings").setDescription(roleName + " " + value + " removed");
+				return defaultSettingsEmbed("Removed " + roleName + " " + value);
 			}
 		}
 		return invalidEmbed("Invalid role value");
@@ -1443,16 +1304,14 @@ public class SettingsExecute {
 	public EmbedBuilder setOneLevelRole(String roleName, String roleMention) {
 		if (!isOneLevelRole(roleName)) {
 			return invalidEmbed(
-				"This role does is not a one level role. Use `" + guildPrefix + "settings roles add [roleName] [value] [@role]` instead"
+				"This role is not a one level role. Use `" + guildPrefix + "settings roles add <roleName> <value> <@role>` instead"
 			);
 		}
 
 		Role role = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
-		if (role == null) {
-			return invalidEmbed("Invalid role mention");
-		}
-		if (role.isPublicRole() || role.isManaged()) {
-			return invalidEmbed("Role cannot be managed or @everyone!");
+		EmbedBuilder eb = checkRoleEmebd(role);
+		if(eb != null){
+			return eb;
 		}
 
 		JsonObject newRoleSettings;
@@ -1467,21 +1326,15 @@ public class SettingsExecute {
 		newRoleSettings.add("levels", currentLevels);
 
 		int responseCode = database.setRoleSettings(guild.getId(), roleName, newRoleSettings);
-
 		if (responseCode != 200) {
-			return invalidEmbed("API returned response code " + responseCode);
+			return apiFailMessage(responseCode);
 		}
 
-		return defaultEmbed("Settings").setDescription(roleName + " set to " + role.getAsMention());
+		return defaultSettingsEmbed(roleName + " set to " + role.getAsMention());
 	}
 
 	public static boolean isOneLevelRole(String roleName) {
-		return (
-			roleName.equals("pet_enthusiast") ||
-			roleName.equals("doom_slayer") ||
-			roleName.equals("all_slayer_nine") ||
-			roleName.equals("ironman")
-		);
+		return roleName.equals("pet_enthusiast") || roleName.equals("ironman");
 	}
 
 	/* Verify Settings */
@@ -1802,38 +1655,36 @@ public class SettingsExecute {
 		return true;
 	}
 
-	public EmbedBuilder setApplyEnable(String name, String enable) {
-		if (enable.equalsIgnoreCase("true") || enable.equalsIgnoreCase("false")) {
-			int responseCode = updateApplySettings(name, "enable", enable);
+	public EmbedBuilder setApplyEnable(String name, boolean enable) {
+		if(!enable){
+			int responseCode = updateApplySettings(name, "enable", "false");
 			if (responseCode != 200) {
 				return invalidEmbed("API returned response code " + responseCode);
 			}
 
-			EmbedBuilder eb = defaultEmbed("Settings");
-			eb.setDescription(
-				"**Apply:** " +
-				(enable.equalsIgnoreCase("true") ? "enabled" : "disabled") +
-				"\nRun `" +
-				guildPrefix +
-				"reload` to reload the settings"
-			);
-			return eb;
+			return defaultSettingsEmbed("**Apply:** disabled\nRun `" + guildPrefix + "reload` to reload the settings");
 		}
-		return defaultEmbed("Invalid Input");
+
+
+		if(allowApplyEnable(name)){
+			int responseCode = updateApplySettings(name, "enable", "true");
+			if (responseCode != 200) {
+				return invalidEmbed("API returned response code " + responseCode);
+			}
+
+			return defaultSettingsEmbed("**Apply:** enabled\nRun `" + guildPrefix + "reload` to reload the settings");
+		}
+
+		return invalidEmbed("All required apply settings must be set before enabling");
 	}
 
-	public EmbedBuilder setIsIronman(String name, String isIronman) {
-		if (isIronman.equalsIgnoreCase("true") || isIronman.equalsIgnoreCase("false")) {
-			int responseCode = updateApplySettings(name, "ironmanOnly", isIronman.toLowerCase());
-			if (responseCode != 200) {
-				return invalidEmbed("API returned response code " + responseCode);
-			}
-
-			EmbedBuilder eb = defaultEmbed("Settings");
-			eb.setDescription("**Ironman only:** " + (isIronman.equalsIgnoreCase("true") ? "enabled" : "disabled"));
-			return eb;
+	public EmbedBuilder setIsIronman(String name, boolean isIronman) {
+		int responseCode = updateApplySettings(name, "ironmanOnly", "" + isIronman);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
 		}
-		return defaultEmbed("Invalid Input");
+
+		return defaultSettingsEmbed("**Ironman only:** " + (isIronman ? "enabled" : "disabled"));
 	}
 
 	public EmbedBuilder setApplyMessageTextChannelId(String name, String textChannel) {
@@ -2131,6 +1982,87 @@ public class SettingsExecute {
 		}
 
 		return invalidEmbed("Invalid Name");
+	}
+
+
+	private EmbedBuilder removeApplyBlacklist(String username) {
+		UsernameUuidStruct uuidStruct = usernameToUuid(username);
+		if (uuidStruct.isNotValid()) {
+			return invalidEmbed(uuidStruct.getFailCause());
+		}
+
+		JsonArray currentBlacklist = database.getApplyBlacklist(guild.getId());
+		for (int i = 0; i < currentBlacklist.size(); i++) {
+			if (
+					higherDepth(currentBlacklist.get(i), "uuid").getAsString().equals(uuidStruct.getUuid()) ||
+							higherDepth(currentBlacklist.get(i), "username").getAsString().equals(uuidStruct.getUsername())
+			) {
+				currentBlacklist.remove(i);
+				int responseCode = database.setApplyBlacklist(guild.getId(), currentBlacklist);
+				if (responseCode != 200) {
+					return apiFailMessage(responseCode);
+				}
+
+				return defaultSettingsEmbed()
+						.setDescription("Removed " + nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()) + " from the blacklist");
+			}
+		}
+
+		return invalidEmbed(nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()) + " is not blacklisted");
+	}
+
+	private EmbedBuilder listApplyBlacklist() {
+		JsonArray currentBlacklist = database.getApplyBlacklist(guild.getId());
+		EmbedBuilder eb = defaultSettingsEmbed();
+		if (currentBlacklist.size() == 0) {
+			return eb.setDescription("No one is blacklisted.");
+		}
+
+		for (JsonElement blacklisted : currentBlacklist) {
+			eb.appendDescription(
+					"• " +
+							nameMcHyperLink(higherDepth(blacklisted, "username").getAsString(), higherDepth(blacklisted, "uuid").getAsString()) +
+							" - " +
+							higherDepth(blacklisted, "reason").getAsString() +
+							"\n"
+			);
+		}
+		return eb;
+	}
+
+	public EmbedBuilder addApplyBlacklist(String username, String reason) {
+		UsernameUuidStruct uuidStruct = usernameToUuid(username);
+		if (uuidStruct.isNotValid()) {
+			return invalidEmbed(uuidStruct.getFailCause());
+		}
+
+		JsonArray currentBlacklist = database.getApplyBlacklist(guild.getId());
+		JsonElement blacklistedUser = streamJsonArray(currentBlacklist)
+				.filter(blacklist ->
+						higherDepth(blacklist, "uuid").getAsString().equals(uuidStruct.getUuid()) ||
+								higherDepth(blacklist, "username").getAsString().equals(uuidStruct.getUsername())
+				)
+				.findFirst()
+				.orElse(null);
+		if (blacklistedUser != null) {
+			return invalidEmbed(
+					nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()) +
+							" is already blacklisted with reason `" +
+							higherDepth(blacklistedUser, "reason").getAsString() +
+							"`"
+			);
+		}
+
+		currentBlacklist.add(gson.toJsonTree(new ApplyBlacklist(uuidStruct.getUsername(), uuidStruct.getUuid(), reason)));
+		int responseCode = database.setApplyBlacklist(guild.getId(), currentBlacklist);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		return defaultSettingsEmbed()
+				.setDescription(
+						"Blacklisted " + nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()) + " with reason `" + reason + "`"
+				);
 	}
 
 	public int updateApplySettings(String name, String key, String newValue) {

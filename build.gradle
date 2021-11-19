@@ -93,7 +93,7 @@ dependencies {
     implementation "org.codehaus.groovy:groovy:3.0.8"
 
     // Logging
-    implementation 'ch.qos.logback:logback-classic:1.2.6'
+    implementation 'ch.qos.logback:logback-classic:1.2.7'
 
     // Git
     implementation 'org.eclipse.jgit:org.eclipse.jgit:5.13.0.202109080827-r'

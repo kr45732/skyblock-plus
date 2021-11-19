@@ -373,6 +373,9 @@ public class Player {
 		return higherDepth(profileJson(), "slayer_bosses." + slayerName + ".boss_kills_tier_" + tier, 0);
 	}
 
+	/**
+	 * @param slayerName sven, rev, tara, enderman
+	 */
 	public int getSlayer(String slayerName) {
 		JsonElement profileSlayer = higherDepth(profileJson(), "slayer_bosses");
 		switch (slayerName) {

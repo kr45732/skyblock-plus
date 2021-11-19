@@ -99,10 +99,7 @@ public class AutomatedRoles {
 	private RoleModel total_slayer = new RoleModel();
 
 	@Embedded
-	private RoleModel doom_slayer = new RoleModel();
-
-	@Embedded
-	private RoleModel all_slayer_nine = new RoleModel();
+	private RoleModel slayer_nine = new RoleModel();
 
 	@Embedded
 	private RoleModel skill_average = new RoleModel();

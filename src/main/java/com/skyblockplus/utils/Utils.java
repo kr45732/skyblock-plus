@@ -83,7 +83,7 @@ public class Utils {
 	public static final int globalCooldown = 4;
 	public static final String DISCORD_SERVER_INVITE_LINK = "https://dsc.gg/skyblock-plus";
 	public static final String BOT_INVITE_LINK =
-		"https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403040337&scope=bot%20applications.commands";
+		"https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403041361&scope=bot%20applications.commands";
 	public static final String FORUM_POST_LINK = "https://hypixel.net/threads/3980092";
 	public static final AsyncHttpClient asyncHttpClient = Dsl.asyncHttpClient();
 	public static final CloseableHttpClient httpClient = HttpClientBuilder.create().build();
@@ -1158,6 +1158,7 @@ public class Utils {
 		for (Map.Entry<String, JsonElement> manualOverride : higherDepth(splitPriceOverrides, "manual").getAsJsonObject().entrySet()) {
 			priceOverrideJson.add(manualOverride.getKey(), manualOverride.getValue());
 		}
+		priceOverrideJson.remove("ENCHANTED_BOOK");
 	}
 
 	public static double getPriceOverride(String itemId) {
