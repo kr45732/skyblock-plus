@@ -74,9 +74,11 @@ public class SkyblockEventCommand extends Command {
 		}
 		guildMap.get(guildId).setEventMemberListLastUpdated(null);
 
-		try{announcementChannel
-			.retrieveMessageById(higherDepth(runningEventSettings, "announcementMessageId").getAsString())
-			.queue(m -> m.editMessageComponents().queue());}catch (Exception ignored){}
+		try {
+			announcementChannel
+				.retrieveMessageById(higherDepth(runningEventSettings, "announcementMessageId").getAsString())
+				.queue(m -> m.editMessageComponents().queue());
+		} catch (Exception ignored) {}
 
 		CustomPaginator.Builder paginateBuilder = defaultPaginator()
 			.setColumns(1)
