@@ -99,6 +99,7 @@ public class AuctionCommand extends Command {
 			paginateBuilder.setItemsPerPage(7);
 		}
 
+		long auctionTax = 0;
 		for (int i = 0; i < auctionsArray.size(); i++) {
 			JsonElement currentAuction = auctionsArray.get(i);
 			if (!higherDepth(currentAuction, "claimed").getAsBoolean()) {
@@ -134,6 +135,7 @@ public class AuctionCommand extends Command {
 					if (highestBid >= startingBid) {
 						auction = "Auction sold for " + simplifyNumber(highestBid) + " coins";
 						totalSoldValue += highestBid;
+						auctionTax += (highestBid > 1000000) ? ((0.99 * highestBid < 1000000) ? (highestBid - 1000000) : (long) (0.01 * highestBid)) : 0;
 					} else {
 						auction = "Auction did not sell";
 						failedToSell += startingBid;
@@ -173,7 +175,7 @@ public class AuctionCommand extends Command {
 			.setEveryPageTitleUrl(skyblockStatsLink(usernameUuidStruct.getUsername(), null))
 			.setEveryPageThumbnail(usernameUuidStruct.getAvatarlUrl())
 			.setEveryPageText(
-				(totalSoldValue > 0 ? "**Sold Auctions Value:** " + simplifyNumber(totalSoldValue) : "") +
+				(totalSoldValue > 0 ? "**Sold Auctions Value:** " + simplifyNumber(totalSoldValue) + (auctionTax > 0 ? " - " + simplifyNumber(auctionTax) + " = " + simplifyNumber(totalSoldValue - auctionTax) : "") : "") +
 				(totalPendingValue > 0 ? "\n**Unsold Auctions Value:** " + simplifyNumber(totalPendingValue) : "") +
 				(failedToSell > 0 ? "\n**Did Not Sell Auctions Value:** " + simplifyNumber(failedToSell) : "") +
 				(verbose ? "\n**Verbose JSON:** " + makeHastePost(formattedGson.toJson(calc.getVerboseJson())) + ".json" : "")

@@ -789,15 +789,10 @@ public class NetworthExecute {
 			(item.getId().equals("PET") ? capitalizeString(item.getRarity()) + " " : "") +
 			item.getName();
 
-		if (item.getId().equals("PET")) {
-			for (String extraItem : item.getExtraStats()) {
-				if (PET_ITEM_NAMES.contains(extraItem)) {
-					JsonElement petItemEmoji = getEmojiMap().get(extraItem);
-					if (petItemEmoji != null) {
-						formattedStr += " " + petItemEmoji.getAsString();
-					}
-					break;
-				}
+		if(item.getPetItem() != null){
+			JsonElement petItemEmoji = getEmojiMap().get(item.getPetItem());
+			if (petItemEmoji != null) {
+				formattedStr += " " + petItemEmoji.getAsString();
 			}
 		}
 
