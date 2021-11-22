@@ -387,8 +387,8 @@ public class ApiHandler {
 
 			URI uri = new URIBuilder(httpget.getURI())
 				.addParameter("end", "" + Instant.now().toEpochMilli())
-				.addParameter("name", "%" + query + "%")
-				.addParameter("sort", "starting_bid")
+				.addParameter("item_name", "%" + query + "%")
+				.addParameter("sort", "ASC")
 				.addParameter("limit", "1")
 				.addParameter("key", AUCTION_API_KEY)
 				.build();
@@ -408,9 +408,9 @@ public class ApiHandler {
 
 			URIBuilder uri = new URIBuilder(httpGet.getURI())
 				.addParameter("end", "" + Instant.now().toEpochMilli())
-				.addParameter("name", "%" + petName + "%")
+				.addParameter("item_name", "%" + petName + "%")
 				.addParameter("item_id", "PET")
-				.addParameter("sort", "starting_bid")
+				.addParameter("sort", "ASC")
 				.addParameter("limit", "1")
 				.addParameter("key", AUCTION_API_KEY);
 			if (!rarity.equals("ANY")) {
@@ -434,7 +434,7 @@ public class ApiHandler {
 				.addParameter("end", "" + Instant.now().toEpochMilli())
 				.addParameter("item_id", "ENCHANTED_BOOK")
 				.addParameter("enchants", enchantId.toUpperCase() + ";" + enchantLevel)
-				.addParameter("sort", "starting_bid")
+				.addParameter("sort", "ASC")
 				.addParameter("limit", "1")
 				.addParameter("key", AUCTION_API_KEY)
 				.build();
