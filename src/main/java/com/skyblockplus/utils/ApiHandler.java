@@ -386,10 +386,7 @@ public class ApiHandler {
 			httpget.addHeader("content-type", "application/json; charset=UTF-8");
 
 			URI uri = new URIBuilder(httpget.getURI())
-					.addParameter(
-							"end",
-							"" + Instant.now().toEpochMilli()
-					)
+				.addParameter("end", "" + Instant.now().toEpochMilli())
 				.addParameter("name", "%" + query + "%")
 				.addParameter("sort", "starting_bid")
 				.addParameter("limit", "1")
@@ -410,16 +407,13 @@ public class ApiHandler {
 			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
 
 			URIBuilder uri = new URIBuilder(httpGet.getURI())
-					.addParameter(
-							"end",
-							"" + Instant.now().toEpochMilli()
-					)
+				.addParameter("end", "" + Instant.now().toEpochMilli())
 				.addParameter("name", "%" + petName + "%")
-					.addParameter("item_id", "PET")
+				.addParameter("item_id", "PET")
 				.addParameter("sort", "starting_bid")
 				.addParameter("limit", "1")
 				.addParameter("key", AUCTION_API_KEY);
-			if(!rarity.equals("ANY")){
+			if (!rarity.equals("ANY")) {
 				uri.addParameter("tier", rarity);
 			}
 			httpGet.setURI(uri.build());
@@ -437,12 +431,9 @@ public class ApiHandler {
 			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
 
 			URI uri = new URIBuilder(httpGet.getURI())
-				.addParameter(
-					"end",
-					"" + Instant.now().toEpochMilli()
-				)
-					.addParameter("item_id", "ENCHANTED_BOOK")
-					.addParameter("enchants", enchantId.toUpperCase() + ";" + enchantLevel)
+				.addParameter("end", "" + Instant.now().toEpochMilli())
+				.addParameter("item_id", "ENCHANTED_BOOK")
+				.addParameter("enchants", enchantId.toUpperCase() + ";" + enchantLevel)
 				.addParameter("sort", "starting_bid")
 				.addParameter("limit", "1")
 				.addParameter("key", AUCTION_API_KEY)
