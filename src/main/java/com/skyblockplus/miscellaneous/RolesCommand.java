@@ -523,7 +523,7 @@ public class RolesCommand extends Command {
 	}
 
 	private static String roleDeletedString(String name) {
-		return "• <@" + name + ">\n";
+		return "• <@&" + name + "\n";
 	}
 
 	public static EmbedBuilder listRoles(PaginatorEvent event) {

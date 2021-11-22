@@ -382,11 +382,14 @@ public class ApiHandler {
 
 	public static JsonArray queryLowestBin(String query) {
 		try {
-			HttpGet httpget = new HttpGet("https://auctions.tyman.tech/query");
+			HttpGet httpget = new HttpGet("http://apollo.arcator.co.uk:1194/query");
 			httpget.addHeader("content-type", "application/json; charset=UTF-8");
 
 			URI uri = new URIBuilder(httpget.getURI())
-				.addParameter("query", "end_t > " + Instant.now().toEpochMilli())
+					.addParameter(
+							"end",
+							"" + Instant.now().toEpochMilli()
+					)
 				.addParameter("name", "%" + query + "%")
 				.addParameter("sort", "starting_bid")
 				.addParameter("limit", "1")
@@ -403,23 +406,23 @@ public class ApiHandler {
 
 	public static JsonArray queryLowestBinPet(String petName, String rarity) {
 		try {
-			HttpGet httpGet = new HttpGet("https://auctions.tyman.tech/query");
+			HttpGet httpGet = new HttpGet("http://apollo.arcator.co.uk:1194/query");
 			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
 
-			URI uri = new URIBuilder(httpGet.getURI())
-				.addParameter(
-					"query",
-					"end_t > " +
-					Instant.now().toEpochMilli() +
-					" AND item_id = 'PET'" +
-					(!rarity.equalsIgnoreCase("any") ? " AND tier = '" + rarity.toUpperCase() + "'" : "")
-				)
+			URIBuilder uri = new URIBuilder(httpGet.getURI())
+					.addParameter(
+							"end",
+							"" + Instant.now().toEpochMilli()
+					)
 				.addParameter("name", "%" + petName + "%")
+					.addParameter("item_id", "PET")
 				.addParameter("sort", "starting_bid")
 				.addParameter("limit", "1")
-				.addParameter("key", AUCTION_API_KEY)
-				.build();
-			httpGet.setURI(uri);
+				.addParameter("key", AUCTION_API_KEY);
+			if(!rarity.equals("ANY")){
+				uri.addParameter("tier", rarity);
+			}
+			httpGet.setURI(uri.build());
 
 			try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
 				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
@@ -430,20 +433,16 @@ public class ApiHandler {
 
 	public static JsonArray queryLowestBinEnchant(String enchantId, int enchantLevel) {
 		try {
-			HttpGet httpGet = new HttpGet("https://auctions.tyman.tech/query");
+			HttpGet httpGet = new HttpGet("http://apollo.arcator.co.uk:1194/query");
 			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
 
 			URI uri = new URIBuilder(httpGet.getURI())
 				.addParameter(
-					"query",
-					"end_t > " +
-					Instant.now().toEpochMilli() +
-					" AND item_id = 'ENCHANTED_BOOK' AND '" +
-					enchantId.toUpperCase() +
-					";" +
-					enchantLevel +
-					"' = ANY (enchants)"
+					"end",
+					"" + Instant.now().toEpochMilli()
 				)
+					.addParameter("item_id", "ENCHANTED_BOOK")
+					.addParameter("enchants", enchantId.toUpperCase() + ";" + enchantLevel)
 				.addParameter("sort", "starting_bid")
 				.addParameter("limit", "1")
 				.addParameter("key", AUCTION_API_KEY)
@@ -458,9 +457,8 @@ public class ApiHandler {
 	}
 
 	public static JsonArray getAuctionPetsByName(String query) {
-		// Query should be 'name','name','name'...
 		try {
-			HttpGet httpget = new HttpGet("https://auctions.tyman.tech/pets");
+			HttpGet httpget = new HttpGet("http://apollo.arcator.co.uk:1194/pets");
 			httpget.addHeader("content-type", "application/json; charset=UTF-8");
 
 			URI uri = new URIBuilder(httpget.getURI()).addParameter("query", query).addParameter("key", AUCTION_API_KEY).build();
