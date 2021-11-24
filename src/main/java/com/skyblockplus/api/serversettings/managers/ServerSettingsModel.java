@@ -24,15 +24,14 @@ import com.skyblockplus.api.serversettings.automatedroles.AutomatedRoles;
 import com.skyblockplus.api.serversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.serversettings.automatedverify.AutomatedVerify;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @AllArgsConstructor

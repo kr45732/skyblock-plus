@@ -176,9 +176,7 @@ public class RolesCommand extends Command {
 								JsonArray curLevels = higherDepth(currentRole, "levels").getAsJsonArray();
 								List<JsonElement> guildRoles = new ArrayList<>();
 								for (JsonElement curLevel : curLevels) {
-									guildRoles.add(
-										database.getGuildSettings(guild.getId(), higherDepth(curLevel, "value").getAsString())
-									);
+									guildRoles.add(database.getGuildSettings(guild.getId(), higherDepth(curLevel, "value").getAsString()));
 								}
 
 								for (JsonElement guildRoleSettings : guildRoles) {
@@ -205,11 +203,7 @@ public class RolesCommand extends Command {
 														continue;
 													}
 
-													if (
-														higherDepth(guildRank, "value")
-															.getAsString()
-															.equalsIgnoreCase(guildMemberRank)
-													) {
+													if (higherDepth(guildRank, "value").getAsString().equalsIgnoreCase(guildMemberRank)) {
 														if (!member.getRoles().contains(currentLevelRole)) {
 															if (botRole.canInteract(currentLevelRole)) {
 																toAdd.add(currentLevelRole);

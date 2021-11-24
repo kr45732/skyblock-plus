@@ -364,9 +364,7 @@ public class ApplyUser implements Serializable {
 
 						state = 2;
 
-						TextChannel staffChannel = jda.getTextChannelById(
-							higherDepth(currentSettings, "applyStaffChannel").getAsString()
-						);
+						TextChannel staffChannel = jda.getTextChannelById(higherDepth(currentSettings, "applyStaffChannel").getAsString());
 						staffChannelId = staffChannel.getId();
 
 						EmbedBuilder applyPlayerStats = defaultPlayerEmbed();
@@ -548,7 +546,8 @@ public class ApplyUser implements Serializable {
 
 							waitInviteChannel = null;
 							try {
-								waitInviteChannel = jda.getTextChannelById(higherDepth(currentSettings, "applyWaitingChannel").getAsString());
+								waitInviteChannel =
+									jda.getTextChannelById(higherDepth(currentSettings, "applyWaitingChannel").getAsString());
 							} catch (Exception ignored) {}
 							eb = defaultEmbed("Application waitlisted");
 							eb.setDescription(higherDepth(currentSettings, "applyWaitlistMessage").getAsString());

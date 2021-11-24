@@ -18,6 +18,8 @@
 
 package com.skyblockplus.settings;
 
+import static com.skyblockplus.utils.Utils.gson;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -33,13 +35,10 @@ import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsService;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-
-import static com.skyblockplus.utils.Utils.gson;
 
 @Service
 @Transactional
@@ -227,11 +226,11 @@ public class Database {
 		return settingsService.setPartyFinderCategoryId(serverId, newSettings).getStatusCodeValue();
 	}
 
-	public List<AutomatedGuild> getAllGuildSettings(String serverId){
+	public List<AutomatedGuild> getAllGuildSettings(String serverId) {
 		return settingsService.getAllGuildSettings(serverId);
 	}
 
-    public JsonElement getGuildSettings(String serverId, String name) {
+	public JsonElement getGuildSettings(String serverId, String name) {
 		return gson.toJsonTree(settingsService.getGuildSettings(serverId, name).getBody());
 	}
 

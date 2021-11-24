@@ -789,7 +789,7 @@ public class NetworthExecute {
 			(item.getId().equals("PET") ? capitalizeString(item.getRarity()) + " " : "") +
 			item.getName();
 
-		if(item.getPetItem() != null){
+		if (item.getPetItem() != null) {
 			JsonElement petItemEmoji = getEmojiMap().get(item.getPetItem());
 			if (petItemEmoji != null) {
 				formattedStr += " " + petItemEmoji.getAsString();

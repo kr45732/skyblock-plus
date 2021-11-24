@@ -18,6 +18,13 @@
 
 package com.skyblockplus.settings;
 
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -35,22 +42,14 @@ import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import com.vdurmont.emoji.EmojiParser;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.PermissionException;
-
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
-import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Utils.*;
 
 public class SettingsExecute {
 
@@ -288,49 +287,51 @@ public class SettingsExecute {
 					// settings guild sbf apply staff_role add @role
 					// settings guild sbf apply requirements add <req>
 					// settings guild sbf apply requirements remove <index>
-					if(args.length == 2){
-						eb = defaultSettingsEmbed()
-					.addField(
-								"Automatic Guild One",
-								(
+					if (args.length == 2) {
+						eb =
+							defaultSettingsEmbed()
+								.addField(
+									"Automatic Guild One",
+									(
 										higherDepth(currentSettings, "automatedGuildOne.guildName") != null
-												? "Name: " +
-												higherDepth(currentSettings, "automatedGuildOne.guildName").getAsString() +
-												"\nCommand: `" +
-												guildPrefix +
-												"settings guild " +
-												higherDepth(currentSettings, "automatedGuildOne.guildName").getAsString() +
-												"`" +
-												""
-												: "Not setup"
-								),
-								false
-						).addField(
-								"Automatic Guild Two",
-								(
+											? "Name: " +
+											higherDepth(currentSettings, "automatedGuildOne.guildName").getAsString() +
+											"\nCommand: `" +
+											guildPrefix +
+											"settings guild " +
+											higherDepth(currentSettings, "automatedGuildOne.guildName").getAsString() +
+											"`" +
+											""
+											: "Not setup"
+									),
+									false
+								)
+								.addField(
+									"Automatic Guild Two",
+									(
 										higherDepth(currentSettings, "automatedGuildTwo.guildName") != null
-												? "Name: " +
-												higherDepth(currentSettings, "automatedGuildTwo.guildName").getAsString() +
-												"\nCommand: `" +
-												guildPrefix +
-												"settings guild " +
-												higherDepth(currentSettings, "automatedGuildTwo.guildName").getAsString() +
-												"`" +
-												""
-												: "Not setup"
-								),
-								false
-						);
-					} else if (args.length == 3){
+											? "Name: " +
+											higherDepth(currentSettings, "automatedGuildTwo.guildName").getAsString() +
+											"\nCommand: `" +
+											guildPrefix +
+											"settings guild " +
+											higherDepth(currentSettings, "automatedGuildTwo.guildName").getAsString() +
+											"`" +
+											""
+											: "Not setup"
+									),
+									false
+								);
+					} else if (args.length == 3) {
 						paginate(getGuildSettings(args[2]));
 						return;
-					} else if(args.length == 4 ){
-						if(args[2].equals("create")) {
+					} else if (args.length == 4) {
+						if (args[2].equals("create")) {
 							eb = createNewGuild(args[3]);
-						}else if(args[2].equals("remove")){
+						} else if (args[2].equals("remove")) {
 							eb = removeGuild(args[3]);
 						}
-					}else if(args.length == 5) {
+					} else if (args.length == 5) {
 						JsonElement guildSettings = database.getGuildSettings(guild.getId(), args[2]);
 						if (guildSettings == null || guildSettings.isJsonNull()) {
 							eb = invalidEmbed("No automated guild is created for " + args[2]);
@@ -354,21 +355,33 @@ public class SettingsExecute {
 							} else if (args[4].equals("disable")) {
 								eb = setGuildCounterEnable(guildSettings.getAsJsonObject(), false);
 							}
-						} else if(args[3].equals("apply")){
+						} else if (args[3].equals("apply")) {
 							if (args[4].equals("enable")) {
 								eb = setApplyEnable(guildSettings.getAsJsonObject(), true);
 							} else if (args[4].equals("disable")) {
 								eb = setApplyEnable(guildSettings.getAsJsonObject(), false);
 							}
 						}
-					} else if(setArgs(6).length == 6 && !(args[3].equals("ranks") && args[4].equals("add")) && !(args[3].equals("apply") && (args[4].equals("staff_role") || args[4].equals("requirements") || args[4].equals("reqs") || args[4].equals("req")))){
+					} else if (
+						setArgs(6).length == 6 &&
+						!(args[3].equals("ranks") && args[4].equals("add")) &&
+						!(
+							args[3].equals("apply") &&
+							(
+								args[4].equals("staff_role") ||
+								args[4].equals("requirements") ||
+								args[4].equals("reqs") ||
+								args[4].equals("req")
+							)
+						)
+					) {
 						JsonElement guildSettings = database.getGuildSettings(guild.getId(), args[2]);
-						if(args[3].equals("ranks")){
-							if(args[4].equals("remove")){
+						if (args[3].equals("ranks")) {
+							if (args[4].equals("remove")) {
 								eb = removeGuildRank(guildSettings.getAsJsonObject(), args[5]);
 							}
-						}else if(args[3].equals("apply")){
-							switch (args[4]){
+						} else if (args[3].equals("apply")) {
+							switch (args[4]) {
 								case "message":
 									eb = setApplyMessage(guildSettings.getAsJsonObject(), args[5]);
 									break;
@@ -394,38 +407,38 @@ public class SettingsExecute {
 									eb = setApplyDenyMessage(guildSettings.getAsJsonObject(), args[5]);
 									break;
 								case "ironman":
-									if(args[5].equals("true")){
+									if (args[5].equals("true")) {
 										eb = setApplyIronman(guildSettings.getAsJsonObject(), true);
-									}else if(args[5].equals("false")){
+									} else if (args[5].equals("false")) {
 										eb = setApplyIronman(guildSettings.getAsJsonObject(), false);
 									}
 									break;
 							}
 						}
-					}else if(setArgs(7).length == 7){
+					} else if (setArgs(7).length == 7) {
 						JsonElement guildSettings = database.getGuildSettings(guild.getId(), args[2]);
-						if(args[3].equals("ranks")){
-							if(args[4].equals("add")){
+						if (args[3].equals("ranks")) {
+							if (args[4].equals("add")) {
 								eb = addGuildRank(guildSettings.getAsJsonObject(), args[5], args[6]);
 							}
-						}else if(args[3].equals("apply")){
-							if(args[4].equals("staff_role")){
-								if(args[5].equals("add")){
+						} else if (args[3].equals("apply")) {
+							if (args[4].equals("staff_role")) {
+								if (args[5].equals("add")) {
 									eb = addApplyStaffRole(guildSettings.getAsJsonObject(), args[6]);
-								}else if(args[5].equals("remove")){
+								} else if (args[5].equals("remove")) {
 									eb = removeApplyStaffRole(guildSettings.getAsJsonObject(), args[6]);
 								}
-							}else if(args[4].equals("requirements") || args[4].equals("reqs") || args[4].equals("req")){
-								if(args[5].equals("add")){
+							} else if (args[4].equals("requirements") || args[4].equals("reqs") || args[4].equals("req")) {
+								if (args[5].equals("add")) {
 									eb = addApplyRequirement(guildSettings.getAsJsonObject(), args[6]);
-								}else if(args[5].equals("remove")){
+								} else if (args[5].equals("remove")) {
 									eb = removeApplyRequirement(guildSettings.getAsJsonObject(), args[6]);
 								}
 							}
 						}
 					}
 
-					if(eb == null){
+					if (eb == null) {
 						eb = errorEmbed("settings guild");
 					}
 				}
@@ -440,17 +453,20 @@ public class SettingsExecute {
 			.queue();
 	}
 
-	public EmbedBuilder createNewGuild(String guildName){
+	public EmbedBuilder createNewGuild(String guildName) {
 		HypixelResponse guildResponse = getGuildFromName(guildName);
-		if(guildResponse.isNotValid()){
+		if (guildResponse.isNotValid()) {
 			return invalidEmbed(guildResponse.getFailCause());
 		}
 
 		String guildNameFormatted = guildResponse.get("name").getAsString();
-		AutomatedGuild guildSettings = new AutomatedGuild(guildNameFormatted.toLowerCase().replace(" ", "_"), guildResponse.get("_id").getAsString());
+		AutomatedGuild guildSettings = new AutomatedGuild(
+			guildNameFormatted.toLowerCase().replace(" ", "_"),
+			guildResponse.get("_id").getAsString()
+		);
 
 		int responseCode = database.setGuildSettings(guild.getId(), gson.toJsonTree(guildSettings));
-		if(responseCode != 200){
+		if (responseCode != 200) {
 			return apiFailMessage(responseCode);
 		}
 
@@ -542,16 +558,16 @@ public class SettingsExecute {
 		}
 
 		VoiceChannel guildMemberCounterChannel = guild
-				.createVoiceChannel(
-						guildJson.get("name").getAsString() + " Members: " + guildJson.get("members").getAsJsonArray().size() + "/125"
-				)
-				.addPermissionOverride(guild.getPublicRole(), EnumSet.of(Permission.VIEW_CHANNEL), EnumSet.of(Permission.VOICE_CONNECT))
-				.addMemberPermissionOverride(
-						jda.getSelfUser().getIdLong(),
-						EnumSet.of(Permission.VIEW_CHANNEL, Permission.MANAGE_CHANNEL, Permission.VOICE_CONNECT),
-						null
-				)
-				.complete();
+			.createVoiceChannel(
+				guildJson.get("name").getAsString() + " Members: " + guildJson.get("members").getAsJsonArray().size() + "/125"
+			)
+			.addPermissionOverride(guild.getPublicRole(), EnumSet.of(Permission.VIEW_CHANNEL), EnumSet.of(Permission.VOICE_CONNECT))
+			.addMemberPermissionOverride(
+				jda.getSelfUser().getIdLong(),
+				EnumSet.of(Permission.VIEW_CHANNEL, Permission.MANAGE_CHANNEL, Permission.VOICE_CONNECT),
+				null
+			)
+			.complete();
 		guildSettings.addProperty("guildCounterEnable", "true");
 		guildSettings.addProperty("guildCounterChannel", guildMemberCounterChannel.getId());
 
@@ -595,21 +611,21 @@ public class SettingsExecute {
 				}
 
 				return defaultSettingsEmbed(
-						"Added guild rank: " + higherDepth(guildRank, "name").getAsString() + " - " + role.getAsMention()
+					"Added guild rank: " + higherDepth(guildRank, "name").getAsString() + " - " + role.getAsMention()
 				);
 			}
 		}
 
 		return invalidEmbed(
-				"Invalid guild rank. " +
-						(
-								guildRanks.size() > 0
-										? "Valid guild ranks are: " +
-										streamJsonArray(guildRanks)
-												.map(r -> higherDepth(r, "name").getAsString().replace(" ", "_"))
-												.collect(Collectors.joining(", "))
-										: "No guild ranks found"
-						)
+			"Invalid guild rank. " +
+			(
+				guildRanks.size() > 0
+					? "Valid guild ranks are: " +
+					streamJsonArray(guildRanks)
+						.map(r -> higherDepth(r, "name").getAsString().replace(" ", "_"))
+						.collect(Collectors.joining(", "))
+					: "No guild ranks found"
+			)
 		);
 	}
 
@@ -647,12 +663,14 @@ public class SettingsExecute {
 			return defaultSettingsEmbed("Disabled apply. Run `" + guildPrefix + "reload` to reload the settings");
 		}
 
-		if (!higherDepth(guildSettings, "applyMessageChannel", "").isEmpty() &&
-				!higherDepth(guildSettings, "applyStaffChannel", "").isEmpty() &&
-				!higherDepth(guildSettings, "applyCategory", "").isEmpty() &&
-				!higherDepth(guildSettings, "applyMessage", "").isEmpty() &&
-				!higherDepth(guildSettings, "applyAcceptMessage", "").isEmpty() &&
-				!higherDepth(guildSettings, "applyDenyMessage", "").isEmpty()) {
+		if (
+			!higherDepth(guildSettings, "applyMessageChannel", "").isEmpty() &&
+			!higherDepth(guildSettings, "applyStaffChannel", "").isEmpty() &&
+			!higherDepth(guildSettings, "applyCategory", "").isEmpty() &&
+			!higherDepth(guildSettings, "applyMessage", "").isEmpty() &&
+			!higherDepth(guildSettings, "applyAcceptMessage", "").isEmpty() &&
+			!higherDepth(guildSettings, "applyDenyMessage", "").isEmpty()
+		) {
 			guildSettings.addProperty("applyEnable", "true");
 			int responseCode = database.setGuildSettings(guild.getId(), guildSettings);
 			if (responseCode != 200) {
@@ -670,7 +688,7 @@ public class SettingsExecute {
 			return invalidEmbed("Message cannot by empty or longer than 1500 letters");
 		}
 
-		guildSettings.addProperty("applyMessage",EmojiParser.parseToAliases(message) );
+		guildSettings.addProperty("applyMessage", EmojiParser.parseToAliases(message));
 		int responseCode = database.setGuildSettings(guild.getId(), guildSettings);
 		if (responseCode != 200) {
 			return apiFailMessage(responseCode);
@@ -682,7 +700,7 @@ public class SettingsExecute {
 	public EmbedBuilder setApplyChannel(JsonObject guildSettings, String textChannel) {
 		TextChannel applyChannel = guild.getTextChannelById(textChannel.replaceAll("[<#>]", ""));
 		EmbedBuilder eb = checkTextChannel(applyChannel);
-		if(eb != null){
+		if (eb != null) {
 			return eb;
 		}
 
@@ -741,7 +759,9 @@ public class SettingsExecute {
 			return apiFailMessage(responseCode);
 		}
 
-		return defaultSettingsEmbed("Set apply waiting for invite channel to: " + (waitingChannel == null ? "none" : waitingChannel.getAsMention()));
+		return defaultSettingsEmbed(
+			"Set apply waiting for invite channel to: " + (waitingChannel == null ? "none" : waitingChannel.getAsMention())
+		);
 	}
 
 	public EmbedBuilder setApplyAcceptMessage(JsonObject guildSettings, String acceptMessage) {
@@ -750,7 +770,7 @@ public class SettingsExecute {
 		}
 
 		guildSettings.addProperty("applyAcceptMessage", EmojiParser.parseToAliases(acceptMessage));
-		int responseCode =database.setGuildSettings(guild.getId(), guildSettings);
+		int responseCode = database.setGuildSettings(guild.getId(), guildSettings);
 		if (responseCode != 200) {
 			return apiFailMessage(responseCode);
 		}
@@ -763,7 +783,10 @@ public class SettingsExecute {
 			return invalidEmbed("Text cannot be empty or longer than 1500 letters");
 		}
 
-		guildSettings.addProperty("applyWaitlistMessage", waitlistMessage.equalsIgnoreCase("none") ? "none" : EmojiParser.parseToAliases(waitlistMessage));
+		guildSettings.addProperty(
+			"applyWaitlistMessage",
+			waitlistMessage.equalsIgnoreCase("none") ? "none" : EmojiParser.parseToAliases(waitlistMessage)
+		);
 		int responseCode = database.setGuildSettings(guild.getId(), guildSettings);
 		if (responseCode != 200) {
 			return apiFailMessage(responseCode);
@@ -778,7 +801,7 @@ public class SettingsExecute {
 		}
 
 		guildSettings.addProperty("applyDenyMessage", EmojiParser.parseToAliases(denyMessage));
-		int responseCode =database.setGuildSettings(guild.getId(), guildSettings);
+		int responseCode = database.setGuildSettings(guild.getId(), guildSettings);
 		if (responseCode != 200) {
 			return apiFailMessage(responseCode);
 		}
@@ -821,7 +844,7 @@ public class SettingsExecute {
 			return apiFailMessage(responseCode);
 		}
 
-		return defaultSettingsEmbed("Added apply staff role: "+ role.getAsMention());
+		return defaultSettingsEmbed("Added apply staff role: " + role.getAsMention());
 	}
 
 	public EmbedBuilder removeApplyStaffRole(JsonObject guildSettings, String roleMention) {
@@ -884,14 +907,16 @@ public class SettingsExecute {
 			return apiFailMessage(responseCode);
 		}
 
-		return defaultSettingsEmbed("Added an apply requirement:\n• Slayer - " +
-				slayerReq +
-				"\n• Skills - " +
-				skillsReq +
-				"\n• Catacombs - " +
-				cataReq +
-				"\n• Weight - " +
-				weightReq);
+		return defaultSettingsEmbed(
+			"Added an apply requirement:\n• Slayer - " +
+			slayerReq +
+			"\n• Skills - " +
+			skillsReq +
+			"\n• Catacombs - " +
+			cataReq +
+			"\n• Weight - " +
+			weightReq
+		);
 	}
 
 	public EmbedBuilder removeApplyRequirement(JsonObject guildSettings, String reqNumber) {
@@ -907,28 +932,30 @@ public class SettingsExecute {
 				return apiFailMessage(responseCode);
 			}
 
-			return defaultSettingsEmbed("Removed an apply requirement:\n• Slayer - " +
-					higherDepth(req, "slayerReq", 0) +
-					"\n• Skills - " +
-					higherDepth(req, "skillsReq", 0) +
-					"\n• Catacombs - " +
-					higherDepth(req, "catacombsReq", 0) +
-					"\n• Weight - " +
-					higherDepth(req, "weightReq", 0));
+			return defaultSettingsEmbed(
+				"Removed an apply requirement:\n• Slayer - " +
+				higherDepth(req, "slayerReq", 0) +
+				"\n• Skills - " +
+				higherDepth(req, "skillsReq", 0) +
+				"\n• Catacombs - " +
+				higherDepth(req, "catacombsReq", 0) +
+				"\n• Weight - " +
+				higherDepth(req, "weightReq", 0)
+			);
 		} catch (Exception e) {
 			return invalidEmbed(
-					"Invalid requirement number. Run `" + guildPrefix + "settings guild <name>` to see the current apply requirements"
+				"Invalid requirement number. Run `" + guildPrefix + "settings guild <name>` to see the current apply requirements"
 			);
 		}
 	}
 
-	public EmbedBuilder removeGuild(String name){
+	public EmbedBuilder removeGuild(String name) {
 		JsonElement guildSettings = database.getGuildSettings(guild.getId(), name);
-		if(guildSettings == null || guildSettings.isJsonNull()){
+		if (guildSettings == null || guildSettings.isJsonNull()) {
 			return invalidEmbed("No automated guild set up for " + name);
 		}
 		int responseCode = database.removeGuildSettings(guild.getId(), name);
-		if(responseCode != 200){
+		if (responseCode != 200) {
 			return apiFailMessage(responseCode);
 		}
 		return defaultSettingsEmbed("Removed automated guild for " + name);
@@ -944,8 +971,8 @@ public class SettingsExecute {
 		JsonArray currentBlacklist = database.getApplyBlacklist(guild.getId());
 		for (int i = 0; i < currentBlacklist.size(); i++) {
 			if (
-					higherDepth(currentBlacklist.get(i), "uuid").getAsString().equals(uuidStruct.getUuid()) ||
-							higherDepth(currentBlacklist.get(i), "username").getAsString().equals(uuidStruct.getUsername())
+				higherDepth(currentBlacklist.get(i), "uuid").getAsString().equals(uuidStruct.getUuid()) ||
+				higherDepth(currentBlacklist.get(i), "username").getAsString().equals(uuidStruct.getUsername())
 			) {
 				currentBlacklist.remove(i);
 				int responseCode = database.setApplyBlacklist(guild.getId(), currentBlacklist);
@@ -954,7 +981,7 @@ public class SettingsExecute {
 				}
 
 				return defaultSettingsEmbed()
-						.setDescription("Removed " + nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()) + " from the blacklist");
+					.setDescription("Removed " + nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()) + " from the blacklist");
 			}
 		}
 
@@ -970,11 +997,11 @@ public class SettingsExecute {
 
 		for (JsonElement blacklisted : currentBlacklist) {
 			eb.appendDescription(
-					"• " +
-							nameMcHyperLink(higherDepth(blacklisted, "username").getAsString(), higherDepth(blacklisted, "uuid").getAsString()) +
-							" - " +
-							higherDepth(blacklisted, "reason").getAsString() +
-							"\n"
+				"• " +
+				nameMcHyperLink(higherDepth(blacklisted, "username").getAsString(), higherDepth(blacklisted, "uuid").getAsString()) +
+				" - " +
+				higherDepth(blacklisted, "reason").getAsString() +
+				"\n"
 			);
 		}
 		return eb;
@@ -988,18 +1015,18 @@ public class SettingsExecute {
 
 		JsonArray currentBlacklist = database.getApplyBlacklist(guild.getId());
 		JsonElement blacklistedUser = streamJsonArray(currentBlacklist)
-				.filter(blacklist ->
-						higherDepth(blacklist, "uuid").getAsString().equals(uuidStruct.getUuid()) ||
-								higherDepth(blacklist, "username").getAsString().equals(uuidStruct.getUsername())
-				)
-				.findFirst()
-				.orElse(null);
+			.filter(blacklist ->
+				higherDepth(blacklist, "uuid").getAsString().equals(uuidStruct.getUuid()) ||
+				higherDepth(blacklist, "username").getAsString().equals(uuidStruct.getUsername())
+			)
+			.findFirst()
+			.orElse(null);
 		if (blacklistedUser != null) {
 			return invalidEmbed(
-					nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()) +
-							" is already blacklisted with reason `" +
-							higherDepth(blacklistedUser, "reason").getAsString() +
-							"`"
+				nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()) +
+				" is already blacklisted with reason `" +
+				higherDepth(blacklistedUser, "reason").getAsString() +
+				"`"
 			);
 		}
 
@@ -1010,9 +1037,9 @@ public class SettingsExecute {
 		}
 
 		return defaultSettingsEmbed()
-				.setDescription(
-						"Blacklisted " + nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()) + " with reason `" + reason + "`"
-				);
+			.setDescription(
+				"Blacklisted " + nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()) + " with reason `" + reason + "`"
+			);
 	}
 
 	/* Guild Role Settings */
@@ -1024,31 +1051,34 @@ public class SettingsExecute {
 
 		CustomPaginator.Builder paginateBuilder = defaultPaginator(author);
 		PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
-		extras.addEmbedPage(defaultSettingsEmbed()
-		.setDescription("**" + displaySettings(settings, "applyEnable").replace("•", "").trim() + "**")
-		.addField("Button Message Channel", displaySettings(settings, "applyMessageChannel"), true)
-		.addField("Staff Message Channel", displaySettings(settings, "applyStaffChannel"), true)
-		.addField("Waiting For Invite Channel", displaySettings(settings, "applyWaitingChannel"), true)
-		.addField("Staff Ping Roles", displaySettings(settings, "applyStaffRoles"), true)
-		.addField("New Channel Category", displaySettings(settings, "applyCategory"), true)
-		.addField("Ironman Only", displaySettings(settings, "applyIronmanOnly"), true)
-		.addField("Button Message Text", displaySettings(settings, "applyMessage"), true)
-		.addField("Accepted Message", displaySettings(settings, "applyAcceptMessage"), true)
-		.addField("Waitlisted Message", displaySettings(settings, "applyWaitlistMessage"), true)
-		.addField("Denied Message", displaySettings(settings, "applyDenyMessage"), true)
-		.addField("Requirements", displaySettings(settings, "applyReqs"), true));
-
-		EmbedBuilder eb = defaultSettingsEmbed().addField(
-			"Guild Role",
-			"**" +
-			displaySettings(settings, "guildMemberRoleEnable") +
-			"**" +
-			"\n**• Guild Name:** " +
-			displaySettings(settings, "guildId") +
-			"\n**• Guild Member Role:** " +
-			displaySettings(settings, "guildMemberRole"),
-			false
+		extras.addEmbedPage(
+			defaultSettingsEmbed()
+				.setDescription("**" + displaySettings(settings, "applyEnable").replace("•", "").trim() + "**")
+				.addField("Button Message Channel", displaySettings(settings, "applyMessageChannel"), true)
+				.addField("Staff Message Channel", displaySettings(settings, "applyStaffChannel"), true)
+				.addField("Waiting For Invite Channel", displaySettings(settings, "applyWaitingChannel"), true)
+				.addField("Staff Ping Roles", displaySettings(settings, "applyStaffRoles"), true)
+				.addField("New Channel Category", displaySettings(settings, "applyCategory"), true)
+				.addField("Ironman Only", displaySettings(settings, "applyIronmanOnly"), true)
+				.addField("Button Message Text", displaySettings(settings, "applyMessage"), true)
+				.addField("Accepted Message", displaySettings(settings, "applyAcceptMessage"), true)
+				.addField("Waitlisted Message", displaySettings(settings, "applyWaitlistMessage"), true)
+				.addField("Denied Message", displaySettings(settings, "applyDenyMessage"), true)
+				.addField("Requirements", displaySettings(settings, "applyReqs"), true)
 		);
+
+		EmbedBuilder eb = defaultSettingsEmbed()
+			.addField(
+				"Guild Role",
+				"**" +
+				displaySettings(settings, "guildMemberRoleEnable") +
+				"**" +
+				"\n**• Guild Name:** " +
+				displaySettings(settings, "guildId") +
+				"\n**• Guild Member Role:** " +
+				displaySettings(settings, "guildMemberRole"),
+				false
+			);
 
 		StringBuilder guildRanksString = new StringBuilder();
 		for (JsonElement guildRank : higherDepth(settings, "guildRanks").getAsJsonArray()) {
@@ -1059,7 +1089,12 @@ public class SettingsExecute {
 				.append(higherDepth(guildRank, "roleId").getAsString())
 				.append(">");
 		}
-		eb.addField("Guild Ranks", displaySettings(settings, "guildRanksEnable")  + (guildRanksString.length() > 0 ? guildRanksString.toString() : "\n• No guild ranks set"), false);
+		eb.addField(
+			"Guild Ranks",
+			displaySettings(settings, "guildRanksEnable") +
+			(guildRanksString.length() > 0 ? guildRanksString.toString() : "\n• No guild ranks set"),
+			false
+		);
 
 		eb.addField("Guild Counter", higherDepth(settings, "guildCounterEnable", "false").equals("true") ? "Enabled" : "Disabled", false);
 		extras.addEmbedPage(eb);
@@ -2209,12 +2244,12 @@ public class SettingsExecute {
 		}
 	}
 
-	public EmbedBuilder checkTextChannel(TextChannel channel){
-		if(channel == null){
+	public EmbedBuilder checkTextChannel(TextChannel channel) {
+		if (channel == null) {
 			return invalidEmbed("The provided text channel doesn't exist");
-		}else if(!channel.canTalk()){
+		} else if (!channel.canTalk()) {
 			return invalidEmbed("I do not have the necessary permissions to talk in the provided channel");
-		}else{
+		} else {
 			return null;
 		}
 	}

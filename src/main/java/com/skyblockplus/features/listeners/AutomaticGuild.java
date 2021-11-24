@@ -135,7 +135,9 @@ public class AutomaticGuild {
 						.setActionRow(Button.primary("create_application_button_" + currentSetting.getGuildName(), "Apply Here"))
 						.queue();
 
-					applyGuild.removeIf(o1 -> higherDepth(o1.currentSettings, "guildName").getAsString().equals(currentSetting.getGuildName()));
+					applyGuild.removeIf(o1 ->
+						higherDepth(o1.currentSettings, "guildName").getAsString().equals(currentSetting.getGuildName())
+					);
 					applyGuild.add(new ApplyGuild(reactMessage, gson.toJsonTree(currentSetting)));
 				} catch (Exception e) {
 					Message reactMessage = reactChannel
@@ -146,7 +148,9 @@ public class AutomaticGuild {
 					currentSetting.setApplyPrevMessage(reactMessage.getId());
 					database.setGuildSettings(event.getGuild().getId(), gson.toJsonTree(currentSetting));
 
-					applyGuild.removeIf(o1 -> higherDepth(o1.currentSettings, "guildName").getAsString().equals(currentSetting.getGuildName()));
+					applyGuild.removeIf(o1 ->
+						higherDepth(o1.currentSettings, "guildName").getAsString().equals(currentSetting.getGuildName())
+					);
 					applyGuild.add(new ApplyGuild(reactMessage, gson.toJsonTree(currentSetting)));
 				}
 			} catch (Exception e) {
@@ -210,7 +214,9 @@ public class AutomaticGuild {
 						applyStr.append("• Reloaded `").append(currentSetting.getGuildName()).append("`\n");
 					}
 				} else {
-					applyGuild.removeIf(o1 -> higherDepth(o1.currentSettings, "guildName").getAsString().equals(currentSetting.getGuildName()));
+					applyGuild.removeIf(o1 ->
+						higherDepth(o1.currentSettings, "guildName").getAsString().equals(currentSetting.getGuildName())
+					);
 					applyStr.append("• `").append(currentSetting.getGuildName()).append("` is disabled\n");
 				}
 			} catch (Exception e) {
@@ -345,12 +351,11 @@ public class AutomaticGuild {
 				if (curSettings.getGuildName() == null) {
 					currentSettings.remove(i);
 				} else if (
-					curSettings.getGuildMemberRoleEnable().equalsIgnoreCase("true") || curSettings.getGuildRanksEnable().equalsIgnoreCase("true")
+					curSettings.getGuildMemberRoleEnable().equalsIgnoreCase("true") ||
+					curSettings.getGuildRanksEnable().equalsIgnoreCase("true")
 				) {
 					anyGuildRoleRankEnable = true;
-				} else if (
-					curSettings.getGuildCounterEnable() == null || curSettings.getGuildCounterEnable().equalsIgnoreCase("false")
-				) {
+				} else if (curSettings.getGuildCounterEnable() == null || curSettings.getGuildCounterEnable().equalsIgnoreCase("false")) {
 					currentSettings.remove(i);
 				}
 			}

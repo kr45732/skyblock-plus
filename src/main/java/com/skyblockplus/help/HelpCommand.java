@@ -56,7 +56,6 @@ public class HelpCommand extends Command {
 		"Guild | Roles & Ranks Settings",
 		"Guild | Apply Settings",
 		"Roles Settings"
-
 	);
 
 	private static final String[] pageTitles = ArrayUtils.addFirst(admin, "Navigation");
@@ -403,115 +402,128 @@ public class HelpCommand extends Command {
 							.addSubcommands(
 								new HelpData("create", "Create a new automatic guild for a guild.", "create <name>")
 									.addExamples("create myGuild"),
-									new HelpData("remove", "Remove an automatic guild.", "remove <name>")
-											.addExamples("remove myGuild"),
+								new HelpData("remove", "Remove an automatic guild.", "remove <name>").addExamples("remove myGuild"),
 								new HelpData("member_role", "Automatic guild member role.", "settings guild <name> member_role", true)
-										.addSubcommands(
-												new HelpData("enable", "Enable automatic guild role."),
-												new HelpData("disable", "Disable automatic guild role."),
-												new HelpData("<@role>", "Set the role to give guild members.")
+									.addSubcommands(
+										new HelpData("enable", "Enable automatic guild role."),
+										new HelpData("disable", "Disable automatic guild role."),
+										new HelpData("<@role>", "Set the role to give guild members.")
+									),
+								new HelpData("ranks", "Automatic guild ranks.", "settings guild <name> ranks", true)
+									.addSubcommands(
+										new HelpData("enable", "Enable automatic guild ranks."),
+										new HelpData("disable", "Disable automatic guild ranks."),
+										new HelpData("add", "Add a guild rank.", "add <rank> <@role>"),
+										new HelpData("remove", "Remove a guild rank.", "remove <rank>")
+									),
+								new HelpData("counter", "Automatic guild member counter.", "settings guild <name> counter", true)
+									.addSubcommands(
+										new HelpData(
+											"enable",
+											"Enable and create the voice channel for the automatic guild member counter."
 										),
-									new HelpData("ranks", "Automatic guild ranks.", "settings guild <name> ranks", true)
-											.addSubcommands(
-													new HelpData("enable", "Enable automatic guild ranks."),
-													new HelpData("disable", "Disable automatic guild ranks."),
-													new HelpData("add", "Add a guild rank.", "add <rank> <@role>"),
-													new HelpData("remove", "Remove a guild rank.", "remove <rank>")
-											),
-									new HelpData("counter", "Automatic guild member counter.", "settings guild <name> counter", true)
-											.addSubcommands(
-													new HelpData("enable", "Enable and create the voice channel for the automatic guild member counter."),
-													new HelpData("disable", "Disable automatic guild member counter.")
-											),
+										new HelpData("disable", "Disable automatic guild member counter.")
+									),
 								new HelpData("apply", "Automatic application system for this guild.")
-										.addSubcommands(
-												new HelpData("enable", " Enable automatic apply.", "settings guild <name> apply enable", true),
-												new HelpData("disable", " Enable automatic disable.", "settings guild <name> apply disable", true),
-												new HelpData("message", "The message that users will see when verifying.", "settings guild <name> apply message <message>", true),
-												new HelpData("staff_role", "Modify roles that will be pinged for an application", "settings guild <name> apply staff_role", true)
-														.addSubcommands(
-																new HelpData(
-																		"add",
-																		"Add a role which will be pinged when a new application is submitted.",
-																		"settings guild <name> apply staff_role add <@role>",
-																		true
-																)
-																	,
-																new HelpData(
-																		"remove",
-																		"Remove a staff ping role.",
-																		"settings guild <name> apply staff_role remove <@role>",
-																		true
-																)
-
-														),
-												new HelpData(
-														"channel",
-														"Channel where the message to react for applying will sent.",
-														"settings guild <name> apply channel <#channel>", true
-												),
-												new HelpData(
-														"category",
-														"Category where new apply channels will be made. Run `categories` to get the ID's of all categories in the server.",
-														"settings guild <name> apply category <category>", true
-												),
-												new HelpData(
-														"staff_channel",
-														"Channel where new applications will be sent to be reviewed by staff.",
-														"settings guild <name> apply staff_channel <#channel>", true
-												)
-														,
-												new HelpData(
-														"waiting_channel",
-														"Channel where the players who were accepted or waitlisted will be sent. Optional and can be set to none.",
-														"settings guild <name> apply waiting_channel <#channel>", true
-												)
-														,
-												new HelpData(
-														"accept_message",
-														"Message that will be sent if applicant is accepted.",
-														"settings guild <name> apply accept_message <message>", true
-												)
-														,
-												new HelpData(
-														"waitlist_message",
-														"Message that will be sent if applicant is waitlisted. Optional and can be set to none.",
-														"settings guild <name> apply waitlist_message <message>", true
-												)
-														,
-												new HelpData(
-														"ironman",
-														"Whether applicants must use an ironman profile. Default is false.",
-														"settings guild <name> apply ironman <true|false>", true
-												),
-												new HelpData(
-														"deny_message",
-														"Message that will be sent if applicant is denied.",
-														"settings guild <name> apply deny_message <message>", true
-												),
-												new HelpData(
-														"requirements",
-														"Requirements applications must meet. An application will be auto-denied if they do not meet the requirements.",
-														"settings guild <name> apply requirements", true
-												)
-														.addAliases("reqs", "req")
-														.addSubcommands(
-																new HelpData(
-																		"add",
-																		"Add a requirement that applicant must meet. At least one of the requirement types must be set.",
-																		"settings guild <name> apply requirements add [slayer:amount] [skills:amount] [catacombs:amount] [weight:amount]",
-																		true
-																)
-																		,
-																new HelpData(
-																		"remove",
-																		"Remove a requirement by its index. Run `settings apply <name>` to see the index for all current requirements.",
-																		"settings guild <name> apply requirements remove <index>",
-																		true
-																)
-
-														)
+									.addSubcommands(
+										new HelpData("enable", " Enable automatic apply.", "settings guild <name> apply enable", true),
+										new HelpData("disable", " Enable automatic disable.", "settings guild <name> apply disable", true),
+										new HelpData(
+											"message",
+											"The message that users will see when verifying.",
+											"settings guild <name> apply message <message>",
+											true
+										),
+										new HelpData(
+											"staff_role",
+											"Modify roles that will be pinged for an application",
+											"settings guild <name> apply staff_role",
+											true
 										)
+											.addSubcommands(
+												new HelpData(
+													"add",
+													"Add a role which will be pinged when a new application is submitted.",
+													"settings guild <name> apply staff_role add <@role>",
+													true
+												),
+												new HelpData(
+													"remove",
+													"Remove a staff ping role.",
+													"settings guild <name> apply staff_role remove <@role>",
+													true
+												)
+											),
+										new HelpData(
+											"channel",
+											"Channel where the message to react for applying will sent.",
+											"settings guild <name> apply channel <#channel>",
+											true
+										),
+										new HelpData(
+											"category",
+											"Category where new apply channels will be made. Run `categories` to get the ID's of all categories in the server.",
+											"settings guild <name> apply category <category>",
+											true
+										),
+										new HelpData(
+											"staff_channel",
+											"Channel where new applications will be sent to be reviewed by staff.",
+											"settings guild <name> apply staff_channel <#channel>",
+											true
+										),
+										new HelpData(
+											"waiting_channel",
+											"Channel where the players who were accepted or waitlisted will be sent. Optional and can be set to none.",
+											"settings guild <name> apply waiting_channel <#channel>",
+											true
+										),
+										new HelpData(
+											"accept_message",
+											"Message that will be sent if applicant is accepted.",
+											"settings guild <name> apply accept_message <message>",
+											true
+										),
+										new HelpData(
+											"waitlist_message",
+											"Message that will be sent if applicant is waitlisted. Optional and can be set to none.",
+											"settings guild <name> apply waitlist_message <message>",
+											true
+										),
+										new HelpData(
+											"ironman",
+											"Whether applicants must use an ironman profile. Default is false.",
+											"settings guild <name> apply ironman <true|false>",
+											true
+										),
+										new HelpData(
+											"deny_message",
+											"Message that will be sent if applicant is denied.",
+											"settings guild <name> apply deny_message <message>",
+											true
+										),
+										new HelpData(
+											"requirements",
+											"Requirements applications must meet. An application will be auto-denied if they do not meet the requirements.",
+											"settings guild <name> apply requirements",
+											true
+										)
+											.addAliases("reqs", "req")
+											.addSubcommands(
+												new HelpData(
+													"add",
+													"Add a requirement that applicant must meet. At least one of the requirement types must be set.",
+													"settings guild <name> apply requirements add [slayer:amount] [skills:amount] [catacombs:amount] [weight:amount]",
+													true
+												),
+												new HelpData(
+													"remove",
+													"Remove a requirement by its index. Run `settings apply <name>` to see the index for all current requirements.",
+													"settings guild <name> apply requirements remove <index>",
+													true
+												)
+											)
+									)
 							)
 					),
 				new HelpData("setup", "A short walk-through on how to setup the bot."),
@@ -597,7 +609,10 @@ public class HelpCommand extends Command {
 		);
 
 		paginateBuilder.addItems(
-			help.create("auctions [player] [sort:low|high] [filter:unsold|sold] [--verbose]", "Get a player's unclaimed auctions on all profiles") +
+			help.create(
+				"auctions [player] [sort:low|high] [filter:unsold|sold] [--verbose]",
+				"Get a player's unclaimed auctions on all profiles"
+			) +
 			help.create("auctions uuid <UUID>", "Get an auction by its UUID") +
 			help.create("bin <item>", "Get the lowest bin of an item") +
 			help.create("bazaar <item]", "Get bazaar prices of an item") +
@@ -700,15 +715,15 @@ public class HelpCommand extends Command {
 			);
 
 			paginateBuilder.addItems(
-					help.create("settings guild create <name>", "Create a new automatic guild where name is the guild's name") +
-					help.create("settings guild remove <name>", "Remove an automatic guild") +
-					help.create("settings guild <name>", "View the settings for a specific automatic guild") +
-					help.create("settings guild <name> member_role <enable|disable>", "Enable or disable automatic guild role assigning") +
-					help.create("settings guild <name> member_role <@role>", "Set the role to give guild members") +
-					help.create("settings guild <name> ranks <enable|disable>", "Enable or disable automatic guild rank assigning") +
-					help.create("settings guild <name> ranks add <rank_name> <@role>", "Add an automatic guild rank") +
-					help.create("settings guild <name> ranks remove <rank_name>", "Remove an automatic guild rank") +
-					help.create("settings guild <name> counter <enable|disable>", "Enable or disable guild members counter")
+				help.create("settings guild create <name>", "Create a new automatic guild where name is the guild's name") +
+				help.create("settings guild remove <name>", "Remove an automatic guild") +
+				help.create("settings guild <name>", "View the settings for a specific automatic guild") +
+				help.create("settings guild <name> member_role <enable|disable>", "Enable or disable automatic guild role assigning") +
+				help.create("settings guild <name> member_role <@role>", "Set the role to give guild members") +
+				help.create("settings guild <name> ranks <enable|disable>", "Enable or disable automatic guild rank assigning") +
+				help.create("settings guild <name> ranks add <rank_name> <@role>", "Add an automatic guild rank") +
+				help.create("settings guild <name> ranks remove <rank_name>", "Remove an automatic guild rank") +
+				help.create("settings guild <name> counter <enable|disable>", "Enable or disable guild members counter")
 			);
 
 			paginateBuilder.addItems(

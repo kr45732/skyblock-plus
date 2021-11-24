@@ -18,13 +18,12 @@
 
 package com.skyblockplus.utils.structs;
 
+import static com.skyblockplus.utils.Constants.PET_ITEM_NAMES;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
 import lombok.Data;
-
-import static com.skyblockplus.utils.Constants.PET_ITEM_NAMES;
 
 @Data
 public class InvItem {
@@ -73,11 +72,14 @@ public class InvItem {
 	}
 
 	public String getPetApiName() {
-		return (getName() + "_" + getRarity()).toUpperCase().replace(" ", "_") + (getPetItem() != null && getPetItem().equals("PET_ITEM_TIER_BOOST") ? "_TB" : "");
+		return (
+			(getName() + "_" + getRarity()).toUpperCase().replace(" ", "_") +
+			(getPetItem() != null && getPetItem().equals("PET_ITEM_TIER_BOOST") ? "_TB" : "")
+		);
 	}
 
-	public String getPetItem(){
-		if(id.equals("PET")) {
+	public String getPetItem() {
+		if (id.equals("PET")) {
 			for (String extraItem : getExtraStats()) {
 				if (PET_ITEM_NAMES.contains(extraItem)) {
 					return extraItem;

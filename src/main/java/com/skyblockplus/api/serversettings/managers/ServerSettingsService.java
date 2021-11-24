@@ -343,13 +343,13 @@ public class ServerSettingsService {
 			}
 
 			if (
-					currentServerSettings.getAutomatedGuildOne().getGuildName() != null &&
-							currentServerSettings.getAutomatedGuildOne().getGuildName().equalsIgnoreCase(guildSettingsName)
+				currentServerSettings.getAutomatedGuildOne().getGuildName() != null &&
+				currentServerSettings.getAutomatedGuildOne().getGuildName().equalsIgnoreCase(guildSettingsName)
 			) {
 				currentServerSettings.setAutomatedGuildOne(newSettings);
 			} else if (
-					currentServerSettings.getAutomatedGuildTwo().getGuildName() != null &&
-							currentServerSettings.getAutomatedGuildTwo().getGuildName().equalsIgnoreCase(guildSettingsName)
+				currentServerSettings.getAutomatedGuildTwo().getGuildName() != null &&
+				currentServerSettings.getAutomatedGuildTwo().getGuildName().equalsIgnoreCase(guildSettingsName)
 			) {
 				currentServerSettings.setAutomatedGuildTwo(newSettings);
 			} else {
@@ -373,7 +373,7 @@ public class ServerSettingsService {
 
 		if (currentServerSettings != null) {
 			return new ArrayList<>(
-					Arrays.asList(currentServerSettings.getAutomatedGuildOne(), currentServerSettings.getAutomatedGuildTwo())
+				Arrays.asList(currentServerSettings.getAutomatedGuildOne(), currentServerSettings.getAutomatedGuildTwo())
 			);
 		}
 		return null;
@@ -405,13 +405,13 @@ public class ServerSettingsService {
 
 		if (currentServerSettings != null) {
 			if (
-					currentServerSettings.getAutomatedGuildOne().getGuildName() != null &&
-							currentServerSettings.getAutomatedGuildOne().getGuildName().equalsIgnoreCase(name)
+				currentServerSettings.getAutomatedGuildOne().getGuildName() != null &&
+				currentServerSettings.getAutomatedGuildOne().getGuildName().equalsIgnoreCase(name)
 			) {
 				return currentServerSettings.getAutomatedGuildOne();
 			} else if (
-					currentServerSettings.getAutomatedGuildTwo().getGuildName() != null &&
-							currentServerSettings.getAutomatedGuildTwo().getGuildName().equalsIgnoreCase(name)
+				currentServerSettings.getAutomatedGuildTwo().getGuildName() != null &&
+				currentServerSettings.getAutomatedGuildTwo().getGuildName().equalsIgnoreCase(name)
 			) {
 				return currentServerSettings.getAutomatedGuildTwo();
 			}
@@ -604,8 +604,8 @@ public class ServerSettingsService {
 		if (currentServerSettings != null) {
 			String dbPrefix = currentServerSettings.getPrefix();
 			return new ResponseEntity<>(
-					(dbPrefix != null && dbPrefix.length() > 0 && dbPrefix.length() <= 5) ? dbPrefix : DEFAULT_PREFIX,
-					HttpStatus.OK
+				(dbPrefix != null && dbPrefix.length() > 0 && dbPrefix.length() <= 5) ? dbPrefix : DEFAULT_PREFIX,
+				HttpStatus.OK
 			);
 		}
 

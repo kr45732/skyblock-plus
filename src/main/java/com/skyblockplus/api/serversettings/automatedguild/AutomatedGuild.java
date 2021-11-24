@@ -19,69 +19,76 @@
 package com.skyblockplus.api.serversettings.automatedguild;
 
 import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Embeddable;
 import javax.persistence.FetchType;
-import java.util.ArrayList;
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 @Data
 @AllArgsConstructor
 @Embeddable
 public class AutomatedGuild {
 
-    private String guildName;
-    private String guildId;
+	private String guildName;
+	private String guildId;
 
-    // Apply
-    private String applyEnable = "false";
-    private String applyMessageChannel = ""; // Message with button will be sent here
-    private String applyStaffChannel = ""; // Applications to be reviewed by staff sent here
-    private String applyCategory = ""; // Where new applications are created
-    private String applyWaitingChannel = ""; // Applications that are waitlisted by staff sent here
-    private String applyIronmanOnly = "false";
-    @Column(length = 2048)
-    private String applyMessage = "";
-    @Column(length = 2048)
-    private String applyAcceptMessage = "";
-    @Column(length = 2048)
-    private String applyDenyMessage = "";
-    @Column(length = 2048)
-    private String applyWaitlistMessage = "";
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Fetch(value = FetchMode.SUBSELECT)
-    private List<String> applyStaffRoles = new ArrayList<>();
-    private String applyPrevMessage = ""; // Used to edit original message rather than sending new when the bot restarts
-    @Column(columnDefinition = "TEXT")
-    private String applyUsersCache = "";
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Fetch(value = FetchMode.SUBSELECT)
-    private List<ApplyRequirements> applyReqs = new ArrayList<>();
+	// Apply
+	private String applyEnable = "false";
+	private String applyMessageChannel = ""; // Message with button will be sent here
+	private String applyStaffChannel = ""; // Applications to be reviewed by staff sent here
+	private String applyCategory = ""; // Where new applications are created
+	private String applyWaitingChannel = ""; // Applications that are waitlisted by staff sent here
+	private String applyIronmanOnly = "false";
 
-    // Guild Member Roles
-    private String guildMemberRoleEnable = "false";
-    private String guildMemberRole = "";
+	@Column(length = 2048)
+	private String applyMessage = "";
 
-    // Guild Rank
-    private String guildRanksEnable = "false";
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Fetch(value = FetchMode.SUBSELECT)
-    private List<RoleObject> guildRanks = new ArrayList<>();
+	@Column(length = 2048)
+	private String applyAcceptMessage = "";
 
-    private String guildCounterEnable = "false";
-    private String guildCounterChannel = "";
+	@Column(length = 2048)
+	private String applyDenyMessage = "";
 
-    public AutomatedGuild() {
-    }
+	@Column(length = 2048)
+	private String applyWaitlistMessage = "";
 
-    public AutomatedGuild(String guildName, String guildId) {
-        this.guildName = guildName;
-        this.guildId = guildId;
-    }
+	@ElementCollection(fetch = FetchType.EAGER)
+	@Fetch(value = FetchMode.SUBSELECT)
+	private List<String> applyStaffRoles = new ArrayList<>();
+
+	private String applyPrevMessage = ""; // Used to edit original message rather than sending new when the bot restarts
+
+	@Column(columnDefinition = "TEXT")
+	private String applyUsersCache = "";
+
+	@ElementCollection(fetch = FetchType.EAGER)
+	@Fetch(value = FetchMode.SUBSELECT)
+	private List<ApplyRequirements> applyReqs = new ArrayList<>();
+
+	// Guild Member Roles
+	private String guildMemberRoleEnable = "false";
+	private String guildMemberRole = "";
+
+	// Guild Rank
+	private String guildRanksEnable = "false";
+
+	@ElementCollection(fetch = FetchType.EAGER)
+	@Fetch(value = FetchMode.SUBSELECT)
+	private List<RoleObject> guildRanks = new ArrayList<>();
+
+	private String guildCounterEnable = "false";
+	private String guildCounterChannel = "";
+
+	public AutomatedGuild() {}
+
+	public AutomatedGuild(String guildName, String guildId) {
+		this.guildName = guildName;
+		this.guildId = guildId;
+	}
 }

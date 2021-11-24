@@ -18,9 +18,8 @@
 
 package com.skyblockplus.api.serversettings.managers;
 
-import java.util.List;
-
 import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

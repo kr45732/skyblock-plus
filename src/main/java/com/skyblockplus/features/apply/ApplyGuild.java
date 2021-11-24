@@ -45,7 +45,8 @@ public class ApplyGuild {
 	public ApplyGuild(Message reactMessage, JsonElement currentSettings) {
 		this.reactMessage = reactMessage;
 		this.currentSettings = currentSettings;
-		this.applyUserList = getApplyGuildUsersCache(reactMessage.getGuild().getId(), higherDepth(currentSettings, "guildName").getAsString());
+		this.applyUserList =
+			getApplyGuildUsersCache(reactMessage.getGuild().getId(), higherDepth(currentSettings, "guildName").getAsString());
 		try {
 			this.waitInviteChannel = jda.getTextChannelById(higherDepth(currentSettings, "applyWaitingChannel").getAsString());
 		} catch (Exception ignored) {}
