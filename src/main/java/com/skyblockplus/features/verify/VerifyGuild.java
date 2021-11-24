@@ -27,7 +27,7 @@ import static com.skyblockplus.utils.Utils.higherDepth;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.skyblockplus.api.serversettings.automatedguild.GuildRole;
+import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.Message;
@@ -105,8 +105,8 @@ public class VerifyGuild {
 					try {
 						HypixelResponse playerGuild = getGuildFromPlayer(higherDepth(linkedUser, "minecraftUuid").getAsString());
 						if (!playerGuild.isNotValid()) {
-							GuildRole settingsGuildId = database
-								.getAllGuildRoles(event.getGuild().getId())
+							AutomatedGuild settingsGuildId = database
+								.getAllGuildSettings(event.getGuild().getId())
 								.stream()
 								.filter(guildRole -> guildRole.getGuildId().equalsIgnoreCase(playerGuild.get("_id").getAsString()))
 								.findFirst()

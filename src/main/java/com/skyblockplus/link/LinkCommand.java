@@ -27,7 +27,7 @@ import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
-import com.skyblockplus.api.serversettings.automatedguild.GuildRole;
+import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
 import com.skyblockplus.utils.structs.HypixelResponse;
@@ -85,8 +85,8 @@ public class LinkCommand extends Command {
 							try {
 								HypixelResponse playerGuild = getGuildFromPlayer(playerInfo.getUuid());
 								if (!playerGuild.isNotValid()) {
-									GuildRole settingsGuildId = database
-										.getAllGuildRoles(guild.getId())
+									AutomatedGuild settingsGuildId = database
+										.getAllGuildSettings(guild.getId())
 										.stream()
 										.filter(guildRole -> guildRole.getGuildId().equalsIgnoreCase(playerGuild.get("_id").getAsString()))
 										.findFirst()

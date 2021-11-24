@@ -79,7 +79,7 @@ public class ApplyUser implements Serializable {
 		this.guildId = event.getGuild().getId();
 		this.playerUsername = playerUsername;
 
-		Category applyCategory = event.getGuild().getCategoryById(higherDepth(currentSettings, "newChannelCategory").getAsString());
+		Category applyCategory = event.getGuild().getCategoryById(higherDepth(currentSettings, "applyCategory").getAsString());
 		if (applyCategory.getChannels().size() == 50) {
 			failCause =
 				"Unable to create a new application due to the application category reaching 50/50 channels. Please report this to the server's staff.";
@@ -92,7 +92,7 @@ public class ApplyUser implements Serializable {
 			.addPermissionOverride(event.getGuild().getPublicRole(), null, EnumSet.of(Permission.VIEW_CHANNEL));
 
 		try {
-			for (JsonElement staffPingRole : higherDepth(currentSettings, "staffRoles").getAsJsonArray()) {
+			for (JsonElement staffPingRole : higherDepth(currentSettings, "applyStaffRoles").getAsJsonArray()) {
 				applicationChannelAction =
 					applicationChannelAction.addPermissionOverride(
 						event.getGuild().getRoleById(staffPingRole.getAsString()),
@@ -108,7 +108,7 @@ public class ApplyUser implements Serializable {
 
 		boolean isIronman = false;
 		try {
-			isIronman = higherDepth(currentSettings, "ironmanOnly").getAsBoolean();
+			isIronman = higherDepth(currentSettings, "applyIronmanOnly").getAsBoolean();
 		} catch (Exception ignored) {}
 
 		Player player = new Player(playerUsername);
@@ -169,7 +169,7 @@ public class ApplyUser implements Serializable {
 		JsonElement currentSettings = JsonParser.parseString(currentSettingsString);
 
 		if (!event.getUser().getId().equals(applyingUserId) && !event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
-			JsonArray staffPingRoles = higherDepth(currentSettings, "staffRoles").getAsJsonArray();
+			JsonArray staffPingRoles = higherDepth(currentSettings, "applyStaffRoles").getAsJsonArray();
 			boolean hasStaffRole = false;
 			if (staffPingRoles.size() != 0) {
 				for (JsonElement staffPingRole : staffPingRoles) {
@@ -335,7 +335,7 @@ public class ApplyUser implements Serializable {
 	public boolean onButtonClick(ButtonClickEvent event, ApplyGuild parent) {
 		JsonElement currentSettings = JsonParser.parseString(currentSettingsString);
 		if (!event.getUser().getId().equals(applyingUserId) && !event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
-			JsonArray staffPingRoles = higherDepth(currentSettings, "staffRoles").getAsJsonArray();
+			JsonArray staffPingRoles = higherDepth(currentSettings, "applyStaffRoles").getAsJsonArray();
 			boolean hasStaffRole = false;
 			if (staffPingRoles.size() != 0) {
 				for (JsonElement staffPingRole : staffPingRoles) {
@@ -365,7 +365,7 @@ public class ApplyUser implements Serializable {
 						state = 2;
 
 						TextChannel staffChannel = jda.getTextChannelById(
-							higherDepth(currentSettings, "messageStaffChannelId").getAsString()
+							higherDepth(currentSettings, "applyStaffChannel").getAsString()
 						);
 						staffChannelId = staffChannel.getId();
 
@@ -385,7 +385,7 @@ public class ApplyUser implements Serializable {
 							applyPlayerStats.addField("Name history", nameHistory, true);
 						}
 						applyPlayerStats.setThumbnail("https://cravatar.eu/helmavatar/" + playerUsername + "/64.png");
-						String waitlistMsg = higherDepth(currentSettings, "waitlistedMessageText", null);
+						String waitlistMsg = higherDepth(currentSettings, "applyWaitlistMessage", null);
 
 						List<Button> row = new ArrayList<>();
 						row.add(Button.success("apply_user_accept", "Accept"));
@@ -393,7 +393,7 @@ public class ApplyUser implements Serializable {
 							row.add(Button.primary("apply_user_waitlist", "Waitlist"));
 						}
 						row.add(Button.danger("apply_user_deny", "Deny"));
-						String staffPingMentions = streamJsonArray(higherDepth(currentSettings, "staffRoles").getAsJsonArray())
+						String staffPingMentions = streamJsonArray(higherDepth(currentSettings, "applyStaffRoles").getAsJsonArray())
 							.map(r -> "<@&" + r.getAsString() + ">")
 							.collect(Collectors.joining(" "));
 						Message reactMessage = staffPingMentions.isEmpty()
@@ -490,11 +490,11 @@ public class ApplyUser implements Serializable {
 
 						TextChannel waitInviteChannel = null;
 						try {
-							waitInviteChannel = jda.getTextChannelById(higherDepth(currentSettings, "waitingChannelId").getAsString());
+							waitInviteChannel = jda.getTextChannelById(higherDepth(currentSettings, "applyWaitingChannel").getAsString());
 						} catch (Exception ignored) {}
 
 						EmbedBuilder eb = defaultEmbed("Application Accepted");
-						eb.setDescription(higherDepth(currentSettings, "acceptMessageText").getAsString());
+						eb.setDescription(higherDepth(currentSettings, "applyAcceptMessage").getAsString());
 						MessageAction action = applicationChannel.sendMessage(applyingUser.getAsMention()).setEmbeds(eb.build());
 						if (waitInviteChannel == null) {
 							action = action.setActionRow(Button.success("apply_user_delete_channel", "Close Channel"));
@@ -509,7 +509,7 @@ public class ApplyUser implements Serializable {
 								.setActionRow(
 									Button.success(
 										"apply_user_wait_" +
-										higherDepth(currentSettings, "name").getAsString() +
+										higherDepth(currentSettings, "guildName").getAsString() +
 										"_" +
 										applicationChannelId,
 										"Invited"
@@ -522,9 +522,8 @@ public class ApplyUser implements Serializable {
 						return true;
 					case "apply_user_waitlist":
 						if (
-							higherDepth(currentSettings, "waitlistedMessageText") != null &&
-							higherDepth(currentSettings, "waitlistedMessageText").getAsString().length() > 0 &&
-							!higherDepth(currentSettings, "waitlistedMessageText").getAsString().equals("none")
+							!higherDepth(currentSettings, "applyWaitlistMessage", "").isEmpty() &&
+							!higherDepth(currentSettings, "applyWaitlistMessage", "").equals("none")
 						) {
 							event.getMessage().editMessageComponents().queue();
 							reactMessage.delete().queueAfter(5, TimeUnit.SECONDS);
@@ -549,10 +548,10 @@ public class ApplyUser implements Serializable {
 
 							waitInviteChannel = null;
 							try {
-								waitInviteChannel = jda.getTextChannelById(higherDepth(currentSettings, "waitingChannelId").getAsString());
+								waitInviteChannel = jda.getTextChannelById(higherDepth(currentSettings, "applyWaitingChannel").getAsString());
 							} catch (Exception ignored) {}
 							eb = defaultEmbed("Application waitlisted");
-							eb.setDescription(higherDepth(currentSettings, "waitlistedMessageText").getAsString());
+							eb.setDescription(higherDepth(currentSettings, "applyWaitlistMessage").getAsString());
 
 							action = applicationChannel.sendMessage(applyingUser.getAsMention()).setEmbeds(eb.build());
 
@@ -571,7 +570,7 @@ public class ApplyUser implements Serializable {
 									.setActionRow(
 										Button.success(
 											"apply_user_wait_" +
-											higherDepth(currentSettings, "name").getAsString() +
+											higherDepth(currentSettings, "guildName").getAsString() +
 											"_" +
 											applicationChannelId,
 											"Invited"
@@ -603,7 +602,7 @@ public class ApplyUser implements Serializable {
 						}
 
 						eb = defaultEmbed("Application Not Accepted");
-						eb.setDescription(higherDepth(currentSettings, "denyMessageText").getAsString());
+						eb.setDescription(higherDepth(currentSettings, "applyDenyMessage").getAsString());
 
 						reactMessage =
 							applicationChannel

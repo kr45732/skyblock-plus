@@ -29,9 +29,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.skyblockplus.api.serversettings.automatedapply.AutomatedApply;
-import com.skyblockplus.api.serversettings.automatedguild.GuildRank;
-import com.skyblockplus.api.serversettings.automatedguild.GuildRole;
+import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
+import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
 import com.skyblockplus.features.apply.ApplyGuild;
 import com.skyblockplus.features.apply.ApplyUser;
@@ -113,41 +112,41 @@ public class AutomaticGuild {
 
 	/* Automated Apply Methods */
 	public void applyConstructor(GenericGuildEvent event) {
-		List<AutomatedApply> currentSettings = database.getAllApplySettings(event.getGuild().getId());
+		List<AutomatedGuild> currentSettings = database.getAllGuildSettings(event.getGuild().getId());
 		if (currentSettings == null) {
 			return;
 		}
 
-		for (AutomatedApply currentSetting : currentSettings) {
+		for (AutomatedGuild currentSetting : currentSettings) {
 			try {
-				if (currentSetting.getEnable() == null || currentSetting.getEnable().equalsIgnoreCase("false")) {
+				if (currentSetting.getApplyEnable() == null || currentSetting.getApplyEnable().equalsIgnoreCase("false")) {
 					continue;
 				}
 
-				TextChannel reactChannel = event.getGuild().getTextChannelById(currentSetting.getMessageTextChannelId());
+				TextChannel reactChannel = event.getGuild().getTextChannelById(currentSetting.getApplyMessageChannel());
 
 				EmbedBuilder eb = defaultEmbed("Apply For Guild");
-				eb.setDescription(currentSetting.getMessageText());
+				eb.setDescription(currentSetting.getApplyMessage());
 
 				try {
-					Message reactMessage = reactChannel.retrieveMessageById(currentSetting.getPreviousMessageId()).complete();
+					Message reactMessage = reactChannel.retrieveMessageById(currentSetting.getApplyPrevMessage()).complete();
 					reactMessage
 						.editMessageEmbeds(eb.build())
-						.setActionRow(Button.primary("create_application_button_" + currentSetting.getName(), "Apply Here"))
+						.setActionRow(Button.primary("create_application_button_" + currentSetting.getGuildName(), "Apply Here"))
 						.queue();
 
-					applyGuild.removeIf(o1 -> higherDepth(o1.currentSettings, "name").getAsString().equals(currentSetting.getName()));
+					applyGuild.removeIf(o1 -> higherDepth(o1.currentSettings, "guildName").getAsString().equals(currentSetting.getGuildName()));
 					applyGuild.add(new ApplyGuild(reactMessage, gson.toJsonTree(currentSetting)));
 				} catch (Exception e) {
 					Message reactMessage = reactChannel
 						.sendMessageEmbeds(eb.build())
-						.setActionRow(Button.primary("create_application_button_" + currentSetting.getName(), "Apply Here"))
+						.setActionRow(Button.primary("create_application_button_" + currentSetting.getGuildName(), "Apply Here"))
 						.complete();
 
-					currentSetting.setPreviousMessageId(reactMessage.getId());
-					database.setApplySettings(event.getGuild().getId(), gson.toJsonTree(currentSetting));
+					currentSetting.setApplyPrevMessage(reactMessage.getId());
+					database.setGuildSettings(event.getGuild().getId(), gson.toJsonTree(currentSetting));
 
-					applyGuild.removeIf(o1 -> higherDepth(o1.currentSettings, "name").getAsString().equals(currentSetting.getName()));
+					applyGuild.removeIf(o1 -> higherDepth(o1.currentSettings, "guildName").getAsString().equals(currentSetting.getGuildName()));
 					applyGuild.add(new ApplyGuild(reactMessage, gson.toJsonTree(currentSetting)));
 				}
 			} catch (Exception e) {
@@ -162,27 +161,27 @@ public class AutomaticGuild {
 			return "Invalid guild";
 		}
 
-		List<AutomatedApply> currentSettings = database.getAllApplySettings(guildId);
-		currentSettings.removeIf(o1 -> o1.getName() == null);
+		List<AutomatedGuild> currentSettings = database.getAllGuildSettings(guildId);
+		currentSettings.removeIf(o1 -> o1.getGuildName() == null);
 
 		if (currentSettings.size() == 0) {
 			return "No enabled apply settings";
 		}
 
 		StringBuilder applyStr = new StringBuilder();
-		for (AutomatedApply currentSetting : currentSettings) {
+		for (AutomatedGuild currentSetting : currentSettings) {
 			try {
-				if (currentSetting.getEnable().equalsIgnoreCase("true")) {
-					TextChannel reactChannel = guild.getTextChannelById(currentSetting.getMessageTextChannelId());
+				if (currentSetting.getApplyEnable().equalsIgnoreCase("true")) {
+					TextChannel reactChannel = guild.getTextChannelById(currentSetting.getApplyMessageChannel());
 
 					EmbedBuilder eb = defaultEmbed("Apply For Guild");
-					eb.setDescription(currentSetting.getMessageText());
+					eb.setDescription(currentSetting.getApplyMessage());
 
 					List<ApplyUser> curApplyUsers = new ArrayList<>();
 					for (Iterator<ApplyGuild> iterator = applyGuild.iterator(); iterator.hasNext();) {
 						ApplyGuild applyG = iterator.next();
 
-						if (higherDepth(applyG.currentSettings, "name").getAsString().equals(currentSetting.getName())) {
+						if (higherDepth(applyG.currentSettings, "guildName").getAsString().equals(currentSetting.getGuildName())) {
 							curApplyUsers.addAll(applyG.applyUserList);
 							iterator.remove();
 							break;
@@ -190,41 +189,41 @@ public class AutomaticGuild {
 					}
 
 					try {
-						Message reactMessage = reactChannel.retrieveMessageById(currentSetting.getPreviousMessageId()).complete();
+						Message reactMessage = reactChannel.retrieveMessageById(currentSetting.getApplyPrevMessage()).complete();
 						reactMessage
 							.editMessageEmbeds(eb.build())
-							.setActionRow(Button.primary("create_application_button_" + currentSetting.getName(), "Apply Here"))
+							.setActionRow(Button.primary("create_application_button_" + currentSetting.getGuildName(), "Apply Here"))
 							.queue();
 
 						applyGuild.add(new ApplyGuild(reactMessage, gson.toJsonTree(currentSetting), curApplyUsers));
-						applyStr.append("• Reloaded `").append(currentSetting.getName()).append("`\n");
+						applyStr.append("• Reloaded `").append(currentSetting.getGuildName()).append("`\n");
 					} catch (Exception e) {
 						Message reactMessage = reactChannel
 							.sendMessageEmbeds(eb.build())
-							.setActionRow(Button.primary("create_application_button_" + currentSetting.getName(), "Apply Here"))
+							.setActionRow(Button.primary("create_application_button_" + currentSetting.getGuildName(), "Apply Here"))
 							.complete();
 
-						currentSetting.setPreviousMessageId(reactMessage.getId());
-						database.setApplySettings(guild.getId(), gson.toJsonTree(currentSetting));
+						currentSetting.setApplyPrevMessage(reactMessage.getId());
+						database.setGuildSettings(guild.getId(), gson.toJsonTree(currentSetting));
 
 						applyGuild.add(new ApplyGuild(reactMessage, gson.toJsonTree(currentSetting), curApplyUsers));
-						applyStr.append("• Reloaded `").append(currentSetting.getName()).append("`\n");
+						applyStr.append("• Reloaded `").append(currentSetting.getGuildName()).append("`\n");
 					}
 				} else {
-					applyGuild.removeIf(o1 -> higherDepth(o1.currentSettings, "name").getAsString().equals(currentSetting.getName()));
-					applyStr.append("• `").append(currentSetting.getName()).append("` is disabled\n");
+					applyGuild.removeIf(o1 -> higherDepth(o1.currentSettings, "guildName").getAsString().equals(currentSetting.getGuildName()));
+					applyStr.append("• `").append(currentSetting.getGuildName()).append("` is disabled\n");
 				}
 			} catch (Exception e) {
 				log.error("Reload apply constructor error - " + guildId, e);
 				if (e.getMessage() != null && e.getMessage().contains("Missing permission")) {
 					applyStr
 						.append("• Error Reloading for `")
-						.append(currentSetting.getName())
+						.append(currentSetting.getGuildName())
 						.append("` - missing permission(s): ")
 						.append(e.getMessage().split("Missing permission: ")[1])
 						.append("\n");
 				} else {
-					applyStr.append("• Error Reloading for `").append(currentSetting.getName()).append("`\n");
+					applyStr.append("• Error Reloading for `").append(currentSetting.getGuildName()).append("`\n");
 				}
 			}
 		}
@@ -334,7 +333,7 @@ public class AutomaticGuild {
 			long startTime = System.currentTimeMillis();
 
 			Guild guild = jda.getGuildById(guildId);
-			List<GuildRole> currentSettings = database.getAllGuildRoles(guild.getId());
+			List<AutomatedGuild> currentSettings = database.getAllGuildSettings(guild.getId());
 
 			if (currentSettings == null) {
 				return;
@@ -342,15 +341,15 @@ public class AutomaticGuild {
 
 			boolean anyGuildRoleRankEnable = false;
 			for (int i = currentSettings.size() - 1; i >= 0; i--) {
-				GuildRole curSettings = currentSettings.get(i);
-				if (curSettings.getName() == null) {
+				AutomatedGuild curSettings = currentSettings.get(i);
+				if (curSettings.getGuildName() == null) {
 					currentSettings.remove(i);
 				} else if (
-					curSettings.getEnableGuildRole().equalsIgnoreCase("true") || curSettings.getEnableGuildRanks().equalsIgnoreCase("true")
+					curSettings.getGuildMemberRoleEnable().equalsIgnoreCase("true") || curSettings.getGuildRanksEnable().equalsIgnoreCase("true")
 				) {
 					anyGuildRoleRankEnable = true;
 				} else if (
-					curSettings.getEnableGuildUserCount() == null || curSettings.getEnableGuildUserCount().equalsIgnoreCase("false")
+					curSettings.getGuildCounterEnable() == null || curSettings.getGuildCounterEnable().equalsIgnoreCase("false")
 				) {
 					currentSettings.remove(i);
 				}
@@ -385,7 +384,7 @@ public class AutomaticGuild {
 				}
 			}
 
-			for (GuildRole currentSetting : currentSettings) {
+			for (AutomatedGuild currentSetting : currentSettings) {
 				HypixelResponse response = getGuildFromId(currentSetting.getGuildId());
 				if (response.isNotValid()) {
 					continue;
@@ -393,8 +392,8 @@ public class AutomaticGuild {
 
 				JsonArray guildMembers = response.get("members").getAsJsonArray();
 
-				boolean enableGuildRole = currentSetting.getEnableGuildRole().equalsIgnoreCase("true");
-				boolean enableGuildRanks = currentSetting.getEnableGuildRanks().equalsIgnoreCase("true");
+				boolean enableGuildRole = currentSetting.getGuildMemberRoleEnable().equalsIgnoreCase("true");
+				boolean enableGuildRanks = currentSetting.getGuildRanksEnable().equalsIgnoreCase("true");
 				if (enableGuildRanks || enableGuildRole) {
 					Map<String, String> uuidToRankMap = new HashMap<>();
 					for (JsonElement guildMember : guildMembers) {
@@ -404,22 +403,7 @@ public class AutomaticGuild {
 						);
 					}
 
-					try {
-						if (guild.getId().equals("782154976243089429")) {
-							TextChannel ignoreChannel = guild.getTextChannelById("846493091233792066");
-							String[] messageContent = ignoreChannel
-								.retrieveMessageById(ignoreChannel.getLatestMessageId())
-								.complete()
-								.getContentRaw()
-								.split(" ");
-
-							for (String removeM : messageContent) {
-								uuidToRankMap.replace(removeM, "null");
-							}
-						}
-					} catch (Exception ignored) {}
-
-					Role guildMemberRole = enableGuildRole ? guild.getRoleById(currentSetting.getRoleId()) : null;
+					Role guildMemberRole = enableGuildRole ? guild.getRoleById(currentSetting.getGuildMemberRole()) : null;
 					for (Member linkedUser : inGuildUsers) {
 						List<Role> rolesToAdd = new ArrayList<>();
 						List<Role> rolesToRemove = new ArrayList<>();
@@ -433,16 +417,16 @@ public class AutomaticGuild {
 						}
 
 						if (enableGuildRanks) {
-							List<GuildRank> guildRanksArr = currentSetting.getGuildRanks();
+							List<RoleObject> guildRanksArr = currentSetting.getGuildRanks();
 							if (!uuidToRankMap.containsKey(discordIdToUuid.get(linkedUser.getId()))) {
-								for (GuildRank guildRank : guildRanksArr) {
-									rolesToRemove.add(guild.getRoleById(guildRank.getDiscordRoleId()));
+								for (RoleObject guildRank : guildRanksArr) {
+									rolesToRemove.add(guild.getRoleById(guildRank.getRoleId()));
 								}
 							} else {
 								String currentRank = uuidToRankMap.get(discordIdToUuid.get(linkedUser.getId()));
-								for (GuildRank guildRank : guildRanksArr) {
-									Role currentRankRole = guild.getRoleById(guildRank.getDiscordRoleId());
-									if (guildRank.getMinecraftRoleName().equalsIgnoreCase(currentRank)) {
+								for (RoleObject guildRank : guildRanksArr) {
+									Role currentRankRole = guild.getRoleById(guildRank.getRoleId());
+									if (guildRank.getValue().equalsIgnoreCase(currentRank)) {
 										rolesToAdd.add(currentRankRole);
 									} else {
 										rolesToRemove.add(currentRankRole);
@@ -459,13 +443,13 @@ public class AutomaticGuild {
 					}
 				}
 
-				if (currentSetting.getEnableGuildUserCount() != null && currentSetting.getEnableGuildUserCount().equals("true")) {
+				if (currentSetting.getGuildCounterEnable() != null && currentSetting.getGuildCounterEnable().equals("true")) {
 					VoiceChannel curVc;
 					try {
-						curVc = guild.getVoiceChannelById(currentSetting.getGuildUserChannelId());
+						curVc = guild.getVoiceChannelById(currentSetting.getGuildCounterChannel());
 					} catch (Exception e) {
-						currentSetting.setEnableGuildUserCount("false");
-						database.setGuildRoleSettings(guild.getId(), currentSetting);
+						currentSetting.setGuildCounterEnable("false");
+						database.setGuildSettings(guild.getId(), gson.toJsonTree(currentSetting));
 						continue;
 					}
 
@@ -834,7 +818,7 @@ public class AutomaticGuild {
 
 				JsonObject toAdd = new JsonObject();
 				toAdd.addProperty("name", itemName);
-				//				toAdd.add("recipe", higherDepth(itemJson, "recipe"));
+				//	toAdd.add("recipe", higherDepth(itemJson, "recipe"));
 				toAdd.add("wiki", higherDepth(itemJson, "infoType", "").equals("WIKI_URL") ? higherDepth(itemJson, "info.[0]") : null);
 
 				outputObj.add(itemId, toAdd);

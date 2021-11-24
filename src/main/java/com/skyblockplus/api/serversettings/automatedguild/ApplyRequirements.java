@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.api.serversettings.automatedapply;
+package com.skyblockplus.api.serversettings.automatedguild;
 
 import javax.persistence.Embeddable;
 import lombok.AllArgsConstructor;
@@ -25,11 +25,12 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 @Embeddable
-public class ApplyBlacklist {
+public class ApplyRequirements {
 
-	private String username = "";
-	private String uuid = "";
-	private String reason = "";
+	private String slayerReq = "";
+	private String skillsReq = "";
+	private String catacombsReq = "";
+	private String weightReq = "";
 
-	public ApplyBlacklist() {}
+	public ApplyRequirements() {}
 }

@@ -18,23 +18,21 @@
 
 package com.skyblockplus.features.setup;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.waiter;
-import static com.skyblockplus.features.listeners.MainListener.onApplyReload;
-import static com.skyblockplus.features.listeners.MainListener.onVerifyReload;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.gson;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.skyblockplus.api.serversettings.automatedverify.AutomatedVerify;
 import com.skyblockplus.settings.SettingsExecute;
-import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.interactions.components.Button;
+
+import java.util.concurrent.TimeUnit;
+
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.features.listeners.MainListener.onVerifyReload;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.gson;
 
 public class SetupCommandHandler {
 
@@ -157,7 +155,7 @@ public class SetupCommandHandler {
 				} else if (featureType.startsWith("guild_counter_")) {
 					this.name = featureType.split("guild_counter_")[1];
 					this.featureType = "guild_counter";
-					EmbedBuilder eb = settings.setGuildCounterEnable(name, true);
+					EmbedBuilder eb = settings.setGuildCounterEnable(getSettings(), true);
 					if (eb.build().getTitle().equals("Settings")) {
 						buttonEvent
 							.getHook()
@@ -190,10 +188,6 @@ public class SetupCommandHandler {
 				database.setVerifySettings(buttonEvent.getGuild().getId(), gson.toJsonTree(new AutomatedVerify()));
 				break;
 			case "apply":
-				if (name != null) {
-					database.removeApplySettings(buttonEvent.getGuild().getId(), name);
-				}
-				break;
 			case "guild":
 				if (name != null) {
 					database.removeGuildSettings(buttonEvent.getGuild().getId(), name);
@@ -221,11 +215,11 @@ public class SetupCommandHandler {
 					case 1:
 						eb = settings.setVerifyMessageTextChannelId(event.getMessage().getContentRaw());
 						eb2.setDescription(
-							"Reply with the role(s) a user should be given once verified. Separate multiple roles with a comma and a space."
+							"Reply with the role(s) a user should be given once verified. Separate multiple roles with a space."
 						);
 						break;
 					case 2:
-						String[] verifyRoles = event.getMessage().getContentRaw().split(", ");
+						String[] verifyRoles = event.getMessage().getContentRaw().split(" ");
 						if (verifyRoles.length == 0 || verifyRoles.length > 3) {
 							eb =
 								defaultEmbed(
@@ -269,143 +263,143 @@ public class SetupCommandHandler {
 						return;
 				}
 				break;
-			case "apply":
-				switch (state) {
-					case 0:
-						this.name = event.getMessage().getContentRaw();
-						eb = settings.createApplyGuild(event.getMessage().getContentRaw());
-						eb2.setDescription("Reply with the message that users will see and click to in order to apply.");
-						break;
-					case 1:
-						eb = settings.setApplyMessageText(name, event.getMessage().getContentRaw());
-						eb2.setDescription("Reply with the channel where the message will be sent.");
-						break;
-					case 2:
-						eb = settings.setApplyMessageTextChannelId(name, event.getMessage().getContentRaw());
-						StringBuilder categoriesStr = new StringBuilder();
-						for (Category category : event.getGuild().getCategories()) {
-							categoriesStr.append("\n").append(category.getName()).append(" - ").append(category.getId());
-						}
-						eb2.setDescription(
-							"Reply with the category where new applications should be made.\nList of all categories: " + categoriesStr
-						);
-						break;
-					case 3:
-						eb = settings.setApplyNewChannelCategory(name, event.getMessage().getContentRaw());
-						eb2.setDescription("Reply with the staff channel where applications should be sent.");
-						break;
-					case 4:
-						eb = settings.setApplyMessageStaffChannelId(name, event.getMessage().getContentRaw());
-						eb2.setDescription(
-							"Reply with a staff role that should be pinged when an application is received. Reply with 'none' for no ping."
-						);
-						break;
-					case 5:
-						eb = settings.addApplyStaffRole(name, event.getMessage().getContentRaw());
-						eb2.setDescription("Reply with the message that should be sent if an application is accepted.");
-						break;
-					case 6:
-						eb = settings.setApplyAcceptMessageText(name, event.getMessage().getContentRaw());
-						eb2.setDescription("Reply with the message that should be sent if an application is denied.");
-						break;
-					case 7:
-						eb = settings.setApplyDenyMessageText(name, event.getMessage().getContentRaw());
-						eb2.setDescription(
-							"Reply with the message that should be sent if an application is waitlisted. Reply with 'none' if you do not want this."
-						);
-						break;
-					case 8:
-						eb = settings.setApplyWaitListMessageText(name, event.getMessage().getContentRaw());
-						eb2.setDescription(
-							"Reply with the channel where the players who were accepted or waitlisted will be sent. Reply with 'none' if you do not want this."
-						);
-						break;
-					case 9:
-						eb = settings.setWaitingChannel(name, event.getMessage().getContentRaw());
-						eb2.setDescription("Reply with 'yes' if the applications should be ironman only.");
-						break;
-					case 10:
-						eb = settings.setIsIronman(name, event.getMessage().getContentRaw().equalsIgnoreCase("yes"));
-						eb2.setDescription(
-							"Reply with the requirements that an applicant must meet. Separate multiple requirements with a comma and a space. (Example: `weight:4000 skills:40, slayer:1500000 catacombs:30, weight:5000`). Reply with 'none' if you do not want this."
-						);
-						break;
-					case 11:
-						if (!event.getMessage().getContentRaw().equalsIgnoreCase("none")) {
-							String[] reqs = event.getMessage().getContentRaw().split(", ");
-							if (reqs.length == 0 || reqs.length > 3) {
-								eb = defaultEmbed("You must add at least one requirement and at most three requirements");
-							} else {
-								database.setApplyReqs(event.getGuild().getId(), name, new JsonArray());
-								for (String req : reqs) {
-									eb = settings.addApplyRequirement(name, req);
-									if (!eb.build().getTitle().equals("Settings")) {
-										break;
-									}
-								}
-							}
-						} else {
-							eb = defaultEmbed("Settings");
-						}
-
-						eb2.setDescription("Reply with 'enable' to enable this automatic application system.");
-						break;
-					case 12:
-						if (event.getMessage().getContentRaw().equalsIgnoreCase("enable")) {
-							eb = settings.setApplyEnable(name, true);
-							if (eb.build().getTitle().equals("Settings")) {
-								String msg = onApplyReload(event.getGuild().getId());
-								if (msg.contains("• Reloaded `" + name + "`")) {
-									sendEmbed(defaultEmbed("Success").setDescription("Enabled this automatic application systen."));
-								} else {
-									if (!msg.contains("• `" + name + "` is disabled")) {
-										msg = "`" + name + "` is disabled";
-									} else {
-										msg =
-											"Error Reloading for `" + name + msg.split("• Error Reloading for `" + name)[1].split("\n")[0];
-									}
-									sendEmbed(defaultEmbed("Error").setDescription(msg));
-								}
-							} else {
-								sendEmbed(eb);
-							}
-						} else {
-							sendEmbed(defaultEmbed("Canceled the process"));
-							cancel();
-						}
-						return;
-				}
-				break;
-			case "guild":
-				switch (state) {
-					case 0:
-						this.name = event.getMessage().getContentRaw();
-						eb = settings.createGuildRoles(name);
-						eb2.setDescription("Reply with the name of the Hypixel guild");
-						break;
-					case 1:
-						eb = settings.setGuildRoleId(name, event.getMessage().getContentRaw());
-						if (eb.build().getTitle().equals("Settings")) {
-							eb =
-								defaultEmbed("Setup")
-									.setDescription("Choose one of the buttons below to setup the corresponding automatic guild feature");
-							buttonEvent
-								.getChannel()
-								.sendMessageEmbeds(eb.build())
-								.setActionRow(
-									Button.primary("setup_command_guild_role_" + name, "Guild Member Role"),
-									Button.primary("setup_command_guild_ranks_" + name, "Guild Ranks"),
-									Button.primary("setup_command_guild_counter_" + name, "Guild Member Counter")
-								)
-								.queue();
-							return;
-						}
-				}
-				break;
+//			case "apply":
+//				switch (state) {
+//					case 0:
+//						this.name = event.getMessage().getContentRaw();
+//						eb = settings.createNewGuild(event.getMessage().getContentRaw());
+//						eb2.setDescription("Reply with the message that users will see and click to in order to apply.");
+//						break;
+//					case 1:
+//						eb = settings.setApplyMessage(getSettings(), event.getMessage().getContentRaw());
+//						eb2.setDescription("Reply with the channel where the message will be sent.");
+//						break;
+//					case 2:
+//						eb = settings.setApplyChannel(getSettings(), event.getMessage().getContentRaw());
+//						StringBuilder categoriesStr = new StringBuilder();
+//						for (Category category : event.getGuild().getCategories()) {
+//							categoriesStr.append("\n").append(category.getName()).append(" - ").append(category.getId());
+//						}
+//						eb2.setDescription(
+//							"Reply with the category where new applications should be made.\nList of all categories: " + categoriesStr
+//						);
+//						break;
+//					case 3:
+//						eb = settings.setApplyCategory(getSettings(), event.getMessage().getContentRaw());
+//						eb2.setDescription("Reply with the staff channel where applications should be sent.");
+//						break;
+//					case 4:
+//						eb = settings.setApplyStaffChannel(getSettings(), event.getMessage().getContentRaw());
+//						eb2.setDescription(
+//							"Reply with a staff role that should be pinged when an application is received. Reply with 'none' for no ping."
+//						);
+//						break;
+//					case 5:
+//						eb = settings.addApplyStaffRole(getSettings(), event.getMessage().getContentRaw());
+//						eb2.setDescription("Reply with the message that should be sent if an application is accepted.");
+//						break;
+//					case 6:
+//						eb = settings.setApplyAcceptMessage(getSettings(), event.getMessage().getContentRaw());
+//						eb2.setDescription("Reply with the message that should be sent if an application is denied.");
+//						break;
+//					case 7:
+//						eb = settings.setApplyDenyMessage(getSettings(), event.getMessage().getContentRaw());
+//						eb2.setDescription(
+//							"Reply with the message that should be sent if an application is waitlisted. Reply with 'none' if you do not want this."
+//						);
+//						break;
+//					case 8:
+//						eb = settings.setApplyWaitlistMessage(getSettings(), event.getMessage().getContentRaw());
+//						eb2.setDescription(
+//							"Reply with the channel where the players who were accepted or waitlisted will be sent. Reply with 'none' if you do not want this."
+//						);
+//						break;
+//					case 9:
+//						eb = settings.setApplyWaitingChannel(getSettings(), event.getMessage().getContentRaw());
+//						eb2.setDescription("Reply with 'yes' if the applications should be ironman only.");
+//						break;
+//					case 10:
+//						eb = settings.setApplyIronman(getSettings(), event.getMessage().getContentRaw().equalsIgnoreCase("yes"));
+//						eb2.setDescription(
+//							"Reply with the requirements that an applicant must meet. Separate multiple requirements with a comma and a space. (Example: `weight:4000 skills:40, slayer:1500000 catacombs:30, weight:5000`). Reply with 'none' if you do not want this."
+//						);
+//						break;
+//					case 11:
+//						if (!event.getMessage().getContentRaw().equalsIgnoreCase("none")) {
+//							String[] reqs = event.getMessage().getContentRaw().split(", ");
+//							if (reqs.length == 0 || reqs.length > 3) {
+//								eb = defaultEmbed("You must add at least one requirement and at most three requirements");
+//							} else {
+//								database.setApplyReqs(event.getGuild().getId(), name, new JsonArray());
+//								for (String req : reqs) {
+//									eb = settings.addApplyRequirement(getSettings(), req);
+//									if (!eb.build().getTitle().equals("Settings")) {
+//										break;
+//									}
+//								}
+//							}
+//						} else {
+//							eb = defaultEmbed("Settings");
+//						}
+//
+//						eb2.setDescription("Reply with 'enable' to enable this automatic application system.");
+//						break;
+//					case 12:
+//						if (event.getMessage().getContentRaw().equalsIgnoreCase("enable")) {
+//							eb = settings.setApplyEnable(getSettings(), true);
+//							if (eb.build().getTitle().equals("Settings")) {
+//								String msg = onApplyReload(event.getGuild().getId());
+//								if (msg.contains("• Reloaded `" + name + "`")) {
+//									sendEmbed(defaultEmbed("Success").setDescription("Enabled this automatic application systen."));
+//								} else {
+//									if (!msg.contains("• `" + name + "` is disabled")) {
+//										msg = "`" + name + "` is disabled";
+//									} else {
+//										msg =
+//											"Error Reloading for `" + name + msg.split("• Error Reloading for `" + name)[1].split("\n")[0];
+//									}
+//									sendEmbed(defaultEmbed("Error").setDescription(msg));
+//								}
+//							} else {
+//								sendEmbed(eb);
+//							}
+//						} else {
+//							sendEmbed(defaultEmbed("Canceled the process"));
+//							cancel();
+//						}
+//						return;
+//				}
+//				break;
+//			case "guild":
+//				switch (state) {
+//					case 0:
+//						this.name = event.getMessage().getContentRaw();
+//						eb = settings.createNewGuild(name);
+//						eb2.setDescription("Reply with the name of the Hypixel guild");
+//						break;
+//					case 1:
+//						eb = settings.setGuildRoleId(name, event.getMessage().getContentRaw());
+//						if (eb.build().getTitle().equals("Settings")) {
+//							eb =
+//								defaultEmbed("Setup")
+//									.setDescription("Choose one of the buttons below to setup the corresponding automatic guild feature");
+//							buttonEvent
+//								.getChannel()
+//								.sendMessageEmbeds(eb.build())
+//								.setActionRow(
+//									Button.primary("setup_command_guild_role_" + name, "Guild Member Role"),
+//									Button.primary("setup_command_guild_ranks_" + name, "Guild Ranks"),
+//									Button.primary("setup_command_guild_counter_" + name, "Guild Member Counter")
+//								)
+//								.queue();
+//							return;
+//						}
+//				}
+//				break;
 			case "guild_role":
-				eb = settings.setGuildRoleName(name, event.getMessage().getContentRaw());
+				eb = settings.setGuildMemberRole(getSettings(), event.getMessage().getContentRaw());
 				if (eb.build().getTitle().equals("Settings")) {
-					eb = settings.setGuildRoleEnable(name, true);
+					eb = settings.setGuildMemberRoleEnable(getSettings(), true);
 					if (eb.build().getTitle().equals("Settings")) {
 						sendEmbed(defaultEmbed("Success").setDescription("Enabled guild member role sync."));
 					} else {
@@ -419,15 +413,15 @@ public class SetupCommandHandler {
 				if (guildRanks.length == 0) {
 					eb = defaultEmbed("You must specify at least one rank");
 				} else {
-					JsonObject obj = database.getGuildRoleSettings(event.getGuild().getId(), name).getAsJsonObject();
+					JsonObject obj = database.getGuildSettings(event.getGuild().getId(), name).getAsJsonObject();
 					obj.add("guildRanks", new JsonArray());
-					database.setGuildRoleSettings(event.getGuild().getId(), obj);
+					database.setGuildSettings(event.getGuild().getId(), obj);
 
 					for (String guildRank : guildRanks) {
 						String[] guildRanksSplit = guildRank.split(" ");
 						eb =
 							settings.addGuildRank(
-								name,
+									getSettings(),
 								guildRanksSplit.length >= 1 ? guildRanksSplit[0] : null,
 								guildRanksSplit.length >= 2 ? guildRanksSplit[1] : null
 							);
@@ -438,7 +432,7 @@ public class SetupCommandHandler {
 				}
 
 				if (eb.build().getTitle().equals("Settings")) {
-					eb = settings.setGuildRankEnable(name, true);
+					eb = settings.setGuildRanksEnable(getSettings(), true);
 					if (eb.build().getTitle().equals("Settings")) {
 						sendEmbed(defaultEmbed("Success").setDescription("Enabled guild ranks sync."));
 					} else {
@@ -493,5 +487,9 @@ public class SetupCommandHandler {
 				buttonEvent.getChannel().sendMessageEmbeds(defaultEmbed("Timeout").build()).queue();
 			}
 		);
+	}
+
+	private JsonObject getSettings(){
+		return database.getGuildSettings(buttonEvent.getGuild().getId(), name).getAsJsonObject();
 	}
 }

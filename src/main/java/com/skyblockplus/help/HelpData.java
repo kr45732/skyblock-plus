@@ -135,7 +135,7 @@ public class HelpData {
 			"`" +
 			prefix +
 			command.getUsage() +
-			" [subcommand]`" +
+			" <subcommand>`" +
 			(command.secondUsage != null ? "\n`" + prefix + getSecondUsage(command) + "`" : "")
 		);
 	}

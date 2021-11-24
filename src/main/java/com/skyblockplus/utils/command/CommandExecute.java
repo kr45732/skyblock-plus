@@ -76,8 +76,9 @@ public abstract class CommandExecute {
 		com.skyblockplus.utils.Utils.logCommand(event.getGuild(), event.getAuthor(), event.getMessage().getContentRaw());
 	}
 
-	protected void setArgs(int limit) {
+	protected String[] setArgs(int limit) {
 		args = event.getMessage().getContentRaw().split("\\s+", limit);
+		return args;
 	}
 
 	protected void embed(EmbedBuilder embedBuilder) {

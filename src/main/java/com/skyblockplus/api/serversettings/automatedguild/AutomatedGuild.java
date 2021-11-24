@@ -18,7 +18,7 @@
 
 package com.skyblockplus.api.serversettings.automatedguild;
 
-import com.skyblockplus.api.serversettings.automatedapply.ApplyRequirements;
+import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.hibernate.annotations.Fetch;
@@ -36,15 +36,15 @@ import java.util.List;
 @Embeddable
 public class AutomatedGuild {
 
-    private String name; // Used to reference to this automated guild (isn't necessarily the guild's name)
+    private String guildName;
     private String guildId;
 
     // Apply
     private String applyEnable = "false";
-    private String applyMessageChannelId = ""; // Message with button will be sent here
-    private String applyStaffChannelId = ""; // Applications to be reviewed by staff sent here
+    private String applyMessageChannel = ""; // Message with button will be sent here
+    private String applyStaffChannel = ""; // Applications to be reviewed by staff sent here
     private String applyCategory = ""; // Where new applications are created
-    private String applyWaitingChannelId = ""; // Applications that are waitlisted by staff sent here
+    private String applyWaitingChannel = ""; // Applications that are waitlisted by staff sent here
     private String applyIronmanOnly = "false";
     @Column(length = 2048)
     private String applyMessage = "";
@@ -53,11 +53,11 @@ public class AutomatedGuild {
     @Column(length = 2048)
     private String applyDenyMessage = "";
     @Column(length = 2048)
-    private String applyWaitlistedMessage = "";
+    private String applyWaitlistMessage = "";
     @ElementCollection(fetch = FetchType.EAGER)
     @Fetch(value = FetchMode.SUBSELECT)
     private List<String> applyStaffRoles = new ArrayList<>();
-    private String applyPrevMessageId = ""; // Used to edit original message rather than sending new on bot restart
+    private String applyPrevMessage = ""; // Used to edit original message rather than sending new when the bot restarts
     @Column(columnDefinition = "TEXT")
     private String applyUsersCache = "";
     @ElementCollection(fetch = FetchType.EAGER)
@@ -65,17 +65,23 @@ public class AutomatedGuild {
     private List<ApplyRequirements> applyReqs = new ArrayList<>();
 
     // Guild Member Roles
-    private String guildMemberEnable = "false";
-    private String guildMemberRoleId = "";
+    private String guildMemberRoleEnable = "false";
+    private String guildMemberRole = "";
 
     // Guild Rank
     private String guildRanksEnable = "false";
     @ElementCollection(fetch = FetchType.EAGER)
     @Fetch(value = FetchMode.SUBSELECT)
-    private List<GuildRank> guildRanks = new ArrayList<>();
+    private List<RoleObject> guildRanks = new ArrayList<>();
 
     private String guildCounterEnable = "false";
-    private String guildCounterChannelId = "";
+    private String guildCounterChannel = "";
 
-    public AutomatedGuild() {}
+    public AutomatedGuild() {
+    }
+
+    public AutomatedGuild(String guildName, String guildId) {
+        this.guildName = guildName;
+        this.guildId = guildId;
+    }
 }

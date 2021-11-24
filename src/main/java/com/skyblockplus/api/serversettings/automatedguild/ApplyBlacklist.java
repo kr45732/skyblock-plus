@@ -25,10 +25,11 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 @Embeddable
-public class GuildRank {
+public class ApplyBlacklist {
 
-	public String minecraftRoleName;
-	public String discordRoleId;
+	private String username = "";
+	private String uuid = "";
+	private String reason = "";
 
-	public GuildRank() {}
+	public ApplyBlacklist() {}
 }

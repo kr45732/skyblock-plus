@@ -18,18 +18,14 @@
 
 package com.skyblockplus.settings;
 
-import static com.skyblockplus.utils.Utils.gson;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountService;
-import com.skyblockplus.api.serversettings.automatedapply.ApplyBlacklist;
-import com.skyblockplus.api.serversettings.automatedapply.ApplyRequirements;
-import com.skyblockplus.api.serversettings.automatedapply.AutomatedApply;
-import com.skyblockplus.api.serversettings.automatedguild.GuildRole;
+import com.skyblockplus.api.serversettings.automatedguild.ApplyBlacklist;
+import com.skyblockplus.api.serversettings.automatedguild.ApplyRequirements;
+import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.api.serversettings.automatedroles.AutomatedRoles;
 import com.skyblockplus.api.serversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.serversettings.automatedverify.AutomatedVerify;
@@ -37,10 +33,13 @@ import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsService;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+import static com.skyblockplus.utils.Utils.gson;
 
 @Service
 @Transactional
@@ -55,12 +54,8 @@ public class Database {
 		this.linkedAccountService = linkedAccountService;
 	}
 
-	public int removeApplySettings(String serverId, String name) {
-		return settingsService.removeApplySettings(serverId, name).getStatusCodeValue();
-	}
-
-	public void removeGuildSettings(String serverId, String name) {
-		settingsService.removeGuildSettings(serverId, name).getStatusCodeValue();
+	public int removeGuildSettings(String serverId, String name) {
+		return settingsService.removeGuildSettings(serverId, name).getStatusCodeValue();
 	}
 
 	public int addLinkedUser(LinkedAccountModel newUser) {
@@ -139,14 +134,6 @@ public class Database {
 		return settingsService.setRoleSettings(serverId, gson.fromJson(newRoleSettings, RoleModel.class), roleName).getStatusCodeValue();
 	}
 
-	public int setGuildRoleSettings(String serverId, JsonObject currentSettings) {
-		return settingsService.setGuildRoleSettings(serverId, gson.fromJson(currentSettings, GuildRole.class)).getStatusCodeValue();
-	}
-
-	public int setGuildRoleSettings(String serverId, GuildRole currentSettings) {
-		return settingsService.setGuildRoleSettings(serverId, currentSettings).getStatusCodeValue();
-	}
-
 	public int setApplyCacheSettings(String serverId, String name, String currentSettings) {
 		return settingsService.setApplyUsersCache(serverId, name, currentSettings).getStatusCodeValue();
 	}
@@ -175,10 +162,6 @@ public class Database {
 		return settingsService.getSkyblockEventActive(serverId);
 	}
 
-	public String getSkyblockEventGuildId(String serverId) {
-		return (String) settingsService.getSkyblockEventGuildId(serverId).getBody();
-	}
-
 	public JsonElement getSkyblockEventSettings(String serverId) {
 		return gson.toJsonTree(settingsService.getSkyblockEventSettings(serverId).getBody());
 	}
@@ -191,40 +174,12 @@ public class Database {
 		return settingsService.eventHasMemberByUuid(serverId, minecraftUuid);
 	}
 
-	public JsonElement getApplyReqs(String serverId, String name) {
-		return gson.toJsonTree(settingsService.getApplyReqs(serverId, name).getBody());
-	}
-
 	public int setApplyReqs(String serverId, String name, JsonArray newApplyReqs) {
 		return settingsService.setApplyReqs(serverId, name, gson.fromJson(newApplyReqs, ApplyRequirements[].class)).getStatusCodeValue();
 	}
 
-	public List<AutomatedApply> getAllApplySettings(String serverId) {
-		return settingsService.getAllApplySettings(serverId);
-	}
-
-	public JsonElement getApplySettings(String serverId, String name) {
-		return gson.toJsonTree(settingsService.getApplySettingsExt(serverId, name).getBody());
-	}
-
-	public int setApplySettings(String serverId, AutomatedApply newSettings) {
-		return settingsService.setApplySettings(serverId, newSettings).getStatusCodeValue();
-	}
-
-	public int setApplySettings(String serverId, JsonElement newSettings) {
-		return settingsService.setApplySettings(serverId, gson.fromJson(newSettings, AutomatedApply.class)).getStatusCodeValue();
-	}
-
 	public int setVerifyRolesSettings(String serverId, JsonArray newSettings) {
 		return settingsService.setVerifyRolesSettings(serverId, gson.fromJson(newSettings, String[].class)).getStatusCodeValue();
-	}
-
-	public List<GuildRole> getAllGuildRoles(String serverId) {
-		return settingsService.getAllGuildRolesSettings(serverId);
-	}
-
-	public JsonElement getGuildRoleSettings(String serverId, String name) {
-		return gson.toJsonTree(settingsService.getGuildRoleSettingsExt(serverId, name).getBody());
 	}
 
 	public String getServerHypixelApiKey(String serverId) {
@@ -270,5 +225,17 @@ public class Database {
 
 	public int setPartyFinderCategoryId(String serverId, String newSettings) {
 		return settingsService.setPartyFinderCategoryId(serverId, newSettings).getStatusCodeValue();
+	}
+
+	public List<AutomatedGuild> getAllGuildSettings(String serverId){
+		return settingsService.getAllGuildSettings(serverId);
+	}
+
+    public JsonElement getGuildSettings(String serverId, String name) {
+		return gson.toJsonTree(settingsService.getGuildSettings(serverId, name).getBody());
+	}
+
+	public int setGuildSettings(String serverId, JsonElement newSettings) {
+		return settingsService.setGuildSettings(serverId, gson.fromJson(newSettings, AutomatedGuild.class)).getStatusCodeValue();
 	}
 }

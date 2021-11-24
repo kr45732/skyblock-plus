@@ -177,7 +177,7 @@ public class RolesCommand extends Command {
 								List<JsonElement> guildRoles = new ArrayList<>();
 								for (JsonElement curLevel : curLevels) {
 									guildRoles.add(
-										database.getGuildRoleSettings(guild.getId(), higherDepth(curLevel, "value").getAsString())
+										database.getGuildSettings(guild.getId(), higherDepth(curLevel, "value").getAsString())
 									);
 								}
 
@@ -196,17 +196,17 @@ public class RolesCommand extends Command {
 												String guildMemberRank = higherDepth(guildMember, "rank").getAsString().replace(" ", "_");
 												for (JsonElement guildRank : guildRanks) {
 													Role currentLevelRole = guild.getRoleById(
-														higherDepth(guildRank, "discordRoleId").getAsString()
+														higherDepth(guildRank, "roleId").getAsString()
 													);
 													if (currentLevelRole == null) {
 														errorRoles.append(
-															roleDeletedString(higherDepth(guildRank, "discordRoleId").getAsString())
+															roleDeletedString(higherDepth(guildRank, "roleId").getAsString())
 														);
 														continue;
 													}
 
 													if (
-														higherDepth(guildRank, "minecraftRoleName")
+														higherDepth(guildRank, "value")
 															.getAsString()
 															.equalsIgnoreCase(guildMemberRank)
 													) {
@@ -544,14 +544,14 @@ public class RolesCommand extends Command {
 			if ("guild_ranks".equals(currentRoleName)) {
 				JsonArray curLevels = higherDepth(currentRole, "levels").getAsJsonArray();
 				for (JsonElement curLevel : curLevels) {
-					JsonElement guildRoleSettings = database.getGuildRoleSettings(
+					JsonElement guildRoleSettings = database.getGuildSettings(
 						event.getGuild().getId(),
 						higherDepth(curLevel, "value").getAsString()
 					);
 					JsonArray guildRanks = higherDepth(guildRoleSettings, "guildRanks").getAsJsonArray();
 					for (JsonElement guildRank : guildRanks) {
 						paginateBuilder.addItems(
-							event.getGuild().getRoleById(higherDepth(guildRank, "discordRoleId").getAsString()).getAsMention()
+							event.getGuild().getRoleById(higherDepth(guildRank, "roleId").getAsString()).getAsMention()
 						);
 					}
 				}

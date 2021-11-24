@@ -509,7 +509,8 @@ public class SkyblockEventCommand extends Command {
 					return invalidEmbed(guildJson.getFailCause());
 				}
 
-				if (!guildJson.get("_id").getAsString().equals(database.getSkyblockEventGuildId(guildId))) {
+				JsonElement eventSettings = database.getSkyblockEventSettings(guildId);
+				if (!guildJson.get("_id").getAsString().equals(higherDepth(eventSettings, "eventGuildId").getAsString())) {
 					return invalidEmbed("You must be in the guild to join the event");
 				}
 				Player player = args.length == 3 ? new Player(username, args[2]) : new Player(username);
@@ -518,7 +519,7 @@ public class SkyblockEventCommand extends Command {
 					try {
 						double startingAmount = 0;
 						String startingAmountFormatted = "";
-						JsonElement eventSettings = database.getSkyblockEventSettings(guildId);
+
 						String eventType = higherDepth(eventSettings, "eventType").getAsString();
 
 						switch (eventType) {

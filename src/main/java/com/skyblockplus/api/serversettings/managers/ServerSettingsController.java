@@ -18,9 +18,9 @@
 
 package com.skyblockplus.api.serversettings.managers;
 
-import com.skyblockplus.api.serversettings.automatedapply.AutomatedApply;
-import com.skyblockplus.api.serversettings.automatedguild.GuildRole;
 import java.util.List;
+
+import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -54,19 +54,6 @@ public class ServerSettingsController {
 		return settingsService.getVerifySettings(serverId);
 	}
 
-	@GetMapping("/get/apply/all")
-	public List<AutomatedApply> getAllApplySettings(@RequestParam(value = "serverId") String serverId) {
-		return settingsService.getAllApplySettings(serverId);
-	}
-
-	@GetMapping("/get/apply/byName")
-	public ResponseEntity<?> getApplySettings(
-		@RequestParam(value = "serverId") String serverId,
-		@RequestParam(value = "name") String name
-	) {
-		return settingsService.getApplySettingsExt(serverId, name);
-	}
-
 	@GetMapping("/get/roles")
 	public ResponseEntity<?> getRolesSettings(@RequestParam(value = "serverId") String serverId) {
 		return settingsService.getRolesSettings(serverId);
@@ -81,16 +68,16 @@ public class ServerSettingsController {
 	}
 
 	@GetMapping("/get/guild/all")
-	public List<GuildRole> getAllGuildRoleSettings(@RequestParam(value = "serverId") String serverId) {
-		return settingsService.getAllGuildRolesSettings(serverId);
+	public List<AutomatedGuild> getAllGuildSettings(@RequestParam(value = "serverId") String serverId) {
+		return settingsService.getAllGuildSettings(serverId);
 	}
 
 	@GetMapping("/get/guild/byName")
-	public ResponseEntity<?> getGuildRoleSettings(
+	public ResponseEntity<?> getGuildSettings(
 		@RequestParam(value = "serverId") String serverId,
 		@RequestParam(value = "name") String name
 	) {
-		return settingsService.getGuildRoleSettingsExt(serverId, name);
+		return settingsService.getGuildSettings(serverId, name);
 	}
 
 	@GetMapping("/t/event")

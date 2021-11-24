@@ -45,9 +45,9 @@ public class ApplyGuild {
 	public ApplyGuild(Message reactMessage, JsonElement currentSettings) {
 		this.reactMessage = reactMessage;
 		this.currentSettings = currentSettings;
-		this.applyUserList = getApplyGuildUsersCache(reactMessage.getGuild().getId(), higherDepth(currentSettings, "name").getAsString());
+		this.applyUserList = getApplyGuildUsersCache(reactMessage.getGuild().getId(), higherDepth(currentSettings, "guildName").getAsString());
 		try {
-			this.waitInviteChannel = jda.getTextChannelById(higherDepth(currentSettings, "waitingChannelId").getAsString());
+			this.waitInviteChannel = jda.getTextChannelById(higherDepth(currentSettings, "applyWaitingChannel").getAsString());
 		} catch (Exception ignored) {}
 	}
 
@@ -90,7 +90,7 @@ public class ApplyGuild {
 			return null;
 		}
 
-		if (!event.getButton().getId().equals("create_application_button_" + higherDepth(currentSettings, "name").getAsString())) {
+		if (!event.getButton().getId().equals("create_application_button_" + higherDepth(currentSettings, "guildName").getAsString())) {
 			return null;
 		}
 
@@ -179,12 +179,12 @@ public class ApplyGuild {
 			return null;
 		}
 
-		if (!event.getComponentId().startsWith("apply_user_wait_" + higherDepth(currentSettings, "name").getAsString())) {
+		if (!event.getComponentId().startsWith("apply_user_wait_" + higherDepth(currentSettings, "guildName").getAsString())) {
 			return null;
 		}
 
 		if (!event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
-			JsonArray staffPingRoles = higherDepth(currentSettings, "staffRoles").getAsJsonArray();
+			JsonArray staffPingRoles = higherDepth(currentSettings, "applyStaffRoles").getAsJsonArray();
 			boolean hasStaffRole = false;
 			if (staffPingRoles.size() != 0) {
 				for (JsonElement staffPingRole : staffPingRoles) {
@@ -204,7 +204,7 @@ public class ApplyGuild {
 			TextChannel toCloseChannel = event
 				.getGuild()
 				.getTextChannelById(
-					event.getComponentId().split("apply_user_wait_" + higherDepth(currentSettings, "name").getAsString() + "_")[1]
+					event.getComponentId().split("apply_user_wait_" + higherDepth(currentSettings, "guildName").getAsString() + "_")[1]
 				);
 			toCloseChannel.sendMessageEmbeds(defaultEmbed("Closing channel").build()).queue();
 			toCloseChannel.delete().reason("Application closed").queueAfter(10, TimeUnit.SECONDS);
