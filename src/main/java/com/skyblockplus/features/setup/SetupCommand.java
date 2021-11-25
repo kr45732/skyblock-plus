@@ -38,17 +38,15 @@ public class SetupCommand extends Command {
 	}
 
 	public static ActionRow getSetupActionRow() {
-		return ActionRow.of(
-			Button.primary("setup_command_verify", "Verification"),
-			Button.primary("setup_command_apply", "Application").asDisabled(),
-			Button.primary("setup_command_guild", "Guild Roles & Ranks").asDisabled(),
-			Button.primary("setup_command_roles", "Skyblock Roles"),
-			Button.primary("setup_command_prefix", "Prefix")
-		);
+		return ActionRow.of(Button.primary("setup_command_verify", "Verification"),
+				Button.primary("setup_command_guild", "Guild | Application, Roles & Ranks").asDisabled(),
+				Button.primary("setup_command_roles", "Skyblock Roles"),
+				Button.primary("setup_command_prefix", "Prefix"));
 	}
 
 	public static EmbedBuilder getSetupEmbed() {
-		return defaultEmbed("Setup").setDescription("Choose one of the buttons below to setup the corresponding feature");
+		return defaultEmbed("Setup")
+				.setDescription("Choose one of the buttons below to setup the corresponding feature");
 	}
 
 	@Override
@@ -60,7 +58,6 @@ public class SetupCommand extends Command {
 
 				ebMessage.editMessageEmbeds(getSetupEmbed().build()).setActionRows(getSetupActionRow()).queue();
 			}
-		}
-			.queue();
+		}.queue();
 	}
 }

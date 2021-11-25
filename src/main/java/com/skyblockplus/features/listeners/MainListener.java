@@ -22,7 +22,6 @@ import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.*;
 
-import com.skyblockplus.features.skyblockevent.SkyblockEventCommand;
 import java.util.HashMap;
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -91,7 +90,8 @@ public class MainListener extends ListenerAdapter {
 
 		try {
 			logCommand(event.getGuild(), "Left guild");
-		} catch (Exception ignored) {}
+		} catch (Exception ignored) {
+		}
 	}
 
 	@Override
@@ -102,43 +102,25 @@ public class MainListener extends ListenerAdapter {
 
 		if (isUniqueGuild(event.getGuild().getId())) {
 			try {
-				EmbedBuilder eb = defaultEmbed("Thank you!")
-					.setDescription(
-						"- Thank you for adding me to " +
-						event.getGuild().getName() +
-						"\n- My prefix is `" +
-						DEFAULT_PREFIX +
-						"` and can be changed using `" +
-						DEFAULT_PREFIX +
-						"settings set prefix <prefix>`\n- You can view my commands by running `" +
-						DEFAULT_PREFIX +
-						"help`\n- Make sure to check out `" +
-						DEFAULT_PREFIX +
-						"setup` or the forum post [**here**](" +
-						FORUM_POST_LINK +
-						") on how to setup the customizable features of this bot!"
-					);
-				TextChannel channel = event
-					.getGuild()
-					.getTextChannels()
-					.stream()
-					.filter(textChannel -> textChannel.getName().toLowerCase().contains("general") && textChannel.canTalk())
-					.findFirst()
-					.orElse(null);
+				EmbedBuilder eb = defaultEmbed("Thank you!").setDescription("- Thank you for adding me to "
+						+ event.getGuild().getName() + "\n- My prefix is `" + DEFAULT_PREFIX
+						+ "` and can be changed using `" + DEFAULT_PREFIX
+						+ "settings set prefix <prefix>`\n- You can view my commands by running `" + DEFAULT_PREFIX
+						+ "help`\n- Make sure to check out `" + DEFAULT_PREFIX + "setup` or the forum post [**here**]("
+						+ FORUM_POST_LINK + ") on how to setup the customizable features of this bot!");
+				TextChannel channel = event.getGuild().getTextChannels().stream().filter(
+						textChannel -> textChannel.getName().toLowerCase().contains("general") && textChannel.canTalk())
+						.findFirst().orElse(null);
 				if (channel != null) {
 					channel.sendMessageEmbeds(eb.build()).queue();
 				} else {
 					event.getGuild().getDefaultChannel().sendMessageEmbeds(eb.build()).queue();
 				}
-			} catch (Exception ignored) {}
+			} catch (Exception ignored) {
+			}
 
-			logCommand(
-				event.getGuild(),
-				"Joined guild | #" +
-				jda.getGuilds().size() +
-				" | Users: " +
-				event.getGuild().retrieveMetaData().complete().getApproximateMembers()
-			);
+			logCommand(event.getGuild(), "Joined guild | #" + jda.getGuilds().size() + " | Users: "
+					+ event.getGuild().retrieveMetaData().complete().getApproximateMembers());
 
 			guildMap.put(event.getGuild().getId(), new AutomaticGuild(event));
 		} else {
@@ -182,7 +164,8 @@ public class MainListener extends ListenerAdapter {
 		}
 
 		if (event.getGuild() == null) {
-			event.editButton(event.getButton().asDisabled().withLabel("Disabled").withStyle(ButtonStyle.DANGER)).queue();
+			event.editButton(event.getButton().asDisabled().withLabel("Disabled").withStyle(ButtonStyle.DANGER))
+					.queue();
 
 			event.getHook().editOriginal("❌ This button has been disabled").queue();
 			return;

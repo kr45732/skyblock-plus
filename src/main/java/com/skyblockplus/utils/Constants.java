@@ -20,6 +20,7 @@ package com.skyblockplus.utils;
 
 import static com.skyblockplus.utils.Utils.*;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
@@ -56,6 +57,7 @@ public class Constants {
 	public static JsonObject DUNGEON_COMPLETION_BUFFS;
 	public static Map<String, String> HOTM_PERK_ID_TO_NAME;
 	public static Map<String, Integer> HOTM_PERK_MAX_LEVEL;
+	public static Map<String, String> SLAYER_EMOJI_MAP;
 
 	/* Fetched from other sources */
 	public static List<String> ENCHANT_NAMES;
@@ -67,18 +69,26 @@ public class Constants {
 	public static List<String> BITS_ITEM_NAMES;
 	public static List<String> PET_ITEM_NAMES;
 	public static Set<String> ALL_TALISMANS;
+	public static Map<String, Long> COLLECTION_ID_TO_MAX_AMOUNT;
 
 	public static void initialize() {
 		try {
-			JsonObject constantsJson = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/Constants.json")
-				.getAsJsonObject();
+			JsonObject constantsJson = getJson(
+					"https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/Constants.json")
+							.getAsJsonObject();
 
-			Type mapStringString = new TypeToken<Map<String, String>>() {}.getType();
-			Type listInteger = new TypeToken<List<Integer>>() {}.getType();
-			Type listString = new TypeToken<List<String>>() {}.getType();
-			Type mapStringDoubleArray = new TypeToken<Map<String, Double[]>>() {}.getType();
-			Type mapStringDouble = new TypeToken<Map<String, Double>>() {}.getType();
-			Type mapStringInteger = new TypeToken<Map<String, Integer>>() {}.getType();
+			Type mapStringString = new TypeToken<Map<String, String>>() {
+			}.getType();
+			Type listInteger = new TypeToken<List<Integer>>() {
+			}.getType();
+			Type listString = new TypeToken<List<String>>() {
+			}.getType();
+			Type mapStringDoubleArray = new TypeToken<Map<String, Double[]>>() {
+			}.getType();
+			Type mapStringDouble = new TypeToken<Map<String, Double>>() {
+			}.getType();
+			Type mapStringInteger = new TypeToken<Map<String, Integer>>() {
+			}.getType();
 
 			/* CATACOMBS_LEVEL_50_XP */
 			CATACOMBS_LEVEL_50_XP = higherDepth(constantsJson, "CATACOMBS_LEVEL_50_XP").getAsDouble();
@@ -93,7 +103,8 @@ public class Constants {
 			RARITY_TO_NUMBER_MAP = gson.fromJson(higherDepth(constantsJson, "RARITY_TO_NUMBER_MAP"), mapStringString);
 
 			/* CRAFTED_MINIONS_TO_SLOTS */
-			CRAFTED_MINIONS_TO_SLOTS = gson.fromJson(higherDepth(constantsJson, "CRAFTED_MINIONS_TO_SLOTS"), listInteger);
+			CRAFTED_MINIONS_TO_SLOTS = gson.fromJson(higherDepth(constantsJson, "CRAFTED_MINIONS_TO_SLOTS"),
+					listInteger);
 
 			/* COSMETIC_SKILL_NAMES */
 			COSMETIC_SKILL_NAMES = gson.fromJson(higherDepth(constantsJson, "COSMETIC_SKILL_NAMES"), listString);
@@ -158,9 +169,13 @@ public class Constants {
 			/* HOTM_PERK_MAX_LEVEL */
 			HOTM_PERK_MAX_LEVEL = gson.fromJson(higherDepth(constantsJson, "HOTM_PERK_MAX_LEVEL"), mapStringInteger);
 
+			/* SLAYER_EMOJI_MAP */
+			SLAYER_EMOJI_MAP = gson.fromJson(higherDepth(constantsJson, "SLAYER_EMOJI_MAP"), mapStringString);
+
 			/* ENCHANT_NAMES */
 			ENCHANT_NAMES = new ArrayList<>();
-			for (Map.Entry<String, JsonElement> enchantArr : higherDepth(getEnchantsJson(), "enchants").getAsJsonObject().entrySet()) {
+			for (Map.Entry<String, JsonElement> enchantArr : higherDepth(getEnchantsJson(), "enchants")
+					.getAsJsonObject().entrySet()) {
 				for (JsonElement enchantName : enchantArr.getValue().getAsJsonArray()) {
 					ENCHANT_NAMES.add(enchantName.getAsString().toUpperCase());
 				}
@@ -170,7 +185,8 @@ public class Constants {
 			}
 
 			/* ALL_SKILL_NAMES */
-			ALL_SKILL_NAMES = new ArrayList<>(higherDepth(getLevelingJson(), "leveling_caps").getAsJsonObject().keySet());
+			ALL_SKILL_NAMES = new ArrayList<>(
+					higherDepth(getLevelingJson(), "leveling_caps").getAsJsonObject().keySet());
 			ALL_SKILL_NAMES.remove("HOTM");
 			ALL_SKILL_NAMES.remove("catacombs");
 
@@ -196,14 +212,26 @@ public class Constants {
 			/* ALL_TALISMANS */
 			ALL_TALISMANS = new HashSet<>();
 			for (Map.Entry<String, JsonElement> talismanUpgrade : higherDepth(getTalismanJson(), "talismans")
-				.getAsJsonObject()
-				.entrySet()) {
+					.getAsJsonObject().entrySet()) {
 				ALL_TALISMANS.add(talismanUpgrade.getKey());
 				if (higherDepth(getTalismanJson(), "talisman_duplicates." + talismanUpgrade.getKey()) != null) {
-					for (JsonElement duplicate : higherDepth(getTalismanJson(), "talisman_duplicates." + talismanUpgrade.getKey())
-						.getAsJsonArray()) {
+					for (JsonElement duplicate : higherDepth(getTalismanJson(),
+							"talisman_duplicates." + talismanUpgrade.getKey()).getAsJsonArray()) {
 						ALL_TALISMANS.add(duplicate.getAsString());
 					}
+				}
+			}
+
+			/* COLLECTION_ID_TO_MAX_AMOUNT */
+			COLLECTION_ID_TO_MAX_AMOUNT = new HashMap<>();
+			for (Map.Entry<String, JsonElement> collectionCategories : higherDepth(
+					getJson("https://api.hypixel.net/resources/skyblock/collections"), "collections").getAsJsonObject()
+							.entrySet()) {
+				for (Map.Entry<String, JsonElement> collection : higherDepth(collectionCategories.getValue(), "items")
+						.getAsJsonObject().entrySet()) {
+					JsonArray collectionTiers = higherDepth(collection.getValue(), "tiers").getAsJsonArray();
+					COLLECTION_ID_TO_MAX_AMOUNT.put(collection.getKey(),
+							higherDepth(collectionTiers.get(collectionTiers.size() - 1), "amountRequired").getAsLong());
 				}
 			}
 		} catch (Exception e) {

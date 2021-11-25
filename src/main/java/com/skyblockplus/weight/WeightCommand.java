@@ -64,7 +64,7 @@ public class WeightCommand extends Command {
 			StringBuilder slayerStr = new StringBuilder();
 			for (String slayerName : SLAYER_NAMES) {
 				slayerStr
-					.append(capitalizeString(slayerName))
+					.append(SLAYER_EMOJI_MAP.get(slayerName) + " " +capitalizeString(slayerName))
 					.append(": ")
 					.append(weight.getSlayerWeight().getSlayerWeight(slayerName).getFormatted())
 					.append("\n");
@@ -72,20 +72,21 @@ public class WeightCommand extends Command {
 			StringBuilder skillsStr = new StringBuilder();
 			for (String skillName : SKILL_NAMES) {
 				skillsStr
-					.append(capitalizeString(skillName))
+					.append(SKILLS_EMOJI_MAP.get(skillName) + " " + capitalizeString(skillName))
 					.append(": ")
 					.append(weight.getSkillsWeight().getSkillsWeight(skillName).getFormatted())
 					.append("\n");
 			}
 			StringBuilder dungeonsStr = new StringBuilder();
+			
 			dungeonsStr
-				.append(capitalizeString("catacombs"))
+				.append(DUNGEON_EMOJI_MAP.get("catacombs") + " " + capitalizeString("catacombs"))
 				.append(": ")
 				.append(weight.getDungeonsWeight().getDungeonWeight("catacombs").getFormatted())
 				.append("\n");
 			for (String dungeonClassName : DUNGEON_CLASS_NAMES) {
 				dungeonsStr
-					.append(capitalizeString(dungeonClassName))
+					.append(DUNGEON_EMOJI_MAP.get(dungeonClassName) + " " + capitalizeString(dungeonClassName))
 					.append(": ")
 					.append(weight.getDungeonsWeight().getClassWeight(dungeonClassName).getFormatted())
 					.append("\n");
@@ -102,7 +103,7 @@ public class WeightCommand extends Command {
 			StringBuilder lilySlayerStr = new StringBuilder();
 			for (String slayerName : SLAYER_NAMES) {
 				lilySlayerStr
-					.append(capitalizeString(slayerName))
+					.append(SLAYER_EMOJI_MAP.get(slayerName) + " " + capitalizeString(slayerName))
 					.append(": ")
 					.append(lilyWeight.getSlayerWeight().getSlayerWeight(slayerName).getFormatted())
 					.append("\n");
@@ -110,19 +111,19 @@ public class WeightCommand extends Command {
 			StringBuilder lilySkillsStr = new StringBuilder();
 			for (String skillName : SKILL_NAMES) {
 				lilySkillsStr
-					.append(capitalizeString(skillName))
+					.append(SKILLS_EMOJI_MAP.get(skillName) + " " + capitalizeString(skillName))
 					.append(": ")
 					.append(lilyWeight.getSkillsWeight().getSkillsWeight(skillName).getFormatted())
 					.append("\n");
 			}
 			String lilyDungeonsStr =
-				"Catacombs: " +
+			DUNGEON_EMOJI_MAP.get("catacombs") + " Catacombs: " +
 				lilyWeight.getDungeonsWeight().getDungeonWeight().getFormatted() +
 				"\n" +
-				"Normal floor completions: " +
+				 DUNGEON_EMOJI_MAP.get("catacombs_1")   + " Normal floor completions: " +
 				lilyWeight.getDungeonsWeight().getDungeonCompletionWeight("normal").getFormatted() +
 				"\n" +
-				"Master floor completions: " +
+				DUNGEON_EMOJI_MAP.get("master_catacombs_1") + " Master floor completions: " +
 				lilyWeight.getDungeonsWeight().getDungeonCompletionWeight("master").getFormatted() +
 				"\n";
 

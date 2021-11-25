@@ -19,6 +19,7 @@
 package com.skyblockplus.slayer;
 
 import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Constants.SLAYER_EMOJI_MAP;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -129,17 +130,17 @@ public class SlayerCommand extends Command {
 				simplifyNumber(coinsSpentOnSlayers)
 			);
 			eb.addField(
-				"<:sven_packmaster:800002277648891914> Wolf (" + player.getSlayerLevel("sven") + ")",
+				SLAYER_EMOJI_MAP.get("sven") + " Wolf (" + player.getSlayerLevel("sven") + ")",
 				simplifyNumber(player.getSlayer("sven")) + " XP",
 				true
 			);
 			eb.addField(
-				"<:revenant_horror:800002290987302943> Zombie (" + player.getSlayerLevel("rev") + ")",
+				SLAYER_EMOJI_MAP.get("rev") +" Zombie (" + player.getSlayerLevel("rev") + ")",
 				simplifyNumber(player.getSlayer("rev")) + " XP",
 				true
 			);
 			eb.addField(
-				"<:tarantula_broodfather:800002277262884874> Spider (" + player.getSlayerLevel("tara") + ")",
+				SLAYER_EMOJI_MAP.get("tara") +" Spider (" + player.getSlayerLevel("tara") + ")",
 				simplifyNumber(player.getSlayer("tara")) + " XP",
 				true
 			);
@@ -149,7 +150,7 @@ public class SlayerCommand extends Command {
 			eb.addField("Boss Kills", taraKills, true);
 
 			eb.addField(
-				"<:voidgloom_seraph:849280131281059881> Enderman (" + player.getSlayerLevel("enderman") + ")",
+				SLAYER_EMOJI_MAP.get("ENDERMAN") + " Enderman (" + player.getSlayerLevel("enderman") + ")",
 				simplifyNumber(player.getSlayer("enderman")) + " XP",
 				true
 			);

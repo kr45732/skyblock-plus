@@ -119,5 +119,9 @@ public class AutomatedRoles {
 	@Embedded
 	private RoleModel ironman = new RoleModel();
 
-	public AutomatedRoles() {}
+	@Embedded
+	private RoleModel maxed_collections = new RoleModel();
+
+	public AutomatedRoles() {
+	}
 }

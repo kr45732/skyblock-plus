@@ -74,7 +74,10 @@ public class ServerSettingsModel {
 
 	private String pfCategoryId = "";
 
-	public ServerSettingsModel() {}
+	private String applyGuestRole = "";
+
+	public ServerSettingsModel() {
+	}
 
 	public ServerSettingsModel(String serverName, String serverId) {
 		this.serverName = serverName;
@@ -94,10 +97,14 @@ public class ServerSettingsModel {
 		copy.setAutomatedVerify(automatedVerify);
 		copy.setAutomatedGuildOne(automatedGuildOne);
 		copy.setAutomatedGuildTwo(automatedGuildTwo);
+		copy.setApplicationBlacklist(applicationBlacklist);
 		copy.setAutomatedRoles(automatedRoles);
 		copy.setSbEvent(sbEvent);
+		copy.setMee6Data(mee6Data);
 		copy.setHypixelApiKey(nullHypixelApiKey ? null : hypixelApiKey);
-
+		copy.setPrefix(prefix);
+		copy.setPfCategoryId(pfCategoryId);
+		copy.setApplyGuestRole(applyGuestRole);
 		return copy;
 	}
 }
