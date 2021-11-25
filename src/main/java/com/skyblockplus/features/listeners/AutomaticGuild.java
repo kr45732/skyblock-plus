@@ -410,14 +410,14 @@ public class AutomaticGuild {
 							if (uuidToRankMap.containsKey(discordIdToUuid.get(linkedUser.getId()))) {
 								rolesToAdd.add(guildMemberRole);
 								Role applyGuestRole = guildMap.get(guildId).applyGuestRole;
-								if (applyGuestRole != null) {
+								if (applyGuestRole != null && !inGuild.contains(linkedUser.getId())) {
 									inGuild.add(linkedUser.getId());
 									rolesToRemove.add(applyGuestRole);
 								}
 							} else {
 								rolesToRemove.add(guildMemberRole);
 								Role applyGuestRole = guildMap.get(guildId).applyGuestRole;
-								if (applyGuestRole != null) {
+								if (applyGuestRole != null && !inGuild.contains(linkedUser.getId())) {
 									rolesToAdd.add(applyGuestRole);
 								}
 							}
