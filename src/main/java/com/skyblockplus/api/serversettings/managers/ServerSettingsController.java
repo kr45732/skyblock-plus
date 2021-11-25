@@ -59,8 +59,10 @@ public class ServerSettingsController {
 	}
 
 	@GetMapping("/get/role")
-	public ResponseEntity<?> getRoleSettings(@RequestParam(value = "serverId") String serverId,
-			@RequestParam(value = "roleName") String roleName) {
+	public ResponseEntity<?> getRoleSettings(
+		@RequestParam(value = "serverId") String serverId,
+		@RequestParam(value = "roleName") String roleName
+	) {
 		return settingsService.getRoleSettings(serverId, roleName);
 	}
 
@@ -70,8 +72,10 @@ public class ServerSettingsController {
 	}
 
 	@GetMapping("/get/guild/byName")
-	public ResponseEntity<?> getGuildSettings(@RequestParam(value = "serverId") String serverId,
-			@RequestParam(value = "name") String name) {
+	public ResponseEntity<?> getGuildSettings(
+		@RequestParam(value = "serverId") String serverId,
+		@RequestParam(value = "name") String name
+	) {
 		return settingsService.getGuildSettings(serverId, name);
 	}
 

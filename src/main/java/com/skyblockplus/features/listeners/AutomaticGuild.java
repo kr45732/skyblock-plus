@@ -103,8 +103,7 @@ public class AutomaticGuild {
 		prefix = database.getPrefix(guildId);
 		try {
 			partyFinderCategory = event.getGuild().getCategoryById(database.getPartyFinderCategoryId(guildId));
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 	}
 
 	public static String getGuildPrefix(String guildId) {
@@ -121,8 +120,7 @@ public class AutomaticGuild {
 
 		for (AutomatedGuild currentSetting : currentSettings) {
 			try {
-				if (currentSetting.getApplyEnable() == null
-						|| currentSetting.getApplyEnable().equalsIgnoreCase("false")) {
+				if (currentSetting.getApplyEnable() == null || currentSetting.getApplyEnable().equalsIgnoreCase("false")) {
 					continue;
 				}
 
@@ -132,25 +130,28 @@ public class AutomaticGuild {
 				eb.setDescription(currentSetting.getApplyMessage());
 
 				try {
-					Message reactMessage = reactChannel.retrieveMessageById(currentSetting.getApplyPrevMessage())
-							.complete();
-					reactMessage.editMessageEmbeds(eb.build()).setActionRow(
-							Button.primary("create_application_button_" + currentSetting.getGuildName(), "Apply Here"))
-							.queue();
+					Message reactMessage = reactChannel.retrieveMessageById(currentSetting.getApplyPrevMessage()).complete();
+					reactMessage
+						.editMessageEmbeds(eb.build())
+						.setActionRow(Button.primary("create_application_button_" + currentSetting.getGuildName(), "Apply Here"))
+						.queue();
 
-					applyGuild.removeIf(o1 -> higherDepth(o1.currentSettings, "guildName").getAsString()
-							.equals(currentSetting.getGuildName()));
+					applyGuild.removeIf(o1 ->
+						higherDepth(o1.currentSettings, "guildName").getAsString().equals(currentSetting.getGuildName())
+					);
 					applyGuild.add(new ApplyGuild(reactMessage, gson.toJsonTree(currentSetting)));
 				} catch (Exception e) {
-					Message reactMessage = reactChannel.sendMessageEmbeds(eb.build()).setActionRow(
-							Button.primary("create_application_button_" + currentSetting.getGuildName(), "Apply Here"))
-							.complete();
+					Message reactMessage = reactChannel
+						.sendMessageEmbeds(eb.build())
+						.setActionRow(Button.primary("create_application_button_" + currentSetting.getGuildName(), "Apply Here"))
+						.complete();
 
 					currentSetting.setApplyPrevMessage(reactMessage.getId());
 					database.setGuildSettings(event.getGuild().getId(), gson.toJsonTree(currentSetting));
 
-					applyGuild.removeIf(o1 -> higherDepth(o1.currentSettings, "guildName").getAsString()
-							.equals(currentSetting.getGuildName()));
+					applyGuild.removeIf(o1 ->
+						higherDepth(o1.currentSettings, "guildName").getAsString().equals(currentSetting.getGuildName())
+					);
 					applyGuild.add(new ApplyGuild(reactMessage, gson.toJsonTree(currentSetting)));
 				}
 			} catch (Exception e) {
@@ -185,8 +186,7 @@ public class AutomaticGuild {
 					for (Iterator<ApplyGuild> iterator = applyGuild.iterator(); iterator.hasNext();) {
 						ApplyGuild applyG = iterator.next();
 
-						if (higherDepth(applyG.currentSettings, "guildName").getAsString()
-								.equals(currentSetting.getGuildName())) {
+						if (higherDepth(applyG.currentSettings, "guildName").getAsString().equals(currentSetting.getGuildName())) {
 							curApplyUsers.addAll(applyG.applyUserList);
 							iterator.remove();
 							break;
@@ -194,20 +194,19 @@ public class AutomaticGuild {
 					}
 
 					try {
-						Message reactMessage = reactChannel.retrieveMessageById(currentSetting.getApplyPrevMessage())
-								.complete();
-						reactMessage.editMessageEmbeds(eb.build())
-								.setActionRow(Button.primary(
-										"create_application_button_" + currentSetting.getGuildName(), "Apply Here"))
-								.queue();
+						Message reactMessage = reactChannel.retrieveMessageById(currentSetting.getApplyPrevMessage()).complete();
+						reactMessage
+							.editMessageEmbeds(eb.build())
+							.setActionRow(Button.primary("create_application_button_" + currentSetting.getGuildName(), "Apply Here"))
+							.queue();
 
 						applyGuild.add(new ApplyGuild(reactMessage, gson.toJsonTree(currentSetting), curApplyUsers));
 						applyStr.append("• Reloaded `").append(currentSetting.getGuildName()).append("`\n");
 					} catch (Exception e) {
-						Message reactMessage = reactChannel.sendMessageEmbeds(eb.build())
-								.setActionRow(Button.primary(
-										"create_application_button_" + currentSetting.getGuildName(), "Apply Here"))
-								.complete();
+						Message reactMessage = reactChannel
+							.sendMessageEmbeds(eb.build())
+							.setActionRow(Button.primary("create_application_button_" + currentSetting.getGuildName(), "Apply Here"))
+							.complete();
 
 						currentSetting.setApplyPrevMessage(reactMessage.getId());
 						database.setGuildSettings(guild.getId(), gson.toJsonTree(currentSetting));
@@ -216,16 +215,20 @@ public class AutomaticGuild {
 						applyStr.append("• Reloaded `").append(currentSetting.getGuildName()).append("`\n");
 					}
 				} else {
-					applyGuild.removeIf(o1 -> higherDepth(o1.currentSettings, "guildName").getAsString()
-							.equals(currentSetting.getGuildName()));
+					applyGuild.removeIf(o1 ->
+						higherDepth(o1.currentSettings, "guildName").getAsString().equals(currentSetting.getGuildName())
+					);
 					applyStr.append("• `").append(currentSetting.getGuildName()).append("` is disabled\n");
 				}
 			} catch (Exception e) {
 				log.error("Reload apply constructor error - " + guildId, e);
 				if (e.getMessage() != null && e.getMessage().contains("Missing permission")) {
-					applyStr.append("• Error Reloading for `").append(currentSetting.getGuildName())
-							.append("` - missing permission(s): ")
-							.append(e.getMessage().split("Missing permission: ")[1]).append("\n");
+					applyStr
+						.append("• Error Reloading for `")
+						.append(currentSetting.getGuildName())
+						.append("` - missing permission(s): ")
+						.append(e.getMessage().split("Missing permission: ")[1])
+						.append("\n");
 				} else {
 					applyStr.append("• Error Reloading for `").append(currentSetting.getGuildName()).append("`\n");
 				}
@@ -242,31 +245,33 @@ public class AutomaticGuild {
 		}
 
 		try {
-			if (higherDepth(currentSettings, "enable") == null || (higherDepth(currentSettings, "enable") != null
-					&& !higherDepth(currentSettings, "enable").getAsBoolean())) {
+			if (
+				higherDepth(currentSettings, "enable") == null ||
+				(higherDepth(currentSettings, "enable") != null && !higherDepth(currentSettings, "enable").getAsBoolean())
+			) {
 				return;
 			}
 
 			if (higherDepth(currentSettings, "enable").getAsBoolean()) {
-				TextChannel reactChannel = event.getGuild()
-						.getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
+				TextChannel reactChannel = event
+					.getGuild()
+					.getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
 				try {
 					Message reactMessage = reactChannel
-							.retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString())
-							.complete();
+						.retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString())
+						.complete();
 					if (reactMessage != null) {
 						reactMessage.editMessage(higherDepth(currentSettings, "messageText").getAsString()).queue();
 
 						verifyGuild = new VerifyGuild(reactChannel, reactMessage, currentSettings, guildId);
 						return;
 					}
-				} catch (Exception ignored) {
-				}
+				} catch (Exception ignored) {}
 
 				Message reactMessage = reactChannel
-						.sendMessage(higherDepth(currentSettings, "messageText").getAsString())
-						.addFile(new File("src/main/java/com/skyblockplus/features/verify/Link_Discord_To_Hypixel.mp4"))
-						.complete();
+					.sendMessage(higherDepth(currentSettings, "messageText").getAsString())
+					.addFile(new File("src/main/java/com/skyblockplus/features/verify/Link_Discord_To_Hypixel.mp4"))
+					.complete();
 
 				JsonObject newSettings = currentSettings.getAsJsonObject();
 				newSettings.addProperty("previousMessageId", reactMessage.getId());
@@ -292,25 +297,23 @@ public class AutomaticGuild {
 
 		try {
 			if (higherDepth(currentSettings, "enable").getAsBoolean()) {
-				TextChannel reactChannel = guild
-						.getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
+				TextChannel reactChannel = guild.getTextChannelById(higherDepth(currentSettings, "messageTextChannelId").getAsString());
 				try {
 					Message reactMessage = reactChannel
-							.retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString())
-							.complete();
+						.retrieveMessageById(higherDepth(currentSettings, "previousMessageId").getAsString())
+						.complete();
 					if (reactMessage != null) {
 						reactMessage.editMessage(higherDepth(currentSettings, "messageText").getAsString()).queue();
 
 						verifyGuild = new VerifyGuild(reactChannel, reactMessage, currentSettings, guildId);
 						return "Reloaded";
 					}
-				} catch (Exception ignored) {
-				}
+				} catch (Exception ignored) {}
 
 				Message reactMessage = reactChannel
-						.sendMessage(higherDepth(currentSettings, "messageText").getAsString())
-						.addFile(new File("src/main/java/com/skyblockplus/features/verify/Link_Discord_To_Hypixel.mp4"))
-						.complete();
+					.sendMessage(higherDepth(currentSettings, "messageText").getAsString())
+					.addFile(new File("src/main/java/com/skyblockplus/features/verify/Link_Discord_To_Hypixel.mp4"))
+					.complete();
 
 				JsonObject newSettings = currentSettings.getAsJsonObject();
 				newSettings.addProperty("previousMessageId", reactMessage.getId());
@@ -348,11 +351,12 @@ public class AutomaticGuild {
 				AutomatedGuild curSettings = currentSettings.get(i);
 				if (curSettings.getGuildName() == null) {
 					currentSettings.remove(i);
-				} else if (curSettings.getGuildMemberRoleEnable().equalsIgnoreCase("true")
-						|| curSettings.getGuildRanksEnable().equalsIgnoreCase("true")) {
+				} else if (
+					curSettings.getGuildMemberRoleEnable().equalsIgnoreCase("true") ||
+					curSettings.getGuildRanksEnable().equalsIgnoreCase("true")
+				) {
 					anyGuildRoleRankEnable = true;
-				} else if (curSettings.getGuildCounterEnable() == null
-						|| curSettings.getGuildCounterEnable().equalsIgnoreCase("false")) {
+				} else if (curSettings.getGuildCounterEnable() == null || curSettings.getGuildCounterEnable().equalsIgnoreCase("false")) {
 					currentSettings.remove(i);
 				}
 			}
@@ -366,14 +370,18 @@ public class AutomaticGuild {
 			Map<String, String> discordIdToUuid = new HashMap<>();
 			int counterUpdate = 0;
 			if (anyGuildRoleRankEnable) {
-				database.getLinkedUsers().forEach(
-						linkedUser -> discordIdToUuid.put(linkedUser.getDiscordId(), linkedUser.getMinecraftUuid()));
+				database
+					.getLinkedUsers()
+					.forEach(linkedUser -> discordIdToUuid.put(linkedUser.getDiscordId(), linkedUser.getMinecraftUuid()));
 
 				CountDownLatch latch = new CountDownLatch(1);
-				guild.findMembers(member -> discordIdToUuid.containsKey(member.getId())).onSuccess(members -> {
-					inGuildUsers.addAll(members);
-					latch.countDown();
-				}).onError(error -> latch.countDown());
+				guild
+					.findMembers(member -> discordIdToUuid.containsKey(member.getId()))
+					.onSuccess(members -> {
+						inGuildUsers.addAll(members);
+						latch.countDown();
+					})
+					.onError(error -> latch.countDown());
 
 				try {
 					latch.await(15, TimeUnit.SECONDS);
@@ -396,12 +404,13 @@ public class AutomaticGuild {
 				if (enableGuildRanks || enableGuildRole) {
 					Map<String, String> uuidToRankMap = new HashMap<>();
 					for (JsonElement guildMember : guildMembers) {
-						uuidToRankMap.put(higherDepth(guildMember, "uuid").getAsString(),
-								higherDepth(guildMember, "rank").getAsString().replace(" ", "_"));
+						uuidToRankMap.put(
+							higherDepth(guildMember, "uuid").getAsString(),
+							higherDepth(guildMember, "rank").getAsString().replace(" ", "_")
+						);
 					}
 
-					Role guildMemberRole = enableGuildRole ? guild.getRoleById(currentSetting.getGuildMemberRole())
-							: null;
+					Role guildMemberRole = enableGuildRole ? guild.getRoleById(currentSetting.getGuildMemberRole()) : null;
 					for (Member linkedUser : inGuildUsers) {
 						List<Role> rolesToAdd = new ArrayList<>();
 						List<Role> rolesToRemove = new ArrayList<>();
@@ -444,15 +453,13 @@ public class AutomaticGuild {
 
 						try {
 							guild.modifyMemberRoles(linkedUser, rolesToAdd, rolesToRemove).complete();
-						} catch (Exception ignored) {
-						}
+						} catch (Exception ignored) {}
 
 						memberCountList.add(linkedUser.getId());
 					}
 				}
 
-				if (currentSetting.getGuildCounterEnable() != null
-						&& currentSetting.getGuildCounterEnable().equals("true")) {
+				if (currentSetting.getGuildCounterEnable() != null && currentSetting.getGuildCounterEnable().equals("true")) {
 					VoiceChannel curVc;
 					try {
 						curVc = guild.getVoiceChannelById(currentSetting.getGuildCounterChannel());
@@ -467,23 +474,27 @@ public class AutomaticGuild {
 					}
 
 					if (curVc.getName().split(":").length == 2) {
-						curVc.getManager()
-								.setName(curVc.getName().split(":")[0].trim() + ": " + guildMembers.size() + "/125")
-								.complete();
+						curVc.getManager().setName(curVc.getName().split(":")[0].trim() + ": " + guildMembers.size() + "/125").complete();
 					} else {
-						curVc.getManager().setName(
-								response.get("name").getAsString() + " Members: " + guildMembers.size() + "/125")
-								.complete();
+						curVc
+							.getManager()
+							.setName(response.get("name").getAsString() + " Members: " + guildMembers.size() + "/125")
+							.complete();
 					}
 
 					counterUpdate++;
 				}
 			}
 
-			logCommand(guild,
-					"Guild Role | Users (" + memberCountList.size() + ") | Time ("
-							+ ((System.currentTimeMillis() - startTime) / 1000) + "s)"
-							+ (counterUpdate > 0 ? " | Counters (" + counterUpdate + ")" : ""));
+			logCommand(
+				guild,
+				"Guild Role | Users (" +
+				memberCountList.size() +
+				") | Time (" +
+				((System.currentTimeMillis() - startTime) / 1000) +
+				"s)" +
+				(counterUpdate > 0 ? " | Counters (" + counterUpdate + ")" : "")
+			);
 		} catch (Exception e) {
 			log.error("updateGuild - " + guildId, e);
 		}
@@ -498,8 +509,7 @@ public class AutomaticGuild {
 		try {
 			if (database.getSkyblockEventActive(guildId)) {
 				JsonElement currentSettings = database.getSkyblockEventSettings(guildId);
-				Instant endingTime = Instant
-						.ofEpochSecond(higherDepth(currentSettings, "timeEndingSeconds").getAsLong());
+				Instant endingTime = Instant.ofEpochSecond(higherDepth(currentSettings, "timeEndingSeconds").getAsLong());
 				if (Duration.between(Instant.now(), endingTime).toMinutes() <= 5) {
 					endSkyblockEvent(guildId);
 				}
@@ -530,8 +540,7 @@ public class AutomaticGuild {
 		}
 
 		currentMee6Settings = currentSettings;
-		boolean enabled = higherDepth(currentSettings, "enable") != null
-				&& higherDepth(currentSettings, "enable").getAsBoolean();
+		boolean enabled = higherDepth(currentSettings, "enable") != null && higherDepth(currentSettings, "enable").getAsBoolean();
 		return "Mee6 roles are " + (enabled ? "enabled" : "disabled");
 	}
 
@@ -575,8 +584,7 @@ public class AutomaticGuild {
 							if (playerLevel >= higherDepth(curRole, "value", 0)) {
 								toAdd.add(event.getGuild().getRoleById(higherDepth(curRole, "roleId").getAsString()));
 							} else {
-								toRemove.add(
-										event.getGuild().getRoleById(higherDepth(curRole, "roleId").getAsString()));
+								toRemove.add(event.getGuild().getRoleById(higherDepth(curRole, "roleId").getAsString()));
 							}
 						}
 						event.getGuild().modifyMemberRoles(member, toAdd, toRemove).queue();
@@ -593,9 +601,11 @@ public class AutomaticGuild {
 
 	public JsonArray getMee6Leaderboard(int pageNumber) {
 		try {
-			return higherDepth(getJson(
-					"https://mee6.xyz/api/plugins/levels/leaderboard/" + guildId + "?limit=1000&page=" + pageNumber),
-					"players").getAsJsonArray();
+			return higherDepth(
+				getJson("https://mee6.xyz/api/plugins/levels/leaderboard/" + guildId + "?limit=1000&page=" + pageNumber),
+				"players"
+			)
+				.getAsJsonArray();
 		} catch (Exception e) {
 			return null;
 		}
@@ -607,21 +617,30 @@ public class AutomaticGuild {
 	}
 
 	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
-		if (event.getGuild().getId().equals("796790757947867156")
-				&& event.getChannel().getId().equals("869278025018114108")) {
-			if (event.getMessage().getEmbeds().size() > 0
-					&& event.getMessage().getEmbeds().get(0).getDescription() != null
-					&& event.getMessage().getEmbeds().get(0).getDescription()
-							.contains("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO/commit/")) {
+		if (event.getGuild().getId().equals("796790757947867156") && event.getChannel().getId().equals("869278025018114108")) {
+			if (
+				event.getMessage().getEmbeds().size() > 0 &&
+				event.getMessage().getEmbeds().get(0).getDescription() != null &&
+				event
+					.getMessage()
+					.getEmbeds()
+					.get(0)
+					.getDescription()
+					.contains("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO/commit/")
+			) {
 				if (IS_API) {
 					updateItemMappings();
 				}
 
-				scheduler.schedule(() -> {
-					internalJsonMappings = null;
-					getInternalJsonMappings();
-					refreshPriceOverrideJson();
-				}, 5, TimeUnit.MINUTES);
+				scheduler.schedule(
+					() -> {
+						internalJsonMappings = null;
+						getInternalJsonMappings();
+						refreshPriceOverrideJson();
+					},
+					5,
+					TimeUnit.MINUTES
+				);
 			}
 			return;
 		}
@@ -650,9 +669,12 @@ public class AutomaticGuild {
 			event.deferReply(true).complete();
 
 			if (event.getComponentId().equals("event_message_join")) {
-				event.getHook().editOriginalEmbeds(SkyblockEventCommand
-						.joinSkyblockEvent(event.getGuild().getId(), event.getUser().getId(), new String[0]).build())
-						.queue();
+				event
+					.getHook()
+					.editOriginalEmbeds(
+						SkyblockEventCommand.joinSkyblockEvent(event.getGuild().getId(), event.getUser().getId(), new String[0]).build()
+					)
+					.queue();
 			} else {
 				EmbedBuilder eb = SkyblockEventCommand.getEventLeaderboard(event);
 				if (eb != null) {
@@ -664,27 +686,22 @@ public class AutomaticGuild {
 			event.deferReply().complete();
 
 			if (!event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
-				event.getHook().editOriginal("❌ You must have the Administrator permission in this Guild to use that!")
-						.queue();
+				event.getHook().editOriginal("❌ You must have the Administrator permission in this Guild to use that!").queue();
 				return;
 			}
 
-			SetupCommandHandler handler = new SetupCommandHandler(event,
-					event.getComponentId().split("setup_command_")[1]);
+			SetupCommandHandler handler = new SetupCommandHandler(event, event.getComponentId().split("setup_command_")[1]);
 			if (handler.isValid()) {
 				return;
 			}
-		} else if (event.getButton().getId().startsWith("apply_user_")
-				&& !event.getButton().getId().startsWith("apply_user_wait_")) {
+		} else if (event.getButton().getId().startsWith("apply_user_") && !event.getButton().getId().startsWith("apply_user_wait_")) {
 			event.deferReply().complete();
 		} else if (event.getButton().getId().startsWith("party_finder_channel_close_")) {
-			if (event.getUser().getId()
-					.equalsIgnoreCase(event.getButton().getId().split("party_finder_channel_close_")[1])) {
+			if (event.getUser().getId().equalsIgnoreCase(event.getButton().getId().split("party_finder_channel_close_")[1])) {
 				event.replyEmbeds(defaultEmbed("Party Finder").setDescription("Closing channel").build()).queue();
 				event.getTextChannel().delete().queueAfter(5, TimeUnit.SECONDS);
 			} else {
-				event.replyEmbeds(invalidEmbed("Only the party leader can close the channel").build())
-						.setEphemeral(true).queue();
+				event.replyEmbeds(invalidEmbed("Only the party leader can close the channel").build()).setEphemeral(true).queue();
 			}
 			return;
 		} else {
@@ -724,8 +741,7 @@ public class AutomaticGuild {
 	public void schedulerConstructor() {
 		int eventDelay = (int) (Math.random() * 60 + 1);
 		scheduledFutures.add(scheduler.scheduleWithFixedDelay(this::updateGuild, eventDelay, 180, TimeUnit.MINUTES));
-		scheduledFutures
-				.add(scheduler.scheduleWithFixedDelay(this::updateSkyblockEvent, eventDelay, 60, TimeUnit.MINUTES));
+		scheduledFutures.add(scheduler.scheduleWithFixedDelay(this::updateSkyblockEvent, eventDelay, 60, TimeUnit.MINUTES));
 	}
 
 	public void setPrefix(String prefix) {
@@ -746,35 +762,39 @@ public class AutomaticGuild {
 			}
 			skyblockPlusDir.mkdir();
 
-			Git neuRepo = Git.cloneRepository().setURI("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO.git")
-					.setDirectory(neuDir).call();
+			Git neuRepo = Git
+				.cloneRepository()
+				.setURI("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO.git")
+				.setDirectory(neuDir)
+				.call();
 
-			Git skyblockPlusDataRepo = Git.cloneRepository().setURI("https://github.com/kr45732/skyblock-plus-data.git")
-					.setDirectory(skyblockPlusDir).call();
+			Git skyblockPlusDataRepo = Git
+				.cloneRepository()
+				.setURI("https://github.com/kr45732/skyblock-plus-data.git")
+				.setDirectory(skyblockPlusDir)
+				.call();
 
 			JsonElement currentPriceOverrides = JsonParser.parseReader(
-					new FileReader("src/main/java/com/skyblockplus/json/skyblock_plus/PriceOverrides.json"));
-			try (Writer writer = new FileWriter(
-					"src/main/java/com/skyblockplus/json/skyblock_plus/PriceOverrides.json")) {
+				new FileReader("src/main/java/com/skyblockplus/json/skyblock_plus/PriceOverrides.json")
+			);
+			try (Writer writer = new FileWriter("src/main/java/com/skyblockplus/json/skyblock_plus/PriceOverrides.json")) {
 				formattedGson.toJson(getUpdatedPriceOverridesJson(currentPriceOverrides), writer);
 				writer.flush();
 			}
 
-			try (Writer writer = new FileWriter(
-					"src/main/java/com/skyblockplus/json/skyblock_plus/InternalNameMappings.json")) {
+			try (Writer writer = new FileWriter("src/main/java/com/skyblockplus/json/skyblock_plus/InternalNameMappings.json")) {
 				formattedGson.toJson(getUpdatedItemMappingsJson(), writer);
 				writer.flush();
 			}
 
-			skyblockPlusDataRepo.add().addFilepattern("InternalNameMappings.json").addFilepattern("PriceOverrides.json")
-					.call();
-			skyblockPlusDataRepo.commit().setAuthor("kr45632", "52721908+kr45732@users.noreply.github.com")
-					.setCommitter("kr45632", "52721908+kr45732@users.noreply.github.com")
-					.setMessage("Automatic update (" + neuRepo.log().setMaxCount(1).call().iterator().next().getName()
-							+ ")")
-					.call();
-			skyblockPlusDataRepo.push()
-					.setCredentialsProvider(new UsernamePasswordCredentialsProvider(GITHUB_TOKEN, "")).call();
+			skyblockPlusDataRepo.add().addFilepattern("InternalNameMappings.json").addFilepattern("PriceOverrides.json").call();
+			skyblockPlusDataRepo
+				.commit()
+				.setAuthor("kr45632", "52721908+kr45732@users.noreply.github.com")
+				.setCommitter("kr45632", "52721908+kr45732@users.noreply.github.com")
+				.setMessage("Automatic update (" + neuRepo.log().setMaxCount(1).call().iterator().next().getName() + ")")
+				.call();
+			skyblockPlusDataRepo.push().setCredentialsProvider(new UsernamePasswordCredentialsProvider(GITHUB_TOKEN, "")).call();
 
 			FileUtils.deleteDirectory(neuDir);
 			FileUtils.deleteDirectory(skyblockPlusDir);
@@ -795,8 +815,7 @@ public class AutomaticGuild {
 		rarityMapRev.put("1", "Uncommon");
 		rarityMapRev.put("0", "Common");
 
-		for (File child : Arrays.stream(dir.listFiles()).sorted(Comparator.comparing(File::getName))
-				.collect(Collectors.toList())) {
+		for (File child : Arrays.stream(dir.listFiles()).sorted(Comparator.comparing(File::getName)).collect(Collectors.toList())) {
 			try {
 				JsonElement itemJson = JsonParser.parseReader(new FileReader(child));
 				String itemName = parseMcCodes(higherDepth(itemJson, "displayname").getAsString()).replace("�", "");
@@ -818,9 +837,7 @@ public class AutomaticGuild {
 				JsonObject toAdd = new JsonObject();
 				toAdd.addProperty("name", itemName);
 				// toAdd.add("recipe", higherDepth(itemJson, "recipe"));
-				toAdd.add("wiki",
-						higherDepth(itemJson, "infoType", "").equals("WIKI_URL") ? higherDepth(itemJson, "info.[0]")
-								: null);
+				toAdd.add("wiki", higherDepth(itemJson, "infoType", "").equals("WIKI_URL") ? higherDepth(itemJson, "info.[0]") : null);
 
 				outputObj.add(itemId, toAdd);
 			} catch (Exception e) {
@@ -853,19 +870,19 @@ public class AutomaticGuild {
 					try {
 						higherDepth(bazaarJson, id + ".sell_summary.[0].pricePerUnit").getAsDouble();
 						continue;
-					} catch (Exception ignored) {
-					}
+					} catch (Exception ignored) {}
 
 					for (JsonElement itemPrice : sbzPricesJson) {
 						String itemNamePrice = higherDepth(itemPrice, "name").getAsString();
-						if (itemNamePrice.equalsIgnoreCase(id)
-								|| itemNamePrice.equalsIgnoreCase(name.replace(" ", "_"))) {
+						if (itemNamePrice.equalsIgnoreCase(id) || itemNamePrice.equalsIgnoreCase(name.replace(" ", "_"))) {
 							long sbzPrice = higherDepth(itemPrice, "low").getAsLong();
 							long binPrice = higherDepth(binJson, id, Long.MAX_VALUE);
 							long averagePrice = higherDepth(averageJson, id) != null
-									? Math.min(higherDepth(averageJson, id + ".price", Long.MAX_VALUE),
-											higherDepth(averageJson, id + ".clean_price", Long.MAX_VALUE))
-									: Long.MAX_VALUE;
+								? Math.min(
+									higherDepth(averageJson, id + ".price", Long.MAX_VALUE),
+									higherDepth(averageJson, id + ".clean_price", Long.MAX_VALUE)
+								)
+								: Long.MAX_VALUE;
 							long minPrice = Math.min(sbzPrice, Math.min(binPrice, averagePrice));
 							if (minPrice != Long.MAX_VALUE) {
 								price = minPrice;

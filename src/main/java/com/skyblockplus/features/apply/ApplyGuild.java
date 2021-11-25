@@ -45,13 +45,11 @@ public class ApplyGuild {
 	public ApplyGuild(Message reactMessage, JsonElement currentSettings) {
 		this.reactMessage = reactMessage;
 		this.currentSettings = currentSettings;
-		this.applyUserList = getApplyGuildUsersCache(reactMessage.getGuild().getId(),
-				higherDepth(currentSettings, "guildName").getAsString());
+		this.applyUserList =
+			getApplyGuildUsersCache(reactMessage.getGuild().getId(), higherDepth(currentSettings, "guildName").getAsString());
 		try {
-			this.waitInviteChannel = jda
-					.getTextChannelById(higherDepth(currentSettings, "applyWaitingChannel").getAsString());
-		} catch (Exception ignored) {
-		}
+			this.waitInviteChannel = jda.getTextChannelById(higherDepth(currentSettings, "applyWaitingChannel").getAsString());
+		} catch (Exception ignored) {}
 	}
 
 	public ApplyGuild(Message reactMessage, JsonElement currentSettings, List<ApplyUser> prevApplyUsers) {
@@ -68,8 +66,11 @@ public class ApplyGuild {
 	}
 
 	public void onMessageReactionAdd_ExistingApplyUser(MessageReactionAddEvent event) {
-		ApplyUser findApplyUser = applyUserList.stream()
-				.filter(applyUser -> applyUser.reactMessageId.equals(event.getMessageId())).findFirst().orElse(null);
+		ApplyUser findApplyUser = applyUserList
+			.stream()
+			.filter(applyUser -> applyUser.reactMessageId.equals(event.getMessageId()))
+			.findFirst()
+			.orElse(null);
 
 		if (findApplyUser != null) {
 			if (findApplyUser.onMessageReactionAdd(event)) {
@@ -79,9 +80,10 @@ public class ApplyGuild {
 	}
 
 	public void onTextChannelDelete(TextChannelDeleteEvent event) {
-		applyUserList.removeIf(applyUser -> (applyUser.applicationChannelId != null
-				&& applyUser.applicationChannelId.equals(event.getChannel().getId()))
-				|| (applyUser.staffChannelId != null && applyUser.staffChannelId.equals(event.getChannel().getId())));
+		applyUserList.removeIf(applyUser ->
+			(applyUser.applicationChannelId != null && applyUser.applicationChannelId.equals(event.getChannel().getId())) ||
+			(applyUser.staffChannelId != null && applyUser.staffChannelId.equals(event.getChannel().getId()))
+		);
 	}
 
 	public String onButtonClick_NewApplyUser(ButtonClickEvent event) {
@@ -89,38 +91,43 @@ public class ApplyGuild {
 			return null;
 		}
 
-		if (!event.getButton().getId()
-				.equals("create_application_button_" + higherDepth(currentSettings, "guildName").getAsString())) {
+		if (!event.getButton().getId().equals("create_application_button_" + higherDepth(currentSettings, "guildName").getAsString())) {
 			return null;
 		}
 
-		ApplyUser runningApplication = applyUserList.stream()
-				.filter(o1 -> o1.applyingUserId.equals(event.getUser().getId())).findFirst().orElse(null);
+		ApplyUser runningApplication = applyUserList
+			.stream()
+			.filter(o1 -> o1.applyingUserId.equals(event.getUser().getId()))
+			.findFirst()
+			.orElse(null);
 
 		if (runningApplication != null) {
 			return "❌ There is already an application open in <#" + runningApplication.applicationChannelId + ">";
 		}
 
 		JsonElement linkedAccount = database.getLinkedUserByDiscordId(event.getUser().getId());
-		if (linkedAccount.isJsonNull()
-				|| !higherDepth(linkedAccount, "discordId").getAsString().equals((event.getUser().getId()))) {
+		if (linkedAccount.isJsonNull() || !higherDepth(linkedAccount, "discordId").getAsString().equals((event.getUser().getId()))) {
 			if (linkedAccount.isJsonNull()) {
 				return "❌ You are not linked to the bot. Please run `+link [IGN]` and try again.";
 			} else {
-				return ("❌ Account " + higherDepth(linkedAccount, "minecraftUsername").getAsString()
-						+ " is linked with the Discord tag "
-						+ jda.retrieveUserById(higherDepth(linkedAccount, "discordId").getAsString()).complete()
-								.getAsTag()
-						+ "\nYour current Discord tag is " + event.getUser().getAsTag()
-						+ ".\nPlease relink and try again");
+				return (
+					"❌ Account " +
+					higherDepth(linkedAccount, "minecraftUsername").getAsString() +
+					" is linked with the Discord tag " +
+					jda.retrieveUserById(higherDepth(linkedAccount, "discordId").getAsString()).complete().getAsTag() +
+					"\nYour current Discord tag is " +
+					event.getUser().getAsTag() +
+					".\nPlease relink and try again"
+				);
 			}
 		}
 		JsonElement blacklisted = streamJsonArray(database.getApplyBlacklist(event.getGuild().getId()))
-				.filter(blacklist -> higherDepth(blacklist, "uuid").getAsString()
-						.equals(higherDepth(linkedAccount, "minecraftUuid").getAsString())
-						|| higherDepth(blacklist, "username").getAsString()
-								.equals(higherDepth(linkedAccount, "minecraftUsername").getAsString()))
-				.findFirst().orElse(null);
+			.filter(blacklist ->
+				higherDepth(blacklist, "uuid").getAsString().equals(higherDepth(linkedAccount, "minecraftUuid").getAsString()) ||
+				higherDepth(blacklist, "username").getAsString().equals(higherDepth(linkedAccount, "minecraftUsername").getAsString())
+			)
+			.findFirst()
+			.orElse(null);
 		if (blacklisted != null) {
 			return "❌ You have been blacklisted with reason `" + higherDepth(blacklisted, "reason").getAsString() + "`";
 		}
@@ -134,16 +141,14 @@ public class ApplyGuild {
 			}
 		}
 
-		ApplyUser toAdd = new ApplyUser(event, currentSettings,
-				higherDepth(linkedAccount, "minecraftUsername").getAsString());
+		ApplyUser toAdd = new ApplyUser(event, currentSettings, higherDepth(linkedAccount, "minecraftUsername").getAsString());
 		if (toAdd.failCause != null) {
 			return "❌ " + toAdd.failCause;
 		}
 
 		applyUserList.add(toAdd);
 
-		return "✅ A new application was created in "
-				+ event.getGuild().getTextChannelById(toAdd.applicationChannelId).getAsMention();
+		return "✅ A new application was created in " + event.getGuild().getTextChannelById(toAdd.applicationChannelId).getAsMention();
 	}
 
 	public String onButtonClick(ButtonClickEvent event) {
@@ -161,8 +166,11 @@ public class ApplyGuild {
 	}
 
 	public boolean onButtonClick_CurrentApplyUser(ButtonClickEvent event) {
-		ApplyUser findApplyUser = applyUserList.stream()
-				.filter(applyUser -> applyUser.reactMessageId.equals(event.getMessageId())).findFirst().orElse(null);
+		ApplyUser findApplyUser = applyUserList
+			.stream()
+			.filter(applyUser -> applyUser.reactMessageId.equals(event.getMessageId()))
+			.findFirst()
+			.orElse(null);
 
 		return findApplyUser != null && findApplyUser.onButtonClick(event, this);
 	}
@@ -172,8 +180,7 @@ public class ApplyGuild {
 			return null;
 		}
 
-		if (!event.getComponentId()
-				.startsWith("apply_user_wait_" + higherDepth(currentSettings, "guildName").getAsString())) {
+		if (!event.getComponentId().startsWith("apply_user_wait_" + higherDepth(currentSettings, "guildName").getAsString())) {
 			return null;
 		}
 
@@ -182,8 +189,7 @@ public class ApplyGuild {
 			boolean hasStaffRole = false;
 			if (staffPingRoles.size() != 0) {
 				for (JsonElement staffPingRole : staffPingRoles) {
-					if (event.getMember().getRoles()
-							.contains(event.getGuild().getRoleById(staffPingRole.getAsString()))) {
+					if (event.getMember().getRoles().contains(event.getGuild().getRoleById(staffPingRole.getAsString()))) {
 						hasStaffRole = true;
 						break;
 					}
@@ -196,20 +202,16 @@ public class ApplyGuild {
 		}
 
 		try {
-			String[] channelRoleSplit = event.getComponentId()
-					.split("apply_user_wait_" + higherDepth(currentSettings, "guildName").getAsString() + "_")[1]
-							.split("_");
+			String[] channelRoleSplit = event
+				.getComponentId()
+				.split("apply_user_wait_" + higherDepth(currentSettings, "guildName").getAsString() + "_")[1].split("_");
 			TextChannel toCloseChannel = event.getGuild().getTextChannelById(channelRoleSplit[0]);
 			try {
-				event.getGuild()
-						.addRoleToMember(event.getUser().getId(), event.getGuild().getRoleById(channelRoleSplit[1]))
-						.queue();
-			} catch (Exception ignored) {
-			}
+				event.getGuild().addRoleToMember(event.getUser().getId(), event.getGuild().getRoleById(channelRoleSplit[1])).queue();
+			} catch (Exception ignored) {}
 			toCloseChannel.sendMessageEmbeds(defaultEmbed("Closing channel").build()).queue();
 			toCloseChannel.delete().reason("Application closed").queueAfter(10, TimeUnit.SECONDS);
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 
 		event.getMessage().delete().queueAfter(3, TimeUnit.SECONDS);
 		return "✅ Player was invited";

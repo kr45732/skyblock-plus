@@ -110,8 +110,7 @@ public class Database {
 	}
 
 	public int setVerifySettings(String serverId, JsonElement newVerifySettings) {
-		return settingsService.setVerifySettings(serverId, gson.fromJson(newVerifySettings, AutomatedVerify.class))
-				.getStatusCodeValue();
+		return settingsService.setVerifySettings(serverId, gson.fromJson(newVerifySettings, AutomatedVerify.class)).getStatusCodeValue();
 	}
 
 	public JsonElement getRolesSettings(String serverId) {
@@ -119,8 +118,7 @@ public class Database {
 	}
 
 	public int setRolesSettings(String serverId, JsonElement newRoleSettings) {
-		return settingsService.setRolesSettings(serverId, gson.fromJson(newRoleSettings, AutomatedRoles.class))
-				.getStatusCodeValue();
+		return settingsService.setRolesSettings(serverId, gson.fromJson(newRoleSettings, AutomatedRoles.class)).getStatusCodeValue();
 	}
 
 	public boolean serverByServerIdExists(String serverId) {
@@ -132,8 +130,7 @@ public class Database {
 	}
 
 	public int setRoleSettings(String serverId, String roleName, JsonElement newRoleSettings) {
-		return settingsService.setRoleSettings(serverId, gson.fromJson(newRoleSettings, RoleModel.class), roleName)
-				.getStatusCodeValue();
+		return settingsService.setRoleSettings(serverId, gson.fromJson(newRoleSettings, RoleModel.class), roleName).getStatusCodeValue();
 	}
 
 	public int setApplyCacheSettings(String serverId, String name, String currentSettings) {
@@ -142,8 +139,7 @@ public class Database {
 
 	public JsonArray getApplyCacheSettings(String serverId, String name) {
 		try {
-			return JsonParser.parseString((String) settingsService.getApplyUsersCache(serverId, name).getBody())
-					.getAsJsonArray();
+			return JsonParser.parseString((String) settingsService.getApplyUsersCache(serverId, name).getBody()).getAsJsonArray();
 		} catch (Exception e) {
 			return new JsonArray();
 		}
@@ -178,13 +174,11 @@ public class Database {
 	}
 
 	public int setApplyReqs(String serverId, String name, JsonArray newApplyReqs) {
-		return settingsService.setApplyReqs(serverId, name, gson.fromJson(newApplyReqs, ApplyRequirements[].class))
-				.getStatusCodeValue();
+		return settingsService.setApplyReqs(serverId, name, gson.fromJson(newApplyReqs, ApplyRequirements[].class)).getStatusCodeValue();
 	}
 
 	public int setVerifyRolesSettings(String serverId, JsonArray newSettings) {
-		return settingsService.setVerifyRolesSettings(serverId, gson.fromJson(newSettings, String[].class))
-				.getStatusCodeValue();
+		return settingsService.setVerifyRolesSettings(serverId, gson.fromJson(newSettings, String[].class)).getStatusCodeValue();
 	}
 
 	public String getServerHypixelApiKey(String serverId) {
@@ -201,8 +195,7 @@ public class Database {
 	}
 
 	public int setMee6Settings(String serverId, JsonElement newSettings) {
-		return settingsService.setMee6Settings(serverId, gson.fromJson(newSettings, RoleModel.class))
-				.getStatusCodeValue();
+		return settingsService.setMee6Settings(serverId, gson.fromJson(newSettings, RoleModel.class)).getStatusCodeValue();
 	}
 
 	public int setPrefix(String serverId, String prefix) {
@@ -218,8 +211,7 @@ public class Database {
 	}
 
 	public int setApplyBlacklist(String serverId, JsonArray newSettings) {
-		return settingsService.setApplyBlacklist(serverId, gson.fromJson(newSettings, ApplyBlacklist[].class))
-				.getStatusCodeValue();
+		return settingsService.setApplyBlacklist(serverId, gson.fromJson(newSettings, ApplyBlacklist[].class)).getStatusCodeValue();
 	}
 
 	public String getPartyFinderCategoryId(String serverId) {
@@ -243,8 +235,7 @@ public class Database {
 	}
 
 	public int setGuildSettings(String serverId, JsonElement newSettings) {
-		return settingsService.setGuildSettings(serverId, gson.fromJson(newSettings, AutomatedGuild.class))
-				.getStatusCodeValue();
+		return settingsService.setGuildSettings(serverId, gson.fromJson(newSettings, AutomatedGuild.class)).getStatusCodeValue();
 	}
 
 	public int setApplyGuestRole(String serverId, String newSettings) {

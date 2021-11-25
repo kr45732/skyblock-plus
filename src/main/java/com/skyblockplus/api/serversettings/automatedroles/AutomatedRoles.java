@@ -122,6 +122,5 @@ public class AutomatedRoles {
 	@Embedded
 	private RoleModel maxed_collections = new RoleModel();
 
-	public AutomatedRoles() {
-	}
+	public AutomatedRoles() {}
 }

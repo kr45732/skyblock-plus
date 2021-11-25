@@ -18,8 +18,8 @@
 
 package com.skyblockplus.slayer;
 
-import static com.skyblockplus.utils.Utils.*;
 import static com.skyblockplus.utils.Constants.SLAYER_EMOJI_MAP;
+import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -135,12 +135,12 @@ public class SlayerCommand extends Command {
 				true
 			);
 			eb.addField(
-				SLAYER_EMOJI_MAP.get("rev") +" Zombie (" + player.getSlayerLevel("rev") + ")",
+				SLAYER_EMOJI_MAP.get("rev") + " Zombie (" + player.getSlayerLevel("rev") + ")",
 				simplifyNumber(player.getSlayer("rev")) + " XP",
 				true
 			);
 			eb.addField(
-				SLAYER_EMOJI_MAP.get("tara") +" Spider (" + player.getSlayerLevel("tara") + ")",
+				SLAYER_EMOJI_MAP.get("tara") + " Spider (" + player.getSlayerLevel("tara") + ")",
 				simplifyNumber(player.getSlayer("tara")) + " XP",
 				true
 			);

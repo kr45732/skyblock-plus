@@ -59,8 +59,7 @@ public class SkillsWeight {
 				return weightStruct.add(new WeightStruct(base));
 			}
 
-			return weightStruct
-					.add(new WeightStruct(Math.round(base), Math.pow((currentSkillXp - maxLevelExp) / divider, 0.968)));
+			return weightStruct.add(new WeightStruct(Math.round(base), Math.pow((currentSkillXp - maxLevelExp) / divider, 0.968)));
 		}
 
 		return new WeightStruct();

@@ -190,12 +190,12 @@ public class SkyblockCommand extends Command {
 				true
 			);
 			eb.addField(
-				SLAYER_EMOJI_MAP.get("rev") +" Zombie (" + player.getSlayerLevel("rev") + ")",
+				SLAYER_EMOJI_MAP.get("rev") + " Zombie (" + player.getSlayerLevel("rev") + ")",
 				simplifyNumber(player.getSlayer("rev")) + " XP",
 				true
 			);
 			eb.addField(
-				SLAYER_EMOJI_MAP.get("tara") +" Spider (" + player.getSlayerLevel("tara") + ")",
+				SLAYER_EMOJI_MAP.get("tara") + " Spider (" + player.getSlayerLevel("tara") + ")",
 				simplifyNumber(player.getSlayer("tara")) + " XP",
 				true
 			);

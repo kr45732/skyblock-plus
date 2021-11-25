@@ -64,7 +64,7 @@ public class WeightCommand extends Command {
 			StringBuilder slayerStr = new StringBuilder();
 			for (String slayerName : SLAYER_NAMES) {
 				slayerStr
-					.append(SLAYER_EMOJI_MAP.get(slayerName) + " " +capitalizeString(slayerName))
+					.append(SLAYER_EMOJI_MAP.get(slayerName) + " " + capitalizeString(slayerName))
 					.append(": ")
 					.append(weight.getSlayerWeight().getSlayerWeight(slayerName).getFormatted())
 					.append("\n");
@@ -78,7 +78,7 @@ public class WeightCommand extends Command {
 					.append("\n");
 			}
 			StringBuilder dungeonsStr = new StringBuilder();
-			
+
 			dungeonsStr
 				.append(DUNGEON_EMOJI_MAP.get("catacombs") + " " + capitalizeString("catacombs"))
 				.append(": ")
@@ -117,13 +117,16 @@ public class WeightCommand extends Command {
 					.append("\n");
 			}
 			String lilyDungeonsStr =
-			DUNGEON_EMOJI_MAP.get("catacombs") + " Catacombs: " +
+				DUNGEON_EMOJI_MAP.get("catacombs") +
+				" Catacombs: " +
 				lilyWeight.getDungeonsWeight().getDungeonWeight().getFormatted() +
 				"\n" +
-				 DUNGEON_EMOJI_MAP.get("catacombs_1")   + " Normal floor completions: " +
+				DUNGEON_EMOJI_MAP.get("catacombs_1") +
+				" Normal floor completions: " +
 				lilyWeight.getDungeonsWeight().getDungeonCompletionWeight("normal").getFormatted() +
 				"\n" +
-				DUNGEON_EMOJI_MAP.get("master_catacombs_1") + " Master floor completions: " +
+				DUNGEON_EMOJI_MAP.get("master_catacombs_1") +
+				" Master floor completions: " +
 				lilyWeight.getDungeonsWeight().getDungeonCompletionWeight("master").getFormatted() +
 				"\n";
 

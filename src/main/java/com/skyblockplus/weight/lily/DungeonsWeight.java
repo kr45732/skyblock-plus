@@ -47,13 +47,15 @@ public class DungeonsWeight {
 		double level = cataSkill.getProgressLevel();
 		long cataXP = cataSkill.getTotalExp();
 
-		double n = cataXP < 569809640 ? 0.2 * Math.pow(level / 50, 2.967355422)
-				: 0.2 * Math.pow(1 + (cataXP - CATACOMBS_LEVEL_50_XP) / 142452410 / 50, 2.967355422);
+		double n = cataXP < 569809640
+			? 0.2 * Math.pow(level / 50, 2.967355422)
+			: 0.2 * Math.pow(1 + (cataXP - CATACOMBS_LEVEL_50_XP) / 142452410 / 50, 2.967355422);
 
 		if (level != 0) {
 			if (cataXP < 569809640) {
-				return weightStruct.add(new WeightStruct(0.81522766192742
-						* ((Math.pow(1.18340401286164044, (level + 1)) - 1.05994990217254) * (1 + n))));
+				return weightStruct.add(
+					new WeightStruct(0.81522766192742 * ((Math.pow(1.18340401286164044, (level + 1)) - 1.05994990217254) * (1 + n)))
+				);
 			} else {
 				return weightStruct.add(new WeightStruct(4000 * (n / 0.15465244570598540)));
 			}
@@ -83,8 +85,12 @@ public class DungeonsWeight {
 			}
 
 			double score = 0;
-			for (Map.Entry<String, JsonElement> normalFloor : higherDepth(player.profileJson(),
-					"dungeons.dungeon_types.catacombs.tier_completions").getAsJsonObject().entrySet()) {
+			for (Map.Entry<String, JsonElement> normalFloor : higherDepth(
+				player.profileJson(),
+				"dungeons.dungeon_types.catacombs.tier_completions"
+			)
+				.getAsJsonObject()
+				.entrySet()) {
 				int amount = normalFloor.getValue().getAsInt();
 				double excess = 0;
 				if (amount > 1000) {
@@ -93,8 +99,7 @@ public class DungeonsWeight {
 				}
 
 				double floorScore = amount * dcw.get("catacombs_" + normalFloor.getKey()).getAsDouble();
-				if (excess > 0)
-					floorScore *= Math.log(excess / 1000 + 1) / Math.log(7.5) + 1;
+				if (excess > 0) floorScore *= Math.log(excess / 1000 + 1) / Math.log(7.5) + 1;
 				score += floorScore;
 			}
 
@@ -105,23 +110,30 @@ public class DungeonsWeight {
 			}
 
 			JsonObject dcb = DUNGEON_COMPLETION_BUFFS;
-			for (Map.Entry<String, JsonElement> masterFloor : higherDepth(player.profileJson(),
-					"dungeons.dungeon_types.master_catacombs.tier_completions").getAsJsonObject().entrySet()) {
+			for (Map.Entry<String, JsonElement> masterFloor : higherDepth(
+				player.profileJson(),
+				"dungeons.dungeon_types.master_catacombs.tier_completions"
+			)
+				.getAsJsonObject()
+				.entrySet()) {
 				if (higherDepth(dcb, masterFloor.getKey()) != null) {
 					int amount = masterFloor.getValue().getAsInt();
 					double threshold = 20;
 					if (amount >= threshold) {
 						upperBound += higherDepth(dcb, masterFloor.getKey()).getAsInt();
 					} else {
-						upperBound += higherDepth(dcb, masterFloor.getKey()).getAsInt()
-								* Math.pow((amount / threshold), 1.840896416);
+						upperBound += higherDepth(dcb, masterFloor.getKey()).getAsInt() * Math.pow((amount / threshold), 1.840896416);
 					}
 				}
 			}
 
 			double masterScore = 0;
-			for (Map.Entry<String, JsonElement> masterFloor : higherDepth(player.profileJson(),
-					"dungeons.dungeon_types.master_catacombs.tier_completions").getAsJsonObject().entrySet()) {
+			for (Map.Entry<String, JsonElement> masterFloor : higherDepth(
+				player.profileJson(),
+				"dungeons.dungeon_types.master_catacombs.tier_completions"
+			)
+				.getAsJsonObject()
+				.entrySet()) {
 				int amount = masterFloor.getValue().getAsInt();
 				double excess = 0;
 				if (amount > 1000) {
@@ -130,8 +142,7 @@ public class DungeonsWeight {
 				}
 
 				double floorScore = amount * dcw.get("master_catacombs_" + masterFloor.getKey()).getAsDouble();
-				if (excess > 0)
-					floorScore *= (Math.log((excess / 1000) + 1) / Math.log(5)) + 1;
+				if (excess > 0) floorScore *= (Math.log((excess / 1000) + 1) / Math.log(5)) + 1;
 				masterScore += floorScore;
 			}
 

@@ -76,8 +76,7 @@ public class ServerSettingsModel {
 
 	private String applyGuestRole = "";
 
-	public ServerSettingsModel() {
-	}
+	public ServerSettingsModel() {}
 
 	public ServerSettingsModel(String serverName, String serverId) {
 		this.serverName = serverName;
