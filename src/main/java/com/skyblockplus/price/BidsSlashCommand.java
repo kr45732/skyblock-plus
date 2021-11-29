@@ -18,6 +18,7 @@
 
 package com.skyblockplus.price;
 
+import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -33,11 +34,12 @@ public class BidsSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandExecutedEvent event) {
 		event.logCommand();
 
-		event.embed(BidsCommand.getPlayerBids(event.getOptionStr("player")));
+		event.paginate(BidsCommand.getPlayerBids(event.getOptionStr("player"), new PaginatorEvent(event)));
 	}
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData(name, "Get a player's bids").addOption(OptionType.STRING, "player", "Player username or mention");
+		return new CommandData(name, "Get a player's bids").addOption(OptionType.STRING, "player",
+				"Player username or mention");
 	}
 }

@@ -106,7 +106,7 @@ public class SettingsExecute {
 						eb = setApplyGuestRole(args[3]);
 					}
 				} else if ((args.length == 4 || args.length == 5 || content.split(" ", 6).length == 6)
-						&& args[1].equals("apply") && args[2].equals("blacklist")) {
+						&& args[1].equals("guild") && args[2].equals("blacklist")) {
 					args = content.split(" ", 6);
 					if (args.length == 4 && args[3].equals("list")) {
 						eb = listApplyBlacklist();
@@ -980,7 +980,7 @@ public class SettingsExecute {
 		JsonElement settings = database.getGuildSettings(guild.getId(), name);
 		if (settings == null || settings.isJsonNull()) {
 			return defaultSettingsEmbed(
-					"Invalid setting name. Use " + guildPrefix + "guild to see all current guild settings.");
+					"Invalid setting name. Use `" + guildPrefix + "settings guild` to see all current guild settings.");
 		}
 
 		CustomPaginator.Builder paginateBuilder = defaultPaginator(author);
@@ -1845,6 +1845,8 @@ public class SettingsExecute {
 		}
 
 		ranks.add(gson.toJsonTree(new RoleObject("" + intLevel, role.getId())));
+		ranks = collectJsonArray(
+				streamJsonArray(ranks).sorted(Comparator.comparingInt(r -> higherDepth(r, "value").getAsInt())));
 		settings.add("levels", ranks);
 
 		int responseCode = setMee6Settings(settings);
@@ -2055,6 +2057,7 @@ public class SettingsExecute {
 				case "applyStaffChannel":
 					return "<#" + currentSettingValue + ">";
 				case "roleId":
+				case "guildMemberRole":
 					return "<@&" + currentSettingValue + ">";
 				case "applyCategory":
 					try {
