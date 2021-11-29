@@ -58,14 +58,14 @@ public class SkyblockCommand extends Command {
 			eb.addField("Slayer weight", weight.getSlayerWeight().getWeightStruct().getFormatted(), true);
 			eb.addField("Dungeons weight", weight.getDungeonsWeight().getWeightStruct().getFormatted(), true);
 			double playerNetworth = player.getNetworth();
-			eb.addField("Networth", playerNetworth == -1 ? "Inventory API disabled" : roundAndFormat(playerNetworth), true);
+			eb.addField("Networth", playerNetworth == -1 ? "Inventory API disabled" : roundAndFormat(playerNetworth),
+					true);
 			eb.addField(
-				"Bank & purse coins",
-				(player.getBankBalance() == -1 ? "API disabled" : simplifyNumber(player.getBankBalance())) +
-				" + " +
-				simplifyNumber(player.getPurseCoins()),
-				true
-			);
+					"Bank & purse coins",
+					(player.getBankBalance() == -1 ? "API disabled" : simplifyNumber(player.getBankBalance())) +
+							" + " +
+							simplifyNumber(player.getPurseCoins()),
+					true);
 			extras.addEmbedPage(eb);
 
 			eb = player.defaultPlayerEmbed();
@@ -75,32 +75,33 @@ public class SkyblockCommand extends Command {
 				SkillsStruct skillInfo = player.getSkill(skillName);
 				if (skillInfo != null) {
 					eb.addField(
-						SKILLS_EMOJI_MAP.get(skillName) +
-						" " +
-						capitalizeString(skillInfo.getName()) +
-						" (" +
-						skillInfo.getCurrentLevel() +
-						")",
-						simplifyNumber(skillInfo.getExpCurrent()) +
-						" / " +
-						simplifyNumber(skillInfo.getExpForNext()) +
-						"\nTotal XP: " +
-						simplifyNumber(skillInfo.getTotalExp()) +
-						"\nProgress: " +
-						(skillInfo.isMaxed() ? "MAX" : roundProgress(skillInfo.getProgressToNext())),
-						true
-					);
+							SKILLS_EMOJI_MAP.get(skillName) +
+									" " +
+									capitalizeString(skillInfo.getName()) +
+									" (" +
+									skillInfo.getCurrentLevel() +
+									")",
+							simplifyNumber(skillInfo.getExpCurrent()) +
+									" / " +
+									simplifyNumber(skillInfo.getExpForNext()) +
+									"\nTotal XP: " +
+									simplifyNumber(skillInfo.getTotalExp()) +
+									"\nProgress: " +
+									(skillInfo.isMaxed() ? "MAX" : roundProgress(skillInfo.getProgressToNext())),
+							true);
 					if (!COSMETIC_SKILL_NAMES.contains(skillName)) {
 						trueSA += skillInfo.getCurrentLevel();
 						progressSA += skillInfo.getProgressLevel();
 					}
 				} else {
-					eb.addField(SKILLS_EMOJI_MAP.get(skillName) + " " + capitalizeString(skillName) + " (?) ", "Unable to retrieve", true);
+					eb.addField(SKILLS_EMOJI_MAP.get(skillName) + " " + capitalizeString(skillName) + " (?) ",
+							"Unable to retrieve", true);
 				}
 			}
 			trueSA /= SKILL_NAMES.size();
 			progressSA /= SKILL_NAMES.size();
-			eb.setDescription("True skill average: " + roundAndFormat(trueSA) + "\nProgress skill average: " + roundAndFormat(progressSA));
+			eb.setDescription("True skill average: " + roundAndFormat(trueSA) + "\nProgress skill average: "
+					+ roundAndFormat(progressSA));
 			extras.addEmbedPage(eb);
 
 			eb = player.defaultPlayerEmbed();
@@ -121,142 +122,137 @@ public class SkyblockCommand extends Command {
 			int endermanTwoKills = player.getSlayerBossKills("enderman", 1);
 			int endermanThreeKills = player.getSlayerBossKills("enderman", 2);
 			int endermanFourKills = player.getSlayerBossKills("enderman", 3);
-			String svenKills =
-				"**Tier 1:** " +
-				svenOneKills +
-				"\n**Tier 2:** " +
-				svenTwoKills +
-				"\n**Tier 3:** " +
-				svenThreeKills +
-				"\n**Tier 4:** " +
-				svenFourKills;
-			String revKills =
-				"**Tier 1:** " +
-				revOneKills +
-				"\n**Tier 2:** " +
-				revTwoKills +
-				"\n**Tier 3:** " +
-				revThreeKills +
-				"\n**Tier 4:** " +
-				revFourKills +
-				"\n**Tier 5:** " +
-				revFiveKills;
-			String taraKills =
-				"**Tier 1:** " +
-				taraOneKills +
-				"\n**Tier 2:** " +
-				taraTwoKills +
-				"\n**Tier 3:** " +
-				taraThreeKills +
-				"\n**Tier 4:** " +
-				taraFourKills;
-			String endermanKills =
-				"**Tier 1:** " +
-				endermanOneKills +
-				"\n**Tier 2:** " +
-				endermanTwoKills +
-				"\n**Tier 3:** " +
-				endermanThreeKills +
-				"\n**Tier 4:** " +
-				endermanFourKills;
-			long coinsSpentOnSlayers =
-				100L *
-				(svenOneKills + revOneKills + taraOneKills) +
-				2000L *
-				(svenTwoKills + revTwoKills + taraTwoKills) +
-				10000L *
-				(svenThreeKills + revThreeKills + taraThreeKills) +
-				50000L *
-				(svenFourKills + revFourKills + taraFourKills) +
-				100000L *
-				revFiveKills +
-				2000L *
-				endermanOneKills +
-				7500L *
-				endermanTwoKills +
-				20000L *
-				endermanThreeKills +
-				50000L *
-				endermanFourKills;
+			String svenKills = "**Tier 1:** " +
+					svenOneKills +
+					"\n**Tier 2:** " +
+					svenTwoKills +
+					"\n**Tier 3:** " +
+					svenThreeKills +
+					"\n**Tier 4:** " +
+					svenFourKills;
+			String revKills = "**Tier 1:** " +
+					revOneKills +
+					"\n**Tier 2:** " +
+					revTwoKills +
+					"\n**Tier 3:** " +
+					revThreeKills +
+					"\n**Tier 4:** " +
+					revFourKills +
+					"\n**Tier 5:** " +
+					revFiveKills;
+			String taraKills = "**Tier 1:** " +
+					taraOneKills +
+					"\n**Tier 2:** " +
+					taraTwoKills +
+					"\n**Tier 3:** " +
+					taraThreeKills +
+					"\n**Tier 4:** " +
+					taraFourKills;
+			String endermanKills = "**Tier 1:** " +
+					endermanOneKills +
+					"\n**Tier 2:** " +
+					endermanTwoKills +
+					"\n**Tier 3:** " +
+					endermanThreeKills +
+					"\n**Tier 4:** " +
+					endermanFourKills;
+			long coinsSpentOnSlayers = 100L *
+					(svenOneKills + revOneKills + taraOneKills) +
+					2000L *
+							(svenTwoKills + revTwoKills + taraTwoKills)
+					+
+					10000L *
+							(svenThreeKills + revThreeKills + taraThreeKills)
+					+
+					50000L *
+							(svenFourKills + revFourKills + taraFourKills)
+					+
+					100000L *
+							revFiveKills
+					+
+					2000L *
+							endermanOneKills
+					+
+					7500L *
+							endermanTwoKills
+					+
+					20000L *
+							endermanThreeKills
+					+
+					50000L *
+							endermanFourKills;
 			eb.setDescription(
-				"**Total slayer:** " +
-				formatNumber(player.getTotalSlayer()) +
-				" XP\n**Total coins spent:** " +
-				simplifyNumber(coinsSpentOnSlayers)
-			);
+					"**Total slayer:** " +
+							formatNumber(player.getTotalSlayer()) +
+							" XP\n**Total coins spent:** " +
+							simplifyNumber(coinsSpentOnSlayers));
 			eb.addField(
-				SLAYER_EMOJI_MAP.get("sven") + " Wolf (" + player.getSlayerLevel("sven") + ")",
-				simplifyNumber(player.getSlayer("sven")) + " XP",
-				true
-			);
+					SLAYER_EMOJI_MAP.get("sven") + " Wolf (" + player.getSlayerLevel("sven") + ")",
+					simplifyNumber(player.getSlayer("sven")) + " XP",
+					true);
 			eb.addField(
-				SLAYER_EMOJI_MAP.get("rev") + " Zombie (" + player.getSlayerLevel("rev") + ")",
-				simplifyNumber(player.getSlayer("rev")) + " XP",
-				true
-			);
+					SLAYER_EMOJI_MAP.get("rev") + " Zombie (" + player.getSlayerLevel("rev") + ")",
+					simplifyNumber(player.getSlayer("rev")) + " XP",
+					true);
 			eb.addField(
-				SLAYER_EMOJI_MAP.get("tara") + " Spider (" + player.getSlayerLevel("tara") + ")",
-				simplifyNumber(player.getSlayer("tara")) + " XP",
-				true
-			);
+					SLAYER_EMOJI_MAP.get("tara") + " Spider (" + player.getSlayerLevel("tara") + ")",
+					simplifyNumber(player.getSlayer("tara")) + " XP",
+					true);
 			eb.addField("Boss Kills", svenKills, true);
 			eb.addField("Boss Kills", revKills, true);
 			eb.addField("Boss Kills", taraKills, true);
 			eb.addField(
-				SLAYER_EMOJI_MAP.get("ENDERMAN") + " Enderman (" + player.getSlayerLevel("enderman") + ")",
-				simplifyNumber(player.getSlayer("enderman")) + " XP",
-				true
-			);
+					SLAYER_EMOJI_MAP.get("enderman") + " Enderman (" + player.getSlayerLevel("enderman") + ")",
+					simplifyNumber(player.getSlayer("enderman")) + " XP",
+					true);
 			eb.addBlankField(true);
 			eb.addBlankField(true);
 			eb.addField("Boss Kills", endermanKills, true);
 			extras.addEmbedPage(eb);
 
 			try {
-				eb =
-					player
+				eb = player
 						.defaultPlayerEmbed()
 						.setDescription(
-							"**Secrets:** " +
-							formatNumber(player.getDungeonSecrets()) +
-							"\n**Selected class:** " +
-							player.getSelectedDungeonClass()
-						);
+								"**Secrets:** " +
+										formatNumber(player.getDungeonSecrets()) +
+										"\n**Selected class:** " +
+										player.getSelectedDungeonClass());
 				SkillsStruct skillInfo = player.getCatacombs();
 				eb.addField(
-					DUNGEON_EMOJI_MAP.get("catacombs") +
-					" " +
-					capitalizeString(skillInfo.getName()) +
-					" (" +
-					skillInfo.getCurrentLevel() +
-					")",
-					simplifyNumber(skillInfo.getExpCurrent()) +
-					" / " +
-					simplifyNumber(skillInfo.getExpForNext()) +
-					"\nTotal XP: " +
-					simplifyNumber(skillInfo.getTotalExp()) +
-					"\nProgress: " +
-					(skillInfo.isMaxed() ? "MAX" : roundProgress(skillInfo.getProgressToNext())),
-					true
-				);
+						DUNGEON_EMOJI_MAP.get("catacombs") +
+								" " +
+								capitalizeString(skillInfo.getName()) +
+								" (" +
+								skillInfo.getCurrentLevel() +
+								")",
+						simplifyNumber(skillInfo.getExpCurrent()) +
+								" / " +
+								simplifyNumber(skillInfo.getExpForNext()) +
+								"\nTotal XP: " +
+								simplifyNumber(skillInfo.getTotalExp()) +
+								"\nProgress: " +
+								(skillInfo.isMaxed() ? "MAX" : roundProgress(skillInfo.getProgressToNext())),
+						true);
 				eb.addBlankField(true).addBlankField(true);
 				for (String className : DUNGEON_CLASS_NAMES) {
 					skillInfo = player.getDungeonClass(className);
 					eb.addField(
-						DUNGEON_EMOJI_MAP.get(className) + " " + capitalizeString(className) + " (" + skillInfo.getCurrentLevel() + ")",
-						simplifyNumber(skillInfo.getExpCurrent()) +
-						" / " +
-						simplifyNumber(skillInfo.getExpForNext()) +
-						"\nTotal XP: " +
-						simplifyNumber(skillInfo.getTotalExp()) +
-						"\nProgress: " +
-						(skillInfo.isMaxed() ? "MAX" : roundProgress(skillInfo.getProgressToNext())),
-						true
-					);
+							DUNGEON_EMOJI_MAP.get(className) + " " + capitalizeString(className) + " ("
+									+ skillInfo.getCurrentLevel() + ")",
+							simplifyNumber(skillInfo.getExpCurrent()) +
+									" / " +
+									simplifyNumber(skillInfo.getExpForNext()) +
+									"\nTotal XP: " +
+									simplifyNumber(skillInfo.getTotalExp()) +
+									"\nProgress: " +
+									(skillInfo.isMaxed() ? "MAX" : roundProgress(skillInfo.getProgressToNext())),
+							true);
 				}
 				eb.addBlankField(true);
 				for (String dungeonType : getJsonKeys(higherDepth(player.profileJson(), "dungeons.dungeon_types"))) {
-					JsonElement curDungeonType = higherDepth(player.profileJson(), "dungeons.dungeon_types." + dungeonType);
+					JsonElement curDungeonType = higherDepth(player.profileJson(),
+							"dungeons.dungeon_types." + dungeonType);
 					int min = (dungeonType.equals("catacombs") ? 0 : 1);
 					int max = (dungeonType.equals("catacombs") ? 8 : 7);
 					int embedCount = 0;
@@ -268,14 +264,17 @@ public class SkyblockCommand extends Command {
 						int fastestSPlusInt = higherDepth(curDungeonType, "fastest_time_s_plus." + i, -1);
 						int minutes = fastestSPlusInt / 1000 / 60;
 						int seconds = fastestSPlusInt / 1000 % 60;
-						String name = i == 0 ? "Entrance" : ((dungeonType.equals("catacombs") ? "Floor " : "Master ") + i);
+						String name = i == 0 ? "Entrance"
+								: ((dungeonType.equals("catacombs") ? "Floor " : "Master ") + i);
 
 						String ebStr = "Completions: " + higherDepth(curDungeonType, "tier_completions." + i, 0);
 						ebStr += "\nBest Score: " + higherDepth(curDungeonType, "best_score." + i, 0);
-						ebStr +=
-							"\nFastest S+: " + (fastestSPlusInt != -1 ? minutes + ":" + (seconds >= 10 ? seconds : "0" + seconds) : "None");
+						ebStr += "\nFastest S+: "
+								+ (fastestSPlusInt != -1 ? minutes + ":" + (seconds >= 10 ? seconds : "0" + seconds)
+										: "None");
 
-						eb.addField(DUNGEON_EMOJI_MAP.get(dungeonType + "_" + i) + " " + capitalizeString(name), ebStr, true);
+						eb.addField(DUNGEON_EMOJI_MAP.get(dungeonType + "_" + i) + " " + capitalizeString(name), ebStr,
+								true);
 						embedCount++;
 					}
 
@@ -314,6 +313,6 @@ public class SkyblockCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.queue();
+				.queue();
 	}
 }

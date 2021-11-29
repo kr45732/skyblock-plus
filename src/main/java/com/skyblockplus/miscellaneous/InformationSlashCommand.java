@@ -33,10 +33,10 @@ public class InformationSlashCommand extends SlashCommand {
 		event.logCommand();
 
 		event
-			.getHook()
-			.editOriginalEmbeds(InformationCommand.getInformation(event.getClient().getStartTime()).build())
-			.setActionRows(InformationCommand.getInformationActionRow())
-			.queue();
+				.getHook()
+				.editOriginalEmbeds(InformationCommand.getInformation().build())
+				.setActionRows(InformationCommand.getInformationActionRow())
+				.queue();
 	}
 
 	@Override

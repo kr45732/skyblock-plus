@@ -20,7 +20,6 @@ package com.skyblockplus.utils.slashcommand;
 
 import static com.skyblockplus.utils.Utils.invalidEmbed;
 
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.entities.ChannelType;
@@ -32,21 +31,26 @@ import net.dv8tion.jda.api.requests.ErrorResponse;
 public class SlashCommandClient extends ListenerAdapter {
 
 	private final List<SlashCommand> slashCommands;
-	private final OffsetDateTime startTime;
+	private String ownerId;
 
 	public SlashCommandClient() {
 		this.slashCommands = new ArrayList<>();
-		this.startTime = OffsetDateTime.now();
 	}
 
 	public SlashCommandClient addSlashCommands(SlashCommand... commands) {
 		for (SlashCommand command : commands) {
 			if (slashCommands.stream().anyMatch(auction -> auction.getName().equalsIgnoreCase(command.getName()))) {
-				throw new IllegalArgumentException("Command added has a name that has already been indexed: " + command.getName());
+				throw new IllegalArgumentException(
+						"Command added has a name that has already been indexed: " + command.getName());
 			} else {
 				slashCommands.add(command);
 			}
 		}
+		return this;
+	}
+
+	public SlashCommandClient setOwnerId(String ownerId) {
+		this.ownerId = ownerId;
 		return this;
 	}
 
@@ -57,7 +61,7 @@ public class SlashCommandClient extends ListenerAdapter {
 			return;
 		}
 		if (event.getChannelType() != ChannelType.TEXT) {
-			event.replyEmbeds(invalidEmbed("This command cannot only be used in text channels").build()).queue();
+			event.replyEmbeds(invalidEmbed("This command can only be used in text channels").build()).queue();
 			return;
 		}
 
@@ -84,14 +88,15 @@ public class SlashCommandClient extends ListenerAdapter {
 			}
 		}
 
-		slashCommandExecutedEvent.getHook().editOriginalEmbeds(slashCommandExecutedEvent.invalidCommandMessage().build()).queue();
-	}
-
-	public OffsetDateTime getStartTime() {
-		return startTime;
+		slashCommandExecutedEvent.getHook()
+				.editOriginalEmbeds(slashCommandExecutedEvent.invalidCommandMessage().build()).queue();
 	}
 
 	public List<SlashCommand> getSlashCommands() {
 		return slashCommands;
+	}
+
+	public boolean isOwner(String userId) {
+		return ownerId != null ? userId.equals(ownerId) : false;
 	}
 }

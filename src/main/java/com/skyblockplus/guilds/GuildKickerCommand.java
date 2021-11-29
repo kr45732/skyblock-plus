@@ -36,7 +36,6 @@ import com.skyblockplus.utils.structs.HypixelGuildCache;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,12 +65,10 @@ public class GuildKickerCommand extends Command {
 					return invalidEmbed(indvReq + " is an invalid requirement format");
 				}
 
-				if (
-					!reqDashSplit[0].equals("slayer") &&
-					!reqDashSplit[0].equals("skills") &&
-					!reqDashSplit[0].equals("catacombs") &&
-					!reqDashSplit[0].equals("weight")
-				) {
+				if (!reqDashSplit[0].equals("slayer") &&
+						!reqDashSplit[0].equals("skills") &&
+						!reqDashSplit[0].equals("catacombs") &&
+						!reqDashSplit[0].equals("weight")) {
 					return invalidEmbed(indvReq + " is an invalid requirement type");
 				}
 
@@ -102,8 +99,7 @@ public class GuildKickerCommand extends Command {
 		if (!useKey) {
 			if (higherDepth(guildLbJson, "data") == null) {
 				return invalidEmbed(
-					"This guild is not on the senither leaderboard so you must set the Hypixel API key for this server and rerun the command with `--usekey` flag"
-				);
+						"This guild is not on the senither leaderboard so you must set the Hypixel API key for this server and rerun the command with `--usekey` flag");
 			}
 
 			JsonArray guildMembers = higherDepth(guildLbJson, "data").getAsJsonArray();
@@ -146,7 +142,8 @@ public class GuildKickerCommand extends Command {
 						}
 					}
 
-					if (slayer >= slayerReq && Math.max(0, skills) >= skillsReq && catacombs >= catacombsReq && weight >= weightReq) {
+					if (slayer >= slayerReq && Math.max(0, skills) >= skillsReq && catacombs >= catacombsReq
+							&& weight >= weightReq) {
 						meetsReqs = true;
 						break;
 					}
@@ -154,31 +151,27 @@ public class GuildKickerCommand extends Command {
 
 				if (!meetsReqs) {
 					paginateBuilder.addItems(
-						"• **" +
-						higherDepth(guildMember, "username").getAsString() +
-						"** | Slayer: " +
-						formatNumber(slayer) +
-						" | Skills: " +
-						roundAndFormat(skills) +
-						" | Cata: " +
-						roundAndFormat(catacombs) +
-						" | Weight: " +
-						roundAndFormat(weight)
-					);
+							"• **" +
+									higherDepth(guildMember, "username").getAsString() +
+									"** | Slayer: " +
+									formatNumber(slayer) +
+									" | Skills: " +
+									roundAndFormat(skills) +
+									" | Cata: " +
+									roundAndFormat(catacombs) +
+									" | Weight: " +
+									roundAndFormat(weight));
 					missingReqsCount++;
 				}
 			}
 
-			Duration duration = Duration.between(lastUpdated, Instant.now());
-
 			paginateBuilder.setPaginatorExtras(
-				new PaginatorExtras()
-					.setEveryPageTitle("Guild Kick Helper")
-					.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
-					.setEveryPageText(
-						"**Total missing requirements:** " + missingReqsCount + "\n**Updated:** " + instantToDHM(duration) + " ago\n"
-					)
-			);
+					new PaginatorExtras()
+							.setEveryPageTitle("Guild Kick Helper")
+							.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
+							.setEveryPageText(
+									"**Total missing requirements:** " + missingReqsCount + "\n**Updated:** <t:"
+											+ lastUpdated.getEpochSecond() + ":R>\n"));
 		} else {
 			String hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
 
@@ -204,35 +197,34 @@ public class GuildKickerCommand extends Command {
 
 					CompletableFuture<String> guildMemberUsername = asyncUuidToUsername(guildMemberUuid);
 					futuresList.add(
-						guildMemberUsername.thenApply(guildMemberUsernameResponse -> {
-							try {
-								if (keyCooldownMap.get(hypixelKey).getRemainingLimit().get() < 5) {
-									System.out.println(
-										"Sleeping for " + keyCooldownMap.get(hypixelKey).getTimeTillReset().get() + " seconds"
-									);
-									TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).getTimeTillReset().get());
+							guildMemberUsername.thenApply(guildMemberUsernameResponse -> {
+								try {
+									if (keyCooldownMap.get(hypixelKey).getRemainingLimit().get() < 5) {
+										System.out.println(
+												"Sleeping for "
+														+ keyCooldownMap.get(hypixelKey).getTimeTillReset().get()
+														+ " seconds");
+										TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).getTimeTillReset().get());
+									}
+								} catch (Exception ignored) {
 								}
-							} catch (Exception ignored) {}
 
-							CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(
-								guildMemberUuid,
-								hypixelKey
-							);
+								CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(
+										guildMemberUuid,
+										hypixelKey);
 
-							return guildMemberProfileJson.thenApply(guildMemberProfileJsonResponse -> {
-								Player guildMemberPlayer = new Player(
-									guildMemberUuid,
-									guildMemberUsernameResponse,
-									guildMemberProfileJsonResponse
-								);
+								return guildMemberProfileJson.thenApply(guildMemberProfileJsonResponse -> {
+									Player guildMemberPlayer = new Player(
+											guildMemberUuid,
+											guildMemberUsernameResponse,
+											guildMemberProfileJsonResponse);
 
-								if (guildMemberPlayer.isValid()) {
-									newGuildCache.addPlayer(guildMemberPlayer);
-								}
-								return null;
-							});
-						})
-					);
+									if (guildMemberPlayer.isValid()) {
+										newGuildCache.addPlayer(guildMemberPlayer);
+									}
+									return null;
+								});
+							}));
 				}
 
 				for (CompletableFuture<CompletableFuture<String>> future : futuresList) {
@@ -278,7 +270,8 @@ public class GuildKickerCommand extends Command {
 						}
 					}
 
-					if (slayer >= slayerReq && Math.max(0, skills) >= skillsReq && catacombs >= catacombsReq && weight >= weightReq) {
+					if (slayer >= slayerReq && Math.max(0, skills) >= skillsReq && catacombs >= catacombsReq
+							&& weight >= weightReq) {
 						meetsReqs = true;
 						break;
 					}
@@ -286,35 +279,33 @@ public class GuildKickerCommand extends Command {
 
 				if (!meetsReqs) {
 					paginateBuilder.addItems(
-						"• **" +
-						getStringFromCache(guildMember, "username") +
-						"** | Slayer: " +
-						formatNumber(slayer) +
-						" | Skills: " +
-						roundAndFormat(skills) +
-						" | Cata: " +
-						roundAndFormat(catacombs) +
-						" | Weight: " +
-						roundAndFormat(weight)
-					);
+							"• **" +
+									getStringFromCache(guildMember, "username") +
+									"** | Slayer: " +
+									formatNumber(slayer) +
+									" | Skills: " +
+									roundAndFormat(skills) +
+									" | Cata: " +
+									roundAndFormat(catacombs) +
+									" | Weight: " +
+									roundAndFormat(weight));
 				}
 			}
 
 			paginateBuilder.setPaginatorExtras(
-				new PaginatorExtras()
-					.setEveryPageTitle("Guild Kick Helper")
-					.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
-					.setEveryPageText(
-						"**Total missing requirements:** " +
-						paginateBuilder.getItemsSize() +
-						(
-							lastUpdated != null
-								? "\n**Last updated:** " + instantToDHM(Duration.between(lastUpdated, Instant.now())) + " ago"
-								: ""
-						) +
-						"\n"
-					)
-			);
+					new PaginatorExtras()
+							.setEveryPageTitle("Guild Kick Helper")
+							.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
+							.setEveryPageText(
+									"**Total missing requirements:** " +
+											paginateBuilder.getItemsSize() +
+											(lastUpdated != null
+													? "\n**Last updated:** <t:"
+															+ lastUpdated.getEpochSecond()
+															+ ":R>"
+													: "")
+											+
+											"\n"));
 		}
 		event.paginate(paginateBuilder);
 		return null;
@@ -343,6 +334,6 @@ public class GuildKickerCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.queue();
+				.queue();
 	}
 }

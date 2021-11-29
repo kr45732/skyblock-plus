@@ -26,23 +26,30 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public abstract class SlashCommand {
 
-	protected final int cooldown = globalCooldown;
 	protected String name = "null";
+	protected int cooldown = -1;
 	protected Permission[] botPermissions = defaultPerms();
 	protected Permission[] userPermissions = new Permission[0];
 
 	protected abstract void execute(SlashCommandExecutedEvent event);
 
 	protected void run(SlashCommandExecutedEvent event) {
+		if (cooldown == -1) {
+			cooldown = client.getCommands().stream().filter(c -> c.getName().equals(name)).findFirst().get()
+					.getCooldown();
+		}
+
 		for (Permission p : userPermissions) {
 			if (p.isChannel()) {
 				if (!event.getMember().hasPermission(event.getTextChannel(), p)) {
-					event.embed(invalidEmbed("You must have the " + p.getName() + " permission in this channel to use that!"));
+					event.embed(invalidEmbed(
+							"You must have the " + p.getName() + " permission in this channel to use that!"));
 					return;
 				}
 			} else {
 				if (!event.getMember().hasPermission(p)) {
-					event.embed(invalidEmbed("You must have the " + p.getName() + " permission in this server to use that!"));
+					event.embed(invalidEmbed(
+							"You must have the " + p.getName() + " permission in this server to use that!"));
 					return;
 				}
 			}
@@ -53,18 +60,17 @@ public abstract class SlashCommand {
 				if (!event.getSelfMember().hasPermission(event.getTextChannel(), p)) {
 					if (p == Permission.MESSAGE_WRITE) {
 						event
-							.getUser()
-							.openPrivateChannel()
-							.queue(dm ->
-								dm
-									.sendMessageEmbeds(
-										invalidEmbed(
-											"I need the " + p.getName() + " permission in " + event.getTextChannel().getAsMention() + "!"
-										)
-											.build()
-									)
-									.queue(ignored -> {}, ignored -> {})
-							);
+								.getUser()
+								.openPrivateChannel()
+								.queue(dm -> dm
+										.sendMessageEmbeds(
+												invalidEmbed(
+														"I need the " + p.getName() + " permission in "
+																+ event.getTextChannel().getAsMention() + "!")
+																		.build())
+										.queue(ignored -> {
+										}, ignored -> {
+										}));
 					} else {
 						event.embed(invalidEmbed("I need the " + p.getName() + " permission in this channel!"));
 					}
@@ -86,11 +92,13 @@ public abstract class SlashCommand {
 	}
 
 	public int getRemainingCooldown(SlashCommandExecutedEvent event) {
-		String key = name + "|" + String.format("U:%d", event.getUser().getIdLong());
-		int remaining = client.getRemainingCooldown(key);
-		if (remaining > 0) {
-			return remaining;
-		} else {
+		if (!event.isOwner()) {
+			String key = name + "|" + String.format("U:%d", event.getUser().getIdLong());
+			int remaining = client.getRemainingCooldown(key);
+			if (remaining > 0) {
+				return remaining;
+			}
+
 			client.applyCooldown(key, cooldown);
 		}
 
@@ -99,9 +107,10 @@ public abstract class SlashCommand {
 
 	public void replyCooldown(SlashCommandExecutedEvent event, int remainingCooldown) {
 		event
-			.getHook()
-			.editOriginalEmbeds(invalidEmbed("That command is on cooldown for " + remainingCooldown + " more seconds").build())
-			.queue();
+				.getHook()
+				.editOriginalEmbeds(
+						invalidEmbed("That command is on cooldown for " + remainingCooldown + " more seconds").build())
+				.queue();
 	}
 
 	public abstract CommandData getCommandData();

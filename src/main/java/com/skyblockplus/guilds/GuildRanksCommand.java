@@ -35,7 +35,6 @@ import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.*;
 import java.io.FileReader;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -52,7 +51,8 @@ public class GuildRanksCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	public static EmbedBuilder getLeaderboard(String username, boolean ironmanOnly, boolean useKey, PaginatorEvent event) {
+	public static EmbedBuilder getLeaderboard(String username, boolean ironmanOnly, boolean useKey,
+			PaginatorEvent event) {
 		String hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
 
 		if (ironmanOnly) {
@@ -91,18 +91,15 @@ public class GuildRanksCommand extends Command {
 		String guildName = higherDepth(guildJson, "name").getAsString();
 		JsonElement lbSettings;
 		try {
-			lbSettings =
-				higherDepth(
+			lbSettings = higherDepth(
 					JsonParser.parseReader(new FileReader("src/main/java/com/skyblockplus/json/GuildSettings.json")),
-					guildId + ".guild_leaderboard"
-				);
+					guildId + ".guild_leaderboard");
 		} catch (Exception e) {
 			return invalidEmbed(
-				guildName +
-				"'s settings are not setup. Please join the [Skyblock Plus Discord](" +
-				DISCORD_SERVER_INVITE_LINK +
-				") to setup this for your guild."
-			);
+					guildName +
+							"'s settings are not setup. Please join the [Skyblock Plus Discord](" +
+							DISCORD_SERVER_INVITE_LINK +
+							") to setup this for your guild.");
 		}
 
 		String lbType = higherDepth(lbSettings, "lb_type").getAsString();
@@ -126,7 +123,8 @@ public class GuildRanksCommand extends Command {
 		List<GuildRanksStruct> gMembers = new ArrayList<>();
 		Map<String, String> ranksMap = new HashMap<>();
 		for (JsonElement guildM : guildMembers) {
-			ranksMap.put(higherDepth(guildM, "uuid").getAsString(), higherDepth(guildM, "rank").getAsString().toLowerCase());
+			ranksMap.put(higherDepth(guildM, "uuid").getAsString(),
+					higherDepth(guildM, "rank").getAsString().toLowerCase());
 		}
 
 		Instant lastUpdated = null;
@@ -145,36 +143,35 @@ public class GuildRanksCommand extends Command {
 
 					CompletableFuture<String> guildMemberUsername = asyncUuidToUsername(guildMemberUuid);
 					futuresList.add(
-						guildMemberUsername.thenApply(guildMemberUsernameResponse -> {
-							try {
-								if (keyCooldownMap.get(hypixelKey).getRemainingLimit().get() < 5) {
-									System.out.println(
-										"Sleeping for " + keyCooldownMap.get(hypixelKey).getTimeTillReset().get() + " seconds"
-									);
-									TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).getTimeTillReset().get());
-								}
-							} catch (Exception ignored) {}
-
-							CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(
-								guildMemberUuid,
-								hypixelKey
-							);
-
-							return guildMemberProfileJson.thenApply(guildMemberProfileJsonResponse -> {
-								Player guildMemberPlayer = new Player(
-									guildMemberUuid,
-									guildMemberUsernameResponse,
-									guildMemberProfileJsonResponse
-								);
-
-								if (guildMemberPlayer.isValid()) {
-									newGuildCache.addPlayer(guildMemberPlayer);
+							guildMemberUsername.thenApply(guildMemberUsernameResponse -> {
+								try {
+									if (keyCooldownMap.get(hypixelKey).getRemainingLimit().get() < 5) {
+										System.out.println(
+												"Sleeping for "
+														+ keyCooldownMap.get(hypixelKey).getTimeTillReset().get()
+														+ " seconds");
+										TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).getTimeTillReset().get());
+									}
+								} catch (Exception ignored) {
 								}
 
-								return null;
-							});
-						})
-					);
+								CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(
+										guildMemberUuid,
+										hypixelKey);
+
+								return guildMemberProfileJson.thenApply(guildMemberProfileJsonResponse -> {
+									Player guildMemberPlayer = new Player(
+											guildMemberUuid,
+											guildMemberUsernameResponse,
+											guildMemberProfileJsonResponse);
+
+									if (guildMemberPlayer.isValid()) {
+										newGuildCache.addPlayer(guildMemberPlayer);
+									}
+
+									return null;
+								});
+							}));
 				}
 
 				for (CompletableFuture<CompletableFuture<String>> future : futuresList) {
@@ -209,8 +206,9 @@ public class GuildRanksCommand extends Command {
 				}
 			}
 		} else {
-			JsonArray guildLbJson = higherDepth(getJson("https://hypixel-app-api.senither.com/leaderboard/players/" + guildId), "data")
-				.getAsJsonArray();
+			JsonArray guildLbJson = higherDepth(
+					getJson("https://hypixel-app-api.senither.com/leaderboard/players/" + guildId), "data")
+							.getAsJsonArray();
 			for (JsonElement lbM : guildLbJson) {
 				String lbUuid = higherDepth(lbM, "uuid").getAsString().replace("-", "");
 				String curRank = ranksMap.get(lbUuid);
@@ -221,18 +219,17 @@ public class GuildRanksCommand extends Command {
 					}
 
 					gMembers.add(
-						new GuildRanksStruct(
-							higherDepth(lbM, "username").getAsString(),
-							higherDepth(lbM, "average_skill_progress").getAsDouble(),
-							higherDepth(lbM, "total_slayer").getAsDouble(),
-							higherDepth(lbM, "catacomb").getAsDouble(),
-							higherDepth(lbM, "weight").getAsDouble(),
-							curRank
-						)
-					);
+							new GuildRanksStruct(
+									higherDepth(lbM, "username").getAsString(),
+									higherDepth(lbM, "average_skill_progress").getAsDouble(),
+									higherDepth(lbM, "total_slayer").getAsDouble(),
+									higherDepth(lbM, "catacomb").getAsDouble(),
+									higherDepth(lbM, "weight").getAsDouble(),
+									curRank));
 					uniqueGuildName.add(higherDepth(lbM, "username").getAsString());
 					Instant mLastUpdated = Instant.parse(higherDepth(lbM, "last_updated_at").getAsString());
-					lastUpdated = lastUpdated == null || mLastUpdated.isBefore(lastUpdated) ? mLastUpdated : lastUpdated;
+					lastUpdated = lastUpdated == null || mLastUpdated.isBefore(lastUpdated) ? mLastUpdated
+							: lastUpdated;
 				}
 			}
 		}
@@ -263,7 +260,8 @@ public class GuildRanksCommand extends Command {
 								slayerRank = j;
 								break;
 							}
-						} catch (NullPointerException ignored) {}
+						} catch (NullPointerException ignored) {
+						}
 					}
 				}
 
@@ -274,7 +272,8 @@ public class GuildRanksCommand extends Command {
 								skillsRank = j;
 								break;
 							}
-						} catch (NullPointerException ignored) {}
+						} catch (NullPointerException ignored) {
+						}
 					}
 				}
 
@@ -285,7 +284,8 @@ public class GuildRanksCommand extends Command {
 								catacombsRank = j;
 								break;
 							}
-						} catch (NullPointerException ignored) {}
+						} catch (NullPointerException ignored) {
+						}
 					}
 				}
 
@@ -296,7 +296,8 @@ public class GuildRanksCommand extends Command {
 								weightRank = j;
 								break;
 							}
-						} catch (NullPointerException ignored) {}
+						} catch (NullPointerException ignored) {
+						}
 					}
 				}
 
@@ -336,7 +337,8 @@ public class GuildRanksCommand extends Command {
 
 			JsonArray ranksArr = higherDepth(lbSettings, "ranks").getAsJsonArray();
 
-			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(20);
+			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1)
+					.setItemsPerPage(20);
 			int totalChange = 0;
 			for (ArrayList<GuildRanksStruct> currentLeaderboard : guildLeaderboards) {
 				for (int i = 0; i < currentLeaderboard.size(); i++) {
@@ -361,7 +363,8 @@ public class GuildRanksCommand extends Command {
 							}
 
 							if (!rankNamesList.contains(playerRank.toLowerCase())) {
-								paginateBuilder.addItems(("- /g setrank " + fixUsername(playerUsername) + " " + rankNamesList.get(0)));
+								paginateBuilder.addItems(
+										("- /g setrank " + fixUsername(playerUsername) + " " + rankNamesList.get(0)));
 								totalChange++;
 							}
 							break;
@@ -371,32 +374,30 @@ public class GuildRanksCommand extends Command {
 			}
 
 			paginateBuilder.setPaginatorExtras(
-				new PaginatorExtras()
-					.setEveryPageTitle("Rank changes for " + guildName)
-					.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
-					.setEveryPageText(
-						"**Total rank changes:** " +
-						totalChange +
-						(
-							lastUpdated != null
-								? "\n**Last updated:** " + instantToDHM(Duration.between(lastUpdated, Instant.now())) + " ago"
-								: ""
-						) +
-						"\n"
-					)
-			);
+					new PaginatorExtras()
+							.setEveryPageTitle("Rank changes for " + guildName)
+							.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
+							.setEveryPageText(
+									"**Total rank changes:** " +
+											totalChange +
+											(lastUpdated != null
+													? "\n**Last updated:** <t:" + lastUpdated.getEpochSecond() + ":R>"
+													: "")
+											+
+											"\n"));
 			event.paginate(paginateBuilder);
 		} else {
-			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(20);
+			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1)
+					.setItemsPerPage(20);
 			int totalChange = 0;
 			List<String> defaultRank = streamJsonArray(higherDepth(lbSettings, "default_role").getAsJsonArray())
-				.map(JsonElement::getAsString)
-				.collect(Collectors.toList());
+					.map(JsonElement::getAsString)
+					.collect(Collectors.toList());
 			for (GuildRanksStruct gMember : gMembers) {
 				for (JsonElement rank : higherDepth(lbSettings, "ranks").getAsJsonArray()) {
 					List<String> rankNamesList = streamJsonArray(higherDepth(rank, "names").getAsJsonArray())
-						.map(JsonElement::getAsString)
-						.collect(Collectors.toList());
+							.map(JsonElement::getAsString)
+							.collect(Collectors.toList());
 					boolean meetsReqOr = false;
 					for (JsonElement reqOr : higherDepth(rank, "requirements").getAsJsonArray()) {
 						boolean meetsReqAnd = true;
@@ -430,12 +431,14 @@ public class GuildRanksCommand extends Command {
 
 					if (meetsReqOr) {
 						if (!rankNamesList.contains(gMember.getGuildRank().toLowerCase())) {
-							paginateBuilder.addItems(("- /g setrank " + fixUsername(gMember.getName()) + " " + rankNamesList.get(0)));
+							paginateBuilder.addItems(
+									("- /g setrank " + fixUsername(gMember.getName()) + " " + rankNamesList.get(0)));
 							totalChange++;
 						}
 					} else {
 						if (!defaultRank.contains(gMember.getGuildRank().toLowerCase())) {
-							paginateBuilder.addItems(("- /g setrank " + fixUsername(gMember.getName()) + " " + defaultRank.get(0)));
+							paginateBuilder.addItems(
+									("- /g setrank " + fixUsername(gMember.getName()) + " " + defaultRank.get(0)));
 							totalChange++;
 						}
 					}
@@ -444,20 +447,19 @@ public class GuildRanksCommand extends Command {
 			}
 
 			paginateBuilder.setPaginatorExtras(
-				new PaginatorExtras()
-					.setEveryPageTitle("Rank changes for " + guildName)
-					.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
-					.setEveryPageText(
-						"**Total rank changes:** " +
-						totalChange +
-						(
-							lastUpdated != null
-								? "\n**Last updated:** " + instantToDHM(Duration.between(lastUpdated, Instant.now())) + " ago"
-								: ""
-						) +
-						"\n"
-					)
-			);
+					new PaginatorExtras()
+							.setEveryPageTitle("Rank changes for " + guildName)
+							.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
+							.setEveryPageText(
+									"**Total rank changes:** " +
+											totalChange +
+											(lastUpdated != null
+													? "\n**Last updated:** <t:"
+															+ lastUpdated.getEpochSecond()
+															+ ":R>"
+													: "")
+											+
+											"\n"));
 			if (paginateBuilder.getItemsSize() == 0) {
 				return defaultEmbed("No rank changes");
 			}
@@ -491,6 +493,6 @@ public class GuildRanksCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.queue();
+				.queue();
 	}
 }

@@ -18,7 +18,7 @@
 
 package com.skyblockplus.dungeons;
 
-import static com.skyblockplus.utils.Constants.ESSENCE_ITEM_NAMES;
+import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
@@ -60,13 +60,16 @@ public class EssenceCommand extends Command {
 						eb.setDescription("**Essence Type:** " + capitalizeString(essenceType) + " essence");
 						break;
 					case "dungeonize":
-						eb.addField("Dungeonize item", higherDepth(itemJson, level).getAsString() + " " + essenceType + " essence", false);
+						eb.addField("Dungeonize item",
+								higherDepth(itemJson, level).getAsString() + " " + essenceType + " essence", false);
 						break;
 					case "1":
-						eb.addField(level + " star", higherDepth(itemJson, level).getAsString() + " " + essenceType + " essence", false);
+						eb.addField(level + " star",
+								higherDepth(itemJson, level).getAsString() + " " + essenceType + " essence", false);
 						break;
 					default:
-						eb.addField(level + " stars", higherDepth(itemJson, level).getAsString() + " " + essenceType + " essence", false);
+						eb.addField(level + " stars",
+								higherDepth(itemJson, level).getAsString() + " " + essenceType + " essence", false);
 						break;
 				}
 			}
@@ -83,18 +86,21 @@ public class EssenceCommand extends Command {
 
 			for (Map.Entry<String, JsonElement> entry : player.profileJson().getAsJsonObject().entrySet()) {
 				if (entry.getKey().startsWith("essence_")) {
+					String essenceType = entry.getKey().split("essence_")[1];
 					eb.appendDescription(
-						"**• " +
-						capitalizeString(entry.getKey().split("essence_")[1]) +
-						" essence:** " +
-						formatNumber(entry.getValue().getAsInt()) +
-						"\n"
-					);
+							ESSENCE_EMOJI_MAP.get(essenceType) + "** " +
+									capitalizeString(essenceType) +
+									" essence:** " +
+									formatNumber(entry.getValue().getAsInt()) +
+									"\n");
 				}
 			}
 
-			for (Map.Entry<String, JsonElement> perk : higherDepth(player.profileJson(), "perks").getAsJsonObject().entrySet()) {
-				eb.appendDescription("\n**• " + capitalizeString(perk.getKey().replace("_", " ")) + ":** " + perk.getValue().getAsInt());
+			for (Map.Entry<String, JsonElement> perk : higherDepth(player.profileJson(), "perks").getAsJsonObject()
+					.entrySet()) {
+				eb.appendDescription("\n" + ESSENCE_EMOJI_MAP.get(perk.getKey()) + "** "
+						+ capitalizeString(perk.getKey().replace("_", " ")) + ":** "
+						+ perk.getValue().getAsInt());
 			}
 
 			return eb;
@@ -140,6 +146,6 @@ public class EssenceCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-			.queue();
+				.queue();
 	}
 }

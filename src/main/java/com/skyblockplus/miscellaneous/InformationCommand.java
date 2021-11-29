@@ -18,13 +18,12 @@
 
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.Main.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
-import java.time.OffsetDateTime;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
@@ -40,43 +39,40 @@ public class InformationCommand extends Command {
 
 	public static ActionRow getInformationActionRow() {
 		return ActionRow.of(
-			Button.link(BOT_INVITE_LINK, "Invite Link"),
-			Button.link(DISCORD_SERVER_INVITE_LINK, "Discord Server"),
-			Button.link(FORUM_POST_LINK, "Forum Post"),
-			Button.link("https://www.patreon.com/skyblock_plus", "Patreon")
-		);
+				Button.link(BOT_INVITE_LINK, "Invite Link"),
+				Button.link(DISCORD_SERVER_INVITE_LINK, "Discord Server"),
+				Button.link(FORUM_POST_LINK, "Forum Post"),
+				Button.link("https://www.patreon.com/skyblock_plus", "Patreon"));
 	}
 
-	public static EmbedBuilder getInformation(OffsetDateTime startTime) {
+	public static EmbedBuilder getInformation() {
 		EmbedBuilder eb = defaultEmbed("Skyblock Plus");
 
 		eb.setDescription(
-			"Skyblock Plus is a Skyblock focused Discord bot that has many commands to help Skyblock players and guild staff! It allows for quick retrieval of Skyblock stats plus customizable features for a better Skyblock experience."
-		);
+				"Skyblock Plus is a Skyblock focused Discord bot that has many commands to help Skyblock players and guild staff! It allows for quick retrieval of Skyblock stats plus customizable features for a better Skyblock experience.");
 		eb.addField(
-			"Statistics",
-			"**Servers:** " +
-			jda.getGuilds().size() +
-			"\n**Ping:** " +
-			jda.getRestPing().complete() +
-			"ms\n**Websocket:** " +
-			jda.getGatewayPing() +
-			"ms",
-			true
-		);
+				"Statistics",
+				"**Servers:** " +
+						jda.getGuilds().size() +
+						"\n**Ping:** " +
+						jda.getRestPing().complete() +
+						"ms\n**Websocket:** " +
+						jda.getGatewayPing() +
+						"ms",
+				true);
 		eb.addField(
-			"Usage",
-			"**Memory:** " +
-			roundAndFormat(
-				100.0 * (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (Runtime.getRuntime().totalMemory())
-			) +
-			"%",
-			true
-		);
+				"Usage",
+				"**Memory:** " +
+						roundAndFormat(
+								100.0 * (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())
+										/ (Runtime.getRuntime().totalMemory()))
+						+
+						"%",
+				true);
 
 		eb.setThumbnail("https://cdn.discordapp.com/attachments/803419567958392832/825768516636508160/sb_loading.gif");
 
-		eb.setFooter("Last restart").setTimestamp(startTime);
+		eb.setFooter("Last restart").setTimestamp(client.getStartTime());
 
 		return eb;
 	}
@@ -89,11 +85,11 @@ public class InformationCommand extends Command {
 				logCommand();
 
 				ebMessage
-					.editMessageEmbeds(getInformation(event.getClient().getStartTime()).build())
-					.setActionRows(getInformationActionRow())
-					.queue();
+						.editMessageEmbeds(getInformation().build())
+						.setActionRows(getInformationActionRow())
+						.queue();
 			}
 		}
-			.queue();
+				.queue();
 	}
 }
