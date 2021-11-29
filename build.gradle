@@ -1,0 +1,104 @@
+/*
+ * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
+ * Copyright (c) 2021 kr45732
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+plugins {
+    id 'application'
+
+    // Shadow jar
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
+
+    // Spring boot
+    id 'org.springframework.boot' version '2.5.3'
+    id "io.spring.dependency-management" version "1.0.11.RELEASE"
+
+    // Lombok annotations
+    id "io.freefair.lombok" version "6.0.0-m2"
+}
+
+version = '0.0.1'
+sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
+mainClassName = 'com.skyblockplus.Main'
+
+task stage(dependsOn: ['shadowJar']) {
+    dependsOn build
+    doLast {
+        file("build/libs/SkyblockPlus-0.0.1-all.jar").delete()
+	delete fileTree(dir: "build/distributions/")
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://m2.dv8tion.net/releases' }
+    maven { url 'https://jitpack.io' }
+    maven { url 'https://m2.chew.pro/releases' }
+}
+
+dependencies {
+    // JDA (Discord API wrapper)
+     implementation ('net.dv8tion:JDA:4.4.0_350') {
+         exclude module: 'opus-java'
+     }
+
+    // Discord webhooks
+    implementation 'club.minnced:discord-webhooks:0.7.2'
+
+    // JDA utilities
+    implementation 'pw.chew:jda-chewtils:1.22.0'
+
+    // Google libraries
+    implementation 'com.google.code.gson:gson:2.8.9'
+    implementation 'com.google.guava:guava:31.0.1-jre'
+
+    // NBT parser
+    implementation 'com.github.TheNullicorn:Nedit:2.1.0'
+
+    // Spring boot and postgresql
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.5.6'
+    implementation 'org.springframework.boot:spring-boot-starter-security:2.5.6'
+    implementation 'org.springframework.boot:spring-boot-starter-web:2.5.6'
+    runtimeOnly 'org.postgresql:postgresql:42.3.1'
+
+    // MySQL
+    implementation 'mysql:mysql-connector-java:8.0.27'
+
+    // Http Client
+    implementation 'org.apache.httpcomponents:httpclient:4.5.13'
+
+    // Async http client
+    implementation 'org.asynchttpclient:async-http-client:2.12.3'
+
+    // Emoji parser
+    implementation 'com.vdurmont:emoji-java:5.1.1'
+
+    // Apache common text
+    implementation 'org.apache.commons:commons-text:1.9'
+
+    // Groovy
+    implementation "org.codehaus.groovy:groovy:3.0.8"
+
+    // Logging
+    implementation 'ch.qos.logback:logback-classic:1.2.7'
+
+    // Git
+    implementation 'org.eclipse.jgit:org.eclipse.jgit:5.13.0.202109080827-r'
+
+    // Caching
+    // noinspection GradlePackageUpdate
+    implementation 'com.github.ben-manes.caffeine:caffeine:2.9.2'
+}
