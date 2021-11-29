@@ -39,7 +39,6 @@ public class BidsSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData(name, "Get a player's bids").addOption(OptionType.STRING, "player",
-				"Player username or mention");
+		return new CommandData(name, "Get a player's bids").addOption(OptionType.STRING, "player", "Player username or mention");
 	}
 }
