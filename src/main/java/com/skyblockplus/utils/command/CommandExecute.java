@@ -56,13 +56,14 @@ public abstract class CommandExecute {
 	public void queue() {
 		executor.submit(() -> {
 			if (sendLoadingEmbed) {
-				this.ebMessage = event
+				this.ebMessage =
+					event
 						.getChannel()
 						.sendMessage(
-								"**⚠️ Skyblock Plus will stop responding to message commands <t:1643806800:R>!** Please use slash commands instead. If you do not see slash commands from this bot, then please re-invite the bot using the link in "
-										+
-										getGuildPrefix(event.getGuild().getId()) +
-										"invite.")
+							"**⚠️ Skyblock Plus will stop responding to message commands <t:1643806800:R>!** Please use slash commands instead. If you do not see slash commands from this bot, then please re-invite the bot using the link in " +
+							getGuildPrefix(event.getGuild().getId()) +
+							"invite."
+						)
 						.setEmbeds(loadingEmbed().build())
 						.complete();
 			}
@@ -72,8 +73,7 @@ public abstract class CommandExecute {
 	}
 
 	protected void logCommand() {
-		com.skyblockplus.utils.Utils.logCommand(event.getGuild(), event.getAuthor(),
-				event.getMessage().getContentRaw());
+		com.skyblockplus.utils.Utils.logCommand(event.getGuild(), event.getAuthor(), event.getMessage().getContentRaw());
 	}
 
 	protected String[] setArgs(int limit) {
@@ -82,27 +82,19 @@ public abstract class CommandExecute {
 	}
 
 	protected void embed(EmbedBuilder embedBuilder) {
-		ebMessage.editMessageEmbeds(embedBuilder.build()).queue(ignored -> {
-		}, ignored -> {
-		});
+		ebMessage.editMessageEmbeds(embedBuilder.build()).queue(ignored -> {}, ignored -> {});
 	}
 
 	protected void paginate(EmbedBuilder embedBuilder) {
 		if (embedBuilder == null) {
-			ebMessage.delete().queue(ignored -> {
-			}, ignored -> {
-			});
+			ebMessage.delete().queue(ignored -> {}, ignored -> {});
 		} else {
-			ebMessage.editMessageEmbeds(embedBuilder.build()).queue(ignored -> {
-			}, ignored -> {
-			});
+			ebMessage.editMessageEmbeds(embedBuilder.build()).queue(ignored -> {}, ignored -> {});
 		}
 	}
 
 	protected void sendErrorEmbed() {
-		ebMessage.editMessageEmbeds(errorEmbed(command.getName()).build()).queue(ignored -> {
-		}, ignored -> {
-		});
+		ebMessage.editMessageEmbeds(errorEmbed(command.getName()).build()).queue(ignored -> {}, ignored -> {});
 	}
 
 	/**
@@ -145,10 +137,8 @@ public abstract class CommandExecute {
 		}
 
 		ebMessage
-				.editMessageEmbeds(invalidEmbed("<@" + userId + "> is not linked to the bot.").build())
-				.queue(ignored -> {
-				}, ignored -> {
-				});
+			.editMessageEmbeds(invalidEmbed("<@" + userId + "> is not linked to the bot.").build())
+			.queue(ignored -> {}, ignored -> {});
 		return true;
 	}
 

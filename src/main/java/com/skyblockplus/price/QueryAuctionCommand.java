@@ -97,23 +97,21 @@ public class QueryAuctionCommand extends Command {
 		EmbedBuilder eb = defaultEmbed("Query Auctions");
 
 		String lowestBinStr = "";
-		lowestBinStr += "**Name:** "
-				+ (tempName == null ? higherDepth(lowestBinAuction, "item_name").getAsString() : tempName);
+		lowestBinStr += "**Name:** " + (tempName == null ? higherDepth(lowestBinAuction, "item_name").getAsString() : tempName);
 		lowestBinStr += "\n**Rarity:** " + higherDepth(lowestBinAuction, "tier").getAsString().toLowerCase();
 		lowestBinStr += "\n**Price:** " + simplifyNumber(higherDepth(lowestBinAuction, "starting_bid").getAsDouble());
-		lowestBinStr += "\n**Seller:** "
-				+ uuidToUsername(higherDepth(lowestBinAuction, "auctioneer").getAsString()).getUsername();
+		lowestBinStr += "\n**Seller:** " + uuidToUsername(higherDepth(lowestBinAuction, "auctioneer").getAsString()).getUsername();
 		lowestBinStr += "\n**Auction:** `/viewauction " + higherDepth(lowestBinAuction, "uuid").getAsString() + "`";
-		lowestBinStr += "\n**Ends:** <t:"
-				+ Instant.ofEpochMilli(higherDepth(lowestBinAuction, "end_t").getAsLong()).getEpochSecond() + ":R>";
+		lowestBinStr +=
+			"\n**Ends:** <t:" + Instant.ofEpochMilli(higherDepth(lowestBinAuction, "end_t").getAsLong()).getEpochSecond() + ":R>";
 
 		String itemId = higherDepth(lowestBinAuction, "item_id").getAsString();
 		if (itemId.equals("ENCHANTED_BOOK")) {
 			eb.setThumbnail("https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK");
 		} else if (itemId.equals("PET")) {
 			eb.setThumbnail(
-					getPetUrl(higherDepth(lowestBinAuction, "item_name").getAsString().split("] ")[1].toUpperCase()
-							.replace(" ", "_")));
+				getPetUrl(higherDepth(lowestBinAuction, "item_name").getAsString().split("] ")[1].toUpperCase().replace(" ", "_"))
+			);
 		} else {
 			eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId);
 		}
@@ -139,6 +137,6 @@ public class QueryAuctionCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-				.queue();
+			.queue();
 	}
 }

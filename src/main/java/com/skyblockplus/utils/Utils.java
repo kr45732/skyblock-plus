@@ -80,7 +80,8 @@ public class Utils {
 	public static final Color botColor = new Color(223, 5, 5);
 	public static final int globalCooldown = 4;
 	public static final String DISCORD_SERVER_INVITE_LINK = "https://dsc.gg/skyblock-plus";
-	public static final String BOT_INVITE_LINK = "https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403041361&scope=bot%20applications.commands";
+	public static final String BOT_INVITE_LINK =
+		"https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403041361&scope=bot%20applications.commands";
 	public static final String FORUM_POST_LINK = "https://hypixel.net/threads/3980092";
 	public static final AsyncHttpClient asyncHttpClient = Dsl.asyncHttpClient();
 	public static final CloseableHttpClient httpClient = HttpClientBuilder.create().build();
@@ -92,9 +93,9 @@ public class Utils {
 	public static final AtomicInteger timeTillReset = new AtomicInteger(0);
 	public static final ConcurrentHashMap<String, HypixelKeyInformation> keyCooldownMap = new ConcurrentHashMap<>();
 	public static final Cache<String, HypixelGuildCache> hypixelGuildsCacheMap = Caffeine
-			.newBuilder()
-			.expireAfterWrite(15, TimeUnit.MINUTES)
-			.build();
+		.newBuilder()
+		.expireAfterWrite(15, TimeUnit.MINUTES)
+		.build();
 	public static final Gson gson = new Gson();
 	public static final Gson formattedGson = new GsonBuilder().setPrettyPrinting().create();
 	private static final Pattern patternControlCode = Pattern.compile("(?i)\\u00A7[0-9A-FK-OR]");
@@ -158,9 +159,8 @@ public class Utils {
 
 	public static JsonObject getInternalJsonMappings() {
 		if (internalJsonMappings == null) {
-			internalJsonMappings = getJson(
-					"https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json")
-							.getAsJsonObject();
+			internalJsonMappings =
+				getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json").getAsJsonObject();
 		}
 
 		return internalJsonMappings;
@@ -169,11 +169,9 @@ public class Utils {
 	public static JsonObject getEmojiMap() {
 		if (emojiMap == null) {
 			try {
-				emojiMap = JsonParser
-						.parseReader(new FileReader("src/main/java/com/skyblockplus/json/IdToEmojiMappings.json"))
-						.getAsJsonObject();
-			} catch (Exception ignored) {
-			}
+				emojiMap =
+					JsonParser.parseReader(new FileReader("src/main/java/com/skyblockplus/json/IdToEmojiMappings.json")).getAsJsonObject();
+			} catch (Exception ignored) {}
 		}
 
 		return emojiMap;
@@ -182,19 +180,16 @@ public class Utils {
 	public static boolean getEmojiMap(boolean forceReload) {
 		if (forceReload) {
 			try {
-				emojiMap = JsonParser
-						.parseReader(new FileReader("src/main/java/com/skyblockplus/json/IdToEmojiMappings.json"))
-						.getAsJsonObject();
-			} catch (Exception ignored) {
-			}
+				emojiMap =
+					JsonParser.parseReader(new FileReader("src/main/java/com/skyblockplus/json/IdToEmojiMappings.json")).getAsJsonObject();
+			} catch (Exception ignored) {}
 		}
 
 		return emojiMap != null && forceReload;
 	}
 
 	public static JsonElement getAverageAuctionJson() {
-		if (averageAuctionJson == null
-				|| Duration.between(averageAuctionJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
+		if (averageAuctionJson == null || Duration.between(averageAuctionJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
 			averageAuctionJson = getJson("https://moulberry.codes/auction_averages/3day.json");
 			averageAuctionJsonLastUpdated = Instant.now();
 		}
@@ -213,8 +208,7 @@ public class Utils {
 
 	public static double getNpcSellPrice(String id) {
 		if (npcSellPrices == null) {
-			npcSellPrices = higherDepth(getJson("https://api.hypixel.net/resources/skyblock/items"), "items")
-					.getAsJsonArray();
+			npcSellPrices = higherDepth(getJson("https://api.hypixel.net/resources/skyblock/items"), "items").getAsJsonArray();
 		}
 
 		for (JsonElement npcSellPrice : npcSellPrices) {
@@ -228,8 +222,7 @@ public class Utils {
 
 	public static JsonArray getSbzPricesJson() {
 		if (sbzPricesJson == null || Duration.between(sbzPricesJsonLastUpdated, Instant.now()).toMinutes() >= 15) {
-			sbzPricesJson = getJson("https://raw.githubusercontent.com/skyblockz/pricecheckbot/master/data.json")
-					.getAsJsonArray();
+			sbzPricesJson = getJson("https://raw.githubusercontent.com/skyblockz/pricecheckbot/master/data.json").getAsJsonArray();
 			sbzPricesJsonLastUpdated = Instant.now();
 		}
 
@@ -238,8 +231,7 @@ public class Utils {
 
 	public static JsonElement getMiscJson() {
 		if (miscJson == null) {
-			miscJson = getJson(
-					"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/misc.json");
+			miscJson = getJson("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/misc.json");
 		}
 
 		return miscJson;
@@ -247,15 +239,15 @@ public class Utils {
 
 	public static JsonElement getTalismanJson() {
 		if (talismanJson == null) {
-			talismanJson = parseJsString(
+			talismanJson =
+				parseJsString(
 					"{" +
-							getSkyCryptData(
-									"https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/talismans.js")
-											.replace("export const ", "")
-											.replace(" = ", ": ")
-											.replace(";", ",")
-							+
-							"}");
+					getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/talismans.js")
+						.replace("export const ", "")
+						.replace(" = ", ": ")
+						.replace(";", ",") +
+					"}"
+				);
 		}
 
 		return talismanJson;
@@ -271,8 +263,8 @@ public class Utils {
 
 	public static JsonElement getReforgeStonesJson() {
 		if (reforgeStonesJson == null) {
-			reforgeStonesJson = getJson(
-					"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/reforgestones.json");
+			reforgeStonesJson =
+				getJson("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/reforgestones.json");
 		}
 
 		return reforgeStonesJson;
@@ -280,40 +272,38 @@ public class Utils {
 
 	public static JsonElement getPetJson() {
 		if (petsJson == null) {
-			petsJson = getJson(
-					"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/pets.json");
+			petsJson = getJson("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/pets.json");
 		}
 		return petsJson;
 	}
 
 	public static JsonElement getPetNumsJson() {
 		if (petNumsJson == null) {
-			petNumsJson = getJson(
-					"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/petnums.json");
+			petNumsJson = getJson("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/petnums.json");
 		}
 		return petNumsJson;
 	}
 
 	public static JsonElement getEnchantsJson() {
 		if (enchantsJson == null) {
-			enchantsJson = getJson(
-					"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/enchants.json");
+			enchantsJson =
+				getJson("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/enchants.json");
 		}
 		return enchantsJson;
 	}
 
 	public static JsonElement getLevelingJson() {
 		if (levelingJson == null) {
-			levelingJson = getJson(
-					"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/leveling.json");
+			levelingJson =
+				getJson("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/leveling.json");
 		}
 		return levelingJson;
 	}
 
 	public static JsonElement getEssenceCostsJson() {
 		if (essenceCostsJson == null) {
-			essenceCostsJson = getJson(
-					"https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/essencecosts.json");
+			essenceCostsJson =
+				getJson("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/essencecosts.json");
 		}
 		return essenceCostsJson;
 	}
@@ -322,9 +312,10 @@ public class Utils {
 		if (collectionsJson == null) {
 			collectionsJson = new JsonObject();
 			JsonObject hypixelCollectionsJson = higherDepth(
-					getJson("https://api.hypixel.net/resources/skyblock/collections"),
-					"collections")
-							.getAsJsonObject();
+				getJson("https://api.hypixel.net/resources/skyblock/collections"),
+				"collections"
+			)
+				.getAsJsonObject();
 			for (Map.Entry<String, JsonElement> collectionType : hypixelCollectionsJson.entrySet()) {
 				JsonObject collectionItems = higherDepth(collectionType.getValue(), "items").getAsJsonObject();
 				for (Map.Entry<String, JsonElement> item : collectionItems.entrySet()) {
@@ -345,21 +336,22 @@ public class Utils {
 
 	public static JsonElement getSkyCryptPetJson() {
 		if (skyCryptPetJson == null) {
-			skyCryptPetJson = parseJsString(
+			skyCryptPetJson =
+				parseJsString(
 					Pattern
-							.compile("/\\*(.*)\\*/", Pattern.DOTALL)
-							.matcher(
-									"{" +
-											getSkyCryptData(
-													"https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/pets.js")
-															.split("];")[1].replace("export const ", "")
-																	.replace(" = ", ": ")
-																	.replace(";", ",")
-											+
-											"}")
-							.replaceAll("")
-							.replace("//(.*)", "")
-							.replaceAll("(description: `)(.*?)(\\s*`,)", ""));
+						.compile("/\\*(.*)\\*/", Pattern.DOTALL)
+						.matcher(
+							"{" +
+							getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/pets.js")
+								.split("];")[1].replace("export const ", "")
+								.replace(" = ", ": ")
+								.replace(";", ",") +
+							"}"
+						)
+						.replaceAll("")
+						.replace("//(.*)", "")
+						.replaceAll("(description: `)(.*?)(\\s*`,)", "")
+				);
 		}
 
 		return skyCryptPetJson;
@@ -372,8 +364,7 @@ public class Utils {
 				log.info("Sleeping for " + timeTillReset + " seconds");
 				TimeUnit.SECONDS.sleep(timeTillReset.get());
 			}
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 
 		try {
 			HttpGet httpget = new HttpGet(jsonUrl);
@@ -385,17 +376,14 @@ public class Utils {
 			try (CloseableHttpResponse httpResponse = httpClient.execute(httpget)) {
 				if (jsonUrl.toLowerCase().contains("api.hypixel.net") && jsonUrl.contains(HYPIXEL_API_KEY)) {
 					try {
-						remainingLimit
-								.set(Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Remaining").getValue()));
+						remainingLimit.set(Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Remaining").getValue()));
 						timeTillReset.set(Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Reset").getValue()));
-					} catch (Exception ignored) {
-					}
+					} catch (Exception ignored) {}
 				}
 
 				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent()));
 			}
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 		return null;
 	}
 
@@ -418,8 +406,7 @@ public class Utils {
 				}
 				return result.toString();
 			}
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 		return null;
 	}
 
@@ -431,13 +418,12 @@ public class Utils {
 			httpPost.setEntity(entity);
 
 			try (CloseableHttpResponse httpResponse = httpClient.execute(httpPost)) {
-				return ("https://hst.sh/" +
-						higherDepth(
-								JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())),
-								"key").getAsString());
+				return (
+					"https://hst.sh/" +
+					higherDepth(JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())), "key").getAsString()
+				);
 			}
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 		return null;
 	}
 
@@ -454,7 +440,8 @@ public class Utils {
 
 			if (response.get("socialMedia.links.DISCORD") == null) {
 				return new DiscordInfoStruct(
-						"Player is not linked on Hypixel. For help on how to link view [__**this video**__](https://streamable.com/sdq8tp).");
+					"Player is not linked on Hypixel. For help on how to link view [__**this video**__](https://streamable.com/sdq8tp)."
+				);
 			}
 
 			String discordTag = response.get("socialMedia.links.DISCORD").getAsString();
@@ -472,8 +459,7 @@ public class Utils {
 			skyCryptPetJson = getSkyCryptPetJson();
 		}
 		try {
-			return ("https://sky.shiiyu.moe"
-					+ higherDepth(skyCryptPetJson, "pet_data." + petName.toUpperCase() + ".head").getAsString());
+			return ("https://sky.shiiyu.moe" + higherDepth(skyCryptPetJson, "pet_data." + petName.toUpperCase() + ".head").getAsString());
 		} catch (Exception e) {
 			return null;
 		}
@@ -486,12 +472,11 @@ public class Utils {
 
 			try (CloseableHttpResponse httpResponse = httpClient.execute(httpget)) {
 				return new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent()))
-						.lines()
-						.parallel()
-						.collect(Collectors.joining("\n"));
+					.lines()
+					.parallel()
+					.collect(Collectors.joining("\n"));
 			}
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 		return null;
 	}
 
@@ -546,8 +531,7 @@ public class Utils {
 		EmbedBuilder eb = new EmbedBuilder();
 		eb.setColor(botColor);
 		eb.setFooter("Created by CrypticPlasma", null);
-		if (titleUrl != null && titleUrl.length() <= MessageEmbed.URL_MAX_LENGTH
-				&& EmbedBuilder.URL_PATTERN.matcher(titleUrl).matches()) {
+		if (titleUrl != null && titleUrl.length() <= MessageEmbed.URL_MAX_LENGTH && EmbedBuilder.URL_PATTERN.matcher(titleUrl).matches()) {
 			eb.setTitle(title, titleUrl);
 		} else {
 			eb.setTitle(title);
@@ -565,8 +549,7 @@ public class Utils {
 	}
 
 	public static EmbedBuilder loadingEmbed() {
-		return defaultEmbed(null).setImage(
-				"https://cdn.discordapp.com/attachments/803419567958392832/825768516636508160/sb_loading.gif");
+		return defaultEmbed(null).setImage("https://cdn.discordapp.com/attachments/803419567958392832/825768516636508160/sb_loading.gif");
 	}
 
 	public static EmbedBuilder errorEmbed(String name) {
@@ -575,15 +558,13 @@ public class Utils {
 
 	public static CustomPaginator.Builder defaultPaginator(User... eventAuthor) {
 		return new CustomPaginator.Builder()
-				.setEventWaiter(waiter)
-				.setColumns(1)
-				.setItemsPerPage(1)
-				.setFinalAction(m -> m.editMessageComponents().queue(ignored -> {
-				}, ignored -> {
-				}))
-				.setTimeout(30, TimeUnit.SECONDS)
-				.setColor(botColor)
-				.setUsers(eventAuthor);
+			.setEventWaiter(waiter)
+			.setColumns(1)
+			.setItemsPerPage(1)
+			.setFinalAction(m -> m.editMessageComponents().queue(ignored -> {}, ignored -> {}))
+			.setTimeout(30, TimeUnit.SECONDS)
+			.setColor(botColor)
+			.setUsers(eventAuthor);
 	}
 
 	/* Format numbers or text */
@@ -634,10 +615,10 @@ public class Utils {
 
 	public static String capitalizeString(String str) {
 		return Stream
-				.of(str.trim().split("\\s"))
-				.filter(word -> word.length() > 0)
-				.map(word -> word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase())
-				.collect(Collectors.joining(" "));
+			.of(str.trim().split("\\s"))
+			.filter(word -> word.length() > 0)
+			.map(word -> word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase())
+			.collect(Collectors.joining(" "));
 	}
 
 	public static String parseMcCodes(String unformattedString) {
@@ -707,14 +688,12 @@ public class Utils {
 	}
 
 	public static String toRomanNumerals(int number) {
-		return join("", nCopies(number, "i")).replace("iiiii", "v").replace("iiii", "iv").replace("vv", "x")
-				.replace("viv", "ix");
+		return join("", nCopies(number, "i")).replace("iiiii", "v").replace("iiii", "iv").replace("vv", "x").replace("viv", "ix");
 	}
 
 	public static JsonElement parseJsString(String jsString) {
 		try {
-			return JsonParser
-					.parseString(jsScriptEngine.eval(String.format("JSON.stringify(%s);", jsString)).toString());
+			return JsonParser.parseString(jsScriptEngine.eval(String.format("JSON.stringify(%s);", jsString)).toString());
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			return null;
@@ -724,8 +703,7 @@ public class Utils {
 	public static String convertSkyblockIdName(String itemName) {
 		try {
 			return higherDepth(getCollectionsJson(), itemName + ".name").getAsString();
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 		return capitalizeString(itemName.replace("_", " "));
 	}
 
@@ -733,12 +711,12 @@ public class Utils {
 		getInternalJsonMappings();
 
 		String internalName = itemName
-				.trim()
-				.toUpperCase()
-				.replace(" ", "_")
-				.replace("'S", "")
-				.replace("FRAG", "FRAGMENT")
-				.replace(".", "");
+			.trim()
+			.toUpperCase()
+			.replace(" ", "_")
+			.replace("'S", "")
+			.replace("FRAG", "FRAGMENT")
+			.replace(".", "");
 
 		switch (internalName) {
 			case "GOD_POT":
@@ -768,8 +746,10 @@ public class Utils {
 		}
 
 		for (Map.Entry<String, JsonElement> entry : internalJsonMappings.entrySet()) {
-			if (higherDepth(entry.getValue(), "name").getAsString().equalsIgnoreCase(itemName) ||
-					entry.getKey().equalsIgnoreCase(internalName)) {
+			if (
+				higherDepth(entry.getValue(), "name").getAsString().equalsIgnoreCase(itemName) ||
+				entry.getKey().equalsIgnoreCase(internalName)
+			) {
 				internalName = entry.getKey();
 				break;
 			}
@@ -871,12 +851,13 @@ public class Utils {
 			String[] database_url_unformatted = ((String) appProps.get("DATABASE_URL")).split(":", 3);
 			DATABASE_USERNAME = database_url_unformatted[1].replace("/", "");
 			DATABASE_PASSWORD = database_url_unformatted[2].split("@")[0];
-			DATABASE_URL = "jdbc:postgresql://" +
-					database_url_unformatted[2].split("@")[1] +
-					"?sslmode=require&user=" +
-					DATABASE_USERNAME +
-					"&password=" +
-					DATABASE_PASSWORD;
+			DATABASE_URL =
+				"jdbc:postgresql://" +
+				database_url_unformatted[2].split("@")[1] +
+				"?sslmode=require&user=" +
+				DATABASE_USERNAME +
+				"&password=" +
+				DATABASE_PASSWORD;
 			GITHUB_TOKEN = (String) appProps.get("GITHUB_TOKEN");
 			API_USERNAME = (String) appProps.get("API_USERNAME");
 			API_PASSWORD = (String) appProps.get("API_PASSWORD");
@@ -894,12 +875,13 @@ public class Utils {
 			String[] database_url_unformatted = System.getenv("DATABASE_URL").split(":", 3);
 			DATABASE_USERNAME = database_url_unformatted[1].replace("/", "");
 			DATABASE_PASSWORD = database_url_unformatted[2].split("@")[0];
-			DATABASE_URL = "jdbc:postgresql://" +
-					database_url_unformatted[2].split("@")[1] +
-					"?sslmode=require&user=" +
-					DATABASE_USERNAME +
-					"&password=" +
-					DATABASE_PASSWORD;
+			DATABASE_URL =
+				"jdbc:postgresql://" +
+				database_url_unformatted[2].split("@")[1] +
+				"?sslmode=require&user=" +
+				DATABASE_USERNAME +
+				"&password=" +
+				DATABASE_PASSWORD;
 			GITHUB_TOKEN = System.getenv("GITHUB_TOKEN");
 			API_USERNAME = System.getenv("API_USERNAME");
 			API_PASSWORD = System.getenv("API_PASSWORD");
@@ -938,11 +920,11 @@ public class Utils {
 			return null;
 		}
 
-		return ("https://sky.shiiyu.moe/stats/" +
-				username +
-				(profileName != null && !profileName.equalsIgnoreCase("Not Allowed To Quit Skyblock Ever Again")
-						? "/" + profileName
-						: ""));
+		return (
+			"https://sky.shiiyu.moe/stats/" +
+			username +
+			(profileName != null && !profileName.equalsIgnoreCase("Not Allowed To Quit Skyblock Ever Again") ? "/" + profileName : "")
+		);
 	}
 
 	public static Map<Integer, InvItem> getGenericInventoryMap(NBTCompound parsedContents) {
@@ -957,16 +939,15 @@ public class Utils {
 						InvItem itemInfo = new InvItem();
 						itemInfo.setName(parseMcCodes(item.getString("tag.display.Name", "None")));
 						itemInfo.setLore(
-								parseMcCodes(item.getString("tag.display.Lore", "None").replace(", ", "\n")
-										.replace("[", "").replace("]", "")));
+							parseMcCodes(item.getString("tag.display.Lore", "None").replace(", ", "\n").replace("[", "").replace("]", ""))
+						);
 						itemInfo.setCount(Integer.parseInt(item.getString("Count", "0").replace("b", " ")));
 						itemInfo.setId(item.getString("tag.ExtraAttributes.id", "None"));
 						itemInfo.setCreationTimestamp(item.getString("tag.ExtraAttributes.timestamp", "None"));
 						itemInfo.setHbpCount(item.getInt("tag.ExtraAttributes.hot_potato_count", 0));
 						itemInfo.setRecombobulated(item.getInt("tag.ExtraAttributes.rarity_upgrades", 0) == 1);
 						itemInfo.setModifier(item.getString("tag.ExtraAttributes.modifier", "None"));
-						itemInfo.setDungeonFloor(
-								Integer.parseInt(item.getString("tag.ExtraAttributes.item_tier", "-1")));
+						itemInfo.setDungeonFloor(Integer.parseInt(item.getString("tag.ExtraAttributes.item_tier", "-1")));
 						itemInfo.setNbtTag(item.toString());
 
 						if (item.containsTag("tag.ExtraAttributes.enchantments", TagType.COMPOUND)) {
@@ -1021,11 +1002,9 @@ public class Utils {
 							for (Map.Entry<String, Object> gem : gems.entrySet()) {
 								if (!gem.getKey().endsWith("_gem")) {
 									if (gems.containsKey(gem.getKey() + "_gem")) {
-										itemInfo.addExtraValue(
-												gem.getValue() + "_" + gems.get(gem.getKey() + "_gem") + "_GEM");
+										itemInfo.addExtraValue(gem.getValue() + "_" + gems.get(gem.getKey() + "_gem") + "_GEM");
 									} else {
-										itemInfo.addExtraValue(
-												gem.getValue() + "_" + gem.getKey().split("_")[0] + "_GEM");
+										itemInfo.addExtraValue(gem.getValue() + "_" + gem.getKey().split("_")[0] + "_GEM");
 									}
 								}
 							}
@@ -1036,25 +1015,20 @@ public class Utils {
 						}
 
 						try {
-							byte[] backpackContents = item
-									.getByteArray("tag.ExtraAttributes." + itemInfo.getId().toLowerCase() + "_data");
-							NBTCompound parsedContentsBackpack = NBTReader
-									.read(new ByteArrayInputStream(backpackContents));
+							byte[] backpackContents = item.getByteArray("tag.ExtraAttributes." + itemInfo.getId().toLowerCase() + "_data");
+							NBTCompound parsedContentsBackpack = NBTReader.read(new ByteArrayInputStream(backpackContents));
 							itemInfo.setBackpackItems(getGenericInventoryMap(parsedContentsBackpack).values());
-						} catch (Exception ignored) {
-						}
+						} catch (Exception ignored) {}
 
 						itemsMap.put(i, itemInfo);
 						continue;
 					}
-				} catch (Exception ignored) {
-				}
+				} catch (Exception ignored) {}
 				itemsMap.put(i, null);
 			}
 
 			return itemsMap;
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 
 		return null;
 	}
@@ -1070,18 +1044,19 @@ public class Utils {
 			for (ApplyGuild applySetting : applySettings) {
 				try {
 					database.deleteApplyCacheSettings(
-							automaticGuild.getKey(),
-							higherDepth(applySetting.currentSettings, "guildName").getAsString());
+						automaticGuild.getKey(),
+						higherDepth(applySetting.currentSettings, "guildName").getAsString()
+					);
 					List<ApplyUser> applyUserList = applySetting.applyUserList;
 					if (applyUserList.size() > 0) {
 						int code = database.setApplyCacheSettings(
-								automaticGuild.getKey(),
-								higherDepth(applySetting.currentSettings, "guildName").getAsString(),
-								gson.toJson(applyUserList));
+							automaticGuild.getKey(),
+							higherDepth(applySetting.currentSettings, "guildName").getAsString(),
+							gson.toJson(applyUserList)
+						);
 
 						if (code == 200) {
-							log.info("Successfully cached ApplyUser | " + automaticGuild.getKey() + " | "
-									+ applyUserList.size());
+							log.info("Successfully cached ApplyUser | " + automaticGuild.getKey() + " | " + applyUserList.size());
 						}
 					}
 				} catch (Exception e) {
@@ -1106,8 +1081,7 @@ public class Utils {
 				applyUsersCacheList.add(currentApplyUserCache);
 			}
 			if (applyUsersCacheList.size() > 0) {
-				log.info("Retrieved cache (" + applyUsersCacheList.size() + ") - guildId={" + guildId + "}, name={"
-						+ name + "}");
+				log.info("Retrieved cache (" + applyUsersCacheList.size() + ") - guildId={" + guildId + "}, name={" + name + "}");
 				database.deleteApplyCacheSettings(guildId, name);
 				return applyUsersCacheList;
 			}
@@ -1150,12 +1124,10 @@ public class Utils {
 	}
 
 	public static void refreshPriceOverrideJson() {
-		JsonElement splitPriceOverrides = getJson(
-				"https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/PriceOverrides.json")
-						.getAsJsonObject();
+		JsonElement splitPriceOverrides = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/PriceOverrides.json")
+			.getAsJsonObject();
 		priceOverrideJson = higherDepth(splitPriceOverrides, "automatic").getAsJsonObject();
-		for (Map.Entry<String, JsonElement> manualOverride : higherDepth(splitPriceOverrides, "manual")
-				.getAsJsonObject().entrySet()) {
+		for (Map.Entry<String, JsonElement> manualOverride : higherDepth(splitPriceOverrides, "manual").getAsJsonObject().entrySet()) {
 			priceOverrideJson.add(manualOverride.getKey(), manualOverride.getValue());
 		}
 		priceOverrideJson.remove("ENCHANTED_BOOK");
@@ -1184,10 +1156,10 @@ public class Utils {
 
 	public static Permission[] defaultPerms() {
 		return new Permission[] {
-				Permission.MESSAGE_WRITE,
-				Permission.MESSAGE_EMBED_LINKS,
-				Permission.MESSAGE_MANAGE,
-				Permission.MESSAGE_ADD_REACTION,
+			Permission.MESSAGE_WRITE,
+			Permission.MESSAGE_EMBED_LINKS,
+			Permission.MESSAGE_MANAGE,
+			Permission.MESSAGE_ADD_REACTION,
 		};
 	}
 

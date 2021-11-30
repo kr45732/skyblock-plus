@@ -113,9 +113,7 @@ public class SlashCommandExecutedEvent {
 	}
 
 	public void embed(EmbedBuilder eb) {
-		event.getHook().editOriginalEmbeds(eb.build()).queue(ignored -> {
-		}, ignored -> {
-		});
+		event.getHook().editOriginalEmbeds(eb.build()).queue(ignored -> {}, ignored -> {});
 	}
 
 	private boolean getLinkedUser(String id) {
@@ -152,18 +150,14 @@ public class SlashCommandExecutedEvent {
 
 	public void paginate(EmbedBuilder failEmbed, boolean deleteOriginal) {
 		if (failEmbed != null) {
-			event.getHook().editOriginalEmbeds(failEmbed.build()).queue(ignored -> {
-			}, ignored -> {
-			});
+			event.getHook().editOriginalEmbeds(failEmbed.build()).queue(ignored -> {}, ignored -> {});
 		} else if (deleteOriginal) {
 			event.getHook().deleteOriginal().queue();
 		}
 	}
 
 	public void string(String string) {
-		event.getHook().editOriginal(string).queue(ignored -> {
-		}, ignored -> {
-		});
+		event.getHook().editOriginal(string).queue(ignored -> {}, ignored -> {});
 	}
 
 	public Member getSelfMember() {

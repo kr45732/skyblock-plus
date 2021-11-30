@@ -20,7 +20,6 @@ package com.skyblockplus.settings;
 
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
-
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -39,13 +38,14 @@ public class SettingsSlashCommand extends SlashCommand {
 			event.logCommand();
 		}
 
-		event.paginate(new SettingsExecute(event.getGuild(), event.getChannel(), event.getUser())
-				.getSettingsEmbed(content, content.split("\\s+")), true);
+		event.paginate(
+			new SettingsExecute(event.getGuild(), event.getChannel(), event.getUser()).getSettingsEmbed(content, content.split("\\s+")),
+			true
+		);
 	}
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData(name, "Main settings command")
-				.addOption(OptionType.STRING, "command", "Subcommand to execute");
+		return new CommandData(name, "Main settings command").addOption(OptionType.STRING, "command", "Subcommand to execute");
 	}
 }

@@ -91,30 +91,29 @@ public class GuildStatisticsCommand extends Command {
 
 				CompletableFuture<String> guildMemberUsername = asyncUuidToUsername(guildMemberUuid);
 				futuresList.add(
-						guildMemberUsername.thenApply(guildMemberUsernameResponse -> {
-							try {
-								if (keyCooldownMap.get(hypixelKey).getRemainingLimit().get() < 5) {
-									System.out.println("Sleeping for "
-											+ keyCooldownMap.get(hypixelKey).getTimeTillReset().get() + " seconds");
-									TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).getTimeTillReset().get());
-								}
-							} catch (Exception ignored) {
+					guildMemberUsername.thenApply(guildMemberUsernameResponse -> {
+						try {
+							if (keyCooldownMap.get(hypixelKey).getRemainingLimit().get() < 5) {
+								System.out.println("Sleeping for " + keyCooldownMap.get(hypixelKey).getTimeTillReset().get() + " seconds");
+								TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).getTimeTillReset().get());
 							}
+						} catch (Exception ignored) {}
 
-							CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(
-									guildMemberUuid, hypixelKey);
-							return guildMemberProfileJson.thenApply(guildMemberProfileJsonResponse -> {
-								Player guildMemberPlayer = new Player(
-										guildMemberUuid,
-										guildMemberUsernameResponse,
-										guildMemberProfileJsonResponse);
+						CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(guildMemberUuid, hypixelKey);
+						return guildMemberProfileJson.thenApply(guildMemberProfileJsonResponse -> {
+							Player guildMemberPlayer = new Player(
+								guildMemberUuid,
+								guildMemberUsernameResponse,
+								guildMemberProfileJsonResponse
+							);
 
-								if (guildMemberPlayer.isValid()) {
-									newGuildCache.addPlayer(guildMemberPlayer);
-								}
-								return null;
-							});
-						}));
+							if (guildMemberPlayer.isValid()) {
+								newGuildCache.addPlayer(guildMemberPlayer);
+							}
+							return null;
+						});
+					})
+				);
 			}
 
 			for (CompletableFuture<CompletableFuture<String>> future : futuresList) {
@@ -130,88 +129,86 @@ public class GuildStatisticsCommand extends Command {
 		}
 
 		List<String> slayerLb = guildMemberPlayersList
-				.stream()
-				.sorted(Comparator.comparingDouble(m -> -getDoubleFromCache(m, "slayer")))
-				.collect(Collectors.toList());
+			.stream()
+			.sorted(Comparator.comparingDouble(m -> -getDoubleFromCache(m, "slayer")))
+			.collect(Collectors.toList());
 		List<String> skillsLb = guildMemberPlayersList
-				.stream()
-				.sorted(Comparator.comparingDouble(m -> -getDoubleFromCache(m, "skills")))
-				.collect(Collectors.toList());
+			.stream()
+			.sorted(Comparator.comparingDouble(m -> -getDoubleFromCache(m, "skills")))
+			.collect(Collectors.toList());
 		List<String> cataLb = guildMemberPlayersList
-				.stream()
-				.sorted(Comparator.comparingDouble(m -> -getDoubleFromCache(m, "catacombs")))
-				.collect(Collectors.toList());
+			.stream()
+			.sorted(Comparator.comparingDouble(m -> -getDoubleFromCache(m, "catacombs")))
+			.collect(Collectors.toList());
 		List<String> weightLb = guildMemberPlayersList
-				.stream()
-				.sorted(Comparator.comparingDouble(m -> -getDoubleFromCache(m, "weight")))
-				.collect(Collectors.toList());
+			.stream()
+			.sorted(Comparator.comparingDouble(m -> -getDoubleFromCache(m, "weight")))
+			.collect(Collectors.toList());
 
-		double averageSlayer = slayerLb.stream().mapToDouble(m -> getDoubleFromCache(m, "slayer")).sum()
-				/ slayerLb.size();
-		double averageSkills = skillsLb.stream().mapToDouble(m -> getDoubleFromCache(m, "skills")).sum()
-				/ skillsLb.size();
+		double averageSlayer = slayerLb.stream().mapToDouble(m -> getDoubleFromCache(m, "slayer")).sum() / slayerLb.size();
+		double averageSkills = skillsLb.stream().mapToDouble(m -> getDoubleFromCache(m, "skills")).sum() / skillsLb.size();
 		double averageCata = cataLb.stream().mapToDouble(m -> getDoubleFromCache(m, "catacombs")).sum() / cataLb.size();
-		double averageWeight = weightLb.stream().mapToDouble(m -> getDoubleFromCache(m, "weight")).sum()
-				/ weightLb.size();
+		double averageWeight = weightLb.stream().mapToDouble(m -> getDoubleFromCache(m, "weight")).sum() / weightLb.size();
 
 		eb = defaultEmbed(guildName, "https://hypixel-leaderboard.senither.com/guilds/" + guildId);
 		eb.setDescription(
-				"**Average slayer XP:** " +
-						roundAndFormat(averageSlayer) +
-						"\n**Average skills level:** " +
-						roundAndFormat(averageSkills) +
-						"\n**Average catacombs level:** " +
-						roundAndFormat(averageCata) +
-						"\n**Average weight:** " +
-						roundAndFormat(averageWeight) +
-						(lastUpdated != null ? "\n**Last updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : ""));
+			"**Average slayer XP:** " +
+			roundAndFormat(averageSlayer) +
+			"\n**Average skills level:** " +
+			roundAndFormat(averageSkills) +
+			"\n**Average catacombs level:** " +
+			roundAndFormat(averageCata) +
+			"\n**Average weight:** " +
+			roundAndFormat(averageWeight) +
+			(lastUpdated != null ? "\n**Last updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "")
+		);
 		StringBuilder slayerStr = new StringBuilder();
 		for (int i = 0; i < Math.min(5, slayerLb.size()); i++) {
 			String cur = slayerLb.get(i);
 			slayerStr
-					.append("`")
-					.append(i + 1)
-					.append(")` ")
-					.append(fixUsername(getStringFromCache(cur, "username")))
-					.append(": ")
-					.append(roundAndFormat(getDoubleFromCache(cur, "slayer")))
-					.append("\n");
+				.append("`")
+				.append(i + 1)
+				.append(")` ")
+				.append(fixUsername(getStringFromCache(cur, "username")))
+				.append(": ")
+				.append(roundAndFormat(getDoubleFromCache(cur, "slayer")))
+				.append("\n");
 		}
 		StringBuilder skillsStr = new StringBuilder();
 		for (int i = 0; i < Math.min(5, skillsLb.size()); i++) {
 			String cur = skillsLb.get(i);
 			skillsStr
-					.append("`")
-					.append(i + 1)
-					.append(")` ")
-					.append(fixUsername(getStringFromCache(cur, "username")))
-					.append(": ")
-					.append(roundAndFormat(getDoubleFromCache(cur, "skills")))
-					.append("\n");
+				.append("`")
+				.append(i + 1)
+				.append(")` ")
+				.append(fixUsername(getStringFromCache(cur, "username")))
+				.append(": ")
+				.append(roundAndFormat(getDoubleFromCache(cur, "skills")))
+				.append("\n");
 		}
 		StringBuilder cataStr = new StringBuilder();
 		for (int i = 0; i < Math.min(5, cataLb.size()); i++) {
 			String cur = cataLb.get(i);
 			cataStr
-					.append("`")
-					.append(i + 1)
-					.append(")` ")
-					.append(fixUsername(getStringFromCache(cur, "username")))
-					.append(": ")
-					.append(roundAndFormat(getDoubleFromCache(cur, "catacombs")))
-					.append("\n");
+				.append("`")
+				.append(i + 1)
+				.append(")` ")
+				.append(fixUsername(getStringFromCache(cur, "username")))
+				.append(": ")
+				.append(roundAndFormat(getDoubleFromCache(cur, "catacombs")))
+				.append("\n");
 		}
 		StringBuilder weightStr = new StringBuilder();
 		for (int i = 0; i < Math.min(5, weightLb.size()); i++) {
 			String cur = weightLb.get(i);
 			weightStr
-					.append("`")
-					.append(i + 1)
-					.append(")` ")
-					.append(fixUsername(getStringFromCache(cur, "username")))
-					.append(": ")
-					.append(roundAndFormat(getDoubleFromCache(cur, "weight")))
-					.append("\n");
+				.append("`")
+				.append(i + 1)
+				.append(")` ")
+				.append(fixUsername(getStringFromCache(cur, "username")))
+				.append(": ")
+				.append(roundAndFormat(getDoubleFromCache(cur, "weight")))
+				.append("\n");
 		}
 		eb.addField("Slayer top 5", slayerStr.toString(), false);
 		eb.addField("Skills top 5", skillsStr.toString(), false);
@@ -236,6 +233,6 @@ public class GuildStatisticsCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-				.queue();
+			.queue();
 	}
 }

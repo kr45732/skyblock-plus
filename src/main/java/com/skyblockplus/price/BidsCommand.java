@@ -64,41 +64,39 @@ public class BidsCommand extends Command {
 			Instant endingAt = Instant.ofEpochMilli(higherDepth(bid, "end_t").getAsLong());
 			Duration duration = Duration.between(Instant.now(), endingAt);
 
-			itemName = (isPet ? capitalizeString(higherDepth(bid, "tier").getAsString()) + " " : "")
-					+ higherDepth(bid, "item_name").getAsString();
+			itemName =
+				(isPet ? capitalizeString(higherDepth(bid, "tier").getAsString()) + " " : "") + higherDepth(bid, "item_name").getAsString();
 
 			JsonArray bidsArr = higherDepth(bid, "bids").getAsJsonArray();
 			long highestBid = higherDepth(bidsArr, "[" + (bidsArr.size() - 1) + "].amount").getAsLong();
 			if (duration.toMillis() > 0) {
 				auctionDesc = "Current bid: " + simplifyNumber(highestBid);
 				auctionDesc += " | Ending in <t:" + endingAt.getEpochSecond() + ":R>";
-				auctionDesc += "\nHighest bidder: " +
-						uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString())
-								.getUsername();
+				auctionDesc +=
+					"\nHighest bidder: " +
+					uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).getUsername();
 				for (int i = bidsArr.size() - 1; i >= 0; i--) {
 					JsonElement curBid = bidsArr.get(i);
 					if (higherDepth(curBid, "bidder").getAsString().equals(usernameUuidStruct.getUuid())) {
-						auctionDesc += "\nYour highest bid: "
-								+ simplifyNumber(higherDepth(curBid, "amount").getAsDouble());
+						auctionDesc += "\nYour highest bid: " + simplifyNumber(higherDepth(curBid, "amount").getAsDouble());
 						break;
 					}
 				}
 			} else {
 				auctionDesc = "Auction sold for " + simplifyNumber(highestBid) + " coins";
-				auctionDesc += "\n " +
-						uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString())
-								.getUsername()
-						+
-						" won the auction";
+				auctionDesc +=
+					"\n " +
+					uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).getUsername() +
+					" won the auction";
 			}
 
 			extras.addEmbedField(itemName, auctionDesc, false);
 		}
 
 		extras
-				.setEveryPageTitle(usernameUuidStruct.getUsername())
-				.setEveryPageTitleUrl(skyblockStatsLink(usernameUuidStruct.getUsername(), null))
-				.setEveryPageThumbnail(usernameUuidStruct.getAvatarlUrl());
+			.setEveryPageTitle(usernameUuidStruct.getUsername())
+			.setEveryPageTitleUrl(skyblockStatsLink(usernameUuidStruct.getUsername(), null))
+			.setEveryPageThumbnail(usernameUuidStruct.getAvatarlUrl());
 
 		event.paginate(paginateBuilder.setPaginatorExtras(extras));
 		return null;
@@ -123,6 +121,6 @@ public class BidsCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-				.queue();
+			.queue();
 	}
 }

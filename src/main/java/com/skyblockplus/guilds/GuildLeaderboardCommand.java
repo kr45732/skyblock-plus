@@ -52,8 +52,7 @@ public class GuildLeaderboardCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	public static EmbedBuilder getLeaderboard(String lbType, String username, boolean ironmanOnly,
-			PaginatorEvent event) {
+	public static EmbedBuilder getLeaderboard(String lbType, String username, boolean ironmanOnly, PaginatorEvent event) {
 		String hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
 
 		EmbedBuilder eb = checkHypixelKey(hypixelKey);
@@ -63,8 +62,9 @@ public class GuildLeaderboardCommand extends Command {
 
 		if (typeToIndex(lbType.toLowerCase()) < 2) { // Type is invalid, username, or uuid
 			return invalidEmbed(
-					lbType +
-							" is an invalid leaderboard type. Valid types are: `slayer`, `skills`, `catacombs`, `weight`, `sven_xp`, `rev_xp`, `tara_xp`, `enderman_xp`, `alchemy`, `combat`,`fishing`, `farming`, `foraging`, `carpentry`, `mining`, `taming`, and `enchanting`");
+				lbType +
+				" is an invalid leaderboard type. Valid types are: `slayer`, `skills`, `catacombs`, `weight`, `sven_xp`, `rev_xp`, `tara_xp`, `enderman_xp`, `alchemy`, `combat`,`fishing`, `farming`, `foraging`, `carpentry`, `mining`, `taming`, and `enchanting`"
+			);
 		}
 		lbType = lbType.toLowerCase();
 
@@ -100,30 +100,29 @@ public class GuildLeaderboardCommand extends Command {
 
 				CompletableFuture<String> guildMemberUsername = asyncUuidToUsername(guildMemberUuid);
 				futuresList.add(
-						guildMemberUsername.thenApply(guildMemberUsernameResponse -> {
-							try {
-								if (keyCooldownMap.get(hypixelKey).getRemainingLimit().get() < 5) {
-									System.out.println("Sleeping for "
-											+ keyCooldownMap.get(hypixelKey).getTimeTillReset().get() + " seconds");
-									TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).getTimeTillReset().get());
-								}
-							} catch (Exception ignored) {
+					guildMemberUsername.thenApply(guildMemberUsernameResponse -> {
+						try {
+							if (keyCooldownMap.get(hypixelKey).getRemainingLimit().get() < 5) {
+								System.out.println("Sleeping for " + keyCooldownMap.get(hypixelKey).getTimeTillReset().get() + " seconds");
+								TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).getTimeTillReset().get());
 							}
+						} catch (Exception ignored) {}
 
-							CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(
-									guildMemberUuid, hypixelKey);
-							return guildMemberProfileJson.thenApply(guildMemberProfileJsonResponse -> {
-								Player guildMemberPlayer = new Player(
-										guildMemberUuid,
-										guildMemberUsernameResponse,
-										guildMemberProfileJsonResponse);
+						CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(guildMemberUuid, hypixelKey);
+						return guildMemberProfileJson.thenApply(guildMemberProfileJsonResponse -> {
+							Player guildMemberPlayer = new Player(
+								guildMemberUuid,
+								guildMemberUsernameResponse,
+								guildMemberProfileJsonResponse
+							);
 
-								if (guildMemberPlayer.isValid()) {
-									newGuildCache.addPlayer(guildMemberPlayer);
-								}
-								return null;
-							});
-						}));
+							if (guildMemberPlayer.isValid()) {
+								newGuildCache.addPlayer(guildMemberPlayer);
+							}
+							return null;
+						});
+					})
+				);
 			}
 
 			for (CompletableFuture<CompletableFuture<String>> future : futuresList) {
@@ -143,8 +142,7 @@ public class GuildLeaderboardCommand extends Command {
 
 		int guildRank = -1;
 		String amt = "-1";
-		for (int i = 0,
-				guildMemberPlayersListSize = guildMemberPlayersList.size(); i < guildMemberPlayersListSize; i++) {
+		for (int i = 0, guildMemberPlayersListSize = guildMemberPlayersList.size(); i < guildMemberPlayersListSize; i++) {
 			String guildPlayer = guildMemberPlayersList.get(i);
 			String formattedAmt = roundAndFormat(getDoubleFromCache(guildPlayer, lbType));
 			String guildPlayerUsername = getStringFromCache(guildPlayer, "username");
@@ -156,21 +154,23 @@ public class GuildLeaderboardCommand extends Command {
 			}
 		}
 
-		String ebStr = "**Player:** " +
-				usernameUuidStruct.getUsername() +
-				"\n**Guild Rank:** #" +
-				(guildRank + 1) +
-				"\n**" +
-				capitalizeString(lbType.replace("_", " ")) +
-				":** " +
-				amt +
-				(lastUpdated != null ? "\n**Last updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "");
+		String ebStr =
+			"**Player:** " +
+			usernameUuidStruct.getUsername() +
+			"\n**Guild Rank:** #" +
+			(guildRank + 1) +
+			"\n**" +
+			capitalizeString(lbType.replace("_", " ")) +
+			":** " +
+			amt +
+			(lastUpdated != null ? "\n**Last updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "");
 
 		paginateBuilder.setPaginatorExtras(
-				new PaginatorExtras()
-						.setEveryPageTitle(guildName)
-						.setEveryPageText(ebStr)
-						.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId));
+			new PaginatorExtras()
+				.setEveryPageTitle(guildName)
+				.setEveryPageText(ebStr)
+				.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
+		);
 		event.paginate(paginateBuilder);
 
 		return null;
@@ -199,6 +199,6 @@ public class GuildLeaderboardCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-				.queue();
+			.queue();
 	}
 }

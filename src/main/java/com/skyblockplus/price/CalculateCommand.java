@@ -53,17 +53,15 @@ public class CalculateCommand extends Command {
 
 		JsonElement auction = auctionResponse.get("[0]");
 		try {
-			InvItem item = getGenericInventoryMap(
-					NBTReader.readBase64(higherDepth(auction, "item_bytes.data").getAsString())).get(0);
+			InvItem item = getGenericInventoryMap(NBTReader.readBase64(higherDepth(auction, "item_bytes.data").getAsString())).get(0);
 			double price = new NetworthExecute().initPrices().calculateItemPrice(item);
 			String itemName = higherDepth(auction, "item_name").getAsString();
 			if (item.getId().equals("ENCHANTED_BOOK")) {
 				itemName = parseMcCodes(higherDepth(auction, "item_lore").getAsString().split("\n")[0]);
 			} else {
-				itemName = (item.getId().equals("PET")
-						? capitalizeString(higherDepth(auction, "tier").getAsString().toLowerCase()) + " "
-						: "") +
-						itemName;
+				itemName =
+					(item.getId().equals("PET") ? capitalizeString(higherDepth(auction, "tier").getAsString().toLowerCase()) + " " : "") +
+					itemName;
 			}
 
 			Instant endingAt = Instant.ofEpochMilli(higherDepth(auction, "end").getAsLong());
@@ -79,33 +77,31 @@ public class CalculateCommand extends Command {
 
 			if (duration.toMillis() > 0) {
 				if (bin) {
-					ebStr += "\n**BIN:** " + simplifyNumber(startingBid) + " coins | Ending in <t:"
-							+ endingAt.getEpochSecond() + ":R>";
+					ebStr += "\n**BIN:** " + simplifyNumber(startingBid) + " coins | Ending in <t:" + endingAt.getEpochSecond() + ":R>";
 				} else {
-					ebStr += "\n**Current bid:** " + simplifyNumber(highestBid) + " | Ending in <t:"
-							+ endingAt.getEpochSecond() + ":R>";
-					ebStr += bidsArr.size() > 0
+					ebStr += "\n**Current bid:** " + simplifyNumber(highestBid) + " | Ending in <t:" + endingAt.getEpochSecond() + ":R>";
+					ebStr +=
+						bidsArr.size() > 0
 							? "\n**Highest bidder:** " +
-									uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString())
-											.getUsername()
+							uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).getUsername()
 							: "";
 				}
 			} else {
 				if (highestBid >= startingBid) {
-					ebStr += "\n**Auction sold** for " +
-							simplifyNumber(highestBid) +
-							" coins to " +
-							uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString())
-									.getUsername();
+					ebStr +=
+						"\n**Auction sold** for " +
+						simplifyNumber(highestBid) +
+						" coins to " +
+						uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).getUsername();
 				} else {
 					ebStr = "\n**Auction did not sell**";
 				}
 			}
 
 			return defaultEmbed("Auction Price Calculator")
-					.setThumbnail("https://sky.shiiyu.moe/item.gif/" + item.getId())
-					.setDescription(ebStr)
-					.appendDescription("\n**Calculated Price:** " + roundAndFormat(price));
+				.setThumbnail("https://sky.shiiyu.moe/item.gif/" + item.getId())
+				.setDescription(ebStr)
+				.appendDescription("\n**Calculated Price:** " + roundAndFormat(price));
 		} catch (Exception e) {
 			e.printStackTrace();
 			return defaultEmbed("Error parsing data");
@@ -127,6 +123,6 @@ public class CalculateCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-				.queue();
+			.queue();
 	}
 }

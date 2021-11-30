@@ -51,11 +51,12 @@ public class AuctionCommand extends Command {
 	}
 
 	public static EmbedBuilder getPlayerAuction(
-			String username,
-			AuctionFilterType filterType,
-			AuctionSortType sortType,
-			boolean verbose,
-			PaginatorEvent event) {
+		String username,
+		AuctionFilterType filterType,
+		AuctionSortType sortType,
+		boolean verbose,
+		PaginatorEvent event
+	) {
 		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
 		if (usernameUuidStruct.isNotValid()) {
 			return invalidEmbed(usernameUuidStruct.getFailCause());
@@ -69,14 +70,20 @@ public class AuctionCommand extends Command {
 		JsonArray auctionsArray = auctionsResponse.getResponse().getAsJsonArray();
 		Stream<JsonElement> stream = streamJsonArray(auctionsArray);
 		if (filterType == AuctionFilterType.SOLD || filterType == AuctionFilterType.UNSOLD) {
-			stream = stream.filter(auction -> (filterType == AuctionFilterType.SOLD) == (higherDepth(auction,
-					"highest_bid_amount", 0) >= higherDepth(auction, "starting_bid", 0)));
+			stream =
+				stream.filter(auction ->
+					(filterType == AuctionFilterType.SOLD) ==
+					(higherDepth(auction, "highest_bid_amount", 0) >= higherDepth(auction, "starting_bid", 0))
+				);
 		}
 		if (sortType == AuctionSortType.LOW || sortType == AuctionSortType.HIGH) {
-			stream = stream.sorted(
-					Comparator.comparingLong(auction -> (sortType == AuctionSortType.LOW ? 1 : -1) *
-							Math.max(higherDepth(auction, "highest_bid_amount", 0L),
-									higherDepth(auction, "starting_bid", 0))));
+			stream =
+				stream.sorted(
+					Comparator.comparingLong(auction ->
+						(sortType == AuctionSortType.LOW ? 1 : -1) *
+						Math.max(higherDepth(auction, "highest_bid_amount", 0L), higherDepth(auction, "starting_bid", 0))
+					)
+				);
 		}
 		auctionsArray = collectJsonArray(stream);
 
@@ -86,30 +93,25 @@ public class AuctionCommand extends Command {
 			long failedToSell = 0;
 			long auctionTax = 0;
 
-			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1)
-					.setItemsPerPage(10);
+			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(10);
 			PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_FIELDS);
 
 			for (JsonElement currentAuction : auctionsArray) {
 				if (!higherDepth(currentAuction, "claimed").getAsBoolean()) {
 					String auctionName;
 					String auction;
-					boolean isPet = higherDepth(currentAuction, "item_lore").getAsString().toLowerCase()
-							.contains("pet");
+					boolean isPet = higherDepth(currentAuction, "item_lore").getAsString().toLowerCase().contains("pet");
 					boolean bin = higherDepth(currentAuction, "bin", false);
 
 					Instant endingAt = Instant.ofEpochMilli(higherDepth(currentAuction, "end").getAsLong());
 					Duration duration = Duration.between(Instant.now(), endingAt);
 
 					if (higherDepth(currentAuction, "item_name").getAsString().equals("Enchanted Book")) {
-						auctionName = parseMcCodes(
-								higherDepth(currentAuction, "item_lore").getAsString().split("\n")[0]);
+						auctionName = parseMcCodes(higherDepth(currentAuction, "item_lore").getAsString().split("\n")[0]);
 					} else {
-						auctionName = (isPet
-								? capitalizeString(higherDepth(currentAuction, "tier").getAsString().toLowerCase())
-										+ " "
-								: "") +
-								higherDepth(currentAuction, "item_name").getAsString();
+						auctionName =
+							(isPet ? capitalizeString(higherDepth(currentAuction, "tier").getAsString().toLowerCase()) + " " : "") +
+							higherDepth(currentAuction, "item_name").getAsString();
 					}
 
 					long highestBid = higherDepth(currentAuction, "highest_bid_amount", 0);
@@ -127,9 +129,9 @@ public class AuctionCommand extends Command {
 						if (highestBid >= startingBid) {
 							auction = "Auction sold for " + simplifyNumber(highestBid) + " coins";
 							totalSoldValue += highestBid;
-							auctionTax += (highestBid > 1000000)
-									? ((0.99 * highestBid < 1000000) ? (highestBid - 1000000)
-											: (long) (0.01 * highestBid))
+							auctionTax +=
+								(highestBid > 1000000)
+									? ((0.99 * highestBid < 1000000) ? (highestBid - 1000000) : (long) (0.01 * highestBid))
 									: 0;
 						} else {
 							auction = "Auction did not sell";
@@ -146,25 +148,20 @@ public class AuctionCommand extends Command {
 			}
 
 			extras
-					.setEveryPageTitle(usernameUuidStruct.getUsername())
-					.setEveryPageTitleUrl(skyblockStatsLink(usernameUuidStruct.getUsername(), null))
-					.setEveryPageThumbnail(usernameUuidStruct.getAvatarlUrl())
-					.setEveryPageText(
-							(totalSoldValue > 0
-									? "**Sold Auctions Value:** " +
-											simplifyNumber(totalSoldValue) +
-											(auctionTax > 0
-													? " - " + simplifyNumber(auctionTax) + " = "
-															+ simplifyNumber(totalSoldValue - auctionTax)
-													: "")
-									: "") +
-									(totalPendingValue > 0
-											? "\n**Unsold Auctions Value:** " + simplifyNumber(totalPendingValue)
-											: "")
-									+
-									(failedToSell > 0
-											? "\n**Did Not Sell Auctions Value:** " + simplifyNumber(failedToSell)
-											: ""));
+				.setEveryPageTitle(usernameUuidStruct.getUsername())
+				.setEveryPageTitleUrl(skyblockStatsLink(usernameUuidStruct.getUsername(), null))
+				.setEveryPageThumbnail(usernameUuidStruct.getAvatarlUrl())
+				.setEveryPageText(
+					(
+						totalSoldValue > 0
+							? "**Sold Auctions Value:** " +
+							simplifyNumber(totalSoldValue) +
+							(auctionTax > 0 ? " - " + simplifyNumber(auctionTax) + " = " + simplifyNumber(totalSoldValue - auctionTax) : "")
+							: ""
+					) +
+					(totalPendingValue > 0 ? "\n**Unsold Auctions Value:** " + simplifyNumber(totalPendingValue) : "") +
+					(failedToSell > 0 ? "\n**Did Not Sell Auctions Value:** " + simplifyNumber(failedToSell) : "")
+				);
 
 			event.paginate(paginateBuilder.setPaginatorExtras(extras));
 		} else {
@@ -179,27 +176,22 @@ public class AuctionCommand extends Command {
 			NetworthExecute calc = new NetworthExecute().initPrices().setVerbose(true);
 
 			for (JsonElement currentAuction : auctionsArray) {
-				EmbedBuilder eb = defaultEmbed(usernameUuidStruct.getUsername(),
-						skyblockStatsLink(usernameUuidStruct.getUsername(), null));
+				EmbedBuilder eb = defaultEmbed(usernameUuidStruct.getUsername(), skyblockStatsLink(usernameUuidStruct.getUsername(), null));
 				if (!higherDepth(currentAuction, "claimed").getAsBoolean()) {
 					String auctionName;
 
-					boolean isPet = higherDepth(currentAuction, "item_lore").getAsString().toLowerCase()
-							.contains("pet");
+					boolean isPet = higherDepth(currentAuction, "item_lore").getAsString().toLowerCase().contains("pet");
 					boolean bin = higherDepth(currentAuction, "bin", false);
 
 					Instant endingAt = Instant.ofEpochMilli(higherDepth(currentAuction, "end").getAsLong());
 					Duration duration = Duration.between(Instant.now(), endingAt);
 
 					if (higherDepth(currentAuction, "item_name").getAsString().equals("Enchanted Book")) {
-						auctionName = parseMcCodes(
-								higherDepth(currentAuction, "item_lore").getAsString().split("\n")[0]);
+						auctionName = parseMcCodes(higherDepth(currentAuction, "item_lore").getAsString().split("\n")[0]);
 					} else {
-						auctionName = (isPet
-								? capitalizeString(higherDepth(currentAuction, "tier").getAsString().toLowerCase())
-										+ " "
-								: "") +
-								higherDepth(currentAuction, "item_name").getAsString();
+						auctionName =
+							(isPet ? capitalizeString(higherDepth(currentAuction, "tier").getAsString().toLowerCase()) + " " : "") +
+							higherDepth(currentAuction, "item_name").getAsString();
 					}
 					eb.addField("Item Name", auctionName, false);
 
@@ -217,27 +209,23 @@ public class AuctionCommand extends Command {
 						}
 						auction += " | Ending in <t:" + endingAt.getEpochSecond() + ":R>";
 						eb.addField("Status", auction, false);
-						eb.addField("Command",
-								"`/viewauction " + higherDepth(currentAuction, "uuid").getAsString() + "`", false);
+						eb.addField("Command", "`/viewauction " + higherDepth(currentAuction, "uuid").getAsString() + "`", false);
 					} else {
 						if (highestBid >= startingBid) {
 							totalSoldValue += highestBid;
-							aucTax = (highestBid > 1000000)
-									? ((0.99 * highestBid < 1000000) ? (highestBid - 1000000)
-											: (long) (0.01 * highestBid))
+							aucTax =
+								(highestBid > 1000000)
+									? ((0.99 * highestBid < 1000000) ? (highestBid - 1000000) : (long) (0.01 * highestBid))
 									: 0;
 							auctionTax += aucTax;
 							eb.addField(
-									"Status",
-									"Sold for " +
-											formatNumber(highestBid) +
-											(aucTax > 0
-													? " - " + formatNumber(aucTax) + " = "
-															+ formatNumber(highestBid - aucTax)
-													: "")
-											+
-											" coins",
-									false);
+								"Status",
+								"Sold for " +
+								formatNumber(highestBid) +
+								(aucTax > 0 ? " - " + formatNumber(aucTax) + " = " + formatNumber(highestBid - aucTax) : "") +
+								" coins",
+								false
+							);
 						} else {
 							eb.addField("Status", "Failed to sell", false);
 							auction = "Auction did not sell";
@@ -247,17 +235,15 @@ public class AuctionCommand extends Command {
 
 					try {
 						double calculatedPrice = calc.calculateItemPrice(
-								getGenericInventoryMap(NBTReader
-										.readBase64(higherDepth(currentAuction, "item_bytes.data").getAsString()))
-												.get(0));
+							getGenericInventoryMap(NBTReader.readBase64(higherDepth(currentAuction, "item_bytes.data").getAsString()))
+								.get(0)
+						);
 						eb.addField("Estimated Price", roundAndFormat(calculatedPrice), false);
 						try {
 							JsonObject verboseObj = calc.getVerboseJson().getAsJsonArray().get(0).getAsJsonObject();
 							verboseObj.remove("nbt_tag");
-							eb.addField("Estimated Price Breakdown",
-									"```json\n" + formattedGson.toJson(verboseObj) + "\n```", false);
-						} catch (Exception e) {
-						}
+							eb.addField("Estimated Price Breakdown", "```json\n" + formattedGson.toJson(verboseObj) + "\n```", false);
+						} catch (Exception e) {}
 						calc.resetVerboseJson();
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -273,34 +259,30 @@ public class AuctionCommand extends Command {
 
 			for (int i = 0; i < extras.getEmbedPages().size(); i++) {
 				extras
-						.getEmbedPages()
-						.set(
-								i,
-								extras
-										.getEmbedPages()
-										.get(i)
-										.setTitle(usernameUuidStruct.getUsername(),
-												skyblockStatsLink(usernameUuidStruct.getUsername(), null))
-										.setThumbnail(usernameUuidStruct.getAvatarlUrl())
-										.setDescription(
-												(totalSoldValue > 0
-														? "**Sold Auctions Value:** " +
-																simplifyNumber(totalSoldValue) +
-																(auctionTax > 0
-																		? " - " + simplifyNumber(auctionTax) + " = "
-																				+ simplifyNumber(
-																						totalSoldValue - auctionTax)
-																		: "")
-														: "") +
-														(totalPendingValue > 0
-																? "\n**Unsold Auctions Value:** "
-																		+ simplifyNumber(totalPendingValue)
-																: "")
-														+
-														(failedToSell > 0
-																? "\n**Did Not Sell Auctions Value:** "
-																		+ simplifyNumber(failedToSell)
-																: "")));
+					.getEmbedPages()
+					.set(
+						i,
+						extras
+							.getEmbedPages()
+							.get(i)
+							.setTitle(usernameUuidStruct.getUsername(), skyblockStatsLink(usernameUuidStruct.getUsername(), null))
+							.setThumbnail(usernameUuidStruct.getAvatarlUrl())
+							.setDescription(
+								(
+									totalSoldValue > 0
+										? "**Sold Auctions Value:** " +
+										simplifyNumber(totalSoldValue) +
+										(
+											auctionTax > 0
+												? " - " + simplifyNumber(auctionTax) + " = " + simplifyNumber(totalSoldValue - auctionTax)
+												: ""
+										)
+										: ""
+								) +
+								(totalPendingValue > 0 ? "\n**Unsold Auctions Value:** " + simplifyNumber(totalPendingValue) : "") +
+								(failedToSell > 0 ? "\n**Did Not Sell Auctions Value:** " + simplifyNumber(failedToSell) : "")
+							)
+					);
 			}
 
 			event.paginate(paginateBuilder.setPaginatorExtras(extras));
@@ -320,21 +302,20 @@ public class AuctionCommand extends Command {
 
 		String itemId = "None";
 		try {
-			itemId = NBTReader
+			itemId =
+				NBTReader
 					.readBase64(higherDepth(auctionJson, "item_bytes.data").getAsString())
 					.getList("i")
 					.getCompound(0)
 					.getString("tag.ExtraAttributes.id", "None");
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 
 		if (itemId.equals("ENCHANTED_BOOK")) {
 			itemName = parseMcCodes(higherDepth(auctionJson, "item_lore").getAsString().split("\n")[0]);
 		} else {
-			itemName = (itemId.equals("PET")
-					? capitalizeString(higherDepth(auctionJson, "tier").getAsString().toLowerCase()) + " "
-					: "") +
-					itemName;
+			itemName =
+				(itemId.equals("PET") ? capitalizeString(higherDepth(auctionJson, "tier").getAsString().toLowerCase()) + " " : "") +
+				itemName;
 		}
 
 		Instant endingAt = Instant.ofEpochMilli(higherDepth(auctionJson, "end").getAsLong());
@@ -350,24 +331,22 @@ public class AuctionCommand extends Command {
 
 		if (duration.toMillis() > 0) {
 			if (bin) {
-				ebStr += "\n**BIN:** " + simplifyNumber(startingBid) + " coins | Ending in <t:"
-						+ endingAt.getEpochSecond() + ":R>";
+				ebStr += "\n**BIN:** " + simplifyNumber(startingBid) + " coins | Ending in <t:" + endingAt.getEpochSecond() + ":R>";
 			} else {
-				ebStr += "\n**Current bid:** " + simplifyNumber(highestBid) + " | Ending in <t:"
-						+ endingAt.getEpochSecond() + ":R>";
-				ebStr += bidsArr.size() > 0
+				ebStr += "\n**Current bid:** " + simplifyNumber(highestBid) + " | Ending in <t:" + endingAt.getEpochSecond() + ":R>";
+				ebStr +=
+					bidsArr.size() > 0
 						? "\n**Highest bidder:** " +
-								uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString())
-										.getUsername()
+						uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).getUsername()
 						: "";
 			}
 		} else {
 			if (highestBid >= startingBid) {
-				ebStr += "\n**Auction sold** for " +
-						simplifyNumber(highestBid) +
-						" coins to " +
-						uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString())
-								.getUsername();
+				ebStr +=
+					"\n**Auction sold** for " +
+					simplifyNumber(highestBid) +
+					" coins to " +
+					uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).getUsername();
 			} else {
 				ebStr = "\n**Auction did not sell**";
 			}
@@ -392,8 +371,7 @@ public class AuctionCommand extends Command {
 					for (int i = 0; i < args.length; i++) {
 						if (args[i].startsWith("filter:")) {
 							try {
-								filterType = AuctionFilterType
-										.valueOf(args[i].split("filter:")[1].toUpperCase(Locale.ROOT));
+								filterType = AuctionFilterType.valueOf(args[i].split("filter:")[1].toUpperCase(Locale.ROOT));
 								removeArg(i);
 							} catch (IllegalArgumentException e) {
 								embed(invalidEmbed("Invalid filter type provided"));
@@ -426,7 +404,7 @@ public class AuctionCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-				.queue();
+			.queue();
 	}
 
 	public enum AuctionFilterType {
