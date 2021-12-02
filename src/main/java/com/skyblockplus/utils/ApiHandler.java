@@ -50,12 +50,12 @@ import org.slf4j.LoggerFactory;
 
 public class ApiHandler {
 
-	public static final Cache<String, String> uuidToUsernameCache = Caffeine.newBuilder()
-			.expireAfterWrite(30, TimeUnit.MINUTES).build();
+	public static final Cache<String, String> uuidToUsernameCache = Caffeine.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build();
 	public static final ConcurrentHashMap<String, Instant> uuidToTimeSkyblockProfiles = new ConcurrentHashMap<>();
 	private static final Pattern minecraftUsernameRegex = Pattern.compile("^\\w+$", Pattern.CASE_INSENSITIVE);
 	private static final Pattern minecraftUuidRegex = Pattern.compile(
-			"[0-9a-f]{32}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
+		"[0-9a-f]{32}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+	);
 
 	public static Connection cacheDatabaseConnection;
 	private static final Logger log = LoggerFactory.getLogger(ApiHandler.class);
@@ -74,17 +74,18 @@ public class ApiHandler {
 	}
 
 	public static boolean reloadSettingsJson() {
-		useAlternativeApi = higherDepth(
+		useAlternativeApi =
+			higherDepth(
 				getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/settings.json"),
 				"useAlternativeApi",
-				false);
+				false
+			);
 		return useAlternativeApi;
 	}
 
 	public static Connection getCacheDatabaseConnection() throws SQLException {
 		if (cacheDatabaseConnection == null || cacheDatabaseConnection.isClosed()) {
-			cacheDatabaseConnection = DriverManager.getConnection(PLANET_SCALE_URL, PLANET_SCALE_USERNAME,
-					PLANET_SCALE_PASSWORD);
+			cacheDatabaseConnection = DriverManager.getConnection(PLANET_SCALE_URL, PLANET_SCALE_USERNAME, PLANET_SCALE_PASSWORD);
 		}
 
 		return cacheDatabaseConnection;
@@ -106,12 +107,12 @@ public class ApiHandler {
 		}
 
 		Map.Entry<String, String> cachedResponse = uuidToUsernameCache
-				.asMap()
-				.entrySet()
-				.stream()
-				.filter(entry -> entry.getValue().equalsIgnoreCase(username))
-				.findFirst()
-				.orElse(null);
+			.asMap()
+			.entrySet()
+			.stream()
+			.filter(entry -> entry.getValue().equalsIgnoreCase(username))
+			.findFirst()
+			.orElse(null);
 		if (cachedResponse != null) {
 			return new UsernameUuidStruct(cachedResponse.getValue(), cachedResponse.getKey());
 		}
@@ -134,8 +135,9 @@ public class ApiHandler {
 				JsonElement usernameJson = getJson("https://api.ashcon.app/mojang/v2/user/" + username);
 				try {
 					UsernameUuidStruct usernameUuidStruct = new UsernameUuidStruct(
-							higherDepth(usernameJson, "username").getAsString(),
-							higherDepth(usernameJson, "uuid").getAsString().replace("-", ""));
+						higherDepth(usernameJson, "username").getAsString(),
+						higherDepth(usernameJson, "uuid").getAsString().replace("-", "")
+					);
 					uuidToUsernameCache.put(usernameUuidStruct.getUuid(), usernameUuidStruct.getUsername());
 					return usernameUuidStruct;
 				} catch (Exception e) {
@@ -145,16 +147,16 @@ public class ApiHandler {
 				JsonElement usernameJson = getJson("https://playerdb.co/api/player/minecraft/" + username);
 				try {
 					UsernameUuidStruct usernameUuidStruct = new UsernameUuidStruct(
-							higherDepth(usernameJson, "data.player.username").getAsString(),
-							higherDepth(usernameJson, "data.player.id").getAsString().replace("-", ""));
+						higherDepth(usernameJson, "data.player.username").getAsString(),
+						higherDepth(usernameJson, "data.player.id").getAsString().replace("-", "")
+					);
 					uuidToUsernameCache.put(usernameUuidStruct.getUuid(), usernameUuidStruct.getUsername());
 					return usernameUuidStruct;
 				} catch (Exception e) {
 					return new UsernameUuidStruct(higherDepth(usernameJson, "code").getAsString());
 				}
 			}
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 		return new UsernameUuidStruct();
 	}
 
@@ -171,8 +173,7 @@ public class ApiHandler {
 					}
 				}
 			} else {
-				JsonElement usernameJson = higherDepth(getJson("https://playerdb.co/api/player/minecraft/" + uuid),
-						"data.player");
+				JsonElement usernameJson = higherDepth(getJson("https://playerdb.co/api/player/minecraft/" + uuid), "data.player");
 				String username = higherDepth(usernameJson, "username").getAsString();
 				for (JsonElement name : higherDepth(usernameJson, "meta.name_history").getAsJsonArray()) {
 					if (!higherDepth(name, "name").getAsString().equals(username)) {
@@ -181,8 +182,7 @@ public class ApiHandler {
 				}
 			}
 			return nameHistory;
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 		return new ArrayList<>();
 	}
 
@@ -193,23 +193,24 @@ public class ApiHandler {
 		if (cachedResponse != null) {
 			future.complete(cachedResponse);
 		} else {
-			future = asyncHttpClient
+			future =
+				asyncHttpClient
 					.prepareGet(
-							(useAlternativeApi ? "https://playerdb.co/api/player/minecraft/"
-									: "https://api.ashcon.app/mojang/v2/user/") + uuid)
+						(useAlternativeApi ? "https://playerdb.co/api/player/minecraft/" : "https://api.ashcon.app/mojang/v2/user/") + uuid
+					)
 					.execute()
 					.toCompletableFuture()
 					.thenApply(uuidToUsernameResponse -> {
 						try {
 							String username = Utils
-									.higherDepth(
-											JsonParser.parseString(uuidToUsernameResponse.getResponseBody()),
-											(useAlternativeApi ? "data.player." : "") + "username")
-									.getAsString();
+								.higherDepth(
+									JsonParser.parseString(uuidToUsernameResponse.getResponseBody()),
+									(useAlternativeApi ? "data.player." : "") + "username"
+								)
+								.getAsString();
 							uuidToUsernameCache.put(uuid, username);
 							return username;
-						} catch (Exception ignored) {
-						}
+						} catch (Exception ignored) {}
 						return null;
 					});
 		}
@@ -228,23 +229,20 @@ public class ApiHandler {
 		}
 
 		try {
-			JsonElement profilesJson = getJson(
-					"https://api.hypixel.net/skyblock/profiles?key=" + hypixelApiKey + "&uuid=" + uuid);
+			JsonElement profilesJson = getJson("https://api.hypixel.net/skyblock/profiles?key=" + hypixelApiKey + "&uuid=" + uuid);
 
 			try {
 				if (higherDepth(profilesJson, "profiles").isJsonNull()) {
 					return new HypixelResponse("Player has no SkyBlock profiles");
 				}
 
-				JsonArray profileArray = processSkyblockProfilesArray(
-						higherDepth(profilesJson, "profiles").getAsJsonArray());
+				JsonArray profileArray = processSkyblockProfilesArray(higherDepth(profilesJson, "profiles").getAsJsonArray());
 				cacheJson(uuid, profileArray);
 				return new HypixelResponse(profileArray);
 			} catch (Exception e) {
 				return new HypixelResponse(higherDepth(profilesJson, "cause").getAsString());
 			}
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 
 		return new HypixelResponse();
 	}
@@ -256,7 +254,8 @@ public class ApiHandler {
 		if (cachedResponse != null) {
 			future.complete(cachedResponse);
 		} else {
-			future = asyncHttpClient
+			future =
+				asyncHttpClient
 					.prepareGet("https://api.hypixel.net/skyblock/profiles?key=" + hypixelApiKey + "&uuid=" + uuid)
 					.execute()
 					.toCompletableFuture()
@@ -264,25 +263,23 @@ public class ApiHandler {
 						try {
 							try {
 								keyCooldownMap
-										.get(hypixelApiKey)
-										.getRemainingLimit()
-										.set(Integer.parseInt(profilesResponse.getHeader("RateLimit-Remaining")));
+									.get(hypixelApiKey)
+									.getRemainingLimit()
+									.set(Integer.parseInt(profilesResponse.getHeader("RateLimit-Remaining")));
 								keyCooldownMap
-										.get(hypixelApiKey)
-										.getTimeTillReset()
-										.set(Integer.parseInt(profilesResponse.getHeader("RateLimit-Reset")));
-							} catch (Exception ignored) {
-							}
+									.get(hypixelApiKey)
+									.getTimeTillReset()
+									.set(Integer.parseInt(profilesResponse.getHeader("RateLimit-Reset")));
+							} catch (Exception ignored) {}
 
 							JsonArray profileArray = processSkyblockProfilesArray(
-									higherDepth(JsonParser.parseString(profilesResponse.getResponseBody()), "profiles")
-											.getAsJsonArray());
+								higherDepth(JsonParser.parseString(profilesResponse.getResponseBody()), "profiles").getAsJsonArray()
+							);
 
 							cacheJson(uuid, profileArray);
 
 							return profileArray;
-						} catch (Exception ignored) {
-						}
+						} catch (Exception ignored) {}
 						return null;
 					});
 		}
@@ -304,23 +301,20 @@ public class ApiHandler {
 			} catch (Exception e) {
 				return new HypixelResponse(higherDepth(playerJson, "cause").getAsString());
 			}
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 
 		return new HypixelResponse();
 	}
 
 	public static HypixelResponse getAuctionGeneric(String query) {
 		try {
-			JsonElement auctionResponse = getJson(
-					"https://api.hypixel.net/skyblock/auction?key=" + HYPIXEL_API_KEY + query);
+			JsonElement auctionResponse = getJson("https://api.hypixel.net/skyblock/auction?key=" + HYPIXEL_API_KEY + query);
 			try {
 				return new HypixelResponse(higherDepth(auctionResponse, "auctions").getAsJsonArray());
 			} catch (Exception e) {
 				return new HypixelResponse(higherDepth(auctionResponse, "cause").getAsString());
 			}
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 
 		return new HypixelResponse();
 	}
@@ -331,8 +325,7 @@ public class ApiHandler {
 
 	public static HypixelResponse getAuctionFromUuid(String auctionUuid) {
 		HypixelResponse response = getAuctionGeneric("&uuid=" + auctionUuid);
-		return response.isNotValid() ? response
-				: (response.get("[0]") != null ? response : new HypixelResponse("Invalid auction UUID"));
+		return response.isNotValid() ? response : (response.get("[0]") != null ? response : new HypixelResponse("Invalid auction UUID"));
 	}
 
 	public static HypixelResponse getGuildGeneric(String query) {
@@ -353,8 +346,7 @@ public class ApiHandler {
 			} catch (Exception e) {
 				return new HypixelResponse(higherDepth(guildResponse, "cause").getAsString());
 			}
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 
 		return new HypixelResponse();
 	}
@@ -377,18 +369,16 @@ public class ApiHandler {
 			httpget.addHeader("content-type", "application/json; charset=UTF-8");
 
 			URI uri = new URIBuilder(httpget.getURI())
-					.addParameter("bids", uuid)
-					.addParameter("limit", "-1")
-					.addParameter("key", AUCTION_API_KEY)
-					.build();
+				.addParameter("bids", uuid)
+				.addParameter("limit", "-1")
+				.addParameter("key", AUCTION_API_KEY)
+				.build();
 			httpget.setURI(uri);
 
 			try (CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpget)) {
-				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent()))
-						.getAsJsonArray();
+				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
 			}
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 		return null;
 	}
 
@@ -398,20 +388,18 @@ public class ApiHandler {
 			httpget.addHeader("content-type", "application/json; charset=UTF-8");
 
 			URI uri = new URIBuilder(httpget.getURI())
-					.addParameter("end", "" + Instant.now().toEpochMilli())
-					.addParameter("item_name", "%" + query + "%")
-					.addParameter("sort", "ASC")
-					.addParameter("limit", "1")
-					.addParameter("key", AUCTION_API_KEY)
-					.build();
+				.addParameter("end", "" + Instant.now().toEpochMilli())
+				.addParameter("item_name", "%" + query + "%")
+				.addParameter("sort", "ASC")
+				.addParameter("limit", "1")
+				.addParameter("key", AUCTION_API_KEY)
+				.build();
 			httpget.setURI(uri);
 
 			try (CloseableHttpResponse httpResponse = httpClient.execute(httpget)) {
-				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent()))
-						.getAsJsonArray();
+				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
 			}
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 		return null;
 	}
 
@@ -421,23 +409,21 @@ public class ApiHandler {
 			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
 
 			URIBuilder uri = new URIBuilder(httpGet.getURI())
-					.addParameter("end", "" + Instant.now().toEpochMilli())
-					.addParameter("item_name", "%" + petName + "%")
-					.addParameter("item_id", "PET")
-					.addParameter("sort", "ASC")
-					.addParameter("limit", "1")
-					.addParameter("key", AUCTION_API_KEY);
+				.addParameter("end", "" + Instant.now().toEpochMilli())
+				.addParameter("item_name", "%" + petName + "%")
+				.addParameter("item_id", "PET")
+				.addParameter("sort", "ASC")
+				.addParameter("limit", "1")
+				.addParameter("key", AUCTION_API_KEY);
 			if (!rarity.equals("ANY")) {
 				uri.addParameter("tier", rarity);
 			}
 			httpGet.setURI(uri.build());
 
 			try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
-				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent()))
-						.getAsJsonArray();
+				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
 			}
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 		return null;
 	}
 
@@ -447,21 +433,19 @@ public class ApiHandler {
 			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
 
 			URI uri = new URIBuilder(httpGet.getURI())
-					.addParameter("end", "" + Instant.now().toEpochMilli())
-					.addParameter("item_id", "ENCHANTED_BOOK")
-					.addParameter("enchants", enchantId.toUpperCase() + ";" + enchantLevel)
-					.addParameter("sort", "ASC")
-					.addParameter("limit", "1")
-					.addParameter("key", AUCTION_API_KEY)
-					.build();
+				.addParameter("end", "" + Instant.now().toEpochMilli())
+				.addParameter("item_id", "ENCHANTED_BOOK")
+				.addParameter("enchants", enchantId.toUpperCase() + ";" + enchantLevel)
+				.addParameter("sort", "ASC")
+				.addParameter("limit", "1")
+				.addParameter("key", AUCTION_API_KEY)
+				.build();
 			httpGet.setURI(uri);
 
 			try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
-				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent()))
-						.getAsJsonArray();
+				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
 			}
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 		return null;
 	}
 
@@ -470,16 +454,13 @@ public class ApiHandler {
 			HttpGet httpget = new HttpGet("http://apollo.arcator.co.uk:1194/pets");
 			httpget.addHeader("content-type", "application/json; charset=UTF-8");
 
-			URI uri = new URIBuilder(httpget.getURI()).addParameter("query", query).addParameter("key", AUCTION_API_KEY)
-					.build();
+			URI uri = new URIBuilder(httpget.getURI()).addParameter("query", query).addParameter("key", AUCTION_API_KEY).build();
 			httpget.setURI(uri);
 
 			try (CloseableHttpResponse httpResponse = httpClient.execute(httpget)) {
-				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent()))
-						.getAsJsonArray();
+				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
 			}
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 		return null;
 	}
 
@@ -490,15 +471,15 @@ public class ApiHandler {
 				uuidToTimeSkyblockProfiles.put(playerUuid, now);
 
 				statement.executeUpdate(
-						"INSERT INTO profiles VALUES ('" +
-								playerUuid +
-								"', " +
-								now.toEpochMilli() +
-								", '" +
-								json +
-								"') ON DUPLICATE KEY UPDATE uuid = VALUES(uuid), time = VALUES(time), data = VALUES(data)");
-			} catch (Exception ignored) {
-			}
+					"INSERT INTO profiles VALUES ('" +
+					playerUuid +
+					"', " +
+					now.toEpochMilli() +
+					", '" +
+					json +
+					"') ON DUPLICATE KEY UPDATE uuid = VALUES(uuid), time = VALUES(time), data = VALUES(data)"
+				);
+			} catch (Exception ignored) {}
 		});
 	}
 
@@ -508,8 +489,7 @@ public class ApiHandler {
 			deleteCachedJson(playerUuid);
 		} else {
 			try (Statement statement = getCacheDatabaseConnection().createStatement()) {
-				try (ResultSet response = statement
-						.executeQuery("SELECT * FROM profiles where uuid = '" + playerUuid + "'")) {
+				try (ResultSet response = statement.executeQuery("SELECT * FROM profiles where uuid = '" + playerUuid + "'")) {
 					if (response.next()) {
 						Instant lastUpdatedResponse = Instant.ofEpochMilli(response.getLong("time"));
 						if (Duration.between(lastUpdatedResponse, Instant.now()).toMillis() > 90000) {
@@ -520,8 +500,7 @@ public class ApiHandler {
 						}
 					}
 				}
-			} catch (Exception ignored) {
-			}
+			} catch (Exception ignored) {}
 		}
 		return null;
 	}
@@ -543,8 +522,7 @@ public class ApiHandler {
 
 			try (Statement statement = getCacheDatabaseConnection().createStatement()) {
 				statement.executeUpdate("DELETE FROM profiles WHERE uuid IN (" + query + ")");
-			} catch (Exception ignored) {
-			}
+			} catch (Exception ignored) {}
 		});
 	}
 
@@ -558,13 +536,11 @@ public class ApiHandler {
 				}
 				deleteCachedJson(expiredCacheUuidList.toArray(new String[0]));
 			}
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 
 		try (Statement statement = getCacheDatabaseConnection().createStatement()) {
 			statement.executeUpdate("DELETE FROM profiles WHERE time < " + now + "");
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 	}
 
 	public static JsonArray processSkyblockProfilesArray(JsonArray array) {
@@ -599,25 +575,28 @@ public class ApiHandler {
 	public static void updateLinkedAccounts() {
 		try {
 			database
-					.getLinkedUsers()
-					.stream()
-					.filter(linkedAccountModel -> Duration
-							.between(Instant.ofEpochMilli(Long.parseLong(linkedAccountModel.getLastUpdated())),
-									Instant.now())
-							.toDays() > 5)
-					.limit(10)
-					.forEach(o -> asyncUuidToUsername(o.getMinecraftUuid())
-							.thenApply(username -> {
-								if (username != null) {
-									database.addLinkedUser(
-											new LinkedAccountModel(
-													"" + Instant.now().toEpochMilli(),
-													o.getDiscordId(),
-													o.getMinecraftUuid(),
-													username));
-								}
-								return null;
-							}));
+				.getLinkedUsers()
+				.stream()
+				.filter(linkedAccountModel ->
+					Duration.between(Instant.ofEpochMilli(Long.parseLong(linkedAccountModel.getLastUpdated())), Instant.now()).toDays() > 5
+				)
+				.limit(10)
+				.forEach(o ->
+					asyncUuidToUsername(o.getMinecraftUuid())
+						.thenApply(username -> {
+							if (username != null) {
+								database.addLinkedUser(
+									new LinkedAccountModel(
+										"" + Instant.now().toEpochMilli(),
+										o.getDiscordId(),
+										o.getMinecraftUuid(),
+										username
+									)
+								);
+							}
+							return null;
+						})
+				);
 		} catch (Exception e) {
 			log.error("Exception when updating linked accounts", e);
 		}
