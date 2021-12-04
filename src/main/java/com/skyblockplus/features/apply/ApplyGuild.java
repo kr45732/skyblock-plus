@@ -132,7 +132,7 @@ public class ApplyGuild {
 			return "❌ You have been blacklisted with reason `" + higherDepth(blacklisted, "reason").getAsString() + "`";
 		}
 
-		if(higherDepth(currentSettings, "applyScammerCheck", false)) {
+		if (higherDepth(currentSettings, "applyScammerCheck", false)) {
 			String scammerReason = getScammerReason(higherDepth(linkedAccount, "minecraftUuid").getAsString());
 			if (scammerReason != null) {
 				return "❌ You have been marked as a scammer by SkyblockZ with reason `" + scammerReason + "`";

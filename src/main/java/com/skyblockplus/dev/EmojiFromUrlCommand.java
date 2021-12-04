@@ -46,8 +46,11 @@ public class EmojiFromUrlCommand extends Command {
 		String websiteContent = getUrl("https://sky.shiiyu.moe/stats/" + name)
 			.split("const items = JSON.parse\\(`")[1].split("const calculated =")[0].trim();
 
-		String[] hotmSplit =
-			websiteContent.substring(0, websiteContent.length() - 3).replaceAll("<.*?>", "").replaceAll("\"Lore\":\\[.*?],", "").split("\"hotm\"");
+		String[] hotmSplit = websiteContent
+			.substring(0, websiteContent.length() - 3)
+			.replaceAll("<.*?>", "")
+			.replaceAll("\"Lore\":\\[.*?],", "")
+			.split("\"hotm\"");
 		websiteContent = hotmSplit[0] + "\"talismans\"" + hotmSplit[1].split("\"talismans\"")[1];
 
 		return JsonParser.parseString(websiteContent);
@@ -96,9 +99,9 @@ public class EmojiFromUrlCommand extends Command {
 							id = higherDepth(i, "tag.ExtraAttributes.id").getAsString();
 							path = "https://sky.shiiyu.moe" + higherDepth(i, "texture_path").getAsString();
 						} catch (Exception e) {
-							if(id != null){
+							if (id != null) {
 								path = "https://sky.shiiyu.moe/item/" + id;
-							}else {
+							} else {
 								continue;
 							}
 						}

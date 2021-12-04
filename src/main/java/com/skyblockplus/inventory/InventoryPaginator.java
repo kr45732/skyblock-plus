@@ -22,7 +22,6 @@ import static com.skyblockplus.Main.waiter;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -45,16 +44,26 @@ public class InventoryPaginator {
 		this.maxPageNumber = enderChestPages.size() - 1;
 
 		pagePart1 = channel.sendMessage(enderChestPages.get(0)[0]).complete();
-		pagePart2 = channel.sendMessage(enderChestPages.get(0)[1]).setActionRow().setActionRow(
-				Button.primary("inv_paginator_left_button", Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")),
-				Button.primary("inv_paginator_right_button", Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
-		) .complete();
+		pagePart2 =
+			channel
+				.sendMessage(enderChestPages.get(0)[1])
+				.setActionRow()
+				.setActionRow(
+					Button.primary("inv_paginator_left_button", Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")),
+					Button.primary("inv_paginator_right_button", Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
+				)
+				.complete();
 
 		waitForEvent();
 	}
 
 	private boolean condition(ButtonClickEvent event) {
-		return event.isFromGuild() && !event.getUser().isBot() && event.getUser().getId().equals(user.getId()) && event.getMessageId().equals(pagePart2.getId());
+		return (
+			event.isFromGuild() &&
+			!event.getUser().isBot() &&
+			event.getUser().getId().equals(user.getId()) &&
+			event.getMessageId().equals(pagePart2.getId())
+		);
 	}
 
 	public void action(ButtonClickEvent event) {
@@ -74,14 +83,14 @@ public class InventoryPaginator {
 		waitForEvent();
 	}
 
-	private void waitForEvent(){
+	private void waitForEvent() {
 		waiter.waitForEvent(
-				ButtonClickEvent.class,
-				this::condition,
-				this::action,
-				30,
-				TimeUnit.SECONDS,
-				() -> pagePart2.editMessageComponents().queue()
+			ButtonClickEvent.class,
+			this::condition,
+			this::action,
+			30,
+			TimeUnit.SECONDS,
+			() -> pagePart2.editMessageComponents().queue()
 		);
 	}
 }

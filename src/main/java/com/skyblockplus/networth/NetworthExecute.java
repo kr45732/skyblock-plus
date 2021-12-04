@@ -448,10 +448,10 @@ public class NetworthExecute {
 						invTotal += auctionPrice + miscExtras;
 						if (verbose) {
 							calcItemsJsonStr
-									.append("{\"name\":\"")
-									.append(item.getName())
-									.append("\",\"total\":\"")
-									.append(simplifyNumber(auctionPrice + miscExtras))
+								.append("{\"name\":\"")
+								.append(item.getName())
+								.append("\",\"total\":\"")
+								.append(simplifyNumber(auctionPrice + miscExtras))
 								.append("\",\"base_cost\":\"")
 								.append(simplifyNumber(auctionPrice))
 								.append("\"")
@@ -493,10 +493,10 @@ public class NetworthExecute {
 						petsTotal += auctionPrice + miscExtras;
 						if (verbose) {
 							calcItemsJsonStr
-									.append("{\"name\":\"")
-									.append(item.getName())
-									.append("\",\"total\":\"")
-									.append(simplifyNumber(auctionPrice + miscExtras))
+								.append("{\"name\":\"")
+								.append(item.getName())
+								.append("\",\"total\":\"")
+								.append(simplifyNumber(auctionPrice + miscExtras))
 								.append("\",\"base_cost\":\"")
 								.append(simplifyNumber(auctionPrice))
 								.append("\"")
@@ -538,10 +538,10 @@ public class NetworthExecute {
 						enderChestTotal += auctionPrice + miscExtras;
 						if (verbose) {
 							calcItemsJsonStr
-									.append("{\"name\":\"")
-									.append(item.getName())
-									.append("\",\"total\":\"")
-									.append(simplifyNumber(auctionPrice + miscExtras))
+								.append("{\"name\":\"")
+								.append(item.getName())
+								.append("\",\"total\":\"")
+								.append(simplifyNumber(auctionPrice + miscExtras))
 								.append("\",\"base_cost\":\"")
 								.append(simplifyNumber(auctionPrice))
 								.append("\"")
@@ -583,10 +583,10 @@ public class NetworthExecute {
 						storageTotal += auctionPrice + miscExtras;
 						if (verbose) {
 							calcItemsJsonStr
-									.append("{\"name\":\"")
-									.append(item.getName())
-									.append("\",\"total\":\"")
-									.append(simplifyNumber(auctionPrice + miscExtras))
+								.append("{\"name\":\"")
+								.append(item.getName())
+								.append("\",\"total\":\"")
+								.append(simplifyNumber(auctionPrice + miscExtras))
 								.append("\",\"base_cost\":\"")
 								.append(simplifyNumber(auctionPrice))
 								.append("\"")
@@ -632,10 +632,10 @@ public class NetworthExecute {
 				invTotal += auctionPrice + miscExtras;
 				if (verbose) {
 					calcItemsJsonStr
-							.append("{\"name\":\"")
-							.append(item.getName())
-							.append("\",\"total\":\"")
-							.append(simplifyNumber(auctionPrice + miscExtras))
+						.append("{\"name\":\"")
+						.append(item.getName())
+						.append("\",\"total\":\"")
+						.append(simplifyNumber(auctionPrice + miscExtras))
 						.append("\",\"base_cost\":\"")
 						.append(simplifyNumber(auctionPrice))
 						.append("\",")
@@ -676,10 +676,10 @@ public class NetworthExecute {
 				petsTotal += auctionPrice + miscExtras;
 				if (verbose) {
 					calcItemsJsonStr
-							.append("{\"name\":\"")
-							.append(item.getName())
-							.append("\",\"total\":\"")
-							.append(simplifyNumber(auctionPrice + miscExtras))
+						.append("{\"name\":\"")
+						.append(item.getName())
+						.append("\",\"total\":\"")
+						.append(simplifyNumber(auctionPrice + miscExtras))
 						.append("\",\"base_cost\":\"")
 						.append(simplifyNumber(auctionPrice))
 						.append("\",")
@@ -720,10 +720,10 @@ public class NetworthExecute {
 				enderChestTotal += auctionPrice + miscExtras;
 				if (verbose) {
 					calcItemsJsonStr
-							.append("{\"name\":\"")
-							.append(item.getName())
-							.append("\",\"total\":\"")
-							.append(simplifyNumber(auctionPrice + miscExtras))
+						.append("{\"name\":\"")
+						.append(item.getName())
+						.append("\",\"total\":\"")
+						.append(simplifyNumber(auctionPrice + miscExtras))
 						.append("\",\"base_cost\":\"")
 						.append(simplifyNumber(auctionPrice))
 						.append("\",")
@@ -764,10 +764,10 @@ public class NetworthExecute {
 				storageTotal += auctionPrice + miscExtras;
 				if (verbose) {
 					calcItemsJsonStr
-							.append("{\"name\":\"")
-							.append(item.getName())
-							.append("\",\"total\":\"")
-							.append(simplifyNumber(auctionPrice + miscExtras))
+						.append("{\"name\":\"")
+						.append(item.getName())
+						.append("\",\"total\":\"")
+						.append(simplifyNumber(auctionPrice + miscExtras))
 						.append("\",\"base_cost\":\"")
 						.append(simplifyNumber(auctionPrice))
 						.append("\",")

@@ -94,10 +94,11 @@ public class SacksCommand extends Command {
 						emoji = higherDepth(getEmojiMap(), "RED_MUSHROOM", null);
 					}
 
-					if(emoji == null){
+					if (emoji == null) {
 						missing.addProperty(currentSack.getKey(), idToName(currentSack.getKey()));
 					}
-					paginateBuilder.addItems((emoji != null ? emoji + " " : "") +
+					paginateBuilder.addItems(
+						(emoji != null ? emoji + " " : "") +
 						"**" +
 						convertSkyblockIdName(currentSack.getKey()) +
 						":** " +

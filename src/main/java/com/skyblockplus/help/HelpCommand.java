@@ -729,18 +729,12 @@ public class HelpCommand extends Command {
 			);
 
 			paginateBuilder.addItems(
-					help.create(
-							"settings guild blacklist add <player> [reason]",
-							"Blacklist a player from using the application system on this server"
-					)+
-							help.create(
-									"settings guild blacklist remove <player>",
-									"Remove a player from the application blacklist"
-							)+
-							help.create(
-									"settings guild blacklist list",
-									"List all players that are blacklisted from the application system"
-							) +
+				help.create(
+					"settings guild blacklist add <player> [reason]",
+					"Blacklist a player from using the application system on this server"
+				) +
+				help.create("settings guild blacklist remove <player>", "Remove a player from the application blacklist") +
+				help.create("settings guild blacklist list", "List all players that are blacklisted from the application system") +
 				help.create("settings guild <name> apply <enable|disable>", "Enable or disable automatic apply") +
 				help.create("settings guild <name> apply message <message>", "The message that users will see when verifying") +
 				help.create(
@@ -772,10 +766,10 @@ public class HelpCommand extends Command {
 					"settings guild <name> apply requirements add [slayer:amount] [skills:amount] [catacombs:amount] [weight:amount]",
 					"Add a requirement that applicant must meet. At least one of the requirement types must be set. Can be empty"
 				) +
-						help.create(
-								"settings guild <name> apply scammer_check <true|false>",
-								"Whether the applicant should be automatically be denied if marked a scammer in the SkyblockZ database"
-						)+
+				help.create(
+					"settings guild <name> apply scammer_check <true|false>",
+					"Whether the applicant should be automatically be denied if marked a scammer in the SkyblockZ database"
+				) +
 				help.create(
 					"settings guild <name> apply reqs remove <index>",
 					"Remove a requirement. Run `settings guild <name>` to see the index for all current requirements"

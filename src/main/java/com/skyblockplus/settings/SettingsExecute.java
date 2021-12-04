@@ -687,7 +687,7 @@ public class SettingsExecute {
 		return defaultSettingsEmbed("Apply message set to: " + message);
 	}
 
-	public EmbedBuilder setApplyScammerCheck(JsonObject guildSettings, boolean enable){
+	public EmbedBuilder setApplyScammerCheck(JsonObject guildSettings, boolean enable) {
 		guildSettings.addProperty("applyScammerCheck", "" + enable);
 		int responseCode = database.setGuildSettings(guild.getId(), guildSettings);
 
