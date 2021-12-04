@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
@@ -44,11 +45,12 @@ public class EssenceWaiter {
 	private final Map<Integer, String> emojiEssenceMap;
 	private int startingLevel;
 
-	public EssenceWaiter(String itemId, JsonElement itemJson, Message reactMessage, User user) {
+	public EssenceWaiter(String itemId, JsonElement itemJson, Message _reactMessage, User user) {
+		TextChannel channel = _reactMessage.getTextChannel();
+		_reactMessage.delete().queue();
 		this.itemId = itemId;
 		this.itemName = idToName(itemId);
 		this.itemJson = itemJson;
-		this.reactMessage = reactMessage;
 		this.user = user;
 
 		essenceEmojiMap.put("⏫", -1);
@@ -71,7 +73,7 @@ public class EssenceWaiter {
 		}
 		eb.addField("Levels", initialMessageInfo + "0⃣ - 0 stars\n1⃣ - 1 star\n2⃣ - 2 stars\n3⃣ - 3 stars\n4⃣ - 4 stars", false);
 		eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId);
-		reactMessage.editMessageEmbeds(eb.build()).queue();
+		this.reactMessage = channel.sendMessageEmbeds(eb.build()).complete();
 
 		validReactions.add("0⃣");
 		validReactions.add("1⃣");

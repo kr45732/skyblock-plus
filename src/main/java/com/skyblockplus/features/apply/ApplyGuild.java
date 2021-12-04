@@ -132,6 +132,13 @@ public class ApplyGuild {
 			return "❌ You have been blacklisted with reason `" + higherDepth(blacklisted, "reason").getAsString() + "`";
 		}
 
+		if(higherDepth(currentSettings, "applyScammerCheck", false)) {
+			String scammerReason = getScammerReason(higherDepth(linkedAccount, "minecraftUuid").getAsString());
+			if (scammerReason != null) {
+				return "❌ You have been marked as a scammer by SkyblockZ with reason `" + scammerReason + "`";
+			}
+		}
+
 		Player player = new Player(higherDepth(linkedAccount, "minecraftUsername").getAsString());
 		if (!player.isValid()) {
 			return "❌ Unable to fetch player data. Failed cause: `" + player.getFailCause() + "`";

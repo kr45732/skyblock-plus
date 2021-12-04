@@ -73,6 +73,7 @@ public class WardrobeCommand extends Command {
 				event.paginate(paginateBuilder);
 				return null;
 			}
+			return invalidEmbed("API disabled");
 		}
 		return player.getFailEmbed();
 	}

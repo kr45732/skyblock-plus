@@ -397,6 +397,13 @@ public class SettingsExecute {
 								eb = setApplyIronman(guildSettings.getAsJsonObject(), false);
 							}
 							break;
+						case "scammer_check":
+							if (args[5].equals("true")) {
+								eb = setApplyScammerCheck(guildSettings.getAsJsonObject(), true);
+							} else if (args[5].equals("false")) {
+								eb = setApplyScammerCheck(guildSettings.getAsJsonObject(), false);
+							}
+							break;
 					}
 				}
 			} else if ((args = content.split("\\s+", 7)).length == 7) {
@@ -678,6 +685,17 @@ public class SettingsExecute {
 		}
 
 		return defaultSettingsEmbed("Apply message set to: " + message);
+	}
+
+	public EmbedBuilder setApplyScammerCheck(JsonObject guildSettings, boolean enable){
+		guildSettings.addProperty("applyScammerCheck", "" + enable);
+		int responseCode = database.setGuildSettings(guild.getId(), guildSettings);
+
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		return defaultSettingsEmbed("Apply SkyblockZ scammer check: " + (enable ? "enabled" : "disabled"));
 	}
 
 	public EmbedBuilder setApplyChannel(JsonObject guildSettings, String textChannel) {
@@ -1047,6 +1065,7 @@ public class SettingsExecute {
 				.addField("Accepted Message", displaySettings(settings, "applyAcceptMessage"), true)
 				.addField("Waitlisted Message", displaySettings(settings, "applyWaitlistMessage"), true)
 				.addField("Denied Message", displaySettings(settings, "applyDenyMessage"), true)
+				.addField("Scammer Check", displaySettings(settings, "applyScammerCheck"), true)
 				.addField("Requirements", displaySettings(settings, "applyReqs"), true)
 		);
 
@@ -2163,7 +2182,7 @@ public class SettingsExecute {
 				.count() ==
 			0
 		) {
-			return invalidEmbed("There must be at least one active guild application system to set a guest role");
+			return invalidEmbed("There must be at least one active application system to set a guest role");
 		}
 
 		int responseCode = database.setApplyGuestRole(guild.getId(), role.getId());

@@ -40,11 +40,12 @@ public class AutomatedGuild {
 
 	// Apply
 	private String applyEnable = "false";
-	private String applyMessageChannel = ""; // Message with button will be sent here
-	private String applyStaffChannel = ""; // Applications to be reviewed by staff sent here
-	private String applyCategory = ""; // Where new applications are created
-	private String applyWaitingChannel = ""; // Applications that are waitlisted by staff sent here
+	private String applyMessageChannel = "";
+	private String applyStaffChannel = "";
+	private String applyCategory = "";
+	private String applyWaitingChannel = "";
 	private String applyIronmanOnly = "false";
+	private String applyScammerCheck = "false";
 
 	@Column(length = 2048)
 	private String applyMessage = "";

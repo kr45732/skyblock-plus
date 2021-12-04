@@ -365,7 +365,7 @@ public class ApiHandler {
 
 	public static JsonArray getBidsFromPlayer(String uuid) {
 		try {
-			HttpGet httpget = new HttpGet("http://apollo.arcator.co.uk:1194/query");
+			HttpGet httpget = new HttpGet("http://venus.arcator.co.uk:1194/query");
 			httpget.addHeader("content-type", "application/json; charset=UTF-8");
 
 			URI uri = new URIBuilder(httpget.getURI())
@@ -384,7 +384,7 @@ public class ApiHandler {
 
 	public static JsonArray queryLowestBin(String query) {
 		try {
-			HttpGet httpget = new HttpGet("http://apollo.arcator.co.uk:1194/query");
+			HttpGet httpget = new HttpGet("http://venus.arcator.co.uk:1194/query");
 			httpget.addHeader("content-type", "application/json; charset=UTF-8");
 
 			URI uri = new URIBuilder(httpget.getURI())
@@ -405,7 +405,7 @@ public class ApiHandler {
 
 	public static JsonArray queryLowestBinPet(String petName, String rarity) {
 		try {
-			HttpGet httpGet = new HttpGet("http://apollo.arcator.co.uk:1194/query");
+			HttpGet httpGet = new HttpGet("http://venus.arcator.co.uk:1194/query");
 			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
 
 			URIBuilder uri = new URIBuilder(httpGet.getURI())
@@ -429,7 +429,7 @@ public class ApiHandler {
 
 	public static JsonArray queryLowestBinEnchant(String enchantId, int enchantLevel) {
 		try {
-			HttpGet httpGet = new HttpGet("http://apollo.arcator.co.uk:1194/query");
+			HttpGet httpGet = new HttpGet("http://venus.arcator.co.uk:1194/query");
 			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
 
 			URI uri = new URIBuilder(httpGet.getURI())
@@ -451,7 +451,7 @@ public class ApiHandler {
 
 	public static JsonArray getAuctionPetsByName(String query) {
 		try {
-			HttpGet httpget = new HttpGet("http://apollo.arcator.co.uk:1194/pets");
+			HttpGet httpget = new HttpGet("http://venus.arcator.co.uk:1194/pets");
 			httpget.addHeader("content-type", "application/json; charset=UTF-8");
 
 			URI uri = new URIBuilder(httpget.getURI()).addParameter("query", query).addParameter("key", AUCTION_API_KEY).build();

@@ -117,6 +117,7 @@ public class Utils {
 	public static String PLANET_SCALE_URL = "";
 	public static String PLANET_SCALE_USERNAME = "";
 	public static String PLANET_SCALE_PASSWORD = "";
+	public static String SBZ_SCAMMER_DB_KEY = "";
 	public static boolean IS_API = false;
 	/* Miscellaneous */
 	public static TextChannel botLogChannel;
@@ -410,11 +411,11 @@ public class Utils {
 		return null;
 	}
 
-	public static String makeHastePost(String body) {
+	public static String makeHastePost(Object body) {
 		try {
 			HttpPost httpPost = new HttpPost("https://hst.sh/documents");
 
-			StringEntity entity = new StringEntity(body);
+			StringEntity entity = new StringEntity(body.toString());
 			httpPost.setEntity(entity);
 
 			try (CloseableHttpResponse httpResponse = httpClient.execute(httpPost)) {
@@ -478,6 +479,10 @@ public class Utils {
 			}
 		} catch (Exception ignored) {}
 		return null;
+	}
+
+	public static String getScammerReason(String uuid){
+		return higherDepth(getJson("https://api.robothanzo.dev/scammer/" + uuid + "?key=" + SBZ_SCAMMER_DB_KEY), "results.reason", null);
 	}
 
 	/* Logging */
@@ -868,6 +873,7 @@ public class Utils {
 			PLANET_SCALE_URL = (String) appProps.get("PLANET_SCALE_URL");
 			PLANET_SCALE_USERNAME = (String) appProps.get("PLANET_SCALE_USERNAME");
 			PLANET_SCALE_PASSWORD = (String) appProps.get("PLANET_SCALE_PASSWORD");
+			SBZ_SCAMMER_DB_KEY = (String) appProps.get("SBZ_SCAMMER_DB_KEY");
 		} catch (IOException e) {
 			HYPIXEL_API_KEY = System.getenv("HYPIXEL_API_KEY");
 			BOT_TOKEN = System.getenv("BOT_TOKEN");
@@ -893,6 +899,7 @@ public class Utils {
 			PLANET_SCALE_URL = System.getenv("PLANET_SCALE_URL");
 			PLANET_SCALE_USERNAME = System.getenv("PLANET_SCALE_USERNAME");
 			PLANET_SCALE_PASSWORD = System.getenv("PLANET_SCALE_PASSWORD");
+			SBZ_SCAMMER_DB_KEY = System.getenv("SBZ_SCAMMER_DB_KEY");
 		}
 	}
 

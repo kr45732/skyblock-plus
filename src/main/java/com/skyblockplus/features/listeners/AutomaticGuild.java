@@ -663,7 +663,7 @@ public class AutomaticGuild {
 	}
 
 	public void onButtonClick(ButtonClickEvent event) {
-		if (event.getComponentId().startsWith("paginator_")) {
+		if (event.getComponentId().startsWith("paginator_") || event.getComponentId().startsWith("inv_paginator_")) {
 			return;
 		} else if (event.getComponentId().startsWith("event_message_")) {
 			event.deferReply(true).complete();
