@@ -47,7 +47,6 @@ public class InventoryPaginator {
 		pagePart2 =
 			channel
 				.sendMessage(enderChestPages.get(0)[1])
-				.setActionRow()
 				.setActionRow(
 					Button.primary("inv_paginator_left_button", Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")),
 					Button.primary("inv_paginator_right_button", Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))

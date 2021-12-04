@@ -390,6 +390,7 @@ public class ApiHandler {
 			URI uri = new URIBuilder(httpget.getURI())
 				.addParameter("end", "" + Instant.now().toEpochMilli())
 				.addParameter("item_name", "%" + query + "%")
+					.addParameter("bin", "true")
 				.addParameter("sort", "ASC")
 				.addParameter("limit", "1")
 				.addParameter("key", AUCTION_API_KEY)
@@ -412,6 +413,7 @@ public class ApiHandler {
 				.addParameter("end", "" + Instant.now().toEpochMilli())
 				.addParameter("item_name", "%" + petName + "%")
 				.addParameter("item_id", "PET")
+					.addParameter("bin", "true")
 				.addParameter("sort", "ASC")
 				.addParameter("limit", "1")
 				.addParameter("key", AUCTION_API_KEY);
@@ -436,6 +438,7 @@ public class ApiHandler {
 				.addParameter("end", "" + Instant.now().toEpochMilli())
 				.addParameter("item_id", "ENCHANTED_BOOK")
 				.addParameter("enchants", enchantId.toUpperCase() + ";" + enchantLevel)
+					.addParameter("bin", "true")
 				.addParameter("sort", "ASC")
 				.addParameter("limit", "1")
 				.addParameter("key", AUCTION_API_KEY)

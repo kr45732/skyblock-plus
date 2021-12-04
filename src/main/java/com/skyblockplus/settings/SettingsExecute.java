@@ -1438,7 +1438,7 @@ public class SettingsExecute {
 	public boolean allowRolesEnable() {
 		JsonObject currentSettings = database.getRolesSettings(guild.getId()).getAsJsonObject();
 		currentSettings.remove("enable");
-		return getJsonKeys(currentSettings).stream().anyMatch(role -> higherDepth(currentSettings, role + ".enable").getAsBoolean());
+		return getJsonKeys(currentSettings).stream().anyMatch(role -> higherDepth(currentSettings, role + ".enable", false));
 	}
 
 	public EmbedBuilder setRolesEnable(boolean enable) {
@@ -1473,7 +1473,7 @@ public class SettingsExecute {
 			if (enable) {
 				List<String> enabled = new ArrayList<>();
 				for (Entry<String, JsonElement> role : roleSettings.entrySet()) {
-					if (!role.getKey().equals("true") && !higherDepth(role.getValue(), "levels").getAsJsonArray().isEmpty()) {
+					if (!role.getKey().equals("true") && higherDepth(role.getValue(), "levels.[0]") != null) {
 						JsonObject curRole = role.getValue().getAsJsonObject();
 						curRole.addProperty("enable", "true");
 						roleSettings.add(role.getKey(), curRole);
