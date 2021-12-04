@@ -267,18 +267,18 @@ public class SetupCommandHandler {
 					if (eb.build().getTitle().equals("Settings")) {
 						this.name = eb.build().getDescription().split("`")[1].split("`")[0].toLowerCase().replace(" ", "_");
 						eb =
-								defaultEmbed("Setup")
-										.setDescription("Choose one of the buttons below to setup the corresponding automatic guild feature");
+							defaultEmbed("Setup")
+								.setDescription("Choose one of the buttons below to setup the corresponding automatic guild feature");
 						buttonEvent
-								.getChannel()
-								.sendMessageEmbeds(eb.build())
-								.setActionRow(
-										Button.primary("setup_command_guild_apply_" + name, "Automated Apply"),
-										Button.primary("setup_command_guild_role_" + name, "Guild Member Role"),
-										Button.primary("setup_command_guild_ranks_" + name, "Guild Ranks"),
-										Button.primary("setup_command_guild_counter_" + name, "Guild Member Counter")
-								)
-								.queue();
+							.getChannel()
+							.sendMessageEmbeds(eb.build())
+							.setActionRow(
+								Button.primary("setup_command_guild_apply_" + name, "Automated Apply"),
+								Button.primary("setup_command_guild_role_" + name, "Guild Member Role"),
+								Button.primary("setup_command_guild_ranks_" + name, "Guild Ranks"),
+								Button.primary("setup_command_guild_counter_" + name, "Guild Member Counter")
+							)
+							.queue();
 						return;
 					}
 				}
