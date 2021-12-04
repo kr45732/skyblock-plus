@@ -482,7 +482,7 @@ public class Utils {
 	}
 
 	public static String getScammerReason(String uuid) {
-		return higherDepth(getJson("https://api.robothanzo.dev/scammer/" + uuid + "?key=" + SBZ_SCAMMER_DB_KEY), "results.reason", null);
+		return higherDepth(getJson("https://api.robothanzo.dev/scammer/" + uuid + "?key=" + SBZ_SCAMMER_DB_KEY), "result.reason", null);
 	}
 
 	/* Logging */
