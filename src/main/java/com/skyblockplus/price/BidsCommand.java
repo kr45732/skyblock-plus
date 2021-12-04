@@ -71,7 +71,7 @@ public class BidsCommand extends Command {
 			long highestBid = higherDepth(bidsArr, "[" + (bidsArr.size() - 1) + "].amount").getAsLong();
 			if (duration.toMillis() > 0) {
 				auctionDesc = "Current bid: " + simplifyNumber(highestBid);
-				auctionDesc += " | Ending in <t:" + endingAt.getEpochSecond() + ":R>";
+				auctionDesc += " | Ending <t:" + endingAt.getEpochSecond() + ":R>";
 				auctionDesc +=
 					"\nHighest bidder: " +
 					uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).getUsername();

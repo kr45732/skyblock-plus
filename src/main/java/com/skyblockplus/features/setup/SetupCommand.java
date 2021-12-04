@@ -40,7 +40,7 @@ public class SetupCommand extends Command {
 	public static ActionRow getSetupActionRow() {
 		return ActionRow.of(
 			Button.primary("setup_command_verify", "Verification"),
-			Button.primary("setup_command_guild", "Guild | Application, Roles & Ranks").asDisabled(),
+			Button.primary("setup_command_guild", "Guild | Application, Roles & Ranks"),
 			Button.primary("setup_command_roles", "Skyblock Roles"),
 			Button.primary("setup_command_prefix", "Prefix")
 		);

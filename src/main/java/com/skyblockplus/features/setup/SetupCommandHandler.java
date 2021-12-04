@@ -262,27 +262,25 @@ public class SetupCommandHandler {
 				}
 				break;
 			case "guild":
-				switch (state) {
-					case 0:
-						eb = settings.createNewGuild(event.getMessage().getContentRaw());
-						if (eb.build().getTitle().equals("Settings")) {
-							this.name = eb.build().getDescription().split("`")[1].split("`")[0].toLowerCase().replace(" ", "_");
-							eb =
+				if (state == 0) {
+					eb = settings.createNewGuild(event.getMessage().getContentRaw());
+					if (eb.build().getTitle().equals("Settings")) {
+						this.name = eb.build().getDescription().split("`")[1].split("`")[0].toLowerCase().replace(" ", "_");
+						eb =
 								defaultEmbed("Setup")
-									.setDescription("Choose one of the buttons below to setup the corresponding automatic guild feature");
-							buttonEvent
+										.setDescription("Choose one of the buttons below to setup the corresponding automatic guild feature");
+						buttonEvent
 								.getChannel()
 								.sendMessageEmbeds(eb.build())
 								.setActionRow(
-									Button.primary("setup_command_guild_apply_" + name, "Automated Apply"),
-									Button.primary("setup_command_guild_role_" + name, "Guild Member Role"),
-									Button.primary("setup_command_guild_ranks_" + name, "Guild Ranks"),
-									Button.primary("setup_command_guild_counter_" + name, "Guild Member Counter")
+										Button.primary("setup_command_guild_apply_" + name, "Automated Apply"),
+										Button.primary("setup_command_guild_role_" + name, "Guild Member Role"),
+										Button.primary("setup_command_guild_ranks_" + name, "Guild Ranks"),
+										Button.primary("setup_command_guild_counter_" + name, "Guild Member Counter")
 								)
 								.queue();
-							return;
-						}
-						break;
+						return;
+					}
 				}
 				break;
 			case "guild_apply":
@@ -414,7 +412,7 @@ public class SetupCommandHandler {
 							settings.addGuildRank(
 								getSettings(),
 								guildRanksSplit.length >= 1 ? guildRanksSplit[0] : null,
-								guildRanksSplit.length >= 2 ? guildRanksSplit[1] : null
+								guildRanksSplit.length >= 2 ? guildRanksSplit[1] : ""
 							);
 						if (!eb.build().getTitle().equals("Settings")) {
 							break;

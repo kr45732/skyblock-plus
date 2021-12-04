@@ -77,9 +77,9 @@ public class CalculateCommand extends Command {
 
 			if (duration.toMillis() > 0) {
 				if (bin) {
-					ebStr += "\n**BIN:** " + simplifyNumber(startingBid) + " coins | Ending in <t:" + endingAt.getEpochSecond() + ":R>";
+					ebStr += "\n**BIN:** " + simplifyNumber(startingBid) + " coins | Ending <t:" + endingAt.getEpochSecond() + ":R>";
 				} else {
-					ebStr += "\n**Current bid:** " + simplifyNumber(highestBid) + " | Ending in <t:" + endingAt.getEpochSecond() + ":R>";
+					ebStr += "\n**Current bid:** " + simplifyNumber(highestBid) + " | Ending <t:" + endingAt.getEpochSecond() + ":R>";
 					ebStr +=
 						bidsArr.size() > 0
 							? "\n**Highest bidder:** " +
