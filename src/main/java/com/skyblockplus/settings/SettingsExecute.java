@@ -1473,7 +1473,7 @@ public class SettingsExecute {
 			if (enable) {
 				List<String> enabled = new ArrayList<>();
 				for (Entry<String, JsonElement> role : roleSettings.entrySet()) {
-					if (!role.getKey().equals("true") && higherDepth(role.getValue(), "levels.[0]") != null) {
+					if (!higherDepth(role.getValue(), "enable", false) && higherDepth(role.getValue(), "levels.[0]") != null) {
 						JsonObject curRole = role.getValue().getAsJsonObject();
 						curRole.addProperty("enable", "true");
 						roleSettings.add(role.getKey(), curRole);

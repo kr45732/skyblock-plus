@@ -135,7 +135,7 @@ public class ApplyGuild {
 		if (higherDepth(currentSettings, "applyScammerCheck", false)) {
 			String scammerReason = getScammerReason(higherDepth(linkedAccount, "minecraftUuid").getAsString());
 			if (scammerReason != null) {
-				return "❌ You have been marked as a scammer by SkyblockZ with reason `" + scammerReason + "`";
+				return "SBZ_SCAMMER_CHECK_" + scammerReason;
 			}
 		}
 

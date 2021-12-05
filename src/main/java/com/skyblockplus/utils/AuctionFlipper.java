@@ -18,92 +18,122 @@
 
 package com.skyblockplus.utils;
 
-import static com.skyblockplus.utils.Utils.*;
-
 import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.external.JDAWebhookClient;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.skyblockplus.networth.NetworthExecute;
-import com.skyblockplus.utils.structs.InvItem;
-import java.io.IOException;
+import com.google.gson.JsonParser;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+
+import java.io.InputStreamReader;
+import java.net.URI;
 import java.time.Instant;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import me.nullicorn.nedit.NBTReader;
+import java.util.stream.Collectors;
+
+import static com.skyblockplus.utils.Utils.*;
 
 public class AuctionFlipper {
 
-	private static final NetworthExecute calculator = new NetworthExecute().setVerbose(true).setFlipper(true);
 	private static final JDAWebhookClient flipperWebhook = new WebhookClientBuilder(
-		"https://discord.com/api/webhooks/901508783862325268/SKvSwKeCAfz71rWUrbQi5Runb6Jbebo6gLwaq0cjU1rCIPJ22VtmA-85zIlujHEAqfw1"
+		"https://discord.com/api/webhooks/917160844247334933/WKeMowhugO5-xbLlD8TakRfCskt7D5Sm7giMY8LfN2MzKjxsDUm9Y2yPw61_yzQTgcII"
 	)
 		.setExecutorService(scheduler)
 		.setHttpClient(okHttpClient)
 		.buildJDA();
-	public static boolean enable = false;
+	private static boolean enable = false;
 	private static Instant lastUpdated;
+	private static final Cache<String, Long> auctionUuidToMessage = Caffeine.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build();
 
-	public static void scheduleFlipper() {
-		scheduler.scheduleAtFixedRate(AuctionFlipper::flip, 5, 60, TimeUnit.SECONDS);
+	public static void onGuildMessageReceived(GuildMessageReceivedEvent event){
+		try {
+			if (event.getChannel().getId().equals("912156704383336458")) {
+				if (event.getMessage().getEmbeds().get(0).getDescription().startsWith("Insert time: ")) {
+					flip();
+				}
+			}
+		}catch (Exception ignored) {}
 	}
 
 	public static void flip() {
-		try {
-			if (!enable) {
-				return;
-			}
-
-			calculator.initPrices();
-			System.out.println("Flipping...");
-
-			JsonElement auctionJson = getJson("https://moulberry.codes/auction.json");
-			Instant thisLastUpdated = Instant.ofEpochSecond(higherDepth(auctionJson, "time").getAsLong());
-			if (lastUpdated == null || thisLastUpdated.isAfter(lastUpdated)) {
-				lastUpdated = thisLastUpdated;
-				JsonArray newAuctions = higherDepth(auctionJson, "new_auctions").getAsJsonArray();
-
-				for (JsonElement auction : newAuctions) {
-					if (higherDepth(auction, "bin", false)) {
-						InvItem item = null;
-						try {
-							item = getGenericInventoryMap(NBTReader.readBase64(higherDepth(auction, "item_bytes").getAsString())).get(0);
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-						if (item == null) {
-							continue;
-						}
-
-						double itemPrice = calculator.calculateItemPrice(item);
-						long startingBid = higherDepth(auction, "starting_bid").getAsLong();
-						double profit = itemPrice - startingBid;
-						if (profit > 1000000) {
-							flipperWebhook.send(
-								defaultEmbed(item.getName())
-									.setDescription(
-										"**Current price:** " +
-										formatNumber(startingBid) +
-										"\n**Calculated value:** " +
-										formatNumber(itemPrice) +
-										"\n**Estimated profit:** " +
-										formatNumber(profit) +
-										"\n**Command:** `/viewauction " +
-										higherDepth(auction, "uuid").getAsString() +
-										"`" +
-										"\n**Ending** <t:" +
-										Instant.ofEpochMilli(higherDepth(auction, "end").getAsLong()).getEpochSecond() +
-										":R>"
-									)
-									.addField("Price breakdown", calculator.getItemInfo(), false)
-									.setThumbnail("https://sky.shiiyu.moe/item.gif/" + item.getId())
-									.build()
-							);
-						}
-					}
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		if (!enable) {
+			return;
 		}
+
+		JsonArray underBinJson = getUnderBinJson().getAsJsonArray();
+		if(underBinJson != null) {
+			for (JsonElement auction : underBinJson) {
+				String itemId = higherDepth(auction, "id").getAsString();
+				if(isVanillaItem(itemId)){
+					continue;
+				}
+				String itemName = higherDepth(auction, "name").getAsString();
+				long startingBid = higherDepth(auction, "starting_bid").getAsLong();
+				long profit = higherDepth(auction, "profit").getAsLong();
+				String auctionUuid = higherDepth(auction, "uuid").getAsString();
+				flipperWebhook.send(
+						defaultEmbed(itemName)
+								.setDescription(
+										"**Current price:** " +
+												formatNumber(startingBid) +
+												"\n**Previous bin price:** " +
+												formatNumber(higherDepth(auction, "past_bin_price").getAsLong()) +
+												"\n**Estimated profit:** " +
+												formatNumber(profit) +
+												"\n**Command:** `/viewauction " +
+												auctionUuid +
+												"`" +
+												"\n**Ending** <t:" +
+												Instant.ofEpochMilli(higherDepth(auction, "end").getAsLong()).getEpochSecond() +
+												":R>"
+								)
+								.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId)
+								.build()
+				).whenComplete((m, e) -> {
+					if (m != null) {
+						auctionUuidToMessage.put(auctionUuid, m.getId());
+					}
+				});
+
+			}
+		}
+
+		JsonElement endedAuctionsJson = getJson("https://api.hypixel.net/skyblock/auctions_ended");
+		Instant jsonLastUpdated = Instant.ofEpochMilli(higherDepth(endedAuctionsJson, "lastUpdated").getAsLong());
+		if (lastUpdated == null || lastUpdated.isBefore(jsonLastUpdated)) {
+			lastUpdated = jsonLastUpdated;
+			Map<String, Long> toEdit = auctionUuidToMessage.getAllPresent(streamJsonArray(higherDepth(endedAuctionsJson, "auctions").getAsJsonArray()).map(a -> higherDepth(a, "auction_id").getAsString()).collect(Collectors.toList()));
+			for (Map.Entry<String, Long> entry : toEdit.entrySet()) {
+				flipperWebhook.edit(entry.getValue(), defaultEmbed("Auction Sold").build());
+			}
+			auctionUuidToMessage.invalidate(toEdit);
+		}
+	}
+
+	public static JsonElement getUnderBinJson(){
+		try {
+			HttpGet httpget = new HttpGet("http://venus.arcator.co.uk:1194/underbin");
+			httpget.addHeader("content-type", "application/json; charset=UTF-8");
+
+			URI uri = new URIBuilder(httpget.getURI())
+					.addParameter("key", AUCTION_API_KEY)
+					.build();
+			httpget.setURI(uri);
+
+			try (CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpget)) {
+				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
+			}
+		} catch (Exception ignored) {}
+		return null;
+	}
+
+	public static void setEnable(boolean enable) {
+		AuctionFlipper.enable = enable;
 	}
 }

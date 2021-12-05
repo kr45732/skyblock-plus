@@ -713,6 +713,9 @@ public class AutomaticGuild {
 			if (buttonClickReply != null) {
 				if (buttonClickReply.equals("IGNORE_INTERNAL")) {
 					return;
+				}else if(buttonClickReply.startsWith("SBZ_SCAMMER_CHECK_")){
+					event.getHook().editOriginalEmbeds(defaultEmbed("Error").setDescription("You have been marked as a scammer with reason `" + buttonClickReply.split("SBZ_SCAMMER_CHECK_")[1] + "`").setFooter("Scammer check powered by SkyBlockZ (discord.gg/skyblock)").build()).queue();
+					return;
 				}
 
 				event.getHook().editOriginal(buttonClickReply).queue();

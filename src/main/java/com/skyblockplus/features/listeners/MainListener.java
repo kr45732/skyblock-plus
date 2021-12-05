@@ -24,6 +24,8 @@ import static com.skyblockplus.utils.Utils.*;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import com.skyblockplus.utils.AuctionFlipper;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
@@ -165,6 +167,7 @@ public class MainListener extends ListenerAdapter {
 		if (guildMap.containsKey(event.getGuild().getId())) {
 			guildMap.get(event.getGuild().getId()).onGuildMessageReceived(event);
 		}
+		AuctionFlipper.onGuildMessageReceived(event);
 	}
 
 	@Override

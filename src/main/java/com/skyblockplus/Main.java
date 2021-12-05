@@ -54,6 +54,7 @@ import com.skyblockplus.skills.SkillsSlashCommand;
 import com.skyblockplus.slayer.SlayerCommand;
 import com.skyblockplus.slayer.SlayerSlashCommand;
 import com.skyblockplus.utils.ApiHandler;
+import com.skyblockplus.utils.AuctionFlipper;
 import com.skyblockplus.utils.Constants;
 import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.exceptionhandler.ExceptionEventListener;
@@ -263,7 +264,7 @@ public class Main {
 			ApiHandler.initialize();
 			TrackAuctionsCommand.initialize();
 			GuildTrackerCommand.initialize();
-			// AuctionFlipper.scheduleFlipper();
+			AuctionFlipper.setEnable(true);
 		}
 	}
 

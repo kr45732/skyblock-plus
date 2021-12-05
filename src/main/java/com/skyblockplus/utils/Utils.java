@@ -127,6 +127,7 @@ public class Utils {
 	public static Instant averageAuctionJsonLastUpdated = Instant.now();
 	public static Instant bazaarJsonLastUpdated = Instant.now();
 	public static Instant sbzPricesJsonLastUpdated = Instant.now();
+	public static Set<String> vanillaItems;
 	/* JSON */
 	private static JsonElement essenceCostsJson;
 	private static JsonElement levelingJson;
@@ -1141,6 +1142,15 @@ public class Utils {
 			priceOverrideJson.add(manualOverride.getKey(), manualOverride.getValue());
 		}
 		priceOverrideJson.remove("ENCHANTED_BOOK");
+	}
+
+	public static boolean isVanillaItem(String id){
+		if(vanillaItems == null) {
+			vanillaItems = higherDepth(getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/PriceOverrides.json")
+					.getAsJsonObject(), "automatic").getAsJsonObject().keySet();
+		}
+
+		return vanillaItems.contains(id);
 	}
 
 	public static double getPriceOverride(String itemId) {
