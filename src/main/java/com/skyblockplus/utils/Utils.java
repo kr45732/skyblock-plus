@@ -1144,10 +1144,15 @@ public class Utils {
 		priceOverrideJson.remove("ENCHANTED_BOOK");
 	}
 
-	public static boolean isVanillaItem(String id){
-		if(vanillaItems == null) {
-			vanillaItems = higherDepth(getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/PriceOverrides.json")
-					.getAsJsonObject(), "automatic").getAsJsonObject().keySet();
+	public static boolean isVanillaItem(String id) {
+		if (vanillaItems == null) {
+			vanillaItems =
+				higherDepth(
+					getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/PriceOverrides.json").getAsJsonObject(),
+					"automatic"
+				)
+					.getAsJsonObject()
+					.keySet();
 		}
 
 		return vanillaItems.contains(id);
