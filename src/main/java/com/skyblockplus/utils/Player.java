@@ -1000,15 +1000,15 @@ public class Player {
 	public double getWeight(String... weightTypes) {
 		Weight weight = new Weight(this);
 		for (String weightType : weightTypes) {
-			if(SLAYER_NAMES.contains(weightType)){
+			if (SLAYER_NAMES.contains(weightType)) {
 				weight.getSlayerWeight().getSlayerWeight(weightType);
-			}else if(SKILL_NAMES.contains(weightType)){
+			} else if (SKILL_NAMES.contains(weightType)) {
 				weight.getSkillsWeight().getSkillsWeight(weightType);
-			}else if(DUNGEON_CLASS_NAMES.contains(weightType)){
+			} else if (DUNGEON_CLASS_NAMES.contains(weightType)) {
 				weight.getDungeonsWeight().getClassWeight(weightType);
-			}else if(weightType.equals("catacombs")){
+			} else if (weightType.equals("catacombs")) {
 				weight.getDungeonsWeight().getDungeonWeight("catacombs");
-			}else{
+			} else {
 				throw new IllegalArgumentException("Invalid weight type: " + weightType);
 			}
 		}
