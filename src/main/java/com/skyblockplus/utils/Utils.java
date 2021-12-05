@@ -152,6 +152,9 @@ public class Utils {
 	public static JsonElement getLowestBinJson() {
 		if (lowestBinJson == null || Duration.between(lowestBinJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
 			lowestBinJson = getJson("https://moulberry.codes/lowestbin.json");
+			if(lowestBinJson == null){
+				lowestBinJson = getJson("http://venus.arcator.co.uk:1194/lowestbin?key=" + AUCTION_API_KEY);
+			}
 			lowestBinJsonLastUpdated = Instant.now();
 		}
 

@@ -997,20 +997,23 @@ public class Player {
 		return new Weight(this, true).getTotalWeight().getRaw();
 	}
 
-	public double getWeight(String weightType) {
-		Weight weight = new Weight(this, true);
-		switch (weightType) {
-			case "all":
-				return weight.getTotalWeight().getRaw();
-			case "slayer":
-				return weight.getSlayerWeight().getWeightStruct().getRaw();
-			case "skills":
-				return weight.getSkillsWeight().getWeightStruct().getRaw();
-			case "dungeons":
-				return weight.getDungeonsWeight().getWeightStruct().getRaw();
-			default:
-				throw new IllegalArgumentException("Invalid weight type");
+	public double getWeight(String... weightTypes) {
+		Weight weight = new Weight(this);
+		for (String weightType : weightTypes) {
+			if(SLAYER_NAMES.contains(weightType)){
+				weight.getSlayerWeight().getSlayerWeight(weightType);
+			}else if(SKILL_NAMES.contains(weightType)){
+				weight.getSkillsWeight().getSkillsWeight(weightType);
+			}else if(DUNGEON_CLASS_NAMES.contains(weightType)){
+				weight.getDungeonsWeight().getClassWeight(weightType);
+			}else if(weightType.equals("catacombs")){
+				weight.getDungeonsWeight().getDungeonWeight("catacombs");
+			}else{
+				throw new IllegalArgumentException("Invalid weight type: " + weightType);
+			}
 		}
+
+		return weight.getTotalWeight().getRaw();
 	}
 
 	public EmbedBuilder defaultPlayerEmbed() {

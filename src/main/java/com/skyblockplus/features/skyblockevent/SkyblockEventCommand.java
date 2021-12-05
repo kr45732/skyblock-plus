@@ -77,7 +77,7 @@ public class SkyblockEventCommand extends Command {
 		try {
 			announcementChannel
 				.retrieveMessageById(higherDepth(runningEventSettings, "announcementMessageId").getAsString())
-				.queue(m -> m.editMessageComponents().queue());
+				.queue(m -> m.editMessageEmbeds(defaultEmbed("Skyblock Event").setDescription("Event has ended").build()).setActionRows().queue());
 		} catch (Exception ignored) {}
 
 		CustomPaginator.Builder paginateBuilder = defaultPaginator()
@@ -255,8 +255,8 @@ public class SkyblockEventCommand extends Command {
 												);
 											}
 										} else if (eventType.startsWith("weight.")) {
-											String skillType = eventType.split("weight.")[1];
-											double skillXp = guildMemberPlayer.getWeight(skillType);
+											String weightTypes = eventType.split("weight.")[1];
+											double skillXp = guildMemberPlayer.getWeight(weightTypes.split("-"));
 
 											if (skillXp != -1) {
 												return new EventMember(
@@ -569,8 +569,8 @@ public class SkyblockEventCommand extends Command {
 											"  xp";
 										break;
 									} else if (eventType.startsWith("weight.")) {
-										String skillType = eventType.split("weight.")[1];
-										startingAmount = player.getWeight(skillType);
+										String weightTypes = eventType.split("weight.")[1];
+										startingAmount = player.getWeight(weightTypes.split("-"));
 										startingAmountFormatted = formatNumber(startingAmount) + " " + getEventTypeFormatted(eventType);
 										break;
 									}
@@ -681,7 +681,7 @@ public class SkyblockEventCommand extends Command {
 			guild
 				.getTextChannelById(higherDepth(settings, "announcementId").getAsString())
 				.retrieveMessageById(higherDepth(settings, "announcementMessageId").getAsString())
-				.queue(m -> m.editMessageComponents().queue());
+				.queue(m -> m.editMessageEmbeds(defaultEmbed("Skyblock Event").setDescription("Event has ended").build()).setActionRows().queue());
 			guildMap.get(guild.getId()).setEventMemberListLastUpdated(null);
 			int code = database.setSkyblockEventSettings(guild.getId(), new EventSettings());
 
@@ -717,7 +717,8 @@ public class SkyblockEventCommand extends Command {
 		} else if (eventType.startsWith("skills.")) {
 			return eventType.split("skills.")[1].equals("all") ? "skills" : eventType.split("skills.")[1];
 		} else if (eventType.startsWith("weight.")) {
-			return eventType.split("weight.")[1].equals("all") ? "weight" : eventType.split("weight.")[1] + " weight";
+			String[] types = eventType.split("weight.")[1].split("-");
+			return types.length == 18 ? "weight" : String.join(", ", types) + " weight" + (types.length > 1 ? "s" : "") ;
 		}
 
 		return eventType;

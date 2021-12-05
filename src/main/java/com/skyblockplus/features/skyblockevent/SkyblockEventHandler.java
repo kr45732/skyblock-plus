@@ -23,7 +23,7 @@ import static com.skyblockplus.Main.waiter;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.features.skyblockevent.SkyblockEventCommand.getEventTypeFormatted;
 import static com.skyblockplus.utils.ApiHandler.getGuildFromName;
-import static com.skyblockplus.utils.Constants.ALL_SKILL_NAMES;
+import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
@@ -33,10 +33,7 @@ import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -129,7 +126,7 @@ public class SkyblockEventHandler {
 						break;
 					case "weight":
 						state = 9;
-						eb.setDescription("Reply with the weight type this event should track or 'all' for total weight.");
+						eb.setDescription("Reply with the weight types separated by a comma this event should track or 'all' for total weight. Choosing one of the categories (slayer, skills, or dungeons) will select all weights in that category.\n\nWeight types:\n• Slayer: sven, tara, rev, enderman\n• Skills: taming, mining, foraging, enchanting, farming, combat, fishing, alchemy\n• Dungeons: catacombs, healer, mage, berserk, archer, tank");
 						sendEmbedMessage(eb);
 						return;
 					case "skills":
@@ -200,22 +197,44 @@ public class SkyblockEventHandler {
 				sendEmbedMessage(eb);
 				break;
 			case 9:
-				if (
-					replyMessage.equalsIgnoreCase("all") ||
-					replyMessage.equalsIgnoreCase("skills") ||
-					replyMessage.equalsIgnoreCase("dungeons") ||
-					replyMessage.equalsIgnoreCase("slayer")
-				) {
-					String eventType = "weight." + replyMessage.toLowerCase();
+				boolean invalidTypes = false;
+				Set<String> selectedTypes = new HashSet<>();
+				String[] weightTypes = replyMessage.toLowerCase().split(",");
+				for (String weightType : weightTypes) {
+					weightType = weightType.trim();
+					if (weightType.equals("all")){
+						selectedTypes.addAll(SLAYER_NAMES);
+						selectedTypes.addAll(SKILL_NAMES);
+						selectedTypes.addAll(DUNGEON_CLASS_NAMES);
+						selectedTypes.add("catacombs");
+						break;
+					} else if(weightType.equals("slayer") ){
+						selectedTypes.addAll(SLAYER_NAMES);
+					}
+					else if(weightType.equals("skills")){
+						selectedTypes.addAll(SKILL_NAMES);
+					}
+					else if(weightType.equals("dungeons")){
+						selectedTypes.add("catacombs");
+						selectedTypes.addAll(DUNGEON_CLASS_NAMES);
+					}else if(SLAYER_NAMES.contains(weightType) || SKILL_NAMES.contains(weightType) || DUNGEON_CLASS_NAMES.contains(weightType) || weightType.equals("catacombs")){
+						selectedTypes.add(weightType);
+					}else{
+						eb.setDescription("`" + weightType + "` is invalid. Please try again.");
+						attemptsLeft --;
+						invalidTypes = true;
+						break;
+					}
+				}
+
+				if(!invalidTypes){
+					String eventType = "weight." + String.join("-", selectedTypes);
 					eb.addField("Event Type", getEventTypeFormatted(eventType), false);
 					eventSettings.setEventType(eventType);
 					eb.setDescription(
-						"Reply with the minimum and/or maximum amount a player can have when joining the event. Follow the format in the example below (type:value):\nmin:5000\nmax:8000\n\nOptional and can be set to 'none'."
+							"Reply with the minimum and/or maximum amount a player can have when joining the event. Follow the format in the example below (type:value):\nmin:5000\nmax:8000\n\nOptional and can be set to 'none'."
 					);
 					state = 2;
-				} else {
-					eb.setDescription("`" + replyMessage + "` is invalid. Please choose from all, skills, slayer, or dungeons");
-					attemptsLeft--;
 				}
 				sendEmbedMessage(eb);
 				break;
@@ -347,10 +366,9 @@ public class SkyblockEventHandler {
 					String eventTypeFormatted = getEventTypeFormatted(eventSettings.getEventType());
 
 					announcementEb.setDescription(
-						"A new " +
-						eventTypeFormatted.toLowerCase() +
-						" Skyblock event has been created! Please see below for more information."
+						"A new Skyblock event has been created! Please see below for more information."
 					);
+					announcementEb.addField("Event Type", eventTypeFormatted, false);
 					announcementEb.addField("Guild", higherDepth(guildJson, "name").getAsString(), false);
 					announcementEb.addField("End Date", "Ends <t:" + eventSettings.getTimeEndingSeconds() + ":R>", false);
 
