@@ -70,7 +70,7 @@ public class InventoryPaginator {
 			if ((pageNumber - 1) >= 0) {
 				pageNumber -= 1;
 			}
-		} else if (event.getComponentId().equals("inv_paginator_left_button")) {
+		} else if (event.getComponentId().equals("inv_paginator_right_button")) {
 			if ((pageNumber + 1) <= maxPageNumber) {
 				pageNumber += 1;
 			}
