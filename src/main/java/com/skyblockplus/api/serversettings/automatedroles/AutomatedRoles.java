@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AutomatedRoles {
 
 	private String enable = "false";
+	private String useHighest = "false";
 
 	@Embedded
 	private RoleModel sven = new RoleModel();

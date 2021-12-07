@@ -1103,8 +1103,13 @@ public class Player {
 		return higherDepth(getOuterProfileJson(), "game_mode", "").equals("ironman");
 	}
 
+	public double getHighestAmount(String type) {
+		return getHighestAmount(type, false);
+	}
+
 	public double getHighestAmount(String type, boolean ironmanOnly) {
 		double highestAmount = -1.0;
+		int beforeProfileIndex = this.profileIndex;
 		this.profileIndex = 0;
 		for (JsonElement ignored : profilesArray) {
 			if (ironmanOnly && !isIronman()) {
@@ -1123,11 +1128,11 @@ public class Player {
 				case "weight":
 					highestAmount = Math.max(highestAmount, getWeight());
 					break;
-				case "svenXp":
-				case "revXp":
-				case "taraXp":
-				case "endermanXp":
-					highestAmount = Math.max(highestAmount, getSlayer(type.replace("Xp", "")));
+				case "sven":
+				case "rev":
+				case "tara":
+				case "enderman":
+					highestAmount = Math.max(highestAmount, getSlayer(type));
 					break;
 				case "alchemy":
 				case "combat":
@@ -1140,13 +1145,72 @@ public class Player {
 				case "enchanting":
 					highestAmount = Math.max(highestAmount, getSkill(type) != null ? getSkill(type).getProgressLevel() : -1);
 					break;
+				case "bank":
+					highestAmount = Math.max(highestAmount, getBankBalance());
+					break;
+				case "purse":
+					highestAmount = Math.max(highestAmount, getPurseCoins());
+					break;
+				case "pet_score":
+					highestAmount = Math.max(highestAmount, getPetScore());
+					break;
+				case "networth":
+					highestAmount = Math.max(highestAmount, getNetworth());
+					break;
+				case "fairy_souls":
+					highestAmount = Math.max(highestAmount, getFairySouls());
+					break;
+				case "slot_collector":
+					highestAmount = Math.max(highestAmount, getNumberMinionSlots());
+					break;
+				case "dungeon_secrets":
+					highestAmount = Math.max(highestAmount, getDungeonSecrets());
+					break;
+				case "accessory_count":
+					highestAmount = Math.max(highestAmount, getAccessoryCount());
+					break;
+				case "total_slayer":
+					highestAmount = Math.max(highestAmount, getTotalSlayer());
+					break;
+				case "slayer_nine":
+					highestAmount = Math.max(highestAmount, getNumLvlNineSlayers());
+					break;
+				case "maxed_collections":
+					highestAmount = Math.max(highestAmount, getNumMaxedCollections());
+					break;
+				case "ironman": // Returns 1 if the player has any ironman profiles, else -1
+					highestAmount = Math.max(highestAmount, isIronman() ? 1 : -1);
+					break;
 				default:
+					this.profileIndex = beforeProfileIndex;
 					return -1;
 			}
 			this.profileIndex++;
 		}
 
+		this.profileIndex = beforeProfileIndex;
 		return highestAmount;
+	}
+
+	public int getNumLvlNineSlayers(){
+		int lvlNineSlayers = getSlayer("sven") >= 1000000 ? 1 : 0;
+		lvlNineSlayers = getSlayer("rev") >= 1000000 ? lvlNineSlayers + 1 : lvlNineSlayers;
+		lvlNineSlayers = getSlayer("tara") >= 1000000 ? lvlNineSlayers + 1 : lvlNineSlayers;
+		return getSlayer("enderman") >= 1000000 ? lvlNineSlayers + 1 : lvlNineSlayers;
+	}
+
+	public int getNumMaxedCollections(){
+		int numMaxedColl = 0;
+		for (Map.Entry<String, JsonElement> collection : higherDepth(profileJson(), "collection")
+				.getAsJsonObject()
+				.entrySet()) {
+			long maxAmount = COLLECTION_ID_TO_MAX_AMOUNT.getOrDefault(collection.getKey(), -1L);
+			if (maxAmount != -1 && collection.getValue().getAsLong() >= maxAmount) {
+				numMaxedColl++;
+			}
+		}
+
+		return numMaxedColl;
 	}
 
 	public SkillsStruct getHOTM() {

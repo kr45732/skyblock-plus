@@ -34,7 +34,11 @@ public class BidsSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandExecutedEvent event) {
 		event.logCommand();
 
-		event.paginate(BidsCommand.getPlayerBids(event.getOptionStr("player"), new PaginatorEvent(event)));
+		if (event.invalidPlayerOption()) {
+			return;
+		}
+
+		event.paginate(BidsCommand.getPlayerBids(event.player, new PaginatorEvent(event)));
 	}
 
 	@Override

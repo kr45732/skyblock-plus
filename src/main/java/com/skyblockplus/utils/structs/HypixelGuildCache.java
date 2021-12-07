@@ -35,6 +35,10 @@ public class HypixelGuildCache {
 		this.lastUpdated = Instant.now();
 	}
 
+	public static boolean isValidType(String type){
+		return typeToIndex(type.toLowerCase()) >= 2;
+	}
+
 	public static int typeToIndex(String type) {
 		switch (type) {
 			case "username":
@@ -49,13 +53,13 @@ public class HypixelGuildCache {
 				return 4;
 			case "weight":
 				return 5;
-			case "sven_xp":
+			case "sven":
 				return 6;
-			case "rev_xp":
+			case "rev":
 				return 7;
-			case "tara_xp":
+			case "tara":
 				return 8;
-			case "enderman_xp":
+			case "enderman":
 				return 9;
 			case "alchemy":
 				return 10;
@@ -124,13 +128,13 @@ public class HypixelGuildCache {
 			"=:=" +
 			player.getHighestAmount("weight", ironmanOnly) +
 			"=:=" +
-			player.getHighestAmount("svenXp", ironmanOnly) +
+			player.getHighestAmount("sven", ironmanOnly) +
 			"=:=" +
-			player.getHighestAmount("revXp", ironmanOnly) +
+			player.getHighestAmount("rev", ironmanOnly) +
 			"=:=" +
-			player.getHighestAmount("taraXp", ironmanOnly) +
+			player.getHighestAmount("tara", ironmanOnly) +
 			"=:=" +
-			player.getHighestAmount("endermanXp", ironmanOnly) +
+			player.getHighestAmount("enderman", ironmanOnly) +
 			"=:=" +
 			player.getHighestAmount("alchemy", ironmanOnly) +
 			"=:=" +

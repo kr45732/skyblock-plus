@@ -24,7 +24,6 @@ import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.external.JDAWebhookClient;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import java.io.InputStreamReader;
@@ -52,7 +51,7 @@ public class AuctionFlipper {
 
 	public static void onGuildMessageReceived(GuildMessageReceivedEvent event) {
 		try {
-			if (event.getChannel().getId().equals("912156704383336458")) {
+			if (event.getChannel().getId().equals("912156704383336458") && event.isWebhookMessage()) {
 				if (event.getMessage().getEmbeds().get(0).getDescription().startsWith("Insert time: ")) {
 					flip();
 				}
@@ -65,34 +64,26 @@ public class AuctionFlipper {
 			return;
 		}
 
-		JsonArray underBinJson = getUnderBinJson().getAsJsonArray();
+		JsonElement underBinJson = getUnderBinJson();
 		if (underBinJson != null) {
-			for (JsonElement auction : underBinJson) {
+			for (JsonElement auction : underBinJson.getAsJsonArray()) {
 				String itemId = higherDepth(auction, "id").getAsString();
-				if (isVanillaItem(itemId)) {
+				if (isVanillaItem(itemId) ||  itemId.equals("BEDROCK")) {
 					continue;
 				}
 				String itemName = higherDepth(auction, "name").getAsString();
 				long startingBid = higherDepth(auction, "starting_bid").getAsLong();
+				long pastBinPrice = higherDepth(auction, "past_bin_price").getAsLong();
 				long profit = higherDepth(auction, "profit").getAsLong();
 				String auctionUuid = higherDepth(auction, "uuid").getAsString();
 				flipperWebhook
 					.send(
 						defaultEmbed(itemName)
-							.setDescription(
-								"**Current price:** " +
-								formatNumber(startingBid) +
-								"\n**Previous bin price:** " +
-								formatNumber(higherDepth(auction, "past_bin_price").getAsLong()) +
-								"\n**Estimated profit:** " +
-								formatNumber(profit) +
-								"\n**Command:** `/viewauction " +
-								auctionUuid +
-								"`" +
-								"\n**Ending** <t:" +
-								Instant.ofEpochMilli(higherDepth(auction, "end").getAsLong()).getEpochSecond() +
-								":R>"
-							)
+								.addField("Price", formatNumber(startingBid), true)
+								.addField("Previous Lowest Bin", formatNumber(pastBinPrice), true)
+								.addField("Estimated Profit", roundAndFormat(profit), true)
+								.addField("Command","`/viewauction " + auctionUuid + "`", true)
+								.addField("End", "t:" + Instant.ofEpochMilli(higherDepth(auction, "end").getAsLong()).getEpochSecond() + ":R>", true)
 							.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId)
 							.build()
 					)

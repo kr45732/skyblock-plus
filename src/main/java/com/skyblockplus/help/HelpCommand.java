@@ -137,7 +137,7 @@ public class HelpCommand extends Command {
 					.addAliases("g"),
 				new HelpData(
 					"guild-leaderboard",
-					"Get a leaderboard for a guild. The type can be slayer, skills, catacombs, weight, sven_xp, rev_xp, tara_xp, and enderman_xp. The mode can be normal or ironman. A Hypixel API key must be set in settings set hypixel_key <key>.",
+					"Get a leaderboard for a guild. The type can be slayer, skills, catacombs, weight, sven, rev, tara, enderman, alchemy, combat, fishing, farming, foraging, carpentry, mining, taming, and enchanting. The mode can be normal or ironman. A Hypixel API key must be set in settings set hypixel_key <key>.",
 					"guild-leaderboard <type> <u:player> [mode:normal|ironman]"
 				)
 					.addAliases("g-lb")
@@ -779,9 +779,10 @@ public class HelpCommand extends Command {
 			paginateBuilder.addItems(
 				help.create("settings roles", "Get the current roles settings for the bot") +
 				help.create("settings roles <enable|disable>", "Enable or disable automatic roles") +
+						help.create("settings roles use_highest <true|false>", "Enable or disable using the highest values or last played on profile. Default is false") +
 				help.create(
 					"settings roles <enable|disable> <roleName|all>",
-					"Enable or disable a specific automatic role or enable or disable each automatic role"
+					"Enable or disable a specific automatic role or enable or disable all applicable automatic roles"
 				) +
 				help.create(
 					"settings roles add <roleName> <value> <@role>",

@@ -60,10 +60,10 @@ public class GuildLeaderboardCommand extends Command {
 			return eb;
 		}
 
-		if (typeToIndex(lbType.toLowerCase()) < 2) { // Type is invalid, username, or uuid
+		if (!isValidType(lbType)) { // Type is invalid, username, or uuid
 			return invalidEmbed(
 				lbType +
-				" is an invalid leaderboard type. Valid types are: `slayer`, `skills`, `catacombs`, `weight`, `sven_xp`, `rev_xp`, `tara_xp`, `enderman_xp`, `alchemy`, `combat`,`fishing`, `farming`, `foraging`, `carpentry`, `mining`, `taming`, and `enchanting`"
+				" is an invalid leaderboard type. Use `/help guild-leaderboard` to see valid types"
 			);
 		}
 		lbType = lbType.toLowerCase();

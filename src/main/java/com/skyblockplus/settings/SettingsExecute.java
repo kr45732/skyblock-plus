@@ -198,10 +198,20 @@ public class SettingsExecute {
 					}
 				}
 			} else if (args.length == 4) {
-				if (args[2].equals("enable")) {
-					eb = setRoleEnable(args[3], true);
-				} else if (args[2].equals("disable")) {
-					eb = setRoleEnable(args[3], false);
+				switch (args[2]) {
+					case "enable":
+						eb = setRoleEnable(args[3], true);
+						break;
+					case "disable":
+						eb = setRoleEnable(args[3], false);
+						break;
+					case "use_highest":
+						if (args[3].equals("true")) {
+							eb = setRolesUseHighest(true);
+						} else if (args[3].equals("false")) {
+							eb = setRolesUseHighest(false);
+						}
+						break;
 				}
 			} else if (args.length == 5) {
 				if (args[2].equals("remove")) {
@@ -1170,6 +1180,7 @@ public class SettingsExecute {
 			pageNumbers
 		);
 		roleNames.remove("enable");
+		roleNames.remove("useHighest");
 		for (String roleName : roleNames) {
 			JsonElement currentRoleSettings = higherDepth(rolesSettings, roleName);
 			StringBuilder ebFieldString = new StringBuilder();
@@ -1438,6 +1449,7 @@ public class SettingsExecute {
 	public boolean allowRolesEnable() {
 		JsonObject currentSettings = database.getRolesSettings(guild.getId()).getAsJsonObject();
 		currentSettings.remove("enable");
+		currentSettings.remove("useHighest");
 		return getJsonKeys(currentSettings).stream().anyMatch(role -> higherDepth(currentSettings, role + ".enable", false));
 	}
 
@@ -1465,6 +1477,17 @@ public class SettingsExecute {
 		}
 
 		return defaultSettingsEmbed("**Roles:** enabled");
+	}
+
+	public EmbedBuilder setRolesUseHighest(boolean enable) {
+		JsonObject newRolesJson = database.getRolesSettings(guild.getId()).getAsJsonObject();
+		newRolesJson.addProperty("useHighest", "" + enable);
+		int responseCode = database.setRolesSettings(guild.getId(), newRolesJson);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		return defaultSettingsEmbed("**Use highest amount:** " + enable);
 	}
 
 	public EmbedBuilder setRoleEnable(String roleName, boolean enable) {
@@ -2175,12 +2198,9 @@ public class SettingsExecute {
 		}
 
 		if (
-			database
-				.getAllGuildSettings(guild.getId())
-				.stream()
-				.filter(g -> g != null && g.getApplyEnable() != null && g.getApplyEnable().equals("true"))
-				.count() ==
-			0
+				database
+						.getAllGuildSettings(guild.getId())
+						.stream().noneMatch(g -> g != null && g.getApplyEnable() != null && g.getApplyEnable().equals("true"))
 		) {
 			return invalidEmbed("There must be at least one active application system to set a guest role");
 		}
