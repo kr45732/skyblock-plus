@@ -2198,9 +2198,10 @@ public class SettingsExecute {
 		}
 
 		if (
-				database
-						.getAllGuildSettings(guild.getId())
-						.stream().noneMatch(g -> g != null && g.getApplyEnable() != null && g.getApplyEnable().equals("true"))
+			database
+				.getAllGuildSettings(guild.getId())
+				.stream()
+				.noneMatch(g -> g != null && g.getApplyEnable() != null && g.getApplyEnable().equals("true"))
 		) {
 			return invalidEmbed("There must be at least one active application system to set a guest role");
 		}

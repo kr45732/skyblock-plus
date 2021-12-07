@@ -68,7 +68,7 @@ public class AuctionFlipper {
 		if (underBinJson != null) {
 			for (JsonElement auction : underBinJson.getAsJsonArray()) {
 				String itemId = higherDepth(auction, "id").getAsString();
-				if (isVanillaItem(itemId) ||  itemId.equals("BEDROCK")) {
+				if (isVanillaItem(itemId) || itemId.equals("BEDROCK")) {
 					continue;
 				}
 				String itemName = higherDepth(auction, "name").getAsString();
@@ -79,11 +79,15 @@ public class AuctionFlipper {
 				flipperWebhook
 					.send(
 						defaultEmbed(itemName)
-								.addField("Price", formatNumber(startingBid), true)
-								.addField("Previous Lowest Bin", formatNumber(pastBinPrice), true)
-								.addField("Estimated Profit", roundAndFormat(profit), true)
-								.addField("Command","`/viewauction " + auctionUuid + "`", true)
-								.addField("End", "t:" + Instant.ofEpochMilli(higherDepth(auction, "end").getAsLong()).getEpochSecond() + ":R>", true)
+							.addField("Price", formatNumber(startingBid), true)
+							.addField("Previous Lowest Bin", formatNumber(pastBinPrice), true)
+							.addField("Estimated Profit", roundAndFormat(profit), true)
+							.addField("Command", "`/viewauction " + auctionUuid + "`", true)
+							.addField(
+								"End",
+								"t:" + Instant.ofEpochMilli(higherDepth(auction, "end").getAsLong()).getEpochSecond() + ":R>",
+								true
+							)
 							.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId)
 							.build()
 					)

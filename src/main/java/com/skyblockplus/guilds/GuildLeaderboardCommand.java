@@ -61,10 +61,7 @@ public class GuildLeaderboardCommand extends Command {
 		}
 
 		if (!isValidType(lbType)) { // Type is invalid, username, or uuid
-			return invalidEmbed(
-				lbType +
-				" is an invalid leaderboard type. Use `/help guild-leaderboard` to see valid types"
-			);
+			return invalidEmbed(lbType + " is an invalid leaderboard type. Use `/help guild-leaderboard` to see valid types");
 		}
 		lbType = lbType.toLowerCase();
 

@@ -18,6 +18,11 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.settings.SettingsExecute.isOneLevelRole;
+import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
@@ -31,19 +36,13 @@ import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.settings.SettingsExecute.isOneLevelRole;
-import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
-import static com.skyblockplus.utils.Utils.*;
 
 public class RolesCommand extends Command {
 
@@ -266,33 +265,25 @@ public class RolesCommand extends Command {
 								case "rev":
 								case "tara":
 								case "enderman":
-
-										roleAmount = useHighest ? player.getHighestAmount(currentRoleName) : player.getSlayer(currentRoleName);
-										break;
-
+									roleAmount = useHighest ? player.getHighestAmount(currentRoleName) : player.getSlayer(currentRoleName);
+									break;
 								case "coins":
-
-										roleAmount = useHighest ? player.getHighestAmount("bank") : player.getBankBalance();
-										if (roleAmount == -1 && !disabledAPI.toString().contains("Banking")) {
-											disabledAPI.append(roleChangeString("Banking API disabled"));
-										} else {
-											roleAmount += useHighest ? player.getHighestAmount("purse") : player.getPurseCoins();
-										}
-										break;
-
+									roleAmount = useHighest ? player.getHighestAmount("bank") : player.getBankBalance();
+									if (roleAmount == -1 && !disabledAPI.toString().contains("Banking")) {
+										disabledAPI.append(roleChangeString("Banking API disabled"));
+									} else {
+										roleAmount += useHighest ? player.getHighestAmount("purse") : player.getPurseCoins();
+									}
+									break;
 								case "skill_average":
-
-										roleAmount = useHighest ? player.getHighestAmount("skills") : player.getSkillAverage();
-										if (roleAmount == -1 && !disabledAPI.toString().contains("Skills")) {
-											disabledAPI.append(roleChangeString("Skills API disabled"));
-										}
-										break;
-
+									roleAmount = useHighest ? player.getHighestAmount("skills") : player.getSkillAverage();
+									if (roleAmount == -1 && !disabledAPI.toString().contains("Skills")) {
+										disabledAPI.append(roleChangeString("Skills API disabled"));
+									}
+									break;
 								case "pet_score":
-
-										roleAmount = useHighest ? player.getHighestAmount(currentRoleName) :player.getPetScore();
-										break;
-
+									roleAmount = useHighest ? player.getHighestAmount(currentRoleName) : player.getPetScore();
+									break;
 								case "alchemy":
 								case "combat":
 								case "fishing":
@@ -302,46 +293,41 @@ public class RolesCommand extends Command {
 								case "mining":
 								case "taming":
 								case "enchanting":
+									if (useHighest) {
+										roleAmount = player.getHighestAmount(currentRoleName);
+									} else if (player.getSkill(currentRoleName) != null) {
+										roleAmount = player.getSkill(currentRoleName).getProgressLevel();
+									}
 
-										if(useHighest){
-											roleAmount = player.getHighestAmount(currentRoleName);
-										}else if (player.getSkill(currentRoleName) != null){
-											roleAmount = player.getSkill(currentRoleName).getProgressLevel();
-										}
-
-										if (roleAmount == -1 && !disabledAPI.toString().contains("Skills")) {
-											disabledAPI.append(roleChangeString("Skills API disabled"));
-										}
-										break;
-
+									if (roleAmount == -1 && !disabledAPI.toString().contains("Skills")) {
+										disabledAPI.append(roleChangeString("Skills API disabled"));
+									}
+									break;
 								case "networth":
-
-										roleAmount = useHighest ? player.getHighestAmount(currentRoleName) : player.getNetworth();
-										break;
-
+									roleAmount = useHighest ? player.getHighestAmount(currentRoleName) : player.getNetworth();
+									break;
 								case "catacombs":
-
-										roleAmount = useHighest ? player.getHighestAmount(currentRoleName) : player.getCatacombs().getProgressLevel();
-										break;
-
+									roleAmount =
+										useHighest ? player.getHighestAmount(currentRoleName) : player.getCatacombs().getProgressLevel();
+									break;
 								case "fairy_souls":
-
-										roleAmount =useHighest ? player.getHighestAmount(currentRoleName) : player.getFairySouls();
-										break;
-
+									roleAmount = useHighest ? player.getHighestAmount(currentRoleName) : player.getFairySouls();
+									break;
 								case "slot_collector":
-
-										roleAmount = useHighest ? player.getHighestAmount(currentRoleName) :player.getNumberMinionSlots();
-										break;
-
+									roleAmount = useHighest ? player.getHighestAmount(currentRoleName) : player.getNumberMinionSlots();
+									break;
 								case "dungeon_secrets":
-									roleAmount = useHighest ? player.getHighestAmount(currentRoleName) :player.getDungeonSecrets();
+									roleAmount = useHighest ? player.getHighestAmount(currentRoleName) : player.getDungeonSecrets();
 									break;
 								case "accessory_count":
-									roleAmount = useHighest ? player.getHighestAmount(currentRoleName) :player.getAccessoryCount();
+									roleAmount = useHighest ? player.getHighestAmount(currentRoleName) : player.getAccessoryCount();
 									break;
 								case "weight":
-									if (!useHighest && player.getSkillAverage() == -1 && !disabledAPI.toString().contains("Skills (for weight)")) {
+									if (
+										!useHighest &&
+										player.getSkillAverage() == -1 &&
+										!disabledAPI.toString().contains("Skills (for weight)")
+									) {
 										disabledAPI.append(roleChangeString("Skills (for weight) API disabled"));
 									}
 									roleAmount = useHighest ? player.getHighestAmount(currentRoleName) : player.getWeight();
@@ -446,7 +432,7 @@ public class RolesCommand extends Command {
 							break;
 						}
 					case "pet_enthusiast":
-					// TODO: Highest role for this
+						// TODO: Highest role for this
 						{
 							JsonArray playerPets = player.getPets();
 							ArrayList<String> excludedPets = new ArrayList<>(Arrays.asList("guardian", "jellyfish", "parrot", "sheep"));
@@ -494,15 +480,17 @@ public class RolesCommand extends Command {
 				player
 					.defaultPlayerEmbed()
 					.setDescription(
-							useHighest ? "**NOTE: Using highest values across all profiles**\n\n" :"" +
-						"**Added Roles (" +
-						toAdd.size() +
-						")**\n" +
-						(addedRoles.length() > 0 ? addedRoles.toString() : "• None\n") +
-						"\n**Removed Roles (" +
-						toRemove.size() +
-						")**\n" +
-						(removedRoles.length() > 0 ? removedRoles.toString() : "• None")
+						useHighest
+							? "**NOTE: Using highest values across all profiles**\n\n"
+							: "" +
+							"**Added Roles (" +
+							toAdd.size() +
+							")**\n" +
+							(addedRoles.length() > 0 ? addedRoles.toString() : "• None\n") +
+							"\n**Removed Roles (" +
+							toRemove.size() +
+							")**\n" +
+							(removedRoles.length() > 0 ? removedRoles.toString() : "• None")
 					);
 			if (disabledAPI.length() > 0) {
 				eb.addField("Disabled APIs:", disabledAPI.toString(), false);

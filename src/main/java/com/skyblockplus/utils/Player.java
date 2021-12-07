@@ -1192,18 +1192,16 @@ public class Player {
 		return highestAmount;
 	}
 
-	public int getNumLvlNineSlayers(){
+	public int getNumLvlNineSlayers() {
 		int lvlNineSlayers = getSlayer("sven") >= 1000000 ? 1 : 0;
 		lvlNineSlayers = getSlayer("rev") >= 1000000 ? lvlNineSlayers + 1 : lvlNineSlayers;
 		lvlNineSlayers = getSlayer("tara") >= 1000000 ? lvlNineSlayers + 1 : lvlNineSlayers;
 		return getSlayer("enderman") >= 1000000 ? lvlNineSlayers + 1 : lvlNineSlayers;
 	}
 
-	public int getNumMaxedCollections(){
+	public int getNumMaxedCollections() {
 		int numMaxedColl = 0;
-		for (Map.Entry<String, JsonElement> collection : higherDepth(profileJson(), "collection")
-				.getAsJsonObject()
-				.entrySet()) {
+		for (Map.Entry<String, JsonElement> collection : higherDepth(profileJson(), "collection").getAsJsonObject().entrySet()) {
 			long maxAmount = COLLECTION_ID_TO_MAX_AMOUNT.getOrDefault(collection.getKey(), -1L);
 			if (maxAmount != -1 && collection.getValue().getAsLong() >= maxAmount) {
 				numMaxedColl++;

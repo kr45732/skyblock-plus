@@ -779,7 +779,10 @@ public class HelpCommand extends Command {
 			paginateBuilder.addItems(
 				help.create("settings roles", "Get the current roles settings for the bot") +
 				help.create("settings roles <enable|disable>", "Enable or disable automatic roles") +
-						help.create("settings roles use_highest <true|false>", "Enable or disable using the highest values or last played on profile. Default is false") +
+				help.create(
+					"settings roles use_highest <true|false>",
+					"Enable or disable using the highest values or last played on profile. Default is false"
+				) +
 				help.create(
 					"settings roles <enable|disable> <roleName|all>",
 					"Enable or disable a specific automatic role or enable or disable all applicable automatic roles"

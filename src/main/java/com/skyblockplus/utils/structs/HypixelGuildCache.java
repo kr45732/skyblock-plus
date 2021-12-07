@@ -35,7 +35,7 @@ public class HypixelGuildCache {
 		this.lastUpdated = Instant.now();
 	}
 
-	public static boolean isValidType(String type){
+	public static boolean isValidType(String type) {
 		return typeToIndex(type.toLowerCase()) >= 2;
 	}
 
