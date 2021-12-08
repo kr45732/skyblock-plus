@@ -69,16 +69,10 @@ public class NetworthExecute {
 	private double fumingPrice;
 	private double hbpPrice;
 	private String itemInfo;
-	private boolean isFlipper = false;
 	private boolean onlyTotal = false;
 
 	public NetworthExecute setVerbose(boolean verbose) {
 		this.verbose = verbose;
-		return this;
-	}
-
-	public NetworthExecute setFlipper(boolean isFlipper) {
-		this.isFlipper = isFlipper;
 		return this;
 	}
 
@@ -363,9 +357,10 @@ public class NetworthExecute {
 				}
 			}
 
-			System.out.println(
-				collectJsonArray(tempSet.stream().filter(str -> !str.toLowerCase().startsWith("rune_")).map(JsonPrimitive::new))
-			);
+			JsonArray missing = collectJsonArray(tempSet.stream().filter(str -> !str.toLowerCase().startsWith("rune_")).map(JsonPrimitive::new));
+			if(!missing.isEmpty()){
+				System.out.println(missing);
+			}
 
 			return eb;
 		}
@@ -959,19 +954,6 @@ public class NetworthExecute {
 			calcItemsJsonStr.append("},");
 		}
 
-		if (isFlipper) {
-			itemInfo =
-				"**Base cost**: " +
-				simplifyNumber(itemCost) +
-				(recombobulatedExtra > 0 ? "\n**Recombobulator:** " + simplifyNumber(recombobulatedExtra) : "") +
-				(hbpExtras > 0 ? "\n**HBP:** " + simplifyNumber(hbpExtras) : "") +
-				(fumingExtras > 0 ? "\n**Fuming:** " + simplifyNumber(fumingExtras) : "") +
-				(reforgeExtras > 0 ? "\n**Reforge:** " + simplifyNumber(reforgeExtras) : "") +
-				(enchantsExtras > 0 ? "\n**Enchants:** " + simplifyNumber(enchantsExtras) : "") +
-				(miscExtras > 0 ? "\n**Miscellaneous:** " + simplifyNumber(miscExtras) : "") +
-				(backpackExtras > 0 ? "\n**Backpack:** " + simplifyNumber(backpackExtras) : "");
-		}
-
 		return totalPrice;
 	}
 
@@ -1258,10 +1240,6 @@ public class NetworthExecute {
 
 		tempSet.add(itemId + " - " + iName);
 		return 0;
-	}
-
-	public String getItemInfo() {
-		return itemInfo;
 	}
 
 	public JsonElement getVerboseJson() {

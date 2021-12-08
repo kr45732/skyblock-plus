@@ -40,16 +40,21 @@ import org.apache.http.client.utils.URIBuilder;
 public class AuctionFlipper {
 
 	private static final JDAWebhookClient flipperWebhook = new WebhookClientBuilder(
-		"https://discord.com/api/webhooks/917160844247334933/WKeMowhugO5-xbLlD8TakRfCskt7D5Sm7giMY8LfN2MzKjxsDUm9Y2yPw61_yzQTgcII"
+		DEFAULT_PREFIX.equals("+") ? "https://discord.com/api/webhooks/917160844247334933/WKeMowhugO5-xbLlD8TakRfCskt7D5Sm7giMY8LfN2MzKjxsDUm9Y2yPw61_yzQTgcII"
+				: "https://discord.com/api/webhooks/917959010622255144/ljWuFDr73A_PfyBBUUQWUE17nlFPFhbe3TUP-MxaIzlp_o-jYojrWRAF-hQGYxaxcZfM"
 	)
 		.setExecutorService(scheduler)
 		.setHttpClient(okHttpClient)
 		.buildJDA();
 	private static boolean enable = false;
 	private static Instant lastUpdated;
-	private static final Cache<String, Long> auctionUuidToMessage = Caffeine.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build();
+	private static final Cache<String, Long> auctionUuidToMessage = Caffeine.newBuilder().expireAfterWrite(45, TimeUnit.MINUTES).build();
 
 	public static void onGuildMessageReceived(GuildMessageReceivedEvent event) {
+		if (!enable) {
+			return;
+		}
+
 		try {
 			if (event.getChannel().getId().equals("912156704383336458") && event.isWebhookMessage()) {
 				if (event.getMessage().getEmbeds().get(0).getDescription().startsWith("Insert time: ")) {
@@ -60,10 +65,7 @@ public class AuctionFlipper {
 	}
 
 	public static void flip() {
-		if (!enable) {
-			return;
-		}
-
+		JsonElement avgAuctionJson = getAverageAuctionJson();
 		JsonElement underBinJson = getUnderBinJson();
 		if (underBinJson != null) {
 			for (JsonElement auction : underBinJson.getAsJsonArray()) {
@@ -71,31 +73,41 @@ public class AuctionFlipper {
 				if (isVanillaItem(itemId) || itemId.equals("BEDROCK")) {
 					continue;
 				}
-				String itemName = higherDepth(auction, "name").getAsString();
-				long startingBid = higherDepth(auction, "starting_bid").getAsLong();
+
+				int sales = higherDepth(avgAuctionJson, itemId + ".sales", -1);
+				if(sales < 5){
+					continue;
+				}
+
 				long pastBinPrice = higherDepth(auction, "past_bin_price").getAsLong();
-				long profit = higherDepth(auction, "profit").getAsLong();
-				String auctionUuid = higherDepth(auction, "uuid").getAsString();
-				flipperWebhook
-					.send(
-						defaultEmbed(itemName)
-							.addField("Price", formatNumber(startingBid), true)
-							.addField("Previous Lowest Bin", formatNumber(pastBinPrice), true)
-							.addField("Estimated Profit", roundAndFormat(profit), true)
-							.addField("Command", "`/viewauction " + auctionUuid + "`", true)
-							.addField(
-								"End",
-								"t:" + Instant.ofEpochMilli(higherDepth(auction, "end").getAsLong()).getEpochSecond() + ":R>",
-								true
+				double profit = higherDepth(auction, "profit").getAsLong() - pastBinPrice * 0.01;
+				if(profit >= 1000000) {
+					long startingBid = higherDepth(auction, "starting_bid").getAsLong();
+					String itemName = higherDepth(auction, "name").getAsString();
+					String auctionUuid = higherDepth(auction, "uuid").getAsString();
+
+					flipperWebhook
+							.send(
+									defaultEmbed(itemName)
+											.addField("Price", formatNumber(startingBid), true)
+											.addField("Previous Lowest Bin", formatNumber(pastBinPrice), true)
+											.addField("Estimated Profit", roundAndFormat(profit), true)
+											.addField(
+													"End",
+													"<t:" + Instant.ofEpochMilli(higherDepth(auction, "end").getAsLong()).getEpochSecond() + ":R>",
+													true
+											)
+											.addField("Sales Per Day", formatNumber(sales), true)
+											.addField("Command", "`/viewauction " + auctionUuid + "`", true)
+											.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId)
+											.build()
 							)
-							.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId)
-							.build()
-					)
-					.whenComplete((m, e) -> {
-						if (m != null) {
-							auctionUuidToMessage.put(auctionUuid, m.getId());
-						}
-					});
+							.whenComplete((m, e) -> {
+								if (m != null) {
+									auctionUuidToMessage.put(auctionUuid, m.getId());
+								}
+							});
+				}
 			}
 		}
 

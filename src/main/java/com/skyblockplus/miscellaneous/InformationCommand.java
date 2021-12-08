@@ -47,12 +47,9 @@ public class InformationCommand extends Command {
 	}
 
 	public static EmbedBuilder getInformation() {
-		EmbedBuilder eb = defaultEmbed("Skyblock Plus");
-
-		eb.setDescription(
+		return defaultEmbed("Skyblock Plus").setDescription(
 			"Skyblock Plus is a Skyblock focused Discord bot that has many commands to help Skyblock players and guild staff! It allows for quick retrieval of Skyblock stats plus customizable features for a better Skyblock experience."
-		);
-		eb.addField(
+		).addField(
 			"Statistics",
 			"**Servers:** " +
 			jda.getGuilds().size() +
@@ -62,8 +59,7 @@ public class InformationCommand extends Command {
 			jda.getGatewayPing() +
 			"ms",
 			true
-		);
-		eb.addField(
+		).addField(
 			"Usage",
 			"**Memory:** " +
 			roundAndFormat(
@@ -71,13 +67,8 @@ public class InformationCommand extends Command {
 			) +
 			"%",
 			true
-		);
-
-		eb.setThumbnail("https://cdn.discordapp.com/attachments/803419567958392832/825768516636508160/sb_loading.gif");
-
-		eb.setFooter("Last restart").setTimestamp(client.getStartTime());
-
-		return eb;
+		).setThumbnail("https://cdn.discordapp.com/attachments/803419567958392832/825768516636508160/sb_loading.gif")
+				.setFooter("Last restart").setTimestamp(client.getStartTime());
 	}
 
 	@Override

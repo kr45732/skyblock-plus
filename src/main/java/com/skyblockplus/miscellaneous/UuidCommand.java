@@ -54,8 +54,12 @@ public class UuidCommand extends Command {
 			protected void execute() {
 				logCommand();
 
-				if (args.length == 2) {
-					embed(getUuidPlayer(args[1]));
+				if (args.length == 2 || args.length == 1) {
+					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
+						return;
+					}
+
+					embed(getUuidPlayer(username));
 					return;
 				}
 

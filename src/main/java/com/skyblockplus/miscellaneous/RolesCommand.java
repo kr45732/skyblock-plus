@@ -480,9 +480,9 @@ public class RolesCommand extends Command {
 				player
 					.defaultPlayerEmbed()
 					.setDescription(
-						useHighest
+						(useHighest
 							? "**NOTE: Using highest values across all profiles**\n\n"
-							: "" +
+							: "") +
 							"**Added Roles (" +
 							toAdd.size() +
 							")**\n" +
