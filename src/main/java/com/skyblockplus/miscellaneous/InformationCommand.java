@@ -47,28 +47,33 @@ public class InformationCommand extends Command {
 	}
 
 	public static EmbedBuilder getInformation() {
-		return defaultEmbed("Skyblock Plus").setDescription(
-			"Skyblock Plus is a Skyblock focused Discord bot that has many commands to help Skyblock players and guild staff! It allows for quick retrieval of Skyblock stats plus customizable features for a better Skyblock experience."
-		).addField(
-			"Statistics",
-			"**Servers:** " +
-			jda.getGuilds().size() +
-			"\n**Ping:** " +
-			jda.getRestPing().complete() +
-			"ms\n**Websocket:** " +
-			jda.getGatewayPing() +
-			"ms",
-			true
-		).addField(
-			"Usage",
-			"**Memory:** " +
-			roundAndFormat(
-				100.0 * (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (Runtime.getRuntime().totalMemory())
-			) +
-			"%",
-			true
-		).setThumbnail("https://cdn.discordapp.com/attachments/803419567958392832/825768516636508160/sb_loading.gif")
-				.setFooter("Last restart").setTimestamp(client.getStartTime());
+		return defaultEmbed("Skyblock Plus")
+			.setDescription(
+				"Skyblock Plus is a Skyblock focused Discord bot that has many commands to help Skyblock players and guild staff! It allows for quick retrieval of Skyblock stats plus customizable features for a better Skyblock experience."
+			)
+			.addField(
+				"Statistics",
+				"**Servers:** " +
+				jda.getGuilds().size() +
+				"\n**Ping:** " +
+				jda.getRestPing().complete() +
+				"ms\n**Websocket:** " +
+				jda.getGatewayPing() +
+				"ms",
+				true
+			)
+			.addField(
+				"Usage",
+				"**Memory:** " +
+				roundAndFormat(
+					100.0 * (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (Runtime.getRuntime().totalMemory())
+				) +
+				"%",
+				true
+			)
+			.setThumbnail("https://cdn.discordapp.com/attachments/803419567958392832/825768516636508160/sb_loading.gif")
+			.setFooter("Last restart")
+			.setTimestamp(client.getStartTime());
 	}
 
 	@Override

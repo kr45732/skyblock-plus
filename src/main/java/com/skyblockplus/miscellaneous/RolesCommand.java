@@ -480,17 +480,15 @@ public class RolesCommand extends Command {
 				player
 					.defaultPlayerEmbed()
 					.setDescription(
-						(useHighest
-							? "**NOTE: Using highest values across all profiles**\n\n"
-							: "") +
-							"**Added Roles (" +
-							toAdd.size() +
-							")**\n" +
-							(addedRoles.length() > 0 ? addedRoles.toString() : "• None\n") +
-							"\n**Removed Roles (" +
-							toRemove.size() +
-							")**\n" +
-							(removedRoles.length() > 0 ? removedRoles.toString() : "• None")
+						(useHighest ? "**NOTE: Using highest values across all profiles**\n\n" : "") +
+						"**Added Roles (" +
+						toAdd.size() +
+						")**\n" +
+						(addedRoles.length() > 0 ? addedRoles.toString() : "• None\n") +
+						"\n**Removed Roles (" +
+						toRemove.size() +
+						")**\n" +
+						(removedRoles.length() > 0 ? removedRoles.toString() : "• None")
 					);
 			if (disabledAPI.length() > 0) {
 				eb.addField("Disabled APIs:", disabledAPI.toString(), false);
