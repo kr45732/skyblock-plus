@@ -226,7 +226,7 @@ public class PartyCommand extends Command {
 
 		Party party = partyList.stream().filter(p -> p.getPartyLeaderUsername().equalsIgnoreCase(id)).findFirst().orElse(null);
 		if (party == null) {
-			return invalidEmbed("Invalid party id. You can get a list of all parties using /party list");
+			return invalidEmbed("Invalid party id. You can get a list of all parties using `/party list`");
 		}
 
 		JsonElement linkedUser = database.getLinkedUserByDiscordId(event.getUser().getId());

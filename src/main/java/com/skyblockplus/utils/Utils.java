@@ -20,8 +20,7 @@ package com.skyblockplus.utils;
 
 import static com.skyblockplus.Main.*;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.ApiHandler.playerFromUuid;
-import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
+import static com.skyblockplus.utils.ApiHandler.*;
 import static java.lang.String.join;
 import static java.util.Collections.nCopies;
 
@@ -32,6 +31,7 @@ import com.google.gson.*;
 import com.skyblockplus.features.apply.ApplyGuild;
 import com.skyblockplus.features.apply.ApplyUser;
 import com.skyblockplus.features.listeners.AutomaticGuild;
+import com.skyblockplus.features.party.Party;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.exceptionhandler.ExceptionExecutor;
 import com.skyblockplus.utils.structs.*;
@@ -1076,6 +1076,30 @@ public class Utils {
 			}
 		}
 		log.info("Cached apply users in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
+	}
+
+	public static void cacheParties() {
+		if (!DEFAULT_PREFIX.equals("+")) {
+			return;
+		}
+
+		long startTime = System.currentTimeMillis();
+		for (Map.Entry<String, AutomaticGuild> automaticGuild : guildMap.entrySet()) {
+			try {
+				List<Party> partyList = automaticGuild.getValue().partyList;
+				if (partyList.size() > 0) {
+					String partySettingsJson = gson.toJson(partyList);
+					int code = cachePartySettings(automaticGuild.getValue().guildId, partySettingsJson);
+
+					if (code == 200) {
+						log.info("Successfully cached PartyList | " + automaticGuild.getKey() + " | " + partyList.size());
+					}
+				}
+			}catch (Exception e){
+				log.error("cacheParties - " + automaticGuild.getKey(), e);
+			}
+		}
+		log.info("Cached parties in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
 	}
 
 	public static List<ApplyUser> getApplyGuildUsersCache(String guildId, String name) {

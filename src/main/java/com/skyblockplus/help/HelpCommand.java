@@ -743,7 +743,7 @@ public class HelpCommand extends Command {
 				) +
 				help.create("settings guild <name> apply staff_role remove <@role>", "Remove a staff ping role") +
 				help.create("settings guild <name> apply channel <#channel>", "Channel where the message to click for applying will sent") +
-				help.create("settings guild <name> category <category>", "Category where new apply channels will be made") +
+				help.create("settings guild <name> apply category <category>", "Category where new apply channels will be made") +
 				help.create(
 					"settings guild <name> apply staff_channel <#channel>",
 					"Channel where new applications will be sent to be reviewed by staff"

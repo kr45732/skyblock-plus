@@ -264,6 +264,7 @@ public class Main {
 
 		if (!IS_API) {
 			ApiHandler.initialize();
+			ApiHandler.initializeParties();
 			TrackAuctionsCommand.initialize();
 			GuildTrackerCommand.initialize();
 			AuctionFlipper.setEnable(true);
@@ -276,6 +277,9 @@ public class Main {
 
 		log.info("Caching Apply Users");
 		cacheApplyGuildUsers();
+
+		log.info("Caching Parties");
+		cacheParties();
 
 		log.info("Closing Http Client");
 		closeHttpClient();

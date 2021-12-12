@@ -19,6 +19,7 @@
 package com.skyblockplus.utils;
 
 import static com.skyblockplus.Main.database;
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.github.benmanes.caffeine.cache.Cache;
@@ -27,10 +28,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
+import com.skyblockplus.features.party.Party;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.sql.*;
 import java.time.Duration;
@@ -603,5 +607,44 @@ public class ApiHandler {
 		} catch (Exception e) {
 			log.error("Exception when updating linked accounts", e);
 		}
+	}
+
+	public static int cachePartySettings(String guildId, String json){
+		try (Statement statement = getCacheDatabaseConnection().createStatement()) {
+			statement.executeUpdate(
+					"INSERT INTO party VALUES ('" +
+							guildId +
+							"', '" +
+							json +
+							"') ON DUPLICATE KEY UPDATE guild_id = VALUES(guild_id), data = VALUES(data)"
+			);
+			return 200;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return 400;
+		}
+	}
+
+	public static void initializeParties() {
+		if (!DEFAULT_PREFIX.equals("+")) {
+			return;
+		}
+
+		List<String> toDeleteIds = new ArrayList<>();
+		try (Statement statement = getCacheDatabaseConnection().createStatement()) {
+			try (ResultSet response = statement.executeQuery("SELECT * FROM party")) {
+				Type partyListType = new TypeToken<List<Party>>() {}.getType();
+				while (response.next()) {
+					String guildId = response.getString("guild_id");
+					toDeleteIds.add(guildId);
+					List<Party> partyList = gson.fromJson(response.getString("data"), partyListType);
+					guildMap.get(guildId).setPartyList(partyList);
+				}
+			}
+		} catch (Exception ignored) {}
+
+		try (Statement statement = getCacheDatabaseConnection().createStatement()) {
+			statement.executeUpdate("DELETE FROM party WHERE guild_id IN (" + String.join(",", toDeleteIds) + ")");
+		} catch (Exception ignored) {}
 	}
 }

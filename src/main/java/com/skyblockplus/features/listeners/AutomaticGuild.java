@@ -676,10 +676,12 @@ public class AutomaticGuild {
 					)
 					.queue();
 			} else {
-				EmbedBuilder eb = SkyblockEventCommand.getEventLeaderboard(event);
-				if (eb != null) {
-					event.getHook().editOriginalEmbeds(eb.build()).queue();
-				}
+				executor.submit(() -> {
+					EmbedBuilder eb = SkyblockEventCommand.getEventLeaderboard(event);
+					if (eb != null) {
+						event.getHook().editOriginalEmbeds(eb.build()).queue();
+					}
+				});
 			}
 			return;
 		} else if (event.getComponentId().startsWith("setup_command_")) {
@@ -697,7 +699,7 @@ public class AutomaticGuild {
 		} else if (event.getButton().getId().startsWith("apply_user_") && !event.getButton().getId().startsWith("apply_user_wait_")) {
 			event.deferReply().complete();
 		} else if (event.getButton().getId().startsWith("party_finder_channel_close_")) {
-			if (event.getUser().getId().equalsIgnoreCase(event.getButton().getId().split("party_finder_channel_close_")[1])) {
+			if (event.getUser().getId().equals(event.getButton().getId().split("party_finder_channel_close_")[1])) {
 				event.replyEmbeds(defaultEmbed("Party Finder").setDescription("Closing channel").build()).queue();
 				event.getTextChannel().delete().queueAfter(5, TimeUnit.SECONDS);
 			} else {
@@ -925,5 +927,9 @@ public class AutomaticGuild {
 
 	public void setApplyGuestRole(Role role) {
 		this.applyGuestRole = role;
+	}
+
+	public void setPartyList(List<Party> partyList) {
+		this.partyList = partyList;
 	}
 }
