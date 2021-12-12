@@ -81,34 +81,28 @@ public class AuctionFlipper {
 				}
 
 				long pastBinPrice = higherDepth(auction, "past_bin_price").getAsLong();
-				double profit = higherDepth(auction, "profit").getAsLong() - pastBinPrice * 0.01;
-				if (profit >= 1000000) {
-					long startingBid = higherDepth(auction, "starting_bid").getAsLong();
-					String itemName = higherDepth(auction, "name").getAsString();
-					String auctionUuid = higherDepth(auction, "uuid").getAsString();
+				double profit = higherDepth(auction, "profit").getAsLong();
+				long startingBid = higherDepth(auction, "starting_bid").getAsLong();
+				String itemName = higherDepth(auction, "name").getAsString();
+				String auctionUuid = higherDepth(auction, "uuid").getAsString();
 
-					flipperWebhook
-						.send(
-							defaultEmbed(itemName)
-								.addField("Price", formatNumber(startingBid), true)
-								.addField("Previous Lowest Bin", formatNumber(pastBinPrice), true)
-								.addField("Estimated Profit", roundAndFormat(profit), true)
-								.addField(
-									"End",
-									"<t:" + Instant.ofEpochMilli(higherDepth(auction, "end").getAsLong()).getEpochSecond() + ":R>",
-									true
-								)
-								.addField("Sales Per Day", formatNumber(sales), true)
-								.addField("Command", "`/viewauction " + auctionUuid + "`", true)
-								.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId)
-								.build()
-						)
-						.whenComplete((m, e) -> {
-							if (m != null) {
-								auctionUuidToMessage.put(auctionUuid, m.getId());
-							}
-						});
-				}
+				flipperWebhook
+					.send(
+						defaultEmbed(itemName)
+							.addField("Price", formatNumber(startingBid), true)
+							.addField("Previous Lowest Bin", formatNumber(pastBinPrice), true)
+							.addField("Estimated Profit", roundAndFormat(profit), true)
+							.addField("Sales Per Day", formatNumber(sales), true)
+							.addField("Command", "`/viewauction " + auctionUuid + "`", true)
+							.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId)
+							.build()
+					)
+					.whenComplete((m, e) -> {
+						if (m != null) {
+							auctionUuidToMessage.put(auctionUuid, m.getId());
+						}
+					});
+
 			}
 		}
 

@@ -26,6 +26,7 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
@@ -37,6 +38,8 @@ import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
+
+import java.io.InputStreamReader;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -49,6 +52,9 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -291,6 +297,20 @@ public class SkyblockEventCommand extends Command {
 		}
 
 		guildMemberPlayersList.sort(Comparator.comparingDouble(o1 -> -Double.parseDouble(o1.getStartingAmount())));
+
+		if(guildId.equals("602137436490956820")){
+			executor.submit(() -> {
+				try {
+					HttpPost httpPost = new HttpPost("https://soopymc.my.to/api/soopyv2/lbdatathing");
+
+					StringEntity entity = new StringEntity(gson.toJsonTree(guildMemberPlayersList).toString());
+					httpPost.setEntity(entity);
+
+					try (CloseableHttpResponse ignored = httpClient.execute(httpPost)) {
+					}
+				} catch (Exception ignored) {}
+			});
+		}
 		return guildMemberPlayersList;
 	}
 
