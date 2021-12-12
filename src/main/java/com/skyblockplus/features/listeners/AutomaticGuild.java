@@ -463,10 +463,9 @@ public class AutomaticGuild {
 					VoiceChannel curVc = null;
 					try {
 						curVc = guild.getVoiceChannelById(currentSetting.getGuildCounterChannel());
-					} catch (Exception ignored) {
-					}
+					} catch (Exception ignored) {}
 
-					if(curVc == null){
+					if (curVc == null) {
 						currentSetting.setGuildCounterEnable("false");
 						database.setGuildSettings(guild.getId(), gson.toJsonTree(currentSetting));
 						continue;
