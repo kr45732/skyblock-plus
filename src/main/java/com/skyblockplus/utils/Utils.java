@@ -1095,7 +1095,7 @@ public class Utils {
 						log.info("Successfully cached PartyList | " + automaticGuild.getKey() + " | " + partyList.size());
 					}
 				}
-			}catch (Exception e){
+			} catch (Exception e) {
 				log.error("cacheParties - " + automaticGuild.getKey(), e);
 			}
 		}

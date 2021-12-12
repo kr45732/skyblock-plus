@@ -609,14 +609,14 @@ public class ApiHandler {
 		}
 	}
 
-	public static int cachePartySettings(String guildId, String json){
+	public static int cachePartySettings(String guildId, String json) {
 		try (Statement statement = getCacheDatabaseConnection().createStatement()) {
 			statement.executeUpdate(
-					"INSERT INTO party VALUES ('" +
-							guildId +
-							"', '" +
-							json +
-							"') ON DUPLICATE KEY UPDATE guild_id = VALUES(guild_id), data = VALUES(data)"
+				"INSERT INTO party VALUES ('" +
+				guildId +
+				"', '" +
+				json +
+				"') ON DUPLICATE KEY UPDATE guild_id = VALUES(guild_id), data = VALUES(data)"
 			);
 			return 200;
 		} catch (Exception e) {
