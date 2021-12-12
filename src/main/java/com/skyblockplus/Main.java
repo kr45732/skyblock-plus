@@ -176,7 +176,8 @@ public class Main {
 					new SkyblockCommand(),
 					new GuildStatisticsCommand(),
 					new GuildTrackerCommand(),
-					new PartyCommand()
+					new PartyCommand(),
+						new TimeCommand()
 				)
 				.build();
 
@@ -234,7 +235,8 @@ public class Main {
 					new GuildStatisticsSlashCommand(),
 					new GuildTrackerSlashCommand(),
 					new PartySlashCommand(),
-					new SettingsSlashCommand()
+					new SettingsSlashCommand(),
+						new TimeSlashCommand()
 				);
 
 		jda =

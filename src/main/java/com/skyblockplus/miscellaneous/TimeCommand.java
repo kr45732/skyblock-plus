@@ -18,7 +18,6 @@
 
 package com.skyblockplus.miscellaneous;
 
-import com.google.common.base.Strings;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
@@ -30,11 +29,11 @@ import static com.google.common.base.Strings.padStart;
 import static com.skyblockplus.utils.Utils.*;
 
 public class TimeCommand extends Command {
-	private static final String[] seasons = new String[]{"Early Spring", "Spring", "Late Spring", "Early Summer", "Summer", "Late Summer", "Early Autumn", "Autumn", "Late Autumn", "Early Winter", "Winter", "Late Winter"};
+	private static final String[] SEASONS = new String[]{"Early Spring", "Spring", "Late Spring", "Early Summer", "Summer", "Late Summer", "Early Autumn", "Autumn", "Late Autumn", "Early Winter", "Winter", "Late Winter"};
 	private static final int HOUR_MS = 50000;
 	private static final int DAY_MS = 24 * HOUR_MS;
 	private static final int MONTH_MS = 31 * DAY_MS;
-	private static final int YEAR_MS = seasons.length * MONTH_MS;
+	private static final int YEAR_MS = SEASONS.length * MONTH_MS;
 	private static final long YEAR_0 = 1560275700000L;
 
 	public TimeCommand() {
@@ -47,17 +46,12 @@ public class TimeCommand extends Command {
 		long now = Instant.now().toEpochMilli();
 
 		long currentOffset = (now - YEAR_0) % YEAR_MS;
-
 		long currentYear = Math.floorDiv((now - YEAR_0), YEAR_MS);
-
 		int currentMonth = (int) Math.floorDiv(currentOffset, MONTH_MS);
 		long currentMonthOffset = (currentOffset - (long) currentMonth * MONTH_MS) % MONTH_MS;
-
 		int currentDay = (int) Math.floorDiv(currentMonthOffset, DAY_MS);
 		long currentDayOffset = (currentMonthOffset - (long) currentDay * DAY_MS) % DAY_MS;
-
 		long currentHour = Math.floorDiv(currentDayOffset, HOUR_MS);
-
 		long currentMinute = (long) Math.floor(((double) currentDayOffset - currentHour * HOUR_MS) / HOUR_MS * 60);
 
 		String suffix = "am";
@@ -68,9 +62,11 @@ public class TimeCommand extends Command {
 		if (currentHour == 0) {
 			currentHour = 12;
 		}
-		String date = seasons[currentMonth] + " **" + nth(currentDay + 1) + "**";
-		String formattedTime = currentHour + ":" + padStart("" + ((int) Math.floorDiv(currentMinute, 10) * 10), 2, '0') + suffix;
-		return defaultEmbed("Time").setDescription(date + "\n" + formattedTime + "\n" + (currentYear + 1));
+
+		return defaultEmbed("Skyblock Time")
+				.addField("Year", "" + (currentYear + 1), false)
+				.addField("Date", SEASONS[currentMonth] + " **" + nth(currentDay + 1) + "**", false)
+				.addField("Time", currentHour + ":" + padStart("" + ((int) Math.floorDiv(currentMinute, 10) * 10), 2, '0') + suffix, false);
 	}
 
 	public static String nth(int n) {
