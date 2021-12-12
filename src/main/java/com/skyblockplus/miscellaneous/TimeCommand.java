@@ -18,18 +18,31 @@
 
 package com.skyblockplus.miscellaneous;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.utils.command.CommandExecute;
-import net.dv8tion.jda.api.EmbedBuilder;
-
-import java.time.Instant;
-
 import static com.google.common.base.Strings.padStart;
 import static com.skyblockplus.utils.Utils.*;
 
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.command.CommandExecute;
+import java.time.Instant;
+import net.dv8tion.jda.api.EmbedBuilder;
+
 public class TimeCommand extends Command {
-	private static final String[] SEASONS = new String[]{"Early Spring", "Spring", "Late Spring", "Early Summer", "Summer", "Late Summer", "Early Autumn", "Autumn", "Late Autumn", "Early Winter", "Winter", "Late Winter"};
+
+	private static final String[] SEASONS = new String[] {
+		"Early Spring",
+		"Spring",
+		"Late Spring",
+		"Early Summer",
+		"Summer",
+		"Late Summer",
+		"Early Autumn",
+		"Autumn",
+		"Late Autumn",
+		"Early Winter",
+		"Winter",
+		"Late Winter",
+	};
 	private static final int HOUR_MS = 50000;
 	private static final int DAY_MS = 24 * HOUR_MS;
 	private static final int MONTH_MS = 31 * DAY_MS;
@@ -64,19 +77,18 @@ public class TimeCommand extends Command {
 		}
 
 		return defaultEmbed("Skyblock Time")
-				.addField("Year", "" + (currentYear + 1), false)
-				.addField("Date", SEASONS[currentMonth] + " **" + nth(currentDay + 1) + "**", false)
-				.addField("Time", currentHour + ":" + padStart("" + ((int) Math.floorDiv(currentMinute, 10) * 10), 2, '0') + suffix, false);
+			.addField("Year", "" + (currentYear + 1), false)
+			.addField("Date", SEASONS[currentMonth] + " **" + nth(currentDay + 1) + "**", false)
+			.addField("Time", currentHour + ":" + padStart("" + ((int) Math.floorDiv(currentMinute, 10) * 10), 2, '0') + suffix, false);
 	}
 
 	public static String nth(int n) {
 		try {
-			return n + new String[]{"st", "nd", "rd"}[((n + 90) % 100 - 10) % 10 - 1];
+			return n + new String[] { "st", "nd", "rd" }[((n + 90) % 100 - 10) % 10 - 1];
 		} catch (Exception e) {
 			return n + "th";
 		}
 	}
-
 
 	@Override
 	protected void execute(CommandEvent event) {
@@ -88,6 +100,6 @@ public class TimeCommand extends Command {
 				embed(getSkyblockTime());
 			}
 		}
-				.queue();
+			.queue();
 	}
 }

@@ -102,7 +102,6 @@ public class AuctionFlipper {
 							auctionUuidToMessage.put(auctionUuid, m.getId());
 						}
 					});
-
 			}
 		}
 

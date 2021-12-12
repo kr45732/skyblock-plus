@@ -177,7 +177,7 @@ public class Main {
 					new GuildStatisticsCommand(),
 					new GuildTrackerCommand(),
 					new PartyCommand(),
-						new TimeCommand()
+					new TimeCommand()
 				)
 				.build();
 
@@ -236,7 +236,7 @@ public class Main {
 					new GuildTrackerSlashCommand(),
 					new PartySlashCommand(),
 					new SettingsSlashCommand(),
-						new TimeSlashCommand()
+					new TimeSlashCommand()
 				);
 
 		jda =
