@@ -641,7 +641,7 @@ public class ApiHandler {
 						List<Party> partyList = gson.fromJson(response.getString("data"), partyListType);
 						guildMap.get(guildId).setPartyList(partyList);
 						log.info("Retrieved party cache (" + partyList.size() + ") - guildId={" + guildId + "}");
-					}catch (Exception e){
+					} catch (Exception e) {
 						log.error("initializeParties guildId={" + guildId + "}", e);
 					}
 				}
