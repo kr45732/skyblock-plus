@@ -20,7 +20,7 @@ plugins {
     id 'application'
 
     // Shadow jar
-    id 'com.github.johnrengelman.shadow' version '6.1.0'
+    id 'com.github.johnrengelman.shadow' version '7.1.0'
 
     // Spring boot
     id 'org.springframework.boot' version '2.5.3'
