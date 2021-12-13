@@ -1201,11 +1201,14 @@ public class Player {
 
 	public int getNumMaxedCollections() {
 		int numMaxedColl = 0;
-		for (Map.Entry<String, JsonElement> collection : higherDepth(profileJson(), "collection").getAsJsonObject().entrySet()) {
-			long maxAmount = COLLECTION_ID_TO_MAX_AMOUNT.getOrDefault(collection.getKey(), -1L);
-			if (maxAmount != -1 && collection.getValue().getAsLong() >= maxAmount) {
-				numMaxedColl++;
+		try {
+			for (Map.Entry<String, JsonElement> collection : higherDepth(profileJson(), "collection").getAsJsonObject().entrySet()) {
+				long maxAmount = COLLECTION_ID_TO_MAX_AMOUNT.getOrDefault(collection.getKey(), -1L);
+				if (maxAmount != -1 && collection.getValue().getAsLong() >= maxAmount) {
+					numMaxedColl++;
+				}
 			}
+		} catch (Exception ignored) {
 		}
 
 		return numMaxedColl;
