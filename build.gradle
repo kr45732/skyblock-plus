@@ -56,7 +56,7 @@ dependencies {
      }
 
     // Discord webhooks
-    implementation 'club.minnced:discord-webhooks:0.7.3'
+    implementation 'club.minnced:discord-webhooks:0.7.4'
 
     // JDA utilities
     implementation 'pw.chew:jda-chewtils:1.23.0'
