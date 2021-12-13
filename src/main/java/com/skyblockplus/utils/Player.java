@@ -1208,8 +1208,7 @@ public class Player {
 					numMaxedColl++;
 				}
 			}
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 
 		return numMaxedColl;
 	}
