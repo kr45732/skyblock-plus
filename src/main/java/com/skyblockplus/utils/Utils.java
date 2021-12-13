@@ -972,7 +972,7 @@ public class Utils {
 
 						String itemSkinStr = item.getString("tag.ExtraAttributes.skin", "None");
 						if (!itemSkinStr.equals("None")) {
-							itemInfo.addExtraValue("PET_SKIN_" + itemSkinStr);
+							itemInfo.addExtraValue((itemInfo.getId().equals("PET") ? "PET_SKIN_" : "") + itemSkinStr);
 						}
 
 						if (item.containsTag("tag.ExtraAttributes.ability_scroll", TagType.LIST)) {
@@ -1004,25 +1004,21 @@ public class Utils {
 							}
 						}
 
-						for (int j = 0; j < item.getInt("tag.ExtraAttributes.farming_for_dummies_count", 0); j++) {
-							itemInfo.addExtraValue("FARMING_FOR_DUMMIES");
-						}
+						itemInfo.addExtraValues(item.getInt("tag.ExtraAttributes.farming_for_dummies_count", 0), "FARMING_FOR_DUMMIES");
 
 						if (item.containsTag("tag.ExtraAttributes.gems", TagType.COMPOUND)) {
 							NBTCompound gems = item.getCompound("tag.ExtraAttributes.gems");
 							for (Map.Entry<String, Object> gem : gems.entrySet()) {
 								if (!gem.getKey().endsWith("_gem")) {
-									if (gems.containsKey(gem.getKey() + "_gem")) {
+									if(gem.getKey().equals("unlocked_slots")){
+										itemInfo.addExtraValues(gems.getList(gem.getKey()).size(), "GEMSTONE_CHAMBER");
+									} else if (gems.containsKey(gem.getKey() + "_gem")) {
 										itemInfo.addExtraValue(gem.getValue() + "_" + gems.get(gem.getKey() + "_gem") + "_GEM");
 									} else {
 										itemInfo.addExtraValue(gem.getValue() + "_" + gem.getKey().split("_")[0] + "_GEM");
 									}
 								}
 							}
-						}
-
-						for (int j = 0; j < item.getInt("tag.ExtraAttributes.gemstone_slots", 0); j++) {
-							itemInfo.addExtraValue("GEMSTONE_CHAMBER");
 						}
 
 						try {

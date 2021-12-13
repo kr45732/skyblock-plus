@@ -58,7 +58,7 @@ public class AuctionFlipper {
 
 		try {
 			if (event.getChannel().getId().equals("912156704383336458") && event.isWebhookMessage()) {
-				if (event.getMessage().getEmbeds().get(0).getDescription().startsWith("Insert time: ")) {
+				if (event.getMessage().getEmbeds().get(0).getDescription().startsWith("Successfully updated under bins file in ")) {
 					flip();
 				}
 			}

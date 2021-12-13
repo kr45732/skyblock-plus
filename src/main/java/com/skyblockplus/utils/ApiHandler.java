@@ -620,7 +620,6 @@ public class ApiHandler {
 			);
 			return 200;
 		} catch (Exception e) {
-			e.printStackTrace();
 			return 400;
 		}
 	}
@@ -635,10 +634,16 @@ public class ApiHandler {
 			try (ResultSet response = statement.executeQuery("SELECT * FROM party")) {
 				Type partyListType = new TypeToken<List<Party>>() {}.getType();
 				while (response.next()) {
-					String guildId = response.getString("guild_id");
-					toDeleteIds.add(guildId);
-					List<Party> partyList = gson.fromJson(response.getString("data"), partyListType);
-					guildMap.get(guildId).setPartyList(partyList);
+					String guildId = null;
+					try {
+						guildId = response.getString("guild_id");
+						toDeleteIds.add(guildId);
+						List<Party> partyList = gson.fromJson(response.getString("data"), partyListType);
+						guildMap.get(guildId).setPartyList(partyList);
+						log.info("Retrieved party cache (" + partyList.size() + ") - guildId={" + guildId + "}");
+					}catch (Exception e){
+						log.error("initializeParties guildId={" + guildId + "}", e);
+					}
 				}
 			}
 		} catch (Exception ignored) {}

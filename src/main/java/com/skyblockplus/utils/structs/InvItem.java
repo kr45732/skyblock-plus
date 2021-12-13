@@ -22,6 +22,7 @@ import static com.skyblockplus.utils.Constants.PET_ITEM_NAMES;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import lombok.Data;
 
@@ -56,6 +57,12 @@ public class InvItem {
 
 	public void addExtraValue(String itemId) {
 		extraStats.add(itemId);
+	}
+
+	public void addExtraValues(int count, String itemId) {
+		if (count > 0) {
+			extraStats.addAll(Collections.nCopies(count, itemId));
+		}
 	}
 
 	public void setLore(String lore) {
