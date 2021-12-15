@@ -1252,7 +1252,7 @@ public class Utils {
 		return "[**" + username + "**](https://mine.ly/" + uuid + ")";
 	}
 
-	public static boolean isMainBot(){
+	public static boolean isMainBot() {
 		return DEFAULT_PREFIX.equals("+");
 	}
 }

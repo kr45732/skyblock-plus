@@ -40,7 +40,7 @@ import org.apache.http.client.utils.URIBuilder;
 public class AuctionFlipper {
 
 	private static final JDAWebhookClient flipperWebhook = new WebhookClientBuilder(
-			isMainBot()
+		isMainBot()
 			? "https://discord.com/api/webhooks/917160844247334933/WKeMowhugO5-xbLlD8TakRfCskt7D5Sm7giMY8LfN2MzKjxsDUm9Y2yPw61_yzQTgcII"
 			: "https://discord.com/api/webhooks/917959010622255144/ljWuFDr73A_PfyBBUUQWUE17nlFPFhbe3TUP-MxaIzlp_o-jYojrWRAF-hQGYxaxcZfM"
 	)
