@@ -625,7 +625,7 @@ public class ApiHandler {
 	}
 
 	public static void initializeParties() {
-		if (!DEFAULT_PREFIX.equals("+")) {
+		if (!isMainBot()) {
 			return;
 		}
 

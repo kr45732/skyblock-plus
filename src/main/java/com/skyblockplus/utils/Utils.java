@@ -63,6 +63,7 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import okhttp3.OkHttpClient;
 import org.apache.commons.text.similarity.LevenshteinDistance;
+import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -427,6 +428,23 @@ public class Utils {
 					"https://hst.sh/" +
 					higherDepth(JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())), "key").getAsString()
 				);
+			}
+		} catch (Exception ignored) {}
+		return null;
+	}
+
+	public static JsonElement postJson(String url, JsonElement body, Header... headers) {
+		try {
+			HttpPost httpPost = new HttpPost(url);
+
+			StringEntity entity = new StringEntity(body.toString());
+			httpPost.setEntity(entity);
+			httpPost.setHeaders(headers);
+			httpPost.setHeader("Content-Type", "application/json");
+			httpPost.setHeader("Accept", "application/json");
+
+			try (CloseableHttpResponse httpResponse = httpClient.execute(httpPost)) {
+				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent()));
 			}
 		} catch (Exception ignored) {}
 		return null;
@@ -1049,7 +1067,7 @@ public class Utils {
 	}
 
 	public static void cacheApplyGuildUsers() {
-		if (!DEFAULT_PREFIX.equals("+")) {
+		if (!isMainBot()) {
 			return;
 		}
 
@@ -1083,7 +1101,7 @@ public class Utils {
 	}
 
 	public static void cacheParties() {
-		if (!DEFAULT_PREFIX.equals("+")) {
+		if (!isMainBot()) {
 			return;
 		}
 
@@ -1107,7 +1125,7 @@ public class Utils {
 	}
 
 	public static List<ApplyUser> getApplyGuildUsersCache(String guildId, String name) {
-		if (!DEFAULT_PREFIX.equals("+")) {
+		if (!isMainBot()) {
 			return new ArrayList<>();
 		}
 
@@ -1232,5 +1250,9 @@ public class Utils {
 
 	public static String nameMcHyperLink(String username, String uuid) {
 		return "[**" + username + "**](https://mine.ly/" + uuid + ")";
+	}
+
+	public static boolean isMainBot(){
+		return DEFAULT_PREFIX.equals("+");
 	}
 }

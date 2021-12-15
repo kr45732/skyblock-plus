@@ -171,7 +171,7 @@ public class SettingsExecute {
 			eb.addField("Mee6 Roles Settings", "Use `" + guildPrefix + "settings mee6` to see the current settings", false);
 		} else if (args.length == 2 && args[1].equals("general")) {
 			eb = defaultSettingsEmbed();
-			eb.addField("Prefix", higherDepth(currentSettings, "prefix", "+"), false);
+			eb.addField("Prefix", higherDepth(currentSettings, "prefix", DEFAULT_PREFIX), false);
 			String hypixelKey = database.getServerHypixelApiKey(guild.getId());
 			eb.addField("Hypixel API Key", hypixelKey != null && hypixelKey.length() > 0 ? "Hidden" : "Not set", false);
 			String pfCategory = higherDepth(currentSettings, "pfCategoryId", "none");

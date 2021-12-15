@@ -21,6 +21,7 @@ package com.skyblockplus;
 import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.utils.Utils.*;
 
+import com.google.gson.JsonObject;
 import com.jagrosh.jdautilities.command.*;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.dev.*;
@@ -72,6 +73,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import org.apache.http.message.BasicHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -268,6 +270,27 @@ public class Main {
 			TrackAuctionsCommand.initialize();
 			GuildTrackerCommand.initialize();
 			AuctionFlipper.setEnable(true);
+
+			if(isMainBot()){
+				int serverCount = jda.getGuilds().size();
+				String selfUserId = jda.getSelfUser().getId();
+
+				JsonObject dscBotListJson = new JsonObject();
+				dscBotListJson.addProperty("guilds", serverCount);
+				postJson("https://discordbotlist.com/api/v1/bots/" + selfUserId + "/stats", dscBotListJson, new BasicHeader("Authorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0IjoxLCJpZCI6Ijc5Njc5MTE2NzM2NjU5NDU5MiIsImlhdCI6MTYzOTUyODcwNn0.eJ6ikA4fIPJI9W-lJkHs-oxNNGKsWPbH8cU7oVEbNYY"));
+
+				JsonObject dscBotsJson = new JsonObject();
+				dscBotsJson.addProperty("guildCount", serverCount);
+				postJson("https://discord.bots.gg/api/v1/bots/" + selfUserId + "/stats", dscBotsJson, new BasicHeader("Authorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGkiOnRydWUsImlkIjoiMzg1OTM5MDMxNTk2NDY2MTc2IiwiaWF0IjoxNjM5NTI5NjAyfQ.OsD5zgKVTgSh6IG34GGBsHPGoK7QTlkcHeksKRnIcWA"));
+
+//				JsonObject discordsJson = new JsonObject();
+//				discordsJson.addProperty("server_count", serverCount);
+//				postJson("https://discords.com/bots/api/bot/" + selfUserId, discordsJson, new BasicHeader("Authorization", "c46ba888473968c1e1c9ddc7e11c515abf1b85ece6df62a21fed3e9dcae4efd4b62d2dc9e2637c11b3eda05dd668630444c33e6add140da5ec50a95521f38004"));
+
+				JsonObject topGgJson = new JsonObject();
+				topGgJson.addProperty("server_count", serverCount);
+				postJson("https://top.gg/api/bots/" + selfUserId + "/stats" , topGgJson, new BasicHeader("Authorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ijc5Njc5MTE2NzM2NjU5NDU5MiIsImJvdCI6dHJ1ZSwiaWF0IjoxNjM5NTMyMTI2fQ.YN6n3mXXgbENfQv1k8OylJV6tfZHqEFgciVGGt_Tsa0"));
+			}
 		}
 	}
 
