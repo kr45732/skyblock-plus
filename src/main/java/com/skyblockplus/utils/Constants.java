@@ -27,6 +27,7 @@ import com.google.gson.reflect.TypeToken;
 import com.skyblockplus.Main;
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Constants {
 
@@ -71,6 +72,7 @@ public class Constants {
 	public static List<String> PET_ITEM_NAMES;
 	public static Set<String> ALL_TALISMANS;
 	public static Map<String, Long> COLLECTION_ID_TO_MAX_AMOUNT;
+	public static Map<String, String> NUMBER_TO_RARITY_MAP;
 
 	public static void initialize() {
 		try {
@@ -235,6 +237,9 @@ public class Constants {
 					);
 				}
 			}
+
+			/* NUMBER_TO_RARITY_MAP */
+			NUMBER_TO_RARITY_MAP = RARITY_TO_NUMBER_MAP.entrySet().stream().collect(Collectors.toMap(e -> e.getValue().replace(";", ""), Map.Entry::getKey));
 		} catch (Exception e) {
 			Main.log.error("Exception while initializing constants", e);
 		}

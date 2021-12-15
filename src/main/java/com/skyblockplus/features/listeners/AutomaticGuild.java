@@ -23,6 +23,8 @@ import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.features.skyblockevent.SkyblockEventCommand.endSkyblockEvent;
 import static com.skyblockplus.utils.ApiHandler.getGuildFromId;
+import static com.skyblockplus.utils.Constants.NUMBER_TO_RARITY_MAP;
+import static com.skyblockplus.utils.Constants.RARITY_TO_NUMBER_MAP;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -826,14 +828,6 @@ public class AutomaticGuild {
 		File dir = new File("src/main/java/com/skyblockplus/json/neu/items");
 		JsonObject outputObj = new JsonObject();
 
-		Map<String, String> rarityMapRev = new HashMap<>();
-		rarityMapRev.put("5", "Mythic");
-		rarityMapRev.put("4", "Legendary");
-		rarityMapRev.put("3", "Epic");
-		rarityMapRev.put("2", "Rare");
-		rarityMapRev.put("1", "Uncommon");
-		rarityMapRev.put("0", "Common");
-
 		for (File child : Arrays.stream(dir.listFiles()).sorted(Comparator.comparing(File::getName)).collect(Collectors.toList())) {
 			try {
 				JsonElement itemJson = JsonParser.parseReader(new FileReader(child));
@@ -844,7 +838,7 @@ public class AutomaticGuild {
 				}
 
 				if (itemName.startsWith("[Lvl")) {
-					itemName = rarityMapRev.get(itemId.split(";")[1]) + " " + itemName.split("] ")[1];
+					itemName = capitalizeString(NUMBER_TO_RARITY_MAP.get(itemId.split(";")[1])) + " " + itemName.split("] ")[1];
 				}
 				if (itemName.equals("Enchanted Book")) {
 					itemName = parseMcCodes(higherDepth(itemJson, "lore.[0]").getAsString());

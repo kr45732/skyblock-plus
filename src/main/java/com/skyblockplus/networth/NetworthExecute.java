@@ -787,7 +787,7 @@ public class NetworthExecute {
 	private String addItemStr(InvItem item, double itemPrice) {
 		String formattedStr =
 			(item.getCount() != 1 ? item.getCount() + "x " : "") +
-			(item.getId().equals("PET") ? capitalizeString(item.getRarity()) + " " : "") +
+			(item.getId().equals("PET") ? capitalizeString(item.getPetRarity()) + " " : "") +
 			item.getName();
 
 		if (item.getPetItem() != null) {
