@@ -116,6 +116,6 @@ public class InvItem {
 				return NUMBER_TO_RARITY_MAP.get("" + (Integer.parseInt(RARITY_TO_NUMBER_MAP.get(rarity).replace(";", "")) + 1));
 			}
 		}
-		return null;
+		return rarity;
 	}
 }
