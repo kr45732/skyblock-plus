@@ -18,18 +18,18 @@
 
 package com.skyblockplus.utils.structs;
 
+import static com.skyblockplus.utils.Constants.*;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import lombok.Data;
-
-import static com.skyblockplus.utils.Constants.*;
 
 @Data
 public class InvItem {
+
 	private String name;
 	private String lore;
 	private int count = 1;
@@ -82,7 +82,16 @@ public class InvItem {
 	public String getPetApiName() {
 		return (
 			(getName() + "_" + getRarity()).toUpperCase().replace(" ", "_") +
-			(getPetItem() != null && (getPetItem().equals("PET_ITEM_TIER_BOOST") || getPetItem().equals("PET_ITEM_VAMPIRE_FANG") || getPetItem().equals("PET_ITEM_TOY_JERRY")) ? "_TB" : "")
+			(
+				getPetItem() != null &&
+					(
+						getPetItem().equals("PET_ITEM_TIER_BOOST") ||
+						getPetItem().equals("PET_ITEM_VAMPIRE_FANG") ||
+						getPetItem().equals("PET_ITEM_TOY_JERRY")
+					)
+					? "_TB"
+					: ""
+			)
 		);
 	}
 
@@ -98,8 +107,12 @@ public class InvItem {
 	}
 
 	public String getPetRarity() {
-		if (id.equals("PET")){
-			if (extraStats.contains("PET_ITEM_TIER_BOOST") || extraStats.contains("PET_ITEM_VAMPIRE_FANG") || extraStats.contains("PET_ITEM_TOY_JERRY")){
+		if (id.equals("PET")) {
+			if (
+				extraStats.contains("PET_ITEM_TIER_BOOST") ||
+				extraStats.contains("PET_ITEM_VAMPIRE_FANG") ||
+				extraStats.contains("PET_ITEM_TOY_JERRY")
+			) {
 				return NUMBER_TO_RARITY_MAP.get("" + (Integer.parseInt(RARITY_TO_NUMBER_MAP.get(rarity).replace(";", "")) + 1));
 			}
 		}

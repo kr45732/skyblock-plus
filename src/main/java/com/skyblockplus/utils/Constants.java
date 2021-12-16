@@ -239,7 +239,8 @@ public class Constants {
 			}
 
 			/* NUMBER_TO_RARITY_MAP */
-			NUMBER_TO_RARITY_MAP = RARITY_TO_NUMBER_MAP.entrySet().stream().collect(Collectors.toMap(e -> e.getValue().replace(";", ""), Map.Entry::getKey));
+			NUMBER_TO_RARITY_MAP =
+				RARITY_TO_NUMBER_MAP.entrySet().stream().collect(Collectors.toMap(e -> e.getValue().replace(";", ""), Map.Entry::getKey));
 		} catch (Exception e) {
 			Main.log.error("Exception while initializing constants", e);
 		}
