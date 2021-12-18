@@ -342,7 +342,11 @@ public class NetworthExecute {
 			eb.addField("Armor | " + simplifyNumber(invArmor), armorStr.length() == 0 ? "Empty" : armorStr.toString(), false);
 			eb.addField("Wardrobe | " + simplifyNumber(wardrobeTotal), wardrobeStr.length() == 0 ? "Empty" : wardrobeStr.toString(), false);
 			eb.addField("Pets | " + simplifyNumber(petsTotal), petsStr.length() == 0 ? "Empty" : petsStr.toString(), false);
-			eb.addField("Accessories | " + simplifyNumber(talismanTotal), talismanStr.length() == 0 ? "Empty" : talismanStr.toString(), false);
+			eb.addField(
+				"Accessories | " + simplifyNumber(talismanTotal),
+				talismanStr.length() == 0 ? "Empty" : talismanStr.toString(),
+				false
+			);
 			eb.addField("Bug in the price calculation?", "[Please submit a bug report here!](https://forms.gle/RBmN2AFBLafGyx5E7)", false);
 
 			if (verbose) {

@@ -37,7 +37,7 @@ public abstract class SlashCommand {
 	protected void run(SlashCommandExecutedEvent event) {
 		if (cooldown == -1) {
 			Command command = client.getCommands().stream().filter(c -> c.getName().equals(name)).findFirst().orElse(null);
-			cooldown = command != null ? command.getCooldown()  : globalCooldown;
+			cooldown = command != null ? command.getCooldown() : globalCooldown;
 		}
 
 		for (Permission p : userPermissions) {

@@ -18,6 +18,8 @@
 
 package com.skyblockplus.utils.command;
 
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.jagrosh.jdautilities.menu.Menu;
 import com.skyblockplus.utils.structs.PaginatorExtras;
@@ -40,8 +42,6 @@ import net.dv8tion.jda.api.requests.restaction.WebhookMessageUpdateAction;
 import net.dv8tion.jda.internal.utils.Checks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static com.skyblockplus.utils.Utils.defaultEmbed;
 
 public class CustomPaginator extends Menu {
 
@@ -143,39 +143,37 @@ public class CustomPaginator extends Menu {
 	private void initialize(RestAction<Message> action, int pageNum) {
 		if (pages == 0) {
 			if (action instanceof MessageAction) {
-				action =
-						((MessageAction) action).setEmbeds(defaultEmbed("No items to paginate").build());
+				action = ((MessageAction) action).setEmbeds(defaultEmbed("No items to paginate").build());
 			} else if (action instanceof WebhookMessageUpdateAction) {
-				action =
-						((WebhookMessageUpdateAction<Message>) action).setEmbeds(defaultEmbed("No items to paginate").build());
+				action = ((WebhookMessageUpdateAction<Message>) action).setEmbeds(defaultEmbed("No items to paginate").build());
 			}
 			action.queue();
 			return;
 		} else if (pages > 1) {
 			if (action instanceof MessageAction) {
 				action =
-						((MessageAction) action).setActionRow(
-								Button.primary(LEFT, Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")),
-								Button.primary(RIGHT, Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
+					((MessageAction) action).setActionRow(
+							Button.primary(LEFT, Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")),
+							Button.primary(RIGHT, Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
 						);
 			} else if (action instanceof WebhookMessageUpdateAction) {
 				action =
-						((WebhookMessageUpdateAction<Message>) action).setActionRow(
-								Button.primary(LEFT, Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")),
-								Button.primary(RIGHT, Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
+					((WebhookMessageUpdateAction<Message>) action).setActionRow(
+							Button.primary(LEFT, Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")),
+							Button.primary(RIGHT, Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
 						);
 			}
 		}
 
 		action.queue(
-				m -> {
-					if (pages > 1) {
-						pagination(m, pageNum);
-					} else {
-						finalAction.accept(m);
-					}
-				},
-				throwableConsumer
+			m -> {
+				if (pages > 1) {
+					pagination(m, pageNum);
+				} else {
+					finalAction.accept(m);
+				}
+			},
+			throwableConsumer
 		);
 	}
 
@@ -348,7 +346,7 @@ public class CustomPaginator extends Menu {
 					}
 					break;
 				case EMBED_PAGES:
-					if(extras.getEmbedFields().isEmpty()){
+					if (extras.getEmbedFields().isEmpty()) {
 						log.error("Paginator type is EMBED_PAGES but no embed pages were provided");
 					}
 					if (!strings.isEmpty()) {

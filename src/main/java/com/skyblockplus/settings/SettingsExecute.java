@@ -499,7 +499,7 @@ public class SettingsExecute {
 
 	public EmbedBuilder setGuildMemberRole(JsonObject guildSettings, String roleMention) {
 		Object eb = checkRole(roleMention);
-		if (eb instanceof EmbedBuilder){
+		if (eb instanceof EmbedBuilder) {
 			return ((EmbedBuilder) eb);
 		}
 		Role role = ((Role) eb);
@@ -581,7 +581,7 @@ public class SettingsExecute {
 
 	public EmbedBuilder addGuildRank(JsonObject guildSettings, String rankName, String roleMention) {
 		Object eb = checkRole(roleMention);
-		if (eb instanceof EmbedBuilder){
+		if (eb instanceof EmbedBuilder) {
 			return ((EmbedBuilder) eb);
 		}
 		Role role = ((Role) eb);
@@ -832,7 +832,7 @@ public class SettingsExecute {
 
 	public EmbedBuilder addApplyStaffRole(JsonObject guildSettings, String roleMention) {
 		Object eb = checkRole(roleMention);
-		if (eb instanceof EmbedBuilder){
+		if (eb instanceof EmbedBuilder) {
 			return ((EmbedBuilder) eb);
 		}
 		Role role = ((Role) eb);
@@ -860,7 +860,7 @@ public class SettingsExecute {
 
 	public EmbedBuilder removeApplyStaffRole(JsonObject guildSettings, String roleMention) {
 		Object eb = checkRole(roleMention);
-		if (eb instanceof EmbedBuilder){
+		if (eb instanceof EmbedBuilder) {
 			return ((EmbedBuilder) eb);
 		}
 		Role role = ((Role) eb);
@@ -1608,7 +1608,7 @@ public class SettingsExecute {
 		}
 
 		Object eb = checkRole(roleMention);
-		if (eb instanceof EmbedBuilder){
+		if (eb instanceof EmbedBuilder) {
 			return ((EmbedBuilder) eb);
 		}
 		Role role = ((Role) eb);
@@ -1714,7 +1714,7 @@ public class SettingsExecute {
 		}
 
 		Object eb = checkRole(roleMention);
-		if (eb instanceof EmbedBuilder){
+		if (eb instanceof EmbedBuilder) {
 			return ((EmbedBuilder) eb);
 		}
 		Role role = ((Role) eb);
@@ -2023,7 +2023,7 @@ public class SettingsExecute {
 
 	public EmbedBuilder addMee6Role(String level, String roleMention) {
 		Object eb = checkRole(roleMention);
-		if (eb instanceof EmbedBuilder){
+		if (eb instanceof EmbedBuilder) {
 			return ((EmbedBuilder) eb);
 		}
 		Role role = ((Role) eb);
@@ -2190,7 +2190,7 @@ public class SettingsExecute {
 		}
 
 		Object eb = checkRole(roleMention);
-		if (eb instanceof EmbedBuilder){
+		if (eb instanceof EmbedBuilder) {
 			return ((EmbedBuilder) eb);
 		}
 		Role role = ((Role) eb);
