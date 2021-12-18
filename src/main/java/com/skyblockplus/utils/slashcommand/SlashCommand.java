@@ -21,6 +21,7 @@ package com.skyblockplus.utils.slashcommand;
 import static com.skyblockplus.Main.client;
 import static com.skyblockplus.utils.Utils.*;
 
+import com.jagrosh.jdautilities.command.Command;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
@@ -35,7 +36,8 @@ public abstract class SlashCommand {
 
 	protected void run(SlashCommandExecutedEvent event) {
 		if (cooldown == -1) {
-			cooldown = client.getCommands().stream().filter(c -> c.getName().equals(name)).findFirst().get().getCooldown();
+			Command command = client.getCommands().stream().filter(c -> c.getName().equals(name)).findFirst().orElse(null);
+			cooldown = command != null ? command.getCooldown()  : globalCooldown;
 		}
 
 		for (Permission p : userPermissions) {

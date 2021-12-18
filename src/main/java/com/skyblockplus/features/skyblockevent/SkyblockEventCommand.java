@@ -100,7 +100,7 @@ public class SkyblockEventCommand extends Command {
 			);
 		}
 
-		if (paginateBuilder.getItemsSize() > 0) {
+		if (paginateBuilder.size() > 0) {
 			paginateBuilder.build().paginate(announcementChannel, 0);
 		} else {
 			announcementChannel
@@ -130,7 +130,7 @@ public class SkyblockEventCommand extends Command {
 				} catch (Exception ignored) {}
 			}
 
-			if (paginateBuilder.getItemsSize() > 0) {
+			if (paginateBuilder.size() > 0) {
 				paginateBuilder.build().paginate(announcementChannel, 0);
 				database.setSkyblockEventSettings(guildId, new EventSettings());
 				return defaultEmbed("Success").setDescription("Ended skyblock event");
@@ -330,7 +330,7 @@ public class SkyblockEventCommand extends Command {
 				);
 			}
 
-			if (paginateBuilder.getItemsSize() > 0) {
+			if (paginateBuilder.size() > 0) {
 				long minutesSinceUpdate = Duration.between(currentGuild.eventMemberListLastUpdated, Instant.now()).toMinutes();
 
 				String minutesSinceUpdateString;
@@ -377,7 +377,7 @@ public class SkyblockEventCommand extends Command {
 		guildMap.get(guildId).setEventMemberList(guildMemberPlayersList);
 		guildMap.get(guildId).setEventMemberListLastUpdated(Instant.now());
 
-		if (paginateBuilder.getItemsSize() > 0) {
+		if (paginateBuilder.size() > 0) {
 			paginateBuilder.build().paginate(event.getHook(), 0);
 			return null;
 		}
@@ -417,7 +417,7 @@ public class SkyblockEventCommand extends Command {
 				);
 			}
 
-			if (paginateBuilder.getItemsSize() > 0) {
+			if (paginateBuilder.size() > 0) {
 				long minutesSinceUpdate = Duration.between(currentGuild.eventMemberListLastUpdated, Instant.now()).toMinutes();
 
 				String minutesSinceUpdateString;
@@ -464,7 +464,7 @@ public class SkyblockEventCommand extends Command {
 		guildMap.get(guildId).setEventMemberList(guildMemberPlayersList);
 		guildMap.get(guildId).setEventMemberListLastUpdated(Instant.now());
 
-		if (paginateBuilder.getItemsSize() > 0) {
+		if (paginateBuilder.size() > 0) {
 			event.paginate(paginateBuilder);
 			return null;
 		}

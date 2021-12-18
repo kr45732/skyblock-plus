@@ -41,6 +41,8 @@ import net.dv8tion.jda.internal.utils.Checks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+
 public class CustomPaginator extends Menu {
 
 	private static final Logger log = LoggerFactory.getLogger(CustomPaginator.class);
@@ -139,33 +141,41 @@ public class CustomPaginator extends Menu {
 	}
 
 	private void initialize(RestAction<Message> action, int pageNum) {
-		if (pages > 1) {
+		if (pages == 0) {
 			if (action instanceof MessageAction) {
 				action =
-					((MessageAction) action).setActionRow(
-							Button.primary(LEFT, Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")),
-							Button.primary(RIGHT, Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
+						((MessageAction) action).setEmbeds(defaultEmbed("No items to paginate").build());
+			} else if (action instanceof WebhookMessageUpdateAction) {
+				action =
+						((WebhookMessageUpdateAction<Message>) action).setEmbeds(defaultEmbed("No items to paginate").build());
+			}
+			action.queue();
+			return;
+		} else if (pages > 1) {
+			if (action instanceof MessageAction) {
+				action =
+						((MessageAction) action).setActionRow(
+								Button.primary(LEFT, Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")),
+								Button.primary(RIGHT, Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
 						);
 			} else if (action instanceof WebhookMessageUpdateAction) {
 				action =
-					((WebhookMessageUpdateAction<Message>) action).setActionRow(
-							Button.primary(LEFT, Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")),
-							Button.primary(RIGHT, Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
+						((WebhookMessageUpdateAction<Message>) action).setActionRow(
+								Button.primary(LEFT, Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")),
+								Button.primary(RIGHT, Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
 						);
-			} else {
-				log.error("This shouldn't happen | Class: " + action.getClass() + " | Action: " + action);
 			}
 		}
 
 		action.queue(
-			m -> {
-				if (pages > 1) {
-					pagination(m, pageNum);
-				} else {
-					finalAction.accept(m);
-				}
-			},
-			throwableConsumer
+				m -> {
+					if (pages > 1) {
+						pagination(m, pageNum);
+					} else {
+						finalAction.accept(m);
+					}
+				},
+				throwableConsumer
 		);
 	}
 
@@ -316,29 +326,35 @@ public class CustomPaginator extends Menu {
 			Checks.check(waiter != null, "Must set an EventWaiter");
 			switch (extras.getType()) {
 				case DEFAULT:
-					Checks.check(!strings.isEmpty(), "Must include at least one item to paginate");
-					if (extras.getEmbedFields().size() > 0) {
+					if (strings.isEmpty()) {
+						log.error("Paginator type is DEFAULT but no strings were provided");
+					}
+					if (!extras.getEmbedFields().isEmpty()) {
 						log.warn("Paginator type is DEFAULT but embed fields were also provided");
 					}
-					if (extras.getEmbedPages().size() > 0) {
+					if (!extras.getEmbedPages().isEmpty()) {
 						log.warn("Paginator type is DEFAULT but embed pages were also provided");
 					}
 					break;
 				case EMBED_FIELDS:
-					Checks.check(!extras.getEmbedFields().isEmpty(), "Must include at least one embed field to paginate");
-					if (strings.size() > 1) {
+					if (extras.getEmbedFields().isEmpty()) {
+						log.error("Paginator type is EMBED_FIELDS but no embed fields were provided");
+					}
+					if (!strings.isEmpty()) {
 						log.warn("Paginator type is EMBED_FIELDS but strings were also provided");
 					}
-					if (extras.getEmbedPages().size() > 0) {
+					if (!extras.getEmbedPages().isEmpty()) {
 						log.warn("Paginator type is EMBED_FIELDS but embed pages were also provided");
 					}
 					break;
 				case EMBED_PAGES:
-					Checks.check(!extras.getEmbedPages().isEmpty(), "Must include at least one embed page to paginate");
-					if (strings.size() > 0) {
+					if(extras.getEmbedFields().isEmpty()){
+						log.error("Paginator type is EMBED_PAGES but no embed pages were provided");
+					}
+					if (!strings.isEmpty()) {
 						log.warn("Paginator type is EMBED_PAGES but strings were also provided");
 					}
-					if (extras.getEmbedFields().size() > 0) {
+					if (!extras.getEmbedFields().isEmpty()) {
 						log.warn("Paginator type is EMBED_PAGES but embed fields were also provided");
 					}
 					break;
@@ -378,13 +394,17 @@ public class CustomPaginator extends Menu {
 		}
 
 		public Builder setColumns(int columns) {
-			if (columns < 1 || columns > 3) throw new IllegalArgumentException("Only 1, 2, or 3 columns are supported");
+			if (columns < 1 || columns > 3) {
+				throw new IllegalArgumentException("Only 1, 2, or 3 columns are supported");
+			}
 			this.columns = columns;
 			return this;
 		}
 
 		public Builder setItemsPerPage(int num) {
-			if (num < 1) throw new IllegalArgumentException("There must be at least one item per page");
+			if (num < 1) {
+				throw new IllegalArgumentException("There must be at least one item per page");
+			}
 			this.itemsPerPage = num;
 			return this;
 		}
@@ -393,19 +413,22 @@ public class CustomPaginator extends Menu {
 			strings.addAll(Arrays.asList(items));
 		}
 
-		public Builder setItems(String... items) {
-			strings.clear();
-			Collections.addAll(strings, items);
-			return this;
-		}
-
 		public Builder wrapPageEnds(boolean wrapPageEnds) {
 			this.wrapPageEnds = wrapPageEnds;
 			return this;
 		}
 
-		public int getItemsSize() {
-			return strings.size();
+		public int size() {
+			switch (extras.getType()) {
+				case DEFAULT:
+					return strings.size();
+				case EMBED_FIELDS:
+					return extras.getEmbedFields().size();
+				case EMBED_PAGES:
+					return extras.getEmbedPages().size();
+				default:
+					throw new IllegalArgumentException("Invalid paginator type");
+			}
 		}
 	}
 }

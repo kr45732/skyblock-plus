@@ -307,7 +307,7 @@ public class GuildKickerCommand extends Command {
 					.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
 					.setEveryPageText(
 						"**Total missing requirements:** " +
-						paginateBuilder.getItemsSize() +
+						paginateBuilder.size() +
 						(lastUpdated != null ? "\n**Last updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "") +
 						"\n"
 					)

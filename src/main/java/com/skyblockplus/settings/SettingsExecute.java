@@ -498,11 +498,11 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder setGuildMemberRole(JsonObject guildSettings, String roleMention) {
-		Role role = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
-		EmbedBuilder eb = checkRole(role);
-		if (eb != null) {
-			return eb;
+		Object eb = checkRole(roleMention);
+		if (eb instanceof EmbedBuilder){
+			return ((EmbedBuilder) eb);
 		}
+		Role role = ((Role) eb);
 
 		guildSettings.addProperty("guildMemberRole", role.getId());
 		int responseCode = database.setGuildSettings(guild.getId(), guildSettings);
@@ -580,11 +580,11 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder addGuildRank(JsonObject guildSettings, String rankName, String roleMention) {
-		Role role = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
-		EmbedBuilder eb = checkRole(role);
-		if (eb != null) {
-			return eb;
+		Object eb = checkRole(roleMention);
+		if (eb instanceof EmbedBuilder){
+			return ((EmbedBuilder) eb);
 		}
+		Role role = ((Role) eb);
 
 		HypixelResponse guildJson = getGuildFromId(higherDepth(guildSettings, "guildId").getAsString());
 		if (guildJson.isNotValid()) {
@@ -831,11 +831,11 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder addApplyStaffRole(JsonObject guildSettings, String roleMention) {
-		Role role = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
-		EmbedBuilder eb = checkRole(role);
-		if (eb != null) {
-			return eb;
+		Object eb = checkRole(roleMention);
+		if (eb instanceof EmbedBuilder){
+			return ((EmbedBuilder) eb);
 		}
+		Role role = ((Role) eb);
 
 		JsonArray staffRoles = higherDepth(guildSettings, "applyStaffRoles").getAsJsonArray();
 		if (staffRoles.size() >= 3) {
@@ -859,11 +859,11 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder removeApplyStaffRole(JsonObject guildSettings, String roleMention) {
-		Role role = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
-		EmbedBuilder eb = checkRole(role);
-		if (eb != null) {
-			return eb;
+		Object eb = checkRole(roleMention);
+		if (eb instanceof EmbedBuilder){
+			return ((EmbedBuilder) eb);
 		}
+		Role role = ((Role) eb);
 
 		JsonArray staffRoles = higherDepth(guildSettings, "applyStaffRoles").getAsJsonArray();
 		for (int i = staffRoles.size() - 1; i >= 0; i--) {
@@ -1082,12 +1082,10 @@ public class SettingsExecute {
 		EmbedBuilder eb = defaultSettingsEmbed()
 			.addField(
 				"Guild Role",
-				"**" +
 				displaySettings(settings, "guildMemberRoleEnable") +
-				"**" +
-				"\n**• Guild Name:** " +
+				"\n• Guild Name: " +
 				displaySettings(settings, "guildId") +
-				"\n**• Guild Member Role:** " +
+				"\n• Guild Member Role: " +
 				displaySettings(settings, "guildMemberRole"),
 				false
 			);
@@ -1609,11 +1607,11 @@ public class SettingsExecute {
 			}
 		}
 
-		Role role = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
-		EmbedBuilder eb = checkRole(role);
-		if (eb != null) {
-			return eb;
+		Object eb = checkRole(roleMention);
+		if (eb instanceof EmbedBuilder){
+			return ((EmbedBuilder) eb);
 		}
+		Role role = ((Role) eb);
 
 		JsonObject newRoleSettings;
 		try {
@@ -1715,11 +1713,11 @@ public class SettingsExecute {
 			);
 		}
 
-		Role role = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
-		EmbedBuilder eb = checkRole(role);
-		if (eb != null) {
-			return eb;
+		Object eb = checkRole(roleMention);
+		if (eb instanceof EmbedBuilder){
+			return ((EmbedBuilder) eb);
 		}
+		Role role = ((Role) eb);
 
 		JsonObject newRoleSettings;
 		try {
@@ -2024,11 +2022,11 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder addMee6Role(String level, String roleMention) {
-		Role role = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
-		EmbedBuilder eb = checkRole(role);
-		if (eb != null) {
-			return eb;
+		Object eb = checkRole(roleMention);
+		if (eb instanceof EmbedBuilder){
+			return ((EmbedBuilder) eb);
 		}
+		Role role = ((Role) eb);
 
 		int intLevel = -1;
 		try {
@@ -2191,11 +2189,11 @@ public class SettingsExecute {
 			return defaultSettingsEmbed("Set guest role to: none");
 		}
 
-		Role role = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
-		EmbedBuilder eb = checkRole(role);
-		if (eb != null) {
-			return eb;
+		Object eb = checkRole(roleMention);
+		if (eb instanceof EmbedBuilder){
+			return ((EmbedBuilder) eb);
 		}
+		Role role = ((Role) eb);
 
 		if (
 			database
@@ -2268,6 +2266,7 @@ public class SettingsExecute {
 					case "applyMessageChannel":
 					case "applyWaitingChannel":
 					case "applyStaffChannel":
+					case "messageTextChannelId":
 						return "<#" + currentSettingValue + ">";
 					case "roleId":
 					case "guildMemberRole":
@@ -2282,6 +2281,7 @@ public class SettingsExecute {
 						}
 						break;
 					case "applyEnable":
+					case "enable":
 						return currentSettingValue.equals("true") ? "• Enabled" : "• Disabled";
 					case "guildId":
 						try {
@@ -2313,16 +2313,23 @@ public class SettingsExecute {
 		return defaultEmbed("Settings").setDescription(description);
 	}
 
-	public EmbedBuilder checkRole(Role role) {
+	public Object checkRole(String roleMention) {
+		Role role;
+		try {
+			role = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
+		} catch (Exception e) {
+			return invalidEmbed("The provided role is invalid");
+		}
+
 		if (role == null) {
 			return invalidEmbed("The provided role does not exist");
 		} else if (role.isPublicRole()) {
 			return invalidEmbed("The role cannot be the everyone role");
 		} else if (role.isManaged()) {
 			return invalidEmbed("The role cannot be a managed role");
-		} else {
-			return null;
 		}
+
+		return role;
 	}
 
 	public EmbedBuilder checkTextChannel(TextChannel channel) {
