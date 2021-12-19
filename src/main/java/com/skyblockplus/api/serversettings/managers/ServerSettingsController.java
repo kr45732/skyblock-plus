@@ -72,10 +72,7 @@ public class ServerSettingsController {
 	}
 
 	@GetMapping("/get/guild/byName")
-	public ResponseEntity<?> getGuildSettings(
-		@RequestParam(value = "guildId") String serverId,
-		@RequestParam(value = "name") String name
-	) {
+	public ResponseEntity<?> getGuildSettings(@RequestParam(value = "guildId") String serverId, @RequestParam(value = "name") String name) {
 		return settingsService.getGuildSettings(serverId, name);
 	}
 
