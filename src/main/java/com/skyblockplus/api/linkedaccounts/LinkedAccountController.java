@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/private/linkedAccounts")
+@RequestMapping("/api/private/linked-accounts")
 public class LinkedAccountController {
 
 	private final LinkedAccountService settingsService;

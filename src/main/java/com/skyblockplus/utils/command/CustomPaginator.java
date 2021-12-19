@@ -346,7 +346,7 @@ public class CustomPaginator extends Menu {
 					}
 					break;
 				case EMBED_PAGES:
-					if (extras.getEmbedFields().isEmpty()) {
+					if (extras.getEmbedPages().isEmpty()) {
 						log.error("Paginator type is EMBED_PAGES but no embed pages were provided");
 					}
 					if (!strings.isEmpty()) {

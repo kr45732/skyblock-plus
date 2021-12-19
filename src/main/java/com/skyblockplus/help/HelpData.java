@@ -35,7 +35,7 @@ public class HelpData {
 	private final List<String> examples = new ArrayList<>();
 	private final List<HelpData> subcommands = new ArrayList<>();
 	private boolean ignoreSuperCommand;
-	private HelpData superCommand;
+	private transient HelpData superCommand;
 	private String secondDescription;
 	private String secondUsage;
 	private String prefix;

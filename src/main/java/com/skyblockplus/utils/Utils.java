@@ -123,7 +123,6 @@ public class Utils {
 	/* Miscellaneous */
 	public static TextChannel botLogChannel;
 	public static TextChannel errorLogChannel;
-	public static JDAWebhookClient webhookClient;
 	public static Instant lowestBinJsonLastUpdated = Instant.now();
 	public static Instant averageAuctionJsonLastUpdated = Instant.now();
 	public static Instant bazaarJsonLastUpdated = Instant.now();
