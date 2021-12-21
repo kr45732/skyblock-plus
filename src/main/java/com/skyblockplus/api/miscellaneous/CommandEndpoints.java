@@ -18,7 +18,13 @@
 
 package com.skyblockplus.api.miscellaneous;
 
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.skyblockplus.help.HelpCommand;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,20 +32,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.utils.Utils.*;
-
 @RestController
 @RequestMapping(value = "/api/public")
 public class CommandEndpoints {
+
 	private static List<Map<String, Object>> apiCommandList;
 
-	public static void initialize(){
-		apiCommandList = HelpCommand.helpDataList.stream().map(helpData -> DataObject.fromJson(gson.toJson(helpData)).toMap()).collect(Collectors.toList());
+	public static void initialize() {
+		apiCommandList =
+			HelpCommand.helpDataList
+				.stream()
+				.map(helpData -> DataObject.fromJson(gson.toJson(helpData)).toMap())
+				.collect(Collectors.toList());
 	}
 
 	@GetMapping("/get/commands")
@@ -50,9 +54,13 @@ public class CommandEndpoints {
 	@GetMapping("/get/stats")
 	public ResponseEntity<?> getStats() {
 		return new ResponseEntity<>(
-				DataObject.empty()
-						.put("guild_count", jda.getGuildCache().size())
-						.put("user_count", jda.getUserCache().size())
-						.put("command_uses", getCommandUses()).toMap(), HttpStatus.OK);
+			DataObject
+				.empty()
+				.put("guild_count", jda.getGuildCache().size())
+				.put("user_count", jda.getUserCache().size())
+				.put("command_uses", getCommandUses())
+				.toMap(),
+			HttpStatus.OK
+		);
 	}
 }

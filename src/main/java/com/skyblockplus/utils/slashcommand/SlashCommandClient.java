@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
@@ -107,7 +106,7 @@ public class SlashCommandClient extends ListenerAdapter {
 		return commandUses.getOrDefault(command.getName(), 0);
 	}
 
-    public void setCommandUses(Map<String, Integer> commandUsage) {
+	public void setCommandUses(Map<String, Integer> commandUsage) {
 		commandUsage.forEach((key, value) -> commandUses.merge(key, value, Integer::sum));
-    }
+	}
 }

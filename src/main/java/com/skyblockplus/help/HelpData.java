@@ -81,7 +81,6 @@ public class HelpData {
 
 		this.prefix = prefix;
 
-
 		EmbedBuilder eb = defaultEmbed(getCategory() + " | " + capitalizeString(getName()));
 		eb.addField("Description", getDescription(), false);
 		eb.addField("Usage", getUsageFormatted(), false);
@@ -102,14 +101,14 @@ public class HelpData {
 		return description + (secondDescription != null ? "\n\n" + secondDescription : "");
 	}
 
-	private String getCategory(){
+	private String getCategory() {
 		return getCategory(this);
 	}
 
-	private String getCategory(HelpData data){
-		if(data.category != null){
+	private String getCategory(HelpData data) {
+		if (data.category != null) {
 			return data.category;
-		}else if(data.superCommand != null){
+		} else if (data.superCommand != null) {
 			return getCategory(data.superCommand);
 		}
 		return null;
@@ -221,12 +220,12 @@ public class HelpData {
 		return this;
 	}
 
-	public HelpData setCategory(String category){
+	public HelpData setCategory(String category) {
 		this.category = category;
 		return this;
 	}
 
-	public HelpData setPrefix(String prefix){
+	public HelpData setPrefix(String prefix) {
 		this.prefix = prefix;
 		for (HelpData subcommand : subcommands) {
 			subcommand.setPrefix(prefix);

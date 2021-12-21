@@ -1152,9 +1152,9 @@ public class Utils {
 		}
 
 		long startTime = System.currentTimeMillis();
-		if(cacheCommandUseDb(gson.toJson(getCommandUses())) == 200){
+		if (cacheCommandUseDb(gson.toJson(getCommandUses())) == 200) {
 			log.info("Cached command uses in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
-		}else {
+		} else {
 			log.error("Failed to cached command uses in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
 		}
 	}
@@ -1266,9 +1266,16 @@ public class Utils {
 		return DEFAULT_PREFIX.equals("+");
 	}
 
-	public static Map<String, Integer> getCommandUses(){
-		Map<String, Integer> commandUses = client.getCommands().stream().collect(Collectors.toMap(Command::getName, command -> client.getCommandUses(command), (a, b) -> b));
-		slashCommandClient.getCommands().stream().collect(Collectors.toMap(SlashCommand::getName, command -> slashCommandClient.getCommandUses(command), (a, b) -> b)).forEach((key, value) -> commandUses.merge(key, value, Integer::sum));
+	public static Map<String, Integer> getCommandUses() {
+		Map<String, Integer> commandUses = client
+			.getCommands()
+			.stream()
+			.collect(Collectors.toMap(Command::getName, command -> client.getCommandUses(command), (a, b) -> b));
+		slashCommandClient
+			.getCommands()
+			.stream()
+			.collect(Collectors.toMap(SlashCommand::getName, command -> slashCommandClient.getCommandUses(command), (a, b) -> b))
+			.forEach((key, value) -> commandUses.merge(key, value, Integer::sum));
 		return commandUses;
 	}
 }

@@ -76,29 +76,36 @@ public class HelpCommand extends Command {
 				new HelpData("help", "Show the help menu with all the commands.", "help")
 					.addSecondData("Show the help menu for a certain command.", "help <command>")
 					.addExamples("help", "help guild experience")
-					.addAliases("commands").setCategory("general"),
+					.addAliases("commands")
+					.setCategory("general"),
 				new HelpData("information", "Get information about this bot.").addAliases("info", "about").setCategory("general"),
 				new HelpData("invite", "Get the invite link and Discord link for the bot.").setCategory("general"),
 				new HelpData("link", "Get what Hypixel account you are linked to.", "link")
 					.addSecondData("Link your Hypixel account to the bot.", "link <player>")
-					.addExamples("link CrypticPlasma").setCategory("general"),
+					.addExamples("link CrypticPlasma")
+					.setCategory("general"),
 				new HelpData("unlink", "Unlink your account from the bot.").addAliases("unverify").setCategory("general"),
 				new HelpData("vote", "Links for where you can vote for the bot.").setCategory("general"),
 				// Slayer
 				new HelpData("slayer", "Get the slayer data of a player.", "slayer [player] [profile]")
 					.addAliases("slayers")
-					.addExamples("slayer CrypticPlasma", "slayer CrypticPlasma Zucchini").setCategory("slayer"),
+					.addExamples("slayer CrypticPlasma", "slayer CrypticPlasma Zucchini")
+					.setCategory("slayer"),
 				// Skills
 				new HelpData("skills", "Get the skills data of a player.", "skills [player] [profile]")
 					.addAliases("skill")
-					.addExamples("skills CrypticPlasma", "skills CrypticPlasma Zucchini").setCategory("skills"),
+					.addExamples("skills CrypticPlasma", "skills CrypticPlasma Zucchini")
+					.setCategory("skills"),
 				new HelpData("hotm", "Get a player's heart of the mountain statistics.", "hotm [player] [profile]")
-					.addExamples("hotm CrypticPlasma", "hotm CrypticPlasma Zucchini").setCategory("skills"),
+					.addExamples("hotm CrypticPlasma", "hotm CrypticPlasma Zucchini")
+					.setCategory("skills"),
 				// Dungeons
 				new HelpData("dungeons", "Get the dungeons data of a player.", "dungeons [player] [profile]")
 					.addAliases("cata", "catacombs")
-					.addExamples("dungeons CrypticPlasma", "dungeons CrypticPlasma Zucchini").setCategory("dungeons"),
-				new HelpData("essence", "Main essence command.").setCategory("dungeons")
+					.addExamples("dungeons CrypticPlasma", "dungeons CrypticPlasma Zucchini")
+					.setCategory("dungeons"),
+				new HelpData("essence", "Main essence command.")
+					.setCategory("dungeons")
 					.addSubcommands(
 						new HelpData("upgrade", "Interactive message to find the essence amount to upgrade an item.", "upgrade <item>")
 							.addExamples("upgrade Hyperion"),
@@ -110,7 +117,8 @@ public class HelpCommand extends Command {
 					),
 				new HelpData("partyfinder", "A party finder helper that shows a player's dungeon stats.", "partyfinder [player] [profile]")
 					.addAliases("pf")
-					.addExamples("partyfinder CrypticPlasma", "partyfinder CrypticPlasma Zucchini").setCategory("dungeons"),
+					.addExamples("partyfinder CrypticPlasma", "partyfinder CrypticPlasma Zucchini")
+					.setCategory("dungeons"),
 				// Guild
 				new HelpData("guild", "Main guild command")
 					.addSecondData("Find what guild a player is in.", "guild <player>")
@@ -134,21 +142,24 @@ public class HelpCommand extends Command {
 							)
 							.addExamples("experience u:CrypticPlasma", "experience g:Skyblock_Forceful days:4")
 					)
-					.addAliases("g").setCategory("guild"),
+					.addAliases("g")
+					.setCategory("guild"),
 				new HelpData(
 					"guild-leaderboard",
 					"Get a leaderboard for a guild. The type can be slayer, skills, catacombs, weight, sven, rev, tara, enderman, alchemy, combat, fishing, farming, foraging, carpentry, mining, taming, and enchanting. The mode can be normal or ironman. A Hypixel API key must be set in settings set hypixel_key <key>.",
 					"guild-leaderboard <type> <u:player> [mode:normal|ironman]"
 				)
 					.addAliases("g-lb")
-					.addExamples("guild-leaderboard weight u:CrypticPlasma").setCategory("guild"),
+					.addExamples("guild-leaderboard weight u:CrypticPlasma")
+					.setCategory("guild"),
 				new HelpData(
 					"guild-kicker",
 					"Get all player's who don't meet the provided requirements. The requirement type can be skills, slayer, catacombs, or weight. The requirement value must be an integer. You can have up to 3 sets of requirements. Append the `--usekey` flag to force use the set Hypixel API key.",
 					"guild-kicker <u:player> <[type:value ...]> ..."
 				)
 					.addAliases("g-kicker")
-					.addExamples("guild-kicker u:CrypticPlasma [weight:4000 skills:40] [weight:4500]").setCategory("guild"),
+					.addExamples("guild-kicker u:CrypticPlasma [weight:4000 skills:40] [weight:4500]")
+					.setCategory("guild"),
 				new HelpData(
 					"guild-ranks",
 					"A customizable helper that will tell you who to promote or demote in your Hypixel guild. Please DM me or join the Skyblock Plus Discord server to set this up for your guild.",
@@ -156,35 +167,47 @@ public class HelpCommand extends Command {
 				)
 					.addAliases("g-ranks")
 					.addAliases("g-rank")
-					.addExamples("guild-ranks u:CrypticPlasma").setCategory("guild"),
+					.addExamples("guild-ranks u:CrypticPlasma")
+					.setCategory("guild"),
 				// Auctions
 				new HelpData("auctions", "Get a player's unclaimed auctions on all profiles.", "auctions [player]")
 					.addSecondData("Get information about an auction by it's UUID", "auctions uuid <UUID>")
 					.addAliases("auction", "ah")
-					.addExamples("auctions CrypticPlasma", "auctions uuid 77df55d9c0084473b113265ef48fb396").setCategory("price"),
-				new HelpData("bin", "Get the lowest bin of an item.", "bin <item>").addAliases("lbin").addExamples("bin Necron Chestplate").setCategory("price"),
+					.addExamples("auctions CrypticPlasma", "auctions uuid 77df55d9c0084473b113265ef48fb396")
+					.setCategory("price"),
+				new HelpData("bin", "Get the lowest bin of an item.", "bin <item>")
+					.addAliases("lbin")
+					.addExamples("bin Necron Chestplate")
+					.setCategory("price"),
 				new HelpData("bazaar", "Get the bazaar prices of an item.", "bazaar <item>")
 					.addAliases("bz")
-					.addExamples("bazaar Booster Cookie").setCategory("price"),
+					.addExamples("bazaar Booster Cookie")
+					.setCategory("price"),
 				new HelpData("average", "Get the average auction price of an item.", "average <item>")
 					.addAliases("avg")
-					.addExamples("average Necron's Handle").setCategory("price"),
-				new HelpData("bids", "Get a player's auction house bids", "bids [player].").addExamples("bids CrypticPlasma").setCategory("price"),
+					.addExamples("average Necron's Handle")
+					.setCategory("price"),
+				new HelpData("bids", "Get a player's auction house bids", "bids [player].")
+					.addExamples("bids CrypticPlasma")
+					.setCategory("price"),
 				new HelpData(
 					"query",
 					"Query the auction house for the lowest bin of an item. This command lets you make more specific queries than the lowest bin command.",
 					"query <item>"
 				)
-					.addExamples("query Necron's Chestplate ✪✪✪✪✪").setCategory("price"),
+					.addExamples("query Necron's Chestplate ✪✪✪✪✪")
+					.setCategory("price"),
 				new HelpData("bits", "Get the bits cost of an item from the bits shop.", "bits <item>")
 					.addExamples("bits God Potion")
-					.addAliases("bit").setCategory("price"),
+					.addAliases("bit")
+					.setCategory("price"),
 				new HelpData(
 					"calculate",
 					"Calculate the price of an item on the auction house using the auction's UUID.",
 					"calculate <UUID>"
 				)
-					.addExamples("calculate 8be8bef8c46f4dbda2eccd1ca0c30e27").setCategory("price"),
+					.addExamples("calculate 8be8bef8c46f4dbda2eccd1ca0c30e27")
+					.setCategory("price"),
 				new HelpData("track", "Main track command")
 					.addSubcommands(
 						new HelpData(
@@ -194,7 +217,8 @@ public class HelpCommand extends Command {
 						)
 							.addExamples("auctions CrypticPlasma"),
 						new HelpData("stop", "Stop tracking a player's auctions")
-					).setCategory("price"),
+					)
+					.setCategory("price"),
 				// Inventory
 				new HelpData("inventory", "Get a player's inventory represented in emojis.", "inventory [player] [profile]")
 					.addSecondData("Get a player's inventory with lore.", "inventory [player] [profile] <slot:number>")
@@ -204,12 +228,15 @@ public class HelpCommand extends Command {
 						"inventory CrypticPlasma Zucchini",
 						"inventory CrypticPlasma slot:1",
 						"inventory CrypticPlasma Zucchini slot:1"
-					).setCategory("inventory"),
+					)
+					.setCategory("inventory"),
 				new HelpData("armor", "Get a player's equipped armor with lore.", "armor [player] [profile]")
-					.addExamples("armor CrypticPlasma", "armor CrypticPlasma Zucchini").setCategory("inventory"),
+					.addExamples("armor CrypticPlasma", "armor CrypticPlasma Zucchini")
+					.setCategory("inventory"),
 				new HelpData("enderchest", "Get a player's ender chest represented in emojis.", "enderchest [player] [profile]")
 					.addAliases("ec", "echest")
-					.addExamples("enderchest CrypticPlasma", "enderchest CrypticPlasma Zucchini").setCategory("inventory"),
+					.addExamples("enderchest CrypticPlasma", "enderchest CrypticPlasma Zucchini")
+					.setCategory("inventory"),
 				new HelpData("talisman", "Get a player's talisman bag represented in emojis.", "talisman [player] [profile]")
 					.addSecondData("Get a player's talisman bag with lore.", "talisman [player] [profile] <slot:number>")
 					.addExamples(
@@ -218,13 +245,15 @@ public class HelpCommand extends Command {
 						"talisman CrypticPlasma slot:1",
 						"talisman CrypticPlasma Zucchini slot:1"
 					)
-					.addAliases("talismans").setCategory("inventory"),
+					.addAliases("talismans")
+					.setCategory("inventory"),
 				new HelpData(
 					"sacks",
 					"Get a player's sacks' content bag represented in a list. Sorted by descending price.",
 					"sacks [player] [profile]"
 				)
-					.addExamples("sacks CrypticPlasma", "sacks CrypticPlasma Zucchini").setCategory("inventory"),
+					.addExamples("sacks CrypticPlasma", "sacks CrypticPlasma Zucchini")
+					.setCategory("inventory"),
 				new HelpData("wardrobe", "Get a player's wardrobe armors represented in emojis.", "wardrobe [player] [profile]")
 					.addSecondData("Get a player's wardrobe armors represented in a list.", "wardrobe list [player] [profile]")
 					.addExamples(
@@ -234,14 +263,16 @@ public class HelpCommand extends Command {
 						"wardrobe list CrypticPlasma Zucchini"
 					),
 				new HelpData("pets", "Get a player's pets.", "pets [player] [profile]")
-					.addExamples("pets CrypticPlasma", "pets CrypticPlasma Zucchini").setCategory("inventory"),
+					.addExamples("pets CrypticPlasma", "pets CrypticPlasma Zucchini")
+					.setCategory("inventory"),
 				// Misc
 				new HelpData("roles", "Main roles command.")
 					.addAliases("role")
 					.addSubcommands(
 						new HelpData("claim", "Claim your automatic Skyblock roles. You must be linked to the bot.", "claim <profile>")
 							.addExamples("claim", "claim Zucchini")
-					).setCategory("miscellaneous"),
+					)
+					.setCategory("miscellaneous"),
 				new HelpData("bank", "Get a player's bank and purse coins.", "bank [player] [profile]")
 					.addSecondData("Get a player's bank transaction history.", "bank history [player] [profile]")
 					.addExamples(
@@ -249,7 +280,8 @@ public class HelpCommand extends Command {
 						"bank CrypticPlasma Zucchini",
 						"bank history CrypticPlasma",
 						"bank history CrypticPlasma Zucchini"
-					).setCategory("miscellaneous"),
+					)
+					.setCategory("miscellaneous"),
 				new HelpData("networth", "Calculate a player's networth.", "networth [player] [profile]")
 					.addSecondData(
 						"Calculate a player's networth with a detailed JSON of each item cost.",
@@ -261,14 +293,16 @@ public class HelpCommand extends Command {
 						"networth CrypticPlasma Zucchini",
 						"networth CrypticPlasma --verbose",
 						"networth CrypticPlasma Zucchini --verbose"
-					).setCategory("miscellaneous"),
+					)
+					.setCategory("miscellaneous"),
 				new HelpData(
 					"active-coins",
 					"Get a player's active coins. This is the sum of their bank, purse, and sold auction coins.",
 					"active-coins [player] [profile]"
 				)
 					.addExamples("active-coins CrypticPlasma", "active-coins CrypticPlasma Zucchini")
-					.addAliases("ac").setCategory("miscellaneous"),
+					.addAliases("ac")
+					.setCategory("miscellaneous"),
 				new HelpData(
 					"weight",
 					"Get a player's slayer, skills, dungeons, and total weight. Shows both senither and lily weight.",
@@ -278,20 +312,27 @@ public class HelpCommand extends Command {
 						"Calculate predicted senither weight using given stats (not 100% accurate).",
 						"weight calculate [skill avg] [slayer] [cata level] [avg dungeon class level]"
 					)
-					.addExamples("weight CrypticPlasma", "weight CrypticPlasma Zucchini", "weight calculate 37 600500 23 22").setCategory("miscellaneous"),
+					.addExamples("weight CrypticPlasma", "weight CrypticPlasma Zucchini", "weight calculate 37 600500 23 22")
+					.setCategory("miscellaneous"),
 				new HelpData("hypixel", "Get Hypixel information about a player.", "hypixel [player]")
 					.addSecondData("Get fastest Hypixel lobby parkour for a player.", "hypixel parkour [player]")
-					.addExamples("hypixel CrypticPlasma", "hypixel parkour CrypticPlasma").setCategory("miscellaneous"),
+					.addExamples("hypixel CrypticPlasma", "hypixel parkour CrypticPlasma")
+					.setCategory("miscellaneous"),
 				new HelpData("missing", "Get a player's missing talismans.", "missing [player] [profile]")
-					.addExamples("missing CrypticPlasma", "missing CrypticPlasma Zucchini").setCategory("miscellaneous"),
+					.addExamples("missing CrypticPlasma", "missing CrypticPlasma Zucchini")
+					.setCategory("miscellaneous"),
 				new HelpData("profiles", "Get information about all of a player's profiles.", "missing [player] [profile]")
-					.addExamples("profiles CrypticPlasma", "profiles CrypticPlasma Zucchini").setCategory("miscellaneous"),
+					.addExamples("profiles CrypticPlasma", "profiles CrypticPlasma Zucchini")
+					.setCategory("miscellaneous"),
 				new HelpData("cakes", "Get a player's active and inactive cake buffs.", "cakes [player] [profile]")
-					.addExamples("cakes CrypticPlasma", "cakes CrypticPlasma Zucchini").setCategory("miscellaneous"),
+					.addExamples("cakes CrypticPlasma", "cakes CrypticPlasma Zucchini")
+					.setCategory("miscellaneous"),
 				new HelpData("harp", "Get a player's harp statistics.", "harp [player] [profile]")
-					.addExamples("harp CrypticPlasma", "harp CrypticPlasma Zucchini").setCategory("miscellaneous"),
+					.addExamples("harp CrypticPlasma", "harp CrypticPlasma Zucchini")
+					.setCategory("miscellaneous"),
 				new HelpData("uuid", "Convert username to UUID or UUID to username.", "uuid [username|uuid]")
-					.addExamples("uuid CrypticPlasma", "uuid 044903b7a9d3416d957f929557af6c88").setCategory("miscellaneous"),
+					.addExamples("uuid CrypticPlasma", "uuid 044903b7a9d3416d957f929557af6c88")
+					.setCategory("miscellaneous"),
 				new HelpData("fetchur", "Get the item that fetchur wants today").setCategory("miscellaneous"),
 				// Party
 				new HelpData("party", "Main party command.")
@@ -304,7 +345,8 @@ public class HelpCommand extends Command {
 						new HelpData("list", "List all active parties"),
 						new HelpData("disband", "Disband your current party."),
 						new HelpData("kick <username>", "Kick a member from your party").addExamples("kick CrypticPlasma")
-					).setCategory("party"),
+					)
+					.setCategory("party"),
 				// Skyblock event
 				new HelpData("event", "Main event command.")
 					.addSubcommands(
@@ -315,10 +357,11 @@ public class HelpCommand extends Command {
 						new HelpData("leaderboard", "Get the leaderboard for current event.").addAliases("lb"),
 						new HelpData("end", "Force end the event."),
 						new HelpData("cancel", "Cancel the event. No prizes or winners will be announced.")
-					).setCategory("event"),
+					)
+					.setCategory("event"),
 				// Settings
 				new HelpData("settings", "Main settings command.")
-						.setCategory("settings")
+					.setCategory("settings")
 					.addAliases("config", "configuration")
 					.addSecondData("View the current settings for the Discord server.", "settings")
 					.addSubcommands(

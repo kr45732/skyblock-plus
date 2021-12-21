@@ -24,7 +24,6 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 
-
 public class UpdateCommand extends Command {
 
 	public UpdateCommand() {
@@ -43,7 +42,7 @@ public class UpdateCommand extends Command {
 				ProcessBuilder builder = new ProcessBuilder("skyblock-plus");
 				try {
 					builder.start();
-				}catch (Exception e){
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
