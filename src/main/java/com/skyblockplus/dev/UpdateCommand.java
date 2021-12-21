@@ -24,10 +24,11 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 
-public class ShutdownCommand extends Command {
 
-	public ShutdownCommand() {
-		this.name = "d-shutdown";
+public class UpdateCommand extends Command {
+
+	public UpdateCommand() {
+		this.name = "d-update";
 		this.ownerCommand = true;
 		this.botPermissions = defaultPerms();
 	}
@@ -38,8 +39,13 @@ public class ShutdownCommand extends Command {
 			@Override
 			protected void execute() {
 				logCommand();
-				event.reactWarning();
-				event.getJDA().shutdown();
+
+				ProcessBuilder builder = new ProcessBuilder("skyblock-plus");
+				try {
+					builder.start();
+				}catch (Exception e){
+					e.printStackTrace();
+				}
 			}
 		}
 			.queue();

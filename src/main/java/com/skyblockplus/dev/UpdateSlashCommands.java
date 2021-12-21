@@ -82,6 +82,6 @@ public class UpdateSlashCommands extends Command {
 	}
 
 	private List<CommandData> generateSlashCommands() {
-		return slashCommandClient.getSlashCommands().stream().map(SlashCommand::getCommandData).collect(Collectors.toList());
+		return slashCommandClient.getCommands().stream().map(SlashCommand::getCommandData).collect(Collectors.toList());
 	}
 }

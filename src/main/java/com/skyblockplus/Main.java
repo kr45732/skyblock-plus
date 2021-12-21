@@ -21,9 +21,9 @@ package com.skyblockplus;
 import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.utils.Utils.*;
 
-import com.google.gson.JsonObject;
 import com.jagrosh.jdautilities.command.*;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.skyblockplus.api.miscellaneous.CommandEndpoints;
 import com.skyblockplus.dev.*;
 import com.skyblockplus.dungeons.*;
 import com.skyblockplus.features.listeners.MainListener;
@@ -73,7 +73,6 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
-import org.apache.http.message.BasicHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -91,229 +90,181 @@ public class Main {
 	public static SlashCommandClient slashCommandClient;
 
 	public static void main(String[] args) throws LoginException, IllegalArgumentException {
-		try {
-			Main.globalExceptionHandler = new GlobalExceptionHandler();
-			Thread.setDefaultUncaughtExceptionHandler(globalExceptionHandler);
-			RestAction.setDefaultFailure(e -> globalExceptionHandler.uncaughtException(null, e));
+		Main.globalExceptionHandler = new GlobalExceptionHandler();
+		Thread.setDefaultUncaughtExceptionHandler(globalExceptionHandler);
+		RestAction.setDefaultFailure(e -> globalExceptionHandler.uncaughtException(null, e));
 
-			Utils.initialize();
-			Constants.initialize();
+		Utils.initialize();
+		Constants.initialize();
 
-			Main.database = SpringApplication.run(Main.class, args).getBean(Database.class);
-			Main.waiter = new EventWaiter(scheduler, true);
-			Main.client =
-				new CommandClientBuilder()
-					.setOwnerId("385939031596466176")
-					.setEmojis("✅", "⚠️", "❌")
-					.useHelpBuilder(false)
-					.setPrefixFunction(event -> event.isFromGuild() ? getGuildPrefix(event.getGuild().getId()) : DEFAULT_PREFIX)
-					.setListener(
-						new CommandListener() {
-							@Override
-							public void onCommandException(CommandEvent event, Command command, Throwable throwable) {
-								globalExceptionHandler.uncaughtException(event, command, throwable);
-							}
+		Main.database = SpringApplication.run(Main.class, args).getBean(Database.class);
+		Main.waiter = new EventWaiter(scheduler, true);
+		Main.client =
+			new CommandClientBuilder()
+				.setOwnerId("385939031596466176")
+				.setEmojis("✅", "⚠️", "❌")
+				.useHelpBuilder(false)
+				.setPrefixFunction(event -> event.isFromGuild() ? getGuildPrefix(event.getGuild().getId()) : DEFAULT_PREFIX)
+				.setListener(
+					new CommandListener() {
+						@Override
+						public void onCommandException(CommandEvent event, Command command, Throwable throwable) {
+							globalExceptionHandler.uncaughtException(event, command, throwable);
 						}
-					)
-					.addCommands(
-						new InformationCommand(),
-						new SlayerCommand(),
-						new HelpCommand(),
-						new GuildCommand(),
-						new AuctionCommand(),
-						new BinCommand(),
-						new SkillsCommand(),
-						new DungeonsCommand(),
-						new ShutdownCommand(),
-						new RolesCommand(),
-						new GuildRanksCommand(),
-						new EssenceCommand(),
-						new BankCommand(),
-						new WardrobeCommand(),
-						new TalismanBagCommand(),
-						new InventoryCommand(),
-						new SacksCommand(),
-						new WeightCommand(),
-						new HypixelCommand(),
-						new UuidCommand(),
-						new SettingsCommand(),
-						new ReloadCommand(),
-						new SetupCommand(),
-						new CategoriesCommand(),
-						new PartyFinderCommand(),
-						new QuickSetupTestCommand(),
-						new EmojiMapServerCommand(),
-						new EnderChestCommand(),
-						new GetAllGuildsIn(),
-						new LinkCommand(),
-						new GetSettingsFile(),
-						new UnlinkCommand(),
-						new LinkedUserDev(),
-						new BazaarCommand(),
-						new AverageAuctionCommand(),
-						new PetsCommand(),
-						new SkyblockEventCommand(),
-						new DeleteMessagesCommand(),
-						new PlaceholderCommand(),
-						new ProfilesCommand(),
-						new NetworthCommand(),
-						new QueryAuctionCommand(),
-						new BidsCommand(),
-						new BitsCommand(),
-						new EvaluateCommand(),
-						new GuildKickerCommand(),
-						new MissingTalismansCommand(),
-						new UpdateSlashCommands(),
-						new CalculateCommand(),
-						new EmojiFromUrlCommand(),
-						new GuildLeaderboardCommand(),
-						new ArmorCommand(),
-						new FetchurCommand(),
-						new CheckEmojisCommand(),
-						new HarpCommand(),
-						new CakesCommand(),
-						new ActiveCoinsCommand(),
-						new HotmCommand(),
-						new VoteCommand(),
-						new TrackAuctionsCommand(),
-						new SkyblockCommand(),
-						new GuildStatisticsCommand(),
-						new PartyCommand(),
-						new TimeCommand()
-					)
-					.build();
+					}
+				)
+				.addCommands(
+					new InformationCommand(),
+					new SlayerCommand(),
+					new HelpCommand(),
+					new GuildCommand(),
+					new AuctionCommand(),
+					new BinCommand(),
+					new SkillsCommand(),
+					new DungeonsCommand(),
+					new UpdateCommand(),
+					new RolesCommand(),
+					new GuildRanksCommand(),
+					new EssenceCommand(),
+					new BankCommand(),
+					new WardrobeCommand(),
+					new TalismanBagCommand(),
+					new InventoryCommand(),
+					new SacksCommand(),
+					new WeightCommand(),
+					new HypixelCommand(),
+					new UuidCommand(),
+					new SettingsCommand(),
+					new ReloadCommand(),
+					new SetupCommand(),
+					new CategoriesCommand(),
+					new PartyFinderCommand(),
+					new QuickSetupTestCommand(),
+					new EmojiMapServerCommand(),
+					new EnderChestCommand(),
+					new GetAllGuildsIn(),
+					new LinkCommand(),
+					new GetSettingsFile(),
+					new UnlinkCommand(),
+					new LinkedUserDev(),
+					new BazaarCommand(),
+					new AverageAuctionCommand(),
+					new PetsCommand(),
+					new SkyblockEventCommand(),
+					new DeleteMessagesCommand(),
+					new PlaceholderCommand(),
+					new ProfilesCommand(),
+					new NetworthCommand(),
+					new QueryAuctionCommand(),
+					new BidsCommand(),
+					new BitsCommand(),
+					new EvaluateCommand(),
+					new GuildKickerCommand(),
+					new MissingTalismansCommand(),
+					new UpdateSlashCommands(),
+					new CalculateCommand(),
+					new EmojiFromUrlCommand(),
+					new GuildLeaderboardCommand(),
+					new ArmorCommand(),
+					new FetchurCommand(),
+					new CheckEmojisCommand(),
+					new HarpCommand(),
+					new CakesCommand(),
+					new ActiveCoinsCommand(),
+					new HotmCommand(),
+					new VoteCommand(),
+					new TrackAuctionsCommand(),
+					new SkyblockCommand(),
+					new GuildStatisticsCommand(),
+					new PartyCommand(),
+					new TimeCommand()
+				)
+				.build();
 
-			slashCommandClient =
-				new SlashCommandClient()
-					.setOwnerId("385939031596466176")
-					.addSlashCommands(
-						new InviteSlashCommand(),
-						new VoteSlashCommand(),
-						new HotmSlashCommand(),
-						new InformationSlashCommand(),
-						new LinkSlashCommand(),
-						new UnlinkSlashCommand(),
-						new SlayerSlashCommand(),
-						new SkillsSlashCommand(),
-						new DungeonsSlashCommand(),
-						new EssenceSlashCommand(),
-						new PartyFinderSlashCommand(),
-						new GuildSlashCommand(),
-						new HelpSlashCommand(),
-						new AuctionsSlashCommand(),
-						new BinSlashCommand(),
-						new BazaarSlashCommand(),
-						new AverageAuctionSlashCommand(),
-						new BidsSlashCommand(),
-						new QueryAuctionsSlashCommand(),
-						new BitsSlashCommand(),
-						new RolesSlashCommand(),
-						new BankSlashCommand(),
-						new WeightSlashCommand(),
-						new HypixelSlashCommand(),
-						new ProfilesSlashCommand(),
-						new MissingTalismansSlashCommand(),
-						new CalculateSlashCommand(),
-						new SetupSlashCommand(),
-						new SkyblockEventSlashCommand(),
-						new FetchurSlashCommand(),
-						new NetworthSlashCommand(),
-						new InventorySlashCommand(),
-						new ArmorSlashCommand(),
-						new EnderChestSlashCommand(),
-						new TalismanBagSlashCommand(),
-						new SacksSlashCommand(),
-						new WardrobeSlashCommand(),
-						new HarpSlashCommand(),
-						new CakesSlashCommand(),
-						new ActiveCoinsSlashCommand(),
-						new GuildLeaderboardSlashCommand(),
-						new GuildRanksSlashCommand(),
-						new GuildKickerSlashCommand(),
-						new PetsSlashCommand(),
-						new UuidSlashCommand(),
-						new TrackAuctionsSlashCommand(),
-						new SkyblockSlashCommand(),
-						new GuildStatisticsSlashCommand(),
-						new PartySlashCommand(),
-						new SettingsSlashCommand(),
-						new TimeSlashCommand()
-					);
+		slashCommandClient =
+			new SlashCommandClient()
+				.setOwnerId("385939031596466176")
+				.addCommands(
+					new InviteSlashCommand(),
+					new VoteSlashCommand(),
+					new HotmSlashCommand(),
+					new InformationSlashCommand(),
+					new LinkSlashCommand(),
+					new UnlinkSlashCommand(),
+					new SlayerSlashCommand(),
+					new SkillsSlashCommand(),
+					new DungeonsSlashCommand(),
+					new EssenceSlashCommand(),
+					new PartyFinderSlashCommand(),
+					new GuildSlashCommand(),
+					new HelpSlashCommand(),
+					new AuctionsSlashCommand(),
+					new BinSlashCommand(),
+					new BazaarSlashCommand(),
+					new AverageAuctionSlashCommand(),
+					new BidsSlashCommand(),
+					new QueryAuctionsSlashCommand(),
+					new BitsSlashCommand(),
+					new RolesSlashCommand(),
+					new BankSlashCommand(),
+					new WeightSlashCommand(),
+					new HypixelSlashCommand(),
+					new ProfilesSlashCommand(),
+					new MissingTalismansSlashCommand(),
+					new CalculateSlashCommand(),
+					new SetupSlashCommand(),
+					new SkyblockEventSlashCommand(),
+					new FetchurSlashCommand(),
+					new NetworthSlashCommand(),
+					new InventorySlashCommand(),
+					new ArmorSlashCommand(),
+					new EnderChestSlashCommand(),
+					new TalismanBagSlashCommand(),
+					new SacksSlashCommand(),
+					new WardrobeSlashCommand(),
+					new HarpSlashCommand(),
+					new CakesSlashCommand(),
+					new ActiveCoinsSlashCommand(),
+					new GuildLeaderboardSlashCommand(),
+					new GuildRanksSlashCommand(),
+					new GuildKickerSlashCommand(),
+					new PetsSlashCommand(),
+					new UuidSlashCommand(),
+					new TrackAuctionsSlashCommand(),
+					new SkyblockSlashCommand(),
+					new GuildStatisticsSlashCommand(),
+					new PartySlashCommand(),
+					new SettingsSlashCommand(),
+					new TimeSlashCommand()
+				);
 
-			jda =
-				JDABuilder
-					.createDefault(BOT_TOKEN)
-					.setStatus(OnlineStatus.DO_NOT_DISTURB)
-					.addEventListeners(
-						new ExceptionEventListener(waiter),
-						client,
-						new ExceptionEventListener(slashCommandClient),
-						new ExceptionEventListener(new MainListener())
-					)
-					.setActivity(Activity.playing("Loading..."))
-					.setMemberCachePolicy(MemberCachePolicy.ALL)
-					.disableCache(CacheFlag.VOICE_STATE)
-					.enableIntents(GatewayIntent.GUILD_MEMBERS)
-					.build();
+		jda =
+			JDABuilder
+				.createDefault(BOT_TOKEN)
+				.setStatus(OnlineStatus.DO_NOT_DISTURB)
+				.addEventListeners(
+					new ExceptionEventListener(waiter),
+					client,
+					new ExceptionEventListener(slashCommandClient),
+					new ExceptionEventListener(new MainListener())
+				)
+				.setActivity(Activity.playing("Loading..."))
+				.setMemberCachePolicy(MemberCachePolicy.ALL)
+				.disableCache(CacheFlag.VOICE_STATE)
+				.enableIntents(GatewayIntent.GUILD_MEMBERS)
+				.build();
 
-			try {
-				jda.awaitReady();
-			} catch (InterruptedException e) {
-				log.error(e.getMessage(), e);
-			}
-			jda.getPresence().setActivity(Activity.watching(DEFAULT_PREFIX + "help in " + jda.getGuilds().size() + " servers"));
-
-			if (!IS_API) {
-				ApiHandler.initialize();
-				ApiHandler.initializeParties();
-				TrackAuctionsCommand.initialize();
-				AuctionFlipper.setEnable(true);
-
-				if (isMainBot()) {
-					int serverCount = jda.getGuilds().size();
-					String selfUserId = jda.getSelfUser().getId();
-
-					JsonObject dscBotListJson = new JsonObject();
-					dscBotListJson.addProperty("guilds", serverCount);
-					postJson(
-						"https://discordbotlist.com/api/v1/bots/" + selfUserId + "/stats",
-						dscBotListJson,
-						new BasicHeader(
-							"Authorization",
-							"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0IjoxLCJpZCI6Ijc5Njc5MTE2NzM2NjU5NDU5MiIsImlhdCI6MTYzOTUyODcwNn0.eJ6ikA4fIPJI9W-lJkHs-oxNNGKsWPbH8cU7oVEbNYY"
-						)
-					);
-
-					JsonObject dscBotsJson = new JsonObject();
-					dscBotsJson.addProperty("guildCount", serverCount);
-					postJson(
-						"https://discord.bots.gg/api/v1/bots/" + selfUserId + "/stats",
-						dscBotsJson,
-						new BasicHeader(
-							"Authorization",
-							"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGkiOnRydWUsImlkIjoiMzg1OTM5MDMxNTk2NDY2MTc2IiwiaWF0IjoxNjM5NTI5NjAyfQ.OsD5zgKVTgSh6IG34GGBsHPGoK7QTlkcHeksKRnIcWA"
-						)
-					);
-
-					//				JsonObject discordsJson = new JsonObject();
-					//				discordsJson.addProperty("server_count", serverCount);
-					//				postJson("https://discords.com/bots/api/bot/" + selfUserId, discordsJson, new BasicHeader("Authorization", "c46ba888473968c1e1c9ddc7e11c515abf1b85ece6df62a21fed3e9dcae4efd4b62d2dc9e2637c11b3eda05dd668630444c33e6add140da5ec50a95521f38004"));
-
-					JsonObject topGgJson = new JsonObject();
-					topGgJson.addProperty("server_count", serverCount);
-					postJson(
-						"https://top.gg/api/bots/" + selfUserId + "/stats",
-						topGgJson,
-						new BasicHeader(
-							"Authorization",
-							"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ijc5Njc5MTE2NzM2NjU5NDU5MiIsImJvdCI6dHJ1ZSwiaWF0IjoxNjM5NTMyMTI2fQ.YN6n3mXXgbENfQv1k8OylJV6tfZHqEFgciVGGt_Tsa0"
-						)
-					);
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		try {
+			jda.awaitReady();
+		} catch (InterruptedException e) {
+			log.error(e.getMessage(), e);
 		}
+		jda.getPresence().setActivity(Activity.watching(DEFAULT_PREFIX + "help in " + jda.getGuilds().size() + " servers"));
+
+		ApiHandler.initialize();
+		TrackAuctionsCommand.initialize();
+		AuctionFlipper.setEnable(true);
+		CommandEndpoints.initialize();
 	}
 
 	@PreDestroy
@@ -325,6 +276,9 @@ public class Main {
 
 		log.info("Caching Parties");
 		cacheParties();
+
+		log.info("Caching Command Uses");
+		cacheCommandUses();
 
 		log.info("Closing Http Client");
 		closeHttpClient();

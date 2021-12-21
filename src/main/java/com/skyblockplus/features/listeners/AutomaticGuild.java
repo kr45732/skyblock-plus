@@ -632,19 +632,10 @@ public class AutomaticGuild {
 					.getDescription()
 					.contains("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO/commit/")
 			) {
-				if (IS_API) {
-					updateItemMappings();
-				}
-
-				scheduler.schedule(
-					() -> {
-						internalJsonMappings = null;
-						getInternalJsonMappings();
-						refreshPriceOverrideJson();
-					},
-					5,
-					TimeUnit.MINUTES
-				);
+				updateItemMappings();
+				internalJsonMappings = null;
+				getInternalJsonMappings();
+				refreshPriceOverrideJson();
 			}
 			return;
 		}
@@ -657,9 +648,7 @@ public class AutomaticGuild {
 			return;
 		}
 
-		if (mee6Roles(event)) {
-			return;
-		}
+		mee6Roles(event);
 	}
 
 	public void onTextChannelDelete(TextChannelDeleteEvent event) {

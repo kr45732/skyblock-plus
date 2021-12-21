@@ -18,7 +18,7 @@
 
 package com.skyblockplus.utils;
 
-import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.*;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -49,6 +49,7 @@ import java.util.regex.Pattern;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.message.BasicHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,6 +69,9 @@ public class ApiHandler {
 	public static void initialize() {
 		try {
 			getCacheDatabaseConnection();
+			initializeParties();
+			updateBotListStatistics();
+			initializeCommandUses();
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateCache, 60, 90, TimeUnit.SECONDS);
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateLinkedAccounts, 60, 30, TimeUnit.SECONDS);
 		} catch (SQLException e) {
@@ -93,6 +97,53 @@ public class ApiHandler {
 		}
 
 		return cacheDatabaseConnection;
+	}
+
+	public static void updateBotListStatistics(){
+		if (!isMainBot()) {
+			return;
+		}
+
+			int serverCount = jda.getGuilds().size();
+			String selfUserId = jda.getSelfUser().getId();
+
+			JsonObject dscBotListJson = new JsonObject();
+			dscBotListJson.addProperty("guilds", serverCount);
+			postJson(
+					"https://discordbotlist.com/api/v1/bots/" + selfUserId + "/stats",
+					dscBotListJson,
+					new BasicHeader(
+							"Authorization",
+							"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0IjoxLCJpZCI6Ijc5Njc5MTE2NzM2NjU5NDU5MiIsImlhdCI6MTYzOTUyODcwNn0.eJ6ikA4fIPJI9W-lJkHs-oxNNGKsWPbH8cU7oVEbNYY"
+					)
+			);
+
+			JsonObject dscBotsJson = new JsonObject();
+			dscBotsJson.addProperty("guildCount", serverCount);
+			postJson(
+					"https://discord.bots.gg/api/v1/bots/" + selfUserId + "/stats",
+					dscBotsJson,
+					new BasicHeader(
+							"Authorization",
+							"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGkiOnRydWUsImlkIjoiMzg1OTM5MDMxNTk2NDY2MTc2IiwiaWF0IjoxNjM5NTI5NjAyfQ.OsD5zgKVTgSh6IG34GGBsHPGoK7QTlkcHeksKRnIcWA"
+					)
+			);
+
+			//				JsonObject discordsJson = new JsonObject();
+			//				discordsJson.addProperty("server_count", serverCount);
+			//				postJson("https://discords.com/bots/api/bot/" + selfUserId, discordsJson, new BasicHeader("Authorization", "c46ba888473968c1e1c9ddc7e11c515abf1b85ece6df62a21fed3e9dcae4efd4b62d2dc9e2637c11b3eda05dd668630444c33e6add140da5ec50a95521f38004"));
+
+			JsonObject topGgJson = new JsonObject();
+			topGgJson.addProperty("server_count", serverCount);
+			postJson(
+					"https://top.gg/api/bots/" + selfUserId + "/stats",
+					topGgJson,
+					new BasicHeader(
+							"Authorization",
+							"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ijc5Njc5MTE2NzM2NjU5NDU5MiIsImJvdCI6dHJ1ZSwiaWF0IjoxNjM5NTMyMTI2fQ.YN6n3mXXgbENfQv1k8OylJV6tfZHqEFgciVGGt_Tsa0"
+					)
+			);
+
 	}
 
 	public static boolean isValidMinecraftUsername(String username) {
@@ -621,6 +672,37 @@ public class ApiHandler {
 			return 200;
 		} catch (Exception e) {
 			return 400;
+		}
+	}
+
+	public static int cacheCommandUseDb(String json) {
+		try (Statement statement = getCacheDatabaseConnection().createStatement()) {
+			statement.executeUpdate(
+					"INSERT INTO commands VALUES (0, '" +
+							json +
+							"') ON DUPLICATE KEY UPDATE data = VALUES(data)"
+			);
+			return 200;
+		} catch (Exception e) {
+			return 400;
+		}
+	}
+
+	public static void initializeCommandUses() {
+		if (!isMainBot()) {
+			return;
+		}
+
+		try (Statement statement = getCacheDatabaseConnection().createStatement()) {
+			try (ResultSet response = statement.executeQuery("SELECT * FROM commands")) {
+				Type typeMapStringInt = new TypeToken<Map<String, Integer>>() {}.getType();
+				response.next();
+				Map<String, Integer> commandUsage = gson.fromJson(response.getString("data"), typeMapStringInt);
+				slashCommandClient.setCommandUses(commandUsage);
+				log.info("Retrieved command uses");
+			}
+		} catch (Exception e) {
+			log.error("initializeCommandUses", e);
 		}
 	}
 

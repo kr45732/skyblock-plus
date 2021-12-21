@@ -39,6 +39,7 @@ public class HelpData {
 	private String secondDescription;
 	private String secondUsage;
 	private String prefix;
+	private String category;
 
 	public HelpData(String name, String description, String usage, boolean ignoreSuperCommand) {
 		this(name, description, usage);
@@ -80,7 +81,8 @@ public class HelpData {
 
 		this.prefix = prefix;
 
-		EmbedBuilder eb = defaultEmbed(capitalizeString(getName()));
+
+		EmbedBuilder eb = defaultEmbed(getCategory() + " | " + capitalizeString(getName()));
 		eb.addField("Description", getDescription(), false);
 		eb.addField("Usage", getUsageFormatted(), false);
 		if (aliases.size() > 0) {
@@ -98,6 +100,19 @@ public class HelpData {
 
 	private String getDescription() {
 		return description + (secondDescription != null ? "\n\n" + secondDescription : "");
+	}
+
+	private String getCategory(){
+		return getCategory(this);
+	}
+
+	private String getCategory(HelpData data){
+		if(data.category != null){
+			return data.category;
+		}else if(data.superCommand != null){
+			return getCategory(data.superCommand);
+		}
+		return null;
 	}
 
 	public String getUsage() {
@@ -203,6 +218,19 @@ public class HelpData {
 
 	public HelpData setSuperCommand(HelpData superCommand) {
 		this.superCommand = superCommand;
+		return this;
+	}
+
+	public HelpData setCategory(String category){
+		this.category = category;
+		return this;
+	}
+
+	public HelpData setPrefix(String prefix){
+		this.prefix = prefix;
+		for (HelpData subcommand : subcommands) {
+			subcommand.setPrefix(prefix);
+		}
 		return this;
 	}
 

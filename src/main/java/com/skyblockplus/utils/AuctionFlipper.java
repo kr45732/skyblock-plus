@@ -52,7 +52,7 @@ public class AuctionFlipper {
 	private static final Cache<String, Long> auctionUuidToMessage = Caffeine.newBuilder().expireAfterWrite(45, TimeUnit.MINUTES).build();
 
 	public static void onGuildMessageReceived(GuildMessageReceivedEvent event) {
-		if (!enable) {
+		if (!enable || !isMainBot()) {
 			return;
 		}
 

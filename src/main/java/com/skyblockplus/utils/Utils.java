@@ -24,16 +24,17 @@ import static com.skyblockplus.utils.ApiHandler.*;
 import static java.lang.String.join;
 import static java.util.Collections.nCopies;
 
-import club.minnced.discord.webhook.external.JDAWebhookClient;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.gson.*;
+import com.jagrosh.jdautilities.command.Command;
 import com.skyblockplus.features.apply.ApplyGuild;
 import com.skyblockplus.features.apply.ApplyUser;
 import com.skyblockplus.features.listeners.AutomaticGuild;
 import com.skyblockplus.features.party.Party;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.exceptionhandler.ExceptionExecutor;
+import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.structs.*;
 import java.awt.*;
 import java.io.*;
@@ -119,7 +120,6 @@ public class Utils {
 	public static String PLANET_SCALE_USERNAME = "";
 	public static String PLANET_SCALE_PASSWORD = "";
 	public static String SBZ_SCAMMER_DB_KEY = "";
-	public static boolean IS_API = false;
 	/* Miscellaneous */
 	public static TextChannel botLogChannel;
 	public static TextChannel errorLogChannel;
@@ -869,7 +869,6 @@ public class Utils {
 	public static void initialize() {
 		Properties appProps = new Properties();
 		try {
-			IS_API = false;
 			appProps.load(new FileInputStream("DevSettings.properties"));
 			HYPIXEL_API_KEY = (String) appProps.get("HYPIXEL_API_KEY");
 			BOT_TOKEN = (String) appProps.get("BOT_TOKEN");
@@ -913,7 +912,6 @@ public class Utils {
 			API_USERNAME = System.getenv("API_USERNAME");
 			API_PASSWORD = System.getenv("API_PASSWORD");
 			API_BASE_URL = System.getenv("API_BASE_URL");
-			IS_API = API_BASE_URL.equals("https://skyblock-plus.up.railway.app/");
 			DEFAULT_PREFIX = System.getenv("DEFAULT_PREFIX");
 			CACHE_DATABASE_TOKEN = System.getenv("CACHE_DATABASE_TOKEN");
 			AUCTION_API_KEY = System.getenv("AUCTION_API_KEY");
@@ -1148,6 +1146,19 @@ public class Utils {
 		return new ArrayList<>();
 	}
 
+	public static void cacheCommandUses() {
+		if (!isMainBot()) {
+			return;
+		}
+
+		long startTime = System.currentTimeMillis();
+		if(cacheCommandUseDb(gson.toJson(getCommandUses())) == 200){
+			log.info("Cached command uses in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
+		}else {
+			log.error("Failed to cached command uses in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
+		}
+	}
+
 	public static void closeAsyncHttpClient() {
 		try {
 			asyncHttpClient.close();
@@ -1253,5 +1264,11 @@ public class Utils {
 
 	public static boolean isMainBot() {
 		return DEFAULT_PREFIX.equals("+");
+	}
+
+	public static Map<String, Integer> getCommandUses(){
+		Map<String, Integer> commandUses = client.getCommands().stream().collect(Collectors.toMap(Command::getName, command -> client.getCommandUses(command), (a, b) -> b));
+		slashCommandClient.getCommands().stream().collect(Collectors.toMap(SlashCommand::getName, command -> slashCommandClient.getCommandUses(command), (a, b) -> b)).forEach((key, value) -> commandUses.merge(key, value, Integer::sum));
+		return commandUses;
 	}
 }

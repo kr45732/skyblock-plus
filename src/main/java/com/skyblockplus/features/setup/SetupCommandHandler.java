@@ -296,12 +296,12 @@ public class SetupCommandHandler {
 							categoriesStr.append("\n").append(category.getName()).append(" - ").append(category.getId());
 						}
 						eb2.setDescription(
-							"Reply with the category where new applications should be made.\nList of all categories: " + categoriesStr
+							"Reply with the category where new applications should be made.\n\nList of all categories:" + categoriesStr
 						);
 						break;
 					case 2:
 						eb = settings.setApplyCategory(getSettings(), event.getMessage().getContentRaw());
-						eb2.setDescription("Reply with the staff channel where applications should besent.");
+						eb2.setDescription("Reply with the staff channel where applications will be sent.");
 						break;
 					case 3:
 						eb = settings.setApplyStaffChannel(getSettings(), event.getMessage().getContentRaw());
