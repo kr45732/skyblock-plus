@@ -131,6 +131,7 @@ public class GuildRanksCommand extends Command {
 
 		Instant lastUpdated = null;
 		if (useKey) {
+
 			HypixelGuildCache guildCache = hypixelGuildsCacheMap.getIfPresent(guildId);
 			List<String> guildMemberPlayersList;
 			if (guildCache != null) {
@@ -389,10 +390,11 @@ public class GuildRanksCommand extends Command {
 				.map(JsonElement::getAsString)
 				.collect(Collectors.toList());
 			for (GuildRanksStruct gMember : gMembers) {
-				for (JsonElement rank : higherDepth(lbSettings, "ranks").getAsJsonArray()) {
-					List<String> rankNamesList = streamJsonArray(higherDepth(rank, "names").getAsJsonArray())
-						.map(JsonElement::getAsString)
-						.collect(Collectors.toList());
+				int highestRankMet = -1;
+				JsonArray gRanks = higherDepth(lbSettings, "ranks").getAsJsonArray();
+				for (int i = 0; i < gRanks.size(); i++) {
+					JsonElement rank = gRanks.get(i);
+
 					boolean meetsReqOr = false;
 					for (JsonElement reqOr : higherDepth(rank, "requirements").getAsJsonArray()) {
 						boolean meetsReqAnd = true;
@@ -425,17 +427,23 @@ public class GuildRanksCommand extends Command {
 					}
 
 					if (meetsReqOr) {
-						if (!rankNamesList.contains(gMember.getGuildRank().toLowerCase())) {
-							paginateBuilder.addItems(("- /g setrank " + fixUsername(gMember.getName()) + " " + rankNamesList.get(0)));
-							totalChange++;
-						}
-					} else {
-						if (!defaultRank.contains(gMember.getGuildRank().toLowerCase())) {
-							paginateBuilder.addItems(("- /g setrank " + fixUsername(gMember.getName()) + " " + defaultRank.get(0)));
-							totalChange++;
-						}
+						highestRankMet = Math.max(i, highestRankMet);
 					}
-					break;
+				}
+
+				if(highestRankMet != -1) {
+					List<String> rankNamesList = streamJsonArray(higherDepth(gRanks.get(highestRankMet), "names").getAsJsonArray())
+							.map(JsonElement::getAsString)
+							.collect(Collectors.toList());
+					if (!rankNamesList.contains(gMember.getGuildRank().toLowerCase())) {
+						paginateBuilder.addItems(("- /g setrank " + fixUsername(gMember.getName()) + " " + rankNamesList.get(0)));
+						totalChange++;
+					}
+				} else {
+					if (!defaultRank.contains(gMember.getGuildRank().toLowerCase())) {
+						paginateBuilder.addItems(("- /g setrank " + fixUsername(gMember.getName()) + " " + defaultRank.get(0)));
+						totalChange++;
+					}
 				}
 			}
 

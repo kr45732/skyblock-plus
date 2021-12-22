@@ -21,10 +21,17 @@ package com.skyblockplus.api.miscellaneous;
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.*;
 
+import com.skyblockplus.features.jacob.JacobHandler;
 import com.skyblockplus.help.HelpCommand;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +42,10 @@ import org.springframework.web.bind.annotation.*;
 public class PublicEndpoints {
 
 	private static List<Map<String, Object>> apiCommandList;
+	private static Instant userCountLastUpdated = Instant.now();
+	public static int userCount = -1;
+
+	private static final List<String> ignoredGuilds = Arrays.asList("374071874222686211", "110373943822540800", "597450230430040076", "703967135961055314", "858695709393027102");
 
 	public static void initialize() {
 		apiCommandList =
@@ -52,11 +63,16 @@ public class PublicEndpoints {
 	@GetMapping("/get/stats")
 	public ResponseEntity<?> getStats() {
 		Map<String, Integer> commandUses = getCommandUses();
+		if(userCount == -1 || Duration.between(userCountLastUpdated, Instant.now()).toHours() >= 1) {
+			userCount = jda.getGuilds().stream().filter(g -> !ignoredGuilds.contains(g.getId())).map(Guild::getMemberCount).mapToInt(Integer::intValue).sum();
+			userCountLastUpdated = Instant.now();
+		}
+
 		return new ResponseEntity<>(
 			DataObject
 				.empty()
 				.put("guild_count", jda.getGuildCache().size())
-				.put("user_count", jda.getUserCache().size())
+				.put("user_count", userCount)
 				.put("total_command_uses", commandUses.values().stream().mapToInt(Integer::intValue).sum())
 				.put("command_uses", commandUses)
 				.toMap(),
@@ -67,7 +83,8 @@ public class PublicEndpoints {
 	@PostMapping(value = "/post/jacob", consumes = "application/json", produces = "application/json")
 	public ResponseEntity<?> postJacobData(@RequestBody JacobData jacobData, @RequestHeader String key) {
 		if (key.equals("2d7569ff0decff164a46e8d417e7b692")) {
-			if (true) {
+			if (JacobHandler.needsUpdate()) {
+				JacobHandler.setJacobData(jacobData);
 				return new ResponseEntity<>(DataObject.empty().put("success", true).toMap(), HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(

@@ -149,5 +149,47 @@
         }
       ]
     }
+  },
+  "61072a0b8ea8c9d8ce9ba88e": {
+    "name": "Big Shrimps",
+    "guild_leaderboard": {
+      "lb_type": "amount",
+      "staff_ranks": [
+        "officer",
+        "guild master"
+      ],
+      "ignore_staff": true,
+      "default_role": [
+        "tiny shrimp"
+      ],
+      "ranks": [
+        {
+          "requirements": [
+            [
+              {
+                "amount": 5000,
+                "type": "weight"
+              }
+            ]
+          ],
+          "names": [
+            "shrimp"
+          ]
+        },
+        {
+          "requirements": [
+            [
+              {
+                "amount": 8000,
+                "type": "weight"
+              }
+            ]
+          ],
+          "names": [
+            "big shrimp"
+          ]
+        }
+      ]
+    }
   }
 }

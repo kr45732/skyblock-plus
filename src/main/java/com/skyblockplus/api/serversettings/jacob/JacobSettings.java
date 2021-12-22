@@ -16,37 +16,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.dev;
+package com.skyblockplus.api.serversettings.jacob;
 
-import static com.skyblockplus.utils.Utils.defaultPerms;
+import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.utils.command.CommandExecute;
+import javax.persistence.ElementCollection;
+import javax.persistence.Embeddable;
+import javax.persistence.FetchType;
+import java.util.ArrayList;
+import java.util.List;
 
-public class UpdateCommand extends Command {
+@Data
+@AllArgsConstructor
+@Embeddable
+public class JacobSettings {
+    private String enable = "false";
+    private String channel = "";
 
-	public UpdateCommand() {
-		this.name = "d-update";
-		this.ownerCommand = true;
-		this.botPermissions = defaultPerms();
-	}
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Fetch(value = FetchMode.SUBSELECT)
+    private List<RoleObject> crops = new ArrayList<>();
 
-	@Override
-	protected void execute(CommandEvent event) {
-		new CommandExecute(this, event, false) {
-			@Override
-			protected void execute() {
-				logCommand();
-
-				ProcessBuilder builder = new ProcessBuilder("skyblock-plus");
-				try {
-					builder.start();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
-			.queue();
-	}
+    public JacobSettings(){}
 }

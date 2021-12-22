@@ -23,6 +23,7 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.api.miscellaneous.PublicEndpoints;
 import com.skyblockplus.utils.command.CommandExecute;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -55,6 +56,8 @@ public class InformationCommand extends Command {
 				"Statistics",
 				"**Servers:** " +
 				jda.getGuilds().size() +
+						"\n**Users:** " +
+						formatNumber(PublicEndpoints.userCount) +
 				"\n**Ping:** " +
 				jda.getRestPing().complete() +
 				"ms\n**Websocket:** " +
@@ -66,7 +69,7 @@ public class InformationCommand extends Command {
 				"Usage",
 				"**Memory:** " +
 				roundAndFormat(
-					100.0 * (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (Runtime.getRuntime().totalMemory())
+					100.0 * (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (Runtime.getRuntime().maxMemory())
 				) +
 				"%",
 				true

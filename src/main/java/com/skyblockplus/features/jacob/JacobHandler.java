@@ -18,18 +18,59 @@
 
 package com.skyblockplus.features.jacob;
 
+import com.skyblockplus.api.miscellaneous.JacobContest;
 import com.skyblockplus.api.miscellaneous.JacobData;
+import com.skyblockplus.features.listeners.AutomaticGuild;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+
+import java.util.concurrent.TimeUnit;
+
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.miscellaneous.TimeCommand.getSkyblockYear;
+import static com.skyblockplus.utils.Utils.*;
 
 public class JacobHandler {
 
-	private static JacobData jacobData;
-	private static int year;
+    private static JacobData jacobData = null;
+    private static boolean isRunning = false;
 
-	//    public static boolean needsUpdate() {
-	//
-	//    }
+    public static void initialize() {
+        // TODO: cache this when stop and start
+        setJacobData(gson.fromJson(getJson("https://hst.sh/raw/ceziketoko.json"), JacobData.class));
+    }
 
-	public static void setJacobData(JacobData data) {
-		JacobHandler.jacobData = data;
-	}
+    public static boolean needsUpdate() {
+        return jacobData == null || jacobData.getYear() != getSkyblockYear();
+    }
+
+    public static void setJacobData(JacobData jacobData) {
+        JacobHandler.jacobData = jacobData;
+        if (!isRunning) {
+            queue();
+        }
+    }
+
+    private static void queue() {
+        if(jacobData == null){
+            isRunning = false;
+            return;
+        }
+
+        JacobContest nextContest = jacobData.getNextContest();
+        if (nextContest != null) {
+            isRunning = true;
+            scheduler.schedule(() -> {
+                MessageEmbed embed = defaultEmbed("Jacob's Contest")
+                        .setDescription("The next farming contest is starting <t:" + nextContest.getTimeInstant().getEpochSecond() + ":R>\n")
+                        .addField("Crops", nextContest.getCropsFormatted(), false)
+                        .build();
+                for (AutomaticGuild guild : guildMap.values()) {
+                    guild.onFarmingContest(nextContest.getCrops(), embed);
+                }
+                queue();
+            }, nextContest.getDurationUntil().minusMinutes(5).toMillis(), TimeUnit.MILLISECONDS);
+        } else {
+            isRunning = false;
+        }
+    }
 }

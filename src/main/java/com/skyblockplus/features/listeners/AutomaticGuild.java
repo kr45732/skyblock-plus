@@ -18,15 +18,6 @@
 
 package com.skyblockplus.features.listeners;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.features.skyblockevent.SkyblockEventCommand.endSkyblockEvent;
-import static com.skyblockplus.utils.ApiHandler.getGuildFromId;
-import static com.skyblockplus.utils.Constants.NUMBER_TO_RARITY_MAP;
-import static com.skyblockplus.utils.Constants.RARITY_TO_NUMBER_MAP;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -36,23 +27,13 @@ import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
 import com.skyblockplus.features.apply.ApplyGuild;
 import com.skyblockplus.features.apply.ApplyUser;
+import com.skyblockplus.features.jacob.FarmingContest;
 import com.skyblockplus.features.party.Party;
 import com.skyblockplus.features.setup.SetupCommandHandler;
 import com.skyblockplus.features.skyblockevent.SkyblockEventCommand;
 import com.skyblockplus.features.skyblockevent.SkyblockEventHandler;
 import com.skyblockplus.features.verify.VerifyGuild;
 import com.skyblockplus.utils.structs.HypixelResponse;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.Writer;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
@@ -69,6 +50,26 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.Writer;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.features.skyblockevent.SkyblockEventCommand.endSkyblockEvent;
+import static com.skyblockplus.utils.ApiHandler.getGuildFromId;
+import static com.skyblockplus.utils.Constants.NUMBER_TO_RARITY_MAP;
+import static com.skyblockplus.utils.Utils.*;
 
 public class AutomaticGuild {
 
@@ -93,6 +94,7 @@ public class AutomaticGuild {
 	public final String guildId;
 	public final List<ScheduledFuture<?>> scheduledFutures = new ArrayList<>();
 	public String prefix;
+	public FarmingContest farmingContest;
 
 	/* Constructor */
 	public AutomaticGuild(GenericGuildEvent event) {
@@ -106,6 +108,7 @@ public class AutomaticGuild {
 		try {
 			partyFinderCategory = event.getGuild().getCategoryById(database.getPartyFinderCategoryId(guildId));
 		} catch (Exception ignored) {}
+		farmingContest = new FarmingContest(guildId);
 	}
 
 	public static String getGuildPrefix(String guildId) {
@@ -918,5 +921,9 @@ public class AutomaticGuild {
 
 	public void setPartyList(List<Party> partyList) {
 		this.partyList = partyList;
+	}
+
+	public void onFarmingContest(List<String> crops, MessageEmbed embed){
+		farmingContest.onFarmingContest(crops, embed);
 	}
 }

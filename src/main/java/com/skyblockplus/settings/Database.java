@@ -31,6 +31,7 @@ import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.api.serversettings.automatedroles.AutomatedRoles;
 import com.skyblockplus.api.serversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.serversettings.automatedverify.AutomatedVerify;
+import com.skyblockplus.api.serversettings.jacob.JacobSettings;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsService;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
@@ -240,5 +241,13 @@ public class Database {
 
 	public int setApplyGuestRole(String serverId, String newSettings) {
 		return settingsService.setApplyGuestRole(serverId, newSettings).getStatusCodeValue();
+	}
+
+    public JsonElement getJacobSettings(String serverId) {
+		return gson.toJsonTree(settingsService.getJacobSettings(serverId).getBody());
+    }
+
+	public int setJacobSettings(String serverId, JsonElement newSettings) {
+		return settingsService.setJacobSettings(serverId, gson.fromJson(newSettings, JacobSettings.class)).getStatusCodeValue();
 	}
 }

@@ -59,7 +59,6 @@ public class TimeCommand extends Command {
 		long now = Instant.now().toEpochMilli();
 
 		long currentOffset = (now - YEAR_0) % YEAR_MS;
-		long currentYear = Math.floorDiv((now - YEAR_0), YEAR_MS);
 		int currentMonth = (int) Math.floorDiv(currentOffset, MONTH_MS);
 		long currentMonthOffset = (currentOffset - (long) currentMonth * MONTH_MS) % MONTH_MS;
 		int currentDay = (int) Math.floorDiv(currentMonthOffset, DAY_MS);
@@ -77,9 +76,15 @@ public class TimeCommand extends Command {
 		}
 
 		return defaultEmbed("Skyblock Time")
-			.addField("Year", "" + (currentYear + 1), false)
+			.addField("Year", "" + getSkyblockYear(), false)
 			.addField("Date", SEASONS[currentMonth] + " **" + nth(currentDay + 1) + "**", false)
 			.addField("Time", currentHour + ":" + padStart("" + ((int) Math.floorDiv(currentMinute, 10) * 10), 2, '0') + suffix, false);
+	}
+
+	public static int getSkyblockYear(){
+		long now = Instant.now().toEpochMilli();
+		long currentYear = Math.floorDiv((now - YEAR_0), YEAR_MS);
+		return (int) (currentYear + 1);
 	}
 
 	public static String nth(int n) {

@@ -165,6 +165,7 @@ public class SettingsExecute {
 		} else if (args.length == 1) {
 			eb = defaultSettingsEmbed();
 			eb.addField("General Settings", "Use `" + guildPrefix + "settings general` to see the current settings", false);
+			eb.addField("Jacob Settings", "Use `" + guildPrefix + "settings jacob` to see the farming event settings", false);
 			eb.addField("Verify Settings", "Use `" + guildPrefix + "settings verify` to see the current settings", false);
 			eb.addField("Guild Settings", "Use `" + guildPrefix + "settings guild` to see the current settings", false);
 			eb.addField("Roles Settings", "Use `" + guildPrefix + "settings roles` to see the current settings", false);
@@ -178,7 +179,31 @@ public class SettingsExecute {
 			eb.addField("Party Finder Category", pfCategory.equals("none") ? "None" : "<#" + pfCategory + ">", false);
 			String applyGuestRole = higherDepth(currentSettings, "applyGuestRole", "none");
 			eb.addField("Guest Role", applyGuestRole.equals("none") ? "None" : "<@&" + applyGuestRole + ">", false);
-		} else if (args.length >= 2 && args[1].equals("roles")) {
+		} else if (args.length >= 2 && args[1].equals("jacob")) {
+			if(args.length == 2){
+				eb = displayJacobSettings(higherDepth(currentSettings, "jacobSettings"));
+			}else if(args.length == 3){
+				if(args[2].equals("enable")){
+					eb = setJacobEnable(true);
+				}else if(args[2].equals("disable")){
+					eb = setJacobEnable(false);
+				}
+			}else if(args.length ==4){
+				if(args[2].equals("remove")){
+					eb = removeJacobCrop(args[3]);
+				}else if(args[2].equals("channel")){
+					eb = setJacobChannel(args[3]);
+				}
+			}else if(args.length == 5){
+				if(args[2].equals("add")){
+					eb = addJacobCrop(args[3], args[4]);
+				}
+			}
+
+			if (eb == null) {
+				eb = errorEmbed("settings jacob");
+			}
+		}else if (args.length >= 2 && args[1].equals("roles")) {
 			if (args.length == 2) {
 				if (higherDepth(currentSettings, "automatedRoles") != null) {
 					getRolesSettings(higherDepth(currentSettings, "automatedRoles")).build().paginate(channel, 0);
@@ -456,6 +481,195 @@ public class SettingsExecute {
 		return eb;
 	}
 
+	/* Jacob Settings */
+	public EmbedBuilder displayJacobSettings(JsonElement jacobSettings) {
+		String ebFieldString = "";
+		ebFieldString += "**" + displaySettings(jacobSettings, "enable") + "**";
+		ebFieldString += "\n**• Channel:** " + displaySettings(jacobSettings, "channel");
+		ebFieldString += "\n**• Crop(s):** " + displaySettings(jacobSettings, "crops");
+		return defaultEmbed("Jacob Settings").setDescription(ebFieldString);
+	}
+
+	public EmbedBuilder setJacobChannel(String textChannel) {
+		try {
+			TextChannel channel = guild.getTextChannelById(textChannel.replaceAll("[<#>]", ""));
+			JsonObject jacobSettings = database.getJacobSettings(guild.getId()).getAsJsonObject();
+			jacobSettings.addProperty("channel", channel.getId());
+			int responseCode = database.setJacobSettings(guild.getId(), jacobSettings);
+			if (responseCode != 200) {
+				return invalidEmbed("API returned response code " + responseCode);
+			}
+
+			return defaultSettingsEmbed("**Jacob channel set to:** " + channel.getAsMention());
+		} catch (Exception ignored) {}
+		return defaultEmbed("Invalid Text Channel");
+	}
+
+	public EmbedBuilder removeJacobCrop(String crop) {
+		crop = capitalizeString(crop);
+
+		JsonObject jacobSettings = database.getJacobSettings(guild.getId()).getAsJsonObject();
+		JsonArray jacobRoles = higherDepth(jacobSettings, "crops").getAsJsonArray();
+
+		for (int i = jacobRoles.size() - 1; i >= 0; i--) {
+			if (higherDepth(jacobRoles.get(i), "value").getAsString().equals(crop)) {
+				jacobRoles.remove(i);
+			}
+		}
+
+		jacobSettings.add("crops", jacobRoles);
+		if (jacobRoles.size() == 0) {
+			jacobSettings.addProperty("enable", "false");
+		}
+		int responseCode = database.setJacobSettings(guild.getId(), jacobSettings);
+
+		if (responseCode != 200) {
+			return invalidEmbed("API returned response code " + responseCode);
+		}
+
+		guildMap.get(guild.getId()).farmingContest.reloadSettingsJson(jacobSettings);
+
+		return defaultSettingsEmbed("**Removed jacob crop:** " + crop);
+	}
+
+	public EmbedBuilder addJacobCrop(String crop, String roleMention) {
+		crop = capitalizeString(crop);
+		List<String> validCrops = Arrays.asList("Wheat", "Carrot", "Potato", "Pumpkin", "Melon", "Mushroom", "Cactus", "Sugar Cane", "Nether Wart", "Cocoa Beans");
+		if(!validCrops.contains(crop)){
+			return invalidEmbed("Invalid crop name\n\nValid crop names are: " + String.join(", ", validCrops));
+		}
+
+		Object eb = checkRole(roleMention);
+		if (eb instanceof EmbedBuilder) {
+			return ((EmbedBuilder) eb);
+		}
+		Role role = ((Role) eb);
+
+		JsonObject jacobSettings = database.getJacobSettings(guild.getId()).getAsJsonObject();
+		JsonArray crops = higherDepth(jacobSettings, "crops").getAsJsonArray();
+
+		crops.add(gson.toJsonTree(new RoleObject(crop, role.getId())));
+		jacobSettings.add("crops", crops);
+		int responseCode = database.setJacobSettings(guild.getId(), jacobSettings);
+
+		if (responseCode != 200) {
+			return invalidEmbed("API returned response code " + responseCode);
+		}
+		guildMap.get(guild.getId()).farmingContest.reloadSettingsJson(jacobSettings);
+
+		return defaultSettingsEmbed("**Jacob crop added:** " + crop + " - " + role.getAsMention());
+	}
+
+	public EmbedBuilder setJacobEnable(boolean enable){
+		JsonObject jacobSettings = database.getJacobSettings(guild.getId()).getAsJsonObject();
+		if (!enable) {
+			jacobSettings.addProperty("enable", "false");
+			int responseCode = database.setJacobSettings(guild.getId(), jacobSettings);
+			if (responseCode != 200) {
+				return apiFailMessage(responseCode);
+			}
+			guildMap.get(guild.getId()).farmingContest.reloadSettingsJson(jacobSettings);
+
+			return defaultSettingsEmbed("Disabled jacob settings.");
+		}
+
+		try{guild.getTextChannelById(higherDepth(jacobSettings, "channel").getAsString()).getId();
+			higherDepth(jacobSettings, "crops").getAsJsonArray().get(0);
+		}catch (Exception e){
+			return invalidEmbed("All settings (channel and at least one crop) must be set before enabling");
+		}
+
+		jacobSettings.addProperty("enable", "true");
+		int responseCode = database.setJacobSettings(guild.getId(), jacobSettings);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+		guildMap.get(guild.getId()).farmingContest.reloadSettingsJson(jacobSettings);
+
+		return defaultSettingsEmbed("Disabled jacob settings.");
+	}
+
+	/* Apply Settings */
+	public EmbedBuilder removeApplyBlacklist(String username) {
+		UsernameUuidStruct uuidStruct = usernameToUuid(username);
+		if (uuidStruct.isNotValid()) {
+			return invalidEmbed(uuidStruct.getFailCause());
+		}
+
+		JsonArray currentBlacklist = database.getApplyBlacklist(guild.getId());
+		for (int i = 0; i < currentBlacklist.size(); i++) {
+			if (
+				higherDepth(currentBlacklist.get(i), "uuid").getAsString().equals(uuidStruct.getUuid()) ||
+				higherDepth(currentBlacklist.get(i), "username").getAsString().equals(uuidStruct.getUsername())
+			) {
+				currentBlacklist.remove(i);
+				int responseCode = database.setApplyBlacklist(guild.getId(), currentBlacklist);
+				if (responseCode != 200) {
+					return apiFailMessage(responseCode);
+				}
+
+				return defaultSettingsEmbed()
+					.setDescription("Removed " + nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()) + " from the blacklist");
+			}
+		}
+
+		return invalidEmbed(nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()) + " is not blacklisted");
+	}
+
+	public EmbedBuilder listApplyBlacklist() {
+		JsonArray currentBlacklist = database.getApplyBlacklist(guild.getId());
+		EmbedBuilder eb = defaultSettingsEmbed();
+		if (currentBlacklist.size() == 0) {
+			return eb.setDescription("No one is blacklisted.");
+		}
+
+		for (JsonElement blacklisted : currentBlacklist) {
+			eb.appendDescription(
+				"• " +
+				nameMcHyperLink(higherDepth(blacklisted, "username").getAsString(), higherDepth(blacklisted, "uuid").getAsString()) +
+				" - " +
+				higherDepth(blacklisted, "reason").getAsString() +
+				"\n"
+			);
+		}
+		return eb;
+	}
+
+	public EmbedBuilder addApplyBlacklist(String username, String reason) {
+		UsernameUuidStruct uuidStruct = usernameToUuid(username);
+		if (uuidStruct.isNotValid()) {
+			return invalidEmbed(uuidStruct.getFailCause());
+		}
+
+		JsonArray currentBlacklist = database.getApplyBlacklist(guild.getId());
+		JsonElement blacklistedUser = streamJsonArray(currentBlacklist)
+			.filter(blacklist ->
+				higherDepth(blacklist, "uuid").getAsString().equals(uuidStruct.getUuid()) ||
+				higherDepth(blacklist, "username").getAsString().equals(uuidStruct.getUsername())
+			)
+			.findFirst()
+			.orElse(null);
+		if (blacklistedUser != null) {
+			return invalidEmbed(
+				nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()) +
+				" is already blacklisted with reason `" +
+				higherDepth(blacklistedUser, "reason").getAsString() +
+				"`"
+			);
+		}
+
+		currentBlacklist.add(gson.toJsonTree(new ApplyBlacklist(uuidStruct.getUsername(), uuidStruct.getUuid(), reason)));
+		int responseCode = database.setApplyBlacklist(guild.getId(), currentBlacklist);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		return defaultSettingsEmbed()
+			.setDescription(
+				"Blacklisted " + nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()) + " with reason `" + reason + "`"
+			);
+	}
+
 	public EmbedBuilder createNewGuild(String guildName) {
 		HypixelResponse guildResponse = getGuildFromName(guildName);
 		if (guildResponse.isNotValid()) {
@@ -464,8 +678,8 @@ public class SettingsExecute {
 
 		String guildNameFormatted = guildResponse.get("name").getAsString();
 		AutomatedGuild guildSettings = new AutomatedGuild(
-			guildNameFormatted.toLowerCase().replace(" ", "_"),
-			guildResponse.get("_id").getAsString()
+				guildNameFormatted.toLowerCase().replace(" ", "_"),
+				guildResponse.get("_id").getAsString()
 		);
 
 		int responseCode = database.setGuildSettings(guild.getId(), gson.toJsonTree(guildSettings));
@@ -561,16 +775,16 @@ public class SettingsExecute {
 		}
 
 		VoiceChannel guildMemberCounterChannel = guild
-			.createVoiceChannel(
-				guildJson.get("name").getAsString() + " Members: " + guildJson.get("members").getAsJsonArray().size() + "/125"
-			)
-			.addPermissionOverride(guild.getPublicRole(), EnumSet.of(Permission.VIEW_CHANNEL), EnumSet.of(Permission.VOICE_CONNECT))
-			.addMemberPermissionOverride(
-				jda.getSelfUser().getIdLong(),
-				EnumSet.of(Permission.VIEW_CHANNEL, Permission.MANAGE_CHANNEL, Permission.VOICE_CONNECT),
-				null
-			)
-			.complete();
+				.createVoiceChannel(
+						guildJson.get("name").getAsString() + " Members: " + guildJson.get("members").getAsJsonArray().size() + "/125"
+				)
+				.addPermissionOverride(guild.getPublicRole(), EnumSet.of(Permission.VIEW_CHANNEL), EnumSet.of(Permission.VOICE_CONNECT))
+				.addMemberPermissionOverride(
+						jda.getSelfUser().getIdLong(),
+						EnumSet.of(Permission.VIEW_CHANNEL, Permission.MANAGE_CHANNEL, Permission.VOICE_CONNECT),
+						null
+				)
+				.complete();
 		guildSettings.addProperty("guildCounterEnable", "true");
 		guildSettings.addProperty("guildCounterChannel", guildMemberCounterChannel.getId());
 
@@ -614,21 +828,21 @@ public class SettingsExecute {
 				}
 
 				return defaultSettingsEmbed(
-					"Added guild rank: " + higherDepth(guildRank, "name").getAsString() + " - " + role.getAsMention()
+						"Added guild rank: " + higherDepth(guildRank, "name").getAsString() + " - " + role.getAsMention()
 				);
 			}
 		}
 
 		return invalidEmbed(
-			"Invalid guild rank. " +
-			(
-				guildRanks.size() > 0
-					? "Valid guild ranks are: " +
-					streamJsonArray(guildRanks)
-						.map(r -> higherDepth(r, "name").getAsString().replace(" ", "_"))
-						.collect(Collectors.joining(", "))
-					: "No guild ranks found"
-			)
+				"Invalid guild rank. " +
+						(
+								guildRanks.size() > 0
+										? "Valid guild ranks are: " +
+										streamJsonArray(guildRanks)
+												.map(r -> higherDepth(r, "name").getAsString().replace(" ", "_"))
+												.collect(Collectors.joining(", "))
+										: "No guild ranks found"
+						)
 		);
 	}
 
@@ -667,12 +881,12 @@ public class SettingsExecute {
 		}
 
 		if (
-			!higherDepth(guildSettings, "applyMessageChannel", "").isEmpty() &&
-			!higherDepth(guildSettings, "applyStaffChannel", "").isEmpty() &&
-			!higherDepth(guildSettings, "applyCategory", "").isEmpty() &&
-			!higherDepth(guildSettings, "applyMessage", "").isEmpty() &&
-			!higherDepth(guildSettings, "applyAcceptMessage", "").isEmpty() &&
-			!higherDepth(guildSettings, "applyDenyMessage", "").isEmpty()
+				!higherDepth(guildSettings, "applyMessageChannel", "").isEmpty() &&
+						!higherDepth(guildSettings, "applyStaffChannel", "").isEmpty() &&
+						!higherDepth(guildSettings, "applyCategory", "").isEmpty() &&
+						!higherDepth(guildSettings, "applyMessage", "").isEmpty() &&
+						!higherDepth(guildSettings, "applyAcceptMessage", "").isEmpty() &&
+						!higherDepth(guildSettings, "applyDenyMessage", "").isEmpty()
 		) {
 			guildSettings.addProperty("applyEnable", "true");
 			int responseCode = database.setGuildSettings(guild.getId(), guildSettings);
@@ -774,7 +988,7 @@ public class SettingsExecute {
 		}
 
 		return defaultSettingsEmbed(
-			"Set apply waiting for invite channel to: " + (waitingChannel == null ? "none" : waitingChannel.getAsMention())
+				"Set apply waiting for invite channel to: " + (waitingChannel == null ? "none" : waitingChannel.getAsMention())
 		);
 	}
 
@@ -798,8 +1012,8 @@ public class SettingsExecute {
 		}
 
 		guildSettings.addProperty(
-			"applyWaitlistMessage",
-			waitlistMessage.equalsIgnoreCase("none") ? "none" : EmojiParser.parseToAliases(waitlistMessage)
+				"applyWaitlistMessage",
+				waitlistMessage.equalsIgnoreCase("none") ? "none" : EmojiParser.parseToAliases(waitlistMessage)
 		);
 		int responseCode = database.setGuildSettings(guild.getId(), guildSettings);
 		if (responseCode != 200) {
@@ -922,14 +1136,14 @@ public class SettingsExecute {
 		}
 
 		return defaultSettingsEmbed(
-			"Added an apply requirement:\n• Slayer - " +
-			slayerReq +
-			"\n• Skills - " +
-			skillsReq +
-			"\n• Catacombs - " +
-			cataReq +
-			"\n• Weight - " +
-			weightReq
+				"Added an apply requirement:\n• Slayer - " +
+						slayerReq +
+						"\n• Skills - " +
+						skillsReq +
+						"\n• Catacombs - " +
+						cataReq +
+						"\n• Weight - " +
+						weightReq
 		);
 	}
 
@@ -947,18 +1161,18 @@ public class SettingsExecute {
 			}
 
 			return defaultSettingsEmbed(
-				"Removed an apply requirement:\n• Slayer - " +
-				higherDepth(req, "slayerReq", 0) +
-				"\n• Skills - " +
-				higherDepth(req, "skillsReq", 0) +
-				"\n• Catacombs - " +
-				higherDepth(req, "catacombsReq", 0) +
-				"\n• Weight - " +
-				higherDepth(req, "weightReq", 0)
+					"Removed an apply requirement:\n• Slayer - " +
+							higherDepth(req, "slayerReq", 0) +
+							"\n• Skills - " +
+							higherDepth(req, "skillsReq", 0) +
+							"\n• Catacombs - " +
+							higherDepth(req, "catacombsReq", 0) +
+							"\n• Weight - " +
+							higherDepth(req, "weightReq", 0)
 			);
 		} catch (Exception e) {
 			return invalidEmbed(
-				"Invalid requirement number. Run `" + guildPrefix + "settings guild <name>` to see the current apply requirements"
+					"Invalid requirement number. Run `" + guildPrefix + "settings guild <name>` to see the current apply requirements"
 			);
 		}
 	}
@@ -975,88 +1189,6 @@ public class SettingsExecute {
 		return defaultSettingsEmbed("Removed automated guild for " + name);
 	}
 
-	/* Apply Settings */
-	public EmbedBuilder removeApplyBlacklist(String username) {
-		UsernameUuidStruct uuidStruct = usernameToUuid(username);
-		if (uuidStruct.isNotValid()) {
-			return invalidEmbed(uuidStruct.getFailCause());
-		}
-
-		JsonArray currentBlacklist = database.getApplyBlacklist(guild.getId());
-		for (int i = 0; i < currentBlacklist.size(); i++) {
-			if (
-				higherDepth(currentBlacklist.get(i), "uuid").getAsString().equals(uuidStruct.getUuid()) ||
-				higherDepth(currentBlacklist.get(i), "username").getAsString().equals(uuidStruct.getUsername())
-			) {
-				currentBlacklist.remove(i);
-				int responseCode = database.setApplyBlacklist(guild.getId(), currentBlacklist);
-				if (responseCode != 200) {
-					return apiFailMessage(responseCode);
-				}
-
-				return defaultSettingsEmbed()
-					.setDescription("Removed " + nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()) + " from the blacklist");
-			}
-		}
-
-		return invalidEmbed(nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()) + " is not blacklisted");
-	}
-
-	public EmbedBuilder listApplyBlacklist() {
-		JsonArray currentBlacklist = database.getApplyBlacklist(guild.getId());
-		EmbedBuilder eb = defaultSettingsEmbed();
-		if (currentBlacklist.size() == 0) {
-			return eb.setDescription("No one is blacklisted.");
-		}
-
-		for (JsonElement blacklisted : currentBlacklist) {
-			eb.appendDescription(
-				"• " +
-				nameMcHyperLink(higherDepth(blacklisted, "username").getAsString(), higherDepth(blacklisted, "uuid").getAsString()) +
-				" - " +
-				higherDepth(blacklisted, "reason").getAsString() +
-				"\n"
-			);
-		}
-		return eb;
-	}
-
-	public EmbedBuilder addApplyBlacklist(String username, String reason) {
-		UsernameUuidStruct uuidStruct = usernameToUuid(username);
-		if (uuidStruct.isNotValid()) {
-			return invalidEmbed(uuidStruct.getFailCause());
-		}
-
-		JsonArray currentBlacklist = database.getApplyBlacklist(guild.getId());
-		JsonElement blacklistedUser = streamJsonArray(currentBlacklist)
-			.filter(blacklist ->
-				higherDepth(blacklist, "uuid").getAsString().equals(uuidStruct.getUuid()) ||
-				higherDepth(blacklist, "username").getAsString().equals(uuidStruct.getUsername())
-			)
-			.findFirst()
-			.orElse(null);
-		if (blacklistedUser != null) {
-			return invalidEmbed(
-				nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()) +
-				" is already blacklisted with reason `" +
-				higherDepth(blacklistedUser, "reason").getAsString() +
-				"`"
-			);
-		}
-
-		currentBlacklist.add(gson.toJsonTree(new ApplyBlacklist(uuidStruct.getUsername(), uuidStruct.getUuid(), reason)));
-		int responseCode = database.setApplyBlacklist(guild.getId(), currentBlacklist);
-		if (responseCode != 200) {
-			return apiFailMessage(responseCode);
-		}
-
-		return defaultSettingsEmbed()
-			.setDescription(
-				"Blacklisted " + nameMcHyperLink(uuidStruct.getUsername(), uuidStruct.getUuid()) + " with reason `" + reason + "`"
-			);
-	}
-
-	/* Guild Role Settings */
 	public EmbedBuilder getGuildSettings(String name) {
 		JsonElement settings = database.getGuildSettings(guild.getId(), name);
 		if (settings == null || settings.isJsonNull()) {
@@ -1646,7 +1778,7 @@ public class SettingsExecute {
 
 		if (!roleName.equals("guild_member")) {
 			currentLevels =
-				collectJsonArray(streamJsonArray(currentLevels).sorted(Comparator.comparingInt(o -> higherDepth(o, "value").getAsInt())));
+				collectJsonArray(streamJsonArray(currentLevels).sorted(Comparator.comparingLong(o -> higherDepth(o, "value").getAsLong())));
 		} else {
 			roleValue = guildName;
 		}
@@ -2292,6 +2424,18 @@ public class SettingsExecute {
 				}
 
 				return ebStr.toString();
+			}else if (settingName.equals("crops")) {
+				JsonArray roles = higherDepth(jsonSettings, settingName).getAsJsonArray();
+				List<String> ebStr = new ArrayList<>();
+				for (JsonElement role : roles) {
+					ebStr.add(higherDepth(role, "value").getAsString() +  " - " + "<@&" + higherDepth(role, "roleId").getAsString() + ">");
+				}
+
+				if (ebStr.isEmpty()) {
+					return "None";
+				}
+
+				return String.join(", ", ebStr);
 			}
 
 			String currentSettingValue = higherDepth(jsonSettings, settingName).getAsString();
@@ -2301,6 +2445,7 @@ public class SettingsExecute {
 					case "applyWaitingChannel":
 					case "applyStaffChannel":
 					case "messageTextChannelId":
+					case "channel":
 						return "<#" + currentSettingValue + ">";
 					case "roleId":
 					case "guildMemberRole":
