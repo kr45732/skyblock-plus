@@ -21,14 +21,15 @@ package com.skyblockplus.features.jacob;
 import com.skyblockplus.api.miscellaneous.JacobData;
 
 public class JacobHandler {
-    private static JacobData jacobData;
-    private static int year;
 
-//    public static boolean needsUpdate() {
-//
-//    }
+	private static JacobData jacobData;
+	private static int year;
 
-    public static void setJacobData(JacobData data){
-        JacobHandler.jacobData = data;
-    }
+	//    public static boolean needsUpdate() {
+	//
+	//    }
+
+	public static void setJacobData(JacobData data) {
+		JacobHandler.jacobData = data;
+	}
 }

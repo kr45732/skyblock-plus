@@ -25,7 +25,7 @@ import org.springframework.web.servlet.view.RedirectView;
 @RestController
 public class WebsiteRedirector {
 
-	@RequestMapping(value = {"", "/"})
+	@RequestMapping(value = { "", "/" })
 	public RedirectView base() {
 		RedirectView redirectView = new RedirectView();
 		redirectView.setUrl("https://skyblock-plus.vercel.app/");
