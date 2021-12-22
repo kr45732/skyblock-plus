@@ -16,19 +16,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.api.miscellaneous;
+package com.skyblockplus.features.jacob;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.view.RedirectView;
+import com.skyblockplus.api.miscellaneous.JacobData;
 
-@RestController
-public class WebsiteRedirector {
+public class JacobHandler {
+    private static JacobData jacobData;
+    private static int year;
 
-	@RequestMapping(value = {"", "/"})
-	public RedirectView base() {
-		RedirectView redirectView = new RedirectView();
-		redirectView.setUrl("https://skyblock-plus.vercel.app/");
-		return redirectView;
-	}
+//    public static boolean needsUpdate() {
+//
+//    }
+
+    public static void setJacobData(JacobData data){
+        JacobHandler.jacobData = data;
+    }
 }

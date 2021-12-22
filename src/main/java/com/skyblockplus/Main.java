@@ -250,15 +250,6 @@ public class Main {
 				)
 				.setActivity(Activity.playing("Loading..."))
 				.setMemberCachePolicy(MemberCachePolicy.ALL)
-				.setChunkingFilter(
-					ChunkingFilter.exclude(
-						374071874222686211L,
-						110373943822540800L,
-						597450230430040076L,
-						703967135961055314L,
-						858695709393027102L
-					)
-				)
 				.disableCache(CacheFlag.VOICE_STATE)
 				.enableIntents(GatewayIntent.GUILD_MEMBERS)
 				.build();
