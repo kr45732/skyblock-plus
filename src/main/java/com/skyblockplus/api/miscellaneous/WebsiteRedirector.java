@@ -24,8 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class WebsiteRedirector {
 
-    @GetMapping({"", "/"})
-    public String getBase() {
-        return "redirect:https://skyblock-plus.vercel.app/";
-    }
+	@GetMapping({ "", "/" })
+	public String getBase() {
+		return "redirect:https://skyblock-plus.vercel.app/";
+	}
 }

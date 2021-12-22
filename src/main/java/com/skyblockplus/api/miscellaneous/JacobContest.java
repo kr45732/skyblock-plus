@@ -18,12 +18,12 @@
 
 package com.skyblockplus.api.miscellaneous;
 
-import lombok.Data;
-
 import java.util.List;
+import lombok.Data;
 
 @Data
 public class JacobContest {
-    private long time;
-    private List<String> crops;
+
+	private long time;
+	private List<String> crops;
 }

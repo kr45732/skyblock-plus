@@ -1026,10 +1026,12 @@ public class Utils {
 							for (Map.Entry<String, Object> gem : gems.entrySet()) {
 								if (!gem.getKey().endsWith("_gem")) {
 									if (gem.getKey().equals("unlocked_slots")) {
-										if (itemInfo.getId().equals("DIVAN_HELMET") ||
-												itemInfo.getId().equals("DIVAN_CHESTPLATE") ||
-												itemInfo.getId().equals("DIVAN_LEGGINGS") ||
-												itemInfo.getId().equals("DIVAN_BOOTS")) {
+										if (
+											itemInfo.getId().equals("DIVAN_HELMET") ||
+											itemInfo.getId().equals("DIVAN_CHESTPLATE") ||
+											itemInfo.getId().equals("DIVAN_LEGGINGS") ||
+											itemInfo.getId().equals("DIVAN_BOOTS")
+										) {
 											itemInfo.addExtraValues(gems.getList(gem.getKey()).size(), "GEMSTONE_CHAMBER");
 										}
 									} else if (gems.containsKey(gem.getKey() + "_gem")) {

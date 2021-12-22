@@ -40,7 +40,7 @@ public class EmojiFromUrlCommand extends Command {
 		this.name = "d-em";
 		this.ownerCommand = true;
 		this.botPermissions = defaultPerms();
-		this.aliases = new String[]{"em"};
+		this.aliases = new String[] { "em" };
 	}
 
 	public static JsonElement getSkyCryptItemsJson(String name) {

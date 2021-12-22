@@ -48,8 +48,8 @@ public class GetSettingsCommand extends Command {
 				if (args.length == 1) {
 					event.getChannel().sendMessage(getServerSettings(event.getGuild().getId())).queue();
 					return;
-				}else if (args.length == 2) {
-					if(args[1].equals("all")) {
+				} else if (args.length == 2) {
+					if (args[1].equals("all")) {
 						event.getChannel().sendMessage(getAllServerSettings()).queue();
 					} else {
 						event.getChannel().sendMessage(getServerSettings(args[1])).queue();
@@ -65,7 +65,7 @@ public class GetSettingsCommand extends Command {
 
 	private String getAllServerSettings() {
 		List<ServerSettingsModel> settings = database.getAllServerSettings();
-		if(settings == null){
+		if (settings == null) {
 			return "Unable to fetch all server settings";
 		}
 

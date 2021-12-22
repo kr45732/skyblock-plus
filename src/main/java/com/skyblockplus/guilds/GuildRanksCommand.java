@@ -94,7 +94,8 @@ public class GuildRanksCommand extends Command {
 				higherDepth(
 					JsonParser.parseReader(new FileReader("src/main/java/com/skyblockplus/json/GuildSettings.json")),
 					guildId + ".guild_leaderboard"
-				).getAsJsonObject();
+				)
+					.getAsJsonObject();
 		} catch (Exception e) {
 			return invalidEmbed(
 				guildName +

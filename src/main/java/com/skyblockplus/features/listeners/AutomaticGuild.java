@@ -169,7 +169,7 @@ public class AutomaticGuild {
 		}
 
 		List<AutomatedGuild> currentSettings = database.getAllGuildSettings(guildId);
-		currentSettings.removeIf( o1 -> o1 == null || o1.getGuildName() == null);
+		currentSettings.removeIf(o1 -> o1 == null || o1.getGuildName() == null);
 
 		if (currentSettings.size() == 0) {
 			return "No enabled apply settings";
@@ -838,7 +838,7 @@ public class AutomaticGuild {
 
 				JsonObject toAdd = new JsonObject();
 				toAdd.addProperty("name", itemName);
-				if(itemId.contains("GENERATOR")) {
+				if (itemId.contains("GENERATOR")) {
 					toAdd.add("recipe", higherDepth(itemJson, "recipe"));
 				}
 				toAdd.add("wiki", higherDepth(itemJson, "infoType", "").equals("WIKI_URL") ? higherDepth(itemJson, "info.[0]") : null);

@@ -30,7 +30,6 @@ import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
@@ -154,8 +153,14 @@ public class VerifyGuild {
 				}
 			}
 			try {
-				event.getGuild().removeRoleFromMember(event.getMember(), event.getGuild().getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString())).queue();
-			}catch (Exception ignored){}
+				event
+					.getGuild()
+					.removeRoleFromMember(
+						event.getMember(),
+						event.getGuild().getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString())
+					)
+					.queue();
+			} catch (Exception ignored) {}
 		} catch (Exception e) {
 			updatedRoles = "error";
 		}

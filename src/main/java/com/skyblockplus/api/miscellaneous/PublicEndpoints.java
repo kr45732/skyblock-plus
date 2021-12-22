@@ -64,12 +64,12 @@ public class PublicEndpoints {
 		);
 	}
 
-	@PostMapping(value="/post/jacob", consumes = "application/json", produces = "application/json")
+	@PostMapping(value = "/post/jacob", consumes = "application/json", produces = "application/json")
 	public ResponseEntity<?> postJacobData(@RequestBody JacobData jacobData, @RequestHeader String key) {
-		if(key.equals("2d7569ff0decff164a46e8d417e7b692")) {
+		if (key.equals("2d7569ff0decff164a46e8d417e7b692")) {
 			System.out.println(gson.toJsonTree(jacobData));
 			return new ResponseEntity<>(DataObject.empty().put("success", true), HttpStatus.OK);
-		}else{
+		} else {
 			return new ResponseEntity<>(DataObject.empty().put("success", false).put("cause", "Not authorized"), HttpStatus.FORBIDDEN);
 		}
 	}

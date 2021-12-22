@@ -124,8 +124,13 @@ public class LinkCommand extends Command {
 						}
 					}
 					try {
-						guild.removeRoleFromMember(member, guild.getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString())).queue();
-					}catch (Exception ignored){}
+						guild
+							.removeRoleFromMember(
+								member,
+								guild.getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString())
+							)
+							.queue();
+					} catch (Exception ignored) {}
 				} catch (Exception ignored) {}
 			}
 

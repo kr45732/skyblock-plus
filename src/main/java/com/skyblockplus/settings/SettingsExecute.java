@@ -1941,7 +1941,7 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder setVerifyRemoveRole(String roleMention) {
-		if(roleMention.equalsIgnoreCase("none")){
+		if (roleMention.equalsIgnoreCase("none")) {
 			JsonObject verifySettings = database.getVerifySettings(guild.getId()).getAsJsonObject();
 			verifySettings.addProperty("verifiedRemoveRole", "none");
 			int responseCode = database.setVerifySettings(guild.getId(), verifySettings);

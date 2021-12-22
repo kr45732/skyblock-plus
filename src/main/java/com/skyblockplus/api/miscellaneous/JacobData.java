@@ -18,12 +18,12 @@
 
 package com.skyblockplus.api.miscellaneous;
 
-import lombok.Data;
-
 import java.util.List;
+import lombok.Data;
 
 @Data
 public class JacobData {
-    private int year;
-    private List<JacobContest> contests;
+
+	private int year;
+	private List<JacobContest> contests;
 }

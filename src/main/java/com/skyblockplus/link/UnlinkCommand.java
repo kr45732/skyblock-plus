@@ -52,8 +52,14 @@ public class UnlinkCommand extends Command {
 				}
 			}
 			try {
-				event.getGuild().addRoleToMember(event.getMember(), event.getGuild().getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString())).queue();
-			}catch (Exception ignored){}
+				event
+					.getGuild()
+					.addRoleToMember(
+						event.getMember(),
+						event.getGuild().getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString())
+					)
+					.queue();
+			} catch (Exception ignored) {}
 		} catch (Exception ignored) {}
 		database.deleteLinkedUserByDiscordId(event.getUser().getId());
 		return defaultEmbed("Success").setDescription("You were unlinked");
