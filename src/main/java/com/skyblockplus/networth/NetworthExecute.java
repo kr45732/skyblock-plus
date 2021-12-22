@@ -33,6 +33,8 @@ import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.InvItem;
 import com.skyblockplus.utils.structs.NwItemPrice;
 import java.util.*;
+import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 
 public class NetworthExecute {
@@ -1216,9 +1218,8 @@ public class NetworthExecute {
 						break;
 					default:
 						if (itemId.contains("generator")) {
-							String minionName = itemId.split("_generator_")[0];
-							int level = Integer.parseInt(itemId.split("_generator_")[1]);
-							itemId = minionName + "_minion_" + toRomanNumerals(level);
+							int index = itemId.lastIndexOf("_");
+							return getMinionCost(itemId.substring(0, index).toUpperCase(), Integer.parseInt(itemId.substring(index + 1)));
 						} else if (itemId.startsWith("theoretical_hoe_")) {
 							String parseHoe = itemId.split("theoretical_hoe_")[1];
 							String hoeType = parseHoe.split("_")[0];
@@ -1245,6 +1246,30 @@ public class NetworthExecute {
 
 		tempSet.add(itemId + " - " + iName);
 		return 0;
+	}
+
+	public double getMinionCost(String id, int tier) {
+		return getMinionCost(id, tier, -1);
+	}
+
+	public double getMinionCost(String id, int tier, int depth) {
+		if (tier == 1 && (id.equals("FLOWER_GENERATOR") || id.equals("SNOW_GENERATOR"))) {
+			String finalId = id.split("GENERATOR")[0].toLowerCase() + "minion_i";
+			return streamJsonArray(sbzPrices).filter(i -> higherDepth(i, "name", "").equals(finalId)).map(i -> higherDepth(i, "low", 0)).findFirst().orElse(0);
+		}
+
+		double cost = 0;
+		for (String material : higherDepth(getInternalJsonMappings(), id + "_" + tier + ".recipe").getAsJsonObject().entrySet().stream().map(e -> e.getValue().getAsString()).collect(Collectors.toList())) {
+			String[] idCountSplit = material.split(":");
+			if (idCountSplit[0].contains("GENERATOR")) {
+				if(depth - 1 != 0) {
+					cost += getMinionCost(id, tier - 1, depth - 1);
+				}
+			} else {
+				cost += getLowestPrice(idCountSplit[0].replace("-", ":"), "") * Integer.parseInt(idCountSplit[1]);
+			}
+		}
+		return cost;
 	}
 
 	public JsonElement getVerboseJson() {

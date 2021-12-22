@@ -23,7 +23,7 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.*;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.skyblockplus.api.miscellaneous.CommandEndpoints;
+import com.skyblockplus.api.miscellaneous.PublicEndpoints;
 import com.skyblockplus.dev.*;
 import com.skyblockplus.dungeons.*;
 import com.skyblockplus.features.listeners.MainListener;
@@ -71,6 +71,7 @@ import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.RestAction;
+import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.slf4j.Logger;
@@ -139,14 +140,13 @@ public class Main {
 					new SetupCommand(),
 					new CategoriesCommand(),
 					new PartyFinderCommand(),
-					new QuickSetupTestCommand(),
-					new EmojiMapServerCommand(),
+					new DevSettingsCommand(),
+					new GetServerEmojisCommand(),
 					new EnderChestCommand(),
-					new GetAllGuildsIn(),
 					new LinkCommand(),
-					new GetSettingsFile(),
+					new GetSettingsCommand(),
 					new UnlinkCommand(),
-					new LinkedUserDev(),
+					new LinkedUserCommand(),
 					new BazaarCommand(),
 					new AverageAuctionCommand(),
 					new PetsCommand(),
@@ -250,6 +250,7 @@ public class Main {
 				)
 				.setActivity(Activity.playing("Loading..."))
 				.setMemberCachePolicy(MemberCachePolicy.ALL)
+				.setChunkingFilter(ChunkingFilter.exclude(374071874222686211L, 110373943822540800L, 597450230430040076L, 703967135961055314L, 858695709393027102L))
 				.disableCache(CacheFlag.VOICE_STATE)
 				.enableIntents(GatewayIntent.GUILD_MEMBERS)
 				.build();
@@ -264,7 +265,7 @@ public class Main {
 		ApiHandler.initialize();
 		TrackAuctionsCommand.initialize();
 		AuctionFlipper.setEnable(true);
-		CommandEndpoints.initialize();
+		PublicEndpoints.initialize();
 	}
 
 	@PreDestroy

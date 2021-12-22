@@ -22,14 +22,15 @@ import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
@@ -152,6 +153,9 @@ public class VerifyGuild {
 					updatedRoles = "error";
 				}
 			}
+			try {
+				event.getGuild().removeRoleFromMember(event.getMember(), event.getGuild().getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString())).queue();
+			}catch (Exception ignored){}
 		} catch (Exception e) {
 			updatedRoles = "error";
 		}

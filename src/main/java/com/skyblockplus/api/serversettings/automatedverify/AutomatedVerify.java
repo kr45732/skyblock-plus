@@ -45,6 +45,8 @@ public class AutomatedVerify {
 	@Fetch(value = FetchMode.SUBSELECT)
 	private List<String> verifiedRoles = new ArrayList<>();
 
+	private String verifiedRemoveRole = "";
+
 	private String verifiedNickname = "";
 
 	private String previousMessageId = "";

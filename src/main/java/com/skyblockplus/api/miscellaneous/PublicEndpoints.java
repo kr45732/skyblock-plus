@@ -28,13 +28,11 @@ import java.util.stream.Collectors;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/api/public")
-public class CommandEndpoints {
+public class PublicEndpoints {
 
 	private static List<Map<String, Object>> apiCommandList;
 
@@ -53,14 +51,26 @@ public class CommandEndpoints {
 
 	@GetMapping("/get/stats")
 	public ResponseEntity<?> getStats() {
+		Map<String, Integer> commandUses = getCommandUses();
 		return new ResponseEntity<>(
 			DataObject
 				.empty()
 				.put("guild_count", jda.getGuildCache().size())
 				.put("user_count", jda.getUserCache().size())
-				.put("command_uses", getCommandUses())
+				.put("total_command_uses", commandUses.values().stream().mapToInt(Integer::intValue).sum())
+				.put("command_uses", commandUses)
 				.toMap(),
 			HttpStatus.OK
 		);
+	}
+
+	@PostMapping(value="/post/jacob", consumes = "application/json", produces = "application/json")
+	public ResponseEntity<?> postJacobData(@RequestBody JacobData jacobData, @RequestHeader String key) {
+		if(key.equals("2d7569ff0decff164a46e8d417e7b692")) {
+			System.out.println(gson.toJsonTree(jacobData));
+			return new ResponseEntity<>(DataObject.empty().put("success", true), HttpStatus.OK);
+		}else{
+			return new ResponseEntity<>(DataObject.empty().put("success", false).put("cause", "Not authorized"), HttpStatus.FORBIDDEN);
+		}
 	}
 }

@@ -76,7 +76,7 @@ public class InventoryPaginator {
 			}
 		}
 
-		pagePart1.editMessage(enderChestPages.get(pageNumber)[0]).complete();
+		pagePart1.editMessage(enderChestPages.get(pageNumber)[0]).queue();
 		event.editMessage(enderChestPages.get(pageNumber)[1]).complete();
 
 		waitForEvent();

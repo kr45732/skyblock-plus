@@ -37,9 +37,10 @@ public class EmojiFromUrlCommand extends Command {
 	public static final JsonObject addedObj = new JsonObject();
 
 	public EmojiFromUrlCommand() {
-		this.name = "em";
+		this.name = "d-em";
 		this.ownerCommand = true;
 		this.botPermissions = defaultPerms();
+		this.aliases = new String[]{"em"};
 	}
 
 	public static JsonElement getSkyCryptItemsJson(String name) {
@@ -62,7 +63,7 @@ public class EmojiFromUrlCommand extends Command {
 			@Override
 			protected void execute() {
 				if (!event.getGuild().getName().startsWith("Skyblock Plus - Emoji Server")) {
-					event.reply("Wrong Server!");
+					event.reply("Error: server name must start with `Skyblock Plus - Emoji Server`");
 					return;
 				}
 

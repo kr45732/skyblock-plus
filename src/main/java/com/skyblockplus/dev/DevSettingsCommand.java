@@ -30,9 +30,9 @@ import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
 import com.skyblockplus.utils.command.CommandExecute;
 import net.dv8tion.jda.api.EmbedBuilder;
 
-public class QuickSetupTestCommand extends Command {
+public class DevSettingsCommand extends Command {
 
-	public QuickSetupTestCommand() {
+	public DevSettingsCommand() {
 		this.name = "d-settings";
 		this.ownerCommand = true;
 		this.botPermissions = defaultPerms();

@@ -27,9 +27,9 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import net.dv8tion.jda.api.entities.Emote;
 
-public class EmojiMapServerCommand extends Command {
+public class GetServerEmojisCommand extends Command {
 
-	public EmojiMapServerCommand() {
+	public GetServerEmojisCommand() {
 		this.name = "d-emojis";
 		this.ownerCommand = true;
 		this.aliases = new String[] { "d-emoji" };

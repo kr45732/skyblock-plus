@@ -59,12 +59,12 @@ public abstract class CommandExecute {
 				this.ebMessage =
 					event
 						.getChannel()
-						.sendMessage(
-							"**⚠️ Skyblock Plus will stop responding to message commands <t:1643806800:R>!** Please use slash commands instead. If you do not see slash commands from this bot, then please re-invite the bot using the link in " +
-							getGuildPrefix(event.getGuild().getId()) +
-							"invite."
-						)
-						.setEmbeds(loadingEmbed().build())
+//						.sendMessage(
+//							"**⚠️ Skyblock Plus will stop responding to message commands <t:1651377600:R>!** Please use slash commands instead. If you do not see slash commands from this bot, then please re-invite the bot using the link in " +
+//							getGuildPrefix(event.getGuild().getId()) +
+//							"invite."
+//						)
+						.sendMessageEmbeds(loadingEmbed().build())
 						.complete();
 			}
 			this.args = event.getMessage().getContentRaw().split("\\s+");

@@ -123,6 +123,9 @@ public class LinkCommand extends Command {
 							e.printStackTrace();
 						}
 					}
+					try {
+						guild.removeRoleFromMember(member, guild.getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString())).queue();
+					}catch (Exception ignored){}
 				} catch (Exception ignored) {}
 			}
 

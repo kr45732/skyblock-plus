@@ -19,70 +19,66 @@
 package com.skyblockplus.dev;
 
 import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.utils.command.CommandExecute;
+import java.util.List;
+import net.dv8tion.jda.api.entities.Guild;
 
-public class LinkedUserDev extends Command {
+public class GetSettingsCommand extends Command {
 
-	public LinkedUserDev() {
-		this.name = "d-linked";
+	public GetSettingsCommand() {
+		this.name = "d-getsettings";
 		this.ownerCommand = true;
 		this.botPermissions = defaultPerms();
 	}
 
 	@Override
 	protected void execute(CommandEvent event) {
-		new CommandExecute(this, event) {
+		new CommandExecute(this, event, false) {
 			@Override
 			protected void execute() {
 				logCommand();
 
-				if (args.length == 4) {
-					if (args[1].equals("delete")) {
-						switch (args[2]) {
-							case "discordId":
-								database.deleteLinkedUserByDiscordId(args[3]);
-								embed(defaultEmbed("Done"));
-								return;
-							case "username":
-								database.deleteLinkedUserByMinecraftUsername(args[3]);
-								embed(defaultEmbed("Done"));
-								return;
-							case "uuid":
-								database.deleteLinkedUserByMinecraftUuid(args[3]);
-								embed(defaultEmbed("Done"));
-								return;
-						}
+				if (args.length == 1) {
+					event.getChannel().sendMessage(getServerSettings(event.getGuild().getId())).queue();
+					return;
+				}else if (args.length == 2) {
+					if(args[1].equals("all")) {
+						event.getChannel().sendMessage(getAllServerSettings()).queue();
+					} else {
+						event.getChannel().sendMessage(getServerSettings(args[1])).queue();
 					}
-				} else if (args.length == 2) {
-					if (args[1].equals("all")) {
-						if (getAllLinkedUsers(event)) {
-							ebMessage.delete().queue();
-							return;
-						}
-					}
+					return;
 				}
 
-				sendErrorEmbed();
+				event.getChannel().sendMessageEmbeds(errorEmbed(name).build()).queue();
 			}
 		}
 			.queue();
 	}
 
-	private boolean getAllLinkedUsers(CommandEvent event) {
-		JsonElement allSettings = gson.toJsonTree(database.getLinkedUsers());
-		if (allSettings == null) {
-			return false;
+	private String getAllServerSettings() {
+		List<ServerSettingsModel> settings = database.getAllServerSettings();
+		if(settings == null){
+			return "Unable to fetch all server settings";
 		}
 
-		try {
-			event.getChannel().sendMessage(makeHastePost(formattedGson.toJson(allSettings)) + ".json").queue();
-			return true;
-		} catch (Exception ignored) {}
-		return false;
+		return makeHastePost(formattedGson.toJson(settings)) + ".json";
+	}
+
+	private String getServerSettings(String guildId) {
+		Guild guild = jda.getGuildById(guildId);
+		JsonElement currentSettings = database.getServerSettings(guildId);
+		if (guild == null || currentSettings == null) {
+			return "No settings for provided guild id";
+		}
+
+		return makeHastePost(formattedGson.toJson(currentSettings)) + ".json";
 	}
 }

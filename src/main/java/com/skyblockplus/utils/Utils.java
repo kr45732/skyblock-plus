@@ -81,7 +81,7 @@ public class Utils {
 	/* Constants */
 	public static final Color botColor = new Color(223, 5, 5);
 	public static final int globalCooldown = 4;
-	public static final String DISCORD_SERVER_INVITE_LINK = "https://dsc.gg/skyblock-plus";
+	public static final String DISCORD_SERVER_INVITE_LINK = "https://discord.gg/Z4Fn3eNDXT";
 	public static final String BOT_INVITE_LINK =
 		"https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403041361&scope=bot%20applications.commands";
 	public static final String FORUM_POST_LINK = "https://hypixel.net/threads/3980092";
@@ -100,7 +100,7 @@ public class Utils {
 		.build();
 	public static final Gson gson = new Gson();
 	public static final Gson formattedGson = new GsonBuilder().setPrettyPrinting().create();
-	private static final Pattern patternControlCode = Pattern.compile("(?i)\\u00A7[0-9A-FK-OR]");
+	private static final Pattern mcColorPattern = Pattern.compile("(?i)\\u00A7[0-9A-FK-OR]");
 	private static final Logger log = LoggerFactory.getLogger(Utils.class);
 	/* Configuration File */
 	public static String HYPIXEL_API_KEY = "";
@@ -648,7 +648,7 @@ public class Utils {
 	}
 
 	public static String parseMcCodes(String unformattedString) {
-		return patternControlCode.matcher(unformattedString.replace("\u00A7ka", "")).replaceAll("");
+		return mcColorPattern.matcher(unformattedString.replace("\u00A7ka", "")).replaceAll("");
 	}
 
 	public static String fixUsername(String username) {
@@ -1025,16 +1025,13 @@ public class Utils {
 							NBTCompound gems = item.getCompound("tag.ExtraAttributes.gems");
 							for (Map.Entry<String, Object> gem : gems.entrySet()) {
 								if (!gem.getKey().endsWith("_gem")) {
-									if (
-										gem.getKey().equals("unlocked_slots") &&
-										(
-											itemInfo.getId().equals("DIVAN_HELMET") ||
-											itemInfo.getId().equals("DIVAN_CHESTPLATE") ||
-											itemInfo.getId().equals("DIVAN_LEGGINGS") ||
-											itemInfo.getId().equals("DIVAN_BOOTS")
-										)
-									) {
-										itemInfo.addExtraValues(gems.getList(gem.getKey()).size(), "GEMSTONE_CHAMBER");
+									if (gem.getKey().equals("unlocked_slots")) {
+										if (itemInfo.getId().equals("DIVAN_HELMET") ||
+												itemInfo.getId().equals("DIVAN_CHESTPLATE") ||
+												itemInfo.getId().equals("DIVAN_LEGGINGS") ||
+												itemInfo.getId().equals("DIVAN_BOOTS")) {
+											itemInfo.addExtraValues(gems.getList(gem.getKey()).size(), "GEMSTONE_CHAMBER");
+										}
 									} else if (gems.containsKey(gem.getKey() + "_gem")) {
 										itemInfo.addExtraValue(gem.getValue() + "_" + gems.get(gem.getKey() + "_gem") + "_GEM");
 									} else {
@@ -1270,6 +1267,7 @@ public class Utils {
 		Map<String, Integer> commandUses = client
 			.getCommands()
 			.stream()
+			.filter(command -> !command.isOwnerCommand())
 			.collect(Collectors.toMap(Command::getName, command -> client.getCommandUses(command), (a, b) -> b));
 		slashCommandClient
 			.getCommands()

@@ -268,6 +268,9 @@ public class SettingsExecute {
 							eb = invalidEmbed("Invalid setting");
 						}
 						break;
+					case "remove_role":
+						eb = setVerifyRemoveRole(args[3]);
+						break;
 					case "enable":
 						if (args[3].equals("sync")) {
 							eb = setVerifySyncEnable("true");
@@ -1749,6 +1752,7 @@ public class SettingsExecute {
 		ebFieldString += "\n**• Message Text:** " + displaySettings(verifySettings, "messageText");
 		ebFieldString += "\n**• Channel:** " + displaySettings(verifySettings, "messageTextChannelId");
 		ebFieldString += "\n**• Verified Role(s):** " + displaySettings(verifySettings, "verifiedRoles");
+		ebFieldString += "\n**• Verified Remove Role:** " + displaySettings(verifySettings, "verifiedRemoveRole");
 		ebFieldString += "\n**• Nickname Template:** " + displaySettings(verifySettings, "verifiedNickname");
 		ebFieldString += "\n**• Member join sync:** " + displaySettings(verifySettings, "enableMemberJoinSync");
 		return ebFieldString;
@@ -1934,6 +1938,36 @@ public class SettingsExecute {
 
 		EmbedBuilder eb = defaultEmbed("Settings");
 		return eb.setDescription("**Verify role added:** " + verifyRole.getAsMention());
+	}
+
+	public EmbedBuilder setVerifyRemoveRole(String roleMention) {
+		if(roleMention.equalsIgnoreCase("none")){
+			JsonObject verifySettings = database.getVerifySettings(guild.getId()).getAsJsonObject();
+			verifySettings.addProperty("verifiedRemoveRole", "none");
+			int responseCode = database.setVerifySettings(guild.getId(), verifySettings);
+			if (responseCode != 200) {
+				return apiFailMessage(responseCode);
+			}
+			guildMap.get(guild.getId()).verifyGuild.reloadSettingsJson(verifySettings);
+			return defaultSettingsEmbed("Verify remove role removed");
+		}
+
+		Object eb = checkRole(roleMention);
+		if (eb instanceof EmbedBuilder) {
+			return ((EmbedBuilder) eb);
+		}
+		Role role = ((Role) eb);
+
+		JsonObject verifySettings = database.getVerifySettings(guild.getId()).getAsJsonObject();
+		verifySettings.addProperty("verifiedRemoveRole", role.getId());
+		int responseCode = database.setVerifySettings(guild.getId(), verifySettings);
+
+		if (responseCode != 200) {
+			return invalidEmbed("API returned response code " + responseCode);
+		}
+		guildMap.get(guild.getId()).verifyGuild.reloadSettingsJson(verifySettings);
+
+		return defaultSettingsEmbed("**Verify remove role set:** " + role.getAsMention());
 	}
 
 	public EmbedBuilder setVerifySyncEnable(String enable) {
@@ -2270,6 +2304,7 @@ public class SettingsExecute {
 						return "<#" + currentSettingValue + ">";
 					case "roleId":
 					case "guildMemberRole":
+					case "verifiedRemoveRole":
 						return "<@&" + currentSettingValue + ">";
 					case "applyCategory":
 						try {

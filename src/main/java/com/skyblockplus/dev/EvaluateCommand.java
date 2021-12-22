@@ -39,9 +39,9 @@ public class EvaluateCommand extends Command {
 	private GroovyShell shell = new GroovyShell();
 
 	public EvaluateCommand() {
-		this.name = "evaluate";
+		this.name = "d-evaluate";
 		this.ownerCommand = true;
-		this.aliases = new String[] { "eval", "ev" };
+		this.aliases = new String[] { "evaluate", "eval", "ev" };
 		this.botPermissions = defaultPerms();
 
 		// import [name].*
