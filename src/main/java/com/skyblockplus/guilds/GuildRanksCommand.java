@@ -131,7 +131,6 @@ public class GuildRanksCommand extends Command {
 
 		Instant lastUpdated = null;
 		if (useKey) {
-
 			HypixelGuildCache guildCache = hypixelGuildsCacheMap.getIfPresent(guildId);
 			List<String> guildMemberPlayersList;
 			if (guildCache != null) {
@@ -431,10 +430,10 @@ public class GuildRanksCommand extends Command {
 					}
 				}
 
-				if(highestRankMet != -1) {
+				if (highestRankMet != -1) {
 					List<String> rankNamesList = streamJsonArray(higherDepth(gRanks.get(highestRankMet), "names").getAsJsonArray())
-							.map(JsonElement::getAsString)
-							.collect(Collectors.toList());
+						.map(JsonElement::getAsString)
+						.collect(Collectors.toList());
 					if (!rankNamesList.contains(gMember.getGuildRank().toLowerCase())) {
 						paginateBuilder.addItems(("- /g setrank " + fixUsername(gMember.getName()) + " " + rankNamesList.get(0)));
 						totalChange++;

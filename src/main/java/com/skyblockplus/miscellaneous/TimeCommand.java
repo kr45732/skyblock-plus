@@ -81,7 +81,7 @@ public class TimeCommand extends Command {
 			.addField("Time", currentHour + ":" + padStart("" + ((int) Math.floorDiv(currentMinute, 10) * 10), 2, '0') + suffix, false);
 	}
 
-	public static int getSkyblockYear(){
+	public static int getSkyblockYear() {
 		long now = Instant.now().toEpochMilli();
 		long currentYear = Math.floorDiv((now - YEAR_0), YEAR_MS);
 		return (int) (currentYear + 1);

@@ -29,15 +29,15 @@ public class JacobContest {
 	private long time;
 	private List<String> crops;
 
-	public boolean reminderHasPassed(){
+	public boolean reminderHasPassed() {
 		return Instant.now().isAfter(getTimeInstant().minusSeconds(301));
 	}
 
-	public Instant getTimeInstant(){
+	public Instant getTimeInstant() {
 		return Instant.ofEpochMilli(time);
 	}
 
-	public Duration getDurationUntil(){
+	public Duration getDurationUntil() {
 		return Duration.between(Instant.now(), getTimeInstant());
 	}
 

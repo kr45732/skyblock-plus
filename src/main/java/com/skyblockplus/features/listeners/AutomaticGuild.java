@@ -18,6 +18,14 @@
 
 package com.skyblockplus.features.listeners;
 
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.features.skyblockevent.SkyblockEventCommand.endSkyblockEvent;
+import static com.skyblockplus.utils.ApiHandler.getGuildFromId;
+import static com.skyblockplus.utils.Constants.NUMBER_TO_RARITY_MAP;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -34,6 +42,17 @@ import com.skyblockplus.features.skyblockevent.SkyblockEventCommand;
 import com.skyblockplus.features.skyblockevent.SkyblockEventHandler;
 import com.skyblockplus.features.verify.VerifyGuild;
 import com.skyblockplus.utils.structs.HypixelResponse;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.Writer;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
@@ -50,26 +69,6 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.Writer;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.features.skyblockevent.SkyblockEventCommand.endSkyblockEvent;
-import static com.skyblockplus.utils.ApiHandler.getGuildFromId;
-import static com.skyblockplus.utils.Constants.NUMBER_TO_RARITY_MAP;
-import static com.skyblockplus.utils.Utils.*;
 
 public class AutomaticGuild {
 
@@ -923,7 +922,7 @@ public class AutomaticGuild {
 		this.partyList = partyList;
 	}
 
-	public void onFarmingContest(List<String> crops, MessageEmbed embed){
+	public void onFarmingContest(List<String> crops, MessageEmbed embed) {
 		farmingContest.onFarmingContest(crops, embed);
 	}
 }

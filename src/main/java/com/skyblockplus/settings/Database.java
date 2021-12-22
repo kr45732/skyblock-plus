@@ -243,9 +243,9 @@ public class Database {
 		return settingsService.setApplyGuestRole(serverId, newSettings).getStatusCodeValue();
 	}
 
-    public JsonElement getJacobSettings(String serverId) {
+	public JsonElement getJacobSettings(String serverId) {
 		return gson.toJsonTree(settingsService.getJacobSettings(serverId).getBody());
-    }
+	}
 
 	public int setJacobSettings(String serverId, JsonElement newSettings) {
 		return settingsService.setJacobSettings(serverId, gson.fromJson(newSettings, JacobSettings.class)).getStatusCodeValue();

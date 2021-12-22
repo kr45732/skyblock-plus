@@ -180,22 +180,22 @@ public class SettingsExecute {
 			String applyGuestRole = higherDepth(currentSettings, "applyGuestRole", "none");
 			eb.addField("Guest Role", applyGuestRole.equals("none") ? "None" : "<@&" + applyGuestRole + ">", false);
 		} else if (args.length >= 2 && args[1].equals("jacob")) {
-			if(args.length == 2){
+			if (args.length == 2) {
 				eb = displayJacobSettings(higherDepth(currentSettings, "jacobSettings"));
-			}else if(args.length == 3){
-				if(args[2].equals("enable")){
+			} else if (args.length == 3) {
+				if (args[2].equals("enable")) {
 					eb = setJacobEnable(true);
-				}else if(args[2].equals("disable")){
+				} else if (args[2].equals("disable")) {
 					eb = setJacobEnable(false);
 				}
-			}else if(args.length ==4){
-				if(args[2].equals("remove")){
+			} else if (args.length == 4) {
+				if (args[2].equals("remove")) {
 					eb = removeJacobCrop(args[3]);
-				}else if(args[2].equals("channel")){
+				} else if (args[2].equals("channel")) {
 					eb = setJacobChannel(args[3]);
 				}
-			}else if(args.length == 5){
-				if(args[2].equals("add")){
+			} else if (args.length == 5) {
+				if (args[2].equals("add")) {
 					eb = addJacobCrop(args[3], args[4]);
 				}
 			}
@@ -203,7 +203,7 @@ public class SettingsExecute {
 			if (eb == null) {
 				eb = errorEmbed("settings jacob");
 			}
-		}else if (args.length >= 2 && args[1].equals("roles")) {
+		} else if (args.length >= 2 && args[1].equals("roles")) {
 			if (args.length == 2) {
 				if (higherDepth(currentSettings, "automatedRoles") != null) {
 					getRolesSettings(higherDepth(currentSettings, "automatedRoles")).build().paginate(channel, 0);
@@ -534,8 +534,19 @@ public class SettingsExecute {
 
 	public EmbedBuilder addJacobCrop(String crop, String roleMention) {
 		crop = capitalizeString(crop);
-		List<String> validCrops = Arrays.asList("Wheat", "Carrot", "Potato", "Pumpkin", "Melon", "Mushroom", "Cactus", "Sugar Cane", "Nether Wart", "Cocoa Beans");
-		if(!validCrops.contains(crop)){
+		List<String> validCrops = Arrays.asList(
+			"Wheat",
+			"Carrot",
+			"Potato",
+			"Pumpkin",
+			"Melon",
+			"Mushroom",
+			"Cactus",
+			"Sugar Cane",
+			"Nether Wart",
+			"Cocoa Beans"
+		);
+		if (!validCrops.contains(crop)) {
 			return invalidEmbed("Invalid crop name\n\nValid crop names are: " + String.join(", ", validCrops));
 		}
 
@@ -560,7 +571,7 @@ public class SettingsExecute {
 		return defaultSettingsEmbed("**Jacob crop added:** " + crop + " - " + role.getAsMention());
 	}
 
-	public EmbedBuilder setJacobEnable(boolean enable){
+	public EmbedBuilder setJacobEnable(boolean enable) {
 		JsonObject jacobSettings = database.getJacobSettings(guild.getId()).getAsJsonObject();
 		if (!enable) {
 			jacobSettings.addProperty("enable", "false");
@@ -573,9 +584,10 @@ public class SettingsExecute {
 			return defaultSettingsEmbed("Disabled jacob settings.");
 		}
 
-		try{guild.getTextChannelById(higherDepth(jacobSettings, "channel").getAsString()).getId();
+		try {
+			guild.getTextChannelById(higherDepth(jacobSettings, "channel").getAsString()).getId();
 			higherDepth(jacobSettings, "crops").getAsJsonArray().get(0);
-		}catch (Exception e){
+		} catch (Exception e) {
 			return invalidEmbed("All settings (channel and at least one crop) must be set before enabling");
 		}
 
@@ -678,8 +690,8 @@ public class SettingsExecute {
 
 		String guildNameFormatted = guildResponse.get("name").getAsString();
 		AutomatedGuild guildSettings = new AutomatedGuild(
-				guildNameFormatted.toLowerCase().replace(" ", "_"),
-				guildResponse.get("_id").getAsString()
+			guildNameFormatted.toLowerCase().replace(" ", "_"),
+			guildResponse.get("_id").getAsString()
 		);
 
 		int responseCode = database.setGuildSettings(guild.getId(), gson.toJsonTree(guildSettings));
@@ -775,16 +787,16 @@ public class SettingsExecute {
 		}
 
 		VoiceChannel guildMemberCounterChannel = guild
-				.createVoiceChannel(
-						guildJson.get("name").getAsString() + " Members: " + guildJson.get("members").getAsJsonArray().size() + "/125"
-				)
-				.addPermissionOverride(guild.getPublicRole(), EnumSet.of(Permission.VIEW_CHANNEL), EnumSet.of(Permission.VOICE_CONNECT))
-				.addMemberPermissionOverride(
-						jda.getSelfUser().getIdLong(),
-						EnumSet.of(Permission.VIEW_CHANNEL, Permission.MANAGE_CHANNEL, Permission.VOICE_CONNECT),
-						null
-				)
-				.complete();
+			.createVoiceChannel(
+				guildJson.get("name").getAsString() + " Members: " + guildJson.get("members").getAsJsonArray().size() + "/125"
+			)
+			.addPermissionOverride(guild.getPublicRole(), EnumSet.of(Permission.VIEW_CHANNEL), EnumSet.of(Permission.VOICE_CONNECT))
+			.addMemberPermissionOverride(
+				jda.getSelfUser().getIdLong(),
+				EnumSet.of(Permission.VIEW_CHANNEL, Permission.MANAGE_CHANNEL, Permission.VOICE_CONNECT),
+				null
+			)
+			.complete();
 		guildSettings.addProperty("guildCounterEnable", "true");
 		guildSettings.addProperty("guildCounterChannel", guildMemberCounterChannel.getId());
 
@@ -828,21 +840,21 @@ public class SettingsExecute {
 				}
 
 				return defaultSettingsEmbed(
-						"Added guild rank: " + higherDepth(guildRank, "name").getAsString() + " - " + role.getAsMention()
+					"Added guild rank: " + higherDepth(guildRank, "name").getAsString() + " - " + role.getAsMention()
 				);
 			}
 		}
 
 		return invalidEmbed(
-				"Invalid guild rank. " +
-						(
-								guildRanks.size() > 0
-										? "Valid guild ranks are: " +
-										streamJsonArray(guildRanks)
-												.map(r -> higherDepth(r, "name").getAsString().replace(" ", "_"))
-												.collect(Collectors.joining(", "))
-										: "No guild ranks found"
-						)
+			"Invalid guild rank. " +
+			(
+				guildRanks.size() > 0
+					? "Valid guild ranks are: " +
+					streamJsonArray(guildRanks)
+						.map(r -> higherDepth(r, "name").getAsString().replace(" ", "_"))
+						.collect(Collectors.joining(", "))
+					: "No guild ranks found"
+			)
 		);
 	}
 
@@ -881,12 +893,12 @@ public class SettingsExecute {
 		}
 
 		if (
-				!higherDepth(guildSettings, "applyMessageChannel", "").isEmpty() &&
-						!higherDepth(guildSettings, "applyStaffChannel", "").isEmpty() &&
-						!higherDepth(guildSettings, "applyCategory", "").isEmpty() &&
-						!higherDepth(guildSettings, "applyMessage", "").isEmpty() &&
-						!higherDepth(guildSettings, "applyAcceptMessage", "").isEmpty() &&
-						!higherDepth(guildSettings, "applyDenyMessage", "").isEmpty()
+			!higherDepth(guildSettings, "applyMessageChannel", "").isEmpty() &&
+			!higherDepth(guildSettings, "applyStaffChannel", "").isEmpty() &&
+			!higherDepth(guildSettings, "applyCategory", "").isEmpty() &&
+			!higherDepth(guildSettings, "applyMessage", "").isEmpty() &&
+			!higherDepth(guildSettings, "applyAcceptMessage", "").isEmpty() &&
+			!higherDepth(guildSettings, "applyDenyMessage", "").isEmpty()
 		) {
 			guildSettings.addProperty("applyEnable", "true");
 			int responseCode = database.setGuildSettings(guild.getId(), guildSettings);
@@ -988,7 +1000,7 @@ public class SettingsExecute {
 		}
 
 		return defaultSettingsEmbed(
-				"Set apply waiting for invite channel to: " + (waitingChannel == null ? "none" : waitingChannel.getAsMention())
+			"Set apply waiting for invite channel to: " + (waitingChannel == null ? "none" : waitingChannel.getAsMention())
 		);
 	}
 
@@ -1012,8 +1024,8 @@ public class SettingsExecute {
 		}
 
 		guildSettings.addProperty(
-				"applyWaitlistMessage",
-				waitlistMessage.equalsIgnoreCase("none") ? "none" : EmojiParser.parseToAliases(waitlistMessage)
+			"applyWaitlistMessage",
+			waitlistMessage.equalsIgnoreCase("none") ? "none" : EmojiParser.parseToAliases(waitlistMessage)
 		);
 		int responseCode = database.setGuildSettings(guild.getId(), guildSettings);
 		if (responseCode != 200) {
@@ -1136,14 +1148,14 @@ public class SettingsExecute {
 		}
 
 		return defaultSettingsEmbed(
-				"Added an apply requirement:\n• Slayer - " +
-						slayerReq +
-						"\n• Skills - " +
-						skillsReq +
-						"\n• Catacombs - " +
-						cataReq +
-						"\n• Weight - " +
-						weightReq
+			"Added an apply requirement:\n• Slayer - " +
+			slayerReq +
+			"\n• Skills - " +
+			skillsReq +
+			"\n• Catacombs - " +
+			cataReq +
+			"\n• Weight - " +
+			weightReq
 		);
 	}
 
@@ -1161,18 +1173,18 @@ public class SettingsExecute {
 			}
 
 			return defaultSettingsEmbed(
-					"Removed an apply requirement:\n• Slayer - " +
-							higherDepth(req, "slayerReq", 0) +
-							"\n• Skills - " +
-							higherDepth(req, "skillsReq", 0) +
-							"\n• Catacombs - " +
-							higherDepth(req, "catacombsReq", 0) +
-							"\n• Weight - " +
-							higherDepth(req, "weightReq", 0)
+				"Removed an apply requirement:\n• Slayer - " +
+				higherDepth(req, "slayerReq", 0) +
+				"\n• Skills - " +
+				higherDepth(req, "skillsReq", 0) +
+				"\n• Catacombs - " +
+				higherDepth(req, "catacombsReq", 0) +
+				"\n• Weight - " +
+				higherDepth(req, "weightReq", 0)
 			);
 		} catch (Exception e) {
 			return invalidEmbed(
-					"Invalid requirement number. Run `" + guildPrefix + "settings guild <name>` to see the current apply requirements"
+				"Invalid requirement number. Run `" + guildPrefix + "settings guild <name>` to see the current apply requirements"
 			);
 		}
 	}
@@ -2424,11 +2436,11 @@ public class SettingsExecute {
 				}
 
 				return ebStr.toString();
-			}else if (settingName.equals("crops")) {
+			} else if (settingName.equals("crops")) {
 				JsonArray roles = higherDepth(jsonSettings, settingName).getAsJsonArray();
 				List<String> ebStr = new ArrayList<>();
 				for (JsonElement role : roles) {
-					ebStr.add(higherDepth(role, "value").getAsString() +  " - " + "<@&" + higherDepth(role, "roleId").getAsString() + ">");
+					ebStr.add(higherDepth(role, "value").getAsString() + " - " + "<@&" + higherDepth(role, "roleId").getAsString() + ">");
 				}
 
 				if (ebStr.isEmpty()) {
