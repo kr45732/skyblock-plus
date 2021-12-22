@@ -533,7 +533,7 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder addJacobCrop(String crop, String roleMention) {
-		crop = capitalizeString(crop);
+		crop = capitalizeString(crop.replace("_", " "));
 		List<String> validCrops = Arrays.asList(
 			"Wheat",
 			"Carrot",
@@ -598,7 +598,7 @@ public class SettingsExecute {
 		}
 		guildMap.get(guild.getId()).farmingContest.reloadSettingsJson(jacobSettings);
 
-		return defaultSettingsEmbed("Disabled jacob settings.");
+		return defaultSettingsEmbed("Enab jacob settings.");
 	}
 
 	/* Apply Settings */
