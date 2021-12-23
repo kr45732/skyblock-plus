@@ -926,14 +926,16 @@ public class AutomaticGuild {
 		this.partyList = partyList;
 	}
 
-	public void setFetchurChannel(TextChannel channel){this.fetchurChannel = channel;}
+	public void setFetchurChannel(TextChannel channel) {
+		this.fetchurChannel = channel;
+	}
 
 	public void onFarmingContest(List<String> crops, MessageEmbed embed) {
 		farmingContest.onFarmingContest(crops, embed);
 	}
 
 	public void onFetchur(MessageEmbed embed) {
-		if(fetchurChannel != null){
+		if (fetchurChannel != null) {
 			fetchurChannel.sendMessageEmbeds(embed).queue();
 		}
 	}

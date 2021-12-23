@@ -35,7 +35,7 @@ public class JacobHandler {
 		return jacobData == null || jacobData.getYear() != getSkyblockYear();
 	}
 
-	public static JacobData getJacobData(){
+	public static JacobData getJacobData() {
 		return jacobData;
 	}
 

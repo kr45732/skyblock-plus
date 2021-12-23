@@ -1295,22 +1295,26 @@ public class Utils {
 		return commandUses;
 	}
 
-	public static int getUserCount(){
+	public static int getUserCount() {
 		if (userCount == -1 || Duration.between(userCountLastUpdated, Instant.now()).toHours() >= 1) {
 			userCount =
-					jda
-							.getGuilds()
-							.stream()
-							.filter(g -> !Arrays.asList(
-									"374071874222686211",
-									"110373943822540800",
-									"597450230430040076",
-									"703967135961055314",
-									"858695709393027102"
-							).contains(g.getId()))
-							.map(Guild::getMemberCount)
-							.mapToInt(Integer::intValue)
-							.sum();
+				jda
+					.getGuilds()
+					.stream()
+					.filter(g ->
+						!Arrays
+							.asList(
+								"374071874222686211",
+								"110373943822540800",
+								"597450230430040076",
+								"703967135961055314",
+								"858695709393027102"
+							)
+							.contains(g.getId())
+					)
+					.map(Guild::getMemberCount)
+					.mapToInt(Integer::intValue)
+					.sum();
 			userCountLastUpdated = Instant.now();
 		}
 
