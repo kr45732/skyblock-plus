@@ -18,6 +18,7 @@
 
 package com.skyblockplus.features.jacob;
 
+import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.miscellaneous.TimeCommand.getSkyblockYear;
 import static com.skyblockplus.utils.Utils.*;

@@ -2375,7 +2375,7 @@ public class SettingsExecute {
 				if (responseCode != 200) {
 					return invalidEmbed("API returned response code " + responseCode);
 				}
-				guildMap.get(guild.getId()).setPartyFinderCategory(null);
+				guildMap.get(guild.getId()).setFetchurChannel(null);
 				return defaultSettingsEmbed("**Fetchur notifications disabled**");
 			} else {
 				TextChannel fChannel = guild.getTextChannelById(channel.replaceAll("[<#>]", ""));

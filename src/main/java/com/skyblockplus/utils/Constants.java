@@ -171,15 +171,14 @@ public class Constants {
 			ESSENCE_EMOJI_MAP = gson.fromJson(higherDepth(constantsJson, "ESSENCE_EMOJI_MAP"), mapStringString);
 
 			/* ENCHANT_NAMES */
-			ENCHANT_NAMES = new ArrayList<>();
+			HashSet<String> enchantNames = new HashSet<>();
 			for (Map.Entry<String, JsonElement> enchantArr : higherDepth(getEnchantsJson(), "enchants").getAsJsonObject().entrySet()) {
 				for (JsonElement enchantName : enchantArr.getValue().getAsJsonArray()) {
-					ENCHANT_NAMES.add(enchantName.getAsString().toUpperCase());
+					enchantNames.add(enchantName.getAsString().toUpperCase());
 				}
 			}
-			if (!ENCHANT_NAMES.contains("ULTIMATE_JERRY")) {
-				ENCHANT_NAMES.add("ULTIMATE_JERRY");
-			}
+			enchantNames.add("ULTIMATE_JERRY");
+			ENCHANT_NAMES = new ArrayList<>(enchantNames);
 
 			/* ALL_SKILL_NAMES */
 			ALL_SKILL_NAMES = new ArrayList<>(higherDepth(getLevelingJson(), "leveling_caps").getAsJsonObject().keySet());

@@ -1024,6 +1024,25 @@ public class Utils {
 
 						itemInfo.addExtraValues(item.getInt("tag.ExtraAttributes.farming_for_dummies_count", 0), "FARMING_FOR_DUMMIES");
 
+						itemInfo.addExtraValues(Integer.parseInt(item.getString("tag.ExtraAttributes.ethermerge", "0").replace("b", " ")), "ETHERWARP_CONDUIT");
+
+						if(item.containsKey("tag.ExtraAttributes.drill_part_upgrade_module")){
+							itemInfo.addExtraValue(item.getString("tag.ExtraAttributes.drill_part_upgrade_module").toUpperCase());
+						}
+						if(item.containsKey("tag.ExtraAttributes.drill_part_fuel_tank")){
+							itemInfo.addExtraValue(item.getString("tag.ExtraAttributes.drill_part_fuel_tank").toUpperCase());
+						}
+						if(item.containsKey("tag.ExtraAttributes.drill_part_engine")){
+							itemInfo.addExtraValue(item.getString("tag.ExtraAttributes.drill_part_engine").toUpperCase());
+						}
+
+						if(item.containsKey("tag.ExtraAttributes.petInfo")){
+							JsonElement petInfoJson = JsonParser.parseString(item.getString("tag.ExtraAttributes.petInfo"));
+							if (higherDepth(petInfoJson, "heldItem", null) != null) {
+								itemInfo.addExtraValue(higherDepth(petInfoJson, "heldItem").getAsString());
+							}
+						}
+
 						if (item.containsTag("tag.ExtraAttributes.gems", TagType.COMPOUND)) {
 							NBTCompound gems = item.getCompound("tag.ExtraAttributes.gems");
 							for (Map.Entry<String, Object> gem : gems.entrySet()) {

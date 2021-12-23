@@ -204,7 +204,7 @@ public class ApplyGuild {
 			}
 
 			if (!hasStaffRole) {
-				return "❌ You are missing the required permissions in this Guild to use that!";
+				return "❌ You are missing the required permissions in this guild to use that!";
 			}
 		}
 
@@ -214,7 +214,7 @@ public class ApplyGuild {
 				.split("apply_user_wait_" + higherDepth(currentSettings, "guildName").getAsString() + "_")[1].split("_");
 			TextChannel toCloseChannel = event.getGuild().getTextChannelById(channelRoleSplit[0]);
 			try {
-				event.getGuild().addRoleToMember(event.getUser().getId(), event.getGuild().getRoleById(channelRoleSplit[1])).queue();
+				event.getGuild().addRoleToMember(channelRoleSplit[1], event.getGuild().getRoleById(channelRoleSplit[2])).queue();
 			} catch (Exception ignored) {}
 			toCloseChannel.sendMessageEmbeds(defaultEmbed("Closing channel").build()).queue();
 			toCloseChannel.delete().reason("Application closed").queueAfter(10, TimeUnit.SECONDS);

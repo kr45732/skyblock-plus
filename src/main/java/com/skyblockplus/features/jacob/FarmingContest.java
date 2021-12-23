@@ -63,11 +63,16 @@ public class FarmingContest {
 	}
 
 	public void reloadSettingsJson(JsonElement jacobSettings) {
-		enable = higherDepth(jacobSettings, "enable", false);
-		if (enable) {
-			channel = jda.getGuildById(guildId).getTextChannelById(higherDepth(jacobSettings, "channel").getAsString());
-			wantedCrops =
-				gson.fromJson(higherDepth(jacobSettings, "crops").getAsJsonArray(), new TypeToken<List<RoleObject>>() {}.getType());
+		try {
+			enable = higherDepth(jacobSettings, "enable", false);
+			if (enable) {
+				channel = jda.getGuildById(guildId).getTextChannelById(higherDepth(jacobSettings, "channel").getAsString());
+				wantedCrops =
+						gson.fromJson(higherDepth(jacobSettings, "crops").getAsJsonArray(), new TypeToken<List<RoleObject>>() {
+						}.getType());
+			}
+		}catch (Exception e){
+			e.printStackTrace();
 		}
 	}
 }

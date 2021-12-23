@@ -141,7 +141,7 @@ public class SkyblockEventCommand extends Command {
 		return defaultEmbed("Success").setDescription("Ended skyblock event");
 	}
 
-	private static List<EventMember> getEventLeaderboardList(JsonElement runningSettings, String guildId) {
+	public static List<EventMember> getEventLeaderboardList(JsonElement runningSettings, String guildId) {
 		List<EventMember> guildMemberPlayersList = new ArrayList<>();
 		List<CompletableFuture<CompletableFuture<EventMember>>> futuresList = new ArrayList<>();
 		JsonArray membersArr = higherDepth(runningSettings, "membersList").getAsJsonArray();

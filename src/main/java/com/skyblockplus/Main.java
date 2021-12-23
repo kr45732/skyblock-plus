@@ -234,7 +234,8 @@ public class Main {
 					new GuildStatisticsSlashCommand(),
 					new PartySlashCommand(),
 					new SettingsSlashCommand(),
-					new TimeSlashCommand()
+					new TimeSlashCommand(),
+						new ReloadSlashCommand()
 				);
 
 		jda =

@@ -19,7 +19,10 @@
 package com.skyblockplus.api.linkedaccounts;
 
 import java.util.List;
+
+import net.dv8tion.jda.api.utils.data.DataObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/private/linkedAccounts")
+@RequestMapping(value = "/api/private/linked-accounts")
 public class LinkedAccountController {
 
 	private final LinkedAccountService settingsService;
@@ -42,18 +45,20 @@ public class LinkedAccountController {
 		return settingsService.getAllLinkedAccounts();
 	}
 
-	@GetMapping("/get/by/discordId")
-	public ResponseEntity<?> getByDiscordId(@RequestParam(value = "discordId") String discordId) {
-		return settingsService.getByDiscordId(discordId);
-	}
-
-	@GetMapping("/get/by/minecraftUuid")
-	public ResponseEntity<?> getByMinecraftUuid(@RequestParam(value = "minecraftUuid") String minecraftUuid) {
-		return settingsService.getByMinecraftUuid(minecraftUuid);
-	}
-
-	@GetMapping("/get/by/minecraftUsername")
-	public ResponseEntity<?> getByMinecraftUsername(@RequestParam(value = "minecraftUsername") String minecraftUsername) {
-		return settingsService.getByMinecraftUsername(minecraftUsername);
+	@GetMapping("/get/by")
+	public ResponseEntity<?> getByDiscordId(
+			@RequestParam(value = "id", required = false) String id,
+			@RequestParam(value = "uuid", required = false) String uuid,
+			@RequestParam(value = "username", required = false) String username
+	) {
+		if(id != null) {
+			return settingsService.getByDiscordId(id);
+		}else if(uuid != null){
+			return settingsService.getByMinecraftUuid(uuid);
+		}else if(username != null){
+			return settingsService.getByMinecraftUsername(username);
+		}else{
+			return new ResponseEntity<>(DataObject.empty().put("success", false).put("cause", "No parameter provided from: id, uuid, username").toMap(), HttpStatus.BAD_REQUEST);
+		}
 	}
 }

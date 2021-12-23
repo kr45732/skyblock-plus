@@ -211,12 +211,12 @@ public class NetworthExecute {
 			if (sacksMap != null) {
 				for (Map.Entry<String, Integer> sackEntry : sacksMap.entrySet()) {
 					if (sackEntry.getValue() > 0) {
-						sacksTotal += getLowestPrice(sackEntry.getKey(), sackEntry.getKey(), true) * sackEntry.getValue();
+						sacksTotal += getLowestPrice(sackEntry.getKey(), true) * sackEntry.getValue();
 					}
 				}
 			}
 
-			calculateAllPetsPrice();
+			calculatePetPrices();
 
 			if (onlyTotal) {
 				return invalidEmbed("Only total is enabled");
@@ -394,7 +394,7 @@ public class NetworthExecute {
 			sacksTotal;
 	}
 
-	private void calculateAllPetsPrice() {
+	private void calculatePetPrices() {
 		StringBuilder queryStr = new StringBuilder();
 		for (InvItem item : invPets) {
 			queryStr.append("'").append(item.getPetApiName()).append("',");
@@ -405,7 +405,6 @@ public class NetworthExecute {
 		for (InvItem item : enderChestPets) {
 			queryStr.append("'").append(item.getPetApiName()).append("',");
 		}
-
 		for (InvItem item : storagePets) {
 			queryStr.append("'").append(item.getPetApiName()).append("',");
 		}
@@ -430,7 +429,7 @@ public class NetworthExecute {
 						try {
 							List<String> extraStats = item.getExtraStats();
 							for (String extraItem : extraStats) {
-								double miscPrice = getLowestPrice(extraItem, " ");
+								double miscPrice = getLowestPrice(extraItem);
 								miscExtras += miscPrice;
 								miscStr
 									.append("{\"name\":\"")
@@ -475,7 +474,7 @@ public class NetworthExecute {
 						try {
 							List<String> extraStats = item.getExtraStats();
 							for (String extraItem : extraStats) {
-								double miscPrice = getLowestPrice(extraItem, " ");
+								double miscPrice = getLowestPrice(extraItem);
 								miscExtras += miscPrice;
 								miscStr
 									.append("{\"name\":\"")
@@ -520,7 +519,7 @@ public class NetworthExecute {
 						try {
 							List<String> extraStats = item.getExtraStats();
 							for (String extraItem : extraStats) {
-								double miscPrice = getLowestPrice(extraItem, " ");
+								double miscPrice = getLowestPrice(extraItem);
 								miscExtras += miscPrice;
 								miscStr
 									.append("{\"name\":\"")
@@ -565,7 +564,7 @@ public class NetworthExecute {
 						try {
 							List<String> extraStats = item.getExtraStats();
 							for (String extraItem : extraStats) {
-								double miscPrice = getLowestPrice(extraItem, " ");
+								double miscPrice = getLowestPrice(extraItem);
 								miscExtras += miscPrice;
 								miscStr
 									.append("{\"name\":\"")
@@ -614,7 +613,7 @@ public class NetworthExecute {
 				try {
 					List<String> extraStats = item.getExtraStats();
 					for (String extraItem : extraStats) {
-						double miscPrice = getLowestPrice(extraItem, " ");
+						double miscPrice = getLowestPrice(extraItem);
 						miscExtras += miscPrice;
 						miscStr
 							.append("{\"name\":\"")
@@ -658,7 +657,7 @@ public class NetworthExecute {
 				try {
 					List<String> extraStats = item.getExtraStats();
 					for (String extraItem : extraStats) {
-						double miscPrice = getLowestPrice(extraItem, " ");
+						double miscPrice = getLowestPrice(extraItem);
 						miscExtras += miscPrice;
 						miscStr
 							.append("{\"name\":\"")
@@ -702,7 +701,7 @@ public class NetworthExecute {
 				try {
 					List<String> extraStats = item.getExtraStats();
 					for (String extraItem : extraStats) {
-						double miscPrice = getLowestPrice(extraItem, " ");
+						double miscPrice = getLowestPrice(extraItem);
 						miscExtras += miscPrice;
 						miscStr
 							.append("{\"name\":\"")
@@ -746,7 +745,7 @@ public class NetworthExecute {
 				try {
 					List<String> extraStats = item.getExtraStats();
 					for (String extraItem : extraStats) {
-						double miscPrice = getLowestPrice(extraItem, " ");
+						double miscPrice = getLowestPrice(extraItem);
 						miscExtras += miscPrice;
 						miscStr
 							.append("{\"name\":\"")
@@ -847,7 +846,7 @@ public class NetworthExecute {
 				}
 				return 0;
 			} else {
-				itemCost = getLowestPrice(item.getId().toUpperCase(), item.getName());
+				itemCost = getLowestPrice(item.getId().toUpperCase());
 			}
 		} catch (Exception ignored) {}
 
@@ -903,7 +902,7 @@ public class NetworthExecute {
 		try {
 			List<String> extraStats = item.getExtraStats();
 			for (String extraItem : extraStats) {
-				double miscPrice = getLowestPrice(extraItem, " ");
+				double miscPrice = getLowestPrice(extraItem);
 				miscExtras += miscPrice;
 				miscStr.append("{\"name\":\"").append(extraItem).append("\",\"price\":\"").append(simplifyNumber(miscPrice)).append("\"},");
 			}
@@ -999,7 +998,7 @@ public class NetworthExecute {
 				}
 				return new NwItemPrice(0, null);
 			} else {
-				itemCost = getLowestPrice(item.getId().toUpperCase(), item.getName());
+				itemCost = getLowestPrice(item.getId().toUpperCase());
 			}
 		} catch (Exception ignored) {}
 
@@ -1055,7 +1054,7 @@ public class NetworthExecute {
 		try {
 			List<String> extraStats = item.getExtraStats();
 			for (String extraItem : extraStats) {
-				double miscPrice = getLowestPrice(extraItem, "");
+				double miscPrice = getLowestPrice(extraItem);
 				miscExtras += miscPrice;
 				miscStr.append("{\"name\":\"").append(extraItem).append("\",\"price\":\"").append(simplifyNumber(miscPrice)).append("\"},");
 			}
@@ -1106,7 +1105,7 @@ public class NetworthExecute {
 			JsonElement reforgeStoneInfo = higherDepth(reforgesStonesJson, reforgeStone);
 			if (higherDepth(reforgeStoneInfo, "reforgeName").getAsString().equalsIgnoreCase(reforgeName)) {
 				String reforgeStoneId = higherDepth(reforgeStoneInfo, "internalName").getAsString();
-				double reforgeStoneCost = getLowestPrice(reforgeStoneId, idToName(reforgeStoneId));
+				double reforgeStoneCost = getLowestPrice(reforgeStoneId);
 				double reforgeApplyCost = higherDepth(reforgeStoneInfo, "reforgeCosts." + itemRarity.toUpperCase()).getAsLong();
 				return reforgeStoneCost + reforgeApplyCost;
 			}
@@ -1159,15 +1158,16 @@ public class NetworthExecute {
 		return 0;
 	}
 
-	private double getLowestPrice(String itemId, String iName) {
-		return getLowestPrice(itemId, iName, false);
+	private double getLowestPrice(String itemId) {
+		return getLowestPrice(itemId, false);
 	}
 
-	private double getLowestPrice(String itemId, String iName, boolean onlyBazaar) {
+	private double getLowestPrice(String itemId, boolean onlyBazaar) {
 		double priceOverride = getPriceOverride(itemId);
 		if (priceOverride != -1) {
 			return priceOverride;
 		}
+		String iName = idToName(itemId);
 
 		try {
 			return Math.max(higherDepth(bazaarJson, itemId + ".sell_summary.[0].pricePerUnit").getAsDouble(), 0);
@@ -1236,7 +1236,7 @@ public class NetworthExecute {
 
 				for (JsonElement itemPrice : sbzPrices) {
 					String itemName = higherDepth(itemPrice, "name").getAsString();
-					if (itemName.equalsIgnoreCase(itemId) || itemName.equalsIgnoreCase(itemId.toLowerCase().replace(" ", "_"))) {
+					if (itemName.equalsIgnoreCase(itemId) || itemName.equalsIgnoreCase(itemId.toLowerCase().replace(" ", "_")) || itemName.equalsIgnoreCase(iName.toLowerCase().replace(" ", "_"))) {
 						return Math.max(higherDepth(itemPrice, "low").getAsDouble(), 0);
 					}
 				}
@@ -1252,8 +1252,8 @@ public class NetworthExecute {
 	}
 
 	public double getMinionCost(String id, int tier, int depth) {
-		if (tier == 1 && (id.equals("FLOWER_GENERATOR") || id.equals("SNOW_GENERATOR"))) {
-			String finalId = id.split("GENERATOR")[0].toLowerCase() + "minion_i";
+		if ((tier == 1 && (id.equals("FLOWER_GENERATOR") || id.equals("SNOW_GENERATOR"))) || (tier == 12)) {
+			String finalId = id.split("GENERATOR")[0].toLowerCase() + "minion_" + (tier == 1 ? "i" : "xii");
 			return streamJsonArray(sbzPrices)
 				.filter(i -> higherDepth(i, "name", "").equals(finalId))
 				.map(i -> higherDepth(i, "low", 0))
@@ -1274,7 +1274,7 @@ public class NetworthExecute {
 					cost += getMinionCost(id, tier - 1, depth - 1);
 				}
 			} else {
-				cost += getLowestPrice(idCountSplit[0].replace("-", ":"), "") * Integer.parseInt(idCountSplit[1]);
+				cost += getLowestPrice(idCountSplit[0].replace("-", ":")) * Integer.parseInt(idCountSplit[1]);
 			}
 		}
 		return cost;

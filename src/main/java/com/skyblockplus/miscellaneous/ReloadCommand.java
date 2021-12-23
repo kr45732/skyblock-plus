@@ -25,7 +25,9 @@ import static com.skyblockplus.utils.Utils.defaultPerms;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
 
 public class ReloadCommand extends Command {
 
@@ -43,14 +45,16 @@ public class ReloadCommand extends Command {
 			protected void execute() {
 				logCommand();
 
-				eb = defaultEmbed("Reload Settings for " + event.getGuild().getName());
-				eb.addField("Apply settings reload status", onApplyReload(event.getGuild().getId()), false);
-				eb.addField("Verify settings reload status", onVerifyReload(event.getGuild().getId()), false);
-				eb.addField("Mee6 roles reload status", onMee6Reload(event.getGuild().getId()), false);
-
-				embed(eb);
+				embed(getReloadEmbed(event.getGuild()));
 			}
 		}
 			.queue();
+	}
+
+	public static EmbedBuilder getReloadEmbed(Guild guild){
+		return defaultEmbed("Reload Settings for " + guild.getName())
+				.addField("Apply settings reload status", onApplyReload(guild.getId()), false)
+				.addField("Verify settings reload status", onVerifyReload(guild.getId()), false)
+				.addField("Mee6 roles reload status", onMee6Reload(guild.getId()), false);
 	}
 }

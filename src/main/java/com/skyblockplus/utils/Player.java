@@ -610,11 +610,11 @@ public class Player {
 					capitalizeString(higherDepth(pet, "type").getAsString().toUpperCase().replace("_", " "))
 				);
 				invItemStruct.setId("PET");
-				if (higherDepth(pet, "skin") != null && !higherDepth(pet, "skin").isJsonNull()) {
+				if (higherDepth(pet, "skin", null) != null) {
 					invItemStruct.addExtraValue("PET_SKIN_" + higherDepth(pet, "skin").getAsString());
 				}
 				invItemStruct.setRarity(higherDepth(pet, "tier").getAsString());
-				if (higherDepth(pet, "heldItem") != null && !higherDepth(pet, "heldItem").isJsonNull()) {
+				if (higherDepth(pet, "heldItem", null) != null) {
 					invItemStruct.addExtraValue(higherDepth(pet, "heldItem").getAsString());
 				}
 				petsNameFormatted.add(invItemStruct);

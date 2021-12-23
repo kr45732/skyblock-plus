@@ -23,9 +23,13 @@ import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.skyblockplus.utils.AuctionFlipper;
+
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
@@ -103,32 +107,32 @@ public class MainListener extends ListenerAdapter {
 		if (isUniqueGuild(event.getGuild().getId())) {
 			try {
 				EmbedBuilder eb = defaultEmbed("Thank you!")
-					.setDescription(
-						"- Thank you for adding me to " +
-						event.getGuild().getName() +
-						"\n- My prefix is `" +
-						DEFAULT_PREFIX +
-						"` and can be changed using `" +
-						DEFAULT_PREFIX +
-						"settings set prefix <prefix>`\n- You can view my commands by running `" +
-						DEFAULT_PREFIX +
-						"help`\n- Make sure to check out `" +
-						DEFAULT_PREFIX +
-						"setup` or the forum post [**here**](" +
-						FORUM_POST_LINK +
-						") on how to setup the customizable features of this bot!"
-					);
+						.setDescription(
+								"- Thank you for adding me to " +
+										event.getGuild().getName() +
+										"\n- My prefix is `" +
+										DEFAULT_PREFIX +
+										"` and can be changed using `" +
+										DEFAULT_PREFIX +
+										"settings set prefix <prefix>`\n- You can view my commands by running `" +
+										DEFAULT_PREFIX +
+										"help`\n- Make sure to check out `" +
+										DEFAULT_PREFIX +
+										"setup` or the forum post [**here**](" +
+										FORUM_POST_LINK +
+										") on how to setup the customizable features of this bot!"
+						);
 				TextChannel channel = event
-					.getGuild()
-					.getTextChannels()
-					.stream()
-					.filter(textChannel -> textChannel.getName().toLowerCase().contains("general") && textChannel.canTalk())
-					.findFirst()
-					.orElse(null);
+						.getGuild()
+						.getTextChannels()
+						.stream()
+						.filter(textChannel -> textChannel.getName().toLowerCase().contains("general") && textChannel.canTalk())
+						.min(Comparator.naturalOrder())
+						.orElse(event.getGuild().getTextChannels().stream()
+								.filter(c -> event.getGuild().getPublicRole().hasPermission(c, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE))
+								.min(Comparator.naturalOrder()).orElse(null));
 				if (channel != null) {
 					channel.sendMessageEmbeds(eb.build()).queue();
-				} else {
-					event.getGuild().getDefaultChannel().sendMessageEmbeds(eb.build()).queue();
 				}
 			} catch (Exception ignored) {}
 

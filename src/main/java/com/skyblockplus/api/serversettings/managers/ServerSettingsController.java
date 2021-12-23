@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/private/serverSettings")
+@RequestMapping("/api/private/server-settings")
 public class ServerSettingsController {
 
 	private final ServerSettingsService settingsService;

@@ -18,19 +18,20 @@
 
 package com.skyblockplus.api.miscellaneous;
 
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.skyblockplus.features.jacob.JacobData;
 import com.skyblockplus.features.jacob.JacobHandler;
 import com.skyblockplus.help.HelpCommand;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.utils.Utils.*;
 
 @RestController
 @RequestMapping(value = "/api/public")
