@@ -68,10 +68,9 @@ public class FarmingContest {
 			if (enable) {
 				channel = jda.getGuildById(guildId).getTextChannelById(higherDepth(jacobSettings, "channel").getAsString());
 				wantedCrops =
-						gson.fromJson(higherDepth(jacobSettings, "crops").getAsJsonArray(), new TypeToken<List<RoleObject>>() {
-						}.getType());
+					gson.fromJson(higherDepth(jacobSettings, "crops").getAsJsonArray(), new TypeToken<List<RoleObject>>() {}.getType());
 			}
-		}catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

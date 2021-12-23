@@ -509,7 +509,9 @@ public class ApplyUser implements Serializable {
 										higherDepth(currentSettings, "guildName").getAsString() +
 										"_" +
 										applicationChannelId +
-												"_" + applyingUserId + "_" +
+										"_" +
+										applyingUserId +
+										"_" +
 										higherDepth(currentSettings, "guildMemberRole", "null"),
 										"Invited"
 									)
@@ -583,7 +585,9 @@ public class ApplyUser implements Serializable {
 											higherDepth(currentSettings, "guildName").getAsString() +
 											"_" +
 											applicationChannelId +
-											"_" + applyingUserId + "_" +
+											"_" +
+											applyingUserId +
+											"_" +
 											higherDepth(currentSettings, "guildMemberRole", "null"),
 											"Invited"
 										)

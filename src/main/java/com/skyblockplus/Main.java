@@ -235,7 +235,7 @@ public class Main {
 					new PartySlashCommand(),
 					new SettingsSlashCommand(),
 					new TimeSlashCommand(),
-						new ReloadSlashCommand()
+					new ReloadSlashCommand()
 				);
 
 		jda =

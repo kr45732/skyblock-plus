@@ -19,7 +19,6 @@
 package com.skyblockplus.api.linkedaccounts;
 
 import java.util.List;
-
 import net.dv8tion.jda.api.utils.data.DataObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -47,18 +46,21 @@ public class LinkedAccountController {
 
 	@GetMapping("/get/by")
 	public ResponseEntity<?> getByDiscordId(
-			@RequestParam(value = "id", required = false) String id,
-			@RequestParam(value = "uuid", required = false) String uuid,
-			@RequestParam(value = "username", required = false) String username
+		@RequestParam(value = "id", required = false) String id,
+		@RequestParam(value = "uuid", required = false) String uuid,
+		@RequestParam(value = "username", required = false) String username
 	) {
-		if(id != null) {
+		if (id != null) {
 			return settingsService.getByDiscordId(id);
-		}else if(uuid != null){
+		} else if (uuid != null) {
 			return settingsService.getByMinecraftUuid(uuid);
-		}else if(username != null){
+		} else if (username != null) {
 			return settingsService.getByMinecraftUsername(username);
-		}else{
-			return new ResponseEntity<>(DataObject.empty().put("success", false).put("cause", "No parameter provided from: id, uuid, username").toMap(), HttpStatus.BAD_REQUEST);
+		} else {
+			return new ResponseEntity<>(
+				DataObject.empty().put("success", false).put("cause", "No parameter provided from: id, uuid, username").toMap(),
+				HttpStatus.BAD_REQUEST
+			);
 		}
 	}
 }
