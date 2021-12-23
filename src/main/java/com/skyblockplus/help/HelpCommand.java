@@ -52,6 +52,7 @@ public class HelpCommand extends Command {
 	private static final String[] admin = ArrayUtils.addAll(
 		nonAdmin,
 		"Settings",
+		"Jacob Events",
 		"Verify Settings",
 		"Guild | Roles & Ranks Settings",
 		"Guild | Apply Settings",
@@ -737,10 +738,22 @@ public class HelpCommand extends Command {
 					"settings set pf_category <category>",
 					"Set the category where new channels will be created for the bot's party feature"
 				) +
+						help.create(
+								"settings set fetchur_channel <#channel>",
+								"Set the channel where fetchur item notifications will be sent every day at 12 am EST"
+						) +
 				help.create("settings set guest_role <@role>", "Set the guest role") +
 				help.create("settings delete hypixel_key", "Delete the set Hypixel API key of this server") +
 				help.create("settings delete prefix", "Reset the prefix of the bot") +
 				help.create("settings delete all", "Delete the current server settings")
+			);
+
+			paginateBuilder.addItems(
+				help.create("settings jacob", "View the current settings for farming event notifications") +
+				help.create("settings jacob <enable|disable>", "Enable or disable farming event notifications") +
+				help.create("settings jacob channel <#channel>", "Set the channel where farming event notifications will be sent") +
+				help.create("settings jacob add <crop> <@role>", "Added a crop and the role that should be pinged") +
+				help.create("settings jacob remove <crop>", "Remove a crop from the tracking list")
 			);
 
 			paginateBuilder.addItems(
@@ -828,15 +841,15 @@ public class HelpCommand extends Command {
 					"Enable or disable using the highest values or last played on profile. Default is false"
 				) +
 				help.create(
-					"settings roles <enable|disable> <roleName|all>",
+					"settings roles <enable|disable> <role_name|all>",
 					"Enable or disable a specific automatic role or enable or disable all applicable automatic roles"
 				) +
 				help.create(
-					"settings roles add <roleName> <value> <@role>",
+					"settings roles add <role_name> <value> <@role>",
 					"Add a new level to a role with its corresponding Discord role"
 				) +
-				help.create("settings roles remove <roleName> <value>", "Remove a role level for a role") +
-				help.create("settings roles set <roleName> <@role>", "Set a one level role's role")
+				help.create("settings roles remove <role_name> <value>", "Remove a role level for a role") +
+				help.create("settings roles set <role_name> <@role>", "Set a one level role's role")
 			);
 		}
 

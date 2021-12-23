@@ -80,6 +80,8 @@ public class ServerSettingsModel {
 
 	private String applyGuestRole = "";
 
+	private String fetchurChannel = "";
+
 	public ServerSettingsModel() {}
 
 	public ServerSettingsModel(String serverName, String serverId) {
@@ -109,6 +111,7 @@ public class ServerSettingsModel {
 		copy.setPrefix(prefix);
 		copy.setPfCategoryId(pfCategoryId);
 		copy.setApplyGuestRole(applyGuestRole);
+		copy.setFetchurChannel(fetchurChannel);
 		return copy;
 	}
 }

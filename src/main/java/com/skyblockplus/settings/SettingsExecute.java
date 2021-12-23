@@ -110,6 +110,10 @@ public class SettingsExecute {
 					break;
 				case "guest_role":
 					eb = setApplyGuestRole(args[3]);
+					break;
+				case "fetchur_channel":
+					eb = setFetchurChannel(args[3]);
+					break;
 			}
 		} else if (
 			(args.length == 4 || args.length == 5 || content.split(" ", 6).length == 6) &&
@@ -177,6 +181,8 @@ public class SettingsExecute {
 			eb.addField("Hypixel API Key", hypixelKey != null && hypixelKey.length() > 0 ? "Hidden" : "Not set", false);
 			String pfCategory = higherDepth(currentSettings, "pfCategoryId", "none");
 			eb.addField("Party Finder Category", pfCategory.equals("none") ? "None" : "<#" + pfCategory + ">", false);
+			String fetchurChannel = higherDepth(currentSettings, "fetchurChannel", "none");
+			eb.addField("Fetchur Notifications Channel", fetchurChannel.equals("none") ? "None" : "<#" + fetchurChannel + ">", false);
 			String applyGuestRole = higherDepth(currentSettings, "applyGuestRole", "none");
 			eb.addField("Guest Role", applyGuestRole.equals("none") ? "None" : "<@&" + applyGuestRole + ">", false);
 		} else if (args.length >= 2 && args[1].equals("jacob")) {
@@ -604,7 +610,7 @@ public class SettingsExecute {
 		}
 		guildMap.get(guild.getId()).farmingContest.reloadSettingsJson(jacobSettings);
 
-		return defaultSettingsEmbed("Enab jacob settings.");
+		return defaultSettingsEmbed("Enable jacob settings.");
 	}
 
 	/* Apply Settings */
@@ -2339,7 +2345,7 @@ public class SettingsExecute {
 		return defaultSettingsEmbed("**Reset the server's prefix to:** " + DEFAULT_PREFIX);
 	}
 
-	private EmbedBuilder setPartyFinderCategory(String category) {
+	public EmbedBuilder setPartyFinderCategory(String category) {
 		try {
 			if (category.equalsIgnoreCase("none")) {
 				int responseCode = database.setPartyFinderCategoryId(guild.getId(), "none");
@@ -2357,6 +2363,29 @@ public class SettingsExecute {
 				guildMap.get(guild.getId()).setPartyFinderCategory(pfCategory);
 
 				return defaultSettingsEmbed("**Party finder new channel category set to:** <#" + pfCategory.getId() + ">");
+			}
+		} catch (Exception ignored) {}
+		return invalidEmbed("Invalid guild category id");
+	}
+
+	public EmbedBuilder setFetchurChannel(String channel) {
+		try {
+			if (channel.equalsIgnoreCase("none")) {
+				int responseCode = database.setFetchurChannelId(guild.getId(), "none");
+				if (responseCode != 200) {
+					return invalidEmbed("API returned response code " + responseCode);
+				}
+				guildMap.get(guild.getId()).setPartyFinderCategory(null);
+				return defaultSettingsEmbed("**Fetchur notifications disabled**");
+			} else {
+				TextChannel fChannel = guild.getTextChannelById(channel.replaceAll("[<#>]", ""));
+				int responseCode = database.setFetchurChannelId(guild.getId(), fChannel.getId());
+				if (responseCode != 200) {
+					return invalidEmbed("API returned response code " + responseCode);
+				}
+				guildMap.get(guild.getId()).setFetchurChannel(fChannel);
+
+				return defaultSettingsEmbed("**Fetchur notifications channel set to:** " + fChannel.getAsMention());
 			}
 		} catch (Exception ignored) {}
 		return invalidEmbed("Invalid guild category id");

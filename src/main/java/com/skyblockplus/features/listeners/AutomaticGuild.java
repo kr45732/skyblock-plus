@@ -94,6 +94,7 @@ public class AutomaticGuild {
 	public final List<ScheduledFuture<?>> scheduledFutures = new ArrayList<>();
 	public String prefix;
 	public FarmingContest farmingContest;
+	public TextChannel fetchurChannel = null;
 
 	/* Constructor */
 	public AutomaticGuild(GenericGuildEvent event) {
@@ -108,6 +109,9 @@ public class AutomaticGuild {
 			partyFinderCategory = event.getGuild().getCategoryById(database.getPartyFinderCategoryId(guildId));
 		} catch (Exception ignored) {}
 		farmingContest = new FarmingContest(guildId);
+		try {
+			fetchurChannel = event.getGuild().getTextChannelById(database.getFetchurChannelId(guildId));
+		} catch (Exception ignored) {}
 	}
 
 	public static String getGuildPrefix(String guildId) {
@@ -922,7 +926,15 @@ public class AutomaticGuild {
 		this.partyList = partyList;
 	}
 
+	public void setFetchurChannel(TextChannel channel){this.fetchurChannel = channel;}
+
 	public void onFarmingContest(List<String> crops, MessageEmbed embed) {
 		farmingContest.onFarmingContest(crops, embed);
+	}
+
+	public void onFetchur(MessageEmbed embed) {
+		if(fetchurChannel != null){
+			fetchurChannel.sendMessageEmbeds(embed).queue();
+		}
 	}
 }

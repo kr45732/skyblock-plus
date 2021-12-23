@@ -30,6 +30,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
+import com.skyblockplus.features.jacob.JacobData;
+import com.skyblockplus.features.jacob.JacobHandler;
 import com.skyblockplus.features.party.Party;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
@@ -72,6 +74,7 @@ public class ApiHandler {
 			initializeParties();
 			updateBotListStatistics();
 			initializeCommandUses();
+			initializeJacobData();
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateCache, 60, 90, TimeUnit.SECONDS);
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateLinkedAccounts, 60, 30, TimeUnit.SECONDS);
 		} catch (SQLException e) {
@@ -683,6 +686,15 @@ public class ApiHandler {
 		}
 	}
 
+	public static int cacheJacobDataDb(String json) {
+		try (Statement statement = getCacheDatabaseConnection().createStatement()) {
+			statement.executeUpdate("INSERT INTO jacob VALUES (0, '" + json + "') ON DUPLICATE KEY UPDATE data = VALUES(data)");
+			return 200;
+		} catch (Exception e) {
+			return 400;
+		}
+	}
+
 	public static void initializeCommandUses() {
 		if (!isMainBot()) {
 			return;
@@ -698,6 +710,23 @@ public class ApiHandler {
 			}
 		} catch (Exception e) {
 			log.error("initializeCommandUses", e);
+		}
+	}
+
+	public static void initializeJacobData() {
+		if (!isMainBot()) {
+			return;
+		}
+
+		try (Statement statement = getCacheDatabaseConnection().createStatement()) {
+			try (ResultSet response = statement.executeQuery("SELECT * FROM jacob")) {
+				response.next();
+				JacobData data = gson.fromJson(response.getString("data"), JacobData.class);
+				JacobHandler.setJacobData(data);
+				log.info("Retrieved jacob data");
+			}
+		} catch (Exception e) {
+			log.error("initializeJacobData", e);
 		}
 	}
 

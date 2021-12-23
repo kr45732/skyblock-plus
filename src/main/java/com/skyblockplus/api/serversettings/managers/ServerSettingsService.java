@@ -29,6 +29,7 @@ import com.skyblockplus.api.serversettings.automatedverify.AutomatedVerify;
 import com.skyblockplus.api.serversettings.jacob.JacobSettings;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -678,6 +679,28 @@ public class ServerSettingsService {
 
 		if (currentServerSettings != null) {
 			currentServerSettings.setJacobSettings(newSettings);
+			settingsRepository.save(currentServerSettings);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	}
+
+	public ResponseEntity<?> getFetchurChannelId(String serverId) {
+		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+		if (currentServerSettings != null) {
+			return new ResponseEntity<>(currentServerSettings.getFetchurChannel(), HttpStatus.OK);
+		}
+
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	}
+
+	public ResponseEntity<HttpStatus> setFetchurChannelId(String serverId, String newChannelId) {
+		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+		if (currentServerSettings != null) {
+			currentServerSettings.setFetchurChannel(newChannelId);
 			settingsRepository.save(currentServerSettings);
 			return new ResponseEntity<>(HttpStatus.OK);
 		}

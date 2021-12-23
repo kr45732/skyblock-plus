@@ -57,7 +57,7 @@ public class InformationCommand extends Command {
 				"**Servers:** " +
 				jda.getGuilds().size() +
 				"\n**Users:** " +
-				formatNumber(PublicEndpoints.userCount) +
+				formatNumber(getUserCount()) +
 				"\n**Ping:** " +
 				jda.getRestPing().complete() +
 				"ms\n**Websocket:** " +

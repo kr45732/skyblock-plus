@@ -22,8 +22,6 @@ import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.miscellaneous.TimeCommand.getSkyblockYear;
 import static com.skyblockplus.utils.Utils.*;
 
-import com.skyblockplus.api.miscellaneous.JacobContest;
-import com.skyblockplus.api.miscellaneous.JacobData;
 import com.skyblockplus.features.listeners.AutomaticGuild;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -33,13 +31,12 @@ public class JacobHandler {
 	private static JacobData jacobData = null;
 	private static boolean isRunning = false;
 
-	public static void initialize() {
-		// TODO: cache this when stop and start
-		setJacobData(gson.fromJson(getJson("https://hst.sh/raw/ceziketoko.json"), JacobData.class));
-	}
-
 	public static boolean needsUpdate() {
 		return jacobData == null || jacobData.getYear() != getSkyblockYear();
+	}
+
+	public static JacobData getJacobData(){
+		return jacobData;
 	}
 
 	public static void setJacobData(JacobData jacobData) {

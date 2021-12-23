@@ -26,7 +26,7 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.api.miscellaneous.PublicEndpoints;
 import com.skyblockplus.dev.*;
 import com.skyblockplus.dungeons.*;
-import com.skyblockplus.features.jacob.JacobHandler;
+import com.skyblockplus.features.fetchur.FetchurHandler;
 import com.skyblockplus.features.listeners.MainListener;
 import com.skyblockplus.features.party.PartyCommand;
 import com.skyblockplus.features.party.PartySlashCommand;
@@ -264,7 +264,7 @@ public class Main {
 		TrackAuctionsCommand.initialize();
 		AuctionFlipper.setEnable(true);
 		PublicEndpoints.initialize();
-		JacobHandler.initialize();
+		FetchurHandler.initialize();
 	}
 
 	@PreDestroy
@@ -279,6 +279,9 @@ public class Main {
 
 		log.info("Caching Command Uses");
 		cacheCommandUses();
+
+		log.info("Caching Jacob Data");
+		cacheJacobData();
 
 		log.info("Closing Http Client");
 		closeHttpClient();

@@ -16,27 +16,36 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.api.miscellaneous;
+package com.skyblockplus.features.jacob;
 
-import java.util.Iterator;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import lombok.Data;
 
 @Data
-public class JacobData {
+public class JacobContest {
 
-	private int year;
-	private List<JacobContest> contests;
+	private long time;
+	private List<String> crops;
 
-	public JacobContest getNextContest() {
-		for (Iterator<JacobContest> iterator = contests.iterator(); iterator.hasNext();) {
-			JacobContest contest = iterator.next();
-			if (contest.reminderHasPassed()) {
-				iterator.remove();
-			} else {
-				return contest;
-			}
+	public boolean reminderHasPassed() {
+		return Instant.now().isAfter(getTimeInstant().minusSeconds(301));
+	}
+
+	public Instant getTimeInstant() {
+		return Instant.ofEpochMilli(time);
+	}
+
+	public Duration getDurationUntil() {
+		return Duration.between(Instant.now(), getTimeInstant());
+	}
+
+	public String getCropsFormatted() {
+		StringBuilder cropsFormatted = new StringBuilder();
+		for (String crop : crops) {
+			cropsFormatted.append("➜ ").append(crop).append("\n");
 		}
-		return null;
+		return cropsFormatted.toString();
 	}
 }

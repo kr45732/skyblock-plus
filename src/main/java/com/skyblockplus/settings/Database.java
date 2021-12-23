@@ -250,4 +250,16 @@ public class Database {
 	public int setJacobSettings(String serverId, JsonElement newSettings) {
 		return settingsService.setJacobSettings(serverId, gson.fromJson(newSettings, JacobSettings.class)).getStatusCodeValue();
 	}
+
+    public String getFetchurChannelId(String serverId) {
+		try {
+			return (String) settingsService.getFetchurChannelId(serverId).getBody();
+		} catch (Exception e) {
+			return null;
+		}
+    }
+
+	public int setFetchurChannelId(String serverId, String newSettings) {
+		return settingsService.setFetchurChannelId(serverId, newSettings).getStatusCodeValue();
+	}
 }

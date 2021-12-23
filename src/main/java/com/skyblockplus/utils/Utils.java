@@ -30,6 +30,7 @@ import com.google.gson.*;
 import com.jagrosh.jdautilities.command.Command;
 import com.skyblockplus.features.apply.ApplyGuild;
 import com.skyblockplus.features.apply.ApplyUser;
+import com.skyblockplus.features.jacob.JacobHandler;
 import com.skyblockplus.features.listeners.AutomaticGuild;
 import com.skyblockplus.features.party.Party;
 import com.skyblockplus.utils.command.CustomPaginator;
@@ -128,6 +129,8 @@ public class Utils {
 	public static Instant bazaarJsonLastUpdated = Instant.now();
 	public static Instant sbzPricesJsonLastUpdated = Instant.now();
 	public static Set<String> vanillaItems;
+	private static Instant userCountLastUpdated = Instant.now();
+	private static int userCount = -1;
 	/* JSON */
 	private static JsonElement essenceCostsJson;
 	private static JsonElement levelingJson;
@@ -1154,7 +1157,20 @@ public class Utils {
 		if (cacheCommandUseDb(gson.toJson(getCommandUses())) == 200) {
 			log.info("Cached command uses in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
 		} else {
-			log.error("Failed to cached command uses in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
+			log.error("Failed to cache command uses in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
+		}
+	}
+
+	public static void cacheJacobData() {
+		if (!isMainBot()) {
+			return;
+		}
+
+		long startTime = System.currentTimeMillis();
+		if (cacheJacobDataDb(gson.toJson(JacobHandler.getJacobData())) == 200) {
+			log.info("Cached jacob data in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
+		} else {
+			log.error("Failed to jacob data uses in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
 		}
 	}
 
@@ -1277,5 +1293,27 @@ public class Utils {
 			.collect(Collectors.toMap(SlashCommand::getName, command -> slashCommandClient.getCommandUses(command), (a, b) -> b))
 			.forEach((key, value) -> commandUses.merge(key, value, Integer::sum));
 		return commandUses;
+	}
+
+	public static int getUserCount(){
+		if (userCount == -1 || Duration.between(userCountLastUpdated, Instant.now()).toHours() >= 1) {
+			userCount =
+					jda
+							.getGuilds()
+							.stream()
+							.filter(g -> !Arrays.asList(
+									"374071874222686211",
+									"110373943822540800",
+									"597450230430040076",
+									"703967135961055314",
+									"858695709393027102"
+							).contains(g.getId()))
+							.map(Guild::getMemberCount)
+							.mapToInt(Integer::intValue)
+							.sum();
+			userCountLastUpdated = Instant.now();
+		}
+
+		return userCount;
 	}
 }
