@@ -89,7 +89,7 @@ public class Utils {
 	public static final CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 	public static final OkHttpClient okHttpClient = new OkHttpClient().newBuilder().build();
 	public static final ExecutorService executor = new ExceptionExecutor();
-	public static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(3);
+	public static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(5);
 	public static final ScriptEngine jsScriptEngine = new ScriptEngineManager().getEngineByName("js");
 	public static final AtomicInteger remainingLimit = new AtomicInteger(120);
 	public static final AtomicInteger timeTillReset = new AtomicInteger(0);

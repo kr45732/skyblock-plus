@@ -559,6 +559,12 @@ public class SettingsExecute {
 		JsonObject jacobSettings = database.getJacobSettings(guild.getId()).getAsJsonObject();
 		JsonArray crops = higherDepth(jacobSettings, "crops").getAsJsonArray();
 
+		for (int i = crops.size() - 1; i >= 0; i--) {
+			if (higherDepth(crops.get(i), "value").getAsString().equals(crop)) {
+				crops.remove(i);
+			}
+		}
+
 		crops.add(gson.toJsonTree(new RoleObject(crop, role.getId())));
 		jacobSettings.add("crops", crops);
 		int responseCode = database.setJacobSettings(guild.getId(), jacobSettings);

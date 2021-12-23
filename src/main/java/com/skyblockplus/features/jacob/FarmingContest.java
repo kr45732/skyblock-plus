@@ -18,11 +18,12 @@
 
 package com.skyblockplus.features.jacob;
 
+import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.gson;
 import static com.skyblockplus.utils.Utils.higherDepth;
 
-import com.google.gson.JsonObject;
+import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
 import java.util.ArrayList;
@@ -39,24 +40,29 @@ public class FarmingContest {
 
 	public FarmingContest(String guildId) {
 		this.guildId = guildId;
+		reloadSettingsJson(database.getJacobSettings(guildId));
 	}
 
 	public void onFarmingContest(List<String> crops, MessageEmbed embed) {
-		if (enable) {
-			List<String> roleMentions = new ArrayList<>();
-			for (RoleObject wantedCrop : wantedCrops) {
-				if (crops.contains(wantedCrop.getValue())) {
-					roleMentions.add("<@&" + wantedCrop.getRoleId() + ">");
+		try {
+			if (enable) {
+				List<String> roleMentions = new ArrayList<>();
+				for (RoleObject wantedCrop : wantedCrops) {
+					if (crops.contains(wantedCrop.getValue())) {
+						roleMentions.add("<@&" + wantedCrop.getRoleId() + ">");
+					}
+				}
+
+				if (!roleMentions.isEmpty()) {
+					channel.sendMessage(String.join(" ", roleMentions)).setEmbeds(embed).queue();
 				}
 			}
-
-			if (!roleMentions.isEmpty()) {
-				channel.sendMessage(String.join(" ", roleMentions)).setEmbeds(embed).queue();
-			}
+		}catch (Exception e){
+			e.printStackTrace();
 		}
 	}
 
-	public void reloadSettingsJson(JsonObject jacobSettings) {
+	public void reloadSettingsJson(JsonElement jacobSettings) {
 		enable = higherDepth(jacobSettings, "enable", false);
 		if (enable) {
 			channel = jda.getGuildById(guildId).getTextChannelById(higherDepth(jacobSettings, "channel").getAsString());
