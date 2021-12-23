@@ -25,7 +25,6 @@ import static com.skyblockplus.utils.Utils.*;
 import com.skyblockplus.api.miscellaneous.JacobContest;
 import com.skyblockplus.api.miscellaneous.JacobData;
 import com.skyblockplus.features.listeners.AutomaticGuild;
-
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
@@ -60,25 +59,25 @@ public class JacobHandler {
 		if (nextContest != null) {
 			isRunning = true;
 			scheduler.schedule(
-					() -> {
-						try {
-							MessageEmbed embed = defaultEmbed("Jacob's Contest")
-									.setDescription(
-											"The next farming contest is starting <t:" + nextContest.getTimeInstant().getEpochSecond() + ":R>\n"
-									)
-									.addField("Crops", nextContest.getCropsFormatted(), false)
-									.build();
-							for (AutomaticGuild guild : guildMap.values()) {
-								guild.onFarmingContest(nextContest.getCrops(), embed);
-							}
-							queue();
-						} catch (Exception e) {
-							isRunning = false;
-							e.printStackTrace();
+				() -> {
+					try {
+						MessageEmbed embed = defaultEmbed("Jacob's Contest")
+							.setDescription(
+								"The next farming contest is starting <t:" + nextContest.getTimeInstant().getEpochSecond() + ":R>\n"
+							)
+							.addField("Crops", nextContest.getCropsFormatted(), false)
+							.build();
+						for (AutomaticGuild guild : guildMap.values()) {
+							guild.onFarmingContest(nextContest.getCrops(), embed);
 						}
-					},
-					nextContest.getDurationUntil().minusMinutes(5).toMillis(),
-					TimeUnit.MILLISECONDS
+						queue();
+					} catch (Exception e) {
+						isRunning = false;
+						e.printStackTrace();
+					}
+				},
+				nextContest.getDurationUntil().minusMinutes(5).toMillis(),
+				TimeUnit.MILLISECONDS
 			);
 		} else {
 			isRunning = false;

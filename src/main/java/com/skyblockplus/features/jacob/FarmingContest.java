@@ -57,7 +57,7 @@ public class FarmingContest {
 					channel.sendMessage(String.join(" ", roleMentions)).setEmbeds(embed).queue();
 				}
 			}
-		}catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
