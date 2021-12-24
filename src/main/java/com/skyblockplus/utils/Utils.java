@@ -643,11 +643,13 @@ public class Utils {
 	}
 
 	public static String capitalizeString(String str) {
-		return str == null ? null : Stream
-			.of(str.trim().split("\\s"))
-			.filter(word -> word.length() > 0)
-			.map(word -> word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase())
-			.collect(Collectors.joining(" "));
+		return str == null
+			? null
+			: Stream
+				.of(str.trim().split("\\s"))
+				.filter(word -> word.length() > 0)
+				.map(word -> word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase())
+				.collect(Collectors.joining(" "));
 	}
 
 	public static String parseMcCodes(String unformattedString) {
