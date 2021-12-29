@@ -18,13 +18,13 @@
 
 package com.skyblockplus.miscellaneous;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.utils.command.CommandExecute;
-
 import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.utils.Utils.defaultPerms;
 import static com.skyblockplus.utils.Utils.globalCooldown;
+
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.command.CommandExecute;
 
 public class MentionCommand extends Command {
 
@@ -39,7 +39,10 @@ public class MentionCommand extends Command {
 		new CommandExecute(this, event, false) {
 			@Override
 			protected void execute() {
-				event.getMessage().reply("My prefix here is `/` or `" + getGuildPrefix(event.getGuild().getId()) + "`. Type `/help` for help!").queue();
+				event
+					.getMessage()
+					.reply("My prefix here is `/` or `" + getGuildPrefix(event.getGuild().getId()) + "`. Type `/help` for help!")
+					.queue();
 			}
 		}
 			.queue();

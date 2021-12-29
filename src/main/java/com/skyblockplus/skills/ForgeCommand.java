@@ -18,20 +18,19 @@
 
 package com.skyblockplus.skills;
 
+import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.time.Instant;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static com.skyblockplus.utils.Constants.*;
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class ForgeCommand extends Command {
 
@@ -48,13 +47,20 @@ public class ForgeCommand extends Command {
 			JsonObject forgeItems = higherDepth(player.profileJson(), "forge.forge_processes.forge_1").getAsJsonObject();
 			for (JsonElement forgeItem : forgeItems.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList())) {
 				String itemId = higherDepth(forgeItem, "id").getAsString();
-				eb.addField(idToName(itemId),
-						"Slot: " + higherDepth(forgeItem, "slot", 0)
-						+ "\nEnd: <t:" + Instant.ofEpochMilli(higherDepth(forgeItem, "startTime").getAsLong()).plusMillis(FORGE_TIMES.get(itemId)).getEpochSecond()  + ":R>"
-						,false
+				eb.addField(
+					idToName(itemId),
+					"Slot: " +
+					higherDepth(forgeItem, "slot", 0) +
+					"\nEnd: <t:" +
+					Instant
+						.ofEpochMilli(higherDepth(forgeItem, "startTime").getAsLong())
+						.plusMillis(FORGE_TIMES.get(itemId))
+						.getEpochSecond() +
+					":R>",
+					false
 				);
 			}
-			if(eb.getFields().size() == 0){
+			if (eb.getFields().size() == 0) {
 				return defaultEmbed(player.getUsername() + " has no items in the forge");
 			}
 			return eb;

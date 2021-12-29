@@ -18,17 +18,16 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.util.stream.Collectors;
-
-import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class ScammerCommand extends Command {
 
@@ -40,26 +39,41 @@ public class ScammerCommand extends Command {
 
 	public static EmbedBuilder getScammer(String username) {
 		UsernameUuidStruct usernameUuid = usernameToUuid(username);
-		if(usernameUuid.isNotValid()){
+		if (usernameUuid.isNotValid()) {
 			return invalidEmbed(usernameUuid.failCause());
 		}
 
 		JsonElement scammerJson = getScammerJson(usernameUuid.uuid());
-		EmbedBuilder eb = defaultEmbed(usernameUuid.username(), "https://mine.ly/" + usernameUuid.uuid()).setFooter("Scammer check powered by SkyBlockZ (discord.gg/skyblock)");
-		if(scammerJson == null){
-			return eb.setDescription(usernameUuid.username() + " is not marked as a scammer but still take caution when trading with any player!");
+		EmbedBuilder eb = defaultEmbed(usernameUuid.username(), "https://mine.ly/" + usernameUuid.uuid())
+			.setFooter("Scammer check powered by SkyBlockZ (discord.gg/skyblock)");
+		if (scammerJson == null) {
+			return eb.setDescription(
+				usernameUuid.username() + " is not marked as a scammer but still take caution when trading with any player!"
+			);
 		}
 
 		eb.setDescription("This account **IS** marked as a scammer");
 		eb.addField("Reason", higherDepth(scammerJson, "result.reason", "No reason provided"), false);
-		if(higherDepth(scammerJson, "is_alt", false)){
+		if (higherDepth(scammerJson, "is_alt", false)) {
 			eb.setDescription("This account **IS** marked as a scammers alt");
 		}
-		if(higherDepth(scammerJson, "result.discord.[0]") != null){
-			eb.addField("Discord Account(s)", streamJsonArray(higherDepth(scammerJson, "result.discord").getAsJsonArray()).map(e -> "<@" + e.getAsString() + ">").collect(Collectors.joining(" ")), false);
+		if (higherDepth(scammerJson, "result.discord.[0]") != null) {
+			eb.addField(
+				"Discord Account(s)",
+				streamJsonArray(higherDepth(scammerJson, "result.discord").getAsJsonArray())
+					.map(e -> "<@" + e.getAsString() + ">")
+					.collect(Collectors.joining(" ")),
+				false
+			);
 		}
-		if(higherDepth(scammerJson, "result.alts.[0]") != null){
-			eb.addField("Minecraft Alt(s)", streamJsonArray(higherDepth(scammerJson, "result.alts").getAsJsonArray()).map(JsonElement::getAsString).collect(Collectors.joining(" ")), false);
+		if (higherDepth(scammerJson, "result.alts.[0]") != null) {
+			eb.addField(
+				"Minecraft Alt(s)",
+				streamJsonArray(higherDepth(scammerJson, "result.alts").getAsJsonArray())
+					.map(JsonElement::getAsString)
+					.collect(Collectors.joining(" ")),
+				false
+			);
 		}
 		return eb;
 	}

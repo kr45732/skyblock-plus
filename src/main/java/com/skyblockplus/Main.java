@@ -110,7 +110,8 @@ public class Main {
 							globalExceptionHandler.uncaughtException(event, command, throwable);
 						}
 					}
-				).setActivity(Activity.playing("Loading..."))
+				)
+				.setActivity(Activity.playing("Loading..."))
 				.addCommands(
 					new InformationCommand(),
 					new SlayerCommand(),
@@ -174,9 +175,9 @@ public class Main {
 					new GuildStatisticsCommand(),
 					new PartyCommand(),
 					new TimeCommand(),
-						new ForgeCommand(),
-						new ScammerCommand(),
-						new MentionCommand()
+					new ForgeCommand(),
+					new ScammerCommand(),
+					new MentionCommand()
 				)
 				.build();
 
@@ -236,8 +237,8 @@ public class Main {
 					new SettingsSlashCommand(),
 					new TimeSlashCommand(),
 					new ReloadSlashCommand(),
-						new ForgeSlashCommand(),
-						new ScammerSlashCommand()
+					new ForgeSlashCommand(),
+					new ScammerSlashCommand()
 				);
 
 		jda =

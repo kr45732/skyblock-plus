@@ -510,7 +510,7 @@ public class Utils {
 		return higherDepth(scammerJson, "success", false) ? scammerJson : null;
 	}
 
-	public static String getScammerReason(String uuid){
+	public static String getScammerReason(String uuid) {
 		return higherDepth(getScammerJson(uuid), "result.reason", "No reason provided");
 	}
 
@@ -968,17 +968,22 @@ public class Utils {
 							NBTCompound enchants = item.getCompound("tag.ExtraAttributes.enchantments");
 							List<String> enchantsList = new ArrayList<>();
 							for (Map.Entry<String, Object> enchant : enchants.entrySet()) {
-								if(enchant.getKey().equals("EFFICIENCY") && !itemInfo.getId().equals("STONK_PICKAXE") && (int) enchant.getValue() > 5){
-									 itemInfo.addExtraValues((int) enchant.getValue() - 5, "SIL_EX");
+								if (
+									enchant.getKey().equals("EFFICIENCY") &&
+									!itemInfo.getId().equals("STONK_PICKAXE") &&
+									(int) enchant.getValue() > 5
+								) {
+									itemInfo.addExtraValues((int) enchant.getValue() - 5, "SIL_EX");
 								}
 								enchantsList.add(enchant.getKey() + ";" + enchant.getValue());
-
 							}
 							itemInfo.setEnchantsFormatted(enchantsList);
 						}
 
 						if (item.containsKey("tag.ExtraAttributes.skin")) {
-							itemInfo.addExtraValue((itemInfo.getId().equals("PET") ? "PET_SKIN_" : "") + item.getString("tag.ExtraAttributes.skin"));
+							itemInfo.addExtraValue(
+								(itemInfo.getId().equals("PET") ? "PET_SKIN_" : "") + item.getString("tag.ExtraAttributes.skin")
+							);
 						}
 
 						if (item.containsKey("tag.ExtraAttributes.talisman_enrichment")) {
