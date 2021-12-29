@@ -177,7 +177,7 @@ public class Constants {
 			IGNORED_ENCHANTS = gson.fromJson(higherDepth(constantsJson, "IGNORED_ENCHANTS"), mapStringInteger);
 
 			/* FORGE_TIMES */
-			FORGE_TIMES = gson.fromJson(higherDepth(constantsJson, "IGNORED_ENCHANTS"), mapStringLong);
+			FORGE_TIMES = gson.fromJson(higherDepth(constantsJson, "FORGE_TIMES"), mapStringLong);
 
 			/* ENCHANT_NAMES */
 			HashSet<String> enchantNames = new HashSet<>();

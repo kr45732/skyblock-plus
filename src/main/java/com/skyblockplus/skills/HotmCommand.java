@@ -77,6 +77,9 @@ public class HotmCommand extends Command {
 				if (!perk.getValue().getAsJsonPrimitive().isNumber()) {
 					continue;
 				}
+				if(HOTM_PERK_MAX_LEVEL.getOrDefault(perk.getKey(), 50) == 1){
+					continue;
+				}
 				perksStr
 					.append("• **")
 					.append(capitalizeString(HOTM_PERK_ID_TO_NAME.getOrDefault(perk.getKey(), perk.getKey().replace("_", " "))))

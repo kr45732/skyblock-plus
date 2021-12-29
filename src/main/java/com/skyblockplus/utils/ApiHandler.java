@@ -71,7 +71,7 @@ public class ApiHandler {
 		try {
 			getCacheDatabaseConnection();
 			initializeParties();
-			scheduler.scheduleWithFixedDelay(ApiHandler::updateBotStatistics, 0, 6, TimeUnit.HOURS);
+			scheduler.scheduleWithFixedDelay(ApiHandler::updateBotStatistics, 0, 3, TimeUnit.HOURS);
 			initializeCommandUses();
 			initializeJacobData();
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateCache, 60, 90, TimeUnit.SECONDS);

@@ -22,7 +22,6 @@ import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
@@ -44,8 +43,22 @@ public class ForgeCommand extends Command {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			EmbedBuilder eb = player.defaultPlayerEmbed();
-			JsonObject forgeItems = higherDepth(player.profileJson(), "forge.forge_processes.forge_1").getAsJsonObject();
-			for (JsonElement forgeItem : forgeItems.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList())) {
+			JsonElement forgeItems = higherDepth(player.profileJson(), "forge.forge_processes.forge_1");
+			if(forgeItems == null){
+				return defaultEmbed(player.getUsername() + " has no items in the forge");
+			}
+			int forgeTime = higherDepth(player.profileJson(), "mining_core.nodes.forge_time", 0);
+			double bonus;
+			if(forgeTime <= 1){
+				bonus = 1;
+			} else if (forgeTime <= 10){
+				bonus = 0.85;
+			}else if(forgeTime <= 19){
+				bonus = 0.805;
+			}else {
+				bonus = 0.7;
+			}
+			for (JsonElement forgeItem : forgeItems.getAsJsonObject().entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList())) {
 				String itemId = higherDepth(forgeItem, "id").getAsString();
 				eb.addField(
 					idToName(itemId),
@@ -54,7 +67,7 @@ public class ForgeCommand extends Command {
 					"\nEnd: <t:" +
 					Instant
 						.ofEpochMilli(higherDepth(forgeItem, "startTime").getAsLong())
-						.plusMillis(FORGE_TIMES.get(itemId))
+						.plusMillis((long) (FORGE_TIMES.get(itemId) * bonus))
 						.getEpochSecond() +
 					":R>",
 					false
@@ -62,6 +75,9 @@ public class ForgeCommand extends Command {
 			}
 			if (eb.getFields().size() == 0) {
 				return defaultEmbed(player.getUsername() + " has no items in the forge");
+			}
+			if(forgeTime != 1){
+				eb.setDescription("**Quick Forge:**" + roundAndFormat(100 - forgeTime * 100.0) + "& less forge time");
 			}
 			return eb;
 		}
