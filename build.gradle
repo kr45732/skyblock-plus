@@ -100,5 +100,5 @@ dependencies {
 
     // Caching
     // noinspection GradlePackageUpdate
-    implementation 'com.github.ben-manes.caffeine:caffeine:2.9.2'
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.0.5'
 }
