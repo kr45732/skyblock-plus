@@ -391,8 +391,7 @@ public class RolesCommand extends Command {
 							}
 						}
 					}
-					case "pet_enthusiast" -> // TODO: Highest role for this
-					{
+					case "pet_enthusiast" -> { // TODO: Highest role for this
 						JsonArray playerPets = player.getPets();
 						ArrayList<String> excludedPets = new ArrayList<>(Arrays.asList("guardian", "jellyfish", "parrot", "sheep"));
 
