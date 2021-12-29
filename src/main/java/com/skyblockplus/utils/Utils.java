@@ -511,7 +511,8 @@ public class Utils {
 	}
 
 	public static String getScammerReason(String uuid) {
-		return higherDepth(getScammerJson(uuid), "result.reason", "No reason provided");
+		JsonElement scammerJson = getScammerJson(uuid);
+		return scammerJson != null ? higherDepth(getScammerJson(uuid), "result.reason", "No reason provided") : null;
 	}
 
 	/* Logging */
