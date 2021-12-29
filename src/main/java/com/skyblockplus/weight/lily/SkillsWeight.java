@@ -44,8 +44,7 @@ public class SkillsWeight {
 		double skillAverage = 0;
 		for (String skill : SKILL_NAMES) {
 			try {
-				SkillsStruct skillsStruct = player.getSkill(skill, Player.WeightType.LILY);
-				skillAverage += skillsStruct.currentLevel();
+				skillAverage += player.getSkill(skill, Player.WeightType.LILY).currentLevel();
 			} catch (Exception e) {
 				return new WeightStruct();
 			}
@@ -56,11 +55,12 @@ public class SkillsWeight {
 		JsonArray srwTable = higherDepth(SKILL_RATIO_WEIGHT, skillName).getAsJsonArray();
 		double base =
 			(
-				(12 * Math.pow((skillAverage / 60), 2)) *
+				(12 * Math.pow((skillAverage / 60), 2.44780217148309)) *
 				srwTable.get(skillsStruct.currentLevel()).getAsDouble() *
 				srwTable.get(srwTable.size() - 1).getAsDouble()
 			) +
 			(srwTable.get(srwTable.size() - 1).getAsDouble() * Math.pow(skillsStruct.currentLevel() / 60.0, Math.pow(2, 0.5)));
+		base *= 0.908108108108108;
 		double overflow = 0;
 		if (skillsStruct.totalExp() > SKILLS_LEVEL_60_XP) {
 			double factor = higherDepth(SKILL_FACTORS, skillName).getAsDouble();

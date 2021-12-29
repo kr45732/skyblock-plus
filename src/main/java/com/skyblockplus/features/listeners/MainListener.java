@@ -40,13 +40,10 @@ import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class MainListener extends ListenerAdapter {
 
 	public static final Map<String, AutomaticGuild> guildMap = new HashMap<>();
-	private static final Logger log = LoggerFactory.getLogger(MainListener.class);
 
 	public static String onApplyReload(String guildId) {
 		String reloadStatus = "Error reloading";
@@ -80,8 +77,6 @@ public class MainListener extends ListenerAdapter {
 
 		if (isUniqueGuild(event.getGuild().getId())) {
 			guildMap.put(event.getGuild().getId(), new AutomaticGuild(event));
-		} else {
-			log.warn("GuildReadyEvent - " + event.getGuild() + " exists in guildMap");
 		}
 	}
 
@@ -151,8 +146,6 @@ public class MainListener extends ListenerAdapter {
 			);
 
 			guildMap.put(event.getGuild().getId(), new AutomaticGuild(event));
-		} else {
-			log.warn("GuildJoinEvent - " + event.getGuild() + " exists in guildMap");
 		}
 	}
 

@@ -48,16 +48,16 @@ public class DungeonsWeight {
 		long cataXP = cataSkill.totalExp();
 
 		double n = cataXP < 569809640
-			? 0.2 * Math.pow(level / 50, 2.967355422)
-			: 0.2 * Math.pow(1 + (cataXP - CATACOMBS_LEVEL_50_XP) / 142452410 / 50, 2.967355422);
+			? 0.2 * Math.pow(level / 50, 1.538679118869934)
+			: Math.pow(1 + (cataXP - CATACOMBS_LEVEL_50_XP) / 142452410 / 50, 2.967355422);
 
 		if (level != 0) {
 			if (cataXP < 569809640) {
 				return weightStruct.add(
-					new WeightStruct(0.81522766192742 * ((Math.pow(1.18340401286164044, (level + 1)) - 1.05994990217254) * (1 + n)))
+					new WeightStruct(0.5046647430979266 * ((Math.pow(1.18340401286164044, (level + 1)) - 1.05994990217254) * (1 + n)))
 				);
 			} else {
-				return weightStruct.add(new WeightStruct(4000 * (n / 0.15465244570598540)));
+				return weightStruct.add(new WeightStruct(3250 * n));
 			}
 		} else {
 			return new WeightStruct();

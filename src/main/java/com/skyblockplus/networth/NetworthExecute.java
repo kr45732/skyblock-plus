@@ -1265,7 +1265,7 @@ public class NetworthExecute {
 			String[] idCountSplit = material.split(":");
 			if (idCountSplit[0].contains("GENERATOR")) {
 				if (depth - 1 != 0) {
-					cost += getMinionCost(id, tier - 1, depth - 1);
+					cost += getMinionCost(idCountSplit[0].substring(0, idCountSplit[0].lastIndexOf("_")), tier - 1, depth - 1);
 				}
 			} else {
 				cost += getLowestPrice(idCountSplit[0].replace("-", ":")) * Integer.parseInt(idCountSplit[1]);

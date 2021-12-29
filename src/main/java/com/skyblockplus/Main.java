@@ -49,10 +49,7 @@ import com.skyblockplus.price.*;
 import com.skyblockplus.settings.Database;
 import com.skyblockplus.settings.SettingsCommand;
 import com.skyblockplus.settings.SettingsSlashCommand;
-import com.skyblockplus.skills.HotmCommand;
-import com.skyblockplus.skills.HotmSlashCommand;
-import com.skyblockplus.skills.SkillsCommand;
-import com.skyblockplus.skills.SkillsSlashCommand;
+import com.skyblockplus.skills.*;
 import com.skyblockplus.slayer.SlayerCommand;
 import com.skyblockplus.slayer.SlayerSlashCommand;
 import com.skyblockplus.utils.ApiHandler;
@@ -113,7 +110,7 @@ public class Main {
 							globalExceptionHandler.uncaughtException(event, command, throwable);
 						}
 					}
-				)
+				).setActivity(Activity.playing("Loading..."))
 				.addCommands(
 					new InformationCommand(),
 					new SlayerCommand(),
@@ -176,7 +173,10 @@ public class Main {
 					new SkyblockCommand(),
 					new GuildStatisticsCommand(),
 					new PartyCommand(),
-					new TimeCommand()
+					new TimeCommand(),
+						new ForgeCommand(),
+						new ScammerCommand(),
+						new MentionCommand()
 				)
 				.build();
 
@@ -235,7 +235,9 @@ public class Main {
 					new PartySlashCommand(),
 					new SettingsSlashCommand(),
 					new TimeSlashCommand(),
-					new ReloadSlashCommand()
+					new ReloadSlashCommand(),
+						new ForgeSlashCommand(),
+						new ScammerSlashCommand()
 				);
 
 		jda =

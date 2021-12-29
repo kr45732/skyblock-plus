@@ -43,7 +43,7 @@ public class JacobHandler {
 
 	public static void setJacobData(JacobData jacobData) {
 		JacobHandler.jacobData = jacobData;
-		if (jacobFuture.isDone()) {
+		if (jacobFuture == null || jacobFuture.isDone()) {
 			queue();
 		}
 	}

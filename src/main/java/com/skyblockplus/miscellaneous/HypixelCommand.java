@@ -222,6 +222,8 @@ public class HypixelCommand extends Command {
 		new CommandExecute(this, event) {
 			@Override
 			protected void execute() {
+				logCommand();
+
 				if ((args.length == 3 || args.length == 2) && args[1].equals("parkour")) {
 					if (getMentionedUsername(args.length == 2 ? -1 : 1)) {
 						return;

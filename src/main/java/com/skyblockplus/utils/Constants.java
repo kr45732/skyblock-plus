@@ -61,6 +61,7 @@ public class Constants {
 	public static Map<String, String> SLAYER_EMOJI_MAP;
 	public static Map<String, String> ESSENCE_EMOJI_MAP;
 	public static Map<String, Integer> IGNORED_ENCHANTS;
+	public static Map<String, Long> FORGE_TIMES;
 
 	/* Fetched from other sources */
 	public static List<String> ENCHANT_NAMES;
@@ -86,6 +87,7 @@ public class Constants {
 			Type mapStringDoubleArray = new TypeToken<Map<String, Double[]>>() {}.getType();
 			Type mapStringDouble = new TypeToken<Map<String, Double>>() {}.getType();
 			Type mapStringInteger = new TypeToken<Map<String, Integer>>() {}.getType();
+			Type mapStringLong = new TypeToken<Map<String, Long>>() {}.getType();
 
 			/* CATACOMBS_LEVEL_50_XP */
 			CATACOMBS_LEVEL_50_XP = higherDepth(constantsJson, "CATACOMBS_LEVEL_50_XP").getAsDouble();
@@ -173,6 +175,9 @@ public class Constants {
 
 			/* IGNORED_ENCHANTS */
 			IGNORED_ENCHANTS = gson.fromJson(higherDepth(constantsJson, "IGNORED_ENCHANTS"), mapStringInteger);
+
+			/* FORGE_TIMES */
+			FORGE_TIMES = gson.fromJson(higherDepth(constantsJson, "IGNORED_ENCHANTS"), mapStringLong);
 
 			/* ENCHANT_NAMES */
 			HashSet<String> enchantNames = new HashSet<>();

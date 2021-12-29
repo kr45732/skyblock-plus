@@ -105,14 +105,14 @@ public class ApiHandler {
 
 	public static void updateBotStatistics() {
 		try {
+			int serverCount = jda.getGuilds().size();
+			jda.getPresence().setActivity(Activity.watching(DEFAULT_PREFIX + "help in " + serverCount + " servers"));
+
 			if (!isMainBot()) {
 				return;
 			}
 
-			int serverCount = jda.getGuilds().size();
 			String selfUserId = jda.getSelfUser().getId();
-
-			jda.getPresence().setActivity(Activity.watching(DEFAULT_PREFIX + "help in " + serverCount + " servers"));
 
 			JsonObject dscBotListJson = new JsonObject();
 			dscBotListJson.addProperty("guilds", serverCount);
