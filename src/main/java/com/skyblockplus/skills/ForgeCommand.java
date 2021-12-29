@@ -44,21 +44,26 @@ public class ForgeCommand extends Command {
 		if (player.isValid()) {
 			EmbedBuilder eb = player.defaultPlayerEmbed();
 			JsonElement forgeItems = higherDepth(player.profileJson(), "forge.forge_processes.forge_1");
-			if(forgeItems == null){
+			if (forgeItems == null) {
 				return defaultEmbed(player.getUsername() + " has no items in the forge");
 			}
 			int forgeTime = higherDepth(player.profileJson(), "mining_core.nodes.forge_time", 0);
 			double bonus;
-			if(forgeTime <= 1){
+			if (forgeTime <= 1) {
 				bonus = 1;
-			} else if (forgeTime <= 10){
+			} else if (forgeTime <= 10) {
 				bonus = 0.85;
-			}else if(forgeTime <= 19){
+			} else if (forgeTime <= 19) {
 				bonus = 0.805;
-			}else {
+			} else {
 				bonus = 0.7;
 			}
-			for (JsonElement forgeItem : forgeItems.getAsJsonObject().entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList())) {
+			for (JsonElement forgeItem : forgeItems
+				.getAsJsonObject()
+				.entrySet()
+				.stream()
+				.map(Map.Entry::getValue)
+				.collect(Collectors.toList())) {
 				String itemId = higherDepth(forgeItem, "id").getAsString();
 				eb.addField(
 					idToName(itemId),
@@ -76,7 +81,7 @@ public class ForgeCommand extends Command {
 			if (eb.getFields().size() == 0) {
 				return defaultEmbed(player.getUsername() + " has no items in the forge");
 			}
-			if(forgeTime != 1){
+			if (forgeTime != 1) {
 				eb.setDescription("**Quick Forge:**" + roundAndFormat(100 - forgeTime * 100.0) + "& less forge time");
 			}
 			return eb;

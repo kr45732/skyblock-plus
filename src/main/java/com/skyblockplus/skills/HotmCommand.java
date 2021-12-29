@@ -77,7 +77,7 @@ public class HotmCommand extends Command {
 				if (!perk.getValue().getAsJsonPrimitive().isNumber()) {
 					continue;
 				}
-				if(HOTM_PERK_MAX_LEVEL.getOrDefault(perk.getKey(), 50) == 1){
+				if (HOTM_PERK_MAX_LEVEL.getOrDefault(perk.getKey(), 50) == 1) {
 					continue;
 				}
 				perksStr
