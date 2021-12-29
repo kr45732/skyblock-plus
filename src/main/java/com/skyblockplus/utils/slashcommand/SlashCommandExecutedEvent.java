@@ -18,157 +18,164 @@
 
 package com.skyblockplus.utils.slashcommand;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.utils.Utils.invalidEmbed;
-
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Utils;
-import java.util.regex.Matcher;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
+import java.util.regex.Matcher;
+
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.Utils.higherDepth;
+import static com.skyblockplus.utils.Utils.invalidEmbed;
+
 public class SlashCommandExecutedEvent {
 
-	private final SlashCommandEvent event;
-	private final InteractionHook hook;
-	private final SlashCommandClient slashCommandClient;
-	public String player;
+    private final SlashCommandEvent event;
+    private final InteractionHook hook;
+    private final SlashCommandClient slashCommandClient;
+    public String player;
 
-	public SlashCommandExecutedEvent(SlashCommandEvent event, SlashCommandClient slashCommandClient) {
-		this.event = event;
-		this.slashCommandClient = slashCommandClient;
-		this.hook = event.getHook();
-	}
+    public SlashCommandExecutedEvent(SlashCommandEvent event, SlashCommandClient slashCommandClient) {
+        this.event = event;
+        this.slashCommandClient = slashCommandClient;
+        this.hook = event.getHook();
+    }
 
-	public SlashCommandClient getClient() {
-		return slashCommandClient;
-	}
+    public SlashCommandClient getClient() {
+        return slashCommandClient;
+    }
 
-	public InteractionHook getHook() {
-		return hook;
-	}
+    public InteractionHook getHook() {
+        return hook;
+    }
 
-	public SlashCommandEvent getEvent() {
-		return event;
-	}
+    public SlashCommandEvent getEvent() {
+        return event;
+    }
 
-	public void logCommand() {
-		StringBuilder options = new StringBuilder();
-		for (OptionMapping option : event.getOptions()) {
-			options.append(" ").append(option.getAsString());
-		}
-		Utils.logCommand(event.getGuild(), event.getUser(), ("/" + event.getCommandPath().replace("/", " ") + options));
-	}
+    public void logCommand() {
+        StringBuilder options = new StringBuilder();
+        for (OptionMapping option : event.getOptions()) {
+            options.append(" ").append(option.getAsString());
+        }
+        Utils.logCommand(event.getGuild(), event.getUser(), ("/" + event.getCommandPath().replace("/", " ") + options));
+    }
 
-	public User getUser() {
-		return event.getUser();
-	}
+    public User getUser() {
+        return event.getUser();
+    }
 
-	public Member getMember() {
-		return event.getMember();
-	}
+    public Member getMember() {
+        return event.getMember();
+    }
 
-	public Guild getGuild() {
-		return event.getGuild();
-	}
+    public Guild getGuild() {
+        return event.getGuild();
+    }
 
-	public MessageChannel getChannel() {
-		return event.getChannel();
-	}
+    public MessageChannel getChannel() {
+        return event.getChannel();
+    }
 
-	public String getOptionStr(String name) {
-		return getOptionStr(name, null);
-	}
+    public String getOptionStr(String name) {
+        return getOptionStr(name, null);
+    }
 
-	public String getOptionStr(String name, String defaultValue) {
-		OptionMapping option = event.getOption(name);
-		return option == null ? defaultValue : option.getAsString();
-	}
+    public String getOptionStr(String name, String defaultValue) {
+        OptionMapping option = event.getOption(name);
+        return option == null ? defaultValue : option.getAsString();
+    }
 
-	public int getOptionInt(String name, int defaultValue) {
-		OptionMapping option = event.getOption(name);
-		return option == null ? defaultValue : (int) option.getAsLong();
-	}
+    public int getOptionInt(String name, int defaultValue) {
+        OptionMapping option = event.getOption(name);
+        return option == null ? defaultValue : (int) option.getAsLong();
+    }
 
-	public boolean getOptionBoolean(String name, boolean defaultValue) {
-		OptionMapping option = event.getOption(name);
-		return option == null ? defaultValue : option.getAsBoolean();
-	}
+    public boolean getOptionBoolean(String name, boolean defaultValue) {
+        OptionMapping option = event.getOption(name);
+        return option == null ? defaultValue : option.getAsBoolean();
+    }
 
-	public double getOptionDouble(String name, double defaultValue) {
-		OptionMapping option = event.getOption(name);
-		return option == null ? defaultValue : option.getAsDouble();
-	}
+    public double getOptionDouble(String name, double defaultValue) {
+        OptionMapping option = event.getOption(name);
+        return option == null ? defaultValue : option.getAsDouble();
+    }
 
-	public EmbedBuilder invalidCommandMessage() {
-		return invalidEmbed("Invalid Command");
-	}
+    public EmbedBuilder invalidCommandMessage() {
+        return invalidEmbed("Invalid Command");
+    }
 
-	public String getSubcommandName() {
-		return event.getSubcommandName();
-	}
+    public String getSubcommandName() {
+        return event.getSubcommandName();
+    }
 
-	public void embed(EmbedBuilder eb) {
-		event.getHook().editOriginalEmbeds(eb.build()).queue(ignored -> {}, ignored -> {});
-	}
+    public void embed(EmbedBuilder eb) {
+        event.getHook().editOriginalEmbeds(eb.build()).queue(ignored -> {
+        }, ignored -> {
+        });
+    }
 
-	private boolean getLinkedUser(String id) {
-		JsonElement linkedUserUsername = higherDepth(database.getLinkedUserByDiscordId(id), "minecraftUuid");
-		if (linkedUserUsername != null) {
-			player = linkedUserUsername.getAsString();
-			return false;
-		}
+    private boolean getLinkedUser(String id) {
+        JsonElement linkedUserUsername = higherDepth(database.getLinkedUserByDiscordId(id), "minecraftUuid");
+        if (linkedUserUsername != null) {
+            player = linkedUserUsername.getAsString();
+            return false;
+        }
 
-		embed(invalidEmbed("<@" + id + "> is not linked to the bot."));
-		return true;
-	}
+        embed(invalidEmbed("<@" + id + "> is not linked to the bot."));
+        return true;
+    }
 
-	public boolean invalidPlayerOption() {
-		OptionMapping option = event.getOption("player");
+    public boolean invalidPlayerOption() {
+        OptionMapping option = event.getOption("player");
 
-		if (option == null) {
-			return getLinkedUser(event.getUser().getId());
-		}
+        if (option == null) {
+            return getLinkedUser(event.getUser().getId());
+        }
 
-		player = option.getAsString();
+        player = option.getAsString();
 
-		Matcher matcher = Message.MentionType.USER.getPattern().matcher(option.getAsString());
-		if (matcher.matches()) {
-			return getLinkedUser(matcher.group(1));
-		}
+        Matcher matcher = Message.MentionType.USER.getPattern().matcher(option.getAsString());
+        if (matcher.matches()) {
+            return getLinkedUser(matcher.group(1));
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	public void paginate(EmbedBuilder failEmbed) {
-		paginate(failEmbed, false);
-	}
+    public void paginate(EmbedBuilder failEmbed) {
+        paginate(failEmbed, false);
+    }
 
-	public void paginate(EmbedBuilder failEmbed, boolean deleteOriginal) {
-		if (failEmbed != null) {
-			event.getHook().editOriginalEmbeds(failEmbed.build()).queue(ignored -> {}, ignored -> {});
-		} else if (deleteOriginal) {
-			event.getHook().deleteOriginal().queue();
-		}
-	}
+    public void paginate(EmbedBuilder failEmbed, boolean deleteOriginal) {
+        if (failEmbed != null) {
+            event.getHook().editOriginalEmbeds(failEmbed.build()).queue(ignored -> {
+            }, ignored -> {
+            });
+        } else if (deleteOriginal) {
+            event.getHook().deleteOriginal().queue();
+        }
+    }
 
-	public void string(String string) {
-		event.getHook().editOriginal(string).queue(ignored -> {}, ignored -> {});
-	}
+    public void string(String string) {
+        event.getHook().editOriginal(string).queue(ignored -> {
+        }, ignored -> {
+        });
+    }
 
-	public Member getSelfMember() {
-		return event.getGuild().getSelfMember();
-	}
+    public Member getSelfMember() {
+        return event.getGuild().getSelfMember();
+    }
 
-	public TextChannel getTextChannel() {
-		return event.getTextChannel();
-	}
+    public TextChannel getTextChannel() {
+        return event.getTextChannel();
+    }
 
-	public boolean isOwner() {
-		return slashCommandClient.isOwner(getUser().getId());
-	}
+    public boolean isOwner() {
+        return slashCommandClient.isOwner(getUser().getId());
+    }
 }

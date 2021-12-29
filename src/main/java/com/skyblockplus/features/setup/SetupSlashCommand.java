@@ -25,20 +25,20 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class SetupSlashCommand extends SlashCommand {
 
-	public SetupSlashCommand() {
-		this.name = "setup";
-		this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
-	}
+    public SetupSlashCommand() {
+        this.name = "setup";
+        this.userPermissions = new Permission[]{Permission.ADMINISTRATOR};
+    }
 
-	@Override
-	protected void execute(SlashCommandExecutedEvent event) {
-		event.logCommand();
+    @Override
+    protected void execute(SlashCommandExecutedEvent event) {
+        event.logCommand();
 
-		event.getHook().editOriginalEmbeds(SetupCommand.getSetupEmbed().build()).setActionRows(SetupCommand.getSetupActionRow()).queue();
-	}
+        event.getHook().editOriginalEmbeds(SetupCommand.getSetupEmbed().build()).setActionRows(SetupCommand.getSetupActionRow()).queue();
+    }
 
-	@Override
-	public CommandData getCommandData() {
-		return new CommandData(name, "A short walk-through on how to setup the bot");
-	}
+    @Override
+    public CommandData getCommandData() {
+        return new CommandData(name, "A short walk-through on how to setup the bot");
+    }
 }

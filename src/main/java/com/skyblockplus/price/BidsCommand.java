@@ -18,9 +18,6 @@
 
 package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
@@ -30,97 +27,101 @@ import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
+import net.dv8tion.jda.api.EmbedBuilder;
+
 import java.time.Duration;
 import java.time.Instant;
-import net.dv8tion.jda.api.EmbedBuilder;
+
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Utils.*;
 
 public class BidsCommand extends Command {
 
-	public BidsCommand() {
-		this.name = "bids";
-		this.cooldown = globalCooldown;
-		this.botPermissions = defaultPerms();
-	}
+    public BidsCommand() {
+        this.name = "bids";
+        this.cooldown = globalCooldown;
+        this.botPermissions = defaultPerms();
+    }
 
-	public static EmbedBuilder getPlayerBids(String username, PaginatorEvent event) {
-		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
-		if (usernameUuidStruct.isNotValid()) {
-			return invalidEmbed(usernameUuidStruct.getFailCause());
-		}
+    public static EmbedBuilder getPlayerBids(String username, PaginatorEvent event) {
+        UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
+        if (usernameUuidStruct.isNotValid()) {
+            return invalidEmbed(usernameUuidStruct.failCause());
+        }
 
-		JsonArray bids = getBidsFromPlayer(usernameUuidStruct.getUuid());
-		if (bids == null || bids.size() == 0) {
-			return defaultEmbed("No bids found for " + usernameUuidStruct.getUsername());
-		}
+        JsonArray bids = getBidsFromPlayer(usernameUuidStruct.uuid());
+        if (bids == null || bids.size() == 0) {
+            return defaultEmbed("No bids found for " + usernameUuidStruct.username());
+        }
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(10);
-		PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_FIELDS);
+        CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(10);
+        PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_FIELDS);
 
-		for (JsonElement bid : bids) {
-			String auctionDesc;
-			String itemName;
-			boolean isPet = higherDepth(bid, "item_id").getAsString().equals("PET");
+        for (JsonElement bid : bids) {
+            String auctionDesc;
+            String itemName;
+            boolean isPet = higherDepth(bid, "item_id").getAsString().equals("PET");
 
-			Instant endingAt = Instant.ofEpochMilli(higherDepth(bid, "end_t").getAsLong());
-			Duration duration = Duration.between(Instant.now(), endingAt);
+            Instant endingAt = Instant.ofEpochMilli(higherDepth(bid, "end_t").getAsLong());
+            Duration duration = Duration.between(Instant.now(), endingAt);
 
-			itemName =
-				(isPet ? capitalizeString(higherDepth(bid, "tier").getAsString()) + " " : "") + higherDepth(bid, "item_name").getAsString();
+            itemName =
+                    (isPet ? capitalizeString(higherDepth(bid, "tier").getAsString()) + " " : "") + higherDepth(bid, "item_name").getAsString();
 
-			JsonArray bidsArr = higherDepth(bid, "bids").getAsJsonArray();
-			long highestBid = higherDepth(bidsArr, "[" + (bidsArr.size() - 1) + "].amount").getAsLong();
-			if (duration.toMillis() > 0) {
-				auctionDesc = "Current bid: " + simplifyNumber(highestBid);
-				auctionDesc += " | Ending <t:" + endingAt.getEpochSecond() + ":R>";
-				auctionDesc +=
-					"\nHighest bidder: " +
-					uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).getUsername();
-				for (int i = bidsArr.size() - 1; i >= 0; i--) {
-					JsonElement curBid = bidsArr.get(i);
-					if (higherDepth(curBid, "bidder").getAsString().equals(usernameUuidStruct.getUuid())) {
-						auctionDesc += "\nYour highest bid: " + simplifyNumber(higherDepth(curBid, "amount").getAsDouble());
-						break;
-					}
-				}
-			} else {
-				auctionDesc = "Auction sold for " + simplifyNumber(highestBid) + " coins";
-				auctionDesc +=
-					"\n " +
-					uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).getUsername() +
-					" won the auction";
-			}
+            JsonArray bidsArr = higherDepth(bid, "bids").getAsJsonArray();
+            long highestBid = higherDepth(bidsArr, "[" + (bidsArr.size() - 1) + "].amount").getAsLong();
+            if (duration.toMillis() > 0) {
+                auctionDesc = "Current bid: " + simplifyNumber(highestBid);
+                auctionDesc += " | Ending <t:" + endingAt.getEpochSecond() + ":R>";
+                auctionDesc +=
+                        "\nHighest bidder: " +
+                                uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).username();
+                for (int i = bidsArr.size() - 1; i >= 0; i--) {
+                    JsonElement curBid = bidsArr.get(i);
+                    if (higherDepth(curBid, "bidder").getAsString().equals(usernameUuidStruct.uuid())) {
+                        auctionDesc += "\nYour highest bid: " + simplifyNumber(higherDepth(curBid, "amount").getAsDouble());
+                        break;
+                    }
+                }
+            } else {
+                auctionDesc = "Auction sold for " + simplifyNumber(highestBid) + " coins";
+                auctionDesc +=
+                        "\n " +
+                                uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).username() +
+                                " won the auction";
+            }
 
-			extras.addEmbedField(itemName, auctionDesc, false);
-		}
+            extras.addEmbedField(itemName, auctionDesc, false);
+        }
 
-		extras
-			.setEveryPageTitle(usernameUuidStruct.getUsername())
-			.setEveryPageTitleUrl(skyblockStatsLink(usernameUuidStruct.getUsername(), null))
-			.setEveryPageThumbnail(usernameUuidStruct.getAvatarlUrl());
+        extras
+                .setEveryPageTitle(usernameUuidStruct.username())
+                .setEveryPageTitleUrl(skyblockStatsLink(usernameUuidStruct.username(), null))
+                .setEveryPageThumbnail(usernameUuidStruct.getAvatarlUrl());
 
-		event.paginate(paginateBuilder.setPaginatorExtras(extras));
-		return null;
-	}
+        event.paginate(paginateBuilder.setPaginatorExtras(extras));
+        return null;
+    }
 
-	@Override
-	protected void execute(CommandEvent event) {
-		new CommandExecute(this, event) {
-			@Override
-			protected void execute() {
-				logCommand();
+    @Override
+    protected void execute(CommandEvent event) {
+        new CommandExecute(this, event) {
+            @Override
+            protected void execute() {
+                logCommand();
 
-				if (args.length == 2 || args.length == 1) {
-					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
-						return;
-					}
+                if (args.length == 2 || args.length == 1) {
+                    if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
+                        return;
+                    }
 
-					paginate(getPlayerBids(username, new PaginatorEvent(event)));
-					return;
-				}
+                    paginate(getPlayerBids(username, new PaginatorEvent(event)));
+                    return;
+                }
 
-				sendErrorEmbed();
-			}
-		}
-			.queue();
-	}
+                sendErrorEmbed();
+            }
+        }
+                .queue();
+    }
 }

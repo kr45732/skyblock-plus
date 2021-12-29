@@ -18,60 +18,62 @@
 
 package com.skyblockplus.features.jacob;
 
+import com.google.gson.JsonElement;
+import com.google.gson.reflect.TypeToken;
+import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.TextChannel;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.gson;
 import static com.skyblockplus.utils.Utils.higherDepth;
 
-import com.google.gson.JsonElement;
-import com.google.gson.reflect.TypeToken;
-import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
-import java.util.ArrayList;
-import java.util.List;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.TextChannel;
-
 public class FarmingContest {
 
-	public boolean enable = false;
-	public List<RoleObject> wantedCrops;
-	public TextChannel channel;
-	public final String guildId;
+    public final String guildId;
+    public boolean enable = false;
+    public List<RoleObject> wantedCrops;
+    public TextChannel channel;
 
-	public FarmingContest(String guildId) {
-		this.guildId = guildId;
-		reloadSettingsJson(database.getJacobSettings(guildId));
-	}
+    public FarmingContest(String guildId) {
+        this.guildId = guildId;
+        reloadSettingsJson(database.getJacobSettings(guildId));
+    }
 
-	public void onFarmingContest(List<String> crops, MessageEmbed embed) {
-		try {
-			if (enable) {
-				List<String> roleMentions = new ArrayList<>();
-				for (RoleObject wantedCrop : wantedCrops) {
-					if (crops.contains(wantedCrop.getValue())) {
-						roleMentions.add("<@&" + wantedCrop.getRoleId() + ">");
-					}
-				}
+    public void onFarmingContest(List<String> crops, MessageEmbed embed) {
+        try {
+            if (enable) {
+                List<String> roleMentions = new ArrayList<>();
+                for (RoleObject wantedCrop : wantedCrops) {
+                    if (crops.contains(wantedCrop.getValue())) {
+                        roleMentions.add("<@&" + wantedCrop.getRoleId() + ">");
+                    }
+                }
 
-				if (!roleMentions.isEmpty()) {
-					channel.sendMessage(String.join(" ", roleMentions)).setEmbeds(embed).queue();
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+                if (!roleMentions.isEmpty()) {
+                    channel.sendMessage(String.join(" ", roleMentions)).setEmbeds(embed).queue();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-	public void reloadSettingsJson(JsonElement jacobSettings) {
-		try {
-			enable = higherDepth(jacobSettings, "enable", false);
-			if (enable) {
-				channel = jda.getGuildById(guildId).getTextChannelById(higherDepth(jacobSettings, "channel").getAsString());
-				wantedCrops =
-					gson.fromJson(higherDepth(jacobSettings, "crops").getAsJsonArray(), new TypeToken<List<RoleObject>>() {}.getType());
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+    public void reloadSettingsJson(JsonElement jacobSettings) {
+        try {
+            enable = higherDepth(jacobSettings, "enable", false);
+            if (enable) {
+                channel = jda.getGuildById(guildId).getTextChannelById(higherDepth(jacobSettings, "channel").getAsString());
+                wantedCrops =
+                        gson.fromJson(higherDepth(jacobSettings, "crops").getAsJsonArray(), new TypeToken<List<RoleObject>>() {
+                        }.getType());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

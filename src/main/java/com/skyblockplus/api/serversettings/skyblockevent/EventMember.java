@@ -18,19 +18,20 @@
 
 package com.skyblockplus.api.serversettings.skyblockevent;
 
-import javax.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.persistence.Embeddable;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Embeddable
 public class EventMember {
 
-	private String username = "";
-	private String uuid = "";
-	private String startingAmount = "";
-	private String profileName = "";
-
-	public EventMember() {}
+    private String username = "";
+    private String uuid = "";
+    private String startingAmount = "";
+    private String profileName = "";
 }

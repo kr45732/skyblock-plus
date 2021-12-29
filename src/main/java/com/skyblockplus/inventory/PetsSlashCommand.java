@@ -26,25 +26,25 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class PetsSlashCommand extends SlashCommand {
 
-	public PetsSlashCommand() {
-		this.name = "pets";
-	}
+    public PetsSlashCommand() {
+        this.name = "pets";
+    }
 
-	@Override
-	protected void execute(SlashCommandExecutedEvent event) {
-		event.logCommand();
+    @Override
+    protected void execute(SlashCommandExecutedEvent event) {
+        event.logCommand();
 
-		if (event.invalidPlayerOption()) {
-			return;
-		}
+        if (event.invalidPlayerOption()) {
+            return;
+        }
 
-		event.paginate(PetsCommand.getPlayerPets(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
-	}
+        event.paginate(PetsCommand.getPlayerPets(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
+    }
 
-	@Override
-	public CommandData getCommandData() {
-		return new CommandData(name, "Get a player's pets menu")
-			.addOption(OptionType.STRING, "player", "Player username or mention")
-			.addOption(OptionType.STRING, "profile", "Profile name");
-	}
+    @Override
+    public CommandData getCommandData() {
+        return new CommandData(name, "Get a player's pets menu")
+                .addOption(OptionType.STRING, "player", "Player username or mention")
+                .addOption(OptionType.STRING, "profile", "Profile name");
+    }
 }

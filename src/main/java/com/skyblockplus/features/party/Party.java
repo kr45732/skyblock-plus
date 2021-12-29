@@ -18,75 +18,76 @@
 
 package com.skyblockplus.features.party;
 
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 public class Party {
 
-	private String partyLeaderUsername;
-	private String partyLeaderId;
-	private String messageChannelId;
-	private String floor;
-	private List<String> requestedClasses;
-	private final List<PartyMember> partyMembers = new ArrayList<>();
-	private final List<String> missingClasses = new ArrayList<>();
+    private final List<PartyMember> partyMembers = new ArrayList<>();
+    private final List<String> missingClasses = new ArrayList<>();
+    private String partyLeaderUsername;
+    private String partyLeaderId;
+    private String messageChannelId;
+    private String floor;
+    private List<String> requestedClasses;
 
-	public Party(String partyLeaderUsername, String partyLeaderId, String floor, List<String> requestedClasses, String messageChannelId) {
-		this.partyLeaderUsername = partyLeaderUsername;
-		this.partyLeaderId = partyLeaderId;
-		this.floor = floor;
-		this.requestedClasses = requestedClasses;
-		this.missingClasses.addAll(requestedClasses);
-		this.messageChannelId = messageChannelId;
-	}
+    public Party(String partyLeaderUsername, String partyLeaderId, String floor, List<String> requestedClasses, String messageChannelId) {
+        this.partyLeaderUsername = partyLeaderUsername;
+        this.partyLeaderId = partyLeaderId;
+        this.floor = floor;
+        this.requestedClasses = requestedClasses;
+        this.missingClasses.addAll(requestedClasses);
+        this.messageChannelId = messageChannelId;
+    }
 
-	public void joinParty(String username, String discordId, String className, boolean isAny) {
-		missingClasses.remove(isAny ? "any" : className);
-		partyMembers.add(new PartyMember(username, discordId, className, isAny));
-	}
+    public void joinParty(String username, String discordId, String className, boolean isAny) {
+        missingClasses.remove(isAny ? "any" : className);
+        partyMembers.add(new PartyMember(username, discordId, className, isAny));
+    }
 
-	public boolean leaveParty(String discordId) {
-		for (PartyMember partyMember : partyMembers) {
-			if (partyMember.getDiscordId().equals(discordId)) {
-				missingClasses.add(partyMember.isAny() ? "any" : partyMember.getClassName());
-				partyMembers.remove(partyMember);
-				return true;
-			}
-		}
-		return false;
-	}
+    public boolean leaveParty(String discordId) {
+        for (PartyMember partyMember : partyMembers) {
+            if (partyMember.getDiscordId().equals(discordId)) {
+                missingClasses.add(partyMember.isAny() ? "any" : partyMember.getClassName());
+                partyMembers.remove(partyMember);
+                return true;
+            }
+        }
+        return false;
+    }
 
-	public String kickFromParty(String username) {
-		for (PartyMember partyMember : partyMembers) {
-			if (partyMember.getUsername().equalsIgnoreCase(username)) {
-				missingClasses.add(partyMember.isAny() ? "any" : partyMember.getClassName());
-				partyMembers.remove(partyMember);
-				return partyMember.getUsername();
-			}
-		}
-		return null;
-	}
+    public String kickFromParty(String username) {
+        for (PartyMember partyMember : partyMembers) {
+            if (partyMember.getUsername().equalsIgnoreCase(username)) {
+                missingClasses.add(partyMember.isAny() ? "any" : partyMember.getClassName());
+                partyMembers.remove(partyMember);
+                return partyMember.getUsername();
+            }
+        }
+        return null;
+    }
 
-	public int getFloorInt() {
-		if (floor.equals("entrance")) {
-			return 0;
-		} else if (floor.startsWith("master_floor_")) {
-			return 7 + Integer.parseInt(floor.split("master_floor_")[1]);
-		} else {
-			return Integer.parseInt(floor.split("floor_")[1]);
-		}
-	}
+    public int getFloorInt() {
+        if (floor.equals("entrance")) {
+            return 0;
+        } else if (floor.startsWith("master_floor_")) {
+            return 7 + Integer.parseInt(floor.split("master_floor_")[1]);
+        } else {
+            return Integer.parseInt(floor.split("floor_")[1]);
+        }
+    }
 
-	@Data
-	@AllArgsConstructor
-	public static class PartyMember {
+    @Data
+    @AllArgsConstructor
+    public static class PartyMember {
 
-		private String username;
-		private String discordId;
-		private String className;
-		private boolean isAny;
-	}
+        private String username;
+        private String discordId;
+        private String className;
+        private boolean isAny;
+    }
 }

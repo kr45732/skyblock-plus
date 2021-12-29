@@ -18,46 +18,48 @@
 
 package com.skyblockplus.dev;
 
-import static com.skyblockplus.utils.Utils.*;
-
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
+
 import java.util.concurrent.TimeUnit;
+
+import static com.skyblockplus.utils.Utils.*;
 
 public class DeleteMessagesCommand extends Command {
 
-	public DeleteMessagesCommand() {
-		this.name = "d-purge";
-		this.ownerCommand = true;
-		this.botPermissions = defaultPerms();
-	}
+    public DeleteMessagesCommand() {
+        this.name = "d-purge";
+        this.ownerCommand = true;
+        this.botPermissions = defaultPerms();
+    }
 
-	@Override
-	protected void execute(CommandEvent event) {
-		new CommandExecute(this, event) {
-			@Override
-			protected void execute() {
-				logCommand();
+    @Override
+    protected void execute(CommandEvent event) {
+        new CommandExecute(this, event) {
+            @Override
+            protected void execute() {
+                logCommand();
 
-				if (args.length == 2) {
-					try {
-						int messageCount = Math.min(Integer.parseInt(args[1]) + 1, 100);
-						event.getChannel().purgeMessages(event.getChannel().getHistory().retrievePast(messageCount).complete());
+                if (args.length == 2) {
+                    try {
+                        int messageCount = Math.min(Integer.parseInt(args[1]) + 1, 100);
+                        event.getChannel().purgeMessages(event.getChannel().getHistory().retrievePast(messageCount).complete());
 
-						event
-							.getChannel()
-							.sendMessageEmbeds(defaultEmbed("Purged messages").build())
-							.complete()
-							.delete()
-							.queueAfter(3, TimeUnit.SECONDS);
-						return;
-					} catch (Exception ignored) {}
-				}
+                        event
+                                .getChannel()
+                                .sendMessageEmbeds(defaultEmbed("Purged messages").build())
+                                .complete()
+                                .delete()
+                                .queueAfter(3, TimeUnit.SECONDS);
+                        return;
+                    } catch (Exception ignored) {
+                    }
+                }
 
-				event.getChannel().sendMessageEmbeds(errorEmbed(name).build()).queue();
-			}
-		}
-			.queue();
-	}
+                event.getChannel().sendMessageEmbeds(errorEmbed(name).build()).queue();
+            }
+        }
+                .queue();
+    }
 }

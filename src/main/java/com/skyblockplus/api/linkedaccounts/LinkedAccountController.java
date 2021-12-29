@@ -18,7 +18,6 @@
 
 package com.skyblockplus.api.linkedaccounts;
 
-import java.util.List;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,39 +27,41 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(value = "/api/private/linked-accounts")
 public class LinkedAccountController {
 
-	private final LinkedAccountService settingsService;
+    private final LinkedAccountService settingsService;
 
-	@Autowired
-	public LinkedAccountController(LinkedAccountService settingsService) {
-		this.settingsService = settingsService;
-	}
+    @Autowired
+    public LinkedAccountController(LinkedAccountService settingsService) {
+        this.settingsService = settingsService;
+    }
 
-	@GetMapping("/get/all")
-	public List<LinkedAccountModel> getAllServerSettings() {
-		return settingsService.getAllLinkedAccounts();
-	}
+    @GetMapping("/get/all")
+    public List<LinkedAccountModel> getAllServerSettings() {
+        return settingsService.getAllLinkedAccounts();
+    }
 
-	@GetMapping("/get/by")
-	public ResponseEntity<?> getByDiscordId(
-		@RequestParam(value = "id", required = false) String id,
-		@RequestParam(value = "uuid", required = false) String uuid,
-		@RequestParam(value = "username", required = false) String username
-	) {
-		if (id != null) {
-			return settingsService.getByDiscordId(id);
-		} else if (uuid != null) {
-			return settingsService.getByMinecraftUuid(uuid);
-		} else if (username != null) {
-			return settingsService.getByMinecraftUsername(username);
-		} else {
-			return new ResponseEntity<>(
-				DataObject.empty().put("success", false).put("cause", "No parameter provided from: id, uuid, username").toMap(),
-				HttpStatus.BAD_REQUEST
-			);
-		}
-	}
+    @GetMapping("/get/by")
+    public ResponseEntity<?> getByDiscordId(
+            @RequestParam(value = "id", required = false) String id,
+            @RequestParam(value = "uuid", required = false) String uuid,
+            @RequestParam(value = "username", required = false) String username
+    ) {
+        if (id != null) {
+            return settingsService.getByDiscordId(id);
+        } else if (uuid != null) {
+            return settingsService.getByMinecraftUuid(uuid);
+        } else if (username != null) {
+            return settingsService.getByMinecraftUsername(username);
+        } else {
+            return new ResponseEntity<>(
+                    DataObject.empty().put("success", false).put("cause", "No parameter provided from: id, uuid, username").toMap(),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+    }
 }

@@ -26,33 +26,33 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class GuildRanksSlashCommand extends SlashCommand {
 
-	public GuildRanksSlashCommand() {
-		this.name = "guild-ranks";
-	}
+    public GuildRanksSlashCommand() {
+        this.name = "guild-ranks";
+    }
 
-	@Override
-	protected void execute(SlashCommandExecutedEvent event) {
-		event.logCommand();
+    @Override
+    protected void execute(SlashCommandExecutedEvent event) {
+        event.logCommand();
 
-		if (event.invalidPlayerOption()) {
-			return;
-		}
+        if (event.invalidPlayerOption()) {
+            return;
+        }
 
-		event.paginate(
-			GuildRanksCommand.getLeaderboard(
-				event.player,
-				event.getOptionBoolean("ironman", false),
-				event.getOptionBoolean("usekey", false),
-				new PaginatorEvent(event)
-			)
-		);
-	}
+        event.paginate(
+                GuildRanksCommand.getLeaderboard(
+                        event.player,
+                        event.getOptionBoolean("ironman", false),
+                        event.getOptionBoolean("usekey", false),
+                        new PaginatorEvent(event)
+                )
+        );
+    }
 
-	@Override
-	public CommandData getCommandData() {
-		return new CommandData(name, "Get helper which shows who to promote or demote in your guild")
-			.addOption(OptionType.STRING, "player", "Player username or mention")
-			.addOption(OptionType.BOOLEAN, "ironman", "If the leaderboard should be ironman only")
-			.addOption(OptionType.BOOLEAN, "usekey", "If the API key for this server should be used for more accurate results");
-	}
+    @Override
+    public CommandData getCommandData() {
+        return new CommandData(name, "Get helper which shows who to promote or demote in your guild")
+                .addOption(OptionType.STRING, "player", "Player username or mention")
+                .addOption(OptionType.BOOLEAN, "ironman", "If the leaderboard should be ironman only")
+                .addOption(OptionType.BOOLEAN, "usekey", "If the API key for this server should be used for more accurate results");
+    }
 }

@@ -31,7 +31,6 @@ plugins {
 }
 
 version = '0.0.1'
-sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
 mainClassName = 'com.skyblockplus.Main'
 
 task stage(dependsOn: ['shadowJar']) {
@@ -96,9 +95,11 @@ dependencies {
     implementation 'ch.qos.logback:logback-classic:1.2.10'
 
     // Git
-    implementation 'org.eclipse.jgit:org.eclipse.jgit:5.13.0.202109080827-r'
+    implementation 'org.eclipse.jgit:org.eclipse.jgit:6.0.0.202111291000-r'
+
+    // JS script engine
+    implementation 'org.openjdk.nashorn:nashorn-core:15.3'
 
     // Caching
-    // noinspection GradlePackageUpdate
-    implementation 'com.github.ben-manes.caffeine:caffeine:2.9.2'
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.0.5'
 }

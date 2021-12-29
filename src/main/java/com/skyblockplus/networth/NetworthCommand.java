@@ -18,23 +18,23 @@
 
 package com.skyblockplus.networth;
 
-import static com.skyblockplus.utils.Utils.defaultPerms;
-import static com.skyblockplus.utils.Utils.globalCooldown;
-
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 
+import static com.skyblockplus.utils.Utils.defaultPerms;
+import static com.skyblockplus.utils.Utils.globalCooldown;
+
 public class NetworthCommand extends Command {
 
-	public NetworthCommand() {
-		this.name = "networth";
-		this.cooldown = globalCooldown + 1;
-		this.aliases = new String[] { "nw", "n" };
-		this.botPermissions = defaultPerms();
-	}
+    public NetworthCommand() {
+        this.name = "networth";
+        this.cooldown = globalCooldown + 1;
+        this.aliases = new String[]{"nw", "n"};
+        this.botPermissions = defaultPerms();
+    }
 
-	@Override
-	protected void execute(CommandEvent event) {
-		new NetworthExecute().execute(this, event);
-	}
+    @Override
+    protected void execute(CommandEvent event) {
+        new NetworthExecute().execute(this, event);
+    }
 }

@@ -18,35 +18,35 @@
 
 package com.skyblockplus.utils.exceptionhandler;
 
-import static com.skyblockplus.Main.globalExceptionHandler;
-
 import java.util.concurrent.*;
+
+import static com.skyblockplus.Main.globalExceptionHandler;
 
 public class ExceptionExecutor extends ThreadPoolExecutor {
 
-	public ExceptionExecutor() {
-		super(8, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>());
-	}
+    public ExceptionExecutor() {
+        super(8, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>());
+    }
 
-	protected void afterExecute(Runnable r, Throwable t) {
-		super.afterExecute(r, t);
-		if (t == null && r instanceof Future<?>) {
-			try {
-				Future<?> future = (Future<?>) r;
-				if (future.isDone()) {
-					future.get();
-				}
-			} catch (CancellationException ce) {
-				t = ce;
-			} catch (ExecutionException ee) {
-				t = ee.getCause();
-			} catch (InterruptedException ie) {
-				Thread.currentThread().interrupt();
-			}
-		}
+    protected void afterExecute(Runnable r, Throwable t) {
+        super.afterExecute(r, t);
+        if (t == null && r instanceof Future<?>) {
+            try {
+                Future<?> future = (Future<?>) r;
+                if (future.isDone()) {
+                    future.get();
+                }
+            } catch (CancellationException ce) {
+                t = ce;
+            } catch (ExecutionException ee) {
+                t = ee.getCause();
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
+        }
 
-		if (t != null) {
-			globalExceptionHandler.uncaughtException(null, t);
-		}
-	}
+        if (t != null) {
+            globalExceptionHandler.uncaughtException(null, t);
+        }
+    }
 }

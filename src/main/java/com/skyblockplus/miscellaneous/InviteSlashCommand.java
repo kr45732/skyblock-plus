@@ -24,23 +24,23 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class InviteSlashCommand extends SlashCommand {
 
-	public InviteSlashCommand() {
-		this.name = "invite";
-	}
+    public InviteSlashCommand() {
+        this.name = "invite";
+    }
 
-	@Override
-	protected void execute(SlashCommandExecutedEvent event) {
-		event.logCommand();
+    @Override
+    protected void execute(SlashCommandExecutedEvent event) {
+        event.logCommand();
 
-		event
-			.getHook()
-			.editOriginalEmbeds(InformationCommand.getInformation().build())
-			.setActionRows(InformationCommand.getInformationActionRow())
-			.queue();
-	}
+        event
+                .getHook()
+                .editOriginalEmbeds(InformationCommand.getInformation().build())
+                .setActionRows(InformationCommand.getInformationActionRow())
+                .queue();
+    }
 
-	@Override
-	public CommandData getCommandData() {
-		return new CommandData(name, "Invite this bot to your server");
-	}
+    @Override
+    public CommandData getCommandData() {
+        return new CommandData(name, "Invite this bot to your server");
+    }
 }

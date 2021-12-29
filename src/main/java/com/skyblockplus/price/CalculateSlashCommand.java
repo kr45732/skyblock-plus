@@ -25,19 +25,19 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class CalculateSlashCommand extends SlashCommand {
 
-	public CalculateSlashCommand() {
-		this.name = "calculate";
-	}
+    public CalculateSlashCommand() {
+        this.name = "calculate";
+    }
 
-	@Override
-	protected void execute(SlashCommandExecutedEvent event) {
-		event.logCommand();
+    @Override
+    protected void execute(SlashCommandExecutedEvent event) {
+        event.logCommand();
 
-		event.embed(CalculateCommand.calculatePriceFromUuid(event.getOptionStr("uuid")));
-	}
+        event.embed(CalculateCommand.calculatePriceFromUuid(event.getOptionStr("uuid")));
+    }
 
-	@Override
-	public CommandData getCommandData() {
-		return new CommandData(name, "Calculate the price of an auction").addOption(OptionType.STRING, "uuid", "Auction UUID", true);
-	}
+    @Override
+    public CommandData getCommandData() {
+        return new CommandData(name, "Calculate the price of an auction").addOption(OptionType.STRING, "uuid", "Auction UUID", true);
+    }
 }

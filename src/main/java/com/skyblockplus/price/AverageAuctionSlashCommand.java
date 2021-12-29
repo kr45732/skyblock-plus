@@ -25,19 +25,19 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class AverageAuctionSlashCommand extends SlashCommand {
 
-	public AverageAuctionSlashCommand() {
-		this.name = "average";
-	}
+    public AverageAuctionSlashCommand() {
+        this.name = "average";
+    }
 
-	@Override
-	protected void execute(SlashCommandExecutedEvent event) {
-		event.logCommand();
+    @Override
+    protected void execute(SlashCommandExecutedEvent event) {
+        event.logCommand();
 
-		event.embed(AverageAuctionCommand.getAverageAuctionPrice(event.getOptionStr("item")));
-	}
+        event.embed(AverageAuctionCommand.getAverageAuctionPrice(event.getOptionStr("item")));
+    }
 
-	@Override
-	public CommandData getCommandData() {
-		return new CommandData(name, "Get the average auction price of an item").addOption(OptionType.STRING, "item", "Item name", true);
-	}
+    @Override
+    public CommandData getCommandData() {
+        return new CommandData(name, "Get the average auction price of an item").addOption(OptionType.STRING, "item", "Item name", true);
+    }
 }

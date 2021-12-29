@@ -18,19 +18,20 @@
 
 package com.skyblockplus.api.serversettings.automatedguild;
 
-import javax.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.persistence.Embeddable;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Embeddable
 public class ApplyRequirements {
 
-	private String slayerReq = "";
-	private String skillsReq = "";
-	private String catacombsReq = "";
-	private String weightReq = "";
-
-	public ApplyRequirements() {}
+    private String slayerReq = "";
+    private String skillsReq = "";
+    private String catacombsReq = "";
+    private String weightReq = "";
 }

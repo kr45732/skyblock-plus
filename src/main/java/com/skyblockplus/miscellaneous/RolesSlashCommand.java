@@ -27,34 +27,28 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class RolesSlashCommand extends SlashCommand {
 
-	public RolesSlashCommand() {
-		this.name = "roles";
-	}
+    public RolesSlashCommand() {
+        this.name = "roles";
+    }
 
-	@Override
-	protected void execute(SlashCommandExecutedEvent event) {
-		event.logCommand();
+    @Override
+    protected void execute(SlashCommandExecutedEvent event) {
+        event.logCommand();
 
-		switch (event.getSubcommandName()) {
-			case "claim":
-				event.embed(RolesCommand.updateRoles(event.getOptionStr("profile"), event.getGuild(), event.getMember()));
-				break;
-			case "list":
-				event.paginate(RolesCommand.listRoles(new PaginatorEvent(event)));
-				break;
-			default:
-				event.invalidCommandMessage();
-				break;
-		}
-	}
+        switch (event.getSubcommandName()) {
+            case "claim" -> event.embed(RolesCommand.updateRoles(event.getOptionStr("profile"), event.getGuild(), event.getMember()));
+            case "list" -> event.paginate(RolesCommand.listRoles(new PaginatorEvent(event)));
+            default -> event.invalidCommandMessage();
+        }
+    }
 
-	@Override
-	public CommandData getCommandData() {
-		return new CommandData(name, "Main roles command")
-			.addSubcommands(
-				new SubcommandData("claim", "Claim automatic Skyblock roles. The player must be linked to the bot")
-					.addOption(OptionType.STRING, "profile", "Profile name"),
-				new SubcommandData("list", "List all roles that can be claimed through the bot")
-			);
-	}
+    @Override
+    public CommandData getCommandData() {
+        return new CommandData(name, "Main roles command")
+                .addSubcommands(
+                        new SubcommandData("claim", "Claim automatic Skyblock roles. The player must be linked to the bot")
+                                .addOption(OptionType.STRING, "profile", "Profile name"),
+                        new SubcommandData("list", "List all roles that can be claimed through the bot")
+                );
+    }
 }

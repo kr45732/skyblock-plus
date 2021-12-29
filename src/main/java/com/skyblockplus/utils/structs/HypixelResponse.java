@@ -18,34 +18,29 @@
 
 package com.skyblockplus.utils.structs;
 
+import com.google.gson.JsonElement;
+
 import static com.skyblockplus.utils.Utils.higherDepth;
 
-import com.google.gson.JsonElement;
-import lombok.Data;
+public record HypixelResponse(JsonElement response, String failCause) {
 
-@Data
-public class HypixelResponse {
+    public HypixelResponse(JsonElement response) {
+        this(response, null);
+    }
 
-	private JsonElement response;
-	private String failCause;
+    public HypixelResponse(String failCase) {
+        this(null, failCase);
+    }
 
-	public HypixelResponse(JsonElement response) {
-		this.response = response;
-	}
+    public HypixelResponse() {
+        this("Unknown fail cause");
+    }
 
-	public HypixelResponse(String failCase) {
-		this.failCause = failCase;
-	}
+    public boolean isNotValid() {
+        return response == null;
+    }
 
-	public HypixelResponse() {
-		this.failCause = "Unknown fail cause";
-	}
-
-	public boolean isNotValid() {
-		return response == null;
-	}
-
-	public JsonElement get(String path) {
-		return higherDepth(response, path);
-	}
+    public JsonElement get(String path) {
+        return higherDepth(response, path);
+    }
 }

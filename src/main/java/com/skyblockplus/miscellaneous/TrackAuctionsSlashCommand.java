@@ -26,40 +26,36 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class TrackAuctionsSlashCommand extends SlashCommand {
 
-	public TrackAuctionsSlashCommand() {
-		this.name = "track";
-	}
+    public TrackAuctionsSlashCommand() {
+        this.name = "track";
+    }
 
-	@Override
-	protected void execute(SlashCommandExecutedEvent event) {
-		event.logCommand();
+    @Override
+    protected void execute(SlashCommandExecutedEvent event) {
+        event.logCommand();
 
-		switch (event.getSubcommandName()) {
-			case "auctions":
-				if (event.invalidPlayerOption()) {
-					return;
-				}
-				event.embed(TrackAuctionsCommand.trackAuctions(event.player, event.getUser().getId()));
-				break;
-			case "stop":
-				event.embed(TrackAuctionsCommand.stopTrackingAuctions(event.getUser().getId()));
-				break;
-			default:
-				event.embed(event.invalidCommandMessage());
-				break;
-		}
-	}
+        switch (event.getSubcommandName()) {
+            case "auctions" -> {
+                if (event.invalidPlayerOption()) {
+                    return;
+                }
+                event.embed(TrackAuctionsCommand.trackAuctions(event.player, event.getUser().getId()));
+            }
+            case "stop" -> event.embed(TrackAuctionsCommand.stopTrackingAuctions(event.getUser().getId()));
+            default -> event.embed(event.invalidCommandMessage());
+        }
+    }
 
-	@Override
-	public CommandData getCommandData() {
-		return new CommandData(name, "Main track command")
-			.addSubcommands(
-				new SubcommandData(
-					"auctions",
-					"Track the auctions of a certain player & receive a DM from the bot when the their auctions sell"
-				)
-					.addOption(OptionType.STRING, "player", "Player username or mention"),
-				new SubcommandData("stop", "Stop tracking a players auctions")
-			);
-	}
+    @Override
+    public CommandData getCommandData() {
+        return new CommandData(name, "Main track command")
+                .addSubcommands(
+                        new SubcommandData(
+                                "auctions",
+                                "Track the auctions of a certain player & receive a DM from the bot when the their auctions sell"
+                        )
+                                .addOption(OptionType.STRING, "player", "Player username or mention"),
+                        new SubcommandData("stop", "Stop tracking a players auctions")
+                );
+    }
 }

@@ -18,50 +18,50 @@
 
 package com.skyblockplus.weight.senither;
 
-import static com.skyblockplus.utils.Constants.SKILL_WEIGHTS;
-
 import com.skyblockplus.utils.Constants;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.SkillsStruct;
 import com.skyblockplus.utils.structs.WeightStruct;
 
+import static com.skyblockplus.utils.Constants.SKILL_WEIGHTS;
+
 public class SkillsWeight {
 
-	private final Player player;
-	private final WeightStruct weightStruct;
+    private final Player player;
+    private final WeightStruct weightStruct;
 
-	public SkillsWeight(Player player) {
-		this.player = player;
-		this.weightStruct = new WeightStruct();
-	}
+    public SkillsWeight(Player player) {
+        this.player = player;
+        this.weightStruct = new WeightStruct();
+    }
 
-	public static double of(double skillAverage, double exponent) {
-		return (8 * (Math.pow(skillAverage * 10, 0.5 + exponent + (skillAverage / 100)) / 1250));
-	}
+    public static double of(double skillAverage, double exponent) {
+        return (8 * (Math.pow(skillAverage * 10, 0.5 + exponent + (skillAverage / 100)) / 1250));
+    }
 
-	public WeightStruct getWeightStruct() {
-		return weightStruct;
-	}
+    public WeightStruct getWeightStruct() {
+        return weightStruct;
+    }
 
-	public WeightStruct getSkillsWeight(String skillName) {
-		Double[] curWeights = SKILL_WEIGHTS.get(skillName);
-		double exponent = curWeights[0];
-		double divider = curWeights[1];
-		double currentSkillXp = player.getSkillXp(skillName);
+    public WeightStruct getSkillsWeight(String skillName) {
+        Double[] curWeights = SKILL_WEIGHTS.get(skillName);
+        double exponent = curWeights[0];
+        double divider = curWeights[1];
+        double currentSkillXp = player.getSkillXp(skillName);
 
-		if (currentSkillXp != -1) {
-			int maxLevel = player.getSkillMaxLevel(skillName, Player.WeightType.SENITHER);
-			SkillsStruct skillsStruct = player.getSkill(skillName, Player.WeightType.SENITHER);
-			double level = skillsStruct.getProgressLevel();
-			double maxLevelExp = maxLevel == 50 ? Constants.SKILLS_LEVEL_50_XP : Constants.SKILLS_LEVEL_60_XP;
-			double base = Math.pow(level * 10, 0.5 + exponent + (level / 100)) / 1250;
-			if (currentSkillXp <= maxLevelExp) {
-				return weightStruct.add(new WeightStruct(base));
-			}
+        if (currentSkillXp != -1) {
+            int maxLevel = player.getSkillMaxLevel(skillName, Player.WeightType.SENITHER);
+            SkillsStruct skillsStruct = player.getSkill(skillName, Player.WeightType.SENITHER);
+            double level = skillsStruct.getProgressLevel();
+            double maxLevelExp = maxLevel == 50 ? Constants.SKILLS_LEVEL_50_XP : Constants.SKILLS_LEVEL_60_XP;
+            double base = Math.pow(level * 10, 0.5 + exponent + (level / 100)) / 1250;
+            if (currentSkillXp <= maxLevelExp) {
+                return weightStruct.add(new WeightStruct(base));
+            }
 
-			return weightStruct.add(new WeightStruct(Math.round(base), Math.pow((currentSkillXp - maxLevelExp) / divider, 0.968)));
-		}
+            return weightStruct.add(new WeightStruct(Math.round(base), Math.pow((currentSkillXp - maxLevelExp) / divider, 0.968)));
+        }
 
-		return new WeightStruct();
-	}
+        return new WeightStruct();
+    }
 }

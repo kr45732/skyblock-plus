@@ -24,19 +24,19 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class FetchurSlashCommand extends SlashCommand {
 
-	public FetchurSlashCommand() {
-		this.name = "fetchur";
-	}
+    public FetchurSlashCommand() {
+        this.name = "fetchur";
+    }
 
-	@Override
-	protected void execute(SlashCommandExecutedEvent event) {
-		event.logCommand();
+    @Override
+    protected void execute(SlashCommandExecutedEvent event) {
+        event.logCommand();
 
-		event.embed(FetchurCommand.getFetchurItem());
-	}
+        event.embed(FetchurCommand.getFetchurItem());
+    }
 
-	@Override
-	public CommandData getCommandData() {
-		return new CommandData(name, "Get the item that fetchur wants today");
-	}
+    @Override
+    public CommandData getCommandData() {
+        return new CommandData(name, "Get the item that fetchur wants today");
+    }
 }

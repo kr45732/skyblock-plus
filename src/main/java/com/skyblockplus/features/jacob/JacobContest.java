@@ -18,34 +18,35 @@
 
 package com.skyblockplus.features.jacob;
 
+import lombok.Data;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
-import lombok.Data;
 
 @Data
 public class JacobContest {
 
-	private long time;
-	private List<String> crops;
+    private long time;
+    private List<String> crops;
 
-	public boolean reminderHasPassed() {
-		return Instant.now().isAfter(getTimeInstant().minusSeconds(301));
-	}
+    public boolean reminderHasPassed() {
+        return Instant.now().isAfter(getTimeInstant().minusSeconds(301));
+    }
 
-	public Instant getTimeInstant() {
-		return Instant.ofEpochMilli(time);
-	}
+    public Instant getTimeInstant() {
+        return Instant.ofEpochMilli(time);
+    }
 
-	public Duration getDurationUntil() {
-		return Duration.between(Instant.now(), getTimeInstant());
-	}
+    public Duration getDurationUntil() {
+        return Duration.between(Instant.now(), getTimeInstant());
+    }
 
-	public String getCropsFormatted() {
-		StringBuilder cropsFormatted = new StringBuilder();
-		for (String crop : crops) {
-			cropsFormatted.append("➜ ").append(crop).append("\n");
-		}
-		return cropsFormatted.toString();
-	}
+    public String getCropsFormatted() {
+        StringBuilder cropsFormatted = new StringBuilder();
+        for (String crop : crops) {
+            cropsFormatted.append("➜ ").append(crop).append("\n");
+        }
+        return cropsFormatted.toString();
+    }
 }

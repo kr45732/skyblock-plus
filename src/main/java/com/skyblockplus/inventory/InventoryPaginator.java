@@ -18,10 +18,6 @@
 
 package com.skyblockplus.inventory;
 
-import static com.skyblockplus.Main.waiter;
-
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -29,67 +25,72 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.interactions.components.Button;
 
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import static com.skyblockplus.Main.waiter;
+
 public class InventoryPaginator {
 
-	private final List<String[]> enderChestPages;
-	private final Message pagePart1;
-	private final Message pagePart2;
-	private final User user;
-	private final int maxPageNumber;
-	private int pageNumber = 0;
+    private final List<String[]> enderChestPages;
+    private final Message pagePart1;
+    private final Message pagePart2;
+    private final User user;
+    private final int maxPageNumber;
+    private int pageNumber = 0;
 
-	public InventoryPaginator(List<String[]> enderChestPages, MessageChannel channel, User user) {
-		this.enderChestPages = enderChestPages;
-		this.user = user;
-		this.maxPageNumber = enderChestPages.size() - 1;
+    public InventoryPaginator(List<String[]> enderChestPages, MessageChannel channel, User user) {
+        this.enderChestPages = enderChestPages;
+        this.user = user;
+        this.maxPageNumber = enderChestPages.size() - 1;
 
-		pagePart1 = channel.sendMessage(enderChestPages.get(0)[0]).complete();
-		pagePart2 =
-			channel
-				.sendMessage(enderChestPages.get(0)[1])
-				.setActionRow(
-					Button.primary("inv_paginator_left_button", Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")),
-					Button.primary("inv_paginator_right_button", Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
-				)
-				.complete();
+        pagePart1 = channel.sendMessage(enderChestPages.get(0)[0]).complete();
+        pagePart2 =
+                channel
+                        .sendMessage(enderChestPages.get(0)[1])
+                        .setActionRow(
+                                Button.primary("inv_paginator_left_button", Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")),
+                                Button.primary("inv_paginator_right_button", Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
+                        )
+                        .complete();
 
-		waitForEvent();
-	}
+        waitForEvent();
+    }
 
-	private boolean condition(ButtonClickEvent event) {
-		return (
-			event.isFromGuild() &&
-			!event.getUser().isBot() &&
-			event.getUser().getId().equals(user.getId()) &&
-			event.getMessageId().equals(pagePart2.getId())
-		);
-	}
+    private boolean condition(ButtonClickEvent event) {
+        return (
+                event.isFromGuild() &&
+                        !event.getUser().isBot() &&
+                        event.getUser().getId().equals(user.getId()) &&
+                        event.getMessageId().equals(pagePart2.getId())
+        );
+    }
 
-	public void action(ButtonClickEvent event) {
-		if (event.getComponentId().equals("inv_paginator_left_button")) {
-			if ((pageNumber - 1) >= 0) {
-				pageNumber -= 1;
-			}
-		} else if (event.getComponentId().equals("inv_paginator_right_button")) {
-			if ((pageNumber + 1) <= maxPageNumber) {
-				pageNumber += 1;
-			}
-		}
+    public void action(ButtonClickEvent event) {
+        if (event.getComponentId().equals("inv_paginator_left_button")) {
+            if ((pageNumber - 1) >= 0) {
+                pageNumber -= 1;
+            }
+        } else if (event.getComponentId().equals("inv_paginator_right_button")) {
+            if ((pageNumber + 1) <= maxPageNumber) {
+                pageNumber += 1;
+            }
+        }
 
-		pagePart1.editMessage(enderChestPages.get(pageNumber)[0]).queue();
-		event.editMessage(enderChestPages.get(pageNumber)[1]).complete();
+        pagePart1.editMessage(enderChestPages.get(pageNumber)[0]).queue();
+        event.editMessage(enderChestPages.get(pageNumber)[1]).complete();
 
-		waitForEvent();
-	}
+        waitForEvent();
+    }
 
-	private void waitForEvent() {
-		waiter.waitForEvent(
-			ButtonClickEvent.class,
-			this::condition,
-			this::action,
-			30,
-			TimeUnit.SECONDS,
-			() -> pagePart2.editMessageComponents().queue()
-		);
-	}
+    private void waitForEvent() {
+        waiter.waitForEvent(
+                ButtonClickEvent.class,
+                this::condition,
+                this::action,
+                30,
+                TimeUnit.SECONDS,
+                () -> pagePart2.editMessageComponents().queue()
+        );
+    }
 }

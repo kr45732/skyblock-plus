@@ -18,11 +18,9 @@
 
 package com.skyblockplus.utils.structs;
 
-import lombok.Data;
+public record NwItemPrice(double price, String json) {
 
-@Data
-public class NwItemPrice {
-
-	private final double price;
-	private final String json;
+    public NwItemPrice() {
+        this(0, "");
+    }
 }

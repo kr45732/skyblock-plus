@@ -19,27 +19,28 @@
 package com.skyblockplus.api.serversettings.jacob;
 
 import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
-import java.util.ArrayList;
-import java.util.List;
-import javax.persistence.ElementCollection;
-import javax.persistence.Embeddable;
-import javax.persistence.FetchType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
+import javax.persistence.ElementCollection;
+import javax.persistence.Embeddable;
+import javax.persistence.FetchType;
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Embeddable
 public class JacobSettings {
 
-	private String enable = "false";
-	private String channel = "";
+    private String enable = "false";
+    private String channel = "";
 
-	@ElementCollection(fetch = FetchType.EAGER)
-	@Fetch(value = FetchMode.SUBSELECT)
-	private List<RoleObject> crops = new ArrayList<>();
-
-	public JacobSettings() {}
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Fetch(value = FetchMode.SUBSELECT)
+    private List<RoleObject> crops = new ArrayList<>();
 }

@@ -18,10 +18,6 @@
 
 package com.skyblockplus.link;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
@@ -31,147 +27,156 @@ import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
 import com.skyblockplus.utils.structs.HypixelResponse;
-import java.time.Instant;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 
+import java.time.Instant;
+
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
+import static com.skyblockplus.utils.Utils.*;
+
 public class LinkCommand extends Command {
 
-	public LinkCommand() {
-		this.name = "link";
-		this.cooldown = globalCooldown;
-		this.aliases = new String[] { "verify" };
-		this.botPermissions = defaultPerms();
-	}
+    public LinkCommand() {
+        this.name = "link";
+        this.cooldown = globalCooldown;
+        this.aliases = new String[]{"verify"};
+        this.botPermissions = defaultPerms();
+    }
 
-	public static EmbedBuilder linkAccount(String username, Member member, Guild guild) {
-		DiscordInfoStruct playerInfo = getPlayerDiscordInfo(username);
-		if (playerInfo.isNotValid()) {
-			return invalidEmbed(playerInfo.getFailCause());
-		}
+    public static EmbedBuilder linkAccount(String username, Member member, Guild guild) {
+        DiscordInfoStruct playerInfo = getPlayerDiscordInfo(username);
+        if (playerInfo.isNotValid()) {
+            return invalidEmbed(playerInfo.failCause());
+        }
 
-		if (!member.getUser().getAsTag().equals(playerInfo.getDiscordTag())) {
-			EmbedBuilder eb = defaultEmbed("Discord tag mismatch");
-			eb.setDescription(
-				"**Player Username:** `" +
-				playerInfo.getUsername() +
-				"`\n**API Discord Tag:** `" +
-				playerInfo.getDiscordTag() +
-				"`\n**Your Discord Tag:** `" +
-				member.getUser().getAsTag() +
-				"`"
-			);
-			return eb;
-		}
+        if (!member.getUser().getAsTag().equals(playerInfo.discordTag())) {
+            EmbedBuilder eb = defaultEmbed("Discord tag mismatch");
+            eb.setDescription(
+                    "**Player Username:** `" +
+                            playerInfo.username() +
+                            "`\n**API Discord Tag:** `" +
+                            playerInfo.discordTag() +
+                            "`\n**Your Discord Tag:** `" +
+                            member.getUser().getAsTag() +
+                            "`"
+            );
+            return eb;
+        }
 
-		LinkedAccountModel toAdd = new LinkedAccountModel(
-			"" + Instant.now().toEpochMilli(),
-			member.getId(),
-			playerInfo.getUuid(),
-			playerInfo.getUsername()
-		);
+        LinkedAccountModel toAdd = new LinkedAccountModel(
+                "" + Instant.now().toEpochMilli(),
+                member.getId(),
+                playerInfo.uuid(),
+                playerInfo.username()
+        );
 
-		if (database.addLinkedUser(toAdd) == 200) {
-			JsonElement verifySettings = database.getVerifySettings(guild.getId());
-			if (verifySettings != null) {
-				try {
-					String nicknameTemplate = higherDepth(verifySettings, "verifiedNickname").getAsString();
-					if (!nicknameTemplate.equalsIgnoreCase("none") && !nicknameTemplate.isEmpty()) {
-						nicknameTemplate = nicknameTemplate.replace("[IGN]", playerInfo.getUsername());
+        if (database.addLinkedUser(toAdd) == 200) {
+            JsonElement verifySettings = database.getVerifySettings(guild.getId());
+            if (verifySettings != null) {
+                try {
+                    String nicknameTemplate = higherDepth(verifySettings, "verifiedNickname").getAsString();
+                    if (!nicknameTemplate.equalsIgnoreCase("none") && !nicknameTemplate.isEmpty()) {
+                        nicknameTemplate = nicknameTemplate.replace("[IGN]", playerInfo.username());
 
-						if (nicknameTemplate.contains("[GUILD_RANK]")) {
-							try {
-								HypixelResponse playerGuild = getGuildFromPlayer(playerInfo.getUuid());
-								if (!playerGuild.isNotValid()) {
-									AutomatedGuild settingsGuildId = database
-										.getAllGuildSettings(guild.getId())
-										.stream()
-										.filter(guildRole -> guildRole.getGuildId().equalsIgnoreCase(playerGuild.get("_id").getAsString()))
-										.findFirst()
-										.orElse(null);
+                        if (nicknameTemplate.contains("[GUILD_RANK]")) {
+                            try {
+                                HypixelResponse playerGuild = getGuildFromPlayer(playerInfo.uuid());
+                                if (!playerGuild.isNotValid()) {
+                                    AutomatedGuild settingsGuildId = database
+                                            .getAllGuildSettings(guild.getId())
+                                            .stream()
+                                            .filter(guildRole -> guildRole.getGuildId().equalsIgnoreCase(playerGuild.get("_id").getAsString()))
+                                            .findFirst()
+                                            .orElse(null);
 
-									if (settingsGuildId != null) {
-										JsonArray guildMembers = playerGuild.get("members").getAsJsonArray();
-										for (JsonElement guildMember : guildMembers) {
-											if (higherDepth(guildMember, "uuid").getAsString().equals(playerInfo.getUuid())) {
-												nicknameTemplate =
-													nicknameTemplate.replace(
-														"[GUILD_RANK]",
-														higherDepth(guildMember, "rank").getAsString()
-													);
-												break;
-											}
-										}
-									}
-								}
-							} catch (Exception ignored) {}
-						}
+                                    if (settingsGuildId != null) {
+                                        JsonArray guildMembers = playerGuild.get("members").getAsJsonArray();
+                                        for (JsonElement guildMember : guildMembers) {
+                                            if (higherDepth(guildMember, "uuid").getAsString().equals(playerInfo.uuid())) {
+                                                nicknameTemplate =
+                                                        nicknameTemplate.replace(
+                                                                "[GUILD_RANK]",
+                                                                higherDepth(guildMember, "rank").getAsString()
+                                                        );
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            } catch (Exception ignored) {
+                            }
+                        }
 
-						member.modifyNickname(nicknameTemplate).queue();
-					}
-				} catch (Exception ignored) {}
+                        member.modifyNickname(nicknameTemplate).queue();
+                    }
+                } catch (Exception ignored) {
+                }
 
-				try {
-					JsonArray verifyRoles = higherDepth(verifySettings, "verifiedRoles").getAsJsonArray();
-					for (JsonElement verifyRole : verifyRoles) {
-						try {
-							guild.addRoleToMember(member.getId(), guild.getRoleById(verifyRole.getAsString())).complete();
-						} catch (Exception e) {
-							System.out.println(verifyRole);
-							e.printStackTrace();
-						}
-					}
-					try {
-						guild
-							.removeRoleFromMember(
-								member,
-								guild.getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString())
-							)
-							.queue();
-					} catch (Exception ignored) {}
-				} catch (Exception ignored) {}
-			}
+                try {
+                    JsonArray verifyRoles = higherDepth(verifySettings, "verifiedRoles").getAsJsonArray();
+                    for (JsonElement verifyRole : verifyRoles) {
+                        try {
+                            guild.addRoleToMember(member.getId(), guild.getRoleById(verifyRole.getAsString())).complete();
+                        } catch (Exception e) {
+                            System.out.println(verifyRole);
+                            e.printStackTrace();
+                        }
+                    }
+                    try {
+                        guild
+                                .removeRoleFromMember(
+                                        member,
+                                        guild.getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString())
+                                )
+                                .queue();
+                    } catch (Exception ignored) {
+                    }
+                } catch (Exception ignored) {
+                }
+            }
 
-			return defaultEmbed("Success")
-				.setDescription("`" + member.getUser().getAsTag() + "` was linked to `" + playerInfo.getUsername() + "`");
-		} else {
-			return invalidEmbed("Error linking `" + member.getUser().getAsTag() + " to `" + playerInfo.getUsername() + "`");
-		}
-	}
+            return defaultEmbed("Success")
+                    .setDescription("`" + member.getUser().getAsTag() + "` was linked to `" + playerInfo.username() + "`");
+        } else {
+            return invalidEmbed("Error linking `" + member.getUser().getAsTag() + " to `" + playerInfo.username() + "`");
+        }
+    }
 
-	public static EmbedBuilder getLinkedAccount(User user) {
-		JsonElement userInfo = database.getLinkedUserByDiscordId(user.getId());
+    public static EmbedBuilder getLinkedAccount(User user) {
+        JsonElement userInfo = database.getLinkedUserByDiscordId(user.getId());
 
-		try {
-			return defaultEmbed("Linked information")
-				.setDescription(
-					"`" + user.getAsTag() + "` is linked to `" + (higherDepth(userInfo, "minecraftUsername").getAsString()) + "`"
-				);
-		} catch (Exception e) {
-			return invalidEmbed("`" + user.getAsTag() + "` is not linked");
-		}
-	}
+        try {
+            return defaultEmbed("Linked information")
+                    .setDescription(
+                            "`" + user.getAsTag() + "` is linked to `" + (higherDepth(userInfo, "minecraftUsername").getAsString()) + "`"
+                    );
+        } catch (Exception e) {
+            return invalidEmbed("`" + user.getAsTag() + "` is not linked");
+        }
+    }
 
-	@Override
-	protected void execute(CommandEvent event) {
-		new CommandExecute(this, event) {
-			@Override
-			protected void execute() {
-				logCommand();
+    @Override
+    protected void execute(CommandEvent event) {
+        new CommandExecute(this, event) {
+            @Override
+            protected void execute() {
+                logCommand();
 
-				if (args.length == 2) {
-					embed(linkAccount(args[1], event.getMember(), event.getGuild()));
-					return;
-				} else if (args.length == 1) {
-					embed(getLinkedAccount(event.getAuthor()));
-					return;
-				}
+                if (args.length == 2) {
+                    embed(linkAccount(args[1], event.getMember(), event.getGuild()));
+                    return;
+                } else if (args.length == 1) {
+                    embed(getLinkedAccount(event.getAuthor()));
+                    return;
+                }
 
-				sendErrorEmbed();
-			}
-		}
-			.queue();
-	}
+                sendErrorEmbed();
+            }
+        }
+                .queue();
+    }
 }

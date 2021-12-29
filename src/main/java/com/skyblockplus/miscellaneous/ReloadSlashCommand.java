@@ -25,20 +25,20 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class ReloadSlashCommand extends SlashCommand {
 
-	public ReloadSlashCommand() {
-		this.name = "reload";
-		this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
-	}
+    public ReloadSlashCommand() {
+        this.name = "reload";
+        this.userPermissions = new Permission[]{Permission.ADMINISTRATOR};
+    }
 
-	@Override
-	protected void execute(SlashCommandExecutedEvent event) {
-		event.logCommand();
+    @Override
+    protected void execute(SlashCommandExecutedEvent event) {
+        event.logCommand();
 
-		event.embed(ReloadCommand.getReloadEmbed(event.getGuild()));
-	}
+        event.embed(ReloadCommand.getReloadEmbed(event.getGuild()));
+    }
 
-	@Override
-	public CommandData getCommandData() {
-		return new CommandData(name, "Reload the guild application, verification and mee6 roles settings");
-	}
+    @Override
+    public CommandData getCommandData() {
+        return new CommandData(name, "Reload the guild application, verification and mee6 roles settings");
+    }
 }

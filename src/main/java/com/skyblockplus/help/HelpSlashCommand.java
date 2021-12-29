@@ -26,20 +26,20 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class HelpSlashCommand extends SlashCommand {
 
-	public HelpSlashCommand() {
-		this.name = "help";
-	}
+    public HelpSlashCommand() {
+        this.name = "help";
+    }
 
-	@Override
-	protected void execute(SlashCommandExecutedEvent event) {
-		event.logCommand();
+    @Override
+    protected void execute(SlashCommandExecutedEvent event) {
+        event.logCommand();
 
-		event.paginate(HelpCommand.getHelp(event.getOptionStr("command"), new PaginatorEvent(event)));
-	}
+        event.paginate(HelpCommand.getHelp(event.getOptionStr("command"), new PaginatorEvent(event)));
+    }
 
-	@Override
-	public CommandData getCommandData() {
-		return new CommandData(name, "Show the help page for this bot")
-			.addOption(OptionType.STRING, "command", "Name of command or page number");
-	}
+    @Override
+    public CommandData getCommandData() {
+        return new CommandData(name, "Show the help page for this bot")
+                .addOption(OptionType.STRING, "command", "Name of command or page number");
+    }
 }

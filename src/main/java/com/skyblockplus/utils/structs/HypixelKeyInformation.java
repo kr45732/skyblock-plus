@@ -19,11 +19,10 @@
 package com.skyblockplus.utils.structs;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import lombok.Data;
 
-@Data
-public class HypixelKeyInformation {
+public record HypixelKeyInformation(AtomicInteger remainingLimit, AtomicInteger timeTillReset) {
 
-	private final AtomicInteger remainingLimit = new AtomicInteger(120);
-	private final AtomicInteger timeTillReset = new AtomicInteger(0);
+    public HypixelKeyInformation() {
+        this(new AtomicInteger(120), new AtomicInteger(0));
+    }
 }

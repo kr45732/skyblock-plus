@@ -18,17 +18,7 @@
 
 package com.skyblockplus.utils.structs;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+public record GuildRanksStruct(String name, double skills, double slayer, double catacombs, double weight,
+                               String guildRank) {
 
-@AllArgsConstructor
-@Data
-public class GuildRanksStruct {
-
-	private String name;
-	private double skills;
-	private double slayer;
-	private double catacombs;
-	private double weight;
-	private String guildRank;
 }

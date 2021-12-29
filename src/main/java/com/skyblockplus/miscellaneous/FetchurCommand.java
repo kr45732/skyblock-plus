@@ -18,46 +18,47 @@
 
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.Constants.FETCHUR_ITEMS;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
+import net.dv8tion.jda.api.EmbedBuilder;
+
 import java.time.LocalDate;
 import java.time.ZoneId;
-import net.dv8tion.jda.api.EmbedBuilder;
+
+import static com.skyblockplus.utils.Constants.FETCHUR_ITEMS;
+import static com.skyblockplus.utils.Utils.*;
 
 public class FetchurCommand extends Command {
 
-	public FetchurCommand() {
-		this.name = "fetchur";
-		this.cooldown = globalCooldown;
-		this.botPermissions = defaultPerms();
-	}
+    public FetchurCommand() {
+        this.name = "fetchur";
+        this.cooldown = globalCooldown;
+        this.botPermissions = defaultPerms();
+    }
 
-	public static EmbedBuilder getFetchurItem() {
-		int index = LocalDate.now(ZoneId.of("America/New_York")).getDayOfMonth() % FETCHUR_ITEMS.size() - 1;
-		if (index == -1) {
-			index = FETCHUR_ITEMS.size() - 1;
-		}
+    public static EmbedBuilder getFetchurItem() {
+        int index = LocalDate.now(ZoneId.of("America/New_York")).getDayOfMonth() % FETCHUR_ITEMS.size() - 1;
+        if (index == -1) {
+            index = FETCHUR_ITEMS.size() - 1;
+        }
 
-		String[] fetchurItem = FETCHUR_ITEMS.get(index).split("\\|");
-		return defaultEmbed("Fetchur item")
-			.setDescription(fetchurItem[0])
-			.setThumbnail("https://sky.shiiyu.moe/item.gif/" + fetchurItem[1]);
-	}
+        String[] fetchurItem = FETCHUR_ITEMS.get(index).split("\\|");
+        return defaultEmbed("Fetchur item")
+                .setDescription(fetchurItem[0])
+                .setThumbnail("https://sky.shiiyu.moe/item.gif/" + fetchurItem[1]);
+    }
 
-	@Override
-	protected void execute(CommandEvent event) {
-		new CommandExecute(this, event) {
-			@Override
-			protected void execute() {
-				logCommand();
+    @Override
+    protected void execute(CommandEvent event) {
+        new CommandExecute(this, event) {
+            @Override
+            protected void execute() {
+                logCommand();
 
-				embed(getFetchurItem());
-			}
-		}
-			.queue();
-	}
+                embed(getFetchurItem());
+            }
+        }
+                .queue();
+    }
 }

@@ -19,7 +19,6 @@
 package com.skyblockplus.api.serversettings.managers;
 
 import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,62 +26,64 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/private/server-settings")
 public class ServerSettingsController {
 
-	private final ServerSettingsService settingsService;
+    private final ServerSettingsService settingsService;
 
-	@Autowired
-	public ServerSettingsController(ServerSettingsService settingsService) {
-		this.settingsService = settingsService;
-	}
+    @Autowired
+    public ServerSettingsController(ServerSettingsService settingsService) {
+        this.settingsService = settingsService;
+    }
 
-	@GetMapping("/get/all")
-	public List<ServerSettingsModel> getAllServerSettings() {
-		return settingsService.getAllServerSettings();
-	}
+    @GetMapping("/get/all")
+    public List<ServerSettingsModel> getAllServerSettings() {
+        return settingsService.getAllServerSettings();
+    }
 
-	@GetMapping("/get/byId")
-	public ResponseEntity<?> getServerSettings(@RequestParam(value = "guildId") String serverId) {
-		return settingsService.getServerSettingsById(serverId);
-	}
+    @GetMapping("/get/byId")
+    public ResponseEntity<?> getServerSettings(@RequestParam(value = "guildId") String serverId) {
+        return settingsService.getServerSettingsById(serverId);
+    }
 
-	@GetMapping("/get/verify")
-	public ResponseEntity<?> getVerifySettings(@RequestParam(value = "guildId") String serverId) {
-		return settingsService.getVerifySettings(serverId);
-	}
+    @GetMapping("/get/verify")
+    public ResponseEntity<?> getVerifySettings(@RequestParam(value = "guildId") String serverId) {
+        return settingsService.getVerifySettings(serverId);
+    }
 
-	@GetMapping("/get/roles")
-	public ResponseEntity<?> getRolesSettings(@RequestParam(value = "guildId") String serverId) {
-		return settingsService.getRolesSettings(serverId);
-	}
+    @GetMapping("/get/roles")
+    public ResponseEntity<?> getRolesSettings(@RequestParam(value = "guildId") String serverId) {
+        return settingsService.getRolesSettings(serverId);
+    }
 
-	@GetMapping("/get/role")
-	public ResponseEntity<?> getRoleSettings(
-		@RequestParam(value = "guildId") String serverId,
-		@RequestParam(value = "roleName") String roleName
-	) {
-		return settingsService.getRoleSettings(serverId, roleName);
-	}
+    @GetMapping("/get/role")
+    public ResponseEntity<?> getRoleSettings(
+            @RequestParam(value = "guildId") String serverId,
+            @RequestParam(value = "roleName") String roleName
+    ) {
+        return settingsService.getRoleSettings(serverId, roleName);
+    }
 
-	@GetMapping("/get/guild/all")
-	public List<AutomatedGuild> getAllGuildSettings(@RequestParam(value = "guildId") String serverId) {
-		return settingsService.getAllGuildSettings(serverId);
-	}
+    @GetMapping("/get/guild/all")
+    public List<AutomatedGuild> getAllGuildSettings(@RequestParam(value = "guildId") String serverId) {
+        return settingsService.getAllGuildSettings(serverId);
+    }
 
-	@GetMapping("/get/guild/byName")
-	public ResponseEntity<?> getGuildSettings(@RequestParam(value = "guildId") String serverId, @RequestParam(value = "name") String name) {
-		return settingsService.getGuildSettings(serverId, name);
-	}
+    @GetMapping("/get/guild/byName")
+    public ResponseEntity<?> getGuildSettings(@RequestParam(value = "guildId") String serverId, @RequestParam(value = "name") String name) {
+        return settingsService.getGuildSettings(serverId, name);
+    }
 
-	@GetMapping("/get/event")
-	public ResponseEntity<?> getSkyblockEventSettings(@RequestParam(value = "guildId") String serverId) {
-		return settingsService.getSkyblockEventSettings(serverId);
-	}
+    @GetMapping("/get/event")
+    public ResponseEntity<?> getSkyblockEventSettings(@RequestParam(value = "guildId") String serverId) {
+        return settingsService.getSkyblockEventSettings(serverId);
+    }
 
-	@GetMapping("/get/mee6")
-	public ResponseEntity<?> getMee6Settings(@RequestParam(value = "guildId") String serverId) {
-		return settingsService.getMee6Settings(serverId);
-	}
+    @GetMapping("/get/mee6")
+    public ResponseEntity<?> getMee6Settings(@RequestParam(value = "guildId") String serverId) {
+        return settingsService.getMee6Settings(serverId);
+    }
 }

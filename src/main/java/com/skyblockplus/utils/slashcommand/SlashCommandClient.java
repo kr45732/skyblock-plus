@@ -18,95 +18,96 @@
 
 package com.skyblockplus.utils.slashcommand;
 
-import static com.skyblockplus.utils.Utils.invalidEmbed;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static com.skyblockplus.utils.Utils.invalidEmbed;
+
 public class SlashCommandClient extends ListenerAdapter {
 
-	private final List<SlashCommand> slashCommands;
-	private String ownerId;
-	private final Map<String, Integer> commandUses = new HashMap<>();
+    private final List<SlashCommand> slashCommands;
+    private final Map<String, Integer> commandUses = new HashMap<>();
+    private String ownerId;
 
-	public SlashCommandClient() {
-		this.slashCommands = new ArrayList<>();
-	}
+    public SlashCommandClient() {
+        this.slashCommands = new ArrayList<>();
+    }
 
-	public SlashCommandClient addCommands(SlashCommand... commands) {
-		for (SlashCommand command : commands) {
-			if (slashCommands.stream().anyMatch(auction -> auction.getName().equalsIgnoreCase(command.getName()))) {
-				throw new IllegalArgumentException("Command added has a name that has already been indexed: " + command.getName());
-			} else {
-				slashCommands.add(command);
-			}
-		}
-		return this;
-	}
+    public SlashCommandClient addCommands(SlashCommand... commands) {
+        for (SlashCommand command : commands) {
+            if (slashCommands.stream().anyMatch(auction -> auction.getName().equalsIgnoreCase(command.getName()))) {
+                throw new IllegalArgumentException("Command added has a name that has already been indexed: " + command.getName());
+            } else {
+                slashCommands.add(command);
+            }
+        }
+        return this;
+    }
 
-	public SlashCommandClient setOwnerId(String ownerId) {
-		this.ownerId = ownerId;
-		return this;
-	}
+    public SlashCommandClient setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
+        return this;
+    }
 
-	@Override
-	public void onSlashCommand(SlashCommandEvent event) {
-		if (!event.isFromGuild()) {
-			event.replyEmbeds(invalidEmbed("This command cannot be used in direct messages").build()).queue();
-			return;
-		}
-		if (event.getChannelType() != ChannelType.TEXT) {
-			event.replyEmbeds(invalidEmbed("This command can only be used in text channels").build()).queue();
-			return;
-		}
+    @Override
+    public void onSlashCommand(SlashCommandEvent event) {
+        if (!event.isFromGuild()) {
+            event.replyEmbeds(invalidEmbed("This command cannot be used in direct messages").build()).queue();
+            return;
+        }
+        if (event.getChannelType() != ChannelType.TEXT) {
+            event.replyEmbeds(invalidEmbed("This command can only be used in text channels").build()).queue();
+            return;
+        }
 
-		try {
-			event.deferReply().complete();
-		} catch (ErrorResponseException e) {
-			if (e.getErrorCode() != ErrorResponse.UNKNOWN_INTERACTION.getCode()) {
-				throw e;
-			}
-			return;
-		}
+        try {
+            event.deferReply().complete();
+        } catch (ErrorResponseException e) {
+            if (e.getErrorCode() != ErrorResponse.UNKNOWN_INTERACTION.getCode()) {
+                throw e;
+            }
+            return;
+        }
 
-		SlashCommandExecutedEvent slashCommandExecutedEvent = new SlashCommandExecutedEvent(event, this);
-		for (SlashCommand command : slashCommands) {
-			if (command.getName().equals(event.getName())) {
-				commandUses.put(command.getName(), commandUses.getOrDefault(command.getName(), 0) + 1);
-				int remainingCooldown = command.getRemainingCooldown(slashCommandExecutedEvent);
-				if (remainingCooldown > 0) {
-					command.replyCooldown(slashCommandExecutedEvent, remainingCooldown);
-				} else {
-					command.run(slashCommandExecutedEvent);
-				}
+        SlashCommandExecutedEvent slashCommandExecutedEvent = new SlashCommandExecutedEvent(event, this);
+        for (SlashCommand command : slashCommands) {
+            if (command.getName().equals(event.getName())) {
+                commandUses.put(command.getName(), commandUses.getOrDefault(command.getName(), 0) + 1);
+                int remainingCooldown = command.getRemainingCooldown(slashCommandExecutedEvent);
+                if (remainingCooldown > 0) {
+                    command.replyCooldown(slashCommandExecutedEvent, remainingCooldown);
+                } else {
+                    command.run(slashCommandExecutedEvent);
+                }
 
-				return;
-			}
-		}
+                return;
+            }
+        }
 
-		slashCommandExecutedEvent.getHook().editOriginalEmbeds(slashCommandExecutedEvent.invalidCommandMessage().build()).queue();
-	}
+        slashCommandExecutedEvent.getHook().editOriginalEmbeds(slashCommandExecutedEvent.invalidCommandMessage().build()).queue();
+    }
 
-	public List<SlashCommand> getCommands() {
-		return slashCommands;
-	}
+    public List<SlashCommand> getCommands() {
+        return slashCommands;
+    }
 
-	public boolean isOwner(String userId) {
-		return userId.equals(ownerId);
-	}
+    public boolean isOwner(String userId) {
+        return userId.equals(ownerId);
+    }
 
-	public int getCommandUses(SlashCommand command) {
-		return commandUses.getOrDefault(command.getName(), 0);
-	}
+    public int getCommandUses(SlashCommand command) {
+        return commandUses.getOrDefault(command.getName(), 0);
+    }
 
-	public void setCommandUses(Map<String, Integer> commandUsage) {
-		commandUsage.forEach((key, value) -> commandUses.merge(key, value, Integer::sum));
-	}
+    public void setCommandUses(Map<String, Integer> commandUsage) {
+        commandUsage.forEach((key, value) -> commandUses.merge(key, value, Integer::sum));
+    }
 }

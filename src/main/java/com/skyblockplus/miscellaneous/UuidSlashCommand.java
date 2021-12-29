@@ -25,24 +25,24 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class UuidSlashCommand extends SlashCommand {
 
-	public UuidSlashCommand() {
-		this.name = "uuid";
-	}
+    public UuidSlashCommand() {
+        this.name = "uuid";
+    }
 
-	@Override
-	protected void execute(SlashCommandExecutedEvent event) {
-		event.logCommand();
+    @Override
+    protected void execute(SlashCommandExecutedEvent event) {
+        event.logCommand();
 
-		if (event.invalidPlayerOption()) {
-			return;
-		}
+        if (event.invalidPlayerOption()) {
+            return;
+        }
 
-		event.embed(UuidCommand.getUuidPlayer(event.player));
-	}
+        event.embed(UuidCommand.getUuidPlayer(event.player));
+    }
 
-	@Override
-	public CommandData getCommandData() {
-		return new CommandData(name, "Convert a username to UUID or UUID to username")
-			.addOption(OptionType.STRING, "player", "Username or UUID");
-	}
+    @Override
+    public CommandData getCommandData() {
+        return new CommandData(name, "Convert a username to UUID or UUID to username")
+                .addOption(OptionType.STRING, "player", "Username or UUID");
+    }
 }

@@ -19,142 +19,123 @@
 package com.skyblockplus.utils.structs;
 
 import com.skyblockplus.utils.Player;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
 public class HypixelGuildCache {
 
-	private final List<String> normalCache;
-	private final List<String> ironmanCache;
-	private Instant lastUpdated;
+    private final List<String> normalCache;
+    private final List<String> ironmanCache;
+    private Instant lastUpdated;
 
-	public HypixelGuildCache() {
-		this.normalCache = new ArrayList<>();
-		this.ironmanCache = new ArrayList<>();
-		this.lastUpdated = Instant.now();
-	}
+    public HypixelGuildCache() {
+        this.normalCache = new ArrayList<>();
+        this.ironmanCache = new ArrayList<>();
+        this.lastUpdated = Instant.now();
+    }
 
-	public static boolean isValidType(String type) {
-		return typeToIndex(type.toLowerCase()) >= 2;
-	}
+    public static boolean isValidType(String type) {
+        return typeToIndex(type.toLowerCase()) >= 2;
+    }
 
-	public static int typeToIndex(String type) {
-		switch (type) {
-			case "username":
-				return 0;
-			case "uuid":
-				return 1;
-			case "slayer":
-				return 2;
-			case "skills":
-				return 3;
-			case "catacombs":
-				return 4;
-			case "weight":
-				return 5;
-			case "sven":
-				return 6;
-			case "rev":
-				return 7;
-			case "tara":
-				return 8;
-			case "enderman":
-				return 9;
-			case "alchemy":
-				return 10;
-			case "combat":
-				return 11;
-			case "fishing":
-				return 12;
-			case "farming":
-				return 13;
-			case "foraging":
-				return 14;
-			case "carpentry":
-				return 15;
-			case "mining":
-				return 16;
-			case "taming":
-				return 17;
-			case "enchanting":
-				return 18;
-			default:
-				return -1;
-		}
-	}
+    public static int typeToIndex(String type) {
+        return switch (type) {
+            case "username" -> 0;
+            case "uuid" -> 1;
+            case "slayer" -> 2;
+            case "skills" -> 3;
+            case "catacombs" -> 4;
+            case "weight" -> 5;
+            case "sven" -> 6;
+            case "rev" -> 7;
+            case "tara" -> 8;
+            case "enderman" -> 9;
+            case "alchemy" -> 10;
+            case "combat" -> 11;
+            case "fishing" -> 12;
+            case "farming" -> 13;
+            case "foraging" -> 14;
+            case "carpentry" -> 15;
+            case "mining" -> 16;
+            case "taming" -> 17;
+            case "enchanting" -> 18;
+            default -> -1;
+        };
+    }
 
-	public static String getStringFromCache(String cache, String type) {
-		return cache.split("=:=")[typeToIndex(type)];
-	}
+    public static String getStringFromCache(String cache, String type) {
+        return cache.split("=:=")[typeToIndex(type)];
+    }
 
-	public static double getDoubleFromCache(String cache, String type) {
-		return Double.parseDouble(getStringFromCache(cache, type));
-	}
+    public static double getDoubleFromCache(String cache, String type) {
+        return Double.parseDouble(getStringFromCache(cache, type));
+    }
 
-	public void addPlayer(Player player) {
-		normalCache.add(memberCacheFromPlayer(player, false));
-		ironmanCache.add(memberCacheFromPlayer(player, true));
-	}
+    public void addPlayer(Player player) {
+        normalCache.add(memberCacheFromPlayer(player, false));
+        ironmanCache.add(memberCacheFromPlayer(player, true));
+    }
 
-	public Instant getLastUpdated() {
-		return lastUpdated;
-	}
+    public Instant getLastUpdated() {
+        return lastUpdated;
+    }
 
-	public HypixelGuildCache setLastUpdated() {
-		lastUpdated = Instant.now();
-		return this;
-	}
+    public HypixelGuildCache setLastUpdated() {
+        lastUpdated = Instant.now();
+        return this;
+    }
 
-	public List<String> getCache() {
-		return getCache(false);
-	}
+    public List<String> getCache() {
+        return getCache(false);
+    }
 
-	public List<String> getCache(boolean ironmanOnly) {
-		return ironmanOnly ? ironmanCache : normalCache;
-	}
+    public List<String> getCache(boolean ironmanOnly) {
+        return ironmanOnly ? ironmanCache : normalCache;
+    }
 
-	private String memberCacheFromPlayer(Player player, boolean ironmanOnly) {
-		return (
-			player.getUsername() +
-			"=:=" +
-			player.getUuid() +
-			"=:=" +
-			player.getHighestAmount("slayer", ironmanOnly) +
-			"=:=" +
-			player.getHighestAmount("skills", ironmanOnly) +
-			"=:=" +
-			player.getHighestAmount("catacombs", ironmanOnly) +
-			"=:=" +
-			player.getHighestAmount("weight", ironmanOnly) +
-			"=:=" +
-			player.getHighestAmount("sven", ironmanOnly) +
-			"=:=" +
-			player.getHighestAmount("rev", ironmanOnly) +
-			"=:=" +
-			player.getHighestAmount("tara", ironmanOnly) +
-			"=:=" +
-			player.getHighestAmount("enderman", ironmanOnly) +
-			"=:=" +
-			player.getHighestAmount("alchemy", ironmanOnly) +
-			"=:=" +
-			player.getHighestAmount("combat", ironmanOnly) +
-			"=:=" +
-			player.getHighestAmount("fishing", ironmanOnly) +
-			"=:=" +
-			player.getHighestAmount("farming", ironmanOnly) +
-			"=:=" +
-			player.getHighestAmount("foraging", ironmanOnly) +
-			"=:=" +
-			player.getHighestAmount("carpentry", ironmanOnly) +
-			"=:=" +
-			player.getHighestAmount("mining", ironmanOnly) +
-			"=:=" +
-			player.getHighestAmount("taming", ironmanOnly) +
-			"=:=" +
-			player.getHighestAmount("enchanting", ironmanOnly) +
-			"=:=" +
-			player.getHighestAmount("enchanting", ironmanOnly)
-		);
-	}
+    private String memberCacheFromPlayer(Player player, boolean ironmanOnly) {
+        return (
+                player.getUsername() +
+                        "=:=" +
+                        player.getUuid() +
+                        "=:=" +
+                        player.getHighestAmount("slayer", ironmanOnly) +
+                        "=:=" +
+                        player.getHighestAmount("skills", ironmanOnly) +
+                        "=:=" +
+                        player.getHighestAmount("catacombs", ironmanOnly) +
+                        "=:=" +
+                        player.getHighestAmount("weight", ironmanOnly) +
+                        "=:=" +
+                        player.getHighestAmount("sven", ironmanOnly) +
+                        "=:=" +
+                        player.getHighestAmount("rev", ironmanOnly) +
+                        "=:=" +
+                        player.getHighestAmount("tara", ironmanOnly) +
+                        "=:=" +
+                        player.getHighestAmount("enderman", ironmanOnly) +
+                        "=:=" +
+                        player.getHighestAmount("alchemy", ironmanOnly) +
+                        "=:=" +
+                        player.getHighestAmount("combat", ironmanOnly) +
+                        "=:=" +
+                        player.getHighestAmount("fishing", ironmanOnly) +
+                        "=:=" +
+                        player.getHighestAmount("farming", ironmanOnly) +
+                        "=:=" +
+                        player.getHighestAmount("foraging", ironmanOnly) +
+                        "=:=" +
+                        player.getHighestAmount("carpentry", ironmanOnly) +
+                        "=:=" +
+                        player.getHighestAmount("mining", ironmanOnly) +
+                        "=:=" +
+                        player.getHighestAmount("taming", ironmanOnly) +
+                        "=:=" +
+                        player.getHighestAmount("enchanting", ironmanOnly) +
+                        "=:=" +
+                        player.getHighestAmount("enchanting", ironmanOnly)
+        );
+    }
 }

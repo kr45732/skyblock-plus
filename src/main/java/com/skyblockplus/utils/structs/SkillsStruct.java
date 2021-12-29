@@ -18,24 +18,14 @@
 
 package com.skyblockplus.utils.structs;
 
-import lombok.Data;
+public record SkillsStruct(String name, int currentLevel, int maxLevel, long totalExp, long expCurrent, long expForNext,
+                           double progressToNext) {
 
-@Data
-public class SkillsStruct {
+    public boolean isMaxed() {
+        return currentLevel == maxLevel;
+    }
 
-	private final String name;
-	private final int currentLevel;
-	private final int maxLevel;
-	private final long totalExp;
-	private final long expCurrent;
-	private final long expForNext;
-	private final double progressToNext;
-
-	public boolean isMaxed() {
-		return currentLevel == maxLevel;
-	}
-
-	public double getProgressLevel() {
-		return currentLevel + progressToNext;
-	}
+    public double getProgressLevel() {
+        return currentLevel + progressToNext;
+    }
 }

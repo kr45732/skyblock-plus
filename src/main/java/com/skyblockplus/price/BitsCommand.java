@@ -18,49 +18,49 @@
 
 package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.Constants.BITS_ITEM_NAMES;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import net.dv8tion.jda.api.EmbedBuilder;
 
+import static com.skyblockplus.utils.Constants.BITS_ITEM_NAMES;
+import static com.skyblockplus.utils.Utils.*;
+
 public class BitsCommand extends Command {
 
-	public BitsCommand() {
-		this.name = "bits";
-		this.cooldown = globalCooldown;
-		this.aliases = new String[] { "bit" };
-		this.botPermissions = defaultPerms();
-	}
+    public BitsCommand() {
+        this.name = "bits";
+        this.cooldown = globalCooldown;
+        this.aliases = new String[]{"bit"};
+        this.botPermissions = defaultPerms();
+    }
 
-	public static EmbedBuilder getBitPrices(String itemName) {
-		String closestMatch = getClosestMatch(nameToId(itemName), BITS_ITEM_NAMES);
-		if (closestMatch != null) {
-			return defaultEmbed("Bits Price")
-				.addField(idToName(closestMatch), formatNumber(higherDepth(getBitsJson(), closestMatch, 0L)), false);
-		}
+    public static EmbedBuilder getBitPrices(String itemName) {
+        String closestMatch = getClosestMatch(nameToId(itemName), BITS_ITEM_NAMES);
+        if (closestMatch != null) {
+            return defaultEmbed("Bits Price")
+                    .addField(idToName(closestMatch), formatNumber(higherDepth(getBitsJson(), closestMatch, 0L)), false);
+        }
 
-		return defaultEmbed("No bit price found for " + capitalizeString(itemName));
-	}
+        return defaultEmbed("No bit price found for " + capitalizeString(itemName));
+    }
 
-	@Override
-	protected void execute(CommandEvent event) {
-		new CommandExecute(this, event) {
-			@Override
-			protected void execute() {
-				logCommand();
-				setArgs(2);
+    @Override
+    protected void execute(CommandEvent event) {
+        new CommandExecute(this, event) {
+            @Override
+            protected void execute() {
+                logCommand();
+                setArgs(2);
 
-				if (args.length == 2) {
-					embed(getBitPrices(args[1]));
-					return;
-				}
+                if (args.length == 2) {
+                    embed(getBitPrices(args[1]));
+                    return;
+                }
 
-				sendErrorEmbed();
-			}
-		}
-			.queue();
-	}
+                sendErrorEmbed();
+            }
+        }
+                .queue();
+    }
 }

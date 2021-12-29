@@ -26,33 +26,33 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class SacksSlashCommand extends SlashCommand {
 
-	public SacksSlashCommand() {
-		this.name = "sacks";
-	}
+    public SacksSlashCommand() {
+        this.name = "sacks";
+    }
 
-	@Override
-	protected void execute(SlashCommandExecutedEvent event) {
-		event.logCommand();
+    @Override
+    protected void execute(SlashCommandExecutedEvent event) {
+        event.logCommand();
 
-		if (event.invalidPlayerOption()) {
-			return;
-		}
+        if (event.invalidPlayerOption()) {
+            return;
+        }
 
-		event.paginate(
-			SacksCommand.getPlayerSacks(
-				event.player,
-				event.getOptionStr("profile"),
-				event.getOptionBoolean("npc", false),
-				new PaginatorEvent(event)
-			)
-		);
-	}
+        event.paginate(
+                SacksCommand.getPlayerSacks(
+                        event.player,
+                        event.getOptionStr("profile"),
+                        event.getOptionBoolean("npc", false),
+                        new PaginatorEvent(event)
+                )
+        );
+    }
 
-	@Override
-	public CommandData getCommandData() {
-		return new CommandData(name, "Get a player's sacks' content bag represented in a list")
-			.addOption(OptionType.STRING, "player", "Player username or mention")
-			.addOption(OptionType.STRING, "profile", "Profile name")
-			.addOption(OptionType.BOOLEAN, "npc", "Use npc sell prices (bazaar will be used for items that don't have an npc price)");
-	}
+    @Override
+    public CommandData getCommandData() {
+        return new CommandData(name, "Get a player's sacks' content bag represented in a list")
+                .addOption(OptionType.STRING, "player", "Player username or mention")
+                .addOption(OptionType.STRING, "profile", "Profile name")
+                .addOption(OptionType.BOOLEAN, "npc", "Use npc sell prices (bazaar will be used for items that don't have an npc price)");
+    }
 }

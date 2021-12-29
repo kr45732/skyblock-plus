@@ -18,9 +18,6 @@
 
 package com.skyblockplus.features.skyblockevent;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
@@ -28,69 +25,72 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+
 public class SkyblockEventSlashCommand extends SlashCommand {
 
-	public SkyblockEventSlashCommand() {
-		this.name = "event";
-	}
+    public SkyblockEventSlashCommand() {
+        this.name = "event";
+    }
 
-	@Override
-	protected void execute(SlashCommandExecutedEvent event) {
-		event.logCommand();
+    @Override
+    protected void execute(SlashCommandExecutedEvent event) {
+        event.logCommand();
 
-		String subcommandName = event.getSubcommandName();
-		if (
-			(subcommandName.equals("create") || subcommandName.equals("cancel") || subcommandName.equals("end")) &&
-			!event.getMember().hasPermission(Permission.ADMINISTRATOR)
-		) {
-			event.string("❌ You must have the Administrator permission in this Guild to use that!");
-			return;
-		}
+        String subcommandName = event.getSubcommandName();
+        if (
+                (subcommandName.equals("create") || subcommandName.equals("cancel") || subcommandName.equals("end")) &&
+                        !event.getMember().hasPermission(Permission.ADMINISTRATOR)
+        ) {
+            event.string("❌ You must have the Administrator permission in this Guild to use that!");
+            return;
+        }
 
-		switch (subcommandName) {
-			case "create":
-				event.paginate(SkyblockEventCommand.createSkyblockEvent(new PaginatorEvent(event)));
-				break;
-			case "current":
-				event.embed(SkyblockEventCommand.getCurrentSkyblockEvent(event.getGuild().getId()));
-				break;
-			case "cancel":
-				event.embed(SkyblockEventCommand.cancelSkyblockEvent(event.getGuild()));
-				break;
-			case "join":
-				event.embed(SkyblockEventCommand.joinSkyblockEvent(event.getGuild().getId(), event.getUser().getId(), new String[] {}));
-				break;
-			case "leave":
-				event.embed(SkyblockEventCommand.leaveSkyblockEvent(event.getGuild().getId(), event.getUser().getId()));
-				break;
-			case "leaderboard":
-			case "lb":
-				event.paginate(SkyblockEventCommand.getEventLeaderboard(new PaginatorEvent(event)));
-				break;
-			case "end":
-				if (database.getSkyblockEventActive(event.getGuild().getId())) {
-					event.embed(SkyblockEventCommand.endSkyblockEvent(event.getGuild().getId()));
-				} else {
-					event.embed(defaultEmbed("No event running"));
-				}
-				break;
-			default:
-				event.embed(event.invalidCommandMessage());
-				break;
-		}
-	}
+        switch (subcommandName) {
+            case "create":
+                event.paginate(SkyblockEventCommand.createSkyblockEvent(new PaginatorEvent(event)));
+                break;
+            case "current":
+                event.embed(SkyblockEventCommand.getCurrentSkyblockEvent(event.getGuild().getId()));
+                break;
+            case "cancel":
+                event.embed(SkyblockEventCommand.cancelSkyblockEvent(event.getGuild()));
+                break;
+            case "join":
+                event.embed(SkyblockEventCommand.joinSkyblockEvent(event.getGuild().getId(), event.getUser().getId(), new String[]{}));
+                break;
+            case "leave":
+                event.embed(SkyblockEventCommand.leaveSkyblockEvent(event.getGuild().getId(), event.getUser().getId()));
+                break;
+            case "leaderboard":
+            case "lb":
+                event.paginate(SkyblockEventCommand.getEventLeaderboard(new PaginatorEvent(event)));
+                break;
+            case "end":
+                if (database.getSkyblockEventActive(event.getGuild().getId())) {
+                    event.embed(SkyblockEventCommand.endSkyblockEvent(event.getGuild().getId()));
+                } else {
+                    event.embed(defaultEmbed("No event running"));
+                }
+                break;
+            default:
+                event.embed(event.invalidCommandMessage());
+                break;
+        }
+    }
 
-	@Override
-	public CommandData getCommandData() {
-		return new CommandData(name, "Main event command")
-			.addSubcommands(
-				new SubcommandData("create", "Interactive message to create a Skyblock event"),
-				new SubcommandData("end", "Force end the event"),
-				new SubcommandData("current", "Get information about the current event"),
-				new SubcommandData("join", "Join the current event"),
-				new SubcommandData("leave", "Leave the current event"),
-				new SubcommandData("cancel", "Cancel the event"),
-				new SubcommandData("leaderboard", "Get the leaderboard for current event")
-			);
-	}
+    @Override
+    public CommandData getCommandData() {
+        return new CommandData(name, "Main event command")
+                .addSubcommands(
+                        new SubcommandData("create", "Interactive message to create a Skyblock event"),
+                        new SubcommandData("end", "Force end the event"),
+                        new SubcommandData("current", "Get information about the current event"),
+                        new SubcommandData("join", "Join the current event"),
+                        new SubcommandData("leave", "Leave the current event"),
+                        new SubcommandData("cancel", "Cancel the event"),
+                        new SubcommandData("leaderboard", "Get the leaderboard for current event")
+                );
+    }
 }

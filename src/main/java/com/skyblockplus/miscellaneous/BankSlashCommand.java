@@ -27,43 +27,37 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class BankSlashCommand extends SlashCommand {
 
-	public BankSlashCommand() {
-		this.name = "bank";
-	}
+    public BankSlashCommand() {
+        this.name = "bank";
+    }
 
-	@Override
-	protected void execute(SlashCommandExecutedEvent event) {
-		event.logCommand();
+    @Override
+    protected void execute(SlashCommandExecutedEvent event) {
+        event.logCommand();
 
-		if (event.invalidPlayerOption()) {
-			return;
-		}
+        if (event.invalidPlayerOption()) {
+            return;
+        }
 
-		switch (event.getSubcommandName()) {
-			case "total":
-				event.embed(BankCommand.getPlayerBalance(event.player, event.getOptionStr("profile")));
-				break;
-			case "history":
-				event.paginate(BankCommand.getPlayerBankHistory(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
-				break;
-			default:
-				event.embed(event.invalidCommandMessage());
-				break;
-		}
-	}
+        switch (event.getSubcommandName()) {
+            case "total" -> event.embed(BankCommand.getPlayerBalance(event.player, event.getOptionStr("profile")));
+            case "history" -> event.paginate(BankCommand.getPlayerBankHistory(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
+            default -> event.embed(event.invalidCommandMessage());
+        }
+    }
 
-	@Override
-	public CommandData getCommandData() {
-		return new CommandData(name, "Main bank command")
-			.addSubcommands(
-				new SubcommandData("total", "Get a player's bank and purse coins")
-					.addOption(OptionType.STRING, "player", "Player username or mention")
-					.addOption(OptionType.STRING, "profile", "Profile name")
-			)
-			.addSubcommands(
-				new SubcommandData("history", "Get a player's bank transaction history")
-					.addOption(OptionType.STRING, "player", "Player username or mention")
-					.addOption(OptionType.STRING, "profile", "Profile name")
-			);
-	}
+    @Override
+    public CommandData getCommandData() {
+        return new CommandData(name, "Main bank command")
+                .addSubcommands(
+                        new SubcommandData("total", "Get a player's bank and purse coins")
+                                .addOption(OptionType.STRING, "player", "Player username or mention")
+                                .addOption(OptionType.STRING, "profile", "Profile name")
+                )
+                .addSubcommands(
+                        new SubcommandData("history", "Get a player's bank transaction history")
+                                .addOption(OptionType.STRING, "player", "Player username or mention")
+                                .addOption(OptionType.STRING, "profile", "Profile name")
+                );
+    }
 }

@@ -18,9 +18,6 @@
 
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.Constants.ALL_TALISMANS;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -29,116 +26,120 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.InvItem;
+import net.dv8tion.jda.api.EmbedBuilder;
+
 import java.util.*;
 import java.util.stream.Collectors;
-import net.dv8tion.jda.api.EmbedBuilder;
+
+import static com.skyblockplus.utils.Constants.ALL_TALISMANS;
+import static com.skyblockplus.utils.Utils.*;
 
 public class MissingTalismansCommand extends Command {
 
-	public MissingTalismansCommand() {
-		this.name = "missing";
-		this.cooldown = globalCooldown;
-		this.botPermissions = defaultPerms();
-	}
+    public MissingTalismansCommand() {
+        this.name = "missing";
+        this.cooldown = globalCooldown;
+        this.botPermissions = defaultPerms();
+    }
 
-	public static EmbedBuilder getMissingTalismans(String username, String profileName) {
-		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
-		if (player.isValid()) {
-			Set<String> playerItems;
-			try {
-				playerItems =
-					player.getInventoryMap().values().stream().filter(Objects::nonNull).map(InvItem::getId).collect(Collectors.toSet());
-				playerItems.addAll(
-					player.getEnderChestMap().values().stream().filter(Objects::nonNull).map(InvItem::getId).collect(Collectors.toSet())
-				);
-				playerItems.addAll(
-					player.getStorageMap().values().stream().filter(Objects::nonNull).map(InvItem::getId).collect(Collectors.toSet())
-				);
-				playerItems.addAll(
-					player.getTalismanBagMap().values().stream().filter(Objects::nonNull).map(InvItem::getId).collect(Collectors.toSet())
-				);
-			} catch (Exception e) {
-				return invalidEmbed("Inventory API is disabled");
-			}
+    public static EmbedBuilder getMissingTalismans(String username, String profileName) {
+        Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+        if (player.isValid()) {
+            Set<String> playerItems;
+            try {
+                playerItems =
+                        player.getInventoryMap().values().stream().filter(Objects::nonNull).map(InvItem::getId).collect(Collectors.toSet());
+                playerItems.addAll(
+                        player.getEnderChestMap().values().stream().filter(Objects::nonNull).map(InvItem::getId).collect(Collectors.toSet())
+                );
+                playerItems.addAll(
+                        player.getStorageMap().values().stream().filter(Objects::nonNull).map(InvItem::getId).collect(Collectors.toSet())
+                );
+                playerItems.addAll(
+                        player.getTalismanBagMap().values().stream().filter(Objects::nonNull).map(InvItem::getId).collect(Collectors.toSet())
+                );
+            } catch (Exception e) {
+                return invalidEmbed("Inventory API is disabled");
+            }
 
-			JsonObject talismanUpgrades = higherDepth(getMiscJson(), "talisman_upgrades").getAsJsonObject();
-			Set<String> missingInternal = new HashSet<>(ALL_TALISMANS);
+            JsonObject talismanUpgrades = higherDepth(getMiscJson(), "talisman_upgrades").getAsJsonObject();
+            Set<String> missingInternal = new HashSet<>(ALL_TALISMANS);
 
-			for (String playerItem : playerItems) {
-				missingInternal.remove(playerItem);
-				for (Map.Entry<String, JsonElement> talismanUpgradesElement : talismanUpgrades.entrySet()) {
-					JsonArray upgrades = talismanUpgradesElement.getValue().getAsJsonArray();
-					for (int j = 0; j < upgrades.size(); j++) {
-						String upgrade = upgrades.get(j).getAsString();
-						if (playerItem.equals(upgrade)) {
-							missingInternal.remove(talismanUpgradesElement.getKey());
-							break;
-						}
-					}
-				}
-			}
+            for (String playerItem : playerItems) {
+                missingInternal.remove(playerItem);
+                for (Map.Entry<String, JsonElement> talismanUpgradesElement : talismanUpgrades.entrySet()) {
+                    JsonArray upgrades = talismanUpgradesElement.getValue().getAsJsonArray();
+                    for (int j = 0; j < upgrades.size(); j++) {
+                        String upgrade = upgrades.get(j).getAsString();
+                        if (playerItem.equals(upgrade)) {
+                            missingInternal.remove(talismanUpgradesElement.getKey());
+                            break;
+                        }
+                    }
+                }
+            }
 
-			List<String> missingInternalArr = new ArrayList<>(missingInternal);
-			List<String> missingInternalArrCopy = new ArrayList<>(missingInternalArr);
+            List<String> missingInternalArr = new ArrayList<>(missingInternal);
+            List<String> missingInternalArrCopy = new ArrayList<>(missingInternalArr);
 
-			missingInternalArrCopy.forEach(o1 -> {
-				if (higherDepth(talismanUpgrades, o1) != null) {
-					JsonArray curUpgrades = higherDepth(talismanUpgrades, o1).getAsJsonArray();
-					for (JsonElement curUpgrade : curUpgrades) {
-						missingInternalArr.remove(curUpgrade.getAsString());
-					}
-				}
-			});
+            missingInternalArrCopy.forEach(o1 -> {
+                if (higherDepth(talismanUpgrades, o1) != null) {
+                    JsonArray curUpgrades = higherDepth(talismanUpgrades, o1).getAsJsonArray();
+                    for (JsonElement curUpgrade : curUpgrades) {
+                        missingInternalArr.remove(curUpgrade.getAsString());
+                    }
+                }
+            });
 
-			JsonElement lowestBinJson = getLowestBinJson();
-			missingInternalArr.sort(
-				Comparator.comparingDouble(o1 -> higherDepth(lowestBinJson, o1) != null ? higherDepth(lowestBinJson, o1).getAsDouble() : 0)
-			);
+            JsonElement lowestBinJson = getLowestBinJson();
+            missingInternalArr.sort(
+                    Comparator.comparingDouble(o1 -> higherDepth(lowestBinJson, o1) != null ? higherDepth(lowestBinJson, o1).getAsDouble() : 0)
+            );
 
-			StringBuilder ebStr = new StringBuilder(
-				"Missing " +
-				missingInternalArr.size() +
-				" talisman" +
-				(missingInternalArr.size() > 1 ? "s" : "") +
-				". " +
-				(missingInternalArr.size() > 40 ? "Only the cheapest 40 are shown. " : "") +
-				"Sorted by ascending cost. Talismans with a * have higher tiers.\n\n"
-			);
+            StringBuilder ebStr = new StringBuilder(
+                    "Missing " +
+                            missingInternalArr.size() +
+                            " talisman" +
+                            (missingInternalArr.size() > 1 ? "s" : "") +
+                            ". " +
+                            (missingInternalArr.size() > 40 ? "Only the cheapest 40 are shown. " : "") +
+                            "Sorted by ascending cost. Talismans with a * have higher tiers.\n\n"
+            );
 
-			JsonObject mappings = getInternalJsonMappings();
-			for (int i = 0; i < Math.min(missingInternalArr.size(), 40); i++) {
-				String cur = missingInternalArr.get(i);
-				String wikiLink = higherDepth(mappings, i + ".wiki", null);
-				ebStr
-					.append("• ")
-					.append(wikiLink == null ? idToName(cur) : "[" + idToName(cur) + "](" + wikiLink + ")")
-					.append(higherDepth(talismanUpgrades, cur) != null ? "**\\***" : "")
-					.append("\n");
-			}
-			return player.defaultPlayerEmbed().setDescription(ebStr.toString());
-		}
-		return player.getFailEmbed();
-	}
+            JsonObject mappings = getInternalJsonMappings();
+            for (int i = 0; i < Math.min(missingInternalArr.size(), 40); i++) {
+                String cur = missingInternalArr.get(i);
+                String wikiLink = higherDepth(mappings, i + ".wiki", null);
+                ebStr
+                        .append("• ")
+                        .append(wikiLink == null ? idToName(cur) : "[" + idToName(cur) + "](" + wikiLink + ")")
+                        .append(higherDepth(talismanUpgrades, cur) != null ? "**\\***" : "")
+                        .append("\n");
+            }
+            return player.defaultPlayerEmbed().setDescription(ebStr.toString());
+        }
+        return player.getFailEmbed();
+    }
 
-	@Override
-	protected void execute(CommandEvent event) {
-		new CommandExecute(this, event) {
-			@Override
-			protected void execute() {
-				logCommand();
+    @Override
+    protected void execute(CommandEvent event) {
+        new CommandExecute(this, event) {
+            @Override
+            protected void execute() {
+                logCommand();
 
-				if (args.length == 3 || args.length == 2 || args.length == 1) {
-					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
-						return;
-					}
+                if (args.length == 3 || args.length == 2 || args.length == 1) {
+                    if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
+                        return;
+                    }
 
-					embed(getMissingTalismans(username, args.length == 3 ? args[2] : null));
-					return;
-				}
+                    embed(getMissingTalismans(username, args.length == 3 ? args[2] : null));
+                    return;
+                }
 
-				sendErrorEmbed();
-			}
-		}
-			.queue();
-	}
+                sendErrorEmbed();
+            }
+        }
+                .queue();
+    }
 }

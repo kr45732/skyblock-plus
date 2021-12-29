@@ -18,46 +18,46 @@
 
 package com.skyblockplus.dev;
 
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.defaultPerms;
-
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.defaultPerms;
+
 public class PlaceholderCommand extends Command {
 
-	public PlaceholderCommand() {
-		this.name = "d-placeholder";
-		this.ownerCommand = true;
-		this.aliases = new String[] { "ph" };
-		this.botPermissions = defaultPerms();
-	}
+    public PlaceholderCommand() {
+        this.name = "d-placeholder";
+        this.ownerCommand = true;
+        this.aliases = new String[]{"ph"};
+        this.botPermissions = defaultPerms();
+    }
 
-	@Override
-	protected void execute(CommandEvent event) {
-		new CommandExecute(this, event) {
-			@Override
-			protected void execute() {
-				logCommand();
+    @Override
+    protected void execute(CommandEvent event) {
+        new CommandExecute(this, event) {
+            @Override
+            protected void execute() {
+                logCommand();
 
-				eb = defaultEmbed("Debug");
-				if (args.length == 2 && args[1].equals("gc")) {
-					System.gc();
-					eb.addField("GC RUN", "GC RUN", false);
-				}
-				eb.addField("Total", "" + (Runtime.getRuntime().totalMemory() / 1000000.0) + " MB", false);
-				eb.addField("Free", "" + (Runtime.getRuntime().freeMemory() / 1000000.0) + " MB", false);
-				eb.addField(
-					"Used",
-					"" + ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1000000.0) + " MB",
-					false
-				);
-				eb.addField("Max", "" + (Runtime.getRuntime().maxMemory() / 1000000.0) + " MB", false);
+                eb = defaultEmbed("Debug");
+                if (args.length == 2 && args[1].equals("gc")) {
+                    System.gc();
+                    eb.addField("GC RUN", "GC RUN", false);
+                }
+                eb.addField("Total", "" + (Runtime.getRuntime().totalMemory() / 1000000.0) + " MB", false);
+                eb.addField("Free", "" + (Runtime.getRuntime().freeMemory() / 1000000.0) + " MB", false);
+                eb.addField(
+                        "Used",
+                        "" + ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1000000.0) + " MB",
+                        false
+                );
+                eb.addField("Max", "" + (Runtime.getRuntime().maxMemory() / 1000000.0) + " MB", false);
 
-				embed(eb);
-			}
-		}
-			.queue();
-	}
+                embed(eb);
+            }
+        }
+                .queue();
+    }
 }

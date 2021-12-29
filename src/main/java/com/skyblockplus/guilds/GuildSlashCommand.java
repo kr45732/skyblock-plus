@@ -29,53 +29,45 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class GuildSlashCommand extends SlashCommand {
 
-	public GuildSlashCommand() {
-		this.name = "guild";
-	}
+    public GuildSlashCommand() {
+        this.name = "guild";
+    }
 
-	@Override
-	protected void execute(SlashCommandExecutedEvent event) {
-		event.logCommand();
+    @Override
+    protected void execute(SlashCommandExecutedEvent event) {
+        event.logCommand();
 
-		if (event.invalidPlayerOption()) {
-			return;
-		}
+        if (event.invalidPlayerOption()) {
+            return;
+        }
 
-		switch (event.getSubcommandName()) {
-			case "player":
-				event.embed(GuildCommand.getGuildPlayer(event.player));
-				break;
-			case "information":
-				event.embed(GuildCommand.getGuildInfo(event.player));
-				break;
-			case "members":
-				event.paginate(GuildCommand.getGuildMembersFromPlayer(event.player, new PaginatorEvent(event)));
-				break;
-			case "experience":
-				OptionMapping numDays = event.getEvent().getOption("days");
-				event.paginate(
-					GuildCommand.getGuildExpFromPlayer(event.player, numDays != null ? numDays.getAsLong() : 7, new PaginatorEvent(event))
-				);
-				break;
-			default:
-				event.embed(event.invalidCommandMessage());
-				break;
-		}
-	}
+        switch (event.getSubcommandName()) {
+            case "player" -> event.embed(GuildCommand.getGuildPlayer(event.player));
+            case "information" -> event.embed(GuildCommand.getGuildInfo(event.player));
+            case "members" -> event.paginate(GuildCommand.getGuildMembersFromPlayer(event.player, new PaginatorEvent(event)));
+            case "experience" -> {
+                OptionMapping numDays = event.getEvent().getOption("days");
+                event.paginate(
+                        GuildCommand.getGuildExpFromPlayer(event.player, numDays != null ? numDays.getAsLong() : 7, new PaginatorEvent(event))
+                );
+            }
+            default -> event.embed(event.invalidCommandMessage());
+        }
+    }
 
-	@Override
-	public CommandData getCommandData() {
-		return new CommandData(name, "Main guild command")
-			.addSubcommands(
-				new SubcommandData("player", "Find what guild a player is in")
-					.addOption(OptionType.STRING, "player", "Player username or mention"),
-				new SubcommandData("information", "Get information and statistics about a player's guild")
-					.addOption(OptionType.STRING, "player", "Player username or mention"),
-				new SubcommandData("members", "Get a list of all members in a player's guild")
-					.addOption(OptionType.STRING, "player", "Player username or mention"),
-				new SubcommandData("experience", "Get the experience leaderboard for a player's guild")
-					.addOption(OptionType.STRING, "player", "Player username or mention")
-					.addOptions(new OptionData(OptionType.INTEGER, "days", "Number of days").setRequiredRange(1, 7))
-			);
-	}
+    @Override
+    public CommandData getCommandData() {
+        return new CommandData(name, "Main guild command")
+                .addSubcommands(
+                        new SubcommandData("player", "Find what guild a player is in")
+                                .addOption(OptionType.STRING, "player", "Player username or mention"),
+                        new SubcommandData("information", "Get information and statistics about a player's guild")
+                                .addOption(OptionType.STRING, "player", "Player username or mention"),
+                        new SubcommandData("members", "Get a list of all members in a player's guild")
+                                .addOption(OptionType.STRING, "player", "Player username or mention"),
+                        new SubcommandData("experience", "Get the experience leaderboard for a player's guild")
+                                .addOption(OptionType.STRING, "player", "Player username or mention")
+                                .addOptions(new OptionData(OptionType.INTEGER, "days", "Number of days").setRequiredRange(1, 7))
+                );
+    }
 }
