@@ -27,51 +27,51 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 public class GuildLeaderboardSlashCommand extends SlashCommand {
 
-    public GuildLeaderboardSlashCommand() {
-        this.name = "guild-leaderboard";
-    }
+	public GuildLeaderboardSlashCommand() {
+		this.name = "guild-leaderboard";
+	}
 
-    @Override
-    protected void execute(SlashCommandExecutedEvent event) {
-        event.logCommand();
+	@Override
+	protected void execute(SlashCommandExecutedEvent event) {
+		event.logCommand();
 
-        if (event.invalidPlayerOption()) {
-            return;
-        }
+		if (event.invalidPlayerOption()) {
+			return;
+		}
 
-        event.paginate(
-                GuildLeaderboardCommand.getLeaderboard(
-                        event.getOptionStr("type"),
-                        event.player,
-                        event.getOptionBoolean("ironman", false),
-                        new PaginatorEvent(event)
-                )
-        );
-    }
+		event.paginate(
+			GuildLeaderboardCommand.getLeaderboard(
+				event.getOptionStr("type"),
+				event.player,
+				event.getOptionBoolean("ironman", false),
+				new PaginatorEvent(event)
+			)
+		);
+	}
 
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(name, "Get a leaderboard for a guild. The API key must be set for this server.")
-                .addOptions(
-                        new OptionData(OptionType.STRING, "type", "The leaderboard type", true)
-                                .addChoice("Slayer", "slayer")
-                                .addChoice("Skills", "skills")
-                                .addChoice("Catacombs", "catacombs")
-                                .addChoice("Sven Xp", "sven")
-                                .addChoice("Revenant Xp", "rev")
-                                .addChoice("Tarantula Xp", "tara")
-                                .addChoice("Enderman Xp", "enderman")
-                                .addChoice("Alchemy", "alchemy")
-                                .addChoice("Combat", "combat")
-                                .addChoice("Fishing", "fishing")
-                                .addChoice("Farming", "farming")
-                                .addChoice("Foraging", "foraging")
-                                .addChoice("Carpentry", "carpentry")
-                                .addChoice("Mining", "mining")
-                                .addChoice("Taming", "taming")
-                                .addChoice("Enchanting", "enchanting")
-                )
-                .addOption(OptionType.STRING, "player", "Player username or mention")
-                .addOption(OptionType.BOOLEAN, "ironman", "If the leaderboard should be ironman only");
-    }
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData(name, "Get a leaderboard for a guild. The API key must be set for this server.")
+			.addOptions(
+				new OptionData(OptionType.STRING, "type", "The leaderboard type", true)
+					.addChoice("Slayer", "slayer")
+					.addChoice("Skills", "skills")
+					.addChoice("Catacombs", "catacombs")
+					.addChoice("Sven Xp", "sven")
+					.addChoice("Revenant Xp", "rev")
+					.addChoice("Tarantula Xp", "tara")
+					.addChoice("Enderman Xp", "enderman")
+					.addChoice("Alchemy", "alchemy")
+					.addChoice("Combat", "combat")
+					.addChoice("Fishing", "fishing")
+					.addChoice("Farming", "farming")
+					.addChoice("Foraging", "foraging")
+					.addChoice("Carpentry", "carpentry")
+					.addChoice("Mining", "mining")
+					.addChoice("Taming", "taming")
+					.addChoice("Enchanting", "enchanting")
+			)
+			.addOption(OptionType.STRING, "player", "Player username or mention")
+			.addOption(OptionType.BOOLEAN, "ironman", "If the leaderboard should be ironman only");
+	}
 }

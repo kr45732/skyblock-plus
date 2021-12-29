@@ -18,14 +18,20 @@
 
 package com.skyblockplus.utils.structs;
 
-public record SkillsStruct(String name, int currentLevel, int maxLevel, long totalExp, long expCurrent, long expForNext,
-                           double progressToNext) {
+public record SkillsStruct(
+	String name,
+	int currentLevel,
+	int maxLevel,
+	long totalExp,
+	long expCurrent,
+	long expForNext,
+	double progressToNext
+) {
+	public boolean isMaxed() {
+		return currentLevel == maxLevel;
+	}
 
-    public boolean isMaxed() {
-        return currentLevel == maxLevel;
-    }
-
-    public double getProgressLevel() {
-        return currentLevel + progressToNext;
-    }
+	public double getProgressLevel() {
+		return currentLevel + progressToNext;
+	}
 }

@@ -27,61 +27,61 @@ import net.dv8tion.jda.api.entities.User;
 
 public class PaginatorEvent {
 
-    private final boolean isSlashCommand;
-    private final SlashCommandExecutedEvent slashCommand;
-    private final CommandEvent command;
+	private final boolean isSlashCommand;
+	private final SlashCommandExecutedEvent slashCommand;
+	private final CommandEvent command;
 
-    public PaginatorEvent(Object event) {
-        if (event instanceof SlashCommandExecutedEvent e) {
-            isSlashCommand = true;
-            slashCommand = e;
-            command = null;
-        } else if (event instanceof CommandEvent e) {
-            isSlashCommand = false;
-            slashCommand = null;
-            command = e;
-        } else {
-            throw new IllegalArgumentException("Invalid event class type provided: " + event.getClass());
-        }
-    }
+	public PaginatorEvent(Object event) {
+		if (event instanceof SlashCommandExecutedEvent e) {
+			isSlashCommand = true;
+			slashCommand = e;
+			command = null;
+		} else if (event instanceof CommandEvent e) {
+			isSlashCommand = false;
+			slashCommand = null;
+			command = e;
+		} else {
+			throw new IllegalArgumentException("Invalid event class type provided: " + event.getClass());
+		}
+	}
 
-    public boolean isSlashCommand() {
-        return isSlashCommand;
-    }
+	public boolean isSlashCommand() {
+		return isSlashCommand;
+	}
 
-    public SlashCommandExecutedEvent getSlashCommand() {
-        return slashCommand;
-    }
+	public SlashCommandExecutedEvent getSlashCommand() {
+		return slashCommand;
+	}
 
-    public CommandEvent getCommand() {
-        return command;
-    }
+	public CommandEvent getCommand() {
+		return command;
+	}
 
-    public User getUser() {
-        return isSlashCommand ? slashCommand.getUser() : command.getAuthor();
-    }
+	public User getUser() {
+		return isSlashCommand ? slashCommand.getUser() : command.getAuthor();
+	}
 
-    public void paginate(CustomPaginator.Builder builder) {
-        paginate(builder, 0);
-    }
+	public void paginate(CustomPaginator.Builder builder) {
+		paginate(builder, 0);
+	}
 
-    public void paginate(CustomPaginator.Builder builder, int page) {
-        if (isSlashCommand) {
-            builder.build().paginate(slashCommand.getHook(), page);
-        } else {
-            builder.build().paginate(command.getChannel(), page);
-        }
-    }
+	public void paginate(CustomPaginator.Builder builder, int page) {
+		if (isSlashCommand) {
+			builder.build().paginate(slashCommand.getHook(), page);
+		} else {
+			builder.build().paginate(command.getChannel(), page);
+		}
+	}
 
-    public Guild getGuild() {
-        return isSlashCommand ? slashCommand.getGuild() : command.getGuild();
-    }
+	public Guild getGuild() {
+		return isSlashCommand ? slashCommand.getGuild() : command.getGuild();
+	}
 
-    public MessageChannel getChannel() {
-        return isSlashCommand ? slashCommand.getChannel() : command.getChannel();
-    }
+	public MessageChannel getChannel() {
+		return isSlashCommand ? slashCommand.getChannel() : command.getChannel();
+	}
 
-    public Member getMember() {
-        return isSlashCommand ? slashCommand.getMember() : command.getMember();
-    }
+	public Member getMember() {
+		return isSlashCommand ? slashCommand.getMember() : command.getMember();
+	}
 }

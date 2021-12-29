@@ -18,6 +18,9 @@
 
 package com.skyblockplus.link;
 
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -25,58 +28,53 @@ import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Utils.*;
-
 public class UnlinkCommand extends Command {
 
-    public UnlinkCommand() {
-        this.name = "unlink";
-        this.cooldown = globalCooldown;
-        this.botPermissions = defaultPerms();
-        this.aliases = new String[]{"unverify"};
-    }
+	public UnlinkCommand() {
+		this.name = "unlink";
+		this.cooldown = globalCooldown;
+		this.botPermissions = defaultPerms();
+		this.aliases = new String[] { "unverify" };
+	}
 
-    public static EmbedBuilder unlinkAccount(PaginatorEvent event) {
-        JsonElement verifySettings = database.getVerifySettings(event.getGuild().getId());
-        try {
-            for (JsonElement verifyRole : higherDepth(verifySettings, "verifiedRoles").getAsJsonArray()) {
-                try {
-                    event
-                            .getGuild()
-                            .removeRoleFromMember(event.getMember().getId(), event.getGuild().getRoleById(verifyRole.getAsString()))
-                            .complete();
-                } catch (Exception e) {
-                    System.out.println(verifyRole);
-                    e.printStackTrace();
-                }
-            }
-            try {
-                event
-                        .getGuild()
-                        .addRoleToMember(
-                                event.getMember(),
-                                event.getGuild().getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString())
-                        )
-                        .queue();
-            } catch (Exception ignored) {
-            }
-        } catch (Exception ignored) {
-        }
-        database.deleteLinkedUserByDiscordId(event.getUser().getId());
-        return defaultEmbed("Success").setDescription("You were unlinked");
-    }
+	public static EmbedBuilder unlinkAccount(PaginatorEvent event) {
+		JsonElement verifySettings = database.getVerifySettings(event.getGuild().getId());
+		try {
+			for (JsonElement verifyRole : higherDepth(verifySettings, "verifiedRoles").getAsJsonArray()) {
+				try {
+					event
+						.getGuild()
+						.removeRoleFromMember(event.getMember().getId(), event.getGuild().getRoleById(verifyRole.getAsString()))
+						.complete();
+				} catch (Exception e) {
+					System.out.println(verifyRole);
+					e.printStackTrace();
+				}
+			}
+			try {
+				event
+					.getGuild()
+					.addRoleToMember(
+						event.getMember(),
+						event.getGuild().getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString())
+					)
+					.queue();
+			} catch (Exception ignored) {}
+		} catch (Exception ignored) {}
+		database.deleteLinkedUserByDiscordId(event.getUser().getId());
+		return defaultEmbed("Success").setDescription("You were unlinked");
+	}
 
-    @Override
-    protected void execute(CommandEvent event) {
-        new CommandExecute(this, event) {
-            @Override
-            protected void execute() {
-                logCommand();
+	@Override
+	protected void execute(CommandEvent event) {
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
 
-                embed(unlinkAccount(new PaginatorEvent(event)));
-            }
-        }
-                .queue();
-    }
+				embed(unlinkAccount(new PaginatorEvent(event)));
+			}
+		}
+			.queue();
+	}
 }

@@ -18,153 +18,142 @@
 
 package com.skyblockplus.utils.command;
 
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import java.util.regex.Matcher;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.regex.Matcher;
-
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Utils.*;
-
 public abstract class CommandExecute {
 
-    protected final CommandEvent event;
-    protected final Command command;
-    protected Message ebMessage;
-    protected String[] args;
-    protected String username;
-    protected EmbedBuilder eb;
-    private boolean sendLoadingEmbed = true;
+	protected final CommandEvent event;
+	protected final Command command;
+	protected Message ebMessage;
+	protected String[] args;
+	protected String username;
+	protected EmbedBuilder eb;
+	private boolean sendLoadingEmbed = true;
 
-    public CommandExecute(Command command, CommandEvent event) {
-        this.command = command;
-        this.event = event;
-    }
+	public CommandExecute(Command command, CommandEvent event) {
+		this.command = command;
+		this.event = event;
+	}
 
-    public CommandExecute(Command command, CommandEvent event, boolean sendLoadingEmbed) {
-        this.command = command;
-        this.event = event;
-        this.sendLoadingEmbed = sendLoadingEmbed;
-    }
+	public CommandExecute(Command command, CommandEvent event, boolean sendLoadingEmbed) {
+		this.command = command;
+		this.event = event;
+		this.sendLoadingEmbed = sendLoadingEmbed;
+	}
 
-    protected abstract void execute();
+	protected abstract void execute();
 
-    public void queue() {
-        executor.submit(() -> {
-            if (sendLoadingEmbed) {
-                this.ebMessage =
-                        event
-                                .getChannel()
-                                //						.sendMessage(
-                                //							"**⚠️ Skyblock Plus will stop responding to message commands <t:1651377600:R>!** Please use slash commands instead. If you do not see slash commands from this bot, then please re-invite the bot using the link in " +
-                                //							getGuildPrefix(event.getGuild().getId()) +
-                                //							"invite."
-                                //						)
-                                .sendMessageEmbeds(loadingEmbed().build())
-                                .complete();
-            }
-            this.args = event.getMessage().getContentRaw().split("\\s+");
-            execute();
-        });
-    }
+	public void queue() {
+		executor.submit(() -> {
+			if (sendLoadingEmbed) {
+				this.ebMessage =
+					event
+						.getChannel()
+						//						.sendMessage(
+						//							"**⚠️ Skyblock Plus will stop responding to message commands <t:1651377600:R>!** Please use slash commands instead. If you do not see slash commands from this bot, then please re-invite the bot using the link in " +
+						//							getGuildPrefix(event.getGuild().getId()) +
+						//							"invite."
+						//						)
+						.sendMessageEmbeds(loadingEmbed().build())
+						.complete();
+			}
+			this.args = event.getMessage().getContentRaw().split("\\s+");
+			execute();
+		});
+	}
 
-    protected void logCommand() {
-        com.skyblockplus.utils.Utils.logCommand(event.getGuild(), event.getAuthor(), event.getMessage().getContentRaw());
-    }
+	protected void logCommand() {
+		com.skyblockplus.utils.Utils.logCommand(event.getGuild(), event.getAuthor(), event.getMessage().getContentRaw());
+	}
 
-    protected String[] setArgs(int limit) {
-        args = event.getMessage().getContentRaw().split("\\s+", limit);
-        return args;
-    }
+	protected String[] setArgs(int limit) {
+		args = event.getMessage().getContentRaw().split("\\s+", limit);
+		return args;
+	}
 
-    protected void embed(EmbedBuilder embedBuilder) {
-        ebMessage.editMessageEmbeds(embedBuilder.build()).queue(ignored -> {
-        }, ignored -> {
-        });
-    }
+	protected void embed(EmbedBuilder embedBuilder) {
+		ebMessage.editMessageEmbeds(embedBuilder.build()).queue(ignored -> {}, ignored -> {});
+	}
 
-    protected void paginate(EmbedBuilder embedBuilder) {
-        if (embedBuilder == null) {
-            ebMessage.delete().queue(ignored -> {
-            }, ignored -> {
-            });
-        } else {
-            ebMessage.editMessageEmbeds(embedBuilder.build()).queue(ignored -> {
-            }, ignored -> {
-            });
-        }
-    }
+	protected void paginate(EmbedBuilder embedBuilder) {
+		if (embedBuilder == null) {
+			ebMessage.delete().queue(ignored -> {}, ignored -> {});
+		} else {
+			ebMessage.editMessageEmbeds(embedBuilder.build()).queue(ignored -> {}, ignored -> {});
+		}
+	}
 
-    protected void sendErrorEmbed() {
-        ebMessage.editMessageEmbeds(errorEmbed(command.getName()).build()).queue(ignored -> {
-        }, ignored -> {
-        });
-    }
+	protected void sendErrorEmbed() {
+		ebMessage.editMessageEmbeds(errorEmbed(command.getName()).build()).queue(ignored -> {}, ignored -> {});
+	}
 
-    /**
-     * @return true if the command's author is not linked, false otherwise (the
-     * command's author is linked)
-     */
-    protected boolean getAuthorUsername() {
-        return getLinkedUser(event.getAuthor().getId());
-    }
+	/**
+	 * @return true if the command's author is not linked, false otherwise (the
+	 * command's author is linked)
+	 */
+	protected boolean getAuthorUsername() {
+		return getLinkedUser(event.getAuthor().getId());
+	}
 
-    /**
-     * @param index which arg index the mention is located at
-     * @return true if a mention was found and the mentioned user is not linked,
-     * otherwise false (no mention found or the user is linked)
-     */
-    protected boolean getMentionedUsername(int index) {
-        if (index == -1) {
-            return getAuthorUsername();
-        }
+	/**
+	 * @param index which arg index the mention is located at
+	 * @return true if a mention was found and the mentioned user is not linked,
+	 * otherwise false (no mention found or the user is linked)
+	 */
+	protected boolean getMentionedUsername(int index) {
+		if (index == -1) {
+			return getAuthorUsername();
+		}
 
-        username = args[index];
-        Matcher matcher = Message.MentionType.USER.getPattern().matcher(args[index]);
-        if (!matcher.matches()) {
-            return false;
-        }
+		username = args[index];
+		Matcher matcher = Message.MentionType.USER.getPattern().matcher(args[index]);
+		if (!matcher.matches()) {
+			return false;
+		}
 
-        return getLinkedUser(matcher.group(1));
-    }
+		return getLinkedUser(matcher.group(1));
+	}
 
-    /**
-     * @param userId the user's Discord id
-     * @return true if the provided userId is not linked to the bot, otherwise false
-     * (the provided userId is linked)
-     */
-    protected boolean getLinkedUser(String userId) {
-        JsonElement linkedUserUsername = higherDepth(database.getLinkedUserByDiscordId(userId), "minecraftUuid");
-        if (linkedUserUsername != null) {
-            username = linkedUserUsername.getAsString();
-            return false;
-        }
+	/**
+	 * @param userId the user's Discord id
+	 * @return true if the provided userId is not linked to the bot, otherwise false
+	 * (the provided userId is linked)
+	 */
+	protected boolean getLinkedUser(String userId) {
+		JsonElement linkedUserUsername = higherDepth(database.getLinkedUserByDiscordId(userId), "minecraftUuid");
+		if (linkedUserUsername != null) {
+			username = linkedUserUsername.getAsString();
+			return false;
+		}
 
-        ebMessage
-                .editMessageEmbeds(invalidEmbed("<@" + userId + "> is not linked to the bot.").build())
-                .queue(ignored -> {
-                }, ignored -> {
-                });
-        return true;
-    }
+		ebMessage
+			.editMessageEmbeds(invalidEmbed("<@" + userId + "> is not linked to the bot.").build())
+			.queue(ignored -> {}, ignored -> {});
+		return true;
+	}
 
-    protected void removeArg(int index) {
-        args = ArrayUtils.remove(args, index);
-    }
+	protected void removeArg(int index) {
+		args = ArrayUtils.remove(args, index);
+	}
 
-    protected boolean getBooleanArg(String match) {
-        boolean arg = false;
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].equals(match)) {
-                arg = true;
-                removeArg(i);
-            }
-        }
+	protected boolean getBooleanArg(String match) {
+		boolean arg = false;
+		for (int i = 0; i < args.length; i++) {
+			if (args[i].equals(match)) {
+				arg = true;
+				removeArg(i);
+			}
+		}
 
-        return arg;
-    }
+		return arg;
+	}
 }

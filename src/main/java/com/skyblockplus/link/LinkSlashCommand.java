@@ -25,25 +25,25 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class LinkSlashCommand extends SlashCommand {
 
-    public LinkSlashCommand() {
-        this.name = "link";
-    }
+	public LinkSlashCommand() {
+		this.name = "link";
+	}
 
-    @Override
-    protected void execute(SlashCommandExecutedEvent event) {
-        event.logCommand();
+	@Override
+	protected void execute(SlashCommandExecutedEvent event) {
+		event.logCommand();
 
-        String linkOption = event.getOptionStr("player");
-        event.embed(
-                linkOption != null
-                        ? LinkCommand.linkAccount(linkOption, event.getMember(), event.getGuild())
-                        : LinkCommand.getLinkedAccount(event.getUser())
-        );
-    }
+		String linkOption = event.getOptionStr("player");
+		event.embed(
+			linkOption != null
+				? LinkCommand.linkAccount(linkOption, event.getMember(), event.getGuild())
+				: LinkCommand.getLinkedAccount(event.getUser())
+		);
+	}
 
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(name, "Get what Hypixel account you are linked to")
-                .addOption(OptionType.STRING, "player", "Link your Hypixel account to this bot");
-    }
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData(name, "Get what Hypixel account you are linked to")
+			.addOption(OptionType.STRING, "player", "Link your Hypixel account to this bot");
+	}
 }

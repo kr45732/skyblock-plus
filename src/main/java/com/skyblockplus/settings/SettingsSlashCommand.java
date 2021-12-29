@@ -26,26 +26,26 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class SettingsSlashCommand extends SlashCommand {
 
-    public SettingsSlashCommand() {
-        this.name = "settings";
-        this.userPermissions = new Permission[]{Permission.ADMINISTRATOR};
-    }
+	public SettingsSlashCommand() {
+		this.name = "settings";
+		this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
+	}
 
-    @Override
-    protected void execute(SlashCommandExecutedEvent event) {
-        String content = "settings " + event.getOptionStr("command", "");
-        if (!content.contains("hypixel_key")) {
-            event.logCommand();
-        }
+	@Override
+	protected void execute(SlashCommandExecutedEvent event) {
+		String content = "settings " + event.getOptionStr("command", "");
+		if (!content.contains("hypixel_key")) {
+			event.logCommand();
+		}
 
-        event.paginate(
-                new SettingsExecute(event.getGuild(), event.getChannel(), event.getUser()).getSettingsEmbed(content, content.split("\\s+")),
-                true
-        );
-    }
+		event.paginate(
+			new SettingsExecute(event.getGuild(), event.getChannel(), event.getUser()).getSettingsEmbed(content, content.split("\\s+")),
+			true
+		);
+	}
 
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(name, "Main settings command").addOption(OptionType.STRING, "command", "Subcommand to execute");
-    }
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData(name, "Main settings command").addOption(OptionType.STRING, "command", "Subcommand to execute");
+	}
 }

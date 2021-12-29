@@ -18,20 +18,19 @@
 
 package com.skyblockplus.utils.exceptionhandler;
 
+import static com.skyblockplus.Main.globalExceptionHandler;
+
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
 import org.jetbrains.annotations.NotNull;
 
-import static com.skyblockplus.Main.globalExceptionHandler;
-
 public record ExceptionEventListener(EventListener listener) implements EventListener {
-
-    @Override
-    public void onEvent(@NotNull GenericEvent event) {
-        try {
-            listener.onEvent(event);
-        } catch (Exception e) {
-            globalExceptionHandler.uncaughtException(null, e);
-        }
-    }
+	@Override
+	public void onEvent(@NotNull GenericEvent event) {
+		try {
+			listener.onEvent(event);
+		} catch (Exception e) {
+			globalExceptionHandler.uncaughtException(null, e);
+		}
+	}
 }

@@ -25,25 +25,25 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class ActiveCoinsSlashCommand extends SlashCommand {
 
-    public ActiveCoinsSlashCommand() {
-        this.name = "active-coins";
-    }
+	public ActiveCoinsSlashCommand() {
+		this.name = "active-coins";
+	}
 
-    @Override
-    protected void execute(SlashCommandExecutedEvent event) {
-        event.logCommand();
+	@Override
+	protected void execute(SlashCommandExecutedEvent event) {
+		event.logCommand();
 
-        if (event.invalidPlayerOption()) {
-            return;
-        }
+		if (event.invalidPlayerOption()) {
+			return;
+		}
 
-        event.embed(ActiveCoinsCommand.getActiveCoins(event.player, event.getOptionStr("profile")));
-    }
+		event.embed(ActiveCoinsCommand.getActiveCoins(event.player, event.getOptionStr("profile")));
+	}
 
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(name, "Get the active coins (bank, purse, and sold auctions) of a player")
-                .addOption(OptionType.STRING, "player", "Player username or mention")
-                .addOption(OptionType.STRING, "profile", "Profile name");
-    }
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData(name, "Get the active coins (bank, purse, and sold auctions) of a player")
+			.addOption(OptionType.STRING, "player", "Player username or mention")
+			.addOption(OptionType.STRING, "profile", "Profile name");
+	}
 }

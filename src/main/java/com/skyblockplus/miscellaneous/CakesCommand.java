@@ -18,97 +18,96 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class CakesCommand extends Command {
 
-    public CakesCommand() {
-        this.name = "cakes";
-        this.cooldown = globalCooldown;
-        this.botPermissions = defaultPerms();
-    }
+	public CakesCommand() {
+		this.name = "cakes";
+		this.cooldown = globalCooldown;
+		this.botPermissions = defaultPerms();
+	}
 
-    public static EmbedBuilder getCakes(String username, String profileName) {
-        Player player = profileName == null ? new Player(username) : new Player(username, profileName);
-        if (player.isValid()) {
-            EmbedBuilder eb = player.defaultPlayerEmbed();
+	public static EmbedBuilder getCakes(String username, String profileName) {
+		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+		if (player.isValid()) {
+			EmbedBuilder eb = player.defaultPlayerEmbed();
 
-            List<String> missingCakes = new ArrayList<>(
-                    Arrays.asList(
-                            "cake_strength",
-                            "cake_pet_luck",
-                            "cake_health",
-                            "cake_walk_speed",
-                            "cake_magic_find",
-                            "cake_ferocity",
-                            "cake_defense",
-                            "cake_sea_creature_chance",
-                            "cake_intelligence"
-                    )
-            );
-            StringBuilder activeCakes = new StringBuilder();
-            if (higherDepth(player.profileJson(), "temp_stat_buffs") != null) {
-                for (JsonElement cake : higherDepth(player.profileJson(), "temp_stat_buffs").getAsJsonArray()) {
-                    Instant expires = Instant.ofEpochMilli(higherDepth(cake, "expire_at").getAsLong());
-                    if (expires.isAfter(Instant.now())) {
-                        String cakeName = higherDepth(cake, "key").getAsString();
-                        activeCakes
-                                .append("**• ")
-                                .append(capitalizeString(cakeName.split("cake_")[1].replace("_", " ")))
-                                .append(" Cake:** expires <t:")
-                                .append(Instant.ofEpochMilli(higherDepth(cake, "expire_at").getAsLong()).getEpochSecond())
-                                .append(":R>\n");
-                        missingCakes.remove(cakeName);
-                    }
-                }
-            }
-            eb.addField("Active Cakes", activeCakes.length() > 0 ? activeCakes.toString() : "None", false);
+			List<String> missingCakes = new ArrayList<>(
+				Arrays.asList(
+					"cake_strength",
+					"cake_pet_luck",
+					"cake_health",
+					"cake_walk_speed",
+					"cake_magic_find",
+					"cake_ferocity",
+					"cake_defense",
+					"cake_sea_creature_chance",
+					"cake_intelligence"
+				)
+			);
+			StringBuilder activeCakes = new StringBuilder();
+			if (higherDepth(player.profileJson(), "temp_stat_buffs") != null) {
+				for (JsonElement cake : higherDepth(player.profileJson(), "temp_stat_buffs").getAsJsonArray()) {
+					Instant expires = Instant.ofEpochMilli(higherDepth(cake, "expire_at").getAsLong());
+					if (expires.isAfter(Instant.now())) {
+						String cakeName = higherDepth(cake, "key").getAsString();
+						activeCakes
+							.append("**• ")
+							.append(capitalizeString(cakeName.split("cake_")[1].replace("_", " ")))
+							.append(" Cake:** expires <t:")
+							.append(Instant.ofEpochMilli(higherDepth(cake, "expire_at").getAsLong()).getEpochSecond())
+							.append(":R>\n");
+						missingCakes.remove(cakeName);
+					}
+				}
+			}
+			eb.addField("Active Cakes", activeCakes.length() > 0 ? activeCakes.toString() : "None", false);
 
-            StringBuilder missingCakesStr = new StringBuilder();
-            for (String missingCake : missingCakes) {
-                missingCakesStr
-                        .append("**• ")
-                        .append(capitalizeString(missingCake.split("cake_")[1].replace("_", " ")))
-                        .append(" Cake**\n");
-            }
-            eb.addField("Inactive Cakes", missingCakesStr.length() > 0 ? missingCakesStr.toString() : "None", false);
+			StringBuilder missingCakesStr = new StringBuilder();
+			for (String missingCake : missingCakes) {
+				missingCakesStr
+					.append("**• ")
+					.append(capitalizeString(missingCake.split("cake_")[1].replace("_", " ")))
+					.append(" Cake**\n");
+			}
+			eb.addField("Inactive Cakes", missingCakesStr.length() > 0 ? missingCakesStr.toString() : "None", false);
 
-            return eb;
-        }
-        return player.getFailEmbed();
-    }
+			return eb;
+		}
+		return player.getFailEmbed();
+	}
 
-    @Override
-    protected void execute(CommandEvent event) {
-        new CommandExecute(this, event) {
-            @Override
-            protected void execute() {
-                logCommand();
+	@Override
+	protected void execute(CommandEvent event) {
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
 
-                if (args.length == 3 || args.length == 2 || args.length == 1) {
-                    if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
-                        return;
-                    }
+				if (args.length == 3 || args.length == 2 || args.length == 1) {
+					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
+						return;
+					}
 
-                    embed(getCakes(username, args.length == 3 ? args[2] : null));
-                    return;
-                }
+					embed(getCakes(username, args.length == 3 ? args[2] : null));
+					return;
+				}
 
-                sendErrorEmbed();
-            }
-        }
-                .queue();
-    }
+				sendErrorEmbed();
+			}
+		}
+			.queue();
+	}
 }

@@ -26,25 +26,25 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class SkyblockSlashCommand extends SlashCommand {
 
-    public SkyblockSlashCommand() {
-        this.name = "skyblock";
-    }
+	public SkyblockSlashCommand() {
+		this.name = "skyblock";
+	}
 
-    @Override
-    protected void execute(SlashCommandExecutedEvent event) {
-        event.logCommand();
+	@Override
+	protected void execute(SlashCommandExecutedEvent event) {
+		event.logCommand();
 
-        if (event.invalidPlayerOption()) {
-            return;
-        }
+		if (event.invalidPlayerOption()) {
+			return;
+		}
 
-        event.paginate(SkyblockCommand.getSkyblock(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
-    }
+		event.paginate(SkyblockCommand.getSkyblock(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
+	}
 
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(name, "Get an overfiew of a player's Skyblock statistics")
-                .addOption(OptionType.STRING, "player", "Player username or mention")
-                .addOption(OptionType.STRING, "profile", "Profile name");
-    }
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData(name, "Get an overfiew of a player's Skyblock statistics")
+			.addOption(OptionType.STRING, "player", "Player username or mention")
+			.addOption(OptionType.STRING, "profile", "Profile name");
+	}
 }

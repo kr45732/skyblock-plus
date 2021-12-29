@@ -26,33 +26,33 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class GuildKickerSlashCommand extends SlashCommand {
 
-    public GuildKickerSlashCommand() {
-        this.name = "guild-kicker";
-    }
+	public GuildKickerSlashCommand() {
+		this.name = "guild-kicker";
+	}
 
-    @Override
-    protected void execute(SlashCommandExecutedEvent event) {
-        event.logCommand();
+	@Override
+	protected void execute(SlashCommandExecutedEvent event) {
+		event.logCommand();
 
-        if (event.invalidPlayerOption()) {
-            return;
-        }
+		if (event.invalidPlayerOption()) {
+			return;
+		}
 
-        event.paginate(
-                GuildKickerCommand.getGuildKicker(
-                        event.player,
-                        event.getOptionStr("requirements"),
-                        event.getOptionBoolean("usekey", false),
-                        new PaginatorEvent(event)
-                )
-        );
-    }
+		event.paginate(
+			GuildKickerCommand.getGuildKicker(
+				event.player,
+				event.getOptionStr("requirements"),
+				event.getOptionBoolean("usekey", false),
+				new PaginatorEvent(event)
+			)
+		);
+	}
 
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(name, "Get helper which shows who to promote or demote in your guild")
-                .addOption(OptionType.STRING, "requirements", "The requirements a player must meet", true)
-                .addOption(OptionType.STRING, "player", "Player username or mention")
-                .addOption(OptionType.BOOLEAN, "usekey", "If the API key for this server should be used for more accurate results");
-    }
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData(name, "Get helper which shows who to promote or demote in your guild")
+			.addOption(OptionType.STRING, "requirements", "The requirements a player must meet", true)
+			.addOption(OptionType.STRING, "player", "Player username or mention")
+			.addOption(OptionType.BOOLEAN, "usekey", "If the API key for this server should be used for more accurate results");
+	}
 }

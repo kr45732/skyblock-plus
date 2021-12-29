@@ -18,126 +18,125 @@
 
 package com.skyblockplus.price;
 
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.time.Instant;
-
-import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Constants.*;
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class QueryAuctionCommand extends Command {
 
-    public QueryAuctionCommand() {
-        this.name = "query";
-        this.cooldown = globalCooldown + 1;
-        this.botPermissions = defaultPerms();
-    }
+	public QueryAuctionCommand() {
+		this.name = "query";
+		this.cooldown = globalCooldown + 1;
+		this.botPermissions = defaultPerms();
+	}
 
-    public static EmbedBuilder queryAuctions(String query) {
-        JsonArray lowestBinArr = null;
-        String tempName = null;
-        for (String enchantId : ENCHANT_NAMES) {
-            if (query.replace(" ", "_").toUpperCase().contains(enchantId)) {
-                int enchantLevel;
-                try {
-                    enchantLevel = Integer.parseInt(query.replaceAll("\\D+", "").trim());
-                } catch (NumberFormatException e) {
-                    enchantLevel = 1;
-                }
+	public static EmbedBuilder queryAuctions(String query) {
+		JsonArray lowestBinArr = null;
+		String tempName = null;
+		for (String enchantId : ENCHANT_NAMES) {
+			if (query.replace(" ", "_").toUpperCase().contains(enchantId)) {
+				int enchantLevel;
+				try {
+					enchantLevel = Integer.parseInt(query.replaceAll("\\D+", "").trim());
+				} catch (NumberFormatException e) {
+					enchantLevel = 1;
+				}
 
-                lowestBinArr = queryLowestBinEnchant(enchantId, enchantLevel);
-                if (lowestBinArr == null) {
-                    return invalidEmbed("Error fetching auctions data");
-                }
-                tempName = idToName(enchantId + ";" + enchantLevel);
-                break;
-            }
-        }
+				lowestBinArr = queryLowestBinEnchant(enchantId, enchantLevel);
+				if (lowestBinArr == null) {
+					return invalidEmbed("Error fetching auctions data");
+				}
+				tempName = idToName(enchantId + ";" + enchantLevel);
+				break;
+			}
+		}
 
-        if (lowestBinArr == null) {
-            for (String pet : PET_NAMES) {
-                if (query.replace(" ", "_").toUpperCase().contains(pet)) {
-                    query = query.toLowerCase();
+		if (lowestBinArr == null) {
+			for (String pet : PET_NAMES) {
+				if (query.replace(" ", "_").toUpperCase().contains(pet)) {
+					query = query.toLowerCase();
 
-                    String rarity = "ANY";
-                    for (String rarityName : RARITY_TO_NUMBER_MAP.keySet()) {
-                        if (query.contains(rarityName.toLowerCase())) {
-                            rarity = rarityName;
-                            query = query.replace(rarityName.toLowerCase(), "").trim().replaceAll("\\s+", " ");
-                            break;
-                        }
-                    }
+					String rarity = "ANY";
+					for (String rarityName : RARITY_TO_NUMBER_MAP.keySet()) {
+						if (query.contains(rarityName.toLowerCase())) {
+							rarity = rarityName;
+							query = query.replace(rarityName.toLowerCase(), "").trim().replaceAll("\\s+", " ");
+							break;
+						}
+					}
 
-                    lowestBinArr = queryLowestBinPet(query, rarity);
-                    if (lowestBinArr == null) {
-                        return invalidEmbed("Error fetching auctions data");
-                    }
-                    break;
-                }
-            }
-        }
+					lowestBinArr = queryLowestBinPet(query, rarity);
+					if (lowestBinArr == null) {
+						return invalidEmbed("Error fetching auctions data");
+					}
+					break;
+				}
+			}
+		}
 
-        if (lowestBinArr == null) {
-            lowestBinArr = queryLowestBin(query);
-            if (lowestBinArr == null) {
-                return invalidEmbed("Error fetching auctions data");
-            }
-        }
+		if (lowestBinArr == null) {
+			lowestBinArr = queryLowestBin(query);
+			if (lowestBinArr == null) {
+				return invalidEmbed("Error fetching auctions data");
+			}
+		}
 
-        if (lowestBinArr.size() == 0) {
-            return invalidEmbed("No bins matching '" + query + "' found");
-        }
+		if (lowestBinArr.size() == 0) {
+			return invalidEmbed("No bins matching '" + query + "' found");
+		}
 
-        JsonElement lowestBinAuction = lowestBinArr.get(0);
-        EmbedBuilder eb = defaultEmbed("Query Auctions");
+		JsonElement lowestBinAuction = lowestBinArr.get(0);
+		EmbedBuilder eb = defaultEmbed("Query Auctions");
 
-        String lowestBinStr = "";
-        lowestBinStr += "**Name:** " + (tempName == null ? higherDepth(lowestBinAuction, "item_name").getAsString() : tempName);
-        lowestBinStr += "\n**Rarity:** " + higherDepth(lowestBinAuction, "tier").getAsString().toLowerCase();
-        lowestBinStr += "\n**Price:** " + simplifyNumber(higherDepth(lowestBinAuction, "starting_bid").getAsDouble());
-        lowestBinStr += "\n**Seller:** " + uuidToUsername(higherDepth(lowestBinAuction, "auctioneer").getAsString()).username();
-        lowestBinStr += "\n**Auction:** `/viewauction " + higherDepth(lowestBinAuction, "uuid").getAsString() + "`";
-        lowestBinStr +=
-                "\n**Ends:** <t:" + Instant.ofEpochMilli(higherDepth(lowestBinAuction, "end_t").getAsLong()).getEpochSecond() + ":R>";
+		String lowestBinStr = "";
+		lowestBinStr += "**Name:** " + (tempName == null ? higherDepth(lowestBinAuction, "item_name").getAsString() : tempName);
+		lowestBinStr += "\n**Rarity:** " + higherDepth(lowestBinAuction, "tier").getAsString().toLowerCase();
+		lowestBinStr += "\n**Price:** " + simplifyNumber(higherDepth(lowestBinAuction, "starting_bid").getAsDouble());
+		lowestBinStr += "\n**Seller:** " + uuidToUsername(higherDepth(lowestBinAuction, "auctioneer").getAsString()).username();
+		lowestBinStr += "\n**Auction:** `/viewauction " + higherDepth(lowestBinAuction, "uuid").getAsString() + "`";
+		lowestBinStr +=
+			"\n**Ends:** <t:" + Instant.ofEpochMilli(higherDepth(lowestBinAuction, "end_t").getAsLong()).getEpochSecond() + ":R>";
 
-        String itemId = higherDepth(lowestBinAuction, "item_id").getAsString();
-        if (itemId.equals("PET")) {
-            if (!higherDepth(lowestBinAuction, "item_name").getAsString().startsWith("Mystery ")) {
-                eb.setThumbnail(
-                        getPetUrl(higherDepth(lowestBinAuction, "item_name").getAsString().split("] ")[1].toUpperCase().replace(" ", "_"))
-                );
-            }
-        } else {
-            eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId);
-        }
+		String itemId = higherDepth(lowestBinAuction, "item_id").getAsString();
+		if (itemId.equals("PET")) {
+			if (!higherDepth(lowestBinAuction, "item_name").getAsString().startsWith("Mystery ")) {
+				eb.setThumbnail(
+					getPetUrl(higherDepth(lowestBinAuction, "item_name").getAsString().split("] ")[1].toUpperCase().replace(" ", "_"))
+				);
+			}
+		} else {
+			eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId);
+		}
 
-        eb.addField("Lowest Bin", lowestBinStr, false);
+		eb.addField("Lowest Bin", lowestBinStr, false);
 
-        return eb;
-    }
+		return eb;
+	}
 
-    @Override
-    protected void execute(CommandEvent event) {
-        new CommandExecute(this, event) {
-            @Override
-            protected void execute() {
-                logCommand();
-                setArgs(2);
+	@Override
+	protected void execute(CommandEvent event) {
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
+				setArgs(2);
 
-                if (args.length == 2) {
-                    embed(queryAuctions(args[1]));
-                    return;
-                }
+				if (args.length == 2) {
+					embed(queryAuctions(args[1]));
+					return;
+				}
 
-                sendErrorEmbed();
-            }
-        }
-                .queue();
-    }
+				sendErrorEmbed();
+			}
+		}
+			.queue();
+	}
 }

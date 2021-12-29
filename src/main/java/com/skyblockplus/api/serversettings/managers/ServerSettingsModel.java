@@ -25,16 +25,15 @@ import com.skyblockplus.api.serversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.serversettings.automatedverify.AutomatedVerify;
 import com.skyblockplus.api.serversettings.jacob.JacobSettings;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -43,76 +42,76 @@ import java.util.List;
 @Transactional
 public class ServerSettingsModel {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
 
-    private String serverName;
-    private String serverId;
+	private String serverName;
+	private String serverId;
 
-    @Embedded
-    private AutomatedVerify automatedVerify = new AutomatedVerify();
+	@Embedded
+	private AutomatedVerify automatedVerify = new AutomatedVerify();
 
-    @Embedded
-    private AutomatedGuild automatedGuildOne = null;
+	@Embedded
+	private AutomatedGuild automatedGuildOne = null;
 
-    @Embedded
-    private AutomatedGuild automatedGuildTwo = null;
+	@Embedded
+	private AutomatedGuild automatedGuildTwo = null;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Fetch(value = FetchMode.SUBSELECT)
-    private List<ApplyBlacklist> applicationBlacklist = new ArrayList<>();
+	@ElementCollection(fetch = FetchType.EAGER)
+	@Fetch(value = FetchMode.SUBSELECT)
+	private List<ApplyBlacklist> applicationBlacklist = new ArrayList<>();
 
-    @Embedded
-    private AutomatedRoles automatedRoles = new AutomatedRoles();
+	@Embedded
+	private AutomatedRoles automatedRoles = new AutomatedRoles();
 
-    @Embedded
-    private EventSettings sbEvent = new EventSettings();
+	@Embedded
+	private EventSettings sbEvent = new EventSettings();
 
-    @Embedded
-    private RoleModel mee6Data = new RoleModel();
+	@Embedded
+	private RoleModel mee6Data = new RoleModel();
 
-    @Embedded
-    private JacobSettings jacobSettings = new JacobSettings();
+	@Embedded
+	private JacobSettings jacobSettings = new JacobSettings();
 
-    private String hypixelApiKey = "";
+	private String hypixelApiKey = "";
 
-    private String prefix = null;
+	private String prefix = null;
 
-    private String pfCategoryId = "";
+	private String pfCategoryId = "";
 
-    private String applyGuestRole = "";
+	private String applyGuestRole = "";
 
-    private String fetchurChannel = "";
+	private String fetchurChannel = "";
 
-    public ServerSettingsModel(String serverName, String serverId) {
-        this.serverName = serverName;
-        this.serverId = serverId;
-    }
+	public ServerSettingsModel(String serverName, String serverId) {
+		this.serverName = serverName;
+		this.serverId = serverId;
+	}
 
-    public String getHypixelApiKey() {
-        return null;
-    }
+	public String getHypixelApiKey() {
+		return null;
+	}
 
-    public String getHypixelApiKeyInt() {
-        return hypixelApiKey;
-    }
+	public String getHypixelApiKeyInt() {
+		return hypixelApiKey;
+	}
 
-    public ServerSettingsModel copy(boolean nullHypixelApiKey) {
-        ServerSettingsModel copy = new ServerSettingsModel(serverName, serverId);
-        copy.setAutomatedVerify(automatedVerify);
-        copy.setAutomatedGuildOne(automatedGuildOne);
-        copy.setAutomatedGuildTwo(automatedGuildTwo);
-        copy.setApplicationBlacklist(applicationBlacklist);
-        copy.setAutomatedRoles(automatedRoles);
-        copy.setSbEvent(sbEvent);
-        copy.setMee6Data(mee6Data);
-        copy.setJacobSettings(jacobSettings);
-        copy.setHypixelApiKey(nullHypixelApiKey ? null : hypixelApiKey);
-        copy.setPrefix(prefix);
-        copy.setPfCategoryId(pfCategoryId);
-        copy.setApplyGuestRole(applyGuestRole);
-        copy.setFetchurChannel(fetchurChannel);
-        return copy;
-    }
+	public ServerSettingsModel copy(boolean nullHypixelApiKey) {
+		ServerSettingsModel copy = new ServerSettingsModel(serverName, serverId);
+		copy.setAutomatedVerify(automatedVerify);
+		copy.setAutomatedGuildOne(automatedGuildOne);
+		copy.setAutomatedGuildTwo(automatedGuildTwo);
+		copy.setApplicationBlacklist(applicationBlacklist);
+		copy.setAutomatedRoles(automatedRoles);
+		copy.setSbEvent(sbEvent);
+		copy.setMee6Data(mee6Data);
+		copy.setJacobSettings(jacobSettings);
+		copy.setHypixelApiKey(nullHypixelApiKey ? null : hypixelApiKey);
+		copy.setPrefix(prefix);
+		copy.setPfCategoryId(pfCategoryId);
+		copy.setApplyGuestRole(applyGuestRole);
+		copy.setFetchurChannel(fetchurChannel);
+		return copy;
+	}
 }

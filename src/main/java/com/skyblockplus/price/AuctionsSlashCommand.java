@@ -28,52 +28,52 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class AuctionsSlashCommand extends SlashCommand {
 
-    public AuctionsSlashCommand() {
-        this.name = "auctions";
-    }
+	public AuctionsSlashCommand() {
+		this.name = "auctions";
+	}
 
-    @Override
-    protected void execute(SlashCommandExecutedEvent event) {
-        event.logCommand();
+	@Override
+	protected void execute(SlashCommandExecutedEvent event) {
+		event.logCommand();
 
-        switch (event.getSubcommandName()) {
-            case "player" -> {
-                if (event.invalidPlayerOption()) {
-                    return;
-                }
-                event.paginate(
-                        AuctionCommand.getPlayerAuction(
-                                event.player,
-                                AuctionCommand.AuctionFilterType.valueOf(event.getOptionStr("filter", "none").toUpperCase()),
-                                AuctionCommand.AuctionSortType.valueOf(event.getOptionStr("sort", "none").toUpperCase()),
-                                event.getOptionBoolean("verbose", false),
-                                new PaginatorEvent(event)
-                        )
-                );
-            }
-            case "uuid" -> event.embed(AuctionCommand.getAuctionByUuid(event.getOptionStr("uuid")));
-            default -> event.embed(event.invalidCommandMessage());
-        }
-    }
+		switch (event.getSubcommandName()) {
+			case "player" -> {
+				if (event.invalidPlayerOption()) {
+					return;
+				}
+				event.paginate(
+					AuctionCommand.getPlayerAuction(
+						event.player,
+						AuctionCommand.AuctionFilterType.valueOf(event.getOptionStr("filter", "none").toUpperCase()),
+						AuctionCommand.AuctionSortType.valueOf(event.getOptionStr("sort", "none").toUpperCase()),
+						event.getOptionBoolean("verbose", false),
+						new PaginatorEvent(event)
+					)
+				);
+			}
+			case "uuid" -> event.embed(AuctionCommand.getAuctionByUuid(event.getOptionStr("uuid")));
+			default -> event.embed(event.invalidCommandMessage());
+		}
+	}
 
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(name, "Main auctions command")
-                .addSubcommands(
-                        new SubcommandData("player", "Get player's active (not claimed) auctions on all profiles")
-                                .addOption(OptionType.STRING, "player", "Player username or mention")
-                                .addOptions(
-                                        new OptionData(OptionType.STRING, "filter", "How the auctions should be filtered")
-                                                .addChoice("Sold", "sold")
-                                                .addChoice("Unsold", "Unsold")
-                                )
-                                .addOptions(
-                                        new OptionData(OptionType.STRING, "sort", "How the auctions should be sorted")
-                                                .addChoice("Low", "low")
-                                                .addChoice("High", "high")
-                                )
-                                .addOption(OptionType.BOOLEAN, "verbose", "Get more information & a detailed breakdown for each auction"),
-                        new SubcommandData("uuid", "Get an auction by it's UUID").addOption(OptionType.STRING, "uuid", "Auction UUID", true)
-                );
-    }
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData(name, "Main auctions command")
+			.addSubcommands(
+				new SubcommandData("player", "Get player's active (not claimed) auctions on all profiles")
+					.addOption(OptionType.STRING, "player", "Player username or mention")
+					.addOptions(
+						new OptionData(OptionType.STRING, "filter", "How the auctions should be filtered")
+							.addChoice("Sold", "sold")
+							.addChoice("Unsold", "Unsold")
+					)
+					.addOptions(
+						new OptionData(OptionType.STRING, "sort", "How the auctions should be sorted")
+							.addChoice("Low", "low")
+							.addChoice("High", "high")
+					)
+					.addOption(OptionType.BOOLEAN, "verbose", "Get more information & a detailed breakdown for each auction"),
+				new SubcommandData("uuid", "Get an auction by it's UUID").addOption(OptionType.STRING, "uuid", "Auction UUID", true)
+			);
+	}
 }

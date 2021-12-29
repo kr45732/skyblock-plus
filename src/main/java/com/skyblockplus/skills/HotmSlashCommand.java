@@ -25,25 +25,25 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class HotmSlashCommand extends SlashCommand {
 
-    public HotmSlashCommand() {
-        this.name = "hotm";
-    }
+	public HotmSlashCommand() {
+		this.name = "hotm";
+	}
 
-    @Override
-    protected void execute(SlashCommandExecutedEvent event) {
-        event.logCommand();
+	@Override
+	protected void execute(SlashCommandExecutedEvent event) {
+		event.logCommand();
 
-        if (event.invalidPlayerOption()) {
-            return;
-        }
+		if (event.invalidPlayerOption()) {
+			return;
+		}
 
-        event.embed(HotmCommand.getHotm(event.player, event.getOptionStr("profile")));
-    }
+		event.embed(HotmCommand.getHotm(event.player, event.getOptionStr("profile")));
+	}
 
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(name, "Get a player's heart of the mountain statistics")
-                .addOption(OptionType.STRING, "player", "Player username or mention")
-                .addOption(OptionType.STRING, "profile", "Profile name");
-    }
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData(name, "Get a player's heart of the mountain statistics")
+			.addOption(OptionType.STRING, "player", "Player username or mention")
+			.addOption(OptionType.STRING, "profile", "Profile name");
+	}
 }

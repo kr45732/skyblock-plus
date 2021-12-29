@@ -26,24 +26,24 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class ProfilesSlashCommand extends SlashCommand {
 
-    public ProfilesSlashCommand() {
-        this.name = "profiles";
-    }
+	public ProfilesSlashCommand() {
+		this.name = "profiles";
+	}
 
-    @Override
-    protected void execute(SlashCommandExecutedEvent event) {
-        event.logCommand();
+	@Override
+	protected void execute(SlashCommandExecutedEvent event) {
+		event.logCommand();
 
-        if (event.invalidPlayerOption()) {
-            return;
-        }
+		if (event.invalidPlayerOption()) {
+			return;
+		}
 
-        event.paginate(ProfilesCommand.getPlayerProfiles(event.player, new PaginatorEvent(event)));
-    }
+		event.paginate(ProfilesCommand.getPlayerProfiles(event.player, new PaginatorEvent(event)));
+	}
 
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(name, "Get a information about all of a player's profiles")
-                .addOption(OptionType.STRING, "player", "Player username or mention");
-    }
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData(name, "Get a information about all of a player's profiles")
+			.addOption(OptionType.STRING, "player", "Player username or mention");
+	}
 }

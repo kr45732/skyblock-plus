@@ -18,38 +18,38 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import net.dv8tion.jda.api.EmbedBuilder;
 
-import static com.skyblockplus.utils.Utils.*;
-
 public class VoteCommand extends Command {
 
-    public VoteCommand() {
-        this.name = "vote";
-        this.cooldown = globalCooldown;
-        this.botPermissions = defaultPerms();
-    }
+	public VoteCommand() {
+		this.name = "vote";
+		this.cooldown = globalCooldown;
+		this.botPermissions = defaultPerms();
+	}
 
-    public static EmbedBuilder getVoteEmbed() {
-        return defaultEmbed("Vote for Skyblock Plus")
-                .setDescription(
-                        "You can vote for the bot on [**top.gg**](https://top.gg/bot/796791167366594592/vote), [**Discord Bot List**](https://discordbotlist.com/bots/skyblock-plus/upvote), and [**discords.com**](https://discords.com/bots/bot/796791167366594592/vote)"
-                );
-    }
+	public static EmbedBuilder getVoteEmbed() {
+		return defaultEmbed("Vote for Skyblock Plus")
+			.setDescription(
+				"You can vote for the bot on [**top.gg**](https://top.gg/bot/796791167366594592/vote), [**Discord Bot List**](https://discordbotlist.com/bots/skyblock-plus/upvote), and [**discords.com**](https://discords.com/bots/bot/796791167366594592/vote)"
+			);
+	}
 
-    @Override
-    protected void execute(CommandEvent event) {
-        new CommandExecute(this, event) {
-            @Override
-            protected void execute() {
-                logCommand();
+	@Override
+	protected void execute(CommandEvent event) {
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
 
-                embed(getVoteEmbed());
-            }
-        }
-                .queue();
-    }
+				embed(getVoteEmbed());
+			}
+		}
+			.queue();
+	}
 }

@@ -19,8 +19,7 @@
 package com.skyblockplus.utils.structs;
 
 public record NwItemPrice(double price, String json) {
-
-    public NwItemPrice() {
-        this(0, "");
-    }
+	public NwItemPrice() {
+		this(0, "");
+	}
 }

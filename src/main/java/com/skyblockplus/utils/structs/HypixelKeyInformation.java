@@ -21,8 +21,7 @@ package com.skyblockplus.utils.structs;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public record HypixelKeyInformation(AtomicInteger remainingLimit, AtomicInteger timeTillReset) {
-
-    public HypixelKeyInformation() {
-        this(new AtomicInteger(120), new AtomicInteger(0));
-    }
+	public HypixelKeyInformation() {
+		this(new AtomicInteger(120), new AtomicInteger(0));
+	}
 }

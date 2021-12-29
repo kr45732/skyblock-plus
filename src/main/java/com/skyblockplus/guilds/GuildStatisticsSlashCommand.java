@@ -25,24 +25,24 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class GuildStatisticsSlashCommand extends SlashCommand {
 
-    public GuildStatisticsSlashCommand() {
-        this.name = "guild-statistics";
-    }
+	public GuildStatisticsSlashCommand() {
+		this.name = "guild-statistics";
+	}
 
-    @Override
-    protected void execute(SlashCommandExecutedEvent event) {
-        event.logCommand();
+	@Override
+	protected void execute(SlashCommandExecutedEvent event) {
+		event.logCommand();
 
-        if (event.invalidPlayerOption()) {
-            return;
-        }
+		if (event.invalidPlayerOption()) {
+			return;
+		}
 
-        event.embed(GuildStatisticsCommand.getStatistics(event.player, event.getGuild()));
-    }
+		event.embed(GuildStatisticsCommand.getStatistics(event.player, event.getGuild()));
+	}
 
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(name, "Get a guild's SkyBlock statistics of slayer, skills, catacombs, and weight")
-                .addOption(OptionType.STRING, "player", "Player username or mention");
-    }
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData(name, "Get a guild's SkyBlock statistics of slayer, skills, catacombs, and weight")
+			.addOption(OptionType.STRING, "player", "Player username or mention");
+	}
 }

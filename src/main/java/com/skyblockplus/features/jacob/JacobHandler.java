@@ -18,64 +18,64 @@
 
 package com.skyblockplus.features.jacob;
 
-import com.skyblockplus.features.listeners.AutomaticGuild;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.miscellaneous.TimeCommand.getSkyblockYear;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.Utils.scheduler;
 
+import com.skyblockplus.features.listeners.AutomaticGuild;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+
 public class JacobHandler {
 
-    public static ScheduledFuture<?> jacobFuture;
-    private static JacobData jacobData = null;
+	public static ScheduledFuture<?> jacobFuture;
+	private static JacobData jacobData = null;
 
-    public static boolean needsUpdate() {
-        return jacobData == null || jacobData.getYear() != getSkyblockYear();
-    }
+	public static boolean needsUpdate() {
+		return jacobData == null || jacobData.getYear() != getSkyblockYear();
+	}
 
-    public static JacobData getJacobData() {
-        return jacobData;
-    }
+	public static JacobData getJacobData() {
+		return jacobData;
+	}
 
-    public static void setJacobData(JacobData jacobData) {
-        JacobHandler.jacobData = jacobData;
-        if (jacobFuture.isDone()) {
-            queue();
-        }
-    }
+	public static void setJacobData(JacobData jacobData) {
+		JacobHandler.jacobData = jacobData;
+		if (jacobFuture.isDone()) {
+			queue();
+		}
+	}
 
-    private static void queue() {
-        if (jacobData == null) {
-            return;
-        }
+	private static void queue() {
+		if (jacobData == null) {
+			return;
+		}
 
-        JacobContest nextContest = jacobData.getNextContest();
-        if (nextContest != null) {
-            jacobFuture = scheduler.schedule(
-                    () -> {
-                        try {
-                            MessageEmbed embed = defaultEmbed("Jacob's Contest")
-                                    .setDescription(
-                                            "The next farming contest is starting <t:" + nextContest.getTimeInstant().getEpochSecond() + ":R>\n"
-                                    )
-                                    .addField("Crops", nextContest.getCropsFormatted(), false)
-                                    .build();
-                            for (AutomaticGuild guild : guildMap.values()) {
-                                guild.onFarmingContest(nextContest.getCrops(), embed);
-                            }
-                            queue();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    },
-                    nextContest.getDurationUntil().minusMinutes(5).toMillis(),
-                    TimeUnit.MILLISECONDS
-            );
-        }
-    }
+		JacobContest nextContest = jacobData.getNextContest();
+		if (nextContest != null) {
+			jacobFuture =
+				scheduler.schedule(
+					() -> {
+						try {
+							MessageEmbed embed = defaultEmbed("Jacob's Contest")
+								.setDescription(
+									"The next farming contest is starting <t:" + nextContest.getTimeInstant().getEpochSecond() + ":R>\n"
+								)
+								.addField("Crops", nextContest.getCropsFormatted(), false)
+								.build();
+							for (AutomaticGuild guild : guildMap.values()) {
+								guild.onFarmingContest(nextContest.getCrops(), embed);
+							}
+							queue();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					},
+					nextContest.getDurationUntil().minusMinutes(5).toMillis(),
+					TimeUnit.MILLISECONDS
+				);
+		}
+	}
 }

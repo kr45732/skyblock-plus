@@ -24,23 +24,23 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class InformationSlashCommand extends SlashCommand {
 
-    public InformationSlashCommand() {
-        this.name = "information";
-    }
+	public InformationSlashCommand() {
+		this.name = "information";
+	}
 
-    @Override
-    protected void execute(SlashCommandExecutedEvent event) {
-        event.logCommand();
+	@Override
+	protected void execute(SlashCommandExecutedEvent event) {
+		event.logCommand();
 
-        event
-                .getHook()
-                .editOriginalEmbeds(InformationCommand.getInformation().build())
-                .setActionRows(InformationCommand.getInformationActionRow())
-                .queue();
-    }
+		event
+			.getHook()
+			.editOriginalEmbeds(InformationCommand.getInformation().build())
+			.setActionRows(InformationCommand.getInformationActionRow())
+			.queue();
+	}
 
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(name, "Get information about this bot");
-    }
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData(name, "Get information about this bot");
+	}
 }

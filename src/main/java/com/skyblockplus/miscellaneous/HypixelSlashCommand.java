@@ -26,35 +26,35 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class HypixelSlashCommand extends SlashCommand {
 
-    public HypixelSlashCommand() {
-        this.name = "hypixel";
-    }
+	public HypixelSlashCommand() {
+		this.name = "hypixel";
+	}
 
-    @Override
-    protected void execute(SlashCommandExecutedEvent event) {
-        event.logCommand();
+	@Override
+	protected void execute(SlashCommandExecutedEvent event) {
+		event.logCommand();
 
-        if (event.invalidPlayerOption()) {
-            return;
-        }
+		if (event.invalidPlayerOption()) {
+			return;
+		}
 
-        switch (event.getSubcommandName()) {
-            case "player" -> event.embed(HypixelCommand.getHypixelStats(event.player));
-            case "parkour" -> event.embed(HypixelCommand.getParkourStats(event.player));
-            default -> event.embed(event.invalidCommandMessage());
-        }
-    }
+		switch (event.getSubcommandName()) {
+			case "player" -> event.embed(HypixelCommand.getHypixelStats(event.player));
+			case "parkour" -> event.embed(HypixelCommand.getParkourStats(event.player));
+			default -> event.embed(event.invalidCommandMessage());
+		}
+	}
 
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(name, "Main hypixel command")
-                .addSubcommands(
-                        new SubcommandData("player", "Get Hypixel information about a player")
-                                .addOption(OptionType.STRING, "player", "Player username or mention")
-                )
-                .addSubcommands(
-                        new SubcommandData("parkour", "Get fastest Hypixel lobby parkour for a player")
-                                .addOption(OptionType.STRING, "player", "Player username or mention")
-                );
-    }
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData(name, "Main hypixel command")
+			.addSubcommands(
+				new SubcommandData("player", "Get Hypixel information about a player")
+					.addOption(OptionType.STRING, "player", "Player username or mention")
+			)
+			.addSubcommands(
+				new SubcommandData("parkour", "Get fastest Hypixel lobby parkour for a player")
+					.addOption(OptionType.STRING, "player", "Player username or mention")
+			);
+	}
 }

@@ -25,20 +25,20 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class QueryAuctionsSlashCommand extends SlashCommand {
 
-    public QueryAuctionsSlashCommand() {
-        this.name = "query";
-    }
+	public QueryAuctionsSlashCommand() {
+		this.name = "query";
+	}
 
-    @Override
-    protected void execute(SlashCommandExecutedEvent event) {
-        event.logCommand();
+	@Override
+	protected void execute(SlashCommandExecutedEvent event) {
+		event.logCommand();
 
-        event.embed(QueryAuctionCommand.queryAuctions(event.getOptionStr("item")));
-    }
+		event.embed(QueryAuctionCommand.queryAuctions(event.getOptionStr("item")));
+	}
 
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(name, "Query the auction house for the lowest bin of an item")
-                .addOption(OptionType.STRING, "item", "Item name", true);
-    }
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData(name, "Query the auction house for the lowest bin of an item")
+			.addOption(OptionType.STRING, "item", "Item name", true);
+	}
 }

@@ -18,101 +18,99 @@
 
 package com.skyblockplus.utils.slashcommand;
 
+import static com.skyblockplus.Main.client;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.jagrosh.jdautilities.command.Command;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
-import static com.skyblockplus.Main.client;
-import static com.skyblockplus.utils.Utils.*;
-
 public abstract class SlashCommand {
 
-    protected final Permission[] botPermissions = defaultPerms();
-    protected String name = "null";
-    protected int cooldown = -1;
-    protected Permission[] userPermissions = new Permission[0];
+	protected final Permission[] botPermissions = defaultPerms();
+	protected String name = "null";
+	protected int cooldown = -1;
+	protected Permission[] userPermissions = new Permission[0];
 
-    protected abstract void execute(SlashCommandExecutedEvent event);
+	protected abstract void execute(SlashCommandExecutedEvent event);
 
-    protected void run(SlashCommandExecutedEvent event) {
-        if (cooldown == -1) {
-            Command command = client.getCommands().stream().filter(c -> c.getName().equals(name)).findFirst().orElse(null);
-            cooldown = command != null ? command.getCooldown() : globalCooldown;
-        }
+	protected void run(SlashCommandExecutedEvent event) {
+		if (cooldown == -1) {
+			Command command = client.getCommands().stream().filter(c -> c.getName().equals(name)).findFirst().orElse(null);
+			cooldown = command != null ? command.getCooldown() : globalCooldown;
+		}
 
-        for (Permission p : userPermissions) {
-            if (p.isChannel()) {
-                if (!event.getMember().hasPermission(event.getTextChannel(), p)) {
-                    event.embed(invalidEmbed("You must have the " + p.getName() + " permission in this channel to use that!"));
-                    return;
-                }
-            } else {
-                if (!event.getMember().hasPermission(p)) {
-                    event.embed(invalidEmbed("You must have the " + p.getName() + " permission in this server to use that!"));
-                    return;
-                }
-            }
-        }
+		for (Permission p : userPermissions) {
+			if (p.isChannel()) {
+				if (!event.getMember().hasPermission(event.getTextChannel(), p)) {
+					event.embed(invalidEmbed("You must have the " + p.getName() + " permission in this channel to use that!"));
+					return;
+				}
+			} else {
+				if (!event.getMember().hasPermission(p)) {
+					event.embed(invalidEmbed("You must have the " + p.getName() + " permission in this server to use that!"));
+					return;
+				}
+			}
+		}
 
-        for (Permission p : botPermissions) {
-            if (p.isChannel()) {
-                if (!event.getSelfMember().hasPermission(event.getTextChannel(), p)) {
-                    if (p == Permission.MESSAGE_WRITE) {
-                        event
-                                .getUser()
-                                .openPrivateChannel()
-                                .queue(dm ->
-                                        dm
-                                                .sendMessageEmbeds(
-                                                        invalidEmbed(
-                                                                "I need the " + p.getName() + " permission in " + event.getTextChannel().getAsMention() + "!"
-                                                        )
-                                                                .build()
-                                                )
-                                                .queue(ignored -> {
-                                                }, ignored -> {
-                                                })
-                                );
-                    } else {
-                        event.embed(invalidEmbed("I need the " + p.getName() + " permission in this channel!"));
-                    }
-                    return;
-                }
-            } else {
-                if (!event.getSelfMember().hasPermission(p)) {
-                    event.embed(invalidEmbed("I need the " + p.getName() + " permission in this server!"));
-                    return;
-                }
-            }
-        }
+		for (Permission p : botPermissions) {
+			if (p.isChannel()) {
+				if (!event.getSelfMember().hasPermission(event.getTextChannel(), p)) {
+					if (p == Permission.MESSAGE_WRITE) {
+						event
+							.getUser()
+							.openPrivateChannel()
+							.queue(dm ->
+								dm
+									.sendMessageEmbeds(
+										invalidEmbed(
+											"I need the " + p.getName() + " permission in " + event.getTextChannel().getAsMention() + "!"
+										)
+											.build()
+									)
+									.queue(ignored -> {}, ignored -> {})
+							);
+					} else {
+						event.embed(invalidEmbed("I need the " + p.getName() + " permission in this channel!"));
+					}
+					return;
+				}
+			} else {
+				if (!event.getSelfMember().hasPermission(p)) {
+					event.embed(invalidEmbed("I need the " + p.getName() + " permission in this server!"));
+					return;
+				}
+			}
+		}
 
-        executor.submit(() -> execute(event));
-    }
+		executor.submit(() -> execute(event));
+	}
 
-    public String getName() {
-        return name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public int getRemainingCooldown(SlashCommandExecutedEvent event) {
-        if (!event.isOwner()) {
-            String key = name + "|" + String.format("U:%d", event.getUser().getIdLong());
-            int remaining = client.getRemainingCooldown(key);
-            if (remaining > 0) {
-                return remaining;
-            }
+	public int getRemainingCooldown(SlashCommandExecutedEvent event) {
+		if (!event.isOwner()) {
+			String key = name + "|" + String.format("U:%d", event.getUser().getIdLong());
+			int remaining = client.getRemainingCooldown(key);
+			if (remaining > 0) {
+				return remaining;
+			}
 
-            client.applyCooldown(key, cooldown);
-        }
+			client.applyCooldown(key, cooldown);
+		}
 
-        return 0;
-    }
+		return 0;
+	}
 
-    public void replyCooldown(SlashCommandExecutedEvent event, int remainingCooldown) {
-        event
-                .getHook()
-                .editOriginalEmbeds(invalidEmbed("That command is on cooldown for " + remainingCooldown + " more seconds").build())
-                .queue();
-    }
+	public void replyCooldown(SlashCommandExecutedEvent event, int remainingCooldown) {
+		event
+			.getHook()
+			.editOriginalEmbeds(invalidEmbed("That command is on cooldown for " + remainingCooldown + " more seconds").build())
+			.queue();
+	}
 
-    public abstract CommandData getCommandData();
+	public abstract CommandData getCommandData();
 }

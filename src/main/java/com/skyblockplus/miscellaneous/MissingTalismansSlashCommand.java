@@ -25,25 +25,25 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class MissingTalismansSlashCommand extends SlashCommand {
 
-    public MissingTalismansSlashCommand() {
-        this.name = "missing";
-    }
+	public MissingTalismansSlashCommand() {
+		this.name = "missing";
+	}
 
-    @Override
-    protected void execute(SlashCommandExecutedEvent event) {
-        event.logCommand();
+	@Override
+	protected void execute(SlashCommandExecutedEvent event) {
+		event.logCommand();
 
-        if (event.invalidPlayerOption()) {
-            return;
-        }
+		if (event.invalidPlayerOption()) {
+			return;
+		}
 
-        event.embed(MissingTalismansCommand.getMissingTalismans(event.player, event.getOptionStr("profile")));
-    }
+		event.embed(MissingTalismansCommand.getMissingTalismans(event.player, event.getOptionStr("profile")));
+	}
 
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(name, "Get a player's missing talismans")
-                .addOption(OptionType.STRING, "player", "Player username or mention")
-                .addOption(OptionType.STRING, "profile", "Profile name");
-    }
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData(name, "Get a player's missing talismans")
+			.addOption(OptionType.STRING, "player", "Player username or mention")
+			.addOption(OptionType.STRING, "profile", "Profile name");
+	}
 }

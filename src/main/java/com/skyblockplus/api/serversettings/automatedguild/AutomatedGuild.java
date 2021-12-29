@@ -19,18 +19,17 @@
 package com.skyblockplus.api.serversettings.automatedguild;
 
 import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Embeddable;
+import javax.persistence.FetchType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
-
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Embeddable;
-import javax.persistence.FetchType;
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -38,59 +37,59 @@ import java.util.List;
 @Embeddable
 public class AutomatedGuild {
 
-    private String guildName;
-    private String guildId;
+	private String guildName;
+	private String guildId;
 
-    // Apply
-    private String applyEnable = "false";
-    private String applyMessageChannel = "";
-    private String applyStaffChannel = "";
-    private String applyCategory = "";
-    private String applyWaitingChannel = "";
-    private String applyIronmanOnly = "false";
-    private String applyScammerCheck = "false";
+	// Apply
+	private String applyEnable = "false";
+	private String applyMessageChannel = "";
+	private String applyStaffChannel = "";
+	private String applyCategory = "";
+	private String applyWaitingChannel = "";
+	private String applyIronmanOnly = "false";
+	private String applyScammerCheck = "false";
 
-    @Column(length = 2048)
-    private String applyMessage = "";
+	@Column(length = 2048)
+	private String applyMessage = "";
 
-    @Column(length = 2048)
-    private String applyAcceptMessage = "";
+	@Column(length = 2048)
+	private String applyAcceptMessage = "";
 
-    @Column(length = 2048)
-    private String applyDenyMessage = "";
+	@Column(length = 2048)
+	private String applyDenyMessage = "";
 
-    @Column(length = 2048)
-    private String applyWaitlistMessage = "";
+	@Column(length = 2048)
+	private String applyWaitlistMessage = "";
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Fetch(value = FetchMode.SUBSELECT)
-    private List<String> applyStaffRoles = new ArrayList<>();
+	@ElementCollection(fetch = FetchType.EAGER)
+	@Fetch(value = FetchMode.SUBSELECT)
+	private List<String> applyStaffRoles = new ArrayList<>();
 
-    private String applyPrevMessage = ""; // Used to edit original message rather than sending new when the bot restarts
+	private String applyPrevMessage = ""; // Used to edit original message rather than sending new when the bot restarts
 
-    @Column(columnDefinition = "TEXT")
-    private String applyUsersCache = "";
+	@Column(columnDefinition = "TEXT")
+	private String applyUsersCache = "";
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Fetch(value = FetchMode.SUBSELECT)
-    private List<ApplyRequirements> applyReqs = new ArrayList<>();
+	@ElementCollection(fetch = FetchType.EAGER)
+	@Fetch(value = FetchMode.SUBSELECT)
+	private List<ApplyRequirements> applyReqs = new ArrayList<>();
 
-    // Guild Member Roles
-    private String guildMemberRoleEnable = "false";
-    private String guildMemberRole = "";
+	// Guild Member Roles
+	private String guildMemberRoleEnable = "false";
+	private String guildMemberRole = "";
 
-    // Guild Rank
-    private String guildRanksEnable = "false";
+	// Guild Rank
+	private String guildRanksEnable = "false";
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Fetch(value = FetchMode.SUBSELECT)
-    private List<RoleObject> guildRanks = new ArrayList<>();
+	@ElementCollection(fetch = FetchType.EAGER)
+	@Fetch(value = FetchMode.SUBSELECT)
+	private List<RoleObject> guildRanks = new ArrayList<>();
 
-    private String guildCounterEnable = "false";
-    private String guildCounterChannel = "";
+	private String guildCounterEnable = "false";
+	private String guildCounterChannel = "";
 
-    public AutomatedGuild(String guildName, String guildId) {
-        this.guildName = guildName;
-        this.guildId = guildId;
-    }
+	public AutomatedGuild(String guildName, String guildId) {
+		this.guildName = guildName;
+		this.guildId = guildId;
+	}
 }

@@ -25,19 +25,19 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class BitsSlashCommand extends SlashCommand {
 
-    public BitsSlashCommand() {
-        this.name = "bits";
-    }
+	public BitsSlashCommand() {
+		this.name = "bits";
+	}
 
-    @Override
-    protected void execute(SlashCommandExecutedEvent event) {
-        event.logCommand();
+	@Override
+	protected void execute(SlashCommandExecutedEvent event) {
+		event.logCommand();
 
-        event.embed(BitsCommand.getBitPrices(event.getOptionStr("item")));
-    }
+		event.embed(BitsCommand.getBitPrices(event.getOptionStr("item")));
+	}
 
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(name, "Get the price of an item from the bits shop").addOption(OptionType.STRING, "item", "Item name", true);
-    }
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData(name, "Get the price of an item from the bits shop").addOption(OptionType.STRING, "item", "Item name", true);
+	}
 }

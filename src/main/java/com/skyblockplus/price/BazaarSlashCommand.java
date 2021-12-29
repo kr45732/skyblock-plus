@@ -25,19 +25,19 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class BazaarSlashCommand extends SlashCommand {
 
-    public BazaarSlashCommand() {
-        this.name = "bazaar";
-    }
+	public BazaarSlashCommand() {
+		this.name = "bazaar";
+	}
 
-    @Override
-    protected void execute(SlashCommandExecutedEvent event) {
-        event.logCommand();
+	@Override
+	protected void execute(SlashCommandExecutedEvent event) {
+		event.logCommand();
 
-        event.embed(BazaarCommand.getBazaarItem(event.getOptionStr("item")));
-    }
+		event.embed(BazaarCommand.getBazaarItem(event.getOptionStr("item")));
+	}
 
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(name, "Get bazaar prices of an item").addOption(OptionType.STRING, "item", "Item name", true);
-    }
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData(name, "Get bazaar prices of an item").addOption(OptionType.STRING, "item", "Item name", true);
+	}
 }

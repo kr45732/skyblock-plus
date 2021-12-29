@@ -18,7 +18,4 @@
 
 package com.skyblockplus.utils.structs;
 
-public record GuildRanksStruct(String name, double skills, double slayer, double catacombs, double weight,
-                               String guildRank) {
-
-}
+public record GuildRanksStruct(String name, double skills, double slayer, double catacombs, double weight, String guildRank) {}

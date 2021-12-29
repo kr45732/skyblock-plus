@@ -18,6 +18,9 @@
 
 package com.skyblockplus.inventory;
 
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.invalidEmbed;
+
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
@@ -25,63 +28,60 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.invalidEmbed;
-
 public class InventorySlashCommand extends SlashCommand {
 
-    public InventorySlashCommand() {
-        this.name = "inventory";
-    }
+	public InventorySlashCommand() {
+		this.name = "inventory";
+	}
 
-    @Override
-    protected void execute(SlashCommandExecutedEvent event) {
-        event.logCommand();
+	@Override
+	protected void execute(SlashCommandExecutedEvent event) {
+		event.logCommand();
 
-        if (event.invalidPlayerOption()) {
-            return;
-        }
+		if (event.invalidPlayerOption()) {
+			return;
+		}
 
-        switch (event.getSubcommandName()) {
-            case "list" -> event.paginate(
-                    InventoryCommand.getPlayerInventoryList(
-                            event.player,
-                            event.getOptionStr("profile"),
-                            event.getOptionInt("slot", 0),
-                            new PaginatorEvent(event)
-                    )
-            );
-            case "emoji" -> {
-                String[] playerInventory = InventoryCommand.getPlayerInventory(event.player, event.getOptionStr("profile"));
-                if (playerInventory != null) {
-                    event.getHook().deleteOriginal().queue();
-                    event.getChannel().sendMessage(playerInventory[0]).complete();
-                    event.getChannel().sendMessage(playerInventory[1]).queue();
-                    if (playerInventory[2].length() > 0) {
-                        event
-                                .getChannel()
-                                .sendMessageEmbeds(defaultEmbed("Missing emojis").setDescription(playerInventory[2]).build())
-                                .queue();
-                    }
-                } else {
-                    event.embed(invalidEmbed("Inventory API disabled"));
-                }
-            }
-            default -> event.embed(event.invalidCommandMessage());
-        }
-    }
+		switch (event.getSubcommandName()) {
+			case "list" -> event.paginate(
+				InventoryCommand.getPlayerInventoryList(
+					event.player,
+					event.getOptionStr("profile"),
+					event.getOptionInt("slot", 0),
+					new PaginatorEvent(event)
+				)
+			);
+			case "emoji" -> {
+				String[] playerInventory = InventoryCommand.getPlayerInventory(event.player, event.getOptionStr("profile"));
+				if (playerInventory != null) {
+					event.getHook().deleteOriginal().queue();
+					event.getChannel().sendMessage(playerInventory[0]).complete();
+					event.getChannel().sendMessage(playerInventory[1]).queue();
+					if (playerInventory[2].length() > 0) {
+						event
+							.getChannel()
+							.sendMessageEmbeds(defaultEmbed("Missing emojis").setDescription(playerInventory[2]).build())
+							.queue();
+					}
+				} else {
+					event.embed(invalidEmbed("Inventory API disabled"));
+				}
+			}
+			default -> event.embed(event.invalidCommandMessage());
+		}
+	}
 
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(name, "Main inventory command")
-                .addSubcommands(
-                        new SubcommandData("list", "Get a list of the player's inventory with lore")
-                                .addOption(OptionType.STRING, "player", "Player username or mention")
-                                .addOption(OptionType.STRING, "profile", "Profile name")
-                                .addOption(OptionType.INTEGER, "slot", "Slot number"),
-                        new SubcommandData("emoji", "Get a player's inventory represented in emojis")
-                                .addOption(OptionType.STRING, "player", "Player username or mention")
-                                .addOption(OptionType.STRING, "profile", "Profile name")
-                );
-    }
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData(name, "Main inventory command")
+			.addSubcommands(
+				new SubcommandData("list", "Get a list of the player's inventory with lore")
+					.addOption(OptionType.STRING, "player", "Player username or mention")
+					.addOption(OptionType.STRING, "profile", "Profile name")
+					.addOption(OptionType.INTEGER, "slot", "Slot number"),
+				new SubcommandData("emoji", "Get a player's inventory represented in emojis")
+					.addOption(OptionType.STRING, "player", "Player username or mention")
+					.addOption(OptionType.STRING, "profile", "Profile name")
+			);
+	}
 }

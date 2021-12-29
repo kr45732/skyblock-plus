@@ -18,29 +18,28 @@
 
 package com.skyblockplus.utils.structs;
 
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import static com.skyblockplus.utils.Utils.invalidEmbed;
 
+import net.dv8tion.jda.api.EmbedBuilder;
+
 public record DiscordInfoStruct(String discordTag, String username, String uuid, String failCause) {
+	public DiscordInfoStruct(String discordTag, String username, String uuid) {
+		this(discordTag, username, uuid, null);
+	}
 
-    public DiscordInfoStruct(String discordTag, String username, String uuid) {
-        this(discordTag, username, uuid, null);
-    }
+	public DiscordInfoStruct(String failCause) {
+		this(null, null, null, failCause);
+	}
 
-    public DiscordInfoStruct(String failCause) {
-        this(null, null, null, failCause);
-    }
+	public DiscordInfoStruct() {
+		this("Player is not linked on Hypixel");
+	}
 
-    public DiscordInfoStruct() {
-        this("Player is not linked on Hypixel");
-    }
+	public boolean isNotValid() {
+		return discordTag == null || username == null || uuid == null;
+	}
 
-    public boolean isNotValid() {
-        return discordTag == null || username == null || uuid == null;
-    }
-
-    public EmbedBuilder getFailEmbed() {
-        return invalidEmbed(failCause);
-    }
+	public EmbedBuilder getFailEmbed() {
+		return invalidEmbed(failCause);
+	}
 }

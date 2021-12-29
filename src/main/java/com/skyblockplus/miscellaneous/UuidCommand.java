@@ -18,54 +18,54 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import net.dv8tion.jda.api.EmbedBuilder;
 
-import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
-import static com.skyblockplus.utils.Utils.*;
-
 public class UuidCommand extends Command {
 
-    public UuidCommand() {
-        this.name = "uuid";
-        this.aliases = new String[]{"username"};
-        this.cooldown = globalCooldown + 1;
-        this.botPermissions = defaultPerms();
-    }
+	public UuidCommand() {
+		this.name = "uuid";
+		this.aliases = new String[] { "username" };
+		this.cooldown = globalCooldown + 1;
+		this.botPermissions = defaultPerms();
+	}
 
-    public static EmbedBuilder getUuidPlayer(String username) {
-        UsernameUuidStruct usernameUuid = usernameToUuid(username);
-        if (usernameUuid.isNotValid()) {
-            return invalidEmbed(usernameUuid.failCause());
-        }
+	public static EmbedBuilder getUuidPlayer(String username) {
+		UsernameUuidStruct usernameUuid = usernameToUuid(username);
+		if (usernameUuid.isNotValid()) {
+			return invalidEmbed(usernameUuid.failCause());
+		}
 
-        return defaultEmbed(usernameUuid.username(), "https://plancke.io/hypixel/player/stats/" + usernameUuid.username())
-                .setDescription("**Username:** " + usernameUuid.username() + "\n**Uuid:** " + usernameUuid.uuid())
-                .setThumbnail(usernameUuid.getAvatarlUrl());
-    }
+		return defaultEmbed(usernameUuid.username(), "https://plancke.io/hypixel/player/stats/" + usernameUuid.username())
+			.setDescription("**Username:** " + usernameUuid.username() + "\n**Uuid:** " + usernameUuid.uuid())
+			.setThumbnail(usernameUuid.getAvatarlUrl());
+	}
 
-    @Override
-    protected void execute(CommandEvent event) {
-        new CommandExecute(this, event) {
-            @Override
-            protected void execute() {
-                logCommand();
+	@Override
+	protected void execute(CommandEvent event) {
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
 
-                if (args.length == 2 || args.length == 1) {
-                    if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
-                        return;
-                    }
+				if (args.length == 2 || args.length == 1) {
+					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
+						return;
+					}
 
-                    embed(getUuidPlayer(username));
-                    return;
-                }
+					embed(getUuidPlayer(username));
+					return;
+				}
 
-                sendErrorEmbed();
-            }
-        }
-                .queue();
-    }
+				sendErrorEmbed();
+			}
+		}
+			.queue();
+	}
 }

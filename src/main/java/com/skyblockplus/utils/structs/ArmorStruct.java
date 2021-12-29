@@ -25,23 +25,23 @@ import lombok.Data;
 @AllArgsConstructor
 public class ArmorStruct {
 
-    private String helmet;
-    private String chestplate;
-    private String leggings;
-    private String boots;
+	private String helmet;
+	private String chestplate;
+	private String leggings;
+	private String boots;
 
-    public ArmorStruct() {
-        this.helmet = "Empty";
-        this.chestplate = "Empty";
-        this.leggings = "Empty";
-        this.boots = "Empty";
-    }
+	public ArmorStruct() {
+		this.helmet = "Empty";
+		this.chestplate = "Empty";
+		this.leggings = "Empty";
+		this.boots = "Empty";
+	}
 
-    public ArmorStruct makeBold() {
-        setHelmet("**" + getHelmet() + "**");
-        setChestplate("**" + getChestplate() + "**");
-        setLeggings("**" + getLeggings() + "**");
-        setBoots("**" + getBoots() + "**");
-        return this;
-    }
+	public ArmorStruct makeBold() {
+		setHelmet("**" + getHelmet() + "**");
+		setChestplate("**" + getChestplate() + "**");
+		setLeggings("**" + getLeggings() + "**");
+		setBoots("**" + getBoots() + "**");
+		return this;
+	}
 }

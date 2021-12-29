@@ -28,8 +28,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class CustomErrorController implements ErrorController {
 
-    @RequestMapping("/error")
-    public ResponseEntity<?> error() {
-        return new ResponseEntity<>(DataObject.empty().put("success", false).put("cause", "Bad request").toMap(), HttpStatus.BAD_REQUEST);
-    }
+	@RequestMapping("/error")
+	public ResponseEntity<?> error() {
+		return new ResponseEntity<>(DataObject.empty().put("success", false).put("cause", "Bad request").toMap(), HttpStatus.BAD_REQUEST);
+	}
 }

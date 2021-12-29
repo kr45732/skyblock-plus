@@ -24,19 +24,19 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class VoteSlashCommand extends SlashCommand {
 
-    public VoteSlashCommand() {
-        this.name = "vote";
-    }
+	public VoteSlashCommand() {
+		this.name = "vote";
+	}
 
-    @Override
-    protected void execute(SlashCommandExecutedEvent event) {
-        event.logCommand();
+	@Override
+	protected void execute(SlashCommandExecutedEvent event) {
+		event.logCommand();
 
-        event.embed(VoteCommand.getVoteEmbed());
-    }
+		event.embed(VoteCommand.getVoteEmbed());
+	}
 
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(name, "Get links where you can vote for the bot");
-    }
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData(name, "Get links where you can vote for the bot");
+	}
 }

@@ -25,19 +25,19 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class BinSlashCommand extends SlashCommand {
 
-    public BinSlashCommand() {
-        this.name = "bin";
-    }
+	public BinSlashCommand() {
+		this.name = "bin";
+	}
 
-    @Override
-    protected void execute(SlashCommandExecutedEvent event) {
-        event.logCommand();
+	@Override
+	protected void execute(SlashCommandExecutedEvent event) {
+		event.logCommand();
 
-        event.embed(BinCommand.getLowestBin(event.getOptionStr("item")));
-    }
+		event.embed(BinCommand.getLowestBin(event.getOptionStr("item")));
+	}
 
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(name, "Get the lowest bin of an item").addOption(OptionType.STRING, "item", "Item name", true);
-    }
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData(name, "Get the lowest bin of an item").addOption(OptionType.STRING, "item", "Item name", true);
+	}
 }

@@ -24,19 +24,19 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class TimeSlashCommand extends SlashCommand {
 
-    public TimeSlashCommand() {
-        this.name = "time";
-    }
+	public TimeSlashCommand() {
+		this.name = "time";
+	}
 
-    @Override
-    protected void execute(SlashCommandExecutedEvent event) {
-        event.logCommand();
+	@Override
+	protected void execute(SlashCommandExecutedEvent event) {
+		event.logCommand();
 
-        event.embed(TimeCommand.getSkyblockTime());
-    }
+		event.embed(TimeCommand.getSkyblockTime());
+	}
 
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(name, "Get the current Skyblock time and date");
-    }
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData(name, "Get the current Skyblock time and date");
+	}
 }

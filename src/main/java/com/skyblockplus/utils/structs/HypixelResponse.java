@@ -18,29 +18,28 @@
 
 package com.skyblockplus.utils.structs;
 
-import com.google.gson.JsonElement;
-
 import static com.skyblockplus.utils.Utils.higherDepth;
 
+import com.google.gson.JsonElement;
+
 public record HypixelResponse(JsonElement response, String failCause) {
+	public HypixelResponse(JsonElement response) {
+		this(response, null);
+	}
 
-    public HypixelResponse(JsonElement response) {
-        this(response, null);
-    }
+	public HypixelResponse(String failCase) {
+		this(null, failCase);
+	}
 
-    public HypixelResponse(String failCase) {
-        this(null, failCase);
-    }
+	public HypixelResponse() {
+		this("Unknown fail cause");
+	}
 
-    public HypixelResponse() {
-        this("Unknown fail cause");
-    }
+	public boolean isNotValid() {
+		return response == null;
+	}
 
-    public boolean isNotValid() {
-        return response == null;
-    }
-
-    public JsonElement get(String path) {
-        return higherDepth(response, path);
-    }
+	public JsonElement get(String path) {
+		return higherDepth(response, path);
+	}
 }

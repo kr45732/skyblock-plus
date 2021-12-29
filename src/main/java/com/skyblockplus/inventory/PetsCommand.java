@@ -18,6 +18,8 @@
 
 package com.skyblockplus.inventory;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
@@ -29,71 +31,68 @@ import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import net.dv8tion.jda.api.EmbedBuilder;
 
-import static com.skyblockplus.utils.Utils.*;
-
 public class PetsCommand extends Command {
 
-    public PetsCommand() {
-        this.name = "pets";
-        this.cooldown = globalCooldown;
-        this.botPermissions = defaultPerms();
-    }
+	public PetsCommand() {
+		this.name = "pets";
+		this.cooldown = globalCooldown;
+		this.botPermissions = defaultPerms();
+	}
 
-    public static EmbedBuilder getPlayerPets(String username, String profileName, PaginatorEvent event) {
-        Player player = profileName == null ? new Player(username) : new Player(username, profileName);
-        if (player.isValid()) {
-            CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(3).setItemsPerPage(15);
+	public static EmbedBuilder getPlayerPets(String username, String profileName, PaginatorEvent event) {
+		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+		if (player.isValid()) {
+			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(3).setItemsPerPage(15);
 
-            JsonArray playerPets = player.getPets();
-            for (JsonElement pet : playerPets) {
-                String petItem = null;
-                try {
-                    petItem = idToName(higherDepth(pet, "heldItem").getAsString()).toLowerCase();
-                } catch (Exception ignored) {
-                }
+			JsonArray playerPets = player.getPets();
+			for (JsonElement pet : playerPets) {
+				String petItem = null;
+				try {
+					petItem = idToName(higherDepth(pet, "heldItem").getAsString()).toLowerCase();
+				} catch (Exception ignored) {}
 
-                paginateBuilder.addItems(
-                        "**" +
-                                capitalizeString(higherDepth(pet, "type").getAsString().toLowerCase().replace("_", " ")) +
-                                " (" +
-                                petLevelFromXp(higherDepth(pet, "exp", 0L), higherDepth(pet, "tier").getAsString()) +
-                                ")**" +
-                                "\nTier: " +
-                                higherDepth(pet, "tier").getAsString().toLowerCase() +
-                                (petItem != null ? "\nItem: " + petItem : "")
-                );
-            }
-            paginateBuilder.setPaginatorExtras(
-                    new PaginatorExtras()
-                            .setEveryPageTitle(player.getUsername())
-                            .setEveryPageThumbnail(player.getThumbnailUrl())
-                            .setEveryPageTitleUrl(player.skyblockStatsLink())
-            );
-            event.paginate(paginateBuilder);
-            return null;
-        }
-        return player.getFailEmbed();
-    }
+				paginateBuilder.addItems(
+					"**" +
+					capitalizeString(higherDepth(pet, "type").getAsString().toLowerCase().replace("_", " ")) +
+					" (" +
+					petLevelFromXp(higherDepth(pet, "exp", 0L), higherDepth(pet, "tier").getAsString()) +
+					")**" +
+					"\nTier: " +
+					higherDepth(pet, "tier").getAsString().toLowerCase() +
+					(petItem != null ? "\nItem: " + petItem : "")
+				);
+			}
+			paginateBuilder.setPaginatorExtras(
+				new PaginatorExtras()
+					.setEveryPageTitle(player.getUsername())
+					.setEveryPageThumbnail(player.getThumbnailUrl())
+					.setEveryPageTitleUrl(player.skyblockStatsLink())
+			);
+			event.paginate(paginateBuilder);
+			return null;
+		}
+		return player.getFailEmbed();
+	}
 
-    @Override
-    protected void execute(CommandEvent event) {
-        new CommandExecute(this, event) {
-            @Override
-            protected void execute() {
-                logCommand();
+	@Override
+	protected void execute(CommandEvent event) {
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
 
-                if (args.length == 3 || args.length == 2 || args.length == 1) {
-                    if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
-                        return;
-                    }
+				if (args.length == 3 || args.length == 2 || args.length == 1) {
+					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
+						return;
+					}
 
-                    paginate(getPlayerPets(username, args.length == 3 ? args[2] : null, new PaginatorEvent(event)));
-                    return;
-                }
+					paginate(getPlayerPets(username, args.length == 3 ? args[2] : null, new PaginatorEvent(event)));
+					return;
+				}
 
-                sendErrorEmbed();
-            }
-        }
-                .queue();
-    }
+				sendErrorEmbed();
+			}
+		}
+			.queue();
+	}
 }

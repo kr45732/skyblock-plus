@@ -18,26 +18,25 @@
 
 package com.skyblockplus.features.jacob;
 
-import lombok.Data;
-
 import java.util.Iterator;
 import java.util.List;
+import lombok.Data;
 
 @Data
 public class JacobData {
 
-    private int year;
-    private List<JacobContest> contests;
+	private int year;
+	private List<JacobContest> contests;
 
-    public JacobContest getNextContest() {
-        for (Iterator<JacobContest> iterator = contests.iterator(); iterator.hasNext(); ) {
-            JacobContest contest = iterator.next();
-            if (contest.reminderHasPassed()) {
-                iterator.remove();
-            } else {
-                return contest;
-            }
-        }
-        return null;
-    }
+	public JacobContest getNextContest() {
+		for (Iterator<JacobContest> iterator = contests.iterator(); iterator.hasNext();) {
+			JacobContest contest = iterator.next();
+			if (contest.reminderHasPassed()) {
+				iterator.remove();
+			} else {
+				return contest;
+			}
+		}
+		return null;
+	}
 }

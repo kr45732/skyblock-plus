@@ -28,50 +28,50 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class WeightSlashCommand extends SlashCommand {
 
-    public WeightSlashCommand() {
-        this.name = "weight";
-    }
+	public WeightSlashCommand() {
+		this.name = "weight";
+	}
 
-    @Override
-    protected void execute(SlashCommandExecutedEvent event) {
-        event.logCommand();
+	@Override
+	protected void execute(SlashCommandExecutedEvent event) {
+		event.logCommand();
 
-        switch (event.getSubcommandName()) {
-            case "player" -> {
-                if (event.invalidPlayerOption()) {
-                    return;
-                }
-                event.paginate(WeightCommand.getPlayerWeight(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
-            }
-            case "calculate" -> event.embed(
-                    WeightCommand.calculateWeight(
-                            event.getOptionDouble("skill_average", 0),
-                            event.getOptionDouble("slayer", 0),
-                            event.getOptionDouble("catacombs", 0),
-                            event.getOptionDouble("average_class", 0)
-                    )
-            );
-            default -> event.embed(event.invalidCommandMessage());
-        }
-    }
+		switch (event.getSubcommandName()) {
+			case "player" -> {
+				if (event.invalidPlayerOption()) {
+					return;
+				}
+				event.paginate(WeightCommand.getPlayerWeight(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
+			}
+			case "calculate" -> event.embed(
+				WeightCommand.calculateWeight(
+					event.getOptionDouble("skill_average", 0),
+					event.getOptionDouble("slayer", 0),
+					event.getOptionDouble("catacombs", 0),
+					event.getOptionDouble("average_class", 0)
+				)
+			);
+			default -> event.embed(event.invalidCommandMessage());
+		}
+	}
 
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(name, "Main weight command")
-                .addSubcommands(
-                        new SubcommandData("player", "Get a player's weight")
-                                .addOption(OptionType.STRING, "player", "Player username or mention")
-                                .addOption(OptionType.STRING, "profile", "Profile name")
-                )
-                .addSubcommands(
-                        new SubcommandData("calculate", "Calculate predicted weight using given stats (not 100% accurate)")
-                                .addOptions(
-                                        new OptionData(OptionType.NUMBER, "skill_average", "Player's skill average", true).setRequiredRange(0, 55),
-                                        new OptionData(OptionType.NUMBER, "slayer", "Player's slayer XP", true).setRequiredRange(0, 500000000),
-                                        new OptionData(OptionType.NUMBER, "dungeons", "Player's catacombs level", true).setRequiredRange(0, 50),
-                                        new OptionData(OptionType.NUMBER, "average_class", "Player's average dungeon class level", true)
-                                                .setRequiredRange(0, 50)
-                                )
-                );
-    }
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData(name, "Main weight command")
+			.addSubcommands(
+				new SubcommandData("player", "Get a player's weight")
+					.addOption(OptionType.STRING, "player", "Player username or mention")
+					.addOption(OptionType.STRING, "profile", "Profile name")
+			)
+			.addSubcommands(
+				new SubcommandData("calculate", "Calculate predicted weight using given stats (not 100% accurate)")
+					.addOptions(
+						new OptionData(OptionType.NUMBER, "skill_average", "Player's skill average", true).setRequiredRange(0, 55),
+						new OptionData(OptionType.NUMBER, "slayer", "Player's slayer XP", true).setRequiredRange(0, 500000000),
+						new OptionData(OptionType.NUMBER, "dungeons", "Player's catacombs level", true).setRequiredRange(0, 50),
+						new OptionData(OptionType.NUMBER, "average_class", "Player's average dungeon class level", true)
+							.setRequiredRange(0, 50)
+					)
+			);
+	}
 }

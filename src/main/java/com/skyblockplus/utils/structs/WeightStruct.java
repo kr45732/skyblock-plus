@@ -18,43 +18,43 @@
 
 package com.skyblockplus.utils.structs;
 
-import lombok.Data;
-
 import static com.skyblockplus.utils.Utils.roundAndFormat;
+
+import lombok.Data;
 
 @Data
 public class WeightStruct {
 
-    private double base;
-    private double overflow;
+	private double base;
+	private double overflow;
 
-    public WeightStruct() {
-        this(0, 0);
-    }
+	public WeightStruct() {
+		this(0, 0);
+	}
 
-    public WeightStruct(double base) {
-        this(base, 0);
-    }
+	public WeightStruct(double base) {
+		this(base, 0);
+	}
 
-    public WeightStruct(double base, double overflow) {
-        this.base = base;
-        this.overflow = overflow;
-    }
+	public WeightStruct(double base, double overflow) {
+		this.base = base;
+		this.overflow = overflow;
+	}
 
-    /**
-     * Note: returns the weight struct being added, not this
-     **/
-    public WeightStruct add(WeightStruct o) {
-        this.base += o.base;
-        this.overflow += o.overflow;
-        return o;
-    }
+	/**
+	 * Note: returns the weight struct being added, not this
+	 **/
+	public WeightStruct add(WeightStruct o) {
+		this.base += o.base;
+		this.overflow += o.overflow;
+		return o;
+	}
 
-    public String getFormatted() {
-        return roundAndFormat(base + overflow) + (overflow > 0 ? " (" + roundAndFormat(base) + " + " + roundAndFormat(overflow) + ")" : "");
-    }
+	public String getFormatted() {
+		return roundAndFormat(base + overflow) + (overflow > 0 ? " (" + roundAndFormat(base) + " + " + roundAndFormat(overflow) + ")" : "");
+	}
 
-    public double getRaw() {
-        return base + overflow;
-    }
+	public double getRaw() {
+		return base + overflow;
+	}
 }

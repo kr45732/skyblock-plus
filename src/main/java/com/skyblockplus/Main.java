@@ -18,6 +18,9 @@
 
 package com.skyblockplus;
 
+import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.jagrosh.jdautilities.command.*;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.api.miscellaneous.PublicEndpoints;
@@ -61,6 +64,8 @@ import com.skyblockplus.utils.exceptionhandler.GlobalExceptionHandler;
 import com.skyblockplus.utils.slashcommand.SlashCommandClient;
 import com.skyblockplus.weight.WeightCommand;
 import com.skyblockplus.weight.WeightSlashCommand;
+import javax.annotation.PreDestroy;
+import javax.security.auth.login.LoginException;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -74,222 +79,216 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import javax.annotation.PreDestroy;
-import javax.security.auth.login.LoginException;
-
-import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
-import static com.skyblockplus.utils.Utils.*;
-
 @SpringBootApplication
 public class Main {
 
-    public static final Logger log = LoggerFactory.getLogger(Main.class);
-    public static JDA jda;
-    public static Database database;
-    public static EventWaiter waiter;
-    public static GlobalExceptionHandler globalExceptionHandler;
-    public static CommandClient client;
-    public static SlashCommandClient slashCommandClient;
+	public static final Logger log = LoggerFactory.getLogger(Main.class);
+	public static JDA jda;
+	public static Database database;
+	public static EventWaiter waiter;
+	public static GlobalExceptionHandler globalExceptionHandler;
+	public static CommandClient client;
+	public static SlashCommandClient slashCommandClient;
 
-    public static void main(String[] args) throws LoginException, IllegalArgumentException {
-        Main.globalExceptionHandler = new GlobalExceptionHandler();
-        Thread.setDefaultUncaughtExceptionHandler(globalExceptionHandler);
-        RestAction.setDefaultFailure(e -> globalExceptionHandler.uncaughtException(null, e));
+	public static void main(String[] args) throws LoginException, IllegalArgumentException {
+		Main.globalExceptionHandler = new GlobalExceptionHandler();
+		Thread.setDefaultUncaughtExceptionHandler(globalExceptionHandler);
+		RestAction.setDefaultFailure(e -> globalExceptionHandler.uncaughtException(null, e));
 
-        Utils.initialize();
-        Constants.initialize();
+		Utils.initialize();
+		Constants.initialize();
 
-        Main.database = SpringApplication.run(Main.class, args).getBean(Database.class);
-        Main.waiter = new EventWaiter(scheduler, true);
-        Main.client =
-                new CommandClientBuilder()
-                        .setOwnerId("385939031596466176")
-                        .setEmojis("✅", "⚠️", "❌")
-                        .useHelpBuilder(false)
-                        .setPrefixFunction(event -> event.isFromGuild() ? getGuildPrefix(event.getGuild().getId()) : DEFAULT_PREFIX)
-                        .setListener(
-                                new CommandListener() {
-                                    @Override
-                                    public void onCommandException(CommandEvent event, Command command, Throwable throwable) {
-                                        globalExceptionHandler.uncaughtException(event, command, throwable);
-                                    }
-                                }
-                        )
-                        .addCommands(
-                                new InformationCommand(),
-                                new SlayerCommand(),
-                                new HelpCommand(),
-                                new GuildCommand(),
-                                new AuctionCommand(),
-                                new BinCommand(),
-                                new SkillsCommand(),
-                                new DungeonsCommand(),
-                                new RolesCommand(),
-                                new GuildRanksCommand(),
-                                new EssenceCommand(),
-                                new BankCommand(),
-                                new WardrobeCommand(),
-                                new TalismanBagCommand(),
-                                new InventoryCommand(),
-                                new SacksCommand(),
-                                new WeightCommand(),
-                                new HypixelCommand(),
-                                new UuidCommand(),
-                                new SettingsCommand(),
-                                new ReloadCommand(),
-                                new SetupCommand(),
-                                new CategoriesCommand(),
-                                new PartyFinderCommand(),
-                                new DevSettingsCommand(),
-                                new GetServerEmojisCommand(),
-                                new EnderChestCommand(),
-                                new LinkCommand(),
-                                new GetSettingsCommand(),
-                                new UnlinkCommand(),
-                                new LinkedUserCommand(),
-                                new BazaarCommand(),
-                                new AverageAuctionCommand(),
-                                new PetsCommand(),
-                                new SkyblockEventCommand(),
-                                new DeleteMessagesCommand(),
-                                new PlaceholderCommand(),
-                                new ProfilesCommand(),
-                                new NetworthCommand(),
-                                new QueryAuctionCommand(),
-                                new BidsCommand(),
-                                new BitsCommand(),
-                                new EvaluateCommand(),
-                                new GuildKickerCommand(),
-                                new MissingTalismansCommand(),
-                                new UpdateSlashCommands(),
-                                new CalculateCommand(),
-                                new EmojiFromUrlCommand(),
-                                new GuildLeaderboardCommand(),
-                                new ArmorCommand(),
-                                new FetchurCommand(),
-                                new CheckEmojisCommand(),
-                                new HarpCommand(),
-                                new CakesCommand(),
-                                new ActiveCoinsCommand(),
-                                new HotmCommand(),
-                                new VoteCommand(),
-                                new TrackAuctionsCommand(),
-                                new SkyblockCommand(),
-                                new GuildStatisticsCommand(),
-                                new PartyCommand(),
-                                new TimeCommand()
-                        )
-                        .build();
+		Main.database = SpringApplication.run(Main.class, args).getBean(Database.class);
+		Main.waiter = new EventWaiter(scheduler, true);
+		Main.client =
+			new CommandClientBuilder()
+				.setOwnerId("385939031596466176")
+				.setEmojis("✅", "⚠️", "❌")
+				.useHelpBuilder(false)
+				.setPrefixFunction(event -> event.isFromGuild() ? getGuildPrefix(event.getGuild().getId()) : DEFAULT_PREFIX)
+				.setListener(
+					new CommandListener() {
+						@Override
+						public void onCommandException(CommandEvent event, Command command, Throwable throwable) {
+							globalExceptionHandler.uncaughtException(event, command, throwable);
+						}
+					}
+				)
+				.addCommands(
+					new InformationCommand(),
+					new SlayerCommand(),
+					new HelpCommand(),
+					new GuildCommand(),
+					new AuctionCommand(),
+					new BinCommand(),
+					new SkillsCommand(),
+					new DungeonsCommand(),
+					new RolesCommand(),
+					new GuildRanksCommand(),
+					new EssenceCommand(),
+					new BankCommand(),
+					new WardrobeCommand(),
+					new TalismanBagCommand(),
+					new InventoryCommand(),
+					new SacksCommand(),
+					new WeightCommand(),
+					new HypixelCommand(),
+					new UuidCommand(),
+					new SettingsCommand(),
+					new ReloadCommand(),
+					new SetupCommand(),
+					new CategoriesCommand(),
+					new PartyFinderCommand(),
+					new DevSettingsCommand(),
+					new GetServerEmojisCommand(),
+					new EnderChestCommand(),
+					new LinkCommand(),
+					new GetSettingsCommand(),
+					new UnlinkCommand(),
+					new LinkedUserCommand(),
+					new BazaarCommand(),
+					new AverageAuctionCommand(),
+					new PetsCommand(),
+					new SkyblockEventCommand(),
+					new DeleteMessagesCommand(),
+					new PlaceholderCommand(),
+					new ProfilesCommand(),
+					new NetworthCommand(),
+					new QueryAuctionCommand(),
+					new BidsCommand(),
+					new BitsCommand(),
+					new EvaluateCommand(),
+					new GuildKickerCommand(),
+					new MissingTalismansCommand(),
+					new UpdateSlashCommands(),
+					new CalculateCommand(),
+					new EmojiFromUrlCommand(),
+					new GuildLeaderboardCommand(),
+					new ArmorCommand(),
+					new FetchurCommand(),
+					new CheckEmojisCommand(),
+					new HarpCommand(),
+					new CakesCommand(),
+					new ActiveCoinsCommand(),
+					new HotmCommand(),
+					new VoteCommand(),
+					new TrackAuctionsCommand(),
+					new SkyblockCommand(),
+					new GuildStatisticsCommand(),
+					new PartyCommand(),
+					new TimeCommand()
+				)
+				.build();
 
-        slashCommandClient =
-                new SlashCommandClient()
-                        .setOwnerId("385939031596466176")
-                        .addCommands(
-                                new InviteSlashCommand(),
-                                new VoteSlashCommand(),
-                                new HotmSlashCommand(),
-                                new InformationSlashCommand(),
-                                new LinkSlashCommand(),
-                                new UnlinkSlashCommand(),
-                                new SlayerSlashCommand(),
-                                new SkillsSlashCommand(),
-                                new DungeonsSlashCommand(),
-                                new EssenceSlashCommand(),
-                                new PartyFinderSlashCommand(),
-                                new GuildSlashCommand(),
-                                new HelpSlashCommand(),
-                                new AuctionsSlashCommand(),
-                                new BinSlashCommand(),
-                                new BazaarSlashCommand(),
-                                new AverageAuctionSlashCommand(),
-                                new BidsSlashCommand(),
-                                new QueryAuctionsSlashCommand(),
-                                new BitsSlashCommand(),
-                                new RolesSlashCommand(),
-                                new BankSlashCommand(),
-                                new WeightSlashCommand(),
-                                new HypixelSlashCommand(),
-                                new ProfilesSlashCommand(),
-                                new MissingTalismansSlashCommand(),
-                                new CalculateSlashCommand(),
-                                new SetupSlashCommand(),
-                                new SkyblockEventSlashCommand(),
-                                new FetchurSlashCommand(),
-                                new NetworthSlashCommand(),
-                                new InventorySlashCommand(),
-                                new ArmorSlashCommand(),
-                                new EnderChestSlashCommand(),
-                                new TalismanBagSlashCommand(),
-                                new SacksSlashCommand(),
-                                new WardrobeSlashCommand(),
-                                new HarpSlashCommand(),
-                                new CakesSlashCommand(),
-                                new ActiveCoinsSlashCommand(),
-                                new GuildLeaderboardSlashCommand(),
-                                new GuildRanksSlashCommand(),
-                                new GuildKickerSlashCommand(),
-                                new PetsSlashCommand(),
-                                new UuidSlashCommand(),
-                                new TrackAuctionsSlashCommand(),
-                                new SkyblockSlashCommand(),
-                                new GuildStatisticsSlashCommand(),
-                                new PartySlashCommand(),
-                                new SettingsSlashCommand(),
-                                new TimeSlashCommand(),
-                                new ReloadSlashCommand()
-                        );
+		slashCommandClient =
+			new SlashCommandClient()
+				.setOwnerId("385939031596466176")
+				.addCommands(
+					new InviteSlashCommand(),
+					new VoteSlashCommand(),
+					new HotmSlashCommand(),
+					new InformationSlashCommand(),
+					new LinkSlashCommand(),
+					new UnlinkSlashCommand(),
+					new SlayerSlashCommand(),
+					new SkillsSlashCommand(),
+					new DungeonsSlashCommand(),
+					new EssenceSlashCommand(),
+					new PartyFinderSlashCommand(),
+					new GuildSlashCommand(),
+					new HelpSlashCommand(),
+					new AuctionsSlashCommand(),
+					new BinSlashCommand(),
+					new BazaarSlashCommand(),
+					new AverageAuctionSlashCommand(),
+					new BidsSlashCommand(),
+					new QueryAuctionsSlashCommand(),
+					new BitsSlashCommand(),
+					new RolesSlashCommand(),
+					new BankSlashCommand(),
+					new WeightSlashCommand(),
+					new HypixelSlashCommand(),
+					new ProfilesSlashCommand(),
+					new MissingTalismansSlashCommand(),
+					new CalculateSlashCommand(),
+					new SetupSlashCommand(),
+					new SkyblockEventSlashCommand(),
+					new FetchurSlashCommand(),
+					new NetworthSlashCommand(),
+					new InventorySlashCommand(),
+					new ArmorSlashCommand(),
+					new EnderChestSlashCommand(),
+					new TalismanBagSlashCommand(),
+					new SacksSlashCommand(),
+					new WardrobeSlashCommand(),
+					new HarpSlashCommand(),
+					new CakesSlashCommand(),
+					new ActiveCoinsSlashCommand(),
+					new GuildLeaderboardSlashCommand(),
+					new GuildRanksSlashCommand(),
+					new GuildKickerSlashCommand(),
+					new PetsSlashCommand(),
+					new UuidSlashCommand(),
+					new TrackAuctionsSlashCommand(),
+					new SkyblockSlashCommand(),
+					new GuildStatisticsSlashCommand(),
+					new PartySlashCommand(),
+					new SettingsSlashCommand(),
+					new TimeSlashCommand(),
+					new ReloadSlashCommand()
+				);
 
-        jda =
-                JDABuilder
-                        .createDefault(BOT_TOKEN)
-                        .setStatus(OnlineStatus.DO_NOT_DISTURB)
-                        .addEventListeners(
-                                new ExceptionEventListener(waiter),
-                                client,
-                                new ExceptionEventListener(slashCommandClient),
-                                new ExceptionEventListener(new MainListener())
-                        )
-                        .setActivity(Activity.playing("Loading..."))
-                        .setMemberCachePolicy(MemberCachePolicy.ALL)
-                        .disableCache(CacheFlag.VOICE_STATE)
-                        .enableIntents(GatewayIntent.GUILD_MEMBERS)
-                        .build();
+		jda =
+			JDABuilder
+				.createDefault(BOT_TOKEN)
+				.setStatus(OnlineStatus.DO_NOT_DISTURB)
+				.addEventListeners(
+					new ExceptionEventListener(waiter),
+					client,
+					new ExceptionEventListener(slashCommandClient),
+					new ExceptionEventListener(new MainListener())
+				)
+				.setActivity(Activity.playing("Loading..."))
+				.setMemberCachePolicy(MemberCachePolicy.ALL)
+				.disableCache(CacheFlag.VOICE_STATE)
+				.enableIntents(GatewayIntent.GUILD_MEMBERS)
+				.build();
 
-        try {
-            jda.awaitReady();
-        } catch (InterruptedException e) {
-            log.error(e.getMessage(), e);
-        }
+		try {
+			jda.awaitReady();
+		} catch (InterruptedException e) {
+			log.error(e.getMessage(), e);
+		}
 
-        ApiHandler.initialize();
-        TrackAuctionsCommand.initialize();
-        AuctionFlipper.setEnable(true);
-        PublicEndpoints.initialize();
-        FetchurHandler.initialize();
-    }
+		ApiHandler.initialize();
+		TrackAuctionsCommand.initialize();
+		AuctionFlipper.setEnable(true);
+		PublicEndpoints.initialize();
+		FetchurHandler.initialize();
+	}
 
-    @PreDestroy
-    public void onExit() {
-        log.info("Stopping");
+	@PreDestroy
+	public void onExit() {
+		log.info("Stopping");
 
-        log.info("Caching Apply Users");
-        cacheApplyGuildUsers();
+		log.info("Caching Apply Users");
+		cacheApplyGuildUsers();
 
-        log.info("Caching Parties");
-        cacheParties();
+		log.info("Caching Parties");
+		cacheParties();
 
-        log.info("Caching Command Uses");
-        cacheCommandUses();
+		log.info("Caching Command Uses");
+		cacheCommandUses();
 
-        log.info("Caching Jacob Data");
-        cacheJacobData();
+		log.info("Caching Jacob Data");
+		cacheJacobData();
 
-        log.info("Closing Http Client");
-        closeHttpClient();
+		log.info("Closing Http Client");
+		closeHttpClient();
 
-        log.info("Closing Async Http Client");
-        closeAsyncHttpClient();
+		log.info("Closing Async Http Client");
+		closeAsyncHttpClient();
 
-        log.info("Finished");
-    }
+		log.info("Finished");
+	}
 }

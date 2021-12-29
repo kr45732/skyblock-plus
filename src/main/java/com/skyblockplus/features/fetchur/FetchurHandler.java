@@ -18,36 +18,35 @@
 
 package com.skyblockplus.features.fetchur;
 
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.utils.Utils.scheduler;
+
 import com.skyblockplus.features.listeners.AutomaticGuild;
 import com.skyblockplus.miscellaneous.FetchurCommand;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.concurrent.TimeUnit;
-
-import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.Utils.scheduler;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 
 public class FetchurHandler {
 
-    public static void initialize() {
-        ZoneId z = ZoneId.of("America/New_York");
-        ZonedDateTime now = ZonedDateTime.now(z);
-        LocalDate tomorrow = now.toLocalDate().plusDays(1);
+	public static void initialize() {
+		ZoneId z = ZoneId.of("America/New_York");
+		ZonedDateTime now = ZonedDateTime.now(z);
+		LocalDate tomorrow = now.toLocalDate().plusDays(1);
 
-        scheduler.scheduleAtFixedRate(
-                () -> {
-                    MessageEmbed embed = FetchurCommand.getFetchurItem().build();
-                    for (AutomaticGuild guild : guildMap.values()) {
-                        guild.onFetchur(embed);
-                    }
-                },
-                Duration.between(now, tomorrow.atStartOfDay(z)).plusMillis(1).toMillis(),
-                TimeUnit.DAYS.toMillis(1),
-                TimeUnit.MILLISECONDS
-        );
-    }
+		scheduler.scheduleAtFixedRate(
+			() -> {
+				MessageEmbed embed = FetchurCommand.getFetchurItem().build();
+				for (AutomaticGuild guild : guildMap.values()) {
+					guild.onFetchur(embed);
+				}
+			},
+			Duration.between(now, tomorrow.atStartOfDay(z)).plusMillis(1).toMillis(),
+			TimeUnit.DAYS.toMillis(1),
+			TimeUnit.MILLISECONDS
+		);
+	}
 }

@@ -18,6 +18,10 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.features.listeners.MainListener.*;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.defaultPerms;
+
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
@@ -25,36 +29,32 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 
-import static com.skyblockplus.features.listeners.MainListener.*;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.defaultPerms;
-
 public class ReloadCommand extends Command {
 
-    public ReloadCommand() {
-        this.name = "reload";
-        this.cooldown = 45;
-        this.userPermissions = new Permission[]{Permission.ADMINISTRATOR};
-        this.botPermissions = defaultPerms();
-    }
+	public ReloadCommand() {
+		this.name = "reload";
+		this.cooldown = 45;
+		this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
+		this.botPermissions = defaultPerms();
+	}
 
-    public static EmbedBuilder getReloadEmbed(Guild guild) {
-        return defaultEmbed("Reload Settings for " + guild.getName())
-                .addField("Apply settings reload status", onApplyReload(guild.getId()), false)
-                .addField("Verify settings reload status", onVerifyReload(guild.getId()), false)
-                .addField("Mee6 roles reload status", onMee6Reload(guild.getId()), false);
-    }
+	public static EmbedBuilder getReloadEmbed(Guild guild) {
+		return defaultEmbed("Reload Settings for " + guild.getName())
+			.addField("Apply settings reload status", onApplyReload(guild.getId()), false)
+			.addField("Verify settings reload status", onVerifyReload(guild.getId()), false)
+			.addField("Mee6 roles reload status", onMee6Reload(guild.getId()), false);
+	}
 
-    @Override
-    protected void execute(CommandEvent event) {
-        new CommandExecute(this, event) {
-            @Override
-            protected void execute() {
-                logCommand();
+	@Override
+	protected void execute(CommandEvent event) {
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
 
-                embed(getReloadEmbed(event.getGuild()));
-            }
-        }
-                .queue();
-    }
+				embed(getReloadEmbed(event.getGuild()));
+			}
+		}
+			.queue();
+	}
 }

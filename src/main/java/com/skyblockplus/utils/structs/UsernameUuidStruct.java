@@ -19,28 +19,27 @@
 package com.skyblockplus.utils.structs;
 
 public record UsernameUuidStruct(String username, String uuid, String failCause) {
+	public UsernameUuidStruct(String username, String uuid) {
+		this(username, uuid, null);
+	}
 
-    public UsernameUuidStruct(String username, String uuid) {
-        this(username, uuid, null);
-    }
+	public UsernameUuidStruct(String failCause) {
+		this(null, null, failCause);
+	}
 
-    public UsernameUuidStruct(String failCause) {
-        this(null, null, failCause);
-    }
+	public UsernameUuidStruct() {
+		this("Unknown fail cause");
+	}
 
-    public UsernameUuidStruct() {
-        this("Unknown fail cause");
-    }
+	public boolean isNotValid() {
+		return username == null || uuid == null;
+	}
 
-    public boolean isNotValid() {
-        return username == null || uuid == null;
-    }
+	public String getAvatarlUrl() {
+		return "https://cravatar.eu/helmavatar/" + uuid + "/64.png";
+	}
 
-    public String getAvatarlUrl() {
-        return "https://cravatar.eu/helmavatar/" + uuid + "/64.png";
-    }
-
-    public String getAuctionUrl() {
-        return "https://auctions.craftlink.xyz/players/" + uuid;
-    }
+	public String getAuctionUrl() {
+		return "https://auctions.craftlink.xyz/players/" + uuid;
+	}
 }

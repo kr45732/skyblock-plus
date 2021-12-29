@@ -27,38 +27,38 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class PartySlashCommand extends SlashCommand {
 
-    public PartySlashCommand() {
-        this.name = "party";
-    }
+	public PartySlashCommand() {
+		this.name = "party";
+	}
 
-    @Override
-    protected void execute(SlashCommandExecutedEvent event) {
-        event.logCommand();
+	@Override
+	protected void execute(SlashCommandExecutedEvent event) {
+		event.logCommand();
 
-        switch (event.getSubcommandName()) {
-            case "create" -> event.paginate(PartyCommand.createParty(new PaginatorEvent(event)), true);
-            case "list" -> event.embed(PartyCommand.getPartyList(event.getGuild().getId()));
-            case "leave" -> event.embed(PartyCommand.leaveParty(new PaginatorEvent(event)));
-            case "disband" -> event.embed(PartyCommand.disbandParty(new PaginatorEvent(event)));
-            case "join" -> event.embed(PartyCommand.joinParty(event.getOptionStr("username"), new PaginatorEvent(event)));
-            case "kick" -> event.embed(PartyCommand.kickMemberFromParty(event.getOptionStr("username"), new PaginatorEvent(event)));
-            case "current" -> event.embed(PartyCommand.getCurrentParty(new PaginatorEvent(event)));
-            default -> event.embed(event.invalidCommandMessage());
-        }
-    }
+		switch (event.getSubcommandName()) {
+			case "create" -> event.paginate(PartyCommand.createParty(new PaginatorEvent(event)), true);
+			case "list" -> event.embed(PartyCommand.getPartyList(event.getGuild().getId()));
+			case "leave" -> event.embed(PartyCommand.leaveParty(new PaginatorEvent(event)));
+			case "disband" -> event.embed(PartyCommand.disbandParty(new PaginatorEvent(event)));
+			case "join" -> event.embed(PartyCommand.joinParty(event.getOptionStr("username"), new PaginatorEvent(event)));
+			case "kick" -> event.embed(PartyCommand.kickMemberFromParty(event.getOptionStr("username"), new PaginatorEvent(event)));
+			case "current" -> event.embed(PartyCommand.getCurrentParty(new PaginatorEvent(event)));
+			default -> event.embed(event.invalidCommandMessage());
+		}
+	}
 
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(name, "Main party command")
-                .addSubcommands(
-                        new SubcommandData("create", "Interactive message to create a new party"),
-                        new SubcommandData("list", "List all active parties"),
-                        new SubcommandData("leave", "Leave your current party"),
-                        new SubcommandData("disband", "Disband your current party"),
-                        new SubcommandData("current", "Get information about the party you are currently in"),
-                        new SubcommandData("join", "Join a party").addOption(OptionType.STRING, "username", "The party leader's username", true),
-                        new SubcommandData("kick", "Kick a member from your party")
-                                .addOption(OptionType.STRING, "username", "The party member's username", true)
-                );
-    }
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData(name, "Main party command")
+			.addSubcommands(
+				new SubcommandData("create", "Interactive message to create a new party"),
+				new SubcommandData("list", "List all active parties"),
+				new SubcommandData("leave", "Leave your current party"),
+				new SubcommandData("disband", "Disband your current party"),
+				new SubcommandData("current", "Get information about the party you are currently in"),
+				new SubcommandData("join", "Join a party").addOption(OptionType.STRING, "username", "The party leader's username", true),
+				new SubcommandData("kick", "Kick a member from your party")
+					.addOption(OptionType.STRING, "username", "The party member's username", true)
+			);
+	}
 }

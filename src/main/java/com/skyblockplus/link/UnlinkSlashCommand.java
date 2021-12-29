@@ -25,18 +25,18 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class UnlinkSlashCommand extends SlashCommand {
 
-    public UnlinkSlashCommand() {
-        this.name = "unlink";
-    }
+	public UnlinkSlashCommand() {
+		this.name = "unlink";
+	}
 
-    @Override
-    protected void execute(SlashCommandExecutedEvent event) {
-        event.logCommand();
-        event.embed(UnlinkCommand.unlinkAccount(new PaginatorEvent(event)));
-    }
+	@Override
+	protected void execute(SlashCommandExecutedEvent event) {
+		event.logCommand();
+		event.embed(UnlinkCommand.unlinkAccount(new PaginatorEvent(event)));
+	}
 
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(name, "Unlink your account from this bot");
-    }
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData(name, "Unlink your account from this bot");
+	}
 }

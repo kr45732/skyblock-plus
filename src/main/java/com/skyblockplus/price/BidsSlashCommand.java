@@ -26,23 +26,23 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class BidsSlashCommand extends SlashCommand {
 
-    public BidsSlashCommand() {
-        this.name = "bids";
-    }
+	public BidsSlashCommand() {
+		this.name = "bids";
+	}
 
-    @Override
-    protected void execute(SlashCommandExecutedEvent event) {
-        event.logCommand();
+	@Override
+	protected void execute(SlashCommandExecutedEvent event) {
+		event.logCommand();
 
-        if (event.invalidPlayerOption()) {
-            return;
-        }
+		if (event.invalidPlayerOption()) {
+			return;
+		}
 
-        event.paginate(BidsCommand.getPlayerBids(event.player, new PaginatorEvent(event)));
-    }
+		event.paginate(BidsCommand.getPlayerBids(event.player, new PaginatorEvent(event)));
+	}
 
-    @Override
-    public CommandData getCommandData() {
-        return new CommandData(name, "Get a player's bids").addOption(OptionType.STRING, "player", "Player username or mention");
-    }
+	@Override
+	public CommandData getCommandData() {
+		return new CommandData(name, "Get a player's bids").addOption(OptionType.STRING, "player", "Player username or mention");
+	}
 }
