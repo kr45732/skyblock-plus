@@ -125,7 +125,7 @@ public class ApplyUser implements Serializable {
 
 		getNameHistory(player.getUuid()).forEach(i -> nameHistory += "\n• " + fixUsername(i));
 		if (profileNames.length == 1) {
-			logMessage(applicationChannel.sendMessage(applyingUser.getAsMention()).complete());
+			applicationChannel.sendMessage(applyingUser.getAsMention()).complete();
 			caseOne(profileNames[0], currentSettings, applicationChannel);
 		} else {
 			EmbedBuilder welcomeEb = this.defaultPlayerEmbed();
@@ -157,7 +157,6 @@ public class ApplyUser implements Serializable {
 			profileEmojiToName.put("↩️", player.getProfileName());
 
 			Message reactMessage = applicationChannel.sendMessage(applyingUser.getAsMention()).setEmbeds(welcomeEb.build()).complete();
-			logMessage(reactMessage);
 			this.reactMessageId = reactMessage.getId();
 
 			for (String profileEmoji : profileEmojiToName.keySet()) {
@@ -197,7 +196,7 @@ public class ApplyUser implements Serializable {
 		if (state == 0) {
 			reactMessage.clearReactions().queue();
 			if (event.getReactionEmote().getAsReactionCode().equals("❌")) {
-				event.getChannel().sendMessageEmbeds(defaultEmbed("Closing channel").build()).queue(this::logMessage);
+				event.getChannel().sendMessageEmbeds(defaultEmbed("Closing channel").build()).queue();
 				event
 					.getGuild()
 					.getTextChannelById(event.getChannel().getId())
@@ -281,7 +280,6 @@ public class ApplyUser implements Serializable {
 					.sendMessageEmbeds(reqEmbed.build())
 					.setActionRow(Button.success("apply_user_delete_channel", "Close Channel"))
 					.complete();
-			logMessage(reactMessage);
 			this.reactMessageId = reactMessage.getId();
 			state = 3;
 		} else {
@@ -333,7 +331,6 @@ public class ApplyUser implements Serializable {
 						Button.danger("apply_user_cancel", "Cancel")
 					)
 					.complete();
-			logMessage(reactMessage);
 			this.reactMessageId = reactMessage.getId();
 			state = 1;
 		}
@@ -402,7 +399,6 @@ public class ApplyUser implements Serializable {
 						Message reactMessage = staffPingMentions.isEmpty()
 							? staffChannel.sendMessageEmbeds(applyPlayerStats.build()).setActionRow(row).complete()
 							: staffChannel.sendMessage(staffPingMentions).setEmbeds(applyPlayerStats.build()).setActionRow(row).complete();
-						logMessage(reactMessage);
 						reactMessageId = reactMessage.getId();
 						return true;
 					}
@@ -502,7 +498,6 @@ public class ApplyUser implements Serializable {
 						}
 
 						reactMessage = action.complete();
-						logMessage(reactMessage);
 
 						state = 3;
 						if (waitInviteChannel != null) {
@@ -521,7 +516,7 @@ public class ApplyUser implements Serializable {
 										"Invited"
 									)
 								)
-								.queue(this::logMessage);
+								.queue();
 						} else {
 							try {
 								event
@@ -577,7 +572,6 @@ public class ApplyUser implements Serializable {
 							}
 
 							reactMessage = action.complete();
-							logMessage(reactMessage);
 
 							state = 3;
 							if (waitInviteChannel != null) {
@@ -598,7 +592,7 @@ public class ApplyUser implements Serializable {
 											"Invited"
 										)
 									)
-									.queue(this::logMessage);
+									.queue();
 							} else {
 								try {
 									event
@@ -642,7 +636,6 @@ public class ApplyUser implements Serializable {
 								.setEmbeds(eb.build())
 								.setActionRow(Button.success("apply_user_delete_channel", "Close Channel"))
 								.complete();
-						logMessage(reactMessage);
 						state = 3;
 						this.reactMessageId = reactMessage.getId();
 						return true;
@@ -707,11 +700,6 @@ public class ApplyUser implements Serializable {
 		return false;
 	}
 
-	public void logMessage(Message message) {
-		if (logApplication) {
-			logs.add(ApplyLog.toLog(message));
-		}
-	}
 
 	public boolean onGuildMessageReceived(GuildMessageReceivedEvent event) {
 		if (!event.getChannel().getId().equals(applicationChannelId)) {
@@ -722,7 +710,7 @@ public class ApplyUser implements Serializable {
 			return true;
 		}
 
-		logMessage(event.getMessage());
+		logs.add(ApplyLog.toLog(event.getMessage()));
 		return true;
 	}
 }

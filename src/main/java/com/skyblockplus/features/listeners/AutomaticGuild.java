@@ -643,6 +643,7 @@ public class AutomaticGuild {
 					.get(0)
 					.getDescription()
 					.contains("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO/commit/")
+					&& isMainBot()
 			) {
 				updateItemMappings();
 				internalJsonMappings = null;
