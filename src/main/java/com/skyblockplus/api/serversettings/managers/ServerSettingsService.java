@@ -646,4 +646,26 @@ public class ServerSettingsService {
 
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
+
+	public ResponseEntity<HttpStatus> setFetchurRole(String serverId, String newRoleId) {
+		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+		if (currentServerSettings != null) {
+			currentServerSettings.setFetchurRole(newRoleId);
+			settingsRepository.save(currentServerSettings);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	}
+
+	public ResponseEntity<?> getFetchurRole(String serverId) {
+		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+		if (currentServerSettings != null) {
+			return new ResponseEntity<>(currentServerSettings.getFetchurRole(), HttpStatus.OK);
+		}
+
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	}
 }

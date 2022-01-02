@@ -215,14 +215,6 @@ public class Database {
 		return settingsService.setApplyBlacklist(serverId, gson.fromJson(newSettings, ApplyBlacklist[].class)).getStatusCodeValue();
 	}
 
-	public String getPartyFinderCategoryId(String serverId) {
-		try {
-			return (String) settingsService.getPartyFinderCategoryId(serverId).getBody();
-		} catch (Exception e) {
-			return null;
-		}
-	}
-
 	public int setPartyFinderCategoryId(String serverId, String newSettings) {
 		return settingsService.setPartyFinderCategoryId(serverId, newSettings).getStatusCodeValue();
 	}
@@ -251,15 +243,11 @@ public class Database {
 		return settingsService.setJacobSettings(serverId, gson.fromJson(newSettings, JacobSettings.class)).getStatusCodeValue();
 	}
 
-	public String getFetchurChannelId(String serverId) {
-		try {
-			return (String) settingsService.getFetchurChannelId(serverId).getBody();
-		} catch (Exception e) {
-			return null;
-		}
-	}
-
 	public int setFetchurChannelId(String serverId, String newSettings) {
 		return settingsService.setFetchurChannelId(serverId, newSettings).getStatusCodeValue();
 	}
+
+    public int setFetchurRole(String serverId, String newSettings) {
+		return settingsService.setFetchurRole(serverId, newSettings).getStatusCodeValue();
+    }
 }

@@ -108,6 +108,7 @@ public class SettingsExecute {
 				case "pf_category" -> eb = setPartyFinderCategory(args[3]);
 				case "guest_role" -> eb = setApplyGuestRole(args[3]);
 				case "fetchur_channel" -> eb = setFetchurChannel(args[3]);
+				case "fetchur_ping" -> eb = setFetchurPing(args[3]);
 			}
 		} else if (
 			(args.length == 4 || args.length == 5 || content.split(" ", 6).length == 6) &&
@@ -172,11 +173,13 @@ public class SettingsExecute {
 			eb = defaultSettingsEmbed();
 			eb.addField("Prefix", higherDepth(currentSettings, "prefix", DEFAULT_PREFIX), false);
 			String hypixelKey = database.getServerHypixelApiKey(guild.getId());
-			eb.addField("Hypixel API Key", hypixelKey != null && hypixelKey.length() > 0 ? "Hidden" : "Not set", false);
+			eb.addField("Hypixel API Key", hypixelKey != null && !hypixelKey.isEmpty() ? "Hidden" : "Not set", false);
 			String pfCategory = higherDepth(currentSettings, "pfCategoryId", "none");
 			eb.addField("Party Finder Category", pfCategory.equals("none") ? "None" : "<#" + pfCategory + ">", false);
 			String fetchurChannel = higherDepth(currentSettings, "fetchurChannel", "none");
 			eb.addField("Fetchur Notifications Channel", fetchurChannel.equals("none") ? "None" : "<#" + fetchurChannel + ">", false);
+			String fetchurRole = higherDepth(currentSettings, "fetchurRole", "none");
+			eb.addField("Fetchur Ping Role", fetchurRole.equals("none") ? "None" : "<@" + fetchurRole + ">", false);
 			String applyGuestRole = higherDepth(currentSettings, "applyGuestRole", "none");
 			eb.addField("Guest Role", applyGuestRole.equals("none") ? "None" : "<@&" + applyGuestRole + ">", false);
 		} else if (args.length >= 2 && args[1].equals("jacob")) {
@@ -441,6 +444,16 @@ public class SettingsExecute {
 							} else if (args[5].equals("false")) {
 								eb = setApplyScammerCheck(guildSettings.getAsJsonObject(), false);
 							}
+							break;
+						case "log_applications":
+							if (args[5].equals("true")) {
+								eb = setApplyLogApplications(guildSettings.getAsJsonObject(), true);
+							} else if (args[5].equals("false")) {
+								eb = setApplyLogApplications(guildSettings.getAsJsonObject(), false);
+							}
+							break;
+						case "log_channel":
+							eb = setApplyLogChannel(guildSettings.getAsJsonObject(), args[5]);
 							break;
 					}
 				}
@@ -957,6 +970,22 @@ public class SettingsExecute {
 		return defaultSettingsEmbed("Set apply message channel to: " + applyChannel.getAsMention());
 	}
 
+	public EmbedBuilder setApplyLogChannel(JsonObject guildSettings, String textChannel) {
+		TextChannel applyChannel = guild.getTextChannelById(textChannel.replaceAll("[<#>]", ""));
+		EmbedBuilder eb = checkTextChannel(applyChannel);
+		if (eb != null) {
+			return eb;
+		}
+
+		guildSettings.addProperty("applyLogChannel", applyChannel.getId());
+		int responseCode = database.setGuildSettings(guild.getId(), guildSettings);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		return defaultSettingsEmbed("Set apply log channel to: " + applyChannel.getAsMention());
+	}
+
 	public EmbedBuilder setApplyCategory(JsonObject guildSettings, String messageCategory) {
 		try {
 			Category applyCategory = guild.getCategoryById(messageCategory.replaceAll("[<#>]", ""));
@@ -1053,6 +1082,22 @@ public class SettingsExecute {
 		return defaultSettingsEmbed("Apply deny message set to: " + denyMessage);
 	}
 
+	public EmbedBuilder setApplyLogApplications(JsonObject guildSettings, boolean logApps) {
+		if(!logApps){
+			if(higherDepth(guildSettings, "applyLogChannel", "").isEmpty()){
+				return invalidEmbed("Log channel must be set before enabling application logging");
+			}
+		}
+
+		guildSettings.addProperty("applyLogApplication", "" + logApps);
+		int responseCode = database.setGuildSettings(guild.getId(), guildSettings);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		return defaultSettingsEmbed("Set apply logging applications to: " + logApps);
+	}
+
 	public EmbedBuilder setApplyIronman(JsonObject guildSettings, boolean isIronman) {
 		guildSettings.addProperty("applyIronmanOnly", "" + isIronman);
 		int responseCode = database.setGuildSettings(guild.getId(), guildSettings);
@@ -1111,7 +1156,7 @@ public class SettingsExecute {
 			return apiFailMessage(responseCode);
 		}
 
-		return defaultSettingsEmbed("Removeda apply staff role: " + role.getAsMention());
+		return defaultSettingsEmbed("Removed an apply staff role: " + role.getAsMention());
 	}
 
 	public EmbedBuilder addApplyRequirement(JsonObject guildSettings, String reqArgs) {
@@ -2338,6 +2383,32 @@ public class SettingsExecute {
 
 		guildMap.get(guild.getId()).setApplyGuestRole(role);
 		return defaultSettingsEmbed("Set guest role to: " + role.getAsMention());
+	}
+
+	public EmbedBuilder setFetchurPing(String roleMention) {
+		if (roleMention.equalsIgnoreCase("none")) {
+			int responseCode = database.setFetchurRole(guild.getId(), "none");
+			if (responseCode != 200) {
+				return apiFailMessage( responseCode);
+			}
+
+			guildMap.get(guild.getId()).setFetchurPing(null);
+			return defaultSettingsEmbed("Set fetchur ping to: none");
+		}
+
+		Object eb = checkRole(roleMention);
+		if (eb instanceof EmbedBuilder e) {
+			return e;
+		}
+		Role role = ((Role) eb);
+
+		int responseCode = database.setFetchurRole(guild.getId(), role.getId());
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		guildMap.get(guild.getId()).setFetchurPing(role);
+		return defaultSettingsEmbed("Set fetchur ping to: " + role.getAsMention());
 	}
 
 	/* Helper functions */

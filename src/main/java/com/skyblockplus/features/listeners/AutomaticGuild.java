@@ -95,6 +95,7 @@ public class AutomaticGuild {
 	public String prefix;
 	public TextChannel fetchurChannel = null;
 	private Role applyGuestRole = null;
+	private Role fetchurPing = null;
 
 	/* Constructor */
 	public AutomaticGuild(GenericGuildEvent event) {
@@ -103,14 +104,21 @@ public class AutomaticGuild {
 		applyConstructor(event);
 		verifyConstructor(event);
 		schedulerConstructor();
-		currentMee6Settings = database.getMee6Settings(guildId);
 		prefix = database.getPrefix(guildId);
-		try {
-			partyFinderCategory = event.getGuild().getCategoryById(database.getPartyFinderCategoryId(guildId));
-		} catch (Exception ignored) {}
 		farmingContest = new FarmingContest(guildId);
+		JsonElement serverSettings = database.getServerSettings(guildId);
+		currentMee6Settings = higherDepth(serverSettings, "mee6Data");
 		try {
-			fetchurChannel = event.getGuild().getTextChannelById(database.getFetchurChannelId(guildId));
+			partyFinderCategory = event.getGuild().getCategoryById(higherDepth(serverSettings, "serverSettings", null));
+		} catch (Exception ignored) {}
+		try {
+			fetchurChannel = event.getGuild().getTextChannelById(higherDepth(serverSettings, "fetchurChannel", null));
+		} catch (Exception ignored) {}
+		try {
+			applyGuestRole = event.getGuild().getRoleById(higherDepth(serverSettings, "applyGuestRole", null));
+		} catch (Exception ignored) {}
+		try {
+			fetchurPing = event.getGuild().getRoleById(higherDepth(serverSettings, "fetchurRole", null));
 		} catch (Exception ignored) {}
 	}
 
@@ -648,6 +656,16 @@ public class AutomaticGuild {
 			return;
 		}
 
+		if(event.getAuthor().isBot() && !event.getAuthor().getId().equals(jda.getSelfUser().getId())){
+			return;
+		}
+
+		for (ApplyGuild guild : applyGuild) {
+			if(guild.onGuildMessageReceived(event)){
+				return;
+			}
+		}
+
 		if (event.getAuthor().isBot()) {
 			return;
 		}
@@ -682,13 +700,12 @@ public class AutomaticGuild {
 			}
 			return;
 		} else if (event.getComponentId().startsWith("setup_command_")) {
-			event.deferReply().complete();
-
 			if (!event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
-				event.getHook().editOriginal("❌ You must have the Administrator permission in this Guild to use that!").queue();
+				event.reply("❌ You must have the administrator permission in this guild to use that!").setEphemeral(true).queue();
 				return;
 			}
 
+			event.deferReply().complete();
 			SetupCommandHandler handler = new SetupCommandHandler(event, event.getComponentId().split("setup_command_")[1]);
 			if (handler.isValid()) {
 				return;
@@ -928,13 +945,21 @@ public class AutomaticGuild {
 		this.fetchurChannel = channel;
 	}
 
+	public void setFetchurPing(Role role) {
+		this.fetchurPing = role;
+	}
+
 	public void onFarmingContest(List<String> crops, MessageEmbed embed) {
 		farmingContest.onFarmingContest(crops, embed);
 	}
 
 	public void onFetchur(MessageEmbed embed) {
 		if (fetchurChannel != null) {
-			fetchurChannel.sendMessageEmbeds(embed).queue();
+			if(fetchurPing == null) {
+				fetchurChannel.sendMessageEmbeds(embed).queue();
+			}else{
+				fetchurChannel.sendMessage(fetchurPing.getAsMention()).setEmbeds(embed).queue();
+			}
 		}
 	}
 }

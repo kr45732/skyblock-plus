@@ -422,7 +422,7 @@ public class Utils {
 		try {
 			HttpPost httpPost = new HttpPost("https://hst.sh/documents");
 
-			StringEntity entity = new StringEntity(body.toString());
+			StringEntity entity = new StringEntity(body.toString(), "UTF-8");
 			httpPost.setEntity(entity);
 
 			try (CloseableHttpResponse httpResponse = httpClient.execute(httpPost)) {
@@ -439,7 +439,7 @@ public class Utils {
 		try {
 			HttpPost httpPost = new HttpPost(url);
 
-			StringEntity entity = new StringEntity(body.toString());
+			StringEntity entity = new StringEntity(body.toString(), "UTF-8");
 			httpPost.setEntity(entity);
 			httpPost.setHeaders(headers);
 			httpPost.setHeader("Content-Type", "application/json");
@@ -1068,6 +1068,8 @@ public class Utils {
 								}
 							}
 						}
+
+						itemInfo.addExtraValues(item.getInt("tag.ExtraAttributes.gemstone_slots", 0), "GEMSTONE_CHAMBER");
 
 						try {
 							byte[] backpackContents = item.getByteArray("tag.ExtraAttributes." + itemInfo.getId().toLowerCase() + "_data");

@@ -83,6 +83,7 @@ public class ServerSettingsModel {
 	private String applyGuestRole = "";
 
 	private String fetchurChannel = "";
+	private String fetchurRole = "";
 
 	public ServerSettingsModel(String serverName, String serverId) {
 		this.serverName = serverName;

@@ -32,6 +32,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
 public class ApplyGuild {
@@ -222,5 +223,14 @@ public class ApplyGuild {
 
 		event.getMessage().delete().queueAfter(3, TimeUnit.SECONDS);
 		return "✅ Player was invited";
+	}
+
+	public boolean onGuildMessageReceived(GuildMessageReceivedEvent event) {
+		for (ApplyUser applyUser : applyUserList) {
+			if(applyUser.onGuildMessageReceived(event)){
+				return true;
+			}
+		}
+		return false;
 	}
 }
