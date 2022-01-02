@@ -725,7 +725,7 @@ public class ApplyUser implements Serializable {
 		}
 
 		for (int i = 0; i < logs.size(); i++) {
-			if(logs.get(i).getId().equals(event.getMessage().getId())){
+			if (logs.get(i).getId().equals(event.getMessage().getId())) {
 				logs.set(i, ApplyLog.toLog(event.getMessage()));
 				break;
 			}

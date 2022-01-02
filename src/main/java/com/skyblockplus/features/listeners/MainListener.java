@@ -18,7 +18,15 @@
 
 package com.skyblockplus.features.listeners;
 
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.skyblockplus.utils.AuctionFlipper;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -35,15 +43,6 @@ import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
-import static com.skyblockplus.utils.Utils.*;
 
 public class MainListener extends ListenerAdapter {
 
@@ -171,8 +170,15 @@ public class MainListener extends ListenerAdapter {
 	@Override
 	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
 		if (guildMap.containsKey(event.getGuild().getId())) {
-			if(!event.getAuthor().isBot() && event.getMessage().getContentRaw().equals("<@!" + jda.getSelfUser().getId() + ">") || event.getMessage().getContentRaw().equals("<@" + jda.getSelfUser().getId() + ">")){
-				event.getMessage().reply("My prefix here is `/` or `" + getGuildPrefix(event.getGuild().getId()) + "`. Type `/help` for help!").queue();
+			if (
+				!event.getAuthor().isBot() &&
+				event.getMessage().getContentRaw().equals("<@!" + jda.getSelfUser().getId() + ">") ||
+				event.getMessage().getContentRaw().equals("<@" + jda.getSelfUser().getId() + ">")
+			) {
+				event
+					.getMessage()
+					.reply("My prefix here is `/` or `" + getGuildPrefix(event.getGuild().getId()) + "`. Type `/help` for help!")
+					.queue();
 			}
 
 			guildMap.get(event.getGuild().getId()).onGuildMessageReceived(event);

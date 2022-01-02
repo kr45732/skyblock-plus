@@ -113,7 +113,7 @@ public class Main {
 					}
 				)
 				.setActivity(Activity.playing("Loading..."))
-					.setManualUpsert(true)
+				.setManualUpsert(true)
 				.addCommands(
 					new InformationCommand(),
 					new SlayerCommand(),

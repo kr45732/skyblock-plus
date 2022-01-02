@@ -967,7 +967,7 @@ public class AutomaticGuild {
 
 	public void onGuildMessageUpdate(GuildMessageUpdateEvent event) {
 		for (ApplyGuild guild : applyGuild) {
-			if(guild.onGuildMessageUpdate(event)){
+			if (guild.onGuildMessageUpdate(event)) {
 				return;
 			}
 		}
@@ -975,7 +975,7 @@ public class AutomaticGuild {
 
 	public void onGuildMessageDelete(GuildMessageDeleteEvent event) {
 		for (ApplyGuild guild : applyGuild) {
-			if(guild.onGuildMessageDelete(event)){
+			if (guild.onGuildMessageDelete(event)) {
 				return;
 			}
 		}

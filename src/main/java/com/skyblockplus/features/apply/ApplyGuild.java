@@ -238,7 +238,7 @@ public class ApplyGuild {
 
 	public boolean onGuildMessageUpdate(GuildMessageUpdateEvent event) {
 		for (ApplyUser applyUser : applyUserList) {
-			if(applyUser.onGuildMessageUpdate(event)){
+			if (applyUser.onGuildMessageUpdate(event)) {
 				return true;
 			}
 		}
@@ -247,7 +247,7 @@ public class ApplyGuild {
 
 	public boolean onGuildMessageDelete(GuildMessageDeleteEvent event) {
 		for (ApplyUser applyUser : applyUserList) {
-			if(applyUser.onGuildMessageDelete(event)){
+			if (applyUser.onGuildMessageDelete(event)) {
 				return true;
 			}
 		}
