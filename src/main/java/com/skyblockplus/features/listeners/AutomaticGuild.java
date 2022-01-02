@@ -642,8 +642,8 @@ public class AutomaticGuild {
 					.getEmbeds()
 					.get(0)
 					.getDescription()
-					.contains("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO/commit/")
-					&& isMainBot()
+					.contains("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO/commit/") &&
+				isMainBot()
 			) {
 				updateItemMappings();
 				internalJsonMappings = null;

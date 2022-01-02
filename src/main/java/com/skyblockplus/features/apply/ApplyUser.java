@@ -700,7 +700,6 @@ public class ApplyUser implements Serializable {
 		return false;
 	}
 
-
 	public boolean onGuildMessageReceived(GuildMessageReceivedEvent event) {
 		if (!event.getChannel().getId().equals(applicationChannelId)) {
 			return false;
