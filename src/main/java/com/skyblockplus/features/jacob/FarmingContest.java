@@ -18,7 +18,6 @@
 
 package com.skyblockplus.features.jacob;
 
-import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.utils.Utils.gson;
 import static com.skyblockplus.utils.Utils.higherDepth;
@@ -38,9 +37,9 @@ public class FarmingContest {
 	public List<RoleObject> wantedCrops;
 	public TextChannel channel;
 
-	public FarmingContest(String guildId) {
+	public FarmingContest(String guildId, JsonElement jacobSettings) {
 		this.guildId = guildId;
-		reloadSettingsJson(database.getJacobSettings(guildId));
+		reloadSettingsJson(jacobSettings);
 	}
 
 	public void onFarmingContest(List<String> crops, MessageEmbed embed) {

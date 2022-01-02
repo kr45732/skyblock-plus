@@ -41,13 +41,14 @@ public class VerifyGuild {
 	public TextChannel messageChannel;
 	public Message originalMessage;
 	public JsonElement verifySettings;
-	public boolean enable = true;
+	public final boolean enable;
 
 	public VerifyGuild(TextChannel messageChannel, Message originalMessage, JsonElement verifySettings, String guildId) {
 		this.messageChannel = messageChannel;
 		this.originalMessage = originalMessage;
 		this.verifySettings = verifySettings;
 		this.guildId = guildId;
+		this.enable = true;
 	}
 
 	public VerifyGuild(String guildId) {

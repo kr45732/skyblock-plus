@@ -26,6 +26,7 @@ import lombok.Getter;
 @Getter
 public class LogMessage {
 
+	String id;
 	LogUser user;
 	String text;
 	String timestamp;

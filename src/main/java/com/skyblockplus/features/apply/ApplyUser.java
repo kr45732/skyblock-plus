@@ -41,7 +41,9 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
@@ -710,6 +712,37 @@ public class ApplyUser implements Serializable {
 		}
 
 		logs.add(ApplyLog.toLog(event.getMessage()));
+		return true;
+	}
+
+	public boolean onGuildMessageUpdate(GuildMessageUpdateEvent event) {
+		if (!event.getChannel().getId().equals(applicationChannelId)) {
+			return false;
+		}
+
+		if (!logApplication) {
+			return true;
+		}
+
+		for (int i = 0; i < logs.size(); i++) {
+			if(logs.get(i).getId().equals(event.getMessage().getId())){
+				logs.set(i, ApplyLog.toLog(event.getMessage()));
+				break;
+			}
+		}
+		return true;
+	}
+
+	public boolean onGuildMessageDelete(GuildMessageDeleteEvent event) {
+		if (!event.getChannel().getId().equals(applicationChannelId)) {
+			return false;
+		}
+
+		if (!logApplication) {
+			return true;
+		}
+
+		logs.removeIf(m -> m.getId().equals(event.getMessageId()));
 		return true;
 	}
 }

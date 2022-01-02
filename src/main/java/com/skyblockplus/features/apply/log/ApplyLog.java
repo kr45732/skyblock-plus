@@ -34,6 +34,7 @@ public class ApplyLog {
 	public static LogMessage toLog(Message message) {
 		LogMessage.Builder builder = LogMessage
 			.builder()
+				.id(message.getId())
 			.user(
 				LogUser
 					.builder()

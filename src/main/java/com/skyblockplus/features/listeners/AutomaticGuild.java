@@ -60,7 +60,9 @@ import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
@@ -100,13 +102,12 @@ public class AutomaticGuild {
 	/* Constructor */
 	public AutomaticGuild(GenericGuildEvent event) {
 		guildId = event.getGuild().getId();
-		verifyGuild = new VerifyGuild(guildId);
+		JsonElement serverSettings = database.getServerSettings(guildId);
 		applyConstructor(event);
-		verifyConstructor(event);
+		verifyConstructor(event, higherDepth(serverSettings, "automatedVerify"));
 		schedulerConstructor();
 		prefix = database.getPrefix(guildId);
-		farmingContest = new FarmingContest(guildId);
-		JsonElement serverSettings = database.getServerSettings(guildId);
+		farmingContest = new FarmingContest(guildId, higherDepth(serverSettings, "jacobSettings"));
 		currentMee6Settings = higherDepth(serverSettings, "mee6Data");
 		try {
 			partyFinderCategory = event.getGuild().getCategoryById(higherDepth(serverSettings, "serverSettings", null));
@@ -254,8 +255,8 @@ public class AutomaticGuild {
 	}
 
 	/* Automated Verify Methods */
-	public void verifyConstructor(GenericGuildEvent event) {
-		JsonElement currentSettings = database.getVerifySettings(event.getGuild().getId());
+	public void verifyConstructor(GenericGuildEvent event, JsonElement currentSettings) {
+		verifyGuild = new VerifyGuild(guildId);
 		if (currentSettings == null) {
 			return;
 		}
@@ -960,6 +961,22 @@ public class AutomaticGuild {
 				fetchurChannel.sendMessageEmbeds(embed).queue();
 			} else {
 				fetchurChannel.sendMessage(fetchurPing.getAsMention()).setEmbeds(embed).queue();
+			}
+		}
+	}
+
+	public void onGuildMessageUpdate(GuildMessageUpdateEvent event) {
+		for (ApplyGuild guild : applyGuild) {
+			if(guild.onGuildMessageUpdate(event)){
+				return;
+			}
+		}
+	}
+
+	public void onGuildMessageDelete(GuildMessageDeleteEvent event) {
+		for (ApplyGuild guild : applyGuild) {
+			if(guild.onGuildMessageDelete(event)){
+				return;
 			}
 		}
 	}

@@ -32,7 +32,9 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
 public class ApplyGuild {
@@ -228,6 +230,24 @@ public class ApplyGuild {
 	public boolean onGuildMessageReceived(GuildMessageReceivedEvent event) {
 		for (ApplyUser applyUser : applyUserList) {
 			if (applyUser.onGuildMessageReceived(event)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean onGuildMessageUpdate(GuildMessageUpdateEvent event) {
+		for (ApplyUser applyUser : applyUserList) {
+			if(applyUser.onGuildMessageUpdate(event)){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean onGuildMessageDelete(GuildMessageDeleteEvent event) {
+		for (ApplyUser applyUser : applyUserList) {
+			if(applyUser.onGuildMessageDelete(event)){
 				return true;
 			}
 		}

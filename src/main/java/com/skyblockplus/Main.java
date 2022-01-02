@@ -113,6 +113,7 @@ public class Main {
 					}
 				)
 				.setActivity(Activity.playing("Loading..."))
+					.setManualUpsert(true)
 				.addCommands(
 					new InformationCommand(),
 					new SlayerCommand(),
@@ -177,8 +178,7 @@ public class Main {
 					new PartyCommand(),
 					new TimeCommand(),
 					new ForgeCommand(),
-					new ScammerCommand(),
-					new MentionCommand()
+					new ScammerCommand()
 				)
 				.build();
 
