@@ -18,19 +18,19 @@
 
 package com.skyblockplus.features.apply.log;
 
+import java.util.List;
 import lombok.Builder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
-import java.util.List;
-
 @Builder(builderClassName = "Builder")
 public class LogEmbed {
-    String title;
-    String url;
-    String description;
-    List<MessageEmbed.Field> fields;
-    String footer;
-    String color;
-    String timestamp;
-    String thumbnail;
+
+	String title;
+	String url;
+	String description;
+	List<MessageEmbed.Field> fields;
+	String footer;
+	String color;
+	String timestamp;
+	String thumbnail;
 }

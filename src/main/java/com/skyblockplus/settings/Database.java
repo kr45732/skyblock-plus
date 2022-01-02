@@ -247,7 +247,7 @@ public class Database {
 		return settingsService.setFetchurChannelId(serverId, newSettings).getStatusCodeValue();
 	}
 
-    public int setFetchurRole(String serverId, String newSettings) {
+	public int setFetchurRole(String serverId, String newSettings) {
 		return settingsService.setFetchurRole(serverId, newSettings).getStatusCodeValue();
-    }
+	}
 }

@@ -656,12 +656,12 @@ public class AutomaticGuild {
 			return;
 		}
 
-		if(event.getAuthor().isBot() && !event.getAuthor().getId().equals(jda.getSelfUser().getId())){
+		if (event.getAuthor().isBot() && !event.getAuthor().getId().equals(jda.getSelfUser().getId())) {
 			return;
 		}
 
 		for (ApplyGuild guild : applyGuild) {
-			if(guild.onGuildMessageReceived(event)){
+			if (guild.onGuildMessageReceived(event)) {
 				return;
 			}
 		}
@@ -955,9 +955,9 @@ public class AutomaticGuild {
 
 	public void onFetchur(MessageEmbed embed) {
 		if (fetchurChannel != null) {
-			if(fetchurPing == null) {
+			if (fetchurPing == null) {
 				fetchurChannel.sendMessageEmbeds(embed).queue();
-			}else{
+			} else {
 				fetchurChannel.sendMessage(fetchurPing.getAsMention()).setEmbeds(embed).queue();
 			}
 		}

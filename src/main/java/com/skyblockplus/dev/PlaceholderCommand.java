@@ -18,18 +18,18 @@
 
 package com.skyblockplus.dev;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
-
-import static com.skyblockplus.utils.Utils.*;
 
 public class PlaceholderCommand extends Command {
 
 	public PlaceholderCommand() {
 		this.name = "d-placeholder";
 		this.ownerCommand = true;
-		this.aliases = new String[]{"ph"};
+		this.aliases = new String[] { "ph" };
 		this.botPermissions = defaultPerms();
 	}
 
@@ -48,15 +48,15 @@ public class PlaceholderCommand extends Command {
 				eb.addField("Total", "" + (Runtime.getRuntime().totalMemory() / 1000000.0) + " MB", false);
 				eb.addField("Free", "" + (Runtime.getRuntime().freeMemory() / 1000000.0) + " MB", false);
 				eb.addField(
-						"Used",
-						"" + ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1000000.0) + " MB",
-						false
+					"Used",
+					"" + ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1000000.0) + " MB",
+					false
 				);
 				eb.addField("Max", "" + (Runtime.getRuntime().maxMemory() / 1000000.0) + " MB", false);
 
 				embed(eb);
 			}
 		}
-				.queue();
+			.queue();
 	}
 }

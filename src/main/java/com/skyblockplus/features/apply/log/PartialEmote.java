@@ -20,12 +20,12 @@ package com.skyblockplus.features.apply.log;
 
 import net.dv8tion.jda.api.entities.Emote;
 
-public record PartialEmote (long id, String name, boolean animated) {
-    public String getImageUrl() {
-        return String.format(Emote.ICON_URL, id, animated ? "gif" : "png");
-    }
+public record PartialEmote(long id, String name, boolean animated) {
+	public String getImageUrl() {
+		return String.format(Emote.ICON_URL, id, animated ? "gif" : "png");
+	}
 
-    public String getAsMention() {
-        return (animated ? "<a:" : "<:") + name + ":" + id + ">";
-    }
+	public String getAsMention() {
+		return (animated ? "<a:" : "<:") + name + ":" + id + ">";
+	}
 }

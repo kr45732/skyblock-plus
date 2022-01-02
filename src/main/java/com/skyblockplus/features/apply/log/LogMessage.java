@@ -18,16 +18,16 @@
 
 package com.skyblockplus.features.apply.log;
 
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.List;
 
 @Builder(builderClassName = "Builder")
 @Getter
 public class LogMessage {
-    LogUser user;
-    String text;
-    String timestamp;
-    List<LogEmbed> embeds;
+
+	LogUser user;
+	String text;
+	String timestamp;
+	List<LogEmbed> embeds;
 }

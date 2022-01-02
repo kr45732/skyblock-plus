@@ -24,9 +24,10 @@ import lombok.Getter;
 @Builder(builderClassName = "Builder")
 @Getter
 public class LogUser {
-    String name;
-    String avatar;
-    boolean isBot;
-    boolean isVerified;
-    String color;
+
+	String name;
+	String avatar;
+	boolean isBot;
+	boolean isVerified;
+	String color;
 }

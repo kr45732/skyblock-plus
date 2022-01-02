@@ -227,7 +227,7 @@ public class ApplyGuild {
 
 	public boolean onGuildMessageReceived(GuildMessageReceivedEvent event) {
 		for (ApplyUser applyUser : applyUserList) {
-			if(applyUser.onGuildMessageReceived(event)){
+			if (applyUser.onGuildMessageReceived(event)) {
 				return true;
 			}
 		}

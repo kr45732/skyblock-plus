@@ -1083,8 +1083,8 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder setApplyLogApplications(JsonObject guildSettings, boolean logApps) {
-		if(!logApps){
-			if(higherDepth(guildSettings, "applyLogChannel", "").isEmpty()){
+		if (!logApps) {
+			if (higherDepth(guildSettings, "applyLogChannel", "").isEmpty()) {
 				return invalidEmbed("Log channel must be set before enabling application logging");
 			}
 		}
@@ -2389,7 +2389,7 @@ public class SettingsExecute {
 		if (roleMention.equalsIgnoreCase("none")) {
 			int responseCode = database.setFetchurRole(guild.getId(), "none");
 			if (responseCode != 200) {
-				return apiFailMessage( responseCode);
+				return apiFailMessage(responseCode);
 			}
 
 			guildMap.get(guild.getId()).setFetchurPing(null);

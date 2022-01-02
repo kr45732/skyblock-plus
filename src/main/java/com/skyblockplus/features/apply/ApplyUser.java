@@ -27,7 +27,6 @@ import com.skyblockplus.features.apply.log.ApplyLog;
 import com.skyblockplus.features.apply.log.LogMessage;
 import com.skyblockplus.networth.NetworthExecute;
 import com.skyblockplus.utils.Player;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Serializable;
@@ -96,8 +95,8 @@ public class ApplyUser implements Serializable {
 
 		ChannelAction<TextChannel> applicationChannelAction = applyCategory
 			.createTextChannel("apply-" + playerUsername)
-				.syncPermissionOverrides()
-				.addPermissionOverride(event.getGuild().getSelfMember(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE), null)
+			.syncPermissionOverrides()
+			.addPermissionOverride(event.getGuild().getSelfMember(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE), null)
 			.addPermissionOverride(event.getMember(), EnumSet.of(Permission.VIEW_CHANNEL), null)
 			.addPermissionOverride(event.getGuild().getPublicRole(), null, EnumSet.of(Permission.VIEW_CHANNEL));
 
@@ -654,25 +653,48 @@ public class ApplyUser implements Serializable {
 				event.getHook().editOriginalEmbeds(defaultEmbed("Closing Channel").build()).queue();
 				event.getTextChannel().delete().reason("Application closed").queueAfter(10, TimeUnit.SECONDS);
 				parent.applyUserList.remove(this);
-				if(logApplication) {
+				if (logApplication) {
 					try {
-						File logFile = new File("src/main/java/com/skyblockplus/json/application_transcripts/" + applicationChannelId + ".json");
+						File logFile = new File(
+							"src/main/java/com/skyblockplus/json/application_transcripts/" + applicationChannelId + ".json"
+						);
 						try (Writer writer = new FileWriter(logFile)) {
 							formattedGson.toJson(logs, writer);
 							writer.flush();
 						}
-						event.getGuild().getTextChannelById(higherDepth(currentSettings, "applyLogChannel").getAsString())
-								.sendFile(logFile, playerUsername + ".json").queue(
-										m -> m.editMessageEmbeds(
-												defaultEmbed("Application Log")
-														.addField("Applicant", playerUsername, true)
-														.addField("Guild Name", capitalizeString(higherDepth(currentSettings, "guildName").getAsString().replace("_", " ")), true)
-														.addField("Direct Transcript", "[Link](https://skyblock-plus-logs.vercel.app/logs?url=" + m.getAttachments().get(0).getUrl() + ")", true)
-														.addField("Users in Transcript", String.join("\n", logs.stream().map(logM -> logM.getUser().getName()).collect(Collectors.toSet())), true)
-														.build()
-										).queue()
-								);
-
+						event
+							.getGuild()
+							.getTextChannelById(higherDepth(currentSettings, "applyLogChannel").getAsString())
+							.sendFile(logFile, playerUsername + ".json")
+							.queue(m ->
+								m
+									.editMessageEmbeds(
+										defaultEmbed("Application Log")
+											.addField("Applicant", playerUsername, true)
+											.addField(
+												"Guild Name",
+												capitalizeString(higherDepth(currentSettings, "guildName").getAsString().replace("_", " ")),
+												true
+											)
+											.addField(
+												"Direct Transcript",
+												"[Link](https://skyblock-plus-logs.vercel.app/logs?url=" +
+												m.getAttachments().get(0).getUrl() +
+												")",
+												true
+											)
+											.addField(
+												"Users in Transcript",
+												String.join(
+													"\n",
+													logs.stream().map(logM -> logM.getUser().getName()).collect(Collectors.toSet())
+												),
+												true
+											)
+											.build()
+									)
+									.queue()
+							);
 
 						logFile.delete();
 					} catch (Exception e) {
@@ -685,18 +707,18 @@ public class ApplyUser implements Serializable {
 		return false;
 	}
 
-	public void logMessage(Message message){
-		if(logApplication){
+	public void logMessage(Message message) {
+		if (logApplication) {
 			logs.add(ApplyLog.toLog(message));
 		}
 	}
 
 	public boolean onGuildMessageReceived(GuildMessageReceivedEvent event) {
-		if(!event.getChannel().getId().equals(applicationChannelId)){
+		if (!event.getChannel().getId().equals(applicationChannelId)) {
 			return false;
 		}
 
-		if(!logApplication){
+		if (!logApplication) {
 			return true;
 		}
 
