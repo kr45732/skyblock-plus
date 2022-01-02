@@ -58,7 +58,7 @@ dependencies {
     implementation 'club.minnced:discord-webhooks:0.7.5'
 
     // JDA utilities
-    implementation 'pw.chew:jda-chewtils:1.23.0'
+    implementation 'pw.chew:jda-chewtils:1.24.1'
 
     // Google libraries
     implementation 'com.google.code.gson:gson:2.8.9'
