@@ -712,8 +712,8 @@ public class AutomaticGuild {
 			event.deferReply().complete();
 		} else if (event.getButton().getId().startsWith("party_finder_channel_close_")) {
 			if (event.getUser().getId().equals(event.getButton().getId().split("party_finder_channel_close_")[1])) {
-				event.replyEmbeds(defaultEmbed("Party Finder").setDescription("Closing channel").build()).queue();
-				event.getTextChannel().delete().queueAfter(5, TimeUnit.SECONDS);
+				event.replyEmbeds(defaultEmbed("Party Finder").setDescription("Archiving thread...").build()).queue();
+				((ThreadChannel) event.getChannel()).getManager().setArchived(true).queueAfter(3, TimeUnit.SECONDS);
 			} else {
 				event.replyEmbeds(invalidEmbed("Only the party leader can close the channel").build()).setEphemeral(true).queue();
 			}

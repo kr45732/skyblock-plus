@@ -18,26 +18,26 @@
 
 package com.skyblockplus.help;
 
-import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.PaginatorExtras;
+import net.dv8tion.jda.api.EmbedBuilder;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
-import org.apache.commons.lang3.ArrayUtils;
+
+import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
+import static com.skyblockplus.utils.Utils.*;
 
 public class HelpCommand extends Command {
 
 	public static final List<HelpData> helpDataList = new ArrayList<>();
-	private static final String[] nonAdmin = {
+	private static final String[] pageTitles = {
+			"Navigation",
 		"General",
 		"Slayer",
 		"Skills",
@@ -48,18 +48,13 @@ public class HelpCommand extends Command {
 		"Miscellaneous Commands",
 		"Party",
 		"Skyblock Event",
+			"Settings",
+			"Jacob Events",
+			"Verify Settings",
+			"Guild | Roles & Ranks Settings",
+			"Guild | Apply Settings",
+			"Roles Settings"
 	};
-	private static final String[] admin = ArrayUtils.addAll(
-		nonAdmin,
-		"Settings",
-		"Jacob Events",
-		"Verify Settings",
-		"Guild | Roles & Ranks Settings",
-		"Guild | Apply Settings",
-		"Roles Settings"
-	);
-
-	private static final String[] pageTitles = ArrayUtils.addFirst(admin, "Navigation");
 
 	public HelpCommand() {
 		this.name = "help";
@@ -601,10 +596,8 @@ public class HelpCommand extends Command {
 			.setItemsPerPage(1)
 			.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles));
 
-		boolean isAdmin = event.getMember().hasPermission(Permission.ADMINISTRATOR);
-
 		paginateBuilder.addItems(
-			"Use the arrow buttons to navigate through the pages" + generatePageMap(isAdmin) + "\n\n<> = required [] = optional"
+			"Use the arrow buttons to navigate through the pages" + generatePageMap() + "\n\n<> = required [] = optional"
 		);
 
 		HelpGenerator help = new HelpGenerator(getGuildPrefix(event.getGuild().getId()));
@@ -717,16 +710,15 @@ public class HelpCommand extends Command {
 		);
 
 		paginateBuilder.addItems(
-			help.createAdmin("event create", "Interactive message to create a Skyblock event", isAdmin) +
+			help.create("event create", "Interactive message to create a Skyblock event") +
 			help.create("event current", "Get information about the current event") +
 			help.create("event join [profile]", "Join the current event") +
 			help.create("event leave", "Leave the current event") +
 			help.create("event leaderboard", "Get the leaderboard for current event") +
-			help.createAdmin("event end", "Force end the event", isAdmin) +
-			help.createAdmin("event cancel", "Cancel the event. No announcement will be made", isAdmin)
+			help.create("event end", "Force end the event") +
+			help.create("event cancel", "Cancel the event. No announcement will be made")
 		);
 
-		if (isAdmin) {
 			paginateBuilder.addItems(
 				help.create("settings", "View the current settings for the Discord server") +
 				help.create("settings general", "View the bot's general settings for this server") +
@@ -852,16 +844,16 @@ public class HelpCommand extends Command {
 				help.create("settings roles remove <role_name> <value>", "Remove a role level for a role") +
 				help.create("settings roles set <role_name> <@role>", "Set a one level role's role")
 			);
-		}
+
 
 		event.paginate(paginateBuilder, startingPage);
 		return null;
 	}
 
-	private static String generatePageMap(boolean isAdmin) {
+	private static String generatePageMap() {
 		StringBuilder generatedStr = new StringBuilder();
-		for (int i = 0; i < (isAdmin ? admin : nonAdmin).length; i++) {
-			generatedStr.append("\n• **Page ").append(i + 2).append(":** ").append((isAdmin ? admin : nonAdmin)[i]);
+		for (int i = 1; i < pageTitles.length; i++) {
+			generatedStr.append("\n• **Page ").append(i + 2).append(":** ").append(pageTitles[i]);
 		}
 		return generatedStr.toString();
 	}
@@ -883,10 +875,6 @@ public class HelpCommand extends Command {
 	record HelpGenerator(String prefix) {
 		public String create(String commandName, String desc) {
 			return "`" + prefix + commandName + "`: " + desc + "\n";
-		}
-
-		public String createAdmin(String commandName, String desc, boolean isAdmin) {
-			return isAdmin ? "`" + prefix + commandName + "`: " + desc + "\n" : "";
 		}
 	}
 }

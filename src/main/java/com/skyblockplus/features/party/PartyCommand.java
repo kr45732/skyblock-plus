@@ -240,7 +240,7 @@ public class PartyCommand extends Command {
 								)
 								.build()
 						)
-						.setActionRow(Button.danger("party_finder_channel_close_" + party.getPartyLeaderId(), "Close Channel"))
+						.setActionRow(Button.danger("party_finder_channel_close_" + party.getPartyLeaderId(), "Archive Thraed"))
 						.queueAfter(1, TimeUnit.SECONDS);
 				} catch (InsufficientPermissionException e) {
 					channel

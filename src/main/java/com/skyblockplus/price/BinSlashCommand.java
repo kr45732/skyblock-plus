@@ -25,10 +25,14 @@ import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import java.util.stream.Collectors;
+
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.CommandAutoCompleteInteraction;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import org.jetbrains.annotations.NotNull;
 
 public class BinSlashCommand extends SlashCommand {
 
@@ -59,7 +63,7 @@ public class BinSlashCommand extends SlashCommand {
 						25
 					)
 				)
-				.queue();
+				.queue((ignored) -> {}, (ignored) -> {});
 		}
 	}
 }

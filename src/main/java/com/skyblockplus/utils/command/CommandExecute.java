@@ -27,7 +27,6 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import java.util.regex.Matcher;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import org.apache.commons.lang3.ArrayUtils;
 
 public abstract class CommandExecute {
 
@@ -142,7 +141,13 @@ public abstract class CommandExecute {
 	}
 
 	protected void removeArg(int index) {
-		args = ArrayUtils.remove(args, index);
+		String[] newArgs = new String[args.length - 1];
+		for(int i=0; i<args.length ;i++){
+			if(i != index){
+				newArgs[i] = args[i];
+			}
+		}
+		args = newArgs;
 	}
 
 	protected boolean getBooleanArg(String match) {

@@ -18,12 +18,6 @@
 
 package com.skyblockplus.utils;
 
-import static com.skyblockplus.Main.*;
-import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.ApiHandler.*;
-import static java.lang.String.join;
-import static java.util.Collections.nCopies;
-
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.gson.*;
@@ -37,26 +31,12 @@ import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.exceptionhandler.ExceptionExecutor;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.structs.*;
-import java.awt.*;
-import java.io.*;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.*;
-import java.util.List;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
 import me.nullicorn.nedit.type.NBTList;
 import me.nullicorn.nedit.type.TagType;
+import me.xdrop.fuzzywuzzy.FuzzySearch;
+import me.xdrop.fuzzywuzzy.model.ExtractedResult;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -64,7 +44,6 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import okhttp3.OkHttpClient;
-import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -76,6 +55,29 @@ import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.Dsl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import java.awt.*;
+import java.io.*;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.skyblockplus.Main.*;
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.utils.ApiHandler.*;
+import static java.lang.String.join;
+import static java.util.Collections.nCopies;
 
 public class Utils {
 
@@ -922,31 +924,15 @@ public class Utils {
 			return toMatch;
 		}
 
-		LevenshteinDistance matchCalc = LevenshteinDistance.getDefaultInstance();
-		int minDistance = matchCalc.apply(matchFrom.get(0), toMatch);
-		String closestMatch = matchFrom.get(0);
-		for (String itemF : matchFrom) {
-			int currentDistance = matchCalc.apply(itemF, toMatch);
-			if (currentDistance < minDistance) {
-				minDistance = currentDistance;
-				closestMatch = itemF;
-			}
-		}
-
-		return closestMatch;
+		return FuzzySearch.extractOne(toMatch, matchFrom).getString();
 	}
 
 	public static List<String> getClosestMatch(String toMatch, List<String> matchFrom, int numMatches) {
 		if (matchFrom == null || matchFrom.size() == 0) {
-			return List.of(toMatch);
+			return Arrays.asList(toMatch);
 		}
 
-		LevenshteinDistance matchCalc = LevenshteinDistance.getDefaultInstance();
-		return matchFrom
-			.stream()
-			.sorted(Comparator.comparingInt(m -> matchCalc.apply(m, toMatch)))
-			.limit(numMatches)
-			.collect(Collectors.toList());
+		return FuzzySearch.extractSorted(toMatch, matchFrom).stream().limit(numMatches).map(ExtractedResult::getString).collect(Collectors.toList());
 	}
 
 	public static String skyblockStatsLink(String username, String profileName) {
