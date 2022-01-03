@@ -142,8 +142,8 @@ public abstract class CommandExecute {
 
 	protected void removeArg(int index) {
 		String[] newArgs = new String[args.length - 1];
-		for(int i=0; i<args.length ;i++){
-			if(i != index){
+		for (int i = 0; i < args.length; i++) {
+			if (i != index) {
 				newArgs[i] = args[i];
 			}
 		}

@@ -25,7 +25,6 @@ import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.CommandAutoCompleteInteraction;
@@ -63,7 +62,7 @@ public class BinSlashCommand extends SlashCommand {
 						25
 					)
 				)
-				.queue((ignored) -> {}, (ignored) -> {});
+				.queue(ignored -> {}, ignored -> {});
 		}
 	}
 }

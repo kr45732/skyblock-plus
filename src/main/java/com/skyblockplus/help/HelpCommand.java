@@ -18,26 +18,25 @@
 
 package com.skyblockplus.help;
 
+import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.PaginatorExtras;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class HelpCommand extends Command {
 
 	public static final List<HelpData> helpDataList = new ArrayList<>();
 	private static final String[] pageTitles = {
-			"Navigation",
+		"Navigation",
 		"General",
 		"Slayer",
 		"Skills",
@@ -48,12 +47,12 @@ public class HelpCommand extends Command {
 		"Miscellaneous Commands",
 		"Party",
 		"Skyblock Event",
-			"Settings",
-			"Jacob Events",
-			"Verify Settings",
-			"Guild | Roles & Ranks Settings",
-			"Guild | Apply Settings",
-			"Roles Settings"
+		"Settings",
+		"Jacob Events",
+		"Verify Settings",
+		"Guild | Roles & Ranks Settings",
+		"Guild | Apply Settings",
+		"Roles Settings",
 	};
 
 	public HelpCommand() {
@@ -719,132 +718,125 @@ public class HelpCommand extends Command {
 			help.create("event cancel", "Cancel the event. No announcement will be made")
 		);
 
-			paginateBuilder.addItems(
-				help.create("settings", "View the current settings for the Discord server") +
-				help.create("settings general", "View the bot's general settings for this server") +
-				help.create("setup", "A short walk-through on how to setup the bot") +
-				help.create("categories", "Get the name and id of all categories in this server") +
-				help.create("settings set hypixel_key <key>", "Set a Hypixel API key for this server") +
-				help.create("settings set prefix <prefix>", "Set the prefix of the bot") +
-				help.create(
-					"settings set pf_category <category>",
-					"Set the category where new channels will be created for the bot's party feature"
-				) +
-				help.create(
-					"settings set fetchur_channel <#channel>",
-					"Set the channel where fetchur item notifications will be sent every day at 12 am EST"
-				) +
-				help.create("settings set fetchur_ping <@role>", "Role that will be pinged when the fetchur item notifications is sent") +
-				help.create("settings set guest_role <@role>", "Set the guest role") +
-				help.create("settings delete hypixel_key", "Delete the set Hypixel API key of this server") +
-				help.create("settings delete prefix", "Reset the prefix of the bot") +
-				help.create("settings delete all", "Delete the current server settings")
-			);
+		paginateBuilder.addItems(
+			help.create("settings", "View the current settings for the Discord server") +
+			help.create("settings general", "View the bot's general settings for this server") +
+			help.create("setup", "A short walk-through on how to setup the bot") +
+			help.create("categories", "Get the name and id of all categories in this server") +
+			help.create("settings set hypixel_key <key>", "Set a Hypixel API key for this server") +
+			help.create("settings set prefix <prefix>", "Set the prefix of the bot") +
+			help.create(
+				"settings set pf_category <category>",
+				"Set the category where new channels will be created for the bot's party feature"
+			) +
+			help.create(
+				"settings set fetchur_channel <#channel>",
+				"Set the channel where fetchur item notifications will be sent every day at 12 am EST"
+			) +
+			help.create("settings set fetchur_ping <@role>", "Role that will be pinged when the fetchur item notifications is sent") +
+			help.create("settings set guest_role <@role>", "Set the guest role") +
+			help.create("settings delete hypixel_key", "Delete the set Hypixel API key of this server") +
+			help.create("settings delete prefix", "Reset the prefix of the bot") +
+			help.create("settings delete all", "Delete the current server settings")
+		);
 
-			paginateBuilder.addItems(
-				help.create("settings jacob", "View the current settings for farming event notifications") +
-				help.create("settings jacob <enable|disable>", "Enable or disable farming event notifications") +
-				help.create("settings jacob channel <#channel>", "Set the channel where farming event notifications will be sent") +
-				help.create("settings jacob add <crop> <@role>", "Added a crop and the role that should be pinged") +
-				help.create("settings jacob remove <crop>", "Remove a crop from the tracking list")
-			);
+		paginateBuilder.addItems(
+			help.create("settings jacob", "View the current settings for farming event notifications") +
+			help.create("settings jacob <enable|disable>", "Enable or disable farming event notifications") +
+			help.create("settings jacob channel <#channel>", "Set the channel where farming event notifications will be sent") +
+			help.create("settings jacob add <crop> <@role>", "Added a crop and the role that should be pinged") +
+			help.create("settings jacob remove <crop>", "Remove a crop from the tracking list")
+		);
 
-			paginateBuilder.addItems(
-				help.create("settings verify", "Get the current verify settings for the bot") +
-				help.create("settings verify <enable|disable>", "Enable or disable automatic verify") +
-				help.create("settings verify message <message>", "The message that users will see when verifying") +
-				help.create("settings verify role add <@role>", "Add a role that user will receive upon being verified") +
-				help.create("settings verify role remove <@role>", "Remove a verify role") +
-				help.create(
-					"settings verify channel <#channel>",
-					"Channel where the verify message will be sent and messages will be auto deleted"
-				) +
-				help.create(
-					"settings verify nickname [prefix] [IGN] [postfix]",
-					"The nickname template on verifying. Can be set to none."
-				) +
-				help.create("settings verify <enable|disable> sync", "Enable or disable automatic verify role and nickname syncing")
-			);
+		paginateBuilder.addItems(
+			help.create("settings verify", "Get the current verify settings for the bot") +
+			help.create("settings verify <enable|disable>", "Enable or disable automatic verify") +
+			help.create("settings verify message <message>", "The message that users will see when verifying") +
+			help.create("settings verify role add <@role>", "Add a role that user will receive upon being verified") +
+			help.create("settings verify role remove <@role>", "Remove a verify role") +
+			help.create(
+				"settings verify channel <#channel>",
+				"Channel where the verify message will be sent and messages will be auto deleted"
+			) +
+			help.create("settings verify nickname [prefix] [IGN] [postfix]", "The nickname template on verifying. Can be set to none.") +
+			help.create("settings verify <enable|disable> sync", "Enable or disable automatic verify role and nickname syncing")
+		);
 
-			paginateBuilder.addItems(
-				help.create("settings guild create <name>", "Create a new automatic guild where name is the guild's name") +
-				help.create("settings guild remove <name>", "Remove an automatic guild") +
-				help.create("settings guild <name>", "View the settings for a specific automatic guild") +
-				help.create("settings guild <name> member_role <enable|disable>", "Enable or disable automatic guild role assigning") +
-				help.create("settings guild <name> member_role <@role>", "Set the role to give guild members") +
-				help.create("settings guild <name> ranks <enable|disable>", "Enable or disable automatic guild rank assigning") +
-				help.create("settings guild <name> ranks add <rank_name> <@role>", "Add an automatic guild rank") +
-				help.create("settings guild <name> ranks remove <rank_name>", "Remove an automatic guild rank") +
-				help.create("settings guild <name> counter <enable|disable>", "Enable or disable guild members counter")
-			);
+		paginateBuilder.addItems(
+			help.create("settings guild create <name>", "Create a new automatic guild where name is the guild's name") +
+			help.create("settings guild remove <name>", "Remove an automatic guild") +
+			help.create("settings guild <name>", "View the settings for a specific automatic guild") +
+			help.create("settings guild <name> member_role <enable|disable>", "Enable or disable automatic guild role assigning") +
+			help.create("settings guild <name> member_role <@role>", "Set the role to give guild members") +
+			help.create("settings guild <name> ranks <enable|disable>", "Enable or disable automatic guild rank assigning") +
+			help.create("settings guild <name> ranks add <rank_name> <@role>", "Add an automatic guild rank") +
+			help.create("settings guild <name> ranks remove <rank_name>", "Remove an automatic guild rank") +
+			help.create("settings guild <name> counter <enable|disable>", "Enable or disable guild members counter")
+		);
 
-			paginateBuilder.addItems(
-				help.create(
-					"settings guild blacklist add <player> [reason]",
-					"Blacklist a player from using the application system on this server"
-				) +
-				help.create("settings guild blacklist remove <player>", "Remove a player from the application blacklist") +
-				help.create("settings guild blacklist list", "List all players that are blacklisted from the application system") +
-				help.create("settings guild <name> apply <enable|disable>", "Enable or disable automatic apply") +
-				help.create("settings guild <name> apply message <message>", "The message that users will see when verifying") +
-				help.create(
-					"settings guild <name> apply staff_role add <@role>",
-					"Add a role that will be pinged when a new application is submitted"
-				) +
-				help.create("settings guild <name> apply staff_role remove <@role>", "Remove a staff ping role") +
-				help.create("settings guild <name> apply channel <#channel>", "Channel where the message to click for applying will sent") +
-				help.create("settings guild <name> apply category <category>", "Category where new apply channels will be made") +
-				help.create(
-					"settings guild <name> apply staff_channel <#channel>",
-					"Channel where new applications will be sent to be reviewed by staff"
-				) +
-				help.create(
-					"settings guild <name> apply waiting_channel <#channel>",
-					"Channel where the players who were accepted or waitlisted will be sent. Can be set to none"
-				) +
-				help.create("settings guild <name> apply accept_message <message>", "Message that will be sent if applicant is accepted") +
-				help.create(
-					"settings guild <name> apply waitlist_message <message>",
-					"Message that will be sent if applicant is waitlisted. Can be set to none"
-				) +
-				help.create(
-					"settings guild <name> apply ironman <true|false>",
-					"Whether applicants must use an ironman profile. Defaults to false"
-				) +
-				help.create("settings guild <name> apply deny_message <message>", "Message that will be sent if applicant is denied") +
-				help.create(
-					"settings guild <name> apply requirements add [slayer:amount] [skills:amount] [catacombs:amount] [weight:amount]",
-					"Add a requirement that applicant must meet. At least one of the requirement types must be set. Can be empty"
-				) +
-				help.create(
-					"settings guild <name> apply scammer_check <true|false>",
-					"Whether the applicant should be automatically be denied if marked a scammer in the SkyblockZ database"
-				) +
-				help.create(
-					"settings guild <name> apply reqs remove <index>",
-					"Remove a requirement. Run `settings guild <name>` to see the index for all current requirements"
-				)
-			);
+		paginateBuilder.addItems(
+			help.create(
+				"settings guild blacklist add <player> [reason]",
+				"Blacklist a player from using the application system on this server"
+			) +
+			help.create("settings guild blacklist remove <player>", "Remove a player from the application blacklist") +
+			help.create("settings guild blacklist list", "List all players that are blacklisted from the application system") +
+			help.create("settings guild <name> apply <enable|disable>", "Enable or disable automatic apply") +
+			help.create("settings guild <name> apply message <message>", "The message that users will see when verifying") +
+			help.create(
+				"settings guild <name> apply staff_role add <@role>",
+				"Add a role that will be pinged when a new application is submitted"
+			) +
+			help.create("settings guild <name> apply staff_role remove <@role>", "Remove a staff ping role") +
+			help.create("settings guild <name> apply channel <#channel>", "Channel where the message to click for applying will sent") +
+			help.create("settings guild <name> apply category <category>", "Category where new apply channels will be made") +
+			help.create(
+				"settings guild <name> apply staff_channel <#channel>",
+				"Channel where new applications will be sent to be reviewed by staff"
+			) +
+			help.create(
+				"settings guild <name> apply waiting_channel <#channel>",
+				"Channel where the players who were accepted or waitlisted will be sent. Can be set to none"
+			) +
+			help.create("settings guild <name> apply accept_message <message>", "Message that will be sent if applicant is accepted") +
+			help.create(
+				"settings guild <name> apply waitlist_message <message>",
+				"Message that will be sent if applicant is waitlisted. Can be set to none"
+			) +
+			help.create(
+				"settings guild <name> apply ironman <true|false>",
+				"Whether applicants must use an ironman profile. Defaults to false"
+			) +
+			help.create("settings guild <name> apply deny_message <message>", "Message that will be sent if applicant is denied") +
+			help.create(
+				"settings guild <name> apply requirements add [slayer:amount] [skills:amount] [catacombs:amount] [weight:amount]",
+				"Add a requirement that applicant must meet. At least one of the requirement types must be set. Can be empty"
+			) +
+			help.create(
+				"settings guild <name> apply scammer_check <true|false>",
+				"Whether the applicant should be automatically be denied if marked a scammer in the SkyblockZ database"
+			) +
+			help.create(
+				"settings guild <name> apply reqs remove <index>",
+				"Remove a requirement. Run `settings guild <name>` to see the index for all current requirements"
+			)
+		);
 
-			paginateBuilder.addItems(
-				help.create("settings roles", "Get the current roles settings for the bot") +
-				help.create("settings roles <enable|disable>", "Enable or disable automatic roles") +
-				help.create(
-					"settings roles use_highest <true|false>",
-					"Enable or disable using the highest values or last played on profile. Default is false"
-				) +
-				help.create(
-					"settings roles <enable|disable> <role_name|all>",
-					"Enable or disable a specific automatic role or enable or disable all applicable automatic roles"
-				) +
-				help.create(
-					"settings roles add <role_name> <value> <@role>",
-					"Add a new level to a role with its corresponding Discord role"
-				) +
-				help.create("settings roles remove <role_name> <value>", "Remove a role level for a role") +
-				help.create("settings roles set <role_name> <@role>", "Set a one level role's role")
-			);
-
+		paginateBuilder.addItems(
+			help.create("settings roles", "Get the current roles settings for the bot") +
+			help.create("settings roles <enable|disable>", "Enable or disable automatic roles") +
+			help.create(
+				"settings roles use_highest <true|false>",
+				"Enable or disable using the highest values or last played on profile. Default is false"
+			) +
+			help.create(
+				"settings roles <enable|disable> <role_name|all>",
+				"Enable or disable a specific automatic role or enable or disable all applicable automatic roles"
+			) +
+			help.create("settings roles add <role_name> <value> <@role>", "Add a new level to a role with its corresponding Discord role") +
+			help.create("settings roles remove <role_name> <value>", "Remove a role level for a role") +
+			help.create("settings roles set <role_name> <@role>", "Set a one level role's role")
+		);
 
 		event.paginate(paginateBuilder, startingPage);
 		return null;
