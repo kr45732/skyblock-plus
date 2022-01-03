@@ -63,7 +63,7 @@ public class PartyHandler {
 
 	private boolean condition(SelectMenuInteraction event) {
 		return (
-				event.isFromGuild() &&
+			event.isFromGuild() &&
 			event.getUser().getId().equals(paginatorEvent.getUser().getId()) &&
 			event.getChannel().getId().equals(paginatorEvent.getChannel().getId()) &&
 			event.getComponentId().equals(menuId)
@@ -199,7 +199,7 @@ public class PartyHandler {
 
 	private void scheduleWaiter() {
 		waiter.waitForEvent(
-				SelectMenuInteractionEvent.class,
+			SelectMenuInteractionEvent.class,
 			this::condition,
 			this::action,
 			3,

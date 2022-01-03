@@ -41,7 +41,8 @@ public class HelpSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return Commands.slash(name, "Show the help page for this bot")
+		return Commands
+			.slash(name, "Show the help page for this bot")
 			.addOption(OptionType.STRING, "command", "Name of command or page number");
 	}
 }

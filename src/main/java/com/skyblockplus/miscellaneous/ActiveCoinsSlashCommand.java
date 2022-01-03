@@ -43,7 +43,8 @@ public class ActiveCoinsSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return Commands.slash(name, "Get the active coins (bank, purse, and sold auctions) of a player")
+		return Commands
+			.slash(name, "Get the active coins (bank, purse, and sold auctions) of a player")
 			.addOption(OptionType.STRING, "player", "Player username or mention")
 			.addOption(OptionType.STRING, "profile", "Profile name");
 	}

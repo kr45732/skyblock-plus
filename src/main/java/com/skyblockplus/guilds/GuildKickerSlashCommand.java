@@ -51,7 +51,8 @@ public class GuildKickerSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return Commands.slash(name, "Get helper which shows who to promote or demote in your guild")
+		return Commands
+			.slash(name, "Get helper which shows who to promote or demote in your guild")
 			.addOption(OptionType.STRING, "requirements", "The requirements a player must meet", true)
 			.addOption(OptionType.STRING, "player", "Player username or mention")
 			.addOption(OptionType.BOOLEAN, "usekey", "If the API key for this server should be used for more accurate results");

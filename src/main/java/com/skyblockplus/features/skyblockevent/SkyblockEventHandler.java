@@ -78,7 +78,7 @@ public class SkyblockEventHandler {
 
 	private boolean condition(MessageReceivedEvent event) {
 		return (
-				event.isFromGuild() &&
+			event.isFromGuild() &&
 			paginatorEvent.getChannel().getId().equals(event.getChannel().getId()) &&
 			paginatorEvent.getUser().getId().equals(event.getAuthor().getId())
 		);

@@ -43,7 +43,8 @@ public class UuidSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return Commands.slash(name, "Convert a username to UUID or UUID to username")
-				.addOption(OptionType.STRING, "player", "Username or UUID");
+		return Commands
+			.slash(name, "Convert a username to UUID or UUID to username")
+			.addOption(OptionType.STRING, "player", "Username or UUID");
 	}
 }

@@ -18,6 +18,12 @@
 
 package com.skyblockplus.utils.slashcommand;
 
+import static com.skyblockplus.utils.Utils.invalidEmbed;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -25,13 +31,6 @@ import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.requests.ErrorResponse;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static com.skyblockplus.utils.Utils.invalidEmbed;
 
 public class SlashCommandClient extends ListenerAdapter {
 
@@ -99,7 +98,7 @@ public class SlashCommandClient extends ListenerAdapter {
 
 	@Override
 	public void onCommandAutoCompleteInteraction(CommandAutoCompleteInteractionEvent event) {
-		if(!event.getCommandType().equals(Command.Type.SLASH)){
+		if (!event.getCommandType().equals(Command.Type.SLASH)) {
 			return;
 		}
 

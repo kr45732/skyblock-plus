@@ -88,7 +88,7 @@ public class ApplyUser implements Serializable {
 
 		try {
 			this.logApplication = jda.getTextChannelById(higherDepth(currentSettings, "applyLogChannel").getAsString()) != null;
-		}catch (Exception ignored){}
+		} catch (Exception ignored) {}
 
 		Category applyCategory = event.getGuild().getCategoryById(higherDepth(currentSettings, "applyCategory").getAsString());
 		if (applyCategory.getChannels().size() == 50) {
@@ -272,7 +272,7 @@ public class ApplyUser implements Serializable {
 				" | Skill Average - " +
 				(player.getSkillAverage() == -1 ? "API disabled" : roundAndFormat(player.getSkillAverage())) +
 				" | Catacombs - " +
-						roundAndFormat(player.getCatacombs().getProgressLevel()) +
+				roundAndFormat(player.getCatacombs().getProgressLevel()) +
 				" | Weight - " +
 				roundAndFormat(player.getWeight())
 			);

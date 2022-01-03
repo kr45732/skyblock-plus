@@ -49,7 +49,8 @@ public class TrackAuctionsSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return Commands.slash(name, "Main track command")
+		return Commands
+			.slash(name, "Main track command")
 			.addSubcommands(
 				new SubcommandData(
 					"auctions",

@@ -18,18 +18,17 @@
 
 package com.skyblockplus.price;
 
+import static com.skyblockplus.utils.Utils.getClosestMatch;
+import static com.skyblockplus.utils.Utils.getLowestBinJson;
+
 import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-
-import java.util.stream.Collectors;
-
-import static com.skyblockplus.utils.Utils.getClosestMatch;
-import static com.skyblockplus.utils.Utils.getLowestBinJson;
 
 public class BinSlashCommand extends SlashCommand {
 
@@ -51,8 +50,16 @@ public class BinSlashCommand extends SlashCommand {
 
 	@Override
 	public void onAutoComplete(CommandAutoCompleteInteractionEvent event) {
-		if(event.getFocusedOption().getName().equals("item")){
-			event.replyChoiceStrings(getClosestMatch(event.getFocusedOption().getAsString(), getLowestBinJson().getAsJsonObject().keySet().stream().map(Utils::idToName).distinct().collect(Collectors.toList()), 25)).queue();
+		if (event.getFocusedOption().getName().equals("item")) {
+			event
+				.replyChoiceStrings(
+					getClosestMatch(
+						event.getFocusedOption().getAsString(),
+						getLowestBinJson().getAsJsonObject().keySet().stream().map(Utils::idToName).distinct().collect(Collectors.toList()),
+						25
+					)
+				)
+				.queue();
 		}
 	}
 }

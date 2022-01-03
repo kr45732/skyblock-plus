@@ -43,7 +43,8 @@ public class HotmSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return Commands.slash(name, "Get a player's heart of the mountain statistics")
+		return Commands
+			.slash(name, "Get a player's heart of the mountain statistics")
 			.addOption(OptionType.STRING, "player", "Player username or mention")
 			.addOption(OptionType.STRING, "profile", "Profile name");
 	}

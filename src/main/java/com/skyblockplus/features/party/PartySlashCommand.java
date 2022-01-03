@@ -50,7 +50,8 @@ public class PartySlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return Commands.slash(name, "Main party command")
+		return Commands
+			.slash(name, "Main party command")
 			.addSubcommands(
 				new SubcommandData("create", "Interactive message to create a new party"),
 				new SubcommandData("list", "List all active parties"),

@@ -57,11 +57,7 @@ public class InventoryPaginator {
 	}
 
 	private boolean condition(ButtonInteractionEvent event) {
-		return (
-			event.isFromGuild() &&
-			event.getUser().getId().equals(user.getId()) &&
-			event.getMessageId().equals(pagePart2.getId())
-		);
+		return (event.isFromGuild() && event.getUser().getId().equals(user.getId()) && event.getMessageId().equals(pagePart2.getId()));
 	}
 
 	public void action(ButtonInteractionEvent event) {
@@ -83,7 +79,7 @@ public class InventoryPaginator {
 
 	private void waitForEvent() {
 		waiter.waitForEvent(
-				ButtonInteractionEvent.class,
+			ButtonInteractionEvent.class,
 			this::condition,
 			this::action,
 			30,

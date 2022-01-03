@@ -115,5 +115,5 @@ public abstract class SlashCommand {
 
 	public abstract CommandData getCommandData();
 
-	public void onAutoComplete(CommandAutoCompleteInteractionEvent event){}
+	public void onAutoComplete(CommandAutoCompleteInteractionEvent event) {}
 }

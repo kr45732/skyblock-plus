@@ -961,7 +961,7 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder setApplyLogChannel(JsonObject guildSettings, String textChannel) {
-		if(textChannel.equalsIgnoreCase("none")){
+		if (textChannel.equalsIgnoreCase("none")) {
 			guildSettings.addProperty("applyLogChannel", "none");
 			int responseCode = database.setGuildSettings(guild.getId(), guildSettings);
 			if (responseCode != 200) {
@@ -1081,7 +1081,6 @@ public class SettingsExecute {
 
 		return defaultSettingsEmbed("Apply deny message set to: " + denyMessage);
 	}
-
 
 	public EmbedBuilder setApplyIronman(JsonObject guildSettings, boolean isIronman) {
 		guildSettings.addProperty("applyIronmanOnly", "" + isIronman);

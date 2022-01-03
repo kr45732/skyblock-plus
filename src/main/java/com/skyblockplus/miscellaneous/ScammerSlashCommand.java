@@ -43,7 +43,8 @@ public class ScammerSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return Commands.slash(name, "Check if a player is marked as a scammer in SBZ's database")
+		return Commands
+			.slash(name, "Check if a player is marked as a scammer in SBZ's database")
 			.addOption(OptionType.STRING, "player", "Player username or mention");
 	}
 }

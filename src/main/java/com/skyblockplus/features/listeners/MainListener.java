@@ -130,8 +130,7 @@ public class MainListener extends ListenerAdapter {
 							.getGuild()
 							.getTextChannels()
 							.stream()
-							.filter(c ->
-								event.getGuild().getPublicRole().hasPermission(c, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)
+							.filter(c -> event.getGuild().getPublicRole().hasPermission(c, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)
 							)
 							.min(Comparator.naturalOrder())
 							.orElse(null)
@@ -159,7 +158,7 @@ public class MainListener extends ListenerAdapter {
 
 	@Override
 	public void onMessageReactionAdd(MessageReactionAddEvent event) {
-		if(!event.isFromGuild()){
+		if (!event.isFromGuild()) {
 			return;
 		}
 
@@ -174,7 +173,7 @@ public class MainListener extends ListenerAdapter {
 
 	@Override
 	public void onMessageReceived(MessageReceivedEvent event) {
-		if(!event.isFromGuild()){
+		if (!event.isFromGuild()) {
 			return;
 		}
 
@@ -197,7 +196,7 @@ public class MainListener extends ListenerAdapter {
 
 	@Override
 	public void onMessageUpdate(MessageUpdateEvent event) {
-		if(!event.isFromGuild()){
+		if (!event.isFromGuild()) {
 			return;
 		}
 
@@ -208,7 +207,7 @@ public class MainListener extends ListenerAdapter {
 
 	@Override
 	public void onMessageDelete(MessageDeleteEvent event) {
-		if(!event.isFromGuild()){
+		if (!event.isFromGuild()) {
 			return;
 		}
 
@@ -219,7 +218,7 @@ public class MainListener extends ListenerAdapter {
 
 	@Override
 	public void onChannelDelete(ChannelDeleteEvent event) {
-		if(!event.isFromType(ChannelType.TEXT)){
+		if (!event.isFromType(ChannelType.TEXT)) {
 			return;
 		}
 

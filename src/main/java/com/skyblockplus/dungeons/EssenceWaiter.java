@@ -96,7 +96,7 @@ public class EssenceWaiter {
 
 	private boolean condition(MessageReactionAddEvent event) {
 		return (
-				event.isFromGuild() &&
+			event.isFromGuild() &&
 			event.getMessageId().equals(reactMessage.getId()) &&
 			event.getUser().getId().equals(user.getId()) &&
 			validReactions.contains(event.getReactionEmote().getName())

@@ -83,7 +83,8 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return Commands.slash(name, "Main event command")
+		return Commands
+			.slash(name, "Main event command")
 			.addSubcommands(
 				new SubcommandData("create", "Interactive message to create a Skyblock event"),
 				new SubcommandData("end", "Force end the event"),

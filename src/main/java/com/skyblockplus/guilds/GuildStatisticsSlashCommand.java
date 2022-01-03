@@ -43,7 +43,8 @@ public class GuildStatisticsSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return Commands.slash(name, "Get a guild's SkyBlock statistics of slayer, skills, catacombs, and weight")
+		return Commands
+			.slash(name, "Get a guild's SkyBlock statistics of slayer, skills, catacombs, and weight")
 			.addOption(OptionType.STRING, "player", "Player username or mention");
 	}
 }

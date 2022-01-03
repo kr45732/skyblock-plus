@@ -83,7 +83,8 @@ public class TalismanBagSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return Commands.slash(name, "Main talisman bag command")
+		return Commands
+			.slash(name, "Main talisman bag command")
 			.addSubcommands(
 				new SubcommandData("list", "Get a list of the player's talisman bag with lore")
 					.addOption(OptionType.STRING, "player", "Player username or mention")

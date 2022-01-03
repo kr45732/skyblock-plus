@@ -74,7 +74,8 @@ public class InventorySlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return Commands.slash(name, "Main inventory command")
+		return Commands
+			.slash(name, "Main inventory command")
 			.addSubcommands(
 				new SubcommandData("list", "Get a list of the player's inventory with lore")
 					.addOption(OptionType.STRING, "player", "Player username or mention")

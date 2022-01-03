@@ -180,7 +180,7 @@ public class SetupCommandHandler {
 
 	private boolean checkReply(MessageReceivedEvent event) {
 		return (
-				event.isFromGuild() &&
+			event.isFromGuild() &&
 			event.getChannel().getId().equals(buttonEvent.getChannel().getId()) &&
 			event.getAuthor().getId().equals(buttonEvent.getUser().getId())
 		);

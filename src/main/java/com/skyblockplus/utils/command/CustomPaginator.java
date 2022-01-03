@@ -23,7 +23,6 @@ import static com.skyblockplus.utils.Utils.defaultEmbed;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.jagrosh.jdautilities.menu.Menu;
 import com.skyblockplus.utils.structs.PaginatorExtras;
-
 import java.awt.*;
 import java.time.Instant;
 import java.util.Arrays;
@@ -175,7 +174,7 @@ public class CustomPaginator extends Menu {
 
 	private void pagination(Message message, int pageNum) {
 		waiter.waitForEvent(
-				ButtonInteractionEvent.class,
+			ButtonInteractionEvent.class,
 			event -> checkButtonClick(event, message.getId()),
 			event -> handleButtonClick(event, pageNum),
 			timeout,
