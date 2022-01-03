@@ -393,7 +393,7 @@ public class Utils {
 
 	public static JsonObject getJsonObject(String url) {
 		try {
-			return getJsonObject(url).getAsJsonObject();
+			return getJson(url).getAsJsonObject();
 		} catch (Exception e) {
 			return null;
 		}
