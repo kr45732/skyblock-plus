@@ -27,18 +27,18 @@ import com.skyblockplus.utils.Utils;
 import java.util.regex.Matcher;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 
 public class SlashCommandExecutedEvent {
 
-	private final SlashCommandEvent event;
+	private final SlashCommandInteraction event;
 	private final InteractionHook hook;
 	private final SlashCommandClient slashCommandClient;
 	public String player;
 
-	public SlashCommandExecutedEvent(SlashCommandEvent event, SlashCommandClient slashCommandClient) {
+	public SlashCommandExecutedEvent(SlashCommandInteraction event, SlashCommandClient slashCommandClient) {
 		this.event = event;
 		this.slashCommandClient = slashCommandClient;
 		this.hook = event.getHook();
@@ -52,7 +52,7 @@ public class SlashCommandExecutedEvent {
 		return hook;
 	}
 
-	public SlashCommandEvent getEvent() {
+	public SlashCommandInteraction getEvent() {
 		return event;
 	}
 

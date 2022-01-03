@@ -30,8 +30,9 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
-import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
+import net.dv8tion.jda.api.interactions.components.selections.SelectMenuInteraction;
 
 public class PartyHandler {
 
@@ -47,7 +48,7 @@ public class PartyHandler {
 		this.username = username;
 		this.paginatorEvent = paginatorEvent;
 
-		SelectionMenu menu = getMainSelectionMenu();
+		SelectMenu menu = getMainSelectionMenu();
 		this.menuId = menu.getId();
 		this.message =
 			paginatorEvent
@@ -60,22 +61,23 @@ public class PartyHandler {
 		scheduleWaiter();
 	}
 
-	private boolean condition(SelectionMenuEvent event) {
+	private boolean condition(SelectMenuInteraction event) {
 		return (
+				event.isFromGuild() &&
 			event.getUser().getId().equals(paginatorEvent.getUser().getId()) &&
 			event.getChannel().getId().equals(paginatorEvent.getChannel().getId()) &&
 			event.getComponentId().equals(menuId)
 		);
 	}
 
-	private void action(SelectionMenuEvent event) {
+	private void action(SelectMenuInteraction event) {
 		event.deferEdit().complete();
 
 		switch (menuId) {
 			case "party_finder_create_main":
 				switch (event.getSelectedOptions().get(0).getValue()) {
 					case "floor" -> {
-						SelectionMenu floorMenu = SelectionMenu
+						SelectMenu floorMenu = SelectMenu
 							.create("party_finder_create_floor")
 							.addOption("Entrance", "entrance")
 							.addOption("Floor 1", "floor_1")
@@ -102,7 +104,7 @@ public class PartyHandler {
 					case "class" -> {
 						classes.clear();
 						classIndex = 0;
-						SelectionMenu classMenu = getClassSelectionMenu("healer");
+						SelectMenu classMenu = getClassSelectionMenu("healer");
 						menuId = classMenu.getId();
 						event
 							.getHook()
@@ -150,7 +152,7 @@ public class PartyHandler {
 				break;
 			case "party_finder_create_floor":
 				floor = event.getSelectedOptions().get(0).getValue();
-				SelectionMenu mainMenu = getMainSelectionMenu();
+				SelectMenu mainMenu = getMainSelectionMenu();
 				menuId = mainMenu.getId();
 				event.getHook().editOriginalEmbeds(getCreationEmbed().build()).setActionRow(mainMenu).queue();
 				break;
@@ -166,17 +168,17 @@ public class PartyHandler {
 						for (int i = 0; i < 4 - classesSize; i++) {
 							classes.add("any");
 						}
-						SelectionMenu defaultMenu = getMainSelectionMenu();
+						SelectMenu defaultMenu = getMainSelectionMenu();
 						menuId = defaultMenu.getId();
 						event.getHook().editOriginalEmbeds(getCreationEmbed().build()).setActionRow(defaultMenu).queue();
 						break;
 					}
 
 					String nextClassName = DUNGEON_CLASS_NAMES.get(++classIndex);
-					SelectionMenu nextClassMenu = getClassSelectionMenu(nextClassName);
+					SelectMenu nextClassMenu = getClassSelectionMenu(nextClassName);
 
 					if (nextClassMenu == null) {
-						SelectionMenu defaultMenu = getMainSelectionMenu();
+						SelectMenu defaultMenu = getMainSelectionMenu();
 						menuId = defaultMenu.getId();
 						event.getHook().editOriginalEmbeds(getCreationEmbed().build()).setActionRow(defaultMenu).queue();
 						break;
@@ -197,7 +199,7 @@ public class PartyHandler {
 
 	private void scheduleWaiter() {
 		waiter.waitForEvent(
-			SelectionMenuEvent.class,
+				SelectMenuInteractionEvent.class,
 			this::condition,
 			this::action,
 			3,
@@ -206,8 +208,8 @@ public class PartyHandler {
 		);
 	}
 
-	private SelectionMenu getMainSelectionMenu() {
-		return SelectionMenu
+	private SelectMenu getMainSelectionMenu() {
+		return SelectMenu
 			.create("party_finder_create_main")
 			.addOption("Floor", "floor", "Change the requested floor number")
 			.addOption("Classes", "class", "Change the requested classes")
@@ -223,8 +225,8 @@ public class PartyHandler {
 		return eb;
 	}
 
-	private SelectionMenu getClassSelectionMenu(String className) {
-		SelectionMenu.Builder classMenu = SelectionMenu.create("party_finder_create_class_" + className);
+	private SelectMenu getClassSelectionMenu(String className) {
+		SelectMenu.Builder classMenu = SelectMenu.create("party_finder_create_class_" + className);
 		switch (classes.size()) {
 			case 0:
 				classMenu.addOption("Zero", "0");

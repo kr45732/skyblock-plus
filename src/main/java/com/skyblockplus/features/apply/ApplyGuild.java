@@ -30,11 +30,11 @@ import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageDeleteEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
+import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
 public class ApplyGuild {
@@ -82,15 +82,15 @@ public class ApplyGuild {
 		}
 	}
 
-	public void onTextChannelDelete(TextChannelDeleteEvent event) {
+	public void onTextChannelDelete(ChannelDeleteEvent event) {
 		applyUserList.removeIf(applyUser ->
 			(applyUser.applicationChannelId != null && applyUser.applicationChannelId.equals(event.getChannel().getId())) ||
 			(applyUser.staffChannelId != null && applyUser.staffChannelId.equals(event.getChannel().getId()))
 		);
 	}
 
-	public String onButtonClick_NewApplyUser(ButtonClickEvent event) {
-		if (event.getMessageIdLong() != reactMessage.getIdLong()) {
+	public String onButtonClick_NewApplyUser(ButtonInteractionEvent event) {
+		if (!event.getMessageId().equals(reactMessage.getId())) {
 			return null;
 		}
 
@@ -161,7 +161,7 @@ public class ApplyGuild {
 		return "✅ A new application was created in " + event.getGuild().getTextChannelById(toAdd.applicationChannelId).getAsMention();
 	}
 
-	public String onButtonClick(ButtonClickEvent event) {
+	public String onButtonClick(ButtonInteractionEvent event) {
 		String waitingForInvite = onButtonClick_WaitingForInviteApplyUser(event);
 		if (waitingForInvite != null) {
 			return waitingForInvite;
@@ -175,7 +175,7 @@ public class ApplyGuild {
 		return onButtonClick_NewApplyUser(event);
 	}
 
-	public boolean onButtonClick_CurrentApplyUser(ButtonClickEvent event) {
+	public boolean onButtonClick_CurrentApplyUser(ButtonInteractionEvent event) {
 		ApplyUser findApplyUser = applyUserList
 			.stream()
 			.filter(applyUser -> applyUser.reactMessageId.equals(event.getMessageId()))
@@ -185,7 +185,7 @@ public class ApplyGuild {
 		return findApplyUser != null && findApplyUser.onButtonClick(event, this);
 	}
 
-	public String onButtonClick_WaitingForInviteApplyUser(ButtonClickEvent event) {
+	public String onButtonClick_WaitingForInviteApplyUser(ButtonInteractionEvent event) {
 		if (!event.getChannel().equals(waitInviteChannel)) {
 			return null;
 		}
@@ -227,7 +227,7 @@ public class ApplyGuild {
 		return "✅ Player was invited";
 	}
 
-	public boolean onGuildMessageReceived(GuildMessageReceivedEvent event) {
+	public boolean onGuildMessageReceived(MessageReceivedEvent event) {
 		for (ApplyUser applyUser : applyUserList) {
 			if (applyUser.onGuildMessageReceived(event)) {
 				return true;
@@ -236,7 +236,7 @@ public class ApplyGuild {
 		return false;
 	}
 
-	public boolean onGuildMessageUpdate(GuildMessageUpdateEvent event) {
+	public boolean onGuildMessageUpdate(MessageUpdateEvent event) {
 		for (ApplyUser applyUser : applyUserList) {
 			if (applyUser.onGuildMessageUpdate(event)) {
 				return true;
@@ -245,7 +245,7 @@ public class ApplyGuild {
 		return false;
 	}
 
-	public boolean onGuildMessageDelete(GuildMessageDeleteEvent event) {
+	public boolean onGuildMessageDelete(MessageDeleteEvent event) {
 		for (ApplyUser applyUser : applyUserList) {
 			if (applyUser.onGuildMessageDelete(event)) {
 				return true;

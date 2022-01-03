@@ -22,6 +22,7 @@ import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 public class LinkSlashCommand extends SlashCommand {
 
@@ -43,7 +44,7 @@ public class LinkSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData(name, "Get what Hypixel account you are linked to")
+		return Commands.slash(name, "Get what Hypixel account you are linked to")
 			.addOption(OptionType.STRING, "player", "Link your Hypixel account to this bot");
 	}
 }

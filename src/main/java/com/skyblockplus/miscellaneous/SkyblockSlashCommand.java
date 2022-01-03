@@ -23,6 +23,7 @@ import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 public class SkyblockSlashCommand extends SlashCommand {
 
@@ -43,7 +44,7 @@ public class SkyblockSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData(name, "Get an overfiew of a player's Skyblock statistics")
+		return Commands.slash(name, "Get an overfiew of a player's Skyblock statistics")
 			.addOption(OptionType.STRING, "player", "Player username or mention")
 			.addOption(OptionType.STRING, "profile", "Profile name");
 	}

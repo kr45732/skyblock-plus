@@ -49,7 +49,6 @@ public class AutomatedGuild {
 	private String applyIronmanOnly = "false";
 	private String applyScammerCheck = "false";
 	private String applyLogChannel = "";
-	private String applyLogApplication = "false";
 
 	@Column(length = 2048)
 	private String applyMessage = "";

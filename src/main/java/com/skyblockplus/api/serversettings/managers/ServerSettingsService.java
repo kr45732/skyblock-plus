@@ -569,27 +569,6 @@ public class ServerSettingsService {
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 
-	public ResponseEntity<?> getPartyFinderCategoryId(String serverId) {
-		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
-
-		if (currentServerSettings != null) {
-			return new ResponseEntity<>(currentServerSettings.getPfCategoryId(), HttpStatus.OK);
-		}
-
-		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-	}
-
-	public ResponseEntity<HttpStatus> setPartyFinderCategoryId(String serverId, String newCategoryId) {
-		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
-
-		if (currentServerSettings != null) {
-			currentServerSettings.setPfCategoryId(newCategoryId);
-			settingsRepository.save(currentServerSettings);
-			return new ResponseEntity<>(HttpStatus.OK);
-		}
-
-		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-	}
 
 	public ResponseEntity<HttpStatus> setApplyGuestRole(String serverId, String newSettings) {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
@@ -625,16 +604,6 @@ public class ServerSettingsService {
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 
-	public ResponseEntity<?> getFetchurChannelId(String serverId) {
-		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
-
-		if (currentServerSettings != null) {
-			return new ResponseEntity<>(currentServerSettings.getFetchurChannel(), HttpStatus.OK);
-		}
-
-		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-	}
-
 	public ResponseEntity<HttpStatus> setFetchurChannelId(String serverId, String newChannelId) {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
@@ -654,16 +623,6 @@ public class ServerSettingsService {
 			currentServerSettings.setFetchurRole(newRoleId);
 			settingsRepository.save(currentServerSettings);
 			return new ResponseEntity<>(HttpStatus.OK);
-		}
-
-		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-	}
-
-	public ResponseEntity<?> getFetchurRole(String serverId) {
-		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
-
-		if (currentServerSettings != null) {
-			return new ResponseEntity<>(currentServerSettings.getFetchurRole(), HttpStatus.OK);
 		}
 
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

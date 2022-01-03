@@ -23,6 +23,7 @@ import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 public class GuildLeaderboardSlashCommand extends SlashCommand {
@@ -51,7 +52,7 @@ public class GuildLeaderboardSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData(name, "Get a leaderboard for a guild. The API key must be set for this server.")
+		return Commands.slash(name, "Get a leaderboard for a guild. The API key must be set for this server.")
 			.addOptions(
 				new OptionData(OptionType.STRING, "type", "The leaderboard type", true)
 					.addChoice("Slayer", "slayer")

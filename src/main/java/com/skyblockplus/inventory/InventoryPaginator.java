@@ -26,8 +26,8 @@ import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 public class InventoryPaginator {
 
@@ -56,16 +56,15 @@ public class InventoryPaginator {
 		waitForEvent();
 	}
 
-	private boolean condition(ButtonClickEvent event) {
+	private boolean condition(ButtonInteractionEvent event) {
 		return (
 			event.isFromGuild() &&
-			!event.getUser().isBot() &&
 			event.getUser().getId().equals(user.getId()) &&
 			event.getMessageId().equals(pagePart2.getId())
 		);
 	}
 
-	public void action(ButtonClickEvent event) {
+	public void action(ButtonInteractionEvent event) {
 		if (event.getComponentId().equals("inv_paginator_left_button")) {
 			if ((pageNumber - 1) >= 0) {
 				pageNumber -= 1;
@@ -84,7 +83,7 @@ public class InventoryPaginator {
 
 	private void waitForEvent() {
 		waiter.waitForEvent(
-			ButtonClickEvent.class,
+				ButtonInteractionEvent.class,
 			this::condition,
 			this::action,
 			30,

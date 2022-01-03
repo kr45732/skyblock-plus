@@ -22,6 +22,7 @@ import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 public class BazaarSlashCommand extends SlashCommand {
 
@@ -38,6 +39,6 @@ public class BazaarSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData(name, "Get bazaar prices of an item").addOption(OptionType.STRING, "item", "Item name", true);
+		return Commands.slash(name, "Get bazaar prices of an item").addOption(OptionType.STRING, "item", "Item name", true);
 	}
 }

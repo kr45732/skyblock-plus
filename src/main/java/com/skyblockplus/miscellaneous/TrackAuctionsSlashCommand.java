@@ -22,6 +22,7 @@ import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class TrackAuctionsSlashCommand extends SlashCommand {
@@ -48,7 +49,7 @@ public class TrackAuctionsSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData(name, "Main track command")
+		return Commands.slash(name, "Main track command")
 			.addSubcommands(
 				new SubcommandData(
 					"auctions",

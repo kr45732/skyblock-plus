@@ -26,6 +26,7 @@ import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class SkyblockEventSlashCommand extends SlashCommand {
@@ -82,7 +83,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData(name, "Main event command")
+		return Commands.slash(name, "Main event command")
 			.addSubcommands(
 				new SubcommandData("create", "Interactive message to create a Skyblock event"),
 				new SubcommandData("end", "Force end the event"),

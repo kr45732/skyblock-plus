@@ -39,8 +39,8 @@ import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 public class SkyblockEventHandler {
 
@@ -67,7 +67,7 @@ public class SkyblockEventHandler {
 
 		this.eventSettings = new EventSettings();
 		waiter.waitForEvent(
-			GuildMessageReceivedEvent.class,
+			MessageReceivedEvent.class,
 			this::condition,
 			this::action,
 			3,
@@ -76,14 +76,15 @@ public class SkyblockEventHandler {
 		);
 	}
 
-	private boolean condition(GuildMessageReceivedEvent event) {
+	private boolean condition(MessageReceivedEvent event) {
 		return (
+				event.isFromGuild() &&
 			paginatorEvent.getChannel().getId().equals(event.getChannel().getId()) &&
 			paginatorEvent.getUser().getId().equals(event.getAuthor().getId())
 		);
 	}
 
-	private void action(GuildMessageReceivedEvent event) {
+	private void action(MessageReceivedEvent event) {
 		String replyMessage = event.getMessage().getContentRaw();
 
 		if (replyMessage.equalsIgnoreCase("cancel")) {
@@ -438,7 +439,7 @@ public class SkyblockEventHandler {
 			guildMap.get(paginatorEvent.getGuild().getId()).setSkyblockEventHandler(null);
 		} else if (waitForReply) {
 			waiter.waitForEvent(
-				GuildMessageReceivedEvent.class,
+				MessageReceivedEvent.class,
 				this::condition,
 				this::action,
 				3,

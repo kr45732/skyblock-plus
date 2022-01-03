@@ -23,6 +23,7 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public abstract class SlashCommand {
@@ -57,7 +58,7 @@ public abstract class SlashCommand {
 		for (Permission p : botPermissions) {
 			if (p.isChannel()) {
 				if (!event.getSelfMember().hasPermission(event.getTextChannel(), p)) {
-					if (p == Permission.MESSAGE_WRITE) {
+					if (p == Permission.MESSAGE_SEND) {
 						event
 							.getUser()
 							.openPrivateChannel()
@@ -113,4 +114,6 @@ public abstract class SlashCommand {
 	}
 
 	public abstract CommandData getCommandData();
+
+	public void onAutoComplete(CommandAutoCompleteInteractionEvent event){}
 }

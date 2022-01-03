@@ -18,26 +18,26 @@
 
 package com.skyblockplus.features.party;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.PaginatorEvent;
-import java.util.EnumSet;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.ThreadChannel;
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.interactions.components.Button;
-import net.dv8tion.jda.api.requests.restaction.ChannelAction;
+
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.utils.Utils.*;
 
 public class PartyCommand extends Command {
 
@@ -224,54 +224,44 @@ public class PartyCommand extends Command {
 				)
 				.queueAfter(1, TimeUnit.SECONDS);
 			if (party.getPartyMembers().size() == 4) {
-				if (guildMap.get(event.getGuild().getId()).partyFinderCategory != null) {
-					ChannelAction<TextChannel> action = guildMap
-						.get(event.getGuild().getId())
-						.partyFinderCategory.createTextChannel("pf-" + party.getPartyLeaderUsername())
-						.addPermissionOverride(event.getMember(), EnumSet.of(Permission.VIEW_CHANNEL), null)
-						.addPermissionOverride(event.getGuild().getPublicRole(), null, EnumSet.of(Permission.VIEW_CHANNEL));
-					for (Party.PartyMember partyMember : party.getPartyMembers()) {
-						action =
-							action.addMemberPermissionOverride(
-								Long.parseLong(partyMember.getDiscordId()),
-								EnumSet.of(Permission.VIEW_CHANNEL),
-								null
-							);
-					}
-					TextChannel pfChannel = action.complete();
-					pfChannel
-						.sendMessage(
-							"<@" +
-							party.getPartyLeaderId() +
-							"> " +
-							party.getPartyMembers().stream().map(m -> "<@" + m.getDiscordId() + ">").collect(Collectors.joining(" "))
-						)
-						.setEmbeds(
-							defaultEmbed("Party Finder")
-								.setDescription(
-									"Your party has reached 5/5 players and has been unlisted. The party leader can click the button below to close this channel."
-								)
-								.build()
-						)
-						.setActionRow(Button.danger("party_finder_channel_close_" + party.getPartyLeaderId(), "Close Channel"))
-						.queueAfter(1, TimeUnit.SECONDS);
-				} else {
+				try {
+					ThreadChannel threadChannel = channel
+							.createThreadChannel("pf-" + party.getPartyLeaderUsername()).complete();
+
+					threadChannel
+							.sendMessage(
+									"<@" +
+											party.getPartyLeaderId() +
+											"> " +
+											party.getPartyMembers().stream().map(m -> "<@" + m.getDiscordId() + ">").collect(Collectors.joining(" "))
+							)
+							.setEmbeds(
+									defaultEmbed("Party Finder")
+											.setDescription(
+													"Your party has reached 5/5 players and has been unlisted. The party leader can click the button below to close this channel."
+											)
+											.build()
+							)
+							.setActionRow(Button.danger("party_finder_channel_close_" + party.getPartyLeaderId(), "Close Channel"))
+							.queueAfter(1, TimeUnit.SECONDS);
+				} catch (InsufficientPermissionException e) {
 					channel
-						.sendMessage(
-							"<@" +
-							party.getPartyLeaderId() +
-							"> " +
-							party.getPartyMembers().stream().map(m -> "<@" + m.getDiscordId() + ">").collect(Collectors.joining(" "))
-						)
-						.setEmbeds(
-							defaultEmbed("Party Finder")
-								.setDescription(
-									"Your party has reached 5/5 players and has been unlisted. Cannot create new text channel since the server's party finder category has not been set"
-								)
-								.build()
-						)
-						.queueAfter(1, TimeUnit.SECONDS);
+							.sendMessage(
+									"<@" +
+											party.getPartyLeaderId() +
+											"> " +
+											party.getPartyMembers().stream().map(m -> "<@" + m.getDiscordId() + ">").collect(Collectors.joining(" "))
+							)
+							.setEmbeds(
+									defaultEmbed("Party Finder")
+											.setDescription(
+													"Your party has reached 5/5 players and has been unlisted. Missing permissions to create a channel: `" + e.getMessage().split("Missing permission: ")[1] + "`"
+											)
+											.build()
+							)
+							.queueAfter(1, TimeUnit.SECONDS);
 				}
+
 				partyList.remove(party);
 			}
 

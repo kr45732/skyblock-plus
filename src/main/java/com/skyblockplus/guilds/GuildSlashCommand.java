@@ -24,6 +24,7 @@ import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
@@ -57,7 +58,7 @@ public class GuildSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData(name, "Main guild command")
+		return Commands.slash(name, "Main guild command")
 			.addSubcommands(
 				new SubcommandData("player", "Find what guild a player is in")
 					.addOption(OptionType.STRING, "player", "Player username or mention"),

@@ -23,6 +23,7 @@ import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
@@ -58,7 +59,7 @@ public class AuctionsSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData(name, "Main auctions command")
+		return Commands.slash(name, "Main auctions command")
 			.addSubcommands(
 				new SubcommandData("player", "Get player's active (not claimed) auctions on all profiles")
 					.addOption(OptionType.STRING, "player", "Player username or mention")

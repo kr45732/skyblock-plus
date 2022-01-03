@@ -188,6 +188,19 @@
           "names": [
             "big shrimp"
           ]
+        },
+        {
+          "requirements": [
+            [
+              {
+                "amount": 15000,
+                "type": "weight"
+              }
+            ]
+          ],
+          "names": [
+            "sweaty shrimp"
+          ]
         }
       ]
     }

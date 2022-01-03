@@ -215,10 +215,6 @@ public class Database {
 		return settingsService.setApplyBlacklist(serverId, gson.fromJson(newSettings, ApplyBlacklist[].class)).getStatusCodeValue();
 	}
 
-	public int setPartyFinderCategoryId(String serverId, String newSettings) {
-		return settingsService.setPartyFinderCategoryId(serverId, newSettings).getStatusCodeValue();
-	}
-
 	public List<AutomatedGuild> getAllGuildSettings(String serverId) {
 		return settingsService.getAllGuildSettings(serverId);
 	}

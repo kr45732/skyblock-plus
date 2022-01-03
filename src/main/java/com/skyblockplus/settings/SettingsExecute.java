@@ -105,7 +105,6 @@ public class SettingsExecute {
 			switch (args[2]) {
 				case "hypixel_key" -> eb = setHypixelKey(args[3]);
 				case "prefix" -> eb = setPrefix(content.split(" ", 4)[3]);
-				case "pf_category" -> eb = setPartyFinderCategory(args[3]);
 				case "guest_role" -> eb = setApplyGuestRole(args[3]);
 				case "fetchur_channel" -> eb = setFetchurChannel(args[3]);
 				case "fetchur_ping" -> eb = setFetchurPing(args[3]);
@@ -174,8 +173,6 @@ public class SettingsExecute {
 			eb.addField("Prefix", higherDepth(currentSettings, "prefix", DEFAULT_PREFIX), false);
 			String hypixelKey = database.getServerHypixelApiKey(guild.getId());
 			eb.addField("Hypixel API Key", hypixelKey != null && !hypixelKey.isEmpty() ? "Hidden" : "Not set", false);
-			String pfCategory = higherDepth(currentSettings, "pfCategoryId", "none");
-			eb.addField("Party Finder Category", pfCategory.equals("none") ? "None" : "<#" + pfCategory + ">", false);
 			String fetchurChannel = higherDepth(currentSettings, "fetchurChannel", "none");
 			eb.addField("Fetchur Notifications Channel", fetchurChannel.equals("none") ? "None" : "<#" + fetchurChannel + ">", false);
 			String fetchurRole = higherDepth(currentSettings, "fetchurRole", "none");
@@ -443,13 +440,6 @@ public class SettingsExecute {
 								eb = setApplyScammerCheck(guildSettings.getAsJsonObject(), true);
 							} else if (args[5].equals("false")) {
 								eb = setApplyScammerCheck(guildSettings.getAsJsonObject(), false);
-							}
-							break;
-						case "log_applications":
-							if (args[5].equals("true")) {
-								eb = setApplyLogApplications(guildSettings.getAsJsonObject(), true);
-							} else if (args[5].equals("false")) {
-								eb = setApplyLogApplications(guildSettings.getAsJsonObject(), false);
 							}
 							break;
 						case "log_channel":
@@ -971,6 +961,16 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder setApplyLogChannel(JsonObject guildSettings, String textChannel) {
+		if(textChannel.equalsIgnoreCase("none")){
+			guildSettings.addProperty("applyLogChannel", "none");
+			int responseCode = database.setGuildSettings(guild.getId(), guildSettings);
+			if (responseCode != 200) {
+				return apiFailMessage(responseCode);
+			}
+
+			return defaultSettingsEmbed("Set apply log channel to: none");
+		}
+
 		TextChannel applyChannel = guild.getTextChannelById(textChannel.replaceAll("[<#>]", ""));
 		EmbedBuilder eb = checkTextChannel(applyChannel);
 		if (eb != null) {
@@ -1082,21 +1082,6 @@ public class SettingsExecute {
 		return defaultSettingsEmbed("Apply deny message set to: " + denyMessage);
 	}
 
-	public EmbedBuilder setApplyLogApplications(JsonObject guildSettings, boolean logApps) {
-		if (!logApps) {
-			if (higherDepth(guildSettings, "applyLogChannel", "").isEmpty()) {
-				return invalidEmbed("Log channel must be set before enabling application logging");
-			}
-		}
-
-		guildSettings.addProperty("applyLogApplication", "" + logApps);
-		int responseCode = database.setGuildSettings(guild.getId(), guildSettings);
-		if (responseCode != 200) {
-			return apiFailMessage(responseCode);
-		}
-
-		return defaultSettingsEmbed("Set apply logging applications to: " + logApps);
-	}
 
 	public EmbedBuilder setApplyIronman(JsonObject guildSettings, boolean isIronman) {
 		guildSettings.addProperty("applyIronmanOnly", "" + isIronman);
@@ -2302,29 +2287,6 @@ public class SettingsExecute {
 
 		guildMap.get(guild.getId()).setPrefix(DEFAULT_PREFIX);
 		return defaultSettingsEmbed("**Reset the server's prefix to:** " + DEFAULT_PREFIX);
-	}
-
-	public EmbedBuilder setPartyFinderCategory(String category) {
-		try {
-			if (category.equalsIgnoreCase("none")) {
-				int responseCode = database.setPartyFinderCategoryId(guild.getId(), "none");
-				if (responseCode != 200) {
-					return invalidEmbed("API returned response code " + responseCode);
-				}
-				guildMap.get(guild.getId()).setPartyFinderCategory(null);
-				return defaultSettingsEmbed("**Party finder new channel category disabled**");
-			} else {
-				Category pfCategory = guild.getCategoryById(category.replaceAll("[<#>]", ""));
-				int responseCode = database.setPartyFinderCategoryId(guild.getId(), pfCategory.getId());
-				if (responseCode != 200) {
-					return invalidEmbed("API returned response code " + responseCode);
-				}
-				guildMap.get(guild.getId()).setPartyFinderCategory(pfCategory);
-
-				return defaultSettingsEmbed("**Party finder new channel category set to:** <#" + pfCategory.getId() + ">");
-			}
-		} catch (Exception ignored) {}
-		return invalidEmbed("Invalid guild category id");
 	}
 
 	public EmbedBuilder setFetchurChannel(String channel) {

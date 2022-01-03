@@ -134,30 +134,30 @@ public class Utils {
 	private static Instant userCountLastUpdated = Instant.now();
 	private static int userCount = -1;
 	/* JSON */
-	private static JsonElement essenceCostsJson;
-	private static JsonElement levelingJson;
+	private static JsonObject essenceCostsJson;
+	private static JsonObject levelingJson;
 	private static JsonObject collectionsJson;
-	private static JsonElement skyCryptPetJson;
-	private static JsonElement enchantsJson;
-	private static JsonElement petNumsJson;
-	private static JsonElement petsJson;
-	private static JsonElement reforgeStonesJson;
-	private static JsonElement bitsJson;
-	private static JsonElement miscJson;
-	private static JsonElement talismanJson;
-	private static JsonElement lowestBinJson;
-	private static JsonElement averageAuctionJson;
-	private static JsonElement bazaarJson;
+	private static JsonObject skyCryptPetJson;
+	private static JsonObject enchantsJson;
+	private static JsonObject petNumsJson;
+	private static JsonObject petsJson;
+	private static JsonObject reforgeStonesJson;
+	private static JsonObject bitsJson;
+	private static JsonObject miscJson;
+	private static JsonObject talismanJson;
+	private static JsonObject lowestBinJson;
+	private static JsonObject averageAuctionJson;
+	private static JsonObject bazaarJson;
 	private static JsonArray sbzPricesJson;
 	private static JsonObject emojiMap;
 	private static JsonArray npcSellPrices;
 
 	/* Getters */
-	public static JsonElement getLowestBinJson() {
+	public static JsonObject getLowestBinJson() {
 		if (lowestBinJson == null || Duration.between(lowestBinJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
-			lowestBinJson = getJson("https://moulberry.codes/lowestbin.json");
+			lowestBinJson = getJsonObject("https://moulberry.codes/lowestbin.json");
 			if (lowestBinJson == null) {
-				lowestBinJson = getJson("http://venus.arcator.co.uk:1194/lowestbin?key=" + AUCTION_API_KEY);
+				lowestBinJson = getJsonObject("http://venus.arcator.co.uk:1194/lowestbin?key=" + AUCTION_API_KEY);
 			}
 			lowestBinJsonLastUpdated = Instant.now();
 		}
@@ -168,7 +168,7 @@ public class Utils {
 	public static JsonObject getInternalJsonMappings() {
 		if (internalJsonMappings == null) {
 			internalJsonMappings =
-				getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json").getAsJsonObject();
+					getJsonObject("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json");
 		}
 
 		return internalJsonMappings;
@@ -185,29 +185,18 @@ public class Utils {
 		return emojiMap;
 	}
 
-	public static boolean getEmojiMap(boolean forceReload) {
-		if (forceReload) {
-			try {
-				emojiMap =
-					JsonParser.parseReader(new FileReader("src/main/java/com/skyblockplus/json/IdToEmojiMappings.json")).getAsJsonObject();
-			} catch (Exception ignored) {}
-		}
-
-		return emojiMap != null && forceReload;
-	}
-
-	public static JsonElement getAverageAuctionJson() {
+	public static JsonObject getAverageAuctionJson() {
 		if (averageAuctionJson == null || Duration.between(averageAuctionJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
-			averageAuctionJson = getJson("https://moulberry.codes/auction_averages/3day.json");
+			averageAuctionJson = getJsonObject("https://moulberry.codes/auction_averages/3day.json");
 			averageAuctionJsonLastUpdated = Instant.now();
 		}
 
 		return averageAuctionJson;
 	}
 
-	public static JsonElement getBazaarJson() {
+	public static JsonObject getBazaarJson() {
 		if (bazaarJson == null || Duration.between(bazaarJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
-			bazaarJson = getJson("https://api.hypixel.net/skyblock/bazaar");
+			bazaarJson = getJsonObject("https://api.hypixel.net/skyblock/bazaar");
 			bazaarJsonLastUpdated = Instant.now();
 		}
 
@@ -237,15 +226,15 @@ public class Utils {
 		return sbzPricesJson;
 	}
 
-	public static JsonElement getMiscJson() {
+	public static JsonObject getMiscJson() {
 		if (miscJson == null) {
-			miscJson = getJson("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/misc.json");
+			miscJson = getJsonObject("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/misc.json");
 		}
 
 		return miscJson;
 	}
 
-	public static JsonElement getTalismanJson() {
+	public static JsonObject getTalismanJson() {
 		if (talismanJson == null) {
 			talismanJson =
 				parseJsString(
@@ -255,63 +244,63 @@ public class Utils {
 						.replace(" = ", ": ")
 						.replace(";", ",") +
 					"}"
-				);
+				).getAsJsonObject();
 		}
 
 		return talismanJson;
 	}
 
-	public static JsonElement getBitsJson() {
+	public static JsonObject getBitsJson() {
 		if (bitsJson == null) {
-			bitsJson = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/BitPricesJson.json");
+			bitsJson = getJsonObject("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/BitPricesJson.json");
 		}
 
 		return bitsJson;
 	}
 
-	public static JsonElement getReforgeStonesJson() {
+	public static JsonObject getReforgeStonesJson() {
 		if (reforgeStonesJson == null) {
 			reforgeStonesJson =
-				getJson("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/reforgestones.json");
+					getJsonObject("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/reforgestones.json");
 		}
 
 		return reforgeStonesJson;
 	}
 
-	public static JsonElement getPetJson() {
+	public static JsonObject getPetJson() {
 		if (petsJson == null) {
-			petsJson = getJson("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/pets.json");
+			petsJson = getJsonObject("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/pets.json");
 		}
 		return petsJson;
 	}
 
-	public static JsonElement getPetNumsJson() {
+	public static JsonObject getPetNumsJson() {
 		if (petNumsJson == null) {
-			petNumsJson = getJson("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/petnums.json");
+			petNumsJson = getJsonObject("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/petnums.json");
 		}
 		return petNumsJson;
 	}
 
-	public static JsonElement getEnchantsJson() {
+	public static JsonObject getEnchantsJson() {
 		if (enchantsJson == null) {
 			enchantsJson =
-				getJson("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/enchants.json");
+					getJsonObject("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/enchants.json");
 		}
 		return enchantsJson;
 	}
 
-	public static JsonElement getLevelingJson() {
+	public static JsonObject getLevelingJson() {
 		if (levelingJson == null) {
 			levelingJson =
-				getJson("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/leveling.json");
+					getJsonObject("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/leveling.json");
 		}
 		return levelingJson;
 	}
 
-	public static JsonElement getEssenceCostsJson() {
+	public static JsonObject getEssenceCostsJson() {
 		if (essenceCostsJson == null) {
 			essenceCostsJson =
-				getJson("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/essencecosts.json");
+					getJsonObject("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/constants/essencecosts.json");
 		}
 		return essenceCostsJson;
 	}
@@ -342,7 +331,7 @@ public class Utils {
 		return collectionsJson;
 	}
 
-	public static JsonElement getSkyCryptPetJson() {
+	public static JsonObject getSkyCryptPetJson() {
 		if (skyCryptPetJson == null) {
 			skyCryptPetJson =
 				parseJsString(
@@ -359,7 +348,7 @@ public class Utils {
 						.replaceAll("")
 						.replace("//(.*)", "")
 						.replaceAll("(description: `)(.*?)(\\s*`,)", "")
-				);
+				).getAsJsonObject();
 		}
 
 		return skyCryptPetJson;
@@ -393,6 +382,14 @@ public class Utils {
 			}
 		} catch (Exception ignored) {}
 		return null;
+	}
+
+	public static JsonObject getJsonObject(String url){
+		try{
+			return getJsonObject(url).getAsJsonObject();
+		}catch (Exception e){
+			return null;
+		}
 	}
 
 	public static String getSkyCryptData(String dataUrl) {
@@ -780,6 +777,8 @@ public class Utils {
 				return "JUJU_SHORTBOW";
 			case "VALK":
 				return "VALKYRIE";
+			case "HANDLE":
+				return "NECRON_HANDLE";
 		}
 
 		for (Map.Entry<String, JsonElement> entry : internalJsonMappings.entrySet()) {
@@ -929,6 +928,16 @@ public class Utils {
 
 		return closestMatch;
 	}
+
+	public static List<String> getClosestMatch(String toMatch, List<String> matchFrom, int numMatches) {
+		if (matchFrom == null || matchFrom.size() == 0) {
+			return List.of(toMatch);
+		}
+
+		LevenshteinDistance matchCalc = LevenshteinDistance.getDefaultInstance();
+		return matchFrom.stream().sorted(Comparator.comparingInt(m -> matchCalc.apply(m, toMatch))).limit(numMatches).collect(Collectors.toList());
+	}
+
 
 	public static String skyblockStatsLink(String username, String profileName) {
 		if (username == null) {
@@ -1277,7 +1286,7 @@ public class Utils {
 
 	public static Permission[] defaultPerms() {
 		return new Permission[] {
-			Permission.MESSAGE_WRITE,
+			Permission.MESSAGE_SEND,
 			Permission.MESSAGE_EMBED_LINKS,
 			Permission.MESSAGE_MANAGE,
 			Permission.MESSAGE_ADD_REACTION,

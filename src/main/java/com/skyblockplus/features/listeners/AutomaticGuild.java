@@ -56,16 +56,16 @@ import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
+import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageDeleteEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
-import net.dv8tion.jda.api.interactions.components.Button;
-import net.dv8tion.jda.api.interactions.components.ButtonStyle;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
@@ -93,7 +93,6 @@ public class AutomaticGuild {
 	public Instant lastMee6RankUpdate = null;
 	/* Party */
 	public List<Party> partyList = new ArrayList<>();
-	public Category partyFinderCategory = null;
 	public String prefix;
 	public TextChannel fetchurChannel = null;
 	private Role applyGuestRole = null;
@@ -109,9 +108,6 @@ public class AutomaticGuild {
 		prefix = database.getPrefix(guildId);
 		farmingContest = new FarmingContest(guildId, higherDepth(serverSettings, "jacobSettings"));
 		currentMee6Settings = higherDepth(serverSettings, "mee6Data");
-		try {
-			partyFinderCategory = event.getGuild().getCategoryById(higherDepth(serverSettings, "serverSettings", null));
-		} catch (Exception ignored) {}
 		try {
 			fetchurChannel = event.getGuild().getTextChannelById(higherDepth(serverSettings, "fetchurChannel", null));
 		} catch (Exception ignored) {}
@@ -563,7 +559,7 @@ public class AutomaticGuild {
 		return "Mee6 roles are " + (enabled ? "enabled" : "disabled");
 	}
 
-	public void mee6Roles(GuildMessageReceivedEvent event) {
+	public void mee6Roles(MessageReceivedEvent event) {
 		if (event.getMessage().getContentRaw().toLowerCase().startsWith("!rank")) {
 			try {
 				if (!higherDepth(currentMee6Settings, "enable").getAsBoolean()) {
@@ -633,7 +629,7 @@ public class AutomaticGuild {
 		applyGuild.forEach(o1 -> o1.onMessageReactionAdd(event));
 	}
 
-	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
+	public void onGuildMessageReceived(MessageReceivedEvent event) {
 		if (event.getGuild().getId().equals("796790757947867156") && event.getChannel().getId().equals("869278025018114108")) {
 			if (
 				event.getMessage().getEmbeds().size() > 0 &&
@@ -675,11 +671,11 @@ public class AutomaticGuild {
 		mee6Roles(event);
 	}
 
-	public void onTextChannelDelete(TextChannelDeleteEvent event) {
+	public void onTextChannelDelete(ChannelDeleteEvent event) {
 		applyGuild.forEach(o1 -> o1.onTextChannelDelete(event));
 	}
 
-	public void onButtonClick(ButtonClickEvent event) {
+	public void onButtonClick(ButtonInteractionEvent event) {
 		if (event.getComponentId().startsWith("paginator_") || event.getComponentId().startsWith("inv_paginator_")) {
 			return;
 		} else if (event.getComponentId().startsWith("event_message_")) {
@@ -931,10 +927,6 @@ public class AutomaticGuild {
 		return finalOutput;
 	}
 
-	public void setPartyFinderCategory(Category category) {
-		this.partyFinderCategory = category;
-	}
-
 	public void setApplyGuestRole(Role role) {
 		this.applyGuestRole = role;
 	}
@@ -965,7 +957,7 @@ public class AutomaticGuild {
 		}
 	}
 
-	public void onGuildMessageUpdate(GuildMessageUpdateEvent event) {
+	public void onGuildMessageUpdate(MessageUpdateEvent event) {
 		for (ApplyGuild guild : applyGuild) {
 			if (guild.onGuildMessageUpdate(event)) {
 				return;
@@ -973,7 +965,7 @@ public class AutomaticGuild {
 		}
 	}
 
-	public void onGuildMessageDelete(GuildMessageDeleteEvent event) {
+	public void onGuildMessageDelete(MessageDeleteEvent event) {
 		for (ApplyGuild guild : applyGuild) {
 			if (guild.onGuildMessageDelete(event)) {
 				return;

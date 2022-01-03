@@ -23,6 +23,7 @@ import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 public class BidsSlashCommand extends SlashCommand {
 
@@ -43,6 +44,6 @@ public class BidsSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData(name, "Get a player's bids").addOption(OptionType.STRING, "player", "Player username or mention");
+		return Commands.slash(name, "Get a player's bids").addOption(OptionType.STRING, "player", "Player username or mention");
 	}
 }

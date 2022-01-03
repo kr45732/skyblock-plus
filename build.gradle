@@ -50,15 +50,20 @@ repositories {
 
 dependencies {
     // JDA (Discord API wrapper)
-     implementation ('net.dv8tion:JDA:4.4.0_352') {
-         exclude module: 'opus-java'
-     }
+//    implementation ('net.dv8tion:JDA:5.0.0-alpha.3') {
+//         exclude module: 'opus-java'
+//    }
+
+    implementation ('com.github.DV8FromTheWorld:JDA:rework~interactions-SNAPSHOT') {
+        exclude module: 'opus-java'
+    }
 
     // Discord webhooks
     implementation 'club.minnced:discord-webhooks:0.7.5'
 
     // JDA utilities
-    implementation 'pw.chew:jda-chewtils:1.24.1'
+//    implementation 'pw.chew:jda-chewtils:1.24.1'
+    implementation 'com.github.Chew:JDA-Chewtils:rework~interactions-SNAPSHOT'
 
     // Google libraries
     implementation 'com.google.code.gson:gson:2.8.9'

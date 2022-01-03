@@ -23,6 +23,7 @@ import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 public class SettingsSlashCommand extends SlashCommand {
 
@@ -46,6 +47,6 @@ public class SettingsSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData(name, "Main settings command").addOption(OptionType.STRING, "command", "Subcommand to execute");
+		return Commands.slash(name, "Main settings command").addOption(OptionType.STRING, "command", "Subcommand to execute");
 	}
 }

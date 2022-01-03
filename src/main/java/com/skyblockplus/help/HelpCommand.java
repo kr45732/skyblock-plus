@@ -742,6 +742,10 @@ public class HelpCommand extends Command {
 					"settings set fetchur_channel <#channel>",
 					"Set the channel where fetchur item notifications will be sent every day at 12 am EST"
 				) +
+						help.create(
+								"settings set fetchur_ping <@role>",
+								"Role that will be pinged when the fetchur item notifications is sent"
+						) +
 				help.create("settings set guest_role <@role>", "Set the guest role") +
 				help.create("settings delete hypixel_key", "Delete the set Hypixel API key of this server") +
 				help.create("settings delete prefix", "Reset the prefix of the bot") +

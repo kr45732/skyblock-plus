@@ -22,6 +22,7 @@ import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 public class UnlinkSlashCommand extends SlashCommand {
 
@@ -37,6 +38,6 @@ public class UnlinkSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData(name, "Unlink your account from this bot");
+		return Commands.slash(name, "Unlink your account from this bot");
 	}
 }

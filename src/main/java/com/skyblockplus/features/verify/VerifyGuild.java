@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class VerifyGuild {
 
@@ -56,7 +56,7 @@ public class VerifyGuild {
 		this.guildId = guildId;
 	}
 
-	public boolean onGuildMessageReceived(GuildMessageReceivedEvent event) {
+	public boolean onGuildMessageReceived(MessageReceivedEvent event) {
 		if (!enable) {
 			return false;
 		}

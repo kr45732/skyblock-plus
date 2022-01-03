@@ -23,6 +23,7 @@ import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 public class GuildKickerSlashCommand extends SlashCommand {
 
@@ -50,7 +51,7 @@ public class GuildKickerSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData(name, "Get helper which shows who to promote or demote in your guild")
+		return Commands.slash(name, "Get helper which shows who to promote or demote in your guild")
 			.addOption(OptionType.STRING, "requirements", "The requirements a player must meet", true)
 			.addOption(OptionType.STRING, "player", "Player username or mention")
 			.addOption(OptionType.BOOLEAN, "usekey", "If the API key for this server should be used for more accurate results");

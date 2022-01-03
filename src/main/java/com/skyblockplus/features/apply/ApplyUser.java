@@ -40,12 +40,12 @@ import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageDeleteEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
-import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 
@@ -59,7 +59,7 @@ public class ApplyUser implements Serializable {
 	public String reactMessageId;
 	public int state = 0;
 	public String staffChannelId;
-	public boolean logApplication;
+	public boolean logApplication = false;
 	public List<LogMessage> logs = new ArrayList<>();
 	// Embed
 	public String playerSlayer;
@@ -73,7 +73,7 @@ public class ApplyUser implements Serializable {
 	public String playerProfileName;
 	public String failCause;
 
-	public ApplyUser(ButtonClickEvent event, JsonElement currentSettings, String playerUsername) {
+	public ApplyUser(ButtonInteractionEvent event, JsonElement currentSettings, String playerUsername) {
 		User applyingUser = event.getUser();
 		logCommand(event.getGuild(), applyingUser, "apply " + applyingUser.getName());
 
@@ -86,7 +86,9 @@ public class ApplyUser implements Serializable {
 		this.guildId = event.getGuild().getId();
 		this.playerUsername = playerUsername;
 
-		this.logApplication = higherDepth(currentSettings, "applyLogApplication", false);
+		try {
+			this.logApplication = jda.getTextChannelById(higherDepth(currentSettings, "applyLogChannel").getAsString()) != null;
+		}catch (Exception ignored){}
 
 		Category applyCategory = event.getGuild().getCategoryById(higherDepth(currentSettings, "applyCategory").getAsString());
 		if (applyCategory.getChannels().size() == 50) {
@@ -98,7 +100,7 @@ public class ApplyUser implements Serializable {
 		ChannelAction<TextChannel> applicationChannelAction = applyCategory
 			.createTextChannel("apply-" + playerUsername)
 			.syncPermissionOverrides()
-			.addPermissionOverride(event.getGuild().getSelfMember(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE), null)
+			.addPermissionOverride(event.getGuild().getSelfMember(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND), null)
 			.addPermissionOverride(event.getMember(), EnumSet.of(Permission.VIEW_CHANNEL), null)
 			.addPermissionOverride(event.getGuild().getPublicRole(), null, EnumSet.of(Permission.VIEW_CHANNEL));
 
@@ -239,16 +241,24 @@ public class ApplyUser implements Serializable {
 					meetReqs = true;
 					break;
 				} else {
-					missingReqsStr
-						.append("• Slayer - ")
-						.append(formatNumber(slayerReq))
-						.append(" | Skill Average - ")
-						.append(formatNumber(skillsReq))
-						.append(" | Catacombs - ")
-						.append(formatNumber(cataReq))
-						.append(" | Weight - ")
-						.append(formatNumber(weightReq))
-						.append("\n");
+					boolean isFirst = true;
+					if (slayerReq > 0) {
+						missingReqsStr.append("• " + "Slayer - ").append(formatNumber(slayerReq));
+						isFirst = false;
+					}
+					if (skillsReq > 0) {
+						missingReqsStr.append(isFirst ? "• " : " | ").append("Skill Average - ").append(formatNumber(skillsReq));
+						isFirst = false;
+					}
+					if (cataReq > 0) {
+						missingReqsStr.append(isFirst ? "• " : " | ").append("Catacombs - ").append(formatNumber(cataReq));
+						isFirst = false;
+					}
+					if (weightReq > 0) {
+						missingReqsStr.append(isFirst ? "• " : " | ").append("Weight - ").append(formatNumber(weightReq));
+					}
+
+					missingReqsStr.append("\n");
 				}
 			}
 		}
@@ -260,15 +270,15 @@ public class ApplyUser implements Serializable {
 				"**Your statistics:**\n• Slayer - " +
 				formatNumber(player.getTotalSlayer()) +
 				" | Skill Average - " +
-				(player.getSkillAverage() == -1 ? "API disabled" : formatNumber(player.getSkillAverage())) +
+				(player.getSkillAverage() == -1 ? "API disabled" : roundAndFormat(player.getSkillAverage())) +
 				" | Catacombs - " +
-				formatNumber(player.getCatacombs().getProgressLevel()) +
+						roundAndFormat(player.getCatacombs().getProgressLevel()) +
 				" | Weight - " +
-				formatNumber(player.getWeight())
+				roundAndFormat(player.getWeight())
 			);
 			reqEmbed.appendDescription("\n\n**You do not meet any of the following requirements:**\n" + missingReqsStr);
 			reqEmbed.appendDescription(
-				"\nIf you think these values are incorrect make sure all your APIs are enabled and/or try relinking"
+				"\nIf you any of these value seem incorrect, then make sure all your APIs are enabled and/or try relinking"
 			);
 
 			playerSlayer = formatNumber(player.getTotalSlayer());
@@ -342,7 +352,7 @@ public class ApplyUser implements Serializable {
 		return defaultEmbed(fixUsername(playerUsername) + ironmanSymbol, skyblockStatsLink(playerUsername, playerProfileName));
 	}
 
-	public boolean onButtonClick(ButtonClickEvent event, ApplyGuild parent) {
+	public boolean onButtonClick(ButtonInteractionEvent event, ApplyGuild parent) {
 		JsonElement currentSettings = JsonParser.parseString(currentSettingsString);
 		if (!event.getUser().getId().equals(applyingUserId) && !event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
 			JsonArray staffPingRoles = higherDepth(currentSettings, "applyStaffRoles").getAsJsonArray();
@@ -702,7 +712,7 @@ public class ApplyUser implements Serializable {
 		return false;
 	}
 
-	public boolean onGuildMessageReceived(GuildMessageReceivedEvent event) {
+	public boolean onGuildMessageReceived(MessageReceivedEvent event) {
 		if (!event.getChannel().getId().equals(applicationChannelId)) {
 			return false;
 		}
@@ -715,7 +725,7 @@ public class ApplyUser implements Serializable {
 		return true;
 	}
 
-	public boolean onGuildMessageUpdate(GuildMessageUpdateEvent event) {
+	public boolean onGuildMessageUpdate(MessageUpdateEvent event) {
 		if (!event.getChannel().getId().equals(applicationChannelId)) {
 			return false;
 		}
@@ -733,7 +743,7 @@ public class ApplyUser implements Serializable {
 		return true;
 	}
 
-	public boolean onGuildMessageDelete(GuildMessageDeleteEvent event) {
+	public boolean onGuildMessageDelete(MessageDeleteEvent event) {
 		if (!event.getChannel().getId().equals(applicationChannelId)) {
 			return false;
 		}

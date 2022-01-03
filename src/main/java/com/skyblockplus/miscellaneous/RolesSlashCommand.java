@@ -23,6 +23,7 @@ import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class RolesSlashCommand extends SlashCommand {
@@ -44,7 +45,7 @@ public class RolesSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData(name, "Main roles command")
+		return Commands.slash(name, "Main roles command")
 			.addSubcommands(
 				new SubcommandData("claim", "Claim automatic Skyblock roles. The player must be linked to the bot")
 					.addOption(OptionType.STRING, "profile", "Profile name"),

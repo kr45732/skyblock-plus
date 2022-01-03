@@ -23,6 +23,7 @@ import static com.skyblockplus.utils.Utils.defaultEmbed;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.jagrosh.jdautilities.menu.Menu;
 import com.skyblockplus.utils.structs.PaginatorExtras;
+
 import java.awt.*;
 import java.time.Instant;
 import java.util.Arrays;
@@ -34,10 +35,10 @@ import java.util.function.Consumer;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
-import net.dv8tion.jda.api.interactions.components.Button;
-import net.dv8tion.jda.api.interactions.components.ButtonStyle;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageUpdateAction;
@@ -174,8 +175,8 @@ public class CustomPaginator extends Menu {
 
 	private void pagination(Message message, int pageNum) {
 		waiter.waitForEvent(
-			ButtonClickEvent.class,
-			event -> checkButtonClick(event, message.getIdLong()),
+				ButtonInteractionEvent.class,
+			event -> checkButtonClick(event, message.getId()),
 			event -> handleButtonClick(event, pageNum),
 			timeout,
 			unit,
@@ -183,12 +184,12 @@ public class CustomPaginator extends Menu {
 		);
 	}
 
-	private boolean checkButtonClick(ButtonClickEvent event, long messageId) {
-		if (event.getMessageIdLong() != messageId) {
+	private boolean checkButtonClick(ButtonInteractionEvent event, String messageId) {
+		if (!event.getMessageId().equals(messageId)) {
 			return false;
 		}
 
-		if (event.getButton() == null || event.getButton().getId() == null) {
+		if (event.getButton().getId() == null) {
 			return false;
 		}
 
@@ -204,8 +205,8 @@ public class CustomPaginator extends Menu {
 		}
 	}
 
-	private void handleButtonClick(ButtonClickEvent event, int pageNum) {
-		if (event.getButton() == null || event.getButton().getId() == null) {
+	private void handleButtonClick(ButtonInteractionEvent event, int pageNum) {
+		if (event.getButton().getId() == null) {
 			return;
 		}
 

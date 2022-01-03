@@ -48,7 +48,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -294,7 +294,7 @@ public class SkyblockEventCommand extends Command {
 		return guildMemberPlayersList;
 	}
 
-	public static EmbedBuilder getEventLeaderboard(ButtonClickEvent event) {
+	public static EmbedBuilder getEventLeaderboard(ButtonInteractionEvent event) {
 		String guildId = event.getGuild().getId();
 		if (!database.getSkyblockEventActive(guildId)) {
 			return defaultEmbed("No event running");

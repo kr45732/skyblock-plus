@@ -22,6 +22,7 @@ import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 public class CalculateSlashCommand extends SlashCommand {
 
@@ -38,6 +39,6 @@ public class CalculateSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData(name, "Calculate the price of an auction").addOption(OptionType.STRING, "uuid", "Auction UUID", true);
+		return Commands.slash(name, "Calculate the price of an auction").addOption(OptionType.STRING, "uuid", "Auction UUID", true);
 	}
 }

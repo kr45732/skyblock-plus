@@ -21,6 +21,7 @@ package com.skyblockplus.miscellaneous;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 public class TimeSlashCommand extends SlashCommand {
 
@@ -37,6 +38,6 @@ public class TimeSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData(name, "Get the current Skyblock time and date");
+		return Commands.slash(name, "Get the current Skyblock time and date");
 	}
 }

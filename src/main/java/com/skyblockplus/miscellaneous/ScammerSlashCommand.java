@@ -22,6 +22,7 @@ import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 public class ScammerSlashCommand extends SlashCommand {
 
@@ -42,7 +43,7 @@ public class ScammerSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData(name, "Check if a player is marked as a scammer in SBZ's database")
+		return Commands.slash(name, "Check if a player is marked as a scammer in SBZ's database")
 			.addOption(OptionType.STRING, "player", "Player username or mention");
 	}
 }

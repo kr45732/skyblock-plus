@@ -78,8 +78,6 @@ public class ServerSettingsModel {
 
 	private String prefix = null;
 
-	private String pfCategoryId = "";
-
 	private String applyGuestRole = "";
 
 	private String fetchurChannel = "";
@@ -110,7 +108,6 @@ public class ServerSettingsModel {
 		copy.setJacobSettings(jacobSettings);
 		copy.setHypixelApiKey(nullHypixelApiKey ? null : hypixelApiKey);
 		copy.setPrefix(prefix);
-		copy.setPfCategoryId(pfCategoryId);
 		copy.setApplyGuestRole(applyGuestRole);
 		copy.setFetchurChannel(fetchurChannel);
 		return copy;

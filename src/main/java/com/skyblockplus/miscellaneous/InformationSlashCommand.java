@@ -21,6 +21,7 @@ package com.skyblockplus.miscellaneous;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 public class InformationSlashCommand extends SlashCommand {
 
@@ -41,6 +42,6 @@ public class InformationSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return new CommandData(name, "Get information about this bot");
+		return Commands.slash(name, "Get information about this bot");
 	}
 }

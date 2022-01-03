@@ -32,20 +32,20 @@ import com.skyblockplus.settings.SettingsExecute;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Category;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 public class SetupCommandHandler {
 
-	private final ButtonClickEvent buttonEvent;
+	private final ButtonInteractionEvent buttonEvent;
 	private final SettingsExecute settings;
 	private int state = 0;
 	private String featureType = null;
 	private int attemptsLeft = 3;
 	private String name;
 
-	public SetupCommandHandler(ButtonClickEvent buttonEvent, String featureType) {
+	public SetupCommandHandler(ButtonInteractionEvent buttonEvent, String featureType) {
 		settings = new SettingsExecute(buttonEvent.getGuild(), buttonEvent.getChannel(), buttonEvent.getUser());
 		this.buttonEvent = buttonEvent;
 
@@ -178,8 +178,9 @@ public class SetupCommandHandler {
 		waitForReply();
 	}
 
-	private boolean checkReply(GuildMessageReceivedEvent event) {
+	private boolean checkReply(MessageReceivedEvent event) {
 		return (
+				event.isFromGuild() &&
 			event.getChannel().getId().equals(buttonEvent.getChannel().getId()) &&
 			event.getAuthor().getId().equals(buttonEvent.getUser().getId())
 		);
@@ -199,7 +200,7 @@ public class SetupCommandHandler {
 		}
 	}
 
-	private void handleReply(GuildMessageReceivedEvent event) {
+	private void handleReply(MessageReceivedEvent event) {
 		if (event.getMessage().getContentRaw().equalsIgnoreCase("cancel")) {
 			sendEmbed(defaultEmbed("Canceled the process"));
 			cancel();
@@ -471,7 +472,7 @@ public class SetupCommandHandler {
 
 	private void waitForReply() {
 		waiter.waitForEvent(
-			GuildMessageReceivedEvent.class,
+			MessageReceivedEvent.class,
 			this::checkReply,
 			this::handleReply,
 			1,

@@ -29,19 +29,20 @@ import java.util.HashMap;
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
+import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageDeleteEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.components.ButtonStyle;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import org.jetbrains.annotations.NotNull;
 
 public class MainListener extends ListenerAdapter {
@@ -130,7 +131,7 @@ public class MainListener extends ListenerAdapter {
 							.getTextChannels()
 							.stream()
 							.filter(c ->
-								event.getGuild().getPublicRole().hasPermission(c, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)
+								event.getGuild().getPublicRole().hasPermission(c, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)
 							)
 							.min(Comparator.naturalOrder())
 							.orElse(null)
@@ -158,6 +159,10 @@ public class MainListener extends ListenerAdapter {
 
 	@Override
 	public void onMessageReactionAdd(MessageReactionAddEvent event) {
+		if(!event.isFromGuild()){
+			return;
+		}
+
 		if (event.getUser() != null && event.getUser().isBot()) {
 			return;
 		}
@@ -168,7 +173,11 @@ public class MainListener extends ListenerAdapter {
 	}
 
 	@Override
-	public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
+	public void onMessageReceived(MessageReceivedEvent event) {
+		if(!event.isFromGuild()){
+			return;
+		}
+
 		if (guildMap.containsKey(event.getGuild().getId())) {
 			if (
 				!event.getAuthor().isBot() &&
@@ -187,28 +196,40 @@ public class MainListener extends ListenerAdapter {
 	}
 
 	@Override
-	public void onGuildMessageUpdate(GuildMessageUpdateEvent event) {
+	public void onMessageUpdate(MessageUpdateEvent event) {
+		if(!event.isFromGuild()){
+			return;
+		}
+
 		if (guildMap.containsKey(event.getGuild().getId())) {
 			guildMap.get(event.getGuild().getId()).onGuildMessageUpdate(event);
 		}
 	}
 
 	@Override
-	public void onGuildMessageDelete(GuildMessageDeleteEvent event) {
+	public void onMessageDelete(MessageDeleteEvent event) {
+		if(!event.isFromGuild()){
+			return;
+		}
+
 		if (guildMap.containsKey(event.getGuild().getId())) {
 			guildMap.get(event.getGuild().getId()).onGuildMessageDelete(event);
 		}
 	}
 
 	@Override
-	public void onTextChannelDelete(TextChannelDeleteEvent event) {
+	public void onChannelDelete(ChannelDeleteEvent event) {
+		if(!event.isFromType(ChannelType.TEXT)){
+			return;
+		}
+
 		if (guildMap.containsKey(event.getGuild().getId())) {
 			guildMap.get(event.getGuild().getId()).onTextChannelDelete(event);
 		}
 	}
 
 	@Override
-	public void onButtonClick(ButtonClickEvent event) {
+	public void onButtonInteraction(ButtonInteractionEvent event) {
 		if (event.getUser().isBot()) {
 			return;
 		}
