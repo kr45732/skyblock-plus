@@ -18,6 +18,10 @@
 
 package com.skyblockplus.price;
 
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
@@ -26,13 +30,8 @@ import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.PaginatorExtras;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.time.Instant;
-
-import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Constants.*;
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class PriceCommand extends Command {
 
@@ -109,13 +108,13 @@ public class PriceCommand extends Command {
 			lowestBinStr += "\n**Seller:** " + uuidToUsername(higherDepth(lowestBinAuction, "auctioneer").getAsString()).username();
 			lowestBinStr += "\n**Auction:** `/viewauction " + higherDepth(lowestBinAuction, "uuid").getAsString() + "`";
 			lowestBinStr +=
-					"\n**Ends:** <t:" + Instant.ofEpochMilli(higherDepth(lowestBinAuction, "end_t").getAsLong()).getEpochSecond() + ":R>";
+				"\n**Ends:** <t:" + Instant.ofEpochMilli(higherDepth(lowestBinAuction, "end_t").getAsLong()).getEpochSecond() + ":R>";
 
 			String itemId = higherDepth(lowestBinAuction, "item_id").getAsString();
 			if (itemId.equals("PET")) {
 				if (!higherDepth(lowestBinAuction, "item_name").getAsString().startsWith("Mystery ")) {
 					eb.setThumbnail(
-							getPetUrl(higherDepth(lowestBinAuction, "item_name").getAsString().split("] ")[1].toUpperCase().replace(" ", "_"))
+						getPetUrl(higherDepth(lowestBinAuction, "item_name").getAsString().split("] ")[1].toUpperCase().replace(" ", "_"))
 					);
 				}
 			} else {

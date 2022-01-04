@@ -18,6 +18,8 @@
 
 package com.skyblockplus.price;
 
+import static com.skyblockplus.utils.Utils.getQueryItems;
+
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
@@ -26,8 +28,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-
-import static com.skyblockplus.utils.Utils.getQueryItems;
 
 public class PriceSlashCommand extends SlashCommand {
 
@@ -39,7 +39,13 @@ public class PriceSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		event.paginate(PriceCommand.queryAuctions(event.getOptionStr("item"), PriceCommand.AuctionType.valueOf(event.getOptionStr("auction_type", "bin").toUpperCase()), new PaginatorEvent(event)));
+		event.paginate(
+			PriceCommand.queryAuctions(
+				event.getOptionStr("item"),
+				PriceCommand.AuctionType.valueOf(event.getOptionStr("auction_type", "bin").toUpperCase()),
+				new PaginatorEvent(event)
+			)
+		);
 	}
 
 	@Override
@@ -47,20 +53,18 @@ public class PriceSlashCommand extends SlashCommand {
 		return Commands
 			.slash(name, "Query the auction house for the price of an item")
 			.addOption(OptionType.STRING, "item", "Item name", true, true)
-				.addOptions(new OptionData(OptionType.STRING, "auction_type", "Which type of auctions to show")
-						.addChoice("Bin", "bin")
-						.addChoice("Regular auctions", "auction")
-						.addChoice("Bin & regular auctions", "bin")
-				);
+			.addOptions(
+				new OptionData(OptionType.STRING, "auction_type", "Which type of auctions to show")
+					.addChoice("Bin", "bin")
+					.addChoice("Regular auctions", "auction")
+					.addChoice("Bin & regular auctions", "bin")
+			);
 	}
 
 	@Override
 	public void onAutoComplete(AutoCompleteEvent event) {
 		if (event.getFocusedOption().getName().equals("item")) {
-			event
-					.replyClosestMatch(
-							event.getFocusedOption().getAsString(),
-							getQueryItems());
+			event.replyClosestMatch(event.getFocusedOption().getAsString(), getQueryItems());
 		}
 	}
 }

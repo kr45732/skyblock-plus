@@ -63,7 +63,7 @@ public class HypixelSlashCommand extends SlashCommand {
 
 	@Override
 	public void onAutoComplete(AutoCompleteEvent event) {
-		if(event.getFocusedOption().getName().equals("player")){
+		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		}
 	}

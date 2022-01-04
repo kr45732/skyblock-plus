@@ -18,17 +18,16 @@
 
 package com.skyblockplus.price;
 
+import static com.skyblockplus.utils.Utils.getAverageAuctionJson;
+
 import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-
-import java.util.stream.Collectors;
-
-import static com.skyblockplus.utils.Utils.getAverageAuctionJson;
 
 public class AverageAuctionSlashCommand extends SlashCommand {
 
@@ -45,20 +44,20 @@ public class AverageAuctionSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return Commands.slash(name, "Get the average auction price of an item").addOption(OptionType.STRING, "item", "Item name", true, true);
+		return Commands
+			.slash(name, "Get the average auction price of an item")
+			.addOption(OptionType.STRING, "item", "Item name", true, true);
 	}
 
 	@Override
 	public void onAutoComplete(AutoCompleteEvent event) {
 		if (event.getFocusedOption().getName().equals("item")) {
-			event
-					.replyClosestMatch(
-									event.getFocusedOption().getAsString(),
-									getAverageAuctionJson().keySet().stream().map(Utils::idToName).distinct().collect(Collectors.toList())
-					);
-		}else if(event.getFocusedOption().getName().equals("player")){
-				event.replyClosestPlayer();
-			}
-
+			event.replyClosestMatch(
+				event.getFocusedOption().getAsString(),
+				getAverageAuctionJson().keySet().stream().map(Utils::idToName).distinct().collect(Collectors.toList())
+			);
+		} else if (event.getFocusedOption().getName().equals("player")) {
+			event.replyClosestPlayer();
+		}
 	}
 }

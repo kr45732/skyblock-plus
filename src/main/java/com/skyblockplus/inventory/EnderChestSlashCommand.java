@@ -24,9 +24,8 @@ import static com.skyblockplus.utils.Utils.invalidEmbed;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
-import java.util.List;
-
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import java.util.List;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -76,7 +75,7 @@ public class EnderChestSlashCommand extends SlashCommand {
 
 	@Override
 	public void onAutoComplete(AutoCompleteEvent event) {
-		if(event.getFocusedOption().getName().equals("player")){
+		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		}
 	}

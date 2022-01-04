@@ -211,7 +211,7 @@ public class Utils {
 	}
 
 	public static List<String> getQueryItems() {
-		if(queryItems == null) {
+		if (queryItems == null) {
 			try {
 				HttpGet httpget = new HttpGet("http://venus.arcator.co.uk:1194/query_items");
 				httpget.addHeader("content-type", "application/json; charset=UTF-8");
@@ -220,10 +220,14 @@ public class Utils {
 				httpget.setURI(uri);
 
 				try (CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpget)) {
-					queryItems = streamJsonArray(JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray()).map(e -> e.getAsString()).collect(Collectors.toList());
+					queryItems =
+						streamJsonArray(
+							JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray()
+						)
+							.map(e -> e.getAsString())
+							.collect(Collectors.toList());
 				}
-			} catch (Exception ignored) {
-			}
+			} catch (Exception ignored) {}
 		}
 
 		return queryItems;

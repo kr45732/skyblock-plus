@@ -20,12 +20,11 @@ package com.skyblockplus.utils.slashcommand;
 
 import static com.skyblockplus.utils.Utils.invalidEmbed;
 
+import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -104,7 +103,11 @@ public class SlashCommandClient extends ListenerAdapter {
 			return;
 		}
 
-		slashCommands.stream().filter(c -> c.getName().equals(event.getName())).findFirst().ifPresent(c -> c.onAutoComplete(new AutoCompleteEvent(event)));
+		slashCommands
+			.stream()
+			.filter(c -> c.getName().equals(event.getName()))
+			.findFirst()
+			.ifPresent(c -> c.onAutoComplete(new AutoCompleteEvent(event)));
 	}
 
 	public List<SlashCommand> getCommands() {

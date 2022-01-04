@@ -223,22 +223,30 @@ public class PartyCommand extends Command {
 				.queueAfter(1, TimeUnit.SECONDS);
 			if (party.getPartyMembers().size() == 4) {
 				try {
-					channel.createThreadChannel("pf-" + party.getPartyLeaderUsername()).queue(threadChannel -> threadChannel
-							.sendMessage(
+					channel
+						.createThreadChannel("pf-" + party.getPartyLeaderUsername())
+						.queue(threadChannel ->
+							threadChannel
+								.sendMessage(
 									"<@" +
-											party.getPartyLeaderId() +
-											"> " +
-											party.getPartyMembers().stream().map(m -> "<@" + m.getDiscordId() + ">").collect(Collectors.joining(" "))
-							)
-							.setEmbeds(
+									party.getPartyLeaderId() +
+									"> " +
+									party
+										.getPartyMembers()
+										.stream()
+										.map(m -> "<@" + m.getDiscordId() + ">")
+										.collect(Collectors.joining(" "))
+								)
+								.setEmbeds(
 									defaultEmbed("Party Finder")
-											.setDescription(
-													"Your party has reached 5/5 players and has been unlisted. The party leader can click the button below to close this channel."
-											)
-											.build()
-							)
-							.setActionRow(Button.danger("party_finder_channel_close_" + party.getPartyLeaderId(), "Archive Thraed"))
-							.queueAfter(1, TimeUnit.SECONDS));
+										.setDescription(
+											"Your party has reached 5/5 players and has been unlisted. The party leader can click the button below to close this channel."
+										)
+										.build()
+								)
+								.setActionRow(Button.danger("party_finder_channel_close_" + party.getPartyLeaderId(), "Archive Thraed"))
+								.queueAfter(1, TimeUnit.SECONDS)
+						);
 				} catch (InsufficientPermissionException e) {
 					channel
 						.sendMessage(

@@ -18,20 +18,19 @@
 
 package com.skyblockplus.dungeons;
 
+import static com.skyblockplus.utils.Constants.ESSENCE_ITEM_NAMES;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
-
-import java.util.stream.Collectors;
-
-import static com.skyblockplus.utils.Constants.ESSENCE_ITEM_NAMES;
-import static com.skyblockplus.utils.Utils.*;
 
 public class EssenceSlashCommand extends SlashCommand {
 
@@ -86,14 +85,11 @@ public class EssenceSlashCommand extends SlashCommand {
 	@Override
 	public void onAutoComplete(AutoCompleteEvent event) {
 		if (event.getFocusedOption().getName().equals("item")) {
-			event
-					.replyClosestMatch(
-									event.getFocusedOption().getAsString(),
-									ESSENCE_ITEM_NAMES.stream().map(Utils::idToName).distinct().collect(Collectors.toList())
-
-							)
-					;
-		}else if(event.getFocusedOption().getName().equals("player")){
+			event.replyClosestMatch(
+				event.getFocusedOption().getAsString(),
+				ESSENCE_ITEM_NAMES.stream().map(Utils::idToName).distinct().collect(Collectors.toList())
+			);
+		} else if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		}
 	}

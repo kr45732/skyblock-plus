@@ -18,18 +18,17 @@
 
 package com.skyblockplus.dungeons;
 
+import static com.skyblockplus.utils.Constants.ESSENCE_ITEM_NAMES;
+
 import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-
-import java.util.stream.Collectors;
-
-import static com.skyblockplus.utils.Constants.ESSENCE_ITEM_NAMES;
 
 public class DungeonsSlashCommand extends SlashCommand {
 
@@ -58,7 +57,7 @@ public class DungeonsSlashCommand extends SlashCommand {
 
 	@Override
 	public void onAutoComplete(AutoCompleteEvent event) {
-		if(event.getFocusedOption().getName().equals("player")){
+		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		}
 	}

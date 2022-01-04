@@ -45,12 +45,14 @@ public class BidsSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return Commands.slash(name, "Get a player's bids").addOption(OptionType.STRING, "player", "Player username or mention", false, true);
+		return Commands
+			.slash(name, "Get a player's bids")
+			.addOption(OptionType.STRING, "player", "Player username or mention", false, true);
 	}
 
 	@Override
 	public void onAutoComplete(AutoCompleteEvent event) {
-		if(event.getFocusedOption().getName().equals("player")){
+		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		}
 	}

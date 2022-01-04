@@ -61,7 +61,7 @@ public class AuctionFlipper {
 				String desc = event.getMessage().getEmbeds().get(0).getDescription();
 				if (desc.startsWith("Successfully updated under bins file in ")) {
 					flip();
-				}else if(desc.contains(" query auctions into database in ")){
+				} else if (desc.contains(" query auctions into database in ")) {
 					queryItems = null;
 				}
 			}

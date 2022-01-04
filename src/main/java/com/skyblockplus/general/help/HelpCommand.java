@@ -616,7 +616,7 @@ public class HelpCommand extends Command {
 		paginateBuilder.addItems(
 			help.create("skills [player] [profile]", "Get the skills data of a player") +
 			help.create("hotm [player] [profile]", "Get a player's heart of the mountain statistics") +
-				help.create("forge [player] [profile]", "Get a player's forge items & ending times")
+			help.create("forge [player] [profile]", "Get a player's forge items & ending times")
 		);
 
 		paginateBuilder.addItems(
@@ -697,8 +697,8 @@ public class HelpCommand extends Command {
 			help.create("cakes [player] [profile]", "Get a player's inactive and active cake buffs") +
 			help.create("harp [player] [profile]", "Get a player's harp statistics") +
 			help.create("uuid [username|uuid]", "Convert username to UUID or UUID to username") +
-					help.create("time", "Get the current year, date, and time in Skyblock") +
-					help.create("scammer [player]", "Check if a player is marked as a scamer in the SBZ database")
+			help.create("time", "Get the current year, date, and time in Skyblock") +
+			help.create("scammer [player]", "Check if a player is marked as a scamer in the SBZ database")
 		);
 
 		paginateBuilder.addItems(
