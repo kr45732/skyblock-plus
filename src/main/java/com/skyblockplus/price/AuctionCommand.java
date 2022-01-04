@@ -18,28 +18,28 @@
 
 package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.networth.NetworthExecute;
+import com.skyblockplus.miscellaneous.networth.NetworthExecute;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
+import me.nullicorn.nedit.NBTReader;
+import net.dv8tion.jda.api.EmbedBuilder;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Comparator;
-import java.util.Locale;
 import java.util.stream.Stream;
-import me.nullicorn.nedit.NBTReader;
-import net.dv8tion.jda.api.EmbedBuilder;
+
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Utils.*;
 
 public class AuctionCommand extends Command {
 
@@ -370,7 +370,7 @@ public class AuctionCommand extends Command {
 					for (int i = 0; i < args.length; i++) {
 						if (args[i].startsWith("filter:")) {
 							try {
-								filterType = AuctionFilterType.valueOf(args[i].split("filter:")[1].toUpperCase(Locale.ROOT));
+								filterType = AuctionFilterType.valueOf(args[i].split("filter:")[1].toUpperCase());
 								removeArg(i);
 							} catch (IllegalArgumentException e) {
 								embed(invalidEmbed("Invalid filter type provided"));

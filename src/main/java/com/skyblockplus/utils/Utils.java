@@ -28,6 +28,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.gson.*;
 import com.jagrosh.jdautilities.command.Command;
+import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
 import com.skyblockplus.features.apply.ApplyGuild;
 import com.skyblockplus.features.apply.ApplyUser;
 import com.skyblockplus.features.jacob.JacobHandler;
@@ -40,6 +41,7 @@ import com.skyblockplus.utils.structs.*;
 import java.awt.*;
 import java.io.*;
 import java.math.RoundingMode;
+import java.net.URI;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.Duration;
@@ -70,6 +72,7 @@ import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -85,7 +88,7 @@ public class Utils {
 	public static final int globalCooldown = 4;
 	public static final String DISCORD_SERVER_INVITE_LINK = "https://discord.gg/Z4Fn3eNDXT";
 	public static final String BOT_INVITE_LINK =
-		"https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=403041361&scope=bot%20applications.commands";
+		"https://discord.com/api/oauth2/authorize?client_id=796791167366594592&permissions=395540032593&scope=bot%20applications.commands";
 	public static final String FORUM_POST_LINK = "https://hypixel.net/threads/3980092";
 	public static final AsyncHttpClient asyncHttpClient = Dsl.asyncHttpClient();
 	public static final CloseableHttpClient httpClient = HttpClientBuilder.create().build();
@@ -122,18 +125,6 @@ public class Utils {
 	public static String PLANET_SCALE_USERNAME = "";
 	public static String PLANET_SCALE_PASSWORD = "";
 	public static String SBZ_SCAMMER_DB_KEY = "";
-	/* Miscellaneous */
-	public static TextChannel botLogChannel;
-	public static TextChannel errorLogChannel;
-	public static Instant lowestBinJsonLastUpdated = Instant.now();
-	public static Instant averageAuctionJsonLastUpdated = Instant.now();
-	public static Instant bazaarJsonLastUpdated = Instant.now();
-	public static Instant sbzPricesJsonLastUpdated = Instant.now();
-	public static Set<String> vanillaItems;
-	public static JsonObject internalJsonMappings;
-	public static JsonObject priceOverrideJson;
-	private static Instant userCountLastUpdated = Instant.now();
-	private static int userCount = -1;
 	/* JSON */
 	private static JsonObject essenceCostsJson;
 	private static JsonObject levelingJson;
@@ -152,6 +143,21 @@ public class Utils {
 	private static JsonArray sbzPricesJson;
 	private static JsonObject emojiMap;
 	private static JsonArray npcSellPrices;
+	public static JsonObject internalJsonMappings;
+	public static JsonObject priceOverrideJson;
+	/* Miscellaneous */
+	public static TextChannel botLogChannel;
+	public static TextChannel errorLogChannel;
+	public static Instant lowestBinJsonLastUpdated = Instant.now();
+	public static Instant averageAuctionJsonLastUpdated = Instant.now();
+	public static Instant bazaarJsonLastUpdated = Instant.now();
+	public static Instant sbzPricesJsonLastUpdated = Instant.now();
+	public static Set<String> vanillaItems;
+	private static Instant userCountLastUpdated = Instant.now();
+	private static int userCount = -1;
+	public static List<String> linkedUsers;
+	public static Instant linkedUsersLastUpdated = Instant.now();
+	public static List<String> queryItems;
 
 	/* Getters */
 	public static JsonObject getLowestBinJson() {
@@ -202,6 +208,25 @@ public class Utils {
 		}
 
 		return bazaarJson;
+	}
+
+	public static List<String> getQueryItems() {
+		if(queryItems == null) {
+			try {
+				HttpGet httpget = new HttpGet("http://venus.arcator.co.uk:1194/query_items");
+				httpget.addHeader("content-type", "application/json; charset=UTF-8");
+
+				URI uri = new URIBuilder(httpget.getURI()).addParameter("key", AUCTION_API_KEY).build();
+				httpget.setURI(uri);
+
+				try (CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpget)) {
+					queryItems = streamJsonArray(JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray()).map(e -> e.getAsString()).collect(Collectors.toList());
+				}
+			} catch (Exception ignored) {
+			}
+		}
+
+		return queryItems;
 	}
 
 	public static double getNpcSellPrice(String id) {
@@ -336,6 +361,15 @@ public class Utils {
 		}
 
 		return collectionsJson;
+	}
+
+	public static List<String> getLinkedUsers() {
+		if (linkedUsers == null || Duration.between(linkedUsersLastUpdated, Instant.now()).toMinutes() >= 45) {
+			linkedUsers = database.getLinkedUsers().stream().map(LinkedAccountModel::getMinecraftUsername).collect(Collectors.toList());
+			linkedUsersLastUpdated = Instant.now();
+		}
+
+		return linkedUsers;
 	}
 
 	public static JsonObject getSkyCryptPetJson() {
@@ -928,7 +962,7 @@ public class Utils {
 
 	public static List<String> getClosestMatch(String toMatch, List<String> matchFrom, int numMatches) {
 		if (matchFrom == null || matchFrom.size() == 0) {
-			return Arrays.asList(toMatch);
+			return List.of(toMatch);
 		}
 
 		return FuzzySearch

@@ -24,8 +24,10 @@ import static com.skyblockplus.utils.Utils.invalidEmbed;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
-import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
 import java.util.List;
+
+import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -38,7 +40,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 	}
 
 	@Override
-	protected void execute(SlashCommandExecutedEvent event) {
+	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
 		if (event.invalidPlayerOption()) {
@@ -87,12 +89,19 @@ public class TalismanBagSlashCommand extends SlashCommand {
 			.slash(name, "Main talisman bag command")
 			.addSubcommands(
 				new SubcommandData("list", "Get a list of the player's talisman bag with lore")
-					.addOption(OptionType.STRING, "player", "Player username or mention")
+					.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 					.addOption(OptionType.STRING, "profile", "Profile name")
 					.addOption(OptionType.INTEGER, "slot", "Slot number"),
 				new SubcommandData("emoji", "Get a player's talisman bag represented in emojis")
-					.addOption(OptionType.STRING, "player", "Player username or mention")
+					.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 					.addOption(OptionType.STRING, "profile", "Profile name")
 			);
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if(event.getFocusedOption().getName().equals("player")){
+			event.replyClosestPlayer();
+		}
 	}
 }

@@ -19,7 +19,7 @@
 package com.skyblockplus.price;
 
 import com.skyblockplus.utils.slashcommand.SlashCommand;
-import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -31,7 +31,7 @@ public class CalculateSlashCommand extends SlashCommand {
 	}
 
 	@Override
-	protected void execute(SlashCommandExecutedEvent event) {
+	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
 		event.embed(CalculateCommand.calculatePriceFromUuid(event.getOptionStr("uuid")));

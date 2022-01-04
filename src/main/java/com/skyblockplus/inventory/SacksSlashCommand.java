@@ -20,7 +20,8 @@ package com.skyblockplus.inventory;
 
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
-import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
+import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -32,7 +33,7 @@ public class SacksSlashCommand extends SlashCommand {
 	}
 
 	@Override
-	protected void execute(SlashCommandExecutedEvent event) {
+	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
 		if (event.invalidPlayerOption()) {
@@ -53,8 +54,15 @@ public class SacksSlashCommand extends SlashCommand {
 	public CommandData getCommandData() {
 		return Commands
 			.slash(name, "Get a player's sacks' content bag represented in a list")
-			.addOption(OptionType.STRING, "player", "Player username or mention")
+			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 			.addOption(OptionType.STRING, "profile", "Profile name")
 			.addOption(OptionType.BOOLEAN, "npc", "Use npc sell prices (bazaar will be used for items that don't have an npc price)");
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if(event.getFocusedOption().getName().equals("player")){
+			event.replyClosestPlayer();
+		}
 	}
 }

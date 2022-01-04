@@ -25,7 +25,7 @@ import static com.skyblockplus.utils.Utils.*;
 import com.google.gson.*;
 import com.skyblockplus.features.apply.log.ApplyLog;
 import com.skyblockplus.features.apply.log.LogMessage;
-import com.skyblockplus.networth.NetworthExecute;
+import com.skyblockplus.miscellaneous.networth.NetworthExecute;
 import com.skyblockplus.utils.Player;
 import java.io.File;
 import java.io.FileWriter;

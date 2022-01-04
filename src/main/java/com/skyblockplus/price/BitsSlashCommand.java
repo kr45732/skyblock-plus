@@ -18,11 +18,17 @@
 
 package com.skyblockplus.price;
 
+import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
-import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
+import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+
+import java.util.stream.Collectors;
+
+import static com.skyblockplus.utils.Constants.BITS_ITEM_NAMES;
 
 public class BitsSlashCommand extends SlashCommand {
 
@@ -31,7 +37,7 @@ public class BitsSlashCommand extends SlashCommand {
 	}
 
 	@Override
-	protected void execute(SlashCommandExecutedEvent event) {
+	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
 		event.embed(BitsCommand.getBitPrices(event.getOptionStr("item")));
@@ -39,6 +45,18 @@ public class BitsSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return Commands.slash(name, "Get the price of an item from the bits shop").addOption(OptionType.STRING, "item", "Item name", true);
+		return Commands.slash(name, "Get the price of an item from the bits shop").addOption(OptionType.STRING, "item", "Item name", true, true);
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("item")) {
+			event.replyClosestMatch(
+					event.getFocusedOption().getAsString(),
+					BITS_ITEM_NAMES.stream().map(Utils::idToName).distinct().collect(Collectors.toList()));
+		}else if(event.getFocusedOption().getName().equals("player")){
+				event.replyClosestPlayer();
+
+		}
 	}
 }

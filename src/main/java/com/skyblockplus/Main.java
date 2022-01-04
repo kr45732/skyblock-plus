@@ -34,18 +34,22 @@ import com.skyblockplus.features.setup.SetupCommand;
 import com.skyblockplus.features.setup.SetupSlashCommand;
 import com.skyblockplus.features.skyblockevent.SkyblockEventCommand;
 import com.skyblockplus.features.skyblockevent.SkyblockEventSlashCommand;
-import com.skyblockplus.guilds.*;
-import com.skyblockplus.help.HelpCommand;
-import com.skyblockplus.help.HelpSlashCommand;
+import com.skyblockplus.general.*;
+import com.skyblockplus.general.help.HelpCommand;
+import com.skyblockplus.general.help.HelpSlashCommand;
+import com.skyblockplus.guild.*;
 import com.skyblockplus.inventory.*;
-import com.skyblockplus.link.LinkCommand;
-import com.skyblockplus.link.LinkSlashCommand;
-import com.skyblockplus.link.UnlinkCommand;
-import com.skyblockplus.link.UnlinkSlashCommand;
+import com.skyblockplus.general.LinkCommand;
+import com.skyblockplus.general.LinkSlashCommand;
+import com.skyblockplus.general.UnlinkCommand;
+import com.skyblockplus.general.UnlinkSlashCommand;
 import com.skyblockplus.miscellaneous.*;
-import com.skyblockplus.networth.NetworthCommand;
-import com.skyblockplus.networth.NetworthSlashCommand;
+import com.skyblockplus.miscellaneous.networth.NetworthCommand;
+import com.skyblockplus.miscellaneous.networth.NetworthSlashCommand;
+import com.skyblockplus.miscellaneous.weight.WeightCommand;
+import com.skyblockplus.miscellaneous.weight.WeightSlashCommand;
 import com.skyblockplus.price.*;
+import com.skyblockplus.settings.CategoriesCommand;
 import com.skyblockplus.settings.Database;
 import com.skyblockplus.settings.SettingsCommand;
 import com.skyblockplus.settings.SettingsSlashCommand;
@@ -59,8 +63,6 @@ import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.exceptionhandler.ExceptionEventListener;
 import com.skyblockplus.utils.exceptionhandler.GlobalExceptionHandler;
 import com.skyblockplus.utils.slashcommand.SlashCommandClient;
-import com.skyblockplus.weight.WeightCommand;
-import com.skyblockplus.weight.WeightSlashCommand;
 import java.io.File;
 import javax.annotation.PreDestroy;
 import javax.security.auth.login.LoginException;
@@ -154,12 +156,12 @@ public class Main {
 					new PlaceholderCommand(),
 					new ProfilesCommand(),
 					new NetworthCommand(),
-					new QueryAuctionCommand(),
+					new PriceCommand(),
 					new BidsCommand(),
 					new BitsCommand(),
 					new EvaluateCommand(),
 					new GuildKickerCommand(),
-					new MissingTalismansCommand(),
+					new MissingCommand(),
 					new UpdateSlashCommands(),
 					new CalculateCommand(),
 					new EmojiFromUrlCommand(),
@@ -204,14 +206,14 @@ public class Main {
 					new BazaarSlashCommand(),
 					new AverageAuctionSlashCommand(),
 					new BidsSlashCommand(),
-					new QueryAuctionsSlashCommand(),
+					new PriceSlashCommand(),
 					new BitsSlashCommand(),
 					new RolesSlashCommand(),
 					new BankSlashCommand(),
 					new WeightSlashCommand(),
 					new HypixelSlashCommand(),
 					new ProfilesSlashCommand(),
-					new MissingTalismansSlashCommand(),
+					new MissingSlashCommand(),
 					new CalculateSlashCommand(),
 					new SetupSlashCommand(),
 					new SkyblockEventSlashCommand(),

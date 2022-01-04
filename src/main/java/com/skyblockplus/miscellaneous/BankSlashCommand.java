@@ -20,7 +20,8 @@ package com.skyblockplus.miscellaneous;
 
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
-import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
+import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -33,7 +34,7 @@ public class BankSlashCommand extends SlashCommand {
 	}
 
 	@Override
-	protected void execute(SlashCommandExecutedEvent event) {
+	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
 		if (event.invalidPlayerOption()) {
@@ -55,13 +56,20 @@ public class BankSlashCommand extends SlashCommand {
 			.slash(name, "Main bank command")
 			.addSubcommands(
 				new SubcommandData("total", "Get a player's bank and purse coins")
-					.addOption(OptionType.STRING, "player", "Player username or mention")
+					.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 					.addOption(OptionType.STRING, "profile", "Profile name")
 			)
 			.addSubcommands(
 				new SubcommandData("history", "Get a player's bank transaction history")
-					.addOption(OptionType.STRING, "player", "Player username or mention")
+					.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 					.addOption(OptionType.STRING, "profile", "Profile name")
 			);
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if(event.getFocusedOption().getName().equals("player")){
+			event.replyClosestPlayer();
+		}
 	}
 }

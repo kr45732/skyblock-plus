@@ -392,7 +392,7 @@ public class SettingsExecute {
 				!(args[3].equals("ranks") && args[4].equals("add")) &&
 				!(
 					args[3].equals("apply") &&
-					(args[4].equals("staff_role") || args[4].equals("requirements") || args[4].equals("reqs") || args[4].equals("req"))
+					(args[4].equals("staff_roles") || args[4].equals("requirements") || args[4].equals("reqs") || args[4].equals("req"))
 				)
 			) {
 				JsonElement guildSettings = database.getGuildSettings(guild.getId(), args[2]);
@@ -456,7 +456,7 @@ public class SettingsExecute {
 						eb = addGuildRank(guildSettings.getAsJsonObject(), args[5], args[6]);
 					}
 				} else if (args[3].equals("apply")) {
-					if (args[4].equals("staff_role")) {
+					if (args[4].equals("staff_roles")) {
 						if (args[5].equals("add")) {
 							eb = addApplyStaffRole(guildSettings.getAsJsonObject(), args[6]);
 						} else if (args[5].equals("remove")) {

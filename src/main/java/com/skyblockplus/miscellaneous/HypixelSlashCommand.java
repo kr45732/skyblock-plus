@@ -19,7 +19,8 @@
 package com.skyblockplus.miscellaneous;
 
 import com.skyblockplus.utils.slashcommand.SlashCommand;
-import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
+import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -32,7 +33,7 @@ public class HypixelSlashCommand extends SlashCommand {
 	}
 
 	@Override
-	protected void execute(SlashCommandExecutedEvent event) {
+	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
 		if (event.invalidPlayerOption()) {
@@ -52,11 +53,18 @@ public class HypixelSlashCommand extends SlashCommand {
 			.slash(name, "Main hypixel command")
 			.addSubcommands(
 				new SubcommandData("player", "Get Hypixel information about a player")
-					.addOption(OptionType.STRING, "player", "Player username or mention")
+					.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 			)
 			.addSubcommands(
 				new SubcommandData("parkour", "Get fastest Hypixel lobby parkour for a player")
-					.addOption(OptionType.STRING, "player", "Player username or mention")
+					.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 			);
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if(event.getFocusedOption().getName().equals("player")){
+			event.replyClosestPlayer();
+		}
 	}
 }

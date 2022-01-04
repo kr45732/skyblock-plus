@@ -20,7 +20,8 @@ package com.skyblockplus.miscellaneous;
 
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
-import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
+import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -33,7 +34,7 @@ public class RolesSlashCommand extends SlashCommand {
 	}
 
 	@Override
-	protected void execute(SlashCommandExecutedEvent event) {
+	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
 		switch (event.getSubcommandName()) {
@@ -52,5 +53,12 @@ public class RolesSlashCommand extends SlashCommand {
 					.addOption(OptionType.STRING, "profile", "Profile name"),
 				new SubcommandData("list", "List all roles that can be claimed through the bot")
 			);
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if(event.getFocusedOption().getName().equals("player")){
+			event.replyClosestPlayer();
+		}
 	}
 }

@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -78,22 +80,22 @@ public class SlashCommandClient extends ListenerAdapter {
 			return;
 		}
 
-		SlashCommandExecutedEvent slashCommandExecutedEvent = new SlashCommandExecutedEvent(event, this);
+		SlashCommandEvent slashCommandEvent = new SlashCommandEvent(event, this);
 		for (SlashCommand command : slashCommands) {
 			if (command.getName().equals(event.getName())) {
 				commandUses.put(command.getName(), commandUses.getOrDefault(command.getName(), 0) + 1);
-				int remainingCooldown = command.getRemainingCooldown(slashCommandExecutedEvent);
+				int remainingCooldown = command.getRemainingCooldown(slashCommandEvent);
 				if (remainingCooldown > 0) {
-					command.replyCooldown(slashCommandExecutedEvent, remainingCooldown);
+					command.replyCooldown(slashCommandEvent, remainingCooldown);
 				} else {
-					command.run(slashCommandExecutedEvent);
+					command.run(slashCommandEvent);
 				}
 
 				return;
 			}
 		}
 
-		slashCommandExecutedEvent.getHook().editOriginalEmbeds(slashCommandExecutedEvent.invalidCommandMessage().build()).queue();
+		slashCommandEvent.getHook().editOriginalEmbeds(slashCommandEvent.invalidCommandMessage().build()).queue();
 	}
 
 	@Override
@@ -102,7 +104,7 @@ public class SlashCommandClient extends ListenerAdapter {
 			return;
 		}
 
-		slashCommands.stream().filter(c -> c.getName().equals(event.getName())).findFirst().ifPresent(c -> c.onAutoComplete(event));
+		slashCommands.stream().filter(c -> c.getName().equals(event.getName())).findFirst().ifPresent(c -> c.onAutoComplete(new AutoCompleteEvent(event)));
 	}
 
 	public List<SlashCommand> getCommands() {

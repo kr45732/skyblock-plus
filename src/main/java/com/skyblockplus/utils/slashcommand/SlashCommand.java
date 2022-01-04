@@ -22,8 +22,8 @@ import static com.skyblockplus.Main.client;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
+import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public abstract class SlashCommand {
@@ -33,9 +33,9 @@ public abstract class SlashCommand {
 	protected int cooldown = -1;
 	protected Permission[] userPermissions = new Permission[0];
 
-	protected abstract void execute(SlashCommandExecutedEvent event);
+	protected abstract void execute(SlashCommandEvent event);
 
-	protected void run(SlashCommandExecutedEvent event) {
+	protected void run(SlashCommandEvent event) {
 		if (cooldown == -1) {
 			Command command = client.getCommands().stream().filter(c -> c.getName().equals(name)).findFirst().orElse(null);
 			cooldown = command != null ? command.getCooldown() : globalCooldown;
@@ -92,7 +92,7 @@ public abstract class SlashCommand {
 		return name;
 	}
 
-	public int getRemainingCooldown(SlashCommandExecutedEvent event) {
+	public int getRemainingCooldown(SlashCommandEvent event) {
 		if (!event.isOwner()) {
 			String key = name + "|" + String.format("U:%d", event.getUser().getIdLong());
 			int remaining = client.getRemainingCooldown(key);
@@ -106,7 +106,7 @@ public abstract class SlashCommand {
 		return 0;
 	}
 
-	public void replyCooldown(SlashCommandExecutedEvent event, int remainingCooldown) {
+	public void replyCooldown(SlashCommandEvent event, int remainingCooldown) {
 		event
 			.getHook()
 			.editOriginalEmbeds(invalidEmbed("That command is on cooldown for " + remainingCooldown + " more seconds").build())
@@ -115,5 +115,5 @@ public abstract class SlashCommand {
 
 	public abstract CommandData getCommandData();
 
-	public void onAutoComplete(CommandAutoCompleteInteractionEvent event) {}
+	public void onAutoComplete(AutoCompleteEvent event) {}
 }

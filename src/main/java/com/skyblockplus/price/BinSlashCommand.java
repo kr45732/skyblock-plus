@@ -18,20 +18,17 @@
 
 package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.Utils.getClosestMatch;
-import static com.skyblockplus.utils.Utils.getLowestBinJson;
-
 import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
-import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
-import java.util.stream.Collectors;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.CommandAutoCompleteInteraction;
+import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
+import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import org.jetbrains.annotations.NotNull;
+
+import java.util.stream.Collectors;
+
+import static com.skyblockplus.utils.Utils.getLowestBinJson;
 
 public class BinSlashCommand extends SlashCommand {
 
@@ -40,7 +37,7 @@ public class BinSlashCommand extends SlashCommand {
 	}
 
 	@Override
-	protected void execute(SlashCommandExecutedEvent event) {
+	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
 		event.embed(BinCommand.getLowestBin(event.getOptionStr("item")));
@@ -52,17 +49,14 @@ public class BinSlashCommand extends SlashCommand {
 	}
 
 	@Override
-	public void onAutoComplete(CommandAutoCompleteInteractionEvent event) {
+	public void onAutoComplete(AutoCompleteEvent event) {
 		if (event.getFocusedOption().getName().equals("item")) {
 			event
-				.replyChoiceStrings(
-					getClosestMatch(
+				.replyClosestMatch(
 						event.getFocusedOption().getAsString(),
-						getLowestBinJson().getAsJsonObject().keySet().stream().map(Utils::idToName).distinct().collect(Collectors.toList()),
-						25
-					)
-				)
-				.queue(ignored -> {}, ignored -> {});
-		}
+						getLowestBinJson().keySet().stream().map(Utils::idToName).distinct().collect(Collectors.toList()));
+		}else if(event.getFocusedOption().getName().equals("player")){
+				event.replyClosestPlayer();
+			}
 	}
 }

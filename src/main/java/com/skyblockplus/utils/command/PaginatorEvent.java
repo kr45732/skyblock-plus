@@ -19,7 +19,7 @@
 package com.skyblockplus.utils.command;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -28,11 +28,11 @@ import net.dv8tion.jda.api.entities.User;
 public class PaginatorEvent {
 
 	private final boolean isSlashCommand;
-	private final SlashCommandExecutedEvent slashCommand;
+	private final SlashCommandEvent slashCommand;
 	private final CommandEvent command;
 
 	public PaginatorEvent(Object event) {
-		if (event instanceof SlashCommandExecutedEvent e) {
+		if (event instanceof SlashCommandEvent e) {
 			isSlashCommand = true;
 			slashCommand = e;
 			command = null;
@@ -49,7 +49,7 @@ public class PaginatorEvent {
 		return isSlashCommand;
 	}
 
-	public SlashCommandExecutedEvent getSlashCommand() {
+	public SlashCommandEvent getSlashCommand() {
 		return slashCommand;
 	}
 

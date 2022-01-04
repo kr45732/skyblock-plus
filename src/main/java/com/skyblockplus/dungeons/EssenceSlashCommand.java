@@ -18,16 +18,20 @@
 
 package com.skyblockplus.dungeons;
 
-import static com.skyblockplus.utils.Constants.ESSENCE_ITEM_NAMES;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.google.gson.JsonElement;
+import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
-import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
+import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+
+import java.util.stream.Collectors;
+
+import static com.skyblockplus.utils.Constants.ESSENCE_ITEM_NAMES;
+import static com.skyblockplus.utils.Utils.*;
 
 public class EssenceSlashCommand extends SlashCommand {
 
@@ -36,7 +40,7 @@ public class EssenceSlashCommand extends SlashCommand {
 	}
 
 	@Override
-	protected void execute(SlashCommandExecutedEvent event) {
+	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
 		switch (event.getSubcommandName()) {
@@ -70,12 +74,27 @@ public class EssenceSlashCommand extends SlashCommand {
 			.slash(name, "Get essence upgrade information for an item")
 			.addSubcommands(
 				new SubcommandData("upgrade", "Interactive message to find the essence amount to upgrade an item")
-					.addOption(OptionType.STRING, "item", "Item name", true),
+					.addOption(OptionType.STRING, "item", "Item name", true, true),
 				new SubcommandData("information", "Get the amount of essence to upgrade an item for each level")
-					.addOption(OptionType.STRING, "item", "Item name", true),
+					.addOption(OptionType.STRING, "item", "Item name", true, true),
 				new SubcommandData("player", "Get the amount of each essence a player has")
-					.addOption(OptionType.STRING, "player", "Player username or mention")
+					.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 					.addOption(OptionType.STRING, "profile", "Profile name")
 			);
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("item")) {
+			event
+					.replyClosestMatch(
+									event.getFocusedOption().getAsString(),
+									ESSENCE_ITEM_NAMES.stream().map(Utils::idToName).distinct().collect(Collectors.toList())
+
+							)
+					;
+		}else if(event.getFocusedOption().getName().equals("player")){
+			event.replyClosestPlayer();
+		}
 	}
 }

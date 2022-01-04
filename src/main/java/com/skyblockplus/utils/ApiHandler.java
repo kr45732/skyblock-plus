@@ -33,6 +33,7 @@ import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
 import com.skyblockplus.features.jacob.JacobData;
 import com.skyblockplus.features.jacob.JacobHandler;
 import com.skyblockplus.features.party.Party;
+import com.skyblockplus.price.PriceCommand;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.io.InputStreamReader;
@@ -447,20 +448,23 @@ public class ApiHandler {
 		return null;
 	}
 
-	public static JsonArray queryLowestBin(String query) {
+	public static JsonArray queryLowestBin(String query, PriceCommand.AuctionType auctionType) {
 		try {
 			HttpGet httpget = new HttpGet("http://venus.arcator.co.uk:1194/query");
 			httpget.addHeader("content-type", "application/json; charset=UTF-8");
 
-			URI uri = new URIBuilder(httpget.getURI())
+			URIBuilder uriBuilder = new URIBuilder(httpget.getURI())
 				.addParameter("end", "" + Instant.now().toEpochMilli())
 				.addParameter("item_name", "%" + query + "%")
-				.addParameter("bin", "true")
 				.addParameter("sort", "ASC")
-				.addParameter("limit", "1")
-				.addParameter("key", AUCTION_API_KEY)
-				.build();
-			httpget.setURI(uri);
+				.addParameter("limit", "10")
+				.addParameter("key", AUCTION_API_KEY);
+			if (auctionType == PriceCommand.AuctionType.BIN) {
+				uriBuilder.addParameter("bin", "true");
+			} else if (auctionType == PriceCommand.AuctionType.AUCTION) {
+				uriBuilder.addParameter("bin", "false");
+			}
+			httpget.setURI(uriBuilder.build());
 
 			try (CloseableHttpResponse httpResponse = httpClient.execute(httpget)) {
 				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
@@ -469,23 +473,27 @@ public class ApiHandler {
 		return null;
 	}
 
-	public static JsonArray queryLowestBinPet(String petName, String rarity) {
+	public static JsonArray queryLowestBinPet(String petName, String rarity, PriceCommand.AuctionType auctionType) {
 		try {
 			HttpGet httpGet = new HttpGet("http://venus.arcator.co.uk:1194/query");
 			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
 
-			URIBuilder uri = new URIBuilder(httpGet.getURI())
+			URIBuilder uriBuilder = new URIBuilder(httpGet.getURI())
 				.addParameter("end", "" + Instant.now().toEpochMilli())
 				.addParameter("item_name", "%" + petName + "%")
 				.addParameter("item_id", "PET")
-				.addParameter("bin", "true")
 				.addParameter("sort", "ASC")
-				.addParameter("limit", "1")
+				.addParameter("limit", "10")
 				.addParameter("key", AUCTION_API_KEY);
 			if (!rarity.equals("ANY")) {
-				uri.addParameter("tier", rarity);
+				uriBuilder.addParameter("tier", rarity);
 			}
-			httpGet.setURI(uri.build());
+			if (auctionType == PriceCommand.AuctionType.BIN) {
+				uriBuilder.addParameter("bin", "true");
+			} else if (auctionType == PriceCommand.AuctionType.AUCTION) {
+				uriBuilder.addParameter("bin", "false");
+			}
+			httpGet.setURI(uriBuilder.build());
 
 			try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
 				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
@@ -494,21 +502,24 @@ public class ApiHandler {
 		return null;
 	}
 
-	public static JsonArray queryLowestBinEnchant(String enchantId, int enchantLevel) {
+	public static JsonArray queryLowestBinEnchant(String enchantId, int enchantLevel, PriceCommand.AuctionType auctionType) {
 		try {
 			HttpGet httpGet = new HttpGet("http://venus.arcator.co.uk:1194/query");
 			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
 
-			URI uri = new URIBuilder(httpGet.getURI())
+			URIBuilder uriBuilder = new URIBuilder(httpGet.getURI())
 				.addParameter("end", "" + Instant.now().toEpochMilli())
 				.addParameter("item_id", "ENCHANTED_BOOK")
 				.addParameter("enchants", enchantId.toUpperCase() + ";" + enchantLevel)
-				.addParameter("bin", "true")
 				.addParameter("sort", "ASC")
-				.addParameter("limit", "1")
-				.addParameter("key", AUCTION_API_KEY)
-				.build();
-			httpGet.setURI(uri);
+				.addParameter("limit", "10")
+				.addParameter("key", AUCTION_API_KEY);
+			if (auctionType == PriceCommand.AuctionType.BIN) {
+				uriBuilder.addParameter("bin", "true");
+			} else if (auctionType == PriceCommand.AuctionType.AUCTION) {
+				uriBuilder.addParameter("bin", "false");
+			}
+			httpGet.setURI(uriBuilder.build());
 
 			try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
 				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();

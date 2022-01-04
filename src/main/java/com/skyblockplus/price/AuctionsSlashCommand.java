@@ -20,7 +20,8 @@ package com.skyblockplus.price;
 
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
-import com.skyblockplus.utils.slashcommand.SlashCommandExecutedEvent;
+import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
+import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -34,7 +35,7 @@ public class AuctionsSlashCommand extends SlashCommand {
 	}
 
 	@Override
-	protected void execute(SlashCommandExecutedEvent event) {
+	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
 		switch (event.getSubcommandName()) {
@@ -63,7 +64,7 @@ public class AuctionsSlashCommand extends SlashCommand {
 			.slash(name, "Main auctions command")
 			.addSubcommands(
 				new SubcommandData("player", "Get player's active (not claimed) auctions on all profiles")
-					.addOption(OptionType.STRING, "player", "Player username or mention")
+					.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 					.addOptions(
 						new OptionData(OptionType.STRING, "filter", "How the auctions should be filtered")
 							.addChoice("Sold", "sold")
@@ -77,5 +78,12 @@ public class AuctionsSlashCommand extends SlashCommand {
 					.addOption(OptionType.BOOLEAN, "verbose", "Get more information & a detailed breakdown for each auction"),
 				new SubcommandData("uuid", "Get an auction by it's UUID").addOption(OptionType.STRING, "uuid", "Auction UUID", true)
 			);
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if(event.getFocusedOption().getName().equals("player")){
+			event.replyClosestPlayer();
+		}
 	}
 }

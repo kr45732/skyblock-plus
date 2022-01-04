@@ -54,7 +54,7 @@ public class EssenceCommand extends Command {
 
 		EmbedBuilder eb = defaultEmbed("Essence information for " + itemName);
 		if (itemJson != null) {
-			String essenceType = higherDepth(itemJson, "type").getAsString().toLowerCase(Locale.ROOT);
+			String essenceType = higherDepth(itemJson, "type").getAsString().toLowerCase();
 			for (String level : getJsonKeys(itemJson)) {
 				switch (level) {
 					case "type" -> eb.setDescription("**Essence Type:** " + capitalizeString(essenceType) + " essence");
