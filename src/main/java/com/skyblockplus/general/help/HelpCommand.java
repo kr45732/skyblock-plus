@@ -656,7 +656,7 @@ public class HelpCommand extends Command {
 			help.create("bazaar <item]", "Get bazaar prices of an item") +
 			help.create("average <item>", "Get the average auction price of an item") +
 			help.create("bids [player]", "Get a player's auction house bids") +
-			help.create("price <item>", "Query the auction house for the lowest bin of an item") +
+			help.create("price <item> [type:bin|auction|both]", "Query the auction house for the lowest bin of an item") +
 			help.create("bits <item>", "Get the bits cost of an item from the bits shop") +
 			help.create("calculate <uuid>", "Calculate the price of an item on the auction house using the auction's UUID") +
 			help.create("track auctions <player>", "Get a DM when any of a player's auctions sell") +
