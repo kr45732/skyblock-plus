@@ -298,7 +298,7 @@ public class CustomPaginator extends Menu {
 
 		embedBuilder
 			.setColor(color)
-			.setFooter("Created By CrypticPlasma • Page " + pageNum + "/" + pages, null)
+			.setFooter("By CrypticPlasma • Page " + pageNum + "/" + pages + " • dsc.gg/sb+", null)
 			.setTimestamp(Instant.now());
 
 		return embedBuilder.build();

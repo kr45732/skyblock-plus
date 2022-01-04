@@ -457,7 +457,7 @@ public class ApiHandler {
 				.addParameter("end", "" + Instant.now().toEpochMilli())
 				.addParameter("item_name", "%" + query + "%")
 				.addParameter("sort", "ASC")
-				.addParameter("limit", "10")
+				.addParameter("limit", "5")
 				.addParameter("key", AUCTION_API_KEY);
 			if (auctionType == PriceCommand.AuctionType.BIN) {
 				uriBuilder.addParameter("bin", "true");
@@ -483,7 +483,7 @@ public class ApiHandler {
 				.addParameter("item_name", "%" + petName + "%")
 				.addParameter("item_id", "PET")
 				.addParameter("sort", "ASC")
-				.addParameter("limit", "10")
+				.addParameter("limit", "5")
 				.addParameter("key", AUCTION_API_KEY);
 			if (!rarity.equals("ANY")) {
 				uriBuilder.addParameter("tier", rarity);
@@ -512,7 +512,7 @@ public class ApiHandler {
 				.addParameter("item_id", "ENCHANTED_BOOK")
 				.addParameter("enchants", enchantId.toUpperCase() + ";" + enchantLevel)
 				.addParameter("sort", "ASC")
-				.addParameter("limit", "10")
+				.addParameter("limit", "5")
 				.addParameter("key", AUCTION_API_KEY);
 			if (auctionType == PriceCommand.AuctionType.BIN) {
 				uriBuilder.addParameter("bin", "true");

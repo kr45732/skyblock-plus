@@ -608,7 +608,7 @@ public class Utils {
 	public static EmbedBuilder defaultEmbed(String title, String titleUrl) {
 		EmbedBuilder eb = new EmbedBuilder();
 		eb.setColor(botColor);
-		eb.setFooter("Created by CrypticPlasma", null);
+		eb.setFooter("By CrypticPlasma • dsc.gg/sb+", null);
 		if (titleUrl != null && titleUrl.length() <= MessageEmbed.URL_MAX_LENGTH && EmbedBuilder.URL_PATTERN.matcher(titleUrl).matches()) {
 			eb.setTitle(title, titleUrl);
 		} else {

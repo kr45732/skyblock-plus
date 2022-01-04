@@ -258,7 +258,7 @@ public class PartyCommand extends Command {
 						.setEmbeds(
 							defaultEmbed("Party Finder")
 								.setDescription(
-									"Your party has reached 5/5 players and has been unlisted. Missing permissions to create a channel: `" +
+									"Your party has reached 5/5 players and has been unlisted. Missing permissions to create a thread: `" +
 									e.getMessage().split("Missing permission: ")[1] +
 									"`"
 								)
