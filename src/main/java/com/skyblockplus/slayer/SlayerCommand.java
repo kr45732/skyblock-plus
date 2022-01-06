@@ -124,9 +124,9 @@ public class SlayerCommand extends Command {
 				50000L *
 				endermanFourKills;
 			eb.setDescription(
-				"**Total slayer:** " +
+				"**Total Slayer:** " +
 				formatNumber(player.getTotalSlayer()) +
-				" XP\n**Total coins spent:** " +
+				" XP\n**Total Coins Spent:** " +
 				simplifyNumber(coinsSpentOnSlayers)
 			);
 			eb.addField(

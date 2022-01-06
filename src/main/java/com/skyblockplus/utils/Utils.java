@@ -224,7 +224,7 @@ public class Utils {
 						streamJsonArray(
 							JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray()
 						)
-							.map(e -> e.getAsString())
+							.map(JsonElement::getAsString)
 							.collect(Collectors.toList());
 				}
 			} catch (Exception ignored) {}
@@ -668,11 +668,9 @@ public class Utils {
 
 	public static String simplifyNumber(double number) {
 		String formattedNumber;
-		DecimalFormat df = new DecimalFormat("#.#");
+		DecimalFormat df = new DecimalFormat("#.##");
 		df.setRoundingMode(RoundingMode.HALF_UP);
 		if (1000000000000D > number && number >= 1000000000) {
-			df = new DecimalFormat("#.##");
-			df.setRoundingMode(RoundingMode.HALF_UP);
 			number = number >= 999999999950D ? 999999999949D : number;
 			formattedNumber = df.format(number / 1000000000) + "B";
 		} else if (number >= 1000000) {
@@ -684,8 +682,6 @@ public class Utils {
 		} else if (number < 1) {
 			formattedNumber = "0";
 		} else {
-			df = new DecimalFormat("#.##");
-			df.setRoundingMode(RoundingMode.HALF_UP);
 			formattedNumber = df.format(number);
 		}
 		return formattedNumber;
@@ -957,7 +953,7 @@ public class Utils {
 	}
 
 	public static String getClosestMatch(String toMatch, List<String> matchFrom) {
-		if (matchFrom == null || matchFrom.size() == 0) {
+		if (matchFrom == null || matchFrom.isEmpty()) {
 			return toMatch;
 		}
 
@@ -965,7 +961,7 @@ public class Utils {
 	}
 
 	public static List<String> getClosestMatch(String toMatch, List<String> matchFrom, int numMatches) {
-		if (matchFrom == null || matchFrom.size() == 0) {
+		if (matchFrom == null || matchFrom.isEmpty()) {
 			return List.of(toMatch);
 		}
 
@@ -1264,17 +1260,25 @@ public class Utils {
 		}
 	}
 
-	public static int petLevelFromXp(long petExp, String rarity) {
+	public static int petLevelFromXp(long petExp, String rarity, String id) {
 		int petRarityOffset = higherDepth(getPetJson(), "pet_rarity_offset." + rarity.toUpperCase()).getAsInt();
-		JsonArray petLevelsXpPer = higherDepth(getPetJson(), "pet_levels").getAsJsonArray();
+		JsonArray petLevelsXpPer = higherDepth(getPetJson(), "pet_levels").getAsJsonArray().deepCopy();
+		JsonElement customLevelingJson = higherDepth(getPetJson(), "custom_pet_leveling." + id);
+		if(customLevelingJson != null) {
+			switch (higherDepth(customLevelingJson, "type", 0)) {
+				case 1 -> petLevelsXpPer.addAll(higherDepth(customLevelingJson, "pet_levels").getAsJsonArray());
+				case 2 -> petLevelsXpPer = higherDepth(customLevelingJson, "pet_levels").getAsJsonArray();
+			}
+		}
+		int maxLevel = higherDepth(customLevelingJson, "max_level", 100);
 		long totalExp = 0;
 		for (int i = petRarityOffset; i < petLevelsXpPer.size(); i++) {
 			totalExp += petLevelsXpPer.get(i).getAsLong();
 			if (totalExp >= petExp) {
-				return (Math.min(i - petRarityOffset + 1, 100));
+				return (Math.min(i - petRarityOffset + 1, maxLevel));
 			}
 		}
-		return 100;
+		return maxLevel;
 	}
 
 	public static void refreshPriceOverrideJson() {

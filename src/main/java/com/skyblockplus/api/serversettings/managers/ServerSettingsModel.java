@@ -110,6 +110,7 @@ public class ServerSettingsModel {
 		copy.setPrefix(prefix);
 		copy.setApplyGuestRole(applyGuestRole);
 		copy.setFetchurChannel(fetchurChannel);
+		copy.setFetchurRole(fetchurRole);
 		return copy;
 	}
 }

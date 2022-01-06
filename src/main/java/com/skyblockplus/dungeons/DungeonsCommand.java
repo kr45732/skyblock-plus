@@ -54,7 +54,7 @@ public class DungeonsCommand extends Command {
 					.setEveryPageText(
 						"**Secrets:** " +
 						formatNumber(player.getDungeonSecrets()) +
-						"\n**Selected class:** " +
+						"\n**Selected Class:** " +
 						player.getSelectedDungeonClass()
 					);
 

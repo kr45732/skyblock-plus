@@ -105,7 +105,7 @@ public class PriceCommand extends Command {
 			lowestBinStr += "**Name:** " + (tempName == null ? higherDepth(lowestBinAuction, "item_name").getAsString() : tempName);
 			lowestBinStr += "\n**Rarity:** " + higherDepth(lowestBinAuction, "tier").getAsString().toLowerCase();
 			lowestBinStr += "\n**Price:** " + simplifyNumber(higherDepth(lowestBinAuction, "starting_bid").getAsDouble());
-			lowestBinStr += "\n**Seller:** " + uuidToUsername(higherDepth(lowestBinAuction, "auctioneer").getAsString()).username();
+//			lowestBinStr += "\n**Seller:** " + uuidToUsername(higherDepth(lowestBinAuction, "auctioneer").getAsString()).username();
 			lowestBinStr += "\n**Auction:** `/viewauction " + higherDepth(lowestBinAuction, "uuid").getAsString() + "`";
 			lowestBinStr +=
 				"\n**Ends:** <t:" + Instant.ofEpochMilli(higherDepth(lowestBinAuction, "end_t").getAsLong()).getEpochSecond() + ":R>";

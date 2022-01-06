@@ -214,7 +214,7 @@ public class SkyblockCommand extends Command {
 						.setDescription(
 							"**Secrets:** " +
 							formatNumber(player.getDungeonSecrets()) +
-							"\n**Selected class:** " +
+							"\n**Selected Class:** " +
 							player.getSelectedDungeonClass()
 						);
 				SkillsStruct skillInfo = player.getCatacombs();

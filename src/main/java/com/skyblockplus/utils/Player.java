@@ -597,7 +597,7 @@ public class Player {
 				InvItem invItemStruct = new InvItem();
 				invItemStruct.setName(
 					"[Lvl " +
-					petLevelFromXp(higherDepth(pet, "exp", 0L), higherDepth(pet, "tier").getAsString().toLowerCase()) +
+					petLevelFromXp(higherDepth(pet, "exp", 0L), higherDepth(pet, "tier").getAsString().toLowerCase(), higherDepth(pet, "type").getAsString()) +
 					"] " +
 					capitalizeString(higherDepth(pet, "type").getAsString().toUpperCase().replace("_", " "))
 				);

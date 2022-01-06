@@ -18,34 +18,33 @@
 
 package com.skyblockplus.utils.command;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import java.util.regex.Matcher;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
-public abstract class CommandExecute {
+import java.util.regex.Matcher;
 
-	protected final CommandEvent event;
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.Utils.*;
+
+public abstract class CommandExecute extends CommandEvent {
+
 	protected final Command command;
 	protected Message ebMessage;
 	protected String[] args;
 	protected String username;
 	protected EmbedBuilder eb;
-	private boolean sendLoadingEmbed = true;
+	private final boolean sendLoadingEmbed;
 
 	public CommandExecute(Command command, CommandEvent event) {
-		this.command = command;
-		this.event = event;
+		this(command, event, true);
 	}
 
 	public CommandExecute(Command command, CommandEvent event, boolean sendLoadingEmbed) {
+		super(event.getEvent(), event.getPrefix(), event.getArgs(), event.getClient());
 		this.command = command;
-		this.event = event;
 		this.sendLoadingEmbed = sendLoadingEmbed;
 	}
 
@@ -55,8 +54,7 @@ public abstract class CommandExecute {
 		executor.submit(() -> {
 			if (sendLoadingEmbed) {
 				this.ebMessage =
-					event
-						.getChannel()
+					getChannel()
 						//						.sendMessage(
 						//							"**⚠️ Skyblock Plus will stop responding to message commands <t:1651377600:R>!** Please use slash commands instead. If you do not see slash commands from this bot, then please re-invite the bot using the link in " +
 						//							getGuildPrefix(event.getGuild().getId()) +
@@ -65,17 +63,17 @@ public abstract class CommandExecute {
 						.sendMessageEmbeds(loadingEmbed().build())
 						.complete();
 			}
-			this.args = event.getMessage().getContentRaw().split("\\s+");
+			this.args = getMessage().getContentRaw().split("\\s+");
 			execute();
 		});
 	}
 
 	protected void logCommand() {
-		com.skyblockplus.utils.Utils.logCommand(event.getGuild(), event.getAuthor(), event.getMessage().getContentRaw());
+		com.skyblockplus.utils.Utils.logCommand(getGuild(), getAuthor(), getMessage().getContentRaw());
 	}
 
 	protected String[] setArgs(int limit) {
-		args = event.getMessage().getContentRaw().split("\\s+", limit);
+		args = getMessage().getContentRaw().split("\\s+", limit);
 		return args;
 	}
 
@@ -100,7 +98,7 @@ public abstract class CommandExecute {
 	 * command's author is linked)
 	 */
 	protected boolean getAuthorUsername() {
-		return getLinkedUser(event.getAuthor().getId());
+		return getLinkedUser(getAuthor().getId());
 	}
 
 	/**
