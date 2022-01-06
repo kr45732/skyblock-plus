@@ -186,7 +186,7 @@ public class ApplyGuild {
 	}
 
 	public String onButtonClick_WaitingForInviteApplyUser(ButtonInteractionEvent event) {
-		if (!event.getChannel().getId().equals(waitInviteChannel)) {
+		if (!event.getChannel().getId().equals(waitInviteChannel.getId())) {
 			return null;
 		}
 
