@@ -1264,7 +1264,7 @@ public class Utils {
 		int petRarityOffset = higherDepth(getPetJson(), "pet_rarity_offset." + rarity.toUpperCase()).getAsInt();
 		JsonArray petLevelsXpPer = higherDepth(getPetJson(), "pet_levels").getAsJsonArray().deepCopy();
 		JsonElement customLevelingJson = higherDepth(getPetJson(), "custom_pet_leveling." + id);
-		if(customLevelingJson != null) {
+		if (customLevelingJson != null) {
 			switch (higherDepth(customLevelingJson, "type", 0)) {
 				case 1 -> petLevelsXpPer.addAll(higherDepth(customLevelingJson, "pet_levels").getAsJsonArray());
 				case 2 -> petLevelsXpPer = higherDepth(customLevelingJson, "pet_levels").getAsJsonArray();

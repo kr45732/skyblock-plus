@@ -43,7 +43,7 @@ public record UsernameUuidStruct(String username, String uuid, String failCause)
 		return "https://auctions.craftlink.xyz/players/" + uuid;
 	}
 
-	public  String nameMcHyperLink() {
+	public String nameMcHyperLink() {
 		return "[**" + username + "**](https://mine.ly/" + uuid + ")";
 	}
 }

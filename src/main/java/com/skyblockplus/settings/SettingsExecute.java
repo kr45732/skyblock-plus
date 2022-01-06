@@ -494,12 +494,12 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder setJacobChannel(String channelMention) {
-	  	Object eb = checkTextChannel(channelMention);
-	  	if(eb instanceof EmbedBuilder e){
-	  		return e;
+		Object eb = checkTextChannel(channelMention);
+		if (eb instanceof EmbedBuilder e) {
+			return e;
 		}
 
-	  	TextChannel channel = ((TextChannel) eb);
+		TextChannel channel = ((TextChannel) eb);
 		JsonObject jacobSettings = getJacobSetings();
 		jacobSettings.addProperty("channel", channel.getId());
 		int responseCode = database.setJacobSettings(guild.getId(), jacobSettings);
@@ -604,7 +604,7 @@ public class SettingsExecute {
 		return defaultSettingsEmbed((enable ? "Enabled" : "Disabled") + " jacob notifications");
 	}
 
-	public JsonObject getJacobSetings(){
+	public JsonObject getJacobSetings() {
 		return higherDepth(serverSettings, "jacobSettings").getAsJsonObject();
 	}
 
@@ -627,8 +627,7 @@ public class SettingsExecute {
 					return apiFailMessage(responseCode);
 				}
 
-				return defaultSettingsEmbed()
-					.setDescription("Removed " + uuidStruct.nameMcHyperLink() + " from the blacklist");
+				return defaultSettingsEmbed().setDescription("Removed " + uuidStruct.nameMcHyperLink() + " from the blacklist");
 			}
 		}
 
@@ -670,7 +669,7 @@ public class SettingsExecute {
 			.orElse(null);
 		if (blacklistedUser != null) {
 			return invalidEmbed(
-					uuidStruct.nameMcHyperLink() +
+				uuidStruct.nameMcHyperLink() +
 				" is already blacklisted with reason `" +
 				higherDepth(blacklistedUser, "reason").getAsString() +
 				"`"
@@ -751,7 +750,7 @@ public class SettingsExecute {
 			return apiFailMessage(responseCode);
 		}
 
-		return defaultSettingsEmbed((enable ? "Enabled": "Disabled") + " automatic guild ranks");
+		return defaultSettingsEmbed((enable ? "Enabled" : "Disabled") + " automatic guild ranks");
 	}
 
 	public EmbedBuilder setGuildCounterEnable(JsonObject guildSettings, boolean enable) {
@@ -872,14 +871,16 @@ public class SettingsExecute {
 	public EmbedBuilder setApplyEnable(JsonObject guildSettings, boolean enable) {
 		if (enable) {
 			if (
-					higherDepth(guildSettings, "applyMessageChannel", "").isEmpty() ||
-							higherDepth(guildSettings, "applyStaffChannel", "").isEmpty() ||
-							higherDepth(guildSettings, "applyCategory", "").isEmpty() ||
-							higherDepth(guildSettings, "applyMessage", "").isEmpty() ||
-							higherDepth(guildSettings, "applyAcceptMessage", "").isEmpty() ||
-							higherDepth(guildSettings, "applyDenyMessage", "").isEmpty()
+				higherDepth(guildSettings, "applyMessageChannel", "").isEmpty() ||
+				higherDepth(guildSettings, "applyStaffChannel", "").isEmpty() ||
+				higherDepth(guildSettings, "applyCategory", "").isEmpty() ||
+				higherDepth(guildSettings, "applyMessage", "").isEmpty() ||
+				higherDepth(guildSettings, "applyAcceptMessage", "").isEmpty() ||
+				higherDepth(guildSettings, "applyDenyMessage", "").isEmpty()
 			) {
-				return invalidEmbed("All required application settings must be set before enabling\n\nRequired settings: channel, staff_channel, category, message, accept_message, deny_message");
+				return invalidEmbed(
+					"All required application settings must be set before enabling\n\nRequired settings: channel, staff_channel, category, message, accept_message, deny_message"
+				);
 			}
 		}
 
@@ -889,7 +890,12 @@ public class SettingsExecute {
 			return apiFailMessage(responseCode);
 		}
 
-		return defaultSettingsEmbed((enable ? "Enabled" : "Disabled") + " automated applications for " + higherDepth(guildSettings, "guildName").getAsString().replace("_", "") + "\n\nRun `/reload` to reload the settings");
+		return defaultSettingsEmbed(
+			(enable ? "Enabled" : "Disabled") +
+			" automated applications for " +
+			higherDepth(guildSettings, "guildName").getAsString().replace("_", "") +
+			"\n\nRun `/reload` to reload the settings"
+		);
 	}
 
 	public EmbedBuilder setApplyMessage(JsonObject guildSettings, String message) {
@@ -919,7 +925,7 @@ public class SettingsExecute {
 
 	public EmbedBuilder setApplyChannel(JsonObject guildSettings, String textChannel) {
 		Object eb = checkTextChannel(textChannel);
-		if(eb instanceof EmbedBuilder e){
+		if (eb instanceof EmbedBuilder e) {
 			return e;
 		}
 		TextChannel channel = ((TextChannel) eb);
@@ -945,7 +951,7 @@ public class SettingsExecute {
 		}
 
 		Object eb = checkTextChannel(textChannel);
-		if(eb instanceof EmbedBuilder e){
+		if (eb instanceof EmbedBuilder e) {
 			return e;
 		}
 		TextChannel channel = ((TextChannel) eb);
@@ -976,7 +982,7 @@ public class SettingsExecute {
 
 	public EmbedBuilder setApplyStaffChannel(JsonObject guildSettings, String textChannel) {
 		Object eb = checkTextChannel(textChannel);
-		if(eb instanceof EmbedBuilder e){
+		if (eb instanceof EmbedBuilder e) {
 			return e;
 		}
 		TextChannel channel = ((TextChannel) eb);
@@ -994,7 +1000,7 @@ public class SettingsExecute {
 		TextChannel channel = null;
 		if (!textChannel.equalsIgnoreCase("none")) {
 			Object eb = checkTextChannel(textChannel);
-			if(eb instanceof EmbedBuilder e){
+			if (eb instanceof EmbedBuilder e) {
 				return e;
 			}
 			channel = ((TextChannel) eb);
@@ -1006,9 +1012,7 @@ public class SettingsExecute {
 			return apiFailMessage(responseCode);
 		}
 
-		return defaultSettingsEmbed(
-			"Set apply waiting for invite channel to: " + (channel == null ? "none" : channel.getAsMention())
-		);
+		return defaultSettingsEmbed("Set apply waiting for invite channel to: " + (channel == null ? "none" : channel.getAsMention()));
 	}
 
 	public EmbedBuilder setApplyAcceptMessage(JsonObject guildSettings, String acceptMessage) {
@@ -1267,7 +1271,7 @@ public class SettingsExecute {
 		return null;
 	}
 
-	public JsonArray getApplyBlacklist(){
+	public JsonArray getApplyBlacklist() {
 		return higherDepth(serverSettings, "applicationBlacklist").getAsJsonArray();
 	}
 
@@ -2491,7 +2495,7 @@ public class SettingsExecute {
 		TextChannel channel;
 		try {
 			channel = guild.getTextChannelById(channelMention.replaceAll("[<#>]", ""));
-		}catch (Exception e){
+		} catch (Exception e) {
 			return invalidEmbed("The provided text channel is invalid");
 		}
 

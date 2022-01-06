@@ -18,16 +18,15 @@
 
 package com.skyblockplus.utils.command;
 
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import java.util.regex.Matcher;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-
-import java.util.regex.Matcher;
-
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Utils.*;
 
 public abstract class CommandExecute extends CommandEvent {
 

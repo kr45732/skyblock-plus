@@ -90,14 +90,26 @@ public class EssenceCommand extends Command {
 			for (Map.Entry<String, JsonElement> entry : player.profileJson().getAsJsonObject().entrySet()) {
 				if (entry.getKey().startsWith("essence_")) {
 					String essenceType = entry.getKey().split("essence_")[1];
-					amountsStr.append(ESSENCE_EMOJI_MAP.get(essenceType)).append("** ").append(capitalizeString(essenceType)).append(" essence:** ").append(formatNumber(entry.getValue().getAsInt())).append("\n");
+					amountsStr
+						.append(ESSENCE_EMOJI_MAP.get(essenceType))
+						.append("** ")
+						.append(capitalizeString(essenceType))
+						.append(" essence:** ")
+						.append(formatNumber(entry.getValue().getAsInt()))
+						.append("\n");
 				}
 			}
 			eb.addField("Amounts", amountsStr.toString(), false);
 
 			StringBuilder shopUpgrades = new StringBuilder();
 			for (Map.Entry<String, JsonElement> perk : higherDepth(player.profileJson(), "perks").getAsJsonObject().entrySet()) {
-				shopUpgrades.append("\n").append(ESSENCE_EMOJI_MAP.get(perk.getKey())).append("** ").append(capitalizeString(perk.getKey().replace("_", " "))).append(":** ").append(perk.getValue().getAsInt());
+				shopUpgrades
+					.append("\n")
+					.append(ESSENCE_EMOJI_MAP.get(perk.getKey()))
+					.append("** ")
+					.append(capitalizeString(perk.getKey().replace("_", " ")))
+					.append(":** ")
+					.append(perk.getValue().getAsInt());
 			}
 			eb.addField("Shop Upgrades", shopUpgrades.toString(), false);
 
