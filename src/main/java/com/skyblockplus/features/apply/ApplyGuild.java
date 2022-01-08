@@ -186,7 +186,7 @@ public class ApplyGuild {
 	}
 
 	public String onButtonClick_WaitingForInviteApplyUser(ButtonInteractionEvent event) {
-		if(waitInviteChannel == null){
+		if (waitInviteChannel == null) {
 			return null;
 		}
 
@@ -223,7 +223,11 @@ public class ApplyGuild {
 			try {
 				event.getGuild().addRoleToMember(channelRoleSplit[1], event.getGuild().getRoleById(channelRoleSplit[2])).queue();
 			} catch (Exception ignored) {}
-			applyUserList.stream().filter(applyUser -> applyUser.applicationChannelId.equals(toCloseChannel.getId())).findFirst().ifPresent(applyUser -> applyUser.onButtonClick(event, this, true));
+			applyUserList
+				.stream()
+				.filter(applyUser -> applyUser.applicationChannelId.equals(toCloseChannel.getId()))
+				.findFirst()
+				.ifPresent(applyUser -> applyUser.onButtonClick(event, this, true));
 		} catch (Exception ignored) {}
 
 		event.getMessage().delete().queueAfter(3, TimeUnit.SECONDS);

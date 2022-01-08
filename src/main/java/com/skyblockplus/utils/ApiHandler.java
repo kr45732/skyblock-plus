@@ -429,10 +429,17 @@ public class ApiHandler {
 		return getGuildGeneric("&name=" + guildName.replace(" ", "%20").replace("_", "%20"));
 	}
 
-	public static String getQueryApiUrl(String path){
-		return (Duration.between(lastQueryApiUpdate, Instant.now()).toMinutes() > 5 ? "https://query-api.herokuapp.com/" : "http://venus.arcator.co.uk:1194/") + path;
-
+	public static String getQueryApiUrl(String path) {
+		return (
+			(
+				Duration.between(lastQueryApiUpdate, Instant.now()).toMinutes() > 5
+					? "https://query-api.herokuapp.com/"
+					: "http://venus.arcator.co.uk:1194/"
+			) +
+			path
+		);
 	}
+
 	public static JsonArray getBidsFromPlayer(String uuid) {
 		try {
 			HttpGet httpGet = new HttpGet(getQueryApiUrl("query"));

@@ -1400,10 +1400,10 @@ public class Utils {
 		return userCount;
 	}
 
-	public static String getItemThumbnail(String id){
+	public static String getItemThumbnail(String id) {
 		if (PET_NAMES.contains(id.split(";")[0].trim())) {
 			return getPetUrl(id.split(";")[0].trim());
-		}else if(ENCHANT_NAMES.contains(id.split(";")[0].trim())){
+		} else if (ENCHANT_NAMES.contains(id.split(";")[0].trim())) {
 			return "https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK";
 		}
 		return "https://sky.shiiyu.moe/item.gif/" + id;

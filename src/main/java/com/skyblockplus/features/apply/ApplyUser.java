@@ -652,10 +652,10 @@ public class ApplyUser implements Serializable {
 				break;
 			case 3:
 				TextChannel appChannel = jda.getTextChannelById(applicationChannelId);
-				if(!isWait) {
+				if (!isWait) {
 					event.getMessage().editMessageComponents().queue();
 					event.getHook().editOriginalEmbeds(defaultEmbed("Closing Channel").build()).complete();
-				}else{
+				} else {
 					appChannel.sendMessageEmbeds(defaultEmbed("Closing Channel").build()).complete();
 				}
 				appChannel.delete().reason("Application closed").queueAfter(10, TimeUnit.SECONDS);

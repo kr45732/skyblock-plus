@@ -538,7 +538,6 @@ public class AutomaticGuild {
 		this.skyblockEventHandler = skyblockEventHandler;
 	}
 
-
 	/* Events */
 	public void onMessageReactionAdd(MessageReactionAddEvent event) {
 		applyGuild.forEach(o1 -> o1.onMessageReactionAdd(event));
@@ -790,7 +789,7 @@ public class AutomaticGuild {
 				JsonObject itemJson = JsonParser.parseReader(new FileReader(child)).getAsJsonObject();
 				if (itemJson.has("vanilla")) {
 					String id = itemJson.get("internalname").getAsString().replace("-", ":");
-					if(higherDepth(bazaarJson, id + ".sell_summary.[0].pricePerUnit") == null) {
+					if (higherDepth(bazaarJson, id + ".sell_summary.[0].pricePerUnit") == null) {
 						outputObject.addProperty(id, Math.max(0, getNpcSellPrice(id)));
 					}
 				}

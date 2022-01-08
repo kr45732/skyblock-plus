@@ -61,7 +61,11 @@ public class AverageAuctionCommand extends Command {
 					String enchantedBookId = i + ";" + Integer.parseInt(itemId.replaceAll("\\D+", ""));
 					if (higherDepth(averageAhJson, enchantedBookId) != null) {
 						JsonElement itemJson = higherDepth(averageAhJson, enchantedBookId);
-						eb.addField(idToName(enchantedBookId), formatNumber(higherDepth(itemJson, "clean_price", higherDepth(itemJson, "price", 0L))), false);
+						eb.addField(
+							idToName(enchantedBookId),
+							formatNumber(higherDepth(itemJson, "clean_price", higherDepth(itemJson, "price", 0L))),
+							false
+						);
 						eb.setThumbnail("https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK");
 						return eb;
 					}
@@ -70,7 +74,11 @@ public class AverageAuctionCommand extends Command {
 						String enchantedBookId = i + ";" + j;
 						if (higherDepth(averageAhJson, enchantedBookId) != null) {
 							JsonElement itemJson = higherDepth(averageAhJson, enchantedBookId);
-							eb.addField(idToName(enchantedBookId), formatNumber(higherDepth(itemJson, "clean_price", higherDepth(itemJson, "price", 0L))), false);
+							eb.addField(
+								idToName(enchantedBookId),
+								formatNumber(higherDepth(itemJson, "clean_price", higherDepth(itemJson, "price", 0L))),
+								false
+							);
 						}
 					}
 
@@ -113,7 +121,11 @@ public class AverageAuctionCommand extends Command {
 
 				if (higherDepth(averageAhJson, petId) != null) {
 					JsonElement itemJson = higherDepth(averageAhJson, petId);
-					eb.addField(idToName(petId), formatNumber(higherDepth(itemJson, "clean_price", higherDepth(itemJson, "price", 0L))), false);
+					eb.addField(
+						idToName(petId),
+						formatNumber(higherDepth(itemJson, "clean_price", higherDepth(itemJson, "price", 0L))),
+						false
+					);
 					eb.setThumbnail(getItemThumbnail(petId));
 					return eb;
 				}
@@ -123,7 +135,11 @@ public class AverageAuctionCommand extends Command {
 		String closestMatch = getClosestMatch(itemId, getJsonKeys(averageAhJson));
 		if (closestMatch != null) {
 			JsonElement itemJson = higherDepth(averageAhJson, closestMatch);
-			eb.addField(idToName(closestMatch), formatNumber(higherDepth(itemJson, "clean_price", higherDepth(itemJson, "price", 0L))), false);
+			eb.addField(
+				idToName(closestMatch),
+				formatNumber(higherDepth(itemJson, "clean_price", higherDepth(itemJson, "price", 0L))),
+				false
+			);
 			eb.setThumbnail(getItemThumbnail(closestMatch));
 			return eb;
 		}
