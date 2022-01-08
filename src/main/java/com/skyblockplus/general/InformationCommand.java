@@ -75,7 +75,7 @@ public class InformationCommand extends Command {
 				true
 			)
 			.setThumbnail("https://cdn.discordapp.com/attachments/803419567958392832/825768516636508160/sb_loading.gif")
-			.setFooter("Last restart")
+			.setFooter("dsc.gg/sb+ • Last restart")
 			.setTimestamp(client.getStartTime());
 	}
 

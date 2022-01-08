@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
+import org.jetbrains.annotations.NotNull;
 
 public class BinCommand extends Command {
 
@@ -46,11 +47,11 @@ public class BinCommand extends Command {
 			return invalidEmbed("Error fetching auctions");
 		}
 
+		EmbedBuilder eb = defaultEmbed("Lowest bin");
 		String itemId = nameToId(item);
 		if (higherDepth(lowestBinJson, itemId) != null) {
-			EmbedBuilder eb = defaultEmbed("Lowest bin");
 			eb.addField(idToName(itemId), formatNumber(higherDepth(lowestBinJson, itemId, 0L)), false);
-			eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId);
+			eb.setThumbnail(getItemThumbnail(itemId));
 			return eb;
 		}
 
@@ -59,13 +60,11 @@ public class BinCommand extends Command {
 				try {
 					String enchantedBookId = i + ";" + Integer.parseInt(itemId.replaceAll("\\D+", ""));
 					if (higherDepth(lowestBinJson, enchantedBookId) != null) {
-						EmbedBuilder eb = defaultEmbed("Lowest bin");
 						eb.addField(idToName(enchantedBookId), formatNumber(higherDepth(lowestBinJson, enchantedBookId, 0L)), false);
 						eb.setThumbnail("https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK");
 						return eb;
 					}
 				} catch (NumberFormatException e) {
-					EmbedBuilder eb = defaultEmbed("Lowest bin");
 					for (int j = 10; j > 0; j--) {
 						String enchantedBookId = i + ";" + j;
 						if (higherDepth(lowestBinJson, enchantedBookId) != null) {
@@ -111,9 +110,8 @@ public class BinCommand extends Command {
 				}
 
 				if (higherDepth(lowestBinJson, petId) != null) {
-					EmbedBuilder eb = defaultEmbed("Lowest bin");
 					eb.addField(idToName(petId), formatNumber(higherDepth(lowestBinJson, petId, 0L)), false);
-					eb.setThumbnail(getPetUrl(petId.split(";")[0]));
+					eb.setThumbnail(getItemThumbnail(petId));
 					return eb;
 				}
 			}
@@ -121,14 +119,8 @@ public class BinCommand extends Command {
 
 		String closestMatch = getClosestMatch(itemId, getJsonKeys(lowestBinJson));
 		if (closestMatch != null) {
-			EmbedBuilder eb = defaultEmbed("Lowest bin");
-			if (PET_NAMES.contains(closestMatch.split(";")[0].trim())) {
-				eb.setThumbnail(getPetUrl(closestMatch.split(";")[0].trim()));
-			} else {
-				eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + closestMatch);
-			}
-
 			eb.addField(idToName(closestMatch), formatNumber(higherDepth(lowestBinJson, closestMatch, 0L)), false);
+			eb.setThumbnail(getItemThumbnail(closestMatch));
 			return eb;
 		}
 

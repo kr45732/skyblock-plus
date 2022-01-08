@@ -191,14 +191,6 @@ public class Database {
 		return settingsService.setServerHypixelApiKey(serverId, newKey).getStatusCodeValue();
 	}
 
-	public JsonElement getMee6Settings(String serverId) {
-		return gson.toJsonTree(settingsService.getMee6Settings(serverId).getBody());
-	}
-
-	public int setMee6Settings(String serverId, JsonElement newSettings) {
-		return settingsService.setMee6Settings(serverId, gson.fromJson(newSettings, RoleModel.class)).getStatusCodeValue();
-	}
-
 	public int setPrefix(String serverId, String prefix) {
 		return settingsService.setPrefix(serverId, prefix).getStatusCodeValue();
 	}

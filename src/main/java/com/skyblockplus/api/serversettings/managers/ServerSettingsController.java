@@ -80,9 +80,4 @@ public class ServerSettingsController {
 	public ResponseEntity<?> getSkyblockEventSettings(@RequestParam(value = "guildId") String serverId) {
 		return settingsService.getSkyblockEventSettings(serverId);
 	}
-
-	@GetMapping("/get/mee6")
-	public ResponseEntity<?> getMee6Settings(@RequestParam(value = "guildId") String serverId) {
-		return settingsService.getMee6Settings(serverId);
-	}
 }

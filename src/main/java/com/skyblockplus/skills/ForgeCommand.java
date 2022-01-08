@@ -82,7 +82,7 @@ public class ForgeCommand extends Command {
 				return defaultEmbed(player.getUsername() + " has no items in the forge");
 			}
 			if (forgeTime != 1) {
-				eb.setDescription("**Quick Forge:**" + roundAndFormat(100 - bonus * 100.0) + "% less forge time");
+				eb.setDescription("**Quick Forge:** " + roundAndFormat(100 - bonus * 100.0) + "% less forge time");
 			}
 			return eb;
 		}

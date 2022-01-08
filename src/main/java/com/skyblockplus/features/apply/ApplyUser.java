@@ -36,10 +36,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Category;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -352,7 +349,7 @@ public class ApplyUser implements Serializable {
 		return defaultEmbed(fixUsername(playerUsername) + ironmanSymbol, skyblockStatsLink(playerUsername, playerProfileName));
 	}
 
-	public boolean onButtonClick(ButtonInteractionEvent event, ApplyGuild parent) {
+	public boolean onButtonClick(ButtonInteractionEvent event, ApplyGuild parent, boolean isWait) {
 		JsonElement currentSettings = JsonParser.parseString(currentSettingsString);
 		if (!event.getUser().getId().equals(applyingUserId) && !event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
 			JsonArray staffPingRoles = higherDepth(currentSettings, "applyStaffRoles").getAsJsonArray();
@@ -654,9 +651,14 @@ public class ApplyUser implements Serializable {
 				}
 				break;
 			case 3:
-				event.getMessage().editMessageComponents().queue();
-				event.getHook().editOriginalEmbeds(defaultEmbed("Closing Channel").build()).queue();
-				event.getTextChannel().delete().reason("Application closed").queueAfter(10, TimeUnit.SECONDS);
+				TextChannel appChannel = jda.getTextChannelById(applicationChannelId);
+				if(!isWait) {
+					event.getMessage().editMessageComponents().queue();
+					event.getHook().editOriginalEmbeds(defaultEmbed("Closing Channel").build()).complete();
+				}else{
+					appChannel.sendMessageEmbeds(defaultEmbed("Closing Channel").build()).complete();
+				}
+				appChannel.delete().reason("Application closed").queueAfter(10, TimeUnit.SECONDS);
 				parent.applyUserList.remove(this);
 				if (logApplication) {
 					try {

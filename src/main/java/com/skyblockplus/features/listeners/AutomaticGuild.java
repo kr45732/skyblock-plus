@@ -88,9 +88,6 @@ public class AutomaticGuild {
 	public SkyblockEventHandler skyblockEventHandler = null;
 	public List<EventMember> eventMemberList = new ArrayList<>();
 	public Instant eventMemberListLastUpdated = null;
-	/* Mee6 Roles */
-	public JsonElement currentMee6Settings;
-	public Instant lastMee6RankUpdate = null;
 	/* Party */
 	public List<Party> partyList = new ArrayList<>();
 	public String prefix;
@@ -107,7 +104,6 @@ public class AutomaticGuild {
 		schedulerConstructor();
 		prefix = database.getPrefix(guildId);
 		farmingContest = new FarmingContest(guildId, higherDepth(serverSettings, "jacobSettings"));
-		currentMee6Settings = higherDepth(serverSettings, "mee6Data");
 		try {
 			fetchurChannel = event.getGuild().getTextChannelById(higherDepth(serverSettings, "fetchurChannel", null));
 		} catch (Exception ignored) {}
@@ -542,87 +538,6 @@ public class AutomaticGuild {
 		this.skyblockEventHandler = skyblockEventHandler;
 	}
 
-	/* Mee6 Roles Methods */
-	public String reloadMee6Settings(String guildId) {
-		Guild guild = jda.getGuildById(guildId);
-		if (guild == null) {
-			return "Invalid guild";
-		}
-
-		JsonElement currentSettings = database.getMee6Settings(guild.getId());
-		if (currentSettings == null) {
-			return "No settings found";
-		}
-
-		currentMee6Settings = currentSettings;
-		boolean enabled = higherDepth(currentSettings, "enable") != null && higherDepth(currentSettings, "enable").getAsBoolean();
-		return "Mee6 roles are " + (enabled ? "enabled" : "disabled");
-	}
-
-	public void mee6Roles(MessageReceivedEvent event) {
-		if (event.getMessage().getContentRaw().toLowerCase().startsWith("!rank")) {
-			try {
-				if (!higherDepth(currentMee6Settings, "enable").getAsBoolean()) {
-					return;
-				}
-			} catch (Exception e) {
-				return;
-			}
-
-			if (lastMee6RankUpdate != null && Duration.between(lastMee6RankUpdate, Instant.now()).toMinutes() <= 3) {
-				return;
-			}
-
-			lastMee6RankUpdate = Instant.now();
-
-			int pageNum = 0;
-			while (true) {
-				JsonArray leaderboardArr = getMee6Leaderboard(pageNum);
-				if (leaderboardArr == null || leaderboardArr.size() == 0) {
-					return;
-				}
-
-				Member member;
-				if (event.getMessage().getMentionedMembers().isEmpty()) {
-					member = event.getMember();
-				} else {
-					member = event.getMessage().getMentionedMembers().get(0);
-				}
-
-				for (JsonElement player : leaderboardArr) {
-					if (higherDepth(player, "id").getAsString().equals(member.getId())) {
-						int playerLevel = higherDepth(player, "level", 0);
-						JsonArray curRoles = higherDepth(currentMee6Settings, "levels").getAsJsonArray();
-						List<Role> toAdd = new ArrayList<>();
-						List<Role> toRemove = new ArrayList<>();
-						for (JsonElement curRole : curRoles) {
-							if (playerLevel >= higherDepth(curRole, "value", 0)) {
-								toAdd.add(event.getGuild().getRoleById(higherDepth(curRole, "roleId").getAsString()));
-							} else {
-								toRemove.add(event.getGuild().getRoleById(higherDepth(curRole, "roleId").getAsString()));
-							}
-						}
-						event.getGuild().modifyMemberRoles(member, toAdd, toRemove).queue();
-						return;
-					}
-				}
-
-				pageNum++;
-			}
-		}
-	}
-
-	public JsonArray getMee6Leaderboard(int pageNumber) {
-		try {
-			return higherDepth(
-				getJson("https://mee6.xyz/api/plugins/levels/leaderboard/" + guildId + "?limit=1000&page=" + pageNumber),
-				"players"
-			)
-				.getAsJsonArray();
-		} catch (Exception e) {
-			return null;
-		}
-	}
 
 	/* Events */
 	public void onMessageReactionAdd(MessageReactionAddEvent event) {
@@ -663,12 +578,6 @@ public class AutomaticGuild {
 				return;
 			}
 		}
-
-		if (event.getAuthor().isBot()) {
-			return;
-		}
-
-		mee6Roles(event);
 	}
 
 	public void onTextChannelDelete(ChannelDeleteEvent event) {
@@ -874,47 +783,16 @@ public class AutomaticGuild {
 	public JsonElement getUpdatedPriceOverridesJson(JsonElement currentPriceOverrides) {
 		File dir = new File("src/main/java/com/skyblockplus/json/neu/items");
 		JsonElement bazaarJson = higherDepth(getBazaarJson(), "products");
-		JsonArray sbzPricesJson = getSbzPricesJson();
-		JsonElement binJson = getLowestBinJson();
-		JsonElement averageJson = getAverageAuctionJson();
 		JsonObject outputObject = new JsonObject();
 
 		for (File child : dir.listFiles()) {
 			try {
 				JsonObject itemJson = JsonParser.parseReader(new FileReader(child)).getAsJsonObject();
 				if (itemJson.has("vanilla")) {
-					String name = parseMcCodes(itemJson.get("displayname").getAsString());
-					String id = itemJson.get("internalname").getAsString();
-					if (id.contains("-")) {
-						id = id.replace("-", ":");
+					String id = itemJson.get("internalname").getAsString().replace("-", ":");
+					if(higherDepth(bazaarJson, id + ".sell_summary.[0].pricePerUnit") == null) {
+						outputObject.addProperty(id, Math.max(0, getNpcSellPrice(id)));
 					}
-					long price = 0;
-
-					try {
-						higherDepth(bazaarJson, id + ".sell_summary.[0].pricePerUnit").getAsDouble();
-						continue;
-					} catch (Exception ignored) {}
-
-					for (JsonElement itemPrice : sbzPricesJson) {
-						String itemNamePrice = higherDepth(itemPrice, "name").getAsString();
-						if (itemNamePrice.equalsIgnoreCase(id) || itemNamePrice.equalsIgnoreCase(name.replace(" ", "_"))) {
-							long sbzPrice = higherDepth(itemPrice, "low").getAsLong();
-							long binPrice = higherDepth(binJson, id, Long.MAX_VALUE);
-							long averagePrice = higherDepth(averageJson, id) != null
-								? Math.min(
-									higherDepth(averageJson, id + ".price", Long.MAX_VALUE),
-									higherDepth(averageJson, id + ".clean_price", Long.MAX_VALUE)
-								)
-								: Long.MAX_VALUE;
-							long minPrice = Math.min(sbzPrice, Math.min(binPrice, averagePrice));
-							if (minPrice != Long.MAX_VALUE) {
-								price = minPrice;
-							}
-							break;
-						}
-					}
-
-					outputObject.addProperty(id, price);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();

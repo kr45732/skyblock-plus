@@ -56,7 +56,7 @@ public class SkyblockEventHandler {
 		this.paginatorEvent = paginatorEvent;
 		this.eb =
 			defaultEmbed("Skyblock Event")
-				.setFooter("Type 'cancel' to stop the process")
+				.setFooter("Type 'cancel' to stop the process • dsc.gg/sb+")
 				.setDescription("Reply with the name of the guild I should track.");
 
 		if (paginatorEvent.isSlashCommand()) {

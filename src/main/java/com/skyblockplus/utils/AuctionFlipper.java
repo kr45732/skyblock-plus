@@ -18,6 +18,8 @@
 
 package com.skyblockplus.utils;
 
+import static com.skyblockplus.utils.ApiHandler.getQueryApiUrl;
+import static com.skyblockplus.utils.ApiHandler.lastQueryApiUpdate;
 import static com.skyblockplus.utils.Utils.*;
 
 import club.minnced.discord.webhook.WebhookClientBuilder;
@@ -52,14 +54,11 @@ public class AuctionFlipper {
 	private static Instant lastUpdated;
 
 	public static void onGuildMessageReceived(MessageReceivedEvent event) {
-		if (!enable || !isMainBot()) {
-			return;
-		}
-
 		try {
 			if (event.getChannel().getId().equals("912156704383336458") && event.isWebhookMessage()) {
+				lastQueryApiUpdate = Instant.now();
 				String desc = event.getMessage().getEmbeds().get(0).getDescription();
-				if (desc.startsWith("Successfully updated under bins file in ")) {
+				if (enable && isMainBot()&& desc.startsWith("Successfully updated under bins file in ")) {
 					flip();
 				} else if (desc.contains(" query auctions into database in ")) {
 					queryItems = null;
@@ -126,13 +125,13 @@ public class AuctionFlipper {
 
 	public static JsonElement getUnderBinJson() {
 		try {
-			HttpGet httpget = new HttpGet("http://venus.arcator.co.uk:1194/underbin");
-			httpget.addHeader("content-type", "application/json; charset=UTF-8");
+			HttpGet httpGet = new HttpGet(getQueryApiUrl("underbin"));
+			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
 
-			URI uri = new URIBuilder(httpget.getURI()).addParameter("key", AUCTION_API_KEY).build();
-			httpget.setURI(uri);
+			URI uri = new URIBuilder(httpGet.getURI()).addParameter("key", AUCTION_API_KEY).build();
+			httpGet.setURI(uri);
 
-			try (CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpget)) {
+			try (CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpGet)) {
 				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
 			}
 		} catch (Exception ignored) {}

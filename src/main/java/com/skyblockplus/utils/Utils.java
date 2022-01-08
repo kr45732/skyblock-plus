@@ -21,6 +21,8 @@ package com.skyblockplus.utils;
 import static com.skyblockplus.Main.*;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Constants.ENCHANT_NAMES;
+import static com.skyblockplus.utils.Constants.PET_NAMES;
 import static java.lang.String.join;
 import static java.util.Collections.nCopies;
 
@@ -78,6 +80,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.Dsl;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -164,7 +167,7 @@ public class Utils {
 		if (lowestBinJson == null || Duration.between(lowestBinJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
 			lowestBinJson = getJsonObject("https://moulberry.codes/lowestbin.json");
 			if (lowestBinJson == null) {
-				lowestBinJson = getJsonObject("http://venus.arcator.co.uk:1194/lowestbin?key=" + AUCTION_API_KEY);
+				lowestBinJson = getJsonObject(getQueryApiUrl("lowestbin") + "?key=" + AUCTION_API_KEY);
 			}
 			lowestBinJsonLastUpdated = Instant.now();
 		}
@@ -213,13 +216,13 @@ public class Utils {
 	public static List<String> getQueryItems() {
 		if (queryItems == null) {
 			try {
-				HttpGet httpget = new HttpGet("http://venus.arcator.co.uk:1194/query_items");
-				httpget.addHeader("content-type", "application/json; charset=UTF-8");
+				HttpGet httpGet = new HttpGet(getQueryApiUrl("query_items"));
+				httpGet.addHeader("content-type", "application/json; charset=UTF-8");
 
-				URI uri = new URIBuilder(httpget.getURI()).addParameter("key", AUCTION_API_KEY).build();
-				httpget.setURI(uri);
+				URI uri = new URIBuilder(httpGet.getURI()).addParameter("key", AUCTION_API_KEY).build();
+				httpGet.setURI(uri);
 
-				try (CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpget)) {
+				try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
 					queryItems =
 						streamJsonArray(
 							JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray()
@@ -410,13 +413,13 @@ public class Utils {
 		} catch (Exception ignored) {}
 
 		try {
-			HttpGet httpget = new HttpGet(jsonUrl);
+			HttpGet httpGet = new HttpGet(jsonUrl);
 			if (jsonUrl.contains("raw.githubusercontent.com")) {
-				httpget.setHeader("Authorization", "token " + GITHUB_TOKEN);
+				httpGet.setHeader("Authorization", "token " + GITHUB_TOKEN);
 			}
-			httpget.addHeader("content-type", "application/json; charset=UTF-8");
+			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
 
-			try (CloseableHttpResponse httpResponse = httpClient.execute(httpget)) {
+			try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
 				if (jsonUrl.toLowerCase().contains("api.hypixel.net") && jsonUrl.contains(HYPIXEL_API_KEY)) {
 					try {
 						remainingLimit.set(Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Remaining").getValue()));
@@ -444,11 +447,11 @@ public class Utils {
 		}
 
 		try {
-			HttpGet httpget = new HttpGet(dataUrl);
-			httpget.setHeader("Authorization", "token " + GITHUB_TOKEN);
-			httpget.addHeader("content-type", "application/json; charset=UTF-8");
+			HttpGet httpGet = new HttpGet(dataUrl);
+			httpGet.setHeader("Authorization", "token " + GITHUB_TOKEN);
+			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
 
-			try (CloseableHttpResponse httpResponse = httpClient.execute(httpget)) {
+			try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
 				InputStream inputStream = httpResponse.getEntity().getContent();
 				ByteArrayOutputStream result = new ByteArrayOutputStream();
 				byte[] buffer = new byte[1024];
@@ -535,10 +538,10 @@ public class Utils {
 
 	public static String getUrl(String url) {
 		try {
-			HttpGet httpget = new HttpGet(url);
-			httpget.addHeader("content-type", "application/json; charset=UTF-8");
+			HttpGet httpGet = new HttpGet(url);
+			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
 
-			try (CloseableHttpResponse httpResponse = httpClient.execute(httpget)) {
+			try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
 				return new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent()))
 					.lines()
 					.parallel()
@@ -1372,7 +1375,7 @@ public class Utils {
 	}
 
 	public static int getUserCount() {
-		if (userCount == -1 || Duration.between(userCountLastUpdated, Instant.now()).toHours() >= 1) {
+		if (userCount == -1 || Duration.between(userCountLastUpdated, Instant.now()).toMinutes() >= 60) {
 			userCount =
 				jda
 					.getGuilds()
@@ -1395,5 +1398,14 @@ public class Utils {
 		}
 
 		return userCount;
+	}
+
+	public static String getItemThumbnail(String id){
+		if (PET_NAMES.contains(id.split(";")[0].trim())) {
+			return getPetUrl(id.split(";")[0].trim());
+		}else if(ENCHANT_NAMES.contains(id.split(";")[0].trim())){
+			return "https://sky.shiiyu.moe/item.gif/ENCHANTED_BOOK";
+		}
+		return "https://sky.shiiyu.moe/item.gif/" + id;
 	}
 }

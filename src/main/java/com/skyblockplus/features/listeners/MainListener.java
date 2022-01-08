@@ -65,14 +65,6 @@ public class MainListener extends ListenerAdapter {
 		return reloadStatus;
 	}
 
-	public static String onMee6Reload(String guildId) {
-		String reloadStatus = "Error reloading";
-		if (guildMap.containsKey(guildId)) {
-			reloadStatus = guildMap.get(guildId).reloadMee6Settings(guildId);
-		}
-		return reloadStatus;
-	}
-
 	@Override
 	public void onGuildReady(GuildReadyEvent event) {
 		if (event.getGuild().getName().startsWith("Skyblock Plus - Emoji Server")) {

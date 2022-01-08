@@ -67,6 +67,8 @@ public class ApiHandler {
 	);
 	private static final Logger log = LoggerFactory.getLogger(ApiHandler.class);
 	public static Connection cacheDatabaseConnection;
+	public static Instant lastQueryApiUpdate;
+	public static boolean useAlternativeApi = reloadSettingsJson();
 
 	public static void initialize() {
 		try {
@@ -83,8 +85,6 @@ public class ApiHandler {
 			log.error("Exception when initializing the ApiHandler", e);
 		}
 	}
-
-	public static boolean useAlternativeApi = reloadSettingsJson();
 
 	public static boolean reloadSettingsJson() {
 		useAlternativeApi =
@@ -429,19 +429,23 @@ public class ApiHandler {
 		return getGuildGeneric("&name=" + guildName.replace(" ", "%20").replace("_", "%20"));
 	}
 
+	public static String getQueryApiUrl(String path){
+		return (Duration.between(lastQueryApiUpdate, Instant.now()).toMinutes() > 5 ? "https://query-api.herokuapp.com/" : "http://venus.arcator.co.uk:1194/") + path;
+
+	}
 	public static JsonArray getBidsFromPlayer(String uuid) {
 		try {
-			HttpGet httpget = new HttpGet("http://venus.arcator.co.uk:1194/query");
-			httpget.addHeader("content-type", "application/json; charset=UTF-8");
+			HttpGet httpGet = new HttpGet(getQueryApiUrl("query"));
+			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
 
-			URI uri = new URIBuilder(httpget.getURI())
+			URI uri = new URIBuilder(httpGet.getURI())
 				.addParameter("bids", uuid)
 				.addParameter("limit", "-1")
 				.addParameter("key", AUCTION_API_KEY)
 				.build();
-			httpget.setURI(uri);
+			httpGet.setURI(uri);
 
-			try (CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpget)) {
+			try (CloseableHttpResponse httpResponse = Utils.httpClient.execute(httpGet)) {
 				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
 			}
 		} catch (Exception ignored) {}
@@ -450,23 +454,23 @@ public class ApiHandler {
 
 	public static JsonArray queryLowestBin(String query, PriceCommand.AuctionType auctionType) {
 		try {
-			HttpGet httpget = new HttpGet("http://venus.arcator.co.uk:1194/query");
-			httpget.addHeader("content-type", "application/json; charset=UTF-8");
+			HttpGet httpGet = new HttpGet(getQueryApiUrl("query"));
+			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
 
-			URIBuilder uriBuilder = new URIBuilder(httpget.getURI())
+			URIBuilder uriBuilder = new URIBuilder(httpGet.getURI())
 				.addParameter("end", "" + Instant.now().toEpochMilli())
 				.addParameter("item_name", "%" + query + "%")
 				.addParameter("sort", "ASC")
-				.addParameter("limit", "5")
+				.addParameter("limit", "10")
 				.addParameter("key", AUCTION_API_KEY);
 			if (auctionType == PriceCommand.AuctionType.BIN) {
 				uriBuilder.addParameter("bin", "true");
 			} else if (auctionType == PriceCommand.AuctionType.AUCTION) {
 				uriBuilder.addParameter("bin", "false");
 			}
-			httpget.setURI(uriBuilder.build());
+			httpGet.setURI(uriBuilder.build());
 
-			try (CloseableHttpResponse httpResponse = httpClient.execute(httpget)) {
+			try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
 				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
 			}
 		} catch (Exception ignored) {}
@@ -475,7 +479,7 @@ public class ApiHandler {
 
 	public static JsonArray queryLowestBinPet(String petName, String rarity, PriceCommand.AuctionType auctionType) {
 		try {
-			HttpGet httpGet = new HttpGet("http://venus.arcator.co.uk:1194/query");
+			HttpGet httpGet = new HttpGet(getQueryApiUrl("query"));
 			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
 
 			URIBuilder uriBuilder = new URIBuilder(httpGet.getURI())
@@ -483,7 +487,7 @@ public class ApiHandler {
 				.addParameter("item_name", "%" + petName + "%")
 				.addParameter("item_id", "PET")
 				.addParameter("sort", "ASC")
-				.addParameter("limit", "5")
+				.addParameter("limit", "10")
 				.addParameter("key", AUCTION_API_KEY);
 			if (!rarity.equals("ANY")) {
 				uriBuilder.addParameter("tier", rarity);
@@ -504,7 +508,7 @@ public class ApiHandler {
 
 	public static JsonArray queryLowestBinEnchant(String enchantId, int enchantLevel, PriceCommand.AuctionType auctionType) {
 		try {
-			HttpGet httpGet = new HttpGet("http://venus.arcator.co.uk:1194/query");
+			HttpGet httpGet = new HttpGet(getQueryApiUrl("query"));
 			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
 
 			URIBuilder uriBuilder = new URIBuilder(httpGet.getURI())
@@ -512,7 +516,7 @@ public class ApiHandler {
 				.addParameter("item_id", "ENCHANTED_BOOK")
 				.addParameter("enchants", enchantId.toUpperCase() + ";" + enchantLevel)
 				.addParameter("sort", "ASC")
-				.addParameter("limit", "5")
+				.addParameter("limit", "10")
 				.addParameter("key", AUCTION_API_KEY);
 			if (auctionType == PriceCommand.AuctionType.BIN) {
 				uriBuilder.addParameter("bin", "true");
@@ -530,13 +534,13 @@ public class ApiHandler {
 
 	public static JsonArray getAuctionPetsByName(String query) {
 		try {
-			HttpGet httpget = new HttpGet("http://venus.arcator.co.uk:1194/pets");
-			httpget.addHeader("content-type", "application/json; charset=UTF-8");
+			HttpGet httpGet = new HttpGet("http://venus.arcator.co.uk:1194/pets");
+			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
 
-			URI uri = new URIBuilder(httpget.getURI()).addParameter("query", query).addParameter("key", AUCTION_API_KEY).build();
-			httpget.setURI(uri);
+			URI uri = new URIBuilder(httpGet.getURI()).addParameter("query", query).addParameter("key", AUCTION_API_KEY).build();
+			httpGet.setURI(uri);
 
-			try (CloseableHttpResponse httpResponse = httpClient.execute(httpget)) {
+			try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
 				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())).getAsJsonArray();
 			}
 		} catch (Exception ignored) {}

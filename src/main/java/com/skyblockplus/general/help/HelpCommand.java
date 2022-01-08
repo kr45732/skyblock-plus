@@ -377,11 +377,6 @@ public class HelpCommand extends Command {
 									"prefix",
 									"Set the prefix of the bot. Must be a least one character and no more than five.",
 									"prefix [prefix]"
-								),
-								new HelpData(
-									"pf_category",
-									"Set the category where new channels will be created for the bot's party feature. Can be set to 'none' to disable creating new channels.",
-									"pf_category <category>"
 								)
 							),
 						new HelpData("verify", "Main command for verification settings.")
@@ -416,23 +411,23 @@ public class HelpCommand extends Command {
 							.addSecondData("Get the current roles settings for the bot.", "roles")
 							.addSubcommands(
 								new HelpData("enable", "Enable automatic roles.")
-									.addSecondData("Enable a specific automatic role (disabled by default).", "enable <roleName>")
+									.addSecondData("Enable a specific automatic role (disabled by default).", "enable <role_name>")
 									.addExamples("enable", "enable dungeon_secrets"),
 								new HelpData("disable", "Disable automatic roles.")
-									.addSecondData("Disable a specific automatic role.", "disable <roleName>")
+									.addSecondData("Disable a specific automatic role.", "disable <role_name>")
 									.addExamples("disable", "disable dungeon_secrets"),
 								new HelpData(
 									"add",
 									"Add a new level to a role with its corresponding Discord role.",
-									"add <roleName> <value> <@role>"
+									"add <role_name> <value> <@role>"
 								)
 									.addExamples("add sven 400000 @sven 8", "add alchemy 50 @alchemy 50"),
-								new HelpData("remove", "Remove a role level for a role.", "remove <roleName> <value>")
+								new HelpData("remove", "Remove a role level for a role.", "remove <role_name> <value>")
 									.addExamples("remove sven 400000", "remove alchemy 50"),
 								new HelpData(
-									"set <roleName> <@role>",
+									"set <role_name> <@role>",
 									"Set the Discord role for a one level role.",
-									"set <roleName> <@role>"
+									"set <role_name> <@role>"
 								)
 									.addExamples("set ironman @ironman player", "set pet_enthusiast @pet lover")
 							),
@@ -728,10 +723,6 @@ public class HelpCommand extends Command {
 			help.create("categories", "Get the name and id of all categories in this server") +
 			help.create("settings set hypixel_key <key>", "Set a Hypixel API key for this server") +
 			help.create("settings set prefix <prefix>", "Set the prefix of the bot") +
-			help.create(
-				"settings set pf_category <category>",
-				"Set the category where new channels will be created for the bot's party feature"
-			) +
 			help.create(
 				"settings set fetchur_channel <#channel>",
 				"Set the channel where fetchur item notifications will be sent every day at 12 am EST"

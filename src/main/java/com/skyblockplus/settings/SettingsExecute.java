@@ -122,24 +122,6 @@ public class SettingsExecute {
 			} else if (args.length == 5 && args[3].equals("remove")) {
 				eb = removeApplyBlacklist(args[4]);
 			}
-		} else if (args.length >= 2 && args[1].equals("mee6")) {
-			if (args.length == 2) {
-				eb = getMee6DataSettings();
-			} else if (args.length == 3) {
-				if (args[2].equals("enable")) {
-					eb = setMee6Enable(true);
-				} else if (args[2].equals("disable")) {
-					eb = setMee6Enable(false);
-				}
-			} else if (args.length == 4 && args[2].equals("remove")) {
-				eb = removeMee6Role(args[3]);
-			} else if (args.length == 5 && args[2].equals("add")) {
-				eb = addMee6Role(args[3], args[4]);
-			}
-
-			if (eb == null) {
-				eb = errorEmbed("settings mee6");
-			}
 		} else if (args.length == 3 && args[1].equals("delete")) {
 			switch (args[2]) {
 				case "all":
@@ -167,7 +149,6 @@ public class SettingsExecute {
 			eb.addField("Verify Settings", "Use `" + guildPrefix + "settings verify` to see the current settings", false);
 			eb.addField("Guild Settings", "Use `" + guildPrefix + "settings guild` to see the current settings", false);
 			eb.addField("Roles Settings", "Use `" + guildPrefix + "settings roles` to see the current settings", false);
-			eb.addField("Mee6 Roles Settings", "Use `" + guildPrefix + "settings mee6` to see the current settings", false);
 		} else if (args.length == 2 && args[1].equals("general")) {
 			eb = defaultSettingsEmbed();
 			eb.addField("Prefix", higherDepth(currentSettings, "prefix", DEFAULT_PREFIX), false);
@@ -1686,7 +1667,7 @@ public class SettingsExecute {
 			return invalidEmbed("Invalid guild role name or guild ranks not enabled");
 		} else if (isOneLevelRole(roleName)) {
 			return invalidEmbed(
-				"These roles do not support levels. Use `" + guildPrefix + "settings roles set <roleName> <@role>` instead"
+				"These roles do not support levels. Use `" + guildPrefix + "settings roles set <role_name> <@role>` instead"
 			);
 		} else {
 			try {
@@ -1749,7 +1730,7 @@ public class SettingsExecute {
 	public EmbedBuilder removeRoleLevel(String roleName, String value) {
 		if (isOneLevelRole(roleName)) {
 			return defaultEmbed(
-				"These roles do not support levels. Use `" + guildPrefix + "settings roles set <roleName> <@role>` instead"
+				"These roles do not support levels. Use `" + guildPrefix + "settings roles set <role_name> <@role>` instead"
 			);
 		}
 
@@ -1798,7 +1779,7 @@ public class SettingsExecute {
 	public EmbedBuilder setOneLevelRole(String roleName, String roleMention) {
 		if (!isOneLevelRole(roleName)) {
 			return invalidEmbed(
-				"This role is not a one level role. Use `" + guildPrefix + "settings roles add <roleName> <value> <@role>` instead"
+				"This role is not a one level role. Use `" + guildPrefix + "settings roles add <role_name> <value> <@role>` instead"
 			);
 		}
 
@@ -2076,149 +2057,6 @@ public class SettingsExecute {
 			guildMap.get(guild.getId()).verifyGuild.reloadSettingsJson(newVerifySettings);
 		}
 		return database.setVerifySettings(guild.getId(), newVerifySettings);
-	}
-
-	/* Mee6 */
-	public EmbedBuilder getMee6DataSettings() {
-		JsonObject settings = getMee6Json();
-
-		EmbedBuilder eb = defaultSettingsEmbed(higherDepth(settings, "enable", "false").equals("true") ? "**Enabled**" : "**Disabled**");
-		JsonArray curRoles = higherDepth(settings, "levels").getAsJsonArray();
-		if (curRoles.size() == 0) {
-			eb.appendDescription("\n**• Leveling roles:** none");
-		} else {
-			for (JsonElement curRole : curRoles) {
-				eb.appendDescription(
-					"\n• **Level " +
-					higherDepth(curRole, "value").getAsString() +
-					":** <@&" +
-					higherDepth(curRole, "roleId").getAsString() +
-					">"
-				);
-			}
-		}
-
-		return eb;
-	}
-
-	public EmbedBuilder setMee6Enable(boolean enable) {
-		if (!enable) {
-			int responseCode = setMee6Settings("enable", "false");
-			if (responseCode != 200) {
-				return apiFailMessage(responseCode);
-			}
-
-			return defaultSettingsEmbed("Disabled Mee6 automatic leveling roles.");
-		}
-
-		JsonElement settings = getMee6Json();
-
-		if (higherDepth(settings, "levels").getAsJsonArray().size() == 0) {
-			return invalidEmbed("You must set at least one leveling role.");
-		}
-		try {
-			if (
-				higherDepth(getJson("https://mee6.xyz/api/plugins/levels/leaderboard/" + guild.getId()), "players")
-					.getAsJsonArray()
-					.size() ==
-				0
-			) {
-				return invalidEmbed("The Mee6 leveling leaderboard must be public for this server.");
-			}
-		} catch (Exception e) {
-			return invalidEmbed("The Mee6 leveling leaderboard must be public for this server.");
-		}
-
-		int responseCode = setMee6Settings("enable", "true");
-		if (responseCode != 200) {
-			return apiFailMessage(responseCode);
-		}
-
-		return defaultSettingsEmbed("Enabled Mee6 automatic leveling roles.");
-	}
-
-	public EmbedBuilder addMee6Role(String level, String roleMention) {
-		Object eb = checkRole(roleMention);
-		if (eb instanceof EmbedBuilder e) {
-			return e;
-		}
-		Role role = ((Role) eb);
-
-		int intLevel = -1;
-		try {
-			intLevel = Integer.parseInt(level);
-		} catch (Exception ignored) {}
-		if (intLevel <= 0 || intLevel >= 250) {
-			return invalidEmbed("The level must be an integer between 0 and 250.");
-		}
-
-		JsonObject settings = getMee6Json();
-		JsonArray ranks = settings.getAsJsonArray("levels");
-
-		if (ranks.size() >= 10) {
-			return defaultEmbed("You have reached the max amount of Mee6 roles (10/10).");
-		}
-		for (int i = ranks.size() - 1; i >= 0; i--) {
-			if (higherDepth(ranks.get(i), "value").getAsInt() == intLevel) {
-				ranks.remove(i);
-			}
-		}
-
-		ranks.add(gson.toJsonTree(new RoleObject("" + intLevel, role.getId())));
-		ranks = collectJsonArray(streamJsonArray(ranks).sorted(Comparator.comparingInt(r -> higherDepth(r, "value").getAsInt())));
-		settings.add("levels", ranks);
-
-		int responseCode = setMee6Settings(settings);
-		if (responseCode != 200) {
-			return apiFailMessage(responseCode);
-		}
-
-		return defaultSettingsEmbed("Added level " + intLevel + " role as " + role.getAsMention() + ".");
-	}
-
-	public EmbedBuilder removeMee6Role(String level) {
-		int intLevel = -1;
-		try {
-			intLevel = Integer.parseInt(level);
-		} catch (Exception ignored) {}
-		if (intLevel <= 0 || intLevel >= 250) {
-			return invalidEmbed("The level must be an integer between 0 and 250.");
-		}
-
-		JsonObject curSettings = getMee6Json();
-		JsonArray curRanks = curSettings.get("levels").getAsJsonArray();
-		for (JsonElement rank : curRanks) {
-			if (higherDepth(rank, "value").getAsInt() == intLevel) {
-				curRanks.remove(rank);
-				if (curRanks.size() == 0) {
-					curSettings.addProperty("enable", "false");
-				}
-				curSettings.add("levels", curRanks);
-
-				int responseCode = database.setMee6Settings(guild.getId(), curSettings);
-				if (responseCode != 200) {
-					return apiFailMessage(responseCode);
-				}
-
-				return defaultSettingsEmbed("Removed the role for level " + intLevel + ".");
-			}
-		}
-
-		return invalidEmbed("There is no role set for level " + intLevel + ".");
-	}
-
-	public JsonObject getMee6Json() {
-		return serverSettings.getAsJsonObject("mee6Data");
-	}
-
-	public int setMee6Settings(String key, String newValue) {
-		JsonObject newSettings = getMee6Json();
-		newSettings.addProperty(key, newValue);
-		return setMee6Settings(newSettings);
-	}
-
-	public int setMee6Settings(JsonElement newSettings) {
-		return database.setMee6Settings(guild.getId(), newSettings);
 	}
 
 	/* Miscellaneous */

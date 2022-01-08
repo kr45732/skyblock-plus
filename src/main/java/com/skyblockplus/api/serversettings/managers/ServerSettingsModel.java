@@ -21,7 +21,6 @@ package com.skyblockplus.api.serversettings.managers;
 import com.skyblockplus.api.serversettings.automatedguild.ApplyBlacklist;
 import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.api.serversettings.automatedroles.AutomatedRoles;
-import com.skyblockplus.api.serversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.serversettings.automatedverify.AutomatedVerify;
 import com.skyblockplus.api.serversettings.jacob.JacobSettings;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
@@ -69,9 +68,6 @@ public class ServerSettingsModel {
 	private EventSettings sbEvent = new EventSettings();
 
 	@Embedded
-	private RoleModel mee6Data = new RoleModel();
-
-	@Embedded
 	private JacobSettings jacobSettings = new JacobSettings();
 
 	private String hypixelApiKey = "";
@@ -104,7 +100,6 @@ public class ServerSettingsModel {
 		copy.setApplicationBlacklist(applicationBlacklist);
 		copy.setAutomatedRoles(automatedRoles);
 		copy.setSbEvent(sbEvent);
-		copy.setMee6Data(mee6Data);
 		copy.setJacobSettings(jacobSettings);
 		copy.setHypixelApiKey(nullHypixelApiKey ? null : hypixelApiKey);
 		copy.setPrefix(prefix);

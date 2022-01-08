@@ -56,7 +56,7 @@ public class SetupCommandHandler {
 					.editOriginalEmbeds(
 						defaultEmbed("Setup")
 							.setDescription("Reply with the message that users will see when verifying.")
-							.setFooter("Reply with 'cancel' to stop the process")
+							.setFooter("Reply with 'cancel' to stop the process • dsc.gg/sb+")
 							.build()
 					)
 					.queue();
@@ -67,8 +67,7 @@ public class SetupCommandHandler {
 					.editOriginalEmbeds(
 						defaultEmbed("Setup")
 							.setDescription("Reply with the name of the Hypixel guild you are setting this up for.")
-							.setFooter("Reply with 'cancel' to stop the process")
-							.setFooter("Reply with 'cancel' to stop the process")
+							.setFooter("Reply with 'cancel' to stop the process • dsc.gg/sb+")
 							.build()
 					)
 					.queue();
@@ -86,10 +85,10 @@ public class SetupCommandHandler {
 
                                                         **__Setup__**
                                                         - In order to enable automatic roles, there must be at least one role setting enabled:
-                                                        - `settings roles add [roleName] [value] [@role]` - add a level to a role. Maximum for all roles __combined__ is 120.
-                                                        - `settings roles remove [roleName] [value]` - remove a level from a role.
-                                                        - `settings roles set [roleName] [@role]` - set a one level role's role
-                                                        - `settings roles enable [roleName]` - enable a role.
+                                                        - `settings roles add [role_name] [value] [@role]` - add a level to a role. Maximum for all roles __combined__ is 120.
+                                                        - `settings roles remove [role_name] [value]` - remove a level from a role.
+                                                        - `settings roles set [role_name] [@role]` - set a one level role's role
+                                                        - `settings roles enable [role_name]` - enable a role.
                                                         • Tutorial video linked [__here__](https://streamable.com/wninsw)
 
                                                         **__Enable__**
@@ -111,7 +110,7 @@ public class SetupCommandHandler {
 							.setDescription(
 								"Reply with the prefix you want to set. The prefix must be a least one character and no more than five."
 							)
-							.setFooter("Reply with 'cancel' to stop the process")
+							.setFooter("Reply with 'cancel' to stop the process • dsc.gg/sb+")
 							.build()
 					)
 					.queue();
@@ -125,7 +124,7 @@ public class SetupCommandHandler {
 						.editOriginalEmbeds(
 							defaultEmbed("Setup")
 								.setDescription("Reply with the message that users will see and click to in order to apply.")
-								.setFooter("Reply with 'cancel' to stop the process")
+								.setFooter("Reply with 'cancel' to stop the process • dsc.gg/sb+")
 								.build()
 						)
 						.queue();
@@ -137,7 +136,7 @@ public class SetupCommandHandler {
 						.editOriginalEmbeds(
 							defaultEmbed("Setup")
 								.setDescription("Reply with the guild member role.")
-								.setFooter("Reply with 'cancel' to stop the process")
+								.setFooter("Reply with 'cancel' to stop the process • dsc.gg/sb+")
 								.build()
 						)
 						.queue();
@@ -151,7 +150,7 @@ public class SetupCommandHandler {
 								.setDescription(
 									"Reply with the guild rank(s) and the role(s). (Example: `god @role1, moderator @role2, @officer @role3`)."
 								)
-								.setFooter("Reply with 'cancel' to stop the process")
+								.setFooter("Reply with 'cancel' to stop the process • dsc.gg/sb+")
 								.build()
 						)
 						.queue();
@@ -208,7 +207,7 @@ public class SetupCommandHandler {
 		}
 
 		EmbedBuilder eb = null;
-		EmbedBuilder eb2 = defaultEmbed("Setup").setFooter("Reply with 'cancel' to stop the process");
+		EmbedBuilder eb2 = defaultEmbed("Setup").setFooter("Reply with 'cancel' to stop the process • dsc.gg/sb+");
 		switch (featureType) {
 			case "verify":
 				switch (state) {

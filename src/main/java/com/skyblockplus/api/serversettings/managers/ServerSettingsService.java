@@ -501,28 +501,6 @@ public class ServerSettingsService {
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 
-	// Mee6
-	public ResponseEntity<?> getMee6Settings(String serverId) {
-		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
-
-		if (currentServerSettings != null) {
-			return new ResponseEntity<>(currentServerSettings.getMee6Data(), HttpStatus.OK);
-		}
-
-		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-	}
-
-	public ResponseEntity<HttpStatus> setMee6Settings(String serverId, RoleModel newSettings) {
-		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
-
-		if (currentServerSettings != null) {
-			currentServerSettings.setMee6Data(newSettings);
-			settingsRepository.save(currentServerSettings);
-			return new ResponseEntity<>(HttpStatus.OK);
-		}
-		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-	}
-
 	// Misc
 	public ResponseEntity<?> getServerHypixelApiKey(String serverId) {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);

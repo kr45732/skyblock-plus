@@ -41,8 +41,7 @@ public class ReloadCommand extends Command {
 	public static EmbedBuilder getReloadEmbed(Guild guild) {
 		return defaultEmbed("Reload Settings for " + guild.getName())
 			.addField("Apply settings reload status", onApplyReload(guild.getId()), false)
-			.addField("Verify settings reload status", onVerifyReload(guild.getId()), false)
-			.addField("Mee6 roles reload status", onMee6Reload(guild.getId()), false);
+			.addField("Verify settings reload status", onVerifyReload(guild.getId()), false);
 	}
 
 	@Override

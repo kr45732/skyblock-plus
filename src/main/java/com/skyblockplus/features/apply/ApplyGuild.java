@@ -182,10 +182,14 @@ public class ApplyGuild {
 			.findFirst()
 			.orElse(null);
 
-		return findApplyUser != null && findApplyUser.onButtonClick(event, this);
+		return findApplyUser != null && findApplyUser.onButtonClick(event, this, false);
 	}
 
 	public String onButtonClick_WaitingForInviteApplyUser(ButtonInteractionEvent event) {
+		if(waitInviteChannel == null){
+			return null;
+		}
+
 		if (!event.getChannel().getId().equals(waitInviteChannel.getId())) {
 			return null;
 		}
@@ -219,8 +223,7 @@ public class ApplyGuild {
 			try {
 				event.getGuild().addRoleToMember(channelRoleSplit[1], event.getGuild().getRoleById(channelRoleSplit[2])).queue();
 			} catch (Exception ignored) {}
-			toCloseChannel.sendMessageEmbeds(defaultEmbed("Closing channel").build()).queue();
-			toCloseChannel.delete().reason("Application closed").queueAfter(10, TimeUnit.SECONDS);
+			applyUserList.stream().filter(applyUser -> applyUser.applicationChannelId.equals(toCloseChannel.getId())).findFirst().ifPresent(applyUser -> applyUser.onButtonClick(event, this, true));
 		} catch (Exception ignored) {}
 
 		event.getMessage().delete().queueAfter(3, TimeUnit.SECONDS);

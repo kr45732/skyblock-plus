@@ -40,6 +40,6 @@ public class ReloadSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return Commands.slash(name, "Reload the guild application, verification and mee6 roles settings");
+		return Commands.slash(name, "Reload the guild application and verification settings");
 	}
 }
