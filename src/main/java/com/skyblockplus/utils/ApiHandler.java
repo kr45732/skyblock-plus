@@ -432,7 +432,7 @@ public class ApiHandler {
 	public static String getQueryApiUrl(String path) {
 		return (
 			(
-					Duration.between(lastQueryApiUpdate, Instant.now()).toMinutes() > 5
+				Duration.between(lastQueryApiUpdate, Instant.now()).toMinutes() > 5
 					? "https://query-api.herokuapp.com/"
 					: "http://venus.arcator.co.uk:1194/"
 			) +
