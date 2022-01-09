@@ -125,7 +125,6 @@ public class ApplyUser implements Serializable {
 		String[] profileNames = player.getAllProfileNames(isIronman);
 
 		getNameHistory(player.getUuid()).forEach(i -> nameHistory += "\n• " + fixUsername(i));
-		System.out.println("changed");
 		if (profileNames.length == 1) {
 			applicationChannel.sendMessage(applyingUser.getAsMention()).complete();
 			caseOne(profileNames[0], currentSettings, applicationChannel);
