@@ -67,7 +67,7 @@ public class ApiHandler {
 	);
 	private static final Logger log = LoggerFactory.getLogger(ApiHandler.class);
 	public static Connection cacheDatabaseConnection;
-	public static Instant lastQueryApiUpdate;
+	public static Instant lastQueryApiUpdate = Instant.now();
 	public static boolean useAlternativeApi = reloadSettingsJson();
 
 	public static void initialize() {
@@ -432,7 +432,7 @@ public class ApiHandler {
 	public static String getQueryApiUrl(String path) {
 		return (
 			(
-				Duration.between(lastQueryApiUpdate, Instant.now()).toMinutes() > 5
+					Duration.between(lastQueryApiUpdate, Instant.now()).toMinutes() > 5
 					? "https://query-api.herokuapp.com/"
 					: "http://venus.arcator.co.uk:1194/"
 			) +

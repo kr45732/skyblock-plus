@@ -72,7 +72,7 @@ public class ApplyUser implements Serializable {
 
 	public ApplyUser(ButtonInteractionEvent event, JsonElement currentSettings, String playerUsername) {
 		User applyingUser = event.getUser();
-		logCommand(event.getGuild(), applyingUser, "apply " + applyingUser.getName());
+		logCommand(event.getGuild(), applyingUser, "apply " + playerUsername);
 
 		JsonObject currentSettingsObj = currentSettings.getAsJsonObject();
 		currentSettingsObj.remove("applyUsersCache");
@@ -125,6 +125,7 @@ public class ApplyUser implements Serializable {
 		String[] profileNames = player.getAllProfileNames(isIronman);
 
 		getNameHistory(player.getUuid()).forEach(i -> nameHistory += "\n• " + fixUsername(i));
+		System.out.println("changed");
 		if (profileNames.length == 1) {
 			applicationChannel.sendMessage(applyingUser.getAsMention()).complete();
 			caseOne(profileNames[0], currentSettings, applicationChannel);

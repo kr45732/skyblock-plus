@@ -30,6 +30,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -57,6 +58,13 @@ public class AuctionFlipper {
 		try {
 			if (event.getChannel().getId().equals("912156704383336458") && event.isWebhookMessage()) {
 				lastQueryApiUpdate = Instant.now();
+				String desc = event.getMessage().getEmbeds().get(0).getDescription();
+				if (enable && isMainBot() && desc.startsWith("Successfully updated under bins file in ")) {
+					flip();
+				} else if (desc.contains(" query auctions into database in ")) {
+					queryItems = null;
+				}
+			}else if(event.getChannel().getId().equals("922176660596482098") && event.isWebhookMessage() && Duration.between(lastQueryApiUpdate, Instant.now()).toMinutes() > 5){
 				String desc = event.getMessage().getEmbeds().get(0).getDescription();
 				if (enable && isMainBot() && desc.startsWith("Successfully updated under bins file in ")) {
 					flip();
