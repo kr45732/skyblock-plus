@@ -379,9 +379,7 @@ public class AutomaticGuild {
 			Map<String, String> discordIdToUuid = new HashMap<>();
 			int counterUpdate = 0;
 			if (anyGuildRoleRankEnable) {
-				database
-					.getLinkedAccounts()
-					.forEach(linkedUser -> discordIdToUuid.put(linkedUser.discord(), linkedUser.uuid()));
+				database.getLinkedAccounts().forEach(linkedUser -> discordIdToUuid.put(linkedUser.discord(), linkedUser.uuid()));
 
 				CountDownLatch latch = new CountDownLatch(1);
 				guild

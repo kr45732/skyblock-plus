@@ -65,12 +65,7 @@ public class LinkCommand extends Command {
 			return eb;
 		}
 
-		LinkedAccount toAdd = new LinkedAccount(
-				Instant.now().toEpochMilli(),
-				member.getId(),
-			playerInfo.uuid(),
-			playerInfo.username()
-		);
+		LinkedAccount toAdd = new LinkedAccount(Instant.now().toEpochMilli(), member.getId(), playerInfo.uuid(), playerInfo.username());
 
 		if (database.insertLinkedAccount(toAdd)) {
 			JsonElement verifySettings = database.getVerifySettings(guild.getId());

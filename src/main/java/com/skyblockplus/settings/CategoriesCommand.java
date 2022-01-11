@@ -49,7 +49,7 @@ public class CategoriesCommand extends Command {
 			.queue();
 	}
 
-	public static EmbedBuilder getCategories(Guild guild){
+	public static EmbedBuilder getCategories(Guild guild) {
 		StringBuilder ebString = new StringBuilder();
 		for (net.dv8tion.jda.api.entities.Category category : guild.getCategories()) {
 			ebString.append("\n• ").append(category.getName()).append(" ⇢ `").append(category.getId()).append("`");

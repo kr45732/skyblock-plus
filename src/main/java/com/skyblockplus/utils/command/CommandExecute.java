@@ -23,9 +23,8 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import java.util.regex.Matcher;
-
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
+import java.util.regex.Matcher;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
@@ -126,7 +125,7 @@ public abstract class CommandExecute extends CommandEvent {
 	 * (the provided userId is linked)
 	 */
 	protected boolean getLinkedUser(String userId) {
-		LinkedAccount linkedUserUsername = database.getByDiscord	(userId);
+		LinkedAccount linkedUserUsername = database.getByDiscord(userId);
 		if (linkedUserUsername != null) {
 			player = linkedUserUsername.uuid();
 			return false;

@@ -115,7 +115,7 @@ public class ApplyGuild {
 		} else if (!linkedAccount.discord().equals(event.getUser().getId())) {
 			return (
 				"❌ Account " +
-						linkedAccount.username() +
+				linkedAccount.username() +
 				" is linked with the Discord tag " +
 				jda.retrieveUserById(linkedAccount.discord()).complete().getAsTag() +
 				"\nYour current Discord tag is " +

@@ -18,6 +18,10 @@
 
 package com.skyblockplus.utils;
 
+import static com.skyblockplus.Main.slashCommandClient;
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
@@ -26,9 +30,6 @@ import com.skyblockplus.features.jacob.JacobHandler;
 import com.skyblockplus.features.party.Party;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.lang.reflect.Type;
 import java.sql.*;
 import java.time.Duration;
@@ -37,208 +38,214 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static com.skyblockplus.Main.slashCommandClient;
-import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.Utils.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CacheDatabase {
-    private static final Logger log = LoggerFactory.getLogger(CacheDatabase.class);
 
-    private final HikariDataSource dataSource;
-    private final ConcurrentHashMap<String, Instant> uuidToTimeSkyblockProfiles = new ConcurrentHashMap<>();
+	private static final Logger log = LoggerFactory.getLogger(CacheDatabase.class);
 
-    public CacheDatabase() {
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(PLANET_SCALE_URL);
-        config.setUsername(PLANET_SCALE_USERNAME);
-        config.setPassword(PLANET_SCALE_PASSWORD);
-        dataSource = new HikariDataSource(config);
-    }
+	private final HikariDataSource dataSource;
+	private final ConcurrentHashMap<String, Instant> uuidToTimeSkyblockProfiles = new ConcurrentHashMap<>();
 
-    public Connection getConnection() throws SQLException {
-        return dataSource.getConnection();
-    }
+	public CacheDatabase() {
+		HikariConfig config = new HikariConfig();
+		config.setJdbcUrl(PLANET_SCALE_URL);
+		config.setUsername(PLANET_SCALE_USERNAME);
+		config.setPassword(PLANET_SCALE_PASSWORD);
+		dataSource = new HikariDataSource(config);
+	}
 
-    public void cacheJson(String uuid, JsonElement json) {
-        executor.submit(() -> {
-            try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
-                Instant now = Instant.now();
-                uuidToTimeSkyblockProfiles.put(uuid, now);
+	public Connection getConnection() throws SQLException {
+		return dataSource.getConnection();
+	}
 
-                statement.executeUpdate(
-                        "INSERT INTO profiles VALUES ('" +
-                                uuid +
-                                "', " +
-                                now.toEpochMilli() +
-                                ", '" +
-                                json +
-                                "') ON DUPLICATE KEY UPDATE uuid = VALUES(uuid), time = VALUES(time), data = VALUES(data)"
-                );
-            } catch (Exception ignored) {
-            }
-        });
-    }
+	public void cacheJson(String uuid, JsonElement json) {
+		executor.submit(() -> {
+			try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
+				Instant now = Instant.now();
+				uuidToTimeSkyblockProfiles.put(uuid, now);
 
-    public JsonElement getCachedJson(String uuid) {
-        Instant lastUpdated = uuidToTimeSkyblockProfiles.getOrDefault(uuid, null);
-        if (lastUpdated != null && Duration.between(lastUpdated, Instant.now()).toMillis() > 90000) {
-            deleteCachedJson(uuid);
-        } else {
-            try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("SELECT * FROM profiles where uuid = ?")) {
-                statement.setString(1, uuid);
-                try (ResultSet response = statement.executeQuery()) {
-                    if (response.next()) {
-                        Instant lastUpdatedResponse = Instant.ofEpochMilli(response.getLong("time"));
-                        if (Duration.between(lastUpdatedResponse, Instant.now()).toMillis() > 90000) {
-                            deleteCachedJson(uuid);
-                        } else {
-                            uuidToTimeSkyblockProfiles.put(uuid, lastUpdatedResponse);
-                            return JsonParser.parseString(response.getString("data"));
-                        }
-                    }
-                }
-            } catch (Exception ignored) {
-            }
-        }
-        return null;
-    }
+				statement.executeUpdate(
+					"INSERT INTO profiles VALUES ('" +
+					uuid +
+					"', " +
+					now.toEpochMilli() +
+					", '" +
+					json +
+					"') ON DUPLICATE KEY UPDATE uuid = VALUES(uuid), time = VALUES(time), data = VALUES(data)"
+				);
+			} catch (Exception ignored) {}
+		});
+	}
 
-    public void deleteCachedJson(String... uuids) {
-        if (uuids.length == 0) {
-            return;
-        }
+	public JsonElement getCachedJson(String uuid) {
+		Instant lastUpdated = uuidToTimeSkyblockProfiles.getOrDefault(uuid, null);
+		if (lastUpdated != null && Duration.between(lastUpdated, Instant.now()).toMillis() > 90000) {
+			deleteCachedJson(uuid);
+		} else {
+			try (
+				Connection connection = getConnection();
+				PreparedStatement statement = connection.prepareStatement("SELECT * FROM profiles where uuid = ?")
+			) {
+				statement.setString(1, uuid);
+				try (ResultSet response = statement.executeQuery()) {
+					if (response.next()) {
+						Instant lastUpdatedResponse = Instant.ofEpochMilli(response.getLong("time"));
+						if (Duration.between(lastUpdatedResponse, Instant.now()).toMillis() > 90000) {
+							deleteCachedJson(uuid);
+						} else {
+							uuidToTimeSkyblockProfiles.put(uuid, lastUpdatedResponse);
+							return JsonParser.parseString(response.getString("data"));
+						}
+					}
+				}
+			} catch (Exception ignored) {}
+		}
+		return null;
+	}
 
-        executor.submit(() -> {
-            StringBuilder query = new StringBuilder();
-            for (String uuid : uuids) {
-                uuidToTimeSkyblockProfiles.remove(uuid);
-                query.append("'").append(uuid).append("',");
-            }
-            if (query.charAt(query.length() - 1) == ',') {
-                query.deleteCharAt(query.length() - 1);
-            }
+	public void deleteCachedJson(String... uuids) {
+		if (uuids.length == 0) {
+			return;
+		}
 
-            try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
-                statement.executeUpdate("DELETE FROM profiles WHERE uuid IN (" + query + ")");
-            } catch (Exception ignored) {
-            }
-        });
-    }
+		executor.submit(() -> {
+			StringBuilder query = new StringBuilder();
+			for (String uuid : uuids) {
+				uuidToTimeSkyblockProfiles.remove(uuid);
+				query.append("'").append(uuid).append("',");
+			}
+			if (query.charAt(query.length() - 1) == ',') {
+				query.deleteCharAt(query.length() - 1);
+			}
 
-    public void updateCache() {
-        long now = Instant.now().minusSeconds(90).toEpochMilli();
-        try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("SELECT uuid FROM profiles WHERE time < ?")) {
-            statement.setLong(1, now);
-            try (ResultSet response = statement.executeQuery()) {
-                List<String> expiredCacheUuidList = new ArrayList<>();
-                while (response.next()) {
-                    expiredCacheUuidList.add(response.getString("uuid"));
-                }
-                deleteCachedJson(expiredCacheUuidList.toArray(new String[0]));
-            }
-        } catch (Exception ignored) {
-        }
+			try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
+				statement.executeUpdate("DELETE FROM profiles WHERE uuid IN (" + query + ")");
+			} catch (Exception ignored) {}
+		});
+	}
 
-        try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("DELETE FROM profiles WHERE time < ?")) {
-            statement.setLong(1, now);
-            statement.executeUpdate();
-        } catch (Exception ignored) {
-        }
-    }
+	public void updateCache() {
+		long now = Instant.now().minusSeconds(90).toEpochMilli();
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement("SELECT uuid FROM profiles WHERE time < ?")
+		) {
+			statement.setLong(1, now);
+			try (ResultSet response = statement.executeQuery()) {
+				List<String> expiredCacheUuidList = new ArrayList<>();
+				while (response.next()) {
+					expiredCacheUuidList.add(response.getString("uuid"));
+				}
+				deleteCachedJson(expiredCacheUuidList.toArray(new String[0]));
+			}
+		} catch (Exception ignored) {}
 
-    public boolean cachePartyData(String guildId, String json) {
-        try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
-            statement.executeUpdate(
-                    "INSERT INTO party VALUES ('" +
-                            guildId +
-                            "', '" +
-                            json +
-                            "') ON DUPLICATE KEY UPDATE guild_id = VALUES(guild_id), data = VALUES(data)"
-            );
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement("DELETE FROM profiles WHERE time < ?")
+		) {
+			statement.setLong(1, now);
+			statement.executeUpdate();
+		} catch (Exception ignored) {}
+	}
 
-    public boolean cacheCommandUsage(String json) {
-        try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
-            statement.executeUpdate("INSERT INTO commands VALUES (0, '" + json + "') ON DUPLICATE KEY UPDATE data = VALUES(data)");
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
+	public boolean cachePartyData(String guildId, String json) {
+		try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
+			statement.executeUpdate(
+				"INSERT INTO party VALUES ('" +
+				guildId +
+				"', '" +
+				json +
+				"') ON DUPLICATE KEY UPDATE guild_id = VALUES(guild_id), data = VALUES(data)"
+			);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
 
-    public boolean cacheJacobData(String json) {
-        try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
-            statement.executeUpdate("INSERT INTO jacob VALUES (0, '" + json + "') ON DUPLICATE KEY UPDATE data = VALUES(data)");
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
+	public boolean cacheCommandUsage(String json) {
+		try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
+			statement.executeUpdate("INSERT INTO commands VALUES (0, '" + json + "') ON DUPLICATE KEY UPDATE data = VALUES(data)");
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
 
-    public void initializeCommandUses() {
-        if (!isMainBot()) {
-            return;
-        }
+	public boolean cacheJacobData(String json) {
+		try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
+			statement.executeUpdate("INSERT INTO jacob VALUES (0, '" + json + "') ON DUPLICATE KEY UPDATE data = VALUES(data)");
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
 
-        try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("SELECT * FROM commands")) {
-            try (ResultSet response = statement.executeQuery()) {
-                response.next();
-                Map<String, Integer> commandUsage = gson.fromJson(response.getString("data"), new TypeToken<Map<String, Integer>>() {}.getType());
-                slashCommandClient.setCommandUses(commandUsage);
-                log.info("Retrieved command uses");
-            }
-        } catch (Exception e) {
-            log.error("initializeCommandUses", e);
-        }
-    }
+	public void initializeCommandUses() {
+		if (!isMainBot()) {
+			return;
+		}
 
-    public void initializeJacobData() {
-        if (!isMainBot()) {
-            return;
-        }
+		try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("SELECT * FROM commands")) {
+			try (ResultSet response = statement.executeQuery()) {
+				response.next();
+				Map<String, Integer> commandUsage = gson.fromJson(
+					response.getString("data"),
+					new TypeToken<Map<String, Integer>>() {}.getType()
+				);
+				slashCommandClient.setCommandUses(commandUsage);
+				log.info("Retrieved command uses");
+			}
+		} catch (Exception e) {
+			log.error("initializeCommandUses", e);
+		}
+	}
 
-        try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("SELECT * FROM jacob")) {
-            try (ResultSet response = statement.executeQuery()) {
-                response.next();
-                JacobHandler.setJacobData(gson.fromJson(response.getString("data"), JacobData.class));
-                log.info("Retrieved jacob data");
-            }
-        } catch (Exception e) {
-            log.error("initializeJacobData", e);
-        }
-    }
+	public void initializeJacobData() {
+		if (!isMainBot()) {
+			return;
+		}
 
-    public void initializeParties() {
-        if (!isMainBot()) {
-            return;
-        }
+		try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("SELECT * FROM jacob")) {
+			try (ResultSet response = statement.executeQuery()) {
+				response.next();
+				JacobHandler.setJacobData(gson.fromJson(response.getString("data"), JacobData.class));
+				log.info("Retrieved jacob data");
+			}
+		} catch (Exception e) {
+			log.error("initializeJacobData", e);
+		}
+	}
 
-        List<String> toDeleteIds = new ArrayList<>();
-        try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("SELECT * FROM party")) {
-            try (ResultSet response = statement.executeQuery()) {
-                Type partyListType = new TypeToken<List<Party>>() {}.getType();
-                while (response.next()) {
-                    String guildId = null;
-                    try {
-                        guildId = response.getString("guild_id");
-                        toDeleteIds.add(guildId);
-                        List<Party> partyList = gson.fromJson(response.getString("data"), partyListType);
-                        guildMap.get(guildId).setPartyList(partyList);
-                        log.info("Retrieved party cache (" + partyList.size() + ") - guildId={" + guildId + "}");
-                    } catch (Exception e) {
-                        log.error("initializeParties guildId={" + guildId + "}", e);
-                    }
-                }
-            }
-        } catch (Exception ignored) {}
+	public void initializeParties() {
+		if (!isMainBot()) {
+			return;
+		}
 
-        try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
-            statement.executeUpdate("DELETE FROM party WHERE guild_id IN (" + String.join(",", toDeleteIds) + ")");
-        } catch (Exception ignored) {}
-    }
+		List<String> toDeleteIds = new ArrayList<>();
+		try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("SELECT * FROM party")) {
+			try (ResultSet response = statement.executeQuery()) {
+				Type partyListType = new TypeToken<List<Party>>() {}.getType();
+				while (response.next()) {
+					String guildId = null;
+					try {
+						guildId = response.getString("guild_id");
+						toDeleteIds.add(guildId);
+						List<Party> partyList = gson.fromJson(response.getString("data"), partyListType);
+						guildMap.get(guildId).setPartyList(partyList);
+						log.info("Retrieved party cache (" + partyList.size() + ") - guildId={" + guildId + "}");
+					} catch (Exception e) {
+						log.error("initializeParties guildId={" + guildId + "}", e);
+					}
+				}
+			}
+		} catch (Exception ignored) {}
+
+		try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
+			statement.executeUpdate("DELETE FROM party WHERE guild_id IN (" + String.join(",", toDeleteIds) + ")");
+		} catch (Exception ignored) {}
+	}
 }

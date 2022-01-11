@@ -18,6 +18,8 @@
 
 package com.skyblockplus.settings;
 
+import static com.skyblockplus.utils.Utils.gson;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -34,13 +36,10 @@ import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsService;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-
-import static com.skyblockplus.utils.Utils.gson;
 
 @Service
 @Transactional
@@ -224,15 +223,15 @@ public class Database {
 		return linkedAccountService.getAllLinkedAccounts();
 	}
 
-	public boolean deleteByDiscord(String discord){
+	public boolean deleteByDiscord(String discord) {
 		return linkedAccountService.deleteByDiscord(discord);
 	}
 
-	public boolean deleteByUuid(String uuid){
+	public boolean deleteByUuid(String uuid) {
 		return linkedAccountService.deleteByUuid(uuid);
 	}
 
-	public boolean deleteByUsername(String username){
+	public boolean deleteByUsername(String username) {
 		return linkedAccountService.deleteByUsername(username);
 	}
 }

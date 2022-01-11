@@ -18,7 +18,4 @@
 
 package com.skyblockplus.api.linkedaccounts;
 
-
-public record LinkedAccount(long lastUpdated, String discord, String uuid,
-							String username) {
-}
+public record LinkedAccount(long lastUpdated, String discord, String uuid, String username) {}

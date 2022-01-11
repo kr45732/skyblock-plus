@@ -18,8 +18,9 @@
 
 package com.skyblockplus.api.linkedaccounts;
 
-import java.util.List;
+import static com.skyblockplus.Main.database;
 
+import java.util.List;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +28,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import static com.skyblockplus.Main.database;
 
 @RestController
 @RequestMapping(value = "/api/private/linked-accounts")

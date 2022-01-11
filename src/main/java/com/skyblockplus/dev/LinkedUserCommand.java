@@ -44,7 +44,7 @@ public class LinkedUserCommand extends Command {
 					if (args[1].equals("delete")) {
 						switch (args[2]) {
 							case "discord" -> {
-								event.getChannel().sendMessage("" +database.deleteByDiscord(args[3])).queue();
+								event.getChannel().sendMessage("" + database.deleteByDiscord(args[3])).queue();
 								return;
 							}
 							case "username" -> {

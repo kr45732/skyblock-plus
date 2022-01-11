@@ -18,6 +18,10 @@
 
 package com.skyblockplus.utils;
 
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.gson.JsonArray;
@@ -28,14 +32,6 @@ import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.price.PriceCommand;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import net.dv8tion.jda.api.entities.Activity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.message.BasicHeader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.time.Duration;
@@ -46,10 +42,13 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
-
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.entities.Activity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.message.BasicHeader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ApiHandler {
 
@@ -298,7 +297,7 @@ public class ApiHandler {
 	public static CompletableFuture<JsonElement> asyncSkyblockProfilesFromUuid(String uuid, String hypixelApiKey) {
 		CompletableFuture<JsonElement> future = new CompletableFuture<>();
 
-		JsonElement cachedResponse =  cacheDatabase.getCachedJson(uuid);
+		JsonElement cachedResponse = cacheDatabase.getCachedJson(uuid);
 		if (cachedResponse != null) {
 			future.complete(cachedResponse);
 		} else {
@@ -567,7 +566,8 @@ public class ApiHandler {
 
 	public static void updateLinkedAccounts() {
 		try {
-			database.getLinkedAccounts()
+			database
+				.getLinkedAccounts()
 				.stream()
 				.filter(linkedAccountModel ->
 					Duration.between(Instant.ofEpochMilli(linkedAccountModel.lastUpdated()), Instant.now()).toDays() > 5
@@ -578,13 +578,7 @@ public class ApiHandler {
 						.thenApply(username -> {
 							if (username != null) {
 								database.insertLinkedAccount(
-									new LinkedAccount(
-
-											Instant.now().toEpochMilli(),
-											o.discord(),
-										o.uuid(),
-										username
-									)
+									new LinkedAccount(Instant.now().toEpochMilli(), o.discord(), o.uuid(), username)
 								);
 							}
 							return null;
