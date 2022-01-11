@@ -90,7 +90,7 @@ public class ScammerCommand extends Command {
 						return;
 					}
 
-					embed(getScammer(username));
+					embed(getScammer(player));
 					return;
 				}
 

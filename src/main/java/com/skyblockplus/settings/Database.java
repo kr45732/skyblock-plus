@@ -18,12 +18,10 @@
 
 package com.skyblockplus.settings;
 
-import static com.skyblockplus.utils.Utils.gson;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
+import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountService;
 import com.skyblockplus.api.serversettings.automatedguild.ApplyBlacklist;
 import com.skyblockplus.api.serversettings.automatedguild.ApplyRequirements;
@@ -36,10 +34,13 @@ import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsService;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+import static com.skyblockplus.utils.Utils.gson;
 
 @Service
 @Transactional
@@ -49,45 +50,13 @@ public class Database {
 	public final LinkedAccountService linkedAccountService;
 
 	@Autowired
-	public Database(ServerSettingsService settingsService, LinkedAccountService linkedAccountService) {
+	public Database(ServerSettingsService settingsService) {
 		this.settingsService = settingsService;
-		this.linkedAccountService = linkedAccountService;
+		this.linkedAccountService = new LinkedAccountService();
 	}
 
 	public int removeGuildSettings(String serverId, String name) {
 		return settingsService.removeGuildSettings(serverId, name).getStatusCodeValue();
-	}
-
-	public int addLinkedUser(LinkedAccountModel newUser) {
-		return linkedAccountService.addNewLinkedAccount(newUser).getStatusCodeValue();
-	}
-
-	public JsonElement getLinkedUserByMinecraftUsername(String minecraftUsername) {
-		return gson.toJsonTree(linkedAccountService.getByMinecraftUsername(minecraftUsername).getBody());
-	}
-
-	public JsonElement getLinkedUserByMinecraftUuid(String minecraftUuid) {
-		return gson.toJsonTree(linkedAccountService.getByMinecraftUuid(minecraftUuid).getBody());
-	}
-
-	public JsonElement getLinkedUserByDiscordId(String discordId) {
-		return gson.toJsonTree(linkedAccountService.getByDiscordId(discordId).getBody());
-	}
-
-	public void deleteLinkedUserByDiscordId(String discordId) {
-		linkedAccountService.deleteByDiscordId(discordId);
-	}
-
-	public void deleteLinkedUserByMinecraftUsername(String minecraftUsername) {
-		linkedAccountService.deleteByMinecraftUsername(minecraftUsername);
-	}
-
-	public void deleteLinkedUserByMinecraftUuid(String minecraftUuid) {
-		linkedAccountService.deleteByMinecraftUuid(minecraftUuid);
-	}
-
-	public List<LinkedAccountModel> getLinkedUsers() {
-		return linkedAccountService.getAllLinkedAccounts();
 	}
 
 	public List<ServerSettingsModel> getAllServerSettings() {
@@ -223,10 +192,6 @@ public class Database {
 		return settingsService.setApplyGuestRole(serverId, newSettings).getStatusCodeValue();
 	}
 
-	public JsonElement getJacobSettings(String serverId) {
-		return gson.toJsonTree(settingsService.getJacobSettings(serverId).getBody());
-	}
-
 	public int setJacobSettings(String serverId, JsonElement newSettings) {
 		return settingsService.setJacobSettings(serverId, gson.fromJson(newSettings, JacobSettings.class)).getStatusCodeValue();
 	}
@@ -237,5 +202,37 @@ public class Database {
 
 	public int setFetchurRole(String serverId, String newSettings) {
 		return settingsService.setFetchurRole(serverId, newSettings).getStatusCodeValue();
+	}
+
+	public boolean insertLinkedAccount(LinkedAccount linkedAccount) {
+		return linkedAccountService.insertLinkedAccount(linkedAccount);
+	}
+
+	public LinkedAccount getByUsername(String username) {
+		return linkedAccountService.getByUsername(username);
+	}
+
+	public LinkedAccount getByUuid(String uuid) {
+		return linkedAccountService.getByUuid(uuid);
+	}
+
+	public LinkedAccount getByDiscord(String discord) {
+		return linkedAccountService.getByDiscord(discord);
+	}
+
+	public List<LinkedAccount> getLinkedAccounts() {
+		return linkedAccountService.getAllLinkedAccounts();
+	}
+
+	public boolean deleteByDiscord(String discord){
+		return linkedAccountService.deleteByDiscord(discord);
+	}
+
+	public boolean deleteByUuid(String uuid){
+		return linkedAccountService.deleteByUuid(uuid);
+	}
+
+	public boolean deleteByUsername(String username){
+		return linkedAccountService.deleteByUsername(username);
 	}
 }

@@ -30,7 +30,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.gson.*;
 import com.jagrosh.jdautilities.command.Command;
-import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
+import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.features.apply.ApplyGuild;
 import com.skyblockplus.features.apply.ApplyUser;
 import com.skyblockplus.features.jacob.JacobHandler;
@@ -80,7 +80,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.Dsl;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,6 +127,9 @@ public class Utils {
 	public static String PLANET_SCALE_USERNAME = "";
 	public static String PLANET_SCALE_PASSWORD = "";
 	public static String SBZ_SCAMMER_DB_KEY = "";
+	public static String LINKED_USER_URL = "";
+	public static String LINKED_USER_USERNAME = "";
+	public static String LINKED_USER_PASSWORD = "";
 	/* JSON */
 	private static JsonObject essenceCostsJson;
 	private static JsonObject levelingJson;
@@ -372,7 +374,7 @@ public class Utils {
 
 	public static List<String> getLinkedUsers() {
 		if (linkedUsers == null || Duration.between(linkedUsersLastUpdated, Instant.now()).toMinutes() >= 45) {
-			linkedUsers = database.getLinkedUsers().stream().map(LinkedAccountModel::getMinecraftUsername).collect(Collectors.toList());
+			linkedUsers = database.getLinkedAccounts().stream().map(LinkedAccount::username).collect(Collectors.toList());
 			linkedUsersLastUpdated = Instant.now();
 		}
 
@@ -927,6 +929,9 @@ public class Utils {
 			PLANET_SCALE_USERNAME = (String) appProps.get("PLANET_SCALE_USERNAME");
 			PLANET_SCALE_PASSWORD = (String) appProps.get("PLANET_SCALE_PASSWORD");
 			SBZ_SCAMMER_DB_KEY = (String) appProps.get("SBZ_SCAMMER_DB_KEY");
+			LINKED_USER_URL = (String) appProps.get("LINKED_USER_URL");
+			LINKED_USER_USERNAME = (String) appProps.get("LINKED_USER_USERNAME");
+			LINKED_USER_PASSWORD = (String) appProps.get("LINKED_USER_PASSWORD");
 		} catch (IOException e) {
 			HYPIXEL_API_KEY = System.getenv("HYPIXEL_API_KEY");
 			BOT_TOKEN = System.getenv("BOT_TOKEN");
@@ -952,6 +957,9 @@ public class Utils {
 			PLANET_SCALE_USERNAME = System.getenv("PLANET_SCALE_USERNAME");
 			PLANET_SCALE_PASSWORD = System.getenv("PLANET_SCALE_PASSWORD");
 			SBZ_SCAMMER_DB_KEY = System.getenv("SBZ_SCAMMER_DB_KEY");
+			LINKED_USER_URL = System.getenv("LINKED_USER_URL");
+			LINKED_USER_USERNAME = System.getenv("LINKED_USER_USERNAME");
+			LINKED_USER_PASSWORD = System.getenv("LINKED_USER_PASSWORD");
 		}
 	}
 
@@ -1181,9 +1189,7 @@ public class Utils {
 				List<Party> partyList = automaticGuild.getValue().partyList;
 				if (partyList.size() > 0) {
 					String partySettingsJson = gson.toJson(partyList);
-					int code = cachePartySettings(automaticGuild.getValue().guildId, partySettingsJson);
-
-					if (code == 200) {
+					if (cacheDatabase.cachePartyData(automaticGuild.getValue().guildId, partySettingsJson)) {
 						log.info("Successfully cached PartyList | " + automaticGuild.getKey() + " | " + partyList.size());
 					}
 				}
@@ -1225,7 +1231,7 @@ public class Utils {
 		}
 
 		long startTime = System.currentTimeMillis();
-		if (cacheCommandUseDb(gson.toJson(getCommandUses())) == 200) {
+		if (cacheDatabase.cacheCommandUsage(gson.toJson(getCommandUses()))) {
 			log.info("Cached command uses in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
 		} else {
 			log.error("Failed to cache command uses in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
@@ -1238,7 +1244,7 @@ public class Utils {
 		}
 
 		long startTime = System.currentTimeMillis();
-		if (cacheJacobDataDb(gson.toJson(JacobHandler.getJacobData())) == 200) {
+		if (cacheDatabase.cacheJacobData(gson.toJson(JacobHandler.getJacobData()))) {
 			log.info("Cached jacob data in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
 		} else {
 			log.error("Failed to jacob data uses in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");

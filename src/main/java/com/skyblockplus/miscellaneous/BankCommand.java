@@ -120,14 +120,14 @@ public class BankCommand extends Command {
 						return;
 					}
 
-					paginate(getPlayerBankHistory(username, args.length == 4 ? args[3] : null, new PaginatorEvent(event)));
+					paginate(getPlayerBankHistory(player, args.length == 4 ? args[3] : null, new PaginatorEvent(event)));
 					return;
 				} else if (args.length == 3 || args.length == 2 || args.length == 1) {
 					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
 						return;
 					}
 
-					embed(getPlayerBalance(username, args.length == 3 ? args[2] : null));
+					embed(getPlayerBalance(player, args.length == 3 ? args[2] : null));
 					return;
 				}
 

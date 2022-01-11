@@ -117,7 +117,7 @@ public class ProfilesCommand extends Command {
 						return;
 					}
 
-					paginate(getPlayerProfiles(username, new PaginatorEvent(event)));
+					paginate(getPlayerProfiles(player, new PaginatorEvent(event)));
 					return;
 				}
 

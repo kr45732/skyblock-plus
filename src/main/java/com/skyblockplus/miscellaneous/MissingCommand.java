@@ -132,7 +132,7 @@ public class MissingCommand extends Command {
 						return;
 					}
 
-					embed(getMissingTalismans(username, args.length == 3 ? args[2] : null));
+					embed(getMissingTalismans(player, args.length == 3 ? args[2] : null));
 					return;
 				}
 

@@ -373,7 +373,7 @@ public class ApplyUser implements Serializable {
 				switch (event.getButton().getId()) {
 					case "apply_user_submit" -> {
 						event.getMessage().editMessageComponents().queue();
-						EmbedBuilder finishApplyEmbed = defaultEmbed("Thank you for applying!");
+						EmbedBuilder finishApplyEmbed = defaultEmbed("Application Sent");
 						finishApplyEmbed.setDescription("You will be notified once staff review your application");
 						event.getHook().editOriginalEmbeds(finishApplyEmbed.build()).queue();
 						state = 2;

@@ -29,6 +29,7 @@ import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
@@ -56,12 +57,12 @@ public class RolesCommand extends Command {
 	public static EmbedBuilder updateRoles(String profile, Guild guild, Member member) {
 		EmbedBuilder eb;
 
-		if (database.getLinkedUserByDiscordId(member.getId()).isJsonNull()) {
+		LinkedAccount linkedInfo = database.getByDiscord(member.getId());
+		if (linkedInfo == null) {
 			return defaultEmbed("You must be linked to run this command. Use `/link <player>` to link");
 		}
 
-		JsonElement linkedInfo = database.getLinkedUserByDiscordId(member.getId());
-		DiscordInfoStruct discordInfo = getPlayerDiscordInfo(higherDepth(linkedInfo, "minecraftUuid").getAsString());
+		DiscordInfoStruct discordInfo = getPlayerDiscordInfo(linkedInfo.uuid());
 
 		if (discordInfo.isNotValid()) {
 			return discordInfo.getFailEmbed();

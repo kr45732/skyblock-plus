@@ -19,8 +19,8 @@
 package com.skyblockplus.api.linkedaccounts;
 
 import java.util.List;
+
 import net.dv8tion.jda.api.utils.data.DataObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,34 +28,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.skyblockplus.Main.database;
+
 @RestController
 @RequestMapping(value = "/api/private/linked-accounts")
 public class LinkedAccountController {
 
-	private final LinkedAccountService settingsService;
-
-	@Autowired
-	public LinkedAccountController(LinkedAccountService settingsService) {
-		this.settingsService = settingsService;
-	}
-
 	@GetMapping("/get/all")
-	public List<LinkedAccountModel> getAllServerSettings() {
-		return settingsService.getAllLinkedAccounts();
+	public List<LinkedAccount> getAllServerSettings() {
+		return database.getLinkedAccounts();
 	}
 
 	@GetMapping("/get/by")
 	public ResponseEntity<?> getByDiscordId(
-		@RequestParam(value = "id", required = false) String id,
+		@RequestParam(value = "discord", required = false) String discord,
 		@RequestParam(value = "uuid", required = false) String uuid,
 		@RequestParam(value = "username", required = false) String username
 	) {
-		if (id != null) {
-			return settingsService.getByDiscordId(id);
+		if (discord != null) {
+			return new ResponseEntity<>(database.getByDiscord(discord), HttpStatus.OK);
 		} else if (uuid != null) {
-			return settingsService.getByMinecraftUuid(uuid);
+			return new ResponseEntity<>(database.getByUuid(uuid), HttpStatus.OK);
 		} else if (username != null) {
-			return settingsService.getByMinecraftUsername(username);
+			return new ResponseEntity<>(database.getByUsername(username), HttpStatus.OK);
 		} else {
 			return new ResponseEntity<>(
 				DataObject.empty().put("success", false).put("cause", "No parameter provided from: id, uuid, username").toMap(),

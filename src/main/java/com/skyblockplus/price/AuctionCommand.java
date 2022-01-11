@@ -395,7 +395,7 @@ public class AuctionCommand extends Command {
 						return;
 					}
 
-					paginate(getPlayerAuction(username, filterType, sortType, verbose, new PaginatorEvent(event)));
+					paginate(getPlayerAuction(player, filterType, sortType, verbose, new PaginatorEvent(event)));
 					return;
 				}
 

@@ -111,7 +111,7 @@ public class NetworthExecute {
 						return;
 					}
 
-					embed(getPlayerNetworth(username, args.length == 3 ? args[2] : null));
+					embed(getPlayerNetworth(player, args.length == 3 ? args[2] : null));
 					return;
 				}
 

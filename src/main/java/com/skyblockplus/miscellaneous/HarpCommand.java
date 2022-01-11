@@ -89,7 +89,7 @@ public class HarpCommand extends Command {
 						return;
 					}
 
-					embed(getHarp(username, args.length == 3 ? args[2] : null));
+					embed(getHarp(player, args.length == 3 ? args[2] : null));
 					return;
 				}
 

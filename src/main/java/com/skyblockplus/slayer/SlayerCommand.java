@@ -175,7 +175,7 @@ public class SlayerCommand extends Command {
 						return;
 					}
 
-					embed(getPlayerSlayer(username, args.length == 3 ? args[2] : null));
+					embed(getPlayerSlayer(player, args.length == 3 ? args[2] : null));
 					return;
 				}
 

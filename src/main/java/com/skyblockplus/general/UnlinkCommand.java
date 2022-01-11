@@ -61,7 +61,7 @@ public class UnlinkCommand extends Command {
 					.queue();
 			} catch (Exception ignored) {}
 		} catch (Exception ignored) {}
-		database.deleteLinkedUserByDiscordId(event.getUser().getId());
+		database.deleteByDiscord(event.getUser().getId());
 		return defaultEmbed("Success").setDescription("You were unlinked");
 	}
 

@@ -87,7 +87,7 @@ public class SkillsCommand extends Command {
 						return;
 					}
 
-					embed(getPlayerSkill(username, args.length == 3 ? args[2] : null));
+					embed(getPlayerSkill(player, args.length == 3 ? args[2] : null));
 					return;
 				}
 

@@ -113,7 +113,7 @@ public class BidsCommand extends Command {
 						return;
 					}
 
-					paginate(getPlayerBids(username, new PaginatorEvent(event)));
+					paginate(getPlayerBids(player, new PaginatorEvent(event)));
 					return;
 				}
 

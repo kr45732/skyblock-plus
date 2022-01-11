@@ -18,24 +18,25 @@
 
 package com.skyblockplus.features.party;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.Utils.*;
-
-import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.PaginatorEvent;
-import java.util.HashSet;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.utils.Utils.*;
 
 public class PartyCommand extends Command {
 
@@ -132,7 +133,7 @@ public class PartyCommand extends Command {
 			return invalidEmbed("You are already a party leader or in a party");
 		}
 
-		String username = higherDepth(database.getLinkedUserByDiscordId(event.getUser().getId()), "minecraftUsername", null);
+		String username = database.getByDiscord(event.getUser().getId()).username();
 		if (username == null) {
 			return invalidEmbed("You must be linked to run this command. Use `/link <player>` to link");
 		}
@@ -185,12 +186,12 @@ public class PartyCommand extends Command {
 			return invalidEmbed("Invalid party id. You can get a list of all parties using `/party list`");
 		}
 
-		JsonElement linkedUser = database.getLinkedUserByDiscordId(event.getUser().getId());
-		if (linkedUser.isJsonNull()) {
+		LinkedAccount linkedUser = database.getByDiscord(event.getUser().getId());
+		if (linkedUser == null) {
 			return invalidEmbed("You must be linked to run this command. Use `/link <player>` to link");
 		}
 
-		Player player = new Player(higherDepth(linkedUser, "minecraftUuid").getAsString());
+		Player player = new Player(linkedUser.uuid());
 		if (player.getHighestPlayedDungeonFloor() + 1 < party.getFloorInt()) {
 			return invalidEmbed("You have not unlocked this floor");
 		}

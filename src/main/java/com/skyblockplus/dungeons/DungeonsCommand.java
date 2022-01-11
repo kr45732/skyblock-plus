@@ -135,7 +135,7 @@ public class DungeonsCommand extends Command {
 						return;
 					}
 
-					paginate(getPlayerDungeons(username, args.length == 3 ? args[2] : null, new PaginatorEvent(event)));
+					paginate(getPlayerDungeons(player, args.length == 3 ? args[2] : null, new PaginatorEvent(event)));
 					return;
 				}
 

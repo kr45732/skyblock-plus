@@ -16,35 +16,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.api.linkedaccounts;
+package com.skyblockplus.settings;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.skyblockplus.utils.slashcommand.SlashCommand;
+import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-@Data
-@AllArgsConstructor
-@Entity
-@NoArgsConstructor
-public class LinkedAccountModel {
+public class CategoriesSlashCommand extends SlashCommand {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+	public CategoriesSlashCommand() {
+		this.name = "categories";
+		this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
+	}
 
-	private String lastUpdated = "";
-	private String discordId = "";
-	private String minecraftUuid = "";
-	private String minecraftUsername = "";
+	@Override
+	protected void execute(SlashCommandEvent event) {
+		event.logCommand();
 
-	public LinkedAccountModel(String lastUpdated, String discordId, String minecraftUuid, String minecraftUsername) {
-		this.lastUpdated = lastUpdated;
-		this.discordId = discordId;
-		this.minecraftUuid = minecraftUuid;
-		this.minecraftUsername = minecraftUsername;
+		event.embed(CategoriesCommand.getCategories(event.getGuild()));
+	}
+
+	@Override
+	public CommandData getCommandData() {
+		return Commands.slash(name, "Get a list mapping all visible category names to their ids'");
 	}
 }

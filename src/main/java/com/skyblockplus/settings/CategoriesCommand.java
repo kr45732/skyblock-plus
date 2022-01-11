@@ -23,7 +23,9 @@ import static com.skyblockplus.utils.Utils.*;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
 
 public class CategoriesCommand extends Command {
 
@@ -41,14 +43,18 @@ public class CategoriesCommand extends Command {
 			protected void execute() {
 				logCommand();
 
-				StringBuilder ebString = new StringBuilder();
-				for (net.dv8tion.jda.api.entities.Category category : event.getGuild().getCategories()) {
-					ebString.append("\n• ").append(category.getName()).append(" ⇢ `").append(category.getId()).append("`");
-				}
-
-				embed(defaultEmbed("Guild Categories").setDescription(ebString.length() == 0 ? "None" : ebString.toString()));
+				embed(getCategories(event.getGuild()));
 			}
 		}
 			.queue();
+	}
+
+	public static EmbedBuilder getCategories(Guild guild){
+		StringBuilder ebString = new StringBuilder();
+		for (net.dv8tion.jda.api.entities.Category category : guild.getCategories()) {
+			ebString.append("\n• ").append(category.getName()).append(" ⇢ `").append(category.getId()).append("`");
+		}
+
+		return defaultEmbed("Guild Categories").setDescription(ebString.length() == 0 ? "None" : ebString.toString());
 	}
 }

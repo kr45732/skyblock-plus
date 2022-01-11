@@ -18,19 +18,19 @@
 
 package com.skyblockplus.utils.slashcommand;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.utils.Utils.invalidEmbed;
-
-import com.google.gson.JsonElement;
+import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.utils.Utils;
-import java.util.regex.Matcher;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
+
+import java.util.regex.Matcher;
+
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.Utils.invalidEmbed;
 
 public class SlashCommandEvent extends SlashCommandInteractionEvent {
 
@@ -87,9 +87,9 @@ public class SlashCommandEvent extends SlashCommandInteractionEvent {
 	}
 
 	private boolean getLinkedUser(String id) {
-		JsonElement linkedUserUsername = higherDepth(database.getLinkedUserByDiscordId(id), "minecraftUuid");
+		LinkedAccount linkedUserUsername = database.getByDiscord(id);
 		if (linkedUserUsername != null) {
-			player = linkedUserUsername.getAsString();
+			player = linkedUserUsername.uuid();
 			return false;
 		}
 

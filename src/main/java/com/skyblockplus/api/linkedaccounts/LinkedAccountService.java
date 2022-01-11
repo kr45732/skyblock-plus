@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021 kr45732
+ * Copyright (c) 2022 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -18,76 +18,118 @@
 
 package com.skyblockplus.api.linkedaccounts;
 
-import java.util.List;
-import javax.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
-@Service
-@Transactional
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.skyblockplus.utils.Utils.*;
+
 public class LinkedAccountService {
 
-	private final LinkedAccountRepository settingsRepository;
+    private final HikariDataSource dataSource;
 
-	@Autowired
-	public LinkedAccountService(LinkedAccountRepository settingsRepository) {
-		this.settingsRepository = settingsRepository;
-	}
+    public LinkedAccountService() {
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(LINKED_USER_URL);
+        config.setUsername(LINKED_USER_USERNAME);
+        config.setPassword(LINKED_USER_PASSWORD);
+        dataSource = new HikariDataSource(config);
+    }
 
-	public List<LinkedAccountModel> getAllLinkedAccounts() {
-		return settingsRepository.findAll();
-	}
+    public Connection getConnection() throws SQLException {
+        return dataSource.getConnection();
+    }
 
-	public ResponseEntity<?> getByDiscordId(String discordId) {
-		LinkedAccountModel linkedAccount = settingsRepository.findByDiscordId(discordId);
-		if (linkedAccount != null) {
-			return new ResponseEntity<>(linkedAccount, HttpStatus.OK);
-		}
-		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-	}
+    public boolean insertLinkedAccount(LinkedAccount linkedAccount) {
+        try {
+            String discord = linkedAccount.discord();
+            long lastUpdated = linkedAccount.lastUpdated();
+            String username = linkedAccount.username();
+            String uuid = linkedAccount.uuid();
 
-	public ResponseEntity<?> getByMinecraftUuid(String minecraftUuid) {
-		LinkedAccountModel linkedAccount = settingsRepository.findByMinecraftUuid(minecraftUuid);
-		if (linkedAccount != null) {
-			return new ResponseEntity<>(linkedAccount, HttpStatus.OK);
-		}
-		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-	}
+            try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("DELETE FROM linked_account WHERE discord = ? OR username = ? or uuid = ?")) {
+                statement.setString(1, discord);
+                statement.setString(2, username);
+                statement.setString(3, uuid);
+                statement.executeUpdate();
+            }
 
-	public ResponseEntity<?> getByMinecraftUsername(String minecraftUsername) {
-		LinkedAccountModel linkedAccount = settingsRepository.findByMinecraftUsername(minecraftUsername);
-		if (linkedAccount != null) {
-			return new ResponseEntity<>(linkedAccount, HttpStatus.OK);
-		}
-		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-	}
+            try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("INSERT INTO linked_account (last_updated, discord, username, uuid) VALUES (?, ?, ?, ?)")) {
+                statement.setLong(1, lastUpdated);
+                statement.setString(2, discord);
+                statement.setString(3, username);
+                statement.setString(4, uuid);
+                return statement.executeUpdate() == 1;
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+            return false;
+        }
+    }
 
-	public void deleteByMinecraftUsername(String minecraftUsername) {
-		settingsRepository.deleteByMinecraftUsername(minecraftUsername);
-	}
+    public LinkedAccount getByUsername(String username) {
+        return getBy("username", username);
+    }
 
-	public void deleteByDiscordId(String discordId) {
-		settingsRepository.deleteByDiscordId(discordId);
-	}
+    public LinkedAccount getByUuid(String uuid) {
+        return getBy("uuid", uuid);
+    }
 
-	public void deleteByMinecraftUuid(String minecraftUuid) {
-		settingsRepository.deleteByMinecraftUuid(minecraftUuid);
-	}
+    public LinkedAccount getByDiscord(String discord) {
+       return getBy("discord", discord);
+    }
 
-	public ResponseEntity<HttpStatus> addNewLinkedAccount(LinkedAccountModel linkedAccountModel) {
-		if (settingsRepository.existsByMinecraftUsername(linkedAccountModel.getMinecraftUsername())) {
-			deleteByMinecraftUsername(linkedAccountModel.getMinecraftUsername());
-		}
-		if (settingsRepository.existsByMinecraftUuid(linkedAccountModel.getMinecraftUuid())) {
-			deleteByMinecraftUuid(linkedAccountModel.getMinecraftUuid());
-		}
-		if (settingsRepository.existsByDiscordId(linkedAccountModel.getDiscordId())) {
-			deleteByDiscordId(linkedAccountModel.getDiscordId());
-		}
+    public List<LinkedAccount> getAllLinkedAccounts() {
+        try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("SELECT * FROM linked_account")) {
+            try (ResultSet response = statement.executeQuery()) {
+                List<LinkedAccount> linkedAccounts = new ArrayList<>();
+                while (response.next()) {
+                    linkedAccounts.add(responseToRecord(response));
+                }
+                return linkedAccounts;
+            }
+        } catch (Exception ignored) {}
+        return null;
+    }
 
-		settingsRepository.save(linkedAccountModel);
-		return new ResponseEntity<>(HttpStatus.OK);
-	}
+    public boolean deleteByDiscord(String discord){
+        return deleteBy("discord", discord);
+    }
+
+    public boolean deleteByUuid(String uuid){
+        return deleteBy("uuid", uuid);
+    }
+
+    public boolean deleteByUsername(String username){
+        return deleteBy("username", username);
+    }
+
+    private LinkedAccount getBy(String type, String value) {
+        try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("SELECT * FROM linked_account where "  + type + " = ?")) {
+            statement.setString(1, value);
+            try (ResultSet response = statement.executeQuery()) {
+                if (response.next()) {
+                    return responseToRecord(response);
+                }
+            }
+        } catch (Exception ignored) {}
+        return null;
+    }
+
+    private boolean deleteBy(String type, String value) {
+        try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("DELETE FROM linked_account WHERE " + type + " = ?")) {
+            statement.setString(1, value);
+              return statement.executeUpdate() == 1;
+        }catch (SQLException e){
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private LinkedAccount responseToRecord(ResultSet response) throws SQLException {
+        return new LinkedAccount(response.getLong("last_updated"), response.getString("discord"), response.getString("uuid"), response.getString("username"));
+    }
 }

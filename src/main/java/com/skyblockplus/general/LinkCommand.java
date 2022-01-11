@@ -26,7 +26,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
+import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
@@ -35,7 +35,6 @@ import java.time.Instant;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.User;
 
 public class LinkCommand extends Command {
 
@@ -66,14 +65,14 @@ public class LinkCommand extends Command {
 			return eb;
 		}
 
-		LinkedAccountModel toAdd = new LinkedAccountModel(
-			"" + Instant.now().toEpochMilli(),
-			member.getId(),
+		LinkedAccount toAdd = new LinkedAccount(
+				Instant.now().toEpochMilli(),
+				member.getId(),
 			playerInfo.uuid(),
 			playerInfo.username()
 		);
 
-		if (database.addLinkedUser(toAdd) == 200) {
+		if (database.insertLinkedAccount(toAdd)) {
 			JsonElement verifySettings = database.getVerifySettings(guild.getId());
 			if (verifySettings != null) {
 				try {
@@ -141,19 +140,6 @@ public class LinkCommand extends Command {
 		}
 	}
 
-	public static EmbedBuilder getLinkedAccount(User user) {
-		JsonElement userInfo = database.getLinkedUserByDiscordId(user.getId());
-
-		try {
-			return defaultEmbed("Linked information")
-				.setDescription(
-					"`" + user.getAsTag() + "` is linked to `" + (higherDepth(userInfo, "minecraftUsername").getAsString()) + "`"
-				);
-		} catch (Exception e) {
-			return invalidEmbed("`" + user.getAsTag() + "` is not linked");
-		}
-	}
-
 	@Override
 	protected void execute(CommandEvent event) {
 		new CommandExecute(this, event) {
@@ -163,9 +149,6 @@ public class LinkCommand extends Command {
 
 				if (args.length == 2) {
 					embed(linkAccount(args[1], event.getMember(), event.getGuild()));
-					return;
-				} else if (args.length == 1) {
-					embed(getLinkedAccount(event.getAuthor()));
 					return;
 				}
 

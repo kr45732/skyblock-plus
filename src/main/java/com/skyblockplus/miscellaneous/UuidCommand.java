@@ -59,7 +59,7 @@ public class UuidCommand extends Command {
 						return;
 					}
 
-					embed(getUuidPlayer(username));
+					embed(getUuidPlayer(player));
 					return;
 				}
 

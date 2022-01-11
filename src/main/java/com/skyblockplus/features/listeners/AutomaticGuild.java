@@ -380,8 +380,8 @@ public class AutomaticGuild {
 			int counterUpdate = 0;
 			if (anyGuildRoleRankEnable) {
 				database
-					.getLinkedUsers()
-					.forEach(linkedUser -> discordIdToUuid.put(linkedUser.getDiscordId(), linkedUser.getMinecraftUuid()));
+					.getLinkedAccounts()
+					.forEach(linkedUser -> discordIdToUuid.put(linkedUser.discord(), linkedUser.uuid()));
 
 				CountDownLatch latch = new CountDownLatch(1);
 				guild

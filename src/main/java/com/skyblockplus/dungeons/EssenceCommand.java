@@ -27,7 +27,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
-import java.util.Locale;
+
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
 
@@ -149,7 +149,7 @@ public class EssenceCommand extends Command {
 						return;
 					}
 
-					embed(getPlayerEssence(username, args.length == 4 ? args[3] : null));
+					embed(getPlayerEssence(player, args.length == 4 ? args[3] : null));
 					return;
 				}
 

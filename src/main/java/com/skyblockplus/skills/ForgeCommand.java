@@ -101,7 +101,7 @@ public class ForgeCommand extends Command {
 						return;
 					}
 
-					embed(getForge(username, args.length == 3 ? args[2] : null));
+					embed(getForge(player, args.length == 3 ? args[2] : null));
 					return;
 				}
 

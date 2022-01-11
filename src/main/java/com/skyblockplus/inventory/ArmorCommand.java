@@ -113,7 +113,7 @@ public class ArmorCommand extends Command {
 						return;
 					}
 
-					paginate(getPlayerEquippedArmor(username, args.length == 3 ? args[2] : null, new PaginatorEvent(event)));
+					paginate(getPlayerEquippedArmor(player, args.length == 3 ? args[2] : null, new PaginatorEvent(event)));
 					return;
 				}
 

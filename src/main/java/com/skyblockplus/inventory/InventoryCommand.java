@@ -115,14 +115,14 @@ public class InventoryCommand extends Command {
 						return;
 					}
 
-					paginate(getPlayerInventoryList(username, args.length == 3 ? args[2] : null, slotNumber, new PaginatorEvent(event)));
+					paginate(getPlayerInventoryList(player, args.length == 3 ? args[2] : null, slotNumber, new PaginatorEvent(event)));
 					return;
 				} else if (args.length == 3 || args.length == 2 || args.length == 1) {
 					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
 						return;
 					}
 
-					String[] playerInventory = getPlayerInventory(username, args.length == 3 ? args[2] : null);
+					String[] playerInventory = getPlayerInventory(player, args.length == 3 ? args[2] : null);
 					if (playerInventory != null) {
 						ebMessage.delete().queue();
 						ebMessage.getChannel().sendMessage(playerInventory[0]).complete();

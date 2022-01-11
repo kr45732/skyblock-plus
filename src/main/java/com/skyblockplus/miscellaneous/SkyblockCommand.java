@@ -297,7 +297,7 @@ public class SkyblockCommand extends Command {
 						return;
 					}
 
-					paginate(getSkyblock(username, args.length == 3 ? args[2] : null, new PaginatorEvent(event)));
+					paginate(getSkyblock(player, args.length == 3 ? args[2] : null, new PaginatorEvent(event)));
 					return;
 				}
 

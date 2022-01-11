@@ -34,18 +34,13 @@ public class LinkSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		String linkOption = event.getOptionStr("player");
-		event.embed(
-			linkOption != null
-				? LinkCommand.linkAccount(linkOption, event.getMember(), event.getGuild())
-				: LinkCommand.getLinkedAccount(event.getUser())
-		);
+		event.embed(LinkCommand.linkAccount(event.getOptionStr("player"), event.getMember(), event.getGuild()));
 	}
 
 	@Override
 	public CommandData getCommandData() {
 		return Commands
-			.slash(name, "Get what Hypixel account you are linked to")
-			.addOption(OptionType.STRING, "player", "Link your Hypixel account to this bot");
+			.slash(name, "Link your Hypixel account to this bot")
+			.addOption(OptionType.STRING, "player", "Player username", true);
 	}
 }

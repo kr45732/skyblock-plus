@@ -46,6 +46,7 @@ repositories {
     maven { url 'https://m2.dv8tion.net/releases' }
     maven { url 'https://jitpack.io' }
     maven { url 'https://m2.chew.pro/releases' }
+    maven { url 'https://m2.chew.pro/snapshots' }
 }
 
 dependencies {
@@ -53,7 +54,6 @@ dependencies {
 //    implementation ('net.dv8tion:JDA:5.0.0-alpha.3') {
 //         exclude module: 'opus-java'
 //    }
-
     implementation ('com.github.DV8FromTheWorld:JDA:rework~interactions-SNAPSHOT') {
         exclude module: 'opus-java'
     }
@@ -62,8 +62,7 @@ dependencies {
     implementation 'club.minnced:discord-webhooks:0.7.5'
 
     // JDA utilities
-//    implementation 'pw.chew:jda-chewtils:1.24.1'
-    implementation 'com.github.Chew:JDA-Chewtils:rework~interactions-SNAPSHOT'
+    implementation 'pw.chew:jda-chewtils:2.0-interactions-SNAPSHOT'
 
     // Google libraries
     implementation 'com.google.code.gson:gson:2.8.9'

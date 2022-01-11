@@ -229,14 +229,14 @@ public class HypixelCommand extends Command {
 						return;
 					}
 
-					embed(getParkourStats(username));
+					embed(getParkourStats(player));
 					return;
 				} else if (args.length == 2 || args.length == 1) {
 					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
 						return;
 					}
 
-					embed(getHypixelStats(username));
+					embed(getHypixelStats(player));
 					return;
 				}
 

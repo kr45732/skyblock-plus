@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021 kr45732
+ * Copyright (c) 2021-2022 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -18,37 +18,16 @@
 
 package com.skyblockplus.utils;
 
-import static com.skyblockplus.Main.*;
-import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.reflect.TypeToken;
-import com.skyblockplus.api.linkedaccounts.LinkedAccountModel;
-import com.skyblockplus.features.jacob.JacobData;
-import com.skyblockplus.features.jacob.JacobHandler;
-import com.skyblockplus.features.party.Party;
+import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.price.PriceCommand;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import java.io.InputStreamReader;
-import java.lang.reflect.Type;
-import java.net.URI;
-import java.sql.*;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 import net.dv8tion.jda.api.entities.Activity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -57,30 +36,41 @@ import org.apache.http.message.BasicHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
+
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.utils.Utils.*;
+
 public class ApiHandler {
 
 	public static final Cache<String, String> uuidToUsernameCache = Caffeine.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build();
-	public static final ConcurrentHashMap<String, Instant> uuidToTimeSkyblockProfiles = new ConcurrentHashMap<>();
+	public static CacheDatabase cacheDatabase = new CacheDatabase();
 	private static final Pattern minecraftUsernameRegex = Pattern.compile("^\\w+$", Pattern.CASE_INSENSITIVE);
 	private static final Pattern minecraftUuidRegex = Pattern.compile(
 		"[0-9a-f]{32}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
 	);
 	private static final Logger log = LoggerFactory.getLogger(ApiHandler.class);
-	public static Connection cacheDatabaseConnection;
 	public static Instant lastQueryApiUpdate = Instant.now();
 	public static boolean useAlternativeApi = reloadSettingsJson();
 
 	public static void initialize() {
 		try {
-			getCacheDatabaseConnection();
-			initializeParties();
+			cacheDatabase.initializeParties();
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateBotStatistics, 0, 3, TimeUnit.HOURS);
-			initializeCommandUses();
-			initializeJacobData();
-			scheduler.scheduleWithFixedDelay(ApiHandler::updateCache, 60, 90, TimeUnit.SECONDS);
+			cacheDatabase.initializeCommandUses();
+			cacheDatabase.initializeJacobData();
+			scheduler.scheduleWithFixedDelay(cacheDatabase::updateCache, 60, 90, TimeUnit.SECONDS);
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateLinkedAccounts, 60, 30, TimeUnit.SECONDS);
-		} catch (SQLException e) {
-			log.error("Exception when connecting to cache database", e);
 		} catch (Exception e) {
 			log.error("Exception when initializing the ApiHandler", e);
 		}
@@ -94,14 +84,6 @@ public class ApiHandler {
 				false
 			);
 		return useAlternativeApi;
-	}
-
-	public static Connection getCacheDatabaseConnection() throws SQLException {
-		if (cacheDatabaseConnection == null || cacheDatabaseConnection.isClosed()) {
-			cacheDatabaseConnection = DriverManager.getConnection(PLANET_SCALE_URL, PLANET_SCALE_USERNAME, PLANET_SCALE_PASSWORD);
-		}
-
-		return cacheDatabaseConnection;
 	}
 
 	public static void updateBotStatistics() {
@@ -289,7 +271,7 @@ public class ApiHandler {
 	}
 
 	public static HypixelResponse skyblockProfilesFromUuid(String uuid, String hypixelApiKey) {
-		JsonElement cachedResponse = getCachedJson(uuid);
+		JsonElement cachedResponse = cacheDatabase.getCachedJson(uuid);
 		if (cachedResponse != null) {
 			return new HypixelResponse(cachedResponse);
 		}
@@ -303,7 +285,7 @@ public class ApiHandler {
 				}
 
 				JsonArray profileArray = processSkyblockProfilesArray(higherDepth(profilesJson, "profiles").getAsJsonArray());
-				cacheJson(uuid, profileArray);
+				cacheDatabase.cacheJson(uuid, profileArray);
 				return new HypixelResponse(profileArray);
 			} catch (Exception e) {
 				return new HypixelResponse(higherDepth(profilesJson, "cause").getAsString());
@@ -316,7 +298,7 @@ public class ApiHandler {
 	public static CompletableFuture<JsonElement> asyncSkyblockProfilesFromUuid(String uuid, String hypixelApiKey) {
 		CompletableFuture<JsonElement> future = new CompletableFuture<>();
 
-		JsonElement cachedResponse = getCachedJson(uuid);
+		JsonElement cachedResponse =  cacheDatabase.getCachedJson(uuid);
 		if (cachedResponse != null) {
 			future.complete(cachedResponse);
 		} else {
@@ -342,7 +324,7 @@ public class ApiHandler {
 								higherDepth(JsonParser.parseString(profilesResponse.getResponseBody()), "profiles").getAsJsonArray()
 							);
 
-							cacheJson(uuid, profileArray);
+							cacheDatabase.cacheJson(uuid, profileArray);
 
 							return profileArray;
 						} catch (Exception ignored) {}
@@ -541,7 +523,7 @@ public class ApiHandler {
 
 	public static JsonArray getAuctionPetsByName(String query) {
 		try {
-			HttpGet httpGet = new HttpGet("http://venus.arcator.co.uk:1194/pets");
+			HttpGet httpGet = new HttpGet(getQueryApiUrl("pets"));
 			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
 
 			URI uri = new URIBuilder(httpGet.getURI()).addParameter("query", query).addParameter("key", AUCTION_API_KEY).build();
@@ -552,85 +534,6 @@ public class ApiHandler {
 			}
 		} catch (Exception ignored) {}
 		return null;
-	}
-
-	public static void cacheJson(String playerUuid, JsonElement json) {
-		executor.submit(() -> {
-			try (Statement statement = getCacheDatabaseConnection().createStatement()) {
-				Instant now = Instant.now();
-				uuidToTimeSkyblockProfiles.put(playerUuid, now);
-
-				statement.executeUpdate(
-					"INSERT INTO profiles VALUES ('" +
-					playerUuid +
-					"', " +
-					now.toEpochMilli() +
-					", '" +
-					json +
-					"') ON DUPLICATE KEY UPDATE uuid = VALUES(uuid), time = VALUES(time), data = VALUES(data)"
-				);
-			} catch (Exception ignored) {}
-		});
-	}
-
-	public static JsonElement getCachedJson(String playerUuid) {
-		Instant lastUpdated = uuidToTimeSkyblockProfiles.getOrDefault(playerUuid, null);
-		if (lastUpdated != null && Duration.between(lastUpdated, Instant.now()).toMillis() > 90000) {
-			deleteCachedJson(playerUuid);
-		} else {
-			try (Statement statement = getCacheDatabaseConnection().createStatement()) {
-				try (ResultSet response = statement.executeQuery("SELECT * FROM profiles where uuid = '" + playerUuid + "'")) {
-					if (response.next()) {
-						Instant lastUpdatedResponse = Instant.ofEpochMilli(response.getLong("time"));
-						if (Duration.between(lastUpdatedResponse, Instant.now()).toMillis() > 90000) {
-							deleteCachedJson(playerUuid);
-						} else {
-							uuidToTimeSkyblockProfiles.put(playerUuid, lastUpdatedResponse);
-							return JsonParser.parseString(response.getString("data"));
-						}
-					}
-				}
-			} catch (Exception ignored) {}
-		}
-		return null;
-	}
-
-	public static void deleteCachedJson(String... playerUuids) {
-		if (playerUuids.length == 0) {
-			return;
-		}
-
-		executor.submit(() -> {
-			StringBuilder query = new StringBuilder();
-			for (String playerUuid : playerUuids) {
-				uuidToTimeSkyblockProfiles.remove(playerUuid);
-				query.append("'").append(playerUuid).append("',");
-			}
-			if (query.charAt(query.length() - 1) == ',') {
-				query.deleteCharAt(query.length() - 1);
-			}
-
-			try (Statement statement = getCacheDatabaseConnection().createStatement()) {
-				statement.executeUpdate("DELETE FROM profiles WHERE uuid IN (" + query + ")");
-			} catch (Exception ignored) {}
-		});
-	}
-
-	public static void updateCache() {
-		long now = Instant.now().minusSeconds(90).toEpochMilli();
-		try (Statement statement = getCacheDatabaseConnection().createStatement()) {
-			try (ResultSet response = statement.executeQuery("SELECT uuid FROM profiles WHERE time < " + now + "")) {
-				List<String> expiredCacheUuidList = new ArrayList<>();
-				while (response.next()) {
-					expiredCacheUuidList.add(response.getString("uuid"));
-				}
-				deleteCachedJson(expiredCacheUuidList.toArray(new String[0]));
-			}
-		} catch (Exception ignored) {}
-
-		try (Statement statement = getCacheDatabaseConnection().createStatement()) {
-			statement.executeUpdate("DELETE FROM profiles WHERE time < " + now + "");
-		} catch (Exception ignored) {}
 	}
 
 	public static JsonArray processSkyblockProfilesArray(JsonArray array) {
@@ -664,22 +567,22 @@ public class ApiHandler {
 
 	public static void updateLinkedAccounts() {
 		try {
-			database
-				.getLinkedUsers()
+			database.getLinkedAccounts()
 				.stream()
 				.filter(linkedAccountModel ->
-					Duration.between(Instant.ofEpochMilli(Long.parseLong(linkedAccountModel.getLastUpdated())), Instant.now()).toDays() > 5
+					Duration.between(Instant.ofEpochMilli(linkedAccountModel.lastUpdated()), Instant.now()).toDays() > 5
 				)
 				.limit(10)
 				.forEach(o ->
-					asyncUuidToUsername(o.getMinecraftUuid())
+					asyncUuidToUsername(o.uuid())
 						.thenApply(username -> {
 							if (username != null) {
-								database.addLinkedUser(
-									new LinkedAccountModel(
-										"" + Instant.now().toEpochMilli(),
-										o.getDiscordId(),
-										o.getMinecraftUuid(),
+								database.insertLinkedAccount(
+									new LinkedAccount(
+
+											Instant.now().toEpochMilli(),
+											o.discord(),
+										o.uuid(),
 										username
 									)
 								);
@@ -690,102 +593,5 @@ public class ApiHandler {
 		} catch (Exception e) {
 			log.error("Exception when updating linked accounts", e);
 		}
-	}
-
-	public static int cachePartySettings(String guildId, String json) {
-		try (Statement statement = getCacheDatabaseConnection().createStatement()) {
-			statement.executeUpdate(
-				"INSERT INTO party VALUES ('" +
-				guildId +
-				"', '" +
-				json +
-				"') ON DUPLICATE KEY UPDATE guild_id = VALUES(guild_id), data = VALUES(data)"
-			);
-			return 200;
-		} catch (Exception e) {
-			return 400;
-		}
-	}
-
-	public static int cacheCommandUseDb(String json) {
-		try (Statement statement = getCacheDatabaseConnection().createStatement()) {
-			statement.executeUpdate("INSERT INTO commands VALUES (0, '" + json + "') ON DUPLICATE KEY UPDATE data = VALUES(data)");
-			return 200;
-		} catch (Exception e) {
-			return 400;
-		}
-	}
-
-	public static int cacheJacobDataDb(String json) {
-		try (Statement statement = getCacheDatabaseConnection().createStatement()) {
-			statement.executeUpdate("INSERT INTO jacob VALUES (0, '" + json + "') ON DUPLICATE KEY UPDATE data = VALUES(data)");
-			return 200;
-		} catch (Exception e) {
-			return 400;
-		}
-	}
-
-	public static void initializeCommandUses() {
-		if (!isMainBot()) {
-			return;
-		}
-
-		try (Statement statement = getCacheDatabaseConnection().createStatement()) {
-			try (ResultSet response = statement.executeQuery("SELECT * FROM commands")) {
-				Type typeMapStringInt = new TypeToken<Map<String, Integer>>() {}.getType();
-				response.next();
-				Map<String, Integer> commandUsage = gson.fromJson(response.getString("data"), typeMapStringInt);
-				slashCommandClient.setCommandUses(commandUsage);
-				log.info("Retrieved command uses");
-			}
-		} catch (Exception e) {
-			log.error("initializeCommandUses", e);
-		}
-	}
-
-	public static void initializeJacobData() {
-		if (!isMainBot()) {
-			return;
-		}
-
-		try (Statement statement = getCacheDatabaseConnection().createStatement()) {
-			try (ResultSet response = statement.executeQuery("SELECT * FROM jacob")) {
-				response.next();
-				JacobData data = gson.fromJson(response.getString("data"), JacobData.class);
-				JacobHandler.setJacobData(data);
-				log.info("Retrieved jacob data");
-			}
-		} catch (Exception e) {
-			log.error("initializeJacobData", e);
-		}
-	}
-
-	public static void initializeParties() {
-		if (!isMainBot()) {
-			return;
-		}
-
-		List<String> toDeleteIds = new ArrayList<>();
-		try (Statement statement = getCacheDatabaseConnection().createStatement()) {
-			try (ResultSet response = statement.executeQuery("SELECT * FROM party")) {
-				Type partyListType = new TypeToken<List<Party>>() {}.getType();
-				while (response.next()) {
-					String guildId = null;
-					try {
-						guildId = response.getString("guild_id");
-						toDeleteIds.add(guildId);
-						List<Party> partyList = gson.fromJson(response.getString("data"), partyListType);
-						guildMap.get(guildId).setPartyList(partyList);
-						log.info("Retrieved party cache (" + partyList.size() + ") - guildId={" + guildId + "}");
-					} catch (Exception e) {
-						log.error("initializeParties guildId={" + guildId + "}", e);
-					}
-				}
-			}
-		} catch (Exception ignored) {}
-
-		try (Statement statement = getCacheDatabaseConnection().createStatement()) {
-			statement.executeUpdate("DELETE FROM party WHERE guild_id IN (" + String.join(",", toDeleteIds) + ")");
-		} catch (Exception ignored) {}
 	}
 }

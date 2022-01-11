@@ -24,6 +24,7 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.utils.Player;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -108,26 +109,25 @@ public class ApplyGuild {
 			return "❌ There is already an application open in <#" + runningApplication.applicationChannelId + ">";
 		}
 
-		JsonElement linkedAccount = database.getLinkedUserByDiscordId(event.getUser().getId());
-		if (linkedAccount.isJsonNull() || !higherDepth(linkedAccount, "discordId").getAsString().equals((event.getUser().getId()))) {
-			if (linkedAccount.isJsonNull()) {
-				return "❌ You are not linked to the bot. Please run `+link [IGN]` and try again.";
-			} else {
-				return (
-					"❌ Account " +
-					higherDepth(linkedAccount, "minecraftUsername").getAsString() +
-					" is linked with the Discord tag " +
-					jda.retrieveUserById(higherDepth(linkedAccount, "discordId").getAsString()).complete().getAsTag() +
-					"\nYour current Discord tag is " +
-					event.getUser().getAsTag() +
-					".\nPlease relink and try again"
-				);
-			}
+		LinkedAccount linkedAccount = database.getByDiscord(event.getUser().getId());
+		if (linkedAccount == null) {
+			return "❌ You are not linked to the bot. Please run `+link [IGN]` and try again.";
+		} else if (!linkedAccount.discord().equals(event.getUser().getId())) {
+			return (
+				"❌ Account " +
+						linkedAccount.username() +
+				" is linked with the Discord tag " +
+				jda.retrieveUserById(linkedAccount.discord()).complete().getAsTag() +
+				"\nYour current Discord tag is " +
+				event.getUser().getAsTag() +
+				".\nPlease relink and try again"
+			);
 		}
+
 		JsonElement blacklisted = streamJsonArray(database.getApplyBlacklist(event.getGuild().getId()))
 			.filter(blacklist ->
-				higherDepth(blacklist, "uuid").getAsString().equals(higherDepth(linkedAccount, "minecraftUuid").getAsString()) ||
-				higherDepth(blacklist, "username").getAsString().equals(higherDepth(linkedAccount, "minecraftUsername").getAsString())
+				higherDepth(blacklist, "uuid").getAsString().equals(linkedAccount.uuid()) ||
+				higherDepth(blacklist, "username").getAsString().equals(linkedAccount.username())
 			)
 			.findFirst()
 			.orElse(null);
@@ -136,13 +136,13 @@ public class ApplyGuild {
 		}
 
 		if (higherDepth(currentSettings, "applyScammerCheck", false)) {
-			String scammerReason = getScammerReason(higherDepth(linkedAccount, "minecraftUuid").getAsString());
+			String scammerReason = getScammerReason(linkedAccount.uuid());
 			if (scammerReason != null) {
 				return "SBZ_SCAMMER_CHECK_" + scammerReason;
 			}
 		}
 
-		Player player = new Player(higherDepth(linkedAccount, "minecraftUsername").getAsString());
+		Player player = new Player(linkedAccount.username());
 		if (!player.isValid()) {
 			return "❌ Unable to fetch player data. Failed cause: `" + player.getFailCause() + "`";
 		} else {
@@ -151,7 +151,7 @@ public class ApplyGuild {
 			}
 		}
 
-		ApplyUser toAdd = new ApplyUser(event, currentSettings, higherDepth(linkedAccount, "minecraftUsername").getAsString());
+		ApplyUser toAdd = new ApplyUser(event, currentSettings, linkedAccount.username());
 		if (toAdd.failCause != null) {
 			return "❌ " + toAdd.failCause;
 		}

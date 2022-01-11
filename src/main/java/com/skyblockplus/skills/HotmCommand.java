@@ -107,7 +107,7 @@ public class HotmCommand extends Command {
 						return;
 					}
 
-					embed(getHotm(username, args.length == 3 ? args[2] : null));
+					embed(getHotm(player, args.length == 3 ? args[2] : null));
 					return;
 				}
 

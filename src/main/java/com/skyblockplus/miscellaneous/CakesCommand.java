@@ -101,7 +101,7 @@ public class CakesCommand extends Command {
 						return;
 					}
 
-					embed(getCakes(username, args.length == 3 ? args[2] : null));
+					embed(getCakes(player, args.length == 3 ? args[2] : null));
 					return;
 				}
 

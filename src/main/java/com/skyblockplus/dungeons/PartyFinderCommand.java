@@ -68,7 +68,7 @@ public class PartyFinderCommand extends Command {
 						return;
 					}
 
-					embed(getPartyFinderInfo(username, args.length == 3 ? args[2] : null));
+					embed(getPartyFinderInfo(player, args.length == 3 ? args[2] : null));
 					return;
 				}
 

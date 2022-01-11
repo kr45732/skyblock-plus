@@ -106,14 +106,14 @@ public class TalismanBagCommand extends Command {
 						return;
 					}
 
-					paginate(getPlayerTalismansList(username, args.length == 3 ? args[2] : null, slotNumber, new PaginatorEvent(event)));
+					paginate(getPlayerTalismansList(player, args.length == 3 ? args[2] : null, slotNumber, new PaginatorEvent(event)));
 					return;
 				} else if (args.length == 3 || args.length == 2 || args.length == 1) {
 					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
 						return;
 					}
 
-					List<String[]> playerEnderChest = getPlayerTalismansEmoji(username, args.length == 3 ? args[2] : null);
+					List<String[]> playerEnderChest = getPlayerTalismansEmoji(player, args.length == 3 ? args[2] : null);
 					if (playerEnderChest != null) {
 						ebMessage.delete().queue();
 						if (missingEmoji.length() > 0) {

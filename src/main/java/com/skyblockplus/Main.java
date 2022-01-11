@@ -18,9 +18,6 @@
 
 package com.skyblockplus;
 
-import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.jagrosh.jdautilities.command.*;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.api.miscellaneous.PublicEndpoints;
@@ -35,10 +32,6 @@ import com.skyblockplus.features.setup.SetupSlashCommand;
 import com.skyblockplus.features.skyblockevent.SkyblockEventCommand;
 import com.skyblockplus.features.skyblockevent.SkyblockEventSlashCommand;
 import com.skyblockplus.general.*;
-import com.skyblockplus.general.LinkCommand;
-import com.skyblockplus.general.LinkSlashCommand;
-import com.skyblockplus.general.UnlinkCommand;
-import com.skyblockplus.general.UnlinkSlashCommand;
 import com.skyblockplus.general.help.HelpCommand;
 import com.skyblockplus.general.help.HelpSlashCommand;
 import com.skyblockplus.guild.*;
@@ -49,10 +42,7 @@ import com.skyblockplus.miscellaneous.networth.NetworthSlashCommand;
 import com.skyblockplus.miscellaneous.weight.WeightCommand;
 import com.skyblockplus.miscellaneous.weight.WeightSlashCommand;
 import com.skyblockplus.price.*;
-import com.skyblockplus.settings.CategoriesCommand;
-import com.skyblockplus.settings.Database;
-import com.skyblockplus.settings.SettingsCommand;
-import com.skyblockplus.settings.SettingsSlashCommand;
+import com.skyblockplus.settings.*;
 import com.skyblockplus.skills.*;
 import com.skyblockplus.slayer.SlayerCommand;
 import com.skyblockplus.slayer.SlayerSlashCommand;
@@ -63,9 +53,6 @@ import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.exceptionhandler.ExceptionEventListener;
 import com.skyblockplus.utils.exceptionhandler.GlobalExceptionHandler;
 import com.skyblockplus.utils.slashcommand.SlashCommandClient;
-import java.io.File;
-import javax.annotation.PreDestroy;
-import javax.security.auth.login.LoginException;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -78,6 +65,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import javax.annotation.PreDestroy;
+import javax.security.auth.login.LoginException;
+import java.io.File;
+
+import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
+import static com.skyblockplus.utils.Utils.*;
 
 @SpringBootApplication
 public class Main {
@@ -241,7 +235,7 @@ public class Main {
 					new TimeSlashCommand(),
 					new ReloadSlashCommand(),
 					new ForgeSlashCommand(),
-					new ScammerSlashCommand()
+					new ScammerSlashCommand(), new CategoriesSlashCommand()
 				);
 
 		jda =

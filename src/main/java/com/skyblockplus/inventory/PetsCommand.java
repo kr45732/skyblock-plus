@@ -90,7 +90,7 @@ public class PetsCommand extends Command {
 						return;
 					}
 
-					paginate(getPlayerPets(username, args.length == 3 ? args[2] : null, new PaginatorEvent(event)));
+					paginate(getPlayerPets(player, args.length == 3 ? args[2] : null, new PaginatorEvent(event)));
 					return;
 				}
 

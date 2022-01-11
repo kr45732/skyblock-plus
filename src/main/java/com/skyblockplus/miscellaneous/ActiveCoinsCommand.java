@@ -86,7 +86,7 @@ public class ActiveCoinsCommand extends Command {
 						return;
 					}
 
-					embed(getActiveCoins(username, args.length == 3 ? args[2] : null));
+					embed(getActiveCoins(player, args.length == 3 ? args[2] : null));
 					return;
 				}
 

@@ -49,7 +49,7 @@ public class EnderChestCommand extends Command {
 						return;
 					}
 
-					List<String[]> playerEnderChest = getPlayerEnderChest(username, args.length == 3 ? args[2] : null);
+					List<String[]> playerEnderChest = getPlayerEnderChest(player, args.length == 3 ? args[2] : null);
 					if (playerEnderChest != null) {
 						ebMessage.delete().queue();
 						if (missingEmoji.length() > 0) {

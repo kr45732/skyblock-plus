@@ -21,10 +21,11 @@ package com.skyblockplus.utils.command;
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.utils.Utils.*;
 
-import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import java.util.regex.Matcher;
+
+import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
@@ -33,7 +34,7 @@ public abstract class CommandExecute extends CommandEvent {
 	protected final Command command;
 	protected Message ebMessage;
 	protected String[] args;
-	protected String username;
+	protected String player;
 	protected EmbedBuilder eb;
 	private final boolean sendLoadingEmbed;
 
@@ -110,7 +111,7 @@ public abstract class CommandExecute extends CommandEvent {
 			return getAuthorUsername();
 		}
 
-		username = args[index];
+		player = args[index];
 		Matcher matcher = Message.MentionType.USER.getPattern().matcher(args[index]);
 		if (!matcher.matches()) {
 			return false;
@@ -125,9 +126,9 @@ public abstract class CommandExecute extends CommandEvent {
 	 * (the provided userId is linked)
 	 */
 	protected boolean getLinkedUser(String userId) {
-		JsonElement linkedUserUsername = higherDepth(database.getLinkedUserByDiscordId(userId), "minecraftUuid");
+		LinkedAccount linkedUserUsername = database.getByDiscord	(userId);
 		if (linkedUserUsername != null) {
-			username = linkedUserUsername.getAsString();
+			player = linkedUserUsername.uuid();
 			return false;
 		}
 

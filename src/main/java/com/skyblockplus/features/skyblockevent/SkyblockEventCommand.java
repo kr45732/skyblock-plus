@@ -28,6 +28,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
 import com.skyblockplus.features.listeners.AutomaticGuild;
@@ -470,10 +471,9 @@ public class SkyblockEventCommand extends Command {
 
 	public static EmbedBuilder leaveSkyblockEvent(String guildId, String userId) {
 		if (database.getSkyblockEventActive(guildId)) {
-			JsonElement linkedAccount = database.getLinkedUserByDiscordId(userId);
+			LinkedAccount linkedAccount = database.getByDiscord(userId);
 			if (linkedAccount != null) {
-				String uuid = higherDepth(linkedAccount, "minecraftUuid").getAsString();
-				int code = database.removeMemberFromSkyblockEvent(guildId, uuid);
+				int code = database.removeMemberFromSkyblockEvent(guildId, linkedAccount.uuid());
 
 				if (code == 200) {
 					return defaultEmbed("Success").setDescription("You left the event");
@@ -490,16 +490,10 @@ public class SkyblockEventCommand extends Command {
 
 	public static EmbedBuilder joinSkyblockEvent(String guildId, String userId, String[] args) {
 		if (database.getSkyblockEventActive(guildId)) {
-			JsonElement linkedAccount = database.getLinkedUserByDiscordId(userId);
+			LinkedAccount linkedAccount = database.getByDiscord(userId);
 			if (linkedAccount != null) {
-				String uuid;
-				String username;
-				try {
-					uuid = higherDepth(linkedAccount, "minecraftUuid").getAsString();
-					username = higherDepth(linkedAccount, "minecraftUsername").getAsString();
-				} catch (Exception e) {
-					return defaultEmbed("You must be linked to run this command. Use `/link <player>` to link");
-				}
+				String uuid = linkedAccount.uuid();
+				String username = linkedAccount.username();
 
 				if (database.eventHasMemberByUuid(guildId, uuid)) {
 					return invalidEmbed("You are already in the event! If you want to leave or change profile use `/event leave`");

@@ -162,7 +162,7 @@ public class TrackAuctionsCommand extends Command {
 						return;
 					}
 
-					embed(trackAuctions(username, event.getAuthor().getId()));
+					embed(trackAuctions(player, event.getAuthor().getId()));
 					return;
 				} else if (args.length == 2 && args[1].equals("stop")) {
 					embed(stopTrackingAuctions(event.getAuthor().getId()));
