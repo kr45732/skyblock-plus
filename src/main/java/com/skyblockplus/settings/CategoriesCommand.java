@@ -43,7 +43,8 @@ public class CategoriesCommand extends Command {
 
 				embed(getCategories(event.getGuild()));
 			}
-		}.setAdminCommand(true)
+		}
+			.setAdminCommand(true)
 			.queue();
 	}
 

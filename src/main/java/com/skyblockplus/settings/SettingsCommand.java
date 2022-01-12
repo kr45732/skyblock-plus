@@ -24,11 +24,10 @@ import static com.skyblockplus.utils.Utils.globalCooldown;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.ISnowflake;
-
 import java.util.List;
 import java.util.stream.Collectors;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.ISnowflake;
 
 public class SettingsCommand extends Command {
 
@@ -41,10 +40,14 @@ public class SettingsCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		if(!event.getMember().hasPermission(Permission.ADMINISTRATOR)){
+		if (!event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
 			List<String> playerRoles = event.getMember().getRoles().stream().map(ISnowflake::getId).collect(Collectors.toList());
-			List<String> botManagerRoles = guildMap.get(event.getGuild().getId()).botManagerRoles.stream().filter(playerRoles::contains).collect(Collectors.toList());
-			if(botManagerRoles.isEmpty()){
+			List<String> botManagerRoles = guildMap
+				.get(event.getGuild().getId())
+				.botManagerRoles.stream()
+				.filter(playerRoles::contains)
+				.collect(Collectors.toList());
+			if (botManagerRoles.isEmpty()) {
 				event.reply("You are missing the required permissions or roles to use this command");
 				return;
 			}

@@ -24,12 +24,11 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import java.util.List;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 public abstract class SlashCommand {
 
@@ -53,16 +52,25 @@ public abstract class SlashCommand {
 					return;
 				}
 			} else {
-				if(p == Permission.ADMINISTRATOR){
-					if(!event.getMember().hasPermission(Permission.ADMINISTRATOR)){
-						List<String> playerRoles = event.getMember().getRoles().stream().map(ISnowflake::getId).collect(Collectors.toList());
-						List<String> botManagerRoles = guildMap.get(event.getGuild().getId()).botManagerRoles.stream().filter(playerRoles::contains).collect(Collectors.toList());
-						if(botManagerRoles.isEmpty()){
+				if (p == Permission.ADMINISTRATOR) {
+					if (!event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
+						List<String> playerRoles = event
+							.getMember()
+							.getRoles()
+							.stream()
+							.map(ISnowflake::getId)
+							.collect(Collectors.toList());
+						List<String> botManagerRoles = guildMap
+							.get(event.getGuild().getId())
+							.botManagerRoles.stream()
+							.filter(playerRoles::contains)
+							.collect(Collectors.toList());
+						if (botManagerRoles.isEmpty()) {
 							event.embed(invalidEmbed("You are missing the required permissions or roles to use this command"));
 							return;
 						}
 					}
-				}else {
+				} else {
 					if (!event.getMember().hasPermission(p)) {
 						event.embed(invalidEmbed("You must have the " + p.getName() + " permission in this server to use that!"));
 						return;

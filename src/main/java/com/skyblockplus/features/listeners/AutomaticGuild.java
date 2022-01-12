@@ -115,7 +115,11 @@ public class AutomaticGuild {
 			fetchurPing = event.getGuild().getRoleById(higherDepth(serverSettings, "fetchurRole", null));
 		} catch (Exception ignored) {}
 		try {
-			botManagerRoles.addAll(streamJsonArray(higherDepth(serverSettings, "botManagerRoles").getAsJsonArray()).map(e -> e.getAsString()).collect(Collectors.toList()));
+			botManagerRoles.addAll(
+				streamJsonArray(higherDepth(serverSettings, "botManagerRoles").getAsJsonArray())
+					.map(e -> e.getAsString())
+					.collect(Collectors.toList())
+			);
 		} catch (Exception ignored) {}
 	}
 

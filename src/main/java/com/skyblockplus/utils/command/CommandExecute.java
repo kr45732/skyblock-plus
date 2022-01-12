@@ -18,21 +18,20 @@
 
 package com.skyblockplus.utils.command;
 
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Message;
-
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.stream.Collectors;
-
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.Utils.*;
 
 public abstract class CommandExecute extends CommandEvent {
 
@@ -58,11 +57,15 @@ public abstract class CommandExecute extends CommandEvent {
 
 	public void queue() {
 		executor.submit(() -> {
-			if(adminCommand){
-				if(!getMember().hasPermission(Permission.ADMINISTRATOR)){
+			if (adminCommand) {
+				if (!getMember().hasPermission(Permission.ADMINISTRATOR)) {
 					List<String> playerRoles = getMember().getRoles().stream().map(ISnowflake::getId).collect(Collectors.toList());
-					List<String> botManagerRoles = guildMap.get(getGuild().getId()).botManagerRoles.stream().filter(playerRoles::contains).collect(Collectors.toList());
-					if(botManagerRoles.isEmpty()){
+					List<String> botManagerRoles = guildMap
+						.get(getGuild().getId())
+						.botManagerRoles.stream()
+						.filter(playerRoles::contains)
+						.collect(Collectors.toList());
+					if (botManagerRoles.isEmpty()) {
 						reply("You are missing the required permissions or roles to use this command");
 						return;
 					}
@@ -177,7 +180,7 @@ public abstract class CommandExecute extends CommandEvent {
 		return arg;
 	}
 
-	public CommandExecute setAdminCommand(boolean adminCommand){
+	public CommandExecute setAdminCommand(boolean adminCommand) {
 		this.adminCommand = adminCommand;
 		return this;
 	}

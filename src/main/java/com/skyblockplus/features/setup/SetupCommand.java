@@ -58,7 +58,8 @@ public class SetupCommand extends Command {
 
 				ebMessage.editMessageEmbeds(getSetupEmbed().build()).setActionRows(getSetupActionRow()).queue();
 			}
-		}.setAdminCommand(true)
+		}
+			.setAdminCommand(true)
 			.queue();
 	}
 }

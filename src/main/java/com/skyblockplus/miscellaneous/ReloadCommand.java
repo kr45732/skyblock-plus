@@ -52,7 +52,8 @@ public class ReloadCommand extends Command {
 
 				embed(getReloadEmbed(event.getGuild()));
 			}
-		}.setAdminCommand(true)
+		}
+			.setAdminCommand(true)
 			.queue();
 	}
 }
