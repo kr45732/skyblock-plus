@@ -89,11 +89,12 @@ public class AutomaticGuild {
 	public List<EventMember> eventMemberList = new ArrayList<>();
 	public Instant eventMemberListLastUpdated = null;
 	/* Party */
-	public List<Party> partyList = new ArrayList<>();
+	public final List<Party> partyList = new ArrayList<>();
 	public String prefix;
 	public TextChannel fetchurChannel = null;
-	private Role applyGuestRole = null;
-	private Role fetchurPing = null;
+	public Role applyGuestRole = null;
+	public Role fetchurPing = null;
+	public final List<String> botManagerRoles = new ArrayList<>();
 
 	/* Constructor */
 	public AutomaticGuild(GenericGuildEvent event) {
@@ -112,6 +113,9 @@ public class AutomaticGuild {
 		} catch (Exception ignored) {}
 		try {
 			fetchurPing = event.getGuild().getRoleById(higherDepth(serverSettings, "fetchurRole", null));
+		} catch (Exception ignored) {}
+		try {
+			botManagerRoles.addAll(streamJsonArray(higherDepth(serverSettings, "botManagerRoles").getAsJsonArray()).map(e -> e.getAsString()).collect(Collectors.toList()));
 		} catch (Exception ignored) {}
 	}
 
@@ -807,7 +811,8 @@ public class AutomaticGuild {
 	}
 
 	public void setPartyList(List<Party> partyList) {
-		this.partyList = partyList;
+		this.partyList.clear();
+		this.partyList.addAll(partyList);
 	}
 
 	public void setFetchurChannel(TextChannel channel) {
@@ -846,5 +851,10 @@ public class AutomaticGuild {
 				return;
 			}
 		}
+	}
+
+	public void setBotManagerRoles(List<String> botManagerRoles) {
+		this.botManagerRoles.clear();
+		this.botManagerRoles.addAll(botManagerRoles);
 	}
 }

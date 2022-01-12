@@ -79,6 +79,10 @@ public class ServerSettingsModel {
 	private String fetchurChannel = "";
 	private String fetchurRole = "";
 
+	@ElementCollection(fetch = FetchType.EAGER)
+	@Fetch(value = FetchMode.SUBSELECT)
+	private List<String> botManagerRoles = new ArrayList<>();
+
 	public ServerSettingsModel(String serverName, String serverId) {
 		this.serverName = serverName;
 		this.serverId = serverId;
@@ -106,6 +110,7 @@ public class ServerSettingsModel {
 		copy.setApplyGuestRole(applyGuestRole);
 		copy.setFetchurChannel(fetchurChannel);
 		copy.setFetchurRole(fetchurRole);
+		copy.setBotManagerRoles(botManagerRoles);
 		return copy;
 	}
 }

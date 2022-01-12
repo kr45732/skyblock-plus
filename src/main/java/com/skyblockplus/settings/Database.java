@@ -234,4 +234,8 @@ public class Database {
 	public boolean deleteByUsername(String username) {
 		return linkedAccountService.deleteByUsername(username);
 	}
+
+	public int setBotManagerRoles(String serverId, JsonArray newSettings) {
+		return settingsService.setBotManagerRoles(serverId, gson.fromJson(newSettings, String[].class)).getStatusCodeValue();
+	}
 }

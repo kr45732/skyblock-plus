@@ -559,16 +559,6 @@ public class ServerSettingsService {
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 
-	public ResponseEntity<?> getJacobSettings(String serverId) {
-		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
-
-		if (currentServerSettings != null) {
-			return new ResponseEntity<>(currentServerSettings.getJacobSettings(), HttpStatus.OK);
-		}
-
-		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-	}
-
 	public ResponseEntity<HttpStatus> setJacobSettings(String serverId, JacobSettings newSettings) {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
@@ -598,6 +588,18 @@ public class ServerSettingsService {
 
 		if (currentServerSettings != null) {
 			currentServerSettings.setFetchurRole(newRoleId);
+			settingsRepository.save(currentServerSettings);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	}
+
+	public ResponseEntity<HttpStatus> setBotManagerRoles(String serverId, String[] newSettings) {
+		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+		if (currentServerSettings != null) {
+			currentServerSettings.setBotManagerRoles(new ArrayList<>(Arrays.asList(newSettings)));
 			settingsRepository.save(currentServerSettings);
 			return new ResponseEntity<>(HttpStatus.OK);
 		}

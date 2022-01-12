@@ -24,7 +24,6 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 
 public class CategoriesCommand extends Command {
@@ -32,7 +31,6 @@ public class CategoriesCommand extends Command {
 	public CategoriesCommand() {
 		this.name = "categories";
 		this.cooldown = globalCooldown;
-		this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
 		this.botPermissions = defaultPerms();
 	}
 
@@ -45,7 +43,7 @@ public class CategoriesCommand extends Command {
 
 				embed(getCategories(event.getGuild()));
 			}
-		}
+		}.setAdminCommand(true)
 			.queue();
 	}
 

@@ -28,6 +28,7 @@ import static com.skyblockplus.utils.Utils.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.serversettings.automatedguild.ApplyBlacklist;
@@ -138,9 +139,11 @@ public class SettingsExecute {
 					eb = resetPrefix();
 					break;
 			}
-
-			if (eb == null) {
-				eb = errorEmbed("settings delete");
+		} else if (args.length == 4 && args[1].equals("bot_manager")) {
+			if(args[2].equals("add")){
+				eb = addBotManagerRole(args[3]);
+			}else if(args[2].equals("remove")){
+				eb = removeBotManagerRole(args[3]);
 			}
 		} else if (args.length == 1) {
 			eb = defaultSettingsEmbed();
@@ -160,6 +163,8 @@ public class SettingsExecute {
 			eb.addField("Fetchur Ping Role", fetchurRole.equals("none") ? "None" : "<@" + fetchurRole + ">", false);
 			String applyGuestRole = higherDepth(currentSettings, "applyGuestRole", "none");
 			eb.addField("Guest Role", applyGuestRole.equals("none") ? "None" : "<@&" + applyGuestRole + ">", false);
+			String botManagerRoles = streamJsonArray(higherDepth(currentSettings, "botManagerRoles").getAsJsonArray()).map(r -> "<@&" + r.getAsString() + ">").collect(Collectors.joining(" "));
+			eb.addField("Bot Manager Roles", botManagerRoles.isEmpty() ? "None" : botManagerRoles, false);
 		} else if (args.length >= 2 && args[1].equals("jacob")) {
 			if (args.length == 2) {
 				eb = displayJacobSettings(higherDepth(currentSettings, "jacobSettings"));
@@ -2191,6 +2196,53 @@ public class SettingsExecute {
 
 		guildMap.get(guild.getId()).setFetchurPing(role);
 		return defaultSettingsEmbed("Set fetchur ping to: " + role.getAsMention());
+	}
+
+	public EmbedBuilder addBotManagerRole(String roleMention) {
+		Object eb = checkRole(roleMention);
+		if (eb instanceof EmbedBuilder e) {
+			return e;
+		}
+		Role role = ((Role) eb);
+
+		JsonArray curBotRoles = higherDepth(serverSettings, "botManagerRoles").getAsJsonArray();
+		for (int i = curBotRoles.size() - 1; i >= 0; i--) {
+			if(curBotRoles.get(i).getAsString().equals(role.getId())){
+				curBotRoles.remove(i);
+			}
+		}
+		curBotRoles.add(role.getId());
+
+		int responseCode = database.setBotManagerRoles(guild.getId(), curBotRoles);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		guildMap.get(guild.getId()).setBotManagerRoles(gson.fromJson(curBotRoles, new TypeToken<List<String>>() {}.getType()));
+		return defaultSettingsEmbed("Added bot manager role: " + role.getAsMention());
+	}
+
+	public EmbedBuilder removeBotManagerRole(String roleMention) {
+		Object eb = checkRole(roleMention);
+		if (eb instanceof EmbedBuilder e) {
+			return e;
+		}
+		Role role = ((Role) eb);
+
+		JsonArray curBotRoles = higherDepth(serverSettings, "botManagerRoles").getAsJsonArray();
+		for (int i = curBotRoles.size() - 1; i >= 0; i--) {
+			if(curBotRoles.get(i).getAsString().equals(role.getId())){
+				curBotRoles.remove(i);
+			}
+		}
+
+		int responseCode = database.setBotManagerRoles(guild.getId(), curBotRoles);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		guildMap.get(guild.getId()).setBotManagerRoles(gson.fromJson(curBotRoles, new TypeToken<List<String>>() {}.getType()));
+		return defaultSettingsEmbed("Removed bot manager role: " + role.getAsMention());
 	}
 
 	/* Helper functions */

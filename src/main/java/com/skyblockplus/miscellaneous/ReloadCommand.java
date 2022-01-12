@@ -34,7 +34,6 @@ public class ReloadCommand extends Command {
 	public ReloadCommand() {
 		this.name = "reload";
 		this.cooldown = 45;
-		this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
 		this.botPermissions = defaultPerms();
 	}
 
@@ -53,7 +52,7 @@ public class ReloadCommand extends Command {
 
 				embed(getReloadEmbed(event.getGuild()));
 			}
-		}
+		}.setAdminCommand(true)
 			.queue();
 	}
 }

@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021 kr45732
+ * Copyright (c) 2021-2022 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -18,15 +18,21 @@
 
 package com.skyblockplus.utils.command;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
-import java.util.regex.Matcher;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Message;
+
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.stream.Collectors;
+
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.utils.Utils.*;
 
 public abstract class CommandExecute extends CommandEvent {
 
@@ -36,6 +42,7 @@ public abstract class CommandExecute extends CommandEvent {
 	protected String player;
 	protected EmbedBuilder eb;
 	private final boolean sendLoadingEmbed;
+	private boolean adminCommand;
 
 	public CommandExecute(Command command, CommandEvent event) {
 		this(command, event, true);
@@ -51,6 +58,17 @@ public abstract class CommandExecute extends CommandEvent {
 
 	public void queue() {
 		executor.submit(() -> {
+			if(adminCommand){
+				if(!getMember().hasPermission(Permission.ADMINISTRATOR)){
+					List<String> playerRoles = getMember().getRoles().stream().map(ISnowflake::getId).collect(Collectors.toList());
+					List<String> botManagerRoles = guildMap.get(getGuild().getId()).botManagerRoles.stream().filter(playerRoles::contains).collect(Collectors.toList());
+					if(botManagerRoles.isEmpty()){
+						reply("You are missing the required permissions or roles to use this command");
+						return;
+					}
+				}
+			}
+
 			if (sendLoadingEmbed) {
 				this.ebMessage =
 					getChannel()
@@ -157,5 +175,10 @@ public abstract class CommandExecute extends CommandEvent {
 		}
 
 		return arg;
+	}
+
+	public CommandExecute setAdminCommand(boolean adminCommand){
+		this.adminCommand = adminCommand;
+		return this;
 	}
 }

@@ -18,25 +18,38 @@
 
 package com.skyblockplus.settings;
 
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.Utils.defaultPerms;
 import static com.skyblockplus.utils.Utils.globalCooldown;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.ISnowflake;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class SettingsCommand extends Command {
 
 	public SettingsCommand() {
 		this.name = "settings";
 		this.cooldown = globalCooldown + 1;
-		this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
 		this.botPermissions = defaultPerms();
-		this.aliases = new String[] { "config", "configuration" };
+		this.aliases = new String[] { "config", "configuration", "setting" };
 	}
 
 	@Override
 	protected void execute(CommandEvent event) {
+		if(!event.getMember().hasPermission(Permission.ADMINISTRATOR)){
+			List<String> playerRoles = event.getMember().getRoles().stream().map(ISnowflake::getId).collect(Collectors.toList());
+			List<String> botManagerRoles = guildMap.get(event.getGuild().getId()).botManagerRoles.stream().filter(playerRoles::contains).collect(Collectors.toList());
+			if(botManagerRoles.isEmpty()){
+				event.reply("You are missing the required permissions or roles to use this command");
+				return;
+			}
+		}
+
 		new SettingsExecute(event).execute(this, event);
 	}
 }

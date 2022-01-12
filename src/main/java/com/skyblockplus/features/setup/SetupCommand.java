@@ -33,7 +33,6 @@ public class SetupCommand extends Command {
 	public SetupCommand() {
 		this.name = "setup";
 		this.cooldown = globalCooldown;
-		this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
 		this.botPermissions = defaultPerms();
 	}
 
@@ -59,7 +58,7 @@ public class SetupCommand extends Command {
 
 				ebMessage.editMessageEmbeds(getSetupEmbed().build()).setActionRows(getSetupActionRow()).queue();
 			}
-		}
+		}.setAdminCommand(true)
 			.queue();
 	}
 }
