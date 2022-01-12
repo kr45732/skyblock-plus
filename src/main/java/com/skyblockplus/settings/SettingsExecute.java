@@ -160,7 +160,7 @@ public class SettingsExecute {
 			String fetchurChannel = higherDepth(currentSettings, "fetchurChannel", "none");
 			eb.addField("Fetchur Notifications Channel", fetchurChannel.equals("none") ? "None" : "<#" + fetchurChannel + ">", false);
 			String fetchurRole = higherDepth(currentSettings, "fetchurRole", "none");
-			eb.addField("Fetchur Ping Role", fetchurRole.equals("none") ? "None" : "<@" + fetchurRole + ">", false);
+			eb.addField("Fetchur Ping Role", fetchurRole.equals("none") ? "None" : "<@&" + fetchurRole + ">", false);
 			String applyGuestRole = higherDepth(currentSettings, "applyGuestRole", "none");
 			eb.addField("Guest Role", applyGuestRole.equals("none") ? "None" : "<@&" + applyGuestRole + ">", false);
 			String botManagerRoles = streamJsonArray(higherDepth(currentSettings, "botManagerRoles").getAsJsonArray())
