@@ -177,12 +177,13 @@ public class SettingsExecute {
 					eb = setJacobEnable(false);
 				}
 			} else if (args.length == 4) {
-				eb = switch (args[2]) {
-					case "add" -> addJacobCrop(args[3]);
-					case "remove" -> removeJacobCrop(args[3]);
-					case "channel" -> setJacobChannel(args[3]);
-					default -> null;
-				};
+				eb =
+					switch (args[2]) {
+						case "add" -> addJacobCrop(args[3]);
+						case "remove" -> removeJacobCrop(args[3]);
+						case "channel" -> setJacobChannel(args[3]);
+						default -> null;
+					};
 			}
 
 			if (eb == null) {
@@ -284,7 +285,7 @@ public class SettingsExecute {
 					case "sync":
 						if (args[3].equals("true")) {
 							eb = setVerifySyncEnable(true);
-						}else if (args[3].equals("false")) {
+						} else if (args[3].equals("false")) {
 							eb = setVerifySyncEnable(false);
 						}
 						break;
@@ -540,7 +541,7 @@ public class SettingsExecute {
 		Role role;
 		try {
 			role = guild.createRole().setName(crop).complete();
-		}catch (PermissionException e){
+		} catch (PermissionException e) {
 			return invalidEmbed("Missing permission `" + e.getPermission().getName() + "` to create a role for " + crop);
 		}
 
@@ -1872,10 +1873,10 @@ public class SettingsExecute {
 
 	public EmbedBuilder setVerifyMessageTextChannelId(String textChannel) {
 		Object eb = checkTextChannel(textChannel);
-		if(eb instanceof EmbedBuilder e){
+		if (eb instanceof EmbedBuilder e) {
 			return e;
 		}
-		TextChannel channel = (TextChannel)eb ;
+		TextChannel channel = (TextChannel) eb;
 
 		try {
 			int responseCode = updateVerifySettings("messageTextChannelId", channel.getId());
@@ -1932,7 +1933,7 @@ public class SettingsExecute {
 
 	public EmbedBuilder removeVerifyRole(String roleMention) {
 		Object eb = checkRole(roleMention);
-		if(eb instanceof EmbedBuilder e){
+		if (eb instanceof EmbedBuilder e) {
 			return e;
 		}
 		Role role = (Role) eb;
@@ -1963,7 +1964,7 @@ public class SettingsExecute {
 
 	public EmbedBuilder addVerifyRole(String roleMention) {
 		Object eb = checkRole(roleMention);
-		if(eb instanceof EmbedBuilder e){
+		if (eb instanceof EmbedBuilder e) {
 			return e;
 		}
 		Role role = ((Role) eb);
@@ -2100,7 +2101,7 @@ public class SettingsExecute {
 			return defaultSettingsEmbed("**Fetchur notifications disabled**");
 		} else {
 			Object eb = checkTextChannel(channelMention);
-			if(eb instanceof EmbedBuilder e){
+			if (eb instanceof EmbedBuilder e) {
 				return e;
 			}
 			TextChannel channel = (TextChannel) eb;
@@ -2273,7 +2274,12 @@ public class SettingsExecute {
 					List<String> ebStr = new ArrayList<>();
 					for (JsonElement role : roles) {
 						ebStr.add(
-							"• " + higherDepth(role, "value").getAsString() + " - " + "<@&" + higherDepth(role, "roleId").getAsString() + ">"
+							"• " +
+							higherDepth(role, "value").getAsString() +
+							" - " +
+							"<@&" +
+							higherDepth(role, "roleId").getAsString() +
+							">"
 						);
 					}
 
@@ -2286,7 +2292,7 @@ public class SettingsExecute {
 			}
 
 			String currentSettingValue = higherDepth(jsonSettings, settingName).getAsString();
-			if(currentSettingValue.equals("none")){
+			if (currentSettingValue.equals("none")) {
 				return "None";
 			}
 			if (!currentSettingValue.isEmpty()) {

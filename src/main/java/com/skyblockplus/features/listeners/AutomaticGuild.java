@@ -346,7 +346,7 @@ public class AutomaticGuild {
 		} catch (Exception e) {
 			log.error("Reload verify constructor error - " + guildId, e);
 			if (e instanceof PermissionException ex) {
-				return ("Error Reloading\nMissing permission: " +ex.getPermission().getName());
+				return ("Error Reloading\nMissing permission: " + ex.getPermission().getName());
 			}
 		}
 		return "Error Reloading";

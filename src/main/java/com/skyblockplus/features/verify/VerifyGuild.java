@@ -18,25 +18,24 @@
 
 package com.skyblockplus.features.verify;
 
-import com.google.gson.JsonElement;
-import com.skyblockplus.api.linkedaccounts.LinkedAccount;
-import com.skyblockplus.utils.structs.HypixelResponse;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
 import static com.skyblockplus.utils.Utils.*;
+
+import com.google.gson.JsonElement;
+import com.skyblockplus.api.linkedaccounts.LinkedAccount;
+import com.skyblockplus.utils.structs.HypixelResponse;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class VerifyGuild {
 
@@ -101,7 +100,7 @@ public class VerifyGuild {
 		String updatedRoles = "false";
 
 		try {
-			String[] nicknameTemplate = {higherDepth(verifySettings, "verifiedNickname", "none")};
+			String[] nicknameTemplate = { higherDepth(verifySettings, "verifiedNickname", "none") };
 			if (nicknameTemplate[0].contains("[IGN]")) {
 				nicknameTemplate[0] = nicknameTemplate[0].replace("[IGN]", linkedUser.username());
 
@@ -109,19 +108,21 @@ public class VerifyGuild {
 					try {
 						HypixelResponse playerGuild = getGuildFromPlayer(linkedUser.uuid());
 						if (!playerGuild.isNotValid()) {
-						database
+							database
 								.getAllGuildSettings(event.getGuild().getId())
 								.stream()
 								.filter(guildRole -> guildRole.getGuildId().equalsIgnoreCase(playerGuild.get("_id").getAsString()))
 								.findFirst()
-								.flatMap(settingsGuildId -> streamJsonArray(playerGuild.get("members").getAsJsonArray())
+								.flatMap(settingsGuildId ->
+									streamJsonArray(playerGuild.get("members").getAsJsonArray())
 										.filter(g -> higherDepth(g, "uuid", "").equals(linkedUser.uuid()))
-										.findFirst())
-								.ifPresent(g -> nicknameTemplate[0] = nicknameTemplate[0].replace("[GUILD_RANK]", higherDepth(g, "rank").getAsString()));
-
+										.findFirst()
+								)
+								.ifPresent(g ->
+									nicknameTemplate[0] = nicknameTemplate[0].replace("[GUILD_RANK]", higherDepth(g, "rank").getAsString())
+								);
 						}
-					} catch (Exception ignored) {
-					}
+					} catch (Exception ignored) {}
 				}
 
 				event.getMember().modifyNickname(nicknameTemplate[0]).complete();
@@ -133,13 +134,12 @@ public class VerifyGuild {
 
 		try {
 			List<Role> toAdd = streamJsonArray(higherDepth(verifySettings, "verifiedRoles").getAsJsonArray())
-					.map(e -> event.getGuild().getRoleById(e.getAsString()))
-					.collect(Collectors.toList());
+				.map(e -> event.getGuild().getRoleById(e.getAsString()))
+				.collect(Collectors.toList());
 			List<Role> toRemove = new ArrayList<>();
 			try {
 				toRemove.add(event.getGuild().getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString()));
-			} catch (Exception ignored) {
-			}
+			} catch (Exception ignored) {}
 			if (!toAdd.isEmpty() || !toRemove.isEmpty()) {
 				event.getGuild().modifyMemberRoles(event.getMember(), toAdd, toRemove).complete();
 				updatedRoles = "true";
@@ -151,35 +151,35 @@ public class VerifyGuild {
 		String finalUpdatedRoles = updatedRoles;
 		String finalUpdatedNickname = updatedNickname;
 		event
-				.getUser()
-				.openPrivateChannel()
-				.queue(privateChannel -> privateChannel
-						.sendMessageEmbeds(
-								defaultEmbed("Member synced")
-										.setDescription(
-												"You have automatically been synced in `" +
-														event.getGuild().getName() +
-														"`" +
-														(
-																!finalUpdatedRoles.equals("false")
-																		? finalUpdatedRoles.equals("true")
-																		? "\n• Successfully synced your roles"
-																		: "\n• Error syncing your roles"
-																		: ""
-														) +
-														(
-																!finalUpdatedNickname.equals("false")
-																		? finalUpdatedNickname.equals("true")
-																		? "\n• Successfully synced your nickname"
-																		: "\n• Error syncing your nickname"
-																		: ""
-														)
-										)
-										.build()
-						)
-						.queue(ignored -> {
-						}, ignored -> {
-						}));
+			.getUser()
+			.openPrivateChannel()
+			.queue(privateChannel ->
+				privateChannel
+					.sendMessageEmbeds(
+						defaultEmbed("Member synced")
+							.setDescription(
+								"You have automatically been synced in `" +
+								event.getGuild().getName() +
+								"`" +
+								(
+									!finalUpdatedRoles.equals("false")
+										? finalUpdatedRoles.equals("true")
+											? "\n• Successfully synced your roles"
+											: "\n• Error syncing your roles"
+										: ""
+								) +
+								(
+									!finalUpdatedNickname.equals("false")
+										? finalUpdatedNickname.equals("true")
+											? "\n• Successfully synced your nickname"
+											: "\n• Error syncing your nickname"
+										: ""
+								)
+							)
+							.build()
+					)
+					.queue(ignored -> {}, ignored -> {})
+			);
 	}
 
 	public void reloadSettingsJson(JsonElement newVerifySettings) {

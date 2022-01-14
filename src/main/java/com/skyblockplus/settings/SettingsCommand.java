@@ -42,9 +42,7 @@ public class SettingsCommand extends Command {
 	protected void execute(CommandEvent event) {
 		if (!event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
 			List<String> playerRoles = event.getMember().getRoles().stream().map(ISnowflake::getId).collect(Collectors.toList());
-			if (guildMap
-					.get(event.getGuild().getId())
-					.botManagerRoles.stream().noneMatch(playerRoles::contains)) {
+			if (guildMap.get(event.getGuild().getId()).botManagerRoles.stream().noneMatch(playerRoles::contains)) {
 				event.reply("You are missing the required permissions or roles to use this command");
 				return;
 			}

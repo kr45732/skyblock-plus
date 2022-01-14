@@ -76,7 +76,7 @@ public class HelpCommand extends Command {
 				new HelpData("information", "Get information about this bot.").addAliases("info", "about").setCategory("general"),
 				new HelpData("invite", "Get the invite link and support server link for the bot.").setCategory("general"),
 				new HelpData("link", "Link your Hypixel account to the bot.", "link <player>")
-						.addAliases("verify")
+					.addAliases("verify")
 					.addExamples("link CrypticPlasma")
 					.setCategory("general"),
 				new HelpData("unlink", "Unlink your account from the bot.").addAliases("unverify").setCategory("general"),
@@ -94,9 +94,9 @@ public class HelpCommand extends Command {
 				new HelpData("hotm", "Get a player's heart of the mountain statistics.", "hotm [player] [profile]")
 					.addExamples("hotm CrypticPlasma", "hotm CrypticPlasma Zucchini")
 					.setCategory("skills"),
-					new HelpData("forge", "Get a player's forge items and ending times", "forge [player] [profile]")
-							.addExamples("forge CrypticPlasma", "forge CrypticPlasma Zucchini")
-							.setCategory("skills"),
+				new HelpData("forge", "Get a player's forge items and ending times", "forge [player] [profile]")
+					.addExamples("forge CrypticPlasma", "forge CrypticPlasma Zucchini")
+					.setCategory("skills"),
 				// Dungeons
 				new HelpData("dungeons", "Get the dungeons data of a player.", "dungeons [player] [profile]")
 					.addAliases("cata", "catacombs")
@@ -160,17 +160,27 @@ public class HelpCommand extends Command {
 					.setCategory("guild"),
 				new HelpData(
 					"guild-ranks",
-					"A customizable helper that will tell you who to promote or demote in your Hypixel guild. Please DM me or join the Skyblock Plus [Discord Server](" + DISCORD_SERVER_INVITE_LINK + ") to set this up for your guild.",
+					"A customizable helper that will tell you who to promote or demote in your Hypixel guild. Please DM me or join the Skyblock Plus [Discord Server](" +
+					DISCORD_SERVER_INVITE_LINK +
+					") to set this up for your guild.",
 					"guild-ranks <u:player> [mode:normal|ironman]"
 				)
 					.addAliases("g-ranks", "g-rank")
 					.addExamples("guild-ranks u:CrypticPlasma")
 					.setCategory("guild"),
 				// Auctions
-				new HelpData("auctions", "Get a player's unclaimed auctions on all profiles. Can be sorted ascending or descending. Can be filtered by sold or unsold. Add verbose flag to show estimated price of each auction.", "auctions [player] [sort:low|high] [filter:unsold|sold] [--verbose]")
+				new HelpData(
+					"auctions",
+					"Get a player's unclaimed auctions on all profiles. Can be sorted ascending or descending. Can be filtered by sold or unsold. Add verbose flag to show estimated price of each auction.",
+					"auctions [player] [sort:low|high] [filter:unsold|sold] [--verbose]"
+				)
 					.addSecondData("Get information about an auction by it's UUID", "auctions uuid <UUID>")
 					.addAliases("auction", "ah")
-					.addExamples("auctions CrypticPlasma", "auctions CrypticPlasma filter:sold --verbose", "auctions uuid 77df55d9c0084473b113265ef48fb396")
+					.addExamples(
+						"auctions CrypticPlasma",
+						"auctions CrypticPlasma filter:sold --verbose",
+						"auctions uuid 77df55d9c0084473b113265ef48fb396"
+					)
 					.setCategory("price"),
 				new HelpData("bin", "Get the lowest bin of an item.", "bin <item>")
 					.addAliases("lbin")
@@ -331,10 +341,14 @@ public class HelpCommand extends Command {
 					.addExamples("uuid CrypticPlasma", "uuid 044903b7a9d3416d957f929557af6c88")
 					.setCategory("miscellaneous"),
 				new HelpData("fetchur", "Get the item that fetchur wants today").setCategory("miscellaneous"),
-					new HelpData("time", "Get the current year, date, and time in Skyblock").setCategory("miscellaneous"),
-					new HelpData("scammer", "Check if a player is marked as a scammer in the SkyblockZ database with the reason, discord(s), and Minecraft alt(s)", "scammer [player]")
-							.addExamples("scammer CrypticPlasma")
-							.setCategory("miscellaneous"),
+				new HelpData("time", "Get the current year, date, and time in Skyblock").setCategory("miscellaneous"),
+				new HelpData(
+					"scammer",
+					"Check if a player is marked as a scammer in the SkyblockZ database with the reason, discord(s), and Minecraft alt(s)",
+					"scammer [player]"
+				)
+					.addExamples("scammer CrypticPlasma")
+					.setCategory("miscellaneous"),
 				// Party
 				new HelpData("party", "Main party command.")
 					.addSubcommands(
@@ -384,51 +398,48 @@ public class HelpCommand extends Command {
 									"Set the prefix of the bot. Must be a least one character and no more than five.",
 									"prefix [prefix]"
 								),
-									new HelpData(
-											"fetchur_channel",
-											"Set the channel where fetchur notifications will be posted at 12 am EST every day.",
-											"fetchur_channel [#channel]"
-									),
-									new HelpData(
-											"fetchur_ping",
-											"Set the role that will be pinged with the daily fetchur notifications.",
-											"fetchur_ping [@role]"
-									)
-									,
-									new HelpData(
-											"guest_role",
-											"Set the role that will be given to linked users that are not in any of the setup automatic guilds. Requires at least one automatic guild to be setup.",
-											"guest_role [@role]"
-									)
+								new HelpData(
+									"fetchur_channel",
+									"Set the channel where fetchur notifications will be posted at 12 am EST every day.",
+									"fetchur_channel [#channel]"
+								),
+								new HelpData(
+									"fetchur_ping",
+									"Set the role that will be pinged with the daily fetchur notifications.",
+									"fetchur_ping [@role]"
+								),
+								new HelpData(
+									"guest_role",
+									"Set the role that will be given to linked users that are not in any of the setup automatic guilds. Requires at least one automatic guild to be setup.",
+									"guest_role [@role]"
+								)
 							),
-							new HelpData("bot_manager", "Manage bot manager roles.")
-									.addSubcommands(
-											new HelpData(
-													"add",
-													"Add a bot manager role. This allows members with this role to use features that are admin only.",
-													"add [@role]"
-											)
-											,
-											new HelpData(
-													"remove",
-													"Remove a bot manager role.",
-													"remove [@role]"
-											)
-									)
-							,
-							new HelpData("jacob", "Main command for jacob event settings.")
-									.addSecondData("Get the current farming event settings for the bot.", "jacob")
-									.addSubcommands(
-											new HelpData("enable", "Enable farming event notifications."),
-											new HelpData("disable", "Disable farming event notifications."),
-											new HelpData("channel", "Set the channel where farming event notifications will be posted.", "channel <#channel>"),
-											new HelpData(
-													"add",
-													"Add a crop to be tracked and notified. The role will automatically be created.",
-													"add <crop>"
-											),
-											new HelpData("remove", "Remove a crop from the tracking list.", "remove <crop>")
-									),
+						new HelpData("bot_manager", "Manage bot manager roles.")
+							.addSubcommands(
+								new HelpData(
+									"add",
+									"Add a bot manager role. This allows members with this role to use features that are admin only.",
+									"add [@role]"
+								),
+								new HelpData("remove", "Remove a bot manager role.", "remove [@role]")
+							),
+						new HelpData("jacob", "Main command for jacob event settings.")
+							.addSecondData("Get the current farming event settings for the bot.", "jacob")
+							.addSubcommands(
+								new HelpData("enable", "Enable farming event notifications."),
+								new HelpData("disable", "Disable farming event notifications."),
+								new HelpData(
+									"channel",
+									"Set the channel where farming event notifications will be posted.",
+									"channel <#channel>"
+								),
+								new HelpData(
+									"add",
+									"Add a crop to be tracked and notified. The role will automatically be created.",
+									"add <crop>"
+								),
+								new HelpData("remove", "Remove a crop from the tracking list.", "remove <crop>")
+							),
 						new HelpData("verify", "Main command for verification settings.")
 							.addSecondData("Get the current verification settings for the bot.", "verify")
 							.addSubcommands(
@@ -456,16 +467,19 @@ public class HelpCommand extends Command {
 									"nickname [prefix] [IGN] [postfix]"
 								)
 									.addExamples("nickname Verified | [IGN]", "nickname [[GUILD_RANK]] [IGN]"),
-									new HelpData(
-											"remove_role",
-											"Set the role that will be removed on verifying and re-added when un-verifying.",
-											"remove_role <@role>"
-									),
-									new HelpData("sync", "Enable or disable verify member join sync")
-											.addSubcommands(
-													new HelpData("enable", "Enable verification join sync. This will sync the verified role(s) and nickname when a user joins the server."),
-													new HelpData("disable", "Disable verification member join sync")
-											)
+								new HelpData(
+									"remove_role",
+									"Set the role that will be removed on verifying and re-added when un-verifying.",
+									"remove_role <@role>"
+								),
+								new HelpData("sync", "Enable or disable verify member join sync")
+									.addSubcommands(
+										new HelpData(
+											"enable",
+											"Enable verification join sync. This will sync the verified role(s) and nickname when a user joins the server."
+										),
+										new HelpData("disable", "Disable verification member join sync")
+									)
 							),
 						new HelpData("roles", "Main command for automatic roles settings.")
 							.addSecondData("Get the current roles settings for the bot.", "roles")
@@ -518,12 +532,18 @@ public class HelpCommand extends Command {
 										),
 										new HelpData("disable", "Disable automatic guild member counter.")
 									),
-									new HelpData("blacklist", "View or manage the application blacklist for this server.")
-											.addSubcommands(
-													new HelpData("list", "Get a list of all the blacklisted players on this server with the reasons and namemc links."),
-													new HelpData("add <player> [reason]", "Add a player to the blacklist. Reason will default to 'not provided' if not set."),
-													new HelpData("remove <player>", "Remove a player from the blacklist.")
-											),
+								new HelpData("blacklist", "View or manage the application blacklist for this server.")
+									.addSubcommands(
+										new HelpData(
+											"list",
+											"Get a list of all the blacklisted players on this server with the reasons and namemc links."
+										),
+										new HelpData(
+											"add <player> [reason]",
+											"Add a player to the blacklist. Reason will default to 'not provided' if not set."
+										),
+										new HelpData("remove <player>", "Remove a player from the blacklist.")
+									),
 								new HelpData("apply", "Automatic application system for this guild.")
 									.addSubcommands(
 										new HelpData("enable", "Enable automatic apply.", "settings guild <name> apply enable", true),
@@ -623,24 +643,27 @@ public class HelpCommand extends Command {
 													true
 												)
 											),
-											new HelpData(
-													"scammer_check",
-													"Enable or disable if a player should automatically be denied if they are marked as a scammer in the SkyblockZ database. Defaults to false.",
-													"settings guild <name> apply scammer_check <true|false>",
-													true
-											),
-											new HelpData(
-													"log_channel",
-													"Set the channel where application will be logged to once complete. Can be set to none to disable this feature.",
-													"settings guild <name> apply log_channel <#channel>",
-													true
-											)
+										new HelpData(
+											"scammer_check",
+											"Enable or disable if a player should automatically be denied if they are marked as a scammer in the SkyblockZ database. Defaults to false.",
+											"settings guild <name> apply scammer_check <true|false>",
+											true
+										),
+										new HelpData(
+											"log_channel",
+											"Set the channel where application will be logged to once complete. Can be set to none to disable this feature.",
+											"settings guild <name> apply log_channel <#channel>",
+											true
+										)
 									)
 							)
 					),
 				new HelpData("setup", "A short walk-through on how to setup the bot."),
 				new HelpData("categories", "Get the id's of all categories in the Discord server."),
-					new HelpData("reload", "Reload the automatic guild application(s) and automatic verification settings. This for changes to take effect for both of these features.")
+				new HelpData(
+					"reload",
+					"Reload the automatic guild application(s) and automatic verification settings. This for changes to take effect for both of these features."
+				)
 			)
 		);
 	}
@@ -800,7 +823,7 @@ public class HelpCommand extends Command {
 			help.create("settings general", "View the bot's general settings for this server") +
 			help.create("setup", "A short walk-through on how to setup the bot") +
 			help.create("categories", "Get the name and id of all categories in this server") +
-					help.create("reload", "Reload the guild application and verification settings") +
+			help.create("reload", "Reload the guild application and verification settings") +
 			help.create("settings set hypixel_key <key>", "Set a Hypixel API key for this server") +
 			help.create("settings set prefix <prefix>", "Set the prefix of the bot") +
 			help.create(
@@ -809,8 +832,8 @@ public class HelpCommand extends Command {
 			) +
 			help.create("settings set fetchur_ping <@role>", "Role that will be pinged when the fetchur item notifications is sent") +
 			help.create("settings set guest_role <@role>", "Set the guest role") +
-					help.create("settings bot_manager add <@role>", "Add a bot manager role") +
-					help.create("settings bot_manager remove <@role>", "Remove a bot manager role") +
+			help.create("settings bot_manager add <@role>", "Add a bot manager role") +
+			help.create("settings bot_manager remove <@role>", "Remove a bot manager role") +
 			help.create("settings delete hypixel_key", "Delete the set Hypixel API key of this server") +
 			help.create("settings delete prefix", "Reset the prefix of the bot") +
 			help.create("settings delete all", "Delete the current server settings")
@@ -835,7 +858,7 @@ public class HelpCommand extends Command {
 				"Channel where the verify message will be sent and messages will be auto deleted"
 			) +
 			help.create("settings verify nickname [prefix] [IGN] [postfix]", "The nickname template on verifying. Can be set to none.") +
-					help.create("settings verify remove_role <@role>", "Role that will be removed on verifying and re-added when un-verifying") +
+			help.create("settings verify remove_role <@role>", "Role that will be removed on verifying and re-added when un-verifying") +
 			help.create("settings verify <enable|disable> sync", "Enable or disable automatic verify role and nickname syncing")
 		);
 
@@ -889,16 +912,18 @@ public class HelpCommand extends Command {
 				"settings guild <name> apply requirements add [slayer:amount] [skills:amount] [catacombs:amount] [weight:amount]",
 				"Add a requirement that applicant must meet. At least one of the requirement types must be set. Can be empty"
 			) +
-
 			help.create(
 				"settings guild <name> apply requirements remove <index>",
 				"Remove a requirement. Run `settings guild <name>` to see the index for all current requirements"
-			) +help.create(
-					"settings guild <name> apply scammer_check <true|false>",
-					"Whether the applicant should be automatically be denied if marked a scammer in the SkyblockZ database"
 			) +
-				help.create("settings guild <name> apply log_channel <#channel>", "Channel where application logs will sent to. Can be set to none")
-
+			help.create(
+				"settings guild <name> apply scammer_check <true|false>",
+				"Whether the applicant should be automatically be denied if marked a scammer in the SkyblockZ database"
+			) +
+			help.create(
+				"settings guild <name> apply log_channel <#channel>",
+				"Channel where application logs will sent to. Can be set to none"
+			)
 		);
 
 		paginateBuilder.addItems(
