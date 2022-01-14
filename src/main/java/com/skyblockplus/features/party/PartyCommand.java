@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
+import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 public class PartyCommand extends Command {
@@ -132,12 +132,12 @@ public class PartyCommand extends Command {
 			return invalidEmbed("You are already a party leader or in a party");
 		}
 
-		String username = database.getByDiscord(event.getUser().getId()).username();
-		if (username == null) {
+		LinkedAccount linkedAccount = database.getByDiscord(event.getUser().getId());
+		if (linkedAccount == null) {
 			return invalidEmbed("You must be linked to run this command. Use `/link <player>` to link");
 		}
 
-		new PartyHandler(username, event);
+		new PartyHandler(linkedAccount.username(), event);
 		return null;
 	}
 
@@ -247,7 +247,7 @@ public class PartyCommand extends Command {
 								.setActionRow(Button.danger("party_finder_channel_close_" + party.getPartyLeaderId(), "Archive Thraed"))
 								.queueAfter(1, TimeUnit.SECONDS)
 						);
-				} catch (InsufficientPermissionException e) {
+				} catch (PermissionException e) {
 					channel
 						.sendMessage(
 							"<@" +
@@ -258,8 +258,8 @@ public class PartyCommand extends Command {
 						.setEmbeds(
 							defaultEmbed("Party Finder")
 								.setDescription(
-									"Your party has reached 5/5 players and has been unlisted. Missing permissions to create a thread: `" +
-									e.getMessage().split("Missing permission: ")[1] +
+									"Your party has reached 5/5 players and has been unlisted. Missing permissions: `" +
+									e.getPermission().getName() +
 									"`"
 								)
 								.build()

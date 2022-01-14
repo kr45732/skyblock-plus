@@ -64,6 +64,7 @@ import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
@@ -117,7 +118,7 @@ public class AutomaticGuild {
 		try {
 			botManagerRoles.addAll(
 				streamJsonArray(higherDepth(serverSettings, "botManagerRoles").getAsJsonArray())
-					.map(e -> e.getAsString())
+					.map(JsonElement::getAsString)
 					.collect(Collectors.toList())
 			);
 		} catch (Exception ignored) {}
@@ -239,12 +240,12 @@ public class AutomaticGuild {
 				}
 			} catch (Exception e) {
 				log.error("Reload apply constructor error - " + guildId, e);
-				if (e.getMessage() != null && e.getMessage().contains("Missing permission")) {
+				if (e instanceof PermissionException ex) {
 					applyStr
-						.append("• Error Reloading for `")
+						.append("• Error reloading `")
 						.append(currentSetting.getGuildName())
-						.append("` - missing permission(s): ")
-						.append(e.getMessage().split("Missing permission: ")[1])
+						.append("` - missing permission: ")
+						.append(ex.getPermission().getName())
 						.append("\n");
 				} else {
 					applyStr.append("• Error Reloading for `").append(currentSetting.getGuildName()).append("`\n");
@@ -344,8 +345,8 @@ public class AutomaticGuild {
 			}
 		} catch (Exception e) {
 			log.error("Reload verify constructor error - " + guildId, e);
-			if (e.getMessage().contains("Missing permission")) {
-				return ("Error Reloading\nMissing permission: " + e.getMessage().split("Missing permission: ")[1]);
+			if (e instanceof PermissionException ex) {
+				return ("Error Reloading\nMissing permission: " +ex.getPermission().getName());
 			}
 		}
 		return "Error Reloading";

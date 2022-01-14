@@ -177,15 +177,12 @@ public class SettingsExecute {
 					eb = setJacobEnable(false);
 				}
 			} else if (args.length == 4) {
-				if (args[2].equals("remove")) {
-					eb = removeJacobCrop(args[3]);
-				} else if (args[2].equals("channel")) {
-					eb = setJacobChannel(args[3]);
-				}
-			} else if (args.length == 5) {
-				if (args[2].equals("add")) {
-					eb = addJacobCrop(args[3], args[4]);
-				}
+				eb = switch (args[2]) {
+					case "add" -> addJacobCrop(args[3]);
+					case "remove" -> removeJacobCrop(args[3]);
+					case "channel" -> setJacobChannel(args[3]);
+					default -> null;
+				};
 			}
 
 			if (eb == null) {
@@ -197,7 +194,7 @@ public class SettingsExecute {
 					getRolesSettings(higherDepth(currentSettings, "automatedRoles")).build().paginate(channel, 0);
 					return null;
 				} else {
-					eb = defaultEmbed("Settings").addField("Roles Settings", "Error! Data not found", false);
+					eb = defaultSettingsEmbed().addField("Roles Settings", "Error! Data not found", false);
 				}
 			} else if (args.length == 3) {
 				if (args[2].equals("enable")) {
@@ -244,7 +241,7 @@ public class SettingsExecute {
 		} else if (content.split(" ", 4).length >= 2 && content.split(" ", 4)[1].equals("verify")) {
 			args = content.split(" ", 4);
 			if (args.length == 2) {
-				eb = defaultEmbed("Settings");
+				eb = defaultSettingsEmbed();
 				if (higherDepth(currentSettings, "automatedVerify") != null) {
 					eb.setDescription(getCurrentVerifySettings(higherDepth(currentSettings, "automatedVerify")));
 				} else {
@@ -284,14 +281,11 @@ public class SettingsExecute {
 					case "remove_role":
 						eb = setVerifyRemoveRole(args[3]);
 						break;
-					case "enable":
-						if (args[3].equals("sync")) {
-							eb = setVerifySyncEnable("true");
-						}
-						break;
-					case "disable":
-						if (args[3].equals("sync")) {
-							eb = setVerifySyncEnable("false");
+					case "sync":
+						if (args[3].equals("true")) {
+							eb = setVerifySyncEnable(true);
+						}else if (args[3].equals("false")) {
+							eb = setVerifySyncEnable(false);
 						}
 						break;
 				}
@@ -525,7 +519,7 @@ public class SettingsExecute {
 		return defaultSettingsEmbed("Removed jacob crop: " + crop);
 	}
 
-	public EmbedBuilder addJacobCrop(String crop, String roleMention) {
+	public EmbedBuilder addJacobCrop(String crop) {
 		crop = capitalizeString(crop.replace("_", " "));
 		List<String> validCrops = Arrays.asList(
 			"Wheat",
@@ -543,11 +537,12 @@ public class SettingsExecute {
 			return invalidEmbed("Invalid crop name\n\nValid crop names are: " + String.join(", ", validCrops));
 		}
 
-		Object eb = checkRole(roleMention);
-		if (eb instanceof EmbedBuilder e) {
-			return e;
+		Role role;
+		try {
+			role = guild.createRole().setName(crop).complete();
+		}catch (PermissionException e){
+			return invalidEmbed("Missing permission `" + e.getPermission().getName() + "` to create a role for " + crop);
 		}
-		Role role = ((Role) eb);
 
 		JsonObject jacobSettings = getJacobSetings();
 		JsonArray crops = higherDepth(jacobSettings, "crops").getAsJsonArray();
@@ -615,7 +610,7 @@ public class SettingsExecute {
 					return apiFailMessage(responseCode);
 				}
 
-				return defaultSettingsEmbed().setDescription("Removed " + uuidStruct.nameMcHyperLink() + " from the blacklist");
+				return defaultSettingsEmbed("Removed " + uuidStruct.nameMcHyperLink() + " from the blacklist");
 			}
 		}
 
@@ -1210,8 +1205,7 @@ public class SettingsExecute {
 		CustomPaginator.Builder paginateBuilder = defaultPaginator(author);
 		PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
 		extras.addEmbedPage(
-			defaultSettingsEmbed()
-				.setDescription("**" + displaySettings(settings, "applyEnable").replace("•", "").trim() + "**")
+			defaultSettingsEmbed("**" + displaySettings(settings, "applyEnable").replace("•", "").trim() + "**")
 				.addField("Button Message Channel", displaySettings(settings, "applyMessageChannel"), true)
 				.addField("Staff Message Channel", displaySettings(settings, "applyStaffChannel"), true)
 				.addField("Waiting For Invite Channel", displaySettings(settings, "applyWaitingChannel"), true)
@@ -1846,18 +1840,16 @@ public class SettingsExecute {
 		if (enable.equalsIgnoreCase("true") || enable.equalsIgnoreCase("false")) {
 			int responseCode = updateVerifySettings("enable", enable);
 			if (responseCode != 200) {
-				return invalidEmbed("API returned response code " + responseCode);
+				return apiFailMessage(responseCode);
 			}
 
-			EmbedBuilder eb = defaultEmbed("Settings");
-			eb.setDescription(
+			return defaultSettingsEmbed(
 				"**Verify:** " +
 				(enable.equalsIgnoreCase("true") ? "enabled" : "disabled") +
 				"\nRun `" +
 				guildPrefix +
 				"reload` to reload the settings"
 			);
-			return eb;
 		}
 		return defaultEmbed("Invalid Input");
 	}
@@ -1870,30 +1862,29 @@ public class SettingsExecute {
 
 			int responseCode = updateVerifySettings("messageText", EmojiParser.parseToAliases(verifyText));
 			if (responseCode != 200) {
-				return invalidEmbed("API returned response code " + responseCode);
+				return apiFailMessage(responseCode);
 			}
 
-			EmbedBuilder eb = defaultEmbed("Settings");
-			eb.setDescription("**Verify message set to:** " + verifyText);
-			return eb;
+			return defaultSettingsEmbed("**Verify message set to:** " + verifyText);
 		}
 		return defaultEmbed("Invalid Input");
 	}
 
 	public EmbedBuilder setVerifyMessageTextChannelId(String textChannel) {
+		Object eb = checkTextChannel(textChannel);
+		if(eb instanceof EmbedBuilder e){
+			return e;
+		}
+		TextChannel channel = (TextChannel)eb ;
+
 		try {
-			TextChannel verifyMessageTextChannel = guild.getTextChannelById(textChannel.replaceAll("[<#>]", ""));
-			try {
-				verifyMessageTextChannel.getManager().setSlowmode(5).queue();
-			} catch (Exception ignored) {}
-			int responseCode = updateVerifySettings("messageTextChannelId", verifyMessageTextChannel.getId());
+			int responseCode = updateVerifySettings("messageTextChannelId", channel.getId());
 			if (responseCode != 200) {
-				return invalidEmbed("API returned response code " + responseCode);
+				return apiFailMessage(responseCode);
 			}
 
-			EmbedBuilder eb = defaultEmbed("Settings");
-			eb.setDescription("**Verify text channel set to:** " + verifyMessageTextChannel.getAsMention());
-			return eb;
+			channel.getManager().setSlowmode(5).queue();
+			return defaultSettingsEmbed("**Verify text channel set to:** " + channel);
 		} catch (Exception ignored) {}
 		return defaultEmbed("Invalid Text Channel");
 	}
@@ -1902,14 +1893,11 @@ public class SettingsExecute {
 		if (!nickname.contains("[IGN]")) {
 			if (nickname.equalsIgnoreCase("none")) {
 				int responseCode = updateVerifySettings("verifiedNickname", "none");
-
 				if (responseCode != 200) {
-					return invalidEmbed("API returned response code " + responseCode);
+					return apiFailMessage(responseCode);
 				}
 
-				EmbedBuilder eb = defaultEmbed("Settings");
-				eb.setDescription("**Verify nickname disabled**");
-				return eb;
+				return defaultSettingsEmbed("**Verify nickname disabled**");
 			}
 			return invalidEmbed("Nickname must contain [IGN] parameter");
 		}
@@ -1935,32 +1923,25 @@ public class SettingsExecute {
 		}
 
 		int responseCode = updateVerifySettings("verifiedNickname", nickname);
-
 		if (responseCode != 200) {
-			return invalidEmbed("API returned response code " + responseCode);
+			return apiFailMessage(responseCode);
 		}
 
-		EmbedBuilder eb = defaultEmbed("Settings");
-		eb.setDescription("**Verify nickname set to:** " + nickname);
-		return eb;
+		return defaultSettingsEmbed("**Verify nickname set to:** " + nickname);
 	}
 
 	public EmbedBuilder removeVerifyRole(String roleMention) {
-		Role verifyRole;
-		try {
-			verifyRole = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
-			if ((verifyRole.isPublicRole() || verifyRole.isManaged())) {
-				return invalidEmbed("Invalid role");
-			}
-		} catch (Exception e) {
-			return defaultEmbed("Invalid Role");
+		Object eb = checkRole(roleMention);
+		if(eb instanceof EmbedBuilder e){
+			return e;
 		}
+		Role role = (Role) eb;
 
 		JsonElement verifySettings = database.getVerifySettings(guild.getId());
 		JsonArray currentVerifyRoles = higherDepth(verifySettings, "verifiedRoles").getAsJsonArray();
 
 		for (int i = currentVerifyRoles.size() - 1; i >= 0; i--) {
-			if (currentVerifyRoles.get(i).getAsString().equals(verifyRole.getId())) {
+			if (currentVerifyRoles.get(i).getAsString().equals(role.getId())) {
 				currentVerifyRoles.remove(i);
 			}
 		}
@@ -1968,7 +1949,7 @@ public class SettingsExecute {
 		int responseCode = database.setVerifyRolesSettings(guild.getId(), currentVerifyRoles);
 
 		if (responseCode != 200) {
-			return invalidEmbed("API returned response code " + responseCode);
+			return apiFailMessage(responseCode);
 		}
 
 		guildMap.get(guild.getId()).verifyGuild.reloadSettingsJson(verifySettings);
@@ -1977,20 +1958,15 @@ public class SettingsExecute {
 			updateVerifySettings("enable", "false");
 		}
 
-		EmbedBuilder eb = defaultEmbed("Settings");
-		return eb.setDescription("**Removed verify role:** " + verifyRole.getAsMention());
+		return defaultSettingsEmbed("**Removed verify role:** " + role.getAsMention());
 	}
 
 	public EmbedBuilder addVerifyRole(String roleMention) {
-		Role verifyRole;
-		try {
-			verifyRole = guild.getRoleById(roleMention.replaceAll("[<@&>]", ""));
-			if ((verifyRole.isPublicRole() || verifyRole.isManaged())) {
-				return invalidEmbed("Role cannot be managed or @everyone");
-			}
-		} catch (Exception e) {
-			return defaultEmbed("Invalid Role");
+		Object eb = checkRole(roleMention);
+		if(eb instanceof EmbedBuilder e){
+			return e;
 		}
+		Role role = ((Role) eb);
 
 		JsonElement verifySettings = database.getVerifySettings(guild.getId());
 		JsonArray currentVerifyRoles = higherDepth(verifySettings, "verifiedRoles").getAsJsonArray();
@@ -1998,16 +1974,15 @@ public class SettingsExecute {
 			return defaultEmbed("You have reached the max number of verify roles (3/3)");
 		}
 
-		currentVerifyRoles.add(verifyRole.getId());
+		currentVerifyRoles.add(role.getId());
 		int responseCode = database.setVerifyRolesSettings(guild.getId(), currentVerifyRoles);
 
 		if (responseCode != 200) {
-			return invalidEmbed("API returned response code " + responseCode);
+			return apiFailMessage(responseCode);
 		}
 		guildMap.get(guild.getId()).verifyGuild.reloadSettingsJson(verifySettings);
 
-		EmbedBuilder eb = defaultEmbed("Settings");
-		return eb.setDescription("**Verify role added:** " + verifyRole.getAsMention());
+		return defaultSettingsEmbed("**Verify role added:** " + role.getAsMention());
 	}
 
 	public EmbedBuilder setVerifyRemoveRole(String roleMention) {
@@ -2033,14 +2008,14 @@ public class SettingsExecute {
 		int responseCode = database.setVerifySettings(guild.getId(), verifySettings);
 
 		if (responseCode != 200) {
-			return invalidEmbed("API returned response code " + responseCode);
+			return apiFailMessage(responseCode);
 		}
 		guildMap.get(guild.getId()).verifyGuild.reloadSettingsJson(verifySettings);
 
 		return defaultSettingsEmbed("**Verify remove role set:** " + role.getAsMention());
 	}
 
-	public EmbedBuilder setVerifySyncEnable(String enable) {
+	public EmbedBuilder setVerifySyncEnable(boolean enable) {
 		JsonObject currentSettings = database.getVerifySettings(guild.getId()).getAsJsonObject();
 
 		String nickname = higherDepth(currentSettings, "verifiedNickname").getAsString();
@@ -2048,13 +2023,12 @@ public class SettingsExecute {
 			return invalidEmbed("You must have at least on verify role or a nickname template set.");
 		}
 
-		int responseCode = updateVerifySettings("enableMemberJoinSync", enable);
+		int responseCode = updateVerifySettings("enableMemberJoinSync", "" + enable);
 		if (responseCode != 200) {
-			return invalidEmbed("API returned response code " + responseCode);
+			return apiFailMessage(responseCode);
 		}
 
-		EmbedBuilder eb = defaultEmbed("Settings");
-		return eb.setDescription("Member join sync " + (enable.equals("true") ? "enabled" : "disabled"));
+		return defaultSettingsEmbed("Member join sync " + (enable ? "enabled" : "disabled"));
 	}
 
 	public int updateVerifySettings(String key, String newValue) {
@@ -2116,34 +2090,36 @@ public class SettingsExecute {
 		return defaultSettingsEmbed("**Reset the server's prefix to:** " + DEFAULT_PREFIX);
 	}
 
-	public EmbedBuilder setFetchurChannel(String channel) {
-		try {
-			if (channel.equalsIgnoreCase("none")) {
-				int responseCode = database.setFetchurChannelId(guild.getId(), "none");
-				if (responseCode != 200) {
-					return invalidEmbed("API returned response code " + responseCode);
-				}
-				guildMap.get(guild.getId()).setFetchurChannel(null);
-				return defaultSettingsEmbed("**Fetchur notifications disabled**");
-			} else {
-				TextChannel fChannel = guild.getTextChannelById(channel.replaceAll("[<#>]", ""));
-				int responseCode = database.setFetchurChannelId(guild.getId(), fChannel.getId());
-				if (responseCode != 200) {
-					return invalidEmbed("API returned response code " + responseCode);
-				}
-				guildMap.get(guild.getId()).setFetchurChannel(fChannel);
-
-				return defaultSettingsEmbed("**Fetchur notifications channel set to:** " + fChannel.getAsMention());
+	public EmbedBuilder setFetchurChannel(String channelMention) {
+		if (channelMention.equalsIgnoreCase("none")) {
+			int responseCode = database.setFetchurChannelId(guild.getId(), "none");
+			if (responseCode != 200) {
+				return apiFailMessage(responseCode);
 			}
-		} catch (Exception ignored) {}
-		return invalidEmbed("Invalid guild category id");
+			guildMap.get(guild.getId()).setFetchurChannel(null);
+			return defaultSettingsEmbed("**Fetchur notifications disabled**");
+		} else {
+			Object eb = checkTextChannel(channelMention);
+			if(eb instanceof EmbedBuilder e){
+				return e;
+			}
+			TextChannel channel = (TextChannel) eb;
+
+			int responseCode = database.setFetchurChannelId(guild.getId(), channel.getId());
+			if (responseCode != 200) {
+				return apiFailMessage(responseCode);
+			}
+
+			guildMap.get(guild.getId()).setFetchurChannel(channel);
+			return defaultSettingsEmbed("**Fetchur notifications channel set to:** " + channel.getAsMention());
+		}
 	}
 
 	public EmbedBuilder setApplyGuestRole(String roleMention) {
 		if (roleMention.equalsIgnoreCase("none")) {
 			int responseCode = database.setApplyGuestRole(guild.getId(), "none");
 			if (responseCode != 200) {
-				return invalidEmbed("API returned responseet code " + responseCode);
+				return apiFailMessage(responseCode);
 			}
 
 			guildMap.get(guild.getId()).setApplyGuestRole(null);
@@ -2167,7 +2143,7 @@ public class SettingsExecute {
 
 		int responseCode = database.setApplyGuestRole(guild.getId(), role.getId());
 		if (responseCode != 200) {
-			return invalidEmbed("API returned responseet code " + responseCode);
+			return apiFailMessage(responseCode);
 		}
 
 		guildMap.get(guild.getId()).setApplyGuestRole(role);
@@ -2253,7 +2229,7 @@ public class SettingsExecute {
 			switch (settingName) {
 				case "applyReqs" -> {
 					JsonArray reqs = higherDepth(jsonSettings, settingName).getAsJsonArray();
-					if (reqs.size() == 0) {
+					if (reqs.isEmpty()) {
 						return "None";
 					}
 					StringBuilder reqsString = new StringBuilder("\n");
@@ -2297,7 +2273,7 @@ public class SettingsExecute {
 					List<String> ebStr = new ArrayList<>();
 					for (JsonElement role : roles) {
 						ebStr.add(
-							higherDepth(role, "value").getAsString() + " - " + "<@&" + higherDepth(role, "roleId").getAsString() + ">"
+							"• " + higherDepth(role, "value").getAsString() + " - " + "<@&" + higherDepth(role, "roleId").getAsString() + ">"
 						);
 					}
 
@@ -2305,46 +2281,38 @@ public class SettingsExecute {
 						return "None";
 					}
 
-					return String.join(", ", ebStr);
+					return String.join("\n", ebStr);
 				}
 			}
 
 			String currentSettingValue = higherDepth(jsonSettings, settingName).getAsString();
-			if (currentSettingValue.length() > 0) {
+			if(currentSettingValue.equals("none")){
+				return "None";
+			}
+			if (!currentSettingValue.isEmpty()) {
 				switch (settingName) {
 					case "applyMessageChannel":
 					case "applyWaitingChannel":
 					case "applyStaffChannel":
 					case "messageTextChannelId":
 					case "channel":
+					case "applyCategory":
 						return "<#" + currentSettingValue + ">";
 					case "roleId":
 					case "guildMemberRole":
 					case "verifiedRemoveRole":
 						return "<@&" + currentSettingValue + ">";
-					case "applyCategory":
-						try {
-							return ("<#" + guild.getCategoryById(currentSettingValue).getId() + ">");
-						} catch (PermissionException e) {
-							if (e.getMessage().contains("Missing permission")) {
-								return ("Missing permission: " + e.getMessage().split("Missing permission: ")[1]);
-							}
-						}
-						break;
 					case "applyEnable":
 					case "enable":
+					case "guildMemberRoleEnable":
+					case "guildRanksEnable":
 						return currentSettingValue.equals("true") ? "• Enabled" : "• Disabled";
 					case "guildId":
 						try {
-							HypixelResponse guildJson = getGuildFromId(currentSettingValue);
-							return guildJson.get("name").getAsString();
+							return getGuildFromId(currentSettingValue).get("name").getAsString();
 						} catch (Exception e) {
-							return ("Error finding guild associated with " + currentSettingValue + " id");
+							return ("Error finding Hypixel guild associated with id: `" + currentSettingValue + "`");
 						}
-					case "guildMemberRoleEnable":
-						return currentSettingValue.equals("true") ? "• Guild role enabled" : "• Guild role disabled";
-					case "guildRanksEnable":
-						return currentSettingValue.equals("true") ? "• Guild ranks enabled" : "• Guild ranks disabled";
 				}
 				return currentSettingValue;
 			}

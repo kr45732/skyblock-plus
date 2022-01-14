@@ -45,8 +45,18 @@ repositories {
     mavenCentral()
     maven { url 'https://m2.dv8tion.net/releases' }
     maven { url 'https://jitpack.io' }
-    maven { url 'https://m2.chew.pro/releases' }
-    maven { url 'https://m2.chew.pro/snapshots' }
+    maven {
+        url 'https://m2.chew.pro/releases'
+        content {
+            includeGroup("pw.chew")
+        }
+    }
+    maven {
+        url 'https://m2.chew.pro/snapshots'
+        content {
+            includeGroup("pw.chew")
+        }
+    }
 }
 
 dependencies {
@@ -54,7 +64,7 @@ dependencies {
 //    implementation ('net.dv8tion:JDA:5.0.0-alpha.3') {
 //         exclude module: 'opus-java'
 //    }
-    implementation ('com.github.DV8FromTheWorld:JDA:rework~interactions-SNAPSHOT') {
+    implementation ('com.github.DV8FromTheWorld:JDA:daaef75be1') {
         exclude module: 'opus-java'
     }
 

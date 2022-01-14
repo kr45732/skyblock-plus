@@ -60,12 +60,9 @@ public abstract class SlashCommand {
 							.stream()
 							.map(ISnowflake::getId)
 							.collect(Collectors.toList());
-						List<String> botManagerRoles = guildMap
-							.get(event.getGuild().getId())
-							.botManagerRoles.stream()
-							.filter(playerRoles::contains)
-							.collect(Collectors.toList());
-						if (botManagerRoles.isEmpty()) {
+						if (guildMap
+								.get(event.getGuild().getId())
+								.botManagerRoles.stream().noneMatch(playerRoles::contains)) {
 							event.embed(invalidEmbed("You are missing the required permissions or roles to use this command"));
 							return;
 						}

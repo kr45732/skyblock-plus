@@ -18,23 +18,26 @@
 
 package com.skyblockplus.general;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
-import static com.skyblockplus.utils.Utils.*;
-
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
-import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
 import com.skyblockplus.utils.structs.HypixelResponse;
-import java.time.Instant;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
+import static com.skyblockplus.utils.Utils.*;
 
 public class LinkCommand extends Command {
 
@@ -52,17 +55,16 @@ public class LinkCommand extends Command {
 		}
 
 		if (!member.getUser().getAsTag().equals(playerInfo.discordTag())) {
-			EmbedBuilder eb = defaultEmbed("Discord tag mismatch");
-			eb.setDescription(
-				"**Player Username:** `" +
-				playerInfo.username() +
-				"`\n**API Discord Tag:** `" +
-				playerInfo.discordTag() +
-				"`\n**Your Discord Tag:** `" +
-				member.getUser().getAsTag() +
-				"`"
-			);
-			return eb;
+			return defaultEmbed("Discord tag mismatch")
+					.setDescription(
+							"**Player Username:** `" +
+									playerInfo.username() +
+									"`\n**API Discord Tag:** `" +
+									playerInfo.discordTag() +
+									"`\n**Your Discord Tag:** `" +
+									member.getUser().getAsTag() +
+									"`"
+					);
 		}
 
 		LinkedAccount toAdd = new LinkedAccount(Instant.now().toEpochMilli(), member.getId(), playerInfo.uuid(), playerInfo.username());
@@ -71,60 +73,46 @@ public class LinkCommand extends Command {
 			JsonElement verifySettings = database.getVerifySettings(guild.getId());
 			if (verifySettings != null) {
 				try {
-					String nicknameTemplate = higherDepth(verifySettings, "verifiedNickname").getAsString();
-					if (!nicknameTemplate.equalsIgnoreCase("none") && !nicknameTemplate.isEmpty()) {
-						nicknameTemplate = nicknameTemplate.replace("[IGN]", playerInfo.username());
+					String[] nicknameTemplate = new String[]{higherDepth(verifySettings, "verifiedNickname").getAsString()};
 
-						if (nicknameTemplate.contains("[GUILD_RANK]")) {
+					if (nicknameTemplate[0].contains("[IGN]")) {
+						nicknameTemplate[0] = nicknameTemplate[0].replace("[IGN]", toAdd.username());
+
+						if (nicknameTemplate[0].contains("[GUILD_RANK]")) {
 							try {
-								HypixelResponse playerGuild = getGuildFromPlayer(playerInfo.uuid());
+								HypixelResponse playerGuild = getGuildFromPlayer(toAdd.uuid());
 								if (!playerGuild.isNotValid()) {
-									AutomatedGuild settingsGuildId = database
-										.getAllGuildSettings(guild.getId())
-										.stream()
-										.filter(guildRole -> guildRole.getGuildId().equalsIgnoreCase(playerGuild.get("_id").getAsString()))
-										.findFirst()
-										.orElse(null);
+									database
+											.getAllGuildSettings(guild.getId())
+											.stream()
+											.filter(guildRole -> guildRole.getGuildId().equalsIgnoreCase(playerGuild.get("_id").getAsString()))
+											.findFirst()
+											.flatMap(settingsGuildId -> streamJsonArray(playerGuild.get("members").getAsJsonArray())
+													.filter(g -> higherDepth(g, "uuid", "").equals(toAdd.uuid()))
+													.findFirst())
+											.ifPresent(g -> nicknameTemplate[0] = nicknameTemplate[0].replace("[GUILD_RANK]", higherDepth(g, "rank").getAsString()));
 
-									if (settingsGuildId != null) {
-										JsonArray guildMembers = playerGuild.get("members").getAsJsonArray();
-										for (JsonElement guildMember : guildMembers) {
-											if (higherDepth(guildMember, "uuid").getAsString().equals(playerInfo.uuid())) {
-												nicknameTemplate =
-													nicknameTemplate.replace(
-														"[GUILD_RANK]",
-														higherDepth(guildMember, "rank").getAsString()
-													);
-												break;
-											}
-										}
-									}
 								}
-							} catch (Exception ignored) {}
+							} catch (Exception ignored) {
+							}
 						}
 
-						member.modifyNickname(nicknameTemplate).queue();
+						member.modifyNickname(nicknameTemplate[0]).queue();
 					}
 				} catch (Exception ignored) {}
 
 				try {
-					JsonArray verifyRoles = higherDepth(verifySettings, "verifiedRoles").getAsJsonArray();
-					for (JsonElement verifyRole : verifyRoles) {
-						try {
-							guild.addRoleToMember(member.getId(), guild.getRoleById(verifyRole.getAsString())).complete();
-						} catch (Exception e) {
-							System.out.println(verifyRole);
-							e.printStackTrace();
-						}
-					}
+					List<Role> toAddRoles = streamJsonArray(higherDepth(verifySettings, "verifiedRoles").getAsJsonArray())
+							.map(e -> guild.getRoleById(e.getAsString()))
+							.collect(Collectors.toList());
+					List<Role> toRemoveRoles = new ArrayList<>();
 					try {
-						guild
-							.removeRoleFromMember(
-								member,
-								guild.getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString())
-							)
-							.queue();
-					} catch (Exception ignored) {}
+						toRemoveRoles.add(guild.getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString()));
+					} catch (Exception ignored) {
+					}
+					if (!toAddRoles.isEmpty() || !toRemoveRoles.isEmpty()) {
+						guild.modifyMemberRoles(member, toAddRoles, toRemoveRoles).complete();
+					}
 				} catch (Exception ignored) {}
 			}
 

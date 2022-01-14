@@ -18,7 +18,6 @@
 
 package com.skyblockplus.general.help;
 
-import static com.skyblockplus.utils.Utils.capitalizeString;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
 
 import java.util.ArrayList;
@@ -81,7 +80,7 @@ public class HelpData {
 
 		this.prefix = prefix;
 
-		EmbedBuilder eb = defaultEmbed(getCategory() + " | " + capitalizeString(getName()));
+		EmbedBuilder eb = defaultEmbed(getCategory() + " | " + getName());
 		eb.addField("Description", getDescription(), false);
 		eb.addField("Usage", getUsageFormatted(), false);
 		if (aliases.size() > 0) {

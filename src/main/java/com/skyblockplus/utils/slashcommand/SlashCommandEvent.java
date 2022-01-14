@@ -18,18 +18,19 @@
 
 package com.skyblockplus.utils.slashcommand;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.utils.Utils.invalidEmbed;
-
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.utils.Utils;
-import java.util.regex.Matcher;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
+
+import java.util.regex.Matcher;
+
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.Utils.invalidEmbed;
 
 public class SlashCommandEvent extends SlashCommandInteractionEvent {
 
