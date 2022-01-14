@@ -64,7 +64,7 @@ dependencies {
 //    implementation ('net.dv8tion:JDA:5.0.0-alpha.3') {
 //         exclude module: 'opus-java'
 //    }
-    implementation ('com.github.DV8FromTheWorld:JDA:daaef75be1') {
+    implementation ('com.github.DV8FromTheWorld:JDA:4.4.0') {
         exclude module: 'opus-java'
     }
 
