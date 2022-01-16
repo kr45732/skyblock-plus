@@ -18,22 +18,6 @@
 
 package com.skyblockplus.settings;
 
-import com.google.gson.JsonObject;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.Main;
-import com.skyblockplus.features.apply.ApplyUser;
-import com.skyblockplus.features.apply.log.ApplyLog;
-import com.skyblockplus.utils.command.CommandExecute;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
@@ -41,13 +25,28 @@ import static com.skyblockplus.utils.ApiHandler.getNameHistory;
 import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
 import static com.skyblockplus.utils.Utils.*;
 
+import com.google.gson.JsonObject;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.Main;
+import com.skyblockplus.features.apply.ApplyUser;
+import com.skyblockplus.features.apply.log.ApplyLog;
+import com.skyblockplus.utils.command.CommandExecute;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
+
 public class FixApplicationCommand extends Command {
 
 	public FixApplicationCommand() {
 		this.name = "fix-application";
 		this.cooldown = globalCooldown;
 		this.botPermissions = defaultPerms();
-		this.aliases = new String[]{"fix"};
+		this.aliases = new String[] { "fix" };
 	}
 
 	@Override
@@ -70,8 +69,7 @@ public class FixApplicationCommand extends Command {
 					int state = -1;
 					try {
 						state = Integer.parseInt(args[2]);
-					} catch (Exception ignored) {
-					}
+					} catch (Exception ignored) {}
 					if (state < 0 || state > 3) {
 						embed(invalidEmbed("State must be 0, 1, 2, or 3"));
 						return;
@@ -84,8 +82,8 @@ public class FixApplicationCommand extends Command {
 				sendErrorEmbed();
 			}
 		}
-				.setAdminCommand(true)
-				.queue();
+			.setAdminCommand(true)
+			.queue();
 	}
 
 	public static EmbedBuilder getFixApplicationEmbed(TextChannel channel, int state, Guild guild) {
@@ -97,20 +95,24 @@ public class FixApplicationCommand extends Command {
 			}
 
 			String botId = jda.getSelfUser().getId();
-			Message firstMessage = messages.stream().filter(m -> m.getAuthor().getId().equals(botId) && m.getMentionedUsers().size() == 0 /*m.getContentRaw().contains(", this is your application for ")*/).findFirst().orElse(null);
+			Message firstMessage = messages
+				.stream()
+				.filter(m -> m.getAuthor().getId().equals(botId) && m.getMentionedUsers().size() == 0
+				/*m.getContentRaw().contains(", this is your application for ")*/)
+				.findFirst()
+				.orElse(null);
 			if (firstMessage == null) {
 				return invalidEmbed("Unable to find initial message in application");
 			}
 
 			User applicant = firstMessage.getMentionedUsers().get(0);
-			String guildName = "ironman_casuals";//firstMessage.getContentRaw().split(", this is your application for ")[1].replace(" ", "_").toLowerCase();
+			String guildName = "ironman_casuals"; //firstMessage.getContentRaw().split(", this is your application for ")[1].replace(" ", "_").toLowerCase();
 			JsonObject settings = database.getGuildSettings(guild.getId(), guildName).getAsJsonObject();
 			settings.remove("applyUsersCache");
 			boolean logApplication = false;
 			try {
 				logApplication = guild.getTextChannelById(higherDepth(settings, "applyLogChannel").getAsString()) != null;
-			} catch (Exception ignored) {
-			}
+			} catch (Exception ignored) {}
 
 			String username = firstMessage.getEmbeds().get(0).getTitle().replace(" ♻️", "");
 			StringBuilder nameHistory = new StringBuilder();
@@ -126,8 +128,7 @@ public class FixApplicationCommand extends Command {
 					name = name.substring(name.lastIndexOf("/") + 1, name.length() - 1);
 					emojiJson.addProperty(emojiLineSplit[0].replaceAll("<:|>", ""), name);
 				}
-			}catch (Exception ignored){
-			}
+			} catch (Exception ignored) {}
 
 			applicationJson.addProperty("applyingUserId", applicant.getId());
 			applicationJson.addProperty("currentSettingsString", settings.toString());
@@ -142,74 +143,129 @@ public class FixApplicationCommand extends Command {
 			applicationJson.addProperty("ironmanSymbol", "");
 
 			if (state >= 1) {
-				Message submitAppMessage = messages.stream().filter(m -> {
-					try {
-						return m.getAuthor().getId().equals(botId) && m.getEmbeds().get(0).getFields().get(0).getName().equals("Weight");
-					} catch (Exception e) {
-						return false;
-					}
-				}).findFirst().orElse(null);
+				Message submitAppMessage = messages
+					.stream()
+					.filter(m -> {
+						try {
+							return (
+								m.getAuthor().getId().equals(botId) && m.getEmbeds().get(0).getFields().get(0).getName().equals("Weight")
+							);
+						} catch (Exception e) {
+							return false;
+						}
+					})
+					.findFirst()
+					.orElse(null);
 				if (submitAppMessage == null) {
 					return invalidEmbed("Unable to find submit application confirm message");
 				}
 
 				for (MessageEmbed.Field field : submitAppMessage.getEmbeds().get(0).getFields()) {
-					String jsonName = switch (field.getName()) {
-						case "Weight" -> "playerWeight";
-						case "Total slayer" -> "playerSlayer";
-						case "Progress skill level" -> "playerSkills";
-						case "Catacombs level" -> "playerCatacombs";
-						case "Bank & purse coins" -> "playerCoins";
-						default -> throw new IllegalStateException("Unexpected value: " + field.getName());
-					};
+					String jsonName =
+						switch (field.getName()) {
+							case "Weight" -> "playerWeight";
+							case "Total slayer" -> "playerSlayer";
+							case "Progress skill level" -> "playerSkills";
+							case "Catacombs level" -> "playerCatacombs";
+							case "Bank & purse coins" -> "playerCoins";
+							default -> throw new IllegalStateException("Unexpected value: " + field.getName());
+						};
 					applicationJson.addProperty(jsonName, field.getValue());
 				}
 				applicationJson.addProperty("reactMessageId", submitAppMessage.getId());
 				String url = submitAppMessage.getEmbeds().get(0).getUrl();
 				applicationJson.addProperty("playerProfileName", url.substring(url.lastIndexOf("/") + 1));
 				applicationJson.addProperty("ironmanSymbol", submitAppMessage.getEmbeds().get(0).getTitle().endsWith(" ♻️") ? " ♻️" : "");
-				submitAppMessage.editMessageComponents(submitAppMessage.getActionRows().stream().map(r -> ActionRow.of(r.getButtons().stream().map(b ->
-						switch (b.getId()) {
-							case "apply_user_submit" -> b.withLabel("Submit").withStyle(ButtonStyle.SUCCESS);
-							case "apply_user_retry" -> b.withLabel("Retry").withStyle(ButtonStyle.PRIMARY);
-							case "apply_user_cancel" -> b.withLabel("Cancel").withStyle(ButtonStyle.DANGER);
-							default -> throw new IllegalStateException("Unexpected value: " + b.getId());
-						}
-				).collect(Collectors.toList())).asEnabled()).collect(Collectors.toList())).queue();
+				submitAppMessage
+					.editMessageComponents(
+						submitAppMessage
+							.getActionRows()
+							.stream()
+							.map(r ->
+								ActionRow
+									.of(
+										r
+											.getButtons()
+											.stream()
+											.map(b ->
+												switch (b.getId()) {
+													case "apply_user_submit" -> b.withLabel("Submit").withStyle(ButtonStyle.SUCCESS);
+													case "apply_user_retry" -> b.withLabel("Retry").withStyle(ButtonStyle.PRIMARY);
+													case "apply_user_cancel" -> b.withLabel("Cancel").withStyle(ButtonStyle.DANGER);
+													default -> throw new IllegalStateException("Unexpected value: " + b.getId());
+												}
+											)
+											.collect(Collectors.toList())
+									)
+									.asEnabled()
+							)
+							.collect(Collectors.toList())
+					)
+					.queue();
 			}
 
 			if (state >= 2) {
 				TextChannel staffChannel = guild.getTextChannelById(higherDepth(settings, "applyStaffChannel").getAsString());
 				applicationJson.addProperty("staffChannelId", staffChannel.getId());
 
-				Message staffMessage = staffChannel.getIterableHistory().takeAsync(100).get().stream().filter(m -> {
-					try {
-						return m.getAuthor().getId().equals(botId) && m.getEmbeds().get(0).getTitle().equals(username);
-					} catch (Exception e) {
-						return false;
-					}
-				}).findFirst().orElse(null);
+				Message staffMessage = staffChannel
+					.getIterableHistory()
+					.takeAsync(100)
+					.get()
+					.stream()
+					.filter(m -> {
+						try {
+							return m.getAuthor().getId().equals(botId) && m.getEmbeds().get(0).getTitle().equals(username);
+						} catch (Exception e) {
+							return false;
+						}
+					})
+					.findFirst()
+					.orElse(null);
 				if (staffMessage == null) {
 					return invalidEmbed("Unable to find staff accept/waitlist/deny message in the past 100 messages");
 				}
 
 				applicationJson.addProperty("reactMessageId", staffMessage.getId());
-				staffMessage.editMessageComponents(staffMessage.getActionRows().stream().map(r -> ActionRow.of(r.getButtons().stream().map(b ->
-						switch (b.getId()) {
-							case "apply_user_accept" -> b.withLabel("Accept").withStyle(ButtonStyle.SUCCESS);
-							case "apply_user_waitlist" -> b.withLabel("Waitlist").withStyle(ButtonStyle.PRIMARY);
-							case "apply_user_deny" -> b.withLabel("Deny").withStyle(ButtonStyle.DANGER);
-							default -> throw new IllegalStateException("Unexpected value: " + b.getId());
-						}
-				).collect(Collectors.toList())).asEnabled()).collect(Collectors.toList())).queue();
+				staffMessage
+					.editMessageComponents(
+						staffMessage
+							.getActionRows()
+							.stream()
+							.map(r ->
+								ActionRow
+									.of(
+										r
+											.getButtons()
+											.stream()
+											.map(b ->
+												switch (b.getId()) {
+													case "apply_user_accept" -> b.withLabel("Accept").withStyle(ButtonStyle.SUCCESS);
+													case "apply_user_waitlist" -> b.withLabel("Waitlist").withStyle(ButtonStyle.PRIMARY);
+													case "apply_user_deny" -> b.withLabel("Deny").withStyle(ButtonStyle.DANGER);
+													default -> throw new IllegalStateException("Unexpected value: " + b.getId());
+												}
+											)
+											.collect(Collectors.toList())
+									)
+									.asEnabled()
+							)
+							.collect(Collectors.toList())
+					)
+					.queue();
 			}
 
 			Collections.reverse(messages);
 			applicationJson.add("logs", gson.toJsonTree(messages.stream().map(ApplyLog::toLog).collect(Collectors.toList())));
 
-			guildMap.get(guild.getId()).applyGuild.stream().filter(g -> higherDepth(g.currentSettings, "guildName").getAsString().equals(guildName)).findFirst().get().applyUserList.add(gson.fromJson(applicationJson, ApplyUser.class));
+			guildMap
+				.get(guild.getId())
+				.applyGuild.stream()
+				.filter(g -> higherDepth(g.currentSettings, "guildName").getAsString().equals(guildName))
+				.findFirst()
+				.get()
+				.applyUserList.add(gson.fromJson(applicationJson, ApplyUser.class));
 			return defaultEmbed("Success").setDescription("Fixed & retrieved application successfully: " + makeHastePost(applicationJson));
-
 		} catch (Exception e) {
 			Main.log.error("Error when retrieving application", e);
 			return invalidEmbed("Error when fixing application: " + e.getMessage());

@@ -237,7 +237,7 @@ public class Main {
 					new ForgeSlashCommand(),
 					new ScammerSlashCommand(),
 					new CategoriesSlashCommand(),
-						new FixApplicationSlashCommand()
+					new FixApplicationSlashCommand()
 				);
 
 		jda =

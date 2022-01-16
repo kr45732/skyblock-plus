@@ -39,13 +39,22 @@ public class FixApplicationSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		event.embed(FixApplicationCommand.getFixApplicationEmbed((TextChannel) event.getOption("channel").getAsGuildChannel(), event.getOptionInt("state", -1), event.getGuild()));
+		event.embed(
+			FixApplicationCommand.getFixApplicationEmbed(
+				(TextChannel) event.getOption("channel").getAsGuildChannel(),
+				event.getOptionInt("state", -1),
+				event.getGuild()
+			)
+		);
 	}
 
 	@Override
 	public CommandData getCommandData() {
-		return Commands.slash(name, "Fix an application if it's broken")
-				.addOptions(new OptionData(OptionType.CHANNEL, "channel", "Application channel", true).setChannelTypes(ChannelType.TEXT) ,
-						new OptionData(OptionType.INTEGER, "state", "State of the application", true).setRequiredRange(0, 3));
+		return Commands
+			.slash(name, "Fix an application if it's broken")
+			.addOptions(
+				new OptionData(OptionType.CHANNEL, "channel", "Application channel", true).setChannelTypes(ChannelType.TEXT),
+				new OptionData(OptionType.INTEGER, "state", "State of the application", true).setRequiredRange(0, 3)
+			);
 	}
 }
