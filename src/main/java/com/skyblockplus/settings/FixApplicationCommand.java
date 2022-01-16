@@ -97,7 +97,7 @@ public class FixApplicationCommand extends Command {
 			String botId = jda.getSelfUser().getId();
 			Message firstMessage = messages
 				.stream()
-				.filter(m -> m.getAuthor().getId().equals(botId) && m.getMentionedUsers().size() == 0
+				.filter(m -> m.getAuthor().getId().equals(botId) && m.getMentionedUsers().size() == 1
 				/*m.getContentRaw().contains(", this is your application for ")*/)
 				.findFirst()
 				.orElse(null);
