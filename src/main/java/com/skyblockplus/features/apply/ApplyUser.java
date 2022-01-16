@@ -126,7 +126,7 @@ public class ApplyUser implements Serializable {
 
 		getNameHistory(player.getUuid()).forEach(i -> nameHistory += "\n• " + fixUsername(i));
 		if (profileNames.length == 1) {
-			applicationChannel.sendMessage(applyingUser.getAsMention()).complete();
+			applicationChannel.sendMessage(applyingUser.getAsMention() + ", this is your application for " + capitalizeString(higherDepth(currentSettings, "guildName").getAsString().replace("_", " "))).complete();
 			caseOne(profileNames[0], currentSettings, applicationChannel);
 		} else {
 			EmbedBuilder welcomeEb = this.defaultPlayerEmbed();
@@ -157,7 +157,7 @@ public class ApplyUser implements Serializable {
 			);
 			profileEmojiToName.put("↩️", player.getProfileName());
 
-			Message reactMessage = applicationChannel.sendMessage(applyingUser.getAsMention()).setEmbeds(welcomeEb.build()).complete();
+			Message reactMessage = applicationChannel.sendMessage(applyingUser.getAsMention() + ", this is your application for " + capitalizeString(higherDepth(currentSettings, "guildName").getAsString().replace("_", " "))).setEmbeds(welcomeEb.build()).complete();
 			this.reactMessageId = reactMessage.getId();
 
 			for (String profileEmoji : profileEmojiToName.keySet()) {

@@ -173,7 +173,8 @@ public class Main {
 					new PartyCommand(),
 					new TimeCommand(),
 					new ForgeCommand(),
-					new ScammerCommand()
+					new ScammerCommand(),
+					new FixApplicationCommand()
 				)
 				.build();
 
@@ -235,7 +236,8 @@ public class Main {
 					new ReloadSlashCommand(),
 					new ForgeSlashCommand(),
 					new ScammerSlashCommand(),
-					new CategoriesSlashCommand()
+					new CategoriesSlashCommand(),
+						new FixApplicationSlashCommand()
 				);
 
 		jda =
