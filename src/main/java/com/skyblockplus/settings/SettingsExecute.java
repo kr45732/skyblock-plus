@@ -1832,7 +1832,10 @@ public class SettingsExecute {
 
 		try {
 			for (Entry<String, JsonElement> key : currentSettings.entrySet()) {
-				if ((key.getValue().isJsonPrimitive() && key.getValue().getAsString().length() == 0) || (key.getValue().isJsonArray() && key.getValue().getAsJsonArray().isEmpty())) {
+				if (
+					(key.getValue().isJsonPrimitive() && key.getValue().getAsString().length() == 0) ||
+					(key.getValue().isJsonArray() && key.getValue().getAsJsonArray().isEmpty())
+				) {
 					return false;
 				}
 			}

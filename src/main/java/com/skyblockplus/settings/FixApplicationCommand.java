@@ -214,7 +214,9 @@ public class FixApplicationCommand extends Command {
 					.stream()
 					.filter(m -> {
 						try {
-							return m.getAuthor().getId().equals(botId) && m.getEmbeds().get(0).getTitle().replace(" ♻️", "").equals(username);
+							return (
+								m.getAuthor().getId().equals(botId) && m.getEmbeds().get(0).getTitle().replace(" ♻️", "").equals(username)
+							);
 						} catch (Exception e) {
 							return false;
 						}

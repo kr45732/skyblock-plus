@@ -837,7 +837,7 @@ public class HelpCommand extends Command {
 			help.create("settings delete hypixel_key", "Delete the set Hypixel API key of this server") +
 			help.create("settings delete prefix", "Reset the prefix of the bot") +
 			help.create("settings delete all", "Delete the current server settings") +
-					help.create("settings fix_application <#channel> <state>", "Fix an application")
+			help.create("settings fix_application <#channel> <state>", "Fix an application")
 		);
 
 		paginateBuilder.addItems(
