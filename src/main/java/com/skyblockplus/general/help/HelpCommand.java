@@ -472,13 +472,13 @@ public class HelpCommand extends Command {
 									"Set the role that will be removed on verifying and re-added when un-verifying.",
 									"remove_role <@role>"
 								),
-								new HelpData("sync", "Enable or disable verify member join sync")
+								new HelpData("sync", "Enable or disable verify automatic sync")
 									.addSubcommands(
 										new HelpData(
 											"true",
-											"Enable verification join sync. This will sync the verified role(s) and nickname when a user joins the server."
+											"Enable verification automatic sync. This will sync the verified role(s) and nickname when a user joins the server or every 3 hours."
 										),
-										new HelpData("false", "Disable verification member join sync")
+										new HelpData("false", "Disable verification automatic sync")
 									)
 							),
 						new HelpData("roles", "Main command for automatic roles settings.")

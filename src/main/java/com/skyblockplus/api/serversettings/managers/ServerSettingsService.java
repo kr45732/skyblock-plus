@@ -571,7 +571,7 @@ public class ServerSettingsService {
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 
-	public ResponseEntity<HttpStatus> setFetchurChannelId(String serverId, String newChannelId) {
+	public ResponseEntity<HttpStatus> setFetchurChannel(String serverId, String newChannelId) {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
 		if (currentServerSettings != null) {
@@ -588,6 +588,30 @@ public class ServerSettingsService {
 
 		if (currentServerSettings != null) {
 			currentServerSettings.setFetchurRole(newRoleId);
+			settingsRepository.save(currentServerSettings);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	}
+
+	public ResponseEntity<HttpStatus> setMayorChannel(String serverId, String newChannelId) {
+		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+		if (currentServerSettings != null) {
+			currentServerSettings.setMayorChannel(newChannelId);
+			settingsRepository.save(currentServerSettings);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	}
+
+	public ResponseEntity<HttpStatus> setMayorRole(String serverId, String newRoleId) {
+		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+		if (currentServerSettings != null) {
+			currentServerSettings.setMayorRole(newRoleId);
 			settingsRepository.save(currentServerSettings);
 			return new ResponseEntity<>(HttpStatus.OK);
 		}

@@ -28,6 +28,7 @@ import com.skyblockplus.dev.*;
 import com.skyblockplus.dungeons.*;
 import com.skyblockplus.features.fetchur.FetchurHandler;
 import com.skyblockplus.features.listeners.MainListener;
+import com.skyblockplus.features.mayor.MayorHandler;
 import com.skyblockplus.features.party.PartyCommand;
 import com.skyblockplus.features.party.PartySlashCommand;
 import com.skyblockplus.features.setup.SetupCommand;
@@ -267,6 +268,7 @@ public class Main {
 		AuctionFlipper.setEnable(true);
 		PublicEndpoints.initialize();
 		FetchurHandler.initialize();
+		MayorHandler.initialize();
 		File transcriptDir = new File("src/main/java/com/skyblockplus/json/application_transcripts/");
 		if (!transcriptDir.exists()) {
 			log.info((transcriptDir.mkdirs() ? "Successfully created" : "Failed to create") + " application transcript directory");

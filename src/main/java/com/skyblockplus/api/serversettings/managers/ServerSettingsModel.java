@@ -79,6 +79,9 @@ public class ServerSettingsModel {
 	private String fetchurChannel = "";
 	private String fetchurRole = "";
 
+	private String mayorChannel = "";
+	private String mayorRole = "";
+
 	@ElementCollection(fetch = FetchType.EAGER)
 	@Fetch(value = FetchMode.SUBSELECT)
 	private List<String> botManagerRoles = new ArrayList<>();

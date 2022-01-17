@@ -175,6 +175,16 @@ public class FixApplicationCommand extends Command {
 				String url = submitAppMessage.getEmbeds().get(0).getUrl();
 				applicationJson.addProperty("playerProfileName", url.substring(url.lastIndexOf("/") + 1));
 				applicationJson.addProperty("ironmanSymbol", submitAppMessage.getEmbeds().get(0).getTitle().endsWith(" ♻️") ? " ♻️" : "");
+
+				List<Message> toDeleteSubmitAppMessages = messages.stream().filter(m -> {
+					if(m.getAuthor().getId().equals(botId) && m.getContentRaw().equals("❌ This button has been disabled")){
+						Message repliedMessage = m.getReferencedMessage();
+						return repliedMessage != null && repliedMessage.getId().equals(submitAppMessage.getId());
+					}
+					return false;
+				}).limit(100).collect(Collectors.toList());
+				channel.purgeMessages(toDeleteSubmitAppMessages);
+
 				submitAppMessage
 					.editMessageComponents(
 						submitAppMessage
@@ -207,10 +217,11 @@ public class FixApplicationCommand extends Command {
 				TextChannel staffChannel = guild.getTextChannelById(higherDepth(settings, "applyStaffChannel").getAsString());
 				applicationJson.addProperty("staffChannelId", staffChannel.getId());
 
-				Message staffMessage = staffChannel
-					.getIterableHistory()
-					.takeAsync(100)
-					.get()
+				List<Message> staffMessages = staffChannel
+						.getIterableHistory()
+						.takeAsync(100)
+						.get();
+				Message staffMessage = staffMessages
 					.stream()
 					.filter(m -> {
 						try {
@@ -226,6 +237,15 @@ public class FixApplicationCommand extends Command {
 				if (staffMessage == null) {
 					return invalidEmbed("Unable to find staff accept/waitlist/deny message in the past 100 messages");
 				}
+
+				List<Message> toDeleteStaffMsg = staffMessages.stream().filter(m -> {
+					if(m.getAuthor().getId().equals(botId) && m.getContentRaw().equals("❌ This button has been disabled")){
+						Message repliedMessage = m.getReferencedMessage();
+						return repliedMessage != null && repliedMessage.getId().equals(staffMessage.getId());
+					}
+					return false;
+				}).limit(100).collect(Collectors.toList());
+				staffChannel.purgeMessages(toDeleteStaffMsg);
 
 				applicationJson.addProperty("reactMessageId", staffMessage.getId());
 				staffMessage

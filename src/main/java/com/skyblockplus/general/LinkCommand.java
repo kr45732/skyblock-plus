@@ -112,7 +112,7 @@ public class LinkCommand extends Command {
 						toRemoveRoles.add(guild.getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString()));
 					} catch (Exception ignored) {}
 					if (!toAddRoles.isEmpty() || !toRemoveRoles.isEmpty()) {
-						guild.modifyMemberRoles(member, toAddRoles, toRemoveRoles).complete();
+						guild.modifyMemberRoles(member, toAddRoles, toRemoveRoles).queue();
 					}
 				} catch (Exception ignored) {}
 			}

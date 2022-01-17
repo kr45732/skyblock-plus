@@ -109,6 +109,8 @@ public class SettingsExecute {
 				case "guest_role" -> eb = setApplyGuestRole(args[3]);
 				case "fetchur_channel" -> eb = setFetchurChannel(args[3]);
 				case "fetchur_ping" -> eb = setFetchurPing(args[3]);
+				case "mayor_channel" -> eb = setMayorChannel(args[3]);
+				case "mayor_ping" -> eb = setMayorPing(args[3]);
 			}
 		} else if (
 			(args.length == 4 || args.length == 5 || content.split(" ", 6).length == 6) &&
@@ -158,11 +160,11 @@ public class SettingsExecute {
 			String hypixelKey = database.getServerHypixelApiKey(guild.getId());
 			eb.addField("Hypixel API Key", hypixelKey != null && !hypixelKey.isEmpty() ? "Hidden" : "Not set", false);
 			String fetchurChannel = higherDepth(currentSettings, "fetchurChannel", "none");
-			eb.addField("Fetchur Notifications Channel", fetchurChannel.equals("none") ? "None" : "<#" + fetchurChannel + ">", false);
+			eb.addField("Fetchur Notifications Channel", fetchurChannel.equals("none") || fetchurChannel.isEmpty() ? "None" : "<#" + fetchurChannel + ">", false);
 			String fetchurRole = higherDepth(currentSettings, "fetchurRole", "none");
-			eb.addField("Fetchur Ping Role", fetchurRole.equals("none") ? "None" : "<@&" + fetchurRole + ">", false);
+			eb.addField("Fetchur Ping Role", fetchurRole.equals("none") || fetchurRole.isEmpty() ? "None" : "<@&" + fetchurRole + ">", false);
 			String applyGuestRole = higherDepth(currentSettings, "applyGuestRole", "none");
-			eb.addField("Guest Role", applyGuestRole.equals("none") ? "None" : "<@&" + applyGuestRole + ">", false);
+			eb.addField("Guest Role", applyGuestRole.equals("none") || applyGuestRole.isEmpty() ? "None" : "<@&" + applyGuestRole + ">", false);
 			String botManagerRoles = streamJsonArray(higherDepth(currentSettings, "botManagerRoles").getAsJsonArray())
 				.map(r -> "<@&" + r.getAsString() + ">")
 				.collect(Collectors.joining(" "));
@@ -1819,7 +1821,7 @@ public class SettingsExecute {
 		ebFieldString += "\n**• Verified Role(s):** " + displaySettings(verifySettings, "verifiedRoles");
 		ebFieldString += "\n**• Verified Remove Role:** " + displaySettings(verifySettings, "verifiedRemoveRole");
 		ebFieldString += "\n**• Nickname Template:** " + displaySettings(verifySettings, "verifiedNickname");
-		ebFieldString += "\n**• Member join sync:** " + displaySettings(verifySettings, "enableMemberJoinSync");
+		ebFieldString += "\n**• Automatic sync:** " + displaySettings(verifySettings, "enableAutomaticSync");
 		return ebFieldString;
 	}
 
@@ -1827,7 +1829,7 @@ public class SettingsExecute {
 		JsonObject currentSettings = database.getVerifySettings(guild.getId()).getAsJsonObject();
 		currentSettings.remove("previousMessageId");
 		currentSettings.remove("verifiedNickname");
-		currentSettings.remove("enableMemberJoinSync");
+		currentSettings.remove("enableAutomaticSync");
 		currentSettings.remove("verifiedRemoveRole");
 
 		try {
@@ -2026,22 +2028,22 @@ public class SettingsExecute {
 		JsonObject currentSettings = database.getVerifySettings(guild.getId()).getAsJsonObject();
 
 		String nickname = higherDepth(currentSettings, "verifiedNickname").getAsString();
-		if ((nickname.isEmpty() || nickname.equals("none")) && higherDepth(currentSettings, "verifiedRoles").getAsJsonArray().size() == 0) {
+		if (!nickname.contains("[IGN]") && higherDepth(currentSettings, "verifiedRoles").getAsJsonArray().isEmpty()) {
 			return invalidEmbed("You must have at least on verify role or a nickname template set.");
 		}
 
-		int responseCode = updateVerifySettings("enableMemberJoinSync", "" + enable);
+		int responseCode = updateVerifySettings("enableAutomaticSync", "" + enable);
 		if (responseCode != 200) {
 			return apiFailMessage(responseCode);
 		}
 
-		return defaultSettingsEmbed("Member join sync " + (enable ? "enabled" : "disabled"));
+		return defaultSettingsEmbed("Automatic sync " + (enable ? "enabled" : "disabled"));
 	}
 
 	public int updateVerifySettings(String key, String newValue) {
 		JsonObject newVerifySettings = database.getVerifySettings(guild.getId()).getAsJsonObject();
 		newVerifySettings.addProperty(key, newValue);
-		if (key.equals("verifiedNickname") || key.equals("enableMemberJoinSync")) {
+		if (key.equals("verifiedNickname") || key.equals("enableAutomaticSync")) {
 			guildMap.get(guild.getId()).verifyGuild.reloadSettingsJson(newVerifySettings);
 		}
 		return database.setVerifySettings(guild.getId(), newVerifySettings);
@@ -2099,7 +2101,7 @@ public class SettingsExecute {
 
 	public EmbedBuilder setFetchurChannel(String channelMention) {
 		if (channelMention.equalsIgnoreCase("none")) {
-			int responseCode = database.setFetchurChannelId(guild.getId(), "none");
+			int responseCode = database.setFetchurChannel(guild.getId(), "none");
 			if (responseCode != 200) {
 				return apiFailMessage(responseCode);
 			}
@@ -2112,7 +2114,7 @@ public class SettingsExecute {
 			}
 			TextChannel channel = (TextChannel) eb;
 
-			int responseCode = database.setFetchurChannelId(guild.getId(), channel.getId());
+			int responseCode = database.setFetchurChannel(guild.getId(), channel.getId());
 			if (responseCode != 200) {
 				return apiFailMessage(responseCode);
 			}
@@ -2181,6 +2183,57 @@ public class SettingsExecute {
 
 		guildMap.get(guild.getId()).setFetchurPing(role);
 		return defaultSettingsEmbed("Set fetchur ping to: " + role.getAsMention());
+	}
+
+	public EmbedBuilder setMayorChannel(String channelMention) {
+		if (channelMention.equalsIgnoreCase("none")) {
+			int responseCode = database.setMayorChannel(guild.getId(), "none");
+			if (responseCode != 200) {
+				return apiFailMessage(responseCode);
+			}
+			guildMap.get(guild.getId()).setMayorChannel(null);
+			return defaultSettingsEmbed("**Mayor notifications disabled**");
+		} else {
+			Object eb = checkTextChannel(channelMention);
+			if (eb instanceof EmbedBuilder e) {
+				return e;
+			}
+			TextChannel channel = (TextChannel) eb;
+
+			int responseCode = database.setMayorChannel(guild.getId(), channel.getId());
+			if (responseCode != 200) {
+				return apiFailMessage(responseCode);
+			}
+
+			guildMap.get(guild.getId()).setFetchurChannel(channel);
+			return defaultSettingsEmbed("**Mayor notifications channel set to:** " + channel.getAsMention());
+		}
+	}
+
+	public EmbedBuilder setMayorPing(String roleMention) {
+		if (roleMention.equalsIgnoreCase("none")) {
+			int responseCode = database.setMayorRole(guild.getId(), "none");
+			if (responseCode != 200) {
+				return apiFailMessage(responseCode);
+			}
+
+			guildMap.get(guild.getId()).setMayorPing(null);
+			return defaultSettingsEmbed("Set mayor ping to: none");
+		}
+
+		Object eb = checkRole(roleMention);
+		if (eb instanceof EmbedBuilder e) {
+			return e;
+		}
+		Role role = ((Role) eb);
+
+		int responseCode = database.setMayorRole(guild.getId(), role.getId());
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		guildMap.get(guild.getId()).setMayorPing(role);
+		return defaultSettingsEmbed("Set mayor ping to: " + role.getAsMention());
 	}
 
 	public EmbedBuilder addBotManagerRole(String roleMention) {

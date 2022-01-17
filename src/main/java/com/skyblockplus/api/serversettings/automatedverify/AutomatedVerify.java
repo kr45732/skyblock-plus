@@ -53,5 +53,5 @@ public class AutomatedVerify {
 
 	private String previousMessageId = "";
 
-	private String enableMemberJoinSync = "false";
+	private String enableAutomaticSync = "false";
 }

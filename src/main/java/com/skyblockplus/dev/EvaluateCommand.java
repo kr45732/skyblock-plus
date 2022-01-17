@@ -94,7 +94,7 @@ public class EvaluateCommand extends Command {
 			@Override
 			protected void execute() {
 				setArgs(2);
-				Message ebMessage = event.getChannel().sendMessage("Loading").complete();
+				ebMessage = event.getChannel().sendMessage("Loading").complete();
 
 				if (args.length < 2) {
 					ebMessage.editMessage("Invalid Input").queue();

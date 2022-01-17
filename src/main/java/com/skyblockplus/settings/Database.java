@@ -195,12 +195,20 @@ public class Database {
 		return settingsService.setJacobSettings(serverId, gson.fromJson(newSettings, JacobSettings.class)).getStatusCodeValue();
 	}
 
-	public int setFetchurChannelId(String serverId, String newSettings) {
-		return settingsService.setFetchurChannelId(serverId, newSettings).getStatusCodeValue();
+	public int setFetchurChannel(String serverId, String newSettings) {
+		return settingsService.setFetchurChannel(serverId, newSettings).getStatusCodeValue();
 	}
 
 	public int setFetchurRole(String serverId, String newSettings) {
 		return settingsService.setFetchurRole(serverId, newSettings).getStatusCodeValue();
+	}
+
+	public int setMayorChannel(String serverId, String newSettings) {
+		return settingsService.setMayorChannel(serverId, newSettings).getStatusCodeValue();
+	}
+
+	public int setMayorRole(String serverId, String newSettings) {
+		return settingsService.setMayorRole(serverId, newSettings).getStatusCodeValue();
 	}
 
 	public boolean insertLinkedAccount(LinkedAccount linkedAccount) {

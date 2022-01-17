@@ -87,7 +87,7 @@ public class VerifyGuild {
 	}
 
 	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
-		if (!higherDepth(verifySettings, "enableMemberJoinSync", "false").equals("true")) {
+		if (!higherDepth(verifySettings, "enableAutomaticSync", "false").equals("true")) {
 			return;
 		}
 
@@ -183,7 +183,7 @@ public class VerifyGuild {
 	}
 
 	public void reloadSettingsJson(JsonElement newVerifySettings) {
-		if (higherDepth(newVerifySettings, "enableMemberJoinSync", "").equals("true")) {
+		if (higherDepth(newVerifySettings, "enableAutomaticSync", "").equals("true")) {
 			verifySettings = database.getVerifySettings(guildId);
 		}
 	}

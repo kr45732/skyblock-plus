@@ -107,8 +107,7 @@ public class EssenceWaiter {
 		validReactions.clear();
 		startingLevel = essenceEmojiMap.get(event.getReactionEmote().getName());
 		reactMessage.clearReactions().complete();
-		EmbedBuilder eb = defaultEmbed("Essence upgrade for " + itemName);
-		eb.setDescription("Choose the ending item level");
+		EmbedBuilder eb = defaultEmbed("Essence upgrade for " + itemName).setDescription("Choose the ending item level");
 
 		StringBuilder levelsString = new StringBuilder();
 		for (int i = (startingLevel + 1); i <= 5; i++) {
