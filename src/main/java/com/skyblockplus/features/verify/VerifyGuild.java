@@ -82,7 +82,7 @@ public class VerifyGuild {
 			}
 		}
 
-		event.getMessage().delete().queueAfter(8, TimeUnit.SECONDS, ignored -> {}, ignored -> {});
+		event.getMessage().delete().queueAfter(8, TimeUnit.SECONDS, ignore, ignore);
 		return true;
 	}
 
@@ -178,7 +178,7 @@ public class VerifyGuild {
 							)
 							.build()
 					)
-					.queue(ignored -> {}, ignored -> {})
+					.queue(ignore, ignore)
 			);
 	}
 

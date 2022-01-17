@@ -53,6 +53,7 @@ import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -437,7 +438,7 @@ public class AutomaticGuild {
 
 					String nicknameTemplate = higherDepth(verifySettings, "verifiedNickname").getAsString();
 					if (nicknameTemplate.contains("[IGN]")) {
-						nicknameTemplate.replace("[IGN]", linkedAccount.username());
+						nicknameTemplate = nicknameTemplate.replace("[IGN]", linkedAccount.username());
 
 						if (nicknameTemplate.contains("[GUILD_RANK]") && guildSettings != null && !guildSettings.isEmpty()) {
 							try {
@@ -463,8 +464,9 @@ public class AutomaticGuild {
 							} catch (Exception ignored) {}
 						}
 
-						linkedMember.modifyNickname(nicknameTemplate).queue();
+						linkedMember.modifyNickname(nicknameTemplate).queue(ignore, ignore);
 					}
+
 
 					try {
 						List<Role> toAddRoles = streamJsonArray(higherDepth(verifySettings, "verifiedRoles").getAsJsonArray())
@@ -550,7 +552,7 @@ public class AutomaticGuild {
 							}
 
 							try {
-								guild.modifyMemberRoles(linkedUser, rolesToAdd, rolesToRemove).complete();
+								guild.modifyMemberRoles(linkedUser, rolesToAdd, rolesToRemove).queue(ignore, ignore);
 							} catch (Exception ignored) {}
 
 							memberCountList.add(linkedUser.getId());
@@ -573,17 +575,10 @@ public class AutomaticGuild {
 							continue;
 						}
 
-						if (curVc.getName().split(":").length == 2) {
-							curVc
-								.getManager()
-								.setName(curVc.getName().split(":")[0].trim() + ": " + guildMembers.size() + "/125")
-								.complete();
-						} else {
-							curVc
-								.getManager()
-								.setName(response.get("name").getAsString() + " Members: " + guildMembers.size() + "/125")
-								.complete();
-						}
+						curVc
+							.getManager()
+							.setName(curVc.getName().split(":").length == 2 ? curVc.getName().split(":")[0].trim() + ": " + guildMembers.size() + "/125" : response.get("name").getAsString() + " Members: " + guildMembers.size() + "/125")
+							.queue();
 
 						counterUpdate++;
 					}

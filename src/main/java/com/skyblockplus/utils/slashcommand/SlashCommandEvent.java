@@ -19,6 +19,7 @@
 package com.skyblockplus.utils.slashcommand;
 
 import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.Utils.ignore;
 import static com.skyblockplus.utils.Utils.invalidEmbed;
 
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
@@ -82,7 +83,7 @@ public class SlashCommandEvent extends SlashCommandInteractionEvent {
 	}
 
 	public void embed(EmbedBuilder eb) {
-		getHook().editOriginalEmbeds(eb.build()).queue(ignored -> {}, ignored -> {});
+		getHook().editOriginalEmbeds(eb.build()).queue(ignore, ignore);
 	}
 
 	private boolean getLinkedUser(String id) {
@@ -119,14 +120,14 @@ public class SlashCommandEvent extends SlashCommandInteractionEvent {
 
 	public void paginate(EmbedBuilder failEmbed, boolean deleteOriginal) {
 		if (failEmbed != null) {
-			getHook().editOriginalEmbeds(failEmbed.build()).queue(ignored -> {}, ignored -> {});
+			getHook().editOriginalEmbeds(failEmbed.build()).queue(ignore, ignore);
 		} else if (deleteOriginal) {
 			getHook().deleteOriginal().queue();
 		}
 	}
 
 	public void string(String string) {
-		getHook().editOriginal(string).queue(ignored -> {}, ignored -> {});
+		getHook().editOriginal(string).queue(ignore, ignore);
 	}
 
 	public Member getSelfMember() {

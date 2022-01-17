@@ -89,7 +89,7 @@ public abstract class SlashCommand {
 										)
 											.build()
 									)
-									.queue(ignored -> {}, ignored -> {})
+									.queue(ignore, ignore)
 							);
 					} else {
 						event.embed(invalidEmbed("I need the " + p.getName() + " permission in this channel!"));

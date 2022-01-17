@@ -128,7 +128,7 @@ public class TrackAuctionsCommand extends Command {
 											)
 											.build()
 									)
-									.queue(ignored -> {}, ignored -> {})
+									.queue(ignore, ignore)
 							)
 					);
 			}

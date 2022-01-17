@@ -93,19 +93,19 @@ public abstract class CommandExecute extends CommandEvent {
 	}
 
 	protected void embed(EmbedBuilder embedBuilder) {
-		ebMessage.editMessageEmbeds(embedBuilder.build()).queue(ignored -> {}, ignored -> {});
+		ebMessage.editMessageEmbeds(embedBuilder.build()).queue(ignore, ignore);
 	}
 
 	protected void paginate(EmbedBuilder embedBuilder) {
 		if (embedBuilder == null) {
-			ebMessage.delete().queue(ignored -> {}, ignored -> {});
+			ebMessage.delete().queue(ignore, ignore);
 		} else {
-			ebMessage.editMessageEmbeds(embedBuilder.build()).queue(ignored -> {}, ignored -> {});
+			ebMessage.editMessageEmbeds(embedBuilder.build()).queue(ignore, ignore);
 		}
 	}
 
 	protected void sendErrorEmbed() {
-		ebMessage.editMessageEmbeds(errorEmbed(command.getName()).build()).queue(ignored -> {}, ignored -> {});
+		ebMessage.editMessageEmbeds(errorEmbed(command.getName()).build()).queue(ignore, ignore);
 	}
 
 	/**
@@ -149,7 +149,7 @@ public abstract class CommandExecute extends CommandEvent {
 
 		ebMessage
 			.editMessageEmbeds(invalidEmbed("<@" + userId + "> is not linked to the bot.").build())
-			.queue(ignored -> {}, ignored -> {});
+			.queue(ignore, ignore);
 		return true;
 	}
 

@@ -52,6 +52,7 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -109,6 +110,7 @@ public class Utils {
 	public static final Gson formattedGson = new GsonBuilder().setPrettyPrinting().create();
 	private static final Pattern mcColorPattern = Pattern.compile("(?i)\\u00A7[0-9A-FK-OR]");
 	private static final Logger log = LoggerFactory.getLogger(Utils.class);
+	public static final Consumer<Object> ignore = ignored -> {};
 	/* Configuration File */
 	public static String HYPIXEL_API_KEY = "";
 	public static String BOT_TOKEN = "";
@@ -644,7 +646,7 @@ public class Utils {
 			.setEventWaiter(waiter)
 			.setColumns(1)
 			.setItemsPerPage(1)
-			.setFinalAction(m -> m.editMessageComponents().queue(ignored -> {}, ignored -> {}))
+			.setFinalAction(m -> m.editMessageComponents().queue(ignore, ignore))
 			.setTimeout(30, TimeUnit.SECONDS)
 			.setColor(botColor)
 			.setUsers(eventAuthor);
