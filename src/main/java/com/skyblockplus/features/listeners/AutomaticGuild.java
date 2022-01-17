@@ -467,7 +467,6 @@ public class AutomaticGuild {
 						linkedMember.modifyNickname(nicknameTemplate).queue(ignore, ignore);
 					}
 
-
 					try {
 						List<Role> toAddRoles = streamJsonArray(higherDepth(verifySettings, "verifiedRoles").getAsJsonArray())
 							.map(e -> {
@@ -577,7 +576,11 @@ public class AutomaticGuild {
 
 						curVc
 							.getManager()
-							.setName(curVc.getName().split(":").length == 2 ? curVc.getName().split(":")[0].trim() + ": " + guildMembers.size() + "/125" : response.get("name").getAsString() + " Members: " + guildMembers.size() + "/125")
+							.setName(
+								curVc.getName().split(":").length == 2
+									? curVc.getName().split(":")[0].trim() + ": " + guildMembers.size() + "/125"
+									: response.get("name").getAsString() + " Members: " + guildMembers.size() + "/125"
+							)
 							.queue();
 
 						counterUpdate++;

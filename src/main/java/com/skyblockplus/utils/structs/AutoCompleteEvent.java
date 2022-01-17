@@ -18,11 +18,11 @@
 
 package com.skyblockplus.utils.structs;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.CommandAutoCompleteInteraction;
-
-import static com.skyblockplus.utils.Utils.*;
 
 public class AutoCompleteEvent extends CommandAutoCompleteInteractionEvent {
 

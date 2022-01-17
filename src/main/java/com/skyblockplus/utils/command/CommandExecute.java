@@ -147,9 +147,7 @@ public abstract class CommandExecute extends CommandEvent {
 			return false;
 		}
 
-		ebMessage
-			.editMessageEmbeds(invalidEmbed("<@" + userId + "> is not linked to the bot.").build())
-			.queue(ignore, ignore);
+		ebMessage.editMessageEmbeds(invalidEmbed("<@" + userId + "> is not linked to the bot.").build()).queue(ignore, ignore);
 		return true;
 	}
 
