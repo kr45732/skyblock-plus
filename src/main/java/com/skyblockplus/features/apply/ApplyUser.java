@@ -129,7 +129,7 @@ public class ApplyUser implements Serializable {
 			applicationChannel
 				.sendMessage(
 					applyingUser.getAsMention() +
-					", this is your application for " +
+					" this is your application for " +
 					capitalizeString(higherDepth(currentSettings, "guildName").getAsString().replace("_", " "))
 				)
 				.complete();
@@ -166,7 +166,7 @@ public class ApplyUser implements Serializable {
 			Message reactMessage = applicationChannel
 				.sendMessage(
 					applyingUser.getAsMention() +
-					", this is your application for " +
+					" this is your application for " +
 					capitalizeString(higherDepth(currentSettings, "guildName").getAsString().replace("_", " "))
 				)
 				.setEmbeds(welcomeEb.build())

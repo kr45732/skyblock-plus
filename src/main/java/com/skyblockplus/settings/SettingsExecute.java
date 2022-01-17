@@ -1826,10 +1826,13 @@ public class SettingsExecute {
 	public boolean allowVerifyEnable() {
 		JsonObject currentSettings = database.getVerifySettings(guild.getId()).getAsJsonObject();
 		currentSettings.remove("previousMessageId");
+		currentSettings.remove("verifiedNickname");
+		currentSettings.remove("enableMemberJoinSync");
+		currentSettings.remove("verifiedRemoveRole");
 
 		try {
 			for (Entry<String, JsonElement> key : currentSettings.entrySet()) {
-				if (key.getValue().getAsString().length() == 0) {
+				if ((key.getValue().isJsonPrimitive() && key.getValue().getAsString().length() == 0) || (key.getValue().isJsonArray() && key.getValue().getAsJsonArray().isEmpty())) {
 					return false;
 				}
 			}

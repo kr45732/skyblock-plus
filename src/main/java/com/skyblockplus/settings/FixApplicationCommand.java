@@ -44,7 +44,7 @@ public class FixApplicationCommand extends Command {
 
 	public FixApplicationCommand() {
 		this.name = "fix-application";
-		this.cooldown = globalCooldown;
+		this.cooldown = globalCooldown + 1;
 		this.botPermissions = defaultPerms();
 		this.aliases = new String[] { "fix" };
 	}
@@ -97,8 +97,7 @@ public class FixApplicationCommand extends Command {
 			String botId = jda.getSelfUser().getId();
 			Message firstMessage = messages
 				.stream()
-				.filter(m -> m.getAuthor().getId().equals(botId) && m.getMentionedUsers().size() == 1
-				/*m.getContentRaw().contains(", this is your application for ")*/)
+				.filter(m -> m.getAuthor().getId().equals(botId) && m.getContentRaw().contains(" this is your application for "))
 				.findFirst()
 				.orElse(null);
 			if (firstMessage == null) {
@@ -106,7 +105,7 @@ public class FixApplicationCommand extends Command {
 			}
 
 			User applicant = firstMessage.getMentionedUsers().get(0);
-			String guildName = "ironman_casuals"; //firstMessage.getContentRaw().split(", this is your application for ")[1].replace(" ", "_").toLowerCase();
+			String guildName = firstMessage.getContentRaw().split(" this is your application for ")[1].replace(" ", "_").toLowerCase();
 			JsonObject settings = database.getGuildSettings(guild.getId(), guildName).getAsJsonObject();
 			settings.remove("applyUsersCache");
 			boolean logApplication = false;
@@ -215,7 +214,7 @@ public class FixApplicationCommand extends Command {
 					.stream()
 					.filter(m -> {
 						try {
-							return m.getAuthor().getId().equals(botId) && m.getEmbeds().get(0).getTitle().equals(username);
+							return m.getAuthor().getId().equals(botId) && m.getEmbeds().get(0).getTitle().replace(" ♻️", "").equals(username);
 						} catch (Exception e) {
 							return false;
 						}
@@ -268,7 +267,7 @@ public class FixApplicationCommand extends Command {
 			return defaultEmbed("Success").setDescription("Fixed & retrieved application successfully: " + makeHastePost(applicationJson));
 		} catch (Exception e) {
 			Main.log.error("Error when retrieving application", e);
-			return invalidEmbed("Error when fixing application: " + e.getMessage());
+			return invalidEmbed("Error when fixing application, please report this to the developer:\n```" + e.getMessage() + "```");
 		}
 	}
 }

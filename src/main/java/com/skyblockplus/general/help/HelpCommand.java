@@ -396,22 +396,22 @@ public class HelpCommand extends Command {
 								new HelpData(
 									"prefix",
 									"Set the prefix of the bot. Must be a least one character and no more than five.",
-									"prefix [prefix]"
+									"prefix <prefix>"
 								),
 								new HelpData(
 									"fetchur_channel",
 									"Set the channel where fetchur notifications will be posted at 12 am EST every day.",
-									"fetchur_channel [#channel]"
+									"fetchur_channel <#channel>"
 								),
 								new HelpData(
 									"fetchur_ping",
 									"Set the role that will be pinged with the daily fetchur notifications.",
-									"fetchur_ping [@role]"
+									"fetchur_ping <@role>"
 								),
 								new HelpData(
 									"guest_role",
 									"Set the role that will be given to linked users that are not in any of the setup automatic guilds. Requires at least one automatic guild to be setup.",
-									"guest_role [@role]"
+									"guest_role <@role>"
 								)
 							),
 						new HelpData("bot_manager", "Manage bot manager roles.")
@@ -419,9 +419,9 @@ public class HelpCommand extends Command {
 								new HelpData(
 									"add",
 									"Add a bot manager role. This allows members with this role to use features that are admin only.",
-									"add [@role]"
+									"add <@role>"
 								),
-								new HelpData("remove", "Remove a bot manager role.", "remove [@role]")
+								new HelpData("remove", "Remove a bot manager role.", "remove <@role>")
 							),
 						new HelpData("jacob", "Main command for jacob event settings.")
 							.addSecondData("Get the current farming event settings for the bot.", "jacob")
@@ -475,10 +475,10 @@ public class HelpCommand extends Command {
 								new HelpData("sync", "Enable or disable verify member join sync")
 									.addSubcommands(
 										new HelpData(
-											"enable",
+											"true",
 											"Enable verification join sync. This will sync the verified role(s) and nickname when a user joins the server."
 										),
-										new HelpData("disable", "Disable verification member join sync")
+										new HelpData("false", "Disable verification member join sync")
 									)
 							),
 						new HelpData("roles", "Main command for automatic roles settings.")
@@ -836,7 +836,8 @@ public class HelpCommand extends Command {
 			help.create("settings bot_manager remove <@role>", "Remove a bot manager role") +
 			help.create("settings delete hypixel_key", "Delete the set Hypixel API key of this server") +
 			help.create("settings delete prefix", "Reset the prefix of the bot") +
-			help.create("settings delete all", "Delete the current server settings")
+			help.create("settings delete all", "Delete the current server settings") +
+					help.create("settings fix_application <#channel> <state>", "Fix an application")
 		);
 
 		paginateBuilder.addItems(
@@ -859,7 +860,7 @@ public class HelpCommand extends Command {
 			) +
 			help.create("settings verify nickname [prefix] [IGN] [postfix]", "The nickname template on verifying. Can be set to none.") +
 			help.create("settings verify remove_role <@role>", "Role that will be removed on verifying and re-added when un-verifying") +
-			help.create("settings verify <enable|disable> sync", "Enable or disable automatic verify role and nickname syncing")
+			help.create("settings verify sync <true|false>", "Enable or disable automatic verify role and nickname syncing")
 		);
 
 		paginateBuilder.addItems(
