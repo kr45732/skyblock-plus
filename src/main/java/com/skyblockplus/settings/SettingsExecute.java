@@ -160,11 +160,23 @@ public class SettingsExecute {
 			String hypixelKey = database.getServerHypixelApiKey(guild.getId());
 			eb.addField("Hypixel API Key", hypixelKey != null && !hypixelKey.isEmpty() ? "Hidden" : "Not set", false);
 			String fetchurChannel = higherDepth(currentSettings, "fetchurChannel", "none");
-			eb.addField("Fetchur Notifications Channel", fetchurChannel.equals("none") || fetchurChannel.isEmpty() ? "None" : "<#" + fetchurChannel + ">", false);
+			eb.addField(
+				"Fetchur Notifications Channel",
+				fetchurChannel.equals("none") || fetchurChannel.isEmpty() ? "None" : "<#" + fetchurChannel + ">",
+				false
+			);
 			String fetchurRole = higherDepth(currentSettings, "fetchurRole", "none");
-			eb.addField("Fetchur Ping Role", fetchurRole.equals("none") || fetchurRole.isEmpty() ? "None" : "<@&" + fetchurRole + ">", false);
+			eb.addField(
+				"Fetchur Ping Role",
+				fetchurRole.equals("none") || fetchurRole.isEmpty() ? "None" : "<@&" + fetchurRole + ">",
+				false
+			);
 			String applyGuestRole = higherDepth(currentSettings, "applyGuestRole", "none");
-			eb.addField("Guest Role", applyGuestRole.equals("none") || applyGuestRole.isEmpty() ? "None" : "<@&" + applyGuestRole + ">", false);
+			eb.addField(
+				"Guest Role",
+				applyGuestRole.equals("none") || applyGuestRole.isEmpty() ? "None" : "<@&" + applyGuestRole + ">",
+				false
+			);
 			String botManagerRoles = streamJsonArray(higherDepth(currentSettings, "botManagerRoles").getAsJsonArray())
 				.map(r -> "<@&" + r.getAsString() + ">")
 				.collect(Collectors.joining(" "));

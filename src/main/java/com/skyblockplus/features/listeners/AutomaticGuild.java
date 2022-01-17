@@ -55,7 +55,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
@@ -378,23 +377,29 @@ public class AutomaticGuild {
 				return;
 			}
 
-			final boolean[] roleOrRankEnabled = {false};
+			final boolean[] roleOrRankEnabled = { false };
 			List<AutomatedGuild> filteredGuildSettings = null;
-			if(guildSettings != null) {
-				filteredGuildSettings = guildSettings.stream()
+			if (guildSettings != null) {
+				filteredGuildSettings =
+					guildSettings
+						.stream()
 						.filter(curSettings -> {
 							if (curSettings.getGuildName() == null) {
 								return false;
 							} else if (
-									curSettings.getGuildMemberRoleEnable().equalsIgnoreCase("true") ||
-											curSettings.getGuildRanksEnable().equalsIgnoreCase("true")
+								curSettings.getGuildMemberRoleEnable().equalsIgnoreCase("true") ||
+								curSettings.getGuildRanksEnable().equalsIgnoreCase("true")
 							) {
 								roleOrRankEnabled[0] = true;
 								return true;
 							} else {
-								return curSettings.getGuildCounterEnable() != null && !curSettings.getGuildCounterEnable().equalsIgnoreCase("false");
+								return (
+									curSettings.getGuildCounterEnable() != null &&
+									!curSettings.getGuildCounterEnable().equalsIgnoreCase("false")
+								);
 							}
-						}).collect(Collectors.toList());
+						})
+						.collect(Collectors.toList());
 
 				if (filteredGuildSettings.isEmpty()) {
 					return;
@@ -405,7 +410,9 @@ public class AutomaticGuild {
 			Map<String, LinkedAccount> discordToUuid = new HashMap<>();
 			int counterUpdate = 0;
 			if (roleOrRankEnabled[0] || verifyEnabled) {
-				discordToUuid.putAll(database.getLinkedAccounts().stream().collect(Collectors.toMap(LinkedAccount::discord, Function.identity())));
+				discordToUuid.putAll(
+					database.getLinkedAccounts().stream().collect(Collectors.toMap(LinkedAccount::discord, Function.identity()))
+				);
 
 				CountDownLatch latch = new CountDownLatch(1);
 				guild
@@ -423,33 +430,37 @@ public class AutomaticGuild {
 				}
 			}
 
-			if(verifyEnabled){
+			if (verifyEnabled) {
 				List<HypixelResponse> guildResponses = null;
 				for (Member linkedMember : inGuildUsers) {
 					LinkedAccount linkedAccount = discordToUuid.get(linkedMember.getId());
 
 					String nicknameTemplate = higherDepth(verifySettings, "verifiedNickname").getAsString();
-					if(nicknameTemplate.contains("[IGN]")) {
+					if (nicknameTemplate.contains("[IGN]")) {
 						nicknameTemplate.replace("[IGN]", linkedAccount.username());
 
 						if (nicknameTemplate.contains("[GUILD_RANK]") && guildSettings != null && !guildSettings.isEmpty()) {
 							try {
 								if (guildResponses == null) {
-									guildResponses = guildSettings
-											.stream()
-											.map(g -> getGuildFromId(g.getGuildId())).collect(Collectors.toList());
+									guildResponses =
+										guildSettings.stream().map(g -> getGuildFromId(g.getGuildId())).collect(Collectors.toList());
 								}
 
 								for (HypixelResponse guildResponse : guildResponses) {
-									String rank = higherDepth(streamJsonArray(guildResponse.get("members").getAsJsonArray()).filter(m -> higherDepth(m, "uuid", "").equals(linkedAccount.uuid()))
-											.findFirst().orElse(null), "rank", null);
+									String rank = higherDepth(
+										streamJsonArray(guildResponse.get("members").getAsJsonArray())
+											.filter(m -> higherDepth(m, "uuid", "").equals(linkedAccount.uuid()))
+											.findFirst()
+											.orElse(null),
+										"rank",
+										null
+									);
 									if (rank != null) {
 										nicknameTemplate = nicknameTemplate.replace("[GUILD_RANK]", rank);
 										break;
 									}
 								}
-							} catch (Exception ignored) {
-							}
+							} catch (Exception ignored) {}
 						}
 
 						linkedMember.modifyNickname(nicknameTemplate).queue();
@@ -457,14 +468,15 @@ public class AutomaticGuild {
 
 					try {
 						List<Role> toAddRoles = streamJsonArray(higherDepth(verifySettings, "verifiedRoles").getAsJsonArray())
-								.map(e -> {
-									try {
-										return guild.getRoleById(e.getAsString());
-									} catch (Exception ignored) {
-										return null;
-									}
-								}).filter(Objects::nonNull)
-								.collect(Collectors.toList());
+							.map(e -> {
+								try {
+									return guild.getRoleById(e.getAsString());
+								} catch (Exception ignored) {
+									return null;
+								}
+							})
+							.filter(Objects::nonNull)
+							.collect(Collectors.toList());
 						List<Role> toRemoveRoles = new ArrayList<>();
 						try {
 							toRemoveRoles.add(guild.getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString()));
@@ -477,7 +489,7 @@ public class AutomaticGuild {
 			}
 
 			Set<String> memberCountList = new HashSet<>();
-			if(filteredGuildSettings != null) {
+			if (filteredGuildSettings != null) {
 				Set<String> inGuild = new HashSet<>();
 				for (AutomatedGuild currentSetting : filteredGuildSettings) {
 					HypixelResponse response = getGuildFromId(currentSetting.getGuildId());
@@ -492,8 +504,8 @@ public class AutomaticGuild {
 						Map<String, String> uuidToRankMap = new HashMap<>();
 						for (JsonElement guildMember : guildMembers) {
 							uuidToRankMap.put(
-									higherDepth(guildMember, "uuid").getAsString(),
-									higherDepth(guildMember, "rank").getAsString().replace(" ", "_")
+								higherDepth(guildMember, "uuid").getAsString(),
+								higherDepth(guildMember, "rank").getAsString().replace(" ", "_")
 							);
 						}
 
@@ -549,8 +561,7 @@ public class AutomaticGuild {
 						VoiceChannel curVc = null;
 						try {
 							curVc = guild.getVoiceChannelById(currentSetting.getGuildCounterChannel());
-						} catch (Exception ignored) {
-						}
+						} catch (Exception ignored) {}
 
 						if (curVc == null) {
 							currentSetting.setGuildCounterEnable("false");
@@ -563,12 +574,15 @@ public class AutomaticGuild {
 						}
 
 						if (curVc.getName().split(":").length == 2) {
-							curVc.getManager().setName(curVc.getName().split(":")[0].trim() + ": " + guildMembers.size() + "/125").complete();
+							curVc
+								.getManager()
+								.setName(curVc.getName().split(":")[0].trim() + ": " + guildMembers.size() + "/125")
+								.complete();
 						} else {
 							curVc
-									.getManager()
-									.setName(response.get("name").getAsString() + " Members: " + guildMembers.size() + "/125")
-									.complete();
+								.getManager()
+								.setName(response.get("name").getAsString() + " Members: " + guildMembers.size() + "/125")
+								.complete();
 						}
 
 						counterUpdate++;
@@ -580,7 +594,8 @@ public class AutomaticGuild {
 				guild,
 				"Update Guild | Time (" +
 				((System.currentTimeMillis() - startTime) / 1000) +
-				"s)" + (!memberCountList.isEmpty() ? " | Users (" + eventMemberList.size() + ")" : "") +
+				"s)" +
+				(!memberCountList.isEmpty() ? " | Users (" + eventMemberList.size() + ")" : "") +
 				(counterUpdate > 0 ? " | Counters (" + counterUpdate + ")" : "")
 			);
 		} catch (Exception e) {

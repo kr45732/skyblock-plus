@@ -18,41 +18,53 @@
 
 package com.skyblockplus.features.mayor;
 
-import com.google.gson.JsonElement;
-import com.skyblockplus.features.listeners.AutomaticGuild;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-
-import java.util.concurrent.TimeUnit;
-
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.Utils.*;
 
+import com.google.gson.JsonElement;
+import com.skyblockplus.features.listeners.AutomaticGuild;
+import java.util.concurrent.TimeUnit;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+
 public class MayorHandler {
 
-    public static void initialize(){
-        scheduler.scheduleAtFixedRate(MayorHandler::updateMayor, 0, 30, TimeUnit.MINUTES);
-    }
+	public static void initialize() {
+		scheduler.scheduleAtFixedRate(MayorHandler::updateMayor, 0, 30, TimeUnit.MINUTES);
+	}
 
-    private static void updateMayor() {
-        try {
-            JsonElement mayorJson = getJson("https://whoknew.sbe-stole-skytils.design/");
-            if (higherDepth(mayorJson, "name", "").equals(jda.getTextChannelById("932484216179011604").getHistory().retrievePast(1).complete().get(0).getEmbeds().get(0).getTitle())) {
-                return;
-            }
+	private static void updateMayor() {
+		try {
+			JsonElement mayorJson = getJson("https://whoknew.sbe-stole-skytils.design/");
+			if (
+				higherDepth(mayorJson, "name", "")
+					.equals(
+						jda
+							.getTextChannelById("932484216179011604")
+							.getHistory()
+							.retrievePast(1)
+							.complete()
+							.get(0)
+							.getEmbeds()
+							.get(0)
+							.getTitle()
+					)
+			) {
+				return;
+			}
 
-            EmbedBuilder eb = defaultEmbed(higherDepth(mayorJson, "name").getAsString());
-            for (JsonElement perk : higherDepth(mayorJson, "perks").getAsJsonArray()) {
-                eb.addField(higherDepth(perk, "name").getAsString(), higherDepth(perk, "description").getAsString(), false);
-            }
-            MessageEmbed embed = eb.build();
+			EmbedBuilder eb = defaultEmbed(higherDepth(mayorJson, "name").getAsString());
+			for (JsonElement perk : higherDepth(mayorJson, "perks").getAsJsonArray()) {
+				eb.addField(higherDepth(perk, "name").getAsString(), higherDepth(perk, "description").getAsString(), false);
+			}
+			MessageEmbed embed = eb.build();
 
-            for (AutomaticGuild guild : guildMap.values()) {
-                guild.onMayor(embed);
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
+			for (AutomaticGuild guild : guildMap.values()) {
+				guild.onMayor(embed);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }

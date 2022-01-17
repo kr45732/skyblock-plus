@@ -48,12 +48,16 @@ public class UpdateSlashCommands extends Command {
 				logCommand();
 
 				if (args.length == 1) {
-					jda.getGuildById(event.getGuild().getId()).updateCommands().addCommands(generateSlashCommands()).queue(s -> event
-							.getChannel()
-							.sendMessageEmbeds(
-									defaultEmbed("Success - added " + s.size() + " slash commands for this guild").build()
-							)
-							.queue());
+					jda
+						.getGuildById(event.getGuild().getId())
+						.updateCommands()
+						.addCommands(generateSlashCommands())
+						.queue(s ->
+							event
+								.getChannel()
+								.sendMessageEmbeds(defaultEmbed("Success - added " + s.size() + " slash commands for this guild").build())
+								.queue()
+						);
 					return;
 				} else if (args.length == 2) {
 					if (args[1].equals("clear")) {
@@ -61,12 +65,15 @@ public class UpdateSlashCommands extends Command {
 						event.getChannel().sendMessageEmbeds(defaultEmbed("Success - cleared commands for this guild").build()).queue();
 						return;
 					} else if (args[1].equals("global")) {
-						jda.updateCommands().addCommands(generateSlashCommands()).queue(s -> event
-								.getChannel()
-								.sendMessageEmbeds(
-										defaultEmbed("Success - added " + s.size() + " slash commands globally").build()
-								)
-								.queue());
+						jda
+							.updateCommands()
+							.addCommands(generateSlashCommands())
+							.queue(s ->
+								event
+									.getChannel()
+									.sendMessageEmbeds(defaultEmbed("Success - added " + s.size() + " slash commands globally").build())
+									.queue()
+							);
 
 						return;
 					}
