@@ -38,31 +38,30 @@ public class MayorHandler {
 		try {
 			JsonElement mayorJson = getJson("https://whoknew.sbe-stole-skytils.design/api/mayor");
 			String curMayorName = higherDepth(mayorJson, "name", null);
-			if(curMayorName == null){
+			if (curMayorName == null) {
 				return;
 			}
 
-			if(curMayorName.equals("Jerry")){
+			if (curMayorName.equals("Jerry")) {
 				mayorJson = higherDepth(getJson("https://whoknew.sbe-stole-skytils.design/api/mayor/jerry"), "mayor");
 				curMayorName = "Jerry | " + higherDepth(mayorJson, "name").getAsString();
 			}
 
-			if (curMayorName
-					.equals(
-						jda
-							.getTextChannelById("932484216179011604")
-							.getHistory()
-							.retrievePast(1)
-							.complete()
-							.get(0)
-							.getEmbeds()
-							.get(0)
-							.getTitle()
-					)
+			if (
+				curMayorName.equals(
+					jda
+						.getTextChannelById("932484216179011604")
+						.getHistory()
+						.retrievePast(1)
+						.complete()
+						.get(0)
+						.getEmbeds()
+						.get(0)
+						.getTitle()
+				)
 			) {
 				return;
 			}
-
 
 			EmbedBuilder eb = defaultEmbed(curMayorName);
 			for (JsonElement perk : higherDepth(mayorJson, "perks").getAsJsonArray()) {

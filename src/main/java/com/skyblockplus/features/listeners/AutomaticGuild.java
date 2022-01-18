@@ -434,7 +434,9 @@ public class AutomaticGuild {
 			if (verifyEnabled) {
 				List<HypixelResponse> guildResponses = null;
 				for (Member linkedMember : inGuildUsers) {
-					if(!guild.getSelfMember().canInteract(linkedMember)){continue;}
+					if (!guild.getSelfMember().canInteract(linkedMember)) {
+						continue;
+					}
 
 					LinkedAccount linkedAccount = discordToUuid.get(linkedMember.getId());
 					String nicknameTemplate = higherDepth(verifySettings, "verifiedNickname").getAsString();
@@ -514,7 +516,7 @@ public class AutomaticGuild {
 						Role guildMemberRole = enableGuildRole ? guild.getRoleById(currentSetting.getGuildMemberRole()) : null;
 						Role applyGuestRole = guildMap.get(guildId).applyGuestRole;
 						for (Member linkedMember : inGuildUsers) {
-							if(!guild.getSelfMember().canInteract(linkedMember)) {
+							if (!guild.getSelfMember().canInteract(linkedMember)) {
 								continue;
 							}
 
