@@ -173,16 +173,12 @@ public class SettingsExecute {
 			);
 			String mayorChannel = higherDepth(currentSettings, "mayorChannel", "none");
 			eb.addField(
-					"Mayor Notifications Channel",
-					mayorChannel.equals("none") || mayorChannel.isEmpty() ? "None" : "<#" + mayorChannel + ">",
-					false
+				"Mayor Notifications Channel",
+				mayorChannel.equals("none") || mayorChannel.isEmpty() ? "None" : "<#" + mayorChannel + ">",
+				false
 			);
 			String mayorRole = higherDepth(currentSettings, "mayorRole", "none");
-			eb.addField(
-					"Mayor Ping Role",
-					mayorRole.equals("none") || mayorRole.isEmpty() ? "None" : "<@&" + mayorRole + ">",
-					false
-			);
+			eb.addField("Mayor Ping Role", mayorRole.equals("none") || mayorRole.isEmpty() ? "None" : "<@&" + mayorRole + ">", false);
 			String applyGuestRole = higherDepth(currentSettings, "applyGuestRole", "none");
 			eb.addField(
 				"Guest Role",
