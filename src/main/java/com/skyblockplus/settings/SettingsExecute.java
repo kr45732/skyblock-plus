@@ -171,6 +171,18 @@ public class SettingsExecute {
 				fetchurRole.equals("none") || fetchurRole.isEmpty() ? "None" : "<@&" + fetchurRole + ">",
 				false
 			);
+			String mayorChannel = higherDepth(currentSettings, "mayorChannel", "none");
+			eb.addField(
+					"Mayor Notifications Channel",
+					mayorChannel.equals("none") || mayorChannel.isEmpty() ? "None" : "<#" + mayorChannel + ">",
+					false
+			);
+			String mayorRole = higherDepth(currentSettings, "mayorRole", "none");
+			eb.addField(
+					"Mayor Ping Role",
+					mayorRole.equals("none") || mayorRole.isEmpty() ? "None" : "<@&" + mayorRole + ">",
+					false
+			);
 			String applyGuestRole = higherDepth(currentSettings, "applyGuestRole", "none");
 			eb.addField(
 				"Guest Role",
@@ -2217,7 +2229,7 @@ public class SettingsExecute {
 				return apiFailMessage(responseCode);
 			}
 
-			guildMap.get(guild.getId()).setFetchurChannel(channel);
+			guildMap.get(guild.getId()).setMayorChannel(channel);
 			return defaultSettingsEmbed("**Mayor notifications channel set to:** " + channel.getAsMention());
 		}
 	}

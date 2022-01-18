@@ -113,6 +113,8 @@ public class ServerSettingsModel {
 		copy.setApplyGuestRole(applyGuestRole);
 		copy.setFetchurChannel(fetchurChannel);
 		copy.setFetchurRole(fetchurRole);
+		copy.setMayorChannel(mayorChannel);
+		copy.setMayorRole(mayorRole);
 		copy.setBotManagerRoles(botManagerRoles);
 		return copy;
 	}

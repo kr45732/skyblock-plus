@@ -408,6 +408,16 @@ public class HelpCommand extends Command {
 									"Set the role that will be pinged with the daily fetchur notifications.",
 									"fetchur_ping <@role>"
 								),
+									new HelpData(
+											"mayor_channel",
+											"Set the channel where notifications will be sent when a new mayor is elected or perks rotate.",
+											"mayor_channel <#channel>"
+									),
+									new HelpData(
+											"mayor_ping",
+											"Set the role that will be pinged with mayor notifications.",
+											"mayor_ping <@role>"
+									),
 								new HelpData(
 									"guest_role",
 									"Set the role that will be given to linked users that are not in any of the setup automatic guilds. Requires at least one automatic guild to be setup.",
@@ -831,6 +841,11 @@ public class HelpCommand extends Command {
 				"Set the channel where fetchur item notifications will be sent every day at 12 am EST"
 			) +
 			help.create("settings set fetchur_ping <@role>", "Role that will be pinged when the fetchur item notifications is sent") +
+					help.create(
+							"settings set mayor_channel <#channel>",
+							"Set the channel where notifications will be sent when a new mayor is elected"
+					) +
+					help.create("settings set mayor_ping <@role>", "Role that will be pinged when mayor notifications are sent") +
 			help.create("settings set guest_role <@role>", "Set the guest role") +
 			help.create("settings bot_manager add <@role>", "Add a bot manager role") +
 			help.create("settings bot_manager remove <@role>", "Remove a bot manager role") +
