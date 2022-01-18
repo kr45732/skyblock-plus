@@ -434,8 +434,9 @@ public class AutomaticGuild {
 			if (verifyEnabled) {
 				List<HypixelResponse> guildResponses = null;
 				for (Member linkedMember : inGuildUsers) {
-					LinkedAccount linkedAccount = discordToUuid.get(linkedMember.getId());
+					if(!guild.getSelfMember().canInteract(linkedMember)){continue;}
 
+					LinkedAccount linkedAccount = discordToUuid.get(linkedMember.getId());
 					String nicknameTemplate = higherDepth(verifySettings, "verifiedNickname").getAsString();
 					if (nicknameTemplate.contains("[IGN]")) {
 						nicknameTemplate = nicknameTemplate.replace("[IGN]", linkedAccount.username());
@@ -512,20 +513,24 @@ public class AutomaticGuild {
 
 						Role guildMemberRole = enableGuildRole ? guild.getRoleById(currentSetting.getGuildMemberRole()) : null;
 						Role applyGuestRole = guildMap.get(guildId).applyGuestRole;
-						for (Member linkedUser : inGuildUsers) {
+						for (Member linkedMember : inGuildUsers) {
+							if(!guild.getSelfMember().canInteract(linkedMember)) {
+								continue;
+							}
+
 							List<Role> rolesToAdd = new ArrayList<>();
 							List<Role> rolesToRemove = new ArrayList<>();
 
 							if (enableGuildRole) {
-								if (uuidToRankMap.containsKey(discordToUuid.get(linkedUser.getId()).uuid())) {
+								if (uuidToRankMap.containsKey(discordToUuid.get(linkedMember.getId()).uuid())) {
 									rolesToAdd.add(guildMemberRole);
-									if (applyGuestRole != null && !inGuild.contains(linkedUser.getId())) {
-										inGuild.add(linkedUser.getId());
+									if (applyGuestRole != null && !inGuild.contains(linkedMember.getId())) {
+										inGuild.add(linkedMember.getId());
 										rolesToRemove.add(applyGuestRole);
 									}
 								} else {
 									rolesToRemove.add(guildMemberRole);
-									if (applyGuestRole != null && !inGuild.contains(linkedUser.getId())) {
+									if (applyGuestRole != null && !inGuild.contains(linkedMember.getId())) {
 										rolesToAdd.add(applyGuestRole);
 									}
 								}
@@ -533,12 +538,12 @@ public class AutomaticGuild {
 
 							if (enableGuildRanks) {
 								List<RoleObject> guildRanksArr = currentSetting.getGuildRanks();
-								if (!uuidToRankMap.containsKey(discordToUuid.get(linkedUser.getId()).uuid())) {
+								if (!uuidToRankMap.containsKey(discordToUuid.get(linkedMember.getId()).uuid())) {
 									for (RoleObject guildRank : guildRanksArr) {
 										rolesToRemove.add(guild.getRoleById(guildRank.getRoleId()));
 									}
 								} else {
-									String currentRank = uuidToRankMap.get(discordToUuid.get(linkedUser.getId()).uuid());
+									String currentRank = uuidToRankMap.get(discordToUuid.get(linkedMember.getId()).uuid());
 									for (RoleObject guildRank : guildRanksArr) {
 										Role currentRankRole = guild.getRoleById(guildRank.getRoleId());
 										if (guildRank.getValue().equalsIgnoreCase(currentRank)) {
@@ -551,10 +556,10 @@ public class AutomaticGuild {
 							}
 
 							try {
-								guild.modifyMemberRoles(linkedUser, rolesToAdd, rolesToRemove).queue(ignore, ignore);
+								guild.modifyMemberRoles(linkedMember, rolesToAdd, rolesToRemove).queue(ignore, ignore);
 							} catch (Exception ignored) {}
 
-							memberCountList.add(linkedUser.getId());
+							memberCountList.add(linkedMember.getId());
 						}
 					}
 
@@ -593,7 +598,7 @@ public class AutomaticGuild {
 				"Update Guild | Time (" +
 				((System.currentTimeMillis() - startTime) / 1000) +
 				"s)" +
-				(!memberCountList.isEmpty() ? " | Users (" + eventMemberList.size() + ")" : "") +
+				(!memberCountList.isEmpty() ? " | Users (" + memberCountList.size() + ")" : "") +
 				(counterUpdate > 0 ? " | Counters (" + counterUpdate + ")" : "")
 			);
 		} catch (Exception e) {

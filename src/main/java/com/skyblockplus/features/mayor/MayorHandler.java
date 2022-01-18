@@ -36,9 +36,18 @@ public class MayorHandler {
 
 	private static void updateMayor() {
 		try {
-			JsonElement mayorJson = getJson("https://whoknew.sbe-stole-skytils.design/");
-			if (
-				higherDepth(mayorJson, "name", "")
+			JsonElement mayorJson = getJson("https://whoknew.sbe-stole-skytils.design/api/mayor");
+			String curMayorName = higherDepth(mayorJson, "name", null);
+			if(curMayorName == null){
+				return;
+			}
+
+			if(curMayorName.equals("Jerry")){
+				mayorJson = higherDepth(getJson("https://whoknew.sbe-stole-skytils.design/api/mayor/jerry"), "mayor");
+				curMayorName = "Jerry | " + higherDepth(mayorJson, "name").getAsString();
+			}
+
+			if (curMayorName
 					.equals(
 						jda
 							.getTextChannelById("932484216179011604")
@@ -54,7 +63,8 @@ public class MayorHandler {
 				return;
 			}
 
-			EmbedBuilder eb = defaultEmbed(higherDepth(mayorJson, "name").getAsString());
+
+			EmbedBuilder eb = defaultEmbed(curMayorName);
 			for (JsonElement perk : higherDepth(mayorJson, "perks").getAsJsonArray()) {
 				eb.addField(higherDepth(perk, "name").getAsString(), higherDepth(perk, "description").getAsString(), false);
 			}
