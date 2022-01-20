@@ -120,7 +120,7 @@ public class AutomatedRoles {
 	private RoleModel networth = new RoleModel();
 
 	@Embedded
-	private RoleModel ironman = new RoleModel();
+	private RoleModel gamemode = new RoleModel();
 
 	@Embedded
 	private RoleModel maxed_collections = new RoleModel();

@@ -625,7 +625,7 @@ public class HelpCommand extends Command {
 											true
 										),
 										new HelpData(
-											"ironman",
+											"gamemode",
 											"Whether applicants must use a certain gamemode profile in their application. Defaults to all.",
 											"settings guild <name> apply gamemode <true|false>",
 											true

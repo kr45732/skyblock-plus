@@ -986,7 +986,7 @@ public class Player {
 
 		for (JsonElement profile : profilesArray) {
 			try {
-				if (gamemode == Gamemode.ALL || Gamemode.of(higherDepth(getOuterProfileJson(), "game_mode", "regular")) == gamemode) {
+				if (gamemode == Gamemode.ALL || Gamemode.of(higherDepth(profile, "game_mode", "regular")) == gamemode) {
 					profileNameList.add(higherDepth(profile, "cute_name").getAsString().toLowerCase());
 				}
 			} catch (Exception ignored) {}
@@ -1120,7 +1120,7 @@ public class Player {
 	}
 
 	public boolean isGamemode(Gamemode gamemode) {
-		return getGamemode() == gamemode;
+		return gamemode == Gamemode.ALL || getGamemode() == gamemode;
 	}
 
 	public Gamemode getGamemode() {
@@ -1128,7 +1128,7 @@ public class Player {
 	}
 
 	public double getHighestAmount(String type) {
-		return getHighestAmount(type, Gamemode.REGULAR);
+		return getHighestAmount(type, Gamemode.ALL);
 	}
 
 	public double getHighestAmount(String type, Gamemode gamemode) {

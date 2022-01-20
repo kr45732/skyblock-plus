@@ -193,8 +193,8 @@ public class ServerSettingsService {
 					return new ResponseEntity<>(currentRoleSettings.getPet_enthusiast(), HttpStatus.OK);
 				case "slayer_nine":
 					return new ResponseEntity<>(currentRoleSettings.getSlayer_nine(), HttpStatus.OK);
-				case "ironman":
-					return new ResponseEntity<>(currentRoleSettings.getIronman(), HttpStatus.OK);
+				case "gamemode":
+					return new ResponseEntity<>(currentRoleSettings.getGamemode(), HttpStatus.OK);
 				case "skill_average":
 					return new ResponseEntity<>(currentRoleSettings.getSkill_average(), HttpStatus.OK);
 				case "pet_score":
@@ -255,7 +255,7 @@ public class ServerSettingsService {
 				case "maxed_collections" -> currentRoleSettings.setMaxed_collections(newRoleSettings);
 				case "pet_enthusiast" -> currentRoleSettings.setPet_enthusiast(newRoleSettings);
 				case "slayer_nine" -> currentRoleSettings.setSlayer_nine(newRoleSettings);
-				case "ironman" -> currentRoleSettings.setIronman(newRoleSettings);
+				case "gamemode" -> currentRoleSettings.setGamemode(newRoleSettings);
 				case "skill_average" -> currentRoleSettings.setSkill_average(newRoleSettings);
 				case "pet_score" -> currentRoleSettings.setPet_score(newRoleSettings);
 				case "dungeon_secrets" -> currentRoleSettings.setDungeon_secrets(newRoleSettings);

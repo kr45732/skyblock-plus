@@ -376,7 +376,7 @@ public class RolesCommand extends Command {
 								continue;
 							}
 
-							if (player.getHighestAmount(mode) == 1) {
+							if (useHighest ? player.getHighestAmount(mode) == 1 : player.isGamemode(Player.Gamemode.of(mode))) {
 								if (!member.getRoles().contains(currentLevelRole)) {
 									if (botRole.canInteract(currentLevelRole)) {
 										toAdd.add(currentLevelRole);

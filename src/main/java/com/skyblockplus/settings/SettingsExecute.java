@@ -82,7 +82,7 @@ public class SettingsExecute {
 	}
 
 	public static boolean isOneLevelRole(String roleName) {
-		return roleName.equals("pet_enthusiast") || roleName.equals("ironman");
+		return roleName.equals("pet_enthusiast");
 	}
 
 	public void execute(Command command, CommandEvent event) {
@@ -1313,7 +1313,7 @@ public class SettingsExecute {
 		rolePageMap.put("dungeon_secrets", 27);
 		rolePageMap.put("accessory_count", 28);
 		rolePageMap.put("networth", 29);
-		rolePageMap.put("ironman", 30);
+		rolePageMap.put("gamemode", 30);
 		rolePageMap.put("maxed_collections", 31);
 
 		if (rolePageMap.containsKey(roleName)) {
@@ -1337,6 +1337,7 @@ public class SettingsExecute {
 		pageTitles.add("Roles Settings");
 		ArrayList<String> roleNames = getJsonKeys(rolesSettings);
 		StringBuilder pageNumbers = new StringBuilder();
+		roleNames.remove("useHighest");
 		for (int i = 1; i < roleNames.size(); i++) {
 			pageNumbers.append("\n**Page ").append(i + 1).append(":** ").append(roleNames.get(i));
 		}
@@ -1344,11 +1345,10 @@ public class SettingsExecute {
 		paginateBuilder.addItems(
 			"**Automated Roles " +
 			(higherDepth(rolesSettings, "enable").getAsString().equals("true") ? "Enabled" : "Disabled") +
-			"**" +
+			"**\n**Use highest:** " + higherDepth(rolesSettings, "useHighest", false) + "\n" +
 			pageNumbers
 		);
 		roleNames.remove("enable");
-		roleNames.remove("useHighest");
 		for (String roleName : roleNames) {
 			JsonElement currentRoleSettings = higherDepth(rolesSettings, roleName);
 			StringBuilder ebFieldString = new StringBuilder();
@@ -1428,10 +1428,10 @@ public class SettingsExecute {
 					.append("**The number of level nine slayers a player has**\nExample: `")
 					.append(guildPrefix)
 					.append("settings roles add slayer_nine 3 @role`\n");
-				case "ironman" -> ebFieldString
-					.append("**Playing on a ironman profile**\nExample: `")
+				case "gamemode" -> ebFieldString
+					.append("**Playing on an ironman or stranded profile**\nExample: `")
 					.append(guildPrefix)
-					.append("settings roles set ironman @ironman`\n");
+					.append("settings roles add gamemode stranded @Stranded Gamer`\n");
 				case "dungeon_secrets" -> ebFieldString
 					.append("**A player's dungeon secrets count**\nExample: `")
 					.append(guildPrefix)
@@ -1693,8 +1693,12 @@ public class SettingsExecute {
 			return invalidEmbed("Invalid guild role name or guild ranks not enabled");
 		} else if (isOneLevelRole(roleName)) {
 			return invalidEmbed(
-				"These roles do not support levels. Use `" + guildPrefix + "settings roles set <role_name> <@role>` instead"
+					"These roles do not support levels. Use `" + guildPrefix + "settings roles set <role_name> <@role>` instead"
 			);
+		} else if(roleName.equals("gamemode")){
+			if(!roleValue.equals("ironman") && !roleValue.equals("stranded")){
+				return invalidEmbed("Mode must be ironman or stranded");
+			}
 		} else {
 			try {
 				Long.parseLong(roleValue);
@@ -1737,11 +1741,11 @@ public class SettingsExecute {
 
 		currentLevels.add(gson.toJsonTree(new RoleObject(roleValue, role.getId())));
 
-		if (!roleName.equals("guild_member")) {
+		if (roleName.equals("guild_member")) {
+			roleValue = guildName;
+		} else if(!roleName.equals("gamemode")) {
 			currentLevels =
 				collectJsonArray(streamJsonArray(currentLevels).sorted(Comparator.comparingLong(o -> higherDepth(o, "value").getAsLong())));
-		} else {
-			roleValue = guildName;
 		}
 		newRoleSettings.add("levels", currentLevels);
 
