@@ -60,11 +60,13 @@ public class SlayerWeight {
 	}
 
 	public WeightStruct getSlayerWeight(String slayerName) {
+		return getSlayerWeight(slayerName, player.getSlayer(slayerName));
+	}
+
+	public WeightStruct getSlayerWeight(String slayerName, int currentSlayerXp) {
 		Double[] curWeights = SLAYER_WEIGHTS.get(slayerName);
 		double divider = curWeights[0];
 		double modifier = curWeights[1];
-
-		int currentSlayerXp = player.getSlayer(slayerName);
 
 		if (currentSlayerXp <= 1000000) {
 			return weightStruct.add(new WeightStruct(currentSlayerXp == 0 ? 0 : currentSlayerXp / divider));

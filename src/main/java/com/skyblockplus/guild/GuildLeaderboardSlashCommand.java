@@ -18,6 +18,7 @@
 
 package com.skyblockplus.guild;
 
+import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
@@ -45,7 +46,7 @@ public class GuildLeaderboardSlashCommand extends SlashCommand {
 			GuildLeaderboardCommand.getLeaderboard(
 				event.getOptionStr("type"),
 				event.player,
-				event.getOptionBoolean("ironman", false),
+				Player.Gamemode.of(event.getOptionStr("gamemode", "regular")),
 				new PaginatorEvent(event)
 			)
 		);
@@ -75,7 +76,11 @@ public class GuildLeaderboardSlashCommand extends SlashCommand {
 					.addChoice("Enchanting", "enchanting")
 			)
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOption(OptionType.BOOLEAN, "ironman", "If the leaderboard should be ironman only");
+			.addOptions(new OptionData(OptionType.STRING, "gamemode", "Gamemode type")
+					.addChoice("regular", "regular")
+					.addChoice("ironman", "ironman")
+					.addChoice("stranded", "stranded")
+			);
 	}
 
 	@Override

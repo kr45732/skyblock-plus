@@ -37,6 +37,7 @@ import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.api.serversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
+import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.HypixelResponse;
@@ -433,12 +434,8 @@ public class SettingsExecute {
 						case "deny_message":
 							eb = setApplyDenyMessage(guildSettings.getAsJsonObject(), args[5]);
 							break;
-						case "ironman":
-							if (args[5].equals("true")) {
-								eb = setApplyIronman(guildSettings.getAsJsonObject(), true);
-							} else if (args[5].equals("false")) {
-								eb = setApplyIronman(guildSettings.getAsJsonObject(), false);
-							}
+						case "gamemode":
+							eb = setApplyGamemode(guildSettings.getAsJsonObject(), args[5]);
 							break;
 						case "scammer_check":
 							if (args[5].equals("true")) {
@@ -1066,15 +1063,20 @@ public class SettingsExecute {
 		return defaultSettingsEmbed("Apply deny message set to: " + denyMessage);
 	}
 
-	public EmbedBuilder setApplyIronman(JsonObject guildSettings, boolean isIronman) {
-		guildSettings.addProperty("applyIronmanOnly", "" + isIronman);
+	public EmbedBuilder setApplyGamemode(JsonObject guildSettings, String gamemode) {
+		try {
+			Player.Gamemode.of(gamemode);
+		}catch (Exception e){
+			return invalidEmbed("Invalid gamemode");
+		}
+		guildSettings.addProperty("applyGamemode", gamemode.toLowerCase());
 
 		int responseCode = database.setGuildSettings(guild.getId(), guildSettings);
 		if (responseCode != 200) {
 			return apiFailMessage(responseCode);
 		}
 
-		return defaultSettingsEmbed("Set apply to " + (isIronman ? "ironman mode only" : "any mode"));
+		return defaultSettingsEmbed("Set apply gamemode to: " + gamemode.toLowerCase());
 	}
 
 	public EmbedBuilder addApplyStaffRole(JsonObject guildSettings, String roleMention) {
@@ -1234,7 +1236,7 @@ public class SettingsExecute {
 				.addField("Waiting For Invite Channel", displaySettings(settings, "applyWaitingChannel"), true)
 				.addField("Staff Ping Roles", displaySettings(settings, "applyStaffRoles"), true)
 				.addField("New Channel Category", displaySettings(settings, "applyCategory"), true)
-				.addField("Ironman Only", displaySettings(settings, "applyIronmanOnly"), true)
+				.addField("Gamemode", displaySettings(settings, "applyGamemode"), true)
 				.addField("Button Message Text", displaySettings(settings, "applyMessage"), true)
 				.addField("Accepted Message", displaySettings(settings, "applyAcceptMessage"), true)
 				.addField("Waitlisted Message", displaySettings(settings, "applyWaitlistMessage"), true)

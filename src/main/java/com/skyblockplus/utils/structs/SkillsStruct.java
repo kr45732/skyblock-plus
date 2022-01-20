@@ -18,6 +18,8 @@
 
 package com.skyblockplus.utils.structs;
 
+import com.skyblockplus.utils.Constants;
+
 public record SkillsStruct(
 	String name,
 	int currentLevel,
@@ -33,5 +35,9 @@ public record SkillsStruct(
 
 	public double getProgressLevel() {
 		return currentLevel + progressToNext;
+	}
+
+	public double getMaxXp(){
+		return maxLevel == 50 ? Constants.SKILLS_LEVEL_50_XP : Constants.SKILLS_LEVEL_60_XP;
 	}
 }

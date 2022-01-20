@@ -38,19 +38,15 @@ public class WeightSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
+		if (event.invalidPlayerOption()) {
+			return;
+		}
+
 		switch (event.getSubcommandName()) {
-			case "player" -> {
-				if (event.invalidPlayerOption()) {
-					return;
-				}
-				event.paginate(WeightCommand.getPlayerWeight(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
-			}
+			case "player" -> event.paginate(WeightCommand.getPlayerWeight(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
 			case "calculate" -> event.embed(
 				WeightCommand.calculateWeight(
-					event.getOptionDouble("skill_average", 0),
-					event.getOptionDouble("slayer", 0),
-					event.getOptionDouble("catacombs", 0),
-					event.getOptionDouble("average_class", 0)
+					event.player, event.getOptionStr("profile"), event.getOptionStr("type"), event.getOptionInt("amount", 0)
 				)
 			);
 			default -> event.embed(event.invalidCommandMessage());
@@ -67,13 +63,12 @@ public class WeightSlashCommand extends SlashCommand {
 					.addOption(OptionType.STRING, "profile", "Profile name")
 			)
 			.addSubcommands(
-				new SubcommandData("calculate", "Calculate predicted weight using given stats (not 100% accurate)")
+				new SubcommandData("calculate", "Calculate predicted weight change for a reaching certain skill/slayer/catacombs amount")
+						.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+						.addOption(OptionType.STRING, "profile", "Profile name")
 					.addOptions(
-						new OptionData(OptionType.NUMBER, "skill_average", "Player's skill average", true).setRequiredRange(0, 55),
-						new OptionData(OptionType.NUMBER, "slayer", "Player's slayer XP", true).setRequiredRange(0, 500000000),
-						new OptionData(OptionType.NUMBER, "dungeons", "Player's catacombs level", true).setRequiredRange(0, 50),
-						new OptionData(OptionType.NUMBER, "average_class", "Player's average dungeon class level", true)
-							.setRequiredRange(0, 50)
+						new OptionData(OptionType.STRING, "type", "Skill, slayer, or dungeon type to see change of", true),
+						new OptionData(OptionType.NUMBER, "amount", "Target level or amount", true).setRequiredRange(0, 500000000)
 					)
 			);
 	}

@@ -146,8 +146,9 @@ public class ApplyGuild {
 		if (!player.isValid()) {
 			return "❌ Unable to fetch player data. Failed cause: `" + player.getFailCause() + "`";
 		} else {
-			if (higherDepth(currentSettings, "ironmanOnly", false) && player.getAllProfileNames(true).length == 0) {
-				return "❌ You have no ironman profiles created";
+			Player.Gamemode gamemode = Player.Gamemode.of(higherDepth(currentSettings, "applyGamemode", "all"));;
+			if (player.getAllProfileNames(gamemode).length == 0) {
+				return "❌ You have no " + gamemode.toString().toLowerCase() + " profiles created";
 			}
 		}
 

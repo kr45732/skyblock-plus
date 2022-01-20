@@ -27,11 +27,13 @@ public class HypixelGuildCache {
 
 	private final List<String> normalCache;
 	private final List<String> ironmanCache;
+	private final List<String> strandedCache;
 	private Instant lastUpdated;
 
 	public HypixelGuildCache() {
 		this.normalCache = new ArrayList<>();
 		this.ironmanCache = new ArrayList<>();
+		this.strandedCache = new ArrayList<>();
 		this.lastUpdated = Instant.now();
 	}
 
@@ -73,8 +75,9 @@ public class HypixelGuildCache {
 	}
 
 	public void addPlayer(Player player) {
-		normalCache.add(memberCacheFromPlayer(player, false));
-		ironmanCache.add(memberCacheFromPlayer(player, true));
+		normalCache.add(memberCacheFromPlayer(player, Player.Gamemode.REGULAR));
+		ironmanCache.add(memberCacheFromPlayer(player, Player.Gamemode.IRONMAN));
+		strandedCache.add(memberCacheFromPlayer(player, Player.Gamemode.IRONMAN));
 	}
 
 	public Instant getLastUpdated() {
@@ -87,54 +90,58 @@ public class HypixelGuildCache {
 	}
 
 	public List<String> getCache() {
-		return getCache(false);
+		return getCache(Player.Gamemode.REGULAR);
 	}
 
-	public List<String> getCache(boolean ironmanOnly) {
-		return ironmanOnly ? ironmanCache : normalCache;
+	public List<String> getCache(Player.Gamemode gamemode) {
+		return switch (gamemode) {
+			case IRONMAN -> ironmanCache;
+			case STRANDED -> strandedCache;
+			default -> normalCache;
+		};
 	}
 
-	private String memberCacheFromPlayer(Player player, boolean ironmanOnly) {
+	private String memberCacheFromPlayer(Player player, Player.Gamemode gamemode) {
 		return (
 			player.getUsername() +
 			"=:=" +
 			player.getUuid() +
 			"=:=" +
-			player.getHighestAmount("slayer", ironmanOnly) +
+			player.getHighestAmount("slayer", gamemode) +
 			"=:=" +
-			player.getHighestAmount("skills", ironmanOnly) +
+			player.getHighestAmount("skills", gamemode) +
 			"=:=" +
-			player.getHighestAmount("catacombs", ironmanOnly) +
+			player.getHighestAmount("catacombs", gamemode) +
 			"=:=" +
-			player.getHighestAmount("weight", ironmanOnly) +
+			player.getHighestAmount("weight", gamemode) +
 			"=:=" +
-			player.getHighestAmount("sven", ironmanOnly) +
+			player.getHighestAmount("sven", gamemode) +
 			"=:=" +
-			player.getHighestAmount("rev", ironmanOnly) +
+			player.getHighestAmount("rev", gamemode) +
 			"=:=" +
-			player.getHighestAmount("tara", ironmanOnly) +
+			player.getHighestAmount("tara", gamemode) +
 			"=:=" +
-			player.getHighestAmount("enderman", ironmanOnly) +
+			player.getHighestAmount("enderman", gamemode) +
 			"=:=" +
-			player.getHighestAmount("alchemy", ironmanOnly) +
+			player.getHighestAmount("alchemy", gamemode) +
 			"=:=" +
-			player.getHighestAmount("combat", ironmanOnly) +
+			player.getHighestAmount("combat", gamemode) +
 			"=:=" +
-			player.getHighestAmount("fishing", ironmanOnly) +
+			player.getHighestAmount("fishing", gamemode) +
 			"=:=" +
-			player.getHighestAmount("farming", ironmanOnly) +
+			player.getHighestAmount("farming", gamemode) +
 			"=:=" +
-			player.getHighestAmount("foraging", ironmanOnly) +
+			player.getHighestAmount("foraging", gamemode) +
 			"=:=" +
-			player.getHighestAmount("carpentry", ironmanOnly) +
+			player.getHighestAmount("carpentry", gamemode) +
 			"=:=" +
-			player.getHighestAmount("mining", ironmanOnly) +
+			player.getHighestAmount("mining", gamemode) +
 			"=:=" +
-			player.getHighestAmount("taming", ironmanOnly) +
+			player.getHighestAmount("taming", gamemode) +
 			"=:=" +
-			player.getHighestAmount("enchanting", ironmanOnly) +
+			player.getHighestAmount("enchanting", gamemode) +
 			"=:=" +
-			player.getHighestAmount("enchanting", ironmanOnly)
+			player.getHighestAmount("enchanting", gamemode)
 		);
 	}
 }

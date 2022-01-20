@@ -62,6 +62,7 @@ public class Constants {
 	public static Map<String, String> ESSENCE_EMOJI_MAP;
 	public static Map<String, Integer> IGNORED_ENCHANTS;
 	public static Map<String, Long> FORGE_TIMES;
+	public static Map<String, String> MAYOR_NAME_TO_SKIN;
 
 	/* Fetched from other sources */
 	public static List<String> ENCHANT_NAMES;
@@ -178,6 +179,9 @@ public class Constants {
 
 			/* FORGE_TIMES */
 			FORGE_TIMES = gson.fromJson(higherDepth(constantsJson, "FORGE_TIMES"), mapStringLong);
+
+			/* MAYOR_NAME_TO_SKIN */
+			MAYOR_NAME_TO_SKIN = gson.fromJson(higherDepth(constantsJson, "MAYOR_NAME_TO_SKIN"), mapStringString);
 
 			/* ENCHANT_NAMES */
 			HashSet<String> enchantNames = new HashSet<>();

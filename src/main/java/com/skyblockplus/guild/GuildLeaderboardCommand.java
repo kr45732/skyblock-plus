@@ -52,7 +52,7 @@ public class GuildLeaderboardCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	public static EmbedBuilder getLeaderboard(String lbType, String username, boolean ironmanOnly, PaginatorEvent event) {
+	public static EmbedBuilder getLeaderboard(String lbType, String username, Player.Gamemode gamemode, PaginatorEvent event) {
 		String hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
 
 		EmbedBuilder eb = checkHypixelKey(hypixelKey);
@@ -85,7 +85,7 @@ public class GuildLeaderboardCommand extends Command {
 		Instant lastUpdated = null;
 
 		if (guildCache != null) {
-			guildMemberPlayersList = guildCache.getCache(ironmanOnly);
+			guildMemberPlayersList = guildCache.getCache(gamemode);
 			lastUpdated = guildCache.getLastUpdated();
 		} else {
 			HypixelGuildCache newGuildCache = new HypixelGuildCache();
@@ -130,7 +130,7 @@ public class GuildLeaderboardCommand extends Command {
 				}
 			}
 
-			guildMemberPlayersList = newGuildCache.getCache(ironmanOnly);
+			guildMemberPlayersList = newGuildCache.getCache(gamemode);
 			hypixelGuildsCacheMap.put(guildId, newGuildCache.setLastUpdated());
 		}
 
@@ -181,15 +181,9 @@ public class GuildLeaderboardCommand extends Command {
 				logCommand();
 
 				if ((args.length == 4 || args.length == 3) && args[2].toLowerCase().startsWith("u:")) {
-					boolean ironmanOnly = false;
-					for (int i = 0; i < args.length; i++) {
-						if (args[i].startsWith("mode:")) {
-							ironmanOnly = args[i].split("mode:")[1].equals("ironman");
-							removeArg(i);
-						}
-					}
+					Player.Gamemode gamemode=	Player.Gamemode.of(getStringOption("mode"));
 
-					paginate(getLeaderboard(args[1], args[2].split(":")[1], ironmanOnly, new PaginatorEvent(event)));
+					paginate(getLeaderboard(args[1], args[2].split(":")[1], gamemode, new PaginatorEvent(event)));
 					return;
 				}
 

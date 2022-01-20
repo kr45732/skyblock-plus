@@ -46,7 +46,7 @@ public class AutomatedGuild {
 	private String applyStaffChannel = "";
 	private String applyCategory = "";
 	private String applyWaitingChannel = "";
-	private String applyIronmanOnly = "false";
+	private String applyGamemode = "";
 	private String applyScammerCheck = "false";
 	private String applyLogChannel = "";
 

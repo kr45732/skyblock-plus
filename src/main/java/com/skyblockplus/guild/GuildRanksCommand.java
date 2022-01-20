@@ -51,10 +51,10 @@ public class GuildRanksCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	public static EmbedBuilder getLeaderboard(String username, boolean ironmanOnly, boolean useKey, PaginatorEvent event) {
+	public static EmbedBuilder getLeaderboard(String username, Player.Gamemode gamemode, boolean useKey, PaginatorEvent event) {
 		String hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
 
-		if (ironmanOnly) {
+		if (gamemode != Player.Gamemode.REGULAR) {
 			if (hypixelKey == null) {
 				return invalidEmbed("You must set a Hypixel API key to use the ironman only option");
 			}
@@ -134,7 +134,7 @@ public class GuildRanksCommand extends Command {
 			HypixelGuildCache guildCache = hypixelGuildsCacheMap.getIfPresent(guildId);
 			List<String> guildMemberPlayersList;
 			if (guildCache != null) {
-				guildMemberPlayersList = guildCache.getCache(ironmanOnly);
+				guildMemberPlayersList = guildCache.getCache(gamemode);
 				lastUpdated = guildCache.getLastUpdated();
 			} else {
 				HypixelGuildCache newGuildCache = new HypixelGuildCache();
@@ -183,7 +183,7 @@ public class GuildRanksCommand extends Command {
 					}
 				}
 
-				guildMemberPlayersList = newGuildCache.getCache(ironmanOnly);
+				guildMemberPlayersList = newGuildCache.getCache(gamemode);
 				hypixelGuildsCacheMap.put(guildId, newGuildCache.setLastUpdated());
 			}
 
@@ -464,17 +464,11 @@ public class GuildRanksCommand extends Command {
 				logCommand();
 
 				if ((args.length == 3 || args.length == 2) && args[1].toLowerCase().startsWith("u:")) {
-					boolean ironmanOnly = false;
-					for (int i = 0; i < args.length; i++) {
-						if (args[i].startsWith("mode:")) {
-							ironmanOnly = args[i].split("mode:")[1].equals("ironman");
-							removeArg(i);
-						}
-					}
+				 Player.Gamemode gamemode=	Player.Gamemode.of(getStringOption("mode"));
 
 					boolean useKey = getBooleanArg("--usekey");
 
-					paginate(getLeaderboard(args[1].split(":")[1], ironmanOnly, useKey, new PaginatorEvent(event)));
+					paginate(getLeaderboard(args[1].split(":")[1], gamemode, useKey, new PaginatorEvent(event)));
 					return;
 				}
 

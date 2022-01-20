@@ -116,13 +116,9 @@ public class ApplyUser implements Serializable {
 
 		this.applicationChannelId = applicationChannel.getId();
 
-		boolean isIronman = false;
-		try {
-			isIronman = higherDepth(currentSettings, "applyIronmanOnly").getAsBoolean();
-		} catch (Exception ignored) {}
 
 		Player player = new Player(playerUsername);
-		String[] profileNames = player.getAllProfileNames(isIronman);
+		String[] profileNames = player.getAllProfileNames(Player.Gamemode.of(higherDepth(currentSettings, "applyGamemode", "all")));
 
 		getNameHistory(player.getUuid()).forEach(i -> nameHistory += "\n• " + fixUsername(i));
 		if (profileNames.length == 1) {
@@ -332,7 +328,7 @@ public class ApplyUser implements Serializable {
 			}
 			playerUsername = player.getUsername();
 
-			ironmanSymbol = player.isIronman() ? " ♻️" : "";
+			ironmanSymbol = player.getSymbol(" ");
 			playerProfileName = player.getProfileName();
 			double bankCoins = player.getBankBalance();
 			playerCoins = (bankCoins != -1 ? simplifyNumber(bankCoins) : "API disabled") + " + " + simplifyNumber(player.getPurseCoins());

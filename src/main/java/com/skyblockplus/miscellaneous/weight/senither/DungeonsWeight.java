@@ -60,8 +60,12 @@ public class DungeonsWeight {
 	}
 
 	public WeightStruct getDungeonWeight(String dungeonName) {
-		double catacombsSkillXp = player.getSkillXp(dungeonName);
-		double level = player.getCatacombs().getProgressLevel();
+		return getDungeonWeight(dungeonName, player.getCatacombs());
+	}
+
+	public WeightStruct getDungeonWeight(String dungeonName, SkillsStruct catacombs) {
+		double catacombsSkillXp = catacombs.totalExp();
+		double level = catacombs.getProgressLevel();
 		double base = Math.pow(level, 4.5) * DUNGEON_WEIGHTS.get(dungeonName);
 
 		if (catacombsSkillXp <= Constants.CATACOMBS_LEVEL_50_XP) {

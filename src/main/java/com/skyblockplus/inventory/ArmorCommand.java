@@ -44,7 +44,7 @@ public class ArmorCommand extends Command {
 	public static EmbedBuilder getPlayerEquippedArmor(String username, String profileName, PaginatorEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
-			Map<Integer, InvItem> inventoryMap = player.getInventoryArmorMap();
+			Map<Integer, InvItem> inventoryMap = player.getArmorMap();
 			if (inventoryMap != null) {
 				List<String> pageTitles = new ArrayList<>();
 				List<String> pageThumbnails = new ArrayList<>();

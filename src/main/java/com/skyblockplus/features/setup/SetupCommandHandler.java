@@ -336,15 +336,11 @@ public class SetupCommandHandler {
 					}
 					case 8 -> {
 						eb = settings.setApplyWaitingChannel(getSettings(), event.getMessage().getContentRaw());
-						eb2.setDescription("Reply with 'yes' if the applications should be ironman only.");
-					}
-					case 9 -> {
-						eb = settings.setApplyIronman(getSettings(), event.getMessage().getContentRaw().equalsIgnoreCase("yes"));
 						eb2.setDescription(
 							"Reply with the requirements that an applicant must meet. Separate multiple requirements with a comma and a space. (Example: `weight:4000 skills:40, slayer:1500000 catacombs:30, weight:5000`). Reply with 'none' if you do not want this."
 						);
 					}
-					case 10 -> {
+					case 9 -> {
 						if (!event.getMessage().getContentRaw().equalsIgnoreCase("none")) {
 							String[] reqs = event.getMessage().getContentRaw().split(", ");
 							if (reqs.length == 0 || reqs.length > 3) {
@@ -363,7 +359,7 @@ public class SetupCommandHandler {
 						}
 						eb2.setDescription("Reply with 'enable' to enable this automatic application system.");
 					}
-					case 11 -> {
+					case 10 -> {
 						if (event.getMessage().getContentRaw().equalsIgnoreCase("enable")) {
 							eb = settings.setApplyEnable(getSettings(), true);
 							if (eb.build().getTitle().equals("Settings")) {

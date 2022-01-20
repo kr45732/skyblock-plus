@@ -41,8 +41,8 @@ public class Player {
 	public String invMissing = "";
 	private JsonArray profilesArray;
 	private int profileIndex;
-	private JsonElement hypixelProfileJson;
-	private boolean validPlayer = false;
+	private JsonElement hypixelPlayerJson;
+	private boolean valid = false;
 	private String uuid;
 	private String username;
 	private String profileName;
@@ -69,7 +69,7 @@ public class Player {
 			return;
 		}
 
-		this.validPlayer = true;
+		this.valid = true;
 	}
 
 	public Player(String username, String profileName) {
@@ -93,7 +93,7 @@ public class Player {
 			return;
 		}
 
-		this.validPlayer = true;
+		this.valid = true;
 	}
 
 	public Player(String uuid, String username, JsonElement outerProfileJson) {
@@ -113,7 +113,7 @@ public class Player {
 			return;
 		}
 
-		this.validPlayer = true;
+		this.valid = true;
 	}
 
 	public Player(String uuid, String username, String profileName, JsonElement outerProfileJson) {
@@ -134,7 +134,7 @@ public class Player {
 			return;
 		}
 
-		this.validPlayer = true;
+		this.valid = true;
 	}
 
 	/* Constructor helper methods */
@@ -193,15 +193,15 @@ public class Player {
 	}
 
 	public String getUsername() {
-		return this.username;
+		return username;
 	}
 
 	public String getProfileName() {
-		return this.profileName;
+		return profileName;
 	}
 
 	public String getUuid() {
-		return this.uuid;
+		return uuid;
 	}
 
 	public JsonElement getOuterProfileJson() {
@@ -213,7 +213,7 @@ public class Player {
 	}
 
 	public boolean isValid() {
-		return validPlayer;
+		return valid;
 	}
 
 	public String getFailCause() {
@@ -229,10 +229,10 @@ public class Player {
 		return "https://cravatar.eu/helmavatar/" + uuid + "/64.png";
 	}
 
-	/**
-	 * Will return -1 if API is disabled
-	 */
 	/* Bank and purse */
+	/**
+	 * @return Bank balance or -1 if bank API disabled
+	 */
 	public double getBankBalance() {
 		return higherDepth(getOuterProfileJson(), "banking.balance", -1.0);
 	}
@@ -302,11 +302,19 @@ public class Player {
 	}
 
 	public double getSkillAverage() {
+		return getSkillAverage("", 0);
+	}
+
+	public double getSkillAverage(String skillName, int overrideAmount) {
 		double skillAverage = 0;
 		for (String skill : SKILL_NAMES) {
 			try {
-				SkillsStruct skillsStruct = getSkill(skill);
-				skillAverage += skillsStruct.getProgressLevel();
+				if(skill.equals(skillName)) {
+					skillAverage += overrideAmount;
+				} else {
+					SkillsStruct skillsStruct = getSkill(skill);
+					skillAverage += skillsStruct.getProgressLevel();
+				}
 			} catch (Exception e) {
 				return -1;
 			}
@@ -344,7 +352,9 @@ public class Player {
 
 		long xpCurrent = (long) Math.floor(skillExp - xpTotal);
 		long xpForNext = 0;
-		if (level < maxLevel) xpForNext = (long) Math.ceil(skillsTable.get(level).getAsLong());
+		if (level < maxLevel) {
+			xpForNext = (long) Math.ceil(skillsTable.get(level).getAsLong());
+		}
 
 		if (skillExp == 0) {
 			level = 0;
@@ -356,9 +366,54 @@ public class Player {
 		return new SkillsStruct(skill, level, maxLevel, skillExp, xpCurrent, xpForNext, progress);
 	}
 
+	public SkillsStruct skillInfoFromLevel(int targetLevel, String skill){
+		return skillInfoFromLevel(targetLevel, skill, WeightType.NONE);
+	}
+
+	public SkillsStruct skillInfoFromLevel(int targetLevel, String skill, WeightType weightType) {
+		JsonArray skillsTable =
+				switch (skill) {
+					case "catacombs" -> higherDepth(getLevelingJson(), "catacombs").getAsJsonArray();
+					case "runecrafting" -> higherDepth(getLevelingJson(), "runecrafting_xp").getAsJsonArray();
+					case "HOTM" -> higherDepth(getLevelingJson(), "HOTM").getAsJsonArray();
+					default -> higherDepth(getLevelingJson(), "leveling_xp").getAsJsonArray();
+				};
+
+		int maxLevel = getSkillMaxLevel(skill, weightType);
+
+		long xpTotal = 0L;
+		int level = 1;
+		for (int i = 0; i < maxLevel; i++) {
+			xpTotal += skillsTable.get(i).getAsLong();
+
+			if (level >= targetLevel) {
+				xpTotal -= skillsTable.get(i).getAsLong();
+				break;
+			} else {
+				level = (i + 1);
+			}
+		}
+
+		long xpForNext = 0;
+		if (level < maxLevel) {
+			xpForNext = (long) Math.ceil(skillsTable.get(level).getAsLong());
+		}
+
+		return new SkillsStruct(skill, targetLevel, maxLevel, xpTotal, 0, xpForNext, 0);
+	}
+
+	public SkillsStruct getHOTM() {
+		long xp = higherDepth(profileJson(), "mining_core.experience", -1L);
+		return xp == -1 ? null : skillInfoFromExp(xp, "HOTM");
+	}
+
 	/* Slayer */
 	public int getTotalSlayer() {
-		return getSlayer("sven") + getSlayer("rev") + getSlayer("tara") + getSlayer("enderman");
+		return getTotalSlayer("", 0);
+	}
+
+	public int getTotalSlayer(String type, int overrideAmount) {
+		return (type.equals("sven") ? overrideAmount : getSlayer("sven")) + (type.equals("rev") ? overrideAmount : getSlayer("rev")) + (type.equals("tara") ? overrideAmount : getSlayer("tara")) + (type.equals("enderman") ? overrideAmount : getSlayer("enderman"));
 	}
 
 	public int getSlayerBossKills(String slayerName, int tier) {
@@ -379,63 +434,26 @@ public class Player {
 		};
 	}
 
-	public int getSlayerLevel(String slayerName) {
-		switch (slayerName) {
-			case "sven" -> {
-				JsonArray wolfLevelArray = higherDepth(getLevelingJson(), "slayer_xp.wolf").getAsJsonArray();
-				int wolfXp = getSlayer("sven");
-				int prevWolfLevel = 0;
-				for (int i = 0; i < wolfLevelArray.size(); i++) {
-					if (wolfXp >= wolfLevelArray.get(i).getAsInt()) {
-						prevWolfLevel = i + 1;
-					} else {
-						break;
-					}
-				}
-				return prevWolfLevel;
-			}
-			case "rev" -> {
-				JsonArray zombieLevelArray = higherDepth(getLevelingJson(), "slayer_xp.zombie").getAsJsonArray();
-				int zombieXp = getSlayer("rev");
-				int prevZombieMax = 0;
-				for (int i = 0; i < zombieLevelArray.size(); i++) {
-					if (zombieXp >= zombieLevelArray.get(i).getAsInt()) {
-						prevZombieMax = i + 1;
-					} else {
-						break;
-					}
-				}
-				return prevZombieMax;
-			}
-			case "tara" -> {
-				JsonArray spiderLevelArray = higherDepth(getLevelingJson(), "slayer_xp.spider").getAsJsonArray();
-				int spiderXp = getSlayer("tara");
-				int prevSpiderMax = 0;
-				for (int i = 0; i < spiderLevelArray.size(); i++) {
-					if (spiderXp >= spiderLevelArray.get(i).getAsInt()) {
-						prevSpiderMax = i + 1;
-					} else {
-						break;
-					}
-				}
-				return prevSpiderMax;
-			}
-			case "enderman" -> {
-				JsonArray endermanLevelArray = higherDepth(getLevelingJson(), "slayer_xp.enderman").getAsJsonArray();
-				int endermanXp = getSlayer("enderman");
-				int prevEndermanMax = 0;
-				for (int i = 0; i < endermanLevelArray.size(); i++) {
-					if (endermanXp >= endermanLevelArray.get(i).getAsInt()) {
-						prevEndermanMax = i + 1;
-					} else {
-						break;
-					}
-				}
-				return prevEndermanMax;
+	public int getSlayerLevel(String slayerName){
+		return getSlayerLevel(slayerName, getSlayer(slayerName));
+	}
+
+	public int getSlayerLevel(String slayerName, int xp) {
+		JsonArray levelArray = higherDepth(getLevelingJson(), "slayer_xp." + switch (slayerName) {
+			case "sven" -> "wolf";
+			case "rev" -> "zombie";
+			case "tara" -> "spider";
+			default -> slayerName;
+		}).getAsJsonArray();
+		int level = 0;
+		for (int i = 0; i < levelArray.size(); i++) {
+			if (xp >= levelArray.get(i).getAsInt()) {
+				level = i + 1;
+			} else {
+				break;
 			}
 		}
-
-		return 0;
+		return level;
 	}
 
 	/* Dungeons */
@@ -506,11 +524,11 @@ public class Player {
 	}
 
 	public int getDungeonSecrets() {
-		if (hypixelProfileJson == null) {
-			hypixelProfileJson = playerFromUuid(uuid).response();
+		if (hypixelPlayerJson == null) {
+			hypixelPlayerJson = playerFromUuid(uuid).response();
 		}
 
-		return higherDepth(hypixelProfileJson, "achievements.skyblock_treasure_hunter", 0);
+		return higherDepth(hypixelPlayerJson, "achievements.skyblock_treasure_hunter", 0);
 	}
 
 	public SkillsStruct getDungeonClass(String className) {
@@ -521,7 +539,6 @@ public class Player {
 		return skillInfoFromExp(higherDepth(profileJson(), "dungeons.dungeon_types.catacombs.experience", 0L), "catacombs");
 	}
 
-	/* -- Start inventory -- */
 	/* InvItem maps */
 	public Map<Integer, InvItem> getInventoryMap() {
 		try {
@@ -563,7 +580,7 @@ public class Player {
 		return null;
 	}
 
-	public Map<Integer, InvItem> getInventoryArmorMap() {
+	public Map<Integer, InvItem> getArmorMap() {
 		try {
 			String contents = higherDepth(profileJson(), "inv_armor.data").getAsString();
 			NBTCompound parsedContents = NBTReader.readBase64(contents);
@@ -629,7 +646,21 @@ public class Player {
 		return null;
 	}
 
-	/* Emoji viewer arrays / other inventory */
+	public Map<String, Integer> getPlayerSacks() {
+		try {
+			JsonObject sacksJson = higherDepth(profileJson(), "sacks_counts").getAsJsonObject();
+			Map<String, Integer> sacksMap = new HashMap<>();
+			for (Map.Entry<String, JsonElement> sacksEntry : sacksJson.entrySet()) {
+				sacksMap.put(sacksEntry.getKey(), sacksEntry.getValue().getAsInt());
+			}
+
+			return sacksMap;
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	/* Emoji viewer arrays & other inventory */
 	public List<String[]> getTalismanBag() {
 		try {
 			String encodedInventoryContents = higherDepth(profileJson(), "talisman_bag.data").getAsString();
@@ -825,7 +856,7 @@ public class Player {
 				armorStructMap.put(i + 9, pageTwoStruct);
 			}
 			if (equippedSlot > 0) {
-				armorStructMap.replace((equippedSlot - 1), getInventoryArmor().makeBold());
+				armorStructMap.replace((equippedSlot - 1), getArmor().makeBold());
 			}
 
 			return armorStructMap;
@@ -837,7 +868,7 @@ public class Player {
 	public List<String[]> getWardrobe() {
 		try {
 			int equippedWardrobeSlot = higherDepth(profileJson(), "wardrobe_equipped_slot").getAsInt();
-			Map<Integer, InvItem> equippedArmor = equippedWardrobeSlot != -1 ? getInventoryArmorMap() : null;
+			Map<Integer, InvItem> equippedArmor = equippedWardrobeSlot != -1 ? getArmorMap() : null;
 
 			String encodedInventoryContents = higherDepth(profileJson(), "wardrobe_contents.data").getAsString();
 			NBTCompound decodedInventoryContents = NBTReader.readBase64(encodedInventoryContents);
@@ -910,7 +941,7 @@ public class Player {
 		return null;
 	}
 
-	public ArmorStruct getInventoryArmor() {
+	public ArmorStruct getArmor() {
 		try {
 			String encodedInventoryContents = higherDepth(profileJson(), "inv_armor.data").getAsString();
 			NBTCompound decodedInventoryContents = NBTReader.readBase64(encodedInventoryContents);
@@ -936,24 +967,8 @@ public class Player {
 		return higherDepth(profileJson(), "pets").getAsJsonArray();
 	}
 
-	public Map<String, Integer> getPlayerSacks() {
-		try {
-			JsonObject sacksJson = higherDepth(profileJson(), "sacks_counts").getAsJsonObject();
-			Map<String, Integer> sacksMap = new HashMap<>();
-			for (Map.Entry<String, JsonElement> sacksEntry : sacksJson.entrySet()) {
-				sacksMap.put(sacksEntry.getKey(), sacksEntry.getValue().getAsInt());
-			}
-
-			return sacksMap;
-		} catch (Exception e) {
-			return null;
-		}
-	}
-
-	/* -- End inventory -- */
-
 	/* Miscellaneous */
-	public String[] getAllProfileNames(boolean isIronman) {
+	public String[] getAllProfileNames(Gamemode gamemode) {
 		List<String> profileNameList = new ArrayList<>();
 		if (this.profilesArray == null) {
 			this.profilesArray = skyblockProfilesFromUuid(uuid).response().getAsJsonArray();
@@ -961,11 +976,9 @@ public class Player {
 
 		for (JsonElement profile : profilesArray) {
 			try {
-				if (isIronman && higherDepth(profile, "game_mode") == null) {
-					continue;
+				if (gamemode == Gamemode.ALL || Gamemode.of(higherDepth(getOuterProfileJson(), "game_mode", "regular")) == gamemode) {
+					profileNameList.add(higherDepth(profile, "cute_name").getAsString().toLowerCase());
 				}
-
-				profileNameList.add(higherDepth(profile, "cute_name").getAsString().toLowerCase());
 			} catch (Exception ignored) {}
 		}
 
@@ -1017,7 +1030,7 @@ public class Player {
 	}
 
 	public EmbedBuilder defaultPlayerEmbed(String extra) {
-		return defaultEmbed(fixUsername(getUsername()) + (isIronman() ? " ♻️" : "") + extra, skyblockStatsLink())
+		return defaultEmbed(fixUsername(getUsername()) + getSymbol(" ") + extra, skyblockStatsLink())
 			.setThumbnail(getThumbnailUrl());
 	}
 
@@ -1086,20 +1099,32 @@ public class Player {
 		return petScore;
 	}
 
-	public boolean isIronman() {
-		return higherDepth(getOuterProfileJson(), "game_mode", "").equals("ironman");
+	public String getSymbol(String... prefix){
+		return ((prefix.length >= 1 ? prefix[0] : "") + switch (getGamemode()){
+			case IRONMAN -> "\u267B️";
+			case STRANDED -> "\uD83C\uDFDD";
+			default -> "";
+		}).stripTrailing();
+	}
+
+	public boolean isGamemode(Gamemode gamemode){
+		return getGamemode() == gamemode;
+	}
+
+	public Gamemode getGamemode(){
+		return Gamemode.of(higherDepth(getOuterProfileJson(), "game_mode", "regular"));
 	}
 
 	public double getHighestAmount(String type) {
-		return getHighestAmount(type, false);
+		return getHighestAmount(type, Gamemode.REGULAR);
 	}
 
-	public double getHighestAmount(String type, boolean ironmanOnly) {
+	public double getHighestAmount(String type, Gamemode gamemode) {
 		double highestAmount = -1.0;
 		int beforeProfileIndex = this.profileIndex;
 		this.profileIndex = 0;
 		for (JsonElement ignored : profilesArray) {
-			if (ironmanOnly && !isIronman()) {
+			if (!isGamemode(gamemode)) {
 				continue;
 			}
 
@@ -1165,8 +1190,9 @@ public class Player {
 				case "maxed_collections":
 					highestAmount = Math.max(highestAmount, getNumMaxedCollections());
 					break;
-				case "ironman": // Returns 1 if the player has any ironman profiles, else -1
-					highestAmount = Math.max(highestAmount, isIronman() ? 1 : -1);
+				case "ironman":
+				case "stranded":
+					highestAmount = Math.max(highestAmount, isGamemode(Gamemode.of(type)) ? 1 : -1);
 					break;
 				default:
 					this.profileIndex = beforeProfileIndex;
@@ -1200,9 +1226,12 @@ public class Player {
 		return numMaxedColl;
 	}
 
-	public SkillsStruct getHOTM() {
-		long xp = higherDepth(profileJson(), "mining_core.experience", -1L);
-		return xp == -1 ? null : skillInfoFromExp(xp, "HOTM");
+	public int getAccessoryCount() {
+		return getItemsPlayerHas(new ArrayList<>(ALL_TALISMANS), getTalismanBagMap().values().toArray(new InvItem[0])).size();
+	}
+
+	public double getNetworth() {
+		return NetworthExecute.getTotalNetworth(username, profileName);
 	}
 
 	@Override
@@ -1210,7 +1239,7 @@ public class Player {
 		return (
 			"Player{" +
 			"validPlayer=" +
-			validPlayer +
+					valid +
 			", playerUuid='" +
 			uuid +
 			'\'' +
@@ -1224,17 +1253,24 @@ public class Player {
 		);
 	}
 
-	public int getAccessoryCount() {
-		return getItemsPlayerHas(new ArrayList<>(ALL_TALISMANS), getTalismanBagMap().values().toArray(new InvItem[0])).size();
-	}
-
-	public double getNetworth() {
-		return NetworthExecute.getTotalNetworth(username, profileName);
-	}
-
 	public enum WeightType {
 		NONE,
 		SENITHER,
 		LILY,
+	}
+
+	public enum Gamemode {
+		ALL,
+		REGULAR,
+		STRANDED,
+		IRONMAN;
+
+		public static Gamemode of(String gamemode) {
+			return valueOf(switch (gamemode = gamemode.toUpperCase()) {
+				case "ISLAND" -> "STRANDED";
+				case "" -> "ALL";
+				default -> gamemode;
+			});
+		}
 	}
 }

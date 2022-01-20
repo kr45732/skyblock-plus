@@ -18,6 +18,7 @@
 
 package com.skyblockplus.guild;
 
+import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
@@ -25,6 +26,7 @@ import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 public class GuildRanksSlashCommand extends SlashCommand {
 
@@ -43,7 +45,7 @@ public class GuildRanksSlashCommand extends SlashCommand {
 		event.paginate(
 			GuildRanksCommand.getLeaderboard(
 				event.player,
-				event.getOptionBoolean("ironman", false),
+					Player.Gamemode.of(event.getOptionStr("gamemode", "regular")),
 				event.getOptionBoolean("usekey", false),
 				new PaginatorEvent(event)
 			)
@@ -55,7 +57,11 @@ public class GuildRanksSlashCommand extends SlashCommand {
 		return Commands
 			.slash(name, "Get helper which shows who to promote or demote in your guild")
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOption(OptionType.BOOLEAN, "ironman", "If the leaderboard should be ironman only")
+				.addOptions(new OptionData(OptionType.STRING, "gamemode", "Gamemode type")
+						.addChoice("regular", "regular")
+						.addChoice("ironman", "ironman")
+						.addChoice("stranded", "stranded")
+				)
 			.addOption(OptionType.BOOLEAN, "usekey", "If the API key for this server should be used for more accurate results");
 	}
 

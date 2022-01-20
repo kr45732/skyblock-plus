@@ -365,29 +365,34 @@ public class RolesCommand extends Command {
 							}
 						}
 					}
-					case "ironman" -> {
-						Role curRole = guild.getRoleById(higherDepth(currentRole, "levels.[0].roleId").getAsString());
-						if (curRole == null) {
-							errorRoles.append(roleDeletedString(higherDepth(currentRole, "levels.[0].roleId").getAsString()));
-							continue;
-						}
-
-						if (useHighest ? player.getHighestAmount(currentRoleName) == 1 : player.isIronman()) {
-							if (!member.getRoles().contains(curRole)) {
-								if (botRole.canInteract(curRole)) {
-									toAdd.add(curRole);
-									addedRoles.append(roleChangeString(curRole.getName()));
-								} else {
-									errorRoles.append(roleChangeString(curRole.getName()));
-								}
+					case "gamemode" -> {
+						JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
+						for (int i = levelsArray.size() - 1; i >= 0; i--) {
+							JsonElement currentLevel = levelsArray.get(i);
+							String mode = higherDepth(currentLevel, "value").getAsString();
+							Role currentLevelRole = guild.getRoleById(higherDepth(currentLevel, "roleId").getAsString());
+							if (currentLevelRole == null) {
+								errorRoles.append(roleDeletedString(higherDepth(currentLevel, "roleId").getAsString()));
+								continue;
 							}
-						} else {
-							if (member.getRoles().contains(curRole)) {
-								if (botRole.canInteract(curRole)) {
-									removedRoles.append(roleChangeString(curRole.getName()));
-									toRemove.add(curRole);
-								} else {
-									errorRoles.append(roleChangeString(curRole.getName()));
+
+							if (player.getHighestAmount(mode) == 1) {
+								if (!member.getRoles().contains(currentLevelRole)) {
+									if (botRole.canInteract(currentLevelRole)) {
+										toAdd.add(currentLevelRole);
+										addedRoles.append(roleChangeString(currentLevelRole.getName()));
+									} else {
+										errorRoles.append(roleChangeString(currentLevelRole.getName()));
+									}
+								}
+							} else {
+								if (member.getRoles().contains(currentLevelRole)) {
+									if (botRole.canInteract(currentLevelRole)) {
+										toRemove.add(currentLevelRole);
+										removedRoles.append(roleChangeString(currentLevelRole.getName()));
+									} else {
+										errorRoles.append(roleChangeString(currentLevelRole.getName()));
+									}
 								}
 							}
 						}

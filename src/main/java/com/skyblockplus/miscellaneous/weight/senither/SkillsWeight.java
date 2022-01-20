@@ -44,14 +44,16 @@ public class SkillsWeight {
 	}
 
 	public WeightStruct getSkillsWeight(String skillName) {
+		return getSkillsWeight(skillName, player.getSkill(skillName, Player.WeightType.SENITHER));
+	}
+	public WeightStruct getSkillsWeight(String skillName, SkillsStruct skillsStruct) {
 		Double[] curWeights = SKILL_WEIGHTS.get(skillName);
 		double exponent = curWeights[0];
 		double divider = curWeights[1];
-		double currentSkillXp = player.getSkillXp(skillName);
 
-		if (currentSkillXp != -1) {
-			int maxLevel = player.getSkillMaxLevel(skillName, Player.WeightType.SENITHER);
-			SkillsStruct skillsStruct = player.getSkill(skillName, Player.WeightType.SENITHER);
+		if (skillsStruct != null) {
+			double currentSkillXp = skillsStruct.totalExp();
+			int maxLevel = skillsStruct.maxLevel();
 			double level = skillsStruct.getProgressLevel();
 			double maxLevelExp = maxLevel == 50 ? Constants.SKILLS_LEVEL_50_XP : Constants.SKILLS_LEVEL_60_XP;
 			double base = Math.pow(level * 10, 0.5 + exponent + (level / 100)) / 1250;

@@ -20,6 +20,7 @@ package com.skyblockplus.features.mayor;
 
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.utils.Constants.MAYOR_NAME_TO_SKIN;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
@@ -67,6 +68,8 @@ public class MayorHandler {
 			for (JsonElement perk : higherDepth(mayorJson, "perks").getAsJsonArray()) {
 				eb.addField(higherDepth(perk, "name").getAsString(), higherDepth(perk, "description").getAsString(), false);
 			}
+			String mayorId = (curMayorName.contains(" | ") ? curMayorName.split(" \\| ")[1] : curMayorName).toUpperCase();
+			eb.setThumbnail("https://mc-heads.net/body/" + MAYOR_NAME_TO_SKIN.get(mayorId) + "/left");
 			MessageEmbed embed = eb.build();
 
 			for (AutomaticGuild guild : guildMap.values()) {

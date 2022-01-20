@@ -144,11 +144,11 @@ public class HelpCommand extends Command {
 					.setCategory("guild"),
 				new HelpData(
 					"guild-leaderboard",
-					"Get a leaderboard for a guild. The type can be slayer, skills, catacombs, weight, sven, rev, tara, enderman, alchemy, combat, fishing, farming, foraging, carpentry, mining, taming, and enchanting. The mode can be normal or ironman. A Hypixel API key must be set in settings set hypixel_key <key>.",
-					"guild-leaderboard <type> <u:player> [mode:normal|ironman]"
+					"Get a leaderboard for a guild. The type can be slayer, skills, catacombs, weight, sven, rev, tara, enderman, alchemy, combat, fishing, farming, foraging, carpentry, mining, taming, and enchanting. The mode can be regular, ironman, or stranded. A Hypixel API key must be set in settings set hypixel_key <key>.",
+					"guild-leaderboard <type> <u:player> [mode:regular|ironman|stranded]"
 				)
 					.addAliases("g-lb")
-					.addExamples("guild-leaderboard weight u:CrypticPlasma", "guild-leaderboard weight u:CrypticPlasma mode:ironman")
+					.addExamples("guild-leaderboard weight u:CrypticPlasma", "guild-leaderboard sven u:CrypticPlasma mode:ironman")
 					.setCategory("guild"),
 				new HelpData(
 					"guild-kicker",
@@ -163,7 +163,7 @@ public class HelpCommand extends Command {
 					"A customizable helper that will tell you who to promote or demote in your Hypixel guild. Please DM me or join the Skyblock Plus [Discord Server](" +
 					DISCORD_SERVER_INVITE_LINK +
 					") to set this up for your guild.",
-					"guild-ranks <u:player> [mode:normal|ironman]"
+					"guild-ranks <u:player> [mode:regular|ironman|stranded]"
 				)
 					.addAliases("g-ranks", "g-rank")
 					.addExamples("guild-ranks u:CrypticPlasma")
@@ -316,10 +316,10 @@ public class HelpCommand extends Command {
 					"weight [player] [profile]"
 				)
 					.addSecondData(
-						"Calculate predicted senither weight using given stats (not 100% accurate).",
-						"weight calculate [skill avg] [slayer] [cata level] [avg dungeon class level]"
+						"Calculate predicted weight change for a reaching certain skill, slayer, or catacombs level/amount.",
+						"weight calculate [player] [profile] <type:type> <amount:amount>"
 					)
-					.addExamples("weight CrypticPlasma", "weight CrypticPlasma Zucchini", "weight calculate 37 600500 23 22")
+					.addExamples("weight CrypticPlasma", "weight CrypticPlasma Zucchini", "weight calculate CrypticPlasma type:catacombs amount:43")
 					.setCategory("miscellaneous"),
 				new HelpData("hypixel", "Get Hypixel information about a player.", "hypixel [player]")
 					.addSecondData("Get fastest Hypixel lobby parkour for a player.", "hypixel parkour [player]")
@@ -622,8 +622,8 @@ public class HelpCommand extends Command {
 										),
 										new HelpData(
 											"ironman",
-											"Whether applicants must use an ironman profile. Default is false.",
-											"settings guild <name> apply ironman <true|false>",
+											"Whether applicants must use a certain gamemode profile in their application. Defaults to all.",
+											"settings guild <name> apply gamemode <true|false>",
 											true
 										),
 										new HelpData(
@@ -742,13 +742,13 @@ public class HelpCommand extends Command {
 			help.create("guild members <g:guild_name>", "Get a list of all members in a guild") +
 			help.create("guild experience <u:player>", "Get the experience leaderboard for a player's guild") +
 			help.create("guild experience <g:guild_name>", "Get the experience leaderboard for a guild") +
-			help.create("g-lb <type> <u:player> [mode:normal|ironman]", "Get a leaderboard for a player's guild") +
+			help.create("g-lb <type> <u:player> [mode:normal|ironman|stranded]", "Get a leaderboard for a player's guild") +
 			help.create(
 				"g-kicker <u:player> <type:value> ...",
 				"Get all player's who don't meet the provided requirements. The requirement name can be skills, slayer, catacombs, or weight. The requirement value must be an integer."
 			) +
 			help.create(
-				"g-ranks <u:player> [mode:normal|ironman]",
+				"g-ranks <u:player> [mode:normal|ironman|stranded]",
 				"A customizable helper that will tell you who to promote or demote in your Hypixel guild"
 			)
 		);
@@ -793,8 +793,8 @@ public class HelpCommand extends Command {
 			help.create("networth [player] [profile] --verbose", "Calculate a player's networth with a detailed JSON of each item cost") +
 			help.create("weight [player] [profile]", "Get a player's slayer, skills, dungeons, and total weight") +
 			help.create(
-				"weight calculate <skill avg> <slayer> <cata lvl> <avg dungeon class lvl>",
-				"Estimate a weight using given statistics"
+				"weight calculate [player] [profile] <type:type> <amount:amount>",
+				"Calculate predicted weight change for a reaching certain skill, slayer, or catacombs level/amount."
 			) +
 			help.create("hypixel [player]", "Get Hypixel information about a player") +
 			help.create("hypixel parkour [player]", "Get fastest Hypixel lobby parkour for a player") +
@@ -920,8 +920,8 @@ public class HelpCommand extends Command {
 				"Message that will be sent if applicant is waitlisted. Can be set to none"
 			) +
 			help.create(
-				"settings guild <name> apply ironman <true|false>",
-				"Whether applicants must use an ironman profile. Defaults to false"
+				"settings guild <name> apply gamemode <true|false>",
+				"Whether applicants must use a certain gamemode profile in their application. Defaults to 'all'"
 			) +
 			help.create("settings guild <name> apply deny_message <message>", "Message that will be sent if applicant is denied") +
 			help.create(

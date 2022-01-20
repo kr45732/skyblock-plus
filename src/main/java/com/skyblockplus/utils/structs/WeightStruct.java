@@ -42,7 +42,7 @@ public class WeightStruct {
 	}
 
 	/**
-	 * Note: returns the weight struct being added, not this
+	 * @return The weight struct being added, not this
 	 **/
 	public WeightStruct add(WeightStruct o) {
 		this.base += o.base;
@@ -50,11 +50,20 @@ public class WeightStruct {
 		return o;
 	}
 
-	public String getFormatted() {
-		return roundAndFormat(base + overflow) + (overflow > 0 ? " (" + roundAndFormat(base) + " + " + roundAndFormat(overflow) + ")" : "");
+	public String getFormatted(){
+		return getFormatted(true);
+	}
+
+	public String getFormatted(boolean showOverflow) {
+		return roundAndFormat(base + overflow) + (overflow > 0 && showOverflow ? " (" + roundAndFormat(base) + " + " + roundAndFormat(overflow) + ")" : "");
 	}
 
 	public double getRaw() {
 		return base + overflow;
+	}
+
+	public void reset(){
+		this.base = 0;
+		this.overflow = 0;
 	}
 }

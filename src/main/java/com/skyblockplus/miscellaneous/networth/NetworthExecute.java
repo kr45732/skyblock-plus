@@ -162,7 +162,7 @@ public class NetworthExecute {
 				}
 			}
 
-			Map<Integer, InvItem> invArmorMap = player.getInventoryArmorMap();
+			Map<Integer, InvItem> invArmorMap = player.getArmorMap();
 			if (invArmorMap != null) {
 				for (InvItem item : invArmorMap.values()) {
 					double itemPrice = calculateItemPrice(item);

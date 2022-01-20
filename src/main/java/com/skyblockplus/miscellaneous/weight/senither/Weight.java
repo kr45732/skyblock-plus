@@ -39,7 +39,7 @@ public class Weight {
 		this.dungeonsWeight = new DungeonsWeight(player);
 
 		if (calculateWeight) {
-			calculateWeight();
+			calculateWeight("");
 		}
 	}
 
@@ -125,16 +125,32 @@ public class Weight {
 		return w;
 	}
 
-	private void calculateWeight() {
+	public Weight calculateWeight(String exclude){
+		slayerWeight.getWeightStruct().reset();
+		skillsWeight.getWeightStruct().reset();
+		dungeonsWeight.getWeightStruct().reset();
+
+		exclude = exclude.toLowerCase();
 		for (String slayerName : SLAYER_NAMES) {
-			slayerWeight.getSlayerWeight(slayerName);
+			if(!exclude.equals(slayerName)) {
+				slayerWeight.getSlayerWeight(slayerName);
+			}
 		}
+
 		for (String skillName : SKILL_NAMES) {
-			skillsWeight.getSkillsWeight(skillName);
+			if(!exclude.equals(skillName)) {
+				skillsWeight.getSkillsWeight(skillName);
+			}
 		}
-		dungeonsWeight.getDungeonWeight("catacombs");
+
+		if(!exclude.equals("catacombs")) {
+			dungeonsWeight.getDungeonWeight("catacombs");
+		}
 		for (String dungeonClassName : DUNGEON_CLASS_NAMES) {
-			dungeonsWeight.getClassWeight(dungeonClassName);
+			if(!exclude.equals(dungeonClassName)) {
+				dungeonsWeight.getClassWeight(dungeonClassName);
+			}
 		}
+		return this;
 	}
 }
