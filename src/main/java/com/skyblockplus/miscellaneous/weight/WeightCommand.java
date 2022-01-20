@@ -145,7 +145,6 @@ public class WeightCommand extends Command {
 				Weight predictedWeight = new Weight(player).calculateWeight(type);
 				WeightStruct pre = weight.getSlayerWeight().getSlayerWeight(type);
 				WeightStruct post = predictedWeight.getSlayerWeight().getSlayerWeight(type, amount);
-				System.out.println(post.getFormatted(true));
 				eb.addField(
 					"Slayer Change",
 					roundAndFormat(player.getTotalSlayer()) + " ➜ " + roundAndFormat(player.getTotalSlayer(type, amount)),

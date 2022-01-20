@@ -69,12 +69,26 @@ public class WeightSlashCommand extends SlashCommand {
 			)
 			.addSubcommands(
 				new SubcommandData("calculate", "Calculate predicted weight change for a reaching certain skill/slayer/catacombs amount")
+					.addOptions(
+						new OptionData(OptionType.STRING, "type", "Skill, slayer, or dungeon type to see change of", true)
+								.addChoice("Sven", "sven")
+								.addChoice("Revenant", "rev")
+								.addChoice("Tarantula", "tara")
+								.addChoice("Enderman", "enderman")
+								.addChoice("Alchemy", "alchemy")
+								.addChoice("Combat", "combat")
+								.addChoice("Farming", "farming")
+								.addChoice("Mining", "sven")
+								.addChoice("Fishing", "fishing")
+								.addChoice("Taming", "taming")
+								.addChoice("Enchanting", "enchanting")
+								.addChoice("Foraging", "foraging")
+								.addChoice("Catacombs", "catacombs")
+							,
+						new OptionData(OptionType.INTEGER, "amount", "Target level or amount", true).setRequiredRange(0, 500000000)
+					)
 					.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 					.addOption(OptionType.STRING, "profile", "Profile name")
-					.addOptions(
-						new OptionData(OptionType.STRING, "type", "Skill, slayer, or dungeon type to see change of", true),
-						new OptionData(OptionType.NUMBER, "amount", "Target level or amount", true).setRequiredRange(0, 500000000)
-					)
 			);
 	}
 
