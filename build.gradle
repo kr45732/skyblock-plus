@@ -88,7 +88,7 @@ dependencies {
     runtimeOnly 'org.postgresql:postgresql:42.3.1'
 
     // MySQL
-    implementation 'mysql:mysql-connector-java:8.0.27'
+    implementation 'mysql:mysql-connector-java:8.0.28'
 
     // Http Client
     implementation 'org.apache.httpcomponents:httpclient:4.5.13'
