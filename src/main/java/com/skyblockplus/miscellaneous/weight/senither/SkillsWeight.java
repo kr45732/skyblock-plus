@@ -46,6 +46,7 @@ public class SkillsWeight {
 	public WeightStruct getSkillsWeight(String skillName) {
 		return getSkillsWeight(skillName, player.getSkill(skillName, Player.WeightType.SENITHER));
 	}
+
 	public WeightStruct getSkillsWeight(String skillName, SkillsStruct skillsStruct) {
 		Double[] curWeights = SKILL_WEIGHTS.get(skillName);
 		double exponent = curWeights[0];

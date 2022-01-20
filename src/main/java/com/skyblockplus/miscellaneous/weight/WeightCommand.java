@@ -49,37 +49,122 @@ public class WeightCommand extends Command {
 			if (type.equals("catacombs")) {
 				SkillsStruct current = player.getCatacombs();
 				SkillsStruct target = player.skillInfoFromLevel(amount, type);
-				eb.addField("Current", "Level: " + roundAndFormat(current.getProgressLevel()) + "\nXP: " + formatNumber(current.totalExp()), false);
-				eb.addField("Target", "Level: " + amount + "\nXP: " + formatNumber(target.totalExp()) + " (+" + formatNumber(target.totalExp() - current.totalExp()) + ")", false);
+				eb.addField(
+					"Current",
+					"Level: " + roundAndFormat(current.getProgressLevel()) + "\nXP: " + formatNumber(current.totalExp()),
+					false
+				);
+				eb.addField(
+					"Target",
+					"Level: " +
+					amount +
+					"\nXP: " +
+					formatNumber(target.totalExp()) +
+					" (+" +
+					formatNumber(target.totalExp() - current.totalExp()) +
+					")",
+					false
+				);
 				Weight weight = new Weight(player).calculateWeight(type);
 				Weight predictedWeight = new Weight(player).calculateWeight(type);
 				WeightStruct pre = weight.getDungeonsWeight().getDungeonWeight(type);
 				WeightStruct post = predictedWeight.getDungeonsWeight().getDungeonWeight(type, target);
-				eb.addField("Weight Change", "Total: " + weight.getTotalWeight().getFormatted(false) + " ➜ " + predictedWeight.getTotalWeight().getFormatted(false) + "\n" + capitalizeString(type) + ": " + pre.getFormatted(false) + " ➜ " + post.getFormatted(false), false);
+				eb.addField(
+					"Weight Change",
+					"Total: " +
+					weight.getTotalWeight().getFormatted(false) +
+					" ➜ " +
+					predictedWeight.getTotalWeight().getFormatted(false) +
+					"\n" +
+					capitalizeString(type) +
+					": " +
+					pre.getFormatted(false) +
+					" ➜ " +
+					post.getFormatted(false),
+					false
+				);
 				return eb;
 			} else if (ALL_SKILL_NAMES.contains(type)) {
 				SkillsStruct current = player.getSkill(type);
 				SkillsStruct target = player.skillInfoFromLevel(amount, type);
-				eb.addField("Current", "Level: " + roundAndFormat(current.getProgressLevel()) + "\nXP: " + formatNumber(current.totalExp()), false);
-				eb.addField("Target", "Level: " + amount + "\nXP: " + formatNumber(target.totalExp()) + " (+" + formatNumber(target.totalExp() - current.totalExp()) + ")", false);
+				eb.addField(
+					"Current",
+					"Level: " + roundAndFormat(current.getProgressLevel()) + "\nXP: " + formatNumber(current.totalExp()),
+					false
+				);
+				eb.addField(
+					"Target",
+					"Level: " +
+					amount +
+					"\nXP: " +
+					formatNumber(target.totalExp()) +
+					" (+" +
+					formatNumber(target.totalExp() - current.totalExp()) +
+					")",
+					false
+				);
 				Weight weight = new Weight(player).calculateWeight(type);
 				Weight predictedWeight = new Weight(player).calculateWeight(type);
 				WeightStruct pre = weight.getSkillsWeight().getSkillsWeight(type);
 				WeightStruct post = predictedWeight.getSkillsWeight().getSkillsWeight(type, target);
-				eb.addField("Skill Average Change", roundAndFormat(player.getSkillAverage()) + " ➜ " + roundAndFormat(player.getSkillAverage(type, amount)), false);
-				eb.addField("Weight Change", "Total: " + weight.getTotalWeight().getFormatted(false) + " ➜ " + predictedWeight.getTotalWeight().getFormatted(false) + "\n" +  capitalizeString(type) + ": " + pre.getFormatted(false) + " ➜ " + post.getFormatted(false), false);
+				eb.addField(
+					"Skill Average Change",
+					roundAndFormat(player.getSkillAverage()) + " ➜ " + roundAndFormat(player.getSkillAverage(type, amount)),
+					false
+				);
+				eb.addField(
+					"Weight Change",
+					"Total: " +
+					weight.getTotalWeight().getFormatted(false) +
+					" ➜ " +
+					predictedWeight.getTotalWeight().getFormatted(false) +
+					"\n" +
+					capitalizeString(type) +
+					": " +
+					pre.getFormatted(false) +
+					" ➜ " +
+					post.getFormatted(false),
+					false
+				);
 				return eb;
 			} else if (SLAYER_NAMES.contains(type)) {
 				int curXp = player.getSlayer(type);
 				eb.addField("Current", "Level: " + player.getSlayerLevel(type) + "\nXP: " + formatNumber(curXp), false);
-				eb.addField("Target", "Level: " + player.getSlayerLevel(type, amount) + "\nXP: " + formatNumber(amount) + " (+" + formatNumber(amount - curXp) + ")", false);
+				eb.addField(
+					"Target",
+					"Level: " +
+					player.getSlayerLevel(type, amount) +
+					"\nXP: " +
+					formatNumber(amount) +
+					" (+" +
+					formatNumber(amount - curXp) +
+					")",
+					false
+				);
 				Weight weight = new Weight(player).calculateWeight(type);
 				Weight predictedWeight = new Weight(player).calculateWeight(type);
 				WeightStruct pre = weight.getSlayerWeight().getSlayerWeight(type);
 				WeightStruct post = predictedWeight.getSlayerWeight().getSlayerWeight(type, amount);
 				System.out.println(post.getFormatted(true));
-				eb.addField("Slayer Change", roundAndFormat(player.getTotalSlayer()) + " ➜ " + roundAndFormat(player.getTotalSlayer(type, amount)), false);
-				eb.addField("Weight Change", "Total: " + weight.getTotalWeight().getFormatted(false) + " ➜ " + predictedWeight.getTotalWeight().getFormatted(false) + "\n" + capitalizeString(type) + ": " + pre.getFormatted(false) + " ➜ " + post.getFormatted(false), false);
+				eb.addField(
+					"Slayer Change",
+					roundAndFormat(player.getTotalSlayer()) + " ➜ " + roundAndFormat(player.getTotalSlayer(type, amount)),
+					false
+				);
+				eb.addField(
+					"Weight Change",
+					"Total: " +
+					weight.getTotalWeight().getFormatted(false) +
+					" ➜ " +
+					predictedWeight.getTotalWeight().getFormatted(false) +
+					"\n" +
+					capitalizeString(type) +
+					": " +
+					pre.getFormatted(false) +
+					" ➜ " +
+					post.getFormatted(false),
+					false
+				);
 				return eb;
 			} else {
 				return invalidEmbed("Invalid type");
@@ -200,15 +285,14 @@ public class WeightCommand extends Command {
 					String type = getStringOption("type");
 					int amount = getIntOption("amount");
 
-					if(type == null){
+					if (type == null) {
 						embed(invalidEmbed("Type is not provided or invalid"));
 						return;
 					}
-					if(amount < 0){
+					if (amount < 0) {
 						embed(invalidEmbed("Amount is not provided or invalid"));
 						return;
 					}
-
 
 					if (getMentionedUsername(args.length == 2 ? -2 : 2)) {
 						return;

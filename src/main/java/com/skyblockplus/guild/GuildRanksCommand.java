@@ -464,7 +464,7 @@ public class GuildRanksCommand extends Command {
 				logCommand();
 
 				if ((args.length == 3 || args.length == 2) && args[1].toLowerCase().startsWith("u:")) {
-				 Player.Gamemode gamemode=	Player.Gamemode.of(getStringOption("mode"));
+					Player.Gamemode gamemode = Player.Gamemode.of(getStringOption("mode"));
 
 					boolean useKey = getBooleanArg("--usekey");
 

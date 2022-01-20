@@ -76,7 +76,8 @@ public class GuildLeaderboardSlashCommand extends SlashCommand {
 					.addChoice("Enchanting", "enchanting")
 			)
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOptions(new OptionData(OptionType.STRING, "gamemode", "Gamemode type")
+			.addOptions(
+				new OptionData(OptionType.STRING, "gamemode", "Gamemode type")
 					.addChoice("regular", "regular")
 					.addChoice("ironman", "ironman")
 					.addChoice("stranded", "stranded")

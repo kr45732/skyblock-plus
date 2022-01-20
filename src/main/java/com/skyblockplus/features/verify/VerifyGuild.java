@@ -77,7 +77,10 @@ public class VerifyGuild {
 			}
 
 			String guildPrefix = getGuildPrefix(event.getGuild().getId());
-			if (!event.getMessage().getContentRaw().startsWith(guildPrefix + "link ") || !event.getMessage().getContentRaw().startsWith(guildPrefix + "verify ")) {
+			if (
+				!event.getMessage().getContentRaw().startsWith(guildPrefix + "link ") ||
+				!event.getMessage().getContentRaw().startsWith(guildPrefix + "verify ")
+			) {
 				event.getMessage().delete().queue();
 				return true;
 			}

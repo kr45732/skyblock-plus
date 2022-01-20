@@ -116,7 +116,6 @@ public class ApplyUser implements Serializable {
 
 		this.applicationChannelId = applicationChannel.getId();
 
-
 		Player player = new Player(playerUsername);
 		String[] profileNames = player.getAllProfileNames(Player.Gamemode.of(higherDepth(currentSettings, "applyGamemode", "all")));
 

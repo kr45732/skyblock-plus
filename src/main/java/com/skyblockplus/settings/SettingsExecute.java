@@ -1066,7 +1066,7 @@ public class SettingsExecute {
 	public EmbedBuilder setApplyGamemode(JsonObject guildSettings, String gamemode) {
 		try {
 			Player.Gamemode.of(gamemode);
-		}catch (Exception e){
+		} catch (Exception e) {
 			return invalidEmbed("Invalid gamemode");
 		}
 		guildSettings.addProperty("applyGamemode", gamemode.toLowerCase());

@@ -37,7 +37,7 @@ public record SkillsStruct(
 		return currentLevel + progressToNext;
 	}
 
-	public double getMaxXp(){
+	public double getMaxXp() {
 		return maxLevel == 50 ? Constants.SKILLS_LEVEL_50_XP : Constants.SKILLS_LEVEL_60_XP;
 	}
 }

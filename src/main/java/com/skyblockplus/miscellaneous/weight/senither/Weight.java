@@ -125,29 +125,29 @@ public class Weight {
 		return w;
 	}
 
-	public Weight calculateWeight(String exclude){
+	public Weight calculateWeight(String exclude) {
 		slayerWeight.getWeightStruct().reset();
 		skillsWeight.getWeightStruct().reset();
 		dungeonsWeight.getWeightStruct().reset();
 
 		exclude = exclude.toLowerCase();
 		for (String slayerName : SLAYER_NAMES) {
-			if(!exclude.equals(slayerName)) {
+			if (!exclude.equals(slayerName)) {
 				slayerWeight.getSlayerWeight(slayerName);
 			}
 		}
 
 		for (String skillName : SKILL_NAMES) {
-			if(!exclude.equals(skillName)) {
+			if (!exclude.equals(skillName)) {
 				skillsWeight.getSkillsWeight(skillName);
 			}
 		}
 
-		if(!exclude.equals("catacombs")) {
+		if (!exclude.equals("catacombs")) {
 			dungeonsWeight.getDungeonWeight("catacombs");
 		}
 		for (String dungeonClassName : DUNGEON_CLASS_NAMES) {
-			if(!exclude.equals(dungeonClassName)) {
+			if (!exclude.equals(dungeonClassName)) {
 				dungeonsWeight.getClassWeight(dungeonClassName);
 			}
 		}

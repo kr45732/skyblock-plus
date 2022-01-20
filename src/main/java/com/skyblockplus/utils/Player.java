@@ -309,7 +309,7 @@ public class Player {
 		double skillAverage = 0;
 		for (String skill : SKILL_NAMES) {
 			try {
-				if(skill.equals(skillName)) {
+				if (skill.equals(skillName)) {
 					skillAverage += overrideAmount;
 				} else {
 					SkillsStruct skillsStruct = getSkill(skill);
@@ -366,18 +366,18 @@ public class Player {
 		return new SkillsStruct(skill, level, maxLevel, skillExp, xpCurrent, xpForNext, progress);
 	}
 
-	public SkillsStruct skillInfoFromLevel(int targetLevel, String skill){
+	public SkillsStruct skillInfoFromLevel(int targetLevel, String skill) {
 		return skillInfoFromLevel(targetLevel, skill, WeightType.NONE);
 	}
 
 	public SkillsStruct skillInfoFromLevel(int targetLevel, String skill, WeightType weightType) {
 		JsonArray skillsTable =
-				switch (skill) {
-					case "catacombs" -> higherDepth(getLevelingJson(), "catacombs").getAsJsonArray();
-					case "runecrafting" -> higherDepth(getLevelingJson(), "runecrafting_xp").getAsJsonArray();
-					case "HOTM" -> higherDepth(getLevelingJson(), "HOTM").getAsJsonArray();
-					default -> higherDepth(getLevelingJson(), "leveling_xp").getAsJsonArray();
-				};
+			switch (skill) {
+				case "catacombs" -> higherDepth(getLevelingJson(), "catacombs").getAsJsonArray();
+				case "runecrafting" -> higherDepth(getLevelingJson(), "runecrafting_xp").getAsJsonArray();
+				case "HOTM" -> higherDepth(getLevelingJson(), "HOTM").getAsJsonArray();
+				default -> higherDepth(getLevelingJson(), "leveling_xp").getAsJsonArray();
+			};
 
 		int maxLevel = getSkillMaxLevel(skill, weightType);
 
@@ -413,7 +413,12 @@ public class Player {
 	}
 
 	public int getTotalSlayer(String type, int overrideAmount) {
-		return (type.equals("sven") ? overrideAmount : getSlayer("sven")) + (type.equals("rev") ? overrideAmount : getSlayer("rev")) + (type.equals("tara") ? overrideAmount : getSlayer("tara")) + (type.equals("enderman") ? overrideAmount : getSlayer("enderman"));
+		return (
+			(type.equals("sven") ? overrideAmount : getSlayer("sven")) +
+			(type.equals("rev") ? overrideAmount : getSlayer("rev")) +
+			(type.equals("tara") ? overrideAmount : getSlayer("tara")) +
+			(type.equals("enderman") ? overrideAmount : getSlayer("enderman"))
+		);
 	}
 
 	public int getSlayerBossKills(String slayerName, int tier) {
@@ -434,17 +439,22 @@ public class Player {
 		};
 	}
 
-	public int getSlayerLevel(String slayerName){
+	public int getSlayerLevel(String slayerName) {
 		return getSlayerLevel(slayerName, getSlayer(slayerName));
 	}
 
 	public int getSlayerLevel(String slayerName, int xp) {
-		JsonArray levelArray = higherDepth(getLevelingJson(), "slayer_xp." + switch (slayerName) {
-			case "sven" -> "wolf";
-			case "rev" -> "zombie";
-			case "tara" -> "spider";
-			default -> slayerName;
-		}).getAsJsonArray();
+		JsonArray levelArray = higherDepth(
+			getLevelingJson(),
+			"slayer_xp." +
+			switch (slayerName) {
+				case "sven" -> "wolf";
+				case "rev" -> "zombie";
+				case "tara" -> "spider";
+				default -> slayerName;
+			}
+		)
+			.getAsJsonArray();
 		int level = 0;
 		for (int i = 0; i < levelArray.size(); i++) {
 			if (xp >= levelArray.get(i).getAsInt()) {
@@ -1030,8 +1040,7 @@ public class Player {
 	}
 
 	public EmbedBuilder defaultPlayerEmbed(String extra) {
-		return defaultEmbed(fixUsername(getUsername()) + getSymbol(" ") + extra, skyblockStatsLink())
-			.setThumbnail(getThumbnailUrl());
+		return defaultEmbed(fixUsername(getUsername()) + getSymbol(" ") + extra, skyblockStatsLink()).setThumbnail(getThumbnailUrl());
 	}
 
 	public EmbedBuilder getFailEmbed() {
@@ -1099,19 +1108,22 @@ public class Player {
 		return petScore;
 	}
 
-	public String getSymbol(String... prefix){
-		return ((prefix.length >= 1 ? prefix[0] : "") + switch (getGamemode()){
-			case IRONMAN -> "\u267B️";
-			case STRANDED -> "\uD83C\uDFDD";
-			default -> "";
-		}).stripTrailing();
+	public String getSymbol(String... prefix) {
+		return (
+			(prefix.length >= 1 ? prefix[0] : "") +
+			switch (getGamemode()) {
+				case IRONMAN -> "\u267B️";
+				case STRANDED -> "\uD83C\uDFDD";
+				default -> "";
+			}
+		).stripTrailing();
 	}
 
-	public boolean isGamemode(Gamemode gamemode){
+	public boolean isGamemode(Gamemode gamemode) {
 		return getGamemode() == gamemode;
 	}
 
-	public Gamemode getGamemode(){
+	public Gamemode getGamemode() {
 		return Gamemode.of(higherDepth(getOuterProfileJson(), "game_mode", "regular"));
 	}
 
@@ -1239,7 +1251,7 @@ public class Player {
 		return (
 			"Player{" +
 			"validPlayer=" +
-					valid +
+			valid +
 			", playerUuid='" +
 			uuid +
 			'\'' +
@@ -1266,11 +1278,13 @@ public class Player {
 		IRONMAN;
 
 		public static Gamemode of(String gamemode) {
-			return valueOf(switch (gamemode = gamemode.toUpperCase()) {
-				case "ISLAND" -> "STRANDED";
-				case "" -> "ALL";
-				default -> gamemode;
-			});
+			return valueOf(
+				switch (gamemode = gamemode.toUpperCase()) {
+					case "ISLAND" -> "STRANDED";
+					case "" -> "ALL";
+					default -> gamemode;
+				}
+			);
 		}
 	}
 }

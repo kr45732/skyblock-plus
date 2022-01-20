@@ -43,10 +43,15 @@ public class WeightSlashCommand extends SlashCommand {
 		}
 
 		switch (event.getSubcommandName()) {
-			case "player" -> event.paginate(WeightCommand.getPlayerWeight(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
+			case "player" -> event.paginate(
+				WeightCommand.getPlayerWeight(event.player, event.getOptionStr("profile"), new PaginatorEvent(event))
+			);
 			case "calculate" -> event.embed(
 				WeightCommand.calculateWeight(
-					event.player, event.getOptionStr("profile"), event.getOptionStr("type"), event.getOptionInt("amount", 0)
+					event.player,
+					event.getOptionStr("profile"),
+					event.getOptionStr("type"),
+					event.getOptionInt("amount", 0)
 				)
 			);
 			default -> event.embed(event.invalidCommandMessage());
@@ -64,8 +69,8 @@ public class WeightSlashCommand extends SlashCommand {
 			)
 			.addSubcommands(
 				new SubcommandData("calculate", "Calculate predicted weight change for a reaching certain skill/slayer/catacombs amount")
-						.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-						.addOption(OptionType.STRING, "profile", "Profile name")
+					.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+					.addOption(OptionType.STRING, "profile", "Profile name")
 					.addOptions(
 						new OptionData(OptionType.STRING, "type", "Skill, slayer, or dungeon type to see change of", true),
 						new OptionData(OptionType.NUMBER, "amount", "Target level or amount", true).setRequiredRange(0, 500000000)

@@ -50,19 +50,22 @@ public class WeightStruct {
 		return o;
 	}
 
-	public String getFormatted(){
+	public String getFormatted() {
 		return getFormatted(true);
 	}
 
 	public String getFormatted(boolean showOverflow) {
-		return roundAndFormat(base + overflow) + (overflow > 0 && showOverflow ? " (" + roundAndFormat(base) + " + " + roundAndFormat(overflow) + ")" : "");
+		return (
+			roundAndFormat(base + overflow) +
+			(overflow > 0 && showOverflow ? " (" + roundAndFormat(base) + " + " + roundAndFormat(overflow) + ")" : "")
+		);
 	}
 
 	public double getRaw() {
 		return base + overflow;
 	}
 
-	public void reset(){
+	public void reset() {
 		this.base = 0;
 		this.overflow = 0;
 	}

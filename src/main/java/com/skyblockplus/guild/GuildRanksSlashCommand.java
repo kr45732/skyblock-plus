@@ -45,7 +45,7 @@ public class GuildRanksSlashCommand extends SlashCommand {
 		event.paginate(
 			GuildRanksCommand.getLeaderboard(
 				event.player,
-					Player.Gamemode.of(event.getOptionStr("gamemode", "regular")),
+				Player.Gamemode.of(event.getOptionStr("gamemode", "regular")),
 				event.getOptionBoolean("usekey", false),
 				new PaginatorEvent(event)
 			)
@@ -57,11 +57,12 @@ public class GuildRanksSlashCommand extends SlashCommand {
 		return Commands
 			.slash(name, "Get helper which shows who to promote or demote in your guild")
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOptions(new OptionData(OptionType.STRING, "gamemode", "Gamemode type")
-						.addChoice("regular", "regular")
-						.addChoice("ironman", "ironman")
-						.addChoice("stranded", "stranded")
-				)
+			.addOptions(
+				new OptionData(OptionType.STRING, "gamemode", "Gamemode type")
+					.addChoice("regular", "regular")
+					.addChoice("ironman", "ironman")
+					.addChoice("stranded", "stranded")
+			)
 			.addOption(OptionType.BOOLEAN, "usekey", "If the API key for this server should be used for more accurate results");
 	}
 

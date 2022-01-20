@@ -181,7 +181,7 @@ public class GuildLeaderboardCommand extends Command {
 				logCommand();
 
 				if ((args.length == 4 || args.length == 3) && args[2].toLowerCase().startsWith("u:")) {
-					Player.Gamemode gamemode=	Player.Gamemode.of(getStringOption("mode"));
+					Player.Gamemode gamemode = Player.Gamemode.of(getStringOption("mode"));
 
 					paginate(getLeaderboard(args[1], args[2].split(":")[1], gamemode, new PaginatorEvent(event)));
 					return;

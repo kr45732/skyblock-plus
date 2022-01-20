@@ -25,7 +25,6 @@ import static com.skyblockplus.utils.Utils.*;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;

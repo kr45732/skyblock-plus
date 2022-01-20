@@ -319,7 +319,11 @@ public class HelpCommand extends Command {
 						"Calculate predicted weight change for a reaching certain skill, slayer, or catacombs level/amount.",
 						"weight calculate [player] [profile] <type:type> <amount:amount>"
 					)
-					.addExamples("weight CrypticPlasma", "weight CrypticPlasma Zucchini", "weight calculate CrypticPlasma type:catacombs amount:43")
+					.addExamples(
+						"weight CrypticPlasma",
+						"weight CrypticPlasma Zucchini",
+						"weight calculate CrypticPlasma type:catacombs amount:43"
+					)
 					.setCategory("miscellaneous"),
 				new HelpData("hypixel", "Get Hypixel information about a player.", "hypixel [player]")
 					.addSecondData("Get fastest Hypixel lobby parkour for a player.", "hypixel parkour [player]")
