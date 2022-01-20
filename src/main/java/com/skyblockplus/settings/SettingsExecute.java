@@ -1345,7 +1345,9 @@ public class SettingsExecute {
 		paginateBuilder.addItems(
 			"**Automated Roles " +
 			(higherDepth(rolesSettings, "enable").getAsString().equals("true") ? "Enabled" : "Disabled") +
-			"**\n**Use highest:** " + higherDepth(rolesSettings, "useHighest", false) + "\n" +
+			"**\n**Use highest:** " +
+			higherDepth(rolesSettings, "useHighest", false) +
+			"\n" +
 			pageNumbers
 		);
 		roleNames.remove("enable");
@@ -1693,10 +1695,10 @@ public class SettingsExecute {
 			return invalidEmbed("Invalid guild role name or guild ranks not enabled");
 		} else if (isOneLevelRole(roleName)) {
 			return invalidEmbed(
-					"These roles do not support levels. Use `" + guildPrefix + "settings roles set <role_name> <@role>` instead"
+				"These roles do not support levels. Use `" + guildPrefix + "settings roles set <role_name> <@role>` instead"
 			);
-		} else if(roleName.equals("gamemode")){
-			if(!roleValue.equals("ironman") && !roleValue.equals("stranded")){
+		} else if (roleName.equals("gamemode")) {
+			if (!roleValue.equals("ironman") && !roleValue.equals("stranded")) {
 				return invalidEmbed("Mode must be ironman or stranded");
 			}
 		} else {
@@ -1743,7 +1745,7 @@ public class SettingsExecute {
 
 		if (roleName.equals("guild_member")) {
 			roleValue = guildName;
-		} else if(!roleName.equals("gamemode")) {
+		} else if (!roleName.equals("gamemode")) {
 			currentLevels =
 				collectJsonArray(streamJsonArray(currentLevels).sorted(Comparator.comparingLong(o -> higherDepth(o, "value").getAsLong())));
 		}
