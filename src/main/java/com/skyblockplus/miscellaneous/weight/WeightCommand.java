@@ -43,7 +43,7 @@ public class WeightCommand extends Command {
 	}
 
 	public static EmbedBuilder calculateWeight(String username, String profileName, String type, int amount) {
-		if((SLAYER_NAMES.contains(type) && amount > 500000000) || (amount > 100)){
+		if ((SLAYER_NAMES.contains(type) && amount > 500000000) || (amount > 100)) {
 			return invalidEmbed("Invalid amount");
 		}
 
