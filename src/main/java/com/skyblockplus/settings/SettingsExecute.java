@@ -2453,9 +2453,9 @@ public class SettingsExecute {
 		}
 
 		if (channel == null) {
-			return invalidEmbed("The provided text channel doesn't exist");
+			return invalidEmbed("The provided text channel does not exist");
 		} else if (!channel.canTalk()) {
-			return invalidEmbed("I do not have the necessary permissions to talk in the provided channel");
+			return invalidEmbed("I am missing the necessary permissions to send messages in the provided channel");
 		}
 
 		return channel;
