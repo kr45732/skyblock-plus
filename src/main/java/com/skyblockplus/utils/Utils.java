@@ -970,7 +970,9 @@ public class Utils {
 			return toMatch;
 		}
 
-		return nameToId(FuzzySearch.extractOne(toMatch, matchFrom.stream().map(Utils::idToName).distinct().collect(Collectors.toList())).getString());
+		return nameToId(
+			FuzzySearch.extractOne(toMatch, matchFrom.stream().map(Utils::idToName).distinct().collect(Collectors.toList())).getString()
+		);
 	}
 
 	public static String getClosestMatch(String toMatch, List<String> matchFrom) {

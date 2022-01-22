@@ -127,9 +127,9 @@ public class ApplyGuild {
 
 		JsonElement blacklistSettings = database.getBlacklistSettings(event.getGuild().getId());
 		JsonArray currentBlacklist = higherDepth(blacklistSettings, "blacklist").getAsJsonArray();
-		streamJsonArray(higherDepth(blacklistSettings, "isUsing").getAsJsonArray()).map(g ->
-				guildMap.get(g.getAsString()).blacklist
-		).forEach(currentBlacklist::addAll);
+		streamJsonArray(higherDepth(blacklistSettings, "isUsing").getAsJsonArray())
+			.map(g -> guildMap.get(g.getAsString()).blacklist)
+			.forEach(currentBlacklist::addAll);
 		JsonElement blacklisted = streamJsonArray(currentBlacklist)
 			.filter(blacklist ->
 				higherDepth(blacklist, "uuid").getAsString().equals(linkedAccount.uuid()) ||
@@ -234,7 +234,13 @@ public class ApplyGuild {
 				.stream()
 				.filter(applyUser -> applyUser.applicationChannelId.equals(toCloseChannel.getId()))
 				.findFirst()
-				.ifPresentOrElse(applyUser -> applyUser.onButtonClick(event, this, true), () -> toCloseChannel.sendMessageEmbeds(defaultEmbed("Closing Channel").build()).queue(m -> m.getTextChannel().delete().reason("Application closed").queueAfter(10, TimeUnit.SECONDS)));
+				.ifPresentOrElse(
+					applyUser -> applyUser.onButtonClick(event, this, true),
+					() ->
+						toCloseChannel
+							.sendMessageEmbeds(defaultEmbed("Closing Channel").build())
+							.queue(m -> m.getTextChannel().delete().reason("Application closed").queueAfter(10, TimeUnit.SECONDS))
+				);
 		} catch (Exception ignored) {}
 
 		event.getMessage().delete().queueAfter(3, TimeUnit.SECONDS);

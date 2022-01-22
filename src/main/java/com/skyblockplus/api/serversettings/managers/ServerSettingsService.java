@@ -20,12 +20,12 @@ package com.skyblockplus.api.serversettings.managers;
 
 import static com.skyblockplus.utils.Utils.DEFAULT_PREFIX;
 
-import com.skyblockplus.api.serversettings.blacklist.Blacklist;
 import com.skyblockplus.api.serversettings.automatedguild.ApplyRequirements;
 import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.api.serversettings.automatedroles.AutomatedRoles;
 import com.skyblockplus.api.serversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.serversettings.automatedverify.AutomatedVerify;
+import com.skyblockplus.api.serversettings.blacklist.Blacklist;
 import com.skyblockplus.api.serversettings.jacob.JacobSettings;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;

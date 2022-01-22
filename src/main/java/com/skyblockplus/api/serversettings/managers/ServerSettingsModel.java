@@ -18,10 +18,10 @@
 
 package com.skyblockplus.api.serversettings.managers;
 
-import com.skyblockplus.api.serversettings.blacklist.Blacklist;
 import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.api.serversettings.automatedroles.AutomatedRoles;
 import com.skyblockplus.api.serversettings.automatedverify.AutomatedVerify;
+import com.skyblockplus.api.serversettings.blacklist.Blacklist;
 import com.skyblockplus.api.serversettings.jacob.JacobSettings;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
 import java.util.ArrayList;
