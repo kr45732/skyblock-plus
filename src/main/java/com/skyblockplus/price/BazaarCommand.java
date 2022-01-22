@@ -46,18 +46,7 @@ public class BazaarCommand extends Command {
 
 		String itemId = nameToId(itemNameU);
 		if (higherDepth(bazaarItems, itemId) == null) {
-			Map<String, String> itemNameToId = new HashMap<>();
-			for (String itemIID : getJsonKeys(bazaarItems)) {
-				String itemName;
-				try {
-					itemName = higherDepth(bazaarItems, itemIID + ".name").getAsString();
-				} catch (Exception e) {
-					itemName = capitalizeString(itemIID.replace("_", " "));
-				}
-				itemNameToId.put(itemName, itemIID);
-			}
-
-			itemId = itemNameToId.get(getClosestMatch(itemId, new ArrayList<>(itemNameToId.keySet())));
+			itemId = getClosestMatchFromIds(itemId, getJsonKeys(bazaarItems));
 		}
 
 		JsonElement itemInfo = higherDepth(bazaarItems, itemId);

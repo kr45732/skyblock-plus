@@ -52,7 +52,7 @@ public class BazaarSlashCommand extends SlashCommand {
 	public void onAutoComplete(AutoCompleteEvent event) {
 		if (event.getFocusedOption().getName().equals("item")) {
 			event.replyClosestMatch(
-				event.getFocusedOption().getAsString(),
+				event.getFocusedOption().getValue(),
 				higherDepth(getBazaarJson(), "products")
 					.getAsJsonObject()
 					.keySet()

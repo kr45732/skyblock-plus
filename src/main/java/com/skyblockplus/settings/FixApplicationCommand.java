@@ -22,18 +22,20 @@ import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.getNameHistory;
-import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonObject;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.Main;
+import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.features.apply.ApplyUser;
 import com.skyblockplus.features.apply.log.ApplyLog;
 import com.skyblockplus.utils.command.CommandExecute;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -113,9 +115,10 @@ public class FixApplicationCommand extends Command {
 				logApplication = guild.getTextChannelById(higherDepth(settings, "applyLogChannel").getAsString()) != null;
 			} catch (Exception ignored) {}
 
-			String username = firstMessage.getEmbeds().get(0).getTitle().replace(" ♻️", "");
+			LinkedAccount linkedAcc = database.getByDiscord(applicant.getId());
+			String username = linkedAcc.username();
 			StringBuilder nameHistory = new StringBuilder();
-			for (String i : getNameHistory(usernameToUuid(username).uuid())) {
+			for (String i : getNameHistory(linkedAcc.uuid())) {
 				nameHistory.append("\n• ").append(fixUsername(i));
 			}
 

@@ -53,7 +53,6 @@ import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -80,27 +79,31 @@ public class AutomaticGuild {
 
 	private static final Logger log = LoggerFactory.getLogger(AutomaticGuild.class);
 
-	/* Automated Apply */
+	/* Apply */
 	public final List<ApplyGuild> applyGuild = new ArrayList<>();
-	/* Miscellaneous */
-	public final String guildId;
-	public final List<ScheduledFuture<?>> scheduledFutures = new ArrayList<>();
-	public final FarmingContest farmingContest;
-	/* Automated Verify */
+	public JsonArray blacklist = new JsonArray();
+	public Role applyGuestRole = null;
+	/* Verify */
 	public VerifyGuild verifyGuild;
 	/* Skyblock event */
 	public SkyblockEventHandler skyblockEventHandler = null;
 	public List<EventMember> eventMemberList = new ArrayList<>();
 	public Instant eventMemberListLastUpdated = null;
-	/* Party */
-	public final List<Party> partyList = new ArrayList<>();
-	public String prefix;
+	/* Fetchur */
 	public TextChannel fetchurChannel = null;
 	public Role fetchurPing = null;
+	/* Mayor */
 	public TextChannel mayorChannel = null;
 	public Role mayorPing = null;
-	public Role applyGuestRole = null;
+	/* Party */
+	public final List<Party> partyList = new ArrayList<>();
+	/* Jacob */
+	public final FarmingContest farmingContest;
+	/* Miscellaneous */
 	public final List<String> botManagerRoles = new ArrayList<>();
+	public final String guildId;
+	public final List<ScheduledFuture<?>> scheduledFutures = new ArrayList<>();
+	public String prefix;
 
 	/* Constructor */
 	public AutomaticGuild(GenericGuildEvent event) {
@@ -111,6 +114,9 @@ public class AutomaticGuild {
 		schedulerConstructor();
 		prefix = database.getPrefix(guildId);
 		farmingContest = new FarmingContest(guildId, higherDepth(serverSettings, "jacobSettings"));
+		try {
+			blacklist = higherDepth(serverSettings, "blacklist.blacklist").getAsJsonArray();
+		} catch (Exception ignored) {}
 		try {
 			fetchurChannel = event.getGuild().getTextChannelById(higherDepth(serverSettings, "fetchurChannel", null));
 		} catch (Exception ignored) {}
@@ -969,5 +975,9 @@ public class AutomaticGuild {
 	public void setBotManagerRoles(List<String> botManagerRoles) {
 		this.botManagerRoles.clear();
 		this.botManagerRoles.addAll(botManagerRoles);
+	}
+
+	public void setBlacklist(JsonArray blacklist) {
+		this.blacklist = blacklist;
 	}
 }

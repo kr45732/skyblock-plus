@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021 kr45732
+ * Copyright (c) 2021-2022 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -16,20 +16,38 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.api.serversettings.automatedguild;
+package com.skyblockplus.api.serversettings.blacklist;
 
+import javax.persistence.ElementCollection;
 import javax.persistence.Embeddable;
+import javax.persistence.FetchType;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Embeddable
-public class ApplyBlacklist {
+public class Blacklist {
 
-	private String username = "";
-	private String uuid = "";
-	private String reason = "";
+	@ElementCollection(fetch = FetchType.EAGER)
+	@Fetch(value = FetchMode.SUBSELECT)
+	private List<BlacklistEntry> blacklist = new ArrayList<>();
+
+	// Servers that can use this server's blacklist
+	@ElementCollection(fetch = FetchType.EAGER)
+	@Fetch(value = FetchMode.SUBSELECT)
+	private List<String> canUse = new ArrayList<>();
+
+	// Other servers' blacklists that this server is using
+	@ElementCollection(fetch = FetchType.EAGER)
+	@Fetch(value = FetchMode.SUBSELECT)
+	private List<String> isUsing = new ArrayList<>();
 }

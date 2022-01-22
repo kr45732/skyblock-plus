@@ -54,7 +54,11 @@ public class FixApplicationSlashCommand extends SlashCommand {
 			.slash(name, "Fix an application if it's broken")
 			.addOptions(
 				new OptionData(OptionType.CHANNEL, "channel", "Application channel", true).setChannelTypes(ChannelType.TEXT),
-				new OptionData(OptionType.INTEGER, "state", "State of the application", true).setRequiredRange(0, 3)
+				new OptionData(OptionType.INTEGER, "state", "State of the application", true)
+						.addChoice("User has not chosen profile they want to apply on (skip this if they only have one profile)", 0)
+						.addChoice("User has chosen profile they want to apply with but have not submitted their application", 1)
+						.addChoice("User has submitted their application but staff have not accepted, waitlisted, or denied them yet", 2)
+						.addChoice("Staff have accepted, waitlisted, or denied applicant but channel is still open", 3)
 			);
 	}
 }

@@ -25,7 +25,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.api.linkedaccounts.LinkedAccountService;
-import com.skyblockplus.api.serversettings.automatedguild.ApplyBlacklist;
+import com.skyblockplus.api.serversettings.blacklist.Blacklist;
 import com.skyblockplus.api.serversettings.automatedguild.ApplyRequirements;
 import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.api.serversettings.automatedroles.AutomatedRoles;
@@ -167,12 +167,12 @@ public class Database {
 		return settingsService.getPrefix(serverId).getBody();
 	}
 
-	public JsonArray getApplyBlacklist(String serverId) {
-		return gson.toJsonTree(settingsService.getApplyBlacklist(serverId).getBody()).getAsJsonArray();
+	public JsonElement getBlacklistSettings(String serverId) {
+		return gson.toJsonTree(settingsService.getBlacklistSettings(serverId).getBody());
 	}
 
-	public int setApplyBlacklist(String serverId, JsonArray newSettings) {
-		return settingsService.setApplyBlacklist(serverId, gson.fromJson(newSettings, ApplyBlacklist[].class)).getStatusCodeValue();
+	public int setBlacklistSettings(String serverId, JsonElement newSettings) {
+		return settingsService.setBlacklistSettings(serverId, gson.fromJson(newSettings, Blacklist.class)).getStatusCodeValue();
 	}
 
 	public List<AutomatedGuild> getAllGuildSettings(String serverId) {

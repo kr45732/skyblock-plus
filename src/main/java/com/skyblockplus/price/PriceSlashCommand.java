@@ -64,7 +64,7 @@ public class PriceSlashCommand extends SlashCommand {
 	@Override
 	public void onAutoComplete(AutoCompleteEvent event) {
 		if (event.getFocusedOption().getName().equals("item")) {
-			event.replyClosestMatch(event.getFocusedOption().getAsString(), getQueryItems());
+			event.replyClosestMatch(event.getFocusedOption().getValue(), getQueryItems());
 		}
 	}
 }

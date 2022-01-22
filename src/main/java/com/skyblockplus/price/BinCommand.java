@@ -117,7 +117,7 @@ public class BinCommand extends Command {
 			}
 		}
 
-		String closestMatch = getClosestMatch(itemId, getJsonKeys(lowestBinJson));
+		String closestMatch = getClosestMatchFromIds(itemId, getJsonKeys(lowestBinJson));
 		if (closestMatch != null) {
 			eb.addField(idToName(closestMatch), formatNumber(higherDepth(lowestBinJson, closestMatch, 0L)), false);
 			eb.setThumbnail(getItemThumbnail(closestMatch));

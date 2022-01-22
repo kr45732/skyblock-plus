@@ -965,6 +965,14 @@ public class Utils {
 		}
 	}
 
+	public static String getClosestMatchFromIds(String toMatch, List<String> matchFrom) {
+		if (matchFrom == null || matchFrom.isEmpty()) {
+			return toMatch;
+		}
+
+		return nameToId(FuzzySearch.extractOne(toMatch, matchFrom.stream().map(Utils::idToName).distinct().collect(Collectors.toList())).getString());
+	}
+
 	public static String getClosestMatch(String toMatch, List<String> matchFrom) {
 		if (matchFrom == null || matchFrom.isEmpty()) {
 			return toMatch;

@@ -46,7 +46,7 @@ public class EssenceSlashCommand extends SlashCommand {
 			case "upgrade" -> {
 				String itemId = nameToId(event.getOptionStr("item"));
 				if (higherDepth(getEssenceCostsJson(), itemId) == null) {
-					String closestMatch = getClosestMatch(itemId, ESSENCE_ITEM_NAMES);
+					String closestMatch = getClosestMatchFromIds(itemId, ESSENCE_ITEM_NAMES);
 					itemId = closestMatch != null ? closestMatch : itemId;
 				}
 				JsonElement itemJson = higherDepth(getEssenceCostsJson(), itemId);
@@ -86,7 +86,7 @@ public class EssenceSlashCommand extends SlashCommand {
 	public void onAutoComplete(AutoCompleteEvent event) {
 		if (event.getFocusedOption().getName().equals("item")) {
 			event.replyClosestMatch(
-				event.getFocusedOption().getAsString(),
+				event.getFocusedOption().getValue(),
 				ESSENCE_ITEM_NAMES.stream().map(Utils::idToName).distinct().collect(Collectors.toList())
 			);
 		} else if (event.getFocusedOption().getName().equals("player")) {

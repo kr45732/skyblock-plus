@@ -1281,6 +1281,7 @@ public class Player {
 			return valueOf(
 				switch (gamemode = gamemode.toUpperCase()) {
 					case "ISLAND" -> "STRANDED";
+					case "BINGO" -> "REGULAR";
 					case "" -> "ALL";
 					default -> gamemode;
 				}

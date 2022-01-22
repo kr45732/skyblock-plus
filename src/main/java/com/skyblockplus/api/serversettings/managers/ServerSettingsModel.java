@@ -18,7 +18,7 @@
 
 package com.skyblockplus.api.serversettings.managers;
 
-import com.skyblockplus.api.serversettings.automatedguild.ApplyBlacklist;
+import com.skyblockplus.api.serversettings.blacklist.Blacklist;
 import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.api.serversettings.automatedroles.AutomatedRoles;
 import com.skyblockplus.api.serversettings.automatedverify.AutomatedVerify;
@@ -57,9 +57,8 @@ public class ServerSettingsModel {
 	@Embedded
 	private AutomatedGuild automatedGuildTwo = null;
 
-	@ElementCollection(fetch = FetchType.EAGER)
-	@Fetch(value = FetchMode.SUBSELECT)
-	private List<ApplyBlacklist> applicationBlacklist = new ArrayList<>();
+	@Embedded
+	private Blacklist blacklist;
 
 	@Embedded
 	private AutomatedRoles automatedRoles = new AutomatedRoles();
@@ -104,7 +103,7 @@ public class ServerSettingsModel {
 		copy.setAutomatedVerify(automatedVerify);
 		copy.setAutomatedGuildOne(automatedGuildOne);
 		copy.setAutomatedGuildTwo(automatedGuildTwo);
-		copy.setApplicationBlacklist(applicationBlacklist);
+		copy.setBlacklist(blacklist);
 		copy.setAutomatedRoles(automatedRoles);
 		copy.setSbEvent(sbEvent);
 		copy.setJacobSettings(jacobSettings);

@@ -20,6 +20,7 @@ package com.skyblockplus.features.apply;
 
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -124,7 +125,12 @@ public class ApplyGuild {
 			);
 		}
 
-		JsonElement blacklisted = streamJsonArray(database.getApplyBlacklist(event.getGuild().getId()))
+		JsonElement blacklistSettings = database.getBlacklistSettings(event.getGuild().getId());
+		JsonArray currentBlacklist = higherDepth(blacklistSettings, "blacklist").getAsJsonArray();
+		streamJsonArray(higherDepth(blacklistSettings, "isUsing").getAsJsonArray()).map(g ->
+				guildMap.get(g.getAsString()).blacklist
+		).forEach(currentBlacklist::addAll);
+		JsonElement blacklisted = streamJsonArray(currentBlacklist)
 			.filter(blacklist ->
 				higherDepth(blacklist, "uuid").getAsString().equals(linkedAccount.uuid()) ||
 				higherDepth(blacklist, "username").getAsString().equals(linkedAccount.username())
@@ -228,7 +234,7 @@ public class ApplyGuild {
 				.stream()
 				.filter(applyUser -> applyUser.applicationChannelId.equals(toCloseChannel.getId()))
 				.findFirst()
-				.ifPresent(applyUser -> applyUser.onButtonClick(event, this, true));
+				.ifPresentOrElse(applyUser -> applyUser.onButtonClick(event, this, true), () -> toCloseChannel.sendMessageEmbeds(defaultEmbed("Closing Channel").build()).queue(m -> m.getTextChannel().delete().reason("Application closed").queueAfter(10, TimeUnit.SECONDS)));
 		} catch (Exception ignored) {}
 
 		event.getMessage().delete().queueAfter(3, TimeUnit.SECONDS);

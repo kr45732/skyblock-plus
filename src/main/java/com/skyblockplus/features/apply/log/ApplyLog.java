@@ -32,6 +32,9 @@ import net.dv8tion.jda.api.utils.MiscUtil;
 public class ApplyLog {
 
 	public static LogMessage toLog(Message message) {
+		if(message.getMember() == null){
+			try{message.getGuild().retrieveMember(message.getAuthor()).complete();}catch (Exception ignored){}
+		}
 		LogMessage.Builder builder = LogMessage
 			.builder()
 			.id(message.getId())

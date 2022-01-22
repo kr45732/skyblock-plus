@@ -53,7 +53,7 @@ public class AverageAuctionSlashCommand extends SlashCommand {
 	public void onAutoComplete(AutoCompleteEvent event) {
 		if (event.getFocusedOption().getName().equals("item")) {
 			event.replyClosestMatch(
-				event.getFocusedOption().getAsString(),
+				event.getFocusedOption().getValue(),
 				getAverageAuctionJson().keySet().stream().map(Utils::idToName).distinct().collect(Collectors.toList())
 			);
 		} else if (event.getFocusedOption().getName().equals("player")) {

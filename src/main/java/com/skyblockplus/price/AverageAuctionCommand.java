@@ -132,7 +132,7 @@ public class AverageAuctionCommand extends Command {
 			}
 		}
 
-		String closestMatch = getClosestMatch(itemId, getJsonKeys(averageAhJson));
+		String closestMatch = getClosestMatchFromIds(itemId, getJsonKeys(averageAhJson));
 		if (closestMatch != null) {
 			JsonElement itemJson = higherDepth(averageAhJson, closestMatch);
 			eb.addField(

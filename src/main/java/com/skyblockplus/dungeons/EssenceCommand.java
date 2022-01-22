@@ -45,7 +45,7 @@ public class EssenceCommand extends Command {
 		preFormattedItem = nameToId(preFormattedItem);
 
 		if (higherDepth(essenceCostsJson, preFormattedItem) == null) {
-			String closestMatch = getClosestMatch(preFormattedItem, ESSENCE_ITEM_NAMES);
+			String closestMatch = getClosestMatchFromIds(preFormattedItem, ESSENCE_ITEM_NAMES);
 			preFormattedItem = closestMatch != null ? closestMatch : preFormattedItem;
 		}
 
@@ -129,7 +129,7 @@ public class EssenceCommand extends Command {
 					String itemId = nameToId(args[2]);
 
 					if (higherDepth(getEssenceCostsJson(), itemId) == null) {
-						String closestMatch = getClosestMatch(itemId, ESSENCE_ITEM_NAMES);
+						String closestMatch = getClosestMatchFromIds(itemId, ESSENCE_ITEM_NAMES);
 						itemId = closestMatch != null ? closestMatch : itemId;
 					}
 
