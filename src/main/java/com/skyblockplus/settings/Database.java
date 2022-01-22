@@ -70,6 +70,10 @@ public class Database {
 		settingsService.addNewServerSettings(serverId, serverSettingsModel).getStatusCodeValue();
 	}
 
+	public void setServerSettings(String serverId, ServerSettingsModel serverSettingsModel) {
+		settingsService.setServerSettings(serverId, serverSettingsModel).getStatusCodeValue();
+	}
+
 	public int deleteServerSettings(String serverId) {
 		return settingsService.deleteServerSettings(serverId).getStatusCodeValue();
 	}

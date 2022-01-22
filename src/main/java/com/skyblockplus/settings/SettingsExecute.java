@@ -113,10 +113,6 @@ public class SettingsExecute {
 				case "mayor_channel" -> eb = setMayorChannel(args[3]);
 				case "mayor_ping" -> eb = setMayorPing(args[3]);
 			}
-			// settings guild blacklist share <id>
-			// settings guild blacklist unshare <id>
-			// settings guild blacklist add <id>
-			// settings guild blacklist remove <id>
 		} else if (
 			(args.length == 4 || args.length == 5 || content.split(" ", 6).length == 6) &&
 			args[1].equals("guild") &&
