@@ -75,9 +75,9 @@ public class HypixelGuildCache {
 	}
 
 	public void addPlayer(Player player) {
-		normalCache.add(memberCacheFromPlayer(player, Player.Gamemode.REGULAR));
+		normalCache.add(memberCacheFromPlayer(player, Player.Gamemode.ALL));
 		ironmanCache.add(memberCacheFromPlayer(player, Player.Gamemode.IRONMAN));
-		strandedCache.add(memberCacheFromPlayer(player, Player.Gamemode.IRONMAN));
+		strandedCache.add(memberCacheFromPlayer(player, Player.Gamemode.STRANDED));
 	}
 
 	public Instant getLastUpdated() {
@@ -90,7 +90,7 @@ public class HypixelGuildCache {
 	}
 
 	public List<String> getCache() {
-		return getCache(Player.Gamemode.REGULAR);
+		return getCache(Player.Gamemode.ALL);
 	}
 
 	public List<String> getCache(Player.Gamemode gamemode) {
