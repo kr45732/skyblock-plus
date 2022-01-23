@@ -231,8 +231,17 @@ public class GuildRanksCommand extends Command {
 					uniqueGuildName.add(higherDepth(lbM, "username").getAsString());
 				}
 			}
-			lastUpdated = Instant.parse(higherDepth(streamJsonArray(higherDepth(getJson("https://hypixel-app-api.senither.com/leaderboard"), "data").getAsJsonArray())
-					.filter(g -> higherDepth(g, "id").getAsString().equals(guildId)).findFirst().get(), "last_updated_at").getAsString());
+			lastUpdated =
+				Instant.parse(
+					higherDepth(
+						streamJsonArray(higherDepth(getJson("https://hypixel-app-api.senither.com/leaderboard"), "data").getAsJsonArray())
+							.filter(g -> higherDepth(g, "id").getAsString().equals(guildId))
+							.findFirst()
+							.get(),
+						"last_updated_at"
+					)
+						.getAsString()
+				);
 		}
 
 		if (lbType.equals("position")) {

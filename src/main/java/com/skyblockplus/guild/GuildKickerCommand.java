@@ -109,7 +109,6 @@ public class GuildKickerCommand extends Command {
 
 			int missingReqsCount = 0;
 			for (JsonElement guildMember : guildMembers) {
-
 				double slayer = higherDepth(guildMember, "total_slayer").getAsDouble();
 				double skills = higherDepth(guildMember, "average_skill_progress").getAsDouble();
 				double catacombs = higherDepth(guildMember, "catacomb").getAsDouble();
@@ -155,7 +154,6 @@ public class GuildKickerCommand extends Command {
 				}
 			}
 
-
 			paginateBuilder.setPaginatorExtras(
 				new PaginatorExtras()
 					.setEveryPageTitle("Guild Kick Helper")
@@ -164,8 +162,20 @@ public class GuildKickerCommand extends Command {
 						"**Total missing requirements:** " +
 						missingReqsCount +
 						"\n**Updated:** <t:" +
-						Instant.parse(higherDepth(streamJsonArray(higherDepth(getJson("https://hypixel-app-api.senither.com/leaderboard"), "data").getAsJsonArray())
-								.filter(g -> higherDepth(g, "id").getAsString().equals(guildId)).findFirst().get(), "last_updated_at").getAsString()).getEpochSecond() +
+						Instant
+							.parse(
+								higherDepth(
+									streamJsonArray(
+										higherDepth(getJson("https://hypixel-app-api.senither.com/leaderboard"), "data").getAsJsonArray()
+									)
+										.filter(g -> higherDepth(g, "id").getAsString().equals(guildId))
+										.findFirst()
+										.get(),
+									"last_updated_at"
+								)
+									.getAsString()
+							)
+							.getEpochSecond() +
 						":R>\n"
 					)
 			);
