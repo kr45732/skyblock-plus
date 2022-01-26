@@ -121,7 +121,7 @@ public class SacksCommand extends Command {
 						"\n"
 					)
 			);
-			System.out.println(makeHastePost(missing.toString()));
+//			System.out.println(makeHastePost(missing.toString()));
 			event.paginate(paginateBuilder);
 			return null;
 		}
