@@ -56,6 +56,21 @@ public class AuctionFlipper {
 	private static Instant lastUpdated = Instant.now();
 	private static Instant lastHerokuUpdated = Instant.now();
 
+	public static void scheduleHerokuUpdate() {
+		scheduler.scheduleWithFixedDelay(() -> {
+			try {
+				if (Duration.between(lastHerokuUpdated, Instant.now()).toMinutes() > 10) {
+					deleteUrl(
+							"https://api.heroku.com/apps/query-api/dynos",
+							new BasicHeader("Accept", "application/vnd.heroku+json; version=3"),
+							new BasicHeader("Authorization", "Bearer " + HEROKU_API_KEY)
+					);
+				}
+			} catch (Exception ignored) {
+			}
+		}, 10, 10, TimeUnit.MINUTES);
+	}
+
 	public static void onGuildMessageReceived(MessageReceivedEvent event) {
 		try {
 			if (event.getChannel().getId().equals("912156704383336458") && event.isWebhookMessage()) {
@@ -78,12 +93,6 @@ public class AuctionFlipper {
 				} else if (desc.contains(" query auctions into database in ")) {
 					queryItems = null;
 				}
-			} else if (Duration.between(lastHerokuUpdated, Instant.now()).toMinutes() > 10) {
-				deleteUrl(
-					"https://api.heroku.com/apps/query-api/dynos",
-					new BasicHeader("Accept", "application/vnd.heroku+json; version=3"),
-					new BasicHeader("Authorization", "Bearer " + HEROKU_API_KEY)
-				);
 			}
 		} catch (Exception ignored) {}
 	}

@@ -266,6 +266,7 @@ public class Main {
 		ApiHandler.initialize();
 		TrackAuctionsCommand.initialize();
 		AuctionFlipper.setEnable(true);
+		AuctionFlipper.scheduleHerokuUpdate();
 		PublicEndpoints.initialize();
 		FetchurHandler.initialize();
 		MayorHandler.initialize();
