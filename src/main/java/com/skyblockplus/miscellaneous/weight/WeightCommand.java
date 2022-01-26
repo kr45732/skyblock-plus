@@ -43,7 +43,7 @@ public class WeightCommand extends Command {
 	}
 
 	public static EmbedBuilder calculateWeight(String username, String profileName, String type, int amount) {
-		if ((SLAYER_NAMES.contains(type) && amount > 500000000) || (amount > 100)) {
+		if ((SLAYER_NAMES.contains(type) && amount > 500000000) || (!SLAYER_NAMES.contains(type) && amount > 100)) {
 			return invalidEmbed("Invalid amount");
 		}
 
@@ -226,7 +226,7 @@ public class WeightCommand extends Command {
 			eb.addField("Slayer | " + weight.getSlayerWeight().getWeightStruct().getFormatted(), slayerStr.toString(), false);
 			eb.addField("Skills | " + weight.getSkillsWeight().getWeightStruct().getFormatted(), skillsStr.toString(), false);
 			eb.addField("Dungeons | " + weight.getDungeonsWeight().getWeightStruct().getFormatted(), dungeonsStr.toString(), false);
-			eb.setDescription("**Total Weight:** " + weight.getTotalWeight().getFormatted());
+			eb.setDescription("**Total Weight:** " + weight.getTotalWeight().getFormatted() + "\n**Stage:** " + weight.getStage());
 			extras.addEmbedPage(eb);
 
 			com.skyblockplus.miscellaneous.weight.lily.Weight lilyWeight = new com.skyblockplus.miscellaneous.weight.lily.Weight(player);
@@ -268,7 +268,7 @@ public class WeightCommand extends Command {
 			lilyEb.addField("Slayer | " + lilyWeight.getSlayerWeight().getWeightStruct().getFormatted(), lilySlayerStr.toString(), false);
 			lilyEb.addField("Skills | " + lilyWeight.getSkillsWeight().getWeightStruct().getFormatted(), lilySkillsStr.toString(), false);
 			lilyEb.addField("Dungeons | " + lilyWeight.getDungeonsWeight().getWeightStruct().getFormatted(), lilyDungeonsStr, false);
-			lilyEb.setDescription("**Total Weight:** " + lilyWeight.getTotalWeight().getFormatted());
+			lilyEb.setDescription("**Total Weight:** " + lilyWeight.getTotalWeight().getFormatted() + "\n**Stage:** " + lilyWeight.getStage());
 			extras.addEmbedPage(lilyEb);
 
 			event.paginate(paginateBuilder.setPaginatorExtras(extras));

@@ -49,7 +49,7 @@ public class RolesCommand extends Command {
 
 	public RolesCommand() {
 		this.name = "roles";
-		this.cooldown = 10;
+		this.cooldown = 7;
 		this.aliases = new String[] { "role" };
 		this.botPermissions = defaultPerms();
 	}

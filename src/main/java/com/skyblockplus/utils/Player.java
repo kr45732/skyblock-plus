@@ -49,6 +49,9 @@ public class Player {
 	private String failCause = "Unknown fail cause";
 
 	/* Constructors */
+	// Empty player, always invalid
+	public Player(){}
+
 	public Player(String username) {
 		if (usernameToUuid(username)) {
 			return;

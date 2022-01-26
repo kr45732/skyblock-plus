@@ -73,6 +73,7 @@ import net.dv8tion.jda.api.entities.User;
 import okhttp3.OkHttpClient;
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
@@ -101,7 +102,7 @@ public class Utils {
 	public static final ScriptEngine jsScriptEngine = new ScriptEngineManager().getEngineByName("js");
 	public static final AtomicInteger remainingLimit = new AtomicInteger(120);
 	public static final AtomicInteger timeTillReset = new AtomicInteger(0);
-	public static final ConcurrentHashMap<String, HypixelKeyInformation> keyCooldownMap = new ConcurrentHashMap<>();
+	public static final ConcurrentHashMap<String, HypixelKeyRecord> keyCooldownMap = new ConcurrentHashMap<>();
 	public static final Cache<String, HypixelGuildCache> hypixelGuildsCacheMap = Caffeine
 		.newBuilder()
 		.expireAfterWrite(15, TimeUnit.MINUTES)
@@ -111,6 +112,7 @@ public class Utils {
 	private static final Pattern mcColorPattern = Pattern.compile("(?i)\\u00A7[0-9A-FK-OR]");
 	private static final Logger log = LoggerFactory.getLogger(Utils.class);
 	public static final Consumer<Object> ignore = ignored -> {};
+	public static final Pattern nicknameTemplatePattern = Pattern.compile("\\[(GUILD|PLAYER)\\.(\\w+)]");
 	/* Configuration File */
 	public static String HYPIXEL_API_KEY = "";
 	public static String BOT_TOKEN = "";
@@ -120,7 +122,6 @@ public class Utils {
 	public static String DATABASE_PASSWORD = "";
 	public static String API_USERNAME = "";
 	public static String API_PASSWORD = "";
-	public static String API_BASE_URL = "";
 	public static String GITHUB_TOKEN = "";
 	public static String DEFAULT_PREFIX = "";
 	public static String CACHE_DATABASE_TOKEN = "";
@@ -132,6 +133,7 @@ public class Utils {
 	public static String LINKED_USER_URL = "";
 	public static String LINKED_USER_USERNAME = "";
 	public static String LINKED_USER_PASSWORD = "";
+	public static String HEROKU_API_KEY = "";
 	/* JSON */
 	private static JsonObject essenceCostsJson;
 	private static JsonObject levelingJson;
@@ -491,11 +493,26 @@ public class Utils {
 
 			StringEntity entity = new StringEntity(body.toString(), "UTF-8");
 			httpPost.setEntity(entity);
-			httpPost.setHeaders(headers);
 			httpPost.setHeader("Content-Type", "application/json");
 			httpPost.setHeader("Accept", "application/json");
+			httpPost.setHeaders(headers);
 
 			try (CloseableHttpResponse httpResponse = httpClient.execute(httpPost)) {
+				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent()));
+			}
+		} catch (Exception ignored) {}
+		return null;
+	}
+
+	public static JsonElement deleteUrl(String url, Header... headers) {
+		try {
+			HttpDelete httpDelete = new HttpDelete(url);
+
+			httpDelete.setHeader("Content-Type", "application/json");
+			httpDelete.setHeader("Accept", "application/json");
+			httpDelete.setHeaders(headers);
+
+			try (CloseableHttpResponse httpResponse = httpClient.execute(httpDelete)) {
 				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent()));
 			}
 		} catch (Exception ignored) {}
@@ -887,7 +904,7 @@ public class Utils {
 
 	public static EmbedBuilder checkHypixelKey(String hypixelKey) {
 		if (hypixelKey == null) {
-			return invalidEmbed("You must set a Hypixel API key to use this command");
+			return invalidEmbed("You must set a Hypixel API key to use this feature");
 		}
 
 		try {
@@ -897,7 +914,7 @@ public class Utils {
 		}
 
 		if (!keyCooldownMap.containsKey(hypixelKey)) {
-			keyCooldownMap.put(hypixelKey, new HypixelKeyInformation());
+			keyCooldownMap.put(hypixelKey, new HypixelKeyRecord());
 		}
 
 		return null;
@@ -923,7 +940,6 @@ public class Utils {
 			GITHUB_TOKEN = (String) appProps.get("GITHUB_TOKEN");
 			API_USERNAME = (String) appProps.get("API_USERNAME");
 			API_PASSWORD = (String) appProps.get("API_PASSWORD");
-			API_BASE_URL = (String) appProps.get("API_BASE_URL");
 			DEFAULT_PREFIX = (String) appProps.get("DEFAULT_PREFIX");
 			CACHE_DATABASE_TOKEN = (String) appProps.get("CACHE_DATABASE_TOKEN");
 			AUCTION_API_KEY = (String) appProps.get("AUCTION_API_KEY");
@@ -934,6 +950,7 @@ public class Utils {
 			LINKED_USER_URL = (String) appProps.get("LINKED_USER_URL");
 			LINKED_USER_USERNAME = (String) appProps.get("LINKED_USER_USERNAME");
 			LINKED_USER_PASSWORD = (String) appProps.get("LINKED_USER_PASSWORD");
+			HEROKU_API_KEY = (String) appProps.get("HEROKU_API_KEY");
 		} catch (IOException e) {
 			HYPIXEL_API_KEY = System.getenv("HYPIXEL_API_KEY");
 			BOT_TOKEN = System.getenv("BOT_TOKEN");
@@ -951,7 +968,6 @@ public class Utils {
 			GITHUB_TOKEN = System.getenv("GITHUB_TOKEN");
 			API_USERNAME = System.getenv("API_USERNAME");
 			API_PASSWORD = System.getenv("API_PASSWORD");
-			API_BASE_URL = System.getenv("API_BASE_URL");
 			DEFAULT_PREFIX = System.getenv("DEFAULT_PREFIX");
 			CACHE_DATABASE_TOKEN = System.getenv("CACHE_DATABASE_TOKEN");
 			AUCTION_API_KEY = System.getenv("AUCTION_API_KEY");
@@ -962,6 +978,7 @@ public class Utils {
 			LINKED_USER_URL = System.getenv("LINKED_USER_URL");
 			LINKED_USER_USERNAME = System.getenv("LINKED_USER_USERNAME");
 			LINKED_USER_PASSWORD = System.getenv("LINKED_USER_PASSWORD");
+			HEROKU_API_KEY = System.getenv("HEROKU_API_KEY");
 		}
 	}
 

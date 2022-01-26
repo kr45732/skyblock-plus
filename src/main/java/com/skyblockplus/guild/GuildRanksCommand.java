@@ -52,6 +52,10 @@ public class GuildRanksCommand extends Command {
 	}
 
 	public static EmbedBuilder getLeaderboard(String username, Player.Gamemode gamemode, boolean useKey, PaginatorEvent event) {
+		if(!event.getUser().getId().equals("385939031596466176")){
+			return invalidEmbed("This command has been disabled");
+		}
+
 		String hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
 
 		if (gamemode != Player.Gamemode.REGULAR) {
@@ -64,7 +68,7 @@ public class GuildRanksCommand extends Command {
 				return invalidEmbed("You must set a valid Hypixel API key to use the ironman only option");
 			}
 			if (!keyCooldownMap.containsKey(hypixelKey)) {
-				keyCooldownMap.put(hypixelKey, new HypixelKeyInformation());
+				keyCooldownMap.put(hypixelKey, new HypixelKeyRecord());
 			}
 			useKey = true;
 		} else if (useKey) {
@@ -147,7 +151,7 @@ public class GuildRanksCommand extends Command {
 					futuresList.add(
 						guildMemberUsername.thenApply(guildMemberUsernameResponse -> {
 							try {
-								if (keyCooldownMap.get(hypixelKey).remainingLimit().get() < 5) {
+								if (keyCooldownMap.get(hypixelKey).isRateLimited()) {
 									System.out.println("Sleeping for " + keyCooldownMap.get(hypixelKey).timeTillReset().get() + " seconds");
 									TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).timeTillReset().get());
 								}
@@ -473,8 +477,7 @@ public class GuildRanksCommand extends Command {
 				logCommand();
 
 				if ((args.length == 3 || args.length == 2) && args[1].toLowerCase().startsWith("u:")) {
-					Player.Gamemode gamemode = Player.Gamemode.of(getStringOption("mode"));
-
+					Player.Gamemode gamemode = Player.Gamemode.of(getStringOption("mode", "all"));
 					boolean useKey = getBooleanArg("--usekey");
 
 					paginate(getLeaderboard(args[1].split(":")[1], gamemode, useKey, new PaginatorEvent(event)));

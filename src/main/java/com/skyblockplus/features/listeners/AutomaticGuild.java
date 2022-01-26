@@ -18,14 +18,6 @@
 
 package com.skyblockplus.features.listeners;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.features.skyblockevent.SkyblockEventCommand.endSkyblockEvent;
-import static com.skyblockplus.utils.ApiHandler.getGuildFromId;
-import static com.skyblockplus.utils.Constants.NUMBER_TO_RARITY_MAP;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -43,18 +35,7 @@ import com.skyblockplus.features.skyblockevent.SkyblockEventCommand;
 import com.skyblockplus.features.skyblockevent.SkyblockEventHandler;
 import com.skyblockplus.features.verify.VerifyGuild;
 import com.skyblockplus.utils.structs.HypixelResponse;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.Writer;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import com.skyblockplus.utils.structs.RoleModifyRecord;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
@@ -74,6 +55,27 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.Writer;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static com.skyblockplus.Main.database;
+import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.features.skyblockevent.SkyblockEventCommand.endSkyblockEvent;
+import static com.skyblockplus.utils.ApiHandler.getGuildFromId;
+import static com.skyblockplus.utils.Constants.NUMBER_TO_RARITY_MAP;
+import static com.skyblockplus.utils.Utils.*;
 
 public class AutomaticGuild {
 
@@ -345,6 +347,8 @@ public class AutomaticGuild {
 					}
 				} catch (Exception ignored) {}
 
+				verifyGuild = new VerifyGuild(guildId); // Prevent the old settings from deleting the new message
+
 				Message reactMessage = reactChannel
 					.sendMessage(higherDepth(currentSettings, "messageText").getAsString())
 					.addFile(new File("src/main/java/com/skyblockplus/features/verify/Link_Discord_To_Hypixel.mp4"))
@@ -437,64 +441,84 @@ public class AutomaticGuild {
 				}
 			}
 
+			Map<Member, RoleModifyRecord> memberToRoleChanges = new HashMap<>();
 			if (verifyEnabled) {
-				List<HypixelResponse> guildResponses = null;
+				List<Role> toAddRoles = streamJsonArray(higherDepth(verifySettings, "verifiedRoles").getAsJsonArray())
+						.map(e -> guild.getRoleById(e.getAsString()))
+						.filter(Objects::nonNull)
+						.collect(Collectors.toCollection(ArrayList::new));
+				List<Role> toRemoveRoles = new ArrayList<>();
+				try {
+					toRemoveRoles.add(guild.getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString()));
+				} catch (Exception ignored) {}
+
+//				List<HypixelResponse> guildResponses = null;
+//				String key = database.getServerHypixelApiKey(guild.getId());
+//				key = checkHypixelKey(key) == null ?  key : null;
 				for (Member linkedMember : inGuildUsers) {
 					if (!guild.getSelfMember().canInteract(linkedMember)) {
 						continue;
 					}
 
-					LinkedAccount linkedAccount = discordToUuid.get(linkedMember.getId());
-					String nicknameTemplate = higherDepth(verifySettings, "verifiedNickname").getAsString();
-					if (nicknameTemplate.contains("[IGN]")) {
-						nicknameTemplate = nicknameTemplate.replace("[IGN]", linkedAccount.username());
+//					LinkedAccount linkedAccount = discordToUuid.get(linkedMember.getId());
+//					String nicknameTemplate = higherDepth(verifySettings, "verifiedNickname").getAsString();
+//					if (nicknameTemplate.contains("[IGN]")) {
+//						nicknameTemplate = nicknameTemplate.replace("[IGN]", linkedAccount.username());
+//
+//						Matcher matcher = nicknameTemplatePattern.matcher(nicknameTemplate);
+//						Player player = null;
+//						while(matcher.find()) {
+//							String category = matcher.group(1).toUpperCase();
+//							String type = matcher.group(2).toUpperCase();
+//
+//							if (category.equals("GUILD") && (type.equals("NAME") || type.equals("TAG") || type.equals("RANK")) && guildSettings != null && !guildSettings.isEmpty()) {
+//								if (guildResponses == null) {
+//									guildResponses =
+//											guildSettings.stream().map(g -> getGuildFromId(g.getGuildId())).collect(Collectors.toList());
+//								}
+//								HypixelResponse guildResponse = guildResponses
+//										.stream()
+//										.filter(g -> streamJsonArray(g.get("members").getAsJsonArray())
+//												.anyMatch(m -> higherDepth(m, "uuid", "").equals(linkedAccount.uuid()))
+//										).findFirst().orElse(null);
+//
+//								if (guildResponse != null) {
+//									nicknameTemplate = nicknameTemplate.replace("[GUILD." + type + "]", switch (type) {
+//										case "NAME" -> guildResponse.get("name").getAsString();
+//										case "RANK" -> higherDepth(streamJsonArray(guildResponse.get("members").getAsJsonArray())
+//												.filter(g -> higherDepth(g, "uuid", "").equals(linkedAccount.uuid())).findFirst().orElse(null), "rank", "");
+//										default -> guildResponse.get("tag").getAsString();
+//									});
+//								}
+//							} else if (category.equals("PLAYER") && (type.equals("SKILLS") || type.equals("CATACOMBS") || type.equals("SLAYER") || type.equals("WEIGHT"))) {
+//								if (key != null) {
+//									if (player == null) {
+//										HypixelResponse response = skyblockProfilesFromUuid(linkedAccount.uuid(), key);
+//										player = response.isNotValid() ? new Player() : new Player(linkedAccount.uuid(), linkedAccount.username(), response.response());
+//									}
+//
+//									if (player.isValid()) {
+//										nicknameTemplate = nicknameTemplate.replace("[PLAYER." + type + "]",
+//												switch (type) {
+//													case "SKILLS" -> roundAndFormat(player.getSkillAverage());
+//													case "SLAYER" -> simplifyNumber(player.getTotalSlayer());
+//													case "WEIGHT" -> roundAndFormat(player.getWeight());
+//													default -> roundAndFormat(player.getCatacombs().getProgressLevel());
+//												}
+//										);
+//									}
+//								}
+//							}
+//
+//							nicknameTemplate = nicknameTemplate.replace(matcher.group(0), "");
+//						}
+//
+//						linkedMember.modifyNickname(nicknameTemplate).queue(ignore, ignore);
+//					}
 
-						if (nicknameTemplate.contains("[GUILD_RANK]") && guildSettings != null && !guildSettings.isEmpty()) {
-							try {
-								if (guildResponses == null) {
-									guildResponses =
-										guildSettings.stream().map(g -> getGuildFromId(g.getGuildId())).collect(Collectors.toList());
-								}
-
-								for (HypixelResponse guildResponse : guildResponses) {
-									String rank = higherDepth(
-										streamJsonArray(guildResponse.get("members").getAsJsonArray())
-											.filter(m -> higherDepth(m, "uuid", "").equals(linkedAccount.uuid()))
-											.findFirst()
-											.orElse(null),
-										"rank",
-										null
-									);
-									if (rank != null) {
-										nicknameTemplate = nicknameTemplate.replace("[GUILD_RANK]", rank);
-										break;
-									}
-								}
-							} catch (Exception ignored) {}
-						}
-
-						linkedMember.modifyNickname(nicknameTemplate).queue(ignore, ignore);
+					if(!toAddRoles.isEmpty() || !toRemoveRoles.isEmpty()) {
+						memberToRoleChanges.put(linkedMember, memberToRoleChanges.getOrDefault(linkedMember, new RoleModifyRecord()).update(toAddRoles, toRemoveRoles));
 					}
-
-					try {
-						List<Role> toAddRoles = streamJsonArray(higherDepth(verifySettings, "verifiedRoles").getAsJsonArray())
-							.map(e -> {
-								try {
-									return guild.getRoleById(e.getAsString());
-								} catch (Exception ignored) {
-									return null;
-								}
-							})
-							.filter(Objects::nonNull)
-							.collect(Collectors.toList());
-						List<Role> toRemoveRoles = new ArrayList<>();
-						try {
-							toRemoveRoles.add(guild.getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString()));
-						} catch (Exception ignored) {}
-						if (!toAddRoles.isEmpty() || !toRemoveRoles.isEmpty()) {
-							guild.modifyMemberRoles(linkedMember, toAddRoles, toRemoveRoles).queue();
-						}
-					} catch (Exception ignored) {}
 				}
 			}
 
@@ -563,10 +587,9 @@ public class AutomaticGuild {
 								}
 							}
 
-							try {
-								guild.modifyMemberRoles(linkedMember, rolesToAdd, rolesToRemove).queue(ignore, ignore);
-							} catch (Exception ignored) {}
-
+							if(!rolesToAdd.isEmpty() || !rolesToRemove.isEmpty()) {
+								memberToRoleChanges.put(linkedMember, memberToRoleChanges.getOrDefault(linkedMember, new RoleModifyRecord()).update(rolesToAdd, rolesToRemove));
+							}
 							memberCountList.add(linkedMember.getId());
 						}
 					}
@@ -599,6 +622,10 @@ public class AutomaticGuild {
 						counterUpdate++;
 					}
 				}
+			}
+
+			for (Map.Entry<Member, RoleModifyRecord> entry : memberToRoleChanges.entrySet()) {
+				guild.modifyMemberRoles(entry.getKey(), entry.getValue().add(), entry.getValue().remove()).queue();
 			}
 
 			logCommand(

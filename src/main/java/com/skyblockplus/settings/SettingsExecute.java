@@ -46,6 +46,8 @@ import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import com.vdurmont.emoji.EmojiParser;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -208,7 +210,8 @@ public class SettingsExecute {
 				} else if (args[2].equals("disable")) {
 					eb = setJacobEnable(false);
 				}
-			} else if (args.length == 4) {
+			} else if (content.split("\n", 4).length == 4) {
+				args = content.split("\n", 4);
 				eb =
 					switch (args[2]) {
 						case "add" -> addJacobCrop(args[3]);
@@ -2073,31 +2076,36 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder setVerifyNickname(String nickname) {
-		if (!nickname.contains("[IGN]")) {
-			if (nickname.equalsIgnoreCase("none")) {
-				int responseCode = updateVerifySettings("verifiedNickname", "none");
-				if (responseCode != 200) {
-					return apiFailMessage(responseCode);
-				}
-
-				return defaultSettingsEmbed("**Verify nickname disabled**");
+		if (nickname.equalsIgnoreCase("none")) {
+			int responseCode = updateVerifySettings("verifiedNickname", "none");
+			if (responseCode != 200) {
+				return apiFailMessage(responseCode);
 			}
-			return invalidEmbed("Nickname must contain [IGN] parameter");
+
+			return defaultSettingsEmbed("**Verify nickname disabled**");
 		}
 
-		if (nickname.contains("[GUILD_RANK]")) {
-			List<AutomatedGuild> guildRoleSettings = database.getAllGuildSettings(guild.getId());
-			guildRoleSettings.removeIf(o1 -> {
-				try {
-					return !o1.getGuildRanksEnable().equalsIgnoreCase("true");
-				} catch (Exception e) {
-					return true;
-				}
-			});
-			if (guildRoleSettings.size() == 0) {
+		if (!nickname.contains("[IGN]")) {
+			return invalidEmbed("Nickname template must contain [IGN]");
+		}
+
+		String origNick = nickname;
+		Matcher matcher = nicknameTemplatePattern.matcher(nickname);
+		while (matcher.find()) {
+			String category = matcher.group(1).toUpperCase();
+			String type = matcher.group(2).toUpperCase();
+
+			if (category.equals("GUILD") && (type.equals("NAME") || type.equals("TAG") || type.equals("RANK")) && database.getAllGuildSettings(guild.getId()).stream().noneMatch(g -> g.getGuildRanksEnable().equalsIgnoreCase("true"))) {
+				nickname = nickname.replaceFirst(matcher.group(0),"");
 				return invalidEmbed(
-					"At least one guild ranks must be enabled in " + guildPrefix + "`settings guild [name]` to use the [GUILD_RANK] prefix"
+					"At least one guild ranks must be enabled in " + guildPrefix + "`settings guild [name]` to use [GUILD." + type + "]"
 				);
+			}else if(category.equals("PLAYER") && (type.equals("SKILLS") || type.equals("CATACOMBS") || type.equals("SLAYER") || type.equals("WEIGHT") || type.equals("CLASS"))){
+				EmbedBuilder eb = checkHypixelKey(database.getServerHypixelApiKey(guild.getId()));
+				if(eb != null){
+					return eb;
+				}
+				nickname = nickname.replaceFirst(matcher.group(0),"");
 			}
 		}
 
@@ -2105,12 +2113,12 @@ public class SettingsExecute {
 			return invalidEmbed("Nickname prefix and/or postfix must be less than or equal to 15 letters");
 		}
 
-		int responseCode = updateVerifySettings("verifiedNickname", nickname);
+		int responseCode = updateVerifySettings("verifiedNickname", origNick);
 		if (responseCode != 200) {
 			return apiFailMessage(responseCode);
 		}
 
-		return defaultSettingsEmbed("**Verify nickname set to:** " + nickname);
+		return defaultSettingsEmbed("**Verify nickname set to:** " + origNick);
 	}
 
 	public EmbedBuilder removeVerifyRole(String roleMention) {

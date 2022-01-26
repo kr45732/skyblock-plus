@@ -206,7 +206,7 @@ public class GuildKickerCommand extends Command {
 					futuresList.add(
 						guildMemberUsername.thenApply(guildMemberUsernameResponse -> {
 							try {
-								if (keyCooldownMap.get(hypixelKey).remainingLimit().get() < 5) {
+								if (keyCooldownMap.get(hypixelKey).isRateLimited()) {
 									System.out.println("Sleeping for " + keyCooldownMap.get(hypixelKey).timeTillReset().get() + " seconds");
 									TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).timeTillReset().get());
 								}

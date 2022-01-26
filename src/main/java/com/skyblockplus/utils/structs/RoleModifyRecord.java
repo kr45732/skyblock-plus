@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021 kr45732
+ * Copyright (c) 2022 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -18,10 +18,19 @@
 
 package com.skyblockplus.utils.structs;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import net.dv8tion.jda.api.entities.Role;
 
-public record HypixelKeyInformation(AtomicInteger remainingLimit, AtomicInteger timeTillReset) {
-	public HypixelKeyInformation() {
-		this(new AtomicInteger(120), new AtomicInteger(0));
-	}
+import java.util.ArrayList;
+import java.util.List;
+
+public record RoleModifyRecord(List<Role> add, List<Role> remove) {
+    public RoleModifyRecord(){
+        this(new ArrayList<>(), new ArrayList<>());
+    }
+
+    public RoleModifyRecord update(List<Role> add, List<Role> remove){
+        this.add.addAll(add);
+        this.remove.addAll(remove);
+        return this;
+    }
 }

@@ -39,6 +39,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.message.BasicHeader;
 
 public class AuctionFlipper {
 
@@ -52,7 +53,8 @@ public class AuctionFlipper {
 		.buildJDA();
 	private static final Cache<String, Long> auctionUuidToMessage = Caffeine.newBuilder().expireAfterWrite(45, TimeUnit.MINUTES).build();
 	private static boolean enable = false;
-	private static Instant lastUpdated;
+	private static Instant lastUpdated = Instant.now();
+	private static Instant lastHerokuUpdated = Instant.now();
 
 	public static void onGuildMessageReceived(MessageReceivedEvent event) {
 		try {
@@ -69,12 +71,15 @@ public class AuctionFlipper {
 				event.isWebhookMessage() &&
 				Duration.between(lastQueryApiUpdate, Instant.now()).toMinutes() > 5
 			) {
+				lastHerokuUpdated = Instant.now();
 				String desc = event.getMessage().getEmbeds().get(0).getDescription();
 				if (enable && isMainBot() && desc.startsWith("Successfully updated under bins file in ")) {
 					flip();
 				} else if (desc.contains(" query auctions into database in ")) {
 					queryItems = null;
 				}
+			}else if (Duration.between(lastHerokuUpdated, Instant.now()).toMinutes() > 10) {
+				deleteUrl("https://api.heroku.com/apps/query-api/dynos", new BasicHeader("Accept", "application/vnd.heroku+json; version=3"), new BasicHeader("Authorization", "Bearer " + HEROKU_API_KEY));
 			}
 		} catch (Exception ignored) {}
 	}

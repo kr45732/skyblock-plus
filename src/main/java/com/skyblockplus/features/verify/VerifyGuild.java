@@ -22,14 +22,18 @@ import static com.skyblockplus.Main.database;
 import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
+import static com.skyblockplus.utils.ApiHandler.skyblockProfilesFromUuid;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
+import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
+import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
@@ -104,32 +108,62 @@ public class VerifyGuild {
 		String updatedRoles = "false";
 
 		try {
-			String[] nicknameTemplate = { higherDepth(verifySettings, "verifiedNickname", "none") };
-			if (nicknameTemplate[0].contains("[IGN]")) {
-				nicknameTemplate[0] = nicknameTemplate[0].replace("[IGN]", linkedUser.username());
+			String nicknameTemplate = higherDepth(verifySettings, "verifiedNickname", "none");
+			if (nicknameTemplate.contains("[IGN]")) {
+				nicknameTemplate = nicknameTemplate.replace("[IGN]", linkedUser.username());
 
-				if (nicknameTemplate[0].contains("[GUILD_RANK]")) {
-					try {
-						HypixelResponse playerGuild = getGuildFromPlayer(linkedUser.uuid());
-						if (!playerGuild.isNotValid()) {
-							database
-								.getAllGuildSettings(event.getGuild().getId())
-								.stream()
-								.filter(guildRole -> guildRole.getGuildId().equalsIgnoreCase(playerGuild.get("_id").getAsString()))
-								.findFirst()
-								.flatMap(settingsGuildId ->
-									streamJsonArray(playerGuild.get("members").getAsJsonArray())
-										.filter(g -> higherDepth(g, "uuid", "").equals(linkedUser.uuid()))
-										.findFirst()
-								)
-								.ifPresent(g ->
-									nicknameTemplate[0] = nicknameTemplate[0].replace("[GUILD_RANK]", higherDepth(g, "rank").getAsString())
-								);
+				Matcher matcher = nicknameTemplatePattern.matcher(nicknameTemplate);
+				HypixelResponse playerGuild = null;
+				Player player = null;
+				String key = database.getServerHypixelApiKey(event.getGuild().getId());
+				while (matcher.find()) {
+					String category = matcher.group(1);
+					String type = matcher.group(2);
+
+					if (category.equals("GUILD") && (type.equals("NAME") || type.equals("TAG") || type.equals("RANK"))) {
+						if (playerGuild == null) {
+							playerGuild = getGuildFromPlayer(linkedUser.uuid());
+							if (!playerGuild.isNotValid()) {
+								String gId = playerGuild.get("_id").getAsString();
+								if (database.getAllGuildSettings(event.getGuild().getId()).stream().noneMatch(g -> g.getGuildId().equals(gId))) {
+									playerGuild = new HypixelResponse();
+								}
+							}
 						}
-					} catch (Exception ignored) {}
+
+						if (!playerGuild.isNotValid()) {
+							nicknameTemplate = nicknameTemplate.replace(matcher.group(0), switch (type) {
+								case "NAME" -> playerGuild.get("name").getAsString();
+								case "RANK" -> higherDepth(streamJsonArray(playerGuild.get("members").getAsJsonArray())
+										.filter(g -> higherDepth(g, "uuid", "").equals(linkedUser.uuid())).findFirst().orElse(null), "rank", "");
+								default -> playerGuild.get("tag").getAsString();
+							});
+						}
+					} else if (category.equals("PLAYER") && (type.equals("SKILLS") || type.equals("CATACOMBS") || type.equals("SLAYER") || type.equals("WEIGHT") || type.equals("CLASS"))) {
+						if (key != null) {
+							if (player == null) {
+								HypixelResponse response = skyblockProfilesFromUuid(linkedUser.uuid(), key);
+								player = response.isNotValid() ? new Player() : new Player(linkedUser.uuid(), linkedUser.username(), response.response());
+							}
+
+							if (player.isValid()) {
+								nicknameTemplate = nicknameTemplate.replace(matcher.group(0),
+										switch (type) {
+											case "SKILLS" -> roundAndFormat(player.getSkillAverage());
+											case "SLAYER" -> simplifyNumber(player.getTotalSlayer());
+											case "WEIGHT" -> roundAndFormat(player.getWeight());
+											case "CLASS" -> player.getSelectedDungeonClass().equals("none") ? "" : "" + player.getSelectedDungeonClass().toUpperCase().charAt(0);
+											default -> roundAndFormat(player.getCatacombs().getProgressLevel());
+										}
+								);
+							}
+						}
+					}
+
+					nicknameTemplate = nicknameTemplate.replace(matcher.group(0), "");
 				}
 
-				event.getMember().modifyNickname(nicknameTemplate[0]).complete();
+				event.getMember().modifyNickname(nicknameTemplate).complete();
 				updatedNickname = "true";
 			}
 		} catch (Exception e) {

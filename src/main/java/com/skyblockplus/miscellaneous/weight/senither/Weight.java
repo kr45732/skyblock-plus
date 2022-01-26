@@ -125,6 +125,23 @@ public class Weight {
 		return w;
 	}
 
+	public String getStage(){
+		double weight = getTotalWeight().getRaw();
+		if(weight >= 30000){
+			return "No Life";
+		}else if(weight >= 15000){
+			return "End Game";
+		}else if(weight >= 10000){
+			return "Early End Game";
+		}else if(weight >= 7000){
+			return "Late Game";
+		}else if(weight >= 2000){
+			return "Mid Game";
+		}else{
+			return "Early Game";
+		}
+	}
+
 	public Weight calculateWeight(String exclude) {
 		slayerWeight.getWeightStruct().reset();
 		skillsWeight.getWeightStruct().reset();

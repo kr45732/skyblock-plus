@@ -477,10 +477,10 @@ public class HelpCommand extends Command {
 								),
 								new HelpData(
 									"nickname",
-									"The nickname template that a user will be renamed to on verifying. Can be set to none. You can use [GUILD_RANK] in the template. It will be replaced with the user's guild rank if they are in any guilds in `settings guild`.",
+									"The nickname template that a user will be renamed to on verifying. Can be set to none.\n\nYou can use the following templates:\n• [GUILD.NAME]\n• [GUILD.TAG]\n• [GUILD.RANK]\n• [PLAYER.SKILLS]\n• [PLAYER.CATACOMBS]\n• [PLAYER.SLAYER]\n• [PLAYER.WEIGHT]",
 									"nickname [prefix] [IGN] [postfix]"
 								)
-									.addExamples("nickname Verified | [IGN]", "nickname [[GUILD_RANK]] [IGN]"),
+									.addExamples("nickname Verified | [IGN]", "nickname [[GUILD.RANK]] [IGN]"),
 								new HelpData(
 									"remove_role",
 									"Set the role that will be removed on verifying and re-added when un-verifying.",

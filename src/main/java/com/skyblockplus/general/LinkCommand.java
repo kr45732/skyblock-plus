@@ -20,18 +20,26 @@ package com.skyblockplus.general;
 
 import static com.skyblockplus.Main.database;
 import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
+import static com.skyblockplus.utils.ApiHandler.skyblockProfilesFromUuid;
 import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.checkHypixelKey;
 
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
+import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
+import com.skyblockplus.utils.ApiHandler;
+import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -72,34 +80,63 @@ public class LinkCommand extends Command {
 			JsonElement verifySettings = database.getVerifySettings(guild.getId());
 			if (verifySettings != null) {
 				try {
-					String[] nicknameTemplate = new String[] { higherDepth(verifySettings, "verifiedNickname").getAsString() };
+					String nicknameTemplate = higherDepth(verifySettings, "verifiedNickname").getAsString();
 
-					if (nicknameTemplate[0].contains("[IGN]")) {
-						nicknameTemplate[0] = nicknameTemplate[0].replace("[IGN]", toAdd.username());
+					if (nicknameTemplate.contains("[IGN]")) {
+						nicknameTemplate = nicknameTemplate.replace("[IGN]", toAdd.username());
 
-						if (nicknameTemplate[0].contains("[GUILD_RANK]")) {
-							try {
-								HypixelResponse playerGuild = getGuildFromPlayer(toAdd.uuid());
-								if (!playerGuild.isNotValid()) {
-									database
-										.getAllGuildSettings(guild.getId())
-										.stream()
-										.filter(guildRole -> guildRole.getGuildId().equalsIgnoreCase(playerGuild.get("_id").getAsString()))
-										.findFirst()
-										.flatMap(settingsGuildId ->
-											streamJsonArray(playerGuild.get("members").getAsJsonArray())
-												.filter(g -> higherDepth(g, "uuid", "").equals(toAdd.uuid()))
-												.findFirst()
-										)
-										.ifPresent(g ->
-											nicknameTemplate[0] =
-												nicknameTemplate[0].replace("[GUILD_RANK]", higherDepth(g, "rank").getAsString())
-										);
+						Matcher matcher = nicknameTemplatePattern.matcher(nicknameTemplate);
+						HypixelResponse playerGuild = null;
+						Player player = null;
+						String key = database.getServerHypixelApiKey(guild.getId());
+						while (matcher.find()) {
+							String category = matcher.group(1);
+							String type = matcher.group(2);
+
+							if (category.equals("GUILD") && (type.equals("NAME") || type.equals("TAG") || type.equals("RANK"))) {
+								if (playerGuild == null) {
+									playerGuild = getGuildFromPlayer(toAdd.uuid());
+									if (!playerGuild.isNotValid()) {
+										String gId = playerGuild.get("_id").getAsString();
+										if (database.getAllGuildSettings(guild.getId()).stream().noneMatch(g -> g.getGuildId().equals(gId))) {
+											playerGuild = new HypixelResponse();
+										}
+									}
 								}
-							} catch (Exception ignored) {}
+
+								if (!playerGuild.isNotValid()) {
+									nicknameTemplate = nicknameTemplate.replace(matcher.group(0), switch (type) {
+										case "NAME" -> playerGuild.get("name").getAsString();
+										case "RANK" -> higherDepth(streamJsonArray(playerGuild.get("members").getAsJsonArray())
+												.filter(g -> higherDepth(g, "uuid", "").equals(toAdd.uuid())).findFirst().orElse(null), "rank", "");
+										default -> playerGuild.get("tag").getAsString();
+									});
+								}
+							} else if (category.equals("PLAYER") && (type.equals("SKILLS") || type.equals("CATACOMBS") || type.equals("SLAYER") || type.equals("WEIGHT") || type.equals("CLASS"))) {
+								if (key != null) {
+									if (player == null) {
+										HypixelResponse response = skyblockProfilesFromUuid(toAdd.uuid(), key);
+										player = response.isNotValid() ? new Player() : new Player(toAdd.uuid(), toAdd.username(), response.response());
+									}
+
+									if (player.isValid()) {
+										nicknameTemplate = nicknameTemplate.replace(matcher.group(0),
+												switch (type) {
+													case "SKILLS" -> roundAndFormat(player.getSkillAverage());
+													case "SLAYER" -> simplifyNumber(player.getTotalSlayer());
+													case "WEIGHT" -> roundAndFormat(player.getWeight());
+													case "CLASS" -> player.getSelectedDungeonClass().equals("none") ? "" : "" + player.getSelectedDungeonClass().toUpperCase().charAt(0);
+													default -> roundAndFormat(player.getCatacombs().getProgressLevel());
+												}
+										);
+									}
+								}
+							}
+
+							nicknameTemplate = nicknameTemplate.replace(matcher.group(0), "");
 						}
 
-						member.modifyNickname(nicknameTemplate[0]).queue();
+						member.modifyNickname(nicknameTemplate).queue();
 					}
 				} catch (Exception ignored) {}
 
@@ -117,10 +154,9 @@ public class LinkCommand extends Command {
 				} catch (Exception ignored) {}
 			}
 
-			return defaultEmbed("Success")
-				.setDescription("`" + member.getUser().getAsTag() + "` was linked to `" + playerInfo.username() + "`");
+			return defaultEmbed("Success").setDescription("You have been linked to `" + playerInfo.username() + "`");
 		} else {
-			return invalidEmbed("Error linking `" + member.getUser().getAsTag() + " to `" + playerInfo.username() + "`");
+			return invalidEmbed("Error when inserting into database");
 		}
 	}
 
