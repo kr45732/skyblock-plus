@@ -58,7 +58,7 @@ public class GuildKickerCommand extends Command {
 			return invalidEmbed("You can only enter a maximum of 3 sets of requirements");
 		}
 		for (int i = 0; i < reqsArr.length; i++) {
-			String[] indvReqs = reqsArr[i].replace("[", "").replace("]", "").split(" ");
+			String[] indvReqs = reqsArr[i].replace("[", "").replace("]", "").split("\\s+");
 			for (String indvReq : indvReqs) {
 				String[] reqDashSplit = indvReq.split(":");
 				if (reqDashSplit.length != 2) {
@@ -117,7 +117,7 @@ public class GuildKickerCommand extends Command {
 				boolean meetsReqs = false;
 
 				for (String req : reqsArr) {
-					String[] reqSplit = req.split(" ");
+					String[] reqSplit = req.split("\\s+");
 					double slayerReq = 0;
 					double skillsReq = 0;
 					double catacombsReq = 0;
@@ -254,7 +254,7 @@ public class GuildKickerCommand extends Command {
 				boolean meetsReqs = false;
 
 				for (String req : reqsArr) {
-					String[] reqSplit = req.split(" ");
+					String[] reqSplit = req.split("\\s+");
 					double slayerReq = 0;
 					double skillsReq = 0;
 					double catacombsReq = 0;

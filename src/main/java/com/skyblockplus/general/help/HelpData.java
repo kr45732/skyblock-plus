@@ -71,9 +71,9 @@ public class HelpData {
 
 	public EmbedBuilder getHelp(String subcommandName, String prefix) {
 		if (subcommandName != null) {
-			HelpData subcommand = subcommands.stream().filter(cmd -> cmd.matchTo(subcommandName.split(" ")[0])).findFirst().orElse(null);
+			HelpData subcommand = subcommands.stream().filter(cmd -> cmd.matchTo(subcommandName.split("\\s+")[0])).findFirst().orElse(null);
 			if (subcommand != null) {
-				return subcommand.getHelp(subcommandName.split(" ", 2).length == 2 ? subcommandName.split(" ", 2)[1] : null, prefix);
+				return subcommand.getHelp(subcommandName.split("\\s+", 2).length == 2 ? subcommandName.split("\\s+", 2)[1] : null, prefix);
 			}
 			return defaultEmbed("Invalid Command");
 		}

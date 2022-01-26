@@ -47,7 +47,6 @@ import com.vdurmont.emoji.EmojiParser;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -210,8 +209,8 @@ public class SettingsExecute {
 				} else if (args[2].equals("disable")) {
 					eb = setJacobEnable(false);
 				}
-			} else if (content.split("\n", 4).length == 4) {
-				args = content.split("\n", 4);
+			} else if (content.split(" ", 4).length == 4) {
+				args = content.split(" ", 4);
 				eb =
 					switch (args[2]) {
 						case "add" -> addJacobCrop(args[3]);
@@ -305,7 +304,7 @@ public class SettingsExecute {
 						eb = setVerifyNickname(args[3]);
 						break;
 					case "role":
-						args = content.split(" ");
+						args = content.split("\\s+");
 						if (args.length == 5 && args[3].equals("add")) {
 							eb = addVerifyRole(args[4]);
 						} else if (args.length == 5 && args[3].equals("remove")) {
@@ -1292,19 +1291,19 @@ public class SettingsExecute {
 		int weightReq = 0;
 
 		try {
-			slayerReq = Integer.parseInt(reqArgs.split("slayer:")[1].split(" ")[0]);
+			slayerReq = Integer.parseInt(reqArgs.split("slayer:")[1].split("\\s+")[0]);
 		} catch (Exception ignored) {}
 
 		try {
-			skillsReq = Integer.parseInt(reqArgs.split("skills:")[1].split(" ")[0]);
+			skillsReq = Integer.parseInt(reqArgs.split("skills:")[1].split("\\s+")[0]);
 		} catch (Exception ignored) {}
 
 		try {
-			cataReq = Integer.parseInt(reqArgs.split("catacombs:")[1].split(" ")[0]);
+			cataReq = Integer.parseInt(reqArgs.split("catacombs:")[1].split("\\s+")[0]);
 		} catch (Exception ignored) {}
 
 		try {
-			weightReq = Integer.parseInt(reqArgs.split("weight:")[1].split(" ")[0]);
+			weightReq = Integer.parseInt(reqArgs.split("weight:")[1].split("\\s+")[0]);
 		} catch (Exception ignored) {}
 
 		ApplyRequirements toAddReq = new ApplyRequirements("" + slayerReq, "" + skillsReq, "" + cataReq, "" + weightReq);
@@ -2097,13 +2096,14 @@ public class SettingsExecute {
 
 			if (
 				category.equals("GUILD") &&
-				(type.equals("NAME") || type.equals("TAG") || type.equals("RANK")) &&
-				database.getAllGuildSettings(guild.getId()).stream().noneMatch(g -> g.getGuildRanksEnable().equalsIgnoreCase("true"))
+				(type.equals("NAME") || type.equals("TAG") || type.equals("RANK"))
 			) {
-				nickname = nickname.replaceFirst(matcher.group(0), "");
-				return invalidEmbed(
-					"At least one guild ranks must be enabled in " + guildPrefix + "`settings guild [name]` to use [GUILD." + type + "]"
-				);
+				if(database.getAllGuildSettings(guild.getId()).stream().noneMatch(g -> g.getGuildRanksEnable().equalsIgnoreCase("true"))) {
+					return invalidEmbed(
+							"At least one guild ranks must be enabled in " + guildPrefix + "`settings guild [name]` to use [GUILD." + type + "]"
+					);
+				}
+				nickname = nickname.replace(matcher.group(0), "");
 			} else if (
 				category.equals("PLAYER") &&
 				(
@@ -2118,7 +2118,7 @@ public class SettingsExecute {
 				if (eb != null) {
 					return eb;
 				}
-				nickname = nickname.replaceFirst(matcher.group(0), "");
+				nickname = nickname.replace(matcher.group(0), "");
 			}
 		}
 

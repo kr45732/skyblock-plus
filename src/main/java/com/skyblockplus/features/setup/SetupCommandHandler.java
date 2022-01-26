@@ -222,7 +222,7 @@ public class SetupCommandHandler {
 						);
 					}
 					case 2 -> {
-						String[] verifyRoles = event.getMessage().getContentRaw().split(" ");
+						String[] verifyRoles = event.getMessage().getContentRaw().split("\\s+");
 						if (verifyRoles.length == 0 || verifyRoles.length > 3) {
 							eb =
 								defaultEmbed(
@@ -408,7 +408,7 @@ public class SetupCommandHandler {
 					database.setGuildSettings(event.getGuild().getId(), obj);
 
 					for (String guildRank : guildRanks) {
-						String[] guildRanksSplit = guildRank.split(" ");
+						String[] guildRanksSplit = guildRank.split("\\s+");
 						eb =
 							settings.addGuildRank(
 								getSettings(),

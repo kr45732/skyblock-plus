@@ -394,7 +394,7 @@ public class HelpCommand extends Command {
 							.addSubcommands(
 								new HelpData(
 									"hypixel_key",
-									"Set a Hypixel API key for this server. Once set, this cannot be viewed for the privacy of the key owner. The key is currently only used in the guild leaderboard and guild kicker command.",
+									"Set a Hypixel API key for this server. Once set, this cannot be viewed for the privacy of the key owner.",
 									"hypixel_key <key>"
 								),
 								new HelpData(
