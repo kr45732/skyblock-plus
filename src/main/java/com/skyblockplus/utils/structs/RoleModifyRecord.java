@@ -18,19 +18,18 @@
 
 package com.skyblockplus.utils.structs;
 
-import net.dv8tion.jda.api.entities.Role;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.dv8tion.jda.api.entities.Role;
 
 public record RoleModifyRecord(List<Role> add, List<Role> remove) {
-    public RoleModifyRecord(){
-        this(new ArrayList<>(), new ArrayList<>());
-    }
+	public RoleModifyRecord() {
+		this(new ArrayList<>(), new ArrayList<>());
+	}
 
-    public RoleModifyRecord update(List<Role> add, List<Role> remove){
-        this.add.addAll(add);
-        this.remove.addAll(remove);
-        return this;
-    }
+	public RoleModifyRecord update(List<Role> add, List<Role> remove) {
+		this.add.addAll(add);
+		this.remove.addAll(remove);
+		return this;
+	}
 }

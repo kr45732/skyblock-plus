@@ -211,7 +211,6 @@ public abstract class CommandExecute extends CommandEvent {
 		return -1;
 	}
 
-
 	public CommandExecute setAdminCommand(boolean adminCommand) {
 		this.adminCommand = adminCommand;
 		return this;

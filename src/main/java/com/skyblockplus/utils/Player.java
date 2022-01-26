@@ -50,7 +50,7 @@ public class Player {
 
 	/* Constructors */
 	// Empty player, always invalid
-	public Player(){}
+	public Player() {}
 
 	public Player(String username) {
 		if (usernameToUuid(username)) {

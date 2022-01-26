@@ -125,19 +125,19 @@ public class Weight {
 		return w;
 	}
 
-	public String getStage(){
+	public String getStage() {
 		double weight = getTotalWeight().getRaw();
-		if(weight >= 30000){
+		if (weight >= 30000) {
 			return "No Life";
-		}else if(weight >= 15000){
+		} else if (weight >= 15000) {
 			return "End Game";
-		}else if(weight >= 10000){
+		} else if (weight >= 10000) {
 			return "Early End Game";
-		}else if(weight >= 7000){
+		} else if (weight >= 7000) {
 			return "Late Game";
-		}else if(weight >= 2000){
+		} else if (weight >= 2000) {
 			return "Mid Game";
-		}else{
+		} else {
 			return "Early Game";
 		}
 	}

@@ -25,15 +25,12 @@ public record HypixelKeyRecord(AtomicInteger remainingLimit, AtomicInteger timeT
 		this(new AtomicInteger(120), new AtomicInteger(0));
 	}
 
-	public boolean isRateLimited(){
+	public boolean isRateLimited() {
 		return remainingLimit.get() < 5;
 	}
 
 	@Override
 	public String toString() {
-		return "HypixelKeyRecord{" +
-				"remainingLimit=" + remainingLimit +
-				", timeTillReset=" + timeTillReset +
-				'}';
+		return "HypixelKeyRecord{" + "remainingLimit=" + remainingLimit + ", timeTillReset=" + timeTillReset + '}';
 	}
 }

@@ -78,8 +78,12 @@ public class AuctionFlipper {
 				} else if (desc.contains(" query auctions into database in ")) {
 					queryItems = null;
 				}
-			}else if (Duration.between(lastHerokuUpdated, Instant.now()).toMinutes() > 10) {
-				deleteUrl("https://api.heroku.com/apps/query-api/dynos", new BasicHeader("Accept", "application/vnd.heroku+json; version=3"), new BasicHeader("Authorization", "Bearer " + HEROKU_API_KEY));
+			} else if (Duration.between(lastHerokuUpdated, Instant.now()).toMinutes() > 10) {
+				deleteUrl(
+					"https://api.heroku.com/apps/query-api/dynos",
+					new BasicHeader("Accept", "application/vnd.heroku+json; version=3"),
+					new BasicHeader("Authorization", "Bearer " + HEROKU_API_KEY)
+				);
 			}
 		} catch (Exception ignored) {}
 	}

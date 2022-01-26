@@ -2095,17 +2095,30 @@ public class SettingsExecute {
 			String category = matcher.group(1).toUpperCase();
 			String type = matcher.group(2).toUpperCase();
 
-			if (category.equals("GUILD") && (type.equals("NAME") || type.equals("TAG") || type.equals("RANK")) && database.getAllGuildSettings(guild.getId()).stream().noneMatch(g -> g.getGuildRanksEnable().equalsIgnoreCase("true"))) {
-				nickname = nickname.replaceFirst(matcher.group(0),"");
+			if (
+				category.equals("GUILD") &&
+				(type.equals("NAME") || type.equals("TAG") || type.equals("RANK")) &&
+				database.getAllGuildSettings(guild.getId()).stream().noneMatch(g -> g.getGuildRanksEnable().equalsIgnoreCase("true"))
+			) {
+				nickname = nickname.replaceFirst(matcher.group(0), "");
 				return invalidEmbed(
 					"At least one guild ranks must be enabled in " + guildPrefix + "`settings guild [name]` to use [GUILD." + type + "]"
 				);
-			}else if(category.equals("PLAYER") && (type.equals("SKILLS") || type.equals("CATACOMBS") || type.equals("SLAYER") || type.equals("WEIGHT") || type.equals("CLASS"))){
+			} else if (
+				category.equals("PLAYER") &&
+				(
+					type.equals("SKILLS") ||
+					type.equals("CATACOMBS") ||
+					type.equals("SLAYER") ||
+					type.equals("WEIGHT") ||
+					type.equals("CLASS")
+				)
+			) {
 				EmbedBuilder eb = checkHypixelKey(database.getServerHypixelApiKey(guild.getId()));
-				if(eb != null){
+				if (eb != null) {
 					return eb;
 				}
-				nickname = nickname.replaceFirst(matcher.group(0),"");
+				nickname = nickname.replaceFirst(matcher.group(0), "");
 			}
 		}
 

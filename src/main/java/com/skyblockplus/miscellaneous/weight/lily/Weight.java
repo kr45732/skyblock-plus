@@ -65,27 +65,27 @@ public class Weight {
 		return w;
 	}
 
-	public String getStage(){
+	public String getStage() {
 		double weight = getTotalWeight().getRaw();
-		if(weight >= 23550){
+		if (weight >= 23550) {
 			return "Prestigious";
-		}else if(weight >= 19875){
+		} else if (weight >= 19875) {
 			return "Far End Game";
-		}else if(weight >= 15900){
+		} else if (weight >= 15900) {
 			return "End Game";
-		}else if(weight >= 10690) {
+		} else if (weight >= 10690) {
 			return "Early End Game";
-		} else if(weight >= 8017.5){
+		} else if (weight >= 8017.5) {
 			return "Late Game";
-		}else if(weight >= 4810.5){
+		} else if (weight >= 4810.5) {
 			return "Early-Late Game";
-		}else if(weight >= 2806.125){
+		} else if (weight >= 2806.125) {
 			return "Mid Game";
-		}else if(weight >= 1403.062){
+		} else if (weight >= 1403.062) {
 			return "Early-Mid Game";
-		}else if(weight >= 601.312){
+		} else if (weight >= 601.312) {
 			return "Early Game";
-		}else {
+		} else {
 			return "Fresh";
 		}
 	}

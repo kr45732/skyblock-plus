@@ -268,7 +268,9 @@ public class WeightCommand extends Command {
 			lilyEb.addField("Slayer | " + lilyWeight.getSlayerWeight().getWeightStruct().getFormatted(), lilySlayerStr.toString(), false);
 			lilyEb.addField("Skills | " + lilyWeight.getSkillsWeight().getWeightStruct().getFormatted(), lilySkillsStr.toString(), false);
 			lilyEb.addField("Dungeons | " + lilyWeight.getDungeonsWeight().getWeightStruct().getFormatted(), lilyDungeonsStr, false);
-			lilyEb.setDescription("**Total Weight:** " + lilyWeight.getTotalWeight().getFormatted() + "\n**Stage:** " + lilyWeight.getStage());
+			lilyEb.setDescription(
+				"**Total Weight:** " + lilyWeight.getTotalWeight().getFormatted() + "\n**Stage:** " + lilyWeight.getStage()
+			);
 			extras.addEmbedPage(lilyEb);
 
 			event.paginate(paginateBuilder.setPaginatorExtras(extras));

@@ -98,37 +98,65 @@ public class LinkCommand extends Command {
 									playerGuild = getGuildFromPlayer(toAdd.uuid());
 									if (!playerGuild.isNotValid()) {
 										String gId = playerGuild.get("_id").getAsString();
-										if (database.getAllGuildSettings(guild.getId()).stream().noneMatch(g -> g.getGuildId().equals(gId))) {
+										if (
+											database.getAllGuildSettings(guild.getId()).stream().noneMatch(g -> g.getGuildId().equals(gId))
+										) {
 											playerGuild = new HypixelResponse();
 										}
 									}
 								}
 
 								if (!playerGuild.isNotValid()) {
-									nicknameTemplate = nicknameTemplate.replace(matcher.group(0), switch (type) {
-										case "NAME" -> playerGuild.get("name").getAsString();
-										case "RANK" -> higherDepth(streamJsonArray(playerGuild.get("members").getAsJsonArray())
-												.filter(g -> higherDepth(g, "uuid", "").equals(toAdd.uuid())).findFirst().orElse(null), "rank", "");
-										default -> playerGuild.get("tag").getAsString();
-									});
+									nicknameTemplate =
+										nicknameTemplate.replace(
+											matcher.group(0),
+											switch (type) {
+												case "NAME" -> playerGuild.get("name").getAsString();
+												case "RANK" -> higherDepth(
+													streamJsonArray(playerGuild.get("members").getAsJsonArray())
+														.filter(g -> higherDepth(g, "uuid", "").equals(toAdd.uuid()))
+														.findFirst()
+														.orElse(null),
+													"rank",
+													""
+												);
+												default -> playerGuild.get("tag").getAsString();
+											}
+										);
 								}
-							} else if (category.equals("PLAYER") && (type.equals("SKILLS") || type.equals("CATACOMBS") || type.equals("SLAYER") || type.equals("WEIGHT") || type.equals("CLASS"))) {
+							} else if (
+								category.equals("PLAYER") &&
+								(
+									type.equals("SKILLS") ||
+									type.equals("CATACOMBS") ||
+									type.equals("SLAYER") ||
+									type.equals("WEIGHT") ||
+									type.equals("CLASS")
+								)
+							) {
 								if (key != null) {
 									if (player == null) {
 										HypixelResponse response = skyblockProfilesFromUuid(toAdd.uuid(), key);
-										player = response.isNotValid() ? new Player() : new Player(toAdd.uuid(), toAdd.username(), response.response());
+										player =
+											response.isNotValid()
+												? new Player()
+												: new Player(toAdd.uuid(), toAdd.username(), response.response());
 									}
 
 									if (player.isValid()) {
-										nicknameTemplate = nicknameTemplate.replace(matcher.group(0),
+										nicknameTemplate =
+											nicknameTemplate.replace(
+												matcher.group(0),
 												switch (type) {
 													case "SKILLS" -> roundAndFormat(player.getSkillAverage());
 													case "SLAYER" -> simplifyNumber(player.getTotalSlayer());
 													case "WEIGHT" -> roundAndFormat(player.getWeight());
-													case "CLASS" -> player.getSelectedDungeonClass().equals("none") ? "" : "" + player.getSelectedDungeonClass().toUpperCase().charAt(0);
+													case "CLASS" -> player.getSelectedDungeonClass().equals("none")
+														? ""
+														: "" + player.getSelectedDungeonClass().toUpperCase().charAt(0);
 													default -> roundAndFormat(player.getCatacombs().getProgressLevel());
 												}
-										);
+											);
 									}
 								}
 							}
