@@ -2094,13 +2094,10 @@ public class SettingsExecute {
 			String category = matcher.group(1).toUpperCase();
 			String type = matcher.group(2).toUpperCase();
 
-			if (
-				category.equals("GUILD") &&
-				(type.equals("NAME") || type.equals("TAG") || type.equals("RANK"))
-			) {
-				if(database.getAllGuildSettings(guild.getId()).stream().noneMatch(g -> g.getGuildRanksEnable().equalsIgnoreCase("true"))) {
+			if (category.equals("GUILD") && (type.equals("NAME") || type.equals("TAG") || type.equals("RANK"))) {
+				if (database.getAllGuildSettings(guild.getId()).stream().noneMatch(g -> g.getGuildRanksEnable().equalsIgnoreCase("true"))) {
 					return invalidEmbed(
-							"At least one guild ranks must be enabled in " + guildPrefix + "`settings guild [name]` to use [GUILD." + type + "]"
+						"At least one guild ranks must be enabled in " + guildPrefix + "`settings guild [name]` to use [GUILD." + type + "]"
 					);
 				}
 				nickname = nickname.replace(matcher.group(0), "");
