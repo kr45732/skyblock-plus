@@ -175,7 +175,8 @@ public class Main {
 					new TimeCommand(),
 					new ForgeCommand(),
 					new ScammerCommand(),
-					new FixApplicationCommand()
+					new FixApplicationCommand(),
+						new NucleusCommand()
 				)
 				.build();
 
