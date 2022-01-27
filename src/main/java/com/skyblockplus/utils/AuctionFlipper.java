@@ -85,12 +85,9 @@ public class AuctionFlipper {
 				} else if (desc.contains(" query auctions into database in ")) {
 					queryItems = null;
 				}
-			} else if (
-				event.getChannel().getId().equals("922176660596482098") &&
-				event.isWebhookMessage()
-			) {
+			} else if (event.getChannel().getId().equals("922176660596482098") && event.isWebhookMessage()) {
 				lastHerokuUpdated = Instant.now();
-				if(Duration.between(lastQueryApiUpdate, Instant.now()).toMinutes() > 5) {
+				if (Duration.between(lastQueryApiUpdate, Instant.now()).toMinutes() > 5) {
 					String desc = event.getMessage().getEmbeds().get(0).getDescription();
 					if (enable && isMainBot() && desc.startsWith("Successfully updated under bins file in ")) {
 						flip();

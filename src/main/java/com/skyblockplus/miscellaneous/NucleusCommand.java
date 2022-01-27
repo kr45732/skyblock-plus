@@ -18,13 +18,13 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.HypixelPlayer;
 import com.skyblockplus.utils.command.CommandExecute;
 import net.dv8tion.jda.api.EmbedBuilder;
-
-import static com.skyblockplus.utils.Utils.*;
 
 public class NucleusCommand extends Command {
 
@@ -39,9 +39,10 @@ public class NucleusCommand extends Command {
 		if (!player.isNotValid()) {
 			EmbedBuilder eb = player.getDefaultEmbed();
 			String nuc = "Not found api";
-			try{nuc = "" + player.get("achievements.skyblock_crystal_nucleus").getAsInt();}catch (Exception ignored){};
+			try {
+				nuc = "" + player.get("achievements.skyblock_crystal_nucleus").getAsInt();
+			} catch (Exception ignored) {}
 			eb.addField("Skyblock Crystal Nucleus", nuc, false);
-
 			return eb;
 		}
 		return defaultEmbed(player.getFailCause());
