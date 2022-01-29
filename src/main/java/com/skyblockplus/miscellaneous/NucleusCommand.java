@@ -20,11 +20,18 @@ package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.Utils.*;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.utils.HypixelPlayer;
+import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import net.dv8tion.jda.api.EmbedBuilder;
+
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class NucleusCommand extends Command {
 
@@ -35,17 +42,26 @@ public class NucleusCommand extends Command {
 	}
 
 	public static EmbedBuilder getNuc(String username) {
-		HypixelPlayer player = new HypixelPlayer(username);
-		if (!player.isNotValid()) {
-			EmbedBuilder eb = player.getDefaultEmbed();
-			String nuc = "Not found api";
-			try {
-				nuc = "" + player.get("achievements.skyblock_crystal_nucleus").getAsInt();
-			} catch (Exception ignored) {}
-			eb.addField("Skyblock Crystal Nucleus", nuc, false);
+		Player player = new Player(username);
+		if (player.isValid()) {
+			EmbedBuilder eb = player.defaultPlayerEmbed();
+			int achievementCount = higherDepth(player.getHypixelPlayerJson(), "achievements.skyblock_crystal_nucleus", -1);
+			Map<String, Integer> sbCounts = new HashMap<>();
+			for (JsonElement profile : player.getProfileArray()) {
+				if(higherDepth(profile, "members." + player.getUuid() + ".mining_core.crystals") != null) {
+					sbCounts.put(higherDepth(profile, "cute_name", "null"), higherDepth(profile, "members." + player.getUuid() + ".mining_core.crystals").getAsJsonObject().entrySet().stream().map(m -> higherDepth(m.getValue(), "total_placed", -1))
+							.filter(m -> m != -1)
+							.min(Comparator.naturalOrder()).orElse(0));
+				}
+			}
+			int sbCount = sbCounts.values().stream().mapToInt(Integer::intValue).sum();
+
+			eb.addField("Difference", formatNumber(Math.max(achievementCount, 0) - sbCount), false);
+			eb.addField("Achievement Nucleus Count", achievementCount != -1 ? formatNumber(achievementCount) : "Achievement not found in API", false);
+			eb.addField("Skyblock Nucleus Count", sbCount + "\n\n**Profiles:**\n" + sbCounts.entrySet().stream().map(e -> e.getKey() + " - " + e.getValue()).collect(Collectors.joining("\n• ", "• ", "")), false);
 			return eb;
 		}
-		return defaultEmbed(player.getFailCause());
+		return invalidEmbed(player.getFailCause());
 	}
 
 	@Override

@@ -25,7 +25,6 @@ import static com.skyblockplus.utils.Utils.*;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
@@ -176,15 +175,7 @@ public abstract class CommandExecute extends CommandEvent {
 	}
 
 	protected String getStringOption(String match) {
-		for (int i = 0; i < args.length; i++) {
-			if (args[i].startsWith(match + ":")) {
-				String arg = args[i].split(match + ":")[1];
-				removeArg(i);
-				return arg;
-			}
-		}
-
-		return null;
+		return getStringOption(match, null);
 	}
 
 	protected String getStringOption(String match, String defaultValue) {

@@ -387,8 +387,7 @@ public class HelpCommand extends Command {
 						new HelpData("delete", "Delete certain settings or all settings from the database.")
 							.addSubcommands(
 								new HelpData("all", "Delete the current server settings."),
-								new HelpData("hypixel_key", "Delete the set Hypixel API of this server."),
-								new HelpData("prefix", "Reset the prefix of the bot")
+								new HelpData("hypixel_key", "Delete the set Hypixel API of this server.")
 							),
 						new HelpData("set", "Set certain settings.")
 							.addSubcommands(
@@ -546,12 +545,8 @@ public class HelpCommand extends Command {
 										),
 										new HelpData("disable", "Disable automatic guild member counter.")
 									),
-								new HelpData("blacklist", "View or manage the application blacklist for this server.")
+								new HelpData("blacklist", "View or manage the application blacklist for this server.").addSecondData("Get a list of all the blacklisted players on this server with the reasons and namemc links.", "blacklist")
 									.addSubcommands(
-										new HelpData(
-											"list",
-											"Get a list of all the blacklisted players on this server with the reasons and namemc links."
-										),
 										new HelpData(
 											"add <player> [reason]",
 											"Add a player to the blacklist. Reason will default to 'not provided' if not set."
@@ -854,7 +849,6 @@ public class HelpCommand extends Command {
 			help.create("settings bot_manager add <@role>", "Add a bot manager role") +
 			help.create("settings bot_manager remove <@role>", "Remove a bot manager role") +
 			help.create("settings delete hypixel_key", "Delete the set Hypixel API key of this server") +
-			help.create("settings delete prefix", "Reset the prefix of the bot") +
 			help.create("settings delete all", "Delete the current server settings") +
 			help.create("settings fix_application <#channel> <state>", "Fix an application")
 		);
@@ -900,7 +894,7 @@ public class HelpCommand extends Command {
 				"Blacklist a player from using the application system on this server"
 			) +
 			help.create("settings guild blacklist remove <player>", "Remove a player from the application blacklist") +
-			help.create("settings guild blacklist list", "List all players that are blacklisted from the application system") +
+			help.create("settings guild blacklist", "List all players that are blacklisted from the application system") +
 			help.create("settings guild <name> apply <enable|disable>", "Enable or disable automatic apply") +
 			help.create("settings guild <name> apply message <message>", "The message that users will see when verifying") +
 			help.create(

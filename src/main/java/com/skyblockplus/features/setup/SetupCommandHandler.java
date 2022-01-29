@@ -247,7 +247,7 @@ public class SetupCommandHandler {
 					}
 					case 4 -> {
 						if (event.getMessage().getContentRaw().equalsIgnoreCase("enable")) {
-							eb = settings.setVerifyEnable("true");
+							eb = settings.setVerifyEnable(true);
 							if (eb.build().getTitle().equals("Settings")) {
 								String msg = onVerifyReload(event.getGuild().getId());
 								if (msg.equals("Reloaded")) {

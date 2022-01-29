@@ -34,8 +34,6 @@ import com.skyblockplus.features.apply.log.ApplyLog;
 import com.skyblockplus.utils.command.CommandExecute;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -284,8 +282,10 @@ public class FixApplicationCommand extends Command {
 					.queue();
 			}
 
-			Collections.reverse(messages);
-			applicationJson.add("logs", gson.toJsonTree(messages.stream().map(ApplyLog::toLog).collect(Collectors.toList())));
+			if(logApplication) {
+				Collections.reverse(messages);
+				applicationJson.add("logs", gson.toJsonTree(messages.stream().map(ApplyLog::toLog).collect(Collectors.toList())));
+			}
 
 			guildMap
 				.get(guild.getId())

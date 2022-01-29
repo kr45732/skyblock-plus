@@ -60,12 +60,12 @@ public class GuildRanksCommand extends Command {
 
 		if (gamemode != Player.Gamemode.REGULAR) {
 			if (hypixelKey == null) {
-				return invalidEmbed("You must set a Hypixel API key to use the ironman only option");
+				return invalidEmbed("You must set a Hypixel API key to use the ironman/stranded only option");
 			}
 			try {
 				higherDepth(getJson("https://api.hypixel.net/key?key=" + hypixelKey), "record.key").getAsString();
 			} catch (Exception e) {
-				return invalidEmbed("You must set a valid Hypixel API key to use the ironman only option");
+				return invalidEmbed("You must set a valid Hypixel API key to use the ironman/stranded only option");
 			}
 			if (!keyCooldownMap.containsKey(hypixelKey)) {
 				keyCooldownMap.put(hypixelKey, new HypixelKeyRecord());

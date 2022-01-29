@@ -46,7 +46,7 @@ public class GuildLeaderboardSlashCommand extends SlashCommand {
 			GuildLeaderboardCommand.getLeaderboard(
 				event.getOptionStr("type"),
 				event.player,
-				Player.Gamemode.of(event.getOptionStr("gamemode", "regular")),
+				Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
 				new PaginatorEvent(event)
 			)
 		);
@@ -78,9 +78,9 @@ public class GuildLeaderboardSlashCommand extends SlashCommand {
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 			.addOptions(
 				new OptionData(OptionType.STRING, "gamemode", "Gamemode type")
-					.addChoice("regular", "regular")
-					.addChoice("ironman", "ironman")
-					.addChoice("stranded", "stranded")
+					.addChoice("All", "all")
+					.addChoice("Ironman", "ironman")
+					.addChoice("Stranded", "stranded")
 			);
 	}
 

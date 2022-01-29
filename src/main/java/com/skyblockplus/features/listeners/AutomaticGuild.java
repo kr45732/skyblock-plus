@@ -23,6 +23,7 @@ import static com.skyblockplus.Main.jda;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.features.skyblockevent.SkyblockEventCommand.endSkyblockEvent;
 import static com.skyblockplus.utils.ApiHandler.getGuildFromId;
+import static com.skyblockplus.utils.ApiHandler.skyblockProfilesFromUuid;
 import static com.skyblockplus.utils.Constants.NUMBER_TO_RARITY_MAP;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -42,6 +43,7 @@ import com.skyblockplus.features.setup.SetupCommandHandler;
 import com.skyblockplus.features.skyblockevent.SkyblockEventCommand;
 import com.skyblockplus.features.skyblockevent.SkyblockEventHandler;
 import com.skyblockplus.features.verify.VerifyGuild;
+import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.RoleModifyRecord;
 import java.io.File;
@@ -55,6 +57,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -86,6 +89,7 @@ public class AutomaticGuild {
 	public Role applyGuestRole = null;
 	/* Verify */
 	public VerifyGuild verifyGuild;
+	public final List<String> updatedMembers = new ArrayList<>();
 	/* Skyblock event */
 	public SkyblockEventHandler skyblockEventHandler = null;
 	public List<EventMember> eventMemberList = new ArrayList<>();
@@ -390,25 +394,15 @@ public class AutomaticGuild {
 			final boolean[] roleOrRankEnabled = { false };
 			List<AutomatedGuild> filteredGuildSettings = null;
 			if (guildSettings != null) {
+				guildSettings.removeIf(g -> g == null || g.getGuildName() == null);
 				filteredGuildSettings =
 					guildSettings
 						.stream()
-						.filter(curSettings -> {
-							if (curSettings.getGuildName() == null) {
-								return false;
-							} else if (
-								curSettings.getGuildMemberRoleEnable().equalsIgnoreCase("true") ||
-								curSettings.getGuildRanksEnable().equalsIgnoreCase("true")
-							) {
-								roleOrRankEnabled[0] = true;
-								return true;
-							} else {
-								return (
-									curSettings.getGuildCounterEnable() != null &&
-									!curSettings.getGuildCounterEnable().equalsIgnoreCase("false")
-								);
-							}
-						})
+						.filter(curSettings -> curSettings.getGuildMemberRoleEnable().equalsIgnoreCase("true") ||
+								curSettings.getGuildRanksEnable().equalsIgnoreCase("true") ? (roleOrRankEnabled[0] = true) : (
+								curSettings.getGuildCounterEnable() != null &&
+										!curSettings.getGuildCounterEnable().equalsIgnoreCase("false")
+						))
 						.collect(Collectors.toList());
 
 				if (filteredGuildSettings.isEmpty()) {
@@ -451,69 +445,86 @@ public class AutomaticGuild {
 					toRemoveRoles.add(guild.getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString()));
 				} catch (Exception ignored) {}
 
-				//				List<HypixelResponse> guildResponses = null;
-				//				String key = database.getServerHypixelApiKey(guild.getId());
-				//				key = checkHypixelKey(key) == null ?  key : null;
+				List<HypixelResponse> guildResponses = null;
+				String key = database.getServerHypixelApiKey(guild.getId());
+				key = checkHypixelKey(key) == null ?  key : null;
+				int numUpdated = 0;
+
+				List<Member> notUpdatedMembers = inGuildUsers.stream().filter(m -> !updatedMembers.contains(m.getId())).collect(Collectors.toList());
+				if(notUpdatedMembers.size() < 120){
+					updatedMembers.clear();
+					inGuildUsers.sort(Comparator.comparing(m -> !notUpdatedMembers.contains(m)));
+				}
+
 				for (Member linkedMember : inGuildUsers) {
 					if (!guild.getSelfMember().canInteract(linkedMember)) {
 						continue;
 					}
 
-					//					LinkedAccount linkedAccount = discordToUuid.get(linkedMember.getId());
-					//					String nicknameTemplate = higherDepth(verifySettings, "verifiedNickname").getAsString();
-					//					if (nicknameTemplate.contains("[IGN]")) {
-					//						nicknameTemplate = nicknameTemplate.replace("[IGN]", linkedAccount.username());
-					//
-					//						Matcher matcher = nicknameTemplatePattern.matcher(nicknameTemplate);
-					//						Player player = null;
-					//						while(matcher.find()) {
-					//							String category = matcher.group(1).toUpperCase();
-					//							String type = matcher.group(2).toUpperCase();
-					//
-					//							if (category.equals("GUILD") && (type.equals("NAME") || type.equals("TAG") || type.equals("RANK")) && guildSettings != null && !guildSettings.isEmpty()) {
-					//								if (guildResponses == null) {
-					//									guildResponses =
-					//											guildSettings.stream().map(g -> getGuildFromId(g.getGuildId())).collect(Collectors.toList());
-					//								}
-					//								HypixelResponse guildResponse = guildResponses
-					//										.stream()
-					//										.filter(g -> streamJsonArray(g.get("members").getAsJsonArray())
-					//												.anyMatch(m -> higherDepth(m, "uuid", "").equals(linkedAccount.uuid()))
-					//										).findFirst().orElse(null);
-					//
-					//								if (guildResponse != null) {
-					//									nicknameTemplate = nicknameTemplate.replace("[GUILD." + type + "]", switch (type) {
-					//										case "NAME" -> guildResponse.get("name").getAsString();
-					//										case "RANK" -> higherDepth(streamJsonArray(guildResponse.get("members").getAsJsonArray())
-					//												.filter(g -> higherDepth(g, "uuid", "").equals(linkedAccount.uuid())).findFirst().orElse(null), "rank", "");
-					//										default -> guildResponse.get("tag").getAsString();
-					//									});
-					//								}
-					//							} else if (category.equals("PLAYER") && (type.equals("SKILLS") || type.equals("CATACOMBS") || type.equals("SLAYER") || type.equals("WEIGHT"))) {
-					//								if (key != null) {
-					//									if (player == null) {
-					//										HypixelResponse response = skyblockProfilesFromUuid(linkedAccount.uuid(), key);
-					//										player = response.isNotValid() ? new Player() : new Player(linkedAccount.uuid(), linkedAccount.username(), response.response());
-					//									}
-					//
-					//									if (player.isValid()) {
-					//										nicknameTemplate = nicknameTemplate.replace("[PLAYER." + type + "]",
-					//												switch (type) {
-					//													case "SKILLS" -> roundAndFormat(player.getSkillAverage());
-					//													case "SLAYER" -> simplifyNumber(player.getTotalSlayer());
-					//													case "WEIGHT" -> roundAndFormat(player.getWeight());
-					//													default -> roundAndFormat(player.getCatacombs().getProgressLevel());
-					//												}
-					//										);
-					//									}
-					//								}
-					//							}
-					//
-					//							nicknameTemplate = nicknameTemplate.replace(matcher.group(0), "");
-					//						}
-					//
-					//						linkedMember.modifyNickname(nicknameTemplate).queue(ignore, ignore);
-					//					}
+					if(numUpdated < 120 && !updatedMembers.contains(linkedMember.getId())) {
+						updatedMembers.add(linkedMember.getId());
+						numUpdated ++;
+
+						String nicknameTemplate = higherDepth(verifySettings, "verifiedNickname").getAsString();
+						if (nicknameTemplate.contains("[IGN]")) {
+							LinkedAccount linkedAccount = discordToUuid.get(linkedMember.getId());
+							nicknameTemplate = nicknameTemplate.replace("[IGN]", linkedAccount.username());
+
+							Matcher matcher = nicknameTemplatePattern.matcher(nicknameTemplate);
+							Player player = null;
+							while (matcher.find()) {
+								String category = matcher.group(1).toUpperCase();
+								String type = matcher.group(2).toUpperCase();
+								String extra = matcher.group(3) == null ? "" : matcher.group(3);
+
+								if (category.equals("GUILD") && (type.equals("NAME") || type.equals("TAG") || type.equals("RANK")) && guildSettings != null && !guildSettings.isEmpty()) {
+									if (guildResponses == null) {
+										guildResponses =
+												guildSettings.stream().map(g -> getGuildFromId(g.getGuildId())).collect(Collectors.toList());
+									}
+									HypixelResponse guildResponse = guildResponses
+											.stream()
+											.filter(g -> streamJsonArray(g.get("members").getAsJsonArray())
+													.anyMatch(m -> higherDepth(m, "uuid", "").equals(linkedAccount.uuid()))
+											).findFirst().orElse(null);
+
+									if (guildResponse != null) {
+										nicknameTemplate = nicknameTemplate.replace(matcher.group(0), switch (type) {
+											case "NAME" -> guildResponse.get("name").getAsString();
+											case "RANK" -> higherDepth(streamJsonArray(guildResponse.get("members").getAsJsonArray())
+													.filter(g -> higherDepth(g, "uuid", "").equals(linkedAccount.uuid())).findFirst().orElse(null), "rank", "");
+											default -> guildResponse.get("tag").getAsString();
+										} +extra);
+									}
+								} else if (category.equals("PLAYER") && (type.equals("SKILLS") || type.equals("CATACOMBS") || type.equals("SLAYER") || type.equals("WEIGHT") || type.equals("CLASS"))) {
+									if (key != null) {
+										if (player == null) {
+											HypixelResponse response = skyblockProfilesFromUuid(linkedAccount.uuid(), key);
+											player = response.isNotValid() ? new Player() : new Player(linkedAccount.uuid(), linkedAccount.username(), response.response());
+										}
+
+										if (player.isValid()) {
+											nicknameTemplate = nicknameTemplate.replace(matcher.group(0),
+													switch (type) {
+														case "SKILLS" -> roundAndFormat(player.getSkillAverage());
+														case "SLAYER" -> simplifyNumber(player.getTotalSlayer());
+														case "WEIGHT" -> roundAndFormat(player.getWeight());
+														case "CLASS" -> player.getSelectedDungeonClass().equals("none")
+																? ""
+																: "" + player.getSelectedDungeonClass().toUpperCase().charAt(0);
+														default -> roundAndFormat(player.getCatacombs().getProgressLevel());
+													} + extra
+											);
+										}
+									}
+								}
+
+								nicknameTemplate = nicknameTemplate.replace(matcher.group(0), "");
+							}
+
+							linkedMember.modifyNickname(nicknameTemplate).queue();
+						}
+					}
 
 					if (!toAddRoles.isEmpty() || !toRemoveRoles.isEmpty()) {
 						memberToRoleChanges.put(

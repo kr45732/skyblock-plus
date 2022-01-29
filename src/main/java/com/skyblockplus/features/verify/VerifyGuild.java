@@ -119,6 +119,7 @@ public class VerifyGuild {
 				while (matcher.find()) {
 					String category = matcher.group(1);
 					String type = matcher.group(2);
+					String extra = matcher.group(3) == null ? "" : matcher.group(3);
 
 					if (category.equals("GUILD") && (type.equals("NAME") || type.equals("TAG") || type.equals("RANK"))) {
 						if (playerGuild == null) {
@@ -151,7 +152,7 @@ public class VerifyGuild {
 											""
 										);
 										default -> playerGuild.get("tag").getAsString();
-									}
+									} + extra
 								);
 						}
 					} else if (

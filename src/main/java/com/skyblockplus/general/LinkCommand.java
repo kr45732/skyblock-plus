@@ -92,6 +92,7 @@ public class LinkCommand extends Command {
 						while (matcher.find()) {
 							String category = matcher.group(1);
 							String type = matcher.group(2);
+							String extra = matcher.group(3) == null ? "" : matcher.group(3);
 
 							if (category.equals("GUILD") && (type.equals("NAME") || type.equals("TAG") || type.equals("RANK"))) {
 								if (playerGuild == null) {
@@ -121,7 +122,7 @@ public class LinkCommand extends Command {
 													""
 												);
 												default -> playerGuild.get("tag").getAsString();
-											}
+											} + extra
 										);
 								}
 							} else if (
@@ -155,7 +156,7 @@ public class LinkCommand extends Command {
 														? ""
 														: "" + player.getSelectedDungeonClass().toUpperCase().charAt(0);
 													default -> roundAndFormat(player.getCatacombs().getProgressLevel());
-												}
+												} + extra
 											);
 									}
 								}

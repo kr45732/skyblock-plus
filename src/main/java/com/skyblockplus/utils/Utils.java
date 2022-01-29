@@ -112,7 +112,7 @@ public class Utils {
 	private static final Pattern mcColorPattern = Pattern.compile("(?i)\\u00A7[0-9A-FK-OR]");
 	private static final Logger log = LoggerFactory.getLogger(Utils.class);
 	public static final Consumer<Object> ignore = ignored -> {};
-	public static final Pattern nicknameTemplatePattern = Pattern.compile("\\[(GUILD|PLAYER)\\.(\\w+)]");
+	public static final Pattern nicknameTemplatePattern = Pattern.compile("\\[(GUILD|PLAYER)\\.(\\w+)(?:\\.\\{(.*?)})?]");
 	/* Configuration File */
 	public static String HYPIXEL_API_KEY = "";
 	public static String BOT_TOKEN = "";

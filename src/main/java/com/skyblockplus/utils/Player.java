@@ -223,6 +223,14 @@ public class Player {
 		return failCause;
 	}
 
+	public JsonElement getHypixelPlayerJson(){
+		if (hypixelPlayerJson == null) {
+			hypixelPlayerJson = playerFromUuid(uuid).response();
+		}
+
+		return hypixelPlayerJson;
+	}
+
 	/* Links */
 	public String skyblockStatsLink() {
 		return Utils.skyblockStatsLink(username, profileName);
@@ -537,11 +545,7 @@ public class Player {
 	}
 
 	public int getDungeonSecrets() {
-		if (hypixelPlayerJson == null) {
-			hypixelPlayerJson = playerFromUuid(uuid).response();
-		}
-
-		return higherDepth(hypixelPlayerJson, "achievements.skyblock_treasure_hunter", 0);
+		return higherDepth(getHypixelPlayerJson(), "achievements.skyblock_treasure_hunter", 0);
 	}
 
 	public SkillsStruct getDungeonClass(String className) {
@@ -989,7 +993,7 @@ public class Player {
 
 		for (JsonElement profile : profilesArray) {
 			try {
-				if (gamemode == Gamemode.ALL || Gamemode.of(higherDepth(profile, "game_mode", "regular")) == gamemode) {
+				if (gamemode.isGamemode(higherDepth(profile, "game_mode", "regular"))) {
 					profileNameList.add(higherDepth(profile, "cute_name").getAsString().toLowerCase());
 				}
 			} catch (Exception ignored) {}
@@ -1123,7 +1127,7 @@ public class Player {
 	}
 
 	public boolean isGamemode(Gamemode gamemode) {
-		return gamemode == Gamemode.ALL || getGamemode() == gamemode;
+		return gamemode.isGamemode(getGamemode());
 	}
 
 	public Gamemode getGamemode() {
@@ -1278,7 +1282,8 @@ public class Player {
 		ALL,
 		REGULAR,
 		STRANDED,
-		IRONMAN;
+		IRONMAN,
+		IRONMAN_STRANDED;
 
 		public static Gamemode of(String gamemode) {
 			return valueOf(
@@ -1289,6 +1294,14 @@ public class Player {
 					default -> gamemode;
 				}
 			);
+		}
+
+		public boolean isGamemode(Object gamemode){
+			if(gamemode instanceof Gamemode mode){
+				return (this == IRONMAN_STRANDED) ? ((gamemode == IRONMAN) || (gamemode == STRANDED)) : ((this == ALL) || (this == mode));
+			}
+
+			return isGamemode(of((String) gamemode));
 		}
 	}
 }
