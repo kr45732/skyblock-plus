@@ -545,7 +545,11 @@ public class HelpCommand extends Command {
 										),
 										new HelpData("disable", "Disable automatic guild member counter.")
 									),
-								new HelpData("blacklist", "View or manage the application blacklist for this server.").addSecondData("Get a list of all the blacklisted players on this server with the reasons and namemc links.", "blacklist")
+								new HelpData("blacklist", "View or manage the application blacklist for this server.")
+									.addSecondData(
+										"Get a list of all the blacklisted players on this server with the reasons and namemc links.",
+										"blacklist"
+									)
 									.addSubcommands(
 										new HelpData(
 											"add <player> [reason]",

@@ -223,7 +223,7 @@ public class Player {
 		return failCause;
 	}
 
-	public JsonElement getHypixelPlayerJson(){
+	public JsonElement getHypixelPlayerJson() {
 		if (hypixelPlayerJson == null) {
 			hypixelPlayerJson = playerFromUuid(uuid).response();
 		}
@@ -1296,8 +1296,8 @@ public class Player {
 			);
 		}
 
-		public boolean isGamemode(Object gamemode){
-			if(gamemode instanceof Gamemode mode){
+		public boolean isGamemode(Object gamemode) {
+			if (gamemode instanceof Gamemode mode) {
 				return (this == IRONMAN_STRANDED) ? ((gamemode == IRONMAN) || (gamemode == STRANDED)) : ((this == ALL) || (this == mode));
 			}
 

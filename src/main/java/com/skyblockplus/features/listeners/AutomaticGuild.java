@@ -398,11 +398,15 @@ public class AutomaticGuild {
 				filteredGuildSettings =
 					guildSettings
 						.stream()
-						.filter(curSettings -> curSettings.getGuildMemberRoleEnable().equalsIgnoreCase("true") ||
-								curSettings.getGuildRanksEnable().equalsIgnoreCase("true") ? (roleOrRankEnabled[0] = true) : (
-								curSettings.getGuildCounterEnable() != null &&
-										!curSettings.getGuildCounterEnable().equalsIgnoreCase("false")
-						))
+						.filter(curSettings ->
+							curSettings.getGuildMemberRoleEnable().equalsIgnoreCase("true") ||
+								curSettings.getGuildRanksEnable().equalsIgnoreCase("true")
+								? (roleOrRankEnabled[0] = true)
+								: (
+									curSettings.getGuildCounterEnable() != null &&
+									!curSettings.getGuildCounterEnable().equalsIgnoreCase("false")
+								)
+						)
 						.collect(Collectors.toList());
 
 				if (filteredGuildSettings.isEmpty()) {
@@ -447,11 +451,14 @@ public class AutomaticGuild {
 
 				List<HypixelResponse> guildResponses = null;
 				String key = database.getServerHypixelApiKey(guild.getId());
-				key = checkHypixelKey(key) == null ?  key : null;
+				key = checkHypixelKey(key) == null ? key : null;
 				int numUpdated = 0;
 
-				List<Member> notUpdatedMembers = inGuildUsers.stream().filter(m -> !updatedMembers.contains(m.getId())).collect(Collectors.toList());
-				if(notUpdatedMembers.size() < 120){
+				List<Member> notUpdatedMembers = inGuildUsers
+					.stream()
+					.filter(m -> !updatedMembers.contains(m.getId()))
+					.collect(Collectors.toList());
+				if (notUpdatedMembers.size() < 120) {
 					updatedMembers.clear();
 					inGuildUsers.sort(Comparator.comparing(m -> !notUpdatedMembers.contains(m)));
 				}
@@ -461,9 +468,9 @@ public class AutomaticGuild {
 						continue;
 					}
 
-					if(numUpdated < 120 && !updatedMembers.contains(linkedMember.getId())) {
+					if (numUpdated < 120 && !updatedMembers.contains(linkedMember.getId())) {
 						updatedMembers.add(linkedMember.getId());
-						numUpdated ++;
+						numUpdated++;
 
 						String nicknameTemplate = higherDepth(verifySettings, "verifiedNickname").getAsString();
 						if (nicknameTemplate.contains("[IGN]")) {
@@ -477,44 +484,78 @@ public class AutomaticGuild {
 								String type = matcher.group(2).toUpperCase();
 								String extra = matcher.group(3) == null ? "" : matcher.group(3);
 
-								if (category.equals("GUILD") && (type.equals("NAME") || type.equals("TAG") || type.equals("RANK")) && guildSettings != null && !guildSettings.isEmpty()) {
+								if (
+									category.equals("GUILD") &&
+									(type.equals("NAME") || type.equals("TAG") || type.equals("RANK")) &&
+									guildSettings != null &&
+									!guildSettings.isEmpty()
+								) {
 									if (guildResponses == null) {
 										guildResponses =
-												guildSettings.stream().map(g -> getGuildFromId(g.getGuildId())).collect(Collectors.toList());
+											guildSettings.stream().map(g -> getGuildFromId(g.getGuildId())).collect(Collectors.toList());
 									}
 									HypixelResponse guildResponse = guildResponses
-											.stream()
-											.filter(g -> streamJsonArray(g.get("members").getAsJsonArray())
-													.anyMatch(m -> higherDepth(m, "uuid", "").equals(linkedAccount.uuid()))
-											).findFirst().orElse(null);
+										.stream()
+										.filter(g ->
+											streamJsonArray(g.get("members").getAsJsonArray())
+												.anyMatch(m -> higherDepth(m, "uuid", "").equals(linkedAccount.uuid()))
+										)
+										.findFirst()
+										.orElse(null);
 
 									if (guildResponse != null) {
-										nicknameTemplate = nicknameTemplate.replace(matcher.group(0), switch (type) {
-											case "NAME" -> guildResponse.get("name").getAsString();
-											case "RANK" -> higherDepth(streamJsonArray(guildResponse.get("members").getAsJsonArray())
-													.filter(g -> higherDepth(g, "uuid", "").equals(linkedAccount.uuid())).findFirst().orElse(null), "rank", "");
-											default -> guildResponse.get("tag").getAsString();
-										} +extra);
+										nicknameTemplate =
+											nicknameTemplate.replace(
+												matcher.group(0),
+												switch (type) {
+													case "NAME" -> guildResponse.get("name").getAsString();
+													case "RANK" -> higherDepth(
+														streamJsonArray(guildResponse.get("members").getAsJsonArray())
+															.filter(g -> higherDepth(g, "uuid", "").equals(linkedAccount.uuid()))
+															.findFirst()
+															.orElse(null),
+														"rank",
+														""
+													);
+													default -> guildResponse.get("tag").getAsString();
+												} +
+												extra
+											);
 									}
-								} else if (category.equals("PLAYER") && (type.equals("SKILLS") || type.equals("CATACOMBS") || type.equals("SLAYER") || type.equals("WEIGHT") || type.equals("CLASS"))) {
+								} else if (
+									category.equals("PLAYER") &&
+									(
+										type.equals("SKILLS") ||
+										type.equals("CATACOMBS") ||
+										type.equals("SLAYER") ||
+										type.equals("WEIGHT") ||
+										type.equals("CLASS")
+									)
+								) {
 									if (key != null) {
 										if (player == null) {
 											HypixelResponse response = skyblockProfilesFromUuid(linkedAccount.uuid(), key);
-											player = response.isNotValid() ? new Player() : new Player(linkedAccount.uuid(), linkedAccount.username(), response.response());
+											player =
+												response.isNotValid()
+													? new Player()
+													: new Player(linkedAccount.uuid(), linkedAccount.username(), response.response());
 										}
 
 										if (player.isValid()) {
-											nicknameTemplate = nicknameTemplate.replace(matcher.group(0),
+											nicknameTemplate =
+												nicknameTemplate.replace(
+													matcher.group(0),
 													switch (type) {
 														case "SKILLS" -> roundAndFormat(player.getSkillAverage());
 														case "SLAYER" -> simplifyNumber(player.getTotalSlayer());
 														case "WEIGHT" -> roundAndFormat(player.getWeight());
 														case "CLASS" -> player.getSelectedDungeonClass().equals("none")
-																? ""
-																: "" + player.getSelectedDungeonClass().toUpperCase().charAt(0);
+															? ""
+															: "" + player.getSelectedDungeonClass().toUpperCase().charAt(0);
 														default -> roundAndFormat(player.getCatacombs().getProgressLevel());
-													} + extra
-											);
+													} +
+													extra
+												);
 										}
 									}
 								}

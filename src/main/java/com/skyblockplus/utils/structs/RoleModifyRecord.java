@@ -21,7 +21,6 @@ package com.skyblockplus.utils.structs;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
 import net.dv8tion.jda.api.entities.Role;
 
 public record RoleModifyRecord(List<Role> add, List<Role> remove) {

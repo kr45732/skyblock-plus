@@ -102,27 +102,27 @@ public class SettingsExecute {
 		EmbedBuilder eb = null;
 		JsonElement currentSettings = database.getServerSettings(guild.getId());
 		if (content.length() >= 4 && args[1].equals("set")) {
-			eb = switch (args[2]) {
-				case "hypixel_key" -> setHypixelKey(args[3]);
-				case "prefix" -> setPrefix(content.split(" ", 4)[3]);
-				case "guest_role" -> setApplyGuestRole(args[3]);
-				case "fetchur_channel" -> setFetchurChannel(args[3]);
-				case "fetchur_ping" -> setFetchurPing(args[3]);
-				case "mayor_channel" -> setMayorChannel(args[3]);
-				case "mayor_ping" -> setMayorPing(args[3]);
-				default -> errorEmbed("settings set");
-			};
-		}  else if (args.length == 3 && args[1].equals("delete")) {
-			eb = switch (args[2]) {
-				case "all" -> database.deleteServerSettings(guild.getId()) == 200 ? defaultEmbed("Success").setDescription("Server settings deleted") : invalidEmbed("Error deleting server settings");
-				case "hypixel_key" -> deleteHypixelKey();
-				default -> errorEmbed("settings delete");
-			};
-		} else if (
-				args.length >= 3 &&
-						args[1].equals("guild") &&
-						args[2].equals("blacklist")
-		) {
+			eb =
+				switch (args[2]) {
+					case "hypixel_key" -> setHypixelKey(args[3]);
+					case "prefix" -> setPrefix(content.split(" ", 4)[3]);
+					case "guest_role" -> setApplyGuestRole(args[3]);
+					case "fetchur_channel" -> setFetchurChannel(args[3]);
+					case "fetchur_ping" -> setFetchurPing(args[3]);
+					case "mayor_channel" -> setMayorChannel(args[3]);
+					case "mayor_ping" -> setMayorPing(args[3]);
+					default -> errorEmbed("settings set");
+				};
+		} else if (args.length == 3 && args[1].equals("delete")) {
+			eb =
+				switch (args[2]) {
+					case "all" -> database.deleteServerSettings(guild.getId()) == 200
+						? defaultEmbed("Success").setDescription("Server settings deleted")
+						: invalidEmbed("Error deleting server settings");
+					case "hypixel_key" -> deleteHypixelKey();
+					default -> errorEmbed("settings delete");
+				};
+		} else if (args.length >= 3 && args[1].equals("guild") && args[2].equals("blacklist")) {
 			args = content.split(" ", 6);
 			if (args.length == 3) {
 				return displayApplyBlacklist();
@@ -132,36 +132,36 @@ public class SettingsExecute {
 				eb = removeApplyBlacklist(args[4]);
 			} else if (args.length == 5) {
 				eb =
-						switch (args[3]) {
-							case "share" -> shareBlacklist(args[4]);
-							case "unshare" -> unshareBlacklist(args[4]);
-							case "use" -> useBlacklist(args[4]);
-							case "stop_using" -> stopUsingBlacklist(args[4]);
-							default -> eb;
-						};
+					switch (args[3]) {
+						case "share" -> shareBlacklist(args[4]);
+						case "unshare" -> unshareBlacklist(args[4]);
+						case "use" -> useBlacklist(args[4]);
+						case "stop_using" -> stopUsingBlacklist(args[4]);
+						default -> eb;
+					};
 			}
 
-			if(eb == null){
+			if (eb == null) {
 				eb = errorEmbed("settings guild blacklist");
 			}
-		}
-		else if (args.length == 4 && args[1].equals("bot_manager")) {
+		} else if (args.length == 4 && args[1].equals("bot_manager")) {
 			if (args[2].equals("add")) {
 				eb = addBotManagerRole(args[3]);
 			} else if (args[2].equals("remove")) {
 				eb = removeBotManagerRole(args[3]);
 			}
 
-			if(eb == null){
+			if (eb == null) {
 				eb = errorEmbed("settings bot_manager");
 			}
 		} else if (args.length == 1) {
-			eb = defaultSettingsEmbed()
+			eb =
+				defaultSettingsEmbed()
 					.addField("General Settings", "Use `/settings general` to see the current settings", false)
 					.addField("Jacob Settings", "Use `/settings jacob` to see the current settings", false)
-			.addField("Verify Settings", "Use `/settings verify` to see the current settings", false)
-			.addField("Guild Settings", "Use `/settings guild` to see the current settings", false)
-			.addField("Roles Settings", "Use `/settings roles` to see the current settings", false);
+					.addField("Verify Settings", "Use `/settings verify` to see the current settings", false)
+					.addField("Guild Settings", "Use `/settings guild` to see the current settings", false)
+					.addField("Roles Settings", "Use `/settings roles` to see the current settings", false);
 		} else if (args.length == 2 && args[1].equals("general")) {
 			eb = defaultSettingsEmbed();
 			eb.addField("Prefix", higherDepth(currentSettings, "prefix", DEFAULT_PREFIX), false);
@@ -267,11 +267,12 @@ public class SettingsExecute {
 			if (args.length == 2) {
 				eb = defaultSettingsEmbed(getCurrentVerifySettings(higherDepth(currentSettings, "automatedVerify")));
 			} else if (args.length == 3) {
-				eb = switch (args[2]) {
-					case "enable" -> setVerifyEnable(true);
-					case "disable" -> setVerifyEnable(false);
-					default -> eb;
-				};
+				eb =
+					switch (args[2]) {
+						case "enable" -> setVerifyEnable(true);
+						case "disable" -> setVerifyEnable(false);
+						default -> eb;
+					};
 			} else if (args.length == 4) {
 				switch (args[2]) {
 					case "message" -> eb = setVerifyMessageText(args[3]);
@@ -286,11 +287,12 @@ public class SettingsExecute {
 						}
 					}
 					case "remove_role" -> eb = setVerifyRemoveRole(args[3]);
-					case "sync" -> eb = switch (args[3]) {
-						case "true" -> setVerifySyncEnable(true);
-						case "false" -> setVerifySyncEnable(false);
-						default -> eb;
-					};
+					case "sync" -> eb =
+						switch (args[3]) {
+							case "true" -> setVerifySyncEnable(true);
+							case "false" -> setVerifySyncEnable(false);
+							default -> eb;
+						};
 				}
 			}
 
@@ -332,39 +334,44 @@ public class SettingsExecute {
 			} else if (args.length == 3) {
 				return getGuildSettings(args[2]);
 			} else if (args.length == 4) {
-				eb = switch (args[2]) {
-					case "create" -> createNewGuild(args[3]);
-					case "remove" -> removeGuild(args[3]);
-					default -> eb;
-				};
+				eb =
+					switch (args[2]) {
+						case "create" -> createNewGuild(args[3]);
+						case "remove" -> removeGuild(args[3]);
+						default -> eb;
+					};
 			} else if (args.length == 5) {
 				JsonElement guildSettings = database.getGuildSettings(guild.getId(), args[2]);
 				if (guildSettings == null || guildSettings.isJsonNull()) {
 					eb = invalidEmbed("No automated guild is created for " + args[2]);
 				} else if (args[3].equals("member_role")) {
-					eb = switch (args[4]) {
-						case "enable" -> setGuildMemberRoleEnable(guildSettings.getAsJsonObject(), true);
-						case "disable" -> setGuildMemberRoleEnable(guildSettings.getAsJsonObject(), false);
-						default -> setGuildMemberRole(guildSettings.getAsJsonObject(), args[4]);
-					};
+					eb =
+						switch (args[4]) {
+							case "enable" -> setGuildMemberRoleEnable(guildSettings.getAsJsonObject(), true);
+							case "disable" -> setGuildMemberRoleEnable(guildSettings.getAsJsonObject(), false);
+							default -> setGuildMemberRole(guildSettings.getAsJsonObject(), args[4]);
+						};
 				} else if (args[3].equals("ranks")) {
-					eb = switch (args[4]) {
-						case "enable" -> setGuildRanksEnable(guildSettings.getAsJsonObject(), true);
-						case "disable" -> setGuildRanksEnable(guildSettings.getAsJsonObject(), false);
-						default -> eb;
-					};
+					eb =
+						switch (args[4]) {
+							case "enable" -> setGuildRanksEnable(guildSettings.getAsJsonObject(), true);
+							case "disable" -> setGuildRanksEnable(guildSettings.getAsJsonObject(), false);
+							default -> eb;
+						};
 				} else if (args[3].equals("counter")) {
-					eb = switch (args[4]) {
-						case "enable" -> setGuildCounterEnable(guildSettings.getAsJsonObject(), true);
-						case "disable" -> setGuildCounterEnable(guildSettings.getAsJsonObject(), false);
-						default -> eb;
-					};
+					eb =
+						switch (args[4]) {
+							case "enable" -> setGuildCounterEnable(guildSettings.getAsJsonObject(), true);
+							case "disable" -> setGuildCounterEnable(guildSettings.getAsJsonObject(), false);
+							default -> eb;
+						};
 				} else if (args[3].equals("apply")) {
-					eb = switch (args[4]) {
-						case "enable" -> setApplyEnable(guildSettings.getAsJsonObject(), true);
-						case "disable" -> setApplyEnable(guildSettings.getAsJsonObject(), false);
-						default -> eb;
-					};
+					eb =
+						switch (args[4]) {
+							case "enable" -> setApplyEnable(guildSettings.getAsJsonObject(), true);
+							case "disable" -> setApplyEnable(guildSettings.getAsJsonObject(), false);
+							default -> eb;
+						};
 				}
 			} else if (
 				(args = content.split("\\s+", 6)).length == 6 &&
@@ -412,17 +419,19 @@ public class SettingsExecute {
 					}
 				} else if (args[3].equals("apply")) {
 					if (args[4].equals("staff_roles")) {
-						eb = switch (args[5]) {
-							case "add" -> addApplyStaffRole(guildSettings.getAsJsonObject(), args[6]);
-							case "remove" -> removeApplyStaffRole(guildSettings.getAsJsonObject(), args[6]);
-							default -> eb;
-						};
+						eb =
+							switch (args[5]) {
+								case "add" -> addApplyStaffRole(guildSettings.getAsJsonObject(), args[6]);
+								case "remove" -> removeApplyStaffRole(guildSettings.getAsJsonObject(), args[6]);
+								default -> eb;
+							};
 					} else if (args[4].equals("requirements") || args[4].equals("reqs") || args[4].equals("req")) {
-						eb = switch (args[5]) {
-							case "add" -> addApplyRequirement(guildSettings.getAsJsonObject(), args[6]);
-							case "remove" -> removeApplyRequirement(guildSettings.getAsJsonObject(), args[6]);
-							default -> eb;
-						};
+						eb =
+							switch (args[5]) {
+								case "add" -> addApplyRequirement(guildSettings.getAsJsonObject(), args[6]);
+								case "remove" -> removeApplyRequirement(guildSettings.getAsJsonObject(), args[6]);
+								default -> eb;
+							};
 					}
 				}
 			}
@@ -473,7 +482,9 @@ public class SettingsExecute {
 
 		for (int i = jacobRoles.size() - 1; i >= 0; i--) {
 			if (higherDepth(jacobRoles.get(i), "value").getAsString().equals(crop)) {
-				try{guild.getRoleById(higherDepth(jacobRoles.get(i), "roleId").getAsString()).delete().queue();}catch (Exception ignored){}
+				try {
+					guild.getRoleById(higherDepth(jacobRoles.get(i), "roleId").getAsString()).delete().queue();
+				} catch (Exception ignored) {}
 				jacobRoles.remove(i);
 			}
 		}
@@ -1290,9 +1301,7 @@ public class SettingsExecute {
 				higherDepth(req, "weightReq", 0)
 			);
 		} catch (Exception e) {
-			return invalidEmbed(
-				"Invalid requirement number. Run `/settings guild <name>` to see the current apply requirements"
-			);
+			return invalidEmbed("Invalid requirement number. Run `/settings guild <name>` to see the current apply requirements");
 		}
 	}
 
@@ -1445,16 +1454,21 @@ public class SettingsExecute {
 			}
 
 			switch (roleName) {
-				case "guild_member" -> ebFieldString
-					.append("**Member role for Hypixel guilds**\nExample: `/settings roles add guild_member skyblock_forceful @sbf guild member`\n");
-				case "sven" -> ebFieldString
-					.append("**A player's sven packmaster slayer xp**\nExample: `/settings roles add sven 1000000 @sven 9`\n");
-				case "rev" -> ebFieldString
-					.append("**A player's revenant horror xp slayer**\nExample: `/settings roles add rev 400000 @rev 8`\n");
-				case "tara" -> ebFieldString
-					.append("**A player's tarantula broodfather slayer xp**\nExample: `/settings roles add tara 100000 @tara 7`\n");
-				case "coins" -> ebFieldString
-					.append("**Coins in a player's bank and purse**\nExample: `/settings roles add coins 1000000 @millionaire`\n");
+				case "guild_member" -> ebFieldString.append(
+					"**Member role for Hypixel guilds**\nExample: `/settings roles add guild_member skyblock_forceful @sbf guild member`\n"
+				);
+				case "sven" -> ebFieldString.append(
+					"**A player's sven packmaster slayer xp**\nExample: `/settings roles add sven 1000000 @sven 9`\n"
+				);
+				case "rev" -> ebFieldString.append(
+					"**A player's revenant horror xp slayer**\nExample: `/settings roles add rev 400000 @rev 8`\n"
+				);
+				case "tara" -> ebFieldString.append(
+					"**A player's tarantula broodfather slayer xp**\nExample: `/settings roles add tara 100000 @tara 7`\n"
+				);
+				case "coins" -> ebFieldString.append(
+					"**Coins in a player's bank and purse**\nExample: `/settings roles add coins 1000000 @millionaire`\n"
+				);
 				case "alchemy",
 					"combat",
 					"fishing",
@@ -1474,32 +1488,43 @@ public class SettingsExecute {
 					.append(" 30 @")
 					.append(roleName)
 					.append(" 30`\n");
-				case "fairy_souls" -> ebFieldString
-					.append("**Amount of collected fairy souls**\nExample: `/settings roles add fairy_souls 50 @50 souls collected`\n");
-				case "slot_collector" -> ebFieldString
-					.append("**Number of minion slots excluding upgrades**\nExample: `/settings roles add slot_collector 24 @maxed minion slots`\n");
-				case "maxed_collections" -> ebFieldString
-					.append("**Number of a player's individually maxed collections**\nExample: `/settings roles add maxed_collections 62 @all collections maxed`\n");
-				case "pet_enthusiast" -> ebFieldString
-					.append("**Having a level 100 epic or legendary pet that is not an enchanting or alchemy pet**\nExample: `/settings roles set pet_enthusiast @level 100 pet`\n");
-				case "guild_ranks" -> ebFieldString
-					.append("**If a player is in the guild set in `/settings guild`, they will be given the corresponding rank role set there**\nNote: this role can only be enabled, disabled, and linked here. To modify guild ranks use `/settings guild [name]`\n");
-				case "slayer_nine" -> ebFieldString
-					.append("**The number of level nine slayers a player has**\nExample: `/settings roles add slayer_nine 3 @role`\n");
-				case "gamemode" -> ebFieldString
-					.append("**Playing on an ironman or stranded profile**\nExample: `/settings roles add gamemode stranded @Stranded Gamer`\n");
-				case "dungeon_secrets" -> ebFieldString
-					.append("**A player's dungeon secrets count**\nExample: `/settings roles add dungeon_secrets 25000 @secret sweat`\n");
-				case "accessory_count" -> ebFieldString
-					.append("**A player's dungeon unique accessory count**\nExample: `/settings roles add accessory_count 75 @accessory collector`\n");
-				case "networth" -> ebFieldString
-					.append("**A player's networth**\nExample: `/settings roles add networth 1000000000 @billionaire`\n");
-				case "enderman" -> ebFieldString
-					.append("**A player's voidgloom seraph slayer xp**\nExample: `/settings roles add enderman 100000 @enderman 7`\n");
-				case "weight" -> ebFieldString
-					.append("**A player's weight**\nExample: `/settings roles add weight 5000 @5k weight`\n");
-				case "total_slayer" -> ebFieldString
-					.append("**A player's total slayer xp**\nExample: `/settings roles add total_slayer 1000000 @1m slayer`\n");
+				case "fairy_souls" -> ebFieldString.append(
+					"**Amount of collected fairy souls**\nExample: `/settings roles add fairy_souls 50 @50 souls collected`\n"
+				);
+				case "slot_collector" -> ebFieldString.append(
+					"**Number of minion slots excluding upgrades**\nExample: `/settings roles add slot_collector 24 @maxed minion slots`\n"
+				);
+				case "maxed_collections" -> ebFieldString.append(
+					"**Number of a player's individually maxed collections**\nExample: `/settings roles add maxed_collections 62 @all collections maxed`\n"
+				);
+				case "pet_enthusiast" -> ebFieldString.append(
+					"**Having a level 100 epic or legendary pet that is not an enchanting or alchemy pet**\nExample: `/settings roles set pet_enthusiast @level 100 pet`\n"
+				);
+				case "guild_ranks" -> ebFieldString.append(
+					"**If a player is in the guild set in `/settings guild`, they will be given the corresponding rank role set there**\nNote: this role can only be enabled, disabled, and linked here. To modify guild ranks use `/settings guild [name]`\n"
+				);
+				case "slayer_nine" -> ebFieldString.append(
+					"**The number of level nine slayers a player has**\nExample: `/settings roles add slayer_nine 3 @role`\n"
+				);
+				case "gamemode" -> ebFieldString.append(
+					"**Playing on an ironman or stranded profile**\nExample: `/settings roles add gamemode stranded @Stranded Gamer`\n"
+				);
+				case "dungeon_secrets" -> ebFieldString.append(
+					"**A player's dungeon secrets count**\nExample: `/settings roles add dungeon_secrets 25000 @secret sweat`\n"
+				);
+				case "accessory_count" -> ebFieldString.append(
+					"**A player's dungeon unique accessory count**\nExample: `/settings roles add accessory_count 75 @accessory collector`\n"
+				);
+				case "networth" -> ebFieldString.append(
+					"**A player's networth**\nExample: `/settings roles add networth 1000000000 @billionaire`\n"
+				);
+				case "enderman" -> ebFieldString.append(
+					"**A player's voidgloom seraph slayer xp**\nExample: `/settings roles add enderman 100000 @enderman 7`\n"
+				);
+				case "weight" -> ebFieldString.append("**A player's weight**\nExample: `/settings roles add weight 5000 @5k weight`\n");
+				case "total_slayer" -> ebFieldString.append(
+					"**A player's total slayer xp**\nExample: `/settings roles add total_slayer 1000000 @1m slayer`\n"
+				);
 			}
 
 			ebFieldString
@@ -1735,9 +1760,7 @@ public class SettingsExecute {
 
 			return invalidEmbed("Invalid guild role name or guild ranks not enabled");
 		} else if (isOneLevelRole(roleName)) {
-			return invalidEmbed(
-				"These roles do not support levels. Use `/settings roles set <role_name> <@role>` instead"
-			);
+			return invalidEmbed("These roles do not support levels. Use `/settings roles set <role_name> <@role>` instead");
 		} else if (roleName.equals("gamemode")) {
 			if (!roleValue.equals("ironman") && !roleValue.equals("stranded")) {
 				return invalidEmbed("Mode must be ironman or stranded");
@@ -1802,9 +1825,7 @@ public class SettingsExecute {
 
 	public EmbedBuilder removeRoleLevel(String roleName, String value) {
 		if (isOneLevelRole(roleName)) {
-			return defaultEmbed(
-				"These roles do not support levels. Use `/settings roles set <role_name> <@role>` instead"
-			);
+			return defaultEmbed("These roles do not support levels. Use `/settings roles set <role_name> <@role>` instead");
 		}
 
 		JsonObject currentRoleSettings;
@@ -1851,9 +1872,7 @@ public class SettingsExecute {
 
 	public EmbedBuilder setOneLevelRole(String roleName, String roleMention) {
 		if (!isOneLevelRole(roleName)) {
-			return invalidEmbed(
-				"This role is not a one level role. Use `/settings roles add <role_name> <value> <@role>` instead"
-			);
+			return invalidEmbed("This role is not a one level role. Use `/settings roles add <role_name> <value> <@role>` instead");
 		}
 
 		Object eb = checkRole(roleMention);
@@ -1895,7 +1914,7 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder setVerifyEnable(boolean enable) {
-		if(!enable){
+		if (!enable) {
 			JsonObject currentSettings = database.getVerifySettings(guild.getId()).getAsJsonObject();
 			currentSettings.remove("previousMessageId");
 			currentSettings.remove("verifiedNickname");
@@ -1905,10 +1924,12 @@ public class SettingsExecute {
 			try {
 				for (Entry<String, JsonElement> key : currentSettings.entrySet()) {
 					if (
-							(key.getValue().isJsonPrimitive() && key.getValue().getAsString().isEmpty()) ||
-									(key.getValue().isJsonArray() && key.getValue().getAsJsonArray().isEmpty())
+						(key.getValue().isJsonPrimitive() && key.getValue().getAsString().isEmpty()) ||
+						(key.getValue().isJsonArray() && key.getValue().getAsJsonArray().isEmpty())
 					) {
-						return invalidEmbed("The following settings must be set before enabling verify: message, channel, and at least one verified role");
+						return invalidEmbed(
+							"The following settings must be set before enabling verify: message, channel, and at least one verified role"
+						);
 					}
 				}
 			} catch (Exception ignored) {}
@@ -1919,11 +1940,7 @@ public class SettingsExecute {
 			return apiFailMessage(responseCode);
 		}
 
-		return defaultSettingsEmbed(
-			"**Verify:** " +
-			(enable ? "enabled" : "disabled") +
-			"\nRun `/reload` to reload the settings"
-		);
+		return defaultSettingsEmbed("**Verify:** " + (enable ? "enabled" : "disabled") + "\nRun `/reload` to reload the settings");
 	}
 
 	public EmbedBuilder setVerifyMessageText(String verifyText) {
@@ -1982,10 +1999,13 @@ public class SettingsExecute {
 			String type = matcher.group(2).toUpperCase();
 
 			if (category.equals("GUILD") && (type.equals("NAME") || type.equals("TAG") || type.equals("RANK"))) {
-				if (database.getAllGuildSettings(guild.getId()).stream().noneMatch(g -> g != null && g.getGuildRanksEnable() != null && g.getGuildRanksEnable().equalsIgnoreCase("true"))) {
-					return invalidEmbed(
-						"At least one guild ranks must be enabled in `/settings guild <name>` to use " + matcher.group(0)
-					);
+				if (
+					database
+						.getAllGuildSettings(guild.getId())
+						.stream()
+						.noneMatch(g -> g != null && g.getGuildRanksEnable() != null && g.getGuildRanksEnable().equalsIgnoreCase("true"))
+				) {
+					return invalidEmbed("At least one guild ranks must be enabled in `/settings guild <name>` to use " + matcher.group(0));
 				}
 				nickname = nickname.replace(matcher.group(0), "");
 			} else if (

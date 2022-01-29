@@ -122,7 +122,8 @@ public class LinkCommand extends Command {
 													""
 												);
 												default -> playerGuild.get("tag").getAsString();
-											} + extra
+											} +
+											extra
 										);
 								}
 							} else if (
@@ -156,7 +157,8 @@ public class LinkCommand extends Command {
 														? ""
 														: "" + player.getSelectedDungeonClass().toUpperCase().charAt(0);
 													default -> roundAndFormat(player.getCatacombs().getProgressLevel());
-												} + extra
+												} +
+												extra
 											);
 									}
 								}

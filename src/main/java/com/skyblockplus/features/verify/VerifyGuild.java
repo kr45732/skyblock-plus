@@ -152,7 +152,8 @@ public class VerifyGuild {
 											""
 										);
 										default -> playerGuild.get("tag").getAsString();
-									} + extra
+									} +
+									extra
 								);
 						}
 					} else if (

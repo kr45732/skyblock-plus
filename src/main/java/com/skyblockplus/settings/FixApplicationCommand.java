@@ -282,7 +282,7 @@ public class FixApplicationCommand extends Command {
 					.queue();
 			}
 
-			if(logApplication) {
+			if (logApplication) {
 				Collections.reverse(messages);
 				applicationJson.add("logs", gson.toJsonTree(messages.stream().map(ApplyLog::toLog).collect(Collectors.toList())));
 			}
