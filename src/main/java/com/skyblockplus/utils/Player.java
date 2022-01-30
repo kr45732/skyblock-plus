@@ -1147,80 +1147,79 @@ public class Player {
 		int beforeProfileIndex = this.profileIndex;
 		this.profileIndex = 0;
 		for (JsonElement ignored : profilesArray) {
-			if (!isGamemode(gamemode)) {
-				continue;
+			if (isGamemode(gamemode)) {
+				switch (type) {
+					case "slayer":
+						highestAmount = Math.max(highestAmount, getTotalSlayer());
+					case "skills":
+						highestAmount = Math.max(highestAmount, getSkillAverage());
+						break;
+					case "catacombs":
+						highestAmount = Math.max(highestAmount, getCatacombs().getProgressLevel());
+						break;
+					case "weight":
+						highestAmount = Math.max(highestAmount, getWeight());
+						break;
+					case "sven":
+					case "rev":
+					case "tara":
+					case "enderman":
+						highestAmount = Math.max(highestAmount, getSlayer(type));
+						break;
+					case "alchemy":
+					case "combat":
+					case "fishing":
+					case "farming":
+					case "foraging":
+					case "carpentry":
+					case "mining":
+					case "taming":
+					case "enchanting":
+						highestAmount = Math.max(highestAmount, getSkill(type) != null ? getSkill(type).getProgressLevel() : -1);
+						break;
+					case "bank":
+						highestAmount = Math.max(highestAmount, getBankBalance());
+						break;
+					case "purse":
+						highestAmount = Math.max(highestAmount, getPurseCoins());
+						break;
+					case "pet_score":
+						highestAmount = Math.max(highestAmount, getPetScore());
+						break;
+					case "networth":
+						highestAmount = Math.max(highestAmount, getNetworth());
+						break;
+					case "fairy_souls":
+						highestAmount = Math.max(highestAmount, getFairySouls());
+						break;
+					case "slot_collector":
+						highestAmount = Math.max(highestAmount, getNumberMinionSlots());
+						break;
+					case "dungeon_secrets":
+						highestAmount = Math.max(highestAmount, getDungeonSecrets());
+						break;
+					case "accessory_count":
+						highestAmount = Math.max(highestAmount, getAccessoryCount());
+						break;
+					case "total_slayer":
+						highestAmount = Math.max(highestAmount, getTotalSlayer());
+						break;
+					case "slayer_nine":
+						highestAmount = Math.max(highestAmount, getNumLvlNineSlayers());
+						break;
+					case "maxed_collections":
+						highestAmount = Math.max(highestAmount, getNumMaxedCollections());
+						break;
+					case "ironman":
+					case "stranded":
+						highestAmount = Math.max(highestAmount, isGamemode(Gamemode.of(type)) ? 1 : -1);
+						break;
+					default:
+						this.profileIndex = beforeProfileIndex;
+						return -1;
+				}
 			}
 
-			switch (type) {
-				case "slayer":
-					highestAmount = Math.max(highestAmount, getTotalSlayer());
-				case "skills":
-					highestAmount = Math.max(highestAmount, getSkillAverage());
-					break;
-				case "catacombs":
-					highestAmount = Math.max(highestAmount, getCatacombs().getProgressLevel());
-					break;
-				case "weight":
-					highestAmount = Math.max(highestAmount, getWeight());
-					break;
-				case "sven":
-				case "rev":
-				case "tara":
-				case "enderman":
-					highestAmount = Math.max(highestAmount, getSlayer(type));
-					break;
-				case "alchemy":
-				case "combat":
-				case "fishing":
-				case "farming":
-				case "foraging":
-				case "carpentry":
-				case "mining":
-				case "taming":
-				case "enchanting":
-					highestAmount = Math.max(highestAmount, getSkill(type) != null ? getSkill(type).getProgressLevel() : -1);
-					break;
-				case "bank":
-					highestAmount = Math.max(highestAmount, getBankBalance());
-					break;
-				case "purse":
-					highestAmount = Math.max(highestAmount, getPurseCoins());
-					break;
-				case "pet_score":
-					highestAmount = Math.max(highestAmount, getPetScore());
-					break;
-				case "networth":
-					highestAmount = Math.max(highestAmount, getNetworth());
-					break;
-				case "fairy_souls":
-					highestAmount = Math.max(highestAmount, getFairySouls());
-					break;
-				case "slot_collector":
-					highestAmount = Math.max(highestAmount, getNumberMinionSlots());
-					break;
-				case "dungeon_secrets":
-					highestAmount = Math.max(highestAmount, getDungeonSecrets());
-					break;
-				case "accessory_count":
-					highestAmount = Math.max(highestAmount, getAccessoryCount());
-					break;
-				case "total_slayer":
-					highestAmount = Math.max(highestAmount, getTotalSlayer());
-					break;
-				case "slayer_nine":
-					highestAmount = Math.max(highestAmount, getNumLvlNineSlayers());
-					break;
-				case "maxed_collections":
-					highestAmount = Math.max(highestAmount, getNumMaxedCollections());
-					break;
-				case "ironman":
-				case "stranded":
-					highestAmount = Math.max(highestAmount, isGamemode(Gamemode.of(type)) ? 1 : -1);
-					break;
-				default:
-					this.profileIndex = beforeProfileIndex;
-					return -1;
-			}
 			this.profileIndex++;
 		}
 
