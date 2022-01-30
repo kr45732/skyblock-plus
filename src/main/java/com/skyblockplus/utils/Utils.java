@@ -98,7 +98,7 @@ public class Utils {
 	public static final CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 	public static final OkHttpClient okHttpClient = new OkHttpClient().newBuilder().build();
 	public static final ExecutorService executor = new ExceptionExecutor();
-	public static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(5);
+	public static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(7);
 	public static final ScriptEngine jsScriptEngine = new ScriptEngineManager().getEngineByName("js");
 	public static final AtomicInteger remainingLimit = new AtomicInteger(120);
 	public static final AtomicInteger timeTillReset = new AtomicInteger(0);
@@ -167,6 +167,7 @@ public class Utils {
 	public static List<String> linkedUsers;
 	public static Instant linkedUsersLastUpdated = Instant.now();
 	public static List<String> queryItems;
+	public static HypixelGuildCache globalLeaderboardCache = new HypixelGuildCache();
 
 	/* Getters */
 	public static JsonObject getLowestBinJson() {
@@ -1178,26 +1179,22 @@ public class Utils {
 			return;
 		}
 
+		updateApplyCache.cancel(true);
+
 		long startTime = System.currentTimeMillis();
 		for (Map.Entry<String, AutomaticGuild> automaticGuild : guildMap.entrySet()) {
 			List<ApplyGuild> applySettings = automaticGuild.getValue().applyGuild;
 			for (ApplyGuild applySetting : applySettings) {
 				try {
-					database.deleteApplyCacheSettings(
-						automaticGuild.getKey(),
-						higherDepth(applySetting.currentSettings, "guildName").getAsString()
-					);
 					List<ApplyUser> applyUserList = applySetting.applyUserList;
-					if (applyUserList.size() > 0) {
-						int code = database.setApplyCacheSettings(
-							automaticGuild.getKey(),
-							higherDepth(applySetting.currentSettings, "guildName").getAsString(),
+					int code = database.setApplyCacheSettings(
+						automaticGuild.getKey(),
+						higherDepth(applySetting.currentSettings, "guildName").getAsString(),
 							gson.toJson(applyUserList)
-						);
+					);
 
-						if (code == 200) {
-							log.info("Successfully cached ApplyUser | " + automaticGuild.getKey() + " | " + applyUserList.size());
-						}
+					if (applyUserList.size() > 0) {
+						log.info("Cached ApplyUser - " + code + " | " + automaticGuild.getKey() + " | " + applyUserList.size());
 					}
 				} catch (Exception e) {
 					log.error("cacheApplyGuildUsers - " + automaticGuild.getKey(), e);
@@ -1229,6 +1226,16 @@ public class Utils {
 		log.info("Cached parties in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
 	}
 
+	public static void cacheLeaderboard() {
+		if (!isMainBot()) {
+			return;
+		}
+
+		long startTime = System.currentTimeMillis();
+		cacheDatabase.cacheLeaderboard(gson.toJsonTree(globalLeaderboardCache).toString());
+		log.info("Cached leaderboard in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
+	}
+
 	public static List<ApplyUser> getApplyGuildUsersCache(String guildId, String name) {
 		if (!isMainBot()) {
 			return new ArrayList<>();
@@ -1244,7 +1251,6 @@ public class Utils {
 			}
 			if (applyUsersCacheList.size() > 0) {
 				log.info("Retrieved cache (" + applyUsersCacheList.size() + ") - guildId={" + guildId + "}, name={" + name + "}");
-				database.deleteApplyCacheSettings(guildId, name);
 				return applyUsersCacheList;
 			}
 		} catch (Exception e) {
@@ -1415,19 +1421,7 @@ public class Utils {
 				jda
 					.getGuilds()
 					.stream()
-					.filter(g ->
-						!Arrays
-							.asList(
-								"374071874222686211",
-								"110373943822540800",
-								"597450230430040076",
-								"703967135961055314",
-								"858695709393027102"
-							)
-							.contains(g.getId())
-					)
-					.map(Guild::getMemberCount)
-					.mapToInt(Integer::intValue)
+					.mapToInt(Guild::getMemberCount)
 					.sum();
 			userCountLastUpdated = Instant.now();
 		}

@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import net.dv8tion.jda.api.entities.Activity;
@@ -61,15 +62,18 @@ public class ApiHandler {
 	private static final Logger log = LoggerFactory.getLogger(ApiHandler.class);
 	public static Instant lastQueryApiUpdate = Instant.now();
 	public static boolean useAlternativeApi = reloadSettingsJson();
+	public static ScheduledFuture<?> updateApplyCache;
 
 	public static void initialize() {
 		try {
+			cacheDatabase.initializeLeaderboard();
 			cacheDatabase.initializeParties();
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateBotStatistics, 0, 3, TimeUnit.HOURS);
 			cacheDatabase.initializeCommandUses();
 			cacheDatabase.initializeJacobData();
-			scheduler.scheduleWithFixedDelay(cacheDatabase::updateCache, 60, 90, TimeUnit.SECONDS);
-			scheduler.scheduleWithFixedDelay(ApiHandler::updateLinkedAccounts, 60, 30, TimeUnit.SECONDS);
+			updateApplyCache = scheduler.scheduleWithFixedDelay(cacheDatabase::updateCache, 60, 90, TimeUnit.SECONDS);
+			scheduler.scheduleWithFixedDelay(Utils::cacheApplyGuildUsers, 30, 30, TimeUnit.MINUTES);
+			scheduler.scheduleWithFixedDelay(ApiHandler::updateLinkedAccounts, 60, 45, TimeUnit.SECONDS);
 		} catch (Exception e) {
 			log.error("Exception when initializing the ApiHandler", e);
 		}
@@ -575,14 +579,9 @@ public class ApiHandler {
 				.limit(10)
 				.forEach(o ->
 					asyncUuidToUsername(o.uuid())
-						.thenApply(username -> {
-							if (username != null) {
-								database.insertLinkedAccount(
-									new LinkedAccount(Instant.now().toEpochMilli(), o.discord(), o.uuid(), username)
-								);
-							}
-							return null;
-						})
+						.thenApply(username -> username != null && database.insertLinkedAccount(
+								new LinkedAccount(Instant.now().toEpochMilli(), o.discord(), o.uuid(), username)
+						))
 				);
 		} catch (Exception e) {
 			log.error("Exception when updating linked accounts", e);

@@ -25,7 +25,7 @@ import java.util.concurrent.*;
 public class ExceptionExecutor extends ThreadPoolExecutor {
 
 	public ExceptionExecutor() {
-		super(8, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>());
+		super(10, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>());
 	}
 
 	protected void afterExecute(Runnable r, Throwable t) {

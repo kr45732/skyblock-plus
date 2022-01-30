@@ -28,6 +28,7 @@ import com.google.gson.reflect.TypeToken;
 import com.skyblockplus.features.jacob.JacobData;
 import com.skyblockplus.features.jacob.JacobHandler;
 import com.skyblockplus.features.party.Party;
+import com.skyblockplus.utils.structs.HypixelGuildCache;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.lang.reflect.Type;
@@ -163,6 +164,31 @@ public class CacheDatabase {
 			return true;
 		} catch (Exception e) {
 			return false;
+		}
+	}
+
+	public boolean cacheLeaderboard(String json) {
+		try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
+			statement.executeUpdate("INSERT INTO leaderboard VALUES (0, '" + json + "') ON DUPLICATE KEY UPDATE data = VALUES(data)");
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	public void initializeLeaderboard() {
+		if (!isMainBot()) {
+			return;
+		}
+
+		try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("SELECT * FROM leaderboard")) {
+			try (ResultSet response = statement.executeQuery()) {
+				response.next();
+				globalLeaderboardCache = gson.fromJson(response.getString("data"), HypixelGuildCache.class);
+				log.info("Retrieved leaderboard");
+			}
+		} catch (Exception e) {
+			log.error("initializeLeaderboard", e);
 		}
 	}
 

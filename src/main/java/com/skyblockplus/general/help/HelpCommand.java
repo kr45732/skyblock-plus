@@ -344,7 +344,8 @@ public class HelpCommand extends Command {
 				new HelpData("uuid", "Convert username to UUID or UUID to username.", "uuid [username|uuid]")
 					.addExamples("uuid CrypticPlasma", "uuid 044903b7a9d3416d957f929557af6c88")
 					.setCategory("miscellaneous"),
-				new HelpData("fetchur", "Get the item that fetchur wants today").setCategory("miscellaneous"),
+				new HelpData("fetchur", "Get the item that fetchur wants today.").setCategory("miscellaneous"),
+					new HelpData("mayor", "Get the current mayor and their perks.").setCategory("miscellaneous"),
 				new HelpData("time", "Get the current year, date, and time in Skyblock").setCategory("miscellaneous"),
 				new HelpData(
 					"scammer",
@@ -476,7 +477,7 @@ public class HelpCommand extends Command {
 								),
 								new HelpData(
 									"nickname",
-									"The nickname template that a user will be renamed to on verifying. Can be set to none.\n\nYou can use the following templates:\n• [GUILD.NAME]\n• [GUILD.TAG]\n• [GUILD.RANK]\n• [PLAYER.SKILLS]\n• [PLAYER.CATACOMBS]\n• [PLAYER.SLAYER]\n• [PLAYER.WEIGHT]",
+									"The nickname template that a user will be renamed to on verifying. Can be set to none. Add .{text} for text that should only be added if the previous template was met. See example [here](https://discord.com/channels/796790757947867156/802749920679165994/937099157200580618)\n\nYou can use the following templates:\n• [GUILD.NAME]\n• [GUILD.TAG]\n• [GUILD.RANK]\n• [PLAYER.SKILLS]\n• [PLAYER.CATACOMBS]\n• [PLAYER.SLAYER]\n• [PLAYER.WEIGHT]\n• [PLAYER.CLASS]",
 									"nickname [prefix] [IGN] [postfix]"
 								)
 									.addExamples("nickname Verified | [IGN]", "nickname [[GUILD.RANK]] [IGN]"),
@@ -555,7 +556,10 @@ public class HelpCommand extends Command {
 											"add <player> [reason]",
 											"Add a player to the blacklist. Reason will default to 'not provided' if not set."
 										),
-										new HelpData("remove <player>", "Remove a player from the blacklist.")
+										new HelpData("share <id>", "Share your blacklist with another server."),
+											new HelpData("unshare <id>", "Stop sharing your blacklist with another server."),
+											new HelpData("use <id>", "Use a shared blacklist from another server."),
+											new HelpData("stop_using <id>", "Stop using a shared blacklist from another server.")
 									),
 								new HelpData("apply", "Automatic application system for this guild.")
 									.addSubcommands(
@@ -625,7 +629,7 @@ public class HelpCommand extends Command {
 										),
 										new HelpData(
 											"gamemode",
-											"Whether applicants must use a certain gamemode profile in their application. Defaults to all.",
+											"Whether applicants must use a certain gamemode profile in their application. Defaults to all. Options are: all, regular, ironman, stranded, or ironman_stranded.",
 											"settings guild <name> apply gamemode <true|false>",
 											true
 										),
@@ -899,6 +903,10 @@ public class HelpCommand extends Command {
 			) +
 			help.create("settings guild blacklist remove <player>", "Remove a player from the application blacklist") +
 			help.create("settings guild blacklist", "List all players that are blacklisted from the application system") +
+			help.create("settings guild blacklist share <id>", "Share your blacklist with another server") +
+			help.create("settings guild blacklist unshare <id>", "Stop sharing your blacklist with another server") +
+			help.create("settings guild blacklist use <id>", "Use a shared blacklist from another server") +
+			help.create("settings guild blacklist stop_using <id>", "Stop using a shared blacklist from another server") +
 			help.create("settings guild <name> apply <enable|disable>", "Enable or disable automatic apply") +
 			help.create("settings guild <name> apply message <message>", "The message that users will see when verifying") +
 			help.create(

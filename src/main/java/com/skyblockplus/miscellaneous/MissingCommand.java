@@ -28,9 +28,13 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
+import com.skyblockplus.utils.command.CustomPaginator;
+import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.InvItem;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import com.skyblockplus.utils.structs.PaginatorExtras;
 import net.dv8tion.jda.api.EmbedBuilder;
 
 public class MissingCommand extends Command {
@@ -41,7 +45,7 @@ public class MissingCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	public static EmbedBuilder getMissingTalismans(String username, String profileName) {
+	public static EmbedBuilder getMissingTalismans(String username, String profileName, PaginatorEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			Set<String> playerItems;
@@ -95,27 +99,25 @@ public class MissingCommand extends Command {
 				Comparator.comparingDouble(o1 -> higherDepth(lowestBinJson, o1) != null ? higherDepth(lowestBinJson, o1).getAsDouble() : 0)
 			);
 
-			StringBuilder ebStr = new StringBuilder(
+			PaginatorExtras extras = new PaginatorExtras().setEveryPageText(
 				"Missing " +
 				missingInternalArr.size() +
 				" talisman" +
 				(missingInternalArr.size() > 1 ? "s" : "") +
-				". " +
-				(missingInternalArr.size() > 40 ? "Only the cheapest 40 are shown. " : "") +
-				"Sorted by ascending cost. Talismans with a * have higher tiers.\n\n"
+				". Sorted by price. Talismans with a * have higher tiers.\n\n"
 			);
 
 			JsonObject mappings = getInternalJsonMappings();
-			for (int i = 0; i < Math.min(missingInternalArr.size(), 40); i++) {
-				String cur = missingInternalArr.get(i);
-				String wikiLink = higherDepth(mappings, i + ".wiki", null);
-				ebStr
-					.append("• ")
-					.append(wikiLink == null ? idToName(cur) : "[" + idToName(cur) + "](" + wikiLink + ")")
-					.append(higherDepth(talismanUpgrades, cur) != null ? "**\\***" : "")
-					.append("\n");
+			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(40);
+			for (String curId: missingInternalArr) {
+				String wikiLink = higherDepth(mappings, curId + ".wiki", null);
+				String name = idToName(curId);
+				paginateBuilder.addItems(
+						"• " + (wikiLink == null ? name : "[" + name + "](" + wikiLink + ")")
+								+ (higherDepth(talismanUpgrades, curId) != null ? "**\\***" : "") + " ➜ " + roundAndFormat(higherDepth(lowestBinJson, curId, 0.0)) + "\n");
 			}
-			return player.defaultPlayerEmbed().setDescription(ebStr.toString());
+			event.paginate(paginateBuilder.setPaginatorExtras(extras));
+			return null;
 		}
 		return player.getFailEmbed();
 	}
@@ -132,7 +134,7 @@ public class MissingCommand extends Command {
 						return;
 					}
 
-					embed(getMissingTalismans(player, args.length == 3 ? args[2] : null));
+					paginate(getMissingTalismans(player, args.length == 3 ? args[2] : null, new PaginatorEvent(event)));
 					return;
 				}
 

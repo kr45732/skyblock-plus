@@ -25,10 +25,12 @@ import java.util.List;
 
 public class HypixelGuildCache {
 
+	private static final String repeat = "=:=-1.0".repeat(17);
+
 	private final List<String> normalCache;
 	private final List<String> ironmanCache;
 	private final List<String> strandedCache;
-	private Instant lastUpdated;
+	private transient Instant lastUpdated;
 
 	public HypixelGuildCache() {
 		this.normalCache = new ArrayList<>();
@@ -75,9 +77,25 @@ public class HypixelGuildCache {
 	}
 
 	public void addPlayer(Player player) {
-		normalCache.add(memberCacheFromPlayer(player, Player.Gamemode.ALL));
-		ironmanCache.add(memberCacheFromPlayer(player, Player.Gamemode.IRONMAN));
-		strandedCache.add(memberCacheFromPlayer(player, Player.Gamemode.STRANDED));
+		normalCache.add(playerToCache(player, Player.Gamemode.ALL));
+		ironmanCache.add(playerToCache(player, Player.Gamemode.IRONMAN));
+		strandedCache.add(playerToCache(player, Player.Gamemode.STRANDED));
+	}
+
+	public synchronized void addPlayerLeaderboard(Player player) {
+		String cache;
+		if((cache = playerToCache(player, Player.Gamemode.ALL)) != null) {
+			normalCache.removeIf(c -> getStringFromCache(c, "uuid").equals(player.getUuid()));
+			normalCache.add(cache);
+		}
+		if((cache = playerToCache(player, Player.Gamemode.IRONMAN)) != null) {
+			ironmanCache.removeIf(c -> getStringFromCache(c, "uuid").equals(player.getUuid()));
+			ironmanCache.add(cache);
+		}
+		if((cache = playerToCache(player, Player.Gamemode.STRANDED)) != null) {
+			strandedCache.removeIf(c -> getStringFromCache(c, "uuid").equals(player.getUuid()));
+			strandedCache.add(cache);
+		}
 	}
 
 	public Instant getLastUpdated() {
@@ -101,8 +119,8 @@ public class HypixelGuildCache {
 		};
 	}
 
-	private String memberCacheFromPlayer(Player player, Player.Gamemode gamemode) {
-		return (
+	private String playerToCache(Player player, Player.Gamemode gamemode) {
+		String cache = (
 			player.getUsername() +
 			"=:=" +
 			player.getUuid() +
@@ -139,9 +157,9 @@ public class HypixelGuildCache {
 			"=:=" +
 			player.getHighestAmount("taming", gamemode) +
 			"=:=" +
-			player.getHighestAmount("enchanting", gamemode) +
-			"=:=" +
 			player.getHighestAmount("enchanting", gamemode)
 		);
+
+		return cache.endsWith(repeat) ? null : cache;
 	}
 }

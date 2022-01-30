@@ -18,6 +18,8 @@
 
 package com.skyblockplus.miscellaneous;
 
+import com.skyblockplus.guild.GuildLeaderboardCommand;
+import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
@@ -25,11 +27,12 @@ import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
-public class MissingSlashCommand extends SlashCommand {
+public class LeaderboardSlashCommand extends SlashCommand {
 
-	public MissingSlashCommand() {
-		this.name = "missing";
+	public LeaderboardSlashCommand() {
+		this.name = "leaderboard";
 	}
 
 	@Override
@@ -40,15 +43,47 @@ public class MissingSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.paginate(MissingCommand.getMissingTalismans(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
+		event.paginate(
+			GuildLeaderboardCommand.getLeaderboard(
+				event.getOptionStr("type"),
+				event.player,
+				Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
+				new PaginatorEvent(event)
+			)
+		);
 	}
 
 	@Override
 	public CommandData getCommandData() {
 		return Commands
-			.slash(name, "Get a player's missing talismans")
+			.slash(name, "Get the global leaderboard. Player's on leaderboard are only added or updated when commands are run")
+			.addOptions(
+				new OptionData(OptionType.STRING, "type", "The leaderboard type", true)
+					.addChoice("Slayer", "slayer")
+					.addChoice("Skills", "skills")
+					.addChoice("Catacombs", "catacombs")
+						.addChoice("Weight", "weight")
+					.addChoice("Sven Xp", "sven")
+					.addChoice("Revenant Xp", "rev")
+					.addChoice("Tarantula Xp", "tara")
+					.addChoice("Enderman Xp", "enderman")
+					.addChoice("Alchemy", "alchemy")
+					.addChoice("Combat", "combat")
+					.addChoice("Fishing", "fishing")
+					.addChoice("Farming", "farming")
+					.addChoice("Foraging", "foraging")
+					.addChoice("Carpentry", "carpentry")
+					.addChoice("Mining", "mining")
+					.addChoice("Taming", "taming")
+					.addChoice("Enchanting", "enchanting")
+			)
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOption(OptionType.STRING, "profile", "Profile name");
+			.addOptions(
+				new OptionData(OptionType.STRING, "gamemode", "Gamemode type")
+					.addChoice("All", "all")
+					.addChoice("Ironman", "ironman")
+					.addChoice("Stranded", "stranded")
+			);
 	}
 
 	@Override

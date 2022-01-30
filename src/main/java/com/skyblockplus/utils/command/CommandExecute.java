@@ -117,7 +117,7 @@ public abstract class CommandExecute extends CommandEvent {
 	}
 
 	/**
-	 * @param index which arg index the mention is located at
+	 * @param index which arg index the mention is located at or -1 if author
 	 * @return true if a mention was found and the mentioned user is not linked,
 	 * otherwise false (no mention found or the user is linked)
 	 */

@@ -176,7 +176,7 @@ public class Main {
 					new ForgeCommand(),
 					new ScammerCommand(),
 					new FixApplicationCommand(),
-					new NucleusCommand()
+					new NucleusCommand(), new MayorCommand(), new LeaderboardCommand()
 				)
 				.build();
 
@@ -239,7 +239,7 @@ public class Main {
 					new ForgeSlashCommand(),
 					new ScammerSlashCommand(),
 					new CategoriesSlashCommand(),
-					new FixApplicationSlashCommand()
+					new FixApplicationSlashCommand(), new MayorSlashCommand(), new LeaderboardSlashCommand()
 				);
 
 		jda =
@@ -283,6 +283,9 @@ public class Main {
 
 		log.info("Caching Apply Users");
 		cacheApplyGuildUsers();
+
+		log.info("Caching Leaderboard");
+		cacheLeaderboard();
 
 		log.info("Caching Parties");
 		cacheParties();

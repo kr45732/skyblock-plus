@@ -72,6 +72,7 @@ public class Player {
 			return;
 		}
 
+		globalLeaderboardCache.addPlayerLeaderboard(this);
 		this.valid = true;
 	}
 
@@ -96,6 +97,7 @@ public class Player {
 			return;
 		}
 
+		globalLeaderboardCache.addPlayerLeaderboard(this);
 		this.valid = true;
 	}
 
@@ -116,6 +118,7 @@ public class Player {
 			return;
 		}
 
+		globalLeaderboardCache.addPlayerLeaderboard(this);
 		this.valid = true;
 	}
 
@@ -137,6 +140,7 @@ public class Player {
 			return;
 		}
 
+		globalLeaderboardCache.addPlayerLeaderboard(this);
 		this.valid = true;
 	}
 

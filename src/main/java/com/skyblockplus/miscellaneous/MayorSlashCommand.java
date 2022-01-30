@@ -18,43 +18,26 @@
 
 package com.skyblockplus.miscellaneous;
 
-import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
-import com.skyblockplus.utils.structs.AutoCompleteEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-public class MissingSlashCommand extends SlashCommand {
+public class MayorSlashCommand extends SlashCommand {
 
-	public MissingSlashCommand() {
-		this.name = "missing";
+	public MayorSlashCommand() {
+		this.name = "mayor";
 	}
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		if (event.invalidPlayerOption()) {
-			return;
-		}
-
-		event.paginate(MissingCommand.getMissingTalismans(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
+		event.embed(MayorCommand.getMayor());
 	}
 
 	@Override
 	public CommandData getCommandData() {
-		return Commands
-			.slash(name, "Get a player's missing talismans")
-			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOption(OptionType.STRING, "profile", "Profile name");
-	}
-
-	@Override
-	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("player")) {
-			event.replyClosestPlayer();
-		}
+		return Commands.slash(name, "Get the current mayor and their perks");
 	}
 }

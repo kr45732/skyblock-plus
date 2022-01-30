@@ -150,13 +150,13 @@ public class LinkCommand extends Command {
 											nicknameTemplate.replace(
 												matcher.group(0),
 												switch (type) {
-													case "SKILLS" -> roundAndFormat(player.getSkillAverage());
+													case "SKILLS" -> roundAndFormat((int) player.getSkillAverage());
 													case "SLAYER" -> simplifyNumber(player.getTotalSlayer());
-													case "WEIGHT" -> roundAndFormat(player.getWeight());
+													case "WEIGHT" -> roundAndFormat((int) player.getWeight());
 													case "CLASS" -> player.getSelectedDungeonClass().equals("none")
 														? ""
 														: "" + player.getSelectedDungeonClass().toUpperCase().charAt(0);
-													default -> roundAndFormat(player.getCatacombs().getProgressLevel());
+													default -> roundAndFormat((int) player.getCatacombs().getProgressLevel());
 												} +
 												extra
 											);
