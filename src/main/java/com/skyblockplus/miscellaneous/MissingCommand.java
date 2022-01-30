@@ -31,10 +31,9 @@ import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.InvItem;
+import com.skyblockplus.utils.structs.PaginatorExtras;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import com.skyblockplus.utils.structs.PaginatorExtras;
 import net.dv8tion.jda.api.EmbedBuilder;
 
 public class MissingCommand extends Command {
@@ -99,22 +98,28 @@ public class MissingCommand extends Command {
 				Comparator.comparingDouble(o1 -> higherDepth(lowestBinJson, o1) != null ? higherDepth(lowestBinJson, o1).getAsDouble() : 0)
 			);
 
-			PaginatorExtras extras = new PaginatorExtras().setEveryPageText(
-				"Missing " +
-				missingInternalArr.size() +
-				" talisman" +
-				(missingInternalArr.size() > 1 ? "s" : "") +
-				". Sorted by price. Talismans with a * have higher tiers.\n\n"
-			);
+			PaginatorExtras extras = new PaginatorExtras()
+				.setEveryPageText(
+					"Missing " +
+					missingInternalArr.size() +
+					" talisman" +
+					(missingInternalArr.size() > 1 ? "s" : "") +
+					". Sorted by price. Talismans with a * have higher tiers.\n\n"
+				);
 
 			JsonObject mappings = getInternalJsonMappings();
 			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(40);
-			for (String curId: missingInternalArr) {
+			for (String curId : missingInternalArr) {
 				String wikiLink = higherDepth(mappings, curId + ".wiki", null);
 				String name = idToName(curId);
 				paginateBuilder.addItems(
-						"• " + (wikiLink == null ? name : "[" + name + "](" + wikiLink + ")")
-								+ (higherDepth(talismanUpgrades, curId) != null ? "**\\***" : "") + " ➜ " + roundAndFormat(higherDepth(lowestBinJson, curId, 0.0)) + "\n");
+					"• " +
+					(wikiLink == null ? name : "[" + name + "](" + wikiLink + ")") +
+					(higherDepth(talismanUpgrades, curId) != null ? "**\\***" : "") +
+					" ➜ " +
+					roundAndFormat(higherDepth(lowestBinJson, curId, 0.0)) +
+					"\n"
+				);
 			}
 			event.paginate(paginateBuilder.setPaginatorExtras(extras));
 			return null;

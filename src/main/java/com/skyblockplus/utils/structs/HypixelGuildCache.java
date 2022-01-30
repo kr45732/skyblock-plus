@@ -84,15 +84,15 @@ public class HypixelGuildCache {
 
 	public synchronized void addPlayerLeaderboard(Player player) {
 		String cache;
-		if((cache = playerToCache(player, Player.Gamemode.ALL)) != null) {
+		if ((cache = playerToCache(player, Player.Gamemode.ALL)) != null) {
 			normalCache.removeIf(c -> getStringFromCache(c, "uuid").equals(player.getUuid()));
 			normalCache.add(cache);
 		}
-		if((cache = playerToCache(player, Player.Gamemode.IRONMAN)) != null) {
+		if ((cache = playerToCache(player, Player.Gamemode.IRONMAN)) != null) {
 			ironmanCache.removeIf(c -> getStringFromCache(c, "uuid").equals(player.getUuid()));
 			ironmanCache.add(cache);
 		}
-		if((cache = playerToCache(player, Player.Gamemode.STRANDED)) != null) {
+		if ((cache = playerToCache(player, Player.Gamemode.STRANDED)) != null) {
 			strandedCache.removeIf(c -> getStringFromCache(c, "uuid").equals(player.getUuid()));
 			strandedCache.add(cache);
 		}
@@ -120,45 +120,46 @@ public class HypixelGuildCache {
 	}
 
 	private String playerToCache(Player player, Player.Gamemode gamemode) {
-		String cache = (
-			player.getUsername() +
-			"=:=" +
-			player.getUuid() +
-			"=:=" +
-			player.getHighestAmount("slayer", gamemode) +
-			"=:=" +
-			player.getHighestAmount("skills", gamemode) +
-			"=:=" +
-			player.getHighestAmount("catacombs", gamemode) +
-			"=:=" +
-			player.getHighestAmount("weight", gamemode) +
-			"=:=" +
-			player.getHighestAmount("sven", gamemode) +
-			"=:=" +
-			player.getHighestAmount("rev", gamemode) +
-			"=:=" +
-			player.getHighestAmount("tara", gamemode) +
-			"=:=" +
-			player.getHighestAmount("enderman", gamemode) +
-			"=:=" +
-			player.getHighestAmount("alchemy", gamemode) +
-			"=:=" +
-			player.getHighestAmount("combat", gamemode) +
-			"=:=" +
-			player.getHighestAmount("fishing", gamemode) +
-			"=:=" +
-			player.getHighestAmount("farming", gamemode) +
-			"=:=" +
-			player.getHighestAmount("foraging", gamemode) +
-			"=:=" +
-			player.getHighestAmount("carpentry", gamemode) +
-			"=:=" +
-			player.getHighestAmount("mining", gamemode) +
-			"=:=" +
-			player.getHighestAmount("taming", gamemode) +
-			"=:=" +
-			player.getHighestAmount("enchanting", gamemode)
-		);
+		String cache =
+			(
+				player.getUsername() +
+				"=:=" +
+				player.getUuid() +
+				"=:=" +
+				player.getHighestAmount("slayer", gamemode) +
+				"=:=" +
+				player.getHighestAmount("skills", gamemode) +
+				"=:=" +
+				player.getHighestAmount("catacombs", gamemode) +
+				"=:=" +
+				player.getHighestAmount("weight", gamemode) +
+				"=:=" +
+				player.getHighestAmount("sven", gamemode) +
+				"=:=" +
+				player.getHighestAmount("rev", gamemode) +
+				"=:=" +
+				player.getHighestAmount("tara", gamemode) +
+				"=:=" +
+				player.getHighestAmount("enderman", gamemode) +
+				"=:=" +
+				player.getHighestAmount("alchemy", gamemode) +
+				"=:=" +
+				player.getHighestAmount("combat", gamemode) +
+				"=:=" +
+				player.getHighestAmount("fishing", gamemode) +
+				"=:=" +
+				player.getHighestAmount("farming", gamemode) +
+				"=:=" +
+				player.getHighestAmount("foraging", gamemode) +
+				"=:=" +
+				player.getHighestAmount("carpentry", gamemode) +
+				"=:=" +
+				player.getHighestAmount("mining", gamemode) +
+				"=:=" +
+				player.getHighestAmount("taming", gamemode) +
+				"=:=" +
+				player.getHighestAmount("enchanting", gamemode)
+			);
 
 		return cache.endsWith(repeat) ? null : cache;
 	}

@@ -579,9 +579,10 @@ public class ApiHandler {
 				.limit(10)
 				.forEach(o ->
 					asyncUuidToUsername(o.uuid())
-						.thenApply(username -> username != null && database.insertLinkedAccount(
-								new LinkedAccount(Instant.now().toEpochMilli(), o.discord(), o.uuid(), username)
-						))
+						.thenApply(username ->
+							username != null &&
+							database.insertLinkedAccount(new LinkedAccount(Instant.now().toEpochMilli(), o.discord(), o.uuid(), username))
+						)
 				);
 		} catch (Exception e) {
 			log.error("Exception when updating linked accounts", e);

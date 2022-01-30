@@ -345,7 +345,7 @@ public class HelpCommand extends Command {
 					.addExamples("uuid CrypticPlasma", "uuid 044903b7a9d3416d957f929557af6c88")
 					.setCategory("miscellaneous"),
 				new HelpData("fetchur", "Get the item that fetchur wants today.").setCategory("miscellaneous"),
-					new HelpData("mayor", "Get the current mayor and their perks.").setCategory("miscellaneous"),
+				new HelpData("mayor", "Get the current mayor and their perks.").setCategory("miscellaneous"),
 				new HelpData("time", "Get the current year, date, and time in Skyblock").setCategory("miscellaneous"),
 				new HelpData(
 					"scammer",
@@ -557,9 +557,9 @@ public class HelpCommand extends Command {
 											"Add a player to the blacklist. Reason will default to 'not provided' if not set."
 										),
 										new HelpData("share <id>", "Share your blacklist with another server."),
-											new HelpData("unshare <id>", "Stop sharing your blacklist with another server."),
-											new HelpData("use <id>", "Use a shared blacklist from another server."),
-											new HelpData("stop_using <id>", "Stop using a shared blacklist from another server.")
+										new HelpData("unshare <id>", "Stop sharing your blacklist with another server."),
+										new HelpData("use <id>", "Use a shared blacklist from another server."),
+										new HelpData("stop_using <id>", "Stop using a shared blacklist from another server.")
 									),
 								new HelpData("apply", "Automatic application system for this guild.")
 									.addSubcommands(

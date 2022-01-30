@@ -181,7 +181,10 @@ public class CacheDatabase {
 			return;
 		}
 
-		try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("SELECT * FROM leaderboard")) {
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement("SELECT * FROM leaderboard")
+		) {
 			try (ResultSet response = statement.executeQuery()) {
 				response.next();
 				globalLeaderboardCache = gson.fromJson(response.getString("data"), HypixelGuildCache.class);

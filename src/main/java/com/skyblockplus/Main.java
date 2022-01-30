@@ -176,7 +176,9 @@ public class Main {
 					new ForgeCommand(),
 					new ScammerCommand(),
 					new FixApplicationCommand(),
-					new NucleusCommand(), new MayorCommand(), new LeaderboardCommand()
+					new NucleusCommand(),
+					new MayorCommand(),
+					new LeaderboardCommand()
 				)
 				.build();
 
@@ -239,7 +241,9 @@ public class Main {
 					new ForgeSlashCommand(),
 					new ScammerSlashCommand(),
 					new CategoriesSlashCommand(),
-					new FixApplicationSlashCommand(), new MayorSlashCommand(), new LeaderboardSlashCommand()
+					new FixApplicationSlashCommand(),
+					new MayorSlashCommand(),
+					new LeaderboardSlashCommand()
 				);
 
 		jda =

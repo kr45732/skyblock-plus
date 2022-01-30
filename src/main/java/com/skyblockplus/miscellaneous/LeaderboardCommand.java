@@ -18,6 +18,9 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.structs.HypixelGuildCache.*;
+
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
@@ -25,14 +28,10 @@ import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.PaginatorExtras;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.structs.HypixelGuildCache.*;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class LeaderboardCommand extends Command {
 
@@ -56,11 +55,12 @@ public class LeaderboardCommand extends Command {
 
 		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(2).setItemsPerPage(20);
 		String finalLbType = lbType;
-		List<String> cacheList = globalLeaderboardCache.getCache(gamemode)
-				.stream()
-				.filter(cache -> getDoubleFromCache(cache, finalLbType) >= 0)
-				.sorted(Comparator.comparingDouble(cache -> -getDoubleFromCache(cache, finalLbType)))
-				.collect(Collectors.toList());
+		List<String> cacheList = globalLeaderboardCache
+			.getCache(gamemode)
+			.stream()
+			.filter(cache -> getDoubleFromCache(cache, finalLbType) >= 0)
+			.sorted(Comparator.comparingDouble(cache -> -getDoubleFromCache(cache, finalLbType)))
+			.collect(Collectors.toList());
 
 		int guildRank = -1;
 		String amt = "Not on leaderboard";
@@ -80,7 +80,7 @@ public class LeaderboardCommand extends Command {
 			"**Player:** " +
 			player.getUsername() +
 			"\n**Rank:** " +
-			(guildRank == -1 ?"Not on leaderboard" : "#" + (guildRank + 1)) +
+			(guildRank == -1 ? "Not on leaderboard" : "#" + (guildRank + 1)) +
 			"\n**" +
 			capitalizeString(lbType.replace("_", " ")) +
 			":** " +
@@ -89,7 +89,7 @@ public class LeaderboardCommand extends Command {
 		paginateBuilder.setPaginatorExtras(
 			new PaginatorExtras()
 				.setEveryPageText(ebStr)
-					.setEveryPageTitle("Global Leaderboard | " + capitalizeString(gamemode.toString()))
+				.setEveryPageTitle("Global Leaderboard | " + capitalizeString(gamemode.toString()))
 				.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/players")
 		);
 

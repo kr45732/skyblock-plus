@@ -1190,7 +1190,7 @@ public class Utils {
 					int code = database.setApplyCacheSettings(
 						automaticGuild.getKey(),
 						higherDepth(applySetting.currentSettings, "guildName").getAsString(),
-							gson.toJson(applyUserList)
+						gson.toJson(applyUserList)
 					);
 
 					if (applyUserList.size() > 0) {
@@ -1417,12 +1417,7 @@ public class Utils {
 
 	public static int getUserCount() {
 		if (userCount == -1 || Duration.between(userCountLastUpdated, Instant.now()).toMinutes() >= 60) {
-			userCount =
-				jda
-					.getGuilds()
-					.stream()
-					.mapToInt(Guild::getMemberCount)
-					.sum();
+			userCount = jda.getGuilds().stream().mapToInt(Guild::getMemberCount).sum();
 			userCountLastUpdated = Instant.now();
 		}
 

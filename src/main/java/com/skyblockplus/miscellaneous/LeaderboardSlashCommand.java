@@ -62,7 +62,7 @@ public class LeaderboardSlashCommand extends SlashCommand {
 					.addChoice("Slayer", "slayer")
 					.addChoice("Skills", "skills")
 					.addChoice("Catacombs", "catacombs")
-						.addChoice("Weight", "weight")
+					.addChoice("Weight", "weight")
 					.addChoice("Sven Xp", "sven")
 					.addChoice("Revenant Xp", "rev")
 					.addChoice("Tarantula Xp", "tara")
