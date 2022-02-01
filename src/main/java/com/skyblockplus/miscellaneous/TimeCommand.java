@@ -47,7 +47,7 @@ public class TimeCommand extends Command {
 	private static final int DAY_MS = 24 * HOUR_MS;
 	private static final int MONTH_MS = 31 * DAY_MS;
 	private static final int YEAR_MS = SEASONS.length * MONTH_MS;
-	private static final long YEAR_0 = 1560275700000L;
+	public static final long YEAR_0 = 1560275700000L;
 
 	public TimeCommand() {
 		this.name = "time";
@@ -87,7 +87,7 @@ public class TimeCommand extends Command {
 		return (int) (currentYear + 1);
 	}
 
-	public static String nth(int n) {
+	private static String nth(int n) {
 		try {
 			return n + new String[] { "st", "nd", "rd" }[((n + 90) % 100 - 10) % 10 - 1];
 		} catch (Exception e) {

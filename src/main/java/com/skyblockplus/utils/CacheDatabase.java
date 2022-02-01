@@ -28,7 +28,6 @@ import com.google.gson.reflect.TypeToken;
 import com.skyblockplus.features.jacob.JacobData;
 import com.skyblockplus.features.jacob.JacobHandler;
 import com.skyblockplus.features.party.Party;
-import com.skyblockplus.utils.structs.HypixelGuildCache;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.lang.reflect.Type;
@@ -39,6 +38,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import net.dv8tion.jda.api.utils.data.DataObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -167,34 +168,6 @@ public class CacheDatabase {
 		}
 	}
 
-	public boolean cacheLeaderboard(String json) {
-		try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
-			statement.executeUpdate("INSERT INTO leaderboard VALUES (0, '" + json + "') ON DUPLICATE KEY UPDATE data = VALUES(data)");
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
-	}
-
-	public void initializeLeaderboard() {
-		if (!isMainBot()) {
-			return;
-		}
-
-		try (
-			Connection connection = getConnection();
-			PreparedStatement statement = connection.prepareStatement("SELECT * FROM leaderboard")
-		) {
-			try (ResultSet response = statement.executeQuery()) {
-				response.next();
-				globalLeaderboardCache = gson.fromJson(response.getString("data"), HypixelGuildCache.class);
-				log.info("Retrieved leaderboard");
-			}
-		} catch (Exception e) {
-			log.error("initializeLeaderboard", e);
-		}
-	}
-
 	public boolean cacheCommandUsage(String json) {
 		try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
 			statement.executeUpdate("INSERT INTO commands VALUES (0, '" + json + "') ON DUPLICATE KEY UPDATE data = VALUES(data)");
@@ -276,5 +249,62 @@ public class CacheDatabase {
 		try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
 			statement.executeUpdate("DELETE FROM party WHERE guild_id IN (" + String.join(",", toDeleteIds) + ")");
 		} catch (Exception ignored) {}
+	}
+
+	public void insertIntoLeaderboard(Player player){
+		insertIntoLeaderboard(player, Player.Gamemode.ALL);
+		insertIntoLeaderboard(player, Player.Gamemode.IRONMAN);
+		insertIntoLeaderboard(player, Player.Gamemode.STRANDED);
+	}
+
+	private void insertIntoLeaderboard(Player player, Player.Gamemode gamemode) {
+		try (
+				Connection connection = getConnection();
+				PreparedStatement statement = connection.prepareStatement(
+						"INSERT INTO " + gamemode.toCacheType() + " (username, uuid, slayer, skills, catacombs, weight, sven, rev, tara, enderman, alchemy, combat, fishing, farming, foraging, carpentry, mining, taming, enchanting) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE username = VALUES(username), uuid = VALUES(uuid), slayer = VALUES(slayer), skills = VALUES(skills), catacombs = VALUES(catacombs), weight = VALUES(weight), sven = VALUES(sven), rev = VALUES(rev), tara = VALUES(tara), enderman = VALUES(enderman), alchemy = VALUES(alchemy), combat = VALUES(combat), fishing = VALUES(fishing), farming = VALUES(farming), foraging = VALUES(foraging), carpentry = VALUES(carpentry), mining = VALUES(mining), taming = VALUES(taming), enchanting = VALUES(enchanting)"
+				)
+		) {
+			statement.setString(1, player.getUsername());
+			statement.setString(2, player.getUuid());
+			statement.setDouble(3, player.getHighestAmount("slayer", gamemode));
+			statement.setDouble(4, player.getHighestAmount("skills", gamemode));
+			statement.setDouble(5, player.getHighestAmount("catacombs", gamemode));
+			statement.setDouble(6, player.getHighestAmount("weight", gamemode));
+			statement.setDouble(7, player.getHighestAmount("sven", gamemode));
+			statement.setDouble(8, player.getHighestAmount("rev", gamemode));
+			statement.setDouble(9, player.getHighestAmount("tara", gamemode));
+			statement.setDouble(10, player.getHighestAmount("enderman", gamemode));
+			statement.setDouble(11, player.getHighestAmount("alchemy", gamemode));
+			statement.setDouble(12, player.getHighestAmount("combat", gamemode));
+			statement.setDouble(13, player.getHighestAmount("fishing", gamemode));
+			statement.setDouble(14, player.getHighestAmount("farming", gamemode));
+			statement.setDouble(15, player.getHighestAmount("foraging", gamemode));
+			statement.setDouble(16, player.getHighestAmount("carpentry", gamemode));
+			statement.setDouble(17, player.getHighestAmount("mining", gamemode));
+			statement.setDouble(18, player.getHighestAmount("taming", gamemode));
+			statement.setDouble(19, player.getHighestAmount("enchanting", gamemode));
+			statement.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public List<DataObject> getLeaderboard(String lbType, Player.Gamemode mode){
+		try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("SELECT username, " + lbType + " FROM " + mode.toCacheType() + " ORDER BY " + lbType + " DESC")) {
+			try (ResultSet response = statement.executeQuery()) {
+				List<DataObject> out = new ArrayList<>();
+				while (response.next()) {
+					try {
+						out.add(DataObject.empty()
+										.put("username", response.getString("username"))
+										.put("data", response.getString(lbType)));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+				return out;
+			}
+		} catch (Exception ignored) {}
+		return null;
 	}
 }

@@ -66,7 +66,6 @@ public class ApiHandler {
 
 	public static void initialize() {
 		try {
-			cacheDatabase.initializeLeaderboard();
 			cacheDatabase.initializeParties();
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateBotStatistics, 0, 3, TimeUnit.HOURS);
 			cacheDatabase.initializeCommandUses();

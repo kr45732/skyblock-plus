@@ -18,8 +18,7 @@
 
 package com.skyblockplus.utils;
 
-import static com.skyblockplus.utils.ApiHandler.playerFromUuid;
-import static com.skyblockplus.utils.ApiHandler.skyblockProfilesFromUuid;
+import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -72,7 +71,7 @@ public class Player {
 			return;
 		}
 
-		globalLeaderboardCache.addPlayerLeaderboard(this);
+		cacheDatabase.insertIntoLeaderboard(this);
 		this.valid = true;
 	}
 
@@ -97,7 +96,7 @@ public class Player {
 			return;
 		}
 
-		globalLeaderboardCache.addPlayerLeaderboard(this);
+		cacheDatabase.insertIntoLeaderboard(this);
 		this.valid = true;
 	}
 
@@ -118,7 +117,7 @@ public class Player {
 			return;
 		}
 
-		globalLeaderboardCache.addPlayerLeaderboard(this);
+		cacheDatabase.insertIntoLeaderboard(this);
 		this.valid = true;
 	}
 
@@ -140,7 +139,7 @@ public class Player {
 			return;
 		}
 
-		globalLeaderboardCache.addPlayerLeaderboard(this);
+		cacheDatabase.insertIntoLeaderboard(this);
 		this.valid = true;
 	}
 
@@ -1297,6 +1296,13 @@ public class Player {
 					default -> gamemode;
 				}
 			);
+		}
+
+		public String toCacheType(){
+			return switch (this){
+				case IRONMAN, STRANDED -> name().toLowerCase();
+				default -> "all";
+			} + "_lb";
 		}
 
 		public boolean isGamemode(Object gamemode) {

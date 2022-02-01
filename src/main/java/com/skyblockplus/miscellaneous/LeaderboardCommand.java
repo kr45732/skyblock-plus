@@ -18,9 +18,6 @@
 
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.structs.HypixelGuildCache.*;
-
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
@@ -28,10 +25,14 @@ import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.PaginatorExtras;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.utils.data.DataObject;
+
+import java.util.List;
+
+import static com.skyblockplus.utils.ApiHandler.cacheDatabase;
+import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.structs.HypixelGuildCache.isValidType;
 
 public class LeaderboardCommand extends Command {
 
@@ -54,20 +55,14 @@ public class LeaderboardCommand extends Command {
 		}
 
 		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(2).setItemsPerPage(20);
-		String finalLbType = lbType;
-		List<String> cacheList = globalLeaderboardCache
-			.getCache(gamemode)
-			.stream()
-			.filter(cache -> getDoubleFromCache(cache, finalLbType) >= 0)
-			.sorted(Comparator.comparingDouble(cache -> -getDoubleFromCache(cache, finalLbType)))
-			.collect(Collectors.toList());
+		List<DataObject> cacheList = cacheDatabase.getLeaderboard(lbType, gamemode);
 
 		int guildRank = -1;
 		String amt = "Not on leaderboard";
 		for (int i = 0, guildMemberPlayersListSize = cacheList.size(); i < guildMemberPlayersListSize; i++) {
-			String guildPlayer = cacheList.get(i);
-			String formattedAmt = roundAndFormat(getDoubleFromCache(guildPlayer, lbType));
-			String guildPlayerUsername = getStringFromCache(guildPlayer, "username");
+			DataObject lbPlayer = cacheList.get(i);
+			String formattedAmt = roundAndFormat(lbPlayer.getDouble("data"));
+			String guildPlayerUsername = lbPlayer.getString("username");
 			paginateBuilder.addItems("`" + (i + 1) + ")` " + fixUsername(guildPlayerUsername) + ": " + formattedAmt);
 
 			if (guildPlayerUsername.equals(player.getUsername())) {

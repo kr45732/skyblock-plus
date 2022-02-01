@@ -25,8 +25,6 @@ import java.util.List;
 
 public class HypixelGuildCache {
 
-	private static final String repeat = "=:=-1.0".repeat(17);
-
 	private final List<String> normalCache;
 	private final List<String> ironmanCache;
 	private final List<String> strandedCache;
@@ -82,22 +80,6 @@ public class HypixelGuildCache {
 		strandedCache.add(playerToCache(player, Player.Gamemode.STRANDED));
 	}
 
-	public synchronized void addPlayerLeaderboard(Player player) {
-		String cache;
-		if ((cache = playerToCache(player, Player.Gamemode.ALL)) != null) {
-			normalCache.removeIf(c -> getStringFromCache(c, "uuid").equals(player.getUuid()));
-			normalCache.add(cache);
-		}
-		if ((cache = playerToCache(player, Player.Gamemode.IRONMAN)) != null) {
-			ironmanCache.removeIf(c -> getStringFromCache(c, "uuid").equals(player.getUuid()));
-			ironmanCache.add(cache);
-		}
-		if ((cache = playerToCache(player, Player.Gamemode.STRANDED)) != null) {
-			strandedCache.removeIf(c -> getStringFromCache(c, "uuid").equals(player.getUuid()));
-			strandedCache.add(cache);
-		}
-	}
-
 	public Instant getLastUpdated() {
 		return lastUpdated;
 	}
@@ -120,7 +102,7 @@ public class HypixelGuildCache {
 	}
 
 	private String playerToCache(Player player, Player.Gamemode gamemode) {
-		String cache =
+		return
 			(
 				player.getUsername() +
 				"=:=" +
@@ -160,7 +142,5 @@ public class HypixelGuildCache {
 				"=:=" +
 				player.getHighestAmount("enchanting", gamemode)
 			);
-
-		return cache.endsWith(repeat) ? null : cache;
 	}
 }

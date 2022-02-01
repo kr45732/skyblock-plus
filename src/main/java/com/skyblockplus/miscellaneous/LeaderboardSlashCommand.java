@@ -44,7 +44,7 @@ public class LeaderboardSlashCommand extends SlashCommand {
 		}
 
 		event.paginate(
-			GuildLeaderboardCommand.getLeaderboard(
+			LeaderboardCommand.getLeaderboard(
 				event.getOptionStr("type"),
 				event.player,
 				Player.Gamemode.of(event.getOptionStr("gamemode", "all")),

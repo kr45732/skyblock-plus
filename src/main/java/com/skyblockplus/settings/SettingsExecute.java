@@ -101,7 +101,7 @@ public class SettingsExecute {
 	public EmbedBuilder getSettingsEmbed(String content, String[] args) {
 		EmbedBuilder eb = null;
 		JsonElement currentSettings = database.getServerSettings(guild.getId());
-		if (content.length() >= 4 && args[1].equals("set")) {
+		if (args.length >= 3 && args[1].equals("set")) {
 			eb =
 				switch (args[2]) {
 					case "hypixel_key" -> setHypixelKey(args[3]);

@@ -167,7 +167,6 @@ public class Utils {
 	public static List<String> linkedUsers;
 	public static Instant linkedUsersLastUpdated = Instant.now();
 	public static List<String> queryItems;
-	public static HypixelGuildCache globalLeaderboardCache = new HypixelGuildCache();
 
 	/* Getters */
 	public static JsonObject getLowestBinJson() {
@@ -1224,16 +1223,6 @@ public class Utils {
 			}
 		}
 		log.info("Cached parties in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
-	}
-
-	public static void cacheLeaderboard() {
-		if (!isMainBot()) {
-			return;
-		}
-
-		long startTime = System.currentTimeMillis();
-		cacheDatabase.cacheLeaderboard(gson.toJsonTree(globalLeaderboardCache).toString());
-		log.info("Cached leaderboard in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
 	}
 
 	public static List<ApplyUser> getApplyGuildUsersCache(String guildId, String name) {
