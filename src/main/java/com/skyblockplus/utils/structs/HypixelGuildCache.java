@@ -102,45 +102,44 @@ public class HypixelGuildCache {
 	}
 
 	private String playerToCache(Player player, Player.Gamemode gamemode) {
-		return
-			(
-				player.getUsername() +
-				"=:=" +
-				player.getUuid() +
-				"=:=" +
-				player.getHighestAmount("slayer", gamemode) +
-				"=:=" +
-				player.getHighestAmount("skills", gamemode) +
-				"=:=" +
-				player.getHighestAmount("catacombs", gamemode) +
-				"=:=" +
-				player.getHighestAmount("weight", gamemode) +
-				"=:=" +
-				player.getHighestAmount("sven", gamemode) +
-				"=:=" +
-				player.getHighestAmount("rev", gamemode) +
-				"=:=" +
-				player.getHighestAmount("tara", gamemode) +
-				"=:=" +
-				player.getHighestAmount("enderman", gamemode) +
-				"=:=" +
-				player.getHighestAmount("alchemy", gamemode) +
-				"=:=" +
-				player.getHighestAmount("combat", gamemode) +
-				"=:=" +
-				player.getHighestAmount("fishing", gamemode) +
-				"=:=" +
-				player.getHighestAmount("farming", gamemode) +
-				"=:=" +
-				player.getHighestAmount("foraging", gamemode) +
-				"=:=" +
-				player.getHighestAmount("carpentry", gamemode) +
-				"=:=" +
-				player.getHighestAmount("mining", gamemode) +
-				"=:=" +
-				player.getHighestAmount("taming", gamemode) +
-				"=:=" +
-				player.getHighestAmount("enchanting", gamemode)
-			);
+		return (
+			player.getUsername() +
+			"=:=" +
+			player.getUuid() +
+			"=:=" +
+			player.getHighestAmount("slayer", gamemode) +
+			"=:=" +
+			player.getHighestAmount("skills", gamemode) +
+			"=:=" +
+			player.getHighestAmount("catacombs", gamemode) +
+			"=:=" +
+			player.getHighestAmount("weight", gamemode) +
+			"=:=" +
+			player.getHighestAmount("sven", gamemode) +
+			"=:=" +
+			player.getHighestAmount("rev", gamemode) +
+			"=:=" +
+			player.getHighestAmount("tara", gamemode) +
+			"=:=" +
+			player.getHighestAmount("enderman", gamemode) +
+			"=:=" +
+			player.getHighestAmount("alchemy", gamemode) +
+			"=:=" +
+			player.getHighestAmount("combat", gamemode) +
+			"=:=" +
+			player.getHighestAmount("fishing", gamemode) +
+			"=:=" +
+			player.getHighestAmount("farming", gamemode) +
+			"=:=" +
+			player.getHighestAmount("foraging", gamemode) +
+			"=:=" +
+			player.getHighestAmount("carpentry", gamemode) +
+			"=:=" +
+			player.getHighestAmount("mining", gamemode) +
+			"=:=" +
+			player.getHighestAmount("taming", gamemode) +
+			"=:=" +
+			player.getHighestAmount("enchanting", gamemode)
+		);
 	}
 }

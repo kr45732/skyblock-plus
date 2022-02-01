@@ -1298,11 +1298,14 @@ public class Player {
 			);
 		}
 
-		public String toCacheType(){
-			return switch (this){
-				case IRONMAN, STRANDED -> name().toLowerCase();
-				default -> "all";
-			} + "_lb";
+		public String toCacheType() {
+			return (
+				switch (this) {
+					case IRONMAN, STRANDED -> name().toLowerCase();
+					default -> "all";
+				} +
+				"_lb"
+			);
 		}
 
 		public boolean isGamemode(Object gamemode) {

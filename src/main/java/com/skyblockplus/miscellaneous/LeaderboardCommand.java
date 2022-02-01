@@ -18,6 +18,10 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.ApiHandler.cacheDatabase;
+import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.structs.HypixelGuildCache.isValidType;
+
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
@@ -25,14 +29,9 @@ import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.PaginatorExtras;
+import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.utils.data.DataObject;
-
-import java.util.List;
-
-import static com.skyblockplus.utils.ApiHandler.cacheDatabase;
-import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.structs.HypixelGuildCache.isValidType;
 
 public class LeaderboardCommand extends Command {
 

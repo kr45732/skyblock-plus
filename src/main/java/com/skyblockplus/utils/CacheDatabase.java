@@ -38,7 +38,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
 import net.dv8tion.jda.api.utils.data.DataObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -251,7 +250,7 @@ public class CacheDatabase {
 		} catch (Exception ignored) {}
 	}
 
-	public void insertIntoLeaderboard(Player player){
+	public void insertIntoLeaderboard(Player player) {
 		insertIntoLeaderboard(player, Player.Gamemode.ALL);
 		insertIntoLeaderboard(player, Player.Gamemode.IRONMAN);
 		insertIntoLeaderboard(player, Player.Gamemode.STRANDED);
@@ -259,10 +258,12 @@ public class CacheDatabase {
 
 	private void insertIntoLeaderboard(Player player, Player.Gamemode gamemode) {
 		try (
-				Connection connection = getConnection();
-				PreparedStatement statement = connection.prepareStatement(
-						"INSERT INTO " + gamemode.toCacheType() + " (username, uuid, slayer, skills, catacombs, weight, sven, rev, tara, enderman, alchemy, combat, fishing, farming, foraging, carpentry, mining, taming, enchanting) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE username = VALUES(username), uuid = VALUES(uuid), slayer = VALUES(slayer), skills = VALUES(skills), catacombs = VALUES(catacombs), weight = VALUES(weight), sven = VALUES(sven), rev = VALUES(rev), tara = VALUES(tara), enderman = VALUES(enderman), alchemy = VALUES(alchemy), combat = VALUES(combat), fishing = VALUES(fishing), farming = VALUES(farming), foraging = VALUES(foraging), carpentry = VALUES(carpentry), mining = VALUES(mining), taming = VALUES(taming), enchanting = VALUES(enchanting)"
-				)
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement(
+				"INSERT INTO " +
+				gamemode.toCacheType() +
+				" (username, uuid, slayer, skills, catacombs, weight, sven, rev, tara, enderman, alchemy, combat, fishing, farming, foraging, carpentry, mining, taming, enchanting) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE username = VALUES(username), uuid = VALUES(uuid), slayer = VALUES(slayer), skills = VALUES(skills), catacombs = VALUES(catacombs), weight = VALUES(weight), sven = VALUES(sven), rev = VALUES(rev), tara = VALUES(tara), enderman = VALUES(enderman), alchemy = VALUES(alchemy), combat = VALUES(combat), fishing = VALUES(fishing), farming = VALUES(farming), foraging = VALUES(foraging), carpentry = VALUES(carpentry), mining = VALUES(mining), taming = VALUES(taming), enchanting = VALUES(enchanting)"
+			)
 		) {
 			statement.setString(1, player.getUsername());
 			statement.setString(2, player.getUuid());
@@ -289,15 +290,18 @@ public class CacheDatabase {
 		}
 	}
 
-	public List<DataObject> getLeaderboard(String lbType, Player.Gamemode mode){
-		try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("SELECT username, " + lbType + " FROM " + mode.toCacheType() + " ORDER BY " + lbType + " DESC")) {
+	public List<DataObject> getLeaderboard(String lbType, Player.Gamemode mode) {
+		try (
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement(
+				"SELECT username, " + lbType + " FROM " + mode.toCacheType() + " ORDER BY " + lbType + " DESC"
+			)
+		) {
 			try (ResultSet response = statement.executeQuery()) {
 				List<DataObject> out = new ArrayList<>();
 				while (response.next()) {
 					try {
-						out.add(DataObject.empty()
-										.put("username", response.getString("username"))
-										.put("data", response.getString(lbType)));
+						out.add(DataObject.empty().put("username", response.getString("username")).put("data", response.getString(lbType)));
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
