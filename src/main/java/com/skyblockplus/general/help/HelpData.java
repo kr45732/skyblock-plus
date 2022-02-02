@@ -158,7 +158,9 @@ public class HelpData {
 		);
 	}
 
-	public List<HelpData> getSubcommands(){return subcommands;}
+	public List<HelpData> getSubcommands() {
+		return subcommands;
+	}
 
 	public String getSubcommandsFormatted() {
 		StringBuilder subcommandsStr = new StringBuilder();

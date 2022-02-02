@@ -66,7 +66,7 @@ public class HelpCommand extends Command {
 		HelpCommand.helpDataList.stream().map(this::commandToNames).forEach(helpNameList::addAll);
 	}
 
-	private List<String> commandToNames(HelpData command){
+	private List<String> commandToNames(HelpData command) {
 		List<String> commands = new ArrayList<>();
 		commands.add(command.getName());
 		for (HelpData subcommand : command.getSubcommands()) {
@@ -524,11 +524,7 @@ public class HelpCommand extends Command {
 									.addExamples("add sven 400000 @sven 8", "add alchemy 50 @alchemy 50"),
 								new HelpData("remove", "Remove a role level for a role.", "remove <role_name> <value>")
 									.addExamples("remove sven 400000", "remove alchemy 50"),
-								new HelpData(
-									"set",
-									"Set the Discord role for a one level role.",
-									"set <role_name> <@role>"
-								)
+								new HelpData("set", "Set the Discord role for a one level role.", "set <role_name> <@role>")
 									.addExamples("set ironman @ironman player", "set pet_enthusiast @pet lover")
 							),
 						new HelpData("guild", "Main command for automatic guild (application and guild roles/ranks).")
@@ -566,7 +562,8 @@ public class HelpCommand extends Command {
 									.addSubcommands(
 										new HelpData(
 											"add",
-											"Add a player to the blacklist. Reason will default to 'not provided' if not set.", "add <player> [reason]"
+											"Add a player to the blacklist. Reason will default to 'not provided' if not set.",
+											"add <player> [reason]"
 										),
 										new HelpData("share", "Share your blacklist with another server.", "share <id>"),
 										new HelpData("unshare", "Stop sharing your blacklist with another server.", "unshare <id>"),

@@ -18,6 +18,8 @@
 
 package com.skyblockplus.general.help;
 
+import static com.skyblockplus.general.help.HelpCommand.helpNameList;
+
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
@@ -25,8 +27,6 @@ import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-
-import static com.skyblockplus.general.help.HelpCommand.helpNameList;
 
 public class HelpSlashCommand extends SlashCommand {
 
@@ -51,10 +51,7 @@ public class HelpSlashCommand extends SlashCommand {
 	@Override
 	public void onAutoComplete(AutoCompleteEvent event) {
 		if (event.getFocusedOption().getName().equals("command")) {
-			event.replyClosestMatch(
-					event.getFocusedOption().getValue(),
-					helpNameList
-			);
+			event.replyClosestMatch(event.getFocusedOption().getValue(), helpNameList);
 		}
 	}
 }

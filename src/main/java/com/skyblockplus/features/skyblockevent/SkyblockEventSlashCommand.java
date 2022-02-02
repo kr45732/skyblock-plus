@@ -43,7 +43,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 		String subcommandName = event.getSubcommandName();
 		if (
 			(subcommandName.equals("create") || subcommandName.equals("cancel") || subcommandName.equals("end")) &&
-					!guildMap.get(event.getGuild().getId()).isAdmin(event.getMember())
+			!guildMap.get(event.getGuild().getId()).isAdmin(event.getMember())
 		) {
 			event.string("❌ You must have the administrator permission in this guild to use that!");
 			return;

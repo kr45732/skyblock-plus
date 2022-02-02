@@ -719,7 +719,7 @@ public class SkyblockEventCommand extends Command {
 				if (args.length == 2 || args.length == 3) {
 					if (
 						(args[1].equals("create") || args[1].equals("cancel") || args[1].equals("end")) &&
-								!guildMap.get(event.getGuild().getId()).isAdmin(event.getMember())
+						!guildMap.get(event.getGuild().getId()).isAdmin(event.getMember())
 					) {
 						ebMessage.delete().complete();
 						event.getChannel().sendMessage("❌ You must have the administrator permission in this guild to use that!").queue();

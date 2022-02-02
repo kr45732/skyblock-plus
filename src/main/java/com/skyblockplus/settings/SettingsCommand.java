@@ -40,7 +40,7 @@ public class SettingsCommand extends Command {
 
 	@Override
 	protected void execute(CommandEvent event) {
-		if(!guildMap.get(event.getGuild().getId()).isAdmin((event.getMember()))){
+		if (!guildMap.get(event.getGuild().getId()).isAdmin((event.getMember()))) {
 			event.reply("You are missing the required permissions or roles to use this command");
 			return;
 		}

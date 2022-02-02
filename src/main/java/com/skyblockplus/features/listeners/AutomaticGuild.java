@@ -1065,7 +1065,7 @@ public class AutomaticGuild {
 		this.blacklist = blacklist;
 	}
 
-	public boolean isAdmin(Member member){
+	public boolean isAdmin(Member member) {
 		if (member.hasPermission(Permission.ADMINISTRATOR)) {
 			List<String> playerRoles = member.getRoles().stream().map(ISnowflake::getId).collect(Collectors.toList());
 			return botManagerRoles.stream().anyMatch(playerRoles::contains);
