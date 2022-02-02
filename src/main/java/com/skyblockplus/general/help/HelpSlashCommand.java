@@ -21,9 +21,12 @@ package com.skyblockplus.general.help;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
+import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+
+import static com.skyblockplus.general.help.HelpCommand.helpNameList;
 
 public class HelpSlashCommand extends SlashCommand {
 
@@ -42,6 +45,16 @@ public class HelpSlashCommand extends SlashCommand {
 	public CommandData getCommandData() {
 		return Commands
 			.slash(name, "Show the help page for this bot")
-			.addOption(OptionType.STRING, "command", "Name of command or page number");
+			.addOption(OptionType.STRING, "command", "Name of command or page number", false, true);
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("command")) {
+			event.replyClosestMatch(
+					event.getFocusedOption().getValue(),
+					helpNameList
+			);
+		}
 	}
 }

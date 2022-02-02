@@ -56,8 +56,6 @@ public class AverageAuctionSlashCommand extends SlashCommand {
 				event.getFocusedOption().getValue(),
 				getAverageAuctionJson().keySet().stream().map(Utils::idToName).distinct().collect(Collectors.toList())
 			);
-		} else if (event.getFocusedOption().getName().equals("player")) {
-			event.replyClosestPlayer();
 		}
 	}
 }

@@ -793,7 +793,7 @@ public class AutomaticGuild {
 			}
 			return;
 		} else if (event.getComponentId().startsWith("setup_command_")) {
-			if (!event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
+			if (!guildMap.get(event.getGuild().getId()).isAdmin(event.getMember())) {
 				event.reply("❌ You must have the administrator permission in this guild to use that!").setEphemeral(true).queue();
 				return;
 			}
@@ -1063,5 +1063,13 @@ public class AutomaticGuild {
 
 	public void setBlacklist(JsonArray blacklist) {
 		this.blacklist = blacklist;
+	}
+
+	public boolean isAdmin(Member member){
+		if (member.hasPermission(Permission.ADMINISTRATOR)) {
+			List<String> playerRoles = member.getRoles().stream().map(ISnowflake::getId).collect(Collectors.toList());
+			return botManagerRoles.stream().anyMatch(playerRoles::contains);
+		}
+		return true;
 	}
 }

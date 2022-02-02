@@ -90,7 +90,7 @@ public class HelpData {
 			eb.addField(examples.size() == 1 ? "Example" : "Examples", getExamples(), false);
 		}
 		if (subcommands.size() > 0) {
-			eb.addField(subcommands.size() == 1 ? "Subcommand" : "Subcommands", getSubcommands(), false);
+			eb.addField(subcommands.size() == 1 ? "Subcommand" : "Subcommands", getSubcommandsFormatted(), false);
 		}
 
 		return eb;
@@ -158,7 +158,9 @@ public class HelpData {
 		);
 	}
 
-	public String getSubcommands() {
+	public List<HelpData> getSubcommands(){return subcommands;}
+
+	public String getSubcommandsFormatted() {
 		StringBuilder subcommandsStr = new StringBuilder();
 		for (int i = 0; i < subcommands.size(); i++) {
 			if (i != 0) {

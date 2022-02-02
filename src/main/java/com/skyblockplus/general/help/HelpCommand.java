@@ -35,6 +35,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 public class HelpCommand extends Command {
 
 	public static final List<HelpData> helpDataList = new ArrayList<>();
+	public static final List<String> helpNameList = new ArrayList<>();
 	private static final String[] pageTitles = {
 		"Navigation",
 		"General",
@@ -60,7 +61,18 @@ public class HelpCommand extends Command {
 		this.aliases = new String[] { "commands" };
 		this.cooldown = globalCooldown;
 		this.botPermissions = defaultPerms();
+
 		setHelpList();
+		HelpCommand.helpDataList.stream().map(this::commandToNames).forEach(helpNameList::addAll);
+	}
+
+	private List<String> commandToNames(HelpData command){
+		List<String> commands = new ArrayList<>();
+		commands.add(command.getName());
+		for (HelpData subcommand : command.getSubcommands()) {
+			commands.addAll(commandToNames(subcommand));
+		}
+		return commands;
 	}
 
 	public static void setHelpList() {
@@ -359,12 +371,12 @@ public class HelpCommand extends Command {
 					.addSubcommands(
 						new HelpData("create", "Interactive message to create a new party."),
 						new HelpData("current", "Get information about your current party."),
-						new HelpData("join <username>", "Join a player's party where username is the party leader's IGN.")
+						new HelpData("join", "Join a player's party where username is the party leader's IGN.", "join <username>")
 							.addExamples("join CrypticPlasma"),
 						new HelpData("leave", "Leave your current party."),
 						new HelpData("list", "List all active parties"),
 						new HelpData("disband", "Disband your current party."),
-						new HelpData("kick <username>", "Kick a member from your party").addExamples("kick CrypticPlasma")
+						new HelpData("kick", "Kick a member from your party", "kick <username>").addExamples("kick CrypticPlasma")
 					)
 					.setCategory("party"),
 				// Skyblock event
@@ -513,7 +525,7 @@ public class HelpCommand extends Command {
 								new HelpData("remove", "Remove a role level for a role.", "remove <role_name> <value>")
 									.addExamples("remove sven 400000", "remove alchemy 50"),
 								new HelpData(
-									"set <role_name> <@role>",
+									"set",
 									"Set the Discord role for a one level role.",
 									"set <role_name> <@role>"
 								)
@@ -529,7 +541,7 @@ public class HelpCommand extends Command {
 									.addSubcommands(
 										new HelpData("enable", "Enable automatic guild role."),
 										new HelpData("disable", "Disable automatic guild role."),
-										new HelpData("<@role>", "Set the role to give guild members.")
+										new HelpData("role", "Set the role to give guild members.", "<@role>")
 									),
 								new HelpData("ranks", "Automatic guild ranks.", "settings guild <name> ranks", true)
 									.addSubcommands(
@@ -553,13 +565,13 @@ public class HelpCommand extends Command {
 									)
 									.addSubcommands(
 										new HelpData(
-											"add <player> [reason]",
-											"Add a player to the blacklist. Reason will default to 'not provided' if not set."
+											"add",
+											"Add a player to the blacklist. Reason will default to 'not provided' if not set.", "add <player> [reason]"
 										),
-										new HelpData("share <id>", "Share your blacklist with another server."),
-										new HelpData("unshare <id>", "Stop sharing your blacklist with another server."),
-										new HelpData("use <id>", "Use a shared blacklist from another server."),
-										new HelpData("stop_using <id>", "Stop using a shared blacklist from another server.")
+										new HelpData("share", "Share your blacklist with another server.", "share <id>"),
+										new HelpData("unshare", "Stop sharing your blacklist with another server.", "unshare <id>"),
+										new HelpData("use", "Use a shared blacklist from another server.", "use <id>"),
+										new HelpData("stop_using", "Stop using a shared blacklist from another server.", "stop_using <id>")
 									),
 								new HelpData("apply", "Automatic application system for this guild.")
 									.addSubcommands(

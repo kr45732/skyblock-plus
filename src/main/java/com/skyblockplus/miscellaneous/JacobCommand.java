@@ -51,7 +51,7 @@ public class JacobCommand extends Command {
 				.addField("Contests", "None left for this year!", false);
 		}
 
-		PaginatorExtras extras = new PaginatorExtras();
+		PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_FIELDS);
 		for (JacobContest contest : data.getContests()) {
 			extras.addEmbedField(
 				"Contest",

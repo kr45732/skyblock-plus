@@ -569,6 +569,15 @@ public class Player {
 		return null;
 	}
 
+	public Map<Integer, InvItem> getPersonalVaultMap() {
+		try {
+			String contents = higherDepth(profileJson(), "personal_vault_contents.data").getAsString();
+			NBTCompound parsedContents = NBTReader.readBase64(contents);
+			return getGenericInventoryMap(parsedContents);
+		} catch (Exception ignored) {}
+		return null;
+	}
+
 	public Map<Integer, InvItem> getStorageMap() {
 		try {
 			JsonElement backpackContents = higherDepth(profileJson(), "backpack_contents");

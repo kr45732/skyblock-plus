@@ -44,7 +44,7 @@ public class JacobHandler {
 			},
 			YEAR_0 + 446400000L * getSkyblockYear() + 1000,
 			446400000L,
-			TimeUnit.SECONDS
+			TimeUnit.MILLISECONDS
 		);
 	}
 

@@ -61,8 +61,6 @@ public class BazaarSlashCommand extends SlashCommand {
 					.distinct()
 					.collect(Collectors.toList())
 			);
-		} else if (event.getFocusedOption().getName().equals("player")) {
-			event.replyClosestPlayer();
 		}
 	}
 }

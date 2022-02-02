@@ -39,7 +39,7 @@ public class BazaarCommand extends Command {
 	}
 
 	public static EmbedBuilder getBazaarItem(String itemNameU) {
-		JsonElement bazaarItems = getJson("https://api.slothpixel.me/api/skyblock/bazaar");
+		JsonElement bazaarItems = higherDepth(getBazaarJson(), "products");
 		if (bazaarItems == null) {
 			return invalidEmbed("Error getting bazaar data");
 		}

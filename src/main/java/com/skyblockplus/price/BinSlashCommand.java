@@ -54,8 +54,6 @@ public class BinSlashCommand extends SlashCommand {
 				event.getFocusedOption().getValue(),
 				getLowestBinJson().keySet().stream().map(Utils::idToName).distinct().collect(Collectors.toList())
 			);
-		} else if (event.getFocusedOption().getName().equals("player")) {
-			event.replyClosestPlayer();
 		}
 	}
 }

@@ -42,7 +42,7 @@ public class FixApplicationSlashCommand extends SlashCommand {
 		event.embed(
 			FixApplicationCommand.getFixApplicationEmbed(
 				(TextChannel) event.getOption("channel").getAsGuildChannel(),
-				event.getOptionInt("state", -1),
+				event.getOptionInt("state", 0),
 				event.getGuild()
 			)
 		);

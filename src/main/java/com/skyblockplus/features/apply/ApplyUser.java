@@ -19,6 +19,7 @@
 package com.skyblockplus.features.apply;
 
 import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.getNameHistory;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -185,7 +186,7 @@ public class ApplyUser implements Serializable {
 		Message reactMessage = applicationChannel.retrieveMessageById(reactMessageId).complete();
 		JsonElement currentSettings = JsonParser.parseString(currentSettingsString);
 
-		if (!event.getUser().getId().equals(applyingUserId) && !event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
+		if (!event.getUser().getId().equals(applyingUserId) && !guildMap.get(guildId).isAdmin(event.getMember())) {
 			JsonArray staffPingRoles = higherDepth(currentSettings, "applyStaffRoles").getAsJsonArray();
 			boolean hasStaffRole = false;
 			if (staffPingRoles.size() != 0) {
@@ -359,7 +360,7 @@ public class ApplyUser implements Serializable {
 
 	public boolean onButtonClick(ButtonInteractionEvent event, ApplyGuild parent, boolean isWait) {
 		JsonElement currentSettings = JsonParser.parseString(currentSettingsString);
-		if (!event.getUser().getId().equals(applyingUserId) && !event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
+		if (!event.getUser().getId().equals(applyingUserId) && !guildMap.get(guildId).isAdmin(event.getMember())) {
 			JsonArray staffPingRoles = higherDepth(currentSettings, "applyStaffRoles").getAsJsonArray();
 			boolean hasStaffRole = false;
 			if (staffPingRoles.size() != 0) {

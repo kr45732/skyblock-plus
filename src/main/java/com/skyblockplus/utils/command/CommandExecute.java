@@ -57,14 +57,9 @@ public abstract class CommandExecute extends CommandEvent {
 
 	public void queue() {
 		executor.submit(() -> {
-			if (adminCommand) {
-				if (!getMember().hasPermission(Permission.ADMINISTRATOR)) {
-					List<String> playerRoles = getMember().getRoles().stream().map(ISnowflake::getId).collect(Collectors.toList());
-					if (guildMap.get(getGuild().getId()).botManagerRoles.stream().noneMatch(playerRoles::contains)) {
+			if (adminCommand &&!guildMap.get(getGuild().getId()).isAdmin(getMember())) {
 						reply("You are missing the required permissions or roles to use this command");
 						return;
-					}
-				}
 			}
 
 			if (sendLoadingEmbed) {

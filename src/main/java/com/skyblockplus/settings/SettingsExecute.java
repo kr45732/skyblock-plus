@@ -300,7 +300,14 @@ public class SettingsExecute {
 				eb = errorEmbed("settings verify");
 			}
 		} else if ((args.length >= 2) && args[1].equals("guild")) {
-			if (args.length == 2) {
+			if(content.split(" ", 4).length == 4 && (args[2].equals("create") || args[2].equals("remove"))){
+				eb =
+						switch (args[2]) {
+							case "create" -> createNewGuild(args[3]);
+							case "remove" -> removeGuild(args[3]);
+							default -> eb;
+						};
+			}else if (args.length == 2) {
 				eb =
 					defaultSettingsEmbed()
 						.addField(
@@ -333,13 +340,6 @@ public class SettingsExecute {
 						);
 			} else if (args.length == 3) {
 				return getGuildSettings(args[2]);
-			} else if (args.length == 4) {
-				eb =
-					switch (args[2]) {
-						case "create" -> createNewGuild(args[3]);
-						case "remove" -> removeGuild(args[3]);
-						default -> eb;
-					};
 			} else if (args.length == 5) {
 				JsonElement guildSettings = database.getGuildSettings(guild.getId(), args[2]);
 				if (guildSettings == null || guildSettings.isJsonNull()) {
