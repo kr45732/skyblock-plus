@@ -29,6 +29,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.Main;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
+import com.skyblockplus.features.apply.ApplyGuild;
 import com.skyblockplus.features.apply.ApplyUser;
 import com.skyblockplus.features.apply.log.ApplyLog;
 import com.skyblockplus.utils.command.CommandExecute;
@@ -287,14 +288,18 @@ public class FixApplicationCommand extends Command {
 				applicationJson.add("logs", gson.toJsonTree(messages.stream().map(ApplyLog::toLog).collect(Collectors.toList())));
 			}
 
-			guildMap
+			ApplyGuild applyGuild = guildMap
 				.get(guild.getId())
 				.applyGuild.stream()
-				.filter(g -> higherDepth(g.currentSettings, "guildName").getAsString().equals(guildName))
-				.findFirst()
-				.get()
-				.applyUserList.add(gson.fromJson(applicationJson, ApplyUser.class));
-			return defaultEmbed("Success").setDescription("Fixed & retrieved application successfully: " + makeHastePost(applicationJson));
+				.filter(g -> higherDepth(g.currentSettings, "guildName", "").equals(guildName))
+				.findFirst().orElse(null);
+
+			if(applyGuild != null) {
+				applyGuild.applyUserList.add(gson.fromJson(applicationJson, ApplyUser.class));
+				return defaultEmbed("Success").setDescription("Fixed & retrieved application successfully: " + makeHastePost(applicationJson));
+			}else{
+				return invalidEmbed("Automatic application for " +  guildName + " doesn't exist. Please report this to the developer");
+			}
 		} catch (Exception e) {
 			Main.log.error("Error when retrieving application", e);
 			return invalidEmbed("Error when fixing application, please report this to the developer:\n```" + e.getMessage() + "```");

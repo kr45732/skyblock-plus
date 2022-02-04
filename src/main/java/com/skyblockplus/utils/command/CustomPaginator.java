@@ -35,9 +35,11 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageUpdateAction;
@@ -49,7 +51,7 @@ public class CustomPaginator extends Menu {
 
 	private static final Logger log = LoggerFactory.getLogger(CustomPaginator.class);
 	private static final Consumer<Throwable> throwableConsumer = e -> {
-		if (!e.getMessage().contains("Unknown Message")) {
+		if(!(e instanceof ErrorResponseException ex && ex.getErrorResponse().equals(ErrorResponse.UNKNOWN_INTERACTION))){
 			log.error(e.getMessage(), e);
 		}
 	};

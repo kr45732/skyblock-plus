@@ -24,7 +24,6 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
@@ -46,7 +45,7 @@ public class SetupCommand extends Command {
 	}
 
 	public static EmbedBuilder getSetupEmbed() {
-		return defaultEmbed("Setup").setDescription("Choose one of the buttons below to setup the corresponding feature");
+		return defaultEmbed("Setup").setDescription("Choose one of the buttons below to setup the corresponding feature. Note that setting a feature can/will override previous settings.");
 	}
 
 	@Override

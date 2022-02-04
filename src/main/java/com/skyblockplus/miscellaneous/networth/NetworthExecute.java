@@ -927,7 +927,7 @@ public class NetworthExecute {
 			}
 		}
 
-		formattedStr += (item.isRecombobulated() ? " <:recombobulator_3000:852647805813784597>" : "") + "@split@" + itemPrice;
+		formattedStr += (item.isRecombobulated() ? " <a:recombobulator_3000:939014985051418654>" : "") + "@split@" + itemPrice;
 
 		return formattedStr;
 	}

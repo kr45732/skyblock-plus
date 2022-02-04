@@ -18,7 +18,6 @@
 
 package com.skyblockplus.miscellaneous;
 
-import com.skyblockplus.guild.GuildLeaderboardCommand;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;

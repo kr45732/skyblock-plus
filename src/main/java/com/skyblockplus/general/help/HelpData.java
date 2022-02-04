@@ -228,14 +228,6 @@ public class HelpData {
 		return this;
 	}
 
-	public HelpData setPrefix(String prefix) {
-		this.prefix = prefix;
-		for (HelpData subcommand : subcommands) {
-			subcommand.setPrefix(prefix);
-		}
-		return this;
-	}
-
 	public boolean matchTo(String cmd) {
 		if (name.equalsIgnoreCase(cmd)) {
 			return true;

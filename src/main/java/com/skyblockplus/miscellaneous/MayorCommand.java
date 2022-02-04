@@ -19,17 +19,14 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.Main.jda;
-import static com.skyblockplus.utils.Constants.FETCHUR_ITEMS;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
+
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 
 public class MayorCommand extends Command {
 

@@ -38,12 +38,8 @@ public class SlashCommandEvent extends SlashCommandInteractionEvent {
 	public String player;
 
 	public SlashCommandEvent(SlashCommandInteractionEvent event, SlashCommandClient slashCommandClient) {
-		super(event.getJDA(), event.getResponseNumber(), ((SlashCommandInteraction) event.getInteraction()));
+		super(event.getJDA(), event.getResponseNumber(), event.getInteraction());
 		this.slashCommandClient = slashCommandClient;
-	}
-
-	public SlashCommandClient getClient() {
-		return slashCommandClient;
 	}
 
 	public void logCommand() {
@@ -71,11 +67,6 @@ public class SlashCommandEvent extends SlashCommandInteractionEvent {
 	public boolean getOptionBoolean(String name, boolean defaultValue) {
 		OptionMapping option = getOption(name);
 		return option == null ? defaultValue : option.getAsBoolean();
-	}
-
-	public double getOptionDouble(String name, double defaultValue) {
-		OptionMapping option = getOption(name);
-		return option == null ? defaultValue : option.getAsDouble();
 	}
 
 	public EmbedBuilder invalidCommandMessage() {

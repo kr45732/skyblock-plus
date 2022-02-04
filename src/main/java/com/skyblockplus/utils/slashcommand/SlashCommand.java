@@ -24,10 +24,7 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
-import java.util.List;
-import java.util.stream.Collectors;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public abstract class SlashCommand {

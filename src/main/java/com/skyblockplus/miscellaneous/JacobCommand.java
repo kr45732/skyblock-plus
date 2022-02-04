@@ -18,7 +18,6 @@
 
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.Constants.FETCHUR_ITEMS;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
@@ -30,8 +29,6 @@ import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.PaginatorExtras;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import net.dv8tion.jda.api.EmbedBuilder;
 
 public class JacobCommand extends Command {
@@ -55,11 +52,11 @@ public class JacobCommand extends Command {
 		for (JacobContest contest : data.getContests()) {
 			extras.addEmbedField(
 				"Contest",
-				"**Starts in:** <t:" + contest.getTimeInstant().getEpochSecond() + ":R>\n**Crops:**\n" + contest.getCropsFormatted(),
+				"**In:** <t:" + contest.getTimeInstant().getEpochSecond() + ":R>\n**Crops:**\n" + contest.getCropsFormatted(),
 				false
 			);
 		}
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(10);
+		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(5);
 		event.paginate(paginateBuilder.setPaginatorExtras(extras));
 		return null;
 	}

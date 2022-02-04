@@ -116,7 +116,6 @@ public class Utils {
 	/* Configuration File */
 	public static String HYPIXEL_API_KEY = "";
 	public static String BOT_TOKEN = "";
-	public static String CLIENT_SECRET = "";
 	public static String DATABASE_URL = "";
 	public static String DATABASE_USERNAME = "";
 	public static String DATABASE_PASSWORD = "";
@@ -124,7 +123,6 @@ public class Utils {
 	public static String API_PASSWORD = "";
 	public static String GITHUB_TOKEN = "";
 	public static String DEFAULT_PREFIX = "";
-	public static String CACHE_DATABASE_TOKEN = "";
 	public static String AUCTION_API_KEY = "";
 	public static String PLANET_SCALE_URL = "";
 	public static String PLANET_SCALE_USERNAME = "";
@@ -151,7 +149,7 @@ public class Utils {
 	private static JsonObject bazaarJson;
 	private static JsonArray sbzPricesJson;
 	private static JsonObject emojiMap;
-	private static JsonArray npcSellPrices;
+	public static JsonArray skyblockItemsJson;
 	public static JsonObject internalJsonMappings;
 	public static JsonObject priceOverrideJson;
 	/* Miscellaneous */
@@ -242,12 +240,18 @@ public class Utils {
 		return queryItems;
 	}
 
-	public static double getNpcSellPrice(String id) {
-		if (npcSellPrices == null) {
-			npcSellPrices = higherDepth(getJson("https://api.hypixel.net/resources/skyblock/items"), "items").getAsJsonArray();
+	public static JsonArray getSkyblockItemsJson() {
+		if (skyblockItemsJson == null) {
+			skyblockItemsJson = higherDepth(getJson("https://api.hypixel.net/resources/skyblock/items"), "items").getAsJsonArray();
 		}
 
-		for (JsonElement npcSellPrice : npcSellPrices) {
+		return skyblockItemsJson;
+	}
+
+	public static double getNpcSellPrice(String id) {
+		getSkyblockItemsJson();
+
+		for (JsonElement npcSellPrice : skyblockItemsJson) {
 			if (higherDepth(npcSellPrice, "id").getAsString().equals(id)) {
 				return higherDepth(npcSellPrice, "npc_sell_price", -1.0);
 			}
@@ -618,16 +622,6 @@ public class Utils {
 		botLogChannel.sendMessageEmbeds(eb.build()).queue();
 	}
 
-	public static void logCommand(String commandInput) {
-		System.out.println(commandInput);
-
-		if (botLogChannel == null) {
-			botLogChannel = jda.getGuildById("796790757947867156").getTextChannelById("818469899848515624");
-		}
-
-		botLogChannel.sendMessageEmbeds(defaultEmbed(null).setDescription(commandInput).build()).queue();
-	}
-
 	/* Embeds and paginators */
 	public static EmbedBuilder defaultEmbed(String title, String titleUrl) {
 		EmbedBuilder eb = new EmbedBuilder();
@@ -810,15 +804,15 @@ public class Utils {
 	public static String nameToId(String itemName) {
 		getInternalJsonMappings();
 
-		String internalName = itemName
-			.trim()
-			.toUpperCase()
-			.replace(" ", "_")
-			.replace("'S", "")
-			.replace("FRAG", "FRAGMENT")
-			.replace(".", "");
+		String id = itemName
+				.trim()
+				.toUpperCase()
+				.replace(" ", "_")
+				.replace("'S", "")
+				.replace("FRAG", "FRAGMENT")
+				.replace(".", "");
 
-		switch (internalName) {
+		switch (id) {
 			case "GOD_POT":
 				return "GOD_POTION";
 			case "AOTD":
@@ -849,12 +843,11 @@ public class Utils {
 
 		for (Map.Entry<String, JsonElement> entry : internalJsonMappings.entrySet()) {
 			if (higherDepth(entry.getValue(), "name").getAsString().equalsIgnoreCase(itemName)) {
-				internalName = entry.getKey();
-				break;
+				return entry.getKey();
 			}
 		}
 
-		return internalName;
+		return id;
 	}
 
 	public static String idToName(String id) {
@@ -923,7 +916,6 @@ public class Utils {
 			appProps.load(new FileInputStream("DevSettings.properties"));
 			HYPIXEL_API_KEY = (String) appProps.get("HYPIXEL_API_KEY");
 			BOT_TOKEN = (String) appProps.get("BOT_TOKEN");
-			CLIENT_SECRET = (String) appProps.get("CLIENT_SECRET");
 			String[] database_url_unformatted = ((String) appProps.get("DATABASE_URL")).split(":", 3);
 			DATABASE_USERNAME = database_url_unformatted[1].replace("/", "");
 			DATABASE_PASSWORD = database_url_unformatted[2].split("@")[0];
@@ -938,7 +930,6 @@ public class Utils {
 			API_USERNAME = (String) appProps.get("API_USERNAME");
 			API_PASSWORD = (String) appProps.get("API_PASSWORD");
 			DEFAULT_PREFIX = (String) appProps.get("DEFAULT_PREFIX");
-			CACHE_DATABASE_TOKEN = (String) appProps.get("CACHE_DATABASE_TOKEN");
 			AUCTION_API_KEY = (String) appProps.get("AUCTION_API_KEY");
 			PLANET_SCALE_URL = (String) appProps.get("PLANET_SCALE_URL");
 			PLANET_SCALE_USERNAME = (String) appProps.get("PLANET_SCALE_USERNAME");
@@ -951,7 +942,6 @@ public class Utils {
 		} catch (IOException e) {
 			HYPIXEL_API_KEY = System.getenv("HYPIXEL_API_KEY");
 			BOT_TOKEN = System.getenv("BOT_TOKEN");
-			CLIENT_SECRET = System.getenv("CLIENT_SECRET");
 			String[] database_url_unformatted = System.getenv("DATABASE_URL").split(":", 3);
 			DATABASE_USERNAME = database_url_unformatted[1].replace("/", "");
 			DATABASE_PASSWORD = database_url_unformatted[2].split("@")[0];
@@ -966,7 +956,6 @@ public class Utils {
 			API_USERNAME = System.getenv("API_USERNAME");
 			API_PASSWORD = System.getenv("API_PASSWORD");
 			DEFAULT_PREFIX = System.getenv("DEFAULT_PREFIX");
-			CACHE_DATABASE_TOKEN = System.getenv("CACHE_DATABASE_TOKEN");
 			AUCTION_API_KEY = System.getenv("AUCTION_API_KEY");
 			PLANET_SCALE_URL = System.getenv("PLANET_SCALE_URL");
 			PLANET_SCALE_USERNAME = System.getenv("PLANET_SCALE_USERNAME");

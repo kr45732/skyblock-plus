@@ -937,7 +937,9 @@ public class AutomaticGuild {
 				String itemName = parseMcCodes(higherDepth(itemJson, "displayname").getAsString()).replace("�", "");
 				String itemId = higherDepth(itemJson, "internalname").getAsString();
 				if (itemName.contains("(")) {
-					continue;
+					if(itemId.endsWith("_MINIBOSS") || itemId.endsWith("_MONSTER") || itemId.endsWith("_ANIMAL") || itemId.endsWith("_SC") || itemId.endsWith("_BOSS")){
+						continue;
+					}
 				}
 
 				if (itemName.startsWith("[Lvl")) {
@@ -968,7 +970,6 @@ public class AutomaticGuild {
 
 	public JsonElement getUpdatedPriceOverridesJson(JsonElement currentPriceOverrides) {
 		File dir = new File("src/main/java/com/skyblockplus/json/neu/items");
-		JsonElement bazaarJson = higherDepth(getBazaarJson(), "products");
 		JsonObject outputObject = new JsonObject();
 
 		for (File child : dir.listFiles()) {
@@ -976,9 +977,7 @@ public class AutomaticGuild {
 				JsonObject itemJson = JsonParser.parseReader(new FileReader(child)).getAsJsonObject();
 				if (itemJson.has("vanilla")) {
 					String id = itemJson.get("internalname").getAsString().replace("-", ":");
-					if (higherDepth(bazaarJson, id + ".sell_summary.[0].pricePerUnit") == null) {
-						outputObject.addProperty(id, Math.max(0, getNpcSellPrice(id)));
-					}
+					outputObject.addProperty(id, Math.max(0, getNpcSellPrice(id)));
 				}
 			} catch (Exception e) {
 				e.printStackTrace();

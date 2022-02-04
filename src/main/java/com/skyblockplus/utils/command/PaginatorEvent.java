@@ -53,10 +53,6 @@ public class PaginatorEvent {
 		return slashCommand;
 	}
 
-	public CommandEvent getCommand() {
-		return command;
-	}
-
 	public User getUser() {
 		return isSlashCommand ? slashCommand.getUser() : command.getAuthor();
 	}

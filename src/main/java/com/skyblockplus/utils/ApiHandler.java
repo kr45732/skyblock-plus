@@ -54,7 +54,7 @@ import org.slf4j.LoggerFactory;
 public class ApiHandler {
 
 	public static final Cache<String, String> uuidToUsernameCache = Caffeine.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).build();
-	public static CacheDatabase cacheDatabase = new CacheDatabase();
+	public static final CacheDatabase cacheDatabase = new CacheDatabase();
 	private static final Pattern minecraftUsernameRegex = Pattern.compile("^\\w+$", Pattern.CASE_INSENSITIVE);
 	private static final Pattern minecraftUuidRegex = Pattern.compile(
 		"[0-9a-f]{32}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"

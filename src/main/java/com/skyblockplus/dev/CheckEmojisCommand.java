@@ -54,7 +54,7 @@ public class CheckEmojisCommand extends Command {
 					}
 					neuDir.mkdir();
 
-					Git neuRepo = Git
+					Git
 						.cloneRepository()
 						.setURI("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO.git")
 						.setDirectory(neuDir)

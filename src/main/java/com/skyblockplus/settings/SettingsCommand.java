@@ -24,10 +24,6 @@ import static com.skyblockplus.utils.Utils.globalCooldown;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import java.util.List;
-import java.util.stream.Collectors;
-import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.ISnowflake;
 
 public class SettingsCommand extends Command {
 

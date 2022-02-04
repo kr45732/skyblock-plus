@@ -117,8 +117,7 @@ public class MissingCommand extends Command {
 					(wikiLink == null ? name : "[" + name + "](" + wikiLink + ")") +
 					(higherDepth(talismanUpgrades, curId) != null ? "**\\***" : "") +
 					" ➜ " +
-					roundAndFormat(higherDepth(lowestBinJson, curId, 0.0)) +
-					"\n"
+					roundAndFormat(higherDepth(lowestBinJson, curId, 0.0))
 				);
 			}
 			event.paginate(paginateBuilder.setPaginatorExtras(extras));

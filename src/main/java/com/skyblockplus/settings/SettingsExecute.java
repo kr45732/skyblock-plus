@@ -137,7 +137,7 @@ public class SettingsExecute {
 						case "unshare" -> unshareBlacklist(args[4]);
 						case "use" -> useBlacklist(args[4]);
 						case "stop_using" -> stopUsingBlacklist(args[4]);
-						default -> eb;
+						default -> null;
 					};
 			}
 
@@ -271,7 +271,7 @@ public class SettingsExecute {
 					switch (args[2]) {
 						case "enable" -> setVerifyEnable(true);
 						case "disable" -> setVerifyEnable(false);
-						default -> eb;
+						default -> null;
 					};
 			} else if (args.length == 4) {
 				switch (args[2]) {
@@ -291,7 +291,7 @@ public class SettingsExecute {
 						switch (args[3]) {
 							case "true" -> setVerifySyncEnable(true);
 							case "false" -> setVerifySyncEnable(false);
-							default -> eb;
+							default -> null;
 						};
 				}
 			}
@@ -301,11 +301,12 @@ public class SettingsExecute {
 			}
 		} else if ((args.length >= 2) && args[1].equals("guild")) {
 			if (content.split(" ", 4).length == 4 && (args[2].equals("create") || args[2].equals("remove"))) {
+				args = content.split(" ", 4);
 				eb =
 					switch (args[2]) {
 						case "create" -> createNewGuild(args[3]);
 						case "remove" -> removeGuild(args[3]);
-						default -> eb;
+						default -> null;
 					};
 			} else if (args.length == 2) {
 				eb =
@@ -356,21 +357,21 @@ public class SettingsExecute {
 						switch (args[4]) {
 							case "enable" -> setGuildRanksEnable(guildSettings.getAsJsonObject(), true);
 							case "disable" -> setGuildRanksEnable(guildSettings.getAsJsonObject(), false);
-							default -> eb;
+							default -> null;
 						};
 				} else if (args[3].equals("counter")) {
 					eb =
 						switch (args[4]) {
 							case "enable" -> setGuildCounterEnable(guildSettings.getAsJsonObject(), true);
 							case "disable" -> setGuildCounterEnable(guildSettings.getAsJsonObject(), false);
-							default -> eb;
+							default -> null;
 						};
 				} else if (args[3].equals("apply")) {
 					eb =
 						switch (args[4]) {
 							case "enable" -> setApplyEnable(guildSettings.getAsJsonObject(), true);
 							case "disable" -> setApplyEnable(guildSettings.getAsJsonObject(), false);
-							default -> eb;
+							default -> null;
 						};
 				}
 			} else if (
@@ -423,14 +424,14 @@ public class SettingsExecute {
 							switch (args[5]) {
 								case "add" -> addApplyStaffRole(guildSettings.getAsJsonObject(), args[6]);
 								case "remove" -> removeApplyStaffRole(guildSettings.getAsJsonObject(), args[6]);
-								default -> eb;
+								default -> null;
 							};
 					} else if (args[4].equals("requirements") || args[4].equals("reqs") || args[4].equals("req")) {
 						eb =
 							switch (args[5]) {
 								case "add" -> addApplyRequirement(guildSettings.getAsJsonObject(), args[6]);
 								case "remove" -> removeApplyRequirement(guildSettings.getAsJsonObject(), args[6]);
-								default -> eb;
+								default -> null;
 							};
 					}
 				}
@@ -608,7 +609,6 @@ public class SettingsExecute {
 	public EmbedBuilder displayApplyBlacklist() {
 		JsonElement blacklistSettings = getBlacklistSettings();
 		JsonArray currentBlacklist = higherDepth(blacklistSettings, "blacklist").getAsJsonArray();
-		EmbedBuilder eb = defaultSettingsEmbed();
 
 		CustomPaginator.Builder paginateBuilder = defaultPaginator(author).setColumns(1).setItemsPerPage(30);
 		paginateBuilder.setPaginatorExtras(new PaginatorExtras().setEveryPageTitle("Settings"));

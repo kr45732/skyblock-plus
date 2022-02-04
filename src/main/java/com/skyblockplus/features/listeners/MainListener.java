@@ -28,8 +28,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
@@ -122,13 +122,12 @@ public class MainListener extends ListenerAdapter {
 							.getGuild()
 							.getTextChannels()
 							.stream()
-							.filter(c -> event.getGuild().getPublicRole().hasPermission(c, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)
-							)
+							.filter(GuildMessageChannel::canTalk)
 							.min(Comparator.naturalOrder())
 							.orElse(null)
 					);
 				if (channel != null) {
-					channel.sendMessageEmbeds(eb.build()).queue();
+					channel.sendMessageEmbeds(eb.build()).queue(ignore, ignore);
 				}
 			} catch (Exception ignored) {}
 

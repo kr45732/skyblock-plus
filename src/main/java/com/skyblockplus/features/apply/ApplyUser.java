@@ -58,7 +58,7 @@ public class ApplyUser implements Serializable {
 	public int state = 0;
 	public String staffChannelId;
 	public boolean logApplication = false;
-	public List<LogMessage> logs = new ArrayList<>();
+	public final List<LogMessage> logs = new ArrayList<>();
 	// Embed
 	public String playerSlayer;
 	public String playerSkills;

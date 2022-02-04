@@ -22,12 +22,11 @@ import static com.skyblockplus.utils.Utils.*;
 
 import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.CommandAutoCompleteInteraction;
 
 public class AutoCompleteEvent extends CommandAutoCompleteInteractionEvent {
 
 	public AutoCompleteEvent(CommandAutoCompleteInteractionEvent event) {
-		super(event.getJDA(), event.getResponseNumber(), ((CommandAutoCompleteInteraction) event.getInteraction()));
+		super(event.getJDA(), event.getResponseNumber(), event.getInteraction());
 	}
 
 	public void replyClosestMatch(String toMatch, List<String> matchFrom) {
