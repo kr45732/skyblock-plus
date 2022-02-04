@@ -937,7 +937,13 @@ public class AutomaticGuild {
 				String itemName = parseMcCodes(higherDepth(itemJson, "displayname").getAsString()).replace("�", "");
 				String itemId = higherDepth(itemJson, "internalname").getAsString();
 				if (itemName.contains("(")) {
-					if(itemId.endsWith("_MINIBOSS") || itemId.endsWith("_MONSTER") || itemId.endsWith("_ANIMAL") || itemId.endsWith("_SC") || itemId.endsWith("_BOSS")){
+					if (
+						itemId.endsWith("_MINIBOSS") ||
+						itemId.endsWith("_MONSTER") ||
+						itemId.endsWith("_ANIMAL") ||
+						itemId.endsWith("_SC") ||
+						itemId.endsWith("_BOSS")
+					) {
 						continue;
 					}
 				}

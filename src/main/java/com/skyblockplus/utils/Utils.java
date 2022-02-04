@@ -804,13 +804,7 @@ public class Utils {
 	public static String nameToId(String itemName) {
 		getInternalJsonMappings();
 
-		String id = itemName
-				.trim()
-				.toUpperCase()
-				.replace(" ", "_")
-				.replace("'S", "")
-				.replace("FRAG", "FRAGMENT")
-				.replace(".", "");
+		String id = itemName.trim().toUpperCase().replace(" ", "_").replace("'S", "").replace("FRAG", "FRAGMENT").replace(".", "");
 
 		switch (id) {
 			case "GOD_POT":

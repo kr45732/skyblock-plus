@@ -45,7 +45,10 @@ public class SetupCommand extends Command {
 	}
 
 	public static EmbedBuilder getSetupEmbed() {
-		return defaultEmbed("Setup").setDescription("Choose one of the buttons below to setup the corresponding feature. Note that setting a feature can/will override previous settings.");
+		return defaultEmbed("Setup")
+			.setDescription(
+				"Choose one of the buttons below to setup the corresponding feature. Note that setting a feature can/will override previous settings."
+			);
 	}
 
 	@Override

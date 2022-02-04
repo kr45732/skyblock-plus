@@ -77,10 +77,7 @@ public class CakesCommand extends Command {
 
 			StringBuilder missingCakesStr = new StringBuilder();
 			for (String missingCake : missingCakes) {
-				missingCakesStr
-					.append("• ")
-					.append(capitalizeString(missingCake.split("cake_")[1].replace("_", " ")))
-					.append(" Cake\n");
+				missingCakesStr.append("• ").append(capitalizeString(missingCake.split("cake_")[1].replace("_", " "))).append(" Cake\n");
 			}
 			eb.addField("Inactive Cakes", missingCakesStr.length() > 0 ? missingCakesStr.toString() : "None", false);
 

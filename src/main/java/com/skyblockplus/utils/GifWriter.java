@@ -18,112 +18,86 @@
 
 package com.skyblockplus.utils;
 
-import javax.imageio.*;
-import javax.imageio.metadata.*;
-import javax.imageio.stream.*;
 import java.awt.image.*;
 import java.io.*;
 import java.util.Iterator;
+import javax.imageio.*;
+import javax.imageio.metadata.*;
+import javax.imageio.stream.*;
 
 public class GifWriter {
-    private final ImageWriter gifWriter;
-    private final ImageWriteParam imageWriteParam;
-    private final IIOMetadata imageMetaData;
 
-    public GifWriter(
-            ImageOutputStream outputStream,
-            int imageType,
-            int timeBetweenFramesMS,
-            boolean loopContinuously) throws IOException {
-        gifWriter = getWriter();
-        imageWriteParam = gifWriter.getDefaultWriteParam();
-        ImageTypeSpecifier imageTypeSpecifier =
-                ImageTypeSpecifier.createFromBufferedImageType(imageType);
+	private final ImageWriter gifWriter;
+	private final ImageWriteParam imageWriteParam;
+	private final IIOMetadata imageMetaData;
 
-        imageMetaData =
-                gifWriter.getDefaultImageMetadata(imageTypeSpecifier,
-                        imageWriteParam);
+	public GifWriter(ImageOutputStream outputStream, int imageType, int timeBetweenFramesMS, boolean loopContinuously) throws IOException {
+		gifWriter = getWriter();
+		imageWriteParam = gifWriter.getDefaultWriteParam();
+		ImageTypeSpecifier imageTypeSpecifier = ImageTypeSpecifier.createFromBufferedImageType(imageType);
 
-        String metaFormatName = imageMetaData.getNativeMetadataFormatName();
+		imageMetaData = gifWriter.getDefaultImageMetadata(imageTypeSpecifier, imageWriteParam);
 
-        IIOMetadataNode root = (IIOMetadataNode)
-                imageMetaData.getAsTree(metaFormatName);
+		String metaFormatName = imageMetaData.getNativeMetadataFormatName();
 
-        IIOMetadataNode graphicsControlExtensionNode = getNode(
-                root,
-                "GraphicControlExtension");
+		IIOMetadataNode root = (IIOMetadataNode) imageMetaData.getAsTree(metaFormatName);
 
-        graphicsControlExtensionNode.setAttribute("disposalMethod", "none");
-        graphicsControlExtensionNode.setAttribute("userInputFlag", "FALSE");
-        graphicsControlExtensionNode.setAttribute(
-                "transparentColorFlag",
-                "FALSE");
-        graphicsControlExtensionNode.setAttribute(
-                "delayTime",
-                Integer.toString(timeBetweenFramesMS / 10));
-        graphicsControlExtensionNode.setAttribute(
-                "transparentColorIndex",
-                "0");
+		IIOMetadataNode graphicsControlExtensionNode = getNode(root, "GraphicControlExtension");
 
-        IIOMetadataNode commentsNode = getNode(root, "CommentExtensions");
-        commentsNode.setAttribute("CommentExtension", "Created by MAH");
+		graphicsControlExtensionNode.setAttribute("disposalMethod", "none");
+		graphicsControlExtensionNode.setAttribute("userInputFlag", "FALSE");
+		graphicsControlExtensionNode.setAttribute("transparentColorFlag", "FALSE");
+		graphicsControlExtensionNode.setAttribute("delayTime", Integer.toString(timeBetweenFramesMS / 10));
+		graphicsControlExtensionNode.setAttribute("transparentColorIndex", "0");
 
-        IIOMetadataNode appExtensionsNode = getNode(
-                root,
-                "ApplicationExtensions");
+		IIOMetadataNode commentsNode = getNode(root, "CommentExtensions");
+		commentsNode.setAttribute("CommentExtension", "Created by MAH");
 
-        IIOMetadataNode child = new IIOMetadataNode("ApplicationExtension");
+		IIOMetadataNode appExtensionsNode = getNode(root, "ApplicationExtensions");
 
-        child.setAttribute("applicationID", "NETSCAPE");
-        child.setAttribute("authenticationCode", "2.0");
+		IIOMetadataNode child = new IIOMetadataNode("ApplicationExtension");
 
-        int loop = loopContinuously ? 0 : 1;
+		child.setAttribute("applicationID", "NETSCAPE");
+		child.setAttribute("authenticationCode", "2.0");
 
-        child.setUserObject(new byte[]{0x1, (byte) (loop & 0xFF), (byte)
-                0});
-        appExtensionsNode.appendChild(child);
+		int loop = loopContinuously ? 0 : 1;
 
-        imageMetaData.setFromTree(metaFormatName, root);
+		child.setUserObject(new byte[] { 0x1, (byte) (loop & 0xFF), (byte) 0 });
+		appExtensionsNode.appendChild(child);
 
-        gifWriter.setOutput(outputStream);
+		imageMetaData.setFromTree(metaFormatName, root);
 
-        gifWriter.prepareWriteSequence(null);
-    }
+		gifWriter.setOutput(outputStream);
 
-    public void writeToSequence(RenderedImage img) throws IOException {
-        gifWriter.writeToSequence(
-                new IIOImage(
-                        img,
-                        null,
-                        imageMetaData),
-                imageWriteParam);
-    }
+		gifWriter.prepareWriteSequence(null);
+	}
 
-    public void close() throws IOException {
-        gifWriter.endWriteSequence();
-    }
+	public void writeToSequence(RenderedImage img) throws IOException {
+		gifWriter.writeToSequence(new IIOImage(img, null, imageMetaData), imageWriteParam);
+	}
 
-    private ImageWriter getWriter() throws IIOException {
-        Iterator<ImageWriter> iterator = ImageIO.getImageWritersBySuffix("gif");
-        if (!iterator.hasNext()) {
-            throw new IIOException("No GIF Image Writers Exist");
-        } else {
-            return iterator.next();
-        }
-    }
+	public void close() throws IOException {
+		gifWriter.endWriteSequence();
+	}
 
-    private IIOMetadataNode getNode(
-            IIOMetadataNode rootNode,
-            String nodeName) {
-        int nNodes = rootNode.getLength();
-        for (int i = 0; i < nNodes; i++) {
-            if (rootNode.item(i).getNodeName().compareToIgnoreCase(nodeName)
-                    == 0) {
-                return ((IIOMetadataNode) rootNode.item(i));
-            }
-        }
-        IIOMetadataNode node = new IIOMetadataNode(nodeName);
-        rootNode.appendChild(node);
-        return (node);
-    }
+	private ImageWriter getWriter() throws IIOException {
+		Iterator<ImageWriter> iterator = ImageIO.getImageWritersBySuffix("gif");
+		if (!iterator.hasNext()) {
+			throw new IIOException("No GIF Image Writers Exist");
+		} else {
+			return iterator.next();
+		}
+	}
+
+	private IIOMetadataNode getNode(IIOMetadataNode rootNode, String nodeName) {
+		int nNodes = rootNode.getLength();
+		for (int i = 0; i < nNodes; i++) {
+			if (rootNode.item(i).getNodeName().compareToIgnoreCase(nodeName) == 0) {
+				return ((IIOMetadataNode) rootNode.item(i));
+			}
+		}
+		IIOMetadataNode node = new IIOMetadataNode(nodeName);
+		rootNode.appendChild(node);
+		return (node);
+	}
 }

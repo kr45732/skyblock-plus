@@ -51,7 +51,7 @@ public class CustomPaginator extends Menu {
 
 	private static final Logger log = LoggerFactory.getLogger(CustomPaginator.class);
 	private static final Consumer<Throwable> throwableConsumer = e -> {
-		if(!(e instanceof ErrorResponseException ex && ex.getErrorResponse().equals(ErrorResponse.UNKNOWN_INTERACTION))){
+		if (!(e instanceof ErrorResponseException ex && ex.getErrorResponse().equals(ErrorResponse.UNKNOWN_INTERACTION))) {
 			log.error(e.getMessage(), e);
 		}
 	};

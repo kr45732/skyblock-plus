@@ -22,7 +22,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-
 import lombok.Data;
 import org.apache.groovy.util.Maps;
 
@@ -30,16 +29,27 @@ import org.apache.groovy.util.Maps;
 public class JacobContest {
 
 	private static final Map<String, String> CROP_NAME_TO_EMOJI = Maps.of(
-			"Wheat","<:wheat:939024495581224981>",
-			"Carrot","<:carrot:939020943332868167>",
-			"Potato","<:potato:939021823780216833>",
-			"Pumpkin","<:pumpkin:939021844202266696>",
-			"Melon","<:melon:939021703785381888>",
-			"Mushroom","<:mushroom:939020905747734558>",
-			"Cactus","<:cactus:939020908046209044>",
-			"Sugar Cane","<:sugar_canes:939024466007162920>",
-			"Nether Wart","<:nether_wart:939021735594950678>",
-			"Cocoa Beans","<:cocoa_beans:939021533379170336>");
+		"Wheat",
+		"<:wheat:939024495581224981>",
+		"Carrot",
+		"<:carrot:939020943332868167>",
+		"Potato",
+		"<:potato:939021823780216833>",
+		"Pumpkin",
+		"<:pumpkin:939021844202266696>",
+		"Melon",
+		"<:melon:939021703785381888>",
+		"Mushroom",
+		"<:mushroom:939020905747734558>",
+		"Cactus",
+		"<:cactus:939020908046209044>",
+		"Sugar Cane",
+		"<:sugar_canes:939024466007162920>",
+		"Nether Wart",
+		"<:nether_wart:939021735594950678>",
+		"Cocoa Beans",
+		"<:cocoa_beans:939021533379170336>"
+	);
 
 	private long time;
 	private List<String> crops;

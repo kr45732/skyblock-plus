@@ -292,13 +292,15 @@ public class FixApplicationCommand extends Command {
 				.get(guild.getId())
 				.applyGuild.stream()
 				.filter(g -> higherDepth(g.currentSettings, "guildName", "").equals(guildName))
-				.findFirst().orElse(null);
+				.findFirst()
+				.orElse(null);
 
-			if(applyGuild != null) {
+			if (applyGuild != null) {
 				applyGuild.applyUserList.add(gson.fromJson(applicationJson, ApplyUser.class));
-				return defaultEmbed("Success").setDescription("Fixed & retrieved application successfully: " + makeHastePost(applicationJson));
-			}else{
-				return invalidEmbed("Automatic application for " +  guildName + " doesn't exist. Please report this to the developer");
+				return defaultEmbed("Success")
+					.setDescription("Fixed & retrieved application successfully: " + makeHastePost(applicationJson));
+			} else {
+				return invalidEmbed("Automatic application for " + guildName + " doesn't exist. Please report this to the developer");
 			}
 		} catch (Exception e) {
 			Main.log.error("Error when retrieving application", e);

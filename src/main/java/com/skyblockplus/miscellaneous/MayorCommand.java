@@ -25,7 +25,6 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import java.time.Instant;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 
 public class MayorCommand extends Command {
