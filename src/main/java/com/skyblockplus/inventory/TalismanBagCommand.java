@@ -35,8 +35,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 
 public class TalismanBagCommand extends Command {
 
-	private String missingEmoji;
-
 	public TalismanBagCommand() {
 		this.name = "talisman";
 		this.cooldown = globalCooldown;
@@ -113,20 +111,7 @@ public class TalismanBagCommand extends Command {
 						return;
 					}
 
-					List<String[]> playerEnderChest = getPlayerTalismansEmoji(player, args.length == 3 ? args[2] : null);
-					if (playerEnderChest != null) {
-						ebMessage.delete().queue();
-						if (missingEmoji.length() > 0) {
-							ebMessage
-								.getChannel()
-								.sendMessageEmbeds(defaultEmbed("Missing emojis").setDescription(missingEmoji).build())
-								.queue();
-						}
-
-						new InventoryPaginator(playerEnderChest, ebMessage.getChannel(), event.getAuthor());
-					} else {
-						embed(invalidEmbed("Unable to fetch player data"));
-					}
+					paginate(getPlayerTalismansEmoji(player, args.length == 3 ? args[2] : null, new PaginatorEvent(event)));
 					return;
 				}
 
@@ -136,16 +121,23 @@ public class TalismanBagCommand extends Command {
 			.queue();
 	}
 
-	private List<String[]> getPlayerTalismansEmoji(String username, String profileName) {
+	public static EmbedBuilder getPlayerTalismansEmoji(String username, String profileName, PaginatorEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
-			List<String[]> talismanBagPages = player.getTalismanBag();
+			List<String[]> talismanBag = player.getTalismanBag();
+			if (talismanBag != null) {
+				if (player.invMissing.length() > 0) {
+					event
+							.getChannel()
+							.sendMessageEmbeds(defaultEmbed("Missing emojis").setDescription(player.invMissing).build())
+							.queue();
+				}
 
-			if (talismanBagPages != null) {
-				this.missingEmoji = player.invMissing;
-				return talismanBagPages;
+				new InventoryPaginator(talismanBag, "Talisman Bag", player, event);
+				return null;
 			}
+			return invalidEmbed(player.getUsername() + "'s inventory API is disabled");
 		}
-		return null;
+		return player.getFailEmbed();
 	}
 }

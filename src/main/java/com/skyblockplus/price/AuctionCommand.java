@@ -92,7 +92,7 @@ public class AuctionCommand extends Command {
 			long failedToSell = 0;
 			long auctionTax = 0;
 
-			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(10);
+			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(9);
 			PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_FIELDS);
 
 			for (JsonElement currentAuction : auctionsArray) {

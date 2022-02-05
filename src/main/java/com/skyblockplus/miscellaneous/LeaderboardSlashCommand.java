@@ -47,6 +47,7 @@ public class LeaderboardSlashCommand extends SlashCommand {
 				event.getOptionStr("type"),
 				event.player,
 				Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
+				event.getOptionInt("page", 0),
 				new PaginatorEvent(event)
 			)
 		);
@@ -81,7 +82,8 @@ public class LeaderboardSlashCommand extends SlashCommand {
 				new OptionData(OptionType.STRING, "gamemode", "Gamemode type")
 					.addChoice("All", "all")
 					.addChoice("Ironman", "ironman")
-					.addChoice("Stranded", "stranded")
+					.addChoice("Stranded", "stranded"),
+					new OptionData(OptionType.INTEGER, "page", "Page number").setMinValue(0)
 			);
 	}
 

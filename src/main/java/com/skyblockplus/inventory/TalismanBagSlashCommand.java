@@ -18,15 +18,10 @@
 
 package com.skyblockplus.inventory;
 
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.invalidEmbed;
-
-import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
-import java.util.List;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -55,29 +50,7 @@ public class TalismanBagSlashCommand extends SlashCommand {
 					new PaginatorEvent(event)
 				)
 			);
-			case "emoji" -> {
-				Player player = event.getOptionStr("profile") == null
-					? new Player(event.player)
-					: new Player(event.player, event.getOptionStr("profile"));
-				if (!player.isValid()) {
-					event.embed(player.getFailEmbed());
-					return;
-				}
-				List<String[]> talismanBagPages = player.getTalismanBag();
-				if (talismanBagPages != null) {
-					event.getHook().deleteOriginal().queue();
-					if (player.invMissing.length() > 0) {
-						event
-							.getChannel()
-							.sendMessageEmbeds(defaultEmbed("Missing emojis").setDescription(player.invMissing).build())
-							.queue();
-					}
-
-					new InventoryPaginator(talismanBagPages, event.getChannel(), event.getUser());
-				} else {
-					event.embed(invalidEmbed("Inventory API disabled"));
-				}
-			}
+			case "emoji" -> event.paginate(TalismanBagCommand.getPlayerTalismansEmoji(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
 			default -> event.embed(event.invalidCommandMessage());
 		}
 	}

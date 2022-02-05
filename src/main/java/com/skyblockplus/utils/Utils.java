@@ -802,6 +802,10 @@ public class Utils {
 	}
 
 	public static String nameToId(String itemName) {
+		return nameToId(itemName, false);
+	}
+
+	public static String nameToId(String itemName, boolean strict) {
 		getInternalJsonMappings();
 
 		String id = itemName.trim().toUpperCase().replace(" ", "_").replace("'S", "").replace("FRAG", "FRAGMENT").replace(".", "");
@@ -841,7 +845,7 @@ public class Utils {
 			}
 		}
 
-		return id;
+		return strict ? null : id;
 	}
 
 	public static String idToName(String id) {
@@ -986,9 +990,8 @@ public class Utils {
 		}
 
 		return FuzzySearch
-			.extractSorted(toMatch, matchFrom)
+			.extractTop(toMatch, matchFrom, numMatches)
 			.stream()
-			.limit(numMatches)
 			.map(ExtractedResult::getString)
 			.collect(Collectors.toList());
 	}

@@ -19,6 +19,7 @@
 package com.skyblockplus.utils.structs;
 
 import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.Utils.idToName;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,6 +46,20 @@ public class InvItem {
 	private String rarity;
 	private int dungeonFloor = 0;
 	private String nbtTag;
+
+	public String getFormattedId(){
+		if(id.equals("PET")){
+			return name.split("] ")[1].toUpperCase().replace(" ", "_") + RARITY_TO_NUMBER_MAP.get(getPetRarity());
+		}else if(id.equals("ENCHANTED_BOOK")){
+			return enchantsFormatted.isEmpty() ? id : enchantsFormatted.get(0).toUpperCase();
+		}else{
+			return id;
+		}
+	}
+
+	public String getNameFormatted() {
+		return id.equals("ENCHANTED_BOOK") && !enchantsFormatted.isEmpty() ? idToName(enchantsFormatted.get(0).toUpperCase()) : name;
+	}
 
 	public void setHbpCount(int hbpCount) {
 		if (hbpCount > 10) {

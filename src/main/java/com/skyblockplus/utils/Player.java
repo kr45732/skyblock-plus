@@ -511,24 +511,17 @@ public class Player {
 		Set<String> itemsPlayerHas = new HashSet<>();
 
 		for (InvItem item : itemsMap) {
-			if (item == null) {
-				continue;
-			}
-
-			if (!item.getBackpackItems().isEmpty()) {
-				List<InvItem> backpackItems = item.getBackpackItems();
-				for (InvItem backpackItem : backpackItems) {
-					if (backpackItem == null) {
-						continue;
+			if (item != null) {
+				if (!item.getBackpackItems().isEmpty()) {
+					for (InvItem backpackItem : item.getBackpackItems()) {
+						if (backpackItem != null && items.contains(backpackItem.getId())) {
+							itemsPlayerHas.add(backpackItem.getId());
+						}
 					}
-
-					if (items.contains(backpackItem.getId())) {
-						itemsPlayerHas.add(capitalizeString(backpackItem.getId().toLowerCase().replace("_", " ")));
+				} else {
+					if (items.contains(item.getId())) {
+						itemsPlayerHas.add(item.getId());
 					}
-				}
-			} else {
-				if (items.contains(item.getId())) {
-					itemsPlayerHas.add(capitalizeString(item.getId().toLowerCase().replace("_", " ")));
 				}
 			}
 		}

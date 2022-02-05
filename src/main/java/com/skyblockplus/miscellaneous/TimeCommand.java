@@ -76,9 +76,9 @@ public class TimeCommand extends Command {
 		}
 
 		return defaultEmbed("Skyblock Time")
-			.addField("Year", "" + getSkyblockYear(), false)
-			.addField("Date", SEASONS[currentMonth] + " **" + nth(currentDay + 1) + "**", false)
-			.addField("Time", currentHour + ":" + padStart("" + ((int) Math.floorDiv(currentMinute, 10) * 10), 2, '0') + suffix, false);
+			.addField("\uD83D\uDDD3️ Year", "" + getSkyblockYear(), false)
+			.addField("\uD83D\uDCC5 Date", SEASONS[currentMonth] + " **" + nth(currentDay + 1) + "**", false)
+			.addField("⏰ Time", currentHour + ":" + padStart("" + ((int) Math.floorDiv(currentMinute, 10) * 10), 2, '0') + suffix, false);
 	}
 
 	public static int getSkyblockYear() {

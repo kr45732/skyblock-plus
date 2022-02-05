@@ -19,37 +19,41 @@
 package com.skyblockplus.inventory;
 
 import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.utils.Utils.ignore;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.command.PaginatorEvent;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 public class InventoryPaginator {
 
-	private final List<String[]> enderChestPages;
+	private final List<String[]> inventoryPages;
 	private final Message pagePart1;
 	private final Message pagePart2;
 	private final User user;
 	private final int maxPageNumber;
 	private int pageNumber = 0;
 
-	public InventoryPaginator(List<String[]> enderChestPages, MessageChannel channel, User user) {
-		this.enderChestPages = enderChestPages;
-		this.user = user;
-		this.maxPageNumber = enderChestPages.size() - 1;
+	public InventoryPaginator(List<String[]> inventoryPages, String type, Player player, PaginatorEvent event) {
+		this.inventoryPages = inventoryPages;
+		this.user = event.getUser();
+		this.maxPageNumber = inventoryPages.size() - 1;
 
-		pagePart1 = channel.sendMessage(enderChestPages.get(0)[0]).complete();
+		pagePart1 = event.getChannel().sendMessage(inventoryPages.get(0)[0]).complete();
 		pagePart2 =
-			channel
-				.sendMessage(enderChestPages.get(0)[1])
+			event.getChannel()
+				.sendMessage(inventoryPages.get(0)[1])
 				.setActionRow(
 					Button.primary("inv_paginator_left_button", Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")),
-					Button.primary("inv_paginator_right_button", Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
+					Button.primary("inv_paginator_right_button", Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>")),
+					Button.link(player.skyblockStatsLink(),type + " of " + player.getUsername())
 				)
 				.complete();
 
@@ -71,8 +75,8 @@ public class InventoryPaginator {
 			}
 		}
 
-		pagePart1.editMessage(enderChestPages.get(pageNumber)[0]).queue();
-		event.editMessage(enderChestPages.get(pageNumber)[1]).complete();
+		pagePart1.editMessage(inventoryPages.get(pageNumber)[0]).queue();
+		event.editMessage(inventoryPages.get(pageNumber)[1]).complete();
 
 		waitForEvent();
 	}
@@ -84,7 +88,7 @@ public class InventoryPaginator {
 			this::action,
 			30,
 			TimeUnit.SECONDS,
-			() -> pagePart2.editMessageComponents().queue()
+			() -> pagePart2.editMessageComponents().queue(ignore, ignore)
 		);
 	}
 }

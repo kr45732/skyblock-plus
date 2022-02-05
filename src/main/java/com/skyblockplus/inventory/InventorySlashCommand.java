@@ -18,9 +18,6 @@
 
 package com.skyblockplus.inventory;
 
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.invalidEmbed;
-
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
@@ -53,22 +50,7 @@ public class InventorySlashCommand extends SlashCommand {
 					new PaginatorEvent(event)
 				)
 			);
-			case "emoji" -> {
-				String[] playerInventory = InventoryCommand.getPlayerInventory(event.player, event.getOptionStr("profile"));
-				if (playerInventory != null) {
-					event.getHook().deleteOriginal().queue();
-					event.getChannel().sendMessage(playerInventory[0]).complete();
-					event.getChannel().sendMessage(playerInventory[1]).queue();
-					if (playerInventory[2].length() > 0) {
-						event
-							.getChannel()
-							.sendMessageEmbeds(defaultEmbed("Missing emojis").setDescription(playerInventory[2]).build())
-							.queue();
-					}
-				} else {
-					event.embed(invalidEmbed("Inventory API disabled"));
-				}
-			}
+			case "emoji" -> event.paginate(InventoryCommand.getPlayerInventory(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
 			default -> event.embed(event.invalidCommandMessage());
 		}
 	}

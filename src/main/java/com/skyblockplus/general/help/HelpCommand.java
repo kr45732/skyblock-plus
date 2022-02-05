@@ -289,16 +289,18 @@ public class HelpCommand extends Command {
 					.addAliases("role")
 					.addSubcommands(
 						new HelpData("claim", "Claim your automatic Skyblock roles. You must be linked to the bot.", "claim <profile>")
-							.addExamples("claim", "claim Zucchini")
+							.addExamples("claim", "claim Zucchini"),
+							new HelpData("list", "List all enabled claimable roles for this server.")
+
 					)
 					.setCategory("miscellaneous"),
-				new HelpData("bank", "Get a player's bank and purse coins.", "bank [player] [profile]")
+				new HelpData("coins", "Get a player's bank and purse coins.", "bank [player] [profile]")
 					.addSecondData("Get a player's bank transaction history.", "bank history [player] [profile]")
 					.addExamples(
-						"bank CrypticPlasma",
-						"bank CrypticPlasma Zucchini",
-						"bank history CrypticPlasma",
-						"bank history CrypticPlasma Zucchini"
+						"coins CrypticPlasma",
+						"coins CrypticPlasma Zucchini",
+						"coins history CrypticPlasma",
+						"coins history CrypticPlasma Zucchini"
 					)
 					.setCategory("miscellaneous"),
 				new HelpData("networth", "Calculate a player's networth.", "networth [player] [profile]")
@@ -802,8 +804,8 @@ public class HelpCommand extends Command {
 		paginateBuilder.addItems(
 			help.create("roles claim [profile]", "Claim your automatic Skyblock roles based on your statistics") +
 			help.create("roles list", "List all roles that can be claimed through the bot") +
-			help.create("bank [player] [profile]", "Get a player's bank and purse coins") +
-			help.create("bank history [player] [profile]", "Get a player's bank transaction history") +
+			help.create("coins [player] [profile]", "Get a player's bank and purse coins") +
+			help.create("coins history [player] [profile]", "Get a player's bank transaction history") +
 			help.create("active-coins [player] [profile]", "Get a player's active coins (bank, purse, and sold auctions)") +
 			help.create("networth [player] [profile]", "Calculate a player's networth") +
 			help.create("networth [player] [profile] --verbose", "Calculate a player's networth with a detailed JSON of each item cost") +

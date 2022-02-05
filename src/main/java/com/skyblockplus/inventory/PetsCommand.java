@@ -18,6 +18,7 @@
 
 package com.skyblockplus.inventory;
 
+import static com.skyblockplus.utils.Constants.RARITY_TO_NUMBER_MAP;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -42,35 +43,34 @@ public class PetsCommand extends Command {
 	public static EmbedBuilder getPlayerPets(String username, String profileName, PaginatorEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
-			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(3).setItemsPerPage(15);
+			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(25);
 
 			JsonArray playerPets = player.getPets();
 			for (JsonElement pet : playerPets) {
 				String petItem = null;
 				try {
-					petItem = idToName(higherDepth(pet, "heldItem").getAsString()).toLowerCase();
-				} catch (Exception ignored) {}
+					petItem = higherDepth(pet, "heldItem").getAsString();
+				} catch (Exception ignored) {
+				}
 
-				paginateBuilder.addItems(
-					"**" +
-					capitalizeString(higherDepth(pet, "type").getAsString().toLowerCase().replace("_", " ")) +
-					" (" +
-					petLevelFromXp(
-						higherDepth(pet, "exp", 0L),
-						higherDepth(pet, "tier").getAsString(),
-						higherDepth(pet, "type").getAsString()
-					) +
-					")**" +
-					"\nTier: " +
-					higherDepth(pet, "tier").getAsString().toLowerCase() +
-					(petItem != null ? "\nItem: " + petItem : "")
+				String petName = higherDepth(pet, "type").getAsString();
+				String rarity = higherDepth(pet, "tier").getAsString();
+
+				paginateBuilder.addItems(getEmojiMap().get(petName + RARITY_TO_NUMBER_MAP.get(rarity)).getAsString() + " " +
+								capitalizeString(rarity) + " [Lvl " + petLevelFromXp(
+								higherDepth(pet, "exp", 0L),
+								rarity,
+								petName
+						) +
+								"] " + capitalizeString(petName.toLowerCase().replace("_", " "))
+								+ " " + (petItem != null ? getEmojiMap().get(petItem).getAsString() : "")
 				);
 			}
 			paginateBuilder.setPaginatorExtras(
-				new PaginatorExtras()
-					.setEveryPageTitle(player.getUsername())
-					.setEveryPageThumbnail(player.getThumbnailUrl())
-					.setEveryPageTitleUrl(player.skyblockStatsLink())
+					new PaginatorExtras()
+							.setEveryPageTitle(player.getUsername())
+							.setEveryPageThumbnail(player.getThumbnailUrl())
+							.setEveryPageTitleUrl(player.skyblockStatsLink())
 			);
 			event.paginate(paginateBuilder);
 			return null;

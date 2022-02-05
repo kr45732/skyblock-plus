@@ -42,7 +42,7 @@ public class LeaderboardCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	public static EmbedBuilder getLeaderboard(String lbType, String username, Player.Gamemode gamemode, PaginatorEvent event) {
+	public static EmbedBuilder getLeaderboard(String lbType, String username, Player.Gamemode gamemode, int page, PaginatorEvent event) {
 		if (!isValidType(lbType)) {
 			return invalidEmbed(lbType + " is an invalid leaderboard type. Use `/help leaderboard` to see valid types");
 		}
@@ -87,7 +87,7 @@ public class LeaderboardCommand extends Command {
 				.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/players")
 		);
 
-		event.paginate(paginateBuilder);
+		event.paginate(paginateBuilder, page);
 		return null;
 	}
 
@@ -99,12 +99,13 @@ public class LeaderboardCommand extends Command {
 				logCommand();
 
 				Player.Gamemode gamemode = Player.Gamemode.of(getStringOption("mode", "all"));
+				int page = getIntOption("page", 0);
 				if (args.length == 3 || args.length == 2) {
 					if (getMentionedUsername(args.length == 2 ? -1 : 2)) {
 						return;
 					}
 
-					paginate(getLeaderboard(args[1], player, gamemode, new PaginatorEvent(event)));
+					paginate(getLeaderboard(args[1], player, gamemode, page, new PaginatorEvent(event)));
 					return;
 				}
 

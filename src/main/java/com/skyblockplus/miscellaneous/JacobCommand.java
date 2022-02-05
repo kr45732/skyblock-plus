@@ -48,10 +48,10 @@ public class JacobCommand extends Command {
 				.addField("Contests", "None left for this year!", false);
 		}
 
-		PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_FIELDS);
+		PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_FIELDS).setEveryPageTitle("Jacob Contests");
 		for (JacobContest contest : data.getContests()) {
 			extras.addEmbedField(
-				"Contest",
+				"Jacob Contest",
 				"**In:** <t:" + contest.getTimeInstant().getEpochSecond() + ":R>\n**Crops:**\n" + contest.getCropsFormatted(),
 				false
 			);

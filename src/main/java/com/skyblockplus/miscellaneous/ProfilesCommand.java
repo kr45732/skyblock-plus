@@ -69,7 +69,7 @@ public class ProfilesCommand extends Command {
 								Instant.ofEpochMilli(higherDepth(profile, "members." + uuid + ".last_save").getAsLong()).getEpochSecond() +
 								">";
 
-							return "\n• " + fixUsername(playerUsername) + " last logged in on " + lastLogin;
+							return "\n• " + fixUsername(playerUsername) + " played on " + lastLogin;
 						})
 				);
 			}

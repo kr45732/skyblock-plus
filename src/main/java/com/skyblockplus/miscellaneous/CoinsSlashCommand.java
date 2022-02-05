@@ -27,10 +27,10 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
-public class BankSlashCommand extends SlashCommand {
+public class CoinsSlashCommand extends SlashCommand {
 
-	public BankSlashCommand() {
-		this.name = "bank";
+	public CoinsSlashCommand() {
+		this.name = "coins";
 	}
 
 	@Override
@@ -42,9 +42,9 @@ public class BankSlashCommand extends SlashCommand {
 		}
 
 		switch (event.getSubcommandName()) {
-			case "total" -> event.embed(BankCommand.getPlayerBalance(event.player, event.getOptionStr("profile")));
+			case "total" -> event.embed(CoinsCommand.getPlayerBalance(event.player, event.getOptionStr("profile")));
 			case "history" -> event.paginate(
-				BankCommand.getPlayerBankHistory(event.player, event.getOptionStr("profile"), new PaginatorEvent(event))
+				CoinsCommand.getPlayerBankHistory(event.player, event.getOptionStr("profile"), new PaginatorEvent(event))
 			);
 			default -> event.embed(event.invalidCommandMessage());
 		}
@@ -53,7 +53,7 @@ public class BankSlashCommand extends SlashCommand {
 	@Override
 	public CommandData getCommandData() {
 		return Commands
-			.slash(name, "Main bank command")
+			.slash(name, "Main coins command")
 			.addSubcommands(
 				new SubcommandData("total", "Get a player's bank and purse coins")
 					.addOption(OptionType.STRING, "player", "Player username or mention", false, true)

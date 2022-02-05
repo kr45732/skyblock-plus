@@ -124,4 +124,7 @@ public class AutomatedRoles {
 
 	@Embedded
 	private RoleModel maxed_collections = new RoleModel();
+
+	@Embedded
+	private RoleModel player_items = new RoleModel();
 }

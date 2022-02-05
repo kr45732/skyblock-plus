@@ -40,6 +40,9 @@ import com.skyblockplus.utils.structs.PaginatorExtras;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -377,6 +380,46 @@ public class RolesCommand extends Command {
 							}
 
 							if (useHighest ? player.getHighestAmount(mode) == 1 : player.isGamemode(Player.Gamemode.of(mode))) {
+								if (!member.getRoles().contains(currentLevelRole)) {
+									if (botRole.canInteract(currentLevelRole)) {
+										toAdd.add(currentLevelRole);
+										addedRoles.append(roleChangeString(currentLevelRole.getName()));
+									} else {
+										errorRoles.append(roleChangeString(currentLevelRole.getName()));
+									}
+								}
+							} else {
+								if (member.getRoles().contains(currentLevelRole)) {
+									if (botRole.canInteract(currentLevelRole)) {
+										toRemove.add(currentLevelRole);
+										removedRoles.append(roleChangeString(currentLevelRole.getName()));
+									} else {
+										errorRoles.append(roleChangeString(currentLevelRole.getName()));
+									}
+								}
+							}
+						}
+					}
+					case "player_items" -> {
+						JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
+						List<String> items = streamJsonArray(levelsArray).map(item -> higherDepth(item, "value").getAsString()).collect(Collectors.toList());
+						Set<String> itemsPlayerHas= player.getItemsPlayerHas(items);
+
+						if(itemsPlayerHas == null){
+							disabledAPI.append(roleChangeString("Inventory API disabled"));
+							continue;
+						}
+
+						for (int i = 0; i < levelsArray.size(); i++) {
+							JsonElement currentLevel = levelsArray.get(i);
+							String id = higherDepth(currentLevel, "value").getAsString();
+							Role currentLevelRole = guild.getRoleById(higherDepth(currentLevel, "roleId").getAsString());
+							if (currentLevelRole == null) {
+								errorRoles.append(roleDeletedString(higherDepth(currentLevel, "roleId").getAsString()));
+								continue;
+							}
+
+							if (itemsPlayerHas.contains(id)) {
 								if (!member.getRoles().contains(currentLevelRole)) {
 									if (botRole.canInteract(currentLevelRole)) {
 										toAdd.add(currentLevelRole);

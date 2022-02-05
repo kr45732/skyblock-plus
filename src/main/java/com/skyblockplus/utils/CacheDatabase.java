@@ -294,7 +294,7 @@ public class CacheDatabase {
 		try (
 			Connection connection = getConnection();
 			PreparedStatement statement = connection.prepareStatement(
-				"SELECT username, " + lbType + " FROM " + mode.toCacheType() + " ORDER BY " + lbType + " DESC"
+				"SELECT username, " + lbType + " FROM " + mode.toCacheType() + " WHERE " + lbType + " >= 0 ORDER BY " + lbType + " DESC"
 			)
 		) {
 			try (ResultSet response = statement.executeQuery()) {

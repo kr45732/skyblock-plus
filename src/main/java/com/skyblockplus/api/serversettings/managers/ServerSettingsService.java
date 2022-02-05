@@ -203,6 +203,8 @@ public class ServerSettingsService {
 					return new ResponseEntity<>(currentRoleSettings.getDungeon_secrets(), HttpStatus.OK);
 				case "accessory_count":
 					return new ResponseEntity<>(currentRoleSettings.getAccessory_count(), HttpStatus.OK);
+				case "player_items":
+					return new ResponseEntity<>(currentRoleSettings.getPlayer_items(), HttpStatus.OK);
 				case "networth":
 					return new ResponseEntity<>(currentRoleSettings.getNetworth(), HttpStatus.OK);
 				case "guild_ranks":
@@ -260,6 +262,7 @@ public class ServerSettingsService {
 				case "pet_score" -> currentRoleSettings.setPet_score(newRoleSettings);
 				case "dungeon_secrets" -> currentRoleSettings.setDungeon_secrets(newRoleSettings);
 				case "accessory_count" -> currentRoleSettings.setAccessory_count(newRoleSettings);
+				case "player_items" -> currentRoleSettings.setPlayer_items(newRoleSettings);
 				case "networth" -> currentRoleSettings.setNetworth(newRoleSettings);
 				case "guild_ranks" -> currentRoleSettings.setGuild_ranks(newRoleSettings);
 				case "enderman" -> currentRoleSettings.setEnderman(newRoleSettings);

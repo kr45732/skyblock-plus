@@ -242,121 +242,113 @@ public class NetworthExecute {
 				return invalidEmbed("Only total is enabled");
 			}
 
-			enderChestItems.sort(Comparator.comparingDouble(item -> -Double.parseDouble(item.split("@split@")[1])));
+			enderChestItems.sort(Comparator.comparingDouble(item -> -Double.parseDouble(item.split("=:=")[1])));
 			StringBuilder echestStr = new StringBuilder();
 			for (int i = 0; i < enderChestItems.size(); i++) {
 				String item = enderChestItems.get(i);
 				echestStr
-					.append("• ")
-					.append(item.split("@split@")[0])
-					.append(" ➜ ")
-					.append(simplifyNumber(Double.parseDouble(item.split("@split@")[1])))
-					.append("\n");
+						.append(item.split("=:=")[0])
+						.append(" ➜ ")
+						.append(simplifyNumber(Double.parseDouble(item.split("=:=")[1])))
+						.append("\n");
 				if (i == 4) {
 					break;
 				}
 			}
 
-			personalVaultItems.sort(Comparator.comparingDouble(item -> -Double.parseDouble(item.split("@split@")[1])));
-			StringBuilder personVaultStr = new StringBuilder();
+			personalVaultItems.sort(Comparator.comparingDouble(item -> -Double.parseDouble(item.split("=:=")[1])));
+			StringBuilder personalVaultStr = new StringBuilder();
 			for (int i = 0; i < personalVaultItems.size(); i++) {
 				String item = personalVaultItems.get(i);
-				personVaultStr
-					.append("• ")
-					.append(item.split("@split@")[0])
-					.append(" ➜ ")
-					.append(simplifyNumber(Double.parseDouble(item.split("@split@")[1])))
-					.append("\n");
+				personalVaultStr
+						.append(item.split("=:=")[0])
+						.append(" ➜ ")
+						.append(simplifyNumber(Double.parseDouble(item.split("=:=")[1])))
+						.append("\n");
 				if (i == 4) {
 					break;
 				}
 			}
 
-			storageItems.sort(Comparator.comparingDouble(item -> -Double.parseDouble(item.split("@split@")[1])));
+			storageItems.sort(Comparator.comparingDouble(item -> -Double.parseDouble(item.split("=:=")[1])));
 			StringBuilder storageStr = new StringBuilder();
 			for (int i = 0; i < storageItems.size(); i++) {
 				String item = storageItems.get(i);
 				storageStr
-					.append("• ")
-					.append(item.split("@split@")[0])
-					.append(" ➜ ")
-					.append(simplifyNumber(Double.parseDouble(item.split("@split@")[1])))
-					.append("\n");
+						.append(item.split("=:=")[0])
+						.append(" ➜ ")
+						.append(simplifyNumber(Double.parseDouble(item.split("=:=")[1])))
+						.append("\n");
 				if (i == 4) {
 					break;
 				}
 			}
 
-			invItems.sort(Comparator.comparingDouble(item -> -Double.parseDouble(item.split("@split@")[1])));
+			invItems.sort(Comparator.comparingDouble(item -> -Double.parseDouble(item.split("=:=")[1])));
 			StringBuilder invStr = new StringBuilder();
 			for (int i = 0; i < invItems.size(); i++) {
 				String item = invItems.get(i);
 				invStr
-					.append("• ")
-					.append(item.split("@split@")[0])
-					.append(" ➜ ")
-					.append(simplifyNumber(Double.parseDouble(item.split("@split@")[1])))
-					.append("\n");
+						.append(item.split("=:=")[0])
+						.append(" ➜ ")
+						.append(simplifyNumber(Double.parseDouble(item.split("=:=")[1])))
+						.append("\n");
 				if (i == 4) {
 					break;
 				}
 			}
 
-			armorItems.sort(Comparator.comparingDouble(item -> -Double.parseDouble(item.split("@split@")[1])));
+			armorItems.sort(Comparator.comparingDouble(item -> -Double.parseDouble(item.split("=:=")[1])));
 			StringBuilder armorStr = new StringBuilder();
 			for (int i = 0; i < armorItems.size(); i++) {
 				String item = armorItems.get(i);
 				armorStr
-					.append("• ")
-					.append(item.split("@split@")[0])
-					.append(" ➜ ")
-					.append(simplifyNumber(Double.parseDouble(item.split("@split@")[1])))
-					.append("\n");
+						.append(item.split("=:=")[0])
+						.append(" ➜ ")
+						.append(simplifyNumber(Double.parseDouble(item.split("=:=")[1])))
+						.append("\n");
 				if (i == 4) {
 					break;
 				}
 			}
 
-			wardrobeItems.sort(Comparator.comparingDouble(item -> -Double.parseDouble(item.split("@split@")[1])));
+			wardrobeItems.sort(Comparator.comparingDouble(item -> -Double.parseDouble(item.split("=:=")[1])));
 			StringBuilder wardrobeStr = new StringBuilder();
 			for (int i = 0; i < wardrobeItems.size(); i++) {
 				String item = wardrobeItems.get(i);
 				wardrobeStr
-					.append("• ")
-					.append(item.split("@split@")[0])
-					.append(" ➜ ")
-					.append(simplifyNumber(Double.parseDouble(item.split("@split@")[1])))
-					.append("\n");
+						.append(item.split("=:=")[0])
+						.append(" ➜ ")
+						.append(simplifyNumber(Double.parseDouble(item.split("=:=")[1])))
+						.append("\n");
 				if (i == 4) {
 					break;
 				}
 			}
 
-			petsItems.sort(Comparator.comparingDouble(item -> -Double.parseDouble(item.split("@split@")[1])));
+			petsItems.sort(Comparator.comparingDouble(item -> -Double.parseDouble(item.split("=:=")[1])));
 			StringBuilder petsStr = new StringBuilder();
 			for (int i = 0; i < petsItems.size(); i++) {
 				String item = petsItems.get(i);
 				petsStr
-					.append("• ")
-					.append(item.split("@split@")[0])
-					.append(" ➜ ")
-					.append(simplifyNumber(Double.parseDouble(item.split("@split@")[1])))
-					.append("\n");
+						.append(item.split("=:=")[0])
+						.append(" ➜ ")
+						.append(simplifyNumber(Double.parseDouble(item.split("=:=")[1])))
+						.append("\n");
 				if (i == 4) {
 					break;
 				}
 			}
 
-			talismanItems.sort(Comparator.comparingDouble(item -> -Double.parseDouble(item.split("@split@")[1])));
+			talismanItems.sort(Comparator.comparingDouble(item -> -Double.parseDouble(item.split("=:=")[1])));
 			StringBuilder talismanStr = new StringBuilder();
 			for (int i = 0; i < talismanItems.size(); i++) {
 				String item = talismanItems.get(i);
 				talismanStr
-					.append("• ")
-					.append(item.split("@split@")[0])
-					.append(" ➜ ")
-					.append(simplifyNumber(Double.parseDouble(item.split("@split@")[1])))
-					.append("\n");
+						.append(item.split("=:=")[0])
+						.append(" ➜ ")
+						.append(simplifyNumber(Double.parseDouble(item.split("=:=")[1])))
+						.append("\n");
 				if (i == 4) {
 					break;
 				}
@@ -368,27 +360,43 @@ public class NetworthExecute {
 			eb.addField("Purse", simplifyNumber(purseCoins), true);
 			eb.addField("Bank", (bankBalance == -1 ? "Private" : simplifyNumber(bankBalance)), true);
 			eb.addField("Sacks", simplifyNumber(sacksTotal), true);
-			eb.addField(
-				"Ender Chest | " + simplifyNumber(enderChestTotal),
-				echestStr.length() == 0 ? "Empty" : echestStr.toString(),
-				false
-			);
-			eb.addField("Storage | " + simplifyNumber(storageTotal), storageStr.length() == 0 ? "Empty" : storageStr.toString(), false);
-			eb.addField("Inventory | " + simplifyNumber(invTotal), invStr.length() == 0 ? "Empty" : invStr.toString(), false);
-			eb.addField("Armor | " + simplifyNumber(invArmor), armorStr.length() == 0 ? "Empty" : armorStr.toString(), false);
-			eb.addField("Wardrobe | " + simplifyNumber(wardrobeTotal), wardrobeStr.length() == 0 ? "Empty" : wardrobeStr.toString(), false);
-			eb.addField("Pets | " + simplifyNumber(petsTotal), petsStr.length() == 0 ? "Empty" : petsStr.toString(), false);
-			eb.addField(
-				"Accessories | " + simplifyNumber(talismanTotal),
-				talismanStr.length() == 0 ? "Empty" : talismanStr.toString(),
-				false
-			);
-			eb.addField(
-				"Personal Vault | " + simplifyNumber(personalVaultTotal),
-				personVaultStr.length() == 0 ? "Empty" : personVaultStr.toString(),
-				false
-			);
-			eb.addField("Bug in the price calculation?", "[Please submit a bug report here!](https://forms.gle/RBmN2AFBLafGyx5E7)", false);
+			if (!echestStr.isEmpty()) {
+				eb.addField(
+						"Ender Chest | " + simplifyNumber(enderChestTotal),
+						echestStr.length() == 0 ? "Empty" : echestStr.toString(),
+						false
+				);
+			}
+			if (!echestStr.isEmpty()) {
+				eb.addField("Storage | " + simplifyNumber(storageTotal), storageStr.toString(), false);
+			}
+			if (!invStr.isEmpty()) {
+				eb.addField("Inventory | " + simplifyNumber(invTotal), invStr.toString(), false);
+			}
+			if (!armorStr.isEmpty()) {
+				eb.addField("Armor | " + simplifyNumber(invArmor), armorStr.toString(), false);
+			}
+			if (!wardrobeStr.isEmpty()) {
+				eb.addField("Wardrobe | " + simplifyNumber(wardrobeTotal), wardrobeStr.toString(), false);
+			}
+			if (!petsStr.isEmpty()) {
+				eb.addField("Pets | " + simplifyNumber(petsTotal), petsStr.toString(), false);
+			}
+			if (!talismanStr.isEmpty()) {
+				eb.addField(
+						"Accessories | " + simplifyNumber(talismanTotal),
+						talismanStr.toString(),
+						false
+				);
+			}
+			if (!personalVaultStr.isEmpty()) {
+				eb.addField(
+						"Personal Vault | " + simplifyNumber(personalVaultTotal),
+						personalVaultStr.toString(),
+						false
+				);
+			}
+			eb.addField("Bug in the calculations?", "[Please submit a bug report here!](https://forms.gle/RBmN2AFBLafGyx5E7)", false);
 
 			if (verbose) {
 				try {
@@ -402,7 +410,7 @@ public class NetworthExecute {
 			}
 
 			JsonArray missing = collectJsonArray(
-				tempSet.stream().filter(str -> !str.toLowerCase().startsWith("rune_")).map(JsonPrimitive::new)
+					tempSet.stream().filter(str -> !str.toLowerCase().startsWith("rune_")).map(JsonPrimitive::new)
 			);
 			if (!missing.isEmpty()) {
 				System.out.println(missing);
@@ -915,10 +923,11 @@ public class NetworthExecute {
 	}
 
 	private String addItemStr(InvItem item, double itemPrice) {
-		String formattedStr =
+		String emoji = higherDepth(getEmojiMap(), item.getFormattedId(), null);
+		String formattedStr =  (emoji == null ? "" : emoji + " ") +
 			(item.getCount() != 1 ? item.getCount() + "x " : "") +
 			(item.getId().equals("PET") ? capitalizeString(item.getPetRarity()) + " " : "") +
-			item.getName();
+			item.getNameFormatted();
 
 		if (item.getPetItem() != null) {
 			JsonElement petItemEmoji = getEmojiMap().get(item.getPetItem());
@@ -927,7 +936,7 @@ public class NetworthExecute {
 			}
 		}
 
-		formattedStr += (item.isRecombobulated() ? " <a:recombobulator_3000:939014985051418654>" : "") + "@split@" + itemPrice;
+		formattedStr += (item.isRecombobulated() ? " <a:recombobulator_3000:939014985051418654>" : "") + "=:=" + itemPrice;
 
 		return formattedStr;
 	}

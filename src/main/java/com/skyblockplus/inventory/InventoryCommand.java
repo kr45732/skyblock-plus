@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 public class InventoryCommand extends Command {
 
@@ -82,15 +83,24 @@ public class InventoryCommand extends Command {
 		return player.getFailEmbed();
 	}
 
-	public static String[] getPlayerInventory(String username, String profileName) {
+	public static EmbedBuilder getPlayerInventory(String username, String profileName, PaginatorEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
-			String[] temp = player.getInventory();
-			if (temp != null) {
-				return new String[] { temp[0], temp[1], player.invMissing };
+			String[] playerInventory = player.getInventory();
+			if (playerInventory != null) {
+				if (player.invMissing.length() > 0) {
+					event
+							.getChannel()
+							.sendMessageEmbeds(defaultEmbed("Missing emojis").setDescription(player.invMissing).build())
+							.queue();
+				}
+				event.getChannel().sendMessage(playerInventory[0]).complete();
+				event.getChannel().sendMessage(playerInventory[1]).setActionRow(Button.link(player.skyblockStatsLink(),"Inventory of " + player.getUsername())).queue();
+				return null;
 			}
+			return invalidEmbed(player.getUsername() + "'s inventory API is disabled");
 		}
-		return null;
+		return player.getFailEmbed();
 	}
 
 	@Override
@@ -122,20 +132,7 @@ public class InventoryCommand extends Command {
 						return;
 					}
 
-					String[] playerInventory = getPlayerInventory(player, args.length == 3 ? args[2] : null);
-					if (playerInventory != null) {
-						ebMessage.delete().queue();
-						ebMessage.getChannel().sendMessage(playerInventory[0]).complete();
-						ebMessage.getChannel().sendMessage(playerInventory[1]).queue();
-						if (playerInventory[2].length() > 0) {
-							ebMessage
-								.getChannel()
-								.sendMessageEmbeds(defaultEmbed("Missing emojis").setDescription(playerInventory[2]).build())
-								.queue();
-						}
-					} else {
-						embed(invalidEmbed("Inventory API disabled"));
-					}
+					paginate(getPlayerInventory(player, args.length == 3 ? args[2] : null, new PaginatorEvent(event)));
 					return;
 				}
 

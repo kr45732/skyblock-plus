@@ -182,6 +182,10 @@ public abstract class CommandExecute extends CommandEvent {
 	}
 
 	protected int getIntOption(String match) {
+		return getIntOption(match, -1);
+	}
+
+	protected int getIntOption(String match, int defaultValue) {
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].startsWith(match + ":")) {
 				int arg = Integer.parseInt(args[i].split(match + ":")[1]);
@@ -190,7 +194,7 @@ public abstract class CommandExecute extends CommandEvent {
 			}
 		}
 
-		return -1;
+		return defaultValue;
 	}
 
 	public CommandExecute setAdminCommand(boolean adminCommand) {

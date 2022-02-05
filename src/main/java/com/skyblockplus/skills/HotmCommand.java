@@ -59,7 +59,7 @@ public class HotmCommand extends Command {
 				higherDepth(miningJson, "tokens", 0) +
 				" (**Spent:** " +
 				higherDepth(miningJson, "tokens_spent", 0) +
-				")\n• **Mithril Powder:** " +
+				")\n **Mithril Powder:** " +
 				formatNumber(higherDepth(miningJson, "powder_mithril", 0)) +
 				" (**Spent:** " +
 				formatNumber(higherDepth(miningJson, "powder_spent_mithril", 0)) +

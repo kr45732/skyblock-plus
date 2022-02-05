@@ -47,6 +47,9 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
+
+import me.xdrop.fuzzywuzzy.FuzzySearch;
+import me.xdrop.fuzzywuzzy.model.ExtractedResult;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
@@ -1411,6 +1414,7 @@ public class SettingsExecute {
 		rolePageMap.put("networth", 29);
 		rolePageMap.put("gamemode", 30);
 		rolePageMap.put("maxed_collections", 31);
+		rolePageMap.put("player_items", 31);
 
 		if (rolePageMap.containsKey(roleName)) {
 			return getRolesSettings(database.getRolesSettings(guild.getId()), rolePageMap.get(roleName));
@@ -1515,6 +1519,7 @@ public class SettingsExecute {
 				case "accessory_count" -> ebFieldString.append(
 					"**A player's dungeon unique accessory count**\nExample: `/settings roles add accessory_count 75 @accessory collector`\n"
 				);
+				case "player_items" -> ebFieldString.append("**Items that a player has**\nExample: `/settings roles add player_items hyperion @mage gamer`\n");
 				case "networth" -> ebFieldString.append(
 					"**A player's networth**\nExample: `/settings roles add networth 1000000000 @billionaire`\n"
 				);
@@ -1765,6 +1770,13 @@ public class SettingsExecute {
 			if (!roleValue.equals("ironman") && !roleValue.equals("stranded")) {
 				return invalidEmbed("Mode must be ironman or stranded");
 			}
+		} else if(roleName.equals("player_items")){
+			roleValue = roleValue.replace("_", " ");
+			String itemId = nameToId(roleValue, true);
+			if(itemId == null){
+				return invalidEmbed("No item with the name `" + roleValue + "` exists. Perhaps you meant any of the following: " + FuzzySearch.extractTop(roleValue, getInternalJsonMappings().entrySet().stream().map(e -> higherDepth(e.getValue(), "name", "")).collect(Collectors.toList()), 5).stream().map(e -> e.getString().replace(" ", "_")).collect(Collectors.joining(", ")));
+			}
+			roleValue = itemId;
 		} else {
 			try {
 				Long.parseLong(roleValue);
@@ -1809,7 +1821,7 @@ public class SettingsExecute {
 
 		if (roleName.equals("guild_member")) {
 			roleValue = guildName;
-		} else if (!roleName.equals("gamemode")) {
+		} else if (!roleName.equals("gamemode") && !roleName.equals("player_items")) {
 			currentLevels =
 				collectJsonArray(streamJsonArray(currentLevels).sorted(Comparator.comparingLong(o -> higherDepth(o, "value").getAsLong())));
 		}

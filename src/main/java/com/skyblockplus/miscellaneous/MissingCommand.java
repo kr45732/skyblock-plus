@@ -98,28 +98,32 @@ public class MissingCommand extends Command {
 				Comparator.comparingDouble(o1 -> higherDepth(lowestBinJson, o1) != null ? higherDepth(lowestBinJson, o1).getAsDouble() : 0)
 			);
 
-			PaginatorExtras extras = new PaginatorExtras()
-				.setEveryPageText(
-					"Missing " +
-					missingInternalArr.size() +
-					" talisman" +
-					(missingInternalArr.size() > 1 ? "s" : "") +
-					". Sorted by price. Talismans with a * have higher tiers.\n\n"
-				);
 
 			JsonObject mappings = getInternalJsonMappings();
-			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(40);
+			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(25);
+			double totalCost = 0;
 			for (String curId : missingInternalArr) {
+				double cost = higherDepth(lowestBinJson, curId, 0.0);
+				totalCost += cost;
 				String wikiLink = higherDepth(mappings, curId + ".wiki", null);
 				String name = idToName(curId);
 				paginateBuilder.addItems(
-					"• " +
+						getEmojiMap().get(curId).getAsString() + " " +
 					(wikiLink == null ? name : "[" + name + "](" + wikiLink + ")") +
 					(higherDepth(talismanUpgrades, curId) != null ? "**\\***" : "") +
 					" ➜ " +
-					roundAndFormat(higherDepth(lowestBinJson, curId, 0.0))
+					roundAndFormat(cost)
 				);
 			}
+			PaginatorExtras extras = new PaginatorExtras()
+					.setEveryPageText(
+							"**Total missing:** " +
+									missingInternalArr.size() +
+									"\n**Total cost:** " + simplifyNumber(totalCost) + "\nNote: Talismans with a * have higher tiers\n"
+					).setEveryPageTitle(player.getUsername())
+					.setEveryPageThumbnail(player.getThumbnailUrl())
+					.setEveryPageTitleUrl(player.skyblockStatsLink());
+
 			event.paginate(paginateBuilder.setPaginatorExtras(extras));
 			return null;
 		}

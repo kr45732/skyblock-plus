@@ -41,40 +41,35 @@ public class EssenceCommand extends Command {
 	public static EmbedBuilder getEssenceInformation(String itemName) {
 		JsonElement essenceCostsJson = getEssenceCostsJson();
 
-		String preFormattedItem = itemName.replace("'s", "").replace(" ", "_").toUpperCase();
-		preFormattedItem = nameToId(preFormattedItem);
+		String itemId = nameToId(itemName);
 
-		if (higherDepth(essenceCostsJson, preFormattedItem) == null) {
-			String closestMatch = getClosestMatchFromIds(preFormattedItem, ESSENCE_ITEM_NAMES);
-			preFormattedItem = closestMatch != null ? closestMatch : preFormattedItem;
+		if (higherDepth(essenceCostsJson, itemId) == null) {
+			String closestMatch = getClosestMatchFromIds(itemId, ESSENCE_ITEM_NAMES);
+			itemId = closestMatch != null ? closestMatch : itemId;
 		}
 
-		JsonElement itemJson = higherDepth(essenceCostsJson, preFormattedItem);
+		JsonElement itemJson = higherDepth(essenceCostsJson, itemId);
 
-		EmbedBuilder eb = defaultEmbed("Essence information for " + itemName);
+		EmbedBuilder eb = defaultEmbed(idToName(itemId));
 		if (itemJson != null) {
 			String essenceType = higherDepth(itemJson, "type").getAsString().toLowerCase();
 			for (String level : getJsonKeys(itemJson)) {
 				switch (level) {
-					case "type" -> eb.setDescription("**Essence Type:** " + capitalizeString(essenceType) + " essence");
-					case "dungeonize" -> eb.addField(
-						"Dungeonize item",
-						higherDepth(itemJson, level).getAsString() + " " + essenceType + " essence",
-						false
+					case "type" -> eb.setDescription("**Essence Type:** " + essenceType);
+					case "dungeonize" -> eb.appendDescription(
+						"\n➜ **Dungeonize:** " + higherDepth(itemJson, level).getAsString()+ " " + ESSENCE_EMOJI_MAP.get(essenceType)
 					);
-					case "1" -> eb.addField(
-						level + " star",
-						higherDepth(itemJson, level).getAsString() + " " + essenceType + " essence",
-						false
+					case "1" -> eb.appendDescription( "\n➜ **" +
+						level + " Star:** " +
+							higherDepth(itemJson, level).getAsString() + " " + ESSENCE_EMOJI_MAP.get(essenceType)
 					);
-					default -> eb.addField(
-						level + " stars",
-						higherDepth(itemJson, level).getAsString() + " " + essenceType + " essence",
-						false
+					default -> eb.appendDescription("\n➜ **" +
+						level + " Stars:** " +
+							higherDepth(itemJson, level).getAsString() + " " + ESSENCE_EMOJI_MAP.get(essenceType)
 					);
 				}
 			}
-			eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + preFormattedItem);
+			eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId);
 			return eb;
 		}
 		return defaultEmbed("Invalid item name");

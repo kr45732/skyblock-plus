@@ -32,10 +32,10 @@ import com.skyblockplus.utils.structs.PaginatorExtras;
 import java.time.Instant;
 import net.dv8tion.jda.api.EmbedBuilder;
 
-public class BankCommand extends Command {
+public class CoinsCommand extends Command {
 
-	public BankCommand() {
-		this.name = "bank";
+	public CoinsCommand() {
+		this.name = "coins";
 		this.cooldown = globalCooldown;
 		this.botPermissions = defaultPerms();
 	}
@@ -49,11 +49,11 @@ public class BankCommand extends Command {
 			EmbedBuilder eb = player.defaultPlayerEmbed();
 			eb.setDescription("**Total coins:** " + simplifyNumber(playerBankBalance + playerPurseCoins));
 			eb.addField(
-				"Bank balance",
+				"<:piggy_bank:939014681434161152> Bank balance",
 				playerBankBalance == -1 ? "Banking API disabled" : simplifyNumber(playerBankBalance) + " coins",
 				false
 			);
-			eb.addField("Purse coins", simplifyNumber(playerPurseCoins) + " coins", false);
+			eb.addField("<:enchanted_gold:939021206470926336> Purse coins", simplifyNumber(playerPurseCoins) + " coins", false);
 			return eb;
 		}
 		return player.getFailEmbed();

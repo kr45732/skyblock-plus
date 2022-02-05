@@ -48,19 +48,20 @@ public class SkyblockCommand extends Command {
 			CustomPaginator.Builder paginator = defaultPaginator(event.getUser());
 			PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
 			Weight weight = new Weight(player, true);
+			com.skyblockplus.miscellaneous.weight.lily.Weight lilyWeight =  new com.skyblockplus.miscellaneous.weight.lily.Weight(player, true);
 
 			EmbedBuilder eb = player.defaultPlayerEmbed();
-			eb.addField("Skill average", roundAndFormat(player.getSkillAverage()), true);
-			eb.addField("Total slayer XP", formatNumber(player.getTotalSlayer()), true);
-			eb.addField("Catacombs", roundAndFormat(player.getCatacombs().getProgressLevel()), true);
-			eb.addField("Weight", weight.getTotalWeight().getFormatted(), true);
-			eb.addField("Skill weight", weight.getSkillsWeight().getWeightStruct().getFormatted(), true);
-			eb.addField("Slayer weight", weight.getSlayerWeight().getWeightStruct().getFormatted(), true);
-			eb.addField("Dungeons weight", weight.getDungeonsWeight().getWeightStruct().getFormatted(), true);
+			eb.addField("<:oak_sapling:939021996262580254> Skill Average", roundAndFormat(player.getSkillAverage()), true);
+			eb.addField("<a:overflux_capacitor:939017397271162952> Total Slayer XP", formatNumber(player.getTotalSlayer()), true);
+			eb.addField(DUNGEON_EMOJI_MAP.get("catacombs") + " Catacombs", roundAndFormat(player.getCatacombs().getProgressLevel()), true);
+			eb.addField("<:training_weights:939010790755827762> Senither Weight", weight.getTotalWeight().getFormatted(), true);
+			eb.addField("\uD83C\uDFC5 Senither Stage", weight.getStage(), true);
+			eb.addField("<:training_weights:939010790755827762> Lily weight", lilyWeight.getTotalWeight().getFormatted(), true);
+			eb.addField("\uD83C\uDFC5 Lily Stage", lilyWeight.getStage(), true);
 			double playerNetworth = player.getNetworth();
-			eb.addField("Networth", playerNetworth == -1 ? "Inventory API disabled" : roundAndFormat(playerNetworth), true);
+			eb.addField("<:enchanted_gold:939021206470926336> Networth", playerNetworth == -1 ? "Inventory API disabled" : roundAndFormat(playerNetworth), true);
 			eb.addField(
-				"Bank & purse coins",
+				"<:piggy_bank:939014681434161152> Bank & purse coins",
 				(player.getBankBalance() == -1 ? "API disabled" : simplifyNumber(player.getBankBalance())) +
 				" + " +
 				simplifyNumber(player.getPurseCoins()),
