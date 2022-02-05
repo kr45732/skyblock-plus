@@ -16,9 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.skills;
+package com.skyblockplus.miscellaneous;
 
-import com.skyblockplus.utils.command.PaginatorEvent;
+import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
@@ -26,35 +26,35 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-public class SkillsSlashCommand extends SlashCommand {
+import java.util.stream.Collectors;
 
-	public SkillsSlashCommand() {
-		this.name = "skills";
+import static com.skyblockplus.utils.Utils.getLowestBinJson;
+
+public class RecipeSlashCommand extends SlashCommand {
+
+	public RecipeSlashCommand() {
+		this.name = "recipe";
 	}
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		if (event.invalidPlayerOption()) {
-			return;
-		}
-
-		event.paginate(SkillsCommand.getPlayerSkill(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
+		event.embed(RecipeCommand.getRecipe(event.getOptionStr("item")));
 	}
 
 	@Override
 	public CommandData getCommandData() {
-		return Commands
-			.slash(name, "Get the skills data of a player")
-			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOption(OptionType.STRING, "profile", "Profile name");
+		return Commands.slash(name, "Get the recipe of an item").addOption(OptionType.STRING, "item", "Item name", true, true);
 	}
 
 	@Override
 	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("player")) {
-			event.replyClosestPlayer();
+		if (event.getFocusedOption().getName().equals("item")) {
+			event.replyClosestMatch(
+					event.getFocusedOption().getValue(),
+					getLowestBinJson().keySet().stream().map(Utils::idToName).distinct().collect(Collectors.toList())
+			);
 		}
 	}
 }

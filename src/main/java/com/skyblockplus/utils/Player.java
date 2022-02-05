@@ -30,6 +30,8 @@ import com.skyblockplus.miscellaneous.weight.senither.Weight;
 import com.skyblockplus.utils.structs.*;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
+
 import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
 import me.nullicorn.nedit.type.NBTList;
@@ -785,6 +787,55 @@ public class Player {
 				}
 			}
 			return enderChestPages;
+		} catch (Exception ignored) {}
+		return null;
+	}
+
+	public List<String[]> getStorage() {
+		try {
+			List<String[]> out = new ArrayList<>();
+			for (JsonElement page : higherDepth(profileJson(), "backpack_contents").getAsJsonObject().entrySet().stream().sorted(Comparator.comparingInt(e -> Integer.parseInt(e.getKey()))).map(e -> e.getValue()).collect(Collectors.toList())) {
+				NBTCompound decodedInventoryContents = NBTReader.readBase64(higherDepth(page, "data").getAsString());
+
+				NBTList invFrames = decodedInventoryContents.getList("i");
+				Map<Integer, String> invFramesMap = new TreeMap<>();
+				for (int i = 0; i < invFrames.size(); i++) {
+					NBTCompound displayName = invFrames.getCompound(i).getCompound("tag.ExtraAttributes");
+					if (displayName != null) {
+						invFramesMap.put(i + 1, displayName.getString("id", "empty").toLowerCase());
+					} else {
+						invFramesMap.put(i + 1, "empty");
+					}
+				}
+				if(invFrames.size() < 27){
+					int curSize = invFrames.size();
+					for(int i=0; i< 27 - curSize	; i++){
+						invFramesMap.put(i + 1 + curSize, "blank");
+					}
+				}
+
+				StringBuilder outputStringPart1 = new StringBuilder();
+				StringBuilder outputStringPart2 = new StringBuilder();
+				StringBuilder curNine = new StringBuilder();
+				for (Map.Entry<Integer, String> i : invFramesMap.entrySet()) {
+					if (i.getKey() <= 18) {
+						curNine.append(itemToEmoji(i.getValue()));
+						if (i.getKey() % 9 == 0) {
+							outputStringPart1.append(curNine + "\n");
+							curNine = new StringBuilder();
+						}
+					} else {
+						curNine.append(itemToEmoji(i.getValue()));
+						if (i.getKey() % 9 == 0) {
+							outputStringPart2.append(curNine).append("\n");
+							curNine = new StringBuilder();
+						}
+					}
+				}
+
+				out.add( new String[] { outputStringPart1.toString(), outputStringPart2.toString() });
+			}
+			return out;
 		} catch (Exception ignored) {}
 		return null;
 	}

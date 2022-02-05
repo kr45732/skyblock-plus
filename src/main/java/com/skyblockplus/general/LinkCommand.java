@@ -45,7 +45,7 @@ public class LinkCommand extends Command {
 
 	public LinkCommand() {
 		this.name = "link";
-		this.cooldown = globalCooldown;
+		this.cooldown = globalCooldown + 2;
 		this.aliases = new String[] { "verify" };
 		this.botPermissions = defaultPerms();
 	}

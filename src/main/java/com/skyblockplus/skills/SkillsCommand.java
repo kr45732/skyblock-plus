@@ -18,15 +18,22 @@
 
 package com.skyblockplus.skills;
 
-import static com.skyblockplus.utils.Constants.*;
-import static com.skyblockplus.utils.Utils.*;
-
+import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
+import com.skyblockplus.utils.command.CustomPaginator;
+import com.skyblockplus.utils.command.PaginatorEvent;
+import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.SkillsStruct;
 import net.dv8tion.jda.api.EmbedBuilder;
+
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.Utils.*;
 
 public class SkillsCommand extends Command {
 
@@ -37,27 +44,29 @@ public class SkillsCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	public static EmbedBuilder getPlayerSkill(String username, String profileName) {
+	public static EmbedBuilder getPlayerSkill(String username, String profileName, PaginatorEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 
 		if (player.isValid()) {
+			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(1);
+			PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
+
+			EmbedBuilder eb = player.defaultPlayerEmbed();
 			double trueSA = 0;
 			double progressSA = 0;
-			EmbedBuilder eb = player.defaultPlayerEmbed();
-
 			for (String skillName : ALL_SKILL_NAMES) {
 				SkillsStruct skillInfo = player.getSkill(skillName);
 				if (skillInfo != null) {
 					eb.addField(
-						SKILLS_EMOJI_MAP.get(skillName) + " " + capitalizeString(skillInfo.name()) + " (" + skillInfo.currentLevel() + ")",
-						simplifyNumber(skillInfo.expCurrent()) +
-						" / " +
-						simplifyNumber(skillInfo.expForNext()) +
-						"\nTotal XP: " +
-						simplifyNumber(skillInfo.totalExp()) +
-						"\nProgress: " +
-						(skillInfo.isMaxed() ? "MAX" : roundProgress(skillInfo.progressToNext())),
-						true
+							SKILLS_EMOJI_MAP.get(skillName) + " " + capitalizeString(skillInfo.name()) + " (" + skillInfo.currentLevel() + ")",
+							simplifyNumber(skillInfo.expCurrent()) +
+									" / " +
+									simplifyNumber(skillInfo.expForNext()) +
+									"\nTotal XP: " +
+									simplifyNumber(skillInfo.totalExp()) +
+									"\nProgress: " +
+									(skillInfo.isMaxed() ? "MAX" : roundProgress(skillInfo.progressToNext())),
+							true
 					);
 					if (!COSMETIC_SKILL_NAMES.contains(skillName)) {
 						trueSA += skillInfo.currentLevel();
@@ -70,7 +79,48 @@ public class SkillsCommand extends Command {
 			trueSA /= SKILL_NAMES.size();
 			progressSA /= SKILL_NAMES.size();
 			eb.setDescription("True skill average: " + roundAndFormat(trueSA) + "\nProgress skill average: " + roundAndFormat(progressSA));
-			return eb;
+			extras.addEmbedPage(eb);
+
+			eb = player.defaultPlayerEmbed();
+			JsonElement jacobStats = higherDepth(player.profileJson(), "jacob2");
+			int bronze = higherDepth(jacobStats, "medals_inv.bronze", 0);
+			int silver = higherDepth(jacobStats, "medals_inv.silver", 0);
+			int gold = higherDepth(jacobStats, "medals_inv.gold", 0);
+			eb.addField("Medals | " + (bronze + silver + gold),
+					"\uD83E\uDD49 Bronze: " + bronze +
+							"\n\uD83E\uDD48 Silver: " + silver +
+							"\n\uD83E\uDD47 Gold: " + gold, false
+			);
+			if (higherDepth(jacobStats, "unique_golds2") != null && !higherDepth(jacobStats, "unique_golds2").getAsJsonArray().isEmpty()) {
+				eb.addField("Unique Golds | " + higherDepth(jacobStats, "unique_golds2").getAsJsonArray().size(),
+						streamJsonArray(higherDepth(jacobStats, "unique_golds2").getAsJsonArray())
+								.map(i -> getEmojiMap().get(i.getAsString().equals("MUSHROOM_COLLECTION") ? "RED_MUSHROOM" : i.getAsString()).getAsString() + " " + idToName(i.getAsString()))
+								.collect(Collectors.joining("\n ")), false
+				);
+			} else {
+				eb.addField("Unique Golds", "None", false);
+			}
+			if (higherDepth(jacobStats, "perks") != null && higherDepth(jacobStats, "perks").getAsJsonObject().size() > 0) {
+				StringBuilder ebStr = new StringBuilder();
+				for (Map.Entry<String, JsonElement> perk : higherDepth(jacobStats, "perks").getAsJsonObject().entrySet()) {
+					ebStr.append("\n⭐ ").append(capitalizeString(perk.getKey().replace("_", " "))).append(": ").append(perk.getValue().getAsInt());
+				}
+				eb.addField("Perks", ebStr.toString(), false);
+			} else {
+				eb.addField("Perks", "None", false);
+			}
+			Map<String, Long> contests = higherDepth(jacobStats, "contests").getAsJsonObject().keySet().stream()
+					.map(s -> s.endsWith("INK_SACK:3") ? "INK_SACK:3" : s.substring(s.lastIndexOf(":") + 1)).collect(Collectors.groupingBy(c -> c, Collectors.counting()));
+			StringBuilder ebStr = new StringBuilder();
+			for (Map.Entry<String, Long> entry : contests.entrySet()) {
+				ebStr.append("\n").append(getEmojiMap().get(entry.getKey().equals("MUSHROOM_COLLECTION") ? "RED_MUSHROOM" : entry.getKey()).getAsString()).append(" ").append(idToName(entry.getKey())).append(" - ").append(entry.getValue());
+			}
+			eb.addField("Participated Contests | " + higherDepth(jacobStats, "contests").getAsJsonObject().size(), ebStr.toString(), false);
+
+			extras.addEmbedPage(eb);
+
+			event.paginate(paginateBuilder.setPaginatorExtras(extras));
+			return null;
 		}
 		return player.getFailEmbed();
 	}
@@ -87,7 +137,7 @@ public class SkillsCommand extends Command {
 						return;
 					}
 
-					embed(getPlayerSkill(player, args.length == 3 ? args[2] : null));
+					paginate(getPlayerSkill(player, args.length == 3 ? args[2] : null, new PaginatorEvent(event)));
 					return;
 				}
 

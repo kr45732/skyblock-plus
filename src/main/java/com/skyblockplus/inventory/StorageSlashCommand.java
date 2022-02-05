@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.skills;
+package com.skyblockplus.inventory;
 
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
@@ -26,10 +26,10 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-public class SkillsSlashCommand extends SlashCommand {
+public class StorageSlashCommand extends SlashCommand {
 
-	public SkillsSlashCommand() {
-		this.name = "skills";
+	public StorageSlashCommand() {
+		this.name = "storage";
 	}
 
 	@Override
@@ -40,13 +40,13 @@ public class SkillsSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.paginate(SkillsCommand.getPlayerSkill(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
+		event.paginate(StorageCommand.getPlayerStorage(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
 	}
 
 	@Override
 	public CommandData getCommandData() {
 		return Commands
-			.slash(name, "Get the skills data of a player")
+			.slash(name, "Get a player's storage represented in emojis")
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 			.addOption(OptionType.STRING, "profile", "Profile name");
 	}

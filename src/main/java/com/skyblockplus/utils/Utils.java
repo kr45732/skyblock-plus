@@ -53,6 +53,7 @@ import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -966,7 +967,12 @@ public class Utils {
 		}
 	}
 
-	public static String getClosestMatchFromIds(String toMatch, List<String> matchFrom) {
+
+	/**
+	 * @param toMatch name to match
+	 * @param matchFrom list of ID (will convert to their names)
+	 */
+	public static String getClosestMatchFromIds(String toMatch, Collection<String> matchFrom) {
 		if (matchFrom == null || matchFrom.isEmpty()) {
 			return toMatch;
 		}

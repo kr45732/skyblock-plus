@@ -84,7 +84,7 @@ public class VerifyGuild {
 				!event.getMessage().getContentRaw().startsWith(guildPrefix + "link ") ||
 				!event.getMessage().getContentRaw().startsWith(guildPrefix + "verify ")
 			) {
-				event.getMessage().delete().queue();
+				event.getMessage().delete().queue(ignore, ignore);
 				return true;
 			}
 		}

@@ -960,7 +960,7 @@ public class AutomaticGuild {
 
 				JsonObject toAdd = new JsonObject();
 				toAdd.addProperty("name", itemName);
-				if (itemId.contains("GENERATOR")) {
+				if (higherDepth(itemJson, "recipe") != null) {
 					toAdd.add("recipe", higherDepth(itemJson, "recipe"));
 				}
 				toAdd.add("wiki", higherDepth(itemJson, "infoType", "").equals("WIKI_URL") ? higherDepth(itemJson, "info.[0]") : null);
