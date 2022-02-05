@@ -50,27 +50,28 @@ public class PetsCommand extends Command {
 				String petItem = null;
 				try {
 					petItem = higherDepth(pet, "heldItem").getAsString();
-				} catch (Exception ignored) {
-				}
+				} catch (Exception ignored) {}
 
 				String petName = higherDepth(pet, "type").getAsString();
 				String rarity = higherDepth(pet, "tier").getAsString();
 
-				paginateBuilder.addItems(getEmojiMap().get(petName + RARITY_TO_NUMBER_MAP.get(rarity)).getAsString() + " " +
-								capitalizeString(rarity) + " [Lvl " + petLevelFromXp(
-								higherDepth(pet, "exp", 0L),
-								rarity,
-								petName
-						) +
-								"] " + capitalizeString(petName.toLowerCase().replace("_", " "))
-								+ " " + (petItem != null ? getEmojiMap().get(petItem).getAsString() : "")
+				paginateBuilder.addItems(
+					getEmojiMap().get(petName + RARITY_TO_NUMBER_MAP.get(rarity)).getAsString() +
+					" " +
+					capitalizeString(rarity) +
+					" [Lvl " +
+					petLevelFromXp(higherDepth(pet, "exp", 0L), rarity, petName) +
+					"] " +
+					capitalizeString(petName.toLowerCase().replace("_", " ")) +
+					" " +
+					(petItem != null ? getEmojiMap().get(petItem).getAsString() : "")
 				);
 			}
 			paginateBuilder.setPaginatorExtras(
-					new PaginatorExtras()
-							.setEveryPageTitle(player.getUsername())
-							.setEveryPageThumbnail(player.getThumbnailUrl())
-							.setEveryPageTitleUrl(player.skyblockStatsLink())
+				new PaginatorExtras()
+					.setEveryPageTitle(player.getUsername())
+					.setEveryPageThumbnail(player.getThumbnailUrl())
+					.setEveryPageTitleUrl(player.skyblockStatsLink())
 			);
 			event.paginate(paginateBuilder);
 			return null;

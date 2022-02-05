@@ -83,7 +83,7 @@ public class LeaderboardSlashCommand extends SlashCommand {
 					.addChoice("All", "all")
 					.addChoice("Ironman", "ironman")
 					.addChoice("Stranded", "stranded"),
-					new OptionData(OptionType.INTEGER, "page", "Page number").setMinValue(0)
+				new OptionData(OptionType.INTEGER, "page", "Page number").setMinValue(0)
 			);
 	}
 

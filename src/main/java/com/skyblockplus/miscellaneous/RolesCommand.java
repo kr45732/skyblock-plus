@@ -42,7 +42,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -402,10 +401,12 @@ public class RolesCommand extends Command {
 					}
 					case "player_items" -> {
 						JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
-						List<String> items = streamJsonArray(levelsArray).map(item -> higherDepth(item, "value").getAsString()).collect(Collectors.toList());
-						Set<String> itemsPlayerHas= player.getItemsPlayerHas(items);
+						List<String> items = streamJsonArray(levelsArray)
+							.map(item -> higherDepth(item, "value").getAsString())
+							.collect(Collectors.toList());
+						Set<String> itemsPlayerHas = player.getItemsPlayerHas(items);
 
-						if(itemsPlayerHas == null){
+						if (itemsPlayerHas == null) {
 							disabledAPI.append(roleChangeString("Inventory API disabled"));
 							continue;
 						}

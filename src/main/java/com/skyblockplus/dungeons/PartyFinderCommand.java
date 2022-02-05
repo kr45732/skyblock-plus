@@ -28,7 +28,6 @@ import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.command.CommandExecute;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 
 public class PartyFinderCommand extends Command {
@@ -51,7 +50,11 @@ public class PartyFinderCommand extends Command {
 			Set<String> necronBlade = player.getItemsPlayerHas(DUNGEON_META_ITEMS);
 			eb.appendDescription(
 				"\n**Meta Items player has:** " +
-				(necronBlade != null ? (necronBlade.size() > 0 ? necronBlade.stream().map(Utils::idToName).collect(Collectors.joining(", ")) : "None") : "Inventory API disabled")
+				(
+					necronBlade != null
+						? (necronBlade.size() > 0 ? necronBlade.stream().map(Utils::idToName).collect(Collectors.joining(", ")) : "None")
+						: "Inventory API disabled"
+				)
 			);
 			return eb;
 		}

@@ -47,12 +47,12 @@ public class InvItem {
 	private int dungeonFloor = 0;
 	private String nbtTag;
 
-	public String getFormattedId(){
-		if(id.equals("PET")){
+	public String getFormattedId() {
+		if (id.equals("PET")) {
 			return name.split("] ")[1].toUpperCase().replace(" ", "_") + RARITY_TO_NUMBER_MAP.get(getPetRarity());
-		}else if(id.equals("ENCHANTED_BOOK")){
+		} else if (id.equals("ENCHANTED_BOOK")) {
 			return enchantsFormatted.isEmpty() ? id : enchantsFormatted.get(0).toUpperCase();
-		}else{
+		} else {
 			return id;
 		}
 	}

@@ -127,10 +127,7 @@ public class TalismanBagCommand extends Command {
 			List<String[]> talismanBag = player.getTalismanBag();
 			if (talismanBag != null) {
 				if (player.invMissing.length() > 0) {
-					event
-							.getChannel()
-							.sendMessageEmbeds(defaultEmbed("Missing emojis").setDescription(player.invMissing).build())
-							.queue();
+					event.getChannel().sendMessageEmbeds(defaultEmbed("Missing emojis").setDescription(player.invMissing).build()).queue();
 				}
 
 				new InventoryPaginator(talismanBag, "Talisman Bag", player, event);

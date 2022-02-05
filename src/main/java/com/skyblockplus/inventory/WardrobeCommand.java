@@ -111,10 +111,7 @@ public class WardrobeCommand extends Command {
 			List<String[]> wardrobe = player.getWardrobe();
 			if (wardrobe != null) {
 				if (player.invMissing.length() > 0) {
-					event
-							.getChannel()
-							.sendMessageEmbeds(defaultEmbed("Missing emojis").setDescription(player.invMissing).build())
-							.queue();
+					event.getChannel().sendMessageEmbeds(defaultEmbed("Missing emojis").setDescription(player.invMissing).build()).queue();
 				}
 
 				new InventoryPaginator(wardrobe, "Wardrobe", player, event);

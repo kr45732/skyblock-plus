@@ -290,8 +290,7 @@ public class HelpCommand extends Command {
 					.addSubcommands(
 						new HelpData("claim", "Claim your automatic Skyblock roles. You must be linked to the bot.", "claim <profile>")
 							.addExamples("claim", "claim Zucchini"),
-							new HelpData("list", "List all enabled claimable roles for this server.")
-
+						new HelpData("list", "List all enabled claimable roles for this server.")
 					)
 					.setCategory("miscellaneous"),
 				new HelpData("coins", "Get a player's bank and purse coins.", "bank [player] [profile]")

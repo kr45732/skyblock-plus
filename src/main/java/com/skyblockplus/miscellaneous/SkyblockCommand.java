@@ -48,7 +48,10 @@ public class SkyblockCommand extends Command {
 			CustomPaginator.Builder paginator = defaultPaginator(event.getUser());
 			PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
 			Weight weight = new Weight(player, true);
-			com.skyblockplus.miscellaneous.weight.lily.Weight lilyWeight =  new com.skyblockplus.miscellaneous.weight.lily.Weight(player, true);
+			com.skyblockplus.miscellaneous.weight.lily.Weight lilyWeight = new com.skyblockplus.miscellaneous.weight.lily.Weight(
+				player,
+				true
+			);
 
 			EmbedBuilder eb = player.defaultPlayerEmbed();
 			eb.addField("<:oak_sapling:939021996262580254> Skill Average", roundAndFormat(player.getSkillAverage()), true);
@@ -59,7 +62,11 @@ public class SkyblockCommand extends Command {
 			eb.addField("<:training_weights:939010790755827762> Lily weight", lilyWeight.getTotalWeight().getFormatted(), true);
 			eb.addField("\uD83C\uDFC5 Lily Stage", lilyWeight.getStage(), true);
 			double playerNetworth = player.getNetworth();
-			eb.addField("<:enchanted_gold:939021206470926336> Networth", playerNetworth == -1 ? "Inventory API disabled" : roundAndFormat(playerNetworth), true);
+			eb.addField(
+				"<:enchanted_gold:939021206470926336> Networth",
+				playerNetworth == -1 ? "Inventory API disabled" : roundAndFormat(playerNetworth),
+				true
+			);
 			eb.addField(
 				"<:piggy_bank:939014681434161152> Bank & purse coins",
 				(player.getBankBalance() == -1 ? "API disabled" : simplifyNumber(player.getBankBalance())) +

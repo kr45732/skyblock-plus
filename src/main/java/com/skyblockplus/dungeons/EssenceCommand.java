@@ -57,15 +57,23 @@ public class EssenceCommand extends Command {
 				switch (level) {
 					case "type" -> eb.setDescription("**Essence Type:** " + essenceType);
 					case "dungeonize" -> eb.appendDescription(
-						"\n➜ **Dungeonize:** " + higherDepth(itemJson, level).getAsString()+ " " + ESSENCE_EMOJI_MAP.get(essenceType)
+						"\n➜ **Dungeonize:** " + higherDepth(itemJson, level).getAsString() + " " + ESSENCE_EMOJI_MAP.get(essenceType)
 					);
-					case "1" -> eb.appendDescription( "\n➜ **" +
-						level + " Star:** " +
-							higherDepth(itemJson, level).getAsString() + " " + ESSENCE_EMOJI_MAP.get(essenceType)
+					case "1" -> eb.appendDescription(
+						"\n➜ **" +
+						level +
+						" Star:** " +
+						higherDepth(itemJson, level).getAsString() +
+						" " +
+						ESSENCE_EMOJI_MAP.get(essenceType)
 					);
-					default -> eb.appendDescription("\n➜ **" +
-						level + " Stars:** " +
-							higherDepth(itemJson, level).getAsString() + " " + ESSENCE_EMOJI_MAP.get(essenceType)
+					default -> eb.appendDescription(
+						"\n➜ **" +
+						level +
+						" Stars:** " +
+						higherDepth(itemJson, level).getAsString() +
+						" " +
+						ESSENCE_EMOJI_MAP.get(essenceType)
 					);
 				}
 			}

@@ -247,10 +247,10 @@ public class NetworthExecute {
 			for (int i = 0; i < enderChestItems.size(); i++) {
 				String item = enderChestItems.get(i);
 				echestStr
-						.append(item.split("=:=")[0])
-						.append(" ➜ ")
-						.append(simplifyNumber(Double.parseDouble(item.split("=:=")[1])))
-						.append("\n");
+					.append(item.split("=:=")[0])
+					.append(" ➜ ")
+					.append(simplifyNumber(Double.parseDouble(item.split("=:=")[1])))
+					.append("\n");
 				if (i == 4) {
 					break;
 				}
@@ -261,10 +261,10 @@ public class NetworthExecute {
 			for (int i = 0; i < personalVaultItems.size(); i++) {
 				String item = personalVaultItems.get(i);
 				personalVaultStr
-						.append(item.split("=:=")[0])
-						.append(" ➜ ")
-						.append(simplifyNumber(Double.parseDouble(item.split("=:=")[1])))
-						.append("\n");
+					.append(item.split("=:=")[0])
+					.append(" ➜ ")
+					.append(simplifyNumber(Double.parseDouble(item.split("=:=")[1])))
+					.append("\n");
 				if (i == 4) {
 					break;
 				}
@@ -275,10 +275,10 @@ public class NetworthExecute {
 			for (int i = 0; i < storageItems.size(); i++) {
 				String item = storageItems.get(i);
 				storageStr
-						.append(item.split("=:=")[0])
-						.append(" ➜ ")
-						.append(simplifyNumber(Double.parseDouble(item.split("=:=")[1])))
-						.append("\n");
+					.append(item.split("=:=")[0])
+					.append(" ➜ ")
+					.append(simplifyNumber(Double.parseDouble(item.split("=:=")[1])))
+					.append("\n");
 				if (i == 4) {
 					break;
 				}
@@ -289,10 +289,10 @@ public class NetworthExecute {
 			for (int i = 0; i < invItems.size(); i++) {
 				String item = invItems.get(i);
 				invStr
-						.append(item.split("=:=")[0])
-						.append(" ➜ ")
-						.append(simplifyNumber(Double.parseDouble(item.split("=:=")[1])))
-						.append("\n");
+					.append(item.split("=:=")[0])
+					.append(" ➜ ")
+					.append(simplifyNumber(Double.parseDouble(item.split("=:=")[1])))
+					.append("\n");
 				if (i == 4) {
 					break;
 				}
@@ -303,10 +303,10 @@ public class NetworthExecute {
 			for (int i = 0; i < armorItems.size(); i++) {
 				String item = armorItems.get(i);
 				armorStr
-						.append(item.split("=:=")[0])
-						.append(" ➜ ")
-						.append(simplifyNumber(Double.parseDouble(item.split("=:=")[1])))
-						.append("\n");
+					.append(item.split("=:=")[0])
+					.append(" ➜ ")
+					.append(simplifyNumber(Double.parseDouble(item.split("=:=")[1])))
+					.append("\n");
 				if (i == 4) {
 					break;
 				}
@@ -317,10 +317,10 @@ public class NetworthExecute {
 			for (int i = 0; i < wardrobeItems.size(); i++) {
 				String item = wardrobeItems.get(i);
 				wardrobeStr
-						.append(item.split("=:=")[0])
-						.append(" ➜ ")
-						.append(simplifyNumber(Double.parseDouble(item.split("=:=")[1])))
-						.append("\n");
+					.append(item.split("=:=")[0])
+					.append(" ➜ ")
+					.append(simplifyNumber(Double.parseDouble(item.split("=:=")[1])))
+					.append("\n");
 				if (i == 4) {
 					break;
 				}
@@ -331,10 +331,10 @@ public class NetworthExecute {
 			for (int i = 0; i < petsItems.size(); i++) {
 				String item = petsItems.get(i);
 				petsStr
-						.append(item.split("=:=")[0])
-						.append(" ➜ ")
-						.append(simplifyNumber(Double.parseDouble(item.split("=:=")[1])))
-						.append("\n");
+					.append(item.split("=:=")[0])
+					.append(" ➜ ")
+					.append(simplifyNumber(Double.parseDouble(item.split("=:=")[1])))
+					.append("\n");
 				if (i == 4) {
 					break;
 				}
@@ -345,10 +345,10 @@ public class NetworthExecute {
 			for (int i = 0; i < talismanItems.size(); i++) {
 				String item = talismanItems.get(i);
 				talismanStr
-						.append(item.split("=:=")[0])
-						.append(" ➜ ")
-						.append(simplifyNumber(Double.parseDouble(item.split("=:=")[1])))
-						.append("\n");
+					.append(item.split("=:=")[0])
+					.append(" ➜ ")
+					.append(simplifyNumber(Double.parseDouble(item.split("=:=")[1])))
+					.append("\n");
 				if (i == 4) {
 					break;
 				}
@@ -362,9 +362,9 @@ public class NetworthExecute {
 			eb.addField("Sacks", simplifyNumber(sacksTotal), true);
 			if (!echestStr.isEmpty()) {
 				eb.addField(
-						"Ender Chest | " + simplifyNumber(enderChestTotal),
-						echestStr.length() == 0 ? "Empty" : echestStr.toString(),
-						false
+					"Ender Chest | " + simplifyNumber(enderChestTotal),
+					echestStr.length() == 0 ? "Empty" : echestStr.toString(),
+					false
 				);
 			}
 			if (!echestStr.isEmpty()) {
@@ -383,18 +383,10 @@ public class NetworthExecute {
 				eb.addField("Pets | " + simplifyNumber(petsTotal), petsStr.toString(), false);
 			}
 			if (!talismanStr.isEmpty()) {
-				eb.addField(
-						"Accessories | " + simplifyNumber(talismanTotal),
-						talismanStr.toString(),
-						false
-				);
+				eb.addField("Accessories | " + simplifyNumber(talismanTotal), talismanStr.toString(), false);
 			}
 			if (!personalVaultStr.isEmpty()) {
-				eb.addField(
-						"Personal Vault | " + simplifyNumber(personalVaultTotal),
-						personalVaultStr.toString(),
-						false
-				);
+				eb.addField("Personal Vault | " + simplifyNumber(personalVaultTotal), personalVaultStr.toString(), false);
 			}
 			eb.addField("Bug in the calculations?", "[Please submit a bug report here!](https://forms.gle/RBmN2AFBLafGyx5E7)", false);
 
@@ -410,7 +402,7 @@ public class NetworthExecute {
 			}
 
 			JsonArray missing = collectJsonArray(
-					tempSet.stream().filter(str -> !str.toLowerCase().startsWith("rune_")).map(JsonPrimitive::new)
+				tempSet.stream().filter(str -> !str.toLowerCase().startsWith("rune_")).map(JsonPrimitive::new)
 			);
 			if (!missing.isEmpty()) {
 				System.out.println(missing);
@@ -924,7 +916,8 @@ public class NetworthExecute {
 
 	private String addItemStr(InvItem item, double itemPrice) {
 		String emoji = higherDepth(getEmojiMap(), item.getFormattedId(), null);
-		String formattedStr =  (emoji == null ? "" : emoji + " ") +
+		String formattedStr =
+			(emoji == null ? "" : emoji + " ") +
 			(item.getCount() != 1 ? item.getCount() + "x " : "") +
 			(item.getId().equals("PET") ? capitalizeString(item.getPetRarity()) + " " : "") +
 			item.getNameFormatted();

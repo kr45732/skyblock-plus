@@ -25,9 +25,8 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.PaginatorEvent;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.util.List;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class EnderChestCommand extends Command {
 
@@ -66,10 +65,7 @@ public class EnderChestCommand extends Command {
 			List<String[]> enderChestPages = player.getEnderChest();
 			if (enderChestPages != null) {
 				if (player.invMissing.length() > 0) {
-					event
-							.getChannel()
-							.sendMessageEmbeds(defaultEmbed("Missing emojis").setDescription(player.invMissing).build())
-							.queue();
+					event.getChannel().sendMessageEmbeds(defaultEmbed("Missing emojis").setDescription(player.invMissing).build()).queue();
 				}
 
 				new InventoryPaginator(enderChestPages, "Ender Chest", player, event);

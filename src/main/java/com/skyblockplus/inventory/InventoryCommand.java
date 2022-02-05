@@ -89,13 +89,14 @@ public class InventoryCommand extends Command {
 			String[] playerInventory = player.getInventory();
 			if (playerInventory != null) {
 				if (player.invMissing.length() > 0) {
-					event
-							.getChannel()
-							.sendMessageEmbeds(defaultEmbed("Missing emojis").setDescription(player.invMissing).build())
-							.queue();
+					event.getChannel().sendMessageEmbeds(defaultEmbed("Missing emojis").setDescription(player.invMissing).build()).queue();
 				}
 				event.getChannel().sendMessage(playerInventory[0]).complete();
-				event.getChannel().sendMessage(playerInventory[1]).setActionRow(Button.link(player.skyblockStatsLink(),"Inventory of " + player.getUsername())).queue();
+				event
+					.getChannel()
+					.sendMessage(playerInventory[1])
+					.setActionRow(Button.link(player.skyblockStatsLink(), "Inventory of " + player.getUsername()))
+					.queue();
 				return null;
 			}
 			return invalidEmbed(player.getUsername() + "'s inventory API is disabled");

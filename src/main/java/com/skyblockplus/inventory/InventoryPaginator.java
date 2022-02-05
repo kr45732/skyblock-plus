@@ -21,11 +21,10 @@ package com.skyblockplus.inventory;
 import static com.skyblockplus.Main.waiter;
 import static com.skyblockplus.utils.Utils.ignore;
 
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorEvent;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
@@ -48,12 +47,13 @@ public class InventoryPaginator {
 
 		pagePart1 = event.getChannel().sendMessage(inventoryPages.get(0)[0]).complete();
 		pagePart2 =
-			event.getChannel()
+			event
+				.getChannel()
 				.sendMessage(inventoryPages.get(0)[1])
 				.setActionRow(
 					Button.primary("inv_paginator_left_button", Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")),
 					Button.primary("inv_paginator_right_button", Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>")),
-					Button.link(player.skyblockStatsLink(),type + " of " + player.getUsername())
+					Button.link(player.skyblockStatsLink(), type + " of " + player.getUsername())
 				)
 				.complete();
 
