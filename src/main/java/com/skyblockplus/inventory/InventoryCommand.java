@@ -95,7 +95,7 @@ public class InventoryCommand extends Command {
 				event
 					.getChannel()
 					.sendMessage(playerInventory[1])
-					.setActionRow(Button.link(player.skyblockStatsLink(), player.getUsername()  + "'s Inventory"))
+					.setActionRow(Button.link(player.skyblockStatsLink(), player.getUsername() + "'s Inventory"))
 					.queue();
 				return null;
 			}

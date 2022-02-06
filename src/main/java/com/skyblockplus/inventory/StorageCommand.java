@@ -18,16 +18,15 @@
 
 package com.skyblockplus.inventory;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.PaginatorEvent;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.util.List;
-
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class StorageCommand extends Command {
 

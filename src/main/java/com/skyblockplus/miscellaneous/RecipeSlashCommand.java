@@ -18,17 +18,16 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.Utils.getLowestBinJson;
+
 import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
 import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-
-import java.util.stream.Collectors;
-
-import static com.skyblockplus.utils.Utils.getLowestBinJson;
 
 public class RecipeSlashCommand extends SlashCommand {
 
@@ -52,8 +51,8 @@ public class RecipeSlashCommand extends SlashCommand {
 	public void onAutoComplete(AutoCompleteEvent event) {
 		if (event.getFocusedOption().getName().equals("item")) {
 			event.replyClosestMatch(
-					event.getFocusedOption().getValue(),
-					getLowestBinJson().keySet().stream().map(Utils::idToName).distinct().collect(Collectors.toList())
+				event.getFocusedOption().getValue(),
+				getLowestBinJson().keySet().stream().map(Utils::idToName).distinct().collect(Collectors.toList())
 			);
 		}
 	}

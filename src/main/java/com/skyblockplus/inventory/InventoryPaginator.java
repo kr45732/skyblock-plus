@@ -23,7 +23,6 @@ import static com.skyblockplus.utils.Utils.ignore;
 
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorEvent;
-
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.Emoji;
@@ -55,7 +54,7 @@ public class InventoryPaginator {
 				.setActionRow(
 					Button.primary("inv_paginator_left_button", Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")).asDisabled(),
 					Button.primary("inv_paginator_right_button", Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>")),
-					Button.link(player.skyblockStatsLink(),  player.getUsername() + "'s " + type + " • Page 1/" + (maxPageNumber + 1))
+					Button.link(player.skyblockStatsLink(), player.getUsername() + "'s " + type + " • Page 1/" + (maxPageNumber + 1))
 				)
 				.complete();
 
@@ -81,8 +80,10 @@ public class InventoryPaginator {
 
 		List<Button> curButtons = event.getMessage().getButtons();
 		Button leftButton = pageNumber == 0 ? curButtons.get(0).asDisabled() : curButtons.get(0).asEnabled();
-		Button rightButton = pageNumber == (maxPageNumber ) ? curButtons.get(1).asDisabled() : curButtons.get(1).asEnabled();
-		Button linkButton = curButtons.get(2).withLabel(curButtons.get(2).getLabel().split("•")[0] + "• Page " + (pageNumber + 1) + "/" + (maxPageNumber + 1));
+		Button rightButton = pageNumber == (maxPageNumber) ? curButtons.get(1).asDisabled() : curButtons.get(1).asEnabled();
+		Button linkButton = curButtons
+			.get(2)
+			.withLabel(curButtons.get(2).getLabel().split("•")[0] + "• Page " + (pageNumber + 1) + "/" + (maxPageNumber + 1));
 		event.editMessage(inventoryPages.get(pageNumber)[1]).setActionRow(leftButton, rightButton, linkButton).queue(ignore, ignore);
 
 		waitForEvent();
@@ -95,7 +96,23 @@ public class InventoryPaginator {
 			this::action,
 			30,
 			TimeUnit.SECONDS,
-			() -> pagePart2.editMessageComponents(ActionRow.of(pagePart2.getButtons().get(2).withLabel(pagePart2.getButtons().get(2).getLabel().split("•")[0] + "• Page " + (pageNumber + 1) + "/" + (maxPageNumber + 1)))).queue(ignore, ignore)
+			() ->
+				pagePart2
+					.editMessageComponents(
+						ActionRow.of(
+							pagePart2
+								.getButtons()
+								.get(2)
+								.withLabel(
+									pagePart2.getButtons().get(2).getLabel().split("•")[0] +
+									"• Page " +
+									(pageNumber + 1) +
+									"/" +
+									(maxPageNumber + 1)
+								)
+						)
+					)
+					.queue(ignore, ignore)
 		);
 	}
 }

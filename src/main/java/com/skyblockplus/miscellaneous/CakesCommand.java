@@ -25,14 +25,12 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
-
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.apache.groovy.util.Maps;
 
@@ -49,16 +47,25 @@ public class CakesCommand extends Command {
 		if (player.isValid()) {
 			EmbedBuilder eb = player.defaultPlayerEmbed();
 
-			Map<String ,String> cakeNameToId = Maps.of(
-					"cake_strength", "EPOCH_CAKE_RED",
-					"cake_pet_luck", "EPOCH_CAKE_PURPLE",
-					"cake_health", "EPOCH_CAKE_PINK",
-					"cake_walk_speed", "EPOCH_CAKE_YELLOW",
-					"cake_magic_find", "EPOCH_CAKE_BLACK",
-					"cake_ferocity", "EPOCH_CAKE_ORANGE",
-					"cake_defense", "EPOCH_CAKE_GREEN",
-					"cake_sea_creature_chance", "EPOCH_CAKE_BLUE",
-					"cake_intelligence", "EPOCH_CAKE_AQUA"
+			Map<String, String> cakeNameToId = Maps.of(
+				"cake_strength",
+				"EPOCH_CAKE_RED",
+				"cake_pet_luck",
+				"EPOCH_CAKE_PURPLE",
+				"cake_health",
+				"EPOCH_CAKE_PINK",
+				"cake_walk_speed",
+				"EPOCH_CAKE_YELLOW",
+				"cake_magic_find",
+				"EPOCH_CAKE_BLACK",
+				"cake_ferocity",
+				"EPOCH_CAKE_ORANGE",
+				"cake_defense",
+				"EPOCH_CAKE_GREEN",
+				"cake_sea_creature_chance",
+				"EPOCH_CAKE_BLUE",
+				"cake_intelligence",
+				"EPOCH_CAKE_AQUA"
 			);
 
 			StringBuilder activeCakes = new StringBuilder();
@@ -68,7 +75,7 @@ public class CakesCommand extends Command {
 					if (expires.isAfter(Instant.now())) {
 						String cakeName = higherDepth(cake, "key").getAsString();
 						activeCakes
-								.append(getEmojiMap().get(cakeNameToId.get(cakeName)).getAsString())
+							.append(getEmojiMap().get(cakeNameToId.get(cakeName)).getAsString())
 							.append(" ")
 							.append(capitalizeString(cakeName.split("cake_")[1].replace("_", " ")))
 							.append(" Cake: expires <t:")
@@ -82,7 +89,11 @@ public class CakesCommand extends Command {
 
 			StringBuilder missingCakesStr = new StringBuilder();
 			for (Map.Entry<String, String> missingCake : cakeNameToId.entrySet()) {
-				missingCakesStr	.append(getEmojiMap().get(missingCake.getValue()).getAsString()).append(" ").append(capitalizeString(missingCake.getKey().split("cake_")[1].replace("_", " "))).append(" Cake\n");
+				missingCakesStr
+					.append(getEmojiMap().get(missingCake.getValue()).getAsString())
+					.append(" ")
+					.append(capitalizeString(missingCake.getKey().split("cake_")[1].replace("_", " ")))
+					.append(" Cake\n");
 			}
 			eb.addField("Inactive Cakes", missingCakesStr.length() > 0 ? missingCakesStr.toString() : "None", false);
 

@@ -51,7 +51,8 @@ public class TalismanBagSlashCommand extends SlashCommand {
 				)
 			);
 			case "emoji" -> event.paginate(
-				TalismanBagCommand.getPlayerTalismansEmoji(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)), true
+				TalismanBagCommand.getPlayerTalismansEmoji(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)),
+				true
 			);
 			default -> event.embed(event.invalidCommandMessage());
 		}

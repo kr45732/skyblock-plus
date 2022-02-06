@@ -18,6 +18,9 @@
 
 package com.skyblockplus.skills;
 
+import static com.skyblockplus.utils.Constants.*;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -27,13 +30,9 @@ import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.SkillsStruct;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static com.skyblockplus.utils.Constants.*;
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class SkillsCommand extends Command {
 
@@ -58,15 +57,15 @@ public class SkillsCommand extends Command {
 				SkillsStruct skillInfo = player.getSkill(skillName);
 				if (skillInfo != null) {
 					eb.addField(
-							SKILLS_EMOJI_MAP.get(skillName) + " " + capitalizeString(skillInfo.name()) + " (" + skillInfo.currentLevel() + ")",
-							simplifyNumber(skillInfo.expCurrent()) +
-									" / " +
-									simplifyNumber(skillInfo.expForNext()) +
-									"\nTotal XP: " +
-									simplifyNumber(skillInfo.totalExp()) +
-									"\nProgress: " +
-									(skillInfo.isMaxed() ? "MAX" : roundProgress(skillInfo.progressToNext())),
-							true
+						SKILLS_EMOJI_MAP.get(skillName) + " " + capitalizeString(skillInfo.name()) + " (" + skillInfo.currentLevel() + ")",
+						simplifyNumber(skillInfo.expCurrent()) +
+						" / " +
+						simplifyNumber(skillInfo.expForNext()) +
+						"\nTotal XP: " +
+						simplifyNumber(skillInfo.totalExp()) +
+						"\nProgress: " +
+						(skillInfo.isMaxed() ? "MAX" : roundProgress(skillInfo.progressToNext())),
+						true
 					);
 					if (!COSMETIC_SKILL_NAMES.contains(skillName)) {
 						trueSA += skillInfo.currentLevel();
@@ -86,16 +85,24 @@ public class SkillsCommand extends Command {
 			int bronze = higherDepth(jacobStats, "medals_inv.bronze", 0);
 			int silver = higherDepth(jacobStats, "medals_inv.silver", 0);
 			int gold = higherDepth(jacobStats, "medals_inv.gold", 0);
-			eb.addField("Medals | " + (bronze + silver + gold),
-					"\uD83E\uDD49 Bronze: " + bronze +
-							"\n\uD83E\uDD48 Silver: " + silver +
-							"\n\uD83E\uDD47 Gold: " + gold, false
+			eb.addField(
+				"Medals | " + (bronze + silver + gold),
+				"\uD83E\uDD49 Bronze: " + bronze + "\n\uD83E\uDD48 Silver: " + silver + "\n\uD83E\uDD47 Gold: " + gold,
+				false
 			);
 			if (higherDepth(jacobStats, "unique_golds2") != null && !higherDepth(jacobStats, "unique_golds2").getAsJsonArray().isEmpty()) {
-				eb.addField("Unique Golds | " + higherDepth(jacobStats, "unique_golds2").getAsJsonArray().size(),
-						streamJsonArray(higherDepth(jacobStats, "unique_golds2").getAsJsonArray())
-								.map(i -> getEmojiMap().get(i.getAsString().equals("MUSHROOM_COLLECTION") ? "RED_MUSHROOM" : i.getAsString()).getAsString() + " " + idToName(i.getAsString()))
-								.collect(Collectors.joining("\n ")), false
+				eb.addField(
+					"Unique Golds | " + higherDepth(jacobStats, "unique_golds2").getAsJsonArray().size(),
+					streamJsonArray(higherDepth(jacobStats, "unique_golds2").getAsJsonArray())
+						.map(i ->
+							getEmojiMap()
+								.get(i.getAsString().equals("MUSHROOM_COLLECTION") ? "RED_MUSHROOM" : i.getAsString())
+								.getAsString() +
+							" " +
+							idToName(i.getAsString())
+						)
+						.collect(Collectors.joining("\n ")),
+					false
 				);
 			} else {
 				eb.addField("Unique Golds", "None", false);
@@ -103,17 +110,31 @@ public class SkillsCommand extends Command {
 			if (higherDepth(jacobStats, "perks") != null && higherDepth(jacobStats, "perks").getAsJsonObject().size() > 0) {
 				StringBuilder ebStr = new StringBuilder();
 				for (Map.Entry<String, JsonElement> perk : higherDepth(jacobStats, "perks").getAsJsonObject().entrySet()) {
-					ebStr.append("\n⭐ ").append(capitalizeString(perk.getKey().replace("_", " "))).append(": ").append(perk.getValue().getAsInt());
+					ebStr
+						.append("\n⭐ ")
+						.append(capitalizeString(perk.getKey().replace("_", " ")))
+						.append(": ")
+						.append(perk.getValue().getAsInt());
 				}
 				eb.addField("Perks", ebStr.toString(), false);
 			} else {
 				eb.addField("Perks", "None", false);
 			}
-			Map<String, Long> contests = higherDepth(jacobStats, "contests").getAsJsonObject().keySet().stream()
-					.map(s -> s.endsWith("INK_SACK:3") ? "INK_SACK:3" : s.substring(s.lastIndexOf(":") + 1)).collect(Collectors.groupingBy(c -> c, Collectors.counting()));
+			Map<String, Long> contests = higherDepth(jacobStats, "contests")
+				.getAsJsonObject()
+				.keySet()
+				.stream()
+				.map(s -> s.endsWith("INK_SACK:3") ? "INK_SACK:3" : s.substring(s.lastIndexOf(":") + 1))
+				.collect(Collectors.groupingBy(c -> c, Collectors.counting()));
 			StringBuilder ebStr = new StringBuilder();
 			for (Map.Entry<String, Long> entry : contests.entrySet()) {
-				ebStr.append("\n").append(getEmojiMap().get(entry.getKey().equals("MUSHROOM_COLLECTION") ? "RED_MUSHROOM" : entry.getKey()).getAsString()).append(" ").append(idToName(entry.getKey())).append(" - ").append(entry.getValue());
+				ebStr
+					.append("\n")
+					.append(getEmojiMap().get(entry.getKey().equals("MUSHROOM_COLLECTION") ? "RED_MUSHROOM" : entry.getKey()).getAsString())
+					.append(" ")
+					.append(idToName(entry.getKey()))
+					.append(" - ")
+					.append(entry.getValue());
 			}
 			eb.addField("Participated Contests | " + higherDepth(jacobStats, "contests").getAsJsonObject().size(), ebStr.toString(), false);
 

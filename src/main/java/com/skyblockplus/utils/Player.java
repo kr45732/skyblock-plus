@@ -31,7 +31,6 @@ import com.skyblockplus.utils.structs.*;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
-
 import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
 import me.nullicorn.nedit.type.NBTList;
@@ -794,7 +793,13 @@ public class Player {
 	public List<String[]> getStorage() {
 		try {
 			List<String[]> out = new ArrayList<>();
-			for (JsonElement page : higherDepth(profileJson(), "backpack_contents").getAsJsonObject().entrySet().stream().sorted(Comparator.comparingInt(e -> Integer.parseInt(e.getKey()))).map(e -> e.getValue()).collect(Collectors.toList())) {
+			for (JsonElement page : higherDepth(profileJson(), "backpack_contents")
+				.getAsJsonObject()
+				.entrySet()
+				.stream()
+				.sorted(Comparator.comparingInt(e -> Integer.parseInt(e.getKey())))
+				.map(e -> e.getValue())
+				.collect(Collectors.toList())) {
 				NBTCompound decodedInventoryContents = NBTReader.readBase64(higherDepth(page, "data").getAsString());
 
 				NBTList invFrames = decodedInventoryContents.getList("i");
@@ -807,9 +812,9 @@ public class Player {
 						invFramesMap.put(i + 1, "empty");
 					}
 				}
-				if(invFrames.size() < 27){
+				if (invFrames.size() < 27) {
 					int curSize = invFrames.size();
-					for(int i=0; i< 27 - curSize	; i++){
+					for (int i = 0; i < 27 - curSize; i++) {
 						invFramesMap.put(i + 1 + curSize, "blank");
 					}
 				}
@@ -833,7 +838,7 @@ public class Player {
 					}
 				}
 
-				out.add( new String[] { outputStringPart1.toString(), outputStringPart2.toString() });
+				out.add(new String[] { outputStringPart1.toString(), outputStringPart2.toString() });
 			}
 			return out;
 		} catch (Exception ignored) {}

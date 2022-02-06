@@ -179,7 +179,8 @@ public class Main {
 					new MayorCommand(),
 					new LeaderboardCommand(),
 					new JacobCommand(),
-						new RecipeCommand(), new StorageCommand()
+					new RecipeCommand(),
+					new StorageCommand()
 				)
 				.build();
 
@@ -245,7 +246,9 @@ public class Main {
 					new FixApplicationSlashCommand(),
 					new MayorSlashCommand(),
 					new LeaderboardSlashCommand(),
-					new JacobSlashCommand(), new RecipeSlashCommand(), new StorageSlashCommand()
+					new JacobSlashCommand(),
+					new RecipeSlashCommand(),
+					new StorageSlashCommand()
 				);
 
 		jda =

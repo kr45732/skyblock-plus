@@ -18,23 +18,22 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.ApiHandler.getAuctionFromPlayer;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.HypixelResponse;
-import me.xdrop.fuzzywuzzy.FuzzySearch;
-import net.dv8tion.jda.api.EmbedBuilder;
-
-import javax.persistence.Embedded;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static com.skyblockplus.utils.ApiHandler.getAuctionFromPlayer;
-import static com.skyblockplus.utils.Utils.*;
+import javax.persistence.Embedded;
+import me.xdrop.fuzzywuzzy.FuzzySearch;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class RecipeCommand extends Command {
 
@@ -47,25 +46,25 @@ public class RecipeCommand extends Command {
 	public static EmbedBuilder getRecipe(String item) {
 		String id = idToName(item);
 
-		if(higherDepth(getInternalJsonMappings(), "id") == null){
+		if (higherDepth(getInternalJsonMappings(), "id") == null) {
 			id = getClosestMatchFromIds(item, getInternalJsonMappings().keySet());
 		}
 		String name = idToName(id);
 
 		JsonElement infoJson = getInternalJsonMappings().get(id);
-		if(higherDepth(infoJson, "recipe") == null){
+		if (higherDepth(infoJson, "recipe") == null) {
 			return invalidEmbed("Unable to get recipe for " + name);
 		}
 
 		EmbedBuilder eb = defaultEmbed("Recipe of " + name);
 		for (Map.Entry<String, JsonElement> entry : higherDepth(infoJson, "recipe").getAsJsonObject().entrySet()) {
 			String[] idCountSplit = entry.getValue().getAsString().split(":");
-			String entryId  =idCountSplit[0].replace("-", ":");
-			if(entry.getKey().equals("B1") || entry.getKey().equals("C1")){
+			String entryId = idCountSplit[0].replace("-", ":");
+			if (entry.getKey().equals("B1") || entry.getKey().equals("C1")) {
 				eb.appendDescription("\n");
 			}
-			eb.appendDescription(higherDepth(getEmojiMap(),entryId, "")  +" ");
-			eb.addField(idToName(entryId),  idCountSplit[1], true);
+			eb.appendDescription(higherDepth(getEmojiMap(), entryId, "") + " ");
+			eb.addField(idToName(entryId), idCountSplit[1], true);
 		}
 		eb.setThumbnail(getItemThumbnail(id));
 		return eb;
