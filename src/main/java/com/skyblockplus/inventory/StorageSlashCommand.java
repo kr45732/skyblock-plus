@@ -40,7 +40,7 @@ public class StorageSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.paginate(StorageCommand.getPlayerStorage(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
+		event.paginate(StorageCommand.getPlayerStorage(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)), true);
 	}
 
 	@Override

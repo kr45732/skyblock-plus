@@ -65,7 +65,7 @@ public abstract class SlashCommand {
 
 		for (Permission p : botPermissions) {
 			if (p.isChannel()) {
-				if (!event.getSelfMember().hasPermission(event.getTextChannel(), p)) {
+				if (!event.getSelfMember().hasPermission(event.getGuildChannel(), p)) {
 					if (p == Permission.MESSAGE_SEND) {
 						event
 							.getUser()
@@ -74,7 +74,7 @@ public abstract class SlashCommand {
 								dm
 									.sendMessageEmbeds(
 										invalidEmbed(
-											"I need the " + p.getName() + " permission in " + event.getTextChannel().getAsMention() + "!"
+											"I need the " + p.getName() + " permission in " + event.getGuildChannel().getAsMention() + "!"
 										)
 											.build()
 									)

@@ -51,7 +51,7 @@ public class InventorySlashCommand extends SlashCommand {
 				)
 			);
 			case "emoji" -> event.paginate(
-				InventoryCommand.getPlayerInventory(event.player, event.getOptionStr("profile"), new PaginatorEvent(event))
+				InventoryCommand.getPlayerInventory(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)), true
 			);
 			default -> event.embed(event.invalidCommandMessage());
 		}

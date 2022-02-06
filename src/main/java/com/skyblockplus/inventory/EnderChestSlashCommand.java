@@ -40,7 +40,7 @@ public class EnderChestSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.paginate(EnderChestCommand.getPlayerEnderChest(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
+		event.paginate(EnderChestCommand.getPlayerEnderChest(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)), true);
 	}
 
 	@Override

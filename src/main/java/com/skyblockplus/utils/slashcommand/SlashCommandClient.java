@@ -65,8 +65,8 @@ public class SlashCommandClient extends ListenerAdapter {
 			event.replyEmbeds(invalidEmbed("This command cannot be used in direct messages").build()).queue();
 			return;
 		}
-		if (event.getChannelType() != ChannelType.TEXT) {
-			event.replyEmbeds(invalidEmbed("This command can only be used in text channels").build()).queue();
+		if (event.getChannelType() == ChannelType.PRIVATE) {
+			event.replyEmbeds(invalidEmbed("This command can only be used in text channels or threads").build()).queue();
 			return;
 		}
 
