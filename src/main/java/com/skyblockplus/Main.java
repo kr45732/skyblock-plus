@@ -64,7 +64,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.PreDestroy;
 import javax.security.auth.login.LoginException;
-
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
@@ -248,7 +247,15 @@ public class Main {
 					new StorageSlashCommand()
 				);
 
-		allServerSettings = gson.toJsonTree(database.getAllServerSettings().stream().collect(Collectors.toMap(ServerSettingsModel::getServerId, Function.identity()))).getAsJsonObject();
+		allServerSettings =
+			gson
+				.toJsonTree(
+					database
+						.getAllServerSettings()
+						.stream()
+						.collect(Collectors.toMap(ServerSettingsModel::getServerId, Function.identity()))
+				)
+				.getAsJsonObject();
 
 		jda =
 			JDABuilder

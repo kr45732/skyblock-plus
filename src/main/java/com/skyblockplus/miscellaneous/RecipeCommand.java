@@ -18,19 +18,19 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class RecipeCommand extends Command {
+
 	public static List<String> allRecipeIds;
 
 	public RecipeCommand() {
@@ -38,7 +38,13 @@ public class RecipeCommand extends Command {
 		this.cooldown = globalCooldown;
 		this.botPermissions = defaultPerms();
 
-		allRecipeIds = getInternalJsonMappings().entrySet().stream().filter(e -> higherDepth(e.getValue(), "recipe") != null).map(Map.Entry::getKey).collect(Collectors.toList());
+		allRecipeIds =
+			getInternalJsonMappings()
+				.entrySet()
+				.stream()
+				.filter(e -> higherDepth(e.getValue(), "recipe") != null)
+				.map(Map.Entry::getKey)
+				.collect(Collectors.toList());
 	}
 
 	public static EmbedBuilder getRecipe(String item) {

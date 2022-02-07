@@ -18,8 +18,8 @@
 
 package com.skyblockplus.api.miscellaneous;
 
-import static com.skyblockplus.utils.Utils.jda;
 import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.jda;
 
 import com.skyblockplus.features.jacob.JacobData;
 import com.skyblockplus.features.jacob.JacobHandler;

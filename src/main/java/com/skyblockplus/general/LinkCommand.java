@@ -18,10 +18,10 @@
 
 package com.skyblockplus.general;
 
-import static com.skyblockplus.utils.Utils.database;
 import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
 import static com.skyblockplus.utils.ApiHandler.skyblockProfilesFromUuid;
 import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.database;
 
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;

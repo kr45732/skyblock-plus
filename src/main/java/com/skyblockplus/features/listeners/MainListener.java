@@ -18,10 +18,10 @@
 
 package com.skyblockplus.features.listeners;
 
-import static com.skyblockplus.utils.Utils.database;
-import static com.skyblockplus.utils.Utils.jda;
 import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.database;
+import static com.skyblockplus.utils.Utils.jda;
 
 import com.skyblockplus.utils.AuctionFlipper;
 import java.util.Comparator;

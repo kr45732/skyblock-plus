@@ -18,8 +18,8 @@
 
 package com.skyblockplus.dev;
 
-import static com.skyblockplus.utils.Utils.database;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.utils.Utils.database;
 import static com.skyblockplus.utils.Utils.defaultPerms;
 import static com.skyblockplus.utils.Utils.makeHastePost;
 

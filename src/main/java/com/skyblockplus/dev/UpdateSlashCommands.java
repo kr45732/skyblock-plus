@@ -18,9 +18,9 @@
 
 package com.skyblockplus.dev;
 
+import static com.skyblockplus.utils.Utils.*;
 import static com.skyblockplus.utils.Utils.jda;
 import static com.skyblockplus.utils.Utils.slashCommandClient;
-import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;

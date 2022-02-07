@@ -18,11 +18,11 @@
 
 package com.skyblockplus.settings;
 
-import static com.skyblockplus.utils.Utils.database;
-import static com.skyblockplus.utils.Utils.jda;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.getNameHistory;
 import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.database;
+import static com.skyblockplus.utils.Utils.jda;
 
 import com.google.gson.JsonObject;
 import com.jagrosh.jdautilities.command.Command;

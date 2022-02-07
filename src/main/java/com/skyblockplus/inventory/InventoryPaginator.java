@@ -18,8 +18,8 @@
 
 package com.skyblockplus.inventory;
 
-import static com.skyblockplus.utils.Utils.waiter;
 import static com.skyblockplus.utils.Utils.ignore;
+import static com.skyblockplus.utils.Utils.waiter;
 
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorEvent;

@@ -18,15 +18,14 @@
 
 package com.skyblockplus.features.jacob;
 
-import static com.skyblockplus.utils.Utils.jda;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.miscellaneous.TimeCommand.YEAR_0;
 import static com.skyblockplus.miscellaneous.TimeCommand.getSkyblockYear;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.jda;
 import static com.skyblockplus.utils.Utils.scheduler;
 
 import com.skyblockplus.features.listeners.AutomaticGuild;
-
 import java.time.Instant;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;

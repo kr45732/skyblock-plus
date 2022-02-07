@@ -18,12 +18,12 @@
 
 package com.skyblockplus.features.setup;
 
-import static com.skyblockplus.utils.Utils.database;
-import static com.skyblockplus.utils.Utils.waiter;
 import static com.skyblockplus.features.listeners.MainListener.onApplyReload;
 import static com.skyblockplus.features.listeners.MainListener.onVerifyReload;
+import static com.skyblockplus.utils.Utils.database;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
 import static com.skyblockplus.utils.Utils.gson;
+import static com.skyblockplus.utils.Utils.waiter;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
