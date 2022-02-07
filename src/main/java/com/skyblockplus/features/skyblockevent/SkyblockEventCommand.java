@@ -18,8 +18,8 @@
 
 package com.skyblockplus.features.skyblockevent;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.utils.Utils.database;
+import static com.skyblockplus.utils.Utils.jda;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Utils.*;

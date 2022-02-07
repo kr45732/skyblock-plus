@@ -18,7 +18,7 @@
 
 package com.skyblockplus.dungeons;
 
-import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.utils.Utils.waiter;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;

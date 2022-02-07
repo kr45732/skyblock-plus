@@ -18,7 +18,7 @@
 
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.Utils.database;
 import static com.skyblockplus.settings.SettingsExecute.isOneLevelRole;
 import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
 import static com.skyblockplus.utils.Utils.*;

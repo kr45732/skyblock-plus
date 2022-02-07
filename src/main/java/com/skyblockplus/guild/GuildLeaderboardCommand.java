@@ -18,7 +18,7 @@
 
 package com.skyblockplus.guild;
 
-import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.Utils.database;
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Utils.*;
 import static com.skyblockplus.utils.structs.HypixelGuildCache.*;

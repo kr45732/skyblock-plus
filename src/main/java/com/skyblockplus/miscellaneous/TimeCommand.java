@@ -29,7 +29,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 
 public class TimeCommand extends Command {
 
-	private static final String[] SEASONS = new String[] {
+	public static final String[] SEASONS = new String[] {
 		"Early Spring",
 		"Spring",
 		"Late Spring",
@@ -43,10 +43,10 @@ public class TimeCommand extends Command {
 		"Winter",
 		"Late Winter",
 	};
-	private static final int HOUR_MS = 50000;
-	private static final int DAY_MS = 24 * HOUR_MS;
-	private static final int MONTH_MS = 31 * DAY_MS;
-	private static final int YEAR_MS = SEASONS.length * MONTH_MS;
+	public static final long HOUR_MS = 50000;
+	public static final long DAY_MS = 24 * HOUR_MS;
+	public static final long MONTH_MS = 31 * DAY_MS;
+	public static final long YEAR_MS = SEASONS.length * MONTH_MS;
 	public static final long YEAR_0 = 1560275700000L;
 
 	public TimeCommand() {

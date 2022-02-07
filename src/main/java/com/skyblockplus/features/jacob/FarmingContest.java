@@ -18,7 +18,7 @@
 
 package com.skyblockplus.features.jacob;
 
-import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.utils.Utils.jda;
 import static com.skyblockplus.utils.Utils.gson;
 import static com.skyblockplus.utils.Utils.higherDepth;
 

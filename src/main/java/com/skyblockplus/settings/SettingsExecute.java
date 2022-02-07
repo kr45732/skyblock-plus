@@ -18,8 +18,8 @@
 
 package com.skyblockplus.settings;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.utils.Utils.database;
+import static com.skyblockplus.utils.Utils.jda;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Utils.*;
@@ -48,7 +48,6 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import me.xdrop.fuzzywuzzy.FuzzySearch;
-import me.xdrop.fuzzywuzzy.model.ExtractedResult;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;

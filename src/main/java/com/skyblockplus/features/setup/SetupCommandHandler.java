@@ -18,8 +18,8 @@
 
 package com.skyblockplus.features.setup;
 
-import static com.skyblockplus.Main.database;
-import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.utils.Utils.database;
+import static com.skyblockplus.utils.Utils.waiter;
 import static com.skyblockplus.features.listeners.MainListener.onApplyReload;
 import static com.skyblockplus.features.listeners.MainListener.onVerifyReload;
 import static com.skyblockplus.utils.Utils.defaultEmbed;

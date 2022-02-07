@@ -52,7 +52,7 @@ public class RecipeSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("item")) {
 			event.replyClosestMatch(
 				event.getFocusedOption().getValue(),
-				getLowestBinJson().keySet().stream().map(Utils::idToName).distinct().collect(Collectors.toList())
+				RecipeCommand.allRecipeIds.stream().map(Utils::idToName).collect(Collectors.toList())
 			);
 		}
 	}

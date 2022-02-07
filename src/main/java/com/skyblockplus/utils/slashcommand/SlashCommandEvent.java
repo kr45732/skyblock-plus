@@ -18,7 +18,7 @@
 
 package com.skyblockplus.utils.slashcommand;
 
-import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.Utils.database;
 import static com.skyblockplus.utils.Utils.ignore;
 import static com.skyblockplus.utils.Utils.invalidEmbed;
 
@@ -30,7 +30,6 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 
 public class SlashCommandEvent extends SlashCommandInteractionEvent {
 

@@ -18,7 +18,7 @@
 
 package com.skyblockplus.utils.command;
 
-import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.Utils.database;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.Utils.*;
 

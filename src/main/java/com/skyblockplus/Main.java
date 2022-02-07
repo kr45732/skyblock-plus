@@ -24,6 +24,7 @@ import static com.skyblockplus.utils.Utils.*;
 import com.jagrosh.jdautilities.command.*;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.api.miscellaneous.PublicEndpoints;
+import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.dev.*;
 import com.skyblockplus.dungeons.*;
 import com.skyblockplus.features.fetchur.FetchurHandler;
@@ -59,9 +60,11 @@ import com.skyblockplus.utils.exceptionhandler.ExceptionEventListener;
 import com.skyblockplus.utils.exceptionhandler.GlobalExceptionHandler;
 import com.skyblockplus.utils.slashcommand.SlashCommandClient;
 import java.io.File;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import javax.annotation.PreDestroy;
 import javax.security.auth.login.LoginException;
-import net.dv8tion.jda.api.JDA;
+
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
@@ -78,24 +81,18 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class Main {
 
 	public static final Logger log = LoggerFactory.getLogger(Main.class);
-	public static JDA jda;
-	public static Database database;
-	public static EventWaiter waiter;
-	public static GlobalExceptionHandler globalExceptionHandler;
-	public static CommandClient client;
-	public static SlashCommandClient slashCommandClient;
 
 	public static void main(String[] args) throws LoginException, IllegalArgumentException {
-		Main.globalExceptionHandler = new GlobalExceptionHandler();
+		globalExceptionHandler = new GlobalExceptionHandler();
 		Thread.setDefaultUncaughtExceptionHandler(globalExceptionHandler);
 		RestAction.setDefaultFailure(e -> globalExceptionHandler.uncaughtException(null, e));
 
 		Utils.initialize();
 		Constants.initialize();
 
-		Main.database = SpringApplication.run(Main.class, args).getBean(Database.class);
-		Main.waiter = new EventWaiter(scheduler, true);
-		Main.client =
+		database = SpringApplication.run(Main.class, args).getBean(Database.class);
+		waiter = new EventWaiter(scheduler, true);
+		client =
 			new CommandClientBuilder()
 				.setOwnerId("385939031596466176")
 				.setEmojis("✅", "⚠️", "❌")
@@ -250,6 +247,8 @@ public class Main {
 					new RecipeSlashCommand(),
 					new StorageSlashCommand()
 				);
+
+		allServerSettings = gson.toJsonTree(database.getAllServerSettings().stream().collect(Collectors.toMap(ServerSettingsModel::getServerId, Function.identity()))).getAsJsonObject();
 
 		jda =
 			JDABuilder

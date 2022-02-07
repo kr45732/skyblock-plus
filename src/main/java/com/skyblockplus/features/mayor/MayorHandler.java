@@ -18,65 +18,120 @@
 
 package com.skyblockplus.features.mayor;
 
-import static com.skyblockplus.Main.jda;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.skyblockplus.features.listeners.AutomaticGuild;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import org.apache.groovy.util.Maps;
+
+import java.time.Instant;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.miscellaneous.TimeCommand.YEAR_0;
+import static com.skyblockplus.miscellaneous.TimeCommand.getSkyblockYear;
 import static com.skyblockplus.utils.Constants.MAYOR_NAME_TO_SKIN;
 import static com.skyblockplus.utils.Utils.*;
 
-import com.google.gson.JsonElement;
-import com.skyblockplus.features.listeners.AutomaticGuild;
-import java.util.concurrent.TimeUnit;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-
 public class MayorHandler {
 
+	public static Map<String, String> mayorNameToEmoji = Maps.of("DERPY", "<:derpy:940083649129349150>",
+			"FOXY", "<:foxy:940083649301315614>",
+			"DANTE", "<:dante:940083649188081715>",
+			"PAUL", "<:paul:940083649607508009>",
+			"AATROX", "<:aatrox:940083649041293312>",
+			"DIAZ", "<:diaz:940083649322303489>",
+			"DIANA", "<:diana:940083649590739004>",
+			"COLE", "<:cole:940083649565581362>",
+			"BARRY", "<:barry:940083649200652338>",
+			"JERRY", "<:jerry:940083649318125578>",
+			"SCORPIUS", "<:scorpius:940083649687203951>",
+			"MARINA", "<:marina:940083649783664660>");
+
 	public static void initialize() {
-		scheduler.scheduleAtFixedRate(MayorHandler::updateMayor, 0, 30, TimeUnit.MINUTES);
+		long newYearStartEpoch = YEAR_0 + 446400000L * (getSkyblockYear() - 1) + 1000;
+		long newYearToElectionOpen = 217200000;
+		long newYearToElectionClose = 105600000;
+		long epochMilliNow = Instant.now().toEpochMilli();
+
+		if ((newYearStartEpoch + newYearToElectionOpen >= epochMilliNow) || (newYearStartEpoch + newYearToElectionClose < epochMilliNow)) { // Election booth is open
+			updateCurrentElection();
+		} else if (newYearStartEpoch + newYearToElectionClose <= (epochMilliNow + 7)) { // Ended at most 7 min ago
+			mayorElected();
+			scheduler.schedule(MayorHandler::initialize, 10, TimeUnit.MINUTES);
+		} else { // Wait for next open
+			scheduler.schedule(MayorHandler::initialize, newYearStartEpoch + newYearToElectionClose - epochMilliNow, TimeUnit.MINUTES);
+		}
 	}
 
-	private static void updateMayor() {
+	public static void mayorElected() {
+		JsonElement cur = higherDepth(getJson("https://api.hypixel.net/resources/skyblock/election"), "mayor");
+		JsonArray mayors = collectJsonArray(streamJsonArray(higherDepth(cur, "election.candidates").getAsJsonArray()).sorted(Comparator.comparingInt(m -> -higherDepth(m, "votes").getAsInt())));
+
+		String winner = higherDepth(cur, "name").getAsString();
+		int year = higherDepth(cur, "election.year").getAsInt();
+		double totalVotes = streamJsonArray(mayors).mapToInt(m -> higherDepth(m, "votes").getAsInt()).sum();
+
+		EmbedBuilder eb = defaultEmbed("Mayor Elected | Year " + year);
+		eb.setDescription("**Year:** " + year + "\n**Total Votes:** " + formatNumber(totalVotes));
+		eb.setThumbnail("https://mc-heads.net/body/" + MAYOR_NAME_TO_SKIN.get(winner.toUpperCase()) + "/left");
+		StringBuilder ebStr = new StringBuilder();
+		for (JsonElement curMayor : mayors) {
+			String name = higherDepth(curMayor, "name").getAsString();
+			int votes = higherDepth(curMayor, "votes").getAsInt();
+
+			if (higherDepth(curMayor, "name").getAsString().equals(winner)) {
+				String perksStr = "";
+				for (JsonElement perk : higherDepth(curMayor, "perks").getAsJsonArray()) {
+					perksStr = "\n➜ " + higherDepth(perk, "name").getAsString() + ": " + parseMcCodes(higherDepth(perk, "description").getAsString());
+				}
+
+				eb.addField(mayorNameToEmoji.get(name.toUpperCase()) + " Mayor " + name, "\n**Votes:** " + roundProgress(votes / totalVotes) + " (" + formatNumber(votes) + ")\n**Perks:**" + perksStr, false);
+			} else {
+				ebStr.append("\n").append(mayorNameToEmoji.get(name.toUpperCase())).append(" **").append(name).append(":** ").append(roundProgress(votes / totalVotes)).append(" (").append(formatNumber(votes)).append(")");
+			}
+		}
+		eb.addField("Loosing Mayors", ebStr.toString(), false);
+
+		MessageEmbed embed = eb.build();
+		for (AutomaticGuild guild : guildMap.values()) {
+			guild.onMayorElected(embed); // Send and ping
+		}
+	}
+
+	public static void updateCurrentElection() {
 		try {
-			JsonElement mayorJson = getJson("https://whoknew.sbe-stole-skytils.design/api/mayor");
-			String curMayorName = higherDepth(mayorJson, "name", null);
-			if (curMayorName == null) {
+			JsonElement cur = higherDepth(getJson("https://api.hypixel.net/resources/skyblock/election"), "current");
+			if (higherDepth(cur, "candidates") == null) {
 				return;
 			}
 
-			if (curMayorName.equals("Jerry")) {
-				mayorJson = higherDepth(getJson("https://whoknew.sbe-stole-skytils.design/api/mayor/jerry"), "mayor");
-				curMayorName = "Jerry | " + higherDepth(mayorJson, "name").getAsString();
-			}
+			JsonArray curMayors = collectJsonArray(streamJsonArray(higherDepth(cur, "candidates").getAsJsonArray()).sorted(Comparator.comparingInt(m -> -higherDepth(m, "votes").getAsInt())));
+			double totalVotes = streamJsonArray(curMayors).mapToInt(m -> higherDepth(m, "votes").getAsInt()).sum();
+			int year = higherDepth(cur, "year").getAsInt();
+			EmbedBuilder eb = defaultEmbed("Mayor Election Open | Year " + year);
+			eb.setDescription("**Year:** " + year + "\n**Total Votes:** " + formatNumber(totalVotes));
+			for (JsonElement curMayor : curMayors) {
+				String perksStr = "";
+				for (JsonElement perk : higherDepth(curMayor, "perks").getAsJsonArray()) {
+					perksStr = "\n➜ " + higherDepth(perk, "name").getAsString() + ": " + parseMcCodes(higherDepth(perk, "description").getAsString());
+				}
 
-			if (
-				curMayorName.equals(
-					jda
-						.getTextChannelById("932484216179011604")
-						.getHistory()
-						.retrievePast(1)
-						.complete()
-						.get(0)
-						.getEmbeds()
-						.get(0)
-						.getTitle()
-				)
-			) {
-				return;
+				int votes = higherDepth(curMayor, "votes").getAsInt();
+				String name = higherDepth(curMayor, "name").getAsString();
+				eb.addField(mayorNameToEmoji.get(name.toUpperCase()) + " " + name, "**Votes:** " + roundProgress(votes / totalVotes) + " (" + formatNumber(votes) + ")\n**Perks:**" + perksStr, false);
 			}
-
-			EmbedBuilder eb = defaultEmbed(curMayorName);
-			for (JsonElement perk : higherDepth(mayorJson, "perks").getAsJsonArray()) {
-				eb.addField(higherDepth(perk, "name").getAsString(), higherDepth(perk, "description").getAsString(), false);
-			}
-			String mayorId = (curMayorName.contains(" | ") ? curMayorName.split(" \\| ")[1] : curMayorName).toUpperCase();
-			eb.setThumbnail("https://mc-heads.net/body/" + MAYOR_NAME_TO_SKIN.get(mayorId) + "/left");
 			MessageEmbed embed = eb.build();
-
 			for (AutomaticGuild guild : guildMap.values()) {
-				guild.onMayor(embed);
+				guild.onMayorElection(embed, year); // Send or update message
 			}
-		} catch (Exception e) {
+		}catch (Exception e){
 			e.printStackTrace();
 		}
+
+		scheduler.schedule(MayorHandler::initialize, 5, TimeUnit.MINUTES);
 	}
 }

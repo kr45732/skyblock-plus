@@ -18,7 +18,7 @@
 
 package com.skyblockplus.general;
 
-import static com.skyblockplus.Main.database;
+import static com.skyblockplus.utils.Utils.database;
 import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
 import static com.skyblockplus.utils.ApiHandler.skyblockProfilesFromUuid;
 import static com.skyblockplus.utils.Utils.*;

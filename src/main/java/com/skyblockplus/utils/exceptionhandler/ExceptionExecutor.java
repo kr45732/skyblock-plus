@@ -18,7 +18,7 @@
 
 package com.skyblockplus.utils.exceptionhandler;
 
-import static com.skyblockplus.Main.globalExceptionHandler;
+import static com.skyblockplus.utils.Utils.globalExceptionHandler;
 
 import java.util.concurrent.*;
 

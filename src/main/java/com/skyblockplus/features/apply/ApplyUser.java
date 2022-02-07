@@ -18,7 +18,7 @@
 
 package com.skyblockplus.features.apply;
 
-import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.utils.Utils.jda;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.getNameHistory;
 import static com.skyblockplus.utils.Utils.*;

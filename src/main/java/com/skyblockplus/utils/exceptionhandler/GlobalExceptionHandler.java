@@ -18,7 +18,7 @@
 
 package com.skyblockplus.utils.exceptionhandler;
 
-import static com.skyblockplus.Main.jda;
+import static com.skyblockplus.utils.Utils.jda;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;

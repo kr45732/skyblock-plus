@@ -18,42 +18,40 @@
 
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.ApiHandler.getAuctionFromPlayer;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
-import com.skyblockplus.utils.structs.HypixelResponse;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Map;
-import java.util.stream.Collectors;
-import javax.persistence.Embedded;
-import me.xdrop.fuzzywuzzy.FuzzySearch;
 import net.dv8tion.jda.api.EmbedBuilder;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static com.skyblockplus.utils.Utils.*;
+
 public class RecipeCommand extends Command {
+	public static List<String> allRecipeIds;
 
 	public RecipeCommand() {
 		this.name = "recipe";
 		this.cooldown = globalCooldown;
 		this.botPermissions = defaultPerms();
+
+		allRecipeIds = getInternalJsonMappings().entrySet().stream().filter(e -> higherDepth(e.getValue(), "recipe") != null).map(Map.Entry::getKey).collect(Collectors.toList());
 	}
 
 	public static EmbedBuilder getRecipe(String item) {
-		String id = idToName(item);
+		String id = nameToId(item);
 
-		if (higherDepth(getInternalJsonMappings(), "id") == null) {
-			id = getClosestMatchFromIds(item, getInternalJsonMappings().keySet());
+		if (higherDepth(getInternalJsonMappings(), id) == null) {
+			id = getClosestMatchFromIds(item, allRecipeIds);
 		}
 		String name = idToName(id);
 
 		JsonElement infoJson = getInternalJsonMappings().get(id);
 		if (higherDepth(infoJson, "recipe") == null) {
-			return invalidEmbed("Unable to get recipe for " + name);
+			return invalidEmbed("No recipe found for " + name);
 		}
 
 		EmbedBuilder eb = defaultEmbed("Recipe of " + name);

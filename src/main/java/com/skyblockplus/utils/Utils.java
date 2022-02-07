@@ -18,7 +18,6 @@
 
 package com.skyblockplus.utils;
 
-import static com.skyblockplus.Main.*;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Constants.ENCHANT_NAMES;
@@ -30,15 +29,20 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.gson.*;
 import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandClient;
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.features.apply.ApplyGuild;
 import com.skyblockplus.features.apply.ApplyUser;
 import com.skyblockplus.features.jacob.JacobHandler;
 import com.skyblockplus.features.listeners.AutomaticGuild;
 import com.skyblockplus.features.party.Party;
+import com.skyblockplus.settings.Database;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.exceptionhandler.ExceptionExecutor;
+import com.skyblockplus.utils.exceptionhandler.GlobalExceptionHandler;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
+import com.skyblockplus.utils.slashcommand.SlashCommandClient;
 import com.skyblockplus.utils.structs.*;
 import java.awt.*;
 import java.io.*;
@@ -53,7 +57,6 @@ import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -66,6 +69,7 @@ import me.nullicorn.nedit.type.TagType;
 import me.xdrop.fuzzywuzzy.FuzzySearch;
 import me.xdrop.fuzzywuzzy.model.ExtractedResult;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -166,6 +170,13 @@ public class Utils {
 	public static List<String> linkedUsers;
 	public static Instant linkedUsersLastUpdated = Instant.now();
 	public static List<String> queryItems;
+	public static JDA jda;
+	public static Database database;
+	public static EventWaiter waiter;
+	public static GlobalExceptionHandler globalExceptionHandler;
+	public static CommandClient client;
+	public static SlashCommandClient slashCommandClient;
+	public static JsonObject allServerSettings;
 
 	/* Getters */
 	public static JsonObject getLowestBinJson() {

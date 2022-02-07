@@ -18,7 +18,7 @@
 
 package com.skyblockplus.inventory;
 
-import static com.skyblockplus.Main.waiter;
+import static com.skyblockplus.utils.Utils.waiter;
 import static com.skyblockplus.utils.Utils.ignore;
 
 import com.skyblockplus.utils.Player;

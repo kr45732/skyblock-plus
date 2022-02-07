@@ -18,7 +18,7 @@
 
 package com.skyblockplus.utils;
 
-import static com.skyblockplus.Main.slashCommandClient;
+import static com.skyblockplus.utils.Utils.slashCommandClient;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.Utils.*;
 
