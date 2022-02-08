@@ -38,53 +38,53 @@ import org.apache.groovy.util.Maps;
 public class MayorHandler {
 
 	public static Map<String, String> mayorNameToEmoji = Maps.of(
-		"DERPY",
-		"<:derpy:940083649129349150>",
-		"FOXY",
-		"<:foxy:940083649301315614>",
-		"DANTE",
-		"<:dante:940083649188081715>",
-		"PAUL",
-		"<:paul:940083649607508009>",
-		"AATROX",
-		"<:aatrox:940083649041293312>",
-		"DIAZ",
-		"<:diaz:940083649322303489>",
-		"DIANA",
-		"<:diana:940083649590739004>",
-		"COLE",
-		"<:cole:940083649565581362>",
-		"BARRY",
-		"<:barry:940083649200652338>",
-		"JERRY",
-		"<:jerry:940083649318125578>",
-		"SCORPIUS",
-		"<:scorpius:940083649687203951>",
-		"MARINA",
-		"<:marina:940083649783664660>"
+			"DERPY",
+			"<:derpy:940083649129349150>",
+			"FOXY",
+			"<:foxy:940083649301315614>",
+			"DANTE",
+			"<:dante:940083649188081715>",
+			"PAUL",
+			"<:paul:940083649607508009>",
+			"AATROX",
+			"<:aatrox:940083649041293312>",
+			"DIAZ",
+			"<:diaz:940083649322303489>",
+			"DIANA",
+			"<:diana:940083649590739004>",
+			"COLE",
+			"<:cole:940083649565581362>",
+			"BARRY",
+			"<:barry:940083649200652338>",
+			"JERRY",
+			"<:jerry:940083649318125578>",
+			"SCORPIUS",
+			"<:scorpius:940083649687203951>",
+			"MARINA",
+			"<:marina:940083649783664660>"
 	);
 
 	public static void initialize() {
-		long newYearStartEpoch = YEAR_0 + 446400000L * (getSkyblockYear() - 1) + 1000;
+		long newYearStartEpoch = YEAR_0 + 446400000L * (getSkyblockYear() - 1);
 		long newYearToElectionOpen = 217200000;
 		long newYearToElectionClose = 105600000;
 		long epochMilliNow = Instant.now().toEpochMilli();
 
 		if ((newYearStartEpoch + newYearToElectionOpen >= epochMilliNow) || (newYearStartEpoch + newYearToElectionClose < epochMilliNow)) { // Election booth is open
 			updateCurrentElection();
-		} else if (newYearStartEpoch + newYearToElectionClose <= (epochMilliNow + 7)) { // Ended at most 7 min ago
+		} else if (newYearStartEpoch + newYearToElectionClose <= (epochMilliNow + 420000)) { // Ended at most 7 min ago
 			mayorElected();
 			scheduler.schedule(MayorHandler::initialize, 10, TimeUnit.MINUTES);
 		} else { // Wait for next open
-			scheduler.schedule(MayorHandler::initialize, newYearStartEpoch + newYearToElectionClose - epochMilliNow, TimeUnit.MINUTES);
+			scheduler.schedule(MayorHandler::initialize, newYearStartEpoch + newYearToElectionClose - epochMilliNow + 1000, TimeUnit.MILLISECONDS);
 		}
 	}
 
 	public static void mayorElected() {
 		JsonElement cur = higherDepth(getJson("https://api.hypixel.net/resources/skyblock/election"), "mayor");
 		JsonArray mayors = collectJsonArray(
-			streamJsonArray(higherDepth(cur, "election.candidates").getAsJsonArray())
-				.sorted(Comparator.comparingInt(m -> -higherDepth(m, "votes").getAsInt()))
+				streamJsonArray(higherDepth(cur, "election.candidates").getAsJsonArray())
+						.sorted(Comparator.comparingInt(m -> -higherDepth(m, "votes").getAsInt()))
 		);
 
 		String winner = higherDepth(cur, "name").getAsString();
@@ -103,31 +103,32 @@ public class MayorHandler {
 				StringBuilder perksStr = new StringBuilder();
 				for (JsonElement perk : higherDepth(curMayor, "perks").getAsJsonArray()) {
 					perksStr
-						.append("\n➜ ")
-						.append(higherDepth(perk, "name").getAsString())
-						.append(": ")
-						.append(parseMcCodes(higherDepth(perk, "description").getAsString()));
+							.append("\n➜ ")
+							.append(higherDepth(perk, "name").getAsString())
+							.append(": ")
+							.append(parseMcCodes(higherDepth(perk, "description").getAsString()));
 				}
 
 				eb.addField(
-					mayorNameToEmoji.get(name.toUpperCase()) + " Mayor " + name,
-					"\n**Votes:** " + roundProgress(votes / totalVotes) + " (" + formatNumber(votes) + ")\n**Perks:**" + perksStr,
-					false
+						mayorNameToEmoji.get(name.toUpperCase()) + " Mayor " + name,
+						"\n**Votes:** " + roundProgress(votes / totalVotes) + " (" + formatNumber(votes) + ")\n**Perks:**" + perksStr,
+						false
 				);
 			} else {
 				ebStr
-					.append("\n")
-					.append(mayorNameToEmoji.get(name.toUpperCase()))
-					.append(" **")
-					.append(name)
-					.append(":** ")
-					.append(roundProgress(votes / totalVotes))
-					.append(" (")
-					.append(formatNumber(votes))
-					.append(")");
+						.append("\n")
+						.append(mayorNameToEmoji.get(name.toUpperCase()))
+						.append(" **")
+						.append(name)
+						.append(":** ")
+						.append(roundProgress(votes / totalVotes))
+						.append(" (")
+						.append(formatNumber(votes))
+						.append(")");
 			}
 		}
 		eb.addField("Loosing Mayors", ebStr.toString(), false);
+		eb.addField("Next Election", "Opens <t:" + Instant.ofEpochMilli(YEAR_0 + 446400000L * (getSkyblockYear() - 1) + 217200000).getEpochSecond() + ":R>", false);
 
 		MessageEmbed embed = eb.build();
 		for (AutomaticGuild guild : guildMap.values()) {
@@ -143,29 +144,29 @@ public class MayorHandler {
 			}
 
 			JsonArray curMayors = collectJsonArray(
-				streamJsonArray(higherDepth(cur, "candidates").getAsJsonArray())
-					.sorted(Comparator.comparingInt(m -> -higherDepth(m, "votes").getAsInt()))
+					streamJsonArray(higherDepth(cur, "candidates").getAsJsonArray())
+							.sorted(Comparator.comparingInt(m -> -higherDepth(m, "votes").getAsInt()))
 			);
 			double totalVotes = streamJsonArray(curMayors).mapToInt(m -> higherDepth(m, "votes").getAsInt()).sum();
 			int year = higherDepth(cur, "year").getAsInt();
 			EmbedBuilder eb = defaultEmbed("Mayor Election Open | Year " + year);
-			eb.setDescription("**Year:** " + year + "\n**Total Votes:** " + formatNumber(totalVotes));
+			eb.setDescription("**Year:** " + year + "\n**Total Votes:** " + formatNumber(totalVotes) + "\n**Closes:** <t:" + Instant.ofEpochMilli(YEAR_0 + 446400000L * (getSkyblockYear() - 1) + 105600000).getEpochSecond() + ":R>");
 			for (JsonElement curMayor : curMayors) {
 				StringBuilder perksStr = new StringBuilder();
 				for (JsonElement perk : higherDepth(curMayor, "perks").getAsJsonArray()) {
 					perksStr
-						.append("\n➜ ")
-						.append(higherDepth(perk, "name").getAsString())
-						.append(": ")
-						.append(parseMcCodes(higherDepth(perk, "description").getAsString()));
+							.append("\n➜ ")
+							.append(higherDepth(perk, "name").getAsString())
+							.append(": ")
+							.append(parseMcCodes(higherDepth(perk, "description").getAsString()));
 				}
 
 				int votes = higherDepth(curMayor, "votes").getAsInt();
 				String name = higherDepth(curMayor, "name").getAsString();
 				eb.addField(
-					mayorNameToEmoji.get(name.toUpperCase()) + " " + name,
-					"**Votes:** " + roundProgress(votes / totalVotes) + " (" + formatNumber(votes) + ")\n**Perks:**" + perksStr,
-					false
+						mayorNameToEmoji.get(name.toUpperCase()) + " " + name,
+						"**Votes:** " + roundProgress(votes / totalVotes) + " (" + formatNumber(votes) + ")\n**Perks:**" + perksStr,
+						false
 				);
 			}
 			MessageEmbed embed = eb.build();
