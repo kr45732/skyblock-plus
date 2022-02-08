@@ -789,7 +789,7 @@ public class AutomaticGuild {
 		try {
 			if (mayorChannel != null) {
 				if (
-						lastMayorMessage != null && Integer.parseInt(lastMayorMessage.getEmbeds().get(0).getTitle().split("Year ")[1]) != year
+					lastMayorMessage != null && Integer.parseInt(lastMayorMessage.getEmbeds().get(0).getTitle().split("Year ")[1]) != year
 				) {
 					lastMayorMessage = null;
 				}

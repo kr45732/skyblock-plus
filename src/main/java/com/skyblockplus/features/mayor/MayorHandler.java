@@ -102,7 +102,11 @@ public class MayorHandler {
 			if (higherDepth(curMayor, "name").getAsString().equals(winner)) {
 				StringBuilder perksStr = new StringBuilder();
 				for (JsonElement perk : higherDepth(curMayor, "perks").getAsJsonArray()) {
-					perksStr.append("\n➜ ").append(higherDepth(perk, "name").getAsString()).append(": ").append(parseMcCodes(higherDepth(perk, "description").getAsString()));
+					perksStr
+						.append("\n➜ ")
+						.append(higherDepth(perk, "name").getAsString())
+						.append(": ")
+						.append(parseMcCodes(higherDepth(perk, "description").getAsString()));
 				}
 
 				eb.addField(
@@ -149,7 +153,11 @@ public class MayorHandler {
 			for (JsonElement curMayor : curMayors) {
 				StringBuilder perksStr = new StringBuilder();
 				for (JsonElement perk : higherDepth(curMayor, "perks").getAsJsonArray()) {
-					perksStr.append("\n➜ ").append(higherDepth(perk, "name").getAsString()).append(": ").append(parseMcCodes(higherDepth(perk, "description").getAsString()));
+					perksStr
+						.append("\n➜ ")
+						.append(higherDepth(perk, "name").getAsString())
+						.append(": ")
+						.append(parseMcCodes(higherDepth(perk, "description").getAsString()));
 				}
 
 				int votes = higherDepth(curMayor, "votes").getAsInt();
