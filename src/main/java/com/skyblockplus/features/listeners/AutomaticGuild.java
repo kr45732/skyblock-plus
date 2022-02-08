@@ -78,6 +78,8 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 public class AutomaticGuild {
 
@@ -118,7 +120,8 @@ public class AutomaticGuild {
 		applyConstructor(event, serverSettings);
 		verifyConstructor(event, higherDepth(serverSettings, "automatedVerify"));
 		schedulerConstructor();
-		prefix = database.getPrefix(guildId);
+		prefix = higherDepth(serverSettings, "prefix", "");
+		prefix = (!prefix.isEmpty() && prefix.length() <= 5) ? prefix : DEFAULT_PREFIX;
 		farmingContest = new FarmingContest(guildId, higherDepth(serverSettings, "jacobSettings"));
 		try {
 			blacklist = higherDepth(serverSettings, "blacklist.blacklist").getAsJsonArray();
@@ -166,7 +169,7 @@ public class AutomaticGuild {
 		return automaticGuild != null ? automaticGuild.prefix : DEFAULT_PREFIX;
 	}
 
-	/* Automated Apply Methods */
+	/* Apply Methods */
 	public void applyConstructor(GenericGuildEvent event, JsonElement serverSettings) {
 		List<AutomatedGuild> currentSettings;
 		try {
@@ -298,7 +301,11 @@ public class AutomaticGuild {
 		return applyStr.length() > 0 ? applyStr.toString() : "• Error reloading";
 	}
 
-	/* Automated Verify Methods */
+	public void setBlacklist(JsonArray blacklist) {
+		this.blacklist = blacklist;
+	}
+
+	/* Verify Methods */
 	public void verifyConstructor(GenericGuildEvent event, JsonElement currentSettings) {
 		verifyGuild = new VerifyGuild(guildId);
 		if (currentSettings == null) {
@@ -746,6 +753,84 @@ public class AutomaticGuild {
 		this.skyblockEventHandler = skyblockEventHandler;
 	}
 
+	/* Fetchur */
+	public void setFetchurChannel(TextChannel channel) {
+		this.fetchurChannel = channel;
+	}
+
+	public void setFetchurPing(Role role) {
+		this.fetchurPing = role;
+	}
+
+	public void onFetchur(MessageEmbed embed) {
+		try {
+			if (fetchurChannel != null) {
+				if (fetchurPing == null) {
+					fetchurChannel.sendMessageEmbeds(embed).queue();
+				} else {
+					fetchurChannel.sendMessage(fetchurPing.getAsMention()).setEmbeds(embed).queue();
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/* Mayor */
+	public void setMayorChannel(TextChannel channel) {
+		this.mayorChannel = channel;
+	}
+
+	public void setMayorPing(Role role) {
+		this.mayorPing = role;
+	}
+
+	public void onMayorElection(MessageEmbed embed, int year) {
+		try {
+			if (mayorChannel != null) {
+				if (
+						lastMayorMessage != null && Integer.parseInt(lastMayorMessage.getEmbeds().get(0).getTitle().split("Year ")[1]) != year
+				) {
+					lastMayorMessage = null;
+				}
+
+				if (lastMayorMessage != null) {
+					mayorChannel.editMessageEmbedsById(lastMayorMessage.getId(), embed).queue();
+				} else {
+					mayorChannel.sendMessageEmbeds(embed).queue(m -> lastMayorMessage = m);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void onMayorElected(MessageEmbed embed) {
+		try {
+			lastMayorMessage = null;
+			if (mayorChannel != null) {
+				if (mayorPing == null) {
+					mayorChannel.sendMessageEmbeds(embed).queue();
+				} else {
+					mayorChannel.sendMessage(mayorPing.getAsMention()).setEmbeds(embed).queue();
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/* Party */
+	public void setPartyList(List<Party> partyList) {
+		this.partyList.clear();
+		this.partyList.addAll(partyList);
+	}
+
+	/* Jacob */
+	public void onFarmingContest(List<String> crops, MessageEmbed embed) {
+		farmingContest.onFarmingContest(crops, embed);
+	}
+
 	/* Events */
 	public void onMessageReactionAdd(MessageReactionAddEvent event) {
 		applyGuild.forEach(o1 -> o1.onMessageReactionAdd(event));
@@ -879,6 +964,22 @@ public class AutomaticGuild {
 		verifyGuild.onGuildMemberJoin(event);
 		if (applyGuestRole != null) {
 			event.getGuild().addRoleToMember(event.getMember(), applyGuestRole).queue();
+		}
+	}
+
+	public void onGuildMessageUpdate(MessageUpdateEvent event) {
+		for (ApplyGuild guild : applyGuild) {
+			if (guild.onGuildMessageUpdate(event)) {
+				return;
+			}
+		}
+	}
+
+	public void onGuildMessageDelete(MessageDeleteEvent event) {
+		for (ApplyGuild guild : applyGuild) {
+			if (guild.onGuildMessageDelete(event)) {
+				return;
+			}
 		}
 	}
 
@@ -1021,68 +1122,9 @@ public class AutomaticGuild {
 		this.applyGuestRole = role;
 	}
 
-	public void setPartyList(List<Party> partyList) {
-		this.partyList.clear();
-		this.partyList.addAll(partyList);
-	}
-
-	public void setFetchurChannel(TextChannel channel) {
-		this.fetchurChannel = channel;
-	}
-
-	public void setFetchurPing(Role role) {
-		this.fetchurPing = role;
-	}
-
-	public void setMayorChannel(TextChannel channel) {
-		this.mayorChannel = channel;
-	}
-
-	public void setMayorPing(Role role) {
-		this.mayorPing = role;
-	}
-
-	public void onFarmingContest(List<String> crops, MessageEmbed embed) {
-		farmingContest.onFarmingContest(crops, embed);
-	}
-
-	public void onFetchur(MessageEmbed embed) {
-		try {
-			if (fetchurChannel != null && fetchurChannel.canTalk()) {
-				if (fetchurPing == null) {
-					fetchurChannel.sendMessageEmbeds(embed).queue();
-				} else {
-					fetchurChannel.sendMessage(fetchurPing.getAsMention()).setEmbeds(embed).queue();
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void onGuildMessageUpdate(MessageUpdateEvent event) {
-		for (ApplyGuild guild : applyGuild) {
-			if (guild.onGuildMessageUpdate(event)) {
-				return;
-			}
-		}
-	}
-
-	public void onGuildMessageDelete(MessageDeleteEvent event) {
-		for (ApplyGuild guild : applyGuild) {
-			if (guild.onGuildMessageDelete(event)) {
-				return;
-			}
-		}
-	}
-
 	public void setBotManagerRoles(List<String> botManagerRoles) {
 		this.botManagerRoles.clear();
 		this.botManagerRoles.addAll(botManagerRoles);
-	}
-
-	public void setBlacklist(JsonArray blacklist) {
-		this.blacklist = blacklist;
 	}
 
 	public boolean isAdmin(Member member) {
@@ -1091,40 +1133,5 @@ public class AutomaticGuild {
 			return botManagerRoles.stream().anyMatch(playerRoles::contains);
 		}
 		return true;
-	}
-
-	public void onMayorElection(MessageEmbed embed, int year) {
-		try {
-			if (mayorChannel != null && mayorChannel.canTalk()) {
-				if (
-					lastMayorMessage != null && Integer.parseInt(lastMayorMessage.getEmbeds().get(0).getTitle().split("Year ")[1]) != year
-				) {
-					lastMayorMessage = null;
-				}
-
-				if (lastMayorMessage != null) {
-					mayorChannel.editMessageEmbedsById(lastMayorMessage.getId(), embed).queue();
-				} else {
-					mayorChannel.sendMessageEmbeds(embed).queue(m -> lastMayorMessage = m);
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void onMayorElected(MessageEmbed embed) {
-		try {
-			lastMayorMessage = null;
-			if (mayorChannel != null && mayorChannel.canTalk()) {
-				if (mayorPing == null) {
-					mayorChannel.sendMessageEmbeds(embed).queue();
-				} else {
-					mayorChannel.sendMessage(mayorPing.getAsMention()).setEmbeds(embed).queue();
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 }

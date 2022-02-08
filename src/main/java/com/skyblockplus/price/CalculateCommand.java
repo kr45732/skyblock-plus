@@ -73,7 +73,7 @@ public class CalculateCommand extends Command {
 			long highestBid = higherDepth(auction, "highest_bid_amount", 0L);
 			long startingBid = higherDepth(auction, "starting_bid", 0L);
 			JsonArray bidsArr = higherDepth(auction, "bids").getAsJsonArray();
-			boolean bin = higherDepth(auction, "bin") != null;
+			boolean bin = higherDepth(auction, "bin", false);
 
 			if (duration.toMillis() > 0) {
 				if (bin) {

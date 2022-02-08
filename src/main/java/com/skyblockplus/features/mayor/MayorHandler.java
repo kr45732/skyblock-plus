@@ -100,13 +100,9 @@ public class MayorHandler {
 			int votes = higherDepth(curMayor, "votes").getAsInt();
 
 			if (higherDepth(curMayor, "name").getAsString().equals(winner)) {
-				String perksStr = "";
+				StringBuilder perksStr = new StringBuilder();
 				for (JsonElement perk : higherDepth(curMayor, "perks").getAsJsonArray()) {
-					perksStr =
-						"\n➜ " +
-						higherDepth(perk, "name").getAsString() +
-						": " +
-						parseMcCodes(higherDepth(perk, "description").getAsString());
+					perksStr.append("\n➜ ").append(higherDepth(perk, "name").getAsString()).append(": ").append(parseMcCodes(higherDepth(perk, "description").getAsString()));
 				}
 
 				eb.addField(
@@ -151,13 +147,9 @@ public class MayorHandler {
 			EmbedBuilder eb = defaultEmbed("Mayor Election Open | Year " + year);
 			eb.setDescription("**Year:** " + year + "\n**Total Votes:** " + formatNumber(totalVotes));
 			for (JsonElement curMayor : curMayors) {
-				String perksStr = "";
+				StringBuilder perksStr = new StringBuilder();
 				for (JsonElement perk : higherDepth(curMayor, "perks").getAsJsonArray()) {
-					perksStr =
-						"\n➜ " +
-						higherDepth(perk, "name").getAsString() +
-						": " +
-						parseMcCodes(higherDepth(perk, "description").getAsString());
+					perksStr.append("\n➜ ").append(higherDepth(perk, "name").getAsString()).append(": ").append(parseMcCodes(higherDepth(perk, "description").getAsString()));
 				}
 
 				int votes = higherDepth(curMayor, "votes").getAsInt();

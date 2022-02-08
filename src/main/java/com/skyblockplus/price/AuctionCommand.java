@@ -325,7 +325,7 @@ public class AuctionCommand extends Command {
 		long highestBid = higherDepth(auctionJson, "highest_bid_amount", 0L);
 		long startingBid = higherDepth(auctionJson, "starting_bid", 0L);
 		JsonArray bidsArr = higherDepth(auctionJson, "bids").getAsJsonArray();
-		boolean bin = higherDepth(auctionJson, "bin") != null;
+		boolean bin = higherDepth(auctionJson, "bin", false);
 
 		if (duration.toMillis() > 0) {
 			if (bin) {
