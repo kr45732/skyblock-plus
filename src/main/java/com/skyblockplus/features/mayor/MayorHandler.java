@@ -78,7 +78,7 @@ public class MayorHandler {
 		} else { // Wait for next open
 			scheduler.schedule(
 				MayorHandler::initialize,
-				newYearStartEpoch + newYearToElectionClose - epochMilliNow + 1000,
+				newYearStartEpoch + newYearToElectionOpen - epochMilliNow + 1000,
 				TimeUnit.MILLISECONDS
 			);
 		}
