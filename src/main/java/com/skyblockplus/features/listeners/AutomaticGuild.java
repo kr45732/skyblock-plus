@@ -19,6 +19,7 @@
 package com.skyblockplus.features.listeners;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.features.mayor.MayorHandler.votesEmbed;
 import static com.skyblockplus.features.skyblockevent.SkyblockEventCommand.endSkyblockEvent;
 import static com.skyblockplus.utils.ApiHandler.getGuildFromId;
 import static com.skyblockplus.utils.ApiHandler.skyblockProfilesFromUuid;
@@ -70,16 +71,16 @@ import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 public class AutomaticGuild {
 
@@ -772,7 +773,7 @@ public class AutomaticGuild {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(guildId, e);
 		}
 	}
 
@@ -785,23 +786,27 @@ public class AutomaticGuild {
 		this.mayorPing = role;
 	}
 
-	public void onMayorElection(MessageEmbed embed, int year) {
+	public void onMayorElection(MessageEmbed embed, Button button, int year) {
 		try {
 			if (mayorChannel != null) {
 				if (
-					lastMayorMessage != null && Integer.parseInt(lastMayorMessage.getEmbeds().get(0).getTitle().split("Year ")[1]) != year
+						lastMayorMessage != null && Integer.parseInt(lastMayorMessage.getEmbeds().get(0).getTitle().split("Year ")[1]) != year
 				) {
 					lastMayorMessage = null;
 				}
 
 				if (lastMayorMessage != null) {
-					mayorChannel.editMessageEmbedsById(lastMayorMessage.getId(), embed).queue();
+					mayorChannel.editMessageEmbedsById(lastMayorMessage.getId(), embed).setActionRow(button).queue(ignore, (e) -> {
+						if (e instanceof ErrorResponseException ex && ex.getErrorResponse() == ErrorResponse.UNKNOWN_MESSAGE) {
+							lastMayorMessage = null;
+						}
+					});
 				} else {
-					mayorChannel.sendMessageEmbeds(embed).queue(m -> lastMayorMessage = m);
+					mayorChannel.sendMessageEmbeds(embed).setActionRow(button).queue(m -> lastMayorMessage = m);
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(guildId, e);
 		}
 	}
 
@@ -816,7 +821,7 @@ public class AutomaticGuild {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(guildId, e);
 		}
 	}
 
@@ -878,6 +883,9 @@ public class AutomaticGuild {
 
 	public void onButtonClick(ButtonInteractionEvent event) {
 		if (event.getComponentId().startsWith("paginator_") || event.getComponentId().startsWith("inv_paginator_")) {
+			return;
+		} else if(event.getComponentId().equals("mayor_graph_button")){
+			event.replyEmbeds(votesEmbed).setEphemeral(true).queue();
 			return;
 		} else if (event.getComponentId().startsWith("event_message_")) {
 			event.deferReply(true).complete();
@@ -1103,7 +1111,7 @@ public class AutomaticGuild {
 		for (File child : dir.listFiles()) {
 			try {
 				JsonObject itemJson = JsonParser.parseReader(new FileReader(child)).getAsJsonObject();
-				if (itemJson.has("vanilla")) {
+				if (higherDepth(itemJson, "vanilla", false) || higherDepth(itemJson, "lore.[0]", "").equals("§8Furniture")) {
 					String id = itemJson.get("internalname").getAsString().replace("-", ":");
 					outputObject.addProperty(id, Math.max(0, getNpcSellPrice(id)));
 				}

@@ -27,17 +27,19 @@ import static com.skyblockplus.utils.Utils.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.skyblockplus.features.listeners.AutomaticGuild;
+
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.groovy.util.Maps;
 
 public class MayorHandler {
 
-	public static Map<String, String> mayorNameToEmoji = Maps.of(
+	public static final Map<String, String> mayorNameToEmoji = Maps.of(
 		"DERPY",
 		"<:derpy:940083649129349150>",
 		"FOXY",
@@ -63,6 +65,7 @@ public class MayorHandler {
 		"MARINA",
 		"<:marina:940083649783664660>"
 	);
+	public static MessageEmbed votesEmbed = defaultEmbed("Mayor Election Graph").setDescription("Data not loaded yet").build();
 
 	public static void initialize() {
 		long newYearStartEpoch = YEAR_0 + 446400000L * (getSkyblockYear() - 1);
@@ -152,42 +155,49 @@ public class MayorHandler {
 			}
 
 			JsonArray curMayors = collectJsonArray(
-				streamJsonArray(higherDepth(cur, "candidates").getAsJsonArray())
-					.sorted(Comparator.comparingInt(m -> -higherDepth(m, "votes").getAsInt()))
+					streamJsonArray(higherDepth(cur, "candidates").getAsJsonArray())
+							.sorted(Comparator.comparingInt(m -> -higherDepth(m, "votes").getAsInt()))
 			);
 			double totalVotes = streamJsonArray(curMayors).mapToInt(m -> higherDepth(m, "votes").getAsInt()).sum();
 			int year = higherDepth(cur, "year").getAsInt();
 			EmbedBuilder eb = defaultEmbed("Mayor Election Open | Year " + year);
 			eb.setDescription(
-				"**Year:** " +
-				year +
-				"\n**Total Votes:** " +
-				formatNumber(totalVotes) +
-				"\n**Closes:** <t:" +
-				Instant.ofEpochMilli(YEAR_0 + 446400000L * (getSkyblockYear() - 1) + 105600000).getEpochSecond() +
-				":R>"
+					"**Year:** " +
+							year +
+							"\n**Total Votes:** " +
+							formatNumber(totalVotes) +
+							"\n**Closes:** <t:" +
+							Instant.ofEpochMilli(YEAR_0 + 446400000L * (year == getSkyblockYear() ? getSkyblockYear() : getSkyblockYear() + 1) + 105600000).getEpochSecond() +
+							":R>"
 			);
+			StringBuilder votesStr = new StringBuilder();
 			for (JsonElement curMayor : curMayors) {
 				StringBuilder perksStr = new StringBuilder();
 				for (JsonElement perk : higherDepth(curMayor, "perks").getAsJsonArray()) {
 					perksStr
-						.append("\n➜ ")
-						.append(higherDepth(perk, "name").getAsString())
-						.append(": ")
-						.append(parseMcCodes(higherDepth(perk, "description").getAsString()));
+							.append("\n➜ ")
+							.append(higherDepth(perk, "name").getAsString())
+							.append(": ")
+							.append(parseMcCodes(higherDepth(perk, "description").getAsString()));
 				}
 
 				int votes = higherDepth(curMayor, "votes").getAsInt();
 				String name = higherDepth(curMayor, "name").getAsString();
 				eb.addField(
-					mayorNameToEmoji.get(name.toUpperCase()) + " " + name,
-					"**Votes:** " + roundProgress(votes / totalVotes) + " (" + formatNumber(votes) + ")\n**Perks:**" + perksStr,
-					false
+						mayorNameToEmoji.get(name.toUpperCase()) + " " + name,
+						"**Votes:** " + roundProgress(votes / totalVotes) + " (" + formatNumber(votes) + ")\n**Perks:**" + perksStr,
+						false
 				);
+
+				int voteGlass = (int) (20.0 * votes / totalVotes);
+				votesStr.append(mayorNameToEmoji.get(name.toUpperCase())).append(" ").append("<:g:939022210499248138>".repeat(voteGlass)).append("<:l:939022213762383993>".repeat(20 - voteGlass)).append("\n");
 			}
+			votesEmbed = defaultEmbed("Mayor Election Graph | Year " + year).setDescription(votesStr).build();
+
 			MessageEmbed embed = eb.build();
+			Button button = Button.primary("mayor_graph_button", "View Graph");
 			for (AutomaticGuild guild : guildMap.values()) {
-				guild.onMayorElection(embed, year); // Send or update message
+				guild.onMayorElection(embed, button, year); // Send or update message
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

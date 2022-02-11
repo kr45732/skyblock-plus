@@ -304,8 +304,8 @@ public class SkyblockEventHandler {
 			case 3:
 				try {
 					int eventDuration = Integer.parseInt(replyMessage);
-					if (eventDuration <= 0 || eventDuration > 336) {
-						eb.setDescription("The event must be at least an hour and at most 2 weeks (336 hours). Please try again.");
+					if (eventDuration <= 0 || eventDuration > 672) {
+						eb.setDescription("The event must be at least an hour and at most 4 weeks (672 hours). Please try again.");
 						attemptsLeft--;
 					} else {
 						long endingTimeSeconds = Instant.now().plus(eventDuration, ChronoUnit.HOURS).getEpochSecond();
