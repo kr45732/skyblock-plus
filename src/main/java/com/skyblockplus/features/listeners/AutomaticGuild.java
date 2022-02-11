@@ -790,17 +790,23 @@ public class AutomaticGuild {
 		try {
 			if (mayorChannel != null) {
 				if (
-						lastMayorMessage != null && Integer.parseInt(lastMayorMessage.getEmbeds().get(0).getTitle().split("Year ")[1]) != year
+					lastMayorMessage != null && Integer.parseInt(lastMayorMessage.getEmbeds().get(0).getTitle().split("Year ")[1]) != year
 				) {
 					lastMayorMessage = null;
 				}
 
 				if (lastMayorMessage != null) {
-					mayorChannel.editMessageEmbedsById(lastMayorMessage.getId(), embed).setActionRow(button).queue(ignore, (e) -> {
-						if (e instanceof ErrorResponseException ex && ex.getErrorResponse() == ErrorResponse.UNKNOWN_MESSAGE) {
-							lastMayorMessage = null;
-						}
-					});
+					mayorChannel
+						.editMessageEmbedsById(lastMayorMessage.getId(), embed)
+						.setActionRow(button)
+						.queue(
+							ignore,
+							e -> {
+								if (e instanceof ErrorResponseException ex && ex.getErrorResponse() == ErrorResponse.UNKNOWN_MESSAGE) {
+									lastMayorMessage = null;
+								}
+							}
+						);
 				} else {
 					mayorChannel.sendMessageEmbeds(embed).setActionRow(button).queue(m -> lastMayorMessage = m);
 				}
@@ -884,7 +890,7 @@ public class AutomaticGuild {
 	public void onButtonClick(ButtonInteractionEvent event) {
 		if (event.getComponentId().startsWith("paginator_") || event.getComponentId().startsWith("inv_paginator_")) {
 			return;
-		} else if(event.getComponentId().equals("mayor_graph_button")){
+		} else if (event.getComponentId().equals("mayor_graph_button")) {
 			event.replyEmbeds(votesEmbed).setEphemeral(true).queue();
 			return;
 		} else if (event.getComponentId().startsWith("event_message_")) {

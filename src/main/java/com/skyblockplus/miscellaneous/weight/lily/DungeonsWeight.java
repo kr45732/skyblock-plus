@@ -49,10 +49,10 @@ public class DungeonsWeight {
 
 		double extra = 0;
 		double n = 0;
-		if(cataXP < 569809640) {
+		if (cataXP < 569809640) {
 			n = 0.2 * Math.pow(level / 50, 1.538679118869934);
 		} else {
-			extra =  Math.pow(500 * (cataXP - CATACOMBS_LEVEL_50_XP) / 142452410, 1 / 1.781925776625157);
+			extra = Math.pow(500 * (cataXP - CATACOMBS_LEVEL_50_XP) / 142452410, 1 / 1.781925776625157);
 		}
 
 		if (level != 0) {

@@ -28,7 +28,6 @@ import com.skyblockplus.utils.command.CommandExecute;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.*;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.apache.groovy.util.Maps;
 
@@ -46,26 +45,15 @@ public class CakesCommand extends Command {
 			EmbedBuilder eb = player.defaultPlayerEmbed();
 
 			Map<String, String> cakeNameToId = new HashMap<>();
-			cakeNameToId.put(
-					"cake_strength",
-					"EPOCH_CAKE_RED");
-			cakeNameToId.put("cake_pet_luck",
-					"EPOCH_CAKE_PURPLE");
-			cakeNameToId.put("cake_health",
-					"EPOCH_CAKE_PINK");
-			cakeNameToId.put("cake_walk_speed",
-					"EPOCH_CAKE_YELLOW");
-			cakeNameToId.put("cake_magic_find",
-					"EPOCH_CAKE_BLACK");
-			cakeNameToId.put("cake_ferocity",
-					"EPOCH_CAKE_ORANGE");
-			cakeNameToId.put("cake_defense",
-					"EPOCH_CAKE_GREEN");
-			cakeNameToId.put("cake_sea_creature_chance",
-					"EPOCH_CAKE_BLUE");
-			cakeNameToId.put("cake_intelligence",
-					"EPOCH_CAKE_AQUA");
-
+			cakeNameToId.put("cake_strength", "EPOCH_CAKE_RED");
+			cakeNameToId.put("cake_pet_luck", "EPOCH_CAKE_PURPLE");
+			cakeNameToId.put("cake_health", "EPOCH_CAKE_PINK");
+			cakeNameToId.put("cake_walk_speed", "EPOCH_CAKE_YELLOW");
+			cakeNameToId.put("cake_magic_find", "EPOCH_CAKE_BLACK");
+			cakeNameToId.put("cake_ferocity", "EPOCH_CAKE_ORANGE");
+			cakeNameToId.put("cake_defense", "EPOCH_CAKE_GREEN");
+			cakeNameToId.put("cake_sea_creature_chance", "EPOCH_CAKE_BLUE");
+			cakeNameToId.put("cake_intelligence", "EPOCH_CAKE_AQUA");
 
 			StringBuilder activeCakes = new StringBuilder();
 			if (higherDepth(player.profileJson(), "temp_stat_buffs") != null) {
