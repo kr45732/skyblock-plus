@@ -52,7 +52,7 @@ public class DungeonsWeight {
 		if (cataXP < 569809640) {
 			n = 0.2 * Math.pow(level / 50, 1.538679118869934);
 		} else {
-			extra = Math.pow(500 * (cataXP - CATACOMBS_LEVEL_50_XP) / 142452410, 1 / 1.781925776625157);
+			extra = 500.0 * Math.pow((cataXP - CATACOMBS_LEVEL_50_XP) / 142452410.0, 1.0 / 1.781925776625157);
 		}
 
 		if (level != 0) {
@@ -146,7 +146,9 @@ public class DungeonsWeight {
 				}
 
 				double floorScore = amount * dcw.get("master_catacombs_" + masterFloor.getKey()).getAsDouble();
-				if (excess > 0) floorScore *= (Math.log((excess / 1000) + 1) / Math.log(6)) + 1;
+				if (excess > 0) {
+					floorScore *= (Math.log((excess / 1000) + 1) / Math.log(6)) + 1;
+				}
 				masterScore += floorScore;
 			}
 

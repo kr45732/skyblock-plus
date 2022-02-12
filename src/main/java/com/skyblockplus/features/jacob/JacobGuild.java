@@ -27,17 +27,19 @@ import com.google.gson.reflect.TypeToken;
 import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.skyblockplus.features.listeners.AutomaticGuild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 
-public class FarmingContest {
+public class JacobGuild {
 
 	public final String guildId;
 	public boolean enable = false;
 	public List<RoleObject> wantedCrops;
 	public TextChannel channel;
 
-	public FarmingContest(String guildId, JsonElement jacobSettings) {
+	public JacobGuild(String guildId, JsonElement jacobSettings) {
 		this.guildId = guildId;
 		reloadSettingsJson(jacobSettings);
 	}
@@ -57,7 +59,7 @@ public class FarmingContest {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			AutomaticGuild.getLogger().error(guildId, e);
 		}
 	}
 
@@ -70,7 +72,7 @@ public class FarmingContest {
 					gson.fromJson(higherDepth(jacobSettings, "crops").getAsJsonArray(), new TypeToken<List<RoleObject>>() {}.getType());
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			AutomaticGuild.getLogger().error(guildId, e);
 		}
 	}
 }

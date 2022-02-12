@@ -38,7 +38,7 @@ import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
 import com.skyblockplus.features.apply.ApplyGuild;
 import com.skyblockplus.features.apply.ApplyUser;
-import com.skyblockplus.features.jacob.FarmingContest;
+import com.skyblockplus.features.jacob.JacobGuild;
 import com.skyblockplus.features.party.Party;
 import com.skyblockplus.features.setup.SetupCommandHandler;
 import com.skyblockplus.features.skyblockevent.SkyblockEventCommand;
@@ -107,7 +107,7 @@ public class AutomaticGuild {
 	/* Party */
 	public final List<Party> partyList = new ArrayList<>();
 	/* Jacob */
-	public final FarmingContest farmingContest;
+	public final JacobGuild jacobGuild;
 	/* Miscellaneous */
 	public final List<String> botManagerRoles = new ArrayList<>();
 	public final String guildId;
@@ -123,7 +123,7 @@ public class AutomaticGuild {
 		schedulerConstructor();
 		prefix = higherDepth(serverSettings, "prefix", "");
 		prefix = (!prefix.isEmpty() && prefix.length() <= 5) ? prefix : DEFAULT_PREFIX;
-		farmingContest = new FarmingContest(guildId, higherDepth(serverSettings, "jacobSettings"));
+		jacobGuild = new JacobGuild(guildId, higherDepth(serverSettings, "jacobSettings"));
 		try {
 			blacklist = higherDepth(serverSettings, "blacklist.blacklist").getAsJsonArray();
 		} catch (Exception ignored) {}
@@ -839,7 +839,7 @@ public class AutomaticGuild {
 
 	/* Jacob */
 	public void onFarmingContest(List<String> crops, MessageEmbed embed) {
-		farmingContest.onFarmingContest(crops, embed);
+		jacobGuild.onFarmingContest(crops, embed);
 	}
 
 	/* Events */
@@ -1116,9 +1116,9 @@ public class AutomaticGuild {
 
 		for (File child : dir.listFiles()) {
 			try {
-				JsonObject itemJson = JsonParser.parseReader(new FileReader(child)).getAsJsonObject();
-				if (higherDepth(itemJson, "vanilla", false) || higherDepth(itemJson, "lore.[0]", "").equals("§8Furniture")) {
-					String id = itemJson.get("internalname").getAsString().replace("-", ":");
+				JsonElement itemJson = JsonParser.parseReader(new FileReader(child));
+				if (higherDepth(itemJson, "vanilla", false) || (higherDepth(itemJson, "lore.[0]", "").equals("§8Furniture") && !higherDepth(itemJson, "internalname", "").startsWith("EPOCH_CAKE_"))) {
+					String id = higherDepth(itemJson, "internalname").getAsString().replace("-", ":");
 					outputObject.addProperty(id, Math.max(0, getNpcSellPrice(id)));
 				}
 			} catch (Exception e) {
@@ -1147,5 +1147,9 @@ public class AutomaticGuild {
 			return botManagerRoles.stream().anyMatch(playerRoles::contains);
 		}
 		return true;
+	}
+
+	public static Logger getLogger(){
+		return log;
 	}
 }

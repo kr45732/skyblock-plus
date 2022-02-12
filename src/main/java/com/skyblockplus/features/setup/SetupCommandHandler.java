@@ -20,15 +20,16 @@ package com.skyblockplus.features.setup;
 
 import static com.skyblockplus.features.listeners.MainListener.onApplyReload;
 import static com.skyblockplus.features.listeners.MainListener.onVerifyReload;
-import static com.skyblockplus.utils.Utils.database;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
-import static com.skyblockplus.utils.Utils.gson;
-import static com.skyblockplus.utils.Utils.waiter;
+import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.skyblockplus.api.serversettings.automatedverify.AutomatedVerify;
 import com.skyblockplus.settings.SettingsExecute;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Category;
@@ -46,7 +47,7 @@ public class SetupCommandHandler {
 	private String name;
 
 	public SetupCommandHandler(ButtonInteractionEvent buttonEvent, String featureType) {
-		settings = new SettingsExecute(buttonEvent.getGuild(), buttonEvent.getChannel(), buttonEvent.getUser());
+		this.settings = new SettingsExecute(buttonEvent.getGuild(), buttonEvent.getChannel(), buttonEvent.getUser());
 		this.buttonEvent = buttonEvent;
 
 		switch (featureType) {
@@ -114,6 +115,45 @@ public class SetupCommandHandler {
 							.build()
 					)
 					.queue();
+				break;
+			case "fetchur":
+				buttonEvent
+						.getHook()
+						.editOriginalEmbeds(
+								defaultEmbed("Setup")
+										.setDescription(
+												"Reply with the channel where fetchur notifications should be sent."
+										)
+										.setFooter("Reply with 'cancel' to stop the process • dsc.gg/sb+")
+										.build()
+						)
+						.queue();
+				break;
+			case "mayor":
+				buttonEvent
+						.getHook()
+						.editOriginalEmbeds(
+								defaultEmbed("Setup")
+										.setDescription(
+												"Reply with the channel where mayor notifications should be sent."
+										)
+										.setFooter("Reply with 'cancel' to stop the process • dsc.gg/sb+")
+										.build()
+						)
+						.queue();
+				break;
+			case "jacob":
+				buttonEvent
+						.getHook()
+						.editOriginalEmbeds(
+								defaultEmbed("Setup")
+										.setDescription(
+												"Reply with the channel where farming event notifications should be sent."
+										)
+										.setFooter("Reply with 'cancel' to stop the process • dsc.gg/sb+")
+										.build()
+						)
+						.queue();
 				break;
 			default:
 				if (featureType.startsWith("guild_apply")) {
@@ -436,6 +476,83 @@ public class SetupCommandHandler {
 				if (eb.build().getTitle().equals("Settings")) {
 					sendEmbed(eb);
 					return;
+				}
+				break;
+			case "fetchur":
+				switch (state) {
+					case 0 -> {
+						eb = settings.setFetchurChannel(event.getMessage().getContentRaw());
+						eb2.setDescription("Reply with the role that should be pinged when the notifications are sent or 'none'.");
+					}
+					case 1 -> {
+						eb = settings.setFetchurPing(event.getMessage().getContentRaw());
+						if(eb.build().getTitle().equals("Settings")){
+							sendEmbed(eb);
+							return;
+						}
+					}
+				}
+				break;
+			case "mayor":
+				switch (state) {
+					case 0 -> {
+						eb = settings.setMayorChannel(event.getMessage().getContentRaw());
+						eb2.setDescription("Reply with the role that should be pinged when the notifications are sent or 'none'.");
+					}
+					case 1 -> {
+						eb = settings.setMayorPing(event.getMessage().getContentRaw());
+						if(eb.build().getTitle().equals("Settings")){
+							sendEmbed(eb);
+							return;
+						}
+					}
+				}
+				break;
+			case "jacob":
+				switch (state) {
+					case 0 -> {
+						eb = settings.setJacobChannel(event.getMessage().getContentRaw());
+						eb2.setDescription("Reply with the crops (separated by a comma) that should be pinged or 'all' to add all crops");
+					}
+					case 1 -> {
+						List<String> crops = new ArrayList<>();
+
+						if(event.getMessage().getContentRaw().equalsIgnoreCase("all")){
+							crops.addAll(Arrays.asList(
+									"Wheat",
+									"Carrot",
+									"Potato",
+									"Pumpkin",
+									"Melon",
+									"Mushroom",
+									"Cactus",
+									"Sugar Cane",
+									"Nether Wart",
+									"Cocoa Beans"
+							));
+						}else{
+							for (String crop : event.getMessage().getContentRaw().split(",")) {
+								crops.add(capitalizeString(crop.trim()));
+							}
+						}
+
+						for (String crop : crops) {
+							eb = settings.addJacobCrop(crop);
+							if (!eb.build().getTitle().equals("Settings")) {
+								break;
+							}
+						}
+						eb2.setDescription("Reply with 'enable' to enable farming event notifications or anything else to cancel.");
+					}
+					case 2 -> {
+						if (event.getMessage().getContentRaw().equalsIgnoreCase("enable")) {
+							sendEmbed( settings.setJacobEnable(true));
+						} else {
+							sendEmbed(defaultEmbed("Canceled the process"));
+							cancel();
+						}
+						return;
+					}
 				}
 				break;
 		}

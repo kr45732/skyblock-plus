@@ -1180,18 +1180,25 @@ public class Utils {
 			List<ApplyGuild> applySettings = automaticGuild.getValue().applyGuild;
 			for (ApplyGuild applySetting : applySettings) {
 				try {
-					List<ApplyUser> applyUserList = applySetting.applyUserList;
-					int code = database.setApplyCacheSettings(
+					String name = higherDepth(applySetting.currentSettings, "guildName").getAsString();
+					List<ApplyUser> applyUserList = applySetting.applyUserList.stream().filter(a -> {
+						try {
+							return jda.getTextChannelById(a.applicationChannelId) != null;
+						} catch (Exception e){
+							return false;
+						}
+					}).collect(Collectors.toList());
+					database.setApplyCacheSettings(
 						automaticGuild.getKey(),
-						higherDepth(applySetting.currentSettings, "guildName").getAsString(),
+						name,
 						gson.toJson(applyUserList)
 					);
 
 					if (applyUserList.size() > 0) {
-						log.info("Cached ApplyUser - " + code + " | " + automaticGuild.getKey() + " | " + applyUserList.size());
+						log.info("Retrieved ApplyUser cache - size={" + applyUserList.size() + "}, guildId={" + automaticGuild.getKey() + "}, name={" + name + "}");
 					}
 				} catch (Exception e) {
-					log.error("cacheApplyGuildUsers - " + automaticGuild.getKey(), e);
+					log.error("guildId={" + automaticGuild.getKey() + "}, name={" + higherDepth(applySetting.currentSettings, "guildName", "null") + "}", e);
 				}
 			}
 		}
@@ -1234,11 +1241,11 @@ public class Utils {
 				applyUsersCacheList.add(currentApplyUserCache);
 			}
 			if (applyUsersCacheList.size() > 0) {
-				log.info("Retrieved cache (" + applyUsersCacheList.size() + ") - guildId={" + guildId + "}, name={" + name + "}");
+				log.info("Retrieved ApplyUser cache - size={" + applyUsersCacheList.size() + "}, guildId={" + guildId + "}, name={" + name + "}");
 				return applyUsersCacheList;
 			}
 		} catch (Exception e) {
-			log.error("getApplyGuildUsersCache(guildId={" + guildId + "}, name={" + name + "})", e);
+			log.error("guildId={" + guildId + "}, name={" + name + "}", e);
 		}
 
 		return new ArrayList<>();

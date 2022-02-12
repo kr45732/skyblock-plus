@@ -501,7 +501,7 @@ public class SettingsExecute {
 			return apiFailMessage(responseCode);
 		}
 
-		guildMap.get(guild.getId()).farmingContest.reloadSettingsJson(jacobSettings);
+		guildMap.get(guild.getId()).jacobGuild.reloadSettingsJson(jacobSettings);
 
 		return defaultSettingsEmbed("Removed jacob crop: " + crop);
 	}
@@ -547,7 +547,7 @@ public class SettingsExecute {
 		if (responseCode != 200) {
 			return apiFailMessage(responseCode);
 		}
-		guildMap.get(guild.getId()).farmingContest.reloadSettingsJson(jacobSettings);
+		guildMap.get(guild.getId()).jacobGuild.reloadSettingsJson(jacobSettings);
 
 		return defaultSettingsEmbed("Added Jacob crop: " + crop + " - " + role.getAsMention());
 	}
@@ -569,7 +569,7 @@ public class SettingsExecute {
 		if (responseCode != 200) {
 			return apiFailMessage(responseCode);
 		}
-		guildMap.get(guild.getId()).farmingContest.reloadSettingsJson(jacobSettings);
+		guildMap.get(guild.getId()).jacobGuild.reloadSettingsJson(jacobSettings);
 
 		return defaultSettingsEmbed((enable ? "Enabled" : "Disabled") + " jacob notifications");
 	}

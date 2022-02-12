@@ -26,6 +26,7 @@ import static com.skyblockplus.utils.Utils.jda;
 import com.google.gson.*;
 import com.skyblockplus.features.apply.log.ApplyLog;
 import com.skyblockplus.features.apply.log.LogMessage;
+import com.skyblockplus.features.listeners.AutomaticGuild;
 import com.skyblockplus.miscellaneous.networth.NetworthExecute;
 import com.skyblockplus.utils.Player;
 import java.io.File;
@@ -714,7 +715,7 @@ public class ApplyUser implements Serializable {
 
 						logFile.delete();
 					} catch (Exception e) {
-						e.printStackTrace();
+						AutomaticGuild.getLogger().error(guildId, e);
 					}
 				}
 				return true;
