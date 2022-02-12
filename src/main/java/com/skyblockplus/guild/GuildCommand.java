@@ -224,7 +224,7 @@ public class GuildCommand extends Command {
 		String guildName = higherDepth(guildJson, "name").getAsString();
 
 		JsonElement created = higherDepth(guildJson, "created");
-		String[] date = Date.from(Instant.ofEpochMilli(created.getAsLong())).toString().split(" ");
+		String[] date = Date.from(Instant.ofEpochMilli(created.getAsLong())).toString().split("\\s+");
 		guildInfo += ("• " + guildName + " was created on " + date[1] + " " + date[2] + ", " + date[5]) + "\n";
 
 		JsonArray guildMembers = higherDepth(guildJson, "members").getAsJsonArray();

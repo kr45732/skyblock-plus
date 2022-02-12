@@ -23,6 +23,8 @@ import java.util.Arrays;
 import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed.Field;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 public class PaginatorExtras {
 
@@ -31,6 +33,7 @@ public class PaginatorExtras {
 	private final List<String> thumbnails = new ArrayList<>();
 	private final List<Field> embedFields = new ArrayList<>();
 	private final List<EmbedBuilder> embedPages = new ArrayList<>();
+	private final List<Button> buttons = new ArrayList<>();
 	private final PaginatorType type;
 	private String everyPageText = null;
 	private String everyPageTitle = null;
@@ -150,6 +153,18 @@ public class PaginatorExtras {
 	public PaginatorExtras addEmbedPage(EmbedBuilder embedBuilder) {
 		this.embedPages.add(embedBuilder);
 		return this;
+	}
+
+	/**
+	 * Only on one row after arrows
+	 */
+	public PaginatorExtras addButton(Button button) {
+		this.buttons.add(button);
+		return this;
+	}
+
+	public ActionRow getButtons(){
+		return buttons.isEmpty() ? null : ActionRow.of(buttons);
 	}
 
 	public enum PaginatorType {

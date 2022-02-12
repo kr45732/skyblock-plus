@@ -70,6 +70,7 @@ public class ApiHandler {
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateBotStatistics, 0, 3, TimeUnit.HOURS);
 			cacheDatabase.initializeCommandUses();
 			cacheDatabase.initializeJacobData();
+			cacheDatabase.initializeAhTracker();
 			updateApplyCache = scheduler.scheduleWithFixedDelay(cacheDatabase::updateCache, 60, 90, TimeUnit.SECONDS);
 			scheduler.scheduleWithFixedDelay(Utils::cacheApplyGuildUsers, 30, 30, TimeUnit.MINUTES);
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateLinkedAccounts, 60, 45, TimeUnit.SECONDS);

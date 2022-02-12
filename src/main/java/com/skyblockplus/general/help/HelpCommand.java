@@ -227,17 +227,6 @@ public class HelpCommand extends Command {
 				)
 					.addExamples("calculate 8be8bef8c46f4dbda2eccd1ca0c30e27")
 					.setCategory("price"),
-				new HelpData("track", "Main track command")
-					.addSubcommands(
-						new HelpData(
-							"auctions",
-							"Track a player's auctions. You will get a DM whenever any of a player's auctions sell.",
-							"track [player]"
-						)
-							.addExamples("auctions CrypticPlasma"),
-						new HelpData("stop", "Stop tracking a player's auctions")
-					)
-					.setCategory("price"),
 				// Inventory
 				new HelpData("inventory", "Get a player's inventory represented in emojis.", "inventory [player] [profile]")
 					.addSecondData("Get a player's inventory with lore.", "inventory [player] [profile] <slot:number>")
@@ -698,7 +687,7 @@ public class HelpCommand extends Command {
 	public static EmbedBuilder getHelp(String pageStr, PaginatorEvent event) {
 		int startingPage = 0;
 		if (pageStr != null) {
-			String[] pageStrSplit = pageStr.split(" ", 2);
+			String[] pageStrSplit = pageStr.split("\\s+", 2);
 
 			if (pageStrSplit.length >= 1) {
 				HelpData matchCmd = helpDataList.stream().filter(cmd -> cmd.matchTo(pageStrSplit[0])).findFirst().orElse(null);
@@ -730,7 +719,6 @@ public class HelpCommand extends Command {
 			help.create("information", "Show information and statistics about the bot") +
 			help.create("invite", "Get the invite link and Discord link for the bot") +
 			help.create("link <player>", "Link your Hypixel account to the bot") +
-			help.create("link", "Get what Hypixel account you are linked to") +
 			help.create("unlink", "Unlink your account from the bot") +
 			help.create("vote", "Vote for the bot")
 		);
@@ -782,9 +770,7 @@ public class HelpCommand extends Command {
 			help.create("bids [player]", "Get a player's auction house bids") +
 			help.create("price <item> [type:bin|auction|both]", "Query the auction house for the lowest bin of an item") +
 			help.create("bits <item>", "Get the bits cost of an item from the bits shop") +
-			help.create("calculate <uuid>", "Calculate the price of an item on the auction house using the auction's UUID") +
-			help.create("track auctions <player>", "Get a DM when any of a player's auctions sell") +
-			help.create("track stop", "Stop tracking a player's auctions")
+			help.create("calculate <uuid>", "Calculate the price of an item on the auction house using the auction's UUID")
 		);
 
 		paginateBuilder.addItems(
@@ -868,7 +854,7 @@ public class HelpCommand extends Command {
 			help.create("settings bot_manager remove <@role>", "Remove a bot manager role") +
 			help.create("settings delete hypixel_key", "Delete the set Hypixel API key of this server") +
 			help.create("settings delete all", "Delete the current server settings") +
-			help.create("settings fix_application <#channel> <state>", "Fix an application")
+			help.create("fix-application <#channel> <state>", "Fix an application")
 		);
 
 		paginateBuilder.addItems(

@@ -167,7 +167,7 @@ public class MayorHandler {
 				formatNumber(totalVotes) +
 				"\n**Closes:** <t:" +
 				Instant
-					.ofEpochMilli(YEAR_0 + 446400000L * (year == getSkyblockYear() ? getSkyblockYear() : getSkyblockYear() + 1) + 105600000)
+					.ofEpochMilli(YEAR_0 + 446400000L * (year == getSkyblockYear() ? getSkyblockYear() : getSkyblockYear() - 1) + 105600000)
 					.getEpochSecond() +
 				":R>"
 			);

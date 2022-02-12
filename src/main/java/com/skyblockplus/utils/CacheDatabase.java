@@ -28,6 +28,8 @@ import com.google.gson.reflect.TypeToken;
 import com.skyblockplus.features.jacob.JacobData;
 import com.skyblockplus.features.jacob.JacobHandler;
 import com.skyblockplus.features.party.Party;
+import com.skyblockplus.price.AuctionTracker;
+import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.lang.reflect.Type;
@@ -176,12 +178,41 @@ public class CacheDatabase {
 		}
 	}
 
+	public boolean cacheAhTracker(String json) {
+		try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
+			statement.executeUpdate("INSERT INTO ah_track VALUES (0, '" + json + "') ON DUPLICATE KEY UPDATE data = VALUES(data)");
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
 	public boolean cacheJacobData(String json) {
 		try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
 			statement.executeUpdate("INSERT INTO jacob VALUES (0, '" + json + "') ON DUPLICATE KEY UPDATE data = VALUES(data)");
 			return true;
 		} catch (Exception e) {
 			return false;
+		}
+	}
+
+	public void initializeAhTracker() {
+		if (!isMainBot()) {
+			return;
+		}
+
+		try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("SELECT * FROM ah_track")) {
+			try (ResultSet response = statement.executeQuery()) {
+				response.next();
+				Map<String, UsernameUuidStruct> ahTrack = gson.fromJson(
+						response.getString("data"),
+						new TypeToken<Map<String, UsernameUuidStruct>>() {}.getType()
+				);
+				AuctionTracker.setAhTrack(ahTrack);
+				log.info("Retrieved auction tracker");
+			}
+		} catch (Exception e) {
+			log.error("", e);
 		}
 	}
 
@@ -201,7 +232,7 @@ public class CacheDatabase {
 				log.info("Retrieved command uses");
 			}
 		} catch (Exception e) {
-			log.error("initializeCommandUses", e);
+			log.error("", e);
 		}
 	}
 
@@ -217,7 +248,7 @@ public class CacheDatabase {
 				log.info("Retrieved jacob data");
 			}
 		} catch (Exception e) {
-			log.error("initializeJacobData", e);
+			log.error("", e);
 		}
 	}
 
@@ -239,7 +270,7 @@ public class CacheDatabase {
 						guildMap.get(guildId).setPartyList(partyList);
 						log.info("Retrieved party cache (" + partyList.size() + ") - guildId={" + guildId + "}");
 					} catch (Exception e) {
-						log.error("initializeParties guildId={" + guildId + "}", e);
+						log.error("guildId={" + guildId + "}", e);
 					}
 				}
 			}

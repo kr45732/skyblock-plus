@@ -25,10 +25,8 @@ import com.jagrosh.jdautilities.menu.Menu;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import java.awt.*;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -37,8 +35,8 @@ import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
@@ -138,6 +136,20 @@ public class CustomPaginator extends Menu {
 	}
 
 	private void initialize(RestAction<Message> action, int pageNum) {
+		List<ActionRow> buttons = new ArrayList<>();
+		if (pages > 1) {
+			buttons.add(ActionRow.of(Button.primary(LEFT, Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")).asDisabled(), Button.primary(RIGHT, Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))));
+		}
+		if (extras.getButtons() != null) {
+			buttons.add(extras.getButtons());
+		}
+
+		if (action instanceof MessageAction a) {
+			action = a.setActionRows(buttons);
+		} else if (action instanceof WebhookMessageUpdateAction<Message> a) {
+			action = a.setActionRows(buttons);
+		}
+
 		if (pages == 0) {
 			if (action instanceof MessageAction a) {
 				action = a.setEmbeds(defaultEmbed("No items to paginate").build());
@@ -145,33 +157,18 @@ public class CustomPaginator extends Menu {
 				action = a.setEmbeds(defaultEmbed("No items to paginate").build());
 			}
 			action.queue();
-			return;
-		} else if (pages > 1) {
-			if (action instanceof MessageAction a) {
-				action =
-					a.setActionRow(
-						Button.primary(LEFT, Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")),
-						Button.primary(RIGHT, Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
-					);
-			} else if (action instanceof WebhookMessageUpdateAction<Message> a) {
-				action =
-					a.setActionRow(
-						Button.primary(LEFT, Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")),
-						Button.primary(RIGHT, Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
-					);
-			}
+		} else {
+			action.queue(
+					m -> {
+						if (pages > 1) {
+							pagination(m, pageNum);
+						} else {
+							finalAction.accept(m);
+						}
+					},
+					throwableConsumer
+			);
 		}
-
-		action.queue(
-			m -> {
-				if (pages > 1) {
-					pagination(m, pageNum);
-				} else {
-					finalAction.accept(m);
-				}
-			},
-			throwableConsumer
-		);
 	}
 
 	private void pagination(Message message, int pageNum) {
@@ -194,16 +191,10 @@ public class CustomPaginator extends Menu {
 			return false;
 		}
 
-		switch (event.getButton().getId()) {
-			case LEFT:
-			case RIGHT:
-				return isValidUser(event.getUser(), event.isFromGuild() ? event.getGuild() : null);
-			default:
-				event
-					.editButton(event.getButton().asDisabled().withId("disabled").withLabel("Disabled").withStyle(ButtonStyle.DANGER))
-					.queue();
-				return false;
-		}
+		return switch (event.getButton().getId()) {
+			case LEFT, RIGHT -> isValidUser(event.getUser(), event.isFromGuild() ? event.getGuild() : null);
+			default -> false;
+		};
 	}
 
 	private void handleButtonClick(ButtonInteractionEvent event, int pageNum) {
@@ -232,8 +223,11 @@ public class CustomPaginator extends Menu {
 			}
 		}
 
+		List<ActionRow> actionRows = new ArrayList<>(event.getMessage().getActionRows());
+		actionRows.set(0, ActionRow.of(newPageNum == 1 ? actionRows.get(0).getButtons().get(0).asDisabled() : actionRows.get(0).getButtons().get(0).asEnabled(), newPageNum == pages ? actionRows.get(0).getButtons().get(1).asDisabled() : actionRows.get(0).getButtons().get(1).asEnabled()));
+
 		int n = newPageNum;
-		event.editMessageEmbeds(getEmbedRender(newPageNum)).queue(hook -> pagination(event.getMessage(), n), throwableConsumer);
+		event.editMessageEmbeds(getEmbedRender(newPageNum)).setActionRows(actionRows).queue(hook -> pagination(event.getMessage(), n), throwableConsumer);
 	}
 
 	private MessageEmbed getEmbedRender(int pageNum) {

@@ -37,6 +37,7 @@ import com.skyblockplus.features.apply.ApplyUser;
 import com.skyblockplus.features.jacob.JacobHandler;
 import com.skyblockplus.features.listeners.AutomaticGuild;
 import com.skyblockplus.features.party.Party;
+import com.skyblockplus.price.AuctionTracker;
 import com.skyblockplus.settings.Database;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.exceptionhandler.ExceptionExecutor;
@@ -669,7 +670,20 @@ public class Utils {
 			.setEventWaiter(waiter)
 			.setColumns(1)
 			.setItemsPerPage(1)
-			.setFinalAction(m -> m.editMessageComponents().queue(ignore, ignore))
+			.setFinalAction(m -> {
+				if(m.getActionRows().isEmpty()){
+					return;
+				}
+
+				if(m.getActionRows().size() == 1 && m.getActionRows().get(0).getButtons().get(0).getId().startsWith("paginator_")){
+					m.editMessageComponents().queue(ignore, ignore);
+					return;
+				}
+
+				if (m.getActionRows().size() == 2) {
+					m.editMessageComponents(m.getActionRows().get(1)).queue(ignore, ignore);
+				}
+			})
 			.setTimeout(30, TimeUnit.SECONDS)
 			.setColor(botColor)
 			.setUsers(eventAuthor);
@@ -1235,7 +1249,7 @@ public class Utils {
 					}
 				}
 			} catch (Exception e) {
-				log.error("cacheParties - " + automaticGuild.getKey(), e);
+				log.error(automaticGuild.getKey(), e);
 			}
 		}
 		log.info("Cached parties in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
@@ -1249,11 +1263,12 @@ public class Utils {
 		JsonArray applyUsersCache = database.getApplyCacheSettings(guildId, name);
 
 		try {
-			List<ApplyUser> applyUsersCacheList = new ArrayList<>();
-			for (JsonElement applyUserCache : applyUsersCache) {
-				ApplyUser currentApplyUserCache = gson.fromJson(applyUserCache, ApplyUser.class);
-				applyUsersCacheList.add(currentApplyUserCache);
-			}
+			List<ApplyUser> applyUsersCacheList = streamJsonArray(applyUsersCache).map(u -> gson.fromJson(u, ApplyUser.class)).filter(u -> {try {
+				return jda.getTextChannelById(u.applicationChannelId) != null;
+			} catch (Exception e) {
+				return false;
+			}}).collect(Collectors.toList());
+
 			if (applyUsersCacheList.size() > 0) {
 				log.info(
 					"Retrieved ApplyUser cache - size={" + applyUsersCacheList.size() + "}, guildId={" + guildId + "}, name={" + name + "}"
@@ -1280,6 +1295,19 @@ public class Utils {
 		}
 	}
 
+	public static void cacheAhTracker() {
+		if (!isMainBot()) {
+			return;
+		}
+
+		long startTime = System.currentTimeMillis();
+		if (cacheDatabase.cacheCommandUsage(gson.toJson(AuctionTracker.commandAuthorToTrackingUser))) {
+			log.info("Cached auction tracker in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
+		} else {
+			log.error("Failed to auction tracker uses in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
+		}
+	}
+
 	public static void cacheJacobData() {
 		if (!isMainBot()) {
 			return;
@@ -1289,7 +1317,7 @@ public class Utils {
 		if (cacheDatabase.cacheJacobData(gson.toJson(JacobHandler.getJacobData()))) {
 			log.info("Cached jacob data in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
 		} else {
-			log.error("Failed to jacob data uses in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
+			log.error("Failed to cache jacob data uses in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
 		}
 	}
 
@@ -1298,7 +1326,7 @@ public class Utils {
 			asyncHttpClient.close();
 			log.info("Successfully Closed Async Http Client");
 		} catch (Exception e) {
-			log.error("closeAsyncHttpClient()", e);
+			log.error("", e);
 		}
 	}
 
@@ -1307,7 +1335,7 @@ public class Utils {
 			httpClient.close();
 			log.info("Successfully Closed Http Client");
 		} catch (Exception e) {
-			log.error("closeHttpClient()", e);
+			log.error("", e);
 		}
 	}
 

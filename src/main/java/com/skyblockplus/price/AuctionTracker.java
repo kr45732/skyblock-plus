@@ -24,9 +24,6 @@ import static com.skyblockplus.utils.Utils.jda;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.InvItem;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.time.Instant;
@@ -36,39 +33,36 @@ import java.util.concurrent.TimeUnit;
 import me.nullicorn.nedit.NBTReader;
 import net.dv8tion.jda.api.EmbedBuilder;
 
-public class TrackAuctionsCommand extends Command {
+public class AuctionTracker {
 
-	private static final Map<String, UsernameUuidStruct> commandAuthorToTrackingUser = new HashMap<>();
+	public static Map<String, UsernameUuidStruct> commandAuthorToTrackingUser = new HashMap<>();
 	private static Instant lastUpdated = null;
 
-	public TrackAuctionsCommand() {
-		this.name = "track";
-		this.cooldown = globalCooldown;
-		this.botPermissions = defaultPerms();
-	}
-
 	public static EmbedBuilder trackAuctions(String username, String userId) {
-		if (commandAuthorToTrackingUser.containsKey(userId)) {
-			UsernameUuidStruct stoppedTracking = commandAuthorToTrackingUser.get(userId);
-			return invalidEmbed(
-				"You are already tracking [**" + stoppedTracking.username() + "**](" + stoppedTracking.getAuctionUrl() + ")"
-			);
-		}
+		UsernameUuidStruct curTrack = commandAuthorToTrackingUser.getOrDefault(userId, null);
 
 		UsernameUuidStruct uuidStruct = usernameToUuid(username);
 		if (uuidStruct.isNotValid()) {
 			return invalidEmbed(uuidStruct.failCause());
 		}
 
-		commandAuthorToTrackingUser.put(userId, uuidStruct);
+		if(curTrack != null && curTrack.uuid().equals(uuidStruct.uuid())){
+			return invalidEmbed("You are already tracking the auctions of [**" +
+					uuidStruct.username() +
+					"**](" +
+					uuidStruct.getAuctionUrl() +
+					")");
+		}
 
+		commandAuthorToTrackingUser.put(userId, uuidStruct);
 		return defaultEmbed("Auction tracker")
 			.setDescription(
+				(curTrack != null ? "Stopped tracking [**" + curTrack.username() + "**](" + curTrack.getAuctionUrl() + "). " : "") +
 				"Now tracking the auctions of [**" +
 				uuidStruct.username() +
 				"**](" +
 				uuidStruct.getAuctionUrl() +
-				"). You will receive a DM whenever one of this player's auctions sells."
+				"). You will receive a DM whenever any of their auctions sells."
 			);
 	}
 
@@ -136,7 +130,7 @@ public class TrackAuctionsCommand extends Command {
 	}
 
 	public static void initialize() {
-		scheduler.scheduleAtFixedRate(TrackAuctionsCommand::trackAuctionRunnable, 0, 30, TimeUnit.SECONDS);
+		scheduler.scheduleAtFixedRate(AuctionTracker::trackAuctionRunnable, 0, 30, TimeUnit.SECONDS);
 	}
 
 	public static EmbedBuilder stopTrackingAuctions(String userId) {
@@ -144,34 +138,13 @@ public class TrackAuctionsCommand extends Command {
 			UsernameUuidStruct stoppedTracking = commandAuthorToTrackingUser.get(userId);
 			commandAuthorToTrackingUser.remove(userId);
 			return defaultEmbed("Auction tracker")
-				.setDescription("Stopped tracking [**" + stoppedTracking.username() + "**](" + stoppedTracking.getAuctionUrl() + ")");
+				.setDescription("Stopped tracking the auctions of [**" + stoppedTracking.username() + "**](" + stoppedTracking.getAuctionUrl() + ")");
 		}
 
-		return defaultEmbed("Auction tracker").setDescription("You are not tracking anyone");
+		return defaultEmbed("Auction tracker").setDescription("You are not tracking this player");
 	}
 
-	@Override
-	protected void execute(CommandEvent event) {
-		new CommandExecute(this, event) {
-			@Override
-			protected void execute() {
-				logCommand();
-
-				if ((args.length == 3 || args.length == 2) && args[1].equals("auctions")) {
-					if (getMentionedUsername(args.length == 2 ? -1 : 2)) {
-						return;
-					}
-
-					embed(trackAuctions(player, event.getAuthor().getId()));
-					return;
-				} else if (args.length == 2 && args[1].equals("stop")) {
-					embed(stopTrackingAuctions(event.getAuthor().getId()));
-					return;
-				}
-
-				sendErrorEmbed();
-			}
-		}
-			.queue();
+	public static void setAhTrack(Map<String, UsernameUuidStruct> ahTrack) {
+		commandAuthorToTrackingUser = ahTrack;
 	}
 }

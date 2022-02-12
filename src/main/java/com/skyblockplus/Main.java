@@ -163,7 +163,6 @@ public class Main {
 					new ActiveCoinsCommand(),
 					new HotmCommand(),
 					new VoteCommand(),
-					new TrackAuctionsCommand(),
 					new SkyblockCommand(),
 					new GuildStatisticsCommand(),
 					new PartyCommand(),
@@ -229,7 +228,6 @@ public class Main {
 					new GuildKickerSlashCommand(),
 					new PetsSlashCommand(),
 					new UuidSlashCommand(),
-					new TrackAuctionsSlashCommand(),
 					new SkyblockSlashCommand(),
 					new GuildStatisticsSlashCommand(),
 					new PartySlashCommand(),
@@ -280,7 +278,7 @@ public class Main {
 		}
 
 		ApiHandler.initialize();
-		TrackAuctionsCommand.initialize();
+		AuctionTracker.initialize();
 		AuctionFlipper.setEnable(true);
 		AuctionFlipper.scheduleHerokuUpdate();
 		PublicEndpoints.initialize();
@@ -305,6 +303,9 @@ public class Main {
 
 		log.info("Caching Command Uses");
 		cacheCommandUses();
+
+		log.info("Caching Auction Tracker");
+		cacheAhTracker();
 
 		log.info("Caching Jacob Data");
 		cacheJacobData();

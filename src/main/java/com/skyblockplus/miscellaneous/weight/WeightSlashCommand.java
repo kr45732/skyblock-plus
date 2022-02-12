@@ -84,7 +84,7 @@ public class WeightSlashCommand extends SlashCommand {
 							.addChoice("Enchanting", "enchanting")
 							.addChoice("Foraging", "foraging")
 							.addChoice("Catacombs", "catacombs"),
-						new OptionData(OptionType.INTEGER, "amount", "Target level or amount", true).setRequiredRange(0, 500000000)
+						new OptionData(OptionType.INTEGER, "amount", "Target xp (slayers) or level", true).setRequiredRange(0, 500000000)
 					)
 					.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 					.addOption(OptionType.STRING, "profile", "Profile name")

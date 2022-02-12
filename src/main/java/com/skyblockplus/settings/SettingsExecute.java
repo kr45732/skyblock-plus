@@ -106,7 +106,7 @@ public class SettingsExecute {
 			eb =
 				switch (args[2]) {
 					case "hypixel_key" -> setHypixelKey(args[3]);
-					case "prefix" -> setPrefix(content.split(" ", 4)[3]);
+					case "prefix" -> setPrefix(content.split("\\s+", 4)[3]);
 					case "guest_role" -> setApplyGuestRole(args[3]);
 					case "fetchur_channel" -> setFetchurChannel(args[3]);
 					case "fetchur_ping" -> setFetchurPing(args[3]);
@@ -124,7 +124,7 @@ public class SettingsExecute {
 					default -> errorEmbed("settings delete");
 				};
 		} else if (args.length >= 3 && args[1].equals("guild") && args[2].equals("blacklist")) {
-			args = content.split(" ", 6);
+			args = content.split("\\s+", 6);
 			if (args.length == 3) {
 				return displayApplyBlacklist();
 			} else if ((args.length >= 5) && args[3].equals("add")) {
@@ -207,8 +207,8 @@ public class SettingsExecute {
 				} else if (args[2].equals("disable")) {
 					eb = setJacobEnable(false);
 				}
-			} else if (content.split(" ", 4).length == 4) {
-				args = content.split(" ", 4);
+			} else if (content.split("\\s+", 4).length == 4) {
+				args = content.split("\\s+", 4);
 				eb =
 					switch (args[2]) {
 						case "add" -> addJacobCrop(args[3]);
@@ -263,8 +263,8 @@ public class SettingsExecute {
 			if (eb == null) {
 				eb = errorEmbed("settings roles");
 			}
-		} else if (content.split(" ", 4).length >= 2 && content.split(" ", 4)[1].equals("verify")) {
-			args = content.split(" ", 4);
+		} else if (content.split("\\s+", 4).length >= 2 && content.split("\\s+", 4)[1].equals("verify")) {
+			args = content.split("\\s+", 4);
 			if (args.length == 2) {
 				eb = defaultSettingsEmbed(getCurrentVerifySettings(higherDepth(currentSettings, "automatedVerify")));
 			} else if (args.length == 3) {
@@ -301,8 +301,8 @@ public class SettingsExecute {
 				eb = errorEmbed("settings verify");
 			}
 		} else if ((args.length >= 2) && args[1].equals("guild")) {
-			if (content.split(" ", 4).length == 4 && (args[2].equals("create") || args[2].equals("remove"))) {
-				args = content.split(" ", 4);
+			if (content.split("\\s+", 4).length == 4 && (args[2].equals("create") || args[2].equals("remove"))) {
+				args = content.split("\\s+", 4);
 				eb =
 					switch (args[2]) {
 						case "create" -> createNewGuild(args[3]);
@@ -520,6 +520,15 @@ public class SettingsExecute {
 			"Nether Wart",
 			"Cocoa Beans"
 		);
+		if(crop.equalsIgnoreCase("all")){
+			for (String validCrop : validCrops) {
+				EmbedBuilder eb = addJacobCrop(validCrop);
+				if(eb != null){
+					return eb;
+				}
+			}
+			return defaultSettingsEmbed("Added all Jacob crops");
+		}
 		if (!validCrops.contains(crop)) {
 			return invalidEmbed("Invalid crop name\n\nValid crop names are: " + String.join(", ", validCrops));
 		}

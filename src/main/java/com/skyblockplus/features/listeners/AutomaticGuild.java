@@ -44,6 +44,7 @@ import com.skyblockplus.features.setup.SetupCommandHandler;
 import com.skyblockplus.features.skyblockevent.SkyblockEventCommand;
 import com.skyblockplus.features.skyblockevent.SkyblockEventHandler;
 import com.skyblockplus.features.verify.VerifyGuild;
+import com.skyblockplus.price.AuctionTracker;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.RoleModifyRecord;
@@ -893,24 +894,33 @@ public class AutomaticGuild {
 		} else if (event.getComponentId().equals("mayor_graph_button")) {
 			event.replyEmbeds(votesEmbed).setEphemeral(true).queue();
 			return;
-		} else if (event.getComponentId().startsWith("event_message_")) {
-			event.deferReply(true).complete();
-
-			if (event.getComponentId().equals("event_message_join")) {
-				event
-					.getHook()
-					.editOriginalEmbeds(
-						SkyblockEventCommand.joinSkyblockEvent(event.getGuild().getId(), event.getUser().getId(), new String[0]).build()
-					)
-					.queue();
-			} else {
-				executor.submit(() -> {
-					EmbedBuilder eb = SkyblockEventCommand.getEventLeaderboard(event);
-					if (eb != null) {
-						event.getHook().editOriginalEmbeds(eb.build()).queue();
+		} else if(event.getComponentId().startsWith("track_auctions_")){
+			String[] discordUuidSplit = event.getComponentId().split("track_auctions_")[1].split("_", 2)[1].split("_", 2);
+			if(event.getUser().getId().equals(discordUuidSplit[0])){
+				event.deferReply(true).queue((ignored) -> {
+					if (event.getComponentId().startsWith("track_auctions_start_")){
+						event.getHook().editOriginalEmbeds(AuctionTracker.trackAuctions(discordUuidSplit[1], event.getUser().getId()).build()).queue();
+					} else if(event.getComponentId().startsWith("track_auctions_stop_")){
+						event.getHook().editOriginalEmbeds(AuctionTracker.stopTrackingAuctions(event.getUser().getId()).build()).queue();
 					}
 				});
 			}
+			return;
+		} else if (event.getComponentId().startsWith("event_message_")) {
+			event.deferReply(true).queue((ignored) -> {if (event.getComponentId().equals("event_message_join")) {
+				event
+						.getHook()
+						.editOriginalEmbeds(
+								SkyblockEventCommand.joinSkyblockEvent(event.getGuild().getId(), event.getUser().getId(), new String[0]).build()
+						)
+						.queue();
+			} else {
+				EmbedBuilder eb = SkyblockEventCommand.getEventLeaderboard(event);
+				if (eb != null) {
+					event.getHook().editOriginalEmbeds(eb.build()).queue();
+				}
+			}
+				});
 			return;
 		} else if (event.getComponentId().startsWith("setup_command_")) {
 			if (!guildMap.get(event.getGuild().getId()).isAdmin(event.getMember())) {
@@ -923,10 +933,8 @@ public class AutomaticGuild {
 			if (handler.isValid()) {
 				return;
 			}
-		} else if (event.getButton().getId().startsWith("apply_user_") && !event.getButton().getId().startsWith("apply_user_wait_")) {
-			event.deferReply().complete();
-		} else if (event.getButton().getId().startsWith("party_finder_channel_close_")) {
-			if (event.getUser().getId().equals(event.getButton().getId().split("party_finder_channel_close_")[1])) {
+		} else if (event.getComponentId().startsWith("party_finder_channel_close_")) {
+			if (event.getUser().getId().equals(event.getComponentId().split("party_finder_channel_close_")[1])) {
 				event.replyEmbeds(defaultEmbed("Party Finder").setDescription("Archiving thread...").build()).queue();
 				((ThreadChannel) event.getChannel()).getManager().setArchived(true).queueAfter(3, TimeUnit.SECONDS);
 			} else {
@@ -934,33 +942,38 @@ public class AutomaticGuild {
 			}
 			return;
 		} else {
-			event.deferReply(true).complete();
-		}
+			if (event.getComponentId().startsWith("apply_user_") && !event.getComponentId().startsWith("apply_user_wait_")){
+				event.deferReply().complete();
+			}
+			else{
+				event.deferReply(true).complete();
+			}
 
-		for (ApplyGuild o1 : applyGuild) {
-			String buttonClickReply = o1.onButtonClick(event);
-			if (buttonClickReply != null) {
-				if (buttonClickReply.equals("IGNORE_INTERNAL")) {
-					return;
-				} else if (buttonClickReply.startsWith("SBZ_SCAMMER_CHECK_")) {
-					event
-						.getHook()
-						.editOriginalEmbeds(
-							defaultEmbed("Error")
-								.setDescription(
-									"You have been marked as a scammer with reason `" +
-									buttonClickReply.split("SBZ_SCAMMER_CHECK_")[1] +
-									"`"
+			for (ApplyGuild o1 : applyGuild) {
+				String buttonClickReply = o1.onButtonClick(event);
+				if (buttonClickReply != null) {
+					if (buttonClickReply.equals("IGNORE_INTERNAL")) {
+						return;
+					} else if (buttonClickReply.startsWith("SBZ_SCAMMER_CHECK_")) {
+						event
+								.getHook()
+								.editOriginalEmbeds(
+										defaultEmbed("Error")
+												.setDescription(
+														"You have been marked as a scammer with reason `" +
+																buttonClickReply.split("SBZ_SCAMMER_CHECK_")[1] +
+																"`"
+												)
+												.setFooter("Scammer check powered by SkyBlockZ (discord.gg/skyblock)")
+												.build()
 								)
-								.setFooter("Scammer check powered by SkyBlockZ (discord.gg/skyblock)")
-								.build()
-						)
-						.queue();
+								.queue();
+						return;
+					}
+
+					event.getHook().editOriginal(buttonClickReply).queue();
 					return;
 				}
-
-				event.getHook().editOriginal(buttonClickReply).queue();
-				return;
 			}
 		}
 

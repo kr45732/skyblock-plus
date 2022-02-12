@@ -84,7 +84,7 @@ public class InvItem {
 		this.lore = lore;
 		if (lore != null) {
 			String[] loreArr = lore.split("\n");
-			this.rarity = loreArr[loreArr.length - 1].trim().split(" ")[0];
+			this.rarity = loreArr[loreArr.length - 1].trim().split("\\s+")[0];
 		}
 	}
 
