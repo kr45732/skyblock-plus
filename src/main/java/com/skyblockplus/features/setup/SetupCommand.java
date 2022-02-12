@@ -23,12 +23,11 @@ import static com.skyblockplus.utils.Utils.*;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
+import java.util.Arrays;
+import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class SetupCommand extends Command {
 
@@ -39,16 +38,18 @@ public class SetupCommand extends Command {
 	}
 
 	public static List<ActionRow> getSetupActionRow() {
-		return Arrays.asList(ActionRow.of(
-			Button.primary("setup_command_verify", "Verification"),
-			Button.primary("setup_command_guild", "Guild Application, Roles & Ranks"),
-			Button.primary("setup_command_roles", "Skyblock Roles"),
-			Button.primary("setup_command_prefix", "Prefix")),
-				ActionRow.of(
-						Button.primary("setup_command_jacob", "Farming Event Notifications"),
-						Button.primary("setup_command_mayor", "Mayor Notifications"),
-						Button.primary("setup_command_fetchur", "Fetchur Notifications")
-				)
+		return Arrays.asList(
+			ActionRow.of(
+				Button.primary("setup_command_verify", "Verification"),
+				Button.primary("setup_command_guild", "Guild Application, Roles & Ranks"),
+				Button.primary("setup_command_roles", "Skyblock Roles"),
+				Button.primary("setup_command_prefix", "Prefix")
+			),
+			ActionRow.of(
+				Button.primary("setup_command_jacob", "Farming Event Notifications"),
+				Button.primary("setup_command_mayor", "Mayor Notifications"),
+				Button.primary("setup_command_fetchur", "Fetchur Notifications")
+			)
 		);
 	}
 

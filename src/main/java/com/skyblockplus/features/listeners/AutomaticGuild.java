@@ -1117,7 +1117,13 @@ public class AutomaticGuild {
 		for (File child : dir.listFiles()) {
 			try {
 				JsonElement itemJson = JsonParser.parseReader(new FileReader(child));
-				if (higherDepth(itemJson, "vanilla", false) || (higherDepth(itemJson, "lore.[0]", "").equals("§8Furniture") && !higherDepth(itemJson, "internalname", "").startsWith("EPOCH_CAKE_"))) {
+				if (
+					higherDepth(itemJson, "vanilla", false) ||
+					(
+						higherDepth(itemJson, "lore.[0]", "").equals("§8Furniture") &&
+						!higherDepth(itemJson, "internalname", "").startsWith("EPOCH_CAKE_")
+					)
+				) {
 					String id = higherDepth(itemJson, "internalname").getAsString().replace("-", ":");
 					outputObject.addProperty(id, Math.max(0, getNpcSellPrice(id)));
 				}
@@ -1149,7 +1155,7 @@ public class AutomaticGuild {
 		return true;
 	}
 
-	public static Logger getLogger(){
+	public static Logger getLogger() {
 		return log;
 	}
 }

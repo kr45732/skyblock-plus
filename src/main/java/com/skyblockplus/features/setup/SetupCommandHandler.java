@@ -26,7 +26,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.skyblockplus.api.serversettings.automatedverify.AutomatedVerify;
 import com.skyblockplus.settings.SettingsExecute;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -118,42 +117,36 @@ public class SetupCommandHandler {
 				break;
 			case "fetchur":
 				buttonEvent
-						.getHook()
-						.editOriginalEmbeds(
-								defaultEmbed("Setup")
-										.setDescription(
-												"Reply with the channel where fetchur notifications should be sent."
-										)
-										.setFooter("Reply with 'cancel' to stop the process • dsc.gg/sb+")
-										.build()
-						)
-						.queue();
+					.getHook()
+					.editOriginalEmbeds(
+						defaultEmbed("Setup")
+							.setDescription("Reply with the channel where fetchur notifications should be sent.")
+							.setFooter("Reply with 'cancel' to stop the process • dsc.gg/sb+")
+							.build()
+					)
+					.queue();
 				break;
 			case "mayor":
 				buttonEvent
-						.getHook()
-						.editOriginalEmbeds(
-								defaultEmbed("Setup")
-										.setDescription(
-												"Reply with the channel where mayor notifications should be sent."
-										)
-										.setFooter("Reply with 'cancel' to stop the process • dsc.gg/sb+")
-										.build()
-						)
-						.queue();
+					.getHook()
+					.editOriginalEmbeds(
+						defaultEmbed("Setup")
+							.setDescription("Reply with the channel where mayor notifications should be sent.")
+							.setFooter("Reply with 'cancel' to stop the process • dsc.gg/sb+")
+							.build()
+					)
+					.queue();
 				break;
 			case "jacob":
 				buttonEvent
-						.getHook()
-						.editOriginalEmbeds(
-								defaultEmbed("Setup")
-										.setDescription(
-												"Reply with the channel where farming event notifications should be sent."
-										)
-										.setFooter("Reply with 'cancel' to stop the process • dsc.gg/sb+")
-										.build()
-						)
-						.queue();
+					.getHook()
+					.editOriginalEmbeds(
+						defaultEmbed("Setup")
+							.setDescription("Reply with the channel where farming event notifications should be sent.")
+							.setFooter("Reply with 'cancel' to stop the process • dsc.gg/sb+")
+							.build()
+					)
+					.queue();
 				break;
 			default:
 				if (featureType.startsWith("guild_apply")) {
@@ -486,7 +479,7 @@ public class SetupCommandHandler {
 					}
 					case 1 -> {
 						eb = settings.setFetchurPing(event.getMessage().getContentRaw());
-						if(eb.build().getTitle().equals("Settings")){
+						if (eb.build().getTitle().equals("Settings")) {
 							sendEmbed(eb);
 							return;
 						}
@@ -501,7 +494,7 @@ public class SetupCommandHandler {
 					}
 					case 1 -> {
 						eb = settings.setMayorPing(event.getMessage().getContentRaw());
-						if(eb.build().getTitle().equals("Settings")){
+						if (eb.build().getTitle().equals("Settings")) {
 							sendEmbed(eb);
 							return;
 						}
@@ -517,8 +510,9 @@ public class SetupCommandHandler {
 					case 1 -> {
 						List<String> crops = new ArrayList<>();
 
-						if(event.getMessage().getContentRaw().equalsIgnoreCase("all")){
-							crops.addAll(Arrays.asList(
+						if (event.getMessage().getContentRaw().equalsIgnoreCase("all")) {
+							crops.addAll(
+								Arrays.asList(
 									"Wheat",
 									"Carrot",
 									"Potato",
@@ -529,8 +523,9 @@ public class SetupCommandHandler {
 									"Sugar Cane",
 									"Nether Wart",
 									"Cocoa Beans"
-							));
-						}else{
+								)
+							);
+						} else {
 							for (String crop : event.getMessage().getContentRaw().split(",")) {
 								crops.add(capitalizeString(crop.trim()));
 							}
@@ -546,7 +541,7 @@ public class SetupCommandHandler {
 					}
 					case 2 -> {
 						if (event.getMessage().getContentRaw().equalsIgnoreCase("enable")) {
-							sendEmbed( settings.setJacobEnable(true));
+							sendEmbed(settings.setJacobEnable(true));
 						} else {
 							sendEmbed(defaultEmbed("Canceled the process"));
 							cancel();

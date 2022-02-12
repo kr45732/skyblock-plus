@@ -25,10 +25,9 @@ import static com.skyblockplus.utils.Utils.jda;
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
+import com.skyblockplus.features.listeners.AutomaticGuild;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.skyblockplus.features.listeners.AutomaticGuild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 
