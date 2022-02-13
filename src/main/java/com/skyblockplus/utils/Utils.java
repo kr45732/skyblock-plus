@@ -671,11 +671,11 @@ public class Utils {
 			.setColumns(1)
 			.setItemsPerPage(1)
 			.setFinalAction(m -> {
-				if(m.getActionRows().isEmpty()){
+				if (m.getActionRows().isEmpty()) {
 					return;
 				}
 
-				if(m.getActionRows().size() == 1 && m.getActionRows().get(0).getButtons().get(0).getId().startsWith("paginator_")){
+				if (m.getActionRows().size() == 1 && m.getActionRows().get(0).getButtons().get(0).getId().startsWith("paginator_")) {
 					m.editMessageComponents().queue(ignore, ignore);
 					return;
 				}
@@ -1263,11 +1263,16 @@ public class Utils {
 		JsonArray applyUsersCache = database.getApplyCacheSettings(guildId, name);
 
 		try {
-			List<ApplyUser> applyUsersCacheList = streamJsonArray(applyUsersCache).map(u -> gson.fromJson(u, ApplyUser.class)).filter(u -> {try {
-				return jda.getTextChannelById(u.applicationChannelId) != null;
-			} catch (Exception e) {
-				return false;
-			}}).collect(Collectors.toList());
+			List<ApplyUser> applyUsersCacheList = streamJsonArray(applyUsersCache)
+				.map(u -> gson.fromJson(u, ApplyUser.class))
+				.filter(u -> {
+					try {
+						return jda.getTextChannelById(u.applicationChannelId) != null;
+					} catch (Exception e) {
+						return false;
+					}
+				})
+				.collect(Collectors.toList());
 
 			if (applyUsersCacheList.size() > 0) {
 				log.info(

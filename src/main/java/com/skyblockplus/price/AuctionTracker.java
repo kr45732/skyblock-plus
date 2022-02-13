@@ -46,12 +46,10 @@ public class AuctionTracker {
 			return invalidEmbed(uuidStruct.failCause());
 		}
 
-		if(curTrack != null && curTrack.uuid().equals(uuidStruct.uuid())){
-			return invalidEmbed("You are already tracking the auctions of [**" +
-					uuidStruct.username() +
-					"**](" +
-					uuidStruct.getAuctionUrl() +
-					")");
+		if (curTrack != null && curTrack.uuid().equals(uuidStruct.uuid())) {
+			return invalidEmbed(
+				"You are already tracking the auctions of [**" + uuidStruct.username() + "**](" + uuidStruct.getAuctionUrl() + ")"
+			);
 		}
 
 		commandAuthorToTrackingUser.put(userId, uuidStruct);
@@ -138,7 +136,9 @@ public class AuctionTracker {
 			UsernameUuidStruct stoppedTracking = commandAuthorToTrackingUser.get(userId);
 			commandAuthorToTrackingUser.remove(userId);
 			return defaultEmbed("Auction tracker")
-				.setDescription("Stopped tracking the auctions of [**" + stoppedTracking.username() + "**](" + stoppedTracking.getAuctionUrl() + ")");
+				.setDescription(
+					"Stopped tracking the auctions of [**" + stoppedTracking.username() + "**](" + stoppedTracking.getAuctionUrl() + ")"
+				);
 		}
 
 		return defaultEmbed("Auction tracker").setDescription("You are not tracking this player");

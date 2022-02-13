@@ -205,8 +205,8 @@ public class CacheDatabase {
 			try (ResultSet response = statement.executeQuery()) {
 				response.next();
 				Map<String, UsernameUuidStruct> ahTrack = gson.fromJson(
-						response.getString("data"),
-						new TypeToken<Map<String, UsernameUuidStruct>>() {}.getType()
+					response.getString("data"),
+					new TypeToken<Map<String, UsernameUuidStruct>>() {}.getType()
 				);
 				AuctionTracker.setAhTrack(ahTrack);
 				log.info("Retrieved auction tracker");

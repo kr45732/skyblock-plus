@@ -163,10 +163,15 @@ public class AuctionCommand extends Command {
 					(failedToSell > 0 ? "\n**Did Not Sell Auctions Value:** " + simplifyNumber(failedToSell) : "")
 				);
 			UsernameUuidStruct curTrack = AuctionTracker.commandAuthorToTrackingUser.getOrDefault(event.getUser().getId(), null);
-			if(curTrack != null && curTrack.uuid().equals(usernameUuidStruct.uuid())){
+			if (curTrack != null && curTrack.uuid().equals(usernameUuidStruct.uuid())) {
 				extras.addButton(Button.primary("track_auctions_stop_" + event.getUser().getId(), "Stop Tracking Player's Auctions"));
-			}else{
-				extras.addButton(Button.primary("track_auctions_start_" + event.getUser().getId() + "_" + usernameUuidStruct.uuid(), "Track Player's Auctions"));
+			} else {
+				extras.addButton(
+					Button.primary(
+						"track_auctions_start_" + event.getUser().getId() + "_" + usernameUuidStruct.uuid(),
+						"Track Player's Auctions"
+					)
+				);
 			}
 
 			event.paginate(paginateBuilder.setPaginatorExtras(extras));

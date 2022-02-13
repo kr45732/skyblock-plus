@@ -163,7 +163,7 @@ public class PaginatorExtras {
 		return this;
 	}
 
-	public ActionRow getButtons(){
+	public ActionRow getButtons() {
 		return buttons.isEmpty() ? null : ActionRow.of(buttons);
 	}
 

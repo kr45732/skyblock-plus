@@ -138,7 +138,12 @@ public class CustomPaginator extends Menu {
 	private void initialize(RestAction<Message> action, int pageNum) {
 		List<ActionRow> buttons = new ArrayList<>();
 		if (pages > 1) {
-			buttons.add(ActionRow.of(Button.primary(LEFT, Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")).asDisabled(), Button.primary(RIGHT, Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))));
+			buttons.add(
+				ActionRow.of(
+					Button.primary(LEFT, Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")).asDisabled(),
+					Button.primary(RIGHT, Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
+				)
+			);
 		}
 		if (extras.getButtons() != null) {
 			buttons.add(extras.getButtons());
@@ -159,14 +164,14 @@ public class CustomPaginator extends Menu {
 			action.queue();
 		} else {
 			action.queue(
-					m -> {
-						if (pages > 1) {
-							pagination(m, pageNum);
-						} else {
-							finalAction.accept(m);
-						}
-					},
-					throwableConsumer
+				m -> {
+					if (pages > 1) {
+						pagination(m, pageNum);
+					} else {
+						finalAction.accept(m);
+					}
+				},
+				throwableConsumer
 			);
 		}
 	}
@@ -224,10 +229,19 @@ public class CustomPaginator extends Menu {
 		}
 
 		List<ActionRow> actionRows = new ArrayList<>(event.getMessage().getActionRows());
-		actionRows.set(0, ActionRow.of(newPageNum == 1 ? actionRows.get(0).getButtons().get(0).asDisabled() : actionRows.get(0).getButtons().get(0).asEnabled(), newPageNum == pages ? actionRows.get(0).getButtons().get(1).asDisabled() : actionRows.get(0).getButtons().get(1).asEnabled()));
+		actionRows.set(
+			0,
+			ActionRow.of(
+				newPageNum == 1 ? actionRows.get(0).getButtons().get(0).asDisabled() : actionRows.get(0).getButtons().get(0).asEnabled(),
+				newPageNum == pages ? actionRows.get(0).getButtons().get(1).asDisabled() : actionRows.get(0).getButtons().get(1).asEnabled()
+			)
+		);
 
 		int n = newPageNum;
-		event.editMessageEmbeds(getEmbedRender(newPageNum)).setActionRows(actionRows).queue(hook -> pagination(event.getMessage(), n), throwableConsumer);
+		event
+			.editMessageEmbeds(getEmbedRender(newPageNum))
+			.setActionRows(actionRows)
+			.queue(hook -> pagination(event.getMessage(), n), throwableConsumer);
 	}
 
 	private MessageEmbed getEmbedRender(int pageNum) {

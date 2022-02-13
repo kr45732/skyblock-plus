@@ -894,32 +894,45 @@ public class AutomaticGuild {
 		} else if (event.getComponentId().equals("mayor_graph_button")) {
 			event.replyEmbeds(votesEmbed).setEphemeral(true).queue();
 			return;
-		} else if(event.getComponentId().startsWith("track_auctions_")){
+		} else if (event.getComponentId().startsWith("track_auctions_")) {
 			String[] discordUuidSplit = event.getComponentId().split("track_auctions_")[1].split("_", 2)[1].split("_", 2);
-			if(event.getUser().getId().equals(discordUuidSplit[0])){
-				event.deferReply(true).queue((ignored) -> {
-					if (event.getComponentId().startsWith("track_auctions_start_")){
-						event.getHook().editOriginalEmbeds(AuctionTracker.trackAuctions(discordUuidSplit[1], event.getUser().getId()).build()).queue();
-					} else if(event.getComponentId().startsWith("track_auctions_stop_")){
-						event.getHook().editOriginalEmbeds(AuctionTracker.stopTrackingAuctions(event.getUser().getId()).build()).queue();
-					}
-				});
+			if (event.getUser().getId().equals(discordUuidSplit[0])) {
+				event
+					.deferReply(true)
+					.queue(ignored -> {
+						if (event.getComponentId().startsWith("track_auctions_start_")) {
+							event
+								.getHook()
+								.editOriginalEmbeds(AuctionTracker.trackAuctions(discordUuidSplit[1], event.getUser().getId()).build())
+								.queue();
+						} else if (event.getComponentId().startsWith("track_auctions_stop_")) {
+							event
+								.getHook()
+								.editOriginalEmbeds(AuctionTracker.stopTrackingAuctions(event.getUser().getId()).build())
+								.queue();
+						}
+					});
 			}
 			return;
 		} else if (event.getComponentId().startsWith("event_message_")) {
-			event.deferReply(true).queue((ignored) -> {if (event.getComponentId().equals("event_message_join")) {
-				event
-						.getHook()
-						.editOriginalEmbeds(
-								SkyblockEventCommand.joinSkyblockEvent(event.getGuild().getId(), event.getUser().getId(), new String[0]).build()
-						)
-						.queue();
-			} else {
-				EmbedBuilder eb = SkyblockEventCommand.getEventLeaderboard(event);
-				if (eb != null) {
-					event.getHook().editOriginalEmbeds(eb.build()).queue();
-				}
-			}
+			event
+				.deferReply(true)
+				.queue(ignored -> {
+					if (event.getComponentId().equals("event_message_join")) {
+						event
+							.getHook()
+							.editOriginalEmbeds(
+								SkyblockEventCommand
+									.joinSkyblockEvent(event.getGuild().getId(), event.getUser().getId(), new String[0])
+									.build()
+							)
+							.queue();
+					} else {
+						EmbedBuilder eb = SkyblockEventCommand.getEventLeaderboard(event);
+						if (eb != null) {
+							event.getHook().editOriginalEmbeds(eb.build()).queue();
+						}
+					}
 				});
 			return;
 		} else if (event.getComponentId().startsWith("setup_command_")) {
@@ -942,10 +955,9 @@ public class AutomaticGuild {
 			}
 			return;
 		} else {
-			if (event.getComponentId().startsWith("apply_user_") && !event.getComponentId().startsWith("apply_user_wait_")){
+			if (event.getComponentId().startsWith("apply_user_") && !event.getComponentId().startsWith("apply_user_wait_")) {
 				event.deferReply().complete();
-			}
-			else{
+			} else {
 				event.deferReply(true).complete();
 			}
 
@@ -956,18 +968,18 @@ public class AutomaticGuild {
 						return;
 					} else if (buttonClickReply.startsWith("SBZ_SCAMMER_CHECK_")) {
 						event
-								.getHook()
-								.editOriginalEmbeds(
-										defaultEmbed("Error")
-												.setDescription(
-														"You have been marked as a scammer with reason `" +
-																buttonClickReply.split("SBZ_SCAMMER_CHECK_")[1] +
-																"`"
-												)
-												.setFooter("Scammer check powered by SkyBlockZ (discord.gg/skyblock)")
-												.build()
-								)
-								.queue();
+							.getHook()
+							.editOriginalEmbeds(
+								defaultEmbed("Error")
+									.setDescription(
+										"You have been marked as a scammer with reason `" +
+										buttonClickReply.split("SBZ_SCAMMER_CHECK_")[1] +
+										"`"
+									)
+									.setFooter("Scammer check powered by SkyBlockZ (discord.gg/skyblock)")
+									.build()
+							)
+							.queue();
 						return;
 					}
 

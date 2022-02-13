@@ -520,10 +520,10 @@ public class SettingsExecute {
 			"Nether Wart",
 			"Cocoa Beans"
 		);
-		if(crop.equalsIgnoreCase("all")){
+		if (crop.equalsIgnoreCase("all")) {
 			for (String validCrop : validCrops) {
 				EmbedBuilder eb = addJacobCrop(validCrop);
-				if(eb != null){
+				if (eb != null) {
 					return eb;
 				}
 			}
