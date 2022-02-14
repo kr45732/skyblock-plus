@@ -1209,7 +1209,7 @@ public class Utils {
 
 					if (applyUserList.size() > 0) {
 						log.info(
-							"Retrieved ApplyUser cache - size={" +
+							"Cached ApplyUser - size={" +
 							applyUserList.size() +
 							"}, guildId={" +
 							automaticGuild.getKey() +
