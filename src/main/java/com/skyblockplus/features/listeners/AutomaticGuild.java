@@ -46,6 +46,7 @@ import com.skyblockplus.features.skyblockevent.SkyblockEventHandler;
 import com.skyblockplus.features.verify.VerifyGuild;
 import com.skyblockplus.price.AuctionTracker;
 import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.RoleModifyRecord;
 import java.io.File;
@@ -926,7 +927,7 @@ public class AutomaticGuild {
 							.getHook()
 							.editOriginalEmbeds(
 								SkyblockEventCommand
-									.joinSkyblockEvent(event.getGuild().getId(), event.getUser().getId(), new String[0])
+									.joinSkyblockEvent(new String[0], new PaginatorEvent(event))
 									.build()
 							)
 							.queue();
