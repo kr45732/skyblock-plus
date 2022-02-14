@@ -487,14 +487,14 @@ public class SkyblockEventCommand extends Command {
 		}
 	}
 
-	public static EmbedBuilder joinSkyblockEvent(String guildId, String userId, String[] args) {
-		if (database.getSkyblockEventActive(guildId)) {
-			LinkedAccount linkedAccount = database.getByDiscord(userId);
+	public static EmbedBuilder joinSkyblockEvent(String[] args, PaginatorEvent event) {
+		if (database.getSkyblockEventActive(event.getGuild().getId())) {
+			LinkedAccount linkedAccount = database.getByDiscord(event.getUser().getId());
 			if (linkedAccount != null) {
 				String uuid = linkedAccount.uuid();
 				String username = linkedAccount.username();
 
-				if (database.eventHasMemberByUuid(guildId, uuid)) {
+				if (database.eventHasMemberByUuid(event.getGuild().getId(), uuid)) {
 					return invalidEmbed("You are already in the event! If you want to leave or change profile use `/event leave`");
 				}
 
@@ -504,10 +504,15 @@ public class SkyblockEventCommand extends Command {
 					return invalidEmbed(guildJson.failCause());
 				}
 
-				JsonElement eventSettings = database.getSkyblockEventSettings(guildId);
+				JsonElement eventSettings = database.getSkyblockEventSettings(event.getGuild().getId());
 				if (!guildJson.get("_id").getAsString().equals(higherDepth(eventSettings, "eventGuildId").getAsString())) {
 					return invalidEmbed("You must be in the guild to join the event");
 				}
+				String requiredRole = higherDepth(eventSettings, "whitelistRole", "");
+				if(!requiredRole.isEmpty() && event.getMember().getRoles().stream().noneMatch(r -> r.getId().equals(requiredRole))) {
+					return invalidEmbed("You must have the <@&" + requiredRole + "> role to join this event");
+				}
+
 				Player player = args.length == 3 ? new Player(username, args[2]) : new Player(username);
 
 				if (player.isValid()) {
@@ -583,7 +588,7 @@ public class SkyblockEventCommand extends Command {
 						} catch (Exception ignored) {}
 
 						int code = database.addMemberToSkyblockEvent(
-							guildId,
+							event.getGuild().getId(),
 							new EventMember(username, uuid, "" + startingAmount, player.getProfileName())
 						);
 
@@ -717,7 +722,7 @@ public class SkyblockEventCommand extends Command {
 
 				if (args.length == 2 || args.length == 3) {
 					if (
-						(args[1].equals("create") || args[1].equals("cancel") || args[1].equals("end")) &&
+						(args[1].equals("create") || args[1].equals("cancel") || args[1].equals("end") || args[1].equals("whitelist")) &&
 						!guildMap.get(event.getGuild().getId()).isAdmin(event.getMember())
 					) {
 						ebMessage.delete().complete();
@@ -739,7 +744,7 @@ public class SkyblockEventCommand extends Command {
 							return;
 						}
 						case "join" -> {
-							embed(joinSkyblockEvent(event.getGuild().getId(), event.getAuthor().getId(), args));
+							embed(joinSkyblockEvent(args, new PaginatorEvent(event)));
 							return;
 						}
 						case "leave" -> {

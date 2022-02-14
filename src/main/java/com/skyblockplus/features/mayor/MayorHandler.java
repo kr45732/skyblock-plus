@@ -70,19 +70,22 @@ public class MayorHandler {
 		long newYearStartEpoch = YEAR_0 + 446400000L * (getSkyblockYear() - 1);
 		long newYearToElectionOpen = 217200000;
 		long newYearToElectionClose = 105600000;
-		long epochMilliNow = Instant.now().toEpochMilli();
 
-		if ((newYearStartEpoch + newYearToElectionOpen >= epochMilliNow) || (newYearStartEpoch + newYearToElectionClose < epochMilliNow)) { // Election booth is open
-			updateCurrentElection();
-		} else if (newYearStartEpoch + newYearToElectionClose <= (epochMilliNow + 420000)) { // Ended at most 7 min ago
+		long currentTime = Instant.now().toEpochMilli();
+		long closeTime = newYearStartEpoch + newYearToElectionClose;
+		long openTime = newYearStartEpoch + newYearToElectionOpen;
+
+		if (currentTime > closeTime && currentTime < closeTime + 420000) { // Ended at most 7 min ago
 			mayorElected();
 			scheduler.schedule(MayorHandler::initialize, 10, TimeUnit.MINUTES);
-		} else { // Wait for next open
+		} else if (currentTime > closeTime && currentTime < openTime) { // Election booth is closed so wait for next open
 			scheduler.schedule(
-				MayorHandler::initialize,
-				newYearStartEpoch + newYearToElectionOpen - epochMilliNow + 1000,
-				TimeUnit.MILLISECONDS
+					MayorHandler::initialize,
+					openTime - currentTime + 1000,
+					TimeUnit.MILLISECONDS
 			);
+		} else { // Election is open
+			updateCurrentElection();
 		}
 	}
 

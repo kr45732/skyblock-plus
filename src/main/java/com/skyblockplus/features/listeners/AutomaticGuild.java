@@ -819,7 +819,10 @@ public class AutomaticGuild {
 
 	public void onMayorElected(MessageEmbed embed) {
 		try {
-			lastMayorMessage = null;
+			if(lastMayorMessage != null){
+				lastMayorMessage.editMessageComponents().queue(ignore, ignore);
+				lastMayorMessage = null;
+			}
 			if (mayorChannel != null) {
 				if (mayorPing == null) {
 					mayorChannel.sendMessageEmbeds(embed).queue();

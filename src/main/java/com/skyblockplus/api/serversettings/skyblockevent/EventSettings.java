@@ -56,5 +56,7 @@ public class EventSettings {
 	private String minAmount = "-1";
 	private String maxAmount = "-1";
 
+	private String whitelistRole = "";
+
 	private String announcementMessageId = "";
 }

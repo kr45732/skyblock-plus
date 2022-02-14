@@ -38,6 +38,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -126,7 +127,7 @@ public class SkyblockEventHandler {
 						eventSettings.setEventType("slayer");
 					}
 					case "weight" -> {
-						state = 9;
+						state = 10;
 						eb.setDescription(
 							"Reply with the weight types separated by a comma this event should track or 'all' for total weight. Choosing one of the categories (slayer, skills, or dungeons) will select all weights in that category.\n\nWeight types:\n• Slayer: sven, tara, rev, enderman\n• Skills: taming, mining, foraging, enchanting, farming, combat, fishing, alchemy\n• Dungeons: catacombs, healer, mage, berserk, archer, tank"
 						);
@@ -134,7 +135,7 @@ public class SkyblockEventHandler {
 						return;
 					}
 					case "skills" -> {
-						state = 8;
+						state = 9;
 						eb.setDescription(
 							"Reply with the skill this event should track or 'all' for all skills excluding cosmetic skills."
 						);
@@ -142,7 +143,7 @@ public class SkyblockEventHandler {
 						return;
 					}
 					case "collections" -> {
-						state = 7;
+						state = 8;
 						eb.setDescription("Which collection should this event track?");
 						sendEmbedMessage(eb);
 						return;
@@ -160,7 +161,7 @@ public class SkyblockEventHandler {
 				state++;
 				sendEmbedMessage(eb);
 				break;
-			case 7:
+			case 8:
 				Map<String, String> collections = new HashMap<>();
 				for (Map.Entry<String, JsonElement> collection : getCollectionsJson().entrySet()) {
 					String collectionName = higherDepth(collection.getValue(), "name").getAsString();
@@ -187,7 +188,7 @@ public class SkyblockEventHandler {
 				attemptsLeft--;
 				sendEmbedMessage(eb);
 				break;
-			case 8:
+			case 9:
 				if (replyMessage.equalsIgnoreCase("all") || ALL_SKILL_NAMES.contains(replyMessage.toLowerCase())) {
 					String eventType = "skills." + replyMessage.toLowerCase();
 					eb.addField("Event Type", getEventTypeFormatted(eventType), false);
@@ -203,7 +204,7 @@ public class SkyblockEventHandler {
 				}
 				sendEmbedMessage(eb);
 				break;
-			case 9:
+			case 10:
 				boolean invalidTypes = false;
 				Set<String> selectedTypes = new HashSet<>();
 				String[] weightTypes = replyMessage.toLowerCase().split(",");
@@ -296,12 +297,43 @@ public class SkyblockEventHandler {
 							false
 						);
 					}
-					eb.setDescription("How many hours should the event last?");
+					eb.setDescription("Reply with the whitelist role guild members must have to join the event or 'none'.");
 					state++;
 				}
 				sendEmbedMessage(eb);
 				break;
 			case 3:
+				if(!replyMessage.equalsIgnoreCase("none")){
+					Role role = null;
+					try {
+						role = event.getGuild().getRoleById(replyMessage.replaceAll("[<@&>]", ""));
+					} catch (Exception e) {
+						eb.setDescription("The provided role is invalid");
+					}
+
+					if (role == null) {
+						eb.setDescription("The provided role does not exist");
+					} else if (role.isPublicRole()) {
+						eb.setDescription("The role cannot be the everyone role");
+						role = null;
+					} else if (role.isManaged()) {
+						eb.setDescription("The role cannot be a managed role");
+						role = null;
+					}
+
+					if(role == null){
+						eb.appendDescription(". Please try again.");
+						attemptsLeft--;
+						sendEmbedMessage(eb);
+						break;
+					}
+
+					eb.addField("Required role", role.getAsMention(), false);
+					eventSettings.setWhitelistRole(role.getId());
+				}
+				sendEmbedMessage(eb.setDescription("How many hours should the event last?"));
+				state++;
+			case 4:
 				try {
 					int eventDuration = Integer.parseInt(replyMessage);
 					if (eventDuration <= 0 || eventDuration > 672) {
@@ -322,7 +354,7 @@ public class SkyblockEventHandler {
 				}
 				sendEmbedMessage(eb);
 				break;
-			case 4:
+			case 5:
 				if (replyMessage.equalsIgnoreCase("none")) {
 					eb.addField("Prizes", "None", false);
 					eb.setDescription("Reply with the channel the announcement and leaderboard should be in.");
@@ -357,7 +389,7 @@ public class SkyblockEventHandler {
 				}
 				sendEmbedMessage(eb);
 				break;
-			case 5:
+			case 6:
 				try {
 					announcementChannel = event.getGuild().getTextChannelById(replyMessage.toLowerCase().replaceAll("[<#>]", ""));
 					eb.addField("Announcement Channel", announcementChannel.getAsMention(), false);
@@ -370,7 +402,7 @@ public class SkyblockEventHandler {
 				}
 				sendEmbedMessage(eb);
 				break;
-			case 6:
+			case 7:
 				if (replyMessage.equalsIgnoreCase("start")) {
 					EmbedBuilder announcementEb = defaultEmbed("Skyblock Event");
 					String eventTypeFormatted = getEventTypeFormatted(eventSettings.getEventType());
