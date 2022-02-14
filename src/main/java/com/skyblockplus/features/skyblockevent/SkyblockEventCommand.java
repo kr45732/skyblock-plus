@@ -509,7 +509,7 @@ public class SkyblockEventCommand extends Command {
 					return invalidEmbed("You must be in the guild to join the event");
 				}
 				String requiredRole = higherDepth(eventSettings, "whitelistRole", "");
-				if(!requiredRole.isEmpty() && event.getMember().getRoles().stream().noneMatch(r -> r.getId().equals(requiredRole))) {
+				if (!requiredRole.isEmpty() && event.getMember().getRoles().stream().noneMatch(r -> r.getId().equals(requiredRole))) {
 					return invalidEmbed("You must have the <@&" + requiredRole + "> role to join this event");
 				}
 

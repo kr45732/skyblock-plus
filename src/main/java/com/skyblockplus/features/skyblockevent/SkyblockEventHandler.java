@@ -303,7 +303,7 @@ public class SkyblockEventHandler {
 				sendEmbedMessage(eb);
 				break;
 			case 3:
-				if(!replyMessage.equalsIgnoreCase("none")){
+				if (!replyMessage.equalsIgnoreCase("none")) {
 					Role role = null;
 					try {
 						role = event.getGuild().getRoleById(replyMessage.replaceAll("[<@&>]", ""));
@@ -321,7 +321,7 @@ public class SkyblockEventHandler {
 						role = null;
 					}
 
-					if(role == null){
+					if (role == null) {
 						eb.appendDescription(". Please try again.");
 						attemptsLeft--;
 						sendEmbedMessage(eb);

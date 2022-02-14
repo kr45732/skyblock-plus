@@ -79,11 +79,7 @@ public class MayorHandler {
 			mayorElected();
 			scheduler.schedule(MayorHandler::initialize, 10, TimeUnit.MINUTES);
 		} else if (currentTime > closeTime && currentTime < openTime) { // Election booth is closed so wait for next open
-			scheduler.schedule(
-					MayorHandler::initialize,
-					openTime - currentTime + 1000,
-					TimeUnit.MILLISECONDS
-			);
+			scheduler.schedule(MayorHandler::initialize, openTime - currentTime + 1000, TimeUnit.MILLISECONDS);
 		} else { // Election is open
 			updateCurrentElection();
 		}

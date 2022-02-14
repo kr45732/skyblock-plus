@@ -820,7 +820,7 @@ public class AutomaticGuild {
 
 	public void onMayorElected(MessageEmbed embed) {
 		try {
-			if(lastMayorMessage != null){
+			if (lastMayorMessage != null) {
 				lastMayorMessage.editMessageComponents().queue(ignore, ignore);
 				lastMayorMessage = null;
 			}
@@ -925,11 +925,7 @@ public class AutomaticGuild {
 					if (event.getComponentId().equals("event_message_join")) {
 						event
 							.getHook()
-							.editOriginalEmbeds(
-								SkyblockEventCommand
-									.joinSkyblockEvent(new String[0], new PaginatorEvent(event))
-									.build()
-							)
+							.editOriginalEmbeds(SkyblockEventCommand.joinSkyblockEvent(new String[0], new PaginatorEvent(event)).build())
 							.queue();
 					} else {
 						EmbedBuilder eb = SkyblockEventCommand.getEventLeaderboard(event);
