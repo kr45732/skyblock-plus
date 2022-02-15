@@ -679,7 +679,8 @@ public class HelpCommand extends Command {
 				new HelpData(
 					"reload",
 					"Reload the automatic guild application(s) and automatic verification settings. This for changes to take effect for both of these features."
-				).setCategory("settings")
+				)
+					.setCategory("settings")
 			)
 		);
 	}
