@@ -674,12 +674,12 @@ public class HelpCommand extends Command {
 									)
 							)
 					),
-				new HelpData("setup", "A short walk-through on how to setup the bot."),
-				new HelpData("categories", "Get the id's of all categories in the Discord server."),
+				new HelpData("setup", "A short walk-through on how to setup the bot.").setCategory("settings"),
+				new HelpData("categories", "Get the id's of all categories in the Discord server.").setCategory("settings"),
 				new HelpData(
 					"reload",
 					"Reload the automatic guild application(s) and automatic verification settings. This for changes to take effect for both of these features."
-				)
+				).setCategory("settings")
 			)
 		);
 	}
@@ -971,7 +971,7 @@ public class HelpCommand extends Command {
 	private static String generatePageMap() {
 		StringBuilder generatedStr = new StringBuilder();
 		for (int i = 1; i < pageTitles.length; i++) {
-			generatedStr.append("\n• **Page ").append(i + 2).append(":** ").append(pageTitles[i]);
+			generatedStr.append("\n• **Page ").append(i + 1).append(":** ").append(pageTitles[i]);
 		}
 		return generatedStr.toString();
 	}

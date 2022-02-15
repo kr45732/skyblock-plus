@@ -333,6 +333,7 @@ public class SkyblockEventHandler {
 				}
 				sendEmbedMessage(eb.setDescription("How many hours should the event last?"));
 				state++;
+				break;
 			case 4:
 				try {
 					int eventDuration = Integer.parseInt(replyMessage);
