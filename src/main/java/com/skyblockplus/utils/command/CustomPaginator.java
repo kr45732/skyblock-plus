@@ -140,8 +140,8 @@ public class CustomPaginator extends Menu {
 		if (pages > 1) {
 			buttons.add(
 				ActionRow.of(
-					Button.primary(LEFT, Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")).asDisabled(),
-					Button.primary(RIGHT, Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>"))
+					Button.primary(LEFT, Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")).withDisabled(pageNum == 1),
+					Button.primary(RIGHT, Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>")).withDisabled(pageNum == pages)
 				)
 			);
 		}

@@ -47,6 +47,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.slf4j.Logger;
@@ -487,14 +488,14 @@ public class SkyblockEventCommand extends Command {
 		}
 	}
 
-	public static EmbedBuilder joinSkyblockEvent(String[] args, PaginatorEvent event) {
-		if (database.getSkyblockEventActive(event.getGuild().getId())) {
-			LinkedAccount linkedAccount = database.getByDiscord(event.getUser().getId());
+	public static EmbedBuilder joinSkyblockEvent(String[] args, Member member) {
+		if (database.getSkyblockEventActive(member.getGuild().getId())) {
+			LinkedAccount linkedAccount = database.getByDiscord(member.getId());
 			if (linkedAccount != null) {
 				String uuid = linkedAccount.uuid();
 				String username = linkedAccount.username();
 
-				if (database.eventHasMemberByUuid(event.getGuild().getId(), uuid)) {
+				if (database.eventHasMemberByUuid(member.getGuild().getId(), uuid)) {
 					return invalidEmbed("You are already in the event! If you want to leave or change profile use `/event leave`");
 				}
 
@@ -504,12 +505,12 @@ public class SkyblockEventCommand extends Command {
 					return invalidEmbed(guildJson.failCause());
 				}
 
-				JsonElement eventSettings = database.getSkyblockEventSettings(event.getGuild().getId());
+				JsonElement eventSettings = database.getSkyblockEventSettings(member.getGuild().getId());
 				if (!guildJson.get("_id").getAsString().equals(higherDepth(eventSettings, "eventGuildId").getAsString())) {
 					return invalidEmbed("You must be in the guild to join the event");
 				}
 				String requiredRole = higherDepth(eventSettings, "whitelistRole", "");
-				if (!requiredRole.isEmpty() && event.getMember().getRoles().stream().noneMatch(r -> r.getId().equals(requiredRole))) {
+				if (!requiredRole.isEmpty() && member.getRoles().stream().noneMatch(r -> r.getId().equals(requiredRole))) {
 					return invalidEmbed("You must have the <@&" + requiredRole + "> role to join this event");
 				}
 
@@ -588,7 +589,7 @@ public class SkyblockEventCommand extends Command {
 						} catch (Exception ignored) {}
 
 						int code = database.addMemberToSkyblockEvent(
-							event.getGuild().getId(),
+								member.getGuild().getId(),
 							new EventMember(username, uuid, "" + startingAmount, player.getProfileName())
 						);
 
@@ -744,7 +745,7 @@ public class SkyblockEventCommand extends Command {
 							return;
 						}
 						case "join" -> {
-							embed(joinSkyblockEvent(args, new PaginatorEvent(event)));
+							embed(joinSkyblockEvent(args, event.getMember()));
 							return;
 						}
 						case "leave" -> {

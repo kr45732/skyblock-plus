@@ -27,17 +27,14 @@ import net.dv8tion.jda.api.entities.User;
 
 public class PaginatorEvent {
 
-	private final boolean isSlashCommand;
 	private final SlashCommandEvent slashCommand;
 	private final CommandEvent command;
 
 	public PaginatorEvent(Object event) {
 		if (event instanceof SlashCommandEvent e) {
-			isSlashCommand = true;
 			slashCommand = e;
 			command = null;
 		} else if (event instanceof CommandEvent e) {
-			isSlashCommand = false;
 			slashCommand = null;
 			command = e;
 		} else {
@@ -46,7 +43,7 @@ public class PaginatorEvent {
 	}
 
 	public boolean isSlashCommand() {
-		return isSlashCommand;
+		return slashCommand != null;
 	}
 
 	public SlashCommandEvent getSlashCommand() {
@@ -54,7 +51,7 @@ public class PaginatorEvent {
 	}
 
 	public User getUser() {
-		return isSlashCommand ? slashCommand.getUser() : command.getAuthor();
+		return isSlashCommand() ? slashCommand.getUser() : command.getAuthor();
 	}
 
 	public void paginate(CustomPaginator.Builder builder) {
@@ -62,7 +59,7 @@ public class PaginatorEvent {
 	}
 
 	public void paginate(CustomPaginator.Builder builder, int page) {
-		if (isSlashCommand) {
+		if (isSlashCommand()) {
 			builder.build().paginate(slashCommand.getHook(), page);
 		} else {
 			builder.build().paginate(command.getChannel(), page);
@@ -70,14 +67,14 @@ public class PaginatorEvent {
 	}
 
 	public Guild getGuild() {
-		return isSlashCommand ? slashCommand.getGuild() : command.getGuild();
+		return isSlashCommand() ? slashCommand.getGuild() : command.getGuild();
 	}
 
 	public MessageChannel getChannel() {
-		return isSlashCommand ? slashCommand.getChannel() : command.getChannel();
+		return isSlashCommand() ? slashCommand.getChannel() : command.getChannel();
 	}
 
 	public Member getMember() {
-		return isSlashCommand ? slashCommand.getMember() : command.getMember();
+		return isSlashCommand() ? slashCommand.getMember() : command.getMember();
 	}
 }

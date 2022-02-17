@@ -916,19 +916,37 @@ public class Utils {
 		};
 	}
 
+
 	public static EmbedBuilder checkHypixelKey(String hypixelKey) {
+		return checkHypixelKey(hypixelKey, true);
+	}
+
+	public static EmbedBuilder checkHypixelKey(String hypixelKey, boolean checkRatelimit) {
 		if (hypixelKey == null) {
 			return invalidEmbed("You must set a Hypixel API key to use this feature");
 		}
 
 		try {
-			higherDepth(getJson("https://api.hypixel.net/key?key=" + hypixelKey), "record.key").getAsString();
+			HttpGet httpGet = new HttpGet("https://api.hypixel.net/key?key=" + hypixelKey);
+			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
+
+			int remainingLimit;
+			int timeTillReset;
+			try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
+				remainingLimit = Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Remaining").getValue());
+				timeTillReset = Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Reset").getValue());
+				if (checkRatelimit && remainingLimit < 10) {
+					return invalidEmbed("That command is on cooldown for " + timeTillReset + " more seconds");
+				}
+
+				higherDepth(JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())), "record.key").getAsString();
+			}
 		} catch (Exception e) {
 			return invalidEmbed("The set Hypixel API key is invalid");
 		}
 
 		if (!keyCooldownMap.containsKey(hypixelKey)) {
-			keyCooldownMap.put(hypixelKey, new HypixelKeyRecord());
+			keyCooldownMap.put(hypixelKey, new HypixelKeyRecord(remainingLimit, timeTillReset));
 		}
 
 		return null;
@@ -1306,10 +1324,10 @@ public class Utils {
 		}
 
 		long startTime = System.currentTimeMillis();
-		if (cacheDatabase.cacheCommandUsage(gson.toJson(AuctionTracker.commandAuthorToTrackingUser))) {
+		if (cacheDatabase.cacheAhTracker(gson.toJson(AuctionTracker.commandAuthorToTrackingUser))) {
 			log.info("Cached auction tracker in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
 		} else {
-			log.error("Failed to auction tracker uses in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
+			log.error("Failed to cache auction tracker in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
 		}
 	}
 

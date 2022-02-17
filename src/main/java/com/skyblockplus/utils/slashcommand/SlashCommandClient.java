@@ -18,6 +18,7 @@
 
 package com.skyblockplus.utils.slashcommand;
 
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.Utils.invalidEmbed;
 
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
@@ -67,6 +68,11 @@ public class SlashCommandClient extends ListenerAdapter {
 		}
 		if (event.getChannelType() == ChannelType.PRIVATE) {
 			event.replyEmbeds(invalidEmbed("This command can only be used in text channels or threads").build()).queue();
+			return;
+		}
+
+		if(guildMap.get(event.getGuild().getId()).channelBlacklist.contains(event.getChannel().getId())){
+			event.replyEmbeds(invalidEmbed("Commands cannot be used in this channel").build()).setEphemeral(true).queue();
 			return;
 		}
 

@@ -85,6 +85,10 @@ public class ServerSettingsModel {
 	@Fetch(value = FetchMode.SUBSELECT)
 	private List<String> botManagerRoles = new ArrayList<>();
 
+	@ElementCollection(fetch = FetchType.EAGER)
+	@Fetch(value = FetchMode.SUBSELECT)
+	private List<String> channelBlacklist = new ArrayList<>();
+
 	public ServerSettingsModel(String serverName, String serverId) {
 		this.serverName = serverName;
 		this.serverId = serverId;
@@ -115,6 +119,7 @@ public class ServerSettingsModel {
 		copy.setMayorChannel(mayorChannel);
 		copy.setMayorRole(mayorRole);
 		copy.setBotManagerRoles(botManagerRoles);
+		copy.setChannelBlacklist(channelBlacklist);
 		return copy;
 	}
 }

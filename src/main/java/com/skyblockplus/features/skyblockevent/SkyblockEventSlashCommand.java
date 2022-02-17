@@ -59,7 +59,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 				event.embed(SkyblockEventCommand.cancelSkyblockEvent(event.getGuild()));
 				break;
 			case "join":
-				event.embed(SkyblockEventCommand.joinSkyblockEvent(new String[] {}, new PaginatorEvent(event)));
+				event.embed(SkyblockEventCommand.joinSkyblockEvent(new String[] {}, event.getMember()));
 				break;
 			case "leave":
 				event.embed(SkyblockEventCommand.leaveSkyblockEvent(event.getGuild().getId(), event.getUser().getId()));

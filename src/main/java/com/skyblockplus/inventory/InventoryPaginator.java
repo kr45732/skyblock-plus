@@ -52,8 +52,8 @@ public class InventoryPaginator {
 				.getChannel()
 				.sendMessage(inventoryPages.get(0)[1])
 				.setActionRow(
-					Button.primary("inv_paginator_left_button", Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")).asDisabled(),
-					Button.primary("inv_paginator_right_button", Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>")),
+					Button.primary("inv_paginator_left_button", Emoji.fromMarkdown("<:left_button_arrow:885628386435821578>")).withDisabled(pageNumber == 0),
+					Button.primary("inv_paginator_right_button", Emoji.fromMarkdown("<:right_button_arrow:885628386578423908>")).withDisabled(pageNumber == (maxPageNumber)),
 					Button.link(player.skyblockStatsLink(), player.getUsername() + "'s " + type + " • Page 1/" + (maxPageNumber + 1))
 				)
 				.complete();

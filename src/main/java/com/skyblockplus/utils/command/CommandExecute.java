@@ -53,6 +53,10 @@ public abstract class CommandExecute extends CommandEvent {
 
 	public void queue() {
 		executor.submit(() -> {
+			if(guildMap.get(getGuild().getId()).channelBlacklist.contains(getChannel().getId())){
+				return;
+			}
+
 			if (adminCommand && !guildMap.get(getGuild().getId()).isAdmin(getMember())) {
 				reply("You are missing the required permissions or roles to use this command");
 				return;

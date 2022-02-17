@@ -116,13 +116,20 @@ public class SettingsExecute {
 				};
 		} else if (args.length == 3 && args[1].equals("delete")) {
 			eb =
-				switch (args[2]) {
-					case "all" -> database.deleteServerSettings(guild.getId()) == 200
-						? defaultEmbed("Success").setDescription("Server settings deleted")
-						: invalidEmbed("Error deleting server settings");
-					case "hypixel_key" -> deleteHypixelKey();
-					default -> errorEmbed("settings delete");
-				};
+					switch (args[2]) {
+						case "all" -> database.deleteServerSettings(guild.getId()) == 200
+								? defaultEmbed("Success").setDescription("Server settings deleted")
+								: invalidEmbed("Error deleting server settings");
+						case "hypixel_key" -> deleteHypixelKey();
+						default -> errorEmbed("settings delete");
+					};
+		} else if (args.length == 4 && args[1].equals("blacklist")) {
+			eb =
+					switch (args[2]) {
+						case "add" -> blacklistChannel(args[3]);
+						case "remove" -> unblacklistChannel(args[3]);
+						default -> errorEmbed("settings blacklist");
+					};
 		} else if (args.length >= 3 && args[1].equals("guild") && args[2].equals("blacklist")) {
 			args = content.split("\\s+", 6);
 			if (args.length == 3) {
@@ -2056,9 +2063,9 @@ public class SettingsExecute {
 					type.equals("CLASS")
 				)
 			) {
-				EmbedBuilder eb = checkHypixelKey(database.getServerHypixelApiKey(guild.getId()));
+				EmbedBuilder eb = checkHypixelKey(database.getServerHypixelApiKey(guild.getId()), false);
 				if (eb != null) {
-					return eb;
+					return invalidEmbed("A valid Hypixel API key must be set (`/settings set hypixel_key <key>`) in order to use the PLAYER template options");
 				}
 				nickname = nickname.replace(matcher.group(0), "");
 			}
@@ -2334,6 +2341,45 @@ public class SettingsExecute {
 			guildMap.get(guild.getId()).setMayorChannel(channel);
 			return defaultSettingsEmbed("**Mayor notifications channel set to:** " + channel.getAsMention());
 		}
+	}
+
+	public EmbedBuilder blacklistChannel(String channelMention) {
+		Object eb = checkTextChannel(channelMention);
+		if (eb instanceof EmbedBuilder e) {
+			return e;
+		}
+		TextChannel channel = (TextChannel) eb;
+
+		JsonArray channelBlacklist = collectJsonArray(streamJsonArray(higherDepth(serverSettings, "channelBlacklist").getAsJsonArray()).filter(c ->! c.getAsString().equals(channel.getId())));
+		channelBlacklist.add(channel.getId());
+
+		int responseCode = database.setChannelBlacklist(guild.getId(), channelBlacklist);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		guildMap.get(guild.getId()).setChannelBlacklist(streamJsonArray(channelBlacklist).map(JsonElement::getAsString).collect(Collectors.toList()));
+		return defaultSettingsEmbed("**Added channel to blacklist:** " + channel.getAsMention());
+
+	}
+
+	public EmbedBuilder unblacklistChannel(String channelMention) {
+		Object eb = checkTextChannel(channelMention);
+		if (eb instanceof EmbedBuilder e) {
+			return e;
+		}
+		TextChannel channel = (TextChannel) eb;
+
+		JsonArray channelBlacklist = collectJsonArray(streamJsonArray(higherDepth(serverSettings, "channelBlacklist").getAsJsonArray()).filter(c ->!c.getAsString().equals(channel.getId())));
+
+		int responseCode = database.setChannelBlacklist(guild.getId(), channelBlacklist);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		guildMap.get(guild.getId()).setChannelBlacklist(streamJsonArray(channelBlacklist).map(JsonElement::getAsString).collect(Collectors.toList()));
+		return defaultSettingsEmbed("**Removed channel from blacklist:** " + channel.getAsMention());
+
 	}
 
 	public EmbedBuilder setMayorPing(String roleMention) {

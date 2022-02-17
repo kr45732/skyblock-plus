@@ -112,6 +112,7 @@ public class AutomaticGuild {
 	public final JacobGuild jacobGuild;
 	/* Miscellaneous */
 	public final List<String> botManagerRoles = new ArrayList<>();
+	public final List<String> channelBlacklist = new ArrayList<>();
 	public final String guildId;
 	public final List<ScheduledFuture<?>> scheduledFutures = new ArrayList<>();
 	public String prefix;
@@ -163,6 +164,13 @@ public class AutomaticGuild {
 				streamJsonArray(higherDepth(serverSettings, "botManagerRoles").getAsJsonArray())
 					.map(JsonElement::getAsString)
 					.collect(Collectors.toList())
+			);
+		} catch (Exception ignored) {}
+		try {
+			channelBlacklist.addAll(
+					streamJsonArray(higherDepth(serverSettings, "channelBlacklist").getAsJsonArray())
+							.map(JsonElement::getAsString)
+							.collect(Collectors.toList())
 			);
 		} catch (Exception ignored) {}
 	}
@@ -482,7 +490,7 @@ public class AutomaticGuild {
 
 				List<HypixelResponse> guildResponses = null;
 				String key = database.getServerHypixelApiKey(guild.getId());
-				key = checkHypixelKey(key) == null ? key : null;
+				key = checkHypixelKey(key, false) == null ? key : null;
 				int numUpdated = 0;
 
 				List<Member> notUpdatedMembers = inGuildUsers
@@ -925,7 +933,7 @@ public class AutomaticGuild {
 					if (event.getComponentId().equals("event_message_join")) {
 						event
 							.getHook()
-							.editOriginalEmbeds(SkyblockEventCommand.joinSkyblockEvent(new String[0], new PaginatorEvent(event)).build())
+							.editOriginalEmbeds(SkyblockEventCommand.joinSkyblockEvent(new String[0], event.getMember()).build())
 							.queue();
 					} else {
 						EmbedBuilder eb = SkyblockEventCommand.getEventLeaderboard(event);
@@ -1182,5 +1190,10 @@ public class AutomaticGuild {
 
 	public static Logger getLogger() {
 		return log;
+	}
+
+	public void setChannelBlacklist(List<String> channelBlacklist) {
+		this.channelBlacklist.clear();
+		this.channelBlacklist.addAll(channelBlacklist);
 	}
 }

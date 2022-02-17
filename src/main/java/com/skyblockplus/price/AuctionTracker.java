@@ -65,65 +65,70 @@ public class AuctionTracker {
 	}
 
 	private static void trackAuctionRunnable() {
-		if (commandAuthorToTrackingUser.isEmpty()) {
-			return;
-		}
-
-		JsonElement endedAuctionsJson = getJson("https://api.hypixel.net/skyblock/auctions_ended");
-		Instant jsonLastUpdated = Instant.ofEpochMilli(higherDepth(endedAuctionsJson, "lastUpdated").getAsLong());
-
-		if (lastUpdated == null || lastUpdated.isBefore(jsonLastUpdated)) {
-			lastUpdated = jsonLastUpdated;
-
-			JsonArray endedAuctionsArray = higherDepth(endedAuctionsJson, "auctions").getAsJsonArray();
-			for (JsonElement endedAuction : endedAuctionsArray) {
-				String seller = higherDepth(endedAuction, "seller").getAsString();
-
-				String itemName = "???";
-				try {
-					InvItem item = getGenericInventoryMap(NBTReader.readBase64(higherDepth(endedAuction, "item_bytes").getAsString()))
-						.get(0);
-					itemName =
-						(item.getCount() > 1 ? item.getCount() + "x " : "") +
-						(
-							item.getId().equals("ENCHANTED_BOOK")
-								? parseMcCodes(item.getLore().split("\n")[0])
-								: (item.getId().equals("PET") ? capitalizeString(item.getRarity()) + " " : "")
-						) +
-						item.getName();
-				} catch (Exception ignored) {}
-				String finalItemName = itemName;
-				String soldFor = formatNumber(higherDepth(endedAuction, "price").getAsLong());
-				long endedAt = higherDepth(endedAuction, "timestamp").getAsLong() / 1000;
-
-				commandAuthorToTrackingUser
-					.entrySet()
-					.stream()
-					.filter(entry -> entry.getValue().uuid().equals(seller))
-					.forEach(entry ->
-						jda
-							.openPrivateChannelById(entry.getKey())
-							.queue(dm ->
-								dm
-									.sendMessageEmbeds(
-										defaultEmbed("Auction tracker")
-											.setDescription(
-												"**Seller:** " +
-												entry.getValue().username() +
-												"\n**Item:** " +
-												finalItemName +
-												"\n**Sold for:** " +
-												soldFor +
-												"\n**Ended:** <t:" +
-												endedAt +
-												":R>"
-											)
-											.build()
-									)
-									.queue(ignore, ignore)
-							)
-					);
+		try {
+			if (commandAuthorToTrackingUser.isEmpty()) {
+				return;
 			}
+
+			JsonElement endedAuctionsJson = getJson("https://api.hypixel.net/skyblock/auctions_ended");
+			Instant jsonLastUpdated = Instant.ofEpochMilli(higherDepth(endedAuctionsJson, "lastUpdated").getAsLong());
+
+			if (lastUpdated == null || lastUpdated.isBefore(jsonLastUpdated)) {
+				lastUpdated = jsonLastUpdated;
+
+				JsonArray endedAuctionsArray = higherDepth(endedAuctionsJson, "auctions").getAsJsonArray();
+				for (JsonElement endedAuction : endedAuctionsArray) {
+					String seller = higherDepth(endedAuction, "seller").getAsString();
+
+					String itemName = "???";
+					try {
+						InvItem item = getGenericInventoryMap(NBTReader.readBase64(higherDepth(endedAuction, "item_bytes").getAsString()))
+								.get(0);
+						itemName =
+								(item.getCount() > 1 ? item.getCount() + "x " : "") +
+										(
+												item.getId().equals("ENCHANTED_BOOK")
+														? parseMcCodes(item.getLore().split("\n")[0])
+														: (item.getId().equals("PET") ? capitalizeString(item.getRarity()) + " " : "")
+										) +
+										item.getName();
+					} catch (Exception ignored) {
+					}
+					String finalItemName = itemName;
+					String soldFor = formatNumber(higherDepth(endedAuction, "price").getAsLong());
+					long endedAt = higherDepth(endedAuction, "timestamp").getAsLong() / 1000;
+
+					commandAuthorToTrackingUser
+							.entrySet()
+							.stream()
+							.filter(entry -> entry.getValue().uuid().equals(seller))
+							.forEach(entry ->
+									jda
+											.openPrivateChannelById(entry.getKey())
+											.queue(dm ->
+													dm
+															.sendMessageEmbeds(
+																	defaultEmbed("Auction tracker")
+																			.setDescription(
+																					"**Seller:** " +
+																							entry.getValue().username() +
+																							"\n**Item:** " +
+																							finalItemName +
+																							"\n**Sold for:** " +
+																							soldFor +
+																							"\n**Ended:** <t:" +
+																							endedAt +
+																							":R>"
+																			)
+																			.build()
+															)
+															.queue(ignore, ignore)
+											)
+							);
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace();
 		}
 	}
 
