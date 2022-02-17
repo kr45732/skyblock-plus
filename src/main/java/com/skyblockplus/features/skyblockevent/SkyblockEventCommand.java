@@ -589,7 +589,7 @@ public class SkyblockEventCommand extends Command {
 						} catch (Exception ignored) {}
 
 						int code = database.addMemberToSkyblockEvent(
-								member.getGuild().getId(),
+							member.getGuild().getId(),
 							new EventMember(username, uuid, "" + startingAmount, player.getProfileName())
 						);
 

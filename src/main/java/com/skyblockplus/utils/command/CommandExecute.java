@@ -53,7 +53,7 @@ public abstract class CommandExecute extends CommandEvent {
 
 	public void queue() {
 		executor.submit(() -> {
-			if(guildMap.get(getGuild().getId()).channelBlacklist.contains(getChannel().getId())){
+			if (guildMap.get(getGuild().getId()).channelBlacklist.contains(getChannel().getId())) {
 				return;
 			}
 

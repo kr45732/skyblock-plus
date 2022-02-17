@@ -634,7 +634,7 @@ public class ServerSettingsService {
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
 
-    public ResponseEntity<Object> setChannelBlacklist(String serverId, String[] newSettings) {
+	public ResponseEntity<Object> setChannelBlacklist(String serverId, String[] newSettings) {
 		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
 
 		if (currentServerSettings != null) {
@@ -644,5 +644,5 @@ public class ServerSettingsService {
 		}
 
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    }
+	}
 }

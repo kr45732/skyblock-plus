@@ -168,9 +168,9 @@ public class AutomaticGuild {
 		} catch (Exception ignored) {}
 		try {
 			channelBlacklist.addAll(
-					streamJsonArray(higherDepth(serverSettings, "channelBlacklist").getAsJsonArray())
-							.map(JsonElement::getAsString)
-							.collect(Collectors.toList())
+				streamJsonArray(higherDepth(serverSettings, "channelBlacklist").getAsJsonArray())
+					.map(JsonElement::getAsString)
+					.collect(Collectors.toList())
 			);
 		} catch (Exception ignored) {}
 	}

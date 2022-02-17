@@ -916,7 +916,6 @@ public class Utils {
 		};
 	}
 
-
 	public static EmbedBuilder checkHypixelKey(String hypixelKey) {
 		return checkHypixelKey(hypixelKey, true);
 	}
@@ -939,7 +938,8 @@ public class Utils {
 					return invalidEmbed("That command is on cooldown for " + timeTillReset + " more seconds");
 				}
 
-				higherDepth(JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())), "record.key").getAsString();
+				higherDepth(JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())), "record.key")
+					.getAsString();
 			}
 		} catch (Exception e) {
 			return invalidEmbed("The set Hypixel API key is invalid");

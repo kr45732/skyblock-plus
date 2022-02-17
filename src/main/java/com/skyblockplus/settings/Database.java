@@ -251,7 +251,7 @@ public class Database {
 		return settingsService.setBotManagerRoles(serverId, gson.fromJson(newSettings, String[].class)).getStatusCodeValue();
 	}
 
-    public int setChannelBlacklist(String serverId, JsonArray newSettings) {
+	public int setChannelBlacklist(String serverId, JsonArray newSettings) {
 		return settingsService.setChannelBlacklist(serverId, gson.fromJson(newSettings, String[].class)).getStatusCodeValue();
-    }
+	}
 }
