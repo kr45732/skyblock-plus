@@ -72,12 +72,17 @@ public class ApiHandler {
 			cacheDatabase.initializeJacobData();
 			cacheDatabase.initializeAhTracker();
 			updateCacheTask = scheduler.scheduleWithFixedDelay(cacheDatabase::updateCache, 60, 90, TimeUnit.SECONDS);
-			scheduler.scheduleWithFixedDelay(() -> {
-				cacheApplyGuildUsers();
-				cacheParties();
-				cacheCommandUses();
-				cacheAhTracker();
-			}, 30, 30, TimeUnit.MINUTES);
+			scheduler.scheduleWithFixedDelay(
+				() -> {
+					cacheApplyGuildUsers();
+					cacheParties();
+					cacheCommandUses();
+					cacheAhTracker();
+				},
+				30,
+				30,
+				TimeUnit.MINUTES
+			);
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateLinkedAccounts, 60, 45, TimeUnit.SECONDS);
 		} catch (Exception e) {
 			log.error("Exception when initializing the ApiHandler", e);
