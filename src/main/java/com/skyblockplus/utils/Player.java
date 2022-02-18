@@ -629,9 +629,9 @@ public class Player {
 
 	public List<InvItem> getPetsMapNames() {
 		JsonArray petsArr;
-		try{
+		try {
 			petsArr = getPets();
-		}catch (Exception e){
+		} catch (Exception e) {
 			return new ArrayList<>();
 		}
 

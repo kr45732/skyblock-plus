@@ -18,6 +18,10 @@
 
 package com.skyblockplus.general;
 
+import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
+import static com.skyblockplus.utils.ApiHandler.skyblockProfilesFromUuid;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -27,20 +31,15 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
 import com.skyblockplus.utils.structs.HypixelResponse;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
-
-import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
-import static com.skyblockplus.utils.ApiHandler.skyblockProfilesFromUuid;
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 
 public class LinkCommand extends Command {
 
@@ -76,20 +75,17 @@ public class LinkCommand extends Command {
 			JsonElement verifySettings = database.getVerifySettings(guild.getId());
 			if (verifySettings != null) {
 				String[] result = updateLinkedUser(verifySettings, toAdd, member);
-				String out = (
+				String out =
+					(
 						!result[1].equals("false")
-								? result[1].equals("true")
-								? "\n• Successfully synced your roles"
-								: "\n• Error syncing your roles"
-								: ""
-				) +
-						(
-								!result[0].equals("false")
-										? result[0].equals("true")
-										? "\n• Successfully synced your nickname"
-										: "\n• Error syncing your nickname"
-										: ""
-						);
+							? result[1].equals("true") ? "\n• Successfully synced your roles" : "\n• Error syncing your roles"
+							: ""
+					) +
+					(
+						!result[0].equals("false")
+							? result[0].equals("true") ? "\n• Successfully synced your nickname" : "\n• Error syncing your nickname"
+							: ""
+					);
 				return defaultEmbed("Success").setDescription("You have been linked to `" + playerInfo.username() + "`\n" + out);
 			}
 
@@ -127,10 +123,10 @@ public class LinkCommand extends Command {
 							if (!playerGuild.isNotValid()) {
 								String gId = playerGuild.get("_id").getAsString();
 								if (
-										database
-												.getAllGuildSettings(member.getGuild().getId())
-												.stream()
-												.noneMatch(g -> g.getGuildId().equals(gId))
+									database
+										.getAllGuildSettings(member.getGuild().getId())
+										.stream()
+										.noneMatch(g -> g.getGuildId().equals(gId))
 								) {
 									playerGuild = new HypixelResponse();
 								}
@@ -139,56 +135,56 @@ public class LinkCommand extends Command {
 
 						if (!playerGuild.isNotValid()) {
 							nicknameTemplate =
-									nicknameTemplate.replace(
-											matcher.group(0),
-											switch (type) {
-												case "NAME" -> playerGuild.get("name").getAsString();
-												case "RANK" -> higherDepth(
-														streamJsonArray(playerGuild.get("members").getAsJsonArray())
-																.filter(g -> higherDepth(g, "uuid", "").equals(linkedAccount.uuid()))
-																.findFirst()
-																.orElse(null),
-														"rank",
-														""
-												);
-												default -> playerGuild.get("tag").getAsString();
-											} +
-													extra
-									);
+								nicknameTemplate.replace(
+									matcher.group(0),
+									switch (type) {
+										case "NAME" -> playerGuild.get("name").getAsString();
+										case "RANK" -> higherDepth(
+											streamJsonArray(playerGuild.get("members").getAsJsonArray())
+												.filter(g -> higherDepth(g, "uuid", "").equals(linkedAccount.uuid()))
+												.findFirst()
+												.orElse(null),
+											"rank",
+											""
+										);
+										default -> playerGuild.get("tag").getAsString();
+									} +
+									extra
+								);
 						}
 					} else if (
-							category.equals("PLAYER") &&
-									(
-											type.equals("SKILLS") ||
-													type.equals("CATACOMBS") ||
-													type.equals("SLAYER") ||
-													type.equals("WEIGHT") ||
-													type.equals("CLASS")
-									)
+						category.equals("PLAYER") &&
+						(
+							type.equals("SKILLS") ||
+							type.equals("CATACOMBS") ||
+							type.equals("SLAYER") ||
+							type.equals("WEIGHT") ||
+							type.equals("CLASS")
+						)
 					) {
 						if (key != null) {
 							if (player == null) {
 								HypixelResponse response = skyblockProfilesFromUuid(linkedAccount.uuid(), key);
 								player =
-										response.isNotValid()
-												? new Player()
-												: new Player(linkedAccount.uuid(), linkedAccount.username(), response.response());
+									response.isNotValid()
+										? new Player()
+										: new Player(linkedAccount.uuid(), linkedAccount.username(), response.response());
 							}
 
 							if (player.isValid()) {
 								nicknameTemplate =
-										nicknameTemplate.replace(
-												matcher.group(0),
-												switch (type) {
-													case "SKILLS" -> roundAndFormat((int) player.getSkillAverage());
-													case "SLAYER" -> simplifyNumber(player.getTotalSlayer());
-													case "WEIGHT" -> roundAndFormat((int) player.getWeight());
-													case "CLASS" -> player.getSelectedDungeonClass().equals("none")
-															? ""
-															: "" + player.getSelectedDungeonClass().toUpperCase().charAt(0);
-													default -> roundAndFormat((int) player.getCatacombs().getProgressLevel());
-												}
-										);
+									nicknameTemplate.replace(
+										matcher.group(0),
+										switch (type) {
+											case "SKILLS" -> roundAndFormat((int) player.getSkillAverage());
+											case "SLAYER" -> simplifyNumber(player.getTotalSlayer());
+											case "WEIGHT" -> roundAndFormat((int) player.getWeight());
+											case "CLASS" -> player.getSelectedDungeonClass().equals("none")
+												? ""
+												: "" + player.getSelectedDungeonClass().toUpperCase().charAt(0);
+											default -> roundAndFormat((int) player.getCatacombs().getProgressLevel());
+										}
+									);
 							}
 						}
 					}
@@ -205,13 +201,12 @@ public class LinkCommand extends Command {
 
 		try {
 			List<Role> toAdd = streamJsonArray(higherDepth(verifySettings, "verifiedRoles").getAsJsonArray())
-					.map(e -> member.getGuild().getRoleById(e.getAsString()))
-					.collect(Collectors.toList());
+				.map(e -> member.getGuild().getRoleById(e.getAsString()))
+				.collect(Collectors.toList());
 			List<Role> toRemove = new ArrayList<>();
 			try {
 				toRemove.add(member.getGuild().getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString()));
-			} catch (Exception ignored) {
-			}
+			} catch (Exception ignored) {}
 
 			if (higherDepth(verifySettings, "enableRolesClaim", false)) {
 				try {
@@ -219,9 +214,9 @@ public class LinkCommand extends Command {
 						if (player == null) {
 							HypixelResponse response = skyblockProfilesFromUuid(linkedAccount.uuid(), key);
 							player =
-									response.isNotValid()
-											? new Player()
-											: new Player(linkedAccount.uuid(), linkedAccount.username(), response.response());
+								response.isNotValid()
+									? new Player()
+									: new Player(linkedAccount.uuid(), linkedAccount.username(), response.response());
 						}
 
 						if (player.isValid()) {
@@ -230,8 +225,7 @@ public class LinkCommand extends Command {
 							toAdd.addAll((List<Role>) out[2]);
 						}
 					}
-				} catch (Exception ignored) {
-				}
+				} catch (Exception ignored) {}
 			}
 			if (!toAdd.isEmpty() || !toRemove.isEmpty()) {
 				member.getGuild().modifyMemberRoles(member, toAdd, toRemove).complete();
@@ -240,7 +234,7 @@ public class LinkCommand extends Command {
 		} catch (Exception e) {
 			updatedRoles = "error";
 		}
-		return new String[]{updatedNickname, updatedRoles};
+		return new String[] { updatedNickname, updatedRoles };
 	}
 
 	@Override

@@ -18,18 +18,17 @@
 
 package com.skyblockplus.features.verify;
 
+import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
+import static com.skyblockplus.general.LinkCommand.updateLinkedUser;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonElement;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
+import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-
-import java.util.concurrent.TimeUnit;
-
-import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
-import static com.skyblockplus.general.LinkCommand.updateLinkedUser;
-import static com.skyblockplus.utils.Utils.*;
 
 public class VerifyGuild {
 
@@ -109,9 +108,7 @@ public class VerifyGuild {
 								"`" +
 								(
 									!result[1].equals("false")
-										? result[1].equals("true")
-											? "\n• Successfully synced your roles"
-											: "\n• Error syncing your roles"
+										? result[1].equals("true") ? "\n• Successfully synced your roles" : "\n• Error syncing your roles"
 										: ""
 								) +
 								(

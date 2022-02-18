@@ -206,8 +206,8 @@ public class SettingsExecute {
 				.collect(Collectors.joining(" "));
 			eb.addField("Bot Manager Roles", botManagerRoles.isEmpty() ? "None" : botManagerRoles, false);
 			String channelBlacklist = streamJsonArray(higherDepth(currentSettings, "channelblacklist").getAsJsonArray())
-					.map(r -> "<#" + r.getAsString() + ">")
-					.collect(Collectors.joining(" "));
+				.map(r -> "<#" + r.getAsString() + ">")
+				.collect(Collectors.joining(" "));
 			eb.addField("Channel Blacklist", channelBlacklist.isEmpty() ? "None" : channelBlacklist, false);
 		} else if (args.length >= 2 && args[1].equals("jacob")) {
 			if (args.length == 2) {
@@ -306,11 +306,11 @@ public class SettingsExecute {
 							default -> null;
 						};
 					case "roles_claim" -> eb =
-							switch (args[3]) {
-								case "true" -> setRolesClaimEnable(true);
-								case "false" -> setRolesClaimEnable(false);
-								default -> null;
-							};
+						switch (args[3]) {
+							case "true" -> setRolesClaimEnable(true);
+							case "false" -> setRolesClaimEnable(false);
+							default -> null;
+						};
 				}
 			}
 
@@ -2199,14 +2199,14 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder setRolesClaimEnable(boolean enable) {
-		if(!higherDepth(database.getRolesSettings(guild.getId()), "enable", false)){
+		if (!higherDepth(database.getRolesSettings(guild.getId()), "enable", false)) {
 			return invalidEmbed("Automatic roles must be enabled");
 		}
 
 		EmbedBuilder eb = checkHypixelKey(database.getServerHypixelApiKey(guild.getId()), false);
 		if (eb != null) {
 			return invalidEmbed(
-					"A valid Hypixel API key must be set (`/settings set hypixel_key <key>`) in order to enable automatic roles claim"
+				"A valid Hypixel API key must be set (`/settings set hypixel_key <key>`) in order to enable automatic roles claim"
 			);
 		}
 
