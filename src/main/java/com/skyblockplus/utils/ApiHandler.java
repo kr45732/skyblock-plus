@@ -71,14 +71,14 @@ public class ApiHandler {
 			cacheDatabase.initializeCommandUses();
 			cacheDatabase.initializeJacobData();
 			cacheDatabase.initializeAhTracker();
-			updateCacheTask = scheduler.scheduleWithFixedDelay(cacheDatabase::updateCache, 60, 90, TimeUnit.SECONDS);
-			scheduler.scheduleWithFixedDelay(
-				() -> {
+			scheduler.scheduleWithFixedDelay(cacheDatabase::updateCache, 60, 90, TimeUnit.SECONDS);
+			updateCacheTask = scheduler.scheduleWithFixedDelay(
+				() -> {try{
 					cacheApplyGuildUsers();
 					cacheParties();
 					cacheCommandUses();
 					cacheAhTracker();
-				},
+				}catch(Exception e){log.error("Exception when interval caching", e);}},
 				30,
 				30,
 				TimeUnit.MINUTES
