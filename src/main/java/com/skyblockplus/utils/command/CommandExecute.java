@@ -27,6 +27,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import java.util.regex.Matcher;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
 
 public abstract class CommandExecute extends CommandEvent {
@@ -89,6 +90,16 @@ public abstract class CommandExecute extends CommandEvent {
 
 	protected void embed(EmbedBuilder embedBuilder) {
 		ebMessage.editMessageEmbeds(embedBuilder.build()).queue(ignore, ignore);
+	}
+
+	protected void embed(Object ebOrMb) {
+		if(ebOrMb instanceof EmbedBuilder eb) {
+			embed(eb);
+		}else if(ebOrMb instanceof MessageBuilder mb){
+			ebMessage.editMessage(mb.build()).queue(ignore, ignore);
+		}else{
+			throw new IllegalArgumentException("Unexpected class: " + ebOrMb.getClass());
+		}
 	}
 
 	protected void paginate(EmbedBuilder embedBuilder) {

@@ -36,6 +36,7 @@ import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
+import com.skyblockplus.dungeons.CalcRunsCommand;
 import com.skyblockplus.features.apply.ApplyGuild;
 import com.skyblockplus.features.apply.ApplyUser;
 import com.skyblockplus.features.jacob.JacobGuild;
@@ -62,6 +63,7 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
@@ -74,9 +76,11 @@ import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.exceptions.PermissionException;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.requests.ErrorResponse;
+import net.dv8tion.jda.api.requests.restaction.WebhookMessageUpdateAction;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
@@ -909,21 +913,39 @@ public class AutomaticGuild {
 			String[] discordUuidSplit = event.getComponentId().split("track_auctions_")[1].split("_", 2)[1].split("_", 2);
 			if (event.getUser().getId().equals(discordUuidSplit[0])) {
 				event
+						.deferReply(true)
+						.queue(ignored -> {
+							if (event.getComponentId().startsWith("track_auctions_start_")) {
+								MessageEmbed eb = AuctionTracker.trackAuctions(discordUuidSplit[1], event.getUser().getId()).build();
+								event.getHook().editOriginalEmbeds(eb).queue();
+								if (!eb.getTitle().equals("Error")) {
+									ActionRow updatedButton = ActionRow.of(Button.primary("track_auctions_stop_" + event.getUser().getId() + "_" + discordUuidSplit[1], "Stop Tracking Player's Auctions"));
+									(event.getMessage().getActionRows().size() == 1 ? event.getMessage().editMessageComponents(updatedButton) : event.getMessage().editMessageComponents(event.getMessage().getActionRows().get(0), updatedButton)).queue();
+								}
+
+							} else if (event.getComponentId().startsWith("track_auctions_stop_")) {
+								MessageEmbed eb = AuctionTracker.stopTrackingAuctions(event.getUser().getId()).build();
+								WebhookMessageUpdateAction<Message> action = event.getHook().editOriginalEmbeds(eb);
+								if (!eb.getTitle().equals("Error")) {
+									ActionRow updatedButton = ActionRow.of(Button.primary("track_auctions_start_" + event.getUser().getId() + "_" + discordUuidSplit[1], "Track Player's Auctions"));
+									(event.getMessage().getActionRows().size() == 1 ? event.getMessage().editMessageComponents(updatedButton) : event.getMessage().editMessageComponents(event.getMessage().getActionRows().get(0), updatedButton)).queue();
+								}
+
+								action.queue();
+							}
+						});
+			}
+			return;
+		} else if(event.getComponentId().startsWith("calc_runs_ring_")){
+			event
 					.deferReply(true)
 					.queue(ignored -> {
-						if (event.getComponentId().startsWith("track_auctions_start_")) {
-							event
-								.getHook()
-								.editOriginalEmbeds(AuctionTracker.trackAuctions(discordUuidSplit[1], event.getUser().getId()).build())
-								.queue();
-						} else if (event.getComponentId().startsWith("track_auctions_stop_")) {
-							event
-								.getHook()
-								.editOriginalEmbeds(AuctionTracker.stopTrackingAuctions(event.getUser().getId()).build())
-								.queue();
-						}
+						// [uuid, profileName, targetLevel, floor]
+						String[] split = event.getComponentId().split("calc_runs_ring_")[1].split("_");
+						Object ebOrMb = CalcRunsCommand.getCalcRuns(split[0], split[1], Integer.parseInt(split[2]), Integer.parseInt(split[3]), true);
+						event.getHook().editOriginal((ebOrMb instanceof EmbedBuilder eb ? new MessageBuilder().setEmbeds(eb.build()) : ((MessageBuilder) ebOrMb)).build()).queue();
+
 					});
-			}
 			return;
 		} else if (event.getComponentId().startsWith("event_message_")) {
 			event

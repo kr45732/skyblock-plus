@@ -53,7 +53,7 @@ public class AuctionTracker {
 		}
 
 		commandAuthorToTrackingUser.put(userId, uuidStruct);
-		return defaultEmbed("Auction tracker")
+		return defaultEmbed("Auction Tracker")
 			.setDescription(
 				(curTrack != null ? "Stopped tracking [**" + curTrack.username() + "**](" + curTrack.getAuctionUrl() + "). " : "") +
 				"Now tracking the auctions of [**" +
@@ -107,7 +107,7 @@ public class AuctionTracker {
 								.queue(dm ->
 									dm
 										.sendMessageEmbeds(
-											defaultEmbed("Auction tracker")
+											defaultEmbed("Auction Tracker")
 												.setDescription(
 													"**Seller:** " +
 													entry.getValue().username() +
@@ -139,13 +139,13 @@ public class AuctionTracker {
 		if (commandAuthorToTrackingUser.containsKey(userId)) {
 			UsernameUuidStruct stoppedTracking = commandAuthorToTrackingUser.get(userId);
 			commandAuthorToTrackingUser.remove(userId);
-			return defaultEmbed("Auction tracker")
+			return defaultEmbed("Auction Tracker")
 				.setDescription(
 					"Stopped tracking the auctions of [**" + stoppedTracking.username() + "**](" + stoppedTracking.getAuctionUrl() + ")"
 				);
 		}
 
-		return defaultEmbed("Auction tracker").setDescription("You are not tracking this player");
+		return invalidEmbed("You are not tracking this player");
 	}
 
 	public static void setAhTrack(Map<String, UsernameUuidStruct> ahTrack) {

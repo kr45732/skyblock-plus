@@ -176,7 +176,7 @@ public class Main {
 					new LeaderboardCommand(),
 					new JacobCommand(),
 					new RecipeCommand(),
-					new StorageCommand()
+					new StorageCommand(), new CalcRunsCommand()
 				)
 				.build();
 
@@ -243,7 +243,7 @@ public class Main {
 					new LeaderboardSlashCommand(),
 					new JacobSlashCommand(),
 					new RecipeSlashCommand(),
-					new StorageSlashCommand()
+					new StorageSlashCommand(), new CalcRunsSlashCommand()
 				);
 
 		allServerSettings =
