@@ -72,17 +72,22 @@ public class ApiHandler {
 			cacheDatabase.initializeJacobData();
 			cacheDatabase.initializeAhTracker();
 			scheduler.scheduleWithFixedDelay(cacheDatabase::updateCache, 60, 90, TimeUnit.SECONDS);
-			updateCacheTask = scheduler.scheduleWithFixedDelay(
-				() -> {try{
-					cacheApplyGuildUsers();
-					cacheParties();
-					cacheCommandUses();
-					cacheAhTracker();
-				}catch(Exception e){log.error("Exception when interval caching", e);}},
-				30,
-				30,
-				TimeUnit.MINUTES
-			);
+			updateCacheTask =
+				scheduler.scheduleWithFixedDelay(
+					() -> {
+						try {
+							cacheApplyGuildUsers();
+							cacheParties();
+							cacheCommandUses();
+							cacheAhTracker();
+						} catch (Exception e) {
+							log.error("Exception when interval caching", e);
+						}
+					},
+					30,
+					30,
+					TimeUnit.MINUTES
+				);
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateLinkedAccounts, 60, 45, TimeUnit.SECONDS);
 		} catch (Exception e) {
 			log.error("Exception when initializing the ApiHandler", e);
