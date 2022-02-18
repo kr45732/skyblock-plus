@@ -1205,8 +1205,6 @@ public class Utils {
 			return;
 		}
 
-		updateApplyCache.cancel(true);
-
 		long startTime = System.currentTimeMillis();
 		for (Map.Entry<String, AutomaticGuild> automaticGuild : guildMap.entrySet()) {
 			List<ApplyGuild> applySettings = automaticGuild.getValue().applyGuild;
@@ -1340,7 +1338,7 @@ public class Utils {
 		if (cacheDatabase.cacheJacobData(gson.toJson(JacobHandler.getJacobData()))) {
 			log.info("Cached jacob data in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
 		} else {
-			log.error("Failed to cache jacob data uses in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
+			log.error("Failed to cache jacob data in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
 		}
 	}
 

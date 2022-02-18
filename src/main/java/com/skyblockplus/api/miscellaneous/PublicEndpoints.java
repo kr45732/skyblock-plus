@@ -72,6 +72,7 @@ public class PublicEndpoints {
 		if (key.equals("2d7569ff0decff164a46e8d417e7b692")) {
 			if (JacobHandler.needsUpdate()) {
 				JacobHandler.setJacobData(jacobData);
+				cacheJacobData();
 				return new ResponseEntity<>(DataObject.empty().put("success", true).toMap(), HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(

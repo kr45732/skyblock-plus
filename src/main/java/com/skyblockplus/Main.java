@@ -19,6 +19,7 @@
 package com.skyblockplus;
 
 import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
+import static com.skyblockplus.utils.ApiHandler.updateCacheTask;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.*;
@@ -294,6 +295,8 @@ public class Main {
 	@PreDestroy
 	public void onExit() {
 		log.info("Stopping");
+
+		updateCacheTask.cancel(true);
 
 		log.info("Caching Apply Users");
 		cacheApplyGuildUsers();
