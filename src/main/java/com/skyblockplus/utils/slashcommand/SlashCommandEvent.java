@@ -78,14 +78,13 @@ public class SlashCommandEvent extends SlashCommandInteractionEvent {
 	}
 
 	public void embed(Object ebOrMb) {
-		if(ebOrMb instanceof EmbedBuilder eb) {
+		if (ebOrMb instanceof EmbedBuilder eb) {
 			embed(eb);
-		}else if(ebOrMb instanceof MessageBuilder mb){
+		} else if (ebOrMb instanceof MessageBuilder mb) {
 			getHook().editOriginal(mb.build()).queue(ignore, ignore);
-		}else{
+		} else {
 			throw new IllegalArgumentException("Unexpected class: " + ebOrMb.getClass());
 		}
-
 	}
 
 	private boolean getLinkedUser(String id) {

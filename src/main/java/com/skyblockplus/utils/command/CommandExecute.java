@@ -93,11 +93,11 @@ public abstract class CommandExecute extends CommandEvent {
 	}
 
 	protected void embed(Object ebOrMb) {
-		if(ebOrMb instanceof EmbedBuilder eb) {
+		if (ebOrMb instanceof EmbedBuilder eb) {
 			embed(eb);
-		}else if(ebOrMb instanceof MessageBuilder mb){
+		} else if (ebOrMb instanceof MessageBuilder mb) {
 			ebMessage.editMessage(mb.build()).queue(ignore, ignore);
-		}else{
+		} else {
 			throw new IllegalArgumentException("Unexpected class: " + ebOrMb.getClass());
 		}
 	}

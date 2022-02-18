@@ -164,7 +164,12 @@ public class AuctionCommand extends Command {
 				);
 			UsernameUuidStruct curTrack = AuctionTracker.commandAuthorToTrackingUser.getOrDefault(event.getUser().getId(), null);
 			if (curTrack != null && curTrack.uuid().equals(usernameUuidStruct.uuid())) {
-				extras.addButton(Button.primary("track_auctions_stop_" + event.getUser().getId() + "_" + usernameUuidStruct.uuid(), "Stop Tracking Player's Auctions"));
+				extras.addButton(
+					Button.primary(
+						"track_auctions_stop_" + event.getUser().getId() + "_" + usernameUuidStruct.uuid(),
+						"Stop Tracking Player's Auctions"
+					)
+				);
 			} else {
 				extras.addButton(
 					Button.primary(

@@ -40,37 +40,41 @@ public class CalcRunsSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.embed(CalcRunsCommand.getCalcRuns(event.player, event.getOptionStr("profile"), event.getOptionInt("level", 1), event.getOptionInt("floor", 0), false));
+		event.embed(
+			CalcRunsCommand.getCalcRuns(
+				event.player,
+				event.getOptionStr("profile"),
+				event.getOptionInt("level", 1),
+				event.getOptionInt("floor", 0),
+				false
+			)
+		);
 	}
 
 	@Override
 	public CommandData getCommandData() {
 		return Commands
 			.slash(name, "A party finder helper that shows a player's dungeon stats")
-				.addOptions(
-new OptionData(OptionType.INTEGER, "level", "Target catacombs level", true)
-		.setRequiredRange(1, 50),
-						new OptionData(OptionType.INTEGER, "floor", "Catacombs or master catacombs floor", true)
-								.addChoice("Entrance", 0)
-								.addChoice("Floor 1", 1)
-								.addChoice("Floor 2", 2)
-								.addChoice("Floor 3", 3)
-								.addChoice("Floor 4", 4)
-								.addChoice("Floor 5", 5)
-								.addChoice("Floor 6", 6)
-								.addChoice("Floor 7", 7)
-								.addChoice("Master Floor 1", 8)
-								.addChoice("Master Floor 2", 9)
-								.addChoice("Master Floor 3", 10)
-								.addChoice("Master Floor 4", 11)
-								.addChoice("Master Floor 5", 12)
-								.addChoice("Master Floor 6", 13)
-
-				)
+			.addOptions(
+				new OptionData(OptionType.INTEGER, "level", "Target catacombs level", true).setRequiredRange(1, 50),
+				new OptionData(OptionType.INTEGER, "floor", "Catacombs or master catacombs floor", true)
+					.addChoice("Entrance", 0)
+					.addChoice("Floor 1", 1)
+					.addChoice("Floor 2", 2)
+					.addChoice("Floor 3", 3)
+					.addChoice("Floor 4", 4)
+					.addChoice("Floor 5", 5)
+					.addChoice("Floor 6", 6)
+					.addChoice("Floor 7", 7)
+					.addChoice("Master Floor 1", 8)
+					.addChoice("Master Floor 2", 9)
+					.addChoice("Master Floor 3", 10)
+					.addChoice("Master Floor 4", 11)
+					.addChoice("Master Floor 5", 12)
+					.addChoice("Master Floor 6", 13)
+			)
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOption(OptionType.STRING, "profile", "Profile name")
-
-				;
+			.addOption(OptionType.STRING, "profile", "Profile name");
 	}
 
 	@Override

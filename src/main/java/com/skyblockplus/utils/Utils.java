@@ -1323,7 +1323,12 @@ public class Utils {
 
 		long startTime = System.currentTimeMillis();
 		if (cacheDatabase.cacheAhTracker(gson.toJson(AuctionTracker.commandAuthorToTrackingUser))) {
-			log.info("Cached auction tracker in " + ((System.currentTimeMillis() - startTime) / 1000) + "s | " + AuctionTracker.commandAuthorToTrackingUser.size());
+			log.info(
+				"Cached auction tracker in " +
+				((System.currentTimeMillis() - startTime) / 1000) +
+				"s | " +
+				AuctionTracker.commandAuthorToTrackingUser.size()
+			);
 		} else {
 			log.error("Failed to cache auction tracker in " + ((System.currentTimeMillis() - startTime) / 1000) + "s");
 		}
