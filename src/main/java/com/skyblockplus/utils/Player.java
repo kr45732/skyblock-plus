@@ -628,7 +628,12 @@ public class Player {
 	}
 
 	public List<InvItem> getPetsMapNames() {
-		JsonArray petsArr = getPets();
+		JsonArray petsArr;
+		try{
+			petsArr = getPets();
+		}catch (Exception e){
+			return new ArrayList<>();
+		}
 
 		List<InvItem> petsNameFormatted = new ArrayList<>();
 

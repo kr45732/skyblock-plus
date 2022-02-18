@@ -274,7 +274,7 @@ public class Utils {
 	}
 
 	public static JsonArray getSbzPricesJson() {
-		if (sbzPricesJson == null || Duration.between(sbzPricesJsonLastUpdated, Instant.now()).toMinutes() >= 15) {
+		if (sbzPricesJson == null || Duration.between(sbzPricesJsonLastUpdated, Instant.now()).toMinutes() >= 30) {
 			sbzPricesJson = getJson("https://raw.githubusercontent.com/skyblockz/pricecheckbot/master/data.json").getAsJsonArray();
 			sbzPricesJsonLastUpdated = Instant.now();
 		}

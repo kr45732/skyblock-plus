@@ -205,6 +205,10 @@ public class SettingsExecute {
 				.map(r -> "<@&" + r.getAsString() + ">")
 				.collect(Collectors.joining(" "));
 			eb.addField("Bot Manager Roles", botManagerRoles.isEmpty() ? "None" : botManagerRoles, false);
+			String channelBlacklist = streamJsonArray(higherDepth(currentSettings, "channelblacklist").getAsJsonArray())
+					.map(r -> "<#" + r.getAsString() + ">")
+					.collect(Collectors.joining(" "));
+			eb.addField("Channel Blacklist", channelBlacklist.isEmpty() ? "None" : channelBlacklist, false);
 		} else if (args.length >= 2 && args[1].equals("jacob")) {
 			if (args.length == 2) {
 				eb = displayJacobSettings(higherDepth(currentSettings, "jacobSettings"));
@@ -301,6 +305,12 @@ public class SettingsExecute {
 							case "false" -> setVerifySyncEnable(false);
 							default -> null;
 						};
+					case "roles_claim" -> eb =
+							switch (args[3]) {
+								case "true" -> setRolesClaimEnable(true);
+								case "false" -> setRolesClaimEnable(false);
+								default -> null;
+							};
 				}
 			}
 
@@ -1631,6 +1641,7 @@ public class SettingsExecute {
 
 	public boolean allowRolesEnable() {
 		JsonObject currentSettings = database.getRolesSettings(guild.getId()).getAsJsonObject();
+
 		currentSettings.remove("enable");
 		currentSettings.remove("useHighest");
 		return currentSettings.keySet().stream().anyMatch(role -> higherDepth(currentSettings, role + ".enable", false));
@@ -1954,7 +1965,8 @@ public class SettingsExecute {
 		ebFieldString += "\n**• Verified Role(s):** " + displaySettings(verifySettings, "verifiedRoles");
 		ebFieldString += "\n**• Verified Remove Role:** " + displaySettings(verifySettings, "verifiedRemoveRole");
 		ebFieldString += "\n**• Nickname Template:** " + displaySettings(verifySettings, "verifiedNickname");
-		ebFieldString += "\n**• Automatic sync:** " + displaySettings(verifySettings, "enableAutomaticSync");
+		ebFieldString += "\n**• Automatic Sync:** " + displaySettings(verifySettings, "enableAutomaticSync");
+		ebFieldString += "\n**• Automatic Roles Claim:** " + displaySettings(verifySettings, "enableRolesClaim");
 		return ebFieldString;
 	}
 
@@ -2184,6 +2196,26 @@ public class SettingsExecute {
 		}
 
 		return defaultSettingsEmbed("Automatic sync " + (enable ? "enabled" : "disabled"));
+	}
+
+	public EmbedBuilder setRolesClaimEnable(boolean enable) {
+		if(!higherDepth(database.getRolesSettings(guild.getId()), "enable", false)){
+			return invalidEmbed("Automatic roles must be enabled");
+		}
+
+		EmbedBuilder eb = checkHypixelKey(database.getServerHypixelApiKey(guild.getId()), false);
+		if (eb != null) {
+			return invalidEmbed(
+					"A valid Hypixel API key must be set (`/settings set hypixel_key <key>`) in order to enable automatic roles claim"
+			);
+		}
+
+		int responseCode = updateVerifySettings("enableRolesClaim", "" + enable);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		return defaultSettingsEmbed("Automatic roles claim sync " + (enable ? "enabled" : "disabled"));
 	}
 
 	public int updateVerifySettings(String key, String newValue) {

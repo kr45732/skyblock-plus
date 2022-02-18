@@ -18,27 +18,18 @@
 
 package com.skyblockplus.features.verify;
 
-import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
-import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
-import static com.skyblockplus.utils.ApiHandler.skyblockProfilesFromUuid;
-import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.database;
-import static com.skyblockplus.utils.Utils.jda;
-
 import com.google.gson.JsonElement;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
-import com.skyblockplus.utils.Player;
-import com.skyblockplus.utils.structs.HypixelResponse;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
+import java.util.concurrent.TimeUnit;
+
+import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
+import static com.skyblockplus.general.LinkCommand.updateLinkedUser;
+import static com.skyblockplus.utils.Utils.*;
 
 public class VerifyGuild {
 
@@ -103,123 +94,8 @@ public class VerifyGuild {
 			return;
 		}
 
-		String updatedNickname = "false";
-		String updatedRoles = "false";
+		String[] result = updateLinkedUser(verifySettings, linkedUser, event.getMember());
 
-		try {
-			String nicknameTemplate = higherDepth(verifySettings, "verifiedNickname", "none");
-			if (nicknameTemplate.contains("[IGN]")) {
-				nicknameTemplate = nicknameTemplate.replace("[IGN]", linkedUser.username());
-
-				Matcher matcher = nicknameTemplatePattern.matcher(nicknameTemplate);
-				HypixelResponse playerGuild = null;
-				Player player = null;
-				String key = database.getServerHypixelApiKey(event.getGuild().getId());
-				while (matcher.find()) {
-					String category = matcher.group(1);
-					String type = matcher.group(2);
-					String extra = matcher.group(3) == null ? "" : matcher.group(3);
-
-					if (category.equals("GUILD") && (type.equals("NAME") || type.equals("TAG") || type.equals("RANK"))) {
-						if (playerGuild == null) {
-							playerGuild = getGuildFromPlayer(linkedUser.uuid());
-							if (!playerGuild.isNotValid()) {
-								String gId = playerGuild.get("_id").getAsString();
-								if (
-									database
-										.getAllGuildSettings(event.getGuild().getId())
-										.stream()
-										.noneMatch(g -> g.getGuildId().equals(gId))
-								) {
-									playerGuild = new HypixelResponse();
-								}
-							}
-						}
-
-						if (!playerGuild.isNotValid()) {
-							nicknameTemplate =
-								nicknameTemplate.replace(
-									matcher.group(0),
-									switch (type) {
-										case "NAME" -> playerGuild.get("name").getAsString();
-										case "RANK" -> higherDepth(
-											streamJsonArray(playerGuild.get("members").getAsJsonArray())
-												.filter(g -> higherDepth(g, "uuid", "").equals(linkedUser.uuid()))
-												.findFirst()
-												.orElse(null),
-											"rank",
-											""
-										);
-										default -> playerGuild.get("tag").getAsString();
-									} +
-									extra
-								);
-						}
-					} else if (
-						category.equals("PLAYER") &&
-						(
-							type.equals("SKILLS") ||
-							type.equals("CATACOMBS") ||
-							type.equals("SLAYER") ||
-							type.equals("WEIGHT") ||
-							type.equals("CLASS")
-						)
-					) {
-						if (key != null) {
-							if (player == null) {
-								HypixelResponse response = skyblockProfilesFromUuid(linkedUser.uuid(), key);
-								player =
-									response.isNotValid()
-										? new Player()
-										: new Player(linkedUser.uuid(), linkedUser.username(), response.response());
-							}
-
-							if (player.isValid()) {
-								nicknameTemplate =
-									nicknameTemplate.replace(
-										matcher.group(0),
-										switch (type) {
-											case "SKILLS" -> roundAndFormat((int) player.getSkillAverage());
-											case "SLAYER" -> simplifyNumber(player.getTotalSlayer());
-											case "WEIGHT" -> roundAndFormat((int) player.getWeight());
-											case "CLASS" -> player.getSelectedDungeonClass().equals("none")
-												? ""
-												: "" + player.getSelectedDungeonClass().toUpperCase().charAt(0);
-											default -> roundAndFormat((int) player.getCatacombs().getProgressLevel());
-										}
-									);
-							}
-						}
-					}
-
-					nicknameTemplate = nicknameTemplate.replace(matcher.group(0), "");
-				}
-
-				event.getMember().modifyNickname(nicknameTemplate).complete();
-				updatedNickname = "true";
-			}
-		} catch (Exception e) {
-			updatedNickname = "error";
-		}
-
-		try {
-			List<Role> toAdd = streamJsonArray(higherDepth(verifySettings, "verifiedRoles").getAsJsonArray())
-				.map(e -> event.getGuild().getRoleById(e.getAsString()))
-				.collect(Collectors.toList());
-			List<Role> toRemove = new ArrayList<>();
-			try {
-				toRemove.add(event.getGuild().getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString()));
-			} catch (Exception ignored) {}
-			if (!toAdd.isEmpty() || !toRemove.isEmpty()) {
-				event.getGuild().modifyMemberRoles(event.getMember(), toAdd, toRemove).complete();
-				updatedRoles = "true";
-			}
-		} catch (Exception e) {
-			updatedRoles = "error";
-		}
-
-		String finalUpdatedRoles = updatedRoles;
-		String finalUpdatedNickname = updatedNickname;
 		event
 			.getUser()
 			.openPrivateChannel()
@@ -232,15 +108,15 @@ public class VerifyGuild {
 								event.getGuild().getName() +
 								"`" +
 								(
-									!finalUpdatedRoles.equals("false")
-										? finalUpdatedRoles.equals("true")
+									!result[1].equals("false")
+										? result[1].equals("true")
 											? "\n• Successfully synced your roles"
 											: "\n• Error syncing your roles"
 										: ""
 								) +
 								(
-									!finalUpdatedNickname.equals("false")
-										? finalUpdatedNickname.equals("true")
+									!result[0].equals("false")
+										? result[0].equals("true")
 											? "\n• Successfully synced your nickname"
 											: "\n• Error syncing your nickname"
 										: ""

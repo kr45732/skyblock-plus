@@ -54,4 +54,6 @@ public class AutomatedVerify {
 	private String previousMessageId = "";
 
 	private String enableAutomaticSync = "false";
+
+	private String enableRolesClaim = "false";
 }

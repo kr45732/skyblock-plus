@@ -367,7 +367,7 @@ public class NetworthExecute {
 					false
 				);
 			}
-			if (!echestStr.isEmpty()) {
+			if (!storageStr.isEmpty()) {
 				eb.addField("Storage | " + simplifyNumber(storageTotal), storageStr.toString(), false);
 			}
 			if (!invStr.isEmpty()) {

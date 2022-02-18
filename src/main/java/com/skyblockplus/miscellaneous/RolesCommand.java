@@ -25,8 +25,6 @@ import static com.skyblockplus.utils.Utils.database;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonSyntaxException;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
@@ -46,6 +44,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 
 public class RolesCommand extends Command {
 
@@ -56,45 +55,16 @@ public class RolesCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	public static EmbedBuilder updateRoles(String profile, Guild guild, Member member) {
-		EmbedBuilder eb;
-
-		LinkedAccount linkedInfo = database.getByDiscord(member.getId());
-		if (linkedInfo == null) {
-			return defaultEmbed("You must be linked to run this command. Use `/link <player>` to link");
-		}
-
-		DiscordInfoStruct discordInfo = getPlayerDiscordInfo(linkedInfo.uuid());
-
-		if (discordInfo.isNotValid()) {
-			return discordInfo.getFailEmbed();
-		}
-
-		if (!member.getUser().getAsTag().equals(discordInfo.discordTag())) {
-			return defaultEmbed("Discord tag mismatch")
-				.setDescription(
-					"**Player Username:** `" +
-					discordInfo.username() +
-					"`\n**API Discord Tag:** `" +
-					discordInfo.discordTag() +
-					"`\n**Your Discord Tag:** `" +
-					member.getUser().getAsTag() +
-					"`"
-				);
-		}
-
-		String username = discordInfo.username();
-		Player player = profile == null ? new Player(username) : new Player(username, profile);
-		if (!player.isValid()) {
-			return player.getFailEmbed();
-		}
-
-		JsonElement rolesJson = database.getRolesSettings(guild.getId());
-		if (rolesJson == null) {
-			return invalidEmbed("Error fetching server's settings");
-		}
-
+	/**
+	 * @return eb or [eb, toAdd, toRemove]
+	 */
+	public static Object updateRoles(Player player, Guild guild, Member member){
 		try {
+			JsonElement rolesJson = database.getRolesSettings(guild.getId());
+			if(rolesJson == null | rolesJson.isJsonNull()){
+				return invalidEmbed("Unable to fetch roles settings");
+			}
+
 			if (!higherDepth(rolesJson, "enable", false)) {
 				return invalidEmbed("Automatic roles not setup or enabled for this server");
 			}
@@ -182,9 +152,9 @@ public class RolesCommand extends Command {
 
 							for (JsonElement guildRoleSettings : guildRoles) {
 								if (
-									higherDepth(guildRoleSettings, "guildId")
-										.getAsString()
-										.equals(higherDepth(guildJson, "_id").getAsString())
+										higherDepth(guildRoleSettings, "guildId")
+												.getAsString()
+												.equals(higherDepth(guildJson, "_id").getAsString())
 								) {
 									JsonArray guildRanks = higherDepth(guildRoleSettings, "guildRanks").getAsJsonArray();
 
@@ -228,35 +198,35 @@ public class RolesCommand extends Command {
 						}
 					}
 					case "sven",
-						"rev",
-						"tara",
-						"coins",
-						"alchemy",
-						"combat",
-						"fishing",
-						"farming",
-						"foraging",
-						"carpentry",
-						"mining",
-						"taming",
-						"enchanting",
-						"catacombs",
-						"fairy_souls",
-						"skill_average",
-						"pet_score",
-						"dungeon_secrets",
-						"slot_collector",
-						"enderman",
-						"weight",
-						"total_slayer",
-						"accessory_count",
-						"networth",
-						"maxed_collections",
-						"slayer_nine" -> {
+							"rev",
+							"tara",
+							"coins",
+							"alchemy",
+							"combat",
+							"fishing",
+							"farming",
+							"foraging",
+							"carpentry",
+							"mining",
+							"taming",
+							"enchanting",
+							"catacombs",
+							"fairy_souls",
+							"skill_average",
+							"pet_score",
+							"dungeon_secrets",
+							"slot_collector",
+							"enderman",
+							"weight",
+							"total_slayer",
+							"accessory_count",
+							"networth",
+							"maxed_collections",
+							"slayer_nine" -> {
 						double roleAmount = -1;
 						switch (currentRoleName) {
 							case "sven", "rev", "tara", "enderman" -> roleAmount =
-								useHighest ? player.getHighestAmount(currentRoleName) : player.getSlayer(currentRoleName);
+									useHighest ? player.getHighestAmount(currentRoleName) : player.getSlayer(currentRoleName);
 							case "coins" -> {
 								roleAmount = useHighest ? player.getHighestAmount("bank") : player.getBankBalance();
 								if (roleAmount == -1 && !disabledAPI.toString().contains("Banking")) {
@@ -284,29 +254,29 @@ public class RolesCommand extends Command {
 							}
 							case "networth" -> roleAmount = useHighest ? player.getHighestAmount(currentRoleName) : player.getNetworth();
 							case "catacombs" -> roleAmount =
-								useHighest ? player.getHighestAmount(currentRoleName) : player.getCatacombs().getProgressLevel();
+									useHighest ? player.getHighestAmount(currentRoleName) : player.getCatacombs().getProgressLevel();
 							case "fairy_souls" -> roleAmount =
-								useHighest ? player.getHighestAmount(currentRoleName) : player.getFairySouls();
+									useHighest ? player.getHighestAmount(currentRoleName) : player.getFairySouls();
 							case "slot_collector" -> roleAmount =
-								useHighest ? player.getHighestAmount(currentRoleName) : player.getNumberMinionSlots();
+									useHighest ? player.getHighestAmount(currentRoleName) : player.getNumberMinionSlots();
 							case "dungeon_secrets" -> roleAmount =
-								useHighest ? player.getHighestAmount(currentRoleName) : player.getDungeonSecrets();
+									useHighest ? player.getHighestAmount(currentRoleName) : player.getDungeonSecrets();
 							case "accessory_count" -> roleAmount =
-								useHighest ? player.getHighestAmount(currentRoleName) : player.getAccessoryCount();
+									useHighest ? player.getHighestAmount(currentRoleName) : player.getAccessoryCount();
 							case "weight" -> {
 								if (
-									!useHighest && player.getSkillAverage() == -1 && !disabledAPI.toString().contains("Skills (for weight)")
+										!useHighest && player.getSkillAverage() == -1 && !disabledAPI.toString().contains("Skills (for weight)")
 								) {
 									disabledAPI.append(roleChangeString("Skills (for weight) API disabled"));
 								}
 								roleAmount = useHighest ? player.getHighestAmount(currentRoleName) : player.getWeight();
 							}
 							case "total_slayer" -> roleAmount =
-								useHighest ? player.getHighestAmount(currentRoleName) : player.getTotalSlayer();
+									useHighest ? player.getHighestAmount(currentRoleName) : player.getTotalSlayer();
 							case "slayer_nine" -> roleAmount =
-								useHighest ? player.getHighestAmount(currentRoleName) : player.getNumLvlNineSlayers();
+									useHighest ? player.getHighestAmount(currentRoleName) : player.getNumLvlNineSlayers();
 							case "maxed_collections" -> roleAmount =
-								useHighest ? player.getHighestAmount(currentRoleName) : player.getNumMaxedCollections();
+									useHighest ? player.getHighestAmount(currentRoleName) : player.getNumMaxedCollections();
 						}
 
 						if (roleAmount == -1) {
@@ -345,11 +315,11 @@ public class RolesCommand extends Command {
 								for (int j = i - 1; j >= 0; j--) {
 									JsonElement currentLevelRemoveStackable = levelsArray.get(j);
 									Role currentLevelRoleRemoveStackable = guild.getRoleById(
-										higherDepth(currentLevelRemoveStackable, "roleId").getAsString()
+											higherDepth(currentLevelRemoveStackable, "roleId").getAsString()
 									);
 									if (currentLevelRoleRemoveStackable == null) {
 										errorRoles.append(
-											roleDeletedString(higherDepth(currentLevelRemoveStackable, "roleId").getAsString())
+												roleDeletedString(higherDepth(currentLevelRemoveStackable, "roleId").getAsString())
 										);
 										continue;
 									}
@@ -402,8 +372,8 @@ public class RolesCommand extends Command {
 					case "player_items" -> {
 						JsonArray levelsArray = higherDepth(currentRole, "levels").getAsJsonArray();
 						List<String> items = streamJsonArray(levelsArray)
-							.map(item -> higherDepth(item, "value").getAsString())
-							.collect(Collectors.toList());
+								.map(item -> higherDepth(item, "value").getAsString())
+								.collect(Collectors.toList());
 						Set<String> itemsPlayerHas = player.getItemsPlayerHas(items);
 
 						if (itemsPlayerHas == null) {
@@ -457,12 +427,12 @@ public class RolesCommand extends Command {
 							if (currentPetRarity.equals("epic") || currentPetRarity.equals("legendary")) {
 								if (!excludedPets.contains(higherDepth(currentPet, "type").getAsString().toLowerCase())) {
 									if (
-										petLevelFromXp(
-											higherDepth(currentPet, "exp", 0L),
-											currentPetRarity,
-											higherDepth(currentPet, "type").getAsString()
-										) ==
-										100
+											petLevelFromXp(
+													higherDepth(currentPet, "exp", 0L),
+													currentPetRarity,
+													higherDepth(currentPet, "type").getAsString()
+											) ==
+													100
 									) {
 										isPetEnthusiast = true;
 										if (!member.getRoles().contains(petEnthusiastRole)) {
@@ -490,20 +460,20 @@ public class RolesCommand extends Command {
 				}
 			}
 
-			eb =
-				player
-					.defaultPlayerEmbed()
-					.setDescription(
-						(useHighest ? "**NOTE: Using highest values across all profiles**\n\n" : "") +
-						"**Added Roles (" +
-						toAdd.size() +
-						")**\n" +
-						(addedRoles.length() > 0 ? addedRoles.toString() : "• None\n") +
-						"\n**Removed Roles (" +
-						toRemove.size() +
-						")**\n" +
-						(removedRoles.length() > 0 ? removedRoles.toString() : "• None")
-					);
+			EmbedBuilder eb =
+					player
+							.defaultPlayerEmbed()
+							.setDescription(
+									(useHighest ? "**NOTE: Using highest values across all profiles**\n\n" : "") +
+											"**Added Roles (" +
+											toAdd.size() +
+											")**\n" +
+											(addedRoles.length() > 0 ? addedRoles.toString() : "• None\n") +
+											"\n**Removed Roles (" +
+											toRemove.size() +
+											")**\n" +
+											(removedRoles.length() > 0 ? removedRoles.toString() : "• None")
+							);
 			if (disabledAPI.length() > 0) {
 				eb.addField("Disabled APIs:", disabledAPI.toString(), false);
 			}
@@ -512,12 +482,56 @@ public class RolesCommand extends Command {
 				eb.addField("Error roles:", errorRoles.toString(), false);
 			}
 
-			guild.modifyMemberRoles(member, toAdd, toRemove).queue();
-		} catch (JsonIOException | JsonSyntaxException e) {
-			eb = defaultEmbed("Error fetching data");
+			return new Object[]{eb, toAdd, toRemove};
+		} catch (Exception e) {
+			return defaultEmbed("Error fetching data");
+		}
+	}
+
+	public static EmbedBuilder updateRoles(String profile, Guild guild, Member member) {
+		LinkedAccount linkedInfo = database.getByDiscord(member.getId());
+		if (linkedInfo == null) {
+			return defaultEmbed("You must be linked to run this command. Use `/link <player>` to link");
 		}
 
-		return eb;
+		DiscordInfoStruct discordInfo = getPlayerDiscordInfo(linkedInfo.uuid());
+
+		if (discordInfo.isNotValid()) {
+			return discordInfo.getFailEmbed();
+		}
+
+		if (!member.getUser().getAsTag().equals(discordInfo.discordTag())) {
+			return defaultEmbed("Discord tag mismatch")
+				.setDescription(
+					"**Player Username:** `" +
+					discordInfo.username() +
+					"`\n**API Discord Tag:** `" +
+					discordInfo.discordTag() +
+					"`\n**Your Discord Tag:** `" +
+					member.getUser().getAsTag() +
+					"`"
+				);
+		}
+
+		String username = discordInfo.username();
+		Player player = profile == null ? new Player(username) : new Player(username, profile);
+		if (!player.isValid()) {
+			return player.getFailEmbed();
+		}
+
+
+		Object out = updateRoles(player, guild, member);
+		if(out instanceof EmbedBuilder eb1){
+			return eb1;
+		}
+
+		Object[] outArr = ((Object[]) out);
+		try {
+			guild.modifyMemberRoles(member, (List<Role>) outArr[1], (List<Role>) outArr[2]).queue();
+		}catch (InsufficientPermissionException e){
+			return invalidEmbed("Missing permission: " + e.getPermission().getName());
+		}
+		return (EmbedBuilder) outArr[0];
 	}
 
 	private static String roleChangeString(String name) {

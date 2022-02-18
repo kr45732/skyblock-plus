@@ -392,7 +392,7 @@ public class ApplyUser implements Serializable {
 						EmbedBuilder applyPlayerStats = defaultPlayerEmbed();
 						applyPlayerStats.addField("Weight", playerWeight, true);
 						applyPlayerStats.addField("Total slayer", playerSlayer, true);
-						applyPlayerStats.addField("Progress average skill level", playerSkills, true);
+						applyPlayerStats.addField("Progress skill level", playerSkills, true);
 						applyPlayerStats.addField("Catacombs level", playerCatacombs, true);
 						applyPlayerStats.addField("Bank & purse coins", playerCoins, true);
 						double playerNetworth = NetworthExecute.getTotalNetworth(playerUsername, playerProfileName);
