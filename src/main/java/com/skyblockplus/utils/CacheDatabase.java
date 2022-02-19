@@ -41,7 +41,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
 import net.dv8tion.jda.api.utils.data.DataObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -322,10 +321,10 @@ public class CacheDatabase {
 			statement.setDouble(17, player.getHighestAmount("mining", gamemode));
 			statement.setDouble(18, player.getHighestAmount("taming", gamemode));
 			statement.setDouble(19, player.getHighestAmount("enchanting", gamemode));
-//			System.out.println("here " + player.getUsername() + " - " + gamemode);
-//			double value = player.getHighestAmount("networth", gamemode);
-//			System.out.println(value);
-			statement.setDouble(20, 0);// player.getHighestAmount("networth", gamemode));
+			//			System.out.println("here " + player.getUsername() + " - " + gamemode);
+			//			double value = player.getHighestAmount("networth", gamemode);
+			//			System.out.println(value);
+			statement.setDouble(20, 0); // player.getHighestAmount("networth", gamemode));
 			statement.executeUpdate();
 		} catch (Exception e) {
 			e.printStackTrace();

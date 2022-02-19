@@ -47,7 +47,8 @@ public class Player {
 	private String username;
 	private String profileName;
 	private String failCause = "Unknown fail cause";
-//	private final Map<String, Double> profileToNetworth = new HashMap<>();
+
+	//	private final Map<String, Double> profileToNetworth = new HashMap<>();
 
 	/* Constructors */
 	// Empty player, always invalid
@@ -1316,13 +1317,13 @@ public class Player {
 	}
 
 	public double getNetworth() {
-//		System.out.println(profileToNetworth + " - " + getProfileName());
-//		if(profileToNetworth.containsKey(getProfileName())){
-//			return profileToNetworth.get(getProfileName());
-//		}
+		//		System.out.println(profileToNetworth + " - " + getProfileName());
+		//		if(profileToNetworth.containsKey(getProfileName())){
+		//			return profileToNetworth.get(getProfileName());
+		//		}
 
 		double nw = NetworthExecute.getTotalNetworth(this);
-//		profileToNetworth.put(getProfileName(), nw);
+		//		profileToNetworth.put(getProfileName(), nw);
 		return nw;
 	}
 
