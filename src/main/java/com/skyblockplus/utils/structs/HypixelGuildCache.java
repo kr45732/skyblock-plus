@@ -140,9 +140,9 @@ public class HypixelGuildCache {
 			"=:=" +
 			player.getHighestAmount("taming", gamemode) +
 			"=:=" +
-			player.getHighestAmount("enchanting", gamemode)
-		 + "=:=" +
-				player.getHighestAmount("networth", gamemode)
+			player.getHighestAmount("enchanting", gamemode) +
+			"=:=" +
+			player.getHighestAmount("networth", gamemode)
 		);
 	}
 }

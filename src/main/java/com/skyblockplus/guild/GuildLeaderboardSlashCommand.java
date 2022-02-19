@@ -58,7 +58,7 @@ public class GuildLeaderboardSlashCommand extends SlashCommand {
 			.slash(name, "Get a leaderboard for a guild. The API key must be set for this server.")
 			.addOptions(
 				new OptionData(OptionType.STRING, "type", "Leaderboard type", true)
-						.addChoice("Networth", "Networth")
+					.addChoice("Networth", "Networth")
 					.addChoice("Slayer", "slayer")
 					.addChoice("Skills", "skills")
 					.addChoice("Catacombs", "catacombs")

@@ -87,7 +87,7 @@ public class PriceCommand extends Command {
 
 		if (lowestBinArr == null) {
 			String finalQuery = query;
-			if(getQueryItems().stream().noneMatch(q -> q.equalsIgnoreCase(finalQuery))) {
+			if (getQueryItems().stream().noneMatch(q -> q.equalsIgnoreCase(finalQuery))) {
 				query = getClosestMatch(query, getQueryItems());
 			}
 			lowestBinArr = queryLowestBin(query, auctionType);
@@ -96,10 +96,7 @@ public class PriceCommand extends Command {
 			}
 		}
 
-
-
 		if (lowestBinArr.size() == 0) {
-
 			return invalidEmbed("No " + auctionType.getName() + " matching '" + query + "' found");
 		}
 
