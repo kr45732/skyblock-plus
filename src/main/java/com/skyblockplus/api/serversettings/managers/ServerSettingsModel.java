@@ -89,6 +89,8 @@ public class ServerSettingsModel {
 	@Fetch(value = FetchMode.SUBSELECT)
 	private List<String> channelBlacklist = new ArrayList<>();
 
+	private String logChannel = "";
+
 	public ServerSettingsModel(String serverName, String serverId) {
 		this.serverName = serverName;
 		this.serverId = serverId;
@@ -120,6 +122,7 @@ public class ServerSettingsModel {
 		copy.setMayorRole(mayorRole);
 		copy.setBotManagerRoles(botManagerRoles);
 		copy.setChannelBlacklist(channelBlacklist);
+		copy.setLogChannel(logChannel);
 		return copy;
 	}
 }

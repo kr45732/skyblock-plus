@@ -102,7 +102,7 @@ public class SettingsExecute {
 	public EmbedBuilder getSettingsEmbed(String content, String[] args) {
 		EmbedBuilder eb = null;
 		JsonElement currentSettings = database.getServerSettings(guild.getId());
-		if (args.length >= 3 && args[1].equals("set")) {
+		if (args.length >= 4 && args[1].equals("set")) {
 			eb =
 				switch (args[2]) {
 					case "hypixel_key" -> setHypixelKey(args[3]);
@@ -112,6 +112,7 @@ public class SettingsExecute {
 					case "fetchur_ping" -> setFetchurPing(args[3]);
 					case "mayor_channel" -> setMayorChannel(args[3]);
 					case "mayor_ping" -> setMayorPing(args[3]);
+					case "log_channel" -> setLogChannel(args[3]);
 					default -> errorEmbed("settings set");
 				};
 		} else if (args.length == 3 && args[1].equals("delete")) {
@@ -2374,6 +2375,31 @@ public class SettingsExecute {
 
 			guildMap.get(guild.getId()).setMayorChannel(channel);
 			return defaultSettingsEmbed("**Mayor notifications channel set to:** " + channel.getAsMention());
+		}
+	}
+
+	public EmbedBuilder setLogChannel(String channelMention) {
+		if (channelMention.equalsIgnoreCase("none")) {
+			int responseCode = database.setLogChannel(guild.getId(), "none");
+			if (responseCode != 200) {
+				return apiFailMessage(responseCode);
+			}
+			guildMap.get(guild.getId()).setLogChannel(null);
+			return defaultSettingsEmbed("**Logging disabled**");
+		} else {
+			Object eb = checkTextChannel(channelMention);
+			if (eb instanceof EmbedBuilder e) {
+				return e;
+			}
+			TextChannel channel = (TextChannel) eb;
+
+			int responseCode = database.setLogChannel(guild.getId(), channel.getId());
+			if (responseCode != 200) {
+				return apiFailMessage(responseCode);
+			}
+
+			guildMap.get(guild.getId()).setLogChannel(channel);
+			return defaultSettingsEmbed("**Log channel set to:** " + channel.getAsMention());
 		}
 	}
 

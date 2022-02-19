@@ -35,7 +35,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 
 public class AuctionTracker {
 
-	public static Map<String, UsernameUuidStruct> commandAuthorToTrackingUser = new HashMap<>();
+	public static final Map<String, UsernameUuidStruct> commandAuthorToTrackingUser = new HashMap<>();
 	private static Instant lastUpdated = null;
 
 	public static EmbedBuilder trackAuctions(String username, String userId) {
@@ -148,7 +148,7 @@ public class AuctionTracker {
 		return invalidEmbed("You are not tracking this player");
 	}
 
-	public static void setAhTrack(Map<String, UsernameUuidStruct> ahTrack) {
-		commandAuthorToTrackingUser = ahTrack;
+	public static void insertAhTrack(String key, UsernameUuidStruct value) {
+		commandAuthorToTrackingUser.put(key, value);
 	}
 }

@@ -55,6 +55,7 @@ import java.io.FileWriter;
 import java.io.Writer;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledFuture;
@@ -90,6 +91,7 @@ import org.slf4j.LoggerFactory;
 public class AutomaticGuild {
 
 	private static final Logger log = LoggerFactory.getLogger(AutomaticGuild.class);
+	public static final ScheduledFuture<?> logFuture = scheduler.scheduleWithFixedDelay(() -> guildMap.values().forEach(g -> g.logAction(null, null)), 5, 5, TimeUnit.MINUTES);
 
 	/* Apply */
 	public final List<ApplyGuild> applyGuild = new ArrayList<>();
@@ -119,6 +121,8 @@ public class AutomaticGuild {
 	public final String guildId;
 	public final List<ScheduledFuture<?>> scheduledFutures = new ArrayList<>();
 	public String prefix;
+	public TextChannel logChannel = null;
+	public List<MessageEmbed> logQueue = new ArrayList<>();
 
 	/* Constructor */
 	public AutomaticGuild(GenericGuildEvent event) {
@@ -175,6 +179,9 @@ public class AutomaticGuild {
 					.map(JsonElement::getAsString)
 					.collect(Collectors.toList())
 			);
+		} catch (Exception ignored) {}
+		try {
+			logChannel = event.getGuild().getTextChannelById(higherDepth(serverSettings, "logChannel", null));
 		} catch (Exception ignored) {}
 	}
 
@@ -1091,6 +1098,10 @@ public class AutomaticGuild {
 		this.prefix = prefix;
 	}
 
+	public void setLogChannel(TextChannel channel) {
+		this.logChannel = channel;
+	}
+
 	public void updateItemMappings() {
 		try {
 			File neuDir = new File("src/main/java/com/skyblockplus/json/neu");
@@ -1240,6 +1251,27 @@ public class AutomaticGuild {
 
 	public static Logger getLogger() {
 		return log;
+	}
+
+	public void logAction(EmbedBuilder eb, Member member){
+		try {
+			if (logChannel == null) {
+				return;
+			}
+
+			if(eb != null && member != null) {
+				eb.setAuthor(member.getEffectiveName() + " (" + member.getId() + ")", null, member.getEffectiveAvatarUrl());
+				eb.setTimestamp(Instant.now());
+				logQueue.add(eb.build());
+			}
+
+			if (logQueue.size() == 5 || logQueue.stream().anyMatch(l -> l.getTimestamp().isBefore(OffsetDateTime.now().minusMinutes(5)))) {
+				logChannel.sendMessageEmbeds(logQueue).queue();
+				logQueue.clear();
+			}
+		} catch (Exception e){
+			log.error(guildId, e);
+		}
 	}
 
 	public void setChannelBlacklist(List<String> channelBlacklist) {

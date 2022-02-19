@@ -645,4 +645,16 @@ public class ServerSettingsService {
 
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	}
+
+	public ResponseEntity<HttpStatus> setLogChannel(String serverId, String newChannelId) {
+		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+		if (currentServerSettings != null) {
+			currentServerSettings.setLogChannel(newChannelId);
+			settingsRepository.save(currentServerSettings);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	}
 }

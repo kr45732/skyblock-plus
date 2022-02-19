@@ -23,6 +23,7 @@ import static com.skyblockplus.utils.Utils.*;
 import static com.skyblockplus.utils.Utils.slashCommandClient;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.skyblockplus.features.jacob.JacobData;
@@ -204,12 +205,11 @@ public class CacheDatabase {
 		try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement("SELECT * FROM ah_track")) {
 			try (ResultSet response = statement.executeQuery()) {
 				response.next();
-				Map<String, UsernameUuidStruct> ahTrack = gson.fromJson(
-					response.getString("data"),
-					new TypeToken<Map<String, UsernameUuidStruct>>() {}.getType()
-				);
-				AuctionTracker.setAhTrack(ahTrack);
-				log.info("Retrieved auction tracker");
+				JsonObject data = JsonParser.parseString(response.getString("data")).getAsJsonObject();
+				for (Map.Entry<String, JsonElement> entry : data.entrySet()) {
+					AuctionTracker.insertAhTrack(entry.getKey(), new UsernameUuidStruct(higherDepth(entry.getValue(),"username").getAsString(), higherDepth(entry.getValue(),"uuid").getAsString()));
+				}
+				log.info("Retrieved auction tracker | " + data.size());
 			}
 		} catch (Exception e) {
 			log.error("", e);

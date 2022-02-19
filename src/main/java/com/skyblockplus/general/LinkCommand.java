@@ -18,6 +18,7 @@
 
 package com.skyblockplus.general;
 
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
 import static com.skyblockplus.utils.ApiHandler.skyblockProfilesFromUuid;
 import static com.skyblockplus.utils.Utils.*;
@@ -234,6 +235,20 @@ public class LinkCommand extends Command {
 		} catch (Exception e) {
 			updatedRoles = "error";
 		}
+
+		guildMap.get(member.getGuild().getId()).logAction(defaultEmbed("Member Verified").setDescription((
+				!updatedRoles.equals("false")
+						? updatedRoles.equals("true") ? "\n• Successfully synced roles" : "\n• Error syncing roles"
+						: ""
+		) +
+				(
+						!updatedNickname.equals("false")
+								? updatedNickname.equals("true")
+								? "\n• Successfully synced nickname"
+								: "\n• Error syncing nickname"
+								: ""
+				)), member);
+
 		return new String[] { updatedNickname, updatedRoles };
 	}
 

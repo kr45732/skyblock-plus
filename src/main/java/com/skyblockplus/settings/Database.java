@@ -167,10 +167,6 @@ public class Database {
 		return settingsService.setPrefix(serverId, prefix).getStatusCodeValue();
 	}
 
-	public String getPrefix(String serverId) {
-		return settingsService.getPrefix(serverId).getBody();
-	}
-
 	public JsonElement getBlacklistSettings(String serverId) {
 		return gson.toJsonTree(settingsService.getBlacklistSettings(serverId).getBody());
 	}
@@ -253,5 +249,9 @@ public class Database {
 
 	public int setChannelBlacklist(String serverId, JsonArray newSettings) {
 		return settingsService.setChannelBlacklist(serverId, gson.fromJson(newSettings, String[].class)).getStatusCodeValue();
+	}
+
+	public int setLogChannel(String serverId, String newSettings) {
+		return settingsService.setLogChannel(serverId, newSettings).getStatusCodeValue();
 	}
 }
