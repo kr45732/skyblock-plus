@@ -62,6 +62,7 @@ public class HypixelGuildCache {
 			case "mining" -> 16;
 			case "taming" -> 17;
 			case "enchanting" -> 18;
+			case "networth" -> 19;
 			default -> -1;
 		};
 	}
@@ -140,6 +141,8 @@ public class HypixelGuildCache {
 			player.getHighestAmount("taming", gamemode) +
 			"=:=" +
 			player.getHighestAmount("enchanting", gamemode)
+		 + "=:=" +
+				player.getHighestAmount("networth", gamemode)
 		);
 	}
 }

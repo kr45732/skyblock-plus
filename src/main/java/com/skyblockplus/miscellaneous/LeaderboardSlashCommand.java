@@ -58,7 +58,8 @@ public class LeaderboardSlashCommand extends SlashCommand {
 		return Commands
 			.slash(name, "Get the global leaderboard. Player's on leaderboard are only added or updated when commands are run")
 			.addOptions(
-				new OptionData(OptionType.STRING, "type", "The leaderboard type", true)
+				new OptionData(OptionType.STRING, "type", "Leaderboard type", true)
+						.addChoice("Networth", "networth")
 					.addChoice("Slayer", "slayer")
 					.addChoice("Skills", "skills")
 					.addChoice("Catacombs", "catacombs")
