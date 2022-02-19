@@ -80,6 +80,12 @@ public class NetworthExecute {
 		return calc.getTotalCalculatedNetworth();
 	}
 
+	public static double getTotalNetworth(Player player) {
+		NetworthExecute calc = new NetworthExecute().setOnlyTotal(true);
+		calc.getPlayerNetworth(player);
+		return calc.getTotalCalculatedNetworth();
+	}
+
 	public NetworthExecute setVerbose(boolean verbose) {
 		this.verbose = verbose;
 		return this;
@@ -125,7 +131,10 @@ public class NetworthExecute {
 	}
 
 	public EmbedBuilder getPlayerNetworth(String username, String profileName) {
-		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
+		return getPlayerNetworth(profileName == null ? new Player(username) : new Player(username, profileName));
+	}
+
+	public EmbedBuilder getPlayerNetworth(Player player) {
 		if (player.isValid()) {
 			EmbedBuilder eb = player.defaultPlayerEmbed();
 
