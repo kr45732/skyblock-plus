@@ -236,18 +236,24 @@ public class LinkCommand extends Command {
 			updatedRoles = "error";
 		}
 
-		guildMap.get(member.getGuild().getId()).logAction(defaultEmbed("Member Verified").setDescription((
-				!updatedRoles.equals("false")
-						? updatedRoles.equals("true") ? "\n• Successfully synced roles" : "\n• Error syncing roles"
-						: ""
-		) +
-				(
-						!updatedNickname.equals("false")
-								? updatedNickname.equals("true")
-								? "\n• Successfully synced nickname"
-								: "\n• Error syncing nickname"
+		guildMap
+			.get(member.getGuild().getId())
+			.logAction(
+				defaultEmbed("Member Verified")
+					.setDescription(
+						(
+							!updatedRoles.equals("false")
+								? updatedRoles.equals("true") ? "\n• Successfully synced roles" : "\n• Error syncing roles"
 								: ""
-				)), member);
+						) +
+						(
+							!updatedNickname.equals("false")
+								? updatedNickname.equals("true") ? "\n• Successfully synced nickname" : "\n• Error syncing nickname"
+								: ""
+						)
+					),
+				member
+			);
 
 		return new String[] { updatedNickname, updatedRoles };
 	}

@@ -207,7 +207,13 @@ public class CacheDatabase {
 				response.next();
 				JsonObject data = JsonParser.parseString(response.getString("data")).getAsJsonObject();
 				for (Map.Entry<String, JsonElement> entry : data.entrySet()) {
-					AuctionTracker.insertAhTrack(entry.getKey(), new UsernameUuidStruct(higherDepth(entry.getValue(),"username").getAsString(), higherDepth(entry.getValue(),"uuid").getAsString()));
+					AuctionTracker.insertAhTrack(
+						entry.getKey(),
+						new UsernameUuidStruct(
+							higherDepth(entry.getValue(), "username").getAsString(),
+							higherDepth(entry.getValue(), "uuid").getAsString()
+						)
+					);
 				}
 				log.info("Retrieved auction tracker | " + data.size());
 			}

@@ -91,7 +91,12 @@ import org.slf4j.LoggerFactory;
 public class AutomaticGuild {
 
 	private static final Logger log = LoggerFactory.getLogger(AutomaticGuild.class);
-	public static final ScheduledFuture<?> logFuture = scheduler.scheduleWithFixedDelay(() -> guildMap.values().forEach(g -> g.logAction(null, null)), 5, 5, TimeUnit.MINUTES);
+	public static final ScheduledFuture<?> logFuture = scheduler.scheduleWithFixedDelay(
+		() -> guildMap.values().forEach(g -> g.logAction(null, null)),
+		5,
+		5,
+		TimeUnit.MINUTES
+	);
 
 	/* Apply */
 	public final List<ApplyGuild> applyGuild = new ArrayList<>();
@@ -1253,13 +1258,13 @@ public class AutomaticGuild {
 		return log;
 	}
 
-	public void logAction(EmbedBuilder eb, Member member){
+	public void logAction(EmbedBuilder eb, Member member) {
 		try {
 			if (logChannel == null) {
 				return;
 			}
 
-			if(eb != null && member != null) {
+			if (eb != null && member != null) {
 				eb.setAuthor(member.getEffectiveName() + " (" + member.getId() + ")", null, member.getEffectiveAvatarUrl());
 				eb.setTimestamp(Instant.now());
 				logQueue.add(eb.build());
@@ -1269,7 +1274,7 @@ public class AutomaticGuild {
 				logChannel.sendMessageEmbeds(logQueue).queue();
 				logQueue.clear();
 			}
-		} catch (Exception e){
+		} catch (Exception e) {
 			log.error(guildId, e);
 		}
 	}
