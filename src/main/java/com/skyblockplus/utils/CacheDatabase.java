@@ -44,7 +44,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-
 import net.dv8tion.jda.api.utils.data.DataObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +54,11 @@ public class CacheDatabase {
 
 	private final HikariDataSource dataSource;
 	private final ConcurrentHashMap<String, Instant> uuidToTimeSkyblockProfiles = new ConcurrentHashMap<>();
-	private final List<Player.Gamemode> leaderboardGamemodes = Arrays.asList(Player.Gamemode.ALL, Player.Gamemode.IRONMAN, Player.Gamemode.STRANDED);
+	private final List<Player.Gamemode> leaderboardGamemodes = Arrays.asList(
+		Player.Gamemode.ALL,
+		Player.Gamemode.IRONMAN,
+		Player.Gamemode.STRANDED
+	);
 
 	public CacheDatabase() {
 		HikariConfig config = new HikariConfig();
@@ -370,10 +373,10 @@ public class CacheDatabase {
 
 	public void updateLeaderboard() {
 		try (
-				Connection connection = getConnection();
-				PreparedStatement statement = connection.prepareStatement(
-						"SELECT uuid FROM all_lb WHERE last_updated < " + Instant.now().plus(5, ChronoUnit.DAYS).toEpochMilli() + " LIMIT 5"
-				)
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement(
+				"SELECT uuid FROM all_lb WHERE last_updated < " + Instant.now().plus(5, ChronoUnit.DAYS).toEpochMilli() + " LIMIT 5"
+			)
 		) {
 			try (ResultSet response = statement.executeQuery()) {
 				while (response.next()) {

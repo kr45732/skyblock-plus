@@ -122,7 +122,9 @@ public class DungeonsWeight {
 					if (amount >= threshold) {
 						upperBound += higherDepth(DUNGEON_COMPLETION_BUFFS, masterFloor.getKey()).getAsInt();
 					} else {
-						upperBound += higherDepth(DUNGEON_COMPLETION_BUFFS, masterFloor.getKey()).getAsInt() * Math.pow((amount / threshold), 1.840896416);
+						upperBound +=
+							higherDepth(DUNGEON_COMPLETION_BUFFS, masterFloor.getKey()).getAsInt() *
+							Math.pow((amount / threshold), 1.840896416);
 					}
 				}
 			}

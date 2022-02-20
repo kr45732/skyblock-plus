@@ -152,12 +152,12 @@ public class Player {
 		}
 
 		this.valid = true;
-		if(!isCopy){
+		if (!isCopy) {
 			cacheDatabase.insertIntoLeaderboard(this);
 		}
 	}
 
-	public Player copy(){
+	public Player copy() {
 		return new Player(getUuid(), getUsername(), getProfileName(), getProfileArray(), true);
 	}
 
