@@ -78,7 +78,7 @@ public class WeightSlashCommand extends SlashCommand {
 							.addChoice("Alchemy", "alchemy")
 							.addChoice("Combat", "combat")
 							.addChoice("Farming", "farming")
-							.addChoice("Mining", "sven")
+							.addChoice("Mining", "mining")
 							.addChoice("Fishing", "fishing")
 							.addChoice("Taming", "taming")
 							.addChoice("Enchanting", "enchanting")

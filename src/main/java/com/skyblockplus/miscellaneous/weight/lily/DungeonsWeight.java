@@ -22,7 +22,6 @@ import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.higherDepth;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.SkillsStruct;
 import com.skyblockplus.utils.structs.WeightStruct;
@@ -69,11 +68,9 @@ public class DungeonsWeight {
 	}
 
 	public WeightStruct getDungeonCompletionWeight(String cataMode) {
-		JsonObject dcw = DUNGEON_COMPLETION_WORTH;
-
 		double max1000 = 0;
 		double mMax1000 = 0;
-		for (Map.Entry<String, JsonElement> dcwEntry : dcw.entrySet()) {
+		for (Map.Entry<String, JsonElement> dcwEntry : DUNGEON_COMPLETION_WORTH.entrySet()) {
 			if (dcwEntry.getKey().startsWith("catacombs_")) {
 				max1000 += dcwEntry.getValue().getAsDouble();
 			} else {
@@ -102,7 +99,7 @@ public class DungeonsWeight {
 					amount = 1000;
 				}
 
-				double floorScore = amount * dcw.get("catacombs_" + normalFloor.getKey()).getAsDouble();
+				double floorScore = amount * DUNGEON_COMPLETION_WORTH.get("catacombs_" + normalFloor.getKey()).getAsDouble();
 				if (excess > 0) floorScore *= Math.log(excess / 1000 + 1) / Math.log(7.5) + 1;
 				score += floorScore;
 			}
@@ -113,20 +110,19 @@ public class DungeonsWeight {
 				return new WeightStruct();
 			}
 
-			JsonObject dcb = DUNGEON_COMPLETION_BUFFS;
 			for (Map.Entry<String, JsonElement> masterFloor : higherDepth(
 				player.profileJson(),
 				"dungeons.dungeon_types.master_catacombs.tier_completions"
 			)
 				.getAsJsonObject()
 				.entrySet()) {
-				if (higherDepth(dcb, masterFloor.getKey()) != null) {
+				if (higherDepth(DUNGEON_COMPLETION_BUFFS, masterFloor.getKey()) != null) {
 					int amount = masterFloor.getValue().getAsInt();
 					double threshold = 20;
 					if (amount >= threshold) {
-						upperBound += higherDepth(dcb, masterFloor.getKey()).getAsInt();
+						upperBound += higherDepth(DUNGEON_COMPLETION_BUFFS, masterFloor.getKey()).getAsInt();
 					} else {
-						upperBound += higherDepth(dcb, masterFloor.getKey()).getAsInt() * Math.pow((amount / threshold), 1.840896416);
+						upperBound += higherDepth(DUNGEON_COMPLETION_BUFFS, masterFloor.getKey()).getAsInt() * Math.pow((amount / threshold), 1.840896416);
 					}
 				}
 			}
@@ -145,7 +141,7 @@ public class DungeonsWeight {
 					amount = 1000;
 				}
 
-				double floorScore = amount * dcw.get("master_catacombs_" + masterFloor.getKey()).getAsDouble();
+				double floorScore = amount * DUNGEON_COMPLETION_WORTH.get("master_catacombs_" + masterFloor.getKey()).getAsDouble();
 				if (excess > 0) {
 					floorScore *= (Math.log((excess / 1000) + 1) / Math.log(6)) + 1;
 				}

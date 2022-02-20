@@ -106,16 +106,16 @@ public class Player {
 		cacheDatabase.insertIntoLeaderboard(this);
 	}
 
-	public Player(String uuid, String username, JsonElement outerProfileJson) {
+	public Player(String uuid, String username, JsonElement profileArray) {
 		this.uuid = uuid;
 		this.username = username;
 
 		try {
-			if (outerProfileJson == null) {
+			if (profileArray == null) {
 				return;
 			}
 
-			this.profilesArray = outerProfileJson.getAsJsonArray();
+			this.profilesArray = profileArray.getAsJsonArray();
 			if (getLatestProfile(profilesArray)) {
 				return;
 			}
@@ -128,16 +128,20 @@ public class Player {
 		cacheDatabase.insertIntoLeaderboard(this);
 	}
 
-	public Player(String uuid, String username, String profileName, JsonElement outerProfileJson) {
+	public Player(String uuid, String username, String profileName, JsonElement profileArray) {
+		this(uuid, username, profileName, profileArray, false);
+	}
+
+	public Player(String uuid, String username, String profileName, JsonElement profileArray, boolean isCopy) {
 		this.uuid = uuid;
 		this.username = username;
 
 		try {
-			if (outerProfileJson == null) {
+			if (profileArray == null) {
 				return;
 			}
 
-			this.profilesArray = outerProfileJson.getAsJsonArray();
+			this.profilesArray = profileArray.getAsJsonArray();
 			if (profileIdFromName(profileName, profilesArray)) {
 				failCause = failCause.equals("Unknown fail cause") ? "Invalid profile name" : "";
 				return;
@@ -148,7 +152,13 @@ public class Player {
 		}
 
 		this.valid = true;
-		cacheDatabase.insertIntoLeaderboard(this);
+		if(!isCopy){
+			cacheDatabase.insertIntoLeaderboard(this);
+		}
+	}
+
+	public Player copy(){
+		return new Player(getUuid(), getUsername(), getProfileName(), getProfileArray(), true);
 	}
 
 	/* Constructor helper methods */

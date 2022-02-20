@@ -37,10 +37,14 @@ import java.lang.reflect.Type;
 import java.sql.*;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+
 import net.dv8tion.jda.api.utils.data.DataObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +55,7 @@ public class CacheDatabase {
 
 	private final HikariDataSource dataSource;
 	private final ConcurrentHashMap<String, Instant> uuidToTimeSkyblockProfiles = new ConcurrentHashMap<>();
+	private final List<Player.Gamemode> leaderboardGamemodes = Arrays.asList(Player.Gamemode.ALL, Player.Gamemode.IRONMAN, Player.Gamemode.STRANDED);
 
 	public CacheDatabase() {
 		HikariConfig config = new HikariConfig();
@@ -58,6 +63,8 @@ public class CacheDatabase {
 		config.setUsername(PLANET_SCALE_USERNAME);
 		config.setPassword(PLANET_SCALE_PASSWORD);
 		dataSource = new HikariDataSource(config);
+
+		scheduler.scheduleWithFixedDelay(this::updateLeaderboard, 1, 1, TimeUnit.MINUTES);
 	}
 
 	public Connection getConnection() throws SQLException {
@@ -288,10 +295,18 @@ public class CacheDatabase {
 	}
 
 	public void insertIntoLeaderboard(Player player) {
+		insertIntoLeaderboard(player, true);
+	}
+
+	public void insertIntoLeaderboard(Player player, boolean makeCopy) {
 		executor.submit(() -> {
-			insertIntoLeaderboard(player, Player.Gamemode.ALL);
-			insertIntoLeaderboard(player, Player.Gamemode.IRONMAN);
-			insertIntoLeaderboard(player, Player.Gamemode.STRANDED);
+			Player playerCopy = null;
+			if (makeCopy) {
+				playerCopy = player.copy();
+			}
+			for (Player.Gamemode gamemode : leaderboardGamemodes) {
+				insertIntoLeaderboard(makeCopy ? playerCopy : player, gamemode);
+			}
 		});
 	}
 
@@ -301,29 +316,30 @@ public class CacheDatabase {
 			PreparedStatement statement = connection.prepareStatement(
 				"INSERT INTO " +
 				gamemode.toCacheType() +
-				" (username, uuid, slayer, skills, catacombs, weight, sven, rev, tara, enderman, alchemy, combat, fishing, farming, foraging, carpentry, mining, taming, enchanting, networth) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE username = VALUES(username), uuid = VALUES(uuid), slayer = VALUES(slayer), skills = VALUES(skills), catacombs = VALUES(catacombs), weight = VALUES(weight), sven = VALUES(sven), rev = VALUES(rev), tara = VALUES(tara), enderman = VALUES(enderman), alchemy = VALUES(alchemy), combat = VALUES(combat), fishing = VALUES(fishing), farming = VALUES(farming), foraging = VALUES(foraging), carpentry = VALUES(carpentry), mining = VALUES(mining), taming = VALUES(taming), enchanting = VALUES(enchanting), networth = VALUES(networth)"
+				" (last_updated, username, uuid, slayer, skills, catacombs, weight, sven, rev, tara, enderman, alchemy, combat, fishing, farming, foraging, carpentry, mining, taming, enchanting, networth) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE last_updated = VALUES(last_updated), username = VALUES(username), uuid = VALUES(uuid), slayer = VALUES(slayer), skills = VALUES(skills), catacombs = VALUES(catacombs), weight = VALUES(weight), sven = VALUES(sven), rev = VALUES(rev), tara = VALUES(tara), enderman = VALUES(enderman), alchemy = VALUES(alchemy), combat = VALUES(combat), fishing = VALUES(fishing), farming = VALUES(farming), foraging = VALUES(foraging), carpentry = VALUES(carpentry), mining = VALUES(mining), taming = VALUES(taming), enchanting = VALUES(enchanting), networth = VALUES(networth)"
 			)
 		) {
-			statement.setString(1, player.getUsername());
-			statement.setString(2, player.getUuid());
-			statement.setDouble(3, player.getHighestAmount("slayer", gamemode));
-			statement.setDouble(4, player.getHighestAmount("skills", gamemode));
-			statement.setDouble(5, player.getHighestAmount("catacombs", gamemode));
-			statement.setDouble(6, player.getHighestAmount("weight", gamemode));
-			statement.setDouble(7, player.getHighestAmount("sven", gamemode));
-			statement.setDouble(8, player.getHighestAmount("rev", gamemode));
-			statement.setDouble(9, player.getHighestAmount("tara", gamemode));
-			statement.setDouble(10, player.getHighestAmount("enderman", gamemode));
-			statement.setDouble(11, player.getHighestAmount("alchemy", gamemode));
-			statement.setDouble(12, player.getHighestAmount("combat", gamemode));
-			statement.setDouble(13, player.getHighestAmount("fishing", gamemode));
-			statement.setDouble(14, player.getHighestAmount("farming", gamemode));
-			statement.setDouble(15, player.getHighestAmount("foraging", gamemode));
-			statement.setDouble(16, player.getHighestAmount("carpentry", gamemode));
-			statement.setDouble(17, player.getHighestAmount("mining", gamemode));
-			statement.setDouble(18, player.getHighestAmount("taming", gamemode));
-			statement.setDouble(19, player.getHighestAmount("enchanting", gamemode));
-			statement.setDouble(20, player.getHighestAmount("networth", gamemode));
+			statement.setLong(1, Instant.now().toEpochMilli());
+			statement.setString(2, player.getUsername());
+			statement.setString(3, player.getUuid());
+			statement.setDouble(4, player.getHighestAmount("slayer", gamemode));
+			statement.setDouble(5, player.getHighestAmount("skills", gamemode));
+			statement.setDouble(6, player.getHighestAmount("catacombs", gamemode));
+			statement.setDouble(7, player.getHighestAmount("weight", gamemode));
+			statement.setDouble(8, player.getHighestAmount("sven", gamemode));
+			statement.setDouble(9, player.getHighestAmount("rev", gamemode));
+			statement.setDouble(10, player.getHighestAmount("tara", gamemode));
+			statement.setDouble(11, player.getHighestAmount("enderman", gamemode));
+			statement.setDouble(12, player.getHighestAmount("alchemy", gamemode));
+			statement.setDouble(13, player.getHighestAmount("combat", gamemode));
+			statement.setDouble(14, player.getHighestAmount("fishing", gamemode));
+			statement.setDouble(15, player.getHighestAmount("farming", gamemode));
+			statement.setDouble(16, player.getHighestAmount("foraging", gamemode));
+			statement.setDouble(17, player.getHighestAmount("carpentry", gamemode));
+			statement.setDouble(18, player.getHighestAmount("mining", gamemode));
+			statement.setDouble(19, player.getHighestAmount("taming", gamemode));
+			statement.setDouble(20, player.getHighestAmount("enchanting", gamemode));
+			statement.setDouble(21, player.getHighestAmount("networth", gamemode));
 			statement.executeUpdate();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -350,5 +366,20 @@ public class CacheDatabase {
 			}
 		} catch (Exception ignored) {}
 		return null;
+	}
+
+	public void updateLeaderboard() {
+		try (
+				Connection connection = getConnection();
+				PreparedStatement statement = connection.prepareStatement(
+						"SELECT uuid FROM all_lb WHERE last_updated < " + Instant.now().plus(5, ChronoUnit.DAYS).toEpochMilli() + " LIMIT 5"
+				)
+		) {
+			try (ResultSet response = statement.executeQuery()) {
+				while (response.next()) {
+					insertIntoLeaderboard(new Player(response.getString("uuid")), false);
+				}
+			}
+		} catch (Exception ignored) {}
 	}
 }
