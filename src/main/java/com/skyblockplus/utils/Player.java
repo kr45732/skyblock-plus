@@ -47,11 +47,13 @@ public class Player {
 	private String username;
 	private String profileName;
 	private String failCause = "Unknown fail cause";
-		private final Map<Integer, Double> profileToNetworth = new HashMap<>();
+	private final Map<Integer, Double> profileToNetworth = new HashMap<>();
 
 	/* Constructors */
 	// Empty player, always invalid
-	public Player() {failCause = "No Args Constructor";}
+	public Player() {
+		failCause = "No Args Constructor";
+	}
 
 	public Player(String username) {
 		if (usernameToUuid(username)) {
@@ -1320,7 +1322,7 @@ public class Player {
 	}
 
 	public double getNetworth() {
-		if(profileToNetworth.containsKey(profileIndex)){
+		if (profileToNetworth.containsKey(profileIndex)) {
 			return profileToNetworth.get(profileIndex);
 		}
 

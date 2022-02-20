@@ -26,13 +26,12 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.PaginatorEvent;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Role;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Role;
 
 public class UnlinkCommand extends Command {
 
@@ -50,16 +49,24 @@ public class UnlinkCommand extends Command {
 		List<Role> toAdd = new ArrayList<>();
 		try {
 			toAdd.add(event.getGuild().getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString()));
-		} catch (Exception ignored) {
-		}
-		event.getGuild().modifyMemberRoles(event.getMember(), toAdd, streamJsonArray(higherDepth(verifySettings, "verifiedRoles").getAsJsonArray())
-				.map(r -> {
-					try {
-						return event.getGuild().getRoleById(r.getAsString());
-					} catch (Exception e) {
-						return null;
-					}
-				}).filter(Objects::nonNull).collect(Collectors.toList())).queue();
+		} catch (Exception ignored) {}
+		event
+			.getGuild()
+			.modifyMemberRoles(
+				event.getMember(),
+				toAdd,
+				streamJsonArray(higherDepth(verifySettings, "verifiedRoles").getAsJsonArray())
+					.map(r -> {
+						try {
+							return event.getGuild().getRoleById(r.getAsString());
+						} catch (Exception e) {
+							return null;
+						}
+					})
+					.filter(Objects::nonNull)
+					.collect(Collectors.toList())
+			)
+			.queue();
 
 		return defaultEmbed("Success").setDescription("You were unlinked");
 	}
