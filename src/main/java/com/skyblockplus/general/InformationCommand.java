@@ -18,14 +18,14 @@
 
 package com.skyblockplus.general;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-
-import static com.skyblockplus.utils.Utils.*;
 
 public class InformationCommand extends Command {
 
@@ -36,41 +36,50 @@ public class InformationCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-
 	public static MessageBuilder getInformation() {
-		return new MessageBuilder().setEmbeds(
-		 defaultEmbed("Skyblock Plus")
-			.setDescription(
-				"Skyblock Plus is a Skyblock focused Discord bot that has many commands to help Skyblock players and guild staff! It allows for quick retrieval of Skyblock stats plus customizable features for a better Skyblock experience."
+		return new MessageBuilder()
+			.setEmbeds(
+				defaultEmbed("Skyblock Plus")
+					.setDescription(
+						"Skyblock Plus is a Skyblock focused Discord bot that has many commands to help Skyblock players and guild staff! It allows for quick retrieval of Skyblock stats plus customizable features for a better Skyblock experience."
+					)
+					.addField(
+						"Statistics",
+						"**Servers:** " +
+						jda.getGuilds().size() +
+						"\n**Users:** " +
+						formatNumber(getUserCount()) +
+						"\n**Ping:** " +
+						jda.getRestPing().complete() +
+						"ms\n**Websocket:** " +
+						jda.getGatewayPing() +
+						"ms",
+						true
+					)
+					.addField(
+						"Usage",
+						"**Memory:** " +
+						roundAndFormat(
+							100.0 *
+							(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) /
+							(Runtime.getRuntime().maxMemory())
+						) +
+						"%",
+						true
+					)
+					.setThumbnail("https://cdn.discordapp.com/attachments/803419567958392832/825768516636508160/sb_loading.gif")
+					.setFooter("dsc.gg/sb+ • Last restart")
+					.setTimestamp(client.getStartTime())
+					.build()
 			)
-			.addField(
-				"Statistics",
-				"**Servers:** " +
-				jda.getGuilds().size() +
-				"\n**Users:** " +
-				formatNumber(getUserCount()) +
-				"\n**Ping:** " +
-				jda.getRestPing().complete() +
-				"ms\n**Websocket:** " +
-				jda.getGatewayPing() +
-				"ms",
-				true
-			)
-			.addField(
-				"Usage",
-				"**Memory:** " +
-				roundAndFormat(
-					100.0 * (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (Runtime.getRuntime().maxMemory())
-				) +
-				"%",
-				true
-			)
-			.setThumbnail("https://cdn.discordapp.com/attachments/803419567958392832/825768516636508160/sb_loading.gif")
-			.setFooter("dsc.gg/sb+ • Last restart")
-			.setTimestamp(client.getStartTime()).build()).setActionRows(ActionRow.of(Button.link(BOT_INVITE_LINK, "Invite Link"),
-				Button.link(DISCORD_SERVER_INVITE_LINK, "Discord Server"),
-				Button.link(FORUM_POST_LINK, "Forum Post"),
-				Button.link("https://www.patreon.com/skyblock_plus", "Patreon")));
+			.setActionRows(
+				ActionRow.of(
+					Button.link(BOT_INVITE_LINK, "Invite Link"),
+					Button.link(DISCORD_SERVER_INVITE_LINK, "Discord Server"),
+					Button.link(FORUM_POST_LINK, "Forum Post"),
+					Button.link("https://www.patreon.com/skyblock_plus", "Patreon")
+				)
+			);
 	}
 
 	@Override

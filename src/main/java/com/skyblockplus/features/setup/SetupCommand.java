@@ -18,14 +18,14 @@
 
 package com.skyblockplus.features.setup;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-
-import static com.skyblockplus.utils.Utils.*;
 
 public class SetupCommand extends Command {
 
@@ -36,20 +36,27 @@ public class SetupCommand extends Command {
 	}
 
 	public static MessageBuilder getSetupEmbed() {
-		return new MessageBuilder().setEmbeds(defaultEmbed("Setup")
-			.setDescription(
-				"Choose one of the buttons below to setup the corresponding feature. Note that setting a feature can/will override previous settings."
-			).build()).setActionRows(ActionRow.of(
-						Button.primary("setup_command_verify", "Verification"),
-						Button.primary("setup_command_guild", "Guild Application, Roles & Ranks"),
-						Button.primary("setup_command_roles", "Skyblock Roles"),
-						Button.primary("setup_command_prefix", "Prefix")
+		return new MessageBuilder()
+			.setEmbeds(
+				defaultEmbed("Setup")
+					.setDescription(
+						"Choose one of the buttons below to setup the corresponding feature. Note that setting a feature can/will override previous settings."
+					)
+					.build()
+			)
+			.setActionRows(
+				ActionRow.of(
+					Button.primary("setup_command_verify", "Verification"),
+					Button.primary("setup_command_guild", "Guild Application, Roles & Ranks"),
+					Button.primary("setup_command_roles", "Skyblock Roles"),
+					Button.primary("setup_command_prefix", "Prefix")
 				),
 				ActionRow.of(
-						Button.primary("setup_command_jacob", "Farming Event Notifications"),
-						Button.primary("setup_command_mayor", "Mayor Notifications"),
-						Button.primary("setup_command_fetchur", "Fetchur Notifications")
-				));
+					Button.primary("setup_command_jacob", "Farming Event Notifications"),
+					Button.primary("setup_command_mayor", "Mayor Notifications"),
+					Button.primary("setup_command_fetchur", "Fetchur Notifications")
+				)
+			);
 	}
 
 	@Override

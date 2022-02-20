@@ -403,7 +403,7 @@ public class NetworthExecute {
 			eb.addField("Bug in the calculations?", "[Please submit a bug report here!](https://forms.gle/RBmN2AFBLafGyx5E7)", false);
 
 			JsonArray missing = collectJsonArray(
-					tempSet.stream().filter(str -> !str.toLowerCase().startsWith("rune_")).map(JsonPrimitive::new)
+				tempSet.stream().filter(str -> !str.toLowerCase().startsWith("rune_")).map(JsonPrimitive::new)
 			);
 			if (!missing.isEmpty()) {
 				System.out.println(missing);
