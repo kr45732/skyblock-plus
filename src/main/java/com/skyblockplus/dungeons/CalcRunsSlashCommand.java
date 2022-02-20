@@ -54,7 +54,7 @@ public class CalcRunsSlashCommand extends SlashCommand {
 	@Override
 	public CommandData getCommandData() {
 		return Commands
-			.slash(name, "A party finder helper that shows a player's dungeon stats")
+			.slash(name, "Calculate the number of runs needed to reach a catacombs level")
 			.addOptions(
 				new OptionData(OptionType.INTEGER, "level", "Target catacombs level", true).setRequiredRange(1, 50),
 				new OptionData(OptionType.INTEGER, "floor", "Catacombs or master catacombs floor", true)
