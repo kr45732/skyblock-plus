@@ -18,16 +18,14 @@
 
 package com.skyblockplus.general;
 
-import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.client;
-import static com.skyblockplus.utils.Utils.jda;
-
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
-import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+
+import static com.skyblockplus.utils.Utils.*;
 
 public class InformationCommand extends Command {
 
@@ -38,17 +36,10 @@ public class InformationCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	public static ActionRow getInformationActionRow() {
-		return ActionRow.of(
-			Button.link(BOT_INVITE_LINK, "Invite Link"),
-			Button.link(DISCORD_SERVER_INVITE_LINK, "Discord Server"),
-			Button.link(FORUM_POST_LINK, "Forum Post"),
-			Button.link("https://www.patreon.com/skyblock_plus", "Patreon")
-		);
-	}
 
-	public static EmbedBuilder getInformation() {
-		return defaultEmbed("Skyblock Plus")
+	public static MessageBuilder getInformation() {
+		return new MessageBuilder().setEmbeds(
+		 defaultEmbed("Skyblock Plus")
 			.setDescription(
 				"Skyblock Plus is a Skyblock focused Discord bot that has many commands to help Skyblock players and guild staff! It allows for quick retrieval of Skyblock stats plus customizable features for a better Skyblock experience."
 			)
@@ -76,7 +67,10 @@ public class InformationCommand extends Command {
 			)
 			.setThumbnail("https://cdn.discordapp.com/attachments/803419567958392832/825768516636508160/sb_loading.gif")
 			.setFooter("dsc.gg/sb+ • Last restart")
-			.setTimestamp(client.getStartTime());
+			.setTimestamp(client.getStartTime()).build()).setActionRows(ActionRow.of(Button.link(BOT_INVITE_LINK, "Invite Link"),
+				Button.link(DISCORD_SERVER_INVITE_LINK, "Discord Server"),
+				Button.link(FORUM_POST_LINK, "Forum Post"),
+				Button.link("https://www.patreon.com/skyblock_plus", "Patreon")));
 	}
 
 	@Override
@@ -86,7 +80,7 @@ public class InformationCommand extends Command {
 			protected void execute() {
 				logCommand();
 
-				ebMessage.editMessageEmbeds(getInformation().build()).setActionRows(getInformationActionRow()).queue();
+				embed(getInformation());
 			}
 		}
 			.queue();

@@ -92,6 +92,9 @@ public abstract class CommandExecute extends CommandEvent {
 		ebMessage.editMessageEmbeds(embedBuilder.build()).queue(ignore, ignore);
 	}
 
+	/**
+	 * @param ebOrMb EmbedBuilder or MessageBuilder (for buttons)
+	 */
 	protected void embed(Object ebOrMb) {
 		if (ebOrMb instanceof EmbedBuilder eb) {
 			embed(eb);

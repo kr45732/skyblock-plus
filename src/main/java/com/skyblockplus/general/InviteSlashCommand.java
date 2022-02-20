@@ -33,11 +33,7 @@ public class InviteSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		event
-			.getHook()
-			.editOriginalEmbeds(InformationCommand.getInformation().build())
-			.setActionRows(InformationCommand.getInformationActionRow())
-			.queue();
+		event.embed(InformationCommand.getInformation());
 	}
 
 	@Override

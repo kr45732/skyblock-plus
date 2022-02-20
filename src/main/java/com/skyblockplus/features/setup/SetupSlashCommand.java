@@ -35,7 +35,7 @@ public class SetupSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		event.getHook().editOriginalEmbeds(SetupCommand.getSetupEmbed().build()).setActionRows(SetupCommand.getSetupActionRow()).queue();
+		event.embed(SetupCommand.getSetupEmbed());
 	}
 
 	@Override

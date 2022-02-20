@@ -35,6 +35,9 @@ import com.skyblockplus.utils.structs.NwItemPrice;
 import java.util.*;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 public class NetworthExecute {
 
@@ -130,11 +133,11 @@ public class NetworthExecute {
 			.queue();
 	}
 
-	public EmbedBuilder getPlayerNetworth(String username, String profileName) {
+	public Object getPlayerNetworth(String username, String profileName) {
 		return getPlayerNetworth(profileName == null ? new Player(username) : new Player(username, profileName));
 	}
 
-	public EmbedBuilder getPlayerNetworth(Player player) {
+	public Object getPlayerNetworth(Player player) {
 		if (player.isValid()) {
 			EmbedBuilder eb = player.defaultPlayerEmbed();
 
@@ -399,22 +402,23 @@ public class NetworthExecute {
 			}
 			eb.addField("Bug in the calculations?", "[Please submit a bug report here!](https://forms.gle/RBmN2AFBLafGyx5E7)", false);
 
-			if (verbose) {
-				try {
-					long startTime = System.currentTimeMillis();
-
-					eb.appendDescription("\nVerbose JSON: " + makeHastePost(formattedGson.toJson(getVerboseJson())) + ".json");
-					System.out.println("Verbose time: " + (System.currentTimeMillis() - startTime) + " ms");
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-
 			JsonArray missing = collectJsonArray(
-				tempSet.stream().filter(str -> !str.toLowerCase().startsWith("rune_")).map(JsonPrimitive::new)
+					tempSet.stream().filter(str -> !str.toLowerCase().startsWith("rune_")).map(JsonPrimitive::new)
 			);
 			if (!missing.isEmpty()) {
 				System.out.println(missing);
+			}
+
+			if (verbose) {
+				try {
+					long startTime = System.currentTimeMillis();
+					String verboseLink = makeHastePost(formattedGson.toJson(getVerboseJson())) + ".json";
+					System.out.println("Verbose time: " + (System.currentTimeMillis() - startTime) + " ms");
+
+					return new MessageBuilder().setEmbeds(eb.build()).setActionRows(ActionRow.of(Button.link("Verbose JSON", verboseLink)));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 
 			return eb;
