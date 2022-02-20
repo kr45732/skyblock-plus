@@ -61,6 +61,7 @@ import com.skyblockplus.utils.exceptionhandler.ExceptionEventListener;
 import com.skyblockplus.utils.exceptionhandler.GlobalExceptionHandler;
 import com.skyblockplus.utils.slashcommand.SlashCommandClient;
 import java.io.File;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.PreDestroy;
@@ -292,13 +293,14 @@ public class Main {
 		if (!transcriptDir.exists()) {
 			log.info((transcriptDir.mkdirs() ? "Successfully created" : "Failed to create") + " application transcript directory");
 		}
+		scheduler.schedule(System::gc, 1, TimeUnit.HOURS); // Sorry for the war crimes
 	}
 
 	@PreDestroy
 	public void onExit() {
 		log.info("Stopping");
 
-		updateCacheTask.cancel(true);
+		log.info("Canceling cache update future: " + updateCacheTask.cancel(true));
 
 		log.info("Caching Apply Users");
 		cacheApplyGuildUsers();

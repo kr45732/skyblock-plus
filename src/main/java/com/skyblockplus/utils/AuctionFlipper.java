@@ -19,7 +19,6 @@
 package com.skyblockplus.utils;
 
 import static com.skyblockplus.utils.ApiHandler.getQueryApiUrl;
-import static com.skyblockplus.utils.ApiHandler.lastQueryApiUpdate;
 import static com.skyblockplus.utils.Utils.*;
 
 import club.minnced.discord.webhook.WebhookClientBuilder;
@@ -54,13 +53,12 @@ public class AuctionFlipper {
 	private static final Cache<String, Long> auctionUuidToMessage = Caffeine.newBuilder().expireAfterWrite(45, TimeUnit.MINUTES).build();
 	private static boolean enable = false;
 	private static Instant lastUpdated = Instant.now();
-	private static Instant lastHerokuUpdated = Instant.now();
 
 	public static void scheduleHerokuUpdate() {
 		scheduler.scheduleWithFixedDelay(
 			() -> {
 				try {
-					if (Duration.between(lastHerokuUpdated, Instant.now()).toMinutes() > 10) {
+					if (Duration.between(lastUpdated, Instant.now()).toMinutes() > 10) {
 						deleteUrl(
 							"https://api.heroku.com/apps/query-api/dynos",
 							new BasicHeader("Accept", "application/vnd.heroku+json; version=3"),
@@ -77,23 +75,13 @@ public class AuctionFlipper {
 
 	public static void onGuildMessageReceived(MessageReceivedEvent event) {
 		try {
-			if (event.getChannel().getId().equals("912156704383336458") && event.isWebhookMessage()) {
-				lastQueryApiUpdate = Instant.now();
+			if (event.getChannel().getId().equals("922176660596482098") && event.isWebhookMessage()) {
+				lastUpdated = Instant.now();
 				String desc = event.getMessage().getEmbeds().get(0).getDescription();
 				if (enable && isMainBot() && desc.startsWith("Successfully updated under bins file in ")) {
 					flip();
 				} else if (desc.contains(" query auctions into database in ")) {
 					queryItems = null;
-				}
-			} else if (event.getChannel().getId().equals("922176660596482098") && event.isWebhookMessage()) {
-				lastHerokuUpdated = Instant.now();
-				if (Duration.between(lastQueryApiUpdate, Instant.now()).toMinutes() > 5) {
-					String desc = event.getMessage().getEmbeds().get(0).getDescription();
-					if (enable && isMainBot() && desc.startsWith("Successfully updated under bins file in ")) {
-						flip();
-					} else if (desc.contains(" query auctions into database in ")) {
-						queryItems = null;
-					}
 				}
 			}
 		} catch (Exception ignored) {}

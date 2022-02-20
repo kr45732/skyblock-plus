@@ -21,7 +21,6 @@ package com.skyblockplus.inventory;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
@@ -54,7 +53,6 @@ public class SacksCommand extends Command {
 			JsonElement bazaarPrices = higherDepth(getBazaarJson(), "products");
 
 			final double[] total = { 0, 0 };
-			JsonObject missing = new JsonObject();
 			sacksMap
 				.entrySet()
 				.stream()
@@ -94,9 +92,6 @@ public class SacksCommand extends Command {
 						emoji = higherDepth(getEmojiMap(), "RED_MUSHROOM", null);
 					}
 
-					if (emoji == null) {
-						missing.addProperty(currentSack.getKey(), idToName(currentSack.getKey()));
-					}
 					paginateBuilder.addItems(
 						(emoji != null ? emoji + " " : "") +
 						"**" +
@@ -121,7 +116,6 @@ public class SacksCommand extends Command {
 						"\n"
 					)
 			);
-			//			System.out.println(makeHastePost(missing.toString()));
 			event.paginate(paginateBuilder);
 			return null;
 		}

@@ -206,7 +206,7 @@ public class SettingsExecute {
 				.map(r -> "<@&" + r.getAsString() + ">")
 				.collect(Collectors.joining(" "));
 			eb.addField("Bot Manager Roles", botManagerRoles.isEmpty() ? "None" : botManagerRoles, false);
-			String channelBlacklist = streamJsonArray(higherDepth(currentSettings, "channelblacklist").getAsJsonArray())
+			String channelBlacklist = streamJsonArray(higherDepth(currentSettings, "channelBlacklist").getAsJsonArray())
 				.map(r -> "<#" + r.getAsString() + ">")
 				.collect(Collectors.joining(" "));
 			eb.addField("Channel Blacklist", channelBlacklist.isEmpty() ? "None" : channelBlacklist, false);

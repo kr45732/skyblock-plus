@@ -47,12 +47,11 @@ public class Player {
 	private String username;
 	private String profileName;
 	private String failCause = "Unknown fail cause";
-
-	//	private final Map<String, Double> profileToNetworth = new HashMap<>();
+		private final Map<Integer, Double> profileToNetworth = new HashMap<>();
 
 	/* Constructors */
 	// Empty player, always invalid
-	public Player() {}
+	public Player() {failCause = "No Args Constructor";}
 
 	public Player(String username) {
 		if (usernameToUuid(username)) {
@@ -71,11 +70,12 @@ public class Player {
 				return;
 			}
 		} catch (Exception e) {
+			failCause = e.getMessage();
 			return;
 		}
 
-		cacheDatabase.insertIntoLeaderboard(this);
 		this.valid = true;
+		cacheDatabase.insertIntoLeaderboard(this);
 	}
 
 	public Player(String username, String profileName) {
@@ -96,11 +96,12 @@ public class Player {
 				return;
 			}
 		} catch (Exception e) {
+			failCause = e.getMessage();
 			return;
 		}
 
-		cacheDatabase.insertIntoLeaderboard(this);
 		this.valid = true;
+		cacheDatabase.insertIntoLeaderboard(this);
 	}
 
 	public Player(String uuid, String username, JsonElement outerProfileJson) {
@@ -117,11 +118,12 @@ public class Player {
 				return;
 			}
 		} catch (Exception e) {
+			failCause = e.getMessage();
 			return;
 		}
 
-		cacheDatabase.insertIntoLeaderboard(this);
 		this.valid = true;
+		cacheDatabase.insertIntoLeaderboard(this);
 	}
 
 	public Player(String uuid, String username, String profileName, JsonElement outerProfileJson) {
@@ -139,11 +141,12 @@ public class Player {
 				return;
 			}
 		} catch (Exception e) {
+			failCause = e.getMessage();
 			return;
 		}
 
-		cacheDatabase.insertIntoLeaderboard(this);
 		this.valid = true;
+		cacheDatabase.insertIntoLeaderboard(this);
 	}
 
 	/* Constructor helper methods */
@@ -1317,14 +1320,13 @@ public class Player {
 	}
 
 	public double getNetworth() {
-		//		System.out.println(profileToNetworth + " - " + getProfileName());
-		//		if(profileToNetworth.containsKey(getProfileName())){
-		//			return profileToNetworth.get(getProfileName());
-		//		}
+		if(profileToNetworth.containsKey(profileIndex)){
+			return profileToNetworth.get(profileIndex);
+		}
 
-		double nw = NetworthExecute.getTotalNetworth(this);
-		//		profileToNetworth.put(getProfileName(), nw);
-		return nw;
+		double networth = NetworthExecute.getTotalNetworth(this);
+		profileToNetworth.put(profileIndex, networth);
+		return networth;
 	}
 
 	@Override

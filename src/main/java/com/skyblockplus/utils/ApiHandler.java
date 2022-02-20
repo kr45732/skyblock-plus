@@ -60,7 +60,6 @@ public class ApiHandler {
 		"[0-9a-f]{32}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
 	);
 	private static final Logger log = LoggerFactory.getLogger(ApiHandler.class);
-	public static Instant lastQueryApiUpdate = Instant.now();
 	public static boolean useAlternativeApi = reloadSettingsJson();
 	public static ScheduledFuture<?> updateCacheTask;
 
@@ -430,14 +429,7 @@ public class ApiHandler {
 	}
 
 	public static String getQueryApiUrl(String path) {
-		return (
-			(
-				Duration.between(lastQueryApiUpdate, Instant.now()).toMinutes() > 5
-					? "https://query-api.herokuapp.com/"
-					: "http://venus.arcator.co.uk:1194/"
-			) +
-			path
-		);
+		return "https://query-api.herokuapp.com/" + path;
 	}
 
 	public static JsonArray getBidsFromPlayer(String uuid) {

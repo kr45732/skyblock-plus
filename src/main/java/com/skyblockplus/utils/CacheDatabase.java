@@ -288,9 +288,11 @@ public class CacheDatabase {
 	}
 
 	public void insertIntoLeaderboard(Player player) {
-		insertIntoLeaderboard(player, Player.Gamemode.ALL);
-		insertIntoLeaderboard(player, Player.Gamemode.IRONMAN);
-		insertIntoLeaderboard(player, Player.Gamemode.STRANDED);
+		executor.submit(() -> {
+			insertIntoLeaderboard(player, Player.Gamemode.ALL);
+			insertIntoLeaderboard(player, Player.Gamemode.IRONMAN);
+			insertIntoLeaderboard(player, Player.Gamemode.STRANDED);
+		});
 	}
 
 	private void insertIntoLeaderboard(Player player, Player.Gamemode gamemode) {
@@ -321,10 +323,7 @@ public class CacheDatabase {
 			statement.setDouble(17, player.getHighestAmount("mining", gamemode));
 			statement.setDouble(18, player.getHighestAmount("taming", gamemode));
 			statement.setDouble(19, player.getHighestAmount("enchanting", gamemode));
-			//			System.out.println("here " + player.getUsername() + " - " + gamemode);
-			//			double value = player.getHighestAmount("networth", gamemode);
-			//			System.out.println(value);
-			statement.setDouble(20, 0); // player.getHighestAmount("networth", gamemode));
+			statement.setDouble(20, player.getHighestAmount("networth", gamemode));
 			statement.executeUpdate();
 		} catch (Exception e) {
 			e.printStackTrace();
