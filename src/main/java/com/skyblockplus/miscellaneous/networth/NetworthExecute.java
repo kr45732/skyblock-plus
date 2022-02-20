@@ -415,7 +415,7 @@ public class NetworthExecute {
 					String verboseLink = makeHastePost(formattedGson.toJson(getVerboseJson())) + ".json";
 					System.out.println("Verbose time: " + (System.currentTimeMillis() - startTime) + " ms");
 
-					return new MessageBuilder().setEmbeds(eb.build()).setActionRows(ActionRow.of(Button.link("Verbose JSON", verboseLink)));
+					return new MessageBuilder().setEmbeds(eb.build()).setActionRows(ActionRow.of(Button.link( verboseLink, "Verbose JSON")));
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
