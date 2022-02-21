@@ -60,7 +60,11 @@ public class LeaderboardCommand extends Command {
 		String amt = "Not on leaderboard";
 		for (int i = 0, guildMemberPlayersListSize = cacheList.size(); i < guildMemberPlayersListSize; i++) {
 			DataObject lbPlayer = cacheList.get(i);
-			String formattedAmt = roundAndFormat(lbPlayer.getDouble("data"));
+			double data = lbPlayer.getDouble("data");
+			if(lbType.equals("networth")){
+				data = (long) data;
+			}
+			String formattedAmt = roundAndFormat(data);
 			String guildPlayerUsername = lbPlayer.getString("username");
 			paginateBuilder.addItems("`" + (i + 1) + ")` " + fixUsername(guildPlayerUsername) + ": " + formattedAmt);
 
