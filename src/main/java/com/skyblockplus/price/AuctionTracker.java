@@ -101,29 +101,33 @@ public class AuctionTracker {
 						.entrySet()
 						.stream()
 						.filter(entry -> entry.getValue().uuid().equals(seller))
-						.forEach(entry ->{ try{
-							jda
-								.openPrivateChannelById(entry.getKey())
-								.queue(dm ->
-									dm
-										.sendMessageEmbeds(
-											defaultEmbed("Auction Tracker")
-												.setDescription(
-													"**Seller:** " +
-													entry.getValue().username() +
-													"\n**Item:** " +
-													finalItemName +
-													"\n**Sold for:** " +
-													soldFor +
-													"\n**Ended:** <t:" +
-													endedAt +
-													":R>"
+						.forEach(entry -> {
+							try {
+								jda
+									.openPrivateChannelById(entry.getKey())
+									.queue(
+										dm ->
+											dm
+												.sendMessageEmbeds(
+													defaultEmbed("Auction Tracker")
+														.setDescription(
+															"**Seller:** " +
+															entry.getValue().username() +
+															"\n**Item:** " +
+															finalItemName +
+															"\n**Sold for:** " +
+															soldFor +
+															"\n**Ended:** <t:" +
+															endedAt +
+															":R>"
+														)
+														.build()
 												)
-												.build()
-										)
-										.queue(ignore, ignore)
-											, ignore);}catch (Exception ignored){}}
-						);
+												.queue(ignore, ignore),
+										ignore
+									);
+							} catch (Exception ignored) {}
+						});
 				}
 			}
 		} catch (Exception e) {
