@@ -103,8 +103,8 @@ public class AuctionTracker {
 						.filter(entry -> entry.getValue().uuid().equals(seller))
 						.forEach(entry -> {
 							try {
-								jda
-									.openPrivateChannelById(entry.getKey())
+								jda.retrieveUserById(entry.getKey())
+									.queue(user -> user.openPrivateChannel()
 									.queue(
 										dm ->
 											dm
@@ -125,7 +125,7 @@ public class AuctionTracker {
 												)
 												.queue(ignore, ignore),
 										ignore
-									);
+									), ignore);
 							} catch (Exception ignored) {}
 						});
 				}
