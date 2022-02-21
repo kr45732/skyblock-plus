@@ -61,7 +61,7 @@ public class LeaderboardCommand extends Command {
 		for (int i = 0, guildMemberPlayersListSize = cacheList.size(); i < guildMemberPlayersListSize; i++) {
 			DataObject lbPlayer = cacheList.get(i);
 			double data = lbPlayer.getDouble("data");
-			if(lbType.equals("networth")){
+			if (lbType.equals("networth")) {
 				data = (long) data;
 			}
 			String formattedAmt = roundAndFormat(data);

@@ -317,16 +317,15 @@ public class CacheDatabase {
 		double highestNw = 0;
 		try {
 			highestNw = player.getHighestAmount("networth", gamemode);
-		} catch (Exception ignored) {
-		}
+		} catch (Exception ignored) {}
 
 		try (
-				Connection connection = getConnection();
-				PreparedStatement statement = connection.prepareStatement(
-						"INSERT INTO " +
-								gamemode.toCacheType() +
-								" (last_updated, username, uuid, slayer, skills, catacombs, weight, sven, rev, tara, enderman, alchemy, combat, fishing, farming, foraging, carpentry, mining, taming, enchanting, networth) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE last_updated = VALUES(last_updated), username = VALUES(username), uuid = VALUES(uuid), slayer = VALUES(slayer), skills = VALUES(skills), catacombs = VALUES(catacombs), weight = VALUES(weight), sven = VALUES(sven), rev = VALUES(rev), tara = VALUES(tara), enderman = VALUES(enderman), alchemy = VALUES(alchemy), combat = VALUES(combat), fishing = VALUES(fishing), farming = VALUES(farming), foraging = VALUES(foraging), carpentry = VALUES(carpentry), mining = VALUES(mining), taming = VALUES(taming), enchanting = VALUES(enchanting), networth = VALUES(networth)"
-				)
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement(
+				"INSERT INTO " +
+				gamemode.toCacheType() +
+				" (last_updated, username, uuid, slayer, skills, catacombs, weight, sven, rev, tara, enderman, alchemy, combat, fishing, farming, foraging, carpentry, mining, taming, enchanting, networth) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE last_updated = VALUES(last_updated), username = VALUES(username), uuid = VALUES(uuid), slayer = VALUES(slayer), skills = VALUES(skills), catacombs = VALUES(catacombs), weight = VALUES(weight), sven = VALUES(sven), rev = VALUES(rev), tara = VALUES(tara), enderman = VALUES(enderman), alchemy = VALUES(alchemy), combat = VALUES(combat), fishing = VALUES(fishing), farming = VALUES(farming), foraging = VALUES(foraging), carpentry = VALUES(carpentry), mining = VALUES(mining), taming = VALUES(taming), enchanting = VALUES(enchanting), networth = VALUES(networth)"
+			)
 		) {
 			statement.setLong(1, Instant.now().toEpochMilli());
 			statement.setString(2, player.getUsername());
