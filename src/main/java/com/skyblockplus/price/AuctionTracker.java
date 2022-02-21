@@ -101,7 +101,7 @@ public class AuctionTracker {
 						.entrySet()
 						.stream()
 						.filter(entry -> entry.getValue().uuid().equals(seller))
-						.forEach(entry ->
+						.forEach(entry ->{ try{
 							jda
 								.openPrivateChannelById(entry.getKey())
 								.queue(dm ->
@@ -122,7 +122,7 @@ public class AuctionTracker {
 												.build()
 										)
 										.queue(ignore, ignore)
-								)
+											, ignore);}catch (Exception ignored){}}
 						);
 				}
 			}
