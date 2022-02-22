@@ -31,7 +31,7 @@ public class AutoCompleteEvent extends CommandAutoCompleteInteractionEvent {
 
 	public void replyClosestMatch(String toMatch, List<String> matchFrom) {
 		List<String> match = getClosestMatch(toMatch, matchFrom, 25);
-		if(match.stream().noneMatch(String::isEmpty)){
+		if (match.stream().noneMatch(String::isEmpty)) {
 			replyChoiceStrings(match).queue(ignore, ignore);
 		}
 	}
