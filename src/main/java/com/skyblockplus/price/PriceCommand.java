@@ -31,6 +31,8 @@ import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import java.time.Instant;
+import java.util.List;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 
 public class PriceCommand extends Command {
@@ -87,7 +89,8 @@ public class PriceCommand extends Command {
 
 		if (lowestBinArr == null) {
 			String finalQuery = query;
-			if (getQueryItems().stream().noneMatch(q -> q.equalsIgnoreCase(finalQuery))) {
+			List<String> queryItems = getQueryItems();
+			if (queryItems != null && queryItems.stream().noneMatch(q -> q.equalsIgnoreCase(finalQuery))) {
 				query = getClosestMatch(query, getQueryItems());
 			}
 			lowestBinArr = queryLowestBin(query, auctionType);

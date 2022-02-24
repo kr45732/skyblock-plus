@@ -126,8 +126,6 @@ public class VerifyGuild {
 	}
 
 	public void reloadSettingsJson(JsonElement newVerifySettings) {
-		if (higherDepth(newVerifySettings, "enableAutomaticSync", "").equals("true")) {
-			verifySettings = database.getVerifySettings(guildId);
-		}
+		this.verifySettings = newVerifySettings.deepCopy();
 	}
 }
