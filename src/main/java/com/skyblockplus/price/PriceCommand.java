@@ -32,7 +32,6 @@ import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import java.time.Instant;
 import java.util.List;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 
 public class PriceCommand extends Command {
