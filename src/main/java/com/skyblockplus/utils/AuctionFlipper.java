@@ -88,9 +88,10 @@ public class AuctionFlipper {
 	}
 
 	public static void flip() {
-		JsonElement avgAuctionJson = getAverageAuctionJson();
 		JsonElement underBinJson = getUnderBinJson();
 		if (underBinJson != null) {
+			JsonElement avgAuctionJson = getAverageAuctionJson();
+
 			for (JsonElement auction : underBinJson.getAsJsonArray()) {
 				String itemId = higherDepth(auction, "id").getAsString();
 				if (isVanillaItem(itemId) || itemId.equals("BEDROCK")) {

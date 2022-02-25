@@ -2313,9 +2313,9 @@ public class SettingsExecute {
 			database
 				.getAllGuildSettings(guild.getId())
 				.stream()
-				.noneMatch(g -> g != null && g.getApplyEnable() != null && g.getApplyEnable().equals("true"))
+				.noneMatch(g -> g != null && g.getGuildMemberRoleEnable() != null && g.getGuildMemberRoleEnable().equals("true"))
 		) {
-			return invalidEmbed("There must be at least one active application system to set a guest role");
+			return invalidEmbed("There must be at least one enabled guild member role to set a guest role");
 		}
 
 		int responseCode = database.setApplyGuestRole(guild.getId(), role.getId());

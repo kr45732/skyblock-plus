@@ -1200,6 +1200,14 @@ public class Utils {
 		return null;
 	}
 
+	public static InvItem nbtToItem(String rawContents){
+		try {
+			return getGenericInventoryMap(NBTReader.readBase64(rawContents)).get(0);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
 	public static void cacheApplyGuildUsers() {
 		if (!isMainBot()) {
 			return;

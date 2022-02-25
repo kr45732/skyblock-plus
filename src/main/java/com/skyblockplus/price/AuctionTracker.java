@@ -82,16 +82,14 @@ public class AuctionTracker {
 
 					String itemName = "???";
 					try {
-						InvItem item = getGenericInventoryMap(NBTReader.readBase64(higherDepth(endedAuction, "item_bytes").getAsString()))
-							.get(0);
+						InvItem item = nbtToItem(higherDepth(endedAuction, "item_bytes").getAsString());
 						itemName =
-							(item.getCount() > 1 ? item.getCount() + "x " : "") +
-							(
-								item.getId().equals("ENCHANTED_BOOK")
-									? parseMcCodes(item.getLore().split("\n")[0])
-									: (item.getId().equals("PET") ? capitalizeString(item.getRarity()) + " " : "")
-							) +
-							item.getName();
+							(item.getCount() > 1 ? item.getCount() + "x " : "");
+						if(item.getId().equals("ENCHANTED_BOOK")) {
+							itemName += parseMcCodes(item.getLore().split("\n")[0]);
+						}else{
+							itemName += (item.getId().equals("PET") ? capitalizeString(item.getRarity()) + " " : "") + item.getName();
+						}
 					} catch (Exception ignored) {}
 					String finalItemName = itemName;
 					String soldFor = formatNumber(higherDepth(endedAuction, "price").getAsLong());
