@@ -83,11 +83,10 @@ public class AuctionTracker {
 					String itemName = "???";
 					try {
 						InvItem item = nbtToItem(higherDepth(endedAuction, "item_bytes").getAsString());
-						itemName =
-							(item.getCount() > 1 ? item.getCount() + "x " : "");
-						if(item.getId().equals("ENCHANTED_BOOK")) {
+						itemName = (item.getCount() > 1 ? item.getCount() + "x " : "");
+						if (item.getId().equals("ENCHANTED_BOOK")) {
 							itemName += parseMcCodes(item.getLore().split("\n")[0]);
-						}else{
+						} else {
 							itemName += (item.getId().equals("PET") ? capitalizeString(item.getRarity()) + " " : "") + item.getName();
 						}
 					} catch (Exception ignored) {}

@@ -1200,7 +1200,7 @@ public class Utils {
 		return null;
 	}
 
-	public static InvItem nbtToItem(String rawContents){
+	public static InvItem nbtToItem(String rawContents) {
 		try {
 			return getGenericInventoryMap(NBTReader.readBase64(rawContents)).get(0);
 		} catch (Exception e) {
