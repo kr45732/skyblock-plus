@@ -73,7 +73,7 @@ dependencies {
 
     // Google libraries
     implementation 'com.google.code.gson:gson:2.9.0'
-    implementation 'com.google.guava:guava:31.0.1-jre'
+    implementation 'com.google.guava:guava:31.1-jre'
 
     // NBT parser
     implementation 'me.nullicorn:Nedit:2.1.1'
