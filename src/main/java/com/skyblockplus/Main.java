@@ -179,7 +179,8 @@ public class Main {
 					new JacobCommand(),
 					new RecipeCommand(),
 					new StorageCommand(),
-					new CalcRunsCommand(), new BingoCommand()
+					new CalcRunsCommand(),
+					new BingoCommand()
 				)
 				.build();
 
@@ -247,7 +248,8 @@ public class Main {
 					new JacobSlashCommand(),
 					new RecipeSlashCommand(),
 					new StorageSlashCommand(),
-					new CalcRunsSlashCommand(), new BingoSlashCommand()
+					new CalcRunsSlashCommand(),
+					new BingoSlashCommand()
 				);
 
 		allServerSettings =

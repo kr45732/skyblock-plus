@@ -18,20 +18,19 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
+import static com.skyblockplus.utils.Constants.FETCHUR_ITEMS;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.time.LocalDate;
 import java.time.ZoneId;
-
-import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
-import static com.skyblockplus.utils.Constants.FETCHUR_ITEMS;
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class BingoCommand extends Command {
 
@@ -53,31 +52,59 @@ public class BingoCommand extends Command {
 
 		JsonElement bingoJson = null;
 		JsonArray bingoArr = new JsonArray();
-		try{
-			bingoJson = streamJsonArray(higherDepth( getJson("https://api.hypixel.net/skyblock/bingo?key=" + HYPIXEL_API_KEY + "&uuid=" + usernameUuidStruct.uuid()), "events").getAsJsonArray()).filter(e -> higherDepth(e, "key", -1) == higherDepth(bingoInfo, "id", -1)).findFirst().orElse(null);
+		try {
+			bingoJson =
+				streamJsonArray(
+					higherDepth(
+						getJson("https://api.hypixel.net/skyblock/bingo?key=" + HYPIXEL_API_KEY + "&uuid=" + usernameUuidStruct.uuid()),
+						"events"
+					)
+						.getAsJsonArray()
+				)
+					.filter(e -> higherDepth(e, "key", -1) == higherDepth(bingoInfo, "id", -1))
+					.findFirst()
+					.orElse(null);
 			bingoArr = higherDepth(bingoJson, "completed_goals").getAsJsonArray();
-		}catch (Exception ignored){}
+		} catch (Exception ignored) {}
 
 		EmbedBuilder eb = defaultEmbed(usernameUuidStruct.username(), skyblockStatsLink(usernameUuidStruct.username(), null));
 		StringBuilder regGoals = new StringBuilder();
 		StringBuilder communityGoals = new StringBuilder();
 		for (JsonElement goal : higherDepth(bingoInfo, "goals").getAsJsonArray()) {
-			if(higherDepth(goal, "progress", -1) != -1){
+			if (higherDepth(goal, "progress", -1) != -1) {
 				long progress = higherDepth(goal, "progress").getAsLong();
 				long nextTier = higherDepth(goal, "tiers.[0]", 0);
 				for (JsonElement tier : higherDepth(goal, "tiers").getAsJsonArray()) {
-					if(progress > tier.getAsInt()){
+					if (progress > tier.getAsInt()) {
 						nextTier = tier.getAsInt();
 						break;
 					}
 				}
-				communityGoals.append("\n➜ ").append(higherDepth(goal, "name").getAsString()).append(": ").append(formatNumber(higherDepth(goal, "progress").getAsLong())).append("/").append(formatNumber(nextTier)).append(" (").append(roundProgress((double) progress / nextTier)).append(")");
-			}else {
-				regGoals.append("\n").append(streamJsonArray(bingoArr).anyMatch(g -> g.getAsString().equals(higherDepth(goal, "id").getAsString())) ? "✅" : "❌").append(" ").append(higherDepth(goal, "name").getAsString()).append(": ").append(parseMcCodes(higherDepth(goal, "lore").getAsString()));
-
+				communityGoals
+					.append("\n➜ ")
+					.append(higherDepth(goal, "name").getAsString())
+					.append(": ")
+					.append(formatNumber(higherDepth(goal, "progress").getAsLong()))
+					.append("/")
+					.append(formatNumber(nextTier))
+					.append(" (")
+					.append(roundProgress((double) progress / nextTier))
+					.append(")");
+			} else {
+				regGoals
+					.append("\n")
+					.append(
+						streamJsonArray(bingoArr).anyMatch(g -> g.getAsString().equals(higherDepth(goal, "id").getAsString())) ? "✅" : "❌"
+					)
+					.append(" ")
+					.append(higherDepth(goal, "name").getAsString())
+					.append(": ")
+					.append(parseMcCodes(higherDepth(goal, "lore").getAsString()));
 			}
 		}
-		eb.setDescription((bingoJson == null ? "**Note: no active bingo profile found**\n" : "") + "**Points:** " + higherDepth(bingoJson, "points", 0));
+		eb.setDescription(
+			(bingoJson == null ? "**Note: no active bingo profile found**\n" : "") + "**Points:** " + higherDepth(bingoJson, "points", 0)
+		);
 		eb.addField("Self Goals", regGoals.toString(), false);
 		eb.addField("Community Goals", communityGoals.toString(), false);
 		eb.setThumbnail(usernameUuidStruct.getAvatarlUrl());
