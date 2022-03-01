@@ -204,5 +204,60 @@
         }
       ]
     }
+  },
+  "5fe788ff8ea8c9855c128080": {
+    "name": "Ban Deez Nuts",
+    "guild_leaderboard": {
+      "lb_type": "amount",
+      "staff_ranks": [
+        "team",
+        "guild master"
+      ],
+      "ignore_staff": true,
+      "default_role": [
+        "member"
+      ],
+      "ranks": [
+        {
+          "requirements": [
+            [
+              {
+                "amount": 11500,
+                "type": "weight"
+              }
+            ]
+          ],
+          "names": [
+            "nuker"
+          ]
+        },
+        {
+          "requirements": [
+            [
+              {
+                "amount": 45,
+                "type": "catacombs"
+              }
+            ]
+          ],
+          "names": [
+            "cata"
+          ]
+        },
+        {
+          "requirements": [
+            [
+              {
+                "amount": 55,
+                "type": "skills"
+              }
+            ]
+          ],
+          "names": [
+            "skill"
+          ]
+        }
+      ]
+    }
   }
 }

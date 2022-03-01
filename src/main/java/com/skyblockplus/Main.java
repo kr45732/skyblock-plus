@@ -46,6 +46,7 @@ import com.skyblockplus.inventory.*;
 import com.skyblockplus.miscellaneous.*;
 import com.skyblockplus.miscellaneous.networth.NetworthCommand;
 import com.skyblockplus.miscellaneous.networth.NetworthSlashCommand;
+import com.skyblockplus.miscellaneous.weight.BingoSlashCommand;
 import com.skyblockplus.miscellaneous.weight.WeightCommand;
 import com.skyblockplus.miscellaneous.weight.WeightSlashCommand;
 import com.skyblockplus.price.*;
@@ -178,7 +179,7 @@ public class Main {
 					new JacobCommand(),
 					new RecipeCommand(),
 					new StorageCommand(),
-					new CalcRunsCommand()
+					new CalcRunsCommand(), new BingoCommand()
 				)
 				.build();
 
@@ -246,7 +247,7 @@ public class Main {
 					new JacobSlashCommand(),
 					new RecipeSlashCommand(),
 					new StorageSlashCommand(),
-					new CalcRunsSlashCommand()
+					new CalcRunsSlashCommand(), new BingoSlashCommand()
 				);
 
 		allServerSettings =

@@ -723,7 +723,7 @@ public class SkyblockEventCommand extends Command {
 
 				if (args.length == 2 || args.length == 3) {
 					if (
-						(args[1].equals("create") || args[1].equals("cancel") || args[1].equals("end") || args[1].equals("whitelist")) &&
+						(args[1].equals("create") || args[1].equals("cancel") || args[1].equals("end")) &&
 						!guildMap.get(event.getGuild().getId()).isAdmin(event.getMember())
 					) {
 						ebMessage.delete().complete();
