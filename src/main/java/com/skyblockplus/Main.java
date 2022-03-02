@@ -292,7 +292,6 @@ public class Main {
 		FetchurHandler.initialize();
 		MayorHandler.initialize();
 		JacobHandler.initialize();
-		BingoCommand.initialize();
 		File transcriptDir = new File("src/main/java/com/skyblockplus/json/application_transcripts/");
 		if (!transcriptDir.exists()) {
 			log.info((transcriptDir.mkdirs() ? "Successfully created" : "Failed to create") + " application transcript directory");
