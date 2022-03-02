@@ -158,11 +158,13 @@ public class Utils {
 	public static JsonArray skyblockItemsJson;
 	public static JsonObject internalJsonMappings;
 	public static JsonObject priceOverrideJson;
+	public static JsonObject bingoInfoJson;
 	/* Miscellaneous */
 	public static TextChannel botLogChannel;
 	public static TextChannel errorLogChannel;
 	public static Instant lowestBinJsonLastUpdated = Instant.now();
 	public static Instant averageAuctionJsonLastUpdated = Instant.now();
+	public static Instant bingoJsonLastUpdated = Instant.now();
 	public static Instant bazaarJsonLastUpdated = Instant.now();
 	public static Instant sbzPricesJsonLastUpdated = Instant.now();
 	public static Set<String> vanillaItems;
@@ -219,6 +221,15 @@ public class Utils {
 		}
 
 		return averageAuctionJson;
+	}
+
+	public static JsonObject getBingoInfoJson() {
+		if (bingoInfoJson == null || Duration.between(bingoJsonLastUpdated, Instant.now()).toMinutes() >= 5) {
+			bingoInfoJson = getJsonObject("https://api.hypixel.net/resources/skyblock/bingo");
+			bingoJsonLastUpdated = Instant.now();
+		}
+
+		return bingoInfoJson;
 	}
 
 	public static JsonObject getBazaarJson() {

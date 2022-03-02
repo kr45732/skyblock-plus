@@ -38,16 +38,10 @@ import org.springframework.util.StringUtils;
 
 public class BingoCommand extends Command {
 
-	public static JsonElement bingoInfo;
-
 	public BingoCommand() {
 		this.name = "bingo";
 		this.cooldown = globalCooldown;
 		this.botPermissions = defaultPerms();
-	}
-
-	public static void initialize() {
-		bingoInfo = getJson("https://api.hypixel.net/resources/skyblock/bingo");
 	}
 
 	public static Object getPlayerBingo(String username) {
@@ -58,6 +52,7 @@ public class BingoCommand extends Command {
 
 		JsonElement bingoJson = null;
 		JsonArray bingoArr = new JsonArray();
+		JsonElement bingoInfo = getBingoInfoJson();
 		try {
 			bingoJson =
 				streamJsonArray(
