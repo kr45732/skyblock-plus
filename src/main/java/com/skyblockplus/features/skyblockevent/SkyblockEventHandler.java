@@ -37,9 +37,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
@@ -48,7 +46,7 @@ public class SkyblockEventHandler {
 	private final PaginatorEvent paginatorEvent;
 	private final EventSettings eventSettings;
 	private final EmbedBuilder eb;
-	public TextChannel announcementChannel;
+	public BaseGuildMessageChannel announcementChannel;
 	public JsonElement guildJson;
 	private int state = 0;
 	private int attemptsLeft = 3;
@@ -392,7 +390,7 @@ public class SkyblockEventHandler {
 				break;
 			case 6:
 				try {
-					announcementChannel = event.getGuild().getTextChannelById(replyMessage.toLowerCase().replaceAll("[<#>]", ""));
+					announcementChannel = (BaseGuildMessageChannel) event.getGuild().getGuildChannelById(replyMessage.toLowerCase().replaceAll("[<#>]", ""));
 					eb.addField("Announcement Channel", announcementChannel.getAsMention(), false);
 					eventSettings.setAnnouncementId(announcementChannel.getId());
 					eb.setDescription("Reply with 'start' to start the event or anything else to cancel.");

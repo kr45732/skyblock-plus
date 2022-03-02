@@ -19,7 +19,6 @@
 package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
-import static com.skyblockplus.utils.Constants.FETCHUR_ITEMS;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -28,8 +27,6 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -89,15 +86,16 @@ public class BingoCommand extends Command {
 						}
 					}
 				}
-				communityGoals
-					.append("\n➜ ")
-					.append(higherDepth(goal, "name").getAsString())
+				communityGoals.append("\n ")
+						.append(progress >= nextTier ? client.getSuccess() : client.getError())
+						.append(" ")
+						.append(higherDepth(goal, "name").getAsString())
 					.append(": ")
 					.append(formatNumber(progress))
 					.append("/")
 					.append(formatNumber(nextTier))
 					.append(" (")
-					.append(roundProgress((double) progress / nextTier))
+					.append((roundProgress((double) Math.min(progress, nextTier) / nextTier)))
 					.append(")");
 			} else {
 				boolean completedGoal = streamJsonArray(bingoArr)
@@ -115,7 +113,7 @@ public class BingoCommand extends Command {
 		eb.setDescription(
 			(
 				bingoJson == null
-					? "**Note: no active bingo profile found**\n"
+					? "**No active bingo profile found**"
 					: (
 						"**Goals Completed:** " +
 						(bingoArr.size() + StringUtils.countOccurrencesOf(cardStr.toString(), "C")) +

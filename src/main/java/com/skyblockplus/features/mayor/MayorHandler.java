@@ -64,7 +64,7 @@ public class MayorHandler {
 		"MARINA",
 		"<:marina:940083649783664660>"
 	);
-	public static MessageEmbed votesEmbed = defaultEmbed("Mayor Election Graph").setDescription("Data not loaded yet").build();
+	public static MessageEmbed votesEmbed = defaultEmbed("Mayor Election Graph").setDescription("Data not loaded").build();
 
 	public static void initialize() {
 		long newYearStartEpoch = YEAR_0 + 446400000L * (getSkyblockYear() - 1);

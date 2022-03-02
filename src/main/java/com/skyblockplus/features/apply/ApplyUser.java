@@ -44,16 +44,15 @@ import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 
 public class ApplyUser implements Serializable {
 
-	public final String applyingUserId;
-	public final String currentSettingsString;
-	public final String guildId;
+	public String applyingUserId;
+	public String currentSettingsString;
+	public String guildId;
 	public final Map<String, String> profileEmojiToName = new LinkedHashMap<>();
 	public String applicationChannelId;
 	public String reactMessageId;
@@ -74,7 +73,9 @@ public class ApplyUser implements Serializable {
 	public String failCause;
 
 	public ApplyUser(ButtonInteractionEvent event, JsonElement currentSettings, String playerUsername) {
-		User applyingUser = event.getUser();
+
+
+		try{User applyingUser = event.getUser();
 		logCommand(event.getGuild(), applyingUser, "apply " + playerUsername);
 
 		JsonObject currentSettingsObj = currentSettings.getAsJsonObject();
@@ -177,7 +178,10 @@ public class ApplyUser implements Serializable {
 				reactMessage.addReaction(profileEmoji).complete();
 			}
 
-			reactMessage.addReaction(client.getError()).queue();
+			reactMessage.addReaction(client.getError().replaceAll("[<>]", "")).queue();
+		}}catch (Exception e){
+			AutomaticGuild.getLogger().error(guildId, e);
+			failCause = e.getMessage();
 		}
 	}
 
@@ -463,7 +467,7 @@ public class ApplyUser implements Serializable {
 						for (String profileEmoji : profileEmojiToName.keySet()) {
 							reactMessage.addReaction(profileEmoji).complete();
 						}
-						reactMessage.addReaction(client.getError()).queue();
+						reactMessage.addReaction(client.getError().replaceAll("[<>]", "")).queue();
 						state = 0;
 						return true;
 					}
