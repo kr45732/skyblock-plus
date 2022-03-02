@@ -26,6 +26,8 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import java.time.Instant;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.entities.Message;
 
 public class MayorCommand extends Command {
 
@@ -35,10 +37,11 @@ public class MayorCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	public static EmbedBuilder getMayor() {
+	public static MessageBuilder getMayor() {
+		Message message = jda.getTextChannelById("932484216179011604").getHistory().retrievePast(1).complete().get(0);
 		EmbedBuilder eb = new EmbedBuilder();
-		eb.copyFrom(jda.getTextChannelById("932484216179011604").getHistory().retrievePast(1).complete().get(0).getEmbeds().get(0));
-		return eb.setTimestamp(Instant.now());
+		eb.copyFrom(message.getEmbeds().get(0));
+		return new MessageBuilder().setEmbeds(eb.setTimestamp(Instant.now()).build()).setActionRows(message.getActionRows());
 	}
 
 	@Override

@@ -44,6 +44,7 @@ import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
@@ -134,7 +135,7 @@ public class ApplyUser implements Serializable {
 		} else {
 			EmbedBuilder welcomeEb = this.defaultPlayerEmbed();
 			welcomeEb.setDescription(
-				"Please react with the emoji that corresponds to the profile you want to apply with or react with ❌ to cancel the application.\n"
+				"Please react with the emoji that corresponds to the profile you want to apply with or react with "+ client.getError() + " to cancel the application.\n"
 			);
 
 			for (String profileName : profileNames) {
@@ -174,7 +175,7 @@ public class ApplyUser implements Serializable {
 				reactMessage.addReaction(profileEmoji).complete();
 			}
 
-			reactMessage.addReaction("❌").queue();
+			reactMessage.addReaction(client.getError()).queue();
 		}
 	}
 
@@ -206,7 +207,7 @@ public class ApplyUser implements Serializable {
 
 		if (state == 0) {
 			reactMessage.clearReactions().queue();
-			if (event.getReactionEmote().getAsReactionCode().equals("❌")) {
+			if (event.getReactionEmote().getAsReactionCode().equals(client.getError())) {
 				event.getChannel().sendMessageEmbeds(defaultEmbed("Closing channel").build()).queue();
 				event
 					.getGuild()
@@ -341,14 +342,17 @@ public class ApplyUser implements Serializable {
 			statsEmbed.addField("Catacombs level", "" + playerCatacombs, true);
 			statsEmbed.addField("Bank & purse coins", playerCoins, true);
 
+			List<Button> buttons = new ArrayList<>();
+			buttons.add(Button.success("apply_user_submit", "Submit"));
+			if(!profileEmojiToName.isEmpty()){
+				buttons.add(Button.primary("apply_user_retry", "Retry"));
+			}
+			buttons.add(Button.danger("apply_user_cancel", "Cancel"));
+
 			reactMessage =
 				applicationChannel
 					.sendMessageEmbeds(statsEmbed.build())
-					.setActionRow(
-						Button.success("apply_user_submit", "Submit"),
-						Button.primary("apply_user_retry", "Retry"),
-						Button.danger("apply_user_cancel", "Cancel")
-					)
+					.setActionRow(buttons)
 					.complete();
 			this.reactMessageId = reactMessage.getId();
 			state = 1;
@@ -424,7 +428,7 @@ public class ApplyUser implements Serializable {
 					case "apply_user_retry" -> {
 						EmbedBuilder retryEmbed = defaultPlayerEmbed();
 						retryEmbed.setDescription(
-							"Please react with the emoji that corresponds to the profile you want to apply with or react with ❌ to cancel the application."
+							"Please react with the emoji that corresponds to the profile you want to apply with or react with " + client.getError() + " to cancel the application."
 						);
 						for (Map.Entry<String, String> profileEntry : profileEmojiToName.entrySet()) {
 							String profileEmoji = profileEntry.getKey().contains(":")
@@ -459,7 +463,7 @@ public class ApplyUser implements Serializable {
 						for (String profileEmoji : profileEmojiToName.keySet()) {
 							reactMessage.addReaction(profileEmoji).complete();
 						}
-						reactMessage.addReaction("❌").queue();
+						reactMessage.addReaction(client.getError()).queue();
 						state = 0;
 						return true;
 					}

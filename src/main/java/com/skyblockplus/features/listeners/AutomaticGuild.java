@@ -921,6 +921,19 @@ public class AutomaticGuild {
 		} else if (event.getComponentId().equals("mayor_graph_button")) {
 			event.replyEmbeds(votesEmbed).setEphemeral(true).queue();
 			return;
+		} else if (event.getComponentId().startsWith("bingo_")) {
+			StringBuilder card = new StringBuilder();
+			String[] split = event.getComponentId().split("bingo_")[1].split("");
+			for (int i = 0; i < split.length; i++) {
+				card.append(i % 5 == 0 ? "\n" : "").append(switch (split[i]) {
+					case "C" -> "<:e:939021091433754664>";
+					case "c" -> "<:e:939021590799188039>";
+					case "S" -> "<:e:939021525124775956>";
+					default -> "<:e:939021749486514216>";
+				});
+			}
+			event.reply(card.toString()).setEphemeral(true).queue();
+			return;
 		} else if (event.getComponentId().startsWith("track_auctions_")) {
 			String[] discordUuidSplit = event.getComponentId().split("track_auctions_")[1].split("_", 2)[1].split("_", 2);
 			if (event.getUser().getId().equals(discordUuidSplit[0])) {
@@ -1007,7 +1020,7 @@ public class AutomaticGuild {
 			return;
 		} else if (event.getComponentId().startsWith("setup_command_")) {
 			if (!guildMap.get(event.getGuild().getId()).isAdmin(event.getMember())) {
-				event.reply("❌ You must have the administrator permission in this guild to use that!").setEphemeral(true).queue();
+				event.reply(client.getError() + " You must have the administrator permission in this guild to use that!").setEphemeral(true).queue();
 				return;
 			}
 
@@ -1060,7 +1073,7 @@ public class AutomaticGuild {
 		}
 
 		event.editButton(event.getButton().asDisabled().withLabel("Disabled").withStyle(ButtonStyle.DANGER)).queue();
-		event.getHook().editOriginal("❌ This button has been disabled").queue();
+		event.getHook().editOriginal(client.getError() + " This button has been disabled").queue();
 	}
 
 	public void onGuildLeave() {

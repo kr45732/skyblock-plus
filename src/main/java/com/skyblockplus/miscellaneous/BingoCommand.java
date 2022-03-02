@@ -31,6 +31,10 @@ import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.springframework.util.StringUtils;
 
 public class BingoCommand extends Command {
 
@@ -40,11 +44,13 @@ public class BingoCommand extends Command {
 		this.name = "bingo";
 		this.cooldown = globalCooldown;
 		this.botPermissions = defaultPerms();
+	}
 
+	public static void initialize(){
 		bingoInfo = getJson("https://api.hypixel.net/resources/skyblock/bingo");
 	}
 
-	public static EmbedBuilder getPlayerBingo(String username) {
+	public static Object getPlayerBingo(String username) {
 		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
 		if (usernameUuidStruct.isNotValid()) {
 			return invalidEmbed(usernameUuidStruct.failCause());
@@ -70,31 +76,41 @@ public class BingoCommand extends Command {
 		EmbedBuilder eb = defaultEmbed(usernameUuidStruct.username(), skyblockStatsLink(usernameUuidStruct.username(), null));
 		StringBuilder regGoals = new StringBuilder();
 		StringBuilder communityGoals = new StringBuilder();
+		StringBuilder cardStr = new StringBuilder(); // C = community done, c = community not done, S = self done, s = self not done
 		for (JsonElement goal : higherDepth(bingoInfo, "goals").getAsJsonArray()) {
 			if (higherDepth(goal, "progress", -1) != -1) {
 				long progress = higherDepth(goal, "progress").getAsLong();
-				long nextTier = higherDepth(goal, "tiers.[0]", 0);
-				for (JsonElement tier : higherDepth(goal, "tiers").getAsJsonArray()) {
-					if (progress > tier.getAsInt()) {
-						nextTier = tier.getAsInt();
-						break;
+				JsonArray tiers = higherDepth(goal, "tiers").getAsJsonArray();
+				long nextTier = tiers.get(0).getAsLong();
+				if(progress >= tiers.get(tiers.size() - 1).getAsLong()){
+					nextTier = tiers.get(tiers.size() - 1).getAsLong();
+					cardStr.append("C");
+				}else {
+					cardStr.append("c");
+					for (JsonElement tier : higherDepth(goal, "tiers").getAsJsonArray()) {
+						if (tier.getAsLong() > progress) {
+							nextTier = tier.getAsInt();
+							break;
+						}
 					}
 				}
 				communityGoals
 					.append("\n➜ ")
 					.append(higherDepth(goal, "name").getAsString())
 					.append(": ")
-					.append(formatNumber(higherDepth(goal, "progress").getAsLong()))
+					.append(formatNumber(progress))
 					.append("/")
 					.append(formatNumber(nextTier))
 					.append(" (")
 					.append(roundProgress((double) progress / nextTier))
 					.append(")");
 			} else {
+				boolean completedGoal = streamJsonArray(bingoArr).anyMatch(g -> g.getAsString().equals(higherDepth(goal, "id").getAsString()));
+				cardStr.append(completedGoal ? "S" : "s");
 				regGoals
 					.append("\n")
 					.append(
-						streamJsonArray(bingoArr).anyMatch(g -> g.getAsString().equals(higherDepth(goal, "id").getAsString())) ? "✅" : "❌"
+						completedGoal ? client.getSuccess() : client.getError()
 					)
 					.append(" ")
 					.append(higherDepth(goal, "name").getAsString())
@@ -103,12 +119,12 @@ public class BingoCommand extends Command {
 			}
 		}
 		eb.setDescription(
-			(bingoJson == null ? "**Note: no active bingo profile found**\n" : "") + "**Points:** " + higherDepth(bingoJson, "points", 0)
+			(bingoJson == null ? "**Note: no active bingo profile found**\n" : ("**Goals Completed:** " + (bingoArr.size() + StringUtils.countOccurrencesOf(cardStr.toString(), "C")) + "\n**Points:** " + higherDepth(bingoJson, "points", 0)  ))
 		);
-		eb.addField("Self Goals", regGoals.toString(), false);
-		eb.addField("Community Goals", communityGoals.toString(), false);
+		eb.appendDescription("\n\n**Self Goals:**" + regGoals);
+		eb.appendDescription("\n\n**Community Goals:**" + communityGoals);
 		eb.setThumbnail(usernameUuidStruct.getAvatarlUrl());
-		return eb;
+		return new MessageBuilder().setEmbeds(eb.build()).setActionRows(ActionRow.of(Button.primary("bingo_" + cardStr, "Bingo Card")));
 	}
 
 	@Override

@@ -107,15 +107,15 @@ public class ApplyGuild {
 			.orElse(null);
 
 		if (runningApplication != null) {
-			return "❌ There is already an application open in <#" + runningApplication.applicationChannelId + ">";
+			return client.getError() + " There is already an application open in <#" + runningApplication.applicationChannelId + ">";
 		}
 
 		LinkedAccount linkedAccount = database.getByDiscord(event.getUser().getId());
 		if (linkedAccount == null) {
-			return "❌ You are not linked to the bot. Please run `+link [IGN]` and try again.";
+			return client.getError() + " You are not linked to the bot. Please run `+link [IGN]` and try again.";
 		} else if (!linkedAccount.discord().equals(event.getUser().getId())) {
 			return (
-				"❌ Account " +
+					client.getError() + " Account " +
 				linkedAccount.username() +
 				" is linked with the Discord tag " +
 				jda.retrieveUserById(linkedAccount.discord()).complete().getAsTag() +
@@ -138,7 +138,7 @@ public class ApplyGuild {
 			.findFirst()
 			.orElse(null);
 		if (blacklisted != null) {
-			return "❌ You have been blacklisted with reason `" + higherDepth(blacklisted, "reason").getAsString() + "`";
+			return client.getError() + " You have been blacklisted with reason `" + higherDepth(blacklisted, "reason").getAsString() + "`";
 		}
 
 		if (higherDepth(currentSettings, "applyScammerCheck", false)) {
@@ -150,22 +150,22 @@ public class ApplyGuild {
 
 		Player player = new Player(linkedAccount.username());
 		if (!player.isValid()) {
-			return "❌ Unable to fetch player data. Failed cause: `" + player.getFailCause() + "`";
+			return client.getError() + " Unable to fetch player data. Failed cause: `" + player.getFailCause() + "`";
 		} else {
 			Player.Gamemode gamemode = Player.Gamemode.of(higherDepth(currentSettings, "applyGamemode", "all"));
 			if (player.getAllProfileNames(gamemode).length == 0) {
-				return "❌ You have no " + gamemode.toString().toLowerCase() + " profiles created";
+				return client.getError() + " You have no " + gamemode.toString().toLowerCase() + " profiles created";
 			}
 		}
 
 		ApplyUser toAdd = new ApplyUser(event, currentSettings, linkedAccount.username());
 		if (toAdd.failCause != null) {
-			return "❌ " + toAdd.failCause;
+			return client.getError() + " " + toAdd.failCause;
 		}
 
 		applyUserList.add(toAdd);
 
-		return "✅ A new application was created in " + event.getGuild().getTextChannelById(toAdd.applicationChannelId).getAsMention();
+		return client.getSuccess() + " A new application was created in " + event.getGuild().getTextChannelById(toAdd.applicationChannelId).getAsMention();
 	}
 
 	public String onButtonClick(ButtonInteractionEvent event) {
@@ -218,7 +218,7 @@ public class ApplyGuild {
 			}
 
 			if (!hasStaffRole) {
-				return "❌ You are missing the required permissions in this guild to use that!";
+				return client.getError() + " You are missing the required permissions in this guild to use that!";
 			}
 		}
 
@@ -244,7 +244,7 @@ public class ApplyGuild {
 		} catch (Exception ignored) {}
 
 		event.getMessage().delete().queueAfter(3, TimeUnit.SECONDS);
-		return "✅ Player was invited";
+		return client.getSuccess() + "P layer was invited";
 	}
 
 	public boolean onGuildMessageReceived(MessageReceivedEvent event) {

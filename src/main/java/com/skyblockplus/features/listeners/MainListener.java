@@ -226,7 +226,7 @@ public class MainListener extends ListenerAdapter {
 
 		if (event.getGuild() == null) {
 			event.editButton(event.getButton().asDisabled().withLabel("Disabled").withStyle(ButtonStyle.DANGER)).queue();
-			event.getHook().editOriginal("❌ This button has been disabled").queue();
+			event.getHook().editOriginal(client.getError() + " This button has been disabled").queue();
 			return;
 		}
 

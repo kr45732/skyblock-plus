@@ -19,8 +19,7 @@
 package com.skyblockplus.features.skyblockevent;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.Utils.database;
-import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.*;
 
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.slashcommand.SlashCommand;
@@ -44,7 +43,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 			(subcommandName.equals("create") || subcommandName.equals("cancel") || subcommandName.equals("end")) &&
 			!guildMap.get(event.getGuild().getId()).isAdmin(event.getMember())
 		) {
-			event.string("❌ You must have the administrator permission in this guild to use that!");
+			event.string(client.getError() + " You must have the administrator permission in this guild to use that!");
 			return;
 		}
 

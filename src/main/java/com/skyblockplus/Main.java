@@ -97,7 +97,7 @@ public class Main {
 		client =
 			new CommandClientBuilder()
 				.setOwnerId("385939031596466176")
-				.setEmojis("✅", "⚠️", "❌")
+				.setEmojis("<:yes:948359788889251940>", "⚠️", "<:no:948359781125607424>")
 				.useHelpBuilder(false)
 				.setPrefixFunction(event -> event.isFromGuild() ? getGuildPrefix(event.getGuild().getId()) : DEFAULT_PREFIX)
 				.setListener(
@@ -292,6 +292,7 @@ public class Main {
 		FetchurHandler.initialize();
 		MayorHandler.initialize();
 		JacobHandler.initialize();
+		BingoCommand.initialize();
 		File transcriptDir = new File("src/main/java/com/skyblockplus/json/application_transcripts/");
 		if (!transcriptDir.exists()) {
 			log.info((transcriptDir.mkdirs() ? "Successfully created" : "Failed to create") + " application transcript directory");

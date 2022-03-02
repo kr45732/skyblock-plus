@@ -727,7 +727,7 @@ public class SkyblockEventCommand extends Command {
 						!guildMap.get(event.getGuild().getId()).isAdmin(event.getMember())
 					) {
 						ebMessage.delete().complete();
-						event.getChannel().sendMessage("❌ You must have the administrator permission in this guild to use that!").queue();
+						event.getChannel().sendMessage(client.getError() + " You must have the administrator permission in this guild to use that!").queue();
 						return;
 					}
 
