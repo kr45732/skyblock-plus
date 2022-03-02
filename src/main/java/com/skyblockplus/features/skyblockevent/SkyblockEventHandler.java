@@ -390,7 +390,8 @@ public class SkyblockEventHandler {
 				break;
 			case 6:
 				try {
-					announcementChannel = (BaseGuildMessageChannel) event.getGuild().getGuildChannelById(replyMessage.toLowerCase().replaceAll("[<#>]", ""));
+					announcementChannel =
+						(BaseGuildMessageChannel) event.getGuild().getGuildChannelById(replyMessage.toLowerCase().replaceAll("[<#>]", ""));
 					eb.addField("Announcement Channel", announcementChannel.getAsMention(), false);
 					eventSettings.setAnnouncementId(announcementChannel.getId());
 					eb.setDescription("Reply with 'start' to start the event or anything else to cancel.");

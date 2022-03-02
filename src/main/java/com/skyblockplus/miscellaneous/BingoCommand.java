@@ -86,10 +86,11 @@ public class BingoCommand extends Command {
 						}
 					}
 				}
-				communityGoals.append("\n ")
-						.append(progress >= nextTier ? client.getSuccess() : client.getError())
-						.append(" ")
-						.append(higherDepth(goal, "name").getAsString())
+				communityGoals
+					.append("\n ")
+					.append(progress >= nextTier ? client.getSuccess() : client.getError())
+					.append(" ")
+					.append(higherDepth(goal, "name").getAsString())
 					.append(": ")
 					.append(formatNumber(progress))
 					.append("/")

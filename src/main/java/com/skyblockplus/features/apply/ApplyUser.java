@@ -73,113 +73,113 @@ public class ApplyUser implements Serializable {
 	public String failCause;
 
 	public ApplyUser(ButtonInteractionEvent event, JsonElement currentSettings, String playerUsername) {
-
-
-		try{User applyingUser = event.getUser();
-		logCommand(event.getGuild(), applyingUser, "apply " + playerUsername);
-
-		JsonObject currentSettingsObj = currentSettings.getAsJsonObject();
-		currentSettingsObj.remove("applyUsersCache");
-		currentSettings = currentSettingsObj.getAsJsonObject();
-
-		this.applyingUserId = applyingUser.getId();
-		this.currentSettingsString = gson.toJson(currentSettings);
-		this.guildId = event.getGuild().getId();
-		this.playerUsername = playerUsername;
-
 		try {
-			this.logApplication = jda.getTextChannelById(higherDepth(currentSettings, "applyLogChannel").getAsString()) != null;
-		} catch (Exception ignored) {}
+			User applyingUser = event.getUser();
+			logCommand(event.getGuild(), applyingUser, "apply " + playerUsername);
 
-		Category applyCategory = event.getGuild().getCategoryById(higherDepth(currentSettings, "applyCategory").getAsString());
-		if (applyCategory.getChannels().size() == 50) {
-			failCause =
-				"Unable to create a new application due to the application category reaching 50/50 channels. Please report this to the server's staff.";
-			return;
-		}
+			JsonObject currentSettingsObj = currentSettings.getAsJsonObject();
+			currentSettingsObj.remove("applyUsersCache");
+			currentSettings = currentSettingsObj.getAsJsonObject();
 
-		ChannelAction<TextChannel> applicationChannelAction = applyCategory
-			.createTextChannel("apply-" + playerUsername)
-			.syncPermissionOverrides()
-			.addPermissionOverride(event.getGuild().getSelfMember(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND), null)
-			.addPermissionOverride(event.getMember(), EnumSet.of(Permission.VIEW_CHANNEL), null)
-			.addPermissionOverride(event.getGuild().getPublicRole(), null, EnumSet.of(Permission.VIEW_CHANNEL));
+			this.applyingUserId = applyingUser.getId();
+			this.currentSettingsString = gson.toJson(currentSettings);
+			this.guildId = event.getGuild().getId();
+			this.playerUsername = playerUsername;
 
-		try {
-			for (JsonElement staffPingRole : higherDepth(currentSettings, "applyStaffRoles").getAsJsonArray()) {
-				applicationChannelAction =
-					applicationChannelAction.addPermissionOverride(
-						event.getGuild().getRoleById(staffPingRole.getAsString()),
-						EnumSet.of(Permission.VIEW_CHANNEL),
-						null
-					);
+			try {
+				this.logApplication = jda.getTextChannelById(higherDepth(currentSettings, "applyLogChannel").getAsString()) != null;
+			} catch (Exception ignored) {}
+
+			Category applyCategory = event.getGuild().getCategoryById(higherDepth(currentSettings, "applyCategory").getAsString());
+			if (applyCategory.getChannels().size() == 50) {
+				failCause =
+					"Unable to create a new application due to the application category reaching 50/50 channels. Please report this to the server's staff.";
+				return;
 			}
-		} catch (Exception ignored) {}
 
-		TextChannel applicationChannel = applicationChannelAction.complete();
+			ChannelAction<TextChannel> applicationChannelAction = applyCategory
+				.createTextChannel("apply-" + playerUsername)
+				.syncPermissionOverrides()
+				.addPermissionOverride(event.getGuild().getSelfMember(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND), null)
+				.addPermissionOverride(event.getMember(), EnumSet.of(Permission.VIEW_CHANNEL), null)
+				.addPermissionOverride(event.getGuild().getPublicRole(), null, EnumSet.of(Permission.VIEW_CHANNEL));
 
-		this.applicationChannelId = applicationChannel.getId();
+			try {
+				for (JsonElement staffPingRole : higherDepth(currentSettings, "applyStaffRoles").getAsJsonArray()) {
+					applicationChannelAction =
+						applicationChannelAction.addPermissionOverride(
+							event.getGuild().getRoleById(staffPingRole.getAsString()),
+							EnumSet.of(Permission.VIEW_CHANNEL),
+							null
+						);
+				}
+			} catch (Exception ignored) {}
 
-		Player player = new Player(playerUsername);
-		String[] profileNames = player.getAllProfileNames(Player.Gamemode.of(higherDepth(currentSettings, "applyGamemode", "all")));
+			TextChannel applicationChannel = applicationChannelAction.complete();
 
-		getNameHistory(player.getUuid()).forEach(i -> nameHistory += "\n• " + fixUsername(i));
-		if (profileNames.length == 1) {
-			applicationChannel
-				.sendMessage(
-					applyingUser.getAsMention() +
-					" this is your application for " +
-					capitalizeString(higherDepth(currentSettings, "guildName").getAsString().replace("_", " "))
-				)
-				.complete();
-			caseOne(profileNames[0], currentSettings, applicationChannel);
-		} else {
-			EmbedBuilder welcomeEb = this.defaultPlayerEmbed();
-			welcomeEb.setDescription(
-				"Please react with the emoji that corresponds to the profile you want to apply with or react with " +
-				client.getError() +
-				" to cancel the application.\n"
-			);
+			this.applicationChannelId = applicationChannel.getId();
 
-			for (String profileName : profileNames) {
-				String profileEmoji = profileNameToEmoji(profileName);
-				this.profileEmojiToName.put(profileEmoji, profileName);
-				profileEmoji = profileEmoji.contains(":") ? "<:" + profileEmoji + ">" : profileEmoji;
+			Player player = new Player(playerUsername);
+			String[] profileNames = player.getAllProfileNames(Player.Gamemode.of(higherDepth(currentSettings, "applyGamemode", "all")));
+
+			getNameHistory(player.getUuid()).forEach(i -> nameHistory += "\n• " + fixUsername(i));
+			if (profileNames.length == 1) {
+				applicationChannel
+					.sendMessage(
+						applyingUser.getAsMention() +
+						" this is your application for " +
+						capitalizeString(higherDepth(currentSettings, "guildName").getAsString().replace("_", " "))
+					)
+					.complete();
+				caseOne(profileNames[0], currentSettings, applicationChannel);
+			} else {
+				EmbedBuilder welcomeEb = this.defaultPlayerEmbed();
+				welcomeEb.setDescription(
+					"Please react with the emoji that corresponds to the profile you want to apply with or react with " +
+					client.getError() +
+					" to cancel the application.\n"
+				);
+
+				for (String profileName : profileNames) {
+					String profileEmoji = profileNameToEmoji(profileName);
+					this.profileEmojiToName.put(profileEmoji, profileName);
+					profileEmoji = profileEmoji.contains(":") ? "<:" + profileEmoji + ">" : profileEmoji;
+					welcomeEb.appendDescription(
+						"\n" +
+						profileEmoji +
+						" - [" +
+						capitalizeString(profileName) +
+						"](" +
+						skyblockStatsLink(player.getUsername(), profileName) +
+						")"
+					);
+				}
 				welcomeEb.appendDescription(
-					"\n" +
-					profileEmoji +
-					" - [" +
-					capitalizeString(profileName) +
-					"](" +
-					skyblockStatsLink(player.getUsername(), profileName) +
+					"\n↩️ - [Last played profile (" +
+					player.getProfileName() +
+					")](" +
+					skyblockStatsLink(player.getUsername(), player.getProfileName()) +
 					")"
 				);
+				profileEmojiToName.put("↩️", player.getProfileName());
+
+				Message reactMessage = applicationChannel
+					.sendMessage(
+						applyingUser.getAsMention() +
+						" this is your application for " +
+						capitalizeString(higherDepth(currentSettings, "guildName").getAsString().replace("_", " "))
+					)
+					.setEmbeds(welcomeEb.build())
+					.complete();
+				this.reactMessageId = reactMessage.getId();
+
+				for (String profileEmoji : profileEmojiToName.keySet()) {
+					reactMessage.addReaction(profileEmoji).complete();
+				}
+
+				reactMessage.addReaction(client.getError().replaceAll("[<>]", "")).queue();
 			}
-			welcomeEb.appendDescription(
-				"\n↩️ - [Last played profile (" +
-				player.getProfileName() +
-				")](" +
-				skyblockStatsLink(player.getUsername(), player.getProfileName()) +
-				")"
-			);
-			profileEmojiToName.put("↩️", player.getProfileName());
-
-			Message reactMessage = applicationChannel
-				.sendMessage(
-					applyingUser.getAsMention() +
-					" this is your application for " +
-					capitalizeString(higherDepth(currentSettings, "guildName").getAsString().replace("_", " "))
-				)
-				.setEmbeds(welcomeEb.build())
-				.complete();
-			this.reactMessageId = reactMessage.getId();
-
-			for (String profileEmoji : profileEmojiToName.keySet()) {
-				reactMessage.addReaction(profileEmoji).complete();
-			}
-
-			reactMessage.addReaction(client.getError().replaceAll("[<>]", "")).queue();
-		}}catch (Exception e){
+		} catch (Exception e) {
 			AutomaticGuild.getLogger().error(guildId, e);
 			failCause = e.getMessage();
 		}
