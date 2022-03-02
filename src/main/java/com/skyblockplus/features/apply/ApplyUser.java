@@ -135,7 +135,9 @@ public class ApplyUser implements Serializable {
 		} else {
 			EmbedBuilder welcomeEb = this.defaultPlayerEmbed();
 			welcomeEb.setDescription(
-				"Please react with the emoji that corresponds to the profile you want to apply with or react with "+ client.getError() + " to cancel the application.\n"
+				"Please react with the emoji that corresponds to the profile you want to apply with or react with " +
+				client.getError() +
+				" to cancel the application.\n"
 			);
 
 			for (String profileName : profileNames) {
@@ -344,16 +346,12 @@ public class ApplyUser implements Serializable {
 
 			List<Button> buttons = new ArrayList<>();
 			buttons.add(Button.success("apply_user_submit", "Submit"));
-			if(!profileEmojiToName.isEmpty()){
+			if (!profileEmojiToName.isEmpty()) {
 				buttons.add(Button.primary("apply_user_retry", "Retry"));
 			}
 			buttons.add(Button.danger("apply_user_cancel", "Cancel"));
 
-			reactMessage =
-				applicationChannel
-					.sendMessageEmbeds(statsEmbed.build())
-					.setActionRow(buttons)
-					.complete();
+			reactMessage = applicationChannel.sendMessageEmbeds(statsEmbed.build()).setActionRow(buttons).complete();
 			this.reactMessageId = reactMessage.getId();
 			state = 1;
 		}
@@ -428,7 +426,9 @@ public class ApplyUser implements Serializable {
 					case "apply_user_retry" -> {
 						EmbedBuilder retryEmbed = defaultPlayerEmbed();
 						retryEmbed.setDescription(
-							"Please react with the emoji that corresponds to the profile you want to apply with or react with " + client.getError() + " to cancel the application."
+							"Please react with the emoji that corresponds to the profile you want to apply with or react with " +
+							client.getError() +
+							" to cancel the application."
 						);
 						for (Map.Entry<String, String> profileEntry : profileEmojiToName.entrySet()) {
 							String profileEmoji = profileEntry.getKey().contains(":")

@@ -115,7 +115,8 @@ public class ApplyGuild {
 			return client.getError() + " You are not linked to the bot. Please run `+link [IGN]` and try again.";
 		} else if (!linkedAccount.discord().equals(event.getUser().getId())) {
 			return (
-					client.getError() + " Account " +
+				client.getError() +
+				" Account " +
 				linkedAccount.username() +
 				" is linked with the Discord tag " +
 				jda.retrieveUserById(linkedAccount.discord()).complete().getAsTag() +
@@ -165,7 +166,11 @@ public class ApplyGuild {
 
 		applyUserList.add(toAdd);
 
-		return client.getSuccess() + " A new application was created in " + event.getGuild().getTextChannelById(toAdd.applicationChannelId).getAsMention();
+		return (
+			client.getSuccess() +
+			" A new application was created in " +
+			event.getGuild().getTextChannelById(toAdd.applicationChannelId).getAsMention()
+		);
 	}
 
 	public String onButtonClick(ButtonInteractionEvent event) {

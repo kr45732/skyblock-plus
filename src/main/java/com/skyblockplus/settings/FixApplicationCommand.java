@@ -181,7 +181,10 @@ public class FixApplicationCommand extends Command {
 				List<Message> toDeleteSubmitAppMessages = messages
 					.stream()
 					.filter(m -> {
-						if (m.getAuthor().getId().equals(botId) && m.getContentRaw().equals(client.getError() + " This button has been disabled")) {
+						if (
+							m.getAuthor().getId().equals(botId) &&
+							m.getContentRaw().equals(client.getError() + " This button has been disabled")
+						) {
 							Message repliedMessage = m.getReferencedMessage();
 							return repliedMessage != null && repliedMessage.getId().equals(submitAppMessage.getId());
 						}
@@ -244,7 +247,10 @@ public class FixApplicationCommand extends Command {
 				List<Message> toDeleteStaffMsg = staffMessages
 					.stream()
 					.filter(m -> {
-						if (m.getAuthor().getId().equals(botId) && m.getContentRaw().equals(client.getError() + " This button has been disabled")) {
+						if (
+							m.getAuthor().getId().equals(botId) &&
+							m.getContentRaw().equals(client.getError() + " This button has been disabled")
+						) {
 							Message repliedMessage = m.getReferencedMessage();
 							return repliedMessage != null && repliedMessage.getId().equals(staffMessage.getId());
 						}

@@ -46,7 +46,7 @@ public class BingoCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	public static void initialize(){
+	public static void initialize() {
 		bingoInfo = getJson("https://api.hypixel.net/resources/skyblock/bingo");
 	}
 
@@ -82,10 +82,10 @@ public class BingoCommand extends Command {
 				long progress = higherDepth(goal, "progress").getAsLong();
 				JsonArray tiers = higherDepth(goal, "tiers").getAsJsonArray();
 				long nextTier = tiers.get(0).getAsLong();
-				if(progress >= tiers.get(tiers.size() - 1).getAsLong()){
+				if (progress >= tiers.get(tiers.size() - 1).getAsLong()) {
 					nextTier = tiers.get(tiers.size() - 1).getAsLong();
 					cardStr.append("C");
-				}else {
+				} else {
 					cardStr.append("c");
 					for (JsonElement tier : higherDepth(goal, "tiers").getAsJsonArray()) {
 						if (tier.getAsLong() > progress) {
@@ -105,13 +105,12 @@ public class BingoCommand extends Command {
 					.append(roundProgress((double) progress / nextTier))
 					.append(")");
 			} else {
-				boolean completedGoal = streamJsonArray(bingoArr).anyMatch(g -> g.getAsString().equals(higherDepth(goal, "id").getAsString()));
+				boolean completedGoal = streamJsonArray(bingoArr)
+					.anyMatch(g -> g.getAsString().equals(higherDepth(goal, "id").getAsString()));
 				cardStr.append(completedGoal ? "S" : "s");
 				regGoals
 					.append("\n")
-					.append(
-						completedGoal ? client.getSuccess() : client.getError()
-					)
+					.append(completedGoal ? client.getSuccess() : client.getError())
 					.append(" ")
 					.append(higherDepth(goal, "name").getAsString())
 					.append(": ")
@@ -119,7 +118,16 @@ public class BingoCommand extends Command {
 			}
 		}
 		eb.setDescription(
-			(bingoJson == null ? "**Note: no active bingo profile found**\n" : ("**Goals Completed:** " + (bingoArr.size() + StringUtils.countOccurrencesOf(cardStr.toString(), "C")) + "\n**Points:** " + higherDepth(bingoJson, "points", 0)  ))
+			(
+				bingoJson == null
+					? "**Note: no active bingo profile found**\n"
+					: (
+						"**Goals Completed:** " +
+						(bingoArr.size() + StringUtils.countOccurrencesOf(cardStr.toString(), "C")) +
+						"\n**Points:** " +
+						higherDepth(bingoJson, "points", 0)
+					)
+			)
 		);
 		eb.appendDescription("\n\n**Self Goals:**" + regGoals);
 		eb.appendDescription("\n\n**Community Goals:**" + communityGoals);
