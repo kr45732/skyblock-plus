@@ -715,8 +715,8 @@ public class SettingsExecute {
 		JsonObject blacklistSettings = getBlacklistSettings();
 		JsonArray isUsing = higherDepth(blacklistSettings, "isUsing").getAsJsonArray();
 
-		if (isUsing.size() == 3) {
-			return invalidEmbed("You have reached the max number of shared blacklists (3/3");
+		if (isUsing.size() == 7) {
+			return invalidEmbed("You have reached the max number of shared blacklists (7/7)");
 		}
 
 		if (streamJsonArray(isUsing).anyMatch(g -> g.getAsString().equals(serverId))) {
@@ -742,8 +742,8 @@ public class SettingsExecute {
 		JsonObject blacklistSettings = getBlacklistSettings();
 		JsonArray canUse = higherDepth(blacklistSettings, "canUse").getAsJsonArray();
 
-		if (canUse.size() == 3) {
-			return invalidEmbed("You have reached the max number of shared blacklists (3/3");
+		if (canUse.size() == 7) {
+			return invalidEmbed("You have reached the max number of shared blacklists (7/7)");
 		}
 
 		if (streamJsonArray(canUse).anyMatch(g -> g.getAsString().equals(serverId))) {
