@@ -30,7 +30,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 public class CalcSlayerSlashCommand extends SlashCommand {
 
 	public CalcSlayerSlashCommand() {
-		this.name = "calcruns";
+		this.name = "calcslayer";
 	}
 
 	@Override
