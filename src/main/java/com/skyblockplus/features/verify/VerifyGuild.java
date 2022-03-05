@@ -19,6 +19,7 @@
 package com.skyblockplus.features.verify;
 
 import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.general.LinkCommand.updateLinkedUser;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -90,6 +91,10 @@ public class VerifyGuild {
 
 		LinkedAccount linkedUser = database.getByDiscord(event.getUser().getId());
 		if (linkedUser == null) {
+			return;
+		}
+
+		if(streamJsonArray(guildMap.get(event.getGuild().getId()).getBlacklist()).anyMatch(blacklist -> higherDepth(blacklist, "uuid").getAsString().equals(linkedUser.uuid()))){
 			return;
 		}
 

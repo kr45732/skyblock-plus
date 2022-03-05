@@ -23,6 +23,7 @@ import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
 import static com.skyblockplus.utils.ApiHandler.skyblockProfilesFromUuid;
 import static com.skyblockplus.utils.Utils.*;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -73,6 +74,14 @@ public class LinkCommand extends Command {
 		LinkedAccount toAdd = new LinkedAccount(Instant.now().toEpochMilli(), member.getId(), playerInfo.uuid(), playerInfo.username());
 
 		if (database.insertLinkedAccount(toAdd)) {
+			JsonElement blacklisted = streamJsonArray(guildMap.get(guild.getId()).getBlacklist())
+						.filter(blacklist -> higherDepth(blacklist, "uuid").getAsString().equals(toAdd.uuid()))
+						.findFirst()
+						.orElse(null);
+			if(blacklisted != null){
+				return invalidEmbed("You have been blacklisted with reason `" + higherDepth(blacklisted, "reason").getAsString() + "`");
+			}
+
 			JsonElement verifySettings = database.getVerifySettings(guild.getId());
 			if (verifySettings != null) {
 				String[] result = updateLinkedUser(verifySettings, toAdd, member);

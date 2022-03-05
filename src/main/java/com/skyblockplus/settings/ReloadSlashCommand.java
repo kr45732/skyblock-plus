@@ -16,28 +16,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.general;
+package com.skyblockplus.settings;
 
-import com.skyblockplus.utils.slashcommand.SlashCommand;
-import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
+import com.skyblockplus.utils.command.SlashCommand;
+import com.skyblockplus.utils.command.SlashCommandEvent;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-public class VoteSlashCommand extends SlashCommand {
+public class ReloadSlashCommand extends SlashCommand {
 
-	public VoteSlashCommand() {
-		this.name = "vote";
+	public ReloadSlashCommand() {
+		this.name = "reload";
+		this.userPermissions = new Permission[] { Permission.ADMINISTRATOR };
 	}
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		event.embed(VoteCommand.getVoteEmbed());
+		event.embed(ReloadCommand.getReloadEmbed(event.getGuild()));
 	}
 
 	@Override
 	public CommandData getCommandData() {
-		return Commands.slash(name, "Get links where you can vote for the bot");
+		return Commands.slash(name, "Reload the guild application and verification settings");
 	}
 }

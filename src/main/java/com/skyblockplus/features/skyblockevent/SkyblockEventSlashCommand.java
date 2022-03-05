@@ -22,8 +22,9 @@ import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.skyblockplus.utils.command.PaginatorEvent;
-import com.skyblockplus.utils.slashcommand.SlashCommand;
-import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
+import com.skyblockplus.utils.command.SlashCommand;
+import com.skyblockplus.utils.command.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
@@ -58,7 +59,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 				event.embed(SkyblockEventCommand.cancelSkyblockEvent(event.getGuild()));
 				break;
 			case "join":
-				event.embed(SkyblockEventCommand.joinSkyblockEvent(new String[] {}, event.getMember()));
+				event.embed(SkyblockEventCommand.joinSkyblockEvent(event.getOptionStr("profile"), event.getMember()));
 				break;
 			case "leave":
 				event.embed(SkyblockEventCommand.leaveSkyblockEvent(event.getGuild().getId(), event.getUser().getId()));
@@ -88,7 +89,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 				new SubcommandData("create", "Interactive message to create a Skyblock event"),
 				new SubcommandData("end", "Force end the event"),
 				new SubcommandData("current", "Get information about the current event"),
-				new SubcommandData("join", "Join the current event"),
+				new SubcommandData("join", "Join the current event")	.addOption(OptionType.STRING, "profile", "Profile name"),
 				new SubcommandData("leave", "Leave the current event"),
 				new SubcommandData("cancel", "Cancel the event"),
 				new SubcommandData("leaderboard", "Get the leaderboard for current event")

@@ -16,28 +16,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.general;
+package com.skyblockplus.settings;
 
-import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.features.listeners.MainListener.*;
+import static com.skyblockplus.utils.Utils.defaultEmbed;
+import static com.skyblockplus.utils.Utils.defaultPerms;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 
-public class VoteCommand extends Command {
+public class ReloadCommand extends Command {
 
-	public VoteCommand() {
-		this.name = "vote";
-		this.cooldown = globalCooldown;
+	public ReloadCommand() {
+		this.name = "reload";
+		this.cooldown = 45;
 		this.botPermissions = defaultPerms();
 	}
 
-	public static EmbedBuilder getVoteEmbed() {
-		return defaultEmbed("Vote for Skyblock Plus")
-			.setDescription(
-				"You can vote for the bot on [**top.gg**](https://top.gg/bot/796791167366594592/vote), [**Discord Bot List**](https://discordbotlist.com/bots/skyblock-plus/upvote), and [**discords.com**](https://discords.com/bots/bot/796791167366594592/vote)"
-			);
+	public static EmbedBuilder getReloadEmbed(Guild guild) {
+		return defaultEmbed("Reload Settings for " + guild.getName())
+			.addField("Apply settings reload status", onApplyReload(guild.getId()), false)
+			.addField("Verify settings reload status", onVerifyReload(guild.getId()), false);
 	}
 
 	@Override
@@ -47,9 +49,10 @@ public class VoteCommand extends Command {
 			protected void execute() {
 				logCommand();
 
-				embed(getVoteEmbed());
+				embed(getReloadEmbed(event.getGuild()));
 			}
 		}
+			.setAdminCommand(true)
 			.queue();
 	}
 }

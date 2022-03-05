@@ -33,7 +33,7 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
-public class EssenceWaiter {
+public class EssenceHandler {
 
 	private final String itemId;
 	private final String itemName;
@@ -45,7 +45,7 @@ public class EssenceWaiter {
 	private final Map<Integer, String> emojiEssenceMap;
 	private int startingLevel;
 
-	public EssenceWaiter(String itemId, JsonElement itemJson, Message _reactMessage, User user) {
+	public EssenceHandler(String itemId, JsonElement itemJson, Message _reactMessage, User user) {
 		TextChannel channel = _reactMessage.getTextChannel();
 		_reactMessage.delete().queue();
 		this.itemId = itemId;

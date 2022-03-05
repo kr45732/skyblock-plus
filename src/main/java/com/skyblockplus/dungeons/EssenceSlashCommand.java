@@ -23,8 +23,8 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.utils.Utils;
-import com.skyblockplus.utils.slashcommand.SlashCommand;
-import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
+import com.skyblockplus.utils.command.SlashCommand;
+import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -51,7 +51,7 @@ public class EssenceSlashCommand extends SlashCommand {
 				}
 				JsonElement itemJson = higherDepth(getEssenceCostsJson(), itemId);
 				if (itemJson != null) {
-					new EssenceWaiter(itemId, itemJson, event.getHook().retrieveOriginal().complete(), event.getUser());
+					new EssenceHandler(itemId, itemJson, event.getHook().retrieveOriginal().complete(), event.getUser());
 				} else {
 					event.embed(invalidEmbed("Invalid item name"));
 				}

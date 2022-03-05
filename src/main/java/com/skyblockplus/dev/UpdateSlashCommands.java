@@ -25,7 +25,7 @@ import static com.skyblockplus.utils.Utils.slashCommandClient;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
-import com.skyblockplus.utils.slashcommand.SlashCommand;
+import com.skyblockplus.utils.command.SlashCommand;
 import java.util.List;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;

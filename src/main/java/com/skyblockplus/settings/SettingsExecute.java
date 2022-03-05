@@ -27,6 +27,7 @@ import static com.skyblockplus.utils.Utils.jda;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.google.gson.reflect.TypeToken;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -124,34 +125,34 @@ public class SettingsExecute {
 					case "hypixel_key" -> deleteHypixelKey();
 					default -> errorEmbed("settings delete");
 				};
-		} else if (args.length == 4 && args[1].equals("blacklist")) {
+		} else if (args.length == 4 && args[1].equals("channel_blacklist")) {
 			eb =
 				switch (args[2]) {
 					case "add" -> blacklistChannel(args[3]);
 					case "remove" -> unblacklistChannel(args[3]);
-					default -> errorEmbed("settings blacklist");
+					default -> errorEmbed("settings channel_blacklist");
 				};
-		} else if (args.length >= 3 && args[1].equals("guild") && args[2].equals("blacklist")) {
-			args = content.split("\\s+", 6);
-			if (args.length == 3) {
-				return displayApplyBlacklist();
-			} else if ((args.length >= 5) && args[3].equals("add")) {
-				eb = addApplyBlacklist(args[4], args.length == 6 ? args[5] : "not provided");
-			} else if (args.length == 5 && args[3].equals("remove")) {
-				eb = removeApplyBlacklist(args[4]);
-			} else if (args.length == 5) {
+		} else if (args.length >= 2 && args[1].equals("blacklist")) {
+			args = content.split("\\s+", 5);
+			if (args.length == 2) {
+				return displayPlayerBlacklist();
+			} else if ((args.length >= 4) && args[2].equals("add")) {
+				eb = addPlayerBlacklist(args[3], args.length == 5 ? args[4] : "not provided");
+			} else if (args.length == 4 && args[2].equals("remove")) {
+				eb = removePlayerBlacklist(args[3]);
+			} else if (args.length == 4) {
 				eb =
-					switch (args[3]) {
-						case "share" -> shareBlacklist(args[4]);
-						case "unshare" -> unshareBlacklist(args[4]);
-						case "use" -> useBlacklist(args[4]);
-						case "stop_using" -> stopUsingBlacklist(args[4]);
+					switch (args[2]) {
+						case "share" -> shareBlacklist(args[3]);
+						case "unshare" -> unshareBlacklist(args[3]);
+						case "use" -> useBlacklist(args[3]);
+						case "stop_using" -> stopUsingBlacklist(args[3]);
 						default -> null;
 					};
 			}
 
 			if (eb == null) {
-				eb = errorEmbed("settings guild blacklist");
+				eb = errorEmbed("settings blacklist");
 			}
 		} else if (args.length == 4 && args[1].equals("bot_manager")) {
 			if (args[2].equals("add")) {
@@ -606,7 +607,7 @@ public class SettingsExecute {
 	}
 
 	/* Apply Settings */
-	public EmbedBuilder removeApplyBlacklist(String username) {
+	public EmbedBuilder removePlayerBlacklist(String username) {
 		UsernameUuidStruct uuidStruct = usernameToUuid(username);
 		if (uuidStruct.isNotValid()) {
 			return invalidEmbed(uuidStruct.failCause());
@@ -634,7 +635,7 @@ public class SettingsExecute {
 		return invalidEmbed(uuidStruct.nameMcHyperLink() + " is not blacklisted");
 	}
 
-	public EmbedBuilder displayApplyBlacklist() {
+	public EmbedBuilder displayPlayerBlacklist() {
 		JsonElement blacklistSettings = getBlacklistSettings();
 		JsonArray currentBlacklist = higherDepth(blacklistSettings, "blacklist").getAsJsonArray();
 
@@ -671,7 +672,7 @@ public class SettingsExecute {
 		return null;
 	}
 
-	public EmbedBuilder addApplyBlacklist(String username, String reason) {
+	public EmbedBuilder addPlayerBlacklist(String username, String reason) {
 		UsernameUuidStruct uuidStruct = usernameToUuid(username);
 		if (uuidStruct.isNotValid()) {
 			return invalidEmbed(uuidStruct.failCause());
@@ -715,8 +716,8 @@ public class SettingsExecute {
 		JsonObject blacklistSettings = getBlacklistSettings();
 		JsonArray isUsing = higherDepth(blacklistSettings, "isUsing").getAsJsonArray();
 
-		if (isUsing.size() == 7) {
-			return invalidEmbed("You have reached the max number of shared blacklists (7/7)");
+		if (isUsing.size() == 6) {
+			return invalidEmbed("You have reached the max number of shared blacklists (6/6)");
 		}
 
 		if (streamJsonArray(isUsing).anyMatch(g -> g.getAsString().equals(serverId))) {
@@ -734,16 +735,25 @@ public class SettingsExecute {
 		if (responseCode != 200) {
 			return apiFailMessage(responseCode);
 		}
+		guildMap.get(guild.getId()).setIsUsing(isUsing);
 
 		return defaultSettingsEmbed("Using the blacklist of " + jda.getGuildById(serverId).getName());
 	}
 
 	public EmbedBuilder shareBlacklist(String serverId) {
+		Guild toShareGuild = null;
+		try{
+			toShareGuild = jda.getGuildById(serverId);
+		}catch (Exception ignored){}
+		if(toShareGuild == null){
+			return invalidEmbed("Invalid server id provided");
+		}
+
 		JsonObject blacklistSettings = getBlacklistSettings();
 		JsonArray canUse = higherDepth(blacklistSettings, "canUse").getAsJsonArray();
 
-		if (canUse.size() == 7) {
-			return invalidEmbed("You have reached the max number of shared blacklists (7/7)");
+		if (canUse.size() == 6) {
+			return invalidEmbed("You have reached the max number of shared blacklists (6/6)");
 		}
 
 		if (streamJsonArray(canUse).anyMatch(g -> g.getAsString().equals(serverId))) {
@@ -758,7 +768,7 @@ public class SettingsExecute {
 			return apiFailMessage(responseCode);
 		}
 
-		return defaultSettingsEmbed("Shared blacklist with " + jda.getGuildById(serverId).getName());
+		return defaultSettingsEmbed("Shared blacklist with " + toShareGuild.getName());
 	}
 
 	public EmbedBuilder unshareBlacklist(String serverId) {
@@ -769,13 +779,15 @@ public class SettingsExecute {
 			return invalidEmbed("You are not sharing the blacklist with the provided server");
 		}
 
-		for (int i = canUse.size() - 1; i >= 0; i--) {
-			if (canUse.get(i).getAsString().equals(serverId)) {
-				canUse.remove(i);
-			}
-		}
-
+		canUse.remove(new JsonPrimitive(serverId));
 		blacklistSettings.add("canUse", canUse);
+
+		JsonObject otherBlacklist = database.getBlacklistSettings(serverId).getAsJsonObject();
+		JsonArray isUsing = higherDepth(otherBlacklist, "isUsing").getAsJsonArray();
+		isUsing.remove(new JsonPrimitive(guild.getId()));
+		otherBlacklist.add("isUsing", isUsing);
+		database.setBlacklistSettings(serverId, otherBlacklist);
+		guildMap.get(serverId).setIsUsing(isUsing);
 
 		int responseCode = database.setBlacklistSettings(guild.getId(), blacklistSettings);
 		if (responseCode != 200) {
@@ -810,6 +822,7 @@ public class SettingsExecute {
 		if (responseCode != 200) {
 			return apiFailMessage(responseCode);
 		}
+		guildMap.get(serverId).setIsUsing(isUsing);
 
 		return defaultSettingsEmbed("Stopped using the blacklist of " + jda.getGuildById(serverId).getName());
 	}

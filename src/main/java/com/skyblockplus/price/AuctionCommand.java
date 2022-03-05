@@ -167,14 +167,14 @@ public class AuctionCommand extends Command {
 				extras.addButton(
 					Button.primary(
 						"track_auctions_stop_" + event.getUser().getId() + "_" + usernameUuidStruct.uuid(),
-						"Stop Tracking Player's Auctions"
+						"Stop Tracking Auctions"
 					)
 				);
 			} else {
 				extras.addButton(
 					Button.primary(
 						"track_auctions_start_" + event.getUser().getId() + "_" + usernameUuidStruct.uuid(),
-						"Track Player's Auctions"
+						"Track Auctions"
 					)
 				);
 			}

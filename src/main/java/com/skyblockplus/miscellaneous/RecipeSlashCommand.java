@@ -18,11 +18,9 @@
 
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.Utils.getLowestBinJson;
-
 import com.skyblockplus.utils.Utils;
-import com.skyblockplus.utils.slashcommand.SlashCommand;
-import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
+import com.skyblockplus.utils.command.SlashCommand;
+import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -44,7 +42,7 @@ public class RecipeSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return Commands.slash(name, "Get the recipe of an item").addOption(OptionType.STRING, "item", "Item name", true, true);
+		return Commands.slash(name, "Get the crafting recipe of an item").addOption(OptionType.STRING, "item", "Item name", true, true);
 	}
 
 	@Override

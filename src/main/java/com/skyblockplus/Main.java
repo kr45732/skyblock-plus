@@ -46,7 +46,7 @@ import com.skyblockplus.inventory.*;
 import com.skyblockplus.miscellaneous.*;
 import com.skyblockplus.miscellaneous.networth.NetworthCommand;
 import com.skyblockplus.miscellaneous.networth.NetworthSlashCommand;
-import com.skyblockplus.miscellaneous.weight.BingoSlashCommand;
+import com.skyblockplus.miscellaneous.BingoSlashCommand;
 import com.skyblockplus.miscellaneous.weight.WeightCommand;
 import com.skyblockplus.miscellaneous.weight.WeightSlashCommand;
 import com.skyblockplus.price.*;
@@ -54,13 +54,10 @@ import com.skyblockplus.settings.*;
 import com.skyblockplus.skills.*;
 import com.skyblockplus.slayer.SlayerCommand;
 import com.skyblockplus.slayer.SlayerSlashCommand;
-import com.skyblockplus.utils.ApiHandler;
-import com.skyblockplus.utils.AuctionFlipper;
-import com.skyblockplus.utils.Constants;
-import com.skyblockplus.utils.Utils;
+import com.skyblockplus.utils.*;
 import com.skyblockplus.utils.exceptionhandler.ExceptionEventListener;
 import com.skyblockplus.utils.exceptionhandler.GlobalExceptionHandler;
-import com.skyblockplus.utils.slashcommand.SlashCommandClient;
+import com.skyblockplus.utils.command.SlashCommandClient;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -165,7 +162,6 @@ public class Main {
 					new CakesCommand(),
 					new ActiveCoinsCommand(),
 					new HotmCommand(),
-					new VoteCommand(),
 					new SkyblockCommand(),
 					new GuildStatisticsCommand(),
 					new PartyCommand(),
@@ -189,7 +185,6 @@ public class Main {
 				.setOwnerId("385939031596466176")
 				.addCommands(
 					new InviteSlashCommand(),
-					new VoteSlashCommand(),
 					new HotmSlashCommand(),
 					new InformationSlashCommand(),
 					new LinkSlashCommand(),

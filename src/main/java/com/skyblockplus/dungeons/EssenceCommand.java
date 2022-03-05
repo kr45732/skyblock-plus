@@ -138,7 +138,7 @@ public class EssenceCommand extends Command {
 
 					JsonElement itemJson = higherDepth(getEssenceCostsJson(), itemId);
 					if (itemJson != null) {
-						new EssenceWaiter(itemId, itemJson, ebMessage, event.getAuthor());
+						new EssenceHandler(itemId, itemJson, ebMessage, event.getAuthor());
 					} else {
 						embed(invalidEmbed("Invalid item name"));
 					}

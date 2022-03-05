@@ -19,7 +19,6 @@
 package com.skyblockplus.utils.command;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;

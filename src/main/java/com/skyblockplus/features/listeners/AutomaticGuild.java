@@ -100,7 +100,6 @@ public class AutomaticGuild {
 
 	/* Apply */
 	public final List<ApplyGuild> applyGuild = new ArrayList<>();
-	public JsonArray blacklist = new JsonArray();
 	public Role applyGuestRole = null;
 	/* Verify */
 	public VerifyGuild verifyGuild;
@@ -128,6 +127,8 @@ public class AutomaticGuild {
 	public String prefix;
 	public TextChannel logChannel = null;
 	public List<MessageEmbed> logQueue = new ArrayList<>();
+	public JsonArray blacklist = new JsonArray();
+	public List<String> isUsing = new ArrayList<>();
 
 	/* Constructor */
 	public AutomaticGuild(GenericGuildEvent event) {
@@ -141,6 +142,7 @@ public class AutomaticGuild {
 		jacobGuild = new JacobGuild(guildId, higherDepth(serverSettings, "jacobSettings"));
 		try {
 			blacklist = higherDepth(serverSettings, "blacklist.blacklist").getAsJsonArray();
+			setIsUsing(higherDepth(blacklist, "isUsing").getAsJsonArray());
 		} catch (Exception ignored) {}
 		try {
 			fetchurChannel = event.getGuild().getTextChannelById(higherDepth(serverSettings, "fetchurChannel", null));
@@ -453,12 +455,12 @@ public class AutomaticGuild {
 					guildSettings
 						.stream()
 						.filter(curSettings ->
-							curSettings.getGuildMemberRoleEnable().equalsIgnoreCase("true") ||
-								curSettings.getGuildRanksEnable().equalsIgnoreCase("true")
+							curSettings.getGuildMemberRoleEnable().equals("true") ||
+								curSettings.getGuildRanksEnable().equals("true")
 								? (roleOrRankEnabled[0] = true)
 								: (
 									curSettings.getGuildCounterEnable() != null &&
-									!curSettings.getGuildCounterEnable().equalsIgnoreCase("false")
+									!curSettings.getGuildCounterEnable().equals("false")
 								)
 						)
 						.collect(Collectors.toList());
@@ -467,6 +469,8 @@ public class AutomaticGuild {
 					return;
 				}
 			}
+
+			JsonArray blacklist = guildMap.get(guildId).getBlacklist();
 
 			List<Member> inGuildUsers = new ArrayList<>();
 			Map<String, LinkedAccount> discordToUuid = new HashMap<>();
@@ -617,14 +621,16 @@ public class AutomaticGuild {
 								nicknameTemplate = nicknameTemplate.replace(matcher.group(0), "");
 							}
 
-							linkedMember.modifyNickname(nicknameTemplate).queue(ignore, ignore);
+							if(streamJsonArray(blacklist).noneMatch(u -> higherDepth(u, "uuid").getAsString().equals(linkedAccount.uuid()))) {
+								linkedMember.modifyNickname(nicknameTemplate).queue(ignore, ignore);
+							}
 						}
 					}
 
 					if (!toAddRoles.isEmpty() || !toRemoveRoles.isEmpty()) {
 						memberToRoleChanges.put(
 							linkedMember,
-							memberToRoleChanges.getOrDefault(linkedMember, new RoleModifyRecord()).update(toAddRoles, toRemoveRoles)
+							memberToRoleChanges.getOrDefault(linkedMember, new RoleModifyRecord( discordToUuid.get(linkedMember.getId()).uuid())).update(toAddRoles, toRemoveRoles)
 						);
 					}
 				}
@@ -698,7 +704,7 @@ public class AutomaticGuild {
 							if (!rolesToAdd.isEmpty() || !rolesToRemove.isEmpty()) {
 								memberToRoleChanges.put(
 									linkedMember,
-									memberToRoleChanges.getOrDefault(linkedMember, new RoleModifyRecord()).update(rolesToAdd, rolesToRemove)
+									memberToRoleChanges.getOrDefault(linkedMember, new RoleModifyRecord(discordToUuid.get(linkedMember.getId()).uuid())).update(rolesToAdd, rolesToRemove)
 								);
 							}
 							memberCountList.add(linkedMember.getId());
@@ -736,7 +742,9 @@ public class AutomaticGuild {
 			}
 
 			for (Map.Entry<Member, RoleModifyRecord> entry : memberToRoleChanges.entrySet()) {
-				guild.modifyMemberRoles(entry.getKey(), entry.getValue().add(), entry.getValue().remove()).queue();
+				if (streamJsonArray(blacklist).noneMatch(u -> higherDepth(u, "uuid").getAsString().equals(entry.getValue().uuid()))) {
+					guild.modifyMemberRoles(entry.getKey(), entry.getValue().add(), entry.getValue().remove()).queue();
+				}
 			}
 
 			logCommand(
@@ -951,7 +959,7 @@ public class AutomaticGuild {
 								ActionRow updatedButton = ActionRow.of(
 									Button.primary(
 										"track_auctions_stop_" + event.getUser().getId() + "_" + discordUuidSplit[1],
-										"Stop Tracking Player's Auctions"
+										"Stop Tracking Auctions"
 									)
 								);
 								(
@@ -967,7 +975,7 @@ public class AutomaticGuild {
 								ActionRow updatedButton = ActionRow.of(
 									Button.primary(
 										"track_auctions_start_" + event.getUser().getId() + "_" + discordUuidSplit[1],
-										"Track Player's Auctions"
+										"Track Auctions"
 									)
 								);
 								(
@@ -1012,7 +1020,7 @@ public class AutomaticGuild {
 					if (event.getComponentId().equals("event_message_join")) {
 						event
 							.getHook()
-							.editOriginalEmbeds(SkyblockEventCommand.joinSkyblockEvent(new String[0], event.getMember()).build())
+							.editOriginalEmbeds(SkyblockEventCommand.joinSkyblockEvent(null, event.getMember()).build())
 							.queue();
 					} else {
 						EmbedBuilder eb = SkyblockEventCommand.getEventLeaderboard(event);
@@ -1302,5 +1310,18 @@ public class AutomaticGuild {
 	public void setChannelBlacklist(List<String> channelBlacklist) {
 		this.channelBlacklist.clear();
 		this.channelBlacklist.addAll(channelBlacklist);
+	}
+
+	public void setIsUsing(JsonArray arr){
+		isUsing = streamJsonArray(arr).map(JsonElement::getAsString).collect(Collectors.toList());
+	}
+
+	public JsonArray getBlacklist(){
+		JsonArray currentBlacklist =  new JsonArray();
+		currentBlacklist.addAll(blacklist);
+		for (String g : isUsing) {
+			currentBlacklist.addAll(guildMap.get(g).blacklist);
+		}
+		return currentBlacklist;
 	}
 }

@@ -19,8 +19,8 @@
 package com.skyblockplus.inventory;
 
 import com.skyblockplus.utils.command.PaginatorEvent;
-import com.skyblockplus.utils.slashcommand.SlashCommand;
-import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
+import com.skyblockplus.utils.command.SlashCommand;
+import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -43,11 +43,10 @@ public class WardrobeSlashCommand extends SlashCommand {
 
 		switch (event.getSubcommandName()) {
 			case "list" -> event.paginate(
-				WardrobeCommand.getPlayerWardrobeList(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)),
-				true
+				WardrobeCommand.getPlayerWardrobeList(event.player, event.getOptionStr("profile"), new PaginatorEvent(event))
 			);
 			case "emoji" -> event.paginate(
-				WardrobeCommand.getPlayerWardrobe(event.player, event.getOptionStr("profile"), new PaginatorEvent(event))
+				WardrobeCommand.getPlayerWardrobe(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)), true
 			);
 			default -> event.embed(event.invalidCommandMessage());
 		}

@@ -488,7 +488,7 @@ public class SkyblockEventCommand extends Command {
 		}
 	}
 
-	public static EmbedBuilder joinSkyblockEvent(String[] args, Member member) {
+	public static EmbedBuilder joinSkyblockEvent(String profile, Member member) {
 		if (database.getSkyblockEventActive(member.getGuild().getId())) {
 			LinkedAccount linkedAccount = database.getByDiscord(member.getId());
 			if (linkedAccount != null) {
@@ -514,7 +514,7 @@ public class SkyblockEventCommand extends Command {
 					return invalidEmbed("You must have the <@&" + requiredRole + "> role to join this event");
 				}
 
-				Player player = args.length == 3 ? new Player(username, args[2]) : new Player(username);
+				Player player = profile != null ? new Player(username, profile) : new Player(username);
 
 				if (player.isValid()) {
 					try {
@@ -748,7 +748,7 @@ public class SkyblockEventCommand extends Command {
 							return;
 						}
 						case "join" -> {
-							embed(joinSkyblockEvent(args, event.getMember()));
+							embed(joinSkyblockEvent(args.length == 3 ? args[2] :  null, event.getMember()));
 							return;
 						}
 						case "leave" -> {

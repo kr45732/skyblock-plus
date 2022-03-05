@@ -23,9 +23,9 @@ import java.util.List;
 import java.util.Objects;
 import net.dv8tion.jda.api.entities.Role;
 
-public record RoleModifyRecord(List<Role> add, List<Role> remove) {
-	public RoleModifyRecord() {
-		this(new ArrayList<>(), new ArrayList<>());
+public record RoleModifyRecord(List<Role> add, List<Role> remove, String uuid) {
+	public RoleModifyRecord(String uuid) {
+		this(new ArrayList<>(), new ArrayList<>(), uuid);
 	}
 
 	public RoleModifyRecord update(List<Role> add, List<Role> remove) {

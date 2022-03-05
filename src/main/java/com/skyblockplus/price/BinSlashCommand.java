@@ -21,8 +21,8 @@ package com.skyblockplus.price;
 import static com.skyblockplus.utils.Utils.getLowestBinJson;
 
 import com.skyblockplus.utils.Utils;
-import com.skyblockplus.utils.slashcommand.SlashCommand;
-import com.skyblockplus.utils.slashcommand.SlashCommandEvent;
+import com.skyblockplus.utils.command.SlashCommand;
+import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.interactions.commands.OptionType;

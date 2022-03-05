@@ -126,16 +126,9 @@ public class ApplyGuild {
 			);
 		}
 
-		JsonElement blacklistSettings = database.getBlacklistSettings(event.getGuild().getId());
-		JsonArray currentBlacklist = higherDepth(blacklistSettings, "blacklist").getAsJsonArray();
-		streamJsonArray(higherDepth(blacklistSettings, "isUsing").getAsJsonArray())
-			.map(g -> guildMap.get(g.getAsString()).blacklist)
-			.forEach(currentBlacklist::addAll);
+		JsonArray currentBlacklist = guildMap.get(event.getGuild().getId()).getBlacklist();
 		JsonElement blacklisted = streamJsonArray(currentBlacklist)
-			.filter(blacklist ->
-				higherDepth(blacklist, "uuid").getAsString().equals(linkedAccount.uuid()) ||
-				higherDepth(blacklist, "username").getAsString().equals(linkedAccount.username())
-			)
+			.filter(blacklist -> higherDepth(blacklist, "uuid").getAsString().equals(linkedAccount.uuid()))
 			.findFirst()
 			.orElse(null);
 		if (blacklisted != null) {
