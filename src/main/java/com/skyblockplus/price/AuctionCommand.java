@@ -172,10 +172,7 @@ public class AuctionCommand extends Command {
 				);
 			} else {
 				extras.addButton(
-					Button.primary(
-						"track_auctions_start_" + event.getUser().getId() + "_" + usernameUuidStruct.uuid(),
-						"Track Auctions"
-					)
+					Button.primary("track_auctions_start_" + event.getUser().getId() + "_" + usernameUuidStruct.uuid(), "Track Auctions")
 				);
 			}
 

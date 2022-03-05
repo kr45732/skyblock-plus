@@ -748,7 +748,7 @@ public class SkyblockEventCommand extends Command {
 							return;
 						}
 						case "join" -> {
-							embed(joinSkyblockEvent(args.length == 3 ? args[2] :  null, event.getMember()));
+							embed(joinSkyblockEvent(args.length == 3 ? args[2] : null, event.getMember()));
 							return;
 						}
 						case "leave" -> {

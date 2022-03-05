@@ -179,14 +179,14 @@ public class HelpCommand extends Command {
 					.addAliases("g-ranks", "g-rank")
 					.addExamples("guild-ranks u:CrypticPlasma")
 					.setCategory("guild"),
-					new HelpData(
-							"guild-statistics",
-							"Get Get a guild's SkyBlock statistics of slayer, skills, catacombs, and weight. Requires a Hypixel API key to be set.",
-							"guild-statistics <u:player>"
-					)
-							.addAliases("guild-stats", "g-stats")
-							.addExamples("guild-stats u:CrypticPlasma")
-							.setCategory("guild"),
+				new HelpData(
+					"guild-statistics",
+					"Get Get a guild's SkyBlock statistics of slayer, skills, catacombs, and weight. Requires a Hypixel API key to be set.",
+					"guild-statistics <u:player>"
+				)
+					.addAliases("guild-stats", "g-stats")
+					.addExamples("guild-stats u:CrypticPlasma")
+					.setCategory("guild"),
 				// Auctions
 				new HelpData(
 					"auctions",
@@ -252,9 +252,9 @@ public class HelpCommand extends Command {
 					.addAliases("ec", "echest")
 					.addExamples("enderchest CrypticPlasma", "enderchest CrypticPlasma Zucchini")
 					.setCategory("inventory"),
-					new HelpData("storage", "Get a player's storage represented in emojis.", "storage [player] [profile]")
-							.addExamples("storage CrypticPlasma", "storage CrypticPlasma Zucchini")
-							.setCategory("inventory"),
+				new HelpData("storage", "Get a player's storage represented in emojis.", "storage [player] [profile]")
+					.addExamples("storage CrypticPlasma", "storage CrypticPlasma Zucchini")
+					.setCategory("inventory"),
 				new HelpData("talisman", "Get a player's talisman bag represented in emojis.", "talisman [player] [profile]")
 					.addSecondData("Get a player's talisman bag with lore.", "talisman [player] [profile] <slot:number>")
 					.addExamples(
@@ -358,8 +358,16 @@ public class HelpCommand extends Command {
 					.setCategory("miscellaneous"),
 				new HelpData("fetchur", "Get the item that fetchur wants today.").setCategory("miscellaneous"),
 				new HelpData("mayor", "Get the current mayor and their perks.").setCategory("miscellaneous"),
-				new HelpData("calcruns", "Calculate the number of runs needed to reach a certain catacombs level. The floor can be from F1 to F7 or M1 to M6.").setCategory("miscellaneous"),
-				new HelpData("leaderboard", "Get a global leaderboard. The type can be slayer, skills, catacombs, weight, sven, rev, tara, enderman, alchemy, combat, fishing, farming, foraging, carpentry, mining, taming, and enchanting. The mode can be all, ironman, or stranded.").setCategory("miscellaneous"),
+				new HelpData(
+					"calcruns",
+					"Calculate the number of runs needed to reach a certain catacombs level. The floor can be from F1 to F7 or M1 to M6."
+				)
+					.setCategory("miscellaneous"),
+				new HelpData(
+					"leaderboard",
+					"Get a global leaderboard. The type can be slayer, skills, catacombs, weight, sven, rev, tara, enderman, alchemy, combat, fishing, farming, foraging, carpentry, mining, taming, and enchanting. The mode can be all, ironman, or stranded."
+				)
+					.setCategory("miscellaneous"),
 				new HelpData("bingo", "Get the current bingo goals and a player's live bingo card.").setCategory("miscellaneous"),
 				new HelpData("recipe", "Get the crafting recipe of an item.").setCategory("miscellaneous"),
 				new HelpData("time", "Get the current year, date, and time in Skyblock").setCategory("miscellaneous"),
@@ -453,31 +461,27 @@ public class HelpCommand extends Command {
 								),
 								new HelpData("remove", "Remove a bot manager role.", "remove <@role>")
 							),
-							new HelpData("channel_blacklist", "Blacklisted command channels.")
-									.addSubcommands(
-											new HelpData(
-													"add",
-													"Blacklist a channel from be able to run bot commands in it.",
-													"add <#channel>"
-											),
-											new HelpData("remove", "Unblacklist a channel", "remove <#channel>")
-									),
-							new HelpData("blacklist", "View or manage the application blacklist for this server.")
-									.addSecondData(
-											"Get a list of all the blacklisted players on this server with the reasons and namemc links.",
-											"blacklist"
-									)
-									.addSubcommands(
-											new HelpData(
-													"add",
-													"Add a player to the blacklist. Reason will default to 'not provided' if not set.",
-													"add <player> [reason]"
-											),
-											new HelpData("share", "Share your blacklist with another server.", "share <server_id>"),
-											new HelpData("unshare", "Stop sharing your blacklist with another server.", "unshare <server_id>"),
-											new HelpData("use", "Use a shared blacklist from another server.", "use <server_id>"),
-											new HelpData("stop_using", "Stop using a shared blacklist from another server.", "stop_using <server_id>")
-									),
+						new HelpData("channel_blacklist", "Blacklisted command channels.")
+							.addSubcommands(
+								new HelpData("add", "Blacklist a channel from be able to run bot commands in it.", "add <#channel>"),
+								new HelpData("remove", "Unblacklist a channel", "remove <#channel>")
+							),
+						new HelpData("blacklist", "View or manage the application blacklist for this server.")
+							.addSecondData(
+								"Get a list of all the blacklisted players on this server with the reasons and namemc links.",
+								"blacklist"
+							)
+							.addSubcommands(
+								new HelpData(
+									"add",
+									"Add a player to the blacklist. Reason will default to 'not provided' if not set.",
+									"add <player> [reason]"
+								),
+								new HelpData("share", "Share your blacklist with another server.", "share <server_id>"),
+								new HelpData("unshare", "Stop sharing your blacklist with another server.", "unshare <server_id>"),
+								new HelpData("use", "Use a shared blacklist from another server.", "use <server_id>"),
+								new HelpData("stop_using", "Stop using a shared blacklist from another server.", "stop_using <server_id>")
+							),
 						new HelpData("jacob", "Main command for jacob event settings.")
 							.addSecondData("Get the current farming event settings for the bot.", "jacob")
 							.addSubcommands(
@@ -535,14 +539,14 @@ public class HelpCommand extends Command {
 										),
 										new HelpData("false", "Disable verification automatic sync")
 									),
-		new HelpData("roles_claim", "Enable or disable automatic roles sync")
-				.addSubcommands(
-						new HelpData(
-								"enable",
-								"Enable automatic roles sync. This is the same as running the roles claim command on joining/linking/verifying"
-						),
-						new HelpData("disable", "Disable automatic roles sync")
-				)
+								new HelpData("roles_claim", "Enable or disable automatic roles sync")
+									.addSubcommands(
+										new HelpData(
+											"enable",
+											"Enable automatic roles sync. This is the same as running the roles claim command on joining/linking/verifying"
+										),
+										new HelpData("disable", "Disable automatic roles sync")
+									)
 							),
 						new HelpData("roles", "Main command for automatic roles settings.")
 							.addSecondData("Get the current roles settings for the bot.", "roles")
@@ -787,10 +791,7 @@ public class HelpCommand extends Command {
 				"g-ranks <u:player> [mode:normal|ironman|stranded]",
 				"A customizable helper that will tell you who to promote or demote in your Hypixel guild"
 			) +
-			help.create(
-					"g-stats <u:player>",
-					"Get a guild's SkyBlock statistics of slayer, skills, catacombs, and weight"
-			)
+			help.create("g-stats <u:player>", "Get a guild's SkyBlock statistics of slayer, skills, catacombs, and weight")
 		);
 
 		paginateBuilder.addItems(
@@ -848,7 +849,7 @@ public class HelpCommand extends Command {
 			help.create("jacob", "Get the upcoming contests and their crops") +
 			help.create("calcruns", "Calculate the number of runs needed to reach a certain catacombs level") +
 			help.create("mayor", "Get information about the current mayor or the running election") +
-			help.create("bingo", "Get the current bingo goals and a player's bingo card")  +
+			help.create("bingo", "Get the current bingo goals and a player's bingo card") +
 			help.create("leaderboard", "Get a global leaderboard") +
 			help.create("recipe", "Get the crafting recipe of an item")
 		);
@@ -900,10 +901,7 @@ public class HelpCommand extends Command {
 			help.create("settings channel_blacklist add <#channel>", "Blacklist a channel from running bot commands") +
 			help.create("settings channel_blacklist remove <#channel>", "Unblacklist a channel from running bot commands") +
 			help.create("fix-application <#channel> <state>", "Fix an application") +
-			help.create(
-					"settings blacklist add <player> [reason]",
-					"Blacklist a player from using the application system on this server"
-			) +
+			help.create("settings blacklist add <player> [reason]", "Blacklist a player from using the application system on this server") +
 			help.create("settings blacklist remove <player>", "Remove a player from the blacklist") +
 			help.create("settings blacklist", "List all players that are blacklisted") +
 			help.create("settings blacklist share <server_id>", "Share your blacklist with another server") +

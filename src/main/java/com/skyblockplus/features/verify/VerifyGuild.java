@@ -94,7 +94,10 @@ public class VerifyGuild {
 			return;
 		}
 
-		if(streamJsonArray(guildMap.get(event.getGuild().getId()).getBlacklist()).anyMatch(blacklist -> higherDepth(blacklist, "uuid").getAsString().equals(linkedUser.uuid()))){
+		if (
+			streamJsonArray(guildMap.get(event.getGuild().getId()).getBlacklist())
+				.anyMatch(blacklist -> higherDepth(blacklist, "uuid").getAsString().equals(linkedUser.uuid()))
+		) {
 			return;
 		}
 

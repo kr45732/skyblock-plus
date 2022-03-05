@@ -455,13 +455,9 @@ public class AutomaticGuild {
 					guildSettings
 						.stream()
 						.filter(curSettings ->
-							curSettings.getGuildMemberRoleEnable().equals("true") ||
-								curSettings.getGuildRanksEnable().equals("true")
+							curSettings.getGuildMemberRoleEnable().equals("true") || curSettings.getGuildRanksEnable().equals("true")
 								? (roleOrRankEnabled[0] = true)
-								: (
-									curSettings.getGuildCounterEnable() != null &&
-									!curSettings.getGuildCounterEnable().equals("false")
-								)
+								: (curSettings.getGuildCounterEnable() != null && !curSettings.getGuildCounterEnable().equals("false"))
 						)
 						.collect(Collectors.toList());
 
@@ -621,7 +617,9 @@ public class AutomaticGuild {
 								nicknameTemplate = nicknameTemplate.replace(matcher.group(0), "");
 							}
 
-							if(streamJsonArray(blacklist).noneMatch(u -> higherDepth(u, "uuid").getAsString().equals(linkedAccount.uuid()))) {
+							if (
+								streamJsonArray(blacklist).noneMatch(u -> higherDepth(u, "uuid").getAsString().equals(linkedAccount.uuid()))
+							) {
 								linkedMember.modifyNickname(nicknameTemplate).queue(ignore, ignore);
 							}
 						}
@@ -630,7 +628,9 @@ public class AutomaticGuild {
 					if (!toAddRoles.isEmpty() || !toRemoveRoles.isEmpty()) {
 						memberToRoleChanges.put(
 							linkedMember,
-							memberToRoleChanges.getOrDefault(linkedMember, new RoleModifyRecord( discordToUuid.get(linkedMember.getId()).uuid())).update(toAddRoles, toRemoveRoles)
+							memberToRoleChanges
+								.getOrDefault(linkedMember, new RoleModifyRecord(discordToUuid.get(linkedMember.getId()).uuid()))
+								.update(toAddRoles, toRemoveRoles)
 						);
 					}
 				}
@@ -704,7 +704,9 @@ public class AutomaticGuild {
 							if (!rolesToAdd.isEmpty() || !rolesToRemove.isEmpty()) {
 								memberToRoleChanges.put(
 									linkedMember,
-									memberToRoleChanges.getOrDefault(linkedMember, new RoleModifyRecord(discordToUuid.get(linkedMember.getId()).uuid())).update(rolesToAdd, rolesToRemove)
+									memberToRoleChanges
+										.getOrDefault(linkedMember, new RoleModifyRecord(discordToUuid.get(linkedMember.getId()).uuid()))
+										.update(rolesToAdd, rolesToRemove)
 								);
 							}
 							memberCountList.add(linkedMember.getId());
@@ -1018,10 +1020,7 @@ public class AutomaticGuild {
 				.deferReply(true)
 				.queue(ignored -> {
 					if (event.getComponentId().equals("event_message_join")) {
-						event
-							.getHook()
-							.editOriginalEmbeds(SkyblockEventCommand.joinSkyblockEvent(null, event.getMember()).build())
-							.queue();
+						event.getHook().editOriginalEmbeds(SkyblockEventCommand.joinSkyblockEvent(null, event.getMember()).build()).queue();
 					} else {
 						EmbedBuilder eb = SkyblockEventCommand.getEventLeaderboard(event);
 						if (eb != null) {
@@ -1312,12 +1311,12 @@ public class AutomaticGuild {
 		this.channelBlacklist.addAll(channelBlacklist);
 	}
 
-	public void setIsUsing(JsonArray arr){
+	public void setIsUsing(JsonArray arr) {
 		isUsing = streamJsonArray(arr).map(JsonElement::getAsString).collect(Collectors.toList());
 	}
 
-	public JsonArray getBlacklist(){
-		JsonArray currentBlacklist =  new JsonArray();
+	public JsonArray getBlacklist() {
+		JsonArray currentBlacklist = new JsonArray();
 		currentBlacklist.addAll(blacklist);
 		for (String g : isUsing) {
 			currentBlacklist.addAll(guildMap.get(g).blacklist);

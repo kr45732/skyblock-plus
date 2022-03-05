@@ -742,10 +742,10 @@ public class SettingsExecute {
 
 	public EmbedBuilder shareBlacklist(String serverId) {
 		Guild toShareGuild = null;
-		try{
+		try {
 			toShareGuild = jda.getGuildById(serverId);
-		}catch (Exception ignored){}
-		if(toShareGuild == null){
+		} catch (Exception ignored) {}
+		if (toShareGuild == null) {
 			return invalidEmbed("Invalid server id provided");
 		}
 

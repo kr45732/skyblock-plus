@@ -46,7 +46,8 @@ public class WardrobeSlashCommand extends SlashCommand {
 				WardrobeCommand.getPlayerWardrobeList(event.player, event.getOptionStr("profile"), new PaginatorEvent(event))
 			);
 			case "emoji" -> event.paginate(
-				WardrobeCommand.getPlayerWardrobe(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)), true
+				WardrobeCommand.getPlayerWardrobe(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)),
+				true
 			);
 			default -> event.embed(event.invalidCommandMessage());
 		}

@@ -75,10 +75,10 @@ public class LinkCommand extends Command {
 
 		if (database.insertLinkedAccount(toAdd)) {
 			JsonElement blacklisted = streamJsonArray(guildMap.get(guild.getId()).getBlacklist())
-						.filter(blacklist -> higherDepth(blacklist, "uuid").getAsString().equals(toAdd.uuid()))
-						.findFirst()
-						.orElse(null);
-			if(blacklisted != null){
+				.filter(blacklist -> higherDepth(blacklist, "uuid").getAsString().equals(toAdd.uuid()))
+				.findFirst()
+				.orElse(null);
+			if (blacklisted != null) {
 				return invalidEmbed("You have been blacklisted with reason `" + higherDepth(blacklisted, "reason").getAsString() + "`");
 			}
 

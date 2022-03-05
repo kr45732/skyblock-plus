@@ -89,7 +89,7 @@ public class SkyblockEventSlashCommand extends SlashCommand {
 				new SubcommandData("create", "Interactive message to create a Skyblock event"),
 				new SubcommandData("end", "Force end the event"),
 				new SubcommandData("current", "Get information about the current event"),
-				new SubcommandData("join", "Join the current event")	.addOption(OptionType.STRING, "profile", "Profile name"),
+				new SubcommandData("join", "Join the current event").addOption(OptionType.STRING, "profile", "Profile name"),
 				new SubcommandData("leave", "Leave the current event"),
 				new SubcommandData("cancel", "Cancel the event"),
 				new SubcommandData("leaderboard", "Get the leaderboard for current event")
