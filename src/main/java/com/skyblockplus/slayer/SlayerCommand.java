@@ -105,11 +105,11 @@ public class SlayerCommand extends Command {
 				endermanFourKills;
 
 			long coinsSpentOnSlayers =
-					2000L *
+				2000L *
 				(svenOneKills + revOneKills + taraOneKills + endermanOneKills) +
-						7500L *
+				7500L *
 				(svenTwoKills + revTwoKills + taraTwoKills + endermanTwoKills) +
-						20000L *
+				20000L *
 				(svenThreeKills + revThreeKills + taraThreeKills + endermanThreeKills) +
 				50000L *
 				(svenFourKills + revFourKills + taraFourKills + endermanFourKills) +

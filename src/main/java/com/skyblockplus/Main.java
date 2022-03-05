@@ -178,7 +178,8 @@ public class Main {
 					new RecipeCommand(),
 					new StorageCommand(),
 					new CalcRunsCommand(),
-					new BingoCommand(), new CalcSlayerCommand()
+					new BingoCommand(),
+					new CalcSlayerCommand()
 				)
 				.build();
 
@@ -246,7 +247,8 @@ public class Main {
 					new RecipeSlashCommand(),
 					new StorageSlashCommand(),
 					new CalcRunsSlashCommand(),
-					new BingoSlashCommand(), new CalcSlayerSlashCommand()
+					new BingoSlashCommand(),
+					new CalcSlayerSlashCommand()
 				);
 
 		allServerSettings =

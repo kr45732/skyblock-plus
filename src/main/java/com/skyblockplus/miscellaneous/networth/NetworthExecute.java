@@ -1370,10 +1370,7 @@ public class NetworthExecute {
 
 				for (JsonElement itemPrice : sbzPrices) {
 					String itemName = higherDepth(itemPrice, "name").getAsString();
-					if (
-						itemName.equalsIgnoreCase(itemId) ||
-						itemName.equalsIgnoreCase(iName.replace(" ", "_"))
-					) {
+					if (itemName.equalsIgnoreCase(itemId) || itemName.equalsIgnoreCase(iName.replace(" ", "_"))) {
 						return Math.max(higherDepth(itemPrice, "low").getAsDouble(), 0);
 					}
 				}

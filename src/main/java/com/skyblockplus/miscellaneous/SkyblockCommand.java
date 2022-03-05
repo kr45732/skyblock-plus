@@ -163,16 +163,16 @@ public class SkyblockCommand extends Command {
 				"\n**Tier 4:** " +
 				endermanFourKills;
 			long coinsSpentOnSlayers =
-					2000L *
-							(svenOneKills + revOneKills + taraOneKills + endermanOneKills) +
-							7500L *
-									(svenTwoKills + revTwoKills + taraTwoKills + endermanTwoKills) +
-							20000L *
-									(svenThreeKills + revThreeKills + taraThreeKills + endermanThreeKills) +
-							50000L *
-									(svenFourKills + revFourKills + taraFourKills + endermanFourKills) +
-							100000L *
-									revFiveKills;
+				2000L *
+				(svenOneKills + revOneKills + taraOneKills + endermanOneKills) +
+				7500L *
+				(svenTwoKills + revTwoKills + taraTwoKills + endermanTwoKills) +
+				20000L *
+				(svenThreeKills + revThreeKills + taraThreeKills + endermanThreeKills) +
+				50000L *
+				(svenFourKills + revFourKills + taraFourKills + endermanFourKills) +
+				100000L *
+				revFiveKills;
 			eb.setDescription(
 				"**Total slayer:** " +
 				formatNumber(player.getTotalSlayer()) +

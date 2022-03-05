@@ -45,7 +45,7 @@ public class CalcSlayerSlashCommand extends SlashCommand {
 			CalcSlayerCommand.getCalcSlayer(
 				event.player,
 				event.getOptionStr("profile"),
-					event.getOptionStr("type"),
+				event.getOptionStr("type"),
 				event.getOptionInt("level", -1),
 				event.getOptionInt("xp", -1)
 			)
@@ -62,8 +62,8 @@ public class CalcSlayerSlashCommand extends SlashCommand {
 					.addChoice("Revenant horror", "rev")
 					.addChoice("Tarantula broodfather", "tara")
 					.addChoice("Voidgloom seraph", "enderman"),
-		new OptionData(OptionType.INTEGER, "level", "Target slayer level").setRequiredRange(1, 9),
-					new OptionData(OptionType.INTEGER, "xp", "Target slayer xp").setMinValue(1)
+				new OptionData(OptionType.INTEGER, "level", "Target slayer level").setRequiredRange(1, 9),
+				new OptionData(OptionType.INTEGER, "xp", "Target slayer xp").setMinValue(1)
 			)
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 			.addOption(OptionType.STRING, "profile", "Profile name");
