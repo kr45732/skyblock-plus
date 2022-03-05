@@ -1372,8 +1372,7 @@ public class NetworthExecute {
 					String itemName = higherDepth(itemPrice, "name").getAsString();
 					if (
 						itemName.equalsIgnoreCase(itemId) ||
-						itemName.equalsIgnoreCase(itemId.toLowerCase().replace(" ", "_")) ||
-						itemName.equalsIgnoreCase(iName.toLowerCase().replace(" ", "_"))
+						itemName.equalsIgnoreCase(iName.replace(" ", "_"))
 					) {
 						return Math.max(higherDepth(itemPrice, "low").getAsDouble(), 0);
 					}

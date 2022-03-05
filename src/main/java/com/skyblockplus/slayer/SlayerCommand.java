@@ -105,24 +105,16 @@ public class SlayerCommand extends Command {
 				endermanFourKills;
 
 			long coinsSpentOnSlayers =
-				100L *
-				(svenOneKills + revOneKills + taraOneKills) +
-				2000L *
-				(svenTwoKills + revTwoKills + taraTwoKills) +
-				10000L *
-				(svenThreeKills + revThreeKills + taraThreeKills) +
+					2000L *
+				(svenOneKills + revOneKills + taraOneKills + endermanOneKills) +
+						7500L *
+				(svenTwoKills + revTwoKills + taraTwoKills + endermanTwoKills) +
+						20000L *
+				(svenThreeKills + revThreeKills + taraThreeKills + endermanThreeKills) +
 				50000L *
-				(svenFourKills + revFourKills + taraFourKills) +
+				(svenFourKills + revFourKills + taraFourKills + endermanFourKills) +
 				100000L *
-				revFiveKills +
-				2000L *
-				endermanOneKills +
-				7500L *
-				endermanTwoKills +
-				20000L *
-				endermanThreeKills +
-				50000L *
-				endermanFourKills;
+				revFiveKills;
 			eb.setDescription(
 				"**Total Slayer:** " +
 				formatNumber(player.getTotalSlayer()) +

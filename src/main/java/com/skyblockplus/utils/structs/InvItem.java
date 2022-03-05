@@ -48,7 +48,7 @@ public class InvItem {
 	private String nbtTag;
 
 	public String getFormattedId() {
-		if (id.equals("PET")) {
+		if (id.equals("PET") && name.contains("] ")) {
 			return name.split("] ")[1].toUpperCase().replace(" ", "_") + RARITY_TO_NUMBER_MAP.get(getPetRarity());
 		} else if (id.equals("ENCHANTED_BOOK")) {
 			return enchantsFormatted.isEmpty() ? id : enchantsFormatted.get(0).toUpperCase();

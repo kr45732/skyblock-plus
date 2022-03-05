@@ -163,24 +163,16 @@ public class SkyblockCommand extends Command {
 				"\n**Tier 4:** " +
 				endermanFourKills;
 			long coinsSpentOnSlayers =
-				100L *
-				(svenOneKills + revOneKills + taraOneKills) +
-				2000L *
-				(svenTwoKills + revTwoKills + taraTwoKills) +
-				10000L *
-				(svenThreeKills + revThreeKills + taraThreeKills) +
-				50000L *
-				(svenFourKills + revFourKills + taraFourKills) +
-				100000L *
-				revFiveKills +
-				2000L *
-				endermanOneKills +
-				7500L *
-				endermanTwoKills +
-				20000L *
-				endermanThreeKills +
-				50000L *
-				endermanFourKills;
+					2000L *
+							(svenOneKills + revOneKills + taraOneKills + endermanOneKills) +
+							7500L *
+									(svenTwoKills + revTwoKills + taraTwoKills + endermanTwoKills) +
+							20000L *
+									(svenThreeKills + revThreeKills + taraThreeKills + endermanThreeKills) +
+							50000L *
+									(svenFourKills + revFourKills + taraFourKills + endermanFourKills) +
+							100000L *
+									revFiveKills;
 			eb.setDescription(
 				"**Total slayer:** " +
 				formatNumber(player.getTotalSlayer()) +
@@ -256,9 +248,8 @@ public class SkyblockCommand extends Command {
 				for (String dungeonType : getJsonKeys(higherDepth(player.profileJson(), "dungeons.dungeon_types"))) {
 					JsonElement curDungeonType = higherDepth(player.profileJson(), "dungeons.dungeon_types." + dungeonType);
 					int min = (dungeonType.equals("catacombs") ? 0 : 1);
-					int max = (dungeonType.equals("catacombs") ? 8 : 7);
 					int embedCount = 0;
-					for (int i = min; i < max; i++) {
+					for (int i = min; i < 8; i++) {
 						if (higherDepth(curDungeonType, "tier_completions." + i, 0) == 0) {
 							continue;
 						}

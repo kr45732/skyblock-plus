@@ -97,6 +97,9 @@ public class HelpCommand extends Command {
 					.addAliases("slayers")
 					.addExamples("slayer CrypticPlasma", "slayer CrypticPlasma Zucchini")
 					.setCategory("slayer"),
+					new HelpData("calcslayer", "Calculate the number of slayer bosses needed to reach a certain level or xp amount. The type can be sven, rev, tara, or enderman.", "calcslayer [player] [profile] <type:type> [level:level] [xp:xp]")
+							.addExamples("calcslayer CrypticPlasma type:rev level:8", "calcslayer CrypticPlasma type:enderman xp:100000")
+							.setCategory("slayer"),
 				// Skills
 				new HelpData("skills", "Get the skills data of a player.", "skills [player] [profile]")
 					.addAliases("skill")
@@ -758,7 +761,9 @@ public class HelpCommand extends Command {
 			help.create("unlink", "Unlink your account from the bot")
 		);
 
-		paginateBuilder.addItems(help.create("slayer [player] [profile]", "Get the slayer data of a player"));
+		paginateBuilder.addItems(
+			help.create("slayer [player] [profile]", "Get the slayer data of a player") +
+			help.create("calcslayer [player] [profile] <type:type> [level:level] [xp:xp]", "Calculate the number of bosses needed to reach a level or xp amount"));
 
 		paginateBuilder.addItems(
 			help.create("skills [player] [profile]", "Get the skills data of a player") +

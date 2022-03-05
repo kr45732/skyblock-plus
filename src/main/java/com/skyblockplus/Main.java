@@ -52,6 +52,8 @@ import com.skyblockplus.miscellaneous.weight.WeightSlashCommand;
 import com.skyblockplus.price.*;
 import com.skyblockplus.settings.*;
 import com.skyblockplus.skills.*;
+import com.skyblockplus.slayer.CalcSlayerCommand;
+import com.skyblockplus.slayer.CalcSlayerSlashCommand;
 import com.skyblockplus.slayer.SlayerCommand;
 import com.skyblockplus.slayer.SlayerSlashCommand;
 import com.skyblockplus.utils.*;
@@ -176,7 +178,7 @@ public class Main {
 					new RecipeCommand(),
 					new StorageCommand(),
 					new CalcRunsCommand(),
-					new BingoCommand()
+					new BingoCommand(), new CalcSlayerCommand()
 				)
 				.build();
 
@@ -244,7 +246,7 @@ public class Main {
 					new RecipeSlashCommand(),
 					new StorageSlashCommand(),
 					new CalcRunsSlashCommand(),
-					new BingoSlashCommand()
+					new BingoSlashCommand(), new CalcSlayerSlashCommand()
 				);
 
 		allServerSettings =

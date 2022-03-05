@@ -40,7 +40,7 @@ public class CalcRunsCommand extends Command {
 
 	public static Object getCalcRuns(String username, String profileName, int targetLevel, int floor, boolean useRing) {
 		if (targetLevel <= 0 || targetLevel > 50) {
-			return invalidEmbed("Target level must be between 0 and 50");
+			return invalidEmbed("Target level must be between 1 and 50");
 		}
 		if (floor < 0 || floor > 13) {
 			return invalidEmbed("Invalid floor");

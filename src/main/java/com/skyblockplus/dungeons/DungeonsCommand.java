@@ -93,8 +93,7 @@ public class DungeonsCommand extends Command {
 				for (String dungeonType : getJsonKeys(higherDepth(player.profileJson(), "dungeons.dungeon_types"))) {
 					JsonElement curDungeonType = higherDepth(player.profileJson(), "dungeons.dungeon_types." + dungeonType);
 					int min = (dungeonType.equals("catacombs") ? 0 : 1);
-					int max = (dungeonType.equals("catacombs") ? 8 : 7);
-					for (int i = min; i < max; i++) {
+					for (int i = min; i < 8; i++) {
 						int fastestSPlusInt = higherDepth(curDungeonType, "fastest_time_s_plus." + i, -1);
 						int minutes = fastestSPlusInt / 1000 / 60;
 						int seconds = fastestSPlusInt / 1000 % 60;
@@ -108,7 +107,8 @@ public class DungeonsCommand extends Command {
 						extras.addEmbedField(DUNGEON_EMOJI_MAP.get(dungeonType + "_" + i) + " " + capitalizeString(name), ebStr, true);
 					}
 
-					if (dungeonType.equals("catacombs")) {
+					extras.addBlankField(true);
+					if (dungeonType.equals("master_catacombs")) {
 						extras.addBlankField(true);
 					}
 				}
