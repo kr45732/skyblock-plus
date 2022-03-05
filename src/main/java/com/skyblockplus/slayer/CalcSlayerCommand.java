@@ -78,7 +78,7 @@ public class CalcSlayerCommand extends Command {
 			long xpNeeded = targetXp - curXp;
 			JsonArray bossXpArr = higherDepth(getLevelingJson(), "slayer_boss_xp").getAsJsonArray();
 			StringBuilder out = new StringBuilder();
-			for (int i = 0; i < (slayerType.equals("enderman") ? 4 : 5); i++) {
+			for (int i = 0; i < (slayerType.equals("rev") ? 5 : 4); i++) {
 				double xpPerBoss = bossXpArr.get(i).getAsInt();
 				int killsNeeded = (int) Math.ceil(xpNeeded / xpPerBoss);
 				long cost =
