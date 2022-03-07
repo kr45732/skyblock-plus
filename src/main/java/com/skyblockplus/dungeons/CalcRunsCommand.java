@@ -57,37 +57,37 @@ public class CalcRunsCommand extends Command {
 			}
 
 			int completions = higherDepth(
-					player.profileJson(),
-					floor > 7
-							? "dungeons.dungeon_types.master_catacombs.tier_completions." + (floor - 7)
-							: "dungeons.dungeon_types.catacombs.tier_completions." + floor,
-					0
+				player.profileJson(),
+				floor > 7
+					? "dungeons.dungeon_types.master_catacombs.tier_completions." + (floor - 7)
+					: "dungeons.dungeon_types.catacombs.tier_completions." + floor,
+				0
 			);
 			int runs = 0;
 
 			int completionsCap =
-					switch (floor) {
-						case 0, 1, 2, 3, 4, 5 -> 150;
-						case 6 -> 100;
-						default -> 50;
-					};
+				switch (floor) {
+					case 0, 1, 2, 3, 4, 5 -> 150;
+					case 6 -> 100;
+					default -> 50;
+				};
 			int baseXp =
-					switch (floor) {
-						case 0 -> 50;
-						case 1 -> 80;
-						case 2 -> 160;
-						case 3 -> 400;
-						case 4 -> 1420;
-						case 5 -> 2000;
-						case 6 -> 4000;
-						case 7 -> 20000;
-						case 8 -> 10000;
-						case 9 -> 15000;
-						case 10 -> 36500;
-						case 11 -> 48500;
-						case 12 -> 70000;
-						default -> 100000;
-					};
+				switch (floor) {
+					case 0 -> 50;
+					case 1 -> 80;
+					case 2 -> 160;
+					case 3 -> 400;
+					case 4 -> 1420;
+					case 5 -> 2000;
+					case 6 -> 4000;
+					case 7 -> 20000;
+					case 8 -> 10000;
+					case 9 -> 15000;
+					case 10 -> 36500;
+					case 11 -> 48500;
+					case 12 -> 70000;
+					default -> 100000;
+				};
 
 			double xpNeeded = target.totalExp() - current.totalExp();
 			for (int i = completions + 1; i <= completionsCap; i++) { // First 0 to completionsCap give different xp per run than after completionsCap
@@ -110,49 +110,50 @@ public class CalcRunsCommand extends Command {
 			WeightStruct post = predictedWeight.getDungeonsWeight().getDungeonWeight("catacombs", target);
 
 			MessageBuilder mb = new MessageBuilder()
-					.setEmbeds(
-							player
-									.defaultPlayerEmbed()
-									.addField(
-											"Current",
-											"Level: " + roundAndFormat(current.getProgressLevel()) + "\nXP: " + formatNumber(current.totalExp()),
-											false
-									)
-									.addField(
-											"Target",
-											"Level: " +
-													target.currentLevel() +
-													"\nXP: " +
-													formatNumber(target.totalExp()) +
-													" (+" +
-													formatNumber(target.totalExp() - current.totalExp()) +
-													")\n" + (floor > 7 ? "M" + (floor - 7) : "F" + floor) +
-													" Runs Needed: " +
-													formatNumber(runs),
-											false
-									)
-									.addField(
-											"Weight Change",
-											"Total: " +
-													weight.getTotalWeight().getFormatted(false) +
-													" ➜ " +
-													predictedWeight.getTotalWeight().getFormatted(false) +
-													"\nCatacombs: " +
-													pre.getFormatted(false) +
-													" ➜ " +
-													post.getFormatted(false),
-											false
-									)
-									.build()
-					);
+				.setEmbeds(
+					player
+						.defaultPlayerEmbed()
+						.addField(
+							"Current",
+							"Level: " + roundAndFormat(current.getProgressLevel()) + "\nXP: " + formatNumber(current.totalExp()),
+							false
+						)
+						.addField(
+							"Target",
+							"Level: " +
+							target.currentLevel() +
+							"\nXP: " +
+							formatNumber(target.totalExp()) +
+							" (+" +
+							formatNumber(target.totalExp() - current.totalExp()) +
+							")\n" +
+							(floor > 7 ? "M" + (floor - 7) : "F" + floor) +
+							" Runs Needed: " +
+							formatNumber(runs),
+							false
+						)
+						.addField(
+							"Weight Change",
+							"Total: " +
+							weight.getTotalWeight().getFormatted(false) +
+							" ➜ " +
+							predictedWeight.getTotalWeight().getFormatted(false) +
+							"\nCatacombs: " +
+							pre.getFormatted(false) +
+							" ➜ " +
+							post.getFormatted(false),
+							false
+						)
+						.build()
+				);
 			if (!useRing) {
 				mb.setActionRows(
-						ActionRow.of(
-								Button.primary(
-										"calc_runs_ring_" + player.getUuid() + "_" + player.getProfileName() + "_" + targetLevel + "_" + floor,
-										"Calculate With Catacombs Expert Ring"
-								)
+					ActionRow.of(
+						Button.primary(
+							"calc_runs_ring_" + player.getUuid() + "_" + player.getProfileName() + "_" + targetLevel + "_" + floor,
+							"Calculate With Catacombs Expert Ring"
 						)
+					)
 				);
 			}
 			return mb;
