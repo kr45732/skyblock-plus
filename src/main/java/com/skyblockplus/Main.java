@@ -295,7 +295,7 @@ public class Main {
 		if (!transcriptDir.exists()) {
 			log.info((transcriptDir.mkdirs() ? "Successfully created" : "Failed to create") + " application transcript directory");
 		}
-		scheduler.schedule(System::gc, 30, TimeUnit.MINUTES); // Sorry for the war crimes
+		scheduler.schedule(System::gc, 20, TimeUnit.MINUTES); // Sorry for the war crimes
 	}
 
 	@PreDestroy
