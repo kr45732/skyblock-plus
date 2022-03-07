@@ -87,7 +87,7 @@ public class ApiHandler {
 					30,
 					TimeUnit.MINUTES
 				);
-			scheduler.scheduleWithFixedDelay(ApiHandler::updateLinkedAccounts, 60, 45, TimeUnit.SECONDS);
+			scheduler.scheduleWithFixedDelay(ApiHandler::updateLinkedAccounts, 60, 30, TimeUnit.SECONDS);
 		} catch (Exception e) {
 			log.error("Exception when initializing the ApiHandler", e);
 		}
@@ -583,7 +583,7 @@ public class ApiHandler {
 				.filter(linkedAccountModel ->
 					Duration.between(Instant.ofEpochMilli(linkedAccountModel.lastUpdated()), Instant.now()).toDays() > 5
 				)
-				.limit(10)
+				.limit(15)
 				.forEach(o ->
 					asyncUuidToUsername(o.uuid())
 						.thenApply(username ->

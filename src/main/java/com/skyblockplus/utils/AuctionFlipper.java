@@ -58,7 +58,7 @@ public class AuctionFlipper {
 		scheduler.scheduleWithFixedDelay(
 			() -> {
 				try {
-					if (Duration.between(lastUpdated, Instant.now()).toMinutes() >= 4) {
+					if (Duration.between(lastUpdated, Instant.now()).toMinutes() >= 3) {
 						deleteUrl(
 							"https://api.heroku.com/apps/query-api/dynos",
 							new BasicHeader("Accept", "application/vnd.heroku+json; version=3"),
