@@ -228,7 +228,7 @@ public class HelpCommand extends Command {
 					"Query the auction house for the lowest price of an item. Allows for more specific queries than bin or average command. Can be filtered by bin only, auction only, or both.",
 					"price <item> [type:bin|auction|both]"
 				)
-					.addExamples("query Necron's Chestplate ✪✪✪✪✪", "query Withered Hyperion ✪✪✪ type:both")
+					.addExamples("price Necron's Chestplate ✪✪✪✪✪", "price Withered Hyperion ✪✪✪ type:both")
 					.setCategory("price"),
 				new HelpData("bits", "Get the bits cost of an item from the bits shop.", "bits <item>")
 					.addExamples("bits God Potion")

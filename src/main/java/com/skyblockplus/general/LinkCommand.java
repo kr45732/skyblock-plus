@@ -36,6 +36,7 @@ import com.skyblockplus.utils.structs.HypixelResponse;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -108,7 +109,14 @@ public class LinkCommand extends Command {
 	/**
 	 * @return [nickname, roles]
 	 */
-	public static String[] updateLinkedUser(JsonElement verifySettings, LinkedAccount linkedAccount, Member member) {
+	public static String[] updateLinkedUser(JsonElement verifySettings, LinkedAccount linkedAccount, Member member){
+		return updateLinkedUser(verifySettings, linkedAccount, member, false);
+	}
+
+	/**
+	 * @return [nickname, roles]
+	 */
+	public static String[] updateLinkedUser(JsonElement verifySettings, LinkedAccount linkedAccount, Member member, boolean delay) {
 		String updatedNickname = "false";
 		String updatedRoles = "false";
 
@@ -238,7 +246,11 @@ public class LinkCommand extends Command {
 				} catch (Exception ignored) {}
 			}
 			if (!toAdd.isEmpty() || !toRemove.isEmpty()) {
-				member.getGuild().modifyMemberRoles(member, toAdd, toRemove).complete();
+				if(delay) {
+					member.getGuild().modifyMemberRoles(member, toAdd, toRemove).queueAfter(3, TimeUnit.SECONDS);
+				}else{
+					member.getGuild().modifyMemberRoles(member, toAdd, toRemove).complete();
+				}
 				updatedRoles = "true";
 			}
 		} catch (Exception e) {

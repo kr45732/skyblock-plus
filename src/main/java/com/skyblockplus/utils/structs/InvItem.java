@@ -58,7 +58,7 @@ public class InvItem {
 	}
 
 	public String getNameFormatted() {
-		return id.equals("ENCHANTED_BOOK") && !enchantsFormatted.isEmpty() ? idToName(enchantsFormatted.get(0).toUpperCase()) : name;
+		return id.equals("ENCHANTED_BOOK") && !enchantsFormatted.isEmpty() ? idToName(enchantsFormatted.get(0)) : name;
 	}
 
 	public void setHbpCount(int hbpCount) {
@@ -72,6 +72,9 @@ public class InvItem {
 
 	public void addExtraValue(String itemId) {
 		extraStats.add(itemId);
+		if(itemId.endsWith("_MASTER_STAR")){
+			name = name.replaceFirst("✪", "⍟");
+		}
 	}
 
 	public void addExtraValues(int count, String itemId) {
