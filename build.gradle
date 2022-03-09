@@ -103,7 +103,7 @@ dependencies {
     implementation 'ch.qos.logback:logback-classic:1.2.11'
 
     // Git
-    implementation 'org.eclipse.jgit:org.eclipse.jgit:6.0.0.202111291000-r'
+    implementation 'org.eclipse.jgit:org.eclipse.jgit:6.1.0.202203080745-r'
 
     // JS script engine
     implementation 'org.openjdk.nashorn:nashorn-core:15.3'
