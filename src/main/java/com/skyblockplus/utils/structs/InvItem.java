@@ -72,7 +72,7 @@ public class InvItem {
 
 	public void addExtraValue(String itemId) {
 		extraStats.add(itemId);
-		if(itemId.endsWith("_MASTER_STAR")){
+		if (itemId.endsWith("_MASTER_STAR")) {
 			name = name.replaceFirst("✪", "⍟");
 		}
 	}

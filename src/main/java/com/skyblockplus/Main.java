@@ -179,7 +179,8 @@ public class Main {
 					new StorageCommand(),
 					new CalcRunsCommand(),
 					new BingoCommand(),
-					new CalcSlayerCommand(), new CheckApiCommand()
+					new CalcSlayerCommand(),
+					new CheckApiCommand()
 				)
 				.build();
 
@@ -248,7 +249,8 @@ public class Main {
 					new StorageSlashCommand(),
 					new CalcRunsSlashCommand(),
 					new BingoSlashCommand(),
-					new CalcSlayerSlashCommand(), new CheckApiSlashCommand()
+					new CalcSlayerSlashCommand(),
+					new CheckApiSlashCommand()
 				);
 
 		allServerSettings =

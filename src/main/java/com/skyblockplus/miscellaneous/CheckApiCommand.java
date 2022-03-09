@@ -18,24 +18,23 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class CheckApiCommand extends Command {
 
 	public CheckApiCommand() {
 		this.name = "check-api";
-		this.aliases = new String[]{"api", "checkapi"};
+		this.aliases = new String[] { "api", "checkapi" };
 		this.cooldown = globalCooldown;
 		this.botPermissions = defaultPerms();
 	}
@@ -45,20 +44,33 @@ public class CheckApiCommand extends Command {
 		if (player.isValid()) {
 			EmbedBuilder eb = player.defaultPlayerEmbed();
 
-			boolean invEnabled =  player.getInventoryMap() != null;
+			boolean invEnabled = player.getInventoryMap() != null;
 			boolean bankEnabled = player.getBankBalance() != -1;
 			boolean collectionsEnabled = false;
-			try{collectionsEnabled = higherDepth(player.profileJson(), "collection").getAsJsonObject() != null;}catch(Exception ignored){}
+			try {
+				collectionsEnabled = higherDepth(player.profileJson(), "collection").getAsJsonObject() != null;
+			} catch (Exception ignored) {}
 			boolean vaultEnabled = player.getPersonalVaultMap() != null;
 			boolean skillsEnabled = player.getSkillAverage("", -1) != -1;
 
 			eb.setDescription(
-					"**All APIs Enabled:** " + (invEnabled && bankEnabled && collectionsEnabled && vaultEnabled && skillsEnabled)
-					+ "\n" + (invEnabled ? client.getSuccess() : client.getError()) + " Inventory API"
-							+ "\n" + (bankEnabled ? client.getSuccess() : client.getError()) + " Bank API"
-							+ "\n" + (collectionsEnabled ? client.getSuccess() : client.getError()) + " Collections API"
-							+ "\n" + (skillsEnabled ? client.getSuccess() : client.getError()) + " Skills API"
-							+ "\n" + (vaultEnabled ? client.getSuccess() : client.getError()) + " Personal Vault API"
+				"**All APIs Enabled:** " +
+				(invEnabled && bankEnabled && collectionsEnabled && vaultEnabled && skillsEnabled) +
+				"\n" +
+				(invEnabled ? client.getSuccess() : client.getError()) +
+				" Inventory API" +
+				"\n" +
+				(bankEnabled ? client.getSuccess() : client.getError()) +
+				" Bank API" +
+				"\n" +
+				(collectionsEnabled ? client.getSuccess() : client.getError()) +
+				" Collections API" +
+				"\n" +
+				(skillsEnabled ? client.getSuccess() : client.getError()) +
+				" Skills API" +
+				"\n" +
+				(vaultEnabled ? client.getSuccess() : client.getError()) +
+				" Personal Vault API"
 			);
 
 			return eb;

@@ -109,7 +109,7 @@ public class LinkCommand extends Command {
 	/**
 	 * @return [nickname, roles]
 	 */
-	public static String[] updateLinkedUser(JsonElement verifySettings, LinkedAccount linkedAccount, Member member){
+	public static String[] updateLinkedUser(JsonElement verifySettings, LinkedAccount linkedAccount, Member member) {
 		return updateLinkedUser(verifySettings, linkedAccount, member, false);
 	}
 
@@ -246,9 +246,9 @@ public class LinkCommand extends Command {
 				} catch (Exception ignored) {}
 			}
 			if (!toAdd.isEmpty() || !toRemove.isEmpty()) {
-				if(delay) {
+				if (delay) {
 					member.getGuild().modifyMemberRoles(member, toAdd, toRemove).queueAfter(3, TimeUnit.SECONDS);
-				}else{
+				} else {
 					member.getGuild().modifyMemberRoles(member, toAdd, toRemove).complete();
 				}
 				updatedRoles = "true";
