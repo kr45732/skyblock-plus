@@ -308,7 +308,8 @@ public class Utils {
 					getSkyCryptData("https://raw.githubusercontent.com/SkyCryptWebsite/SkyCrypt/master/src/constants/talismans.js")
 						.replace("export const ", "")
 						.replace(" = ", ": ")
-						.replace(";", ",").split("//")[0] +
+						.replace(";", ",")
+						.split("//")[0] +
 					"}"
 				)
 					.getAsJsonObject();
