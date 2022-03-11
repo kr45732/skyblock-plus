@@ -114,5 +114,5 @@ dependencies {
     // Fuzzy Searching
     implementation 'me.xdrop:fuzzywuzzy:1.4.0'
 
-   // implementatioe 'org.4.wikitext:swc-parser-lazy:3.1.9'
+   // implementation 'org.sweble.wikitext:swc-parser-lazy:3.1.9'
 }
