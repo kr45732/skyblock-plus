@@ -63,14 +63,14 @@ public class RecipeCommand extends Command {
 		EmbedBuilder eb = defaultEmbed("Recipe of " + name);
 		for (Map.Entry<String, JsonElement> entry : higherDepth(infoJson, "recipe").getAsJsonObject().entrySet()) {
 			String[] idCountSplit = entry.getValue().getAsString().split(":");
+			if (entry.getKey().equals("B1") || entry.getKey().equals("C1")) {
+				eb.appendDescription("\n");
+			}
 			if (idCountSplit.length == 1) {
-				eb.appendDescription(higherDepth(getEmojiMap(), "BLANK", "") + " ");
+				eb.appendDescription(higherDepth(getEmojiMap(), "EMPTY", "") + " ");
 				eb.addBlankField(true);
 			} else {
 				String entryId = idCountSplit[0].replace("-", ":");
-				if (entry.getKey().equals("B1") || entry.getKey().equals("C1")) {
-					eb.appendDescription("\n");
-				}
 				eb.appendDescription(higherDepth(getEmojiMap(), entryId, "") + " ");
 				eb.addField(idToName(entryId), idCountSplit[1], true);
 			}

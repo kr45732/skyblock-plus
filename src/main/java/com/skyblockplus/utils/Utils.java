@@ -169,8 +169,6 @@ public class Utils {
 	public static Set<String> vanillaItems;
 	private static Instant userCountLastUpdated = Instant.now();
 	private static int userCount = -1;
-	public static List<String> linkedUsers;
-	public static Instant linkedUsersLastUpdated = Instant.now();
 	public static List<String> queryItems;
 	public static JDA jda;
 	public static Database database;
@@ -402,15 +400,6 @@ public class Utils {
 		}
 
 		return collectionsJson;
-	}
-
-	public static List<String> getLinkedUsers() {
-		if (linkedUsers == null || Duration.between(linkedUsersLastUpdated, Instant.now()).toMinutes() >= 45) {
-			linkedUsers = database.getLinkedAccounts().stream().map(LinkedAccount::username).collect(Collectors.toList());
-			linkedUsersLastUpdated = Instant.now();
-		}
-
-		return linkedUsers;
 	}
 
 	public static JsonObject getSkyCryptPetJson() {

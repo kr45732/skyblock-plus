@@ -18,12 +18,6 @@
 
 package com.skyblockplus.general;
 
-import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
-import static com.skyblockplus.utils.ApiHandler.skyblockProfilesFromUuid;
-import static com.skyblockplus.utils.Utils.*;
-
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -33,16 +27,22 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.DiscordInfoStruct;
 import com.skyblockplus.utils.structs.HypixelResponse;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.stream.Collectors;
+
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.utils.ApiHandler.getGuildFromPlayer;
+import static com.skyblockplus.utils.ApiHandler.skyblockProfilesFromUuid;
+import static com.skyblockplus.utils.Utils.*;
 
 public class LinkCommand extends Command {
 
@@ -240,18 +240,27 @@ public class LinkCommand extends Command {
 						if (player.isValid()) {
 							Object[] out = (Object[]) RolesCommand.updateRoles(player, member.getGuild(), member);
 							toAdd.addAll((List<Role>) out[1]);
-							toAdd.addAll((List<Role>) out[2]);
+							toRemove.addAll((List<Role>) out[2]);
 						}
 					}
 				} catch (Exception ignored) {}
 			}
 			if (!toAdd.isEmpty() || !toRemove.isEmpty()) {
+				toAdd.removeIf(Objects::isNull);
+				toRemove.removeIf(Objects::isNull);
 				if (delay) {
-					member.getGuild().modifyMemberRoles(member, toAdd, toRemove).queueAfter(3, TimeUnit.SECONDS);
+					for (Role role : toAdd) {
+						if (member.getGuild().getSelfMember().canInteract(role)){
+							member.getGuild().addRoleToMember(member,  role).queue();
+						}else{
+							updatedRoles = "error";
+						}
+					}
+					updatedRoles = updatedRoles.equals("error") ? updatedRoles : "true";
 				} else {
 					member.getGuild().modifyMemberRoles(member, toAdd, toRemove).complete();
+					updatedRoles = "true";
 				}
-				updatedRoles = "true";
 			}
 		} catch (Exception e) {
 			updatedRoles = "error";

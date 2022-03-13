@@ -135,6 +135,17 @@ public class HelpCommand extends Command {
 					.addAliases("pf")
 					.addExamples("partyfinder CrypticPlasma", "partyfinder CrypticPlasma Zucchini")
 					.setCategory("dungeons"),
+					new HelpData(
+							"calcruns",
+							"Calculate the number of runs needed to reach a certain catacombs level. The floor can be from F1 to F7 or M1 to M6.",
+							"calcruns [player] [profile] <level:level> <floor:floor>"
+					).addAliases("runs")
+							.setCategory("dungeons"),
+					new HelpData(
+							"calcdrops","Calculate the drop rate and cost of all chests for a floor",
+							"calcdrops floor [luck:1|2|3|4|5] [accessory:none|talisman|ring|artifact]"
+					).addAliases("drops")
+							.setCategory("dungeons"),
 				// Guild
 				new HelpData("guild", "Main guild command")
 					.addSecondData("Find what guild a player is in.", "guild <player>")
@@ -351,11 +362,13 @@ public class HelpCommand extends Command {
 				new HelpData("missing", "Get a player's missing talismans.", "missing [player] [profile]")
 					.addExamples("missing CrypticPlasma", "missing CrypticPlasma Zucchini")
 					.setCategory("miscellaneous"),
+					new HelpData("check-api", "Get a player's enabled and/or disabled Skyblock APIs", "check-api [player] [profile]").addAliases("api")
+							.setCategory("miscellaneous"),
 				new HelpData("profiles", "Get information about all of a player's profiles.", "missing [player] [profile]")
 					.addExamples("profiles CrypticPlasma", "profiles CrypticPlasma Zucchini")
 					.setCategory("miscellaneous"),
 				new HelpData("cakes", "Get a player's active and inactive cake buffs.", "cakes [player] [profile]")
-					.addExamples("cakes CrypticPlasma", "cakes CrypticPlasma Zucchini")
+					.addExamples("cakes CrypticPlasma", "caks CrypticPlasma Zucchini")
 					.setCategory("miscellaneous"),
 				new HelpData("harp", "Get a player's harp statistics.", "harp [player] [profile]")
 					.addExamples("harp CrypticPlasma", "harp CrypticPlasma Zucchini")
@@ -364,19 +377,20 @@ public class HelpCommand extends Command {
 					.addExamples("uuid CrypticPlasma", "uuid 044903b7a9d3416d957f929557af6c88")
 					.setCategory("miscellaneous"),
 				new HelpData("fetchur", "Get the item that fetchur wants today.").setCategory("miscellaneous"),
+					new HelpData("jacob", "Get the upcoming contests and their crops.").setCategory("miscellaneous"),
 				new HelpData("mayor", "Get the current mayor and their perks.").setCategory("miscellaneous"),
-				new HelpData(
-					"calcruns",
-					"Calculate the number of runs needed to reach a certain catacombs level. The floor can be from F1 to F7 or M1 to M6."
-				)
-					.setCategory("miscellaneous"),
 				new HelpData(
 					"leaderboard",
 					"Get a global leaderboard. The type can be slayer, skills, catacombs, weight, sven, rev, tara, enderman, alchemy, combat, fishing, farming, foraging, carpentry, mining, taming, and enchanting. The mode can be all, ironman, or stranded."
-				)
+				).addAliases("lb")
 					.setCategory("miscellaneous"),
-				new HelpData("bingo", "Get the current bingo goals and a player's live bingo card.").setCategory("miscellaneous"),
-				new HelpData("recipe", "Get the crafting recipe of an item.").setCategory("miscellaneous"),
+					new HelpData(
+							"skyblock",
+							"Get an overview of a player's Skyblock statistics", "skyblock [player] [profile]"
+					).addAliases("sb")
+							.setCategory("miscellaneous"),
+				new HelpData("bingo", "Get the current bingo goals and a player's live bingo card.", "bingo [player]").setCategory("miscellaneous"),
+				new HelpData("recipe", "Get the crafting recipe of an item.", "recipe <item>").setCategory("miscellaneous"),
 				new HelpData("time", "Get the current year, date, and time in Skyblock").setCategory("miscellaneous"),
 				new HelpData(
 					"scammer",
@@ -723,6 +737,7 @@ public class HelpCommand extends Command {
 					"Reload the automatic guild application(s) and automatic verification settings. This for changes to take effect for both of these features."
 				)
 					.setCategory("settings")
+
 			)
 		);
 	}
@@ -784,7 +799,9 @@ public class HelpCommand extends Command {
 			help.create("essence upgrade <item>", "Interactive message to find the essence amount to upgrade an item") +
 			help.create("essence information <item>", "Get the amount of essence to upgrade an item for each level") +
 			help.create("essence player [player] [profile]", "Get a player's essence amounts and essence shop upgrades") +
-			help.create("partyfinder [player] [profile]", "A party finder helper that shows a player's dungeon statistics")
+			help.create("partyfinder [player] [profile]", "A party finder helper that shows a player's dungeon statistics") +
+			help.create("calcruns [player] [profile] <level:level> <floor:floor>", "Calculate the number of runs needed to reach a certain catacombs level") +
+			help.create("calcdrops floor [luck:boss_luck] [accessory:accessory]", "Calculate the drop rate and cost of all chests for a floor")
 		);
 
 		paginateBuilder.addItems(
@@ -860,11 +877,12 @@ public class HelpCommand extends Command {
 			help.create("time", "Get the current year, date, and time in Skyblock") +
 			help.create("scammer [player]", "Check if a player is marked as a scamer in the SBZ database") +
 			help.create("jacob", "Get the upcoming contests and their crops") +
-			help.create("calcruns", "Calculate the number of runs needed to reach a certain catacombs level") +
 			help.create("mayor", "Get information about the current mayor or the running election") +
 			help.create("bingo", "Get the current bingo goals and a player's bingo card") +
 			help.create("leaderboard", "Get a global leaderboard") +
-			help.create("recipe", "Get the crafting recipe of an item")
+					help.create("skyblock [player] [profile]", "Get an overview of a player's Skyblock statistics") +
+			help.create("recipe", "Get the crafting recipe of an item") +
+					help.create("check-api", "Check which Skyblock APIs a player has enabled or disabled")
 		);
 
 		paginateBuilder.addItems(

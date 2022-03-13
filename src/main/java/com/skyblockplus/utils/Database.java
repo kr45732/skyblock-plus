@@ -37,6 +37,8 @@ import com.skyblockplus.api.serversettings.managers.ServerSettingsService;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
 import java.util.List;
+
+import com.skyblockplus.utils.command.CommandExecute;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -253,5 +255,9 @@ public class Database {
 
 	public int setLogChannel(String serverId, String newSettings) {
 		return settingsService.setLogChannel(serverId, newSettings).getStatusCodeValue();
+	}
+
+	public List<String> getClosestLinkedAccounts(String toMatch) {
+		return linkedAccountService.getClosestLinkedAccounts(toMatch);
 	}
 }

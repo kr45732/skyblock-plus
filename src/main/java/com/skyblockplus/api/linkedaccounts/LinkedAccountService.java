@@ -107,6 +107,23 @@ public class LinkedAccountService {
 		return null;
 	}
 
+	public List<String> getClosestLinkedAccounts(String toMatch) {
+		try (
+				Connection connection = getConnection();
+				PreparedStatement statement = connection.prepareStatement("SELECT username FROM linked_account ORDER BY SIMILARITY(username, ?) DESC LIMIT 25")
+		) {
+			statement.setString(1, toMatch);
+			try (ResultSet response = statement.executeQuery()) {
+				List<String> usernames = new ArrayList<>();
+				while (response.next()) {
+					usernames.add(response.getString("username"));
+				}
+				return usernames;
+			}
+		} catch (Exception ignored) {}
+		return null;
+	}
+
 	public boolean deleteByDiscord(String discord) {
 		return deleteBy("discord", discord);
 	}

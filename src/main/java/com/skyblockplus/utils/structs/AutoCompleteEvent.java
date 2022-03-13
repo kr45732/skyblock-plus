@@ -37,6 +37,6 @@ public class AutoCompleteEvent extends CommandAutoCompleteInteractionEvent {
 	}
 
 	public void replyClosestPlayer() {
-		replyChoiceStrings(getClosestMatch(getOption("player").getAsString(), getLinkedUsers(), 25)).queue(ignore, ignore);
+		replyChoiceStrings(database.getClosestLinkedAccounts(getOption("player").getAsString())).queue(ignore, ignore);
 	}
 }

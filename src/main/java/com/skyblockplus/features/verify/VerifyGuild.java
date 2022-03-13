@@ -101,7 +101,7 @@ public class VerifyGuild {
 			return;
 		}
 
-		String[] result = updateLinkedUser(verifySettings, linkedUser, event.getMember());
+		String[] result = updateLinkedUser(verifySettings, linkedUser, event.getMember(), true);
 
 		event
 			.getUser()
