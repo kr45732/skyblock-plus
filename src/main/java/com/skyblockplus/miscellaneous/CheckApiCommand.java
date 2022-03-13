@@ -34,7 +34,7 @@ public class CheckApiCommand extends Command {
 
 	public CheckApiCommand() {
 		this.name = "check-api";
-		this.aliases = new String[] { "api"};
+		this.aliases = new String[] { "api" };
 		this.cooldown = globalCooldown;
 		this.botPermissions = defaultPerms();
 	}

@@ -18,6 +18,8 @@
 
 package com.skyblockplus.dungeons;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.jagrosh.jdautilities.command.Command;
@@ -26,11 +28,8 @@ import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.PaginatorExtras;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.util.Arrays;
-
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class CalcDropsCommand extends Command {
 
@@ -45,7 +44,7 @@ public class CalcDropsCommand extends Command {
 		if (floor < 0 || floor > 14) {
 			return invalidEmbed("Invalid floor");
 		}
-		if(bossLuck < 1 || bossLuck > 5){
+		if (bossLuck < 1 || bossLuck > 5) {
 			return invalidEmbed("Invalid boss luck level");
 		}
 		boolean isMaster = floor > 7;
@@ -56,16 +55,29 @@ public class CalcDropsCommand extends Command {
 		JsonObject data = getJson("https://wiki-data.kr45732.repl.co/data?floor=" + floor).getAsJsonObject();
 		String combo = talisman + bossLuck;
 		for (String chest : Arrays.asList("Wood", "Gold", "Diamond", "Emerald", "Obsidian", "Bedrock")) {
-			if( higherDepth(data, chest) == null){continue;}
-			EmbedBuilder eb = defaultEmbed((isMaster ? "Master " : "") + "Floor " + (isMaster ? floor - 7 : floor) + " Loot", "https://wiki.hypixel.net/Catacombs_Floor_" + toRomanNumerals(isMaster ? floor - 7 : floor).toUpperCase());
+			if (higherDepth(data, chest) == null) {
+				continue;
+			}
+			EmbedBuilder eb = defaultEmbed(
+				(isMaster ? "Master " : "") + "Floor " + (isMaster ? floor - 7 : floor) + " Loot",
+				"https://wiki.hypixel.net/Catacombs_Floor_" + toRomanNumerals(isMaster ? floor - 7 : floor).toUpperCase()
+			);
 			eb.setDescription("**Chest:** " + chest + "\nDrop chances listed as `not S+, S+`\n");
 			for (JsonElement itemData : higherDepth(data, chest).getAsJsonArray()) {
-				String name = higherDepth(itemData,"item").getAsString();
-				eb.appendDescription("\n" + higherDepth(getEmojiMap(), nameToId(name), "") +
-						" **" + name + "**: " + higherDepth(itemData, "drop_chances.S" + combo).getAsString() +
-						", " + higherDepth(itemData, "drop_chances.S+" + combo).getAsString() +
-						" ($" + formatNumber(higherDepth(itemData, "cost").getAsLong()) + ")");
-
+				String name = higherDepth(itemData, "item").getAsString();
+				eb.appendDescription(
+					"\n" +
+					higherDepth(getEmojiMap(), nameToId(name), "") +
+					" **" +
+					name +
+					"**: " +
+					higherDepth(itemData, "drop_chances.S" + combo).getAsString() +
+					", " +
+					higherDepth(itemData, "drop_chances.S+" + combo).getAsString() +
+					" ($" +
+					formatNumber(higherDepth(itemData, "cost").getAsLong()) +
+					")"
+				);
 			}
 			extras.addEmbedPage(eb);
 		}
@@ -81,14 +93,15 @@ public class CalcDropsCommand extends Command {
 				logCommand();
 
 				int bossLuck = getIntOption("luck", 1);
-				String talisman = switch (getStringOption("accessory", "")){
-					case "talisman" -> "B";
-					case "ring" -> "C";
-					case "artifact" -> "D";
-					default -> "A";
-				};
+				String talisman =
+					switch (getStringOption("accessory", "")) {
+						case "talisman" -> "B";
+						case "ring" -> "C";
+						case "artifact" -> "D";
+						default -> "A";
+					};
 
-				if(args.length == 2){
+				if (args.length == 2) {
 					int floorInt = -1;
 					String floor = args[1];
 					try {

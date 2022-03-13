@@ -109,8 +109,10 @@ public class LinkedAccountService {
 
 	public List<String> getClosestLinkedAccounts(String toMatch) {
 		try (
-				Connection connection = getConnection();
-				PreparedStatement statement = connection.prepareStatement("SELECT username FROM linked_account ORDER BY SIMILARITY(username, ?) DESC LIMIT 25")
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement(
+				"SELECT username FROM linked_account ORDER BY SIMILARITY(username, ?) DESC LIMIT 25"
+			)
 		) {
 			statement.setString(1, toMatch);
 			try (ResultSet response = statement.executeQuery()) {

@@ -52,10 +52,10 @@ public class AverageAuctionSlashCommand extends SlashCommand {
 	@Override
 	public void onAutoComplete(AutoCompleteEvent event) {
 		if (event.getFocusedOption().getName().equals("item")) {
-			if(getAverageAuctionJson() != null) {
+			if (getAverageAuctionJson() != null) {
 				event.replyClosestMatch(
-						event.getFocusedOption().getValue(),
-						getAverageAuctionJson().keySet().stream().map(Utils::idToName).distinct().collect(Collectors.toList())
+					event.getFocusedOption().getValue(),
+					getAverageAuctionJson().keySet().stream().map(Utils::idToName).distinct().collect(Collectors.toList())
 				);
 			}
 		}

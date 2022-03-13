@@ -66,12 +66,12 @@ public class CalcDropsSlashCommand extends SlashCommand {
 					.addChoice("Master Floor 5", 12)
 					.addChoice("Master Floor 6", 13)
 					.addChoice("Master Floor 7", 14),
-					new OptionData(OptionType.STRING, "accessory", "Catacombs accessory")
-							.addChoice("None", "A")
-							.addChoice("Talisman", "B")
-							.addChoice("Ring", "C")
-							.addChoice("Artifact", "D"),
-					new OptionData(OptionType.INTEGER, "luck", "Boss luck level").setRequiredRange(1, 5)
+				new OptionData(OptionType.STRING, "accessory", "Catacombs accessory")
+					.addChoice("None", "A")
+					.addChoice("Talisman", "B")
+					.addChoice("Ring", "C")
+					.addChoice("Artifact", "D"),
+				new OptionData(OptionType.INTEGER, "luck", "Boss luck level").setRequiredRange(1, 5)
 			);
 	}
 }

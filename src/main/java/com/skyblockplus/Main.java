@@ -180,7 +180,8 @@ public class Main {
 					new CalcRunsCommand(),
 					new BingoCommand(),
 					new CalcSlayerCommand(),
-					new CheckApiCommand(), new CalcDropsCommand()
+					new CheckApiCommand(),
+					new CalcDropsCommand()
 				)
 				.build();
 
@@ -250,7 +251,8 @@ public class Main {
 					new CalcRunsSlashCommand(),
 					new BingoSlashCommand(),
 					new CalcSlayerSlashCommand(),
-					new CheckApiSlashCommand(), new CalcDropsSlashCommand()
+					new CheckApiSlashCommand(),
+					new CalcDropsSlashCommand()
 				);
 
 		allServerSettings =

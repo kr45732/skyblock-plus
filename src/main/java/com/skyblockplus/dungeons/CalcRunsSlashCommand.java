@@ -72,7 +72,7 @@ public class CalcRunsSlashCommand extends SlashCommand {
 					.addChoice("Master Floor 4", 11)
 					.addChoice("Master Floor 5", 12)
 					.addChoice("Master Floor 6", 13)
-						.addChoice("Master Floor 7", 14)
+					.addChoice("Master Floor 7", 14)
 			)
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 			.addOption(OptionType.STRING, "profile", "Profile name");

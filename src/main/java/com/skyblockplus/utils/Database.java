@@ -36,9 +36,8 @@ import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsService;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
-import java.util.List;
-
 import com.skyblockplus.utils.command.CommandExecute;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -93,7 +93,7 @@ public class PartyHandler {
 							.addOption("Master floor 4", "master_floor_4")
 							.addOption("Master floor 5", "master_floor_5")
 							.addOption("Master floor 6", "master_floor_6")
-								.addOption("Master floor 7", "master_floor_7")
+							.addOption("Master floor 7", "master_floor_7")
 							.build();
 						menuId = floorMenu.getId();
 						event

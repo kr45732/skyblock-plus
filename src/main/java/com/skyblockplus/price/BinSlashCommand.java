@@ -50,10 +50,10 @@ public class BinSlashCommand extends SlashCommand {
 	@Override
 	public void onAutoComplete(AutoCompleteEvent event) {
 		if (event.getFocusedOption().getName().equals("item")) {
-			if(getLowestBinJson() != null) {
+			if (getLowestBinJson() != null) {
 				event.replyClosestMatch(
-						event.getFocusedOption().getValue(),
-						getLowestBinJson().keySet().stream().map(Utils::idToName).distinct().collect(Collectors.toList())
+					event.getFocusedOption().getValue(),
+					getLowestBinJson().keySet().stream().map(Utils::idToName).distinct().collect(Collectors.toList())
 				);
 			}
 		}
