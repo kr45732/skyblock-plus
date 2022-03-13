@@ -18,6 +18,7 @@
 
 package com.skyblockplus.dungeons;
 
+import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
@@ -26,27 +27,22 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
-public class CalcRunsSlashCommand extends SlashCommand {
+public class CalcDropsSlashCommand extends SlashCommand {
 
-	public CalcRunsSlashCommand() {
-		this.name = "calcruns";
+	public CalcDropsSlashCommand() {
+		this.name = "calcdrops";
 	}
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		if (event.invalidPlayerOption()) {
-			return;
-		}
-
-		event.embed(
-			CalcRunsCommand.getCalcRuns(
-				event.player,
-				event.getOptionStr("profile"),
-				event.getOptionInt("level", 1),
-				event.getOptionInt("floor", 0),
-				false
+		event.paginate(
+			CalcDropsCommand.getCalcDrops(
+				event.getOptionInt("floor", 1),
+				event.getOptionInt("luck", 1),
+				event.getOptionStr("accessory", "A"),
+				new PaginatorEvent(event)
 			)
 		);
 	}
@@ -56,9 +52,7 @@ public class CalcRunsSlashCommand extends SlashCommand {
 		return Commands
 			.slash(name, "Calculate the number of runs needed to reach a catacombs level")
 			.addOptions(
-				new OptionData(OptionType.INTEGER, "level", "Target catacombs level", true).setRequiredRange(1, 50),
 				new OptionData(OptionType.INTEGER, "floor", "Catacombs or master catacombs floor", true)
-					.addChoice("Entrance", 0)
 					.addChoice("Floor 1", 1)
 					.addChoice("Floor 2", 2)
 					.addChoice("Floor 3", 3)
@@ -72,16 +66,13 @@ public class CalcRunsSlashCommand extends SlashCommand {
 					.addChoice("Master Floor 4", 11)
 					.addChoice("Master Floor 5", 12)
 					.addChoice("Master Floor 6", 13)
-						.addChoice("Master Floor 7", 14)
-			)
-			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-			.addOption(OptionType.STRING, "profile", "Profile name");
-	}
-
-	@Override
-	public void onAutoComplete(AutoCompleteEvent event) {
-		if (event.getFocusedOption().getName().equals("player")) {
-			event.replyClosestPlayer();
-		}
+					.addChoice("Master Floor 7", 14),
+					new OptionData(OptionType.STRING, "accessory", "Catacombs accessory")
+							.addChoice("None", "A")
+							.addChoice("Talisman", "B")
+							.addChoice("Ring", "C")
+							.addChoice("Artifact", "D"),
+					new OptionData(OptionType.INTEGER, "luck", "Boss luck level").setRequiredRange(1, 5)
+			);
 	}
 }

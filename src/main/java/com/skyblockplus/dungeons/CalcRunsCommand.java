@@ -44,7 +44,7 @@ public class CalcRunsCommand extends Command {
 		if (targetLevel <= 0 || targetLevel > 50) {
 			return invalidEmbed("Target level must be between 1 and 50");
 		}
-		if (floor < 0 || floor > 13) {
+		if (floor < 0 || floor > 14) {
 			return invalidEmbed("Invalid floor");
 		}
 

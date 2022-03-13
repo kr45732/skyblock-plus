@@ -46,27 +46,29 @@ public class UnlinkCommand extends Command {
 		database.deleteByDiscord(event.getUser().getId());
 
 		JsonElement verifySettings = database.getVerifySettings(event.getGuild().getId());
-		List<Role> toAdd = new ArrayList<>();
-		try {
-			toAdd.add(event.getGuild().getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString()));
-		} catch (Exception ignored) {}
-		event
-			.getGuild()
-			.modifyMemberRoles(
-				event.getMember(),
-				toAdd,
-				streamJsonArray(higherDepth(verifySettings, "verifiedRoles").getAsJsonArray())
-					.map(r -> {
-						try {
-							return event.getGuild().getRoleById(r.getAsString());
-						} catch (Exception e) {
-							return null;
-						}
-					})
-					.filter(Objects::nonNull)
-					.collect(Collectors.toList())
-			)
-			.queue();
+		if(verifySettings != null && !verifySettings.isJsonNull()){
+			List<Role> toAdd = new ArrayList<>();
+			try {
+				toAdd.add(event.getGuild().getRoleById(higherDepth(verifySettings, "verifiedRemoveRole").getAsString()));
+			} catch (Exception ignored) {}
+			event
+					.getGuild()
+					.modifyMemberRoles(
+							event.getMember(),
+							toAdd,
+							streamJsonArray(higherDepth(verifySettings, "verifiedRoles").getAsJsonArray())
+									.map(r -> {
+										try {
+											return event.getGuild().getRoleById(r.getAsString());
+										} catch (Exception e) {
+											return null;
+										}
+									})
+									.filter(Objects::nonNull)
+									.collect(Collectors.toList())
+					)
+					.queue();
+		}
 
 		return defaultEmbed("Success").setDescription("You were unlinked");
 	}
