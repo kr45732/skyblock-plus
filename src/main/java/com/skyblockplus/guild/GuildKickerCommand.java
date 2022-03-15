@@ -180,10 +180,6 @@ public class GuildKickerCommand extends Command {
 					)
 			);
 		} else {
-			if (!event.getUser().getId().equals("385939031596466176")) {
-				return invalidEmbed("This command has been disabled");
-			}
-
 			String hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
 
 			EmbedBuilder eb = checkHypixelKey(hypixelKey);

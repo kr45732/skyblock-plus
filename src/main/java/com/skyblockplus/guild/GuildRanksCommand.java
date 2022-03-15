@@ -52,10 +52,6 @@ public class GuildRanksCommand extends Command {
 	}
 
 	public static EmbedBuilder getLeaderboard(String username, Player.Gamemode gamemode, boolean useKey, PaginatorEvent event) {
-		if (!event.getUser().getId().equals("385939031596466176")) {
-			return invalidEmbed("This command has been disabled");
-		}
-
 		String hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
 
 		if (gamemode != Player.Gamemode.REGULAR) {
