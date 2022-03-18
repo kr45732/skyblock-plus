@@ -710,15 +710,27 @@ public class SettingsExecute {
 
 	public EmbedBuilder searchPlayerBlacklist(String username) {
 		List<JsonElement> blacklist = streamJsonArray(guildMap.get(guild.getId()).getBlacklist()).collect(Collectors.toList());
-		if(blacklist.isEmpty()){
+		if (blacklist.isEmpty()) {
 			return invalidEmbed("Blacklist is empty");
 		}
 
 		EmbedBuilder eb = defaultSettingsEmbed();
-		for (BoundExtractedResult<JsonElement> match : FuzzySearch.extractTop(username, blacklist, element -> higherDepth(element, "username").getAsString(), 5)) {
+		for (BoundExtractedResult<JsonElement> match : FuzzySearch.extractTop(
+			username,
+			blacklist,
+			element -> higherDepth(element, "username").getAsString(),
+			5
+		)) {
 			JsonElement referent = match.getReferent();
 			String thisUser = higherDepth(referent, "username").getAsString();
-			eb.addField(thisUser, "Reason: " + higherDepth(referent, "reason").getAsString() + "\nNameMC: "+ nameMcHyperLink(thisUser, higherDepth(referent, "uuid").getAsString()), false);
+			eb.addField(
+				thisUser,
+				"Reason: " +
+				higherDepth(referent, "reason").getAsString() +
+				"\nNameMC: " +
+				nameMcHyperLink(thisUser, higherDepth(referent, "uuid").getAsString()),
+				false
+			);
 		}
 		return eb;
 	}

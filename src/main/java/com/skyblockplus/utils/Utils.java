@@ -1019,7 +1019,14 @@ public class Utils {
 			return toMatch;
 		}
 
-		return FuzzySearch.extractOne(toMatch, matchFrom.stream().collect(Collectors.toMap(Function.identity(), Utils::idToName)).entrySet(), Map.Entry::getValue).getReferent().getKey();
+		return FuzzySearch
+			.extractOne(
+				toMatch,
+				matchFrom.stream().collect(Collectors.toMap(Function.identity(), Utils::idToName)).entrySet(),
+				Map.Entry::getValue
+			)
+			.getReferent()
+			.getKey();
 	}
 
 	public static String getClosestMatch(String toMatch, List<String> matchFrom) {

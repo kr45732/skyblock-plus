@@ -1317,11 +1317,16 @@ public class Player {
 		JsonObject collections = new JsonObject();
 		for (Map.Entry<String, JsonElement> member : higherDepth(getOuterProfileJson(), "members").getAsJsonObject().entrySet()) {
 			try {
-				for (Map.Entry<String, JsonElement> collection : higherDepth(member.getValue(), "collection").getAsJsonObject().entrySet()) {
-					collections.addProperty(collection.getKey(), (collections.has(collection.getKey()) ? collections.get(collection.getKey()).getAsLong() : 0) + collection.getValue().getAsLong());
+				for (Map.Entry<String, JsonElement> collection : higherDepth(member.getValue(), "collection")
+					.getAsJsonObject()
+					.entrySet()) {
+					collections.addProperty(
+						collection.getKey(),
+						(collections.has(collection.getKey()) ? collections.get(collection.getKey()).getAsLong() : 0) +
+						collection.getValue().getAsLong()
+					);
 				}
-			} catch (Exception ignored) {
-			}
+			} catch (Exception ignored) {}
 		}
 		int numMaxedColl = 0;
 		for (Map.Entry<String, JsonElement> collection : collections.entrySet()) {
