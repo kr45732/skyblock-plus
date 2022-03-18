@@ -1314,15 +1314,22 @@ public class Player {
 	}
 
 	public int getNumMaxedCollections() {
-		int numMaxedColl = 0;
-		try {
-			for (Map.Entry<String, JsonElement> collection : higherDepth(profileJson(), "collection").getAsJsonObject().entrySet()) {
-				long maxAmount = COLLECTION_ID_TO_MAX_AMOUNT.getOrDefault(collection.getKey(), -1L);
-				if (maxAmount != -1 && collection.getValue().getAsLong() >= maxAmount) {
-					numMaxedColl++;
+		JsonObject collections = new JsonObject();
+		for (Map.Entry<String, JsonElement> member : higherDepth(getOuterProfileJson(), "members").getAsJsonObject().entrySet()) {
+			try {
+				for (Map.Entry<String, JsonElement> collection : higherDepth(member.getValue(), "collection").getAsJsonObject().entrySet()) {
+					collections.addProperty(collection.getKey(), (collections.has(collection.getKey()) ? collections.get(collection.getKey()).getAsLong() : 0) + collection.getValue().getAsLong());
 				}
+			} catch (Exception ignored) {
 			}
-		} catch (Exception ignored) {}
+		}
+		int numMaxedColl = 0;
+		for (Map.Entry<String, JsonElement> collection : collections.entrySet()) {
+			long maxAmount = COLLECTION_ID_TO_MAX_AMOUNT.getOrDefault(collection.getKey(), -1L);
+			if (maxAmount != -1 && collection.getValue().getAsLong() >= maxAmount) {
+				numMaxedColl++;
+			}
+		}
 
 		return numMaxedColl;
 	}

@@ -31,7 +31,6 @@ import com.google.gson.*;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.skyblockplus.api.linkedaccounts.LinkedAccount;
 import com.skyblockplus.features.apply.ApplyGuild;
 import com.skyblockplus.features.apply.ApplyUser;
 import com.skyblockplus.features.jacob.JacobHandler;
@@ -57,6 +56,7 @@ import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -1019,9 +1019,7 @@ public class Utils {
 			return toMatch;
 		}
 
-		return nameToId(
-			FuzzySearch.extractOne(toMatch, matchFrom.stream().map(Utils::idToName).distinct().collect(Collectors.toList())).getString()
-		);
+		return FuzzySearch.extractOne(toMatch, matchFrom.stream().collect(Collectors.toMap(Function.identity(), Utils::idToName)).entrySet(), Map.Entry::getValue).getReferent().getKey();
 	}
 
 	public static String getClosestMatch(String toMatch, List<String> matchFrom) {

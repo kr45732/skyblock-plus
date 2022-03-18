@@ -49,6 +49,7 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import me.xdrop.fuzzywuzzy.FuzzySearch;
+import me.xdrop.fuzzywuzzy.model.BoundExtractedResult;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
@@ -138,8 +139,6 @@ public class SettingsExecute {
 				return displayPlayerBlacklist();
 			} else if ((args.length >= 4) && args[2].equals("add")) {
 				eb = addPlayerBlacklist(args[3], args.length == 5 ? args[4] : "not provided");
-			} else if (args.length == 4 && args[2].equals("remove")) {
-				eb = removePlayerBlacklist(args[3]);
 			} else if (args.length == 4) {
 				eb =
 					switch (args[2]) {
@@ -147,6 +146,8 @@ public class SettingsExecute {
 						case "unshare" -> unshareBlacklist(args[3]);
 						case "use" -> useBlacklist(args[3]);
 						case "stop_using" -> stopUsingBlacklist(args[3]);
+						case "remove" -> removePlayerBlacklist(args[3]);
+						case "search" -> searchPlayerBlacklist(args[3]);
 						default -> null;
 					};
 			}
@@ -705,6 +706,21 @@ public class SettingsExecute {
 
 		guildMap.get(guild.getId()).setBlacklist(currentBlacklist);
 		return defaultSettingsEmbed("Blacklisted " + uuidStruct.nameMcHyperLink() + " with reason `" + reason + "`");
+	}
+
+	public EmbedBuilder searchPlayerBlacklist(String username) {
+		List<JsonElement> blacklist = streamJsonArray(guildMap.get(guild.getId()).getBlacklist()).collect(Collectors.toList());
+		if(blacklist.isEmpty()){
+			return invalidEmbed("Blacklist is empty");
+		}
+
+		EmbedBuilder eb = defaultSettingsEmbed();
+		for (BoundExtractedResult<JsonElement> match : FuzzySearch.extractTop(username, blacklist, element -> higherDepth(element, "username").getAsString(), 5)) {
+			JsonElement referent = match.getReferent();
+			String thisUser = higherDepth(referent, "username").getAsString();
+			eb.addField(thisUser, "Reason: " + higherDepth(referent, "reason").getAsString() + "\nNameMC: "+ nameMcHyperLink(thisUser, higherDepth(referent, "uuid").getAsString()), false);
+		}
+		return eb;
 	}
 
 	public EmbedBuilder useBlacklist(String serverId) {
