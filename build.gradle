@@ -109,7 +109,7 @@ dependencies {
     implementation 'org.openjdk.nashorn:nashorn-core:15.3'
 
     // Caching
-    implementation 'com.github.ben-manes.caffeine:caffeine:3.0.5'
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.0.6'
 
     // Fuzzy Searching
     implementation 'me.xdrop:fuzzywuzzy:1.4.0'
