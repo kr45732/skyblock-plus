@@ -181,7 +181,8 @@ public class Main {
 					new BingoCommand(),
 					new CalcSlayerCommand(),
 					new CheckApiCommand(),
-					new CalcDropsCommand(), new CalcDragsCommand()
+					new CalcDropsCommand(),
+					new CalcDragsCommand()
 				)
 				.build();
 
@@ -252,7 +253,8 @@ public class Main {
 					new BingoSlashCommand(),
 					new CalcSlayerSlashCommand(),
 					new CheckApiSlashCommand(),
-					new CalcDropsSlashCommand(), new CalcDragsSlashCommand()
+					new CalcDropsSlashCommand(),
+					new CalcDragsSlashCommand()
 				);
 
 		allServerSettings =

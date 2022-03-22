@@ -18,6 +18,8 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -25,52 +27,83 @@ import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.PaginatorExtras;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.util.Comparator;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class CalcDragsCommand extends Command {
 
 	public CalcDragsCommand() {
 		this.name = "calcdrags";
 		this.cooldown = globalCooldown;
-		this.aliases = new String[]{"drags"};
+		this.aliases = new String[] { "drags" };
 		this.botPermissions = defaultPerms();
 	}
 
 	public static EmbedBuilder getCalcDrags(int position, double damageRatio, int eyesPlaced, PaginatorEvent event) {
 		position = damageRatio == 1 ? 1 : position;
 		damageRatio = position == 1 ? 1 : damageRatio;
-		int estimatedQuality = (int) (switch (position) {
-			case 1 -> 200;
-			case 2 -> 175;
-			case 3 -> 150;
-			case 4 -> 125;
-			case 5 -> 110;
-			case 6, 7, 8 -> 100;
-			case 9, 10 -> 90;
-			case 11, 12 -> 80;
-			default -> 70;
-		} + 100 * damageRatio + 100 * eyesPlaced);
+		int estimatedQuality = (int) (
+			switch (position) {
+				case 1 -> 200;
+				case 2 -> 175;
+				case 3 -> 150;
+				case 4 -> 125;
+				case 5 -> 110;
+				case 6, 7, 8 -> 100;
+				case 9, 10 -> 90;
+				case 11, 12 -> 80;
+				default -> 70;
+			} +
+			100 *
+			damageRatio +
+			100 *
+			eyesPlaced
+		);
 
 		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(10);
 		PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
-		for (Map.Entry<String, JsonElement> dragon : getJson("https://wiki-data.kr45732.repl.co/dragon_loot").getAsJsonObject().entrySet()) {
+		for (Map.Entry<String, JsonElement> dragon : getJson("https://wiki-data.kr45732.repl.co/dragon_loot")
+			.getAsJsonObject()
+			.entrySet()) {
 			EmbedBuilder eb = defaultEmbed(capitalizeString(dragon.getKey()) + " Dragon Loot");
-			eb.setDescription("**Your Estimated Quality:** " + estimatedQuality + "\n**Eyes Placed:** " + eyesPlaced
-					+ "\n**Position:** " + position +
-					"\n**Damage Ratio:** " + formatNumber(damageRatio)
+			eb.setDescription(
+				"**Your Estimated Quality:** " +
+				estimatedQuality +
+				"\n**Eyes Placed:** " +
+				eyesPlaced +
+				"\n**Position:** " +
+				position +
+				"\n**Damage Ratio:** " +
+				formatNumber(damageRatio)
 			);
 			eb.setThumbnail("https://wiki.hypixel.net/images/6/60/Minecraft_entities_ender_dragon.gif");
-			for (Map.Entry<String, JsonElement> entry : dragon.getValue().getAsJsonObject().entrySet().stream().sorted(Comparator.comparingInt(e -> -higherDepth(e.getValue(), "quality", 0))).collect(Collectors.toList())) {
-				eb.addField(higherDepth(getEmojiMap(), nameToId(entry.getKey()), "") + " " + entry.getKey() + (higherDepth(entry.getValue(), "unique", false) ? " (Unique)" : ""),
-						"➜ Quality: " + higherDepth(entry.getValue(), "quality", 0) + "\n➜ Drop Chance: " +
-								(higherDepth(entry.getValue(), "eye", false) ? formatNumber(Double.parseDouble(higherDepth(entry.getValue(), "drop_chance", "").replace("%", "")) * eyesPlaced) + "%" : higherDepth(entry.getValue(), "drop_chance", ""))
-						, false);
+			for (Map.Entry<String, JsonElement> entry : dragon
+				.getValue()
+				.getAsJsonObject()
+				.entrySet()
+				.stream()
+				.sorted(Comparator.comparingInt(e -> -higherDepth(e.getValue(), "quality", 0)))
+				.collect(Collectors.toList())) {
+				eb.addField(
+					higherDepth(getEmojiMap(), nameToId(entry.getKey()), "") +
+					" " +
+					entry.getKey() +
+					(higherDepth(entry.getValue(), "unique", false) ? " (Unique)" : ""),
+					"➜ Quality: " +
+					higherDepth(entry.getValue(), "quality", 0) +
+					"\n➜ Drop Chance: " +
+					(
+						higherDepth(entry.getValue(), "eye", false)
+							? formatNumber(
+								Double.parseDouble(higherDepth(entry.getValue(), "drop_chance", "").replace("%", "")) * eyesPlaced
+							) +
+							"%"
+							: higherDepth(entry.getValue(), "drop_chance", "")
+					),
+					false
+				);
 			}
 			extras.addEmbedPage(eb);
 		}
@@ -93,6 +126,6 @@ public class CalcDragsCommand extends Command {
 				paginate(getCalcDrags(position, damageRatio, eyesPlaced, new PaginatorEvent(event)));
 			}
 		}
-				.queue();
+			.queue();
 	}
 }
