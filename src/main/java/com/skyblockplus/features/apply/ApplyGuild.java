@@ -242,7 +242,7 @@ public class ApplyGuild {
 		} catch (Exception ignored) {}
 
 		event.getMessage().delete().queueAfter(3, TimeUnit.SECONDS);
-		return client.getSuccess() + "P layer was invited";
+		return client.getSuccess() + " Player was invited";
 	}
 
 	public boolean onGuildMessageReceived(MessageReceivedEvent event) {

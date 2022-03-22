@@ -64,6 +64,11 @@ public class SlashCommandEvent extends SlashCommandInteractionEvent {
 		return option == null ? defaultValue : (int) option.getAsLong();
 	}
 
+	public double getOptionDouble(String name, double defaultValue) {
+		OptionMapping option = getOption(name);
+		return option == null ? defaultValue : option.getAsDouble();
+	}
+
 	public boolean getOptionBoolean(String name, boolean defaultValue) {
 		OptionMapping option = getOption(name);
 		return option == null ? defaultValue : option.getAsBoolean();

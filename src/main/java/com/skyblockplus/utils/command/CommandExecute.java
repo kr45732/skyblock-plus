@@ -215,6 +215,18 @@ public abstract class CommandExecute extends CommandEvent {
 		return defaultValue;
 	}
 
+	protected double getDoubleOption(String match, double defaultValue) {
+		for (int i = 0; i < args.length; i++) {
+			if (args[i].startsWith(match + ":")) {
+				double arg = Double.parseDouble(args[i].split(match + ":")[1]);
+				removeArg(i);
+				return arg;
+			}
+		}
+
+		return defaultValue;
+	}
+
 	public CommandExecute setAdminCommand(boolean adminCommand) {
 		this.adminCommand = adminCommand;
 		return this;
