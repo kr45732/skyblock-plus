@@ -226,7 +226,10 @@ public class ApplyGuild {
 				.split("apply_user_wait_" + higherDepth(currentSettings, "guildName").getAsString() + "_")[1].split("_");
 			TextChannel toCloseChannel = event.getGuild().getTextChannelById(channelRoleSplit[0]);
 			try {
-				event.getGuild().addRoleToMember(channelRoleSplit[1], event.getGuild().getRoleById(channelRoleSplit[2])).queue(ignore, ignore);
+				event
+					.getGuild()
+					.addRoleToMember(channelRoleSplit[1], event.getGuild().getRoleById(channelRoleSplit[2]))
+					.queue(ignore, ignore);
 			} catch (Exception ignored) {}
 			applyUserList
 				.stream()

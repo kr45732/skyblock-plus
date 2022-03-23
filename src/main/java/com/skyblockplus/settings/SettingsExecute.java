@@ -169,7 +169,7 @@ public class SettingsExecute {
 			eb =
 				defaultSettingsEmbed()
 					.addField("General Settings", "Use `/settings general` to see the current settings", false)
-						.addField("Blacklist Settings", "Use `/settings blacklist` to see the current settings", false)
+					.addField("Blacklist Settings", "Use `/settings blacklist` to see the current settings", false)
 					.addField("Jacob Settings", "Use `/settings jacob` to see the current settings", false)
 					.addField("Verify Settings", "Use `/settings verify` to see the current settings", false)
 					.addField("Guild Settings", "Use `/settings guild` to see the current settings", false)
