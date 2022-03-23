@@ -1249,6 +1249,9 @@ public class NetworthExecute {
 		double averageAuction = -1;
 		String enchantName = enchantId.split(";")[0];
 		int enchantLevel = Integer.parseInt(enchantId.split(";")[1]);
+		if(enchantLevel > 10){
+			return 0;
+		}
 
 		if (enchantLevel <= IGNORED_ENCHANTS.getOrDefault(enchantName, 0)) {
 			return 0;

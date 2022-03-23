@@ -169,6 +169,7 @@ public class SettingsExecute {
 			eb =
 				defaultSettingsEmbed()
 					.addField("General Settings", "Use `/settings general` to see the current settings", false)
+						.addField("Blacklist Settings", "Use `/settings blacklist` to see the current settings", false)
 					.addField("Jacob Settings", "Use `/settings jacob` to see the current settings", false)
 					.addField("Verify Settings", "Use `/settings verify` to see the current settings", false)
 					.addField("Guild Settings", "Use `/settings guild` to see the current settings", false)
@@ -474,8 +475,8 @@ public class SettingsExecute {
 	public EmbedBuilder displayJacobSettings(JsonElement jacobSettings) {
 		String ebFieldString = "";
 		ebFieldString += "**" + displaySettings(jacobSettings, "enable") + "**";
-		ebFieldString += "\n**• Channel:** " + displaySettings(jacobSettings, "channel");
-		ebFieldString += "\n**• Crop(s):** " + displaySettings(jacobSettings, "crops");
+		ebFieldString += "\n• **Channel:** " + displaySettings(jacobSettings, "channel");
+		ebFieldString += "\n• **Crops:** " + displaySettings(jacobSettings, "crops");
 		return defaultEmbed("Jacob Settings").setDescription(ebFieldString);
 	}
 
@@ -652,7 +653,7 @@ public class SettingsExecute {
 		paginateBuilder.addItems(
 			"• Shared with: " + (canUse.isEmpty() ? "none" : canUse),
 			"• Using: " + (isUsing.isEmpty() ? "none" : isUsing),
-			"• Blacklist count (only this server): " + currentBlacklist.size()
+			"• Blacklist size (this server): " + currentBlacklist.size()
 		);
 		paginateBuilder.addItems(Collections.nCopies(27, "").toArray(new String[0]));
 
@@ -2002,13 +2003,13 @@ public class SettingsExecute {
 	public String getCurrentVerifySettings(JsonElement verifySettings) {
 		String ebFieldString = "";
 		ebFieldString += "**" + displaySettings(verifySettings, "enable") + "**";
-		ebFieldString += "\n**• Message Text:** " + displaySettings(verifySettings, "messageText");
-		ebFieldString += "\n**• Channel:** " + displaySettings(verifySettings, "messageTextChannelId");
-		ebFieldString += "\n**• Verified Role(s):** " + displaySettings(verifySettings, "verifiedRoles");
-		ebFieldString += "\n**• Verified Remove Role:** " + displaySettings(verifySettings, "verifiedRemoveRole");
-		ebFieldString += "\n**• Nickname Template:** " + displaySettings(verifySettings, "verifiedNickname");
-		ebFieldString += "\n**• Automatic Sync:** " + displaySettings(verifySettings, "enableAutomaticSync");
-		ebFieldString += "\n**• Automatic Roles Claim:** " + displaySettings(verifySettings, "enableRolesClaim");
+		ebFieldString += "\n• **Message Text:** " + displaySettings(verifySettings, "messageText");
+		ebFieldString += "\n• **Channel:** " + displaySettings(verifySettings, "messageTextChannelId");
+		ebFieldString += "\n• **Verified Role(s):** " + displaySettings(verifySettings, "verifiedRoles");
+		ebFieldString += "\n• **Verified Remove Role:** " + displaySettings(verifySettings, "verifiedRemoveRole");
+		ebFieldString += "\n• **Nickname Template:** " + displaySettings(verifySettings, "verifiedNickname");
+		ebFieldString += "\n• **Automatic Sync:** " + displaySettings(verifySettings, "enableAutomaticSync");
+		ebFieldString += "\n• **Automatic Roles Claim:** " + displaySettings(verifySettings, "enableRolesClaim");
 		return ebFieldString;
 	}
 
@@ -2627,7 +2628,7 @@ public class SettingsExecute {
 						return "None";
 					}
 
-					return String.join("\n", ebStr);
+					return "\n\u200B \u200B  " + String.join("\n\u200B \u200B  ", ebStr);
 				}
 			}
 
