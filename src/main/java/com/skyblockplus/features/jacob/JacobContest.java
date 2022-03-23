@@ -28,7 +28,7 @@ import org.apache.groovy.util.Maps;
 @Data
 public class JacobContest {
 
-	private static final Map<String, String> CROP_NAME_TO_EMOJI = Maps.of(
+	public static final Map<String, String> CROP_NAME_TO_EMOJI = Maps.of(
 		"Wheat",
 		"<:wheat:939024495581224981>",
 		"Carrot",

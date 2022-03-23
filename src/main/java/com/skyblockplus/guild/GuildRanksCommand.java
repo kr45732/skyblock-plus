@@ -54,17 +54,10 @@ public class GuildRanksCommand extends Command {
 	public static EmbedBuilder getLeaderboard(String username, Player.Gamemode gamemode, boolean useKey, PaginatorEvent event) {
 		String hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
 
-		if (gamemode != Player.Gamemode.REGULAR) {
-			if (hypixelKey == null) {
-				return invalidEmbed("You must set a Hypixel API key to use the ironman/stranded only option");
-			}
-			try {
-				higherDepth(getJson("https://api.hypixel.net/key?key=" + hypixelKey), "record.key").getAsString();
-			} catch (Exception e) {
-				return invalidEmbed("You must set a valid Hypixel API key to use the ironman/stranded only option");
-			}
-			if (!keyCooldownMap.containsKey(hypixelKey)) {
-				keyCooldownMap.put(hypixelKey, new HypixelKeyRecord());
+		if (gamemode == Player.Gamemode.IRONMAN || gamemode == Player.Gamemode.STRANDED) {
+			EmbedBuilder eb = checkHypixelKey(hypixelKey);
+			if (eb != null) {
+				return invalidEmbed("You must set a Hypixel API key to use the ironman or stranded only gamemode");
 			}
 			useKey = true;
 		} else if (useKey) {

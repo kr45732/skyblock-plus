@@ -18,6 +18,7 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.features.jacob.JacobContest.CROP_NAME_TO_EMOJI;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.jagrosh.jdautilities.command.Command;
@@ -31,6 +32,8 @@ import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import net.dv8tion.jda.api.EmbedBuilder;
 
+import java.util.stream.Collectors;
+
 public class JacobCommand extends Command {
 
 	public JacobCommand() {
@@ -39,7 +42,11 @@ public class JacobCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	public static EmbedBuilder getJacobEmbed(PaginatorEvent event) {
+	public static EmbedBuilder getJacobEmbed(String crop, PaginatorEvent event) {
+		if(!CROP_NAME_TO_EMOJI.containsKey(crop)){
+			return invalidEmbed("Invalid crop");
+		}
+
 		JacobData data = JacobHandler.getJacobData();
 
 		if (data.getContests().isEmpty()) {
@@ -49,9 +56,9 @@ public class JacobCommand extends Command {
 		}
 
 		PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_FIELDS).setEveryPageTitle("Jacob Contests");
-		for (JacobContest contest : data.getContests()) {
+		for (JacobContest contest : crop.equalsIgnoreCase("all") ? data.getContests():data.getContests().stream().filter(c -> c.getCrops().stream().anyMatch(thisCrop -> thisCrop.equals(crop))).collect(Collectors.toList())) {
 			extras.addEmbedField(
-				"Jacob Contest",
+				"Contest",
 				"**In:** <t:" + contest.getTimeInstant().getEpochSecond() + ":R>\n**Crops:**\n" + contest.getCropsFormatted(),
 				false
 			);
@@ -68,7 +75,7 @@ public class JacobCommand extends Command {
 			protected void execute() {
 				logCommand();
 
-				paginate(getJacobEmbed(new PaginatorEvent(event)));
+				paginate(getJacobEmbed(args.length == 2 ? args[1] : "all", new PaginatorEvent(event)));
 			}
 		}
 			.queue();

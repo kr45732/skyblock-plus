@@ -58,10 +58,10 @@ public class CalcSlayerSlashCommand extends SlashCommand {
 			.slash(name, "Calculate the number of slayer bosses needed to reach a certain level or xp amount")
 			.addOptions(
 				new OptionData(OptionType.STRING, "type", "Slayer type", true)
-					.addChoice("Sven packmaster", "sven")
-					.addChoice("Revenant horror", "rev")
-					.addChoice("Tarantula broodfather", "tara")
-					.addChoice("Voidgloom seraph", "enderman"),
+					.addChoice("Sven Packmaster", "sven")
+					.addChoice("Revenant Horror", "rev")
+					.addChoice("Tarantula Broodfather", "tara")
+					.addChoice("Voidgloom Seraph", "enderman"),
 				new OptionData(OptionType.INTEGER, "level", "Target slayer level").setRequiredRange(1, 9),
 				new OptionData(OptionType.INTEGER, "xp", "Target slayer xp").setMinValue(1)
 			)
