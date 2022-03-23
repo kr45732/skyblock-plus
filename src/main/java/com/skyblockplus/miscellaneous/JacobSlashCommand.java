@@ -18,18 +18,17 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.features.jacob.JacobContest.CROP_NAME_TO_EMOJI;
+
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-
-import java.util.stream.Collectors;
-
-import static com.skyblockplus.features.jacob.JacobContest.CROP_NAME_TO_EMOJI;
 
 public class JacobSlashCommand extends SlashCommand {
 
@@ -46,9 +45,11 @@ public class JacobSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return Commands.slash(name, "Get a list of upcoming farming contests")
-				.addOptions(new OptionData(OptionType.STRING, "crop", "Crop to filter by")
-						.addChoices(CROP_NAME_TO_EMOJI.keySet().stream().map(c -> new Command.Choice(c, c)).collect(Collectors.toList()))
-				);
+		return Commands
+			.slash(name, "Get a list of upcoming farming contests")
+			.addOptions(
+				new OptionData(OptionType.STRING, "crop", "Crop to filter by")
+					.addChoices(CROP_NAME_TO_EMOJI.keySet().stream().map(c -> new Command.Choice(c, c)).collect(Collectors.toList()))
+			);
 	}
 }
