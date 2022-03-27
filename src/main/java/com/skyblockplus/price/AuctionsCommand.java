@@ -111,8 +111,12 @@ public class AuctionsCommand extends Command {
 						auctionName += parseMcCodes(higherDepth(currentAuction, "item_lore").getAsString().split("\n")[0]);
 					} else {
 						auctionName +=
-								(item.getId().equals("PET") ? capitalizeString(higherDepth(currentAuction, "tier").getAsString().toLowerCase()) + " " : (item.getCount() > 1 ? item.getCount() + "x " : "")) +
-										higherDepth(currentAuction, "item_name").getAsString();
+							(
+								item.getId().equals("PET")
+									? capitalizeString(higherDepth(currentAuction, "tier").getAsString().toLowerCase()) + " "
+									: (item.getCount() > 1 ? item.getCount() + "x " : "")
+							) +
+							higherDepth(currentAuction, "item_name").getAsString();
 					}
 
 					long highestBid = higherDepth(currentAuction, "highest_bid_amount", 0);

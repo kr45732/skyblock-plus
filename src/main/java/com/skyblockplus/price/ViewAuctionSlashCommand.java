@@ -40,6 +40,7 @@ public class ViewAuctionSlashCommand extends SlashCommand {
 	@Override
 	public CommandData getCommandData() {
 		return Commands
-			.slash(name, "Get information about an auction by it's UUID").addOption(OptionType.STRING, "uuid", "Auction UUID", true);
+			.slash(name, "Get information about an auction by it's UUID")
+			.addOption(OptionType.STRING, "uuid", "Auction UUID", true);
 	}
 }

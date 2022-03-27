@@ -182,7 +182,10 @@ public class Main {
 					new CalcSlayerCommand(),
 					new CheckApiCommand(),
 					new CalcDropsCommand(),
-					new CalcDragsCommand(), new ViewAuctionCommand(), new CoinsPerBitCommand(), new ReforgeStoneCommand()
+					new CalcDragsCommand(),
+					new ViewAuctionCommand(),
+					new CoinsPerBitCommand(),
+					new ReforgeStoneCommand()
 				)
 				.build();
 
@@ -254,7 +257,10 @@ public class Main {
 					new CalcSlayerSlashCommand(),
 					new CheckApiSlashCommand(),
 					new CalcDropsSlashCommand(),
-					new CalcDragsSlashCommand(), new ViewAuctionSlashCommand(), new CoinsPerBitSlashCommand(), new ReforgeStoneSlashCommand()
+					new CalcDragsSlashCommand(),
+					new ViewAuctionSlashCommand(),
+					new CoinsPerBitSlashCommand(),
+					new ReforgeStoneSlashCommand()
 				);
 
 		allServerSettings =

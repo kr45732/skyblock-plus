@@ -18,17 +18,16 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.Utils.getReforgeStonesJson;
+
 import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-
-import java.util.stream.Collectors;
-
-import static com.skyblockplus.utils.Utils.getReforgeStonesJson;
 
 public class ReforgeStoneSlashCommand extends SlashCommand {
 
@@ -45,7 +44,9 @@ public class ReforgeStoneSlashCommand extends SlashCommand {
 
 	@Override
 	public CommandData getCommandData() {
-		return Commands.slash(name, "Get the reforge stone stats for each rarity").addOption(OptionType.STRING, "item", "Reforge stone name", true, true);
+		return Commands
+			.slash(name, "Get the reforge stone stats for each rarity")
+			.addOption(OptionType.STRING, "item", "Reforge stone name", true, true);
 	}
 
 	@Override
@@ -53,7 +54,7 @@ public class ReforgeStoneSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("item")) {
 			event.replyClosestMatch(
 				event.getFocusedOption().getValue(),
-					getReforgeStonesJson().keySet().stream().map(Utils::idToName).collect(Collectors.toList())
+				getReforgeStonesJson().keySet().stream().map(Utils::idToName).collect(Collectors.toList())
 			);
 		}
 	}

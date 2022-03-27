@@ -37,36 +37,36 @@ public class AuctionsSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-			if (event.invalidPlayerOption()) {
-				return;
-			}
-			event.paginate(
-				AuctionsCommand.getPlayerAuction(
-					event.player,
-					AuctionsCommand.AuctionFilterType.valueOf(event.getOptionStr("filter", "none").toUpperCase()),
-					AuctionsCommand.AuctionSortType.valueOf(event.getOptionStr("sort", "none").toUpperCase()),
-					event.getOptionBoolean("verbose", false),
-					new PaginatorEvent(event)
-				)
-			);
+		if (event.invalidPlayerOption()) {
+			return;
+		}
+		event.paginate(
+			AuctionsCommand.getPlayerAuction(
+				event.player,
+				AuctionsCommand.AuctionFilterType.valueOf(event.getOptionStr("filter", "none").toUpperCase()),
+				AuctionsCommand.AuctionSortType.valueOf(event.getOptionStr("sort", "none").toUpperCase()),
+				event.getOptionBoolean("verbose", false),
+				new PaginatorEvent(event)
+			)
+		);
 	}
 
 	@Override
 	public CommandData getCommandData() {
 		return Commands
 			.slash(name, "Get player's active (not claimed) auctions on all profiles")
-					.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-					.addOptions(
-						new OptionData(OptionType.STRING, "filter", "How the auctions should be filtered")
-							.addChoice("Sold", "sold")
-							.addChoice("Unsold", "Unsold")
-					)
-					.addOptions(
-						new OptionData(OptionType.STRING, "sort", "How the auctions should be sorted")
-							.addChoice("Low", "low")
-							.addChoice("High", "high")
-					)
-					.addOption(OptionType.BOOLEAN, "verbose", "Get more information & a detailed breakdown for each auction");
+			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+			.addOptions(
+				new OptionData(OptionType.STRING, "filter", "How the auctions should be filtered")
+					.addChoice("Sold", "sold")
+					.addChoice("Unsold", "Unsold")
+			)
+			.addOptions(
+				new OptionData(OptionType.STRING, "sort", "How the auctions should be sorted")
+					.addChoice("Low", "low")
+					.addChoice("High", "high")
+			)
+			.addOption(OptionType.BOOLEAN, "verbose", "Get more information & a detailed breakdown for each auction");
 	}
 
 	@Override

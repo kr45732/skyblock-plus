@@ -436,7 +436,9 @@ public class Utils {
 	public static JsonElement getJson(String jsonUrl, String hypixelApiKey) {
 		boolean isMain = hypixelApiKey.equals(HYPIXEL_API_KEY);
 		try {
-			if (jsonUrl.contains(hypixelApiKey) && (isMain ? remainingLimit : keyCooldownMap.get(hypixelApiKey).remainingLimit()).get() < 5) {
+			if (
+				jsonUrl.contains(hypixelApiKey) && (isMain ? remainingLimit : keyCooldownMap.get(hypixelApiKey).remainingLimit()).get() < 5
+			) {
 				int timeTillResetInt = (isMain ? timeTillReset : keyCooldownMap.get(hypixelApiKey).timeTillReset()).get();
 				log.info("Sleeping for " + timeTillResetInt + " seconds");
 				TimeUnit.SECONDS.sleep(timeTillResetInt);
@@ -453,8 +455,12 @@ public class Utils {
 			try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
 				if (jsonUrl.toLowerCase().contains("api.hypixel.net") && jsonUrl.contains(hypixelApiKey)) {
 					try {
-						(isMain ? remainingLimit : keyCooldownMap.get(hypixelApiKey).remainingLimit()).set(Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Remaining").getValue()));
-						(isMain ? timeTillReset : keyCooldownMap.get(hypixelApiKey).timeTillReset()).set(Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Reset").getValue()));
+						(isMain ? remainingLimit : keyCooldownMap.get(hypixelApiKey).remainingLimit()).set(
+								Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Remaining").getValue())
+							);
+						(isMain ? timeTillReset : keyCooldownMap.get(hypixelApiKey).timeTillReset()).set(
+								Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Reset").getValue())
+							);
 					} catch (Exception ignored) {}
 				}
 

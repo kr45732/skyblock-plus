@@ -87,7 +87,11 @@ public class SacksCommand extends Command {
 						) *
 						currentSack.getValue();
 
-					String emoji = higherDepth(getEmojiMap(), currentSack.getKey().equals("MUSHROOM_COLLECTION") ? "RED_MUSHROOM" : currentSack.getKey(), null);
+					String emoji = higherDepth(
+						getEmojiMap(),
+						currentSack.getKey().equals("MUSHROOM_COLLECTION") ? "RED_MUSHROOM" : currentSack.getKey(),
+						null
+					);
 
 					paginateBuilder.addItems(
 						(emoji != null ? emoji + " " : "") +

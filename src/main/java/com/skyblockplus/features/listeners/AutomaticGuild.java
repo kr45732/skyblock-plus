@@ -932,7 +932,7 @@ public class AutomaticGuild {
 		} else if (event.getComponentId().equals("mayor_graph_button")) {
 			event.replyEmbeds(votesEmbed).setEphemeral(true).queue();
 			return;
-		}else if (event.getComponentId().equals("mayor_special_button")) {
+		} else if (event.getComponentId().equals("mayor_special_button")) {
 			event.replyEmbeds(MayorCommand.getSpecialMayors().build()).setEphemeral(true).queue();
 			return;
 		} else if (event.getComponentId().startsWith("bingo_")) {

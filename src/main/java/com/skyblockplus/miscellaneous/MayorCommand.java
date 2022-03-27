@@ -27,10 +27,8 @@ import static com.skyblockplus.utils.Utils.jda;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
-
 import java.time.Instant;
 import java.util.List;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -49,7 +47,7 @@ public class MayorCommand extends Command {
 		Message message = jda.getTextChannelById("932484216179011604").getHistory().retrievePast(1).complete().get(0);
 		EmbedBuilder eb = new EmbedBuilder();
 		eb.copyFrom(message.getEmbeds().get(0));
-		List<Button> buttons =  message.getButtons();
+		List<Button> buttons = message.getButtons();
 		buttons.add(Button.primary("mayor_special_button", "Special Mayors"));
 		return new MessageBuilder().setEmbeds(eb.setTimestamp(Instant.now()).build()).setActionRows(ActionRow.of(buttons));
 	}
@@ -60,7 +58,7 @@ public class MayorCommand extends Command {
 		int year = getSkyblockYear();
 		int nextSpecial = (year + 8) - (year % 8);
 
-		String[] mayorNames = new String[]{"Scorpius", "Derpy", "Jerry"};
+		String[] mayorNames = new String[] { "Scorpius", "Derpy", "Jerry" };
 		EmbedBuilder eb = defaultEmbed("Special Mayors");
 		for (int i = nextSpecial; i < nextSpecial + 24; i += 8) {
 			int mayorIndex = 0;
@@ -69,7 +67,15 @@ public class MayorCommand extends Command {
 			} else if ((i - 16) % 24 == 0) {
 				mayorIndex = 2;
 			}
-			eb.addField(mayorNameToEmoji.get(mayorNames[mayorIndex].toUpperCase()) + " " + mayorNames[mayorIndex], "Opens: <t:" + Instant.ofEpochMilli((YEAR_0 + 446400000L * (i - 1)) + newYearToElectionOpen).getEpochSecond() + ":R>\nCloses: <t:" + Instant.ofEpochMilli((YEAR_0 + 446400000L * (i)) + newYearToElectionClose).getEpochSecond() + ":R>", false);
+			eb.addField(
+				mayorNameToEmoji.get(mayorNames[mayorIndex].toUpperCase()) + " " + mayorNames[mayorIndex],
+				"Opens: <t:" +
+				Instant.ofEpochMilli((YEAR_0 + 446400000L * (i - 1)) + newYearToElectionOpen).getEpochSecond() +
+				":R>\nCloses: <t:" +
+				Instant.ofEpochMilli((YEAR_0 + 446400000L * (i)) + newYearToElectionClose).getEpochSecond() +
+				":R>",
+				false
+			);
 		}
 		return eb;
 	}

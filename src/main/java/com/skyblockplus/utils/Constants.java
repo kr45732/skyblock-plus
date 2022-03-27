@@ -81,8 +81,7 @@ public class Constants {
 
 	public static void initialize() {
 		try {
-			CONSTANTS = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/Constants.json")
-				.getAsJsonObject();
+			CONSTANTS = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/Constants.json").getAsJsonObject();
 
 			Type mapStringString = new TypeToken<Map<String, String>>() {}.getType();
 			Type listInteger = new TypeToken<List<Integer>>() {}.getType();
@@ -260,7 +259,7 @@ public class Constants {
 		}
 	}
 
-	public static JsonElement getConstant(String key){
+	public static JsonElement getConstant(String key) {
 		return CONSTANTS.get(key);
 	}
 }

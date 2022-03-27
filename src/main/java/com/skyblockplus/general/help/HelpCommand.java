@@ -764,8 +764,7 @@ public class HelpCommand extends Command {
 			}
 		}
 
-		CustomPaginator.Builder paginateBuilder = event.getPaginator()
-			.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles));
+		CustomPaginator.Builder paginateBuilder = event.getPaginator().setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles));
 
 		paginateBuilder.addItems(
 			"Use the arrow buttons to navigate through the pages" + generatePageMap() + "\n\n<> = required [] = optional"

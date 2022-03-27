@@ -18,28 +18,58 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.command.CommandExecute;
-import net.dv8tion.jda.api.EmbedBuilder;
-import org.apache.groovy.util.Maps;
-
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.EmbedBuilder;
+import org.apache.groovy.util.Maps;
 
 public class ReforgeStoneCommand extends Command {
 
-	public static final Map<String, String > statToEmoji = Maps.of("HEALTH","❤️","DEFENSE","<:iron_chestplate:939021594775408691>","STRENGTH","<:blaze_powder:939020829486874635>","SPEED","<:sugar:939024464564342805>","CRIT_CHANCE","☣️","CRIT_DAMAGE","☠️","INTELLIGENCE","<:common:939021148484698132>","MINING_SPEED","⛏️","BONUS_ATTACK_SPEED","⚔️","SEA_CREATURE_CHANCE","\uD83D\uDC20","MAGIC_FIND","\uD83C\uDF1F","PET_LUCK","♣️","TRUE_DEFENSE","<:diamond_chestplate:939021063428395098>","FEROCITY","\uD83D\uDDE1️","MINING_FORTUNE","☘️");
+	public static final Map<String, String> statToEmoji = Maps.of(
+		"HEALTH",
+		"❤️",
+		"DEFENSE",
+		"<:iron_chestplate:939021594775408691>",
+		"STRENGTH",
+		"<:blaze_powder:939020829486874635>",
+		"SPEED",
+		"<:sugar:939024464564342805>",
+		"CRIT_CHANCE",
+		"☣️",
+		"CRIT_DAMAGE",
+		"☠️",
+		"INTELLIGENCE",
+		"<:common:939021148484698132>",
+		"MINING_SPEED",
+		"⛏️",
+		"BONUS_ATTACK_SPEED",
+		"⚔️",
+		"SEA_CREATURE_CHANCE",
+		"\uD83D\uDC20",
+		"MAGIC_FIND",
+		"\uD83C\uDF1F",
+		"PET_LUCK",
+		"♣️",
+		"TRUE_DEFENSE",
+		"<:diamond_chestplate:939021063428395098>",
+		"FEROCITY",
+		"\uD83D\uDDE1️",
+		"MINING_FORTUNE",
+		"☘️"
+	);
 
 	public ReforgeStoneCommand() {
 		this.name = "reforgestone";
-		this.aliases = new String[]{"reforge"};
+		this.aliases = new String[] { "reforge" };
 		this.cooldown = globalCooldown;
 		this.botPermissions = defaultPerms();
 	}
@@ -50,15 +80,48 @@ public class ReforgeStoneCommand extends Command {
 		JsonElement reforgeStoneJson = higherDepth(reforgeStonesJson, closestMatch);
 
 		EmbedBuilder eb = defaultEmbed(idToName(closestMatch));
-		eb.setDescription("**Reforge:** " + higherDepth(reforgeStoneJson, "reforgeName").getAsString() + "\n**Item Types:** " + Arrays.stream(higherDepth(reforgeStoneJson, "itemTypes").getAsString().split("\n")).map(Utils::capitalizeString).collect(Collectors.joining(", ")));
+		eb.setDescription(
+			"**Reforge:** " +
+			higherDepth(reforgeStoneJson, "reforgeName").getAsString() +
+			"\n**Item Types:** " +
+			Arrays
+				.stream(higherDepth(reforgeStoneJson, "itemTypes").getAsString().split("\n"))
+				.map(Utils::capitalizeString)
+				.collect(Collectors.joining(", "))
+		);
 		if (higherDepth(reforgeStoneJson, "reforgeAbility", null) != null) {
 			eb.appendDescription("\n**Ability:** " + parseMcCodes(higherDepth(reforgeStoneJson, "reforgeAbility").getAsString()));
 		}
 		for (Map.Entry<String, JsonElement> stat : higherDepth(reforgeStoneJson, "reforgeStats").getAsJsonObject().entrySet()) {
-			eb.addField(capitalizeString(stat.getKey()), "Cost: " + formatNumber(higherDepth(reforgeStoneJson, "reforgeCosts." + stat.getKey()).getAsLong()) + "\n" +
-							(higherDepth(reforgeStoneJson, "reforgeAbility." + stat.getKey(), null) != null ? ("➜ Ability: " + parseMcCodes(higherDepth(reforgeStoneJson, "reforgeAbility." + stat.getKey(), null)).replace("\n", " ") + "\n") : "") +
-							stat.getValue().getAsJsonObject().entrySet().stream().map(e -> statToEmoji.get(e.getKey().toUpperCase()) + " " + capitalizeString(e.getKey().replace("_", " ")) + " ➜ " + e.getValue().getAsInt()).collect(Collectors.joining("\n"))
-					, false);
+			eb.addField(
+				capitalizeString(stat.getKey()),
+				"Cost: " +
+				formatNumber(higherDepth(reforgeStoneJson, "reforgeCosts." + stat.getKey()).getAsLong()) +
+				"\n" +
+				(
+					higherDepth(reforgeStoneJson, "reforgeAbility." + stat.getKey(), null) != null
+						? (
+							"➜ Ability: " +
+							parseMcCodes(higherDepth(reforgeStoneJson, "reforgeAbility." + stat.getKey(), null)).replace("\n", " ") +
+							"\n"
+						)
+						: ""
+				) +
+				stat
+					.getValue()
+					.getAsJsonObject()
+					.entrySet()
+					.stream()
+					.map(e ->
+						statToEmoji.get(e.getKey().toUpperCase()) +
+						" " +
+						capitalizeString(e.getKey().replace("_", " ")) +
+						" ➜ " +
+						e.getValue().getAsInt()
+					)
+					.collect(Collectors.joining("\n")),
+				false
+			);
 		}
 		return eb.setThumbnail(getItemThumbnail(closestMatch));
 	}

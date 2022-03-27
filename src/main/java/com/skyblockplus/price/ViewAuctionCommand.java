@@ -18,21 +18,20 @@
 
 package com.skyblockplus.price;
 
+import static com.skyblockplus.utils.ApiHandler.getAuctionFromUuid;
+import static com.skyblockplus.utils.ApiHandler.uuidToUsername;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.HypixelResponse;
-import me.nullicorn.nedit.NBTReader;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.time.Duration;
 import java.time.Instant;
-
-import static com.skyblockplus.utils.ApiHandler.getAuctionFromUuid;
-import static com.skyblockplus.utils.ApiHandler.uuidToUsername;
-import static com.skyblockplus.utils.Utils.*;
+import me.nullicorn.nedit.NBTReader;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class ViewAuctionCommand extends Command {
 
@@ -115,7 +114,7 @@ public class ViewAuctionCommand extends Command {
 			protected void execute() {
 				logCommand();
 
-				if (args.length == 2 ) {
+				if (args.length == 2) {
 					embed(getAuctionByUuid(args[1]));
 					return;
 				}

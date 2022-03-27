@@ -302,7 +302,7 @@ public class CacheDatabase {
 	}
 
 	public void insertIntoLeaderboard(Player player, boolean makeCopy) {
-		if(!player.isValid()){
+		if (!player.isValid()) {
 			return;
 		}
 

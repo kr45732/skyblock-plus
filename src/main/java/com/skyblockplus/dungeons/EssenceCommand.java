@@ -94,12 +94,12 @@ public class EssenceCommand extends Command {
 				if (entry.getKey().startsWith("essence_")) {
 					String essenceType = entry.getKey().split("essence_")[1];
 					amountsStr
-							.append(ESSENCE_EMOJI_MAP.get(essenceType))
-							.append("** ")
-							.append(capitalizeString(essenceType))
-							.append(" Essence:** ")
-							.append(formatNumber(entry.getValue().getAsInt()))
-							.append("\n");
+						.append(ESSENCE_EMOJI_MAP.get(essenceType))
+						.append("** ")
+						.append(capitalizeString(essenceType))
+						.append(" Essence:** ")
+						.append(formatNumber(entry.getValue().getAsInt()))
+						.append("\n");
 				}
 			}
 			eb.addField("Amounts", amountsStr.toString(), false);
@@ -110,17 +110,25 @@ public class EssenceCommand extends Command {
 			for (Map.Entry<String, JsonElement> perk : higherDepth(player.profileJson(), "perks").getAsJsonObject().entrySet()) {
 				JsonElement curPerk = higherDepth(essenceTiers, perk.getKey());
 				JsonArray tiers = higherDepth(curPerk, "tiers").getAsJsonArray();
-				String out = "\n" +
-						ESSENCE_EMOJI_MAP.get(perk.getKey()) +
-						"** " +
-						capitalizeString(perk.getKey().replace("catacombs_", "") .replace("_", " ")) +
-						":** " + perk.getValue().getAsInt() + "/" + higherDepth(curPerk, "tiers").getAsJsonArray().size() + (perk.getValue().getAsInt() == tiers.size() ? "" : (" (" + formatNumber(tiers.get(perk.getValue().getAsInt()).getAsInt()) + " for next)"));
+				String out =
+					"\n" +
+					ESSENCE_EMOJI_MAP.get(perk.getKey()) +
+					"** " +
+					capitalizeString(perk.getKey().replace("catacombs_", "").replace("_", " ")) +
+					":** " +
+					perk.getValue().getAsInt() +
+					"/" +
+					higherDepth(curPerk, "tiers").getAsJsonArray().size() +
+					(
+						perk.getValue().getAsInt() == tiers.size()
+							? ""
+							: (" (" + formatNumber(tiers.get(perk.getValue().getAsInt()).getAsInt()) + " for next)")
+					);
 				if (higherDepth(curPerk, "type").getAsString().equals("undead")) {
 					undeadShopUpgrades.append(out);
 				} else {
 					witherShopUpgrades.append(out);
 				}
-
 			}
 			eb.addField("Undead Essence Upgrades", undeadShopUpgrades.toString(), false);
 			eb.addField("Wither Essence Upgrades", witherShopUpgrades.toString(), false);
