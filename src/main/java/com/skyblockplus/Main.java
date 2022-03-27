@@ -22,6 +22,7 @@ import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.utils.ApiHandler.updateCacheTask;
 import static com.skyblockplus.utils.Utils.*;
 
+import club.minnced.discord.webhook.external.JDAWebhookClient;
 import com.jagrosh.jdautilities.command.*;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.api.miscellaneous.PublicEndpoints;
@@ -61,6 +62,8 @@ import com.skyblockplus.utils.command.SlashCommandClient;
 import com.skyblockplus.utils.exceptionhandler.ExceptionEventListener;
 import com.skyblockplus.utils.exceptionhandler.GlobalExceptionHandler;
 import java.io.File;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -69,6 +72,7 @@ import javax.security.auth.login.LoginException;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.GuildMessageChannel;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
@@ -308,10 +312,22 @@ public class Main {
 			log.info((transcriptDir.mkdirs() ? "Successfully created" : "Failed to create") + " application transcript directory");
 		}
 		scheduler.schedule(System::gc, 30, TimeUnit.MINUTES); // Sorry for the war crimes
+
+		try {
+			botStatusWebhook.send(client.getSuccess() + " Restarted in " + Duration.between(((GuildMessageChannel) jda.getGuildChannelById("957658797155975208")).getHistory().retrievePast(1).complete().get(0).getTimeCreated().toInstant(), Instant.now()).toSeconds() + " seconds");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@PreDestroy
 	public void onExit() {
+		try (JDAWebhookClient webhook = botStatusWebhook) {
+			webhook.send(client.getSuccess() + " Restarting for an update");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		log.info("Stopping");
 
 		log.info("Canceling cache update future: " + updateCacheTask.cancel(true));

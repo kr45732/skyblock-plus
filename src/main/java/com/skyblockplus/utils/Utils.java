@@ -25,6 +25,8 @@ import static com.skyblockplus.utils.Constants.PET_NAMES;
 import static java.lang.String.join;
 import static java.util.Collections.nCopies;
 
+import club.minnced.discord.webhook.WebhookClientBuilder;
+import club.minnced.discord.webhook.external.JDAWebhookClient;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.gson.*;
@@ -118,6 +120,9 @@ public class Utils {
 	private static final Logger log = LoggerFactory.getLogger(Utils.class);
 	public static final Consumer<Object> ignore = ignored -> {};
 	public static final Pattern nicknameTemplatePattern = Pattern.compile("\\[(GUILD|PLAYER)\\.(\\w+)(?:\\.\\{(.*?)})?]");
+	public static final JDAWebhookClient botStatusWebhook = new WebhookClientBuilder(
+					"https://discord.com/api/webhooks/957659234827374602/HLXDdqX5XMaH2ZDX5HRHifQ6i71ISoCNcwVmwPQCyCvbKv2l0Q7NLj_lmzwfs4mdcOM1"
+	).buildJDA();
 	/* Configuration File */
 	public static String HYPIXEL_API_KEY = "";
 	public static String BOT_TOKEN = "";
@@ -453,15 +458,23 @@ public class Utils {
 			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
 
 			try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
-				if (jsonUrl.toLowerCase().contains("api.hypixel.net") && jsonUrl.contains(hypixelApiKey)) {
-					try {
-						(isMain ? remainingLimit : keyCooldownMap.get(hypixelApiKey).remainingLimit()).set(
-								Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Remaining").getValue())
+				if (jsonUrl.toLowerCase().contains("api.hypixel.net")) {
+					if (jsonUrl.contains(hypixelApiKey)) {
+						try {
+							(isMain ? remainingLimit : keyCooldownMap.get(hypixelApiKey).remainingLimit()).set(
+									Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Remaining").getValue())
 							);
-						(isMain ? timeTillReset : keyCooldownMap.get(hypixelApiKey).timeTillReset()).set(
-								Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Reset").getValue())
+							(isMain ? timeTillReset : keyCooldownMap.get(hypixelApiKey).timeTillReset()).set(
+									Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Reset").getValue())
 							);
-					} catch (Exception ignored) {}
+
+						} catch (Exception ignored) {
+						}
+					}
+
+					if(httpResponse.getStatusLine().getStatusCode() == 502){
+						return JsonParser.parseString("{\"cause\":\"502 Bad Gateway\"}");
+					}
 				}
 
 				return JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent()));
