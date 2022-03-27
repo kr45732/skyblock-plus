@@ -48,7 +48,7 @@ public class SacksCommand extends Command {
 				return invalidEmbed("Inventory API disabled");
 			}
 
-			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(20);
+			CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(20);
 
 			JsonElement bazaarPrices = higherDepth(getBazaarJson(), "products");
 
@@ -87,10 +87,7 @@ public class SacksCommand extends Command {
 						) *
 						currentSack.getValue();
 
-					String emoji = higherDepth(getEmojiMap(), currentSack.getKey(), null);
-					if (emoji == null && currentSack.getKey().equals("MUSHROOM_COLLECTION")) {
-						emoji = higherDepth(getEmojiMap(), "RED_MUSHROOM", null);
-					}
+					String emoji = higherDepth(getEmojiMap(), currentSack.getKey().equals("MUSHROOM_COLLECTION") ? "RED_MUSHROOM" : currentSack.getKey(), null);
 
 					paginateBuilder.addItems(
 						(emoji != null ? emoji + " " : "") +

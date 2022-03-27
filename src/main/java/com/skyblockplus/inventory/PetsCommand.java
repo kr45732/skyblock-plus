@@ -43,7 +43,7 @@ public class PetsCommand extends Command {
 	public static EmbedBuilder getPlayerPets(String username, String profileName, PaginatorEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
-			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(25);
+			CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(25);
 
 			JsonArray playerPets = player.getPets();
 			for (JsonElement pet : playerPets) {
@@ -56,7 +56,7 @@ public class PetsCommand extends Command {
 				String rarity = higherDepth(pet, "tier").getAsString();
 
 				paginateBuilder.addItems(
-					getEmojiMap().get(petName + RARITY_TO_NUMBER_MAP.get(rarity)).getAsString() +
+					getEmoji(petName + RARITY_TO_NUMBER_MAP.get(rarity)) +
 					" " +
 					capitalizeString(rarity) +
 					" [Lvl " +
@@ -64,7 +64,7 @@ public class PetsCommand extends Command {
 					"] " +
 					capitalizeString(petName.toLowerCase().replace("_", " ")) +
 					" " +
-					(petItem != null ? getEmojiMap().get(petItem).getAsString() : "")
+					(petItem != null ? getEmoji(petItem) : "")
 				);
 			}
 			paginateBuilder.setPaginatorExtras(

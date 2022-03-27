@@ -49,7 +49,7 @@ public class ArmorCommand extends Command {
 				List<String> pageTitles = new ArrayList<>();
 				List<String> pageThumbnails = new ArrayList<>();
 
-				CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(1);
+				CustomPaginator.Builder paginateBuilder = event.getPaginator();
 
 				for (Map.Entry<Integer, InvItem> currentInvSlot : inventoryMap.entrySet()) {
 					InvItem currentInvStruct = currentInvSlot.getValue();

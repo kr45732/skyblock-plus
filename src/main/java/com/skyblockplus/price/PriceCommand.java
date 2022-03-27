@@ -102,7 +102,7 @@ public class PriceCommand extends Command {
 			return invalidEmbed("No " + auctionType.getName() + " matching '" + query + "' found");
 		}
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(5);
+		CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(5);
 		PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_FIELDS);
 		for (JsonElement lowestBinAuction : lowestBinArr) {
 			EmbedBuilder eb = defaultEmbed("Query Auctions");

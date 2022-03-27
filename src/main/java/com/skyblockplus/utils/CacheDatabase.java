@@ -302,13 +302,13 @@ public class CacheDatabase {
 	}
 
 	public void insertIntoLeaderboard(Player player, boolean makeCopy) {
+		if(!player.isValid()){
+			return;
+		}
+
 		executor.submit(() -> {
-			Player playerCopy = null;
-			if (makeCopy) {
-				playerCopy = player.copy();
-			}
 			for (Player.Gamemode gamemode : leaderboardGamemodes) {
-				insertIntoLeaderboard(makeCopy ? playerCopy : player, gamemode);
+				insertIntoLeaderboard(makeCopy ? player.copy() : player, gamemode);
 			}
 		});
 	}
@@ -380,7 +380,7 @@ public class CacheDatabase {
 		try (
 			Connection connection = getConnection();
 			PreparedStatement statement = connection.prepareStatement(
-				"SELECT uuid FROM all_lb WHERE last_updated < " + Instant.now().plus(5, ChronoUnit.DAYS).toEpochMilli() + " LIMIT 5"
+				"SELECT uuid FROM all_lb WHERE last_updated < " + Instant.now().minus(5, ChronoUnit.DAYS).toEpochMilli() + " LIMIT 5"
 			)
 		) {
 			try (ResultSet response = statement.executeQuery()) {

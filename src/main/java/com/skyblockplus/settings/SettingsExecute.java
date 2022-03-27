@@ -2273,7 +2273,7 @@ public class SettingsExecute {
 	/* Miscellaneous */
 	public EmbedBuilder setHypixelKey(String newKey) {
 		try {
-			newKey = higherDepth(getJson("https://api.hypixel.net/key?key=" + newKey), "record.key").getAsString();
+			newKey = higherDepth(getJson("https://api.hypixel.net/key?key=" + newKey, newKey), "record.key").getAsString();
 		} catch (Exception e) {
 			return invalidEmbed("Provided Hypixel API key is invalid.");
 		}

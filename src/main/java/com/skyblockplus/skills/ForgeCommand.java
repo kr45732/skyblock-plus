@@ -67,7 +67,7 @@ public class ForgeCommand extends Command {
 				String itemId = higherDepth(forgeItem, "id").getAsString();
 				itemId = itemId.equals("PET") ? "AMMONITE" : itemId;
 				eb.addField(
-					getEmojiMap().get(itemId.equals("AMMONITE") ? "AMMONITE;4" : itemId).getAsString() + " " + idToName(itemId),
+					getEmoji(itemId.equals("AMMONITE") ? "AMMONITE;4" : itemId) + " " + idToName(itemId),
 					"Slot: " +
 					higherDepth(forgeItem, "slot", 0) +
 					"\nEnd: <t:" +

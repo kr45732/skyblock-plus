@@ -211,6 +211,10 @@ public class Utils {
 		return emojiMap;
 	}
 
+	public static String getEmoji(String id) {
+		return higherDepth(getEmojiMap(), id, "");
+	}
+
 	public static JsonObject getAverageAuctionJson() {
 		if (averageAuctionJson == null || Duration.between(averageAuctionJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
 			averageAuctionJson = getJsonObject("https://moulberry.codes/auction_averages/3day.json");
@@ -270,9 +274,7 @@ public class Utils {
 	}
 
 	public static double getNpcSellPrice(String id) {
-		getSkyblockItemsJson();
-
-		for (JsonElement npcSellPrice : skyblockItemsJson) {
+		for (JsonElement npcSellPrice : getSkyblockItemsJson()) {
 			if (higherDepth(npcSellPrice, "id").getAsString().equals(id)) {
 				return higherDepth(npcSellPrice, "npc_sell_price", -1.0);
 			}
@@ -428,10 +430,16 @@ public class Utils {
 
 	/* Http requests */
 	public static JsonElement getJson(String jsonUrl) {
+		return getJson(jsonUrl, HYPIXEL_API_KEY);
+	}
+
+	public static JsonElement getJson(String jsonUrl, String hypixelApiKey) {
+		boolean isMain = hypixelApiKey.equals(HYPIXEL_API_KEY);
 		try {
-			if (jsonUrl.contains(HYPIXEL_API_KEY) && remainingLimit.get() < 5) {
-				log.info("Sleeping for " + timeTillReset + " seconds");
-				TimeUnit.SECONDS.sleep(timeTillReset.get());
+			if (jsonUrl.contains(hypixelApiKey) && (isMain ? remainingLimit : keyCooldownMap.get(hypixelApiKey).remainingLimit()).get() < 5) {
+				int timeTillResetInt = (isMain ? timeTillReset : keyCooldownMap.get(hypixelApiKey).timeTillReset()).get();
+				log.info("Sleeping for " + timeTillResetInt + " seconds");
+				TimeUnit.SECONDS.sleep(timeTillResetInt);
 			}
 		} catch (Exception ignored) {}
 
@@ -443,10 +451,10 @@ public class Utils {
 			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
 
 			try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
-				if (jsonUrl.toLowerCase().contains("api.hypixel.net") && jsonUrl.contains(HYPIXEL_API_KEY)) {
+				if (jsonUrl.toLowerCase().contains("api.hypixel.net") && jsonUrl.contains(hypixelApiKey)) {
 					try {
-						remainingLimit.set(Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Remaining").getValue()));
-						timeTillReset.set(Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Reset").getValue()));
+						(isMain ? remainingLimit : keyCooldownMap.get(hypixelApiKey).remainingLimit()).set(Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Remaining").getValue()));
+						(isMain ? timeTillReset : keyCooldownMap.get(hypixelApiKey).timeTillReset()).set(Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Reset").getValue()));
 					} catch (Exception ignored) {}
 				}
 
@@ -1124,6 +1132,8 @@ public class Utils {
 						if (item.getInt("tag.ExtraAttributes.dungeon_item_level", 0) > 5) {
 							int masterStarCount = item.getInt("tag.ExtraAttributes.dungeon_item_level", 5) - 5;
 							switch (masterStarCount) {
+								case 5:
+									itemInfo.addExtraValue("FIFTH_MASTER_STAR");
 								case 4:
 									itemInfo.addExtraValue("FOURTH_MASTER_STAR");
 								case 3:

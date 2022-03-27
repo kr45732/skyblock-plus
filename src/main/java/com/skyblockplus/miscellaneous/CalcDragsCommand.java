@@ -62,7 +62,7 @@ public class CalcDragsCommand extends Command {
 			eyesPlaced
 		);
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(10);
+		CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(10);
 		PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
 		for (Map.Entry<String, JsonElement> dragon : getJson("https://wiki-data.kr45732.repl.co/dragon_loot")
 			.getAsJsonObject()
@@ -87,7 +87,7 @@ public class CalcDragsCommand extends Command {
 				.sorted(Comparator.comparingInt(e -> -higherDepth(e.getValue(), "quality", 0)))
 				.collect(Collectors.toList())) {
 				eb.addField(
-					higherDepth(getEmojiMap(), nameToId(entry.getKey()), "") +
+					getEmoji(nameToId(entry.getKey())) +
 					" " +
 					entry.getKey() +
 					(higherDepth(entry.getValue(), "unique", false) ? " (Unique)" : ""),

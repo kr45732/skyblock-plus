@@ -764,9 +764,7 @@ public class HelpCommand extends Command {
 			}
 		}
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser())
-			.setColumns(1)
-			.setItemsPerPage(1)
+		CustomPaginator.Builder paginateBuilder = event.getPaginator()
 			.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles));
 
 		paginateBuilder.addItems(

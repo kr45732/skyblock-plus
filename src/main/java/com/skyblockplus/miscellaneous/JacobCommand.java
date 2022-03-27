@@ -68,7 +68,7 @@ public class JacobCommand extends Command {
 				false
 			);
 		}
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(5);
+		CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(5);
 		event.paginate(paginateBuilder.setPaginatorExtras(extras));
 		return null;
 	}

@@ -936,9 +936,9 @@ public class NetworthExecute {
 			item.getNameFormatted();
 
 		if (item.getPetItem() != null) {
-			JsonElement petItemEmoji = getEmojiMap().get(item.getPetItem());
+			String petItemEmoji = higherDepth(getEmojiMap(), item.getPetItem(), null);
 			if (petItemEmoji != null) {
-				formattedStr += " " + petItemEmoji.getAsString();
+				formattedStr += " " + petItemEmoji;
 			}
 		}
 
@@ -1295,11 +1295,11 @@ public class NetworthExecute {
 		return 0;
 	}
 
-	private double getLowestPrice(String itemId) {
+	public double getLowestPrice(String itemId) {
 		return getLowestPrice(itemId, false);
 	}
 
-	private double getLowestPrice(String itemId, boolean onlyBazaar) {
+	public double getLowestPrice(String itemId, boolean onlyBazaar) {
 		double priceOverride = getPriceOverride(itemId);
 		if (priceOverride != -1) {
 			return priceOverride;

@@ -97,7 +97,7 @@ public class GuildKickerCommand extends Command {
 		String guildId = higherDepth(guildJson, "_id").getAsString();
 		JsonElement guildLbJson = getJson("https://hypixel-app-api.senither.com/leaderboard/players/" + guildId);
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(20);
+		CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(20);
 		if (!useKey) {
 			if (higherDepth(guildLbJson, "data") == null) {
 				return invalidEmbed(

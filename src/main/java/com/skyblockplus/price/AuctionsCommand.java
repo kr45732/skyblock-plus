@@ -31,6 +31,7 @@ import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.HypixelResponse;
+import com.skyblockplus.utils.structs.InvItem;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.time.Duration;
@@ -41,9 +42,9 @@ import me.nullicorn.nedit.NBTReader;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
-public class AuctionCommand extends Command {
+public class AuctionsCommand extends Command {
 
-	public AuctionCommand() {
+	public AuctionsCommand() {
 		this.name = "auctions";
 		this.cooldown = globalCooldown;
 		this.aliases = new String[] { "ah", "auction" };
@@ -93,25 +94,25 @@ public class AuctionCommand extends Command {
 			long failedToSell = 0;
 			long auctionTax = 0;
 
-			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(9);
+			CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(9);
 			PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_FIELDS);
 
 			for (JsonElement currentAuction : auctionsArray) {
 				if (!higherDepth(currentAuction, "claimed").getAsBoolean()) {
-					String auctionName;
+					InvItem item = nbtToItem(higherDepth(currentAuction, "item_bytes.data").getAsString());
+					String auctionName = getEmoji(item.getId()) + " ";
 					String auction;
-					boolean isPet = higherDepth(currentAuction, "item_lore").getAsString().toLowerCase().contains("pet");
 					boolean bin = higherDepth(currentAuction, "bin", false);
 
 					Instant endingAt = Instant.ofEpochMilli(higherDepth(currentAuction, "end").getAsLong());
 					Duration duration = Duration.between(Instant.now(), endingAt);
 
-					if (higherDepth(currentAuction, "item_name").getAsString().equals("Enchanted Book")) {
-						auctionName = parseMcCodes(higherDepth(currentAuction, "item_lore").getAsString().split("\n")[0]);
+					if (item.getId().equals("ENCHANTED_BOOK")) {
+						auctionName += parseMcCodes(higherDepth(currentAuction, "item_lore").getAsString().split("\n")[0]);
 					} else {
-						auctionName =
-							(isPet ? capitalizeString(higherDepth(currentAuction, "tier").getAsString().toLowerCase()) + " " : "") +
-							higherDepth(currentAuction, "item_name").getAsString();
+						auctionName +=
+								(item.getId().equals("PET") ? capitalizeString(higherDepth(currentAuction, "tier").getAsString().toLowerCase()) + " " : (item.getCount() > 1 ? item.getCount() + "x " : "")) +
+										higherDepth(currentAuction, "item_name").getAsString();
 					}
 
 					long highestBid = higherDepth(currentAuction, "highest_bid_amount", 0);
@@ -178,7 +179,7 @@ public class AuctionCommand extends Command {
 
 			event.paginate(paginateBuilder.setPaginatorExtras(extras));
 		} else {
-			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser());
+			CustomPaginator.Builder paginateBuilder = event.getPaginator();
 			PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
 
 			long totalSoldValue = 0;
@@ -302,72 +303,6 @@ public class AuctionCommand extends Command {
 		return null;
 	}
 
-	public static EmbedBuilder getAuctionByUuid(String auctionUuid) {
-		HypixelResponse auctionResponse = getAuctionFromUuid(auctionUuid);
-		if (auctionResponse.isNotValid()) {
-			return invalidEmbed(auctionResponse.failCause());
-		}
-
-		JsonElement auctionJson = auctionResponse.get("[0]");
-		EmbedBuilder eb = defaultEmbed("Auction from UUID");
-		String itemName = higherDepth(auctionJson, "item_name").getAsString();
-
-		String itemId = "None";
-		try {
-			itemId =
-				NBTReader
-					.readBase64(higherDepth(auctionJson, "item_bytes.data").getAsString())
-					.getList("i")
-					.getCompound(0)
-					.getString("tag.ExtraAttributes.id", "None");
-		} catch (Exception ignored) {}
-
-		if (itemId.equals("ENCHANTED_BOOK")) {
-			itemName = parseMcCodes(higherDepth(auctionJson, "item_lore").getAsString().split("\n")[0]);
-		} else {
-			itemName =
-				(itemId.equals("PET") ? capitalizeString(higherDepth(auctionJson, "tier").getAsString().toLowerCase()) + " " : "") +
-				itemName;
-		}
-
-		Instant endingAt = Instant.ofEpochMilli(higherDepth(auctionJson, "end").getAsLong());
-		Duration duration = Duration.between(Instant.now(), endingAt);
-
-		String ebStr = "**Item name:** " + itemName;
-		ebStr += "\n**Seller:** " + uuidToUsername(higherDepth(auctionJson, "auctioneer").getAsString()).username();
-		ebStr += "\n**Command:** `/viewauction " + higherDepth(auctionJson, "uuid").getAsString() + "`";
-		long highestBid = higherDepth(auctionJson, "highest_bid_amount", 0L);
-		long startingBid = higherDepth(auctionJson, "starting_bid", 0L);
-		JsonArray bidsArr = higherDepth(auctionJson, "bids").getAsJsonArray();
-		boolean bin = higherDepth(auctionJson, "bin", false);
-
-		if (duration.toMillis() > 0) {
-			if (bin) {
-				ebStr += "\n**BIN:** " + simplifyNumber(startingBid) + " coins | Ending <t:" + endingAt.getEpochSecond() + ":R>";
-			} else {
-				ebStr += "\n**Current bid:** " + simplifyNumber(highestBid) + " | Ending <t:" + endingAt.getEpochSecond() + ":R>";
-				ebStr +=
-					bidsArr.size() > 0
-						? "\n**Highest bidder:** " +
-						uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).username()
-						: "";
-			}
-		} else {
-			if (highestBid >= startingBid) {
-				ebStr +=
-					"\n**Auction sold** for " +
-					simplifyNumber(highestBid) +
-					" coins to " +
-					uuidToUsername(higherDepth(bidsArr.get(bidsArr.size() - 1), "bidder").getAsString()).username();
-			} else {
-				ebStr = "\n**Auction did not sell**";
-			}
-		}
-
-		eb.setThumbnail("https://sky.shiiyu.moe/item.gif/" + itemId);
-		return eb.setDescription(ebStr);
-	}
-
 	@Override
 	protected void execute(CommandEvent event) {
 		new CommandExecute(this, event) {
@@ -375,45 +310,37 @@ public class AuctionCommand extends Command {
 			protected void execute() {
 				logCommand();
 
-				if (args.length == 3 && args[1].equals("uuid")) {
-					embed(getAuctionByUuid(args[2]));
-					return;
-				} else if (args.length == 4 || args.length == 3 || args.length == 2 || args.length == 1) {
-					AuctionFilterType filterType = AuctionFilterType.NONE;
-					for (int i = 0; i < args.length; i++) {
-						if (args[i].startsWith("filter:")) {
-							try {
-								filterType = AuctionFilterType.valueOf(args[i].split("filter:")[1].toUpperCase());
-								removeArg(i);
-							} catch (IllegalArgumentException e) {
-								embed(invalidEmbed("Invalid filter type provided"));
-								return;
-							}
+				AuctionFilterType filterType = AuctionFilterType.NONE;
+				for (int i = 0; i < args.length; i++) {
+					if (args[i].startsWith("filter:")) {
+						try {
+							filterType = AuctionFilterType.valueOf(args[i].split("filter:")[1].toUpperCase());
+							removeArg(i);
+						} catch (IllegalArgumentException e) {
+							embed(invalidEmbed("Invalid filter type provided"));
+							return;
 						}
 					}
-					AuctionSortType sortType = AuctionSortType.NONE;
-					for (int i = 0; i < args.length; i++) {
-						if (args[i].startsWith("sort:")) {
-							try {
-								sortType = AuctionSortType.valueOf(args[i].split("sort:")[1].toUpperCase());
-								removeArg(i);
-							} catch (IllegalArgumentException e) {
-								embed(invalidEmbed("Invalid sort type provided"));
-								return;
-							}
+				}
+				AuctionSortType sortType = AuctionSortType.NONE;
+				for (int i = 0; i < args.length; i++) {
+					if (args[i].startsWith("sort:")) {
+						try {
+							sortType = AuctionSortType.valueOf(args[i].split("sort:")[1].toUpperCase());
+							removeArg(i);
+						} catch (IllegalArgumentException e) {
+							embed(invalidEmbed("Invalid sort type provided"));
+							return;
 						}
 					}
-					boolean verbose = getBooleanArg("--verbose");
+				}
+				boolean verbose = getBooleanArg("--verbose");
 
-					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
-						return;
-					}
-
-					paginate(getPlayerAuction(player, filterType, sortType, verbose, new PaginatorEvent(event)));
+				if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
 					return;
 				}
 
-				sendErrorEmbed();
+				paginate(getPlayerAuction(player, filterType, sortType, verbose, new PaginatorEvent(event)));
 			}
 		}
 			.queue();

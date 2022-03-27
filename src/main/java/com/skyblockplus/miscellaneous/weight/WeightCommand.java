@@ -179,7 +179,7 @@ public class WeightCommand extends Command {
 	public static EmbedBuilder getPlayerWeight(String username, String profileName, PaginatorEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
-			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(3);
+			CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(3);
 			PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
 
 			Weight weight = new Weight(player);

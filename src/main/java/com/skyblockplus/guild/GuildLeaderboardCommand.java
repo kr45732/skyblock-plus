@@ -79,7 +79,7 @@ public class GuildLeaderboardCommand extends Command {
 		String guildName = higherDepth(guildJson, "name").getAsString();
 		String guildId = higherDepth(guildJson, "_id").getAsString();
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(2).setItemsPerPage(20);
+		CustomPaginator.Builder paginateBuilder = event.getPaginator().setColumns(2).setItemsPerPage(20);
 		HypixelGuildCache guildCache = hypixelGuildsCacheMap.getIfPresent(guildId);
 		List<String> guildMemberPlayersList;
 		Instant lastUpdated = null;

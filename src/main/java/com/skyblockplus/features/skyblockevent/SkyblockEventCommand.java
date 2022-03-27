@@ -394,7 +394,7 @@ public class SkyblockEventCommand extends Command {
 
 		AutomaticGuild currentGuild = guildMap.get(guildId);
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(25);
+		CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(25);
 
 		if (
 			(currentGuild.eventMemberList != null) &&

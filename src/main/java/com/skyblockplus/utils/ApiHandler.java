@@ -294,7 +294,7 @@ public class ApiHandler {
 		}
 
 		try {
-			JsonElement profilesJson = getJson("https://api.hypixel.net/skyblock/profiles?key=" + hypixelApiKey + "&uuid=" + uuid);
+			JsonElement profilesJson = getJson("https://api.hypixel.net/skyblock/profiles?key=" + hypixelApiKey + "&uuid=" + uuid, hypixelApiKey);
 
 			try {
 				if (higherDepth(profilesJson, "profiles").isJsonNull()) {

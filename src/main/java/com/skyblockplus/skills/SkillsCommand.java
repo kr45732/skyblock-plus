@@ -47,7 +47,7 @@ public class SkillsCommand extends Command {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 
 		if (player.isValid()) {
-			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(1);
+			CustomPaginator.Builder paginateBuilder = event.getPaginator();
 			PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
 
 			EmbedBuilder eb = player.defaultPlayerEmbed();
@@ -95,9 +95,7 @@ public class SkillsCommand extends Command {
 					"Unique Golds | " + higherDepth(jacobStats, "unique_golds2").getAsJsonArray().size(),
 					streamJsonArray(higherDepth(jacobStats, "unique_golds2").getAsJsonArray())
 						.map(i ->
-							getEmojiMap()
-								.get(i.getAsString().equals("MUSHROOM_COLLECTION") ? "RED_MUSHROOM" : i.getAsString())
-								.getAsString() +
+							getEmoji(i.getAsString().equals("MUSHROOM_COLLECTION") ? "RED_MUSHROOM" : i.getAsString()) +
 							" " +
 							idToName(i.getAsString())
 						)
@@ -130,7 +128,7 @@ public class SkillsCommand extends Command {
 			for (Map.Entry<String, Long> entry : contests.entrySet()) {
 				ebStr
 					.append("\n")
-					.append(getEmojiMap().get(entry.getKey().equals("MUSHROOM_COLLECTION") ? "RED_MUSHROOM" : entry.getKey()).getAsString())
+					.append(getEmoji(entry.getKey().equals("MUSHROOM_COLLECTION") ? "RED_MUSHROOM" : entry.getKey()))
 					.append(" ")
 					.append(idToName(entry.getKey()))
 					.append(" - ")

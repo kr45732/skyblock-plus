@@ -83,7 +83,7 @@ public class GuildCommand extends Command {
 
 		guildExpList.sort(Comparator.comparingInt(o1 -> -Integer.parseInt(o1.split("=:=")[1])));
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(2).setItemsPerPage(20);
+		CustomPaginator.Builder paginateBuilder = event.getPaginator().setColumns(2).setItemsPerPage(20);
 		PaginatorExtras extras = new PaginatorExtras()
 			.setEveryPageTitle(higherDepth(guildJson, "name").getAsString())
 			.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(guildJson, "_id").getAsString());
@@ -286,7 +286,7 @@ public class GuildCommand extends Command {
 			} catch (Exception ignored) {}
 		}
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(3).setItemsPerPage(33);
+		CustomPaginator.Builder paginateBuilder = event.getPaginator().setColumns(3).setItemsPerPage(33);
 
 		paginateBuilder.setPaginatorExtras(
 			new PaginatorExtras()

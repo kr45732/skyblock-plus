@@ -45,6 +45,7 @@ import com.skyblockplus.features.setup.SetupCommandHandler;
 import com.skyblockplus.features.skyblockevent.SkyblockEventCommand;
 import com.skyblockplus.features.skyblockevent.SkyblockEventHandler;
 import com.skyblockplus.features.verify.VerifyGuild;
+import com.skyblockplus.miscellaneous.MayorCommand;
 import com.skyblockplus.price.AuctionTracker;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.structs.HypixelResponse;
@@ -930,6 +931,9 @@ public class AutomaticGuild {
 			return;
 		} else if (event.getComponentId().equals("mayor_graph_button")) {
 			event.replyEmbeds(votesEmbed).setEphemeral(true).queue();
+			return;
+		}else if (event.getComponentId().equals("mayor_special_button")) {
+			event.replyEmbeds(MayorCommand.getSpecialMayors().build()).setEphemeral(true).queue();
 			return;
 		} else if (event.getComponentId().startsWith("bingo_")) {
 			StringBuilder card = new StringBuilder();

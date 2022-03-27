@@ -45,7 +45,7 @@ public class WardrobeCommand extends Command {
 		if (player.isValid()) {
 			Map<Integer, ArmorStruct> armorStructMap = player.getWardrobeList();
 			if (armorStructMap != null) {
-				CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(4);
+				CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(4);
 
 				for (Map.Entry<Integer, ArmorStruct> currentArmour : armorStructMap.entrySet()) {
 					paginateBuilder.addItems(

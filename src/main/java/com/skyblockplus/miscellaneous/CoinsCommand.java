@@ -64,7 +64,7 @@ public class CoinsCommand extends Command {
 		if (player.isValid()) {
 			JsonArray bankHistoryArray = player.getBankHistory();
 			if (bankHistoryArray != null) {
-				CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(20);
+				CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(20);
 
 				paginateBuilder.addItems(
 					"**Last Transaction Time:** " +

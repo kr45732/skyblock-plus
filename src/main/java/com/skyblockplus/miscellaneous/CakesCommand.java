@@ -62,7 +62,7 @@ public class CakesCommand extends Command {
 					if (expires.isAfter(Instant.now())) {
 						String cakeName = higherDepth(cake, "key").getAsString();
 						activeCakes
-							.append(getEmojiMap().get(cakeNameToId.get(cakeName)).getAsString())
+							.append(getEmoji(cakeNameToId.get(cakeName)))
 							.append(" ")
 							.append(capitalizeString(cakeName.split("cake_")[1].replace("_", " ")))
 							.append(" Cake: expires <t:")
@@ -77,7 +77,7 @@ public class CakesCommand extends Command {
 			StringBuilder missingCakesStr = new StringBuilder();
 			for (Map.Entry<String, String> missingCake : cakeNameToId.entrySet()) {
 				missingCakesStr
-					.append(getEmojiMap().get(missingCake.getValue()).getAsString())
+					.append(getEmoji(missingCake.getValue()))
 					.append(" ")
 					.append(capitalizeString(missingCake.getKey().split("cake_")[1].replace("_", " ")))
 					.append(" Cake\n");

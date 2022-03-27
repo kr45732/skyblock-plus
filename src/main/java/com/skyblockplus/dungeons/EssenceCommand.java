@@ -18,10 +18,10 @@
 
 package com.skyblockplus.dungeons;
 
-import static com.skyblockplus.utils.Constants.ESSENCE_EMOJI_MAP;
-import static com.skyblockplus.utils.Constants.ESSENCE_ITEM_NAMES;
+import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -29,6 +29,7 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
+import org.apache.groovy.util.Maps;
 
 public class EssenceCommand extends Command {
 
@@ -93,27 +94,36 @@ public class EssenceCommand extends Command {
 				if (entry.getKey().startsWith("essence_")) {
 					String essenceType = entry.getKey().split("essence_")[1];
 					amountsStr
-						.append(ESSENCE_EMOJI_MAP.get(essenceType))
-						.append("** ")
-						.append(capitalizeString(essenceType))
-						.append(" essence:** ")
-						.append(formatNumber(entry.getValue().getAsInt()))
-						.append("\n");
+							.append(ESSENCE_EMOJI_MAP.get(essenceType))
+							.append("** ")
+							.append(capitalizeString(essenceType))
+							.append(" Essence:** ")
+							.append(formatNumber(entry.getValue().getAsInt()))
+							.append("\n");
 				}
 			}
 			eb.addField("Amounts", amountsStr.toString(), false);
 
-			StringBuilder shopUpgrades = new StringBuilder();
+			JsonElement essenceTiers = getConstant("ESSENCE_SHOP_TIERS");
+			StringBuilder witherShopUpgrades = new StringBuilder();
+			StringBuilder undeadShopUpgrades = new StringBuilder();
 			for (Map.Entry<String, JsonElement> perk : higherDepth(player.profileJson(), "perks").getAsJsonObject().entrySet()) {
-				shopUpgrades
-					.append("\n")
-					.append(ESSENCE_EMOJI_MAP.get(perk.getKey()))
-					.append("** ")
-					.append(capitalizeString(perk.getKey().replace("_", " ")))
-					.append(":** ")
-					.append(perk.getValue().getAsInt());
+				JsonElement curPerk = higherDepth(essenceTiers, perk.getKey());
+				JsonArray tiers = higherDepth(curPerk, "tiers").getAsJsonArray();
+				String out = "\n" +
+						ESSENCE_EMOJI_MAP.get(perk.getKey()) +
+						"** " +
+						capitalizeString(perk.getKey().replace("catacombs_", "") .replace("_", " ")) +
+						":** " + perk.getValue().getAsInt() + "/" + higherDepth(curPerk, "tiers").getAsJsonArray().size() + (perk.getValue().getAsInt() == tiers.size() ? "" : (" (" + formatNumber(tiers.get(perk.getValue().getAsInt()).getAsInt()) + " for next)"));
+				if (higherDepth(curPerk, "type").getAsString().equals("undead")) {
+					undeadShopUpgrades.append(out);
+				} else {
+					witherShopUpgrades.append(out);
+				}
+
 			}
-			eb.addField("Shop Upgrades", shopUpgrades.toString(), false);
+			eb.addField("Undead Essence Upgrades", undeadShopUpgrades.toString(), false);
+			eb.addField("Wither Essence Upgrades", witherShopUpgrades.toString(), false);
 
 			return eb;
 		}

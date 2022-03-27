@@ -99,7 +99,7 @@ public class MissingCommand extends Command {
 			);
 
 			JsonObject mappings = getInternalJsonMappings();
-			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(25);
+			CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(25);
 			double totalCost = 0;
 			for (String curId : missingInternalArr) {
 				double cost = higherDepth(lowestBinJson, curId, 0.0);
@@ -107,7 +107,7 @@ public class MissingCommand extends Command {
 				String wikiLink = higherDepth(mappings, curId + ".wiki", null);
 				String name = idToName(curId);
 				paginateBuilder.addItems(
-					getEmojiMap().get(curId).getAsString() +
+					getEmoji(curId) +
 					" " +
 					(wikiLink == null ? name : "[" + name + "](" + wikiLink + ")") +
 					(higherDepth(talismanUpgrades, curId) != null ? "**\\***" : "") +

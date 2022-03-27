@@ -16,8 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.miscellaneous;
+package com.skyblockplus.price;
 
+import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
@@ -25,27 +26,25 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-public class UuidSlashCommand extends SlashCommand {
+import java.util.stream.Collectors;
 
-	public UuidSlashCommand() {
-		this.name = "uuid";
+import static com.skyblockplus.utils.Utils.getLowestBinJson;
+
+public class CoinsPerBitSlashCommand extends SlashCommand {
+
+	public CoinsPerBitSlashCommand() {
+		this.name = "coinsperbit";
 	}
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		if (event.invalidPlayerOption()) {
-			return;
-		}
-
-		event.embed(UuidCommand.getUuidPlayer(event.player));
+		event.embed(CoinsPerBitCommand.getCoinsPerBit());
 	}
 
 	@Override
 	public CommandData getCommandData() {
-		return Commands
-			.slash(name, "Convert a username to UUID or UUID to username")
-			.addOption(OptionType.STRING, "player", "Username or UUID");
+		return Commands.slash(name, "Get the coins to bits ratio for items in the bits shop");
 	}
 }

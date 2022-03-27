@@ -18,6 +18,7 @@
 
 package com.skyblockplus.miscellaneous;
 
+import com.skyblockplus.utils.Utils;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
@@ -25,27 +26,35 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-public class UuidSlashCommand extends SlashCommand {
+import java.util.stream.Collectors;
 
-	public UuidSlashCommand() {
-		this.name = "uuid";
+import static com.skyblockplus.utils.Utils.getReforgeStonesJson;
+
+public class ReforgeStoneSlashCommand extends SlashCommand {
+
+	public ReforgeStoneSlashCommand() {
+		this.name = "reforgestone";
 	}
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		if (event.invalidPlayerOption()) {
-			return;
-		}
-
-		event.embed(UuidCommand.getUuidPlayer(event.player));
+		event.embed(ReforgeStoneCommand.getReforgeStone(event.getOptionStr("item")));
 	}
 
 	@Override
 	public CommandData getCommandData() {
-		return Commands
-			.slash(name, "Convert a username to UUID or UUID to username")
-			.addOption(OptionType.STRING, "player", "Username or UUID");
+		return Commands.slash(name, "Get the reforge stone stats for each rarity").addOption(OptionType.STRING, "item", "Reforge stone name", true, true);
+	}
+
+	@Override
+	public void onAutoComplete(AutoCompleteEvent event) {
+		if (event.getFocusedOption().getName().equals("item")) {
+			event.replyClosestMatch(
+				event.getFocusedOption().getValue(),
+					getReforgeStonesJson().keySet().stream().map(Utils::idToName).collect(Collectors.toList())
+			);
+		}
 	}
 }

@@ -75,7 +75,7 @@ public class ProfilesCommand extends Command {
 			}
 		}
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(1);
+		CustomPaginator.Builder paginateBuilder = event.getPaginator();
 
 		List<String> pageTitlesUrls = new ArrayList<>();
 		int count = 0;

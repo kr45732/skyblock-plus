@@ -45,7 +45,7 @@ public class SkyblockCommand extends Command {
 	public static EmbedBuilder getSkyblock(String username, String profileName, PaginatorEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
-			CustomPaginator.Builder paginator = defaultPaginator(event.getUser());
+			CustomPaginator.Builder paginator = event.getPaginator();
 			PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
 			Weight weight = new Weight(player, true);
 			com.skyblockplus.miscellaneous.weight.lily.Weight lilyWeight = new com.skyblockplus.miscellaneous.weight.lily.Weight(

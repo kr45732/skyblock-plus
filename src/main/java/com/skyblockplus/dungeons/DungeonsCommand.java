@@ -46,7 +46,7 @@ public class DungeonsCommand extends Command {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			try {
-				CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(3).setItemsPerPage(9);
+				CustomPaginator.Builder paginateBuilder = event.getPaginator().setColumns(3).setItemsPerPage(9);
 				PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_FIELDS);
 				extras
 					.setEveryPageTitle(player.getUsername())

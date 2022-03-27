@@ -53,7 +53,7 @@ public class LeaderboardCommand extends Command {
 			return player.getFailEmbed();
 		}
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(2).setItemsPerPage(20);
+		CustomPaginator.Builder paginateBuilder = event.getPaginator().setColumns(2).setItemsPerPage(20);
 		List<DataObject> cacheList = cacheDatabase.getLeaderboard(lbType, gamemode);
 
 		int guildRank = -1;

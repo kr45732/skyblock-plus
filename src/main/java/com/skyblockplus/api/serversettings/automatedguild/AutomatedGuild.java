@@ -66,7 +66,7 @@ public class AutomatedGuild {
 	@Fetch(value = FetchMode.SUBSELECT)
 	private List<String> applyStaffRoles = new ArrayList<>();
 
-	private String applyPrevMessage = ""; // Used to edit original message rather than sending new when the bot restarts
+	private String applyPrevMessage = "";
 
 	@Column(columnDefinition = "TEXT")
 	private String applyUsersCache = "";

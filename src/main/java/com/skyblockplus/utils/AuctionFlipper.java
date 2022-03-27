@@ -67,9 +67,9 @@ public class AuctionFlipper {
 					}
 				} catch (Exception ignored) {}
 			},
-			1,
-			1,
-			TimeUnit.MINUTES
+			60,
+			30,
+			TimeUnit.SECONDS
 		);
 	}
 

@@ -16,36 +16,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.miscellaneous;
+package com.skyblockplus.price;
 
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
-import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-public class UuidSlashCommand extends SlashCommand {
+public class ViewAuctionSlashCommand extends SlashCommand {
 
-	public UuidSlashCommand() {
-		this.name = "uuid";
+	public ViewAuctionSlashCommand() {
+		this.name = "viewauction";
 	}
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		if (event.invalidPlayerOption()) {
-			return;
-		}
-
-		event.embed(UuidCommand.getUuidPlayer(event.player));
+		event.embed(ViewAuctionCommand.getAuctionByUuid(event.getOptionStr("uuid")));
 	}
 
 	@Override
 	public CommandData getCommandData() {
 		return Commands
-			.slash(name, "Convert a username to UUID or UUID to username")
-			.addOption(OptionType.STRING, "player", "Username or UUID");
+			.slash(name, "Get information about an auction by it's UUID").addOption(OptionType.STRING, "uuid", "Auction UUID", true);
 	}
 }

@@ -336,7 +336,7 @@ public class GuildRanksCommand extends Command {
 
 			JsonArray ranksArr = higherDepth(lbSettings, "ranks").getAsJsonArray();
 
-			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(20);
+			CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(20);
 			int totalChange = 0;
 			for (ArrayList<GuildRanksStruct> currentLeaderboard : guildLeaderboards) {
 				for (int i = 0; i < currentLeaderboard.size(); i++) {
@@ -383,7 +383,7 @@ public class GuildRanksCommand extends Command {
 			);
 			event.paginate(paginateBuilder);
 		} else {
-			CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(20);
+			CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(20);
 			int totalChange = 0;
 			List<String> defaultRank = streamJsonArray(higherDepth(lbSettings, "default_role").getAsJsonArray())
 				.map(JsonElement::getAsString)

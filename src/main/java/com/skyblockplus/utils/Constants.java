@@ -31,6 +31,8 @@ import java.util.stream.Collectors;
 
 public class Constants {
 
+	public static JsonObject CONSTANTS;
+
 	/* Constants JSON */
 	public static double CATACOMBS_LEVEL_50_XP;
 	public static double SKILLS_LEVEL_50_XP;
@@ -79,7 +81,7 @@ public class Constants {
 
 	public static void initialize() {
 		try {
-			JsonObject constantsJson = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/Constants.json")
+			CONSTANTS = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/Constants.json")
 				.getAsJsonObject();
 
 			Type mapStringString = new TypeToken<Map<String, String>>() {}.getType();
@@ -91,97 +93,97 @@ public class Constants {
 			Type mapStringLong = new TypeToken<Map<String, Long>>() {}.getType();
 
 			/* CATACOMBS_LEVEL_50_XP */
-			CATACOMBS_LEVEL_50_XP = higherDepth(constantsJson, "CATACOMBS_LEVEL_50_XP").getAsDouble();
+			CATACOMBS_LEVEL_50_XP = higherDepth(CONSTANTS, "CATACOMBS_LEVEL_50_XP").getAsDouble();
 
 			/* SKILLS_LEVEL_50_XP */
-			SKILLS_LEVEL_50_XP = higherDepth(constantsJson, "SKILLS_LEVEL_50_XP").getAsDouble();
+			SKILLS_LEVEL_50_XP = higherDepth(CONSTANTS, "SKILLS_LEVEL_50_XP").getAsDouble();
 
 			/* SKILLS_LEVEL_60_XP */
-			SKILLS_LEVEL_60_XP = higherDepth(constantsJson, "SKILLS_LEVEL_60_XP").getAsDouble();
+			SKILLS_LEVEL_60_XP = higherDepth(CONSTANTS, "SKILLS_LEVEL_60_XP").getAsDouble();
 
 			/* RARITY_TO_NUMBER_MAP */
-			RARITY_TO_NUMBER_MAP = gson.fromJson(higherDepth(constantsJson, "RARITY_TO_NUMBER_MAP"), mapStringString);
+			RARITY_TO_NUMBER_MAP = gson.fromJson(higherDepth(CONSTANTS, "RARITY_TO_NUMBER_MAP"), mapStringString);
 
 			/* CRAFTED_MINIONS_TO_SLOTS */
-			CRAFTED_MINIONS_TO_SLOTS = gson.fromJson(higherDepth(constantsJson, "CRAFTED_MINIONS_TO_SLOTS"), listInteger);
+			CRAFTED_MINIONS_TO_SLOTS = gson.fromJson(higherDepth(CONSTANTS, "CRAFTED_MINIONS_TO_SLOTS"), listInteger);
 
 			/* COSMETIC_SKILL_NAMES */
-			COSMETIC_SKILL_NAMES = gson.fromJson(higherDepth(constantsJson, "COSMETIC_SKILL_NAMES"), listString);
+			COSMETIC_SKILL_NAMES = gson.fromJson(higherDepth(CONSTANTS, "COSMETIC_SKILL_NAMES"), listString);
 
 			/* SKILLS_EMOJI_MAP */
-			SKILLS_EMOJI_MAP = gson.fromJson(higherDepth(constantsJson, "SKILLS_EMOJI_MAP"), mapStringString);
+			SKILLS_EMOJI_MAP = gson.fromJson(higherDepth(CONSTANTS, "SKILLS_EMOJI_MAP"), mapStringString);
 
 			/* DUNGEON_CLASS_NAMES */
-			DUNGEON_CLASS_NAMES = gson.fromJson(higherDepth(constantsJson, "DUNGEON_CLASS_NAMES"), listString);
+			DUNGEON_CLASS_NAMES = gson.fromJson(higherDepth(CONSTANTS, "DUNGEON_CLASS_NAMES"), listString);
 
 			/* SLAYER_NAMES */
-			SLAYER_NAMES = gson.fromJson(higherDepth(constantsJson, "SLAYER_NAMES"), listString);
+			SLAYER_NAMES = gson.fromJson(higherDepth(CONSTANTS, "SLAYER_NAMES"), listString);
 
 			/* GUILD_EXP_TO_LEVEL */
-			GUILD_EXP_TO_LEVEL = gson.fromJson(higherDepth(constantsJson, "GUILD_EXP_TO_LEVEL"), listInteger);
+			GUILD_EXP_TO_LEVEL = gson.fromJson(higherDepth(CONSTANTS, "GUILD_EXP_TO_LEVEL"), listInteger);
 
 			/* SLAYER_WEIGHTS */
-			SLAYER_WEIGHTS = gson.fromJson(higherDepth(constantsJson, "SLAYER_WEIGHTS"), mapStringDoubleArray);
+			SLAYER_WEIGHTS = gson.fromJson(higherDepth(CONSTANTS, "SLAYER_WEIGHTS"), mapStringDoubleArray);
 
 			/* SKILL_WEIGHTS */
-			SKILL_WEIGHTS = gson.fromJson(higherDepth(constantsJson, "SKILL_WEIGHTS"), mapStringDoubleArray);
+			SKILL_WEIGHTS = gson.fromJson(higherDepth(CONSTANTS, "SKILL_WEIGHTS"), mapStringDoubleArray);
 
 			/* DUNGEON_CLASS_WEIGHTS */
-			DUNGEON_CLASS_WEIGHTS = gson.fromJson(higherDepth(constantsJson, "DUNGEON_CLASS_WEIGHTS"), mapStringDouble);
+			DUNGEON_CLASS_WEIGHTS = gson.fromJson(higherDepth(CONSTANTS, "DUNGEON_CLASS_WEIGHTS"), mapStringDouble);
 
 			/* DUNGEON_WEIGHTS */
-			DUNGEON_WEIGHTS = gson.fromJson(higherDepth(constantsJson, "DUNGEON_WEIGHTS"), mapStringDouble);
+			DUNGEON_WEIGHTS = gson.fromJson(higherDepth(CONSTANTS, "DUNGEON_WEIGHTS"), mapStringDouble);
 
 			/* DUNGEON_EMOJI_MAP */
-			DUNGEON_EMOJI_MAP = gson.fromJson(higherDepth(constantsJson, "DUNGEON_EMOJI_MAP"), mapStringString);
+			DUNGEON_EMOJI_MAP = gson.fromJson(higherDepth(CONSTANTS, "DUNGEON_EMOJI_MAP"), mapStringString);
 
 			/* FETCHUR_ITEMS */
-			FETCHUR_ITEMS = gson.fromJson(higherDepth(constantsJson, "FETCHUR_ITEMS"), listString);
+			FETCHUR_ITEMS = gson.fromJson(higherDepth(CONSTANTS, "FETCHUR_ITEMS"), listString);
 
 			/* DUNGEON_META_ITEMS */
-			DUNGEON_META_ITEMS = gson.fromJson(higherDepth(constantsJson, "DUNGEON_META_ITEMS"), listString);
+			DUNGEON_META_ITEMS = gson.fromJson(higherDepth(CONSTANTS, "DUNGEON_META_ITEMS"), listString);
 
 			/* HARP_SONG_ID_TO_NAME */
-			HARP_SONG_ID_TO_NAME = gson.fromJson(higherDepth(constantsJson, "HARP_SONG_ID_TO_NAME"), mapStringString);
+			HARP_SONG_ID_TO_NAME = gson.fromJson(higherDepth(CONSTANTS, "HARP_SONG_ID_TO_NAME"), mapStringString);
 
 			/* SLAYER_DEPRECATION_SCALING */
-			SLAYER_DEPRECATION_SCALING = higherDepth(constantsJson, "SLAYER_DEPRECATION_SCALING");
+			SLAYER_DEPRECATION_SCALING = higherDepth(CONSTANTS, "SLAYER_DEPRECATION_SCALING");
 
 			/* SKILL_RATIO_WEIGHT */
-			SKILL_RATIO_WEIGHT = higherDepth(constantsJson, "SKILL_RATIO_WEIGHT");
+			SKILL_RATIO_WEIGHT = higherDepth(CONSTANTS, "SKILL_RATIO_WEIGHT");
 
 			/* SKILL_FACTORS */
-			SKILL_FACTORS = higherDepth(constantsJson, "SKILL_FACTORS");
+			SKILL_FACTORS = higherDepth(CONSTANTS, "SKILL_FACTORS");
 
 			/* SKILL_OVERFLOW_MULTIPLIERS */
-			SKILL_OVERFLOW_MULTIPLIERS = higherDepth(constantsJson, "SKILL_OVERFLOW_MULTIPLIERS");
+			SKILL_OVERFLOW_MULTIPLIERS = higherDepth(CONSTANTS, "SKILL_OVERFLOW_MULTIPLIERS");
 
 			/* DUNGEON_COMPLETION_WORTH */
-			DUNGEON_COMPLETION_WORTH = higherDepth(constantsJson, "DUNGEON_COMPLETION_WORTH").getAsJsonObject();
+			DUNGEON_COMPLETION_WORTH = higherDepth(CONSTANTS, "DUNGEON_COMPLETION_WORTH").getAsJsonObject();
 
 			/* DUNGEON_COMPLETION_BUFFS */
-			DUNGEON_COMPLETION_BUFFS = higherDepth(constantsJson, "DUNGEON_COMPLETION_BUFFS").getAsJsonObject();
+			DUNGEON_COMPLETION_BUFFS = higherDepth(CONSTANTS, "DUNGEON_COMPLETION_BUFFS").getAsJsonObject();
 
 			/* HOTM_PERK_ID_TO_NAME */
-			HOTM_PERK_ID_TO_NAME = gson.fromJson(higherDepth(constantsJson, "HOTM_PERK_ID_TO_NAME"), mapStringString);
+			HOTM_PERK_ID_TO_NAME = gson.fromJson(higherDepth(CONSTANTS, "HOTM_PERK_ID_TO_NAME"), mapStringString);
 
 			/* HOTM_PERK_MAX_LEVEL */
-			HOTM_PERK_MAX_LEVEL = gson.fromJson(higherDepth(constantsJson, "HOTM_PERK_MAX_LEVEL"), mapStringInteger);
+			HOTM_PERK_MAX_LEVEL = gson.fromJson(higherDepth(CONSTANTS, "HOTM_PERK_MAX_LEVEL"), mapStringInteger);
 
 			/* SLAYER_EMOJI_MAP */
-			SLAYER_EMOJI_MAP = gson.fromJson(higherDepth(constantsJson, "SLAYER_EMOJI_MAP"), mapStringString);
+			SLAYER_EMOJI_MAP = gson.fromJson(higherDepth(CONSTANTS, "SLAYER_EMOJI_MAP"), mapStringString);
 
 			/* ESSENCE_EMOJI_MAP */
-			ESSENCE_EMOJI_MAP = gson.fromJson(higherDepth(constantsJson, "ESSENCE_EMOJI_MAP"), mapStringString);
+			ESSENCE_EMOJI_MAP = gson.fromJson(higherDepth(CONSTANTS, "ESSENCE_EMOJI_MAP"), mapStringString);
 
 			/* IGNORED_ENCHANTS */
-			IGNORED_ENCHANTS = gson.fromJson(higherDepth(constantsJson, "IGNORED_ENCHANTS"), mapStringInteger);
+			IGNORED_ENCHANTS = gson.fromJson(higherDepth(CONSTANTS, "IGNORED_ENCHANTS"), mapStringInteger);
 
 			/* FORGE_TIMES */
-			FORGE_TIMES = gson.fromJson(higherDepth(constantsJson, "FORGE_TIMES"), mapStringLong);
+			FORGE_TIMES = gson.fromJson(higherDepth(CONSTANTS, "FORGE_TIMES"), mapStringLong);
 
 			/* MAYOR_NAME_TO_SKIN */
-			MAYOR_NAME_TO_SKIN = gson.fromJson(higherDepth(constantsJson, "MAYOR_NAME_TO_SKIN"), mapStringString);
+			MAYOR_NAME_TO_SKIN = gson.fromJson(higherDepth(CONSTANTS, "MAYOR_NAME_TO_SKIN"), mapStringString);
 
 			/* ENCHANT_NAMES */
 			HashSet<String> enchantNames = new HashSet<>();
@@ -256,5 +258,9 @@ public class Constants {
 		} catch (Exception e) {
 			Main.log.error("Exception while initializing constants", e);
 		}
+	}
+
+	public static JsonElement getConstant(String key){
+		return CONSTANTS.get(key);
 	}
 }

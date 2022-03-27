@@ -77,9 +77,9 @@ public class MayorHandler {
 
 		if (currentTime > closeTime && currentTime < closeTime + 420000) { // Ended at most 7 min ago
 			scheduler.schedule(MayorHandler::mayorElected, 5, TimeUnit.MINUTES);
-			scheduler.schedule(MayorHandler::initialize, openTime - currentTime + 1000, TimeUnit.MILLISECONDS);
+			scheduler.schedule(MayorHandler::initialize, 15, TimeUnit.MINUTES);
 		} else if (currentTime > closeTime && currentTime < openTime) { // Election booth is closed so wait for next open
-			scheduler.schedule(MayorHandler::initialize, openTime - currentTime + 1000, TimeUnit.MILLISECONDS);
+			scheduler.schedule(MayorHandler::initialize, 5, TimeUnit.MINUTES);
 		} else { // Election is open
 			updateCurrentElection();
 		}

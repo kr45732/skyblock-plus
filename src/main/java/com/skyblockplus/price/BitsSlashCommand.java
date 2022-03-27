@@ -56,8 +56,6 @@ public class BitsSlashCommand extends SlashCommand {
 				event.getFocusedOption().getValue(),
 				BITS_ITEM_NAMES.stream().map(Utils::idToName).distinct().collect(Collectors.toList())
 			);
-		} else if (event.getFocusedOption().getName().equals("player")) {
-			event.replyClosestPlayer();
 		}
 	}
 }

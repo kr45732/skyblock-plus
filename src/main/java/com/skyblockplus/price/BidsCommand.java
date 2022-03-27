@@ -53,7 +53,7 @@ public class BidsCommand extends Command {
 			return defaultEmbed("No bids found for " + usernameUuidStruct.username());
 		}
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(10);
+		CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(10);
 		PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_FIELDS);
 
 		for (JsonElement bid : bids) {

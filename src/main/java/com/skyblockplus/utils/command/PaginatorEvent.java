@@ -24,6 +24,8 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 
+import static com.skyblockplus.utils.Utils.defaultPaginator;
+
 public class PaginatorEvent {
 
 	private final SlashCommandEvent slashCommand;
@@ -75,5 +77,9 @@ public class PaginatorEvent {
 
 	public Member getMember() {
 		return isSlashCommand() ? slashCommand.getMember() : command.getMember();
+	}
+
+	public CustomPaginator.Builder getPaginator() {
+		return defaultPaginator(getUser()).setColumns(1).setItemsPerPage(1);
 	}
 }

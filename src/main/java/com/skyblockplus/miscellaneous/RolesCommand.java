@@ -546,7 +546,7 @@ public class RolesCommand extends Command {
 			return defaultEmbed("Automatic roles not enabled for this server");
 		}
 
-		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(30);
+		CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(30);
 		List<String> rolesID = getJsonKeys(rolesJson);
 		rolesID.remove("enable");
 		for (String currentRoleName : rolesID) {
