@@ -314,7 +314,22 @@ public class Main {
 		scheduler.schedule(System::gc, 30, TimeUnit.MINUTES); // Sorry for the war crimes
 
 		try {
-			botStatusWebhook.send(client.getSuccess() + " Restarted in " + Duration.between(((GuildMessageChannel) jda.getGuildChannelById("957658797155975208")).getHistory().retrievePast(1).complete().get(0).getTimeCreated().toInstant(), Instant.now()).toSeconds() + " seconds");
+			botStatusWebhook.send(
+				client.getSuccess() +
+				" Restarted in " +
+				Duration
+					.between(
+						((GuildMessageChannel) jda.getGuildChannelById("957658797155975208")).getHistory()
+							.retrievePast(1)
+							.complete()
+							.get(0)
+							.getTimeCreated()
+							.toInstant(),
+						Instant.now()
+					)
+					.toSeconds() +
+				" seconds"
+			);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

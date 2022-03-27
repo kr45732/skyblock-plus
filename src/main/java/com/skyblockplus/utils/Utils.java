@@ -121,8 +121,9 @@ public class Utils {
 	public static final Consumer<Object> ignore = ignored -> {};
 	public static final Pattern nicknameTemplatePattern = Pattern.compile("\\[(GUILD|PLAYER)\\.(\\w+)(?:\\.\\{(.*?)})?]");
 	public static final JDAWebhookClient botStatusWebhook = new WebhookClientBuilder(
-					"https://discord.com/api/webhooks/957659234827374602/HLXDdqX5XMaH2ZDX5HRHifQ6i71ISoCNcwVmwPQCyCvbKv2l0Q7NLj_lmzwfs4mdcOM1"
-	).buildJDA();
+		"https://discord.com/api/webhooks/957659234827374602/HLXDdqX5XMaH2ZDX5HRHifQ6i71ISoCNcwVmwPQCyCvbKv2l0Q7NLj_lmzwfs4mdcOM1"
+	)
+		.buildJDA();
 	/* Configuration File */
 	public static String HYPIXEL_API_KEY = "";
 	public static String BOT_TOKEN = "";
@@ -463,16 +464,14 @@ public class Utils {
 						try {
 							(isMain ? remainingLimit : keyCooldownMap.get(hypixelApiKey).remainingLimit()).set(
 									Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Remaining").getValue())
-							);
+								);
 							(isMain ? timeTillReset : keyCooldownMap.get(hypixelApiKey).timeTillReset()).set(
 									Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Reset").getValue())
-							);
-
-						} catch (Exception ignored) {
-						}
+								);
+						} catch (Exception ignored) {}
 					}
 
-					if(httpResponse.getStatusLine().getStatusCode() == 502){
+					if (httpResponse.getStatusLine().getStatusCode() == 502) {
 						return JsonParser.parseString("{\"cause\":\"502 Bad Gateway\"}");
 					}
 				}
