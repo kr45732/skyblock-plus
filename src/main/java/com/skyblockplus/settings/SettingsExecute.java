@@ -2014,7 +2014,7 @@ public class SettingsExecute {
 	}
 
 	public EmbedBuilder setVerifyEnable(boolean enable) {
-		if (!enable) {
+		if (enable) {
 			JsonObject currentSettings = database.getVerifySettings(guild.getId()).getAsJsonObject();
 			currentSettings.remove("previousMessageId");
 			currentSettings.remove("verifiedNickname");
