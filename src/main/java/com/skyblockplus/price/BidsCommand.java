@@ -58,13 +58,13 @@ public class BidsCommand extends Command {
 
 		for (JsonElement bid : bids) {
 			String auctionDesc;
-			String itemName;
+			String itemName = getEmoji(higherDepth(bid, "item_id").getAsString()) +  " ";
 			boolean isPet = higherDepth(bid, "item_id").getAsString().equals("PET");
 
 			Instant endingAt = Instant.ofEpochMilli(higherDepth(bid, "end_t").getAsLong());
 			Duration duration = Duration.between(Instant.now(), endingAt);
 
-			itemName =
+			itemName +=
 				(isPet ? capitalizeString(higherDepth(bid, "tier").getAsString()) + " " : "") + higherDepth(bid, "item_name").getAsString();
 
 			JsonArray bidsArr = higherDepth(bid, "bids").getAsJsonArray();

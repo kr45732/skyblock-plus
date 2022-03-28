@@ -60,8 +60,8 @@ public class ApiHandler {
 		"[0-9a-f]{32}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
 	);
 	private static final Logger log = LoggerFactory.getLogger(ApiHandler.class);
-	public static boolean useAlternativeApi = reloadSettingsJson();
 	public static boolean useAlternativeAhApi = false;
+	public static boolean useAlternativeApi = reloadSettingsJson();
 	public static ScheduledFuture<?> updateCacheTask;
 
 	public static void initialize() {

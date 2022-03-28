@@ -22,6 +22,7 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Utils;
@@ -92,7 +93,11 @@ public class ReforgeStoneCommand extends Command {
 		if (higherDepth(reforgeStoneJson, "reforgeAbility", null) != null) {
 			eb.appendDescription("\n**Ability:** " + parseMcCodes(higherDepth(reforgeStoneJson, "reforgeAbility").getAsString()));
 		}
-		for (Map.Entry<String, JsonElement> stat : higherDepth(reforgeStoneJson, "reforgeStats").getAsJsonObject().entrySet()) {
+		JsonElement reforgeStats = higherDepth(reforgeStoneJson, "reforgeStats");
+		if(reforgeStats == null){
+			reforgeStats = JsonParser.parseString("{\"COMMON\":{},\"UNCOMMON\":{},\"RARE\":{},\"EPIC\":{},\"LEGENDARY\":{},\"MYTHIC\":{}}");
+		}
+		for (Map.Entry<String, JsonElement> stat : reforgeStats.getAsJsonObject().entrySet()) {
 			eb.addField(
 				capitalizeString(stat.getKey()),
 				"Cost: " +
