@@ -94,7 +94,7 @@ public class ReforgeStoneCommand extends Command {
 			eb.appendDescription("\n**Ability:** " + parseMcCodes(higherDepth(reforgeStoneJson, "reforgeAbility").getAsString()));
 		}
 		JsonElement reforgeStats = higherDepth(reforgeStoneJson, "reforgeStats");
-		if(reforgeStats == null){
+		if (reforgeStats == null) {
 			reforgeStats = JsonParser.parseString("{\"COMMON\":{},\"UNCOMMON\":{},\"RARE\":{},\"EPIC\":{},\"LEGENDARY\":{},\"MYTHIC\":{}}");
 		}
 		for (Map.Entry<String, JsonElement> stat : reforgeStats.getAsJsonObject().entrySet()) {

@@ -58,7 +58,7 @@ public class BidsCommand extends Command {
 
 		for (JsonElement bid : bids) {
 			String auctionDesc;
-			String itemName = getEmoji(higherDepth(bid, "item_id").getAsString()) +  " ";
+			String itemName = getEmoji(higherDepth(bid, "item_id").getAsString()) + " ";
 			boolean isPet = higherDepth(bid, "item_id").getAsString().equals("PET");
 
 			Instant endingAt = Instant.ofEpochMilli(higherDepth(bid, "end_t").getAsLong());

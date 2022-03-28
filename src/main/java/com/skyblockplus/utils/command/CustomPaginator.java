@@ -111,9 +111,14 @@ public class CustomPaginator extends Menu {
 		} else if (pageNum > pages) {
 			pageNum = pages;
 		}
-		Message msg = new MessageBuilder().setEmbeds(getEmbedRender(pageNum)).setContent(	"**⚠️ Skyblock Plus will stop responding to message commands <t:1651377600:R>!** Please use slash commands instead. If you do not see slash commands from this bot, then please re-invite the bot using `" +
+		Message msg = new MessageBuilder()
+			.setEmbeds(getEmbedRender(pageNum))
+			.setContent(
+				"**⚠️ Skyblock Plus will stop responding to message commands <t:1651377600:R>!** Please use slash commands instead. If you do not see slash commands from this bot, then please re-invite the bot using `" +
 				getGuildPrefix(((GuildMessageChannel) channel).getGuild().getId()) +
-				"invite`") .build();
+				"invite`"
+			)
+			.build();
 		initialize(channel.sendMessage(msg), pageNum);
 	}
 
