@@ -96,18 +96,8 @@ public class ApiHandler {
 
 	public static boolean reloadSettingsJson() {
 		JsonElement settings = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/settings.json");
-		useAlternativeAhApi =
-				higherDepth(
-						settings,
-						"useAlternativeAhApi",
-						false
-				);
-		return useAlternativeApi =
-				higherDepth(
-						settings,
-						"useAlternativeApi",
-						false
-				);
+		useAlternativeAhApi = higherDepth(settings, "useAlternativeAhApi", false);
+		return useAlternativeApi = higherDepth(settings, "useAlternativeApi", false);
 	}
 
 	public static void updateBotStatistics() {
@@ -439,7 +429,7 @@ public class ApiHandler {
 	}
 
 	public static String getQueryApiUrl(String path) {
-		return (useAlternativeAhApi ? "https://query-api.up.railway.app/" :"https://query-api.herokuapp.com/" )+ path;
+		return (useAlternativeAhApi ? "https://query-api.up.railway.app/" : "https://query-api.herokuapp.com/") + path;
 	}
 
 	public static JsonArray getBidsFromPlayer(String uuid) {
