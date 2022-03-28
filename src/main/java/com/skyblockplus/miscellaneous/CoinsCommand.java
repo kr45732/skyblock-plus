@@ -64,6 +64,9 @@ public class CoinsCommand extends Command {
 		if (player.isValid()) {
 			JsonArray bankHistoryArray = player.getBankHistory();
 			if (bankHistoryArray != null) {
+				if(bankHistoryArray.isEmpty()){
+					return player.defaultPlayerEmbed().setDescription("Bank history empty");
+				}
 				CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(20);
 
 				paginateBuilder.addItems(
