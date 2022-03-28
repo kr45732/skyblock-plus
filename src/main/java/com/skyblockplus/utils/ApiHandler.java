@@ -61,6 +61,7 @@ public class ApiHandler {
 	);
 	private static final Logger log = LoggerFactory.getLogger(ApiHandler.class);
 	public static boolean useAlternativeApi = reloadSettingsJson();
+	public static boolean useAlternativeAhApi = false;
 	public static ScheduledFuture<?> updateCacheTask;
 
 	public static void initialize() {
@@ -94,13 +95,19 @@ public class ApiHandler {
 	}
 
 	public static boolean reloadSettingsJson() {
-		useAlternativeApi =
-			higherDepth(
-				getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/settings.json"),
-				"useAlternativeApi",
-				false
-			);
-		return useAlternativeApi;
+		JsonElement settings = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/settings.json");
+		useAlternativeAhApi =
+				higherDepth(
+						settings,
+						"useAlternativeAhApi",
+						false
+				);
+		return useAlternativeApi =
+				higherDepth(
+						settings,
+						"useAlternativeApi",
+						false
+				);
 	}
 
 	public static void updateBotStatistics() {
@@ -432,7 +439,7 @@ public class ApiHandler {
 	}
 
 	public static String getQueryApiUrl(String path) {
-		return "https://query-api.herokuapp.com/" + path;
+		return (useAlternativeAhApi ? "https://query-api.up.railway.app/" :"https://query-api.herokuapp.com/" )+ path;
 	}
 
 	public static JsonArray getBidsFromPlayer(String uuid) {
