@@ -61,11 +61,12 @@ public class ApiHandler {
 	);
 	private static final Logger log = LoggerFactory.getLogger(ApiHandler.class);
 	public static boolean useAlternativeAhApi = false;
-	public static boolean useAlternativeApi = reloadSettingsJson();
+	public static boolean useAlternativeApi = false;
 	public static ScheduledFuture<?> updateCacheTask;
 
 	public static void initialize() {
 		try {
+			reloadSettingsJson();
 			cacheDatabase.initializeParties();
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateBotStatistics, 0, 3, TimeUnit.HOURS);
 			cacheDatabase.initializeCommandUses();
@@ -84,8 +85,8 @@ public class ApiHandler {
 							log.error("Exception when interval caching", e);
 						}
 					},
-					30,
-					30,
+					60,
+					60,
 					TimeUnit.MINUTES
 				);
 			scheduler.scheduleWithFixedDelay(ApiHandler::updateLinkedAccounts, 60, 30, TimeUnit.SECONDS);
@@ -94,10 +95,10 @@ public class ApiHandler {
 		}
 	}
 
-	public static boolean reloadSettingsJson() {
+	public static void reloadSettingsJson() {
 		JsonElement settings = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/settings.json");
 		useAlternativeAhApi = higherDepth(settings, "useAlternativeAhApi", false);
-		return useAlternativeApi = higherDepth(settings, "useAlternativeApi", false);
+		useAlternativeApi = higherDepth(settings, "useAlternativeApi", false);
 	}
 
 	public static void updateBotStatistics() {

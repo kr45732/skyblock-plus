@@ -445,19 +445,19 @@ public class NetworthExecute {
 	private void calculatePetPrices() {
 		StringBuilder queryStr = new StringBuilder();
 		for (InvItem item : invPets) {
-			queryStr.append("'").append(item.getPetApiName()).append("',");
+			queryStr.append(item.getPetApiName()).append(",");
 		}
 		for (InvItem item : petsPets) {
-			queryStr.append("'").append(item.getPetApiName()).append("',");
+			queryStr.append(item.getPetApiName()).append(",");
 		}
 		for (InvItem item : enderChestPets) {
-			queryStr.append("'").append(item.getPetApiName()).append("',");
+			queryStr.append(item.getPetApiName()).append(",");
 		}
 		for (InvItem item : storagePets) {
-			queryStr.append("'").append(item.getPetApiName()).append("',");
+			queryStr.append(item.getPetApiName()).append(",");
 		}
 		for (InvItem item : personalVaultPets) {
-			queryStr.append("'").append(item.getPetApiName()).append("',");
+			queryStr.append(item.getPetApiName()).append(",");
 		}
 
 		if (queryStr.length() == 0) {

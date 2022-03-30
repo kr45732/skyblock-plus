@@ -42,7 +42,8 @@ public class JacobCommand extends Command {
 	}
 
 	public static EmbedBuilder getJacobEmbed(String crop, PaginatorEvent event) {
-		if (!CROP_NAME_TO_EMOJI.containsKey(crop)) {
+		crop = capitalizeString(crop);
+		if (!CROP_NAME_TO_EMOJI.containsKey(crop) && !crop.equals("All")) {
 			return invalidEmbed("Invalid crop");
 		}
 
@@ -55,12 +56,13 @@ public class JacobCommand extends Command {
 		}
 
 		PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_FIELDS).setEveryPageTitle("Jacob Contests");
-		for (JacobContest contest : crop.equalsIgnoreCase("all")
+		String finalCrop = crop;
+		for (JacobContest contest : crop.equals("All")
 			? data.getContests()
 			: data
 				.getContests()
 				.stream()
-				.filter(c -> c.getCrops().stream().anyMatch(thisCrop -> thisCrop.equals(crop)))
+				.filter(c -> c.getCrops().stream().anyMatch(thisCrop -> thisCrop.equals(finalCrop)))
 				.collect(Collectors.toList())) {
 			extras.addEmbedField(
 				"Contest",
