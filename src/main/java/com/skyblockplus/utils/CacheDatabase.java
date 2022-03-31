@@ -314,11 +314,6 @@ public class CacheDatabase {
 	}
 
 	private void insertIntoLeaderboard(Player player, Player.Gamemode gamemode) {
-		double highestNw = 0;
-		try {
-			highestNw = player.getHighestAmount("networth", gamemode);
-		} catch (Exception ignored) {}
-
 		try (
 			Connection connection = getConnection();
 			PreparedStatement statement = connection.prepareStatement(
@@ -330,24 +325,24 @@ public class CacheDatabase {
 			statement.setLong(1, Instant.now().toEpochMilli());
 			statement.setString(2, player.getUsername());
 			statement.setString(3, player.getUuid());
-			statement.setDouble(4, player.getHighestAmount("slayer", gamemode));
-			statement.setDouble(5, player.getHighestAmount("skills", gamemode));
-			statement.setDouble(6, player.getHighestAmount("catacombs", gamemode));
-			statement.setDouble(7, player.getHighestAmount("weight", gamemode));
-			statement.setDouble(8, player.getHighestAmount("sven", gamemode));
-			statement.setDouble(9, player.getHighestAmount("rev", gamemode));
-			statement.setDouble(10, player.getHighestAmount("tara", gamemode));
-			statement.setDouble(11, player.getHighestAmount("enderman", gamemode));
-			statement.setDouble(12, player.getHighestAmount("alchemy", gamemode));
-			statement.setDouble(13, player.getHighestAmount("combat", gamemode));
-			statement.setDouble(14, player.getHighestAmount("fishing", gamemode));
-			statement.setDouble(15, player.getHighestAmount("farming", gamemode));
-			statement.setDouble(16, player.getHighestAmount("foraging", gamemode));
-			statement.setDouble(17, player.getHighestAmount("carpentry", gamemode));
-			statement.setDouble(18, player.getHighestAmount("mining", gamemode));
-			statement.setDouble(19, player.getHighestAmount("taming", gamemode));
+			statement.setDouble(4, player.getHighestAmount("slayer", gamemode, true));
+			statement.setDouble(5, player.getHighestAmount("skills", gamemode, true));
+			statement.setDouble(6, player.getHighestAmount("catacombs", gamemode, true));
+			statement.setDouble(7, player.getHighestAmount("weight", gamemode, true));
+			statement.setDouble(8, player.getHighestAmount("sven", gamemode, true));
+			statement.setDouble(9, player.getHighestAmount("rev", gamemode, true));
+			statement.setDouble(10, player.getHighestAmount("tara", gamemode, true));
+			statement.setDouble(11, player.getHighestAmount("enderman", gamemode, true));
+			statement.setDouble(12, player.getHighestAmount("alchemy", gamemode, true));
+			statement.setDouble(13, player.getHighestAmount("combat", gamemode, true));
+			statement.setDouble(14, player.getHighestAmount("fishing", gamemode, true));
+			statement.setDouble(15, player.getHighestAmount("farming", gamemode, true));
+			statement.setDouble(16, player.getHighestAmount("foraging", gamemode, true));
+			statement.setDouble(17, player.getHighestAmount("carpentry", gamemode, true));
+			statement.setDouble(18, player.getHighestAmount("mining", gamemode, true));
+			statement.setDouble(19, player.getHighestAmount("taming", gamemode, true));
 			statement.setDouble(20, player.getHighestAmount("enchanting", gamemode));
-			statement.setDouble(21, highestNw);
+			statement.setDouble(21, player.getHighestAmount("networth", gamemode, true));
 			statement.executeUpdate();
 		} catch (Exception e) {
 			e.printStackTrace();
