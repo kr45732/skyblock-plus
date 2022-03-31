@@ -37,27 +37,29 @@ public abstract class SlashCommand {
 	protected abstract void execute(SlashCommandEvent event);
 
 	protected void run(SlashCommandEvent event) {
-		if (cooldown == -1) {
+		if (!event.isOwner() && cooldown == -1) {
 			Command command = client.getCommands().stream().filter(c -> c.getName().equals(name)).findFirst().orElse(null);
 			cooldown = command != null ? command.getCooldown() : globalCooldown;
 		}
 
-		for (Permission p : userPermissions) {
-			if (p.isChannel()) {
-				if (!event.getMember().hasPermission(event.getTextChannel(), p)) {
-					event.embed(invalidEmbed("You must have the " + p.getName() + " permission in this channel to use that!"));
-					return;
-				}
-			} else {
-				if (p == Permission.ADMINISTRATOR) {
-					if (!guildMap.get(event.getGuild().getId()).isAdmin(event.getMember())) {
-						event.embed(invalidEmbed("You are missing the required permissions or roles to use this command"));
+		if(!event.isOwner()) {
+			for (Permission p : userPermissions) {
+				if (p.isChannel()) {
+					if (!event.getMember().hasPermission(event.getTextChannel(), p)) {
+						event.embed(invalidEmbed("You must have the " + p.getName() + " permission in this channel to use that!"));
 						return;
 					}
 				} else {
-					if (!event.getMember().hasPermission(p)) {
-						event.embed(invalidEmbed("You must have the " + p.getName() + " permission in this server to use that!"));
-						return;
+					if (p == Permission.ADMINISTRATOR) {
+						if (!guildMap.get(event.getGuild().getId()).isAdmin(event.getMember())) {
+							event.embed(invalidEmbed("You are missing the required permissions or roles to use this command"));
+							return;
+						}
+					} else {
+						if (!event.getMember().hasPermission(p)) {
+							event.embed(invalidEmbed("You must have the " + p.getName() + " permission in this server to use that!"));
+							return;
+						}
 					}
 				}
 			}

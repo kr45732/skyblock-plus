@@ -73,6 +73,7 @@ public class PublicEndpoints {
 			if (JacobHandler.needsUpdate()) {
 				JacobHandler.setJacobData(jacobData);
 				cacheJacobData();
+				jda.getTextChannelById("937894945564545035").sendMessage(client.getSuccess() + " Received jacob data").queue();
 				return new ResponseEntity<>(DataObject.empty().put("success", true).toMap(), HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(

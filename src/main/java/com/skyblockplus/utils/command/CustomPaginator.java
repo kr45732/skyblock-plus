@@ -420,7 +420,11 @@ public class CustomPaginator extends Menu {
 		}
 
 		public void addItems(String... items) {
-			strings.addAll(Arrays.asList(items));
+			addItems(Arrays.asList(items));
+		}
+
+		public void addItems(Collection<String> items) {
+			strings.addAll(items);
 		}
 
 		public Builder wrapPageEnds(boolean wrapPageEnds) {

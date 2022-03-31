@@ -189,7 +189,7 @@ public class Main {
 					new CalcDragsCommand(),
 					new ViewAuctionCommand(),
 					new CoinsPerBitCommand(),
-					new ReforgeStoneCommand()
+					new ReforgeStoneCommand(), new CheckGuildApiCommand()
 				)
 				.build();
 
@@ -264,7 +264,7 @@ public class Main {
 					new CalcDragsSlashCommand(),
 					new ViewAuctionSlashCommand(),
 					new CoinsPerBitSlashCommand(),
-					new ReforgeStoneSlashCommand()
+					new ReforgeStoneSlashCommand(), new CheckGuildApiSlashCommand()
 				);
 
 		allServerSettings =
