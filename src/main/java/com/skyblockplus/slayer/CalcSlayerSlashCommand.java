@@ -18,7 +18,6 @@
 
 package com.skyblockplus.slayer;
 
-import com.skyblockplus.dungeons.CalcRunsCommand;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
