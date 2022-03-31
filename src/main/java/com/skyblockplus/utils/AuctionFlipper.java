@@ -76,7 +76,7 @@ public class AuctionFlipper {
 
 	public static void onGuildMessageReceived(MessageReceivedEvent event) {
 		try {
-			if (event.getChannel().getId().equals("958771784004567063") && event.isWebhookMessage()) {
+			if (event.getChannel().getId().equals((useAlternativeAhApi ? "958904253299167262" : "958771784004567063")) && event.isWebhookMessage()) {
 				lastUpdated = Instant.now();
 				String desc = event.getMessage().getEmbeds().get(0).getDescription();
 				if (enable && isMainBot() && desc.startsWith("Successfully updated under bins file in ")) {

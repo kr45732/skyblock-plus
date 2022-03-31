@@ -37,6 +37,7 @@ public class ViewAuctionCommand extends Command {
 
 	public ViewAuctionCommand() {
 		this.name = "viewauction";
+		this.aliases = new String[]{"viewah"};
 		this.cooldown = globalCooldown;
 		this.botPermissions = defaultPerms();
 	}

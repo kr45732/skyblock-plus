@@ -44,7 +44,7 @@ public class CheckGuildApiCommand extends Command {
 
 	public CheckGuildApiCommand() {
 		this.name = "check-guild-api";
-		this.cooldown = 120;
+		this.cooldown = globalCooldown;
 		this.botPermissions = defaultPerms();
 	}
 
