@@ -42,7 +42,7 @@ public abstract class SlashCommand {
 			cooldown = command != null ? command.getCooldown() : globalCooldown;
 		}
 
-		if(!event.isOwner()) {
+		if (!event.isOwner()) {
 			for (Permission p : userPermissions) {
 				if (p.isChannel()) {
 					if (!event.getMember().hasPermission(event.getTextChannel(), p)) {

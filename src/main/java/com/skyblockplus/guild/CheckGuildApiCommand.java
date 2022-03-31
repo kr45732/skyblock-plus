@@ -18,6 +18,10 @@
 
 package com.skyblockplus.guild;
 
+import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.ApiHandler.asyncSkyblockProfilesFromUuid;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
@@ -29,17 +33,12 @@ import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-
-import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.ApiHandler.asyncSkyblockProfilesFromUuid;
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class CheckGuildApiCommand extends Command {
 
@@ -51,12 +50,12 @@ public class CheckGuildApiCommand extends Command {
 
 	public static EmbedBuilder getGuildCheckApi(String username, PaginatorEvent event) {
 		String hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
-		
+
 		EmbedBuilder eb = checkHypixelKey(hypixelKey);
 		if (eb != null) {
 			return eb;
 		}
-		
+
 		UsernameUuidStruct usernameUuid = usernameToUuid(username);
 		if (usernameUuid.isNotValid()) {
 			return invalidEmbed(usernameUuid.failCause());
@@ -75,50 +74,46 @@ public class CheckGuildApiCommand extends Command {
 
 			CompletableFuture<String> guildMemberUsername = asyncUuidToUsername(guildMemberUuid);
 			futuresList.add(
-					guildMemberUsername.thenApply(guildMemberUsernameResponse -> {
-						try {
-							if (keyCooldownMap.get(hypixelKey).isRateLimited()) {
-								System.out.println("Sleeping for " + keyCooldownMap.get(hypixelKey).timeTillReset().get() + " seconds");
-								TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).timeTillReset().get());
+				guildMemberUsername.thenApply(guildMemberUsernameResponse -> {
+					try {
+						if (keyCooldownMap.get(hypixelKey).isRateLimited()) {
+							System.out.println("Sleeping for " + keyCooldownMap.get(hypixelKey).timeTillReset().get() + " seconds");
+							TimeUnit.SECONDS.sleep(keyCooldownMap.get(hypixelKey).timeTillReset().get());
+						}
+					} catch (Exception ignored) {}
+
+					CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(guildMemberUuid, hypixelKey);
+					return guildMemberProfileJson.thenApply(guildMemberProfileJsonResponse -> {
+						Player player = new Player(guildMemberUuid, guildMemberUsernameResponse, guildMemberProfileJsonResponse);
+
+						if (player.isValid()) {
+							boolean invEnabled = player.getInventoryMap() != null;
+							boolean bankEnabled = player.getBankBalance() != -1;
+							boolean collectionsEnabled = false;
+							try {
+								collectionsEnabled = higherDepth(player.profileJson(), "collection").getAsJsonObject() != null;
+							} catch (Exception ignored) {}
+							boolean vaultEnabled = player.getPersonalVaultMap() != null;
+							boolean skillsEnabled = player.getSkillAverage("", -1) != -1;
+
+							if (invEnabled && bankEnabled && collectionsEnabled && vaultEnabled && skillsEnabled) {
+								return client.getSuccess() + " **" + player.getUsername() + ":** all APIs enabled";
+							} else {
+								String out =
+									(invEnabled ? "" : "Inventory API, ") +
+									(bankEnabled ? "" : "Bank API, ") +
+									(collectionsEnabled ? "" : "Collections API, ") +
+									(vaultEnabled ? "" : "Vault API, ") +
+									(skillsEnabled ? "" : "Skills API, ");
+
+								return client.getError() + " **" + player.getUsername() + ":** " + out.substring(0, out.length() - 2);
 							}
-						} catch (Exception ignored) {}
-
-						CompletableFuture<JsonElement> guildMemberProfileJson = asyncSkyblockProfilesFromUuid(guildMemberUuid, hypixelKey);
-						return guildMemberProfileJson.thenApply(guildMemberProfileJsonResponse -> {
-							Player player = new Player(
-									guildMemberUuid,
-									guildMemberUsernameResponse,
-									guildMemberProfileJsonResponse
-							);
-
-							if (player.isValid()) {
-								boolean invEnabled = player.getInventoryMap() != null;
-								boolean bankEnabled = player.getBankBalance() != -1;
-								boolean collectionsEnabled = false;
-								try {
-									collectionsEnabled = higherDepth(player.profileJson(), "collection").getAsJsonObject() != null;
-								} catch (Exception ignored) {}
-								boolean vaultEnabled = player.getPersonalVaultMap() != null;
-								boolean skillsEnabled = player.getSkillAverage("", -1) != -1;
-
-								if(invEnabled && bankEnabled && collectionsEnabled && vaultEnabled && skillsEnabled){
-									return client.getSuccess() + " **" + player.getUsername() + ":** all APIs enabled";
-								}else{
-									String out = (invEnabled ? "" : "Inventory API, ")
-											+ (bankEnabled ? "" : "Bank API, ")
-											+ (collectionsEnabled ? "" : "Collections API, ")
-											+ (vaultEnabled ? "" : "Vault API, ")
-											+ (skillsEnabled ? "" : "Skills API, ");
-
-									return client.getError() + " **" + player.getUsername() + ":** "  + out.substring(0, out.length()-2);
-								}
-							}
-							return client.getError() + " **" + player.getUsername() + ":** unable to get data";
-						});
-					})
+						}
+						return client.getError() + " **" + player.getUsername() + ":** unable to get data";
+					});
+				})
 			);
 		}
-
 
 		List<String> out = new ArrayList<>();
 		for (CompletableFuture<CompletableFuture<String>> future : futuresList) {
@@ -132,9 +127,13 @@ public class CheckGuildApiCommand extends Command {
 		out.sort(Comparator.comparing(o -> !o.contains(client.getError())));
 		CustomPaginator.Builder paginator = event.getPaginator().setItemsPerPage(20);
 		paginator.addItems(out);
-		event.paginate(paginator.setPaginatorExtras(new PaginatorExtras().setEveryPageTitle(guildResponse.get("name").getAsString())
-				.setEveryPageText("**API Disabled Count:** " + out.stream().filter(o -> o.contains(client.getError())).count() + "\n")
-		));
+		event.paginate(
+			paginator.setPaginatorExtras(
+				new PaginatorExtras()
+					.setEveryPageTitle(guildResponse.get("name").getAsString())
+					.setEveryPageText("**API Disabled Count:** " + out.stream().filter(o -> o.contains(client.getError())).count() + "\n")
+			)
+		);
 		return null;
 	}
 
@@ -150,7 +149,7 @@ public class CheckGuildApiCommand extends Command {
 						return;
 					}
 
-					paginate(getGuildCheckApi(player,  new PaginatorEvent(event)));
+					paginate(getGuildCheckApi(player, new PaginatorEvent(event)));
 					return;
 				}
 
