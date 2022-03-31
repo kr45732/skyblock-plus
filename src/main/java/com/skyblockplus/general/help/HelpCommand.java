@@ -208,13 +208,13 @@ public class HelpCommand extends Command {
 					.addAliases("guild-stats", "g-stats")
 					.addExamples("guild-stats u:CrypticPlasma")
 					.setCategory("guild"),
-					new HelpData(
-							"check-guild-api",
-							"Get which Skyblock APIs players have enabled or disabled for a guild. Requires a Hypixel API key to be set.",
-							"check-guild-api <player>"
-					)
-							.addExamples("check-guild-api CrypticPlasma")
-							.setCategory("guild"),
+				new HelpData(
+					"check-guild-api",
+					"Get which Skyblock APIs players have enabled or disabled for a guild. Requires a Hypixel API key to be set.",
+					"check-guild-api <player>"
+				)
+					.addExamples("check-guild-api CrypticPlasma")
+					.setCategory("guild"),
 				// Auctions
 				new HelpData(
 					"auctions",
@@ -222,21 +222,12 @@ public class HelpCommand extends Command {
 					"auctions [player] [sort:low|high] [filter:unsold|sold] [--verbose]"
 				)
 					.addAliases("auction", "ah")
-					.addExamples(
-						"auctions CrypticPlasma",
-						"auctions CrypticPlasma filter:sold --verbose"
-					)
+					.addExamples("auctions CrypticPlasma", "auctions CrypticPlasma filter:sold --verbose")
 					.setCategory("price"),
-					new HelpData(
-							"viewauction",
-							"Get information about an auction by it's UUID.",
-							"viewauction <uuid>"
-					)
-							.addAliases("viewah")
-							.addExamples(
-									"auctions uuid 77df55d9c0084473b113265ef48fb396"
-							)
-							.setCategory("price"),
+				new HelpData("viewauction", "Get information about an auction by it's UUID.", "viewauction <uuid>")
+					.addAliases("viewah")
+					.addExamples("auctions uuid 77df55d9c0084473b113265ef48fb396")
+					.setCategory("price"),
 				new HelpData("bin", "Get the lowest bin of an item.", "bin <item>")
 					.addAliases("lbin")
 					.addExamples("bin Necron Chestplate")
@@ -263,9 +254,9 @@ public class HelpCommand extends Command {
 					.addExamples("bits God Potion")
 					.addAliases("bit")
 					.setCategory("price"),
-					new HelpData("coinsperbit", "Get the coins to bits ratio for items in the bits shop.", "coinsperbit <item>")
-							.addAliases("cpb")
-							.setCategory("price"),
+				new HelpData("coinsperbit", "Get the coins to bits ratio for items in the bits shop.", "coinsperbit <item>")
+					.addAliases("cpb")
+					.setCategory("price"),
 				new HelpData(
 					"calculate",
 					"Calculate the price of an item on the auction house using the auction's UUID.",
@@ -421,20 +412,16 @@ public class HelpCommand extends Command {
 				)
 					.addExamples("scammer CrypticPlasma")
 					.setCategory("miscellaneous"),
-					new HelpData(
-							"calcdrags",
-							"Calculate your loot quality and loot from dragons in the end. The ratio is your damage divided by first place damage.",
-							"calcdrags [position:position] [eyes:eyes] [ratio:ratio]"
-					)
-							.addAliases("drags")
-							.setCategory("miscellaneous"),
-					new HelpData(
-							"reforgestone",
-							"Get the reforge stone stats for each rarity.",
-							"reforgestone <stone>"
-					)
-							.addAliases("reforge")
-							.setCategory("miscellaneous"),
+				new HelpData(
+					"calcdrags",
+					"Calculate your loot quality and loot from dragons in the end. The ratio is your damage divided by first place damage.",
+					"calcdrags [position:position] [eyes:eyes] [ratio:ratio]"
+				)
+					.addAliases("drags")
+					.setCategory("miscellaneous"),
+				new HelpData("reforgestone", "Get the reforge stone stats for each rarity.", "reforgestone <stone>")
+					.addAliases("reforge")
+					.setCategory("miscellaneous"),
 				// Party
 				new HelpData("party", "Main party command.")
 					.addSubcommands(
@@ -876,7 +863,7 @@ public class HelpCommand extends Command {
 			help.create("price <item> [type:bin|auction|both]", "Query the auction house for the lowest bin of an item") +
 			help.create("bits <item>", "Get the bits cost of an item from the bits shop") +
 			help.create("coinsperbit <item>", "Get the coins to bits ratio for items in the bits shop") +
-					help.create("calculate <uuid>", "Calculate the price of an item on the auction house using the auction's UUID")
+			help.create("calculate <uuid>", "Calculate the price of an item on the auction house using the auction's UUID")
 		);
 
 		paginateBuilder.addItems(
@@ -923,8 +910,8 @@ public class HelpCommand extends Command {
 			help.create("skyblock [player] [profile]", "Get an overview of a player's Skyblock statistics") +
 			help.create("recipe", "Get the crafting recipe of an item") +
 			help.create("check-api", "Check which Skyblock APIs a player has enabled or disabled") +
-					help.create("calcdrags", "Calculate loot quality and loot from dragons in the end") +
-					help.create("reforgestone <stone>", "Get the reforge stone stats for each rarity")
+			help.create("calcdrags", "Calculate loot quality and loot from dragons in the end") +
+			help.create("reforgestone <stone>", "Get the reforge stone stats for each rarity")
 		);
 
 		paginateBuilder.addItems(
