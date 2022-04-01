@@ -81,7 +81,7 @@ public class SlashCommandClient extends ListenerAdapter {
 			return;
 		}
 
-		if (Math.random() < 0.1) {
+		if (Math.random() < 0.05) {
 			event.reply("https://i.imgur.com/0ZPHTVz.png").queue();
 			return;
 		}

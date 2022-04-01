@@ -112,7 +112,7 @@ public class Main {
 					}
 				)
 				.setCommandPreProcessBiFunction((event, cmd) -> {
-					if (Math.random() < 0.1) {
+					if (Math.random() < 0.05) {
 						event.getMessage().reply("https://i.imgur.com/0ZPHTVz.png").queue();
 						return false;
 					}
