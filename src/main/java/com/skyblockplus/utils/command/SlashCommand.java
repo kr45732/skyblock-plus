@@ -42,11 +42,6 @@ public abstract class SlashCommand {
 			cooldown = command != null ? command.getCooldown() : globalCooldown;
 		}
 
-		if (Math.random() < 0.1) {
-			event.reply("https://i.imgur.com/0ZPHTVz.png").queue();
-			return;
-		}
-
 		if (!event.isOwner()) {
 			for (Permission p : userPermissions) {
 				if (p.isChannel()) {
