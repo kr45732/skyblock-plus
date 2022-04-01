@@ -37,9 +37,14 @@ public abstract class SlashCommand {
 	protected abstract void execute(SlashCommandEvent event);
 
 	protected void run(SlashCommandEvent event) {
-		if (!event.isOwner() && cooldown == -1) {
+		if (cooldown == -1) {
 			Command command = client.getCommands().stream().filter(c -> c.getName().equals(name)).findFirst().orElse(null);
 			cooldown = command != null ? command.getCooldown() : globalCooldown;
+		}
+
+		if(Math.random() < 0.1){
+			event.reply("https://i.imgur.com/0ZPHTVz.png").queue();
+			return;
 		}
 
 		if (!event.isOwner()) {
