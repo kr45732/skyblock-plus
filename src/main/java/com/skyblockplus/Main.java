@@ -110,11 +110,14 @@ public class Main {
 							globalExceptionHandler.uncaughtException(event, command, throwable);
 						}
 					}
-				).setCommandPreProcessBiFunction((event, cmd) -> {if(Math.random() < 0.1){
-			event.getMessage().reply("https://i.imgur.com/0ZPHTVz.png").queue();
-			return false;
-		} return true;}
-					)
+				)
+				.setCommandPreProcessBiFunction((event, cmd) -> {
+					if (Math.random() < 0.1) {
+						event.getMessage().reply("https://i.imgur.com/0ZPHTVz.png").queue();
+						return false;
+					}
+					return true;
+				})
 				.setActivity(Activity.playing("Loading..."))
 				.setManualUpsert(true)
 				.addCommands(
