@@ -746,7 +746,7 @@ public class AutomaticGuild {
 
 			for (Map.Entry<Member, RoleModifyRecord> entry : memberToRoleChanges.entrySet()) {
 				if (streamJsonArray(blacklist).noneMatch(u -> higherDepth(u, "uuid").getAsString().equals(entry.getValue().uuid()))) {
-					guild.modifyMemberRoles(entry.getKey(), entry.getValue().add(), entry.getValue().remove()).queue();
+					try{ guild.modifyMemberRoles(entry.getKey(), entry.getValue().add(), entry.getValue().remove()).queue();}catch (Exception ignored){}
 				}
 			}
 

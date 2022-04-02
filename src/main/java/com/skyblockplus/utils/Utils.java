@@ -948,7 +948,7 @@ public class Utils {
 
 	public static EmbedBuilder checkHypixelKey(String hypixelKey, boolean checkRatelimit) {
 		if (hypixelKey == null) {
-			return invalidEmbed("You must set a Hypixel API key to use this feature");
+			return invalidEmbed("You must set a valid Hypixel API key to use this feature or command");
 		}
 
 		try {
@@ -968,7 +968,7 @@ public class Utils {
 					.getAsString();
 			}
 		} catch (Exception e) {
-			return invalidEmbed("The set Hypixel API key is invalid");
+			return invalidEmbed("You must set a valid Hypixel API key to use this feature or command");
 		}
 
 		if (!keyCooldownMap.containsKey(hypixelKey)) {

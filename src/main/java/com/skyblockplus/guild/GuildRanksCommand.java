@@ -51,13 +51,13 @@ public class GuildRanksCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	public static EmbedBuilder getLeaderboard(String username, Player.Gamemode gamemode, boolean useKey, PaginatorEvent event) {
+	public static EmbedBuilder getRanks(String username, Player.Gamemode gamemode, boolean useKey, PaginatorEvent event) {
 		String hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
 
 		if (gamemode == Player.Gamemode.IRONMAN || gamemode == Player.Gamemode.STRANDED) {
 			EmbedBuilder eb = checkHypixelKey(hypixelKey);
 			if (eb != null) {
-				return invalidEmbed("You must set a Hypixel API key to use the ironman or stranded only gamemode");
+				return invalidEmbed("You must set a valid Hypixel API key to use the ironman or stranded only gamemode");
 			}
 			useKey = true;
 		} else if (useKey) {
@@ -469,7 +469,7 @@ public class GuildRanksCommand extends Command {
 					Player.Gamemode gamemode = Player.Gamemode.of(getStringOption("mode", "all"));
 					boolean useKey = getBooleanArg("--usekey");
 
-					paginate(getLeaderboard(args[1].split(":")[1], gamemode, useKey, new PaginatorEvent(event)));
+					paginate(getRanks(args[1].split(":")[1], gamemode, useKey, new PaginatorEvent(event)));
 					return;
 				}
 

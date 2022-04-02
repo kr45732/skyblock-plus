@@ -19,6 +19,7 @@
 package com.skyblockplus;
 
 import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.updateCacheTask;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -111,13 +112,7 @@ public class Main {
 						}
 					}
 				)
-				.setCommandPreProcessBiFunction((event, cmd) -> {
-					if (Math.random() < 0.05) {
-						event.getMessage().reply("https://i.imgur.com/0ZPHTVz.png").queue();
-						return false;
-					}
-					return true;
-				})
+				.setCommandPreProcessBiFunction((event, command) -> !guildMap.get(event.getGuild().getId()).channelBlacklist.contains(event.getChannel().getId()))
 				.setActivity(Activity.playing("Loading..."))
 				.setManualUpsert(true)
 				.addCommands(

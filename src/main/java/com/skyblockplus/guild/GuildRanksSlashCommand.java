@@ -43,7 +43,7 @@ public class GuildRanksSlashCommand extends SlashCommand {
 		}
 
 		event.paginate(
-			GuildRanksCommand.getLeaderboard(
+			GuildRanksCommand.getRanks(
 				event.player,
 				Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
 				event.getOptionBoolean("usekey", false),
