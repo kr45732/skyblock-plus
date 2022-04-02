@@ -63,11 +63,11 @@ public abstract class CommandExecute extends CommandEvent {
 			if (sendLoadingEmbed) {
 				this.ebMessage =
 					getChannel()
-//						.sendMessage(
-//							"**⚠️ Skyblock Plus will stop responding to message commands <t:1662004740:R>!** Please use slash commands instead. If you do not see slash commands from this bot, then please re-invite the bot using `" +
-//							getGuildPrefix(getGuild().getId()) +
-//							"invite`"
-//						)
+						//						.sendMessage(
+						//							"**⚠️ Skyblock Plus will stop responding to message commands <t:1662004740:R>!** Please use slash commands instead. If you do not see slash commands from this bot, then please re-invite the bot using `" +
+						//							getGuildPrefix(getGuild().getId()) +
+						//							"invite`"
+						//						)
 						.sendMessageEmbeds(loadingEmbed().build())
 						.complete();
 			}

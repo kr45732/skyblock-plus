@@ -112,7 +112,9 @@ public class Main {
 						}
 					}
 				)
-				.setCommandPreProcessBiFunction((event, command) -> !guildMap.get(event.getGuild().getId()).channelBlacklist.contains(event.getChannel().getId()))
+				.setCommandPreProcessBiFunction((event, command) ->
+					!guildMap.get(event.getGuild().getId()).channelBlacklist.contains(event.getChannel().getId())
+				)
 				.setActivity(Activity.playing("Loading..."))
 				.setManualUpsert(true)
 				.addCommands(
