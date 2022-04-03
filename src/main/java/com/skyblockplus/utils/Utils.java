@@ -472,7 +472,7 @@ public class Utils {
 					}
 
 					if (httpResponse.getStatusLine().getStatusCode() == 502) {
-						return JsonParser.parseString("{\"cause\":\"502 Bad Gateway\"}");
+						return JsonParser.parseString("{\"cause\":\"Hypixel API returned 502 bad gateway\"}");
 					}
 				}
 
