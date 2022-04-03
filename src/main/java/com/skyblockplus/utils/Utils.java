@@ -226,7 +226,14 @@ public class Utils {
 		if (averageAuctionJson == null || Duration.between(averageAuctionJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
 			averageAuctionJson = getJsonObject("https://moulberry.codes/auction_averages/3day.json");
 			if (averageAuctionJson == null) {
-				averageAuctionJson = getJsonObject(getQueryApiUrl("average_auction") + "?key=" + AUCTION_API_KEY + "&time=" + Instant.now().minus(3, ChronoUnit.DAYS).toEpochMilli());
+				averageAuctionJson =
+					getJsonObject(
+						getQueryApiUrl("average_auction") +
+						"?key=" +
+						AUCTION_API_KEY +
+						"&time=" +
+						Instant.now().minus(3, ChronoUnit.DAYS).toEpochMilli()
+					);
 			}
 			averageAuctionJsonLastUpdated = Instant.now();
 		}

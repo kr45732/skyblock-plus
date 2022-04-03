@@ -1104,7 +1104,10 @@ public class NetworthExecute {
 
 		for (String reforgeStone : REFORGE_STONE_NAMES) {
 			JsonElement reforgeStoneInfo = higherDepth(reforgesStonesJson, reforgeStone);
-			if (higherDepth(reforgeStoneInfo, "reforgeName").getAsString().equalsIgnoreCase(reforgeName) || reforgeStone.equalsIgnoreCase(reforgeName)) {
+			if (
+				higherDepth(reforgeStoneInfo, "reforgeName").getAsString().equalsIgnoreCase(reforgeName) ||
+				reforgeStone.equalsIgnoreCase(reforgeName)
+			) {
 				String reforgeStoneId = higherDepth(reforgeStoneInfo, "internalName").getAsString();
 				double reforgeStoneCost = getLowestPrice(reforgeStoneId);
 				double reforgeApplyCost = higherDepth(reforgeStoneInfo, "reforgeCosts." + itemRarity.toUpperCase()).getAsLong();
@@ -1260,7 +1263,9 @@ public class NetworthExecute {
 	}
 
 	public double getMinionCost(String id, int tier, int depth) {
-		if ((tier == 1 && (id.equals("FLOWER_GENERATOR") || id.equals("SNOW_GENERATOR"))) || (tier == 12 && !id.equals("FLOWER_GENERATOR"))) {
+		if (
+			(tier == 1 && (id.equals("FLOWER_GENERATOR") || id.equals("SNOW_GENERATOR"))) || (tier == 12 && !id.equals("FLOWER_GENERATOR"))
+		) {
 			String finalId = id.split("GENERATOR")[0].toLowerCase() + "minion_" + (tier == 1 ? "i" : "xii");
 			return streamJsonArray(sbzPrices)
 				.filter(i -> higherDepth(i, "name", "").equals(finalId))
