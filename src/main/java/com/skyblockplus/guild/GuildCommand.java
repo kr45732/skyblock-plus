@@ -36,7 +36,6 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 
 public class GuildCommand extends Command {
@@ -249,10 +248,14 @@ public class GuildCommand extends Command {
 		JsonArray membersArr = higherDepth(guildJson, "members").getAsJsonArray();
 		Map<CompletableFuture<String>, Integer> futures = new HashMap<>();
 		Map<String, Integer> guildMembers = new HashMap<>();
-	 	Map<String, Integer> ranksMap =	streamJsonArray(higherDepth(guildJson, "ranks").getAsJsonArray()).collect(Collectors.toMap(m -> higherDepth(m, "name").getAsString(), m -> higherDepth(m, "priority", 0)));
+		Map<String, Integer> ranksMap = streamJsonArray(higherDepth(guildJson, "ranks").getAsJsonArray())
+			.collect(Collectors.toMap(m -> higherDepth(m, "name").getAsString(), m -> higherDepth(m, "priority", 0)));
 		for (JsonElement member : membersArr) {
 			String rank = higherDepth(member, "rank").getAsString();
-			futures.put(asyncUuidToUsername(higherDepth(member, "uuid").getAsString()), rank.equals("Guild Master") ? 50 : ranksMap.getOrDefault(higherDepth(member, "rank").getAsString(), 0));
+			futures.put(
+				asyncUuidToUsername(higherDepth(member, "uuid").getAsString()),
+				rank.equals("Guild Master") ? 50 : ranksMap.getOrDefault(higherDepth(member, "rank").getAsString(), 0)
+			);
 		}
 
 		for (Map.Entry<CompletableFuture<String>, Integer> future : futures.entrySet()) {
@@ -265,13 +268,18 @@ public class GuildCommand extends Command {
 
 		paginateBuilder.setPaginatorExtras(
 			new PaginatorExtras()
-					.setEveryPageText("**Size:** " + membersArr.size())
+				.setEveryPageText("**Size:** " + membersArr.size())
 				.setEveryPageTitle(higherDepth(guildJson, "name").getAsString() + " Members")
 				.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(guildJson, "_id").getAsString())
-					.setEveryPageFirstFieldTitle("Members:")
+				.setEveryPageFirstFieldTitle("Members:")
 		);
 
-		for (String member : guildMembers.entrySet().stream().sorted (Comparator.comparingInt(m -> -m.getValue())).map(Map.Entry::getKey).collect(Collectors.toList())) {
+		for (String member : guildMembers
+			.entrySet()
+			.stream()
+			.sorted(Comparator.comparingInt(m -> -m.getValue()))
+			.map(Map.Entry::getKey)
+			.collect(Collectors.toList())) {
 			if (member != null) {
 				paginateBuilder.addItems("• [" + fixUsername(member) + "](" + skyblockStatsLink(member, null) + ")  ");
 			}

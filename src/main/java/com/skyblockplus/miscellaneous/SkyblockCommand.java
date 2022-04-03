@@ -103,7 +103,9 @@ public class SkyblockCommand extends Command {
 			}
 			trueSA /= SKILL_NAMES.size();
 			progressSA /= SKILL_NAMES.size();
-			eb.setDescription("**True Skill Average:** " + roundAndFormat(trueSA) + "\n**Progress Skill Average:** " + roundAndFormat(progressSA));
+			eb.setDescription(
+				"**True Skill Average:** " + roundAndFormat(trueSA) + "\n**Progress Skill Average:** " + roundAndFormat(progressSA)
+			);
 			extras.addEmbedPage(eb);
 
 			eb = player.defaultPlayerEmbed();

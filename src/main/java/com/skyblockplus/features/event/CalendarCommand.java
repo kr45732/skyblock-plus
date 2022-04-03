@@ -18,20 +18,19 @@
 
 package com.skyblockplus.features.event;
 
+import static com.skyblockplus.features.mayor.MayorHandler.currentMayor;
+import static com.skyblockplus.miscellaneous.TimeCommand.*;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-
-import static com.skyblockplus.features.mayor.MayorHandler.currentMayor;
-import static com.skyblockplus.miscellaneous.TimeCommand.*;
-import static com.skyblockplus.utils.Utils.*;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class CalendarCommand extends Command {
 
@@ -48,11 +47,11 @@ public class CalendarCommand extends Command {
 		ZoneId z = ZoneId.of("America/New_York");
 		LocalDate now = LocalDate.now(z);
 		ZonedDateTime nowDateTime = ZonedDateTime.now(z);
-		Instant instantNow =Instant.now();
+		Instant instantNow = Instant.now();
 		long nowEpoch = instantNow.toEpochMilli();
 
 		int curYear = getSkyblockYear();
-		String[] pets = new String[]{"LION;4", "MONKEY;4", "ELEPHANT;4", "GIRAFFE;4", "BLUE_WHALE;4", "TIGER;4"};
+		String[] pets = new String[] { "LION;4", "MONKEY;4", "ELEPHANT;4", "GIRAFFE;4", "BLUE_WHALE;4", "TIGER;4" };
 		int index = 0;
 		if ((curYear - 1) % 3 == 0) {
 			index = 2;
@@ -62,122 +61,128 @@ public class CalendarCommand extends Command {
 
 		Instant bingoStart = now.withDayOfMonth(1).atStartOfDay(z).toInstant();
 		Instant bingoEnd = bingoStart.plus(7, ChronoUnit.DAYS);
-		if(bingoEnd.isBefore(instantNow)){
+		if (bingoEnd.isBefore(instantNow)) {
 			bingoStart = now.withMonth(now.getMonth().plus(1).getValue()).withDayOfMonth(1).atStartOfDay(z).toInstant();
 			bingoEnd = bingoStart.plus(7, ChronoUnit.DAYS);
 		}
-		eb.addField("Bingo", "\uD83C\uDFB2 **Start:** <t:" +
-				bingoStart.getEpochSecond() +
-						":R>" +
-						"\n\uD83C\uDFB2 **End:** <t:" +
-				bingoEnd.getEpochSecond() +
-						":R>", false);
-
+		eb.addField(
+			"Bingo",
+			"\uD83C\uDFB2 **Start:** <t:" +
+			bingoStart.getEpochSecond() +
+			":R>" +
+			"\n\uD83C\uDFB2 **End:** <t:" +
+			bingoEnd.getEpochSecond() +
+			":R>",
+			false
+		);
 
 		eb
-				.addField("Traveling Zoo", getEmoji(pets[index]) +
-						" **Summer:** <t:" +
-						Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 3 * MONTH_MS).getEpochSecond() +
-						":R>" +
-						"\n" +
-						getEmoji(pets[index + 1]) +
-						" **Winter:** <t:" +
-						Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 9 * MONTH_MS).getEpochSecond() +
-						":R>", false)
-				.addField("Winter Island", "\n❄️ **Open:** <t:" +
-						Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 11 * MONTH_MS).getEpochSecond() +
-						":R>" +
-						"\n❄️ **Close:** <t:" +
-						Instant.ofEpochMilli(YEAR_0 + getSkyblockYear() * YEAR_MS).getEpochSecond() +
-						":R>", false);
+			.addField(
+				"Traveling Zoo",
+				getEmoji(pets[index]) +
+				" **Summer:** <t:" +
+				Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 3 * MONTH_MS).getEpochSecond() +
+				":R>" +
+				"\n" +
+				getEmoji(pets[index + 1]) +
+				" **Winter:** <t:" +
+				Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 9 * MONTH_MS).getEpochSecond() +
+				":R>",
+				false
+			)
+			.addField(
+				"Winter Island",
+				"\n❄️ **Open:** <t:" +
+				Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 11 * MONTH_MS).getEpochSecond() +
+				":R>" +
+				"\n❄️ **Close:** <t:" +
+				Instant.ofEpochMilli(YEAR_0 + getSkyblockYear() * YEAR_MS).getEpochSecond() +
+				":R>",
+				false
+			);
 
 		Instant spookyFishingStart = Instant
-				.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 7 * MONTH_MS + 28 * DAY_MS)
-				.minus(1, ChronoUnit.HOURS);
+			.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 7 * MONTH_MS + 28 * DAY_MS)
+			.minus(1, ChronoUnit.HOURS);
 		Instant spookyFishingEnd = spookyFishingStart.plus(2, ChronoUnit.HOURS);
-		if(spookyFishingEnd.isBefore(instantNow)){
-			spookyFishingStart = Instant
-					.ofEpochMilli(YEAR_0 + (getSkyblockYear()) * YEAR_MS + 7 * MONTH_MS + 28 * DAY_MS)
-					.minus(1, ChronoUnit.HOURS);
+		if (spookyFishingEnd.isBefore(instantNow)) {
+			spookyFishingStart =
+				Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear()) * YEAR_MS + 7 * MONTH_MS + 28 * DAY_MS).minus(1, ChronoUnit.HOURS);
 			spookyFishingEnd = spookyFishingEnd.plus(7, ChronoUnit.DAYS);
 		}
-				eb.addField("Spooky Fishing",
-						"\n\uD83D\uDC20 **Start:** <t:" +
-								spookyFishingStart.getEpochSecond() +
-								":R>" + "\n\uD83D\uDC20 **End:** <t:" +
-								spookyFishingEnd
-										.getEpochSecond() +
-								":R>"
-						, false);
+		eb.addField(
+			"Spooky Fishing",
+			"\n\uD83D\uDC20 **Start:** <t:" +
+			spookyFishingStart.getEpochSecond() +
+			":R>" +
+			"\n\uD83D\uDC20 **End:** <t:" +
+			spookyFishingEnd.getEpochSecond() +
+			":R>",
+			false
+		);
 
 		Instant spookyStart = Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 7 * MONTH_MS + 28 * DAY_MS);
 		Instant spookyEnd = spookyStart.plus(1, ChronoUnit.HOURS);
-		if(spookyEnd.isBefore(instantNow)) {
+		if (spookyEnd.isBefore(instantNow)) {
 			spookyStart = Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear()) * YEAR_MS + 7 * MONTH_MS + 28 * DAY_MS);
 			spookyEnd = spookyStart.plus(1, ChronoUnit.HOURS);
 		}
-			eb
-				.addField("Spooky Festival",
-						"\n\uD83C\uDF83 **Start:** <t:" +
-								spookyStart.getEpochSecond() +
-								":R>" +
-								"\n\uD83C\uDF83 **End:** <t:" +
-								spookyEnd.getEpochSecond() +
-								":R>", false
-				);
+		eb.addField(
+			"Spooky Festival",
+			"\n\uD83C\uDF83 **Start:** <t:" +
+			spookyStart.getEpochSecond() +
+			":R>" +
+			"\n\uD83C\uDF83 **End:** <t:" +
+			spookyEnd.getEpochSecond() +
+			":R>",
+			false
+		);
 
 		Instant newYearStart = Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 11 * MONTH_MS + 28 * DAY_MS);
 		Instant newYearEnd = newYearStart.plus(1, ChronoUnit.HOURS);
-		if(newYearEnd.isBefore(instantNow)) {
-			newYearStart = Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() ) * YEAR_MS + 11 * MONTH_MS + 28 * DAY_MS);
+		if (newYearEnd.isBefore(instantNow)) {
+			newYearStart = Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear()) * YEAR_MS + 11 * MONTH_MS + 28 * DAY_MS);
 			newYearEnd = newYearStart.plus(1, ChronoUnit.HOURS);
 		}
-		eb.addField("New Year Celebration",
-						"\uD83C\uDF70 **Start:** <t:" +
-								newYearStart.getEpochSecond() +
-								":R>" + "\n\uD83C\uDF70 **End:** <t:" +
-								newYearEnd.getEpochSecond() +
-								":R>", false);
+		eb.addField(
+			"New Year Celebration",
+			"\uD83C\uDF70 **Start:** <t:" +
+			newYearStart.getEpochSecond() +
+			":R>" +
+			"\n\uD83C\uDF70 **End:** <t:" +
+			newYearEnd.getEpochSecond() +
+			":R>",
+			false
+		);
 
-
-		if(currentMayor.equalsIgnoreCase("marina")) {
-			Instant fishingStart = Instant
-					.ofEpochMilli(
-							YEAR_0 +
-									(getSkyblockYear() - 1) *
-											YEAR_MS +
-									Math.floorDiv((nowEpoch - YEAR_0) % YEAR_MS, MONTH_MS) *
-											MONTH_MS
-					);
+		if (currentMayor.equalsIgnoreCase("marina")) {
+			Instant fishingStart = Instant.ofEpochMilli(
+				YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + Math.floorDiv((nowEpoch - YEAR_0) % YEAR_MS, MONTH_MS) * MONTH_MS
+			);
 			Instant fishingEnd = fishingStart.plus(1, ChronoUnit.HOURS);
 			if (fishingEnd.isBefore(instantNow)) {
 				int curMonth = (int) Math.floorDiv((nowEpoch - YEAR_0) % YEAR_MS, MONTH_MS);
 				int curYearFish = getSkyblockYear() - 1;
-				if(curMonth == 12){
-					curMonth =  1;
-					curYearFish ++;
+				if (curMonth == 12) {
+					curMonth = 1;
+					curYearFish++;
+				} else {
+					curMonth++;
 				}
-				else{
-					curMonth ++;
-				}
-				fishingStart = Instant
-						.ofEpochMilli(
-								YEAR_0 +
-										(curYearFish) *
-												YEAR_MS +
-										curMonth *
-												MONTH_MS
-						);
+				fishingStart = Instant.ofEpochMilli(YEAR_0 + (curYearFish) * YEAR_MS + curMonth * MONTH_MS);
 				fishingEnd = fishingStart.plus(1, ChronoUnit.HOURS);
 			}
 
-			eb.addField("Fishing Festival", "\uD83C\uDFA3 **Start:** <t:" +
-					fishingStart
-							.getEpochSecond() +
-					":R>" + "\n\uD83C\uDFA3 **End:** <t:" +
-					fishingEnd
-							.getEpochSecond() +
-					":R>", false);
+			eb.addField(
+				"Fishing Festival",
+				"\uD83C\uDFA3 **Start:** <t:" +
+				fishingStart.getEpochSecond() +
+				":R>" +
+				"\n\uD83C\uDFA3 **End:** <t:" +
+				fishingEnd.getEpochSecond() +
+				":R>",
+				false
+			);
 		}
 
 		long currentOffset = (nowEpoch - YEAR_0) % YEAR_MS;
@@ -191,35 +196,37 @@ public class CalendarCommand extends Command {
 		} else if (currentDay > 7) {
 			out = 14;
 		}
-		Instant cultStart = Instant
-				.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + currentMonth * MONTH_MS + out * DAY_MS);
-		if(cultStart.plus(5, ChronoUnit.MINUTES).isBefore(instantNow)) {
+		Instant cultStart = Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + currentMonth * MONTH_MS + out * DAY_MS);
+		if (cultStart.plus(5, ChronoUnit.MINUTES).isBefore(instantNow)) {
 			int curYearCult = getSkyblockYear() - 1;
-			if(out == 28){
+			if (out == 28) {
 				out = 7;
-				if(currentMonth == 12){
+				if (currentMonth == 12) {
 					currentMonth = 1;
-					curYearCult ++;
-				}else{
-					currentMonth ++;
+					curYearCult++;
+				} else {
+					currentMonth++;
 				}
-			}else{
-				out +=7;
+			} else {
+				out += 7;
 			}
-			cultStart = Instant
-					.ofEpochMilli(YEAR_0 + (curYearCult) * YEAR_MS + currentMonth * MONTH_MS + out * DAY_MS);
+			cultStart = Instant.ofEpochMilli(YEAR_0 + (curYearCult) * YEAR_MS + currentMonth * MONTH_MS + out * DAY_MS);
 		}
 
-		eb
-				.addField("Miscellaneous",
-						"\uD83D\uDD75️ **Dark Auction:** <t:" +
-								(nowDateTime.withMinute(55).toInstant().isBefore(instantNow) ? nowDateTime .withMinute(55).plusHours(1).toInstant().getEpochSecond() : nowDateTime.withMinute(55).toInstant().getEpochSecond()) +
-								":R>" +
-								"\n⭐ **Cult Of Fallen Star:** <t:" +cultStart
-
-										.getEpochSecond() +
-								":R>"
-						, false);
+		eb.addField(
+			"Miscellaneous",
+			"\uD83D\uDD75️ **Dark Auction:** <t:" +
+			(
+				nowDateTime.withMinute(55).toInstant().isBefore(instantNow)
+					? nowDateTime.withMinute(55).plusHours(1).toInstant().getEpochSecond()
+					: nowDateTime.withMinute(55).toInstant().getEpochSecond()
+			) +
+			":R>" +
+			"\n⭐ **Cult Of Fallen Star:** <t:" +
+			cultStart.getEpochSecond() +
+			":R>",
+			false
+		);
 
 		return eb;
 	}
