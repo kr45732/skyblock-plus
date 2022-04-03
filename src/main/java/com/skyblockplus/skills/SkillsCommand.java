@@ -21,6 +21,7 @@ package com.skyblockplus.skills;
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
 
+import com.google.common.collect.Comparators;
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -30,6 +31,8 @@ import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.SkillsStruct;
+
+import java.util.Comparator;
 import java.util.Map;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -77,7 +80,7 @@ public class SkillsCommand extends Command {
 			}
 			trueSA /= SKILL_NAMES.size();
 			progressSA /= SKILL_NAMES.size();
-			eb.setDescription("True skill average: " + roundAndFormat(trueSA) + "\nProgress skill average: " + roundAndFormat(progressSA));
+			eb.setDescription("**True Skill Average:** " + roundAndFormat(trueSA) + "\n**Progress Skill Average:** " + roundAndFormat(progressSA));
 			extras.addEmbedPage(eb);
 
 			eb = player.defaultPlayerEmbed();
@@ -125,7 +128,7 @@ public class SkillsCommand extends Command {
 				.map(s -> s.endsWith("INK_SACK:3") ? "INK_SACK:3" : s.substring(s.lastIndexOf(":") + 1))
 				.collect(Collectors.groupingBy(c -> c, Collectors.counting()));
 			StringBuilder ebStr = new StringBuilder();
-			for (Map.Entry<String, Long> entry : contests.entrySet()) {
+			for (Map.Entry<String, Long> entry : contests.entrySet().stream().sorted(Comparator.comparingLong(e -> -e.getValue())).collect(Collectors.toList())) {
 				ebStr
 					.append("\n")
 					.append(getEmoji(entry.getKey().equals("MUSHROOM_COLLECTION") ? "RED_MUSHROOM" : entry.getKey()))

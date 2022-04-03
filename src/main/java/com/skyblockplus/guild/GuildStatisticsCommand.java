@@ -152,13 +152,13 @@ public class GuildStatisticsCommand extends Command {
 
 		eb = defaultEmbed(guildName, "https://hypixel-leaderboard.senither.com/guilds/" + guildId);
 		eb.setDescription(
-			"**Average slayer XP:** " +
+			"**Average Slayer XP:** " +
 			roundAndFormat(averageSlayer) +
-			"\n**Average skills level:** " +
+			"\n**Average Skills Level:** " +
 			roundAndFormat(averageSkills) +
-			"\n**Average catacombs level:** " +
+			"\n**Average Catacombs Level:** " +
 			roundAndFormat(averageCata) +
-			"\n**Average weight:** " +
+			"\n**Average Weight:** " +
 			roundAndFormat(averageWeight) +
 			(lastUpdated != null ? "\n**Last updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "")
 		);
@@ -210,10 +210,12 @@ public class GuildStatisticsCommand extends Command {
 				.append(roundAndFormat(getDoubleFromCache(cur, "weight")))
 				.append("\n");
 		}
-		eb.addField("Slayer top 5", slayerStr.toString(), false);
-		eb.addField("Skills top 5", skillsStr.toString(), false);
-		eb.addField("Catacombs top 5", cataStr.toString(), false);
-		eb.addField("Weight top 5", weightStr.toString(), false);
+		eb.addField("Top 5 Slayer", slayerStr.toString(), true);
+		eb.addField("Top 5 Skills", skillsStr.toString(), true);
+		eb.addBlankField(true);
+		eb.addField("Top 5 Catacombs", cataStr.toString(), true);
+		eb.addField("Top 5 Weight", weightStr.toString(), true);
+		eb.addBlankField(true);
 
 		return eb;
 	}

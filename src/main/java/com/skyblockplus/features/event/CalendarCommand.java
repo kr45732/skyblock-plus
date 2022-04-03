@@ -1,6 +1,6 @@
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021 kr45732
+ * Copyright (c) 2021-2022 kr45732
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -16,29 +16,39 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.price;
+package com.skyblockplus.features.event;
 
-import com.skyblockplus.utils.command.SlashCommand;
-import com.skyblockplus.utils.command.SlashCommandEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.utils.command.CommandExecute;
+import net.dv8tion.jda.api.EmbedBuilder;
 
-public class CalculateSlashCommand extends SlashCommand {
+import static com.skyblockplus.utils.Utils.*;
 
-	public CalculateSlashCommand() {
-		this.name = "calculate";
+public class CalendarCommand extends Command {
+
+	public CalendarCommand() {
+		this.name = "calendar";
+		this.cooldown = globalCooldown;
+		this.aliases = new String[]{"cal"};
+		this.botPermissions = defaultPerms();
 	}
 
-	@Override
-	protected void execute(SlashCommandEvent event) {
-		event.logCommand();
-
-		event.embed(CalculateCommand.calculatePriceFromUuid(event.getOptionStr("uuid")));
+	public static EmbedBuilder getCalendar() {
+		return defaultEmbed("Soon:tm:");
 	}
 
+
 	@Override
-	public CommandData getCommandData() {
-		return Commands.slash(name, "Calculate the price of an auction").addOption(OptionType.STRING, "uuid", "Auction UUID", true);
+	protected void execute(CommandEvent event) {
+		new CommandExecute(this, event) {
+			@Override
+			protected void execute() {
+				logCommand();
+
+				embed(getCalendar());
+			}
+		}
+			.queue();
 	}
 }

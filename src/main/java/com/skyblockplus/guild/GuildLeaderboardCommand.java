@@ -137,11 +137,14 @@ public class GuildLeaderboardCommand extends Command {
 		String finalLbType = lbType;
 		guildMemberPlayersList.sort(Comparator.comparingDouble(cache -> -getDoubleFromCache(cache, finalLbType)));
 
+		long total = 0;
 		int guildRank = -1;
 		String amt = "-1";
 		for (int i = 0, guildMemberPlayersListSize = guildMemberPlayersList.size(); i < guildMemberPlayersListSize; i++) {
 			String guildPlayer = guildMemberPlayersList.get(i);
-			String formattedAmt = roundAndFormat(getDoubleFromCache(guildPlayer, lbType));
+			double amount = getDoubleFromCache(guildPlayer, lbType);
+			total += amount;
+			String formattedAmt = roundAndFormat(amount);
 			String guildPlayerUsername = getStringFromCache(guildPlayer, "username");
 			paginateBuilder.addItems("`" + (i + 1) + ")` " + fixUsername(guildPlayerUsername) + ": " + formattedAmt);
 
@@ -152,7 +155,7 @@ public class GuildLeaderboardCommand extends Command {
 		}
 
 		String ebStr =
-			"**Player:** " +
+			"**Total " + capitalizeString(lbType.replace("_", " ") )+ ":** " + formatNumber(total) + "\n**Player:** " +
 			usernameUuidStruct.username() +
 			"\n**Guild Rank:** #" +
 			(guildRank + 1) +
@@ -160,7 +163,7 @@ public class GuildLeaderboardCommand extends Command {
 			capitalizeString(lbType.replace("_", " ")) +
 			":** " +
 			amt +
-			(lastUpdated != null ? "\n**Last updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "");
+			(lastUpdated != null ? "\n**Last Updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "");
 
 		paginateBuilder.setPaginatorExtras(
 			new PaginatorExtras()

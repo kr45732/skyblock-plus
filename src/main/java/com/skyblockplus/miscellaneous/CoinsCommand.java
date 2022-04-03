@@ -18,6 +18,7 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.ApiHandler.getAuctionFromPlayer;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -28,7 +29,10 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
+import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
+
+import java.time.Duration;
 import java.time.Instant;
 import net.dv8tion.jda.api.EmbedBuilder;
 
@@ -45,15 +49,34 @@ public class CoinsCommand extends Command {
 		if (player.isValid()) {
 			double playerBankBalance = player.getBankBalance();
 			double playerPurseCoins = player.getPurseCoins();
+			double auctionCoins = 0;
+			HypixelResponse playerAuctions = getAuctionFromPlayer(player.getUuid());
+			if (!playerAuctions.isNotValid()) {
+				for (JsonElement currentAuction : playerAuctions.response().getAsJsonArray()) {
+					if (higherDepth(currentAuction, "claimed").getAsBoolean()) {
+						continue;
+					}
+					Instant endingAt = Instant.ofEpochMilli(higherDepth(currentAuction, "end").getAsLong());
+					Duration duration = Duration.between(Instant.now(), endingAt);
+					long highestBid = higherDepth(currentAuction, "highest_bid_amount", 0);
+					long startingBid = higherDepth(currentAuction, "starting_bid", 0);
+					if (duration.toMillis() <= 0) {
+						if (highestBid >= startingBid) {
+							auctionCoins += highestBid;
+						}
+					}
+				}
+			}
 
 			EmbedBuilder eb = player.defaultPlayerEmbed();
-			eb.setDescription("**Total coins:** " + simplifyNumber(playerBankBalance + playerPurseCoins));
+			eb.setDescription("**Total Coins:** " + simplifyNumber(playerBankBalance + playerPurseCoins) + " (" + simplifyNumber(playerBankBalance + playerPurseCoins + auctionCoins) + ")");
 			eb.addField(
-				"<:piggy_bank:939014681434161152> Bank balance",
+				"<:piggy_bank:939014681434161152> Bank Balance",
 				playerBankBalance == -1 ? "Banking API disabled" : simplifyNumber(playerBankBalance) + " coins",
 				false
 			);
-			eb.addField("<:enchanted_gold:939021206470926336> Purse coins", simplifyNumber(playerPurseCoins) + " coins", false);
+			eb.addField("<:enchanted_gold:939021206470926336> Purse Coins", simplifyNumber(playerPurseCoins) + " coins", false);
+			eb.addField("<:gold_horse_armor:939021482481291314> Sold Auctions Value", simplifyNumber(auctionCoins), false);
 			return eb;
 		}
 		return player.getFailEmbed();

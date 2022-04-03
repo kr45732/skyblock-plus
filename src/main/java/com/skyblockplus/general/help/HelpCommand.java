@@ -131,10 +131,6 @@ public class HelpCommand extends Command {
 						new HelpData("player", "Get a player's essence amounts and their essence shop upgrades.", "[player] [profile]")
 							.addExamples("player CrypticPlasma", "player CrypticPlasma Zucchini")
 					),
-				new HelpData("partyfinder", "A party finder helper that shows a player's dungeon stats.", "partyfinder [player] [profile]")
-					.addAliases("pf")
-					.addExamples("partyfinder CrypticPlasma", "partyfinder CrypticPlasma Zucchini")
-					.setCategory("dungeons"),
 				new HelpData(
 					"calcruns",
 					"Calculate the number of runs needed to reach a certain catacombs level. The floor can be from F1 to F7 or M1 to M6.",
@@ -257,13 +253,6 @@ public class HelpCommand extends Command {
 				new HelpData("coinsperbit", "Get the coins to bits ratio for items in the bits shop.", "coinsperbit <item>")
 					.addAliases("cpb")
 					.setCategory("price"),
-				new HelpData(
-					"calculate",
-					"Calculate the price of an item on the auction house using the auction's UUID.",
-					"calculate <UUID>"
-				)
-					.addExamples("calculate 8be8bef8c46f4dbda2eccd1ca0c30e27")
-					.setCategory("price"),
 				// Inventory
 				new HelpData("inventory", "Get a player's inventory represented in emojis.", "inventory [player] [profile]")
 					.addSecondData("Get a player's inventory with lore.", "inventory [player] [profile] <slot:number>")
@@ -343,14 +332,6 @@ public class HelpCommand extends Command {
 						"networth CrypticPlasma --verbose",
 						"networth CrypticPlasma Zucchini --verbose"
 					)
-					.setCategory("miscellaneous"),
-				new HelpData(
-					"active-coins",
-					"Get a player's active coins. This is the sum of their bank, purse, and sold auction coins.",
-					"active-coins [player] [profile]"
-				)
-					.addExamples("active-coins CrypticPlasma", "active-coins CrypticPlasma Zucchini")
-					.addAliases("ac")
 					.setCategory("miscellaneous"),
 				new HelpData(
 					"weight",
@@ -818,7 +799,6 @@ public class HelpCommand extends Command {
 			help.create("essence upgrade <item>", "Interactive message to find the essence amount to upgrade an item") +
 			help.create("essence information <item>", "Get the amount of essence to upgrade an item for each level") +
 			help.create("essence player [player] [profile]", "Get a player's essence amounts and essence shop upgrades") +
-			help.create("partyfinder [player] [profile]", "A party finder helper that shows a player's dungeon statistics") +
 			help.create(
 				"calcruns [player] [profile] <level:level> <floor:floor>",
 				"Calculate the number of runs needed to reach a certain catacombs level"
@@ -830,9 +810,8 @@ public class HelpCommand extends Command {
 		);
 
 		paginateBuilder.addItems(
-			help.create("guild <player>", "Find what guild a player is in") +
-			help.create("guild information <u:player>", "Get information and statistics about a player's guild") +
-			help.create("guild information <g:guild_name>", "Get information and statistics about a guild") +
+			help.create("guild <u:player>", "Get information and statistics about a player's guild") +
+			help.create("guild <g:guild_name>", "Get information and statistics about a guild") +
 			help.create("guild members <u:player>", "Get a list of all members in a player's guild") +
 			help.create("guild members <g:guild_name>", "Get a list of all members in a guild") +
 			help.create("guild experience <u:player>", "Get the experience leaderboard for a player's guild") +
@@ -862,8 +841,7 @@ public class HelpCommand extends Command {
 			help.create("bids [player]", "Get a player's auction house bids") +
 			help.create("price <item> [type:bin|auction|both]", "Query the auction house for the lowest bin of an item") +
 			help.create("bits <item>", "Get the bits cost of an item from the bits shop") +
-			help.create("coinsperbit <item>", "Get the coins to bits ratio for items in the bits shop") +
-			help.create("calculate <uuid>", "Calculate the price of an item on the auction house using the auction's UUID")
+			help.create("coinsperbit <item>", "Get the coins to bits ratio for items in the bits shop")
 		);
 
 		paginateBuilder.addItems(
@@ -885,7 +863,6 @@ public class HelpCommand extends Command {
 			help.create("roles list", "List all roles that can be claimed through the bot") +
 			help.create("coins [player] [profile]", "Get a player's bank and purse coins") +
 			help.create("coins history [player] [profile]", "Get a player's bank transaction history") +
-			help.create("active-coins [player] [profile]", "Get a player's active coins (bank, purse, and sold auctions)") +
 			help.create("networth [player] [profile]", "Calculate a player's networth") +
 			help.create("networth [player] [profile] --verbose", "Calculate a player's networth with a detailed JSON of each item cost") +
 			help.create("weight [player] [profile]", "Get a player's slayer, skills, dungeons, and total weight") +

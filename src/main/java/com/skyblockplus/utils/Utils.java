@@ -864,7 +864,7 @@ public class Utils {
 
 		switch (id) {
 			case "GOD_POT":
-				return "GOD_POTION";
+				return "GOD_POTION_2";
 			case "AOTD":
 				return "ASPECT_OF_THE_DRAGON";
 			case "AOTE":

@@ -22,7 +22,6 @@ import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -39,18 +38,47 @@ public class GuildSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		if (event.invalidPlayerOption()) {
-			return;
-		}
-
 		switch (event.getSubcommandName()) {
-			case "player" -> event.embed(GuildCommand.getGuildPlayer(event.player));
-			case "information" -> event.embed(GuildCommand.getGuildInfo(event.player));
-			case "members" -> event.paginate(GuildCommand.getGuildMembersFromPlayer(event.player, new PaginatorEvent(event)));
+			case "information" -> {
+				String guild = event.getOptionStr("guild");
+				if(guild != null){
+					event.embed(GuildCommand.getGuildInfoFromName(guild));
+					return;
+				}
+
+				if (event.invalidPlayerOption()) {
+					return;
+				}
+
+				event.embed(GuildCommand.getGuildInfoFromPlayer(event.player));
+			}
+			case "members" -> {
+				String guild = event.getOptionStr("guild");
+				if(guild != null){
+					event.embed(GuildCommand.getGuildMembersFromName(guild, new PaginatorEvent(event)));
+					return;
+				}
+
+				if (event.invalidPlayerOption()) {
+					return;
+				}
+
+				event.paginate(GuildCommand.getGuildMembersFromPlayer(event.player, new PaginatorEvent(event)));
+			}
 			case "experience" -> {
-				OptionMapping numDays = event.getOption("days");
+				int numDays = event.getOptionInt("days", 7);
+
+				String guild = event.getOptionStr("guild");
+				if(guild != null){
+					event.embed(GuildCommand.getGuildExpFromPlayer(guild,numDays, new PaginatorEvent(event)));
+					return;
+				}
+
+				if (event.invalidPlayerOption()) {
+					return;
+				}
 				event.paginate(
-					GuildCommand.getGuildExpFromPlayer(event.player, numDays != null ? numDays.getAsLong() : 7, new PaginatorEvent(event))
+					GuildCommand.getGuildExpFromPlayer(event.player, numDays, new PaginatorEvent(event))
 				);
 			}
 			default -> event.embed(event.invalidCommandMessage());
@@ -62,14 +90,15 @@ public class GuildSlashCommand extends SlashCommand {
 		return Commands
 			.slash(name, "Main guild command")
 			.addSubcommands(
-				new SubcommandData("player", "Find what guild a player is in")
-					.addOption(OptionType.STRING, "player", "Player username or mention", false, true),
-				new SubcommandData("information", "Get information and statistics about a player's guild")
-					.addOption(OptionType.STRING, "player", "Player username or mention", false, true),
-				new SubcommandData("members", "Get a list of all members in a player's guild")
-					.addOption(OptionType.STRING, "player", "Player username or mention", false, true),
+				new SubcommandData("information", "Get information and statistics about a guild")
+				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+				.addOption(OptionType.STRING, "guild", "Guild name", false),
+		new SubcommandData("members", "Get a list of all members in a player's guild")
+					.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+				.addOption(OptionType.STRING, "guild", "Guild name", false),
 				new SubcommandData("experience", "Get the experience leaderboard for a player's guild")
 					.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+						.addOption(OptionType.STRING, "guild", "Guild name", false)
 					.addOptions(new OptionData(OptionType.INTEGER, "days", "Number of days").setRequiredRange(1, 7))
 			);
 	}

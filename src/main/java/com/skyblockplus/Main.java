@@ -30,6 +30,8 @@ import com.skyblockplus.api.miscellaneous.PublicEndpoints;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.dev.*;
 import com.skyblockplus.dungeons.*;
+import com.skyblockplus.features.event.CalendarCommand;
+import com.skyblockplus.features.event.EventHandler;
 import com.skyblockplus.features.fetchur.FetchurHandler;
 import com.skyblockplus.features.jacob.JacobHandler;
 import com.skyblockplus.features.listeners.MainListener;
@@ -113,7 +115,7 @@ public class Main {
 					}
 				)
 				.setCommandPreProcessBiFunction((event, command) ->
-					!guildMap.get(event.getGuild().getId()).channelBlacklist.contains(event.getChannel().getId())
+					!event.isFromGuild() || !guildMap.get(event.getGuild().getId()).channelBlacklist.contains(event.getChannel().getId())
 				)
 				.setActivity(Activity.playing("Loading..."))
 				.setManualUpsert(true)
@@ -141,7 +143,6 @@ public class Main {
 					new ReloadCommand(),
 					new SetupCommand(),
 					new CategoriesCommand(),
-					new PartyFinderCommand(),
 					new DevSettingsCommand(),
 					new GetServerEmojisCommand(),
 					new EnderChestCommand(),
@@ -164,13 +165,11 @@ public class Main {
 					new GuildKickerCommand(),
 					new MissingCommand(),
 					new UpdateSlashCommands(),
-					new CalculateCommand(),
 					new GuildLeaderboardCommand(),
 					new ArmorCommand(),
 					new FetchurCommand(),
 					new HarpCommand(),
 					new CakesCommand(),
-					new ActiveCoinsCommand(),
 					new HotmCommand(),
 					new SkyblockCommand(),
 					new GuildStatisticsCommand(),
@@ -194,7 +193,8 @@ public class Main {
 					new ViewAuctionCommand(),
 					new CoinsPerBitCommand(),
 					new ReforgeStoneCommand(),
-					new CheckGuildApiCommand()
+					new CheckGuildApiCommand(),
+						new CalendarCommand()
 				)
 				.build();
 
@@ -211,7 +211,6 @@ public class Main {
 					new SkillsSlashCommand(),
 					new DungeonsSlashCommand(),
 					new EssenceSlashCommand(),
-					new PartyFinderSlashCommand(),
 					new GuildSlashCommand(),
 					new HelpSlashCommand(),
 					new AuctionsSlashCommand(),
@@ -227,7 +226,6 @@ public class Main {
 					new HypixelSlashCommand(),
 					new ProfilesSlashCommand(),
 					new MissingSlashCommand(),
-					new CalculateSlashCommand(),
 					new SetupSlashCommand(),
 					new SkyblockEventSlashCommand(),
 					new FetchurSlashCommand(),
@@ -240,7 +238,6 @@ public class Main {
 					new WardrobeSlashCommand(),
 					new HarpSlashCommand(),
 					new CakesSlashCommand(),
-					new ActiveCoinsSlashCommand(),
 					new GuildLeaderboardSlashCommand(),
 					new GuildRanksSlashCommand(),
 					new GuildKickerSlashCommand(),
@@ -313,40 +310,45 @@ public class Main {
 		FetchurHandler.initialize();
 		MayorHandler.initialize();
 		JacobHandler.initialize();
+		EventHandler.init();
 		File transcriptDir = new File("src/main/java/com/skyblockplus/json/application_transcripts/");
 		if (!transcriptDir.exists()) {
 			log.info((transcriptDir.mkdirs() ? "Successfully created" : "Failed to create") + " application transcript directory");
 		}
 		scheduler.schedule(System::gc, 30, TimeUnit.MINUTES); // Sorry for the war crimes
 
-		try {
-			botStatusWebhook.send(
-				client.getSuccess() +
-				" Restarted in " +
-				Duration
-					.between(
-						((GuildMessageChannel) jda.getGuildChannelById("957658797155975208")).getHistory()
-							.retrievePast(1)
-							.complete()
-							.get(0)
-							.getTimeCreated()
-							.toInstant(),
-						Instant.now()
-					)
-					.toSeconds() +
-				" seconds"
-			);
-		} catch (Exception e) {
-			e.printStackTrace();
+		if(isMainBot()) {
+			try {
+				botStatusWebhook.send(
+						client.getSuccess() +
+								" Restarted in " +
+								Duration
+										.between(
+												((GuildMessageChannel) jda.getGuildChannelById("957658797155975208")).getHistory()
+														.retrievePast(1)
+														.complete()
+														.get(0)
+														.getTimeCreated()
+														.toInstant(),
+												Instant.now()
+										)
+										.toSeconds() +
+								" seconds"
+				);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
 	@PreDestroy
 	public void onExit() {
-		try (JDAWebhookClient webhook = botStatusWebhook) {
-			webhook.send(client.getSuccess() + " Restarting for an update");
-		} catch (Exception e) {
-			e.printStackTrace();
+		if(isMainBot()) {
+			try (JDAWebhookClient webhook = botStatusWebhook) {
+				webhook.send(client.getSuccess() + " Restarting for an update");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 
 		log.info("Stopping");

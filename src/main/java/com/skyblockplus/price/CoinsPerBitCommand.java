@@ -18,7 +18,6 @@
 
 package com.skyblockplus.price;
 
-import static com.skyblockplus.utils.Constants.BITS_ITEM_NAMES;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;

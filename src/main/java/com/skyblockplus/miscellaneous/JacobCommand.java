@@ -67,10 +67,13 @@ public class JacobCommand extends Command {
 			extras.addEmbedField(
 				"Contest",
 				"**In:** <t:" + contest.getTimeInstant().getEpochSecond() + ":R>\n**Crops:**\n" + contest.getCropsFormatted(),
-				false
+				true
 			);
 		}
-		CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(5);
+		for (int i = 0; i < 3 - extras.getEmbedFields().size() % 3; i++) {
+			extras.addBlankField(true);
+		}
+		CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(12);
 		event.paginate(paginateBuilder.setPaginatorExtras(extras));
 		return null;
 	}

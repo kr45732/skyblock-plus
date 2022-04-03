@@ -150,33 +150,7 @@ public class GuildCommand extends Command {
 		return getGuildExp(guildJson, days, null, event);
 	}
 
-	public static EmbedBuilder getGuildPlayer(String username) {
-		UsernameUuidStruct usernameUuid = usernameToUuid(username);
-		if (usernameUuid.isNotValid()) {
-			return invalidEmbed(usernameUuid.failCause());
-		}
-
-		HypixelResponse hypixelResponse = getGuildFromPlayer(usernameUuid.uuid());
-		if (hypixelResponse.isNotValid()) {
-			return invalidEmbed(hypixelResponse.failCause());
-		}
-		JsonElement guildJson = hypixelResponse.response();
-
-		try {
-			String guildName = higherDepth(guildJson, "name").getAsString();
-			EmbedBuilder eb = defaultEmbed(
-				fixUsername(usernameUuid.username()) + " is in " + guildName,
-				"https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(guildJson, "_id").getAsString()
-			);
-			eb.addField("Guild statistics:", getGuildInfo(guildJson), false);
-			eb.setThumbnail(usernameUuid.getAvatarlUrl());
-			return eb;
-		} catch (Exception e) {
-			return defaultEmbed(usernameUuid.username() + " is not in a guild");
-		}
-	}
-
-	public static EmbedBuilder getGuildInfo(String username) {
+	public static EmbedBuilder getGuildInfoFromPlayer(String username) {
 		UsernameUuidStruct usernameUuid = usernameToUuid(username);
 		if (usernameUuid.isNotValid()) {
 			return invalidEmbed(usernameUuid.failCause());
@@ -199,7 +173,7 @@ public class GuildCommand extends Command {
 		return eb;
 	}
 
-	public static EmbedBuilder guildInfoFromGuildName(String guildName) {
+	public static EmbedBuilder getGuildInfoFromName(String guildName) {
 		try {
 			HypixelResponse guildResponse = getGuildFromName(guildName);
 			if (guildResponse.isNotValid()) {
@@ -352,17 +326,10 @@ public class GuildCommand extends Command {
 			protected void execute() {
 				logCommand();
 
-				if ((args.length == 3 || args.length == 4) && ("experience".equals(args[1]) || "exp".equals(args[1]))) {
-					int days = 7;
-					if (args.length == 4 && args[3].startsWith("days:")) {
-						try {
-							days = Integer.parseInt(args[3].split("days:")[1]);
-						} catch (Exception e) {
-							embed(invalidEmbed("Invalid days amount"));
-							return;
-						}
-					}
+				if (args.length >= 3 && (args[1].equals("experience") ||args[1].equals("exp"))) {
+					int days = getIntOption("days", 7);
 
+					setArgs(3);
 					if (args[2].startsWith("u:")) {
 						paginate(getGuildExpFromPlayer(args[2].split("u:")[1], days, new PaginatorEvent(event)));
 						return;
@@ -370,15 +337,9 @@ public class GuildCommand extends Command {
 						paginate(getGuildExpFromName(args[2].split("g:")[1], days, new PaginatorEvent(event)));
 						return;
 					}
-				} else if (args.length >= 3 && (args[1].equals("information") || args[1].equals("info"))) {
-					if (args[2].toLowerCase().startsWith("u:")) {
-						embed(getGuildInfo(args[2].split(":")[1]));
-						return;
-					} else if (args[2].startsWith("g:")) {
-						embed(guildInfoFromGuildName(args[2].split(":")[1]));
-						return;
-					}
-				} else if (args.length == 3 && "members".equals(args[1])) {
+				} else if (args.length >= 3 && "members".equals(args[1])) {
+					setArgs(3);
+
 					if (args[2].startsWith("u:")) {
 						paginate(getGuildMembersFromPlayer(args[2].split("u:")[1], new PaginatorEvent(event)));
 						return;
@@ -386,9 +347,16 @@ public class GuildCommand extends Command {
 						paginate(getGuildMembersFromName(args[2].split("g:")[1], new PaginatorEvent(event)));
 						return;
 					}
-				} else if (args.length == 2) {
-					embed(getGuildPlayer(args[1]));
-					return;
+				} else if (args.length >= 2) {
+					setArgs(2);
+
+					if (args[1].startsWith("u:")) {
+						embed(getGuildInfoFromPlayer(args[1].split(":")[1]));
+						return;
+					} else if (args[1].startsWith("g:")) {
+						embed(getGuildInfoFromName(args[1].split(":")[1]));
+						return;
+					}
 				}
 
 				sendErrorEmbed();

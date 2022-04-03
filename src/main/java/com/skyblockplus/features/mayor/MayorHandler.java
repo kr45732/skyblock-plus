@@ -38,6 +38,8 @@ import org.apache.groovy.util.Maps;
 
 public class MayorHandler {
 
+	public static String currentMayor = "";
+
 	public static final Map<String, String> mayorNameToEmoji = Maps.of(
 		"DERPY",
 		"<:derpy:940083649129349150>",
@@ -67,6 +69,10 @@ public class MayorHandler {
 	public static MessageEmbed votesEmbed = defaultEmbed("Mayor Election Graph").setDescription("Data not loaded").build();
 
 	public static void initialize() {
+		if(currentMayor.isEmpty()) {
+			currentMayor = higherDepth(getJson("https://api.hypixel.net/resources/skyblock/election"), "mayor.name", "");
+		}
+
 		long newYearStartEpoch = YEAR_0 + 446400000L * (getSkyblockYear() - 1);
 		long newYearToElectionOpen = 217200000;
 		long newYearToElectionClose = 105600000;
@@ -92,19 +98,19 @@ public class MayorHandler {
 				.sorted(Comparator.comparingInt(m -> -higherDepth(m, "votes").getAsInt()))
 		);
 
-		String winner = higherDepth(cur, "name").getAsString();
+		currentMayor = higherDepth(cur, "name").getAsString();
 		int year = higherDepth(cur, "election.year").getAsInt();
 		double totalVotes = streamJsonArray(mayors).mapToInt(m -> higherDepth(m, "votes").getAsInt()).sum();
 
 		EmbedBuilder eb = defaultEmbed("Mayor Elected | Year " + year);
 		eb.setDescription("**Year:** " + year + "\n**Total Votes:** " + formatNumber(totalVotes));
-		eb.setThumbnail("https://mc-heads.net/body/" + MAYOR_NAME_TO_SKIN.get(winner.toUpperCase()) + "/left");
+		eb.setThumbnail("https://mc-heads.net/body/" + MAYOR_NAME_TO_SKIN.get(currentMayor.toUpperCase()) + "/left");
 		StringBuilder ebStr = new StringBuilder();
 		for (JsonElement curMayor : mayors) {
 			String name = higherDepth(curMayor, "name").getAsString();
 			int votes = higherDepth(curMayor, "votes").getAsInt();
 
-			if (higherDepth(curMayor, "name").getAsString().equals(winner)) {
+			if (higherDepth(curMayor, "name").getAsString().equals(currentMayor)) {
 				StringBuilder perksStr = new StringBuilder();
 				for (JsonElement perk : higherDepth(curMayor, "perks").getAsJsonArray()) {
 					perksStr

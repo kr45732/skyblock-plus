@@ -102,8 +102,11 @@ public class CalcDragsCommand extends Command {
 							"%"
 							: higherDepth(entry.getValue(), "drop_chance", "")
 					),
-					false
+					true
 				);
+			}
+			for (int i = 0; i < 3 - eb.getFields().size() % 3; i++) {
+				eb.addBlankField(true);
 			}
 			extras.addEmbedPage(eb);
 		}
