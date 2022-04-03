@@ -251,7 +251,7 @@ public class EventHandler {
 					times,
 					7,
 					defaultEmbed("Spooky Fishing")
-						.setDescription("Spooky fishing starts <t:" + spookyFishing.plus(1, ChronoUnit.HOURS).getEpochSecond() + ":R>")
+						.setDescription("Spooky fishing starts <t:" + spookyFishing.getEpochSecond() + ":R>")
 						.build()
 				);
 			} else if (nowEpoch > spookyFishing.plusSeconds(60).toEpochMilli() && Long.parseLong(times[7]) < spookyFishing.toEpochMilli()) {
@@ -260,7 +260,7 @@ public class EventHandler {
 					times,
 					7,
 					defaultEmbed("Spooky Fishing")
-						.setDescription("Spooky fishing starts <t:" + spookyFishing.plus(1, ChronoUnit.HOURS).getEpochSecond() + ":R>")
+						.setDescription("Spooky fishing starts <t:" + spookyFishing.getEpochSecond() + ":R>")
 						.build()
 				);
 			}
@@ -275,14 +275,14 @@ public class EventHandler {
 				sendMessage(
 					times,
 					8,
-					defaultEmbed("Spooky Event").setDescription("Spooky event starts <t:" + spookyEvent.getEpochSecond() + ":R>").build()
+					defaultEmbed("Spooky Festival").setDescription("Spooky festival starts <t:" + spookyEvent.getEpochSecond() + ":R>").build()
 				);
 			} else if (nowEpoch > spookyEvent.plusSeconds(60).toEpochMilli() && Long.parseLong(times[8]) < spookyEvent.toEpochMilli()) {
 				// missed
 				sendMessage(
 					times,
 					8,
-					defaultEmbed("Spooky Event").setDescription("Spooky event starts <t:" + spookyEvent.getEpochSecond() + ":R>").build()
+					defaultEmbed("Spooky Festival").setDescription("Spooky festival starts <t:" + spookyEvent.getEpochSecond() + ":R>").build()
 				);
 			}
 
@@ -341,7 +341,7 @@ public class EventHandler {
 					times,
 					10,
 					defaultEmbed("Cult Of Fallen Star")
-						.setDescription("Cult of fallen start arrives <t:" + fallenStar.getEpochSecond() + ":R>")
+						.setDescription("Cult of fallen start arrives <t:" + fallenStar.plus(5, ChronoUnit.MINUTES).getEpochSecond() + ":R>")
 						.build()
 				);
 			} else if (nowEpoch > fallenStar.plusSeconds(60).toEpochMilli() && Long.parseLong(times[10]) < fallenStar.toEpochMilli()) {
@@ -350,7 +350,7 @@ public class EventHandler {
 					times,
 					10,
 					defaultEmbed("Cult Of Fallen Star")
-						.setDescription("Cult of fallen start arrives <t:" + fallenStar.getEpochSecond() + ":R>")
+						.setDescription("Cult of fallen start arrives <t:" + fallenStar.plus(5, ChronoUnit.MINUTES).getEpochSecond() + ":R>")
 						.build()
 				);
 			}

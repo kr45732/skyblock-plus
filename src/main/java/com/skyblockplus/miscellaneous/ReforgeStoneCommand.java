@@ -138,6 +138,7 @@ public class ReforgeStoneCommand extends Command {
 			protected void execute() {
 				logCommand();
 
+				setArgs(2);
 				embed(getReforgeStone(args[1]));
 			}
 		}

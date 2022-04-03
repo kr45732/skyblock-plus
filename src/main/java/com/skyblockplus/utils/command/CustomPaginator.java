@@ -309,7 +309,7 @@ public class CustomPaginator extends Menu {
 					for (int i = start + k * per; i < end && i < start + (k + 1) * per; i++) stringBuilder
 						.append("\n")
 						.append(strings.get(i));
-					embedBuilder.addField("", stringBuilder.toString(), true);
+					embedBuilder.addField((k == 0 && extras.getEveryPageFirstFieldTitle() != null ? extras.getEveryPageFirstFieldTitle() :  ""), stringBuilder.toString(), true);
 				}
 			}
 		}

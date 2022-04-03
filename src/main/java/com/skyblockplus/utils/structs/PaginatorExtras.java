@@ -39,6 +39,7 @@ public class PaginatorExtras {
 	private String everyPageTitle = null;
 	private String everyPageTitleUrl = null;
 	private String everyPageThumbnail = null;
+	private String everyPageFirstFieldTitle = null;
 
 	public PaginatorExtras() {
 		this.type = PaginatorType.DEFAULT;
@@ -165,6 +166,15 @@ public class PaginatorExtras {
 
 	public ActionRow getButtons() {
 		return buttons.isEmpty() ? null : ActionRow.of(buttons);
+	}
+
+	public String getEveryPageFirstFieldTitle() {
+		return everyPageFirstFieldTitle;
+	}
+
+	public PaginatorExtras setEveryPageFirstFieldTitle(String everyPageFirstFieldTitle) {
+		this.everyPageFirstFieldTitle = everyPageFirstFieldTitle;
+		return this;
 	}
 
 	public enum PaginatorType {

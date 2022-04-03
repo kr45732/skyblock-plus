@@ -103,7 +103,7 @@ public class SkyblockCommand extends Command {
 			}
 			trueSA /= SKILL_NAMES.size();
 			progressSA /= SKILL_NAMES.size();
-			eb.setDescription("True skill average: " + roundAndFormat(trueSA) + "\nProgress skill average: " + roundAndFormat(progressSA));
+			eb.setDescription("**True Skill Average:** " + roundAndFormat(trueSA) + "\n**Progress Skill Average:** " + roundAndFormat(progressSA));
 			extras.addEmbedPage(eb);
 
 			eb = player.defaultPlayerEmbed();
@@ -174,9 +174,9 @@ public class SkyblockCommand extends Command {
 				100000L *
 				revFiveKills;
 			eb.setDescription(
-				"**Total slayer:** " +
+				"**Total Slayer:** " +
 				formatNumber(player.getTotalSlayer()) +
-				" XP\n**Total coins spent:** " +
+				" XP\n**Total Coins Spent:** " +
 				simplifyNumber(coinsSpentOnSlayers)
 			);
 			eb.addField(
