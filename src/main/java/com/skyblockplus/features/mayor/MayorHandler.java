@@ -69,7 +69,7 @@ public class MayorHandler {
 	public static MessageEmbed votesEmbed = defaultEmbed("Mayor Election Graph").setDescription("Data not loaded").build();
 
 	public static void initialize() {
-		if(currentMayor.isEmpty()) {
+		if (currentMayor.isEmpty()) {
 			currentMayor = higherDepth(getJson("https://api.hypixel.net/resources/skyblock/election"), "mayor.name", "");
 		}
 

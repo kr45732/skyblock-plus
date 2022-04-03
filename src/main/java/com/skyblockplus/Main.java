@@ -194,7 +194,7 @@ public class Main {
 					new CoinsPerBitCommand(),
 					new ReforgeStoneCommand(),
 					new CheckGuildApiCommand(),
-						new CalendarCommand()
+					new CalendarCommand()
 				)
 				.build();
 
@@ -317,23 +317,23 @@ public class Main {
 		}
 		scheduler.schedule(System::gc, 30, TimeUnit.MINUTES); // Sorry for the war crimes
 
-		if(isMainBot()) {
+		if (isMainBot()) {
 			try {
 				botStatusWebhook.send(
-						client.getSuccess() +
-								" Restarted in " +
-								Duration
-										.between(
-												((GuildMessageChannel) jda.getGuildChannelById("957658797155975208")).getHistory()
-														.retrievePast(1)
-														.complete()
-														.get(0)
-														.getTimeCreated()
-														.toInstant(),
-												Instant.now()
-										)
-										.toSeconds() +
-								" seconds"
+					client.getSuccess() +
+					" Restarted in " +
+					Duration
+						.between(
+							((GuildMessageChannel) jda.getGuildChannelById("957658797155975208")).getHistory()
+								.retrievePast(1)
+								.complete()
+								.get(0)
+								.getTimeCreated()
+								.toInstant(),
+							Instant.now()
+						)
+						.toSeconds() +
+					" seconds"
 				);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -343,7 +343,7 @@ public class Main {
 
 	@PreDestroy
 	public void onExit() {
-		if(isMainBot()) {
+		if (isMainBot()) {
 			try (JDAWebhookClient webhook = botStatusWebhook) {
 				webhook.send(client.getSuccess() + " Restarting for an update");
 			} catch (Exception e) {

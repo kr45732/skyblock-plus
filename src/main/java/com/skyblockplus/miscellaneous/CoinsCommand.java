@@ -31,7 +31,6 @@ import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
-
 import java.time.Duration;
 import java.time.Instant;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -69,7 +68,13 @@ public class CoinsCommand extends Command {
 			}
 
 			EmbedBuilder eb = player.defaultPlayerEmbed();
-			eb.setDescription("**Total Coins:** " + simplifyNumber(playerBankBalance + playerPurseCoins) + " (" + simplifyNumber(playerBankBalance + playerPurseCoins + auctionCoins) + ")");
+			eb.setDescription(
+				"**Total Coins:** " +
+				simplifyNumber(playerBankBalance + playerPurseCoins) +
+				" (" +
+				simplifyNumber(playerBankBalance + playerPurseCoins + auctionCoins) +
+				")"
+			);
 			eb.addField(
 				"<:piggy_bank:939014681434161152> Bank Balance",
 				playerBankBalance == -1 ? "Banking API disabled" : simplifyNumber(playerBankBalance) + " coins",

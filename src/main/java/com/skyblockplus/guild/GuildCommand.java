@@ -326,7 +326,7 @@ public class GuildCommand extends Command {
 			protected void execute() {
 				logCommand();
 
-				if (args.length >= 3 && (args[1].equals("experience") ||args[1].equals("exp"))) {
+				if (args.length >= 3 && (args[1].equals("experience") || args[1].equals("exp"))) {
 					int days = getIntOption("days", 7);
 
 					setArgs(3);

@@ -18,26 +18,25 @@
 
 package com.skyblockplus.features.event;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import net.dv8tion.jda.api.EmbedBuilder;
-
-import static com.skyblockplus.utils.Utils.*;
 
 public class CalendarCommand extends Command {
 
 	public CalendarCommand() {
 		this.name = "calendar";
 		this.cooldown = globalCooldown;
-		this.aliases = new String[]{"cal"};
+		this.aliases = new String[] { "cal" };
 		this.botPermissions = defaultPerms();
 	}
 
 	public static EmbedBuilder getCalendar() {
 		return defaultEmbed("Soon:tm:");
 	}
-
 
 	@Override
 	protected void execute(CommandEvent event) {

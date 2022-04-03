@@ -155,7 +155,11 @@ public class GuildLeaderboardCommand extends Command {
 		}
 
 		String ebStr =
-			"**Total " + capitalizeString(lbType.replace("_", " ") )+ ":** " + formatNumber(total) + "\n**Player:** " +
+			"**Total " +
+			capitalizeString(lbType.replace("_", " ")) +
+			":** " +
+			formatNumber(total) +
+			"\n**Player:** " +
 			usernameUuidStruct.username() +
 			"\n**Guild Rank:** #" +
 			(guildRank + 1) +

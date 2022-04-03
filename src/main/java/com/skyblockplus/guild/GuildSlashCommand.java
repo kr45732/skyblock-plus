@@ -41,7 +41,7 @@ public class GuildSlashCommand extends SlashCommand {
 		switch (event.getSubcommandName()) {
 			case "information" -> {
 				String guild = event.getOptionStr("guild");
-				if(guild != null){
+				if (guild != null) {
 					event.embed(GuildCommand.getGuildInfoFromName(guild));
 					return;
 				}
@@ -54,7 +54,7 @@ public class GuildSlashCommand extends SlashCommand {
 			}
 			case "members" -> {
 				String guild = event.getOptionStr("guild");
-				if(guild != null){
+				if (guild != null) {
 					event.embed(GuildCommand.getGuildMembersFromName(guild, new PaginatorEvent(event)));
 					return;
 				}
@@ -69,17 +69,15 @@ public class GuildSlashCommand extends SlashCommand {
 				int numDays = event.getOptionInt("days", 7);
 
 				String guild = event.getOptionStr("guild");
-				if(guild != null){
-					event.embed(GuildCommand.getGuildExpFromPlayer(guild,numDays, new PaginatorEvent(event)));
+				if (guild != null) {
+					event.embed(GuildCommand.getGuildExpFromPlayer(guild, numDays, new PaginatorEvent(event)));
 					return;
 				}
 
 				if (event.invalidPlayerOption()) {
 					return;
 				}
-				event.paginate(
-					GuildCommand.getGuildExpFromPlayer(event.player, numDays, new PaginatorEvent(event))
-				);
+				event.paginate(GuildCommand.getGuildExpFromPlayer(event.player, numDays, new PaginatorEvent(event)));
 			}
 			default -> event.embed(event.invalidCommandMessage());
 		}
@@ -91,14 +89,14 @@ public class GuildSlashCommand extends SlashCommand {
 			.slash(name, "Main guild command")
 			.addSubcommands(
 				new SubcommandData("information", "Get information and statistics about a guild")
-				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOption(OptionType.STRING, "guild", "Guild name", false),
-		new SubcommandData("members", "Get a list of all members in a player's guild")
 					.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOption(OptionType.STRING, "guild", "Guild name", false),
+					.addOption(OptionType.STRING, "guild", "Guild name", false),
+				new SubcommandData("members", "Get a list of all members in a player's guild")
+					.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+					.addOption(OptionType.STRING, "guild", "Guild name", false),
 				new SubcommandData("experience", "Get the experience leaderboard for a player's guild")
 					.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-						.addOption(OptionType.STRING, "guild", "Guild name", false)
+					.addOption(OptionType.STRING, "guild", "Guild name", false)
 					.addOptions(new OptionData(OptionType.INTEGER, "days", "Number of days").setRequiredRange(1, 7))
 			);
 	}
