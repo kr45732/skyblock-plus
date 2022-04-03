@@ -31,6 +31,7 @@ import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.dev.*;
 import com.skyblockplus.dungeons.*;
 import com.skyblockplus.features.event.CalendarCommand;
+import com.skyblockplus.features.event.CalendarSlashCommand;
 import com.skyblockplus.features.event.EventHandler;
 import com.skyblockplus.features.fetchur.FetchurHandler;
 import com.skyblockplus.features.jacob.JacobHandler;
@@ -267,7 +268,7 @@ public class Main {
 					new ViewAuctionSlashCommand(),
 					new CoinsPerBitSlashCommand(),
 					new ReforgeStoneSlashCommand(),
-					new CheckGuildApiSlashCommand()
+					new CheckGuildApiSlashCommand(), new CalendarSlashCommand()
 				);
 
 		allServerSettings =

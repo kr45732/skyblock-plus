@@ -50,14 +50,7 @@ public class CalendarCommand extends Command {
 		Instant instantNow = Instant.now();
 		long nowEpoch = instantNow.toEpochMilli();
 
-		int curYear = getSkyblockYear();
-		String[] pets = new String[] { "LION;4", "MONKEY;4", "ELEPHANT;4", "GIRAFFE;4", "BLUE_WHALE;4", "TIGER;4" };
-		int index = 0;
-		if ((curYear - 1) % 3 == 0) {
-			index = 2;
-		} else if ((curYear - 2) % 3 == 0) {
-			index = 4;
-		}
+
 
 		Instant bingoStart = now.withDayOfMonth(1).atStartOfDay(z).toInstant();
 		Instant bingoEnd = bingoStart.plus(7, ChronoUnit.DAYS);
@@ -76,18 +69,41 @@ public class CalendarCommand extends Command {
 			false
 		);
 
+		int curYearSummer = getSkyblockYear() ;
+		int curYearWinter = getSkyblockYear() ;
+		Instant summerZooStart = Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 3 * MONTH_MS);
+		Instant summerZooEnd = summerZooStart.plus(1, ChronoUnit.HOURS);
+		if (summerZooEnd.isBefore(instantNow)) {
+			summerZooStart = Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() ) * YEAR_MS + 3 * MONTH_MS);
+			summerZooEnd = summerZooStart.plus(1, ChronoUnit.HOURS);
+			curYearSummer ++;
+		}
+		Instant winterZooStart = Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 9 * MONTH_MS);
+		Instant winterZooEnd = winterZooStart.plus(1, ChronoUnit.HOURS);
+		if (winterZooEnd.isBefore(instantNow)) {
+			winterZooStart = Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() ) * YEAR_MS + 9 * MONTH_MS);
+			winterZooEnd = winterZooStart.plus(1, ChronoUnit.HOURS);
+			curYearWinter ++;
+		}
+		int curYear = summerZooStart.isBefore(winterZooStart) ? curYearSummer : curYearWinter;
+		String[] pets = new String[] { "LION;4", "MONKEY;4", "ELEPHANT;4", "GIRAFFE;4", "BLUE_WHALE;4", "TIGER;4" };
+		int index = 0;
+		if ((curYear - 1) % 3 == 0) {
+			index = 2;
+		} else if ((curYear - 2) % 3 == 0) {
+			index = 4;
+		}
+
 		eb
 			.addField(
 				"Traveling Zoo",
-				getEmoji(pets[index]) +
-				" **Summer:** <t:" +
-				Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 3 * MONTH_MS).getEpochSecond() +
-				":R>" +
-				"\n" +
-				getEmoji(pets[index + 1]) +
-				" **Winter:** <t:" +
-				Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 9 * MONTH_MS).getEpochSecond() +
-				":R>",
+				getEmoji(pets[summerZooStart.isBefore(winterZooStart) ? index : (index + 1)]) +
+				" **Open:** <t:" +
+				(summerZooStart.isBefore(winterZooStart) ? summerZooStart : winterZooStart).getEpochSecond() +
+				":R>\n" +
+						getEmoji(pets[summerZooStart.isBefore(winterZooStart) ? index : (index + 1)]) + " **Close:** <t:" +
+						(summerZooStart.isBefore(winterZooStart) ? summerZooEnd : winterZooEnd).getEpochSecond() +
+						":R>",
 				false
 			)
 			.addField(

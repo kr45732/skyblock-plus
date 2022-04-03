@@ -37,6 +37,10 @@ public class EventHandler {
 	}
 
 	public static void updateEvents() {
+		if(!isMainBot()){
+			return;
+		}
+
 		try {
 			String[] times = jda
 				.getGuildById("796790757947867156")
