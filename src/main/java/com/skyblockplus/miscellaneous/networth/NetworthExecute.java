@@ -1018,7 +1018,7 @@ public class NetworthExecute {
 					}
 
 					double enchantPrice = getLowestPriceEnchant(enchant.toUpperCase());
-					if(!item.getId().equals("ENCHANTED_BOOK")){
+					if (!item.getId().equals("ENCHANTED_BOOK")) {
 						enchantPrice *= enchant.startsWith("ULTIMATE_SOUL_EATER") || enchant.startsWith("OVERLOAD") ? 0.40 : 0.90;
 					}
 					enchantsExtras += enchantPrice;
@@ -1090,12 +1090,8 @@ public class NetworthExecute {
 					? ",\"reforge\":{\"cost\":\"" + simplifyNumber(reforgeExtras) + "\",\"name\":\"" + item.getModifier() + "\"}"
 					: ""
 			);
-			out.append(
-				miscExtras > 0 ? ",\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}" : ""
-			);
-			out.append(
-				backpackExtras > 0 ? ",\"bp\":{\"cost\":\"" + simplifyNumber(backpackExtras) + "\",\"bp\":" + bpStr + "}" : ""
-			);
+			out.append(miscExtras > 0 ? ",\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}" : "");
+			out.append(backpackExtras > 0 ? ",\"bp\":{\"cost\":\"" + simplifyNumber(backpackExtras) + "\",\"bp\":" + bpStr + "}" : "");
 			out.append(",\"nbt_tag\":\"").append(parseMcCodes(item.getNbtTag().replace("\"", "\\\""))).append("\"");
 			out.append("},");
 		}
