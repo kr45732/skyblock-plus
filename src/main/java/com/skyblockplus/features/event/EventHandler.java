@@ -31,12 +31,12 @@ public class EventHandler {
 
 	public static String messageId;
 
-	public static void init() {
-		scheduler.scheduleAtFixedRate(EventHandler::idk, 30, 30, TimeUnit.SECONDS);
+	public static void initialize() {
+		scheduler.scheduleAtFixedRate(EventHandler::updateEvents, 30, 30, TimeUnit.SECONDS);
 		messageId = isMainBot() ? "959829803895255051" : "959888607676625016";
 	}
 
-	public static void idk() {
+	public static void updateEvents() {
 		try {
 			String[] times = jda
 				.getGuildById("796790757947867156")
@@ -45,22 +45,23 @@ public class EventHandler {
 				.complete()
 				.getContentRaw()
 				.split("\n");
-			// 0 - bingo start
-			// 1 - bingo end
-			// 2 - zoo early summer
-			// 3 - zoo early winter
-			// 4 - winter island open
-			// 5 - dark auction open (5 min early)
-			// 6 - new year celebration starts
-			// 7 - spooky fishing starts
-			// 8 - spooky event starts
-			// 9 - fishing festival start
-			// 10 - fallen star (5 min early)
 
 			ZoneId z = ZoneId.of("America/New_York");
 			LocalDate now = LocalDate.now(z);
 			ZonedDateTime nowDateTime = ZonedDateTime.now(z);
 			long nowEpoch = Instant.now().toEpochMilli();
+
+            // 0 - bingo start
+            // 1 - bingo end
+            // 2 - zoo early summer
+            // 3 - zoo early winter
+            // 4 - winter island open
+            // 5 - dark auction open (5 min early)
+            // 6 - new year celebration starts
+            // 7 - spooky fishing starts
+            // 8 - spooky event starts
+            // 9 - fishing festival start
+            // 10 - fallen star (5 min early)
 
 			Instant startOfBingo = now.withDayOfMonth(1).atStartOfDay(z).toInstant();
 			if (
@@ -185,7 +186,7 @@ public class EventHandler {
 				);
 			}
 
-			Instant darkAuctionOpen = nowDateTime.withMinute(50).toInstant();
+			Instant darkAuctionOpen = nowDateTime.withMinute(50).withSecond(0).toInstant();
 			if (
 				darkAuctionOpen.toEpochMilli() <= nowEpoch &&
 				nowEpoch <= darkAuctionOpen.plusSeconds(60).toEpochMilli() &&
