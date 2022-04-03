@@ -26,13 +26,12 @@ import static com.skyblockplus.utils.Utils.*;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
-import net.dv8tion.jda.api.EmbedBuilder;
-
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 public class CalendarCommand extends Command {
 
@@ -62,7 +61,7 @@ public class CalendarCommand extends Command {
 			out = 14;
 		}
 		int curYear = getSkyblockYear();
-		String[] pets = new String[]{"LION;4", "MONKEY;4", "ELEPHANT;4", "GIRAFFE;4", "BLUE_WHALE;4", "TIGER;4"};
+		String[] pets = new String[] { "LION;4", "MONKEY;4", "ELEPHANT;4", "GIRAFFE;4", "BLUE_WHALE;4", "TIGER;4" };
 		int index = 0;
 		if ((curYear - 1) % 3 == 0) {
 			index = 2;
@@ -71,24 +70,63 @@ public class CalendarCommand extends Command {
 		}
 
 		eb.setDescription(
-				"\uD83C\uDFB2 **Bingo Start:** <t:" + now.withDayOfMonth(1).atStartOfDay(z).toInstant().getEpochSecond() + ":R>" +
-						"\n\uD83C\uDFB2 **Bingo End:** <t:" + now.withDayOfMonth(1).atStartOfDay(z).toInstant().plus(7, ChronoUnit.DAYS).getEpochSecond() + ":R>" +
-						"\n" + getEmoji(pets[index]) + " **Traveling Zoo (Summer):** <t:" + Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 3 * MONTH_MS).getEpochSecond() + ":R>"
-						+ "\n" + getEmoji(pets[index + 1]) + " **Traveling Zoo (Winter):** <t:" + Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 9 * MONTH_MS).getEpochSecond() + ":R>"
-						+ "\n❄️ **Winter Island:** <t:" + Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 11 * MONTH_MS).getEpochSecond() + ":R>"
-						+ "\n\uD83D\uDD75️ **Dark Auction:** <t:" + nowDateTime.withMinute(55).toInstant().getEpochSecond() + ":R>"
-						+ "\n\uD83C\uDF70 **New Year Celebration:** <t:" + Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 11 * MONTH_MS + 28 * DAY_MS).getEpochSecond() + ":R>"
-						+ "\n\uD83D\uDC20 **Spooky Fishing:** <t:" + Instant
-						.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 7 * MONTH_MS + 28 * DAY_MS)
-						.minus(1, ChronoUnit.HOURS).getEpochSecond() + ":R>"
-						+ "\n\uD83C\uDF83 **Spooky Event:** <t:" + Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 7 * MONTH_MS + 28 * DAY_MS).getEpochSecond() + ":R>"
-						+ (currentMayor.equalsIgnoreCase("marina") ?
-						("\n\uD83C\uDFA3 **Fishing Festival:** <t:" + Instant.ofEpochMilli(
-								YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + Math.floorDiv((nowEpoch - YEAR_0) % YEAR_MS, MONTH_MS) * MONTH_MS
-						).getEpochSecond() + ":R>") : "")
-						+ "\n⭐ **Cult Of Fallen Star:** <t:" + Instant
-						.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + currentMonth * MONTH_MS + out * DAY_MS)
-						.minus(5, ChronoUnit.MINUTES).getEpochSecond() + ":R>"
+			"\uD83C\uDFB2 **Bingo Start:** <t:" +
+			now.withDayOfMonth(1).atStartOfDay(z).toInstant().getEpochSecond() +
+			":R>" +
+			"\n\uD83C\uDFB2 **Bingo End:** <t:" +
+			now.withDayOfMonth(1).atStartOfDay(z).toInstant().plus(7, ChronoUnit.DAYS).getEpochSecond() +
+			":R>" +
+			"\n" +
+			getEmoji(pets[index]) +
+			" **Traveling Zoo (Summer):** <t:" +
+			Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 3 * MONTH_MS).getEpochSecond() +
+			":R>" +
+			"\n" +
+			getEmoji(pets[index + 1]) +
+			" **Traveling Zoo (Winter):** <t:" +
+			Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 9 * MONTH_MS).getEpochSecond() +
+			":R>" +
+			"\n❄️ **Winter Island:** <t:" +
+			Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 11 * MONTH_MS).getEpochSecond() +
+			":R>" +
+			"\n\uD83D\uDD75️ **Dark Auction:** <t:" +
+			nowDateTime.withMinute(55).toInstant().getEpochSecond() +
+			":R>" +
+			"\n\uD83C\uDF70 **New Year Celebration:** <t:" +
+			Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 11 * MONTH_MS + 28 * DAY_MS).getEpochSecond() +
+			":R>" +
+			"\n\uD83D\uDC20 **Spooky Fishing:** <t:" +
+			Instant
+				.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 7 * MONTH_MS + 28 * DAY_MS)
+				.minus(1, ChronoUnit.HOURS)
+				.getEpochSecond() +
+			":R>" +
+			"\n\uD83C\uDF83 **Spooky Event:** <t:" +
+			Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 7 * MONTH_MS + 28 * DAY_MS).getEpochSecond() +
+			":R>" +
+			(
+				currentMayor.equalsIgnoreCase("marina")
+					? (
+						"\n\uD83C\uDFA3 **Fishing Festival:** <t:" +
+						Instant
+							.ofEpochMilli(
+								YEAR_0 +
+								(getSkyblockYear() - 1) *
+								YEAR_MS +
+								Math.floorDiv((nowEpoch - YEAR_0) % YEAR_MS, MONTH_MS) *
+								MONTH_MS
+							)
+							.getEpochSecond() +
+						":R>"
+					)
+					: ""
+			) +
+			"\n⭐ **Cult Of Fallen Star:** <t:" +
+			Instant
+				.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + currentMonth * MONTH_MS + out * DAY_MS)
+				.minus(5, ChronoUnit.MINUTES)
+				.getEpochSecond() +
+			":R>"
 		);
 
 		return eb;

@@ -51,17 +51,17 @@ public class EventHandler {
 			ZonedDateTime nowDateTime = ZonedDateTime.now(z);
 			long nowEpoch = Instant.now().toEpochMilli();
 
-            // 0 - bingo start
-            // 1 - bingo end
-            // 2 - zoo early summer
-            // 3 - zoo early winter
-            // 4 - winter island open
-            // 5 - dark auction open (5 min early)
-            // 6 - new year celebration starts
-            // 7 - spooky fishing starts
-            // 8 - spooky event starts
-            // 9 - fishing festival start
-            // 10 - fallen star (5 min early)
+			// 0 - bingo start
+			// 1 - bingo end
+			// 2 - zoo early summer
+			// 3 - zoo early winter
+			// 4 - winter island open
+			// 5 - dark auction open (5 min early)
+			// 6 - new year celebration starts
+			// 7 - spooky fishing starts
+			// 8 - spooky event starts
+			// 9 - fishing festival start
+			// 10 - fallen star (5 min early)
 
 			Instant startOfBingo = now.withDayOfMonth(1).atStartOfDay(z).toInstant();
 			if (
