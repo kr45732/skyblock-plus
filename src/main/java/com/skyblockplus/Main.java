@@ -268,7 +268,8 @@ public class Main {
 					new ViewAuctionSlashCommand(),
 					new CoinsPerBitSlashCommand(),
 					new ReforgeStoneSlashCommand(),
-					new CheckGuildApiSlashCommand(), new CalendarSlashCommand()
+					new CheckGuildApiSlashCommand(),
+					new CalendarSlashCommand()
 				);
 
 		allServerSettings =

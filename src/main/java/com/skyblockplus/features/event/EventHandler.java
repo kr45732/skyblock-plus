@@ -37,7 +37,7 @@ public class EventHandler {
 	}
 
 	public static void updateEvents() {
-		if(!isMainBot()){
+		if (!isMainBot()) {
 			return;
 		}
 
