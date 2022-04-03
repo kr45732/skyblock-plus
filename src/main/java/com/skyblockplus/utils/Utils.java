@@ -53,6 +53,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.*;
@@ -224,6 +225,9 @@ public class Utils {
 	public static JsonObject getAverageAuctionJson() {
 		if (averageAuctionJson == null || Duration.between(averageAuctionJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
 			averageAuctionJson = getJsonObject("https://moulberry.codes/auction_averages/3day.json");
+			if (averageAuctionJson == null) {
+				averageAuctionJson = getJsonObject(getQueryApiUrl("average_auction") + "?key=" + AUCTION_API_KEY + "&time=" + Instant.now().minus(3, ChronoUnit.DAYS).toEpochMilli());
+			}
 			averageAuctionJsonLastUpdated = Instant.now();
 		}
 
@@ -1111,7 +1115,7 @@ public class Utils {
 							List<String> enchantsList = new ArrayList<>();
 							for (Map.Entry<String, Object> enchant : enchants.entrySet()) {
 								if (
-									enchant.getKey().equals("EFFICIENCY") &&
+									enchant.getKey().equals("efficiency") &&
 									!itemInfo.getId().equals("STONK_PICKAXE") &&
 									(int) enchant.getValue() > 5
 								) {

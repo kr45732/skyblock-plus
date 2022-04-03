@@ -88,6 +88,7 @@ public class InvItem {
 		if (lore != null) {
 			String[] loreArr = lore.split("\n");
 			this.rarity = loreArr[loreArr.length - 1].trim().split("\\s+")[0];
+			rarity += rarity.startsWith("VERY") ? "_SPECIAL" : "";
 		}
 	}
 
