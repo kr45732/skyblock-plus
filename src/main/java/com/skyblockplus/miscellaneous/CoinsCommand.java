@@ -97,7 +97,6 @@ public class CoinsCommand extends Command {
 				}
 				CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(20);
 
-
 				for (int i = bankHistoryArray.size() - 1; i >= 0; i--) {
 					JsonElement currentTransaction = bankHistoryArray.get(i);
 					String valueString =
@@ -120,13 +119,15 @@ public class CoinsCommand extends Command {
 						.setEveryPageTitle(player.getUsername())
 						.setEveryPageThumbnail(player.getThumbnailUrl())
 						.setEveryPageTitleUrl(player.skyblockStatsLink())
-							.setEveryPageText("**Last Transaction Time:** " +
-									"<t:" +
-									Instant
-											.ofEpochMilli(higherDepth(bankHistoryArray.get(bankHistoryArray.size() - 1), "timestamp").getAsLong())
-											.getEpochSecond() +
-									":D>" +
-									"\n")
+						.setEveryPageText(
+							"**Last Transaction Time:** " +
+							"<t:" +
+							Instant
+								.ofEpochMilli(higherDepth(bankHistoryArray.get(bankHistoryArray.size() - 1), "timestamp").getAsLong())
+								.getEpochSecond() +
+							":D>" +
+							"\n"
+						)
 				);
 
 				event.paginate(paginateBuilder);

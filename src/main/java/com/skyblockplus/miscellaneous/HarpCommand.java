@@ -67,7 +67,6 @@ public class HarpCommand extends Command {
 							"%\nPerfect Completions: " +
 							higherDepth(harpJson, "song_" + songId + "_perfect_completions", 0),
 							true
-
 						);
 					}
 				}

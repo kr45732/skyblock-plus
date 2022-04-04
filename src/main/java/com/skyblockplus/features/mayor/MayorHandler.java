@@ -18,9 +18,9 @@
 
 package com.skyblockplus.features.mayor;
 
-import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.features.event.CalendarCommand.YEAR_0;
 import static com.skyblockplus.features.event.CalendarCommand.getSkyblockYear;
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.Constants.MAYOR_NAME_TO_SKIN;
 import static com.skyblockplus.utils.Utils.*;
 

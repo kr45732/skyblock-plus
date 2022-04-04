@@ -376,7 +376,7 @@ public class HelpCommand extends Command {
 				new HelpData(
 					"leaderboard",
 					"Get a global leaderboard. The type can be slayer, skills, catacombs, weight, sven, rev, tara, enderman, alchemy, combat, fishing, farming, foraging, carpentry, mining, taming, and enchanting. The mode can be all, ironman, or stranded.",
-						"leaderboard <type> [player]"
+					"leaderboard <type> [player]"
 				)
 					.addAliases("lb")
 					.setCategory("miscellaneous"),

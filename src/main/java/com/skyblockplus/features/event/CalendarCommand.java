@@ -87,9 +87,19 @@ public class CalendarCommand extends Command {
 			currentHourTime = 12;
 		}
 
-		eb.setDescription("**Year:** " + getSkyblockYear()
-				+ "\n**Date:** "+ SEASONS[currentMonthTime] + " " + nth(currentDayTime + 1)
-				+ "\n**Time:** "+ currentHourTime + ":" + padStart("" + ((int) Math.floorDiv(currentMinuteTime, 10) * 10), 2, '0') + suffix);
+		eb.setDescription(
+			"**Year:** " +
+			getSkyblockYear() +
+			"\n**Date:** " +
+			SEASONS[currentMonthTime] +
+			" " +
+			nth(currentDayTime + 1) +
+			"\n**Time:** " +
+			currentHourTime +
+			":" +
+			padStart("" + ((int) Math.floorDiv(currentMinuteTime, 10) * 10), 2, '0') +
+			suffix
+		);
 
 		Instant bingoStart = now.withDayOfMonth(1).atStartOfDay(z).toInstant();
 		Instant bingoEnd = bingoStart.plus(7, ChronoUnit.DAYS);
@@ -99,12 +109,7 @@ public class CalendarCommand extends Command {
 		}
 		eb.addField(
 			"\uD83C\uDFB2 Bingo" + (bingoStart.isBefore(instantNow) ? " (Active)" : ""),
-			"**Start:** <t:" +
-			bingoStart.getEpochSecond() +
-			":R>" +
-			"\n**End:** <t:" +
-			bingoEnd.getEpochSecond() +
-			":R>",
+			"**Start:** <t:" + bingoStart.getEpochSecond() + ":R>" + "\n**End:** <t:" + bingoEnd.getEpochSecond() + ":R>",
 			false
 		);
 
@@ -133,31 +138,25 @@ public class CalendarCommand extends Command {
 			index = 4;
 		}
 
-		eb
-			.addField(
-					getEmoji(pets[summerZooStart.isBefore(winterZooStart) ? index : (index + 1)]) + " Traveling Zoo" + ((summerZooStart.isBefore(winterZooStart) ? summerZooStart : winterZooStart).isBefore(instantNow) ? " (Active)" : ""),
-
-				"**Open:** <t:" +
-				(summerZooStart.isBefore(winterZooStart) ? summerZooStart : winterZooStart).getEpochSecond() +
-				":R>\n**Close:** <t:" +
-				(summerZooStart.isBefore(winterZooStart) ? summerZooEnd : winterZooEnd).getEpochSecond() +
-				":R>",
-				false
-			);
+		eb.addField(
+			getEmoji(pets[summerZooStart.isBefore(winterZooStart) ? index : (index + 1)]) +
+			" Traveling Zoo" +
+			((summerZooStart.isBefore(winterZooStart) ? summerZooStart : winterZooStart).isBefore(instantNow) ? " (Active)" : ""),
+			"**Open:** <t:" +
+			(summerZooStart.isBefore(winterZooStart) ? summerZooStart : winterZooStart).getEpochSecond() +
+			":R>\n**Close:** <t:" +
+			(summerZooStart.isBefore(winterZooStart) ? summerZooEnd : winterZooEnd).getEpochSecond() +
+			":R>",
+			false
+		);
 
 		Instant winterOpen = Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 11 * MONTH_MS);
 		Instant winterClose = Instant.ofEpochMilli(YEAR_0 + getSkyblockYear() * YEAR_MS);
-		eb
-			.addField(
-				"❄️ Winter Island" + (winterOpen.isBefore(instantNow) ? " (Active)" : ""),
-				"\n**Open:** <t:" +
-						winterOpen.getEpochSecond() +
-				":R>" +
-				"\n**Close:** <t:" +
-						winterClose.getEpochSecond() +
-				":R>",
-				false
-			);
+		eb.addField(
+			"❄️ Winter Island" + (winterOpen.isBefore(instantNow) ? " (Active)" : ""),
+			"\n**Open:** <t:" + winterOpen.getEpochSecond() + ":R>" + "\n**Close:** <t:" + winterClose.getEpochSecond() + ":R>",
+			false
+		);
 
 		Instant jerryOpen = Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 11 * MONTH_MS + 23 * DAY_MS);
 		Instant jerryClose = jerryOpen.plus(1, ChronoUnit.HOURS);
@@ -165,17 +164,11 @@ public class CalendarCommand extends Command {
 			jerryOpen = Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear()) * YEAR_MS + 11 * MONTH_MS + 23 * DAY_MS);
 			jerryClose = jerryOpen.plus(1, ChronoUnit.HOURS);
 		}
-		eb
-				.addField(
-						"<:jerry:940083649318125578> Defend Jerry's Workshop" + (jerryOpen.isBefore(instantNow) ? " (Active)" : ""),
-						"\n**Start:** <t:" +
-								jerryOpen.getEpochSecond() +
-								":R>" +
-								"\n**End:** <t:" +
-								jerryClose.getEpochSecond() +
-								":R>",
-						false
-				);
+		eb.addField(
+			"<:jerry:940083649318125578> Defend Jerry's Workshop" + (jerryOpen.isBefore(instantNow) ? " (Active)" : ""),
+			"\n**Start:** <t:" + jerryOpen.getEpochSecond() + ":R>" + "\n**End:** <t:" + jerryClose.getEpochSecond() + ":R>",
+			false
+		);
 
 		Instant spookyFishingStart = Instant
 			.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 7 * MONTH_MS + 28 * DAY_MS)
@@ -188,12 +181,7 @@ public class CalendarCommand extends Command {
 		}
 		eb.addField(
 			"\uD83D\uDC20 Spooky Fishing" + (spookyFishingStart.isBefore(instantNow) ? " (Active)" : ""),
-			"\n**Start:** <t:" +
-			spookyFishingStart.getEpochSecond() +
-			":R>" +
-			"\n**End:** <t:" +
-			spookyFishingEnd.getEpochSecond() +
-			":R>",
+			"\n**Start:** <t:" + spookyFishingStart.getEpochSecond() + ":R>" + "\n**End:** <t:" + spookyFishingEnd.getEpochSecond() + ":R>",
 			false
 		);
 
@@ -205,12 +193,7 @@ public class CalendarCommand extends Command {
 		}
 		eb.addField(
 			"\uD83C\uDF83 Spooky Festival" + (spookyStart.isBefore(instantNow) ? " (Active)" : ""),
-			"\n**Start:** <t:" +
-			spookyStart.getEpochSecond() +
-			":R>" +
-			"\n**End:** <t:" +
-			spookyEnd.getEpochSecond() +
-			":R>",
+			"\n**Start:** <t:" + spookyStart.getEpochSecond() + ":R>" + "\n**End:** <t:" + spookyEnd.getEpochSecond() + ":R>",
 			false
 		);
 
@@ -221,14 +204,8 @@ public class CalendarCommand extends Command {
 			newYearEnd = newYearStart.plus(1, ChronoUnit.HOURS);
 		}
 		eb.addField(
-			"\uD83C\uDF70 New Year Celebration"  + (newYearStart.isBefore(instantNow) ? " (Active)" : ""),
-			"**Start:** <t:" +
-			newYearStart.getEpochSecond() +
-			":R>" +
-			"" +
-					"\n**End:** <t:" +
-			newYearEnd.getEpochSecond() +
-			":R>",
+			"\uD83C\uDF70 New Year Celebration" + (newYearStart.isBefore(instantNow) ? " (Active)" : ""),
+			"**Start:** <t:" + newYearStart.getEpochSecond() + ":R>" + "" + "\n**End:** <t:" + newYearEnd.getEpochSecond() + ":R>",
 			false
 		);
 
@@ -252,12 +229,7 @@ public class CalendarCommand extends Command {
 
 			eb.addField(
 				"\uD83C\uDFA3 Fishing Festival" + (fishingStart.isBefore(instantNow) ? " (Active)" : ""),
-				"**Start:** <t:" +
-				fishingStart.getEpochSecond() +
-				":R>" +
-				"\n**End:** <t:" +
-				fishingEnd.getEpochSecond() +
-				":R>",
+				"**Start:** <t:" + fishingStart.getEpochSecond() + ":R>" + "\n**End:** <t:" + fishingEnd.getEpochSecond() + ":R>",
 				false
 			);
 		}
