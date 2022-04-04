@@ -375,7 +375,8 @@ public class HelpCommand extends Command {
 				new HelpData("mayor", "Get the current mayor and their perks.").setCategory("miscellaneous"),
 				new HelpData(
 					"leaderboard",
-					"Get a global leaderboard. The type can be slayer, skills, catacombs, weight, sven, rev, tara, enderman, alchemy, combat, fishing, farming, foraging, carpentry, mining, taming, and enchanting. The mode can be all, ironman, or stranded."
+					"Get a global leaderboard. The type can be slayer, skills, catacombs, weight, sven, rev, tara, enderman, alchemy, combat, fishing, farming, foraging, carpentry, mining, taming, and enchanting. The mode can be all, ironman, or stranded.",
+						"leaderboard <type> [player]"
 				)
 					.addAliases("lb")
 					.setCategory("miscellaneous"),
@@ -385,7 +386,7 @@ public class HelpCommand extends Command {
 				new HelpData("bingo", "Get the current bingo goals and a player's live bingo card.", "bingo [player]")
 					.setCategory("miscellaneous"),
 				new HelpData("recipe", "Get the crafting recipe of an item.", "recipe <item>").setCategory("miscellaneous"),
-				new HelpData("time", "Get the current year, date, and time in Skyblock").setCategory("miscellaneous"),
+				new HelpData("calendar", "Get the current Skyblock datetime and running or upcoming events").setCategory("miscellaneous"),
 				new HelpData(
 					"scammer",
 					"Check if a player is marked as a scammer in the SkyblockZ database with the reason, discord(s), and Minecraft alt(s)",
@@ -878,11 +879,11 @@ public class HelpCommand extends Command {
 			help.create("cakes [player] [profile]", "Get a player's inactive and active cake buffs") +
 			help.create("harp [player] [profile]", "Get a player's harp statistics") +
 			help.create("uuid [username|uuid]", "Convert username to UUID or UUID to username") +
-			help.create("time", "Get the current year, date, and time in Skyblock") +
+			help.create("calendar", "Get the current Skyblock datetime and running or upcoming events") +
 			help.create("scammer [player]", "Check if a player is marked as a scamer in the SBZ database") +
 			help.create("jacob", "Get the upcoming contests and their crops") +
 			help.create("mayor", "Get information about the current mayor or the running election") +
-			help.create("bingo", "Get the current bingo goals and a player's bingo card") +
+			help.create("bingo [player]", "Get the current bingo goals and a player's bingo card") +
 			help.create("leaderboard", "Get a global leaderboard") +
 			help.create("skyblock [player] [profile]", "Get an overview of a player's Skyblock statistics") +
 			help.create("recipe", "Get the crafting recipe of an item") +

@@ -117,11 +117,11 @@ public class MissingCommand extends Command {
 			}
 			PaginatorExtras extras = new PaginatorExtras()
 				.setEveryPageText(
-					"**Total missing:** " +
+					"**Total Missing:** " +
 					missingInternalArr.size() +
-					"\n**Total cost:** " +
+					"\n**Total Cost:** " +
 					simplifyNumber(totalCost) +
-					"\nNote: Talismans with a * have higher tiers\n"
+					"\n**Note:** Talismans with a * have higher tiers\n"
 				)
 				.setEveryPageTitle(player.getUsername())
 				.setEveryPageThumbnail(player.getThumbnailUrl())

@@ -48,9 +48,9 @@ public class HarpCommand extends Command {
 			EmbedBuilder eb = player
 				.defaultPlayerEmbed()
 				.setDescription(
-					"**Last played song:** " +
+					"**Last Played Song:** " +
 					HARP_SONG_ID_TO_NAME.get(higherDepth(harpJson, "selected_song", "None")) +
-					"\n**Claimed melody's hair:** " +
+					"\n**Claimed Melody's Hair:** " +
 					higherDepth(harpJson, "claimed_talisman", false)
 				);
 
@@ -62,14 +62,18 @@ public class HarpCommand extends Command {
 							HARP_SONG_ID_TO_NAME.get(songId),
 							"Completions: " +
 							song.getValue().getAsInt() +
-							"\nBest completion score: " +
+							"\nBest Score: " +
 							roundAndFormat(higherDepth(harpJson, "song_" + songId + "_best_completion", 0.0) * 100) +
-							"%\nPerfect completions: " +
+							"%\nPerfect Completions: " +
 							higherDepth(harpJson, "song_" + songId + "_perfect_completions", 0),
-							false
+							true
+
 						);
 					}
 				}
+			}
+			for (int i = 0; i < 3 - eb.getFields().size() % 3; i++) {
+				eb.addBlankField(true);
 			}
 
 			return eb;

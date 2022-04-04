@@ -65,7 +65,9 @@ public class ReforgeStoneCommand extends Command {
 		"FEROCITY",
 		"\uD83D\uDDE1️",
 		"MINING_FORTUNE",
-		"☘️"
+		"☘️",
+			"DAMAGE",
+			"<:iron_sword:939021608142651403>"
 	);
 
 	public ReforgeStoneCommand() {

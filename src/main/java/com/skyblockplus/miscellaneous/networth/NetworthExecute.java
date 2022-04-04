@@ -367,7 +367,7 @@ public class NetworthExecute {
 
 			double totalNetworth = getTotalCalculatedNetworth();
 
-			eb.setDescription("Total Networth: " + simplifyNumber(totalNetworth) + " (" + formatNumber(totalNetworth) + ")");
+			eb.setDescription("**Total Networth:** " + simplifyNumber(totalNetworth) + " (" + formatNumber(totalNetworth) + ")");
 			eb.addField("Purse", simplifyNumber(purseCoins), true);
 			eb.addField("Bank", (bankBalance == -1 ? "Private" : simplifyNumber(bankBalance)), true);
 			eb.addField("Sacks", simplifyNumber(sacksTotal), true);

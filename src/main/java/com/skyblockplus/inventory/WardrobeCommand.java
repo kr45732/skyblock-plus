@@ -84,11 +84,11 @@ public class WardrobeCommand extends Command {
 				logCommand();
 
 				if ((args.length == 4 || args.length == 3 || args.length == 2) && args[1].equals("list")) {
-					if (getMentionedUsername(args.length == 2 ? -1 : 1)) {
+					if (getMentionedUsername(args.length == 2 ? -1 : 2)) {
 						return;
 					}
 
-					paginate(getPlayerWardrobeList(player, args.length == 4 ? args[3] : null, new PaginatorEvent(event)));
+					paginate(getPlayerWardrobeList(player, args.length == 4 ? args[2] : null, new PaginatorEvent(event)));
 					return;
 				} else if (args.length == 3 || args.length == 2 || args.length == 1) {
 					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
