@@ -20,8 +20,6 @@ package com.skyblockplus.features.apply;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.database;
-import static com.skyblockplus.utils.Utils.jda;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

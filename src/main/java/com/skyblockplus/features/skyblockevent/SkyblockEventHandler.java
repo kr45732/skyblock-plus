@@ -23,8 +23,6 @@ import static com.skyblockplus.features.skyblockevent.SkyblockEventCommand.getEv
 import static com.skyblockplus.utils.ApiHandler.getGuildFromName;
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.database;
-import static com.skyblockplus.utils.Utils.waiter;
 
 import com.google.gson.JsonElement;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;

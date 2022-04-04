@@ -19,7 +19,6 @@
 package com.skyblockplus.guild;
 
 import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.ApiHandler.asyncSkyblockProfilesFromUuid;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;

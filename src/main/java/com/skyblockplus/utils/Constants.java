@@ -50,7 +50,6 @@ public class Constants {
 	public static Map<String, Double> DUNGEON_WEIGHTS;
 	public static Map<String, String> DUNGEON_EMOJI_MAP;
 	public static List<String> FETCHUR_ITEMS;
-	public static List<String> DUNGEON_META_ITEMS;
 	public static Map<String, String> HARP_SONG_ID_TO_NAME;
 	public static JsonElement SLAYER_DEPRECATION_SCALING;
 	public static JsonElement SKILL_RATIO_WEIGHT;
@@ -138,9 +137,6 @@ public class Constants {
 
 			/* FETCHUR_ITEMS */
 			FETCHUR_ITEMS = gson.fromJson(higherDepth(CONSTANTS, "FETCHUR_ITEMS"), listString);
-
-			/* DUNGEON_META_ITEMS */
-			DUNGEON_META_ITEMS = gson.fromJson(higherDepth(CONSTANTS, "DUNGEON_META_ITEMS"), listString);
 
 			/* HARP_SONG_ID_TO_NAME */
 			HARP_SONG_ID_TO_NAME = gson.fromJson(higherDepth(CONSTANTS, "HARP_SONG_ID_TO_NAME"), mapStringString);

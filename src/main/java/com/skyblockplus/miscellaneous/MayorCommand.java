@@ -22,7 +22,6 @@ import static com.skyblockplus.features.event.CalendarCommand.YEAR_0;
 import static com.skyblockplus.features.event.CalendarCommand.getSkyblockYear;
 import static com.skyblockplus.features.mayor.MayorHandler.mayorNameToEmoji;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.jda;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;

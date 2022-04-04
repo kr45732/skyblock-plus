@@ -20,7 +20,6 @@ package com.skyblockplus.utils;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.slashCommandClient;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

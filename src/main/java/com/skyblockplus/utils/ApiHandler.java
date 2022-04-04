@@ -19,8 +19,6 @@
 package com.skyblockplus.utils;
 
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.database;
-import static com.skyblockplus.utils.Utils.jda;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;

@@ -19,7 +19,6 @@
 package com.skyblockplus.general;
 
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.database;
 
 import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;

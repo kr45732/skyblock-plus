@@ -18,7 +18,6 @@
 
 package com.skyblockplus.utils.command;
 
-import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.utils.Utils.defaultEmbed;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;

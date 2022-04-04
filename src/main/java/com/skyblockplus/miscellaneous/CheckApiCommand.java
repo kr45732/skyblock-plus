@@ -20,14 +20,10 @@ package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.Utils.*;
 
-import com.google.gson.JsonElement;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
 
 public class CheckApiCommand extends Command {

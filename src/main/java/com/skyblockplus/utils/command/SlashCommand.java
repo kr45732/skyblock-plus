@@ -20,7 +20,6 @@ package com.skyblockplus.utils.command;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.client;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;

@@ -547,17 +547,6 @@ public class Player {
 		return itemsPlayerHas;
 	}
 
-	public String getFastestF7Time() {
-		try {
-			int f7TimeMilliseconds = higherDepth(profileJson(), "dungeons.dungeon_types.catacombs.fastest_time_s_plus.7").getAsInt();
-			int minutes = f7TimeMilliseconds / 1000 / 60;
-			int seconds = f7TimeMilliseconds / 1000 % 60;
-			return ("\n**Fastest F7 S+:** " + minutes + ":" + (seconds >= 10 ? seconds : "0" + seconds));
-		} catch (Exception e) {
-			return "\n**No F7 S+ time found**";
-		}
-	}
-
 	public int getDungeonSecrets() {
 		return higherDepth(getHypixelPlayerJson(), "achievements.skyblock_treasure_hunter", 0);
 	}
@@ -820,7 +809,7 @@ public class Player {
 				.entrySet()
 				.stream()
 				.sorted(Comparator.comparingInt(e -> Integer.parseInt(e.getKey())))
-				.map(e -> e.getValue())
+				.map(Map.Entry::getValue)
 				.collect(Collectors.toList())) {
 				NBTCompound decodedInventoryContents = NBTReader.readBase64(higherDepth(page, "data").getAsString());
 
@@ -848,7 +837,7 @@ public class Player {
 					if (i.getKey() <= 18) {
 						curNine.append(itemToEmoji(i.getValue()));
 						if (i.getKey() % 9 == 0) {
-							outputStringPart1.append(curNine + "\n");
+							outputStringPart1.append(curNine).append("\n");
 							curNine = new StringBuilder();
 						}
 					} else {

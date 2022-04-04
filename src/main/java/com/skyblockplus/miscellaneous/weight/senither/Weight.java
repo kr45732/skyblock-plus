@@ -43,67 +43,6 @@ public class Weight {
 		}
 	}
 
-	public static double of(double skillAverage, double slayer, double catacombs, double averageDungeonClass) {
-		double totalWeight = 0;
-		totalWeight += calculateSlayerWeight(slayer);
-		totalWeight += calculateSkillsWeight(skillAverage);
-		totalWeight += calculateDungeonsWeight(averageDungeonClass, catacombs);
-		return totalWeight;
-	}
-
-	public static double calculateSlayerWeight(double slayer) {
-		return SlayerWeight.of(
-			slayer,
-			(
-				SLAYER_WEIGHTS.get("rev")[0] +
-				SLAYER_WEIGHTS.get("sven")[0] +
-				SLAYER_WEIGHTS.get("tara")[0] +
-				SLAYER_WEIGHTS.get("enderman")[0]
-			) /
-			4,
-			(
-				SLAYER_WEIGHTS.get("rev")[1] +
-				SLAYER_WEIGHTS.get("sven")[1] +
-				SLAYER_WEIGHTS.get("tara")[1] +
-				SLAYER_WEIGHTS.get("enderman")[1]
-			) /
-			4
-		);
-	}
-
-	public static double calculateSkillsWeight(double skillAverage) {
-		return SkillsWeight.of(
-			skillAverage,
-			(
-				SKILL_WEIGHTS.get("mining")[0] +
-				SKILL_WEIGHTS.get("foraging")[0] +
-				SKILL_WEIGHTS.get("enchanting")[0] +
-				SKILL_WEIGHTS.get("farming")[0] +
-				SKILL_WEIGHTS.get("combat")[0] +
-				SKILL_WEIGHTS.get("fishing")[0] +
-				SKILL_WEIGHTS.get("alchemy")[0] +
-				SKILL_WEIGHTS.get("taming")[0]
-			) /
-			8
-		);
-	}
-
-	public static double calculateDungeonsWeight(double averageDungeonClass, double catacombs) {
-		return DungeonsWeight.of(
-			averageDungeonClass,
-			(
-				DUNGEON_CLASS_WEIGHTS.get("healer") +
-				DUNGEON_CLASS_WEIGHTS.get("mage") +
-				DUNGEON_CLASS_WEIGHTS.get("berserk") +
-				DUNGEON_CLASS_WEIGHTS.get("archer") +
-				DUNGEON_CLASS_WEIGHTS.get("tank")
-			) /
-			5,
-			catacombs,
-			DUNGEON_WEIGHTS.get("catacombs")
-		);
-	}
-
 	public SkillsWeight getSkillsWeight() {
 		return skillsWeight;
 	}

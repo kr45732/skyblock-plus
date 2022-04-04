@@ -20,7 +20,6 @@ package com.skyblockplus.price;
 
 import static com.skyblockplus.utils.ApiHandler.usernameToUuid;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.jda;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

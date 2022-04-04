@@ -21,7 +21,6 @@ package com.skyblockplus.features.apply;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.getNameHistory;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.jda;
 
 import com.google.gson.*;
 import com.skyblockplus.features.apply.log.ApplyLog;

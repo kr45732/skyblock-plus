@@ -49,7 +49,6 @@ import com.skyblockplus.general.help.HelpSlashCommand;
 import com.skyblockplus.guild.*;
 import com.skyblockplus.inventory.*;
 import com.skyblockplus.miscellaneous.*;
-import com.skyblockplus.miscellaneous.BingoSlashCommand;
 import com.skyblockplus.miscellaneous.networth.NetworthCommand;
 import com.skyblockplus.miscellaneous.networth.NetworthSlashCommand;
 import com.skyblockplus.miscellaneous.weight.WeightCommand;

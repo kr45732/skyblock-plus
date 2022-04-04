@@ -18,8 +18,6 @@
 
 package com.skyblockplus.utils.structs;
 
-import com.skyblockplus.utils.Constants;
-
 public record SkillsStruct(
 	String name,
 	int currentLevel,

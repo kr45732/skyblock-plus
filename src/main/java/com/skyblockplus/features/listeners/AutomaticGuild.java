@@ -25,8 +25,6 @@ import static com.skyblockplus.utils.ApiHandler.getGuildFromId;
 import static com.skyblockplus.utils.ApiHandler.skyblockProfilesFromUuid;
 import static com.skyblockplus.utils.Constants.NUMBER_TO_RARITY_MAP;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.Utils.database;
-import static com.skyblockplus.utils.Utils.jda;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -127,7 +125,7 @@ public class AutomaticGuild {
 	public final List<ScheduledFuture<?>> scheduledFutures = new ArrayList<>();
 	public String prefix;
 	public TextChannel logChannel = null;
-	public List<MessageEmbed> logQueue = new ArrayList<>();
+	public final List<MessageEmbed> logQueue = new ArrayList<>();
 	public JsonArray blacklist = new JsonArray();
 	public List<String> isUsing = new ArrayList<>();
 
