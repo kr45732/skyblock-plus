@@ -31,6 +31,7 @@ import com.skyblockplus.api.serversettings.automatedroles.AutomatedRoles;
 import com.skyblockplus.api.serversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.serversettings.automatedverify.AutomatedVerify;
 import com.skyblockplus.api.serversettings.blacklist.Blacklist;
+import com.skyblockplus.api.serversettings.eventnotif.EventNotifSettings;
 import com.skyblockplus.api.serversettings.jacob.JacobSettings;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsService;
@@ -193,6 +194,10 @@ public class Database {
 
 	public int setJacobSettings(String serverId, JsonElement newSettings) {
 		return settingsService.setJacobSettings(serverId, gson.fromJson(newSettings, JacobSettings.class)).getStatusCodeValue();
+	}
+
+	public int setEventSettings(String serverId, JsonElement newSettings) {
+		return settingsService.setEventSettings(serverId, gson.fromJson(newSettings, EventNotifSettings.class)).getStatusCodeValue();
 	}
 
 	public int setFetchurChannel(String serverId, String newSettings) {

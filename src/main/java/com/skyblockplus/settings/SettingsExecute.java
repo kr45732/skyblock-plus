@@ -167,6 +167,7 @@ public class SettingsExecute {
 			eb =
 				defaultSettingsEmbed()
 					.addField("General Settings", "Use `/settings general` to see the current settings", false)
+						.addField("Event Settings", "Use `/settings event` to see the current settings", false)
 					.addField("Blacklist Settings", "Use `/settings blacklist` to see the current settings", false)
 					.addField("Jacob Settings", "Use `/settings jacob` to see the current settings", false)
 					.addField("Verify Settings", "Use `/settings verify` to see the current settings", false)
@@ -223,16 +224,40 @@ public class SettingsExecute {
 			} else if (content.split("\\s+", 4).length == 4) {
 				args = content.split("\\s+", 4);
 				eb =
-					switch (args[2]) {
-						case "add" -> addJacobCrop(args[3]);
-						case "remove" -> removeJacobCrop(args[3]);
-						case "channel" -> setJacobChannel(args[3]);
-						default -> null;
-					};
+						switch (args[2]) {
+							case "add" -> addJacobCrop(args[3]);
+							case "remove" -> removeJacobCrop(args[3]);
+							case "channel" -> setJacobChannel(args[3]);
+							default -> null;
+						};
 			}
 
 			if (eb == null) {
 				eb = errorEmbed("settings jacob");
+			}
+		}else if (args.length >= 2 && args[1].equals("event")) {
+			if (args.length == 2) {
+				eb = displayEventSettings(higherDepth(currentSettings, "eventNotif"));
+			} else if (args.length == 3) {
+				if (args[2].equals("enable")) {
+					eb = setEventEnable(true);
+				} else if (args[2].equals("disable")) {
+					eb = setEventEnable(false);
+				}
+			} else if (content.split("\\s+", 4).length == 4) {
+				args = content.split("\\s+", 4);
+				eb =
+						switch (args[2]) {
+							case "add" -> addEvent(args[3]);
+							case "remove" -> removeEvent(args[3]);
+							case "channel" -> setEventChannel(args[3]);
+							case "ping" -> setEventPing(args[3]);
+							default -> null;
+						};
+			}
+
+			if (eb == null) {
+				eb = errorEmbed("settings event");
 			}
 		} else if (args.length >= 2 && args[1].equals("roles")) {
 			if (args.length == 2) {
@@ -542,7 +567,7 @@ public class SettingsExecute {
 		if (crop.equalsIgnoreCase("all")) {
 			for (String validCrop : validCrops) {
 				EmbedBuilder eb = addJacobCrop(validCrop);
-				if (eb != null) {
+				if (!eb.build().getTitle().equalsIgnoreCase("Settings")) {
 					return eb;
 				}
 			}
@@ -604,6 +629,164 @@ public class SettingsExecute {
 
 	public JsonObject getJacobSetings() {
 		return higherDepth(serverSettings, "jacobSettings").getAsJsonObject();
+	}
+
+	/* Event Settings */
+	public EmbedBuilder displayEventSettings(JsonElement eventSettings) {
+		String ebFieldString = "";
+		ebFieldString += "**" + displaySettings(eventSettings, "enable") + "**";
+		ebFieldString += "\n• **Channel:** " + displaySettings(eventSettings, "channel");
+		ebFieldString += "\n• **Ping:** " + displaySettings(eventSettings, "role");
+		ebFieldString += "\n• **Events:** " + displaySettings(eventSettings, "events");
+		return defaultEmbed("Event Settings").setDescription(ebFieldString);
+	}
+
+	public EmbedBuilder setEventChannel(String channelMention) {
+		Object eb = checkTextChannel(channelMention);
+		if (eb instanceof EmbedBuilder e) {
+			return e;
+		}
+
+		TextChannel channel = ((TextChannel) eb);
+		JsonObject eventSettings = getEventSettings();
+		eventSettings.addProperty("channel", channel.getId());
+		int responseCode = database.setEventSettings(guild.getId(), eventSettings);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		return defaultSettingsEmbed("Set event notification channel to: " + channel.getAsMention());
+	}
+
+	public EmbedBuilder removeEvent(String event) {
+		event = event.toLowerCase();
+
+		JsonObject eventSettings = getEventSettings();
+		JsonArray events = higherDepth(eventSettings, "events").getAsJsonArray();
+
+		for (int i = events.size() - 1; i >= 0; i--) {
+			if (events.get(i).getAsString().equals(event)) {
+				events.remove(i);
+			}
+		}
+
+		eventSettings.add("events", events);
+		if (events.size() == 0) {
+			eventSettings.addProperty("enable", "false");
+		}
+
+		int responseCode = database.setEventSettings(guild.getId(), eventSettings);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		guildMap.get(guild.getId()).eventGuild.reloadSettingsJson(eventSettings);
+
+		return defaultSettingsEmbed("Removed event notification: " + event);
+	}
+
+	public EmbedBuilder setEventPing(String roleMention) {
+		JsonObject eventSettings = getEventSettings();
+
+		if (roleMention.equalsIgnoreCase("none")){
+			eventSettings.addProperty("role", "none");
+			int responseCode = database.setEventSettings(guild.getId(), eventSettings);
+			if (responseCode != 200) {
+				return apiFailMessage(responseCode);
+			}
+
+			guildMap.get(guild.getId()).eventGuild.reloadSettingsJson(eventSettings);
+			return defaultSettingsEmbed("Set event notification ping to: none");
+		}
+
+		Object eb = checkRole(roleMention);
+		if (eb instanceof EmbedBuilder e) {
+			return e;
+		}
+		Role role = ((Role) eb);
+
+		eventSettings.addProperty("role", role.getId());
+		int responseCode = database.setEventSettings(guild.getId(), eventSettings);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		guildMap.get(guild.getId()).eventGuild.reloadSettingsJson(eventSettings);
+		return defaultSettingsEmbed("Set event notification ping to: " + role.getAsMention());
+	}
+
+	public EmbedBuilder addEvent(String event) {
+		event = event.toLowerCase();
+		List<String> validEvents = Arrays.asList(
+				"bingo_start",
+				"bingo_end",
+				"zoo",
+				"winter_island",
+				"dark_auction",
+				"new_year",
+				"spooky_fishing",
+				"spooky",
+				"fishing_festival",
+				"fallen_star"
+		);
+		if (event.equalsIgnoreCase("all")) {
+			for (String validCrop : validEvents) {
+				EmbedBuilder eb = addEvent(validCrop);
+				if (!eb.build().getTitle().equalsIgnoreCase("Settings")) {
+					return eb;
+				}
+			}
+			return defaultSettingsEmbed("Added all events");
+		}
+		if (!validEvents.contains(event)) {
+			return invalidEmbed("Invalid event\n\nValid event names are: " + String.join(", ", validEvents));
+		}
+
+		JsonObject eventSettings = getEventSettings();
+		JsonArray events = higherDepth(eventSettings, "events").getAsJsonArray();
+
+		for (int i = events.size() - 1; i >= 0; i--) {
+			if (events.get(i).getAsString().equals(event)) {
+				return invalidEmbed("You have already added this event");
+			}
+		}
+
+		events.add(new JsonPrimitive(event));
+		eventSettings.add("events", events);
+		int responseCode = database.setEventSettings(guild.getId(), eventSettings);
+
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+		guildMap.get(guild.getId()).eventGuild.reloadSettingsJson(eventSettings);
+
+		return defaultSettingsEmbed("Added event notification: " + event);
+	}
+
+	public EmbedBuilder setEventEnable(boolean enable) {
+		JsonObject eventSettings = getEventSettings();
+		if (enable) {
+			try {
+				guild.getTextChannelById(higherDepth(eventSettings, "channel").getAsString()).getId();
+				higherDepth(eventSettings, "events").getAsJsonArray().get(0);
+			} catch (Exception e) {
+				return invalidEmbed("A channel and at least one event must be set before enabling");
+			}
+		}
+
+		eventSettings.addProperty("enable", enable);
+
+		int responseCode = database.setEventSettings(guild.getId(), eventSettings);
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+		guildMap.get(guild.getId()).eventGuild.reloadSettingsJson(eventSettings);
+
+		return defaultSettingsEmbed((enable ? "Enabled" : "Disabled") + " event notifications");
+	}
+
+	public JsonObject getEventSettings() {
+		return higherDepth(serverSettings, "eventNotif").getAsJsonObject();
 	}
 
 	/* Apply Settings */
@@ -2628,6 +2811,10 @@ public class SettingsExecute {
 
 					return "\n\u200B \u200B  " + String.join("\n\u200B \u200B  ", ebStr);
 				}
+				case "events" -> {
+					String events = streamJsonArray(higherDepth(jsonSettings, settingName).getAsJsonArray()).map(JsonElement::getAsString).collect(Collectors.joining(", "));
+					return events.isEmpty() ? "none" : events;
+				}
 			}
 
 			String currentSettingValue = higherDepth(jsonSettings, settingName).getAsString();
@@ -2646,6 +2833,7 @@ public class SettingsExecute {
 					case "roleId":
 					case "guildMemberRole":
 					case "verifiedRemoveRole":
+					case "role":
 						return "<@&" + currentSettingValue + ">";
 					case "applyEnable":
 					case "enable":

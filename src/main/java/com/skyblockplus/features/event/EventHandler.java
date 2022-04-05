@@ -18,13 +18,23 @@
 
 package com.skyblockplus.features.event;
 
+import com.skyblockplus.features.listeners.AutomaticGuild;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.TextChannel;
+
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import static com.skyblockplus.features.event.CalendarCommand.getSkyblockYear;
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.features.mayor.MayorHandler.currentMayor;
 import static com.skyblockplus.utils.Utils.*;
-
-import java.time.*;
-import java.time.temporal.ChronoUnit;
-import java.util.concurrent.TimeUnit;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 
 public class EventHandler {
 
@@ -32,397 +42,361 @@ public class EventHandler {
 
 	public static void initialize() {
 		scheduler.scheduleAtFixedRate(EventHandler::updateEvents, 30, 30, TimeUnit.SECONDS);
-		messageId = isMainBot() ? "959829803895255051" : "959888607676625016";
+		messageId = isMainBot() ? "960675388441387058" : "960687190990520400";
 	}
 
 	public static void updateEvents() {
-		if (!isMainBot()) {
-			return;
-		}
-
 		try {
-			String[] times = jda
-				.getGuildById("796790757947867156")
-				.getTextChannelById("959829695686381658")
-				.retrieveMessageById(messageId)
-				.complete()
-				.getContentRaw()
-				.split("\n");
+//			if (!isMainBot()) {
+//				return;
+//			}
 
-			ZoneId z = ZoneId.of("America/New_York");
-			LocalDate now = LocalDate.now(z);
-			ZonedDateTime nowDateTime = ZonedDateTime.now(z);
-			long nowEpoch = Instant.now().toEpochMilli();
+			TextChannel timesChannel = jda
+					.getGuildById("796790757947867156")
+					.getTextChannelById("959829695686381658");
+			String[] times = timesChannel
+					.retrieveMessageById(messageId)
+					.complete()
+					.getContentRaw()
+					.split("\n");
 
-			// 0 - bingo start
-			// 1 - bingo end
-			// 2 - zoo early summer
-			// 3 - zoo early winter
-			// 4 - winter island open
-			// 5 - dark auction open
-			// 6 - new year celebration starts
-			// 7 - spooky fishing starts
-			// 8 - spooky event starts
-			// 9 - fishing festival start
-			// 10 - fallen star
+			ZonedDateTime nowDateTime = ZonedDateTime.now(ZoneId.of("America/New_York"));
+			Map<String, MessageEmbed> ebs = new HashMap<>();
+			ebs.putAll(getEventEmbeds(times, nowDateTime, 0));
+			ebs.putAll(getEventEmbeds(times, nowDateTime, 5));
 
-			Instant startOfBingo = now.withDayOfMonth(1).atStartOfDay(z).toInstant();
-			if (
-				startOfBingo.toEpochMilli() <= nowEpoch &&
-				nowEpoch <= startOfBingo.plusSeconds(60).toEpochMilli() &&
-				Long.parseLong(times[0]) < startOfBingo.toEpochMilli()
-			) {
-				// start < now < now + 1 min
-				sendMessage(
-					times,
-					0,
-					defaultEmbed("Bingo Start").setDescription("Bingo starts <t:" + startOfBingo.getEpochSecond() + ":R>").build()
-				);
-			} else if (nowEpoch > startOfBingo.plusSeconds(60).toEpochMilli() && Long.parseLong(times[0]) < startOfBingo.toEpochMilli()) {
-				// missed
-				sendMessage(
-					times,
-					0,
-					defaultEmbed("Bingo Start").setDescription("Bingo starts <t:" + startOfBingo.getEpochSecond() + ":R>").build()
-				);
-			}
-
-			Instant endOfBingo = now.withDayOfMonth(1).atStartOfDay(z).toInstant().plus(7, ChronoUnit.DAYS);
-			if (
-				endOfBingo.toEpochMilli() <= nowEpoch &&
-				nowEpoch <= endOfBingo.plusSeconds(60).toEpochMilli() &&
-				Long.parseLong(times[1]) < endOfBingo.toEpochMilli()
-			) {
-				// end < now < end + 1 min
-				sendMessage(
-					times,
-					1,
-					defaultEmbed("Bingo End").setDescription("Bingo ends <t:" + endOfBingo.getEpochSecond() + ":R>").build()
-				);
-			} else if (nowEpoch > endOfBingo.plusSeconds(60).toEpochMilli() && Long.parseLong(times[1]) < endOfBingo.toEpochMilli()) {
-				// missed
-				sendMessage(
-					times,
-					1,
-					defaultEmbed("Bingo End").setDescription("Bingo ends <t:" + endOfBingo.getEpochSecond() + ":R>").build()
-				);
-			}
-
-			Instant zooEarlySummer = Instant.ofEpochMilli(
-				CalendarCommand.YEAR_0 + (CalendarCommand.getSkyblockYear() - 1) * CalendarCommand.YEAR_MS + 3 * CalendarCommand.MONTH_MS
-			);
-			if (
-				zooEarlySummer.toEpochMilli() <= nowEpoch &&
-				nowEpoch <= zooEarlySummer.plusSeconds(60).toEpochMilli() &&
-				Long.parseLong(times[2]) < zooEarlySummer.toEpochMilli()
-			) {
-				// end < now < end + 1 min
-				sendMessage(
-					times,
-					2,
-					defaultEmbed("Traveling Zoo")
-						.setDescription("Traveling zoo opens <t:" + zooEarlySummer.getEpochSecond() + ":R>")
-						.build()
-				);
-			} else if (
-				nowEpoch > zooEarlySummer.plusSeconds(60).toEpochMilli() && Long.parseLong(times[2]) < zooEarlySummer.toEpochMilli()
-			) {
-				// missed
-				sendMessage(
-					times,
-					2,
-					defaultEmbed("Traveling Zoo")
-						.setDescription("Traveling zoo opens <t:" + zooEarlySummer.getEpochSecond() + ":R>")
-						.build()
-				);
-			}
-
-			Instant zooEarlyWinter = Instant.ofEpochMilli(
-				CalendarCommand.YEAR_0 + (CalendarCommand.getSkyblockYear() - 1) * CalendarCommand.YEAR_MS + 9 * CalendarCommand.MONTH_MS
-			);
-			if (
-				zooEarlyWinter.toEpochMilli() <= nowEpoch &&
-				nowEpoch <= zooEarlyWinter.plusSeconds(60).toEpochMilli() &&
-				Long.parseLong(times[3]) < zooEarlyWinter.toEpochMilli()
-			) {
-				// end < now < end + 1 min
-				sendMessage(
-					times,
-					3,
-					defaultEmbed("Traveling Zoo")
-						.setDescription("Traveling zoo opens <t:" + zooEarlyWinter.getEpochSecond() + ":R>")
-						.build()
-				);
-			} else if (
-				nowEpoch > zooEarlyWinter.plusSeconds(60).toEpochMilli() && Long.parseLong(times[3]) < zooEarlyWinter.toEpochMilli()
-			) {
-				// missed
-				sendMessage(
-					times,
-					3,
-					defaultEmbed("Traveling Zoo")
-						.setDescription("Traveling zoo opens <t:" + zooEarlyWinter.getEpochSecond() + ":R>")
-						.build()
-				);
-			}
-
-			Instant jerryIslandOpen = Instant.ofEpochMilli(
-				CalendarCommand.YEAR_0 + (CalendarCommand.getSkyblockYear() - 1) * CalendarCommand.YEAR_MS + 11 * CalendarCommand.MONTH_MS
-			);
-			if (
-				jerryIslandOpen.toEpochMilli() <= nowEpoch &&
-				nowEpoch <= jerryIslandOpen.plusSeconds(60).toEpochMilli() &&
-				Long.parseLong(times[4]) < jerryIslandOpen.toEpochMilli()
-			) {
-				// end < now < end + 1 min
-				sendMessage(
-					times,
-					4,
-					defaultEmbed("Winter Island")
-						.setDescription("Winter island opens <t:" + jerryIslandOpen.getEpochSecond() + ":R>")
-						.build()
-				);
-			} else if (
-				nowEpoch > jerryIslandOpen.plusSeconds(60).toEpochMilli() && Long.parseLong(times[4]) < jerryIslandOpen.toEpochMilli()
-			) {
-				// missed
-				sendMessage(
-					times,
-					4,
-					defaultEmbed("Winter Island")
-						.setDescription("Winter island opens <t:" + jerryIslandOpen.getEpochSecond() + ":R>")
-						.build()
-				);
-			}
-
-			Instant darkAuctionOpen = nowDateTime.withMinute(50).withSecond(0).toInstant();
-			if (
-				darkAuctionOpen.toEpochMilli() <= nowEpoch &&
-				nowEpoch <= darkAuctionOpen.plusSeconds(60).toEpochMilli() &&
-				Long.parseLong(times[5]) < darkAuctionOpen.toEpochMilli()
-			) {
-				// end < now < end + 1 min
-				sendMessage(
-					times,
-					5,
-					defaultEmbed("Dark Auction")
-						.setDescription("Dark auction opens <t:" + darkAuctionOpen.plus(5, ChronoUnit.MINUTES).getEpochSecond() + ":R>")
-						.build()
-				);
-			} else if (
-				nowEpoch > darkAuctionOpen.plusSeconds(60).toEpochMilli() && Long.parseLong(times[5]) < darkAuctionOpen.toEpochMilli()
-			) {
-				// missed
-				sendMessage(
-					times,
-					5,
-					defaultEmbed("Dark Auction")
-						.setDescription("Dark auction opens <t:" + darkAuctionOpen.plus(5, ChronoUnit.MINUTES).getEpochSecond() + ":R>")
-						.build()
-				);
-			}
-
-			Instant newYearEvent = Instant.ofEpochMilli(
-				CalendarCommand.YEAR_0 +
-				(CalendarCommand.getSkyblockYear() - 1) *
-				CalendarCommand.YEAR_MS +
-				11 *
-				CalendarCommand.MONTH_MS +
-				28 *
-				CalendarCommand.DAY_MS
-			);
-			if (
-				newYearEvent.toEpochMilli() <= nowEpoch &&
-				nowEpoch <= newYearEvent.plusSeconds(60).toEpochMilli() &&
-				Long.parseLong(times[6]) < newYearEvent.toEpochMilli()
-			) {
-				// end < now < end + 1 min
-				sendMessage(
-					times,
-					6,
-					defaultEmbed("New Year Celebration")
-						.setDescription("New year celebration starts <t:" + newYearEvent.getEpochSecond() + ":R>")
-						.build()
-				);
-			} else if (nowEpoch > newYearEvent.plusSeconds(60).toEpochMilli() && Long.parseLong(times[6]) < newYearEvent.toEpochMilli()) {
-				// missed
-				sendMessage(
-					times,
-					6,
-					defaultEmbed("New Year Celebration")
-						.setDescription("New year celebration starts <t:" + newYearEvent.getEpochSecond() + ":R>")
-						.build()
-				);
-			}
-
-			Instant spookyFishing = Instant
-				.ofEpochMilli(
-					CalendarCommand.YEAR_0 +
-					(CalendarCommand.getSkyblockYear() - 1) *
-					CalendarCommand.YEAR_MS +
-					7 *
-					CalendarCommand.MONTH_MS +
-					28 *
-					CalendarCommand.DAY_MS
-				)
-				.minus(1, ChronoUnit.HOURS);
-			if (
-				spookyFishing.toEpochMilli() <= nowEpoch &&
-				nowEpoch <= spookyFishing.plusSeconds(60).toEpochMilli() &&
-				Long.parseLong(times[7]) < spookyFishing.toEpochMilli()
-			) {
-				// end < now < end + 1 min
-				sendMessage(
-					times,
-					7,
-					defaultEmbed("Spooky Fishing")
-						.setDescription("Spooky fishing starts <t:" + spookyFishing.getEpochSecond() + ":R>")
-						.build()
-				);
-			} else if (nowEpoch > spookyFishing.plusSeconds(60).toEpochMilli() && Long.parseLong(times[7]) < spookyFishing.toEpochMilli()) {
-				// missed
-				sendMessage(
-					times,
-					7,
-					defaultEmbed("Spooky Fishing")
-						.setDescription("Spooky fishing starts <t:" + spookyFishing.getEpochSecond() + ":R>")
-						.build()
-				);
-			}
-
-			Instant spookyEvent = Instant.ofEpochMilli(
-				CalendarCommand.YEAR_0 +
-				(CalendarCommand.getSkyblockYear() - 1) *
-				CalendarCommand.YEAR_MS +
-				7 *
-				CalendarCommand.MONTH_MS +
-				28 *
-				CalendarCommand.DAY_MS
-			);
-			if (
-				spookyEvent.toEpochMilli() <= nowEpoch &&
-				nowEpoch <= spookyEvent.plusSeconds(60).toEpochMilli() &&
-				Long.parseLong(times[8]) < spookyEvent.toEpochMilli()
-			) {
-				// end < now < end + 1 min
-				sendMessage(
-					times,
-					8,
-					defaultEmbed("Spooky Festival")
-						.setDescription("Spooky festival starts <t:" + spookyEvent.getEpochSecond() + ":R>")
-						.build()
-				);
-			} else if (nowEpoch > spookyEvent.plusSeconds(60).toEpochMilli() && Long.parseLong(times[8]) < spookyEvent.toEpochMilli()) {
-				// missed
-				sendMessage(
-					times,
-					8,
-					defaultEmbed("Spooky Festival")
-						.setDescription("Spooky festival starts <t:" + spookyEvent.getEpochSecond() + ":R>")
-						.build()
-				);
-			}
-
-			if (currentMayor.equalsIgnoreCase("marina")) {
-				Instant fishingFestival = Instant.ofEpochMilli(
-					CalendarCommand.YEAR_0 +
-					(CalendarCommand.getSkyblockYear() - 1) *
-					CalendarCommand.YEAR_MS +
-					Math.floorDiv((nowEpoch - CalendarCommand.YEAR_0) % CalendarCommand.YEAR_MS, CalendarCommand.MONTH_MS) *
-					CalendarCommand.MONTH_MS
-				);
-				if (
-					fishingFestival.toEpochMilli() <= nowEpoch &&
-					nowEpoch <= fishingFestival.plusSeconds(60).toEpochMilli() &&
-					Long.parseLong(times[9]) < fishingFestival.toEpochMilli()
-				) {
-					// end < now < end + 1 min
-					sendMessage(
-						times,
-						9,
-						defaultEmbed("Fishing Festival")
-							.setDescription("Fishing festival starts <t:" + fishingFestival.getEpochSecond() + ":R>")
-							.build()
-					);
-				} else if (
-					nowEpoch > fishingFestival.plusSeconds(60).toEpochMilli() && Long.parseLong(times[9]) < fishingFestival.toEpochMilli()
-				) {
-					// missed
-					sendMessage(
-						times,
-						9,
-						defaultEmbed("Fishing Festival")
-							.setDescription("Fishing festival starts <t:" + fishingFestival.getEpochSecond() + ":R>")
-							.build()
-					);
+			if (!ebs.isEmpty()) {
+				for (AutomaticGuild guild : guildMap.values()) {
+					guild.onEventNotif(ebs);
 				}
-			}
 
-			long currentOffset = (nowEpoch - CalendarCommand.YEAR_0) % CalendarCommand.YEAR_MS;
-			int currentMonth = (int) Math.floorDiv(currentOffset, CalendarCommand.MONTH_MS);
-			int currentDay = (int) Math.floorDiv(
-				(currentOffset - (long) currentMonth * CalendarCommand.MONTH_MS) % CalendarCommand.MONTH_MS,
-				CalendarCommand.DAY_MS
-			);
-			int out = 7;
-			if (currentDay > 21) {
-				out = 28;
-			} else if (currentDay > 14) {
-				out = 21;
-			} else if (currentDay > 7) {
-				out = 14;
+				timesChannel
+						.editMessageById(messageId, String.join("\n", times))
+						.queue();
 			}
-			Instant fallenStar = Instant
-				.ofEpochMilli(
-					CalendarCommand.YEAR_0 +
-					(CalendarCommand.getSkyblockYear() - 1) *
-					CalendarCommand.YEAR_MS +
-					currentMonth *
-					CalendarCommand.MONTH_MS +
-					out *
-					CalendarCommand.DAY_MS
-				)
-				.minus(5, ChronoUnit.MINUTES);
-			if (
-				fallenStar.toEpochMilli() <= nowEpoch &&
-				nowEpoch <= fallenStar.plusSeconds(60).toEpochMilli() &&
-				Long.parseLong(times[10]) < fallenStar.toEpochMilli()
-			) {
-				// end < now < end + 1 min
-				sendMessage(
-					times,
-					10,
-					defaultEmbed("Cult Of Fallen Star")
-						.setDescription(
-							"Cult of fallen start arrives <t:" + fallenStar.plus(5, ChronoUnit.MINUTES).getEpochSecond() + ":R>"
-						)
-						.build()
-				);
-			} else if (nowEpoch > fallenStar.plusSeconds(60).toEpochMilli() && Long.parseLong(times[10]) < fallenStar.toEpochMilli()) {
-				// missed
-				sendMessage(
-					times,
-					10,
-					defaultEmbed("Cult Of Fallen Star")
-						.setDescription(
-							"Cult of fallen start arrives <t:" + fallenStar.plus(5, ChronoUnit.MINUTES).getEpochSecond() + ":R>"
-						)
-						.build()
-				);
-			}
-
-			jda
-				.getGuildById("796790757947867156")
-				.getTextChannelById("959829695686381658")
-				.editMessageById(messageId, String.join("\n", times))
-				.queue();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	public static void sendMessage(String[] times, int index, MessageEmbed embed) {
-		times[index] = "" + Instant.now().toEpochMilli();
-		jda.getGuildById("796790757947867156").getTextChannelById("959887837728223232").sendMessageEmbeds(embed).queue();
+	public static Map<String, MessageEmbed> getEventEmbeds(String[] times, ZonedDateTime nowDateTime, int timeBefore) {
+		// 0 - bingo start
+		// 1 - bingo end
+		// 2 - zoo early summer
+		// 3 - zoo early winter
+		// 4 - winter island open
+		// 5 - dark auction open
+		// 6 - new year celebration starts
+		// 7 - spooky fishing starts
+		// 8 - spooky event starts
+		// 9 - fishing festival start
+		// 10 - fallen star
+
+		nowDateTime = nowDateTime.plusMinutes(timeBefore);
+		int index = timeBefore == 0 ? 0 : times.length / 2;
+		Map<String, MessageEmbed> ebs = new HashMap<>();
+
+		long nowEpoch = nowDateTime.toInstant().toEpochMilli();
+		LocalDate now = nowDateTime.toLocalDate();
+		ZoneId z = nowDateTime.getZone();
+
+		Instant startOfBingo = now.withDayOfMonth(1).atStartOfDay(z).toInstant();
+		if (
+				startOfBingo.toEpochMilli() <= nowEpoch &&
+						nowEpoch <= startOfBingo.plusSeconds(60).toEpochMilli() &&
+						Long.parseLong(times[index]) < startOfBingo.toEpochMilli()
+		) {
+			times[index] = "" + nowEpoch;
+			ebs.put("bingo_start", defaultEmbed("Bingo Start").setDescription("Bingo starts <t:" + startOfBingo.getEpochSecond() + ":R>").build());
+		} else if (nowEpoch > startOfBingo.plusSeconds(60).toEpochMilli() && Long.parseLong(times[index]) < startOfBingo.toEpochMilli()) {
+			times[index] = "" + nowEpoch;
+			ebs.put("bingo_start",
+					defaultEmbed("Bingo Start").setDescription("Bingo starts <t:" + startOfBingo.getEpochSecond() + ":R>").build()
+			);
+		}
+
+		index++;
+		Instant endOfBingo = now.withDayOfMonth(1).atStartOfDay(z).toInstant().plus(7, ChronoUnit.DAYS);
+		if (
+				endOfBingo.toEpochMilli() <= nowEpoch &&
+						nowEpoch <= endOfBingo.plusSeconds(60).toEpochMilli() &&
+						Long.parseLong(times[index]) < endOfBingo.toEpochMilli()
+		) {
+			times[index] = "" + nowEpoch;
+			ebs.put("bingo_end", defaultEmbed("Bingo End").setDescription("Bingo ends <t:" + endOfBingo.getEpochSecond() + ":R>").build());
+		} else if (nowEpoch > endOfBingo.plusSeconds(60).toEpochMilli() && Long.parseLong(times[index]) < endOfBingo.toEpochMilli()) {
+			times[index] = "" + nowEpoch;
+			ebs.put("bingo_end",
+					defaultEmbed("Bingo End").setDescription("Bingo ends <t:" + endOfBingo.getEpochSecond() + ":R>").build()
+			);
+		}
+
+		index++;
+		String[] pets = new String[]{"LION;4", "MONKEY;4", "ELEPHANT;4", "GIRAFFE;4", "BLUE_WHALE;4", "TIGER;4"};
+		int zooIndex = 0;
+		if ((getSkyblockYear() - 2) % 3 == 0) {
+			zooIndex = 2;
+		} else if ((getSkyblockYear() - 3) % 3 == 0) {
+			zooIndex = 4;
+		}
+		Instant zooEarlySummer = Instant.ofEpochMilli(
+				CalendarCommand.YEAR_0 + (getSkyblockYear() - 1) * CalendarCommand.YEAR_MS + 3 * CalendarCommand.MONTH_MS
+		);
+		if (
+				zooEarlySummer.toEpochMilli() <= nowEpoch &&
+						nowEpoch <= zooEarlySummer.plusSeconds(60).toEpochMilli() &&
+						Long.parseLong(times[index]) < zooEarlySummer.toEpochMilli()
+		) {
+			times[index] = "" + nowEpoch;
+			ebs.put("zoo", defaultEmbed("Traveling Zoo")
+					.setDescription("Traveling zoo opens <t:" + zooEarlySummer.getEpochSecond() + ":R>\nLegendary pet: " + getEmoji(pets[zooIndex]) + " " + idToName(pets[zooIndex])).build()
+
+			);
+		} else if (
+				nowEpoch > zooEarlySummer.plusSeconds(60).toEpochMilli() && Long.parseLong(times[index]) < zooEarlySummer.toEpochMilli()
+		) {
+			times[index] = "" + nowEpoch;
+			ebs.put("zoo",
+					defaultEmbed("Traveling Zoo")
+							.setDescription("Traveling zoo opens <t:" + zooEarlySummer.getEpochSecond() + ":R>\nLegendary pet: " + getEmoji(pets[zooIndex]) + " " + idToName(pets[zooIndex])).build()
+
+			);
+		}
+
+		index++;
+		Instant zooEarlyWinter = Instant.ofEpochMilli(
+				CalendarCommand.YEAR_0 + (getSkyblockYear() - 1) * CalendarCommand.YEAR_MS + 9 * CalendarCommand.MONTH_MS
+		);
+		if (
+				zooEarlyWinter.toEpochMilli() <= nowEpoch &&
+						nowEpoch <= zooEarlyWinter.plusSeconds(60).toEpochMilli() &&
+						Long.parseLong(times[index]) < zooEarlyWinter.toEpochMilli()
+		) {
+			times[index] = "" + nowEpoch;
+			ebs.put("zoo",
+					defaultEmbed("Traveling Zoo")
+							.setDescription("Traveling zoo opens <t:" + zooEarlyWinter.getEpochSecond() + ":R>\nLegendary pet: " + getEmoji(pets[zooIndex + 1]) + " " + idToName(pets[zooIndex + 1])).build()
+			);
+		} else if (
+				nowEpoch > zooEarlyWinter.plusSeconds(60).toEpochMilli() && Long.parseLong(times[index]) < zooEarlyWinter.toEpochMilli()
+		) {
+			times[index] = "" + nowEpoch;
+			ebs.put("zoo",
+					defaultEmbed("Traveling Zoo")
+							.setDescription("Traveling zoo opens <t:" + zooEarlyWinter.getEpochSecond() + ":R>\nLegendary pet: " + getEmoji(pets[zooIndex + 1]) + " " + idToName(pets[zooIndex + 1]))
+							.build()
+			);
+		}
+
+		index++;
+		Instant jerryIslandOpen = Instant.ofEpochMilli(
+				CalendarCommand.YEAR_0 + (getSkyblockYear() - 1) * CalendarCommand.YEAR_MS + 11 * CalendarCommand.MONTH_MS
+		);
+		if (
+				jerryIslandOpen.toEpochMilli() <= nowEpoch &&
+						nowEpoch <= jerryIslandOpen.plusSeconds(60).toEpochMilli() &&
+						Long.parseLong(times[index]) < jerryIslandOpen.toEpochMilli()
+		) {
+			times[index] = "" + nowEpoch;
+			ebs.put("winter_island",
+					defaultEmbed("Winter Island")
+							.setDescription("Winter island opens <t:" + jerryIslandOpen.getEpochSecond() + ":R>").build()
+			);
+		} else if (
+				nowEpoch > jerryIslandOpen.plusSeconds(60).toEpochMilli() && Long.parseLong(times[index]) < jerryIslandOpen.toEpochMilli()
+		) {
+			times[index] = "" + nowEpoch;
+			ebs.put("winter_island",
+					defaultEmbed("Winter Island")
+							.setDescription("Winter island opens <t:" + jerryIslandOpen.getEpochSecond() + ":R>").build()
+			);
+		}
+
+		index++;
+		Instant darkAuctionOpen = nowDateTime.withMinute(55).withSecond(0).toInstant();
+		if (
+				darkAuctionOpen.toEpochMilli() <= nowEpoch &&
+						nowEpoch <= darkAuctionOpen.plusSeconds(60).toEpochMilli() &&
+						Long.parseLong(times[index]) < darkAuctionOpen.toEpochMilli()
+		) {
+			times[index] = "" + nowEpoch;
+			ebs.put("dark_auction",
+					defaultEmbed("Dark Auction")
+							.setDescription("Dark auction opens <t:" + darkAuctionOpen.getEpochSecond() + ":R>").build()
+			);
+		} else if (
+				nowEpoch > darkAuctionOpen.plusSeconds(60).toEpochMilli() && Long.parseLong(times[index]) < darkAuctionOpen.toEpochMilli()
+		) {
+			times[index] = "" + nowEpoch;
+			ebs.put("dark_auction",
+					defaultEmbed("Dark Auction")
+							.setDescription("Dark auction opens <t:" + darkAuctionOpen.getEpochSecond() + ":R>").build()
+			);
+		}
+
+		index++;
+		Instant newYearEvent = Instant.ofEpochMilli(
+				CalendarCommand.YEAR_0 +
+						(getSkyblockYear() - 1) *
+								CalendarCommand.YEAR_MS +
+						11 *
+								CalendarCommand.MONTH_MS +
+						28 *
+								CalendarCommand.DAY_MS
+		);
+		if (
+				newYearEvent.toEpochMilli() <= nowEpoch &&
+						nowEpoch <= newYearEvent.plusSeconds(60).toEpochMilli() &&
+						Long.parseLong(times[index]) < newYearEvent.toEpochMilli()
+		) {
+			times[index] = "" + nowEpoch;
+			ebs.put("new_year",
+					defaultEmbed("New Year Celebration")
+							.setDescription("New year celebration starts <t:" + newYearEvent.getEpochSecond() + ":R>").build()
+			);
+		} else if (nowEpoch > newYearEvent.plusSeconds(60).toEpochMilli() && Long.parseLong(times[index]) < newYearEvent.toEpochMilli()) {
+			times[index] = "" + nowEpoch;
+			ebs.put("new_year",
+					defaultEmbed("New Year Celebration")
+							.setDescription("New year celebration starts <t:" + newYearEvent.getEpochSecond() + ":R>").build()
+			);
+		}
+
+		index++;
+		Instant spookyFishing = Instant
+				.ofEpochMilli(
+						CalendarCommand.YEAR_0 +
+								(getSkyblockYear() - 1) *
+										CalendarCommand.YEAR_MS +
+								7 *
+										CalendarCommand.MONTH_MS +
+								28 *
+										CalendarCommand.DAY_MS
+				)
+				.minus(1, ChronoUnit.HOURS);
+		if (
+				spookyFishing.toEpochMilli() <= nowEpoch &&
+						nowEpoch <= spookyFishing.plusSeconds(60).toEpochMilli() &&
+						Long.parseLong(times[index]) < spookyFishing.toEpochMilli()
+		) {
+			times[index] = "" + nowEpoch;
+			ebs.put("spooky_fishing",
+					defaultEmbed("Spooky Fishing")
+							.setDescription("Spooky fishing starts <t:" + spookyFishing.getEpochSecond() + ":R>").build()
+			);
+		} else if (nowEpoch > spookyFishing.plusSeconds(60).toEpochMilli() && Long.parseLong(times[index]) < spookyFishing.toEpochMilli()) {
+			times[index] = "" + nowEpoch;
+			ebs.put("spooky_fishing",
+					defaultEmbed("Spooky Fishing")
+							.setDescription("Spooky fishing starts <t:" + spookyFishing.getEpochSecond() + ":R>").build()
+			);
+		}
+
+		index++;
+		Instant spookyEvent = Instant.ofEpochMilli(
+				CalendarCommand.YEAR_0 +
+						(getSkyblockYear() - 1) *
+								CalendarCommand.YEAR_MS +
+						7 *
+								CalendarCommand.MONTH_MS +
+						28 *
+								CalendarCommand.DAY_MS
+		);
+		if (
+				spookyEvent.toEpochMilli() <= nowEpoch &&
+						nowEpoch <= spookyEvent.plusSeconds(60).toEpochMilli() &&
+						Long.parseLong(times[index]) < spookyEvent.toEpochMilli()
+		) {
+			times[index] = "" + nowEpoch;
+			ebs.put("spooky",
+					defaultEmbed("Spooky Festival")
+							.setDescription("Spooky festival starts <t:" + spookyEvent.getEpochSecond() + ":R>").build()
+			);
+		} else if (nowEpoch > spookyEvent.plusSeconds(60).toEpochMilli() && Long.parseLong(times[index]) < spookyEvent.toEpochMilli()) {
+			times[index] = "" + nowEpoch;
+			ebs.put("spooky",
+					defaultEmbed("Spooky Festival")
+							.setDescription("Spooky festival starts <t:" + spookyEvent.getEpochSecond() + ":R>").build()
+			);
+		}
+
+		index++;
+		if (currentMayor.equalsIgnoreCase("marina")) {
+			Instant fishingFestival = Instant.ofEpochMilli(
+					CalendarCommand.YEAR_0 +
+							(getSkyblockYear() - 1) *
+									CalendarCommand.YEAR_MS +
+							Math.floorDiv((nowEpoch - CalendarCommand.YEAR_0) % CalendarCommand.YEAR_MS, CalendarCommand.MONTH_MS) *
+									CalendarCommand.MONTH_MS
+			);
+			if (
+					fishingFestival.toEpochMilli() <= nowEpoch &&
+							nowEpoch <= fishingFestival.plusSeconds(60).toEpochMilli() &&
+							Long.parseLong(times[index]) < fishingFestival.toEpochMilli()
+			) {
+				times[index] = "" + nowEpoch;
+				ebs.put("fishing_festival",
+						defaultEmbed("Fishing Festival")
+								.setDescription("Fishing festival starts <t:" + fishingFestival.getEpochSecond() + ":R>").build()
+				);
+			} else if (
+					nowEpoch > fishingFestival.plusSeconds(60).toEpochMilli() && Long.parseLong(times[index]) < fishingFestival.toEpochMilli()
+			) {
+				times[index] = "" + nowEpoch;
+				ebs.put("fishing_festival",
+						defaultEmbed("Fishing Festival")
+								.setDescription("Fishing festival starts <t:" + fishingFestival.getEpochSecond() + ":R>").build()
+				);
+			}
+		}
+
+		index++;
+		long currentOffset = (nowEpoch - CalendarCommand.YEAR_0) % CalendarCommand.YEAR_MS;
+		int currentMonth = (int) Math.floorDiv(currentOffset, CalendarCommand.MONTH_MS);
+		int currentDay = (int) Math.floorDiv(
+				(currentOffset - (long) currentMonth * CalendarCommand.MONTH_MS) % CalendarCommand.MONTH_MS,
+				CalendarCommand.DAY_MS
+		);
+		int out = 7;
+		if (currentDay > 21) {
+			out = 28;
+		} else if (currentDay > 14) {
+			out = 21;
+		} else if (currentDay > 7) {
+			out = 14;
+		}
+		Instant fallenStar = Instant
+				.ofEpochMilli(
+						CalendarCommand.YEAR_0 +
+								(getSkyblockYear() - 1) *
+										CalendarCommand.YEAR_MS +
+								currentMonth *
+										CalendarCommand.MONTH_MS +
+								out *
+										CalendarCommand.DAY_MS
+				);
+		if (
+				fallenStar.toEpochMilli() <= nowEpoch &&
+						nowEpoch <= fallenStar.plusSeconds(60).toEpochMilli() &&
+						Long.parseLong(times[index]) < fallenStar.toEpochMilli()
+		) {
+			times[index] = "" + nowEpoch;
+			ebs.put("fallen_start",
+					defaultEmbed("Cult Of Fallen Star")
+							.setDescription(
+									"Cult of fallen start arrives <t:" + fallenStar.getEpochSecond() + ":R>"
+							).build()
+			);
+		} else if (nowEpoch > fallenStar.plusSeconds(60).toEpochMilli() && Long.parseLong(times[index]) < fallenStar.toEpochMilli()) {
+			times[index] = "" + nowEpoch;
+			ebs.put("fallen_start",
+					defaultEmbed("Cult Of Fallen Star")
+							.setDescription(
+									"Cult of fallen start arrives <t:" + fallenStar.getEpochSecond() + ":R>"
+							).build()
+			);
+		}
+
+		return ebs;
 	}
 }

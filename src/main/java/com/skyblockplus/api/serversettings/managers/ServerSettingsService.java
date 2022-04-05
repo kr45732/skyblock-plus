@@ -26,6 +26,7 @@ import com.skyblockplus.api.serversettings.automatedroles.AutomatedRoles;
 import com.skyblockplus.api.serversettings.automatedroles.RoleModel;
 import com.skyblockplus.api.serversettings.automatedverify.AutomatedVerify;
 import com.skyblockplus.api.serversettings.blacklist.Blacklist;
+import com.skyblockplus.api.serversettings.eventnotif.EventNotifSettings;
 import com.skyblockplus.api.serversettings.jacob.JacobSettings;
 import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
@@ -567,6 +568,18 @@ public class ServerSettingsService {
 
 		if (currentServerSettings != null) {
 			currentServerSettings.setJacobSettings(newSettings);
+			settingsRepository.save(currentServerSettings);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	}
+
+	public ResponseEntity<HttpStatus> setEventSettings(String serverId, EventNotifSettings newSettings) {
+		ServerSettingsModel currentServerSettings = settingsRepository.findServerByServerId(serverId);
+
+		if (currentServerSettings != null) {
+			currentServerSettings.setEventNotif(newSettings);
 			settingsRepository.save(currentServerSettings);
 			return new ResponseEntity<>(HttpStatus.OK);
 		}

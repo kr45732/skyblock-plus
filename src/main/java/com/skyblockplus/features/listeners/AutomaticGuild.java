@@ -37,6 +37,7 @@ import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
 import com.skyblockplus.dungeons.CalcRunsCommand;
 import com.skyblockplus.features.apply.ApplyGuild;
 import com.skyblockplus.features.apply.ApplyUser;
+import com.skyblockplus.features.event.EventGuild;
 import com.skyblockplus.features.jacob.JacobGuild;
 import com.skyblockplus.features.party.Party;
 import com.skyblockplus.features.setup.SetupCommandHandler;
@@ -107,6 +108,8 @@ public class AutomaticGuild {
 	public SkyblockEventHandler skyblockEventHandler = null;
 	public List<EventMember> eventMemberList = new ArrayList<>();
 	public Instant eventMemberListLastUpdated = null;
+	/* Event */
+	public EventGuild eventGuild;
 	/* Fetchur */
 	public TextChannel fetchurChannel = null;
 	public Role fetchurPing = null;
@@ -139,6 +142,7 @@ public class AutomaticGuild {
 		prefix = higherDepth(serverSettings, "prefix", "");
 		prefix = (!prefix.isEmpty() && prefix.length() <= 5) ? prefix : DEFAULT_PREFIX;
 		jacobGuild = new JacobGuild(guildId, higherDepth(serverSettings, "jacobSettings"));
+		eventGuild = new EventGuild(guildId, higherDepth(serverSettings, "eventNotif"));
 		try {
 			blacklist = higherDepth(serverSettings, "blacklist.blacklist").getAsJsonArray();
 			setIsUsing(higherDepth(blacklist, "isUsing").getAsJsonArray());
@@ -1327,4 +1331,8 @@ public class AutomaticGuild {
 		}
 		return currentBlacklist;
 	}
+
+    public void onEventNotif (Map<String, MessageEmbed> ebs) {
+		eventGuild.onEventNotif( ebs);
+    }
 }

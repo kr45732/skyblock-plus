@@ -22,6 +22,7 @@ import com.skyblockplus.api.serversettings.automatedguild.AutomatedGuild;
 import com.skyblockplus.api.serversettings.automatedroles.AutomatedRoles;
 import com.skyblockplus.api.serversettings.automatedverify.AutomatedVerify;
 import com.skyblockplus.api.serversettings.blacklist.Blacklist;
+import com.skyblockplus.api.serversettings.eventnotif.EventNotifSettings;
 import com.skyblockplus.api.serversettings.jacob.JacobSettings;
 import com.skyblockplus.api.serversettings.skyblockevent.EventSettings;
 import java.util.ArrayList;
@@ -91,6 +92,9 @@ public class ServerSettingsModel {
 
 	private String logChannel = "";
 
+	@Embedded
+	private EventNotifSettings eventNotif = new EventNotifSettings();
+
 	public ServerSettingsModel(String serverName, String serverId) {
 		this.serverName = serverName;
 		this.serverId = serverId;
@@ -123,6 +127,7 @@ public class ServerSettingsModel {
 		copy.setBotManagerRoles(botManagerRoles);
 		copy.setChannelBlacklist(channelBlacklist);
 		copy.setLogChannel(logChannel);
+		copy.setEventNotif(eventNotif);
 		return copy;
 	}
 }
