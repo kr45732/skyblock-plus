@@ -167,7 +167,7 @@ public class SettingsExecute {
 			eb =
 				defaultSettingsEmbed()
 					.addField("General Settings", "Use `/settings general` to see the current settings", false)
-						.addField("Event Settings", "Use `/settings event` to see the current settings", false)
+					.addField("Event Settings", "Use `/settings event` to see the current settings", false)
 					.addField("Blacklist Settings", "Use `/settings blacklist` to see the current settings", false)
 					.addField("Jacob Settings", "Use `/settings jacob` to see the current settings", false)
 					.addField("Verify Settings", "Use `/settings verify` to see the current settings", false)
@@ -224,18 +224,18 @@ public class SettingsExecute {
 			} else if (content.split("\\s+", 4).length == 4) {
 				args = content.split("\\s+", 4);
 				eb =
-						switch (args[2]) {
-							case "add" -> addJacobCrop(args[3]);
-							case "remove" -> removeJacobCrop(args[3]);
-							case "channel" -> setJacobChannel(args[3]);
-							default -> null;
-						};
+					switch (args[2]) {
+						case "add" -> addJacobCrop(args[3]);
+						case "remove" -> removeJacobCrop(args[3]);
+						case "channel" -> setJacobChannel(args[3]);
+						default -> null;
+					};
 			}
 
 			if (eb == null) {
 				eb = errorEmbed("settings jacob");
 			}
-		}else if (args.length >= 2 && args[1].equals("event")) {
+		} else if (args.length >= 2 && args[1].equals("event")) {
 			if (args.length == 2) {
 				eb = displayEventSettings(higherDepth(currentSettings, "eventNotif"));
 			} else if (args.length == 3) {
@@ -247,13 +247,13 @@ public class SettingsExecute {
 			} else if (content.split("\\s+", 4).length == 4) {
 				args = content.split("\\s+", 4);
 				eb =
-						switch (args[2]) {
-							case "add" -> addEvent(args[3]);
-							case "remove" -> removeEvent(args[3]);
-							case "channel" -> setEventChannel(args[3]);
-							case "ping" -> setEventPing(args[3]);
-							default -> null;
-						};
+					switch (args[2]) {
+						case "add" -> addEvent(args[3]);
+						case "remove" -> removeEvent(args[3]);
+						case "channel" -> setEventChannel(args[3]);
+						case "ping" -> setEventPing(args[3]);
+						default -> null;
+					};
 			}
 
 			if (eb == null) {
@@ -688,7 +688,7 @@ public class SettingsExecute {
 	public EmbedBuilder setEventPing(String roleMention) {
 		JsonObject eventSettings = getEventSettings();
 
-		if (roleMention.equalsIgnoreCase("none")){
+		if (roleMention.equalsIgnoreCase("none")) {
 			eventSettings.addProperty("role", "none");
 			int responseCode = database.setEventSettings(guild.getId(), eventSettings);
 			if (responseCode != 200) {
@@ -718,16 +718,16 @@ public class SettingsExecute {
 	public EmbedBuilder addEvent(String event) {
 		event = event.toLowerCase();
 		List<String> validEvents = Arrays.asList(
-				"bingo_start",
-				"bingo_end",
-				"zoo",
-				"winter_island",
-				"dark_auction",
-				"new_year",
-				"spooky_fishing",
-				"spooky",
-				"fishing_festival",
-				"fallen_star"
+			"bingo_start",
+			"bingo_end",
+			"zoo",
+			"winter_island",
+			"dark_auction",
+			"new_year",
+			"spooky_fishing",
+			"spooky",
+			"fishing_festival",
+			"fallen_star"
 		);
 		if (event.equalsIgnoreCase("all")) {
 			for (String validCrop : validEvents) {
@@ -2812,7 +2812,9 @@ public class SettingsExecute {
 					return "\n\u200B \u200B  " + String.join("\n\u200B \u200B  ", ebStr);
 				}
 				case "events" -> {
-					String events = streamJsonArray(higherDepth(jsonSettings, settingName).getAsJsonArray()).map(JsonElement::getAsString).collect(Collectors.joining(", "));
+					String events = streamJsonArray(higherDepth(jsonSettings, settingName).getAsJsonArray())
+						.map(JsonElement::getAsString)
+						.collect(Collectors.joining(", "));
 					return events.isEmpty() ? "none" : events;
 				}
 			}

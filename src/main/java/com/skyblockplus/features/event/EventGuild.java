@@ -18,58 +18,66 @@
 
 package com.skyblockplus.features.event;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonElement;
 import com.skyblockplus.features.listeners.AutomaticGuild;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import static com.skyblockplus.utils.Utils.*;
-
 public class EventGuild {
-    public final String guildId;
-    public boolean enable = false;
-    public List<String> wantedEvents;
-    public TextChannel channel;
-    public Role role;
 
-    public EventGuild(String guildId, JsonElement jacobSettings) {
-        this.guildId = guildId;
-        reloadSettingsJson(jacobSettings);
-    }
+	public final String guildId;
+	public boolean enable = false;
+	public List<String> wantedEvents;
+	public TextChannel channel;
+	public Role role;
 
-    public void onEventNotif(Map<String, MessageEmbed> embeds) {
-        try {
-            if (enable) {
-                List<MessageEmbed> filteredEmbeds = embeds.entrySet().stream().filter(e -> wantedEvents.contains(e.getKey())).map(Map.Entry::getValue).collect(Collectors.toList());
+	public EventGuild(String guildId, JsonElement jacobSettings) {
+		this.guildId = guildId;
+		reloadSettingsJson(jacobSettings);
+	}
 
-                if (!filteredEmbeds.isEmpty()) {
-                    if(role != null){
-                        channel.sendMessage(role.getAsMention()).setEmbeds(filteredEmbeds).queue();
-                    }else {
-                        channel.sendMessageEmbeds(filteredEmbeds).queue();
-                    }
-                }
-            }
-        } catch (Exception e) {
-            AutomaticGuild.getLogger().error(guildId, e);
-        }
-    }
+	public void onEventNotif(Map<String, MessageEmbed> embeds) {
+		try {
+			if (enable) {
+				List<MessageEmbed> filteredEmbeds = embeds
+					.entrySet()
+					.stream()
+					.filter(e -> wantedEvents.contains(e.getKey()))
+					.map(Map.Entry::getValue)
+					.collect(Collectors.toList());
 
-    public void reloadSettingsJson(JsonElement eventSettings) {
-        try {
-            enable = higherDepth(eventSettings, "enable", false);
-            if (enable) {
-                channel = jda.getGuildById(guildId).getTextChannelById(higherDepth(eventSettings, "channel").getAsString());
-                role = jda.getGuildById(guildId).getRoleById(higherDepth(eventSettings, "role").getAsString());
-                wantedEvents = streamJsonArray(higherDepth(eventSettings, "events").getAsJsonArray()).map(JsonElement::getAsString).collect(Collectors.toList());
-            }
-        } catch (Exception e) {
-            AutomaticGuild.getLogger().error(guildId, e);
-        }
-    }
+				if (!filteredEmbeds.isEmpty()) {
+					if (role != null) {
+						channel.sendMessage(role.getAsMention()).setEmbeds(filteredEmbeds).queue();
+					} else {
+						channel.sendMessageEmbeds(filteredEmbeds).queue();
+					}
+				}
+			}
+		} catch (Exception e) {
+			AutomaticGuild.getLogger().error(guildId, e);
+		}
+	}
+
+	public void reloadSettingsJson(JsonElement eventSettings) {
+		try {
+			enable = higherDepth(eventSettings, "enable", false);
+			if (enable) {
+				channel = jda.getGuildById(guildId).getTextChannelById(higherDepth(eventSettings, "channel").getAsString());
+				role = jda.getGuildById(guildId).getRoleById(higherDepth(eventSettings, "role").getAsString());
+				wantedEvents =
+					streamJsonArray(higherDepth(eventSettings, "events").getAsJsonArray())
+						.map(JsonElement::getAsString)
+						.collect(Collectors.toList());
+			}
+		} catch (Exception e) {
+			AutomaticGuild.getLogger().error(guildId, e);
+		}
+	}
 }

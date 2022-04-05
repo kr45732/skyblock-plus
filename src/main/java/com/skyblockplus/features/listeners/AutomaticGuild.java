@@ -1332,7 +1332,7 @@ public class AutomaticGuild {
 		return currentBlacklist;
 	}
 
-    public void onEventNotif (Map<String, MessageEmbed> ebs) {
-		eventGuild.onEventNotif( ebs);
-    }
+	public void onEventNotif(Map<String, MessageEmbed> ebs) {
+		eventGuild.onEventNotif(ebs);
+	}
 }
