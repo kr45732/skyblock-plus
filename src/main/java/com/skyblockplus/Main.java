@@ -51,6 +51,8 @@ import com.skyblockplus.inventory.*;
 import com.skyblockplus.miscellaneous.*;
 import com.skyblockplus.miscellaneous.networth.NetworthCommand;
 import com.skyblockplus.miscellaneous.networth.NetworthSlashCommand;
+import com.skyblockplus.miscellaneous.weight.CalcWeightCommand;
+import com.skyblockplus.miscellaneous.weight.CalcWeightSlashCommand;
 import com.skyblockplus.miscellaneous.weight.WeightCommand;
 import com.skyblockplus.miscellaneous.weight.WeightSlashCommand;
 import com.skyblockplus.price.*;
@@ -193,7 +195,7 @@ public class Main {
 					new CoinsPerBitCommand(),
 					new ReforgeStoneCommand(),
 					new CheckGuildApiCommand(),
-					new CalendarCommand()
+					new CalendarCommand(), new CalcWeightCommand()
 				)
 				.build();
 
@@ -266,7 +268,7 @@ public class Main {
 					new CoinsPerBitSlashCommand(),
 					new ReforgeStoneSlashCommand(),
 					new CheckGuildApiSlashCommand(),
-					new CalendarSlashCommand()
+					new CalendarSlashCommand(), new CalcWeightSlashCommand()
 				);
 
 		allServerSettings =

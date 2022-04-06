@@ -18,39 +18,56 @@
 
 package com.skyblockplus.miscellaneous.weight;
 
-import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
-public class WeightSlashCommand extends SlashCommand {
+public class CalcWeightSlashCommand extends SlashCommand {
 
-	public WeightSlashCommand() {
-		this.name = "weight";
+	public CalcWeightSlashCommand() {
+		this.name = "calcweight";
 	}
 
 	@Override
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
-		if (event.invalidPlayerOption()) {
-			return;
-		}
-
-		event.paginate(
-				WeightCommand.getPlayerWeight(event.player, event.getOptionStr("profile"), new PaginatorEvent(event))
-			);
+		event.embed(
+				CalcWeightCommand.calculateWeight(
+						event.player,
+						event.getOptionStr("profile"),
+						event.getOptionStr("type"),
+						event.getOptionInt("amount", 0)
+				));
 	}
 
 	@Override
 	public CommandData getCommandData() {
 		return Commands
-			.slash(name, "Get a player's weight")
-					.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-					.addOption(OptionType.STRING, "profile", "Profile name");
+				.slash(name, "Calculate predicted weight change for a reaching certain skill/slayer/catacombs amount")
+				.addOptions(
+						new OptionData(OptionType.STRING, "type", "Skill, slayer, or dungeon type to see change of", true)
+								.addChoice("Sven", "sven")
+								.addChoice("Revenant", "rev")
+								.addChoice("Tarantula", "tara")
+								.addChoice("Enderman", "enderman")
+								.addChoice("Alchemy", "alchemy")
+								.addChoice("Combat", "combat")
+								.addChoice("Farming", "farming")
+								.addChoice("Mining", "mining")
+								.addChoice("Fishing", "fishing")
+								.addChoice("Taming", "taming")
+								.addChoice("Enchanting", "enchanting")
+								.addChoice("Foraging", "foraging")
+								.addChoice("Catacombs", "catacombs"),
+						new OptionData(OptionType.INTEGER, "amount", "Target xp (slayers) or level", true).setRequiredRange(0, 500000000)
+				)
+				.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+				.addOption(OptionType.STRING, "profile", "Profile name");
 	}
 
 	@Override

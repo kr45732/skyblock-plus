@@ -18,8 +18,7 @@
 
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.features.event.CalendarCommand.YEAR_0;
-import static com.skyblockplus.features.event.CalendarCommand.getSkyblockYear;
+import static com.skyblockplus.features.event.CalendarCommand.*;
 import static com.skyblockplus.features.mayor.MayorHandler.mayorNameToEmoji;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -55,7 +54,7 @@ public class MayorCommand extends Command {
 		long newYearToElectionOpen = 217200000;
 		long newYearToElectionClose = 105600000;
 		int year = getSkyblockYear();
-		int nextSpecial = (year + 8) - (year % 8);
+		int nextSpecial = year % 8 == 0 ? year : ((year + 8) - (year % 8));
 
 		String[] mayorNames = new String[] { "Scorpius", "Derpy", "Jerry" };
 		EmbedBuilder eb = defaultEmbed("Special Mayors");
@@ -68,10 +67,10 @@ public class MayorCommand extends Command {
 			}
 			eb.addField(
 				mayorNameToEmoji.get(mayorNames[mayorIndex].toUpperCase()) + " " + mayorNames[mayorIndex],
-				"Opens: <t:" +
-				Instant.ofEpochMilli((YEAR_0 + 446400000L * (i - 1)) + newYearToElectionOpen).getEpochSecond() +
-				":R>\nCloses: <t:" +
-				Instant.ofEpochMilli((YEAR_0 + 446400000L * (i)) + newYearToElectionClose).getEpochSecond() +
+				"Election Opens: <t:" +
+				Instant.ofEpochMilli((YEAR_0 + YEAR_MS * (i - 1)) + newYearToElectionOpen).getEpochSecond() +
+				":R>\nElection Closes: <t:" +
+				Instant.ofEpochMilli((YEAR_0 + YEAR_MS * (i)) + newYearToElectionClose).getEpochSecond() +
 				":R>",
 				false
 			);

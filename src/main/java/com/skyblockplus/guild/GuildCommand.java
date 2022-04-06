@@ -337,40 +337,45 @@ public class GuildCommand extends Command {
 			protected void execute() {
 				logCommand();
 
-				if (args.length >= 3 && (args[1].equals("experience") || args[1].equals("exp"))) {
+				if (args.length >= 2 && (args[1].equals("experience") || args[1].equals("exp"))) {
 					int days = getIntOption("days", 7);
 
 					setArgs(3);
-					if (args[2].startsWith("u:")) {
-						paginate(getGuildExpFromPlayer(args[2].split("u:")[1], days, new PaginatorEvent(event)));
-						return;
-					} else if (args[2].startsWith("g:")) {
+					if (args.length >= 3 && args[2].startsWith("g:")) {
 						paginate(getGuildExpFromName(args[2].split("g:")[1], days, new PaginatorEvent(event)));
-						return;
+					} else {
+						if (getMentionedUsername(args.length == 2 ? -1 : 3)) {
+							return;
+						}
+
+						paginate(getGuildExpFromPlayer(player, days, new PaginatorEvent(event)));
 					}
 				} else if (args.length >= 3 && "members".equals(args[1])) {
 					setArgs(3);
 
-					if (args[2].startsWith("u:")) {
-						paginate(getGuildMembersFromPlayer(args[2].split("u:")[1], new PaginatorEvent(event)));
-						return;
-					} else if (args[2].startsWith("g:")) {
+					if (args.length >= 3 && args[2].startsWith("g:")) {
 						paginate(getGuildMembersFromName(args[2].split("g:")[1], new PaginatorEvent(event)));
-						return;
+
+					}else {
+						if (getMentionedUsername(args.length == 2 ? -1 : 3)) {
+							return;
+						}
+
+						paginate(getGuildMembersFromPlayer(player, new PaginatorEvent(event)));
 					}
-				} else if (args.length >= 2) {
+				} else {
 					setArgs(2);
 
-					if (args[1].startsWith("u:")) {
-						embed(getGuildInfoFromPlayer(args[1].split(":")[1]));
-						return;
-					} else if (args[1].startsWith("g:")) {
+					if (args.length >= 3 && args[1].startsWith("g:")) {
 						embed(getGuildInfoFromName(args[1].split(":")[1]));
-						return;
+					} else {
+						if (getMentionedUsername(args.length == 2 ? -1 : 3)) {
+							return;
+						}
+
+						embed(getGuildInfoFromPlayer(player));
 					}
 				}
-
-				sendErrorEmbed();
 			}
 		}
 			.queue();

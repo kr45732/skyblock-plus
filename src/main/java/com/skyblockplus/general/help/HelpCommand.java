@@ -149,24 +149,24 @@ public class HelpCommand extends Command {
 				new HelpData("guild", "Main guild command")
 					.addSecondData("Find what guild a player is in.", "guild <player>")
 					.addSubcommands(
-						new HelpData("information", "Get information and statistics about a player's guild.", "information <u:player>")
+						new HelpData("information", "Get information and statistics about a player's guild.", "information <player>")
 							.addSecondData("Get information and statistics about a guild.", "information <g:guild_name>")
 							.addAliases("info")
-							.addExamples("information u:CrypticPlasma", "information g:Skyblock_Forceful"),
-						new HelpData("members", "Get a list of all members in a player's guild.", "members <u:player>")
+							.addExamples("information CrypticPlasma", "information g:Skyblock_Forceful"),
+						new HelpData("members", "Get a list of all members in a player's guild.", "members <player>")
 							.addSecondData("Get a list of all members in a guild.", "members <g:guild_name>")
-							.addExamples("members u:CrypticPlasma", "members g:Skyblock_Forceful"),
+							.addExamples("members CrypticPlasma", "members g:Skyblock_Forceful"),
 						new HelpData(
 							"experience",
 							"Get the experience leaderboard for a player's guild. Days can range from 1 to 7, default number of days is 7.",
-							"experience <u:player> [days:days]"
+							"experience <player> [days:days]"
 						)
 							.addAliases("exp")
 							.addSecondData(
 								"Get the experience leaderboard for a guild. Days can range from 1 to 7, default number of days is 7.",
 								"experience <g:guild_name> [days:days]"
 							)
-							.addExamples("experience u:CrypticPlasma", "experience g:Skyblock_Forceful days:4")
+							.addExamples("experience CrypticPlasma", "experience g:Skyblock_Forceful days:4")
 					)
 					.addAliases("g")
 					.setCategory("guild"),
@@ -338,16 +338,20 @@ public class HelpCommand extends Command {
 					"Get a player's slayer, skills, dungeons, and total weight. Shows both senither and lily weight.",
 					"weight [player] [profile]"
 				)
-					.addSecondData(
-						"Calculate predicted weight change for a reaching certain skill, slayer, or catacombs level/amount.",
-						"weight calculate [player] [profile] <type:type> <amount:amount>"
-					)
 					.addExamples(
 						"weight CrypticPlasma",
-						"weight CrypticPlasma Zucchini",
-						"weight calculate CrypticPlasma type:catacombs amount:43"
+						"weight CrypticPlasma Zucchini"
 					)
 					.setCategory("miscellaneous"),
+					new HelpData(
+							"calcweight",
+							"Calculate predicted weight change for a reaching certain skill, slayer, or catacombs level/amount.",
+							"weight calculate [player] [profile] <type:type> <amount:amount>")
+
+							.addExamples(
+									"weight calculate CrypticPlasma type:catacombs amount:43"
+							)
+							.setCategory("miscellaneous"),
 				new HelpData("hypixel", "Get Hypixel information about a player.", "hypixel [player]")
 					.addSecondData("Get fastest Hypixel lobby parkour for a player.", "hypixel parkour [player]")
 					.addExamples("hypixel CrypticPlasma", "hypixel parkour CrypticPlasma")
@@ -811,11 +815,11 @@ public class HelpCommand extends Command {
 		);
 
 		paginateBuilder.addItems(
-			help.create("guild <u:player>", "Get information and statistics about a player's guild") +
+			help.create("guild <player>", "Get information and statistics about a player's guild") +
 			help.create("guild <g:guild_name>", "Get information and statistics about a guild") +
-			help.create("guild members <u:player>", "Get a list of all members in a player's guild") +
+			help.create("guild members <player>", "Get a list of all members in a player's guild") +
 			help.create("guild members <g:guild_name>", "Get a list of all members in a guild") +
-			help.create("guild experience <u:player>", "Get the experience leaderboard for a player's guild") +
+			help.create("guild experience <player>", "Get the experience leaderboard for a player's guild") +
 			help.create("guild experience <g:guild_name>", "Get the experience leaderboard for a guild") +
 			help.create("g-lb <type> <u:player> [mode:normal|ironman|stranded]", "Get a leaderboard for a player's guild") +
 			help.create(
@@ -868,7 +872,7 @@ public class HelpCommand extends Command {
 			help.create("networth [player] [profile] --verbose", "Calculate a player's networth with a detailed JSON of each item cost") +
 			help.create("weight [player] [profile]", "Get a player's slayer, skills, dungeons, and total weight") +
 			help.create(
-				"weight calculate [player] [profile] <type:type> <amount:amount>",
+				"calcweight [player] [profile] <type:type> <amount:amount>",
 				"Calculate predicted weight change for a reaching certain skill, slayer, or catacombs level/amount."
 			) +
 			help.create("hypixel [player]", "Get Hypixel information about a player") +
@@ -881,14 +885,14 @@ public class HelpCommand extends Command {
 			help.create("uuid [username|uuid]", "Convert username to UUID or UUID to username") +
 			help.create("calendar", "Get the current Skyblock datetime and running or upcoming events") +
 			help.create("scammer [player]", "Check if a player is marked as a scamer in the SBZ database") +
-			help.create("jacob", "Get the upcoming contests and their crops") +
+			help.create("jacob [crop]", "Get the upcoming contests and their crops") +
 			help.create("mayor", "Get information about the current mayor or the running election") +
 			help.create("bingo [player]", "Get the current bingo goals and a player's bingo card") +
-			help.create("leaderboard", "Get a global leaderboard") +
+			help.create("leaderboard <type> [player]", "Get a global leaderboard") +
 			help.create("skyblock [player] [profile]", "Get an overview of a player's Skyblock statistics") +
-			help.create("recipe", "Get the crafting recipe of an item") +
+			help.create("recipe <item>", "Get the crafting recipe of an item") +
 			help.create("check-api", "Check which Skyblock APIs a player has enabled or disabled") +
-			help.create("calcdrags", "Calculate loot quality and loot from dragons in the end") +
+			help.create("calcdrags [eyes:eyes] [position:position] [ratio:ratio]", "Calculate loot quality and loot from dragons in the end") +
 			help.create("reforgestone <stone>", "Get the reforge stone stats for each rarity")
 		);
 

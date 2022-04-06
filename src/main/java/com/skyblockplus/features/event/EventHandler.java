@@ -46,9 +46,9 @@ public class EventHandler {
 
 	public static void updateEvents() {
 		try {
-			//			if (!isMainBot()) {
-			//				return;
-			//			}
+			if (!isMainBot()) {
+				return;
+			}
 
 			TextChannel timesChannel = jda.getGuildById("796790757947867156").getTextChannelById("959829695686381658");
 			String[] times = timesChannel.retrieveMessageById(messageId).complete().getContentRaw().split("\n");
