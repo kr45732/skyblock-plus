@@ -36,6 +36,10 @@ public class CalcWeightSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
+		if (event.invalidPlayerOption()) {
+			return;
+		}
+
 		event.embed(
 			CalcWeightCommand.calculateWeight(
 				event.player,
