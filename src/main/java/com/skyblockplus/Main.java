@@ -195,7 +195,8 @@ public class Main {
 					new CoinsPerBitCommand(),
 					new ReforgeStoneCommand(),
 					new CheckGuildApiCommand(),
-					new CalendarCommand(), new CalcWeightCommand()
+					new CalendarCommand(),
+					new CalcWeightCommand()
 				)
 				.build();
 
@@ -268,7 +269,8 @@ public class Main {
 					new CoinsPerBitSlashCommand(),
 					new ReforgeStoneSlashCommand(),
 					new CheckGuildApiSlashCommand(),
-					new CalendarSlashCommand(), new CalcWeightSlashCommand()
+					new CalendarSlashCommand(),
+					new CalcWeightSlashCommand()
 				);
 
 		allServerSettings =

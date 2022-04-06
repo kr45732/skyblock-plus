@@ -355,8 +355,7 @@ public class GuildCommand extends Command {
 
 					if (args.length >= 3 && args[2].startsWith("g:")) {
 						paginate(getGuildMembersFromName(args[2].split("g:")[1], new PaginatorEvent(event)));
-
-					}else {
+					} else {
 						if (getMentionedUsername(args.length == 2 ? -1 : 3)) {
 							return;
 						}

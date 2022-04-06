@@ -338,20 +338,15 @@ public class HelpCommand extends Command {
 					"Get a player's slayer, skills, dungeons, and total weight. Shows both senither and lily weight.",
 					"weight [player] [profile]"
 				)
-					.addExamples(
-						"weight CrypticPlasma",
-						"weight CrypticPlasma Zucchini"
-					)
+					.addExamples("weight CrypticPlasma", "weight CrypticPlasma Zucchini")
 					.setCategory("miscellaneous"),
-					new HelpData(
-							"calcweight",
-							"Calculate predicted weight change for a reaching certain skill, slayer, or catacombs level/amount.",
-							"weight calculate [player] [profile] <type:type> <amount:amount>")
-
-							.addExamples(
-									"weight calculate CrypticPlasma type:catacombs amount:43"
-							)
-							.setCategory("miscellaneous"),
+				new HelpData(
+					"calcweight",
+					"Calculate predicted weight change for a reaching certain skill, slayer, or catacombs level/amount.",
+					"weight calculate [player] [profile] <type:type> <amount:amount>"
+				)
+					.addExamples("weight calculate CrypticPlasma type:catacombs amount:43")
+					.setCategory("miscellaneous"),
 				new HelpData("hypixel", "Get Hypixel information about a player.", "hypixel [player]")
 					.addSecondData("Get fastest Hypixel lobby parkour for a player.", "hypixel parkour [player]")
 					.addExamples("hypixel CrypticPlasma", "hypixel parkour CrypticPlasma")
@@ -892,7 +887,10 @@ public class HelpCommand extends Command {
 			help.create("skyblock [player] [profile]", "Get an overview of a player's Skyblock statistics") +
 			help.create("recipe <item>", "Get the crafting recipe of an item") +
 			help.create("check-api", "Check which Skyblock APIs a player has enabled or disabled") +
-			help.create("calcdrags [eyes:eyes] [position:position] [ratio:ratio]", "Calculate loot quality and loot from dragons in the end") +
+			help.create(
+				"calcdrags [eyes:eyes] [position:position] [ratio:ratio]",
+				"Calculate loot quality and loot from dragons in the end"
+			) +
 			help.create("reforgestone <stone>", "Get the reforge stone stats for each rarity")
 		);
 

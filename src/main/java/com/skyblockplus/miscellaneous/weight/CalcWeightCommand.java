@@ -18,6 +18,10 @@
 
 package com.skyblockplus.miscellaneous.weight;
 
+import static com.skyblockplus.utils.Constants.ALL_SKILL_NAMES;
+import static com.skyblockplus.utils.Constants.SLAYER_NAMES;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.miscellaneous.weight.senither.Weight;
@@ -26,10 +30,6 @@ import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.SkillsStruct;
 import com.skyblockplus.utils.structs.WeightStruct;
 import net.dv8tion.jda.api.EmbedBuilder;
-
-import static com.skyblockplus.utils.Constants.ALL_SKILL_NAMES;
-import static com.skyblockplus.utils.Constants.SLAYER_NAMES;
-import static com.skyblockplus.utils.Utils.*;
 
 public class CalcWeightCommand extends Command {
 
@@ -51,119 +51,119 @@ public class CalcWeightCommand extends Command {
 				SkillsStruct current = player.getCatacombs();
 				SkillsStruct target = player.skillInfoFromLevel(amount, type);
 				eb.addField(
-						"Current",
-						"Level: " + roundAndFormat(current.getProgressLevel()) + "\nXP: " + formatNumber(current.totalExp()),
-						false
+					"Current",
+					"Level: " + roundAndFormat(current.getProgressLevel()) + "\nXP: " + formatNumber(current.totalExp()),
+					false
 				);
 				eb.addField(
-						"Target",
-						"Level: " +
-								amount +
-								"\nXP: " +
-								formatNumber(target.totalExp()) +
-								" (+" +
-								formatNumber(target.totalExp() - current.totalExp()) +
-								")",
-						false
+					"Target",
+					"Level: " +
+					amount +
+					"\nXP: " +
+					formatNumber(target.totalExp()) +
+					" (+" +
+					formatNumber(target.totalExp() - current.totalExp()) +
+					")",
+					false
 				);
 				Weight weight = new Weight(player).calculateWeight(type);
 				Weight predictedWeight = new Weight(player).calculateWeight(type);
 				WeightStruct pre = weight.getDungeonsWeight().getDungeonWeight(type);
 				WeightStruct post = predictedWeight.getDungeonsWeight().getDungeonWeight(type, target);
 				eb.addField(
-						"Weight Change",
-						"Total: " +
-								weight.getTotalWeight().getFormatted(false) +
-								" ➜ " +
-								predictedWeight.getTotalWeight().getFormatted(false) +
-								"\n" +
-								capitalizeString(type) +
-								": " +
-								pre.getFormatted(false) +
-								" ➜ " +
-								post.getFormatted(false),
-						false
+					"Weight Change",
+					"Total: " +
+					weight.getTotalWeight().getFormatted(false) +
+					" ➜ " +
+					predictedWeight.getTotalWeight().getFormatted(false) +
+					"\n" +
+					capitalizeString(type) +
+					": " +
+					pre.getFormatted(false) +
+					" ➜ " +
+					post.getFormatted(false),
+					false
 				);
 				return eb;
 			} else if (ALL_SKILL_NAMES.contains(type)) {
 				SkillsStruct current = player.getSkill(type);
 				SkillsStruct target = player.skillInfoFromLevel(amount, type);
 				eb.addField(
-						"Current",
-						"Level: " + roundAndFormat(current.getProgressLevel()) + "\nXP: " + formatNumber(current.totalExp()),
-						false
+					"Current",
+					"Level: " + roundAndFormat(current.getProgressLevel()) + "\nXP: " + formatNumber(current.totalExp()),
+					false
 				);
 				eb.addField(
-						"Target",
-						"Level: " +
-								amount +
-								"\nXP: " +
-								formatNumber(target.totalExp()) +
-								" (+" +
-								formatNumber(target.totalExp() - current.totalExp()) +
-								")",
-						false
+					"Target",
+					"Level: " +
+					amount +
+					"\nXP: " +
+					formatNumber(target.totalExp()) +
+					" (+" +
+					formatNumber(target.totalExp() - current.totalExp()) +
+					")",
+					false
 				);
 				Weight weight = new Weight(player).calculateWeight(type);
 				Weight predictedWeight = new Weight(player).calculateWeight(type);
 				WeightStruct pre = weight.getSkillsWeight().getSkillsWeight(type);
 				WeightStruct post = predictedWeight.getSkillsWeight().getSkillsWeight(type, target);
 				eb.addField(
-						"Skill Average Change",
-						roundAndFormat(player.getSkillAverage()) + " ➜ " + roundAndFormat(player.getSkillAverage(type, amount)),
-						false
+					"Skill Average Change",
+					roundAndFormat(player.getSkillAverage()) + " ➜ " + roundAndFormat(player.getSkillAverage(type, amount)),
+					false
 				);
 				eb.addField(
-						"Weight Change",
-						"Total: " +
-								weight.getTotalWeight().getFormatted(false) +
-								" ➜ " +
-								predictedWeight.getTotalWeight().getFormatted(false) +
-								"\n" +
-								capitalizeString(type) +
-								": " +
-								pre.getFormatted(false) +
-								" ➜ " +
-								post.getFormatted(false),
-						false
+					"Weight Change",
+					"Total: " +
+					weight.getTotalWeight().getFormatted(false) +
+					" ➜ " +
+					predictedWeight.getTotalWeight().getFormatted(false) +
+					"\n" +
+					capitalizeString(type) +
+					": " +
+					pre.getFormatted(false) +
+					" ➜ " +
+					post.getFormatted(false),
+					false
 				);
 				return eb;
 			} else if (SLAYER_NAMES.contains(type)) {
 				int curXp = player.getSlayer(type);
 				eb.addField("Current", "Level: " + player.getSlayerLevel(type) + "\nXP: " + formatNumber(curXp), false);
 				eb.addField(
-						"Target",
-						"Level: " +
-								player.getSlayerLevel(type, amount) +
-								"\nXP: " +
-								formatNumber(amount) +
-								" (+" +
-								formatNumber(amount - curXp) +
-								")",
-						false
+					"Target",
+					"Level: " +
+					player.getSlayerLevel(type, amount) +
+					"\nXP: " +
+					formatNumber(amount) +
+					" (+" +
+					formatNumber(amount - curXp) +
+					")",
+					false
 				);
 				Weight weight = new Weight(player).calculateWeight(type);
 				Weight predictedWeight = new Weight(player).calculateWeight(type);
 				WeightStruct pre = weight.getSlayerWeight().getSlayerWeight(type);
 				WeightStruct post = predictedWeight.getSlayerWeight().getSlayerWeight(type, amount);
 				eb.addField(
-						"Slayer Change",
-						roundAndFormat(player.getTotalSlayer()) + " ➜ " + roundAndFormat(player.getTotalSlayer(type, amount)),
-						false
+					"Slayer Change",
+					roundAndFormat(player.getTotalSlayer()) + " ➜ " + roundAndFormat(player.getTotalSlayer(type, amount)),
+					false
 				);
 				eb.addField(
-						"Weight Change",
-						"Total: " +
-								weight.getTotalWeight().getFormatted(false) +
-								" ➜ " +
-								predictedWeight.getTotalWeight().getFormatted(false) +
-								"\n" +
-								capitalizeString(type) +
-								": " +
-								pre.getFormatted(false) +
-								" ➜ " +
-								post.getFormatted(false),
-						false
+					"Weight Change",
+					"Total: " +
+					weight.getTotalWeight().getFormatted(false) +
+					" ➜ " +
+					predictedWeight.getTotalWeight().getFormatted(false) +
+					"\n" +
+					capitalizeString(type) +
+					": " +
+					pre.getFormatted(false) +
+					" ➜ " +
+					post.getFormatted(false),
+					false
 				);
 				return eb;
 			} else {

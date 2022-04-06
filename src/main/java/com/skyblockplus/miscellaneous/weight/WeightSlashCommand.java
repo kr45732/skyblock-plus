@@ -40,17 +40,15 @@ public class WeightSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.paginate(
-				WeightCommand.getPlayerWeight(event.player, event.getOptionStr("profile"), new PaginatorEvent(event))
-			);
+		event.paginate(WeightCommand.getPlayerWeight(event.player, event.getOptionStr("profile"), new PaginatorEvent(event)));
 	}
 
 	@Override
 	public CommandData getCommandData() {
 		return Commands
 			.slash(name, "Get a player's weight")
-					.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-					.addOption(OptionType.STRING, "profile", "Profile name");
+			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+			.addOption(OptionType.STRING, "profile", "Profile name");
 	}
 
 	@Override
