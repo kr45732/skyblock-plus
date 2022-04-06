@@ -654,6 +654,7 @@ public class SettingsExecute {
 		if (responseCode != 200) {
 			return apiFailMessage(responseCode);
 		}
+		guildMap.get(guild.getId()).eventGuild.reloadSettingsJson(eventSettings);
 
 		return defaultSettingsEmbed("Set event notification channel to: " + channel.getAsMention());
 	}
