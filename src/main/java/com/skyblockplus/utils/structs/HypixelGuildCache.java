@@ -18,10 +18,14 @@
 
 package com.skyblockplus.utils.structs;
 
+import com.google.gson.JsonArray;
 import com.skyblockplus.utils.Player;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.skyblockplus.utils.Utils.getLevelingJson;
+import static com.skyblockplus.utils.Utils.higherDepth;
 
 public class HypixelGuildCache {
 
@@ -75,6 +79,10 @@ public class HypixelGuildCache {
 		return Double.parseDouble(getStringFromCache(cache, type));
 	}
 
+	public static int getLevelFromCache(String cache, String xpType) {
+		return skillInfoFromExp((long) Double.parseDouble(getStringFromCache(cache, xpType)), xpType).currentLevel();
+	}
+
 	public void addPlayer(Player player) {
 		normalCache.add(playerToCache(player, Player.Gamemode.ALL));
 		ironmanCache.add(playerToCache(player, Player.Gamemode.IRONMAN));
@@ -112,7 +120,7 @@ public class HypixelGuildCache {
 			"=:=" +
 			player.getHighestAmount("skills", gamemode) +
 			"=:=" +
-			player.getHighestAmount("catacombs", gamemode) +
+			player.getHighestAmount("catacombs_xp", gamemode) +
 			"=:=" +
 			player.getHighestAmount("weight", gamemode) +
 			"=:=" +
@@ -124,25 +132,65 @@ public class HypixelGuildCache {
 			"=:=" +
 			player.getHighestAmount("enderman", gamemode) +
 			"=:=" +
-			player.getHighestAmount("alchemy", gamemode) +
+			player.getHighestAmount("alchemy_xp", gamemode) +
 			"=:=" +
-			player.getHighestAmount("combat", gamemode) +
+			player.getHighestAmount("combat_xp", gamemode) +
 			"=:=" +
-			player.getHighestAmount("fishing", gamemode) +
+			player.getHighestAmount("fishing_xp", gamemode) +
 			"=:=" +
-			player.getHighestAmount("farming", gamemode) +
+			player.getHighestAmount("farming_xp", gamemode) +
 			"=:=" +
-			player.getHighestAmount("foraging", gamemode) +
+			player.getHighestAmount("foraging_xp", gamemode) +
 			"=:=" +
-			player.getHighestAmount("carpentry", gamemode) +
+			player.getHighestAmount("carpentry_xp", gamemode) +
 			"=:=" +
-			player.getHighestAmount("mining", gamemode) +
+			player.getHighestAmount("mining_xp", gamemode) +
 			"=:=" +
-			player.getHighestAmount("taming", gamemode) +
+			player.getHighestAmount("taming_xp", gamemode) +
 			"=:=" +
-			player.getHighestAmount("enchanting", gamemode) +
+			player.getHighestAmount("enchanting_xp", gamemode) +
 			"=:=" +
 			player.getHighestAmount("networth", gamemode)
 		);
+	}
+
+	public static SkillsStruct skillInfoFromExp(long skillExp, String skill) {
+		JsonArray skillsTable =
+				switch (skill) {
+					case "catacombs" -> higherDepth(getLevelingJson(), "catacombs").getAsJsonArray();
+					case "runecrafting" -> higherDepth(getLevelingJson(), "runecrafting_xp").getAsJsonArray();
+					case "HOTM" -> higherDepth(getLevelingJson(), "HOTM").getAsJsonArray();
+					default -> higherDepth(getLevelingJson(), "leveling_xp").getAsJsonArray();
+				};
+
+		int maxLevel = skill.equals("farming") ? 60 : higherDepth(getLevelingJson(), "leveling_caps." + skill, 0);
+
+		long xpTotal = 0L;
+		int level = 1;
+		for (int i = 0; i < maxLevel; i++) {
+			xpTotal += skillsTable.get(i).getAsLong();
+
+			if (xpTotal > skillExp) {
+				xpTotal -= skillsTable.get(i).getAsLong();
+				break;
+			} else {
+				level = (i + 1);
+			}
+		}
+
+		long xpCurrent = (long) Math.floor(skillExp - xpTotal);
+		long xpForNext = 0;
+		if (level < maxLevel) {
+			xpForNext = (long) Math.ceil(skillsTable.get(level).getAsLong());
+		}
+
+		if (skillExp == 0) {
+			level = 0;
+			xpForNext = 0;
+		}
+
+		double progress = xpForNext > 0 ? Math.max(0, Math.min(((double) xpCurrent) / xpForNext, 1)) : 0;
+
+		return new SkillsStruct(skill, level, maxLevel, skillExp, xpCurrent, xpForNext, progress);
 	}
 }

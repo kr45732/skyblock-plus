@@ -340,7 +340,7 @@ public class CacheDatabase {
 			statement.setDouble(17, player.getHighestAmount("carpentry", gamemode, true));
 			statement.setDouble(18, player.getHighestAmount("mining", gamemode, true));
 			statement.setDouble(19, player.getHighestAmount("taming", gamemode, true));
-			statement.setDouble(20, player.getHighestAmount("enchanting", gamemode));
+			statement.setDouble(20, player.getHighestAmount("enchanting", gamemode, true));
 			statement.setDouble(21, player.getHighestAmount("networth", gamemode, true));
 			statement.executeUpdate();
 		} catch (Exception e) {

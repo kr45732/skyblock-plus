@@ -20,8 +20,7 @@ package com.skyblockplus.guild;
 
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.structs.HypixelGuildCache.getDoubleFromCache;
-import static com.skyblockplus.utils.structs.HypixelGuildCache.getStringFromCache;
+import static com.skyblockplus.utils.structs.HypixelGuildCache.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -247,7 +246,7 @@ public class GuildKickerCommand extends Command {
 			for (String guildMember : guildMemberPlayersList) {
 				double slayer = getDoubleFromCache(guildMember, "slayer");
 				double skills = getDoubleFromCache(guildMember, "skills");
-				double catacombs = getDoubleFromCache(guildMember, "catacombs");
+				double catacombs = getLevelFromCache(guildMember, "catacombs");
 				double weight = getDoubleFromCache(guildMember, "weight");
 
 				boolean meetsReqs = false;

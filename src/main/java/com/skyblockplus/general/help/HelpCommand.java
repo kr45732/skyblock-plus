@@ -63,7 +63,7 @@ public class HelpCommand extends Command {
 		this.botPermissions = defaultPerms();
 
 		setHelpList();
-		HelpCommand.helpDataList.stream().map(this::commandToNames).forEach(helpNameList::addAll);
+		helpDataList.stream().map(this::commandToNames).forEach(helpNameList::addAll);
 	}
 
 	private List<String> commandToNames(HelpData command) {
@@ -149,34 +149,37 @@ public class HelpCommand extends Command {
 				new HelpData("guild", "Main guild command")
 					.addSecondData("Find what guild a player is in.", "guild <player>")
 					.addSubcommands(
-						new HelpData("information", "Get information and statistics about a player's guild.", "information <player>")
+						new HelpData("information", "Get information and statistics about a player's guild.", "information [player]")
 							.addSecondData("Get information and statistics about a guild.", "information <g:guild_name>")
 							.addAliases("info")
 							.addExamples("information CrypticPlasma", "information g:Skyblock_Forceful"),
-						new HelpData("members", "Get a list of all members in a player's guild.", "members <player>")
+						new HelpData("members", "Get a list of all members in a player's guild.", "members [player]")
 							.addSecondData("Get a list of all members in a guild.", "members <g:guild_name>")
 							.addExamples("members CrypticPlasma", "members g:Skyblock_Forceful"),
 						new HelpData(
 							"experience",
 							"Get the experience leaderboard for a player's guild. Days can range from 1 to 7, default number of days is 7.",
-							"experience <player> [days:days]"
+							"experience [player] [days:days]"
 						)
 							.addAliases("exp")
 							.addSecondData(
 								"Get the experience leaderboard for a guild. Days can range from 1 to 7, default number of days is 7.",
 								"experience <g:guild_name> [days:days]"
 							)
-							.addExamples("experience CrypticPlasma", "experience g:Skyblock_Forceful days:4")
+							.addExamples("experience CrypticPlasma", "experience g:Skyblock Forceful days:4")
 					)
 					.addAliases("g")
 					.setCategory("guild"),
 				new HelpData(
 					"guild-leaderboard",
-					"Get a leaderboard for a guild. The type can be slayer, skills, catacombs, weight, sven, rev, tara, enderman, alchemy, combat, fishing, farming, foraging, carpentry, mining, taming, and enchanting. The mode can be all, ironman, or stranded. A Hypixel API key must be set in settings set hypixel_key <key>.",
-					"guild-leaderboard <type> <u:player> [mode:regular|ironman|stranded]"
-				)
+					"Get a leaderboard for a player's guild. The type can be slayer, skills, catacombs, weight, sven, rev, tara, enderman, alchemy, combat, fishing, farming, foraging, carpentry, mining, taming, and enchanting. The mode can be all, ironman, or stranded. A Hypixel API key must be set in settings set hypixel_key <key>.",
+					"guild-leaderboard <type> [player] [mode:all|ironman|stranded]"
+				).addSecondData(
+								"Get a leaderboard for a guild.",
+								"guild-leaderboard <type> <g:guild_name> [mode:all|ironman|stranded]"
+						)
 					.addAliases("g-lb")
-					.addExamples("guild-leaderboard weight u:CrypticPlasma", "guild-leaderboard sven u:CrypticPlasma mode:ironman")
+					.addExamples("guild-leaderboard weight CrypticPlasma", "guild-leaderboard sven CrypticPlasma mode:ironman")
 					.setCategory("guild"),
 				new HelpData(
 					"guild-kicker",
@@ -191,7 +194,7 @@ public class HelpCommand extends Command {
 					"A customizable helper that will tell you who to promote or demote in your Hypixel guild. Please DM me or join the Skyblock Plus [Discord Server](" +
 					DISCORD_SERVER_INVITE_LINK +
 					") to set this up for your guild.",
-					"guild-ranks <u:player> [mode:regular|ironman|stranded]"
+					"guild-ranks <u:player> [mode:all|ironman|stranded]"
 				)
 					.addAliases("g-ranks", "g-rank")
 					.addExamples("guild-ranks u:CrypticPlasma")
@@ -337,7 +340,7 @@ public class HelpCommand extends Command {
 					"weight",
 					"Get a player's slayer, skills, dungeons, and total weight. Shows both senither and lily weight.",
 					"weight [player] [profile]"
-				)
+				).addAliases("we")
 					.addExamples("weight CrypticPlasma", "weight CrypticPlasma Zucchini")
 					.setCategory("miscellaneous"),
 				new HelpData(
@@ -493,7 +496,7 @@ public class HelpCommand extends Command {
 							),
 						new HelpData("blacklist", "View or manage the application blacklist for this server.")
 							.addSecondData(
-								"Get a list of all the blacklisted players on this server with the reasons and namemc links.",
+								"Get a list of all the blacklisted players on this server with the reasons and NameMC links.",
 								"blacklist"
 							)
 							.addSubcommands(

@@ -1229,6 +1229,9 @@ public class Player {
 					case "catacombs":
 						highestAmount = Math.max(highestAmount, getCatacombs().getProgressLevel());
 						break;
+					case "catacombs_xp":
+						highestAmount = Math.max(highestAmount, getCatacombs().totalExp());
+						break;
 					case "weight":
 						highestAmount = Math.max(highestAmount, getWeight());
 						break;
@@ -1248,6 +1251,17 @@ public class Player {
 					case "taming":
 					case "enchanting":
 						highestAmount = Math.max(highestAmount, getSkill(type) != null ? getSkill(type).getProgressLevel() : -1);
+						break;
+					case "alchemy_xp":
+					case "combat_xp":
+					case "fishing_xp":
+					case "farming_xp":
+					case "foraging_xp":
+					case "carpentry_xp":
+					case "mining_xp":
+					case "taming_xp":
+					case "enchanting_xp":
+						highestAmount = Math.max(highestAmount, getSkill(type.split("_xp")[0]) != null ? getSkill(type.split("_xp")[0]).totalExp() : -1);
 						break;
 					case "bank":
 						highestAmount = Math.max(highestAmount, getBankBalance());
@@ -1406,5 +1420,31 @@ public class Player {
 
 			return isGamemode(of((String) gamemode));
 		}
+	}
+
+	public boolean isInventoryApiEnabled () {
+		return getInventoryMap() != null;
+	}
+
+	public boolean isBankApiEnabled () {
+		return getBankBalance() != -1;
+	}
+
+	public boolean isCollectionsApiEnabled () {
+		try {
+			return higherDepth(profileJson(), "collection").getAsJsonObject() != null;
+		} catch (Exception ignored) {}
+		return false;
+	}
+
+	public boolean isVaultApiEnabled () {
+		return getPersonalVaultMap() != null;}
+
+	public boolean isSkillsApiEnabled () {
+		return getSkillAverage("", -1) != -1;
+	}
+
+	public boolean isAllApiEnable(){
+		return isInventoryApiEnabled() && isBankApiEnabled() && isCollectionsApiEnabled() && isVaultApiEnabled() && isSkillsApiEnabled();
 	}
 }

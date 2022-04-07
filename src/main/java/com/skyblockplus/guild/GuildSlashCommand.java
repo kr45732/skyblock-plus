@@ -55,7 +55,7 @@ public class GuildSlashCommand extends SlashCommand {
 			case "members" -> {
 				String guild = event.getOptionStr("guild");
 				if (guild != null) {
-					event.embed(GuildCommand.getGuildMembersFromName(guild, new PaginatorEvent(event)));
+					event.paginate(GuildCommand.getGuildMembersFromName(guild, new PaginatorEvent(event)));
 					return;
 				}
 
@@ -70,7 +70,7 @@ public class GuildSlashCommand extends SlashCommand {
 
 				String guild = event.getOptionStr("guild");
 				if (guild != null) {
-					event.embed(GuildCommand.getGuildExpFromPlayer(guild, numDays, new PaginatorEvent(event)));
+					event.paginate(GuildCommand.getGuildExpFromPlayer(guild, numDays, new PaginatorEvent(event)));
 					return;
 				}
 

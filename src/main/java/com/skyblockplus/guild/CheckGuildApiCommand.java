@@ -86,14 +86,11 @@ public class CheckGuildApiCommand extends Command {
 						Player player = new Player(guildMemberUuid, guildMemberUsernameResponse, guildMemberProfileJsonResponse);
 
 						if (player.isValid()) {
-							boolean invEnabled = player.getInventoryMap() != null;
-							boolean bankEnabled = player.getBankBalance() != -1;
-							boolean collectionsEnabled = false;
-							try {
-								collectionsEnabled = higherDepth(player.profileJson(), "collection").getAsJsonObject() != null;
-							} catch (Exception ignored) {}
-							boolean vaultEnabled = player.getPersonalVaultMap() != null;
-							boolean skillsEnabled = player.getSkillAverage("", -1) != -1;
+							boolean invEnabled = player.isInventoryApiEnabled();
+							boolean bankEnabled = player.isBankApiEnabled();
+							boolean collectionsEnabled = player.isCollectionsApiEnabled();
+							boolean vaultEnabled = player.isVaultApiEnabled();
+							boolean skillsEnabled = player.isSkillsApiEnabled();
 
 							if (invEnabled && bankEnabled && collectionsEnabled && vaultEnabled && skillsEnabled) {
 								return client.getSuccess() + " **" + player.getUsername() + ":** all APIs enabled";

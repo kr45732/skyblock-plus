@@ -36,6 +36,7 @@ import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import org.eclipse.jgit.util.StringUtils;
 
 public class ApplyGuild {
 
@@ -147,6 +148,27 @@ public class ApplyGuild {
 			Player.Gamemode gamemode = Player.Gamemode.of(higherDepth(currentSettings, "applyGamemode", "all"));
 			if (player.getAllProfileNames(gamemode).length == 0) {
 				return client.getError() + " You have no " + gamemode.toString().toLowerCase() + " profiles created";
+			}
+		}
+
+		if(higherDepth(currentSettings, "applyCheckApi", false)){
+			boolean invEnabled = player.isInventoryApiEnabled();
+			boolean bankEnabled = player.isBankApiEnabled();
+			boolean collectionsEnabled = player.isCollectionsApiEnabled();
+			boolean vaultEnabled = player.isVaultApiEnabled();
+			boolean skillsEnabled = player.isSkillsApiEnabled();
+
+			if(!invEnabled || !bankEnabled || !collectionsEnabled || !vaultEnabled || !skillsEnabled) {
+				String out =
+						(invEnabled ? "" : "inventory, ") +
+								(bankEnabled ? "" : "bank, ") +
+								(collectionsEnabled ? "" : "collections, ") +
+								(vaultEnabled ? "" : "vault, ") +
+								(skillsEnabled ? "" : "skills, ");
+				out = StringUtils.capitalize(out.substring(0, out.length() - 2));
+
+				return client.getError() + " " + out + " API" +( out.contains(",") ? "s":"") + " not enabled";
+
 			}
 		}
 

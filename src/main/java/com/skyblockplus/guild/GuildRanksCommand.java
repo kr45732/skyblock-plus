@@ -20,8 +20,7 @@ package com.skyblockplus.guild;
 
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.structs.HypixelGuildCache.getDoubleFromCache;
-import static com.skyblockplus.utils.structs.HypixelGuildCache.getStringFromCache;
+import static com.skyblockplus.utils.structs.HypixelGuildCache.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -184,7 +183,7 @@ public class GuildRanksCommand extends Command {
 				String gMemUuid = getStringFromCache(lbM, "uuid");
 				double slayer = getDoubleFromCache(lbM, "slayer");
 				double skills = getDoubleFromCache(lbM, "skills");
-				double catacombs = getDoubleFromCache(lbM, "catacombs");
+				double catacombs = getLevelFromCache(lbM, "catacombs");
 				double weight = getDoubleFromCache(lbM, "weight");
 
 				String curRank = ranksMap.get(gMemUuid);
@@ -465,7 +464,7 @@ public class GuildRanksCommand extends Command {
 				logCommand();
 
 				if ((args.length == 3 || args.length == 2) && args[1].toLowerCase().startsWith("u:")) {
-					Player.Gamemode gamemode = Player.Gamemode.of(getStringOption("mode", "all"));
+					Player.Gamemode gamemode = getGamemodeOption("mode", Player.Gamemode.ALL);
 					boolean useKey = getBooleanArg("--usekey");
 
 					paginate(getRanks(args[1].split(":")[1], gamemode, useKey, new PaginatorEvent(event)));

@@ -51,7 +51,7 @@ public class GuildLeaderboardCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	public static EmbedBuilder getLeaderboard(String lbType, String username, Player.Gamemode gamemode, PaginatorEvent event) {
+	public static EmbedBuilder getLeaderboard(String lbType, String username, String guildName, Player.Gamemode gamemode, PaginatorEvent event) {
 		String hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
 
 		EmbedBuilder eb = checkHypixelKey(hypixelKey);
@@ -64,18 +64,23 @@ public class GuildLeaderboardCommand extends Command {
 		}
 		lbType = lbType.toLowerCase();
 
-		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
-		if (usernameUuidStruct.isNotValid()) {
-			return invalidEmbed(usernameUuidStruct.failCause());
+		UsernameUuidStruct usernameUuidStruct = null;
+		HypixelResponse guildResponse;
+		if(username != null) {
+			usernameUuidStruct = usernameToUuid(username);
+			if (usernameUuidStruct.isNotValid()) {
+				return invalidEmbed(usernameUuidStruct.failCause());
+			}
+			guildResponse = getGuildFromPlayer(usernameUuidStruct.uuid());
+		}else{
+			guildResponse = getGuildFromName(guildName);
 		}
-
-		HypixelResponse guildResponse = getGuildFromPlayer(usernameUuidStruct.uuid());
 		if (guildResponse.isNotValid()) {
 			return invalidEmbed(guildResponse.failCause());
 		}
 
 		JsonElement guildJson = guildResponse.response();
-		String guildName = higherDepth(guildJson, "name").getAsString();
+		guildName = higherDepth(guildJson, "name").getAsString();
 		String guildId = higherDepth(guildJson, "_id").getAsString();
 
 		CustomPaginator.Builder paginateBuilder = event.getPaginator().setColumns(2).setItemsPerPage(20);
@@ -147,7 +152,7 @@ public class GuildLeaderboardCommand extends Command {
 			String guildPlayerUsername = getStringFromCache(guildPlayer, "username");
 			paginateBuilder.addItems("`" + (i + 1) + ")` " + fixUsername(guildPlayerUsername) + ": " + formattedAmt);
 
-			if (guildPlayerUsername.equals(usernameUuidStruct.username())) {
+			if (username != null && guildPlayerUsername.equals(usernameUuidStruct.username())) {
 				guildRank = i;
 				amt = formattedAmt;
 			}
@@ -158,14 +163,14 @@ public class GuildLeaderboardCommand extends Command {
 			capitalizeString(lbType.replace("_", " ")) +
 			":** " +
 			formatNumber(total) +
-			"\n**Player:** " +
+			(username != null ? "\n**Player:** " +
 			usernameUuidStruct.username() +
 			"\n**Guild Rank:** #" +
 			(guildRank + 1) +
 			"\n**" +
 			capitalizeString(lbType.replace("_", " ")) +
 			":** " +
-			amt +
+			amt : "") +
 			(lastUpdated != null ? "\n**Last Updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "");
 
 		paginateBuilder.setPaginatorExtras(
@@ -186,10 +191,18 @@ public class GuildLeaderboardCommand extends Command {
 			protected void execute() {
 				logCommand();
 
-				if ((args.length == 4 || args.length == 3) && args[2].toLowerCase().startsWith("u:")) {
-					Player.Gamemode gamemode = Player.Gamemode.of(getStringOption("mode", "all"));
+				Player.Gamemode gamemode = getGamemodeOption("mode", Player.Gamemode.ALL);
+				setArgs(3);
+				if (args.length >= 2) {
+					if(args.length >= 3 && args[2].startsWith("g:")){
+						paginate(getLeaderboard(args[1], null, args[2].split("g:")[1], gamemode, new PaginatorEvent(event)));
+					}else {
+						if (getMentionedUsername(args.length == 2 ? -1 : 2)) {
+							return;
+						}
 
-					paginate(getLeaderboard(args[1], args[2].split(":")[1], gamemode, new PaginatorEvent(event)));
+						paginate(getLeaderboard(args[1], player, null, gamemode, new PaginatorEvent(event)));
+					}
 					return;
 				}
 

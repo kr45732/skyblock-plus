@@ -38,6 +38,12 @@ public class GuildLeaderboardSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
+		String guild = event.getOptionStr("guild");
+		if (guild != null) {
+			event.paginate(GuildLeaderboardCommand.getLeaderboard(event.getOptionStr("type"), null, guild, Player.Gamemode.of(event.getOptionStr("gamemode", "all")), new PaginatorEvent(event)));
+			return;
+		}
+
 		if (event.invalidPlayerOption()) {
 			return;
 		}
@@ -45,8 +51,8 @@ public class GuildLeaderboardSlashCommand extends SlashCommand {
 		event.paginate(
 			GuildLeaderboardCommand.getLeaderboard(
 				event.getOptionStr("type"),
-				event.player,
-				Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
+				event.player,null,
+					Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
 				new PaginatorEvent(event)
 			)
 		);
@@ -59,25 +65,26 @@ public class GuildLeaderboardSlashCommand extends SlashCommand {
 			.addOptions(
 				new OptionData(OptionType.STRING, "type", "Leaderboard type", true)
 					.addChoice("Networth", "Networth")
-					.addChoice("Slayer", "slayer")
+					.addChoice("Slayer Xp", "slayer")
 					.addChoice("Skills", "skills")
-					.addChoice("Catacombs", "catacombs")
+					.addChoice("Catacombs Xp", "catacombs")
 					.addChoice("Weight", "weight")
 					.addChoice("Sven Xp", "sven")
 					.addChoice("Revenant Xp", "rev")
 					.addChoice("Tarantula Xp", "tara")
 					.addChoice("Enderman Xp", "enderman")
-					.addChoice("Alchemy", "alchemy")
-					.addChoice("Combat", "combat")
-					.addChoice("Fishing", "fishing")
-					.addChoice("Farming", "farming")
-					.addChoice("Foraging", "foraging")
-					.addChoice("Carpentry", "carpentry")
-					.addChoice("Mining", "mining")
-					.addChoice("Taming", "taming")
-					.addChoice("Enchanting", "enchanting")
+					.addChoice("Alchemy Xp", "alchemy")
+					.addChoice("Combat Xp", "combat")
+					.addChoice("Fishing Xp", "fishing")
+					.addChoice("Farming Xp", "farming")
+					.addChoice("Foraging Xp", "foraging")
+					.addChoice("Carpentry Xp", "carpentry")
+					.addChoice("Mining Xp", "mining")
+					.addChoice("Taming Xp", "taming")
+					.addChoice("Enchanting Xp", "enchanting")
 			)
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+				.addOption(OptionType.STRING, "guild", "Guild name", false)
 			.addOptions(
 				new OptionData(OptionType.STRING, "gamemode", "Gamemode type")
 					.addChoice("All", "all")

@@ -40,14 +40,11 @@ public class CheckApiCommand extends Command {
 		if (player.isValid()) {
 			EmbedBuilder eb = player.defaultPlayerEmbed();
 
-			boolean invEnabled = player.getInventoryMap() != null;
-			boolean bankEnabled = player.getBankBalance() != -1;
-			boolean collectionsEnabled = false;
-			try {
-				collectionsEnabled = higherDepth(player.profileJson(), "collection").getAsJsonObject() != null;
-			} catch (Exception ignored) {}
-			boolean vaultEnabled = player.getPersonalVaultMap() != null;
-			boolean skillsEnabled = player.getSkillAverage("", -1) != -1;
+			boolean invEnabled = player.isInventoryApiEnabled();
+			boolean bankEnabled = player.isBankApiEnabled();
+			boolean collectionsEnabled = player.isCollectionsApiEnabled();
+			boolean vaultEnabled = player.isVaultApiEnabled();
+			boolean skillsEnabled = player.isSkillsApiEnabled();
 
 			eb.setDescription(
 				"**All APIs Enabled:** " +

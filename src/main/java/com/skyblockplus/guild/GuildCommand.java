@@ -344,19 +344,19 @@ public class GuildCommand extends Command {
 					if (args.length >= 3 && args[2].startsWith("g:")) {
 						paginate(getGuildExpFromName(args[2].split("g:")[1], days, new PaginatorEvent(event)));
 					} else {
-						if (getMentionedUsername(args.length == 2 ? -1 : 3)) {
+						if (getMentionedUsername(args.length == 2 ? -1 : 2)) {
 							return;
 						}
 
 						paginate(getGuildExpFromPlayer(player, days, new PaginatorEvent(event)));
 					}
-				} else if (args.length >= 3 && "members".equals(args[1])) {
+				} else if (args.length >= 2 && "members".equals(args[1])) {
 					setArgs(3);
 
 					if (args.length >= 3 && args[2].startsWith("g:")) {
 						paginate(getGuildMembersFromName(args[2].split("g:")[1], new PaginatorEvent(event)));
 					} else {
-						if (getMentionedUsername(args.length == 2 ? -1 : 3)) {
+						if (getMentionedUsername(args.length == 2 ? -1 : 2)) {
 							return;
 						}
 
@@ -365,10 +365,10 @@ public class GuildCommand extends Command {
 				} else {
 					setArgs(2);
 
-					if (args.length >= 3 && args[1].startsWith("g:")) {
-						embed(getGuildInfoFromName(args[1].split(":")[1]));
+					if (args.length >= 2 && args[1].startsWith("g:")) {
+						embed(getGuildInfoFromName(args[1].split("g:")[1]));
 					} else {
-						if (getMentionedUsername(args.length == 2 ? -1 : 3)) {
+						if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
 							return;
 						}
 

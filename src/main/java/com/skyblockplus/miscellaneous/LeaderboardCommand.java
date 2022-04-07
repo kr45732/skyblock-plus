@@ -102,7 +102,7 @@ public class LeaderboardCommand extends Command {
 			protected void execute() {
 				logCommand();
 
-				Player.Gamemode gamemode = Player.Gamemode.of(getStringOption("mode", "all"));
+				Player.Gamemode gamemode = getGamemodeOption("mode", Player.Gamemode.ALL);
 				int page = getIntOption("page", 0);
 				if (args.length == 3 || args.length == 2) {
 					if (getMentionedUsername(args.length == 2 ? -1 : 2)) {

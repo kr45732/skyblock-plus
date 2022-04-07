@@ -452,6 +452,13 @@ public class SettingsExecute {
 								eb = setApplyScammerCheck(guildSettings.getAsJsonObject(), false);
 							}
 						}
+						case "check_api" -> {
+							if (args[5].equals("true")) {
+								eb = setApplyCheckApiEnable(guildSettings.getAsJsonObject(), true);
+							} else if (args[5].equals("false")) {
+								eb = setApplyCheckApiEnable(guildSettings.getAsJsonObject(), false);
+							}
+						}
 						case "log_channel" -> eb = setApplyLogChannel(guildSettings.getAsJsonObject(), args[5]);
 					}
 				}
@@ -1246,7 +1253,7 @@ public class SettingsExecute {
 		return defaultSettingsEmbed(
 			(enable ? "Enabled" : "Disabled") +
 			" automated applications for " +
-			higherDepth(guildSettings, "guildName").getAsString().replace("_", "") +
+			higherDepth(guildSettings, "guildName").getAsString().replace("_", " ") +
 			"\n\nRun `/reload` to reload the settings"
 		);
 	}
@@ -1274,6 +1281,17 @@ public class SettingsExecute {
 		}
 
 		return defaultSettingsEmbed("Apply SkyblockZ scammer check: " + (enable ? "enabled" : "disabled"));
+	}
+
+	public EmbedBuilder setApplyCheckApiEnable(JsonObject guildSettings, boolean enable) {
+		guildSettings.addProperty("applyCheckApi", "" + enable);
+		int responseCode = database.setGuildSettings(guild.getId(), guildSettings);
+
+		if (responseCode != 200) {
+			return apiFailMessage(responseCode);
+		}
+
+		return defaultSettingsEmbed("Apply check all APIs are enabled: " + (enable ? "enabled" : "disabled"));
 	}
 
 	public EmbedBuilder setApplyChannel(JsonObject guildSettings, String textChannel) {
@@ -1590,6 +1608,7 @@ public class SettingsExecute {
 				.addField("Waitlisted Message", displaySettings(settings, "applyWaitlistMessage"), true)
 				.addField("Denied Message", displaySettings(settings, "applyDenyMessage"), true)
 				.addField("Scammer Check", displaySettings(settings, "applyScammerCheck"), true)
+				.addField("Check APIs Enabled", displaySettings(settings, "applyCheckApi"), true)
 				.addField("Requirements", displaySettings(settings, "applyReqs"), true)
 		);
 

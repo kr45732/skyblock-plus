@@ -167,7 +167,7 @@
           "requirements": [
             [
               {
-                "amount": 5000,
+                "amount": 6500,
                 "type": "weight"
               }
             ]
@@ -180,7 +180,7 @@
           "requirements": [
             [
               {
-                "amount": 8000,
+                "amount": 10000,
                 "type": "weight"
               }
             ]
