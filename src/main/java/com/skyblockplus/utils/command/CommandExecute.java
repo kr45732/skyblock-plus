@@ -201,7 +201,7 @@ public abstract class CommandExecute extends CommandEvent {
 				String arg = args[i].split(match + ":")[1];
 				removeArg(i);
 				try {
-					Player.Gamemode.of(arg);
+					return Player.Gamemode.of(arg);
 				} catch (Exception e) {
 					return defaultValue;
 				}
