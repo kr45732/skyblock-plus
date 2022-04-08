@@ -24,9 +24,8 @@ import static com.skyblockplus.utils.Utils.*;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.api.linkedaccounts.LinkedAccount;
-import java.util.regex.Matcher;
-
 import com.skyblockplus.utils.Player;
+import java.util.regex.Matcher;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -81,7 +80,7 @@ public abstract class CommandExecute extends CommandEvent {
 	}
 
 	protected String[] setArgs(int limit) {
-		args = String.join( " ", args).split(" ", limit);
+		args = String.join(" ", args).split(" ", limit);
 		return args;
 	}
 
@@ -201,7 +200,11 @@ public abstract class CommandExecute extends CommandEvent {
 			if (args[i].startsWith(match + ":")) {
 				String arg = args[i].split(match + ":")[1];
 				removeArg(i);
-				try{ Player.Gamemode.of(arg);}catch (Exception e){return defaultValue;}
+				try {
+					Player.Gamemode.of(arg);
+				} catch (Exception e) {
+					return defaultValue;
+				}
 			}
 		}
 

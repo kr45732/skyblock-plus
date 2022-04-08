@@ -151,24 +151,23 @@ public class ApplyGuild {
 			}
 		}
 
-		if(higherDepth(currentSettings, "applyCheckApi", false)){
+		if (higherDepth(currentSettings, "applyCheckApi", false)) {
 			boolean invEnabled = player.isInventoryApiEnabled();
 			boolean bankEnabled = player.isBankApiEnabled();
 			boolean collectionsEnabled = player.isCollectionsApiEnabled();
 			boolean vaultEnabled = player.isVaultApiEnabled();
 			boolean skillsEnabled = player.isSkillsApiEnabled();
 
-			if(!invEnabled || !bankEnabled || !collectionsEnabled || !vaultEnabled || !skillsEnabled) {
+			if (!invEnabled || !bankEnabled || !collectionsEnabled || !vaultEnabled || !skillsEnabled) {
 				String out =
-						(invEnabled ? "" : "inventory, ") +
-								(bankEnabled ? "" : "bank, ") +
-								(collectionsEnabled ? "" : "collections, ") +
-								(vaultEnabled ? "" : "vault, ") +
-								(skillsEnabled ? "" : "skills, ");
+					(invEnabled ? "" : "inventory, ") +
+					(bankEnabled ? "" : "bank, ") +
+					(collectionsEnabled ? "" : "collections, ") +
+					(vaultEnabled ? "" : "vault, ") +
+					(skillsEnabled ? "" : "skills, ");
 				out = StringUtils.capitalize(out.substring(0, out.length() - 2));
 
-				return client.getError() + " " + out + " API" +( out.contains(",") ? "s":"") + " not enabled";
-
+				return client.getError() + " " + out + " API" + (out.contains(",") ? "s" : "") + " not enabled";
 			}
 		}
 

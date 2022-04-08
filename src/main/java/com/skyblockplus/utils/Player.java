@@ -1261,7 +1261,11 @@ public class Player {
 					case "mining_xp":
 					case "taming_xp":
 					case "enchanting_xp":
-						highestAmount = Math.max(highestAmount, getSkill(type.split("_xp")[0]) != null ? getSkill(type.split("_xp")[0]).totalExp() : -1);
+						highestAmount =
+							Math.max(
+								highestAmount,
+								getSkill(type.split("_xp")[0]) != null ? getSkill(type.split("_xp")[0]).totalExp() : -1
+							);
 						break;
 					case "bank":
 						highestAmount = Math.max(highestAmount, getBankBalance());
@@ -1422,29 +1426,30 @@ public class Player {
 		}
 	}
 
-	public boolean isInventoryApiEnabled () {
+	public boolean isInventoryApiEnabled() {
 		return getInventoryMap() != null;
 	}
 
-	public boolean isBankApiEnabled () {
+	public boolean isBankApiEnabled() {
 		return getBankBalance() != -1;
 	}
 
-	public boolean isCollectionsApiEnabled () {
+	public boolean isCollectionsApiEnabled() {
 		try {
 			return higherDepth(profileJson(), "collection").getAsJsonObject() != null;
 		} catch (Exception ignored) {}
 		return false;
 	}
 
-	public boolean isVaultApiEnabled () {
-		return getPersonalVaultMap() != null;}
+	public boolean isVaultApiEnabled() {
+		return getPersonalVaultMap() != null;
+	}
 
-	public boolean isSkillsApiEnabled () {
+	public boolean isSkillsApiEnabled() {
 		return getSkillAverage("", -1) != -1;
 	}
 
-	public boolean isAllApiEnable(){
+	public boolean isAllApiEnable() {
 		return isInventoryApiEnabled() && isBankApiEnabled() && isCollectionsApiEnabled() && isVaultApiEnabled() && isSkillsApiEnabled();
 	}
 }

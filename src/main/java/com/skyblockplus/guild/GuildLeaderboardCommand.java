@@ -51,7 +51,13 @@ public class GuildLeaderboardCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	public static EmbedBuilder getLeaderboard(String lbType, String username, String guildName, Player.Gamemode gamemode, PaginatorEvent event) {
+	public static EmbedBuilder getLeaderboard(
+		String lbType,
+		String username,
+		String guildName,
+		Player.Gamemode gamemode,
+		PaginatorEvent event
+	) {
 		String hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
 
 		EmbedBuilder eb = checkHypixelKey(hypixelKey);
@@ -66,13 +72,13 @@ public class GuildLeaderboardCommand extends Command {
 
 		UsernameUuidStruct usernameUuidStruct = null;
 		HypixelResponse guildResponse;
-		if(username != null) {
+		if (username != null) {
 			usernameUuidStruct = usernameToUuid(username);
 			if (usernameUuidStruct.isNotValid()) {
 				return invalidEmbed(usernameUuidStruct.failCause());
 			}
 			guildResponse = getGuildFromPlayer(usernameUuidStruct.uuid());
-		}else{
+		} else {
 			guildResponse = getGuildFromName(guildName);
 		}
 		if (guildResponse.isNotValid()) {
@@ -163,14 +169,18 @@ public class GuildLeaderboardCommand extends Command {
 			capitalizeString(lbType.replace("_", " ")) +
 			":** " +
 			formatNumber(total) +
-			(username != null ? "\n**Player:** " +
-			usernameUuidStruct.username() +
-			"\n**Guild Rank:** #" +
-			(guildRank + 1) +
-			"\n**" +
-			capitalizeString(lbType.replace("_", " ")) +
-			":** " +
-			amt : "") +
+			(
+				username != null
+					? "\n**Player:** " +
+					usernameUuidStruct.username() +
+					"\n**Guild Rank:** #" +
+					(guildRank + 1) +
+					"\n**" +
+					capitalizeString(lbType.replace("_", " ")) +
+					":** " +
+					amt
+					: ""
+			) +
 			(lastUpdated != null ? "\n**Last Updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "");
 
 		paginateBuilder.setPaginatorExtras(
@@ -194,9 +204,9 @@ public class GuildLeaderboardCommand extends Command {
 				Player.Gamemode gamemode = getGamemodeOption("mode", Player.Gamemode.ALL);
 				setArgs(3);
 				if (args.length >= 2) {
-					if(args.length >= 3 && args[2].startsWith("g:")){
+					if (args.length >= 3 && args[2].startsWith("g:")) {
 						paginate(getLeaderboard(args[1], null, args[2].split("g:")[1], gamemode, new PaginatorEvent(event)));
-					}else {
+					} else {
 						if (getMentionedUsername(args.length == 2 ? -1 : 2)) {
 							return;
 						}

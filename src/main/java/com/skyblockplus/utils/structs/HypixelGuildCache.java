@@ -18,14 +18,14 @@
 
 package com.skyblockplus.utils.structs;
 
+import static com.skyblockplus.utils.Utils.getLevelingJson;
+import static com.skyblockplus.utils.Utils.higherDepth;
+
 import com.google.gson.JsonArray;
 import com.skyblockplus.utils.Player;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.skyblockplus.utils.Utils.getLevelingJson;
-import static com.skyblockplus.utils.Utils.higherDepth;
 
 public class HypixelGuildCache {
 
@@ -156,12 +156,12 @@ public class HypixelGuildCache {
 
 	public static SkillsStruct skillInfoFromExp(long skillExp, String skill) {
 		JsonArray skillsTable =
-				switch (skill) {
-					case "catacombs" -> higherDepth(getLevelingJson(), "catacombs").getAsJsonArray();
-					case "runecrafting" -> higherDepth(getLevelingJson(), "runecrafting_xp").getAsJsonArray();
-					case "HOTM" -> higherDepth(getLevelingJson(), "HOTM").getAsJsonArray();
-					default -> higherDepth(getLevelingJson(), "leveling_xp").getAsJsonArray();
-				};
+			switch (skill) {
+				case "catacombs" -> higherDepth(getLevelingJson(), "catacombs").getAsJsonArray();
+				case "runecrafting" -> higherDepth(getLevelingJson(), "runecrafting_xp").getAsJsonArray();
+				case "HOTM" -> higherDepth(getLevelingJson(), "HOTM").getAsJsonArray();
+				default -> higherDepth(getLevelingJson(), "leveling_xp").getAsJsonArray();
+			};
 
 		int maxLevel = skill.equals("farming") ? 60 : higherDepth(getLevelingJson(), "leveling_caps." + skill, 0);
 

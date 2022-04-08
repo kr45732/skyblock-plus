@@ -174,10 +174,8 @@ public class HelpCommand extends Command {
 					"guild-leaderboard",
 					"Get a leaderboard for a player's guild. The type can be slayer, skills, catacombs, weight, sven, rev, tara, enderman, alchemy, combat, fishing, farming, foraging, carpentry, mining, taming, and enchanting. The mode can be all, ironman, or stranded. A Hypixel API key must be set in settings set hypixel_key <key>.",
 					"guild-leaderboard <type> [player] [mode:all|ironman|stranded]"
-				).addSecondData(
-								"Get a leaderboard for a guild.",
-								"guild-leaderboard <type> <g:guild_name> [mode:all|ironman|stranded]"
-						)
+				)
+					.addSecondData("Get a leaderboard for a guild.", "guild-leaderboard <type> <g:guild_name> [mode:all|ironman|stranded]")
 					.addAliases("g-lb")
 					.addExamples("guild-leaderboard weight CrypticPlasma", "guild-leaderboard sven CrypticPlasma mode:ironman")
 					.setCategory("guild"),
@@ -340,7 +338,8 @@ public class HelpCommand extends Command {
 					"weight",
 					"Get a player's slayer, skills, dungeons, and total weight. Shows both senither and lily weight.",
 					"weight [player] [profile]"
-				).addAliases("we")
+				)
+					.addAliases("we")
 					.addExamples("weight CrypticPlasma", "weight CrypticPlasma Zucchini")
 					.setCategory("miscellaneous"),
 				new HelpData(

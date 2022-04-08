@@ -40,7 +40,15 @@ public class GuildLeaderboardSlashCommand extends SlashCommand {
 
 		String guild = event.getOptionStr("guild");
 		if (guild != null) {
-			event.paginate(GuildLeaderboardCommand.getLeaderboard(event.getOptionStr("type"), null, guild, Player.Gamemode.of(event.getOptionStr("gamemode", "all")), new PaginatorEvent(event)));
+			event.paginate(
+				GuildLeaderboardCommand.getLeaderboard(
+					event.getOptionStr("type"),
+					null,
+					guild,
+					Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
+					new PaginatorEvent(event)
+				)
+			);
 			return;
 		}
 
@@ -51,8 +59,9 @@ public class GuildLeaderboardSlashCommand extends SlashCommand {
 		event.paginate(
 			GuildLeaderboardCommand.getLeaderboard(
 				event.getOptionStr("type"),
-				event.player,null,
-					Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
+				event.player,
+				null,
+				Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
 				new PaginatorEvent(event)
 			)
 		);
@@ -84,7 +93,7 @@ public class GuildLeaderboardSlashCommand extends SlashCommand {
 					.addChoice("Enchanting Xp", "enchanting")
 			)
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOption(OptionType.STRING, "guild", "Guild name", false)
+			.addOption(OptionType.STRING, "guild", "Guild name", false)
 			.addOptions(
 				new OptionData(OptionType.STRING, "gamemode", "Gamemode type")
 					.addChoice("All", "all")
