@@ -94,11 +94,18 @@ public class MissingCommand extends Command {
 				}
 			});
 
-			List<String> questTalismans = List.of("MELODY_HAIR", "CHEETAH_TALISMAN","LYNX_TALISMAN", "CAT_TALISMAN");
+			List<String> questTalismans = List.of("MELODY_HAIR", "CHEETAH_TALISMAN", "LYNX_TALISMAN", "CAT_TALISMAN");
 			List<String> unobtainableIronmanTalismans = List.of("DANTE_TALISMAN", "BLOOD_GOD_CREST", "PARTY_HAT_CRAB", "POTATO_TALISMAN");
 			NetworthExecute calc = new NetworthExecute().initPrices();
 			missingInternalArr.sort(
-				Comparator.comparingDouble(o1 -> questTalismans.contains(o1) || o1.startsWith("WEDDING_RING_") || o1.startsWith("CAMPFIRE_TALISMAN_") || (player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(o1))  ? Double.MAX_VALUE : calc.getLowestPrice(o1))
+				Comparator.comparingDouble(o1 ->
+					questTalismans.contains(o1) ||
+						o1.startsWith("WEDDING_RING_") ||
+						o1.startsWith("CAMPFIRE_TALISMAN_") ||
+						(player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(o1))
+						? Double.MAX_VALUE
+						: calc.getLowestPrice(o1)
+				)
 			);
 
 			JsonObject mappings = getInternalJsonMappings();
@@ -110,18 +117,19 @@ public class MissingCommand extends Command {
 				totalCost += cost;
 				String wikiLink = higherDepth(mappings, curId + ".wiki", null);
 				String name = idToName(curId);
-				if(questTalismans.contains(curId) || curId.startsWith("WEDDING_RING_") || curId.startsWith("CAMPFIRE_TALISMAN_")){
+				if (questTalismans.contains(curId) || curId.startsWith("WEDDING_RING_") || curId.startsWith("CAMPFIRE_TALISMAN_")) {
 					costOut = " (Quest)";
-				}else if(player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(curId)){
+				} else if (player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(curId)) {
 					costOut = " (Unobtainable)";
-				}else{
+				} else {
 					costOut = " ➜ " + roundAndFormat(cost);
 				}
 				paginateBuilder.addItems(
 					getEmoji(curId) +
 					" " +
 					(wikiLink == null ? name : "[" + name + "](" + wikiLink + ")") +
-					(higherDepth(talismanUpgrades, curId) != null ? "**\\***" : "") + costOut
+					(higherDepth(talismanUpgrades, curId) != null ? "**\\***" : "") +
+					costOut
 				);
 			}
 			PaginatorExtras extras = new PaginatorExtras()

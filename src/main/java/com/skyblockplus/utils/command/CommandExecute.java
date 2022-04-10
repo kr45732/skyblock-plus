@@ -187,10 +187,10 @@ public abstract class CommandExecute extends CommandEvent {
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].startsWith(match + ":")) {
 				try {
-				String arg = args[i].split(match + ":")[1];
-				removeArg(i);
-				return arg;
-			} catch (Exception ignored) {}
+					String arg = args[i].split(match + ":")[1];
+					removeArg(i);
+					return arg;
+				} catch (Exception ignored) {}
 			}
 		}
 
@@ -218,9 +218,11 @@ public abstract class CommandExecute extends CommandEvent {
 	protected int getIntOption(String match, int defaultValue) {
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].startsWith(match + ":")) {
-				try{int arg = Integer.parseInt(args[i].split(match + ":")[1]);
-				removeArg(i);
-				return arg;} catch (Exception ignored) {}
+				try {
+					int arg = Integer.parseInt(args[i].split(match + ":")[1]);
+					removeArg(i);
+					return arg;
+				} catch (Exception ignored) {}
 			}
 		}
 
@@ -230,9 +232,11 @@ public abstract class CommandExecute extends CommandEvent {
 	protected double getDoubleOption(String match, double defaultValue) {
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].startsWith(match + ":")) {
-				try{double arg = Double.parseDouble(args[i].split(match + ":")[1]);
-				removeArg(i);
-				return arg;} catch (Exception ignored) {}
+				try {
+					double arg = Double.parseDouble(args[i].split(match + ":")[1]);
+					removeArg(i);
+					return arg;
+				} catch (Exception ignored) {}
 			}
 		}
 
