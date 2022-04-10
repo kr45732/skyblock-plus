@@ -307,7 +307,7 @@ public class CacheDatabase {
 			for (Player.Gamemode gamemode : leaderboardGamemodes) {
 				if (player.isValid()) {
 					insertIntoLeaderboard(finalPlayer, gamemode);
-				}else{
+				} else {
 					deleteFromLeaderboard(finalPlayer, gamemode);
 				}
 			}
@@ -352,12 +352,8 @@ public class CacheDatabase {
 
 	private void deleteFromLeaderboard(Player player, Player.Gamemode gamemode) {
 		try (
-				Connection connection = getConnection();
-				PreparedStatement statement = connection.prepareStatement(
-						"DELETE FROM " +
-								gamemode.toCacheType() +
-								" WHERE uuid = ?"
-				)
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement("DELETE FROM " + gamemode.toCacheType() + " WHERE uuid = ?")
 		) {
 			statement.setString(1, player.getUuid());
 			statement.executeUpdate();
@@ -400,14 +396,19 @@ public class CacheDatabase {
 				long start = System.currentTimeMillis();
 				while (response.next() && count < 90) {
 					UsernameUuidStruct uuid = uuidToUsername(response.getString("uuid"));
-					if(!uuid.isNotValid()){
-						asyncSkyblockProfilesFromUuid(uuid.uuid(), count < 45 ? "c0cc68fc-a82a-462f-96ef-a060c22465fa" : "4991bfe2-d7aa-446a-b310-c7a70690927c")
-								.whenComplete((r, e) -> insertIntoLeaderboard(new Player(uuid.uuid(), uuid.username(), r, true), false));
-						count ++;
+					if (!uuid.isNotValid()) {
+						asyncSkyblockProfilesFromUuid(
+							uuid.uuid(),
+							count < 45 ? "c0cc68fc-a82a-462f-96ef-a060c22465fa" : "4991bfe2-d7aa-446a-b310-c7a70690927c"
+						)
+							.whenComplete((r, e) -> insertIntoLeaderboard(new Player(uuid.uuid(), uuid.username(), r, true), false));
+						count++;
 					}
 				}
 				log.info("Updated " + count + " leaderboard players in " + (System.currentTimeMillis() - start) + "ms");
 			}
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

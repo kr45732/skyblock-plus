@@ -977,7 +977,10 @@ public class Utils {
 					.getAsString();
 
 				if (!keyCooldownMap.containsKey(hypixelKey)) {
-					keyCooldownMap.put(hypixelKey, new HypixelKeyRecord(new AtomicInteger(remainingLimit), new AtomicInteger(timeTillReset)));
+					keyCooldownMap.put(
+						hypixelKey,
+						new HypixelKeyRecord(new AtomicInteger(remainingLimit), new AtomicInteger(timeTillReset))
+					);
 				}
 			}
 		} catch (Exception e) {

@@ -104,13 +104,14 @@ public class SacksCommand extends Command {
 					total[npcPrice != -1 ? 1 : 0] += sackPrice;
 				});
 
-			paginateBuilder.getPaginatorExtras()
-					.setEveryPageText(
-						"**Total value:** " +
-						roundAndFormat(total[0] + total[1]) +
-						(useNpcPrice ? " (" + roundAndFormat(total[1]) + " npc + " + roundAndFormat(total[0]) + " bazaar)" : "") +
-						"\n"
-					);
+			paginateBuilder
+				.getPaginatorExtras()
+				.setEveryPageText(
+					"**Total value:** " +
+					roundAndFormat(total[0] + total[1]) +
+					(useNpcPrice ? " (" + roundAndFormat(total[1]) + " npc + " + roundAndFormat(total[0]) + " bazaar)" : "") +
+					"\n"
+				);
 			event.paginate(paginateBuilder);
 			return null;
 		}

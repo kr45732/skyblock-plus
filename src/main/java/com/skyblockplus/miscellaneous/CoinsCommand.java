@@ -113,16 +113,17 @@ public class CoinsCommand extends Command {
 					);
 				}
 
-				paginateBuilder.getPaginatorExtras()
-						.setEveryPageText(
-							"**Last Transaction Time:** " +
-							"<t:" +
-							Instant
-								.ofEpochMilli(higherDepth(bankHistoryArray.get(bankHistoryArray.size() - 1), "timestamp").getAsLong())
-								.getEpochSecond() +
-							":D>" +
-							"\n"
-						);
+				paginateBuilder
+					.getPaginatorExtras()
+					.setEveryPageText(
+						"**Last Transaction Time:** " +
+						"<t:" +
+						Instant
+							.ofEpochMilli(higherDepth(bankHistoryArray.get(bankHistoryArray.size() - 1), "timestamp").getAsLong())
+							.getEpochSecond() +
+						":D>" +
+						"\n"
+					);
 
 				event.paginate(paginateBuilder);
 				return null;

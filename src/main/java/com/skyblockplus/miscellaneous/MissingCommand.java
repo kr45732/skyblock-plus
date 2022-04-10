@@ -47,34 +47,31 @@ public class MissingCommand extends Command {
 	public static EmbedBuilder getMissingTalismans(String username, String profileName, PaginatorEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
-			if(!player.isInventoryApiEnabled()){
+			if (!player.isInventoryApiEnabled()) {
 				return invalidEmbed("Inventory API is disabled");
 			}
 
 			Set<String> playerItems = new HashSet<>();
 			try {
 				playerItems.addAll(
-						player.getInventoryMap().values().stream().filter(Objects::nonNull).map(InvItem::getId).collect(Collectors.toSet()));
-			} catch (Exception ignored) {
-			}
+					player.getInventoryMap().values().stream().filter(Objects::nonNull).map(InvItem::getId).collect(Collectors.toSet())
+				);
+			} catch (Exception ignored) {}
 			try {
 				playerItems.addAll(
-						player.getEnderChestMap().values().stream().filter(Objects::nonNull).map(InvItem::getId).collect(Collectors.toSet())
+					player.getEnderChestMap().values().stream().filter(Objects::nonNull).map(InvItem::getId).collect(Collectors.toSet())
 				);
-			} catch (Exception ignored) {
-			}
+			} catch (Exception ignored) {}
 			try {
 				playerItems.addAll(
-						player.getStorageMap().values().stream().filter(Objects::nonNull).map(InvItem::getId).collect(Collectors.toSet())
+					player.getStorageMap().values().stream().filter(Objects::nonNull).map(InvItem::getId).collect(Collectors.toSet())
 				);
-			} catch (Exception ignored) {
-			}
+			} catch (Exception ignored) {}
 			try {
 				playerItems.addAll(
-						player.getTalismanBagMap().values().stream().filter(Objects::nonNull).map(InvItem::getId).collect(Collectors.toSet())
+					player.getTalismanBagMap().values().stream().filter(Objects::nonNull).map(InvItem::getId).collect(Collectors.toSet())
 				);
-			} catch (Exception ignored) {
-			}
+			} catch (Exception ignored) {}
 
 			JsonObject talismanUpgrades = higherDepth(getMiscJson(), "talisman_upgrades").getAsJsonObject();
 			Set<String> missingInternal = new HashSet<>(ALL_TALISMANS);
@@ -143,13 +140,15 @@ public class MissingCommand extends Command {
 					costOut
 				);
 			}
-			paginateBuilder.getPaginatorExtras().setEveryPageText(
+			paginateBuilder
+				.getPaginatorExtras()
+				.setEveryPageText(
 					"**Total Missing:** " +
-							missingInternalArr.size() +
-							"\n**Total Cost:** " +
-							simplifyNumber(totalCost) +
-							"\n**Note:** Talismans with a * have higher tiers\n"
-			);
+					missingInternalArr.size() +
+					"\n**Total Cost:** " +
+					simplifyNumber(totalCost) +
+					"\n**Note:** Talismans with a * have higher tiers\n"
+				);
 
 			event.paginate(paginateBuilder);
 			return null;

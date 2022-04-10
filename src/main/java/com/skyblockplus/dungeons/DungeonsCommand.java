@@ -46,15 +46,14 @@ public class DungeonsCommand extends Command {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			try {
-				CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator(PaginatorExtras.PaginatorType.EMBED_FIELDS).setColumns(3).setItemsPerPage(9);
+				CustomPaginator.Builder paginateBuilder = player
+					.defaultPlayerPaginator(PaginatorExtras.PaginatorType.EMBED_FIELDS)
+					.setColumns(3)
+					.setItemsPerPage(9);
 				PaginatorExtras extras = paginateBuilder.getPaginatorExtras();
-				extras
-					.setEveryPageText(
-						"**Secrets:** " +
-						formatNumber(player.getDungeonSecrets()) +
-						"\n**Selected Class:** " +
-						player.getSelectedDungeonClass()
-					);
+				extras.setEveryPageText(
+					"**Secrets:** " + formatNumber(player.getDungeonSecrets()) + "\n**Selected Class:** " + player.getSelectedDungeonClass()
+				);
 
 				SkillsStruct skillInfo = player.getCatacombs();
 				extras.addEmbedField(

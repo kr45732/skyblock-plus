@@ -1135,10 +1135,15 @@ public class Player {
 	}
 
 	public CustomPaginator.Builder defaultPlayerPaginator(PaginatorExtras.PaginatorType type) {
-		return  defaultPaginator().setColumns(1).setItemsPerPage(1).setPaginatorExtras(new PaginatorExtras(type)
-				.setEveryPageTitle(fixUsername(getUsername()) + getSymbol(" "))
-				.setEveryPageThumbnail(getThumbnailUrl())
-				.setEveryPageTitleUrl(skyblockStatsLink()));
+		return defaultPaginator()
+			.setColumns(1)
+			.setItemsPerPage(1)
+			.setPaginatorExtras(
+				new PaginatorExtras(type)
+					.setEveryPageTitle(fixUsername(getUsername()) + getSymbol(" "))
+					.setEveryPageThumbnail(getThumbnailUrl())
+					.setEveryPageTitleUrl(skyblockStatsLink())
+			);
 	}
 
 	public EmbedBuilder getFailEmbed() {
@@ -1439,12 +1444,12 @@ public class Player {
 
 		public String getSymbol(String... prefix) {
 			return (
-					(prefix.length >= 1 ? prefix[0] : "") +
-							switch (this) {
-								case IRONMAN -> "\u267B️";
-								case STRANDED -> "\uD83C\uDFDD";
-								default -> "";
-							}
+				(prefix.length >= 1 ? prefix[0] : "") +
+				switch (this) {
+					case IRONMAN -> "\u267B️";
+					case STRANDED -> "\uD83C\uDFDD";
+					default -> "";
+				}
 			).stripTrailing();
 		}
 	}

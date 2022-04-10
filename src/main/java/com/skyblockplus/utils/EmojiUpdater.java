@@ -18,19 +18,14 @@
 
 package com.skyblockplus.utils;
 
+import static com.skyblockplus.utils.Constants.ENCHANT_NAMES;
+import static com.skyblockplus.utils.Constants.PET_NAMES;
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import net.dv8tion.jda.api.entities.Emote;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Icon;
-import org.apache.tomcat.util.http.fileupload.FileUtils;
-import org.eclipse.jgit.api.Git;
-
-import javax.imageio.ImageIO;
-import javax.imageio.stream.FileImageOutputStream;
-import javax.imageio.stream.ImageOutputStream;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -38,14 +33,18 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import static com.skyblockplus.utils.Constants.ENCHANT_NAMES;
-import static com.skyblockplus.utils.Constants.PET_NAMES;
-import static com.skyblockplus.utils.Utils.*;
+import javax.imageio.ImageIO;
+import javax.imageio.stream.FileImageOutputStream;
+import javax.imageio.stream.ImageOutputStream;
+import net.dv8tion.jda.api.entities.Emote;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Icon;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
+import org.eclipse.jgit.api.Git;
 
 /*
  * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
@@ -142,8 +141,8 @@ public class EmojiUpdater {
 						imgFile = new File(skyCryptFiles.getPath() + "/" + sbItem + ".png");
 						ImageIO.write(ImageIO.read(new URL("https://sky.shiiyu.moe/item/" + sbItem)), "png", imgFile);
 					} else {
-						if(imgFiles.length > 1) {
-							System.out.println(sbItem + " - "  + Arrays.toString(imgFiles));
+						if (imgFiles.length > 1) {
+							System.out.println(sbItem + " - " + Arrays.toString(imgFiles));
 						}
 						imgFile = imgFiles[0];
 					}
@@ -169,7 +168,7 @@ public class EmojiUpdater {
 		return null;
 	}
 
-	public static List<String> getEnchantedItems(){
+	public static List<String> getEnchantedItems() {
 		try {
 			File neuDir = new File("src/main/java/com/skyblockplus/json/neu");
 			if (neuDir.exists()) {
@@ -177,26 +176,31 @@ public class EmojiUpdater {
 			}
 			neuDir.mkdir();
 
-			Git
-					.cloneRepository()
-					.setURI("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO.git")
-					.setDirectory(neuDir)
-					.call();
+			Git.cloneRepository().setURI("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO.git").setDirectory(neuDir).call();
 
-			List<String> enchantedItems = Arrays.stream(new File(neuDir.getPath() + "/items").listFiles(f -> {
-				try {
-					JsonElement json = JsonParser.parseReader(new FileReader(f));
-					return !higherDepth(json ,"itemid").getAsString().equals("minecraft:skull") && higherDepth(json, "nbttag").getAsString().startsWith("{ench:[");
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				return false;
-			})).map(f -> f.getName().split(".json")[0]).collect(Collectors.toList());
+			List<String> enchantedItems = Arrays
+				.stream(
+					new File(neuDir.getPath() + "/items")
+						.listFiles(f -> {
+							try {
+								JsonElement json = JsonParser.parseReader(new FileReader(f));
+								return (
+									!higherDepth(json, "itemid").getAsString().equals("minecraft:skull") &&
+									higherDepth(json, "nbttag").getAsString().startsWith("{ench:[")
+								);
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+							return false;
+						})
+				)
+				.map(f -> f.getName().split(".json")[0])
+				.collect(Collectors.toList());
 
 			FileUtils.deleteDirectory(neuDir);
 
 			return enchantedItems;
-		}catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
