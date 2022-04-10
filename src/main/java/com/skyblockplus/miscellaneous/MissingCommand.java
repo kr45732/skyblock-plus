@@ -32,7 +32,6 @@ import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.InvItem;
-import com.skyblockplus.utils.structs.PaginatorExtras;
 import java.util.*;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -48,21 +47,33 @@ public class MissingCommand extends Command {
 	public static EmbedBuilder getMissingTalismans(String username, String profileName, PaginatorEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
-			Set<String> playerItems;
-			try {
-				playerItems =
-					player.getInventoryMap().values().stream().filter(Objects::nonNull).map(InvItem::getId).collect(Collectors.toSet());
-				playerItems.addAll(
-					player.getEnderChestMap().values().stream().filter(Objects::nonNull).map(InvItem::getId).collect(Collectors.toSet())
-				);
-				playerItems.addAll(
-					player.getStorageMap().values().stream().filter(Objects::nonNull).map(InvItem::getId).collect(Collectors.toSet())
-				);
-				playerItems.addAll(
-					player.getTalismanBagMap().values().stream().filter(Objects::nonNull).map(InvItem::getId).collect(Collectors.toSet())
-				);
-			} catch (Exception e) {
+			if(!player.isInventoryApiEnabled()){
 				return invalidEmbed("Inventory API is disabled");
+			}
+
+			Set<String> playerItems = new HashSet<>();
+			try {
+				playerItems.addAll(
+						player.getInventoryMap().values().stream().filter(Objects::nonNull).map(InvItem::getId).collect(Collectors.toSet()));
+			} catch (Exception ignored) {
+			}
+			try {
+				playerItems.addAll(
+						player.getEnderChestMap().values().stream().filter(Objects::nonNull).map(InvItem::getId).collect(Collectors.toSet())
+				);
+			} catch (Exception ignored) {
+			}
+			try {
+				playerItems.addAll(
+						player.getStorageMap().values().stream().filter(Objects::nonNull).map(InvItem::getId).collect(Collectors.toSet())
+				);
+			} catch (Exception ignored) {
+			}
+			try {
+				playerItems.addAll(
+						player.getTalismanBagMap().values().stream().filter(Objects::nonNull).map(InvItem::getId).collect(Collectors.toSet())
+				);
+			} catch (Exception ignored) {
 			}
 
 			JsonObject talismanUpgrades = higherDepth(getMiscJson(), "talisman_upgrades").getAsJsonObject();
@@ -109,10 +120,10 @@ public class MissingCommand extends Command {
 			);
 
 			JsonObject mappings = getInternalJsonMappings();
-			CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(25);
+			CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator().setItemsPerPage(25);
 			double totalCost = 0;
 			for (String curId : missingInternalArr) {
-				String costOut = "";
+				String costOut;
 				double cost = calc.getLowestPrice(curId);
 				totalCost += cost;
 				String wikiLink = higherDepth(mappings, curId + ".wiki", null);
@@ -132,19 +143,15 @@ public class MissingCommand extends Command {
 					costOut
 				);
 			}
-			PaginatorExtras extras = new PaginatorExtras()
-				.setEveryPageText(
+			paginateBuilder.getPaginatorExtras().setEveryPageText(
 					"**Total Missing:** " +
-					missingInternalArr.size() +
-					"\n**Total Cost:** " +
-					simplifyNumber(totalCost) +
-					"\n**Note:** Talismans with a * have higher tiers\n"
-				)
-				.setEveryPageTitle(player.getUsername())
-				.setEveryPageThumbnail(player.getThumbnailUrl())
-				.setEveryPageTitleUrl(player.skyblockStatsLink());
+							missingInternalArr.size() +
+							"\n**Total Cost:** " +
+							simplifyNumber(totalCost) +
+							"\n**Note:** Talismans with a * have higher tiers\n"
+			);
 
-			event.paginate(paginateBuilder.setPaginatorExtras(extras));
+			event.paginate(paginateBuilder);
 			return null;
 		}
 		return player.getFailEmbed();

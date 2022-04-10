@@ -27,7 +27,6 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
-import com.skyblockplus.utils.structs.PaginatorExtras;
 import java.util.Comparator;
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -48,7 +47,7 @@ public class SacksCommand extends Command {
 				return invalidEmbed("Inventory API disabled");
 			}
 
-			CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(20);
+			CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator().setItemsPerPage(20);
 
 			JsonElement bazaarPrices = higherDepth(getBazaarJson(), "products");
 
@@ -105,18 +104,13 @@ public class SacksCommand extends Command {
 					total[npcPrice != -1 ? 1 : 0] += sackPrice;
 				});
 
-			paginateBuilder.setPaginatorExtras(
-				new PaginatorExtras()
-					.setEveryPageTitle(player.getUsername())
-					.setEveryPageThumbnail(player.getThumbnailUrl())
-					.setEveryPageTitleUrl(player.skyblockStatsLink())
+			paginateBuilder.getPaginatorExtras()
 					.setEveryPageText(
 						"**Total value:** " +
 						roundAndFormat(total[0] + total[1]) +
 						(useNpcPrice ? " (" + roundAndFormat(total[1]) + " npc + " + roundAndFormat(total[0]) + " bazaar)" : "") +
 						"\n"
-					)
-			);
+					);
 			event.paginate(paginateBuilder);
 			return null;
 		}

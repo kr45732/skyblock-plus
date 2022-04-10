@@ -108,7 +108,7 @@ public class Utils {
 	public static final ExecutorService executor = new ExceptionExecutor();
 	public static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(7);
 	public static final ScriptEngine jsScriptEngine = new ScriptEngineManager().getEngineByName("js");
-	public static final AtomicInteger remainingLimit = new AtomicInteger(120);
+	public static final AtomicInteger remainingLimit = new AtomicInteger(240);
 	public static final AtomicInteger timeTillReset = new AtomicInteger(0);
 	public static final ConcurrentHashMap<String, HypixelKeyRecord> keyCooldownMap = new ConcurrentHashMap<>();
 	public static final Cache<String, HypixelGuildCache> hypixelGuildsCacheMap = Caffeine
@@ -966,26 +966,23 @@ public class Utils {
 			HttpGet httpGet = new HttpGet("https://api.hypixel.net/key?key=" + hypixelKey);
 			httpGet.addHeader("content-type", "application/json; charset=UTF-8");
 
-			int remainingLimit;
-			int timeTillReset;
 			try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
-				remainingLimit = Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Remaining").getValue());
-				timeTillReset = Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Reset").getValue());
+				int remainingLimit = Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Remaining").getValue());
+				int timeTillReset = Integer.parseInt(httpResponse.getFirstHeader("RateLimit-Reset").getValue());
 				if (checkRatelimit && remainingLimit < 10) {
 					return invalidEmbed("That command is on cooldown for " + timeTillReset + " more seconds");
 				}
 
 				higherDepth(JsonParser.parseReader(new InputStreamReader(httpResponse.getEntity().getContent())), "record.key")
 					.getAsString();
+
+				if (!keyCooldownMap.containsKey(hypixelKey)) {
+					keyCooldownMap.put(hypixelKey, new HypixelKeyRecord(new AtomicInteger(remainingLimit), new AtomicInteger(timeTillReset)));
+				}
 			}
 		} catch (Exception e) {
 			return invalidEmbed("You must set a valid Hypixel API key to use this feature or command");
 		}
-
-		if (!keyCooldownMap.containsKey(hypixelKey)) {
-			keyCooldownMap.put(hypixelKey, new HypixelKeyRecord(remainingLimit, timeTillReset));
-		}
-
 		return null;
 	}
 

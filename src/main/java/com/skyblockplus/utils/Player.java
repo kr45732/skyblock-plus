@@ -21,12 +21,14 @@ package com.skyblockplus.utils;
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.Utils.defaultPaginator;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.skyblockplus.miscellaneous.networth.NetworthExecute;
 import com.skyblockplus.miscellaneous.weight.senither.Weight;
+import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.structs.*;
 import java.time.Instant;
 import java.util.*;
@@ -107,6 +109,10 @@ public class Player {
 	}
 
 	public Player(String uuid, String username, JsonElement profileArray) {
+		this(uuid, username, profileArray, false);
+	}
+
+	public Player(String uuid, String username, JsonElement profileArray, boolean isCopy) {
 		this.uuid = uuid;
 		this.username = username;
 
@@ -125,7 +131,9 @@ public class Player {
 		}
 
 		this.valid = true;
-		cacheDatabase.insertIntoLeaderboard(this);
+		if (!isCopy) {
+			cacheDatabase.insertIntoLeaderboard(this);
+		}
 	}
 
 	public Player(String uuid, String username, String profileName, JsonElement profileArray) {
@@ -1122,6 +1130,17 @@ public class Player {
 		return defaultEmbed(fixUsername(getUsername()) + getSymbol(" ") + extra, skyblockStatsLink()).setThumbnail(getThumbnailUrl());
 	}
 
+	public CustomPaginator.Builder defaultPlayerPaginator() {
+		return defaultPlayerPaginator(PaginatorExtras.PaginatorType.DEFAULT);
+	}
+
+	public CustomPaginator.Builder defaultPlayerPaginator(PaginatorExtras.PaginatorType type) {
+		return  defaultPaginator().setColumns(1).setItemsPerPage(1).setPaginatorExtras(new PaginatorExtras(type)
+				.setEveryPageTitle(fixUsername(getUsername()) + getSymbol(" "))
+				.setEveryPageThumbnail(getThumbnailUrl())
+				.setEveryPageTitleUrl(skyblockStatsLink()));
+	}
+
 	public EmbedBuilder getFailEmbed() {
 		return invalidEmbed(failCause);
 	}
@@ -1188,14 +1207,7 @@ public class Player {
 	}
 
 	public String getSymbol(String... prefix) {
-		return (
-			(prefix.length >= 1 ? prefix[0] : "") +
-			switch (getGamemode()) {
-				case IRONMAN -> "\u267B️";
-				case STRANDED -> "\uD83C\uDFDD";
-				default -> "";
-			}
-		).stripTrailing();
+		return getGamemode().getSymbol(prefix);
 	}
 
 	public boolean isGamemode(Gamemode gamemode) {
@@ -1424,6 +1436,17 @@ public class Player {
 
 			return isGamemode(of((String) gamemode));
 		}
+
+		public String getSymbol(String... prefix) {
+			return (
+					(prefix.length >= 1 ? prefix[0] : "") +
+							switch (this) {
+								case IRONMAN -> "\u267B️";
+								case STRANDED -> "\uD83C\uDFDD";
+								default -> "";
+							}
+			).stripTrailing();
+		}
 	}
 
 	public boolean isInventoryApiEnabled() {
@@ -1447,9 +1470,5 @@ public class Player {
 
 	public boolean isSkillsApiEnabled() {
 		return getSkillAverage("", -1) != -1;
-	}
-
-	public boolean isAllApiEnable() {
-		return isInventoryApiEnabled() && isBankApiEnabled() && isCollectionsApiEnabled() && isVaultApiEnabled() && isSkillsApiEnabled();
 	}
 }

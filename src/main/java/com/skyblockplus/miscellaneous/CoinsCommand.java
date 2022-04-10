@@ -30,7 +30,6 @@ import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.HypixelResponse;
-import com.skyblockplus.utils.structs.PaginatorExtras;
 import java.time.Duration;
 import java.time.Instant;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -95,7 +94,7 @@ public class CoinsCommand extends Command {
 				if (bankHistoryArray.isEmpty()) {
 					return player.defaultPlayerEmbed().setDescription("Bank history empty");
 				}
-				CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(20);
+				CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator().setItemsPerPage(20);
 
 				for (int i = bankHistoryArray.size() - 1; i >= 0; i--) {
 					JsonElement currentTransaction = bankHistoryArray.get(i);
@@ -114,11 +113,7 @@ public class CoinsCommand extends Command {
 					);
 				}
 
-				paginateBuilder.setPaginatorExtras(
-					new PaginatorExtras()
-						.setEveryPageTitle(player.getUsername())
-						.setEveryPageThumbnail(player.getThumbnailUrl())
-						.setEveryPageTitleUrl(player.skyblockStatsLink())
+				paginateBuilder.getPaginatorExtras()
 						.setEveryPageText(
 							"**Last Transaction Time:** " +
 							"<t:" +
@@ -127,8 +122,7 @@ public class CoinsCommand extends Command {
 								.getEpochSecond() +
 							":D>" +
 							"\n"
-						)
-				);
+						);
 
 				event.paginate(paginateBuilder);
 				return null;

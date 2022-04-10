@@ -401,6 +401,10 @@ public class CustomPaginator extends Menu {
 			return this;
 		}
 
+		public PaginatorExtras getPaginatorExtras() {
+			return extras;
+		}
+
 		public Builder setFinalAction(Consumer<Message> finalAction) {
 			this.finalAction = finalAction;
 			return this;

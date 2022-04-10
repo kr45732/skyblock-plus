@@ -27,7 +27,6 @@ import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.ArmorStruct;
-import com.skyblockplus.utils.structs.PaginatorExtras;
 import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -45,7 +44,7 @@ public class WardrobeCommand extends Command {
 		if (player.isValid()) {
 			Map<Integer, ArmorStruct> armorStructMap = player.getWardrobeList();
 			if (armorStructMap != null) {
-				CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(4);
+				CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator().setItemsPerPage(4);
 
 				for (Map.Entry<Integer, ArmorStruct> currentArmour : armorStructMap.entrySet()) {
 					paginateBuilder.addItems(
@@ -62,12 +61,6 @@ public class WardrobeCommand extends Command {
 						"\n"
 					);
 				}
-				paginateBuilder.setPaginatorExtras(
-					new PaginatorExtras()
-						.setEveryPageTitle(player.getUsername())
-						.setEveryPageThumbnail(player.getThumbnailUrl())
-						.setEveryPageTitleUrl(player.skyblockStatsLink())
-				);
 				event.paginate(paginateBuilder);
 				return null;
 			}

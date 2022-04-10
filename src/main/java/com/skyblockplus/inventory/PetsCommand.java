@@ -29,7 +29,6 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
-import com.skyblockplus.utils.structs.PaginatorExtras;
 import net.dv8tion.jda.api.EmbedBuilder;
 
 public class PetsCommand extends Command {
@@ -43,7 +42,7 @@ public class PetsCommand extends Command {
 	public static EmbedBuilder getPlayerPets(String username, String profileName, PaginatorEvent event) {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
-			CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(25);
+			CustomPaginator.Builder paginateBuilder =player.defaultPlayerPaginator().setItemsPerPage(25);
 
 			JsonArray playerPets = player.getPets();
 			for (JsonElement pet : playerPets) {
@@ -67,12 +66,6 @@ public class PetsCommand extends Command {
 					(petItem != null ? getEmoji(petItem) : "")
 				);
 			}
-			paginateBuilder.setPaginatorExtras(
-				new PaginatorExtras()
-					.setEveryPageTitle(player.getUsername())
-					.setEveryPageThumbnail(player.getThumbnailUrl())
-					.setEveryPageTitleUrl(player.skyblockStatsLink())
-			);
 			event.paginate(paginateBuilder);
 			return null;
 		}

@@ -174,7 +174,7 @@ public class FixApplicationCommand extends Command {
 				applicationJson.addProperty("reactMessageId", submitAppMessage.getId());
 				String url = submitAppMessage.getEmbeds().get(0).getUrl();
 				applicationJson.addProperty("playerProfileName", url.substring(url.lastIndexOf("/") + 1));
-				applicationJson.addProperty("ironmanSymbol", submitAppMessage.getEmbeds().get(0).getTitle().endsWith(" ♻️") ? " ♻️" : "");
+				applicationJson.addProperty("ironmanSymbol", submitAppMessage.getEmbeds().get(0).getTitle().endsWith(" ♻️") ? " ♻️" : (submitAppMessage.getEmbeds().get(0).getTitle().endsWith("\uD83C\uDFDD") ? " \uD83C\uDFDD" : ""));
 
 				List<Message> toDeleteSubmitAppMessages = messages
 					.stream()
