@@ -1486,7 +1486,6 @@ public class Utils {
 	public static Permission[] defaultPerms() {
 		return new Permission[] {
 			Permission.MESSAGE_SEND,
-			Permission.MESSAGE_EMBED_LINKS,
 			Permission.MESSAGE_MANAGE,
 			Permission.MESSAGE_ADD_REACTION,
 		};

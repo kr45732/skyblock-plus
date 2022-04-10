@@ -186,9 +186,11 @@ public abstract class CommandExecute extends CommandEvent {
 	protected String getStringOption(String match, String defaultValue) {
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].startsWith(match + ":")) {
+				try {
 				String arg = args[i].split(match + ":")[1];
 				removeArg(i);
 				return arg;
+			} catch (Exception ignored) {}
 			}
 		}
 
@@ -198,13 +200,11 @@ public abstract class CommandExecute extends CommandEvent {
 	protected Player.Gamemode getGamemodeOption(String match, Player.Gamemode defaultValue) {
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].startsWith(match + ":")) {
-				String arg = args[i].split(match + ":")[1];
-				removeArg(i);
 				try {
-					return Player.Gamemode.of(arg);
-				} catch (Exception e) {
-					return defaultValue;
-				}
+					Player.Gamemode arg = Player.Gamemode.of(args[i].split(match + ":")[1]);
+					removeArg(i);
+					return arg;
+				} catch (Exception ignored) {}
 			}
 		}
 
@@ -218,9 +218,9 @@ public abstract class CommandExecute extends CommandEvent {
 	protected int getIntOption(String match, int defaultValue) {
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].startsWith(match + ":")) {
-				int arg = Integer.parseInt(args[i].split(match + ":")[1]);
+				try{int arg = Integer.parseInt(args[i].split(match + ":")[1]);
 				removeArg(i);
-				return arg;
+				return arg;} catch (Exception ignored) {}
 			}
 		}
 
@@ -230,9 +230,9 @@ public abstract class CommandExecute extends CommandEvent {
 	protected double getDoubleOption(String match, double defaultValue) {
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].startsWith(match + ":")) {
-				double arg = Double.parseDouble(args[i].split(match + ":")[1]);
+				try{double arg = Double.parseDouble(args[i].split(match + ":")[1]);
 				removeArg(i);
-				return arg;
+				return arg;} catch (Exception ignored) {}
 			}
 		}
 

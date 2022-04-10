@@ -54,6 +54,7 @@ public class CakesCommand extends Command {
 			cakeNameToId.put("cake_intelligence", "EPOCH_CAKE_AQUA");
 			cakeNameToId.put("cake_farming_fortune", "EPOCH_CAKE_BROWN");
 			cakeNameToId.put("cake_foraging_fortune", "EPOCH_CAKE_WHITE");
+			cakeNameToId.put("cake_mining_fortune", "EPOCH_CAKE_CYAN");
 
 			StringBuilder activeCakes = new StringBuilder();
 			if (higherDepth(player.profileJson(), "temp_stat_buffs") != null) {

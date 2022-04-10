@@ -26,6 +26,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.skyblockplus.miscellaneous.networth.NetworthExecute;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
@@ -93,26 +94,34 @@ public class MissingCommand extends Command {
 				}
 			});
 
-			JsonElement lowestBinJson = getLowestBinJson();
+			List<String> questTalismans = List.of("MELODY_HAIR", "CHEETAH_TALISMAN","LYNX_TALISMAN", "CAT_TALISMAN");
+			List<String> unobtainableIronmanTalismans = List.of("DANTE_TALISMAN", "BLOOD_GOD_CREST", "PARTY_HAT_CRAB", "POTATO_TALISMAN");
+			NetworthExecute calc = new NetworthExecute().initPrices();
 			missingInternalArr.sort(
-				Comparator.comparingDouble(o1 -> higherDepth(lowestBinJson, o1) != null ? higherDepth(lowestBinJson, o1).getAsDouble() : 0)
+				Comparator.comparingDouble(o1 -> questTalismans.contains(o1) || o1.startsWith("WEDDING_RING_") || o1.startsWith("CAMPFIRE_TALISMAN_") || (player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(o1))  ? Double.MAX_VALUE : calc.getLowestPrice(o1))
 			);
 
 			JsonObject mappings = getInternalJsonMappings();
 			CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(25);
 			double totalCost = 0;
 			for (String curId : missingInternalArr) {
-				double cost = higherDepth(lowestBinJson, curId, 0.0);
+				String costOut = "";
+				double cost = calc.getLowestPrice(curId);
 				totalCost += cost;
 				String wikiLink = higherDepth(mappings, curId + ".wiki", null);
 				String name = idToName(curId);
+				if(questTalismans.contains(curId) || curId.startsWith("WEDDING_RING_") || curId.startsWith("CAMPFIRE_TALISMAN_")){
+					costOut = " (Quest)";
+				}else if(player.isGamemode(Player.Gamemode.IRONMAN) && unobtainableIronmanTalismans.contains(curId)){
+					costOut = " (Unobtainable)";
+				}else{
+					costOut = " ➜ " + roundAndFormat(cost);
+				}
 				paginateBuilder.addItems(
 					getEmoji(curId) +
 					" " +
 					(wikiLink == null ? name : "[" + name + "](" + wikiLink + ")") +
-					(higherDepth(talismanUpgrades, curId) != null ? "**\\***" : "") +
-					" ➜ " +
-					roundAndFormat(cost)
+					(higherDepth(talismanUpgrades, curId) != null ? "**\\***" : "") + costOut
 				);
 			}
 			PaginatorExtras extras = new PaginatorExtras()
