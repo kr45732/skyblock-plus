@@ -406,7 +406,7 @@ public class CacheDatabase {
 					} else {
 						asyncSkyblockProfilesFromUuid(
 							usernameUuidStruct.uuid(),
-							count < 45 ? "c0cc68fc-a82a-462f-96ef-a060c22465fa" : "4991bfe2-d7aa-446a-b310-c7a70690927c"
+							count < 45 ? "c0cc68fc-a82a-462f-96ef-a060c22465fa" : "4991bfe2-d7aa-446a-b310-c7a70690927c", false
 						)
 							.whenComplete((r, e) ->
 								insertIntoLeaderboard(new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), r, true), false)

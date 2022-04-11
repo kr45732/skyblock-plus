@@ -312,6 +312,10 @@ public class ApiHandler {
 	}
 
 	public static CompletableFuture<JsonElement> asyncSkyblockProfilesFromUuid(String uuid, String hypixelApiKey) {
+		return asyncSkyblockProfilesFromUuid(uuid, hypixelApiKey, true);
+	}
+
+	public static CompletableFuture<JsonElement> asyncSkyblockProfilesFromUuid(String uuid, String hypixelApiKey, boolean cache) {
 		CompletableFuture<JsonElement> future = new CompletableFuture<>();
 
 		JsonElement cachedResponse = cacheDatabase.getCachedJson(uuid);
@@ -340,7 +344,9 @@ public class ApiHandler {
 								higherDepth(JsonParser.parseString(profilesResponse.getResponseBody()), "profiles").getAsJsonArray()
 							);
 
-							cacheDatabase.cacheJson(uuid, profileArray);
+							if (cache) {
+								cacheDatabase.cacheJson(uuid, profileArray);
+							}
 
 							return profileArray;
 						} catch (Exception ignored) {}
