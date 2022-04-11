@@ -403,17 +403,19 @@ public class CacheDatabase {
 								cacheDatabase.deleteFromLeaderboard(uuid, gamemode);
 							}
 						});
-					}else{
+					} else {
 						asyncSkyblockProfilesFromUuid(
-								usernameUuidStruct.uuid(),
-								count < 45 ? "c0cc68fc-a82a-462f-96ef-a060c22465fa" : "4991bfe2-d7aa-446a-b310-c7a70690927c"
+							usernameUuidStruct.uuid(),
+							count < 45 ? "c0cc68fc-a82a-462f-96ef-a060c22465fa" : "4991bfe2-d7aa-446a-b310-c7a70690927c"
 						)
-								.whenComplete((r, e) -> insertIntoLeaderboard(new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), r, true), false));
+							.whenComplete((r, e) ->
+								insertIntoLeaderboard(new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), r, true), false)
+							);
 					}
 					count++;
 				}
 
-				if(count > 0) {
+				if (count > 0) {
 					log.info("Updated " + count + " leaderboard players in " + (System.currentTimeMillis() - start) + "ms");
 				}
 			}

@@ -48,11 +48,12 @@ public class ScammerCommand extends Command {
 			.setFooter("Scammer check powered by SkyBlockZ (discord.gg/skyblock)");
 		if (scammerJson == null) {
 			return eb.setDescription(
-				client.getSuccess() + " This player is not marked as a scammer, however still exercise caution when trading with any player!"
+				client.getSuccess() +
+				" This player is not marked as a scammer, however still exercise caution when trading with any player!"
 			);
 		}
 
-		eb.setDescription(client.getError() +  " This account **IS** marked as a scammer");
+		eb.setDescription(client.getError() + " This account **IS** marked as a scammer");
 		eb.addField("Reason", higherDepth(scammerJson, "result.reason", "No reason provided"), false);
 		if (higherDepth(scammerJson, "is_alt", false)) {
 			eb.setDescription("This account **IS** marked as an alt");
