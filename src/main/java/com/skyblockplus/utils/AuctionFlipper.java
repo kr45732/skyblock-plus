@@ -60,7 +60,11 @@ public class AuctionFlipper {
 		scheduler.scheduleWithFixedDelay(
 			() -> {
 				try {
-					if (!useAlternativeAhApi && Duration.between(lastUpdated, Instant.now()).toMinutes() >= 3 && !currentMayor.equals("Derpy")) {
+					if (
+						!useAlternativeAhApi &&
+						Duration.between(lastUpdated, Instant.now()).toMinutes() >= 3 &&
+						!currentMayor.equals("Derpy")
+					) {
 						deleteUrl(
 							"https://api.heroku.com/apps/query-api/dynos",
 							new BasicHeader("Accept", "application/vnd.heroku+json; version=3"),

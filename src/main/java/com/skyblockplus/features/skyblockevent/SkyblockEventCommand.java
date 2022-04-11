@@ -521,7 +521,7 @@ public class SkyblockEventCommand extends Command {
 
 						String eventType = higherDepth(eventSettings, "eventType").getAsString();
 
-						if((eventType.startsWith("skills") || eventType.startsWith("weight")) && !player.isSkillsApiEnabled()){
+						if ((eventType.startsWith("skills") || eventType.startsWith("weight")) && !player.isSkillsApiEnabled()) {
 							return invalidEmbed("Please enable your skills API before joining");
 						}
 

@@ -189,7 +189,7 @@ public class Utils {
 	/* Getters */
 	public static JsonObject getLowestBinJson() {
 		if (lowestBinJson == null || Duration.between(lowestBinJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
-			if(currentMayor.equals("Derpy")){
+			if (currentMayor.equals("Derpy")) {
 				return lowestBinJson = getJsonObject(getQueryApiUrl("lowestbin") + "?key=" + AUCTION_API_KEY);
 			}
 
@@ -229,14 +229,8 @@ public class Utils {
 
 	public static JsonObject getAverageAuctionJson() {
 		if (averageAuctionJson == null || Duration.between(averageAuctionJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
-			if(currentMayor.equals("Derpy")){
-				return averageAuctionJson =
-						getJsonObject(
-								getQueryApiUrl("average_auction") +
-										"?key=" +
-										AUCTION_API_KEY +
-										"&time=1"
-						);
+			if (currentMayor.equals("Derpy")) {
+				return averageAuctionJson = getJsonObject(getQueryApiUrl("average_auction") + "?key=" + AUCTION_API_KEY + "&time=1");
 			}
 
 			averageAuctionJson = getJsonObject("https://moulberry.codes/auction_averages/3day.json");
