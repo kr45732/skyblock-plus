@@ -28,7 +28,7 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public abstract class SlashCommand {
 
-	protected final Permission[] botPermissions = defaultPerms();
+	protected final Permission[] botPermissions = defaultPerms(true);
 	protected String name = "null";
 	protected int cooldown = -1;
 	protected Permission[] userPermissions = new Permission[0];

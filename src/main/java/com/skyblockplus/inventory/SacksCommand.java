@@ -44,7 +44,7 @@ public class SacksCommand extends Command {
 		if (player.isValid()) {
 			Map<String, Integer> sacksMap = player.getPlayerSacks();
 			if (sacksMap == null) {
-				return invalidEmbed("Inventory API disabled");
+				return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
 			}
 
 			CustomPaginator.Builder paginateBuilder = player.defaultPlayerPaginator().setItemsPerPage(20);

@@ -209,7 +209,7 @@ public class PartyCommand extends Command {
 					defaultEmbed("Party Finder")
 						.setDescription(
 							"**" +
-							player.getUsername() +
+							player.getUsernameFixed() +
 							" joined your party**\nCatacombs: " +
 							roundAndFormat(player.getCatacombs().getProgressLevel()) +
 							"\nSecrets: " +

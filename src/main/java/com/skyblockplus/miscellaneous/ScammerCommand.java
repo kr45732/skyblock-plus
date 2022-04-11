@@ -44,18 +44,18 @@ public class ScammerCommand extends Command {
 		}
 
 		JsonElement scammerJson = getScammerJson(usernameUuid.uuid());
-		EmbedBuilder eb = defaultEmbed(usernameUuid.username(), "https://mine.ly/" + usernameUuid.uuid())
+		EmbedBuilder eb = defaultEmbed(usernameUuid.usernameFixed(), "https://mine.ly/" + usernameUuid.uuid())
 			.setFooter("Scammer check powered by SkyBlockZ (discord.gg/skyblock)");
 		if (scammerJson == null) {
 			return eb.setDescription(
-				usernameUuid.username() + " is not marked as a scammer but still take caution when trading with any player!"
+				client.getSuccess() + " This player is not marked as a scammer, however still exercise caution when trading with any player!"
 			);
 		}
 
-		eb.setDescription("This account **IS** marked as a scammer");
+		eb.setDescription(client.getError() +  " This account **IS** marked as a scammer");
 		eb.addField("Reason", higherDepth(scammerJson, "result.reason", "No reason provided"), false);
 		if (higherDepth(scammerJson, "is_alt", false)) {
-			eb.setDescription("This account **IS** marked as a scammers alt");
+			eb.setDescription("This account **IS** marked as an alt");
 		}
 		if (higherDepth(scammerJson, "result.discord.[0]") != null) {
 			eb.addField(

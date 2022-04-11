@@ -99,7 +99,7 @@ public class InventoryCommand extends Command {
 					.queue();
 				return null;
 			}
-			return invalidEmbed(player.getUsername() + "'s inventory API is disabled");
+			return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
 		}
 		return player.getFailEmbed();
 	}

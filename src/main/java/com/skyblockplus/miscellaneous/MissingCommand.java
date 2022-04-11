@@ -48,7 +48,7 @@ public class MissingCommand extends Command {
 		Player player = profileName == null ? new Player(username) : new Player(username, profileName);
 		if (player.isValid()) {
 			if (!player.isInventoryApiEnabled()) {
-				return invalidEmbed("Inventory API is disabled");
+				return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
 			}
 
 			Set<String> playerItems = new HashSet<>();

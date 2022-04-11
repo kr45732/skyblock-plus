@@ -18,6 +18,8 @@
 
 package com.skyblockplus.utils.structs;
 
+import static com.skyblockplus.utils.Utils.fixUsername;
+
 public record UsernameUuidStruct(String username, String uuid, String failCause) {
 	public UsernameUuidStruct(String username, String uuid) {
 		this(username, uuid, null);
@@ -45,5 +47,9 @@ public record UsernameUuidStruct(String username, String uuid, String failCause)
 
 	public String nameMcHyperLink() {
 		return "[**" + username + "**](https://mine.ly/" + uuid + ")";
+	}
+
+	public String usernameFixed() {
+		return fixUsername(username());
 	}
 }

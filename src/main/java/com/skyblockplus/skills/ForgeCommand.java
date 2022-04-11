@@ -45,7 +45,7 @@ public class ForgeCommand extends Command {
 			EmbedBuilder eb = player.defaultPlayerEmbed();
 			JsonElement forgeItems = higherDepth(player.profileJson(), "forge.forge_processes.forge_1");
 			if (forgeItems == null) {
-				return defaultEmbed(player.getUsername() + " has no items in the forge");
+				return defaultEmbed(player.getUsernameFixed() + " has no items in the forge");
 			}
 			int forgeTime = higherDepth(player.profileJson(), "mining_core.nodes.forge_time", 0);
 			double bonus;
@@ -80,7 +80,7 @@ public class ForgeCommand extends Command {
 				);
 			}
 			if (eb.getFields().size() == 0) {
-				return defaultEmbed(player.getUsername() + " has no items in the forge");
+				return defaultEmbed(player.getUsernameFixed() + " has no items in the forge");
 			}
 			if (bonus != 1) {
 				eb.setDescription("**Quick Forge:** " + roundAndFormat(100 - bonus * 100.0) + "% less forge time");

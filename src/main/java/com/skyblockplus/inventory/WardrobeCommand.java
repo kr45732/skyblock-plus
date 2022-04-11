@@ -110,7 +110,7 @@ public class WardrobeCommand extends Command {
 				new InventoryPaginator(wardrobe, "Wardrobe", player, event);
 				return null;
 			}
-			return invalidEmbed(player.getUsername() + "'s inventory API is disabled");
+			return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
 		}
 		return player.getFailEmbed();
 	}

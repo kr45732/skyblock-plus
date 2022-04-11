@@ -71,7 +71,7 @@ public class EnderChestCommand extends Command {
 				new InventoryPaginator(enderChestPages, "Ender Chest", player, event);
 				return null;
 			}
-			return invalidEmbed(player.getUsername() + "'s inventory API is disabled");
+			return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
 		}
 		return player.getFailEmbed();
 	}

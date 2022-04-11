@@ -308,7 +308,7 @@ public class CacheDatabase {
 				if (player.isValid()) {
 					insertIntoLeaderboard(finalPlayer, gamemode);
 				} else {
-					deleteFromLeaderboard(finalPlayer, gamemode);
+					deleteFromLeaderboard(finalPlayer.getUuid(), gamemode);
 				}
 			}
 		});
@@ -350,12 +350,12 @@ public class CacheDatabase {
 		}
 	}
 
-	private void deleteFromLeaderboard(Player player, Player.Gamemode gamemode) {
+	private void deleteFromLeaderboard(String uuid, Player.Gamemode gamemode) {
 		try (
 			Connection connection = getConnection();
 			PreparedStatement statement = connection.prepareStatement("DELETE FROM " + gamemode.toCacheType() + " WHERE uuid = ?")
 		) {
-			statement.setString(1, player.getUuid());
+			statement.setString(1, uuid);
 			statement.executeUpdate();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -395,17 +395,27 @@ public class CacheDatabase {
 				int count = 0;
 				long start = System.currentTimeMillis();
 				while (response.next() && count < 90) {
-					UsernameUuidStruct uuid = uuidToUsername(response.getString("uuid"));
-					if (!uuid.isNotValid()) {
+					String uuid = response.getString("uuid");
+					UsernameUuidStruct usernameUuidStruct = uuidToUsername(uuid);
+					if (usernameUuidStruct.isNotValid()) {
+						executor.submit(() -> {
+							for (Player.Gamemode gamemode : leaderboardGamemodes) {
+								cacheDatabase.deleteFromLeaderboard(uuid, gamemode);
+							}
+						});
+					}else{
 						asyncSkyblockProfilesFromUuid(
-							uuid.uuid(),
-							count < 45 ? "c0cc68fc-a82a-462f-96ef-a060c22465fa" : "4991bfe2-d7aa-446a-b310-c7a70690927c"
+								usernameUuidStruct.uuid(),
+								count < 45 ? "c0cc68fc-a82a-462f-96ef-a060c22465fa" : "4991bfe2-d7aa-446a-b310-c7a70690927c"
 						)
-							.whenComplete((r, e) -> insertIntoLeaderboard(new Player(uuid.uuid(), uuid.username(), r, true), false));
-						count++;
+								.whenComplete((r, e) -> insertIntoLeaderboard(new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), r, true), false));
 					}
+					count++;
 				}
-				log.info("Updated " + count + " leaderboard players in " + (System.currentTimeMillis() - start) + "ms");
+
+				if(count > 0) {
+					log.info("Updated " + count + " leaderboard players in " + (System.currentTimeMillis() - start) + "ms");
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

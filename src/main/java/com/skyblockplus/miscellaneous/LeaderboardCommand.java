@@ -76,7 +76,7 @@ public class LeaderboardCommand extends Command {
 
 		String ebStr =
 			"**Player:** " +
-			player.getUsername() +
+			player.getUsernameFixed() +
 			"\n**Rank:** " +
 			(guildRank == -1 ? "Not on leaderboard" : "#" + (guildRank + 1)) +
 			"\n**" +

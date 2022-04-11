@@ -228,6 +228,10 @@ public class Player {
 		return username;
 	}
 
+	public String getUsernameFixed() {
+		return fixUsername(username);
+	}
+
 	public String getProfileName() {
 		return profileName;
 	}

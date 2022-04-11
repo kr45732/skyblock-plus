@@ -1483,8 +1483,12 @@ public class Utils {
 		}
 	}
 
-	public static Permission[] defaultPerms() {
-		return new Permission[] { Permission.MESSAGE_SEND, Permission.MESSAGE_MANAGE, Permission.MESSAGE_ADD_REACTION };
+	public static Permission[] defaultPerms(){
+		return defaultPerms(false);
+	}
+
+	public static Permission[] defaultPerms(boolean isSlash) {
+		return isSlash ? new Permission[] { Permission.MESSAGE_SEND, Permission.MESSAGE_ADD_REACTION} : new Permission[] { Permission.MESSAGE_SEND, Permission.MESSAGE_ADD_REACTION, Permission.MESSAGE_EMBED_LINKS };
 	}
 
 	public static Stream<JsonElement> streamJsonArray(JsonArray array) {

@@ -93,7 +93,7 @@ public class CheckGuildApiCommand extends Command {
 							boolean skillsEnabled = player.isSkillsApiEnabled();
 
 							if (invEnabled && bankEnabled && collectionsEnabled && vaultEnabled && skillsEnabled) {
-								return client.getSuccess() + " **" + player.getUsername() + ":** all APIs enabled";
+								return client.getSuccess() + " **" + player.getUsernameFixed() + ":** all APIs enabled";
 							} else {
 								String out =
 									(invEnabled ? "" : "Inventory API, ") +
@@ -102,10 +102,10 @@ public class CheckGuildApiCommand extends Command {
 									(vaultEnabled ? "" : "Vault API, ") +
 									(skillsEnabled ? "" : "Skills API, ");
 
-								return client.getError() + " **" + player.getUsername() + ":** " + out.substring(0, out.length() - 2);
+								return client.getError() + " **" + player.getUsernameFixed() + ":** " + out.substring(0, out.length() - 2);
 							}
 						}
-						return client.getError() + " **" + player.getUsername() + ":** unable to get data";
+						return client.getError() + " **" + player.getUsernameFixed() + ":** unable to get data";
 					});
 				})
 			);

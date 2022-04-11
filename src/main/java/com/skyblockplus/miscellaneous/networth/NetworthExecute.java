@@ -155,7 +155,7 @@ public class NetworthExecute {
 			Map<Integer, InvItem> playerInventory = player.getInventoryMap();
 			if (playerInventory == null) {
 				invTotal = -1;
-				return defaultEmbed(player.getUsername() + "'s inventory API is disabled");
+				return defaultEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
 			}
 			for (InvItem item : playerInventory.values()) {
 				double itemPrice = calculateItemPrice(item, "inventory");
@@ -975,7 +975,7 @@ public class NetworthExecute {
 
 		try {
 			if (item.getId().equals("PET") && location != null) {
-				if (!item.getName().startsWith("Mystery ")) {
+				if (!item.getName().startsWith("Mystery ") && !item.getName().equals("Unknown Pet")) {
 					switch (location) {
 						case "inventory" -> invPets.add(item);
 						case "pets" -> petsPets.add(item);

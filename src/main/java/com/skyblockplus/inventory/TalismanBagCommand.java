@@ -133,7 +133,7 @@ public class TalismanBagCommand extends Command {
 				new InventoryPaginator(talismanBag, "Talisman Bag", player, event);
 				return null;
 			}
-			return invalidEmbed(player.getUsername() + "'s inventory API is disabled");
+			return invalidEmbed(player.getUsernameFixed() + "'s inventory API is disabled");
 		}
 		return player.getFailEmbed();
 	}
