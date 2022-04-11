@@ -19,6 +19,7 @@
 package com.skyblockplus.utils;
 
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.features.mayor.MayorHandler.currentMayor;
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Constants.ENCHANT_NAMES;
 import static com.skyblockplus.utils.Constants.PET_NAMES;
@@ -188,6 +189,10 @@ public class Utils {
 	/* Getters */
 	public static JsonObject getLowestBinJson() {
 		if (lowestBinJson == null || Duration.between(lowestBinJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
+			if(currentMayor.equals("Derpy")){
+				return lowestBinJson = getJsonObject(getQueryApiUrl("lowestbin") + "?key=" + AUCTION_API_KEY);
+			}
+
 			lowestBinJson = getJsonObject("https://moulberry.codes/lowestbin.json");
 			if (lowestBinJson == null) {
 				lowestBinJson = getJsonObject(getQueryApiUrl("lowestbin") + "?key=" + AUCTION_API_KEY);
@@ -224,6 +229,16 @@ public class Utils {
 
 	public static JsonObject getAverageAuctionJson() {
 		if (averageAuctionJson == null || Duration.between(averageAuctionJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
+			if(currentMayor.equals("Derpy")){
+				return averageAuctionJson =
+						getJsonObject(
+								getQueryApiUrl("average_auction") +
+										"?key=" +
+										AUCTION_API_KEY +
+										"&time=1"
+						);
+			}
+
 			averageAuctionJson = getJsonObject("https://moulberry.codes/auction_averages/3day.json");
 			if (averageAuctionJson == null) {
 				averageAuctionJson =

@@ -521,6 +521,10 @@ public class SkyblockEventCommand extends Command {
 
 						String eventType = higherDepth(eventSettings, "eventType").getAsString();
 
+						if((eventType.startsWith("skills") || eventType.startsWith("weight")) && !player.isSkillsApiEnabled()){
+							return invalidEmbed("Please enable your skills API before joining");
+						}
+
 						switch (eventType) {
 							case "slayer" -> {
 								startingAmount = player.getTotalSlayer();
@@ -536,9 +540,6 @@ public class SkyblockEventCommand extends Command {
 							}
 							case "weight" -> {
 								startingAmount = player.getWeight();
-								if (player.getTotalSkillsXp() == -1) {
-									startingAmount = -1;
-								}
 								startingAmountFormatted = formatNumber(startingAmount) + " weight";
 							}
 							default -> {
@@ -562,10 +563,6 @@ public class SkyblockEventCommand extends Command {
 									startingAmountFormatted = formatNumber(startingAmount) + " " + getEventTypeFormatted(eventType);
 								}
 							}
-						}
-
-						if (startingAmount == -1) {
-							return invalidEmbed("Please enable your skills API and try again");
 						}
 
 						try {

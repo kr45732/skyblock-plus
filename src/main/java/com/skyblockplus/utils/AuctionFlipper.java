@@ -18,6 +18,7 @@
 
 package com.skyblockplus.utils;
 
+import static com.skyblockplus.features.mayor.MayorHandler.currentMayor;
 import static com.skyblockplus.utils.ApiHandler.getQueryApiUrl;
 import static com.skyblockplus.utils.ApiHandler.useAlternativeAhApi;
 import static com.skyblockplus.utils.Utils.*;
@@ -59,7 +60,7 @@ public class AuctionFlipper {
 		scheduler.scheduleWithFixedDelay(
 			() -> {
 				try {
-					if (!useAlternativeAhApi && Duration.between(lastUpdated, Instant.now()).toMinutes() >= 3) {
+					if (!useAlternativeAhApi && Duration.between(lastUpdated, Instant.now()).toMinutes() >= 3 && !currentMayor.equals("Derpy")) {
 						deleteUrl(
 							"https://api.heroku.com/apps/query-api/dynos",
 							new BasicHeader("Accept", "application/vnd.heroku+json; version=3"),
