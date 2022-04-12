@@ -22,6 +22,7 @@ import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Utils.*;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -30,6 +31,7 @@ import com.skyblockplus.features.jacob.JacobData;
 import com.skyblockplus.features.jacob.JacobHandler;
 import com.skyblockplus.features.party.Party;
 import com.skyblockplus.price.AuctionTracker;
+import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -59,6 +61,7 @@ public class CacheDatabase {
 		Player.Gamemode.IRONMAN,
 		Player.Gamemode.STRANDED
 	);
+	public int guildCount = 2;
 
 	public CacheDatabase() {
 		HikariConfig config = new HikariConfig();
@@ -418,6 +421,44 @@ public class CacheDatabase {
 
 				if (count > 0) {
 					log.info("Updated " + count + " leaderboard players in " + (System.currentTimeMillis() - start) + "ms");
+				}
+
+				if(count <= 5 && guildCount != -1){
+					count = 0;
+					String guildId = higherDepth(getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/guilds.json"), "[" + guildCount + "]", null);
+					if(guildId == null){
+						guildCount = -1;
+						log.info("All guilds added");
+						return;
+					}
+					HypixelResponse guildResponse = getGuildFromId(guildId);
+					if(!guildResponse.isNotValid()){
+						JsonArray members = guildResponse.get("members").getAsJsonArray();
+						for (JsonElement member : members) {
+							String uuid = higherDepth(member, "uuid").getAsString();
+							UsernameUuidStruct usernameUuidStruct = uuidToUsername(uuid);
+							if (usernameUuidStruct.isNotValid()) {
+								executor.submit(() -> {
+									for (Player.Gamemode gamemode : leaderboardGamemodes) {
+										cacheDatabase.deleteFromLeaderboard(uuid, gamemode);
+									}
+								});
+							} else {
+								asyncSkyblockProfilesFromUuid(
+										usernameUuidStruct.uuid(),
+										count < (members.size() / 2) ? "c0cc68fc-a82a-462f-96ef-a060c22465fa" : "4991bfe2-d7aa-446a-b310-c7a70690927c",
+										false
+								)
+										.whenComplete((r, e) ->
+												insertIntoLeaderboard(new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), r, true), false)
+										);
+							}
+							count++;
+						}
+					}
+
+					log.info("Finished guild count: " + guildCount);
+					guildCount++;
 				}
 			}
 		} catch (Exception e) {
