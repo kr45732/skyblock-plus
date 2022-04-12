@@ -423,16 +423,20 @@ public class CacheDatabase {
 					log.info("Updated " + count + " leaderboard players in " + (System.currentTimeMillis() - start) + "ms");
 				}
 
-				if(count <= 5 && guildCount != -1){
+				if (count <= 5 && guildCount != -1) {
 					count = 0;
-					String guildId = higherDepth(getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/guilds.json"), "[" + guildCount + "]", null);
-					if(guildId == null){
+					String guildId = higherDepth(
+						getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/guilds.json"),
+						"[" + guildCount + "]",
+						null
+					);
+					if (guildId == null) {
 						guildCount = -1;
 						log.info("All guilds added");
 						return;
 					}
 					HypixelResponse guildResponse = getGuildFromId(guildId);
-					if(!guildResponse.isNotValid()){
+					if (!guildResponse.isNotValid()) {
 						JsonArray members = guildResponse.get("members").getAsJsonArray();
 						for (JsonElement member : members) {
 							String uuid = higherDepth(member, "uuid").getAsString();
@@ -445,13 +449,18 @@ public class CacheDatabase {
 								});
 							} else {
 								asyncSkyblockProfilesFromUuid(
-										usernameUuidStruct.uuid(),
-										count < (members.size() / 2) ? "c0cc68fc-a82a-462f-96ef-a060c22465fa" : "4991bfe2-d7aa-446a-b310-c7a70690927c",
-										false
+									usernameUuidStruct.uuid(),
+									count < (members.size() / 2)
+										? "c0cc68fc-a82a-462f-96ef-a060c22465fa"
+										: "4991bfe2-d7aa-446a-b310-c7a70690927c",
+									false
 								)
-										.whenComplete((r, e) ->
-												insertIntoLeaderboard(new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), r, true), false)
-										);
+									.whenComplete((r, e) ->
+										insertIntoLeaderboard(
+											new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), r, true),
+											false
+										)
+									);
 							}
 							count++;
 						}
