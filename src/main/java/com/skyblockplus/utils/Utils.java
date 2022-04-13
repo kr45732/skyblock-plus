@@ -466,7 +466,7 @@ public class Utils {
 				jsonUrl.contains(hypixelApiKey) && (isMain ? remainingLimit : keyCooldownMap.get(hypixelApiKey).remainingLimit()).get() < 5
 			) {
 				int timeTillResetInt = (isMain ? timeTillReset : keyCooldownMap.get(hypixelApiKey).timeTillReset()).get();
-				log.info("Sleeping for " + timeTillResetInt + " seconds");
+				log.info("Sleeping for " + timeTillResetInt + " seconds (" + isMain + ")");
 				TimeUnit.SECONDS.sleep(timeTillResetInt);
 			}
 		} catch (Exception ignored) {}

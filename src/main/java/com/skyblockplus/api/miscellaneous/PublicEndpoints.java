@@ -18,15 +18,21 @@
 
 package com.skyblockplus.api.miscellaneous;
 
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.Utils.*;
 
+import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
 import com.skyblockplus.features.jacob.JacobData;
 import com.skyblockplus.features.jacob.JacobHandler;
 import com.skyblockplus.general.help.HelpCommand;
+
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.utils.data.DataObject;
+import org.apache.groovy.util.Maps;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -86,5 +92,16 @@ public class PublicEndpoints {
 				HttpStatus.FORBIDDEN
 			);
 		}
+	}
+
+	@GetMapping("/get/sbg/data")
+	public ResponseEntity<?> getSbgEventData() {
+		return new ResponseEntity<>(guildMap.get("602137436490956820").eventMemberList, HttpStatus.OK);
+	}
+
+	@GetMapping("/get/sbg/last-updated")
+	public ResponseEntity<?> getSbgEventLastUpdate() {
+		Instant lastUpdated = guildMap.get("602137436490956820").eventMemberListLastUpdated;
+		return new ResponseEntity<>(Maps.of("last_updated",  lastUpdated == null ? -1 : lastUpdated.toEpochMilli()), HttpStatus.OK);
 	}
 }

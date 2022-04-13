@@ -52,6 +52,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 
 public class SettingsExecute {
@@ -1133,17 +1134,22 @@ public class SettingsExecute {
 			return invalidEmbed(guildJson.failCause());
 		}
 
-		VoiceChannel guildMemberCounterChannel = guild
-			.createVoiceChannel(
-				guildJson.get("name").getAsString() + " Members: " + guildJson.get("members").getAsJsonArray().size() + "/125"
-			)
-			.addPermissionOverride(guild.getPublicRole(), EnumSet.of(Permission.VIEW_CHANNEL), EnumSet.of(Permission.VOICE_CONNECT))
-			.addMemberPermissionOverride(
-				jda.getSelfUser().getIdLong(),
-				EnumSet.of(Permission.VIEW_CHANNEL, Permission.MANAGE_CHANNEL, Permission.VOICE_CONNECT),
-				null
-			)
-			.complete();
+		VoiceChannel guildMemberCounterChannel;
+		try {
+			guildMemberCounterChannel = guild
+					.createVoiceChannel(
+							guildJson.get("name").getAsString() + " Members: " + guildJson.get("members").getAsJsonArray().size() + "/125"
+					)
+					.addPermissionOverride(guild.getPublicRole(), EnumSet.of(Permission.VIEW_CHANNEL), EnumSet.of(Permission.VOICE_CONNECT))
+					.addMemberPermissionOverride(
+							jda.getSelfUser().getIdLong(),
+							EnumSet.of(Permission.VIEW_CHANNEL, Permission.MANAGE_CHANNEL, Permission.VOICE_CONNECT),
+							null
+					)
+					.complete();
+		}catch (PermissionException e){
+			return invalidEmbed("Missing permission: " + e.getPermission().getName() + " for VC");
+		}
 		guildSettings.addProperty("guildCounterEnable", "true");
 		guildSettings.addProperty("guildCounterChannel", guildMemberCounterChannel.getId());
 

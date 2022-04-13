@@ -123,8 +123,7 @@ public class EvaluateCommand extends Command {
 					shell = new GroovyShell();
 				}
 
-				String arg = args[1];
-
+				String arg = getEvent().getMessage().getContentRaw().split(" ", 2)[1].trim();
 				if (arg.startsWith("```") && arg.endsWith("```")) {
 					arg = arg.replaceAll("```(.*)\n", "").replaceAll("\n?```", "");
 				}

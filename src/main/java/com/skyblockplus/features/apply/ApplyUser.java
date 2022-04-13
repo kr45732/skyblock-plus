@@ -43,6 +43,7 @@ import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
@@ -91,8 +92,8 @@ public class ApplyUser implements Serializable {
 
 			Category applyCategory = event.getGuild().getCategoryById(higherDepth(currentSettings, "applyCategory").getAsString());
 			if (applyCategory.getChannels().size() == 50) {
-				failCause =
-					"Unable to create a new application due to the application category reaching 50/50 channels. Please report this to the server's staff.";
+				failCause = client.getError() +
+					" Unable to create a new application due to the application category reaching 50/50 channels. Please report this to the server's staff.";
 				return;
 			}
 
@@ -114,7 +115,13 @@ public class ApplyUser implements Serializable {
 				}
 			} catch (Exception ignored) {}
 
-			TextChannel applicationChannel = applicationChannelAction.complete();
+			TextChannel applicationChannel;
+			try {
+				applicationChannel = applicationChannelAction.complete();
+			}catch (PermissionException e){
+				failCause =client.getError()  + " Missing permission: " + e.getPermission().getName();
+				return;
+			}
 
 			this.applicationChannelId = applicationChannel.getId();
 
