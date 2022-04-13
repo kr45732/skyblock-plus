@@ -25,7 +25,6 @@ import com.skyblockplus.api.serversettings.skyblockevent.EventMember;
 import com.skyblockplus.features.jacob.JacobData;
 import com.skyblockplus.features.jacob.JacobHandler;
 import com.skyblockplus.general.help.HelpCommand;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -102,6 +101,6 @@ public class PublicEndpoints {
 	@GetMapping("/get/sbg/last-updated")
 	public ResponseEntity<?> getSbgEventLastUpdate() {
 		Instant lastUpdated = guildMap.get("602137436490956820").eventMemberListLastUpdated;
-		return new ResponseEntity<>(Maps.of("last_updated",  lastUpdated == null ? -1 : lastUpdated.toEpochMilli()), HttpStatus.OK);
+		return new ResponseEntity<>(Maps.of("last_updated", lastUpdated == null ? -1 : lastUpdated.toEpochMilli()), HttpStatus.OK);
 	}
 }

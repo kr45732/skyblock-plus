@@ -92,7 +92,8 @@ public class ApplyUser implements Serializable {
 
 			Category applyCategory = event.getGuild().getCategoryById(higherDepth(currentSettings, "applyCategory").getAsString());
 			if (applyCategory.getChannels().size() == 50) {
-				failCause = client.getError() +
+				failCause =
+					client.getError() +
 					" Unable to create a new application due to the application category reaching 50/50 channels. Please report this to the server's staff.";
 				return;
 			}
@@ -118,8 +119,8 @@ public class ApplyUser implements Serializable {
 			TextChannel applicationChannel;
 			try {
 				applicationChannel = applicationChannelAction.complete();
-			}catch (PermissionException e){
-				failCause =client.getError()  + " Missing permission: " + e.getPermission().getName();
+			} catch (PermissionException e) {
+				failCause = client.getError() + " Missing permission: " + e.getPermission().getName();
 				return;
 			}
 
