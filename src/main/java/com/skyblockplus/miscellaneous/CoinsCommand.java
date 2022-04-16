@@ -75,7 +75,7 @@ public class CoinsCommand extends Command {
 				")"
 			);
 			eb.addField(
-				getEmoji("PIGGY_BANK" ) + " Bank Balance",
+				getEmoji("PIGGY_BANK") + " Bank Balance",
 				playerBankBalance == -1 ? "Banking API disabled" : simplifyNumber(playerBankBalance) + " coins",
 				false
 			);

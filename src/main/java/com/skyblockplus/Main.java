@@ -320,11 +320,15 @@ public class Main {
 		}
 
 		if (isMainBot()) {
-			scheduler.schedule(() -> {
-				if(Runtime.getRuntime().totalMemory() > 1750000000){
-					System.gc();
-				}
-			}, 1, TimeUnit.MINUTES); // Sorry for the war crimes
+			scheduler.schedule(
+				() -> {
+					if (Runtime.getRuntime().totalMemory() > 1750000000) {
+						System.gc();
+					}
+				},
+				1,
+				TimeUnit.MINUTES
+			); // Sorry for the war crimes
 
 			try {
 				botStatusWebhook.send(

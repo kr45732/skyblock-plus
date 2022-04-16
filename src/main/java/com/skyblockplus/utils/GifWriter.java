@@ -31,7 +31,13 @@ public class GifWriter implements Closeable {
 	private final ImageWriteParam imageWriteParam;
 	private final IIOMetadata imageMetaData;
 
-	public GifWriter(ImageOutputStream outputStream, int imageType, int timeBetweenFramesMS, boolean loopContinuously, boolean transparentColorFlag) throws IOException {
+	public GifWriter(
+		ImageOutputStream outputStream,
+		int imageType,
+		int timeBetweenFramesMS,
+		boolean loopContinuously,
+		boolean transparentColorFlag
+	) throws IOException {
 		gifWriter = getWriter();
 		imageWriteParam = gifWriter.getDefaultWriteParam();
 		ImageTypeSpecifier imageTypeSpecifier = ImageTypeSpecifier.createFromBufferedImageType(imageType);

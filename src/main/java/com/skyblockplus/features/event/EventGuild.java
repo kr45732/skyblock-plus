@@ -70,7 +70,9 @@ public class EventGuild {
 			enable = higherDepth(eventSettings, "enable", false);
 			if (enable) {
 				channel = jda.getGuildById(guildId).getTextChannelById(higherDepth(eventSettings, "channel").getAsString());
-				try{role =jda.getGuildById(guildId).getRoleById(higherDepth(eventSettings, "role").getAsString());}catch (Exception ignored){}
+				try {
+					role = jda.getGuildById(guildId).getRoleById(higherDepth(eventSettings, "role").getAsString());
+				} catch (Exception ignored) {}
 				wantedEvents =
 					streamJsonArray(higherDepth(eventSettings, "events").getAsJsonArray())
 						.map(JsonElement::getAsString)

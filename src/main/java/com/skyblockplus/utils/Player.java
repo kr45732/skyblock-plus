@@ -777,15 +777,18 @@ public class Player {
 				NBTCompound displayName = invFrames.getCompound(i).getCompound("tag.ExtraAttributes");
 				if (displayName != null) {
 					String id = displayName.getString("id", "empty").toLowerCase();
-					if(id.equals("pet")){
-						JsonElement petInfo = JsonParser.parseString(invFrames.getCompound(i).getCompound("tag.ExtraAttributes").getString("petInfo", "{}"));
-						String newId = higherDepth(petInfo, "type", "") + RARITY_TO_NUMBER_MAP.getOrDefault(higherDepth(petInfo, "tier", ""), "");
-						if(!newId.isEmpty()){
+					if (id.equals("pet")) {
+						JsonElement petInfo = JsonParser.parseString(
+							invFrames.getCompound(i).getCompound("tag.ExtraAttributes").getString("petInfo", "{}")
+						);
+						String newId =
+							higherDepth(petInfo, "type", "") + RARITY_TO_NUMBER_MAP.getOrDefault(higherDepth(petInfo, "tier", ""), "");
+						if (!newId.isEmpty()) {
 							id = newId.toLowerCase();
 						}
-					}else if(id.equals("enchanted_book")){
+					} else if (id.equals("enchanted_book")) {
 						NBTCompound enchantedBooks = invFrames.getCompound(i).getCompound("tag.ExtraAttributes.enchantments");
-						if(enchantedBooks.size() == 1){
+						if (enchantedBooks.size() == 1) {
 							Map.Entry<String, Object> enchant = enchantedBooks.entrySet().stream().findFirst().get();
 							id = enchant.getKey() + ";" + enchant.getValue();
 						}
@@ -846,15 +849,18 @@ public class Player {
 					NBTCompound displayName = invFrames.getCompound(i).getCompound("tag.ExtraAttributes");
 					if (displayName != null) {
 						String id = displayName.getString("id", "empty").toLowerCase();
-						if(id.equals("pet")){
-							JsonElement petInfo = JsonParser.parseString(invFrames.getCompound(i).getCompound("tag.ExtraAttributes").getString("petInfo", "{}"));
-							String newId = higherDepth(petInfo, "type", "") + RARITY_TO_NUMBER_MAP.getOrDefault(higherDepth(petInfo, "tier", ""), "");
-							if(!newId.isEmpty()){
+						if (id.equals("pet")) {
+							JsonElement petInfo = JsonParser.parseString(
+								invFrames.getCompound(i).getCompound("tag.ExtraAttributes").getString("petInfo", "{}")
+							);
+							String newId =
+								higherDepth(petInfo, "type", "") + RARITY_TO_NUMBER_MAP.getOrDefault(higherDepth(petInfo, "tier", ""), "");
+							if (!newId.isEmpty()) {
 								id = newId.toLowerCase();
 							}
-						}else if(id.equals("enchanted_book")){
+						} else if (id.equals("enchanted_book")) {
 							NBTCompound enchantedBooks = invFrames.getCompound(i).getCompound("tag.ExtraAttributes.enchantments");
-							if(enchantedBooks.size() == 1){
+							if (enchantedBooks.size() == 1) {
 								Map.Entry<String, Object> enchant = enchantedBooks.entrySet().stream().findFirst().get();
 								id = enchant.getKey() + ";" + enchant.getValue();
 							}
@@ -908,15 +914,18 @@ public class Player {
 				NBTCompound displayName = invFrames.getCompound(i).getCompound("tag.ExtraAttributes");
 				if (displayName != null) {
 					String id = displayName.getString("id", "empty").toLowerCase();
-					if(id.equals("pet")){
-						JsonElement petInfo = JsonParser.parseString(invFrames.getCompound(i).getCompound("tag.ExtraAttributes").getString("petInfo", "{}"));
-						String newId = higherDepth(petInfo, "type", "") + RARITY_TO_NUMBER_MAP.getOrDefault(higherDepth(petInfo, "tier", ""), "");
-						if(!newId.isEmpty()){
+					if (id.equals("pet")) {
+						JsonElement petInfo = JsonParser.parseString(
+							invFrames.getCompound(i).getCompound("tag.ExtraAttributes").getString("petInfo", "{}")
+						);
+						String newId =
+							higherDepth(petInfo, "type", "") + RARITY_TO_NUMBER_MAP.getOrDefault(higherDepth(petInfo, "tier", ""), "");
+						if (!newId.isEmpty()) {
 							id = newId.toLowerCase();
 						}
-					}else if(id.equals("enchanted_book")){
+					} else if (id.equals("enchanted_book")) {
 						NBTCompound enchantedBooks = invFrames.getCompound(i).getCompound("tag.ExtraAttributes.enchantments");
-						if(enchantedBooks.size() == 1){
+						if (enchantedBooks.size() == 1) {
 							Map.Entry<String, Object> enchant = enchantedBooks.entrySet().stream().findFirst().get();
 							id = enchant.getKey() + ";" + enchant.getValue();
 						}

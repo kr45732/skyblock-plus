@@ -18,6 +18,8 @@
 
 package com.skyblockplus.features.jacob;
 
+import static com.skyblockplus.utils.Utils.getEmoji;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -25,14 +27,12 @@ import java.util.Map;
 import lombok.Data;
 import org.apache.groovy.util.Maps;
 
-import static com.skyblockplus.utils.Utils.getEmoji;
-
 @Data
 public class JacobContest {
 
 	public static final Map<String, String> CROP_NAME_TO_EMOJI = Maps.of(
 		"Wheat",
-		 getEmoji("WHEAT"),
+		getEmoji("WHEAT"),
 		"Carrot",
 		getEmoji("CARROT_ITEM"),
 		"Potato",
