@@ -25,48 +25,39 @@ import javax.imageio.*;
 import javax.imageio.metadata.*;
 import javax.imageio.stream.*;
 
-public class GifWriter {
+public class GifWriter implements Closeable {
 
 	private final ImageWriter gifWriter;
 	private final ImageWriteParam imageWriteParam;
 	private final IIOMetadata imageMetaData;
 
-	public GifWriter(ImageOutputStream outputStream, int imageType, int timeBetweenFramesMS, boolean loopContinuously) throws IOException {
+	public GifWriter(ImageOutputStream outputStream, int imageType, int timeBetweenFramesMS, boolean loopContinuously, boolean transparentColorFlag) throws IOException {
 		gifWriter = getWriter();
 		imageWriteParam = gifWriter.getDefaultWriteParam();
 		ImageTypeSpecifier imageTypeSpecifier = ImageTypeSpecifier.createFromBufferedImageType(imageType);
-
 		imageMetaData = gifWriter.getDefaultImageMetadata(imageTypeSpecifier, imageWriteParam);
-
 		String metaFormatName = imageMetaData.getNativeMetadataFormatName();
-
 		IIOMetadataNode root = (IIOMetadataNode) imageMetaData.getAsTree(metaFormatName);
-
 		IIOMetadataNode graphicsControlExtensionNode = getNode(root, "GraphicControlExtension");
-
 		graphicsControlExtensionNode.setAttribute("disposalMethod", "none");
 		graphicsControlExtensionNode.setAttribute("userInputFlag", "FALSE");
-		graphicsControlExtensionNode.setAttribute("transparentColorFlag", "FALSE");
+		graphicsControlExtensionNode.setAttribute("transparentColorFlag", transparentColorFlag ? "TRUE" : "FALSE");
 		graphicsControlExtensionNode.setAttribute("delayTime", Integer.toString(timeBetweenFramesMS / 10));
 		graphicsControlExtensionNode.setAttribute("transparentColorIndex", "0");
-
 		IIOMetadataNode appExtensionsNode = getNode(root, "ApplicationExtensions");
-
 		IIOMetadataNode child = new IIOMetadataNode("ApplicationExtension");
-
 		child.setAttribute("applicationID", "NETSCAPE");
 		child.setAttribute("authenticationCode", "2.0");
-
 		int loop = loopContinuously ? 0 : 1;
-
 		child.setUserObject(new byte[] { 0x1, (byte) (loop & 0xFF), (byte) 0 });
 		appExtensionsNode.appendChild(child);
-
 		imageMetaData.setFromTree(metaFormatName, root);
-
 		gifWriter.setOutput(outputStream);
-
 		gifWriter.prepareWriteSequence(null);
+	}
+
+	public GifWriter(ImageOutputStream outputStream, int imageType, int timeBetweenFramesMS, boolean loopContinuously) throws IOException {
+		this(outputStream, imageType, timeBetweenFramesMS, loopContinuously, false);
 	}
 
 	public void writeToSequence(RenderedImage img) throws IOException {
@@ -95,6 +86,6 @@ public class GifWriter {
 		}
 		IIOMetadataNode node = new IIOMetadataNode(nodeName);
 		rootNode.appendChild(node);
-		return (node);
+		return node;
 	}
 }

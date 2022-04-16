@@ -223,6 +223,10 @@ public class Utils {
 		return emojiMap;
 	}
 
+	public static String getEmoji(String id, String name) {
+		return getEmoji(id).replaceAll("(?<before>:).*(?<after>:)", "${before}" + name + "${after}");
+	}
+
 	public static String getEmoji(String id) {
 		return higherDepth(getEmojiMap(), id, "");
 	}

@@ -75,12 +75,12 @@ public class CoinsCommand extends Command {
 				")"
 			);
 			eb.addField(
-				"<:piggy_bank:939014681434161152> Bank Balance",
+				getEmoji("PIGGY_BANK" ) + " Bank Balance",
 				playerBankBalance == -1 ? "Banking API disabled" : simplifyNumber(playerBankBalance) + " coins",
 				false
 			);
-			eb.addField("<:enchanted_gold:939021206470926336> Purse Coins", simplifyNumber(playerPurseCoins) + " coins", false);
-			eb.addField("<:gold_horse_armor:939021482481291314> Sold Auctions Value", simplifyNumber(auctionCoins), false);
+			eb.addField(getEmoji("ENCHANTED_GOLD") + " Purse Coins", simplifyNumber(playerPurseCoins) + " coins", false);
+			eb.addField(getEmoji("GOLD_BARDING") + " Sold Auctions Value", simplifyNumber(auctionCoins), false);
 			return eb;
 		}
 		return player.getFailEmbed();

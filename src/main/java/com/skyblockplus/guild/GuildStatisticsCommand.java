@@ -159,7 +159,7 @@ public class GuildStatisticsCommand extends Command {
 			roundAndFormat(averageCata) +
 			"\n**Average Weight:** " +
 			roundAndFormat(averageWeight) +
-			(lastUpdated != null ? "\n**Last updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "")
+			(lastUpdated != null ? "\n**Last Updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "")
 		);
 		StringBuilder slayerStr = new StringBuilder();
 		for (int i = 0; i < Math.min(5, slayerLb.size()); i++) {

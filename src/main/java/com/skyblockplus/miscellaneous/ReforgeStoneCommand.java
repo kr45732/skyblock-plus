@@ -39,17 +39,17 @@ public class ReforgeStoneCommand extends Command {
 		"HEALTH",
 		"❤️",
 		"DEFENSE",
-		"<:iron_chestplate:939021594775408691>",
+		getEmoji("IRON_CHESTPLATE"),
 		"STRENGTH",
-		"<:blaze_powder:939020829486874635>",
+		getEmoji("BLAZE_POWDER"),
 		"SPEED",
-		"<:sugar:939024464564342805>",
+		getEmoji("SUGAR"),
 		"CRIT_CHANCE",
 		"☣️",
 		"CRIT_DAMAGE",
 		"☠️",
 		"INTELLIGENCE",
-		"<:common:939021148484698132>",
+		getEmoji("ENCHANTED_BOOK"),
 		"MINING_SPEED",
 		"⛏️",
 		"BONUS_ATTACK_SPEED",
@@ -61,13 +61,13 @@ public class ReforgeStoneCommand extends Command {
 		"PET_LUCK",
 		"♣️",
 		"TRUE_DEFENSE",
-		"<:diamond_chestplate:939021063428395098>",
+		getEmoji("DIAMOND_CHESTPLATE"),
 		"FEROCITY",
 		"\uD83D\uDDE1️",
 		"MINING_FORTUNE",
 		"☘️",
 		"DAMAGE",
-		"<:iron_sword:939021608142651403>"
+		getEmoji("IRON_SWORD")
 	);
 
 	public ReforgeStoneCommand() {

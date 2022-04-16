@@ -295,7 +295,7 @@ public class GuildKickerCommand extends Command {
 					.setEveryPageText(
 						"**Total missing requirements:** " +
 						paginateBuilder.size() +
-						(lastUpdated != null ? "\n**Last updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "") +
+						(lastUpdated != null ? "\n**Last Updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "") +
 						"\n"
 					)
 			);

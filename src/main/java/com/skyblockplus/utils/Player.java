@@ -26,6 +26,7 @@ import static com.skyblockplus.utils.Utils.defaultPaginator;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.skyblockplus.miscellaneous.networth.NetworthExecute;
 import com.skyblockplus.miscellaneous.weight.senither.Weight;
 import com.skyblockplus.utils.command.CustomPaginator;
@@ -775,7 +776,21 @@ public class Player {
 			for (int i = 0; i < invFrames.size(); i++) {
 				NBTCompound displayName = invFrames.getCompound(i).getCompound("tag.ExtraAttributes");
 				if (displayName != null) {
-					invFramesMap.put(i + 1, displayName.getString("id", "empty").toLowerCase());
+					String id = displayName.getString("id", "empty").toLowerCase();
+					if(id.equals("pet")){
+						JsonElement petInfo = JsonParser.parseString(invFrames.getCompound(i).getCompound("tag.ExtraAttributes").getString("petInfo", "{}"));
+						String newId = higherDepth(petInfo, "type", "") + RARITY_TO_NUMBER_MAP.getOrDefault(higherDepth(petInfo, "tier", ""), "");
+						if(!newId.isEmpty()){
+							id = newId.toLowerCase();
+						}
+					}else if(id.equals("enchanted_book")){
+						NBTCompound enchantedBooks = invFrames.getCompound(i).getCompound("tag.ExtraAttributes.enchantments");
+						if(enchantedBooks.size() == 1){
+							Map.Entry<String, Object> enchant = enchantedBooks.entrySet().stream().findFirst().get();
+							id = enchant.getKey() + ";" + enchant.getValue();
+						}
+					}
+					invFramesMap.put(i + 1, id);
 				} else {
 					invFramesMap.put(i + 1, "empty");
 				}
@@ -830,7 +845,21 @@ public class Player {
 				for (int i = 0; i < invFrames.size(); i++) {
 					NBTCompound displayName = invFrames.getCompound(i).getCompound("tag.ExtraAttributes");
 					if (displayName != null) {
-						invFramesMap.put(i + 1, displayName.getString("id", "empty").toLowerCase());
+						String id = displayName.getString("id", "empty").toLowerCase();
+						if(id.equals("pet")){
+							JsonElement petInfo = JsonParser.parseString(invFrames.getCompound(i).getCompound("tag.ExtraAttributes").getString("petInfo", "{}"));
+							String newId = higherDepth(petInfo, "type", "") + RARITY_TO_NUMBER_MAP.getOrDefault(higherDepth(petInfo, "tier", ""), "");
+							if(!newId.isEmpty()){
+								id = newId.toLowerCase();
+							}
+						}else if(id.equals("enchanted_book")){
+							NBTCompound enchantedBooks = invFrames.getCompound(i).getCompound("tag.ExtraAttributes.enchantments");
+							if(enchantedBooks.size() == 1){
+								Map.Entry<String, Object> enchant = enchantedBooks.entrySet().stream().findFirst().get();
+								id = enchant.getKey() + ";" + enchant.getValue();
+							}
+						}
+						invFramesMap.put(i + 1, id);
 					} else {
 						invFramesMap.put(i + 1, "empty");
 					}
@@ -878,7 +907,21 @@ public class Player {
 			for (int i = 0; i < invFrames.size(); i++) {
 				NBTCompound displayName = invFrames.getCompound(i).getCompound("tag.ExtraAttributes");
 				if (displayName != null) {
-					invFramesMap.put(i + 1, displayName.getString("id", "empty").toLowerCase());
+					String id = displayName.getString("id", "empty").toLowerCase();
+					if(id.equals("pet")){
+						JsonElement petInfo = JsonParser.parseString(invFrames.getCompound(i).getCompound("tag.ExtraAttributes").getString("petInfo", "{}"));
+						String newId = higherDepth(petInfo, "type", "") + RARITY_TO_NUMBER_MAP.getOrDefault(higherDepth(petInfo, "tier", ""), "");
+						if(!newId.isEmpty()){
+							id = newId.toLowerCase();
+						}
+					}else if(id.equals("enchanted_book")){
+						NBTCompound enchantedBooks = invFrames.getCompound(i).getCompound("tag.ExtraAttributes.enchantments");
+						if(enchantedBooks.size() == 1){
+							Map.Entry<String, Object> enchant = enchantedBooks.entrySet().stream().findFirst().get();
+							id = enchant.getKey() + ";" + enchant.getValue();
+						}
+					}
+					invFramesMap.put(i + 1, id);
 				} else {
 					invFramesMap.put(i + 1, "empty");
 				}

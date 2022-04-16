@@ -54,21 +54,21 @@ public class SkyblockCommand extends Command {
 			);
 
 			EmbedBuilder eb = player.defaultPlayerEmbed();
-			eb.addField("<:oak_sapling:939021996262580254> Skill Average", roundAndFormat(player.getSkillAverage()), true);
-			eb.addField("<a:overflux_capacitor:939017397271162952> Total Slayer XP", formatNumber(player.getTotalSlayer()), true);
+			eb.addField(getEmoji("SAPLING" )+ " Skill Average", roundAndFormat(player.getSkillAverage()), true);
+			eb.addField(getEmoji("OVERFLUX_CAPACITOR") + " Total Slayer XP", formatNumber(player.getTotalSlayer()), true);
 			eb.addField(DUNGEON_EMOJI_MAP.get("catacombs") + " Catacombs", roundAndFormat(player.getCatacombs().getProgressLevel()), true);
-			eb.addField("<:training_weights:939010790755827762> Senither Weight", weight.getTotalWeight().getFormatted(), true);
+			eb.addField(getEmoji("TRAINING_WEIGHTS") + " Senither Weight", weight.getTotalWeight().getFormatted(), true);
 			eb.addField("\uD83C\uDFC5 Senither Stage", weight.getStage(), true);
-			eb.addField("<:training_weights:939010790755827762> Lily weight", lilyWeight.getTotalWeight().getFormatted(), true);
+			eb.addField(getEmoji("TRAINING_WEIGHTS") + " Lily weight", lilyWeight.getTotalWeight().getFormatted(), true);
 			eb.addField("\uD83C\uDFC5 Lily Stage", lilyWeight.getStage(), true);
 			double playerNetworth = player.getNetworth();
 			eb.addField(
-				"<:enchanted_gold:939021206470926336> Networth",
+				getEmoji("ENCHANTED_GOLD") + " Networth",
 				playerNetworth == -1 ? "Inventory API disabled" : roundAndFormat(playerNetworth),
 				true
 			);
 			eb.addField(
-				"<:piggy_bank:939014681434161152> Bank & purse coins",
+				getEmoji("PIGGY_BANK") + " Bank & purse coins",
 				(player.getBankBalance() == -1 ? "API disabled" : simplifyNumber(player.getBankBalance())) +
 				" + " +
 				simplifyNumber(player.getPurseCoins()),

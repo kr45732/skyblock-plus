@@ -329,7 +329,7 @@ public class SkyblockEventCommand extends Command {
 				paginateBuilder.setPaginatorExtras(
 					new PaginatorExtras()
 						.setEveryPageTitle("Event Leaderboard")
-						.setEveryPageText("**Last updated** <t:" + currentGuild.eventMemberListLastUpdated.getEpochSecond() + ":R>\n")
+						.setEveryPageText("**Last Updated:** <t:" + currentGuild.eventMemberListLastUpdated.getEpochSecond() + ":R>\n")
 				);
 				paginateBuilder.build().paginate(event.getHook(), 0);
 				return null;
@@ -416,7 +416,7 @@ public class SkyblockEventCommand extends Command {
 				paginateBuilder.setPaginatorExtras(
 					new PaginatorExtras()
 						.setEveryPageTitle("Event Leaderboard")
-						.setEveryPageText("**Last updated " + minutesSinceUpdateString + " ago**\n")
+						.setEveryPageText("**Last Updated " + minutesSinceUpdateString + " ago**\n")
 				);
 				event.paginate(paginateBuilder);
 				return null;

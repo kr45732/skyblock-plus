@@ -18,51 +18,32 @@
 
 package com.skyblockplus.utils;
 
-import static com.skyblockplus.utils.Constants.ENCHANT_NAMES;
-import static com.skyblockplus.utils.Constants.PET_NAMES;
-import static com.skyblockplus.utils.Utils.*;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.*;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import javax.imageio.ImageIO;
-import javax.imageio.stream.FileImageOutputStream;
-import javax.imageio.stream.ImageOutputStream;
 import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Icon;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.eclipse.jgit.api.Git;
 
-/*
- * Skyblock Plus - A Skyblock focused Discord bot with many commands and customizable features to improve the experience of Skyblock players and guild staff!
- * Copyright (c) 2021 kr45732
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+import javax.imageio.ImageIO;
+import javax.imageio.stream.FileImageOutputStream;
+import javax.imageio.stream.ImageOutputStream;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.List;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+import static com.skyblockplus.utils.Constants.ENCHANT_NAMES;
+import static com.skyblockplus.utils.Constants.PET_NAMES;
+import static com.skyblockplus.utils.Utils.*;
 
 public class EmojiUpdater {
 
@@ -71,8 +52,8 @@ public class EmojiUpdater {
 	public static JsonElement getMissing(String url) {
 		Set<String> processedItemsSet = getJson(url).getAsJsonObject().keySet();
 		Set<String> allItems = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json")
-			.getAsJsonObject()
-			.keySet();
+				.getAsJsonObject()
+				.keySet();
 		allItems.removeIf(processedItemsSet::contains);
 		return gson.toJsonTree(allItems);
 	}
@@ -81,37 +62,52 @@ public class EmojiUpdater {
 		try {
 			JsonArray sbItems = getSkyblockItemsJson();
 			Set<String> allSbItems = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json")
-				.getAsJsonObject()
-				.keySet();
+					.getAsJsonObject()
+					.keySet();
 			JsonObject out = new JsonObject();
 			File skyCryptFiles = new File("src/main/java/com/skyblockplus/json/skycrypt_images");
-			if (skyCryptFiles.exists()) {
-				skyCryptFiles.delete();
+			if (!skyCryptFiles.exists()) {
+				skyCryptFiles.mkdirs();
 			}
-			skyCryptFiles.mkdirs();
+			File fsrImages = new File("src/main/java/com/skyblockplus/json/fsr_images");
+			if (!fsrImages.exists()) {
+				fsrImages.mkdirs();
+			}
 
 			// Heads
 			for (JsonElement i : sbItems) {
 				String id = higherDepth(i, "id").getAsString();
 				if (higherDepth(i, "skin") != null && allSbItems.contains(id)) {
-					out.addProperty(
-						id,
-						"https://sky.shiiyu.moe/head/" +
-						higherDepth(
-							JsonParser.parseString(new String(Base64.getDecoder().decode(higherDepth(i, "skin").getAsString()))),
-							"textures.SKIN.url",
-							""
-						)
-							.split("://textures.minecraft.net/texture/")[1]
-					);
+					try {
+						String url = "https://sky.shiiyu.moe/head/" +
+								higherDepth(
+										JsonParser.parseString(new String(Base64.getDecoder().decode(higherDepth(i, "skin").getAsString()))),
+										"textures.SKIN.url",
+										""
+								)
+										.split("://textures.minecraft.net/texture/")[1];
+						File imgFile;
+						File[] imgFiles = skyCryptFiles.listFiles(f -> f.getName().split(".png")[0].equals(id));
+						if (imgFiles.length == 0) {
+							imgFile = new File(skyCryptFiles.getPath() + "/" + id + ".png");
+							ImageIO.write(ImageIO.read(new URL(url)), "png", imgFile);
+							TimeUnit.MILLISECONDS.sleep(200);
+						} else {
+							imgFile = imgFiles[0];
+						}
+						out.addProperty(id, imgFile.getPath());
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 					allSbItems.remove(id);
 				}
 			}
+			System.out.println("Finished processing SkyCrypt heads");
 
 			// Gets all images from resource pack
 			JsonObject processedImages = processDir(new File("src/main/java/com/skyblockplus/json/cit"));
 			for (Map.Entry<String, JsonElement> entry : processedImages.entrySet()) {
-				if (allSbItems.contains(entry.getKey())) {
+				if (allSbItems.contains(entry.getKey()) && !out.has(entry.getKey())) {
 					out.add(entry.getKey(), entry.getValue());
 					allSbItems.remove(entry.getKey());
 				}
@@ -123,7 +119,20 @@ public class EmojiUpdater {
 			for (String sbItem : allSbItems) {
 				String split = sbItem.split(";")[0];
 				if (PET_NAMES.contains(split)) {
-					out.addProperty(sbItem, getPetUrl(split));
+					try {
+						File imgFile;
+						File[] imgFiles = skyCryptFiles.listFiles(f -> f.getName().split(".png")[0].equals(sbItem));
+						if (imgFiles.length == 0) {
+							imgFile = new File(skyCryptFiles.getPath() + "/" + sbItem + ".png");
+							ImageIO.write(ImageIO.read(new URL(getPetUrl(split))), "png", imgFile);
+							TimeUnit.MILLISECONDS.sleep(250);
+						} else {
+							imgFile = imgFiles[0];
+						}
+						out.addProperty(sbItem, imgFile.getPath());
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				} else if (ENCHANT_NAMES.contains(split)) {
 					out.addProperty(sbItem, enchantedBook.getPath());
 				}
@@ -137,18 +146,15 @@ public class EmojiUpdater {
 					File imgFile;
 					File[] imgFiles = skyCryptFiles.listFiles(f -> f.getName().split(".png")[0].equals(sbItem));
 					if (imgFiles.length == 0) {
-						System.out.println(sbItem);
 						imgFile = new File(skyCryptFiles.getPath() + "/" + sbItem + ".png");
 						ImageIO.write(ImageIO.read(new URL("https://sky.shiiyu.moe/item/" + sbItem)), "png", imgFile);
+						TimeUnit.MILLISECONDS.sleep(200);
 					} else {
-						if (imgFiles.length > 1) {
-							System.out.println(sbItem + " - " + Arrays.toString(imgFiles));
-						}
 						imgFile = imgFiles[0];
 					}
 					out.addProperty(sbItem, imgFile.getPath());
-					TimeUnit.MILLISECONDS.sleep(250);
-				} catch (Exception ignored) {}
+				} catch (Exception ignored) {
+				}
 
 				if (count != 0 && count % 50 == 0) {
 					System.out.println("Finished " + count + "/" + allSbItems.size());
@@ -157,8 +163,15 @@ public class EmojiUpdater {
 			}
 			System.out.println("Finished processing SkyCrypt items");
 
-			if (!out.has("POTATO_CROWN")) {
-				out.addProperty("POTATO_CROWN", "https://sky.shiiyu.moe/item/GOLD_HELMET");
+			processEnchantedEmojis("https://hst.sh/raw/ponicuqufo");
+			processCompressedImages();
+			File enchantedImagesDir = new File("src/main/java/com/skyblockplus/json/enchanted_images");
+			File compressedImagesDir = new File("src/main/java/com/skyblockplus/json/compressed_images");
+			for (File file : enchantedImagesDir.listFiles()) {
+				out.addProperty(file.getName().replace(".gif", ""), file.getPath());
+			}
+			for (File file : compressedImagesDir.listFiles()) {
+				out.addProperty(file.getName().replace(".gif", ""), file.getPath());
 			}
 
 			return out;
@@ -179,23 +192,28 @@ public class EmojiUpdater {
 			Git.cloneRepository().setURI("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO.git").setDirectory(neuDir).call();
 
 			List<String> enchantedItems = Arrays
-				.stream(
-					new File(neuDir.getPath() + "/items")
-						.listFiles(f -> {
-							try {
-								JsonElement json = JsonParser.parseReader(new FileReader(f));
-								return (
-									!higherDepth(json, "itemid").getAsString().equals("minecraft:skull") &&
-									higherDepth(json, "nbttag").getAsString().startsWith("{ench:[")
-								);
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-							return false;
-						})
-				)
-				.map(f -> f.getName().split(".json")[0])
-				.collect(Collectors.toList());
+					.stream(
+							new File(neuDir.getPath() + "/items")
+									.listFiles(f -> {
+										try {
+											JsonElement json = JsonParser.parseReader(new FileReader(f));
+											String id = higherDepth(json, "internalname").getAsString();
+											return (
+													higherDepth(json, "nbttag").getAsString().startsWith("{ench:[")
+													&& !(id.endsWith("_MINIBOSS") ||
+															id.endsWith("_MONSTER") ||
+															id.endsWith("_ANIMAL") ||
+															id.endsWith("_SC") ||
+															id.endsWith("_BOSS"))
+											);
+										} catch (Exception e) {
+											e.printStackTrace();
+										}
+										return false;
+									})
+					)
+					.map(f -> f.getName().split(".json")[0])
+					.collect(Collectors.toList());
 
 			FileUtils.deleteDirectory(neuDir);
 
@@ -234,10 +252,10 @@ public class EmojiUpdater {
 						String sId = ((String) id);
 						String altId = null;
 						File textureFile = Arrays
-							.stream(file.getParentFile().listFiles())
-							.filter(file1 -> file1.getName().equals(file.getName().replace(".properties", ".png")))
-							.findFirst()
-							.orElse(null);
+								.stream(file.getParentFile().listFiles())
+								.filter(file1 -> file1.getName().equals(file.getName().replace(".properties", ".png")))
+								.findFirst()
+								.orElse(null);
 						if (sId.equals("ipattern:*STONE_BLADE")) {
 							sId = "STONE_BLADE";
 						} else if (sId.equals("pattern:*STARRED_STONE_BLADE")) {
@@ -271,49 +289,63 @@ public class EmojiUpdater {
 								throw new IllegalArgumentException("Image width is not 16 pixels: " + file.getPath());
 							}
 							if (image.getHeight() != 16) {
+								File mcMetaFile = Arrays
+										.stream(file.getParentFile().listFiles())
+										.filter(file1 -> file1.getName().equals(file.getName().replace(".properties", ".png") + ".mcmeta"))
+										.findFirst()
+										.orElse(null);
+								if (id.equals("REFUND_COOKIE") || id.equals("FREE_COOKIE")) {
+									mcMetaFile = new File(file.getParentFile() + "/booster_cookie.png.mcmeta");
+								}
+
+								int frameTime = higherDepth(JsonParser.parseReader(new FileReader(mcMetaFile)), "animation.frametime", -1);
+
 								int rows = image.getHeight() / 16;
 								int subImageHeight = image.getHeight() / rows;
 								BufferedImage[] images = new BufferedImage[rows];
 								for (int i = 0; i < rows; i++) {
-									images[i] = new BufferedImage(128, 128, image.getType());
+									images[i] = new BufferedImage(128, 128, BufferedImage.TYPE_INT_ARGB);
 									Graphics2D imgCreator = images[i].createGraphics();
 									int srcFirstY = subImageHeight * i;
 									int dstCornerY = subImageHeight * i + subImageHeight;
 									imgCreator.setRenderingHint(
-										RenderingHints.KEY_INTERPOLATION,
-										RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR
+											RenderingHints.KEY_INTERPOLATION,
+											RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR
 									);
 									imgCreator.drawImage(image, 0, 0, 128, 128, 0, srcFirstY, image.getWidth(), dstCornerY, null);
 									imgCreator.dispose();
 								}
-								File gifFile = new File(textureFile.getParentFile().getPath() + "/" + sId + "_gif.gif");
+								File gifFile = new File("src/main/java/com/skyblockplus/json/fsr_images/" + sId + ".gif");
 								if (gifFile.exists()) {
 									gifFile.delete();
 								}
 								ImageIO.write(images[images.length - 1], "gif", gifFile);
 								BufferedImage firstImage = images[0];
 								try (ImageOutputStream output = new FileImageOutputStream(gifFile)) {
-									GifWriter writer = new GifWriter(output, firstImage.getType(), 1, true);
-									writer.writeToSequence(firstImage);
-									for (int i = 1; i < images.length - 1; i++) {
-										writer.writeToSequence(images[i]);
+									try(GifWriter writer = new GifWriter(output, firstImage.getType(), frameTime, true)) {
+										for (int i = 0; i < images.length - 1; i++) {
+											writer.writeToSequence(images[i]);
+										}
 									}
-									writer.close();
 								}
 								out.addProperty(sId, gifFile.getPath());
 								if (altId != null) {
 									out.addProperty(altId, gifFile.getPath());
 								}
 							} else {
-								File scaledFile = new File(textureFile.getParentFile().getPath() + "/" + sId + "_scaled.png");
+								if (id.equals("GEMSTONE_GAUNTLET") || id.equals("BONE_BOOMERANG") || id.equals("MIDAS_SWORD") || id.equals("SCORPION_FOIL")) {
+									continue;
+								}
+
+								File scaledFile = new File("src/main/java/com/skyblockplus/json/fsr_images/" + sId + ".png");
 								if (scaledFile.exists()) {
 									scaledFile.delete();
 								}
-								BufferedImage scaledImage = new BufferedImage(128, 128, image.getType());
+								BufferedImage scaledImage = new BufferedImage(128, 128, BufferedImage.TYPE_INT_ARGB);
 								Graphics2D graphics2D = scaledImage.createGraphics();
 								graphics2D.setRenderingHint(
-									RenderingHints.KEY_INTERPOLATION,
-									RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR
+										RenderingHints.KEY_INTERPOLATION,
+										RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR
 								);
 								graphics2D.drawImage(image, 0, 0, 128, 128, null);
 								graphics2D.dispose();
@@ -332,50 +364,69 @@ public class EmojiUpdater {
 		}
 		return out;
 	}
-
+	
 	public static void runEmojis(String parsedItemsUrl) {
 		idToEmoji = new JsonObject();
 		String last = "";
 		try {
 			JsonObject allParsedItems = getJson(parsedItemsUrl).getAsJsonObject();
 			Set<String> added = JsonParser
-				.parseReader(new FileReader("src/main/java/com/skyblockplus/json/IdToEmojiMappings.json"))
-				.getAsJsonObject()
-				.keySet();
-			JsonObject allItems = new JsonObject();
-			for (Map.Entry<String, JsonElement> entry : allParsedItems.entrySet()) {
+					.parseReader(new FileReader("src/main/java/com/skyblockplus/json/IdToEmojiMappings.json"))
+					.getAsJsonObject()
+					.keySet();
+			JsonObject regItems = new JsonObject();
+			JsonObject enchItems = new JsonObject();
+			for (Map.Entry<String, JsonElement> entry : allParsedItems.get("regular").getAsJsonObject().entrySet()) {
 				if (!added.contains(entry.getKey())) {
-					allItems.add(entry.getKey(), entry.getValue());
+					regItems.add(entry.getKey(), entry.getValue());
+				}
+			}
+			for (Map.Entry<String, JsonElement> entry : allParsedItems.get("enchanted").getAsJsonObject().entrySet()) {
+				if (!added.contains(entry.getKey())) {
+					enchItems.add(entry.getKey(), entry.getValue());
 				}
 			}
 
 			List<Guild> guildList = jda
-				.getGuilds()
-				.stream()
-				.filter(g -> {
-					try {
-						return Integer.parseInt(g.getName().split("Skyblock Plus - Emoji Server ")[1]) > 0;
-					} catch (Exception e) {
-						return false;
-					}
-				})
-				.filter(g -> g.getEmotes().size() < g.getMaxEmotes())
-				.sorted(Comparator.comparingInt(g -> Integer.parseInt(g.getName().split("Skyblock Plus - Emoji Server ")[1])))
-				.collect(Collectors.toList());
-			int guildCount = 0;
+					.getGuilds()
+					.stream()
+					.filter(g -> {
+						try {
+							return Integer.parseInt(g.getName().split("Skyblock Plus - Emoji Server ")[1]) > 0;
+						} catch (Exception e) {
+							return false;
+						}
+					})
+					.filter(g -> g.getEmotes().size() < g.getMaxEmotes() * 2)
+					.sorted(Comparator.comparingInt(g -> Integer.parseInt(g.getName().split("Skyblock Plus - Emoji Server ")[1])))
+					.collect(Collectors.toList());
 
-			for (Map.Entry<String, JsonElement> entry : allItems.entrySet()) {
+			int guildCount = 0;
+			for (Map.Entry<String, JsonElement> entry : enchItems.entrySet()) { // Regular or enchanted
 				try {
 					last = entry.toString();
 					String name = idToName(entry.getKey())
-						.toLowerCase()
-						.replace("⚚ ", "starred ")
-						.replace(" ", "_")
-						.replace("'", "")
-						.replace("-", "_");
+							.toLowerCase()
+							.replace("⚚ ", "starred ")
+							.replace(" ", "_")
+							.replace("-", "_")
+							.replace("+", "plus")
+							.replace("&","and")
+							.replaceAll("[™./()#'⸕❁✧❈☘✎❤]", "")
+							.replace("colossal_experience_bottle_upgrade","colossal_exp_bottle_upgrade")
+							.replace("very_official_yellow_rock_of_love!","official_yellow_rock_of_love")
+							.replace("exceedingly_rare_ender_artifact_upgrader","ender_artifact_upgrader")
+							.replace("century_cake_of_the_next_dungeon_floor","dungeon_century_cake")
+							.replace("basket_of_hope_from_the_great_potato_war","basket_of_hope")
+							.replace("travel_scroll_to_blazing_fortress","travel_scroll_blazing_fortress")
+							.replace("travel_scroll_to_spiders_den_top_of_nest","travel_scroll_top_of_spider_nest")
+							.replace("travel_scroll_to_the_void_sepulture","travel_scroll_void_sepulture")
+							.replace("starred_shadow_assassin_chestplate","star_shadow_assassin_chestplate")
+							.replace("travel_scroll_to_the_crystal_hollows","travel_scroll_crystal_hollows")
+							.replace("travel_scroll_to_the_dwarven_forge","travel_scroll_dwarven_forge");
 
 					Guild curGuild = guildList.get(guildCount);
-					if (curGuild.getEmotes().size() >= curGuild.getMaxEmotes()) {
+					if (curGuild.getEmotes().size() >= curGuild.getMaxEmotes() * 2) {
 						guildCount++;
 						curGuild = guildList.get(guildCount);
 						TimeUnit.SECONDS.sleep(5);
@@ -396,7 +447,7 @@ public class EmojiUpdater {
 					idToEmoji.addProperty(entry.getKey(), emoji.getAsMention());
 					TimeUnit.MILLISECONDS.sleep(100);
 				} catch (Exception e) {
-					System.out.println("Failed - " + last);
+					System.out.println("Failed emoji - " + last);
 					e.printStackTrace();
 				}
 			}
@@ -404,5 +455,93 @@ public class EmojiUpdater {
 			System.out.println("Failed - " + last);
 			e.printStackTrace();
 		}
+	}
+
+	public static void processCompressedImages(){
+		File compressedImagesDir = new File("src/main/java/com/skyblockplus/json/compressed_images");
+		if (!compressedImagesDir.exists()) {
+			compressedImagesDir.mkdirs();
+		}
+
+		for (File file : new File("src/main/java/com/skyblockplus/json/enchanted_images").listFiles()) {
+			if(file.length() > 250000){
+				String command = "gifsicle -i " + file.getPath() + " -O3 --colors 256 -o src/main/java/com/skyblockplus/json/compressed_images" + file.getName();
+				try {
+					ProcessBuilder builder = new ProcessBuilder(
+							"gifsicle" ,"-i", file.getPath(), "-O3", "--colors", "256", "-o", compressedImagesDir.getPath() + "/" + file.getName());
+					builder.redirectErrorStream(true);
+					Process p = builder.start();
+					BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
+					String line;
+					do {
+						line = r.readLine();
+					} while (line != null);
+				}catch (Exception e){
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param url https://hst.sh/raw/ponicuqufo
+	 */
+	public static void processEnchantedEmojis(String url) throws IOException {
+		List<File> glintFiles = Arrays.stream(new File("src/main/java/com/skyblockplus/json/glint_images").listFiles()).sorted(Comparator.comparing(File::getName)).toList();
+		List<String> enchantList = streamJsonArray(getJson(url).getAsJsonArray()).map(JsonElement::getAsString).collect(Collectors.toList());
+		File outputFileDir = new File("src/main/java/com/skyblockplus/json/enchanted_images");
+		if(!outputFileDir.exists()){
+			outputFileDir.mkdir();
+		}
+
+		for (File inputFile : new File("src/main/java/com/skyblockplus/json/skycrypt_images").listFiles(f -> enchantList.contains(f.getName().replace(".png", "")))) {
+			BufferedImage inputImage = ImageIO.read(inputFile);
+
+			List<BufferedImage> frames = new ArrayList<>();
+			for (File glintFile : glintFiles) {
+				int inputHeight = inputImage.getHeight();
+				int inputWidth = inputImage.getWidth();
+				int glintSize = 64;
+				float ratioHeight = (float) glintSize / inputHeight;
+				float ratioWidth = (float) glintSize / inputWidth;
+
+				BufferedImage glintImage = ImageIO.read(glintFile);
+				BufferedImage outputImage = new BufferedImage(glintSize, glintSize, BufferedImage.TYPE_INT_ARGB);
+				for (int x = 0; x < glintSize; x++) {
+					for (int y = 0; y < glintSize; y++) {
+						Color color = new Color(inputImage.getRGB((int) (x / ratioWidth), (int) (y / ratioHeight)), true);
+						if (color.getAlpha() == 0) {
+							outputImage.setRGB(x, y, color.getRGB());
+						} else {
+							outputImage.setRGB(x, y, addColor(color, new Color(glintImage.getRGB(x, y), true)).getRGB());
+						}
+					}
+				}
+				frames.add(outputImage);
+			}
+
+			File gifFile = new File(outputFileDir.getPath() + "/" + inputFile.getName().replace(".png", ".gif"));
+			try (ImageOutputStream output = new FileImageOutputStream(gifFile)) {
+				try(GifWriter writer = new GifWriter(output, frames.get(0).getType(), 70, true, true)) {
+					for (BufferedImage frame : frames) {
+						writer.writeToSequence(frame);
+					}
+				}
+			}
+		}
+	}
+
+	public static int clampColor(float x) {
+		return Math.min(Math.max(Math.round(x), 0), 255);
+	}
+
+	public static Color addColor(Color back, Color front) {
+		float x = front.getAlpha() / 255F;
+		return new Color(
+				clampColor((back.getRed() + front.getRed() * x)),
+				clampColor((back.getGreen() + front.getGreen() * x)),
+				clampColor((back.getBlue() + front.getBlue() * x)),
+				back.getAlpha()
+		);
 	}
 }

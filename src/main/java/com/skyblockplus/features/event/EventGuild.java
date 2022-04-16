@@ -37,9 +37,9 @@ public class EventGuild {
 	public TextChannel channel;
 	public Role role;
 
-	public EventGuild(String guildId, JsonElement jacobSettings) {
+	public EventGuild(String guildId, JsonElement eventSettings) {
 		this.guildId = guildId;
-		reloadSettingsJson(jacobSettings);
+		reloadSettingsJson(eventSettings);
 	}
 
 	public void onEventNotif(Map<String, MessageEmbed> embeds) {
@@ -70,7 +70,7 @@ public class EventGuild {
 			enable = higherDepth(eventSettings, "enable", false);
 			if (enable) {
 				channel = jda.getGuildById(guildId).getTextChannelById(higherDepth(eventSettings, "channel").getAsString());
-				role = jda.getGuildById(guildId).getRoleById(higherDepth(eventSettings, "role").getAsString());
+				try{role =jda.getGuildById(guildId).getRoleById(higherDepth(eventSettings, "role").getAsString());}catch (Exception ignored){}
 				wantedEvents =
 					streamJsonArray(higherDepth(eventSettings, "events").getAsJsonArray())
 						.map(JsonElement::getAsString)

@@ -947,10 +947,10 @@ public class AutomaticGuild {
 					.append(i % 5 == 0 ? "\n" : "")
 					.append(
 						switch (split[i]) {
-							case "C" -> "<:e:939021091433754664>";
-							case "c" -> "<:e:939021590799188039>";
-							case "S" -> "<:e:939021525124775956>";
-							default -> "<:e:939021749486514216>";
+							case "C" -> getEmoji("EMERALD_BLOCK", "e");
+							case "c" -> getEmoji("IRON_BLOCK", "e");
+							case "S" -> getEmoji("INK_SACK:10", "e");
+							default -> getEmoji("PAPER", "e");
 						}
 					);
 			}

@@ -199,8 +199,8 @@ public class MayorHandler {
 				votesStr
 					.append(mayorNameToEmoji.get(name.toUpperCase()))
 					.append(" ")
-					.append("<:g:939022210499248138>".repeat(voteGlass))
-					.append("<:l:939022213762383993>".repeat(20 - voteGlass))
+					.append(getEmoji("STAINED_GLASS_PANE:5", "g").repeat(voteGlass))
+					.append(getEmoji("STAINED_GLASS_PANE:8", "l").repeat(20 - voteGlass))
 					.append("\n");
 			}
 			votesEmbed = defaultEmbed("Mayor Election Graph | Year " + year).setDescription(votesStr).build();

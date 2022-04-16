@@ -25,30 +25,32 @@ import java.util.Map;
 import lombok.Data;
 import org.apache.groovy.util.Maps;
 
+import static com.skyblockplus.utils.Utils.getEmoji;
+
 @Data
 public class JacobContest {
 
 	public static final Map<String, String> CROP_NAME_TO_EMOJI = Maps.of(
 		"Wheat",
-		"<:wheat:939024495581224981>",
+		 getEmoji("WHEAT"),
 		"Carrot",
-		"<:carrot:939020943332868167>",
+		getEmoji("CARROT_ITEM"),
 		"Potato",
-		"<:potato:939021823780216833>",
+		getEmoji("POTATO_ITEM"),
 		"Pumpkin",
-		"<:pumpkin:939021844202266696>",
+		getEmoji("PUMPKIN"),
 		"Melon",
-		"<:melon:939021703785381888>",
+		getEmoji("MELON"),
 		"Mushroom",
-		"<:mushroom:939020905747734558>",
+		getEmoji("BROWN_MUSHROOM"),
 		"Cactus",
-		"<:cactus:939020908046209044>",
+		getEmoji("CACTUS"),
 		"Sugar Cane",
-		"<:sugar_canes:939024466007162920>",
+		getEmoji("SUGAR_CANE"),
 		"Nether Wart",
-		"<:nether_wart:939021735594950678>",
+		getEmoji("NETHER_STALK"),
 		"Cocoa Beans",
-		"<:cocoa_beans:939021533379170336>"
+		getEmoji("INK_SACK:3")
 	);
 
 	private long time;

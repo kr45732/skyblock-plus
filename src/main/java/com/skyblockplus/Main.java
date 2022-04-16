@@ -318,9 +318,14 @@ public class Main {
 		if (!transcriptDir.exists()) {
 			log.info((transcriptDir.mkdirs() ? "Successfully created" : "Failed to create") + " application transcript directory");
 		}
-		scheduler.schedule(System::gc, 30, TimeUnit.MINUTES); // Sorry for the war crimes
 
 		if (isMainBot()) {
+			scheduler.schedule(() -> {
+				if(Runtime.getRuntime().totalMemory() > 1750000000){
+					System.gc();
+				}
+			}, 1, TimeUnit.MINUTES); // Sorry for the war crimes
+
 			try {
 				botStatusWebhook.send(
 					client.getSuccess() +

@@ -375,7 +375,7 @@ public class GuildRanksCommand extends Command {
 					.setEveryPageText(
 						"**Total rank changes:** " +
 						totalChange +
-						(lastUpdated != null ? "\n**Last updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "") +
+						(lastUpdated != null ? "\n**Last Updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "") +
 						"\n"
 					)
 			);
@@ -444,7 +444,7 @@ public class GuildRanksCommand extends Command {
 					.setEveryPageText(
 						"**Total rank changes:** " +
 						totalChange +
-						(lastUpdated != null ? "\n**Last updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "") +
+						(lastUpdated != null ? "\n**Last Updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "") +
 						"\n"
 					)
 			);
