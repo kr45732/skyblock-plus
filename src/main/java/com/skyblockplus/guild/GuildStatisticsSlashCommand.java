@@ -35,11 +35,17 @@ public class GuildStatisticsSlashCommand extends SlashCommand {
 	protected void execute(SlashCommandEvent event) {
 		event.logCommand();
 
+		String guild = event.getOptionStr("guild");
+		if (guild != null) {
+			event.embed(GuildStatisticsCommand.getStatistics(null, guild,  event.getGuild().getId()));
+			return;
+		}
+
 		if (event.invalidPlayerOption()) {
 			return;
 		}
 
-		event.embed(GuildStatisticsCommand.getStatistics(event.player, event.getGuild()));
+		event.embed(GuildStatisticsCommand.getStatistics(event.player,  null, event.getGuild().getId()));
 	}
 
 	@Override

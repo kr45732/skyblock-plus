@@ -40,14 +40,15 @@ public class CheckGuildApiSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.paginate(CheckGuildApiCommand.getGuildCheckApi(event.player, new PaginatorEvent(event)));
+		event.paginate(CheckGuildApiCommand.getGuildCheckApi(event.player, event.getOptionStr("exclude", ""), new PaginatorEvent(event)));
 	}
 
 	@Override
 	public CommandData getCommandData() {
 		return Commands
 			.slash(name, "Get which Skyblock APIs players have enabled or disabled for a guild")
-			.addOption(OptionType.STRING, "player", "Player username or mention", false, true);
+			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
+				.addOption(OptionType.STRING, "exclude", "Exclude certain APIs from being checked (comma separated)", false);
 	}
 
 	@Override

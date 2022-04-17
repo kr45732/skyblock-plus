@@ -40,7 +40,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
 
 public class GuildStatisticsCommand extends Command {
 
@@ -51,26 +50,31 @@ public class GuildStatisticsCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	public static EmbedBuilder getStatistics(String username, Guild guild) {
-		String hypixelKey = database.getServerHypixelApiKey(guild.getId());
+	public static EmbedBuilder getStatistics(String username, String guildName, String serverId) {
+		String hypixelKey = database.getServerHypixelApiKey(serverId);
 
 		EmbedBuilder eb = checkHypixelKey(hypixelKey);
 		if (eb != null) {
 			return eb;
 		}
 
-		UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
-		if (usernameUuidStruct.isNotValid()) {
-			return invalidEmbed(usernameUuidStruct.failCause());
-		}
+		HypixelResponse guildResponse;
+		if(username != null) {
+			UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
+			if (usernameUuidStruct.isNotValid()) {
+				return invalidEmbed(usernameUuidStruct.failCause());
+			}
 
-		HypixelResponse guildResponse = getGuildFromPlayer(usernameUuidStruct.uuid());
+			 guildResponse = getGuildFromPlayer(usernameUuidStruct.uuid());
+		}else{
+			guildResponse = getGuildFromName(guildName);
+		}
 		if (guildResponse.isNotValid()) {
 			return invalidEmbed(guildResponse.failCause());
 		}
 
 		JsonElement guildJson = guildResponse.response();
-		String guildName = higherDepth(guildJson, "name").getAsString();
+		guildName = higherDepth(guildJson, "name").getAsString();
 		String guildId = higherDepth(guildJson, "_id").getAsString();
 
 		HypixelGuildCache guildCache = hypixelGuildsCacheMap.getIfPresent(guildId);
@@ -226,12 +230,16 @@ public class GuildStatisticsCommand extends Command {
 			protected void execute() {
 				logCommand();
 
-				if (args.length == 2 && args[1].toLowerCase().startsWith("u:")) {
-					embed(getStatistics(args[1].split("u:")[1], event.getGuild()));
-					return;
-				}
+				setArgs(2);
+				if(args.length == 2 && args[1].startsWith("g:")){
+					embed(getStatistics(null, args[1].split("g:")[1], event.getGuild().getId()));
+				}else {
+					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
+						return;
+					}
 
-				sendErrorEmbed();
+					embed(getStatistics(player, null, event.getGuild().getId()));
+				}
 			}
 		}
 			.queue();

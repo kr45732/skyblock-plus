@@ -132,6 +132,24 @@ public class SlashCommandEvent extends SlashCommandInteractionEvent {
 		}
 	}
 
+	public void paginate(Object ebOrMb) {
+		paginate(ebOrMb, false);
+	}
+
+	public void paginate(Object ebOrMb, boolean deleteOriginal) {
+		if (ebOrMb != null) {
+			if(ebOrMb instanceof EmbedBuilder eb) {
+				getHook().editOriginalEmbeds(eb.build()).queue(ignore, ignore);
+			}else if(ebOrMb instanceof MessageBuilder mb){
+				getHook().editOriginal(mb.build()).queue(ignore, ignore);
+			}else {
+				throw new IllegalArgumentException("Unexpected class: " + ebOrMb.getClass());
+			}
+		} else if (deleteOriginal) {
+			getHook().deleteOriginal().queue();
+		}
+	}
+
 	public void string(String string) {
 		getHook().editOriginal(string).queue(ignore, ignore);
 	}

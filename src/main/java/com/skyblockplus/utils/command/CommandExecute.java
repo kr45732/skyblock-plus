@@ -101,6 +101,18 @@ public abstract class CommandExecute extends CommandEvent {
 		}
 	}
 
+	protected void paginate(Object ebOrMb) {
+		if(ebOrMb == null){
+			ebMessage.delete().queue(ignore, ignore);
+		}else if (ebOrMb instanceof EmbedBuilder eb) {
+			ebMessage.editMessageEmbeds(eb.build()).queue(ignore, ignore);
+		} else if (ebOrMb instanceof MessageBuilder mb) {
+			ebMessage.editMessage(mb.build()).queue(ignore, ignore);
+		} else {
+			throw new IllegalArgumentException("Unexpected class: " + ebOrMb.getClass());
+		}
+	}
+
 	protected void paginate(EmbedBuilder embedBuilder) {
 		if (embedBuilder == null) {
 			ebMessage.delete().queue(ignore, ignore);

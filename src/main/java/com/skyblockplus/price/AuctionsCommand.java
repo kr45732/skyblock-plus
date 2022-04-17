@@ -40,6 +40,8 @@ import java.util.Comparator;
 import java.util.stream.Stream;
 import me.nullicorn.nedit.NBTReader;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 public class AuctionsCommand extends Command {
@@ -51,7 +53,7 @@ public class AuctionsCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	public static EmbedBuilder getPlayerAuction(
+	public static Object getPlayerAuction(
 		String username,
 		AuctionFilterType filterType,
 		AuctionSortType sortType,
@@ -148,8 +150,21 @@ public class AuctionsCommand extends Command {
 				}
 			}
 
+			UsernameUuidStruct curTrack = AuctionTracker.commandAuthorToTrackingUser.getOrDefault(event.getUser().getId(), null);
+			Button button;
+			if (curTrack != null && curTrack.uuid().equals(usernameUuidStruct.uuid())) {
+				button =
+						Button.primary(
+								"track_auctions_stop_" + event.getUser().getId() + "_" + usernameUuidStruct.uuid(),
+								"Stop Tracking Auctions"
+						);
+			} else {
+				button =
+						Button.primary("track_auctions_start_" + event.getUser().getId() + "_" + usernameUuidStruct.uuid(), "Track Auctions")
+				;
+			}
 			if (extras.getEmbedFields().size() == 0) {
-				return invalidEmbed("No auctions found for " + usernameUuidStruct.username());
+				return new MessageBuilder().setEmbeds(invalidEmbed("No auctions found for " + usernameUuidStruct.username()).build()).setActionRows(ActionRow.of(button));
 			}
 
 			extras
@@ -166,20 +181,8 @@ public class AuctionsCommand extends Command {
 					) +
 					(totalPendingValue > 0 ? "\n**Unsold Auctions Value:** " + simplifyNumber(totalPendingValue) : "") +
 					(failedToSell > 0 ? "\n**Did Not Sell Auctions Value:** " + simplifyNumber(failedToSell) : "")
-				);
-			UsernameUuidStruct curTrack = AuctionTracker.commandAuthorToTrackingUser.getOrDefault(event.getUser().getId(), null);
-			if (curTrack != null && curTrack.uuid().equals(usernameUuidStruct.uuid())) {
-				extras.addButton(
-					Button.primary(
-						"track_auctions_stop_" + event.getUser().getId() + "_" + usernameUuidStruct.uuid(),
-						"Stop Tracking Auctions"
-					)
-				);
-			} else {
-				extras.addButton(
-					Button.primary("track_auctions_start_" + event.getUser().getId() + "_" + usernameUuidStruct.uuid(), "Track Auctions")
-				);
-			}
+				).addButton(button);
+
 
 			event.paginate(paginateBuilder.setPaginatorExtras(extras));
 		} else {

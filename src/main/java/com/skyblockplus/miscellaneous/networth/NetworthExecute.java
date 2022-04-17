@@ -941,7 +941,7 @@ public class NetworthExecute {
 			}
 		}
 
-		formattedStr += (item.isRecombobulated() ? " <a:recombobulator_3000:939014985051418654>" : "") + "=:=" + itemPrice;
+		formattedStr += (item.isRecombobulated() ? " " + getEmoji("RECOMBOBULATOR_3000") : "") + "=:=" + itemPrice;
 
 		return formattedStr;
 	}
