@@ -92,9 +92,9 @@ public class BingoCommand extends Command {
 					.append(" ")
 					.append(higherDepth(goal, "name").getAsString())
 					.append(": ")
-					.append(formatNumber(progress))
+					.append(simplifyNumber(progress))
 					.append("/")
-					.append(formatNumber(nextTier))
+					.append(simplifyNumber(nextTier))
 					.append(" (")
 					.append((roundProgress((double) Math.min(progress, nextTier) / nextTier)))
 					.append(")");

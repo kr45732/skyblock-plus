@@ -73,6 +73,7 @@ public class LeaderboardCommand extends Command {
 				amt = formattedAmt;
 			}
 		}
+		page = page == -1 ? (guildRank / 20 + 1) : page;
 
 		String ebStr =
 			"**Player:** " +
@@ -103,7 +104,7 @@ public class LeaderboardCommand extends Command {
 				logCommand();
 
 				Player.Gamemode gamemode = getGamemodeOption("mode", Player.Gamemode.ALL);
-				int page = getIntOption("page", 0);
+				int page = getIntOption("page", -1);
 				if (args.length == 3 || args.length == 2) {
 					if (getMentionedUsername(args.length == 2 ? -1 : 2)) {
 						return;

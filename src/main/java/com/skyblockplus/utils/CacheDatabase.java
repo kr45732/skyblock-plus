@@ -70,7 +70,9 @@ public class CacheDatabase {
 		config.setPassword(PLANET_SCALE_PASSWORD);
 		dataSource = new HikariDataSource(config);
 
-		scheduler.scheduleAtFixedRate(this::updateLeaderboard, 1, 1, TimeUnit.MINUTES);
+		if(isMainBot()) {
+			scheduler.scheduleAtFixedRate(this::updateLeaderboard, 1, 1, TimeUnit.MINUTES);
+		}
 	}
 
 	public Connection getConnection() throws SQLException {
@@ -331,21 +333,21 @@ public class CacheDatabase {
 			statement.setString(3, player.getUuid());
 			statement.setDouble(4, player.getHighestAmount("slayer", gamemode, true));
 			statement.setDouble(5, player.getHighestAmount("skills", gamemode, true));
-			statement.setDouble(6, player.getHighestAmount("catacombs", gamemode, true));
+			statement.setDouble(6, player.getHighestAmount("catacombs_xp", gamemode, true));
 			statement.setDouble(7, player.getHighestAmount("weight", gamemode, true));
 			statement.setDouble(8, player.getHighestAmount("sven", gamemode, true));
 			statement.setDouble(9, player.getHighestAmount("rev", gamemode, true));
 			statement.setDouble(10, player.getHighestAmount("tara", gamemode, true));
 			statement.setDouble(11, player.getHighestAmount("enderman", gamemode, true));
-			statement.setDouble(12, player.getHighestAmount("alchemy", gamemode, true));
-			statement.setDouble(13, player.getHighestAmount("combat", gamemode, true));
-			statement.setDouble(14, player.getHighestAmount("fishing", gamemode, true));
-			statement.setDouble(15, player.getHighestAmount("farming", gamemode, true));
-			statement.setDouble(16, player.getHighestAmount("foraging", gamemode, true));
-			statement.setDouble(17, player.getHighestAmount("carpentry", gamemode, true));
-			statement.setDouble(18, player.getHighestAmount("mining", gamemode, true));
-			statement.setDouble(19, player.getHighestAmount("taming", gamemode, true));
-			statement.setDouble(20, player.getHighestAmount("enchanting", gamemode, true));
+			statement.setDouble(12, player.getHighestAmount("alchemy_xp", gamemode, true));
+			statement.setDouble(13, player.getHighestAmount("combat_xp", gamemode, true));
+			statement.setDouble(14, player.getHighestAmount("fishing_xp", gamemode, true));
+			statement.setDouble(15, player.getHighestAmount("farming_xp", gamemode, true));
+			statement.setDouble(16, player.getHighestAmount("foraging_xp", gamemode, true));
+			statement.setDouble(17, player.getHighestAmount("carpentry_xp", gamemode, true));
+			statement.setDouble(18, player.getHighestAmount("mining_xp", gamemode, true));
+			statement.setDouble(19, player.getHighestAmount("taming_xp", gamemode, true));
+			statement.setDouble(20, player.getHighestAmount("enchanting_xp", gamemode, true));
 			statement.setDouble(21, player.getHighestAmount("networth", gamemode, true));
 			statement.executeUpdate();
 		} catch (Exception e) {

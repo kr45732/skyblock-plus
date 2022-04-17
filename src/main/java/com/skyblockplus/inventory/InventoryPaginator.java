@@ -18,11 +18,12 @@
 
 package com.skyblockplus.inventory;
 
-import static com.skyblockplus.utils.Utils.ignore;
-import static com.skyblockplus.utils.Utils.waiter;
-
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorEvent;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.Emoji;
@@ -32,6 +33,8 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
+import static com.skyblockplus.utils.Utils.*;
+
 public class InventoryPaginator {
 
 	private final List<String[]> inventoryPages;
@@ -40,11 +43,13 @@ public class InventoryPaginator {
 	private final User user;
 	private final int maxPageNumber;
 	private int pageNumber = 0;
+	private Instant lastEdit;
 
 	public InventoryPaginator(List<String[]> inventoryPages, String type, Player player, PaginatorEvent event) {
 		this.inventoryPages = inventoryPages;
 		this.user = event.getUser();
 		this.maxPageNumber = inventoryPages.size() - 1;
+		this.lastEdit = Instant.now();
 
 		pagePart1 = event.getChannel().sendMessage(inventoryPages.get(0)[0]).complete();
 		pagePart2 =
@@ -70,25 +75,30 @@ public class InventoryPaginator {
 	}
 
 	public void action(ButtonInteractionEvent event) {
-		if (event.getComponentId().equals("inv_paginator_left_button")) {
-			if ((pageNumber - 1) >= 0) {
-				pageNumber -= 1;
+		if(Instant.now().minusSeconds(2).isBefore(lastEdit)){
+			event.reply(client.getError() + " Please wait between switching pages").setEphemeral(true).queue();
+		}else {
+			lastEdit = Instant.now();
+			if (event.getComponentId().equals("inv_paginator_left_button")) {
+				if ((pageNumber - 1) >= 0) {
+					pageNumber -= 1;
+				}
+			} else if (event.getComponentId().equals("inv_paginator_right_button")) {
+				if ((pageNumber + 1) <= maxPageNumber) {
+					pageNumber += 1;
+				}
 			}
-		} else if (event.getComponentId().equals("inv_paginator_right_button")) {
-			if ((pageNumber + 1) <= maxPageNumber) {
-				pageNumber += 1;
-			}
+
+			pagePart1.editMessage(inventoryPages.get(pageNumber)[0]).queue(ignore, ignore);
+
+			List<Button> curButtons = event.getMessage().getButtons();
+			Button leftButton = pageNumber == 0 ? curButtons.get(0).asDisabled() : curButtons.get(0).asEnabled();
+			Button rightButton = pageNumber == (maxPageNumber) ? curButtons.get(1).asDisabled() : curButtons.get(1).asEnabled();
+			Button linkButton = curButtons
+					.get(2)
+					.withLabel(curButtons.get(2).getLabel().split("•")[0] + "• Page " + (pageNumber + 1) + "/" + (maxPageNumber + 1));
+			event.editMessage(inventoryPages.get(pageNumber)[1]).setActionRow(leftButton, rightButton, linkButton).queue(ignore, ignore);
 		}
-
-		pagePart1.editMessage(inventoryPages.get(pageNumber)[0]).queue(ignore, ignore);
-
-		List<Button> curButtons = event.getMessage().getButtons();
-		Button leftButton = pageNumber == 0 ? curButtons.get(0).asDisabled() : curButtons.get(0).asEnabled();
-		Button rightButton = pageNumber == (maxPageNumber) ? curButtons.get(1).asDisabled() : curButtons.get(1).asEnabled();
-		Button linkButton = curButtons
-			.get(2)
-			.withLabel(curButtons.get(2).getLabel().split("•")[0] + "• Page " + (pageNumber + 1) + "/" + (maxPageNumber + 1));
-		event.editMessage(inventoryPages.get(pageNumber)[1]).setActionRow(leftButton, rightButton, linkButton).queue(ignore, ignore);
 
 		waitForEvent();
 	}

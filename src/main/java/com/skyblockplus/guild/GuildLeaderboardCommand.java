@@ -189,7 +189,7 @@ public class GuildLeaderboardCommand extends Command {
 				.setEveryPageText(ebStr)
 				.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
 		);
-		event.paginate(paginateBuilder);
+		event.paginate(paginateBuilder, (guildRank / 20) + 1);
 
 		return null;
 	}

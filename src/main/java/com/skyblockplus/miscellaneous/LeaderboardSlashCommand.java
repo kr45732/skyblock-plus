@@ -47,7 +47,7 @@ public class LeaderboardSlashCommand extends SlashCommand {
 				event.getOptionStr("type"),
 				event.player,
 				Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
-				event.getOptionInt("page", 0),
+				event.getOptionInt("page", -1),
 				new PaginatorEvent(event)
 			)
 		);

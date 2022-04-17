@@ -818,7 +818,7 @@ public class HelpCommand extends Command {
 			help.create("guild members <g:guild_name>", "Get a list of all members in a guild") +
 			help.create("guild experience <player>", "Get the experience leaderboard for a player's guild") +
 			help.create("guild experience <g:guild_name>", "Get the experience leaderboard for a guild") +
-			help.create("g-lb <type> <u:player> [mode:normal|ironman|stranded]", "Get a leaderboard for a player's guild") +
+			help.create("g-lb <type> [player] [g:guild_name] [mode:normal|ironman|stranded]", "Get a leaderboard for a player's guild") +
 			help.create(
 				"g-kicker <u:player> <type:value> ...",
 				"Get all player's who don't meet the provided requirements. The requirement name can be skills, slayer, catacombs, or weight. The requirement value must be an integer."
