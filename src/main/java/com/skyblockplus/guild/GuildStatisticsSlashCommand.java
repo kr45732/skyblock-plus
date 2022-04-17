@@ -53,7 +53,7 @@ public class GuildStatisticsSlashCommand extends SlashCommand {
 		return Commands
 			.slash(name, "Get a guild's SkyBlock statistics of slayer, skills, catacombs, and weight")
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOption(OptionType.STRING, "guild", "Guild name", false);
+			.addOption(OptionType.STRING, "guild", "Guild name", false);
 	}
 
 	@Override

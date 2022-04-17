@@ -67,9 +67,7 @@ public class SkyblockEventCommand extends Command {
 		guildMap.get(guildId).setEventMemberListLastUpdated(null);
 		List<EventMember> guildMemberPlayersList = getEventLeaderboardList(runningEventSettings, guildId);
 		if (guildMemberPlayersList == null) {
-			return invalidEmbed(
-				"A Hypixel API key must be set for events over 45 members so the leaderboard can be calculated"
-			);
+			return invalidEmbed("A Hypixel API key must be set for events over 45 members so the leaderboard can be calculated");
 		}
 		guildMap.get(guildId).setEventMemberListLastUpdated(null);
 
@@ -483,7 +481,7 @@ public class SkyblockEventCommand extends Command {
 				}
 
 				JsonElement eventSettings = database.getSkyblockEventSettings(member.getGuild().getId());
-				if(!higherDepth(eventSettings, "eventGuildId", "").isEmpty()){
+				if (!higherDepth(eventSettings, "eventGuildId", "").isEmpty()) {
 					HypixelResponse guildJson = getGuildFromPlayer(uuid);
 					if (guildJson.isNotValid()) {
 						return invalidEmbed(guildJson.failCause());
@@ -604,7 +602,7 @@ public class SkyblockEventCommand extends Command {
 			JsonElement currentSettings = database.getSkyblockEventSettings(guildId);
 			EmbedBuilder eb = defaultEmbed("Current Event");
 
-			if(!higherDepth(currentSettings, "eventGuildId", "").isEmpty()) {
+			if (!higherDepth(currentSettings, "eventGuildId", "").isEmpty()) {
 				HypixelResponse guildJson = getGuildFromId(higherDepth(currentSettings, "eventGuildId").getAsString());
 				if (guildJson.isNotValid()) {
 					return invalidEmbed(guildJson.failCause());

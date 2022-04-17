@@ -45,8 +45,11 @@ public class EventGuild {
 	public void onEventNotif(Map<String, MessageEmbed> embeds) {
 		try {
 			if (enable) {
-				if(!channel.canTalk()){
-					parent.logAction(defaultEmbed("Event Notifications").setDescription("Missing permissions to view or send messages in " + channel.getAsMention()));
+				if (!channel.canTalk()) {
+					parent.logAction(
+						defaultEmbed("Event Notifications")
+							.setDescription("Missing permissions to view or send messages in " + channel.getAsMention())
+					);
 					return;
 				}
 

@@ -91,17 +91,13 @@ public class SkyblockEventHandler {
 
 		switch (state) {
 			case 0:
-				if(replyMessage.equalsIgnoreCase("none")){
+				if (replyMessage.equalsIgnoreCase("none")) {
 					guildJson = null;
 					eventSettings.setEventGuildId("");
 					eb
-							.addField(
-									"Guild",
-									"None",
-									false
-							)
-							.setDescription("Is this a catacombs, slayer, skills, weight, or collections event?");
-				}else {
+						.addField("Guild", "None", false)
+						.setDescription("Is this a catacombs, slayer, skills, weight, or collections event?");
+				} else {
 					HypixelResponse response = getGuildFromName(replyMessage);
 					if (response.isNotValid()) {
 						eb.setDescription(response.failCause() + ". Please try again.");
@@ -110,15 +106,15 @@ public class SkyblockEventHandler {
 						guildJson = response.response();
 						eventSettings.setEventGuildId(higherDepth(guildJson, "_id").getAsString());
 						eb
-								.addField(
-										"Guild",
-										"Name: " +
-												higherDepth(guildJson, "name").getAsString() +
-												"\nMembers: " +
-												higherDepth(guildJson, "members").getAsJsonArray().size(),
-										false
-								)
-								.setDescription("Is this a catacombs, slayer, skills, weight, or collections event?");
+							.addField(
+								"Guild",
+								"Name: " +
+								higherDepth(guildJson, "name").getAsString() +
+								"\nMembers: " +
+								higherDepth(guildJson, "members").getAsJsonArray().size(),
+								false
+							)
+							.setDescription("Is this a catacombs, slayer, skills, weight, or collections event?");
 						state++;
 					}
 				}
@@ -419,7 +415,7 @@ public class SkyblockEventHandler {
 
 					announcementEb.setDescription("A new Skyblock event has been created! Please see below for more information.");
 					announcementEb.addField("Event Type", eventTypeFormatted, false);
-					if(guildJson != null) {
+					if (guildJson != null) {
 						announcementEb.addField("Guild", higherDepth(guildJson, "name").getAsString(), false);
 					}
 					announcementEb.addField("End Date", "Ends <t:" + eventSettings.getTimeEndingSeconds() + ":R>", false);

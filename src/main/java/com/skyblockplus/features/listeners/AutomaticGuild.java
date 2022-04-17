@@ -762,9 +762,14 @@ public class AutomaticGuild {
 				(!memberCountList.isEmpty() ? " | Users (" + memberCountList.size() + ")" : "") +
 				(counterUpdate > 0 ? " | Counters (" + counterUpdate + ")" : "")
 			);
-			logAction(defaultEmbed("Automatic Guild Update").setDescription("• Checked " +
-							formatNumber(memberCountList.size()) + " linked members" +
-					(counterUpdate > 0 ? "\n• Updated " + counterUpdate + " counter" + (counterUpdate > 1 ? "s" :"") : ""))
+			logAction(
+				defaultEmbed("Automatic Guild Update")
+					.setDescription(
+						"• Checked " +
+						formatNumber(memberCountList.size()) +
+						" linked members" +
+						(counterUpdate > 0 ? "\n• Updated " + counterUpdate + " counter" + (counterUpdate > 1 ? "s" : "") : "")
+					)
 			);
 		} catch (Exception e) {
 			log.error("updateGuild - " + guildId, e);
@@ -810,8 +815,11 @@ public class AutomaticGuild {
 	public void onFetchur(MessageEmbed embed) {
 		try {
 			if (fetchurChannel != null) {
-				if(!fetchurChannel.canTalk()){
-					logAction(defaultEmbed("Fetchur Notifications").setDescription("Missing permissions to view or send messages in " + fetchurChannel.getAsMention()));
+				if (!fetchurChannel.canTalk()) {
+					logAction(
+						defaultEmbed("Fetchur Notifications")
+							.setDescription("Missing permissions to view or send messages in " + fetchurChannel.getAsMention())
+					);
 					return;
 				}
 
@@ -838,8 +846,11 @@ public class AutomaticGuild {
 	public void onMayorElection(MessageEmbed embed, Button button, int year) {
 		try {
 			if (mayorChannel != null) {
-				if(!mayorChannel.canTalk()){
-					logAction(defaultEmbed("Mayor Notifications").setDescription("Missing permissions to view or send messages in " + mayorChannel.getAsMention()));
+				if (!mayorChannel.canTalk()) {
+					logAction(
+						defaultEmbed("Mayor Notifications")
+							.setDescription("Missing permissions to view or send messages in " + mayorChannel.getAsMention())
+					);
 					return;
 				}
 
@@ -872,8 +883,11 @@ public class AutomaticGuild {
 
 	public void onMayorElected(MessageEmbed embed) {
 		try {
-			if(!mayorChannel.canTalk()){
-				logAction(defaultEmbed("Mayor Notifications").setDescription("Missing permissions to view or send messages in " + mayorChannel.getAsMention()));
+			if (!mayorChannel.canTalk()) {
+				logAction(
+					defaultEmbed("Mayor Notifications")
+						.setDescription("Missing permissions to view or send messages in " + mayorChannel.getAsMention())
+				);
 				return;
 			}
 

@@ -18,6 +18,8 @@
 
 package com.skyblockplus.features.jacob;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
@@ -26,8 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
-
-import static com.skyblockplus.utils.Utils.*;
 
 public class JacobGuild {
 
@@ -44,8 +44,11 @@ public class JacobGuild {
 	public void onFarmingContest(List<String> crops, MessageEmbed embed) {
 		try {
 			if (enable) {
-				if(!channel.canTalk()){
-					parent.logAction(defaultEmbed("Jacob Notifications").setDescription("Missing permissions to view or send messages in " + channel.getAsMention()));
+				if (!channel.canTalk()) {
+					parent.logAction(
+						defaultEmbed("Jacob Notifications")
+							.setDescription("Missing permissions to view or send messages in " + channel.getAsMention())
+					);
 					return;
 				}
 
