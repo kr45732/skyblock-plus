@@ -54,7 +54,7 @@ public class SkyblockEventHandler {
 		this.eb =
 			defaultEmbed("Skyblock Event")
 				.setFooter("Type 'cancel' to stop the process • dsc.gg/sb+")
-				.setDescription("Reply with the name of the guild I should track.");
+				.setDescription("Reply with the name of the guild I should track or 'none' to let anyone join.");
 
 		if (paginatorEvent.isSlashCommand()) {
 			paginatorEvent.getSlashCommand().getHook().editOriginalEmbeds(eb.build()).queue();
@@ -91,24 +91,36 @@ public class SkyblockEventHandler {
 
 		switch (state) {
 			case 0:
-				HypixelResponse response = getGuildFromName(replyMessage);
-				if (response.isNotValid()) {
-					eb.setDescription(response.failCause() + ". Please try again.");
-					attemptsLeft--;
-				} else {
-					guildJson = response.response();
-					eventSettings.setEventGuildId(higherDepth(guildJson, "_id").getAsString());
+				if(replyMessage.equalsIgnoreCase("none")){
+					guildJson = null;
+					eventSettings.setEventGuildId("");
 					eb
-						.addField(
-							"Guild",
-							"Name: " +
-							higherDepth(guildJson, "name").getAsString() +
-							"\nMembers: " +
-							higherDepth(guildJson, "members").getAsJsonArray().size(),
-							false
-						)
-						.setDescription("Is this a catacombs, slayer, skills, weight, or collections event?");
-					state++;
+							.addField(
+									"Guild",
+									"None",
+									false
+							)
+							.setDescription("Is this a catacombs, slayer, skills, weight, or collections event?");
+				}else {
+					HypixelResponse response = getGuildFromName(replyMessage);
+					if (response.isNotValid()) {
+						eb.setDescription(response.failCause() + ". Please try again.");
+						attemptsLeft--;
+					} else {
+						guildJson = response.response();
+						eventSettings.setEventGuildId(higherDepth(guildJson, "_id").getAsString());
+						eb
+								.addField(
+										"Guild",
+										"Name: " +
+												higherDepth(guildJson, "name").getAsString() +
+												"\nMembers: " +
+												higherDepth(guildJson, "members").getAsJsonArray().size(),
+										false
+								)
+								.setDescription("Is this a catacombs, slayer, skills, weight, or collections event?");
+						state++;
+					}
 				}
 				sendEmbedMessage(eb);
 				break;
@@ -407,7 +419,9 @@ public class SkyblockEventHandler {
 
 					announcementEb.setDescription("A new Skyblock event has been created! Please see below for more information.");
 					announcementEb.addField("Event Type", eventTypeFormatted, false);
-					announcementEb.addField("Guild", higherDepth(guildJson, "name").getAsString(), false);
+					if(guildJson != null) {
+						announcementEb.addField("Guild", higherDepth(guildJson, "name").getAsString(), false);
+					}
 					announcementEb.addField("End Date", "Ends <t:" + eventSettings.getTimeEndingSeconds() + ":R>", false);
 
 					StringBuilder ebString = new StringBuilder();

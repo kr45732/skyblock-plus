@@ -68,7 +68,7 @@ public class SkyblockEventCommand extends Command {
 		List<EventMember> guildMemberPlayersList = getEventLeaderboardList(runningEventSettings, guildId);
 		if (guildMemberPlayersList == null) {
 			return invalidEmbed(
-				"A Hypixel API key must be set for events over 30 members so the leaderboard can be calculated before it ends"
+				"A Hypixel API key must be set for events over 45 members so the leaderboard can be calculated"
 			);
 		}
 		guildMap.get(guildId).setEventMemberListLastUpdated(null);
@@ -147,7 +147,7 @@ public class SkyblockEventCommand extends Command {
 		String eventType = higherDepth(runningSettings, "eventType").getAsString();
 
 		String key = null;
-		if (membersArr.size() > 30) {
+		if (membersArr.size() > 45) {
 			key = database.getServerHypixelApiKey(guildId);
 			if (key == null) {
 				return null;
@@ -341,7 +341,7 @@ public class SkyblockEventCommand extends Command {
 		JsonElement runningSettings = database.getSkyblockEventSettings(guildId);
 		List<EventMember> guildMemberPlayersList = getEventLeaderboardList(runningSettings, guildId);
 		if (guildMemberPlayersList == null) {
-			return invalidEmbed("A Hypixel API key must be set for events with over 30 members");
+			return invalidEmbed("A Hypixel API key must be set for events with over 45 members");
 		}
 
 		for (int i = 0; i < guildMemberPlayersList.size(); i++) {
@@ -373,10 +373,6 @@ public class SkyblockEventCommand extends Command {
 		String guildId = event.getGuild().getId();
 		if (!database.getSkyblockEventActive(guildId)) {
 			return defaultEmbed("No event running");
-		}
-
-		if (!guildMap.containsKey(guildId)) {
-			return defaultEmbed("No guild found");
 		}
 
 		AutomaticGuild currentGuild = guildMap.get(guildId);
@@ -428,7 +424,7 @@ public class SkyblockEventCommand extends Command {
 		JsonElement runningSettings = database.getSkyblockEventSettings(guildId);
 		List<EventMember> guildMemberPlayersList = getEventLeaderboardList(runningSettings, guildId);
 		if (guildMemberPlayersList == null) {
-			return invalidEmbed("A Hypixel API key must be set for events with over 30 members");
+			return invalidEmbed("A Hypixel API key must be set for events with over 45 members");
 		}
 
 		for (int i = 0; i < guildMemberPlayersList.size(); i++) {
@@ -486,15 +482,16 @@ public class SkyblockEventCommand extends Command {
 					return invalidEmbed("You are already in the event! If you want to leave or change profile use `/event leave`");
 				}
 
-				HypixelResponse guildJson = getGuildFromPlayer(uuid);
-
-				if (guildJson.isNotValid()) {
-					return invalidEmbed(guildJson.failCause());
-				}
-
 				JsonElement eventSettings = database.getSkyblockEventSettings(member.getGuild().getId());
-				if (!guildJson.get("_id").getAsString().equals(higherDepth(eventSettings, "eventGuildId").getAsString())) {
-					return invalidEmbed("You must be in the guild to join the event");
+				if(!higherDepth(eventSettings, "eventGuildId", "").isEmpty()){
+					HypixelResponse guildJson = getGuildFromPlayer(uuid);
+					if (guildJson.isNotValid()) {
+						return invalidEmbed(guildJson.failCause());
+					}
+
+					if (!guildJson.get("_id").getAsString().equals(higherDepth(eventSettings, "eventGuildId").getAsString())) {
+						return invalidEmbed("You must be in the guild to join the event");
+					}
 				}
 				String requiredRole = higherDepth(eventSettings, "whitelistRole", "");
 				if (!requiredRole.isEmpty() && member.getRoles().stream().noneMatch(r -> r.getId().equals(requiredRole))) {
@@ -607,11 +604,13 @@ public class SkyblockEventCommand extends Command {
 			JsonElement currentSettings = database.getSkyblockEventSettings(guildId);
 			EmbedBuilder eb = defaultEmbed("Current Event");
 
-			HypixelResponse guildJson = getGuildFromId(higherDepth(currentSettings, "eventGuildId").getAsString());
-			if (guildJson.isNotValid()) {
-				return invalidEmbed(guildJson.failCause());
+			if(!higherDepth(currentSettings, "eventGuildId", "").isEmpty()) {
+				HypixelResponse guildJson = getGuildFromId(higherDepth(currentSettings, "eventGuildId").getAsString());
+				if (guildJson.isNotValid()) {
+					return invalidEmbed(guildJson.failCause());
+				}
+				eb.addField("Guild", guildJson.get("name").getAsString(), false);
 			}
-			eb.addField("Guild", guildJson.get("name").getAsString(), false);
 
 			eb.addField(
 				"Event Type",

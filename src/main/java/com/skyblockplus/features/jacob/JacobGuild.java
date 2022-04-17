@@ -18,10 +18,6 @@
 
 package com.skyblockplus.features.jacob;
 
-import static com.skyblockplus.utils.Utils.gson;
-import static com.skyblockplus.utils.Utils.higherDepth;
-import static com.skyblockplus.utils.Utils.jda;
-
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
@@ -31,21 +27,28 @@ import java.util.List;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 
+import static com.skyblockplus.utils.Utils.*;
+
 public class JacobGuild {
 
-	public final String guildId;
+	public final AutomaticGuild parent;
 	public boolean enable = false;
 	public List<RoleObject> wantedCrops;
 	public TextChannel channel;
 
-	public JacobGuild(String guildId, JsonElement jacobSettings) {
-		this.guildId = guildId;
+	public JacobGuild(JsonElement jacobSettings, AutomaticGuild parent) {
+		this.parent = parent;
 		reloadSettingsJson(jacobSettings);
 	}
 
 	public void onFarmingContest(List<String> crops, MessageEmbed embed) {
 		try {
 			if (enable) {
+				if(!channel.canTalk()){
+					parent.logAction(defaultEmbed("Jacob Notifications").setDescription("Missing permissions to view or send messages in " + channel.getAsMention()));
+					return;
+				}
+
 				List<String> roleMentions = new ArrayList<>();
 				for (RoleObject wantedCrop : wantedCrops) {
 					if (crops.contains(wantedCrop.getValue())) {
@@ -58,7 +61,7 @@ public class JacobGuild {
 				}
 			}
 		} catch (Exception e) {
-			AutomaticGuild.getLogger().error(guildId, e);
+			AutomaticGuild.getLogger().error(parent.guildId, e);
 		}
 	}
 
@@ -66,12 +69,12 @@ public class JacobGuild {
 		try {
 			enable = higherDepth(jacobSettings, "enable", false);
 			if (enable) {
-				channel = jda.getGuildById(guildId).getTextChannelById(higherDepth(jacobSettings, "channel").getAsString());
+				channel = jda.getGuildById(parent.guildId).getTextChannelById(higherDepth(jacobSettings, "channel").getAsString());
 				wantedCrops =
 					gson.fromJson(higherDepth(jacobSettings, "crops").getAsJsonArray(), new TypeToken<List<RoleObject>>() {}.getType());
 			}
 		} catch (Exception e) {
-			AutomaticGuild.getLogger().error(guildId, e);
+			AutomaticGuild.getLogger().error(parent.guildId, e);
 		}
 	}
 }

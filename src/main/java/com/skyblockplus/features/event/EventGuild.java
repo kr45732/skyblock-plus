@@ -31,20 +31,25 @@ import net.dv8tion.jda.api.entities.TextChannel;
 
 public class EventGuild {
 
-	public final String guildId;
+	public final AutomaticGuild parent;
 	public boolean enable = false;
 	public List<String> wantedEvents;
 	public TextChannel channel;
 	public Role role;
 
-	public EventGuild(String guildId, JsonElement eventSettings) {
-		this.guildId = guildId;
+	public EventGuild(JsonElement eventSettings, AutomaticGuild parent) {
+		this.parent = parent;
 		reloadSettingsJson(eventSettings);
 	}
 
 	public void onEventNotif(Map<String, MessageEmbed> embeds) {
 		try {
 			if (enable) {
+				if(!channel.canTalk()){
+					parent.logAction(defaultEmbed("Event Notifications").setDescription("Missing permissions to view or send messages in " + channel.getAsMention()));
+					return;
+				}
+
 				List<MessageEmbed> filteredEmbeds = embeds
 					.entrySet()
 					.stream()
@@ -61,7 +66,7 @@ public class EventGuild {
 				}
 			}
 		} catch (Exception e) {
-			AutomaticGuild.getLogger().error(guildId, e);
+			AutomaticGuild.getLogger().error(parent.guildId, e);
 		}
 	}
 
@@ -69,9 +74,9 @@ public class EventGuild {
 		try {
 			enable = higherDepth(eventSettings, "enable", false);
 			if (enable) {
-				channel = jda.getGuildById(guildId).getTextChannelById(higherDepth(eventSettings, "channel").getAsString());
+				channel = jda.getGuildById(parent.guildId).getTextChannelById(higherDepth(eventSettings, "channel").getAsString());
 				try {
-					role = jda.getGuildById(guildId).getRoleById(higherDepth(eventSettings, "role").getAsString());
+					role = jda.getGuildById(parent.guildId).getRoleById(higherDepth(eventSettings, "role").getAsString());
 				} catch (Exception ignored) {}
 				wantedEvents =
 					streamJsonArray(higherDepth(eventSettings, "events").getAsJsonArray())
@@ -79,7 +84,7 @@ public class EventGuild {
 						.collect(Collectors.toList());
 			}
 		} catch (Exception e) {
-			AutomaticGuild.getLogger().error(guildId, e);
+			AutomaticGuild.getLogger().error(parent.guildId, e);
 		}
 	}
 }
