@@ -526,28 +526,16 @@ public class HelpCommand extends Command {
 								),
 								new HelpData("remove", "Remove a crop from the tracking list.", "remove <crop>")
 							),
-							new HelpData("event", "Main command for event notification settings.")
-									.addSecondData("Get the current event notification settings for the bot.", "event")
-									.addSubcommands(
-											new HelpData("enable", "Enable event notifications."),
-											new HelpData("disable", "Disable event notifications."),
-											new HelpData(
-													"channel",
-													"Set the channel where event notifications will be posted.",
-													"channel <#channel>"
-											),
-											new HelpData(
-													"ping",
-													"Set the role that will be pinged when event notifications are sent.",
-													"ping <@role>"
-											),
-											new HelpData(
-													"add",
-													"Add an event to be tracked and notified.",
-													"add <event|all>"
-											),
-											new HelpData("remove", "Remove an event from the tracking list.", "remove <event>")
-									),
+						new HelpData("event", "Main command for event notification settings.")
+							.addSecondData("Get the current event notification settings for the bot.", "event")
+							.addSubcommands(
+								new HelpData("enable", "Enable event notifications."),
+								new HelpData("disable", "Disable event notifications."),
+								new HelpData("channel", "Set the channel where event notifications will be posted.", "channel <#channel>"),
+								new HelpData("ping", "Set the role that will be pinged when event notifications are sent.", "ping <@role>"),
+								new HelpData("add", "Add an event to be tracked and notified.", "add <event|all>"),
+								new HelpData("remove", "Remove an event from the tracking list.", "remove <event>")
+							),
 						new HelpData("verify", "Main command for verification settings.")
 							.addSecondData("Get the current verification settings for the bot.", "verify")
 							.addSubcommands(
@@ -983,12 +971,12 @@ public class HelpCommand extends Command {
 		);
 
 		paginateBuilder.addItems(
-				help.create("settings event", "View the current settings for event notifications") +
-						help.create("settings event <enable|disable>", "Enable or disable event notifications") +
-						help.create("settings event channel <#channel>", "Set the channel where event notifications will be sent") +
-						help.create("settings event ping <@role>", "Set the role to be pinged when event notifications are sent") +
-						help.create("settings event add <event|all>", "Added an event to be notified for") +
-						help.create("settings event remove <event>", "Remove an event from the notification list")
+			help.create("settings event", "View the current settings for event notifications") +
+			help.create("settings event <enable|disable>", "Enable or disable event notifications") +
+			help.create("settings event channel <#channel>", "Set the channel where event notifications will be sent") +
+			help.create("settings event ping <@role>", "Set the role to be pinged when event notifications are sent") +
+			help.create("settings event add <event|all>", "Added an event to be notified for") +
+			help.create("settings event remove <event>", "Remove an event from the notification list")
 		);
 
 		paginateBuilder.addItems(

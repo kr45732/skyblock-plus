@@ -154,17 +154,18 @@ public class AuctionsCommand extends Command {
 			Button button;
 			if (curTrack != null && curTrack.uuid().equals(usernameUuidStruct.uuid())) {
 				button =
-						Button.primary(
-								"track_auctions_stop_" + event.getUser().getId() + "_" + usernameUuidStruct.uuid(),
-								"Stop Tracking Auctions"
-						);
+					Button.primary(
+						"track_auctions_stop_" + event.getUser().getId() + "_" + usernameUuidStruct.uuid(),
+						"Stop Tracking Auctions"
+					);
 			} else {
 				button =
-						Button.primary("track_auctions_start_" + event.getUser().getId() + "_" + usernameUuidStruct.uuid(), "Track Auctions")
-				;
+					Button.primary("track_auctions_start_" + event.getUser().getId() + "_" + usernameUuidStruct.uuid(), "Track Auctions");
 			}
 			if (extras.getEmbedFields().size() == 0) {
-				return new MessageBuilder().setEmbeds(invalidEmbed("No auctions found for " + usernameUuidStruct.username()).build()).setActionRows(ActionRow.of(button));
+				return new MessageBuilder()
+					.setEmbeds(invalidEmbed("No auctions found for " + usernameUuidStruct.username()).build())
+					.setActionRows(ActionRow.of(button));
 			}
 
 			extras
@@ -181,8 +182,8 @@ public class AuctionsCommand extends Command {
 					) +
 					(totalPendingValue > 0 ? "\n**Unsold Auctions Value:** " + simplifyNumber(totalPendingValue) : "") +
 					(failedToSell > 0 ? "\n**Did Not Sell Auctions Value:** " + simplifyNumber(failedToSell) : "")
-				).addButton(button);
-
+				)
+				.addButton(button);
 
 			event.paginate(paginateBuilder.setPaginatorExtras(extras));
 		} else {

@@ -48,7 +48,7 @@ public class CheckGuildApiSlashCommand extends SlashCommand {
 		return Commands
 			.slash(name, "Get which Skyblock APIs players have enabled or disabled for a guild")
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
-				.addOption(OptionType.STRING, "exclude", "Exclude certain APIs from being checked (comma separated)", false);
+			.addOption(OptionType.STRING, "exclude", "Exclude certain APIs from being checked (comma separated)", false);
 	}
 
 	@Override

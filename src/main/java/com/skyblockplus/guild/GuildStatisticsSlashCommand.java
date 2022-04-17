@@ -37,7 +37,7 @@ public class GuildStatisticsSlashCommand extends SlashCommand {
 
 		String guild = event.getOptionStr("guild");
 		if (guild != null) {
-			event.embed(GuildStatisticsCommand.getStatistics(null, guild,  event.getGuild().getId()));
+			event.embed(GuildStatisticsCommand.getStatistics(null, guild, event.getGuild().getId()));
 			return;
 		}
 
@@ -45,7 +45,7 @@ public class GuildStatisticsSlashCommand extends SlashCommand {
 			return;
 		}
 
-		event.embed(GuildStatisticsCommand.getStatistics(event.player,  null, event.getGuild().getId()));
+		event.embed(GuildStatisticsCommand.getStatistics(event.player, null, event.getGuild().getId()));
 	}
 
 	@Override

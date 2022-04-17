@@ -59,14 +59,14 @@ public class GuildStatisticsCommand extends Command {
 		}
 
 		HypixelResponse guildResponse;
-		if(username != null) {
+		if (username != null) {
 			UsernameUuidStruct usernameUuidStruct = usernameToUuid(username);
 			if (usernameUuidStruct.isNotValid()) {
 				return invalidEmbed(usernameUuidStruct.failCause());
 			}
 
-			 guildResponse = getGuildFromPlayer(usernameUuidStruct.uuid());
-		}else{
+			guildResponse = getGuildFromPlayer(usernameUuidStruct.uuid());
+		} else {
 			guildResponse = getGuildFromName(guildName);
 		}
 		if (guildResponse.isNotValid()) {
@@ -231,9 +231,9 @@ public class GuildStatisticsCommand extends Command {
 				logCommand();
 
 				setArgs(2);
-				if(args.length == 2 && args[1].startsWith("g:")){
+				if (args.length == 2 && args[1].startsWith("g:")) {
 					embed(getStatistics(null, args[1].split("g:")[1], event.getGuild().getId()));
-				}else {
+				} else {
 					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
 						return;
 					}

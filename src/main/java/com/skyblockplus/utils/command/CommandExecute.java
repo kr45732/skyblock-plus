@@ -102,9 +102,9 @@ public abstract class CommandExecute extends CommandEvent {
 	}
 
 	protected void paginate(Object ebOrMb) {
-		if(ebOrMb == null){
+		if (ebOrMb == null) {
 			ebMessage.delete().queue(ignore, ignore);
-		}else if (ebOrMb instanceof EmbedBuilder eb) {
+		} else if (ebOrMb instanceof EmbedBuilder eb) {
 			ebMessage.editMessageEmbeds(eb.build()).queue(ignore, ignore);
 		} else if (ebOrMb instanceof MessageBuilder mb) {
 			ebMessage.editMessage(mb.build()).queue(ignore, ignore);

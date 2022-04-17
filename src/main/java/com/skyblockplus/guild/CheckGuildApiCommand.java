@@ -49,10 +49,10 @@ public class CheckGuildApiCommand extends Command {
 
 	public static EmbedBuilder getGuildCheckApi(String username, String exclude, PaginatorEvent event) {
 		List<String> excludeArr = new ArrayList<>();
-		if(!exclude.isEmpty()){
+		if (!exclude.isEmpty()) {
 			excludeArr.addAll(List.of(exclude.toLowerCase().split(",")));
 			for (String s : excludeArr) {
-				if(!List.of("inventory", "bank", "collections", "vault", "skills").contains(s)){
+				if (!List.of("inventory", "bank", "collections", "vault", "skills").contains(s)) {
 					return invalidEmbed("Invalid exclude type: " + s);
 				}
 			}
@@ -137,7 +137,12 @@ public class CheckGuildApiCommand extends Command {
 			paginator.setPaginatorExtras(
 				new PaginatorExtras()
 					.setEveryPageTitle(guildResponse.get("name").getAsString())
-					.setEveryPageText("**API Disabled Count:** " + out.stream().filter(o -> o.contains(client.getError())).count() + "\n" + (!excludeArr.isEmpty() ? "**Excluded APIs:** " + String.join(", ", excludeArr) + "\n" : ""))
+					.setEveryPageText(
+						"**API Disabled Count:** " +
+						out.stream().filter(o -> o.contains(client.getError())).count() +
+						"\n" +
+						(!excludeArr.isEmpty() ? "**Excluded APIs:** " + String.join(", ", excludeArr) + "\n" : "")
+					)
 			)
 		);
 		return null;
@@ -150,7 +155,7 @@ public class CheckGuildApiCommand extends Command {
 			protected void execute() {
 				logCommand();
 
-				String exclude = getStringOption("exclude","");
+				String exclude = getStringOption("exclude", "");
 				if (args.length == 2 || args.length == 1) {
 					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
 						return;
