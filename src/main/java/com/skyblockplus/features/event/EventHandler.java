@@ -150,7 +150,7 @@ public class EventHandler {
 						":R>\nLegendary Pet: " +
 						getEmoji(pets[zooIndex]) +
 						" " +
-							capitalizeString(pets[zooIndex].split(";")[0])
+						capitalizeString(pets[zooIndex].split(";")[0])
 					)
 					.build()
 			);
@@ -164,10 +164,10 @@ public class EventHandler {
 					.setDescription(
 						"Traveling zoo opens <t:" +
 						zooEarlySummer.getEpochSecond() +
-								":R>\nLegendary Pet: " +
-								getEmoji(pets[zooIndex]) +
-								" " +
-								capitalizeString(pets[zooIndex].split(";")[0])
+						":R>\nLegendary Pet: " +
+						getEmoji(pets[zooIndex]) +
+						" " +
+						capitalizeString(pets[zooIndex].split(";")[0])
 					)
 					.build()
 			);

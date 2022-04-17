@@ -18,9 +18,10 @@
 
 package com.skyblockplus.inventory;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorEvent;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -32,8 +33,6 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-
-import static com.skyblockplus.utils.Utils.*;
 
 public class InventoryPaginator {
 
@@ -75,9 +74,9 @@ public class InventoryPaginator {
 	}
 
 	public void action(ButtonInteractionEvent event) {
-		if(Instant.now().minusSeconds(2).isBefore(lastEdit)){
+		if (Instant.now().minusSeconds(2).isBefore(lastEdit)) {
 			event.reply(client.getError() + " Please wait between switching pages").setEphemeral(true).queue();
-		}else {
+		} else {
 			lastEdit = Instant.now();
 			if (event.getComponentId().equals("inv_paginator_left_button")) {
 				if ((pageNumber - 1) >= 0) {
@@ -95,8 +94,8 @@ public class InventoryPaginator {
 			Button leftButton = pageNumber == 0 ? curButtons.get(0).asDisabled() : curButtons.get(0).asEnabled();
 			Button rightButton = pageNumber == (maxPageNumber) ? curButtons.get(1).asDisabled() : curButtons.get(1).asEnabled();
 			Button linkButton = curButtons
-					.get(2)
-					.withLabel(curButtons.get(2).getLabel().split("•")[0] + "• Page " + (pageNumber + 1) + "/" + (maxPageNumber + 1));
+				.get(2)
+				.withLabel(curButtons.get(2).getLabel().split("•")[0] + "• Page " + (pageNumber + 1) + "/" + (maxPageNumber + 1));
 			event.editMessage(inventoryPages.get(pageNumber)[1]).setActionRow(leftButton, rightButton, linkButton).queue(ignore, ignore);
 		}
 

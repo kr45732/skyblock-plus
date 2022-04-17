@@ -70,7 +70,7 @@ public class CacheDatabase {
 		config.setPassword(PLANET_SCALE_PASSWORD);
 		dataSource = new HikariDataSource(config);
 
-		if(isMainBot()) {
+		if (isMainBot()) {
 			scheduler.scheduleAtFixedRate(this::updateLeaderboard, 1, 1, TimeUnit.MINUTES);
 		}
 	}
