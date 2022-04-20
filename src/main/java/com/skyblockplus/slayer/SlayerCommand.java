@@ -62,6 +62,11 @@ public class SlayerCommand extends Command {
 			int endermanThreeKills = player.getSlayerBossKills("enderman", 2);
 			int endermanFourKills = player.getSlayerBossKills("enderman", 3);
 
+			int blazeOneKills = player.getSlayerBossKills("blaze", 0);
+			int blazeTwoKills = player.getSlayerBossKills("blaze", 1);
+			int blazeThreeKills = player.getSlayerBossKills("blaze", 2);
+			int blazeFourKills = player.getSlayerBossKills("blaze", 3);
+
 			String svenKills =
 				"**Tier 1:** " +
 				svenOneKills +
@@ -104,6 +109,16 @@ public class SlayerCommand extends Command {
 				"\n**Tier 4:** " +
 				endermanFourKills;
 
+			String blazeKills =
+					"**Tier 1:** " +
+							blazeOneKills +
+							"\n**Tier 2:** " +
+							blazeTwoKills +
+							"\n**Tier 3:** " +
+							blazeThreeKills +
+							"\n**Tier 4:** " +
+							blazeFourKills;
+
 			long coinsSpentOnSlayers =
 				2000L *
 				(svenOneKills + revOneKills + taraOneKills + endermanOneKills) +
@@ -114,7 +129,8 @@ public class SlayerCommand extends Command {
 				50000L *
 				(svenFourKills + revFourKills + taraFourKills + endermanFourKills) +
 				100000L *
-				revFiveKills;
+				revFiveKills
+					+ 5000L * blazeOneKills + 12500L * blazeTwoKills; // TODO: check this
 			eb.setDescription(
 				"**Total Slayer:** " +
 				formatNumber(player.getTotalSlayer()) +
@@ -146,9 +162,16 @@ public class SlayerCommand extends Command {
 				simplifyNumber(player.getSlayer("enderman")) + " XP",
 				true
 			);
-			eb.addBlankField(true);
+			eb.addField(SLAYER_EMOJI_MAP.get("blaze") +
+					" Blaze (" + player.getSlayerLevel("blaze") + ")",
+					simplifyNumber(player.getSlayer("blaze")) + " XP",
+					true
+			);
 			eb.addBlankField(true);
 			eb.addField("Boss Kills", endermanKills, true);
+			eb.addField("Boss Kills", blazeKills, true);
+			eb.addBlankField(true);
+			eb.addBlankField(true);
 
 			return eb;
 		}

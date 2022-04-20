@@ -18,7 +18,7 @@
 
 package com.skyblockplus.features.event;
 
-import static com.skyblockplus.features.event.CalendarCommand.getSkyblockYear;
+import static com.skyblockplus.features.event.CalendarCommand.*;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.features.mayor.MayorHandler.currentMayor;
 import static com.skyblockplus.utils.Utils.*;
@@ -82,6 +82,7 @@ public class EventHandler {
 		// 8 - spooky event starts
 		// 9 - fishing festival start
 		// 10 - fallen star
+		// 11 - bank interest
 
 		nowDateTime = nowDateTime.plusMinutes(timeBefore);
 		int index = timeBefore == 0 ? 0 : times.length / 2;
@@ -133,7 +134,7 @@ public class EventHandler {
 			zooIndex = 4;
 		}
 		Instant zooEarlySummer = Instant.ofEpochMilli(
-			CalendarCommand.YEAR_0 + (getSkyblockYear() - 1) * CalendarCommand.YEAR_MS + 3 * CalendarCommand.MONTH_MS
+			YEAR_0 + (getSkyblockYear() - 1) * CalendarCommand.YEAR_MS + 3 * CalendarCommand.MONTH_MS
 		);
 		if (
 			zooEarlySummer.toEpochMilli() <= nowEpoch &&
@@ -175,7 +176,7 @@ public class EventHandler {
 
 		index++;
 		Instant zooEarlyWinter = Instant.ofEpochMilli(
-			CalendarCommand.YEAR_0 + (getSkyblockYear() - 1) * CalendarCommand.YEAR_MS + 9 * CalendarCommand.MONTH_MS
+			YEAR_0 + (getSkyblockYear() - 1) * CalendarCommand.YEAR_MS + 9 * CalendarCommand.MONTH_MS
 		);
 		if (
 			zooEarlyWinter.toEpochMilli() <= nowEpoch &&
@@ -217,7 +218,7 @@ public class EventHandler {
 
 		index++;
 		Instant jerryIslandOpen = Instant.ofEpochMilli(
-			CalendarCommand.YEAR_0 + (getSkyblockYear() - 1) * CalendarCommand.YEAR_MS + 11 * CalendarCommand.MONTH_MS
+			YEAR_0 + (getSkyblockYear() - 1) * CalendarCommand.YEAR_MS + 11 * CalendarCommand.MONTH_MS
 		);
 		if (
 			jerryIslandOpen.toEpochMilli() <= nowEpoch &&
@@ -263,7 +264,7 @@ public class EventHandler {
 
 		index++;
 		Instant newYearEvent = Instant.ofEpochMilli(
-			CalendarCommand.YEAR_0 +
+			YEAR_0 +
 			(getSkyblockYear() - 1) *
 			CalendarCommand.YEAR_MS +
 			11 *
@@ -296,7 +297,7 @@ public class EventHandler {
 		index++;
 		Instant spookyFishing = Instant
 			.ofEpochMilli(
-				CalendarCommand.YEAR_0 +
+				YEAR_0 +
 				(getSkyblockYear() - 1) *
 				CalendarCommand.YEAR_MS +
 				7 *
@@ -325,7 +326,7 @@ public class EventHandler {
 
 		index++;
 		Instant spookyEvent = Instant.ofEpochMilli(
-			CalendarCommand.YEAR_0 +
+			YEAR_0 +
 			(getSkyblockYear() - 1) *
 			CalendarCommand.YEAR_MS +
 			7 *
@@ -354,10 +355,10 @@ public class EventHandler {
 		index++;
 		if (currentMayor.equalsIgnoreCase("marina")) {
 			Instant fishingFestival = Instant.ofEpochMilli(
-				CalendarCommand.YEAR_0 +
+				YEAR_0 +
 				(getSkyblockYear() - 1) *
 				CalendarCommand.YEAR_MS +
-				Math.floorDiv((nowEpoch - CalendarCommand.YEAR_0) % CalendarCommand.YEAR_MS, CalendarCommand.MONTH_MS) *
+				Math.floorDiv((nowEpoch - YEAR_0) % CalendarCommand.YEAR_MS, CalendarCommand.MONTH_MS) *
 				CalendarCommand.MONTH_MS
 			);
 			if (
@@ -386,7 +387,7 @@ public class EventHandler {
 		}
 
 		index++;
-		long currentOffset = (nowEpoch - CalendarCommand.YEAR_0) % CalendarCommand.YEAR_MS;
+		long currentOffset = (nowEpoch - YEAR_0) % CalendarCommand.YEAR_MS;
 		int currentMonth = (int) Math.floorDiv(currentOffset, CalendarCommand.MONTH_MS);
 		int currentDay = (int) Math.floorDiv(
 			(currentOffset - (long) currentMonth * CalendarCommand.MONTH_MS) % CalendarCommand.MONTH_MS,
@@ -401,7 +402,7 @@ public class EventHandler {
 			out = 14;
 		}
 		Instant fallenStar = Instant.ofEpochMilli(
-			CalendarCommand.YEAR_0 +
+			YEAR_0 +
 			(getSkyblockYear() - 1) *
 			CalendarCommand.YEAR_MS +
 			currentMonth *
@@ -416,7 +417,7 @@ public class EventHandler {
 		) {
 			times[index] = "" + nowEpoch;
 			ebs.put(
-				"fallen_start",
+				"fallen_star",
 				defaultEmbed("Cult Of Fallen Star")
 					.setDescription("Cult of fallen start arrives <t:" + fallenStar.getEpochSecond() + ":R>")
 					.build()
@@ -424,10 +425,40 @@ public class EventHandler {
 		} else if (nowEpoch > fallenStar.plusSeconds(60).toEpochMilli() && Long.parseLong(times[index]) < fallenStar.toEpochMilli()) {
 			times[index] = "" + nowEpoch;
 			ebs.put(
-				"fallen_start",
+				"fallen_star",
 				defaultEmbed("Cult Of Fallen Star")
 					.setDescription("Cult of fallen start arrives <t:" + fallenStar.getEpochSecond() + ":R>")
 					.build()
+			);
+		}
+
+		index++;
+		int currentMonthBank = (int) Math.floorDiv(currentOffset, MONTH_MS);
+		if(currentMonthBank <= 2){
+			currentMonthBank = 2;
+		}else if(currentMonthBank <= 5){
+			currentMonthBank = 5;
+		}else if(currentMonthBank <= 8){
+			currentMonthBank = 8;
+		}else{
+			currentMonthBank = 11;
+		}
+		Instant bankStart = Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + currentMonthBank * MONTH_MS + 31 * DAY_MS);
+		if (
+				bankStart.toEpochMilli() <= nowEpoch &&
+						nowEpoch <= bankStart.plusSeconds(60).toEpochMilli() &&
+						Long.parseLong(times[index]) < bankStart.toEpochMilli()
+		) {
+			times[index] = "" + nowEpoch;
+			ebs.put(
+					"bank_interest",
+					defaultEmbed("Bank Interest").setDescription("Bank interest is deposited <t:" + spookyEvent.getEpochSecond() + ":R>").build()
+			);
+		} else if (nowEpoch > spookyEvent.plusSeconds(60).toEpochMilli() && Long.parseLong(times[index]) < spookyEvent.toEpochMilli()) {
+			times[index] = "" + nowEpoch;
+			ebs.put(
+					"bank_interest",
+					defaultEmbed("Bank Interest").setDescription("Bank interest is deposited <t:" + spookyEvent.getEpochSecond() + ":R>").build()
 			);
 		}
 

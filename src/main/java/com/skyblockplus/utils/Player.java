@@ -38,9 +38,74 @@ import me.nullicorn.nedit.NBTReader;
 import me.nullicorn.nedit.type.NBTCompound;
 import me.nullicorn.nedit.type.NBTList;
 import net.dv8tion.jda.api.EmbedBuilder;
+import org.apache.groovy.util.Maps;
 
 public class Player {
 
+	public static final Map<String, String> COLLECTION_NAME_TO_ID = Maps.of( // TODO: update with new collections
+			"sand","SAND",
+			"pumpkin","PUMPKIN",
+			"blaze_rod","BLAZE_ROD",
+			"netherrack","NETHERRACK",
+			"mushroom","MUSHROOM_COLLECTION",
+			"raw_rabbit","RABBIT",
+			"string","STRING",
+			"prismarine_shard","PRISMARINE_SHARD",
+			"potato","POTATO_ITEM",
+			"cactus","CACTUS",
+			"coal","COAL",
+			"pufferfish","RAW_FISH:3",
+			"gunpowder","SULPHUR",
+			"clay","CLAY_BALL",
+			"iron_ingot","IRON_INGOT",
+			"jungle_wood","LOG:3",
+			"end_stone","ENDER_STONE",
+			"ghast_tear","GHAST_TEAR",
+			"obsidian","OBSIDIAN",
+			"acacia_wood","LOG_2",
+			"redstone","REDSTONE",
+			"spruce_wood","LOG:1",
+			"raw_salmon","RAW_FISH:1",
+			"prismarine_crystals","PRISMARINE_CRYSTALS",
+			"nether_wart","NETHER_STALK",
+			"raw_porkchop","PORK",
+			"gravel","GRAVEL",
+			"wheat","WHEAT",
+			"nether_quartz","QUARTZ",
+			"clownfish","RAW_FISH:2",
+			"raw_fish","RAW_FISH",
+			"carrot","CARROT_ITEM",
+			"gemstone","GEMSTONE_COLLECTION",
+			"seeds","SEEDS",
+			"sugar_cane","SUGAR_CANE",
+			"raw_chicken","RAW_CHICKEN",
+			"leather","LEATHER",
+			"magma_cream","MAGMA_CREAM",
+			"raw_mutton","MUTTON",
+			"gold_ingot","GOLD_INGOT",
+			"spider_eye","SPIDER_EYE",
+			"ender_pearl","ENDER_PEARL",
+			"ink_sack","INK_SACK",
+			"emerald","EMERALD",
+			"cocoa_beans","INK_SACK:3",
+			"feather","FEATHER",
+			"cobblestone","COBBLESTONE",
+			"hard_stone","HARD_STONE",
+			"mithril","MITHRIL_ORE",
+			"oak_wood","LOG",
+			"diamond","DIAMOND",
+			"ice","ICE",
+			"lapis_lazuli","INK_SACK:4",
+			"birch_wood","LOG:2",
+			"dark_oak_wood","LOG_2:1",
+			"glowstone_dust","GLOWSTONE_DUST",
+			"lily_pad","WATER_LILY",
+			"sponge","SPONGE",
+			"bone","BONE",
+			"rotten_flesh","ROTTEN_FLESH",
+			"slimeball","SLIME_BALL",
+			"melon","MELON"
+			);
 	public String invMissing = "";
 	private JsonArray profilesArray;
 	private int profileIndex;
@@ -462,7 +527,8 @@ public class Player {
 			(type.equals("sven") ? overrideAmount : getSlayer("sven")) +
 			(type.equals("rev") ? overrideAmount : getSlayer("rev")) +
 			(type.equals("tara") ? overrideAmount : getSlayer("tara")) +
-			(type.equals("enderman") ? overrideAmount : getSlayer("enderman"))
+			(type.equals("enderman") ? overrideAmount : getSlayer("enderman")) +
+		(type.equals("blaze") ? overrideAmount : getSlayer("blaze"))
 		);
 	}
 
@@ -480,6 +546,7 @@ public class Player {
 			case "rev" -> higherDepth(profileSlayer, "zombie.xp", 0);
 			case "tara" -> higherDepth(profileSlayer, "spider.xp", 0);
 			case "enderman" -> higherDepth(profileSlayer, "enderman.xp", 0);
+			case "blaze" -> higherDepth(profileSlayer, "blaze.xp", 0);
 			default -> 0;
 		};
 	}
@@ -493,7 +560,7 @@ public class Player {
 			getLevelingJson(),
 			"slayer_xp." +
 			switch (slayerName) {
-				case "sven" -> "wolf";
+				case "sven", "blaze" -> "wolf"; // TODO is blaze same as wolf/eman?
 				case "rev" -> "zombie";
 				case "tara" -> "spider";
 				default -> slayerName;
@@ -1312,6 +1379,7 @@ public class Player {
 					case "rev":
 					case "tara":
 					case "enderman":
+					case "blaze":
 						highestAmount = Math.max(highestAmount, getSlayer(type));
 						break;
 					case "alchemy":
@@ -1378,8 +1446,13 @@ public class Player {
 						highestAmount = Math.max(highestAmount, isGamemode(Gamemode.of(type)) ? 1 : -1);
 						break;
 					default:
-						this.profileIndex = beforeProfileIndex;
-						return alwaysPositive ? 0 : -1;
+						if(COLLECTION_NAME_TO_ID.containsKey(type)){
+							highestAmount = Math.max(highestAmount, getCollection(COLLECTION_NAME_TO_ID.get(type)));
+							break;
+						}else {
+							this.profileIndex = beforeProfileIndex;
+							return alwaysPositive ? 0 : -1;
+						}
 				}
 			}
 
@@ -1394,7 +1467,13 @@ public class Player {
 		int lvlNineSlayers = getSlayer("sven") >= 1000000 ? 1 : 0;
 		lvlNineSlayers = getSlayer("rev") >= 1000000 ? lvlNineSlayers + 1 : lvlNineSlayers;
 		lvlNineSlayers = getSlayer("tara") >= 1000000 ? lvlNineSlayers + 1 : lvlNineSlayers;
-		return getSlayer("enderman") >= 1000000 ? lvlNineSlayers + 1 : lvlNineSlayers;
+		lvlNineSlayers = getSlayer("enderman") >= 1000000 ? lvlNineSlayers + 1 : lvlNineSlayers;
+		lvlNineSlayers = getSlayer("blaze") >= 1000000 ? lvlNineSlayers + 1 : lvlNineSlayers;
+		return lvlNineSlayers;
+	}
+
+	public long getCollection(String id) {
+		return higherDepth(profileJson(), "collection." + id, -1);
 	}
 
 	public int getNumMaxedCollections() {

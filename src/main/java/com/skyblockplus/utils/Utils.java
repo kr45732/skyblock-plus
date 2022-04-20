@@ -166,6 +166,8 @@ public class Utils {
 	public static JsonObject internalJsonMappings;
 	public static JsonObject priceOverrideJson;
 	public static JsonObject bingoInfoJson;
+	public static JsonObject dungeonLootJson;
+	public static JsonObject dragonLootJson;
 	/* Miscellaneous */
 	public static TextChannel botLogChannel;
 	public static TextChannel errorLogChannel;
@@ -328,6 +330,22 @@ public class Utils {
 		}
 
 		return miscJson;
+	}
+
+	public static JsonObject getDungeonLootJson() {
+		if (dungeonLootJson == null) {
+			dungeonLootJson = getJsonObject("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/dungeon_loot.json");
+		}
+
+		return dungeonLootJson;
+	}
+
+	public static JsonObject getDragonLootJson() {
+		if (dragonLootJson == null) {
+			dragonLootJson = getJsonObject("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/dragon_loot.json");
+		}
+
+		return dragonLootJson;
 	}
 
 	public static JsonObject getTalismanJson() {

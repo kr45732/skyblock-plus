@@ -23,6 +23,7 @@ import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import com.skyblockplus.utils.structs.HypixelGuildCache;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -58,25 +59,7 @@ public class LeaderboardSlashCommand extends SlashCommand {
 		return Commands
 			.slash(name, "Get the global leaderboard. Player's on leaderboard are only added or updated when commands are run")
 			.addOptions(
-				new OptionData(OptionType.STRING, "type", "Leaderboard type", true)
-					.addChoice("Networth", "networth")
-					.addChoice("Slayer", "slayer")
-					.addChoice("Skills", "skills")
-					.addChoice("Catacombs", "catacombs")
-					.addChoice("Weight", "weight")
-					.addChoice("Sven Xp", "sven")
-					.addChoice("Revenant Xp", "rev")
-					.addChoice("Tarantula Xp", "tara")
-					.addChoice("Enderman Xp", "enderman")
-					.addChoice("Alchemy", "alchemy")
-					.addChoice("Combat", "combat")
-					.addChoice("Fishing", "fishing")
-					.addChoice("Farming", "farming")
-					.addChoice("Foraging", "foraging")
-					.addChoice("Carpentry", "carpentry")
-					.addChoice("Mining", "mining")
-					.addChoice("Taming", "taming")
-					.addChoice("Enchanting", "enchanting")
+				new OptionData(OptionType.STRING, "type", "Leaderboard type", true, true)
 			)
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 			.addOptions(
@@ -92,6 +75,8 @@ public class LeaderboardSlashCommand extends SlashCommand {
 	public void onAutoComplete(AutoCompleteEvent event) {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
+		}else if(event.getFocusedOption().getName().equals("type")){
+			event.replyClosestMatch(event.getFocusedOption().getValue(), HypixelGuildCache.getTypes());
 		}
 	}
 }

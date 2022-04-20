@@ -20,6 +20,7 @@ package com.skyblockplus.general.help;
 
 import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.structs.HypixelGuildCache.getTypes;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -377,7 +378,7 @@ public class HelpCommand extends Command {
 				new HelpData("mayor", "Get the current mayor and their perks.").setCategory("miscellaneous"),
 				new HelpData(
 					"leaderboard",
-					"Get a global leaderboard. The type can be slayer, skills, catacombs, weight, sven, rev, tara, enderman, alchemy, combat, fishing, farming, foraging, carpentry, mining, taming, and enchanting. The mode can be all, ironman, or stranded.",
+					"Get a global leaderboard. The type can be " + String.join(", ", getTypes()) + ". The mode can be all, ironman, or stranded.",
 					"leaderboard <type> [player]"
 				)
 					.addAliases("lb")

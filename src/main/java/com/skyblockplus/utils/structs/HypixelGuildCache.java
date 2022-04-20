@@ -26,9 +26,12 @@ import com.skyblockplus.utils.Player;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class HypixelGuildCache {
 
+	public static final List<String> types = List.of("username","uuid","slayer","skills","catacombs","weight","sven","rev","tara","enderman","alchemy","combat","fishing","farming","foraging","carpentry","mining","taming","enchanting","networth","blaze");//, "sand","pumpkin","blaze_rod","netherrack","mushroom","raw_rabbit","string","prismarine_shard","potato","cactus","coal","pufferfish","gunpowder","clay","iron_ingot","jungle_wood","end_stone","ghast_tear","obsidian","acacia_wood","redstone","spruce_wood","raw_salmon","prismarine_crystals","nether_wart","raw_porkchop","gravel","wheat","nether_quartz","clownfish","raw_fish","carrot","gemstone","seeds","sugar_cane","raw_chicken","leather","magma_cream","raw_mutton","gold_ingot","spider_eye","ender_pearl","ink_sack","emerald","cocoa_beans","feather","cobblestone","hard_stone","mithril","oak_wood","diamond","ice","lapis_lazuli","birch_wood","dark_oak_wood","glowstone_dust","lily_pad","sponge","bone","rotten_flesh","slimeball","melon");
 	private final List<String> normalCache;
 	private final List<String> ironmanCache;
 	private final List<String> strandedCache;
@@ -46,29 +49,7 @@ public class HypixelGuildCache {
 	}
 
 	public static int typeToIndex(String type) {
-		return switch (type) {
-			case "username" -> 0;
-			case "uuid" -> 1;
-			case "slayer" -> 2;
-			case "skills" -> 3;
-			case "catacombs" -> 4;
-			case "weight" -> 5;
-			case "sven" -> 6;
-			case "rev" -> 7;
-			case "tara" -> 8;
-			case "enderman" -> 9;
-			case "alchemy" -> 10;
-			case "combat" -> 11;
-			case "fishing" -> 12;
-			case "farming" -> 13;
-			case "foraging" -> 14;
-			case "carpentry" -> 15;
-			case "mining" -> 16;
-			case "taming" -> 17;
-			case "enchanting" -> 18;
-			case "networth" -> 19;
-			default -> -1;
-		};
+		return IntStream.range(0, types.size()).filter(i -> types.get(i).equals(type)).findFirst().orElse(-1);
 	}
 
 	public static String getStringFromCache(String cache, String type) {
@@ -115,42 +96,12 @@ public class HypixelGuildCache {
 			player.getUsername() +
 			"=:=" +
 			player.getUuid() +
-			"=:=" +
-			player.getHighestAmount("slayer", gamemode) +
-			"=:=" +
-			player.getHighestAmount("skills", gamemode) +
-			"=:=" +
-			player.getHighestAmount("catacombs_xp", gamemode) +
-			"=:=" +
-			player.getHighestAmount("weight", gamemode) +
-			"=:=" +
-			player.getHighestAmount("sven", gamemode) +
-			"=:=" +
-			player.getHighestAmount("rev", gamemode) +
-			"=:=" +
-			player.getHighestAmount("tara", gamemode) +
-			"=:=" +
-			player.getHighestAmount("enderman", gamemode) +
-			"=:=" +
-			player.getHighestAmount("alchemy_xp", gamemode) +
-			"=:=" +
-			player.getHighestAmount("combat_xp", gamemode) +
-			"=:=" +
-			player.getHighestAmount("fishing_xp", gamemode) +
-			"=:=" +
-			player.getHighestAmount("farming_xp", gamemode) +
-			"=:=" +
-			player.getHighestAmount("foraging_xp", gamemode) +
-			"=:=" +
-			player.getHighestAmount("carpentry_xp", gamemode) +
-			"=:=" +
-			player.getHighestAmount("mining_xp", gamemode) +
-			"=:=" +
-			player.getHighestAmount("taming_xp", gamemode) +
-			"=:=" +
-			player.getHighestAmount("enchanting_xp", gamemode) +
-			"=:=" +
-			player.getHighestAmount("networth", gamemode)
+			"=:=" + getTypes().stream().map(type -> "" + player.getHighestAmount(
+					type + switch (type) {
+						case "catacombs", "alchemy", "combat", "fishing", "farming", "foraging", "carpentry", "mining", "taming", "enchanting" -> "_xp";
+						default -> "";
+					}
+					, gamemode)).collect(Collectors.joining("=:="))
 		);
 	}
 
@@ -192,5 +143,9 @@ public class HypixelGuildCache {
 		double progress = xpForNext > 0 ? Math.max(0, Math.min(((double) xpCurrent) / xpForNext, 1)) : 0;
 
 		return new SkillsStruct(skill, level, maxLevel, skillExp, xpCurrent, xpForNext, progress);
+	}
+
+	public static List<String> getTypes() {
+		return types.subList(2, types.size());
 	}
 }

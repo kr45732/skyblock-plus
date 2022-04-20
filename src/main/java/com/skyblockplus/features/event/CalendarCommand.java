@@ -70,9 +70,9 @@ public class CalendarCommand extends Command {
 		Instant instantNow = Instant.now();
 		long nowEpoch = instantNow.toEpochMilli();
 
-		long currentOffsetTime = (nowEpoch - YEAR_0) % YEAR_MS;
-		int currentMonthTime = (int) Math.floorDiv(currentOffsetTime, MONTH_MS);
-		long currentMonthOffsetTime = (currentOffsetTime - (long) currentMonthTime * MONTH_MS) % MONTH_MS;
+		long currentOffset = (nowEpoch - YEAR_0) % YEAR_MS;
+		int currentMonthTime = (int) Math.floorDiv(currentOffset, MONTH_MS);
+		long currentMonthOffsetTime = (currentOffset - (long) currentMonthTime * MONTH_MS) % MONTH_MS;
 		int currentDayTime = (int) Math.floorDiv(currentMonthOffsetTime, DAY_MS);
 		long currentDayOffsetTime = (currentMonthOffsetTime - (long) currentDayTime * DAY_MS) % DAY_MS;
 		long currentHourTime = Math.floorDiv(currentDayOffsetTime, HOUR_MS);
@@ -234,7 +234,6 @@ public class CalendarCommand extends Command {
 			);
 		}
 
-		long currentOffset = (nowEpoch - YEAR_0) % YEAR_MS;
 		int currentMonth = (int) Math.floorDiv(currentOffset, MONTH_MS);
 		int currentDay = (int) Math.floorDiv((currentOffset - (long) currentMonth * MONTH_MS) % MONTH_MS, DAY_MS);
 		int out = 7;
@@ -262,6 +261,21 @@ public class CalendarCommand extends Command {
 			cultStart = Instant.ofEpochMilli(YEAR_0 + (curYearCult) * YEAR_MS + currentMonth * MONTH_MS + out * DAY_MS);
 		}
 
+		int currentMonthBank = (int) Math.floorDiv(currentOffset, MONTH_MS);
+		if(currentMonthBank <= 2){
+			currentMonthBank = 2;
+		}else if(currentMonthBank <= 5){
+			currentMonthBank = 5;
+		}else if(currentMonthBank <= 8){
+			currentMonthBank = 8;
+		}else{
+			currentMonthBank = 11;
+		}
+		Instant bankStart = Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + currentMonthBank * MONTH_MS + 31 * DAY_MS);
+		if(bankStart.isBefore(instantNow)){
+			bankStart = Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear()) * YEAR_MS + 2 * MONTH_MS + 31 * DAY_MS);
+		}
+
 		eb.addField(
 			"Miscellaneous",
 			"\uD83D\uDD75️ **Dark Auction:** <t:" +
@@ -273,7 +287,9 @@ public class CalendarCommand extends Command {
 			":R>" +
 			"\n⭐ **Cult Of Fallen Star:** <t:" +
 			cultStart.getEpochSecond() +
-			":R>",
+			":R>" + "\n\uD83E\uDE99 **Bank Interest:** <t:" +
+					bankStart.getEpochSecond() +
+					":R>",
 			false
 		);
 

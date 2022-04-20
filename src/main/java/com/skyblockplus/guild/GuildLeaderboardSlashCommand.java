@@ -23,6 +23,7 @@ import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
+import com.skyblockplus.utils.structs.HypixelGuildCache;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -72,25 +73,8 @@ public class GuildLeaderboardSlashCommand extends SlashCommand {
 		return Commands
 			.slash(name, "Get a leaderboard for a guild. The API key must be set for this server.")
 			.addOptions(
-				new OptionData(OptionType.STRING, "type", "Leaderboard type", true)
-					.addChoice("Networth", "Networth")
-					.addChoice("Slayer Xp", "slayer")
-					.addChoice("Skills", "skills")
-					.addChoice("Catacombs Xp", "catacombs")
-					.addChoice("Weight", "weight")
-					.addChoice("Sven Xp", "sven")
-					.addChoice("Revenant Xp", "rev")
-					.addChoice("Tarantula Xp", "tara")
-					.addChoice("Enderman Xp", "enderman")
-					.addChoice("Alchemy Xp", "alchemy")
-					.addChoice("Combat Xp", "combat")
-					.addChoice("Fishing Xp", "fishing")
-					.addChoice("Farming Xp", "farming")
-					.addChoice("Foraging Xp", "foraging")
-					.addChoice("Carpentry Xp", "carpentry")
-					.addChoice("Mining Xp", "mining")
-					.addChoice("Taming Xp", "taming")
-					.addChoice("Enchanting Xp", "enchanting")
+				new OptionData(OptionType.STRING, "type", "Leaderboard type", true, true)
+
 			)
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 			.addOption(OptionType.STRING, "guild", "Guild name", false)
@@ -106,6 +90,8 @@ public class GuildLeaderboardSlashCommand extends SlashCommand {
 	public void onAutoComplete(AutoCompleteEvent event) {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
+		}else if(event.getFocusedOption().getName().equals("type")){
+			event.replyClosestMatch(event.getFocusedOption().getValue(), HypixelGuildCache.getTypes());
 		}
 	}
 }

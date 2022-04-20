@@ -21,6 +21,8 @@ package com.skyblockplus.utils;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.structs.HypixelGuildCache.getTypes;
+import static com.skyblockplus.utils.structs.HypixelGuildCache.types;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -31,6 +33,7 @@ import com.skyblockplus.features.jacob.JacobData;
 import com.skyblockplus.features.jacob.JacobHandler;
 import com.skyblockplus.features.party.Party;
 import com.skyblockplus.price.AuctionTracker;
+import com.skyblockplus.utils.structs.HypixelGuildCache;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import com.zaxxer.hikari.HikariConfig;
@@ -46,6 +49,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.utils.data.DataObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -321,34 +326,23 @@ public class CacheDatabase {
 
 	private void insertIntoLeaderboard(Player player, Player.Gamemode gamemode) {
 		try (
-			Connection connection = getConnection();
-			PreparedStatement statement = connection.prepareStatement(
-				"INSERT INTO " +
-				gamemode.toCacheType() +
-				" (last_updated, username, uuid, slayer, skills, catacombs, weight, sven, rev, tara, enderman, alchemy, combat, fishing, farming, foraging, carpentry, mining, taming, enchanting, networth) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE last_updated = VALUES(last_updated), username = VALUES(username), uuid = VALUES(uuid), slayer = VALUES(slayer), skills = VALUES(skills), catacombs = VALUES(catacombs), weight = VALUES(weight), sven = VALUES(sven), rev = VALUES(rev), tara = VALUES(tara), enderman = VALUES(enderman), alchemy = VALUES(alchemy), combat = VALUES(combat), fishing = VALUES(fishing), farming = VALUES(farming), foraging = VALUES(foraging), carpentry = VALUES(carpentry), mining = VALUES(mining), taming = VALUES(taming), enchanting = VALUES(enchanting), networth = VALUES(networth)"
-			)
+				Connection connection = getConnection();
+				PreparedStatement statement = connection.prepareStatement(
+						"INSERT INTO " +
+								gamemode.toCacheType() +
+								" (last_updated, " + String.join(", ", types) + ") VALUES (" + "?, ".repeat(types.size() + 1) + ") ON DUPLICATE KEY UPDATE last_updated = VALUES(last_updated), " + types.stream().map(type -> type + " = VALUES(" + type + ")").collect(Collectors.joining(", "))
+				)
 		) {
 			statement.setLong(1, Instant.now().toEpochMilli());
 			statement.setString(2, player.getUsername());
 			statement.setString(3, player.getUuid());
-			statement.setDouble(4, player.getHighestAmount("slayer", gamemode, true));
-			statement.setDouble(5, player.getHighestAmount("skills", gamemode, true));
-			statement.setDouble(6, player.getHighestAmount("catacombs_xp", gamemode, true));
-			statement.setDouble(7, player.getHighestAmount("weight", gamemode, true));
-			statement.setDouble(8, player.getHighestAmount("sven", gamemode, true));
-			statement.setDouble(9, player.getHighestAmount("rev", gamemode, true));
-			statement.setDouble(10, player.getHighestAmount("tara", gamemode, true));
-			statement.setDouble(11, player.getHighestAmount("enderman", gamemode, true));
-			statement.setDouble(12, player.getHighestAmount("alchemy_xp", gamemode, true));
-			statement.setDouble(13, player.getHighestAmount("combat_xp", gamemode, true));
-			statement.setDouble(14, player.getHighestAmount("fishing_xp", gamemode, true));
-			statement.setDouble(15, player.getHighestAmount("farming_xp", gamemode, true));
-			statement.setDouble(16, player.getHighestAmount("foraging_xp", gamemode, true));
-			statement.setDouble(17, player.getHighestAmount("carpentry_xp", gamemode, true));
-			statement.setDouble(18, player.getHighestAmount("mining_xp", gamemode, true));
-			statement.setDouble(19, player.getHighestAmount("taming_xp", gamemode, true));
-			statement.setDouble(20, player.getHighestAmount("enchanting_xp", gamemode, true));
-			statement.setDouble(21, player.getHighestAmount("networth", gamemode, true));
+			for (int i = 2; i < types.size(); i++) {
+				String type = types.get(i);
+				statement.setDouble(i + 2, player.getHighestAmount(type + switch (type) {
+					case "catacombs", "alchemy", "combat", "fishing", "farming", "foraging", "carpentry", "mining", "taming", "enchanting" -> "_xp";
+					default -> "";
+				}, gamemode, true));
+			}
 			statement.executeUpdate();
 		} catch (Exception e) {
 			e.printStackTrace();

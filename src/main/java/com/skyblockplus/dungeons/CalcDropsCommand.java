@@ -52,7 +52,7 @@ public class CalcDropsCommand extends Command {
 		CustomPaginator.Builder paginateBuilder = defaultPaginator(event.getUser()).setColumns(1).setItemsPerPage(10);
 		PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
 
-		JsonObject data = getJson("https://wiki-data.kr45732.repl.co/dungeon_loot?floor=" + floor).getAsJsonObject();
+		JsonObject data = getDungeonLootJson().get("" + floor).getAsJsonObject();
 		String combo = talisman + bossLuck;
 		for (String chest : Arrays.asList("Wood", "Gold", "Diamond", "Emerald", "Obsidian", "Bedrock")) {
 			if (higherDepth(data, chest) == null) {

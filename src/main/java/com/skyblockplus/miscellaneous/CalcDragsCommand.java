@@ -64,7 +64,7 @@ public class CalcDragsCommand extends Command {
 
 		CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(10);
 		PaginatorExtras extras = new PaginatorExtras(PaginatorExtras.PaginatorType.EMBED_PAGES);
-		for (Map.Entry<String, JsonElement> dragon : getJson("https://wiki-data.kr45732.repl.co/dragon_loot")
+		for (Map.Entry<String, JsonElement> dragon : getDragonLootJson()
 			.getAsJsonObject()
 			.entrySet()) {
 			EmbedBuilder eb = defaultEmbed(capitalizeString(dragon.getKey()) + " Dragon Loot");
