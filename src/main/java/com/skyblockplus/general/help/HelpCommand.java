@@ -50,6 +50,7 @@ public class HelpCommand extends Command {
 		"Skyblock Event",
 		"Settings",
 		"Jacob Events",
+		"Event Notifications",
 		"Verify Settings",
 		"Guild | Roles & Ranks Settings",
 		"Guild | Apply Settings",
@@ -504,6 +505,16 @@ public class HelpCommand extends Command {
 									"Add a player to the blacklist. Reason will default to 'not provided' if not set.",
 									"add <player> [reason]"
 								),
+									new HelpData(
+											"remove",
+											"Remove a player from the blacklist.",
+											"remove <player>"
+									),
+									new HelpData(
+											"search",
+											"Search for a player in the blacklist. Will show top five closest results.",
+											"search <player>"
+									),
 								new HelpData("share", "Share your blacklist with another server.", "share <server_id>"),
 								new HelpData("unshare", "Stop sharing your blacklist with another server.", "unshare <server_id>"),
 								new HelpData("use", "Use a shared blacklist from another server.", "use <server_id>"),
@@ -532,8 +543,7 @@ public class HelpCommand extends Command {
 								new HelpData("enable", "Enable event notifications."),
 								new HelpData("disable", "Disable event notifications."),
 								new HelpData("channel", "Set the channel where event notifications will be posted.", "channel <#channel>"),
-								new HelpData("ping", "Set the role that will be pinged when event notifications are sent.", "ping <@role>"),
-								new HelpData("add", "Add an event to be tracked and notified.", "add <event|all>"),
+								new HelpData("add", "Add an event to be tracked and notified.", "add <event|all> [@role]"),
 								new HelpData("remove", "Remove an event from the tracking list.", "remove <event>")
 							),
 						new HelpData("verify", "Main command for verification settings.")
@@ -668,6 +678,12 @@ public class HelpCommand extends Command {
 											"settings guild <name> apply channel <#channel>",
 											true
 										),
+											new HelpData(
+													"check_api",
+													"Whether an applicant must have all APIs enabled in order to apply.",
+													"settings guild <name> apply check_api <true|false>",
+													true
+											),
 										new HelpData(
 											"category",
 											"Category where new apply channels will be made. Run `categories` to get the ID's of all categories in the server.",
@@ -831,7 +847,7 @@ public class HelpCommand extends Command {
 			help.create("g-lb <type> [player] [g:guild_name] [mode:normal|ironman|stranded]", "Get a leaderboard for a player's guild") +
 			help.create(
 				"g-kicker <u:player> <type:value> ...",
-				"Get all player's who don't meet the provided requirements. The requirement name can be skills, slayer, catacombs, or weight. The requirement value must be an integer."
+				"Get all player's who don't meet the provided requirements. The requirement name can be skills, slayer, catacombs, or weight. The requirement value must be an integer"
 			) +
 			help.create(
 				"g-ranks <u:player> [mode:normal|ironman|stranded]",
@@ -880,7 +896,7 @@ public class HelpCommand extends Command {
 			help.create("weight [player] [profile]", "Get a player's slayer, skills, dungeons, and total weight") +
 			help.create(
 				"calcweight [player] [profile] <type:type> <amount:amount>",
-				"Calculate predicted weight change for a reaching certain skill, slayer, or catacombs level/amount."
+				"Calculate predicted weight change for a reaching certain skill, slayer, or catacombs level/amount"
 			) +
 			help.create("hypixel [player]", "Get Hypixel information about a player") +
 			help.create("hypixel parkour [player]", "Get fastest Hypixel lobby parkour for a player") +
@@ -953,9 +969,10 @@ public class HelpCommand extends Command {
 			help.create("settings channel_blacklist add <#channel>", "Blacklist a channel from running bot commands") +
 			help.create("settings channel_blacklist remove <#channel>", "Unblacklist a channel from running bot commands") +
 			help.create("fix-application <#channel> <state>", "Fix an application") +
+			help.create("settings blacklist", "List all players that are blacklisted") +
 			help.create("settings blacklist add <player> [reason]", "Blacklist a player from using the application system on this server") +
 			help.create("settings blacklist remove <player>", "Remove a player from the blacklist") +
-			help.create("settings blacklist", "List all players that are blacklisted") +
+			help.create("settings blacklist search <player>", "Remove a player from the blacklist") +
 			help.create("settings blacklist share <server_id>", "Share your blacklist with another server") +
 			help.create("settings blacklist unshare <server_id>", "Stop sharing your blacklist with another server") +
 			help.create("settings blacklist use <server_id>", "Use a shared blacklist from another server") +
@@ -974,8 +991,7 @@ public class HelpCommand extends Command {
 			help.create("settings event", "View the current settings for event notifications") +
 			help.create("settings event <enable|disable>", "Enable or disable event notifications") +
 			help.create("settings event channel <#channel>", "Set the channel where event notifications will be sent") +
-			help.create("settings event ping <@role>", "Set the role to be pinged when event notifications are sent") +
-			help.create("settings event add <event|all>", "Added an event to be notified for") +
+			help.create("settings event add <event|all> [@role]", "Added an event to be notified for") +
 			help.create("settings event remove <event>", "Remove an event from the notification list")
 		);
 
@@ -989,7 +1005,7 @@ public class HelpCommand extends Command {
 				"settings verify channel <#channel>",
 				"Channel where the verify message will be sent and messages will be auto deleted"
 			) +
-			help.create("settings verify nickname [prefix] [IGN] [postfix]", "The nickname template on verifying. Can be set to none.") +
+			help.create("settings verify nickname [prefix] [IGN] [postfix]", "The nickname template on verifying. Can be set to none") +
 			help.create("settings verify remove_role <@role>", "Role that will be removed on verifying and re-added when un-verifying") +
 			help.create("settings verify sync <true|false>", "Enable or disable automatic verify role and nickname syncing") +
 			help.create("settings verify roles_claim <enable|disable>", "Enable or disable automatic role syncing")

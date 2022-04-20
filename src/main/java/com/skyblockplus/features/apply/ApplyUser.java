@@ -44,6 +44,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.exceptions.PermissionException;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
@@ -398,7 +399,7 @@ public class ApplyUser implements Serializable {
 						event.getMessage().editMessageComponents().queue();
 						EmbedBuilder finishApplyEmbed = defaultEmbed("Application Sent");
 						finishApplyEmbed.setDescription("You will be notified once staff review your application");
-						event.getHook().editOriginalEmbeds(finishApplyEmbed.build()).queue();
+						event.getHook().editOriginalEmbeds(finishApplyEmbed.build()).setActionRow(Button.danger("apply_user_cancel", "Cancel Application")).queue();
 						state = 2;
 						TextChannel staffChannel = jda.getTextChannelById(higherDepth(currentSettings, "applyStaffChannel").getAsString());
 						staffChannelId = staffChannel.getId();
@@ -556,7 +557,8 @@ public class ApplyUser implements Serializable {
 								event
 									.getGuild()
 									.addRoleToMember(
-										applyingUserId,
+											UserSnowflake.fromId(
+										applyingUserId),
 										jda.getRoleById(higherDepth(currentSettings, "guildMemberRole").getAsString())
 									)
 									.queue();
@@ -631,8 +633,8 @@ public class ApplyUser implements Serializable {
 								try {
 									event
 										.getGuild()
-										.addRoleToMember(
-											applyingUserId,
+										.addRoleToMember(UserSnowflake.fromId(
+											applyingUserId),
 											jda.getRoleById(higherDepth(currentSettings, "guildMemberRole").getAsString())
 										)
 										.queue();

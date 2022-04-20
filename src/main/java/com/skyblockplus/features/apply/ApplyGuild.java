@@ -200,13 +200,29 @@ public class ApplyGuild {
 	}
 
 	public boolean onButtonClick_CurrentApplyUser(ButtonInteractionEvent event) {
-		ApplyUser findApplyUser = applyUserList
-			.stream()
-			.filter(applyUser -> applyUser.reactMessageId.equals(event.getMessageId()))
-			.findFirst()
-			.orElse(null);
+		for (ApplyUser applyUser : applyUserList) {
+			if (applyUser.reactMessageId.equals(event.getMessageId())) {
+				return applyUser.onButtonClick(event, this, false);
+			}else if(
+					event.getComponentId().equals("apply_user_cancel")
+					&& applyUser.applicationChannelId.equals(event.getChannel().getId())
+					&& applyUser.state == 2
+			){
+				applyUserList.remove(applyUser);
+				event.getMessage().editMessageComponents().queue();
+				event.getHook().editOriginalEmbeds(defaultEmbed("Canceling application & closing channel").build()).complete();
+				event.getGuild().getTextChannelById(applyUser.staffChannelId).editMessageById(applyUser.reactMessageId, applyUser.playerUsername + " (<@" + applyUser.applyingUserId + ">) canceled their application").setEmbeds().setActionRows().queue();
+				event
+						.getGuild()
+						.getTextChannelById(event.getChannel().getId())
+						.delete()
+						.reason("Application canceled")
+						.queueAfter(10, TimeUnit.SECONDS);
+				return true;
+			}
+		}
 
-		return findApplyUser != null && findApplyUser.onButtonClick(event, this, false);
+		return false;
 	}
 
 	public String onButtonClick_WaitingForInviteApplyUser(ButtonInteractionEvent event) {

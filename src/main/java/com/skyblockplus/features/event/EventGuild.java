@@ -21,7 +21,11 @@ package com.skyblockplus.features.event;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonElement;
+import com.google.gson.reflect.TypeToken;
+import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
 import com.skyblockplus.features.listeners.AutomaticGuild;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -33,9 +37,8 @@ public class EventGuild {
 
 	public final AutomaticGuild parent;
 	public boolean enable = false;
-	public List<String> wantedEvents;
+	public List<RoleObject> wantedEvents;
 	public TextChannel channel;
-	public Role role;
 
 	public EventGuild(JsonElement eventSettings, AutomaticGuild parent) {
 		this.parent = parent;
@@ -53,19 +56,18 @@ public class EventGuild {
 					return;
 				}
 
-				List<MessageEmbed> filteredEmbeds = embeds
-					.entrySet()
-					.stream()
-					.filter(e -> wantedEvents.contains(e.getKey()))
-					.map(Map.Entry::getValue)
-					.collect(Collectors.toList());
+
+				List<String> roleMentions = new ArrayList<>();
+				List<MessageEmbed> filteredEmbeds = new ArrayList<>();
+				for (RoleObject wantedEvent : wantedEvents) {
+					if(embeds.containsKey(wantedEvent.getValue())){
+						filteredEmbeds.add(embeds.get(wantedEvent.getValue()));
+						roleMentions.add("<@&" + wantedEvent.getRoleId() + ">");
+					}
+				}
 
 				if (!filteredEmbeds.isEmpty()) {
-					if (role != null) {
-						channel.sendMessage(role.getAsMention()).setEmbeds(filteredEmbeds).queue();
-					} else {
-						channel.sendMessageEmbeds(filteredEmbeds).queue();
-					}
+					channel.sendMessage(String.join(" ", roleMentions)).setEmbeds(filteredEmbeds).queue();
 				}
 			}
 		} catch (Exception e) {
@@ -78,13 +80,8 @@ public class EventGuild {
 			enable = higherDepth(eventSettings, "enable", false);
 			if (enable) {
 				channel = jda.getGuildById(parent.guildId).getTextChannelById(higherDepth(eventSettings, "channel").getAsString());
-				try {
-					role = jda.getGuildById(parent.guildId).getRoleById(higherDepth(eventSettings, "role").getAsString());
-				} catch (Exception ignored) {}
 				wantedEvents =
-					streamJsonArray(higherDepth(eventSettings, "events").getAsJsonArray())
-						.map(JsonElement::getAsString)
-						.collect(Collectors.toList());
+						gson.fromJson(higherDepth(eventSettings, "events").getAsJsonArray(), new TypeToken<List<RoleObject>>() {}.getType());
 			}
 		} catch (Exception e) {
 			AutomaticGuild.getLogger().error(parent.guildId, e);

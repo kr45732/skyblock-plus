@@ -52,7 +52,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 
 public class SettingsExecute {
@@ -245,14 +244,12 @@ public class SettingsExecute {
 				} else if (args[2].equals("disable")) {
 					eb = setEventEnable(false);
 				}
-			} else if (content.split("\\s+", 4).length == 4) {
-				args = content.split("\\s+", 4);
+			} else {
 				eb =
 					switch (args[2]) {
-						case "add" -> addEvent(args[3]);
+						case "add" -> addEvent(args[3], args.length == 5 ? args[4] : null);
 						case "remove" -> removeEvent(args[3]);
 						case "channel" -> setEventChannel(args[3]);
-						case "ping" -> setEventPing(args[3]);
 						default -> null;
 					};
 			}
@@ -575,7 +572,7 @@ public class SettingsExecute {
 		if (crop.equalsIgnoreCase("all")) {
 			for (String validCrop : validCrops) {
 				EmbedBuilder eb = addJacobCrop(validCrop);
-				if (!eb.build().getTitle().equalsIgnoreCase("Settings")) {
+				if (!eb.build().getTitle().equalsIgnoreCase("Settings") && !eb.build().getDescription().equals("You have already added this crop")) {
 					return eb;
 				}
 			}
@@ -644,7 +641,6 @@ public class SettingsExecute {
 		String ebFieldString = "";
 		ebFieldString += "**" + displaySettings(eventSettings, "enable") + "**";
 		ebFieldString += "\n• **Channel:** " + displaySettings(eventSettings, "channel");
-		ebFieldString += "\n• **Ping:** " + displaySettings(eventSettings, "role");
 		ebFieldString += "\n• **Events:** " + displaySettings(eventSettings, "events");
 		return defaultEmbed("Event Settings").setDescription(ebFieldString);
 	}
@@ -674,7 +670,7 @@ public class SettingsExecute {
 		JsonArray events = higherDepth(eventSettings, "events").getAsJsonArray();
 
 		for (int i = events.size() - 1; i >= 0; i--) {
-			if (events.get(i).getAsString().equals(event)) {
+			if (higherDepth(events.get(i), "value").getAsString().equals(event)) {
 				events.remove(i);
 			}
 		}
@@ -694,37 +690,16 @@ public class SettingsExecute {
 		return defaultSettingsEmbed("Removed event notification: " + event);
 	}
 
-	public EmbedBuilder setEventPing(String roleMention) {
-		JsonObject eventSettings = getEventSettings();
-
-		if (roleMention.equalsIgnoreCase("none")) {
-			eventSettings.addProperty("role", "none");
-			int responseCode = database.setEventSettings(guild.getId(), eventSettings);
-			if (responseCode != 200) {
-				return apiFailMessage(responseCode);
+	public EmbedBuilder addEvent(String event, String roleMention) {
+		Role role = null;
+		if(roleMention != null) {
+			Object eb = checkRole(roleMention);
+			if (eb instanceof EmbedBuilder e) {
+				return e;
 			}
-
-			guildMap.get(guild.getId()).eventGuild.reloadSettingsJson(eventSettings);
-			return defaultSettingsEmbed("Set event notification ping to: none");
+			role = ((Role) eb);
 		}
 
-		Object eb = checkRole(roleMention);
-		if (eb instanceof EmbedBuilder e) {
-			return e;
-		}
-		Role role = ((Role) eb);
-
-		eventSettings.addProperty("role", role.getId());
-		int responseCode = database.setEventSettings(guild.getId(), eventSettings);
-		if (responseCode != 200) {
-			return apiFailMessage(responseCode);
-		}
-
-		guildMap.get(guild.getId()).eventGuild.reloadSettingsJson(eventSettings);
-		return defaultSettingsEmbed("Set event notification ping to: " + role.getAsMention());
-	}
-
-	public EmbedBuilder addEvent(String event) {
 		event = event.toLowerCase();
 		List<String> validEvents = Arrays.asList(
 			"bingo_start",
@@ -738,15 +713,16 @@ public class SettingsExecute {
 			"fishing_festival",
 			"fallen_star"
 		);
-		if (event.equalsIgnoreCase("all")) {
+		if (event.equals("all")) {
 			for (String validCrop : validEvents) {
-				EmbedBuilder eb = addEvent(validCrop);
-				if (!eb.build().getTitle().equalsIgnoreCase("Settings")) {
+				EmbedBuilder eb = addEvent(validCrop, role != null ? role.getId() : "");
+				if (!eb.build().getTitle().equalsIgnoreCase("Settings") && !eb.build().getDescription().equals("You have already added this event")) {
 					return eb;
 				}
 			}
 			return defaultSettingsEmbed("Added all events");
 		}
+
 		if (!validEvents.contains(event)) {
 			return invalidEmbed("Invalid event\n\nValid event names are: " + String.join(", ", validEvents));
 		}
@@ -755,12 +731,20 @@ public class SettingsExecute {
 		JsonArray events = higherDepth(eventSettings, "events").getAsJsonArray();
 
 		for (int i = events.size() - 1; i >= 0; i--) {
-			if (events.get(i).getAsString().equals(event)) {
+			if (higherDepth(events.get(i), "value").getAsString().equals(event)) {
 				return invalidEmbed("You have already added this event");
 			}
 		}
 
-		events.add(new JsonPrimitive(event));
+		try {
+			if(role == null) {
+				role = guild.createRole().setName(capitalizeString(event.replace("_", " "))).complete();
+			}
+		} catch (PermissionException e) {
+			return invalidEmbed("Missing permission `" + e.getPermission().getName() + "` to create a role for " + event);
+		}
+
+		events.add(gson.toJsonTree(new RoleObject(event, role.getId())));
 		eventSettings.add("events", events);
 		int responseCode = database.setEventSettings(guild.getId(), eventSettings);
 
@@ -2818,7 +2802,7 @@ public class SettingsExecute {
 
 					return ebStr.toString();
 				}
-				case "crops" -> {
+				case "crops", "events" -> {
 					JsonArray roles = higherDepth(jsonSettings, settingName).getAsJsonArray();
 					List<String> ebStr = new ArrayList<>();
 					for (JsonElement role : roles) {
@@ -2838,12 +2822,6 @@ public class SettingsExecute {
 
 					return "\n\u200B \u200B  " + String.join("\n\u200B \u200B  ", ebStr);
 				}
-				case "events" -> {
-					String events = streamJsonArray(higherDepth(jsonSettings, settingName).getAsJsonArray())
-						.map(JsonElement::getAsString)
-						.collect(Collectors.joining(", "));
-					return events.isEmpty() ? "none" : events;
-				}
 			}
 
 			String currentSettingValue = higherDepth(jsonSettings, settingName).getAsString();
@@ -2862,7 +2840,6 @@ public class SettingsExecute {
 					case "roleId":
 					case "guildMemberRole":
 					case "verifiedRemoveRole":
-					case "role":
 						return "<@&" + currentSettingValue + ">";
 					case "applyEnable":
 					case "enable":

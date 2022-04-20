@@ -23,6 +23,8 @@ import java.util.List;
 import javax.persistence.ElementCollection;
 import javax.persistence.Embeddable;
 import javax.persistence.FetchType;
+
+import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -37,9 +39,8 @@ public class EventNotifSettings {
 
 	private String enable = "false";
 	private String channel = "";
-	private String role = "";
 
 	@ElementCollection(fetch = FetchType.EAGER)
 	@Fetch(value = FetchMode.SUBSELECT)
-	private List<String> events = new ArrayList<>();
+	private List<RoleObject> events = new ArrayList<>();
 }
