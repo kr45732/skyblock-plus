@@ -26,7 +26,7 @@ public record HypixelKeyRecord(AtomicInteger remainingLimit, AtomicInteger timeT
 	}
 
 	public boolean isRateLimited() {
-		return remainingLimit.get() < 5;
+		return remainingLimit.get() < 5 && timeTillReset.get() > 0;
 	}
 
 	@Override

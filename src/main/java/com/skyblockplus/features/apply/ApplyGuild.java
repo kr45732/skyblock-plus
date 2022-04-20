@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
@@ -263,7 +264,7 @@ public class ApplyGuild {
 			try {
 				event
 					.getGuild()
-					.addRoleToMember(channelRoleSplit[1], event.getGuild().getRoleById(channelRoleSplit[2]))
+					.addRoleToMember(UserSnowflake.fromId(channelRoleSplit[1]), event.getGuild().getRoleById(channelRoleSplit[2]))
 					.queue(ignore, ignore);
 			} catch (Exception ignored) {}
 			applyUserList
