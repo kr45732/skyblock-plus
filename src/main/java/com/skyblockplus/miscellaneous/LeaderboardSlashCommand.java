@@ -58,9 +58,7 @@ public class LeaderboardSlashCommand extends SlashCommand {
 	public CommandData getCommandData() {
 		return Commands
 			.slash(name, "Get the global leaderboard. Player's on leaderboard are only added or updated when commands are run")
-			.addOptions(
-				new OptionData(OptionType.STRING, "type", "Leaderboard type", true, true)
-			)
+			.addOptions(new OptionData(OptionType.STRING, "type", "Leaderboard type", true, true))
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 			.addOptions(
 				new OptionData(OptionType.STRING, "gamemode", "Gamemode type")
@@ -75,7 +73,7 @@ public class LeaderboardSlashCommand extends SlashCommand {
 	public void onAutoComplete(AutoCompleteEvent event) {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
-		}else if(event.getFocusedOption().getName().equals("type")){
+		} else if (event.getFocusedOption().getName().equals("type")) {
 			event.replyClosestMatch(event.getFocusedOption().getValue(), HypixelGuildCache.getTypes());
 		}
 	}

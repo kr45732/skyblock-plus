@@ -262,17 +262,17 @@ public class CalendarCommand extends Command {
 		}
 
 		int currentMonthBank = (int) Math.floorDiv(currentOffset, MONTH_MS);
-		if(currentMonthBank <= 2){
+		if (currentMonthBank <= 2) {
 			currentMonthBank = 2;
-		}else if(currentMonthBank <= 5){
+		} else if (currentMonthBank <= 5) {
 			currentMonthBank = 5;
-		}else if(currentMonthBank <= 8){
+		} else if (currentMonthBank <= 8) {
 			currentMonthBank = 8;
-		}else{
+		} else {
 			currentMonthBank = 11;
 		}
 		Instant bankStart = Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + currentMonthBank * MONTH_MS + 31 * DAY_MS);
-		if(bankStart.isBefore(instantNow)){
+		if (bankStart.isBefore(instantNow)) {
 			bankStart = Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear()) * YEAR_MS + 2 * MONTH_MS + 31 * DAY_MS);
 		}
 
@@ -287,9 +287,10 @@ public class CalendarCommand extends Command {
 			":R>" +
 			"\n⭐ **Cult Of Fallen Star:** <t:" +
 			cultStart.getEpochSecond() +
-			":R>" + "\n\uD83E\uDE99 **Bank Interest:** <t:" +
-					bankStart.getEpochSecond() +
-					":R>",
+			":R>" +
+			"\n\uD83E\uDE99 **Bank Interest:** <t:" +
+			bankStart.getEpochSecond() +
+			":R>",
 			false
 		);
 

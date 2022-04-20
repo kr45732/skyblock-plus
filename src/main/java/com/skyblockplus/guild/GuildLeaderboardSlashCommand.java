@@ -72,10 +72,7 @@ public class GuildLeaderboardSlashCommand extends SlashCommand {
 	public CommandData getCommandData() {
 		return Commands
 			.slash(name, "Get a leaderboard for a guild. The API key must be set for this server.")
-			.addOptions(
-				new OptionData(OptionType.STRING, "type", "Leaderboard type", true, true)
-
-			)
+			.addOptions(new OptionData(OptionType.STRING, "type", "Leaderboard type", true, true))
 			.addOption(OptionType.STRING, "player", "Player username or mention", false, true)
 			.addOption(OptionType.STRING, "guild", "Guild name", false)
 			.addOptions(
@@ -90,7 +87,7 @@ public class GuildLeaderboardSlashCommand extends SlashCommand {
 	public void onAutoComplete(AutoCompleteEvent event) {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
-		}else if(event.getFocusedOption().getName().equals("type")){
+		} else if (event.getFocusedOption().getName().equals("type")) {
 			event.replyClosestMatch(event.getFocusedOption().getValue(), HypixelGuildCache.getTypes());
 		}
 	}

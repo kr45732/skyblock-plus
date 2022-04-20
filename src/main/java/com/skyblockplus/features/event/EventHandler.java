@@ -264,13 +264,7 @@ public class EventHandler {
 
 		index++;
 		Instant newYearEvent = Instant.ofEpochMilli(
-			YEAR_0 +
-			(getSkyblockYear() - 1) *
-			CalendarCommand.YEAR_MS +
-			11 *
-			CalendarCommand.MONTH_MS +
-			28 *
-			CalendarCommand.DAY_MS
+			YEAR_0 + (getSkyblockYear() - 1) * CalendarCommand.YEAR_MS + 11 * CalendarCommand.MONTH_MS + 28 * CalendarCommand.DAY_MS
 		);
 		if (
 			newYearEvent.toEpochMilli() <= nowEpoch &&
@@ -297,13 +291,7 @@ public class EventHandler {
 		index++;
 		Instant spookyFishing = Instant
 			.ofEpochMilli(
-				YEAR_0 +
-				(getSkyblockYear() - 1) *
-				CalendarCommand.YEAR_MS +
-				7 *
-				CalendarCommand.MONTH_MS +
-				28 *
-				CalendarCommand.DAY_MS
+				YEAR_0 + (getSkyblockYear() - 1) * CalendarCommand.YEAR_MS + 7 * CalendarCommand.MONTH_MS + 28 * CalendarCommand.DAY_MS
 			)
 			.minus(1, ChronoUnit.HOURS);
 		if (
@@ -326,13 +314,7 @@ public class EventHandler {
 
 		index++;
 		Instant spookyEvent = Instant.ofEpochMilli(
-			YEAR_0 +
-			(getSkyblockYear() - 1) *
-			CalendarCommand.YEAR_MS +
-			7 *
-			CalendarCommand.MONTH_MS +
-			28 *
-			CalendarCommand.DAY_MS
+			YEAR_0 + (getSkyblockYear() - 1) * CalendarCommand.YEAR_MS + 7 * CalendarCommand.MONTH_MS + 28 * CalendarCommand.DAY_MS
 		);
 		if (
 			spookyEvent.toEpochMilli() <= nowEpoch &&
@@ -434,31 +416,35 @@ public class EventHandler {
 
 		index++;
 		int currentMonthBank = (int) Math.floorDiv(currentOffset, MONTH_MS);
-		if(currentMonthBank <= 2){
+		if (currentMonthBank <= 2) {
 			currentMonthBank = 2;
-		}else if(currentMonthBank <= 5){
+		} else if (currentMonthBank <= 5) {
 			currentMonthBank = 5;
-		}else if(currentMonthBank <= 8){
+		} else if (currentMonthBank <= 8) {
 			currentMonthBank = 8;
-		}else{
+		} else {
 			currentMonthBank = 11;
 		}
 		Instant bankStart = Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + currentMonthBank * MONTH_MS + 31 * DAY_MS);
 		if (
-				bankStart.toEpochMilli() <= nowEpoch &&
-						nowEpoch <= bankStart.plusSeconds(60).toEpochMilli() &&
-						Long.parseLong(times[index]) < bankStart.toEpochMilli()
+			bankStart.toEpochMilli() <= nowEpoch &&
+			nowEpoch <= bankStart.plusSeconds(60).toEpochMilli() &&
+			Long.parseLong(times[index]) < bankStart.toEpochMilli()
 		) {
 			times[index] = "" + nowEpoch;
 			ebs.put(
-					"bank_interest",
-					defaultEmbed("Bank Interest").setDescription("Bank interest is deposited <t:" + spookyEvent.getEpochSecond() + ":R>").build()
+				"bank_interest",
+				defaultEmbed("Bank Interest")
+					.setDescription("Bank interest is deposited <t:" + spookyEvent.getEpochSecond() + ":R>")
+					.build()
 			);
 		} else if (nowEpoch > spookyEvent.plusSeconds(60).toEpochMilli() && Long.parseLong(times[index]) < spookyEvent.toEpochMilli()) {
 			times[index] = "" + nowEpoch;
 			ebs.put(
-					"bank_interest",
-					defaultEmbed("Bank Interest").setDescription("Bank interest is deposited <t:" + spookyEvent.getEpochSecond() + ":R>").build()
+				"bank_interest",
+				defaultEmbed("Bank Interest")
+					.setDescription("Bank interest is deposited <t:" + spookyEvent.getEpochSecond() + ":R>")
+					.build()
 			);
 		}
 

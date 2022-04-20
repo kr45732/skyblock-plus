@@ -50,7 +50,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.utils.data.DataObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -326,22 +325,44 @@ public class CacheDatabase {
 
 	private void insertIntoLeaderboard(Player player, Player.Gamemode gamemode) {
 		try (
-				Connection connection = getConnection();
-				PreparedStatement statement = connection.prepareStatement(
-						"INSERT INTO " +
-								gamemode.toCacheType() +
-								" (last_updated, " + String.join(", ", types) + ") VALUES (" + "?, ".repeat(types.size() + 1) + ") ON DUPLICATE KEY UPDATE last_updated = VALUES(last_updated), " + types.stream().map(type -> type + " = VALUES(" + type + ")").collect(Collectors.joining(", "))
-				)
+			Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement(
+				"INSERT INTO " +
+				gamemode.toCacheType() +
+				" (last_updated, " +
+				String.join(", ", types) +
+				") VALUES (" +
+				"?, ".repeat(types.size() + 1) +
+				") ON DUPLICATE KEY UPDATE last_updated = VALUES(last_updated), " +
+				types.stream().map(type -> type + " = VALUES(" + type + ")").collect(Collectors.joining(", "))
+			)
 		) {
 			statement.setLong(1, Instant.now().toEpochMilli());
 			statement.setString(2, player.getUsername());
 			statement.setString(3, player.getUuid());
 			for (int i = 2; i < types.size(); i++) {
 				String type = types.get(i);
-				statement.setDouble(i + 2, player.getHighestAmount(type + switch (type) {
-					case "catacombs", "alchemy", "combat", "fishing", "farming", "foraging", "carpentry", "mining", "taming", "enchanting" -> "_xp";
-					default -> "";
-				}, gamemode, true));
+				statement.setDouble(
+					i + 2,
+					player.getHighestAmount(
+						type +
+						switch (type) {
+							case "catacombs",
+								"alchemy",
+								"combat",
+								"fishing",
+								"farming",
+								"foraging",
+								"carpentry",
+								"mining",
+								"taming",
+								"enchanting" -> "_xp";
+							default -> "";
+						},
+						gamemode,
+						true
+					)
+				);
 			}
 			statement.executeUpdate();
 		} catch (Exception e) {

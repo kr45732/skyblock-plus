@@ -715,7 +715,7 @@ public class SettingsExecute {
 			"spooky",
 			"fishing_festival",
 			"fallen_star",
-				"bank_interest"
+			"bank_interest"
 		);
 		if (event.equals("all")) {
 			for (String validCrop : validEvents) {
