@@ -24,7 +24,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
 import com.skyblockplus.features.listeners.AutomaticGuild;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -56,11 +55,10 @@ public class EventGuild {
 					return;
 				}
 
-
 				List<String> roleMentions = new ArrayList<>();
 				List<MessageEmbed> filteredEmbeds = new ArrayList<>();
 				for (RoleObject wantedEvent : wantedEvents) {
-					if(embeds.containsKey(wantedEvent.getValue())){
+					if (embeds.containsKey(wantedEvent.getValue())) {
 						filteredEmbeds.add(embeds.get(wantedEvent.getValue()));
 						roleMentions.add("<@&" + wantedEvent.getRoleId() + ">");
 					}
@@ -81,7 +79,7 @@ public class EventGuild {
 			if (enable) {
 				channel = jda.getGuildById(parent.guildId).getTextChannelById(higherDepth(eventSettings, "channel").getAsString());
 				wantedEvents =
-						gson.fromJson(higherDepth(eventSettings, "events").getAsJsonArray(), new TypeToken<List<RoleObject>>() {}.getType());
+					gson.fromJson(higherDepth(eventSettings, "events").getAsJsonArray(), new TypeToken<List<RoleObject>>() {}.getType());
 			}
 		} catch (Exception e) {
 			AutomaticGuild.getLogger().error(parent.guildId, e);

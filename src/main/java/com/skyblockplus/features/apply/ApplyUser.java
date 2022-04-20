@@ -399,7 +399,11 @@ public class ApplyUser implements Serializable {
 						event.getMessage().editMessageComponents().queue();
 						EmbedBuilder finishApplyEmbed = defaultEmbed("Application Sent");
 						finishApplyEmbed.setDescription("You will be notified once staff review your application");
-						event.getHook().editOriginalEmbeds(finishApplyEmbed.build()).setActionRow(Button.danger("apply_user_cancel", "Cancel Application")).queue();
+						event
+							.getHook()
+							.editOriginalEmbeds(finishApplyEmbed.build())
+							.setActionRow(Button.danger("apply_user_cancel", "Cancel Application"))
+							.queue();
 						state = 2;
 						TextChannel staffChannel = jda.getTextChannelById(higherDepth(currentSettings, "applyStaffChannel").getAsString());
 						staffChannelId = staffChannel.getId();
@@ -557,8 +561,7 @@ public class ApplyUser implements Serializable {
 								event
 									.getGuild()
 									.addRoleToMember(
-											UserSnowflake.fromId(
-										applyingUserId),
+										UserSnowflake.fromId(applyingUserId),
 										jda.getRoleById(higherDepth(currentSettings, "guildMemberRole").getAsString())
 									)
 									.queue();
@@ -633,8 +636,8 @@ public class ApplyUser implements Serializable {
 								try {
 									event
 										.getGuild()
-										.addRoleToMember(UserSnowflake.fromId(
-											applyingUserId),
+										.addRoleToMember(
+											UserSnowflake.fromId(applyingUserId),
 											jda.getRoleById(higherDepth(currentSettings, "guildMemberRole").getAsString())
 										)
 										.queue();

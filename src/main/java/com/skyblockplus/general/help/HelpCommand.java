@@ -505,16 +505,12 @@ public class HelpCommand extends Command {
 									"Add a player to the blacklist. Reason will default to 'not provided' if not set.",
 									"add <player> [reason]"
 								),
-									new HelpData(
-											"remove",
-											"Remove a player from the blacklist.",
-											"remove <player>"
-									),
-									new HelpData(
-											"search",
-											"Search for a player in the blacklist. Will show top five closest results.",
-											"search <player>"
-									),
+								new HelpData("remove", "Remove a player from the blacklist.", "remove <player>"),
+								new HelpData(
+									"search",
+									"Search for a player in the blacklist. Will show top five closest results.",
+									"search <player>"
+								),
 								new HelpData("share", "Share your blacklist with another server.", "share <server_id>"),
 								new HelpData("unshare", "Stop sharing your blacklist with another server.", "unshare <server_id>"),
 								new HelpData("use", "Use a shared blacklist from another server.", "use <server_id>"),
@@ -678,12 +674,12 @@ public class HelpCommand extends Command {
 											"settings guild <name> apply channel <#channel>",
 											true
 										),
-											new HelpData(
-													"check_api",
-													"Whether an applicant must have all APIs enabled in order to apply.",
-													"settings guild <name> apply check_api <true|false>",
-													true
-											),
+										new HelpData(
+											"check_api",
+											"Whether an applicant must have all APIs enabled in order to apply.",
+											"settings guild <name> apply check_api <true|false>",
+											true
+										),
 										new HelpData(
 											"category",
 											"Category where new apply channels will be made. Run `categories` to get the ID's of all categories in the server.",

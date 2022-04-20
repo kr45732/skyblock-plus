@@ -572,7 +572,10 @@ public class SettingsExecute {
 		if (crop.equalsIgnoreCase("all")) {
 			for (String validCrop : validCrops) {
 				EmbedBuilder eb = addJacobCrop(validCrop);
-				if (!eb.build().getTitle().equalsIgnoreCase("Settings") && !eb.build().getDescription().equals("You have already added this crop")) {
+				if (
+					!eb.build().getTitle().equalsIgnoreCase("Settings") &&
+					!eb.build().getDescription().equals("You have already added this crop")
+				) {
 					return eb;
 				}
 			}
@@ -692,7 +695,7 @@ public class SettingsExecute {
 
 	public EmbedBuilder addEvent(String event, String roleMention) {
 		Role role = null;
-		if(roleMention != null) {
+		if (roleMention != null) {
 			Object eb = checkRole(roleMention);
 			if (eb instanceof EmbedBuilder e) {
 				return e;
@@ -716,7 +719,10 @@ public class SettingsExecute {
 		if (event.equals("all")) {
 			for (String validCrop : validEvents) {
 				EmbedBuilder eb = addEvent(validCrop, role != null ? role.getId() : "");
-				if (!eb.build().getTitle().equalsIgnoreCase("Settings") && !eb.build().getDescription().equals("You have already added this event")) {
+				if (
+					!eb.build().getTitle().equalsIgnoreCase("Settings") &&
+					!eb.build().getDescription().equals("You have already added this event")
+				) {
 					return eb;
 				}
 			}
@@ -737,7 +743,7 @@ public class SettingsExecute {
 		}
 
 		try {
-			if(role == null) {
+			if (role == null) {
 				role = guild.createRole().setName(capitalizeString(event.replace("_", " "))).complete();
 			}
 		} catch (PermissionException e) {

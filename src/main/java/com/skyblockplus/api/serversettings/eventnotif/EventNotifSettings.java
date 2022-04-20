@@ -18,13 +18,12 @@
 
 package com.skyblockplus.api.serversettings.eventnotif;
 
+import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.ElementCollection;
 import javax.persistence.Embeddable;
 import javax.persistence.FetchType;
-
-import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
