@@ -148,7 +148,8 @@ public class FixApplicationCommand extends Command {
 					.filter(m -> {
 						try {
 							return (
-								m.getAuthor().getId().equals(selfUserId) && m.getEmbeds().get(0).getFields().get(0).getName().equals("Weight")
+								m.getAuthor().getId().equals(selfUserId) &&
+								m.getEmbeds().get(0).getFields().get(0).getName().equals("Weight")
 							);
 						} catch (Exception e) {
 							return false;
@@ -236,7 +237,8 @@ public class FixApplicationCommand extends Command {
 					.filter(m -> {
 						try {
 							return (
-								m.getAuthor().getId().equals(selfUserId) && m.getEmbeds().get(0).getTitle().replace(" ♻️", "").equals(username)
+								m.getAuthor().getId().equals(selfUserId) &&
+								m.getEmbeds().get(0).getTitle().replace(" ♻️", "").equals(username)
 							);
 						} catch (Exception e) {
 							return false;

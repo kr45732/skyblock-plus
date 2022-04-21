@@ -24,7 +24,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
 import com.skyblockplus.features.listeners.AutomaticGuild;
-
 import java.util.*;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.MessageEmbed;

@@ -18,6 +18,11 @@
 
 package com.skyblockplus;
 
+import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.utils.ApiHandler.updateCacheTask;
+import static com.skyblockplus.utils.Utils.*;
+
 import club.minnced.discord.webhook.external.JDAWebhookClient;
 import com.google.common.reflect.ClassPath;
 import com.jagrosh.jdautilities.command.Command;
@@ -40,6 +45,14 @@ import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandClient;
 import com.skyblockplus.utils.exceptionhandler.ExceptionEventListener;
 import com.skyblockplus.utils.exceptionhandler.GlobalExceptionHandler;
+import java.io.File;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import javax.annotation.PreDestroy;
+import javax.security.auth.login.LoginException;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
@@ -53,20 +66,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import javax.annotation.PreDestroy;
-import javax.security.auth.login.LoginException;
-import java.io.File;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
-import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.ApiHandler.updateCacheTask;
-import static com.skyblockplus.utils.Utils.*;
 
 @SpringBootApplication
 public class Main {
@@ -107,11 +106,11 @@ public class Main {
 				.build();
 
 		slashCommandClient =
-			new SlashCommandClient()
-				.setOwnerId(client.getOwnerId())
-				.addCommands(springContext.getBeansOfType(SlashCommand.class).values());
+			new SlashCommandClient().setOwnerId(client.getOwnerId()).addCommands(springContext.getBeansOfType(SlashCommand.class).values());
 
-		log.info("Loaded " + client.getCommands().size() + " prefix commands and " + slashCommandClient.getCommands().size() + " slash commands");
+		log.info(
+			"Loaded " + client.getCommands().size() + " prefix commands and " + slashCommandClient.getCommands().size() + " slash commands"
+		);
 
 		allServerSettings =
 			gson
@@ -136,7 +135,8 @@ public class Main {
 				.setActivity(Activity.playing("Loading..."))
 				.setMemberCachePolicy(MemberCachePolicy.ALL)
 				.disableCache(CacheFlag.VOICE_STATE)
-				.enableIntents(GatewayIntent.GUILD_MEMBERS).setEnableShutdownHook(false)
+				.enableIntents(GatewayIntent.GUILD_MEMBERS)
+				.setEnableShutdownHook(false)
 				.build();
 
 		// TODO: use guild ready events instead

@@ -63,7 +63,8 @@ public class UpdateSlashCommands extends Command {
 						event.getChannel().sendMessageEmbeds(defaultEmbed("Success - cleared commands for this guild").build()).queue();
 						return;
 					} else if (args[1].equals("global")) {
-						jda.getShardById(0)
+						jda
+							.getShardById(0)
 							.updateCommands()
 							.addCommands(generateSlashCommands())
 							.queue(s ->

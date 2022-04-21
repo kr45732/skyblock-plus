@@ -52,9 +52,11 @@ public class InformationCommand extends Command {
 						"\n**Users:** " +
 						formatNumber(getUserCount()) +
 						"\n**Average Ping:** " +
-						formatNumber((long) jda.getShards().stream().map(s -> s.getRestPing().complete()).mapToLong(i -> i).average().orElse(0.0)) +
+						formatNumber(
+							(long) jda.getShards().stream().map(s -> s.getRestPing().complete()).mapToLong(i -> i).average().orElse(0.0)
+						) +
 						"ms\n**Average Websocket:** " +
-								formatNumber(jda.getAverageGatewayPing()) +
+						formatNumber(jda.getAverageGatewayPing()) +
 						"ms",
 						true
 					)

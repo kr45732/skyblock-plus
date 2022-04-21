@@ -327,7 +327,7 @@ public class CacheDatabase {
 				" (last_updated, " +
 				String.join(", ", types) +
 				") VALUES (" +
-						String.join(", ", Collections.nCopies(types.size() + 1, "?"))  +
+				String.join(", ", Collections.nCopies(types.size() + 1, "?")) +
 				") ON DUPLICATE KEY UPDATE last_updated = VALUES(last_updated), " +
 				types.stream().map(type -> type + " = VALUES(" + type + ")").collect(Collectors.joining(", "))
 			)

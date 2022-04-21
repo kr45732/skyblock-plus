@@ -33,6 +33,7 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+
 @Component
 public class BingoCommand extends Command {
 
