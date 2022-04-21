@@ -81,7 +81,7 @@ dependencies {
     // Spring boot and postgresql
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.6.6'
     implementation 'org.springframework.boot:spring-boot-starter-security:2.6.6'
-    implementation 'org.springframework.boot:spring-boot-starter-web:2.6.6'
+    implementation 'org.springframework.boot:spring-boot-starter-web:2.6.7'
     runtimeOnly 'org.postgresql:postgresql:42.3.4'
 
     // MySQL
