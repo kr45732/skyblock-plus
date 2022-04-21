@@ -44,7 +44,9 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
+import org.springframework.stereotype.Component;
 
+@Component
 public class RolesCommand extends Command {
 
 	public RolesCommand() {

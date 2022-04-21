@@ -32,7 +32,9 @@ import com.skyblockplus.utils.structs.PaginatorExtras;
 import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.utils.data.DataObject;
+import org.springframework.stereotype.Component;
 
+@Component
 public class LeaderboardCommand extends Command {
 
 	public LeaderboardCommand() {

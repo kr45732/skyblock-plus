@@ -23,7 +23,9 @@ import static com.skyblockplus.utils.Utils.globalCooldown;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import org.springframework.stereotype.Component;
 
+@Component
 public class NetworthCommand extends Command {
 
 	public NetworthCommand() {

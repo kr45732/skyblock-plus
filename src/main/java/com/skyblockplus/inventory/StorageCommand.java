@@ -27,7 +27,9 @@ import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class StorageCommand extends Command {
 
 	public StorageCommand() {

@@ -169,8 +169,8 @@ public class MainListener extends ListenerAdapter {
 		if (guildMap.containsKey(event.getGuild().getId())) {
 			if (
 				!event.getAuthor().isBot() &&
-				event.getMessage().getContentRaw().equals("<@!" + jda.getSelfUser().getId() + ">") ||
-				event.getMessage().getContentRaw().equals("<@" + jda.getSelfUser().getId() + ">")
+				event.getMessage().getContentRaw().equals("<@!" + selfUserId + ">") ||
+				event.getMessage().getContentRaw().equals("<@" + selfUserId + ">")
 			) {
 				event
 					.getMessage()

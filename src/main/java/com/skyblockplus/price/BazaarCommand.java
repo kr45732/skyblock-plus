@@ -25,7 +25,9 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import net.dv8tion.jda.api.EmbedBuilder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class BazaarCommand extends Command {
 
 	public BazaarCommand() {

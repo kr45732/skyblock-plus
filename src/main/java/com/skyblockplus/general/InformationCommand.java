@@ -26,7 +26,9 @@ import com.skyblockplus.utils.command.CommandExecute;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.springframework.stereotype.Component;
 
+@Component
 public class InformationCommand extends Command {
 
 	public InformationCommand() {
@@ -49,10 +51,10 @@ public class InformationCommand extends Command {
 						jda.getGuilds().size() +
 						"\n**Users:** " +
 						formatNumber(getUserCount()) +
-						"\n**Ping:** " +
-						jda.getRestPing().complete() +
-						"ms\n**Websocket:** " +
-						jda.getGatewayPing() +
+						"\n**Average Ping:** " +
+						formatNumber((long) jda.getShards().stream().map(s -> s.getRestPing().complete()).mapToLong(i -> i).average().orElse(0.0)) +
+						"ms\n**Average Websocket:** " +
+								formatNumber(jda.getAverageGatewayPing()) +
 						"ms",
 						true
 					)

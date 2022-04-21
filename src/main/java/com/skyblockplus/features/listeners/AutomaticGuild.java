@@ -165,7 +165,7 @@ public class AutomaticGuild {
 					.get()
 					.stream()
 					.filter(m ->
-						m.getAuthor().getId().equals(jda.getSelfUser().getId()) &&
+						m.getAuthor().getId().equals(selfUserId) &&
 						!m.getEmbeds().isEmpty() &&
 						m.getEmbeds().get(0).getTitle() != null &&
 						m.getEmbeds().get(0).getTitle().startsWith("Mayor Election Open | ")
@@ -948,7 +948,7 @@ public class AutomaticGuild {
 			return;
 		}
 
-		if (event.getAuthor().isBot() && !event.getAuthor().getId().equals(jda.getSelfUser().getId())) {
+		if (event.getAuthor().isBot() && !event.getAuthor().getId().equals(selfUserId)) {
 			return;
 		}
 

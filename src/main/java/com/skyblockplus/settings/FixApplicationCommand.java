@@ -38,7 +38,9 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
+import org.springframework.stereotype.Component;
 
+@Component
 public class FixApplicationCommand extends Command {
 
 	public FixApplicationCommand() {
@@ -93,10 +95,9 @@ public class FixApplicationCommand extends Command {
 				return invalidEmbed("Cannot retrieve an application with more than 250 messages");
 			}
 
-			String botId = jda.getSelfUser().getId();
 			Message firstMessage = messages
 				.stream()
-				.filter(m -> m.getAuthor().getId().equals(botId) && m.getContentRaw().contains(" this is your application for "))
+				.filter(m -> m.getAuthor().getId().equals(selfUserId) && m.getContentRaw().contains(" this is your application for "))
 				.findFirst()
 				.orElse(null);
 			if (firstMessage == null) {
@@ -147,7 +148,7 @@ public class FixApplicationCommand extends Command {
 					.filter(m -> {
 						try {
 							return (
-								m.getAuthor().getId().equals(botId) && m.getEmbeds().get(0).getFields().get(0).getName().equals("Weight")
+								m.getAuthor().getId().equals(selfUserId) && m.getEmbeds().get(0).getFields().get(0).getName().equals("Weight")
 							);
 						} catch (Exception e) {
 							return false;
@@ -185,7 +186,7 @@ public class FixApplicationCommand extends Command {
 					.stream()
 					.filter(m -> {
 						if (
-							m.getAuthor().getId().equals(botId) &&
+							m.getAuthor().getId().equals(selfUserId) &&
 							m.getContentRaw().equals(client.getError() + " This button has been disabled")
 						) {
 							Message repliedMessage = m.getReferencedMessage();
@@ -235,7 +236,7 @@ public class FixApplicationCommand extends Command {
 					.filter(m -> {
 						try {
 							return (
-								m.getAuthor().getId().equals(botId) && m.getEmbeds().get(0).getTitle().replace(" ♻️", "").equals(username)
+								m.getAuthor().getId().equals(selfUserId) && m.getEmbeds().get(0).getTitle().replace(" ♻️", "").equals(username)
 							);
 						} catch (Exception e) {
 							return false;
@@ -251,7 +252,7 @@ public class FixApplicationCommand extends Command {
 					.stream()
 					.filter(m -> {
 						if (
-							m.getAuthor().getId().equals(botId) &&
+							m.getAuthor().getId().equals(selfUserId) &&
 							m.getContentRaw().equals(client.getError() + " This button has been disabled")
 						) {
 							Message repliedMessage = m.getReferencedMessage();

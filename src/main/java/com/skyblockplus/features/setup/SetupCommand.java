@@ -26,7 +26,9 @@ import com.skyblockplus.utils.command.CommandExecute;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.springframework.stereotype.Component;
 
+@Component
 public class SetupCommand extends Command {
 
 	public SetupCommand() {

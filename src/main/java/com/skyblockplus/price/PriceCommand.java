@@ -33,7 +33,9 @@ import com.skyblockplus.utils.structs.PaginatorExtras;
 import java.time.Instant;
 import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class PriceCommand extends Command {
 
 	public PriceCommand() {

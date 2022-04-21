@@ -31,7 +31,9 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Role;
+import org.springframework.stereotype.Component;
 
+@Component
 public class UnlinkCommand extends Command {
 
 	public UnlinkCommand() {

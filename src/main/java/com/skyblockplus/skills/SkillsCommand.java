@@ -34,7 +34,9 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class SkillsCommand extends Command {
 
 	public SkillsCommand() {

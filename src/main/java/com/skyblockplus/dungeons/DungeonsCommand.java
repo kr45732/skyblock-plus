@@ -32,7 +32,9 @@ import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import com.skyblockplus.utils.structs.SkillsStruct;
 import net.dv8tion.jda.api.EmbedBuilder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class DungeonsCommand extends Command {
 
 	public DungeonsCommand() {

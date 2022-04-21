@@ -33,7 +33,9 @@ import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.time.Duration;
 import java.time.Instant;
 import net.dv8tion.jda.api.EmbedBuilder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class BidsCommand extends Command {
 
 	public BidsCommand() {

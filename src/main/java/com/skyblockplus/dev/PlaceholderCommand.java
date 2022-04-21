@@ -24,7 +24,9 @@ import static com.skyblockplus.utils.Utils.defaultPerms;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
+import org.springframework.stereotype.Component;
 
+@Component
 public class PlaceholderCommand extends Command {
 
 	public PlaceholderCommand() {

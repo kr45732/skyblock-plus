@@ -29,7 +29,9 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class EssenceCommand extends Command {
 
 	public EssenceCommand() {

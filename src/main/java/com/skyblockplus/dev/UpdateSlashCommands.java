@@ -27,7 +27,9 @@ import com.skyblockplus.utils.command.SlashCommand;
 import java.util.List;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import org.springframework.stereotype.Component;
 
+@Component
 public class UpdateSlashCommands extends Command {
 
 	public UpdateSlashCommands() {
@@ -61,7 +63,7 @@ public class UpdateSlashCommands extends Command {
 						event.getChannel().sendMessageEmbeds(defaultEmbed("Success - cleared commands for this guild").build()).queue();
 						return;
 					} else if (args[1].equals("global")) {
-						jda
+						jda.getShardById(0)
 							.updateCommands()
 							.addCommands(generateSlashCommands())
 							.queue(s ->

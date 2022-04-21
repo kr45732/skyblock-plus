@@ -30,7 +30,9 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class BinCommand extends Command {
 
 	public BinCommand() {

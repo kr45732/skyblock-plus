@@ -42,7 +42,9 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import org.springframework.stereotype.Component;
 
+@Component
 public class LinkCommand extends Command {
 
 	public LinkCommand() {

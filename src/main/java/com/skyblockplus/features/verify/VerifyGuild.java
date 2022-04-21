@@ -65,7 +65,7 @@ public class VerifyGuild {
 			return false;
 		}
 
-		if (!event.getAuthor().getId().equals(jda.getSelfUser().getId())) {
+		if (!event.getAuthor().getId().equals(selfUserId)) {
 			if (event.getAuthor().isBot()) {
 				return false;
 			}

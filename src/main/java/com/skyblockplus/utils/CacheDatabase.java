@@ -21,7 +21,6 @@ package com.skyblockplus.utils;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.structs.HypixelGuildCache.getTypes;
 import static com.skyblockplus.utils.structs.HypixelGuildCache.types;
 
 import com.google.gson.JsonArray;
@@ -33,7 +32,6 @@ import com.skyblockplus.features.jacob.JacobData;
 import com.skyblockplus.features.jacob.JacobHandler;
 import com.skyblockplus.features.party.Party;
 import com.skyblockplus.price.AuctionTracker;
-import com.skyblockplus.utils.structs.HypixelGuildCache;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import com.zaxxer.hikari.HikariConfig;
@@ -43,10 +41,7 @@ import java.sql.*;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -332,7 +327,7 @@ public class CacheDatabase {
 				" (last_updated, " +
 				String.join(", ", types) +
 				") VALUES (" +
-				"?, ".repeat(types.size() + 1) +
+						String.join(", ", Collections.nCopies(types.size() + 1, "?"))  +
 				") ON DUPLICATE KEY UPDATE last_updated = VALUES(last_updated), " +
 				types.stream().map(type -> type + " = VALUES(" + type + ")").collect(Collectors.joining(", "))
 			)

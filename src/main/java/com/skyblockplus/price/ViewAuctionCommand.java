@@ -32,7 +32,9 @@ import java.time.Duration;
 import java.time.Instant;
 import me.nullicorn.nedit.NBTReader;
 import net.dv8tion.jda.api.EmbedBuilder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ViewAuctionCommand extends Command {
 
 	public ViewAuctionCommand() {

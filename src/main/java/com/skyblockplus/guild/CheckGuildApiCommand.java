@@ -38,7 +38,9 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.EmbedBuilder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CheckGuildApiCommand extends Command {
 
 	public CheckGuildApiCommand() {

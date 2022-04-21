@@ -79,6 +79,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.sharding.DefaultShardManager;
+import net.dv8tion.jda.api.sharding.ShardManager;
 import okhttp3.OkHttpClient;
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -93,6 +95,7 @@ import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.Dsl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ConfigurableApplicationContext;
 
 public class Utils {
 
@@ -180,13 +183,15 @@ public class Utils {
 	private static Instant userCountLastUpdated = Instant.now();
 	private static int userCount = -1;
 	public static List<String> queryItems;
-	public static JDA jda;
+	public static ShardManager jda;
 	public static Database database;
 	public static EventWaiter waiter;
 	public static GlobalExceptionHandler globalExceptionHandler;
 	public static CommandClient client;
 	public static SlashCommandClient slashCommandClient;
 	public static JsonObject allServerSettings;
+	public static String selfUserId;
+	public static ConfigurableApplicationContext springContext;
 
 	/* Getters */
 	public static JsonObject getLowestBinJson() {

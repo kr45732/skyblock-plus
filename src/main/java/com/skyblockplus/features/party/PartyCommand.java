@@ -35,7 +35,9 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.springframework.stereotype.Component;
 
+@Component
 public class PartyCommand extends Command {
 
 	public PartyCommand() {

@@ -31,7 +31,9 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import net.dv8tion.jda.api.EmbedBuilder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CalendarCommand extends Command {
 
 	public static final String[] SEASONS = new String[] {

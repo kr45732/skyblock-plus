@@ -30,7 +30,9 @@ import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.SkillsStruct;
 import com.skyblockplus.utils.structs.WeightStruct;
 import net.dv8tion.jda.api.EmbedBuilder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CalcWeightCommand extends Command {
 
 	public CalcWeightCommand() {

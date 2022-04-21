@@ -26,7 +26,9 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
 import net.dv8tion.jda.api.entities.Emote;
+import org.springframework.stereotype.Component;
 
+@Component
 public class GetServerEmojisCommand extends Command {
 
 	public GetServerEmojisCommand() {

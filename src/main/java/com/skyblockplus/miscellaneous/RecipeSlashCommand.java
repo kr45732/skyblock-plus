@@ -26,7 +26,9 @@ import java.util.stream.Collectors;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import org.springframework.stereotype.Component;
 
+@Component
 public class RecipeSlashCommand extends SlashCommand {
 
 	public RecipeSlashCommand() {

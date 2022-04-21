@@ -24,9 +24,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 import com.skyblockplus.api.serversettings.automatedroles.RoleObject;
 import com.skyblockplus.features.listeners.AutomaticGuild;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
@@ -55,7 +54,7 @@ public class EventGuild {
 					return;
 				}
 
-				List<String> roleMentions = new ArrayList<>();
+				Set<String> roleMentions = new HashSet<>();
 				List<MessageEmbed> filteredEmbeds = new ArrayList<>();
 				for (RoleObject wantedEvent : wantedEvents) {
 					if (embeds.containsKey(wantedEvent.getValue())) {

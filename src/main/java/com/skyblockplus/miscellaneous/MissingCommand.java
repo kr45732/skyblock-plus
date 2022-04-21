@@ -35,7 +35,9 @@ import com.skyblockplus.utils.structs.InvItem;
 import java.util.*;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class MissingCommand extends Command {
 
 	public MissingCommand() {

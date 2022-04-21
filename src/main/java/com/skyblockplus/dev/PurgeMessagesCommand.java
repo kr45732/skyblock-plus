@@ -23,11 +23,14 @@ import static com.skyblockplus.utils.Utils.*;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.command.CommandExecute;
+import org.springframework.stereotype.Component;
+
 import java.util.concurrent.TimeUnit;
 
-public class DeleteMessagesCommand extends Command {
+@Component
+public class PurgeMessagesCommand extends Command {
 
-	public DeleteMessagesCommand() {
+	public PurgeMessagesCommand() {
 		this.name = "d-purge";
 		this.ownerCommand = true;
 		this.botPermissions = defaultPerms();

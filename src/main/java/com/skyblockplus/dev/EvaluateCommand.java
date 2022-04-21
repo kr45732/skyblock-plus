@@ -30,7 +30,9 @@ import groovy.lang.GroovyShell;
 import java.util.Arrays;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.springframework.stereotype.Component;
 
+@Component
 public class EvaluateCommand extends Command {
 
 	private final StringBuilder importString = new StringBuilder();

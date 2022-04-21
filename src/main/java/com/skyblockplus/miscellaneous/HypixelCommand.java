@@ -31,7 +31,9 @@ import com.skyblockplus.utils.structs.HypixelResponse;
 import java.time.Instant;
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class HypixelCommand extends Command {
 
 	public HypixelCommand() {

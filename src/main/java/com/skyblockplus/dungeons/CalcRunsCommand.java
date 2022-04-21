@@ -30,7 +30,9 @@ import com.skyblockplus.utils.structs.WeightStruct;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CalcRunsCommand extends Command {
 
 	public CalcRunsCommand() {

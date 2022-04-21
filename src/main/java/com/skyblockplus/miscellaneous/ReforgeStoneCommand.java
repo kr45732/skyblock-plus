@@ -32,7 +32,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.apache.groovy.util.Maps;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ReforgeStoneCommand extends Command {
 
 	public static final Map<String, String> statToEmoji = Maps.of(

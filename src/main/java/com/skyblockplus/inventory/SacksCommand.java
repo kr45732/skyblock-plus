@@ -30,7 +30,9 @@ import com.skyblockplus.utils.command.PaginatorEvent;
 import java.util.Comparator;
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class SacksCommand extends Command {
 
 	public SacksCommand() {

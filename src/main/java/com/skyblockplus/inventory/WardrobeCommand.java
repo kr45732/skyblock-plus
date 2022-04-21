@@ -30,7 +30,9 @@ import com.skyblockplus.utils.structs.ArmorStruct;
 import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class WardrobeCommand extends Command {
 
 	public WardrobeCommand() {

@@ -33,7 +33,9 @@ import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.springframework.stereotype.Component;
 
+@Component
 public class InventoryCommand extends Command {
 
 	public InventoryCommand() {

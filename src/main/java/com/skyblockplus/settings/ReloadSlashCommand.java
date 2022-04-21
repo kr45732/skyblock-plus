@@ -23,7 +23,9 @@ import com.skyblockplus.utils.command.SlashCommandEvent;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ReloadSlashCommand extends SlashCommand {
 
 	public ReloadSlashCommand() {

@@ -50,7 +50,9 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
+@Component
 public class SkyblockEventCommand extends Command {
 
 	private static final Logger log = LoggerFactory.getLogger(SkyblockEventCommand.class);

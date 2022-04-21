@@ -27,7 +27,9 @@ import com.skyblockplus.utils.command.CommandExecute;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import net.dv8tion.jda.api.EmbedBuilder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class FetchurCommand extends Command {
 
 	public FetchurCommand() {

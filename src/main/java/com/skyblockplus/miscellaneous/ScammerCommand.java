@@ -28,7 +28,9 @@ import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ScammerCommand extends Command {
 
 	public ScammerCommand() {

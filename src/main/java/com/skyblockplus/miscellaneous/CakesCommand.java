@@ -28,7 +28,9 @@ import com.skyblockplus.utils.command.CommandExecute;
 import java.time.Instant;
 import java.util.*;
 import net.dv8tion.jda.api.EmbedBuilder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CakesCommand extends Command {
 
 	public CakesCommand() {

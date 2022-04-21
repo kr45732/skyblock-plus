@@ -30,7 +30,9 @@ import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.PaginatorExtras;
 import java.util.Arrays;
 import net.dv8tion.jda.api.EmbedBuilder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CalcDropsCommand extends Command {
 
 	public CalcDropsCommand() {

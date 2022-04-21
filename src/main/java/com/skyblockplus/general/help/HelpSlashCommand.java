@@ -27,7 +27,9 @@ import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import org.springframework.stereotype.Component;
 
+@Component
 public class HelpSlashCommand extends SlashCommand {
 
 	public HelpSlashCommand() {

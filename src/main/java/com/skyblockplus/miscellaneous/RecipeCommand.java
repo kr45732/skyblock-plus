@@ -28,7 +28,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.EmbedBuilder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class RecipeCommand extends Command {
 
 	public static List<String> allRecipeIds;

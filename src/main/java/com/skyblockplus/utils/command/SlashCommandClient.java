@@ -23,10 +23,9 @@ import static com.skyblockplus.utils.Utils.invalidEmbed;
 
 import com.skyblockplus.Main;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
+
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -45,7 +44,7 @@ public class SlashCommandClient extends ListenerAdapter {
 		this.slashCommands = new ArrayList<>();
 	}
 
-	public SlashCommandClient addCommands(SlashCommand... commands) {
+	public SlashCommandClient addCommands(Collection<SlashCommand> commands) {
 		for (SlashCommand command : commands) {
 			if (slashCommands.stream().anyMatch(auction -> auction.getName().equalsIgnoreCase(command.getName()))) {
 				Main.log.error(
