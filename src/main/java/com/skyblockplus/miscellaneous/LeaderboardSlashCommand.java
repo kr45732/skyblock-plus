@@ -30,6 +30,10 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.springframework.stereotype.Component;
 
+import java.util.stream.Collectors;
+
+import static com.skyblockplus.utils.Utils.capitalizeString;
+
 @Component
 public class LeaderboardSlashCommand extends SlashCommand {
 
@@ -76,7 +80,7 @@ public class LeaderboardSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		} else if (event.getFocusedOption().getName().equals("type")) {
-			event.replyClosestMatch(event.getFocusedOption().getValue(), HypixelGuildCache.getTypes());
+			event.replyClosestMatch(event.getFocusedOption().getValue(), HypixelGuildCache.getTypes(true));
 		}
 	}
 }

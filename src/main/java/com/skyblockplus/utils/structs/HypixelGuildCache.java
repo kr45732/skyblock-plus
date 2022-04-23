@@ -18,9 +18,6 @@
 
 package com.skyblockplus.utils.structs;
 
-import static com.skyblockplus.utils.Utils.getLevelingJson;
-import static com.skyblockplus.utils.Utils.higherDepth;
-
 import com.google.gson.JsonArray;
 import com.skyblockplus.utils.Player;
 import java.time.Instant;
@@ -28,6 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static com.skyblockplus.utils.Utils.*;
 
 public class HypixelGuildCache {
 
@@ -186,6 +185,14 @@ public class HypixelGuildCache {
 	}
 
 	public static List<String> getTypes() {
-		return types.subList(2, types.size());
+		return getTypes(false);
+	}
+
+	/**
+	 * @return Only stats (no uuid or username)
+	 */
+	public static List<String> getTypes(boolean formatted) {
+		List<String> typesSubList = types.subList(2, types.size());
+		return formatted ? typesSubList.stream().map(t -> capitalizeString(t.replace("_", " "))).collect(Collectors.toList()) : typesSubList;
 	}
 }

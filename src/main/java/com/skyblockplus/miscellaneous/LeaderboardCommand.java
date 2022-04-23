@@ -45,10 +45,17 @@ public class LeaderboardCommand extends Command {
 	}
 
 	public static EmbedBuilder getLeaderboard(String lbType, String username, Player.Gamemode gamemode, int page, PaginatorEvent event) {
-		if (!isValidType(lbType = lbType.equalsIgnoreCase("nw") ? "networth" : lbType)) {
+		lbType = switch (lbType = lbType.replace(" ", "_").toLowerCase()){
+			case "nw" -> "networth";
+			case "wolf" -> "sven";
+			case "spider" -> "tara";
+			case "zombie" -> "rev";
+			default -> lbType;
+		};
+
+		if (!isValidType(lbType)) {
 			return invalidEmbed(lbType + " is an invalid leaderboard type. Use `/help leaderboard` to see valid types");
 		}
-		lbType = lbType.toLowerCase();
 
 		Player player = new Player(username);
 		if (!player.isValid()) {

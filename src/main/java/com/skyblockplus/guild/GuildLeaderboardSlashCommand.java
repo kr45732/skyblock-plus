@@ -90,7 +90,7 @@ public class GuildLeaderboardSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		} else if (event.getFocusedOption().getName().equals("type")) {
-			event.replyClosestMatch(event.getFocusedOption().getValue(), HypixelGuildCache.getTypes());
+			event.replyClosestMatch(event.getFocusedOption().getValue(), HypixelGuildCache.getTypes(true));
 		}
 	}
 }
