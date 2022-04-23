@@ -63,7 +63,6 @@ public class CacheDatabase {
 	public int guildCount = 1;
 	public final Map<String, List<Party>> partyCaches = new HashMap<>();
 
-
 	public CacheDatabase() {
 		HikariConfig config = new HikariConfig();
 		config.setJdbcUrl(PLANET_SCALE_URL);

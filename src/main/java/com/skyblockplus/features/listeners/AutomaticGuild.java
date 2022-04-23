@@ -135,23 +135,23 @@ public class AutomaticGuild {
 	public AutomaticGuild(GenericGuildEvent event) {
 		guildId = event.getGuild().getId();
 
-		if(guildId.equals("796790757947867156") && isMainBot()){
+		if (guildId.equals("796790757947867156") && isMainBot()) {
 			try {
 				botStatusWebhook.send(
-						client.getSuccess() +
-								" Restarted in " +
-								Duration
-										.between(
-												((GuildMessageChannel) jda.getGuildChannelById("957658797155975208")).getHistory()
-														.retrievePast(1)
-														.complete()
-														.get(0)
-														.getTimeCreated()
-														.toInstant(),
-												Instant.now()
-										)
-										.toSeconds() +
-								" seconds"
+					client.getSuccess() +
+					" Restarted in " +
+					Duration
+						.between(
+							((GuildMessageChannel) jda.getGuildChannelById("957658797155975208")).getHistory()
+								.retrievePast(1)
+								.complete()
+								.get(0)
+								.getTimeCreated()
+								.toInstant(),
+							Instant.now()
+						)
+						.toSeconds() +
+					" seconds"
 				);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -216,7 +216,7 @@ public class AutomaticGuild {
 		try {
 			logChannel = event.getGuild().getTextChannelById(higherDepth(serverSettings, "logChannel", null));
 		} catch (Exception ignored) {}
-		if(cacheDatabase.partyCaches.containsKey(guildId)){
+		if (cacheDatabase.partyCaches.containsKey(guildId)) {
 			this.partyList.addAll(cacheDatabase.partyCaches.get(guildId));
 		}
 	}

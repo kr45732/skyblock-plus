@@ -76,24 +76,24 @@ public class AuctionFlipper {
 	public static void initialize(boolean enable) {
 		AuctionFlipper.enable = enable;
 		scheduler.scheduleWithFixedDelay(
-				() -> {
-					try {
-						if (
-								!useAlternativeAhApi &&
-										Duration.between(lastUpdated, Instant.now()).toMinutes() >= 3 &&
-										!currentMayor.equals("Derpy")
-						) {
-							deleteUrl(
-									"https://api.heroku.com/apps/query-api/dynos",
-									new BasicHeader("Accept", "application/vnd.heroku+json; version=3"),
-									new BasicHeader("Authorization", "Bearer " + HEROKU_API_KEY)
-							);
-						}
-					} catch (Exception ignored) {}
-				},
-				60,
-				30,
-				TimeUnit.SECONDS
+			() -> {
+				try {
+					if (
+						!useAlternativeAhApi &&
+						Duration.between(lastUpdated, Instant.now()).toMinutes() >= 3 &&
+						!currentMayor.equals("Derpy")
+					) {
+						deleteUrl(
+							"https://api.heroku.com/apps/query-api/dynos",
+							new BasicHeader("Accept", "application/vnd.heroku+json; version=3"),
+							new BasicHeader("Authorization", "Bearer " + HEROKU_API_KEY)
+						);
+					}
+				} catch (Exception ignored) {}
+			},
+			60,
+			30,
+			TimeUnit.SECONDS
 		);
 	}
 

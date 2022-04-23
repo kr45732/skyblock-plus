@@ -136,7 +136,8 @@ public class SlayerCommand extends Command {
 				blazeOneKills +
 				12500L *
 				blazeTwoKills +
-					60000L * blazeThreeKills; // TODO: check this
+				60000L *
+				blazeThreeKills; // TODO: check this
 			eb.setDescription(
 				"**Total Slayer:** " +
 				formatNumber(player.getTotalSlayer()) +
