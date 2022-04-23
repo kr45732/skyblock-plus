@@ -67,13 +67,14 @@ public class GuildLeaderboardCommand extends Command {
 			return eb;
 		}
 
-		lbType = switch (lbType = lbType.replace(" ", "_").toLowerCase()){
-			case "nw" -> "networth";
-			case "wolf" -> "sven";
-			case "spider" -> "tara";
-			case "zombie" -> "rev";
-			default -> lbType;
-		};
+		lbType =
+			switch (lbType = lbType.replace(" ", "_").toLowerCase()) {
+				case "nw" -> "networth";
+				case "wolf" -> "sven";
+				case "spider" -> "tara";
+				case "zombie" -> "rev";
+				default -> lbType;
+			};
 		if (!isValidType(lbType)) { // Type is invalid, username, or uuid
 			return invalidEmbed(lbType + " is an invalid leaderboard type. Use `/help guild-leaderboard` to see valid types");
 		}

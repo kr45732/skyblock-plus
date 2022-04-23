@@ -18,21 +18,20 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.Utils.capitalizeString;
+
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
 import com.skyblockplus.utils.structs.HypixelGuildCache;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.springframework.stereotype.Component;
-
-import java.util.stream.Collectors;
-
-import static com.skyblockplus.utils.Utils.capitalizeString;
 
 @Component
 public class LeaderboardSlashCommand extends SlashCommand {
