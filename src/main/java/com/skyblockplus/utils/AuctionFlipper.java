@@ -56,29 +56,6 @@ public class AuctionFlipper {
 	private static boolean enable = false;
 	private static Instant lastUpdated = Instant.now();
 
-	public static void scheduleHerokuUpdate() {
-		scheduler.scheduleWithFixedDelay(
-			() -> {
-				try {
-					if (
-						!useAlternativeAhApi &&
-						Duration.between(lastUpdated, Instant.now()).toMinutes() >= 3 &&
-						!currentMayor.equals("Derpy")
-					) {
-						deleteUrl(
-							"https://api.heroku.com/apps/query-api/dynos",
-							new BasicHeader("Accept", "application/vnd.heroku+json; version=3"),
-							new BasicHeader("Authorization", "Bearer " + HEROKU_API_KEY)
-						);
-					}
-				} catch (Exception ignored) {}
-			},
-			60,
-			30,
-			TimeUnit.SECONDS
-		);
-	}
-
 	public static void onGuildMessageReceived(MessageReceivedEvent event) {
 		try {
 			if (
@@ -94,6 +71,30 @@ public class AuctionFlipper {
 				}
 			}
 		} catch (Exception ignored) {}
+	}
+
+	public static void initialize(boolean enable) {
+		AuctionFlipper.enable = enable;
+		scheduler.scheduleWithFixedDelay(
+				() -> {
+					try {
+						if (
+								!useAlternativeAhApi &&
+										Duration.between(lastUpdated, Instant.now()).toMinutes() >= 3 &&
+										!currentMayor.equals("Derpy")
+						) {
+							deleteUrl(
+									"https://api.heroku.com/apps/query-api/dynos",
+									new BasicHeader("Accept", "application/vnd.heroku+json; version=3"),
+									new BasicHeader("Authorization", "Bearer " + HEROKU_API_KEY)
+							);
+						}
+					} catch (Exception ignored) {}
+				},
+				60,
+				30,
+				TimeUnit.SECONDS
+		);
 	}
 
 	public static void flip() {
@@ -166,9 +167,5 @@ public class AuctionFlipper {
 			}
 		} catch (Exception ignored) {}
 		return null;
-	}
-
-	public static void setEnable(boolean enable) {
-		AuctionFlipper.enable = enable;
 	}
 }

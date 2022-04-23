@@ -622,7 +622,7 @@ public class Player {
 			getLevelingJson(),
 			"slayer_xp." +
 			switch (slayerName) {
-				case "sven", "blaze" -> "wolf"; // TODO is blaze same as wolf/eman?
+				case "sven" -> "wolf";
 				case "rev" -> "zombie";
 				case "tara" -> "spider";
 				default -> slayerName;

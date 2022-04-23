@@ -192,8 +192,9 @@ public class SkyblockCommand extends Command {
 				revFiveKills +
 				5000L *
 				blazeOneKills +
-				12500L *
-				blazeTwoKills;
+						12500L *
+								blazeTwoKills +
+						60000L * blazeThreeKills;
 			eb.setDescription(
 				"**Total Slayer:** " +
 				formatNumber(player.getTotalSlayer()) +

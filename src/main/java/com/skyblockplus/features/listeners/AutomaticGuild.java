@@ -21,8 +21,7 @@ package com.skyblockplus.features.listeners;
 import static com.skyblockplus.features.listeners.MainListener.guildMap;
 import static com.skyblockplus.features.mayor.MayorHandler.votesEmbed;
 import static com.skyblockplus.features.skyblockevent.SkyblockEventCommand.endSkyblockEvent;
-import static com.skyblockplus.utils.ApiHandler.getGuildFromId;
-import static com.skyblockplus.utils.ApiHandler.skyblockProfilesFromUuid;
+import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Constants.NUMBER_TO_RARITY_MAP;
 import static com.skyblockplus.utils.Utils.*;
 
@@ -135,6 +134,30 @@ public class AutomaticGuild {
 	/* Constructor */
 	public AutomaticGuild(GenericGuildEvent event) {
 		guildId = event.getGuild().getId();
+
+		if(guildId.equals("796790757947867156") && isMainBot()){
+			try {
+				botStatusWebhook.send(
+						client.getSuccess() +
+								" Restarted in " +
+								Duration
+										.between(
+												((GuildMessageChannel) jda.getGuildChannelById("957658797155975208")).getHistory()
+														.retrievePast(1)
+														.complete()
+														.get(0)
+														.getTimeCreated()
+														.toInstant(),
+												Instant.now()
+										)
+										.toSeconds() +
+								" seconds"
+				);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
 		JsonElement serverSettings = allServerSettings.get(guildId);
 		applyConstructor(event, serverSettings);
 		verifyConstructor(event, higherDepth(serverSettings, "automatedVerify"));
@@ -193,6 +216,9 @@ public class AutomaticGuild {
 		try {
 			logChannel = event.getGuild().getTextChannelById(higherDepth(serverSettings, "logChannel", null));
 		} catch (Exception ignored) {}
+		if(cacheDatabase.partyCaches.containsKey(guildId)){
+			this.partyList.addAll(cacheDatabase.partyCaches.get(guildId));
+		}
 	}
 
 	public static String getGuildPrefix(String guildId) {
@@ -905,12 +931,6 @@ public class AutomaticGuild {
 		} catch (Exception e) {
 			log.error(guildId, e);
 		}
-	}
-
-	/* Party */
-	public void setPartyList(List<Party> partyList) {
-		this.partyList.clear();
-		this.partyList.addAll(partyList);
 	}
 
 	/* Jacob */

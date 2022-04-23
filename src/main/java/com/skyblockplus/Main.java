@@ -18,13 +18,7 @@
 
 package com.skyblockplus;
 
-import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
-import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.ApiHandler.updateCacheTask;
-import static com.skyblockplus.utils.Utils.*;
-
 import club.minnced.discord.webhook.external.JDAWebhookClient;
-import com.google.common.reflect.ClassPath;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -32,8 +26,6 @@ import com.jagrosh.jdautilities.command.CommandListener;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.skyblockplus.api.miscellaneous.PublicEndpoints;
 import com.skyblockplus.api.serversettings.managers.ServerSettingsModel;
-import com.skyblockplus.dev.EvaluateCommand;
-import com.skyblockplus.dev.UpdateSlashCommands;
 import com.skyblockplus.features.event.EventHandler;
 import com.skyblockplus.features.fetchur.FetchurHandler;
 import com.skyblockplus.features.jacob.JacobHandler;
@@ -45,18 +37,9 @@ import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandClient;
 import com.skyblockplus.utils.exceptionhandler.ExceptionEventListener;
 import com.skyblockplus.utils.exceptionhandler.GlobalExceptionHandler;
-import java.io.File;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import javax.annotation.PreDestroy;
-import javax.security.auth.login.LoginException;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.GuildMessageChannel;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
@@ -66,6 +49,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import javax.annotation.PreDestroy;
+import javax.security.auth.login.LoginException;
+import java.io.File;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
+import static com.skyblockplus.features.listeners.MainListener.guildMap;
+import static com.skyblockplus.utils.ApiHandler.updateCacheTask;
+import static com.skyblockplus.utils.Utils.*;
 
 @SpringBootApplication
 public class Main {
@@ -139,7 +134,6 @@ public class Main {
 				.setEnableShutdownHook(false)
 				.build();
 
-		// TODO: use guild ready events instead
 		for (JDA shard : jda.getShards()) {
 			try {
 				shard.awaitReady();
@@ -152,8 +146,7 @@ public class Main {
 
 		ApiHandler.initialize();
 		AuctionTracker.initialize();
-		AuctionFlipper.setEnable(true);
-		AuctionFlipper.scheduleHerokuUpdate();
+		AuctionFlipper.initialize(true);
 		PublicEndpoints.initialize();
 		FetchurHandler.initialize();
 		MayorHandler.initialize();
@@ -174,27 +167,6 @@ public class Main {
 				1,
 				TimeUnit.MINUTES
 			); // Sorry for the war crimes
-
-			try {
-				botStatusWebhook.send(
-					client.getSuccess() +
-					" Restarted in " +
-					Duration
-						.between(
-							((GuildMessageChannel) jda.getGuildChannelById("957658797155975208")).getHistory()
-								.retrievePast(1)
-								.complete()
-								.get(0)
-								.getTimeCreated()
-								.toInstant(),
-							Instant.now()
-						)
-						.toSeconds() +
-					" seconds"
-				);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
 		}
 	}
 

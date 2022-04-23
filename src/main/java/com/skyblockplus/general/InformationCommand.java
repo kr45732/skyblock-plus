@@ -28,6 +28,9 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.springframework.stereotype.Component;
 
+import java.util.Comparator;
+import java.util.stream.Collectors;
+
 @Component
 public class InformationCommand extends Command {
 
@@ -48,18 +51,17 @@ public class InformationCommand extends Command {
 					.addField(
 						"Statistics",
 						"**Servers:** " +
-						jda.getGuilds().size() +
+						jda.getGuildCache().size() +
 						"\n**Users:** " +
 						formatNumber(getUserCount()) +
 						"\n**Average Ping:** " +
-						formatNumber(
-							(long) jda.getShards().stream().map(s -> s.getRestPing().complete()).mapToLong(i -> i).average().orElse(0.0)
+						roundAndFormat(jda.getShardCache().stream().map(s -> s.getRestPing().complete()).mapToLong(i -> i).average().orElse(0.0)
 						) +
 						"ms\n**Average Websocket:** " +
-						formatNumber(jda.getAverageGatewayPing()) +
+								roundAndFormat(jda.getAverageGatewayPing()) +
 						"ms",
 						true
-					)
+					).addField("Shards", jda.getShardCache().stream().sorted(Comparator.comparingInt(s -> s.getShardInfo().getShardId())).map(s -> "**Shard " + (s.getShardInfo().getShardId() + 1) + ":** " + s.getGuildCache().size() + " servers").collect(Collectors.joining("\n")), true)
 					.addField(
 						"Usage",
 						"**Memory:** " +

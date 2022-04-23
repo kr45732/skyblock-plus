@@ -60,7 +60,9 @@ public class CacheDatabase {
 		Player.Gamemode.IRONMAN,
 		Player.Gamemode.STRANDED
 	);
-	public int guildCount = 2;
+	public int guildCount = 1;
+	public final Map<String, List<Party>> partyCaches = new HashMap<>();
+
 
 	public CacheDatabase() {
 		HikariConfig config = new HikariConfig();
@@ -287,7 +289,7 @@ public class CacheDatabase {
 						guildId = response.getString("guild_id");
 						toDeleteIds.add(guildId);
 						List<Party> partyList = gson.fromJson(response.getString("data"), partyListType);
-						guildMap.get(guildId).setPartyList(partyList);
+						partyCaches.put(guildId, partyList);
 						log.info("Retrieved party cache (" + partyList.size() + ") - guildId={" + guildId + "}");
 					} catch (Exception e) {
 						log.error("guildId={" + guildId + "}", e);
