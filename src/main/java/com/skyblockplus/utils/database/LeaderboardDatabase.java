@@ -87,7 +87,7 @@ public class LeaderboardDatabase {
 		dataSource = new MongoClient(new MongoClientURI(LEADERBOARD_DB_URL));
 
 		if (isMainBot()) {
-			scheduler.scheduleAtFixedRate(this::updateLeaderboard, 1, 1, TimeUnit.MINUTES);
+			scheduler.scheduleWithFixedDelay(this::updateLeaderboard, 1, 1, TimeUnit.MINUTES);
 		}
 	}
 
@@ -192,6 +192,10 @@ public class LeaderboardDatabase {
 				.limit(180);
 			int count = 0;
 			for (Document document : response) {
+				if(count == 90){
+					break;
+				}
+
 				String uuid = document.getString("uuid");
 				UsernameUuidStruct usernameUuidStruct = uuidToUsername(uuid);
 				if (usernameUuidStruct.isNotValid()) {
