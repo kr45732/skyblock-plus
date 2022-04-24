@@ -184,13 +184,13 @@ public class LeaderboardDatabase {
 
 	public void updateLeaderboard() {
 		try {
+			long start = System.currentTimeMillis();
 			FindIterable<Document> response = getConnection()
 				.getCollection("all_lb")
-				.find(Filters.lt("last_updated", Instant.now().minus(5, ChronoUnit.DAYS)))
+				.find(Filters.lt("last_updated", Instant.now().minus(5, ChronoUnit.DAYS).toEpochMilli()))
 				.projection(Projections.include("uuid"))
 				.limit(180);
 			int count = 0;
-			long start = System.currentTimeMillis();
 			for (Document document : response) {
 				String uuid = document.getString("uuid");
 				UsernameUuidStruct usernameUuidStruct = uuidToUsername(uuid);
