@@ -20,6 +20,7 @@ package com.skyblockplus.guild;
 
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.database.LeaderboardDatabase.getType;
 import static com.skyblockplus.utils.structs.HypixelGuildCache.*;
 
 import com.google.gson.JsonArray;
@@ -30,6 +31,7 @@ import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
+import com.skyblockplus.utils.database.LeaderboardDatabase;
 import com.skyblockplus.utils.structs.HypixelGuildCache;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.PaginatorExtras;
@@ -67,15 +69,9 @@ public class GuildLeaderboardCommand extends Command {
 			return eb;
 		}
 
-		lbType =
-			switch (lbType = lbType.replace(" ", "_").toLowerCase()) {
-				case "nw" -> "networth";
-				case "wolf" -> "sven";
-				case "spider" -> "tara";
-				case "zombie" -> "rev";
-				default -> lbType;
-			};
-		if (!isValidType(lbType)) { // Type is invalid, username, or uuid
+		lbType = getType(lbType);
+
+		if (!LeaderboardDatabase.isValidType(lbType)) { // Type is invalid, username, or uuid
 			return invalidEmbed(lbType + " is an invalid leaderboard type. Use `/help guild-leaderboard` to see valid types");
 		}
 

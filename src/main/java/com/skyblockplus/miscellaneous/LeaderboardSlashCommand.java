@@ -18,15 +18,12 @@
 
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.Utils.capitalizeString;
-
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandEvent;
+import com.skyblockplus.utils.database.LeaderboardDatabase;
 import com.skyblockplus.utils.structs.AutoCompleteEvent;
-import com.skyblockplus.utils.structs.HypixelGuildCache;
-import java.util.stream.Collectors;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -79,7 +76,7 @@ public class LeaderboardSlashCommand extends SlashCommand {
 		if (event.getFocusedOption().getName().equals("player")) {
 			event.replyClosestPlayer();
 		} else if (event.getFocusedOption().getName().equals("type")) {
-			event.replyClosestMatch(event.getFocusedOption().getValue(), HypixelGuildCache.getTypes(true));
+			event.replyClosestMatch(event.getFocusedOption().getValue(), LeaderboardDatabase.getTypes(true));
 		}
 	}
 }

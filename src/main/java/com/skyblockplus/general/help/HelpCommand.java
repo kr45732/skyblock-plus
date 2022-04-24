@@ -20,7 +20,7 @@ package com.skyblockplus.general.help;
 
 import static com.skyblockplus.features.listeners.AutomaticGuild.getGuildPrefix;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.structs.HypixelGuildCache.getTypes;
+import static com.skyblockplus.utils.database.LeaderboardDatabase.getTypes;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;

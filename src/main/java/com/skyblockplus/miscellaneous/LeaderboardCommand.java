@@ -20,7 +20,8 @@ package com.skyblockplus.miscellaneous;
 
 import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.structs.HypixelGuildCache.isValidType;
+import static com.skyblockplus.utils.database.LeaderboardDatabase.getType;
+import static com.skyblockplus.utils.database.LeaderboardDatabase.isValidType;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -44,15 +45,7 @@ public class LeaderboardCommand extends Command {
 	}
 
 	public static EmbedBuilder getLeaderboard(String lbType, String username, Player.Gamemode gamemode, int page, PaginatorEvent event) {
-		lbType =
-			switch (lbType = lbType.replace(" ", "_").toLowerCase()) {
-				case "nw" -> "networth";
-				case "wolf" -> "sven";
-				case "spider" -> "tara";
-				case "zombie" -> "rev";
-				case "eman" -> "enderman";
-				default -> lbType;
-			};
+		lbType = getType(lbType);
 
 		if (!isValidType(lbType)) {
 			return invalidEmbed(lbType + " is an invalid leaderboard type. Use `/help leaderboard` to see valid types");

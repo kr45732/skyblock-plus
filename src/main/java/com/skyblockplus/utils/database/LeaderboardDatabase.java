@@ -19,8 +19,9 @@
 package com.skyblockplus.utils.database;
 
 import static com.skyblockplus.utils.ApiHandler.*;
+import static com.skyblockplus.utils.Player.COLLECTION_NAME_TO_ID;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.structs.HypixelGuildCache.getTypes;
+import static com.skyblockplus.utils.database.LeaderboardDatabase.getTypes;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -31,12 +32,16 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.*;
 import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.structs.HypixelGuildCache;
 import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+import org.apache.commons.collections4.ListUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.slf4j.Logger;
@@ -44,7 +49,33 @@ import org.slf4j.LoggerFactory;
 
 public class LeaderboardDatabase {
 
-	private static final Logger log = LoggerFactory.getLogger(LeaderboardDatabase.class);
+    public static final List<String> types = ListUtils.union(
+        List.of(
+            "username",
+            "uuid",
+            "slayer",
+            "skills",
+            "catacombs",
+            "weight",
+            "sven",
+            "rev",
+            "tara",
+            "enderman",
+            "alchemy",
+            "combat",
+            "fishing",
+            "farming",
+            "foraging",
+            "carpentry",
+            "mining",
+            "taming",
+            "enchanting",
+            "networth",
+            "blaze"
+        ),
+        COLLECTION_NAME_TO_ID.keySet().stream().toList()
+    );
+    private static final Logger log = LoggerFactory.getLogger(LeaderboardDatabase.class);
 
 	private final MongoClient dataSource;
 	private final List<Player.Gamemode> leaderboardGamemodes = Arrays.asList(
@@ -86,7 +117,7 @@ public class LeaderboardDatabase {
 	private void insertIntoLeaderboard(Player player, Player.Gamemode gamemode) {
 		try {
 			List<Bson> updates = new ArrayList<>();
-			updates.add(Updates.set("last_updated", Instant.now()));
+			updates.add(Updates.set("last_updated", Instant.now().toEpochMilli()));
 			updates.add(Updates.set("username", player.getUsername()));
 			updates.add(Updates.set("uuid", player.getUuid()));
 			for (String type : getTypes()) {
@@ -155,6 +186,7 @@ public class LeaderboardDatabase {
 
 	public void a() {
 		MongoCollection<Document> lbCollection = getConnection().getCollection("all_lb");
+		lbCollection.updateMany(Filters.ne("username", "CrypticPlasma"), Updates.set("last_updated", Instant.now().minus(6, ChronoUnit.DAYS).toEpochMilli()));
 		FindIterable<Document> response = lbCollection.find();
 
 		int count = 0;
@@ -258,5 +290,41 @@ public class LeaderboardDatabase {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static List<String> getTypes() {
+		return getTypes(false);
+	}
+
+	/**
+	 * @return Only stats (no uuid or username)
+	 */
+	public static List<String> getTypes(boolean formatted) {
+		List<String> typesSubList = types.subList(2, types.size());
+		return formatted
+				? typesSubList.stream().map(t -> capitalizeString(t.replace("_", " "))).collect(Collectors.toList())
+				: typesSubList;
+	}
+
+	public static String getType(String lbType){
+		lbType =
+				switch (lbType = lbType.replace(" ", "_").toLowerCase()) {
+					case "nw" -> "networth";
+					case "wolf" -> "sven";
+					case "spider" -> "tara";
+					case "zombie" -> "rev";
+					case "eman" -> "enderman";
+					default -> lbType;
+				};
+
+		if(!isValidType(lbType)){
+			lbType = getClosestMatch(lbType, getTypes());
+		}
+
+		return lbType;
+	}
+
+	public static boolean isValidType(String type) {
+		return HypixelGuildCache.typeToIndex(type.toLowerCase()) >= 2;
 	}
 }

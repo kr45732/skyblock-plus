@@ -18,7 +18,6 @@
 
 package com.skyblockplus.utils.structs;
 
-import static com.skyblockplus.utils.Player.COLLECTION_NAME_TO_ID;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
@@ -28,36 +27,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import org.apache.commons.collections4.ListUtils;
+
+import com.skyblockplus.utils.database.LeaderboardDatabase;
 
 public class HypixelGuildCache {
 
-	public static final List<String> types = ListUtils.union(
-		List.of(
-			"username",
-			"uuid",
-			"slayer",
-			"skills",
-			"catacombs",
-			"weight",
-			"sven",
-			"rev",
-			"tara",
-			"enderman",
-			"alchemy",
-			"combat",
-			"fishing",
-			"farming",
-			"foraging",
-			"carpentry",
-			"mining",
-			"taming",
-			"enchanting",
-			"networth",
-			"blaze"
-		),
-		COLLECTION_NAME_TO_ID.keySet().stream().toList()
-	);
 	private final List<String> normalCache;
 	private final List<String> ironmanCache;
 	private final List<String> strandedCache;
@@ -70,12 +44,8 @@ public class HypixelGuildCache {
 		this.lastUpdated = Instant.now();
 	}
 
-	public static boolean isValidType(String type) {
-		return typeToIndex(type.toLowerCase()) >= 2;
-	}
-
 	public static int typeToIndex(String type) {
-		return IntStream.range(0, types.size()).filter(i -> types.get(i).equals(type)).findFirst().orElse(-1);
+		return IntStream.range(0, LeaderboardDatabase.types.size()).filter(i -> LeaderboardDatabase.types.get(i).equals(type)).findFirst().orElse(-1);
 	}
 
 	public static String getStringFromCache(String cache, String type) {
@@ -123,7 +93,7 @@ public class HypixelGuildCache {
 			"=:=" +
 			player.getUuid() +
 			"=:=" +
-			getTypes()
+			LeaderboardDatabase.getTypes()
 				.stream()
 				.map(type ->
 					"" +
@@ -189,17 +159,4 @@ public class HypixelGuildCache {
 		return new SkillsStruct(skill, level, maxLevel, skillExp, xpCurrent, xpForNext, progress);
 	}
 
-	public static List<String> getTypes() {
-		return getTypes(false);
-	}
-
-	/**
-	 * @return Only stats (no uuid or username)
-	 */
-	public static List<String> getTypes(boolean formatted) {
-		List<String> typesSubList = types.subList(2, types.size());
-		return formatted
-			? typesSubList.stream().map(t -> capitalizeString(t.replace("_", " "))).collect(Collectors.toList())
-			: typesSubList;
-	}
 }
