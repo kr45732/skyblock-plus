@@ -404,9 +404,9 @@ public class NetworthExecute {
 			JsonArray missing = collectJsonArray(
 				tempSet.stream().filter(str -> !str.toLowerCase().startsWith("rune_")).map(JsonPrimitive::new)
 			);
-//			if (!missing.isEmpty()) {
-//				System.out.println(missing);
-//			}
+			//			if (!missing.isEmpty()) {
+			//				System.out.println(missing);
+			//			}
 
 			if (verbose) {
 				try {
