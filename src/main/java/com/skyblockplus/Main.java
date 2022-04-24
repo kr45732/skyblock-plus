@@ -40,6 +40,7 @@ import com.skyblockplus.price.AuctionTracker;
 import com.skyblockplus.utils.*;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandClient;
+import com.skyblockplus.utils.database.Database;
 import com.skyblockplus.utils.exceptionhandler.ExceptionEventListener;
 import com.skyblockplus.utils.exceptionhandler.GlobalExceptionHandler;
 import java.io.File;
@@ -157,14 +158,15 @@ public class Main {
 		}
 
 		if (isMainBot()) {
-			scheduler.schedule(
+			scheduler.scheduleWithFixedDelay(
 				() -> {
 					if (Runtime.getRuntime().totalMemory() > 1750000000) {
 						System.gc();
 					}
 				},
-				1,
-				TimeUnit.MINUTES
+				60,
+				60,
+				TimeUnit.SECONDS
 			); // Sorry for the war crimes
 		}
 	}

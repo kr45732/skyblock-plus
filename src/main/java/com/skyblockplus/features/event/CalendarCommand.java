@@ -247,7 +247,7 @@ public class CalendarCommand extends Command {
 			out = 14;
 		}
 		Instant cultStart = Instant.ofEpochMilli(YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + currentMonth * MONTH_MS + out * DAY_MS);
-		if (cultStart.plus(5, ChronoUnit.MINUTES).isBefore(instantNow)) {
+		if (cultStart.isBefore(instantNow)) {
 			int curYearCult = getSkyblockYear() - 1;
 			if (out == 28) {
 				out = 7;

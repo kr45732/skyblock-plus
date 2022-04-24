@@ -43,6 +43,7 @@ import com.skyblockplus.price.AuctionTracker;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.SlashCommand;
 import com.skyblockplus.utils.command.SlashCommandClient;
+import com.skyblockplus.utils.database.Database;
 import com.skyblockplus.utils.exceptionhandler.ExceptionExecutor;
 import com.skyblockplus.utils.exceptionhandler.GlobalExceptionHandler;
 import com.skyblockplus.utils.structs.*;
@@ -73,13 +74,11 @@ import me.nullicorn.nedit.type.TagType;
 import me.xdrop.fuzzywuzzy.FuzzySearch;
 import me.xdrop.fuzzywuzzy.model.ExtractedResult;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.sharding.DefaultShardManager;
 import net.dv8tion.jda.api.sharding.ShardManager;
 import okhttp3.OkHttpClient;
 import org.apache.http.Header;
@@ -148,6 +147,7 @@ public class Utils {
 	public static String LINKED_USER_USERNAME = "";
 	public static String LINKED_USER_PASSWORD = "";
 	public static String HEROKU_API_KEY = "";
+	public static String LEADERBOARD_DB_URL = "";
 	/* JSON */
 	private static JsonObject essenceCostsJson;
 	private static JsonObject levelingJson;
@@ -1054,6 +1054,7 @@ public class Utils {
 			LINKED_USER_USERNAME = (String) appProps.get("LINKED_USER_USERNAME");
 			LINKED_USER_PASSWORD = (String) appProps.get("LINKED_USER_PASSWORD");
 			HEROKU_API_KEY = (String) appProps.get("HEROKU_API_KEY");
+			LEADERBOARD_DB_URL = (String) appProps.get("LEADERBOARD_DB_URL");
 		} catch (IOException e) {
 			HYPIXEL_API_KEY = System.getenv("HYPIXEL_API_KEY");
 			BOT_TOKEN = System.getenv("BOT_TOKEN");
@@ -1080,6 +1081,7 @@ public class Utils {
 			LINKED_USER_USERNAME = System.getenv("LINKED_USER_USERNAME");
 			LINKED_USER_PASSWORD = System.getenv("LINKED_USER_PASSWORD");
 			HEROKU_API_KEY = System.getenv("HEROKU_API_KEY");
+			LEADERBOARD_DB_URL = System.getenv("LEADERBOARD_DB_URL");
 		}
 	}
 

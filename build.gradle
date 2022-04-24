@@ -113,4 +113,7 @@ dependencies {
 
     // Fuzzy Searching
     implementation 'me.xdrop:fuzzywuzzy:1.4.0'
+
+    // Mongo DB
+    implementation 'org.mongodb:mongo-java-driver:3.12.11'
 }

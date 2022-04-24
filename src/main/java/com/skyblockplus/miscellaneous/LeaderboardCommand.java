@@ -18,10 +18,6 @@
 
 package com.skyblockplus.miscellaneous;
 
-import static com.skyblockplus.utils.ApiHandler.cacheDatabase;
-import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.structs.HypixelGuildCache.isValidType;
-
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
@@ -29,10 +25,14 @@ import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.PaginatorExtras;
-import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.utils.data.DataObject;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
+
+import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
+import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.structs.HypixelGuildCache.isValidType;
 
 @Component
 public class LeaderboardCommand extends Command {
@@ -51,6 +51,7 @@ public class LeaderboardCommand extends Command {
 				case "wolf" -> "sven";
 				case "spider" -> "tara";
 				case "zombie" -> "rev";
+				case "eman" -> "enderman";
 				default -> lbType;
 			};
 
@@ -64,32 +65,28 @@ public class LeaderboardCommand extends Command {
 		}
 
 		CustomPaginator.Builder paginateBuilder = event.getPaginator().setColumns(2).setItemsPerPage(20);
-		List<DataObject> cacheList = cacheDatabase.getLeaderboard(lbType, gamemode);
+		Map<String, Double> cacheList = leaderboardDatabase.getLeaderboard(lbType, gamemode);
 
-		int guildRank = -1;
+		int playerRank = -1;
 		String amt = "Not on leaderboard";
-		for (int i = 0, guildMemberPlayersListSize = cacheList.size(); i < guildMemberPlayersListSize; i++) {
-			DataObject lbPlayer = cacheList.get(i);
-			double data = lbPlayer.getDouble("data");
-			if (lbType.equals("networth")) {
-				data = (long) data;
-			}
-			String formattedAmt = roundAndFormat(data);
-			String guildPlayerUsername = lbPlayer.getString("username");
-			paginateBuilder.addItems("`" + (i + 1) + ")` " + fixUsername(guildPlayerUsername) + ": " + formattedAmt);
+		int rank = 1;
+		for (Map.Entry<String, Double> entry : cacheList.entrySet()) {
+			String formattedAmt = roundAndFormat(lbType.equals("networth") ? entry.getValue().longValue() : entry.getValue());
+			paginateBuilder.addItems("`" + (rank) + ")` " + fixUsername(entry.getKey()) + ": " + formattedAmt);
 
-			if (guildPlayerUsername.equals(player.getUsername())) {
-				guildRank = i;
+			if (entry.getKey().equals(player.getUsername())) {
+				playerRank = rank;
 				amt = formattedAmt;
 			}
+			rank ++;
 		}
-		page = page == -1 ? (guildRank / 20 + 1) : page;
+		page = page == -1 ? ((playerRank - 1) / 20 + 1) : page;
 
 		String ebStr =
 			"**Player:** " +
 			player.getUsernameFixed() +
 			"\n**Rank:** " +
-			(guildRank == -1 ? "Not on leaderboard" : "#" + (guildRank + 1)) +
+			(playerRank == -1 ? "Not on leaderboard" : "#" + (playerRank)) +
 			"\n**" +
 			capitalizeString(lbType.replace("_", " ")) +
 			":** " +

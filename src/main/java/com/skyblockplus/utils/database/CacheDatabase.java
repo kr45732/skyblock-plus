@@ -16,14 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.utils;
+package com.skyblockplus.utils.database;
 
-import static com.skyblockplus.features.listeners.MainListener.guildMap;
-import static com.skyblockplus.utils.ApiHandler.*;
-import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.structs.HypixelGuildCache.types;
-
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -32,22 +26,23 @@ import com.skyblockplus.features.jacob.JacobData;
 import com.skyblockplus.features.jacob.JacobHandler;
 import com.skyblockplus.features.party.Party;
 import com.skyblockplus.price.AuctionTracker;
-import com.skyblockplus.utils.structs.HypixelResponse;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.reflect.Type;
 import java.sql.*;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import net.dv8tion.jda.api.utils.data.DataObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static com.skyblockplus.utils.Utils.*;
 
 public class CacheDatabase {
 
@@ -55,12 +50,6 @@ public class CacheDatabase {
 
 	private final HikariDataSource dataSource;
 	private final ConcurrentHashMap<String, Instant> uuidToTimeSkyblockProfiles = new ConcurrentHashMap<>();
-	private final List<Player.Gamemode> leaderboardGamemodes = Arrays.asList(
-		Player.Gamemode.ALL,
-		Player.Gamemode.IRONMAN,
-		Player.Gamemode.STRANDED
-	);
-	public int guildCount = 1;
 	public final Map<String, List<Party>> partyCaches = new HashMap<>();
 
 	public CacheDatabase() {
@@ -69,10 +58,6 @@ public class CacheDatabase {
 		config.setUsername(PLANET_SCALE_USERNAME);
 		config.setPassword(PLANET_SCALE_PASSWORD);
 		dataSource = new HikariDataSource(config);
-
-		if (isMainBot()) {
-			scheduler.scheduleAtFixedRate(this::updateLeaderboard, 1, 1, TimeUnit.MINUTES);
-		}
 	}
 
 	public Connection getConnection() throws SQLException {
@@ -300,191 +285,5 @@ public class CacheDatabase {
 		try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
 			statement.executeUpdate("DELETE FROM party WHERE guild_id IN (" + String.join(",", toDeleteIds) + ")");
 		} catch (Exception ignored) {}
-	}
-
-	public void insertIntoLeaderboard(Player player) {
-		insertIntoLeaderboard(player, true);
-	}
-
-	public void insertIntoLeaderboard(Player player, boolean makeCopy) {
-		executor.submit(() -> {
-			Player finalPlayer = makeCopy ? player.copy() : player;
-			for (Player.Gamemode gamemode : leaderboardGamemodes) {
-				if (player.isValid()) {
-					insertIntoLeaderboard(finalPlayer, gamemode);
-				} else {
-					deleteFromLeaderboard(finalPlayer.getUuid(), gamemode);
-				}
-			}
-		});
-	}
-
-	private void insertIntoLeaderboard(Player player, Player.Gamemode gamemode) {
-		try (
-			Connection connection = getConnection();
-			PreparedStatement statement = connection.prepareStatement(
-				"INSERT INTO " +
-				gamemode.toCacheType() +
-				" (last_updated, " +
-				String.join(", ", types) +
-				") VALUES (" +
-				String.join(", ", Collections.nCopies(types.size() + 1, "?")) +
-				") ON DUPLICATE KEY UPDATE last_updated = VALUES(last_updated), " +
-				types.stream().map(type -> type + " = VALUES(" + type + ")").collect(Collectors.joining(", "))
-			)
-		) {
-			statement.setLong(1, Instant.now().toEpochMilli());
-			statement.setString(2, player.getUsername());
-			statement.setString(3, player.getUuid());
-			for (int i = 2; i < types.size(); i++) {
-				String type = types.get(i);
-				statement.setDouble(
-					i + 2,
-					player.getHighestAmount(
-						type +
-						switch (type) {
-							case "catacombs",
-								"alchemy",
-								"combat",
-								"fishing",
-								"farming",
-								"foraging",
-								"carpentry",
-								"mining",
-								"taming",
-								"enchanting" -> "_xp";
-							default -> "";
-						},
-						gamemode,
-						true
-					)
-				);
-			}
-			statement.executeUpdate();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void deleteFromLeaderboard(String uuid, Player.Gamemode gamemode) {
-		try (
-			Connection connection = getConnection();
-			PreparedStatement statement = connection.prepareStatement("DELETE FROM " + gamemode.toCacheType() + " WHERE uuid = ?")
-		) {
-			statement.setString(1, uuid);
-			statement.executeUpdate();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	public List<DataObject> getLeaderboard(String lbType, Player.Gamemode mode) {
-		try (
-			Connection connection = getConnection();
-			PreparedStatement statement = connection.prepareStatement(
-				"SELECT username, " + lbType + " FROM " + mode.toCacheType() + " WHERE " + lbType + " >= 0 ORDER BY " + lbType + " DESC"
-			)
-		) {
-			try (ResultSet response = statement.executeQuery()) {
-				List<DataObject> out = new ArrayList<>();
-				while (response.next()) {
-					try {
-						out.add(DataObject.empty().put("username", response.getString("username")).put("data", response.getString(lbType)));
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-				return out;
-			}
-		} catch (Exception ignored) {}
-		return null;
-	}
-
-	public void updateLeaderboard() {
-		try (
-			Connection connection = getConnection();
-			PreparedStatement statement = connection.prepareStatement(
-				"SELECT uuid FROM all_lb WHERE last_updated < " + Instant.now().minus(5, ChronoUnit.DAYS).toEpochMilli() + " LIMIT 180"
-			)
-		) {
-			try (ResultSet response = statement.executeQuery()) {
-				int count = 0;
-				long start = System.currentTimeMillis();
-				while (response.next() && count < 90) {
-					String uuid = response.getString("uuid");
-					UsernameUuidStruct usernameUuidStruct = uuidToUsername(uuid);
-					if (usernameUuidStruct.isNotValid()) {
-						executor.submit(() -> {
-							for (Player.Gamemode gamemode : leaderboardGamemodes) {
-								cacheDatabase.deleteFromLeaderboard(uuid, gamemode);
-							}
-						});
-					} else {
-						asyncSkyblockProfilesFromUuid(
-							usernameUuidStruct.uuid(),
-							count < 45 ? "c0cc68fc-a82a-462f-96ef-a060c22465fa" : "4991bfe2-d7aa-446a-b310-c7a70690927c",
-							false
-						)
-							.whenComplete((r, e) ->
-								insertIntoLeaderboard(new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), r, true), false)
-							);
-					}
-					count++;
-				}
-
-				if (count > 0) {
-					log.info("Updated " + count + " leaderboard players in " + (System.currentTimeMillis() - start) + "ms");
-				}
-
-				if (count <= 5 && guildCount != -1) {
-					count = 0;
-					String guildId = higherDepth(
-						getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/guilds.json"),
-						"[" + guildCount + "]",
-						null
-					);
-					if (guildId == null) {
-						guildCount = -1;
-						log.info("All guilds added");
-						return;
-					}
-					HypixelResponse guildResponse = getGuildFromId(guildId);
-					if (!guildResponse.isNotValid()) {
-						JsonArray members = guildResponse.get("members").getAsJsonArray();
-						for (JsonElement member : members) {
-							String uuid = higherDepth(member, "uuid").getAsString();
-							UsernameUuidStruct usernameUuidStruct = uuidToUsername(uuid);
-							if (usernameUuidStruct.isNotValid()) {
-								executor.submit(() -> {
-									for (Player.Gamemode gamemode : leaderboardGamemodes) {
-										cacheDatabase.deleteFromLeaderboard(uuid, gamemode);
-									}
-								});
-							} else {
-								asyncSkyblockProfilesFromUuid(
-									usernameUuidStruct.uuid(),
-									count < (members.size() / 2)
-										? "c0cc68fc-a82a-462f-96ef-a060c22465fa"
-										: "4991bfe2-d7aa-446a-b310-c7a70690927c",
-									false
-								)
-									.whenComplete((r, e) ->
-										insertIntoLeaderboard(
-											new Player(usernameUuidStruct.uuid(), usernameUuidStruct.username(), r, true),
-											false
-										)
-									);
-							}
-							count++;
-						}
-					}
-
-					log.info("Finished guild count: " + guildCount);
-					guildCount++;
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 }

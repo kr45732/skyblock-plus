@@ -134,7 +134,7 @@ public class EventHandler {
 			zooIndex = 4;
 		}
 		Instant zooEarlySummer = Instant.ofEpochMilli(
-			YEAR_0 + (getSkyblockYear() - 1) * CalendarCommand.YEAR_MS + 3 * CalendarCommand.MONTH_MS
+			YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 3 * MONTH_MS
 		);
 		if (
 			zooEarlySummer.toEpochMilli() <= nowEpoch &&
@@ -176,7 +176,7 @@ public class EventHandler {
 
 		index++;
 		Instant zooEarlyWinter = Instant.ofEpochMilli(
-			YEAR_0 + (getSkyblockYear() - 1) * CalendarCommand.YEAR_MS + 9 * CalendarCommand.MONTH_MS
+			YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 9 * MONTH_MS
 		);
 		if (
 			zooEarlyWinter.toEpochMilli() <= nowEpoch &&
@@ -218,7 +218,7 @@ public class EventHandler {
 
 		index++;
 		Instant jerryIslandOpen = Instant.ofEpochMilli(
-			YEAR_0 + (getSkyblockYear() - 1) * CalendarCommand.YEAR_MS + 11 * CalendarCommand.MONTH_MS
+			YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 11 * MONTH_MS
 		);
 		if (
 			jerryIslandOpen.toEpochMilli() <= nowEpoch &&
@@ -264,7 +264,7 @@ public class EventHandler {
 
 		index++;
 		Instant newYearEvent = Instant.ofEpochMilli(
-			YEAR_0 + (getSkyblockYear() - 1) * CalendarCommand.YEAR_MS + 11 * CalendarCommand.MONTH_MS + 28 * CalendarCommand.DAY_MS
+			YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 11 * MONTH_MS + 28 * DAY_MS
 		);
 		if (
 			newYearEvent.toEpochMilli() <= nowEpoch &&
@@ -291,7 +291,7 @@ public class EventHandler {
 		index++;
 		Instant spookyFishing = Instant
 			.ofEpochMilli(
-				YEAR_0 + (getSkyblockYear() - 1) * CalendarCommand.YEAR_MS + 7 * CalendarCommand.MONTH_MS + 28 * CalendarCommand.DAY_MS
+				YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 7 * MONTH_MS + 28 * DAY_MS
 			)
 			.minus(1, ChronoUnit.HOURS);
 		if (
@@ -314,7 +314,7 @@ public class EventHandler {
 
 		index++;
 		Instant spookyEvent = Instant.ofEpochMilli(
-			YEAR_0 + (getSkyblockYear() - 1) * CalendarCommand.YEAR_MS + 7 * CalendarCommand.MONTH_MS + 28 * CalendarCommand.DAY_MS
+			YEAR_0 + (getSkyblockYear() - 1) * YEAR_MS + 7 * MONTH_MS + 28 * DAY_MS
 		);
 		if (
 			spookyEvent.toEpochMilli() <= nowEpoch &&
@@ -339,9 +339,9 @@ public class EventHandler {
 			Instant fishingFestival = Instant.ofEpochMilli(
 				YEAR_0 +
 				(getSkyblockYear() - 1) *
-				CalendarCommand.YEAR_MS +
-				Math.floorDiv((nowEpoch - YEAR_0) % CalendarCommand.YEAR_MS, CalendarCommand.MONTH_MS) *
-				CalendarCommand.MONTH_MS
+				YEAR_MS +
+				Math.floorDiv((nowEpoch - YEAR_0) % YEAR_MS, MONTH_MS) *
+				MONTH_MS
 			);
 			if (
 				fishingFestival.toEpochMilli() <= nowEpoch &&
@@ -369,11 +369,11 @@ public class EventHandler {
 		}
 
 		index++;
-		long currentOffset = (nowEpoch - YEAR_0) % CalendarCommand.YEAR_MS;
-		int currentMonth = (int) Math.floorDiv(currentOffset, CalendarCommand.MONTH_MS);
+		long currentOffset = (nowEpoch - YEAR_0) % YEAR_MS;
+		int currentMonth = (int) Math.floorDiv(currentOffset, MONTH_MS);
 		int currentDay = (int) Math.floorDiv(
-			(currentOffset - (long) currentMonth * CalendarCommand.MONTH_MS) % CalendarCommand.MONTH_MS,
-			CalendarCommand.DAY_MS
+			(currentOffset - (long) currentMonth * MONTH_MS) % MONTH_MS,
+			DAY_MS
 		);
 		int out = 7;
 		if (currentDay > 21) {
@@ -386,11 +386,11 @@ public class EventHandler {
 		Instant fallenStar = Instant.ofEpochMilli(
 			YEAR_0 +
 			(getSkyblockYear() - 1) *
-			CalendarCommand.YEAR_MS +
+			YEAR_MS +
 			currentMonth *
-			CalendarCommand.MONTH_MS +
+			MONTH_MS +
 			out *
-			CalendarCommand.DAY_MS
+			DAY_MS
 		);
 		if (
 			fallenStar.toEpochMilli() <= nowEpoch &&

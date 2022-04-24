@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.skyblockplus.utils;
+package com.skyblockplus.utils.database;
 
 import static com.skyblockplus.utils.Utils.gson;
 

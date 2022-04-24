@@ -18,10 +18,13 @@
 
 package com.skyblockplus.utils.structs;
 
+import static com.skyblockplus.utils.Player.COLLECTION_NAME_TO_ID;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.skyblockplus.utils.Player;
+import org.apache.commons.collections4.ListUtils;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +33,7 @@ import java.util.stream.IntStream;
 
 public class HypixelGuildCache {
 
-	public static final List<String> types = List.of(
+	public static final List<String> types = ListUtils.union(List.of(
 		"username",
 		"uuid",
 		"slayer",
@@ -52,7 +55,7 @@ public class HypixelGuildCache {
 		"enchanting",
 		"networth",
 		"blaze"
-	); //, "sand","pumpkin","blaze_rod","netherrack","mushroom","raw_rabbit","string","prismarine_shard","potato","cactus","coal","pufferfish","gunpowder","clay","iron_ingot","jungle_wood","end_stone","ghast_tear","obsidian","acacia_wood","redstone","spruce_wood","raw_salmon","prismarine_crystals","nether_wart","raw_porkchop","gravel","wheat","nether_quartz","clownfish","raw_fish","carrot","gemstone","seeds","sugar_cane","raw_chicken","leather","magma_cream","raw_mutton","gold_ingot","spider_eye","ender_pearl","ink_sack","emerald","cocoa_beans","feather","cobblestone","hard_stone","mithril","oak_wood","diamond","ice","lapis_lazuli","birch_wood","dark_oak_wood","glowstone_dust","lily_pad","sponge","bone","rotten_flesh","slimeball","melon");
+	), COLLECTION_NAME_TO_ID.keySet().stream().toList());
 	private final List<String> normalCache;
 	private final List<String> ironmanCache;
 	private final List<String> strandedCache;

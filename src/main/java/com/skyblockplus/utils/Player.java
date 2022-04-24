@@ -42,131 +42,73 @@ import org.apache.groovy.util.Maps;
 
 public class Player {
 
-	public static final Map<String, String> COLLECTION_NAME_TO_ID = Maps.of( // TODO: update with new collections
-		"sand",
-		"SAND",
-		"pumpkin",
-		"PUMPKIN",
-		"blaze_rod",
-		"BLAZE_ROD",
-		"netherrack",
-		"NETHERRACK",
-		"mushroom",
-		"MUSHROOM_COLLECTION",
-		"raw_rabbit",
-		"RABBIT",
-		"string",
-		"STRING",
-		"prismarine_shard",
-		"PRISMARINE_SHARD",
-		"potato",
-		"POTATO_ITEM",
-		"cactus",
-		"CACTUS",
-		"coal",
-		"COAL",
-		"pufferfish",
-		"RAW_FISH:3",
-		"gunpowder",
-		"SULPHUR",
-		"clay",
-		"CLAY_BALL",
-		"iron_ingot",
-		"IRON_INGOT",
-		"jungle_wood",
-		"LOG:3",
-		"end_stone",
-		"ENDER_STONE",
-		"ghast_tear",
-		"GHAST_TEAR",
-		"obsidian",
-		"OBSIDIAN",
-		"acacia_wood",
-		"LOG_2",
-		"redstone",
-		"REDSTONE",
-		"spruce_wood",
-		"LOG:1",
-		"raw_salmon",
-		"RAW_FISH:1",
-		"prismarine_crystals",
-		"PRISMARINE_CRYSTALS",
-		"nether_wart",
-		"NETHER_STALK",
-		"raw_porkchop",
-		"PORK",
-		"gravel",
-		"GRAVEL",
-		"wheat",
-		"WHEAT",
-		"nether_quartz",
-		"QUARTZ",
-		"clownfish",
-		"RAW_FISH:2",
-		"raw_fish",
-		"RAW_FISH",
-		"carrot",
-		"CARROT_ITEM",
-		"gemstone",
-		"GEMSTONE_COLLECTION",
-		"seeds",
-		"SEEDS",
-		"sugar_cane",
-		"SUGAR_CANE",
-		"raw_chicken",
-		"RAW_CHICKEN",
-		"leather",
-		"LEATHER",
-		"magma_cream",
-		"MAGMA_CREAM",
-		"raw_mutton",
-		"MUTTON",
-		"gold_ingot",
-		"GOLD_INGOT",
-		"spider_eye",
-		"SPIDER_EYE",
-		"ender_pearl",
-		"ENDER_PEARL",
-		"ink_sack",
-		"INK_SACK",
-		"emerald",
-		"EMERALD",
-		"cocoa_beans",
-		"INK_SACK:3",
-		"feather",
-		"FEATHER",
-		"cobblestone",
-		"COBBLESTONE",
-		"hard_stone",
-		"HARD_STONE",
-		"mithril",
-		"MITHRIL_ORE",
-		"oak_wood",
-		"LOG",
-		"diamond",
-		"DIAMOND",
-		"ice",
-		"ICE",
-		"lapis_lazuli",
-		"INK_SACK:4",
-		"birch_wood",
-		"LOG:2",
-		"dark_oak_wood",
-		"LOG_2:1",
-		"glowstone_dust",
-		"GLOWSTONE_DUST",
-		"lily_pad",
-		"WATER_LILY",
-		"sponge",
-		"SPONGE",
-		"bone",
-		"BONE",
-		"rotten_flesh",
-		"ROTTEN_FLESH",
-		"slimeball",
-		"SLIME_BALL",
-		"melon",
-		"MELON"
+	public static final Map<String, String> COLLECTION_NAME_TO_ID = Maps.of(
+	"cocoa_beans","INK_SACK:3",
+	"carrot","CARROT_ITEM",
+	"cactus","CACTUS",
+	"raw_chicken","RAW_CHICKEN",
+	"sugar_cane","SUGAR_CANE",
+	"pumpkin","PUMPKIN",
+	"wheat","WHEAT",
+	"seeds","SEEDS",
+	"mushroom","MUSHROOM_COLLECTION",
+	"raw_rabbit","RABBIT",
+	"nether_wart","NETHER_STALK",
+	"mutton","MUTTON",
+	"melon","MELON",
+	"potato","POTATO_ITEM",
+	"leather","LEATHER",
+	"raw_porkchop","PORK",
+	"feather","FEATHER",
+	"lapis_lazuli","INK_SACK:4",
+	"redstone","REDSTONE",
+	"coal","COAL",
+	"mycelium","MYCEL",
+	"end_stone","ENDER_STONE",
+	"nether_quartz","QUARTZ",
+	"sand","SAND",
+	"iron_ingot","IRON_INGOT",
+	"gemstone","GEMSTONE_COLLECTION",
+	"obsidian","OBSIDIAN",
+	"diamond","DIAMOND",
+	"cobblestone","COBBLESTONE",
+	"glowstone_dust","GLOWSTONE_DUST",
+	"gold_ingot","GOLD_INGOT",
+	"gravel","GRAVEL",
+	"hard_stone","HARD_STONE",
+	"mithril","MITHRIL_ORE",
+	"emerald","EMERALD",
+	"red_sand","SAND:1",
+	"ice","ICE",
+	"sulphur","SULPHUR_ORE",
+	"netherrack","NETHERRACK",
+	"ender_pearl","ENDER_PEARL",
+	"slimeball","SLIME_BALL",
+	"magma_cream","MAGMA_CREAM",
+	"ghast_tear","GHAST_TEAR",
+	"gunpowder","SULPHUR",
+	"rotten_flesh","ROTTEN_FLESH",
+	"spider_eye","SPIDER_EYE",
+	"bone","BONE",
+	"blaze_rod","BLAZE_ROD",
+	"string","STRING",
+	"acacia_wood","LOG_2",
+	"spruce_wood","LOG:1",
+	"jungle_wood","LOG:3",
+	"birch_wood","LOG:2",
+	"oak_wood","LOG",
+	"dark_oak_wood","LOG_2:1",
+	"lily_pad","WATER_LILY",
+	"prismarine_shard","PRISMARINE_SHARD",
+	"ink_sack","INK_SACK",
+	"raw_fish","RAW_FISH",
+	"pufferfish","RAW_FISH:3",
+	"clownfish","RAW_FISH:2",
+	"raw_salmon","RAW_FISH:1",
+	"magmafish","MAGMA_FISH",
+	"prismarine_crystals","PRISMARINE_CRYSTALS",
+	"clay","CLAY_BALL",
+	"sponge","SPONGE"
 	);
 	public String invMissing = "";
 	private JsonArray profilesArray;
@@ -207,7 +149,7 @@ public class Player {
 		}
 
 		this.valid = true;
-		cacheDatabase.insertIntoLeaderboard(this);
+		leaderboardDatabase.insertIntoLeaderboard(this);
 	}
 
 	public Player(String username, String profileName) {
@@ -233,7 +175,7 @@ public class Player {
 		}
 
 		this.valid = true;
-		cacheDatabase.insertIntoLeaderboard(this);
+		leaderboardDatabase.insertIntoLeaderboard(this);
 	}
 
 	public Player(String uuid, String username, JsonElement profileArray) {
@@ -260,7 +202,7 @@ public class Player {
 
 		this.valid = true;
 		if (!isCopy) {
-			cacheDatabase.insertIntoLeaderboard(this);
+			leaderboardDatabase.insertIntoLeaderboard(this);
 		}
 	}
 
@@ -289,7 +231,7 @@ public class Player {
 
 		this.valid = true;
 		if (!isCopy) {
-			cacheDatabase.insertIntoLeaderboard(this);
+			leaderboardDatabase.insertIntoLeaderboard(this);
 		}
 	}
 
