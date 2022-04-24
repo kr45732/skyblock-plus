@@ -21,7 +21,6 @@ package com.skyblockplus.utils.database;
 import static com.skyblockplus.utils.ApiHandler.*;
 import static com.skyblockplus.utils.Player.COLLECTION_NAME_TO_ID;
 import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.database.LeaderboardDatabase.getTypes;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -181,31 +180,6 @@ public class LeaderboardDatabase {
 			return out;
 		} catch (Exception ignored) {}
 		return null;
-	}
-
-	public void a() {
-		MongoCollection<Document> lbCollection = getConnection().getCollection("all_lb");
-		lbCollection.updateMany(
-			Filters.ne("username", "CrypticPlasma"),
-			Updates.set("last_updated", Instant.now().minus(6, ChronoUnit.DAYS).toEpochMilli())
-		);
-		FindIterable<Document> response = lbCollection.find();
-
-		int count = 0;
-		for (Document document : response) {
-			long lastUpdated;
-			try {
-				lastUpdated = Long.parseLong(document.getString("last_updated"));
-			} catch (Exception e) {
-				continue;
-			}
-			lbCollection.updateOne(Filters.eq("uuid", document.getString("uuid")), Updates.set("last_updated", lastUpdated));
-			count++;
-
-			if (count % 500 == 0) {
-				System.out.println(count);
-			}
-		}
 	}
 
 	public void updateLeaderboard() {
