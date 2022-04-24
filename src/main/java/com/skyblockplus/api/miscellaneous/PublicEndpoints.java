@@ -95,20 +95,20 @@ public class PublicEndpoints {
 
 	@GetMapping("/get/sbg/data")
 	public ResponseEntity<?> getSbgEventData() {
-		if(guildMap.containsKey("602137436490956820")) {
+		if (guildMap.containsKey("602137436490956820")) {
 			return new ResponseEntity<>(guildMap.get("602137436490956820").eventMemberList, HttpStatus.OK);
-		}else{
+		} else {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	@GetMapping("/get/sbg/last-updated")
 	public ResponseEntity<?> getSbgEventLastUpdate() {
-		if(guildMap.containsKey("602137436490956820")) {
+		if (guildMap.containsKey("602137436490956820")) {
 			Instant lastUpdated = guildMap.get("602137436490956820").eventMemberListLastUpdated;
 			return new ResponseEntity<>(Maps.of("last_updated", lastUpdated == null ? -1 : lastUpdated.toEpochMilli()), HttpStatus.OK);
-		}else{
-				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-			}
+		} else {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 }
