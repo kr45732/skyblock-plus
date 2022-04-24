@@ -87,7 +87,7 @@ public class LeaderboardDatabase {
 		dataSource = new MongoClient(new MongoClientURI(LEADERBOARD_DB_URL));
 
 		if (isMainBot()) {
-			scheduler.scheduleWithFixedDelay(this::updateLeaderboard, 1, 1, TimeUnit.MINUTES);
+			scheduler.scheduleAtFixedRate(this::updateLeaderboard, 1, 1, TimeUnit.MINUTES);
 		}
 	}
 
