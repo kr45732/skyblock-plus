@@ -40,7 +40,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
 import org.apache.commons.collections4.ListUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -49,33 +48,33 @@ import org.slf4j.LoggerFactory;
 
 public class LeaderboardDatabase {
 
-    public static final List<String> types = ListUtils.union(
-        List.of(
-            "username",
-            "uuid",
-            "slayer",
-            "skills",
-            "catacombs",
-            "weight",
-            "sven",
-            "rev",
-            "tara",
-            "enderman",
-            "alchemy",
-            "combat",
-            "fishing",
-            "farming",
-            "foraging",
-            "carpentry",
-            "mining",
-            "taming",
-            "enchanting",
-            "networth",
-            "blaze"
-        ),
-        COLLECTION_NAME_TO_ID.keySet().stream().toList()
-    );
-    private static final Logger log = LoggerFactory.getLogger(LeaderboardDatabase.class);
+	public static final List<String> types = ListUtils.union(
+		List.of(
+			"username",
+			"uuid",
+			"slayer",
+			"skills",
+			"catacombs",
+			"weight",
+			"sven",
+			"rev",
+			"tara",
+			"enderman",
+			"alchemy",
+			"combat",
+			"fishing",
+			"farming",
+			"foraging",
+			"carpentry",
+			"mining",
+			"taming",
+			"enchanting",
+			"networth",
+			"blaze"
+		),
+		COLLECTION_NAME_TO_ID.keySet().stream().toList()
+	);
+	private static final Logger log = LoggerFactory.getLogger(LeaderboardDatabase.class);
 
 	private final MongoClient dataSource;
 	private final List<Player.Gamemode> leaderboardGamemodes = Arrays.asList(
@@ -186,7 +185,10 @@ public class LeaderboardDatabase {
 
 	public void a() {
 		MongoCollection<Document> lbCollection = getConnection().getCollection("all_lb");
-		lbCollection.updateMany(Filters.ne("username", "CrypticPlasma"), Updates.set("last_updated", Instant.now().minus(6, ChronoUnit.DAYS).toEpochMilli()));
+		lbCollection.updateMany(
+			Filters.ne("username", "CrypticPlasma"),
+			Updates.set("last_updated", Instant.now().minus(6, ChronoUnit.DAYS).toEpochMilli())
+		);
 		FindIterable<Document> response = lbCollection.find();
 
 		int count = 0;
@@ -302,22 +304,22 @@ public class LeaderboardDatabase {
 	public static List<String> getTypes(boolean formatted) {
 		List<String> typesSubList = types.subList(2, types.size());
 		return formatted
-				? typesSubList.stream().map(t -> capitalizeString(t.replace("_", " "))).collect(Collectors.toList())
-				: typesSubList;
+			? typesSubList.stream().map(t -> capitalizeString(t.replace("_", " "))).collect(Collectors.toList())
+			: typesSubList;
 	}
 
-	public static String getType(String lbType){
+	public static String getType(String lbType) {
 		lbType =
-				switch (lbType = lbType.replace(" ", "_").toLowerCase()) {
-					case "nw" -> "networth";
-					case "wolf" -> "sven";
-					case "spider" -> "tara";
-					case "zombie" -> "rev";
-					case "eman" -> "enderman";
-					default -> lbType;
-				};
+			switch (lbType = lbType.replace(" ", "_").toLowerCase()) {
+				case "nw" -> "networth";
+				case "wolf" -> "sven";
+				case "spider" -> "tara";
+				case "zombie" -> "rev";
+				case "eman" -> "enderman";
+				default -> lbType;
+			};
 
-		if(!isValidType(lbType)){
+		if (!isValidType(lbType)) {
 			lbType = getClosestMatch(lbType, getTypes());
 		}
 

@@ -22,13 +22,12 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.skyblockplus.utils.Player;
+import com.skyblockplus.utils.database.LeaderboardDatabase;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import com.skyblockplus.utils.database.LeaderboardDatabase;
 
 public class HypixelGuildCache {
 
@@ -45,7 +44,11 @@ public class HypixelGuildCache {
 	}
 
 	public static int typeToIndex(String type) {
-		return IntStream.range(0, LeaderboardDatabase.types.size()).filter(i -> LeaderboardDatabase.types.get(i).equals(type)).findFirst().orElse(-1);
+		return IntStream
+			.range(0, LeaderboardDatabase.types.size())
+			.filter(i -> LeaderboardDatabase.types.get(i).equals(type))
+			.findFirst()
+			.orElse(-1);
 	}
 
 	public static String getStringFromCache(String cache, String type) {
@@ -93,7 +96,8 @@ public class HypixelGuildCache {
 			"=:=" +
 			player.getUuid() +
 			"=:=" +
-			LeaderboardDatabase.getTypes()
+			LeaderboardDatabase
+				.getTypes()
 				.stream()
 				.map(type ->
 					"" +
@@ -158,5 +162,4 @@ public class HypixelGuildCache {
 
 		return new SkillsStruct(skill, level, maxLevel, skillExp, xpCurrent, xpForNext, progress);
 	}
-
 }
