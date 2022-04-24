@@ -168,6 +168,8 @@ public class Main {
 				60,
 				TimeUnit.SECONDS
 			); // Sorry for the war crimes
+
+			scheduler.schedule(ApiHandler::updateBotStatistics, 90, TimeUnit.SECONDS);
 		}
 	}
 
