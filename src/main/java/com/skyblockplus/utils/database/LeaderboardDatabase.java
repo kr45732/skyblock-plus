@@ -192,7 +192,7 @@ public class LeaderboardDatabase {
 				.limit(180);
 			int count = 0;
 			for (Document document : response) {
-				if(count == 90){
+				if (count == 90) {
 					break;
 				}
 
