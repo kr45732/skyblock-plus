@@ -23,39 +23,41 @@ import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.skyblockplus.utils.Player;
-import org.apache.commons.collections4.ListUtils;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.apache.commons.collections4.ListUtils;
 
 public class HypixelGuildCache {
 
-	public static final List<String> types = ListUtils.union(List.of(
-		"username",
-		"uuid",
-		"slayer",
-		"skills",
-		"catacombs",
-		"weight",
-		"sven",
-		"rev",
-		"tara",
-		"enderman",
-		"alchemy",
-		"combat",
-		"fishing",
-		"farming",
-		"foraging",
-		"carpentry",
-		"mining",
-		"taming",
-		"enchanting",
-		"networth",
-		"blaze"
-	), COLLECTION_NAME_TO_ID.keySet().stream().toList());
+	public static final List<String> types = ListUtils.union(
+		List.of(
+			"username",
+			"uuid",
+			"slayer",
+			"skills",
+			"catacombs",
+			"weight",
+			"sven",
+			"rev",
+			"tara",
+			"enderman",
+			"alchemy",
+			"combat",
+			"fishing",
+			"farming",
+			"foraging",
+			"carpentry",
+			"mining",
+			"taming",
+			"enchanting",
+			"networth",
+			"blaze"
+		),
+		COLLECTION_NAME_TO_ID.keySet().stream().toList()
+	);
 	private final List<String> normalCache;
 	private final List<String> ironmanCache;
 	private final List<String> strandedCache;

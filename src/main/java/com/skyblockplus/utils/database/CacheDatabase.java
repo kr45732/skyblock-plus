@@ -18,6 +18,8 @@
 
 package com.skyblockplus.utils.database;
 
+import static com.skyblockplus.utils.Utils.*;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -29,9 +31,6 @@ import com.skyblockplus.price.AuctionTracker;
 import com.skyblockplus.utils.structs.UsernameUuidStruct;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.lang.reflect.Type;
 import java.sql.*;
 import java.time.Duration;
@@ -41,8 +40,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static com.skyblockplus.utils.Utils.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CacheDatabase {
 

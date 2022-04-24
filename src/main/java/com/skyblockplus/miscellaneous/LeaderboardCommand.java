@@ -18,6 +18,10 @@
 
 package com.skyblockplus.miscellaneous;
 
+import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
+import static com.skyblockplus.utils.Utils.*;
+import static com.skyblockplus.utils.structs.HypixelGuildCache.isValidType;
+
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
@@ -25,14 +29,9 @@ import com.skyblockplus.utils.command.CommandExecute;
 import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.PaginatorExtras;
+import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
-
-import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
-import static com.skyblockplus.utils.Utils.*;
-import static com.skyblockplus.utils.structs.HypixelGuildCache.isValidType;
 
 @Component
 public class LeaderboardCommand extends Command {
@@ -78,7 +77,7 @@ public class LeaderboardCommand extends Command {
 				playerRank = rank;
 				amt = formattedAmt;
 			}
-			rank ++;
+			rank++;
 		}
 		page = page == -1 ? ((playerRank - 1) / 20 + 1) : page;
 
