@@ -106,7 +106,7 @@ dependencies {
     implementation 'org.eclipse.jgit:org.eclipse.jgit:6.1.0.202203080745-r'
 
     // JS script engine
-    implementation 'org.openjdk.nashorn:nashorn-core:15.3'
+    implementation 'org.openjdk.nashorn:nashorn-core:15.4'
 
     // Caching
     implementation 'com.github.ben-manes.caffeine:caffeine:3.0.6'
