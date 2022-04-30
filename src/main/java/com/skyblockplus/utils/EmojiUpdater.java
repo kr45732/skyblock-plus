@@ -59,10 +59,19 @@ public class EmojiUpdater {
 
 	public static JsonObject processAll() {
 		try {
+			if(!new File("src/main/java/com/skyblockplus/json/glint_images").exists()){
+				throw new FileNotFoundException("Unable to get glint images folder");
+			}
 			JsonArray sbItems = getSkyblockItemsJson();
 			Set<String> allSbItems = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json")
 				.getAsJsonObject()
 				.keySet();
+			Set<String> added = JsonParser
+					.parseReader(new FileReader("src/main/java/com/skyblockplus/json/IdToEmojiMappings.json"))
+					.getAsJsonObject()
+					.keySet();
+			allSbItems.removeIf(added::contains);
+			System.out.println(makeHastePost(gson.toJsonTree(allSbItems)));
 			JsonObject out = new JsonObject();
 			File skyCryptFiles = new File("src/main/java/com/skyblockplus/json/skycrypt_images");
 			if (!skyCryptFiles.exists()) {
@@ -105,11 +114,14 @@ public class EmojiUpdater {
 			System.out.println("Finished processing SkyCrypt heads");
 
 			// Gets all images from resource pack
-			JsonObject processedImages = processDir(new File("src/main/java/com/skyblockplus/json/cit"));
-			for (Map.Entry<String, JsonElement> entry : processedImages.entrySet()) {
-				if (allSbItems.contains(entry.getKey()) && !out.has(entry.getKey())) {
-					out.add(entry.getKey(), entry.getValue());
-					allSbItems.remove(entry.getKey());
+			File citFolder = new File("src/main/java/com/skyblockplus/json/cit");
+			if(citFolder.exists()) {
+				JsonObject processedImages = processDir(citFolder);
+				for (Map.Entry<String, JsonElement> entry : processedImages.entrySet()) {
+					if (allSbItems.contains(entry.getKey()) && !out.has(entry.getKey())) {
+						out.add(entry.getKey(), entry.getValue());
+						allSbItems.remove(entry.getKey());
+					}
 				}
 			}
 
@@ -162,7 +174,7 @@ public class EmojiUpdater {
 			}
 			System.out.println("Finished processing SkyCrypt items");
 
-			processEnchantedEmojis("https://hst.sh/raw/ponicuqufo");
+			processEnchantedEmojis("https://hst.sh/raw/uwikatafin");
 			processCompressedImages();
 			File enchantedImagesDir = new File("src/main/java/com/skyblockplus/json/enchanted_images");
 			File compressedImagesDir = new File("src/main/java/com/skyblockplus/json/compressed_images");
@@ -173,7 +185,19 @@ public class EmojiUpdater {
 				out.addProperty(file.getName().replace(".gif", ""), file.getPath());
 			}
 
-			return out;
+			JsonObject outSplit = new JsonObject();
+			JsonObject reg = new JsonObject();
+			JsonObject ench = new JsonObject();
+			for (Map.Entry<String, JsonElement> entry : out.entrySet()) {
+				if(entry.getValue().getAsString().endsWith(".gif")){
+					ench.add(entry.getKey(), entry.getValue());
+				}else{
+					reg.add(entry.getKey(), entry.getValue());
+				}
+			}
+			outSplit.add("regular", reg);
+			outSplit.add("enchanted", ench);
+			return outSplit;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -403,12 +427,12 @@ public class EmojiUpdater {
 						return false;
 					}
 				})
-				.filter(g -> g.getEmotes().size() < g.getMaxEmotes() * 2)
+				.filter(g -> g.getEmotes().size() < g.getMaxEmotes()) // *2 if enchanted
 				.sorted(Comparator.comparingInt(g -> Integer.parseInt(g.getName().split("Skyblock Plus - Emoji Server ")[1])))
 				.collect(Collectors.toList());
 
 			int guildCount = 0;
-			for (Map.Entry<String, JsonElement> entry : enchItems.entrySet()) { // Regular or enchanted
+			for (Map.Entry<String, JsonElement> entry : regItems.entrySet()) { // Regular or enchanted
 				try {
 					last = entry.toString();
 					String name = idToName(entry.getKey())
@@ -418,7 +442,7 @@ public class EmojiUpdater {
 						.replace("-", "_")
 						.replace("+", "plus")
 						.replace("&", "and")
-						.replaceAll("[™./()#'⸕❁✧❈☘✎❤]", "")
+						.replaceAll("[™./()#'⸕❁✧❈☘✎❤❂]", "")
 						.replace("colossal_experience_bottle_upgrade", "colossal_exp_bottle_upgrade")
 						.replace("very_official_yellow_rock_of_love!", "official_yellow_rock_of_love")
 						.replace("exceedingly_rare_ender_artifact_upgrader", "ender_artifact_upgrader")
@@ -430,9 +454,15 @@ public class EmojiUpdater {
 						.replace("starred_shadow_assassin_chestplate", "star_shadow_assassin_chestplate")
 						.replace("travel_scroll_to_the_crystal_hollows", "travel_scroll_crystal_hollows")
 						.replace("travel_scroll_to_the_dwarven_forge", "travel_scroll_dwarven_forge");
+					name = switch (name = name.startsWith("_") ? name.substring(1) : name) {
+						case "x" -> "xx";
+						case "y" -> "yy";
+						case "z" -> "zz";
+						default -> name;
+					};
 
 					Guild curGuild = guildList.get(guildCount);
-					if (curGuild.getEmotes().size() >= curGuild.getMaxEmotes() * 2) {
+					if (curGuild.getEmotes().size() >= curGuild.getMaxEmotes()) { // *2 if enchanted
 						guildCount++;
 						curGuild = guildList.get(guildCount);
 						TimeUnit.SECONDS.sleep(5);

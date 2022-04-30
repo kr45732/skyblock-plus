@@ -44,7 +44,6 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.exceptions.PermissionException;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
@@ -601,7 +600,7 @@ public class ApplyUser implements Serializable {
 								waitInviteChannel =
 									jda.getTextChannelById(higherDepth(currentSettings, "applyWaitingChannel").getAsString());
 							} catch (Exception ignored) {}
-							eb = defaultEmbed("Application waitlisted");
+							eb = defaultEmbed("Application Waitlisted");
 							eb.setDescription(higherDepth(currentSettings, "applyWaitlistMessage").getAsString());
 
 							action = applicationChannel.sendMessage(applyingUser.getAsMention()).setEmbeds(eb.build());

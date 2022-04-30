@@ -53,11 +53,11 @@ public class InformationCommand extends Command {
 						jda.getGuildCache().size() +
 						"\n**Users:** " +
 						formatNumber(getUserCount()) +
-						"\n**Average Ping:** " +
+						"\n**Avg Ping:** " +
 						roundAndFormat(
 							jda.getShardCache().stream().map(s -> s.getRestPing().complete()).mapToLong(i -> i).average().orElse(0.0)
 						) +
-						"ms\n**Average Websocket:** " +
+						"ms\n**Avg Websocket:** " +
 						roundAndFormat(jda.getAverageGatewayPing()) +
 						"ms",
 						true

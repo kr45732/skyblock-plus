@@ -182,6 +182,29 @@ public class LeaderboardDatabase {
 		return null;
 	}
 
+	public int getNetworthPosition(String uuid) {
+		try {
+			MongoCollection<Document> lbCollection = getConnection().getCollection("all_lb");
+			FindIterable<Document> response = lbCollection
+					.find()
+					.projection(Projections.include("uuid", "networth"))
+					.sort(Sorts.descending("networth"));
+
+			int position = 1;
+			for (Document document : response) {
+				try {
+					if(document.getString("uuid").equals(uuid)) {
+						return position;
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				position ++;
+			}
+		} catch (Exception ignored) {}
+		return -1;
+	}
+
 	public void updateLeaderboard() {
 		try {
 			long start = System.currentTimeMillis();

@@ -133,14 +133,15 @@ public class CalcSlayerCommand extends Command {
 
 				int level = getIntOption("level");
 				int xp = getIntOption("xp");
-				String type = getStringOption("type", "").toLowerCase();
 
-				if (args.length == 3 || args.length == 2 || args.length == 1) {
-					if (getMentionedUsername(args.length == 1 ? -1 : 1)) {
+				if (args.length == 4 || args.length == 3 || args.length == 2) {
+					String type = args[1].toLowerCase();
+
+					if (getMentionedUsername(args.length == 2 ? -1 : 2)) {
 						return;
 					}
 
-					embed(getCalcSlayer(player, args.length == 3 ? args[2] : null, type, level, xp));
+					embed(getCalcSlayer(player, args.length == 4 ? args[3] : null, type, level, xp));
 					return;
 				}
 

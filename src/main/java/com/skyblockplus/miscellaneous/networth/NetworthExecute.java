@@ -19,13 +19,13 @@
 package com.skyblockplus.miscellaneous.networth;
 
 import static com.skyblockplus.utils.ApiHandler.getAuctionPetsByName;
+import static com.skyblockplus.utils.ApiHandler.leaderboardDatabase;
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
@@ -40,7 +40,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 public class NetworthExecute {
 
-	private final Set<String> tempSet = new HashSet<>();
+//	private final Set<String> tempSet = new HashSet<>();
 	private final List<InvItem> invPets = new ArrayList<>();
 	private final List<InvItem> petsPets = new ArrayList<>();
 	private final List<InvItem> enderChestPets = new ArrayList<>();
@@ -366,8 +366,8 @@ public class NetworthExecute {
 			}
 
 			double totalNetworth = getTotalCalculatedNetworth();
-
-			eb.setDescription("**Total Networth:** " + simplifyNumber(totalNetworth) + " (" + formatNumber(totalNetworth) + ")");
+			int position = leaderboardDatabase.getNetworthPosition(player.getUuid());
+			eb.setDescription("**Total Networth:** " + simplifyNumber(totalNetworth) + " (" + formatNumber(totalNetworth) + ")\n**Leaderboard Position:** " + ( position != -1 ? formatNumber(position) : "Not on leaderboard"));
 			eb.addField("Purse", simplifyNumber(purseCoins), true);
 			eb.addField("Bank", (bankBalance == -1 ? "Private" : simplifyNumber(bankBalance)), true);
 			eb.addField("Sacks", simplifyNumber(sacksTotal), true);
@@ -401,12 +401,12 @@ public class NetworthExecute {
 			}
 			eb.addField("Bug in the calculations?", "[Please submit a bug report here!](https://forms.gle/RBmN2AFBLafGyx5E7)", false);
 
-			JsonArray missing = collectJsonArray(
-				tempSet.stream().filter(str -> !str.toLowerCase().startsWith("rune_")).map(JsonPrimitive::new)
-			);
-			//			if (!missing.isEmpty()) {
-			//				System.out.println(missing);
-			//			}
+//			JsonArray missing = collectJsonArray(
+//				tempSet.stream().filter(str -> !str.toLowerCase().startsWith("rune_")).map(JsonPrimitive::new)
+//			);
+//			if (!missing.isEmpty()) {
+//				System.out.println(missing);
+//			}
 
 			if (verbose) {
 				try {
@@ -1165,7 +1165,7 @@ public class NetworthExecute {
 			}
 		}
 
-		tempSet.add(enchantId);
+//		tempSet.add(enchantId);
 		return 0;
 	}
 
@@ -1254,7 +1254,7 @@ public class NetworthExecute {
 			} catch (Exception ignored) {}
 		}
 
-		tempSet.add(itemId + " - " + iName);
+//		tempSet.add(itemId + " - " + iName);
 		return 0;
 	}
 
