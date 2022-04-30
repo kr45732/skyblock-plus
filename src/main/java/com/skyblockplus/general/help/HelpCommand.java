@@ -177,7 +177,7 @@ public class HelpCommand extends Command {
 				new HelpData(
 					"guild-leaderboard",
 					"Get a leaderboard for a player's guild. The type can be slayer, skills, catacombs, weight, sven, rev, tara, enderman, alchemy, combat, fishing, farming, foraging, carpentry, mining, taming, and enchanting. The mode can be all, ironman, or stranded. A Hypixel API key must be set in settings set hypixel_key <key>.",
-					"guild-leaderboard <type> [player] [mode:all|ironman|stranded] [page:page] [rank"
+					"guild-leaderboard <type> [player] [mode:all|ironman|stranded]"
 				)
 					.addSecondData("Get a leaderboard for a guild.", "guild-leaderboard <type> <g:guild_name> [mode:all|ironman|stranded]")
 					.addAliases("g-lb")
@@ -383,7 +383,7 @@ public class HelpCommand extends Command {
 					"Get a global leaderboard. The type can be " +
 					String.join(", ", getTypes()) +
 					". The mode can be all, ironman, or stranded.",
-					"leaderboard <type> [player]"
+					"leaderboard <type> [player] [page:page] [rank:rank] [amount:amount]"
 				)
 					.addAliases("lb")
 					.setCategory("miscellaneous"),
@@ -912,7 +912,7 @@ public class HelpCommand extends Command {
 			help.create("jacob [crop]", "Get the upcoming contests and their crops") +
 			help.create("mayor", "Get information about the current mayor or the running election") +
 			help.create("bingo [player]", "Get the current bingo goals and a player's bingo card") +
-			help.create("leaderboard <type> [player]", "Get a global leaderboard") +
+			help.create("leaderboard <type> [player] [page:page] [rank:rank] [amount:amount]", "Get a global leaderboard") +
 			help.create("skyblock [player] [profile]", "Get an overview of a player's Skyblock statistics") +
 			help.create("recipe <item>", "Get the crafting recipe of an item") +
 			help.create("check-api [player]", "Check which Skyblock APIs a player has enabled or disabled") +
