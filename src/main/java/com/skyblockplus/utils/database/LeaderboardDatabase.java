@@ -186,20 +186,20 @@ public class LeaderboardDatabase {
 		try {
 			MongoCollection<Document> lbCollection = getConnection().getCollection("all_lb");
 			FindIterable<Document> response = lbCollection
-					.find()
-					.projection(Projections.include("uuid", "networth"))
-					.sort(Sorts.descending("networth"));
+				.find()
+				.projection(Projections.include("uuid", "networth"))
+				.sort(Sorts.descending("networth"));
 
 			int position = 1;
 			for (Document document : response) {
 				try {
-					if(document.getString("uuid").equals(uuid)) {
+					if (document.getString("uuid").equals(uuid)) {
 						return position;
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				position ++;
+				position++;
 			}
 		} catch (Exception ignored) {}
 		return -1;

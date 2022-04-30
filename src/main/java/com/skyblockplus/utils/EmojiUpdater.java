@@ -59,7 +59,7 @@ public class EmojiUpdater {
 
 	public static JsonObject processAll() {
 		try {
-			if(!new File("src/main/java/com/skyblockplus/json/glint_images").exists()){
+			if (!new File("src/main/java/com/skyblockplus/json/glint_images").exists()) {
 				throw new FileNotFoundException("Unable to get glint images folder");
 			}
 			JsonArray sbItems = getSkyblockItemsJson();
@@ -67,9 +67,9 @@ public class EmojiUpdater {
 				.getAsJsonObject()
 				.keySet();
 			Set<String> added = JsonParser
-					.parseReader(new FileReader("src/main/java/com/skyblockplus/json/IdToEmojiMappings.json"))
-					.getAsJsonObject()
-					.keySet();
+				.parseReader(new FileReader("src/main/java/com/skyblockplus/json/IdToEmojiMappings.json"))
+				.getAsJsonObject()
+				.keySet();
 			allSbItems.removeIf(added::contains);
 			System.out.println(makeHastePost(gson.toJsonTree(allSbItems)));
 			JsonObject out = new JsonObject();
@@ -115,7 +115,7 @@ public class EmojiUpdater {
 
 			// Gets all images from resource pack
 			File citFolder = new File("src/main/java/com/skyblockplus/json/cit");
-			if(citFolder.exists()) {
+			if (citFolder.exists()) {
 				JsonObject processedImages = processDir(citFolder);
 				for (Map.Entry<String, JsonElement> entry : processedImages.entrySet()) {
 					if (allSbItems.contains(entry.getKey()) && !out.has(entry.getKey())) {
@@ -189,9 +189,9 @@ public class EmojiUpdater {
 			JsonObject reg = new JsonObject();
 			JsonObject ench = new JsonObject();
 			for (Map.Entry<String, JsonElement> entry : out.entrySet()) {
-				if(entry.getValue().getAsString().endsWith(".gif")){
+				if (entry.getValue().getAsString().endsWith(".gif")) {
 					ench.add(entry.getKey(), entry.getValue());
-				}else{
+				} else {
 					reg.add(entry.getKey(), entry.getValue());
 				}
 			}
@@ -454,12 +454,13 @@ public class EmojiUpdater {
 						.replace("starred_shadow_assassin_chestplate", "star_shadow_assassin_chestplate")
 						.replace("travel_scroll_to_the_crystal_hollows", "travel_scroll_crystal_hollows")
 						.replace("travel_scroll_to_the_dwarven_forge", "travel_scroll_dwarven_forge");
-					name = switch (name = name.startsWith("_") ? name.substring(1) : name) {
-						case "x" -> "xx";
-						case "y" -> "yy";
-						case "z" -> "zz";
-						default -> name;
-					};
+					name =
+						switch (name = name.startsWith("_") ? name.substring(1) : name) {
+							case "x" -> "xx";
+							case "y" -> "yy";
+							case "z" -> "zz";
+							default -> name;
+						};
 
 					Guild curGuild = guildList.get(guildCount);
 					if (curGuild.getEmotes().size() >= curGuild.getMaxEmotes()) { // *2 if enchanted

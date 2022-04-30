@@ -189,7 +189,7 @@ public class EventHandler {
 						":R>\nLegendary pet: " +
 						getEmoji(pets[zooIndex + 1]) +
 						" " +
-								capitalizeString(pets[zooIndex+1].split(";")[0])
+						capitalizeString(pets[zooIndex + 1].split(";")[0])
 					)
 					.build()
 			);
@@ -206,7 +206,7 @@ public class EventHandler {
 						":R>\nLegendary pet: " +
 						getEmoji(pets[zooIndex + 1]) +
 						" " +
-								capitalizeString(pets[zooIndex+1].split(";")[0])
+						capitalizeString(pets[zooIndex + 1].split(";")[0])
 					)
 					.build()
 			);
