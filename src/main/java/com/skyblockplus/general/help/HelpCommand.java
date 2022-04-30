@@ -177,7 +177,7 @@ public class HelpCommand extends Command {
 				new HelpData(
 					"guild-leaderboard",
 					"Get a leaderboard for a player's guild. The type can be slayer, skills, catacombs, weight, sven, rev, tara, enderman, alchemy, combat, fishing, farming, foraging, carpentry, mining, taming, and enchanting. The mode can be all, ironman, or stranded. A Hypixel API key must be set in settings set hypixel_key <key>.",
-					"guild-leaderboard <type> [player] [mode:all|ironman|stranded]"
+					"guild-leaderboard <type> [player] [mode:all|ironman|stranded] [page:page] [rank"
 				)
 					.addSecondData("Get a leaderboard for a guild.", "guild-leaderboard <type> <g:guild_name> [mode:all|ironman|stranded]")
 					.addAliases("g-lb")

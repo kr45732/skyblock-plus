@@ -44,7 +44,7 @@ public class LeaderboardCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	public static EmbedBuilder getLeaderboard(String lbType, String username, Player.Gamemode gamemode, int page, PaginatorEvent event) {
+	public static EmbedBuilder getLeaderboard(String lbType, String username, Player.Gamemode gamemode, int page, int rank, double amount, PaginatorEvent event) {
 		lbType = getType(lbType);
 
 		if (!isValidType(lbType)) {
@@ -60,19 +60,33 @@ public class LeaderboardCommand extends Command {
 		Map<String, Double> cacheList = leaderboardDatabase.getLeaderboard(lbType, gamemode);
 
 		int playerRank = -1;
+		double closestAmt = -1;
+		int idx = 1;
 		String amt = "Not on leaderboard";
-		int rank = 1;
+		int curRank = 1;
 		for (Map.Entry<String, Double> entry : cacheList.entrySet()) {
-			String formattedAmt = roundAndFormat(lbType.equals("networth") ? entry.getValue().longValue() : entry.getValue());
-			paginateBuilder.addItems("`" + (rank) + ")` " + fixUsername(entry.getKey()) + ": " + formattedAmt);
+			double curAmount = lbType.equals("networth") ? entry.getValue().longValue() : entry.getValue();
+			String formattedAmt = roundAndFormat(curAmount);
+			paginateBuilder.addItems("`" + (curRank) + ")` " + fixUsername(entry.getKey()) + ": " + formattedAmt);
 
 			if (entry.getKey().equals(player.getUsername())) {
-				playerRank = rank;
+				playerRank = curRank;
 				amt = formattedAmt;
 			}
-			rank++;
+
+			if(amount != -1 && (closestAmt == -1 || Math.abs(curAmount - amount) < closestAmt)){
+				closestAmt = Math.abs(curAmount - amount);
+				idx = curRank;
+			}
+			curRank++;
 		}
-		page = page == -1 ? ((playerRank - 1) / 20 + 1) : page;
+		if(rank != -1){
+			page = (rank - 1) / 20 + 1;
+		}else if(amount != -1){
+			page = (idx - 1) / 20 + 1;
+		}else if(page == -1){
+			page = (playerRank - 1) / 20 + 1;
+		}
 
 		String ebStr =
 			"**Player:** " +
@@ -104,12 +118,15 @@ public class LeaderboardCommand extends Command {
 
 				Player.Gamemode gamemode = getGamemodeOption("mode", Player.Gamemode.ALL);
 				int page = getIntOption("page", -1);
+				int rank = getIntOption("rank", -1);
+				double amount = getDoubleOption("amount", -1);
+
 				if (args.length == 3 || args.length == 2) {
 					if (getMentionedUsername(args.length == 2 ? -1 : 2)) {
 						return;
 					}
 
-					paginate(getLeaderboard(args[1], player, gamemode, page, new PaginatorEvent(event)));
+					paginate(getLeaderboard(args[1], player, gamemode, page, rank, amount, new PaginatorEvent(event)));
 					return;
 				}
 

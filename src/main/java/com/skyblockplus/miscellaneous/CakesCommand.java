@@ -75,7 +75,7 @@ public class CakesCommand extends Command {
 					}
 				}
 			}
-			eb.addField("Active Cakes", activeCakes.length() > 0 ? activeCakes.toString() : "None", false);
+			eb.appendDescription("**Active Cakes**\n" + (activeCakes.length() > 0 ? activeCakes.toString() : "None\n"));
 
 			StringBuilder missingCakesStr = new StringBuilder();
 			for (Map.Entry<String, String> missingCake : cakeNameToId.entrySet()) {
@@ -85,7 +85,7 @@ public class CakesCommand extends Command {
 					.append(capitalizeString(missingCake.getKey().split("cake_")[1].replace("_", " ")))
 					.append(" Cake\n");
 			}
-			eb.addField("Inactive Cakes", missingCakesStr.length() > 0 ? missingCakesStr.toString() : "None", false);
+			eb.appendDescription("\n**Inactive Cakes**\n" + (missingCakesStr.length() > 0 ? missingCakesStr.toString() : "None"));
 
 			return eb;
 		}
