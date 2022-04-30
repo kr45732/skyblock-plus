@@ -44,7 +44,15 @@ public class LeaderboardCommand extends Command {
 		this.botPermissions = defaultPerms();
 	}
 
-	public static EmbedBuilder getLeaderboard(String lbType, String username, Player.Gamemode gamemode, int page, int rank, double amount, PaginatorEvent event) {
+	public static EmbedBuilder getLeaderboard(
+		String lbType,
+		String username,
+		Player.Gamemode gamemode,
+		int page,
+		int rank,
+		double amount,
+		PaginatorEvent event
+	) {
 		lbType = getType(lbType);
 
 		if (!isValidType(lbType)) {
@@ -74,17 +82,17 @@ public class LeaderboardCommand extends Command {
 				amt = formattedAmt;
 			}
 
-			if(amount != -1 && (closestAmt == -1 || Math.abs(curAmount - amount) < closestAmt)){
+			if (amount != -1 && (closestAmt == -1 || Math.abs(curAmount - amount) < closestAmt)) {
 				closestAmt = Math.abs(curAmount - amount);
 				idx = curRank;
 			}
 			curRank++;
 		}
-		if(rank != -1){
+		if (rank != -1) {
 			page = (rank - 1) / 20 + 1;
-		}else if(amount != -1){
+		} else if (amount != -1) {
 			page = (idx - 1) / 20 + 1;
-		}else if(page == -1){
+		} else if (page == -1) {
 			page = (playerRank - 1) / 20 + 1;
 		}
 

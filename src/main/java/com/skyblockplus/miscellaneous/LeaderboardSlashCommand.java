@@ -51,8 +51,8 @@ public class LeaderboardSlashCommand extends SlashCommand {
 				event.player,
 				Player.Gamemode.of(event.getOptionStr("gamemode", "all")),
 				event.getOptionInt("page", -1),
-					event.getOptionInt("rank", -1),
-					event.getOptionDouble("amount", -1),
+				event.getOptionInt("rank", -1),
+				event.getOptionDouble("amount", -1),
 				new PaginatorEvent(event)
 			)
 		);
@@ -71,7 +71,7 @@ public class LeaderboardSlashCommand extends SlashCommand {
 					.addChoice("Stranded", "stranded"),
 				new OptionData(OptionType.INTEGER, "page", "Page number").setMinValue(1),
 				new OptionData(OptionType.INTEGER, "rank", "Rank number").setMinValue(1),
-					new OptionData(OptionType.NUMBER, "amount", "Amount value").setMinValue(0)
+				new OptionData(OptionType.NUMBER, "amount", "Amount value").setMinValue(0)
 			);
 	}
 
