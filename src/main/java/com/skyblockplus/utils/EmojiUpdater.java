@@ -48,13 +48,20 @@ public class EmojiUpdater {
 
 	public static JsonObject idToEmoji = new JsonObject();
 
-	public static JsonElement getMissing(String url) {
-		Set<String> processedItemsSet = getJson(url).getAsJsonObject().keySet();
-		Set<String> allItems = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json")
-			.getAsJsonObject()
-			.keySet();
-		allItems.removeIf(processedItemsSet::contains);
-		return gson.toJsonTree(allItems);
+	public static JsonElement getMissing(String... url) {
+		try {
+			Set<String> processedItemsSet = (url.length == 0 ? JsonParser
+					.parseReader(new FileReader("src/main/java/com/skyblockplus/json/IdToEmojiMappings.json"))
+					.getAsJsonObject() : getJson(url[0])).getAsJsonObject().keySet();
+			Set<String> allItems = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json")
+					.getAsJsonObject()
+					.keySet();
+			allItems.removeIf(processedItemsSet::contains);
+			return gson.toJsonTree(allItems);
+		}catch (Exception e){
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	public static JsonObject processAll() {
@@ -71,7 +78,7 @@ public class EmojiUpdater {
 				.getAsJsonObject()
 				.keySet();
 			allSbItems.removeIf(added::contains);
-			System.out.println(makeHastePost(gson.toJsonTree(allSbItems)));
+
 			JsonObject out = new JsonObject();
 			File skyCryptFiles = new File("src/main/java/com/skyblockplus/json/skycrypt_images");
 			if (!skyCryptFiles.exists()) {
@@ -126,8 +133,14 @@ public class EmojiUpdater {
 			}
 
 			// Enchants and pets
-			File enchantedBook = new File(skyCryptFiles.getPath() + "/ENCHANTED_BOOK_COPY.png");
-			ImageIO.write(ImageIO.read(new URL("https://sky.shiiyu.moe/item/ENCHANTED_BOOK")), "png", enchantedBook);
+			File enchantedBook = new File(skyCryptFiles.getPath() + "/ENCHANTED_BOOK.png");
+			applyGlintOverlay(ImageIO.read(new URL("https://sky.shiiyu.moe/item/ENCHANTED_BOOK")), enchantedBook, Arrays
+					.stream(new File("src/main/java/com/skyblockplus/json/glint_images").listFiles())
+					.sorted(Comparator.comparing(File::getName))
+					.toList());
+			if(!out.has("ENCHANTED_BOOK")){
+				out.addProperty("ENCHANTED_BOOK", enchantedBook.getPath());
+			}
 			for (String sbItem : allSbItems) {
 				String split = sbItem.split(";")[0];
 				if (PET_NAMES.contains(split)) {
@@ -174,7 +187,7 @@ public class EmojiUpdater {
 			}
 			System.out.println("Finished processing SkyCrypt items");
 
-			processEnchantedEmojis("https://hst.sh/raw/uwikatafin");
+			processEnchantedEmojis("https://hst.sh/raw/ojejilowiw"); // Don't forget to change this!
 			processCompressedImages();
 			File enchantedImagesDir = new File("src/main/java/com/skyblockplus/json/enchanted_images");
 			File compressedImagesDir = new File("src/main/java/com/skyblockplus/json/compressed_images");
@@ -532,9 +545,6 @@ public class EmojiUpdater {
 		}
 	}
 
-	/**
-	 * @param url https://hst.sh/raw/ponicuqufo
-	 */
 	public static void processEnchantedEmojis(String url) throws IOException {
 		List<File> glintFiles = Arrays
 			.stream(new File("src/main/java/com/skyblockplus/json/glint_images").listFiles())
@@ -550,8 +560,12 @@ public class EmojiUpdater {
 
 		for (File inputFile : new File("src/main/java/com/skyblockplus/json/skycrypt_images")
 			.listFiles(f -> enchantList.contains(f.getName().replace(".png", "")))) {
-			BufferedImage inputImage = ImageIO.read(inputFile);
+			applyGlintOverlay(ImageIO.read(inputFile), new File(outputFileDir.getPath() + "/" + inputFile.getName().replace(".png", ".gif")), glintFiles);
+		}
+	}
 
+	public static void applyGlintOverlay( BufferedImage inputImage, File outFile, List<File> glintFiles){
+		try {
 			List<BufferedImage> frames = new ArrayList<>();
 			for (File glintFile : glintFiles) {
 				int inputHeight = inputImage.getHeight();
@@ -575,14 +589,15 @@ public class EmojiUpdater {
 				frames.add(outputImage);
 			}
 
-			File gifFile = new File(outputFileDir.getPath() + "/" + inputFile.getName().replace(".png", ".gif"));
-			try (ImageOutputStream output = new FileImageOutputStream(gifFile)) {
+			try (ImageOutputStream output = new FileImageOutputStream(outFile)) {
 				try (GifWriter writer = new GifWriter(output, frames.get(0).getType(), 70, true, true)) {
 					for (BufferedImage frame : frames) {
 						writer.writeToSequence(frame);
 					}
 				}
 			}
+		}catch (Exception e){
+			e.printStackTrace();
 		}
 	}
 

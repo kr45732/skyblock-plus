@@ -74,27 +74,22 @@ public class ApplyUser implements Serializable {
 
 	public ApplyUser(ButtonInteractionEvent event, JsonElement currentSettings, String playerUsername) {
 		try {
-			User applyingUser = event.getUser();
-			logCommand(event.getGuild(), applyingUser, "apply " + playerUsername);
+			logCommand(event.getGuild(), event.getUser(), "apply " + playerUsername);
 
-			JsonObject currentSettingsObj = currentSettings.getAsJsonObject();
-			currentSettingsObj.remove("applyUsersCache");
-			currentSettings = currentSettingsObj.getAsJsonObject();
-
-			this.applyingUserId = applyingUser.getId();
+			currentSettings.getAsJsonObject().remove("applyUsersCache");
+			this.applyingUserId = event.getUser().getId();
 			this.currentSettingsString = gson.toJson(currentSettings);
 			this.guildId = event.getGuild().getId();
 			this.playerUsername = playerUsername;
-
 			try {
 				this.logApplication = jda.getTextChannelById(higherDepth(currentSettings, "applyLogChannel").getAsString()) != null;
 			} catch (Exception ignored) {}
-
 			Category applyCategory = event.getGuild().getCategoryById(higherDepth(currentSettings, "applyCategory").getAsString());
+
 			if (applyCategory.getChannels().size() == 50) {
 				failCause =
 					client.getError() +
-					" Unable to create a new application due to the application category reaching 50/50 channels. Please report this to the server's staff.";
+					" Unable to create a new application since the application category has reached 50/50 channels. Please report this to the server's staff.";
 				return;
 			}
 
@@ -104,13 +99,12 @@ public class ApplyUser implements Serializable {
 				.addPermissionOverride(event.getGuild().getSelfMember(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND), null)
 				.addPermissionOverride(event.getMember(), EnumSet.of(Permission.VIEW_CHANNEL), null)
 				.addPermissionOverride(event.getGuild().getPublicRole(), null, EnumSet.of(Permission.VIEW_CHANNEL));
-
 			try {
 				for (JsonElement staffPingRole : higherDepth(currentSettings, "applyStaffRoles").getAsJsonArray()) {
 					applicationChannelAction =
 						applicationChannelAction.addPermissionOverride(
 							event.getGuild().getRoleById(staffPingRole.getAsString()),
-							EnumSet.of(Permission.VIEW_CHANNEL),
+							EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND),
 							null
 						);
 				}
@@ -123,7 +117,6 @@ public class ApplyUser implements Serializable {
 				failCause = client.getError() + " Missing permission: " + e.getPermission().getName();
 				return;
 			}
-
 			this.applicationChannelId = applicationChannel.getId();
 
 			Player player = new Player(playerUsername);
@@ -133,15 +126,14 @@ public class ApplyUser implements Serializable {
 			if (profileNames.length == 1) {
 				applicationChannel
 					.sendMessage(
-						applyingUser.getAsMention() +
+							event.getUser().getAsMention() +
 						" this is your application for " +
 						capitalizeString(higherDepth(currentSettings, "guildName").getAsString().replace("_", " "))
 					)
 					.complete();
 				caseOne(profileNames[0], currentSettings, applicationChannel);
 			} else {
-				EmbedBuilder welcomeEb = this.defaultPlayerEmbed();
-				welcomeEb.setDescription(
+				EmbedBuilder welcomeEb = this.defaultPlayerEmbed().setDescription(
 					"Please react with the emoji that corresponds to the profile you want to apply with or react with " +
 					client.getError() +
 					" to cancel the application.\n"
@@ -172,7 +164,7 @@ public class ApplyUser implements Serializable {
 
 				Message reactMessage = applicationChannel
 					.sendMessage(
-						applyingUser.getAsMention() +
+							event.getUser().getAsMention() +
 						" this is your application for " +
 						capitalizeString(higherDepth(currentSettings, "guildName").getAsString().replace("_", " "))
 					)
@@ -498,30 +490,22 @@ public class ApplyUser implements Serializable {
 				break;
 			case 2:
 				TextChannel applicationChannel = jda.getTextChannelById(applicationChannelId);
-				User applyingUser = jda.retrieveUserById(applyingUserId).complete();
 				Message reactMessage = event.getChannel().retrieveMessageById(event.getMessageId()).complete();
 				switch (event.getButton().getId()) {
 					case "apply_user_accept":
 						event.getMessage().editMessageComponents().queue();
 						reactMessage.delete().queueAfter(5, TimeUnit.SECONDS);
 
-						try {
-							event
-								.getHook()
-								.editOriginal(
-									fixUsername(playerUsername) +
-									" (" +
-									applyingUser.getAsMention() +
-									") was accepted by " +
-									event.getUser().getAsMention()
-								)
-								.queue();
-						} catch (Exception e) {
-							event
-								.getHook()
-								.editOriginal(fixUsername(playerUsername) + " was accepted by " + event.getUser().getAsMention())
-								.queue();
-						}
+						event
+							.getHook()
+							.editOriginal(
+								fixUsername(playerUsername) +
+								" (<@" +
+										applyingUserId +
+								">) was accepted by " +
+								event.getUser().getAsMention()
+							)
+							.queue();
 
 						TextChannel waitInviteChannel = null;
 						try {
@@ -530,7 +514,7 @@ public class ApplyUser implements Serializable {
 
 						EmbedBuilder eb = defaultEmbed("Application Accepted");
 						eb.setDescription(higherDepth(currentSettings, "applyAcceptMessage").getAsString());
-						MessageAction action = applicationChannel.sendMessage(applyingUser.getAsMention()).setEmbeds(eb.build());
+						MessageAction action = applicationChannel.sendMessage("<@" + applyingUserId  + ">").setEmbeds(eb.build());
 						if (waitInviteChannel == null) {
 							action = action.setActionRow(Button.success("apply_user_delete_channel", "Close Channel"));
 						}
@@ -577,23 +561,17 @@ public class ApplyUser implements Serializable {
 							event.getMessage().editMessageComponents().queue();
 							reactMessage.delete().queueAfter(5, TimeUnit.SECONDS);
 
-							try {
 								event
 									.getHook()
 									.editOriginal(
 										fixUsername(playerUsername) +
-										" (" +
-										applyingUser.getAsMention() +
-										") was waitlisted by " +
+										" (<@" +
+										applyingUserId +
+										">) was waitlisted by " +
 										event.getUser().getAsMention()
 									)
 									.queue();
-							} catch (Exception e) {
-								event
-									.getHook()
-									.editOriginal(fixUsername(playerUsername) + " was waitlisted by " + event.getUser().getAsMention())
-									.queue();
-							}
+
 
 							waitInviteChannel = null;
 							try {
@@ -603,7 +581,7 @@ public class ApplyUser implements Serializable {
 							eb = defaultEmbed("Application Waitlisted");
 							eb.setDescription(higherDepth(currentSettings, "applyWaitlistMessage").getAsString());
 
-							action = applicationChannel.sendMessage(applyingUser.getAsMention()).setEmbeds(eb.build());
+							action = applicationChannel.sendMessage("<@" + applyingUserId +">").setEmbeds(eb.build());
 
 							if (waitInviteChannel == null) {
 								action = action.setActionRow(Button.success("apply_user_delete_channel", "Close Channel"));
@@ -656,7 +634,7 @@ public class ApplyUser implements Serializable {
 								.editOriginal(
 									playerUsername +
 									" (" +
-									applyingUser.getAsMention() +
+											event.getUser().getAsMention() +
 									") was denied by " +
 									event.getUser().getAsMention()
 								)
@@ -670,7 +648,7 @@ public class ApplyUser implements Serializable {
 
 						reactMessage =
 							applicationChannel
-								.sendMessage(applyingUser.getAsMention())
+								.sendMessage("<@"+applyingUserId +">")
 								.setEmbeds(eb.build())
 								.setActionRow(Button.success("apply_user_delete_channel", "Close Channel"))
 								.complete();

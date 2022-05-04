@@ -39,7 +39,7 @@ public class LeaderboardCommand extends Command {
 
 	public LeaderboardCommand() {
 		this.name = "leaderboard";
-		this.cooldown = globalCooldown + 6;
+		this.cooldown = globalCooldown + 3;
 		this.aliases = new String[] { "lb" };
 		this.botPermissions = defaultPerms();
 	}
