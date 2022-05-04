@@ -50,15 +50,21 @@ public class EmojiUpdater {
 
 	public static JsonElement getMissing(String... url) {
 		try {
-			Set<String> processedItemsSet = (url.length == 0 ? JsonParser
-					.parseReader(new FileReader("src/main/java/com/skyblockplus/json/IdToEmojiMappings.json"))
-					.getAsJsonObject() : getJson(url[0])).getAsJsonObject().keySet();
-			Set<String> allItems = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json")
-					.getAsJsonObject()
+			Set<String> processedItemsSet =
+				(
+					url.length == 0
+						? JsonParser
+							.parseReader(new FileReader("src/main/java/com/skyblockplus/json/IdToEmojiMappings.json"))
+							.getAsJsonObject()
+						: getJson(url[0])
+				).getAsJsonObject()
 					.keySet();
+			Set<String> allItems = getJson("https://raw.githubusercontent.com/kr45732/skyblock-plus-data/main/InternalNameMappings.json")
+				.getAsJsonObject()
+				.keySet();
 			allItems.removeIf(processedItemsSet::contains);
 			return gson.toJsonTree(allItems);
-		}catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -134,11 +140,15 @@ public class EmojiUpdater {
 
 			// Enchants and pets
 			File enchantedBook = new File(skyCryptFiles.getPath() + "/ENCHANTED_BOOK.png");
-			applyGlintOverlay(ImageIO.read(new URL("https://sky.shiiyu.moe/item/ENCHANTED_BOOK")), enchantedBook, Arrays
+			applyGlintOverlay(
+				ImageIO.read(new URL("https://sky.shiiyu.moe/item/ENCHANTED_BOOK")),
+				enchantedBook,
+				Arrays
 					.stream(new File("src/main/java/com/skyblockplus/json/glint_images").listFiles())
 					.sorted(Comparator.comparing(File::getName))
-					.toList());
-			if(!out.has("ENCHANTED_BOOK")){
+					.toList()
+			);
+			if (!out.has("ENCHANTED_BOOK")) {
 				out.addProperty("ENCHANTED_BOOK", enchantedBook.getPath());
 			}
 			for (String sbItem : allSbItems) {
@@ -560,11 +570,15 @@ public class EmojiUpdater {
 
 		for (File inputFile : new File("src/main/java/com/skyblockplus/json/skycrypt_images")
 			.listFiles(f -> enchantList.contains(f.getName().replace(".png", "")))) {
-			applyGlintOverlay(ImageIO.read(inputFile), new File(outputFileDir.getPath() + "/" + inputFile.getName().replace(".png", ".gif")), glintFiles);
+			applyGlintOverlay(
+				ImageIO.read(inputFile),
+				new File(outputFileDir.getPath() + "/" + inputFile.getName().replace(".png", ".gif")),
+				glintFiles
+			);
 		}
 	}
 
-	public static void applyGlintOverlay( BufferedImage inputImage, File outFile, List<File> glintFiles){
+	public static void applyGlintOverlay(BufferedImage inputImage, File outFile, List<File> glintFiles) {
 		try {
 			List<BufferedImage> frames = new ArrayList<>();
 			for (File glintFile : glintFiles) {
@@ -596,7 +610,7 @@ public class EmojiUpdater {
 					}
 				}
 			}
-		}catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

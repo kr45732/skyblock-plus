@@ -126,18 +126,20 @@ public class ApplyUser implements Serializable {
 			if (profileNames.length == 1) {
 				applicationChannel
 					.sendMessage(
-							event.getUser().getAsMention() +
+						event.getUser().getAsMention() +
 						" this is your application for " +
 						capitalizeString(higherDepth(currentSettings, "guildName").getAsString().replace("_", " "))
 					)
 					.complete();
 				caseOne(profileNames[0], currentSettings, applicationChannel);
 			} else {
-				EmbedBuilder welcomeEb = this.defaultPlayerEmbed().setDescription(
-					"Please react with the emoji that corresponds to the profile you want to apply with or react with " +
-					client.getError() +
-					" to cancel the application.\n"
-				);
+				EmbedBuilder welcomeEb =
+					this.defaultPlayerEmbed()
+						.setDescription(
+							"Please react with the emoji that corresponds to the profile you want to apply with or react with " +
+							client.getError() +
+							" to cancel the application.\n"
+						);
 
 				for (String profileName : profileNames) {
 					String profileEmoji = profileNameToEmoji(profileName);
@@ -164,7 +166,7 @@ public class ApplyUser implements Serializable {
 
 				Message reactMessage = applicationChannel
 					.sendMessage(
-							event.getUser().getAsMention() +
+						event.getUser().getAsMention() +
 						" this is your application for " +
 						capitalizeString(higherDepth(currentSettings, "guildName").getAsString().replace("_", " "))
 					)
@@ -501,7 +503,7 @@ public class ApplyUser implements Serializable {
 							.editOriginal(
 								fixUsername(playerUsername) +
 								" (<@" +
-										applyingUserId +
+								applyingUserId +
 								">) was accepted by " +
 								event.getUser().getAsMention()
 							)
@@ -514,7 +516,7 @@ public class ApplyUser implements Serializable {
 
 						EmbedBuilder eb = defaultEmbed("Application Accepted");
 						eb.setDescription(higherDepth(currentSettings, "applyAcceptMessage").getAsString());
-						MessageAction action = applicationChannel.sendMessage("<@" + applyingUserId  + ">").setEmbeds(eb.build());
+						MessageAction action = applicationChannel.sendMessage("<@" + applyingUserId + ">").setEmbeds(eb.build());
 						if (waitInviteChannel == null) {
 							action = action.setActionRow(Button.success("apply_user_delete_channel", "Close Channel"));
 						}
@@ -561,17 +563,16 @@ public class ApplyUser implements Serializable {
 							event.getMessage().editMessageComponents().queue();
 							reactMessage.delete().queueAfter(5, TimeUnit.SECONDS);
 
-								event
-									.getHook()
-									.editOriginal(
-										fixUsername(playerUsername) +
-										" (<@" +
-										applyingUserId +
-										">) was waitlisted by " +
-										event.getUser().getAsMention()
-									)
-									.queue();
-
+							event
+								.getHook()
+								.editOriginal(
+									fixUsername(playerUsername) +
+									" (<@" +
+									applyingUserId +
+									">) was waitlisted by " +
+									event.getUser().getAsMention()
+								)
+								.queue();
 
 							waitInviteChannel = null;
 							try {
@@ -581,7 +582,7 @@ public class ApplyUser implements Serializable {
 							eb = defaultEmbed("Application Waitlisted");
 							eb.setDescription(higherDepth(currentSettings, "applyWaitlistMessage").getAsString());
 
-							action = applicationChannel.sendMessage("<@" + applyingUserId +">").setEmbeds(eb.build());
+							action = applicationChannel.sendMessage("<@" + applyingUserId + ">").setEmbeds(eb.build());
 
 							if (waitInviteChannel == null) {
 								action = action.setActionRow(Button.success("apply_user_delete_channel", "Close Channel"));
@@ -634,7 +635,7 @@ public class ApplyUser implements Serializable {
 								.editOriginal(
 									playerUsername +
 									" (" +
-											event.getUser().getAsMention() +
+									event.getUser().getAsMention() +
 									") was denied by " +
 									event.getUser().getAsMention()
 								)
@@ -648,7 +649,7 @@ public class ApplyUser implements Serializable {
 
 						reactMessage =
 							applicationChannel
-								.sendMessage("<@"+applyingUserId +">")
+								.sendMessage("<@" + applyingUserId + ">")
 								.setEmbeds(eb.build())
 								.setActionRow(Button.success("apply_user_delete_channel", "Close Channel"))
 								.complete();
