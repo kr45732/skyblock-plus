@@ -1012,7 +1012,7 @@ public class NetworthExecute {
 		} catch (Exception ignored) {}
 
 		try {
-			fumingExtras = item.getFumingCount() * fumingPrice * 0.33;
+			fumingExtras = item.getFumingCount() * fumingPrice * 0.66;
 		} catch (Exception ignored) {}
 
 		StringBuilder enchStr = new StringBuilder("[");

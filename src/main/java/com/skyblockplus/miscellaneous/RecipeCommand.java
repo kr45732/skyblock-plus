@@ -69,11 +69,11 @@ public class RecipeCommand extends Command {
 				eb.appendDescription("\n");
 			}
 			if (idCountSplit.length == 1) {
-				eb.appendDescription(getEmoji("EMPTY"));
+				eb.appendDescription(getEmojiOr("EMPTY", "❓"));
 				eb.addBlankField(true);
 			} else {
 				String entryId = idCountSplit[0].replace("-", ":");
-				eb.appendDescription(getEmoji(entryId));
+				eb.appendDescription(getEmojiOr(entryId, "❓"));
 				eb.addField(idToName(entryId), idCountSplit[1], true);
 			}
 		}

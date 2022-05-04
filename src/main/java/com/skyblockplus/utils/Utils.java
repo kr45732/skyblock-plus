@@ -238,6 +238,10 @@ public class Utils {
 		return higherDepth(getEmojiMap(), id, "");
 	}
 
+	public static String getEmojiOr(String id, String defaultValue) {
+		return higherDepth(getEmojiMap(), id, defaultValue);
+	}
+
 	public static JsonObject getAverageAuctionJson() {
 		if (averageAuctionJson == null || Duration.between(averageAuctionJsonLastUpdated, Instant.now()).toMinutes() >= 1) {
 			if (currentMayor.equals("Derpy")) {
