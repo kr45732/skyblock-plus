@@ -64,6 +64,10 @@ public class SlayerWeight {
 	}
 
 	public WeightStruct getSlayerWeight(String slayerName, int currentSlayerXp) {
+		if(slayerName.equals("blaze")){ // TODO: senither blaze weight
+			return new WeightStruct();
+		}
+
 		Double[] curWeights = SLAYER_WEIGHTS.get(slayerName);
 		double divider = curWeights[0];
 		double modifier = curWeights[1];

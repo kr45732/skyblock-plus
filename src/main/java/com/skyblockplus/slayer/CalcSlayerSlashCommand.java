@@ -62,7 +62,8 @@ public class CalcSlayerSlashCommand extends SlashCommand {
 					.addChoice("Sven Packmaster", "sven")
 					.addChoice("Revenant Horror", "rev")
 					.addChoice("Tarantula Broodfather", "tara")
-					.addChoice("Voidgloom Seraph", "enderman"),
+					.addChoice("Voidgloom Seraph", "enderman")
+				.addChoice("Inferno Demonlord", "blaze"),
 				new OptionData(OptionType.INTEGER, "level", "Target slayer level").setRequiredRange(1, 9),
 				new OptionData(OptionType.INTEGER, "xp", "Target slayer xp").setMinValue(1)
 			)

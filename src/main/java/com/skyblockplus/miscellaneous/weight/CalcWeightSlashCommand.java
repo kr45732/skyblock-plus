@@ -62,6 +62,7 @@ public class CalcWeightSlashCommand extends SlashCommand {
 					.addChoice("Revenant", "rev")
 					.addChoice("Tarantula", "tara")
 					.addChoice("Enderman", "enderman")
+						.addChoice("Blaze", "blaze")
 					.addChoice("Alchemy", "alchemy")
 					.addChoice("Combat", "combat")
 					.addChoice("Farming", "farming")

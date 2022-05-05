@@ -57,7 +57,7 @@ public class DungeonsWeight {
 		if (level != 0) {
 			if (cataXP < 569809640) {
 				return weightStruct.add(
-					new WeightStruct(0.6366539836004613 * ((Math.pow(1.18340401286164044, (level + 1)) - 1.05994990217254) * (1 + n)))
+					new WeightStruct(1.2733079672009226 * ((Math.pow(1.18340401286164044, (level + 1)) - 1.05994990217254) * (1 + n)))
 				);
 			} else {
 				return weightStruct.add(new WeightStruct(4100 + extra));
@@ -104,7 +104,7 @@ public class DungeonsWeight {
 				score += floorScore;
 			}
 
-			return weightStruct.add(new WeightStruct(score / max1000 * upperBound));
+			return weightStruct.add(new WeightStruct(score / max1000 * upperBound * 2));
 		} else {
 			if (higherDepth(player.profileJson(), "dungeons.dungeon_types.master_catacombs.tier_completions") == null) {
 				return new WeightStruct();
@@ -150,7 +150,7 @@ public class DungeonsWeight {
 				masterScore += floorScore;
 			}
 
-			return weightStruct.add(new WeightStruct((masterScore / mMax1000) * upperBound));
+			return weightStruct.add(new WeightStruct((masterScore / mMax1000) * upperBound * 2));
 		}
 	}
 }

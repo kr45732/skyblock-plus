@@ -60,22 +60,25 @@ public class SlayerWeight {
 		double weight;
 		switch (slayerName) {
 			case "rev":
-				weight = (effectiveScore / 7000) + (slayerXp / 900000);
+				weight = (effectiveScore / 8390.64) + (slayerXp / 1000000);
 				break;
 			case "tara":
-				weight = (effectiveScore / 4800) + ((slayerXp * 1.6) / 900000);
+				weight = (effectiveScore / 7019.57) + ((slayerXp * 1.6) / 1000000);
 				break;
 			case "sven":
-				weight = (effectiveScore / 2200) + ((slayerXp * 3.6) / 900000);
+				weight = (effectiveScore / 2982.06) + ((slayerXp * 3.6) / 1000000);
 				break;
 			case "enderman":
-				weight = (effectiveScore / 1000) + ((slayerXp * 10) / 900000);
+				weight = (effectiveScore / 1118.81) + ((slayerXp * 10) / 1000000);
+				break;
+			case "blaze":
+				weight = (effectiveScore / 751.281) + ((slayerXp * 15) / 1000000);
 				break;
 			default:
 				return null;
 		}
 
-		return weightStruct.add(new WeightStruct(weight));
+		return weightStruct.add(new WeightStruct(2 * weight));
 	}
 
 	private double actualInt(int intScore) {
