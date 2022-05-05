@@ -200,7 +200,7 @@ public class RolesCommand extends Command {
 					}
 					case "sven",
 						"rev",
-						"tara",
+						"tara","blaze",
 						"coins",
 						"alchemy",
 						"combat",
@@ -226,7 +226,7 @@ public class RolesCommand extends Command {
 						"slayer_nine" -> {
 						double roleAmount = -1;
 						switch (currentRoleName) {
-							case "sven", "rev", "tara", "enderman" -> roleAmount =
+							case "sven", "rev", "tara", "enderman", "blaze" -> roleAmount =
 								useHighest ? player.getHighestAmount(currentRoleName) : player.getSlayer(currentRoleName);
 							case "coins" -> {
 								roleAmount = useHighest ? player.getHighestAmount("bank") : player.getBankBalance();

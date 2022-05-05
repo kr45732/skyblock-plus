@@ -1653,34 +1653,35 @@ public class SettingsExecute {
 		rolePageMap.put("sven", 2);
 		rolePageMap.put("rev", 3);
 		rolePageMap.put("tara", 4);
-		rolePageMap.put("enderman", 5);
-		rolePageMap.put("alchemy", 6);
-		rolePageMap.put("combat", 7);
-		rolePageMap.put("fishing", 8);
-		rolePageMap.put("farming", 9);
-		rolePageMap.put("foraging", 10);
-		rolePageMap.put("carpentry", 11);
-		rolePageMap.put("mining", 12);
-		rolePageMap.put("taming", 13);
-		rolePageMap.put("enchanting", 14);
-		rolePageMap.put("catacombs", 15);
-		rolePageMap.put("weight", 16);
-		rolePageMap.put("guild_member", 17);
-		rolePageMap.put("guild_ranks", 18);
-		rolePageMap.put("coins", 19);
-		rolePageMap.put("fairy_souls", 20);
-		rolePageMap.put("slot_collector", 21);
-		rolePageMap.put("pet_enthusiast", 22);
-		rolePageMap.put("total_slayer", 23);
-		rolePageMap.put("slayer_nine", 24);
-		rolePageMap.put("skill_average", 25);
-		rolePageMap.put("pet_score", 26);
-		rolePageMap.put("dungeon_secrets", 27);
-		rolePageMap.put("accessory_count", 28);
-		rolePageMap.put("networth", 29);
-		rolePageMap.put("gamemode", 30);
-		rolePageMap.put("maxed_collections", 31);
-		rolePageMap.put("player_items", 31);
+		rolePageMap.put("blaze", 5);
+		rolePageMap.put("enderman", 6);
+		rolePageMap.put("alchemy", 7);
+		rolePageMap.put("combat", 8);
+		rolePageMap.put("fishing", 9);
+		rolePageMap.put("farming", 10);
+		rolePageMap.put("foraging", 11);
+		rolePageMap.put("carpentry", 12);
+		rolePageMap.put("mining", 13);
+		rolePageMap.put("taming", 14);
+		rolePageMap.put("enchanting", 15);
+		rolePageMap.put("catacombs", 16);
+		rolePageMap.put("weight", 17);
+		rolePageMap.put("guild_member", 18);
+		rolePageMap.put("guild_ranks", 19);
+		rolePageMap.put("coins", 20);
+		rolePageMap.put("fairy_souls", 21);
+		rolePageMap.put("slot_collector", 22);
+		rolePageMap.put("pet_enthusiast", 23);
+		rolePageMap.put("total_slayer", 24);
+		rolePageMap.put("slayer_nine", 25);
+		rolePageMap.put("skill_average", 26);
+		rolePageMap.put("pet_score", 27);
+		rolePageMap.put("dungeon_secrets", 28);
+		rolePageMap.put("accessory_count", 29);
+		rolePageMap.put("networth", 30);
+		rolePageMap.put("gamemode", 31);
+		rolePageMap.put("maxed_collections", 32);
+		rolePageMap.put("player_items", 33);
 
 		if (rolePageMap.containsKey(roleName)) {
 			return getRolesSettings(database.getRolesSettings(guild.getId()), rolePageMap.get(roleName));
@@ -1735,6 +1736,9 @@ public class SettingsExecute {
 				);
 				case "tara" -> ebFieldString.append(
 					"**A player's tarantula broodfather slayer xp**\nExample: `/settings roles add tara 100000 @tara 7`\n"
+				);
+				case "blaze" -> ebFieldString.append(
+						"**A player's inferno demonlord slayer xp**\nExample: `/settings roles add blaze 100000 @blaze 7`\n"
 				);
 				case "coins" -> ebFieldString.append(
 					"**Coins in a player's bank and purse**\nExample: `/settings roles add coins 1000000 @millionaire`\n"

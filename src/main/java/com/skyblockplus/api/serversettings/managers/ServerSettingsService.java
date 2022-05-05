@@ -192,6 +192,8 @@ public class ServerSettingsService {
 					return new ResponseEntity<>(currentRoleSettings.getMaxed_collections(), HttpStatus.OK);
 				case "pet_enthusiast":
 					return new ResponseEntity<>(currentRoleSettings.getPet_enthusiast(), HttpStatus.OK);
+				case "blaze":
+					return new ResponseEntity<>(currentRoleSettings.getBlaze(), HttpStatus.OK);
 				case "slayer_nine":
 					return new ResponseEntity<>(currentRoleSettings.getSlayer_nine(), HttpStatus.OK);
 				case "gamemode":
@@ -257,6 +259,7 @@ public class ServerSettingsService {
 				case "slot_collector" -> currentRoleSettings.setSlot_collector(newRoleSettings);
 				case "maxed_collections" -> currentRoleSettings.setMaxed_collections(newRoleSettings);
 				case "pet_enthusiast" -> currentRoleSettings.setPet_enthusiast(newRoleSettings);
+				case blaze -> currentRoleSettings.setBlaze(newRoleSettings);
 				case "slayer_nine" -> currentRoleSettings.setSlayer_nine(newRoleSettings);
 				case "gamemode" -> currentRoleSettings.setGamemode(newRoleSettings);
 				case "skill_average" -> currentRoleSettings.setSkill_average(newRoleSettings);

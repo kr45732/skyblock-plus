@@ -45,6 +45,9 @@ public class AutomatedRoles {
 	private RoleModel tara = new RoleModel();
 
 	@Embedded
+	private RoleModel blaze  = new RoleModel();
+
+	@Embedded
 	private RoleModel enderman = new RoleModel();
 
 	@Embedded
