@@ -142,8 +142,6 @@ public class Main {
 			}
 		}
 
-		selfUserId = jda.getShardById(0).getSelfUser().getId();
-
 		ApiHandler.initialize();
 		AuctionTracker.initialize();
 		AuctionFlipper.initialize(true);
