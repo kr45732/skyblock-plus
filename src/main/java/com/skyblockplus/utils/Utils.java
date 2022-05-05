@@ -128,7 +128,6 @@ public class Utils {
 		"https://discord.com/api/webhooks/957659234827374602/HLXDdqX5XMaH2ZDX5HRHifQ6i71ISoCNcwVmwPQCyCvbKv2l0Q7NLj_lmzwfs4mdcOM1"
 	)
 		.buildJDA();
-	public static final String selfUserId = isMainBot() ? "796791167366594592" : "799042642092228658";
 	/* Configuration File */
 	public static String HYPIXEL_API_KEY = "";
 	public static String BOT_TOKEN = "";
@@ -192,6 +191,7 @@ public class Utils {
 	public static SlashCommandClient slashCommandClient;
 	public static JsonObject allServerSettings;
 	public static ConfigurableApplicationContext springContext;
+	public static String selfUserId;
 
 	/* Getters */
 	public static JsonObject getLowestBinJson() {

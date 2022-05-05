@@ -74,6 +74,7 @@ public class Main {
 
 		Utils.initialize();
 		Constants.initialize();
+		selfUserId = isMainBot() ? "796791167366594592" : "799042642092228658";
 
 		springContext = SpringApplication.run(Main.class, args);
 		database = springContext.getBean(Database.class);
