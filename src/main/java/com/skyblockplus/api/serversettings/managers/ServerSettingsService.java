@@ -259,7 +259,7 @@ public class ServerSettingsService {
 				case "slot_collector" -> currentRoleSettings.setSlot_collector(newRoleSettings);
 				case "maxed_collections" -> currentRoleSettings.setMaxed_collections(newRoleSettings);
 				case "pet_enthusiast" -> currentRoleSettings.setPet_enthusiast(newRoleSettings);
-				case blaze -> currentRoleSettings.setBlaze(newRoleSettings);
+				case "blaze" -> currentRoleSettings.setBlaze(newRoleSettings);
 				case "slayer_nine" -> currentRoleSettings.setSlayer_nine(newRoleSettings);
 				case "gamemode" -> currentRoleSettings.setGamemode(newRoleSettings);
 				case "skill_average" -> currentRoleSettings.setSkill_average(newRoleSettings);
