@@ -64,7 +64,7 @@ public class SlayerWeight {
 	}
 
 	public WeightStruct getSlayerWeight(String slayerName, int currentSlayerXp) {
-		if(slayerName.equals("blaze")){ // TODO: senither blaze weight
+		if (slayerName.equals("blaze")) { // TODO: senither blaze weight
 			return new WeightStruct();
 		}
 
