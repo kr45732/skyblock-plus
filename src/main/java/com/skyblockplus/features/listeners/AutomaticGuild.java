@@ -163,7 +163,7 @@ public class AutomaticGuild {
 		verifyConstructor(event, higherDepth(serverSettings, "automatedVerify"));
 		schedulerConstructor();
 		prefix = higherDepth(serverSettings, "prefix", "");
-		prefix = (!prefix.isEmpty() && prefix.length() <= 5) ? prefix : DEFAULT_PREFIX;
+		prefix = (prefix.length() > 0 && prefix.length() <= 5) ? prefix : DEFAULT_PREFIX;
 		jacobGuild = new JacobGuild(higherDepth(serverSettings, "jacobSettings"), this);
 		eventGuild = new EventGuild(higherDepth(serverSettings, "eventNotif"), this);
 		try {
