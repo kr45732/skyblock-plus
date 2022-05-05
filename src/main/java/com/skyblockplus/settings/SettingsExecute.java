@@ -1738,7 +1738,7 @@ public class SettingsExecute {
 					"**A player's tarantula broodfather slayer xp**\nExample: `/settings roles add tara 100000 @tara 7`\n"
 				);
 				case "blaze" -> ebFieldString.append(
-						"**A player's inferno demonlord slayer xp**\nExample: `/settings roles add blaze 100000 @blaze 7`\n"
+					"**A player's inferno demonlord slayer xp**\nExample: `/settings roles add blaze 100000 @blaze 7`\n"
 				);
 				case "coins" -> ebFieldString.append(
 					"**Coins in a player's bank and purse**\nExample: `/settings roles add coins 1000000 @millionaire`\n"

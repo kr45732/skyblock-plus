@@ -200,7 +200,8 @@ public class RolesCommand extends Command {
 					}
 					case "sven",
 						"rev",
-						"tara","blaze",
+						"tara",
+						"blaze",
 						"coins",
 						"alchemy",
 						"combat",
