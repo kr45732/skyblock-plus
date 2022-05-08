@@ -94,9 +94,7 @@ public class ArmorCommand extends Command {
 						paginateBuilder.addItems(itemString);
 					}
 				}
-				paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles).setThumbnails(pageThumbnails));
-
-				event.paginate(paginateBuilder);
+				event.paginate(				paginateBuilder.updateExtras(extra -> extra.setTitles(pageTitles).setThumbnails(pageThumbnails)));
 				return null;
 			}
 		}

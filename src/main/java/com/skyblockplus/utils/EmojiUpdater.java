@@ -38,6 +38,8 @@ import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
+
+import com.skyblockplus.utils.rendering.GifWriter;
 import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Icon;
@@ -139,7 +141,7 @@ public class EmojiUpdater {
 			}
 
 			// Enchants and pets
-			File enchantedBook = new File(skyCryptFiles.getPath() + "/ENCHANTED_BOOK.png");
+			File enchantedBook = new File(skyCryptFiles.getPath() + "/ENCHANTED_BOOK.gif");
 			applyGlintOverlay(
 				ImageIO.read(new URL("https://sky.shiiyu.moe/item/ENCHANTED_BOOK")),
 				enchantedBook,
@@ -197,7 +199,7 @@ public class EmojiUpdater {
 			}
 			System.out.println("Finished processing SkyCrypt items");
 
-			processEnchantedEmojis("https://hst.sh/raw/ojejilowiw"); // Don't forget to change this!
+			processEnchantedEmojis("https://hst.sh/raw/iledoganuf"); // Don't forget to change this!
 			processCompressedImages();
 			File enchantedImagesDir = new File("src/main/java/com/skyblockplus/json/enchanted_images");
 			File compressedImagesDir = new File("src/main/java/com/skyblockplus/json/compressed_images");

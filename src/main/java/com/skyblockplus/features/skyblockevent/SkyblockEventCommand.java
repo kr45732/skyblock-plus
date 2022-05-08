@@ -84,7 +84,7 @@ public class SkyblockEventCommand extends Command {
 		CustomPaginator.Builder paginateBuilder = defaultPaginator()
 			.setColumns(1)
 			.setItemsPerPage(25)
-			.setPaginatorExtras(new PaginatorExtras().setEveryPageTitle("Event Leaderboard"))
+			.updateExtras(extra -> extra.setEveryPageTitle("Event Leaderboard"))
 			.setTimeout(24, TimeUnit.HOURS);
 
 		for (int i = 0; i < guildMemberPlayersList.size(); i++) {
@@ -112,7 +112,7 @@ public class SkyblockEventCommand extends Command {
 				defaultPaginator()
 					.setColumns(1)
 					.setItemsPerPage(25)
-					.setPaginatorExtras(new PaginatorExtras().setEveryPageTitle("Prizes"))
+					.updateExtras(extra -> extra.setEveryPageTitle("Prizes"))
 					.setTimeout(24, TimeUnit.HOURS);
 
 			ArrayList<String> prizeListKeys = getJsonKeys(higherDepth(runningEventSettings, "prizeMap"));
@@ -326,12 +326,11 @@ public class SkyblockEventCommand extends Command {
 			}
 
 			if (paginateBuilder.size() > 0) {
-				paginateBuilder.setPaginatorExtras(
-					new PaginatorExtras()
+				paginateBuilder.updateExtras(extra ->
+					extra
 						.setEveryPageTitle("Event Leaderboard")
 						.setEveryPageText("**Last Updated:** <t:" + currentGuild.eventMemberListLastUpdated.getEpochSecond() + ":R>\n")
-				);
-				paginateBuilder.build().paginate(event.getHook(), 0);
+				).build().paginate(event.getHook(), 0);
 				return null;
 			}
 
@@ -356,7 +355,7 @@ public class SkyblockEventCommand extends Command {
 			);
 		}
 
-		paginateBuilder.setPaginatorExtras(new PaginatorExtras().setEveryPageTitle("Event Leaderboard"));
+		paginateBuilder.getPaginatorExtras().setEveryPageTitle("Event Leaderboard");
 
 		guildMap.get(guildId).setEventMemberList(guildMemberPlayersList);
 		guildMap.get(guildId).setEventMemberListLastUpdated(Instant.now());
@@ -409,12 +408,11 @@ public class SkyblockEventCommand extends Command {
 					minutesSinceUpdateString = minutesSinceUpdate + " minutes ";
 				}
 
-				paginateBuilder.setPaginatorExtras(
-					new PaginatorExtras()
+				event.paginate(paginateBuilder.updateExtras(
+					extra -> extra
 						.setEveryPageTitle("Event Leaderboard")
 						.setEveryPageText("**Last Updated " + minutesSinceUpdateString + " ago**\n")
-				);
-				event.paginate(paginateBuilder);
+				));
 				return null;
 			}
 
@@ -439,7 +437,7 @@ public class SkyblockEventCommand extends Command {
 			);
 		}
 
-		paginateBuilder.setPaginatorExtras(new PaginatorExtras().setEveryPageTitle("Event Leaderboard"));
+		paginateBuilder.getExtras().setEveryPageTitle("Event Leaderboard");
 
 		guildMap.get(guildId).setEventMemberList(guildMemberPlayersList);
 		guildMap.get(guildId).setEventMemberListLastUpdated(Instant.now());

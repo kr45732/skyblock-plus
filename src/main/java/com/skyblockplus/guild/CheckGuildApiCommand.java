@@ -136,8 +136,8 @@ public class CheckGuildApiCommand extends Command {
 		CustomPaginator.Builder paginator = event.getPaginator().setItemsPerPage(20);
 		paginator.addItems(out);
 		event.paginate(
-			paginator.setPaginatorExtras(
-				new PaginatorExtras()
+			paginator.updateExtras(extra ->
+				extra
 					.setEveryPageTitle(guildResponse.get("name").getAsString())
 					.setEveryPageText(
 						"**API Disabled Count:** " +

@@ -383,7 +383,7 @@ public class HelpCommand extends Command {
 					"Get a global leaderboard. The type can be " +
 					String.join(", ", getTypes()) +
 					". The mode can be all, ironman, or stranded.",
-					"leaderboard <type> [player] [page:page] [rank:rank] [amount:amount]"
+					"leaderboard <type> [player] [mode:all|ironman|stranded] [page:page] [rank:rank] [amount:amount]"
 				)
 					.addAliases("lb")
 					.setCategory("miscellaneous"),
@@ -793,7 +793,7 @@ public class HelpCommand extends Command {
 			}
 		}
 
-		CustomPaginator.Builder paginateBuilder = event.getPaginator().setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles));
+		CustomPaginator.Builder paginateBuilder = event.getPaginator().updateExtras(extra -> extra.setTitles(pageTitles));
 
 		paginateBuilder.addItems(
 			"Use the arrow buttons to navigate through the pages" + generatePageMap() + "\n\n<> = required [] = optional"

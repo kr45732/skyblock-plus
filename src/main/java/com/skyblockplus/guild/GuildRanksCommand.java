@@ -370,8 +370,7 @@ public class GuildRanksCommand extends Command {
 				}
 			}
 
-			paginateBuilder.setPaginatorExtras(
-				new PaginatorExtras()
+			paginateBuilder.getExtras()
 					.setEveryPageTitle("Rank changes for " + guildName)
 					.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
 					.setEveryPageText(
@@ -380,7 +379,7 @@ public class GuildRanksCommand extends Command {
 						(lastUpdated != null ? "\n**Last Updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "") +
 						"\n"
 					)
-			);
+			;
 			event.paginate(paginateBuilder);
 		} else {
 			CustomPaginator.Builder paginateBuilder = event.getPaginator().setItemsPerPage(20);
@@ -439,8 +438,7 @@ public class GuildRanksCommand extends Command {
 				}
 			}
 
-			paginateBuilder.setPaginatorExtras(
-				new PaginatorExtras()
+			paginateBuilder.getExtras()
 					.setEveryPageTitle("Rank changes for " + guildName)
 					.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
 					.setEveryPageText(
@@ -449,7 +447,7 @@ public class GuildRanksCommand extends Command {
 						(lastUpdated != null ? "\n**Last Updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "") +
 						"\n"
 					)
-			);
+			;
 			if (paginateBuilder.size() == 0) {
 				return defaultEmbed("No rank changes");
 			}

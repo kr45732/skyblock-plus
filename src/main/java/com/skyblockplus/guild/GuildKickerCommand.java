@@ -154,8 +154,7 @@ public class GuildKickerCommand extends Command {
 				}
 			}
 
-			paginateBuilder.setPaginatorExtras(
-				new PaginatorExtras()
+			paginateBuilder.getPaginatorExtras()
 					.setEveryPageTitle("Guild Kick Helper")
 					.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
 					.setEveryPageText(
@@ -177,8 +176,8 @@ public class GuildKickerCommand extends Command {
 							)
 							.getEpochSecond() +
 						":R>\n"
-					)
-			);
+					);
+
 		} else {
 			String hypixelKey = database.getServerHypixelApiKey(event.getGuild().getId());
 
@@ -290,8 +289,7 @@ public class GuildKickerCommand extends Command {
 				}
 			}
 
-			paginateBuilder.setPaginatorExtras(
-				new PaginatorExtras()
+			paginateBuilder.getPaginatorExtras()
 					.setEveryPageTitle("Guild Kick Helper")
 					.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + guildId)
 					.setEveryPageText(
@@ -300,7 +298,7 @@ public class GuildKickerCommand extends Command {
 						(lastUpdated != null ? "\n**Last Updated:** <t:" + lastUpdated.getEpochSecond() + ":R>" : "") +
 						"\n"
 					)
-			);
+			;
 		}
 		event.paginate(paginateBuilder);
 		return null;

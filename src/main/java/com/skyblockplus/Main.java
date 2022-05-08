@@ -152,9 +152,11 @@ public class Main {
 		JacobHandler.initialize();
 		EventHandler.initialize();
 		File transcriptDir = new File("src/main/java/com/skyblockplus/json/application_transcripts/");
-		if (!transcriptDir.exists()) {
-			log.info((transcriptDir.mkdirs() ? "Successfully created" : "Failed to create") + " application transcript directory");
-		}
+		transcriptDir.delete();
+		log.info((transcriptDir.mkdirs() ? "Successfully created" : "Failed to create") + " application transcript directory");
+		File loreRenders = new File("src/main/java/com/skyblockplus/json/lore_renders/");
+		loreRenders.delete();
+		log.info((loreRenders.mkdirs() ? "Successfully created" : "Failed to create") + " lore render directory");
 
 		if (isMainBot()) {
 			scheduler.scheduleWithFixedDelay(

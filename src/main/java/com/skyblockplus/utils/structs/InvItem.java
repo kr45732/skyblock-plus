@@ -20,18 +20,20 @@ package com.skyblockplus.utils.structs;
 
 import static com.skyblockplus.utils.Constants.*;
 import static com.skyblockplus.utils.Utils.idToName;
+import static com.skyblockplus.utils.Utils.parseMcCodes;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import lombok.Data;
+import me.nullicorn.nedit.type.NBTCompound;
 
 @Data
 public class InvItem {
 
 	private String name;
-	private String lore;
+	private List<String> lore;
 	private int count = 1;
 	private String modifier;
 	private String creationOrigin;
@@ -45,11 +47,19 @@ public class InvItem {
 	private List<InvItem> backpackItems = new ArrayList<>();
 	private String rarity;
 	private int dungeonFloor = 0;
-	private String nbtTag;
+	private NBTCompound nbtTag;
+
+	public String getName(){
+		return getName(true);
+	}
+
+	public String getName(boolean parseMcCodes){
+		return  parseMcCodes ? parseMcCodes(name) : name;
+	}
 
 	public String getFormattedId() {
-		if (id.equals("PET") && name.contains("] ")) {
-			return name.split("] ")[1].toUpperCase().replace(" ", "_") + RARITY_TO_NUMBER_MAP.get(getPetRarity());
+		if (id.equals("PET") && getName().contains("] ")) {
+			return getName().split("] ")[1].toUpperCase().replace(" ", "_") + RARITY_TO_NUMBER_MAP.get(getPetRarity());
 		} else if (id.equals("ENCHANTED_BOOK")) {
 			return enchantsFormatted.isEmpty() ? id : enchantsFormatted.get(0).toUpperCase();
 		} else {
@@ -58,7 +68,7 @@ public class InvItem {
 	}
 
 	public String getNameFormatted() {
-		return id.equals("ENCHANTED_BOOK") && !enchantsFormatted.isEmpty() ? idToName(enchantsFormatted.get(0)) : name;
+		return id.equals("ENCHANTED_BOOK") && !enchantsFormatted.isEmpty() ? idToName(enchantsFormatted.get(0)) : getName();
 	}
 
 	public void setHbpCount(int hbpCount) {
@@ -80,11 +90,10 @@ public class InvItem {
 		}
 	}
 
-	public void setLore(String lore) {
+	public void setLore(List<String> lore) {
 		this.lore = lore;
 		if (lore != null) {
-			String[] loreArr = lore.split("\n");
-			this.rarity = loreArr[loreArr.length - 1].trim().split("\\s+")[0];
+			this.rarity = parseMcCodes(lore.get(lore.size() - 1)).trim().split("\\s+")[0];
 			rarity += rarity.startsWith("VERY") ? "_SPECIAL" : "";
 		}
 	}

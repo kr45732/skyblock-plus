@@ -18,22 +18,19 @@
 
 package com.skyblockplus.inventory;
 
-import static com.skyblockplus.utils.Utils.*;
-
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
-import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.InvItem;
-import com.skyblockplus.utils.structs.PaginatorExtras;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
+
+import static com.skyblockplus.utils.Utils.*;
 
 @Component
 public class InventoryCommand extends Command {
@@ -50,35 +47,7 @@ public class InventoryCommand extends Command {
 		if (player.isValid()) {
 			Map<Integer, InvItem> inventoryMap = player.getInventoryMap();
 			if (inventoryMap != null) {
-				List<String> pageTitles = new ArrayList<>();
-				List<String> pageThumbnails = new ArrayList<>();
-
-				CustomPaginator.Builder paginateBuilder = event.getPaginator();
-
-				for (Map.Entry<Integer, InvItem> currentInvSlot : inventoryMap.entrySet()) {
-					InvItem currentInvStruct = currentInvSlot.getValue();
-
-					if (currentInvStruct == null) {
-						pageTitles.add("Empty");
-						pageThumbnails.add(null);
-						paginateBuilder.addItems("**Slot:** " + (currentInvSlot.getKey() + 1));
-					} else {
-						pageTitles.add(currentInvStruct.getName() + " x" + currentInvStruct.getCount());
-						pageThumbnails.add("https://sky.shiiyu.moe/item.gif/" + currentInvStruct.getId());
-						String itemString = "";
-						itemString += "**Slot:** " + (currentInvSlot.getKey() + 1);
-						itemString += "\n\n**Lore:**\n" + currentInvStruct.getLore();
-						if (currentInvStruct.isRecombobulated()) {
-							itemString += "\n(Recombobulated)";
-						}
-
-						itemString += "\n\n**Item Creation:** " + currentInvStruct.getCreationTimestamp();
-						paginateBuilder.addItems(itemString);
-					}
-				}
-				paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles).setThumbnails(pageThumbnails));
-
-				event.paginate(paginateBuilder, slotNum);
+				new InventoryListPaginator(player, inventoryMap, slotNum, event);
 				return null;
 			}
 		}

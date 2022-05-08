@@ -84,7 +84,7 @@ public class GuildCommand extends Command {
 		guildExpList.sort(Comparator.comparingInt(o1 -> -Integer.parseInt(o1.split("=:=")[1])));
 
 		CustomPaginator.Builder paginateBuilder = event.getPaginator().setColumns(2).setItemsPerPage(20);
-		PaginatorExtras extras = new PaginatorExtras()
+		PaginatorExtras extras = paginateBuilder.getExtras()
 			.setEveryPageTitle(higherDepth(guildJson, "name").getAsString())
 			.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(guildJson, "_id").getAsString());
 
@@ -103,7 +103,6 @@ public class GuildCommand extends Command {
 				"**Player:** " + playerUsername + "\n**Guild Rank:** #" + (guildRank + 1) + "\n**Exp:** " + formatNumber(guildExp)
 			);
 		}
-		paginateBuilder.setPaginatorExtras(extras);
 
 		for (int i = 0; i < guildExpList.size(); i++) {
 			String[] curG = guildExpList.get(i).split("=:=");
@@ -268,13 +267,12 @@ public class GuildCommand extends Command {
 
 		CustomPaginator.Builder paginateBuilder = event.getPaginator().setColumns(3).setItemsPerPage(33);
 
-		paginateBuilder.setPaginatorExtras(
-			new PaginatorExtras()
+		paginateBuilder.getPaginatorExtras()
 				.setEveryPageText("**Size:** " + membersArr.size())
 				.setEveryPageTitle(higherDepth(guildJson, "name").getAsString() + " Members")
 				.setEveryPageTitleUrl("https://hypixel-leaderboard.senither.com/guilds/" + higherDepth(guildJson, "_id").getAsString())
 				.setEveryPageFirstFieldTitle("Members:")
-		);
+		;
 
 		for (String member : guildMembers
 			.entrySet()

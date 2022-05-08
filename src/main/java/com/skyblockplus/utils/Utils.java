@@ -1146,9 +1146,9 @@ public class Utils {
 					NBTCompound item = items.getCompound(i);
 					if (!item.isEmpty()) {
 						InvItem itemInfo = new InvItem();
-						itemInfo.setName(parseMcCodes(item.getString("tag.display.Name", "None")));
+						itemInfo.setName(item.getString("tag.display.Name", "None"));
 						itemInfo.setLore(
-							parseMcCodes(item.getString("tag.display.Lore", "None").replace(", ", "\n").replace("[", "").replace("]", ""))
+							item.getList("tag.display.Lore").stream().map(line -> (String) line).collect(Collectors.toList())
 						);
 						itemInfo.setCount(Integer.parseInt(item.getString("Count", "0").replace("b", " ")));
 						itemInfo.setId(item.getString("tag.ExtraAttributes.id", "None"));
@@ -1157,7 +1157,7 @@ public class Utils {
 						itemInfo.setRecombobulated(item.getInt("tag.ExtraAttributes.rarity_upgrades", 0) == 1);
 						itemInfo.setModifier(item.getString("tag.ExtraAttributes.modifier", "None"));
 						itemInfo.setDungeonFloor(Integer.parseInt(item.getString("tag.ExtraAttributes.item_tier", "-1")));
-						itemInfo.setNbtTag(item.toString());
+						itemInfo.setNbtTag(item);
 
 						if (item.containsTag("tag.ExtraAttributes.enchantments", TagType.COMPOUND)) {
 							NBTCompound enchants = item.getCompound("tag.ExtraAttributes.enchantments");

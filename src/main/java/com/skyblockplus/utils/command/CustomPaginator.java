@@ -29,6 +29,8 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.function.Function;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -328,12 +330,20 @@ public class CustomPaginator extends Menu {
 	public static class Builder extends Menu.Builder<CustomPaginator.Builder, CustomPaginator> {
 
 		private final List<String> strings = new LinkedList<>();
+		private PaginatorExtras extras;
 		private Color color = null;
 		private Consumer<Message> finalAction = m -> m.delete().queue(null, throwableConsumer);
 		private int columns = 1;
 		private int itemsPerPage = 12;
 		private boolean wrapPageEnds = false;
-		private PaginatorExtras extras = new PaginatorExtras();
+
+		public Builder() {
+			this(PaginatorExtras.PaginatorType.DEFAULT);
+		}
+
+		public Builder(PaginatorExtras.PaginatorType paginatorType) {
+			this.extras = new PaginatorExtras(paginatorType);
+		}
 
 		@Override
 		public CustomPaginator build() {
@@ -445,6 +455,15 @@ public class CustomPaginator extends Menu {
 				case EMBED_FIELDS -> extras.getEmbedFields().size();
 				case EMBED_PAGES -> extras.getEmbedPages().size();
 			};
+		}
+
+		public PaginatorExtras getExtras(){
+			return extras;
+		}
+
+		public CustomPaginator.Builder updateExtras(Function<PaginatorExtras, PaginatorExtras> extras){
+			extras.apply(this.extras);
+			return this;
 		}
 	}
 }

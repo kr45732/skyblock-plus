@@ -18,21 +18,19 @@
 
 package com.skyblockplus.inventory;
 
-import static com.skyblockplus.utils.Utils.*;
-
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.skyblockplus.utils.Player;
 import com.skyblockplus.utils.command.CommandExecute;
-import com.skyblockplus.utils.command.CustomPaginator;
 import com.skyblockplus.utils.command.PaginatorEvent;
 import com.skyblockplus.utils.structs.InvItem;
-import com.skyblockplus.utils.structs.PaginatorExtras;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Map;
+
+import static com.skyblockplus.utils.Utils.*;
 
 @Component
 public class TalismanBagCommand extends Command {
@@ -49,35 +47,7 @@ public class TalismanBagCommand extends Command {
 		if (player.isValid()) {
 			Map<Integer, InvItem> talismanBagMap = player.getTalismanBagMap();
 			if (talismanBagMap != null) {
-				List<String> pageTitles = new ArrayList<>();
-				List<String> pageThumbnails = new ArrayList<>();
-
-				CustomPaginator.Builder paginateBuilder = event.getPaginator();
-
-				for (Map.Entry<Integer, InvItem> currentTalisman : talismanBagMap.entrySet()) {
-					InvItem currentTalismanStruct = currentTalisman.getValue();
-
-					if (currentTalismanStruct == null) {
-						pageTitles.add("Empty");
-						pageThumbnails.add(null);
-						paginateBuilder.addItems("**Slot:** " + (currentTalisman.getKey() + 1));
-					} else {
-						pageTitles.add(currentTalismanStruct.getName() + " x" + currentTalismanStruct.getCount());
-						pageThumbnails.add("https://sky.shiiyu.moe/item.gif/" + currentTalismanStruct.getId());
-						String itemString = "";
-						itemString += "**Slot:** " + (currentTalisman.getKey() + 1);
-						itemString += "\n\n**Lore:**\n" + currentTalismanStruct.getLore();
-						if (currentTalismanStruct.isRecombobulated()) {
-							itemString += "\n(Recombobulated)";
-						}
-
-						itemString += "\n\n**Item Creation:** " + currentTalismanStruct.getCreationTimestamp();
-						paginateBuilder.addItems(itemString);
-					}
-				}
-				paginateBuilder.setPaginatorExtras(new PaginatorExtras().setTitles(pageTitles).setThumbnails(pageThumbnails));
-
-				event.paginate(paginateBuilder, slotNum);
+				new InventoryListPaginator(player, talismanBagMap, slotNum, event);
 				return null;
 			}
 		}

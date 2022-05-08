@@ -371,9 +371,9 @@ public class NetworthExecute {
 				"**Total Networth:** " +
 				simplifyNumber(totalNetworth) +
 				" (" +
-				formatNumber(totalNetworth) +
-				")\n**Leaderboard Position:** " +
-				(position != -1 ? formatNumber(position) : "Not on leaderboard")
+				formatNumber(totalNetworth)
+//				+ ")\n**Leaderboard Position:** " +
+//				(position != -1 ? formatNumber(position) : "Not on leaderboard")
 			);
 			eb.addField("Purse", simplifyNumber(purseCoins), true);
 			eb.addField("Bank", (bankBalance == -1 ? "Private" : simplifyNumber(bankBalance)), true);
@@ -1099,7 +1099,7 @@ public class NetworthExecute {
 			);
 			out.append(miscExtras > 0 ? ",\"misc\":{\"total\":\"" + simplifyNumber(miscExtras) + "\",\"miscs\":" + miscStr + "}" : "");
 			out.append(backpackExtras > 0 ? ",\"bp\":{\"cost\":\"" + simplifyNumber(backpackExtras) + "\",\"bp\":" + bpStr + "}" : "");
-			out.append(",\"nbt_tag\":\"").append(parseMcCodes(item.getNbtTag().replace("\"", "\\\""))).append("\"");
+			out.append(",\"nbt_tag\":\"").append(parseMcCodes(item.getNbtTag().toString().replace("\"", "\\\""))).append("\"");
 			out.append("},");
 		}
 

@@ -52,8 +52,7 @@ public class DungeonsCommand extends Command {
 					.defaultPlayerPaginator(PaginatorExtras.PaginatorType.EMBED_FIELDS)
 					.setColumns(3)
 					.setItemsPerPage(9);
-				PaginatorExtras extras = paginateBuilder.getPaginatorExtras();
-				extras.setEveryPageText(
+				PaginatorExtras extras = paginateBuilder.getPaginatorExtras().setEveryPageText(
 					"**Secrets:** " + formatNumber(player.getDungeonSecrets()) + "\n**Selected Class:** " + player.getSelectedDungeonClass()
 				);
 
@@ -112,7 +111,7 @@ public class DungeonsCommand extends Command {
 					}
 				}
 
-				event.paginate(paginateBuilder.setPaginatorExtras(extras));
+				event.paginate(paginateBuilder);
 				return null;
 			} catch (Exception e) {
 				return invalidEmbed("Player has not played dungeons");
